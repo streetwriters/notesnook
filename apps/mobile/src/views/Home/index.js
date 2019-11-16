@@ -92,6 +92,7 @@ export const Home = ({navigation}) => {
               style={{
                 fontSize: SIZE.sm - 2,
                 color: colors.icon,
+                fontFamily: WEIGHT.regular,
               }}>
               Reminders
             </Text>
@@ -121,6 +122,7 @@ export const Home = ({navigation}) => {
               style={{
                 fontSize: SIZE.sm - 2,
                 color: colors.icon,
+                fontFamily: WEIGHT.regular,
               }}>
               Lists
             </Text>
@@ -153,7 +155,6 @@ export const Search = () => {
         backgroundColor: '#f0f0f0',
         alignSelf: 'center',
         borderRadius: br,
-        fontSize: SIZE.sm,
         paddingHorizontal: ph,
         paddingVertical: pv - 5,
         elevation: 5,
@@ -161,12 +162,19 @@ export const Search = () => {
       }}>
       <TextInput
         style={{
-          fontFamily: 'Quicksand-Light',
+          fontFamily: WEIGHT.regular,
           maxWidth: '90%',
+          width: '90%',
         }}
+        numberOfLines={1}
         placeholder="Search your notes"
       />
-      <Icon name="ios-search" color={colors.icon} size={SIZE.xxl} />
+      <Icon
+        style={{paddingRight: '2.5%'}}
+        name="ios-search"
+        color={colors.icon}
+        size={SIZE.xl}
+      />
     </View>
   );
 };
@@ -185,7 +193,7 @@ export const Reminder = () => {
         backgroundColor: colors.accent,
         elevation: 5,
         paddingHorizontal: ph,
-        paddingVertical: pv - 5,
+        paddingVertical: 5,
       }}>
       <View
         style={{
@@ -203,17 +211,24 @@ export const Reminder = () => {
           color="white"
           size={SIZE.md}
         />
+
         <Text
           style={{
-            color: 'white',
-            fontWeight: 'bold',
-            fontSize: SIZE.lg,
+            paddingBottom: 5,
           }}>
-          Pay Utility Bills
           <Text
             style={{
-              fontWeight: 'normal',
+              color: 'white',
+              fontSize: SIZE.lg,
+              fontFamily: WEIGHT.bold,
+            }}>
+            Pay Utility Bills
+          </Text>
+          <Text
+            style={{
+              fontFamily: WEIGHT.light,
               fontSize: SIZE.xs,
+              color: 'white',
             }}>
             {'\n'}
             Amount 5000 RS
@@ -223,14 +238,21 @@ export const Reminder = () => {
         <Text
           style={{
             color: 'white',
-            fontSize: SIZE.xxxl,
+            fontSize: SIZE.xxl,
+            fontFamily: WEIGHT.light,
           }}>
+          <Text
+            style={{
+              fontSize: SIZE.xs,
+            }}>
+            in
+          </Text>
           00:00{''}
           <Text
             style={{
               fontSize: SIZE.xs,
             }}>
-            min
+            mins
           </Text>
         </Text>
       </View>
@@ -255,8 +277,9 @@ export const RecentList = () => {
           style={{
             fontSize: SIZE.lg,
             color: colors.icon,
+            fontFamily: WEIGHT.regular,
           }}>
-          Recent
+          Recents
         </Text>
         <Icon name="ios-albums" color={colors.icon} size={SIZE.xl} />
       </View>
@@ -303,10 +326,10 @@ export const RecentList = () => {
             }}>
             <Text
               style={{
-                fontWeight: 'bold',
                 fontSize: SIZE.md,
                 paddingHorizontal: ph,
                 paddingTop: pv,
+                fontFamily: WEIGHT.bold,
               }}>
               {item.title}
             </Text>
@@ -314,6 +337,8 @@ export const RecentList = () => {
               style={{
                 fontSize: SIZE.xs + 1,
                 paddingHorizontal: ph,
+                color: colors.icon,
+                fontFamily: WEIGHT.regular,
               }}>
               {item.headline}
             </Text>
@@ -333,6 +358,7 @@ export const RecentList = () => {
                   color: colors.accent,
                   fontSize: SIZE.xxs,
                   textAlignVertical: 'center',
+                  fontFamily: WEIGHT.regular,
                 }}>
                 {item.timestamp + '  '}
               </Text>
