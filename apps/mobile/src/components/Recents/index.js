@@ -19,26 +19,6 @@ export const RecentList = () => {
   const [colors, setColors] = useState(COLOR_SCHEME);
   return (
     <>
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          paddingHorizontal: '5%',
-          marginTop: '7.5%',
-          marginBottom: '0%',
-        }}>
-        <Text
-          style={{
-            fontSize: SIZE.lg,
-            color: colors.icon,
-            fontFamily: WEIGHT.regular,
-          }}>
-          Recents
-        </Text>
-        <Icon name="ios-albums" color={colors.icon} size={SIZE.xl} />
-      </View>
-
       <FlatList
         data={[
           {

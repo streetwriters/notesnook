@@ -7,5 +7,6 @@ export const styles = StyleSheet.create({
     height: '100%',
     alignSelf: 'center',
     height: '100%',
+    backgroundColor: 'white',
   },
 });

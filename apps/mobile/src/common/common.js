@@ -3,11 +3,11 @@
 export function setColorScheme(
   night = false,
   bg = 'white',
-  fg = '#0000FF',
+  fg = '#1790F3',
   nav = '#f2f2f2',
   pri = 'black',
   sec = 'white',
-  accent = '#0000FF',
+  accent = '#1790F3',
   normal = 'black',
   icon = ICONS_COLOR,
 ) {
@@ -27,11 +27,11 @@ export function setColorScheme(
 export const COLOR_SCHEME = {
   night: false,
   bg: 'white',
-  fg: '#0000FF',
+  fg: '#0560FF',
   navbg: '#f2f2f2',
   pri: 'black',
   sec: 'white',
-  accent: '#0000FF',
+  accent: '#0560FF',
   normal: 'black',
   icon: 'gray',
 };

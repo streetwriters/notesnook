@@ -1,17 +1,21 @@
-import { createAppContainer, NavigationActions } from "react-navigation";
-import {createStackNavigator} from "react-navigation-stack";
-import Home from "../views/Home/index";
+import {createAppContainer, NavigationActions} from 'react-navigation';
+import {createStackNavigator} from 'react-navigation-stack';
+import Home from '../views/Home/index';
+import Editor from '../views/Editor';
 
 const TopLevelNavigator = createStackNavigator(
-    {
-      Home: {
-        screen: Home
-      }
+  {
+    Home: {
+      screen: Home,
     },
-    {
-      initialRouteName: "Home"
-    }
-  );
+    Editor: {
+      screen: Editor,
+    },
+  },
+  {
+    initialRouteName: 'Home',
+  },
+);
 
 export const AppContainer = createAppContainer(TopLevelNavigator);
 
@@ -25,8 +29,8 @@ function navigate(routeName, params) {
   _navigator.dispatch(
     NavigationActions.navigate({
       routeName,
-      params
-    })
+      params,
+    }),
   );
 }
 
@@ -34,5 +38,5 @@ function navigate(routeName, params) {
 
 export default {
   navigate,
-  setTopLevelNavigator
+  setTopLevelNavigator,
 };

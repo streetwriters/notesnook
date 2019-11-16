@@ -1,5 +1,5 @@
 import React, {Fragment, useEffect, useState} from 'react';
-import {View, TextInput} from 'react-native';
+import {View, TextInput, Platform} from 'react-native';
 import {
   COLOR_SCHEME,
   SIZE,
@@ -11,12 +11,14 @@ import {
   WEIGHT,
 } from '../../common/common';
 import Icon from 'react-native-vector-icons/Ionicons';
+import {getElevation} from '../../utils/utils';
 
 export const Search = () => {
   const [colors, setColors] = useState(COLOR_SCHEME);
   return (
     <View
       style={{
+        ...getElevation(10),
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -25,15 +27,16 @@ export const Search = () => {
         alignSelf: 'center',
         borderRadius: br,
         paddingHorizontal: ph,
-        paddingVertical: pv - 5,
-        elevation: 5,
-        marginTop: 25,
+        paddingVertical: Platform.OS == 'ios' ? pv : pv - 5,
+        marginTop: 10,
+        marginBottom: 25,
       }}>
       <TextInput
         style={{
           fontFamily: WEIGHT.regular,
           maxWidth: '90%',
           width: '90%',
+          fontSize: SIZE.md,
         }}
         numberOfLines={1}
         placeholder="Search your notes"

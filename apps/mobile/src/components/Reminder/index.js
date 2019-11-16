@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {View, Text, TouchableOpacity} from 'react-native';
+import {View, Text, TouchableOpacity, Platform, Dimensions} from 'react-native';
 import {
   COLOR_SCHEME,
   SIZE,
@@ -11,7 +11,9 @@ import {
   WEIGHT,
 } from '../../common/common';
 import Icon from 'react-native-vector-icons/Ionicons';
-
+import {getElevation} from '../../utils/utils';
+const w = Dimensions.get('window').width;
+const h = Dimensions.get('window').height;
 export const Reminder = () => {
   const [colors, setColors] = useState(COLOR_SCHEME);
 
@@ -19,12 +21,12 @@ export const Reminder = () => {
     <TouchableOpacity
       activeOpacity={opacity}
       style={{
+        ...getElevation(10),
         width: '90%',
-        marginVertical: '5%',
+        marginVertical: Platform.OS === 'ios' ? h * 0.02 : '5%',
         alignSelf: 'center',
         borderRadius: br,
         backgroundColor: colors.accent,
-        elevation: 5,
         paddingHorizontal: ph,
         paddingVertical: 5,
       }}>
