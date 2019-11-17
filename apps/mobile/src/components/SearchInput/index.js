@@ -27,9 +27,8 @@ export const Search = () => {
         alignSelf: 'center',
         borderRadius: br,
         paddingHorizontal: ph,
-        paddingVertical: Platform.OS == 'ios' ? pv : pv - 5,
-        marginTop: 10,
-        marginBottom: 25,
+        paddingVertical: Platform.OS == 'ios' ? pv - 3 : pv - 8,
+        marginBottom: 10,
       }}>
       <TextInput
         style={{

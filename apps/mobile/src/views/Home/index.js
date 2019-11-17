@@ -28,6 +28,7 @@ import {Search} from '../../components/SearchInput';
 import {Reminder} from '../../components/Reminder';
 import {RecentList} from '../../components/Recents';
 import {getElevation} from '../../utils/utils';
+import {FlatList} from 'react-native-gesture-handler';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
@@ -35,12 +36,24 @@ export const Home = ({navigation}) => {
   const [loading, setLoading] = useState(true);
   const [colors, setColors] = useState(COLOR_SCHEME);
 
-  const RenderMenu = (
+  const RenderSideMenu = (
     <SafeAreaView
       style={{
         height: '100%',
-        backgroundColor: colors.accent,
+        justifyContent: 'center',
       }}>
+      <View
+        style={{
+          backgroundColor: colors.accent,
+          height: h * 0.5,
+          width: h * 0.5,
+          position: 'absolute',
+          top: h * -0.15,
+          left: h * -0.2,
+          transform: [{rotateZ: '340deg'}],
+          borderRadius: 100,
+        }}
+      />
       <View
         style={{
           height: '25%',
@@ -74,14 +87,13 @@ export const Home = ({navigation}) => {
             fontSize: SIZE.xs,
             marginTop: 10,
           }}>
-          Usage: 80.45/100 MB
+          80.45/100 MB
         </Text>
 
         <View
           style={{
             borderRadius: 2.5,
             backgroundColor: 'white',
-            ...getElevation(10),
             marginTop: 10,
             paddingHorizontal: 5,
             paddingVertical: 2,
@@ -89,8 +101,8 @@ export const Home = ({navigation}) => {
           <Text
             style={{
               fontFamily: WEIGHT.regular,
-
               fontSize: SIZE.xxs,
+              color: colors.accent,
             }}>
             Basic User
           </Text>
@@ -99,133 +111,57 @@ export const Home = ({navigation}) => {
 
       <View
         style={{
-          ...getElevation(5),
-          backgroundColor: 'white',
+          backgroundColor: colors.navbg,
           width: '90%',
           alignSelf: 'center',
           height: '60%',
           marginVertical: 10,
           borderRadius: 5,
         }}>
-        <View
-          style={{
-            backgroundColor: 'white',
-            width: '100%',
-            alignSelf: 'center',
-            flexDirection: 'row',
-            justifyContent: 'flex-start',
-            alignItems: 'center',
-            paddingHorizontal: ph,
-            marginVertical: 10,
-          }}>
-          <Icon
-            style={{
-              width: 30,
-            }}
-            name="ios-home"
-            color={colors.icon}
-            size={SIZE.lg}
-          />
-          <Text
-            style={{
-              fontFamily: WEIGHT.medium,
-              fontSize: SIZE.sm,
-              marginTop: -5,
-            }}>
-            Home
-          </Text>
-        </View>
-        <View
-          style={{
-            backgroundColor: 'white',
-            width: '100%',
-            alignSelf: 'center',
-            flexDirection: 'row',
-            justifyContent: 'flex-start',
-            alignItems: 'center',
-            paddingHorizontal: ph,
-            marginVertical: 10,
-          }}>
-          <Icon
-            style={{
-              width: 30,
-            }}
-            name="ios-heart"
-            color={colors.icon}
-            size={SIZE.lg}
-          />
-          <Text
-            style={{
-              fontFamily: WEIGHT.medium,
-              fontSize: SIZE.sm,
-              marginTop: -5,
-            }}>
-            Favourites
-          </Text>
-        </View>
-        <View
-          style={{
-            backgroundColor: 'white',
-            width: '100%',
-            alignSelf: 'center',
-            flexDirection: 'row',
-            justifyContent: 'flex-start',
-            alignItems: 'center',
-            paddingHorizontal: ph,
-            marginVertical: 10,
-          }}>
-          <Icon
-            style={{
-              width: 30,
-            }}
-            name="ios-settings"
-            color={colors.icon}
-            size={SIZE.lg}
-          />
-          <Text
-            style={{
-              fontFamily: WEIGHT.medium,
-              fontSize: SIZE.sm,
-              marginTop: -5,
-            }}>
-            Settings
-          </Text>
-        </View>
-        <View
-          style={{
-            backgroundColor: 'white',
-            width: '100%',
-            alignSelf: 'center',
-            flexDirection: 'row',
-            justifyContent: 'flex-start',
-            alignItems: 'center',
-            paddingHorizontal: ph,
-            marginVertical: 10,
-          }}>
-          <Icon
-            style={{
-              width: 30,
-            }}
-            name="ios-sync"
-            color={colors.icon}
-            size={SIZE.lg}
-          />
-          <Text
-            style={{
-              fontFamily: WEIGHT.medium,
-              fontSize: SIZE.sm,
-              marginTop: -5,
-            }}>
-            Sync
-          </Text>
-        </View>
+        <FlatList
+          data={[
+            {
+              name: 'Home',
+              icon: 'ios-home',
+            },
+          ]}
+          keyExtractor={(item, index) => item.name}
+          renderItem={({item, index}) => (
+            <TouchableOpacity
+              activeOpacity={opacity}
+              style={{
+                width: '100%',
+                alignSelf: 'center',
+                flexDirection: 'row',
+                justifyContent: 'flex-start',
+                alignItems: 'center',
+                paddingHorizontal: ph,
+                marginVertical: 10,
+              }}>
+              <Icon
+                style={{
+                  width: 30,
+                }}
+                name={item.icon}
+                color={colors.icon}
+                size={SIZE.lg}
+              />
+              <Text
+                style={{
+                  fontFamily: WEIGHT.medium,
+                  fontSize: SIZE.sm,
+                  marginTop: -5,
+                }}>
+                {item.name}
+              </Text>
+            </TouchableOpacity>
+          )}
+        />
       </View>
 
       <View
         style={{
-          ...getElevation(5),
           backgroundColor: '#F3A712',
-
           width: '90%',
           alignSelf: 'center',
           borderRadius: 5,
@@ -258,26 +194,6 @@ export const Home = ({navigation}) => {
     </SafeAreaView>
   );
 
-  let data = [
-    {
-      name: '',
-      icon: 'md-add',
-      func: () => {
-        NavigationService.navigate('Editor');
-      },
-    },
-    {
-      name: 'Reminders',
-      icon: 'ios-clock',
-      func: () => {},
-    },
-    {
-      name: 'Lists',
-      icon: 'ios-list',
-      func: () => {},
-    },
-  ];
-
   useEffect(() => {
     setTimeout(() => {
       setLoading(false);
@@ -285,7 +201,10 @@ export const Home = ({navigation}) => {
   });
 
   return (
-    <SideMenu menu={RenderMenu} openMenuOffset={w / 1.5}>
+    <SideMenu
+      bounceBackOnOverdraw={false}
+      menu={RenderSideMenu}
+      openMenuOffset={w / 1.5}>
       <SafeAreaView style={styles.container}>
         <View
           style={{
@@ -293,8 +212,8 @@ export const Home = ({navigation}) => {
             justifyContent: 'space-between',
             alignItems: 'center',
             paddingHorizontal: '5%',
-            marginTop: Platform.OS == 'ios' ? h * 0.02 : '7.5%',
-            marginBottom: h * 0.02,
+            marginTop: Platform.OS == 'ios' ? h * 0.02 : h * 0.04,
+            marginBottom: h * 0.04,
           }}>
           <Text
             style={{
@@ -304,69 +223,10 @@ export const Home = ({navigation}) => {
             }}>
             Notes
           </Text>
-          <Icon name="md-more" color={colors.icon} size={SIZE.xxxl} />
+          <Icon name="md-more" color={colors.icon} size={SIZE.xxl} />
         </View>
 
         <Search />
-
-        <ScrollView
-          horizontal={true}
-          style={{
-            paddingHorizontal: '4%',
-            height: 200,
-          }}
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{
-            justifyContent: 'flex-start',
-            alignItems: 'center',
-            flexDirection: 'row',
-          }}>
-          {data.map(item => (
-            <TouchableOpacity
-              onPress={item.func}
-              activeOpacity={opacity}
-              style={{
-                ...getElevation(5),
-                width: 100,
-                height: 100,
-                borderRadius: br,
-                backgroundColor:
-                  item.icon === 'md-add' ? colors.accent : '#f0f0f0',
-                justifyContent: 'center',
-                alignItems: 'center',
-
-                marginRight: 30,
-                marginLeft: 5,
-              }}>
-              <View
-                style={{
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}>
-                <Icon
-                  name={item.icon}
-                  color={item.icon === 'md-add' ? 'white' : colors.icon}
-                  size={SIZE.xxl}
-                />
-                {item.name !== '' ? (
-                  <Text
-                    style={{
-                      fontSize: SIZE.sm - 2,
-                      color: colors.icon,
-                      fontFamily: WEIGHT.regular,
-                    }}>
-                    {item.name}
-                  </Text>
-                ) : (
-                  undefined
-                )}
-              </View>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-
-        <Reminder />
-
         <RecentList />
       </SafeAreaView>
     </SideMenu>
