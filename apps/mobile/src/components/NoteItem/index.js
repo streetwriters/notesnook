@@ -37,24 +37,46 @@ const NoteItem = props => {
         backgroundColor: '#f0f0f0',
         marginVertical: h * 0.015,
         borderRadius: br,
-        flexDirection: 'row',
+
         justifyContent: 'center',
         alignItems: 'center',
         padding: pv,
       }}>
       <View
         style={{
-          width: '92%',
-          justifyContent: 'center',
-          alignItems: 'flex-start',
+          width: '100%',
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
         }}>
         <Text
+          numberOfLines={1}
           style={{
+            color: colors.pri,
             fontSize: SIZE.md,
             fontFamily: WEIGHT.bold,
+            maxWidth: '100%',
           }}>
           {item.title}
         </Text>
+
+        <View
+          style={{
+            width: '20%',
+            justifyContent: 'space-between',
+            flexDirection: 'row',
+            alignItems: 'center',
+          }}>
+          <Icon name="md-share-alt" size={SIZE.lg} color={colors.icon} />
+          <Icon name="md-star" size={SIZE.lg} color={colors.icon} />
+          <Icon name="md-more" size={SIZE.lg} color={colors.icon} />
+        </View>
+      </View>
+      <View
+        style={{
+          justifyContent: 'center',
+          alignItems: 'flex-start',
+        }}>
         <Text
           style={{
             fontSize: SIZE.xs + 1,
@@ -74,15 +96,6 @@ const NoteItem = props => {
           {item.timestamp + '  '}
         </Text>
       </View>
-      <TouchableOpacity
-        style={{
-          width: '8%',
-          justifyContent: 'center',
-          alignItems: 'center',
-          minHeight: 60,
-        }}>
-        <Icon name="md-more" size={SIZE.xl} color={colors.accent} />
-      </TouchableOpacity>
     </View>
   );
 };

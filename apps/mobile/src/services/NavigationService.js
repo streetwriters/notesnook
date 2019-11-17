@@ -2,6 +2,8 @@ import {createAppContainer, NavigationActions} from 'react-navigation';
 import {createStackNavigator} from 'react-navigation-stack';
 import Home from '../views/Home/index';
 import Editor from '../views/Editor';
+import Reminders from '../views/Reminders';
+import Lists from '../views/Lists';
 
 const TopLevelNavigator = createStackNavigator(
   {
@@ -10,6 +12,12 @@ const TopLevelNavigator = createStackNavigator(
     },
     Editor: {
       screen: Editor,
+    },
+    Reminders: {
+      screen: Reminders,
+    },
+    Lists: {
+      screen: Lists,
     },
   },
   {

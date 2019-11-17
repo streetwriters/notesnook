@@ -23,6 +23,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import {Reminder} from '../Reminder';
 import {getElevation} from '../../utils/utils';
 import NoteItem from '../NoteItem';
+import NavigationService from '../../services/NavigationService';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
@@ -72,12 +73,16 @@ export const RecentList = () => {
     {
       name: 'Reminders',
       icon: 'ios-clock',
-      func: () => {},
+      func: () => {
+        NavigationService.navigate('Reminders');
+      },
     },
     {
       name: 'Lists',
       icon: 'ios-list',
-      func: () => {},
+      func: () => {
+        NavigationService.navigate('Lists');
+      },
     },
   ];
 

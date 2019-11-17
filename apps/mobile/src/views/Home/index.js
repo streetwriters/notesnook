@@ -8,6 +8,7 @@ import {
   Image,
   SafeAreaView,
   Platform,
+  FlatList,
 } from 'react-native';
 import NavigationService from '../../services/NavigationService';
 import {
@@ -28,7 +29,6 @@ import {Search} from '../../components/SearchInput';
 import {Reminder} from '../../components/Reminder';
 import {RecentList} from '../../components/Recents';
 import {getElevation} from '../../utils/utils';
-import {FlatList} from 'react-native-gesture-handler';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
