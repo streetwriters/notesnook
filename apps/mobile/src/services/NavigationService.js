@@ -4,6 +4,8 @@ import Home from '../views/Home/index';
 import Editor from '../views/Editor';
 import Reminders from '../views/Reminders';
 import Lists from '../views/Lists';
+import Folders from '../views/Folders';
+import Favorites from '../views/Favorites';
 
 const TopLevelNavigator = createStackNavigator(
   {
@@ -18,6 +20,12 @@ const TopLevelNavigator = createStackNavigator(
     },
     Lists: {
       screen: Lists,
+    },
+    Folders: {
+      screen: Folders,
+    },
+    Favorites: {
+      screen: Favorites,
     },
   },
   {

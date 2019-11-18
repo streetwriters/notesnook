@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, createRef} from 'react';
 import {
   ScrollView,
   View,
@@ -35,7 +35,7 @@ const h = Dimensions.get('window').height;
 export const Home = ({navigation}) => {
   const [loading, setLoading] = useState(true);
   const [colors, setColors] = useState(COLOR_SCHEME);
-
+  const [isOpen, setOpen] = useState(false);
   const RenderSideMenu = (
     <SafeAreaView
       style={{
@@ -44,23 +44,12 @@ export const Home = ({navigation}) => {
       }}>
       <View
         style={{
-          backgroundColor: colors.accent,
-          height: h * 0.5,
-          width: h * 0.5,
-          position: 'absolute',
-          top: h * -0.15,
-          left: h * -0.2,
-          transform: [{rotateZ: '340deg'}],
-          borderRadius: 100,
-        }}
-      />
-      <View
-        style={{
           height: '25%',
           width: '100%',
           justifyContent: 'center',
           alignItems: 'center',
           alignSelf: 'center',
+          backgroundColor: colors.accent,
         }}>
         <Image
           style={{
@@ -111,8 +100,7 @@ export const Home = ({navigation}) => {
 
       <View
         style={{
-          backgroundColor: colors.navbg,
-          width: '90%',
+          width: '100%',
           alignSelf: 'center',
           height: '60%',
           marginVertical: 10,
@@ -123,12 +111,27 @@ export const Home = ({navigation}) => {
             {
               name: 'Home',
               icon: 'ios-home',
+              func: () => NavigationService.navigate('Home'),
+            },
+            {
+              name: 'Favorites',
+              icon: 'md-star',
+              func: () => NavigationService.navigate('Favorites'),
+            },
+            {
+              name: 'Folders',
+              icon: 'md-folder',
+              func: () => NavigationService.navigate('Folders'),
             },
           ]}
           keyExtractor={(item, index) => item.name}
           renderItem={({item, index}) => (
             <TouchableOpacity
               activeOpacity={opacity}
+              onPress={() => {
+                item.func();
+                setOpen(false);
+              }}
               style={{
                 width: '100%',
                 alignSelf: 'center',
@@ -162,7 +165,7 @@ export const Home = ({navigation}) => {
       <View
         style={{
           backgroundColor: '#F3A712',
-          width: '90%',
+          width: '95%',
           alignSelf: 'center',
           borderRadius: 5,
           flexDirection: 'row',
@@ -202,7 +205,11 @@ export const Home = ({navigation}) => {
 
   return (
     <SideMenu
+      isOpen={isOpen}
       bounceBackOnOverdraw={false}
+      onChange={args => {
+        setOpen(args);
+      }}
       menu={RenderSideMenu}
       openMenuOffset={w / 1.5}>
       <SafeAreaView style={styles.container}>
