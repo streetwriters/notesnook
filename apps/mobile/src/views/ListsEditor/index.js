@@ -44,7 +44,11 @@ export function useForceUpdate() {
 const ListsEditor = ({navigation}) => {
   const [colors, setColors] = useState(COLOR_SCHEME);
   const [listData, setListData] = useState(['']);
+  const [deleteItemsList, setDeleteItemsList] = useState([]);
+  const [deleteMode, setDeleteMode] = useState(false);
+
   const forceUpdate = useForceUpdate();
+
   const _textRender = createRef();
   let prevItem = null;
   let prevIndex = null;
@@ -108,6 +112,25 @@ const ListsEditor = ({navigation}) => {
           <ListItem
             item={item}
             index={index}
+            deleteItemsList={deleteItemsList}
+            deleteMode={deleteMode}
+            addToDeleteList={index => {
+              let items = deleteItemsList;
+              console.log(items);
+              if (items.includes(index)) {
+                let i = items.indexOf(index);
+                items.splice(i, 1);
+                setDeleteItemsList(items);
+                console.log(JSON.stringify(deleteItemsList), 'splice');
+              } else {
+                items[items.length] = index;
+                console.log(JSON.stringify(items), 'here');
+
+                setDeleteItemsList(items);
+              }
+              items = null;
+              forceUpdate();
+            }}
             onSubmit={(text, index, willFocus = true) => {
               let oldData = listData;
               oldData[index] = text;
@@ -202,6 +225,7 @@ const ListItem = props => {
       </Text>
       <TextInput
         ref={inputRef}
+        editable={props.deleteMode ? false : true}
         placeholder={'List item - tap to edit'}
         style={{
           paddingVertical: 5,
@@ -230,7 +254,7 @@ const ListItem = props => {
           }
         }}
       />
-      {showSubmit ? (
+      {showSubmit && !props.deleteMode ? (
         <TouchableOpacity
           activeOpacity={opacity}
           onPress={() => props.onSubmit(text, props.index)}
@@ -246,6 +270,37 @@ const ListItem = props => {
             marginLeft: 5,
           }}>
           <Icon name="ios-checkmark" color={colors.accent} size={SIZE.md} />
+        </TouchableOpacity>
+      ) : (
+        undefined
+      )}
+      {props.deleteMode ? (
+        <TouchableOpacity
+          activeOpacity={opacity}
+          onPress={() => props.addToDeleteList(props.index)}
+          style={{
+            paddingVertical: 5,
+            height: 40,
+            minWidth: w * 0.9 * 0.1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            color: 'white',
+            backgroundColor: props.deleteItemsList.includes(props.index)
+              ? colors.accent
+              : colors.navbg,
+            borderRadius: 5,
+            borderColor: props.deleteItemsList.includes(props.index)
+              ? colors.accent
+              : 'transparent',
+            borderWidth: 1,
+
+            marginLeft: 5,
+          }}>
+          {props.deleteItemsList.includes(props.index) ? (
+            <Icon name="ios-checkmark" color="white" size={SIZE.xl} />
+          ) : (
+            undefined
+          )}
         </TouchableOpacity>
       ) : (
         undefined
