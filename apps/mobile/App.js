@@ -49,7 +49,9 @@ const App = () => {
           hideShadow={true}
           buttonColor="#3498db"
           title=""
-          onPress={() => {}}>
+          onPress={() => {
+            NavigationService.navigate('ListsEditor');
+          }}>
           <Icon
             name="ios-list"
             style={{

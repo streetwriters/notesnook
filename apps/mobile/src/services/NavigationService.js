@@ -6,6 +6,7 @@ import Reminders from '../views/Reminders';
 import Lists from '../views/Lists';
 import Folders from '../views/Folders';
 import Favorites from '../views/Favorites';
+import ListsEditor from '../views/ListsEditor';
 
 const TopLevelNavigator = createStackNavigator(
   {
@@ -26,6 +27,9 @@ const TopLevelNavigator = createStackNavigator(
     },
     Favorites: {
       screen: Favorites,
+    },
+    ListsEditor: {
+      screen: ListsEditor,
     },
   },
   {
