@@ -3,9 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "emotion-theming": "^10.0.19",
     "react": "^16.11.0",
     "react-dom": "^16.11.0",
-    "react-scripts": "3.2.0"
+    "react-feather": "^2.0.3",
+    "react-scripts": "3.2.0",
+    "rebass": "^4.0.7"
   },
   "scripts": {
     "start": "react-scripts start",
