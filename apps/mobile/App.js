@@ -69,7 +69,9 @@ const App = () => {
           hideShadow={true}
           buttonColor="#1abc9c"
           title=""
-          onPress={() => {}}>
+          onPress={() => {
+            NavigationService.navigate('ReminderEditor');
+          }}>
           <Icon
             name="ios-clock"
             style={{

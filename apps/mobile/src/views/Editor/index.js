@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   TextInput,
   SafeAreaView,
+  StatusBar,
 } from 'react-native';
 import {
   COLOR_SCHEME,
@@ -18,7 +19,7 @@ import {
   WEIGHT,
 } from '../../common/common';
 import Icon from 'react-native-vector-icons/Ionicons';
-
+import RichText from 'react-native-rich-text';
 const saveText = (type, title, content) => {
   let data = {
     type,
@@ -35,58 +36,25 @@ const Editor = ({navigation}) => {
   const _textRender = createRef();
 
   return (
-    <SafeAreaView>
+    <SafeAreaView
+      style={{
+        height: '100%',
+      }}>
       <View
         style={{
           width: '100%',
           paddingHorizontal: '5%',
-          paddingVertical: pv + 5,
-          borderBottomWidth: 1,
-          borderBottomColor: colors.navbg,
+          paddingVertical: pv,
+
           alignSelf: 'center',
+          marginTop: 25,
         }}>
         <Icon name="ios-arrow-back" size={SIZE.xl} color="black" />
       </View>
 
-      <TextInput
-        style={{
-          width: '100%',
-          maxWidth: '100%',
-          textAlignVertical: 'top',
-          fontSize: SIZE.xl,
-          fontFamily: WEIGHT.semibold,
-          paddingHorizontal: '5%',
-          paddingVertical: ph,
-        }}
-        allowFontScaling={true}
-        adjustsFontSizeToFit={true}
-        maxLength={50}
-        numberOfLines={1}
-        placeholderTextColor={colors.icon}
-        placeholder="Untitled Note"
-        onChangeText={value => {
-          _heading = value;
-        }}
-      />
-
-      <TextInput
-        ref={_textRender}
-        style={{
-          width: '100%',
-          maxWidth: '100%',
-          textAlignVertical: 'top',
-          fontSize: SIZE.md,
-          fontFamily: WEIGHT.semibold,
-          paddingHorizontal: '5%',
-          paddingVertical: ph,
-        }}
-        multiline={true}
-        placeholder="Start writing"
-        placeholderTextColor={colors.icon}
-        onChangeText={value => {
-          _text = value;
-        }}
-      />
+      <RichText value="">
+        <RichText.Editor onChangeText={text => console.log(text)} />
+      </RichText>
     </SafeAreaView>
   );
 };

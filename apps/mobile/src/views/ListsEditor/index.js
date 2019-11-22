@@ -48,7 +48,6 @@ const ListsEditor = ({navigation}) => {
   const [deleteMode, setDeleteMode] = useState(false);
 
   const forceUpdate = useForceUpdate();
-
   const _textRender = createRef();
   let prevItem = null;
   let prevIndex = null;
@@ -67,7 +66,7 @@ const ListsEditor = ({navigation}) => {
         }}>
         <TextInput
           style={{
-            fontSize: SIZE.xxl,
+            fontSize: SIZE.xl,
             color: colors.pri,
             fontFamily: WEIGHT.bold,
             paddingVertical: 0,
