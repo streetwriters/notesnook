@@ -32,8 +32,7 @@ const h = Dimensions.get('window').height;
 const data = [
   {
     title: 'One day about',
-    headline:
-      'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has',
+    headline: 'Lorem Ipsum  Lorem Ipsum has',
     timestamp: '2 hours ago',
     type: 'note',
   },
@@ -71,8 +70,8 @@ export const RecentList = () => {
       },
     },
     {
-      name: 'Reminders',
-      icon: 'ios-clock',
+      name: 'All Notes',
+      icon: 'md-create',
       func: () => {
         NavigationService.navigate('Reminders');
       },
@@ -164,8 +163,6 @@ export const RecentList = () => {
                 </TouchableOpacity>
               ))}
             </ScrollView>
-
-            <Reminder />
           </>
         }
         renderItem={({item, index}) => <NoteItem item={item} index={index} />}

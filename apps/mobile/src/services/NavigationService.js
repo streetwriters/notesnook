@@ -37,7 +37,7 @@ const TopLevelNavigator = createStackNavigator(
     },
   },
   {
-    initialRouteName: 'Editor',
+    initialRouteName: 'Home',
   },
 );
 

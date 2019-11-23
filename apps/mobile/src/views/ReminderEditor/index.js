@@ -54,7 +54,7 @@ const ReminderEditor = ({navigation}) => {
           justifyContent: 'space-between',
           alignItems: 'center',
           paddingHorizontal: '5%',
-          marginTop: Platform.OS == 'ios' ? h * 0.02 : h * 0.04,
+          marginTop: Platform.OS == 'ios' ? h * 0.01 : h * 0.04,
           marginBottom: h * 0.04,
         }}>
         <Text

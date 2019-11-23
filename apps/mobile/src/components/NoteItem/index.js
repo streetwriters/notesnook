@@ -74,14 +74,17 @@ const NoteItem = props => {
       </View>
       <View
         style={{
-          justifyContent: 'center',
+          justifyContent: 'flex-start',
           alignItems: 'flex-start',
+          width: '100%',
         }}>
         <Text
           style={{
             fontSize: SIZE.xs + 1,
             color: colors.icon,
             fontFamily: WEIGHT.regular,
+            width: '100%',
+            maxWidth: '100%',
           }}>
           {item.headline}
         </Text>

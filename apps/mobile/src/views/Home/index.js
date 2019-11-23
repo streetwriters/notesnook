@@ -49,7 +49,7 @@ export const Home = ({navigation}) => {
           justifyContent: 'center',
           alignItems: 'center',
           alignSelf: 'center',
-          backgroundColor: colors.accent,
+          backgroundColor: 'white',
         }}>
         <Image
           style={{
@@ -61,8 +61,8 @@ export const Home = ({navigation}) => {
         />
         <Text
           style={{
-            fontFamily: WEIGHT.regular,
-            color: 'white',
+            fontFamily: WEIGHT.semibold,
+            color: colors.accent,
             fontSize: SIZE.md,
             marginTop: 10,
           }}>
@@ -72,7 +72,7 @@ export const Home = ({navigation}) => {
         <Text
           style={{
             fontFamily: WEIGHT.regular,
-            color: 'white',
+            color: colors.accent,
             fontSize: SIZE.xs,
             marginTop: 10,
           }}>
@@ -82,16 +82,16 @@ export const Home = ({navigation}) => {
         <View
           style={{
             borderRadius: 2.5,
-            backgroundColor: 'white',
+            backgroundColor: colors.accent,
             marginTop: 10,
             paddingHorizontal: 5,
             paddingVertical: 2,
           }}>
           <Text
             style={{
-              fontFamily: WEIGHT.regular,
+              fontFamily: WEIGHT.bold,
               fontSize: SIZE.xxs,
-              color: colors.accent,
+              color: 'white',
             }}>
             Basic User
           </Text>
@@ -219,7 +219,7 @@ export const Home = ({navigation}) => {
             justifyContent: 'space-between',
             alignItems: 'center',
             paddingHorizontal: '5%',
-            marginTop: Platform.OS == 'ios' ? h * 0.02 : h * 0.04,
+            marginTop: Platform.OS == 'ios' ? h * 0.01 : h * 0.04,
             marginBottom: h * 0.04,
           }}>
           <Text
