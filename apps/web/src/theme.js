@@ -2,10 +2,12 @@ export default {
   breakpoints: ["40em", "52em", "64em"],
   colors: {
     primary: "white",
-    fontPrimary: "black",
     accent: "#1790F3",
     navbg: "#f0f0f0",
-    transparent: "#00000000"
+    transparent: "#00000000",
+    //font related
+    fontPrimary: "black",
+    fontSecondary: "white"
   },
   fontSizes: [12, 14, 16, 20, 24, 32, 48, 64],
   spaces: [0, 5, 10, 15, 20, 25],
@@ -26,7 +28,7 @@ export default {
   },
   radii: {
     none: 0,
-    default: 5
+    default: 10
   },
   buttons: {
     nav: {

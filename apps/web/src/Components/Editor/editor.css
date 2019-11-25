@@ -1,0 +1,45 @@
+.quill {
+  overflow-y: auto;
+  flex: 1 1 auto;
+}
+
+.ql-container.ql-snow {
+  border: none !important;
+}
+
+.ql-container.ql-snow {
+  overflow-y: none;
+}
+
+/*Quill Toolbar*/
+
+.ql-toolbar.ql-snow svg {
+  height: 22px !important;
+  width: 22px;
+}
+.ql-toolbar.ql-snow span {
+  padding-top: 1px;
+  font-size: 18px;
+}
+.ql-formats {
+  margin-bottom: 5px;
+}
+.ql-header.ql-picker {
+  width: 120px !important;
+}
+.ql-toolbar.ql-snow {
+  border: none !important;
+  border-bottom: 1px solid #f0f0f0 !important;
+  border-top: 1px solid #f0f0f0 !important;
+}
+
+.editor-title {
+  border: none;
+  font-family: Quicksand, sans-serif;
+  font-weight: 500;
+  padding: 12px 15px;
+  font-size: 42px;
+}
+.editor-title:focus {
+  outline: none;
+}

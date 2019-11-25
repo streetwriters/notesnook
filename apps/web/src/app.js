@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import "./app.css";
-import SideBar from "./Components/SideBar";
+import Editor from "./Components/Editor";
 import { ThemeProvider } from "emotion-theming";
-import { Flex, Box, Text, Button, Card } from "rebass";
+import { Flex, Box, Text, Button, Card, Heading } from "rebass";
 import * as Icon from "react-feather";
 import theme from "./theme";
 
@@ -29,27 +29,29 @@ const NavMenuItem = props => (
         }}
       />
       <props.item.icon
-        size={15}
-        style={{ marginTop: 2 /* correction with Quicksand font */ }}
+        size={25}
+        stroke-width={1.3}
+        style={{ marginRight: 3 }}
       />
-      <Text sx={{ fontSize: 15, marginLeft: 1 }}>{props.item.title}</Text>
+      {/*  <Text sx={{ fontSize: 15, marginLeft: 1 }}>{props.item.title}</Text> */}
     </Flex>
   </Button>
 );
 
 function App() {
   const navItems = [
+    { title: "Arkane", icon: Icon.User },
     { title: "Home", icon: Icon.Home },
     { title: "Notebooks", icon: Icon.Book },
     { title: "Folders", icon: Icon.Folder },
     { title: "Lists", icon: Icon.List },
     { title: "Get Pro", icon: Icon.Star }
   ];
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [selectedIndex, setSelectedIndex] = useState(1);
   return (
     <ThemeProvider theme={theme}>
       <Flex height="100%" alignContent="stretch">
-        <Box width="13%" bg="navbg" px={0}>
+        <Box width="4%" bg="navbg" px={0}>
           {navItems.map((item, index) => (
             <NavMenuItem
               onSelected={() => setSelectedIndex(index)}
@@ -59,9 +61,10 @@ function App() {
             />
           ))}
         </Box>
-        <Box px={2} py={2}>
-          <Card />
-        </Box>
+        <Flex flex="1 1 auto" flexDirection="row" alignContent="stretch" px={0}>
+          <Box bg="#fbfbfb" flex="1 1 auto" px={0}></Box>
+          <Editor />
+        </Flex>
       </Flex>
     </ThemeProvider>
   );

@@ -4,9 +4,14 @@
   "private": true,
   "dependencies": {
     "emotion-theming": "^10.0.19",
+    "quill-blot-formatter": "^1.0.5",
+    "quill-emoji": "^0.1.7",
+    "quill-magic-url": "^1.0.3",
+    "quill-markdown-shortcuts": "^0.0.10",
     "react": "^16.11.0",
     "react-dom": "^16.11.0",
     "react-feather": "^2.0.3",
+    "react-quill": "^1.3.3",
     "react-scripts": "3.2.0",
     "rebass": "^4.0.7"
   },
