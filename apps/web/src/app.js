@@ -61,9 +61,8 @@ function App() {
           ))}
         </Box>
         <Flex flex="1 1 auto" flexDirection="row" alignContent="stretch" px={0}>
-          <Box
+          <Flex
             bg="#fbfbfb"
-            display="flex"
             flexDirection="column"
             flex="1 1 auto"
             px={3}
@@ -83,7 +82,8 @@ function App() {
                 boxShadow: "0 0 3px 0px #f0f0f0"
               }}
             />
-          </Box>
+            <Box></Box>
+          </Flex>
           <Editor />
         </Flex>
       </Flex>
