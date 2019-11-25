@@ -28,11 +28,7 @@ const NavMenuItem = props => (
           borderBottomRightRadius: 3
         }}
       />
-      <props.item.icon
-        size={25}
-        stroke-width={1.3}
-        style={{ marginRight: 3 }}
-      />
+      <props.item.icon size={25} strokeWidth={1.3} style={{ marginRight: 3 }} />
       {/*  <Text sx={{ fontSize: 15, marginLeft: 1 }}>{props.item.title}</Text> */}
     </Flex>
   </Button>
@@ -67,12 +63,14 @@ function App() {
             flex="1 1 auto"
             px={3}
             py={3}
+            width="15%"
           >
             <Heading fontSize="heading">Notes</Heading>
             <input
               placeholder="Search"
               style={{
                 marginTop: 8,
+                marginBottom: 16,
                 borderRadius: 5,
                 borderWidth: 0,
                 padding: 13,
@@ -82,7 +80,26 @@ function App() {
                 boxShadow: "0 0 3px 0px #f0f0f0"
               }}
             />
-            <Box></Box>
+            <Box bg="primary" px={3} py={3} sx={{ borderRadius: "default" }}>
+              <Flex flexDirection="row" justifyContent="space-between">
+                <Text fontFamily="body" fontWeight="bold">
+                  This is a note title
+                </Text>
+                <Flex flexDirection="row">
+                  <Icon.Share2 size={20} strokeWidth={1.3} />
+                  <Icon.Heart
+                    size={20}
+                    strokeWidth={1.3}
+                    style={{ marginLeft: 5 }}
+                  />
+                  <Icon.MoreVertical size={20} strokeWidth={1.3} />
+                </Flex>
+              </Flex>
+              <Text fontFamily="body" fontSize="body">
+                You are born to be the greatest there ever was. Embrace your
+                true powers!
+              </Text>
+            </Box>
           </Flex>
           <Editor />
         </Flex>

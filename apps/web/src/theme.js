@@ -11,7 +11,8 @@ export default {
   },
   //fontSizes: [12, 14, 16, 20, 24, 32, 48, 64],
   fontSizes: {
-    heading: 42
+    heading: 42,
+    body: 14
   },
   fontWeights: {
     body: 500,
@@ -27,7 +28,7 @@ export default {
   },
   radii: {
     none: 0,
-    default: 10
+    default: 5
   },
   buttons: {
     nav: {
