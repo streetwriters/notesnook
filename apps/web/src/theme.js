@@ -9,8 +9,10 @@ export default {
     fontPrimary: "black",
     fontSecondary: "white"
   },
-  fontSizes: [12, 14, 16, 20, 24, 32, 48, 64],
-  spaces: [0, 5, 10, 15, 20, 25],
+  //fontSizes: [12, 14, 16, 20, 24, 32, 48, 64],
+  fontSizes: {
+    heading: 42
+  },
   fontWeights: {
     body: 500,
     heading: 700,
@@ -22,9 +24,6 @@ export default {
   },
   sizes: {
     full: "100%"
-  },
-  borders: {
-    none: 0
   },
   radii: {
     none: 0,

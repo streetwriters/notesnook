@@ -37,16 +37,15 @@ const NavMenuItem = props => (
     </Flex>
   </Button>
 );
-
+const navItems = [
+  { title: "Arkane", icon: Icon.User },
+  { title: "Home", icon: Icon.Home },
+  { title: "Notebooks", icon: Icon.Book },
+  { title: "Folders", icon: Icon.Folder },
+  { title: "Lists", icon: Icon.List },
+  { title: "Get Pro", icon: Icon.Star }
+];
 function App() {
-  const navItems = [
-    { title: "Arkane", icon: Icon.User },
-    { title: "Home", icon: Icon.Home },
-    { title: "Notebooks", icon: Icon.Book },
-    { title: "Folders", icon: Icon.Folder },
-    { title: "Lists", icon: Icon.List },
-    { title: "Get Pro", icon: Icon.Star }
-  ];
   const [selectedIndex, setSelectedIndex] = useState(1);
   return (
     <ThemeProvider theme={theme}>
@@ -62,7 +61,29 @@ function App() {
           ))}
         </Box>
         <Flex flex="1 1 auto" flexDirection="row" alignContent="stretch" px={0}>
-          <Box bg="#fbfbfb" flex="1 1 auto" px={0}></Box>
+          <Box
+            bg="#fbfbfb"
+            display="flex"
+            flexDirection="column"
+            flex="1 1 auto"
+            px={3}
+            py={3}
+          >
+            <Heading fontSize="heading">Notes</Heading>
+            <input
+              placeholder="Search"
+              style={{
+                marginTop: 8,
+                borderRadius: 5,
+                borderWidth: 0,
+                padding: 13,
+                fontFamily: "Quicksand, sans-serif",
+                fontWeight: 500,
+                fontSize: 16,
+                boxShadow: "0 0 3px 0px #f0f0f0"
+              }}
+            />
+          </Box>
           <Editor />
         </Flex>
       </Flex>
