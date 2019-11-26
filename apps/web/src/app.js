@@ -13,24 +13,17 @@ const NavMenuItem = props => (
     sx={{
       width: "full",
       borderRadius: "none",
-      textAlign: "left"
+      textAlign: "center",
+      color: props.selected ? "accent" : "fontPrimary"
     }}
     px={0}
   >
-    <Flex flexDirection="row">
-      <Box
-        bg="accent"
-        width={5}
-        sx={{
-          opacity: props.selected ? 1 : 0,
-          marginRight: 3,
-          borderTopRightRadius: 3,
-          borderBottomRightRadius: 3
-        }}
-      />
-      <props.item.icon size={25} strokeWidth={1.3} style={{ marginRight: 3 }} />
-      {/*  <Text sx={{ fontSize: 15, marginLeft: 1 }}>{props.item.title}</Text> */}
-    </Flex>
+    <props.item.icon
+      size={25}
+      strokeWidth={props.selected ? 2 : 1.3}
+      style={{ marginRight: 3 }}
+    />
+    {/*  <Text sx={{ fontSize: 15, marginLeft: 1 }}>{props.item.title}</Text> */}
   </Button>
 );
 const navItems = [
@@ -46,7 +39,7 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <Flex height="100%" alignContent="stretch">
-        <Box width="4%" bg="navbg" px={0}>
+        <Box minWidth={70} maxWidth={70} bg="navbg" px={0}>
           {navItems.map((item, index) => (
             <NavMenuItem
               onSelected={() => setSelectedIndex(index)}
