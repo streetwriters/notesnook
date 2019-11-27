@@ -12,8 +12,8 @@ export default class Convert {
     try {
       let firstChar = input[0];
       if (firstChar === "[" || firstChar === "{") return JSON.parse(input);
-      if (parseInt(input) !== NaN) return parseInt(input);
-      if (parseFloat(input) !== NaN) return parseFloat(input);
+      if (!isNaN(parseInt(input))) return parseInt(input);
+      if (!isNaN(parseFloat(input))) return parseFloat(input);
       if (parseBoolean(input) !== undefined) return parseBoolean(input);
       return input;
     } catch (error) {
