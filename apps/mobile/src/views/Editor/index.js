@@ -25,16 +25,32 @@ import WebView from 'react-native-webview';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useForceUpdate} from '../ListsEditor';
 import {NavigationEvents} from 'react-navigation';
+import {storage} from '../../../App';
 
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
-const saveText = (type, title, content) => {
+
+const saveText = async (type, title, content) => {
   let data = {
     type,
     title,
-    headline: content.slice(0, 60),
-    timestamp: Date.now(),
+    headline:
+      content.text.length < 80 ? content.text : content.text.slice(0, 80),
+    content,
+    favorite: false,
+    'date-created': Date.now(),
+    'last-edited': Date.now(),
+    length: content.text.length,
+    pinned: false,
+    size: 0,
+    colors: [],
+    tags: [],
+    folders: [],
   };
+
+  await storage.write('notes', [data]);
+
+  console.log(await storage.read('notes'));
 };
 
 const Editor = ({navigation}) => {
@@ -42,8 +58,9 @@ const Editor = ({navigation}) => {
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   let EditorWebView = createRef();
   const _textRender = createRef();
-  let _heading = '';
-  let _text = '';
+
+  let content, title, headline;
+
   let keyboardDidShowListener;
   let keyboardDidHideListener;
 
@@ -61,8 +78,8 @@ const Editor = ({navigation}) => {
 
   function onChangeText(data) {
     if (data !== '') {
-      let m = JSON.parse(data);
-      console.log(m);
+      content = JSON.parse(data);
+      saveText('note', title, content);
     }
   }
 
@@ -100,6 +117,9 @@ const Editor = ({navigation}) => {
               paddingHorizontal: '3%',
               paddingVertical: 0,
               marginTop: Platform.OS == 'ios' ? h * 0.01 : h * 0.04,
+            }}
+            onChangeText={value => {
+              title = value;
             }}
           />
 

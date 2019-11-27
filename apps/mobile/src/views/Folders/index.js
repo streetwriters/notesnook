@@ -49,7 +49,7 @@ export const Folders = ({navigation}) => {
             color: colors.pri,
             fontFamily: WEIGHT.bold,
           }}>
-          Folders
+          Notebooks
         </Text>
         <Icon name="md-more" color={colors.icon} size={SIZE.xxl} />
       </View>
@@ -94,11 +94,11 @@ export const Folders = ({navigation}) => {
               <Text
                 style={{
                   fontFamily: WEIGHT.regular,
-                  fontSize: SIZE.lg,
+                  fontSize: SIZE.md,
                   color: 'white',
                   opacity: 0.5,
                 }}>
-                {item.Qty} Files
+                {item.Qty} Notes
               </Text>
             </View>
             <Text

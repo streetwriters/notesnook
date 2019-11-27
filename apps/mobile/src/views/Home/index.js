@@ -44,22 +44,50 @@ export const Home = ({navigation}) => {
       }}>
       <View
         style={{
-          height: '25%',
           width: '100%',
-          justifyContent: 'center',
+          justifyContent: 'flex-start',
+          paddingHorizontal: '5%',
           alignItems: 'center',
           alignSelf: 'center',
           backgroundColor: 'white',
+          marginBottom: 20,
         }}>
         <Image
           style={{
             width: 80,
             height: 80,
             borderRadius: 100,
+            marginRight: 10,
           }}
           source={require('../../assets/images/img.png')}
         />
-        <Text
+
+        <TouchableOpacity
+          onPress={() => {
+            NavigationService.navigate('Login');
+          }}
+          activeOpacity={opacity}
+          style={{
+            paddingVertical: pv - 5,
+            paddingHorizontal: ph,
+            borderRadius: 5,
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginTop: 20,
+            borderColor: colors.accent,
+            backgroundColor: colors.bg,
+            borderWidth: 1,
+          }}>
+          <Text
+            style={{
+              fontFamily: WEIGHT.regular,
+              color: colors.accent,
+            }}>
+            Log in to Sync
+          </Text>
+        </TouchableOpacity>
+
+        {/* <Text
           style={{
             fontFamily: WEIGHT.semibold,
             color: colors.accent,
@@ -77,9 +105,9 @@ export const Home = ({navigation}) => {
             marginTop: 10,
           }}>
           80.45/100 MB
-        </Text>
+        </Text> */}
 
-        <View
+        {/*  <View
           style={{
             borderRadius: 2.5,
             backgroundColor: colors.accent,
@@ -95,7 +123,7 @@ export const Home = ({navigation}) => {
             }}>
             Basic User
           </Text>
-        </View>
+        </View> */}
       </View>
 
       <View
@@ -119,9 +147,19 @@ export const Home = ({navigation}) => {
               func: () => NavigationService.navigate('Favorites'),
             },
             {
-              name: 'Folders',
+              name: 'Notebooks',
               icon: 'md-folder',
               func: () => NavigationService.navigate('Folders'),
+            },
+            {
+              name: 'Tags',
+              icon: 'md-folder',
+              func: () => {},
+            },
+            {
+              name: 'Colors',
+              icon: 'md-folder',
+              func: () => {},
             },
           ]}
           keyExtractor={(item, index) => item.name}

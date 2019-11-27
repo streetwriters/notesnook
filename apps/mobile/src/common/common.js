@@ -1,3 +1,4 @@
+import Storage from '../utils/storage';
 //COLOR SCHEME
 
 export function setColorScheme(
