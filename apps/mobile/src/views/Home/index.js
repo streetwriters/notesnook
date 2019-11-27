@@ -83,7 +83,7 @@ export const Home = ({navigation}) => {
               fontFamily: WEIGHT.regular,
               color: colors.accent,
             }}>
-            Log in to Sync
+            Login to Sync
           </Text>
         </TouchableOpacity>
 

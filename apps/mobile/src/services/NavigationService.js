@@ -9,6 +9,8 @@ import Favorites from '../views/Favorites';
 import ListsEditor from '../views/ListsEditor';
 import ReminderEditor from '../views/ReminderEditor';
 import Login from '../views/Login';
+import Signup from '../views/Signup';
+import ForgotPassword from '../views/ForgotPassword';
 
 const TopLevelNavigator = createStackNavigator(
   {
@@ -38,6 +40,12 @@ const TopLevelNavigator = createStackNavigator(
     },
     Login: {
       screen: Login,
+    },
+    Signup: {
+      screen: Signup,
+    },
+    ForgotPassword: {
+      screen: ForgotPassword,
     },
   },
   {

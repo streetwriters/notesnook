@@ -124,7 +124,6 @@ export const RecentList = () => {
                   onPress={item.func}
                   activeOpacity={opacity}
                   style={{
-                    ...getElevation(5),
                     width: 100,
                     height: 100,
                     borderRadius: br,
@@ -135,7 +134,7 @@ export const RecentList = () => {
                     marginRight: 30,
                     marginLeft: 5,
                     marginVertical: 20,
-                    marginBottom: 30,
+                    marginBottom: 20,
                   }}>
                   <View
                     style={{
@@ -163,6 +162,32 @@ export const RecentList = () => {
                 </TouchableOpacity>
               ))}
             </ScrollView>
+            <TouchableOpacity
+              style={{
+                width: '90%',
+                alignSelf: 'center',
+                backgroundColor: 'red',
+                padding: pv,
+                borderRadius: 5,
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                marginBottom: 10,
+              }}>
+              <Text
+                style={{
+                  fontFamily: WEIGHT.bold,
+                  color: 'white',
+                }}>
+                Sync Disabled
+              </Text>
+              <Text
+                style={{
+                  fontFamily: WEIGHT.medium,
+                  color: 'white',
+                }}>
+                Fix Now
+              </Text>
+            </TouchableOpacity>
           </>
         }
         renderItem={({item, index}) => <NoteItem item={item} index={index} />}

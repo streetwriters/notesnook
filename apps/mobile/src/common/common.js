@@ -50,7 +50,7 @@ export const SIZE = {
   md: 18,
   lg: 22,
   xl: 28,
-  xxl: 34,
+  xxl: 32,
   xxxl: 40,
 };
 

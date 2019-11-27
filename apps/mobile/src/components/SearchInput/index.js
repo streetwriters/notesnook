@@ -18,7 +18,6 @@ export const Search = () => {
   return (
     <View
       style={{
-        ...getElevation(10),
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -39,6 +38,7 @@ export const Search = () => {
         }}
         numberOfLines={1}
         placeholder="Search your notes"
+        placeholderTextColor={colors.icon}
       />
       <Icon
         style={{paddingRight: '2.5%'}}
