@@ -3,7 +3,8 @@ import "./editor.css";
 import ReactQuill, { Quill } from "react-quill";
 import "react-quill/dist/quill.bubble.css";
 import "react-quill/dist/quill.snow.css";
-import { Box } from "rebass";
+import { Flex, Box } from "rebass";
+import { Input } from "@rebass/forms";
 import MarkdownShortcuts from "./modules/markdown";
 import MagicUrl from "quill-magic-url";
 
@@ -34,23 +35,35 @@ const Editor = props => {
   useEffect(() => {
     // move the toolbar outside (easiest way)
     const toolbar = document.querySelector(".ql-toolbar.ql-snow");
-    const quill = document.querySelector(".quill");
-    const editor = document.querySelector(".editor");
-    if (toolbar && quill && editor) {
-      editor.appendChild(toolbar);
-      editor.appendChild(quill);
+    //const quill = document.querySelector(".quill");
+    // const editor = document.querySelector(".editor");
+    const toolbarContainer = document.querySelector("#toolbar");
+    if (toolbar && toolbarContainer) {
+      // const box = <Box>{toolbar}</Box>;
+      toolbarContainer.appendChild(toolbar);
+      //editor.appendChild(quill);
     }
   });
   return (
-    <Box
+    <Flex
       className="editor"
-      display="flex"
+      width={["0%", "60%", "70%"]}
       flex="1 1 auto"
       flexDirection="column"
     >
-      <input className="editor-title" placeholder="Untitled" />
+      <Input
+        placeholder="Untitled"
+        fontFamily="body"
+        fontWeight="heading"
+        fontSize="heading"
+        display={["none", "flex", "flex"]}
+        sx={{ borderWidth: 0, ":focus": { outline: "none" } }}
+        px={3}
+        py={3}
+      />
+      <Box id="toolbar" display={["none", "flex", "flex"]}></Box>
       <ReactQuill modules={modules} theme="snow" />
-    </Box>
+    </Flex>
   );
 };
 export default Editor;

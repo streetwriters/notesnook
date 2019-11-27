@@ -3,6 +3,7 @@ import "./app.css";
 import Editor from "./Components/Editor";
 import { ThemeProvider } from "emotion-theming";
 import { Flex, Box, Text, Button, Card, Heading } from "rebass";
+import { Input } from "@rebass/forms";
 import * as Icon from "react-feather";
 import theme from "./theme";
 
@@ -39,7 +40,7 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <Flex height="100%" alignContent="stretch">
-        <Box minWidth={70} maxWidth={70} bg="navbg" px={0}>
+        <Box width={[0, 0, 70]} bg="navbg" px={0}>
           {navItems.map((item, index) => (
             <NavMenuItem
               onSelected={() => setSelectedIndex(index)}
@@ -51,46 +52,61 @@ function App() {
         </Box>
         <Flex flex="1 1 auto" flexDirection="row" alignContent="stretch" px={0}>
           <Flex
-            bg="#fbfbfb"
+            bg="primary"
             flexDirection="column"
             flex="1 1 auto"
             px={3}
             py={3}
-            width="15%"
+            width={["100%", "40%", "13%"]}
           >
             <Heading fontSize="heading">Notes</Heading>
-            <input
+            <Input
               placeholder="Search"
-              style={{
-                marginTop: 8,
-                marginBottom: 16,
-                borderRadius: 5,
+              fontFamily="body"
+              fontWeight="body"
+              fontSize="input"
+              bg="navbg"
+              my={2}
+              px={3}
+              py={3}
+              sx={{
+                boxShadow: "0 0 5px 2px #b0b0b099",
                 borderWidth: 0,
-                padding: 13,
-                fontFamily: "Quicksand, sans-serif",
-                fontWeight: 500,
-                fontSize: 16,
-                boxShadow: "0 0 3px 0px #f0f0f0"
+                borderRadius: "default"
               }}
             />
-            <Box bg="primary" px={3} py={3} sx={{ borderRadius: "default" }}>
+            <Box
+              bg="navbg"
+              my={2}
+              px={3}
+              py={3}
+              sx={{ borderRadius: "default" }}
+            >
               <Flex flexDirection="row" justifyContent="space-between">
-                <Text fontFamily="body" fontWeight="bold">
+                <Text fontFamily="body" fontSize="title" fontWeight="bold">
                   This is a note title
                 </Text>
                 <Flex flexDirection="row">
-                  <Icon.Share2 size={20} strokeWidth={1.3} />
+                  <Icon.Share2 size={20} strokeWidth={1.5} />
                   <Icon.Heart
                     size={20}
-                    strokeWidth={1.3}
-                    style={{ marginLeft: 5 }}
+                    strokeWidth={1.5}
+                    style={{ marginLeft: 15, marginRight: 10 }}
                   />
-                  <Icon.MoreVertical size={20} strokeWidth={1.3} />
+                  <Icon.MoreVertical size={20} strokeWidth={1.5} />
                 </Flex>
               </Flex>
-              <Text fontFamily="body" fontSize="body">
+              <Text fontFamily="body" fontSize="body" sx={{ marginTop: 1 }}>
                 You are born to be the greatest there ever was. Embrace your
                 true powers!
+              </Text>
+              <Text
+                fontFamily="body"
+                fontWeight="body"
+                fontSize={12}
+                color="accent"
+              >
+                5 hours ago
               </Text>
             </Box>
           </Flex>

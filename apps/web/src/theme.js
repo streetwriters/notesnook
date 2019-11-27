@@ -1,5 +1,5 @@
 export default {
-  breakpoints: ["40em", "52em", "64em"],
+  breakpoints: ["480px", "834px", "1200px"],
   colors: {
     primary: "white",
     accent: "#1790F3",
@@ -9,9 +9,11 @@ export default {
     fontPrimary: "black",
     fontSecondary: "white"
   },
-  //fontSizes: [12, 14, 16, 20, 24, 32, 48, 64],
+  space: [0, 5, 10, 12],
   fontSizes: {
     heading: 42,
+    input: 16,
+    title: 18,
     body: 14
   },
   fontWeights: {
