@@ -1,5 +1,9 @@
 import Storage from "../helpers/storage";
 
+const KEYS = {
+  notes: "notes"
+};
+
 class Database {
   constructor(storage) {
     this.storage = new Storage(storage);
@@ -11,8 +15,8 @@ class Database {
    */
   async getNotes() {
     //update our cache
-    this.notes = await this.storage.read("notes");
-    return this.notes;
+    this.notes = await this.storage.read(KEYS.notes);
+    return Object.values(this.notes);
   }
 
   /**
@@ -43,7 +47,7 @@ class Database {
       dateEditted: Date.now(),
       dateCreated: timestamp
     };
-    await this.storage.write("notes", this.notes);
+    await this.storage.write(KEYS.notes, this.notes);
     return timestamp;
   }
 
@@ -54,12 +58,12 @@ class Database {
   async deleteNotes(notes) {
     if (!notes || notes.length <= 0 || !this.notes || this.notes.length <= 0)
       return;
-    for (note of notes) {
+    for (let note of notes) {
       if (this.notes.hasOwnProperty(note.dateCreated)) {
         delete this.notes[note.dateCreated];
       }
     }
-    await this.storage.write("notes", this.notes);
+    await this.storage.write(KEYS.notes, this.notes);
   }
 
   /**
