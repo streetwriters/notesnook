@@ -30,39 +30,29 @@ import {storage} from '../../../App';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
-const saveText = async (type, title, content) => {
-  let data = {
-    type,
-    title,
-    headline:
-      content.text.length < 80 ? content.text : content.text.slice(0, 80),
-    content,
-    favorite: false,
-    'date-created': Date.now(),
-    'last-edited': Date.now(),
-    length: content.text.length,
-    pinned: false,
-    size: 0,
-    colors: [],
-    tags: [],
-    folders: [],
-  };
-
-  await storage.write('notes', [data]);
-
-  console.log(await storage.read('notes'));
-};
+var timestamp = null;
+var content = null;
+var title = null;
 
 const Editor = ({navigation}) => {
+  // STATE
+
   const [colors, setColors] = useState(COLOR_SCHEME);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
+
+  // VARIABLES
+
+  let updateInterval = null;
+  let keyboardDidShowListener = null;
+  let keyboardDidHideListener = null;
+
+  // REFS
+
   let EditorWebView = createRef();
   const _textRender = createRef();
+  const titleRef = createRef();
 
-  let content, title, headline;
-
-  let keyboardDidShowListener;
-  let keyboardDidHideListener;
+  // FUNCTIONS
 
   const _keyboardDidShow = e => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -76,87 +66,32 @@ const Editor = ({navigation}) => {
     setKeyboardHeight(0);
   };
 
-  function onChangeText(data) {
+  async function onChange(data) {
     if (data !== '') {
       content = JSON.parse(data);
-      saveText('note', title, content);
     }
   }
 
-  useEffect(() => {
-    DeviceEventEmitter.emit('hide');
-    keyboardDidShowListener = Keyboard.addListener(
-      'keyboardDidShow',
-      _keyboardDidShow,
-    );
-    keyboardDidHideListener = Keyboard.addListener(
-      'keyboardDidHide',
-      _keyboardDidHide,
-    );
-    return () => {
-      DeviceEventEmitter.emit('show');
-      keyboardDidShowListener.remove();
-      keyboardDidHideListener.remove();
-    };
-  });
+  const saveNote = async () => {
+    if (title || content) {
+      timestamp = await storage.addNote({
+        title,
+        content,
+        dateCreated: timestamp,
+      });
+    }
+  };
 
   const _renderWebpage = () => {
-    return Platform.OS === 'ios' ? (
-      <KeyboardAvoidingView behavior="padding" style={{height: '100%'}}>
-        <View
-          style={{
-            height: '100%',
-          }}>
-          <TextInput
-            placeholder="Untitled Note"
-            placeholderTextColor={colors.icon}
-            style={{
-              width: '100%',
-              fontFamily: WEIGHT.bold,
-              fontSize: SIZE.xxl,
-              paddingHorizontal: '3%',
-              paddingVertical: 0,
-              marginTop: Platform.OS == 'ios' ? h * 0.01 : h * 0.04,
-            }}
-            onChangeText={value => {
-              title = value;
-            }}
-          />
-
-          <WebView
-            ref={EditorWebView}
-            onError={error => console.log(error)}
-            javaScriptEnabled
-            onShouldStartLoadWithRequest={request => {
-              if (request.url.includes('https')) {
-                Linking.openURL(request.url);
-                return false;
-              } else {
-                return true;
-              }
-            }}
-            cacheEnabled={true}
-            cacheMode="LOAD_CACHE_ELSE_NETWORK"
-            domStorageEnabled
-            scrollEnabled={false}
-            bounces={true}
-            scalesPageToFit={true}
-            source={require('./web/texteditor.html')}
-            style={{height: '100%', maxHeight: '100%'}}
-            onMessage={evt => {
-              if (evt.nativeEvent.data !== '') {
-                onChangeText(evt.nativeEvent.data);
-              }
-            }}
-          />
-        </View>
-      </KeyboardAvoidingView>
-    ) : (
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : null}
+      style={{height: '100%'}}>
       <View
         style={{
           height: '100%',
         }}>
         <TextInput
+          ref={titleRef}
           placeholder="Untitled Note"
           placeholderTextColor={colors.icon}
           style={{
@@ -167,15 +102,23 @@ const Editor = ({navigation}) => {
             paddingVertical: 0,
             marginTop: Platform.OS == 'ios' ? h * 0.01 : h * 0.04,
           }}
+          onChangeText={value => {
+            title = value;
+          }}
+          onSubmitEditing={async () => await saveNote()}
         />
 
         <WebView
           ref={EditorWebView}
           onError={error => console.log(error)}
+          onLoad={() => {
+            if (navigation.state.params.note) {
+              let note = navigation.state.params.note;
+
+              post(JSON.stringify(note.content.delta));
+            }
+          }}
           javaScriptEnabled
-          domStorageEnabled
-          cacheEnabled
-          cacheMode="LOAD_CACHE_ELSE_NETWORK"
           onShouldStartLoadWithRequest={request => {
             if (request.url.includes('https')) {
               Linking.openURL(request.url);
@@ -184,32 +127,86 @@ const Editor = ({navigation}) => {
               return true;
             }
           }}
+          cacheEnabled={true}
+          cacheMode="LOAD_CACHE_ELSE_NETWORK"
+          domStorageEnabled
           scrollEnabled={false}
-          bounces
-          scalesPageToFit
-          source={{
-            uri: 'file:///android_asset/texteditor.html',
-            baseUrl: 'baseUrl:"file:///android_asset/',
-          }}
+          bounces={true}
+          scalesPageToFit={true}
+          source={
+            Platform.OS === 'ios'
+              ? require('./web/texteditor.html')
+              : {
+                  uri: 'file:///android_asset/texteditor.html',
+                  baseUrl: 'baseUrl:"file:///android_asset/',
+                }
+          }
           style={{height: '100%', maxHeight: '100%'}}
           onMessage={evt => {
             if (evt.nativeEvent.data !== '') {
-              onChangeText(evt.nativeEvent.data);
+              onChange(evt.nativeEvent.data);
             }
           }}
         />
       </View>
-    );
+    </KeyboardAvoidingView>;
   };
+
+  // EFFECTS
+
+  useEffect(() => {
+    if (navigation.state.params.note) {
+      let note = navigation.state.params.note;
+      titleRef.current.setNativeProps({
+        text: note.title,
+      });
+      title = note.title;
+      timestamp = note.dateCreated;
+    }
+  });
+
+  useEffect(() => {
+    keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      _keyboardDidShow,
+    );
+    keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      _keyboardDidHide,
+    );
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  });
+
+  useEffect(() => {
+    updateInterval = setInterval(async function() {
+      await saveNote();
+    }, 2000);
+    return () => {
+      saveNote();
+      clearInterval(updateInterval);
+      updateInterval = null;
+    };
+  });
+
+  useEffect(() => {
+    DeviceEventEmitter.emit('hide');
+
+    return () => {
+      DeviceEventEmitter.emit('show');
+    };
+  });
 
   return (
     <SafeAreaView style={{height: '100%'}}>
-      {_renderWebpage()}
       <NavigationEvents
         onWillFocus={() => {
           DeviceEventEmitter.emit('hide');
         }}
       />
+      {_renderWebpage()}
     </SafeAreaView>
   );
 };

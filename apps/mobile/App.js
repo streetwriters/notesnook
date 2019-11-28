@@ -13,7 +13,7 @@ import {
 import {COLOR_SCHEME, SIZE, opacity, WEIGHT} from './src/common/common';
 import Icon from 'react-native-vector-icons/Ionicons';
 import ActionButton from 'react-native-action-button';
-import Storage from 'notes-core/sync/storage';
+import Storage from 'notes-core/api/database';
 import StorageInterface from './src/utils/storage';
 const App = () => {
   const [colors, setColors] = useState(COLOR_SCHEME);

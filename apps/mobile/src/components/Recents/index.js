@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -24,6 +24,7 @@ import {Reminder} from '../Reminder';
 import {getElevation} from '../../utils/utils';
 import NoteItem from '../NoteItem';
 import NavigationService from '../../services/NavigationService';
+import {storage} from '../../../App';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
@@ -57,38 +58,50 @@ const data = [
     timestamp: '2 months ago',
   },
 ];
+let blockdata = [
+  {
+    name: '',
+    icon: 'md-add',
+    func: () => {
+      NavigationService.navigate('Editor');
+    },
+  },
+  {
+    name: 'All Notes',
+    icon: 'md-create',
+    func: () => {
+      NavigationService.navigate('Reminders');
+    },
+  },
+  {
+    name: 'Lists',
+    icon: 'ios-list',
+    func: () => {
+      NavigationService.navigate('Lists');
+    },
+  },
+];
 
 export const RecentList = () => {
   const [colors, setColors] = useState(COLOR_SCHEME);
+  const [notes, setNotes] = useState([]);
 
-  let blockdata = [
-    {
-      name: '',
-      icon: 'md-add',
-      func: () => {
-        NavigationService.navigate('Editor');
-      },
-    },
-    {
-      name: 'All Notes',
-      icon: 'md-create',
-      func: () => {
-        NavigationService.navigate('Reminders');
-      },
-    },
-    {
-      name: 'Lists',
-      icon: 'ios-list',
-      func: () => {
-        NavigationService.navigate('Lists');
-      },
-    },
-  ];
+  const fetchNotes = async () => {
+    return await storage.getNotes();
+  };
+
+  useEffect(() => {
+    fetchNotes().then(allNotes => {
+      if (allNotes) {
+        setNotes(allNotes);
+      }
+    });
+  });
 
   return (
     <>
       <FlatList
-        data={data}
+        data={notes}
         ListFooterComponent={
           <View
             style={{

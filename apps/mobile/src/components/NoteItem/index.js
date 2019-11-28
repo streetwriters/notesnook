@@ -6,6 +6,7 @@ import {
   ScrollView,
   Dimensions,
   FlatList,
+  TouchableWithoutFeedback,
 } from 'react-native';
 
 import {
@@ -21,7 +22,9 @@ import {
 
 import Icon from 'react-native-vector-icons/Ionicons';
 import {Reminder} from '../Reminder';
-import {getElevation} from '../../utils/utils';
+import {getElevation, timeSince} from '../../utils/utils';
+import NavigationService from '../../services/NavigationService';
+
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
@@ -31,74 +34,78 @@ const NoteItem = props => {
 
   return (
     <View
-      activeOpacity={opacity}
       style={{
         marginHorizontal: w * 0.05,
         backgroundColor: '#f0f0f0',
         marginVertical: h * 0.015,
         borderRadius: br,
-
         justifyContent: 'center',
         alignItems: 'center',
+        flexDirection: 'row',
         padding: pv,
       }}>
-      <View
+      <TouchableOpacity
+        activeOpacity={1}
+        onPress={() => {
+          NavigationService.navigate('Editor', {
+            note: item,
+          });
+        }}
         style={{
-          width: '100%',
-          flexDirection: 'row',
-          justifyContent: 'space-between',
+          width: '95%',
+        }}>
+        <>
+          <Text
+            numberOfLines={1}
+            style={{
+              color: colors.pri,
+              fontSize: SIZE.md,
+              fontFamily: WEIGHT.bold,
+              maxWidth: '100%',
+              marginBottom: 5,
+            }}>
+            {item.title.replace('\n', '')}
+          </Text>
+          <View
+            style={{
+              justifyContent: 'flex-start',
+              alignItems: 'flex-start',
+              width: '100%',
+            }}>
+            <Text
+              style={{
+                fontSize: SIZE.xs + 1,
+                color: colors.icon,
+                fontFamily: WEIGHT.regular,
+                width: '100%',
+                maxWidth: '100%',
+                paddingRight: ph,
+              }}>
+              {item.headline}
+            </Text>
+
+            <Text
+              style={{
+                color: colors.accent,
+                fontSize: SIZE.xxs,
+                textAlignVertical: 'center',
+                fontFamily: WEIGHT.regular,
+              }}>
+              {timeSince(item.dateCreated) + '  '}
+            </Text>
+          </View>
+        </>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={{
+          width: '5%',
+          justifyContent: 'center',
+          minHeight: 70,
           alignItems: 'center',
         }}>
-        <Text
-          numberOfLines={1}
-          style={{
-            color: colors.pri,
-            fontSize: SIZE.md,
-            fontFamily: WEIGHT.bold,
-            maxWidth: '100%',
-          }}>
-          {item.title}
-        </Text>
-
-        <View
-          style={{
-            width: '20%',
-            justifyContent: 'space-between',
-            flexDirection: 'row',
-            alignItems: 'center',
-          }}>
-          <Icon name="md-share-alt" size={SIZE.lg} color={colors.icon} />
-          <Icon name="md-star" size={SIZE.lg} color={colors.icon} />
-          <Icon name="md-more" size={SIZE.lg} color={colors.icon} />
-        </View>
-      </View>
-      <View
-        style={{
-          justifyContent: 'flex-start',
-          alignItems: 'flex-start',
-          width: '100%',
-        }}>
-        <Text
-          style={{
-            fontSize: SIZE.xs + 1,
-            color: colors.icon,
-            fontFamily: WEIGHT.regular,
-            width: '100%',
-            maxWidth: '100%',
-          }}>
-          {item.headline}
-        </Text>
-
-        <Text
-          style={{
-            color: colors.accent,
-            fontSize: SIZE.xxs,
-            textAlignVertical: 'center',
-            fontFamily: WEIGHT.regular,
-          }}>
-          {item.timestamp + '  '}
-        </Text>
-      </View>
+        <Icon name="md-more" size={SIZE.lg} color={colors.icon} />
+      </TouchableOpacity>
     </View>
   );
 };
