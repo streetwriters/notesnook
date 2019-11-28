@@ -1,5 +1,19 @@
 {
   "name": "notes-core",
+  "type": "module",
   "version": "0.1.0",
-  "private": true
+  "private": true,
+  "devDependencies": {
+    "@babel/core": "^7.7.4",
+    "@babel/plugin-transform-runtime": "^7.7.4",
+    "@babel/preset-env": "^7.7.4",
+    "@babel/runtime": "^7.7.4",
+    "babel-jest": "^24.9.0",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "jest": "^24.9.0"
+  },
+  "scripts": {
+    "test": "jest --coverage"
+  }
 }
