@@ -5,7 +5,7 @@ import { ThemeProvider } from "emotion-theming";
 import { Flex, Box, Text, Button, Card, Heading } from "rebass";
 import { Input } from "@rebass/forms";
 import * as Icon from "react-feather";
-import theme from "./theme";
+import theme, { SHADOW } from "./theme";
 
 const NavMenuItem = props => (
   <Button
@@ -70,7 +70,7 @@ function App() {
               px={3}
               py={3}
               sx={{
-                boxShadow: "0 0 5px 2px #b0b0b099",
+                boxShadow: SHADOW,
                 borderWidth: 0,
                 borderRadius: "default"
               }}

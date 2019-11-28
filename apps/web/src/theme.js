@@ -1,3 +1,4 @@
+export const SHADOW = "0 0 5px 1px #aaaaaa99";
 export default {
   breakpoints: ["480px", "834px", "1200px"],
   colors: {
