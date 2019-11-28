@@ -15,7 +15,7 @@ function clear() {
   window.localStorage.clear();
 }
 
-export default {
+module.exports = {
   read,
   write,
   remove,
