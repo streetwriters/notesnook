@@ -32,7 +32,23 @@ const modules = {
 };
 
 const Editor = props => {
+  const ref = ref => (Editor.quillRef = ref);
+
   useEffect(() => {
+    if (Editor.quillRef) {
+      const quill = Editor.quillRef.getEditor();
+      if (quill) {
+        quill.keyboard.addBinding(
+          {
+            key: "S",
+            shortKey: true
+          },
+          () => {
+            /* save note here */
+          }
+        );
+      }
+    }
     // move the toolbar outside (easiest way)
     const toolbar = document.querySelector(".ql-toolbar.ql-snow");
     //const quill = document.querySelector(".quill");
@@ -44,6 +60,7 @@ const Editor = props => {
       //editor.appendChild(quill);
     }
   });
+
   return (
     <Flex
       className="editor"
@@ -62,7 +79,7 @@ const Editor = props => {
         py={3}
       />
       <Box id="toolbar" display={["none", "flex", "flex"]}></Box>
-      <ReactQuill modules={modules} theme="snow" />
+      <ReactQuill ref={ref} modules={modules} theme="snow" />
     </Flex>
   );
 };
