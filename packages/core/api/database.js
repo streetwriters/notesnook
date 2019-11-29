@@ -1,4 +1,6 @@
 import Storage from "../helpers/storage";
+import fuzzysearch from "fuzzysearch";
+import ff from "fast-filter";
 
 const KEYS = {
   notes: "notes"
@@ -74,6 +76,19 @@ class Database {
     if (this.notes.hasOwnProperty(id)) {
       return this.notes[id];
     }
+  }
+
+  /**
+   * Searches all notes in the database with the given query
+   * @param {string} query the search query
+   */
+  searchNotes(query) {
+    //TODO add logic to update the cache if necessary
+    return ff(
+      this.notes,
+      v => fuzzysearch(query, v.title) || fuzzysearch(query, v.content.text),
+      this
+    );
   }
 
   //Notebooks

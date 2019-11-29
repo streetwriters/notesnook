@@ -15,5 +15,9 @@
   },
   "scripts": {
     "test": "jest --coverage"
+  },
+  "dependencies": {
+    "fast-filter": "^1.0.4",
+    "fuzzysearch": "^1.0.3"
   }
 }
