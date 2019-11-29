@@ -14,7 +14,13 @@ Quill.register("modules/magicUrl", MagicUrl);
 const modules = {
   toolbar: [
     [{ header: [1, 2, 3, 4, 5, 6] }],
-    ["bold", "italic", "underline", "strike", "blockquote", { align: [] }],
+    ["bold", "italic", "underline", "strike", "blockquote"],
+    [
+      { align: "" },
+      { align: "center" },
+      { align: "right" },
+      { align: "justify" }
+    ],
     [
       { list: "ordered" },
       { list: "bullet" },
