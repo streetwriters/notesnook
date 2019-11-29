@@ -88,7 +88,7 @@ function Home() {
                 style={{ marginRight: -5 }}
               />
             </DropdownTrigger>
-            <DropdownContent style={{ zIndex: 999 }}>
+            <DropdownContent style={{ zIndex: 999, marginLeft: -70 }}>
               <NoteMenu />
             </DropdownContent>
           </Dropdown>
