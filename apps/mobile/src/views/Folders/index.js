@@ -23,11 +23,8 @@ import {
 import Icon from 'react-native-vector-icons/Ionicons';
 import {Reminder} from '../../components/Reminder';
 import {ListItem} from '../../components/ListItem';
-import {getElevation} from '../../utils/utils';
+import {getElevation, h, w} from '../../utils/utils';
 import {FlatList} from 'react-native-gesture-handler';
-
-const w = Dimensions.get('window').width;
-const h = Dimensions.get('window').height;
 
 export const Folders = ({navigation}) => {
   const [colors, setColors] = useState(COLOR_SCHEME);
@@ -83,8 +80,8 @@ export const Folders = ({navigation}) => {
             <View
               style={{
                 ...getElevation(5),
-                width: w * 0.4,
-                height: w * 0.3,
+                width: w * 0.7 * 0.4,
+                height: w * 0.7 * 0.3,
                 borderRadius: 5,
                 backgroundColor: colors.accent,
                 alignItems: 'flex-end',
@@ -106,7 +103,7 @@ export const Folders = ({navigation}) => {
                 fontFamily: WEIGHT.bold,
                 fontSize: SIZE.md,
                 color: colors.pri,
-                maxWidth: w * 0.4,
+                maxWidth: w * 0.7 * 0.4,
               }}>
               {item.name}
             </Text>

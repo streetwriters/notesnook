@@ -6,6 +6,7 @@ import {
   ScrollView,
   Dimensions,
   FlatList,
+  Platform,
 } from 'react-native';
 
 import {
@@ -25,39 +26,7 @@ import {getElevation} from '../../utils/utils';
 import NoteItem from '../NoteItem';
 import NavigationService from '../../services/NavigationService';
 import {storage} from '../../../App';
-const w = Dimensions.get('window').width;
-const h = Dimensions.get('window').height;
 
-// example data
-
-const data = [
-  {
-    title: 'One day about',
-    headline: 'Lorem Ipsum  Lorem Ipsum has',
-    timestamp: '2 hours ago',
-    type: 'note',
-  },
-  {
-    title: 'Shopping List',
-    headline:
-      'It is a long established fact that a reader will be distracted by the readable content of',
-    timestamp: '5 hours ago',
-    type: 'list',
-  },
-  {
-    title: 'Reminder',
-    headline:
-      'Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a ',
-    timestamp: '2 days ago',
-    type: 'reminder',
-  },
-  {
-    title: 'Writing Notes for',
-    headline:
-      'There are many variations of passages of Lorem Ipsum available, but the majority have ',
-    timestamp: '2 months ago',
-  },
-];
 let blockdata = [
   {
     name: '',
@@ -85,18 +54,16 @@ let blockdata = [
 export const RecentList = () => {
   const [colors, setColors] = useState(COLOR_SCHEME);
   const [notes, setNotes] = useState([]);
-
   const fetchNotes = async () => {
-    return await storage.getNotes();
+    let allNotes = await storage.getNotes();
+    console.log(allNotes);
+    if (allNotes) {
+      setNotes(allNotes);
+    }
   };
-
   useEffect(() => {
-    fetchNotes().then(allNotes => {
-      if (allNotes) {
-        setNotes(allNotes);
-      }
-    });
-  });
+    fetchNotes();
+  }, []);
 
   return (
     <>
@@ -124,7 +91,7 @@ export const RecentList = () => {
             <ScrollView
               horizontal={true}
               style={{
-                paddingHorizontal: '4%',
+                paddingHorizontal: '2%',
               }}
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={{
@@ -177,7 +144,7 @@ export const RecentList = () => {
             </ScrollView>
             <TouchableOpacity
               style={{
-                width: '90%',
+                width: Platform.isPad ? '95%' : '90%',
                 alignSelf: 'center',
                 backgroundColor: 'red',
                 padding: pv,

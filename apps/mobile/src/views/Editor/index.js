@@ -73,6 +73,7 @@ const Editor = ({navigation}) => {
   }
 
   const saveNote = async () => {
+    console.log(await storage.getNotes());
     if (title || content) {
       timestamp = await storage.addNote({
         title,
@@ -83,79 +84,81 @@ const Editor = ({navigation}) => {
   };
 
   const _renderWebpage = () => {
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : null}
-      style={{height: '100%'}}>
-      <View
-        style={{
-          height: '100%',
-        }}>
-        <TextInput
-          ref={titleRef}
-          placeholder="Untitled Note"
-          placeholderTextColor={colors.icon}
+    return (
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : null}
+        style={{height: '100%'}}>
+        <View
           style={{
-            width: '100%',
-            fontFamily: WEIGHT.bold,
-            fontSize: SIZE.xxl,
-            paddingHorizontal: '3%',
-            paddingVertical: 0,
-            marginTop: Platform.OS == 'ios' ? h * 0.01 : h * 0.04,
-          }}
-          onChangeText={value => {
-            title = value;
-          }}
-          onSubmitEditing={async () => await saveNote()}
-        />
+            height: '100%',
+          }}>
+          <TextInput
+            ref={titleRef}
+            placeholder="Untitled Note"
+            placeholderTextColor={colors.icon}
+            style={{
+              width: '100%',
+              fontFamily: WEIGHT.bold,
+              fontSize: SIZE.xxl,
+              paddingHorizontal: '3%',
+              paddingVertical: 0,
+              marginTop: Platform.OS == 'ios' ? h * 0.01 : h * 0.04,
+            }}
+            onChangeText={value => {
+              title = value;
+            }}
+            onSubmitEditing={async () => await saveNote()}
+          />
 
-        <WebView
-          ref={EditorWebView}
-          onError={error => console.log(error)}
-          onLoad={() => {
-            if (navigation.state.params.note) {
-              let note = navigation.state.params.note;
+          <WebView
+            ref={EditorWebView}
+            onError={error => console.log(error)}
+            onLoad={() => {
+              if (navigation.state.params && navigation.state.params.note) {
+                let note = navigation.state.params.note;
 
-              post(JSON.stringify(note.content.delta));
+                post(JSON.stringify(note.content.delta));
+              }
+            }}
+            javaScriptEnabled
+            onShouldStartLoadWithRequest={request => {
+              if (request.url.includes('https')) {
+                Linking.openURL(request.url);
+                return false;
+              } else {
+                return true;
+              }
+            }}
+            cacheEnabled={true}
+            cacheMode="LOAD_CACHE_ELSE_NETWORK"
+            domStorageEnabled
+            scrollEnabled={false}
+            bounces={true}
+            scalesPageToFit={true}
+            source={
+              Platform.OS === 'ios'
+                ? require('./web/texteditor.html')
+                : {
+                    uri: 'file:///android_asset/texteditor.html',
+                    baseUrl: 'baseUrl:"file:///android_asset/',
+                  }
             }
-          }}
-          javaScriptEnabled
-          onShouldStartLoadWithRequest={request => {
-            if (request.url.includes('https')) {
-              Linking.openURL(request.url);
-              return false;
-            } else {
-              return true;
-            }
-          }}
-          cacheEnabled={true}
-          cacheMode="LOAD_CACHE_ELSE_NETWORK"
-          domStorageEnabled
-          scrollEnabled={false}
-          bounces={true}
-          scalesPageToFit={true}
-          source={
-            Platform.OS === 'ios'
-              ? require('./web/texteditor.html')
-              : {
-                  uri: 'file:///android_asset/texteditor.html',
-                  baseUrl: 'baseUrl:"file:///android_asset/',
-                }
-          }
-          style={{height: '100%', maxHeight: '100%'}}
-          onMessage={evt => {
-            if (evt.nativeEvent.data !== '') {
-              onChange(evt.nativeEvent.data);
-            }
-          }}
-        />
-      </View>
-    </KeyboardAvoidingView>;
+            style={{height: '100%', maxHeight: '100%'}}
+            onMessage={evt => {
+              if (evt.nativeEvent.data !== '') {
+                onChange(evt.nativeEvent.data);
+              }
+            }}
+          />
+        </View>
+      </KeyboardAvoidingView>
+    );
   };
 
   // EFFECTS
 
   useEffect(() => {
-    if (navigation.state.params.note) {
+    if (navigation.state.params && navigation.state.params.note) {
       let note = navigation.state.params.note;
       titleRef.current.setNativeProps({
         text: note.title,
@@ -163,7 +166,7 @@ const Editor = ({navigation}) => {
       title = note.title;
       timestamp = note.dateCreated;
     }
-  });
+  }, []);
 
   useEffect(() => {
     keyboardDidShowListener = Keyboard.addListener(
@@ -178,7 +181,7 @@ const Editor = ({navigation}) => {
       keyboardDidShowListener.remove();
       keyboardDidHideListener.remove();
     };
-  });
+  }, []);
 
   useEffect(() => {
     updateInterval = setInterval(async function() {
@@ -189,7 +192,7 @@ const Editor = ({navigation}) => {
       clearInterval(updateInterval);
       updateInterval = null;
     };
-  });
+  }, []);
 
   useEffect(() => {
     DeviceEventEmitter.emit('hide');
@@ -197,22 +200,27 @@ const Editor = ({navigation}) => {
     return () => {
       DeviceEventEmitter.emit('show');
     };
-  });
+  }, []);
+
+  useEffect(() => {
+    DeviceEventEmitter.emit('closeSidebar');
+    return () => {
+      DeviceEventEmitter.emit('openSidebar');
+    };
+  }, []);
 
   return (
-    <SafeAreaView style={{height: '100%'}}>
-      <NavigationEvents
-        onWillFocus={() => {
-          DeviceEventEmitter.emit('hide');
-        }}
-      />
-      {_renderWebpage()}
-    </SafeAreaView>
+    <SafeAreaView style={{height: '100%'}}>{_renderWebpage()}</SafeAreaView>
   );
 };
 
 Editor.navigationOptions = {
   header: null,
+  headerStyle: {
+    backgroundColor: 'transparent',
+    borderBottomWidth: 0,
+    height: 0,
+  },
 };
 
 export default Editor;

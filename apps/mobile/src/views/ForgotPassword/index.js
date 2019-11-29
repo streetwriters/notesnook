@@ -27,9 +27,7 @@ import {ListItem} from '../../components/ListItem';
 import {getElevation} from '../../utils/utils';
 import {FlatList, TextInput} from 'react-native-gesture-handler';
 import {NavigationEvents} from 'react-navigation';
-
-const w = Dimensions.get('window').width;
-const h = Dimensions.get('window').height;
+import {Header} from '../../components/header';
 
 export const ForgotPassword = ({navigation}) => {
   const [colors, setColors] = useState(COLOR_SCHEME);
@@ -39,7 +37,7 @@ export const ForgotPassword = ({navigation}) => {
     return () => {
       DeviceEventEmitter.emit('show');
     };
-  });
+  }, []);
 
   return (
     <SafeAreaView>
@@ -48,74 +46,16 @@ export const ForgotPassword = ({navigation}) => {
           DeviceEventEmitter.emit('hide');
         }}
       />
+
+      <Header colors={colors} heading={'Recover Password'} />
+
       <View
         style={{
-          flexDirection: 'row',
-          justifyContent: 'flex-start',
+          justifyContent: 'center',
           alignItems: 'center',
-          paddingHorizontal: '5%',
-          marginTop: Platform.OS == 'ios' ? h * 0.02 : h * 0.04,
-          marginBottom: h * 0.04,
+          width: '100%',
         }}>
-        <TouchableOpacity
-          style={{
-            paddingRight: 20,
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}>
-          <Icon name="ios-arrow-back" size={SIZE.xl} />
-        </TouchableOpacity>
-
-        <Text
-          style={{
-            fontSize: SIZE.xxl,
-            color: colors.pri,
-            fontFamily: WEIGHT.bold,
-          }}>
-          Recover Password
-        </Text>
-      </View>
-
-      <View
-        style={{
-          justifyContent: 'space-between',
-          height: '80%',
-        }}>
-        <View>
-          <TextInput
-            style={{
-              padding: pv,
-              backgroundColor: colors.navbg,
-              marginHorizontal: '5%',
-              borderRadius: 5,
-              fontSize: SIZE.md,
-              fontFamily: WEIGHT.regular,
-              marginBottom: 20,
-            }}
-            placeholder="Email"
-            placeholderTextColor={colors.icon}
-          />
-
-          <TouchableOpacity
-            activeOpacity={opacity}
-            style={{
-              padding: pv,
-              backgroundColor: colors.accent,
-              borderRadius: 5,
-              marginHorizontal: '5%',
-              marginBottom: 10,
-              alignItems: 'center',
-            }}>
-            <Text
-              style={{
-                fontSize: SIZE.md,
-                fontFamily: WEIGHT.medium,
-                color: 'white',
-              }}>
-              Recover
-            </Text>
-          </TouchableOpacity>
-        </View>
+        {renderForgotPassword(colors)}
       </View>
     </SafeAreaView>
   );
@@ -126,3 +66,51 @@ ForgotPassword.navigationOptions = {
 };
 
 export default ForgotPassword;
+
+const renderForgotPassword = colors => {
+  return (
+    <View
+      style={{
+        justifyContent: Platform.isPad ? 'center' : 'space-between',
+        height: '80%',
+        width: Platform.isPad ? '60%' : '100%',
+        alignSelf: 'center',
+      }}>
+      <View>
+        <TextInput
+          style={{
+            padding: pv,
+            backgroundColor: colors.navbg,
+            marginHorizontal: '5%',
+            borderRadius: 5,
+            fontSize: SIZE.md,
+            fontFamily: WEIGHT.regular,
+            marginBottom: 20,
+          }}
+          placeholder="Email"
+          placeholderTextColor={colors.icon}
+        />
+
+        <TouchableOpacity
+          activeOpacity={opacity}
+          style={{
+            padding: pv,
+            backgroundColor: colors.accent,
+            borderRadius: 5,
+            marginHorizontal: '5%',
+            marginBottom: 10,
+            alignItems: 'center',
+          }}>
+          <Text
+            style={{
+              fontSize: SIZE.md,
+              fontFamily: WEIGHT.medium,
+              color: 'white',
+            }}>
+            Recover
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+};

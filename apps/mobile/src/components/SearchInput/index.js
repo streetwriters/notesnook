@@ -1,5 +1,5 @@
 import React, {Fragment, useEffect, useState} from 'react';
-import {View, TextInput, Platform} from 'react-native';
+import {View, TextInput, Platform, DeviceEventEmitter} from 'react-native';
 import {
   COLOR_SCHEME,
   SIZE,
@@ -13,15 +13,16 @@ import {
 import Icon from 'react-native-vector-icons/Ionicons';
 import {getElevation} from '../../utils/utils';
 
-export const Search = () => {
+export const Search = props => {
   const [colors, setColors] = useState(COLOR_SCHEME);
+
   return (
     <View
       style={{
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        width: '90%',
+        width: Platform.isPad ? '95%' : '90%',
         backgroundColor: '#f0f0f0',
         alignSelf: 'center',
         borderRadius: br,
@@ -36,12 +37,16 @@ export const Search = () => {
           width: '90%',
           fontSize: SIZE.md,
         }}
+        onChangeText={props.onChangeText}
+        onSubmitEditing={props.onSubmitEditing}
+        onFocus={props.onFocus}
+        onBlur={props.onBlur}
         numberOfLines={1}
         placeholder="Search your notes"
         placeholderTextColor={colors.icon}
       />
       <Icon
-        style={{paddingRight: '2.5%'}}
+        style={{paddingRight: Platform.isPad ? '1.25%' : '2.5%'}}
         name="ios-search"
         color={colors.icon}
         size={SIZE.xl}

@@ -41,6 +41,7 @@
 	<string></string>
 	<key>UIAppFonts</key>
 	<array>
+		<string>Feather.ttf</string>
 		<string>Quicksand-SemiBold.ttf</string>
 		<string>Quicksand-Medium.ttf</string>
 		<string>Ionicons.ttf</string>

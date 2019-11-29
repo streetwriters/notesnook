@@ -1,3 +1,4 @@
+import {Dimensions} from 'react-native';
 export const getElevation = elevation => {
   return {
     elevation,
@@ -34,3 +35,6 @@ export function timeSince(date) {
   }
   return Math.floor(seconds) + ' secs ago';
 }
+
+export const w = Dimensions.get('window').width;
+export const h = Dimensions.get('window').height;
