@@ -82,10 +82,11 @@ class Database {
    * Searches all notes in the database with the given query
    * @param {string} query the search query
    */
-  searchNotes(query) {
-    //TODO add logic to update the cache if necessary
+  async searchNotes(query) {
+    let notes = await this.getNotes();
+    if (!notes) return;
     return ff(
-      this.notes,
+      notes,
       v => fuzzysearch(query, v.title) || fuzzysearch(query, v.content.text),
       this
     );

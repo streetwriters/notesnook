@@ -52,3 +52,8 @@ test("get all notes", async () => {
   let notes = await db.getNotes();
   expect(notes.length).toBeGreaterThan(0);
 });
+
+test("search all notes", async () => {
+  let filtered = await db.searchNotes("text");
+  expect(filtered.length).toBeGreaterThan(0);
+});
