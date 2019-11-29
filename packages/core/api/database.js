@@ -16,6 +16,7 @@ class Database {
   async getNotes() {
     //update our cache
     this.notes = await this.storage.read(KEYS.notes);
+    if (!this.notes) this.notes = {};
     return Object.values(this.notes);
   }
 
