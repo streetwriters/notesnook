@@ -15,6 +15,8 @@ const menuItems = [
   { title: "Delete", icon: Icon.Trash, color: "red" }
 ];
 let notesMenu = undefined;
+
+//TODO make this generic
 function NoteMenu() {
   return (
     <Flex
