@@ -8,14 +8,16 @@ export default {
     transparent: "#00000000",
     //font related
     fontPrimary: "black",
-    fontSecondary: "white"
+    fontSecondary: "white",
+    border: "#f0f0f0"
   },
   space: [0, 5, 10, 12],
   fontSizes: {
     heading: 42,
     input: 16,
     title: 18,
-    body: 14
+    body: 14,
+    menu: 14
   },
   fontWeights: {
     body: 500,

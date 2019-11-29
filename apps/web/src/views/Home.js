@@ -3,6 +3,57 @@ import { Flex, Box, Text, Heading } from "rebass";
 import * as Icon from "react-feather";
 import { SHADOW } from "../theme";
 import { Input } from "@rebass/forms";
+import Dropdown, {
+  DropdownTrigger,
+  DropdownContent
+} from "react-simple-dropdown";
+import "react-simple-dropdown/styles/Dropdown.css";
+
+const menuItems = [
+  { title: "Favorite", icon: Icon.Heart },
+  { title: "Share", icon: Icon.Share2 },
+  { title: "Delete", icon: Icon.Trash, color: "red" }
+];
+let notesMenu = undefined;
+function NoteMenu() {
+  return (
+    <Flex
+      bg="primary"
+      py={1}
+      sx={{ borderRadius: "default", boxShadow: SHADOW }}
+    >
+      <Box>
+        {menuItems.map(v => (
+          <Flex
+            onClick={() => notesMenu.hide()}
+            flexDirection="row"
+            alignItems="center"
+            py={2.5} //TODO use theme space here instead of custom padding
+            px={2}
+            sx={{
+              color: v.color || "fontPrimary",
+              ":hover": {
+                backgroundColor: "accent",
+                color: "fontSecondary"
+              }
+            }}
+          >
+            <v.icon size={15} strokeWidth={1.5} />
+            <Text
+              className="unselectable"
+              as="span"
+              mx={1}
+              fontFamily="body"
+              fontSize="menu"
+            >
+              {v.title}
+            </Text>
+          </Flex>
+        ))}
+      </Box>
+    </Flex>
+  );
+}
 
 function Home() {
   return (
@@ -27,11 +78,18 @@ function Home() {
           <Text fontFamily="body" fontSize="title" fontWeight="bold">
             This is a note title
           </Text>
-          <Icon.MoreVertical
-            size={20}
-            strokeWidth={1.5}
-            style={{ marginRight: -5 }}
-          />
+          <Dropdown ref={ref => (notesMenu = ref)}>
+            <DropdownTrigger>
+              <Icon.MoreVertical
+                size={20}
+                strokeWidth={1.5}
+                style={{ marginRight: -5 }}
+              />
+            </DropdownTrigger>
+            <DropdownContent style={{ zIndex: 999 }}>
+              <NoteMenu />
+            </DropdownContent>
+          </Dropdown>
         </Flex>
         <Text fontFamily="body" fontSize="body" sx={{ marginTop: 1 }}>
           You are born to be the greatest there ever was. Embrace your true
