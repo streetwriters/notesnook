@@ -30,7 +30,7 @@ function NoteMenu() {
             onClick={() => notesMenu.hide()}
             flexDirection="row"
             alignItems="center"
-            py={2.5} //TODO use theme space here instead of custom padding
+            py={1}
             px={2}
             sx={{
               color: v.color || "fontPrimary",
