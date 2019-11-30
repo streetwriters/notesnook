@@ -7,6 +7,7 @@ import { Flex, Box } from "rebass";
 import { Input } from "@rebass/forms";
 import MarkdownShortcuts from "./modules/markdown";
 import MagicUrl from "quill-magic-url";
+import { db } from "../../common";
 
 Quill.register("modules/markdownShortcuts", MarkdownShortcuts);
 Quill.register("modules/magicUrl", MagicUrl);
@@ -37,36 +38,52 @@ const modules = {
   magicUrl: true
 };
 
+let timestamp = undefined;
+let title = undefined;
+async function saveNote(quill) {
+  let note = {
+    content: {
+      delta: quill.getContents(),
+      text: quill.getText()
+    },
+    title,
+    timestamp
+  };
+  timestamp = await db.addNote(note);
+}
+
 const Editor = props => {
   const ref = ref => (Editor.quillRef = ref);
 
   useEffect(() => {
-    if (Editor.quillRef) {
-      const quill = Editor.quillRef.getEditor();
-      if (quill) {
-        quill.keyboard.addBinding(
-          {
-            key: "S",
-            shortKey: true
-          },
-          () => {
-            /* save note here */
-          }
-        );
+    const quill = Editor.quillRef.getEditor();
+    quill.keyboard.addBinding(
+      {
+        key: "S",
+        shortKey: true
+      },
+      async () => {
+        await saveNote(quill);
       }
-    }
-    // move the toolbar outside (easiest way)
-    const toolbar = document.querySelector(".ql-toolbar.ql-snow");
-    //const quill = document.querySelector(".quill");
-    // const editor = document.querySelector(".editor");
-    const toolbarContainer = document.querySelector("#toolbar");
-    if (toolbar && toolbarContainer) {
-      // const box = <Box>{toolbar}</Box>;
-      toolbarContainer.appendChild(toolbar);
-      //editor.appendChild(quill);
-    }
+    );
+    const saveInterval = setInterval(async () => {
+      if (Date.now() - Editor.lastSaveTimestamp <= 1000) {
+        await saveNote(quill);
+      }
+    }, 2000);
+    return () => {
+      clearInterval(saveInterval);
+    };
   });
 
+  useEffect(() => {
+    // move the toolbar outside (easiest way)
+    const toolbar = document.querySelector(".ql-toolbar.ql-snow");
+    const toolbarContainer = document.querySelector("#toolbar");
+    if (toolbar && toolbarContainer) {
+      toolbarContainer.appendChild(toolbar);
+    }
+  }, []);
   return (
     <Flex
       className="editor"
@@ -83,9 +100,15 @@ const Editor = props => {
         sx={{ borderWidth: 0, ":focus": { outline: "none" } }}
         px={3}
         py={3}
+        onChange={e => (title = e.target.value)}
       />
       <Box id="toolbar" display={["none", "flex", "flex"]}></Box>
-      <ReactQuill ref={ref} modules={modules} theme="snow" />
+      <ReactQuill
+        ref={ref}
+        modules={modules}
+        theme="snow"
+        onChange={() => (Editor.lastSaveTimestamp = Date.now())}
+      />
     </Flex>
   );
 };
