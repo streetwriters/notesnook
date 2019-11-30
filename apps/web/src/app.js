@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./app.css";
-import Editor from "./Components/Editor";
+import Editor from "./components/editor";
 import { ThemeProvider } from "emotion-theming";
 import { Flex, Box, Text, Button, Card, Heading } from "rebass";
 import * as Icon from "react-feather";
