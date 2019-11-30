@@ -91,7 +91,7 @@ export const RecentList = () => {
             <ScrollView
               horizontal={true}
               style={{
-                paddingHorizontal: '2%',
+                paddingHorizontal: Platform.isPad ? '2%' : '4%',
               }}
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={{
@@ -108,13 +108,15 @@ export const RecentList = () => {
                     height: 100,
                     borderRadius: br,
                     backgroundColor:
-                      item.icon === 'md-add' ? colors.accent : '#f0f0f0',
+                      item.icon === 'md-add' ? colors.accent : 'white',
                     justifyContent: 'center',
                     alignItems: 'center',
                     marginRight: 30,
                     marginLeft: 5,
                     marginVertical: 20,
                     marginBottom: 20,
+                    borderWidth: 1.5,
+                    borderColor: '#f0f0f0',
                   }}>
                   <View
                     style={{

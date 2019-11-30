@@ -29,7 +29,7 @@ export const COLOR_SCHEME = {
   night: false,
   bg: 'white',
   fg: '#0560FF',
-  navbg: '#f2f2f2',
+  navbg: '#f6fbfc',
   pri: 'black',
   sec: 'white',
   accent: '#0560FF',

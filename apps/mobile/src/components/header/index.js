@@ -1,6 +1,6 @@
 import React from 'react';
 import {View, TouchableOpacity, Platform, Text} from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
+import Icon from 'react-native-vector-icons/Feather';
 import {SIZE, WEIGHT} from '../../common/common';
 import {h} from '../../utils/utils';
 
@@ -18,11 +18,12 @@ export const Header = ({heading, colors, canGoBack = true}) => {
       {canGoBack ? (
         <TouchableOpacity
           style={{
-            paddingRight: 20,
             justifyContent: 'center',
             alignItems: 'center',
+            height: 40,
+            paddingRight: 15,
           }}>
-          <Icon name="ios-arrow-back" size={SIZE.xl} />
+          <Icon name={'chevron-left'} size={SIZE.xl} />
         </TouchableOpacity>
       ) : (
         undefined

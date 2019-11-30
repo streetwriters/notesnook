@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, createRef} from 'react';
 import {
   ScrollView,
   View,
@@ -63,11 +63,17 @@ export const ForgotPassword = ({navigation}) => {
 
 ForgotPassword.navigationOptions = {
   header: null,
+  headerStyle: {
+    backgroundColor: 'transparent',
+    borderBottomWidth: 0,
+    height: 0,
+  },
 };
 
 export default ForgotPassword;
 
 const renderForgotPassword = colors => {
+  const _email = createRef();
   return (
     <View
       style={{
@@ -78,9 +84,25 @@ const renderForgotPassword = colors => {
       }}>
       <View>
         <TextInput
+          ref={_email}
+          onFocus={() => {
+            _email.current.setNativeProps({
+              style: {
+                borderColor: colors.navbg,
+              },
+            });
+          }}
+          onBlur={() => {
+            _email.current.setNativeProps({
+              style: {
+                borderColor: '#f0f0f0',
+              },
+            });
+          }}
           style={{
             padding: pv,
-            backgroundColor: colors.navbg,
+            borderWidth: 1.5,
+            borderColor: '#f0f0f0',
             marginHorizontal: '5%',
             borderRadius: 5,
             fontSize: SIZE.md,

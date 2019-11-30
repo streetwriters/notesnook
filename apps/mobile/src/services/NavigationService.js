@@ -11,6 +11,8 @@ import ReminderEditor from '../views/ReminderEditor';
 import Login from '../views/Login';
 import Signup from '../views/Signup';
 import ForgotPassword from '../views/ForgotPassword';
+import Settings from '../views/Settings';
+import Trash from '../views/Trash';
 
 const TopLevelNavigator = createStackNavigator(
   {
@@ -46,6 +48,12 @@ const TopLevelNavigator = createStackNavigator(
     },
     ForgotPassword: {
       screen: ForgotPassword,
+    },
+    Settings: {
+      screen: Settings,
+    },
+    Trash: {
+      screen: Trash,
     },
   },
   {

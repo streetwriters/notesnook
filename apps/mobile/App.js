@@ -64,22 +64,28 @@ const App = () => {
         height: '100%',
         flexDirection: 'row',
       }}>
-      <Animatable.View
-        transition="width"
-        duration={200}
-        style={{
-          width: sidebar,
-        }}>
-        <RenderSideMenu
-          colors={colors}
-          close={() => {
-            setSidebar('0%');
-          }}
-        />
-      </Animatable.View>
+      {Platform.isPad ? (
+        <Animatable.View
+          transition="width"
+          duration={200}
+          style={{
+            width: sidebar,
+          }}>
+          <RenderSideMenu
+            colors={colors}
+            close={() => {
+              setSidebar('0%');
+            }}
+          />{' '}
+          : undefined
+        </Animatable.View>
+      ) : (
+        undefined
+      )}
+
       <AppContainer
         style={{
-          width: '70%',
+          width: Platform.isPad ? '70%' : '100%',
           height: '100%',
         }}
         ref={navigatorRef => {

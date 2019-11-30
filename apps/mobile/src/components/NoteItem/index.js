@@ -37,7 +37,7 @@ const NoteItem = props => {
     <View
       style={{
         marginHorizontal: w * 0.05,
-        backgroundColor: '#f0f0f0',
+
         marginVertical: h * 0.015,
         borderRadius: br,
         justifyContent: 'center',
@@ -46,6 +46,8 @@ const NoteItem = props => {
         padding: pv,
         width: Platform.isPad ? '95%' : '90%',
         alignSelf: 'center',
+        borderBottomWidth: 1,
+        borderBottomColor: '#f0f0f0',
       }}>
       <TouchableOpacity
         activeOpacity={1}

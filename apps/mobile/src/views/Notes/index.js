@@ -28,18 +28,27 @@ import {Header} from '../../components/header';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
-export const Favorites = ({navigation}) => {
+export const Notes = ({navigation}) => {
   const [colors, setColors] = useState(COLOR_SCHEME);
+  let params = navigation.state ? navigation.state.params : null;
+
+  useEffect(() => {
+    if (!params) {
+      params = {
+        heading: 'Notes',
+      };
+    }
+  }, []);
 
   return (
     <SafeAreaView>
-      <Header colors={colors} heading="Favorites" canGoBack={false} />
+      <Header colors={colors} heading={params.heading} canGoBack={false} />
     </SafeAreaView>
   );
 };
 
-Favorites.navigationOptions = {
+Notes.navigationOptions = {
   header: null,
 };
 
-export default Favorites;
+export default Notes;

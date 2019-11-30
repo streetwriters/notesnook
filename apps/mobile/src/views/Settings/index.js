@@ -28,18 +28,18 @@ import {Header} from '../../components/header';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
-export const Favorites = ({navigation}) => {
+export const Settings = ({navigation}) => {
   const [colors, setColors] = useState(COLOR_SCHEME);
 
   return (
     <SafeAreaView>
-      <Header colors={colors} heading="Favorites" canGoBack={false} />
+      <Header colors={colors} heading="Settings" canGoBack={false} />
     </SafeAreaView>
   );
 };
 
-Favorites.navigationOptions = {
+Settings.navigationOptions = {
   header: null,
 };
 
-export default Favorites;
+export default Settings;

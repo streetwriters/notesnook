@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, createRef} from 'react';
 import {
   ScrollView,
   View,
@@ -79,6 +79,8 @@ Login.navigationOptions = {
 export default Login;
 
 const renderLogin = colors => {
+  const _email = createRef();
+  const _pass = createRef();
   return (
     <View
       style={{
@@ -89,9 +91,25 @@ const renderLogin = colors => {
       }}>
       <View>
         <TextInput
+          ref={_email}
+          onFocus={() => {
+            _email.current.setNativeProps({
+              style: {
+                borderColor: colors.navbg,
+              },
+            });
+          }}
+          onBlur={() => {
+            _email.current.setNativeProps({
+              style: {
+                borderColor: '#f0f0f0',
+              },
+            });
+          }}
           style={{
             padding: pv,
-            backgroundColor: colors.navbg,
+            borderWidth: 1.5,
+            borderColor: '#f0f0f0',
             marginHorizontal: '5%',
             borderRadius: 5,
             fontSize: SIZE.md,
@@ -102,9 +120,25 @@ const renderLogin = colors => {
           placeholderTextColor={colors.icon}
         />
         <TextInput
+          ref={_pass}
+          onFocus={() => {
+            _pass.current.setNativeProps({
+              style: {
+                borderColor: colors.navbg,
+              },
+            });
+          }}
+          onBlur={() => {
+            _pass.current.setNativeProps({
+              style: {
+                borderColor: '#f0f0f0',
+              },
+            });
+          }}
           style={{
             padding: pv,
-            backgroundColor: colors.navbg,
+            borderWidth: 1.5,
+            borderColor: '#f0f0f0',
             marginHorizontal: '5%',
             borderRadius: 5,
             fontSize: SIZE.md,
