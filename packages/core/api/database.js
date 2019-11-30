@@ -1,6 +1,7 @@
 import Storage from "../helpers/storage";
 import fuzzysearch from "fuzzysearch";
 import ff from "fast-filter";
+import { extractValues } from "../utils";
 
 const KEYS = {
   notes: "notes"
@@ -18,7 +19,7 @@ class Database {
   async getNotes() {
     //update our cache
     this.notes = (await this.storage.read(KEYS.notes)) || {};
-    return Object.values(this.notes);
+    return extractValues(this.notes);
   }
 
   /**
@@ -89,7 +90,7 @@ class Database {
     if (!notes) return;
     return ff(
       notes,
-      v => fuzzysearch(query, v.title) || fuzzysearch(query, v.content.text),
+      v => fuzzysearch(query, v.title + " " + v.content.text),
       this
     );
   }
