@@ -47,7 +47,7 @@ async function saveNote(quill) {
       text: quill.getText()
     },
     title,
-    timestamp
+    dateCreated: timestamp
   };
   timestamp = await db.addNote(note);
 }

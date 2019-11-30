@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Flex, Box, Text, Heading } from "rebass";
 import * as Icon from "react-feather";
 import { SHADOW } from "../theme";
@@ -7,7 +7,9 @@ import Dropdown, {
   DropdownTrigger,
   DropdownContent
 } from "react-simple-dropdown";
+import TimeAgo from "timeago-react";
 import "react-simple-dropdown/styles/Dropdown.css";
+import { db } from "../common";
 
 const menuItems = [
   { title: "Favorite", icon: Icon.Heart },
@@ -58,6 +60,10 @@ function NoteMenu() {
 }
 
 function Home() {
+  const [notes, setNotes] = useState([]);
+  useEffect(async () => {
+    setNotes(await db.getNotes());
+  }, []);
   return (
     <Box>
       <Input
@@ -75,32 +81,38 @@ function Home() {
           borderRadius: "default"
         }}
       />
-      <Box bg="navbg" px={3} py={3} sx={{ borderRadius: "default" }}>
-        <Flex flexDirection="row" justifyContent="space-between">
-          <Text fontFamily="body" fontSize="title" fontWeight="bold">
-            This is a note title
+      {notes.map(note => (
+        <Box bg="navbg" px={3} py={3} sx={{ borderRadius: "default" }}>
+          <Flex flexDirection="row" justifyContent="space-between">
+            <Text fontFamily="body" fontSize="title" fontWeight="bold">
+              {note.title}
+            </Text>
+            <Dropdown ref={ref => (notesMenu = ref)}>
+              <DropdownTrigger>
+                <Icon.MoreVertical
+                  size={20}
+                  strokeWidth={1.5}
+                  style={{ marginRight: -5 }}
+                />
+              </DropdownTrigger>
+              <DropdownContent style={{ zIndex: 999, marginLeft: -70 }}>
+                <NoteMenu />
+              </DropdownContent>
+            </Dropdown>
+          </Flex>
+          <Text fontFamily="body" fontSize="body" sx={{ marginTop: 1 }}>
+            {note.headline}
           </Text>
-          <Dropdown ref={ref => (notesMenu = ref)}>
-            <DropdownTrigger>
-              <Icon.MoreVertical
-                size={20}
-                strokeWidth={1.5}
-                style={{ marginRight: -5 }}
-              />
-            </DropdownTrigger>
-            <DropdownContent style={{ zIndex: 999, marginLeft: -70 }}>
-              <NoteMenu />
-            </DropdownContent>
-          </Dropdown>
-        </Flex>
-        <Text fontFamily="body" fontSize="body" sx={{ marginTop: 1 }}>
-          You are born to be the greatest there ever was. Embrace your true
-          powers!
-        </Text>
-        <Text fontFamily="body" fontWeight="body" fontSize={12} color="accent">
-          5 hours ago
-        </Text>
-      </Box>
+          <Text
+            fontFamily="body"
+            fontWeight="body"
+            fontSize={12}
+            color="accent"
+          >
+            <TimeAgo datetime={note.dateCreated} />
+          </Text>
+        </Box>
+      ))}
     </Box>
   );
 }

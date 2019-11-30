@@ -57,7 +57,7 @@ export function navigate(routeName, root = "navigationView") {
 
   let rootView = document.querySelector(`.${root}`);
   if (!rootView) return;
-  ReactDOM.render(getThemedComponent(route), rootView);
+  ReactDOM.render(<ThemedComponent route={route} />, rootView);
 
   historyContainer[historyContainer.length] = {
     ...route
@@ -73,15 +73,15 @@ export function goBack(root) {
   if (route) {
     let rootView = document.querySelector(`.${root}`);
     if (!rootView) return;
-    ReactDOM.render(getThemedComponent(route), rootView);
+    ReactDOM.render(<ThemedComponent route={route} />, rootView);
   }
 }
 
-function getThemedComponent(route) {
+function ThemedComponent(props) {
   return (
     <ThemeProvider theme={theme}>
-      <Heading fontSize="heading">{route.title}</Heading>
-      {route.component && route.component()}
+      <Heading fontSize="heading">{props.route.title}</Heading>
+      {props.route.component && props.route.component()}
     </ThemeProvider>
   );
 }
