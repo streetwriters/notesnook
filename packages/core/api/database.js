@@ -26,7 +26,8 @@ class Database {
    * @param {object} note The note to add or update
    */
   async addNote(note) {
-    if (!note || !note.content || note.content.length <= 0) return undefined;
+    if (!note || !note.content || (!note.title && !note.content))
+      return undefined;
 
     let timestamp = note.dateCreated || Date.now();
     //add or update a note into the database
@@ -44,7 +45,7 @@ class Database {
       notebooks: note.notebooks || [],
       colors: note.colors || [],
       favorite: note.favorite || false,
-      headline: note.content.text.substring(0, 60),
+      headline: note.content.text.substring(0, 150) + "...",
       length: note.content.text.length,
       dateEditted: Date.now(),
       dateCreated: timestamp
