@@ -66,6 +66,7 @@ function App() {
           />
           <Editor />
         </Flex>
+        <Box id="snackbarContainer" />
       </Flex>
     </ThemeProvider>
   );

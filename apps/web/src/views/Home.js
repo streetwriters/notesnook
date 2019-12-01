@@ -12,6 +12,7 @@ import "react-simple-dropdown/styles/Dropdown.css";
 import { db, ev } from "../common";
 import { Virtuoso as List } from "react-virtuoso";
 import AutoSizer from "react-virtualized-auto-sizer";
+import { showSnack } from "../components/snackbar";
 
 const menuItems = [
   { title: "Favorite", icon: Icon.Heart },
@@ -21,6 +22,7 @@ const menuItems = [
 let notesMenu = undefined;
 
 function sendNewNoteEvent() {
+  showSnack("Let's start writing!", Icon.Edit2);
   ev.emit("onNewNote");
 }
 
@@ -113,12 +115,17 @@ function Home() {
         </Text>
       </Flex>
       <List
-        style={{ width: "100%", flex: "1 1 auto" }}
+        style={{ width: "100%", flex: "1 1 auto", height: "auto" }}
         totalCount={notes.length}
         item={index => {
           const note = notes[index];
           return (
-            <Box bg="navbg" px={3} py={3} sx={{ borderRadius: "default" }}>
+            <Box
+              bg="navbg"
+              px={3}
+              py={3}
+              sx={{ borderRadius: "default", marginBottom: 2 }}
+            >
               <Flex flexDirection="row" justifyContent="space-between">
                 <Text fontFamily="body" fontSize="title" fontWeight="bold">
                   {note.title}

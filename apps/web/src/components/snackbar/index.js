@@ -1,0 +1,51 @@
+import React from "react";
+import ReactDOM from "react-dom";
+import { Flex, Text } from "rebass";
+import { ThemeProvider } from "emotion-theming";
+import theme from "../../theme";
+
+export function showSnack(message, icon = undefined) {
+  const root = document.getElementById("snackbarContainer");
+  if (root) {
+    ReactDOM.render(<Snackbar message={message} Icon={icon} />, root);
+    setTimeout(() => {
+      const snackbar = document.getElementById("snackbar");
+      if (!snackbar) return;
+      setTimeout(() => ReactDOM.unmountComponentAtNode(root), 1000);
+      snackbar.animate(
+        {
+          opacity: [1, 0],
+          transform: ["translateY(0px)", "translateY(500px)"]
+        },
+        1000
+      );
+    }, 2000);
+  }
+}
+
+const Snackbar = props => (
+  <ThemeProvider theme={theme}>
+    <Flex
+      id="snackbar"
+      sx={{
+        position: "absolute",
+        bottom: 10,
+        left: "50%",
+        textAlign: "center",
+        color: "fontSecondary",
+        fontFamily: "body",
+        fontWeight: "body",
+        borderRadius: "default",
+        animation: "1s ease-out fadeUp"
+      }}
+      alignItems="center"
+      flexDirection="row"
+      bg="accent"
+      py={2}
+      px={2}
+    >
+      {props.Icon && <props.Icon size={18} />}
+      <Text mx={1}>{props.message}</Text>
+    </Flex>
+  </ThemeProvider>
+);

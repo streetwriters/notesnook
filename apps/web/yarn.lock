@@ -8760,6 +8760,11 @@ react-scripts@3.2.0:
   optionalDependencies:
     fsevents "2.0.7"
 
+react-simple-animate@^3.3.5:
+  version "3.3.5"
+  resolved "https://registry.yarnpkg.com/react-simple-animate/-/react-simple-animate-3.3.5.tgz#df9e90879872edd6eadc29cfaf438ba04b6e6915"
+  integrity sha512-3tlJ1cazBsEBIJH9GKxrdm9xtsVp9mtVAOK4SgOZVPJKJIKokfgZA+FvqBBTmqQMDfutxI4ogLivBzhAG8/5kA==
+
 react-simple-dropdown@^3.2.3:
   version "3.2.3"
   resolved "https://registry.yarnpkg.com/react-simple-dropdown/-/react-simple-dropdown-3.2.3.tgz#c9737bcb7a54c7de267a1afeeec04de588a3fa7b"
