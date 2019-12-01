@@ -11,7 +11,7 @@ export function showSnack(message, icon = undefined) {
     setTimeout(() => {
       const snackbar = document.getElementById("snackbar");
       if (!snackbar) return;
-      setTimeout(() => ReactDOM.unmountComponentAtNode(root), 1000);
+      setTimeout(() => ReactDOM.unmountComponentAtNode(root), 700);
       snackbar.animate(
         {
           opacity: [1, 0],
@@ -19,7 +19,7 @@ export function showSnack(message, icon = undefined) {
         },
         1000
       );
-    }, 2000);
+    }, 3000);
   }
 }
 
