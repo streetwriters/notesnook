@@ -9,7 +9,9 @@ import Dropdown, {
 } from "react-simple-dropdown";
 import TimeAgo from "timeago-react";
 import "react-simple-dropdown/styles/Dropdown.css";
-import { db } from "../common";
+import { db, ev } from "../common";
+import { Virtuoso as List } from "react-virtuoso";
+import AutoSizer from "react-virtualized-auto-sizer";
 
 const menuItems = [
   { title: "Favorite", icon: Icon.Heart },
@@ -17,6 +19,10 @@ const menuItems = [
   { title: "Delete", icon: Icon.Trash, color: "red" }
 ];
 let notesMenu = undefined;
+
+function sendNewNoteEvent() {
+  ev.emit("onNewNote");
+}
 
 //TODO make this generic
 function NoteMenu() {
@@ -29,6 +35,7 @@ function NoteMenu() {
       <Box>
         {menuItems.map(v => (
           <Flex
+            key={v.title}
             onClick={() => notesMenu.hide()}
             flexDirection="row"
             alignItems="center"
@@ -61,11 +68,11 @@ function NoteMenu() {
 
 function Home() {
   const [notes, setNotes] = useState([]);
-  useEffect(async () => {
-    setNotes(await db.getNotes());
+  useEffect(() => {
+    (async () => setNotes(await db.getNotes()))();
   }, []);
   return (
-    <Box>
+    <Flex flexDirection="column" flex="1 1 auto">
       <Input
         placeholder="Search"
         fontFamily="body"
@@ -81,39 +88,70 @@ function Home() {
           borderRadius: "default"
         }}
       />
-      {notes.map(note => (
-        <Box bg="navbg" px={3} py={3} sx={{ borderRadius: "default" }}>
-          <Flex flexDirection="row" justifyContent="space-between">
-            <Text fontFamily="body" fontSize="title" fontWeight="bold">
-              {note.title}
-            </Text>
-            <Dropdown ref={ref => (notesMenu = ref)}>
-              <DropdownTrigger>
-                <Icon.MoreVertical
-                  size={20}
-                  strokeWidth={1.5}
-                  style={{ marginRight: -5 }}
-                />
-              </DropdownTrigger>
-              <DropdownContent style={{ zIndex: 999, marginLeft: -70 }}>
-                <NoteMenu />
-              </DropdownContent>
-            </Dropdown>
-          </Flex>
-          <Text fontFamily="body" fontSize="body" sx={{ marginTop: 1 }}>
-            {note.headline}
-          </Text>
-          <Text
-            fontFamily="body"
-            fontWeight="body"
-            fontSize={12}
-            color="accent"
-          >
-            <TimeAgo datetime={note.dateCreated} />
-          </Text>
-        </Box>
-      ))}
-    </Box>
+      <Flex
+        bg="accent"
+        width="full"
+        py={3}
+        px={3}
+        flexDirection="row"
+        alignItems="center"
+        sx={{
+          borderRadius: "default",
+          marginBottom: 2,
+          color: "fontSecondary",
+          fontFamily: "body",
+          fontWeight: "body",
+          ":active": {
+            opacity: "0.8"
+          }
+        }}
+        onClick={() => sendNewNoteEvent()}
+      >
+        <Icon.Plus />
+        <Text className="unselectable" mx={1}>
+          Make a new note
+        </Text>
+      </Flex>
+      <List
+        style={{ width: "100%", flex: "1 1 auto" }}
+        totalCount={notes.length}
+        item={index => {
+          const note = notes[index];
+          return (
+            <Box bg="navbg" px={3} py={3} sx={{ borderRadius: "default" }}>
+              <Flex flexDirection="row" justifyContent="space-between">
+                <Text fontFamily="body" fontSize="title" fontWeight="bold">
+                  {note.title}
+                </Text>
+                <Dropdown ref={ref => (notesMenu = ref)}>
+                  <DropdownTrigger>
+                    <Icon.MoreVertical
+                      size={20}
+                      strokeWidth={1.5}
+                      style={{ marginRight: -5 }}
+                    />
+                  </DropdownTrigger>
+                  <DropdownContent style={{ zIndex: 999, marginLeft: -70 }}>
+                    <NoteMenu />
+                  </DropdownContent>
+                </Dropdown>
+              </Flex>
+              <Text fontFamily="body" fontSize="body" sx={{ marginTop: 1 }}>
+                {note.headline}
+              </Text>
+              <Text
+                fontFamily="body"
+                fontWeight="body"
+                fontSize={12}
+                color="accent"
+              >
+                <TimeAgo datetime={note.dateCreated} />
+              </Text>
+            </Box>
+          );
+        }}
+      />
+    </Flex>
   );
 }
 

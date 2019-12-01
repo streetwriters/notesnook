@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import "./editor.css";
 import ReactQuill, { Quill } from "react-quill";
 import "react-quill/dist/quill.bubble.css";
@@ -7,7 +7,7 @@ import { Flex, Box } from "rebass";
 import { Input } from "@rebass/forms";
 import MarkdownShortcuts from "./modules/markdown";
 import MagicUrl from "quill-magic-url";
-import { db } from "../../common";
+import { db, ev } from "../../common";
 
 Quill.register("modules/markdownShortcuts", MarkdownShortcuts);
 Quill.register("modules/magicUrl", MagicUrl);
@@ -51,10 +51,16 @@ async function saveNote(quill) {
   };
   timestamp = await db.addNote(note);
 }
-
+function startAutoSave(quill) {
+  setInterval(async () => {
+    if (Date.now() - Editor.lastSaveTimestamp <= 1000) {
+      await saveNote(quill);
+    }
+  }, 2000);
+}
 const Editor = props => {
   const ref = ref => (Editor.quillRef = ref);
-
+  const titleRef = ref => (Editor.titleRef = ref);
   useEffect(() => {
     const quill = Editor.quillRef.getEditor();
     quill.keyboard.addBinding(
@@ -66,13 +72,23 @@ const Editor = props => {
         await saveNote(quill);
       }
     );
-    const saveInterval = setInterval(async () => {
-      if (Date.now() - Editor.lastSaveTimestamp <= 1000) {
-        await saveNote(quill);
-      }
-    }, 2000);
+
+    let saveInterval = startAutoSave(quill);
+    function onNewNote() {
+      clearInterval(saveInterval);
+      saveNote(quill).then(() => {
+        title = undefined;
+        Editor.titleRef.value = "";
+        Editor.titleRef.focus();
+        quill.setText("\n");
+        Editor.lastSaveTimestamp = 0;
+        saveInterval = startAutoSave(quill);
+      });
+    }
+    ev.addListener("onNewNote", onNewNote);
     return () => {
       clearInterval(saveInterval);
+      ev.removeListener("onNewNote", onNewNote);
     };
   });
 
@@ -92,6 +108,7 @@ const Editor = props => {
       flexDirection="column"
     >
       <Input
+        ref={titleRef}
         placeholder="Untitled"
         fontFamily="body"
         fontWeight="heading"
