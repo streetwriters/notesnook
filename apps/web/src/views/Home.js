@@ -17,9 +17,14 @@ import { showSnack } from "../components/snackbar";
 const menuItems = [
   { title: "Favorite", icon: Icon.Heart },
   { title: "Share", icon: Icon.Share2 },
-  { title: "Delete", icon: Icon.Trash, color: "red" }
+  {
+    title: "Delete",
+    icon: Icon.Trash,
+    color: "red",
+    onClick: note => db.deleteNotes([note])
+  }
 ];
-let notesMenu = undefined;
+let dropdownRefs = [];
 
 function sendNewNoteEvent() {
   showSnack("Let's start writing!", Icon.Edit2);
@@ -27,7 +32,8 @@ function sendNewNoteEvent() {
 }
 
 //TODO make this generic
-function NoteMenu() {
+//TODO make deletion more robust
+function NoteMenu(props) {
   return (
     <Flex
       bg="primary"
@@ -38,7 +44,16 @@ function NoteMenu() {
         {menuItems.map(v => (
           <Flex
             key={v.title}
-            onClick={() => notesMenu.hide()}
+            onClick={() => {
+              props.notesMenu.hide();
+              if (v.onClick) {
+                v.onClick(props.note);
+                if (v.title == "Delete") {
+                  showSnack("Note deleted!", Icon.Check);
+                  props.onNoteDeleted();
+                }
+              }
+            }}
             flexDirection="row"
             alignItems="center"
             py={1}
@@ -130,7 +145,7 @@ function Home() {
                 <Text fontFamily="body" fontSize="title" fontWeight="bold">
                   {note.title}
                 </Text>
-                <Dropdown ref={ref => (notesMenu = ref)}>
+                <Dropdown ref={ref => (dropdownRefs[index] = ref)}>
                   <DropdownTrigger>
                     <Icon.MoreVertical
                       size={20}
@@ -139,7 +154,13 @@ function Home() {
                     />
                   </DropdownTrigger>
                   <DropdownContent style={{ zIndex: 999, marginLeft: -70 }}>
-                    <NoteMenu />
+                    <NoteMenu
+                      notesMenu={dropdownRefs[index]}
+                      note={note}
+                      onNoteDeleted={async () => {
+                        setNotes(await db.getNotes());
+                      }}
+                    />
                   </DropdownContent>
                 </Dropdown>
               </Flex>
