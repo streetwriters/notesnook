@@ -41,11 +41,13 @@ const modules = {
 let timestamp = undefined;
 let title = undefined;
 async function saveNote(quill) {
+  let content = {
+    delta: quill.getContents(),
+    text: quill.getText()
+  };
+  if (!content.delta || content.text.len <= 1) return;
   let note = {
-    content: {
-      delta: quill.getContents(),
-      text: quill.getText()
-    },
+    content,
     title,
     dateCreated: timestamp
   };
