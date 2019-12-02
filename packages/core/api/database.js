@@ -1,6 +1,7 @@
 import Storage from "../helpers/storage";
 import fuzzysearch from "fuzzysearch";
 import ff from "fast-filter";
+import { extractValues } from "../utils";
 
 const KEYS = {
   notes: "notes"
@@ -18,7 +19,7 @@ class Database {
   async getNotes() {
     //update our cache
     this.notes = (await this.storage.read(KEYS.notes)) || {};
-    return Object.values(this.notes);
+    return extractValues(this.notes);
   }
 
   /**
@@ -26,7 +27,8 @@ class Database {
    * @param {object} note The note to add or update
    */
   async addNote(note) {
-    if (!note || !note.content || note.content.length <= 0) return undefined;
+    if (!note || !note.content || (!note.title && !note.content))
+      return undefined;
 
     let timestamp = note.dateCreated || Date.now();
     //add or update a note into the database
@@ -44,7 +46,7 @@ class Database {
       notebooks: note.notebooks || [],
       colors: note.colors || [],
       favorite: note.favorite || false,
-      headline: note.content.text.substring(0, 60),
+      headline: note.content.text.substring(0, 150) + "...",
       length: note.content.text.length,
       dateEditted: Date.now(),
       dateCreated: timestamp
@@ -89,7 +91,7 @@ class Database {
     if (!notes) return;
     return ff(
       notes,
-      v => fuzzysearch(query, v.title) || fuzzysearch(query, v.content.text),
+      v => fuzzysearch(query, v.title + " " + v.content.text),
       this
     );
   }
