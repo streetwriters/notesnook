@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Flex, Box, Text, Heading } from "rebass";
+import { Flex, Box, Text } from "rebass";
 import * as Icon from "react-feather";
 import { SHADOW } from "../theme";
 import { Input } from "@rebass/forms";
@@ -14,6 +14,7 @@ import { Virtuoso as List } from "react-virtuoso";
 import { showSnack } from "../components/snackbar";
 import Menu from "../components/menu";
 
+const dropdownRefs = [];
 const menuItems = [
   { title: "Favorite", icon: Icon.Heart },
   { title: "Share", icon: Icon.Share2 },
@@ -33,7 +34,6 @@ const menuItems = [
     }
   }
 ];
-let dropdownRefs = [];
 
 function sendNewNoteEvent() {
   ev.emit("onNewNote");

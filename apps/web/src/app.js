@@ -2,11 +2,9 @@ import React, { useState, useEffect } from "react";
 import "./app.css";
 import Editor from "./components/editor";
 import { ThemeProvider } from "emotion-theming";
-import { Flex, Box, Text, Button, Card, Heading } from "rebass";
-import * as Icon from "react-feather";
-import theme, { SHADOW } from "./theme";
+import { Flex, Box, Button } from "rebass";
+import theme from "./theme";
 import { routes, navigate } from "./navigation";
-import Home from "../src/views/Home";
 
 const NavMenuItem = props => {
   useEffect(() => {
