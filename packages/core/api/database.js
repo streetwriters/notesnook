@@ -83,6 +83,7 @@ class Database {
    * @param {string} query the search query
    */
   async searchNotes(query) {
+    if (!query) return [];
     //TODO benchmark this and make it faster if necessary
     let notes = await this.getNotes();
     if (!notes) return;
