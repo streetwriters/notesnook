@@ -25,7 +25,11 @@ const menuItems = [
     onClick: note => {
       db.deleteNotes([note]).then(
         //TODO implement undo
-        () => showSnack("Note deleted!", Icon.Check)
+        async () => {
+          showSnack("Note deleted!", Icon.Check);
+          //TODO very crude but works.
+          await Home.onRefresh();
+        }
       );
     }
   }
@@ -39,7 +43,13 @@ function sendNewNoteEvent() {
 function Home() {
   const [notes, setNotes] = useState([]);
   useEffect(() => {
-    (async () => setNotes(await db.getNotes()))();
+    Home.onRefresh = async () => {
+      setNotes(await db.getNotes());
+    };
+    Home.onRefresh();
+    return () => {
+      Home.onRefresh = undefined;
+    };
   }, []);
   return (
     <Flex flexDirection="column" flex="1 1 auto">
