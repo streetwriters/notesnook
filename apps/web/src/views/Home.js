@@ -13,6 +13,7 @@ import { db, ev } from "../common";
 import { Virtuoso as List } from "react-virtuoso";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { showSnack } from "../components/snackbar";
+import Menu from "../components/menu";
 
 const menuItems = [
   { title: "Favorite", icon: Icon.Heart },
@@ -21,66 +22,18 @@ const menuItems = [
     title: "Delete",
     icon: Icon.Trash,
     color: "red",
-    onClick: note => db.deleteNotes([note])
+    onClick: note => {
+      db.deleteNotes([note]).then(
+        //TODO implement undo
+        () => showSnack("Note deleted!", Icon.Check)
+      );
+    }
   }
 ];
 let dropdownRefs = [];
 
 function sendNewNoteEvent() {
-  showSnack("Let's start writing!", Icon.Edit2);
   ev.emit("onNewNote");
-}
-
-//TODO make this generic
-//TODO make deletion more robust
-function NoteMenu(props) {
-  return (
-    <Flex
-      bg="primary"
-      py={1}
-      sx={{ borderRadius: "default", boxShadow: SHADOW }}
-    >
-      <Box>
-        {menuItems.map(v => (
-          <Flex
-            key={v.title}
-            onClick={() => {
-              props.notesMenu.hide();
-              if (v.onClick) {
-                v.onClick(props.note);
-                if (v.title == "Delete") {
-                  showSnack("Note deleted!", Icon.Check);
-                  props.onNoteDeleted();
-                }
-              }
-            }}
-            flexDirection="row"
-            alignItems="center"
-            py={1}
-            px={2}
-            sx={{
-              color: v.color || "fontPrimary",
-              ":hover": {
-                backgroundColor: "accent",
-                color: "fontSecondary"
-              }
-            }}
-          >
-            <v.icon size={15} strokeWidth={1.5} />
-            <Text
-              className="unselectable"
-              as="span"
-              mx={1}
-              fontFamily="body"
-              fontSize="menu"
-            >
-              {v.title}
-            </Text>
-          </Flex>
-        ))}
-      </Box>
-    </Flex>
-  );
 }
 
 function Home() {
@@ -154,12 +107,10 @@ function Home() {
                     />
                   </DropdownTrigger>
                   <DropdownContent style={{ zIndex: 999, marginLeft: -70 }}>
-                    <NoteMenu
-                      notesMenu={dropdownRefs[index]}
-                      note={note}
-                      onNoteDeleted={async () => {
-                        setNotes(await db.getNotes());
-                      }}
+                    <Menu
+                      dropdownRef={dropdownRefs[index]}
+                      menuItems={menuItems}
+                      data={note}
                     />
                   </DropdownContent>
                 </Dropdown>

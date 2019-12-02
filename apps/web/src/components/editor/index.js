@@ -8,6 +8,7 @@ import { Input } from "@rebass/forms";
 import MarkdownShortcuts from "./modules/markdown";
 import MagicUrl from "quill-magic-url";
 import { db, ev } from "../../common";
+import { showSnack } from "../snackbar";
 
 Quill.register("modules/markdownShortcuts", MarkdownShortcuts);
 Quill.register("modules/magicUrl", MagicUrl);
@@ -85,6 +86,7 @@ const Editor = props => {
         quill.setText("\n");
         Editor.lastSaveTimestamp = 0;
         saveInterval = startAutoSave(quill);
+        showSnack("Let's start writing!", Icon.Edit2);
       });
     }
     ev.addListener("onNewNote", onNewNote);
