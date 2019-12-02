@@ -12,7 +12,7 @@ function Menu(props) {
       <Box>
         {props.menuItems.map(item => (
           <Flex
-            key={v.title}
+            key={item.title}
             onClick={() => {
               if (props.dropdownRef) {
                 props.dropdownRef.hide();
@@ -26,14 +26,14 @@ function Menu(props) {
             py={1}
             px={2}
             sx={{
-              color: v.color || "fontPrimary",
+              color: item.color || "fontPrimary",
               ":hover": {
                 backgroundColor: "accent",
                 color: "fontSecondary"
               }
             }}
           >
-            <v.icon size={15} strokeWidth={1.5} />
+            <item.icon size={15} strokeWidth={1.5} />
             <Text
               className="unselectable"
               as="span"

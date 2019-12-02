@@ -7,8 +7,6 @@
     "emotion-theming": "^10.0.19",
     "events": "^3.0.0",
     "notes-core": "npm:@streetwriters/notesnook-core@latest",
-    "quill-blot-formatter": "^1.0.5",
-    "quill-emoji": "^0.1.7",
     "quill-magic-url": "^1.0.3",
     "quill-markdown-shortcuts": "^0.0.10",
     "react": "^16.11.0",

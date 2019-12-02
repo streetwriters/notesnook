@@ -11,7 +11,6 @@ import TimeAgo from "timeago-react";
 import "react-simple-dropdown/styles/Dropdown.css";
 import { db, ev } from "../common";
 import { Virtuoso as List } from "react-virtuoso";
-import AutoSizer from "react-virtualized-auto-sizer";
 import { showSnack } from "../components/snackbar";
 import Menu from "../components/menu";
 

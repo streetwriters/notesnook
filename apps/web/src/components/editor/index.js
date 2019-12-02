@@ -9,6 +9,7 @@ import MarkdownShortcuts from "./modules/markdown";
 import MagicUrl from "quill-magic-url";
 import { db, ev } from "../../common";
 import { showSnack } from "../snackbar";
+import * as Icon from "react-feather";
 
 Quill.register("modules/markdownShortcuts", MarkdownShortcuts);
 Quill.register("modules/magicUrl", MagicUrl);
