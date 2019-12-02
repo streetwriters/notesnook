@@ -420,7 +420,7 @@
       .ql-editor.ql-blank::before {
         color: rgba(0, 0, 0, 0.6);
         content: attr(data-placeholder);
-        font-style: italic;
+        
         left: 15px;
         pointer-events: none;
         position: absolute;
@@ -1103,20 +1103,17 @@
             const editor = new Quill('#editor', {
               modules: {
                 toolbar: [
-                  [{header: [1, 2, 3, 4, 5, 6, false]}],
-                  ['bold', 'italic', 'underline', 'strike'], // toggled buttons
-                  ['link', 'image', 'video'],
-                  ['blockquote', 'code-block'],
+                 [{header:1},{header:2}],  
+                 [{size: ['small', false, 'large', 'huge']}], // custom dropdown
+                  ['bold', 'italic','image'], // toggled buttons
                   [{list: 'ordered'}, {list: 'bullet'}],
+                  [{header: [3, 4, 5, 6]}],
+                  [{align: []}],
+                   [{color: []}, {background: []}], // dropdown with defaults from theme
+                  ['underline', 'strike','blockquote', 'code-block'],
                   [{script: 'sub'}, {script: 'super'}], // superscript/subscript
                   [{indent: '-1'}, {indent: '+1'}], // outdent/indent
                   [{direction: 'rtl'}], // text direction
-
-                  [{size: ['small', false, 'large', 'huge']}], // custom dropdown
-
-                  [{color: []}, {background: []}], // dropdown with defaults from theme
-                  [{align: []}],
-
                   ['clean'],
                 ],
                 imageCompressor: {
@@ -1191,10 +1188,12 @@
                 }
               }
 
-              window.ReactNativeWebView.postMessage(
-                JSON.stringify(editor.getContents()),
-              );
-
+              
+              let m = {};
+              m.delta = editor.getContents();
+              m.text = editor.getText();
+              m.html = editor.root.innerHTML;
+              window.ReactNativeWebView.postMessage(JSON.stringify(m));
             });
 
             var Font = Quill.import('formats/font');

@@ -24,7 +24,6 @@ export const Search = props => {
         justifyContent: 'space-between',
         alignItems: 'center',
         width: Platform.isPad ? '95%' : '90%',
-
         alignSelf: 'center',
         borderRadius: br,
         borderWidth: 1.5,
@@ -58,7 +57,7 @@ export const Search = props => {
       <Icon
         style={{paddingRight: Platform.isPad ? '1.25%' : '2.5%'}}
         onPress={() => {
-          props.value.length > 0 ? props.onClose() : null;
+          props.value.length > 0 ? props.clearSearch() : null;
           inputRef.current.setNativeProps({
             text: '',
           });

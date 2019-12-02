@@ -27,48 +27,13 @@ import NoteItem from '../NoteItem';
 import NavigationService from '../../services/NavigationService';
 import {storage} from '../../../App';
 
-let blockdata = [
-  {
-    name: '',
-    icon: 'md-add',
-    func: () => {
-      NavigationService.navigate('Editor');
-    },
-  },
-  {
-    name: 'All Notes',
-    icon: 'md-create',
-    func: () => {
-      NavigationService.navigate('Reminders');
-    },
-  },
-  {
-    name: 'Lists',
-    icon: 'ios-list',
-    func: () => {
-      NavigationService.navigate('Lists');
-    },
-  },
-];
-
-export const NotesList = ({keyword}) => {
+export const NotesList = ({keyword, searchResults}) => {
   const [colors, setColors] = useState(COLOR_SCHEME);
-  const [notes, setNotes] = useState([]);
-  const fetchNotes = async () => {
-    let allNotes = await storage.getNotes();
-    console.log(allNotes);
-    if (allNotes) {
-      setNotes(allNotes);
-    }
-  };
-  useEffect(() => {
-    fetchNotes();
-  }, [keyword]);
 
   return (
     <>
       <FlatList
-        data={notes}
+        data={searchResults}
         ListFooterComponent={
           <View
             style={{

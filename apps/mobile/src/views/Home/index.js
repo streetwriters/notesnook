@@ -34,6 +34,7 @@ import {Header} from '../../components/header';
 import {tsPropertySignature} from '@babel/types';
 import {NavigationEvents} from 'react-navigation';
 import {NotesList} from '../../components/NotesList';
+import {storage} from '../../../App';
 
 export const Home = ({navigation}) => {
   const [loading, setLoading] = useState(true);
@@ -41,7 +42,7 @@ export const Home = ({navigation}) => {
   const [isOpen, setOpen] = useState(false);
   const [hidden, setHidden] = useState(false);
   const [text, setText] = useState('');
-
+  const [searchResults, setSearchResults] = useState([]);
   useEffect(() => {
     setTimeout(() => {
       setLoading(false);
@@ -50,15 +51,16 @@ export const Home = ({navigation}) => {
 
   const onChangeText = value => {
     setText(value);
-    if (value.length > 2) {
-      setHidden(true);
-    } else if (value.length < 2) {
-      setHidden(false);
-    }
   };
-  const onSubmitEditing = () => {
-    if (!text || text.length < 2) {
+  const onSubmitEditing = async () => {
+    if (!text || text.length < 1) {
       setHidden(false);
+    } else {
+      setHidden(true);
+      let results = await storage.searchNotes(text);
+      if (results) {
+        setSearchResults(results);
+      }
     }
   };
 
@@ -69,6 +71,11 @@ export const Home = ({navigation}) => {
   };
 
   const onFocus = () => {};
+
+  const clearSearch = () => {
+    setSearchResults([]);
+    setHidden(false);
+  };
 
   return Platform.isPad ? (
     <SafeAreaView style={[styles.container]}>
@@ -115,10 +122,15 @@ export const Home = ({navigation}) => {
           onSubmitEditing={onSubmitEditing}
           onBlur={onBlur}
           onFocus={onFocus}
+          clearSearch={clearSearch}
           value={text}
         />
 
-        {hidden ? <NotesList keyword={text} /> : <RecentList />}
+        {hidden ? (
+          <NotesList searchResults={searchResults} keyword={text} />
+        ) : (
+          <RecentList />
+        )}
       </SafeAreaView>
     </SideMenu>
   );
@@ -386,6 +398,12 @@ export const RenderSideMenu = ({colors, close}) => (
             'water',
           ].map(item => (
             <TouchableOpacity
+              onPress={() => {
+                close();
+                NavigationService.navigate('Notes', {
+                  heading: item,
+                });
+              }}
               style={{
                 flexDirection: 'row',
                 justifyContent: 'flex-start',

@@ -24,6 +24,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import {Reminder} from '../../components/Reminder';
 import {ListItem} from '../../components/ListItem';
 import {Header} from '../../components/header';
+import {Search} from '../../components/SearchInput';
 
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
@@ -43,6 +44,7 @@ export const Notes = ({navigation}) => {
   return (
     <SafeAreaView>
       <Header colors={colors} heading={params.heading} canGoBack={false} />
+      <Search />
     </SafeAreaView>
   );
 };

@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import NavigationService, {
   AppContainer,
 } from './src/services/NavigationService';
@@ -10,12 +10,12 @@ import {
   DeviceEventEmitter,
   Platform,
 } from 'react-native';
-import {COLOR_SCHEME, SIZE, opacity, WEIGHT} from './src/common/common';
+import { COLOR_SCHEME, SIZE, opacity, WEIGHT } from './src/common/common';
 import Icon from 'react-native-vector-icons/Ionicons';
 import ActionButton from 'react-native-action-button';
 import Storage from 'notes-core/api/database';
 import StorageInterface from './src/utils/storage';
-import {RenderSideMenu} from './src/views/Home';
+import { RenderSideMenu } from './src/views/Home';
 import * as Animatable from 'react-native-animatable';
 const App = () => {
   const [colors, setColors] = useState(COLOR_SCHEME);
@@ -80,8 +80,8 @@ const App = () => {
           : undefined
         </Animatable.View>
       ) : (
-        undefined
-      )}
+          undefined
+        )}
 
       <AppContainer
         style={{
@@ -137,11 +137,13 @@ const App = () => {
           </ActionButton.Item>
         </ActionButton>
       ) : (
-        undefined
-      )}
+          undefined
+        )}
     </View>
   );
 };
+
+
 
 export default App;
 
