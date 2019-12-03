@@ -22,7 +22,7 @@ import {
   WEIGHT,
 } from '../../common/common';
 import WebView from 'react-native-webview';
-import Icon from 'react-native-vector-icons/Ionicons';
+import Icon from 'react-native-vector-icons/Feather';
 import {useForceUpdate} from '../ListsEditor';
 import {NavigationEvents} from 'react-navigation';
 import {storage} from '../../../App';
@@ -92,23 +92,41 @@ const Editor = ({navigation}) => {
           style={{
             height: '100%',
           }}>
-          <TextInput
-            ref={titleRef}
-            placeholder="Untitled Note"
-            placeholderTextColor={colors.icon}
+          <View
             style={{
-              width: '100%',
-              fontFamily: WEIGHT.bold,
-              fontSize: SIZE.xxl,
-              paddingHorizontal: '3%',
-              paddingVertical: 0,
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              width: '96%',
+              alignSelf: 'center',
               marginTop: Platform.OS == 'ios' ? h * 0.01 : h * 0.04,
-            }}
-            onChangeText={value => {
-              title = value;
-            }}
-            onSubmitEditing={async () => await saveNote()}
-          />
+            }}>
+            <Icon
+              style={{
+                paddingRight: 10,
+              }}
+              name="chevron-left"
+              color={colors.pri}
+              size={SIZE.xxl}
+            />
+
+            <TextInput
+              ref={titleRef}
+              placeholder="Untitled Note"
+              placeholderTextColor={colors.icon}
+              style={{
+                width: '90%',
+                fontFamily: WEIGHT.bold,
+                fontSize: SIZE.xxl,
+                maxWidth: '90%',
+                paddingVertical: 0,
+              }}
+              onChangeText={value => {
+                title = value;
+              }}
+              onSubmitEditing={async () => await saveNote()}
+            />
+          </View>
 
           <WebView
             ref={EditorWebView}

@@ -28,6 +28,7 @@ import {getElevation, h, w, timeSince} from '../../utils/utils';
 import {FlatList, TextInput} from 'react-native-gesture-handler';
 import {useForceUpdate} from '../ListsEditor';
 import {AddNotebookDialog} from '../../components/AddNotebookDialog';
+import {NotebookItem} from '../../components/NotebookItem';
 
 const refs = [];
 
@@ -36,7 +37,10 @@ export const Folders = ({navigation}) => {
   const [addNotebook, setAddNotebook] = useState(false);
   return (
     <SafeAreaView>
-      <AddNotebookDialog visible={addNotebook} />
+      <AddNotebookDialog
+        visible={addNotebook}
+        close={() => setAddNotebook(false)}
+      />
       <View
         style={{
           flexDirection: 'row',
@@ -98,55 +102,16 @@ export const Folders = ({navigation}) => {
             <Text
               style={{
                 fontSize: SIZE.md,
-                fontFamily: WEIGHT.bold,
+                fontFamily: WEIGHT.semibold,
                 color: 'white',
               }}>
-              Create new notebook
+              Create a new notebook
             </Text>
             <Icon name="plus" color="white" size={SIZE.lg} />
           </TouchableOpacity>
         }
         renderItem={({item, index}) => (
-          <View
-            style={{
-              paddingHorizontal: ph,
-              marginHorizontal: '5%',
-              borderBottomWidth: 1,
-              borderBottomColor: '#f0f0f0',
-              paddingVertical: pv + 5,
-            }}>
-            <Text
-              style={{
-                fontFamily: WEIGHT.bold,
-                fontSize: SIZE.md,
-                color: colors.pri,
-                maxWidth: '100%',
-              }}>
-              {item.name}
-            </Text>
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                paddingTop: pv,
-              }}>
-              <Text
-                style={{
-                  fontFamily: WEIGHT.regular,
-                  fontSize: SIZE.xs,
-                  color: colors.accent,
-                }}>
-                June 21
-              </Text>
-              <Text
-                style={{
-                  fontFamily: WEIGHT.regular,
-                  fontSize: SIZE.xs,
-                }}>
-                15 notes
-              </Text>
-            </View>
-          </View>
+          <NotebookItem item={item} index={index} colors={colors} />
         )}
       />
     </SafeAreaView>

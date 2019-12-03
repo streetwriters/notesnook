@@ -148,7 +148,7 @@ export const RecentList = ({update}) => {
               style={{
                 width: Platform.isPad ? '95%' : '90%',
                 alignSelf: 'center',
-                backgroundColor: 'red',
+                backgroundColor: colors.errorBg,
                 padding: pv,
                 borderRadius: 5,
                 flexDirection: 'row',
@@ -158,16 +158,16 @@ export const RecentList = ({update}) => {
               <Text
                 style={{
                   fontFamily: WEIGHT.bold,
-                  color: 'white',
+                  color: colors.errorText,
                 }}>
-                Sync Disabled
+                Sync is disabled
               </Text>
               <Text
                 style={{
                   fontFamily: WEIGHT.medium,
-                  color: 'white',
+                  color: colors.errorText,
                 }}>
-                Fix Now
+                Fix now
               </Text>
             </TouchableOpacity>
           </>
