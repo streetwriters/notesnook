@@ -35,6 +35,12 @@ export const COLOR_SCHEME = {
   accent: '#0560FF',
   normal: 'black',
   icon: 'gray',
+  errorBg: '#FFD2D2',
+  errorText: '#D8000C',
+  successBg: '#DFF2BF',
+  successText: '#4F8A10',
+  warningBg: '#FEEFB3',
+  warningText: '#9F6000',
 };
 
 //FONT FAMILY

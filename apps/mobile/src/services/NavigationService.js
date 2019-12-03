@@ -14,6 +14,7 @@ import ForgotPassword from '../views/ForgotPassword';
 import Settings from '../views/Settings';
 import Trash from '../views/Trash';
 import Notes from '../views/Notes';
+import Tags from '../views/Tags';
 
 const TopLevelNavigator = createStackNavigator(
   {
@@ -58,6 +59,9 @@ const TopLevelNavigator = createStackNavigator(
     },
     Notes: {
       screen: Notes,
+    },
+    Tags: {
+      screen: Tags,
     },
   },
   {

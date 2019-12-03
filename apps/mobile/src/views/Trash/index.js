@@ -8,6 +8,7 @@ import {
   Image,
   SafeAreaView,
   Platform,
+  FlatList,
 } from 'react-native';
 import NavigationService from '../../services/NavigationService';
 import {
@@ -24,6 +25,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import {Reminder} from '../../components/Reminder';
 import {ListItem} from '../../components/ListItem';
 import {Header} from '../../components/header';
+import NoteItem from '../../components/NoteItem';
 
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
@@ -34,6 +36,25 @@ export const Trash = ({navigation}) => {
   return (
     <SafeAreaView>
       <Header colors={colors} heading="Trash" canGoBack={false} />
+      <FlatList
+        numColumns={2}
+        columnWrapperStyle={{
+          width: '45%',
+        }}
+        data={[
+          {
+            title: 'my note',
+            headline: 'my simple not that i just deleted. please restore.',
+            dateCreated: Date.now(),
+          },
+          {
+            title: 'my note',
+            headline: 'my simple not that i just deleted. please restore.',
+            dateCreated: Date.now(),
+          },
+        ]}
+        renderItem={({item, index}) => <NoteItem item={item} />}
+      />
     </SafeAreaView>
   );
 };

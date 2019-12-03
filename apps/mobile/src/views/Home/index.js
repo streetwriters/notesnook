@@ -43,6 +43,7 @@ export const Home = ({navigation}) => {
   const [hidden, setHidden] = useState(false);
   const [text, setText] = useState('');
   const [searchResults, setSearchResults] = useState([]);
+  const [update, setUpdate] = useState(0);
   useEffect(() => {
     setTimeout(() => {
       setLoading(false);
@@ -82,6 +83,7 @@ export const Home = ({navigation}) => {
       <NavigationEvents
         onWillFocus={() => {
           DeviceEventEmitter.emit('openSidebar');
+          setUpdate(update + 1);
         }}
       />
       <Header colors={colors} heading="Home" canGoBack={false} />
@@ -110,6 +112,12 @@ export const Home = ({navigation}) => {
       menu={<RenderSideMenu colors={colors} close={() => setOpen(false)} />}
       openMenuOffset={w / 1.5}>
       <SafeAreaView style={styles.container}>
+        <NavigationEvents
+          onWillFocus={() => {
+            setUpdate(update + 1);
+          }}
+        />
+
         <Header
           colors={colors}
           heading="Home"
@@ -129,7 +137,7 @@ export const Home = ({navigation}) => {
         {hidden ? (
           <NotesList searchResults={searchResults} keyword={text} />
         ) : (
-          <RecentList />
+          <RecentList update={update} />
         )}
       </SafeAreaView>
     </SideMenu>
@@ -152,93 +160,9 @@ export const RenderSideMenu = ({colors, close}) => (
     <ScrollView
       contentContainerStyle={{
         justifyContent: 'space-between',
+        height: '100%',
       }}>
       <View>
-        <View
-          style={{
-            width: '100%',
-            justifyContent: 'space-between',
-            paddingHorizontal: '5%',
-            alignItems: 'center',
-            alignSelf: 'center',
-            marginBottom: 10,
-            marginTop: Platform.OS == 'ios' ? h * 0.01 : h * 0.05,
-            flexDirection: 'row',
-          }}>
-          <Image
-            style={{
-              width: 35,
-              height: 35,
-              borderRadius: 100,
-              marginRight: 10,
-            }}
-            source={require('../../assets/images/img.png')}
-          />
-
-          <TouchableOpacity
-            onPress={() => {
-              close();
-
-              NavigationService.navigate('Login');
-            }}
-            activeOpacity={opacity}
-            style={{
-              paddingVertical: pv - 5,
-              paddingHorizontal: ph,
-              borderRadius: 5,
-              justifyContent: 'center',
-              alignItems: 'center',
-              borderColor: colors.accent,
-              backgroundColor: colors.accent,
-              borderWidth: 1,
-            }}>
-            <Text
-              style={{
-                fontFamily: WEIGHT.medium,
-                color: 'white',
-              }}>
-              Login
-            </Text>
-          </TouchableOpacity>
-
-          {/* <Text
-        style={{
-          fontFamily: WEIGHT.semibold,
-          color: colors.accent,
-          fontSize: SIZE.md,
-          marginTop: 10,
-        }}>
-        Hi, Ammar!
-      </Text>
-
-      <Text
-        style={{
-          fontFamily: WEIGHT.regular,
-          color: colors.accent,
-          fontSize: SIZE.xs,
-          marginTop: 10,
-        }}>
-        80.45/100 MB
-      </Text> */}
-
-          {/*  <View
-        style={{
-          borderRadius: 2.5,
-          backgroundColor: colors.accent,
-          marginTop: 10,
-          paddingHorizontal: 5,
-          paddingVertical: 2,
-        }}>
-        <Text
-          style={{
-            fontFamily: WEIGHT.bold,
-            fontSize: SIZE.xxs,
-            color: 'white',
-          }}>
-          Basic User
-        </Text>
-      </View> */}
-        </View>
         <View
           style={{
             borderWidth: 1,
@@ -247,6 +171,7 @@ export const RenderSideMenu = ({colors, close}) => (
             backgroundColor: colors.navbg,
             width: '100%',
             marginBottom: 5,
+            marginTop: Platform.OS == 'ios' ? h * 0.01 : h * 0.03,
           }}
         />
         <FlatList
@@ -340,10 +265,12 @@ export const RenderSideMenu = ({colors, close}) => (
             </TouchableOpacity>
           )}
         />
-      </View>
 
-      <View>
-        <View
+        <TouchableOpacity
+          onPress={() => {
+            close();
+            NavigationService.navigate('Tags');
+          }}
           style={{
             width: '100%',
             alignSelf: 'center',
@@ -351,7 +278,7 @@ export const RenderSideMenu = ({colors, close}) => (
             justifyContent: 'flex-start',
             alignItems: 'center',
             paddingHorizontal: ph,
-            marginTop: 20,
+            marginTop: 15,
           }}>
           <Icon
             style={{
@@ -365,11 +292,10 @@ export const RenderSideMenu = ({colors, close}) => (
             style={{
               fontFamily: WEIGHT.medium,
               fontSize: SIZE.sm - 1,
-              marginTop: -5,
             }}>
             Tags
           </Text>
-        </View>
+        </TouchableOpacity>
 
         <View
           style={{
@@ -386,7 +312,7 @@ export const RenderSideMenu = ({colors, close}) => (
             flexDirection: 'row',
             flexWrap: 'wrap',
             paddingHorizontal: '5%',
-            marginBottom: 20,
+            marginBottom: 0,
           }}>
           {[
             'home',
@@ -424,33 +350,6 @@ export const RenderSideMenu = ({colors, close}) => (
 
         <View
           style={{
-            width: '100%',
-            alignSelf: 'center',
-            flexDirection: 'row',
-            justifyContent: 'flex-start',
-            alignItems: 'center',
-            paddingHorizontal: ph,
-            marginTop: 20,
-          }}>
-          <Icon
-            style={{
-              width: 30,
-            }}
-            name="circle"
-            color={colors.icon}
-            size={SIZE.md}
-          />
-          <Text
-            style={{
-              fontFamily: WEIGHT.medium,
-              fontSize: SIZE.sm - 1,
-              marginTop: -5,
-            }}>
-            Colors
-          </Text>
-        </View>
-        <View
-          style={{
             borderWidth: 1,
             borderColor: colors.navbg,
             height: 2,
@@ -464,7 +363,7 @@ export const RenderSideMenu = ({colors, close}) => (
             flexDirection: 'row',
             flexWrap: 'wrap',
             paddingHorizontal: '5%',
-            marginBottom: 40,
+            marginBottom: 15,
           }}>
           {['red', 'yellow', 'green', 'blue', 'purple', 'orange', 'gray'].map(
             item => (
@@ -477,18 +376,19 @@ export const RenderSideMenu = ({colors, close}) => (
                 }}>
                 <View
                   style={{
-                    width: 40,
+                    width: 25,
                     height: 25,
                     backgroundColor: item,
-                    borderRadius: 5,
+                    borderRadius: 100,
                   }}
                 />
               </TouchableOpacity>
             ),
           )}
         </ScrollView>
+      </View>
 
-        <View
+      {/*  <View
           style={{
             backgroundColor: '#F3A712',
             width: '90%',
@@ -519,7 +419,83 @@ export const RenderSideMenu = ({colors, close}) => (
             }}>
             <Icon name="star" color="#FCBA04" size={SIZE.lg} />
           </View>
-        </View>
+        </View> */}
+
+      <View
+        style={{
+          width: '100%',
+          justifyContent: 'space-between',
+          paddingHorizontal: '5%',
+          alignItems: 'center',
+          alignSelf: 'center',
+          marginBottom: 20,
+          flexDirection: 'row',
+        }}>
+        <TouchableOpacity
+          onPress={() => {
+            close();
+
+            NavigationService.navigate('Login');
+          }}
+          activeOpacity={opacity}
+          style={{
+            paddingVertical: pv,
+            paddingHorizontal: ph,
+            borderRadius: 5,
+            width: '100%',
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderColor: colors.accent,
+            backgroundColor: colors.accent,
+            borderWidth: 1,
+          }}>
+          <Text
+            style={{
+              fontFamily: WEIGHT.medium,
+              color: 'white',
+              fontSize: SIZE.sm,
+            }}>
+            Login to Sync
+          </Text>
+        </TouchableOpacity>
+
+        {/* <Text
+        style={{
+          fontFamily: WEIGHT.semibold,
+          color: colors.accent,
+          fontSize: SIZE.md,
+          marginTop: 10,
+        }}>
+        Hi, Ammar!
+      </Text>
+
+      <Text
+        style={{
+          fontFamily: WEIGHT.regular,
+          color: colors.accent,
+          fontSize: SIZE.xs,
+          marginTop: 10,
+        }}>
+        80.45/100 MB
+      </Text> */}
+
+        {/*  <View
+        style={{
+          borderRadius: 2.5,
+          backgroundColor: colors.accent,
+          marginTop: 10,
+          paddingHorizontal: 5,
+          paddingVertical: 2,
+        }}>
+        <Text
+          style={{
+            fontFamily: WEIGHT.bold,
+            fontSize: SIZE.xxs,
+            color: 'white',
+          }}>
+          Basic User
+        </Text>
+      </View> */}
       </View>
     </ScrollView>
   </SafeAreaView>

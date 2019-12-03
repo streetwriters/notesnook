@@ -51,7 +51,7 @@ let blockdata = [
   },
 ];
 
-export const RecentList = () => {
+export const RecentList = ({update}) => {
   const [colors, setColors] = useState(COLOR_SCHEME);
   const [notes, setNotes] = useState([]);
   const fetchNotes = async () => {
@@ -63,7 +63,7 @@ export const RecentList = () => {
   };
   useEffect(() => {
     fetchNotes();
-  }, []);
+  }, [update]);
 
   return (
     <>
