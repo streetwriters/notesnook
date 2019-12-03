@@ -258,7 +258,7 @@ class MarkdownShortcuts {
       // remove formatting when there's no text left
       if (
         delta.ops[0].delete !== undefined &&
-        source == "user" &&
+        source === "user" &&
         this.quill.getLength() <= 2
       ) {
         this.quill.removeFormat(0, 1);

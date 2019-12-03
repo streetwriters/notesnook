@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import Home from "../views/Home";
+import Notebooks from "../views/Notebooks";
 import { ThemeProvider } from "emotion-theming";
 import { Heading } from "rebass";
 import * as Icon from "react-feather";
@@ -16,7 +17,7 @@ export const routes = {
   notebooks: {
     key: "notebooks",
     title: "Notebooks",
-    component: undefined,
+    component: Notebooks,
     icon: Icon.Book
   },
   lists: {

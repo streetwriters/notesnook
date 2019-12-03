@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Flex, Box, Text } from "rebass";
 import * as Icon from "react-feather";
-import { SHADOW } from "../theme";
-import { Input } from "@rebass/forms";
+import { ButtonPressedStyle } from "../theme";
 import Dropdown, {
   DropdownTrigger,
   DropdownContent
@@ -13,6 +12,8 @@ import { db, ev } from "../common";
 import { Virtuoso as List } from "react-virtuoso";
 import { showSnack } from "../components/snackbar";
 import Menu from "../components/menu";
+import Button from "../components/button";
+import Search from "../components/search";
 
 const dropdownRefs = [];
 const menuItems = [
@@ -52,45 +53,12 @@ function Home() {
   }, []);
   return (
     <Flex flexDirection="column" flex="1 1 auto">
-      <Input
-        placeholder="Search"
-        fontFamily="body"
-        fontWeight="body"
-        fontSize="input"
-        bg="navbg"
-        my={2}
-        px={3}
-        py={3}
-        sx={{
-          boxShadow: SHADOW,
-          borderWidth: 0,
-          borderRadius: "default"
-        }}
+      <Search placeholder="Search" />
+      <Button
+        Icon={Icon.Plus}
+        content="Make a new note"
+        onClick={sendNewNoteEvent}
       />
-      <Flex
-        bg="accent"
-        width="full"
-        py={3}
-        px={3}
-        flexDirection="row"
-        alignItems="center"
-        sx={{
-          borderRadius: "default",
-          marginBottom: 2,
-          color: "fontSecondary",
-          fontFamily: "body",
-          fontWeight: "body",
-          ":active": {
-            opacity: "0.8"
-          }
-        }}
-        onClick={() => sendNewNoteEvent()}
-      >
-        <Icon.Plus />
-        <Text className="unselectable" mx={1}>
-          Make a new note
-        </Text>
-      </Flex>
       <List
         style={{ width: "100%", flex: "1 1 auto", height: "auto" }}
         totalCount={notes.length}
@@ -101,7 +69,11 @@ function Home() {
               bg="navbg"
               px={3}
               py={3}
-              sx={{ borderRadius: "default", marginBottom: 2 }}
+              sx={{
+                borderRadius: "default",
+                marginBottom: 2,
+                ...ButtonPressedStyle
+              }}
             >
               <Flex flexDirection="row" justifyContent="space-between">
                 <Text fontFamily="body" fontSize="title" fontWeight="bold">

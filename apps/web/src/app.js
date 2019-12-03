@@ -35,7 +35,7 @@ const NavMenuItem = props => {
 };
 
 function App() {
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [selectedIndex, setSelectedIndex] = useState(1);
   return (
     <ThemeProvider theme={theme}>
       <Flex height="100%" alignContent="stretch">

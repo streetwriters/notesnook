@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import "./editor.css";
 import ReactQuill, { Quill } from "react-quill";
 import "react-quill/dist/quill.bubble.css";

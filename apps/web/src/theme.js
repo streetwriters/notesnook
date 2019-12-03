@@ -1,4 +1,10 @@
-export const SHADOW = "0 0 5px 1px #aaaaaa99";
+export const SHADOW = "0 0 8px 0px #aaaaaa44";
+export const DIALOG_SHADOW = "0 0 20px 0px #aaaaaa77";
+export const ButtonPressedStyle = {
+  ":active": {
+    opacity: "0.8"
+  }
+};
 export default {
   breakpoints: ["480px", "834px", "1200px"],
   colors: {
@@ -9,13 +15,15 @@ export default {
     //font related
     fontPrimary: "black",
     fontSecondary: "white",
-    border: "#f0f0f0"
+    border: "#f0f0f0",
+    hover: "#e0e0e0"
   },
   space: [0, 5, 10, 12],
   fontSizes: {
     heading: 42,
     input: 16,
-    title: 18,
+    title: 28,
+    subtitle: 18,
     body: 14,
     menu: 14
   },
@@ -35,6 +43,59 @@ export default {
     none: 0,
     default: 5
   },
+  forms: {
+    default: {
+      borderWidth: 0,
+      borderRadius: "default",
+      bg: "primary",
+      border: "2px solid",
+      borderColor: "border",
+      fontFamily: "body",
+      fontWeight: "body",
+      fontSizes: "input",
+      ":focus": {
+        outline: "none",
+        borderColor: "accent"
+      },
+      ":hover": {
+        borderColor: "hover"
+      }
+    },
+    search: {
+      borderWidth: 0,
+      borderRadius: "default",
+      bg: "primary",
+      border: "2px solid",
+      borderColor: "border",
+      fontFamily: "body",
+      fontWeight: "body",
+      fontSizes: "input",
+      ":focus": {
+        outline: "none",
+        boxShadow: SHADOW
+      },
+      ":hover": {
+        borderColor: "hover"
+      }
+    }
+  },
+  text: {
+    heading: {
+      fontFamily: "body",
+      fontWeight: "heading",
+      fontSize: "heading"
+    },
+    title: {
+      fontFamily: "body",
+      fontWeight: "bold",
+      fontSize: "title"
+    },
+    body: {
+      fontFamily: "body",
+      fontWeight: "body",
+      fontSize: "body"
+    }
+  },
   buttons: {
     nav: {
       color: "fontPrimary",
@@ -43,6 +104,44 @@ export default {
       fontWeight: "body",
       ":focus": {
         outline: "none"
+      }
+    },
+    primary: {
+      color: "fontSecondary",
+      bg: "accent",
+      borderRadius: "default",
+      fontFamily: "body",
+      fontWeight: "body",
+      ":focus": {
+        outline: "none"
+      },
+      ...ButtonPressedStyle
+    },
+    secondary: {
+      color: "fontPrimary",
+      bg: "navbg",
+      borderRadius: "default",
+      fontFamily: "body",
+      fontWeight: "body",
+      ":focus": {
+        outline: "none"
+      },
+      ...ButtonPressedStyle
+    },
+    tertiary: {
+      color: "fontPrimary",
+      bg: "transparent",
+      borderRadius: "default",
+      border: "2px solid",
+      borderColor: "border",
+      fontFamily: "body",
+      fontWeight: "body",
+      ":focus": {
+        outline: "none"
+      },
+      ":active": {
+        color: "accent",
+        opacity: 0.8
       }
     }
   }

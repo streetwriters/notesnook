@@ -1,0 +1,3 @@
+#searchInput:focus + #searchIcon {
+  color: #1790f3;
+}
