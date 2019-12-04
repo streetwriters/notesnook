@@ -16,10 +16,10 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import ActionButton from 'react-native-action-button';
 import Storage from 'notes-core/api/database';
 import StorageInterface from './src/utils/storage';
-import {RenderSideMenu} from './src/views/Home';
 import * as Animatable from 'react-native-animatable';
 import {h} from './src/utils/utils';
 import {Toast} from './src/components/Toast';
+import {Menu} from './src/components/Menu';
 
 const App = () => {
   const [colors, setColors] = useState(COLOR_SCHEME);
@@ -84,7 +84,7 @@ const App = () => {
           style={{
             width: sidebar,
           }}>
-          <RenderSideMenu
+          <Menu
             colors={colors}
             close={() => {
               setSidebar('0%');
