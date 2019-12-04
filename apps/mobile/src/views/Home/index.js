@@ -29,7 +29,7 @@ import Icon from 'react-native-vector-icons/Feather';
 import {Search} from '../../components/SearchInput';
 import {Reminder} from '../../components/Reminder';
 import {RecentList} from '../../components/Recents';
-import {getElevation, w, h} from '../../utils/utils';
+import {getElevation, w, h, Toast} from '../../utils/utils';
 import {Header} from '../../components/header';
 import {tsPropertySignature} from '@babel/types';
 import {NavigationEvents} from 'react-navigation';

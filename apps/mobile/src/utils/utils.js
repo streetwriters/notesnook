@@ -1,4 +1,4 @@
-import {Dimensions} from 'react-native';
+import {Dimensions, DeviceEventEmitter} from 'react-native';
 export const getElevation = elevation => {
   return {
     elevation,
@@ -38,3 +38,12 @@ export function timeSince(date) {
 
 export const w = Dimensions.get('window').width;
 export const h = Dimensions.get('window').height;
+
+export const ToastEvent = {
+  show: (message, type, duration = 1000, func = null) => {
+    DeviceEventEmitter.emit('showToast', {message, type, duration, func});
+  },
+  hide: (message, type, duration = 1000, func = null) => {
+    DeviceEventEmitter.emit('hideToast', {message, type, duration, func});
+  },
+};
