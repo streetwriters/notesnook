@@ -23,7 +23,7 @@ class Database {
   /**
    * Get all notes
    */
-  async getNotes() {
+  getNotes() {
     return extractValues(this.notes);
   }
 
@@ -81,7 +81,7 @@ class Database {
    * @param {string} query the search query
    * @returns An array containing the filtered notes
    */
-  async searchNotes(query) {
+  searchNotes(query) {
     if (!query) return [];
     return ff(
       extractValues(this.notes),
@@ -94,7 +94,7 @@ class Database {
    * Get all notebooks
    * @returns An array containing all the notebooks
    */
-  async getNotebooks() {
+  getNotebooks() {
     return extractValues(this.notebooks);
   }
 
@@ -107,13 +107,15 @@ class Database {
     if (!notebook || !notebook.title) return;
     const id = notebook.dateCreated || Date.now();
     let topics = {};
-    for (let topic of notebook.topics) {
-      topics[topic] = [];
+    if (notebook.topics) {
+      for (let topic of notebook.topics) {
+        topics[topic] = [];
+      }
     }
     this.notebooks[id] = {
       title: notebook.title,
       description: notebook.description,
-      dateCreated: notebook.dateCreated,
+      dateCreated: id,
       pinned: notebook.pinned || false,
       favorite: notebook.favorite || false,
       topics,
@@ -134,7 +136,7 @@ class Database {
     return this.notebookTopicFn(
       notebookId,
       topic,
-      notebook => (notebook.topics[topic] = [])
+      notebook => ((notebook.topics[topic] = []), true)
     );
   }
 
@@ -144,11 +146,11 @@ class Database {
    * @param {string} topic The topic to delete
    */
   deleteTopicFromNotebook(notebookId, topic) {
-    return this.notebookTopicFn(
-      notebookId,
-      topic,
-      notebook => delete notebook.topics[topic]
-    );
+    return this.notebookTopicFn(notebookId, topic, notebook => {
+      if (!notebook.topics[topic]) return false;
+      delete notebook.topics[topic];
+      return true;
+    });
   }
 
   /**
@@ -159,8 +161,10 @@ class Database {
    */
   addNoteToTopic(notebookId, topic, noteId) {
     return this.notebookTopicFn(notebookId, topic, notebook => {
-      let topic = notebook.topics[topic];
-      topic[topic.length] = noteId;
+      if (!notebook.topics.hasOwnProperty(topic)) return false;
+      let nbTopic = notebook.topics[topic];
+      notebook.topics[topic][nbTopic.length] = noteId;
+      return true;
     });
   }
 
@@ -172,10 +176,12 @@ class Database {
    */
   deleteNoteFromTopic(notebookId, topic, noteId) {
     return this.notebookTopicFn(notebookId, topic, notebook => {
-      let topic = notebook.topics[topic];
-      let index = topic.indexOf(noteId);
+      if (!notebook.topics[topic]) return false;
+      let nbTopic = notebook.topics[topic];
+      let index = nbTopic.indexOf(noteId);
       if (index <= -1) return;
-      topic.splice(index, 1);
+      notebook.topics[topic].splice(index, 1);
+      return true;
     });
   }
 
@@ -211,13 +217,14 @@ class Database {
     await this.delete(notebooks, KEYS.notebooks);
   }
 
-  async notebookTopicFn(notebookId, topic, fn) {
+  notebookTopicFn(notebookId, topic, fn) {
     if (!notebookId || !topic || !this.notebooks[notebookId]) return;
     let notebook = this.notebooks[notebookId];
-    if (!notebook.topics[topic]) return;
-    fn(notebook);
-    this.notes[notebookId] = notebook;
-    await this.storage.write(KEYS.notebooks, this.notebooks);
+    if (fn(notebook)) {
+      this.notes[notebookId] = notebook;
+      return this.storage.write(KEYS.notebooks, this.notebooks);
+    }
+    return Promise.resolve();
   }
 
   getItem(id, key) {
