@@ -13,19 +13,22 @@ class Database {
     this.storage = new Storage(storage);
     this.notes = {};
     this.notebooks = {};
+
+    // fill data
+    for (let key of KEYS) {
+      this.storage.read(key).then(data => (this[key] = data));
+    }
   }
 
   /**
-   * Get all notes from the database
+   * Get all notes
    */
   async getNotes() {
-    //update our cache
-    this.notes = (await this.storage.read(KEYS.notes)) || {};
     return extractValues(this.notes);
   }
 
   /**
-   * Adds or updates the note in the database
+   * Adds or updates a note
    * @param {object} note The note to add or update
    */
   async addNote(note) {
@@ -58,52 +61,48 @@ class Database {
   }
 
   /**
-   * Deletes one or more notes from the database
+   * Deletes one or more notes
    * @param {array} notes the notes to be deleted
    */
   async deleteNotes(notes) {
-    if (!notes || notes.length <= 0 || !this.notes || this.notes.length <= 0)
-      return;
-    for (let note of notes) {
-      if (this.notes.hasOwnProperty(note.dateCreated)) {
-        delete this.notes[note.dateCreated];
-      }
-    }
-    await this.storage.write(KEYS.notes, this.notes);
+    this.delete(notes, KEYS.notes);
   }
 
   /**
-   * Gets a note from the database
+   * Gets a note
    * @param {string} id the id of the note (must be a timestamp)
    */
   getNote(id) {
-    if (this.notes.hasOwnProperty(id)) {
-      return this.notes[id];
-    }
+    return this.getItem(id, KEYS.notes);
   }
 
   /**
-   * Searches all notes in the database with the given query
+   * Searches all notes with the given query
    * @param {string} query the search query
+   * @returns An array containing the filtered notes
    */
   async searchNotes(query) {
     if (!query) return [];
-    //TODO benchmark this and make it faster if necessary
-    let notes = await this.getNotes();
-    if (!notes) return [];
     return ff(
-      notes,
+      extractValues(this.notes),
       v => fuzzysearch(query, v.title + " " + v.content.text),
       this
     );
   }
 
-  //Notebooks
+  /**
+   * Get all notebooks
+   * @returns An array containing all the notebooks
+   */
   async getNotebooks() {
-    //update our cache
-    this.notebooks = (await this.storage.read(KEYS.notebooks)) || {};
     return extractValues(this.notebooks);
   }
+
+  /**
+   * Add a notebook
+   * @param {object} notebook The notebook to add
+   * @returns The ID of the added notebook
+   */
   async addNotebook(notebook) {
     if (!notebook || !notebook.title) return;
     const id = notebook.dateCreated || Date.now();
@@ -125,13 +124,118 @@ class Database {
     await this.storage.write(KEYS.notebooks, this.notebooks);
     return id;
   }
-  getNotebook(id) {}
 
-  // Lists
-  getLists() {}
-  getList() {}
-  addList() {}
-  deleteLists() {}
+  /**
+   * Add a topic to the notebook
+   * @param {number} notebookId The ID of notebook
+   * @param {string} topic The topic to add
+   */
+  addTopicToNotebook(notebookId, topic) {
+    return this.notebookTopicFn(
+      notebookId,
+      topic,
+      notebook => (notebook.topics[topic] = [])
+    );
+  }
+
+  /**
+   * Delete a topic from the notebook
+   * @param {number} notebookId The ID of the notebook
+   * @param {string} topic The topic to delete
+   */
+  deleteTopicFromNotebook(notebookId, topic) {
+    return this.notebookTopicFn(
+      notebookId,
+      topic,
+      notebook => delete notebook.topics[topic]
+    );
+  }
+
+  /**
+   * Add a note to a topic in a notebook
+   * @param {number} notebookId The ID of the notebook
+   * @param {string} topic The topic to add note to
+   * @param {number} noteId The ID of the note
+   */
+  addNoteToTopic(notebookId, topic, noteId) {
+    return this.notebookTopicFn(notebookId, topic, notebook => {
+      let topic = notebook.topics[topic];
+      topic[topic.length] = noteId;
+    });
+  }
+
+  /**
+   * Delete a note from a topic in a notebook
+   * @param {number} notebookId The ID of the notebook
+   * @param {string} topic The topic to delete note from
+   * @param {number} noteId The ID of the note
+   */
+  deleteNoteFromTopic(notebookId, topic, noteId) {
+    return this.notebookTopicFn(notebookId, topic, notebook => {
+      let topic = notebook.topics[topic];
+      let index = topic.indexOf(noteId);
+      if (index <= -1) return;
+      topic.splice(index, 1);
+    });
+  }
+
+  /**
+   * Get all the notes in a topic
+   * @param {number} notebookId The ID of the notebook
+   * @param {string} topic The topic
+   * @returns An array containing the topic notes
+   */
+  getTopic(notebookId, topic) {
+    if (!notebookId || !topic || !this.notebooks[notebookId]) return;
+    let notebook = this.notebooks[notebookId];
+    if (!notebook.topics[topic]) return;
+    let topic = notebook.topics[topic];
+    if (topic.length <= 0) return [];
+    return topic.map(note => this.getNote(note));
+  }
+
+  /**
+   * Get a notebook
+   * @param {number} id The ID of the notebook
+   * @returns The notebook
+   */
+  getNotebook(id) {
+    return this.getItem(id, KEYS.notebooks);
+  }
+
+  /**
+   * Delete notebooks
+   * @param {array} notebooks The notebooks to delete
+   */
+  async deleteNotebooks(notebooks) {
+    await this.delete(notebooks, KEYS.notebooks);
+  }
+
+  async notebookTopicFn(notebookId, topic, fn) {
+    if (!notebookId || !topic || !this.notebooks[notebookId]) return;
+    let notebook = this.notebooks[notebookId];
+    if (!notebook.topics[topic]) return;
+    fn(notebook);
+    this.notes[notebookId] = notebook;
+    await this.storage.write(KEYS.notebooks, this.notebooks);
+  }
+
+  getItem(id, key) {
+    if (this[key].hasOwnProperty(id)) {
+      return this[key][id];
+    }
+  }
+
+  async delete(items, key) {
+    if (!items || items.length <= 0 || !this[key] || this[key].length <= 0)
+      return;
+    for (let item of items) {
+      if (this[key].hasOwnProperty(item.dateCreated)) {
+        delete this[key][item.dateCreated];
+      }
+    }
+    await this.storage.write(key, this[key]);
+  }
 }
 
 export default Database;
