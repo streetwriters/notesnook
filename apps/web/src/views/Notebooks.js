@@ -19,11 +19,6 @@ const Notebooks = props => {
   return (
     <Flex flexDirection="column">
       <Search placeholder="Search" />
-      <Button
-        Icon={Icon.Plus}
-        content="Create a notebook"
-        onClick={() => setOpen(true)}
-      />
       <Flex
         flexDirection="row"
         bg={"primary"}
@@ -51,6 +46,12 @@ const Notebooks = props => {
         </Box>
         <Text className="unselectable">{notebook.totalNotes} Notes</Text>
       </Flex>
+
+      <Button
+        Icon={Icon.Plus}
+        content="Create a notebook"
+        onClick={() => setOpen(true)}
+      />
       <CreateNotebookDialog open={open} close={() => setOpen(false)} />
     </Flex>
   );

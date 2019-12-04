@@ -47,7 +47,7 @@ async function saveNote(quill) {
     delta: quill.getContents(),
     text: quill.getText()
   };
-  if (!content.delta || content.text.len <= 1) return;
+  if (!content.delta || content.text.length <= 1) return;
   let note = {
     content,
     title,

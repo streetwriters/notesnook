@@ -20,9 +20,9 @@ export default {
   },
   space: [0, 5, 10, 12],
   fontSizes: {
-    heading: 42,
+    heading: 36,
     input: 16,
-    title: 28,
+    title: 22,
     subtitle: 18,
     body: 14,
     menu: 14

@@ -53,64 +53,86 @@ function Home() {
   }, []);
   return (
     <Flex flexDirection="column" flex="1 1 auto">
-      <Search placeholder="Search" />
-      <Button
-        Icon={Icon.Plus}
-        content="Make a new note"
-        onClick={sendNewNoteEvent}
-      />
-      <List
-        style={{ width: "100%", flex: "1 1 auto", height: "auto" }}
-        totalCount={notes.length}
-        item={index => {
-          const note = notes[index];
-          return (
-            <Box
-              bg="navbg"
-              px={3}
-              py={3}
-              sx={{
-                borderRadius: "default",
-                marginBottom: 2,
-                ...ButtonPressedStyle
-              }}
-            >
-              <Flex flexDirection="row" justifyContent="space-between">
-                <Text fontFamily="body" fontSize="title" fontWeight="bold">
-                  {note.title}
-                </Text>
-                <Dropdown ref={ref => (dropdownRefs[index] = ref)}>
-                  <DropdownTrigger>
-                    <Icon.MoreVertical
-                      size={20}
-                      strokeWidth={1.5}
-                      style={{ marginRight: -5 }}
-                    />
-                  </DropdownTrigger>
-                  <DropdownContent style={{ zIndex: 999, marginLeft: -70 }}>
-                    <Menu
-                      dropdownRef={dropdownRefs[index]}
-                      menuItems={menuItems}
-                      data={note}
-                    />
-                  </DropdownContent>
-                </Dropdown>
-              </Flex>
-              <Text fontFamily="body" fontSize="body" sx={{ marginTop: 1 }}>
-                {note.headline}
-              </Text>
-              <Text
-                fontFamily="body"
-                fontWeight="body"
-                fontSize={12}
-                color="accent"
-              >
-                <TimeAgo datetime={note.dateCreated} />
-              </Text>
-            </Box>
-          );
-        }}
-      />
+      {notes.length > 0 ? (
+        <Flex flexDirection="column" flex="1 1 auto">
+          <Search placeholder="Search" />
+          <List
+            style={{ width: "100%", flex: "1 1 auto", height: "auto" }}
+            totalCount={notes.length}
+            item={index => {
+              const note = notes[index];
+              return (
+                <Box
+                  bg="navbg"
+                  px={3}
+                  py={3}
+                  sx={{
+                    borderRadius: "default",
+                    marginBottom: 2,
+                    ...ButtonPressedStyle
+                  }}
+                >
+                  <Flex flexDirection="row" justifyContent="space-between">
+                    <Text fontFamily="body" fontSize="title" fontWeight="bold">
+                      {note.title}
+                    </Text>
+                    <Dropdown ref={ref => (dropdownRefs[index] = ref)}>
+                      <DropdownTrigger>
+                        <Icon.MoreVertical
+                          size={20}
+                          strokeWidth={1.5}
+                          style={{ marginRight: -5 }}
+                        />
+                      </DropdownTrigger>
+                      <DropdownContent style={{ zIndex: 999, marginLeft: -70 }}>
+                        <Menu
+                          dropdownRef={dropdownRefs[index]}
+                          menuItems={menuItems}
+                          data={note}
+                        />
+                      </DropdownContent>
+                    </Dropdown>
+                  </Flex>
+                  <Text fontFamily="body" fontSize="body" sx={{ marginTop: 1 }}>
+                    {note.headline}
+                  </Text>
+                  <Text
+                    fontFamily="body"
+                    fontWeight="body"
+                    fontSize={12}
+                    color="accent"
+                  >
+                    <TimeAgo datetime={note.dateCreated} />
+                  </Text>
+                </Box>
+              );
+            }}
+          />
+          <Button
+            Icon={Icon.Plus}
+            content="Make a new note"
+            onClick={sendNewNoteEvent}
+          />
+        </Flex>
+      ) : (
+        <Flex
+          flex="1 1 auto"
+          alignItems="center"
+          justifyContent="center"
+          color="#9b9b9b"
+          flexDirection="column"
+        >
+          <Icon.Edit size={72} strokeWidth={1.5} />
+          <Text variant="title">You have no notes</Text>
+          <Button
+            Icon={Icon.Edit2}
+            onClick={sendNewNoteEvent}
+            content="Let's begin"
+            style={{ marginTop: 2, textAlign: "center" }}
+            width={"auto"}
+          />
+        </Flex>
+      )}
     </Flex>
   );
 }

@@ -5,7 +5,7 @@ import { ButtonPressedStyle } from "../../theme";
 const Button = props => (
   <Flex
     bg="accent"
-    width="full"
+    width={props.width || "full"}
     py={3}
     px={3}
     flexDirection="row"
@@ -16,12 +16,14 @@ const Button = props => (
       color: "fontSecondary",
       fontFamily: "body",
       fontWeight: "body",
-      ...ButtonPressedStyle
+      boxShadow: "0 0 20px 0px #1790F3aa",
+      ...ButtonPressedStyle,
+      ...props.style
     }}
     onClick={props.onClick}
   >
     {props.Icon && <props.Icon />}
-    <Text className="unselectable" mx={1}>
+    <Text as="span" className="unselectable" mx={1} flex="1 1 auto">
       {props.content}
     </Text>
   </Flex>

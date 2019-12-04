@@ -35,11 +35,15 @@ const NavMenuItem = props => {
 };
 
 function App() {
-  const [selectedIndex, setSelectedIndex] = useState(1);
+  const [selectedIndex, setSelectedIndex] = useState(0);
   return (
     <ThemeProvider theme={theme}>
       <Flex height="100%" alignContent="stretch">
-        <Box width={[0, 0, 70]} bg="navbg" px={0}>
+        <Box
+          width={[0, 0, 70]}
+          sx={{ borderRight: "1px solid", borderRightColor: "navbg" }}
+          px={0}
+        >
           {Object.values(routes).map((item, index) => (
             <NavMenuItem
               onSelected={() => {
