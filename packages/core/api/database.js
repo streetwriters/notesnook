@@ -4,13 +4,15 @@ import ff from "fast-filter";
 import { extractValues } from "../utils";
 
 const KEYS = {
-  notes: "notes"
+  notes: "notes",
+  notebooks: "notebooks"
 };
 
 class Database {
   constructor(storage) {
     this.storage = new Storage(storage);
     this.notes = {};
+    this.notebooks = {};
   }
 
   /**
@@ -88,7 +90,7 @@ class Database {
     if (!query) return [];
     //TODO benchmark this and make it faster if necessary
     let notes = await this.getNotes();
-    if (!notes) return;
+    if (!notes) return [];
     return ff(
       notes,
       v => fuzzysearch(query, v.title + " " + v.content.text),
@@ -97,9 +99,33 @@ class Database {
   }
 
   //Notebooks
-  getNotebooks() {}
-  getNotebook() {}
-  addNotebook() {}
+  async getNotebooks() {
+    //update our cache
+    this.notebooks = (await this.storage.read(KEYS.notebooks)) || {};
+    return extractValues(this.notebooks);
+  }
+  async addNotebook(notebook) {
+    if (!notebook || !notebook.title) return;
+    const id = notebook.dateCreated || Date.now();
+    let topics = {};
+    for (let topic of notebook.topics) {
+      topics[topic] = [];
+    }
+    this.notebooks[id] = {
+      title: notebook.title,
+      description: notebook.description,
+      dateCreated: notebook.dateCreated,
+      pinned: notebook.pinned || false,
+      favorite: notebook.favorite || false,
+      topics,
+      totalNotes: 0,
+      tags: [],
+      colors: []
+    };
+    await this.storage.write(KEYS.notebooks, this.notebooks);
+    return id;
+  }
+  getNotebook(id) {}
 
   // Lists
   getLists() {}
