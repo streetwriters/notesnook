@@ -12,10 +12,10 @@ class Storage {
     return Convert.fromString(data);
   }
   clear() {
-    this.storage.clear();
+    this.storage.clear(); //TODO add test
   }
   remove(key) {
-    this.storage.remove(key);
+    this.storage.remove(key); //TODO add test
   }
 }
 

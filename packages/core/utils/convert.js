@@ -1,3 +1,4 @@
+//TODO add tests
 export default class Convert {
   static toString(input) {
     try {

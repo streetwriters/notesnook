@@ -33,7 +33,7 @@ class Database {
    */
   async addNote(note) {
     if (!note || !note.content || (!note.title && !note.content))
-      return undefined;
+      return undefined; //TODO add test
 
     let timestamp = note.dateCreated || Date.now();
     //add or update a note into the database
@@ -108,6 +108,7 @@ class Database {
     const id = notebook.dateCreated || Date.now();
     let topics = {};
     if (notebook.topics) {
+      //TODO add test
       for (let topic of notebook.topics) {
         topics[topic] = [];
       }
@@ -224,6 +225,7 @@ class Database {
       this.notes[notebookId] = notebook;
       return this.storage.write(KEYS.notebooks, this.notebooks);
     }
+    //TODO add test
     return Promise.resolve();
   }
 
@@ -235,7 +237,7 @@ class Database {
 
   async delete(items, key) {
     if (!items || items.length <= 0 || !this[key] || this[key].length <= 0)
-      return;
+      return; //TODO add test
     for (let item of items) {
       if (this[key].hasOwnProperty(item.dateCreated)) {
         delete this[key][item.dateCreated];
