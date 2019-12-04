@@ -1,7 +1,14 @@
 import React, {useEffect, useState, createRef} from 'react';
-import {SafeAreaView, Platform, DeviceEventEmitter} from 'react-native';
-import {COLOR_SCHEME} from '../../common/common';
-import SideMenu from 'react-native-side-menu';
+import {
+  SafeAreaView,
+  Platform,
+  DeviceEventEmitter,
+  TouchableOpacity,
+  View,
+  KeyboardAvoidingView,
+  Text,
+} from 'react-native';
+import {COLOR_SCHEME, opacity, pv, br, SIZE, WEIGHT} from '../../common/common';
 import {styles} from './styles';
 import {Search} from '../../components/SearchInput';
 import {RecentList} from '../../components/Recents';
@@ -10,12 +17,11 @@ import {Header} from '../../components/header';
 import {NavigationEvents} from 'react-navigation';
 import {NotesList} from '../../components/NotesList';
 import {storage} from '../../../App';
-import {Menu} from '../../components/Menu';
-
+import Icon from 'react-native-vector-icons/Feather';
+import NavigationService from '../../services/NavigationService';
 export const Home = ({navigation}) => {
   const [loading, setLoading] = useState(true);
   const [colors, setColors] = useState(COLOR_SCHEME);
-  const [isOpen, setOpen] = useState(false);
   const [hidden, setHidden] = useState(false);
   const [text, setText] = useState('');
   const [searchResults, setSearchResults] = useState([]);
@@ -47,7 +53,9 @@ export const Home = ({navigation}) => {
     }
   };
 
-  const onFocus = () => {};
+  const onFocus = () => {
+    setHidden(false);
+  };
 
   const clearSearch = () => {
     setSearchResults([]);
@@ -56,38 +64,39 @@ export const Home = ({navigation}) => {
 
   return Platform.isPad ? (
     <SafeAreaView style={[styles.container]}>
-      <NavigationEvents
-        onWillFocus={() => {
-          DeviceEventEmitter.emit('openSidebar');
-          setUpdate(update + 1);
-        }}
-      />
-      <Header colors={colors} heading="Home" canGoBack={false} />
+      <KeyboardAvoidingView>
+        <NavigationEvents
+          onWillFocus={() => {
+            DeviceEventEmitter.emit('openSidebar');
+            setUpdate(update + 1);
+          }}
+        />
+        <Header colors={colors} heading="Home" canGoBack={false} />
 
-      <Search
-        onChangeText={onChangeText}
-        onSubmitEditing={onSubmitEditing}
-        onBlur={onBlur}
-        onFocus={onFocus}
-        value={text}
-        onClose={() => {
-          setHidden(false);
-          setText('');
-        }}
-      />
+        <Search
+          onChangeText={onChangeText}
+          onSubmitEditing={onSubmitEditing}
+          onBlur={onBlur}
+          onFocus={onFocus}
+          value={text}
+          onClose={() => {
+            setHidden(false);
+            setText('');
+          }}
+        />
 
-      {hidden ? <NotesList keyword={text} /> : <RecentList />}
+        {hidden ? <NotesList keyword={text} /> : <RecentList />}
+      </KeyboardAvoidingView>
     </SafeAreaView>
   ) : (
-    <SideMenu
-      isOpen={isOpen}
-      bounceBackOnOverdraw={false}
-      onChange={args => {
-        setOpen(args);
-      }}
-      menu={<Menu colors={colors} close={() => setOpen(false)} />}
-      openMenuOffset={w / 1.5}>
-      <SafeAreaView style={styles.container}>
+    <SafeAreaView
+      style={{
+        height: '100%',
+      }}>
+      <KeyboardAvoidingView
+        style={{
+          height: '100%',
+        }}>
         <NavigationEvents
           onWillFocus={() => {
             setUpdate(update + 1);
@@ -115,8 +124,42 @@ export const Home = ({navigation}) => {
         ) : (
           <RecentList update={update} />
         )}
-      </SafeAreaView>
-    </SideMenu>
+        <TouchableOpacity
+          onPress={() => {
+            NavigationService.navigate('Editor');
+          }}
+          activeOpacity={opacity}
+          style={{
+            width: '90%',
+            alignSelf: 'center',
+            borderRadius: br,
+            backgroundColor: colors.accent,
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginBottom: 20,
+          }}>
+          <View
+            style={{
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexDirection: 'row',
+              width: '100%',
+              padding: pv,
+              paddingVertical: pv + 5,
+            }}>
+            <Text
+              style={{
+                fontSize: SIZE.md,
+                color: 'white',
+                fontFamily: WEIGHT.bold,
+              }}>
+              Add a new note
+            </Text>
+            <Icon name="plus" color="white" size={SIZE.lg} />
+          </View>
+        </TouchableOpacity>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 

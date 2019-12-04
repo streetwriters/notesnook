@@ -10,6 +10,7 @@ import {
   KeyboardAvoidingView,
   Dimensions,
   TextInput,
+  BackHandler,
 } from 'react-native';
 import {
   COLOR_SCHEME,
@@ -26,6 +27,8 @@ import Icon from 'react-native-vector-icons/Feather';
 import {useForceUpdate} from '../ListsEditor';
 import {NavigationEvents} from 'react-navigation';
 import {storage} from '../../../App';
+import {SideMenuEvent} from '../../utils/utils';
+import {Dialog} from '../../components/Dialog';
 
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
@@ -39,7 +42,7 @@ const Editor = ({navigation}) => {
 
   const [colors, setColors] = useState(COLOR_SCHEME);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
-
+  const [dialog, setDialog] = useState(false);
   // VARIABLES
 
   let updateInterval = null;
@@ -83,7 +86,7 @@ const Editor = ({navigation}) => {
     }
   };
 
-  const _renderWebpage = () => {
+  const _renderEditor = () => {
     return (
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : null}
@@ -104,9 +107,10 @@ const Editor = ({navigation}) => {
             <Icon
               style={{
                 paddingRight: 10,
+                marginTop: 5,
               }}
               name="chevron-left"
-              color={colors.pri}
+              color={colors.icon}
               size={SIZE.xxl}
             />
 
@@ -115,7 +119,7 @@ const Editor = ({navigation}) => {
               placeholder="Untitled Note"
               placeholderTextColor={colors.icon}
               style={{
-                width: '90%',
+                width: '80%',
                 fontFamily: WEIGHT.bold,
                 fontSize: SIZE.xxl,
                 maxWidth: '90%',
@@ -125,6 +129,16 @@ const Editor = ({navigation}) => {
                 title = value;
               }}
               onSubmitEditing={async () => await saveNote()}
+            />
+
+            <Icon
+              style={{
+                paddingRight: 10,
+                marginTop: 5,
+              }}
+              name="more-vertical"
+              color={colors.icon}
+              size={SIZE.xxl}
             />
           </View>
 
@@ -174,6 +188,18 @@ const Editor = ({navigation}) => {
   };
 
   // EFFECTS
+  useEffect(() => {
+    (timestamp = null), (content = null);
+    title = null;
+  }, []);
+
+  useEffect(() => {
+    BackHandler.addEventListener('hardwareBackPress', () => {
+      setDialog(true);
+
+      return true;
+    });
+  });
 
   useEffect(() => {
     if (navigation.state.params && navigation.state.params.note) {
@@ -221,14 +247,31 @@ const Editor = ({navigation}) => {
   }, []);
 
   useEffect(() => {
-    DeviceEventEmitter.emit('closeSidebar');
+    SideMenuEvent.close();
+    SideMenuEvent.disable();
     return () => {
-      DeviceEventEmitter.emit('openSidebar');
+      SideMenuEvent.open();
+      SideMenuEvent.enable();
     };
   }, []);
 
   return (
-    <SafeAreaView style={{height: '100%'}}>{_renderWebpage()}</SafeAreaView>
+    <SafeAreaView style={{height: '100%'}}>
+      <Dialog
+        title="Close Editor"
+        visible={dialog}
+        icon="x"
+        paragraph="Are you sure you want to close editor?"
+        close={() => {
+          setDialog(false);
+        }}
+        positivePress={() => {
+          navigation.goBack();
+          setDialog(false);
+        }}
+      />
+      {_renderEditor()}
+    </SafeAreaView>
   );
 };
 

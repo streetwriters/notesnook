@@ -47,3 +47,18 @@ export const ToastEvent = {
     DeviceEventEmitter.emit('hideToast', {message, type, duration, func});
   },
 };
+
+export const SideMenuEvent = {
+  open: () => {
+    DeviceEventEmitter.emit('openSidebar');
+  },
+  close: () => {
+    DeviceEventEmitter.emit('closeSidebar');
+  },
+  disable: () => {
+    DeviceEventEmitter.emit('disableGesture');
+  },
+  enable: () => {
+    DeviceEventEmitter.emit('enableGesture');
+  },
+};

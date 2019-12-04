@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, createRef} from 'react';
 import {
   View,
   Text,
@@ -21,14 +21,14 @@ import {
   WEIGHT,
 } from '../../common/common';
 
-import Icon from 'react-native-vector-icons/Ionicons';
+import Icon from 'react-native-vector-icons/Feather';
 import {Reminder} from '../Reminder';
 import {getElevation, timeSince} from '../../utils/utils';
 import NavigationService from '../../services/NavigationService';
-
+import Menu, {MenuItem, MenuDivider} from 'react-native-material-menu';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
-
+let setMenuRef = {};
 const NoteItem = props => {
   const [colors, setColors] = useState(COLOR_SCHEME);
   const item = props.item;
@@ -102,15 +102,63 @@ const NoteItem = props => {
         </>
       </TouchableOpacity>
 
-      <TouchableOpacity
+      <View
         style={{
-          width: '5%',
+          width: w * 0.05,
           justifyContent: 'center',
           minHeight: 70,
           alignItems: 'center',
         }}>
-        <Icon name="md-more" size={SIZE.lg} color={colors.icon} />
-      </TouchableOpacity>
+        <Menu
+          style={{
+            borderRadius: 5,
+          }}
+          ref={ref => (setMenuRef[props.index] = ref)}
+          button={
+            <TouchableOpacity
+              style={{
+                width: w * 0.05,
+                justifyContent: 'center',
+                minHeight: 70,
+                alignItems: 'center',
+              }}
+              onPress={() => setMenuRef[props.index].show()}>
+              <Icon name="more-vertical" size={SIZE.lg} color={colors.icon} />
+            </TouchableOpacity>
+          }>
+          <MenuItem
+            textStyle={{
+              color: colors.pri,
+              backgroundColor: colors.bg,
+              fontFamily: WEIGHT.regular,
+              fontSize: SIZE.sm,
+            }}>
+            <Icon name="star" size={SIZE.sm} color={colors.icon} />
+            {'  '}Favourite
+          </MenuItem>
+          <MenuItem
+            textStyle={{
+              color: colors.pri,
+              backgroundColor: colors.bg,
+              fontFamily: WEIGHT.regular,
+              fontSize: SIZE.sm,
+            }}>
+            <Icon name="share" size={SIZE.sm} color={colors.icon} />
+            {'  '}Share
+          </MenuItem>
+
+          <MenuItem
+            textStyle={{
+              color: colors.pri,
+              backgroundColor: colors.bg,
+              fontFamily: WEIGHT.regular,
+              fontSize: SIZE.sm,
+            }}>
+            <Icon name="trash" size={SIZE.sm} color={colors.icon} />
+            {'  '}Delete
+          </MenuItem>
+        </Menu>
+      </View>
     </View>
   );
 };

@@ -4,8 +4,6 @@ import {
   View,
   Text,
   TouchableOpacity,
-  Dimensions,
-  Image,
   SafeAreaView,
   Platform,
   FlatList,
@@ -27,7 +25,7 @@ import Icon from 'react-native-vector-icons/Feather';
 
 import {getElevation, w, h, Toast} from '../../utils/utils';
 
-export const Menu = ({colors, close}) => (
+export const Menu = ({colors, close = () => {}}) => (
   <SafeAreaView
     style={{
       height: '100%',
@@ -98,6 +96,7 @@ export const Menu = ({colors, close}) => (
             <TouchableOpacity
               activeOpacity={opacity}
               onPress={() => {
+                close();
                 item.func();
               }}
               style={{

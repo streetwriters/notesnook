@@ -17,15 +17,16 @@ import ActionButton from 'react-native-action-button';
 import Storage from 'notes-core/api/database';
 import StorageInterface from './src/utils/storage';
 import * as Animatable from 'react-native-animatable';
-import {h} from './src/utils/utils';
+import {h, w} from './src/utils/utils';
 import {Toast} from './src/components/Toast';
 import {Menu} from './src/components/Menu';
-
+import SideMenu from 'react-native-side-menu';
 const App = () => {
   const [colors, setColors] = useState(COLOR_SCHEME);
   const [fab, setFab] = useState(true);
   const [sidebar, setSidebar] = useState('30%');
-
+  const [isOpen, setOpen] = useState(false);
+  const [disableGestures, setDisableGesture] = useState(false);
   useEffect(() => {
     if (Platform.OS === 'android') {
       StatusBar.setBackgroundColor('transparent');
@@ -41,6 +42,12 @@ const App = () => {
     DeviceEventEmitter.addListener('closeSidebar', () => {
       setSidebar('0%');
     });
+    DeviceEventEmitter.addListener('disableGesture', () => {
+      setDisableGesture(true);
+    });
+    DeviceEventEmitter.addListener('enableGesture', () => {
+      setDisableGesture(false);
+    });
 
     return () => {
       DeviceEventEmitter.removeListener('openSidebar', () => {
@@ -48,6 +55,12 @@ const App = () => {
       });
       DeviceEventEmitter.removeListener('closeSidebar', () => {
         setSidebar('0%');
+      });
+      DeviceEventEmitter.removeListener('disableGesture', () => {
+        setDisableGesture(true);
+      });
+      DeviceEventEmitter.removeListener('enableGesture', () => {
+        setDisableGesture(false);
       });
     };
   }, []);
@@ -78,37 +91,56 @@ const App = () => {
         flexDirection: 'row',
       }}>
       {Platform.isPad ? (
-        <Animatable.View
-          transition="width"
-          duration={200}
-          style={{
-            width: sidebar,
-          }}>
-          <Menu
-            colors={colors}
-            close={() => {
-              setSidebar('0%');
+        <>
+          <Animatable.View
+            transition="width"
+            duration={200}
+            style={{
+              width: sidebar,
+            }}>
+            <Menu
+              colors={colors}
+              close={() => {
+                setSidebar('0%');
+              }}
+            />{' '}
+            : undefined
+          </Animatable.View>
+          <AppContainer
+            style={{
+              width: Platform.isPad ? '70%' : '100%',
+              height: '100%',
             }}
-          />{' '}
-          : undefined
-        </Animatable.View>
+            ref={navigatorRef => {
+              NavigationService.setTopLevelNavigator(navigatorRef);
+            }}
+          />
+        </>
       ) : (
-        undefined
+        <SideMenu
+          isOpen={isOpen}
+          disableGestures={disableGestures}
+          bounceBackOnOverdraw={false}
+          onChange={args => {
+            setOpen(args);
+          }}
+          menu={<Menu colors={colors} close={() => setOpen(false)} />}
+          openMenuOffset={w / 1.5}>
+          <AppContainer
+            style={{
+              width: Platform.isPad ? '70%' : '100%',
+              height: '100%',
+            }}
+            ref={navigatorRef => {
+              NavigationService.setTopLevelNavigator(navigatorRef);
+            }}
+          />
+        </SideMenu>
       )}
-
-      <AppContainer
-        style={{
-          width: Platform.isPad ? '70%' : '100%',
-          height: '100%',
-        }}
-        ref={navigatorRef => {
-          NavigationService.setTopLevelNavigator(navigatorRef);
-        }}
-      />
 
       <Toast />
 
-      {fab ? (
+      {/* {fab ? (
         <ActionButton elevation={5} buttonColor={colors.accent}>
           <ActionButton.Item
             buttonColor="#9b59b6"
@@ -153,7 +185,7 @@ const App = () => {
         </ActionButton>
       ) : (
         undefined
-      )}
+      )} */}
     </View>
   );
 };
