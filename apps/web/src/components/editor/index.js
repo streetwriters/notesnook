@@ -92,6 +92,15 @@ const Editor = props => {
         }
       });
     }
+    function onClearNote(dateCreated = undefined) {
+      if (dateCreated && dateCreated !== timestamp) return;
+      clearInterval(saveInterval);
+      title = undefined;
+      Editor.titleRef.value = "";
+      Editor.titleRef.focus();
+      quill.setText("\n");
+      Editor.lastSaveTimestamp = 0;
+    }
     function onOpenNote(note) {
       if (!note) return;
       onNewNote(false);
@@ -99,16 +108,21 @@ const Editor = props => {
         title = note.title;
         timestamp = note.dateCreated;
         Editor.titleRef.value = note.title;
-        quill.setText(note.content.text);
+        // quill.setText(note.content.text);
+        console.log(note);
         quill.setContents(note.content.delta);
         quill.setSelection(note.content.text.length - 1, 0); //to move the cursor to the end
       }, 0);
     }
     ev.addListener("onNewNote", onNewNote);
     ev.addListener("onOpenNote", onOpenNote);
+    ev.addListener("onClearNote", onClearNote);
+
     return () => {
       clearInterval(saveInterval);
       ev.removeListener("onNewNote", onNewNote);
+      ev.removeListener("onOpenNote", onOpenNote);
+      ev.removeListener("onClearNote", onClearNote);
     };
   });
 

@@ -23,6 +23,7 @@ const menuItems = [
     icon: Icon.Trash,
     color: "red",
     onClick: note => {
+      ev.emit("onClearNote", note.dateCreated);
       db.deleteNotes([note]).then(
         //TODO implement undo
         async () => {
@@ -75,6 +76,7 @@ function Home() {
                     marginBottom: 2,
                     borderBottom: "1px solid",
                     borderBottomColor: "navbg",
+                    cursor: "default",
                     ...ButtonPressedStyle
                   }}
                 >

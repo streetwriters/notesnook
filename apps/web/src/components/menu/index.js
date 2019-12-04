@@ -13,13 +13,14 @@ function Menu(props) {
         {props.menuItems.map(item => (
           <Flex
             key={item.title}
-            onClick={() => {
+            onClick={e => {
               if (props.dropdownRef) {
                 props.dropdownRef.hide();
               }
               if (item.onClick) {
                 item.onClick(props.data);
               }
+              e.stopPropagation();
             }}
             flexDirection="row"
             alignItems="center"
