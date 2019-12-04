@@ -5,9 +5,8 @@ import { ButtonPressedStyle } from "../theme";
 import Dropdown, {
   DropdownTrigger,
   DropdownContent
-} from "react-simple-dropdown";
+} from "../components/dropdown";
 import TimeAgo from "timeago-react";
-import "react-simple-dropdown/styles/Dropdown.css";
 import { db, ev } from "../common";
 import { Virtuoso as List } from "react-virtuoso";
 import { showSnack } from "../components/snackbar";
@@ -39,7 +38,9 @@ const menuItems = [
 function sendNewNoteEvent() {
   ev.emit("onNewNote");
 }
-
+function sendOpenNoteEvent(note) {
+  ev.emit("onOpenNote", note);
+}
 function Home() {
   const [notes, setNotes] = useState([]);
   useEffect(() => {
@@ -63,6 +64,10 @@ function Home() {
               const note = notes[index];
               return (
                 <Box
+                  onClick={e => {
+                    sendOpenNoteEvent(note);
+                    e.stopPropagation();
+                  }}
                   px={3}
                   py={3}
                   sx={{
@@ -77,7 +82,10 @@ function Home() {
                     <Text fontFamily="body" fontSize="title" fontWeight="bold">
                       {note.title}
                     </Text>
-                    <Dropdown ref={ref => (dropdownRefs[index] = ref)}>
+                    <Dropdown
+                      style={{ zIndex: 999 }}
+                      ref={ref => (dropdownRefs[index] = ref)}
+                    >
                       <DropdownTrigger>
                         <Icon.MoreVertical
                           size={20}

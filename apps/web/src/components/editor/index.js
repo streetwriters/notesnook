@@ -78,7 +78,7 @@ const Editor = props => {
     );
 
     let saveInterval = startAutoSave(quill);
-    function onNewNote() {
+    function onNewNote(showToast = true) {
       clearInterval(saveInterval);
       saveNote(quill).then(() => {
         title = undefined;
@@ -87,10 +87,25 @@ const Editor = props => {
         quill.setText("\n");
         Editor.lastSaveTimestamp = 0;
         saveInterval = startAutoSave(quill);
-        showSnack("Let's start writing!", Icon.Edit2);
+        if (showToast) {
+          showSnack("Let's start writing!", Icon.Edit2);
+        }
       });
     }
+    function onOpenNote(note) {
+      if (!note) return;
+      onNewNote(false);
+      setTimeout(() => {
+        title = note.title;
+        timestamp = note.dateCreated;
+        Editor.titleRef.value = note.title;
+        quill.setText(note.content.text);
+        quill.setContents(note.content.delta);
+        quill.setSelection(note.content.text.length - 1, 0); //to move the cursor to the end
+      }, 0);
+    }
     ev.addListener("onNewNote", onNewNote);
+    ev.addListener("onOpenNote", onOpenNote);
     return () => {
       clearInterval(saveInterval);
       ev.removeListener("onNewNote", onNewNote);
