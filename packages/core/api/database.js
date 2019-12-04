@@ -15,8 +15,8 @@ class Database {
     this.notebooks = {};
 
     // fill data
-    for (let key of KEYS) {
-      this.storage.read(key).then(data => (this[key] = data));
+    for (let key of extractValues(KEYS)) {
+      this.storage.read(key).then(data => (this[key] = data || {}));
     }
   }
 
@@ -189,9 +189,9 @@ class Database {
     if (!notebookId || !topic || !this.notebooks[notebookId]) return;
     let notebook = this.notebooks[notebookId];
     if (!notebook.topics[topic]) return;
-    let topic = notebook.topics[topic];
-    if (topic.length <= 0) return [];
-    return topic.map(note => this.getNote(note));
+    let nbTopic = notebook.topics[topic];
+    if (nbTopic.length <= 0) return [];
+    return nbTopic.map(note => this.getNote(note));
   }
 
   /**
