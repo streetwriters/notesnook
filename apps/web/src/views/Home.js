@@ -63,12 +63,13 @@ function Home() {
               const note = notes[index];
               return (
                 <Box
-                  bg="navbg"
                   px={3}
                   py={3}
                   sx={{
                     borderRadius: "default",
                     marginBottom: 2,
+                    borderBottom: "1px solid",
+                    borderBottomColor: "navbg",
                     ...ButtonPressedStyle
                   }}
                 >

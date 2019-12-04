@@ -82,7 +82,7 @@ function ThemedComponent(props) {
   return (
     <ThemeProvider theme={theme}>
       <Heading fontSize="heading">{props.route.title}</Heading>
-      {props.route.component && props.route.component()}
+      {props.route.component && <props.route.component />}
     </ThemeProvider>
   );
 }

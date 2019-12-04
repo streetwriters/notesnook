@@ -97,8 +97,14 @@ const CreateNotebookDialog = props => {
           color="accent"
           py={2}
         >
-          <Icon.BookOpen size={40} />
-          <Text mx={2} as="span" variant="title" textAlign="center">
+          <Icon.BookOpen size={42} />
+          <Text
+            mx={2}
+            as="span"
+            variant="title"
+            fontSize={28}
+            textAlign="center"
+          >
             Notebook
           </Text>
         </Flex>
