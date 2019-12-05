@@ -20,7 +20,7 @@ export const Header = ({heading, colors, canGoBack = true}) => {
           style={{
             justifyContent: 'center',
             alignItems: 'center',
-            height: 40,
+
             paddingRight: 15,
           }}>
           <Icon name={'chevron-left'} size={SIZE.xl} />

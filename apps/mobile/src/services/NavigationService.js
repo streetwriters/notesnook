@@ -16,6 +16,7 @@ import Trash from '../views/Trash';
 import Notes from '../views/Notes';
 import Tags from '../views/Tags';
 import Notebook from '../views/Notebook';
+import Move from '../views/Move';
 
 const TopLevelNavigator = createStackNavigator(
   {
@@ -66,6 +67,9 @@ const TopLevelNavigator = createStackNavigator(
     },
     Notebook: {
       screen: Notebook,
+    },
+    Move: {
+      screen: Move,
     },
   },
   {

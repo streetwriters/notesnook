@@ -138,8 +138,6 @@ const App = () => {
         </SideMenu>
       )}
 
-      <Toast />
-
       {/* {fab ? (
         <ActionButton elevation={5} buttonColor={colors.accent}>
           <ActionButton.Item
@@ -186,6 +184,8 @@ const App = () => {
       ) : (
         undefined
       )} */}
+
+      <Toast />
     </View>
   );
 };

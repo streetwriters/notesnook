@@ -71,6 +71,7 @@ export const Home = ({navigation}) => {
             setUpdate(update + 1);
           }}
         />
+
         <Header colors={colors} heading="Home" canGoBack={false} />
 
         <Search

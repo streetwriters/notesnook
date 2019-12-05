@@ -13,12 +13,21 @@ import {
   WEIGHT,
 } from '../../common/common';
 import Icon from 'react-native-vector-icons/Feather';
-export const NotebookItem = ({item, index, colors}) => {
+export const NotebookItem = ({
+  item,
+  index,
+  colors,
+  hideMore,
+  isTopic = false,
+}) => {
   return (
     <TouchableOpacity
       onPress={() => {
         NavigationService.navigate('Notebook', {
           notebook: item,
+          title: hideMore ? 'Choose topic' : item.name,
+          isMove: hideMore ? true : false,
+          hideMore: hideMore ? true : false,
         });
       }}
       style={{
@@ -55,7 +64,37 @@ export const NotebookItem = ({item, index, colors}) => {
           </Text>
         </View>
 
-        <Icon name="more-vertical" size={SIZE.lg} color={colors.icon} />
+        {hideMore ? null : (
+          <Icon name="more-vertical" size={SIZE.lg} color={colors.icon} />
+        )}
+        {hideMore && isTopic ? (
+          <TouchableOpacity
+            activeOpacity={opacity}
+            onPress={() => {
+              NavigationService.navigate('Home');
+            }}
+            style={{
+              borderWidth: 1,
+              borderRadius: 5,
+              width: '20%',
+              paddingHorizontal: ph - 5,
+              borderColor: '#f0f0f0',
+              paddingVertical: pv,
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: colors.accent,
+            }}>
+            <Text
+              style={{
+                fontSize: SIZE.xs,
+                fontFamily: WEIGHT.semibold,
+                color: 'white',
+              }}>
+              Move
+            </Text>
+          </TouchableOpacity>
+        ) : null}
       </View>
     </TouchableOpacity>
   );

@@ -40,11 +40,23 @@ export const w = Dimensions.get('window').width;
 export const h = Dimensions.get('window').height;
 
 export const ToastEvent = {
-  show: (message, type, duration = 1000, func = null) => {
-    DeviceEventEmitter.emit('showToast', {message, type, duration, func});
+  show: (message, type, duration = 10000, func = null, actionText = 'Ok') => {
+    DeviceEventEmitter.emit('showToast', {
+      message,
+      type,
+      duration,
+      func,
+      actionText,
+    });
   },
-  hide: (message, type, duration = 1000, func = null) => {
-    DeviceEventEmitter.emit('hideToast', {message, type, duration, func});
+  hide: (message, type, duration = 1000, func = null, actionText = 'Ok') => {
+    DeviceEventEmitter.emit('hideToast', {
+      message,
+      type,
+      duration,
+      func,
+      actionText,
+    });
   },
 };
 

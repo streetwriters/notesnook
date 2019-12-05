@@ -60,7 +60,10 @@ export const Menu = ({colors, close = () => {}}) => (
             {
               name: 'Notebooks',
               icon: 'book',
-              func: () => NavigationService.navigate('Folders'),
+              func: () =>
+                NavigationService.navigate('Folders', {
+                  title: 'Notebooks',
+                }),
             },
             {
               name: 'Lists',

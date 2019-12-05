@@ -23,21 +23,22 @@ import {
 
 import Icon from 'react-native-vector-icons/Feather';
 import {Reminder} from '../Reminder';
-import {getElevation, timeSince} from '../../utils/utils';
+import {getElevation, timeSince, ToastEvent} from '../../utils/utils';
 import NavigationService from '../../services/NavigationService';
 import Menu, {MenuItem, MenuDivider} from 'react-native-material-menu';
+import {Dialog} from '../Dialog';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
-let setMenuRef = {};
+
 const NoteItem = props => {
   const [colors, setColors] = useState(COLOR_SCHEME);
+  const [visible, setVisible] = useState(false);
   const item = props.item;
-
+  let setMenuRef = {};
   return (
     <View
       style={{
         marginHorizontal: w * 0.05,
-
         marginVertical: h * 0.015,
         borderRadius: br,
         justifyContent: 'center',
@@ -49,6 +50,16 @@ const NoteItem = props => {
         borderBottomWidth: 1,
         borderBottomColor: '#f0f0f0',
       }}>
+      <Dialog
+        visible={visible}
+        title="Delete note"
+        icon="trash"
+        paragraph="Do you want to delete this note?"
+        positiveText="Delete"
+        close={() => {
+          setVisible(false);
+        }}
+      />
       <TouchableOpacity
         activeOpacity={1}
         onPress={() => {
@@ -78,6 +89,7 @@ const NoteItem = props => {
               width: '100%',
             }}>
             <Text
+              numberOfLines={2}
               style={{
                 fontSize: SIZE.xs + 2,
                 color: colors.icon,
@@ -127,19 +139,29 @@ const NoteItem = props => {
             </TouchableOpacity>
           }>
           <MenuItem
+            onPress={() => {
+              setMenuRef[props.index].hide();
+              ToastEvent.show(
+                'Note added to favorites.',
+                'success',
+                3000,
+                () => {},
+                'Ok',
+              );
+            }}
             textStyle={{
               color: colors.pri,
-              backgroundColor: colors.bg,
+
               fontFamily: WEIGHT.regular,
               fontSize: SIZE.sm,
             }}>
             <Icon name="star" size={SIZE.sm} color={colors.icon} />
-            {'  '}Favourite
+            {'  '}Favorite
           </MenuItem>
+
           <MenuItem
             textStyle={{
               color: colors.pri,
-              backgroundColor: colors.bg,
               fontFamily: WEIGHT.regular,
               fontSize: SIZE.sm,
             }}>
@@ -148,14 +170,107 @@ const NoteItem = props => {
           </MenuItem>
 
           <MenuItem
+            onPress={() => {
+              setMenuRef[props.index].hide();
+              ToastEvent.show(
+                'Note copied to clipboard.',
+                'success',
+                3000,
+                () => {},
+                '',
+              );
+            }}
             textStyle={{
               color: colors.pri,
-              backgroundColor: colors.bg,
+
+              fontFamily: WEIGHT.regular,
+              fontSize: SIZE.sm,
+            }}>
+            <Icon name="copy" size={SIZE.sm} color={colors.icon} />
+            {'  '}Copy
+          </MenuItem>
+          <MenuItem
+            onPress={() => {
+              setMenuRef[props.index].hide();
+              NavigationService.navigate('Folders', {
+                note: item,
+                title: 'Choose Notebook',
+                isMove: true,
+                hideMore: true,
+              });
+            }}
+            textStyle={{
+              color: colors.pri,
+
+              fontFamily: WEIGHT.regular,
+              fontSize: SIZE.sm,
+            }}>
+            <Icon name="arrow-right" size={SIZE.sm} color={colors.icon} />
+            {'  '}Move
+          </MenuItem>
+
+          <MenuItem
+            onPress={() => {
+              setVisible(true);
+              setMenuRef[props.index].hide();
+            }}
+            textStyle={{
+              color: colors.pri,
+
               fontFamily: WEIGHT.regular,
               fontSize: SIZE.sm,
             }}>
             <Icon name="trash" size={SIZE.sm} color={colors.icon} />
             {'  '}Delete
+          </MenuItem>
+          <MenuDivider />
+          <MenuItem
+            disabled={true}
+            textStyle={{
+              color: colors.icon,
+
+              fontFamily: WEIGHT.regular,
+              fontSize: SIZE.xs,
+            }}
+            style={{
+              paddingVertical: 0,
+              margin: 0,
+              height: 30,
+            }}>
+            Notebook: School Notes
+          </MenuItem>
+          <MenuItem
+            disabled={true}
+            textStyle={{
+              color: colors.icon,
+
+              fontFamily: WEIGHT.regular,
+              fontSize: SIZE.xs,
+            }}
+            style={{
+              paddingVertical: 0,
+              margin: 0,
+              height: 30,
+              paddingBottom: 10,
+            }}>
+            {'  '}- Topic: Physics
+          </MenuItem>
+
+          <MenuItem
+            disabled={true}
+            textStyle={{
+              color: colors.icon,
+
+              fontFamily: WEIGHT.regular,
+              fontSize: SIZE.xs,
+            }}
+            style={{
+              paddingVertical: 0,
+              margin: 0,
+              height: 30,
+              paddingBottom: 10,
+            }}>
+            Created on: {new Date(item.dateCreated).toISOString().slice(0, 10)}
           </MenuItem>
         </Menu>
       </View>
