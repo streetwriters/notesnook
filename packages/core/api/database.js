@@ -105,9 +105,10 @@ class Database {
   async addNotebook(notebook) {
     if (!notebook || !notebook.title) return;
     const id = notebook.dateCreated || Date.now();
-    let topics = {};
+    let topics = { General: [] };
     if (notebook.topics) {
       for (let topic of notebook.topics) {
+        if (!topic) continue;
         topics[topic] = [];
       }
     }
