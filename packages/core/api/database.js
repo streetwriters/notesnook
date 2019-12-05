@@ -32,8 +32,7 @@ class Database {
    * @param {object} note The note to add or update
    */
   async addNote(note) {
-    if (!note || !note.content || (!note.title && !note.content))
-      return undefined; //TODO add test
+    if (!note || (!note.title && !note.content)) return undefined;
 
     let timestamp = note.dateCreated || Date.now();
     //add or update a note into the database
@@ -65,7 +64,7 @@ class Database {
    * @param {array} notes the notes to be deleted
    */
   async deleteNotes(notes) {
-    this.delete(notes, KEYS.notes);
+    await deleteItems.call(this, notes, KEYS.notes);
   }
 
   /**
@@ -73,7 +72,7 @@ class Database {
    * @param {string} id the id of the note (must be a timestamp)
    */
   getNote(id) {
-    return this.getItem(id, KEYS.notes);
+    return getItem.call(this, id, KEYS.notes);
   }
 
   /**
@@ -108,7 +107,6 @@ class Database {
     const id = notebook.dateCreated || Date.now();
     let topics = {};
     if (notebook.topics) {
-      //TODO add test
       for (let topic of notebook.topics) {
         topics[topic] = [];
       }
@@ -134,7 +132,8 @@ class Database {
    * @param {string} topic The topic to add
    */
   addTopicToNotebook(notebookId, topic) {
-    return this.notebookTopicFn(
+    return notebookTopicFn.call(
+      this,
       notebookId,
       topic,
       notebook => ((notebook.topics[topic] = []), true)
@@ -147,7 +146,7 @@ class Database {
    * @param {string} topic The topic to delete
    */
   deleteTopicFromNotebook(notebookId, topic) {
-    return this.notebookTopicFn(notebookId, topic, notebook => {
+    return notebookTopicFn.call(this, notebookId, topic, notebook => {
       if (!notebook.topics[topic]) return false;
       delete notebook.topics[topic];
       return true;
@@ -161,7 +160,7 @@ class Database {
    * @param {number} noteId The ID of the note
    */
   addNoteToTopic(notebookId, topic, noteId) {
-    return this.notebookTopicFn(notebookId, topic, notebook => {
+    return notebookTopicFn.call(this, notebookId, topic, notebook => {
       if (!notebook.topics.hasOwnProperty(topic)) return false;
       let nbTopic = notebook.topics[topic];
       notebook.topics[topic][nbTopic.length] = noteId;
@@ -176,7 +175,7 @@ class Database {
    * @param {number} noteId The ID of the note
    */
   deleteNoteFromTopic(notebookId, topic, noteId) {
-    return this.notebookTopicFn(notebookId, topic, notebook => {
+    return notebookTopicFn.call(this, notebookId, topic, notebook => {
       if (!notebook.topics[topic]) return false;
       let nbTopic = notebook.topics[topic];
       let index = nbTopic.indexOf(noteId);
@@ -207,7 +206,7 @@ class Database {
    * @returns The notebook
    */
   getNotebook(id) {
-    return this.getItem(id, KEYS.notebooks);
+    return getItem.call(this, id, KEYS.notebooks);
   }
 
   /**
@@ -215,36 +214,36 @@ class Database {
    * @param {array} notebooks The notebooks to delete
    */
   async deleteNotebooks(notebooks) {
-    await this.delete(notebooks, KEYS.notebooks);
-  }
-
-  notebookTopicFn(notebookId, topic, fn) {
-    if (!notebookId || !topic || !this.notebooks[notebookId]) return;
-    let notebook = this.notebooks[notebookId];
-    if (fn(notebook)) {
-      this.notes[notebookId] = notebook;
-      return this.storage.write(KEYS.notebooks, this.notebooks);
-    }
-    //TODO add test
-    return Promise.resolve();
-  }
-
-  getItem(id, key) {
-    if (this[key].hasOwnProperty(id)) {
-      return this[key][id];
-    }
-  }
-
-  async delete(items, key) {
-    if (!items || items.length <= 0 || !this[key] || this[key].length <= 0)
-      return; //TODO add test
-    for (let item of items) {
-      if (this[key].hasOwnProperty(item.dateCreated)) {
-        delete this[key][item.dateCreated];
-      }
-    }
-    await this.storage.write(key, this[key]);
+    await deleteItems.call(this, notebooks, KEYS.notebooks);
   }
 }
 
 export default Database;
+
+async function deleteItems(items, key) {
+  if (!items || items.length <= 0 || !this[key] || this[key].length <= 0)
+    return; //TODO add test
+  for (let item of items) {
+    if (this[key].hasOwnProperty(item.dateCreated)) {
+      delete this[key][item.dateCreated];
+    }
+  }
+  await this.storage.write(key, this[key]);
+}
+
+function notebookTopicFn(notebookId, topic, fn) {
+  if (!notebookId || !topic || !this.notebooks[notebookId]) return;
+  let notebook = this.notebooks[notebookId];
+  if (fn(notebook)) {
+    this.notes[notebookId] = notebook;
+    return this.storage.write(KEYS.notebooks, this.notebooks);
+  }
+  //TODO add test
+  return Promise.resolve();
+}
+
+function getItem(id, key) {
+  if (this[key].hasOwnProperty(id)) {
+    return this[key][id];
+  }
+}

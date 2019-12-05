@@ -1,25 +1,19 @@
-//TODO add tests
 export default class Convert {
   static toString(input) {
-    try {
-      let type = typeof input;
-      if (type === "object") return JSON.stringify(input);
-      return input.toString();
-    } catch (error) {
-      return input.toString();
-    }
+    if (!input) return;
+    let type = typeof input;
+    if (type === "object") return JSON.stringify(input);
+    return input.toString();
   }
   static fromString(input) {
-    try {
-      let firstChar = input[0];
-      if (firstChar === "[" || firstChar === "{") return JSON.parse(input);
-      if (!isNaN(parseInt(input))) return parseInt(input);
-      if (!isNaN(parseFloat(input))) return parseFloat(input);
-      if (parseBoolean(input) !== undefined) return parseBoolean(input);
-      return input;
-    } catch (error) {
-      return input;
-    }
+    if (!input) return;
+    let firstChar = input[0];
+    if (firstChar == "[" || firstChar == "{") return JSON.parse(input);
+    if (!isNaN(parseFloat(input)) && input.includes("."))
+      return parseFloat(input);
+    if (!isNaN(parseInt(input))) return parseInt(input);
+    if (parseBoolean(input) !== undefined) return parseBoolean(input);
+    return input;
   }
 }
 function parseBoolean(value) {

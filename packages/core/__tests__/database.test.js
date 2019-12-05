@@ -10,11 +10,19 @@ const TEST_NOTE = {
 
 const TEST_NOTEBOOK = {
   title: "Test Notebook",
-  description: "Test Description"
+  description: "Test Description",
+  topics: ["hello"]
 };
 
 test("storage is defined", () => {
   expect(db.storage).toBeDefined();
+});
+
+test("add undefined note", async () => {
+  let timestamp = await db.addNote();
+  expect(timestamp).toBeUndefined();
+  timestamp = await db.addNote({});
+  expect(timestamp).toBeUndefined();
 });
 
 test("add a note", async () => {
@@ -110,3 +118,5 @@ test("delete notebook", async () => {
   let notebook = db.getNotebook(TEST_NOTEBOOK.dateCreated);
   expect(notebook).toBeUndefined();
 });
+
+test("delete unknown key", async () => {});
