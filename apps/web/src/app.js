@@ -41,7 +41,7 @@ function App() {
       <Flex height="100%" alignContent="stretch">
         <Box
           width={[0, 0, 70]}
-          sx={{ borderRight: "1px solid", borderRightColor: "navbg" }}
+          sx={{ borderRight: "1px solid", borderRightColor: "border" }}
           px={0}
         >
           {Object.values(routes).map((item, index) => (
@@ -60,6 +60,7 @@ function App() {
           <Flex
             className="navigationView"
             bg="primary"
+            sx={{ borderRight: "1px solid", borderColor: "border" }}
             flexDirection="column"
             flex="1 1 auto"
             px={3}

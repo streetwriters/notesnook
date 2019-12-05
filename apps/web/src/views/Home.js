@@ -138,7 +138,7 @@ function Home() {
           <Button
             Icon={Icon.Edit2}
             onClick={sendNewNoteEvent}
-            content="Let's begin"
+            content="Let's make some"
             style={{ marginTop: 2, textAlign: "center" }}
             width={"auto"}
           />
