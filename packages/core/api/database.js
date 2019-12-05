@@ -47,7 +47,7 @@ class Database {
       content: note.content,
       pinned: note.pinned || false,
       tags: note.tags || [],
-      notebooks: note.notebooks || [],
+      notebooks: note.notebooks || {},
       colors: note.colors || [],
       favorite: note.favorite || false,
       headline: note.content.text.substring(0, 150) + "...",
@@ -160,10 +160,10 @@ class Database {
    * @param {number} noteId The ID of the note
    */
   addNoteToTopic(notebookId, topic, noteId) {
-    return notebookTopicFn.call(this, notebookId, topic, notebook => {
-      if (!notebook.topics.hasOwnProperty(topic)) return false;
-      let nbTopic = notebook.topics[topic];
-      notebook.topics[topic][nbTopic.length] = noteId;
+    return topicNoteFn.call(this, notebookId, topic, noteId, async notebook => {
+      notebook.topics[topic][notebook.topics[topic].length] = noteId;
+      //add notebookId to the note
+      this.notes[noteId].notebooks[notebookId] = notebook.title;
       return true;
     });
   }
@@ -175,12 +175,12 @@ class Database {
    * @param {number} noteId The ID of the note
    */
   deleteNoteFromTopic(notebookId, topic, noteId) {
-    return notebookTopicFn.call(this, notebookId, topic, notebook => {
-      if (!notebook.topics[topic]) return false;
-      let nbTopic = notebook.topics[topic];
-      let index = nbTopic.indexOf(noteId);
-      if (index <= -1) return;
+    return topicNoteFn.call(this, notebookId, topic, noteId, async notebook => {
+      let index = notebook.topics[topic].indexOf(noteId);
+      if (index <= -1) return false;
       notebook.topics[topic].splice(index, 1);
+      //delete notebook from note
+      delete this.notes[noteId].notebooks[notebookId];
       return true;
     });
   }
@@ -240,6 +240,22 @@ function notebookTopicFn(notebookId, topic, fn) {
   }
   //TODO add test
   return Promise.resolve();
+}
+
+function topicNoteFn(notebookId, topic, noteId, fn) {
+  return notebookTopicFn.call(this, notebookId, topic, async notebook => {
+    if (
+      !notebook.topics.hasOwnProperty(topic) ||
+      !this.notes.hasOwnProperty(noteId)
+    )
+      return false;
+
+    if (fn(notebook)) {
+      await this.storage.write(KEYS.notes, this.notes);
+      return true;
+    }
+    return false;
+  });
 }
 
 function getItem(id, key) {

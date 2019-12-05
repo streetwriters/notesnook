@@ -86,6 +86,11 @@ test("add note to topic", async () => {
   expect(notebook.topics["Home"][0]).toBeGreaterThan(0);
 });
 
+test("note has notebook", () => {
+  let note = db.getNote(TEST_NOTE.dateCreated);
+  expect(note.notebooks.hasOwnProperty(TEST_NOTEBOOK.dateCreated)).toBe(true);
+});
+
 test("get topic", () => {
   let notes = db.getTopic(TEST_NOTEBOOK.dateCreated, "Home");
   expect(notes.length).toBeGreaterThan(0);
@@ -99,6 +104,11 @@ test("delete note from topic", async () => {
   );
   let notebook = db.getNotebook(TEST_NOTEBOOK.dateCreated);
   expect(notebook.topics["Home"][0]).toBeUndefined();
+});
+
+test("note doesn't have notebook", () => {
+  let note = db.getNote(TEST_NOTE.dateCreated);
+  expect(note.notebooks.hasOwnProperty(TEST_NOTEBOOK.dateCreated)).toBe(false);
 });
 
 test("delete topic from notebook", async () => {
