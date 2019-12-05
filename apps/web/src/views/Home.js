@@ -26,10 +26,10 @@ const menuItems = [
       ev.emit("onClearNote", note.dateCreated);
       db.deleteNotes([note]).then(
         //TODO implement undo
-        async () => {
+        () => {
           showSnack("Note deleted!", Icon.Check);
           //TODO very crude but works.
-          await Home.onRefresh();
+          Home.onRefresh();
         }
       );
     }
@@ -45,8 +45,8 @@ function sendOpenNoteEvent(note) {
 function Home() {
   const [notes, setNotes] = useState([]);
   useEffect(() => {
-    Home.onRefresh = async () => {
-      setNotes(await db.getNotes());
+    Home.onRefresh = () => {
+      setNotes(db.getNotes());
     };
     Home.onRefresh();
     return () => {
@@ -59,7 +59,12 @@ function Home() {
         <Flex flexDirection="column" flex="1 1 auto">
           <Search placeholder="Search" />
           <List
-            style={{ width: "100%", flex: "1 1 auto", height: "auto" }}
+            style={{
+              width: "100%",
+              flex: "1 1 auto",
+              height: "auto",
+              overflowX: "hidden"
+            }}
             totalCount={notes.length}
             item={index => {
               const note = notes[index];
@@ -69,7 +74,6 @@ function Home() {
                     sendOpenNoteEvent(note);
                     e.stopPropagation();
                   }}
-                  px={3}
                   py={3}
                   sx={{
                     borderRadius: "default",
