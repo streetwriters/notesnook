@@ -101,15 +101,35 @@ const NoteItem = props => {
               {item.headline}
             </Text>
 
-            <Text
+            <View
               style={{
-                color: colors.accent,
-                fontSize: SIZE.xxs + 2,
-                textAlignVertical: 'center',
-                fontFamily: WEIGHT.regular,
+                flexDirection: 'row',
+                justifyContent: 'flex-start',
+                alignItems: 'center',
               }}>
-              {timeSince(item.dateCreated) + '  '}
-            </Text>
+              <Icon
+                style={{width: 30}}
+                name="lock"
+                size={SIZE.sm}
+                color={colors.icon}
+              />
+              <Icon
+                style={{width: 30}}
+                name="star"
+                size={SIZE.sm}
+                color={colors.icon}
+              />
+
+              <Text
+                style={{
+                  color: colors.accent,
+                  fontSize: SIZE.xxs + 2,
+                  textAlignVertical: 'center',
+                  fontFamily: WEIGHT.regular,
+                }}>
+                {timeSince(item.dateCreated) + '  '}
+              </Text>
+            </View>
           </View>
         </>
       </TouchableOpacity>
@@ -138,6 +158,16 @@ const NoteItem = props => {
               <Icon name="more-vertical" size={SIZE.lg} color={colors.icon} />
             </TouchableOpacity>
           }>
+          <MenuItem
+            textStyle={{
+              color: colors.pri,
+
+              fontFamily: WEIGHT.regular,
+              fontSize: SIZE.sm,
+            }}>
+            <Icon name="star" size={SIZE.sm} color={colors.icon} />
+            {'  '}Pin
+          </MenuItem>
           <MenuItem
             onPress={() => {
               setMenuRef[props.index].hide();
@@ -169,26 +199,6 @@ const NoteItem = props => {
             {'  '}Share
           </MenuItem>
 
-          <MenuItem
-            onPress={() => {
-              setMenuRef[props.index].hide();
-              ToastEvent.show(
-                'Note copied to clipboard.',
-                'success',
-                3000,
-                () => {},
-                '',
-              );
-            }}
-            textStyle={{
-              color: colors.pri,
-
-              fontFamily: WEIGHT.regular,
-              fontSize: SIZE.sm,
-            }}>
-            <Icon name="copy" size={SIZE.sm} color={colors.icon} />
-            {'  '}Copy
-          </MenuItem>
           <MenuItem
             onPress={() => {
               setMenuRef[props.index].hide();

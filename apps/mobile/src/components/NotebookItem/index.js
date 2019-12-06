@@ -96,22 +96,38 @@ export const NotebookItem = ({
             </View>
           )}
 
-          <Text
-            style={{
-              fontFamily: WEIGHT.regular,
-              fontSize: SIZE.xs,
-              paddingTop: pv / 2,
-            }}>
-            {isTopic ? null : (
+          {isTopic ? null : (
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'flex-start',
+                alignItems: 'center',
+                marginTop: 5,
+              }}>
+              <Icon
+                style={{width: 30}}
+                name="lock"
+                size={SIZE.sm}
+                color={colors.icon}
+              />
+              <Icon
+                style={{width: 30}}
+                name="star"
+                size={SIZE.sm}
+                color={colors.icon}
+              />
+
               <Text
                 style={{
                   color: colors.accent,
+                  fontSize: SIZE.xxs + 2,
+                  textAlignVertical: 'center',
+                  fontFamily: WEIGHT.regular,
                 }}>
-                {new Date(item.dateCreated).toDateString().substring(4)} {'  '}
+                {new Date(item.dateCreated).toDateString().substring(4)}
               </Text>
-            )}
-            15 notes
-          </Text>
+            </View>
+          )}
         </View>
 
         {hideMore ? null : (
@@ -132,6 +148,36 @@ export const NotebookItem = ({
                 <Icon name="more-vertical" size={SIZE.lg} color={colors.icon} />
               </TouchableOpacity>
             }>
+            <MenuItem
+              textStyle={{
+                color: colors.pri,
+
+                fontFamily: WEIGHT.regular,
+                fontSize: SIZE.sm,
+              }}>
+              <Icon name="star" size={SIZE.sm} color={colors.icon} />
+              {'  '}Pin
+            </MenuItem>
+            <MenuItem
+              onPress={() => {
+                setMenuRef[props.index].hide();
+                ToastEvent.show(
+                  'Note added to favorites.',
+                  'success',
+                  3000,
+                  () => {},
+                  'Ok',
+                );
+              }}
+              textStyle={{
+                color: colors.pri,
+
+                fontFamily: WEIGHT.regular,
+                fontSize: SIZE.sm,
+              }}>
+              <Icon name="star" size={SIZE.sm} color={colors.icon} />
+              {'  '}Favorite
+            </MenuItem>
             <MenuItem
               onPress={() => {
                 setVisible(true);

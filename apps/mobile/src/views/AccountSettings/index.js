@@ -146,7 +146,6 @@ export const AccountSettings = ({navigation}) => {
           width: '90%',
           marginHorizontal: '5%',
           paddingHorizontal: ph,
-
           paddingVertical: pv + 5,
           flexDirection: 'row',
           justifyContent: 'space-between',
