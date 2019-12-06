@@ -105,11 +105,11 @@ class Database {
   async addNotebook(notebook) {
     if (!notebook || !notebook.title) return;
     const id = notebook.dateCreated || Date.now();
-    let topics = { General: [] };
+    let topics = [makeTopic("General")];
     if (notebook.topics) {
       for (let topic of notebook.topics) {
-        if (!topic) continue;
-        topics[topic] = [];
+        if (!topic || topic.trim().length <= 0) continue;
+        topics[topics.length] = makeTopic(topic);
       }
     }
     this.notebooks[id] = {
@@ -137,7 +137,9 @@ class Database {
       this,
       notebookId,
       topic,
-      notebook => ((notebook.topics[topic] = []), true)
+      notebook => (
+        (notebook.topics[notebook.topics.length] = makeTopic(topic)), true
+      )
     );
   }
 
@@ -148,8 +150,9 @@ class Database {
    */
   deleteTopicFromNotebook(notebookId, topic) {
     return notebookTopicFn.call(this, notebookId, topic, notebook => {
-      if (!notebook.topics[topic]) return false;
-      delete notebook.topics[topic];
+      let topicIndex = notebook.topics.findIndex(t => t.title === topic);
+      if (topicIndex === -1) return false;
+      notebook.topics.splice(topicIndex, 1);
       return true;
     });
   }
@@ -161,12 +164,21 @@ class Database {
    * @param {number} noteId The ID of the note
    */
   addNoteToTopic(notebookId, topic, noteId) {
-    return topicNoteFn.call(this, notebookId, topic, noteId, async notebook => {
-      notebook.topics[topic][notebook.topics[topic].length] = noteId;
-      //add notebookId to the note
-      this.notes[noteId].notebooks[notebookId] = notebook.title;
-      return true;
-    });
+    return topicNoteFn.call(
+      this,
+      notebookId,
+      topic,
+      noteId,
+      async (notebook, topicIndex) => {
+        notebook.topics[topicIndex].notes.push(noteId);
+        //increment totalNotes count
+        notebook.topics[topicIndex].totalNotes++;
+        notebook.totalNotes++;
+        //add notebookId to the note
+        this.notes[noteId].notebooks[notebookId] = notebook.title;
+        return true;
+      }
+    );
   }
 
   /**
@@ -176,14 +188,23 @@ class Database {
    * @param {number} noteId The ID of the note
    */
   deleteNoteFromTopic(notebookId, topic, noteId) {
-    return topicNoteFn.call(this, notebookId, topic, noteId, async notebook => {
-      let index = notebook.topics[topic].indexOf(noteId);
-      if (index <= -1) return false;
-      notebook.topics[topic].splice(index, 1);
-      //delete notebook from note
-      delete this.notes[noteId].notebooks[notebookId];
-      return true;
-    });
+    return topicNoteFn.call(
+      this,
+      notebookId,
+      topic,
+      noteId,
+      async (notebook, topicIndex) => {
+        let index = notebook.topics[topicIndex].notes.indexOf(noteId);
+        if (index <= -1) return false;
+        notebook.topics[topicIndex].notes.splice(index, 1);
+        //delete notebook from note
+        delete this.notes[noteId].notebooks[notebookId];
+        //decrement totalNotes count
+        notebook.topics[topicIndex].totalNotes--;
+        notebook.totalNotes--;
+        return true;
+      }
+    );
   }
 
   /**
@@ -195,10 +216,11 @@ class Database {
   getTopic(notebookId, topic) {
     if (!notebookId || !topic || !this.notebooks[notebookId]) return;
     let notebook = this.notebooks[notebookId];
-    if (!notebook.topics[topic]) return;
-    let nbTopic = notebook.topics[topic];
-    if (nbTopic.length <= 0) return [];
-    return nbTopic.map(note => this.getNote(note));
+    let topicIndex = notebook.topics.findIndex(t => t.title === topic);
+    if (topicIndex === -1) return;
+    let nbTopic = notebook.topics[topicIndex];
+    if (nbTopic.notes.length <= 0) return [];
+    return nbTopic.notes.map(note => this.getNote(note));
   }
 
   /**
@@ -245,13 +267,10 @@ function notebookTopicFn(notebookId, topic, fn) {
 
 function topicNoteFn(notebookId, topic, noteId, fn) {
   return notebookTopicFn.call(this, notebookId, topic, async notebook => {
-    if (
-      !notebook.topics.hasOwnProperty(topic) ||
-      !this.notes.hasOwnProperty(noteId)
-    )
-      return false;
+    let topicIndex = notebook.topics.findIndex(t => t.title === topic);
+    if (topicIndex === -1 || !this.notes.hasOwnProperty(noteId)) return false;
 
-    if (fn(notebook)) {
+    if (fn(notebook, topicIndex)) {
       await this.storage.write(KEYS.notes, this.notes);
       return true;
     }
@@ -263,4 +282,13 @@ function getItem(id, key) {
   if (this[key].hasOwnProperty(id)) {
     return this[key][id];
   }
+}
+
+function makeTopic(topic) {
+  return {
+    title: topic,
+    dateCreated: Date.now(),
+    totalNotes: 0,
+    notes: []
+  };
 }

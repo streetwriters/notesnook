@@ -73,7 +73,8 @@ test("get a notebook", () => {
 test("add topic to notebook", async () => {
   await db.addTopicToNotebook(TEST_NOTEBOOK.dateCreated, "Home");
   let notebook = db.getNotebook(TEST_NOTEBOOK.dateCreated);
-  expect(notebook.topics.hasOwnProperty("Home")).toBe(true);
+  let topicIndex = notebook.topics.findIndex(t => t.title === "Home");
+  expect(topicIndex).toBeGreaterThan(-1);
 });
 
 test("add note to topic", async () => {
@@ -83,7 +84,8 @@ test("add note to topic", async () => {
     TEST_NOTE.dateCreated
   );
   let notebook = db.getNotebook(TEST_NOTEBOOK.dateCreated);
-  expect(notebook.topics["Home"][0]).toBeGreaterThan(0);
+  let topicIndex = notebook.topics.findIndex(t => t.title === "Home");
+  expect(notebook.topics[topicIndex].notes[0]).toBeGreaterThan(0);
 });
 
 test("note has notebook", () => {
@@ -103,7 +105,8 @@ test("delete note from topic", async () => {
     TEST_NOTE.dateCreated
   );
   let notebook = db.getNotebook(TEST_NOTEBOOK.dateCreated);
-  expect(notebook.topics["Home"][0]).toBeUndefined();
+  let topicIndex = notebook.topics.findIndex(t => t.title === "Home");
+  expect(notebook.topics[topicIndex].notes[0]).toBeUndefined();
 });
 
 test("note doesn't have notebook", () => {
@@ -114,7 +117,8 @@ test("note doesn't have notebook", () => {
 test("delete topic from notebook", async () => {
   await db.deleteTopicFromNotebook(TEST_NOTEBOOK.dateCreated, "Home");
   let notebook = db.getNotebook(TEST_NOTEBOOK.dateCreated);
-  expect(notebook.topics.hasOwnProperty("Home")).toBe(false);
+  let topicIndex = notebook.topics.findIndex(t => t.title === "Home");
+  expect(topicIndex).toBe(-1);
 });
 
 test("delete note", async () => {
