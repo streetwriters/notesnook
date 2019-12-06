@@ -103,6 +103,7 @@ export const Notebook = ({navigation}) => {
           data={params.notebook.topics}
           onScroll={event => {
             y = event.nativeEvent.contentOffset.y;
+            if (buttonHide) return;
             if (y > offsetY) {
               if (y - offsetY < 150 || countDown > 0) return;
               countDown = 1;
@@ -185,9 +186,9 @@ export const Notebook = ({navigation}) => {
               fontFamily: WEIGHT.semibold,
               color: 'white',
             }}>
+            <Icon name="plus" color="white" size={SIZE.lg} />
             Add a new topic
           </Text>
-          <Icon name="plus" color="white" size={SIZE.lg} />
         </TouchableOpacity>
       </KeyboardAvoidingView>
     </SafeAreaView>

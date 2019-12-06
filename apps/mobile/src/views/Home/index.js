@@ -192,6 +192,7 @@ export const Home = ({navigation}) => {
           <NotesList
             margin={margin}
             onScroll={y => {
+              if (buttonHide) return;
               if (y > offsetY) {
                 if (y - offsetY < 150 || countDown > 0) return;
                 countDown = 1;
@@ -211,6 +212,7 @@ export const Home = ({navigation}) => {
         ) : (
           <RecentList
             onScroll={y => {
+              if (buttonHide) return;
               if (y > offsetY) {
                 if (y - offsetY < 150 || countDown > 0) return;
                 countDown = 1;
@@ -257,10 +259,11 @@ export const Home = ({navigation}) => {
                   fontSize: SIZE.md,
                   color: 'white',
                   fontFamily: WEIGHT.bold,
+                  textAlignVertical: 'center',
                 }}>
-                Add a new note
+                <Icon name="plus" color="white" size={SIZE.lg} />
+                {'  '}Add a new note
               </Text>
-              <Icon name="plus" color="white" size={SIZE.lg} />
             </View>
           </TouchableOpacity>
         )}

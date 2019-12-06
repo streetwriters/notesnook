@@ -119,6 +119,7 @@ export const Folders = ({navigation}) => {
           }}
           onScroll={event => {
             y = event.nativeEvent.contentOffset.y;
+            if (buttonHide) return;
             if (y > offsetY) {
               if (y - offsetY < 150 || countDown > 0) return;
               countDown = 1;
@@ -175,9 +176,9 @@ export const Folders = ({navigation}) => {
               fontFamily: WEIGHT.semibold,
               color: 'white',
             }}>
-            Create a new notebook
+            <Icon name="plus" color="white" size={SIZE.lg} />
+            {'  '} Create a new notebook
           </Text>
-          <Icon name="plus" color="white" size={SIZE.lg} />
         </TouchableOpacity>
       </KeyboardAvoidingView>
     </SafeAreaView>

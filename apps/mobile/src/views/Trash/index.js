@@ -21,7 +21,7 @@ import {
   FONT,
   WEIGHT,
 } from '../../common/common';
-import Icon from 'react-native-vector-icons/Ionicons';
+import Icon from 'react-native-vector-icons/Feather';
 import {Reminder} from '../../components/Reminder';
 import {ListItem} from '../../components/ListItem';
 import {Header} from '../../components/header';
@@ -41,6 +41,9 @@ export const Trash = ({navigation}) => {
         columnWrapperStyle={{
           width: '45%',
         }}
+        style={{
+          height: '80%',
+        }}
         data={[
           {
             title: 'my note',
@@ -55,6 +58,34 @@ export const Trash = ({navigation}) => {
         ]}
         renderItem={({item, index}) => <NoteItem item={item} />}
       />
+      <TouchableOpacity
+        activeOpacity={opacity}
+        onPress={() => {
+          setAddNotebook(true);
+        }}
+        style={{
+          borderRadius: 5,
+          width: '90%',
+          marginHorizontal: '5%',
+          paddingHorizontal: ph,
+
+          paddingVertical: pv + 5,
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 15,
+          backgroundColor: colors.accent,
+        }}>
+        <Text
+          style={{
+            fontSize: SIZE.md,
+            fontFamily: WEIGHT.semibold,
+            color: 'white',
+          }}>
+          <Icon name="plus" color="white" size={SIZE.lg} />
+          {'  '}Clear all Trash
+        </Text>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 };
