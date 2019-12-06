@@ -12,9 +12,10 @@ import { Virtuoso as List } from "react-virtuoso";
 import Notebook from "../components/notebook";
 import Topic from "../components/topic";
 import Note from "../components/note";
+import { routes } from "../navigation";
 
 const inputRefs = [];
-
+const history = [{}];
 const Notebooks = props => {
   const [open, setOpen] = useState(false);
   const [notebooks, setNotebooks] = useState([]);
@@ -28,6 +29,18 @@ const Notebooks = props => {
       Notebooks.onRefresh = undefined;
     };
   }, []);
+  function navigate(item, save = true, title = undefined) {
+    if (save) {
+      history[history.length] = selected;
+    }
+    props.changeTitle(title || item.title || routes.notebooks.title);
+    props.canGoBack(item.title !== undefined);
+    props.backAction(goBack);
+    setSelected((item.title && item) || {});
+  }
+  function goBack() {
+    navigate(history.pop(), false);
+  }
   return (
     <Flex flexDirection="column" flex="1 1 auto">
       {notebooks.length > 0 ? (
@@ -57,9 +70,7 @@ const Notebooks = props => {
                 <Topic
                   index={index}
                   item={selected.topics[index]}
-                  onClick={() => {
-                    setSelected(selected.topics[index]);
-                  }}
+                  onClick={() => navigate(selected.topics[index])}
                 />
               ) : selected.type === "topic" ? (
                 <Note index={index} item={selected.notes[index]} />
@@ -67,14 +78,10 @@ const Notebooks = props => {
                 <Notebook
                   index={index}
                   item={notebooks[index]}
-                  onClick={() => {
-                    props.changeTitle(notebooks[index].title);
-                    setSelected(notebooks[index]);
-                  }}
-                  onTopicClick={(notebook, topic) => {
-                    props.changeTitle(notebook.title);
-                    setSelected(topic);
-                  }}
+                  onClick={() => navigate(notebooks[index])}
+                  onTopicClick={(notebook, topic) =>
+                    navigate(topic, true, notebook.title)
+                  }
                 />
               );
             }}

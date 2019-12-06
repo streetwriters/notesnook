@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 import Home from "../views/Home";
 import Notebooks from "../views/Notebooks";
 import { ThemeProvider } from "emotion-theming";
-import { Heading } from "rebass";
+import { Box, Flex, Heading } from "rebass";
 import * as Icon from "react-feather";
 import theme from "../theme";
 
@@ -19,12 +19,6 @@ export const routes = {
     title: "Notebooks",
     component: Notebooks,
     icon: Icon.Book
-  },
-  lists: {
-    key: "lists",
-    title: "Lists",
-    component: undefined,
-    icon: Icon.List
   },
   trash: {
     key: "trash",
@@ -80,11 +74,31 @@ export function goBack(root) {
 
 function ThemedComponent(props) {
   const [title, setTitle] = useState(props.route.title);
+  const [canGoBack, setCanGoBack] = useState(false);
+  const [backAction, setBackAction] = useState();
+  useEffect(() => {
+    setTitle(props.route.title);
+  }, [props.route.title]);
   return (
     <ThemeProvider theme={theme}>
-      <Heading fontSize="heading">{title}</Heading>
+      <Flex alignItems="center">
+        <Box
+          onClick={backAction}
+          display={canGoBack ? "flex" : "none"}
+          height={42}
+          color="accent"
+          sx={{ marginLeft: -10 /*correction */ }}
+        >
+          <Icon.ChevronLeft size={42} />
+        </Box>
+        <Heading fontSize="heading">{title}</Heading>
+      </Flex>
       {props.route.component && (
-        <props.route.component changeTitle={setTitle} />
+        <props.route.component
+          backAction={action => setBackAction(prev => action)}
+          canGoBack={setCanGoBack}
+          changeTitle={setTitle}
+        />
       )}
     </ThemeProvider>
   );
