@@ -1,56 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { Flex, Box, Text } from "rebass";
+import { Flex, Text } from "rebass";
 import * as Icon from "react-feather";
-import { ButtonPressedStyle } from "../theme";
-import Dropdown, {
-  DropdownTrigger,
-  DropdownContent
-} from "../components/dropdown";
-import TimeAgo from "timeago-react";
-import { db, ev } from "../common";
+import { db, ev, sendNewNoteEvent } from "../common";
 import { Virtuoso as List } from "react-virtuoso";
-import { showSnack } from "../components/snackbar";
-import Menu from "../components/menu";
 import Button from "../components/button";
 import Search from "../components/search";
+import Note from "../components/note";
 
-const dropdownRefs = [];
-const menuItems = [
-  { title: "Favorite", icon: Icon.Heart },
-  { title: "Share", icon: Icon.Share2 },
-  {
-    title: "Delete",
-    icon: Icon.Trash,
-    color: "red",
-    onClick: note => {
-      ev.emit("onClearNote", note.dateCreated);
-      db.deleteNotes([note]).then(
-        //TODO implement undo
-        () => {
-          showSnack("Note deleted!", Icon.Check);
-          //TODO very crude but works.
-          Home.onRefresh();
-        }
-      );
-    }
-  }
-];
-
-function sendNewNoteEvent() {
-  ev.emit("onNewNote");
-}
-function sendOpenNoteEvent(note) {
-  ev.emit("onOpenNote", note);
-}
 function Home() {
   const [notes, setNotes] = useState([]);
   useEffect(() => {
-    Home.onRefresh = () => {
+    function onRefreshNotes() {
       setNotes(db.getNotes());
-    };
-    Home.onRefresh();
+    }
+    onRefreshNotes();
+    ev.addListener("refreshNotes", onRefreshNotes);
     return () => {
-      Home.onRefresh = undefined;
+      ev.removeListener("refreshNotes", onRefreshNotes);
     };
   }, []);
   return (
@@ -66,62 +32,7 @@ function Home() {
               overflowX: "hidden"
             }}
             totalCount={notes.length}
-            item={index => {
-              const note = notes[index];
-              return (
-                <Box
-                  onClick={e => {
-                    sendOpenNoteEvent(note);
-                    e.stopPropagation();
-                  }}
-                  py={3}
-                  sx={{
-                    borderRadius: "default",
-                    marginBottom: 2,
-                    borderBottom: "1px solid",
-                    borderBottomColor: "navbg",
-                    cursor: "default",
-                    ...ButtonPressedStyle
-                  }}
-                >
-                  <Flex flexDirection="row" justifyContent="space-between">
-                    <Text fontFamily="body" fontSize="title" fontWeight="bold">
-                      {note.title}
-                    </Text>
-                    <Dropdown
-                      style={{ zIndex: 999 }}
-                      ref={ref => (dropdownRefs[index] = ref)}
-                    >
-                      <DropdownTrigger>
-                        <Icon.MoreVertical
-                          size={20}
-                          strokeWidth={1.5}
-                          style={{ marginRight: -5 }}
-                        />
-                      </DropdownTrigger>
-                      <DropdownContent style={{ zIndex: 999, marginLeft: -70 }}>
-                        <Menu
-                          dropdownRef={dropdownRefs[index]}
-                          menuItems={menuItems}
-                          data={note}
-                        />
-                      </DropdownContent>
-                    </Dropdown>
-                  </Flex>
-                  <Text fontFamily="body" fontSize="body" sx={{ marginTop: 1 }}>
-                    {note.headline}
-                  </Text>
-                  <Text
-                    fontFamily="body"
-                    fontWeight="body"
-                    fontSize={12}
-                    color="accent"
-                  >
-                    <TimeAgo datetime={note.dateCreated} />
-                  </Text>
-                </Box>
-              );
-            }}
+            item={index => <Note index={index} item={notes[index]} />}
           />
           <Button
             Icon={Icon.Plus}

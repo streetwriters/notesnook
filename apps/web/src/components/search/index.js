@@ -2,7 +2,7 @@ import React from "react";
 import { Flex, Box } from "rebass";
 import { Input } from "@rebass/forms";
 import * as Icon from "react-feather";
-import theme, { SHADOW } from "../../theme";
+import theme from "../../theme";
 import "./search.css";
 const Search = props => (
   <Flex

@@ -1,48 +1,27 @@
 import React, { useState, useEffect } from "react";
 import { Flex, Box, Text, Button as RebassButton } from "rebass";
-import { Input, Label } from "@rebass/forms";
+import { Input } from "@rebass/forms";
 import Button from "../components/button";
 import * as Icon from "react-feather";
-import theme, { ButtonPressedStyle, SHADOW, DIALOG_SHADOW } from "../theme";
+import theme, { DIALOG_SHADOW } from "../theme";
 import Search from "../components/search";
 import Modal from "react-modal";
-import { db, ev } from "../common";
+import { db } from "../common";
 import { showSnack } from "../components/snackbar";
 import { Virtuoso as List } from "react-virtuoso";
-import Dropdown, {
-  DropdownTrigger,
-  DropdownContent
-} from "../components/dropdown";
-import Menu from "../components/menu";
+import Notebook from "../components/notebook";
+import Topic from "../components/topic";
+import Note from "../components/note";
 
 const inputRefs = [];
-const dropdownRefs = [];
-const menuItems = [
-  { title: "Favorite", icon: Icon.Heart },
-  { title: "Share", icon: Icon.Share2 },
-  {
-    title: "Delete",
-    icon: Icon.Trash,
-    color: "red",
-    onClick: note => {
-      ev.emit("onClearNote", note.dateCreated);
-      db.deleteNotes([note]).then(
-        //TODO implement undo
-        async () => {
-          showSnack("Note deleted!", Icon.Check);
-        }
-      );
-    }
-  }
-];
 
 const Notebooks = props => {
   const [open, setOpen] = useState(false);
   const [notebooks, setNotebooks] = useState([]);
+  const [selected, setSelected] = useState({});
   useEffect(() => {
     Notebooks.onRefresh = () => {
       setNotebooks(db.getNotebooks());
-      console.log(notebooks);
     };
     Notebooks.onRefresh();
     return () => {
@@ -53,6 +32,11 @@ const Notebooks = props => {
     <Flex flexDirection="column" flex="1 1 auto">
       {notebooks.length > 0 ? (
         <Flex flexDirection="column" flex="1 1 auto">
+          {selected.type === "topic" && (
+            <Text variant="title" color="accent">
+              {selected.title}
+            </Text>
+          )}
           <Search placeholder="Search" />
           <List
             style={{
@@ -61,85 +45,50 @@ const Notebooks = props => {
               height: "auto",
               overflowX: "hidden"
             }}
-            totalCount={notebooks.length}
+            totalCount={
+              selected.type === "notebook"
+                ? selected.topics.length
+                : selected.type === "topic"
+                ? selected.notes.length
+                : notebooks.length
+            }
             item={index => {
-              const notebook = notebooks[index];
-              return (
-                <Box
-                  onClick={e => {
-                    e.stopPropagation();
+              return selected.type === "notebook" ? (
+                <Topic
+                  index={index}
+                  item={selected.topics[index]}
+                  onClick={() => {
+                    setSelected(selected.topics[index]);
                   }}
-                  py={1}
-                  sx={{
-                    borderRadius: "default",
-                    marginBottom: 2,
-                    borderBottom: "1px solid",
-                    borderBottomColor: "navbg",
-                    cursor: "default",
-                    ...ButtonPressedStyle
+                />
+              ) : selected.type === "topic" ? (
+                <Note index={index} item={selected.notes[index]} />
+              ) : (
+                <Notebook
+                  index={index}
+                  item={notebooks[index]}
+                  onClick={() => {
+                    props.changeTitle(notebooks[index].title);
+                    setSelected(notebooks[index]);
                   }}
-                >
-                  <Flex flexDirection="row" justifyContent="space-between">
-                    <Text fontFamily="body" fontSize="title" fontWeight="bold">
-                      {notebook.title}
-                    </Text>
-                    <Dropdown
-                      style={{ zIndex: 999 }}
-                      ref={ref => (dropdownRefs[index] = ref)}
-                    >
-                      <DropdownTrigger>
-                        <Icon.MoreVertical
-                          size={20}
-                          strokeWidth={1.5}
-                          style={{ marginRight: -5 }}
-                        />
-                      </DropdownTrigger>
-                      <DropdownContent style={{ zIndex: 999, marginLeft: -70 }}>
-                        <Menu
-                          dropdownRef={dropdownRefs[index]}
-                          menuItems={menuItems}
-                          data={notebook}
-                        />
-                      </DropdownContent>
-                    </Dropdown>
-                  </Flex>
-                  <Text variant="body" sx={{ marginBottom: 1 }}>
-                    {notebook.description}
-                  </Text>
-                  <Flex sx={{ marginBottom: 1 }}>
-                    {Object.keys(notebook.topics)
-                      .slice(0, 3)
-                      .map(topic => (
-                        <Flex
-                          bg="accent"
-                          px={1}
-                          py={1}
-                          sx={{
-                            marginRight: 1,
-                            borderRadius: "default",
-                            color: "fontSecondary"
-                          }}
-                        >
-                          <Text variant="body" fontSize={11}>
-                            {topic}
-                          </Text>
-                        </Flex>
-                      ))}
-                  </Flex>
-                  <Text variant="body" fontSize={12} color="accent">
-                    {new Date(notebook.dateCreated).toDateString().substring(4)}
-                    <Text as="span" color="fontPrimary">
-                      {" • " + notebook.totalNotes} Notes
-                    </Text>
-                  </Text>
-                </Box>
+                  onTopicClick={(notebook, topic) => {
+                    props.changeTitle(notebook.title);
+                    setSelected(topic);
+                  }}
+                />
               );
             }}
           />
           <Button
             Icon={Icon.Plus}
             onClick={() => setOpen(true)}
-            content="Create a notebook"
+            content={
+              selected.type === "notebook"
+                ? "Add more topics"
+                : selected.type === "topic"
+                ? "Make a new note"
+                : "Create a notebook"
+            }
           />
         </Flex>
       ) : (
@@ -244,9 +193,9 @@ const CreateNotebookDialog = props => {
             Topics (optional):
           </Text>
           <Box sx={{ maxHeight: 44 * 5, overflowY: "auto", marginBottom: 1 }}>
-            {topics.map((item, index) => (
+            {topics.map((value, index) => (
               <Flex
-                key={item + index.toString()}
+                key={index.toString()}
                 flexDirection="row"
                 sx={{ marginBottom: 1 }}
               >

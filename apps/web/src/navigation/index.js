@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import ReactDOM from "react-dom";
 import Home from "../views/Home";
 import Notebooks from "../views/Notebooks";
@@ -79,10 +79,13 @@ export function goBack(root) {
 }
 
 function ThemedComponent(props) {
+  const [title, setTitle] = useState(props.route.title);
   return (
     <ThemeProvider theme={theme}>
-      <Heading fontSize="heading">{props.route.title}</Heading>
-      {props.route.component && <props.route.component />}
+      <Heading fontSize="heading">{title}</Heading>
+      {props.route.component && (
+        <props.route.component changeTitle={setTitle} />
+      )}
     </ThemeProvider>
   );
 }
