@@ -7,6 +7,7 @@ import {
   View,
   KeyboardAvoidingView,
   Text,
+  Keyboard,
 } from 'react-native';
 import {COLOR_SCHEME, opacity, pv, br, SIZE, WEIGHT} from '../../common/common';
 import {styles} from './styles';
@@ -29,6 +30,7 @@ export const Home = ({navigation}) => {
   const [update, setUpdate] = useState(0);
   const [hideHeader, setHideHeader] = useState(false);
   const [margin, setMargin] = useState(150);
+  const [buttonHide, setButtonHide] = useState(false);
   let offsetY = 0;
   let countUp = 0;
   let countDown = 0;
@@ -84,10 +86,30 @@ export const Home = ({navigation}) => {
       }, 10);
     }
   };
+  useEffect(() => {
+    Keyboard.addListener('keyboardDidShow', () => {
+      setButtonHide(true);
+    });
+    Keyboard.addListener('keyboardDidHide', () => {
+      setTimeout(() => {
+        setButtonHide(false);
+      }, 600);
+    });
+    return () => {
+      Keyboard.removeListener('keyboardDidShow', () => {
+        setButtonHide(true);
+      });
+      Keyboard.removeListener('keyboardDidHide', () => {
+        setTimeout(() => {
+          setButtonHide(false);
+        }, 600);
+      });
+    };
+  }, []);
 
   return Platform.isPad ? (
-    <SafeAreaView style={[styles.container]}>
-      <KeyboardAvoidingView>
+    <SafeAreaView style={[styles.container, {backgroundColor: colors.bg}]}>
+      <KeyboardAvoidingView style={{backgroundColor: colors.bg}}>
         <NavigationEvents
           onWillFocus={() => {
             DeviceEventEmitter.emit('openSidebar');
@@ -155,6 +177,7 @@ export const Home = ({navigation}) => {
               searchHeight = height;
               setMarginTop();
             }}
+            clear={() => setText('')}
             hide={hideHeader}
             onChangeText={onChangeText}
             onSubmitEditing={onSubmitEditing}
@@ -166,7 +189,25 @@ export const Home = ({navigation}) => {
           />
         </View>
         {hidden ? (
-          <NotesList searchResults={searchResults} keyword={text} />
+          <NotesList
+            margin={margin}
+            onScroll={y => {
+              if (y > offsetY) {
+                if (y - offsetY < 150 || countDown > 0) return;
+                countDown = 1;
+                countUp = 0;
+                setHideHeader(true);
+              } else {
+                if (offsetY - y < 150 || countUp > 0) return;
+                countDown = 0;
+                countUp = 1;
+                setHideHeader(false);
+              }
+              offsetY = y;
+            }}
+            searchResults={searchResults}
+            keyword={text}
+          />
         ) : (
           <RecentList
             onScroll={y => {
@@ -187,40 +228,42 @@ export const Home = ({navigation}) => {
             update={update}
           />
         )}
-        <TouchableOpacity
-          onPress={() => {
-            NavigationService.navigate('Editor');
-          }}
-          activeOpacity={opacity}
-          style={{
-            width: '90%',
-            alignSelf: 'center',
-            borderRadius: br,
-            backgroundColor: colors.accent,
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginBottom: 20,
-          }}>
-          <View
+        {buttonHide ? null : (
+          <TouchableOpacity
+            onPress={() => {
+              NavigationService.navigate('Editor');
+            }}
+            activeOpacity={opacity}
             style={{
-              justifyContent: 'space-between',
+              width: '90%',
+              alignSelf: 'center',
+              borderRadius: br,
+              backgroundColor: colors.accent,
+              justifyContent: 'center',
               alignItems: 'center',
-              flexDirection: 'row',
-              width: '100%',
-              padding: pv,
-              paddingVertical: pv + 5,
+              marginBottom: 20,
             }}>
-            <Text
+            <View
               style={{
-                fontSize: SIZE.md,
-                color: 'white',
-                fontFamily: WEIGHT.bold,
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexDirection: 'row',
+                width: '100%',
+                padding: pv,
+                paddingVertical: pv + 5,
               }}>
-              Add a new note
-            </Text>
-            <Icon name="plus" color="white" size={SIZE.lg} />
-          </View>
-        </TouchableOpacity>
+              <Text
+                style={{
+                  fontSize: SIZE.md,
+                  color: 'white',
+                  fontFamily: WEIGHT.bold,
+                }}>
+                Add a new note
+              </Text>
+              <Icon name="plus" color="white" size={SIZE.lg} />
+            </View>
+          </TouchableOpacity>
+        )}
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

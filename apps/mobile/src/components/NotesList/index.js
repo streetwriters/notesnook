@@ -27,7 +27,7 @@ import NoteItem from '../NoteItem';
 import NavigationService from '../../services/NavigationService';
 import {storage} from '../../../App';
 
-export const NotesList = ({keyword, searchResults}) => {
+export const NotesList = ({keyword, searchResults, margin, onScroll}) => {
   const [colors, setColors] = useState(COLOR_SCHEME);
 
   return (
@@ -51,11 +51,16 @@ export const NotesList = ({keyword, searchResults}) => {
             </Text>
           </View>
         }
+        onScroll={event => {
+          y = event.nativeEvent.contentOffset.y;
+          onScroll(y);
+        }}
         ListHeaderComponent={
           <>
             <Text
               style={{
                 fontSize: SIZE.lg,
+                marginTop: margin,
                 fontFamily: WEIGHT.medium,
                 color: colors.pri,
                 paddingHorizontal: Platform.isPad ? '2.5%' : '5%',

@@ -25,11 +25,11 @@ import Icon from 'react-native-vector-icons/Feather';
 
 import {getElevation, w, h, Toast} from '../../utils/utils';
 
-export const Menu = ({colors, close = () => {}}) => (
+export const Menu = ({colors, close = () => {}, hide}) => (
   <SafeAreaView
     style={{
       height: '100%',
-
+      opacity: hide ? 0 : 1,
       backgroundColor: colors.navbg,
     }}>
     <ScrollView

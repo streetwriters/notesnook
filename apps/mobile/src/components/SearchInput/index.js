@@ -76,6 +76,7 @@ export const Search = props => {
         <Icon
           style={{paddingRight: Platform.isPad ? '1.25%' : '2.5%'}}
           onPress={() => {
+            props.clear();
             props.value.length > 0 ? props.clearSearch() : null;
             inputRef.current.setNativeProps({
               text: '',

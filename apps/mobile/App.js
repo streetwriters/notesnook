@@ -10,6 +10,7 @@ import {
   DeviceEventEmitter,
   Platform,
   Text,
+  Keyboard,
 } from 'react-native';
 import {COLOR_SCHEME, SIZE, opacity, WEIGHT, pv, ph} from './src/common/common';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -27,6 +28,7 @@ const App = () => {
   const [sidebar, setSidebar] = useState('30%');
   const [isOpen, setOpen] = useState(false);
   const [disableGestures, setDisableGesture] = useState(false);
+  const [buttonHide, setButtonHide] = useState(false);
   useEffect(() => {
     if (Platform.OS === 'android') {
       StatusBar.setBackgroundColor('transparent');
@@ -83,6 +85,31 @@ const App = () => {
     };
   }, []);
 
+  useEffect(() => {
+    Keyboard.addListener('keyboardDidShow', () => {
+      setDisableGesture(true);
+      setButtonHide(true);
+    });
+    Keyboard.addListener('keyboardDidHide', () => {
+      setDisableGesture(false);
+      setTimeout(() => {
+        setButtonHide(false);
+      }, 500);
+    });
+    return () => {
+      Keyboard.removeListener('keyboardDidShow', () => {
+        setDisableGesture(true);
+        setButtonHide(true);
+      });
+      Keyboard.removeListener('keyboardDidHide', () => {
+        setDisableGesture(false);
+        setTimeout(() => {
+          setButtonHide(false);
+        }, 500);
+      });
+    };
+  }, []);
+
   return (
     <View
       style={{
@@ -121,10 +148,19 @@ const App = () => {
           isOpen={isOpen}
           disableGestures={disableGestures}
           bounceBackOnOverdraw={false}
+          contentContainerStyle={{
+            opacity: 0,
+          }}
           onChange={args => {
             setOpen(args);
           }}
-          menu={<Menu colors={colors} close={() => setOpen(false)} />}
+          menu={
+            <Menu
+              hide={buttonHide}
+              colors={colors}
+              close={() => setOpen(false)}
+            />
+          }
           openMenuOffset={w / 1.5}>
           <AppContainer
             style={{
