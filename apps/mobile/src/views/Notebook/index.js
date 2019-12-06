@@ -51,20 +51,7 @@ export const Notebook = ({navigation}) => {
           style={{
             width: '100%',
           }}
-          data={[
-            {
-              name: 'Class Notes',
-              Qty: '8',
-            },
-            {
-              name: 'Notes of water tabs',
-              Qty: '3',
-            },
-            {
-              name: 'My Lists',
-              Qty: '3',
-            },
-          ]}
+          data={params.notebook.topics}
           ListHeaderComponent={
             <>
               {params.hideMore ? null : (

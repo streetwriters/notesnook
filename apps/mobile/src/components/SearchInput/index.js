@@ -51,7 +51,7 @@ export const Search = props => {
           props.onBlur;
         }}
         numberOfLines={1}
-        placeholder="Search your notes"
+        placeholder={props.placeholder}
         placeholderTextColor={colors.icon}
       />
       <Icon

@@ -23,23 +23,27 @@ import {
 } from '../../common/common';
 import Icon from 'react-native-vector-icons/Feather';
 
-import {getElevation, h, w, timeSince} from '../../utils/utils';
+import {getElevation, h, w, timeSince, ToastEvent} from '../../utils/utils';
 import {FlatList, TextInput} from 'react-native-gesture-handler';
 import {useForceUpdate} from '../../views/ListsEditor';
+import {storage} from '../../../App';
 
-const refs = [];
+let refs = [];
 
 export const AddNotebookDialog = ({visible, close}) => {
   const [colors, setColors] = useState(COLOR_SCHEME);
-  const [topicsToAdd, setTopicsToAdd] = useState(['']);
+  const [topics, setTopics] = useState(['']);
+  const [title, setTitle] = useState(null);
   const forceUpdate = useForceUpdate();
+
   let listRef = createRef();
   let prevItem = null;
   let prevIndex = null;
   let currentSelectedItem = null;
 
+  let description = 'my first notebook';
   const onSubmit = (text, index, willFocus = true) => {
-    let oldData = topicsToAdd;
+    let oldData = topics;
     oldData[index] = text;
 
     if (
@@ -49,8 +53,7 @@ export const AddNotebookDialog = ({visible, close}) => {
     ) {
       oldData.push('');
     }
-
-    setTopicsToAdd(oldData);
+    setTopics(oldData);
     forceUpdate();
     currentSelectedItem = null;
 
@@ -70,15 +73,14 @@ export const AddNotebookDialog = ({visible, close}) => {
   const onFocus = index => {
     currentSelectedItem = index;
     if (currentSelectedItem) {
-      let oldData = topicsToAdd;
+      let oldData = topics;
       oldData[prevIndex] = prevItem;
       if (oldData.length === prevIndex + 1) {
         oldData.push('');
       }
       prevIndex = null;
       prevItem = null;
-      setTopicsToAdd(oldData);
-      console.log(oldData);
+      setTopics(oldData);
       forceUpdate();
     }
   };
@@ -87,14 +89,31 @@ export const AddNotebookDialog = ({visible, close}) => {
     prevItem = text;
   };
   const onDelete = index => {
-    console.log('deleting');
-    let listData = topicsToAdd;
+    let listData = topics;
     if (listData.length === 1) return;
     refs.splice(index, 1);
     listData.splice(index, 1);
-    console.log(refs, listData);
-    setTopicsToAdd(listData);
+
+    setTopics(listData);
     forceUpdate();
+  };
+
+  const addNewNotebook = async () => {
+    if (!title)
+      return ToastEvent.show('Title is required', 'error', 3000, () => {}, '');
+
+    await storage.addNotebook({
+      title,
+      description,
+      topics,
+    });
+    ToastEvent.show('New notebook added', 'success', 3000, () => {}, '');
+    setTopics(['']);
+    prevIndex = null;
+    prevItem = null;
+    currentSelectedItem = null;
+    refs = [];
+    close(true);
   };
 
   return (
@@ -151,6 +170,9 @@ export const AddNotebookDialog = ({visible, close}) => {
               marginTop: 20,
               marginBottom: 10,
             }}
+            onChangeText={value => {
+              setTitle(value);
+            }}
             placeholder="Title of notebook"
             placeholderTextColor={colors.icon}
           />
@@ -164,7 +186,7 @@ export const AddNotebookDialog = ({visible, close}) => {
           </Text>
 
           <FlatList
-            data={topicsToAdd}
+            data={topics}
             ref={listRef}
             removeClippedSubviews={false}
             enableEmptySections={false}
@@ -195,6 +217,9 @@ export const AddNotebookDialog = ({visible, close}) => {
             }}>
             <TouchableOpacity
               activeOpacity={opacity}
+              onPress={async () => {
+                await addNewNotebook();
+              }}
               style={{
                 paddingVertical: pv,
                 paddingHorizontal: ph,
@@ -219,10 +244,11 @@ export const AddNotebookDialog = ({visible, close}) => {
             <TouchableOpacity
               activeOpacity={opacity}
               onPress={() => {
-                setTopicsToAdd(['']);
+                setTopics(['']);
                 prevIndex = null;
                 prevItem = null;
                 currentSelectedItem = null;
+                refs = [];
                 close();
               }}
               style={{

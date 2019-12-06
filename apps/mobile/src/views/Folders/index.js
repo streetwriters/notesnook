@@ -31,12 +31,18 @@ import {useForceUpdate} from '../ListsEditor';
 import {AddNotebookDialog} from '../../components/AddNotebookDialog';
 import {NotebookItem} from '../../components/NotebookItem';
 import {Search} from '../../components/SearchInput';
+import {storage} from '../../../App';
 
 export const Folders = ({navigation}) => {
   const [colors, setColors] = useState(COLOR_SCHEME);
   const [addNotebook, setAddNotebook] = useState(false);
   const [notebooks, setNotebooks] = useState([]);
   const params = navigation.state.params;
+
+  useEffect(() => {
+    setNotebooks(storage.getNotebooks());
+    console.log(storage.getNotebooks());
+  }, []);
 
   return (
     <SafeAreaView
@@ -45,7 +51,12 @@ export const Folders = ({navigation}) => {
       }}>
       <AddNotebookDialog
         visible={addNotebook}
-        close={() => setAddNotebook(false)}
+        close={newNotes => {
+          setAddNotebook(false);
+          if (newNotes) {
+            setNotebooks(storage.getNotebooks());
+          }
+        }}
       />
       <KeyboardAvoidingView
         style={{
@@ -77,12 +88,14 @@ export const Folders = ({navigation}) => {
             size={SIZE.xxl}
           />
         </View>
-        <Search />
+        <Search placeholder="Search in notebooks" />
+
         <FlatList
           style={{
             width: '100%',
           }}
           data={notebooks}
+          keyExtractor={(item, index) => item.dateCreated.toString()}
           renderItem={({item, index}) => (
             <NotebookItem
               hideMore={params.hideMore}

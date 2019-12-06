@@ -65,6 +65,7 @@ export const RecentList = ({update}) => {
             </Text>
           </View>
         }
+        keyExtractor={(item, index) => item.dateCreated.toString()}
         renderItem={({item, index}) => <NoteItem item={item} index={index} />}
       />
     </>

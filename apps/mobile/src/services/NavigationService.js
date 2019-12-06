@@ -17,6 +17,7 @@ import Notes from '../views/Notes';
 import Tags from '../views/Tags';
 import Notebook from '../views/Notebook';
 import Move from '../views/Move';
+import AccountSettings from '../views/AccountSettings';
 
 const TopLevelNavigator = createStackNavigator(
   {
@@ -70,6 +71,9 @@ const TopLevelNavigator = createStackNavigator(
     },
     Move: {
       screen: Move,
+    },
+    AccountSettings: {
+      screen: AccountSettings,
     },
   },
   {

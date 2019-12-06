@@ -114,6 +114,7 @@ export const Home = ({navigation}) => {
         <Search
           onChangeText={onChangeText}
           onSubmitEditing={onSubmitEditing}
+          placeholder="Search your notes"
           onBlur={onBlur}
           onFocus={onFocus}
           clearSearch={clearSearch}
