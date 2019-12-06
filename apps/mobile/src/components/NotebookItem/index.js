@@ -39,7 +39,7 @@ export const NotebookItem = ({
         marginHorizontal: '5%',
         borderBottomWidth: 1,
         borderBottomColor: '#f0f0f0',
-        paddingVertical: pv + 5,
+        paddingVertical: pv,
       }}>
       <View
         style={{

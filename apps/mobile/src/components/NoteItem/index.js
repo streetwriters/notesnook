@@ -39,12 +39,13 @@ const NoteItem = props => {
     <View
       style={{
         marginHorizontal: w * 0.05,
-        marginVertical: h * 0.015,
+        paddingVertical: pv,
+
         borderRadius: br,
         justifyContent: 'center',
         alignItems: 'center',
         flexDirection: 'row',
-        padding: pv,
+        paddingHorizontal: ph,
         width: Platform.isPad ? '95%' : '90%',
         alignSelf: 'center',
         borderBottomWidth: 1,
@@ -68,7 +69,8 @@ const NoteItem = props => {
           });
         }}
         style={{
-          width: '95%',
+          paddingLeft: ph,
+          width: '100%',
         }}>
         <>
           <Text
@@ -140,6 +142,7 @@ const NoteItem = props => {
           justifyContent: 'center',
           minHeight: 70,
           alignItems: 'center',
+          paddingRight: ph,
         }}>
         <Menu
           style={{

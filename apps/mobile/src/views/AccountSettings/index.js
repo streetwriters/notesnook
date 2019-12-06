@@ -80,34 +80,29 @@ export const AccountSettings = ({navigation}) => {
         </Text>
       </View>
       <FlatList
-        data={['Subscription Status', 'Space Used', 'E-to-E Encryption']}
-        ListHeaderComponent={
-          <TouchableOpacity
-            activeOpacity={opacity}
-            style={{
-              borderRadius: 5,
-              width: '90%',
-              marginHorizontal: '5%',
-              paddingHorizontal: ph,
-              borderWidth: 1,
-              borderColor: '#f0f0f0',
-              paddingVertical: pv + 5,
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: 10,
-              backgroundColor: colors.bg,
-            }}>
-            <Text
-              style={{
-                fontSize: SIZE.md,
-                fontFamily: WEIGHT.regular,
-                color: colors.pri,
-              }}>
-              Backup notes
-            </Text>
-          </TouchableOpacity>
-        }
+        data={[
+          {
+            name: 'Backup Notes',
+            icon: 'database',
+          },
+          {
+            name: 'My Devices',
+            icon: 'tablet',
+          },
+          {
+            name: 'Vault',
+            icon: 'shield',
+          },
+
+          {
+            name: 'My Subscription',
+            icon: 'credit-card',
+          },
+          {
+            name: 'Change Password',
+            icon: 'key',
+          },
+        ]}
         renderItem={({item, index}) => (
           <TouchableOpacity
             activeOpacity={opacity}
@@ -126,15 +121,10 @@ export const AccountSettings = ({navigation}) => {
               style={{
                 fontSize: SIZE.md,
                 fontFamily: WEIGHT.regular,
+                textAlignVertical: 'center',
               }}>
-              {item}
-            </Text>
-            <Text
-              style={{
-                fontSize: SIZE.sm,
-                fontFamily: WEIGHT.regular,
-              }}>
-              100/90
+              <Icon name={item.icon} size={SIZE.md} />
+              {'  '} {item.name}
             </Text>
           </TouchableOpacity>
         )}

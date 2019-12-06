@@ -27,7 +27,7 @@ import NoteItem from '../NoteItem';
 import NavigationService from '../../services/NavigationService';
 import {storage} from '../../../App';
 
-export const RecentList = ({update}) => {
+export const RecentList = ({update, onScroll, margin}) => {
   const [colors, setColors] = useState(COLOR_SCHEME);
   const [notes, setNotes] = useState([]);
   const fetchNotes = async () => {
@@ -45,9 +45,21 @@ export const RecentList = ({update}) => {
     <>
       <FlatList
         data={notes}
+        onScroll={event => {
+          y = event.nativeEvent.contentOffset.y;
+          onScroll(y);
+        }}
         style={{
           height: '100%',
+          width: '100%',
         }}
+        ListHeaderComponent={
+          <View
+            style={{
+              marginTop: margin,
+            }}
+          />
+        }
         ListFooterComponent={
           <View
             style={{

@@ -12,13 +12,14 @@ import {COLOR_SCHEME, opacity, pv, br, SIZE, WEIGHT} from '../../common/common';
 import {styles} from './styles';
 import {Search} from '../../components/SearchInput';
 import {RecentList} from '../../components/Recents';
-import {w} from '../../utils/utils';
+import {w, h} from '../../utils/utils';
 import {Header} from '../../components/header';
 import {NavigationEvents} from 'react-navigation';
 import {NotesList} from '../../components/NotesList';
 import {storage} from '../../../App';
 import Icon from 'react-native-vector-icons/Feather';
 import NavigationService from '../../services/NavigationService';
+import {ScrollView} from 'react-native-gesture-handler';
 export const Home = ({navigation}) => {
   const [loading, setLoading] = useState(true);
   const [colors, setColors] = useState(COLOR_SCHEME);
@@ -26,6 +27,14 @@ export const Home = ({navigation}) => {
   const [text, setText] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [update, setUpdate] = useState(0);
+  const [hideHeader, setHideHeader] = useState(false);
+  const [margin, setMargin] = useState(150);
+  let offsetY = 0;
+  let countUp = 0;
+  let countDown = 0;
+  let headerHeight = 0;
+  let searchHeight = 0;
+
   useEffect(() => {
     setTimeout(() => {
       setLoading(false);
@@ -60,6 +69,20 @@ export const Home = ({navigation}) => {
   const clearSearch = () => {
     setSearchResults([]);
     setHidden(false);
+  };
+
+  const setMarginTop = () => {
+    if (margin !== 150) return;
+    if (headerHeight == 0 || searchHeight == 0) {
+      let toAdd = h * 0.06;
+
+      setTimeout(() => {
+        if (margin > headerHeight + searchHeight + toAdd) return;
+        setMargin(headerHeight + searchHeight + toAdd);
+        headerHeight = 0;
+        searchHeight = 0;
+      }, 10);
+    }
   };
 
   return Platform.isPad ? (
@@ -103,28 +126,66 @@ export const Home = ({navigation}) => {
             setUpdate(update + 1);
           }}
         />
+        <View
+          style={{
+            position: 'absolute',
+            backgroundColor: colors.bg,
+            zIndex: 10,
+            width: '100%',
+          }}>
+          <Header
+            sendHeight={height => {
+              headerHeight = height;
+              setMarginTop();
+            }}
+            hide={hideHeader}
+            showSearch={() => {
+              setHideHeader(false);
+              countUp = 0;
+              countDown = 0;
+            }}
+            colors={colors}
+            heading="Home"
+            canGoBack={false}
+            customIcon="menu"
+          />
 
-        <Header
-          colors={colors}
-          heading="Home"
-          canGoBack={false}
-          customIcon="menu"
-        />
-
-        <Search
-          onChangeText={onChangeText}
-          onSubmitEditing={onSubmitEditing}
-          placeholder="Search your notes"
-          onBlur={onBlur}
-          onFocus={onFocus}
-          clearSearch={clearSearch}
-          value={text}
-        />
-
+          <Search
+            sendHeight={height => {
+              searchHeight = height;
+              setMarginTop();
+            }}
+            hide={hideHeader}
+            onChangeText={onChangeText}
+            onSubmitEditing={onSubmitEditing}
+            placeholder="Search your notes"
+            onBlur={onBlur}
+            onFocus={onFocus}
+            clearSearch={clearSearch}
+            value={text}
+          />
+        </View>
         {hidden ? (
           <NotesList searchResults={searchResults} keyword={text} />
         ) : (
-          <RecentList update={update} />
+          <RecentList
+            onScroll={y => {
+              if (y > offsetY) {
+                if (y - offsetY < 150 || countDown > 0) return;
+                countDown = 1;
+                countUp = 0;
+                setHideHeader(true);
+              } else {
+                if (offsetY - y < 150 || countUp > 0) return;
+                countDown = 0;
+                countUp = 1;
+                setHideHeader(false);
+              }
+              offsetY = y;
+            }}
+            margin={margin}
+            update={update}
+          />
         )}
         <TouchableOpacity
           onPress={() => {

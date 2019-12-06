@@ -32,12 +32,34 @@ import {AddNotebookDialog} from '../../components/AddNotebookDialog';
 import {NotebookItem} from '../../components/NotebookItem';
 import {Search} from '../../components/SearchInput';
 import {storage} from '../../../App';
+import {Header} from '../../components/header';
 
 export const Folders = ({navigation}) => {
   const [colors, setColors] = useState(COLOR_SCHEME);
   const [addNotebook, setAddNotebook] = useState(false);
   const [notebooks, setNotebooks] = useState([]);
+  const [hideHeader, setHideHeader] = useState(false);
+  const [margin, setMargin] = useState(150);
   const params = navigation.state.params;
+  let offsetY = 0;
+  let countUp = 0;
+  let countDown = 0;
+  let headerHeight = 0;
+  let searchHeight = 0;
+
+  const setMarginTop = () => {
+    if (margin !== 150) return;
+    if (headerHeight == 0 || searchHeight == 0) {
+      let toAdd = h * 0.06;
+
+      setTimeout(() => {
+        if (margin > headerHeight + searchHeight + toAdd) return;
+        setMargin(headerHeight + searchHeight + toAdd);
+        headerHeight = 0;
+        searchHeight = 0;
+      }, 10);
+    }
+  };
 
   useEffect(() => {
     setNotebooks(storage.getNotebooks());
@@ -64,36 +86,59 @@ export const Folders = ({navigation}) => {
         }}>
         <View
           style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            paddingHorizontal: '5%',
-            marginTop: Platform.OS == 'ios' ? h * 0.02 : h * 0.04,
-            marginBottom: h * 0.04,
+            position: 'absolute',
+            backgroundColor: colors.bg,
+            zIndex: 10,
+            width: '100%',
           }}>
-          <Text
-            style={{
-              fontSize: SIZE.xxl,
-              color: colors.pri,
-              fontFamily: WEIGHT.bold,
-            }}>
-            {params.title}
-          </Text>
-          <Icon
-            style={{
-              marginTop: 10,
+          <Header
+            sendHeight={height => (headerHeight = height)}
+            hide={hideHeader}
+            showSearch={() => {
+              setHideHeader(false);
+              countUp = 0;
+              countDown = 0;
             }}
-            name="more-vertical"
-            color={colors.icon}
-            size={SIZE.xxl}
+            colors={colors}
+            heading={params.title}
+            canGoBack={false}
+          />
+          <Search
+            sendHeight={height => {
+              searchHeight = height;
+              setMarginTop();
+            }}
+            placeholder="Search your notebook"
+            hide={hideHeader}
           />
         </View>
-        <Search placeholder="Search in notebooks" />
 
         <FlatList
           style={{
             width: '100%',
           }}
+          onScroll={event => {
+            y = event.nativeEvent.contentOffset.y;
+            if (y > offsetY) {
+              if (y - offsetY < 150 || countDown > 0) return;
+              countDown = 1;
+              countUp = 0;
+              setHideHeader(true);
+            } else {
+              if (offsetY - y < 150 || countUp > 0) return;
+              countDown = 0;
+              countUp = 1;
+              setHideHeader(false);
+            }
+            offsetY = y;
+          }}
+          ListHeaderComponent={
+            <View
+              style={{
+                marginTop: margin,
+              }}
+            />
+          }
           data={notebooks}
           keyExtractor={(item, index) => item.dateCreated.toString()}
           renderItem={({item, index}) => (

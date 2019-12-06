@@ -37,7 +37,24 @@ export const Settings = ({navigation}) => {
       <Header colors={colors} heading="Settings" canGoBack={false} />
 
       <FlatList
-        data={['Sync', 'Dark Mode', 'Sunset to Sunrise']}
+        data={[
+          {
+            name: 'Sync',
+            icon: 'refresh-ccw',
+            switch: true,
+          },
+          {
+            name: 'Dark Mode',
+            icon: 'moon',
+            switch: true,
+          },
+          {
+            name: 'Sunset to Sunrise',
+            icon: null,
+            switch: true,
+            step: true,
+          },
+        ]}
         ListHeaderComponent={
           <View>
             <TouchableOpacity
@@ -75,7 +92,7 @@ export const Settings = ({navigation}) => {
             activeOpacity={opacity}
             style={{
               borderBottomWidth: 1,
-              width: '90%',
+              width: item.step ? '85%' : '90%',
               marginHorizontal: '5%',
               borderBottomColor: '#f0f0f0',
               paddingVertical: pv + 5,
@@ -83,15 +100,20 @@ export const Settings = ({navigation}) => {
               paddingHorizontal: ph,
               justifyContent: 'space-between',
               alignItems: 'center',
+              marginLeft: item.step ? '10%' : '5%',
             }}>
             <Text
               style={{
-                fontSize: SIZE.md,
+                fontSize: item.step ? SIZE.sm : SIZE.md,
                 fontFamily: WEIGHT.regular,
+                textAlignVertical: 'center',
               }}>
-              {item}
+              <Icon name={item.icon} size={SIZE.md} />
+              {'  '} {item.name}
             </Text>
-            <Icon size={SIZE.lg} color={colors.icon} name="toggle-left" />
+            {item.switch ? (
+              <Icon name="toggle-right" size={item.step ? SIZE.sm : SIZE.md} />
+            ) : null}
           </TouchableOpacity>
         )}
       />

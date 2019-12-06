@@ -36,6 +36,27 @@ const h = Dimensions.get('window').height;
 export const Notebook = ({navigation}) => {
   const [colors, setColors] = useState(COLOR_SCHEME);
   const params = navigation.state.params;
+  const [hideHeader, setHideHeader] = useState(false);
+  const [margin, setMargin] = useState(150);
+  let offsetY = 0;
+  let countUp = 0;
+  let countDown = 0;
+  let headerHeight = 0;
+  let searchHeight = 0;
+
+  const setMarginTop = () => {
+    if (margin !== 150) return;
+    if (headerHeight == 0 || searchHeight == 0) {
+      let toAdd = h * 0.06;
+
+      setTimeout(() => {
+        if (margin > headerHeight + searchHeight + toAdd) return;
+        setMargin(headerHeight + searchHeight + toAdd);
+        headerHeight = 0;
+        searchHeight = 0;
+      }, 10);
+    }
+  };
   return (
     <SafeAreaView
       style={{
@@ -45,13 +66,56 @@ export const Notebook = ({navigation}) => {
         style={{
           height: '100%',
         }}>
-        <Header colors={colors} heading={params.title} canGoBack={false} />
-        <Search />
+        <View
+          style={{
+            position: 'absolute',
+            backgroundColor: colors.bg,
+            zIndex: 10,
+            width: '100%',
+          }}>
+          <Header
+            sendHeight={height => (headerHeight = height)}
+            hide={hideHeader}
+            showSearch={() => {
+              setHideHeader(false);
+              countUp = 0;
+              countDown = 0;
+            }}
+            colors={colors}
+            heading={params.title}
+            canGoBack={false}
+          />
+
+          <Search
+            sendHeight={height => {
+              searchHeight = height;
+              setMarginTop();
+            }}
+            placeholder="Search your notebook"
+            hide={hideHeader}
+          />
+        </View>
+
         <FlatList
           style={{
             width: '100%',
           }}
           data={params.notebook.topics}
+          onScroll={event => {
+            y = event.nativeEvent.contentOffset.y;
+            if (y > offsetY) {
+              if (y - offsetY < 150 || countDown > 0) return;
+              countDown = 1;
+              countUp = 0;
+              setHideHeader(true);
+            } else {
+              if (offsetY - y < 150 || countUp > 0) return;
+              countDown = 0;
+              countUp = 1;
+              setHideHeader(false);
+            }
+            offsetY = y;
+          }}
           ListHeaderComponent={
             <>
               {params.hideMore ? null : (
@@ -63,6 +127,7 @@ export const Notebook = ({navigation}) => {
                   style={{
                     borderWidth: 1,
                     borderRadius: 5,
+                    marginTop: margin,
                     width: '90%',
                     marginHorizontal: '5%',
                     paddingHorizontal: ph,
