@@ -86,7 +86,7 @@ function ThemedComponent(props) {
           onClick={backAction}
           display={canGoBack ? "flex" : "none"}
           height={42}
-          color="accent"
+          color="fontPrimary"
           sx={{ marginLeft: -10 /*correction */ }}
         >
           <Icon.ChevronLeft size={42} />
