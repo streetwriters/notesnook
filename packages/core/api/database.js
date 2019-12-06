@@ -43,6 +43,7 @@ class Database {
         .slice(0, 3)
         .join(" ");
     this.notes[timestamp] = {
+      type: "note",
       title,
       content: note.content,
       pinned: note.pinned || false,
@@ -113,6 +114,7 @@ class Database {
       }
     }
     this.notebooks[id] = {
+      type: "notebook",
       title: notebook.title,
       description: notebook.description,
       dateCreated: id,
@@ -286,6 +288,7 @@ function getItem(id, key) {
 
 function makeTopic(topic) {
   return {
+    type: "topic",
     title: topic,
     dateCreated: Date.now(),
     totalNotes: 0,
