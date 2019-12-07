@@ -119,6 +119,7 @@ export const Notebook = ({navigation}) => {
           data={params.notebook.topics}
           onScroll={event => {
             y = event.nativeEvent.contentOffset.y;
+            if (y < 30) setHideHeader(false);
             if (buttonHide) return;
             if (y > offsetY) {
               if (y - offsetY < 150 || countDown > 0) return;

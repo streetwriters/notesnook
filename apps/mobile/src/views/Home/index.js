@@ -217,6 +217,7 @@ export const Home = ({navigation}) => {
             margin={margin}
             onScroll={y => {
               if (buttonHide) return;
+              if (y < 30) setHideHeader(false);
               if (y > offsetY) {
                 if (y - offsetY < 150 || countDown > 0) return;
                 countDown = 1;
@@ -237,6 +238,7 @@ export const Home = ({navigation}) => {
           <RecentList
             onScroll={y => {
               if (buttonHide) return;
+              if (y < 30) setHideHeader(false);
               if (y > offsetY) {
                 if (y - offsetY < 150 || countDown > 0) return;
                 countDown = 1;
