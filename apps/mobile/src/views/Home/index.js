@@ -93,7 +93,7 @@ export const Home = ({navigation}) => {
     Keyboard.addListener('keyboardDidHide', () => {
       setTimeout(() => {
         setButtonHide(false);
-      }, 600);
+      }, 100);
     });
     return () => {
       Keyboard.removeListener('keyboardDidShow', () => {
@@ -102,7 +102,7 @@ export const Home = ({navigation}) => {
       Keyboard.removeListener('keyboardDidHide', () => {
         setTimeout(() => {
           setButtonHide(false);
-        }, 600);
+        }, 100);
       });
     };
   }, []);

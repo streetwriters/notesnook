@@ -27,12 +27,14 @@ import {getElevation, timeSince, ToastEvent} from '../../utils/utils';
 import NavigationService from '../../services/NavigationService';
 import Menu, {MenuItem, MenuDivider} from 'react-native-material-menu';
 import {Dialog} from '../Dialog';
+import {VaultDialog} from '../VaultDialog';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
 const NoteItem = props => {
   const [colors, setColors] = useState(COLOR_SCHEME);
   const [visible, setVisible] = useState(false);
+  const [vaultDialog, setVaultDialog] = useState(false);
   const item = props.item;
   let setMenuRef = {};
   return (
@@ -61,6 +63,8 @@ const NoteItem = props => {
           setVisible(false);
         }}
       />
+      <VaultDialog visible={vaultDialog} />
+
       <TouchableOpacity
         activeOpacity={1}
         onPress={() => {
@@ -220,6 +224,19 @@ const NoteItem = props => {
             }}>
             <Icon name="arrow-right" size={SIZE.sm} color={colors.icon} />
             {'  '}Move
+          </MenuItem>
+          <MenuItem
+            onPress={() => {
+              setMenuRef[props.index].hide();
+              setVaultDialog(true);
+            }}
+            textStyle={{
+              color: colors.pri,
+              fontFamily: WEIGHT.regular,
+              fontSize: SIZE.sm,
+            }}>
+            <Icon name="lock" size={SIZE.sm} color={colors.icon} />
+            {'  '}Lock
           </MenuItem>
 
           <MenuItem
