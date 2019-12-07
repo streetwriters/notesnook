@@ -132,5 +132,3 @@ test("delete notebook", async () => {
   let notebook = db.getNotebook(TEST_NOTEBOOK.dateCreated);
   expect(notebook).toBeUndefined();
 });
-
-test("delete unknown key", async () => {});
