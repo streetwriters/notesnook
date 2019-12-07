@@ -134,6 +134,7 @@ export const NotebookItem = ({
           <Menu
             style={{
               borderRadius: 5,
+              backgroundColor: colors.bg,
             }}
             ref={ref => (setMenuRef[index] = ref)}
             button={
@@ -193,24 +194,6 @@ export const NotebookItem = ({
               {'  '}Delete
             </MenuItem>
             <MenuDivider />
-
-            <MenuItem
-              disabled={true}
-              textStyle={{
-                color: colors.icon,
-
-                fontFamily: WEIGHT.regular,
-                fontSize: SIZE.xs,
-              }}
-              style={{
-                paddingVertical: 0,
-                margin: 0,
-                height: 30,
-                paddingBottom: 10,
-              }}>
-              Created on:{' '}
-              {new Date(item.dateCreated).toISOString().slice(0, 10)}
-            </MenuItem>
           </Menu>
         )}
         {hideMore && isTopic ? (

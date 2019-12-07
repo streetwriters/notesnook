@@ -90,7 +90,7 @@ const Editor = ({navigation}) => {
     return (
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : null}
-        style={{height: '100%'}}>
+        style={{height: '100%', backgroundColor: colors.bg}}>
         <View
           style={{
             height: '100%',
@@ -146,10 +146,11 @@ const Editor = ({navigation}) => {
             ref={EditorWebView}
             onError={error => console.log(error)}
             onLoad={() => {
+              post(JSON.stringify(COLOR_SCHEME));
               if (navigation.state.params && navigation.state.params.note) {
                 let note = navigation.state.params.note;
 
-                post(JSON.stringify(note.content.delta));
+                //post(JSON.stringify(note.content.delta));
               }
             }}
             javaScriptEnabled
@@ -175,7 +176,11 @@ const Editor = ({navigation}) => {
                     baseUrl: 'baseUrl:"file:///android_asset/',
                   }
             }
-            style={{height: '100%', maxHeight: '100%'}}
+            style={{
+              height: '100%',
+              maxHeight: '100%',
+              backgroundColor: colors.bg,
+            }}
             onMessage={evt => {
               if (evt.nativeEvent.data !== '') {
                 onChange(evt.nativeEvent.data);
@@ -256,7 +261,7 @@ const Editor = ({navigation}) => {
   }, []);
 
   return (
-    <SafeAreaView style={{height: '100%'}}>
+    <SafeAreaView style={{height: '100%', backgroundColor: colors.bg}}>
       <Dialog
         title="Close Editor"
         visible={dialog}

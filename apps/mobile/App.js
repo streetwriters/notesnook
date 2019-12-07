@@ -157,6 +157,7 @@ const App = () => {
         width: '100%',
         height: '100%',
         flexDirection: 'row',
+        backgroundColor: colors.bg,
       }}>
       {Platform.isPad ? (
         <>

@@ -1268,6 +1268,9 @@
                   default:
                     break;
                 }
+              } else if (data.data.includes('night')) {
+                let pageTheme = JSON.parse(data.data);
+                editor.setContent(pageTheme);
               } else if (data.data[0] === '{') {
                 const content = JSON.parse(data.data);
                 editor.setContents(content);
