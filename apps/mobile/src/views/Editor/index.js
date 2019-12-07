@@ -86,6 +86,10 @@ const Editor = ({navigation}) => {
     }
   };
 
+  useEffect(() => {
+    titleRef.current.focus();
+  }, []);
+
   const _renderEditor = () => {
     return (
       <KeyboardAvoidingView
