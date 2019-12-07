@@ -150,11 +150,11 @@ const Editor = ({navigation}) => {
             ref={EditorWebView}
             onError={error => console.log(error)}
             onLoad={() => {
-              post(JSON.stringify(COLOR_SCHEME));
+              post(JSON.stringify(colors));
               if (navigation.state.params && navigation.state.params.note) {
                 let note = navigation.state.params.note;
 
-                //post(JSON.stringify(note.content.delta));
+                post(JSON.stringify(note.content.delta));
               }
             }}
             javaScriptEnabled
