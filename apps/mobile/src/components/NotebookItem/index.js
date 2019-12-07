@@ -38,7 +38,7 @@ export const NotebookItem = ({
         paddingHorizontal: ph,
         marginHorizontal: '5%',
         borderBottomWidth: 1,
-        borderBottomColor: '#f0f0f0',
+        borderBottomColor: colors.nav,
         paddingVertical: pv,
       }}>
       <View
@@ -224,7 +224,7 @@ export const NotebookItem = ({
               borderRadius: 5,
               width: '20%',
               paddingHorizontal: ph - 5,
-              borderColor: '#f0f0f0',
+              borderColor: colors.nav,
               paddingVertical: pv,
               flexDirection: 'row',
               justifyContent: 'center',

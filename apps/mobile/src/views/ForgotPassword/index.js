@@ -20,6 +20,8 @@ import {
   opacity,
   FONT,
   WEIGHT,
+  onThemeUpdate,
+  clearThemeUpdateListener,
 } from '../../common/common';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {Reminder} from '../../components/Reminder';
@@ -28,10 +30,22 @@ import {getElevation} from '../../utils/utils';
 import {FlatList, TextInput} from 'react-native-gesture-handler';
 import {NavigationEvents} from 'react-navigation';
 import {Header} from '../../components/header';
+import {useForceUpdate} from '../ListsEditor';
 
 export const ForgotPassword = ({navigation}) => {
   const [colors, setColors] = useState(COLOR_SCHEME);
+  const forceUpdate = useForceUpdate();
 
+  useEffect(() => {
+    onThemeUpdate(() => {
+      forceUpdate();
+    });
+    return () => {
+      clearThemeUpdateListener(() => {
+        forceUpdate();
+      });
+    };
+  }, []);
   useEffect(() => {
     DeviceEventEmitter.emit('hide');
     return () => {
@@ -40,7 +54,11 @@ export const ForgotPassword = ({navigation}) => {
   }, []);
 
   return (
-    <SafeAreaView>
+    <SafeAreaView
+      style={{
+        backgroundColor: colors.bg,
+        height: '100%',
+      }}>
       <NavigationEvents
         onWillFocus={() => {
           DeviceEventEmitter.emit('hide');
@@ -95,14 +113,14 @@ const renderForgotPassword = colors => {
           onBlur={() => {
             _email.current.setNativeProps({
               style: {
-                borderColor: '#f0f0f0',
+                borderColor: colors.nav,
               },
             });
           }}
           style={{
             padding: pv,
             borderWidth: 1.5,
-            borderColor: '#f0f0f0',
+            borderColor: colors.nav,
             marginHorizontal: '5%',
             borderRadius: 5,
             fontSize: SIZE.md,

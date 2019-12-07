@@ -12,7 +12,21 @@ import {
   Text,
   Keyboard,
 } from 'react-native';
-import {COLOR_SCHEME, SIZE, opacity, WEIGHT, pv, ph} from './src/common/common';
+import AsyncStorage from '@react-native-community/async-storage';
+import {
+  COLOR_SCHEME,
+  COLOR_SCHEME_DARK,
+  SIZE,
+  opacity,
+  WEIGHT,
+  pv,
+  ph,
+  setColorScheme,
+  onThemeUpdate,
+  clearThemeUpdateListener,
+  COLOR_SCHEME_LIGHT,
+  setAccentColor,
+} from './src/common/common';
 import Icon from 'react-native-vector-icons/Ionicons';
 import ActionButton from 'react-native-action-button';
 import Storage from 'notes-core/api/database';
@@ -22,6 +36,7 @@ import {h, w} from './src/utils/utils';
 import {Toast} from './src/components/Toast';
 import {Menu} from './src/components/Menu';
 import SideMenu from 'react-native-side-menu';
+import {useForceUpdate} from './src/views/ListsEditor';
 const App = () => {
   const [colors, setColors] = useState(COLOR_SCHEME);
   const [fab, setFab] = useState(true);
@@ -30,11 +45,29 @@ const App = () => {
   const [disableGestures, setDisableGesture] = useState(false);
   const [buttonHide, setButtonHide] = useState(false);
   useEffect(() => {
-    if (Platform.OS === 'android') {
-      StatusBar.setBackgroundColor('transparent');
-      StatusBar.setTranslucent(true);
-      StatusBar.setBarStyle('dark-content');
-    }
+    let theme = COLOR_SCHEME_LIGHT;
+    AsyncStorage.getItem('accentColor').then(accentColor => {
+      if (typeof accentColor !== 'string') {
+        AsyncStorage.setItem('accentColor', colors.accent);
+      } else {
+        setAccentColor(accentColor);
+      }
+    });
+    AsyncStorage.getItem('theme').then(t => {
+      if (typeof t !== 'string') {
+        AsyncStorage.setItem('theme', JSON.stringify(theme));
+
+        setColorScheme(COLOR_SCHEME_LIGHT);
+      } else {
+        let themeToSet = JSON.parse(t);
+        themeToSet.night
+          ? setColorScheme(COLOR_SCHEME_DARK)
+          : setColorScheme(COLOR_SCHEME_LIGHT);
+        StatusBar.setBarStyle(
+          themeToSet.night ? 'light-content' : 'dark-content',
+        );
+      }
+    });
   }, []);
 
   useEffect(() => {
@@ -110,6 +143,14 @@ const App = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if (Platform.OS === 'android') {
+      StatusBar.setBackgroundColor('transparent');
+      StatusBar.setTranslucent(true);
+      StatusBar.setBarStyle(colors.night ? 'light-content' : 'dark-content');
+    }
+  }, []);
+
   return (
     <View
       style={{
@@ -126,7 +167,6 @@ const App = () => {
               width: sidebar,
             }}>
             <Menu
-              colors={colors}
               close={() => {
                 setSidebar('0%');
               }}

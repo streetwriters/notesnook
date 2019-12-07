@@ -26,7 +26,7 @@ export const ListItem = props => {
         marginVertical: Platform.OS === 'ios' ? h * 0.01 : '0%',
         alignSelf: 'center',
         borderRadius: br,
-        backgroundColor: '#f0f0f0',
+        backgroundColor: colors.nav,
 
         marginBottom: 20,
         padding: 5,

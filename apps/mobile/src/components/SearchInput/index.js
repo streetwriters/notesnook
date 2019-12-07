@@ -48,7 +48,7 @@ export const Search = props => {
             ? pv - 3
             : pv - 8,
           marginBottom: props.hide ? 0 : 10,
-          borderColor: focus ? colors.navbg : '#f0f0f0',
+          borderColor: focus ? colors.accent : colors.nav,
           height: props.hide ? 0 : 55,
         }}>
         <TextInput

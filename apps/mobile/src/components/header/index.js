@@ -44,8 +44,15 @@ export const Header = ({
               justifyContent: 'center',
               alignItems: 'center',
               paddingRight: 15,
+              height: 40,
+              width: 40,
+              marginTop: 5,
             }}>
-            <Icon name={'chevron-left'} size={SIZE.xl} />
+            <Icon
+              color={colors.pri}
+              name={'chevron-left'}
+              size={hide ? SIZE.xl : SIZE.xxl}
+            />
           </TouchableOpacity>
         ) : (
           undefined
@@ -78,7 +85,7 @@ export const Header = ({
             paddingRight: 0,
             marginTop: 7,
           }}>
-          <Icon name={'search'} size={SIZE.xl} />
+          <Icon name={'search'} size={SIZE.xl} color={colors.icon} />
         </TouchableOpacity>
       </Animatable.View>
     </Animatable.View>

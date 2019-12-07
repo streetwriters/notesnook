@@ -73,7 +73,7 @@ export const Move = ({navigation}) => {
               width: '90%',
               marginHorizontal: '5%',
               paddingHorizontal: ph,
-              borderColor: '#f0f0f0',
+              borderColor: colors.nav,
               paddingVertical: pv + 5,
               flexDirection: 'row',
               justifyContent: 'space-between',

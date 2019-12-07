@@ -25,7 +25,7 @@ export const Reminder = props => {
         marginVertical: Platform.OS === 'ios' ? h * 0.01 : '0%',
         alignSelf: 'center',
         borderRadius: br,
-        backgroundColor: props.invert ? '#f0f0f0' : colors.accent,
+        backgroundColor: props.invert ? colors.nav : colors.accent,
         paddingHorizontal: ph,
         marginBottom: 20,
         padding: 5,

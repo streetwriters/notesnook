@@ -51,7 +51,7 @@ const NoteItem = props => {
         width: Platform.isPad ? '95%' : '90%',
         alignSelf: 'center',
         borderBottomWidth: 1,
-        borderBottomColor: '#f0f0f0',
+        borderBottomColor: colors.nav,
       }}>
       <Dialog
         visible={visible}
@@ -151,6 +151,7 @@ const NoteItem = props => {
         <Menu
           style={{
             borderRadius: 5,
+            backgroundColor: colors.nav,
           }}
           ref={ref => (setMenuRef[props.index] = ref)}
           button={

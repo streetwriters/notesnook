@@ -9,7 +9,16 @@ import {
   Text,
   Keyboard,
 } from 'react-native';
-import {COLOR_SCHEME, opacity, pv, br, SIZE, WEIGHT} from '../../common/common';
+import {
+  COLOR_SCHEME,
+  opacity,
+  pv,
+  br,
+  SIZE,
+  WEIGHT,
+  onThemeUpdate,
+  clearThemeUpdateListener,
+} from '../../common/common';
 import {styles} from './styles';
 import {Search} from '../../components/SearchInput';
 import {RecentList} from '../../components/Recents';
@@ -21,6 +30,7 @@ import {storage} from '../../../App';
 import Icon from 'react-native-vector-icons/Feather';
 import NavigationService from '../../services/NavigationService';
 import {ScrollView} from 'react-native-gesture-handler';
+import {useForceUpdate} from '../ListsEditor';
 export const Home = ({navigation}) => {
   const [loading, setLoading] = useState(true);
   const [colors, setColors] = useState(COLOR_SCHEME);
@@ -31,6 +41,7 @@ export const Home = ({navigation}) => {
   const [hideHeader, setHideHeader] = useState(false);
   const [margin, setMargin] = useState(150);
   const [buttonHide, setButtonHide] = useState(false);
+  const forceUpdate = useForceUpdate();
   let offsetY = 0;
   let countUp = 0;
   let countDown = 0;
@@ -41,6 +52,17 @@ export const Home = ({navigation}) => {
     setTimeout(() => {
       setLoading(false);
     }, 1000);
+  }, []);
+
+  useEffect(() => {
+    onThemeUpdate(() => {
+      forceUpdate();
+    });
+    return () => {
+      clearThemeUpdateListener(() => {
+        forceUpdate();
+      });
+    };
   }, []);
 
   const onChangeText = value => {
@@ -138,10 +160,12 @@ export const Home = ({navigation}) => {
     <SafeAreaView
       style={{
         height: '100%',
+        backgroundColor: colors.bg,
       }}>
       <KeyboardAvoidingView
         style={{
           height: '100%',
+          backgroundColor: colors.bg,
         }}>
         <NavigationEvents
           onWillFocus={() => {

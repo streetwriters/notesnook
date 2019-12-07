@@ -20,23 +20,37 @@ import {
   opacity,
   FONT,
   WEIGHT,
+  onThemeUpdate,
+  clearThemeUpdateListener,
 } from '../../common/common';
 import Icon from 'react-native-vector-icons/Feather';
 import {Reminder} from '../../components/Reminder';
 import {ListItem} from '../../components/ListItem';
 import {Header} from '../../components/header';
 import NoteItem from '../../components/NoteItem';
+import {useForceUpdate} from '../ListsEditor';
 
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
 export const AccountSettings = ({navigation}) => {
   const [colors, setColors] = useState(COLOR_SCHEME);
-
+  const forceUpdate = useForceUpdate();
+  useEffect(() => {
+    onThemeUpdate(() => {
+      forceUpdate();
+    });
+    return () => {
+      clearThemeUpdateListener(() => {
+        forceUpdate();
+      });
+    };
+  }, []);
   return (
     <SafeAreaView
       style={{
         height: '100%',
+        backgroundColor: colors.bg,
       }}>
       <Header colors={colors} heading="" canGoBack={true} />
 
@@ -110,7 +124,7 @@ export const AccountSettings = ({navigation}) => {
               borderBottomWidth: 1,
               width: '90%',
               marginHorizontal: '5%',
-              borderBottomColor: '#f0f0f0',
+              borderBottomColor: colors.nav,
               paddingVertical: pv + 5,
               flexDirection: 'row',
               paddingHorizontal: ph,
@@ -122,6 +136,7 @@ export const AccountSettings = ({navigation}) => {
                 fontSize: SIZE.md,
                 fontFamily: WEIGHT.regular,
                 textAlignVertical: 'center',
+                color: colors.pri,
               }}>
               <Icon name={item.icon} size={SIZE.md} />
               {'  '} {item.name}
@@ -149,9 +164,10 @@ export const AccountSettings = ({navigation}) => {
             fontFamily: WEIGHT.regular,
             color: 'white',
           }}>
+          <Icon size={SIZE.lg} color="white" name="log-out" />
+          {'  '}
           Logout
         </Text>
-        <Icon size={SIZE.lg} color="white" name="log-out" />
       </TouchableOpacity>
     </SafeAreaView>
   );

@@ -20,21 +20,38 @@ import {
   opacity,
   FONT,
   WEIGHT,
+  clearThemeUpdateListener,
+  onThemeUpdate,
 } from '../../common/common';
 import Icon from 'react-native-vector-icons/Feather';
 import {Reminder} from '../../components/Reminder';
 import {ListItem} from '../../components/ListItem';
 import {Header} from '../../components/header';
 import NoteItem from '../../components/NoteItem';
+import {useForceUpdate} from '../ListsEditor';
 
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
 export const Trash = ({navigation}) => {
   const [colors, setColors] = useState(COLOR_SCHEME);
+  const forceUpdate = useForceUpdate();
 
+  useEffect(() => {
+    onThemeUpdate(() => {
+      forceUpdate();
+    });
+    return () => {
+      clearThemeUpdateListener(() => {
+        forceUpdate();
+      });
+    };
+  }, []);
   return (
-    <SafeAreaView>
+    <SafeAreaView
+      style={{
+        backgroundColor: colors.bg,
+      }}>
       <Header colors={colors} heading="Trash" canGoBack={false} />
       <FlatList
         numColumns={2}

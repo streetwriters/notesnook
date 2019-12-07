@@ -18,6 +18,8 @@ import {
   opacity,
   FONT,
   WEIGHT,
+  onThemeUpdate,
+  clearThemeUpdateListener,
 } from '../../common/common';
 
 import Icon from 'react-native-vector-icons/Feather';
@@ -41,6 +43,17 @@ export const RecentList = ({update, onScroll, margin}) => {
     fetchNotes();
   }, [update]);
 
+  useEffect(() => {
+    onThemeUpdate(() => {
+      setColors(COLOR_SCHEME);
+    });
+    return () => {
+      clearThemeUpdateListener(() => {
+        setColors(COLOR_SCHEME);
+      });
+    };
+  }, []);
+
   return (
     <>
       <FlatList
@@ -52,6 +65,7 @@ export const RecentList = ({update, onScroll, margin}) => {
         style={{
           height: '100%',
           width: '100%',
+          backgroundColor: colors.bg,
         }}
         ListHeaderComponent={
           <View

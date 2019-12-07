@@ -19,19 +19,33 @@ import {
   opacity,
   FONT,
   WEIGHT,
+  onThemeUpdate,
+  clearThemeUpdateListener,
 } from '../../common/common';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {Reminder} from '../../components/Reminder';
 import {ListItem} from '../../components/ListItem';
 import {Header} from '../../components/header';
 import {Search} from '../../components/SearchInput';
+import {useForceUpdate} from '../ListsEditor';
 
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
 export const Notes = ({navigation}) => {
   const [colors, setColors] = useState(COLOR_SCHEME);
+  const forceUpdate = useForceUpdate();
   let params = navigation.state ? navigation.state.params : null;
+  useEffect(() => {
+    onThemeUpdate(() => {
+      forceUpdate();
+    });
+    return () => {
+      clearThemeUpdateListener(() => {
+        forceUpdate();
+      });
+    };
+  }, []);
 
   useEffect(() => {
     if (!params) {

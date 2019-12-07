@@ -162,7 +162,7 @@ export const AddNotebookDialog = ({visible, close}) => {
             style={{
               padding: pv - 5,
               borderWidth: 1.5,
-              borderColor: '#f0f0f0',
+              borderColor: colors.nav,
               paddingHorizontal: ph,
               borderRadius: 5,
               fontSize: SIZE.sm,
@@ -258,7 +258,7 @@ export const AddNotebookDialog = ({visible, close}) => {
                 width: '45%',
                 justifyContent: 'center',
                 alignItems: 'center',
-                backgroundColor: '#f0f0f0',
+                backgroundColor: colors.nav,
               }}>
               <Text
                 style={{
@@ -298,7 +298,7 @@ const TopicItem = ({
         alignItems: 'center',
         borderRadius: 5,
         borderWidth: 1.5,
-        borderColor: '#f0f0f0',
+        borderColor: colors.nav,
         paddingHorizontal: ph,
         marginTop: 10,
       }}>

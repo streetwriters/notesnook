@@ -21,6 +21,8 @@ import {
   opacity,
   FONT,
   WEIGHT,
+  onThemeUpdate,
+  clearThemeUpdateListener,
 } from '../../common/common';
 import Icon from 'react-native-vector-icons/Feather';
 import {Reminder} from '../../components/Reminder';
@@ -29,6 +31,7 @@ import {Header} from '../../components/header';
 import NoteItem from '../../components/NoteItem';
 import {NotebookItem} from '../../components/NotebookItem';
 import {Search} from '../../components/SearchInput';
+import {useForceUpdate} from '../ListsEditor';
 
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
@@ -38,6 +41,7 @@ export const Notebook = ({navigation}) => {
   const params = navigation.state.params;
   const [hideHeader, setHideHeader] = useState(false);
   const [margin, setMargin] = useState(150);
+  const forceUpdate = useForceUpdate();
   let offsetY = 0;
   let countUp = 0;
   let countDown = 0;
@@ -57,10 +61,22 @@ export const Notebook = ({navigation}) => {
       }, 10);
     }
   };
+
+  useEffect(() => {
+    onThemeUpdate(() => {
+      forceUpdate();
+    });
+    return () => {
+      clearThemeUpdateListener(() => {
+        forceUpdate();
+      });
+    };
+  }, []);
   return (
     <SafeAreaView
       style={{
         height: '100%',
+        backgroundColor: colors.bg,
       }}>
       <KeyboardAvoidingView
         style={{
@@ -132,7 +148,7 @@ export const Notebook = ({navigation}) => {
                     width: '90%',
                     marginHorizontal: '5%',
                     paddingHorizontal: ph,
-                    borderColor: '#f0f0f0',
+                    borderColor: colors.nav,
                     paddingVertical: pv + 5,
                     flexDirection: 'row',
                     justifyContent: 'space-between',
@@ -167,12 +183,10 @@ export const Notebook = ({navigation}) => {
             setAddNotebook(true);
           }}
           style={{
-            borderWidth: 1,
             borderRadius: 5,
             width: '90%',
             marginHorizontal: '5%',
             paddingHorizontal: ph,
-            borderColor: '#f0f0f0',
             paddingVertical: pv + 5,
             flexDirection: 'row',
             justifyContent: 'space-between',

@@ -138,7 +138,7 @@ export const Dialog = ({
                 width: '48%',
                 justifyContent: 'center',
                 alignItems: 'center',
-                backgroundColor: '#f0f0f0',
+                backgroundColor: colors.nav,
               }}>
               <Text
                 style={{

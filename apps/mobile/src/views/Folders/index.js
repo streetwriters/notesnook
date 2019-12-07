@@ -21,6 +21,8 @@ import {
   opacity,
   FONT,
   WEIGHT,
+  onThemeUpdate,
+  clearThemeUpdateListener,
 } from '../../common/common';
 import Icon from 'react-native-vector-icons/Feather';
 import {Reminder} from '../../components/Reminder';
@@ -40,6 +42,7 @@ export const Folders = ({navigation}) => {
   const [notebooks, setNotebooks] = useState([]);
   const [hideHeader, setHideHeader] = useState(false);
   const [margin, setMargin] = useState(150);
+  const forceUpdate = useForceUpdate();
   const params = navigation.state.params;
   let offsetY = 0;
   let countUp = 0;
@@ -66,10 +69,22 @@ export const Folders = ({navigation}) => {
     console.log(storage.getNotebooks());
   }, []);
 
+  useEffect(() => {
+    onThemeUpdate(() => {
+      forceUpdate();
+    });
+    return () => {
+      clearThemeUpdateListener(() => {
+        forceUpdate();
+      });
+    };
+  }, []);
+
   return (
     <SafeAreaView
       style={{
         height: '100%',
+        backgroundColor: colors.bg,
       }}>
       <AddNotebookDialog
         visible={addNotebook}
@@ -157,12 +172,11 @@ export const Folders = ({navigation}) => {
             setAddNotebook(true);
           }}
           style={{
-            borderWidth: 1,
             borderRadius: 5,
             width: '90%',
             marginHorizontal: '5%',
             paddingHorizontal: ph,
-            borderColor: '#f0f0f0',
+
             paddingVertical: pv + 5,
             flexDirection: 'row',
             justifyContent: 'space-between',
