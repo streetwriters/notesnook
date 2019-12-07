@@ -32,7 +32,12 @@ class Database {
    * @param {object} note The note to add or update
    */
   async addNote(note) {
-    if (!note || (!note.title && !note.content)) return undefined;
+    if (
+      !note ||
+      (!note.title &&
+        (!note.content || !note.content.text || !note.content.delta))
+    )
+      return;
 
     let timestamp = note.dateCreated || Date.now();
     //add or update a note into the database
@@ -51,7 +56,9 @@ class Database {
       notebooks: note.notebooks || {},
       colors: note.colors || [],
       favorite: note.favorite || false,
-      headline: note.content.text.substring(0, 150) + "...",
+      headline:
+        note.content.text.substring(0, 150) +
+        (note.content.text.length > 150 ? "..." : ""),
       length: note.content.text.length,
       dateEditted: Date.now(),
       dateCreated: timestamp
@@ -65,7 +72,7 @@ class Database {
    * @param {array} notes the notes to be deleted
    */
   async deleteNotes(notes) {
-    await deleteItems.call(this, notes, KEYS.notes);
+    return await deleteItems.call(this, notes, KEYS.notes);
   }
 
   /**
@@ -104,15 +111,29 @@ class Database {
    * @returns The ID of the added notebook
    */
   async addNotebook(notebook) {
-    if (!notebook || !notebook.title) return;
+    if (!notebook || !notebook.title) {
+      return;
+    }
+    if (
+      extractValues(this.notebooks).findIndex(
+        nb => nb.title === notebook.title
+      ) > -1
+    ) {
+      return;
+    }
+
     const id = notebook.dateCreated || Date.now();
     let topics = [makeTopic("General")];
-    if (notebook.topics) {
-      for (let topic of notebook.topics) {
-        if (!topic || topic.trim().length <= 0) continue;
-        topics[topics.length] = makeTopic(topic);
-      }
+    for (let topic of notebook.topics) {
+      if (
+        !topic ||
+        topic.trim().length <= 0 ||
+        topics.findIndex(t => t.title === topic) > -1 //check for duplicate
+      )
+        continue;
+      topics[topics.length] = makeTopic(topic);
     }
+
     this.notebooks[id] = {
       type: "notebook",
       title: notebook.title,
@@ -135,14 +156,11 @@ class Database {
    * @param {string} topic The topic to add
    */
   addTopicToNotebook(notebookId, topic) {
-    return notebookTopicFn.call(
-      this,
-      notebookId,
-      topic,
-      notebook => (
-        (notebook.topics[notebook.topics.length] = makeTopic(topic)), true
-      )
-    );
+    return notebookTopicFn.call(this, notebookId, topic, notebook => {
+      if (notebook.topics.findIndex(t => t.title === topic) > -1) return false; //check for duplicates
+      notebook.topics[notebook.topics.length] = makeTopic(topic);
+      return true;
+    });
   }
 
   /**
@@ -171,7 +189,9 @@ class Database {
       notebookId,
       topic,
       noteId,
-      async (notebook, topicIndex) => {
+      (notebook, topicIndex) => {
+        if (notebook.topics[topicIndex].notes.indexOf(noteId) > -1)
+          return false; //duplicate check
         notebook.topics[topicIndex].notes.push(noteId);
         //increment totalNotes count
         notebook.topics[topicIndex].totalNotes++;
@@ -239,42 +259,61 @@ class Database {
    * @param {array} notebooks The notebooks to delete
    */
   async deleteNotebooks(notebooks) {
-    await deleteItems.call(this, notebooks, KEYS.notebooks);
+    return await deleteItems.call(this, notebooks, KEYS.notebooks);
+  }
+
+  async moveNote(noteId, from, to) {
+    if (
+      !noteId ||
+      !from ||
+      !to ||
+      !from.notebook ||
+      !to.notebook ||
+      !from.topic ||
+      !to.topic ||
+      from.notebook === to.notebook //moving to same notebook shouldn't be possible
+    )
+      return false;
+    if (await this.deleteNoteFromTopic(from.notebook, from.topic, noteId)) {
+      return await this.addNoteToTopic(to.notebook, to.topic, noteId);
+    }
+    return false;
   }
 }
 
 export default Database;
 
-async function deleteItems(items, key) {
+function deleteItems(items, key) {
   if (!items || items.length <= 0 || !this[key] || this[key].length <= 0)
-    return; //TODO add test
+    return false; //TODO add test
   for (let item of items) {
+    if (!item) continue;
     if (this[key].hasOwnProperty(item.dateCreated)) {
       delete this[key][item.dateCreated];
     }
   }
-  await this.storage.write(key, this[key]);
+  return this.storage.write(key, this[key]).then(s => true);
 }
 
 function notebookTopicFn(notebookId, topic, fn) {
-  if (!notebookId || !topic || !this.notebooks[notebookId]) return;
-  let notebook = this.notebooks[notebookId];
-  if (fn(notebook)) {
+  if (!notebookId || !topic || !this.notebooks[notebookId]) return false;
+  const notebook = this.notebooks[notebookId];
+  const result = fn(notebook);
+  if (result === true) {
     this.notes[notebookId] = notebook;
-    return this.storage.write(KEYS.notebooks, this.notebooks);
+    return this.storage.write(KEYS.notebooks, this.notebooks).then(s => true);
   }
   //TODO add test
-  return Promise.resolve();
+  return result;
 }
 
 function topicNoteFn(notebookId, topic, noteId, fn) {
-  return notebookTopicFn.call(this, notebookId, topic, async notebook => {
+  return notebookTopicFn.call(this, notebookId, topic, notebook => {
     let topicIndex = notebook.topics.findIndex(t => t.title === topic);
     if (topicIndex === -1 || !this.notes.hasOwnProperty(noteId)) return false;
 
     if (fn(notebook, topicIndex)) {
-      await this.storage.write(KEYS.notes, this.notes);
-      return true;
+      return this.storage.write(KEYS.notes, this.notes).then(s => true);
     }
     return false;
   });
