@@ -1,4 +1,8 @@
-import {createAppContainer, NavigationActions} from 'react-navigation';
+import {
+  createAppContainer,
+  NavigationActions,
+  StackActions,
+} from 'react-navigation';
 import {createStackNavigator} from 'react-navigation-stack';
 import Home from '../views/Home/index';
 import Editor from '../views/Editor';
@@ -81,7 +85,9 @@ const TopLevelNavigator = createStackNavigator(
   },
   {
     initialRouteName: 'Home',
-    cardStyle: false,
+    defaultNavigationOptions: {
+      gesturesEnabled: false,
+    },
   },
 );
 
@@ -102,9 +108,19 @@ function navigate(routeName, params) {
   );
 }
 
+function push(routeName, params) {
+  _navigator.dispatch(
+    StackActions.push({
+      routeName,
+      params,
+    }),
+  );
+}
+
 // add other navigation functions that you need and export them
 
 export default {
   navigate,
+  push,
   setTopLevelNavigator,
 };

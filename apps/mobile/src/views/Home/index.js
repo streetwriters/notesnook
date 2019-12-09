@@ -21,7 +21,6 @@ import {
 } from '../../common/common';
 import {styles} from './styles';
 import {Search} from '../../components/SearchInput';
-import {RecentList} from '../../components/Recents';
 import {w, h} from '../../utils/utils';
 import {Header} from '../../components/header';
 import {NavigationEvents} from 'react-navigation';
@@ -29,7 +28,6 @@ import {NotesList} from '../../components/NotesList';
 import {storage} from '../../../App';
 import Icon from 'react-native-vector-icons/Feather';
 import NavigationService from '../../services/NavigationService';
-import {ScrollView} from 'react-native-gesture-handler';
 import {useForceUpdate} from '../ListsEditor';
 import * as Animatable from 'react-native-animatable';
 
@@ -41,13 +39,14 @@ export const Home = ({navigation}) => {
   // State
   const [loading, setLoading] = useState(true);
   const [colors, setColors] = useState(COLOR_SCHEME);
-  const [hidden, setHidden] = useState(false);
+  const [search, setSearch] = useState(false);
   const [text, setText] = useState('');
-  const [searchResults, setSearchResults] = useState([]);
   const [update, setUpdate] = useState(0);
   const [hideHeader, setHideHeader] = useState(false);
   const [margin, setMargin] = useState(150);
   const [buttonHide, setButtonHide] = useState(false);
+  const [notes, setNotes] = useState([]);
+  const [keyword, setKeyword] = useState('');
   const forceUpdate = useForceUpdate();
 
   // Variables
@@ -57,6 +56,9 @@ export const Home = ({navigation}) => {
   let headerHeight = 0;
   let searchHeight = 0;
   let marginSet = false;
+  let searchResults = null;
+  let allNotes = [];
+
   // Effects
 
   useEffect(() => {
@@ -74,6 +76,10 @@ export const Home = ({navigation}) => {
         forceUpdate();
       });
     };
+  }, []);
+
+  useEffect(() => {
+    fetchNotes();
   }, []);
 
   useEffect(() => {
@@ -104,29 +110,45 @@ export const Home = ({navigation}) => {
   };
   const onSubmitEditing = async () => {
     if (!text || text.length < 1) {
-      setHidden(false);
+      setSearch(false);
+      if (allNotes) {
+        setNotes(allNotes);
+      } else {
+        fetchNotes();
+      }
     } else {
-      setHidden(true);
-      let results = await storage.searchNotes(text);
-      if (results) {
-        setSearchResults(results);
+      setSearch(true);
+      setKeyword(text);
+      searchResults = await storage.searchNotes(text);
+      if (searchResults) {
+        setNotes(searchResults);
       }
     }
   };
 
   const onBlur = () => {
     if (text && text.length < 2) {
-      setHidden(false);
+      setSearch(false);
+      if (allNotes) {
+        setNotes(allNotes);
+      } else {
+        fetchNotes();
+      }
     }
   };
 
   const onFocus = () => {
-    setHidden(false);
+    setSearch(false);
   };
 
   const clearSearch = () => {
-    setSearchResults([]);
-    setHidden(false);
+    searchResults = null;
+    setSearch(false);
+    if (allNotes) {
+      setNotes(allNotes);
+    } else {
+      fetchNotes();
+    }
   };
 
   const setMarginTop = () => {
@@ -144,6 +166,13 @@ export const Home = ({navigation}) => {
     }
   };
 
+  const fetchNotes = async () => {
+    allNotes = await storage.getNotes();
+    if (allNotes) {
+      setNotes(allNotes);
+    }
+  };
+
   // Render
 
   return Platform.isPad ? (
@@ -153,6 +182,9 @@ export const Home = ({navigation}) => {
           onWillFocus={() => {
             DeviceEventEmitter.emit('openSidebar');
             setUpdate(update + 1);
+          }}
+          onDidBlur={() => {
+            marginSet = false;
           }}
         />
 
@@ -232,60 +264,30 @@ export const Home = ({navigation}) => {
             value={text}
           />
         </Animatable.View>
-        {hidden ? (
-          <NotesList
-            margin={margin}
-            onScroll={y => {
-              if (buttonHide) return;
-              if (y < 30) setHideHeader(false);
-              if (y > offsetY) {
-                if (y - offsetY < 150 || countDown > 0) return;
-                countDown = 1;
-                countUp = 0;
-                setHideHeader(true);
-              } else {
-                if (offsetY - y < 150 || countUp > 0) return;
-                countDown = 0;
-                countUp = 1;
-                setHideHeader(false);
-              }
-              offsetY = y;
-            }}
-            searchResults={searchResults}
-            keyword={text}
-          />
-        ) : (
-          <RecentList
-            onScroll={y => {
-              if (buttonHide) return;
-              if (y < 30) {
-                setHideHeader(false);
-                countDown = 0;
-                countUp = 1;
-              }
 
-              if (y > offsetY) {
-                if (y - offsetY < 100 || countDown > 0) return;
-                countDown = 1;
-                countUp = 0;
-                setHideHeader(true);
-                offsetY = y;
-                console.log(y, offsetY, 'down');
-              } else {
-                if (offsetY - y < 100 || countUp > 0) return;
-                countDown = 0;
-                countUp = 1;
-                setHideHeader(false);
-                offsetY = y;
-                console.log(y, offsetY, 'up');
-              }
-              offsetY = y;
-              console.log(offsetY);
-            }}
-            margin={margin}
-            update={update}
-          />
-        )}
+        <NotesList
+          margin={margin}
+          onScroll={y => {
+            if (buttonHide) return;
+            if (y < 30) setHideHeader(false);
+            if (y > offsetY) {
+              if (y - offsetY < 150 || countDown > 0) return;
+              countDown = 1;
+              countUp = 0;
+              setHideHeader(true);
+            } else {
+              if (offsetY - y < 150 || countUp > 0) return;
+              countDown = 0;
+              countUp = 1;
+              setHideHeader(false);
+            }
+            offsetY = y;
+          }}
+          isSearch={search}
+          notes={notes}
+          keyword={keyword}
+        />
+
         {buttonHide ? null : (
           <TouchableOpacity
             onPress={() => {

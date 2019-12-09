@@ -32,7 +32,7 @@ import {useForceUpdate} from '../ListsEditor';
 import {NotesList} from '../../components/NotesList';
 import {AnimatedSafeAreaView} from '../Home';
 import {storage} from '../../../App';
-
+import * as Animatable from 'react-native-animatable';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
@@ -69,13 +69,18 @@ export const Notes = ({navigation}) => {
   }, []);
 
   useEffect(() => {
-    let notes = [];
+    let allNotes = [];
 
     params.notes.forEach(note => {
       let noteToAdd = storage.getNote(note);
-      notes[notes.length] = noteToAdd;
+      if (noteToAdd) {
+        allNotes[notes.length] = noteToAdd;
+      }
     });
-    setNotes(notes);
+
+    if (allNotes && allNotes.length > 0) {
+      setNotes(allNotes);
+    }
   }, []);
 
   const setMarginTop = () => {
@@ -95,19 +100,21 @@ export const Notes = ({navigation}) => {
   return (
     <AnimatedSafeAreaView
       transition="backgroundColor"
-      duration={250}
+      duration={1000}
       style={{
         height: '100%',
-        backgroundColor: colors.night ? colors.bg : colors.bg,
+        backgroundColor: colors.bg,
       }}>
       <KeyboardAvoidingView
         style={{
           height: '100%',
         }}>
-        <View
+        <Animatable.View
+          transition="backgroundColor"
+          duration={1000}
           style={{
             position: 'absolute',
-            backgroundColor: colors.night ? colors.bg : colors.bg,
+            backgroundColor: colors.bg,
             zIndex: 10,
             width: '100%',
           }}>
@@ -133,7 +140,7 @@ export const Notes = ({navigation}) => {
             placeholder={`Search in ${params.title}`}
             hide={hideHeader}
           />
-        </View>
+        </Animatable.View>
 
         <NotesList
           margin={margin}
@@ -153,7 +160,9 @@ export const Notes = ({navigation}) => {
             }
             offsetY = y;
           }}
+          isSearch={false}
           notes={notes}
+          keyword={null}
         />
 
         <TouchableOpacity

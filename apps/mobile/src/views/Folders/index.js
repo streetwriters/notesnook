@@ -35,7 +35,9 @@ import {NotebookItem} from '../../components/NotebookItem';
 import {Search} from '../../components/SearchInput';
 import {storage} from '../../../App';
 import {Header} from '../../components/header';
-
+import {AnimatedSafeAreaView} from '../Home';
+import * as Animatable from 'react-native-animatable';
+import {NavigationEvents} from 'react-navigation';
 export const Folders = ({navigation}) => {
   const [colors, setColors] = useState(COLOR_SCHEME);
   const [addNotebook, setAddNotebook] = useState(false);
@@ -82,11 +84,18 @@ export const Folders = ({navigation}) => {
   }, []);
 
   return (
-    <SafeAreaView
+    <AnimatedSafeAreaView
+      transition="backgroundColor"
+      duration={1000}
       style={{
         height: '100%',
         backgroundColor: colors.bg,
       }}>
+      <NavigationEvents
+        onDidBlur={() => {
+          marginSet = false;
+        }}
+      />
       <AddNotebookDialog
         visible={addNotebook}
         close={newNotes => {
@@ -100,7 +109,9 @@ export const Folders = ({navigation}) => {
         style={{
           height: '100%',
         }}>
-        <View
+        <Animatable.View
+          transition="backgroundColor"
+          duration={1000}
           style={{
             position: 'absolute',
             backgroundColor: colors.bg,
@@ -127,7 +138,7 @@ export const Folders = ({navigation}) => {
             placeholder="Search your notebook"
             hide={hideHeader}
           />
-        </View>
+        </Animatable.View>
 
         <FlatList
           style={{
@@ -200,7 +211,7 @@ export const Folders = ({navigation}) => {
           </Text>
         </TouchableOpacity>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </AnimatedSafeAreaView>
   );
 };
 

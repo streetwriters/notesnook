@@ -27,6 +27,7 @@ import {Reminder} from '../../components/Reminder';
 import {ListItem} from '../../components/ListItem';
 import {Header} from '../../components/header';
 import {useForceUpdate} from '../ListsEditor';
+import {AnimatedSafeAreaView} from '../Home';
 
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
@@ -46,9 +47,15 @@ export const Favorites = ({navigation}) => {
     };
   }, []);
   return (
-    <SafeAreaView>
+    <AnimatedSafeAreaView
+      transition="backgroundColor"
+      duration={1000}
+      style={{
+        height: '100%',
+        backgroundColor: colors.bg,
+      }}>
       <Header colors={colors} heading="Favorites" canGoBack={false} />
-    </SafeAreaView>
+    </AnimatedSafeAreaView>
   );
 };
 

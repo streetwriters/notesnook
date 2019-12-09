@@ -33,6 +33,7 @@ import {Header} from '../../components/header';
 import {FlatList} from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-community/async-storage';
 import {useForceUpdate} from '../ListsEditor';
+import {AnimatedSafeAreaView} from '../Home';
 
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
@@ -52,7 +53,9 @@ export const Settings = ({navigation}) => {
     };
   }, []);
   return (
-    <SafeAreaView
+    <AnimatedSafeAreaView
+      transition="backgroundColor"
+      duration={1000}
       style={{
         backgroundColor: colors.bg,
         height: '100%',
@@ -98,7 +101,6 @@ export const Settings = ({navigation}) => {
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   marginBottom: 10,
-                  backgroundColor: colors.bg,
                 }}>
                 <Text
                   style={{
@@ -288,7 +290,7 @@ export const Settings = ({navigation}) => {
           </Text>
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </AnimatedSafeAreaView>
   );
 };
 

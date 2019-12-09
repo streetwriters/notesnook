@@ -55,6 +55,7 @@ export const Search = props => {
           ref={inputRef}
           style={{
             fontFamily: WEIGHT.regular,
+            color: colors.pri,
             maxWidth: '90%',
             width: '90%',
             fontSize: SIZE.md,

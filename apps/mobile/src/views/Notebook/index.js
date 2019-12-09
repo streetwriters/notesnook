@@ -33,7 +33,9 @@ import {NotebookItem} from '../../components/NotebookItem';
 import {Search} from '../../components/SearchInput';
 import {useForceUpdate} from '../ListsEditor';
 import {AddTopicDialog} from '../../components/AddTopicDialog';
-
+import {AnimatedSafeAreaView} from '../Home';
+import * as Animatable from 'react-native-animatable';
+import {NavigationEvents} from 'react-navigation';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
@@ -84,11 +86,18 @@ export const Notebook = ({navigation}) => {
 
   // Render
   return (
-    <SafeAreaView
+    <AnimatedSafeAreaView
+      transition="backgroundColor"
+      duration={1000}
       style={{
         height: '100%',
         backgroundColor: colors.bg,
       }}>
+      <NavigationEvents
+        onDidBlur={() => {
+          marginSet = false;
+        }}
+      />
       <KeyboardAvoidingView
         style={{
           height: '100%',
@@ -100,7 +109,9 @@ export const Notebook = ({navigation}) => {
             setAddTopic(false);
           }}
         />
-        <View
+        <Animatable.View
+          transition="backgroundColor"
+          duration={1000}
           style={{
             position: 'absolute',
             backgroundColor: colors.bg,
@@ -128,7 +139,7 @@ export const Notebook = ({navigation}) => {
             placeholder={`Search in ${params.title}`}
             hide={hideHeader}
           />
-        </View>
+        </Animatable.View>
 
         <FlatList
           style={{
@@ -232,7 +243,7 @@ export const Notebook = ({navigation}) => {
           </Text>
         </TouchableOpacity>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </AnimatedSafeAreaView>
   );
 };
 

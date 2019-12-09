@@ -244,7 +244,7 @@ const NoteItem = props => {
           <MenuItem
             onPress={() => {
               hideMenu();
-              NavigationService.navigate('Folders', {
+              NavigationService.push('Folders', {
                 note: item,
                 title: 'Choose Notebook',
                 isMove: true,

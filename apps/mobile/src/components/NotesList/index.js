@@ -40,6 +40,7 @@ export const NotesList = ({
     <>
       <FlatList
         data={notes}
+        keyExtractor={(item, index) => item.dateCreated.toString()}
         ListFooterComponent={
           <View
             style={{

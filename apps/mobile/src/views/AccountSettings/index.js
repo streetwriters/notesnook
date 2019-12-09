@@ -29,6 +29,7 @@ import {ListItem} from '../../components/ListItem';
 import {Header} from '../../components/header';
 import NoteItem from '../../components/NoteItem';
 import {useForceUpdate} from '../ListsEditor';
+import {AnimatedSafeAreaView} from '../Home';
 
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
@@ -47,7 +48,9 @@ export const AccountSettings = ({navigation}) => {
     };
   }, []);
   return (
-    <SafeAreaView
+    <AnimatedSafeAreaView
+      transition="backgroundColor"
+      duration={1000}
       style={{
         height: '100%',
         backgroundColor: colors.bg,
@@ -169,7 +172,7 @@ export const AccountSettings = ({navigation}) => {
           Logout
         </Text>
       </TouchableOpacity>
-    </SafeAreaView>
+    </AnimatedSafeAreaView>
   );
 };
 
