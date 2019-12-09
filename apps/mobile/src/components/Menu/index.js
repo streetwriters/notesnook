@@ -31,6 +31,7 @@ import Icon from 'react-native-vector-icons/Feather';
 import {getElevation, w, h, Toast} from '../../utils/utils';
 import AsyncStorage from '@react-native-community/async-storage';
 import {useForceUpdate} from '../../views/ListsEditor';
+import {AnimatedSafeAreaView} from '../../views/Home';
 
 export const Menu = ({close = () => {}, hide, update = () => {}}) => {
   const [colors, setColors] = useState(COLOR_SCHEME);
@@ -48,25 +49,24 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
   }, []);
 
   return (
-    <SafeAreaView
+    <AnimatedSafeAreaView
+      transition="backgroundColor"
+      duration={1000}
       style={{
         height: '100%',
         opacity: hide ? 0 : 1,
-        backgroundColor: colors.navbg,
+        backgroundColor: colors.night ? colors.navbg : colors.navbg,
       }}>
       <ScrollView
         contentContainerStyle={{
           justifyContent: 'space-between',
           height: '100%',
-          backgroundColor: colors.navbg,
         }}>
         <View>
           <View
             style={{
-              borderWidth: 1,
-              borderColor: colors.navbg,
               height: 2,
-              backgroundColor: colors.navbg,
+
               width: '100%',
               marginBottom: 5,
               marginTop: Platform.OS == 'ios' ? h * 0.01 : h * 0.03,
@@ -239,8 +239,6 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
 
           <View
             style={{
-              borderWidth: 1,
-              borderColor: colors.navbg,
               height: 2,
               backgroundColor: colors.navbg,
               width: '100%',
@@ -290,8 +288,6 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
 
           <View
             style={{
-              borderWidth: 1,
-              borderColor: colors.navbg,
               height: 2,
               backgroundColor: colors.navbg,
               width: '100%',
@@ -385,9 +381,8 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
               width: '100%',
               justifyContent: 'center',
               alignItems: 'center',
-              borderColor: colors.accent,
+
               backgroundColor: colors.accent,
-              borderWidth: 1,
             }}>
             <Text
               style={{
@@ -438,6 +433,6 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
       </View> */}
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </AnimatedSafeAreaView>
   );
 };

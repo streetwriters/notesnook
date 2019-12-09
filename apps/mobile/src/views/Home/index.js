@@ -31,6 +31,11 @@ import Icon from 'react-native-vector-icons/Feather';
 import NavigationService from '../../services/NavigationService';
 import {ScrollView} from 'react-native-gesture-handler';
 import {useForceUpdate} from '../ListsEditor';
+import * as Animatable from 'react-native-animatable';
+
+export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(
+  SafeAreaView,
+);
 export const Home = ({navigation}) => {
   const [loading, setLoading] = useState(true);
   const [colors, setColors] = useState(COLOR_SCHEME);
@@ -43,7 +48,7 @@ export const Home = ({navigation}) => {
   const [buttonHide, setButtonHide] = useState(false);
   const forceUpdate = useForceUpdate();
   let offsetY = 0;
-  let countUp = 0;
+  let countUp = 1;
   let countDown = 0;
   let headerHeight = 0;
   let searchHeight = 0;
@@ -157,25 +162,28 @@ export const Home = ({navigation}) => {
       </KeyboardAvoidingView>
     </SafeAreaView>
   ) : (
-    <SafeAreaView
+    <AnimatedSafeAreaView
+      transition="backgroundColor"
+      duration={1000}
       style={{
         height: '100%',
-        backgroundColor: colors.bg,
+        backgroundColor: colors.night ? colors.bg : colors.bg,
       }}>
       <KeyboardAvoidingView
         style={{
           height: '100%',
-          backgroundColor: colors.bg,
         }}>
         <NavigationEvents
           onWillFocus={() => {
             setUpdate(update + 1);
           }}
         />
-        <View
+        <Animatable.View
+          transition="backgroundColor"
+          duration={1000}
           style={{
             position: 'absolute',
-            backgroundColor: colors.bg,
+            backgroundColor: colors.night ? colors.bg : colors.bg,
             zIndex: 10,
             width: '100%',
           }}>
@@ -211,7 +219,7 @@ export const Home = ({navigation}) => {
             clearSearch={clearSearch}
             value={text}
           />
-        </View>
+        </Animatable.View>
         {hidden ? (
           <NotesList
             margin={margin}
@@ -238,19 +246,29 @@ export const Home = ({navigation}) => {
           <RecentList
             onScroll={y => {
               if (buttonHide) return;
-              if (y < 30) setHideHeader(false);
+              if (y < 30) {
+                setHideHeader(false);
+                countDown = 0;
+                countUp = 1;
+              }
+
               if (y > offsetY) {
-                if (y - offsetY < 150 || countDown > 0) return;
+                if (y - offsetY < 100 || countDown > 0) return;
                 countDown = 1;
                 countUp = 0;
                 setHideHeader(true);
+                offsetY = y;
+                console.log(y, offsetY, 'down');
               } else {
-                if (offsetY - y < 150 || countUp > 0) return;
+                if (offsetY - y < 100 || countUp > 0) return;
                 countDown = 0;
                 countUp = 1;
                 setHideHeader(false);
+                offsetY = y;
+                console.log(y, offsetY, 'up');
               }
               offsetY = y;
+              console.log(offsetY);
             }}
             margin={margin}
             update={update}
@@ -294,7 +312,7 @@ export const Home = ({navigation}) => {
           </TouchableOpacity>
         )}
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </AnimatedSafeAreaView>
   );
 };
 

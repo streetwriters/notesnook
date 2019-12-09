@@ -29,20 +29,25 @@ import {NavigationEvents} from 'react-navigation';
 import {storage} from '../../../App';
 import {SideMenuEvent} from '../../utils/utils';
 import {Dialog} from '../../components/Dialog';
-
+import {TouchableOpacity} from 'react-native-gesture-handler';
+import * as Animatable from 'react-native-animatable';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
 var timestamp = null;
 var content = null;
 var title = null;
-
+const AnimatedTouchableOpacity = Animatable.createAnimatableComponent(
+  TouchableOpacity,
+);
+const AnimatedTextInput = Animatable.createAnimatableComponent(TextInput);
 const Editor = ({navigation}) => {
   // STATE
 
   const [colors, setColors] = useState(COLOR_SCHEME);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [dialog, setDialog] = useState(false);
+  const [resize, setResize] = useState(false);
   // VARIABLES
 
   let updateInterval = null;
@@ -53,7 +58,6 @@ const Editor = ({navigation}) => {
 
   let EditorWebView = createRef();
   const _textRender = createRef();
-  const titleRef = createRef();
 
   // FUNCTIONS
 
@@ -86,10 +90,6 @@ const Editor = ({navigation}) => {
     }
   };
 
-  useEffect(() => {
-    titleRef.current.focus();
-  }, []);
-
   const _renderEditor = () => {
     return (
       <KeyboardAvoidingView
@@ -108,42 +108,67 @@ const Editor = ({navigation}) => {
               alignSelf: 'center',
               marginTop: Platform.OS == 'ios' ? h * 0.01 : h * 0.04,
             }}>
-            <Icon
-              style={{
-                paddingRight: 10,
-                marginTop: 5,
+            <AnimatedTouchableOpacity
+              onPress={() => {
+                setDialog(true);
               }}
-              name="chevron-left"
-              color={colors.icon}
-              size={SIZE.xxl}
-            />
+              transition={['width', 'height']}
+              duration={250}
+              style={{
+                width: resize ? 35 : 40,
+                height: resize ? 35 : 40,
+              }}>
+              <Icon
+                style={{
+                  paddingRight: 10,
+                  marginTop: 3.5,
+                }}
+                name="chevron-left"
+                color={colors.icon}
+                size={resize ? SIZE.xl : SIZE.xxl}
+              />
+            </AnimatedTouchableOpacity>
 
-            <TextInput
-              ref={titleRef}
+            <AnimatedTextInput
+              transition="fontSize"
               placeholder="Untitled Note"
               placeholderTextColor={colors.icon}
               style={{
                 width: '80%',
                 fontFamily: WEIGHT.bold,
-                fontSize: SIZE.xxl,
+                fontSize: resize ? SIZE.xl : SIZE.xxl,
+                color: colors.pri,
                 maxWidth: '90%',
                 paddingVertical: 0,
               }}
               onChangeText={value => {
                 title = value;
+                if (title.length > 12) {
+                  setResize(true);
+                } else if (title.length < 12) {
+                  setResize(false);
+                }
               }}
               onSubmitEditing={async () => await saveNote()}
             />
 
-            <Icon
+            <AnimatedTouchableOpacity
+              transition={['width', 'height']}
+              duration={250}
               style={{
-                paddingRight: 10,
-                marginTop: 5,
-              }}
-              name="more-vertical"
-              color={colors.icon}
-              size={SIZE.xxl}
-            />
+                width: resize ? 35 : 40,
+                height: resize ? 35 : 40,
+              }}>
+              <Icon
+                style={{
+                  paddingRight: 10,
+                  marginTop: 5,
+                }}
+                name="more-vertical"
+                color={colors.icon}
+                size={resize ? SIZE.xl : SIZE.xxl}
+              />
+            </AnimatedTouchableOpacity>
           </View>
 
           <WebView

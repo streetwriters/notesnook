@@ -26,6 +26,9 @@ const TopLevelNavigator = createStackNavigator(
     },
     Editor: {
       screen: Editor,
+      navigationOptions: {
+        gesturesEnabled: false,
+      },
     },
     Reminders: {
       screen: Reminders,
@@ -78,6 +81,7 @@ const TopLevelNavigator = createStackNavigator(
   },
   {
     initialRouteName: 'Home',
+    cardStyle: false,
   },
 );
 

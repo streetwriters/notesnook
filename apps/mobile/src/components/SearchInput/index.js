@@ -41,7 +41,7 @@ export const Search = props => {
           borderRadius: br,
           borderWidth: props.hide ? 0 : 1.5,
           paddingHorizontal: ph,
-          backgroundColor: colors.bg,
+
           paddingVertical: props.hide
             ? 0
             : Platform.OS == 'ios'

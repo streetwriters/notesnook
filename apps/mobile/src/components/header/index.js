@@ -20,8 +20,8 @@ export const Header = ({
           sendHeight(e.nativeEvent.layout.height);
         }
       }}
-      transition="height"
-      duration={300}
+      transition={['height', 'marginBottom']}
+      duration={250}
       style={{
         height: hide ? 50 : 50,
         flexDirection: 'row',
@@ -30,7 +30,11 @@ export const Header = ({
         alignItems: 'center',
         paddingHorizontal: Platform.isPad ? '2.5%' : '5%',
         paddingTop: Platform.OS == 'ios' ? h * 0.02 : h * 0.06,
-        marginBottom: h * 0.06,
+        marginBottom: hide
+          ? h * 0.03
+          : Platform.OS == 'ios'
+          ? h * 0.04
+          : h * 0.04,
       }}>
       <View
         style={{

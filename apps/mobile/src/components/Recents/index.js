@@ -65,7 +65,6 @@ export const RecentList = ({update, onScroll, margin}) => {
         style={{
           height: '100%',
           width: '100%',
-          backgroundColor: colors.bg,
         }}
         ListHeaderComponent={
           <View
