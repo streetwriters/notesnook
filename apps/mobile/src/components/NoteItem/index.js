@@ -28,6 +28,8 @@ import NavigationService from '../../services/NavigationService';
 import Menu, {MenuItem, MenuDivider} from 'react-native-material-menu';
 import {Dialog} from '../Dialog';
 import {VaultDialog} from '../VaultDialog';
+import {storage} from '../../../App';
+
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
@@ -36,7 +38,37 @@ const NoteItem = props => {
   const [visible, setVisible] = useState(false);
   const [vaultDialog, setVaultDialog] = useState(false);
   const item = props.item;
+
+  let show = null;
+
   let setMenuRef = {};
+
+  const onMenuHide = () => {
+    if (show) {
+      if (show === 'delete') {
+        setVisible(true);
+        show = null;
+      } else if (show == 'vault') {
+        setVaultDialog(true);
+        show = null;
+      }
+    }
+  };
+
+  const hideMenu = () => {
+    setMenuRef[props.index].hide();
+  };
+
+  const showMenu = () => {
+    setMenuRef[props.index].show();
+  };
+
+  const deleteItem = async () => {
+    await storage.deleteNotes([item]);
+    ToastEvent.show('Note moved to trash', 'success', 3000);
+    setVisible(false);
+    props.refresh();
+  };
   return (
     <View
       style={{
@@ -59,6 +91,7 @@ const NoteItem = props => {
         icon="trash"
         paragraph="Do you want to delete this note?"
         positiveText="Delete"
+        positivePress={deleteItem}
         close={() => {
           setVisible(false);
         }}
@@ -153,6 +186,7 @@ const NoteItem = props => {
             borderRadius: 5,
             backgroundColor: colors.nav,
           }}
+          onHidden={onMenuHide}
           ref={ref => (setMenuRef[props.index] = ref)}
           button={
             <TouchableOpacity
@@ -162,7 +196,7 @@ const NoteItem = props => {
                 minHeight: 70,
                 alignItems: 'center',
               }}
-              onPress={() => setMenuRef[props.index].show()}>
+              onPress={showMenu}>
               <Icon name="more-vertical" size={SIZE.lg} color={colors.icon} />
             </TouchableOpacity>
           }>
@@ -178,7 +212,7 @@ const NoteItem = props => {
           </MenuItem>
           <MenuItem
             onPress={() => {
-              setMenuRef[props.index].hide();
+              hideMenu();
               ToastEvent.show(
                 'Note added to favorites.',
                 'success',
@@ -209,7 +243,7 @@ const NoteItem = props => {
 
           <MenuItem
             onPress={() => {
-              setMenuRef[props.index].hide();
+              hideMenu();
               NavigationService.navigate('Folders', {
                 note: item,
                 title: 'Choose Notebook',
@@ -228,8 +262,8 @@ const NoteItem = props => {
           </MenuItem>
           <MenuItem
             onPress={() => {
-              setMenuRef[props.index].hide();
-              setVaultDialog(true);
+              show = 'vault';
+              hideMenu(true);
             }}
             textStyle={{
               color: colors.pri,
@@ -242,8 +276,8 @@ const NoteItem = props => {
 
           <MenuItem
             onPress={() => {
-              setVisible(true);
-              setMenuRef[props.index].hide();
+              show = 'delete';
+              hideMenu();
             }}
             textStyle={{
               color: colors.pri,

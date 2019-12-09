@@ -1,3 +1,5 @@
+// Component to be removed soon.
+
 import React, {useState, useEffect} from 'react';
 import {
   View,
@@ -91,7 +93,9 @@ export const RecentList = ({update, onScroll, margin}) => {
           </View>
         }
         keyExtractor={(item, index) => item.dateCreated.toString()}
-        renderItem={({item, index}) => <NoteItem item={item} index={index} />}
+        renderItem={({item, index}) => (
+          <NoteItem refresh={fetchNotes} item={item} index={index} />
+        )}
       />
     </>
   );

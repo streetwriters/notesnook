@@ -36,7 +36,9 @@ import * as Animatable from 'react-native-animatable';
 export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(
   SafeAreaView,
 );
+
 export const Home = ({navigation}) => {
+  // State
   const [loading, setLoading] = useState(true);
   const [colors, setColors] = useState(COLOR_SCHEME);
   const [hidden, setHidden] = useState(false);
@@ -47,11 +49,15 @@ export const Home = ({navigation}) => {
   const [margin, setMargin] = useState(150);
   const [buttonHide, setButtonHide] = useState(false);
   const forceUpdate = useForceUpdate();
+
+  // Variables
   let offsetY = 0;
   let countUp = 1;
   let countDown = 0;
   let headerHeight = 0;
   let searchHeight = 0;
+  let marginSet = false;
+  // Effects
 
   useEffect(() => {
     setTimeout(() => {
@@ -69,6 +75,29 @@ export const Home = ({navigation}) => {
       });
     };
   }, []);
+
+  useEffect(() => {
+    Keyboard.addListener('keyboardDidShow', () => {
+      setButtonHide(true);
+    });
+    Keyboard.addListener('keyboardDidHide', () => {
+      setTimeout(() => {
+        setButtonHide(false);
+      }, 100);
+    });
+    return () => {
+      Keyboard.removeListener('keyboardDidShow', () => {
+        setButtonHide(true);
+      });
+      Keyboard.removeListener('keyboardDidHide', () => {
+        setTimeout(() => {
+          setButtonHide(false);
+        }, 100);
+      });
+    };
+  }, []);
+
+  // Functions
 
   const onChangeText = value => {
     setText(value);
@@ -106,33 +135,16 @@ export const Home = ({navigation}) => {
       let toAdd = h * 0.06;
 
       setTimeout(() => {
-        if (margin > headerHeight + searchHeight + toAdd) return;
+        if (marginSet) return;
         setMargin(headerHeight + searchHeight + toAdd);
         headerHeight = 0;
         searchHeight = 0;
+        marginSet = true;
       }, 10);
     }
   };
-  useEffect(() => {
-    Keyboard.addListener('keyboardDidShow', () => {
-      setButtonHide(true);
-    });
-    Keyboard.addListener('keyboardDidHide', () => {
-      setTimeout(() => {
-        setButtonHide(false);
-      }, 100);
-    });
-    return () => {
-      Keyboard.removeListener('keyboardDidShow', () => {
-        setButtonHide(true);
-      });
-      Keyboard.removeListener('keyboardDidHide', () => {
-        setTimeout(() => {
-          setButtonHide(false);
-        }, 100);
-      });
-    };
-  }, []);
+
+  // Render
 
   return Platform.isPad ? (
     <SafeAreaView style={[styles.container, {backgroundColor: colors.bg}]}>

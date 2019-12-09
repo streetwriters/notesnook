@@ -20,10 +20,10 @@ export const Header = ({
           sendHeight(e.nativeEvent.layout.height);
         }
       }}
-      transition={['height', 'marginBottom']}
+      transition={['minHeight', 'marginBottom']}
       duration={250}
       style={{
-        height: hide ? 50 : 50,
+        minHeight: hide ? 50 : 50,
         flexDirection: 'row',
         zIndex: 10,
         justifyContent: 'space-between',

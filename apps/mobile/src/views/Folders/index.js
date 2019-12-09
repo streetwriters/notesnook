@@ -41,6 +41,7 @@ export const Folders = ({navigation}) => {
   const [addNotebook, setAddNotebook] = useState(false);
   const [notebooks, setNotebooks] = useState([]);
   const [hideHeader, setHideHeader] = useState(false);
+  const [buttonHide, setButtonHide] = useState(false);
   const [margin, setMargin] = useState(150);
   const forceUpdate = useForceUpdate();
   const params = navigation.state.params;
@@ -161,7 +162,10 @@ export const Folders = ({navigation}) => {
           renderItem={({item, index}) => (
             <NotebookItem
               hideMore={params.hideMore}
+              isMove={params.isMove}
+              noteToMove={params.note}
               item={item}
+              refresh={() => setNotebooks(storage.getNotebooks())}
               index={index}
               colors={colors}
             />

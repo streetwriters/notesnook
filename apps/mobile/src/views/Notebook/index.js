@@ -32,36 +32,29 @@ import NoteItem from '../../components/NoteItem';
 import {NotebookItem} from '../../components/NotebookItem';
 import {Search} from '../../components/SearchInput';
 import {useForceUpdate} from '../ListsEditor';
+import {AddTopicDialog} from '../../components/AddTopicDialog';
 
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
 export const Notebook = ({navigation}) => {
+  // State
   const [colors, setColors] = useState(COLOR_SCHEME);
   const params = navigation.state.params;
   const [hideHeader, setHideHeader] = useState(false);
   const [margin, setMargin] = useState(150);
+  const [buttonHide, setButtonHide] = useState(false);
+  const [addTopic, setAddTopic] = useState(false);
   const forceUpdate = useForceUpdate();
+  // Variables
   let offsetY = 0;
   let countUp = 0;
   let countDown = 0;
   let headerHeight = 0;
   let searchHeight = 0;
+  let marginSet = false;
 
-  const setMarginTop = () => {
-    if (margin !== 150) return;
-    if (headerHeight == 0 || searchHeight == 0) {
-      let toAdd = h * 0.06;
-
-      setTimeout(() => {
-        if (margin > headerHeight + searchHeight + toAdd) return;
-        setMargin(headerHeight + searchHeight + toAdd);
-        headerHeight = 0;
-        searchHeight = 0;
-      }, 10);
-    }
-  };
-
+  // Effects
   useEffect(() => {
     onThemeUpdate(() => {
       forceUpdate();
@@ -72,6 +65,24 @@ export const Notebook = ({navigation}) => {
       });
     };
   }, []);
+
+  // Functions
+  const setMarginTop = () => {
+    if (margin !== 150) return;
+    if (headerHeight == 0 || searchHeight == 0) {
+      let toAdd = h * 0.06;
+
+      setTimeout(() => {
+        if (marginSet) return;
+        setMargin(headerHeight + searchHeight + toAdd);
+        headerHeight = 0;
+        searchHeight = 0;
+        marginSet = true;
+      }, 50);
+    }
+  };
+
+  // Render
   return (
     <SafeAreaView
       style={{
@@ -82,6 +93,13 @@ export const Notebook = ({navigation}) => {
         style={{
           height: '100%',
         }}>
+        <AddTopicDialog
+          visible={addTopic}
+          notebookID={params.notebook.dateCreated}
+          close={() => {
+            setAddTopic(false);
+          }}
+        />
         <View
           style={{
             position: 'absolute',
@@ -107,7 +125,7 @@ export const Notebook = ({navigation}) => {
               searchHeight = height;
               setMarginTop();
             }}
-            placeholder="Search your notebook"
+            placeholder={`Search in ${params.title}`}
             hide={hideHeader}
           />
         </View>
@@ -136,7 +154,9 @@ export const Notebook = ({navigation}) => {
           }}
           ListHeaderComponent={
             <>
-              {params.hideMore ? null : (
+              {params.hideMore ? (
+                <View style={{marginTop: margin}} />
+              ) : (
                 <TouchableOpacity
                   activeOpacity={opacity}
                   onPress={() => {
@@ -172,6 +192,12 @@ export const Notebook = ({navigation}) => {
             <NotebookItem
               hideMore={params.hideMore}
               isTopic={true}
+              noteToMove={params.note}
+              notebookID={params.notebook.dateCreated}
+              isMove={params.isMove}
+              refresh={() => {
+                forceUpdate();
+              }}
               item={item}
               index={index}
               colors={colors}
@@ -181,7 +207,7 @@ export const Notebook = ({navigation}) => {
         <TouchableOpacity
           activeOpacity={opacity}
           onPress={() => {
-            setAddNotebook(true);
+            setAddTopic(true);
           }}
           style={{
             borderRadius: 5,
@@ -202,7 +228,7 @@ export const Notebook = ({navigation}) => {
               color: 'white',
             }}>
             <Icon name="plus" color="white" size={SIZE.lg} />
-            Add a new topic
+            {'  '}Add a new topic
           </Text>
         </TouchableOpacity>
       </KeyboardAvoidingView>

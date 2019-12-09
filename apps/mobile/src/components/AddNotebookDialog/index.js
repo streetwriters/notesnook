@@ -167,6 +167,7 @@ export const AddNotebookDialog = ({visible, close}) => {
               borderRadius: 5,
               fontSize: SIZE.sm,
               fontFamily: WEIGHT.regular,
+              color: colors.pri,
               marginTop: 20,
               marginBottom: 10,
             }}
@@ -181,8 +182,9 @@ export const AddNotebookDialog = ({visible, close}) => {
             style={{
               fontSize: SIZE.sm,
               fontFamily: WEIGHT.semibold,
+              color: colors.pri,
             }}>
-            Topics
+            Topics:
           </Text>
 
           <FlatList
@@ -325,6 +327,7 @@ const TopicItem = ({
           paddingHorizontal: 0,
           fontSize: SIZE.sm,
           fontFamily: WEIGHT.regular,
+          color: colors.pri,
           width: '90%',
           maxWidth: '90%',
         }}

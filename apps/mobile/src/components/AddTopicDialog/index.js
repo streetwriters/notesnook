@@ -1,7 +1,16 @@
 import React, {useEffect, useState, createRef} from 'react';
-import {View, Text, TouchableOpacity, Modal} from 'react-native';
+import {
+  ScrollView,
+  View,
+  Text,
+  TouchableOpacity,
+  Dimensions,
+  Image,
+  SafeAreaView,
+  Platform,
+  Modal,
+} from 'react-native';
 import NavigationService from '../../services/NavigationService';
-
 import {
   COLOR_SCHEME,
   SIZE,
@@ -14,24 +23,36 @@ import {
 } from '../../common/common';
 import Icon from 'react-native-vector-icons/Feather';
 
-export const Dialog = ({
-  title,
-  paragraph = null,
-  positiveText = 'Ok',
-  negativeText = 'Cancel',
-  icon = null,
+import {getElevation, h, w, timeSince, ToastEvent} from '../../utils/utils';
+import {FlatList, TextInput} from 'react-native-gesture-handler';
+import {useForceUpdate} from '../../views/ListsEditor';
+import {storage} from '../../../App';
+
+export const AddTopicDialog = ({
   visible,
   close = () => {},
-  positivePress = () => {},
+  notebookID,
+  toEdit = null,
 }) => {
   const [colors, setColors] = useState(COLOR_SCHEME);
+  const [topics, setTopics] = useState(['']);
+  const forceUpdate = useForceUpdate();
+  const setTitleRef = createRef();
+  let description = 'my first notebook';
+  let title = null;
+  const addNewTopic = async () => {
+    if (!title)
+      return ToastEvent.show('Title is required', 'error', 3000, () => {}, '');
+    console.log(notebookID, title);
+    storage.addTopicToNotebook(notebookID, title);
+    ToastEvent.show('New topic added', 'success', 3000, () => {}, '');
+    close(true);
+  };
 
   return (
     <Modal
       visible={visible}
       transparent={true}
-      animated
-      animationType="fade"
       onRequestClose={() => (refs = [])}>
       <View
         style={{
@@ -57,10 +78,7 @@ export const Dialog = ({
               justifyContent: 'center',
               alignItems: 'center',
             }}>
-            {icon ? (
-              <Icon name={icon} color={colors.accent} size={SIZE.lg} />
-            ) : null}
-
+            <Icon name="book-open" color={colors.accent} size={SIZE.lg} />
             <Text
               style={{
                 color: colors.accent,
@@ -69,38 +87,45 @@ export const Dialog = ({
                 fontSize: SIZE.lg,
                 marginTop: -5,
               }}>
-              {title}
+              {toEdit ? 'Edit Topic' : 'Add New Topic'}
             </Text>
           </View>
 
-          {paragraph ? (
-            <Text
-              style={{
-                color: colors.icon,
-                fontFamily: WEIGHT.regular,
-                fontSize: SIZE.sm - 1,
-                textAlign: 'center',
-                marginTop: 10,
-              }}>
-              {paragraph}
-            </Text>
-          ) : null}
+          <TextInput
+            style={{
+              padding: pv,
+              borderWidth: 1.5,
+              borderColor: colors.nav,
+              paddingHorizontal: ph,
+              borderRadius: 5,
+              fontSize: SIZE.sm,
+              fontFamily: WEIGHT.regular,
+              color: colors.pri,
+              marginTop: 20,
+            }}
+            defaultValue={toEdit ? toEdit.title : null}
+            onChangeText={value => {
+              title = value;
+            }}
+            placeholder="Enter title of topic"
+            placeholderTextColor={colors.icon}
+          />
 
           <View
             style={{
-              justifyContent: 'space-between',
+              justifyContent: 'space-around',
               alignItems: 'center',
               flexDirection: 'row',
               marginTop: 20,
             }}>
             <TouchableOpacity
               activeOpacity={opacity}
-              onPress={() => positivePress()}
+              onPress={async () => await addNewTopic()}
               style={{
                 paddingVertical: pv,
                 paddingHorizontal: ph,
                 borderRadius: 5,
-                width: '48%',
+                width: '45%',
                 justifyContent: 'center',
                 alignItems: 'center',
                 borderColor: colors.accent,
@@ -113,7 +138,7 @@ export const Dialog = ({
                   color: 'white',
                   fontSize: SIZE.sm,
                 }}>
-                {positiveText}
+                Add
               </Text>
             </TouchableOpacity>
 
@@ -124,7 +149,7 @@ export const Dialog = ({
                 paddingVertical: pv,
                 paddingHorizontal: ph,
                 borderRadius: 5,
-                width: '48%',
+                width: '45%',
                 justifyContent: 'center',
                 alignItems: 'center',
                 backgroundColor: colors.nav,
@@ -135,7 +160,7 @@ export const Dialog = ({
                   color: colors.icon,
                   fontSize: SIZE.sm,
                 }}>
-                {negativeText}
+                Cancel
               </Text>
             </TouchableOpacity>
           </View>

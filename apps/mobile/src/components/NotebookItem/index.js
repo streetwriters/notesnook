@@ -13,27 +13,72 @@ import {
   WEIGHT,
 } from '../../common/common';
 import Icon from 'react-native-vector-icons/Feather';
-import {w} from '../../utils/utils';
+import {w, ToastEvent} from '../../utils/utils';
+import {storage} from '../../../App';
+import {Dialog} from '../Dialog';
+import {AddTopicDialog} from '../AddTopicDialog';
 export const NotebookItem = ({
   item,
   index,
-  colors,
-  hideMore,
+  hideMore = false,
   topic,
   isTopic = false,
+  isMove = false,
+  noteToMove = null,
+  notebookID,
+  refresh = () => {},
 }) => {
+  const [colors, setColors] = useState(COLOR_SCHEME);
+  const [isVisible, setVisible] = useState(false);
+  const [addTopic, setAddTopic] = useState(false);
   let setMenuRef = {};
-  return (
-    <TouchableOpacity
-      activeOpacity={opacity}
-      onPress={() => {
-        NavigationService.navigate('Notebook', {
+  let show = null;
+
+  const deleteItem = async () => {
+    if (isTopic) {
+      await storage.deleteTopicFromNotebook(notebookID, item.title);
+      ToastEvent.show('Topic moved to trash', 'success', 3000);
+    } else {
+      await storage.deleteNotebooks([item]);
+      ToastEvent.show('Notebook moved to trash', 'success', 3000);
+    }
+    refresh();
+    setVisible(false);
+  };
+
+  const navigate = () => {
+    isTopic
+      ? NavigationService.navigate('Notes', item)
+      : NavigationService.navigate('Notebook', {
           notebook: item,
+          note: noteToMove,
           title: hideMore ? 'Choose topic' : item.title,
-          isMove: hideMore ? true : false,
+          isMove: isMove ? true : false,
           hideMore: hideMore ? true : false,
         });
-      }}
+  };
+
+  const onMenuHide = () => {
+    if (show) {
+      if (show === 'delete') {
+        setVisible(true);
+        show = null;
+      } else if (show === 'topic') {
+        setAddTopic(true);
+        show = null;
+      }
+    }
+  };
+
+  const hideMenu = () => {
+    setMenuRef[index].hide();
+  };
+
+  const showMenu = () => {
+    setMenuRef[index].show();
+  };
+  return (
+    <View
       style={{
         paddingHorizontal: ph,
         marginHorizontal: '5%',
@@ -41,13 +86,30 @@ export const NotebookItem = ({
         borderBottomColor: colors.nav,
         paddingVertical: pv,
       }}>
+      <Dialog
+        visible={isVisible}
+        title={`Delete ${isTopic ? 'topic' : 'notebook'}`}
+        icon="trash"
+        paragraph={`Do you want to delete this ${
+          isTopic ? 'topic' : 'notebook'
+        }?`}
+        positiveText="Delete"
+        positivePress={deleteItem}
+        close={() => setVisible(false)}
+      />
+      <AddTopicDialog
+        visible={addTopic}
+        toEdit={item}
+        close={() => setAddTopic(false)}
+      />
+
       <View
         style={{
           flexDirection: 'row',
           justifyContent: 'space-between',
           alignItems: 'center',
         }}>
-        <View>
+        <TouchableOpacity onPress={navigate}>
           <Text
             style={{
               fontFamily: WEIGHT.bold,
@@ -76,23 +138,21 @@ export const NotebookItem = ({
                 alignItems: 'center',
                 marginTop: 5,
               }}>
-              {Object.keys(item.topics)
-                .slice(0, 3)
-                .map(topic => (
-                  <Text
-                    style={{
-                      borderRadius: 5,
-                      backgroundColor: colors.accent,
-                      color: 'white',
-                      marginRight: 5,
-                      fontFamily: WEIGHT.regular,
-                      fontSize: SIZE.xxs,
-                      paddingHorizontal: ph / 2,
-                      paddingVertical: pv / 4,
-                    }}>
-                    {topic}
-                  </Text>
-                ))}
+              {item.topics.slice(0, 4).map(topic => (
+                <Text
+                  style={{
+                    borderRadius: 5,
+                    backgroundColor: colors.accent,
+                    color: 'white',
+                    marginRight: 5,
+                    fontFamily: WEIGHT.regular,
+                    fontSize: SIZE.xxs,
+                    paddingHorizontal: ph / 2,
+                    paddingVertical: pv / 4,
+                  }}>
+                  {topic.title}
+                </Text>
+              ))}
             </View>
           )}
 
@@ -128,14 +188,15 @@ export const NotebookItem = ({
               </Text>
             </View>
           )}
-        </View>
+        </TouchableOpacity>
 
         {hideMore ? null : (
           <Menu
             style={{
               borderRadius: 5,
-              backgroundColor: colors.bg,
+              backgroundColor: colors.nav,
             }}
+            onHidden={onMenuHide}
             ref={ref => (setMenuRef[index] = ref)}
             button={
               <TouchableOpacity
@@ -145,10 +206,25 @@ export const NotebookItem = ({
                   minHeight: 70,
                   alignItems: 'center',
                 }}
-                onPress={() => setMenuRef[index].show()}>
+                onPress={showMenu}>
                 <Icon name="more-vertical" size={SIZE.lg} color={colors.icon} />
               </TouchableOpacity>
             }>
+            <MenuItem
+              onPress={() => {
+                show = 'topic';
+                hideMenu();
+              }}
+              textStyle={{
+                color: colors.pri,
+
+                fontFamily: WEIGHT.regular,
+                fontSize: SIZE.sm,
+              }}>
+              <Icon name="edit-2" size={SIZE.sm} color={colors.icon} />
+              {'  '}Edit
+            </MenuItem>
+
             <MenuItem
               textStyle={{
                 color: colors.pri,
@@ -161,7 +237,7 @@ export const NotebookItem = ({
             </MenuItem>
             <MenuItem
               onPress={() => {
-                setMenuRef[props.index].hide();
+                hideMenu();
                 ToastEvent.show(
                   'Note added to favorites.',
                   'success',
@@ -179,10 +255,11 @@ export const NotebookItem = ({
               <Icon name="star" size={SIZE.sm} color={colors.icon} />
               {'  '}Favorite
             </MenuItem>
+
             <MenuItem
               onPress={() => {
-                setVisible(true);
-                setMenuRef[index].hide();
+                show = 'delete';
+                hideMenu();
               }}
               textStyle={{
                 color: colors.pri,
@@ -200,7 +277,13 @@ export const NotebookItem = ({
           <TouchableOpacity
             activeOpacity={opacity}
             onPress={() => {
+              storage.addNoteToTopic(
+                notebookID,
+                item.title,
+                noteToMove.dateCreated,
+              );
               NavigationService.navigate('Home');
+              ToastEvent.show(`Note moved to ${item.title}`, 'success', 3000);
             }}
             style={{
               borderWidth: 1,
@@ -225,6 +308,6 @@ export const NotebookItem = ({
           </TouchableOpacity>
         ) : null}
       </View>
-    </TouchableOpacity>
+    </View>
   );
 };

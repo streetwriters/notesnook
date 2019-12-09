@@ -31,6 +31,8 @@ import {SideMenuEvent} from '../../utils/utils';
 import {Dialog} from '../../components/Dialog';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import * as Animatable from 'react-native-animatable';
+import Menu, {MenuItem, MenuDivider} from 'react-native-material-menu';
+
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
@@ -53,7 +55,7 @@ const Editor = ({navigation}) => {
   let updateInterval = null;
   let keyboardDidShowListener = null;
   let keyboardDidHideListener = null;
-
+  let setMenuRef;
   // REFS
 
   let EditorWebView = createRef();
@@ -152,23 +154,129 @@ const Editor = ({navigation}) => {
               onSubmitEditing={async () => await saveNote()}
             />
 
-            <AnimatedTouchableOpacity
-              transition={['width', 'height']}
-              duration={250}
+            <Menu
               style={{
-                width: resize ? 35 : 40,
-                height: resize ? 35 : 40,
-              }}>
-              <Icon
-                style={{
-                  paddingRight: 10,
-                  marginTop: 5,
+                borderRadius: 5,
+                backgroundColor: colors.nav,
+              }}
+              ref={ref => (setMenuRef = ref)}
+              button={
+                <AnimatedTouchableOpacity
+                  transition={['width', 'height']}
+                  duration={250}
+                  onPress={() => setMenuRef.show()}
+                  style={{
+                    width: resize ? 35 : 40,
+                    height: resize ? 35 : 40,
+                  }}>
+                  <Icon
+                    style={{
+                      paddingRight: 10,
+                      marginTop: 5,
+                    }}
+                    name="more-vertical"
+                    color={colors.icon}
+                    size={resize ? SIZE.xl : SIZE.xxl}
+                  />
+                </AnimatedTouchableOpacity>
+              }>
+              <MenuItem
+                textStyle={{
+                  color: colors.pri,
+
+                  fontFamily: WEIGHT.regular,
+                  fontSize: SIZE.sm,
+                }}>
+                <Icon name="star" size={SIZE.sm} color={colors.icon} />
+                {'  '}Pin
+              </MenuItem>
+              <MenuItem
+                onPress={() => {
+                  setMenuRef.hide();
+                  ToastEvent.show(
+                    'Note added to favorites.',
+                    'success',
+                    3000,
+                    () => {},
+                    'Ok',
+                  );
                 }}
-                name="more-vertical"
-                color={colors.icon}
-                size={resize ? SIZE.xl : SIZE.xxl}
-              />
-            </AnimatedTouchableOpacity>
+                textStyle={{
+                  color: colors.pri,
+                  fontFamily: WEIGHT.regular,
+                  fontSize: SIZE.sm,
+                }}>
+                <Icon name="star" size={SIZE.sm} color={colors.icon} />
+                {'  '}Favorite
+              </MenuItem>
+              <MenuItem
+                textStyle={{
+                  color: colors.pri,
+                  fontFamily: WEIGHT.regular,
+                  fontSize: SIZE.sm,
+                }}>
+                <Icon name="tag" size={SIZE.sm} color={colors.icon} />
+                {'  '}Add Tags
+              </MenuItem>
+
+              <MenuItem
+                textStyle={{
+                  color: colors.pri,
+                  fontFamily: WEIGHT.regular,
+                  fontSize: SIZE.sm,
+                }}>
+                <Icon name="share" size={SIZE.sm} color={colors.icon} />
+                {'  '}Share
+              </MenuItem>
+
+              <MenuItem
+                onPress={() => {
+                  setMenuRef.hide();
+                  NavigationService.navigate('Folders', {
+                    note: item,
+                    title: 'Choose Notebook',
+                    isMove: true,
+                    hideMore: true,
+                  });
+                }}
+                textStyle={{
+                  color: colors.pri,
+                  fontFamily: WEIGHT.regular,
+                  fontSize: SIZE.sm,
+                }}>
+                <Icon name="arrow-right" size={SIZE.sm} color={colors.icon} />
+                {'  '}Move
+              </MenuItem>
+
+              <MenuItem
+                onPress={() => {
+                  setMenuRef.hide();
+                  setVaultDialog(true);
+                }}
+                textStyle={{
+                  color: colors.pri,
+                  fontFamily: WEIGHT.regular,
+                  fontSize: SIZE.sm,
+                }}>
+                <Icon name="lock" size={SIZE.sm} color={colors.icon} />
+                {'  '}Lock
+              </MenuItem>
+
+              <MenuItem
+                onPress={() => {
+                  setVisible(true);
+                  setMenuRef.hide();
+                }}
+                textStyle={{
+                  color: colors.pri,
+
+                  fontFamily: WEIGHT.regular,
+                  fontSize: SIZE.sm,
+                }}>
+                <Icon name="trash" size={SIZE.sm} color={colors.icon} />
+                {'  '}Delete
+              </MenuItem>
+            </Menu>
           </View>
 
           <WebView
