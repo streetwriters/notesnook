@@ -151,6 +151,17 @@ const App = () => {
     }
   }, []);
 
+  useEffect(() => {
+    onThemeUpdate(() => {
+      StatusBar.setBarStyle(colors.night ? 'light-content' : 'dark-content');
+    });
+    return () => {
+      clearThemeUpdateListener(() => {
+        StatusBar.setBarStyle(colors.night ? 'light-content' : 'dark-content');
+      });
+    };
+  }, []);
+
   return (
     <View
       style={{

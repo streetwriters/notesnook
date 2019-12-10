@@ -57,21 +57,20 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
         opacity: hide ? 0 : 1,
         backgroundColor: colors.night ? colors.navbg : colors.navbg,
       }}>
+      <View
+        style={{
+          height: 2,
+          width: '100%',
+          marginBottom: 5,
+          marginTop: Platform.OS == 'ios' ? h * 0.01 : h * 0.03,
+        }}
+      />
       <ScrollView
         contentContainerStyle={{
           justifyContent: 'space-between',
           height: '100%',
         }}>
         <View>
-          <View
-            style={{
-              height: 2,
-
-              width: '100%',
-              marginBottom: 5,
-              marginTop: Platform.OS == 'ios' ? h * 0.01 : h * 0.03,
-            }}
-          />
           <FlatList
             data={[
               {

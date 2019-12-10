@@ -1,17 +1,8 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {View, Text, TouchableOpacity} from 'react-native';
 import NavigationService from '../../services/NavigationService';
 import Menu, {MenuItem, MenuDivider} from 'react-native-material-menu';
-import {
-  COLOR_SCHEME,
-  SIZE,
-  br,
-  ph,
-  pv,
-  opacity,
-  FONT,
-  WEIGHT,
-} from '../../common/common';
+import {COLOR_SCHEME, SIZE, ph, pv, opacity, WEIGHT} from '../../common/common';
 import Icon from 'react-native-vector-icons/Feather';
 import {w, ToastEvent} from '../../utils/utils';
 import {storage} from '../../../App';
@@ -48,10 +39,14 @@ export const NotebookItem = ({
 
   const navigate = () => {
     isTopic
-      ? NavigationService.navigate('Notes', item)
+      ? NavigationService.navigate('Notes', {
+          ...item,
+          notebookID,
+        })
       : NavigationService.navigate('Notebook', {
           notebook: item,
           note: noteToMove,
+
           title: hideMore ? 'Choose topic' : item.title,
           isMove: isMove ? true : false,
           hideMore: hideMore ? true : false,
@@ -281,8 +276,8 @@ export const NotebookItem = ({
         {hideMore && isTopic ? (
           <TouchableOpacity
             activeOpacity={opacity}
-            onPress={() => {
-              storage.addNoteToTopic(
+            onPress={async () => {
+              await storage.addNoteToTopic(
                 notebookID,
                 item.title,
                 noteToMove.dateCreated,

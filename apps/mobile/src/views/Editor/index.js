@@ -11,6 +11,7 @@ import {
   Dimensions,
   TextInput,
   BackHandler,
+  TouchableOpacity,
 } from 'react-native';
 import {
   COLOR_SCHEME,
@@ -31,7 +32,7 @@ import {NavigationEvents} from 'react-navigation';
 import {storage} from '../../../App';
 import {SideMenuEvent} from '../../utils/utils';
 import {Dialog} from '../../components/Dialog';
-import {TouchableOpacity} from 'react-native-gesture-handler';
+
 import * as Animatable from 'react-native-animatable';
 import Menu, {MenuItem, MenuDivider} from 'react-native-material-menu';
 import SideMenu from 'react-native-side-menu';
@@ -60,7 +61,7 @@ const Editor = ({navigation}) => {
   const [resize, setResize] = useState(false);
   const [sidebar, setSidebar] = useState('30%');
   const [isOpen, setOpen] = useState(false);
-
+  const [hide, setHide] = useState(true);
   // VARIABLES
 
   let updateInterval = null;
@@ -74,6 +75,9 @@ const Editor = ({navigation}) => {
   const _keyboardDidShow = e => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setKeyboardHeight(e.endCoordinates.height);
+    if (!isOpen) {
+      setHide(true);
+    }
   };
 
   const post = value => EditorWebView.postMessage(value);
@@ -81,23 +85,30 @@ const Editor = ({navigation}) => {
   const _keyboardDidHide = () => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setKeyboardHeight(0);
+    setTimeout(() => {
+      setHide(false);
+    }, 2000);
   };
 
-  async function onChange(data) {
+  const onChange = data => {
     if (data !== '') {
       content = JSON.parse(data);
     }
-  }
+  };
 
   const saveNote = async () => {
-    console.log(await storage.getNotes());
-    if (title || content) {
-      timestamp = await storage.addNote({
-        title,
-        content,
-        dateCreated: timestamp,
-      });
+    if (!content) {
+      content = {
+        text: '',
+        delta: null,
+      };
     }
+
+    timestamp = await storage.addNote({
+      title,
+      content,
+      dateCreated: timestamp,
+    });
   };
 
   const onWebViewLoad = () => {
@@ -117,11 +128,6 @@ const Editor = ({navigation}) => {
   };
   const onTitleTextChange = value => {
     title = value;
-    if (title.length > 12) {
-      setResize(true);
-    } else if (title.length < 12) {
-      setResize(false);
-    }
   };
 
   const _renderEditor = () => {
@@ -163,15 +169,15 @@ const Editor = ({navigation}) => {
               />
             </AnimatedTouchableOpacity>
 
-            <AnimatedTextInput
-              transition="fontSize"
+            <TextInput
               placeholder="Untitled Note"
               ref={ref => (titleRef = ref)}
               placeholderTextColor={colors.icon}
+              defaultValue={title}
               style={{
                 width: '80%',
                 fontFamily: WEIGHT.bold,
-                fontSize: resize ? SIZE.xl : SIZE.xxl,
+                fontSize: SIZE.xxl,
                 color: colors.pri,
                 maxWidth: '90%',
                 paddingVertical: 0,
@@ -196,7 +202,7 @@ const Editor = ({navigation}) => {
               }}>
               <Icon
                 name="menu"
-                color="white"
+                color={colors.icon}
                 size={resize ? SIZE.xl : SIZE.xxl}
               />
             </AnimatedTouchableOpacity>
@@ -254,18 +260,27 @@ const Editor = ({navigation}) => {
     );
   };
 
+  handleBackEvent = () => {
+    setDialog(true);
+    return true;
+  };
+
   // EFFECTS
-  useEffect(() => {
-    (timestamp = null), (content = null);
-    title = null;
-  }, []);
 
   useEffect(() => {
-    BackHandler.addEventListener('hardwareBackPress', () => {
-      setDialog(true);
-      return true;
-    });
-  });
+    let handleBack = BackHandler.addEventListener(
+      'hardwareBackPress',
+      handleBackEvent,
+    );
+    return () => {
+      title = null;
+      timestamp = null;
+      content = null;
+
+      handleBack.remove();
+      handleBack = null;
+    };
+  }, []);
 
   useEffect(() => {
     keyboardDidShowListener = Keyboard.addListener(
@@ -308,7 +323,7 @@ const Editor = ({navigation}) => {
       SideMenuEvent.open();
       SideMenuEvent.enable();
     };
-  }, []);
+  });
 
   useEffect(() => {
     onThemeUpdate(() => {
@@ -326,6 +341,12 @@ const Editor = ({navigation}) => {
     EditorWebView.reload();
   }, [colors.bg]);
 
+  useEffect(() => {
+    setTimeout(() => {
+      setHide(false);
+    }, 1000);
+  }, []);
+
   return (
     <SideMenu
       isOpen={isOpen}
@@ -340,7 +361,7 @@ const Editor = ({navigation}) => {
       }}
       menu={
         <EditorMenu
-          hide={false}
+          hide={hide}
           close={() => {
             setOpen(false);
           }}

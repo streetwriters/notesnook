@@ -70,18 +70,17 @@ export const Notebook = ({navigation}) => {
 
   // Functions
   const setMarginTop = () => {
-    if (margin !== 150) return;
-    if (headerHeight == 0 || searchHeight == 0) {
-      let toAdd = h * 0.06;
-
-      setTimeout(() => {
-        if (marginSet) return;
-        setMargin(headerHeight + searchHeight + toAdd);
-        headerHeight = 0;
-        searchHeight = 0;
-        marginSet = true;
-      }, 50);
+    console.log(params.notebook);
+    if (headerHeight < 30 || searchHeight < 30) {
+      return;
     }
+    let toAdd = h * 0.06;
+    if (marginSet) return;
+    let a = headerHeight + searchHeight + toAdd;
+    setMargin(a);
+    headerHeight = 0;
+    searchHeight = 0;
+    marginSet = true;
   };
 
   // Render

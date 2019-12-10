@@ -1,4 +1,4 @@
-import React, {useEffect, useState, createRef} from 'react';
+import React, {useEffect, useState, createRef, useCallback} from 'react';
 import {
   SafeAreaView,
   Platform,
@@ -30,14 +30,13 @@ import Icon from 'react-native-vector-icons/Feather';
 import NavigationService from '../../services/NavigationService';
 import {useForceUpdate} from '../ListsEditor';
 import * as Animatable from 'react-native-animatable';
-
+import {useNavigationEvents, useIsFocused} from 'react-navigation-hooks';
 export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(
   SafeAreaView,
 );
 
 export const Home = ({navigation}) => {
   // State
-  const [loading, setLoading] = useState(true);
   const [colors, setColors] = useState(COLOR_SCHEME);
   const [search, setSearch] = useState(false);
   const [text, setText] = useState('');
@@ -48,7 +47,7 @@ export const Home = ({navigation}) => {
   const [notes, setNotes] = useState([]);
   const [keyword, setKeyword] = useState('');
   const forceUpdate = useForceUpdate();
-
+  const isFocused = useIsFocused();
   // Variables
   let offsetY = 0;
   let countUp = 1;
@@ -60,12 +59,10 @@ export const Home = ({navigation}) => {
   let allNotes = [];
 
   // Effects
-
   useEffect(() => {
-    setTimeout(() => {
-      setLoading(false);
-    }, 1000);
-  }, []);
+    if (!isFocused) return;
+    fetchNotes();
+  }, [isFocused]);
 
   useEffect(() => {
     onThemeUpdate(() => {
@@ -78,9 +75,13 @@ export const Home = ({navigation}) => {
     };
   }, []);
 
-  useEffect(() => {
-    fetchNotes();
-  }, []);
+  const fetchNotes = () => {
+    setTimeout(() => {
+      allNotes = storage.getNotes();
+
+      setNotes(allNotes);
+    }, 0);
+  };
 
   useEffect(() => {
     Keyboard.addListener('keyboardDidShow', () => {
@@ -152,25 +153,16 @@ export const Home = ({navigation}) => {
   };
 
   const setMarginTop = () => {
-    if (margin !== 150) return;
-    if (headerHeight == 0 || searchHeight == 0) {
-      let toAdd = h * 0.06;
-
-      setTimeout(() => {
-        if (marginSet) return;
-        setMargin(headerHeight + searchHeight + toAdd);
-        headerHeight = 0;
-        searchHeight = 0;
-        marginSet = true;
-      }, 10);
+    if (headerHeight < 30 || searchHeight < 30) {
+      return;
     }
-  };
-
-  const fetchNotes = async () => {
-    allNotes = await storage.getNotes();
-    if (allNotes) {
-      setNotes(allNotes);
-    }
+    let toAdd = h * 0.06;
+    if (marginSet) return;
+    let a = headerHeight + searchHeight + toAdd;
+    setMargin(a);
+    headerHeight = 0;
+    searchHeight = 0;
+    marginSet = true;
   };
 
   // Render
@@ -178,16 +170,6 @@ export const Home = ({navigation}) => {
   return Platform.isPad ? (
     <SafeAreaView style={[styles.container, {backgroundColor: colors.bg}]}>
       <KeyboardAvoidingView style={{backgroundColor: colors.bg}}>
-        <NavigationEvents
-          onWillFocus={() => {
-            DeviceEventEmitter.emit('openSidebar');
-            setUpdate(update + 1);
-          }}
-          onDidBlur={() => {
-            marginSet = false;
-          }}
-        />
-
         <Header colors={colors} heading="Home" canGoBack={false} />
 
         <Search
@@ -202,7 +184,7 @@ export const Home = ({navigation}) => {
           }}
         />
 
-        {hidden ? <NotesList keyword={text} /> : <RecentList />}
+        <NotesList keyword={text} />
       </KeyboardAvoidingView>
     </SafeAreaView>
   ) : (

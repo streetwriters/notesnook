@@ -46,10 +46,6 @@ export const EditorMenu = ({close = () => {}, hide, update = () => {}}) => {
   let backPressCount = 0;
 
   useEffect(() => {
-    console.log(tagsInputRef.current);
-  }, [tagsInputRef]);
-
-  useEffect(() => {
     onThemeUpdate(() => {
       forceUpdate();
     });
@@ -62,7 +58,7 @@ export const EditorMenu = ({close = () => {}, hide, update = () => {}}) => {
 
   return (
     <AnimatedSafeAreaView
-      transition="backgroundColor"
+      transition={['backgroundColor', 'opacity']}
       duration={1000}
       style={{
         height: '100%',
@@ -349,13 +345,12 @@ export const EditorMenu = ({close = () => {}, hide, update = () => {}}) => {
                 if (tag.includes(' ')) {
                   tag = tag.replace(' ', '_');
                 }
-                let allTags = tags;
+                let allTags = [...tags];
                 allTags.push(tag);
-                setTags(allTags);
                 tagsInputRef.setNativeProps({
                   text: '#',
                 });
-                forceUpdate();
+                setTags(allTags);
                 tagToAdd = '';
                 setTimeout(() => {
                   tagsInputRef.focus();

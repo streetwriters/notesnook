@@ -39,7 +39,7 @@ const h = Dimensions.get('window').height;
 export const Notes = ({navigation}) => {
   const [colors, setColors] = useState(COLOR_SCHEME);
   const [hideHeader, setHideHeader] = useState(false);
-  const [margin, setMargin] = useState(150);
+  const [margin, setMargin] = useState(200);
   const [buttonHide, setButtonHide] = useState(false);
   const [notes, setNotes] = useState([]);
   const forceUpdate = useForceUpdate();
@@ -49,6 +49,7 @@ export const Notes = ({navigation}) => {
   let countDown = 0;
   let headerHeight = 0;
   let searchHeight = 0;
+  let marginSet = false;
   useEffect(() => {
     onThemeUpdate(() => {
       forceUpdate();
@@ -69,33 +70,11 @@ export const Notes = ({navigation}) => {
   }, []);
 
   useEffect(() => {
-    let allNotes = [];
-
-    params.notes.forEach(note => {
-      let noteToAdd = storage.getNote(note);
-      if (noteToAdd) {
-        allNotes[notes.length] = noteToAdd;
-      }
-    });
-
+    let allNotes = storage.getTopic(params.notebookID, params.title);
     if (allNotes && allNotes.length > 0) {
       setNotes(allNotes);
     }
   }, []);
-
-  const setMarginTop = () => {
-    if (margin !== 150) return;
-    if (headerHeight == 0 || searchHeight == 0) {
-      let toAdd = h * 0.06;
-
-      setTimeout(() => {
-        if (margin > headerHeight + searchHeight + toAdd) return;
-        setMargin(headerHeight + searchHeight + toAdd);
-        headerHeight = 0;
-        searchHeight = 0;
-      }, 10);
-    }
-  };
 
   return (
     <AnimatedSafeAreaView
@@ -135,7 +114,6 @@ export const Notes = ({navigation}) => {
           <Search
             sendHeight={height => {
               searchHeight = height;
-              setMarginTop();
             }}
             placeholder={`Search in ${params.title}`}
             hide={hideHeader}

@@ -44,7 +44,7 @@ export const Folders = ({navigation}) => {
   const [notebooks, setNotebooks] = useState([]);
   const [hideHeader, setHideHeader] = useState(false);
   const [buttonHide, setButtonHide] = useState(false);
-  const [margin, setMargin] = useState(150);
+  const [margin, setMargin] = useState(190);
   const forceUpdate = useForceUpdate();
   const params = navigation.state.params;
   let offsetY = 0;
@@ -55,18 +55,16 @@ export const Folders = ({navigation}) => {
   let marginSet = false;
 
   const setMarginTop = () => {
-    if (margin !== 150) return;
-    if (headerHeight == 0 || searchHeight == 0) {
-      let toAdd = h * 0.06;
-
-      setTimeout(() => {
-        if (marginSet) return;
-        setMargin(headerHeight + searchHeight + toAdd);
-        headerHeight = 0;
-        searchHeight = 0;
-        marginSet = true;
-      }, 10);
+    if (headerHeight < 30 || searchHeight < 30) {
+      return;
     }
+    let toAdd = h * 0.06;
+    if (marginSet) return;
+    let a = headerHeight + searchHeight + toAdd;
+    setMargin(a);
+    headerHeight = 0;
+    searchHeight = 0;
+    marginSet = true;
   };
 
   useEffect(() => {
@@ -135,6 +133,7 @@ export const Folders = ({navigation}) => {
           <Search
             sendHeight={height => {
               searchHeight = height;
+              console.log(searchHeight + '' + headerHeight);
               setMarginTop();
             }}
             placeholder="Search your notebook"
