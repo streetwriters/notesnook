@@ -133,7 +133,7 @@ test("duplicate note to topic should not be added", async () => {
 
 test("note has notebook", () => {
   let note = db.getNote(TEST_NOTE.dateCreated);
-  expect(note.notebooks.hasOwnProperty(TEST_NOTEBOOK.dateCreated)).toBe(true);
+  expect(note.notebook.notebook).toBe(TEST_NOTEBOOK.dateCreated);
 });
 
 test("get empty topic", () => {
@@ -163,6 +163,16 @@ test("move note", async () => {
   expect(res).toBe(true);
 });
 
+test("notes don't contain notebooks", () => {
+  let notes = db.getNotes().filter(v => v.type === "notebook");
+  expect(notes.length).toBe(0);
+});
+
+test("notebooks don't contain notes", () => {
+  let notebooks = db.getNotebooks().filter(v => v.type === "note");
+  expect(notebooks.length).toBe(0);
+});
+
 test("deletion of note from invalid topic should return false", async () => {
   let res = await db.deleteNoteFromTopic(
     TEST_NOTEBOOK.dateCreated,
@@ -174,8 +184,8 @@ test("deletion of note from invalid topic should return false", async () => {
 
 test("delete note from topic", async () => {
   await db.deleteNoteFromTopic(
-    TEST_NOTEBOOK.dateCreated,
-    "Home",
+    TEST_NOTEBOOK2.dateCreated,
+    "Home2",
     TEST_NOTE.dateCreated
   );
   let notebook = db.getNotebook(TEST_NOTEBOOK.dateCreated);
@@ -185,7 +195,7 @@ test("delete note from topic", async () => {
 
 test("note doesn't have notebook", () => {
   let note = db.getNote(TEST_NOTE.dateCreated);
-  expect(note.notebooks.hasOwnProperty(TEST_NOTEBOOK.dateCreated)).toBe(false);
+  expect(note.notebook).toStrictEqual({});
 });
 
 test("delete topic from notebook", async () => {
