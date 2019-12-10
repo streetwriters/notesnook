@@ -19,6 +19,10 @@ const TEST_NOTEBOOK2 = {
   topics: ["Home2"]
 };
 
+beforeAll(async () => {
+  return await db.init();
+});
+
 test("storage is defined", () => {
   expect(db.storage).toBeDefined();
 });

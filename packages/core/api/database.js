@@ -7,23 +7,41 @@ const KEYS = {
   notes: "notes",
   notebooks: "notebooks"
 };
-
+function checkInitialized() {
+  if (!this.isInitialized) {
+    throw new Error(
+      "Database is not initialized. Make sure to call await init() on startup."
+    );
+  }
+}
 class Database {
   constructor(storage) {
     this.storage = new Storage(storage);
     this.notes = {};
     this.notebooks = {};
+    this.isInitialized = false;
+  }
 
-    // fill data
-    for (let key of extractValues(KEYS)) {
-      this.storage.read(key).then(data => (this[key] = data || {}));
-    }
+  init() {
+    return new Promise((resolve, reject) => {
+      for (let key of extractValues(KEYS)) {
+        this.storage.read(key).then(data => {
+          this[key] = data || {};
+          if (key === "notebooks") {
+            this.isInitialized = true;
+            //TODO use index here
+            resolve(true);
+          }
+        });
+      }
+    });
   }
 
   /**
    * Get all notes
    */
   getNotes() {
+    checkInitialized.call(this);
     return extractValues(this.notes);
   }
 
@@ -102,6 +120,7 @@ class Database {
    * @returns An array containing all the notebooks
    */
   getNotebooks() {
+    checkInitialized.call(this);
     return extractValues(this.notebooks);
   }
 
@@ -271,7 +290,7 @@ class Database {
       !to.notebook ||
       !from.topic ||
       !to.topic ||
-      from.notebook === to.notebook //moving to same notebook shouldn't be possible
+      (from.notebook === to.notebook && from.topic === to.topic) //moving to same notebook and topic shouldn't be possible
     )
       return false;
     if (await this.deleteNoteFromTopic(from.notebook, from.topic, noteId)) {
@@ -320,6 +339,7 @@ function topicNoteFn(notebookId, topic, noteId, fn) {
 }
 
 function getItem(id, key) {
+  checkInitialized.call(this);
   if (this[key].hasOwnProperty(id)) {
     return this[key][id];
   }
