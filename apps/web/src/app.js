@@ -20,7 +20,7 @@ const NavMenuItem = props => {
         width: "full",
         borderRadius: "none",
         textAlign: "center",
-        color: props.selected ? "accent" : "fontPrimary"
+        color: props.selected ? "primary" : "text"
       }}
       px={0}
     >
@@ -38,7 +38,12 @@ function App() {
   const [selectedIndex, setSelectedIndex] = useState(1);
   return (
     <ThemeProvider theme={theme}>
-      <Flex height="100%" alignContent="stretch">
+      <Flex
+        bg="background"
+        sx={{ color: "text" }}
+        height="100%"
+        alignContent="stretch"
+      >
         <Box
           width={[0, 0, 70]}
           sx={{ borderRight: "1px solid", borderRightColor: "border" }}
@@ -59,7 +64,6 @@ function App() {
         <Flex flex="1 1 auto" flexDirection="row" alignContent="stretch" px={0}>
           <Flex
             className="navigationView"
-            bg="primary"
             sx={{ borderRight: "1px solid", borderColor: "border" }}
             flexDirection="column"
             flex="1 1 auto"

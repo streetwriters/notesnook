@@ -4,11 +4,7 @@ import { SHADOW } from "../../theme";
 
 function Menu(props) {
   return (
-    <Flex
-      bg="primary"
-      py={1}
-      sx={{ borderRadius: "default", boxShadow: SHADOW }}
-    >
+    <Flex bg="background" py={1} sx={{ borderRadius: "default", boxShadow: 2 }}>
       <Box>
         {props.menuItems.map(item => (
           <Flex
@@ -29,7 +25,7 @@ function Menu(props) {
             sx={{
               color: item.color || "fontPrimary",
               ":hover": {
-                backgroundColor: "accent",
+                backgroundColor: "primary",
                 color: "fontSecondary"
               }
             }}

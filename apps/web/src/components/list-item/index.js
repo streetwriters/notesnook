@@ -43,7 +43,7 @@ const ListItem = props => (
         display={props.info ? "flex" : "none"}
         variant="body"
         fontSize={12}
-        color="accent"
+        color="primary"
       >
         {props.info}
       </Text>
@@ -59,7 +59,7 @@ const ListItem = props => (
           style={{ marginRight: -5 }}
         />
       </DropdownTrigger>
-      <DropdownContent style={{ zIndex: 999, marginLeft: -70 }}>
+      <DropdownContent style={{ zIndex: 999, marginLeft: -85 }}>
         <Menu
           dropdownRef={props.dropdownRefs[props.index]}
           menuItems={props.menuItems}

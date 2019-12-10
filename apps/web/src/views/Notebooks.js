@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Flex, Box, Text, Button as RebassButton } from "rebass";
-import { Input } from "@rebass/forms";
+import { Input, Checkbox, Label } from "@rebass/forms";
 import Button from "../components/button";
 import * as Icon from "react-feather";
 import theme, { DIALOG_SHADOW } from "../theme";
@@ -46,7 +46,7 @@ const Notebooks = props => {
       {notebooks.length > 0 ? (
         <Flex flexDirection="column" flex="1 1 auto">
           {selected.type === "topic" && (
-            <Text variant="title" color="accent">
+            <Text variant="title" color="primary">
               {selected.title}
             </Text>
           )}
@@ -155,11 +155,16 @@ const CreateNotebookDialog = props => {
           transform: "translate(-50%, -50%)",
           borderWidth: 0,
           borderRadius: theme.radii["default"],
-          boxShadow: DIALOG_SHADOW,
+          backgroundColor: theme.colors.background,
+          color: theme.colors.text,
+          boxShadow: theme.shadows["3"],
           width: "20%",
           paddingRight: 40,
           paddingLeft: 40,
           overflowY: "hidden"
+        },
+        overlay: {
+          background: theme.colors.overlay
         }
       }}
       contentLabel="Add a Notebook"
@@ -170,10 +175,12 @@ const CreateNotebookDialog = props => {
           alignItems="center"
           alignSelf="center"
           justifyContent="center"
-          color="accent"
+          color="primary"
           py={2}
         >
-          <Icon.BookOpen size={42} />
+          <Box height={42}>
+            <Icon.BookOpen size={42} />
+          </Box>
           <Text
             mx={2}
             as="span"
@@ -196,6 +203,10 @@ const CreateNotebookDialog = props => {
             onChange={e => (CreateNotebookDialog.description = e.target.value)}
             placeholder="Enter description (optional)"
           />
+          <Label>
+            <Checkbox variant="checkbox" />
+            Locked?
+          </Label>
           <Text variant="body" fontWeight="bold" my={1}>
             Topics (optional):
           </Text>

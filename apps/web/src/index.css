@@ -6,6 +6,13 @@ body,
   height: 100%;
   overflow: hidden;
 }
+
+body {
+  font-family: Quicksand, sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+}
+
 @keyframes fadeUp {
   0% {
     transform: translateY(500px);

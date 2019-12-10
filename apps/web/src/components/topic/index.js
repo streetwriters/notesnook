@@ -22,7 +22,7 @@ const Topic = ({ item, index, onClick }) => {
       title={topic.title}
       info={
         <Text>
-          <Text as="span" color="fontPrimary">
+          <Text as="span" color="text">
             {topic.totalNotes} Notes
           </Text>
         </Text>

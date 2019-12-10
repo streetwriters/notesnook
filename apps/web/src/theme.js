@@ -1,23 +1,42 @@
-export const SHADOW = "0 0 8px 0px #aaaaaa44";
-export const DIALOG_SHADOW = "0 0 20px 0px #aaaaaa77";
 export const ButtonPressedStyle = {
   ":active": {
     opacity: "0.8"
   }
 };
+const colorsLight = makeTheme({
+  background: "white",
+  accent: "white",
+  navbg: "#f0f0f0",
+  border: "#f0f0f0",
+  hover: "#e0e0e0",
+  fontSecondary: "white",
+  text: "black",
+  overlay: "rgba(255, 255, 255, 0.75)"
+});
+const colorsDark = makeTheme({
+  background: "#1f1f1f",
+  accent: "#000",
+  navbg: "#2b2b2b",
+  border: "#2b2b2b",
+  hover: "#3b3b3b",
+  fontSecondary: "#000",
+  text: "#fff",
+  overlay: "rgba(0, 0, 0, 0.75)"
+});
+const shadowsDark = {
+  1: "0 0 0px 0px #00000000",
+  2: "0 0 8px 0px #55555544",
+  3: "0 0 20px 0px #55555599"
+};
+const shadowsLight = {
+  1: "0 0 20px 0px #1790F3aa",
+  2: "0 0 8px 0px #aaaaaa44",
+  3: "0 0 20px 0px #aaaaaa77"
+};
+
 export default {
   breakpoints: ["480px", "834px", "1200px"],
-  colors: {
-    primary: "white",
-    accent: "#1790F3",
-    navbg: "#f0f0f0",
-    transparent: "#00000000",
-    //font related
-    fontPrimary: "black",
-    fontSecondary: "white",
-    border: "#f0f0f0",
-    hover: "#e0e0e0"
-  },
+  colors: colorsLight,
   space: [0, 5, 10, 12],
   fontSizes: {
     heading: 36,
@@ -47,7 +66,6 @@ export default {
     default: {
       borderWidth: 0,
       borderRadius: "default",
-      bg: "primary",
       border: "2px solid",
       borderColor: "border",
       fontFamily: "body",
@@ -55,27 +73,17 @@ export default {
       fontSizes: "input",
       ":focus": {
         outline: "none",
-        borderColor: "accent"
+        borderColor: "primary"
       },
       ":hover": {
         borderColor: "hover"
       }
     },
     search: {
-      borderWidth: 0,
-      borderRadius: "default",
-      bg: "primary",
-      border: "2px solid",
-      borderColor: "border",
-      fontFamily: "body",
-      fontWeight: "body",
-      fontSizes: "input",
+      variant: "forms.default",
       ":focus": {
         outline: "none",
-        boxShadow: SHADOW
-      },
-      ":hover": {
-        borderColor: "hover"
+        boxShadow: 2
       }
     }
   },
@@ -83,7 +91,8 @@ export default {
     heading: {
       fontFamily: "body",
       fontWeight: "heading",
-      fontSize: "heading"
+      fontSize: "heading",
+      color: "text"
     },
     title: {
       fontFamily: "body",
@@ -97,18 +106,9 @@ export default {
     }
   },
   buttons: {
-    nav: {
-      color: "fontPrimary",
-      bg: "transparent",
-      fontFamily: "body",
-      fontWeight: "body",
-      ":focus": {
-        outline: "none"
-      }
-    },
     primary: {
       color: "fontSecondary",
-      bg: "accent",
+      bg: "primary",
       borderRadius: "default",
       fontFamily: "body",
       fontWeight: "body",
@@ -118,31 +118,56 @@ export default {
       ...ButtonPressedStyle
     },
     secondary: {
-      color: "fontPrimary",
+      variant: "buttons.primary",
+      color: "text",
       bg: "navbg",
-      borderRadius: "default",
-      fontFamily: "body",
-      fontWeight: "body",
-      ":focus": {
-        outline: "none"
-      },
       ...ButtonPressedStyle
     },
     tertiary: {
-      color: "fontPrimary",
+      variant: "buttons.primary",
+      color: "text",
       bg: "transparent",
-      borderRadius: "default",
       border: "2px solid",
       borderColor: "border",
+      ":active": {
+        color: "primary",
+        opacity: 0.8
+      }
+    },
+    nav: {
+      bg: "transparent",
       fontFamily: "body",
       fontWeight: "body",
       ":focus": {
         outline: "none"
-      },
-      ":active": {
-        color: "accent",
-        opacity: 0.8
       }
     }
-  }
+  },
+  shadows: shadowsLight
 };
+
+function makeTheme({
+  background,
+  accent,
+  navbg,
+  border,
+  hover,
+  fontSecondary,
+  text,
+  overlay
+}) {
+  return {
+    background,
+    primary: "#1790F3",
+    //secondary: "",
+    accent,
+    //custom
+    navbg,
+    border,
+    hover,
+    fontSecondary,
+    transparent: "#00000000",
+    text,
+    overlay
+  };
+}

@@ -29,7 +29,7 @@ const Notebook = ({ item, index, onClick, onTopicClick }) => {
                 e.stopPropagation();
               }}
               key={topic.dateCreated + topic.title}
-              bg="accent"
+              bg="primary"
               px={1}
               py={1}
               sx={{
@@ -48,7 +48,7 @@ const Notebook = ({ item, index, onClick, onTopicClick }) => {
       info={
         <Text>
           {new Date(notebook.dateCreated).toDateString().substring(4)}
-          <Text as="span" color="fontPrimary">
+          <Text as="span" color="text">
             {" • " + notebook.totalNotes} Notes
           </Text>
         </Text>

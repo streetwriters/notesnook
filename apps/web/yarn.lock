@@ -6996,7 +6996,7 @@ normalize-url@^3.0.0, normalize-url@^3.0.1:
 
 "notes-core@https://github.com/thecodrr/notes-core.git":
   version "0.2.0"
-  resolved "https://github.com/thecodrr/notes-core.git#281414d69b6bdc73b70e5347745ce8b797b55991"
+  resolved "https://github.com/thecodrr/notes-core.git#82058c8fa60c370644320fea5e1b4bb0c393c4df"
   dependencies:
     fast-filter "^1.0.4"
     fuzzysearch "^1.0.3"

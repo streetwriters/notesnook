@@ -40,7 +40,7 @@ const Snackbar = props => (
       }}
       alignItems="center"
       flexDirection="row"
-      bg="accent"
+      bg="primary"
       py={2}
       px={2}
     >

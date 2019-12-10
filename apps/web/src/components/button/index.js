@@ -4,7 +4,7 @@ import { ButtonPressedStyle } from "../../theme";
 
 const Button = props => (
   <Flex
-    bg="accent"
+    bg="primary"
     width={props.width || "full"}
     py={3}
     px={3}
@@ -16,7 +16,7 @@ const Button = props => (
       color: "fontSecondary",
       fontFamily: "body",
       fontWeight: "body",
-      boxShadow: "0 0 20px 0px #1790F3aa",
+      boxShadow: 1,
       ...ButtonPressedStyle,
       ...props.style
     }}
