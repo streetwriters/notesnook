@@ -71,7 +71,7 @@ class Database {
       content: note.content,
       pinned: note.pinned || false,
       tags: note.tags || [],
-      notebooks: note.notebooks || {},
+      notebook: note.notebook || {},
       colors: note.colors || [],
       favorite: note.favorite || false,
       headline:
@@ -215,8 +215,11 @@ class Database {
         //increment totalNotes count
         notebook.topics[topicIndex].totalNotes++;
         notebook.totalNotes++;
-        //add notebookId to the note
-        this.notes[noteId].notebooks[notebookId] = notebook.title;
+        //add notebook to the note
+        this.notes[noteId].notebook = {
+          notebook: notebookId,
+          topic: notebook.topics[topicIndex].title
+        };
         return true;
       }
     );
@@ -239,7 +242,7 @@ class Database {
         if (index <= -1) return false;
         notebook.topics[topicIndex].notes.splice(index, 1);
         //delete notebook from note
-        delete this.notes[noteId].notebooks[notebookId];
+        this.notes[noteId].notebook = {};
         //decrement totalNotes count
         notebook.topics[topicIndex].totalNotes--;
         notebook.totalNotes--;
