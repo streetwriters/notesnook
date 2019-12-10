@@ -29,7 +29,7 @@ import WebView from 'react-native-webview';
 import Icon from 'react-native-vector-icons/Feather';
 import {useForceUpdate} from '../ListsEditor';
 import {NavigationEvents} from 'react-navigation';
-import {storage} from '../../../App';
+import {db} from '../../../App';
 import {SideMenuEvent} from '../../utils/utils';
 import {Dialog} from '../../components/Dialog';
 
@@ -104,7 +104,7 @@ const Editor = ({navigation}) => {
       };
     }
 
-    timestamp = await storage.addNote({
+    timestamp = await db.addNote({
       title,
       content,
       dateCreated: timestamp,

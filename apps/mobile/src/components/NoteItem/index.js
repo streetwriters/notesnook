@@ -28,7 +28,7 @@ import NavigationService from '../../services/NavigationService';
 import Menu, {MenuItem, MenuDivider} from 'react-native-material-menu';
 import {Dialog} from '../Dialog';
 import {VaultDialog} from '../VaultDialog';
-import {storage} from '../../../App';
+import {db} from '../../../App';
 
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
@@ -64,7 +64,7 @@ const NoteItem = props => {
   };
 
   const deleteItem = async () => {
-    await storage.deleteNotes([item]);
+    await db.deleteNotes([item]);
     ToastEvent.show('Note moved to trash', 'success', 3000);
     setVisible(false);
     props.refresh();

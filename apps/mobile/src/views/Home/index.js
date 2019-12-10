@@ -25,7 +25,7 @@ import {w, h} from '../../utils/utils';
 import {Header} from '../../components/header';
 import {NavigationEvents} from 'react-navigation';
 import {NotesList} from '../../components/NotesList';
-import {storage} from '../../../App';
+import {db} from '../../../App';
 import Icon from 'react-native-vector-icons/Feather';
 import NavigationService from '../../services/NavigationService';
 import {useForceUpdate} from '../ListsEditor';
@@ -42,7 +42,7 @@ export const Home = ({navigation}) => {
   const [text, setText] = useState('');
   const [update, setUpdate] = useState(0);
   const [hideHeader, setHideHeader] = useState(false);
-  const [margin, setMargin] = useState(150);
+  const [margin, setMargin] = useState(190);
   const [buttonHide, setButtonHide] = useState(false);
   const [notes, setNotes] = useState([]);
   const [keyword, setKeyword] = useState('');
@@ -76,11 +76,8 @@ export const Home = ({navigation}) => {
   }, []);
 
   const fetchNotes = () => {
-    setTimeout(() => {
-      allNotes = storage.getNotes();
-
-      setNotes(allNotes);
-    }, 0);
+    allNotes = db.getNotes();
+    setNotes(allNotes);
   };
 
   useEffect(() => {
@@ -120,7 +117,7 @@ export const Home = ({navigation}) => {
     } else {
       setSearch(true);
       setKeyword(text);
-      searchResults = await storage.searchNotes(text);
+      searchResults = await db.searchNotes(text);
       if (searchResults) {
         setNotes(searchResults);
       }
@@ -153,6 +150,7 @@ export const Home = ({navigation}) => {
   };
 
   const setMarginTop = () => {
+    return;
     if (headerHeight < 30 || searchHeight < 30) {
       return;
     }

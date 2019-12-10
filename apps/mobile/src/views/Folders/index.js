@@ -33,7 +33,7 @@ import {useForceUpdate} from '../ListsEditor';
 import {AddNotebookDialog} from '../../components/AddNotebookDialog';
 import {NotebookItem} from '../../components/NotebookItem';
 import {Search} from '../../components/SearchInput';
-import {storage} from '../../../App';
+import {db} from '../../../App';
 import {Header} from '../../components/header';
 import {AnimatedSafeAreaView} from '../Home';
 import * as Animatable from 'react-native-animatable';
@@ -55,6 +55,7 @@ export const Folders = ({navigation}) => {
   let marginSet = false;
 
   const setMarginTop = () => {
+    return;
     if (headerHeight < 30 || searchHeight < 30) {
       return;
     }
@@ -68,8 +69,8 @@ export const Folders = ({navigation}) => {
   };
 
   useEffect(() => {
-    setNotebooks(storage.getNotebooks());
-    console.log(storage.getNotebooks());
+    setNotebooks(db.getNotebooks());
+    console.log(db.getNotebooks());
   }, []);
 
   useEffect(() => {
@@ -101,7 +102,7 @@ export const Folders = ({navigation}) => {
         close={newNotes => {
           setAddNotebook(false);
           if (newNotes) {
-            setNotebooks(storage.getNotebooks());
+            setNotebooks(db.getNotebooks());
           }
         }}
       />
@@ -164,6 +165,8 @@ export const Folders = ({navigation}) => {
           }}
           ListHeaderComponent={
             <View
+              transition="marginTop"
+              duration={200}
               style={{
                 marginTop: margin,
               }}
@@ -177,7 +180,7 @@ export const Folders = ({navigation}) => {
               isMove={params.isMove}
               noteToMove={params.note}
               item={item}
-              refresh={() => setNotebooks(storage.getNotebooks())}
+              refresh={() => setNotebooks(db.getNotebooks())}
               index={index}
               colors={colors}
             />

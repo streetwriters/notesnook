@@ -11,6 +11,7 @@ import {
   Platform,
   Text,
   Keyboard,
+  Animated,
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import {
@@ -29,14 +30,16 @@ import {
 } from './src/common/common';
 import Icon from 'react-native-vector-icons/Ionicons';
 import ActionButton from 'react-native-action-button';
-import Storage from 'notes-core/api/database';
-import StorageInterface from './src/utils/storage';
 import * as Animatable from 'react-native-animatable';
 import {h, w} from './src/utils/utils';
 import {Toast} from './src/components/Toast';
 import {Menu} from './src/components/Menu';
 import SideMenu from 'react-native-side-menu';
 import {useForceUpdate} from './src/views/ListsEditor';
+import Storage from 'notes-core/api/database';
+import StorageInterface from './src/utils/storage';
+export const db = new Storage(StorageInterface);
+
 const App = () => {
   const [colors, setColors] = useState(COLOR_SCHEME);
   const [fab, setFab] = useState(true);
@@ -44,6 +47,8 @@ const App = () => {
   const [isOpen, setOpen] = useState(false);
   const [disableGestures, setDisableGesture] = useState(false);
   const [buttonHide, setButtonHide] = useState(false);
+  const [isIntialized, setIsInitialized] = useState(false);
+
   useEffect(() => {
     let theme = COLOR_SCHEME_LIGHT;
     AsyncStorage.getItem('accentColor').then(accentColor => {
@@ -162,6 +167,15 @@ const App = () => {
     };
   }, []);
 
+  useEffect(() => {
+    db.init().then(() => {
+      setIsInitialized(true);
+    });
+  });
+
+  if (!isIntialized) {
+    return <View />;
+  }
   return (
     <View
       style={{
@@ -279,5 +293,3 @@ const App = () => {
 };
 
 export default App;
-
-export const storage = new Storage(StorageInterface);

@@ -143,6 +143,7 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
                 activeOpacity={opacity}
                 onPress={() => {
                   item.close === false ? null : close();
+
                   item.func();
                 }}
                 style={{

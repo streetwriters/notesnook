@@ -31,7 +31,7 @@ import {Search} from '../../components/SearchInput';
 import {useForceUpdate} from '../ListsEditor';
 import {NotesList} from '../../components/NotesList';
 import {AnimatedSafeAreaView} from '../Home';
-import {storage} from '../../../App';
+import {db} from '../../../App';
 import * as Animatable from 'react-native-animatable';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
@@ -70,7 +70,7 @@ export const Notes = ({navigation}) => {
   }, []);
 
   useEffect(() => {
-    let allNotes = storage.getTopic(params.notebookID, params.title);
+    let allNotes = db.getTopic(params.notebookID, params.title);
     if (allNotes && allNotes.length > 0) {
       setNotes(allNotes);
     }

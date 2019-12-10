@@ -38,13 +38,15 @@ import * as Animatable from 'react-native-animatable';
 import {NavigationEvents} from 'react-navigation';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
-
+const AnimatedTouchableOpacity = Animatable.createAnimatableComponent(
+  TouchableOpacity,
+);
 export const Notebook = ({navigation}) => {
   // State
   const [colors, setColors] = useState(COLOR_SCHEME);
   const params = navigation.state.params;
   const [hideHeader, setHideHeader] = useState(false);
-  const [margin, setMargin] = useState(150);
+  const [margin, setMargin] = useState(190);
   const [buttonHide, setButtonHide] = useState(false);
   const [addTopic, setAddTopic] = useState(false);
   const forceUpdate = useForceUpdate();
@@ -70,6 +72,7 @@ export const Notebook = ({navigation}) => {
 
   // Functions
   const setMarginTop = () => {
+    return;
     console.log(params.notebook);
     if (headerHeight < 30 || searchHeight < 30) {
       return;
@@ -167,7 +170,9 @@ export const Notebook = ({navigation}) => {
               {params.hideMore ? (
                 <View style={{marginTop: margin}} />
               ) : (
-                <TouchableOpacity
+                <AnimatedTouchableOpacity
+                  transition="marginTop"
+                  duration={200}
                   activeOpacity={opacity}
                   onPress={() => {
                     setAddNotebook(true);
@@ -194,7 +199,7 @@ export const Notebook = ({navigation}) => {
                     }}>
                     View All Notes
                   </Text>
-                </TouchableOpacity>
+                </AnimatedTouchableOpacity>
               )}
             </>
           }

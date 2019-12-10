@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {View, Text, FlatList, Platform} from 'react-native';
 
 import {COLOR_SCHEME, SIZE, WEIGHT} from '../../common/common';
-
+import * as Animatable from 'react-native-animatable';
 import NoteItem from '../NoteItem';
 
 export const NotesList = ({
@@ -43,6 +43,9 @@ export const NotesList = ({
         <>
           {isSearch ? (
             <Text
+              transition="marginTop"
+              delay={200}
+              duration={200}
               style={{
                 fontSize: SIZE.lg,
                 marginTop: margin,
@@ -60,7 +63,7 @@ export const NotesList = ({
               </Text>
             </Text>
           ) : (
-            <View style={{marginTop: margin}} />
+            <View style={{marginTop: margin}}></View>
           )}
         </>
       }

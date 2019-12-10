@@ -26,7 +26,7 @@ import Icon from 'react-native-vector-icons/Feather';
 import {getElevation, h, w, timeSince, ToastEvent} from '../../utils/utils';
 import {FlatList, TextInput} from 'react-native-gesture-handler';
 import {useForceUpdate} from '../../views/ListsEditor';
-import {storage} from '../../../App';
+import {db} from '../../../App';
 
 let refs = [];
 

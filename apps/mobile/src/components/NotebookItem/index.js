@@ -5,7 +5,7 @@ import Menu, {MenuItem, MenuDivider} from 'react-native-material-menu';
 import {COLOR_SCHEME, SIZE, ph, pv, opacity, WEIGHT} from '../../common/common';
 import Icon from 'react-native-vector-icons/Feather';
 import {w, ToastEvent} from '../../utils/utils';
-import {storage} from '../../../App';
+import {db} from '../../../App';
 import {Dialog} from '../Dialog';
 import {AddTopicDialog} from '../AddTopicDialog';
 export const NotebookItem = ({
@@ -27,10 +27,10 @@ export const NotebookItem = ({
 
   const deleteItem = async () => {
     if (isTopic) {
-      await storage.deleteTopicFromNotebook(notebookID, item.title);
+      await db.deleteTopicFromNotebook(notebookID, item.title);
       ToastEvent.show('Topic moved to trash', 'success', 3000);
     } else {
-      await storage.deleteNotebooks([item]);
+      await db.deleteNotebooks([item]);
       ToastEvent.show('Notebook moved to trash', 'success', 3000);
     }
     refresh();
@@ -277,7 +277,7 @@ export const NotebookItem = ({
           <TouchableOpacity
             activeOpacity={opacity}
             onPress={async () => {
-              await storage.addNoteToTopic(
+              await db.addNoteToTopic(
                 notebookID,
                 item.title,
                 noteToMove.dateCreated,

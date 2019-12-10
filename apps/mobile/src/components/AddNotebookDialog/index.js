@@ -26,7 +26,7 @@ import Icon from 'react-native-vector-icons/Feather';
 import {getElevation, h, w, timeSince, ToastEvent} from '../../utils/utils';
 import {FlatList, TextInput} from 'react-native-gesture-handler';
 import {useForceUpdate} from '../../views/ListsEditor';
-import {storage} from '../../../App';
+import {db} from '../../../App';
 
 let refs = [];
 
@@ -102,7 +102,7 @@ export const AddNotebookDialog = ({visible, close}) => {
     if (!title)
       return ToastEvent.show('Title is required', 'error', 3000, () => {}, '');
 
-    await storage.addNotebook({
+    await db.addNotebook({
       title,
       description,
       topics,
