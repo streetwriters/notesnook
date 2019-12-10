@@ -21,6 +21,8 @@ import {
   opacity,
   FONT,
   WEIGHT,
+  onThemeUpdate,
+  clearThemeUpdateListener,
 } from '../../common/common';
 import WebView from 'react-native-webview';
 import Icon from 'react-native-vector-icons/Feather';
@@ -32,17 +34,23 @@ import {Dialog} from '../../components/Dialog';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import * as Animatable from 'react-native-animatable';
 import Menu, {MenuItem, MenuDivider} from 'react-native-material-menu';
-
+import SideMenu from 'react-native-side-menu';
+import {EditorMenu} from '../../components/EditorMenu';
+import {AnimatedSafeAreaView} from '../Home';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
 var timestamp = null;
 var content = null;
 var title = null;
+let titleRef;
+let EditorWebView;
+let animatedViewRef;
 const AnimatedTouchableOpacity = Animatable.createAnimatableComponent(
   TouchableOpacity,
 );
 const AnimatedTextInput = Animatable.createAnimatableComponent(TextInput);
+
 const Editor = ({navigation}) => {
   // STATE
 
@@ -50,16 +58,16 @@ const Editor = ({navigation}) => {
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [dialog, setDialog] = useState(false);
   const [resize, setResize] = useState(false);
+  const [sidebar, setSidebar] = useState('30%');
+  const [isOpen, setOpen] = useState(false);
+
   // VARIABLES
 
   let updateInterval = null;
   let keyboardDidShowListener = null;
   let keyboardDidHideListener = null;
   let setMenuRef;
-  // REFS
-
-  let EditorWebView = createRef();
-  const _textRender = createRef();
+  const forceUpdate = useForceUpdate();
 
   // FUNCTIONS
 
@@ -68,7 +76,7 @@ const Editor = ({navigation}) => {
     setKeyboardHeight(e.endCoordinates.height);
   };
 
-  const post = value => EditorWebView.current.postMessage(value);
+  const post = value => EditorWebView.postMessage(value);
 
   const _keyboardDidHide = () => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -92,11 +100,35 @@ const Editor = ({navigation}) => {
     }
   };
 
+  const onWebViewLoad = () => {
+    post(JSON.stringify(colors));
+    if (navigation.state.params && navigation.state.params.note) {
+      let note = navigation.state.params.note;
+      titleRef.setNativeProps({
+        text: note.title,
+      });
+      title = note.title;
+      timestamp = note.dateCreated;
+      post(JSON.stringify(note.content.delta));
+    }
+    if (content && content.delta) {
+      post(JSON.stringify(content.delta));
+    }
+  };
+  const onTitleTextChange = value => {
+    title = value;
+    if (title.length > 12) {
+      setResize(true);
+    } else if (title.length < 12) {
+      setResize(false);
+    }
+  };
+
   const _renderEditor = () => {
     return (
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : null}
-        style={{height: '100%', backgroundColor: colors.bg}}>
+        style={{height: '100%'}}>
         <View
           style={{
             height: '100%',
@@ -134,6 +166,7 @@ const Editor = ({navigation}) => {
             <AnimatedTextInput
               transition="fontSize"
               placeholder="Untitled Note"
+              ref={ref => (titleRef = ref)}
               placeholderTextColor={colors.icon}
               style={{
                 width: '80%',
@@ -143,153 +176,36 @@ const Editor = ({navigation}) => {
                 maxWidth: '90%',
                 paddingVertical: 0,
               }}
-              onChangeText={value => {
-                title = value;
-                if (title.length > 12) {
-                  setResize(true);
-                } else if (title.length < 12) {
-                  setResize(false);
-                }
-              }}
-              onSubmitEditing={async () => await saveNote()}
+              onChangeText={onTitleTextChange}
+              onSubmitEditing={saveNote}
             />
 
-            <Menu
-              style={{
-                borderRadius: 5,
-                backgroundColor: colors.nav,
+            <AnimatedTouchableOpacity
+              transition={['width', 'height']}
+              duration={250}
+              onPress={() => {
+                setOpen(true);
               }}
-              ref={ref => (setMenuRef = ref)}
-              button={
-                <AnimatedTouchableOpacity
-                  transition={['width', 'height']}
-                  duration={250}
-                  onPress={() => setMenuRef.show()}
-                  style={{
-                    width: resize ? 35 : 40,
-                    height: resize ? 35 : 40,
-                  }}>
-                  <Icon
-                    style={{
-                      paddingRight: 10,
-                      marginTop: 5,
-                    }}
-                    name="more-vertical"
-                    color={colors.icon}
-                    size={resize ? SIZE.xl : SIZE.xxl}
-                  />
-                </AnimatedTouchableOpacity>
-              }>
-              <MenuItem
-                textStyle={{
-                  color: colors.pri,
+              style={{
+                width: resize ? 35 : 40,
+                height: resize ? 35 : 40,
+                justifyContent: 'center',
 
-                  fontFamily: WEIGHT.regular,
-                  fontSize: SIZE.sm,
-                }}>
-                <Icon name="star" size={SIZE.sm} color={colors.icon} />
-                {'  '}Pin
-              </MenuItem>
-              <MenuItem
-                onPress={() => {
-                  setMenuRef.hide();
-                  ToastEvent.show(
-                    'Note added to favorites.',
-                    'success',
-                    3000,
-                    () => {},
-                    'Ok',
-                  );
-                }}
-                textStyle={{
-                  color: colors.pri,
-                  fontFamily: WEIGHT.regular,
-                  fontSize: SIZE.sm,
-                }}>
-                <Icon name="star" size={SIZE.sm} color={colors.icon} />
-                {'  '}Favorite
-              </MenuItem>
-              <MenuItem
-                textStyle={{
-                  color: colors.pri,
-                  fontFamily: WEIGHT.regular,
-                  fontSize: SIZE.sm,
-                }}>
-                <Icon name="tag" size={SIZE.sm} color={colors.icon} />
-                {'  '}Add Tags
-              </MenuItem>
-
-              <MenuItem
-                textStyle={{
-                  color: colors.pri,
-                  fontFamily: WEIGHT.regular,
-                  fontSize: SIZE.sm,
-                }}>
-                <Icon name="share" size={SIZE.sm} color={colors.icon} />
-                {'  '}Share
-              </MenuItem>
-
-              <MenuItem
-                onPress={() => {
-                  setMenuRef.hide();
-                  NavigationService.navigate('Folders', {
-                    note: item,
-                    title: 'Choose Notebook',
-                    isMove: true,
-                    hideMore: true,
-                  });
-                }}
-                textStyle={{
-                  color: colors.pri,
-                  fontFamily: WEIGHT.regular,
-                  fontSize: SIZE.sm,
-                }}>
-                <Icon name="arrow-right" size={SIZE.sm} color={colors.icon} />
-                {'  '}Move
-              </MenuItem>
-
-              <MenuItem
-                onPress={() => {
-                  setMenuRef.hide();
-                  setVaultDialog(true);
-                }}
-                textStyle={{
-                  color: colors.pri,
-                  fontFamily: WEIGHT.regular,
-                  fontSize: SIZE.sm,
-                }}>
-                <Icon name="lock" size={SIZE.sm} color={colors.icon} />
-                {'  '}Lock
-              </MenuItem>
-
-              <MenuItem
-                onPress={() => {
-                  setVisible(true);
-                  setMenuRef.hide();
-                }}
-                textStyle={{
-                  color: colors.pri,
-
-                  fontFamily: WEIGHT.regular,
-                  fontSize: SIZE.sm,
-                }}>
-                <Icon name="trash" size={SIZE.sm} color={colors.icon} />
-                {'  '}Delete
-              </MenuItem>
-            </Menu>
+                alignItems: 'center',
+                paddingTop: 3,
+              }}>
+              <Icon
+                name="menu"
+                color="white"
+                size={resize ? SIZE.xl : SIZE.xxl}
+              />
+            </AnimatedTouchableOpacity>
           </View>
 
           <WebView
-            ref={EditorWebView}
+            ref={ref => (EditorWebView = ref)}
             onError={error => console.log(error)}
-            onLoad={() => {
-              post(JSON.stringify(colors));
-              if (navigation.state.params && navigation.state.params.note) {
-                let note = navigation.state.params.note;
-
-                post(JSON.stringify(note.content.delta));
-              }
-            }}
+            onLoad={onWebViewLoad}
             javaScriptEnabled
             onShouldStartLoadWithRequest={request => {
               if (request.url.includes('https')) {
@@ -299,6 +215,15 @@ const Editor = ({navigation}) => {
                 return true;
               }
             }}
+            renderLoading={() => (
+              <View
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  backgroundColor: 'transparent',
+                }}
+              />
+            )}
             cacheEnabled={true}
             cacheMode="LOAD_CACHE_ELSE_NETWORK"
             domStorageEnabled
@@ -316,7 +241,7 @@ const Editor = ({navigation}) => {
             style={{
               height: '100%',
               maxHeight: '100%',
-              backgroundColor: colors.bg,
+              backgroundColor: 'transparent',
             }}
             onMessage={evt => {
               if (evt.nativeEvent.data !== '') {
@@ -338,21 +263,9 @@ const Editor = ({navigation}) => {
   useEffect(() => {
     BackHandler.addEventListener('hardwareBackPress', () => {
       setDialog(true);
-
       return true;
     });
   });
-
-  useEffect(() => {
-    if (navigation.state.params && navigation.state.params.note) {
-      let note = navigation.state.params.note;
-      titleRef.current.setNativeProps({
-        text: note.title,
-      });
-      title = note.title;
-      timestamp = note.dateCreated;
-    }
-  }, []);
 
   useEffect(() => {
     keyboardDidShowListener = Keyboard.addListener(
@@ -397,23 +310,62 @@ const Editor = ({navigation}) => {
     };
   }, []);
 
+  useEffect(() => {
+    onThemeUpdate(() => {
+      shouldFade = true;
+      forceUpdate();
+    });
+    return () => {
+      clearThemeUpdateListener(() => {
+        forceUpdate();
+      });
+    };
+  }, []);
+
+  useEffect(() => {
+    EditorWebView.reload();
+  }, [colors.bg]);
+
   return (
-    <SafeAreaView style={{height: '100%', backgroundColor: colors.bg}}>
-      <Dialog
-        title="Close Editor"
-        visible={dialog}
-        icon="x"
-        paragraph="Are you sure you want to close editor?"
-        close={() => {
-          setDialog(false);
-        }}
-        positivePress={() => {
-          navigation.goBack();
-          setDialog(false);
-        }}
-      />
-      {_renderEditor()}
-    </SafeAreaView>
+    <SideMenu
+      isOpen={isOpen}
+      bounceBackOnOverdraw={false}
+      contentContainerStyle={{
+        opacity: 0,
+      }}
+      openMenuOffset={w / 1.2}
+      menuPosition="right"
+      onChange={args => {
+        setOpen(args);
+      }}
+      menu={
+        <EditorMenu
+          hide={false}
+          close={() => {
+            setOpen(false);
+          }}
+        />
+      }>
+      <AnimatedSafeAreaView
+        transition="backgroundColor"
+        duration={1000}
+        style={{height: '100%', backgroundColor: colors.bg}}>
+        <Dialog
+          title="Close Editor"
+          visible={dialog}
+          icon="x"
+          paragraph="Are you sure you want to close editor?"
+          close={() => {
+            setDialog(false);
+          }}
+          positivePress={() => {
+            navigation.goBack();
+            setDialog(false);
+          }}
+        />
+        {_renderEditor()}
+      </AnimatedSafeAreaView>
+    </SideMenu>
   );
 };
 

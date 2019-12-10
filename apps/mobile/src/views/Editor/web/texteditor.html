@@ -16,17 +16,19 @@
     <style>
       .app-body {
         margin: 0px;
+        background-color:transparent
       }
 
       .floating-toolbar {
         position: fixed;
         bottom: 0;
         width: 100%;
-        background-color: white;
+        background-color: transparent;
       }
 
       #editor {
         border: hidden !important;
+        background-color:transparent
       }
     </style>
 
@@ -808,6 +810,13 @@
       .ql-snow .ql-tooltip[data-mode='video']::before {
         content: 'Enter video:';
       }
+
+      #toolbar {
+    background-color: transparent;
+  }
+  .ql-container {
+    background-color:transparent;
+  }
     </style>
   </head>
 
@@ -1228,12 +1237,11 @@
     bottom: 0px;
     height: 50px;
     left: 0px;
-    background-color: white;
+   
     border-top: 1px solid ${pageTheme.colors.nav};
   }
-  #toolbar {
-    background-color: ${pageTheme.colors.bg};
-  }
+
+  
 
                 `
                 document.body.appendChild(node);
@@ -1242,7 +1250,7 @@
                 $('.ql-toolbar').css('border-top',`1px solid ${pageTheme.colors.nav}`);
                 $('.ql-picker-options').css('background-color',pageTheme.colors.nav);
                 $('.ql-picker-options').css('border-color',pageTheme.colors.nav);
-                $('.ql-container').css('background-color',pageTheme.colors.bg);
+               
                 $('.ql-container').css('color',pageTheme.colors.pri );
                 $('.ql-editor.ql-blank').before(function() {
                 $(this).css('color',pageTheme.colors.icon);

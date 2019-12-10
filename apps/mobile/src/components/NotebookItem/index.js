@@ -139,19 +139,24 @@ export const NotebookItem = ({
                 marginTop: 5,
               }}>
               {item.topics.slice(0, 4).map(topic => (
-                <Text
+                <View
                   style={{
                     borderRadius: 5,
                     backgroundColor: colors.accent,
-                    color: 'white',
-                    marginRight: 5,
-                    fontFamily: WEIGHT.regular,
-                    fontSize: SIZE.xxs,
-                    paddingHorizontal: ph / 2,
+                    paddingHorizontal: ph / 1.5,
                     paddingVertical: pv / 4,
+                    marginRight: 10,
                   }}>
-                  {topic.title}
-                </Text>
+                  <Text
+                    style={{
+                      color: 'white',
+
+                      fontFamily: WEIGHT.regular,
+                      fontSize: SIZE.xxs + 1,
+                    }}>
+                    {topic.title}
+                  </Text>
+                </View>
               ))}
             </View>
           )}
@@ -180,7 +185,7 @@ export const NotebookItem = ({
               <Text
                 style={{
                   color: colors.accent,
-                  fontSize: SIZE.xxs + 2,
+                  fontSize: SIZE.xxs + 1,
                   textAlignVertical: 'center',
                   fontFamily: WEIGHT.regular,
                 }}>

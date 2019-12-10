@@ -52,6 +52,7 @@ export const Folders = ({navigation}) => {
   let countDown = 0;
   let headerHeight = 0;
   let searchHeight = 0;
+  let marginSet = false;
 
   const setMarginTop = () => {
     if (margin !== 150) return;
@@ -59,10 +60,11 @@ export const Folders = ({navigation}) => {
       let toAdd = h * 0.06;
 
       setTimeout(() => {
-        if (margin > headerHeight + searchHeight + toAdd) return;
+        if (marginSet) return;
         setMargin(headerHeight + searchHeight + toAdd);
         headerHeight = 0;
         searchHeight = 0;
+        marginSet = true;
       }, 10);
     }
   };

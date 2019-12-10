@@ -202,7 +202,7 @@ const App = () => {
               close={() => setOpen(false)}
             />
           }
-          openMenuOffset={w / 1.5}>
+          openMenuOffset={w / 1.3}>
           <AppContainer
             style={{
               width: Platform.isPad ? '70%' : '100%',

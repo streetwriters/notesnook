@@ -77,7 +77,7 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
               {
                 name: 'Home',
                 icon: 'home',
-                func: () => NavigationService.navigate('Home'),
+                func: () => NavigationService.push('Home'),
                 close: true,
               },
 
@@ -85,7 +85,7 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
                 name: 'Notebooks',
                 icon: 'book',
                 func: () =>
-                  NavigationService.navigate('Folders', {
+                  NavigationService.push('Folders', {
                     title: 'Notebooks',
                   }),
                 close: true,
@@ -93,13 +93,13 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
               {
                 name: 'Lists',
                 icon: 'list',
-                func: () => NavigationService.navigate('Lists'),
+                func: () => NavigationService.push('Lists'),
                 close: true,
               },
               {
                 name: 'Favorites',
                 icon: 'star',
-                func: () => NavigationService.navigate('Favorites'),
+                func: () => NavigationService.push('Favorites'),
                 close: true,
               },
 
@@ -128,13 +128,13 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
               {
                 name: 'Trash',
                 icon: 'trash',
-                func: () => NavigationService.navigate('Trash'),
+                func: () => NavigationService.push('Trash'),
                 close: true,
               },
               {
                 name: 'Settings',
                 icon: 'settings',
-                func: () => NavigationService.navigate('Settings'),
+                func: () => NavigationService.push('Settings'),
                 close: true,
               },
             ]}
@@ -152,7 +152,7 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
                   flexDirection: 'row',
                   justifyContent: 'space-between',
                   alignItems: 'flex-end',
-                  paddingHorizontal: ph,
+                  paddingHorizontal: '5%',
                   paddingVertical: 15,
                 }}>
                 <View
@@ -201,7 +201,7 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
               flexDirection: 'row',
               justifyContent: 'space-between',
               alignItems: 'flex-end',
-              paddingHorizontal: ph,
+              paddingHorizontal: '5%',
               marginTop: 15,
             }}>
             <View
@@ -237,14 +237,6 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
             </Text>
           </TouchableOpacity>
 
-          <View
-            style={{
-              height: 2,
-              backgroundColor: colors.navbg,
-              width: '100%',
-              marginBottom: 5,
-            }}
-          />
           <ScrollView
             contentContainerStyle={{
               flexDirection: 'row',
@@ -286,14 +278,6 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
             ))}
           </ScrollView>
 
-          <View
-            style={{
-              height: 2,
-              backgroundColor: colors.navbg,
-              width: '100%',
-              marginBottom: 5,
-            }}
-          />
           <ScrollView
             contentContainerStyle={{
               flexDirection: 'row',
