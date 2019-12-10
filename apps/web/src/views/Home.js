@@ -8,12 +8,11 @@ import Search from "../components/search";
 import Note from "../components/note";
 
 function Home() {
-  const [notes, setNotes] = useState([]);
+  const [notes, setNotes] = useState(db.getNotes());
   useEffect(() => {
     function onRefreshNotes() {
       setNotes(db.getNotes());
     }
-    onRefreshNotes();
     ev.addListener("refreshNotes", onRefreshNotes);
     return () => {
       ev.removeListener("refreshNotes", onRefreshNotes);
