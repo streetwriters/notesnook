@@ -13,6 +13,7 @@ import {
   WEIGHT,
 } from '../../common/common';
 import Icon from 'react-native-vector-icons/Feather';
+import {getElevation} from '../../utils/utils';
 
 export const Dialog = ({
   title,
@@ -43,9 +44,9 @@ export const Dialog = ({
         }}>
         <View
           style={{
+            ...getElevation(5),
             width: '80%',
             maxHeight: 350,
-            elevation: 5,
             borderRadius: 5,
             backgroundColor: colors.bg,
             paddingHorizontal: ph,

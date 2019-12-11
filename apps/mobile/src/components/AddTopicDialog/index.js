@@ -52,6 +52,8 @@ export const AddTopicDialog = ({
   return (
     <Modal
       visible={visible}
+      animated
+      animationType="fade"
       transparent={true}
       onRequestClose={() => (refs = [])}>
       <View
@@ -64,9 +66,10 @@ export const AddTopicDialog = ({
         }}>
         <View
           style={{
+            ...getElevation(5),
             width: '80%',
             maxHeight: 350,
-            elevation: 5,
+
             borderRadius: 5,
             backgroundColor: colors.bg,
             paddingHorizontal: ph,

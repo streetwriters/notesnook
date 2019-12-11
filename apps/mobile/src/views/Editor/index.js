@@ -320,7 +320,8 @@ const Editor = ({navigation}) => {
     SideMenuEvent.close();
     SideMenuEvent.disable();
     return () => {
-      SideMenuEvent.open();
+      Platform.isPad ? SideMenuEvent.open() : null;
+
       SideMenuEvent.enable();
     };
   });

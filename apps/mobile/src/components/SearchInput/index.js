@@ -25,13 +25,18 @@ export const Search = props => {
         props.sendHeight(e.nativeEvent.layout.height);
       }}
       transition="opacity"
-      duration={300}
+      duration={200}
       style={{
         opacity: props.hide ? 0 : 1,
       }}>
       <Animatable.View
-        transition="height"
-        duration={400}
+        transition={[
+          'marginTop',
+          'borderWidth',
+          'marginBottom',
+          'paddingVertical',
+        ]}
+        duration={300}
         style={{
           flexDirection: 'row',
           justifyContent: 'space-between',
@@ -41,7 +46,6 @@ export const Search = props => {
           borderRadius: br,
           borderWidth: props.hide ? 0 : 1.5,
           paddingHorizontal: ph,
-
           paddingVertical: props.hide
             ? 0
             : Platform.OS == 'ios'
@@ -49,7 +53,7 @@ export const Search = props => {
             : pv - 8,
           marginBottom: props.hide ? 0 : 10,
           borderColor: focus ? colors.accent : colors.nav,
-          height: props.hide ? 0 : 55,
+          marginTop: props.hide ? -60 : 0,
         }}>
         <TextInput
           ref={inputRef}

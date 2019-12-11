@@ -2,8 +2,9 @@ import React, {useEffect, useState} from 'react';
 import {View, TouchableOpacity, Platform, Text} from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import {SIZE, WEIGHT} from '../../common/common';
-import {h} from '../../utils/utils';
+import {h, SideMenuEvent} from '../../utils/utils';
 import * as Animatable from 'react-native-animatable';
+import NavigationService from '../../services/NavigationService';
 
 export const Header = ({
   heading,
@@ -11,6 +12,7 @@ export const Header = ({
   canGoBack = true,
   hide,
   showSearch,
+  menu,
   sendHeight = e => {},
 }) => {
   return (
@@ -44,18 +46,48 @@ export const Header = ({
         }}>
         {canGoBack ? (
           <TouchableOpacity
+            hitSlop={{top: 20, bottom: 20, left: 50, right: 40}}
+            onPress={() => {
+              NavigationService.goBack();
+            }}
             style={{
-              justifyContent: 'center',
-              alignItems: 'center',
-              paddingRight: 15,
+              justifyContent: 'flex-start',
+              alignItems: 'flex-start',
               height: 40,
-              width: 40,
-              marginTop: 5,
+              width: 25,
             }}>
             <Icon
+              style={{
+                marginLeft: -10,
+                marginTop: 5,
+              }}
               color={colors.pri}
               name={'chevron-left'}
               size={hide ? SIZE.xl : SIZE.xxl}
+            />
+          </TouchableOpacity>
+        ) : (
+          undefined
+        )}
+        {menu ? (
+          <TouchableOpacity
+            hitSlop={{top: 20, bottom: 20, left: 50, right: 40}}
+            onPress={() => {
+              SideMenuEvent.open();
+            }}
+            style={{
+              justifyContent: 'flex-start',
+              alignItems: 'flex-start',
+              height: 40,
+              width: 42,
+            }}>
+            <Icon
+              style={{
+                marginTop: 6,
+              }}
+              color={colors.pri}
+              name={'menu'}
+              size={hide ? SIZE.xl : SIZE.xxl - 2}
             />
           </TouchableOpacity>
         ) : (

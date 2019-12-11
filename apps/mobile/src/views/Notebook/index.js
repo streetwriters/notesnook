@@ -130,7 +130,7 @@ export const Notebook = ({navigation}) => {
             }}
             colors={colors}
             heading={params.title}
-            canGoBack={false}
+            canGoBack={true}
           />
 
           <Search

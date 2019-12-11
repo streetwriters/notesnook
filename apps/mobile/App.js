@@ -5,23 +5,14 @@ import NavigationService, {
 import {
   StatusBar,
   View,
-  SafeAreaView,
-  TouchableOpacity,
   DeviceEventEmitter,
   Platform,
-  Text,
   Keyboard,
-  Animated,
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import {
   COLOR_SCHEME,
   COLOR_SCHEME_DARK,
-  SIZE,
-  opacity,
-  WEIGHT,
-  pv,
-  ph,
   setColorScheme,
   onThemeUpdate,
   clearThemeUpdateListener,
@@ -77,10 +68,10 @@ const App = () => {
 
   useEffect(() => {
     DeviceEventEmitter.addListener('openSidebar', () => {
-      setSidebar('30%');
+      Platform.isPad ? setSidebar('30%') : setOpen(true);
     });
     DeviceEventEmitter.addListener('closeSidebar', () => {
-      setSidebar('0%');
+      Platform.isPad ? setSidebar('0%') : setOpen(false);
     });
     DeviceEventEmitter.addListener('disableGesture', () => {
       setDisableGesture(true);
@@ -91,10 +82,10 @@ const App = () => {
 
     return () => {
       DeviceEventEmitter.removeListener('openSidebar', () => {
-        setSidebar('30%');
+        Platform.isPad ? setSidebar('30%') : setOpen(true);
       });
       DeviceEventEmitter.removeListener('closeSidebar', () => {
-        setSidebar('0%');
+        Platform.isPad ? setSidebar('0%') : setOpen(false);
       });
       DeviceEventEmitter.removeListener('disableGesture', () => {
         setDisableGesture(true);

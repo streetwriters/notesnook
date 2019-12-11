@@ -120,6 +120,8 @@ export const AddNotebookDialog = ({visible, close}) => {
     <Modal
       visible={visible}
       transparent={true}
+      animated
+      animationType="fade"
       onRequestClose={() => (refs = [])}>
       <View
         style={{
@@ -131,9 +133,10 @@ export const AddNotebookDialog = ({visible, close}) => {
         }}>
         <View
           style={{
+            ...getElevation(5),
             width: '80%',
             maxHeight: 350,
-            elevation: 5,
+
             borderRadius: 5,
             backgroundColor: colors.bg,
             paddingHorizontal: ph,

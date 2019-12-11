@@ -1240,6 +1240,9 @@
    
     border-top: 1px solid ${pageTheme.colors.nav};
   }
+  .ql-editor.ql-blank::before {
+    color: ${pageTheme.colors.icon};
+  }
 
   
 
@@ -1252,9 +1255,7 @@
                 $('.ql-picker-options').css('border-color',pageTheme.colors.nav);
                
                 $('.ql-container').css('color',pageTheme.colors.pri );
-                $('.ql-editor.ql-blank').before(function() {
-                $(this).css('color',pageTheme.colors.icon);
-                })
+                
                 return;
               } 
               if (data.data.substr(0, 7) === '$image$') {

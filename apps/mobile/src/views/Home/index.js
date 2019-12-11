@@ -216,6 +216,7 @@ export const Home = ({navigation}) => {
               headerHeight = height;
               setMarginTop();
             }}
+            menu={true}
             hide={hideHeader}
             showSearch={() => {
               setHideHeader(false);

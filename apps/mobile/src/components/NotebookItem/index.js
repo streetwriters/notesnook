@@ -132,8 +132,10 @@ export const NotebookItem = ({
                 flexDirection: 'row',
                 alignItems: 'center',
                 marginTop: 5,
+                width: '80%',
+                maxWidth: '80%',
               }}>
-              {item.topics.slice(0, 4).map(topic => (
+              {item.topics.slice(0, 2).map(topic => (
                 <View
                   style={{
                     borderRadius: 5,
@@ -143,11 +145,12 @@ export const NotebookItem = ({
                     marginRight: 10,
                   }}>
                   <Text
+                    numberOfLines={1}
                     style={{
                       color: 'white',
-
                       fontFamily: WEIGHT.regular,
                       fontSize: SIZE.xxs + 1,
+                      maxWidth: '100%',
                     }}>
                     {topic.title}
                   </Text>
@@ -277,11 +280,19 @@ export const NotebookItem = ({
           <TouchableOpacity
             activeOpacity={opacity}
             onPress={async () => {
-              await db.addNoteToTopic(
-                notebookID,
-                item.title,
-                noteToMove.dateCreated,
-              );
+              if (!noteToMove.notebook.notebook) {
+                await db.addNoteToTopic(
+                  notebookID,
+                  item.title,
+                  noteToMove.dateCreated,
+                );
+              } else if (noteToMove.notebook.notebook) {
+                await db.moveNote(noteToMove.dateCreated, noteToMove.notebook, {
+                  notebook: notebookID,
+                  topic: item.title,
+                });
+              }
+
               NavigationService.navigate('Home');
               ToastEvent.show(`Note moved to ${item.title}`, 'success', 3000);
             }}
