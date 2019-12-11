@@ -334,11 +334,26 @@ function deleteItems(items, key) {
 function notebookTopicFn(notebookId, topic, fn) {
   if (!notebookId || !topic || !this.notebooks[notebookId]) return false;
   const notebook = this.notebooks[notebookId];
-  const result = fn(notebook);
-  if (result === true) {
+  let result = fn(notebook);
+
+  const saveNotebooks = () => {
     this.notebooks[notebookId] = notebook;
     return this.storage.write(KEYS.notebooks, this.notebooks).then(s => true);
+  };
+
+  if (result instanceof Promise) {
+    return result.then(res => {
+      if (res === true) {
+        return saveNotebooks();
+      }
+      return false;
+    });
   }
+
+  if (result === true) {
+    return saveNotebooks();
+  }
+
   return result;
 }
 

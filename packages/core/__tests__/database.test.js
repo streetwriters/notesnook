@@ -119,7 +119,7 @@ test("add note to topic", async () => {
   );
   let notebook = db.getNotebook(TEST_NOTEBOOK.dateCreated);
   let topicIndex = notebook.topics.findIndex(t => t.title === "Home");
-  expect(notebook.topics[topicIndex].notes[0]).toBeGreaterThan(0);
+  expect(notebook.topics[topicIndex].notes[0]).toBe(TEST_NOTE.dateCreated);
 });
 
 test("duplicate note to topic should not be added", async () => {
