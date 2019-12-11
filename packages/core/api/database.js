@@ -358,12 +358,12 @@ function notebookTopicFn(notebookId, topic, fn) {
 }
 
 function topicNoteFn(notebookId, topic, noteId, fn) {
-  return notebookTopicFn.call(this, notebookId, topic, notebook => {
+  return notebookTopicFn.call(this, notebookId, topic, async notebook => {
     let topicIndex = notebook.topics.findIndex(t => t.title === topic);
     if (topicIndex === -1 || !this.notes.hasOwnProperty(noteId)) return false;
 
-    if (fn(notebook, topicIndex)) {
-      return this.storage.write(KEYS.notes, this.notes).then(s => true);
+    if ((await fn(notebook, topicIndex)) === true) {
+      return await this.storage.write(KEYS.notes, this.notes).then(s => true);
     }
     return false;
   });
