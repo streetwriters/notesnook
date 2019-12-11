@@ -1,6 +1,7 @@
 import Storage from "../helpers/storage";
 import fuzzysearch from "fuzzysearch";
-import ff from "fast-filter";
+var tfun = require("transfun/transfun.js").tfun;
+tfun = global.tfun;
 import { extractValues } from "../utils";
 
 const KEYS = {
@@ -13,6 +14,13 @@ function checkInitialized() {
       "Database is not initialized. Make sure to call await init() on startup."
     );
   }
+}
+function groupBy(xs, key) {
+  return tfun.reduce(function(rv, x) {
+    var v = key instanceof Function ? key(x) : x[key];
+    (rv[v] = rv[v] || []).push(x);
+    return rv;
+  })(xs);
 }
 class Database {
   constructor(storage) {
@@ -42,7 +50,15 @@ class Database {
    */
   getNotes() {
     checkInitialized.call(this);
-    return extractValues(this.notes);
+    return extractValues(this.notes).reverse();
+  }
+
+  //TODO
+  groupNotes() {
+    var c = groupBy(this.getNotes(), x =>
+      new Date(x.dateCreated).getFullYear()
+    );
+    return c;
   }
 
   /**
@@ -108,10 +124,8 @@ class Database {
    */
   searchNotes(query) {
     if (!query) return [];
-    return ff(
-      extractValues(this.notes),
-      v => fuzzysearch(query, v.title + " " + v.content.text),
-      this
+    return tfun.filter(v => fuzzysearch(query, v.title + " " + v.content.text))(
+      extractValues(this.notes)
     );
   }
 
@@ -307,7 +321,7 @@ export default Database;
 
 function deleteItems(items, key) {
   if (!items || items.length <= 0 || !this[key] || this[key].length <= 0)
-    return false; //TODO add test
+    return false;
   for (let item of items) {
     if (!item) continue;
     if (this[key].hasOwnProperty(item.dateCreated)) {
@@ -322,10 +336,9 @@ function notebookTopicFn(notebookId, topic, fn) {
   const notebook = this.notebooks[notebookId];
   const result = fn(notebook);
   if (result === true) {
-    this.notes[notebookId] = notebook;
+    this.notebooks[notebookId] = notebook;
     return this.storage.write(KEYS.notebooks, this.notebooks).then(s => true);
   }
-  //TODO add test
   return result;
 }
 

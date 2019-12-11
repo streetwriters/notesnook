@@ -17,6 +17,8 @@
   },
   "dependencies": {
     "fast-filter": "^1.0.4",
-    "fuzzysearch": "^1.0.3"
+    "fast-sort": "^1.6.0",
+    "fuzzysearch": "^1.0.3",
+    "transfun": "^1.0.2"
   }
 }
