@@ -54,6 +54,7 @@ class Database {
    * @param {string} by One from 'abc', 'month', 'year' or 'week'. Leave it empty for default grouping.
    */
   groupNotes(by) {
+    //TODO add tests
     let notes = this.getNotes();
     switch (by) {
       case "abc":
