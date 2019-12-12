@@ -2,12 +2,14 @@ import Storage from "../helpers/storage";
 import fuzzysearch from "fuzzysearch";
 var tfun = require("transfun/transfun.js").tfun;
 tfun = global.tfun;
-import { extractValues } from "../utils";
+import { extractValues, groupBy } from "../utils";
+import { getWeekGroupFromTimestamp, months } from "../utils/date";
 
 const KEYS = {
   notes: "notes",
   notebooks: "notebooks"
 };
+
 function checkInitialized() {
   if (!this.isInitialized) {
     throw new Error(
@@ -15,13 +17,7 @@ function checkInitialized() {
     );
   }
 }
-function groupBy(xs, key) {
-  return tfun.reduce(function(rv, x) {
-    var v = key instanceof Function ? key(x) : x[key];
-    (rv[v] = rv[v] || []).push(x);
-    return rv;
-  })(xs);
-}
+
 class Database {
   constructor(storage) {
     this.storage = new Storage(storage);
@@ -53,12 +49,39 @@ class Database {
     return extractValues(this.notes).reverse();
   }
 
-  //TODO
-  groupNotes() {
-    var c = groupBy(this.getNotes(), x =>
-      new Date(x.dateCreated).getFullYear()
-    );
-    return c;
+  /**
+   * Group notes by given criteria
+   * @param {string} by One from 'abc', 'month', 'year' or 'week'. Leave it empty for default grouping.
+   */
+  groupNotes(by) {
+    switch (by) {
+      case "abc":
+        return groupBy(notes, note => note.title[0].toUpperCase());
+      case "month":
+        return groupBy(
+          notes,
+          note => months[new Date(note.dateCreated).getMonth()]
+        );
+      case "week":
+        groupBy(notes, note => getWeekGroupFromTimestamp(note.dateCreated));
+      case "year":
+        groupBy(
+          notes,
+          note => months[new Date(note.dateCreated).getFullYear()]
+        );
+      default:
+        let timestamps = {
+          recent: getLastWeekTimestamp(7),
+          lastWeek: getLastWeekTimestamp(7) - 604800000 //seven day timestamp value
+        };
+        groupBy(notes, note =>
+          note.dateCreated >= timestamps.recent
+            ? "Recent"
+            : note.dateCreated >= timestamps.lastWeek
+            ? "Last week"
+            : "Older"
+        );
+    }
   }
 
   /**
