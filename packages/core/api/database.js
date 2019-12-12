@@ -63,9 +63,11 @@ class Database {
           note => months[new Date(note.dateCreated).getMonth()]
         );
       case "week":
-        groupBy(notes, note => getWeekGroupFromTimestamp(note.dateCreated));
+        return groupBy(notes, note =>
+          getWeekGroupFromTimestamp(note.dateCreated)
+        );
       case "year":
-        groupBy(
+        return groupBy(
           notes,
           note => months[new Date(note.dateCreated).getFullYear()]
         );
@@ -74,7 +76,7 @@ class Database {
           recent: getLastWeekTimestamp(7),
           lastWeek: getLastWeekTimestamp(7) - 604800000 //seven day timestamp value
         };
-        groupBy(notes, note =>
+        return groupBy(notes, note =>
           note.dateCreated >= timestamps.recent
             ? "Recent"
             : note.dateCreated >= timestamps.lastWeek
