@@ -370,6 +370,7 @@ class Database {
   }
 
   getTrash() {
+    checkInitialized();
     return extractValues(this.trash).reverse();
   }
 }
