@@ -16,8 +16,6 @@
     "test": "jest"
   },
   "dependencies": {
-    "fast-filter": "^1.0.4",
-    "fast-sort": "^1.6.0",
     "fuzzysearch": "^1.0.3",
     "transfun": "^1.0.2"
   }
