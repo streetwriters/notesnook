@@ -7,7 +7,8 @@ import { getWeekGroupFromTimestamp, months } from "../utils/date";
 
 const KEYS = {
   notes: "notes",
-  notebooks: "notebooks"
+  notebooks: "notebooks",
+  trash: "trash"
 };
 
 function checkInitialized() {
@@ -23,6 +24,7 @@ class Database {
     this.storage = new Storage(storage);
     this.notes = {};
     this.notebooks = {};
+    this.trash = {};
     this.isInitialized = false;
   }
 
@@ -154,6 +156,18 @@ class Database {
     return tfun.filter(v => fuzzysearch(query, v.title + " " + v.content.text))(
       extractValues(this.notes)
     );
+  }
+
+  //TODO
+  lockNote(note) {
+    // this.notes[note.dateCreated].content = Encrypt(JSON.stringify(this.notes[note.dateCreated].content))
+    // this.notes[note.dateCreated].locked = true
+  }
+
+  //TODO
+  unlockNote(note, perm = false) {
+    // this.notes[note.dateCreated].content = JSON.parse(Decrypt(this.notes[note.dateCreated].content))
+    // if (perm) { this.notes[note.dateCreated].locked = false }
   }
 
   /**
@@ -342,6 +356,22 @@ class Database {
     }
     return false;
   }
+
+  async restoreItem(id) {
+    if (!this.trash.hasOwnProperty(id)) {
+      return;
+    }
+    let type = this.trash[id].dType;
+    delete this.trash[id].dateDeleted;
+    delete this.trash[id].dType;
+    let item = this.trash[id];
+    this[type][id] = item;
+    await this.storage.write(type, this[type]);
+  }
+
+  getTrash() {
+    return extractValues(this.trash).reverse();
+  }
 }
 
 export default Database;
@@ -352,10 +382,20 @@ function deleteItems(items, key) {
   for (let item of items) {
     if (!item) continue;
     if (this[key].hasOwnProperty(item.dateCreated)) {
+      //put into trash
+      this[KEYS.trash][item.dateCreated] = this[key][item.dateCreated];
+      this[KEYS.trash][item.dateCreated]["dateDeleted"] = Date.now();
+      this[KEYS.trash][item.dateCreated]["dType"] = key;
+
       delete this[key][item.dateCreated];
     }
   }
-  return this.storage.write(key, this[key]).then(s => true);
+
+  return this.storage
+    .write(key, this[key])
+    .then(s =>
+      this.storage.write(KEYS.trash, this[KEYS.trash]).then(s => true)
+    );
 }
 
 function notebookTopicFn(notebookId, topic, fn) {
