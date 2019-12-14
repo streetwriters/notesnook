@@ -26,13 +26,13 @@ function getWeeksInYear(year) {
   return weeks;
 }
 
-function getDayTimestamp(last) {
+/* function getDayTimestamp(last) {
   to = new Date().getDate() - last;
   date = new Date();
   return date.setDate(to);
-}
+} */
 
-function getLastWeekTimestamp() {
+export function getLastWeekTimestamp() {
   const t = new Date().getDate() + (6 - new Date().getDay() - 1) - 6;
   const lastSaturday = new Date();
   return lastSaturday.setDate(t);
@@ -56,7 +56,7 @@ export function getWeekGroupFromTimestamp(timestamp) {
   let date = new Date(timestamp);
 
   if (!years.hasOwnProperty(date.getFullYear())) {
-    years[date.getFullYear()] = weeks;
+    years[date.getFullYear()] = getWeeksInYear(date.getFullYear());
   }
   let weeks = years[date.getFullYear()];
 
