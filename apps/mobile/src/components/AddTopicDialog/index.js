@@ -85,10 +85,9 @@ export const AddTopicDialog = ({
             <Text
               style={{
                 color: colors.accent,
-                fontFamily: WEIGHT.semibold,
-                marginLeft: 10,
-                fontSize: SIZE.lg,
-                marginTop: -5,
+                fontFamily: WEIGHT.bold,
+                marginLeft: 5,
+                fontSize: SIZE.md,
               }}>
               {toEdit ? 'Edit Topic' : 'Add New Topic'}
             </Text>

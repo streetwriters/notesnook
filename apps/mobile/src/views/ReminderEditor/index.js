@@ -69,7 +69,7 @@ const ReminderEditor = ({navigation}) => {
           }}>
           Set a Reminder
         </Text>
-        <Icon name="md-more" color={colors.icon} size={SIZE.xxl} />
+        <Icon name="md-more" color={colors.icon} size={SIZE.xl} />
       </View>
 
       <Text

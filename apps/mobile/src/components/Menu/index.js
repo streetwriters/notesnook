@@ -8,6 +8,7 @@ import {
   Platform,
   FlatList,
   DeviceEventEmitter,
+  PixelRatio,
 } from 'react-native';
 import NavigationService from '../../services/NavigationService';
 import {
@@ -51,7 +52,7 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
   return (
     <AnimatedSafeAreaView
       transition="backgroundColor"
-      duration={1000}
+      duration={300}
       style={{
         height: '100%',
         opacity: hide ? 0 : 1,
@@ -65,6 +66,7 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
           marginTop: Platform.OS == 'ios' ? h * 0.01 : h * 0.03,
         }}
       />
+
       <ScrollView
         contentContainerStyle={{
           justifyContent: 'space-between',
@@ -151,14 +153,14 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
                   alignSelf: 'center',
                   flexDirection: 'row',
                   justifyContent: 'space-between',
-                  alignItems: 'flex-end',
+                  alignItems: 'center',
                   paddingHorizontal: '5%',
-                  paddingVertical: 15,
+                  paddingVertical: pv + 5,
                 }}>
                 <View
                   style={{
                     flexDirection: 'row',
-                    alignItems: 'flex-end',
+                    alignItems: 'center',
                   }}>
                   <Icon
                     style={{
@@ -170,8 +172,8 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
                   />
                   <Text
                     style={{
-                      fontFamily: WEIGHT.medium,
-                      fontSize: SIZE.sm - 1,
+                      fontFamily: WEIGHT.regular,
+                      fontSize: SIZE.sm,
                       color: colors.pri,
                     }}>
                     {item.name}
@@ -208,7 +210,7 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
               style={{
                 flexDirection: 'row',
                 justifyContent: 'flex-start',
-                alignItems: 'flex-end',
+                alignItems: 'center',
               }}>
               <Icon
                 style={{
@@ -220,21 +222,13 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
               />
               <Text
                 style={{
-                  fontFamily: WEIGHT.medium,
-                  fontSize: SIZE.sm - 1,
+                  fontFamily: WEIGHT.regular,
+                  fontSize: SIZE.sm,
                   color: colors.pri,
                 }}>
                 Tags
               </Text>
             </View>
-            <Text
-              style={{
-                fontSize: SIZE.xs,
-                fontFamily: WEIGHT.regular,
-                color: colors.pri,
-              }}>
-              View All
-            </Text>
           </TouchableOpacity>
 
           <ScrollView
@@ -264,12 +258,13 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
                   flexDirection: 'row',
                   justifyContent: 'flex-start',
                   alignItems: 'center',
-                  margin: 5,
+                  padding: 7,
+                  paddingLeft: 3.5,
                 }}>
                 <Text
                   style={{
                     fontFamily: WEIGHT.regular,
-                    fontSize: SIZE.sm - 2,
+                    fontSize: SIZE.xs,
                     color: colors.icon,
                   }}>
                   #{item}
@@ -296,8 +291,8 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
                   }}>
                   <View
                     style={{
-                      width: 25,
-                      height: 25,
+                      width: 35,
+                      height: 35,
                       backgroundColor: item,
                       borderRadius: 100,
                     }}
@@ -359,22 +354,25 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
             }}
             activeOpacity={opacity}
             style={{
-              paddingVertical: pv,
-              paddingHorizontal: ph,
-              borderRadius: 5,
-              width: '100%',
-              justifyContent: 'center',
-              alignItems: 'center',
+              paddingVertical: pv + 5,
 
-              backgroundColor: colors.accent,
+              width: '100%',
+              borderRadius: 5,
+              justifyContent: 'flex-start',
+              alignItems: 'center',
+              flexDirection: 'row',
+              borderBottomColor: colors.accent,
+              borderBottomWidth: 1,
             }}>
+            <Icon name="log-in" color={colors.accent} size={SIZE.lg} />
+
             <Text
               style={{
-                fontFamily: WEIGHT.medium,
-                color: 'white',
-                fontSize: SIZE.sm,
+                fontFamily: WEIGHT.regular,
+                color: colors.accent,
+                fontSize: SIZE.md,
               }}>
-              Login to Sync
+              {'  '}Login
             </Text>
           </TouchableOpacity>
 

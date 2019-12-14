@@ -2,7 +2,15 @@ import React, {useState} from 'react';
 import {View, Text, TouchableOpacity} from 'react-native';
 import NavigationService from '../../services/NavigationService';
 import Menu, {MenuItem, MenuDivider} from 'react-native-material-menu';
-import {COLOR_SCHEME, SIZE, ph, pv, opacity, WEIGHT} from '../../common/common';
+import {
+  COLOR_SCHEME,
+  SIZE,
+  ph,
+  pv,
+  opacity,
+  WEIGHT,
+  br,
+} from '../../common/common';
 import Icon from 'react-native-vector-icons/Feather';
 import {w, ToastEvent} from '../../utils/utils';
 import {db} from '../../../App';
@@ -17,6 +25,7 @@ export const NotebookItem = ({
   isMove = false,
   noteToMove = null,
   notebookID,
+  numColumns,
   refresh = () => {},
 }) => {
   const [colors, setColors] = useState(COLOR_SCHEME);
@@ -75,11 +84,17 @@ export const NotebookItem = ({
   return (
     <View
       style={{
-        paddingHorizontal: ph,
         marginHorizontal: '5%',
+        paddingVertical: pv,
+        borderRadius: br,
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        flexDirection: 'row',
+        paddingHorizontal: ph,
+        width: '100%',
+        alignSelf: 'center',
         borderBottomWidth: 1,
         borderBottomColor: colors.nav,
-        paddingVertical: pv,
       }}>
       <Dialog
         visible={isVisible}
@@ -103,12 +118,14 @@ export const NotebookItem = ({
           flexDirection: 'row',
           justifyContent: 'space-between',
           alignItems: 'center',
+          width: '100%',
         }}>
         <TouchableOpacity onPress={navigate}>
           <Text
+            numberOfLines={1}
             style={{
               fontFamily: WEIGHT.bold,
-              fontSize: SIZE.md,
+              fontSize: SIZE.sm,
               color: colors.pri,
               maxWidth: '100%',
             }}>
@@ -116,11 +133,15 @@ export const NotebookItem = ({
           </Text>
           {isTopic ? null : (
             <Text
+              numberOfLines={numColumns === 2 ? 3 : 2}
               style={{
                 fontFamily: WEIGHT.regular,
-                fontSize: SIZE.xs + 1,
-                color: colors.pri,
+                fontSize: SIZE.xs,
+                lineHeight: SIZE.sm,
+                color: colors.icon,
                 maxWidth: '100%',
+                paddingVertical: 5,
+                height: numColumns === 2 ? SIZE.sm * 3.5 : null,
               }}>
               {item.description}
             </Text>
@@ -149,7 +170,7 @@ export const NotebookItem = ({
                     style={{
                       color: 'white',
                       fontFamily: WEIGHT.regular,
-                      fontSize: SIZE.xxs + 1,
+                      fontSize: SIZE.xxs,
                       maxWidth: '100%',
                     }}>
                     {topic.title}
@@ -170,20 +191,20 @@ export const NotebookItem = ({
               <Icon
                 style={{width: 30}}
                 name="lock"
-                size={SIZE.sm}
+                size={SIZE.xs}
                 color={colors.icon}
               />
               <Icon
                 style={{width: 30}}
                 name="star"
-                size={SIZE.sm}
+                size={SIZE.xs}
                 color={colors.icon}
               />
 
               <Text
                 style={{
                   color: colors.accent,
-                  fontSize: SIZE.xxs + 1,
+                  fontSize: SIZE.xxs,
                   textAlignVertical: 'center',
                   fontFamily: WEIGHT.regular,
                 }}>

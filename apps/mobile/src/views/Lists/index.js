@@ -43,13 +43,13 @@ export const Lists = ({navigation}) => {
         }}>
         <Text
           style={{
-            fontSize: SIZE.xxl,
+            fontSize: SIZE.xl,
             color: colors.pri,
             fontFamily: WEIGHT.bold,
           }}>
           Lists
         </Text>
-        <Icon name="md-more" color={colors.icon} size={SIZE.xxl} />
+        <Icon name="md-more" color={colors.icon} size={SIZE.xl} />
       </View>
 
       <ListItem />

@@ -79,7 +79,7 @@ export const Notes = ({navigation}) => {
   return (
     <AnimatedSafeAreaView
       transition="backgroundColor"
-      duration={1000}
+      duration={300}
       style={{
         height: '100%',
         backgroundColor: colors.bg,
@@ -90,7 +90,7 @@ export const Notes = ({navigation}) => {
         }}>
         <Animatable.View
           transition="backgroundColor"
-          duration={1000}
+          duration={300}
           style={{
             position: 'absolute',
             backgroundColor: colors.bg,

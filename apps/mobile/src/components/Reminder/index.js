@@ -97,7 +97,7 @@ export const Reminder = props => {
           <Text
             style={{
               color: props.invert ? colors.accent : 'white',
-              fontSize: SIZE.xxl,
+              fontSize: SIZE.xl,
               fontFamily: WEIGHT.light,
             }}>
             <Text

@@ -33,7 +33,7 @@ import {useForceUpdate} from '../ListsEditor';
 import {AddNotebookDialog} from '../../components/AddNotebookDialog';
 import {NotebookItem} from '../../components/NotebookItem';
 import {Search} from '../../components/SearchInput';
-import {db} from '../../../App';
+import {db, DDS} from '../../../App';
 import {Header} from '../../components/header';
 import {AnimatedSafeAreaView} from '../Home';
 import * as Animatable from 'react-native-animatable';
@@ -45,6 +45,7 @@ export const Folders = ({navigation}) => {
   const [hideHeader, setHideHeader] = useState(false);
   const [buttonHide, setButtonHide] = useState(false);
   const [margin, setMargin] = useState(190);
+  const [numColumns, setNumColumns] = useState(1);
   const forceUpdate = useForceUpdate();
   const params = navigation.state.params;
   let offsetY = 0;
@@ -87,7 +88,7 @@ export const Folders = ({navigation}) => {
   return (
     <AnimatedSafeAreaView
       transition="backgroundColor"
-      duration={1000}
+      duration={300}
       style={{
         height: '100%',
         backgroundColor: colors.bg,
@@ -112,7 +113,7 @@ export const Folders = ({navigation}) => {
         }}>
         <Animatable.View
           transition="backgroundColor"
-          duration={1000}
+          duration={300}
           style={{
             position: 'absolute',
             backgroundColor: colors.bg,
@@ -165,12 +166,97 @@ export const Folders = ({navigation}) => {
           }}
           ListHeaderComponent={
             <View
-              transition="marginTop"
-              duration={200}
               style={{
-                marginTop: margin,
-              }}
-            />
+                marginTop: margin + 20,
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                width:
+                  numColumns === 2
+                    ? DDS.isTab
+                      ? w * 0.7 * 0.95
+                      : w * 0.95
+                    : w * 0.95,
+
+                alignSelf: 'center',
+                marginLeft:
+                  numColumns === 2 ? (DDS.isTab ? w * 0.7 * 0.025 : 0) : 0,
+                paddingHorizontal: ph + 5,
+              }}>
+              <View>
+                <Text
+                  transition="marginTop"
+                  delay={200}
+                  duration={200}
+                  style={{
+                    fontSize: SIZE.lg,
+                    fontFamily: WEIGHT.medium,
+                    color: colors.pri,
+                    paddingHorizontal: DDS.isTab ? '2.5%' : '5%',
+                    maxWidth: '100%',
+                  }}>
+                  <Text
+                    style={{
+                      color: colors.accent,
+                    }}></Text>
+                </Text>
+              </View>
+
+              <TouchableOpacity
+                onPress={() => {
+                  setNumColumns(numColumns === 1 ? 2 : 1);
+                }}
+                style={{
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <Icon name="list" size={SIZE.xl} color={colors.icon} />
+              </TouchableOpacity>
+            </View>
+          }
+          numColumns={numColumns}
+          key={numColumns}
+          columnWrapperStyle={
+            numColumns === 1
+              ? null
+              : {
+                  width:
+                    notebooks.length === 1
+                      ? DDS.isTab
+                        ? '95%'
+                        : '90%'
+                      : DDS.isTab
+                      ? '45%'
+                      : '42.5%',
+                }
+          }
+          contentContainerStyle={{
+            width:
+              numColumns === 2
+                ? DDS.isTab
+                  ? '100%'
+                  : null
+                : DDS.isTab
+                ? '95%'
+                : '90%',
+            alignItems: numColumns === 2 ? 'flex-start' : null,
+            alignSelf: 'center',
+          }}
+          ListFooterComponent={
+            <View
+              style={{
+                height: 150,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
+              <Text
+                style={{
+                  color: colors.navbg,
+                  fontSize: SIZE.sm,
+                  fontFamily: WEIGHT.regular,
+                }}>
+                - End -
+              </Text>
+            </View>
           }
           data={notebooks}
           keyExtractor={(item, index) => item.dateCreated.toString()}
@@ -180,6 +266,7 @@ export const Folders = ({navigation}) => {
               isMove={params.isMove}
               noteToMove={params.note}
               item={item}
+              numColumns={numColumns}
               refresh={() => setNotebooks(db.getNotebooks())}
               index={index}
               colors={colors}
@@ -199,18 +286,18 @@ export const Folders = ({navigation}) => {
 
             paddingVertical: pv + 5,
             flexDirection: 'row',
-            justifyContent: 'space-between',
+            justifyContent: 'flex-start',
             alignItems: 'center',
             marginBottom: 15,
             backgroundColor: colors.accent,
           }}>
+          <Icon name="plus" color="white" size={SIZE.lg} />
           <Text
             style={{
               fontSize: SIZE.md,
               fontFamily: WEIGHT.semibold,
               color: 'white',
             }}>
-            <Icon name="plus" color="white" size={SIZE.lg} />
             {'  '} Create a new notebook
           </Text>
         </TouchableOpacity>

@@ -20,7 +20,6 @@ import Trash from '../views/Trash';
 import Notes from '../views/Notes';
 import Tags from '../views/Tags';
 import Notebook from '../views/Notebook';
-import Move from '../views/Move';
 import AccountSettings from '../views/AccountSettings';
 
 const fade = props => {
@@ -95,9 +94,7 @@ const TopLevelNavigator = createStackNavigator(
     Notebook: {
       screen: Notebook,
     },
-    Move: {
-      screen: Move,
-    },
+
     AccountSettings: {
       screen: AccountSettings,
     },
@@ -106,6 +103,11 @@ const TopLevelNavigator = createStackNavigator(
     initialRouteName: 'Home',
     defaultNavigationOptions: {
       gesturesEnabled: false,
+      headerStyle: {
+        backgroundColor: 'transparent',
+        borderBottomWidth: 0,
+        height: 0,
+      },
     },
     transitionConfig: () => ({
       screenInterpolator: props => {

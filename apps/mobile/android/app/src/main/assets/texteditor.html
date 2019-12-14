@@ -971,7 +971,7 @@
                     {delete: url.length},
                     {insert: url, attributes: {link: url}},
                   ]);
-
+                
                   editor.updateContents({
                     ops: ops,
                   });
@@ -989,9 +989,11 @@
             var Font = Quill.import('formats/font');
             Font.whitelist = fontNames;
             Quill.register(Font, true);
+            
            
             // Receber mensagens do RN
             document.addEventListener('message', data => {
+              editor.focus();
               if (data.data.substr(0,9) === '{"night":') {
                 pageTheme.colors = JSON.parse(data.data);
                

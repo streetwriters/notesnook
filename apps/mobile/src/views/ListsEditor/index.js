@@ -77,7 +77,7 @@ const ListsEditor = ({navigation}) => {
           placeholder="Untitled List"
           placeholderTextColor={colors.icon}
         />
-        <Icon name="md-more" color={colors.icon} size={SIZE.xxl} />
+        <Icon name="md-more" color={colors.icon} size={SIZE.xl} />
       </View>
 
       <TextInput

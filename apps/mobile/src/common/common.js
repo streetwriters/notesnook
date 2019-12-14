@@ -1,4 +1,5 @@
-import {DeviceEventEmitter} from 'react-native';
+import {DeviceEventEmitter, StatusBar, PixelRatio} from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
 //COLOR SCHEME
 export const ACCENT = {
   color: '#0560FF',
@@ -16,6 +17,32 @@ export function setColorScheme(colors = COLOR_SCHEME, accent = ACCENT.color) {
   COLOR_SCHEME.icon = colors.icon;
 
   DeviceEventEmitter.emit('onThemeUpdate');
+}
+
+export function getColorScheme(colors) {
+  let theme = colors;
+  AsyncStorage.getItem('accentColor').then(accentColor => {
+    if (typeof accentColor !== 'string') {
+      AsyncStorage.setItem('accentColor', colors.accent);
+    } else {
+      setAccentColor(accentColor);
+    }
+  });
+  AsyncStorage.getItem('theme').then(t => {
+    if (typeof t !== 'string') {
+      AsyncStorage.setItem('theme', JSON.stringify(theme));
+
+      setColorScheme(COLOR_SCHEME_LIGHT);
+    } else {
+      let themeToSet = JSON.parse(t);
+      themeToSet.night
+        ? setColorScheme(COLOR_SCHEME_DARK)
+        : setColorScheme(COLOR_SCHEME_LIGHT);
+      StatusBar.setBarStyle(
+        themeToSet.night ? 'light-content' : 'dark-content',
+      );
+    }
+  });
 }
 
 export function setAccentColor(color) {
@@ -93,14 +120,14 @@ export const FONT_BOLD = '';
 //FONT SIZE
 
 export const SIZE = {
-  xxs: 10,
-  xs: 12,
-  sm: 16,
-  md: 18,
-  lg: 22,
-  xl: 28,
-  xxl: 32,
-  xxxl: 40,
+  xxs: 10 * PixelRatio.getFontScale(),
+  xs: 12 * PixelRatio.getFontScale(),
+  sm: 14 * PixelRatio.getFontScale(),
+  md: 18 * PixelRatio.getFontScale(),
+  lg: 24 * PixelRatio.getFontScale(),
+  xl: 28 * PixelRatio.getFontScale(),
+  xxl: 32 * PixelRatio.getFontScale(),
+  xxxl: 36 * PixelRatio.getFontScale(),
 };
 
 export const br = 5; // border radius
@@ -111,9 +138,9 @@ export const opacity = 0.85; // active opacity
 // GLOBAL FONT
 
 export const WEIGHT = {
-  light: 'Quicksand-Light',
-  regular: 'Quicksand-Regular',
-  medium: 'Quicksand-Medium',
-  semibold: 'Quicksand-SemiBold',
-  bold: 'Quicksand-Bold',
+  light: 'NotoSans',
+  regular: 'NotoSans',
+  medium: 'NotoSans',
+  semibold: 'NotoSerif',
+  bold: 'NotoSerif-Bold',
 };

@@ -24,6 +24,7 @@ import {
   clearThemeUpdateListener,
 } from '../../common/common';
 import Icon from 'react-native-vector-icons/Ionicons';
+import {DDS} from '../../../App';
 import {Reminder} from '../../components/Reminder';
 import {ListItem} from '../../components/ListItem';
 import {getElevation} from '../../utils/utils';
@@ -95,9 +96,9 @@ const renderForgotPassword = colors => {
   return (
     <View
       style={{
-        justifyContent: Platform.isPad ? 'center' : 'space-between',
+        justifyContent: DDS.isTab ? 'center' : 'space-between',
         height: '80%',
-        width: Platform.isPad ? '60%' : '100%',
+        width: DDS.isTab ? '60%' : '100%',
         alignSelf: 'center',
       }}>
       <View>

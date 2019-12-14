@@ -31,7 +31,7 @@ import {FlatList, TextInput} from 'react-native-gesture-handler';
 import {NavigationEvents} from 'react-navigation';
 import {Header} from '../../components/header';
 import {useForceUpdate} from '../ListsEditor';
-
+import {DDS} from '../../../App';
 export const Signup = ({navigation}) => {
   const [colors, setColors] = useState(COLOR_SCHEME);
   const forceUpdate = useForceUpdate();
@@ -95,9 +95,9 @@ const renderSignup = colors => {
   return (
     <View
       style={{
-        justifyContent: Platform.isPad ? 'center' : 'space-between',
+        justifyContent: DDS.isTab ? 'center' : 'space-between',
         height: '80%',
-        width: Platform.isPad ? '60%' : '100%',
+        width: DDS.isTab ? '60%' : '100%',
         alignSelf: 'center',
       }}>
       <View>
@@ -184,7 +184,7 @@ const renderSignup = colors => {
       <View
         style={{
           width: '100%',
-          position: Platform.isPad ? 'absolute' : 'relative',
+          position: DDS.isTab ? 'absolute' : 'relative',
           bottom: '0%',
         }}>
         <TouchableOpacity

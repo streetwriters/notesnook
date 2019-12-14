@@ -1,35 +1,16 @@
-import React, {useState, createRef} from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  ScrollView,
-  Dimensions,
-  FlatList,
-  TouchableWithoutFeedback,
-  Platform,
-} from 'react-native';
+import React, {useState} from 'react';
+import {View, Text, TouchableOpacity, Dimensions} from 'react-native';
 
-import {
-  COLOR_SCHEME,
-  SIZE,
-  br,
-  ph,
-  pv,
-  opacity,
-  FONT,
-  WEIGHT,
-} from '../../common/common';
+import {COLOR_SCHEME, SIZE, br, ph, pv, WEIGHT} from '../../common/common';
 
 import Icon from 'react-native-vector-icons/Feather';
-import {Reminder} from '../Reminder';
-import {getElevation, timeSince, ToastEvent} from '../../utils/utils';
+import {timeSince, ToastEvent} from '../../utils/utils';
 import NavigationService from '../../services/NavigationService';
 import Menu, {MenuItem, MenuDivider} from 'react-native-material-menu';
 import {Dialog} from '../Dialog';
 import {VaultDialog} from '../VaultDialog';
 import {db} from '../../../App';
-
+import {DDS} from '../../../App';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
@@ -72,15 +53,14 @@ const NoteItem = props => {
   return (
     <View
       style={{
-        marginHorizontal: w * 0.05,
+        marginHorizontal: '5%',
         paddingVertical: pv,
-
         borderRadius: br,
-        justifyContent: 'center',
+        justifyContent: 'flex-start',
         alignItems: 'center',
         flexDirection: 'row',
         paddingHorizontal: ph,
-        width: Platform.isPad ? '95%' : '90%',
+        width: '100%',
         alignSelf: 'center',
         borderBottomWidth: 1,
         borderBottomColor: colors.nav,
@@ -106,8 +86,8 @@ const NoteItem = props => {
           });
         }}
         style={{
-          paddingLeft: ph,
-          width: '100%',
+          paddingLeft: 0,
+          width: '95%',
         }}>
         <>
           <Text
@@ -116,7 +96,7 @@ const NoteItem = props => {
               color: colors.pri,
               fontSize: SIZE.md,
               fontFamily: WEIGHT.bold,
-              maxWidth: '100%',
+              maxWidth: '95%',
               marginBottom: 5,
             }}>
             {item.title.replace('\n', '')}
@@ -128,14 +108,16 @@ const NoteItem = props => {
               width: '100%',
             }}>
             <Text
-              numberOfLines={2}
+              numberOfLines={props.numColumns === 2 ? 3 : null}
               style={{
-                fontSize: SIZE.xs + 2,
-                color: colors.icon,
+                fontSize: SIZE.xs + 1,
+                lineHeight: SIZE.sm + 2,
+                color: colors.pri,
                 fontFamily: WEIGHT.regular,
                 width: '100%',
                 maxWidth: '100%',
                 paddingRight: ph,
+                height: props.numColumns === 2 ? SIZE.sm * 3.5 : null,
               }}>
               {item.headline}
             </Text>
@@ -149,20 +131,20 @@ const NoteItem = props => {
               <Icon
                 style={{width: 30}}
                 name="lock"
-                size={SIZE.sm}
+                size={SIZE.xs}
                 color={colors.icon}
               />
               <Icon
                 style={{width: 30}}
                 name="star"
-                size={SIZE.sm}
+                size={SIZE.xs}
                 color={colors.icon}
               />
 
               <Text
                 style={{
                   color: colors.accent,
-                  fontSize: SIZE.xxs + 2,
+                  fontSize: SIZE.xxs,
                   textAlignVertical: 'center',
                   fontFamily: WEIGHT.regular,
                 }}>
@@ -175,7 +157,7 @@ const NoteItem = props => {
 
       <View
         style={{
-          width: w * 0.05,
+          width: DDS.isTab ? w * 0.7 * 0.05 : w * 0.05,
           justifyContent: 'center',
           minHeight: 70,
           alignItems: 'center',
@@ -201,16 +183,22 @@ const NoteItem = props => {
             </TouchableOpacity>
           }>
           <MenuItem
+            style={{
+              height: 35,
+            }}
             textStyle={{
               color: colors.pri,
 
               fontFamily: WEIGHT.regular,
-              fontSize: SIZE.sm,
+              fontSize: SIZE.xs,
             }}>
-            <Icon name="star" size={SIZE.sm} color={colors.icon} />
+            <Icon name="star" size={SIZE.xs} color={colors.icon} />
             {'  '}Pin
           </MenuItem>
           <MenuItem
+            style={{
+              height: 35,
+            }}
             onPress={() => {
               hideMenu();
               ToastEvent.show(
@@ -225,19 +213,23 @@ const NoteItem = props => {
               color: colors.pri,
 
               fontFamily: WEIGHT.regular,
-              fontSize: SIZE.sm,
+              fontSize: SIZE.xs,
             }}>
-            <Icon name="star" size={SIZE.sm} color={colors.icon} />
+            <Icon name="star" size={SIZE.xs} color={colors.icon} />
             {'  '}Favorite
           </MenuItem>
 
           <MenuItem
+            style={{
+              height: 35,
+            }}
             textStyle={{
               color: colors.pri,
+
               fontFamily: WEIGHT.regular,
-              fontSize: SIZE.sm,
+              fontSize: SIZE.xs,
             }}>
-            <Icon name="share" size={SIZE.sm} color={colors.icon} />
+            <Icon name="share" size={SIZE.xs} color={colors.icon} />
             {'  '}Share
           </MenuItem>
 
@@ -246,18 +238,22 @@ const NoteItem = props => {
               hideMenu();
               NavigationService.push('Folders', {
                 note: item,
+
                 title: 'Choose Notebook',
                 isMove: true,
                 hideMore: true,
               });
             }}
+            style={{
+              height: 35,
+            }}
             textStyle={{
               color: colors.pri,
 
               fontFamily: WEIGHT.regular,
-              fontSize: SIZE.sm,
+              fontSize: SIZE.xs,
             }}>
-            <Icon name="arrow-right" size={SIZE.sm} color={colors.icon} />
+            <Icon name="arrow-right" size={SIZE.xs} color={colors.icon} />
             {'  '}Move
           </MenuItem>
           <MenuItem
@@ -265,12 +261,16 @@ const NoteItem = props => {
               show = 'vault';
               hideMenu(true);
             }}
+            style={{
+              height: 35,
+            }}
             textStyle={{
               color: colors.pri,
+
               fontFamily: WEIGHT.regular,
-              fontSize: SIZE.sm,
+              fontSize: SIZE.xs,
             }}>
-            <Icon name="lock" size={SIZE.sm} color={colors.icon} />
+            <Icon name="lock" size={SIZE.xs} color={colors.icon} />
             {'  '}Lock
           </MenuItem>
 
@@ -279,13 +279,15 @@ const NoteItem = props => {
               show = 'delete';
               hideMenu();
             }}
+            style={{
+              height: 35,
+            }}
             textStyle={{
               color: colors.pri,
-
               fontFamily: WEIGHT.regular,
-              fontSize: SIZE.sm,
+              fontSize: SIZE.xs,
             }}>
-            <Icon name="trash" size={SIZE.sm} color={colors.icon} />
+            <Icon name="trash" size={SIZE.xs} color={colors.icon} />
             {'  '}Delete
           </MenuItem>
           <MenuDivider />
@@ -295,12 +297,12 @@ const NoteItem = props => {
               color: colors.icon,
 
               fontFamily: WEIGHT.regular,
-              fontSize: SIZE.xs,
+              fontSize: SIZE.xxs,
             }}
             style={{
               paddingVertical: 0,
               margin: 0,
-              height: 30,
+              height: 35,
             }}>
             Notebook: School Notes
           </MenuItem>
@@ -310,12 +312,12 @@ const NoteItem = props => {
               color: colors.icon,
 
               fontFamily: WEIGHT.regular,
-              fontSize: SIZE.xs,
+              fontSize: SIZE.xxs,
             }}
             style={{
               paddingVertical: 0,
               margin: 0,
-              height: 30,
+              height: 35,
               paddingBottom: 10,
             }}>
             {'  '}- Topic: Physics
@@ -325,14 +327,14 @@ const NoteItem = props => {
             disabled={true}
             textStyle={{
               color: colors.icon,
-
+              height: 35,
               fontFamily: WEIGHT.regular,
-              fontSize: SIZE.xs,
+              fontSize: SIZE.xxs,
             }}
             style={{
               paddingVertical: 0,
               margin: 0,
-              height: 30,
+              height: 35,
               paddingBottom: 10,
             }}>
             Created on: {new Date(item.dateCreated).toISOString().slice(0, 10)}

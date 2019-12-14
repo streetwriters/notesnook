@@ -36,6 +36,7 @@ import {AddTopicDialog} from '../../components/AddTopicDialog';
 import {AnimatedSafeAreaView} from '../Home';
 import * as Animatable from 'react-native-animatable';
 import {NavigationEvents} from 'react-navigation';
+import {DDS} from '../../../App';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 const AnimatedTouchableOpacity = Animatable.createAnimatableComponent(
@@ -48,6 +49,7 @@ export const Notebook = ({navigation}) => {
   const [hideHeader, setHideHeader] = useState(false);
   const [margin, setMargin] = useState(190);
   const [buttonHide, setButtonHide] = useState(false);
+  const [numColumns, setNumColumns] = useState(1);
   const [addTopic, setAddTopic] = useState(false);
   const forceUpdate = useForceUpdate();
   // Variables
@@ -90,7 +92,7 @@ export const Notebook = ({navigation}) => {
   return (
     <AnimatedSafeAreaView
       transition="backgroundColor"
-      duration={1000}
+      duration={300}
       style={{
         height: '100%',
         backgroundColor: colors.bg,
@@ -113,7 +115,7 @@ export const Notebook = ({navigation}) => {
         />
         <Animatable.View
           transition="backgroundColor"
-          duration={1000}
+          duration={300}
           style={{
             position: 'absolute',
             backgroundColor: colors.bg,
@@ -203,6 +205,100 @@ export const Notebook = ({navigation}) => {
               )}
             </>
           }
+          ListHeaderComponent={
+            <View
+              style={{
+                marginTop: margin + 20,
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                width:
+                  numColumns === 2
+                    ? DDS.isTab
+                      ? w * 0.7 * 0.95
+                      : w * 0.95
+                    : w * 0.95,
+
+                alignSelf: 'center',
+                marginLeft:
+                  numColumns === 2 ? (DDS.isTab ? w * 0.7 * 0.025 : 0) : 0,
+                paddingHorizontal: ph + 5,
+              }}>
+              <View>
+                <Text
+                  transition="marginTop"
+                  delay={200}
+                  duration={200}
+                  style={{
+                    fontSize: SIZE.lg,
+                    fontFamily: WEIGHT.medium,
+                    color: colors.pri,
+                    paddingHorizontal: DDS.isTab ? '2.5%' : '5%',
+                    maxWidth: '100%',
+                  }}>
+                  <Text
+                    style={{
+                      color: colors.accent,
+                    }}></Text>
+                </Text>
+              </View>
+
+              <TouchableOpacity
+                onPress={() => {
+                  setNumColumns(numColumns === 1 ? 2 : 1);
+                }}
+                style={{
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <Icon name="list" size={SIZE.xl} color={colors.icon} />
+              </TouchableOpacity>
+            </View>
+          }
+          numColumns={numColumns}
+          key={numColumns}
+          columnWrapperStyle={
+            numColumns === 1
+              ? null
+              : {
+                  width:
+                    params.notebook.topics.length === 1
+                      ? DDS.isTab
+                        ? '95%'
+                        : '90%'
+                      : DDS.isTab
+                      ? '45%'
+                      : '42.5%',
+                }
+          }
+          contentContainerStyle={{
+            width:
+              numColumns === 2
+                ? DDS.isTab
+                  ? '100%'
+                  : null
+                : DDS.isTab
+                ? '95%'
+                : '90%',
+            alignItems: numColumns === 2 ? 'flex-start' : null,
+            alignSelf: 'center',
+          }}
+          ListFooterComponent={
+            <View
+              style={{
+                height: 150,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
+              <Text
+                style={{
+                  color: colors.navbg,
+                  fontSize: SIZE.sm,
+                  fontFamily: WEIGHT.regular,
+                }}>
+                - End -
+              </Text>
+            </View>
+          }
           renderItem={({item, index}) => (
             <NotebookItem
               hideMore={params.hideMore}
@@ -231,18 +327,18 @@ export const Notebook = ({navigation}) => {
             paddingHorizontal: ph,
             paddingVertical: pv + 5,
             flexDirection: 'row',
-            justifyContent: 'space-between',
+            justifyContent: 'flex-start',
             alignItems: 'center',
             marginBottom: 15,
             backgroundColor: colors.accent,
           }}>
+          <Icon name="plus" color="white" size={SIZE.lg} />
           <Text
             style={{
               fontSize: SIZE.md,
               fontFamily: WEIGHT.semibold,
               color: 'white',
             }}>
-            <Icon name="plus" color="white" size={SIZE.lg} />
             {'  '}Add a new topic
           </Text>
         </TouchableOpacity>

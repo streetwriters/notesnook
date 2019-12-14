@@ -42,13 +42,13 @@ export const Reminders = ({navigation}) => {
         }}>
         <Text
           style={{
-            fontSize: SIZE.xxl,
+            fontSize: SIZE.xl,
             color: colors.pri,
             fontFamily: WEIGHT.bold,
           }}>
           Reminders
         </Text>
-        <Icon name="md-more" color={colors.icon} size={SIZE.xxl} />
+        <Icon name="md-more" color={colors.icon} size={SIZE.xl} />
       </View>
 
       <Reminder invert={true} />

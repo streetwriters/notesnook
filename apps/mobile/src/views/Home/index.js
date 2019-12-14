@@ -31,6 +31,8 @@ import NavigationService from '../../services/NavigationService';
 import {useForceUpdate} from '../ListsEditor';
 import * as Animatable from 'react-native-animatable';
 import {useNavigationEvents, useIsFocused} from 'react-navigation-hooks';
+import {useAppContext} from '../../provider/useAppContext';
+import {DDS} from '../../../App';
 export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(
   SafeAreaView,
 );
@@ -48,6 +50,7 @@ export const Home = ({navigation}) => {
   const [keyword, setKeyword] = useState('');
   const forceUpdate = useForceUpdate();
   const isFocused = useIsFocused();
+  const {userLoggedIn, logInUser} = useAppContext();
   // Variables
   let offsetY = 0;
   let countUp = 1;
@@ -59,7 +62,14 @@ export const Home = ({navigation}) => {
   let allNotes = [];
 
   // Effects
+
   useEffect(() => {
+    console.log('deviceType', DDS.isTab);
+    console.log(userLoggedIn);
+  }, [userLoggedIn]);
+  useEffect(() => {
+    logInUser(true);
+
     if (!isFocused) return;
     fetchNotes();
   }, [isFocused]);
@@ -165,30 +175,10 @@ export const Home = ({navigation}) => {
 
   // Render
 
-  return Platform.isPad ? (
-    <SafeAreaView style={[styles.container, {backgroundColor: colors.bg}]}>
-      <KeyboardAvoidingView style={{backgroundColor: colors.bg}}>
-        <Header colors={colors} heading="Home" canGoBack={false} />
-
-        <Search
-          onChangeText={onChangeText}
-          onSubmitEditing={onSubmitEditing}
-          onBlur={onBlur}
-          onFocus={onFocus}
-          value={text}
-          onClose={() => {
-            setHidden(false);
-            setText('');
-          }}
-        />
-
-        <NotesList keyword={text} />
-      </KeyboardAvoidingView>
-    </SafeAreaView>
-  ) : (
+  return (
     <AnimatedSafeAreaView
       transition="backgroundColor"
-      duration={1000}
+      duration={300}
       style={{
         height: '100%',
         backgroundColor: colors.night ? colors.bg : colors.bg,
@@ -204,7 +194,7 @@ export const Home = ({navigation}) => {
         />
         <Animatable.View
           transition="backgroundColor"
-          duration={1000}
+          duration={300}
           style={{
             position: 'absolute',
             backgroundColor: colors.night ? colors.bg : colors.bg,
@@ -248,6 +238,7 @@ export const Home = ({navigation}) => {
 
         <NotesList
           margin={margin}
+          numOfColumns={DDS.isTab ? 2 : 1}
           onScroll={y => {
             if (buttonHide) return;
             if (y < 30) setHideHeader(false);
@@ -276,7 +267,7 @@ export const Home = ({navigation}) => {
             }}
             activeOpacity={opacity}
             style={{
-              width: '90%',
+              width: DDS.isTab ? '95%' : '90%',
               alignSelf: 'center',
               borderRadius: br,
               backgroundColor: colors.accent,
@@ -286,21 +277,21 @@ export const Home = ({navigation}) => {
             }}>
             <View
               style={{
-                justifyContent: 'space-between',
+                justifyContent: 'flex-start',
                 alignItems: 'center',
                 flexDirection: 'row',
                 width: '100%',
                 padding: pv,
                 paddingVertical: pv + 5,
               }}>
+              <Icon name="plus" color="white" size={SIZE.lg} />
               <Text
                 style={{
                   fontSize: SIZE.md,
                   color: 'white',
-                  fontFamily: WEIGHT.bold,
+                  fontFamily: WEIGHT.regular,
                   textAlignVertical: 'center',
                 }}>
-                <Icon name="plus" color="white" size={SIZE.lg} />
                 {'  '}Add a new note
               </Text>
             </View>
@@ -313,6 +304,11 @@ export const Home = ({navigation}) => {
 
 Home.navigationOptions = {
   header: null,
+  headerStyle: {
+    backgroundColor: 'transparent',
+    borderBottomWidth: 0,
+    height: 0,
+  },
 };
 
 export default Home;

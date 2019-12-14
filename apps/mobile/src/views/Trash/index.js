@@ -51,15 +51,17 @@ export const Trash = ({navigation}) => {
     <SafeAreaView
       style={{
         backgroundColor: colors.bg,
+        height: '100%',
       }}>
       <Header colors={colors} heading="Trash" canGoBack={false} />
       <FlatList
         numColumns={2}
         columnWrapperStyle={{
           width: '45%',
+          marginHorizontal: '2.5%',
         }}
         style={{
-          height: '80%',
+          width: '100%',
         }}
         data={[
           {
@@ -85,21 +87,20 @@ export const Trash = ({navigation}) => {
           width: '90%',
           marginHorizontal: '5%',
           paddingHorizontal: ph,
-
           paddingVertical: pv + 5,
           flexDirection: 'row',
-          justifyContent: 'space-between',
+          justifyContent: 'flex-start',
           alignItems: 'center',
-          marginBottom: 15,
+          marginBottom: 20,
           backgroundColor: colors.accent,
         }}>
+        <Icon name="trash" color="white" size={SIZE.lg} />
         <Text
           style={{
             fontSize: SIZE.md,
             fontFamily: WEIGHT.semibold,
             color: 'white',
           }}>
-          <Icon name="plus" color="white" size={SIZE.lg} />
           {'  '}Clear all Trash
         </Text>
       </TouchableOpacity>

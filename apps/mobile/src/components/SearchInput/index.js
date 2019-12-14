@@ -13,7 +13,7 @@ import {
 import Icon from 'react-native-vector-icons/Ionicons';
 import {getElevation} from '../../utils/utils';
 import * as Animatable from 'react-native-animatable';
-
+import {DDS} from '../../../App';
 export const Search = props => {
   const [colors, setColors] = useState(COLOR_SCHEME);
   const [focus, setFocus] = useState(false);
@@ -41,7 +41,7 @@ export const Search = props => {
           flexDirection: 'row',
           justifyContent: 'space-between',
           alignItems: 'center',
-          width: Platform.isPad ? '95%' : '90%',
+          width: DDS.isTab ? '95%' : '90%',
           alignSelf: 'center',
           borderRadius: br,
           borderWidth: props.hide ? 0 : 1.5,
@@ -61,6 +61,7 @@ export const Search = props => {
             fontFamily: WEIGHT.regular,
             color: colors.pri,
             maxWidth: '90%',
+            paddingVertical: 10,
             width: '90%',
             fontSize: SIZE.md,
           }}
@@ -79,7 +80,7 @@ export const Search = props => {
           placeholderTextColor={colors.icon}
         />
         <Icon
-          style={{paddingRight: Platform.isPad ? '1.25%' : '2.5%'}}
+          style={{paddingRight: DDS.isTab ? '1.25%' : '2.5%'}}
           onPress={() => {
             props.clear();
             props.value.length > 0 ? props.clearSearch() : null;

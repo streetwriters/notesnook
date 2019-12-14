@@ -9,6 +9,7 @@ import {
   SafeAreaView,
   Platform,
   Modal,
+  KeyboardAvoidingView,
 } from 'react-native';
 import NavigationService from '../../services/NavigationService';
 import {
@@ -26,7 +27,7 @@ import Icon from 'react-native-vector-icons/Feather';
 import {getElevation, h, w, timeSince, ToastEvent} from '../../utils/utils';
 import {FlatList, TextInput} from 'react-native-gesture-handler';
 import {useForceUpdate} from '../../views/ListsEditor';
-import {db} from '../../../App';
+import {db, DDS} from '../../../App';
 
 let refs = [];
 
@@ -123,7 +124,8 @@ export const AddNotebookDialog = ({visible, close}) => {
       animated
       animationType="fade"
       onRequestClose={() => (refs = [])}>
-      <View
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : null}
         style={{
           width: '100%',
           height: '100%',
@@ -134,7 +136,7 @@ export const AddNotebookDialog = ({visible, close}) => {
         <View
           style={{
             ...getElevation(5),
-            width: '80%',
+            width: DDS.isTab ? '50%' : '80%',
             maxHeight: 350,
 
             borderRadius: 5,
@@ -152,10 +154,9 @@ export const AddNotebookDialog = ({visible, close}) => {
             <Text
               style={{
                 color: colors.accent,
-                fontFamily: WEIGHT.semibold,
-                marginLeft: 10,
-                fontSize: SIZE.lg,
-                marginTop: -5,
+                fontFamily: WEIGHT.bold,
+                marginLeft: 5,
+                fontSize: SIZE.md,
               }}>
               New Notebook
             </Text>
@@ -184,7 +185,7 @@ export const AddNotebookDialog = ({visible, close}) => {
           <Text
             style={{
               fontSize: SIZE.sm,
-              fontFamily: WEIGHT.semibold,
+              fontFamily: WEIGHT.bold,
               color: colors.pri,
             }}>
             Topics:
@@ -276,7 +277,7 @@ export const AddNotebookDialog = ({visible, close}) => {
             </TouchableOpacity>
           </View>
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 };

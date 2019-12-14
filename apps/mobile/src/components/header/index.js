@@ -5,7 +5,7 @@ import {SIZE, WEIGHT} from '../../common/common';
 import {h, SideMenuEvent} from '../../utils/utils';
 import * as Animatable from 'react-native-animatable';
 import NavigationService from '../../services/NavigationService';
-
+import {DDS} from '../../../App';
 export const Header = ({
   heading,
   colors,
@@ -15,6 +15,8 @@ export const Header = ({
   menu,
   sendHeight = e => {},
 }) => {
+  const [isOpen, setOpen] = useState(DDS.isTab ? true : false);
+
   return (
     <Animatable.View
       onLayout={e => {
@@ -30,7 +32,7 @@ export const Header = ({
         zIndex: 10,
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingHorizontal: Platform.isPad ? '2.5%' : '5%',
+        paddingHorizontal: DDS.isTab ? '2.5%' : '5%',
         paddingTop: Platform.OS == 'ios' ? h * 0.02 : h * 0.06,
         marginBottom: hide
           ? h * 0.03
@@ -59,11 +61,10 @@ export const Header = ({
             <Icon
               style={{
                 marginLeft: -10,
-                marginTop: 5,
               }}
               color={colors.pri}
               name={'chevron-left'}
-              size={hide ? SIZE.xl : SIZE.xxl}
+              size={SIZE.xl}
             />
           </TouchableOpacity>
         ) : (
@@ -73,22 +74,21 @@ export const Header = ({
           <TouchableOpacity
             hitSlop={{top: 20, bottom: 20, left: 50, right: 40}}
             onPress={() => {
-              SideMenuEvent.open();
+              if (isOpen) {
+                SideMenuEvent.close();
+                setOpen(false);
+              } else {
+                SideMenuEvent.open();
+                setOpen(true);
+              }
             }}
             style={{
-              justifyContent: 'flex-start',
+              justifyContent: 'center',
               alignItems: 'flex-start',
               height: 40,
-              width: 42,
+              width: 45,
             }}>
-            <Icon
-              style={{
-                marginTop: 6,
-              }}
-              color={colors.pri}
-              name={'menu'}
-              size={hide ? SIZE.xl : SIZE.xxl - 2}
-            />
+            <Icon color={colors.pri} name={'menu'} size={SIZE.xl} />
           </TouchableOpacity>
         ) : (
           undefined
@@ -98,7 +98,7 @@ export const Header = ({
           transition="fontSize"
           duration={300}
           style={{
-            fontSize: hide ? SIZE.xl : SIZE.xxl,
+            fontSize: hide ? SIZE.xl : SIZE.xl,
             color: colors.pri,
             fontFamily: WEIGHT.bold,
           }}>

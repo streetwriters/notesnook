@@ -65,10 +65,9 @@ export const Dialog = ({
             <Text
               style={{
                 color: colors.accent,
-                fontFamily: WEIGHT.semibold,
-                marginLeft: 10,
-                fontSize: SIZE.lg,
-                marginTop: -5,
+                fontFamily: WEIGHT.bold,
+                marginLeft: 5,
+                fontSize: SIZE.md + 2,
               }}>
               {title}
             </Text>
@@ -79,7 +78,7 @@ export const Dialog = ({
               style={{
                 color: colors.icon,
                 fontFamily: WEIGHT.regular,
-                fontSize: SIZE.sm - 1,
+                fontSize: SIZE.sm - 2,
                 textAlign: 'center',
                 marginTop: 10,
               }}>

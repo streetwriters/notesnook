@@ -50,7 +50,7 @@ export const AccountSettings = ({navigation}) => {
   return (
     <AnimatedSafeAreaView
       transition="backgroundColor"
-      duration={1000}
+      duration={300}
       style={{
         height: '100%',
         backgroundColor: colors.bg,
