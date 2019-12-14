@@ -158,51 +158,9 @@ export const Folders = ({navigation}) => {
           ListHeaderComponent={
             <View
               style={{
-                marginTop: margin + 20,
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                width:
-                  numColumns === 2
-                    ? DDS.isTab
-                      ? w * 0.7 * 0.95
-                      : w * 0.95
-                    : w * 0.95,
-
-                alignSelf: 'center',
-                marginLeft:
-                  numColumns === 2 ? (DDS.isTab ? w * 0.7 * 0.025 : 0) : 0,
-                paddingHorizontal: ph + 5,
-              }}>
-              <View>
-                <Text
-                  transition="marginTop"
-                  delay={200}
-                  duration={200}
-                  style={{
-                    fontSize: SIZE.lg,
-                    fontFamily: WEIGHT.medium,
-                    color: colors.pri,
-                    paddingHorizontal: DDS.isTab ? '2.5%' : '5%',
-                    maxWidth: '100%',
-                  }}>
-                  <Text
-                    style={{
-                      color: colors.accent,
-                    }}></Text>
-                </Text>
-              </View>
-
-              <TouchableOpacity
-                onPress={() => {
-                  setNumColumns(numColumns === 1 ? 2 : 1);
-                }}
-                style={{
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}>
-                <Icon name="list" size={SIZE.xl} color={colors.icon} />
-              </TouchableOpacity>
-            </View>
+                marginTop: margin,
+              }}
+            />
           }
           numColumns={numColumns}
           key={numColumns}

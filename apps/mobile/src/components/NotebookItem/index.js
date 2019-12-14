@@ -126,7 +126,7 @@ export const NotebookItem = ({
             numberOfLines={1}
             style={{
               fontFamily: WEIGHT.bold,
-              fontSize: SIZE.sm,
+              fontSize: SIZE.md,
               color: colors.pri,
               maxWidth: '100%',
             }}>
@@ -137,9 +137,9 @@ export const NotebookItem = ({
               numberOfLines={numColumns === 2 ? 3 : 2}
               style={{
                 fontFamily: WEIGHT.regular,
-                fontSize: SIZE.xs,
+                fontSize: SIZE.xs + 1,
                 lineHeight: SIZE.sm,
-                color: colors.icon,
+                color: colors.pri,
                 maxWidth: '100%',
                 paddingVertical: 5,
                 height: numColumns === 2 ? SIZE.sm * 3.5 : null,

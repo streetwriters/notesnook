@@ -33,12 +33,13 @@ let titleRef;
 let EditorWebView;
 
 const Editor = ({navigation}) => {
-  // STATE
-
+  // Global State
   const {colors} = useAppContext();
+
+  // Local State
+
   const [dialog, setDialog] = useState(false);
   const [isOpen, setOpen] = useState(false);
-  const [hide, setHide] = useState(true);
   const [sidebar, setSidebar] = useState(DDS.isTab ? true : false);
   // VARIABLES
   let updateInterval = null;
@@ -227,7 +228,6 @@ const Editor = ({navigation}) => {
       title = null;
       timestamp = null;
       content = null;
-
       handleBack.remove();
       handleBack = null;
     };
@@ -245,26 +245,15 @@ const Editor = ({navigation}) => {
   }, []);
 
   useEffect(() => {
-    DeviceEventEmitter.emit('hide');
-
-    return () => {
-      DeviceEventEmitter.emit('show');
-    };
-  }, []);
-
-  useEffect(() => {
-    null;
-
     return () => {
       DDS.isTab ? SideMenuEvent.open() : null;
-
       SideMenuEvent.enable();
     };
   });
 
   useEffect(() => {
     EditorWebView.reload();
-  }, [colors.bg]);
+  }, [colors]);
 
   return DDS.isTab ? (
     <View

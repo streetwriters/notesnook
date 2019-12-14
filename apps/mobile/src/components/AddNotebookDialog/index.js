@@ -1,32 +1,17 @@
-import React, {useEffect, useState, createRef} from 'react';
+import React, {useState, createRef} from 'react';
 import {
-  ScrollView,
   View,
   Text,
   TouchableOpacity,
-  Dimensions,
-  Image,
-  SafeAreaView,
   Platform,
   Modal,
   KeyboardAvoidingView,
 } from 'react-native';
-import NavigationService from '../../services/NavigationService';
-import {
-  COLOR_SCHEME,
-  SIZE,
-  br,
-  ph,
-  pv,
-  opacity,
-  FONT,
-  WEIGHT,
-} from '../../common/common';
+import {SIZE, ph, pv, opacity, WEIGHT} from '../../common/common';
 import Icon from 'react-native-vector-icons/Feather';
 
-import {getElevation, h, w, timeSince, ToastEvent} from '../../utils/utils';
+import {getElevation, ToastEvent} from '../../utils/utils';
 import {FlatList, TextInput} from 'react-native-gesture-handler';
-import {useForceUpdate} from '../../views/ListsEditor';
 import {db, DDS} from '../../../App';
 import {useAppContext} from '../../provider/useAppContext';
 
@@ -36,28 +21,30 @@ export const AddNotebookDialog = ({visible, close}) => {
   const {colors} = useAppContext();
   const [topics, setTopics] = useState(['']);
   const [title, setTitle] = useState(null);
-  const forceUpdate = useForceUpdate();
 
   let listRef = createRef();
   let prevItem = null;
   let prevIndex = null;
-  let currentSelectedItem = null;
+  let currentSelectedInput = null;
 
   let description = 'my first notebook';
   const onSubmit = (text, index, willFocus = true) => {
-    let oldData = topics;
-    oldData[index] = text;
+    let prevTopics = topics;
+    prevTopics[index] = text;
 
     if (
-      oldData.length === index + 1 &&
+      prevTopics.length === index + 1 &&
       prevIndex !== null &&
       prevItem !== null
     ) {
-      oldData.push('');
+      prevTopics.push('');
     }
-    setTopics(oldData);
-    forceUpdate();
-    currentSelectedItem = null;
+
+    let nextTopics = [...prevTopics];
+
+    setTopics(nextTopics);
+
+    currentSelectedInput = null;
 
     //if (!willFocus) return;
     if (!refs[index + 1]) {
@@ -73,31 +60,39 @@ export const AddNotebookDialog = ({visible, close}) => {
     }
   };
   const onFocus = index => {
-    currentSelectedItem = index;
-    if (currentSelectedItem) {
-      let oldData = topics;
-      oldData[prevIndex] = prevItem;
-      if (oldData.length === prevIndex + 1) {
-        oldData.push('');
+    currentSelectedInput = index;
+
+    if (currentSelectedInput) {
+      let prevTopics = topics;
+
+      prevTopics[prevIndex] = prevItem;
+      if (prevTopics.length === prevIndex + 1) {
+        prevTopics.push('');
       }
       prevIndex = null;
       prevItem = null;
-      setTopics(oldData);
-      forceUpdate();
+
+      let nextTopics = [...prevTopics];
+
+      setTopics(nextTopics);
     }
   };
   const onChange = (text, index) => {
     prevIndex = index;
     prevItem = text;
   };
-  const onDelete = index => {
-    let listData = topics;
-    if (listData.length === 1) return;
-    refs.splice(index, 1);
-    listData.splice(index, 1);
 
-    setTopics(listData);
-    forceUpdate();
+  const onDelete = index => {
+    let prevTopics = topics;
+
+    if (prevTopics.length === 1) return;
+
+    refs = [];
+    prevTopics.splice(index, 1);
+
+    let nextTopics = [...prevTopics];
+
+    setTopics(nextTopics);
   };
 
   const addNewNotebook = async () => {
@@ -113,7 +108,7 @@ export const AddNotebookDialog = ({visible, close}) => {
     setTopics(['']);
     prevIndex = null;
     prevItem = null;
-    currentSelectedItem = null;
+    currentSelectedInput = null;
     refs = [];
     close(true);
   };
@@ -252,10 +247,12 @@ export const AddNotebookDialog = ({visible, close}) => {
               activeOpacity={opacity}
               onPress={() => {
                 setTopics(['']);
+
+                refs = [];
                 prevIndex = null;
                 prevItem = null;
-                currentSelectedItem = null;
-                refs = [];
+                currentSelectedInput = null;
+
                 close();
               }}
               style={{
@@ -313,7 +310,6 @@ const TopicItem = ({
         ref={topicRef}
         onFocus={() => {
           onFocus(index);
-
           setFocus(true);
         }}
         onBlur={() => {

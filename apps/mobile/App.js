@@ -7,11 +7,8 @@ import {
   View,
   DeviceEventEmitter,
   Platform,
-  Keyboard,
   Animated,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
-import ActionButton from 'react-native-action-button';
 import * as Animatable from 'react-native-animatable';
 import {h, w} from './src/utils/utils';
 import {Toast} from './src/components/Toast';
@@ -22,6 +19,7 @@ import StorageInterface from './src/utils/storage';
 import {AppProvider} from './src/provider';
 import {DeviceDetectionService} from './src/utils/deviceDetection';
 import {useAppContext} from './src/provider/useAppContext';
+
 export const DDS = new DeviceDetectionService();
 
 export const db = new Storage(StorageInterface);
