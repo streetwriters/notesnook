@@ -3,7 +3,11 @@ import fuzzysearch from "fuzzysearch";
 var tfun = require("transfun/transfun.js").tfun;
 tfun = global.tfun;
 import { extractValues, groupBy } from "../utils";
-import { getWeekGroupFromTimestamp, months } from "../utils/date";
+import {
+  getWeekGroupFromTimestamp,
+  months,
+  getLastWeekTimestamp
+} from "../utils/date";
 
 const KEYS = {
   notes: "notes",
