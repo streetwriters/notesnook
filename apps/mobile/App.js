@@ -27,14 +27,21 @@ export const DDS = new DeviceDetectionService();
 export const db = new Storage(StorageInterface);
 
 const App = () => {
+  // Global State
   const {colors} = useAppContext();
 
-  const [fab, setFab] = useState(true);
+  // Local State
   const [sidebar, setSidebar] = useState(w * 0.3);
   const [isOpen, setOpen] = useState(false);
   const [disableGestures, setDisableGesture] = useState(false);
-  const [buttonHide, setButtonHide] = useState(false);
   const [isIntialized, setIsInitialized] = useState(false);
+
+  // Effects
+  useEffect(() => {
+    db.init().then(() => {
+      setIsInitialized(true);
+    });
+  }, []);
 
   useEffect(() => {
     DeviceEventEmitter.addListener('openSidebar', () => {
@@ -67,49 +74,6 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    DeviceEventEmitter.addListener('hide', () => {
-      setFab(false);
-    });
-    DeviceEventEmitter.addListener('show', () => {
-      setFab(true);
-    });
-
-    return () => {
-      DeviceEventEmitter.removeListener('hide', () => {
-        setFab(false);
-      });
-      DeviceEventEmitter.removeListener('show', () => {
-        setFab(true);
-      });
-    };
-  }, []);
-
-  useEffect(() => {
-    Keyboard.addListener('keyboardDidShow', () => {
-      setDisableGesture(true);
-      setButtonHide(true);
-    });
-    Keyboard.addListener('keyboardDidHide', () => {
-      setDisableGesture(false);
-      setTimeout(() => {
-        setButtonHide(false);
-      }, 500);
-    });
-    return () => {
-      Keyboard.removeListener('keyboardDidShow', () => {
-        setDisableGesture(true);
-        setButtonHide(true);
-      });
-      Keyboard.removeListener('keyboardDidHide', () => {
-        setDisableGesture(false);
-        setTimeout(() => {
-          setButtonHide(false);
-        }, 500);
-      });
-    };
-  }, []);
-
-  useEffect(() => {
     if (Platform.OS === 'android') {
       StatusBar.setBackgroundColor('transparent');
       StatusBar.setTranslucent(true);
@@ -117,11 +81,7 @@ const App = () => {
     }
   }, []);
 
-  useEffect(() => {
-    db.init().then(() => {
-      setIsInitialized(true);
-    });
-  }, []);
+  // Render
 
   if (!isIntialized) {
     return <View />;
@@ -144,7 +104,7 @@ const App = () => {
                 width: sidebar,
               }}>
               <Menu
-                hide={buttonHide}
+                hide={false}
                 colors={colors}
                 close={() => {
                   //setSidebar('0%');
@@ -183,11 +143,7 @@ const App = () => {
               }, 300);
             }}
             menu={
-              <Menu
-                hide={buttonHide}
-                colors={colors}
-                close={() => setOpen(false)}
-              />
+              <Menu hide={false} colors={colors} close={() => setOpen(false)} />
             }
             openMenuOffset={w / 1.3}>
             <AppContainer
@@ -202,53 +158,6 @@ const App = () => {
             />
           </SideMenu>
         )}
-
-        {/* {fab ? (
-        <ActionButton elevation={5} buttonColor={colors.accent}>
-          <ActionButton.Item
-            buttonColor="#9b59b6"
-            textStyle={{
-              fontFamily: WEIGHT.regular,
-              color: 'white',
-            }}
-            title=""
-            hideShadow={true}
-            onPress={() => {
-              NavigationService.navigate('Editor');
-            }}>
-            <Icon
-              name="md-create"
-              style={{
-                fontSize: 20,
-                height: 22,
-                color: 'white',
-              }}
-            />
-          </ActionButton.Item>
-          <ActionButton.Item
-            textStyle={{
-              fontFamily: WEIGHT.regular,
-              color: 'white',
-            }}
-            hideShadow={true}
-            buttonColor="#3498db"
-            title=""
-            onPress={() => {
-              NavigationService.navigate('ListsEditor');
-            }}>
-            <Icon
-              name="ios-list"
-              style={{
-                fontSize: 20,
-                height: 22,
-                color: 'white',
-              }}
-            />
-          </ActionButton.Item>
-        </ActionButton>
-      ) : (
-        undefined
-      )} */}
 
         <Toast />
       </View>

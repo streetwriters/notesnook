@@ -4,7 +4,7 @@ import {View, Text, TouchableOpacity, Dimensions} from 'react-native';
 import {COLOR_SCHEME, SIZE, br, ph, pv, WEIGHT} from '../../common/common';
 
 import Icon from 'react-native-vector-icons/Feather';
-import {timeSince, ToastEvent} from '../../utils/utils';
+import {timeSince, ToastEvent, SideMenuEvent} from '../../utils/utils';
 import NavigationService from '../../services/NavigationService';
 import Menu, {MenuItem, MenuDivider} from 'react-native-material-menu';
 import {Dialog} from '../Dialog';
@@ -82,6 +82,8 @@ const NoteItem = props => {
       <TouchableOpacity
         activeOpacity={1}
         onPress={() => {
+          SideMenuEvent.close();
+          SideMenuEvent.disable();
           NavigationService.navigate('Editor', {
             note: item,
           });

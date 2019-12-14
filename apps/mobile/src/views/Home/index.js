@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import {COLOR_SCHEME, opacity, pv, br, SIZE, WEIGHT} from '../../common/common';
 import {Search} from '../../components/SearchInput';
-import {w, h} from '../../utils/utils';
+import {w, h, SideMenuEvent} from '../../utils/utils';
 import {Header} from '../../components/header';
 import {NavigationEvents} from 'react-navigation';
 import {NotesList} from '../../components/NotesList';
@@ -27,7 +27,7 @@ export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(
 
 export const Home = ({navigation}) => {
   // State
-  const {colors, updateAppTheme} = useAppContext();
+  const {colors, updateAppTheme, setMenuOpen} = useAppContext();
 
   const [search, setSearch] = useState(false);
   const [text, setText] = useState('');
@@ -51,7 +51,9 @@ export const Home = ({navigation}) => {
   // Effects
   useEffect(() => {
     updateAppTheme(colors);
+    DDS.isTab ? setMenuOpen() : null;
   }, []);
+
   useEffect(() => {
     if (!isFocused) return;
     fetchNotes();
@@ -235,6 +237,8 @@ export const Home = ({navigation}) => {
         {buttonHide ? null : (
           <TouchableOpacity
             onPress={() => {
+              SideMenuEvent.close();
+              SideMenuEvent.disable();
               NavigationService.navigate('Editor');
             }}
             activeOpacity={opacity}

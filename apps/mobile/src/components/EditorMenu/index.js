@@ -177,8 +177,8 @@ export const EditorMenu = ({close = () => {}, hide, update = () => {}}) => {
                     />
                     <Text
                       style={{
-                        fontFamily: WEIGHT.semibold,
-                        fontSize: SIZE.sm - 2,
+                        fontFamily: WEIGHT.regular,
+                        fontSize: SIZE.sm,
                         color: colors.pri,
                       }}>
                       {item.name}
@@ -244,8 +244,8 @@ export const EditorMenu = ({close = () => {}, hide, update = () => {}}) => {
                 />
                 <Text
                   style={{
-                    fontFamily: WEIGHT.semibold,
-                    fontSize: SIZE.sm - 1,
+                    fontFamily: WEIGHT.regular,
+                    fontSize: SIZE.sm,
                     color: colors.pri,
                   }}>
                   Add Tags
@@ -277,7 +277,7 @@ export const EditorMenu = ({close = () => {}, hide, update = () => {}}) => {
                   }}>
                   <Text
                     style={{
-                      fontFamily: WEIGHT.medium,
+                      fontFamily: WEIGHT.regular,
                       fontSize: SIZE.sm - 2,
                       color: 'white',
                     }}>
@@ -289,7 +289,7 @@ export const EditorMenu = ({close = () => {}, hide, update = () => {}}) => {
                 style={{
                   backgroundColor: 'transparent',
                   minWidth: 100,
-                  fontFamily: WEIGHT.semibold,
+                  fontFamily: WEIGHT.regular,
                   color: colors.pri,
                   paddingHorizontal: 5,
                   paddingVertical: 2.5,
@@ -383,11 +383,11 @@ export const EditorMenu = ({close = () => {}, hide, update = () => {}}) => {
                 />
                 <Text
                   style={{
-                    fontFamily: WEIGHT.semibold,
-                    fontSize: SIZE.sm - 2,
+                    fontFamily: WEIGHT.regular,
+                    fontSize: SIZE.sm,
                     color: colors.pri,
                   }}>
-                  Add Color
+                  Add to Color
                 </Text>
               </View>
             </TouchableOpacity>

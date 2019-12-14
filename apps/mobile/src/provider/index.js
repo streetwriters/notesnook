@@ -1,12 +1,14 @@
 import React, {createContext, useEffect} from 'react';
 import {useImmer} from 'use-immer';
-import {COLOR_SCHEME, getColorScheme} from '../common/common';
+import {DDS} from '../../App';
 const ACCENT = {
   color: '#0560FF',
 };
 
 const defaultState = {
-  userLoggedIn: false,
+  isMenuOpen: {
+    current: false,
+  },
   colors: {
     night: false,
     bg: 'white',

@@ -351,8 +351,6 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
               justifyContent: 'flex-start',
               alignItems: 'center',
               flexDirection: 'row',
-              borderBottomColor: colors.accent,
-              borderBottomWidth: 1,
             }}>
             <Icon name="log-in" color={colors.accent} size={SIZE.lg} />
 

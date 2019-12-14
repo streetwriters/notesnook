@@ -16,7 +16,7 @@ export const Header = ({
   sendHeight = e => {},
 }) => {
   const {colors} = useAppContext();
-  const [isOpen, setOpen] = useState(DDS.isTab ? true : false);
+  let isOpen = false;
 
   return (
     <Animatable.View
@@ -77,10 +77,10 @@ export const Header = ({
             onPress={() => {
               if (isOpen) {
                 SideMenuEvent.close();
-                setOpen(false);
+                isOpen = false;
               } else {
                 SideMenuEvent.open();
-                setOpen(true);
+                isOpen = true;
               }
             }}
             style={{

@@ -1,9 +1,6 @@
-import React, {useEffect, useState, createRef} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
-  SafeAreaView,
-  Keyboard,
-  LayoutAnimation,
   Platform,
   Linking,
   DeviceEventEmitter,
@@ -13,28 +10,15 @@ import {
   BackHandler,
   TouchableOpacity,
 } from 'react-native';
-import {
-  COLOR_SCHEME,
-  SIZE,
-  br,
-  ph,
-  pv,
-  opacity,
-  FONT,
-  WEIGHT,
-  onThemeUpdate,
-  clearThemeUpdateListener,
-} from '../../common/common';
+import {SIZE, WEIGHT} from '../../common/common';
 import WebView from 'react-native-webview';
 import Icon from 'react-native-vector-icons/Feather';
-import {useForceUpdate} from '../ListsEditor';
-import {NavigationEvents} from 'react-navigation';
+
 import {db} from '../../../App';
 import {SideMenuEvent} from '../../utils/utils';
 import {Dialog} from '../../components/Dialog';
 import {DDS} from '../../../App';
 import * as Animatable from 'react-native-animatable';
-import Menu, {MenuItem, MenuDivider} from 'react-native-material-menu';
 import SideMenu from 'react-native-side-menu';
 import {EditorMenu} from '../../components/EditorMenu';
 import {AnimatedSafeAreaView} from '../Home';
@@ -47,46 +31,20 @@ var content = null;
 var title = null;
 let titleRef;
 let EditorWebView;
-let animatedViewRef;
-const AnimatedTouchableOpacity = Animatable.createAnimatableComponent(
-  TouchableOpacity,
-);
-const AnimatedTextInput = Animatable.createAnimatableComponent(TextInput);
 
 const Editor = ({navigation}) => {
   // STATE
 
   const {colors} = useAppContext();
   const [dialog, setDialog] = useState(false);
-  const [resize, setResize] = useState(false);
   const [isOpen, setOpen] = useState(false);
   const [hide, setHide] = useState(true);
   const [sidebar, setSidebar] = useState(DDS.isTab ? true : false);
   // VARIABLES
-
   let updateInterval = null;
-  let keyboardDidShowListener = null;
-  let keyboardDidHideListener = null;
-  let setMenuRef;
-  const forceUpdate = useForceUpdate();
-  const {userLoggedIn, logInUser} = useAppContext();
   // FUNCTIONS
 
-  const _keyboardDidShow = e => {
-    if (!isOpen) {
-      setTimeout(() => {
-        setHide(true);
-      }, 300);
-    }
-  };
-
   const post = value => EditorWebView.postMessage(value);
-
-  const _keyboardDidHide = () => {
-    setTimeout(() => {
-      setHide(false);
-    }, 10000);
-  };
 
   const onChange = data => {
     if (data !== '') {
@@ -261,7 +219,6 @@ const Editor = ({navigation}) => {
   // EFFECTS
 
   useEffect(() => {
-    console.log(userLoggedIn);
     let handleBack = BackHandler.addEventListener(
       'hardwareBackPress',
       handleBackEvent,
@@ -273,21 +230,6 @@ const Editor = ({navigation}) => {
 
       handleBack.remove();
       handleBack = null;
-    };
-  }, []);
-
-  useEffect(() => {
-    keyboardDidShowListener = Keyboard.addListener(
-      'keyboardDidShow',
-      _keyboardDidShow,
-    );
-    keyboardDidHideListener = Keyboard.addListener(
-      'keyboardDidHide',
-      _keyboardDidHide,
-    );
-    return () => {
-      keyboardDidShowListener.remove();
-      keyboardDidHideListener.remove();
     };
   }, []);
 
@@ -311,8 +253,8 @@ const Editor = ({navigation}) => {
   }, []);
 
   useEffect(() => {
-    SideMenuEvent.close();
-    SideMenuEvent.disable();
+    null;
+
     return () => {
       DDS.isTab ? SideMenuEvent.open() : null;
 
@@ -321,26 +263,8 @@ const Editor = ({navigation}) => {
   });
 
   useEffect(() => {
-    onThemeUpdate(() => {
-      shouldFade = true;
-      forceUpdate();
-    });
-    return () => {
-      clearThemeUpdateListener(() => {
-        forceUpdate();
-      });
-    };
-  }, []);
-
-  useEffect(() => {
     EditorWebView.reload();
   }, [colors.bg]);
-
-  useEffect(() => {
-    setTimeout(() => {
-      setHide(false);
-    }, 1000);
-  }, []);
 
   return DDS.isTab ? (
     <View
@@ -393,13 +317,15 @@ const Editor = ({navigation}) => {
       onChange={args => {
         setTimeout(() => {
           setOpen(args);
-        }, 300);
+        }, 500);
       }}
       menu={
         <EditorMenu
-          hide={hide}
+          hide={false}
           close={() => {
-            setOpen(false);
+            setTimeout(() => {
+              setOpen(args);
+            }, 500);
           }}
         />
       }>
