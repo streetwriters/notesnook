@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useContext} from 'react';
+import React, {useState, useEffect} from 'react';
 import NavigationService, {
   AppContainer,
 } from './src/services/NavigationService';
@@ -10,13 +10,6 @@ import {
   Keyboard,
   Animated,
 } from 'react-native';
-import {
-  COLOR_SCHEME,
-  onThemeUpdate,
-  clearThemeUpdateListener,
-  getColorScheme,
-  COLOR_SCHEME_DARK,
-} from './src/common/common';
 import Icon from 'react-native-vector-icons/Ionicons';
 import ActionButton from 'react-native-action-button';
 import * as Animatable from 'react-native-animatable';
@@ -26,7 +19,7 @@ import {Menu} from './src/components/Menu';
 import SideMenu from 'react-native-side-menu';
 import Storage from 'notes-core/api/database';
 import StorageInterface from './src/utils/storage';
-import {AppProvider, AppContext} from './src/provider';
+import {AppProvider} from './src/provider';
 import {DeviceDetectionService} from './src/utils/deviceDetection';
 import {useAppContext} from './src/provider/useAppContext';
 export const DDS = new DeviceDetectionService();

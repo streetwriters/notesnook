@@ -1,6 +1,6 @@
-import React, {createContext} from 'react';
+import React, {createContext, useEffect} from 'react';
 import {useImmer} from 'use-immer';
-import {COLOR_SCHEME} from '../common/common';
+import {COLOR_SCHEME, getColorScheme} from '../common/common';
 const ACCENT = {
   color: '#0560FF',
 };

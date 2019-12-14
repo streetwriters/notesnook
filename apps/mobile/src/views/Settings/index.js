@@ -1,38 +1,17 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {
   ScrollView,
   View,
   Text,
   TouchableOpacity,
   Dimensions,
-  Image,
-  SafeAreaView,
-  Platform,
 } from 'react-native';
 import NavigationService from '../../services/NavigationService';
-import {
-  COLOR_SCHEME,
-  SIZE,
-  br,
-  ph,
-  pv,
-  opacity,
-  FONT,
-  WEIGHT,
-  setAccentColor,
-  COLOR_SCHEME_DARK,
-  COLOR_SCHEME_LIGHT,
-  setColorScheme,
-  onThemeUpdate,
-  clearThemeUpdateListener,
-} from '../../common/common';
+import {SIZE, br, ph, pv, opacity, FONT, WEIGHT} from '../../common/common';
 import Icon from 'react-native-vector-icons/Feather';
-import {Reminder} from '../../components/Reminder';
-import {ListItem} from '../../components/ListItem';
 import {Header} from '../../components/header';
 import {FlatList} from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-community/async-storage';
-import {useForceUpdate} from '../ListsEditor';
 import {AnimatedSafeAreaView} from '../Home';
 import {useAppContext} from '../../provider/useAppContext';
 
@@ -40,7 +19,7 @@ const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
 export const Settings = ({navigation}) => {
-  const {colors} = useAppContext();
+  const {colors, changeAccentColor} = useAppContext();
   return (
     <AnimatedSafeAreaView
       transition="backgroundColor"
@@ -179,10 +158,7 @@ export const Settings = ({navigation}) => {
             ].map(item => (
               <TouchableOpacity
                 onPress={() => {
-                  setAccentColor(item);
-                  setColorScheme(
-                    colors.night ? COLOR_SCHEME_DARK : COLOR_SCHEME_LIGHT,
-                  );
+                  changeAccentColor(item);
                   AsyncStorage.setItem('accentColor', item);
                 }}
                 style={{
