@@ -1,3 +1,6 @@
+var tfun = require("transfun/transfun.js").tfun;
+tfun = global.tfun;
+
 export function extractValues(obj) {
   const t = [];
   for (let key in obj) {
