@@ -34,24 +34,13 @@ import {FlatList} from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-community/async-storage';
 import {useForceUpdate} from '../ListsEditor';
 import {AnimatedSafeAreaView} from '../Home';
+import {useAppContext} from '../../provider/useAppContext';
 
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
 export const Settings = ({navigation}) => {
-  const [colors, setColors] = useState(COLOR_SCHEME);
-  const forceUpdate = useForceUpdate();
-
-  useEffect(() => {
-    onThemeUpdate(() => {
-      forceUpdate();
-    });
-    return () => {
-      clearThemeUpdateListener(() => {
-        forceUpdate();
-      });
-    };
-  }, []);
+  const {colors} = useAppContext();
   return (
     <AnimatedSafeAreaView
       transition="backgroundColor"

@@ -14,8 +14,9 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import {getElevation} from '../../utils/utils';
 import * as Animatable from 'react-native-animatable';
 import {DDS} from '../../../App';
+import {useAppContext} from '../../provider/useAppContext';
 export const Search = props => {
-  const [colors, setColors] = useState(COLOR_SCHEME);
+  const {colors} = useAppContext();
   const [focus, setFocus] = useState(false);
 
   const inputRef = createRef();
@@ -49,7 +50,7 @@ export const Search = props => {
           paddingVertical: props.hide
             ? 0
             : Platform.OS == 'ios'
-            ? pv - 3
+            ? pv - 1
             : pv - 8,
           marginBottom: props.hide ? 0 : 10,
           borderColor: focus ? colors.accent : colors.nav,
@@ -61,7 +62,7 @@ export const Search = props => {
             fontFamily: WEIGHT.regular,
             color: colors.pri,
             maxWidth: '90%',
-            paddingVertical: 10,
+
             width: '90%',
             fontSize: SIZE.md,
           }}

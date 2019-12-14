@@ -29,24 +29,13 @@ import {ListItem} from '../../components/ListItem';
 import {Header} from '../../components/header';
 import NoteItem from '../../components/NoteItem';
 import {useForceUpdate} from '../ListsEditor';
+import {useAppContext} from '../../provider/useAppContext';
 
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
 export const Tags = ({navigation}) => {
-  const [colors, setColors] = useState(COLOR_SCHEME);
-  const forceUpdate = useForceUpdate();
-
-  useEffect(() => {
-    onThemeUpdate(() => {
-      forceUpdate();
-    });
-    return () => {
-      clearThemeUpdateListener(() => {
-        forceUpdate();
-      });
-    };
-  }, []);
+  const {colors} = useAppContext();
   return (
     <SafeAreaView
       style={{

@@ -32,20 +32,9 @@ import {NavigationEvents} from 'react-navigation';
 import {Header} from '../../components/header';
 import {useForceUpdate} from '../ListsEditor';
 import {DDS} from '../../../App';
+import {useAppContext} from '../../provider/useAppContext';
 export const Login = ({navigation}) => {
-  const [colors, setColors] = useState(COLOR_SCHEME);
-  const forceUpdate = useForceUpdate();
-
-  useEffect(() => {
-    onThemeUpdate(() => {
-      forceUpdate();
-    });
-    return () => {
-      clearThemeUpdateListener(() => {
-        forceUpdate();
-      });
-    };
-  }, []);
+  const {colors} = useAppContext();
   useEffect(() => {
     DeviceEventEmitter.emit('hide');
     return () => {

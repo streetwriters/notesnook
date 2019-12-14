@@ -28,11 +28,12 @@ import {getElevation, h, w, timeSince, ToastEvent} from '../../utils/utils';
 import {FlatList, TextInput} from 'react-native-gesture-handler';
 import {useForceUpdate} from '../../views/ListsEditor';
 import {db, DDS} from '../../../App';
+import {useAppContext} from '../../provider/useAppContext';
 
 let refs = [];
 
 export const AddNotebookDialog = ({visible, close}) => {
-  const [colors, setColors] = useState(COLOR_SCHEME);
+  const {colors} = useAppContext();
   const [topics, setTopics] = useState(['']);
   const [title, setTitle] = useState(null);
   const forceUpdate = useForceUpdate();

@@ -6,15 +6,16 @@ import {h, SideMenuEvent} from '../../utils/utils';
 import * as Animatable from 'react-native-animatable';
 import NavigationService from '../../services/NavigationService';
 import {DDS} from '../../../App';
+import {useAppContext} from '../../provider/useAppContext';
 export const Header = ({
   heading,
-  colors,
   canGoBack = true,
   hide,
   showSearch,
   menu,
   sendHeight = e => {},
 }) => {
+  const {colors} = useAppContext();
   const [isOpen, setOpen] = useState(DDS.isTab ? true : false);
 
   return (

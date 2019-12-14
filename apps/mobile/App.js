@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import NavigationService, {
   AppContainer,
 } from './src/services/NavigationService';
@@ -15,6 +15,7 @@ import {
   onThemeUpdate,
   clearThemeUpdateListener,
   getColorScheme,
+  COLOR_SCHEME_DARK,
 } from './src/common/common';
 import Icon from 'react-native-vector-icons/Ionicons';
 import ActionButton from 'react-native-action-button';
@@ -25,24 +26,22 @@ import {Menu} from './src/components/Menu';
 import SideMenu from 'react-native-side-menu';
 import Storage from 'notes-core/api/database';
 import StorageInterface from './src/utils/storage';
-import {AppProvider} from './src/provider';
+import {AppProvider, AppContext} from './src/provider';
 import {DeviceDetectionService} from './src/utils/deviceDetection';
+import {useAppContext} from './src/provider/useAppContext';
 export const DDS = new DeviceDetectionService();
 
 export const db = new Storage(StorageInterface);
 
 const App = () => {
-  const [colors, setColors] = useState(COLOR_SCHEME);
+  const {colors} = useAppContext();
+
   const [fab, setFab] = useState(true);
   const [sidebar, setSidebar] = useState(w * 0.3);
   const [isOpen, setOpen] = useState(false);
   const [disableGestures, setDisableGesture] = useState(false);
   const [buttonHide, setButtonHide] = useState(false);
   const [isIntialized, setIsInitialized] = useState(false);
-
-  useEffect(() => {
-    getColorScheme(colors);
-  }, []);
 
   useEffect(() => {
     DeviceEventEmitter.addListener('openSidebar', () => {
@@ -126,17 +125,6 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    onThemeUpdate(() => {
-      StatusBar.setBarStyle(colors.night ? 'light-content' : 'dark-content');
-    });
-    return () => {
-      clearThemeUpdateListener(() => {
-        StatusBar.setBarStyle(colors.night ? 'light-content' : 'dark-content');
-      });
-    };
-  }, []);
-
-  useEffect(() => {
     db.init().then(() => {
       setIsInitialized(true);
     });
@@ -187,6 +175,7 @@ const App = () => {
             bounceBackOnOverdraw={false}
             contentContainerStyle={{
               opacity: 0,
+              backgroundColor: colors.bg,
             }}
             animationFunction={(prop, value) =>
               Animated.spring(prop, {
@@ -212,6 +201,7 @@ const App = () => {
               style={{
                 width: DDS.isTab ? '70%' : '100%',
                 height: '100%',
+                backgroundColor: colors.bg,
               }}
               ref={navigatorRef => {
                 NavigationService.setTopLevelNavigator(navigatorRef);

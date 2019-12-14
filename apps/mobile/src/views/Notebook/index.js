@@ -37,6 +37,7 @@ import {AnimatedSafeAreaView} from '../Home';
 import * as Animatable from 'react-native-animatable';
 import {NavigationEvents} from 'react-navigation';
 import {DDS} from '../../../App';
+import {useAppContext} from '../../provider/useAppContext';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 const AnimatedTouchableOpacity = Animatable.createAnimatableComponent(
@@ -44,7 +45,7 @@ const AnimatedTouchableOpacity = Animatable.createAnimatableComponent(
 );
 export const Notebook = ({navigation}) => {
   // State
-  const [colors, setColors] = useState(COLOR_SCHEME);
+  const {colors} = useAppContext();
   const params = navigation.state.params;
   const [hideHeader, setHideHeader] = useState(false);
   const [margin, setMargin] = useState(190);
@@ -61,16 +62,6 @@ export const Notebook = ({navigation}) => {
   let marginSet = false;
 
   // Effects
-  useEffect(() => {
-    onThemeUpdate(() => {
-      forceUpdate();
-    });
-    return () => {
-      clearThemeUpdateListener(() => {
-        forceUpdate();
-      });
-    };
-  }, []);
 
   // Functions
   const setMarginTop = () => {

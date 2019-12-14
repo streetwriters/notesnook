@@ -38,15 +38,17 @@ import {Header} from '../../components/header';
 import {AnimatedSafeAreaView} from '../Home';
 import * as Animatable from 'react-native-animatable';
 import {NavigationEvents} from 'react-navigation';
+import {useAppContext} from '../../provider/useAppContext';
 export const Folders = ({navigation}) => {
-  const [colors, setColors] = useState(COLOR_SCHEME);
+  const {colors} = useAppContext();
+
   const [addNotebook, setAddNotebook] = useState(false);
   const [notebooks, setNotebooks] = useState([]);
   const [hideHeader, setHideHeader] = useState(false);
   const [buttonHide, setButtonHide] = useState(false);
   const [margin, setMargin] = useState(190);
   const [numColumns, setNumColumns] = useState(1);
-  const forceUpdate = useForceUpdate();
+
   const params = navigation.state.params;
   let offsetY = 0;
   let countUp = 0;
@@ -72,17 +74,6 @@ export const Folders = ({navigation}) => {
   useEffect(() => {
     setNotebooks(db.getNotebooks());
     console.log(db.getNotebooks());
-  }, []);
-
-  useEffect(() => {
-    onThemeUpdate(() => {
-      forceUpdate();
-    });
-    return () => {
-      clearThemeUpdateListener(() => {
-        forceUpdate();
-      });
-    };
   }, []);
 
   return (

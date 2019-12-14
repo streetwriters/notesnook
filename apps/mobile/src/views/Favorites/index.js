@@ -28,24 +28,14 @@ import {ListItem} from '../../components/ListItem';
 import {Header} from '../../components/header';
 import {useForceUpdate} from '../ListsEditor';
 import {AnimatedSafeAreaView} from '../Home';
+import {useAppContext} from '../../provider/useAppContext';
 
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
 export const Favorites = ({navigation}) => {
-  const [colors, setColors] = useState(COLOR_SCHEME);
-  const forceUpdate = useForceUpdate();
+  const {colors} = useAppContext();
 
-  useEffect(() => {
-    onThemeUpdate(() => {
-      forceUpdate();
-    });
-    return () => {
-      clearThemeUpdateListener(() => {
-        forceUpdate();
-      });
-    };
-  }, []);
   return (
     <AnimatedSafeAreaView
       transition="backgroundColor"

@@ -56,7 +56,7 @@ const AnimatedTextInput = Animatable.createAnimatableComponent(TextInput);
 const Editor = ({navigation}) => {
   // STATE
 
-  const [colors, setColors] = useState(COLOR_SCHEME);
+  const {colors} = useAppContext();
   const [dialog, setDialog] = useState(false);
   const [resize, setResize] = useState(false);
   const [isOpen, setOpen] = useState(false);
@@ -123,11 +123,6 @@ const Editor = ({navigation}) => {
     if (content && content.delta) {
       post(JSON.stringify(content.delta));
     }
-
-    EditorWebView.requestFocus();
-    setTimeout(() => {
-      post(null);
-    }, 500);
   };
   const onTitleTextChange = value => {
     title = value;

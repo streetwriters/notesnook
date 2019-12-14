@@ -32,21 +32,11 @@ import {FlatList, TextInput} from 'react-native-gesture-handler';
 import {NavigationEvents} from 'react-navigation';
 import {Header} from '../../components/header';
 import {useForceUpdate} from '../ListsEditor';
+import {useAppContext} from '../../provider/useAppContext';
 
 export const ForgotPassword = ({navigation}) => {
-  const [colors, setColors] = useState(COLOR_SCHEME);
-  const forceUpdate = useForceUpdate();
+  const {colors} = useAppContext();
 
-  useEffect(() => {
-    onThemeUpdate(() => {
-      forceUpdate();
-    });
-    return () => {
-      clearThemeUpdateListener(() => {
-        forceUpdate();
-      });
-    };
-  }, []);
   useEffect(() => {
     DeviceEventEmitter.emit('hide');
     return () => {

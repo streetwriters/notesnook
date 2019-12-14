@@ -16,6 +16,7 @@ import {w, ToastEvent} from '../../utils/utils';
 import {db} from '../../../App';
 import {Dialog} from '../Dialog';
 import {AddTopicDialog} from '../AddTopicDialog';
+import {useAppContext} from '../../provider/useAppContext';
 export const NotebookItem = ({
   item,
   index,
@@ -28,7 +29,7 @@ export const NotebookItem = ({
   numColumns,
   refresh = () => {},
 }) => {
-  const [colors, setColors] = useState(COLOR_SCHEME);
+  const {colors} = useAppContext();
   const [isVisible, setVisible] = useState(false);
   const [addTopic, setAddTopic] = useState(false);
   let setMenuRef = {};

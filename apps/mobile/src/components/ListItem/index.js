@@ -13,10 +13,11 @@ import {
 import Icon from 'react-native-vector-icons/Ionicons';
 import {getElevation} from '../../utils/utils';
 import {FlatList} from 'react-native-gesture-handler';
+import {useAppContext} from '../../provider/useAppContext';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 export const ListItem = props => {
-  const [colors, setColors] = useState(COLOR_SCHEME);
+  const {colors} = useAppContext();
 
   return (
     <View

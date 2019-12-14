@@ -14,6 +14,7 @@ import {
 } from '../../common/common';
 import Icon from 'react-native-vector-icons/Feather';
 import {getElevation} from '../../utils/utils';
+import {useAppContext} from '../../provider/useAppContext';
 
 export const Dialog = ({
   title,
@@ -25,7 +26,7 @@ export const Dialog = ({
   close = () => {},
   positivePress = () => {},
 }) => {
-  const [colors, setColors] = useState(COLOR_SCHEME);
+  const {colors} = useAppContext();
 
   return (
     <Modal

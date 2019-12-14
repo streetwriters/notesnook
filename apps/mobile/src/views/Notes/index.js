@@ -33,11 +33,12 @@ import {NotesList} from '../../components/NotesList';
 import {AnimatedSafeAreaView} from '../Home';
 import {db} from '../../../App';
 import * as Animatable from 'react-native-animatable';
+import {useAppContext} from '../../provider/useAppContext';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
 export const Notes = ({navigation}) => {
-  const [colors, setColors] = useState(COLOR_SCHEME);
+  const {colors} = useAppContext();
   const [hideHeader, setHideHeader] = useState(false);
   const [margin, setMargin] = useState(200);
   const [buttonHide, setButtonHide] = useState(false);

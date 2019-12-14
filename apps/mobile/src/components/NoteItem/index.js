@@ -11,11 +11,12 @@ import {Dialog} from '../Dialog';
 import {VaultDialog} from '../VaultDialog';
 import {db} from '../../../App';
 import {DDS} from '../../../App';
+import {useAppContext} from '../../provider/useAppContext';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
 const NoteItem = props => {
-  const [colors, setColors] = useState(COLOR_SCHEME);
+  const {colors} = useAppContext();
   const [visible, setVisible] = useState(false);
   const [vaultDialog, setVaultDialog] = useState(false);
   const item = props.item;

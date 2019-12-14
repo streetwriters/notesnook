@@ -35,27 +35,17 @@ import AsyncStorage from '@react-native-community/async-storage';
 import {useForceUpdate} from '../../views/ListsEditor';
 import {AnimatedSafeAreaView} from '../../views/Home';
 import {TextInput} from 'react-native-gesture-handler';
+import {useAppContext} from '../../provider/useAppContext';
 
 let tagsInputRef;
 
 export const EditorMenu = ({close = () => {}, hide, update = () => {}}) => {
-  const [colors, setColors] = useState(COLOR_SCHEME);
+  const {colors} = useAppContext();
   const forceUpdate = useForceUpdate();
   const [tags, setTags] = useState([]);
   const [selectedColor, setSelectedColor] = useState([]);
   let tagToAdd = null;
   let backPressCount = 0;
-
-  useEffect(() => {
-    onThemeUpdate(() => {
-      forceUpdate();
-    });
-    return () => {
-      clearThemeUpdateListener(() => {
-        forceUpdate();
-      });
-    };
-  }, []);
 
   return (
     <AnimatedSafeAreaView

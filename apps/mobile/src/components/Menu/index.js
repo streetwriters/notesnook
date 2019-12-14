@@ -33,21 +33,10 @@ import {getElevation, w, h, Toast} from '../../utils/utils';
 import AsyncStorage from '@react-native-community/async-storage';
 import {useForceUpdate} from '../../views/ListsEditor';
 import {AnimatedSafeAreaView} from '../../views/Home';
+import {useAppContext} from '../../provider/useAppContext';
 
 export const Menu = ({close = () => {}, hide, update = () => {}}) => {
-  const [colors, setColors] = useState(COLOR_SCHEME);
-  const forceUpdate = useForceUpdate();
-
-  useEffect(() => {
-    onThemeUpdate(() => {
-      forceUpdate();
-    });
-    return () => {
-      clearThemeUpdateListener(() => {
-        forceUpdate();
-      });
-    };
-  }, []);
+  const {colors, changeColorScheme} = useAppContext();
 
   return (
     <AnimatedSafeAreaView
@@ -113,13 +102,14 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
                       'theme',
                       JSON.stringify(COLOR_SCHEME_DARK),
                     );
-                    setColorScheme(COLOR_SCHEME_DARK);
+                    changeColorScheme(COLOR_SCHEME_DARK);
                   } else {
                     AsyncStorage.setItem(
                       'theme',
                       JSON.stringify(COLOR_SCHEME_LIGHT),
                     );
-                    setColorScheme(COLOR_SCHEME_LIGHT);
+
+                    changeColorScheme(COLOR_SCHEME_LIGHT);
                   }
                 },
                 switch: true,

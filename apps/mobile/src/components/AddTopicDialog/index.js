@@ -27,6 +27,7 @@ import {getElevation, h, w, timeSince, ToastEvent} from '../../utils/utils';
 import {FlatList, TextInput} from 'react-native-gesture-handler';
 import {useForceUpdate} from '../../views/ListsEditor';
 import {db} from '../../../App';
+import {useAppContext} from '../../provider/useAppContext';
 
 export const AddTopicDialog = ({
   visible,
@@ -34,7 +35,7 @@ export const AddTopicDialog = ({
   notebookID,
   toEdit = null,
 }) => {
-  const [colors, setColors] = useState(COLOR_SCHEME);
+  const {colors} = useAppContext();
   const [topics, setTopics] = useState(['']);
   const forceUpdate = useForceUpdate();
   const setTitleRef = createRef();

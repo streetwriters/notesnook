@@ -23,12 +23,13 @@ import {
 import Icon from 'react-native-vector-icons/Ionicons';
 import {Reminder} from '../../components/Reminder';
 import {ListItem} from '../../components/ListItem';
+import {useAppContext} from '../../provider/useAppContext';
 
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
 export const Lists = ({navigation}) => {
-  const [colors, setColors] = useState(COLOR_SCHEME);
+  const {colors} = useAppContext();
 
   return (
     <SafeAreaView>

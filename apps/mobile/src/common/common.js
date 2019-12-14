@@ -1,5 +1,6 @@
 import {DeviceEventEmitter, StatusBar, PixelRatio} from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
+import {useAppContext} from '../provider/useAppContext';
 //COLOR SCHEME
 export const ACCENT = {
   color: '#0560FF',
@@ -17,37 +18,39 @@ export function setColorScheme(colors = COLOR_SCHEME, accent = ACCENT.color) {
   COLOR_SCHEME.icon = colors.icon;
 
   DeviceEventEmitter.emit('onThemeUpdate');
+
+  return COLOR_SCHEME;
 }
 
-export function getColorScheme(colors) {
-  let theme = colors;
-  AsyncStorage.getItem('accentColor').then(accentColor => {
-    if (typeof accentColor !== 'string') {
-      AsyncStorage.setItem('accentColor', colors.accent);
-    } else {
-      setAccentColor(accentColor);
-    }
-  });
-  AsyncStorage.getItem('theme').then(t => {
-    if (typeof t !== 'string') {
-      AsyncStorage.setItem('theme', JSON.stringify(theme));
+export async function getColorScheme(colors) {
+  let accentColor = await AsyncStorage.getItem('accentColor');
+  let t = await AsyncStorage.getItem('theme');
 
-      setColorScheme(COLOR_SCHEME_LIGHT);
-    } else {
-      let themeToSet = JSON.parse(t);
-      themeToSet.night
-        ? setColorScheme(COLOR_SCHEME_DARK)
-        : setColorScheme(COLOR_SCHEME_LIGHT);
-      StatusBar.setBarStyle(
-        themeToSet.night ? 'light-content' : 'dark-content',
-      );
-    }
-  });
+  if (typeof accentColor !== 'string') {
+    AsyncStorage.setItem('accentColor', colors.accent);
+  } else {
+    setAccentColor(accentColor);
+  }
+
+  if (typeof t !== 'string') {
+    AsyncStorage.setItem('theme', JSON.stringify(colors));
+    setColorScheme(COLOR_SCHEME_LIGHT);
+  } else {
+    let themeToSet = JSON.parse(t);
+    themeToSet.night
+      ? setColorScheme(COLOR_SCHEME_DARK)
+      : setColorScheme(COLOR_SCHEME_LIGHT);
+    StatusBar.setBarStyle(themeToSet.night ? 'light-content' : 'dark-content');
+  }
+
+  DeviceEventEmitter.emit('onThemeUpdate');
+  return COLOR_SCHEME;
 }
 
 export function setAccentColor(color) {
   ACCENT.color = color;
-  DeviceEventEmitter.emit('onThemeUpdate');
+
+  return ACCENT;
 }
 
 export const onThemeUpdate = (func = () => {}) => {

@@ -1,25 +1,13 @@
 import React, {useEffect, useState, createRef, useCallback} from 'react';
 import {
   SafeAreaView,
-  Platform,
-  DeviceEventEmitter,
   TouchableOpacity,
   View,
   KeyboardAvoidingView,
   Text,
   Keyboard,
 } from 'react-native';
-import {
-  COLOR_SCHEME,
-  opacity,
-  pv,
-  br,
-  SIZE,
-  WEIGHT,
-  onThemeUpdate,
-  clearThemeUpdateListener,
-} from '../../common/common';
-import {styles} from './styles';
+import {COLOR_SCHEME, opacity, pv, br, SIZE, WEIGHT} from '../../common/common';
 import {Search} from '../../components/SearchInput';
 import {w, h} from '../../utils/utils';
 import {Header} from '../../components/header';
@@ -30,7 +18,7 @@ import Icon from 'react-native-vector-icons/Feather';
 import NavigationService from '../../services/NavigationService';
 import {useForceUpdate} from '../ListsEditor';
 import * as Animatable from 'react-native-animatable';
-import {useNavigationEvents, useIsFocused} from 'react-navigation-hooks';
+import {useIsFocused} from 'react-navigation-hooks';
 import {useAppContext} from '../../provider/useAppContext';
 import {DDS} from '../../../App';
 export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(
@@ -39,7 +27,8 @@ export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(
 
 export const Home = ({navigation}) => {
   // State
-  const [colors, setColors] = useState(COLOR_SCHEME);
+  const {colors, updateAppTheme} = useAppContext();
+
   const [search, setSearch] = useState(false);
   const [text, setText] = useState('');
   const [update, setUpdate] = useState(0);
@@ -48,9 +37,7 @@ export const Home = ({navigation}) => {
   const [buttonHide, setButtonHide] = useState(false);
   const [notes, setNotes] = useState([]);
   const [keyword, setKeyword] = useState('');
-  const forceUpdate = useForceUpdate();
   const isFocused = useIsFocused();
-  const {userLoggedIn, logInUser} = useAppContext();
   // Variables
   let offsetY = 0;
   let countUp = 1;
@@ -62,28 +49,13 @@ export const Home = ({navigation}) => {
   let allNotes = [];
 
   // Effects
-
   useEffect(() => {
-    console.log('deviceType', DDS.isTab);
-    console.log(userLoggedIn);
-  }, [userLoggedIn]);
+    updateAppTheme(colors);
+  }, []);
   useEffect(() => {
-    logInUser(true);
-
     if (!isFocused) return;
     fetchNotes();
   }, [isFocused]);
-
-  useEffect(() => {
-    onThemeUpdate(() => {
-      forceUpdate();
-    });
-    return () => {
-      clearThemeUpdateListener(() => {
-        forceUpdate();
-      });
-    };
-  }, []);
 
   const fetchNotes = () => {
     allNotes = db.getNotes();

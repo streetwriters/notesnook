@@ -11,12 +11,13 @@ import {COLOR_SCHEME, SIZE, opacity, WEIGHT, pv, ph} from '../../common/common';
 import Icon from 'react-native-vector-icons/Feather';
 import * as Animatable from 'react-native-animatable';
 import {h, w} from '../../utils/utils';
+import {useAppContext} from '../../provider/useAppContext';
 
 const AnimatedTouchableOpacity = Animatable.createAnimatableComponent(
   TouchableOpacity,
 );
 export const Toast = () => {
-  const [colors, setColors] = useState(COLOR_SCHEME);
+  const {colors} = useAppContext();
   const [toast, setToast] = useState(false);
   const [message, setMessage] = useState([]);
   const [data, setData] = useState([]);
