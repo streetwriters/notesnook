@@ -1,6 +1,5 @@
 import Database from "../api/database";
 import StorageInterface from "../../notes-web/src/interfaces/storage";
-import { groupBy } from "../utils";
 
 const db = new Database(StorageInterface);
 
