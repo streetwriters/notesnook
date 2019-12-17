@@ -55,6 +55,10 @@ class Database {
     return extractValues(this.notes).reverse();
   }
 
+  getFavorites() {
+    return tfun.filter(".favorite = true")(extractValues(this.notes));
+  }
+
   /**
    * Group notes by given criteria
    * @param {string} by One from 'abc', 'month', 'year' or 'week'. Leave it empty for default grouping.

@@ -80,6 +80,11 @@ test("update note", async () => {
   expect(note.colors).toStrictEqual(["red", "blue"]);
 });
 
+test("get favorites", () => {
+  let favorites = db.getFavorites();
+  expect(favorites.length).toBeGreaterThan(0);
+});
+
 test("note with text longer than 150 characters should have ... in the headline", () => {
   let note = db.getNote(TEST_NOTE.dateCreated);
   expect(note.headline.includes("...")).toBe(true);
