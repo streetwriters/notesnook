@@ -374,8 +374,13 @@ class Database {
   }
 
   getTrash() {
-    checkInitialized();
+    checkInitialized.call(this);
     return extractValues(this.trash).reverse();
+  }
+
+  async clearTrash() {
+    this[KEYS.trash] = {};
+    await this.storage.write(KEYS.trash, this[KEYS.trash]);
   }
 }
 

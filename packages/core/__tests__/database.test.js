@@ -68,9 +68,16 @@ test("update note", async () => {
       text:
         "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
       delta: []
-    }
+    },
+    pinned: true,
+    favorite: true,
+    colors: ["red", "blue"]
   });
   expect(updateTimestamp).toBe(TEST_NOTE.dateCreated);
+  let note = db.getNote(updateTimestamp);
+  expect(note.pinned).toBe(true);
+  expect(note.favorite).toBe(true);
+  expect(note.colors).toStrictEqual(["red", "blue"]);
 });
 
 test("note with text longer than 150 characters should have ... in the headline", () => {
@@ -215,6 +222,23 @@ test("delete notebook", async () => {
   await db.deleteNotebooks([TEST_NOTEBOOK]);
   let notebook = db.getNotebook(TEST_NOTEBOOK.dateCreated);
   expect(notebook).toBeUndefined();
+});
+
+test("trash should not be empty", () => {
+  let trash = db.getTrash();
+  expect(trash.length).toBeGreaterThan(0);
+});
+
+test("restore an item from trash", async () => {
+  await db.restoreItem(TEST_NOTEBOOK.dateCreated);
+  let notebook = db.getNotebook(TEST_NOTEBOOK.dateCreated);
+  expect(notebook.title).toBe(TEST_NOTEBOOK.title);
+});
+
+test("clear trash should clear the trash", async () => {
+  await db.clearTrash();
+  let trash = db.getTrash();
+  expect(trash.length).toBe(0);
 });
 
 //null & undefined checks
