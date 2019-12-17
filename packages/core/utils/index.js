@@ -9,10 +9,19 @@ export function extractValues(obj) {
   return t;
 }
 
-export function groupBy(xs, key) {
-  return tfun.reduce(function(rv, x) {
-    var v = key instanceof Function ? key(x) : x[key];
-    (rv[v] = rv[v] || []).push(x);
-    return rv;
-  })(xs);
+export function groupBy(arr, key) {
+  let retVal = [];
+  for (let val of arr) {
+    let v = key(val);
+    let index = retVal.findIndex(a => a.title === v);
+    if (index === -1) {
+      index = retVal.length;
+      retVal[retVal.length] = {
+        title: v,
+        data: []
+      };
+    }
+    retVal[index].data.push(val);
+  }
+  return retVal;
 }
