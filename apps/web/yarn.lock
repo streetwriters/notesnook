@@ -4328,11 +4328,6 @@ fast-diff@1.1.2:
   resolved "https://registry.yarnpkg.com/fast-diff/-/fast-diff-1.1.2.tgz#4b62c42b8e03de3f848460b639079920695d0154"
   integrity sha512-KaJUt+M9t1qaIteSvjc6P3RbMdXsNhK61GRftR6SNxqmhthcd9MGIi4T+o0jD8LUSpSnSKXE20nLtJ3fOHxQig==
 
-fast-filter@^1.0.4:
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/fast-filter/-/fast-filter-1.0.4.tgz#db462c3e8e6d3c66305752cdb8831a81c8b275db"
-  integrity sha1-20YsPo5tPGYwV1LNuIMagciydds=
-
 fast-glob@^2.0.2:
   version "2.2.7"
   resolved "https://registry.yarnpkg.com/fast-glob/-/fast-glob-2.2.7.tgz#6953857c3afa475fff92ee6015d52da70a4cd39d"
@@ -6996,10 +6991,10 @@ normalize-url@^3.0.0, normalize-url@^3.0.1:
 
 "notes-core@https://github.com/thecodrr/notes-core.git":
   version "0.2.0"
-  resolved "https://github.com/thecodrr/notes-core.git#0077b011b5d049653f62d5d27055a356bc84aada"
+  resolved "https://github.com/thecodrr/notes-core.git#884f119c1e6201e261dace3154661da67e7d8445"
   dependencies:
-    fast-filter "^1.0.4"
     fuzzysearch "^1.0.3"
+    transfun "^1.0.2"
 
 npm-bundled@^1.0.1:
   version "1.0.6"
@@ -10110,6 +10105,11 @@ tr46@^1.0.1:
   integrity sha1-qLE/1r/SSJUZZ0zN5VujaTtwbQk=
   dependencies:
     punycode "^2.1.0"
+
+transfun@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/transfun/-/transfun-1.0.2.tgz#14a3116296a8d921cbf9678ebd5eee1c5bb77b98"
+  integrity sha1-FKMRYpao2SHL+WeOvV7uHFu3e5g=
 
 ts-pnp@1.1.4:
   version "1.1.4"

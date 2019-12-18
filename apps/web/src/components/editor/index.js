@@ -74,6 +74,7 @@ const Editor = props => {
       },
       async () => {
         await saveNote(quill);
+        showSnack("Note saved!", Icon.Check);
       }
     );
 

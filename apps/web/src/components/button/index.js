@@ -16,7 +16,6 @@ const Button = props => (
       color: "fontSecondary",
       fontFamily: "body",
       fontWeight: "body",
-      boxShadow: 1,
       ...ButtonPressedStyle,
       ...props.style
     }}
