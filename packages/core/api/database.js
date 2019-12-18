@@ -62,38 +62,46 @@ class Database {
   /**
    * Group notes by given criteria
    * @param {string} by One from 'abc', 'month', 'year' or 'week'. Leave it empty for default grouping.
+   * @param {boolean} special Should only be used in the React app.
    */
-  groupNotes(by) {
+  groupNotes(by, special = false) {
     //TODO add tests
     let notes = this.getNotes();
     switch (by) {
       case "abc":
-        return groupBy(notes, note => note.title[0].toUpperCase());
+        return groupBy(notes, note => note.title[0].toUpperCase(), special);
       case "month":
         return groupBy(
           notes,
-          note => months[new Date(note.dateCreated).getMonth()]
+          note => months[new Date(note.dateCreated).getMonth()],
+          special
         );
       case "week":
-        return groupBy(notes, note =>
-          getWeekGroupFromTimestamp(note.dateCreated)
+        return groupBy(
+          notes,
+          note => getWeekGroupFromTimestamp(note.dateCreated),
+          special
         );
       case "year":
         return groupBy(
           notes,
-          note => months[new Date(note.dateCreated).getFullYear()]
+          note => months[new Date(note.dateCreated).getFullYear()],
+          special
         );
       default:
         let timestamps = {
           recent: getLastWeekTimestamp(7),
           lastWeek: getLastWeekTimestamp(7) - 604800000 //seven day timestamp value
         };
-        return groupBy(notes, note =>
-          note.dateCreated >= timestamps.recent
-            ? "Recent"
-            : note.dateCreated >= timestamps.lastWeek
-            ? "Last week"
-            : "Older"
+        return groupBy(
+          notes,
+          note =>
+            note.dateCreated >= timestamps.recent
+              ? "Recent"
+              : note.dateCreated >= timestamps.lastWeek
+              ? "Last week"
+              : "Older",
+          special
         );
     }
   }
