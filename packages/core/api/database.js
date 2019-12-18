@@ -69,12 +69,11 @@ class Database {
     let notes = this.getNotes();
     switch (by) {
       case "abc":
-        let groups = groupBy(
+        return groupBy(
           notes.sort((a, b) => a.title.localeCompare(b.title)),
           note => note.title[0].toUpperCase(),
           special
         );
-        return groups;
       case "month":
         return groupBy(
           notes,
