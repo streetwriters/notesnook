@@ -31,20 +31,21 @@ export function groupBy(arr, key, special = false) {
 
 function groupBySpecial(arr, key) {
   let retVal = [];
+  let _groups = {};
   let groups = [];
   let groupCounts = [];
   var i = -1;
   for (let val of arr) {
     i++;
     let k = key(val);
-    let index = groups[k] === undefined ? i : groups[k].index;
+    let index = _groups[k] === undefined ? i : _groups[k].index;
     let groupIndex =
-      groups[k] == undefined ? groupCounts.length : groups[k].groupIndex;
+      _groups[k] == undefined ? groupCounts.length : _groups[k].groupIndex;
     retVal.splice(index, 0, val);
     groupCounts[groupIndex] =
       groupCounts.length == groupIndex ? 1 : groupCounts[groupIndex]++;
-    groups[groupIndex] = {
-      title: k,
+    groups[groupIndex] = { title: k };
+    _groups[k] = {
       index: i,
       groupIndex
     };
