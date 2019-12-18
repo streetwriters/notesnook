@@ -41,7 +41,7 @@ export default {
   fontSizes: {
     heading: 36,
     input: 16,
-    title: 22,
+    title: 18,
     subtitle: 18,
     body: 14,
     menu: 14

@@ -203,7 +203,7 @@ const CreateNotebookDialog = props => {
             onChange={e => (CreateNotebookDialog.description = e.target.value)}
             placeholder="Enter description (optional)"
           />
-          <Label>
+          <Label alignItems="center" my={1}>
             <Checkbox variant="checkbox" />
             Locked?
           </Label>

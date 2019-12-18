@@ -1,18 +1,23 @@
 import React, { useEffect, useState } from "react";
-import { Flex, Text } from "rebass";
+import { Flex, Text, Box } from "rebass";
 import * as Icon from "react-feather";
 import { db, ev, sendNewNoteEvent } from "../common";
-import { Virtuoso as List } from "react-virtuoso";
+import { GroupedVirtuoso as List } from "react-virtuoso";
 import Button from "../components/button";
 import Search from "../components/search";
 import Note from "../components/note";
 
 function Home() {
-  const [notes, setNotes] = useState(db.getNotes());
+  const [notes, setNotes] = useState({
+    items: [],
+    groupCounts: [],
+    groups: []
+  });
   useEffect(() => {
     function onRefreshNotes() {
-      setNotes(db.getNotes());
+      setNotes(db.groupNotes(undefined, true));
     }
+    onRefreshNotes();
     ev.addListener("refreshNotes", onRefreshNotes);
     return () => {
       ev.removeListener("refreshNotes", onRefreshNotes);
@@ -20,7 +25,7 @@ function Home() {
   }, []);
   return (
     <Flex flexDirection="column" flex="1 1 auto">
-      {notes.length > 0 ? (
+      {notes.items.length > 0 ? (
         <Flex flexDirection="column" flex="1 1 auto">
           <Search placeholder="Search" />
           <List
@@ -30,8 +35,15 @@ function Home() {
               height: "auto",
               overflowX: "hidden"
             }}
-            totalCount={notes.length}
-            item={index => <Note index={index} item={notes[index]} />}
+            groupCounts={notes.groupCounts}
+            group={index => (
+              <Box bg="background">
+                <Text variant="heading" color="primary" fontSize={13}>
+                  {notes.groups[index].title}
+                </Text>
+              </Box>
+            )}
+            item={index => <Note index={index} item={notes.items[index]} />}
           />
           <Button
             Icon={Icon.Plus}

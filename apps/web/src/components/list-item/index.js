@@ -43,7 +43,7 @@ const ListItem = props => (
         display={props.info ? "flex" : "none"}
         variant="body"
         fontSize={12}
-        color="primary"
+        color="foreground"
       >
         {props.info}
       </Text>
