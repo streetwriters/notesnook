@@ -47,13 +47,13 @@ export default {
     menu: 14
   },
   fontWeights: {
-    body: 500,
-    heading: 700,
-    bold: 700
+    body: 400,
+    heading: 800,
+    bold: 800
   },
   fonts: {
-    body: "Quicksand, sans-serif",
-    heading: "Quicksand, sans-serif"
+    body: "Noto Sans, sans-serif",
+    heading: "Noto Serif, serif"
   },
   sizes: {
     full: "100%"
@@ -89,13 +89,13 @@ export default {
   },
   text: {
     heading: {
-      fontFamily: "body",
+      fontFamily: "heading",
       fontWeight: "heading",
       fontSize: "heading",
       color: "text"
     },
     title: {
-      fontFamily: "body",
+      fontFamily: "heading",
       fontWeight: "bold",
       fontSize: "title"
     },

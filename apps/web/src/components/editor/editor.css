@@ -33,14 +33,3 @@
   border-bottom: 1px solid #f0f0f0 !important;
   border-top: 1px solid #f0f0f0 !important;
 }
-
-.editor-title {
-  border: none;
-  font-family: Quicksand, sans-serif;
-  font-weight: 700;
-  padding: 12px 15px;
-  font-size: 42px;
-}
-.editor-title:focus {
-  outline: none;
-}

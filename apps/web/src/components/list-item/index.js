@@ -27,7 +27,7 @@ const ListItem = props => (
   >
     <Box>
       <Flex flexDirection="row" justifyContent="space-between">
-        <Text fontFamily="body" fontSize="title" fontWeight="bold">
+        <Text fontFamily="heading" fontSize="title" fontWeight="bold">
           {props.title}
         </Text>
       </Flex>

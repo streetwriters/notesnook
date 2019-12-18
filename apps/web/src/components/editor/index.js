@@ -145,7 +145,7 @@ const Editor = props => {
       <Input
         ref={titleRef}
         placeholder="Untitled"
-        fontFamily="body"
+        fontFamily="heading"
         fontWeight="heading"
         fontSize="heading"
         display={["none", "flex", "flex"]}
