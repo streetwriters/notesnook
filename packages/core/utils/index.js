@@ -31,7 +31,7 @@ export function groupBy(arr, key, special = false) {
 
 function groupBySpecial(arr, key) {
   let retVal = [];
-  let groups = {};
+  let groups = [];
   let groupCounts = [];
   var i = -1;
   for (let val of arr) {
@@ -43,7 +43,7 @@ function groupBySpecial(arr, key) {
     retVal.splice(index, 0, val);
     groupCounts[groupIndex] =
       groupCounts.length == groupIndex ? 1 : groupCounts[groupIndex]++;
-    groups[k] = {
+    groups[groupIndex] = {
       title: k,
       index: i,
       groupIndex
