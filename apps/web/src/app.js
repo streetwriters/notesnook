@@ -5,7 +5,8 @@ import { ThemeProvider } from "emotion-theming";
 import { Flex, Box, Button } from "rebass";
 import theme from "./theme";
 import { routes, navigate } from "./navigation";
-
+import CheckBox from "./components/checkbox";
+import * as Icon from "react-feather";
 const NavMenuItem = props => {
   useEffect(() => {
     if (props.selected) {
@@ -69,9 +70,22 @@ function App() {
             flex="1 1 auto"
             px={2}
             py={2}
-            width={["100%", "40%", "13%"]}
+            width={["100%", "40%", "15%"]}
           />
           <Editor />
+          <Flex
+            sx={{ borderRight: "1px solid", borderColor: "border" }}
+            flexDirection="column"
+            bg="navbg"
+            flex="1 1 auto"
+            px={2}
+            py={2}
+            width={["0%", "0%", "10%"]}
+          >
+            <CheckBox icon={Icon.MapPin} label="Pin" />
+            <CheckBox icon={Icon.Star} label="Favorite" />
+            <CheckBox icon={Icon.Lock} label="Lock" />
+          </Flex>
         </Flex>
         <Box id="snackbarContainer" />
       </Flex>

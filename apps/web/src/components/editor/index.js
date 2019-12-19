@@ -138,7 +138,7 @@ const Editor = props => {
   return (
     <Flex
       className="editor"
-      width={["0%", "60%", "70%"]}
+      width={["0%", "50%", "55%"]}
       flex="1 1 auto"
       flexDirection="column"
     >
