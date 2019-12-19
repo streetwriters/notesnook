@@ -67,8 +67,8 @@ function App() {
             sx={{ borderRight: "1px solid", borderColor: "border" }}
             flexDirection="column"
             flex="1 1 auto"
-            px={3}
-            py={3}
+            px={2}
+            py={2}
             width={["100%", "40%", "13%"]}
           />
           <Editor />

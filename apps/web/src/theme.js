@@ -10,6 +10,7 @@ const colorsLight = makeTheme({
   border: "#f0f0f0",
   hover: "#e0e0e0",
   fontSecondary: "white",
+  fontTertiary: "gray",
   text: "black",
   overlay: "rgba(255, 255, 255, 0.75)"
 });
@@ -30,8 +31,9 @@ const shadowsDark = {
 };
 const shadowsLight = {
   1: "0 0 20px 0px #1790F3aa",
-  2: "0 0 8px 0px #aaaaaa44",
-  3: "0 0 20px 0px #aaaaaa77"
+  2: "0 0 8px 0px #00000047",
+  3: "0 0 20px 0px #aaaaaa77",
+  4: "0 0 5px 0px #00000017"
 };
 
 export default {
@@ -83,7 +85,7 @@ export default {
       variant: "forms.default",
       ":focus": {
         outline: "none",
-        boxShadow: 2
+        boxShadow: 4
       }
     }
   },
@@ -153,6 +155,7 @@ function makeTheme({
   border,
   hover,
   fontSecondary,
+  fontTertiary,
   text,
   overlay
 }) {
@@ -166,6 +169,7 @@ function makeTheme({
     border,
     hover,
     fontSecondary,
+    fontTertiary,
     transparent: "#00000000",
     text,
     overlay

@@ -7,11 +7,12 @@ import ListItem from "../list-item";
 
 const dropdownRefs = [];
 const menuItems = [
-  { title: "Favorite", icon: Icon.Heart },
-  { title: "Share", icon: Icon.Share2 },
+  { title: "Move" },
+  { title: "Pin" },
+  { title: "Favorite" },
+  { title: "Share" },
   {
     title: "Delete",
-    icon: Icon.Trash,
     color: "red",
     onClick: note => {
       ev.emit("onClearNote", note.dateCreated);

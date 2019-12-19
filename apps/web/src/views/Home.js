@@ -38,7 +38,7 @@ function Home() {
             groupCounts={notes.groupCounts}
             group={index => (
               <Box bg="background">
-                <Text variant="heading" color="primary" fontSize={13}>
+                <Text variant="heading" color="primary" fontSize={15}>
                   {notes.groups[index].title}
                 </Text>
               </Box>

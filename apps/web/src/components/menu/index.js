@@ -4,8 +4,17 @@ import { SHADOW } from "../../theme";
 
 function Menu(props) {
   return (
-    <Flex bg="background" py={1} sx={{ borderRadius: "default", boxShadow: 2 }}>
-      <Box>
+    <Flex
+      bg="navbg"
+      py={1}
+      sx={{
+        position: "relative",
+        borderRadius: "default",
+        boxShadow: 2,
+        width: 120
+      }}
+    >
+      <Box width="100%" bg="navbg">
         {props.menuItems.map(item => (
           <Flex
             key={item.title}
@@ -30,7 +39,6 @@ function Menu(props) {
               }
             }}
           >
-            <item.icon size={15} strokeWidth={1.5} />
             <Text
               className="unselectable"
               as="span"

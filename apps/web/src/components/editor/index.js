@@ -150,8 +150,8 @@ const Editor = props => {
         fontSize="heading"
         display={["none", "flex", "flex"]}
         sx={{ borderWidth: 0, ":focus": { outline: "none" } }}
-        px={3}
-        py={3}
+        px={2}
+        py={2}
         onChange={e => (title = e.target.value)}
       />
       <Box id="toolbar" display={["none", "flex", "flex"]}></Box>
