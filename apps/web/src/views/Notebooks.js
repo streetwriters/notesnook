@@ -33,7 +33,11 @@ const Notebooks = props => {
     if (save) {
       history[history.length] = selected;
     }
-    props.changeTitle(title || item.title || routes.notebooks.title);
+    title =
+      selected.type === "notebook"
+        ? selected.title
+        : title || item.title || routes.notebooks.title;
+    props.changeTitle(title);
     props.canGoBack(item.title !== undefined);
     props.backAction(goBack);
     setSelected((item.title && item) || {});
