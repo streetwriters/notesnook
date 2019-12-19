@@ -33,6 +33,7 @@ const Notebooks = props => {
     if (save) {
       history[history.length] = selected;
     }
+    //set notebook title if we are inside the notebook else set the provided or item's title.
     title =
       selected.type === "notebook"
         ? selected.title
