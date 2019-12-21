@@ -131,6 +131,21 @@ class Database {
         .split(" ")
         .slice(0, 3)
         .join(" ");
+
+    //if note exists
+    if (this.notes[timestamp] !== undefined) {
+      let oldNote = this.notes[timestamp];
+      //if we are having new colors
+      if (oldNote.colors !== note.colors) {
+        note.colors = mergeDedupe(oldNote.colors, note.colors);
+      }
+      //if we are having new tags
+      //TODO add new tags to the tags collection...
+      if (oldNote.tags !== note.tags) {
+        note.tags = mergeDedupe(oldNote.tags, note.tags);
+      }
+    }
+
     this.notes[timestamp] = {
       type: "note",
       title,
@@ -503,4 +518,8 @@ async function editItem(type, id, edit) {
     default:
       throw new Error("Invalid type given to pinItem");
   }
+}
+
+function mergeDedupe(arr) {
+  return [...new Set([].concat(...arr))];
 }
