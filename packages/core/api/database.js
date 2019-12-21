@@ -219,7 +219,8 @@ class Database {
     }
     if (
       extractValues(this.notebooks).findIndex(
-        nb => nb.title === notebook.title
+        nb =>
+          nb.title === notebook.title && nb.dateCreated !== notebook.dateCreated
       ) > -1
     ) {
       return;
