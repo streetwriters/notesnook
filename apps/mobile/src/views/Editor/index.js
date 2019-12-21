@@ -41,8 +41,16 @@ const Editor = ({navigation}) => {
   const [dialog, setDialog] = useState(false);
   const [isOpen, setOpen] = useState(false);
   const [sidebar, setSidebar] = useState(DDS.isTab ? true : false);
+  const [noteProps, setNoteProps] = useState({
+    tags: [],
+    locked: false,
+    pinned: false,
+    favorite: false,
+    colors: [],
+  });
   // VARIABLES
   let updateInterval = null;
+
   // FUNCTIONS
 
   const post = value => EditorWebView.postMessage(value);
@@ -53,7 +61,7 @@ const Editor = ({navigation}) => {
     }
   };
 
-  const saveNote = async () => {
+  const saveNote = async (noteProps = {}) => {
     if (!content) {
       content = {
         text: '',
@@ -62,6 +70,11 @@ const Editor = ({navigation}) => {
     }
 
     timestamp = await db.addNote({
+      tags: noteProps.tags,
+      colors: noteProps.colors,
+      pinned: noteProps.pinned,
+      favorite: noteProps.favorite,
+      locked: noteProps.locked,
       title,
       content,
       dateCreated: timestamp,
@@ -76,9 +89,20 @@ const Editor = ({navigation}) => {
         text: note.title,
       });
       title = note.title;
+
       timestamp = note.dateCreated;
       post(JSON.stringify(note.content.delta));
+      let props = {
+        tags: note.tags,
+        colors: note.colors,
+        pinned: note.pinned,
+        favorite: note.favorite,
+        locked: note.locked,
+      };
+      setNoteProps({...props});
+      console.log(note);
     }
+
     if (content && content.delta) {
       post(JSON.stringify(content.delta));
     }
@@ -212,18 +236,13 @@ const Editor = ({navigation}) => {
     );
   };
 
-  handleBackEvent = () => {
-    setDialog(true);
-    return true;
-  };
-
   // EFFECTS
 
   useEffect(() => {
-    let handleBack = BackHandler.addEventListener(
-      'hardwareBackPress',
-      handleBackEvent,
-    );
+    let handleBack = BackHandler.addEventListener('hardwareBackPress', () => {
+      setDialog(true);
+      return true;
+    });
     return () => {
       title = null;
       timestamp = null;
@@ -235,14 +254,14 @@ const Editor = ({navigation}) => {
 
   useEffect(() => {
     updateInterval = setInterval(async function() {
-      await saveNote();
+      await saveNote(noteProps);
     }, 2000);
     return () => {
-      saveNote();
+      saveNote(noteProps);
       clearInterval(updateInterval);
       updateInterval = null;
     };
-  }, []);
+  }, [noteProps]);
 
   useEffect(() => {
     return () => {
@@ -311,6 +330,12 @@ const Editor = ({navigation}) => {
       menu={
         <EditorMenu
           hide={false}
+          noteProps={noteProps}
+          updateProps={props => {
+            setNoteProps(props);
+
+            console.log(props, noteProps);
+          }}
           close={() => {
             setTimeout(() => {
               setOpen(args);

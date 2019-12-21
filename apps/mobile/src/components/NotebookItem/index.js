@@ -17,6 +17,7 @@ import {db} from '../../../App';
 import {Dialog} from '../Dialog';
 import {AddTopicDialog} from '../AddTopicDialog';
 import {useAppContext} from '../../provider/useAppContext';
+import {AddNotebookDialog} from '../AddNotebookDialog';
 export const NotebookItem = ({
   item,
   index,
@@ -27,11 +28,13 @@ export const NotebookItem = ({
   noteToMove = null,
   notebookID,
   numColumns,
+  isTrash,
   refresh = () => {},
 }) => {
   const {colors} = useAppContext();
   const [isVisible, setVisible] = useState(false);
   const [addTopic, setAddTopic] = useState(false);
+  const [addNotebook, setAddNotebook] = useState(false);
   let setMenuRef = {};
   let show = null;
 
@@ -69,8 +72,7 @@ export const NotebookItem = ({
         setVisible(true);
         show = null;
       } else if (show === 'topic') {
-        setAddTopic(true);
-        show = null;
+        isTopic ? setAddTopic(true) : setAddNotebook(true);
       }
     }
   };
@@ -91,7 +93,7 @@ export const NotebookItem = ({
         justifyContent: 'flex-start',
         alignItems: 'center',
         flexDirection: 'row',
-        paddingHorizontal: ph,
+        paddingHorizontal: 0,
         width: '100%',
         alignSelf: 'center',
         borderBottomWidth: 1,
@@ -112,6 +114,13 @@ export const NotebookItem = ({
         visible={addTopic}
         toEdit={item}
         close={() => setAddTopic(false)}
+      />
+      <AddNotebookDialog
+        visible={addNotebook}
+        toEdit={item}
+        close={() => {
+          setAddNotebook(false);
+        }}
       />
 
       <View
@@ -181,7 +190,37 @@ export const NotebookItem = ({
             </View>
           )}
 
-          {isTopic ? null : (
+          {isTrash ? (
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginTop: 5,
+              }}>
+              <Text
+                style={{
+                  color: colors.icon,
+                  fontSize: SIZE.xs - 1,
+                  textAlignVertical: 'center',
+                  fontFamily: WEIGHT.regular,
+                }}>
+                {'Deleted on: ' +
+                  new Date(item.dateDeleted).toISOString().slice(0, 10) +
+                  '   '}
+              </Text>
+              <Text
+                style={{
+                  color: colors.accent,
+                  fontSize: SIZE.xs - 1,
+                  textAlignVertical: 'center',
+                  fontFamily: WEIGHT.regular,
+                }}>
+                {item.type[0].toUpperCase() + item.type.slice(1) + '  '}
+              </Text>
+            </View>
+          ) : null}
+
+          {isTopic || isTrash ? null : (
             <View
               style={{
                 flexDirection: 'row',
@@ -235,66 +274,102 @@ export const NotebookItem = ({
                 <Icon name="more-vertical" size={SIZE.lg} color={colors.icon} />
               </TouchableOpacity>
             }>
-            <MenuItem
-              onPress={() => {
-                show = 'topic';
-                hideMenu();
-              }}
-              textStyle={{
-                color: colors.pri,
+            {isTrash ? (
+              <>
+                <MenuItem
+                  onPress={() => {
+                    show = 'topic';
+                    hideMenu();
+                  }}
+                  textStyle={{
+                    color: colors.pri,
 
-                fontFamily: WEIGHT.regular,
-                fontSize: SIZE.sm,
-              }}>
-              <Icon name="edit-2" size={SIZE.sm} color={colors.icon} />
-              {'  '}Edit
-            </MenuItem>
+                    fontFamily: WEIGHT.regular,
+                    fontSize: SIZE.sm,
+                  }}>
+                  <Icon name="arrow-left" size={SIZE.sm} color={colors.icon} />
+                  {'  '}Restore
+                </MenuItem>
+                <MenuItem
+                  onPress={() => {
+                    show = 'topic';
+                    hideMenu();
+                  }}
+                  textStyle={{
+                    color: colors.pri,
 
-            <MenuItem
-              textStyle={{
-                color: colors.pri,
+                    fontFamily: WEIGHT.regular,
+                    fontSize: SIZE.sm,
+                  }}>
+                  <Icon name="trash" size={SIZE.sm} color={colors.icon} />
+                  {'  '}Remove
+                </MenuItem>
+              </>
+            ) : (
+              <>
+                <MenuItem
+                  onPress={() => {
+                    show = 'topic';
+                    hideMenu();
+                  }}
+                  textStyle={{
+                    color: colors.pri,
 
-                fontFamily: WEIGHT.regular,
-                fontSize: SIZE.sm,
-              }}>
-              <Icon name="star" size={SIZE.sm} color={colors.icon} />
-              {'  '}Pin
-            </MenuItem>
-            <MenuItem
-              onPress={() => {
-                hideMenu();
-                ToastEvent.show(
-                  'Note added to favorites.',
-                  'success',
-                  3000,
-                  () => {},
-                  'Ok',
-                );
-              }}
-              textStyle={{
-                color: colors.pri,
+                    fontFamily: WEIGHT.regular,
+                    fontSize: SIZE.sm,
+                  }}>
+                  <Icon name="edit-2" size={SIZE.sm} color={colors.icon} />
+                  {'  '}Edit
+                </MenuItem>
 
-                fontFamily: WEIGHT.regular,
-                fontSize: SIZE.sm,
-              }}>
-              <Icon name="star" size={SIZE.sm} color={colors.icon} />
-              {'  '}Favorite
-            </MenuItem>
+                <MenuItem
+                  textStyle={{
+                    color: colors.pri,
 
-            <MenuItem
-              onPress={() => {
-                show = 'delete';
-                hideMenu();
-              }}
-              textStyle={{
-                color: colors.pri,
+                    fontFamily: WEIGHT.regular,
+                    fontSize: SIZE.sm,
+                  }}>
+                  <Icon name="star" size={SIZE.sm} color={colors.icon} />
+                  {'  '}Pin
+                </MenuItem>
+                <MenuItem
+                  onPress={() => {
+                    hideMenu();
+                    ToastEvent.show(
+                      'Note added to favorites.',
+                      'success',
+                      3000,
+                      () => {},
+                      'Ok',
+                    );
+                  }}
+                  textStyle={{
+                    color: colors.pri,
 
-                fontFamily: WEIGHT.regular,
-                fontSize: SIZE.sm,
-              }}>
-              <Icon name="trash" size={SIZE.sm} color={colors.icon} />
-              {'  '}Delete
-            </MenuItem>
+                    fontFamily: WEIGHT.regular,
+                    fontSize: SIZE.sm,
+                  }}>
+                  <Icon name="star" size={SIZE.sm} color={colors.icon} />
+                  {'  '}Favorite
+                </MenuItem>
+
+                <MenuItem
+                  onPress={() => {
+                    show = 'delete';
+                    hideMenu();
+                  }}
+                  textStyle={{
+                    color: colors.pri,
+
+                    fontFamily: WEIGHT.regular,
+                    fontSize: SIZE.sm,
+                  }}>
+                  <Icon name="trash" size={SIZE.sm} color={colors.icon} />
+                  {'  '}Delete
+                </MenuItem>
+              </>
+            )}
+
             <MenuDivider />
           </Menu>
         )}

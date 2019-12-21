@@ -20,26 +20,17 @@ export const Header = ({
 
   return (
     <Animatable.View
-      onLayout={e => {
-        if (sendHeight) {
-          sendHeight(e.nativeEvent.layout.height);
-        }
-      }}
       transition={['minHeight', 'marginBottom']}
       duration={250}
       style={{
-        minHeight: hide ? 50 : 50,
         flexDirection: 'row',
         zIndex: 10,
+        height: 50,
+        marginTop: Platform.OS === 'ios' ? 10 : 45,
+        marginBottom: 10,
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingHorizontal: DDS.isTab ? '2.5%' : '5%',
-        paddingTop: Platform.OS == 'ios' ? h * 0.02 : h * 0.06,
-        marginBottom: hide
-          ? h * 0.03
-          : Platform.OS == 'ios'
-          ? h * 0.04
-          : h * 0.04,
       }}>
       <View
         style={{
@@ -65,7 +56,7 @@ export const Header = ({
               }}
               color={colors.pri}
               name={'chevron-left'}
-              size={SIZE.xl}
+              size={SIZE.xxxl}
             />
           </TouchableOpacity>
         ) : (
@@ -87,24 +78,23 @@ export const Header = ({
               justifyContent: 'center',
               alignItems: 'flex-start',
               height: 40,
-              width: 45,
+              marginTop: 2.5,
+              width: 40,
             }}>
-            <Icon color={colors.pri} name={'menu'} size={SIZE.xl} />
+            <Icon color={colors.pri} name={'menu'} size={SIZE.xxxl - 3} />
           </TouchableOpacity>
         ) : (
           undefined
         )}
 
-        <Animatable.Text
-          transition="fontSize"
-          duration={300}
+        <Text
           style={{
-            fontSize: hide ? SIZE.xl : SIZE.xl,
+            fontSize: SIZE.xl,
             color: colors.pri,
             fontFamily: WEIGHT.bold,
           }}>
           {heading}
-        </Animatable.Text>
+        </Text>
       </View>
       <Animatable.View
         transition="opacity"

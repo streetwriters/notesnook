@@ -1,4 +1,4 @@
-import React, {useState, createRef} from 'react';
+import React, {useState, createRef, useEffect} from 'react';
 import {
   View,
   Text,
@@ -17,7 +17,7 @@ import {useAppContext} from '../../provider/useAppContext';
 
 let refs = [];
 
-export const AddNotebookDialog = ({visible, close}) => {
+export const AddNotebookDialog = ({visible, close, toEdit = null}) => {
   const {colors} = useAppContext();
   const [topics, setTopics] = useState(['']);
   const [title, setTitle] = useState(null);
@@ -26,7 +26,7 @@ export const AddNotebookDialog = ({visible, close}) => {
   let prevItem = null;
   let prevIndex = null;
   let currentSelectedInput = null;
-
+  let timestamp = null;
   let description = 'my first notebook';
   const onSubmit = (text, index, willFocus = true) => {
     let prevTopics = topics;
@@ -103,7 +103,10 @@ export const AddNotebookDialog = ({visible, close}) => {
       title,
       description,
       topics,
+      timestamp: toEdit ? toEdit.dateCreated : null,
     });
+    console.log(title, description, topics, toEdit.dateCreated);
+
     ToastEvent.show('New notebook added', 'success', 3000, () => {}, '');
     setTopics(['']);
     prevIndex = null;
@@ -119,6 +122,23 @@ export const AddNotebookDialog = ({visible, close}) => {
       transparent={true}
       animated
       animationType="fade"
+      onShow={() => {
+        if (toEdit !== null) {
+          let topicsList = [];
+          toEdit.topics.forEach(item => {
+            if (item.title !== 'General') {
+              topicsList.push(item.title);
+            }
+          });
+          topicsList.push('');
+          setTopics([...topicsList]);
+          setTitle(toEdit.title);
+          timestamp = toEdit.dateCreated;
+          setTimeout(() => {
+            console.log(timestamp, title, topics);
+          }, 400);
+        }
+      }}
       onRequestClose={() => (refs = [])}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : null}
@@ -154,7 +174,7 @@ export const AddNotebookDialog = ({visible, close}) => {
                 marginLeft: 5,
                 fontSize: SIZE.md,
               }}>
-              New Notebook
+              {toEdit ? 'Edit Notebook' : 'New Notebook'}
             </Text>
           </View>
 
@@ -171,6 +191,7 @@ export const AddNotebookDialog = ({visible, close}) => {
               marginTop: 20,
               marginBottom: 10,
             }}
+            defaultValue={toEdit ? toEdit.title : null}
             onChangeText={value => {
               setTitle(value);
             }}
@@ -200,6 +221,7 @@ export const AddNotebookDialog = ({visible, close}) => {
             renderItem={({item, index}) => (
               <TopicItem
                 item={item}
+                toEdit={toEdit ? true : false}
                 index={index}
                 colors={colors}
                 onSubmit={onSubmit}
@@ -288,6 +310,7 @@ const TopicItem = ({
   onDelete,
   onChange,
   colors,
+  toEdit,
 }) => {
   const [focus, setFocus] = useState(true);
   const topicRef = ref => (refs[index] = ref);
@@ -318,7 +341,6 @@ const TopicItem = ({
         }}
         onChangeText={value => {
           onChange(value, index);
-
           text = value;
         }}
         onSubmit={() => onSubmit(text, index, true)}
@@ -332,6 +354,7 @@ const TopicItem = ({
           width: '90%',
           maxWidth: '90%',
         }}
+        defaultValue={item}
         placeholder="Add a topic"
         placeholderTextColor={colors.icon}
       />

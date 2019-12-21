@@ -30,41 +30,43 @@ import {Header} from '../../components/header';
 import NoteItem from '../../components/NoteItem';
 import {useForceUpdate} from '../ListsEditor';
 import {useAppContext} from '../../provider/useAppContext';
+import {db, DDS} from '../../../App';
+import {NotebookItem} from '../../components/NotebookItem';
 
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
 export const Trash = ({navigation}) => {
   const {colors} = useAppContext();
+  const [trash, setTrash] = useState([]);
+  useEffect(() => {
+    let allTrash = db.getTrash();
+
+    setTrash([...allTrash]);
+    console.log(allTrash);
+  }, []);
+
   return (
     <SafeAreaView
       style={{
         backgroundColor: colors.bg,
         height: '100%',
       }}>
-      <Header colors={colors} heading="Trash" canGoBack={false} />
+      <Header colors={colors} heading="Trash" canGoBack={false} menu={true} />
       <FlatList
-        numColumns={2}
-        columnWrapperStyle={{
-          width: '45%',
-          marginHorizontal: '2.5%',
-        }}
+        numColumns={1}
         style={{
-          width: '100%',
+          width: DDS.isTab ? '95%' : '90%',
+          alignSelf: 'center',
         }}
-        data={[
-          {
-            title: 'my note',
-            headline: 'my simple not that i just deleted. please restore.',
-            dateCreated: Date.now(),
-          },
-          {
-            title: 'my note',
-            headline: 'my simple not that i just deleted. please restore.',
-            dateCreated: Date.now(),
-          },
-        ]}
-        renderItem={({item, index}) => <NoteItem item={item} />}
+        data={trash}
+        renderItem={({item, index}) =>
+          item.type === 'note' ? (
+            <NoteItem item={item} index={index} isTrash={true} />
+          ) : (
+            <NotebookItem item={item} isTrash={true} index={index} />
+          )
+        }
       />
       <TouchableOpacity
         activeOpacity={opacity}
@@ -87,7 +89,7 @@ export const Trash = ({navigation}) => {
         <Text
           style={{
             fontSize: SIZE.md,
-            fontFamily: WEIGHT.semibold,
+            fontFamily: WEIGHT.regular,
             color: 'white',
           }}>
           {'  '}Clear all Trash

@@ -48,7 +48,7 @@ export const Notebook = ({navigation}) => {
   const {colors} = useAppContext();
   const params = navigation.state.params;
   const [hideHeader, setHideHeader] = useState(false);
-  const [margin, setMargin] = useState(190);
+  const [margin, setMargin] = useState(180);
   const [buttonHide, setButtonHide] = useState(false);
   const [numColumns, setNumColumns] = useState(1);
   const [addTopic, setAddTopic] = useState(false);
@@ -161,7 +161,7 @@ export const Notebook = ({navigation}) => {
           ListHeaderComponent={
             <>
               {params.hideMore ? (
-                <View style={{marginTop: margin}} />
+                <View style={{marginTop: Platform.OS == 'ios' ? 145 : 185}} />
               ) : (
                 <AnimatedTouchableOpacity
                   transition="marginTop"
@@ -173,7 +173,7 @@ export const Notebook = ({navigation}) => {
                   style={{
                     borderWidth: 1,
                     borderRadius: 5,
-                    marginTop: margin,
+                    marginTop: Platform.OS == 'ios' ? 145 : 185,
                     width: '90%',
                     marginHorizontal: '5%',
                     paddingHorizontal: ph,
@@ -199,7 +199,7 @@ export const Notebook = ({navigation}) => {
           ListHeaderComponent={
             <View
               style={{
-                marginTop: margin + 20,
+                marginTop: Platform.OS == 'ios' ? 145 : 185 + 20,
                 flexDirection: 'row',
                 justifyContent: 'space-between',
                 width:

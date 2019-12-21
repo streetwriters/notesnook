@@ -46,7 +46,7 @@ export const Folders = ({navigation}) => {
   const [notebooks, setNotebooks] = useState([]);
   const [hideHeader, setHideHeader] = useState(false);
   const [buttonHide, setButtonHide] = useState(false);
-  const [margin, setMargin] = useState(190);
+  const [margin, setMargin] = useState(180);
   const [numColumns, setNumColumns] = useState(1);
 
   const params = navigation.state.params;
@@ -158,7 +158,7 @@ export const Folders = ({navigation}) => {
           ListHeaderComponent={
             <View
               style={{
-                marginTop: margin,
+                marginTop: Platform.OS == 'ios' ? 145 : 185,
               }}
             />
           }

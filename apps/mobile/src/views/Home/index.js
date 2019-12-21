@@ -33,7 +33,7 @@ export const Home = ({navigation}) => {
   const [text, setText] = useState('');
   const [update, setUpdate] = useState(0);
   const [hideHeader, setHideHeader] = useState(false);
-  const [margin, setMargin] = useState(190);
+  const [margin, setMargin] = useState(180);
   const [buttonHide, setButtonHide] = useState(false);
   const [notes, setNotes] = useState([]);
   const [keyword, setKeyword] = useState('');
@@ -56,12 +56,13 @@ export const Home = ({navigation}) => {
 
   useEffect(() => {
     if (!isFocused) return;
+
     fetchNotes();
   }, [isFocused]);
 
   const fetchNotes = () => {
-    allNotes = db.getNotes();
-    setNotes(allNotes);
+    allNotes = db.groupNotes();
+    setNotes([...allNotes]);
   };
 
   useEffect(() => {
@@ -133,20 +134,6 @@ export const Home = ({navigation}) => {
     }
   };
 
-  const setMarginTop = () => {
-    return;
-    if (headerHeight < 30 || searchHeight < 30) {
-      return;
-    }
-    let toAdd = h * 0.06;
-    if (marginSet) return;
-    let a = headerHeight + searchHeight + toAdd;
-    setMargin(a);
-    headerHeight = 0;
-    searchHeight = 0;
-    marginSet = true;
-  };
-
   // Render
 
   return (
@@ -176,10 +163,6 @@ export const Home = ({navigation}) => {
             width: '100%',
           }}>
           <Header
-            sendHeight={height => {
-              headerHeight = height;
-              setMarginTop();
-            }}
             menu={true}
             hide={hideHeader}
             showSearch={() => {
@@ -194,10 +177,6 @@ export const Home = ({navigation}) => {
           />
 
           <Search
-            sendHeight={height => {
-              searchHeight = height;
-              setMarginTop();
-            }}
             clear={() => setText('')}
             hide={hideHeader}
             onChangeText={onChangeText}
@@ -212,7 +191,10 @@ export const Home = ({navigation}) => {
 
         <NotesList
           margin={margin}
-          numOfColumns={DDS.isTab ? 2 : 1}
+          isGrouped={true}
+          refresh={() => {
+            fetchNotes();
+          }}
           onScroll={y => {
             if (buttonHide) return;
             if (y < 30) setHideHeader(false);

@@ -4,7 +4,12 @@ import {View, Text, TouchableOpacity, Dimensions} from 'react-native';
 import {COLOR_SCHEME, SIZE, br, ph, pv, WEIGHT} from '../../common/common';
 
 import Icon from 'react-native-vector-icons/Feather';
-import {timeSince, ToastEvent, SideMenuEvent} from '../../utils/utils';
+import {
+  timeSince,
+  ToastEvent,
+  SideMenuEvent,
+  getElevation,
+} from '../../utils/utils';
 import NavigationService from '../../services/NavigationService';
 import Menu, {MenuItem, MenuDivider} from 'react-native-material-menu';
 import {Dialog} from '../Dialog';
@@ -53,19 +58,22 @@ const NoteItem = props => {
   };
   return (
     <View
-      style={{
-        marginHorizontal: '5%',
-        paddingVertical: pv,
-        borderRadius: br,
-        justifyContent: 'flex-start',
-        alignItems: 'center',
-        flexDirection: 'row',
-        paddingHorizontal: ph,
-        width: '100%',
-        alignSelf: 'center',
-        borderBottomWidth: 1,
-        borderBottomColor: colors.nav,
-      }}>
+      style={[
+        {
+          marginHorizontal: '5%',
+          paddingVertical: pv,
+          justifyContent: 'flex-start',
+          alignItems: 'center',
+          flexDirection: 'row',
+          paddingHorizontal: 0,
+          width: DDS.isTab ? '95%' : '90%',
+          marginHorizontal: '5%',
+          alignSelf: 'center',
+          borderBottomWidth: 1,
+          borderBottomColor: colors.nav,
+        },
+        props.customStyle ? props.customStyle : {},
+      ]}>
       <Dialog
         visible={visible}
         title="Delete note"
@@ -78,6 +86,30 @@ const NoteItem = props => {
         }}
       />
       <VaultDialog visible={vaultDialog} />
+      {props.pinned ? (
+        <View
+          style={{
+            ...getElevation(3),
+            width: 30,
+            height: 30,
+            backgroundColor: colors.accent,
+            borderRadius: 100,
+            position: 'absolute',
+            left: 20,
+            top: -15,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <View
+            style={{
+              width: 5,
+              height: 5,
+              backgroundColor: 'white',
+              borderRadius: 100,
+            }}
+          />
+        </View>
+      ) : null}
 
       <TouchableOpacity
         activeOpacity={1}
@@ -131,28 +163,57 @@ const NoteItem = props => {
                 justifyContent: 'flex-start',
                 alignItems: 'center',
               }}>
-              <Icon
-                style={{width: 30}}
-                name="lock"
-                size={SIZE.xs}
-                color={colors.icon}
-              />
-              <Icon
-                style={{width: 30}}
-                name="star"
-                size={SIZE.xs}
-                color={colors.icon}
-              />
+              {!props.isTrash ? (
+                <>
+                  <Icon
+                    style={{width: 30}}
+                    name="lock"
+                    size={SIZE.xs}
+                    color={colors.icon}
+                  />
+                  <Icon
+                    style={{width: 30}}
+                    name="star"
+                    size={SIZE.xs}
+                    color={colors.icon}
+                  />
 
-              <Text
-                style={{
-                  color: colors.accent,
-                  fontSize: SIZE.xxs,
-                  textAlignVertical: 'center',
-                  fontFamily: WEIGHT.regular,
-                }}>
-                {timeSince(item.dateCreated) + '  '}
-              </Text>
+                  <Text
+                    style={{
+                      color: colors.icon,
+                      fontSize: SIZE.xs - 1,
+                      textAlignVertical: 'center',
+                      fontFamily: WEIGHT.regular,
+                    }}>
+                    {timeSince(item.dateCreated) + '  '}
+                  </Text>
+                </>
+              ) : null}
+
+              {props.isTrash ? (
+                <>
+                  <Text
+                    style={{
+                      color: colors.icon,
+                      fontSize: SIZE.xs - 1,
+                      textAlignVertical: 'center',
+                      fontFamily: WEIGHT.regular,
+                    }}>
+                    {'Deleted on: ' +
+                      new Date(item.dateDeleted).toISOString().slice(0, 10) +
+                      '   '}
+                  </Text>
+                  <Text
+                    style={{
+                      color: colors.accent,
+                      fontSize: SIZE.xs - 1,
+                      textAlignVertical: 'center',
+                      fontFamily: WEIGHT.regular,
+                    }}>
+                    {item.type[0].toUpperCase() + item.type.slice(1) + '  '}
+                  </Text>
+                </>
+              ) : null}
             </View>
           </View>
         </>
@@ -185,163 +246,199 @@ const NoteItem = props => {
               <Icon name="more-vertical" size={SIZE.lg} color={colors.icon} />
             </TouchableOpacity>
           }>
-          <MenuItem
-            style={{
-              height: 35,
-            }}
-            textStyle={{
-              color: colors.pri,
+          {props.isTrash ? (
+            <>
+              <MenuItem
+                onPress={() => {
+                  show = 'topic';
+                  hideMenu();
+                }}
+                textStyle={{
+                  color: colors.pri,
 
-              fontFamily: WEIGHT.regular,
-              fontSize: SIZE.xs,
-            }}>
-            <Icon name="star" size={SIZE.xs} color={colors.icon} />
-            {'  '}Pin
-          </MenuItem>
-          <MenuItem
-            style={{
-              height: 35,
-            }}
-            onPress={() => {
-              hideMenu();
-              ToastEvent.show(
-                'Note added to favorites.',
-                'success',
-                3000,
-                () => {},
-                'Ok',
-              );
-            }}
-            textStyle={{
-              color: colors.pri,
+                  fontFamily: WEIGHT.regular,
+                  fontSize: SIZE.sm,
+                }}>
+                <Icon name="arrow-left" size={SIZE.sm} color={colors.icon} />
+                {'  '}Restore
+              </MenuItem>
+              <MenuItem
+                onPress={() => {
+                  show = 'topic';
+                  hideMenu();
+                }}
+                textStyle={{
+                  color: colors.pri,
 
-              fontFamily: WEIGHT.regular,
-              fontSize: SIZE.xs,
-            }}>
-            <Icon name="star" size={SIZE.xs} color={colors.icon} />
-            {'  '}Favorite
-          </MenuItem>
+                  fontFamily: WEIGHT.regular,
+                  fontSize: SIZE.sm,
+                }}>
+                <Icon name="trash" size={SIZE.sm} color={colors.icon} />
+                {'  '}Remove
+              </MenuItem>
+            </>
+          ) : (
+            <>
+              <MenuItem
+                style={{
+                  height: 35,
+                }}
+                textStyle={{
+                  color: colors.pri,
 
-          <MenuItem
-            style={{
-              height: 35,
-            }}
-            textStyle={{
-              color: colors.pri,
+                  fontFamily: WEIGHT.regular,
+                  fontSize: SIZE.xs,
+                }}>
+                <Icon name="star" size={SIZE.xs} color={colors.icon} />
+                {'  '}Pin
+              </MenuItem>
+              <MenuItem
+                style={{
+                  height: 35,
+                }}
+                onPress={() => {
+                  hideMenu();
+                  ToastEvent.show(
+                    'Note added to favorites.',
+                    'success',
+                    3000,
+                    () => {},
+                    'Ok',
+                  );
+                }}
+                textStyle={{
+                  color: colors.pri,
 
-              fontFamily: WEIGHT.regular,
-              fontSize: SIZE.xs,
-            }}>
-            <Icon name="share" size={SIZE.xs} color={colors.icon} />
-            {'  '}Share
-          </MenuItem>
+                  fontFamily: WEIGHT.regular,
+                  fontSize: SIZE.xs,
+                }}>
+                <Icon name="star" size={SIZE.xs} color={colors.icon} />
+                {'  '}Favorite
+              </MenuItem>
 
-          <MenuItem
-            onPress={() => {
-              hideMenu();
-              NavigationService.push('Folders', {
-                note: item,
+              <MenuItem
+                style={{
+                  height: 35,
+                }}
+                textStyle={{
+                  color: colors.pri,
 
-                title: 'Choose Notebook',
-                isMove: true,
-                hideMore: true,
-              });
-            }}
-            style={{
-              height: 35,
-            }}
-            textStyle={{
-              color: colors.pri,
+                  fontFamily: WEIGHT.regular,
+                  fontSize: SIZE.xs,
+                }}>
+                <Icon name="share" size={SIZE.xs} color={colors.icon} />
+                {'  '}Share
+              </MenuItem>
 
-              fontFamily: WEIGHT.regular,
-              fontSize: SIZE.xs,
-            }}>
-            <Icon name="arrow-right" size={SIZE.xs} color={colors.icon} />
-            {'  '}Move
-          </MenuItem>
-          <MenuItem
-            onPress={() => {
-              show = 'vault';
-              hideMenu(true);
-            }}
-            style={{
-              height: 35,
-            }}
-            textStyle={{
-              color: colors.pri,
+              <MenuItem
+                onPress={() => {
+                  hideMenu();
+                  NavigationService.push('Folders', {
+                    note: item,
 
-              fontFamily: WEIGHT.regular,
-              fontSize: SIZE.xs,
-            }}>
-            <Icon name="lock" size={SIZE.xs} color={colors.icon} />
-            {'  '}Lock
-          </MenuItem>
+                    title: 'Choose Notebook',
+                    isMove: true,
+                    hideMore: true,
+                  });
+                }}
+                style={{
+                  height: 35,
+                }}
+                textStyle={{
+                  color: colors.pri,
 
-          <MenuItem
-            onPress={() => {
-              show = 'delete';
-              hideMenu();
-            }}
-            style={{
-              height: 35,
-            }}
-            textStyle={{
-              color: colors.pri,
-              fontFamily: WEIGHT.regular,
-              fontSize: SIZE.xs,
-            }}>
-            <Icon name="trash" size={SIZE.xs} color={colors.icon} />
-            {'  '}Delete
-          </MenuItem>
-          <MenuDivider />
-          <MenuItem
-            disabled={true}
-            textStyle={{
-              color: colors.icon,
+                  fontFamily: WEIGHT.regular,
+                  fontSize: SIZE.xs,
+                }}>
+                <Icon name="arrow-right" size={SIZE.xs} color={colors.icon} />
+                {'  '}Move
+              </MenuItem>
+              <MenuItem
+                onPress={() => {
+                  show = 'vault';
+                  hideMenu(true);
+                }}
+                style={{
+                  height: 35,
+                }}
+                textStyle={{
+                  color: colors.pri,
 
-              fontFamily: WEIGHT.regular,
-              fontSize: SIZE.xxs,
-            }}
-            style={{
-              paddingVertical: 0,
-              margin: 0,
-              height: 35,
-            }}>
-            Notebook: School Notes
-          </MenuItem>
-          <MenuItem
-            disabled={true}
-            textStyle={{
-              color: colors.icon,
+                  fontFamily: WEIGHT.regular,
+                  fontSize: SIZE.xs,
+                }}>
+                <Icon name="lock" size={SIZE.xs} color={colors.icon} />
+                {'  '}Lock
+              </MenuItem>
 
-              fontFamily: WEIGHT.regular,
-              fontSize: SIZE.xxs,
-            }}
-            style={{
-              paddingVertical: 0,
-              margin: 0,
-              height: 35,
-              paddingBottom: 10,
-            }}>
-            {'  '}- Topic: Physics
-          </MenuItem>
+              <MenuItem
+                onPress={() => {
+                  show = 'delete';
+                  hideMenu();
+                }}
+                style={{
+                  height: 35,
+                }}
+                textStyle={{
+                  color: colors.pri,
+                  fontFamily: WEIGHT.regular,
+                  fontSize: SIZE.xs,
+                }}>
+                <Icon name="trash" size={SIZE.xs} color={colors.icon} />
+                {'  '}Delete
+              </MenuItem>
+              <MenuDivider />
+              <MenuItem
+                disabled={true}
+                textStyle={{
+                  color: colors.icon,
 
-          <MenuItem
-            disabled={true}
-            textStyle={{
-              color: colors.icon,
-              height: 35,
-              fontFamily: WEIGHT.regular,
-              fontSize: SIZE.xxs,
-            }}
-            style={{
-              paddingVertical: 0,
-              margin: 0,
-              height: 35,
-              paddingBottom: 10,
-            }}>
-            Created on: {new Date(item.dateCreated).toISOString().slice(0, 10)}
-          </MenuItem>
+                  fontFamily: WEIGHT.regular,
+                  fontSize: SIZE.xxs,
+                }}
+                style={{
+                  paddingVertical: 0,
+                  margin: 0,
+                  height: 35,
+                }}>
+                Notebook: School Notes
+              </MenuItem>
+              <MenuItem
+                disabled={true}
+                textStyle={{
+                  color: colors.icon,
+
+                  fontFamily: WEIGHT.regular,
+                  fontSize: SIZE.xxs,
+                }}
+                style={{
+                  paddingVertical: 0,
+                  margin: 0,
+                  height: 35,
+                  paddingBottom: 10,
+                }}>
+                {'  '}- Topic: Physics
+              </MenuItem>
+
+              <MenuItem
+                disabled={true}
+                textStyle={{
+                  color: colors.icon,
+                  height: 35,
+                  fontFamily: WEIGHT.regular,
+                  fontSize: SIZE.xxs,
+                }}
+                style={{
+                  paddingVertical: 0,
+                  margin: 0,
+                  height: 35,
+                  paddingBottom: 10,
+                }}>
+                Created on:{' '}
+                {new Date(item.dateCreated).toISOString().slice(0, 10)}
+              </MenuItem>
+            </>
+          )}
         </Menu>
       </View>
     </View>

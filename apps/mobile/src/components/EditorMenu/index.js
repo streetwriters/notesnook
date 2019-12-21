@@ -39,11 +39,15 @@ import {useAppContext} from '../../provider/useAppContext';
 
 let tagsInputRef;
 
-export const EditorMenu = ({close = () => {}, hide, update = () => {}}) => {
-  const {colors} = useAppContext();
-  const forceUpdate = useForceUpdate();
-  const [tags, setTags] = useState([]);
-  const [selectedColor, setSelectedColor] = useState([]);
+export const EditorMenu = ({
+  close = () => {},
+  hide,
+  update = () => {},
+  updateProps = () => {},
+  noteProps,
+}) => {
+  const {colors, changeColorScheme} = useAppContext();
+
   let tagToAdd = null;
   let backPressCount = 0;
 
@@ -84,13 +88,13 @@ export const EditorMenu = ({close = () => {}, hide, update = () => {}}) => {
                         'theme',
                         JSON.stringify(COLOR_SCHEME_DARK),
                       );
-                      setColorScheme(COLOR_SCHEME_DARK);
+                      changeColorScheme(COLOR_SCHEME_DARK);
                     } else {
                       AsyncStorage.setItem(
                         'theme',
                         JSON.stringify(COLOR_SCHEME_LIGHT),
                       );
-                      setColorScheme(COLOR_SCHEME_LIGHT);
+                      changeColorScheme(COLOR_SCHEME_LIGHT);
                     }
                   },
                   switch: true,
@@ -100,46 +104,53 @@ export const EditorMenu = ({close = () => {}, hide, update = () => {}}) => {
                 {
                   name: 'Pinned',
                   icon: 'tag',
-                  func: () => NavigationService.push('Home'),
-                  close: true,
+                  func: () => {
+                    let props = {...noteProps};
+                    props.pinned = !noteProps.pinned;
+
+                    updateProps(props);
+                  },
+                  close: false,
                   check: true,
-                  on: true,
+                  on: noteProps.pinned,
                 },
 
                 {
                   name: 'Add to Favorites',
                   icon: 'star',
-                  func: () =>
-                    NavigationService.push('Folders', {
-                      title: 'Notebooks',
-                    }),
-                  close: true,
+                  func: () => {
+                    let props = {...noteProps};
+                    props.favorite = !noteProps.favorite;
+
+                    updateProps(props);
+                  },
+                  close: false,
                   check: true,
-                  on: false,
+                  on: noteProps.favorite,
                 },
                 {
                   name: 'Share ',
                   icon: 'share',
-                  func: () => NavigationService.push('Lists'),
+                  func: () => {},
                   close: true,
                 },
                 {
                   name: 'Move to Notebook',
                   icon: 'arrow-right',
-                  func: () => NavigationService.push('Favorites'),
+                  func: () => {},
                   close: true,
                 },
 
                 {
                   name: 'Delete',
                   icon: 'trash',
-                  func: () => NavigationService.push('Trash'),
+                  func: () => {},
                   close: true,
                 },
                 {
                   name: 'Locked',
                   icon: 'lock',
-                  func: () => NavigationService.push('Settings'),
+                  func: () => {},
                   close: true,
                   check: true,
                   on: false,
@@ -263,7 +274,7 @@ export const EditorMenu = ({close = () => {}, hide, update = () => {}}) => {
                 borderRadius: 5,
                 backgroundColor: colors.nav,
               }}>
-              {tags.map(item => (
+              {noteProps.tags.map(item => (
                 <TouchableOpacity
                   style={{
                     flexDirection: 'row',
@@ -312,17 +323,18 @@ export const EditorMenu = ({close = () => {}, hide, update = () => {}}) => {
                     if (backPressCount === 1 && !tagToAdd) {
                       backPressCount = 0;
 
-                      let tagInputValue = tags[tags.length - 1];
-                      let allTags = tags;
+                      let tagInputValue =
+                        noteProps.tags[noteProps.tags.length - 1];
+                      let oldProps = {...noteProps};
                       if (allTags.length === 1) return;
 
-                      allTags.splice(allTags.length - 1);
+                      oldProps.tags.splice(allTags.length - 1);
 
-                      setTags(allTags);
+                      updateProps(oldProps);
                       tagsInputRef.setNativeProps({
                         text: tagInputValue,
                       });
-                      forceUpdate();
+
                       setTimeout(() => {
                         tagsInputRef.focus();
                       }, 300);
@@ -339,12 +351,12 @@ export const EditorMenu = ({close = () => {}, hide, update = () => {}}) => {
                   if (tag.includes(' ')) {
                     tag = tag.replace(' ', '_');
                   }
-                  let allTags = [...tags];
-                  allTags.push(tag);
+                  let oldProps = {...noteProps};
+                  oldProps.tags.push(tag);
                   tagsInputRef.setNativeProps({
                     text: '#',
                   });
-                  setTags(allTags);
+                  updateProps(oldProps);
                   tagToAdd = '';
                   setTimeout(() => {
                     tagsInputRef.focus();
@@ -354,10 +366,6 @@ export const EditorMenu = ({close = () => {}, hide, update = () => {}}) => {
             </ScrollView>
 
             <TouchableOpacity
-              onPress={() => {
-                close();
-                NavigationService.navigate('Tags');
-              }}
               style={{
                 width: '100%',
                 alignSelf: 'center',
@@ -411,7 +419,14 @@ export const EditorMenu = ({close = () => {}, hide, update = () => {}}) => {
               ].map(item => (
                 <TouchableOpacity
                   onPress={() => {
-                    setSelectedColor(item);
+                    let props = {...noteProps};
+                    if (props.colors.includes(item)) {
+                      props.colors.splice(props.colors.indexOf(item), 1);
+                    } else {
+                      props.colors.push(item);
+                    }
+
+                    updateProps(props);
                   }}
                   style={{
                     flexDirection: 'row',
@@ -422,8 +437,9 @@ export const EditorMenu = ({close = () => {}, hide, update = () => {}}) => {
                     borderWidth: 1.5,
                     borderRadius: 100,
                     padding: 3,
-                    borderColor:
-                      selectedColor === item ? colors.pri : colors.navbg,
+                    borderColor: noteProps.colors.includes(item)
+                      ? colors.pri
+                      : colors.navbg,
                   }}>
                   <View
                     style={{
@@ -434,7 +450,7 @@ export const EditorMenu = ({close = () => {}, hide, update = () => {}}) => {
                       justifyContent: 'center',
                       alignItems: 'center',
                     }}>
-                    {selectedColor === item ? (
+                    {noteProps.colors.includes(item) ? (
                       <Icon name="check" color="white" size={SIZE.md} />
                     ) : null}
                   </View>

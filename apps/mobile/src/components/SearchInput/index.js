@@ -22,21 +22,16 @@ export const Search = props => {
   const inputRef = createRef();
   return (
     <Animatable.View
-      onLayout={e => {
-        props.sendHeight(e.nativeEvent.layout.height);
-      }}
-      transition="opacity"
+      transition={['marginTop', 'borderWidth', 'marginBottom', 'opacity']}
       duration={200}
       style={{
         opacity: props.hide ? 0 : 1,
+        height: 60,
+        justifyContent: 'center',
+        marginTop: props.hide ? -65 : 0,
       }}>
       <Animatable.View
-        transition={[
-          'marginTop',
-          'borderWidth',
-          'marginBottom',
-          'paddingVertical',
-        ]}
+        transition={['borderWidth']}
         duration={300}
         style={{
           flexDirection: 'row',
@@ -45,16 +40,10 @@ export const Search = props => {
           width: DDS.isTab ? '95%' : '90%',
           alignSelf: 'center',
           borderRadius: br,
+          height: '90%',
           borderWidth: props.hide ? 0 : 1.5,
           paddingHorizontal: ph,
-          paddingVertical: props.hide
-            ? 0
-            : Platform.OS == 'ios'
-            ? pv - 1
-            : pv - 8,
-          marginBottom: props.hide ? 0 : 10,
           borderColor: focus ? colors.accent : colors.nav,
-          marginTop: props.hide ? -60 : 0,
         }}>
         <TextInput
           ref={inputRef}
