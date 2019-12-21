@@ -72,7 +72,7 @@ export const NotesList = ({
             <>
               <NoteItem
                 customStyle={{
-                  backgroundColor: colors.navbg,
+                  backgroundColor: colors.shade,
                   width: '100%',
                   paddingHorizontal: '5%',
                   paddingTop: 20,
@@ -87,7 +87,7 @@ export const NotesList = ({
               />
               <NoteItem
                 customStyle={{
-                  backgroundColor: colors.navbg,
+                  backgroundColor: colors.shade,
                   width: '100%',
                   paddingHorizontal: '5%',
                   paddingTop: 20,

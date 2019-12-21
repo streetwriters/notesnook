@@ -19,6 +19,11 @@ import StorageInterface from './src/utils/storage';
 import {AppProvider} from './src/provider';
 import {DeviceDetectionService} from './src/utils/deviceDetection';
 import {useAppContext} from './src/provider/useAppContext';
+import {
+  COLOR_SCHEME,
+  onThemeUpdate,
+  clearThemeUpdateListener,
+} from './src/common/common';
 
 export const DDS = new DeviceDetectionService();
 
@@ -26,7 +31,7 @@ export const db = new Storage(StorageInterface);
 
 const App = () => {
   // Global State
-  const {colors} = useAppContext();
+  const [colors, setColors] = useState(COLOR_SCHEME);
 
   // Local State
   const [sidebar, setSidebar] = useState(w * 0.3);
@@ -77,6 +82,17 @@ const App = () => {
       StatusBar.setTranslucent(true);
       StatusBar.setBarStyle(colors.night ? 'light-content' : 'dark-content');
     }
+  }, []);
+
+  useEffect(() => {
+    onThemeUpdate(() => {
+      setColors({...COLOR_SCHEME});
+    });
+    return () => {
+      clearThemeUpdateListener(() => {
+        setColors({...COLOR_SCHEME});
+      });
+    };
   }, []);
 
   // Render

@@ -4,15 +4,17 @@ import {useAppContext} from '../provider/useAppContext';
 //COLOR SCHEME
 export const ACCENT = {
   color: '#0560FF',
+  shade: '#0560FF12',
 };
-export function setColorScheme(colors = COLOR_SCHEME, accent = ACCENT.color) {
+export function setColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
   COLOR_SCHEME.bg = colors.bg;
-  COLOR_SCHEME.fg = accent;
+  COLOR_SCHEME.fg = accent.color;
   COLOR_SCHEME.navbg = colors.navbg;
   COLOR_SCHEME.nav = colors.nav;
   COLOR_SCHEME.pri = colors.pri;
   COLOR_SCHEME.sec = colors.sec;
-  COLOR_SCHEME.accent = accent;
+  COLOR_SCHEME.accent = accent.color;
+  COLOR_SCHEME.shade = accent.shade;
   COLOR_SCHEME.normal = colors.normal;
   COLOR_SCHEME.night = colors.night;
   COLOR_SCHEME.icon = colors.icon;
@@ -49,7 +51,7 @@ export async function getColorScheme(colors) {
 
 export function setAccentColor(color) {
   ACCENT.color = color;
-
+  ACCENT.shade = color + '12';
   return ACCENT;
 }
 
@@ -69,6 +71,7 @@ export const COLOR_SCHEME = {
   pri: 'black',
   sec: 'white',
   accent: ACCENT.color,
+  shade: ACCENT.shade,
   normal: 'black',
   icon: 'gray',
   errorBg: '#FFD2D2',
@@ -88,6 +91,7 @@ export const COLOR_SCHEME_LIGHT = {
   pri: 'black',
   sec: 'white',
   accent: ACCENT.color,
+  shade: ACCENT.shade,
   normal: 'black',
   icon: 'gray',
   errorBg: '#FFD2D2',
@@ -106,6 +110,7 @@ export const COLOR_SCHEME_DARK = {
   pri: 'white',
   sec: 'black',
   accent: ACCENT.color,
+  shade: ACCENT.shade,
   normal: 'black',
   icon: 'gray',
   errorBg: '#FFD2D2',

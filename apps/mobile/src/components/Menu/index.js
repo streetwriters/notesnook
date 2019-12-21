@@ -45,7 +45,7 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
       style={{
         height: '100%',
         opacity: hide ? 0 : 1,
-        backgroundColor: colors.night ? colors.navbg : colors.navbg,
+        backgroundColor: colors.shade,
       }}>
       <View
         style={{
@@ -157,7 +157,7 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
                       width: 30,
                     }}
                     name={item.icon}
-                    color={colors.icon}
+                    color={colors.pri}
                     size={SIZE.md}
                   />
                   <Text

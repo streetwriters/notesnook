@@ -159,6 +159,7 @@ export const Settings = ({navigation}) => {
               <TouchableOpacity
                 onPress={() => {
                   changeAccentColor(item);
+
                   AsyncStorage.setItem('accentColor', item);
                 }}
                 style={{

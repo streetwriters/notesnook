@@ -22,7 +22,7 @@ const useAppContext = () => {
     });
   }
 
-  function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT.color) {
+  function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
     let newColors = setColorScheme(colors, accent);
     StatusBar.setBarStyle(newColors.night ? 'light-content' : 'dark-content');
 
@@ -33,6 +33,7 @@ const useAppContext = () => {
 
   function changeAccentColor(accentColor) {
     ACCENT.color = accentColor;
+    ACCENT.shade = accentColor + '12';
     changeColorScheme();
   }
 

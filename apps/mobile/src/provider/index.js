@@ -1,9 +1,6 @@
 import React, {createContext, useEffect} from 'react';
 import {useImmer} from 'use-immer';
 import {DDS} from '../../App';
-const ACCENT = {
-  color: '#0560FF',
-};
 
 const defaultState = {
   isMenuOpen: {
@@ -12,12 +9,13 @@ const defaultState = {
   colors: {
     night: false,
     bg: 'white',
-    fg: ACCENT.color,
+    fg: '#0560FF',
     navbg: '#f6fbfc',
     nav: '#f0f0f0',
     pri: 'black',
     sec: 'white',
-    accent: ACCENT.color,
+    accent: '#0560FF',
+    shade: '#0560FF12',
     normal: 'black',
     icon: 'gray',
     errorBg: '#FFD2D2',
