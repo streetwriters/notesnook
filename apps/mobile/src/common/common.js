@@ -1,23 +1,89 @@
 import {DeviceEventEmitter, StatusBar, PixelRatio} from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
-import {useAppContext} from '../provider/useAppContext';
+
 //COLOR SCHEME
 export const ACCENT = {
   color: '#0560FF',
   shade: '#0560FF12',
 };
+
+const fixedColors = {
+  accent: ACCENT.color,
+  shade: ACCENT.shade,
+  fg: ACCENT.color,
+  normal: 'black',
+  icon: 'gray',
+  errorBg: '#FFD2D2',
+  errorText: '#D8000C',
+  successBg: '#DFF2BF',
+  successText: '#4F8A10',
+  warningBg: '#FEEFB3',
+  warningText: '#9F6000',
+};
+
+export var COLOR_SCHEME = {
+  night: false,
+  bg: 'white',
+  navbg: '#f6fbfc',
+  nav: '#f0f0f0',
+  pri: 'black',
+  sec: 'white',
+  ...fixedColors,
+};
+
+export const COLOR_SCHEME_LIGHT = {
+  night: false,
+  bg: 'white',
+  navbg: '#f6fbfc',
+  nav: '#f0f0f0',
+  pri: 'black',
+  sec: 'white',
+  ...fixedColors,
+};
+export const COLOR_SCHEME_DARK = {
+  night: true,
+  bg: '#1f1f1f',
+  navbg: '#1c1c1c',
+  nav: '#2b2b2b',
+  pri: 'white',
+  sec: 'black',
+  ...fixedColors,
+};
+
+//FONT FAMILY
+//export const FONT = '';
+//export const FONT_BOLD = '';
+
+//FONT SIZE
+
+export const SIZE = {
+  xxs: 10 * PixelRatio.getFontScale(),
+  xs: 12 * PixelRatio.getFontScale(),
+  sm: 14 * PixelRatio.getFontScale(),
+  md: 18 * PixelRatio.getFontScale(),
+  lg: 24 * PixelRatio.getFontScale(),
+  xl: 28 * PixelRatio.getFontScale(),
+  xxl: 32 * PixelRatio.getFontScale(),
+  xxxl: 36 * PixelRatio.getFontScale(),
+};
+
+export const br = 5; // border radius
+export const ph = 10; // padding horizontal
+export const pv = 10; // padding vertical
+export const opacity = 0.85; // active opacity
+
+// GLOBAL FONT
+
+export const WEIGHT = {
+  light: 'NotoSans',
+  regular: 'NotoSans',
+  medium: 'NotoSans',
+  semibold: 'NotoSerif',
+  bold: 'NotoSerif-Bold',
+};
+
 export function setColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
-  COLOR_SCHEME.bg = colors.bg;
-  COLOR_SCHEME.fg = accent.color;
-  COLOR_SCHEME.navbg = colors.navbg;
-  COLOR_SCHEME.nav = colors.nav;
-  COLOR_SCHEME.pri = colors.pri;
-  COLOR_SCHEME.sec = colors.sec;
-  COLOR_SCHEME.accent = accent.color;
-  COLOR_SCHEME.shade = accent.shade;
-  COLOR_SCHEME.normal = colors.normal;
-  COLOR_SCHEME.night = colors.night;
-  COLOR_SCHEME.icon = colors.icon;
+  COLOR_SCHEME = {...colors, accent: accent.color, shade: accent.shade};
 
   DeviceEventEmitter.emit('onThemeUpdate');
 
@@ -60,95 +126,4 @@ export const onThemeUpdate = (func = () => {}) => {
 };
 export const clearThemeUpdateListener = (func = () => {}) => {
   return DeviceEventEmitter.removeListener('onThemeUpdate', func);
-};
-
-export const COLOR_SCHEME = {
-  night: false,
-  bg: 'white',
-  fg: ACCENT.color,
-  navbg: '#f6fbfc',
-  nav: '#f0f0f0',
-  pri: 'black',
-  sec: 'white',
-  accent: ACCENT.color,
-  shade: ACCENT.shade,
-  normal: 'black',
-  icon: 'gray',
-  errorBg: '#FFD2D2',
-  errorText: '#D8000C',
-  successBg: '#DFF2BF',
-  successText: '#4F8A10',
-  warningBg: '#FEEFB3',
-  warningText: '#9F6000',
-};
-
-export const COLOR_SCHEME_LIGHT = {
-  night: false,
-  bg: 'white',
-  fg: ACCENT.color,
-  navbg: '#f6fbfc',
-  nav: '#f0f0f0',
-  pri: 'black',
-  sec: 'white',
-  accent: ACCENT.color,
-  shade: ACCENT.shade,
-  normal: 'black',
-  icon: 'gray',
-  errorBg: '#FFD2D2',
-  errorText: '#D8000C',
-  successBg: '#DFF2BF',
-  successText: '#4F8A10',
-  warningBg: '#FEEFB3',
-  warningText: '#9F6000',
-};
-export const COLOR_SCHEME_DARK = {
-  night: true,
-  bg: '#1f1f1f',
-  fg: ACCENT.color,
-  navbg: '#1c1c1c',
-  nav: '#2b2b2b',
-  pri: 'white',
-  sec: 'black',
-  accent: ACCENT.color,
-  shade: ACCENT.shade,
-  normal: 'black',
-  icon: 'gray',
-  errorBg: '#FFD2D2',
-  errorText: '#D8000C',
-  successBg: '#DFF2BF',
-  successText: '#4F8A10',
-  warningBg: '#FEEFB3',
-  warningText: '#9F6000',
-};
-
-//FONT FAMILY
-export const FONT = '';
-export const FONT_BOLD = '';
-
-//FONT SIZE
-
-export const SIZE = {
-  xxs: 10 * PixelRatio.getFontScale(),
-  xs: 12 * PixelRatio.getFontScale(),
-  sm: 14 * PixelRatio.getFontScale(),
-  md: 18 * PixelRatio.getFontScale(),
-  lg: 24 * PixelRatio.getFontScale(),
-  xl: 28 * PixelRatio.getFontScale(),
-  xxl: 32 * PixelRatio.getFontScale(),
-  xxxl: 36 * PixelRatio.getFontScale(),
-};
-
-export const br = 5; // border radius
-export const ph = 10; // padding horizontal
-export const pv = 10; // padding vertical
-export const opacity = 0.85; // active opacity
-
-// GLOBAL FONT
-
-export const WEIGHT = {
-  light: 'NotoSans',
-  regular: 'NotoSans',
-  medium: 'NotoSans',
-  semibold: 'NotoSerif',
-  bold: 'NotoSerif-Bold',
 };

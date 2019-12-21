@@ -7,12 +7,9 @@ import {
   TouchableOpacity,
   SectionList,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/Feather';
-import {COLOR_SCHEME, SIZE, WEIGHT, ph, pv} from '../../common/common';
-import * as Animatable from 'react-native-animatable';
+import {SIZE, WEIGHT} from '../../common/common';
 import NoteItem from '../NoteItem';
 import {DDS} from '../../../App';
-import {w, h} from '../../utils/utils';
 import {useAppContext} from '../../provider/useAppContext';
 export const NotesList = ({
   keyword = null,

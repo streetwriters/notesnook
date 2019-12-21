@@ -159,91 +159,10 @@ export const Notebook = ({navigation}) => {
             offsetY = y;
           }}
           ListHeaderComponent={
-            <>
-              {params.hideMore ? (
-                <View style={{marginTop: Platform.OS == 'ios' ? 145 : 185}} />
-              ) : (
-                <AnimatedTouchableOpacity
-                  transition="marginTop"
-                  duration={200}
-                  activeOpacity={opacity}
-                  onPress={() => {
-                    setAddNotebook(true);
-                  }}
-                  style={{
-                    borderWidth: 1,
-                    borderRadius: 5,
-                    marginTop: Platform.OS == 'ios' ? 145 : 185,
-                    width: '90%',
-                    marginHorizontal: '5%',
-                    paddingHorizontal: ph,
-                    borderColor: colors.nav,
-                    paddingVertical: pv + 5,
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    marginBottom: 15,
-                  }}>
-                  <Text
-                    style={{
-                      fontSize: SIZE.md,
-                      fontFamily: WEIGHT.bold,
-                      color: colors.pri,
-                    }}>
-                    View All Notes
-                  </Text>
-                </AnimatedTouchableOpacity>
-              )}
-            </>
-          }
-          ListHeaderComponent={
             <View
               style={{
-                marginTop: Platform.OS == 'ios' ? 145 : 185 + 20,
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                width:
-                  numColumns === 2
-                    ? DDS.isTab
-                      ? w * 0.7 * 0.95
-                      : w * 0.95
-                    : w * 0.95,
-
-                alignSelf: 'center',
-                marginLeft:
-                  numColumns === 2 ? (DDS.isTab ? w * 0.7 * 0.025 : 0) : 0,
-                paddingHorizontal: ph + 5,
-              }}>
-              <View>
-                <Text
-                  transition="marginTop"
-                  delay={200}
-                  duration={200}
-                  style={{
-                    fontSize: SIZE.lg,
-                    fontFamily: WEIGHT.medium,
-                    color: colors.pri,
-                    paddingHorizontal: DDS.isTab ? '2.5%' : '5%',
-                    maxWidth: '100%',
-                  }}>
-                  <Text
-                    style={{
-                      color: colors.accent,
-                    }}></Text>
-                </Text>
-              </View>
-
-              <TouchableOpacity
-                onPress={() => {
-                  setNumColumns(numColumns === 1 ? 2 : 1);
-                }}
-                style={{
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}>
-                <Icon name="list" size={SIZE.xl} color={colors.icon} />
-              </TouchableOpacity>
-            </View>
+                marginTop: Platform.OS == 'ios' ? 145 : 185,
+              }}></View>
           }
           numColumns={numColumns}
           key={numColumns}
@@ -327,7 +246,7 @@ export const Notebook = ({navigation}) => {
           <Text
             style={{
               fontSize: SIZE.md,
-              fontFamily: WEIGHT.semibold,
+              fontFamily: WEIGHT.regular,
               color: 'white',
             }}>
             {'  '}Add a new topic

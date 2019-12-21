@@ -1,4 +1,4 @@
-import React, {useEffect, useState, createRef, useCallback} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   SafeAreaView,
   TouchableOpacity,
@@ -16,7 +16,6 @@ import {NotesList} from '../../components/NotesList';
 import {db} from '../../../App';
 import Icon from 'react-native-vector-icons/Feather';
 import NavigationService from '../../services/NavigationService';
-import {useForceUpdate} from '../ListsEditor';
 import * as Animatable from 'react-native-animatable';
 import {useIsFocused} from 'react-navigation-hooks';
 import {useAppContext} from '../../provider/useAppContext';

@@ -1,38 +1,25 @@
-import React, {useEffect, useState, createRef, useRef} from 'react';
+import React from 'react';
 import {
   ScrollView,
   View,
   Text,
   TouchableOpacity,
-  SafeAreaView,
   Platform,
   FlatList,
-  DeviceEventEmitter,
   ActivityIndicator,
   KeyboardAvoidingView,
 } from 'react-native';
-import NavigationService from '../../services/NavigationService';
 import {
-  COLOR_SCHEME,
   SIZE,
-  br,
-  ph,
   pv,
   opacity,
-  FONT,
   WEIGHT,
   COLOR_SCHEME_DARK,
-  setColorScheme,
   COLOR_SCHEME_LIGHT,
-  clearThemeUpdateListener,
-  onThemeUpdate,
 } from '../../common/common';
-
 import Icon from 'react-native-vector-icons/Feather';
-
-import {getElevation, w, h, Toast} from '../../utils/utils';
+import {h} from '../../utils/utils';
 import AsyncStorage from '@react-native-community/async-storage';
-import {useForceUpdate} from '../../views/ListsEditor';
 import {AnimatedSafeAreaView} from '../../views/Home';
 import {TextInput} from 'react-native-gesture-handler';
 import {useAppContext} from '../../provider/useAppContext';
@@ -51,6 +38,187 @@ export const EditorMenu = ({
   let tagToAdd = null;
   let backPressCount = 0;
 
+  _renderListItem = ({item, index}) => (
+    <TouchableOpacity
+      activeOpacity={opacity}
+      onPress={() => {
+        item.close === false ? null : close();
+        item.func();
+      }}
+      style={{
+        width: '100%',
+        alignSelf: 'center',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'flex-end',
+        paddingHorizontal: '5%',
+        paddingVertical: pv + 5,
+      }}>
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+        }}>
+        <Icon
+          style={{
+            width: 30,
+          }}
+          name={item.icon}
+          color={colors.pri}
+          size={SIZE.md}
+        />
+        <Text
+          style={{
+            fontFamily: WEIGHT.regular,
+            fontSize: SIZE.sm,
+            color: colors.pri,
+          }}>
+          {item.name}
+        </Text>
+      </View>
+      {item.switch ? (
+        <Icon
+          size={SIZE.lg + 2}
+          color={item.on ? colors.accent : colors.icon}
+          name={item.on ? 'toggle-right' : 'toggle-left'}
+        />
+      ) : (
+        undefined
+      )}
+      {item.check ? (
+        <TouchableOpacity
+          style={{
+            borderWidth: 2,
+            borderColor: item.on ? colors.accent : colors.icon,
+            width: 23,
+            height: 23,
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderRadius: 100,
+            paddingTop: 3,
+          }}>
+          {item.on ? (
+            <Icon size={SIZE.sm - 2} color={colors.accent} name="check" />
+          ) : null}
+        </TouchableOpacity>
+      ) : null}
+    </TouchableOpacity>
+  );
+
+  _renderTag = item => (
+    <TouchableOpacity
+      style={{
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        margin: 5,
+        paddingHorizontal: 5,
+        paddingVertical: 2.5,
+        backgroundColor: colors.accent,
+        borderRadius: 5,
+      }}>
+      <Text
+        style={{
+          fontFamily: WEIGHT.regular,
+          fontSize: SIZE.sm - 2,
+          color: 'white',
+        }}>
+        {item}
+      </Text>
+    </TouchableOpacity>
+  );
+
+  _renderColor = item => (
+    <TouchableOpacity
+      onPress={() => {
+        let props = {...noteProps};
+        if (props.colors.includes(item)) {
+          props.colors.splice(props.colors.indexOf(item), 1);
+        } else {
+          props.colors.push(item);
+        }
+
+        updateProps(props);
+      }}
+      style={{
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        marginRight: 5,
+        marginBottom: 5,
+        borderWidth: 1.5,
+        borderRadius: 100,
+        padding: 3,
+        borderColor: noteProps.colors.includes(item)
+          ? colors.pri
+          : colors.shade,
+      }}>
+      <View
+        style={{
+          width: 40,
+          height: 40,
+          backgroundColor: item,
+          borderRadius: 100,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        {noteProps.colors.includes(item) ? (
+          <Icon name="check" color="white" size={SIZE.md} />
+        ) : null}
+      </View>
+    </TouchableOpacity>
+  );
+
+  _onSubmit = () => {
+    if (!tagToAdd || tagToAdd === '#') return;
+
+    let tag = tagToAdd;
+    if (tag[0] !== '#') {
+      tag = '#' + tag;
+    }
+    if (tag.includes(' ')) {
+      tag = tag.replace(' ', '_');
+    }
+    let oldProps = {...noteProps};
+    oldProps.tags.push(tag);
+    tagsInputRef.setNativeProps({
+      text: '#',
+    });
+    updateProps(oldProps);
+    tagToAdd = '';
+    setTimeout(() => {
+      tagsInputRef.focus();
+    }, 300);
+  };
+
+  _onKeyPress = event => {
+    if (event.nativeEvent.key === 'Backspace') {
+      if (backPressCount === 0 && !tagToAdd) {
+        backPressCount = 1;
+
+        return;
+      }
+      if (backPressCount === 1 && !tagToAdd) {
+        backPressCount = 0;
+
+        let tagInputValue = noteProps.tags[noteProps.tags.length - 1];
+        let oldProps = {...noteProps};
+        if (allTags.length === 1) return;
+
+        oldProps.tags.splice(allTags.length - 1);
+
+        updateProps(oldProps);
+        tagsInputRef.setNativeProps({
+          text: tagInputValue,
+        });
+
+        setTimeout(() => {
+          tagsInputRef.focus();
+        }, 300);
+      }
+    }
+  };
+
   return (
     <AnimatedSafeAreaView
       transition={['backgroundColor', 'opacity']}
@@ -58,7 +226,7 @@ export const EditorMenu = ({
       style={{
         height: '100%',
         opacity: hide ? 0 : 1,
-        backgroundColor: colors.night ? colors.navbg : colors.navbg,
+        backgroundColor: colors.shade,
       }}>
       <KeyboardAvoidingView
         style={{height: '100%'}}
@@ -157,76 +325,7 @@ export const EditorMenu = ({
                 },
               ]}
               keyExtractor={(item, index) => item.name}
-              renderItem={({item, index}) => (
-                <TouchableOpacity
-                  activeOpacity={opacity}
-                  onPress={() => {
-                    item.close === false ? null : close();
-                    item.func();
-                  }}
-                  style={{
-                    width: '100%',
-                    alignSelf: 'center',
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'flex-end',
-                    paddingHorizontal: '5%',
-                    paddingVertical: pv + 5,
-                  }}>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                    }}>
-                    <Icon
-                      style={{
-                        width: 30,
-                      }}
-                      name={item.icon}
-                      color={colors.icon}
-                      size={SIZE.md}
-                    />
-                    <Text
-                      style={{
-                        fontFamily: WEIGHT.regular,
-                        fontSize: SIZE.sm,
-                        color: colors.pri,
-                      }}>
-                      {item.name}
-                    </Text>
-                  </View>
-                  {item.switch ? (
-                    <Icon
-                      size={SIZE.lg + 2}
-                      color={item.on ? colors.accent : colors.icon}
-                      name={item.on ? 'toggle-right' : 'toggle-left'}
-                    />
-                  ) : (
-                    undefined
-                  )}
-                  {item.check ? (
-                    <TouchableOpacity
-                      style={{
-                        borderWidth: 2,
-                        borderColor: item.on ? colors.accent : colors.icon,
-                        width: 23,
-                        height: 23,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        borderRadius: 100,
-                        paddingTop: 3,
-                      }}>
-                      {item.on ? (
-                        <Icon
-                          size={SIZE.sm - 2}
-                          color={colors.accent}
-                          name="check"
-                        />
-                      ) : null}
-                    </TouchableOpacity>
-                  ) : null}
-                </TouchableOpacity>
-              )}
+              renderItem={_renderListItem}
             />
 
             <TouchableOpacity
@@ -250,7 +349,7 @@ export const EditorMenu = ({
                     width: 30,
                   }}
                   name="tag"
-                  color={colors.icon}
+                  color={colors.pri}
                   size={SIZE.md}
                 />
                 <Text
@@ -274,28 +373,7 @@ export const EditorMenu = ({
                 borderRadius: 5,
                 backgroundColor: colors.nav,
               }}>
-              {noteProps.tags.map(item => (
-                <TouchableOpacity
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'flex-start',
-                    alignItems: 'center',
-                    margin: 5,
-                    paddingHorizontal: 5,
-                    paddingVertical: 2.5,
-                    backgroundColor: colors.accent,
-                    borderRadius: 5,
-                  }}>
-                  <Text
-                    style={{
-                      fontFamily: WEIGHT.regular,
-                      fontSize: SIZE.sm - 2,
-                      color: 'white',
-                    }}>
-                    {item}
-                  </Text>
-                </TouchableOpacity>
-              ))}
+              {noteProps.tags.map(_renderTag)}
               <TextInput
                 style={{
                   backgroundColor: 'transparent',
@@ -313,55 +391,8 @@ export const EditorMenu = ({
                   tagToAdd = value;
                   if (tagToAdd.length > 0) backPressCount = 0;
                 }}
-                onKeyPress={event => {
-                  if (event.nativeEvent.key === 'Backspace') {
-                    if (backPressCount === 0 && !tagToAdd) {
-                      backPressCount = 1;
-
-                      return;
-                    }
-                    if (backPressCount === 1 && !tagToAdd) {
-                      backPressCount = 0;
-
-                      let tagInputValue =
-                        noteProps.tags[noteProps.tags.length - 1];
-                      let oldProps = {...noteProps};
-                      if (allTags.length === 1) return;
-
-                      oldProps.tags.splice(allTags.length - 1);
-
-                      updateProps(oldProps);
-                      tagsInputRef.setNativeProps({
-                        text: tagInputValue,
-                      });
-
-                      setTimeout(() => {
-                        tagsInputRef.focus();
-                      }, 300);
-                    }
-                  }
-                }}
-                onSubmitEditing={() => {
-                  if (!tagToAdd || tagToAdd === '#') return;
-
-                  let tag = tagToAdd;
-                  if (tag[0] !== '#') {
-                    tag = '#' + tag;
-                  }
-                  if (tag.includes(' ')) {
-                    tag = tag.replace(' ', '_');
-                  }
-                  let oldProps = {...noteProps};
-                  oldProps.tags.push(tag);
-                  tagsInputRef.setNativeProps({
-                    text: '#',
-                  });
-                  updateProps(oldProps);
-                  tagToAdd = '';
-                  setTimeout(() => {
-                    tagsInputRef.focus();
-                  }, 300);
-                }}
+                onKeyPress={_onKeyPress}
+                onSubmitEditing={_onSubmit}
               />
             </ScrollView>
 
@@ -386,7 +417,7 @@ export const EditorMenu = ({
                     width: 30,
                   }}
                   name="tag"
-                  color={colors.icon}
+                  color={colors.pri}
                   size={SIZE.md}
                 />
                 <Text
@@ -395,7 +426,7 @@ export const EditorMenu = ({
                     fontSize: SIZE.sm,
                     color: colors.pri,
                   }}>
-                  Add to Color
+                  Assign Colors
                 </Text>
               </View>
             </TouchableOpacity>
@@ -416,46 +447,7 @@ export const EditorMenu = ({
                 'purple',
                 'orange',
                 'gray',
-              ].map(item => (
-                <TouchableOpacity
-                  onPress={() => {
-                    let props = {...noteProps};
-                    if (props.colors.includes(item)) {
-                      props.colors.splice(props.colors.indexOf(item), 1);
-                    } else {
-                      props.colors.push(item);
-                    }
-
-                    updateProps(props);
-                  }}
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'flex-start',
-                    alignItems: 'center',
-                    marginRight: 5,
-                    marginBottom: 5,
-                    borderWidth: 1.5,
-                    borderRadius: 100,
-                    padding: 3,
-                    borderColor: noteProps.colors.includes(item)
-                      ? colors.pri
-                      : colors.navbg,
-                  }}>
-                  <View
-                    style={{
-                      width: 40,
-                      height: 40,
-                      backgroundColor: item,
-                      borderRadius: 100,
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                    }}>
-                    {noteProps.colors.includes(item) ? (
-                      <Icon name="check" color="white" size={SIZE.md} />
-                    ) : null}
-                  </View>
-                </TouchableOpacity>
-              ))}
+              ].map(_renderColor)}
             </ScrollView>
           </View>
           <View

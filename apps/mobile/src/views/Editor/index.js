@@ -314,55 +314,64 @@ const Editor = ({navigation}) => {
       </Animatable.View>
     </View>
   ) : (
-    <SideMenu
-      isOpen={isOpen}
-      bounceBackOnOverdraw={false}
-      contentContainerStyle={{
-        opacity: 0,
-      }}
-      openMenuOffset={w / 1.2}
-      menuPosition="right"
-      onChange={args => {
-        setTimeout(() => {
-          setOpen(args);
-        }, 500);
-      }}
-      menu={
-        <EditorMenu
-          hide={false}
-          noteProps={noteProps}
-          updateProps={props => {
-            setNoteProps(props);
+    <Animatable.View
+      transition="backgroundColor"
+      duration={300}
+      style={{
+        backgroundColor: colors.bg,
+        flex: 1,
+      }}>
+      <SideMenu
+        isOpen={isOpen}
+        bounceBackOnOverdraw={false}
+        contentContainerStyle={{
+          opacity: 0,
+          backgroundColor: colors.bg,
+        }}
+        openMenuOffset={w / 1.2}
+        menuPosition="right"
+        onChange={args => {
+          setTimeout(() => {
+            setOpen(args);
+          }, 500);
+        }}
+        menu={
+          <EditorMenu
+            hide={false}
+            noteProps={noteProps}
+            updateProps={props => {
+              setNoteProps(props);
 
-            console.log(props, noteProps);
-          }}
-          close={() => {
-            setTimeout(() => {
-              setOpen(args);
-            }, 500);
-          }}
-        />
-      }>
-      <AnimatedSafeAreaView
-        transition="backgroundColor"
-        duration={300}
-        style={{height: '100%', backgroundColor: colors.bg}}>
-        <Dialog
-          title="Close Editor"
-          visible={dialog}
-          icon="x"
-          paragraph="Are you sure you want to close editor?"
-          close={() => {
-            setDialog(false);
-          }}
-          positivePress={() => {
-            navigation.goBack();
-            setDialog(false);
-          }}
-        />
-        {_renderEditor()}
-      </AnimatedSafeAreaView>
-    </SideMenu>
+              console.log(props, noteProps);
+            }}
+            close={() => {
+              setTimeout(() => {
+                setOpen(args);
+              }, 500);
+            }}
+          />
+        }>
+        <AnimatedSafeAreaView
+          transition="backgroundColor"
+          duration={300}
+          style={{height: '100%', backgroundColor: colors.bg}}>
+          <Dialog
+            title="Close Editor"
+            visible={dialog}
+            icon="x"
+            paragraph="Are you sure you want to close editor?"
+            close={() => {
+              setDialog(false);
+            }}
+            positivePress={() => {
+              navigation.goBack();
+              setDialog(false);
+            }}
+          />
+          {_renderEditor()}
+        </AnimatedSafeAreaView>
+      </SideMenu>
+    </Animatable.View>
   );
 };
 

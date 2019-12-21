@@ -1,37 +1,24 @@
-import React, {useEffect, useState, createRef} from 'react';
+import React from 'react';
 import {
   ScrollView,
   View,
   Text,
   TouchableOpacity,
-  SafeAreaView,
   Platform,
   FlatList,
-  DeviceEventEmitter,
-  PixelRatio,
 } from 'react-native';
 import NavigationService from '../../services/NavigationService';
 import {
-  COLOR_SCHEME,
   SIZE,
-  br,
-  ph,
   pv,
   opacity,
-  FONT,
   WEIGHT,
   COLOR_SCHEME_DARK,
-  setColorScheme,
   COLOR_SCHEME_LIGHT,
-  clearThemeUpdateListener,
-  onThemeUpdate,
 } from '../../common/common';
-
 import Icon from 'react-native-vector-icons/Feather';
-
-import {getElevation, w, h, Toast} from '../../utils/utils';
+import {h} from '../../utils/utils';
 import AsyncStorage from '@react-native-community/async-storage';
-import {useForceUpdate} from '../../views/ListsEditor';
 import {AnimatedSafeAreaView} from '../../views/Home';
 import {useAppContext} from '../../provider/useAppContext';
 
@@ -207,7 +194,7 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
                   width: 30,
                 }}
                 name="tag"
-                color={colors.icon}
+                color={colors.pri}
                 size={SIZE.md}
               />
               <Text
