@@ -151,20 +151,12 @@ class Database {
     return timestamp;
   }
 
-  async pinItem(type, id) {
-    switch (type) {
-      case "notebook":
-      case "note":
-        col = type == "note" ? this.notes : this.notebooks;
-        func = type == "note" ? this.addNote : this.addNotebook;
-        if (col[id] === undefined) {
-          throw new Error(`Wrong ${type} id.`);
-        }
-        await func({ ...col[id], pinned: true });
-        break;
-      default:
-        throw new Error("Invalid type given to pinItem");
-    }
+  pinItem(type, id) {
+    return editItem.call(this, type, id, { pinned: true });
+  }
+
+  favoriteItem(type, id) {
+    return editItem.call(this, type, id, { favorite: true });
   }
 
   /**
@@ -494,4 +486,20 @@ function makeTopic(topic) {
     totalNotes: 0,
     notes: []
   };
+}
+
+async function editItem(type, id, edit) {
+  switch (type) {
+    case "notebook":
+    case "note":
+      col = type == "note" ? this.notes : this.notebooks;
+      func = type == "note" ? this.addNote : this.addNotebook;
+      if (col[id] === undefined) {
+        throw new Error(`Wrong ${type} id.`);
+      }
+      await func({ ...col[id], ...edit });
+      break;
+    default:
+      throw new Error("Invalid type given to pinItem");
+  }
 }
