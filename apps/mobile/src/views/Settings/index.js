@@ -29,7 +29,12 @@ export const Settings = ({navigation}) => {
         height: '100%',
       }}>
       <View>
-        <Header colors={colors} heading="Settings" canGoBack={false} />
+        <Header
+          menu={true}
+          colors={colors}
+          heading="Settings"
+          canGoBack={false}
+        />
 
         <FlatList
           data={[
@@ -91,7 +96,7 @@ export const Settings = ({navigation}) => {
                 borderBottomColor: colors.nav,
                 paddingVertical: pv + 5,
                 flexDirection: 'row',
-                paddingHorizontal: ph,
+
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 marginLeft: item.step ? '10%' : '5%',
@@ -125,7 +130,6 @@ export const Settings = ({navigation}) => {
             borderBottomColor: colors.nav,
             paddingVertical: pv + 5,
 
-            paddingHorizontal: ph,
             justifyContent: 'space-between',
             alignItems: 'flex-start',
           }}>
@@ -143,6 +147,7 @@ export const Settings = ({navigation}) => {
               flexDirection: 'row',
               flexWrap: 'wrap',
               marginTop: 10,
+              marginHorizontal: 20,
             }}>
             {[
               '#e6194b',
@@ -196,7 +201,7 @@ export const Settings = ({navigation}) => {
             borderBottomColor: colors.nav,
             paddingVertical: pv + 5,
             flexDirection: 'row',
-            paddingHorizontal: ph,
+
             justifyContent: 'space-between',
             alignItems: 'center',
           }}>
@@ -219,7 +224,7 @@ export const Settings = ({navigation}) => {
             borderBottomColor: colors.nav,
             paddingVertical: pv + 5,
             flexDirection: 'row',
-            paddingHorizontal: ph,
+
             justifyContent: 'space-between',
             alignItems: 'center',
           }}>
@@ -242,7 +247,7 @@ export const Settings = ({navigation}) => {
             borderBottomColor: colors.nav,
             paddingVertical: pv + 5,
             flexDirection: 'row',
-            paddingHorizontal: ph,
+
             justifyContent: 'space-between',
             alignItems: 'center',
           }}>

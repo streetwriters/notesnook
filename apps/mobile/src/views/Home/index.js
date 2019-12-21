@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import {COLOR_SCHEME, opacity, pv, br, SIZE, WEIGHT} from '../../common/common';
 import {Search} from '../../components/SearchInput';
-import {w, h, SideMenuEvent} from '../../utils/utils';
+import {w, h, SideMenuEvent, getElevation} from '../../utils/utils';
 import {Header} from '../../components/header';
 import {NavigationEvents} from 'react-navigation';
 import {NotesList} from '../../components/NotesList';

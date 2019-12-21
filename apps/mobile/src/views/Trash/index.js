@@ -56,7 +56,7 @@ export const Trash = ({navigation}) => {
       <FlatList
         numColumns={1}
         style={{
-          width: DDS.isTab ? '95%' : '90%',
+          width: '100%',
           alignSelf: 'center',
         }}
         data={trash}

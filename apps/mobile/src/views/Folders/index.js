@@ -114,6 +114,7 @@ export const Folders = ({navigation}) => {
           <Header
             sendHeight={height => (headerHeight = height)}
             hide={hideHeader}
+            menu={true}
             showSearch={() => {
               setHideHeader(false);
               countUp = 0;
@@ -164,30 +165,8 @@ export const Folders = ({navigation}) => {
           }
           numColumns={numColumns}
           key={numColumns}
-          columnWrapperStyle={
-            numColumns === 1
-              ? null
-              : {
-                  width:
-                    notebooks.length === 1
-                      ? DDS.isTab
-                        ? '95%'
-                        : '90%'
-                      : DDS.isTab
-                      ? '45%'
-                      : '42.5%',
-                }
-          }
           contentContainerStyle={{
-            width:
-              numColumns === 2
-                ? DDS.isTab
-                  ? '100%'
-                  : null
-                : DDS.isTab
-                ? '95%'
-                : '90%',
-            alignItems: numColumns === 2 ? 'flex-start' : null,
+            width: '100%',
             alignSelf: 'center',
           }}
           ListFooterComponent={

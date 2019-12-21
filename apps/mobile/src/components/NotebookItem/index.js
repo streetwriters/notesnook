@@ -13,7 +13,7 @@ import {
 } from '../../common/common';
 import Icon from 'react-native-vector-icons/Feather';
 import {w, ToastEvent} from '../../utils/utils';
-import {db} from '../../../App';
+import {db, DDS} from '../../../App';
 import {Dialog} from '../Dialog';
 import {AddTopicDialog} from '../AddTopicDialog';
 import {useAppContext} from '../../provider/useAppContext';
@@ -94,7 +94,7 @@ export const NotebookItem = ({
         alignItems: 'center',
         flexDirection: 'row',
         paddingHorizontal: 0,
-        width: '100%',
+        width: DDS.isTab ? '95%' : '90%',
         alignSelf: 'center',
         borderBottomWidth: 1,
         borderBottomColor: colors.nav,

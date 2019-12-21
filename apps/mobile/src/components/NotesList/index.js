@@ -163,15 +163,7 @@ export const NotesList = ({
           }}></View>
       }
       contentContainerStyle={{
-        width:
-          numColumns === 2
-            ? DDS.isTab
-              ? '100%'
-              : null
-            : DDS.isTab
-            ? '95%'
-            : '90%',
-        alignItems: numColumns === 2 ? 'flex-start' : null,
+        width: '100%',
         alignSelf: 'center',
       }}
       ListFooterComponent={

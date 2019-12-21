@@ -81,20 +81,25 @@ export const AccountSettings = ({navigation}) => {
           }}>
           Alex's Account
         </Text>
-        <Text
+
+        <View
           style={{
-            color: 'white',
-            fontFamily: WEIGHT.regular,
-            fontSize: SIZE.sm,
-            marginTop: 10,
-            backgroundColor: colors.accent,
             borderRadius: 5,
             padding: 5,
             paddingVertical: 2.5,
             marginBottom: 20,
+            marginTop: 10,
+            backgroundColor: colors.accent,
           }}>
-          Pro
-        </Text>
+          <Text
+            style={{
+              color: 'white',
+              fontFamily: WEIGHT.regular,
+              fontSize: SIZE.sm,
+            }}>
+            Pro
+          </Text>
+        </View>
       </View>
       <FlatList
         data={[
@@ -130,7 +135,6 @@ export const AccountSettings = ({navigation}) => {
               borderBottomColor: colors.nav,
               paddingVertical: pv + 5,
               flexDirection: 'row',
-              paddingHorizontal: ph,
               justifyContent: 'space-between',
               alignItems: 'center',
             }}>
