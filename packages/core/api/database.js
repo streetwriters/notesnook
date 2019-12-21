@@ -12,7 +12,8 @@ import {
 const KEYS = {
   notes: "notes",
   notebooks: "notebooks",
-  trash: "trash"
+  trash: "trash",
+  tags: "tags"
 };
 
 function checkInitialized() {
@@ -37,7 +38,7 @@ class Database {
       for (let key of extractValues(KEYS)) {
         this.storage.read(key).then(data => {
           this[key] = data || {};
-          if (key === "notebooks") {
+          if (key === KEYS.tags) {
             this.isInitialized = true;
             //TODO use index here
             resolve(true);
@@ -148,6 +149,22 @@ class Database {
     };
     await this.storage.write(KEYS.notes, this.notes);
     return timestamp;
+  }
+
+  async pinItem(type, id) {
+    switch (type) {
+      case "notebook":
+      case "note":
+        col = type == "note" ? this.notes : this.notebooks;
+        func = type == "note" ? this.addNote : this.addNotebook;
+        if (col[id] === undefined) {
+          throw new Error(`Wrong ${type} id.`);
+        }
+        await func({ ...col[id], pinned: true });
+        break;
+      default:
+        throw new Error("Invalid type given to pinItem");
+    }
   }
 
   /**
