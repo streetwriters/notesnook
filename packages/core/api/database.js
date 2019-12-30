@@ -128,12 +128,12 @@ class Database {
     if (this.notes[timestamp] !== undefined) {
       let oldNote = this.notes[timestamp];
       //if we are having new colors
-      if (oldNote.colors !== note.colors) {
+      if (oldNote.colors !== note.colors && note.colors) {
         note.colors = mergeDedupe([oldNote.colors, note.colors]);
       }
       //if we are having new tags
       //TODO add new tags to the tags collection...
-      if (oldNote.tags !== note.tags) {
+      if (oldNote.tags !== note.tags && note.tags) {
         note.tags = mergeDedupe([oldNote.tags, note.tags]);
       }
     }
@@ -159,7 +159,7 @@ class Database {
   }
 
   //TODO only send unique values here...
-  updateTags(tags) {
+  async updateTags(tags) {
     for (let tag of tags) {
       this[KEYS.tags][tag] = {
         title: tag,
