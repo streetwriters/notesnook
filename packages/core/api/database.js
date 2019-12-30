@@ -48,9 +48,6 @@ class Database {
     });
   }
 
-  /**
-   * Get all notes
-   */
   getNotes() {
     checkInitialized.call(this);
     return extractValues(this.notes).reverse();
@@ -61,7 +58,6 @@ class Database {
   }
 
   /**
-   * Group notes by given criteria
    * @param {string} by One from 'abc', 'month', 'year' or 'week'. Leave it empty for default grouping.
    * @param {boolean} special Should only be used in the React app.
    */
@@ -111,10 +107,6 @@ class Database {
     }
   }
 
-  /**
-   * Adds or updates a note
-   * @param {object} note The note to add or update
-   */
   async addNote(note) {
     if (
       !note ||
@@ -137,12 +129,12 @@ class Database {
       let oldNote = this.notes[timestamp];
       //if we are having new colors
       if (oldNote.colors !== note.colors) {
-        note.colors = mergeDedupe(oldNote.colors, note.colors);
+        note.colors = mergeDedupe([oldNote.colors, note.colors]);
       }
       //if we are having new tags
       //TODO add new tags to the tags collection...
       if (oldNote.tags !== note.tags) {
-        note.tags = mergeDedupe(oldNote.tags, note.tags);
+        note.tags = mergeDedupe([oldNote.tags, note.tags]);
       }
     }
 
@@ -166,6 +158,17 @@ class Database {
     return timestamp;
   }
 
+  //TODO only send unique values here...
+  updateTags(tags) {
+    for (let tag of tags) {
+      this[KEYS.tags][tag] = {
+        title: tag,
+        count: this[KEYS.tags][tag].count + 1
+      };
+    }
+    await this.storage.write(KEYS.tags, this[KEYS.tags]);
+  }
+
   pinItem(type, id) {
     return editItem.call(this, type, id, { pinned: true });
   }
@@ -174,27 +177,14 @@ class Database {
     return editItem.call(this, type, id, { favorite: true });
   }
 
-  /**
-   * Deletes one or more notes
-   * @param {array} notes the notes to be deleted
-   */
   async deleteNotes(notes) {
     return await deleteItems.call(this, notes, KEYS.notes);
   }
 
-  /**
-   * Gets a note
-   * @param {string} id the id of the note (must be a timestamp)
-   */
   getNote(id) {
     return getItem.call(this, id, KEYS.notes);
   }
 
-  /**
-   * Searches all notes with the given query
-   * @param {string} query the search query
-   * @returns An array containing the filtered notes
-   */
   searchNotes(query) {
     if (!query) return [];
     return tfun.filter(v => fuzzysearch(query, v.title + " " + v.content.text))(
@@ -214,20 +204,11 @@ class Database {
     // if (perm) { this.notes[note.dateCreated].locked = false }
   }
 
-  /**
-   * Get all notebooks
-   * @returns An array containing all the notebooks
-   */
   getNotebooks() {
     checkInitialized.call(this);
     return extractValues(this.notebooks);
   }
 
-  /**
-   * Add a notebook
-   * @param {object} notebook The notebook to add
-   * @returns The ID of the added notebook
-   */
   async addNotebook(notebook) {
     if (!notebook || !notebook.title) {
       return;
@@ -269,11 +250,6 @@ class Database {
     return id;
   }
 
-  /**
-   * Add a topic to the notebook
-   * @param {number} notebookId The ID of notebook
-   * @param {string} topic The topic to add
-   */
   addTopicToNotebook(notebookId, topic) {
     return notebookTopicFn.call(this, notebookId, topic, notebook => {
       if (notebook.topics.findIndex(t => t.title === topic) > -1) return false; //check for duplicates
@@ -282,11 +258,6 @@ class Database {
     });
   }
 
-  /**
-   * Delete a topic from the notebook
-   * @param {number} notebookId The ID of the notebook
-   * @param {string} topic The topic to delete
-   */
   deleteTopicFromNotebook(notebookId, topic) {
     return notebookTopicFn.call(this, notebookId, topic, notebook => {
       let topicIndex = notebook.topics.findIndex(t => t.title === topic);
@@ -296,12 +267,6 @@ class Database {
     });
   }
 
-  /**
-   * Add a note to a topic in a notebook
-   * @param {number} notebookId The ID of the notebook
-   * @param {string} topic The topic to add note to
-   * @param {number} noteId The ID of the note
-   */
   addNoteToTopic(notebookId, topic, noteId) {
     return topicNoteFn.call(
       this,
@@ -325,12 +290,6 @@ class Database {
     );
   }
 
-  /**
-   * Delete a note from a topic in a notebook
-   * @param {number} notebookId The ID of the notebook
-   * @param {string} topic The topic to delete note from
-   * @param {number} noteId The ID of the note
-   */
   deleteNoteFromTopic(notebookId, topic, noteId) {
     return topicNoteFn.call(
       this,
@@ -351,12 +310,6 @@ class Database {
     );
   }
 
-  /**
-   * Get all the notes in a topic
-   * @param {number} notebookId The ID of the notebook
-   * @param {string} topic The topic
-   * @returns An array containing the topic notes
-   */
   getTopic(notebookId, topic) {
     if (!notebookId || !topic || !this.notebooks[notebookId]) return;
     let notebook = this.notebooks[notebookId];
@@ -367,19 +320,10 @@ class Database {
     return nbTopic.notes.map(note => this.getNote(note));
   }
 
-  /**
-   * Get a notebook
-   * @param {number} id The ID of the notebook
-   * @returns The notebook
-   */
   getNotebook(id) {
     return getItem.call(this, id, KEYS.notebooks);
   }
 
-  /**
-   * Delete notebooks
-   * @param {array} notebooks The notebooks to delete
-   */
   async deleteNotebooks(notebooks) {
     return await deleteItems.call(this, notebooks, KEYS.notebooks);
   }
