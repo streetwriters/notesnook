@@ -16,7 +16,7 @@ const CheckBox = props => {
       width="full"
       alignItems="center"
       justifyContent="space-between"
-      sx={{ cursor: "pointer", marginBottom: 1 }}
+      sx={{ cursor: "pointer", marginBottom: 2 }}
     >
       <Flex
         className="unselectable"
@@ -29,6 +29,7 @@ const CheckBox = props => {
       </Flex>
       <Text color={checked ? "primary" : "foreground"}>
         <Icon.CheckCircle
+          size={18}
           className="unselectable"
           style={{ cursor: "pointer" }}
         />
