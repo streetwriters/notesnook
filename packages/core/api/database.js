@@ -8,6 +8,7 @@ import {
   months,
   getLastWeekTimestamp
 } from "../utils/date";
+import Encryptor from "sjcl";
 
 const KEYS = {
   notes: "notes",
@@ -86,7 +87,7 @@ class Database {
       case "year":
         return groupBy(
           notes,
-          note => months[new Date(note.dateCreated).getFullYear()],
+          note => new Date(note.dateCreated).getFullYear().toString(),
           special
         );
       default:
@@ -192,16 +193,30 @@ class Database {
     );
   }
 
-  //TODO
-  lockNote(note) {
-    // this.notes[note.dateCreated].content = Encrypt(JSON.stringify(this.notes[note.dateCreated].content))
-    // this.notes[note.dateCreated].locked = true
+  async lockNote(noteId, password) {
+    if (!this.notes[noteId]) {
+      throw new Error(`Cannot lock note. Invalid ID: ${noteId} given.`);
+    }
+    this.notes[noteId].content = Encryptor.encrypt(
+      password,
+      JSON.stringify(this.notes[noteId].content),
+      { ks: 256 }
+    );
+    this.notes[noteId].locked = true;
+    await this.storage.write(KEYS.notes, this.notes);
+    return true;
   }
 
-  //TODO
-  unlockNote(note, perm = false) {
-    // this.notes[note.dateCreated].content = JSON.parse(Decrypt(this.notes[note.dateCreated].content))
-    // if (perm) { this.notes[note.dateCreated].locked = false }
+  async unlockNote(noteId, password, perm = false) {
+    if (!this.notes[noteId]) {
+      throw new Error(`Cannot unlock note. Invalid ID: ${noteId} given.`);
+    }
+    let decrypted = Encryptor.decrypt(password, this.notes[noteId].content);
+    if (perm) {
+      this.notes[noteId].locked = false;
+      await this.storage.write(KEYS.notes, this.notes);
+    }
+    return { ...this.notes[noteId], content: JSON.parse(decrypted) };
   }
 
   getNotebooks() {
@@ -223,15 +238,26 @@ class Database {
     }
 
     const id = notebook.dateCreated || Date.now();
-    let topics = [makeTopic("General")];
-    for (let topic of notebook.topics) {
+    let topics =
+      !notebook.topics || notebook.topics.length <= 0 ? [] : notebook.topics; //
+    if (notebook.topics.findIndex(topic => topic.title === "General") <= -1) {
+      topics.splice(0, 0, makeTopic("General"));
+    }
+    let index = 0;
+
+    for (let topic of topics) {
       if (
         !topic ||
-        topic.trim().length <= 0 ||
-        topics.findIndex(t => t.title === topic) > -1 //check for duplicate
-      )
+        topics.findIndex(t => t.title === (topic || topic.title)) > -1 //check for duplicate
+      ) {
+        topics.splice(index, 1);
         continue;
-      topics[topics.length] = makeTopic(topic);
+      }
+      if (typeof topic === "string") {
+        if (topic.trim().length <= 0) topics.splice(index, 1);
+        topics[index] = makeTopic(topic);
+      }
+      index++;
     }
 
     this.notebooks[id] = {
@@ -348,7 +374,7 @@ class Database {
 
   async restoreItem(id) {
     if (!this.trash.hasOwnProperty(id)) {
-      return;
+      throw new Error("Cannot restore: This item is not present in trash.");
     }
     let type = this.trash[id].dType;
     delete this.trash[id].dateDeleted;
@@ -452,12 +478,12 @@ async function editItem(type, id, edit) {
   switch (type) {
     case "notebook":
     case "note":
-      col = type == "note" ? this.notes : this.notebooks;
-      func = type == "note" ? this.addNote : this.addNotebook;
+      let col = type == "note" ? this.notes : this.notebooks;
+      let func = type == "note" ? this.addNote : this.addNotebook;
       if (col[id] === undefined) {
         throw new Error(`Wrong ${type} id.`);
       }
-      await func({ ...col[id], ...edit });
+      await func.call(this, { ...col[id], ...edit });
       break;
     default:
       throw new Error("Invalid type given to pinItem");

@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "fuzzysearch": "^1.0.3",
+    "sjcl": "^1.0.8",
     "transfun": "^1.0.2"
   }
 }
