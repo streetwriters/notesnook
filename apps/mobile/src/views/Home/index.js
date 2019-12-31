@@ -11,7 +11,6 @@ import {COLOR_SCHEME, opacity, pv, br, SIZE, WEIGHT} from '../../common/common';
 import {Search} from '../../components/SearchInput';
 import {w, h, SideMenuEvent, getElevation} from '../../utils/utils';
 import {Header} from '../../components/header';
-import {NavigationEvents} from 'react-navigation';
 import {NotesList} from '../../components/NotesList';
 import {db} from '../../../App';
 import Icon from 'react-native-vector-icons/Feather';
@@ -30,7 +29,6 @@ export const Home = ({navigation}) => {
 
   const [search, setSearch] = useState(false);
   const [text, setText] = useState('');
-  const [update, setUpdate] = useState(0);
   const [hideHeader, setHideHeader] = useState(false);
   const [margin, setMargin] = useState(180);
   const [buttonHide, setButtonHide] = useState(false);
@@ -41,9 +39,6 @@ export const Home = ({navigation}) => {
   let offsetY = 0;
   let countUp = 1;
   let countDown = 0;
-  let headerHeight = 0;
-  let searchHeight = 0;
-  let marginSet = false;
   let searchResults = null;
   let allNotes = [];
 
@@ -55,7 +50,6 @@ export const Home = ({navigation}) => {
 
   useEffect(() => {
     if (!isFocused) return;
-
     fetchNotes();
   }, [isFocused]);
 
@@ -147,11 +141,6 @@ export const Home = ({navigation}) => {
         style={{
           height: '100%',
         }}>
-        <NavigationEvents
-          onWillFocus={() => {
-            setUpdate(update + 1);
-          }}
-        />
         <Animatable.View
           transition="backgroundColor"
           duration={300}
@@ -162,8 +151,9 @@ export const Home = ({navigation}) => {
             width: '100%',
           }}>
           <Header
-            menu={true}
+            menu
             hide={hideHeader}
+            verticalMenu
             showSearch={() => {
               setHideHeader(false);
               countUp = 0;

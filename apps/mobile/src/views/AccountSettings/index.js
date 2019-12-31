@@ -104,27 +104,25 @@ export const AccountSettings = ({navigation}) => {
       <FlatList
         data={[
           {
-            name: 'Backup Notes',
-            icon: 'database',
+            name: 'Backup',
           },
           {
             name: 'My Devices',
-            icon: 'tablet',
           },
           {
             name: 'Vault',
-            icon: 'shield',
           },
-
           {
             name: 'My Subscription',
-            icon: 'credit-card',
           },
           {
             name: 'Change Password',
-            icon: 'key',
+          },
+          {
+            name: 'Logout',
           },
         ]}
+        keyExtractor={item => item.name}
         renderItem={({item, index}) => (
           <TouchableOpacity
             activeOpacity={opacity}
@@ -145,37 +143,11 @@ export const AccountSettings = ({navigation}) => {
                 textAlignVertical: 'center',
                 color: colors.pri,
               }}>
-              <Icon name={item.icon} size={SIZE.md} />
-              {'  '} {item.name}
+              {item.name}
             </Text>
           </TouchableOpacity>
         )}
       />
-      <TouchableOpacity
-        activeOpacity={opacity}
-        style={{
-          borderRadius: 5,
-          width: '90%',
-          marginHorizontal: '5%',
-          paddingHorizontal: ph,
-          paddingVertical: pv + 5,
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: 10,
-          backgroundColor: colors.accent,
-        }}>
-        <Text
-          style={{
-            fontSize: SIZE.md,
-            fontFamily: WEIGHT.regular,
-            color: 'white',
-          }}>
-          <Icon size={SIZE.lg} color="white" name="log-out" />
-          {'  '}
-          Logout
-        </Text>
-      </TouchableOpacity>
     </AnimatedSafeAreaView>
   );
 };

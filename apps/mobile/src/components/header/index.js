@@ -13,6 +13,7 @@ export const Header = ({
   hide,
   showSearch,
   menu,
+  verticalMenu = false,
   sendHeight = e => {},
 }) => {
   const {colors} = useAppContext();
@@ -119,16 +120,18 @@ export const Header = ({
             <Icon name={'search'} size={SIZE.xl} color={colors.icon} />
           </TouchableOpacity>
         </Animatable.View>
-        <TouchableOpacity
-          style={{
-            justifyContent: 'center',
-            alignItems: 'flex-end',
-            height: 40,
-            width: 60,
-            paddingRight: 0,
-          }}>
-          <Icon name="more-vertical" size={SIZE.xl} color={colors.pri} />
-        </TouchableOpacity>
+        {verticalMenu ? (
+          <TouchableOpacity
+            style={{
+              justifyContent: 'center',
+              alignItems: 'flex-end',
+              height: 40,
+              width: 60,
+              paddingRight: 0,
+            }}>
+            <Icon name="more-vertical" size={SIZE.xl} color={colors.pri} />
+          </TouchableOpacity>
+        ) : null}
       </View>
     </Animatable.View>
   );
