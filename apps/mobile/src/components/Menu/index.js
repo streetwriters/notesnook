@@ -241,7 +241,7 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
                 <Text
                   style={{
                     fontFamily: WEIGHT.regular,
-                    fontSize: SIZE.xs,
+                    fontSize: SIZE.xs + 1,
                     color: colors.icon,
                   }}>
                   #{item}

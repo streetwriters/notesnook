@@ -255,12 +255,10 @@ const NoteItem = props => {
                 }}
                 textStyle={{
                   color: colors.pri,
-
                   fontFamily: WEIGHT.regular,
                   fontSize: SIZE.sm,
                 }}>
-                <Icon name="arrow-left" size={SIZE.sm} color={colors.icon} />
-                {'  '}Restore
+                Restore
               </MenuItem>
               <MenuItem
                 onPress={() => {
@@ -273,29 +271,21 @@ const NoteItem = props => {
                   fontFamily: WEIGHT.regular,
                   fontSize: SIZE.sm,
                 }}>
-                <Icon name="trash" size={SIZE.sm} color={colors.icon} />
-                {'  '}Remove
+                Remove
               </MenuItem>
             </>
           ) : (
             <>
               <MenuItem
-                style={{
-                  height: 35,
-                }}
                 textStyle={{
                   color: colors.pri,
 
                   fontFamily: WEIGHT.regular,
                   fontSize: SIZE.xs,
                 }}>
-                <Icon name="star" size={SIZE.xs} color={colors.icon} />
-                {'  '}Pin
+                Pin
               </MenuItem>
               <MenuItem
-                style={{
-                  height: 35,
-                }}
                 onPress={() => {
                   hideMenu();
                   ToastEvent.show(
@@ -312,22 +302,17 @@ const NoteItem = props => {
                   fontFamily: WEIGHT.regular,
                   fontSize: SIZE.xs,
                 }}>
-                <Icon name="star" size={SIZE.xs} color={colors.icon} />
-                {'  '}Favorite
+                Favorite
               </MenuItem>
 
               <MenuItem
-                style={{
-                  height: 35,
-                }}
                 textStyle={{
                   color: colors.pri,
 
                   fontFamily: WEIGHT.regular,
                   fontSize: SIZE.xs,
                 }}>
-                <Icon name="share" size={SIZE.xs} color={colors.icon} />
-                {'  '}Share
+                Share
               </MenuItem>
 
               <MenuItem
@@ -341,34 +326,26 @@ const NoteItem = props => {
                     hideMore: true,
                   });
                 }}
-                style={{
-                  height: 35,
-                }}
                 textStyle={{
                   color: colors.pri,
 
                   fontFamily: WEIGHT.regular,
                   fontSize: SIZE.xs,
                 }}>
-                <Icon name="arrow-right" size={SIZE.xs} color={colors.icon} />
-                {'  '}Move
+                Move
               </MenuItem>
               <MenuItem
                 onPress={() => {
                   show = 'vault';
                   hideMenu(true);
                 }}
-                style={{
-                  height: 35,
-                }}
                 textStyle={{
                   color: colors.pri,
 
                   fontFamily: WEIGHT.regular,
                   fontSize: SIZE.xs,
                 }}>
-                <Icon name="lock" size={SIZE.xs} color={colors.icon} />
-                {'  '}Lock
+                Lock
               </MenuItem>
 
               <MenuItem
@@ -376,66 +353,12 @@ const NoteItem = props => {
                   show = 'delete';
                   hideMenu();
                 }}
-                style={{
-                  height: 35,
-                }}
                 textStyle={{
                   color: colors.pri,
                   fontFamily: WEIGHT.regular,
                   fontSize: SIZE.xs,
                 }}>
-                <Icon name="trash" size={SIZE.xs} color={colors.icon} />
-                {'  '}Delete
-              </MenuItem>
-              <MenuDivider />
-              <MenuItem
-                disabled={true}
-                textStyle={{
-                  color: colors.icon,
-
-                  fontFamily: WEIGHT.regular,
-                  fontSize: SIZE.xxs,
-                }}
-                style={{
-                  paddingVertical: 0,
-                  margin: 0,
-                  height: 35,
-                }}>
-                Notebook: School Notes
-              </MenuItem>
-              <MenuItem
-                disabled={true}
-                textStyle={{
-                  color: colors.icon,
-
-                  fontFamily: WEIGHT.regular,
-                  fontSize: SIZE.xxs,
-                }}
-                style={{
-                  paddingVertical: 0,
-                  margin: 0,
-                  height: 35,
-                  paddingBottom: 10,
-                }}>
-                {'  '}- Topic: Physics
-              </MenuItem>
-
-              <MenuItem
-                disabled={true}
-                textStyle={{
-                  color: colors.icon,
-                  height: 35,
-                  fontFamily: WEIGHT.regular,
-                  fontSize: SIZE.xxs,
-                }}
-                style={{
-                  paddingVertical: 0,
-                  margin: 0,
-                  height: 35,
-                  paddingBottom: 10,
-                }}>
-                Created on:{' '}
-                {new Date(item.dateCreated).toISOString().slice(0, 10)}
+                Delete
               </MenuItem>
             </>
           )}

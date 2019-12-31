@@ -57,14 +57,14 @@ export const COLOR_SCHEME_DARK = {
 //FONT SIZE
 
 export const SIZE = {
-  xxs: 10 * PixelRatio.getFontScale(),
-  xs: 12 * PixelRatio.getFontScale(),
-  sm: 14 * PixelRatio.getFontScale(),
-  md: 18 * PixelRatio.getFontScale(),
-  lg: 24 * PixelRatio.getFontScale(),
-  xl: 28 * PixelRatio.getFontScale(),
-  xxl: 32 * PixelRatio.getFontScale(),
-  xxxl: 36 * PixelRatio.getFontScale(),
+  xxs: 10,
+  xs: 12,
+  sm: 15,
+  md: 18,
+  lg: 24,
+  xl: 28,
+  xxl: 32,
+  xxxl: 36,
 };
 
 export const br = 5; // border radius

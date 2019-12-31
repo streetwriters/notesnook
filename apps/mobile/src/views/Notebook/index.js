@@ -166,29 +166,8 @@ export const Notebook = ({navigation}) => {
           }
           numColumns={numColumns}
           key={numColumns}
-          columnWrapperStyle={
-            numColumns === 1
-              ? null
-              : {
-                  width:
-                    params.notebook.topics.length === 1
-                      ? DDS.isTab
-                        ? '95%'
-                        : '90%'
-                      : DDS.isTab
-                      ? '45%'
-                      : '42.5%',
-                }
-          }
           contentContainerStyle={{
-            width:
-              numColumns === 2
-                ? DDS.isTab
-                  ? '100%'
-                  : null
-                : DDS.isTab
-                ? '95%'
-                : '90%',
+            width: '100%',
             alignItems: numColumns === 2 ? 'flex-start' : null,
             alignSelf: 'center',
           }}

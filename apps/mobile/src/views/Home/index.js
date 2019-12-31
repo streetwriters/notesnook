@@ -174,18 +174,19 @@ export const Home = ({navigation}) => {
             canGoBack={false}
             customIcon="menu"
           />
-
-          <Search
-            clear={() => setText('')}
-            hide={hideHeader}
-            onChangeText={onChangeText}
-            onSubmitEditing={onSubmitEditing}
-            placeholder="Search your notes"
-            onBlur={onBlur}
-            onFocus={onFocus}
-            clearSearch={clearSearch}
-            value={text}
-          />
+          {notes[0] ? (
+            <Search
+              clear={() => setText('')}
+              hide={hideHeader}
+              onChangeText={onChangeText}
+              onSubmitEditing={onSubmitEditing}
+              placeholder="Search your notes"
+              onBlur={onBlur}
+              onFocus={onFocus}
+              clearSearch={clearSearch}
+              value={text}
+            />
+          ) : null}
         </Animatable.View>
 
         <NotesList

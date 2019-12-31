@@ -79,7 +79,7 @@ export const Header = ({
               alignItems: 'flex-start',
               height: 40,
               marginTop: 2.5,
-              width: 40,
+              width: 60,
             }}>
             <Icon color={colors.pri} name={'menu'} size={SIZE.xxxl - 3} />
           </TouchableOpacity>
@@ -96,25 +96,40 @@ export const Header = ({
           {heading}
         </Text>
       </View>
-      <Animatable.View
-        transition="opacity"
-        duration={500}
+      <View
         style={{
-          opacity: hide ? 1 : 0,
+          flexDirection: 'row',
+          alignItems: 'center',
         }}>
+        <Animatable.View
+          transition="opacity"
+          duration={500}
+          style={{
+            opacity: hide ? 1 : 0,
+          }}>
+          <TouchableOpacity
+            onPress={() => showSearch()}
+            style={{
+              justifyContent: 'center',
+              alignItems: 'flex-end',
+              height: 40,
+              width: 60,
+              paddingRight: 0,
+            }}>
+            <Icon name={'search'} size={SIZE.xl} color={colors.icon} />
+          </TouchableOpacity>
+        </Animatable.View>
         <TouchableOpacity
-          onPress={() => showSearch()}
           style={{
             justifyContent: 'center',
             alignItems: 'flex-end',
             height: 40,
             width: 60,
             paddingRight: 0,
-            marginTop: 7,
           }}>
-          <Icon name={'search'} size={SIZE.xl} color={colors.icon} />
+          <Icon name="more-vertical" size={SIZE.xl} color={colors.pri} />
         </TouchableOpacity>
-      </Animatable.View>
+      </View>
     </Animatable.View>
   );
 };

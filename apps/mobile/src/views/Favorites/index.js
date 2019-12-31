@@ -80,12 +80,14 @@ export const Favorites = ({navigation}) => {
             canGoBack={false}
             customIcon="menu"
           />
-          <Search
-            clear={() => setText('')}
-            hide={hideHeader}
-            placeholder="Search your notes"
-            value={text}
-          />
+          {favs.length > 0 ? (
+            <Search
+              clear={() => setText('')}
+              hide={hideHeader}
+              placeholder="Search your notes"
+              value={text}
+            />
+          ) : null}
         </Animatable.View>
 
         <NotesList
@@ -109,7 +111,9 @@ export const Favorites = ({navigation}) => {
             }
             offsetY = y;
           }}
+          isFavorites={true}
           isSearch={false}
+          emptyPlaceholderText="Your favorite notes will appear here"
           notes={favs}
           keyword={''}
         />
