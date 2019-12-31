@@ -1,5 +1,7 @@
 import Database from "../api/database";
-import StorageInterface from "../../notes-web/src/interfaces/storage";
+import StorageInterface from "../__mocks__/storage.mock";
+import { getLastWeekTimestamp } from "../utils/date";
+const sjcl = require("sjcl");
 
 function databaseTest() {
   let db = new Database(StorageInterface);
@@ -31,26 +33,55 @@ const topicNoteTest = (topic = "Home") =>
     return { db, timestamp, topic, noteTimestamp };
   });
 
-const TEST_NOTE = {
-  content: { delta: "I am a delta", text: "I am a text" }
-};
+const groupedTest = (type, special = false) =>
+  noteTest().then(async ({ db }) => {
+    await db.addNote({ ...TEST_NOTE, title: "HELLO WHAT!" });
+    await db.addNote({
+      ...TEST_NOTE,
+      title: "Some title",
+      dateCreated: getLastWeekTimestamp() - 604800000
+    });
+    await db.addNote({
+      ...TEST_NOTE,
+      title: "Some title and title title",
+      dateCreated: getLastWeekTimestamp() - 604800000 * 2
+    });
+    let grouped = db.groupNotes(type, special);
+    if (special) {
+      expect(grouped.items.length).toBeGreaterThan(0);
+      expect(grouped.groups.length).toBeGreaterThan(0);
+      expect(grouped.groupCounts.length).toBeGreaterThan(0);
+      return;
+    }
+    expect(grouped.length).toBeGreaterThan(0);
+    expect(grouped[0].data.length).toBeGreaterThan(0);
+    expect(grouped[0].title.length).toBeGreaterThan(0);
+  });
+
+var TEST_NOTE;
 
 const LONG_TEXT =
   "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.";
 
-const TEST_NOTEBOOK = {
-  title: "Test Notebook",
-  description: "Test Description",
-  topics: ["hello", "hello"]
-};
+var TEST_NOTEBOOK;
+var TEST_NOTEBOOK2;
 
-const TEST_NOTEBOOK2 = {
-  title: "Test Notebook 2",
-  description: "Test Description 2",
-  topics: ["Home2"]
-};
-
-afterEach(() => StorageInterface.clear());
+beforeEach(() => {
+  StorageInterface.clear();
+  TEST_NOTE = {
+    content: { delta: "I am a delta", text: "I am a text" }
+  };
+  TEST_NOTEBOOK2 = {
+    title: "Test Notebook 2",
+    description: "Test Description 2",
+    topics: ["Home2"]
+  };
+  TEST_NOTEBOOK = {
+    title: "Test Notebook",
+    description: "Test Description",
+    topics: ["hello", "hello", "    "]
+  };
+});
 
 test("add invalid note", () =>
   databaseTest().then(async db => {
@@ -224,8 +255,11 @@ test("deletion of note from invalid topic should return false", () =>
 
 test("delete note from topic", () =>
   topicNoteTest().then(async ({ db, timestamp, topic, noteTimestamp }) => {
-    await db.deleteNoteFromTopic(timestamp, topic, noteTimestamp);
     let notebook = db.getNotebook(timestamp);
+    expect(await db.deleteNoteFromTopic(timestamp, topic, noteTimestamp)).toBe(
+      true
+    );
+    notebook = db.getNotebook(timestamp);
     let topicIndex = notebook.topics.findIndex(t => t.title === topic);
     expect(notebook.topics[topicIndex].notes[0]).toBeUndefined();
   }));
@@ -361,4 +395,89 @@ test("getting invalid topic from invalid notebook should return undefined", () =
   databaseTest().then(async db => {
     let res = await db.getTopic(1213, "invalid_topic");
     expect(res).toBeUndefined();
+  }));
+
+test("Operations on uninitialized database should throw", () => {
+  let db = new Database(StorageInterface);
+  expect(db.getNotes.bind(db)).toThrowError("Database is not initialized.");
+});
+
+test("edit item with wrong id should throw", () =>
+  databaseTest().then(async db => {
+    db.pinItem("notebook", 1242141).catch(err => {
+      expect(err.message).toContain("Wrong notebook id");
+    });
+  }));
+
+test("edit item with wrong type should throw", () => {
+  databaseTest().then(async db => {
+    db.pinItem("notebok", 1242141).catch(err => {
+      expect(err.message).toContain("Invalid type");
+    });
+  });
+});
+
+test("restoring an invalid item from trash should throw", () =>
+  databaseTest().then(async db => {
+    db.restoreItem(21412).catch(err =>
+      expect(err.message).toContain("Cannot restore")
+    );
+  }));
+
+test("get grouped notes by abc", () => groupedTest("abc"));
+
+test("get grouped notes by abc (special)", () => groupedTest("abc", true));
+
+test("get grouped notes by month", () => groupedTest("month"));
+
+test("get grouped notes by month (special)", () => groupedTest("month", true));
+
+test("get grouped notes by year", () => groupedTest("year"));
+
+test("get grouped notes by year (special)", () => groupedTest("year", true));
+
+test("get grouped notes by weak", () => groupedTest("week"));
+
+test("get grouped notes by weak (special)", () => groupedTest("week", true));
+
+test("get grouped notes default", () => groupedTest());
+
+test("get grouped notes default (special)", () => groupedTest("", true));
+
+test("pin note", () =>
+  noteTest().then(async ({ db, timestamp }) => {
+    await db.pinItem("note", timestamp);
+    expect(db.getNote(timestamp).pinned).toBe(true);
+  }));
+
+test("pin notebook", () =>
+  notebookTest().then(async ({ db, timestamp }) => {
+    await db.pinItem("notebook", timestamp);
+    expect(db.getNotebook(timestamp).pinned).toBe(true);
+  }));
+
+test("favorite note", () =>
+  noteTest().then(async ({ db, timestamp }) => {
+    await db.favoriteItem("note", timestamp);
+    expect(db.getNote(timestamp).favorite).toBe(true);
+  }));
+
+test("favorite notebook", () =>
+  notebookTest().then(async ({ db, timestamp }) => {
+    await db.favoriteItem("notebook", timestamp);
+    expect(db.getNotebook(timestamp).favorite).toBe(true);
+  }));
+
+test("lock and unlock note", () =>
+  noteTest().then(async ({ db, timestamp }) => {
+    expect(await db.lockNote(timestamp, "password123")).toBe(true);
+    let note = db.getNote(timestamp);
+    expect(note.locked).toBe(true);
+    expect(note.content).toContain("iv");
+    note = await db.unlockNote(timestamp, "password123");
+    expect(note.dateCreated).toBe(timestamp);
+    expect(note.content.text).toBe(TEST_NOTE.content.text);
+    await db.unlockNote(timestamp, "password123", true);
+    note = db.getNote(timestamp);
+    expect(note.locked).toBe(false);
   }));
