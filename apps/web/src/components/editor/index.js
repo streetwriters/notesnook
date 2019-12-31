@@ -54,6 +54,7 @@ async function saveNote(quill) {
     dateCreated: timestamp
   };
   timestamp = await db.addNote(note);
+  console.log("note saved", note);
 }
 function startAutoSave(quill) {
   setInterval(async () => {
@@ -83,6 +84,7 @@ const Editor = props => {
       clearInterval(saveInterval);
       saveNote(quill).then(() => {
         title = undefined;
+        timestamp = undefined;
         Editor.titleRef.value = "";
         Editor.titleRef.focus();
         quill.setText("\n");
@@ -97,6 +99,7 @@ const Editor = props => {
       if (dateCreated && dateCreated !== timestamp) return;
       clearInterval(saveInterval);
       title = undefined;
+      timestamp = undefined;
       Editor.titleRef.value = "";
       Editor.titleRef.focus();
       quill.setText("\n");
@@ -106,6 +109,7 @@ const Editor = props => {
       if (!note) return;
       onNewNote(false);
       setTimeout(() => {
+        timestamp = undefined;
         title = note.title;
         timestamp = note.dateCreated;
         Editor.titleRef.value = note.title;
