@@ -1,7 +1,6 @@
 import Database from "../api/database";
 import StorageInterface from "../__mocks__/storage.mock";
 import { getLastWeekTimestamp } from "../utils/date";
-const sjcl = require("sjcl");
 
 function databaseTest() {
   let db = new Database(StorageInterface);
@@ -359,10 +358,11 @@ test("deletion of invalid topic from notebook should return false", () =>
     expect(res).toBe(false);
   }));
 
-test("moving note with wrong id should return false", () =>
+test("moving note with wrong id should throw", () =>
   databaseTest().then(async db => {
-    let res = await db.moveNote(0, undefined, undefined);
-    expect(res).toBe(false);
+    db.moveNote(0, undefined, undefined).catch(err =>
+      expect(err.message).toContain("Failed to move note.")
+    );
   }));
 
 test("moving note to non-existent notebook should return false", () =>
@@ -473,7 +473,7 @@ test("lock and unlock note", () =>
     expect(await db.lockNote(timestamp, "password123")).toBe(true);
     let note = db.getNote(timestamp);
     expect(note.locked).toBe(true);
-    expect(note.content).toContain("iv");
+    expect(note.content.iv).toBeDefined();
     note = await db.unlockNote(timestamp, "password123");
     expect(note.dateCreated).toBe(timestamp);
     expect(note.content.text).toBe(TEST_NOTE.content.text);

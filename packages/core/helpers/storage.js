@@ -17,6 +17,12 @@ class Storage {
   remove(key) {
     this.storage.remove(key); //TODO add test
   }
+  encrypt(password, data) {
+    return this.storage.encrypt(password, data);
+  }
+  decrypt(password, data) {
+    return this.storage.decrypt(password, data);
+  }
 }
 
 export default Storage;

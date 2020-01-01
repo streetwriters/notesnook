@@ -13,9 +13,17 @@ function clear() {
   storage = {};
 }
 
+function encrypt(password, data) {
+  return new Promise((resolve, reject) => resolve({ iv: "", cipher: data }));
+}
+function decrypt(password, data) {
+  return new Promise((resolve, reject) => resolve(data.cipher));
+}
 module.exports = {
   read,
   write,
   remove,
-  clear
+  clear,
+  encrypt,
+  decrypt
 };

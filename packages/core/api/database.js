@@ -8,7 +8,6 @@ import {
   months,
   getLastWeekTimestamp
 } from "../utils/date";
-import Encryptor from "sjcl";
 
 const KEYS = {
   notes: "notes",
@@ -197,10 +196,10 @@ class Database {
     if (!this.notes[noteId]) {
       throw new Error(`Cannot lock note. Invalid ID: ${noteId} given.`);
     }
-    this.notes[noteId].content = Encryptor.encrypt(
+
+    this.notes[noteId].content = await this.storage.encrypt(
       password,
-      JSON.stringify(this.notes[noteId].content),
-      { ks: 256 }
+      JSON.stringify(this.notes[noteId].content)
     );
     this.notes[noteId].locked = true;
     await this.storage.write(KEYS.notes, this.notes);
@@ -211,7 +210,10 @@ class Database {
     if (!this.notes[noteId]) {
       throw new Error(`Cannot unlock note. Invalid ID: ${noteId} given.`);
     }
-    let decrypted = Encryptor.decrypt(password, this.notes[noteId].content);
+    let decrypted = await this.storage.decrypt(
+      password,
+      this.notes[noteId].content
+    );
     if (perm) {
       this.notes[noteId].locked = false;
       await this.storage.write(KEYS.notes, this.notes);
@@ -355,20 +357,19 @@ class Database {
   }
 
   async moveNote(noteId, from, to) {
-    if (
-      !noteId ||
-      (from && (!from.notebook || !from.topic)) ||
-      !to ||
-      !to.notebook ||
-      !to.topic ||
-      (from.notebook === to.notebook && from.topic === to.topic) //moving to same notebook and topic shouldn't be possible
-    )
-      return false;
-    if (!from) {
+    if (!noteId || !to || !to.notebook || !to.topic) {
+      throw new Error(`Error: Failed to move note.`);
+    }
+    if (!from.notebook && !from.topic) {
       return await this.addNoteToTopic(to.notebook, to.topic, noteId);
     } else if (
       await this.deleteNoteFromTopic(from.notebook, from.topic, noteId)
     ) {
+      if (from.notebook === to.notebook && from.topic === to.topic) {
+        throw new Error(
+          "Moving to the same notebook and topic is not possible."
+        );
+      }
       return await this.addNoteToTopic(to.notebook, to.topic, noteId);
     }
     return false;
