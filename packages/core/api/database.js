@@ -357,16 +357,18 @@ class Database {
   async moveNote(noteId, from, to) {
     if (
       !noteId ||
-      !from ||
+      (from && (!from.notebook || !from.topic)) ||
       !to ||
-      !from.notebook ||
       !to.notebook ||
-      !from.topic ||
       !to.topic ||
       (from.notebook === to.notebook && from.topic === to.topic) //moving to same notebook and topic shouldn't be possible
     )
       return false;
-    if (await this.deleteNoteFromTopic(from.notebook, from.topic, noteId)) {
+    if (!from) {
+      return await this.addNoteToTopic(to.notebook, to.topic, noteId);
+    } else if (
+      await this.deleteNoteFromTopic(from.notebook, from.topic, noteId)
+    ) {
       return await this.addNoteToTopic(to.notebook, to.topic, noteId);
     }
     return false;
