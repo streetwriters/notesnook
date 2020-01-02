@@ -406,25 +406,37 @@ async function deleteItems(items, key) {
   for (let item of items) {
     if (!item) continue;
     if (this[key].hasOwnProperty(item.dateCreated)) {
+      //delete note from the notebook too.
+      if (item.type === "note" && item.notebook.topic) {
+        if (
+          !(await this.deleteNoteFromTopic(
+            item.notebook.notebook,
+            item.notebook.topic,
+            item.dateCreated
+          ))
+        ) {
+          continue;
+        }
+      } else if (item.type === "notebook") {
+        let skip = false;
+        for (let topic in item.topics) {
+          for (let note in topic.notes) {
+            if (
+              !(await this.deleteNoteFromTopic(item.dateCreated, topic, note))
+            ) {
+              skip = true;
+              break;
+            }
+          }
+        }
+        if (skip) {
+          continue;
+        }
+      }
       //put into trash
       this[KEYS.trash][item.dateCreated] = this[key][item.dateCreated];
       this[KEYS.trash][item.dateCreated]["dateDeleted"] = Date.now();
       this[KEYS.trash][item.dateCreated]["dType"] = key;
-
-      //delete note from the notebook too.
-      if (item.type === "note" && item.notebook.topic) {
-        await this.deleteNoteFromTopic(
-          item.notebook.dateCreated,
-          item.notebook.topic,
-          item.dateCreated
-        );
-      } else if (item.type === "notebook") {
-        for (let topic in item.topics) {
-          for (let note in topic.notes) {
-            await this.deleteNoteFromTopic(item.dateCreated, topic, note);
-          }
-        }
-      }
 
       delete this[key][item.dateCreated];
     }
