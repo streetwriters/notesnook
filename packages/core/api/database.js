@@ -170,11 +170,11 @@ class Database {
   }
 
   pinItem(type, id) {
-    return editItem.call(this, type, id, { pinned: true });
+    return editItem.call(this, type, id, "pinned");
   }
 
   favoriteItem(type, id) {
-    return editItem.call(this, type, id, { favorite: true });
+    return editItem.call(this, type, id, "favorite");
   }
 
   async deleteNotes(notes) {
@@ -504,7 +504,7 @@ function makeTopic(topic) {
   };
 }
 
-async function editItem(type, id, edit) {
+async function editItem(type, id, prop) {
   switch (type) {
     case "notebook":
     case "note":
@@ -513,6 +513,8 @@ async function editItem(type, id, edit) {
       if (col[id] === undefined) {
         throw new Error(`Wrong ${type} id.`);
       }
+      let state = col[id][prop];
+      let edit = { [prop]: !state };
       await func.call(this, { ...col[id], ...edit });
       break;
     default:
