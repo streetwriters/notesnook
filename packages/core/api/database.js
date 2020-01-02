@@ -400,7 +400,7 @@ class Database {
 
 export default Database;
 
-function deleteItems(items, key) {
+async function deleteItems(items, key) {
   if (!items || items.length <= 0 || !this[key] || this[key].length <= 0)
     return false;
   for (let item of items) {
@@ -412,6 +412,15 @@ function deleteItems(items, key) {
       this[KEYS.trash][item.dateCreated]["dType"] = key;
 
       delete this[key][item.dateCreated];
+
+      //delete note from the notebook too.
+      if (this[key].notebook) {
+        await this.deleteNoteFromTopic(
+          this[key].notebook.dateCreated,
+          this[key].notebook.topic,
+          this[key].dateCreated
+        );
+      }
     }
   }
 
