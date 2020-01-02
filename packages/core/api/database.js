@@ -411,16 +411,22 @@ async function deleteItems(items, key) {
       this[KEYS.trash][item.dateCreated]["dateDeleted"] = Date.now();
       this[KEYS.trash][item.dateCreated]["dType"] = key;
 
-      delete this[key][item.dateCreated];
-
       //delete note from the notebook too.
-      if (this[key].notebook) {
+      if (item.type === "note" && item.notebook.topic) {
         await this.deleteNoteFromTopic(
-          this[key].notebook.dateCreated,
-          this[key].notebook.topic,
-          this[key].dateCreated
+          item.notebook.dateCreated,
+          item.notebook.topic,
+          item.dateCreated
         );
+      } else if (item.type === "notebook") {
+        for (let topic in item.topics) {
+          for (let note in topic.notes) {
+            await this.deleteNoteFromTopic(item.dateCreated, topic, note);
+          }
+        }
       }
+
+      delete this[key][item.dateCreated];
     }
   }
 
