@@ -6991,7 +6991,7 @@ normalize-url@^3.0.0, normalize-url@^3.0.1:
 
 "notes-core@https://github.com/thecodrr/notes-core.git":
   version "0.2.0"
-  resolved "https://github.com/thecodrr/notes-core.git#e7664608adbb20e0c7684aaa08fd3aaf074524d4"
+  resolved "https://github.com/thecodrr/notes-core.git#265c12f66aa05fc2353e97e01279fe226fcd9b06"
   dependencies:
     fuzzysearch "^1.0.3"
     transfun "^1.0.2"

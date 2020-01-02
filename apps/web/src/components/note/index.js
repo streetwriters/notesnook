@@ -4,10 +4,19 @@ import TimeAgo from "timeago-react";
 import { db, ev } from "../../common";
 import { showSnack } from "../snackbar";
 import ListItem from "../list-item";
+import { navigate, routes } from "../../navigation";
 
 const dropdownRefs = [];
 const menuItems = [
-  { title: "Move" },
+  {
+    title: "Move",
+    onClick: note => {
+      navigate(routes.notebooks.key, undefined, {
+        intent: "moveNote",
+        data: note
+      });
+    }
+  },
   { title: "Pin" },
   { title: "Favorite" },
   { title: "Share" },

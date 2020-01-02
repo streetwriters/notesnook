@@ -8,12 +8,13 @@ import theme from "./theme";
 import { routes, navigate } from "./navigation";
 import CheckBox from "./components/checkbox";
 import * as Icon from "react-feather";
+
 const NavMenuItem = props => {
   useEffect(() => {
     if (props.selected) {
       navigate(props.item.key);
     }
-  });
+  }, []);
   return (
     <Button
       onClick={props.onSelected}
@@ -54,8 +55,9 @@ function App() {
           {Object.values(routes).map((item, index) => (
             <NavMenuItem
               onSelected={() => {
-                navigate(item.key);
-                setSelectedIndex(index);
+                if (navigate(item.key)) {
+                  setSelectedIndex(index);
+                }
               }}
               key={item.key}
               item={item}

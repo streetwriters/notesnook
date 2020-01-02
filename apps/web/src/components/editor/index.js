@@ -54,7 +54,6 @@ async function saveNote(quill) {
     dateCreated: timestamp
   };
   timestamp = await db.addNote(note);
-  console.log("note saved", note);
 }
 function startAutoSave(quill) {
   setInterval(async () => {
@@ -114,7 +113,6 @@ const Editor = props => {
         timestamp = note.dateCreated;
         Editor.titleRef.value = note.title;
         // quill.setText(note.content.text);
-        console.log(note);
         quill.setContents(note.content.delta);
         quill.setSelection(note.content.text.length - 1, 0); //to move the cursor to the end
       }, 0);
