@@ -1,7 +1,6 @@
 import Storage from "../helpers/storage";
 import fuzzysearch from "fuzzysearch";
 var tfun = require("transfun/transfun.js").tfun;
-tfun = global.tfun;
 import { extractValues, groupBy } from "../utils";
 import {
   getWeekGroupFromTimestamp,
@@ -54,11 +53,11 @@ class Database {
   }
 
   getFavorites() {
-    return tfun.filter(".favorite = true")(extractValues(this.notes));
+    return tfun.filter(".favorite == true")(extractValues(this.notes));
   }
 
   getPinned() {
-    return tfun.filter(".pinned = true")(extractValues(this.notes));
+    return tfun.filter(".pinned == true")(extractValues(this.notes));
   }
 
   /**
@@ -67,7 +66,7 @@ class Database {
    */
   groupNotes(by, special = false) {
     //TODO add tests
-    let notes = tfun.filter(".pinned = false")(this.getNotes());
+    let notes = tfun.filter(".pinned == false")(this.getNotes());
     switch (by) {
       case "abc":
         return groupBy(
