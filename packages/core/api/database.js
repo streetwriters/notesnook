@@ -57,13 +57,17 @@ class Database {
     return tfun.filter(".favorite = true")(extractValues(this.notes));
   }
 
+  getPinned() {
+    return tfun.filter(".pinned = true")(extractValues(this.notes));
+  }
+
   /**
    * @param {string} by One from 'abc', 'month', 'year' or 'week'. Leave it empty for default grouping.
    * @param {boolean} special Should only be used in the React app.
    */
   groupNotes(by, special = false) {
     //TODO add tests
-    let notes = this.getNotes();
+    let notes = tfun.filter(".pinned = false")(extractValues(this.getNotes()));
     switch (by) {
       case "abc":
         return groupBy(
