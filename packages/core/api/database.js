@@ -114,8 +114,8 @@ class Database {
         (!note.content || !note.content.text || !note.content.delta))
     )
       return;
-
     let timestamp = note.dateCreated || Date.now();
+    note = { ...this.notes[timestamp], ...note };
     //add or update a note into the database
     let title =
       note.title ||
