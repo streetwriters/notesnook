@@ -48,8 +48,12 @@ function App() {
         alignContent="stretch"
       >
         <Box
-          width={[0, 0, 70]}
-          sx={{ borderRight: "1px solid", borderRightColor: "border" }}
+          sx={{
+            borderRight: "1px solid",
+            borderRightColor: "border",
+            minWidth: 70,
+            maxWidth: 70
+          }}
           px={0}
         >
           {Object.values(routes).map((item, index) => (
