@@ -34,6 +34,7 @@ const menuItems = note => [
         ev.emit("refreshNotes");
       })
   },
+  { title: "Edit" },
   { title: note.locked ? "Remove lock" : "Lock" }, //TODO
   { title: "Share" },
   {
@@ -65,7 +66,7 @@ const Note = ({ item, index }) => {
       index={index}
       onClick={sendOpenNoteEvent.bind(this, note)}
       info={
-        <Flex flexDirection="row" justifyContent="center" alignItems="center">
+        <Flex justifyContent="center" alignItems="center">
           <TimeAgo datetime={note.dateCreated} />
           {note.locked && <Icon.Lock size={16} style={{ marginLeft: 5 }} />}
           {note.favorite && <Icon.Star size={16} style={{ marginLeft: 5 }} />}

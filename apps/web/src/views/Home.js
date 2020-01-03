@@ -17,8 +17,8 @@ function Home() {
   useEffect(() => {
     function onRefreshNotes() {
       setNotes(db.groupNotes(undefined, true));
+      setPinnedItems(db.getPinned());
     }
-    setPinnedItems(db.getPinned());
     onRefreshNotes();
     ev.addListener("refreshNotes", onRefreshNotes);
     return () => {

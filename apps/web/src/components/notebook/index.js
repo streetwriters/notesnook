@@ -2,15 +2,33 @@ import React from "react";
 import { Flex, Text } from "rebass";
 import * as Icon from "react-feather";
 import ListItem from "../list-item";
+import { db, ev } from "../../common";
+import { showSnack } from "../snackbar";
 
 const dropdownRefs = [];
-const menuItems = [
-  { title: "Favorite", icon: Icon.Heart },
-  { title: "Share", icon: Icon.Share2 },
+const menuItems = notebook => [
+  {
+    title: notebook.pinned ? "Unpin" : "Pin",
+    onClick: async () =>
+      db.pinItem("notebook", notebook.dateCreated).then(() => {
+        showSnack("Notebook pinned!", Icon.Check);
+        ev.emit("refreshNotebooks");
+      })
+  },
+  {
+    title: notebook.favorite ? "Unfavorite" : "Favorite",
+    onClick: async () =>
+      db.favoriteItem("notebook", notebook.dateCreated).then(() => {
+        showSnack("Notebook favorited!", Icon.Check);
+        ev.emit("refreshNotebooks");
+      })
+  },
+  { title: "Edit" },
+  { title: "Share" },
   {
     title: "Delete",
-    icon: Icon.Trash,
-    color: "red"
+    color: "red",
+    onClick: () => {}
   }
 ];
 const Notebook = ({ item, index, onClick, onTopicClick }) => {
@@ -46,15 +64,19 @@ const Notebook = ({ item, index, onClick, onTopicClick }) => {
         </Flex>
       }
       info={
-        <Text>
+        <Flex justifyContent="center" alignItems="center">
           {new Date(notebook.dateCreated).toDateString().substring(4)}
           <Text as="span">{" • " + notebook.totalNotes} Notes</Text>
-        </Text>
+          {notebook.favorite && (
+            <Icon.Star size={16} style={{ marginLeft: 5 }} />
+          )}
+        </Flex>
       }
+      pinned={notebook.pinned}
       dropdownRefs={dropdownRefs}
       index={index}
       menuData={notebook}
-      menuItems={menuItems}
+      menuItems={menuItems(notebook)}
     />
   );
 };
