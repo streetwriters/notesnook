@@ -1,4 +1,5 @@
 import React from "react";
+import { Flex } from "rebass";
 import * as Icon from "react-feather";
 import TimeAgo from "timeago-react";
 import { db, ev } from "../../common";
@@ -7,23 +8,38 @@ import ListItem from "../list-item";
 import { navigate, routes } from "../../navigation";
 
 const dropdownRefs = [];
-const menuItems = [
+const menuItems = note => [
   {
-    title: "Move",
-    onClick: note => {
+    title: note.notebook.notebook ? "Move" : "Add to notebook",
+    onClick: () => {
       navigate(routes.notebooks.key, undefined, {
         intent: "moveNote",
         data: note
       });
     }
   },
-  { title: "Pin" },
-  { title: "Favorite" },
+  {
+    title: note.pinned ? "Unpin" : "Pin",
+    onClick: async () =>
+      db.pinItem("note", note.dateCreated).then(() => {
+        showSnack("Note pinned!", Icon.Check);
+        ev.emit("refreshNotes");
+      })
+  },
+  {
+    title: note.favorite ? "Unfavorite" : "Favorite",
+    onClick: async () =>
+      db.favoriteItem("note", note.dateCreated).then(() => {
+        showSnack("Note favorited!", Icon.Check);
+        ev.emit("refreshNotes");
+      })
+  },
+  { title: note.locked ? "Remove lock" : "Lock" }, //TODO
   { title: "Share" },
   {
     title: "Delete",
     color: "red",
-    onClick: note => {
+    onClick: () => {
       ev.emit("onClearNote", note.dateCreated);
       db.deleteNotes([note]).then(
         //TODO implement undo
@@ -48,9 +64,16 @@ const Note = ({ item, index }) => {
       body={note.headline}
       index={index}
       onClick={sendOpenNoteEvent.bind(this, note)}
-      info={<TimeAgo datetime={note.dateCreated} />}
+      info={
+        <Flex flexDirection="row" justifyContent="center" alignItems="center">
+          <TimeAgo datetime={note.dateCreated} />
+          {note.locked && <Icon.Lock size={16} style={{ marginLeft: 5 }} />}
+          {note.favorite && <Icon.Star size={16} style={{ marginLeft: 5 }} />}
+        </Flex>
+      }
+      pinned={note.pinned}
       menuData={note}
-      menuItems={menuItems}
+      menuItems={menuItems(note)}
       dropdownRefs={dropdownRefs}
     />
   );

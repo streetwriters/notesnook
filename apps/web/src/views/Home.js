@@ -13,10 +13,12 @@ function Home() {
     groupCounts: [],
     groups: []
   });
+  const [pinnedItems, setPinnedItems] = useState([]);
   useEffect(() => {
     function onRefreshNotes() {
       setNotes(db.groupNotes(undefined, true));
     }
+    setPinnedItems(db.getPinned());
     onRefreshNotes();
     ev.addListener("refreshNotes", onRefreshNotes);
     return () => {
@@ -25,9 +27,12 @@ function Home() {
   }, []);
   return (
     <Flex flexDirection="column" flex="1 1 auto">
-      {notes.items.length > 0 ? (
+      {notes.items.length > 0 || pinnedItems.length > 0 ? (
         <Flex flexDirection="column" flex="1 1 auto">
           <Search placeholder="Search" />
+          {pinnedItems.map((item, index) => (
+            <Note index={index * notes.items.length} item={item} />
+          ))}
           <List
             style={{
               width: "100%",

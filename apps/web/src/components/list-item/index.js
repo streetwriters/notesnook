@@ -16,16 +16,48 @@ const ListItem = props => (
     alignItems="center"
     justifyContent="space-between"
     py={1}
+    bg={props.pinned ? "#1790F310" : "background"}
     sx={{
+      position: "relative",
       borderRadius: "default",
       marginBottom: 2,
+      marginTop: props.pinned ? 4 : 0,
       borderBottom: "1px solid",
       borderBottomColor: "navbg",
       cursor: "default",
       ...ButtonPressedStyle
     }}
   >
-    <Box>
+    {props.pinned && (
+      <Flex
+        bg="primary"
+        sx={{
+          borderRadius: 35,
+          width: 35,
+          height: 35,
+          position: "absolute",
+          top: -15,
+          left: 0
+        }}
+        alignItems="center"
+        justifyContent="center"
+      >
+        <Box
+          bg="white"
+          sx={{
+            borderRadius: 5,
+            width: 3,
+            height: 3,
+            boxShadow: "1px 1px 4px 0px #000000bd" //TODO
+          }}
+        />
+      </Flex>
+    )}
+    <Box
+      sx={{
+        paddingTop: props.pinned ? 4 : 0
+      }}
+    >
       <Flex flexDirection="row" justifyContent="space-between">
         <Text fontFamily="heading" fontSize="title" fontWeight="bold">
           {props.title}
