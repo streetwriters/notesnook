@@ -6,7 +6,7 @@ import * as Icon from "react-feather";
 import theme, { DIALOG_SHADOW } from "../theme";
 import Search from "../components/search";
 import Modal from "react-modal";
-import { db } from "../common";
+import { db, ev } from "../common";
 import { showSnack } from "../components/snackbar";
 import { Virtuoso as List } from "react-virtuoso";
 import Notebook from "../components/notebook";
@@ -22,10 +22,11 @@ const Notebooks = props => {
   const [selected, setSelected] = useState({});
   const [intent, setIntent] = useState(props.intent);
   useEffect(() => {
-    Notebooks.onRefresh = () => {
+    function onRefresh() {
+      console.log("Refreshing notebooks");
       setNotebooks(db.getNotebooks());
-    };
-    Notebooks.onRefresh();
+    }
+    onRefresh();
     navigationEvents.onWillNavigateAway = (routeName, params) => {
       if (routeName !== "notebooks" && intent === "moveNote") {
         return window.confirm(
@@ -34,7 +35,9 @@ const Notebooks = props => {
       }
       return true;
     };
+    ev.addListener("refreshNotebooks", onRefresh);
     return () => {
+      ev.removeListener("refreshNotebooks", onRefresh);
       Notebooks.onRefresh = undefined;
     };
   }, []);

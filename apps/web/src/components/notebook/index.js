@@ -28,7 +28,15 @@ const menuItems = notebook => [
   {
     title: "Delete",
     color: "red",
-    onClick: () => {}
+    onClick: () => {
+      db.deleteNotebooks([notebook]).then(
+        //TODO implement undo
+        () => {
+          showSnack("Notebook deleted!", Icon.Check);
+          ev.emit("refreshNotebooks");
+        }
+      );
+    }
   }
 ];
 const Notebook = ({ item, index, onClick, onTopicClick }) => {
