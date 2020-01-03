@@ -49,15 +49,15 @@ class Database {
 
   getNotes() {
     checkInitialized.call(this);
-    return extractValues(this.notes);
+    return extractValues(this.notes).reverse();
   }
 
   getFavorites() {
-    return tfun.filter(".favorite == true")(extractValues(this.notes));
+    return tfun.filter(".favorite == true")(this.getNotes());
   }
 
   getPinned() {
-    return tfun.filter(".pinned == true")(extractValues(this.notes));
+    return tfun.filter(".pinned == true")(this.getNotes());
   }
 
   /**

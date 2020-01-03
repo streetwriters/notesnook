@@ -41,7 +41,7 @@ function groupBySpecial(arr, key) {
     let index = _groups[k] === undefined ? i : _groups[k].index;
     let groupIndex =
       _groups[k] == undefined ? groupCounts.length : _groups[k].groupIndex;
-    retVal.splice(index, 0, val);
+    retVal.splice(index + 1, 0, val);
     groupCounts[groupIndex] =
       groupCounts.length == groupIndex ? 1 : groupCounts[groupIndex] + 1;
     groups[groupIndex] = { title: k };
