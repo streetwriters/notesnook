@@ -20,6 +20,12 @@ export const routes = {
     component: Notebooks,
     icon: Icon.Book
   },
+  favorite: {
+    key: "favorites",
+    title: "Favorites",
+    component: undefined,
+    icon: Icon.Star
+  },
   trash: {
     key: "trash",
     title: "Trash",
@@ -30,9 +36,11 @@ export const routes = {
     key: "settings",
     title: "Settings",
     component: undefined,
-    icon: Icon.Settings
+    icon: Icon.Settings,
+    bottom: true
   }
 };
+
 const history = {};
 export const navigationEvents = {
   onWillNavigateAway: undefined
