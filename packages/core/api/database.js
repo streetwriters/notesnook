@@ -67,7 +67,7 @@ class Database {
    */
   groupNotes(by, special = false) {
     //TODO add tests
-    let notes = tfun.filter(".pinned = false")(extractValues(this.getNotes()));
+    let notes = tfun.filter(".pinned = false")(this.getNotes());
     switch (by) {
       case "abc":
         return groupBy(
