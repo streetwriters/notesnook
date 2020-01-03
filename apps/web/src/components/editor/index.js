@@ -143,6 +143,9 @@ const Editor = props => {
       width={["0%", "50%", "55%"]}
       flex="1 1 auto"
       flexDirection="column"
+      onBlur={() => {
+        ev.emit("refreshNotes");
+      }}
     >
       <Input
         ref={titleRef}
