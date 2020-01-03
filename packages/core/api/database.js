@@ -49,7 +49,7 @@ class Database {
 
   getNotes() {
     checkInitialized.call(this);
-    return extractValues(this.notes).reverse();
+    return extractValues(this.notes);
   }
 
   getFavorites() {
