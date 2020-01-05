@@ -27,7 +27,7 @@ export const Header = ({
         flexDirection: 'row',
         zIndex: 10,
         height: 50,
-        marginTop: Platform.OS === 'ios' ? 10 : 45,
+        marginTop: Platform.OS === 'ios' ? 0 : 45,
         marginBottom: 10,
         justifyContent: 'space-between',
         alignItems: 'center',

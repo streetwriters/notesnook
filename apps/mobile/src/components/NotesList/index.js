@@ -261,6 +261,14 @@ export const NotesList = ({
             }}>
             Notes you write will appear here.
           </Text>
+          <Text
+            style={{
+              fontSize: SIZE.sm,
+              color: colors.icon,
+              marginTop: 20,
+            }}>
+            No notes found
+          </Text>
         </View>
       }
       ListHeaderComponent={
@@ -592,6 +600,14 @@ export const NotesList = ({
               marginTop: 20,
             }}>
             {emptyPlaceholderText}
+          </Text>
+          <Text
+            style={{
+              fontSize: SIZE.sm,
+              color: colors.icon,
+              marginTop: 20,
+            }}>
+            No Notes found
           </Text>
         </View>
       }

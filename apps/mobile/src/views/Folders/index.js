@@ -57,6 +57,29 @@ export const Folders = ({navigation}) => {
   let searchHeight = 0;
   let marginSet = false;
 
+  const slideRight = {
+    0: {
+      transform: [{translateX: -4}],
+    },
+    0.5: {
+      transform: [{translateX: 0}],
+    },
+    1: {
+      transform: [{translateX: 4}],
+    },
+  };
+  const slideLeft = {
+    0: {
+      transform: [{translateX: 4}],
+    },
+    0.5: {
+      transform: [{translateX: 0}],
+    },
+    1: {
+      transform: [{translateX: -4}],
+    },
+  };
+
   const setMarginTop = () => {
     return;
     if (headerHeight < 30 || searchHeight < 30) {
@@ -124,15 +147,17 @@ export const Folders = ({navigation}) => {
             heading={params.title}
             canGoBack={false}
           />
-          <Search
-            sendHeight={height => {
-              searchHeight = height;
-              console.log(searchHeight + '' + headerHeight);
-              setMarginTop();
-            }}
-            placeholder="Search your notebook"
-            hide={hideHeader}
-          />
+          {notebooks.length == 0 ? null : (
+            <Search
+              sendHeight={height => {
+                searchHeight = height;
+                console.log(searchHeight + '' + headerHeight);
+                setMarginTop();
+              }}
+              placeholder="Search your notebook"
+              hide={hideHeader}
+            />
+          )}
         </Animatable.View>
 
         <FlatList
@@ -165,6 +190,287 @@ export const Folders = ({navigation}) => {
           }
           numColumns={numColumns}
           key={numColumns}
+          ListEmptyComponent={
+            <View
+              style={{
+                height: '80%',
+                width: '100%',
+                alignItems: 'center',
+                alignSelf: 'center',
+                justifyContent: 'center',
+                opacity: 0.8,
+              }}>
+              <Animatable.View
+                animation={slideRight}
+                iterationCount="infinite"
+                duration={3000}
+                iterationDelay={0}
+                direction="alternate"
+                easing="ease-in"
+                useNativeDriver={true}
+                style={{
+                  backgroundColor: colors.shade,
+                  width: '50%',
+                  padding: 5,
+                  borderRadius: 5,
+                  marginBottom: 10,
+                }}>
+                <View
+                  style={{
+                    width: '50%',
+                    height: 15,
+                    borderRadius: 100,
+                    backgroundColor: colors.accent,
+                    marginBottom: 8,
+                  }}
+                />
+                <View
+                  style={{
+                    width: '70%',
+                    height: 10,
+
+                    marginBottom: 8,
+                    flexDirection: 'row',
+                  }}>
+                  <View
+                    style={{
+                      width: '30%',
+                      height: 10,
+                      borderRadius: 5,
+                      backgroundColor: colors.accent,
+                      marginRight: 8,
+                    }}
+                  />
+                  <View
+                    style={{
+                      width: '30%',
+                      height: 10,
+                      borderRadius: 5,
+                      backgroundColor: colors.accent,
+                      marginRight: 8,
+                    }}
+                  />
+                  <View
+                    style={{
+                      width: '30%',
+                      height: 10,
+                      borderRadius: 5,
+                      backgroundColor: colors.accent,
+                      marginRight: 8,
+                    }}
+                  />
+                </View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                  }}>
+                  <View
+                    style={{
+                      width: '15%',
+                      height: 8,
+                      borderRadius: 5,
+                      backgroundColor: colors.icon,
+                      marginRight: '5%',
+                    }}
+                  />
+                  <View
+                    style={{
+                      width: '15%',
+                      height: 8,
+                      borderRadius: 5,
+                      backgroundColor: colors.icon,
+                    }}
+                  />
+                </View>
+              </Animatable.View>
+
+              <Animatable.View
+                animation={slideLeft}
+                iterationCount="infinite"
+                duration={3000}
+                iterationDelay={0}
+                direction="alternate"
+                easing="ease-in"
+                useNativeDriver={true}
+                style={{
+                  backgroundColor: colors.shade,
+                  width: '50%',
+                  padding: 5,
+                  borderRadius: 5,
+                  marginBottom: 10,
+                }}>
+                <View
+                  style={{
+                    width: '50%',
+                    height: 15,
+                    borderRadius: 100,
+                    backgroundColor: colors.accent,
+                    marginBottom: 8,
+                  }}
+                />
+                <View
+                  style={{
+                    width: '70%',
+                    height: 10,
+
+                    marginBottom: 8,
+                    flexDirection: 'row',
+                  }}>
+                  <View
+                    style={{
+                      width: '30%',
+                      height: 10,
+                      borderRadius: 5,
+                      backgroundColor: colors.accent,
+                      marginRight: 8,
+                    }}
+                  />
+                  <View
+                    style={{
+                      width: '30%',
+                      height: 10,
+                      borderRadius: 5,
+                      backgroundColor: colors.accent,
+                      marginRight: 8,
+                    }}
+                  />
+                  <View
+                    style={{
+                      width: '30%',
+                      height: 10,
+                      borderRadius: 5,
+                      backgroundColor: colors.accent,
+                      marginRight: 8,
+                    }}
+                  />
+                </View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                  }}>
+                  <View
+                    style={{
+                      width: '15%',
+                      height: 8,
+                      borderRadius: 5,
+                      backgroundColor: colors.icon,
+                      marginRight: '5%',
+                    }}
+                  />
+                  <View
+                    style={{
+                      width: '15%',
+                      height: 8,
+                      borderRadius: 5,
+                      backgroundColor: colors.icon,
+                    }}
+                  />
+                </View>
+              </Animatable.View>
+
+              <Animatable.View
+                animation={slideRight}
+                iterationCount="infinite"
+                duration={3000}
+                iterationDelay={0}
+                direction="alternate"
+                easing="ease-in"
+                useNativeDriver={true}
+                style={{
+                  backgroundColor: colors.shade,
+                  width: '50%',
+                  padding: 5,
+                  borderRadius: 5,
+                  marginBottom: 10,
+                }}>
+                <View
+                  style={{
+                    width: '50%',
+                    height: 15,
+                    borderRadius: 100,
+                    backgroundColor: colors.accent,
+                    marginBottom: 8,
+                  }}
+                />
+                <View
+                  style={{
+                    width: '70%',
+                    height: 10,
+
+                    marginBottom: 8,
+                    flexDirection: 'row',
+                  }}>
+                  <View
+                    style={{
+                      width: '30%',
+                      height: 10,
+                      borderRadius: 5,
+                      backgroundColor: colors.accent,
+                      marginRight: 8,
+                    }}
+                  />
+                  <View
+                    style={{
+                      width: '30%',
+                      height: 10,
+                      borderRadius: 5,
+                      backgroundColor: colors.accent,
+                      marginRight: 8,
+                    }}
+                  />
+                  <View
+                    style={{
+                      width: '30%',
+                      height: 10,
+                      borderRadius: 5,
+                      backgroundColor: colors.accent,
+                      marginRight: 8,
+                    }}
+                  />
+                </View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                  }}>
+                  <View
+                    style={{
+                      width: '15%',
+                      height: 8,
+                      borderRadius: 5,
+                      backgroundColor: colors.icon,
+                      marginRight: '5%',
+                    }}
+                  />
+                  <View
+                    style={{
+                      width: '15%',
+                      height: 8,
+                      borderRadius: 5,
+                      backgroundColor: colors.icon,
+                    }}
+                  />
+                </View>
+              </Animatable.View>
+
+              <Text
+                style={{
+                  color: colors.icon,
+                  fontSize: SIZE.md,
+                  fontFamily: WEIGHT.regular,
+                  marginTop: 20,
+                }}>
+                Notebooks you add will appear here
+              </Text>
+              <Text
+                style={{
+                  fontSize: SIZE.sm,
+                  color: colors.icon,
+                  marginTop: 20,
+                }}>
+                No Notebooks found
+              </Text>
+            </View>
+          }
           contentContainerStyle={{
             width: '100%',
             alignSelf: 'center',

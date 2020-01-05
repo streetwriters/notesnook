@@ -246,7 +246,7 @@ export const EditorMenu = ({
                 height: 2,
                 width: '100%',
                 marginBottom: 5,
-                marginTop: Platform.OS == 'ios' ? h * 0.01 : h * 0.03,
+                marginTop: Platform.OS == 'ios' ? 0 : 45,
               }}
             />
             <FlatList

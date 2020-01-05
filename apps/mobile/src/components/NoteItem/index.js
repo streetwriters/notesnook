@@ -290,7 +290,6 @@ const NoteItem = props => {
                 }}
                 textStyle={{
                   color: colors.pri,
-
                   fontFamily: WEIGHT.regular,
                   fontSize: SIZE.sm,
                 }}>
@@ -304,7 +303,7 @@ const NoteItem = props => {
                   color: colors.pri,
 
                   fontFamily: WEIGHT.regular,
-                  fontSize: SIZE.xs,
+                  fontSize: SIZE.sm,
                 }}>
                 Pin
               </MenuItem>
@@ -323,7 +322,7 @@ const NoteItem = props => {
                   color: colors.pri,
 
                   fontFamily: WEIGHT.regular,
-                  fontSize: SIZE.xs,
+                  fontSize: SIZE.sm,
                 }}>
                 Favorite
               </MenuItem>
@@ -333,7 +332,7 @@ const NoteItem = props => {
                   color: colors.pri,
 
                   fontFamily: WEIGHT.regular,
-                  fontSize: SIZE.xs,
+                  fontSize: SIZE.sm,
                 }}>
                 Share
               </MenuItem>
@@ -353,9 +352,9 @@ const NoteItem = props => {
                   color: colors.pri,
 
                   fontFamily: WEIGHT.regular,
-                  fontSize: SIZE.xs,
+                  fontSize: SIZE.sm,
                 }}>
-                Move
+                Add to Notebook
               </MenuItem>
               <MenuItem
                 onPress={() => {
@@ -367,9 +366,9 @@ const NoteItem = props => {
                   color: colors.pri,
 
                   fontFamily: WEIGHT.regular,
-                  fontSize: SIZE.xs,
+                  fontSize: SIZE.sm,
                 }}>
-                {item.locked ? 'Remove from vault' : ' Add to Vault'}
+                {item.locked ? 'Remove from vault' : 'Add to Vault'}
               </MenuItem>
 
               <MenuItem
@@ -380,7 +379,7 @@ const NoteItem = props => {
                 textStyle={{
                   color: colors.pri,
                   fontFamily: WEIGHT.regular,
-                  fontSize: SIZE.xs,
+                  fontSize: SIZE.sm,
                 }}>
                 Delete
               </MenuItem>

@@ -287,8 +287,7 @@ export const NotebookItem = ({
                     fontFamily: WEIGHT.regular,
                     fontSize: SIZE.sm,
                   }}>
-                  <Icon name="arrow-left" size={SIZE.sm} color={colors.icon} />
-                  {'  '}Restore
+                  Restore
                 </MenuItem>
                 <MenuItem
                   onPress={() => {
@@ -301,8 +300,7 @@ export const NotebookItem = ({
                     fontFamily: WEIGHT.regular,
                     fontSize: SIZE.sm,
                   }}>
-                  <Icon name="trash" size={SIZE.sm} color={colors.icon} />
-                  {'  '}Remove
+                  Remove
                 </MenuItem>
               </>
             ) : (
@@ -318,8 +316,7 @@ export const NotebookItem = ({
                     fontFamily: WEIGHT.regular,
                     fontSize: SIZE.sm,
                   }}>
-                  <Icon name="edit-2" size={SIZE.sm} color={colors.icon} />
-                  {'  '}Edit
+                  Edit
                 </MenuItem>
 
                 <MenuItem
@@ -329,8 +326,7 @@ export const NotebookItem = ({
                     fontFamily: WEIGHT.regular,
                     fontSize: SIZE.sm,
                   }}>
-                  <Icon name="star" size={SIZE.sm} color={colors.icon} />
-                  {'  '}Pin
+                  Pin
                 </MenuItem>
                 <MenuItem
                   onPress={() => {
@@ -349,8 +345,7 @@ export const NotebookItem = ({
                     fontFamily: WEIGHT.regular,
                     fontSize: SIZE.sm,
                   }}>
-                  <Icon name="star" size={SIZE.sm} color={colors.icon} />
-                  {'  '}Favorite
+                  Favorite
                 </MenuItem>
 
                 <MenuItem
@@ -364,8 +359,7 @@ export const NotebookItem = ({
                     fontFamily: WEIGHT.regular,
                     fontSize: SIZE.sm,
                   }}>
-                  <Icon name="trash" size={SIZE.sm} color={colors.icon} />
-                  {'  '}Delete
+                  Delete
                 </MenuItem>
               </>
             )}
