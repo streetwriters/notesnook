@@ -24,6 +24,8 @@ const NoteItem = props => {
   const {colors} = useAppContext();
   const [visible, setVisible] = useState(false);
   const [vaultDialog, setVaultDialog] = useState(false);
+  const [unlock, setUnlock] = useState(false);
+  const [isPerm, setIsPerm] = useState(false);
   const item = props.item;
 
   let show = null;
@@ -35,7 +37,12 @@ const NoteItem = props => {
       if (show === 'delete') {
         setVisible(true);
         show = null;
-      } else if (show == 'vault') {
+      } else if (show == 'lock') {
+        setVaultDialog(true);
+        show = null;
+      } else if (show == 'unlock') {
+        setUnlock(true);
+        setIsPerm(true);
         setVaultDialog(true);
         show = null;
       }
@@ -85,7 +92,18 @@ const NoteItem = props => {
           setVisible(false);
         }}
       />
-      <VaultDialog visible={vaultDialog} />
+      <VaultDialog
+        close={() => {
+          setVaultDialog(false);
+          setUnlock(false);
+          setIsPerm(false);
+          props.refresh();
+        }}
+        note={item}
+        perm={isPerm}
+        openedToUnlock={unlock}
+        visible={vaultDialog}
+      />
       {props.pinned ? (
         <View
           style={{
@@ -114,11 +132,16 @@ const NoteItem = props => {
       <TouchableOpacity
         activeOpacity={1}
         onPress={() => {
-          SideMenuEvent.close();
-          SideMenuEvent.disable();
-          NavigationService.navigate('Editor', {
-            note: item,
-          });
+          if (item.locked) {
+            setUnlock(true);
+            setVaultDialog(true);
+          } else {
+            SideMenuEvent.close();
+            SideMenuEvent.disable();
+            NavigationService.navigate('Editor', {
+              note: item,
+            });
+          }
         }}
         style={{
           paddingLeft: 0,
@@ -336,7 +359,8 @@ const NoteItem = props => {
               </MenuItem>
               <MenuItem
                 onPress={() => {
-                  show = 'vault';
+                  item.locked ? (show = 'unlock') : (show = 'lock');
+
                   hideMenu(true);
                 }}
                 textStyle={{
@@ -345,7 +369,7 @@ const NoteItem = props => {
                   fontFamily: WEIGHT.regular,
                   fontSize: SIZE.xs,
                 }}>
-                Lock
+                {item.locked ? 'Remove from vault' : ' Add to Vault'}
               </MenuItem>
 
               <MenuItem

@@ -56,6 +56,7 @@ export const Home = ({navigation}) => {
   const fetchNotes = () => {
     allNotes = db.groupNotes();
     setNotes([...allNotes]);
+    console.log(allNotes);
   };
 
   useEffect(() => {

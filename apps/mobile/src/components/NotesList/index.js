@@ -259,7 +259,7 @@ export const NotesList = ({
               fontFamily: WEIGHT.regular,
               marginTop: 20,
             }}>
-            Notes you write show up here.
+            Notes you write will appear here.
           </Text>
         </View>
       }

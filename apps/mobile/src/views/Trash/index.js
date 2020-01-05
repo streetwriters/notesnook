@@ -1,49 +1,26 @@
 import React, {useEffect, useState} from 'react';
 import {
-  ScrollView,
-  View,
   Text,
   TouchableOpacity,
   Dimensions,
-  Image,
   SafeAreaView,
-  Platform,
   FlatList,
 } from 'react-native';
-import NavigationService from '../../services/NavigationService';
-import {
-  COLOR_SCHEME,
-  SIZE,
-  br,
-  ph,
-  pv,
-  opacity,
-  FONT,
-  WEIGHT,
-  clearThemeUpdateListener,
-  onThemeUpdate,
-} from '../../common/common';
+import {SIZE, ph, pv, opacity, WEIGHT} from '../../common/common';
 import Icon from 'react-native-vector-icons/Feather';
-import {Reminder} from '../../components/Reminder';
-import {ListItem} from '../../components/ListItem';
 import {Header} from '../../components/header';
 import NoteItem from '../../components/NoteItem';
-import {useForceUpdate} from '../ListsEditor';
 import {useAppContext} from '../../provider/useAppContext';
-import {db, DDS} from '../../../App';
+import {db} from '../../../App';
 import {NotebookItem} from '../../components/NotebookItem';
-
-const w = Dimensions.get('window').width;
-const h = Dimensions.get('window').height;
 
 export const Trash = ({navigation}) => {
   const {colors} = useAppContext();
   const [trash, setTrash] = useState([]);
+
   useEffect(() => {
     let allTrash = db.getTrash();
-
     setTrash([...allTrash]);
-    console.log(allTrash);
   }, []);
 
   return (
@@ -53,6 +30,7 @@ export const Trash = ({navigation}) => {
         height: '100%',
       }}>
       <Header colors={colors} heading="Trash" canGoBack={false} menu={true} />
+
       <FlatList
         numColumns={1}
         style={{

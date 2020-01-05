@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   ScrollView,
   View,
@@ -23,6 +23,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import {AnimatedSafeAreaView} from '../../views/Home';
 import {TextInput} from 'react-native-gesture-handler';
 import {useAppContext} from '../../provider/useAppContext';
+import {VaultDialog} from '../VaultDialog';
 
 let tagsInputRef;
 
@@ -32,8 +33,12 @@ export const EditorMenu = ({
   update = () => {},
   updateProps = () => {},
   noteProps,
+  note,
+  timestamp,
 }) => {
   const {colors, changeColorScheme} = useAppContext();
+  const [unlock, setUnlock] = useState(false);
+  const [vaultDialog, setVaultDialog] = useState(false);
 
   let tagToAdd = null;
   let backPressCount = 0;
@@ -42,7 +47,6 @@ export const EditorMenu = ({
     <TouchableOpacity
       activeOpacity={opacity}
       onPress={() => {
-        item.close === false ? null : close();
         item.func();
       }}
       style={{
@@ -316,12 +320,19 @@ export const EditorMenu = ({
                   close: true,
                 },
                 {
-                  name: 'Locked',
+                  name: noteProps.locked ? 'Remove from Vault' : 'Add to Vault',
                   icon: 'lock',
-                  func: () => {},
+                  func: () => {
+                    if (noteProps.locked) {
+                      setUnlock(true);
+                    } else {
+                      setUnlock(false);
+                    }
+                    setVaultDialog(true);
+                  },
                   close: true,
                   check: true,
-                  on: false,
+                  on: noteProps.locked,
                 },
               ]}
               keyExtractor={(item, index) => item.name}
@@ -470,6 +481,25 @@ export const EditorMenu = ({
             <ActivityIndicator color={colors.accent} />
           </View>
         </ScrollView>
+
+        <VaultDialog
+          close={(item, locked) => {
+            if (item) {
+              update(item);
+            }
+            let props = {...noteProps};
+            props.locked = locked;
+            updateProps(props);
+
+            setVaultDialog(false);
+            setUnlock(false);
+          }}
+          note={note}
+          timestamp={timestamp}
+          perm={true}
+          openedToUnlock={unlock}
+          visible={vaultDialog}
+        />
       </KeyboardAvoidingView>
     </AnimatedSafeAreaView>
   );

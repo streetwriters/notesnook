@@ -31,7 +31,8 @@ var content = null;
 var title = null;
 let titleRef;
 let EditorWebView;
-
+let timer = null;
+let note = {};
 const Editor = ({navigation}) => {
   // Global State
   const {colors} = useAppContext();
@@ -48,8 +49,10 @@ const Editor = ({navigation}) => {
     favorite: false,
     colors: [],
   });
+
   // VARIABLES
   let updateInterval = null;
+  let lastTextChange = 0;
 
   // FUNCTIONS
 
@@ -61,7 +64,7 @@ const Editor = ({navigation}) => {
     }
   };
 
-  const saveNote = async (noteProps = {}) => {
+  const saveNote = async (noteProps = {}, lockNote = false) => {
     if (!content) {
       content = {
         text: '',
@@ -76,37 +79,49 @@ const Editor = ({navigation}) => {
       favorite: noteProps.favorite,
       locked: noteProps.locked,
       title,
-      content,
+      content: {
+        text: content.text,
+        delta: content.delta,
+      },
       dateCreated: timestamp,
     });
+
+    if (lockNote && noteProps.locked) {
+      console.log(noteProps, timestamp);
+      db.lockNote(timestamp, 'password');
+    }
   };
 
   const onWebViewLoad = () => {
     post(JSON.stringify(colors));
     if (navigation.state.params && navigation.state.params.note) {
-      let note = navigation.state.params.note;
-      titleRef.setNativeProps({
-        text: note.title,
-      });
-      title = note.title;
+      note = navigation.state.params.note;
 
-      timestamp = note.dateCreated;
-      post(JSON.stringify(note.content.delta));
-      let props = {
-        tags: note.tags,
-        colors: note.colors,
-        pinned: note.pinned,
-        favorite: note.favorite,
-        locked: note.locked,
-      };
-      setNoteProps({...props});
-      console.log(note);
-    }
-
-    if (content && content.delta) {
-      post(JSON.stringify(content.delta));
+      updateEditor();
     }
   };
+
+  const updateEditor = () => {
+    let props = {
+      tags: note.tags,
+      colors: note.colors,
+      pinned: note.pinned,
+      favorite: note.favorite,
+      locked: note.locked,
+    };
+    setNoteProps({...props});
+    post(JSON.stringify(note.content.delta));
+    setTimeout(() => {
+      title = note.title;
+      titleRef.setNativeProps({
+        text: title,
+      });
+      timestamp = note.dateCreated;
+      content = note.content;
+    }, 200);
+    console.log(note);
+  };
+
   const onTitleTextChange = value => {
     title = value;
   };
@@ -227,7 +242,11 @@ const Editor = ({navigation}) => {
             }}
             onMessage={evt => {
               if (evt.nativeEvent.data !== '') {
+                timer = null;
                 onChange(evt.nativeEvent.data);
+                timer = setTimeout(() => {
+                  saveNote(noteProps, true);
+                }, 2000);
               }
             }}
           />
@@ -244,22 +263,26 @@ const Editor = ({navigation}) => {
       return true;
     });
     return () => {
-      title = null;
-      timestamp = null;
-      content = null;
       handleBack.remove();
       handleBack = null;
     };
   }, []);
 
   useEffect(() => {
+    console.log('hello');
     updateInterval = setInterval(async function() {
       await saveNote(noteProps);
     }, 2000);
+
     return () => {
-      saveNote(noteProps);
+      saveNote(noteProps, true);
       clearInterval(updateInterval);
       updateInterval = null;
+      console.log('yeah');
+      title = null;
+      content = null;
+      timer = null;
+      timestamp = null;
     };
   }, [noteProps]);
 
@@ -310,7 +333,20 @@ const Editor = ({navigation}) => {
           width: sidebar ? '30%' : '0%',
           opacity: sidebar ? 1 : 0,
         }}>
-        <EditorMenu />
+        <EditorMenu
+          hide={false}
+          noteProps={noteProps}
+          updateProps={props => {
+            setNoteProps(props);
+
+            console.log(props, noteProps);
+          }}
+          close={() => {
+            setTimeout(() => {
+              setOpen(args);
+            }, 500);
+          }}
+        />
       </Animatable.View>
     </View>
   ) : (
@@ -331,6 +367,9 @@ const Editor = ({navigation}) => {
         openMenuOffset={w / 1.2}
         menuPosition="right"
         onChange={args => {
+          if (noteProps.locked) {
+            db.lockNote(timestamp, 'password');
+          }
           setTimeout(() => {
             setOpen(args);
           }, 500);
@@ -339,15 +378,18 @@ const Editor = ({navigation}) => {
           <EditorMenu
             hide={false}
             noteProps={noteProps}
+            note={note}
+            timestamp={timestamp}
             updateProps={props => {
               setNoteProps(props);
-
               console.log(props, noteProps);
+              if (props.locked) {
+                saveNote(noteProps, true);
+              }
             }}
-            close={() => {
-              setTimeout(() => {
-                setOpen(args);
-              }, 500);
+            update={item => {
+              note = item;
+              updateEditor();
             }}
           />
         }>
@@ -368,6 +410,7 @@ const Editor = ({navigation}) => {
               setDialog(false);
             }}
           />
+
           {_renderEditor()}
         </AnimatedSafeAreaView>
       </SideMenu>

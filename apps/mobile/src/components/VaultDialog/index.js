@@ -6,13 +6,23 @@ import {FlatList, TextInput} from 'react-native-gesture-handler';
 import {useForceUpdate} from '../../views/ListsEditor';
 import {db} from '../../../App';
 import {useAppContext} from '../../provider/useAppContext';
+import {getElevation} from '../../utils/utils';
+import NavigationService from '../../services/NavigationService';
 
 let refs = [];
 
-export const VaultDialog = ({visible, close}) => {
+export const VaultDialog = ({
+  openedToUnlock = false,
+  visible,
+  hasPassword = false,
+  note,
+  close = () => {},
+  perm = false,
+  timestamp = null,
+}) => {
   const {colors} = useAppContext();
-  const forceUpdate = useForceUpdate();
   const [hidden, setHidden] = useState(false);
+  let password = null;
   return (
     <Modal
       visible={visible}
@@ -28,9 +38,9 @@ export const VaultDialog = ({visible, close}) => {
         }}>
         <View
           style={{
+            ...getElevation(5),
             width: '80%',
             maxHeight: 350,
-            elevation: 5,
             borderRadius: 5,
             backgroundColor: colors.bg,
             paddingHorizontal: ph,
@@ -46,12 +56,11 @@ export const VaultDialog = ({visible, close}) => {
             <Text
               style={{
                 color: colors.accent,
-                fontFamily: WEIGHT.semibold,
-                marginLeft: 10,
-                fontSize: SIZE.lg,
-                marginTop: -5,
+                fontFamily: WEIGHT.bold,
+                marginLeft: 5,
+                fontSize: SIZE.md,
               }}>
-              Lock Note
+              {openedToUnlock ? 'Unlock Note' : 'Lock Note'}
             </Text>
           </View>
 
@@ -64,12 +73,35 @@ export const VaultDialog = ({visible, close}) => {
               marginTop: 10,
               marginBottom: hidden ? 20 : 0,
             }}>
-            {hidden
+            {hasPassword
               ? 'Set password for all your locked notes.'
+              : openedToUnlock
+              ? 'Enter vault password to unlock note.'
               : 'Do you want to lock this note?'}
           </Text>
 
-          {!hidden ? null : (
+          {openedToUnlock ? (
+            <TextInput
+              style={{
+                padding: pv - 5,
+                borderWidth: 1.5,
+                borderColor: colors.nav,
+                paddingHorizontal: ph,
+                borderRadius: 5,
+                marginTop: 10,
+                fontSize: SIZE.sm,
+                fontFamily: WEIGHT.regular,
+              }}
+              onChangeText={value => {
+                password = value;
+              }}
+              secureTextEntry
+              placeholder="Password"
+              placeholderTextColor={colors.icon}
+            />
+          ) : null}
+
+          {!hasPassword ? null : (
             <View>
               <TextInput
                 style={{
@@ -128,6 +160,31 @@ export const VaultDialog = ({visible, close}) => {
             }}>
             <TouchableOpacity
               activeOpacity={opacity}
+              onPress={async () => {
+                if (openedToUnlock) {
+                  console.log(note.dateCreated, password, perm);
+                  let n = db.getNote(note.dateCreated);
+                  let item;
+                  if (n.content.cipher) {
+                    console.log(n.content.cipher);
+
+                    item = await db.unlockNote(n.dateCreated, password, perm);
+                    console.log(item);
+                  } else {
+                    item = n;
+                  }
+                  if (!perm) {
+                    NavigationService.navigate('Editor', {
+                      note: item,
+                    });
+                  }
+                  close(item, false);
+                } else {
+                  await db.lockNote(note.dateCreated, 'password');
+
+                  close(null, true);
+                }
+              }}
               style={{
                 paddingVertical: pv,
                 paddingHorizontal: ph,
@@ -145,7 +202,7 @@ export const VaultDialog = ({visible, close}) => {
                   color: 'white',
                   fontSize: SIZE.sm,
                 }}>
-                Lock
+                {openedToUnlock ? 'Unlock' : 'Lock'}
               </Text>
             </TouchableOpacity>
 
@@ -176,77 +233,5 @@ export const VaultDialog = ({visible, close}) => {
         </View>
       </View>
     </Modal>
-  );
-};
-
-const TopicItem = ({
-  item,
-  index,
-  onFocus,
-  onSubmit,
-  onDelete,
-  onChange,
-  colors,
-}) => {
-  const [focus, setFocus] = useState(true);
-  const topicRef = ref => (refs[index] = ref);
-
-  let text = item;
-
-  return (
-    <View
-      style={{
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        borderRadius: 5,
-        borderWidth: 1.5,
-        borderColor: colors.nav,
-        paddingHorizontal: ph,
-        marginTop: 10,
-      }}>
-      <TextInput
-        ref={topicRef}
-        onFocus={() => {
-          onFocus(index);
-
-          setFocus(true);
-        }}
-        onBlur={() => {
-          onSubmit(text, index, false);
-          setFocus(false);
-        }}
-        onChangeText={value => {
-          onChange(value, index);
-
-          text = value;
-        }}
-        onSubmit={() => onSubmit(text, index, true)}
-        blurOnSubmit
-        style={{
-          padding: pv - 5,
-          paddingHorizontal: 0,
-          fontSize: SIZE.sm,
-          fontFamily: WEIGHT.regular,
-          width: '90%',
-          maxWidth: '90%',
-        }}
-        placeholder="Add a topic"
-        placeholderTextColor={colors.icon}
-      />
-
-      <TouchableOpacity
-        onPress={() => (!focus ? onDelete(index) : onSubmit(text, index, true))}
-        style={{
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
-        <Icon
-          name={!focus ? 'minus' : 'plus'}
-          size={SIZE.lg}
-          color={colors.accent}
-        />
-      </TouchableOpacity>
-    </View>
   );
 };
