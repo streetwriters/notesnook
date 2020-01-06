@@ -37,7 +37,7 @@ export const routes = {
   settings: {
     key: "settings",
     title: "Settings",
-    component:Settings,
+    component: Settings,
     icon: Icon.Settings,
     bottom: true
   }
@@ -100,7 +100,7 @@ function ThemedComponent(props) {
   }, [props.route.title]);
   return (
     <ThemeProvider theme={theme}>
-      <Flex alignItems="center">
+      <Flex alignItems="center" px={3}>
         <Box
           onClick={backAction}
           display={canGoBack ? "flex" : "none"}

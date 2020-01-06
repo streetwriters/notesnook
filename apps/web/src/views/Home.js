@@ -38,13 +38,17 @@ function Home() {
               overflowX: "hidden"
             }}
             groupCounts={notes.groupCounts}
-            group={groupIndex => (
-              <Box bg="background">
-                <Text variant="heading" color="primary" fontSize={15}>
-                  {notes.groups[groupIndex].title}
-                </Text>
-              </Box>
-            )}
+            group={groupIndex =>
+              notes.groups[groupIndex].title == "Pinned" ? (
+                <Box px={3} bg="background" py={1} />
+              ) : (
+                <Box px={3} bg="background">
+                  <Text variant="heading" color="primary" fontSize={15}>
+                    {notes.groups[groupIndex].title}
+                  </Text>
+                </Box>
+              )
+            }
             item={(index, groupIndex) => (
               <Note index={index} item={notes.items[index]} />
             )}

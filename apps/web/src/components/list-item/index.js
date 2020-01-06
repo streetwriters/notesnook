@@ -17,9 +17,9 @@ const ListItem = props => (
     justifyContent="space-between"
     py={1}
     bg={props.pinned ? "#1790F310" : "background"}
+    px={3}
     sx={{
       position: "relative",
-      borderRadius: "default",
       marginBottom: 2,
       marginTop: props.pinned ? 4 : 0,
       borderBottom: "1px solid",
@@ -39,6 +39,7 @@ const ListItem = props => (
           top: -15,
           left: 0
         }}
+        mx={1}
         alignItems="center"
         justifyContent="center"
       >

@@ -6,6 +6,7 @@ import theme from "../../theme";
 import "./search.css";
 const Search = props => (
   <Flex
+    px={3}
     flexDirection="row"
     justifyContent="center"
     alignItems="center"
@@ -24,7 +25,7 @@ const Search = props => (
       sx={{
         position: "absolute",
         right: 0,
-        marginRight: 10,
+        marginRight: 20,
         color: theme.colors["hover"],
         height: 24
       }}
