@@ -37,6 +37,9 @@ const NavMenuItem = props => {
   );
 };
 var startX, startWidth;
+function getNavigationViewWidth() {
+  return window.localStorage.getItem("navigationViewWidth");
+}
 function App() {
   const [selectedIndex, setSelectedIndex] = useState(1);
   return (
@@ -74,13 +77,15 @@ function App() {
             className="navigationView"
             sx={{
               borderRight: "1px solid",
-              borderColor: "border"
+              borderColor: "border",
+              width: !getNavigationViewWidth()
+                ? ["100%", "40%", "15%"]
+                : getNavigationViewWidth()
             }}
             flexDirection="column"
             flex="1 1 auto"
             px={2}
             py={2}
-            width={["100%", "40%", "15%"]}
             //style={{ width: "362px" }}
           />
           <Box
@@ -100,6 +105,13 @@ function App() {
             onDrag={e => {
               let view = document.querySelector(".navigationView");
               view.style.width = `${startWidth + e.clientX - startX}px`;
+            }}
+            onDragEnd={e => {
+              let view = document.querySelector(".navigationView");
+              window.localStorage.setItem(
+                "navigationViewWidth",
+                view.style.width
+              );
             }}
           />
           <Editor />
