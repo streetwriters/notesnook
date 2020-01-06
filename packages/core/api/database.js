@@ -68,8 +68,9 @@ class Database {
    * @param {boolean} special Should only be used in the React app.
    */
   groupNotes(by, special = false) {
-    //TODO add tests
-    let notes = tfun.filter(".pinned == false")(this.getNotes());
+    let notes = !special
+      ? tfun.filter(".pinned == false")(this.getNotes())
+      : this.getNotes();
     switch (by) {
       case "abc":
         return groupBy(

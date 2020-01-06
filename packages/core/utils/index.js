@@ -1,5 +1,7 @@
 var tfun = require("transfun/transfun.js").tfun;
-tfun = global.tfun;
+if (!tfun) {
+  tfun = global.tfun;
+}
 
 export function extractValues(obj) {
   const t = [];
@@ -35,20 +37,33 @@ function groupBySpecial(arr, key) {
   let groups = [];
   let groupCounts = [];
   var i = -1;
+  let pinned = [];
   for (let val of arr) {
+    if (val.pinned) {
+      pinned[pinned.length] = val;
+      continue;
+    }
     i++;
-    let k = key(val);
-    let index = _groups[k] === undefined ? i : _groups[k].index;
+    let groupTitle = key(val);
+    let index =
+      _groups[groupTitle] === undefined ? i : _groups[groupTitle].index;
     let groupIndex =
-      _groups[k] == undefined ? groupCounts.length : _groups[k].groupIndex;
+      _groups[groupTitle] == undefined
+        ? groupCounts.length
+        : _groups[groupTitle].groupIndex;
     retVal.splice(index + 1, 0, val);
     groupCounts[groupIndex] =
       groupCounts.length == groupIndex ? 1 : groupCounts[groupIndex] + 1;
-    groups[groupIndex] = { title: k };
-    _groups[k] = {
+    groups[groupIndex] = { title: groupTitle };
+    _groups[groupTitle] = {
       index: i,
       groupIndex
     };
   }
-  return { items: retVal, groups, groupCounts };
+
+  let g = { items: retVal, groups, groupCounts };
+  g.items.splice(0, 0, ...pinned);
+  g.groupCounts.splice(0, 0, pinned.length);
+  g.groups.splice(0, 0, { title: " " });
+  return g;
 }
