@@ -37,7 +37,7 @@ export const routes = {
   settings: {
     key: "settings",
     title: "Settings",
-    component: undefined,
+    component:Settings,
     icon: Icon.Settings,
     bottom: true
   }
