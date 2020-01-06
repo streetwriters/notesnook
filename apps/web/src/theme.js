@@ -39,7 +39,7 @@ const shadowsLight = {
 export default {
   breakpoints: ["480px", "834px", "1200px"],
   colors: colorsLight,
-  space: [0, 5, 10, 12],
+  space: [0, 5, 10, 12, 15],
   fontSizes: {
     heading: 36,
     input: 16,

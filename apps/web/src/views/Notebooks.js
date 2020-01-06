@@ -6,13 +6,13 @@ import * as Icon from "react-feather";
 import theme, { DIALOG_SHADOW } from "../theme";
 import Search from "../components/search";
 import Modal from "react-modal";
-import { db } from "../common";
+import { db, ev } from "../common";
 import { showSnack } from "../components/snackbar";
 import { Virtuoso as List } from "react-virtuoso";
 import Notebook from "../components/notebook";
 import Topic from "../components/topic";
 import Note from "../components/note";
-import { routes } from "../navigation";
+import { routes, navigationEvents, goBack as p_goBack } from "../navigation";
 
 const inputRefs = [];
 const history = [{}];
@@ -20,16 +20,33 @@ const Notebooks = props => {
   const [open, setOpen] = useState(false);
   const [notebooks, setNotebooks] = useState([]);
   const [selected, setSelected] = useState({});
+  const [intent, setIntent] = useState(props.intent);
   useEffect(() => {
-    Notebooks.onRefresh = () => {
+    function onRefresh() {
+      console.log("Refreshing notebooks");
       setNotebooks(db.getNotebooks());
+    }
+    onRefresh();
+    navigationEvents.onWillNavigateAway = (routeName, params) => {
+      if (routeName !== "notebooks" && intent === "moveNote") {
+        return window.confirm(
+          "Are you sure you want to navigate away? Your note selection will be lost."
+        );
+      }
+      return true;
     };
-    Notebooks.onRefresh();
+    ev.addListener("refreshNotebooks", onRefresh);
     return () => {
+      ev.removeListener("refreshNotebooks", onRefresh);
       Notebooks.onRefresh = undefined;
     };
   }, []);
   function navigate(item, save = true, title = undefined) {
+    //transform notes in a topic to real notes
+    if (item.notes) {
+      item = { ...item };
+      item.notes = db.getTopic(selected.dateCreated, item.title);
+    }
     if (save) {
       history[history.length] = selected;
     }
@@ -41,6 +58,7 @@ const Notebooks = props => {
     props.changeTitle(title);
     props.canGoBack(item.title !== undefined);
     props.backAction(goBack);
+
     setSelected((item.title && item) || {});
   }
   function goBack() {
@@ -53,6 +71,13 @@ const Notebooks = props => {
           {selected.type === "topic" && (
             <Text variant="title" color="primary">
               {selected.title}
+            </Text>
+          )}
+          {intent === "moveNote" && selected.type !== "topic" && (
+            <Text variant="body" color="primary" fontWeight="bold">
+              Please select a{" "}
+              {selected.type === "notebook" ? "topic" : "notebook"} to move the
+              note to:
             </Text>
           )}
           <Search placeholder="Search" />
@@ -92,13 +117,39 @@ const Notebooks = props => {
             }}
           />
           <Button
-            Icon={Icon.Plus}
-            onClick={() => setOpen(true)}
+            Icon={
+              intent === "moveNote" && selected.type === "topic"
+                ? Icon.Move
+                : Icon.Plus
+            }
+            onClick={async () => {
+              if (intent === "moveNote" && selected.type === "topic") {
+                let to = {
+                  notebook: history[history.length - 1].dateCreated,
+                  topic: selected.title
+                };
+                db.moveNote(props.data.dateCreated, props.data.notebook, to)
+                  .then(
+                    result =>
+                      result &&
+                      showSnack(
+                        `Moved note to ${history[history.length - 1].title}.`
+                      )
+                  )
+                  .catch(err => showSnack(err.message));
+                p_goBack();
+                setIntent(undefined);
+              } else {
+                setOpen(true);
+              }
+            }}
             content={
               selected.type === "notebook"
                 ? "Add more topics"
                 : selected.type === "topic"
-                ? "Make a new note"
+                ? intent === "moveNote"
+                  ? "Move note here"
+                  : "Make a new note"
                 : "Create a notebook"
             }
           />

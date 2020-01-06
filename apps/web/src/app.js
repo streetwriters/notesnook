@@ -8,12 +8,13 @@ import theme from "./theme";
 import { routes, navigate } from "./navigation";
 import CheckBox from "./components/checkbox";
 import * as Icon from "react-feather";
+
 const NavMenuItem = props => {
   useEffect(() => {
     if (props.selected) {
       navigate(props.item.key);
     }
-  });
+  }, []);
   return (
     <Button
       onClick={props.onSelected}
@@ -35,7 +36,10 @@ const NavMenuItem = props => {
     </Button>
   );
 };
-
+var startX, startWidth;
+function getNavigationViewWidth() {
+  return window.localStorage.getItem("navigationViewWidth");
+}
 function App() {
   const [selectedIndex, setSelectedIndex] = useState(1);
   return (
@@ -47,15 +51,20 @@ function App() {
         alignContent="stretch"
       >
         <Box
-          width={[0, 0, 70]}
-          sx={{ borderRight: "1px solid", borderRightColor: "border" }}
+          sx={{
+            borderRight: "1px solid",
+            borderRightColor: "border",
+            minWidth: 70,
+            maxWidth: 70
+          }}
           px={0}
         >
           {Object.values(routes).map((item, index) => (
             <NavMenuItem
               onSelected={() => {
-                navigate(item.key);
-                setSelectedIndex(index);
+                if (navigate(item.key)) {
+                  setSelectedIndex(index);
+                }
               }}
               key={item.key}
               item={item}
@@ -68,13 +77,42 @@ function App() {
             className="navigationView"
             sx={{
               borderRight: "1px solid",
-              borderColor: "border"
+              borderColor: "border",
+              width: !getNavigationViewWidth()
+                ? ["100%", "40%", "15%"]
+                : getNavigationViewWidth()
             }}
             flexDirection="column"
             flex="1 1 auto"
             px={2}
             py={2}
-            width={["100%", "40%", "15%"]}
+            //style={{ width: "362px" }}
+          />
+          <Box
+            className="resize-handle"
+            bg="border"
+            sx={{
+              width: 5,
+              opacity: 0,
+              cursor: "col-resize"
+            }}
+            draggable={true}
+            onDragStart={e => {
+              startX = e.clientX;
+              let view = document.querySelector(".navigationView");
+              startWidth = view.clientWidth - 120;
+            }}
+            onDrag={e => {
+              let view = document.querySelector(".navigationView");
+              view.style.width = `${startWidth + e.clientX - startX}px`;
+            }}
+            onDragEnd={e => {
+              let view = document.querySelector(".navigationView");
+              window.localStorage.setItem(
+                "navigationViewWidth",
+                view.style.width
+              );
+            }}
           />
           <Editor />
           <Flex

@@ -6991,10 +6991,9 @@ normalize-url@^3.0.0, normalize-url@^3.0.1:
 
 "notes-core@https://github.com/thecodrr/notes-core.git":
   version "0.2.0"
-  resolved "https://github.com/thecodrr/notes-core.git#d726ec274ead7a4ac297f68ced5213029d3a39a0"
+  resolved "https://github.com/thecodrr/notes-core.git#3b9f78947fbb1239853cb77002aeab1567d24a87"
   dependencies:
     fuzzysearch "^1.0.3"
-    sjcl "^1.0.8"
     transfun "^1.0.2"
 
 npm-bundled@^1.0.1:
@@ -9407,11 +9406,6 @@ sisteransi@^1.0.3:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/sisteransi/-/sisteransi-1.0.4.tgz#386713f1ef688c7c0304dc4c0632898941cad2e3"
   integrity sha512-/ekMoM4NJ59ivGSfKapeG+FWtrmWvA1p6FBZwXrqojw90vJu8lBmrTxCMuBCydKtkaUe2zt4PlxeTKpjwMbyig==
-
-sjcl@^1.0.8:
-  version "1.0.8"
-  resolved "https://registry.yarnpkg.com/sjcl/-/sjcl-1.0.8.tgz#f2ec8d7dc1f0f21b069b8914a41a8f236b0e252a"
-  integrity sha512-LzIjEQ0S0DpIgnxMEayM1rq9aGwGRG4OnZhCdjx7glTaJtf4zRfpg87ImfjSJjoW9vKpagd82McDOwbRT5kQKQ==
 
 slash@^1.0.0:
   version "1.0.0"

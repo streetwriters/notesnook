@@ -22,6 +22,12 @@ export const routes = {
     component: Notebooks,
     icon: Icon.Book
   },
+  favorite: {
+    key: "favorites",
+    title: "Favorites",
+    component: undefined,
+    icon: Icon.Star
+  },
   trash: {
     key: "trash",
     title: "Trash",
@@ -31,38 +37,49 @@ export const routes = {
   settings: {
     key: "settings",
     title: "Settings",
-    component: Settings,
-    icon: Icon.Settings
+    component: undefined,
+    icon: Icon.Settings,
+    bottom: true
   }
 };
-const history = {};
 
-export function navigate(routeName, root = "navigationView") {
+const history = {};
+export const navigationEvents = {
+  onWillNavigateAway: undefined
+};
+var lastRoute = undefined;
+export function navigate(routeName, root = "navigationView", params = {}) {
   let route = routes[routeName];
 
   // do not navigate if the previous route is the same
   if (!history[root]) {
     history[root] = [];
   }
-  let historyContainer = history[root];
+  if (lastRoute === route) {
+    return false;
+  }
+
   if (
-    historyContainer.length > 0 &&
-    historyContainer[historyContainer.length - 1].title === route.title
+    navigationEvents.onWillNavigateAway &&
+    !navigationEvents.onWillNavigateAway(routeName, params)
   ) {
-    return;
+    navigationEvents.onWillNavigateAway = undefined;
+    return false;
   }
 
   let rootView = document.querySelector(`.${root}`);
-  if (!rootView) return;
-  ReactDOM.render(<ThemedComponent route={route} />, rootView);
-
-  historyContainer[historyContainer.length] = {
-    ...route
-  };
-  history[root] = historyContainer;
+  if (!rootView) return false;
+  if (lastRoute) {
+    history[root][history[root].length] = {
+      ...lastRoute
+    };
+  }
+  ReactDOM.render(<ThemedComponent route={route} params={params} />, rootView);
+  lastRoute = route;
+  return true;
 }
 
-export function goBack(root) {
+export function goBack(root = "navigationView") {
   if (!history[root] || history[root].length <= 0) {
     return;
   }
@@ -100,6 +117,7 @@ function ThemedComponent(props) {
           backAction={action => setBackAction(prev => action)}
           canGoBack={setCanGoBack}
           changeTitle={setTitle}
+          {...props.params}
         />
       )}
     </ThemeProvider>
