@@ -8,6 +8,7 @@ import { ThemeProvider } from "emotion-theming";
 import { Box, Flex, Heading } from "rebass";
 import * as Icon from "react-feather";
 import theme from "../theme";
+import Favorite from "../views/Favorite";
 
 export const routes = {
   home: {
@@ -25,7 +26,7 @@ export const routes = {
   favorites: {
     key: "favorites",
     title: "Favorites",
-    component: undefined,
+    component: Favorite,
     icon: Icon.Star
   },
   trash: {
