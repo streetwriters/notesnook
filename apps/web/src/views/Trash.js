@@ -39,7 +39,7 @@ function Trash() {
           <Button
             Icon={Icon.Trash2}
             content={"Clear Trash"}
-            onClick={db.clearTrash()}
+            onClick={() => db.clearTrash()}
           />
         </Flex>
       ) : (
