@@ -64,6 +64,6 @@ function groupBySpecial(arr, key) {
   let g = { items: retVal, groups, groupCounts };
   g.items.splice(0, 0, ...pinned);
   g.groupCounts.splice(0, 0, pinned.length);
-  g.groups.splice(0, 0, { title: " " });
+  g.groups.splice(0, 0, { title: "Pinned" });
   return g;
 }
