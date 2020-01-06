@@ -10,24 +10,20 @@ const menuItems = [
   { title: "Restore" },
   {
     title: "Delete",
-    color: "red",
+    color: "red"
   }
 ];
 
-function sendOpenNoteEvent(note) {
-  ev.emit("onOpenNote", note);
-}
-
 const Trash = ({ item, index }) => {
-  const note = item;
+  const trashItem = item;
   return (
     <ListItem
-      title={note.title}
-      body={note.headline}
+      title={trashItem.title}
+      body={trashItem.headline}
       index={index}
-      onClick={sendOpenNoteEvent.bind(this, note)}
-      info={<TimeAgo datetime={note.dateCreated} />}
-      menuData={note}
+      onClick={() => {}} //TODO
+      info={<TimeAgo datetime={trashItem.dateDeleted} />}
+      menuData={trashItem}
       menuItems={menuItems}
       dropdownRefs={dropdownRefs}
     />
