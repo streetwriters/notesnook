@@ -26,10 +26,9 @@ function Settings(){
 
     return(
         <Flex flexDirection="column" flex="1 1 auto">
-        {(<Flex flexDirection="column" flex="1 1 auto">
+        <Flex flexDirection="column" flex="1 1 auto">
            <Setting></Setting>
           </Flex>
-        )}
       </Flex>
     );
 }

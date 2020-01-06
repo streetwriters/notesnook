@@ -1,10 +1,11 @@
 import React from "react";
-import * as Icon from "react-feather";
 import TimeAgo from "timeago-react";
 import { db, ev } from "../../common";
 import { showSnack } from "../snackbar";
 import ListItem from "../list-item";
 import { Virtuoso as List } from "react-virtuoso";
+import {Box,Button} from 'rebass';
+import '../../App.css'
 
 const dropdownRefs = [];
 const menuItems = [
@@ -19,10 +20,12 @@ function sendOpenNoteEvent(note) {
   ev.emit("onOpenNote", note);
 }
 
-const Trash = () => {
+const Setting = () => {
   return (
-   <div>My name is ALi.</div>
+    <>
+   <Button className='unselectable' variant='setting'>General</Button>
+   </>
   );
 };
 
-export default Trash;
+export default Setting;

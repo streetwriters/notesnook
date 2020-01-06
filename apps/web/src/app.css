@@ -7,3 +7,7 @@
   user-select: none;
   cursor: default;
 }
+
+.unselectable::-moz-focus-inner {
+  border: 0;
+}

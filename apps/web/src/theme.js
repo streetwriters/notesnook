@@ -143,6 +143,18 @@ export default {
       ":focus": {
         outline: "none"
       }
+    },
+    setting:{
+      bg:'transparent',
+      borderLeft:'0px Solid',
+      borderRight:'0px Solid',
+      borderTop:'0px Solid',
+      borderBottom:'1px Solid',
+      borderColor:'border',
+      color:'text',
+      textAlign:'left',
+      fontSize:'title',
+      fontFamily:'body'
     }
   },
   shadows: shadowsLight
