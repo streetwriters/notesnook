@@ -95,8 +95,7 @@ function App() {
             onDragStart={e => {
               startX = e.clientX;
               let view = document.querySelector(".navigationView");
-              console.log(view);
-              startWidth = view.clientWidth;
+              startWidth = view.clientWidth - 120;
             }}
             onDrag={e => {
               let view = document.querySelector(".navigationView");
