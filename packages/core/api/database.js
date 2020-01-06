@@ -339,8 +339,9 @@ class Database {
         //delete notebook from note
         this.notes[noteId].notebook = {};
         //decrement totalNotes count
-        notebook.topics[topicIndex].totalNotes--;
-        notebook.totalNotes--;
+        if (notebook.topics[topicIndex].totalNotes > 0)
+          notebook.topics[topicIndex].totalNotes--;
+        if (notebook.totalNotes > 0) notebook.totalNotes--;
         return true;
       }
     );
