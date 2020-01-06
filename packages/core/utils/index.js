@@ -33,7 +33,7 @@ export function groupBy(arr, key, special = false) {
 
 function groupBySpecial(arr, key) {
   let retVal = [];
-  let _groups = {};
+  let _groups = { "": 0 };
   let groups = [];
   let groupCounts = [];
   var i = -1;
