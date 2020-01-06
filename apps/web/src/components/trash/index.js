@@ -1,8 +1,6 @@
 import React from "react";
-import * as Icon from "react-feather";
+import { Flex, Text } from "rebass";
 import TimeAgo from "timeago-react";
-import { db, ev } from "../../common";
-import { showSnack } from "../snackbar";
 import ListItem from "../list-item";
 
 const dropdownRefs = [];
@@ -22,7 +20,17 @@ const Trash = ({ item, index }) => {
       body={trashItem.headline}
       index={index}
       onClick={() => {}} //TODO
-      info={<TimeAgo datetime={trashItem.dateDeleted} />}
+      info={
+        <Flex justifyContent="center" alignItems="center">
+          <TimeAgo datetime={trashItem.dateDeleted} />
+          <Text as="span" mx={1}>
+            •
+          </Text>
+          <Text color="primary">
+            {trashItem.type[0].toUpperCase() + trashItem.type.substring(1)}
+          </Text>
+        </Flex>
+      }
       menuData={trashItem}
       menuItems={menuItems}
       dropdownRefs={dropdownRefs}

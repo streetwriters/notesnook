@@ -74,7 +74,10 @@ const Notebook = ({ item, index, onClick, onTopicClick }) => {
       info={
         <Flex justifyContent="center" alignItems="center">
           {new Date(notebook.dateCreated).toDateString().substring(4)}
-          <Text as="span">{" • " + notebook.totalNotes} Notes</Text>
+          <Text as="span" mx={1}>
+            •
+          </Text>
+          <Text>{notebook.totalNotes} Notes</Text>
           {notebook.favorite && (
             <Icon.Star size={16} style={{ marginLeft: 5 }} />
           )}
