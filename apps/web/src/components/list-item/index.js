@@ -82,7 +82,7 @@ const ListItem = props => (
       </Text>
     </Box>
     <Dropdown
-      style={{ zIndex: 1 }}
+      style={{ zIndex: 1, marginRight: -4 }}
       ref={ref => (props.dropdownRefs[props.index] = ref)}
     >
       <DropdownTrigger>
