@@ -1,6 +1,9 @@
 import Storage from "../helpers/storage";
 import fuzzysearch from "fuzzysearch";
 var tfun = require("transfun/transfun.js").tfun;
+if (!tfun) {
+  tfun = global.tfun;
+}
 import { extractValues, groupBy } from "../utils";
 import {
   getWeekGroupFromTimestamp,
