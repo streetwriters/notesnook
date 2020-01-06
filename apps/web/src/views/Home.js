@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Flex, Text, Box } from "rebass";
 import * as Icon from "react-feather";
 import { db, ev, sendNewNoteEvent } from "../common";
@@ -13,11 +13,11 @@ function Home() {
     groupCounts: [],
     groups: []
   });
-  const [pinnedItems, setPinnedItems] = useState([]);
+  //const [pinnedItems, setPinnedItems] = useState([]);
   useEffect(() => {
     function onRefreshNotes() {
-      setNotes(db.groupNotes(undefined, true));
-      setPinnedItems(db.getPinned());
+      let groups = db.groupNotes(undefined, true);
+      setNotes(groups);
     }
     onRefreshNotes();
     ev.addListener("refreshNotes", onRefreshNotes);
@@ -27,12 +27,9 @@ function Home() {
   }, []);
   return (
     <Flex flexDirection="column" flex="1 1 auto">
-      {notes.items.length > 0 || pinnedItems.length > 0 ? (
+      {notes.items.length > 0 ? (
         <Flex flexDirection="column" flex="1 1 auto">
           <Search placeholder="Search" />
-          {pinnedItems.map((item, index) => (
-            <Note index={index * notes.items.length} item={item} />
-          ))}
           <List
             style={{
               width: "100%",
@@ -41,14 +38,16 @@ function Home() {
               overflowX: "hidden"
             }}
             groupCounts={notes.groupCounts}
-            group={index => (
+            group={groupIndex => (
               <Box bg="background">
                 <Text variant="heading" color="primary" fontSize={15}>
-                  {notes.groups[index].title}
+                  {notes.groups[groupIndex].title}
                 </Text>
               </Box>
             )}
-            item={index => <Note index={index} item={notes.items[index]} />}
+            item={(index, groupIndex) => (
+              <Note index={index} item={notes.items[index]} />
+            )}
           />
           <Button
             Icon={Icon.Plus}
