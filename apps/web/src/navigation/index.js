@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 import Home from "../views/Home";
 import Notebooks from "../views/Notebooks";
+import Settings from "../views/Settings";
+import Trash from "../views/Trash";
 import { ThemeProvider } from "emotion-theming";
 import { Box, Flex, Heading } from "rebass";
 import * as Icon from "react-feather";
@@ -23,13 +25,13 @@ export const routes = {
   trash: {
     key: "trash",
     title: "Trash",
-    component: undefined,
+    component: Trash,
     icon: Icon.Trash
   },
   settings: {
     key: "settings",
     title: "Settings",
-    component: undefined,
+    component: Settings,
     icon: Icon.Settings
   }
 };
