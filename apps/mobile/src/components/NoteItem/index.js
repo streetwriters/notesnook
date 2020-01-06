@@ -1,8 +1,6 @@
 import React, {useState} from 'react';
 import {View, Text, TouchableOpacity, Dimensions} from 'react-native';
-
 import {COLOR_SCHEME, SIZE, br, ph, pv, WEIGHT} from '../../common/common';
-
 import Icon from 'react-native-vector-icons/Feather';
 import {
   timeSince,
@@ -188,19 +186,23 @@ const NoteItem = props => {
               }}>
               {!props.isTrash ? (
                 <>
-                  <Icon
-                    style={{width: 30}}
-                    name="lock"
-                    size={SIZE.xs}
-                    color={colors.icon}
-                  />
-                  <Icon
-                    style={{width: 30}}
-                    name="star"
-                    size={SIZE.xs}
-                    color={colors.icon}
-                  />
+                  {item.locked ? (
+                    <Icon
+                      style={{width: 30}}
+                      name="lock"
+                      size={SIZE.xs}
+                      color={colors.icon}
+                    />
+                  ) : null}
 
+                  {item.favorite ? (
+                    <Icon
+                      style={{width: 30}}
+                      name="star"
+                      size={SIZE.xs}
+                      color={colors.icon}
+                    />
+                  ) : null}
                   <Text
                     style={{
                       color: colors.icon,
@@ -208,7 +210,7 @@ const NoteItem = props => {
                       textAlignVertical: 'center',
                       fontFamily: WEIGHT.regular,
                     }}>
-                    {timeSince(item.dateCreated) + '  '}
+                    {timeSince(item.dateCreated)}
                   </Text>
                 </>
               ) : null}
@@ -342,7 +344,6 @@ const NoteItem = props => {
                   hideMenu();
                   NavigationService.push('Folders', {
                     note: item,
-
                     title: 'Choose Notebook',
                     isMove: true,
                     hideMore: true,

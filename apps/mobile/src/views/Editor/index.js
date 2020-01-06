@@ -64,13 +64,14 @@ const Editor = ({navigation}) => {
     }
   };
 
-  const saveNote = async (noteProps = {}, lockNote = false) => {
+  const saveNote = async (noteProps = {}, lockNote = true) => {
     if (!content) {
       content = {
         text: '',
         delta: null,
       };
     }
+    console.log(content.text, timestamp, title);
 
     timestamp = await db.addNote({
       tags: noteProps.tags,
@@ -85,9 +86,8 @@ const Editor = ({navigation}) => {
       },
       dateCreated: timestamp,
     });
-
+    console.log(db.getNote(timestamp));
     if (lockNote && noteProps.locked) {
-      console.log(noteProps, timestamp);
       db.lockNote(timestamp, 'password');
     }
   };
@@ -96,7 +96,6 @@ const Editor = ({navigation}) => {
     post(JSON.stringify(colors));
     if (navigation.state.params && navigation.state.params.note) {
       note = navigation.state.params.note;
-
       updateEditor();
     }
   };
@@ -119,7 +118,6 @@ const Editor = ({navigation}) => {
       timestamp = note.dateCreated;
       content = note.content;
     }, 200);
-    console.log(note);
   };
 
   const onTitleTextChange = value => {
@@ -242,11 +240,13 @@ const Editor = ({navigation}) => {
             }}
             onMessage={evt => {
               if (evt.nativeEvent.data !== '') {
+                clearTimeout(timer);
                 timer = null;
                 onChange(evt.nativeEvent.data);
                 timer = setTimeout(() => {
                   saveNote(noteProps, true);
-                }, 2000);
+                  console.log('saved');
+                }, 1000);
               }
             }}
           />
@@ -265,26 +265,12 @@ const Editor = ({navigation}) => {
     return () => {
       handleBack.remove();
       handleBack = null;
-    };
-  }, []);
-
-  useEffect(() => {
-    console.log('hello');
-    updateInterval = setInterval(async function() {
-      await saveNote(noteProps);
-    }, 2000);
-
-    return () => {
-      saveNote(noteProps, true);
-      clearInterval(updateInterval);
-      updateInterval = null;
-      console.log('yeah');
       title = null;
       content = null;
       timer = null;
       timestamp = null;
     };
-  }, [noteProps]);
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -320,8 +306,10 @@ const Editor = ({navigation}) => {
             setDialog(false);
           }}
           positivePress={() => {
-            navigation.goBack();
-            setDialog(false);
+            setTimeout(() => {
+              navigation.goBack();
+              setDialog(false);
+            }, 1000);
           }}
         />
         {_renderEditor()}
@@ -338,8 +326,6 @@ const Editor = ({navigation}) => {
           noteProps={noteProps}
           updateProps={props => {
             setNoteProps(props);
-
-            console.log(props, noteProps);
           }}
           close={() => {
             setTimeout(() => {

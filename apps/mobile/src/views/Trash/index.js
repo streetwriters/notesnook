@@ -33,6 +33,7 @@ export const Trash = ({navigation}) => {
 
       <FlatList
         numColumns={1}
+        keyExtractor={item => item.dateCreated.toString()}
         style={{
           width: '100%',
           alignSelf: 'center',

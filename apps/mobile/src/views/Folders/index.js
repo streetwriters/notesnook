@@ -517,7 +517,6 @@ export const Folders = ({navigation}) => {
             width: '90%',
             marginHorizontal: '5%',
             paddingHorizontal: ph,
-
             paddingVertical: pv + 5,
             flexDirection: 'row',
             justifyContent: 'flex-start',
@@ -529,10 +528,10 @@ export const Folders = ({navigation}) => {
           <Text
             style={{
               fontSize: SIZE.md,
-              fontFamily: WEIGHT.semibold,
+              fontFamily: WEIGHT.regular,
               color: 'white',
             }}>
-            {'  '} Create a new notebook
+            {'  '}Create a new notebook
           </Text>
         </TouchableOpacity>
       </KeyboardAvoidingView>
