@@ -219,6 +219,7 @@ class Database {
     );
     if (perm) {
       this.notes[noteId].locked = false;
+      this.notes[noteId].content = JSON.parse(decrypted);
       await this.storage.write(KEYS.notes, this.notes);
     }
     return { ...this.notes[noteId], content: JSON.parse(decrypted) };
