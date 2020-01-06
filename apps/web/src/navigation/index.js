@@ -22,7 +22,7 @@ export const routes = {
     component: Notebooks,
     icon: Icon.Book
   },
-  favorite: {
+  favorites: {
     key: "favorites",
     title: "Favorites",
     component: undefined,
