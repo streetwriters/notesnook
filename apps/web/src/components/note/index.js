@@ -10,7 +10,7 @@ import { navigate, routes } from "../../navigation";
 const dropdownRefs = [];
 const menuItems = note => [
   {
-    title: note.notebook.notebook ? "Move" : "Add to notebook",
+    title: note.notebook.notebook ? "Move" : "Add to",
     onClick: () => {
       navigate(routes.notebooks.key, undefined, {
         intent: "moveNote",
