@@ -415,7 +415,7 @@ async function deleteItems(items, key) {
     if (!item) continue;
     if (this[key].hasOwnProperty(item.dateCreated)) {
       //delete note from the notebook too.
-      if (item.type === "note") {
+      if (item.type === "note" && item.notebook.hasOwnProperty("topic")) {
         if (
           !(await this.deleteNoteFromTopic(
             item.notebook.notebook,
