@@ -36,7 +36,7 @@ const NavMenuItem = props => {
     </Button>
   );
 };
-
+var startX, startWidth;
 function App() {
   const [selectedIndex, setSelectedIndex] = useState(1);
   return (
@@ -81,6 +81,27 @@ function App() {
             px={2}
             py={2}
             width={["100%", "40%", "15%"]}
+            //style={{ width: "362px" }}
+          />
+          <Box
+            className="resize-handle"
+            bg="border"
+            sx={{
+              width: 5,
+              opacity: 0,
+              cursor: "col-resize"
+            }}
+            draggable={true}
+            onDragStart={e => {
+              startX = e.clientX;
+              let view = document.querySelector(".navigationView");
+              console.log(view);
+              startWidth = view.clientWidth;
+            }}
+            onDrag={e => {
+              let view = document.querySelector(".navigationView");
+              view.style.width = `${startWidth + e.clientX - startX}px`;
+            }}
           />
           <Editor />
           <Flex
