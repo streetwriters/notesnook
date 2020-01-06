@@ -9,7 +9,6 @@ import {
 } from 'react-native';
 import {SIZE, ph, pv, opacity, WEIGHT} from '../../common/common';
 import Icon from 'react-native-vector-icons/Feather';
-
 import {getElevation, ToastEvent} from '../../utils/utils';
 import {FlatList, TextInput} from 'react-native-gesture-handler';
 import {db, DDS} from '../../../App';
@@ -28,9 +27,14 @@ export const AddNotebookDialog = ({visible, close, toEdit = null}) => {
   let currentSelectedInput = null;
   let timestamp = null;
   let description = 'my first notebook';
-  const onSubmit = (text, index, willFocus = true) => {
+  let backPressCount = 0;
+
+  const onSubmit = (text, index, willFocus = false) => {
+    console.log('here');
     let prevTopics = topics;
     prevTopics[index] = text;
+    prevIndex = index;
+    prevItem = text;
 
     if (
       prevTopics.length === index + 1 &&
@@ -41,24 +45,22 @@ export const AddNotebookDialog = ({visible, close, toEdit = null}) => {
     }
 
     let nextTopics = [...prevTopics];
-
     setTopics(nextTopics);
-
     currentSelectedInput = null;
-
-    //if (!willFocus) return;
     if (!refs[index + 1]) {
       setTimeout(() => {
         if (!refs[index + 1]) return;
-
         refs[index + 1].focus();
-      }, 400);
+      }, 300);
     } else {
       setTimeout(() => {
         refs[index + 1].focus();
-      }, 400);
+      }, 300);
     }
   };
+
+  const onBlur = (text, index) => {};
+
   const onFocus = index => {
     currentSelectedInput = index;
 
@@ -73,7 +75,6 @@ export const AddNotebookDialog = ({visible, close, toEdit = null}) => {
       prevItem = null;
 
       let nextTopics = [...prevTopics];
-
       setTopics(nextTopics);
     }
   };
@@ -86,12 +87,9 @@ export const AddNotebookDialog = ({visible, close, toEdit = null}) => {
     let prevTopics = topics;
 
     if (prevTopics.length === 1) return;
-
     refs = [];
     prevTopics.splice(index, 1);
-
     let nextTopics = [...prevTopics];
-
     setTopics(nextTopics);
   };
 
@@ -116,6 +114,24 @@ export const AddNotebookDialog = ({visible, close, toEdit = null}) => {
     close(true);
   };
 
+  onKeyPress = (event, index, text) => {
+    if (event.nativeEvent.key === 'Backspace') {
+      if (backPressCount === 0 && (!text || text.length == 0)) {
+        backPressCount = 1;
+
+        return;
+      }
+
+      if (backPressCount === 1 && (!text || text.length == 0)) {
+        backPressCount = 0;
+        if (!refs[index] == 0) {
+          refs[index - 1].focus();
+        }
+        onDelete(index);
+      }
+    }
+  };
+
   return (
     <Modal
       visible={visible}
@@ -123,6 +139,7 @@ export const AddNotebookDialog = ({visible, close, toEdit = null}) => {
       animated
       animationType="fade"
       onShow={() => {
+        refs = [];
         if (toEdit !== null) {
           let topicsList = [];
           toEdit.topics.forEach(item => {
@@ -154,7 +171,6 @@ export const AddNotebookDialog = ({visible, close, toEdit = null}) => {
             ...getElevation(5),
             width: DDS.isTab ? '50%' : '80%',
             maxHeight: 350,
-
             borderRadius: 5,
             backgroundColor: colors.bg,
             paddingHorizontal: ph,
@@ -228,6 +244,8 @@ export const AddNotebookDialog = ({visible, close, toEdit = null}) => {
                 onChange={onChange}
                 onFocus={onFocus}
                 onDelete={onDelete}
+                onKeyPress={onKeyPress}
+                onBlur={onBlur}
               />
             )}
           />
@@ -269,12 +287,10 @@ export const AddNotebookDialog = ({visible, close, toEdit = null}) => {
               activeOpacity={opacity}
               onPress={() => {
                 setTopics(['']);
-
                 refs = [];
                 prevIndex = null;
                 prevItem = null;
                 currentSelectedInput = null;
-
                 close();
               }}
               style={{
@@ -311,6 +327,8 @@ const TopicItem = ({
   onChange,
   colors,
   toEdit,
+  onKeyPress,
+  onBlur,
 }) => {
   const [focus, setFocus] = useState(true);
   const topicRef = ref => (refs[index] = ref);
@@ -332,19 +350,24 @@ const TopicItem = ({
       <TextInput
         ref={topicRef}
         onFocus={() => {
+          text = item;
+
           onFocus(index);
           setFocus(true);
         }}
         onBlur={() => {
-          onSubmit(text, index, false);
+          onBlur(text, index);
           setFocus(false);
         }}
         onChangeText={value => {
           onChange(value, index);
           text = value;
         }}
-        onSubmit={() => onSubmit(text, index, true)}
+        onSubmitEditing={() => {
+          onSubmit(text, index, true);
+        }}
         blurOnSubmit
+        onKeyPress={event => onKeyPress(event, index, text)}
         style={{
           padding: pv - 5,
           paddingHorizontal: 0,

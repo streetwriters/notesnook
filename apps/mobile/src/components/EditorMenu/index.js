@@ -26,7 +26,7 @@ import {useAppContext} from '../../provider/useAppContext';
 import {VaultDialog} from '../VaultDialog';
 
 let tagsInputRef;
-
+let tagsList;
 export const EditorMenu = ({
   close = () => {},
   hide,
@@ -375,6 +375,7 @@ export const EditorMenu = ({
             </TouchableOpacity>
 
             <ScrollView
+              ref={ref => (tagsList = ref)}
               contentContainerStyle={{
                 flexDirection: 'row',
                 flexWrap: 'wrap',
@@ -490,7 +491,6 @@ export const EditorMenu = ({
             let props = {...noteProps};
             props.locked = locked;
             updateProps(props);
-
             setVaultDialog(false);
             setUnlock(false);
           }}

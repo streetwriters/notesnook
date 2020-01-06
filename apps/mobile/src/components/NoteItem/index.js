@@ -1,5 +1,11 @@
 import React, {useState} from 'react';
-import {View, Text, TouchableOpacity, Dimensions} from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Dimensions,
+  ScrollView,
+} from 'react-native';
 import {COLOR_SCHEME, SIZE, br, ph, pv, WEIGHT} from '../../common/common';
 import Icon from 'react-native-vector-icons/Feather';
 import {
@@ -164,18 +170,17 @@ const NoteItem = props => {
               width: '100%',
             }}>
             <Text
-              numberOfLines={props.numColumns === 2 ? 3 : null}
               style={{
                 fontSize: SIZE.xs + 1,
-                lineHeight: SIZE.sm + 2,
                 color: colors.pri,
                 fontFamily: WEIGHT.regular,
                 width: '100%',
                 maxWidth: '100%',
                 paddingRight: ph,
-                height: props.numColumns === 2 ? SIZE.sm * 3.5 : null,
               }}>
-              {item.headline}
+              {item.headline[item.headline.length - 1] === '\n'
+                ? item.headline.slice(0, item.headline.length - 1)
+                : item.headline}
             </Text>
 
             <View
@@ -183,12 +188,33 @@ const NoteItem = props => {
                 flexDirection: 'row',
                 justifyContent: 'flex-start',
                 alignItems: 'center',
+                width: '100%',
+                marginTop: 10,
               }}>
               {!props.isTrash ? (
                 <>
+                  <View
+                    style={{
+                      marginRight: 10,
+                      flexDirection: 'row',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    {['red', 'green'].map(item => (
+                      <View
+                        style={{
+                          width: SIZE.xs,
+                          height: SIZE.xs,
+                          borderRadius: 100,
+                          backgroundColor: item,
+                          marginRight: -5.5,
+                        }}></View>
+                    ))}
+                  </View>
+
                   {item.locked ? (
                     <Icon
-                      style={{width: 30}}
+                      style={{marginLeft: 10}}
                       name="lock"
                       size={SIZE.xs}
                       color={colors.icon}
@@ -197,7 +223,7 @@ const NoteItem = props => {
 
                   {item.favorite ? (
                     <Icon
-                      style={{width: 30}}
+                      style={{marginLeft: 10}}
                       name="star"
                       size={SIZE.xs}
                       color={colors.icon}
@@ -209,6 +235,7 @@ const NoteItem = props => {
                       fontSize: SIZE.xs - 1,
                       textAlignVertical: 'center',
                       fontFamily: WEIGHT.regular,
+                      marginLeft: 10,
                     }}>
                     {timeSince(item.dateCreated)}
                   </Text>
