@@ -8,10 +8,10 @@ import Menu from "../menu";
 const ListItem = props => (
   <Flex
     onClick={e => {
+      e.stopPropagation();
       if (props.onClick) {
         props.onClick();
       }
-      e.stopPropagation();
     }}
     alignItems="center"
     justifyContent="space-between"
@@ -24,8 +24,8 @@ const ListItem = props => (
       marginTop: props.pinned ? 4 : 0,
       borderBottom: "1px solid",
       borderBottomColor: "navbg",
-      cursor: "default",
-      ...ButtonPressedStyle
+      cursor: "default"
+      //TODO add onpressed reaction
     }}
   >
     {props.pinned && (
@@ -81,7 +81,7 @@ const ListItem = props => (
       </Text>
     </Box>
     <Dropdown
-      style={{ zIndex: 999 }}
+      style={{ zIndex: 1 }}
       ref={ref => (props.dropdownRefs[props.index] = ref)}
     >
       <DropdownTrigger>
@@ -91,7 +91,7 @@ const ListItem = props => (
           style={{ marginRight: -5 }}
         />
       </DropdownTrigger>
-      <DropdownContent style={{ zIndex: 999, marginLeft: -110 }}>
+      <DropdownContent style={{ zIndex: 2, marginLeft: -110 }}>
         <Menu
           dropdownRef={props.dropdownRefs[props.index]}
           menuItems={props.menuItems}

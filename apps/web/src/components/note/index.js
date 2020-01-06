@@ -42,13 +42,15 @@ const menuItems = note => [
     color: "red",
     onClick: () => {
       ev.emit("onClearNote", note.dateCreated);
-      db.deleteNotes([note]).then(
-        //TODO implement undo
-        () => {
-          showSnack("Note deleted!", Icon.Check);
-          ev.emit("refreshNotes");
-        }
-      );
+      db.deleteNotes([note])
+        .then(
+          //TODO implement undo
+          () => {
+            showSnack("Note deleted!", Icon.Check);
+            ev.emit("refreshNotes");
+          }
+        )
+        .catch(console.log);
     }
   }
 ];
