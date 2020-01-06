@@ -84,8 +84,6 @@ function App() {
             }}
             flexDirection="column"
             flex="1 1 auto"
-            px={2}
-            py={2}
             //style={{ width: "362px" }}
           />
           <Box

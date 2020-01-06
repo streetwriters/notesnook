@@ -6,8 +6,6 @@
  * Licensed under the MIT license.
  */
 (function() {
-  "use strict";
-
   var chars =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
