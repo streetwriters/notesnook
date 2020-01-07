@@ -12,6 +12,7 @@ const menuItems = item => [
         let itemType = item.type[0] + item.type.substring(1);
         showSnack(itemType + " Unfavorited!", Icon.Check);
         ev.emit(`refreshFavorites`);
+        //added favorite and deleted testeding
       })
   },
   {
