@@ -8,6 +8,7 @@ import { routes, navigate } from "./navigation";
 import CheckBox from "./components/checkbox";
 import * as Icon from "react-feather";
 import "./app.css";
+import Properties from "./views/Properties";
 
 const NavMenuItem = props => {
   useEffect(() => {
@@ -117,7 +118,8 @@ function App() {
             }}
           />
           <Editor />
-          <Flex
+          <Properties />
+          {/* <Flex
             sx={{ borderLeft: "1px solid", borderColor: "border" }}
             flexDirection="column"
             bg="#1790F307"
@@ -166,7 +168,7 @@ function App() {
                 </Box>
               ))}
             </Flex>
-          </Flex>
+          </Flex> */}
         </Flex>
         <Box id="dialogContainer" />
         <Box id="snackbarContainer" />
