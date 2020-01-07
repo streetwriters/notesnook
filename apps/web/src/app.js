@@ -8,6 +8,7 @@ import theme from "./theme";
 import { routes, navigate } from "./navigation";
 import CheckBox from "./components/checkbox";
 import * as Icon from "react-feather";
+import './App.css';
 
 const NavMenuItem = props => {
   useEffect(() => {
@@ -17,6 +18,7 @@ const NavMenuItem = props => {
   }, [props.item.key, props.selected]);
   return (
     <Button
+      className='unselectable'
       onClick={props.onSelected}
       variant="nav"
       sx={{
