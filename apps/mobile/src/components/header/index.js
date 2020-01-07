@@ -119,7 +119,7 @@ export const Header = ({
               width: 60,
               paddingRight: 0,
             }}>
-            <Icon name={'search'} size={SIZE.xl} color={colors.pri} />
+            <Icon name={'search'} size={SIZE.xl} color={colors.icon} />
           </TouchableOpacity>
         </Animatable.View>
         {verticalMenu ? (
@@ -145,7 +145,7 @@ export const Header = ({
               }}
               name="arrow-down"
               size={SIZE.lg}
-              color={colors.pri}
+              color={colors.icon}
             />
             <Icon
               style={{
@@ -161,7 +161,7 @@ export const Header = ({
               }}
               name="arrow-up"
               size={SIZE.lg}
-              color={colors.pri}
+              color={colors.icon}
             />
           </TouchableOpacity>
         ) : null}

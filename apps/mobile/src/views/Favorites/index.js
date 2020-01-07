@@ -12,7 +12,6 @@ import {useAppContext} from '../../provider/useAppContext';
 import * as Animatable from 'react-native-animatable';
 import {Search} from '../../components/SearchInput';
 import {db} from '../../../App';
-
 import {SIZE, WEIGHT} from '../../common/common';
 import NoteItem from '../../components/NoteItem';
 import {NotebookItem} from '../../components/NotebookItem';
