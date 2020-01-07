@@ -34,17 +34,11 @@ const menuItems = item => [
         "Are you sure you want to delete this note? It will be moved to trash and permanently deleted after 7 days."
       ).then(res => {
         if (res) {
-          item.type === "note"
-            ? db.deleteNotes([item]).then(() => {
-                let itemType = item.type[0] + item.type.substring(1);
-                showSnack(itemType + " Deleted!", Icon.Trash);
-                ev.emit(`refreshFavorites`);
-              })
-            : db.deleteNotebooks([item]).then(() => {
-                let itemType = item.type[0] + item.type.substring(1);
-                showSnack(itemType + " Deleted!", Icon.Trash);
-                ev.emit(`refreshFavorites`);
-              });
+          let itemType = item.type[0] + item.type.substring(1);
+          db["delete" + itemType]([item]).then(() => {
+            showSnack(itemType + " Deleted!", Icon.Trash);
+            ev.emit(`refreshFavorites`);
+          });
         }
       });
     }
