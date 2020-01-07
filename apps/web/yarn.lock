@@ -6990,8 +6990,8 @@ normalize-url@^3.0.0, normalize-url@^3.0.1:
   integrity sha512-U+JJi7duF1o+u2pynbp2zXDW2/PADgC30f0GsHZtRh+HOcXHnw137TrNlyxxRvWW5fjKd3bcLHPxofWuCjaeZg==
 
 "notes-core@https://github.com/thecodrr/notes-core.git":
-  version "0.2.0"
-  resolved "https://github.com/thecodrr/notes-core.git#481daf066cafac5c371f609ccff3db44ff6d3e48"
+  version "0.3.0"
+  resolved "https://github.com/thecodrr/notes-core.git#a0e77f9539b7574cb375ae401859c5d60a86b34b"
   dependencies:
     fuzzysearch "^1.0.3"
     transfun "^1.0.2"
