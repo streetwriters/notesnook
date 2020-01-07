@@ -169,6 +169,7 @@ function App() {
             </Flex>
           </Flex>
         </Flex>
+        <Box id="dialogContainer" />
         <Box id="snackbarContainer" />
       </Flex>
     </ThemeProvider>

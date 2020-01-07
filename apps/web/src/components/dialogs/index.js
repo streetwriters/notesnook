@@ -1,14 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import ReactDOM from "react-dom";
 import { Flex, Box, Text, Button as RebassButton } from "rebass";
 import { Input, Checkbox, Label } from "@rebass/forms";
 import * as Icon from "react-feather";
 import theme from "../../theme";
 import Modal from "react-modal";
+import { ThemeProvider } from "emotion-theming";
 
 const Dialog = props => {
+  const [open, setOpen] = useState(false);
+  Dialog.close = () => setOpen(false);
+  useEffect(() => {
+    setOpen(props.open);
+  }, [props.open]);
   return (
     <Modal
-      isOpen={props.open}
+      isOpen={open}
       style={{
         content: {
           top: "50%",
@@ -55,16 +62,23 @@ const Dialog = props => {
           </Text>
         </Flex>
         {props.content}
-        <Flex flexDirection="row" justifyContent="center" alignItems="center">
+        <Flex
+          flexDirection="row"
+          my={1}
+          justifyContent="center"
+          alignItems="center"
+        >
           <RebassButton
             variant="primary"
             mx={1}
+            width={"25%"}
             onClick={props.positiveButton.click}
           >
             {props.positiveButton.text || "OK"}
           </RebassButton>
           <RebassButton
             variant="secondary"
+            width={"25%"}
             onClick={props.negativeButton.click}
           >
             {props.negativeButton.text || "Cancel"}
@@ -178,15 +192,15 @@ export const CreateNotebookDialog = props => {
   );
 };
 
-export const ConfirmationDialog = props => {
-  return (
+const ConfirmationDialog = props => (
+  <ThemeProvider theme={theme}>
     <Dialog
-      open={props.open}
+      open={true}
       title={props.title}
       icon={props.icon}
       content={
         <Box my={1}>
-          <Text>{props.description}</Text>
+          <Text>{props.message}</Text>
         </Box>
       }
       positiveButton={{
@@ -195,5 +209,27 @@ export const ConfirmationDialog = props => {
       }}
       negativeButton={{ text: "No", click: props.onNo }}
     />
-  );
+  </ThemeProvider>
+);
+
+export const ask = (icon, title, message) => {
+  const root = document.querySelector("dialogContainer");
+  if (root) {
+    return new Promise((resolve, _) => {
+      ReactDOM.render(
+        <ConfirmationDialog
+          title={title}
+          message={message}
+          icon={icon}
+          onNo={() => {
+            Dialog.close();
+            resolve(false);
+          }}
+          onYes={() => resolve(true)}
+        />,
+        root
+      );
+    });
+  }
+  return Promise.reject("No element with id 'dialogContainer'");
 };

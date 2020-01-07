@@ -10,7 +10,7 @@ import Notebook from "../components/notebook";
 import Topic from "../components/topic";
 import Note from "../components/note";
 import { routes, navigationEvents, goBack as p_goBack } from "../navigation";
-import { CreateNotebookDialog } from "../components/dialogs";
+import { CreateNotebookDialog, ask } from "../components/dialogs";
 
 const history = [{}];
 const Notebooks = props => {
@@ -23,9 +23,11 @@ const Notebooks = props => {
       setNotebooks(db.getNotebooks());
     }
     onRefresh();
-    navigationEvents.onWillNavigateAway = routeName => {
-      if (routeName !== "notebooks" && intent === "moveNote") {
-        return window.confirm(
+    navigationEvents.onWillNavigateAway = async routeName => {
+      if (intent === "moveNote") {
+        return await ask(
+          Icon.Move,
+          "Move",
           "Are you sure you want to navigate away? Your note selection will be lost."
         );
       }
