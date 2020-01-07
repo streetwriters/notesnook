@@ -34,7 +34,7 @@ const menuItems = item => [
         "Are you sure you want to delete this note? It will be moved to trash and permanently deleted after 7 days."
       ).then(res => {
         if (res) {
-          item.type == "note"
+          item.type === "note"
             ? db.deleteNotes([item]).then(() => {
                 let itemType = item.type[0] + item.type.substring(1);
                 showSnack(itemType + " Deleted!", Icon.Trash);
