@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Box, Flex, Text } from "rebass";
 import Button from "../button";
-import { db, ev } from "../common";
+import { ev } from "../../common";
 import ListItem from "../list-item";
 import TimeAgo from "timeago-react";
 import Search from "../search";
@@ -68,7 +68,7 @@ function ListView({
               );
             }}
           />
-          {button && (
+          {callToAction && (
             <Button Icon={icon} content={callToAction} onClick={onClick} />
           )}
         </Flex>

@@ -1,7 +1,7 @@
 import React from "react";
 import { db } from "../common";
 import * as Icon from "react-feather";
-import ListItem from "../components/listview";
+import ListView from "../components/listview";
 
 const dropdownRefs = [];
 const menuItems = [
@@ -14,7 +14,7 @@ const menuItems = [
 
 function Trash() {
   return (
-    <ListItem
+    <ListView
       type="Trash"
       getItems={db.getTrash}
       menu={{ menuItems, dropdownRefs }}
