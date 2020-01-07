@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { Flex, Text, Box } from "rebass";
 import * as Icon from "react-feather";
 import { db, ev, sendNewNoteEvent } from "../common";
@@ -39,7 +39,7 @@ function Home() {
             }}
             groupCounts={notes.groupCounts}
             group={groupIndex =>
-              notes.groups[groupIndex].title == "Pinned" ? (
+              notes.groups[groupIndex].title === "Pinned" ? (
                 <Box px={3} bg="background" py={1} />
               ) : (
                 <Box px={3} bg="background">

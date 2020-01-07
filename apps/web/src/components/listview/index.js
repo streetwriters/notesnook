@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Box, Flex, Text } from "rebass";
+import { Flex, Text } from "rebass";
 import Button from "../button";
 import { ev } from "../../common";
 import ListItem from "../list-item";
@@ -20,7 +20,7 @@ function ListView({ type, getItems, menu, button }) {
     return () => {
       ev.removeListener(`refresh${type}`, onRefreshItems);
     };
-  }, []);
+  }, [getItems, type]);
 
   return (
     <Flex flexDirection="column" flex="1 1 auto">

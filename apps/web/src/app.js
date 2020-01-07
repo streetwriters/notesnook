@@ -14,7 +14,7 @@ const NavMenuItem = props => {
     if (props.selected) {
       navigate(props.item.key);
     }
-  }, []);
+  }, [props.item.key, props.selected]);
   return (
     <Button
       onClick={props.onSelected}

@@ -1,7 +1,6 @@
 import React from "react";
 import { Flex, Box, Text } from "rebass";
 import * as Icon from "react-feather";
-import { ButtonPressedStyle } from "../../theme";
 import Dropdown, { DropdownTrigger, DropdownContent } from "../dropdown";
 import Menu from "../menu";
 

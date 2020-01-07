@@ -3,7 +3,7 @@ import { Flex, Box, Text, Button as RebassButton } from "rebass";
 import { Input, Checkbox, Label } from "@rebass/forms";
 import Button from "../components/button";
 import * as Icon from "react-feather";
-import theme, { DIALOG_SHADOW } from "../theme";
+import theme from "../theme";
 import Search from "../components/search";
 import Modal from "react-modal";
 import { db, ev } from "../common";
@@ -23,11 +23,10 @@ const Notebooks = props => {
   const [intent, setIntent] = useState(props.intent);
   useEffect(() => {
     function onRefresh() {
-      console.log("Refreshing notebooks");
       setNotebooks(db.getNotebooks());
     }
     onRefresh();
-    navigationEvents.onWillNavigateAway = (routeName, params) => {
+    navigationEvents.onWillNavigateAway = routeName => {
       if (routeName !== "notebooks" && intent === "moveNote") {
         return window.confirm(
           "Are you sure you want to navigate away? Your note selection will be lost."
@@ -38,9 +37,10 @@ const Notebooks = props => {
     ev.addListener("refreshNotebooks", onRefresh);
     return () => {
       ev.removeListener("refreshNotebooks", onRefresh);
+      navigationEvents.onWillNavigateAway = undefined;
       Notebooks.onRefresh = undefined;
     };
-  }, []);
+  }, [intent]);
   function navigate(item, save = true, title = undefined) {
     //transform notes in a topic to real notes
     if (item.notes) {

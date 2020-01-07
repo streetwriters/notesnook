@@ -1,6 +1,5 @@
 import React from "react";
 import { Flex, Box, Text } from "rebass";
-import { SHADOW } from "../../theme";
 
 function Menu(props) {
   return (
