@@ -1,30 +1,25 @@
 import React from "react";
 import { db } from "../common";
-import * as Icon from "react-feather";
 import ListItem from "../components/listview";
 
 const dropdownRefs = [];
 const menuItems = [
-  { title: "Restore" },
+  { title: "Unfavorite" },
   {
     title: "Delete",
     color: "red"
   }
 ];
 
-function Trash() {
+function Favorites() {
   return (
     <ListItem
-      type="Trash"
-      getItems={db.getTrash}
+      type="Favorites"
+      getItems={db.getFavorites}
       menu={{ menuItems, dropdownRefs }}
-      button={{
-        callToAction: "Clear Trash",
-        icon: Icon.Trash2,
-        onClick: () => db.clearTrash()
-      }}
+      button={undefined}
     />
   );
 }
 
-export default Trash;
+export default Favorites;
