@@ -37,9 +37,10 @@ const ListItem = props => (
           height: 35,
           position: "absolute",
           top: -15,
-          left: 0
+          left: 0,
+          boxShadow: "2px 1px 3px #00000066"
         }}
-        mx={1}
+        mx={3}
         alignItems="center"
         justifyContent="center"
       >
@@ -47,9 +48,8 @@ const ListItem = props => (
           bg="white"
           sx={{
             borderRadius: 5,
-            width: 3,
-            height: 3,
-            boxShadow: "1px 1px 4px 0px #000000bd" //TODO
+            width: 5,
+            height: 5
           }}
         />
       </Flex>
