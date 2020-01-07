@@ -32,6 +32,7 @@ let titleRef;
 let EditorWebView;
 let timer = null;
 let note = {};
+
 const Editor = ({navigation}) => {
   // Global State
   const {colors} = useAppContext();
@@ -52,7 +53,7 @@ const Editor = ({navigation}) => {
   // VARIABLES
   let updateInterval = null;
   let lastTextChange = 0;
-
+  let menuTimer = null;
   // FUNCTIONS
 
   const post = value => EditorWebView.postMessage(value);
@@ -73,11 +74,7 @@ const Editor = ({navigation}) => {
     console.log(content.text, timestamp, title);
 
     timestamp = await db.addNote({
-      tags: noteProps.tags,
-      colors: noteProps.colors,
-      pinned: noteProps.pinned,
-      favorite: noteProps.favorite,
-      locked: noteProps.locked,
+      ...noteProps,
       title,
       content: {
         text: content.text,
@@ -355,7 +352,9 @@ const Editor = ({navigation}) => {
           if (noteProps.locked) {
             db.lockNote(timestamp, 'password');
           }
-          setTimeout(() => {
+          clearTimeout(menuTimer);
+          menuTimer = null;
+          menuTimer = setTimeout(() => {
             setOpen(args);
           }, 500);
         }}

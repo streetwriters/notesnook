@@ -195,7 +195,7 @@ export const NotesList = ({
             marginTop:
               Platform.OS == 'ios'
                 ? notes[0]
-                  ? 175
+                  ? 135
                   : 135 - 60
                 : notes[0]
                 ? 175
@@ -235,84 +235,3 @@ export const NotesList = ({
     />
   );
 };
-
-/* 
- <FlatList
-      data={notes}
-      keyExtractor={(item, index) => item.dateCreated.toString()}
-      ListFooterComponent={
-        <View
-          style={{
-            height: 150,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}>
-          <Text
-            style={{
-              color: colors.navbg,
-              fontSize: SIZE.sm,
-              fontFamily: WEIGHT.regular,
-            }}>
-            - End -
-          </Text>
-        </View>
-      }
-      onScroll={event => {
-        y = event.nativeEvent.contentOffset.y;
-        onScroll(y);
-      }}
-      ListHeaderComponent={
-        <View
-          style={{
-            marginTop: 185,
-          }}></View>
-      }
-      numColumns={numColumns}
-      key={numColumns}
-      columnWrapperStyle={
-        numColumns === 1
-          ? null
-          : {
-              width:
-                notes.length === 1
-                  ? DDS.isTab
-                    ? '95%'
-                    : '90%'
-                  : DDS.isTab
-                  ? '45%'
-                  : '42.5%',
-            }
-      }
-      contentContainerStyle={{
-        width:
-          numColumns === 2
-            ? DDS.isTab
-              ? '100%'
-              : null
-            : DDS.isTab
-            ? '95%'
-            : '90%',
-        alignItems: numColumns === 2 ? 'flex-start' : null,
-        alignSelf: 'center',
-      }}
-      ListFooterComponent={
-        <View
-          style={{
-            height: 150,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}>
-          <Text
-            style={{
-              color: colors.navbg,
-              fontSize: SIZE.sm,
-              fontFamily: WEIGHT.regular,
-            }}>
-            - End -
-          </Text>
-        </View>
-      }
-      renderItem={({item, index}) => (
-        <NoteItem item={item} numColumns={numColumns} index={index} />
-      )}
-    /> */

@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Platform,
   FlatList,
+  StatusBar,
 } from 'react-native';
 import NavigationService from '../../services/NavigationService';
 import {
@@ -39,7 +40,7 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
           height: 2,
           width: '100%',
           marginBottom: 5,
-          marginTop: Platform.OS == 'ios' ? 0 : 45,
+          marginTop: Platform.OS == 'ios' ? 0 : StatusBar.currentHeight - 10,
         }}
       />
 

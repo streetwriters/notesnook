@@ -37,6 +37,10 @@ const App = () => {
   const [isOpen, setOpen] = useState(false);
   const [disableGestures, setDisableGesture] = useState(false);
   const [isIntialized, setIsInitialized] = useState(false);
+  const [overlay, setOverlay] = useState(false);
+
+  // Variables
+  let timer = null;
 
   // Effects
   useEffect(() => {
@@ -151,7 +155,9 @@ const App = () => {
               })
             }
             onChange={args => {
-              setTimeout(() => {
+              clearTimeout(timer);
+              timer = null;
+              timer = setTimeout(() => {
                 setOpen(args);
               }, 300);
             }}

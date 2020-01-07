@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {View, TouchableOpacity, Platform, Text} from 'react-native';
+import {View, TouchableOpacity, Platform, Text, StatusBar} from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import {SIZE, WEIGHT} from '../../common/common';
 import {h, SideMenuEvent, getElevation} from '../../utils/utils';
@@ -27,7 +27,7 @@ export const Header = ({
         flexDirection: 'row',
         zIndex: 10,
         height: 50,
-        marginTop: Platform.OS === 'ios' ? 0 : 45,
+        marginTop: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight,
         marginBottom: 10,
         justifyContent: 'space-between',
         alignItems: 'center',
