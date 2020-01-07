@@ -213,19 +213,22 @@ const ConfirmationDialog = props => (
 );
 
 export const ask = (icon, title, message) => {
-  const root = document.querySelector("dialogContainer");
+  const root = document.getElementById("dialogContainer");
+  const perform = (result, resolve) => {
+    Dialog.close();
+    resolve(result);
+    ReactDOM.unmountComponentAtNode(root);
+  };
   if (root) {
     return new Promise((resolve, _) => {
       ReactDOM.render(
         <ConfirmationDialog
+          id="confirmationDialog"
           title={title}
           message={message}
           icon={icon}
-          onNo={() => {
-            Dialog.close();
-            resolve(false);
-          }}
-          onYes={() => resolve(true)}
+          onNo={() => perform(false, resolve)}
+          onYes={() => perform(true, resolve)}
         />,
         root
       );

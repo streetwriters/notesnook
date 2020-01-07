@@ -6,6 +6,7 @@ import { db, ev } from "../../common";
 import { showSnack } from "../snackbar";
 import ListItem from "../list-item";
 import { navigate, routes } from "../../navigation";
+import { ask } from "../dialogs";
 
 const dropdownRefs = [];
 const menuItems = note => [
@@ -41,16 +42,24 @@ const menuItems = note => [
     title: "Delete",
     color: "red",
     onClick: () => {
-      ev.emit("onClearNote", note.dateCreated);
-      db.deleteNotes([note])
-        .then(
-          //TODO implement undo
-          () => {
-            showSnack("Note deleted!", Icon.Check);
-            ev.emit("refreshNotes");
-          }
-        )
-        .catch(console.log);
+      ask(
+        Icon.Trash2,
+        "Delete",
+        "Are you sure you want to delete this note? It will be moved to trash and permanently deleted after 7 days."
+      ).then(res => {
+        if (res) {
+          ev.emit("onClearNote", note.dateCreated);
+          db.deleteNotes([note])
+            .then(
+              //TODO implement undo
+              () => {
+                showSnack("Note deleted!", Icon.Check);
+                ev.emit("refreshNotes");
+              }
+            )
+            .catch(console.log);
+        }
+      });
     }
   }
 ];
