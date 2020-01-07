@@ -24,7 +24,7 @@ function Favorites() {
   return (
     <ListItem
       type="Favorites"
-      getItems={db.getFavorites}
+      getItems={db.getFavorites.bind(db)}
       menu={{ menuItems, dropdownRefs }}
       button={undefined}
     />

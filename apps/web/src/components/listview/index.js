@@ -8,12 +8,7 @@ import Search from "../search";
 import * as Icon from "react-feather";
 import { Virtuoso as List } from "react-virtuoso";
 
-function ListView({
-  type,
-  getItems,
-  menu: { menuItems, dropdownRefs },
-  button: { callToAction, icon, onClick }
-}) {
+function ListView({ type, getItems, menu, button }) {
   const [items, setItems] = useState([]);
 
   useEffect(() => {
@@ -62,14 +57,18 @@ function ListView({
                     </Flex>
                   }
                   menuData={item}
-                  menuItems={menuItems(item)}
-                  dropdownRefs={dropdownRefs}
+                  menuItems={menu.menuItems(item)}
+                  dropdownRefs={menu.dropdownRefs}
                 />
               );
             }}
           />
-          {callToAction && (
-            <Button Icon={icon} content={callToAction} onClick={onClick} />
+          {button && (
+            <Button
+              Icon={button.icon}
+              content={button.callToAction}
+              onClick={button.onClick}
+            />
           )}
         </Flex>
       ) : (
