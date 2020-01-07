@@ -1,10 +1,19 @@
 import React from "react";
-import { db } from "../common";
+import { db, ev } from "../common";
+import * as Icon from "react-feather";
 import ListItem from "../components/listview";
-
+import { showSnack } from "../components/snackbar";
 const dropdownRefs = [];
-const menuItems = [
-  { title: "Unfavorite" },
+const menuItems = item => [
+  {
+    title: "Unfavorite",
+    onClick: async () =>
+      db.favoriteItem(item.type, item.dateCreated).then(() => {
+        let itemType = item.type[0] + item.type.substring(1);
+        showSnack(itemType + " favorited!", Icon.Check);
+        ev.emit(`refresh${itemType}s`);
+      })
+  },
   {
     title: "Delete",
     color: "red"

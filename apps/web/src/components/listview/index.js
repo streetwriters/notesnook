@@ -62,7 +62,7 @@ function ListView({
                     </Flex>
                   }
                   menuData={item}
-                  menuItems={menuItems}
+                  menuItems={menuItems(item)}
                   dropdownRefs={dropdownRefs}
                 />
               );
