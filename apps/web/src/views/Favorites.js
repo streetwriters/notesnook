@@ -16,7 +16,15 @@ const menuItems = item => [
   },
   {
     title: "Delete",
-    color: "red"
+    color: "red",
+    onClick: async () => {
+      item.type == "note"
+        ? db.deleteNotes([item])
+        : db.deleteNotebooks([item]).then(() => {
+            let itemType = item.type[0] + item.type.substring(1);
+            showSnack(itemType + " Deleted!", Icon.Trash);
+          });
+    }
   }
 ];
 
