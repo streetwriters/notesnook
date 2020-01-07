@@ -3,6 +3,7 @@ import { db, ev } from "../common";
 import * as Icon from "react-feather";
 import ListView from "../components/listview";
 import { ask } from "../components/dialogs";
+import { showSnack } from "../components/snackbar";
 
 const dropdownRefs = [];
 const menuItems = item => [

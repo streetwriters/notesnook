@@ -4,10 +4,9 @@ import Home from "../views/Home";
 import Notebooks from "../views/Notebooks";
 import Settings from "../views/Settings";
 import Trash from "../views/Trash";
-import { ThemeProvider } from "emotion-theming";
 import { Box, Flex, Heading } from "rebass";
 import * as Icon from "react-feather";
-import theme from "../theme";
+import { ThemeProvider } from "../utils/theme";
 import Favorites from "../views/Favorites";
 
 export const routes = {
@@ -104,7 +103,7 @@ function ThemedComponent(props) {
     setTitle(props.route.title);
   }, [props.route.title]);
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider>
       <Flex alignItems="center" px={3}>
         <Box
           onClick={backAction}

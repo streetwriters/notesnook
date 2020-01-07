@@ -79,7 +79,7 @@ function ListView({ type, getItems, menu, button }) {
           color="#9b9b9b"
           flexDirection="column"
         >
-          {type == "Favorites" ? (
+          {type === "Favorites" ? (
             <Icon.Star size={72} strokeWidth={1.5} />
           ) : (
             <Icon.Trash size={72} strokeWidth={1.5} />

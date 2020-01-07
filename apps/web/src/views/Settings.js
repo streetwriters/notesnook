@@ -3,10 +3,10 @@ import { Box, Button, Flex, Text } from "rebass";
 import * as Icon from "react-feather";
 import { Switch } from "@rebass/forms";
 import "../app.css";
+import { changeTheme, isDarkTheme } from "../utils/theme";
 
 function Settings() {
-  const [check, setCheck] = useState(false);
-
+  const [check, setCheck] = useState(isDarkTheme());
   return (
     <Flex flexDirection="column" flex="1 1 auto">
       <Flex flexDirection="column" flex="1 1 auto">
@@ -62,6 +62,7 @@ function Settings() {
                   className="unselectable"
                   onClick={() => {
                     setCheck(!check);
+                    changeTheme();
                   }}
                   checked={check}
                 />

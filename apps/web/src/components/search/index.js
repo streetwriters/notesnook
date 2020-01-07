@@ -2,7 +2,6 @@ import React from "react";
 import { Flex, Box } from "rebass";
 import { Input } from "@rebass/forms";
 import * as Icon from "react-feather";
-import theme from "../../theme";
 import "./search.css";
 const Search = props => (
   <Flex
@@ -27,7 +26,7 @@ const Search = props => (
         position: "absolute",
         right: 0,
         marginRight: 20,
-        color: theme.colors["hover"],
+        color: "hover",
         height: 24
       }}
     >

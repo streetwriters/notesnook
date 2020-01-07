@@ -8,6 +8,14 @@ body,
   overflow: hidden;
 }
 
+* {
+  -webkit-transition: background-color 300ms linear, border-color 300ms linear;
+  -moz-transition: background-color 300ms linear, border-color 300ms linear;
+  -o-transition: background-color 300ms linear, border-color 300ms linear;
+  -ms-transition: background-color 300ms linear, border-color 300ms linear;
+  transition: background-color 300ms linear, border-color 300ms linear;
+}
+
 body {
   font-family: "Noto Sans", sans-serif;
   font-weight: normal;

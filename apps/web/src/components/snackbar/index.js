@@ -1,8 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { Flex, Text } from "rebass";
-import { ThemeProvider } from "emotion-theming";
-import theme from "../../theme";
+import { ThemeProvider } from "../../utils/theme";
 
 export function showSnack(message, icon = undefined) {
   const root = document.getElementById("snackbarContainer");
@@ -24,7 +23,7 @@ export function showSnack(message, icon = undefined) {
 }
 
 const Snackbar = props => (
-  <ThemeProvider theme={theme}>
+  <ThemeProvider>
     <Flex
       id="snackbar"
       sx={{

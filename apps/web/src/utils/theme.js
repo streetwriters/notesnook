@@ -1,8 +1,8 @@
-export const ButtonPressedStyle = {
-  ":active": {
-    opacity: "0.8"
-  }
-};
+import React from "react";
+import { ThemeProvider as EmotionThemeProvider } from "emotion-theming";
+import { ev } from "../common";
+import { useEffect } from "react";
+
 const colorsLight = makeTheme({
   background: "white",
   accent: "white",
@@ -36,9 +36,9 @@ const shadowsLight = {
   4: "0 0 5px 0px #00000017"
 };
 
-export default {
+const theme = (colors, shadows) => ({
   breakpoints: ["480px", "834px", "1200px"],
-  colors: colorsLight,
+  colors: colors,
   space: [0, 5, 10, 12, 15],
   fontSizes: {
     heading: 36,
@@ -144,23 +144,23 @@ export default {
         outline: "none"
       }
     },
-    setting:{
-      bg:'transparent',
-      borderLeft:'0px Solid',
-      borderRight:'0px Solid',
-      borderTop:'0px Solid',
-      borderBottom:'1px Solid',
-      borderColor:'border',
-      color:'text',
-      textAlign:'left',
-      fontSize:'title',
-      fontFamily:'body',
-      py:'15px',
-      mx:'5px'
+    setting: {
+      bg: "transparent",
+      borderLeft: "0px Solid",
+      borderRight: "0px Solid",
+      borderTop: "0px Solid",
+      borderBottom: "1px Solid",
+      borderColor: "border",
+      color: "text",
+      textAlign: "left",
+      fontSize: "title",
+      fontFamily: "body",
+      py: "15px",
+      mx: "5px"
     }
   },
-  shadows: shadowsLight
-};
+  shadows: shadows
+});
 
 function makeTheme({
   background,
@@ -189,3 +189,45 @@ function makeTheme({
     overlay
   };
 }
+
+const getTheme = type =>
+  type === "dark"
+    ? theme(colorsDark, shadowsDark)
+    : theme(colorsLight, shadowsLight);
+
+var currentTheme = window.localStorage.getItem("theme") || "light";
+
+export const ThemeProvider = props => {
+  const [, updateState] = React.useState();
+  useEffect(() => {
+    function updater() {
+      updateState({});
+    }
+    ev.addListener("changeTheme", updater);
+    return () => {
+      ev.removeListener("changeTheme", updater);
+    };
+  }, []);
+  const theme = getTheme(currentTheme);
+  return (
+    <EmotionThemeProvider theme={theme}>
+      {props.children instanceof Function
+        ? props.children(theme)
+        : props.children}
+    </EmotionThemeProvider>
+  );
+};
+
+export const changeTheme = () => {
+  currentTheme = currentTheme === "dark" ? "light" : "dark";
+  window.localStorage.setItem("theme", currentTheme);
+  ev.emit("changeTheme");
+};
+
+export const isDarkTheme = () => currentTheme === "dark";
+
+export const ButtonPressedStyle = {
+  ":active": {
+    opacity: "0.8"
+  }
+};

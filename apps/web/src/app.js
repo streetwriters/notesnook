@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
 import "./app.css";
 import Editor from "./components/editor";
-import { ThemeProvider } from "emotion-theming";
 import { Flex, Box, Button, Text } from "rebass";
 import { Input } from "@rebass/forms";
-import theme from "./theme";
+import { ThemeProvider } from "./utils/theme";
 import { routes, navigate } from "./navigation";
 import CheckBox from "./components/checkbox";
 import * as Icon from "react-feather";
@@ -45,7 +44,7 @@ function getNavigationViewWidth() {
 function App() {
   const [selectedIndex, setSelectedIndex] = useState(1);
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider>
       <Flex
         bg="background"
         sx={{ color: "text" }}

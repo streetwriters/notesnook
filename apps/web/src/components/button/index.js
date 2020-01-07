@@ -1,7 +1,6 @@
 import React from "react";
 import { Flex, Text } from "rebass";
-import { ButtonPressedStyle } from "../../theme";
-
+import { ButtonPressedStyle } from "../../utils/theme";
 
 const Button = props => (
   <Flex

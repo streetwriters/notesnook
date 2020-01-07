@@ -3,9 +3,8 @@ import ReactDOM from "react-dom";
 import { Flex, Box, Text, Button as RebassButton } from "rebass";
 import { Input, Checkbox, Label } from "@rebass/forms";
 import * as Icon from "react-feather";
-import theme from "../../theme";
+import { ThemeProvider } from "../../utils/theme";
 import Modal from "react-modal";
-import { ThemeProvider } from "emotion-theming";
 
 const Dialog = props => {
   const [open, setOpen] = useState(false);
@@ -14,78 +13,82 @@ const Dialog = props => {
     setOpen(props.open);
   }, [props.open]);
   return (
-    <Modal
-      isOpen={open}
-      style={{
-        content: {
-          top: "50%",
-          left: "50%",
-          right: "auto",
-          bottom: "auto",
-          marginRight: "-50%",
-          transform: "translate(-50%, -50%)",
-          borderWidth: 0,
-          borderRadius: theme.radii["default"],
-          backgroundColor: theme.colors.background,
-          color: theme.colors.text,
-          boxShadow: theme.shadows["3"],
-          width: "20%",
-          paddingRight: 40,
-          paddingLeft: 40,
-          overflowY: "hidden"
-        },
-        overlay: {
-          background: theme.colors.overlay
-        }
-      }}
-    >
-      <Flex flexDirection="column">
-        <Flex
-          flexDirection="row"
-          alignItems="center"
-          alignSelf="center"
-          justifyContent="center"
-          color="primary"
-          py={2}
+    <ThemeProvider>
+      {theme => (
+        <Modal
+          isOpen={open}
+          style={{
+            content: {
+              top: "50%",
+              left: "50%",
+              right: "auto",
+              bottom: "auto",
+              marginRight: "-50%",
+              transform: "translate(-50%, -50%)",
+              borderWidth: 0,
+              borderRadius: theme.radii["default"],
+              backgroundColor: theme.colors.background,
+              color: theme.colors.text,
+              boxShadow: theme.shadows["3"],
+              width: "20%",
+              paddingRight: 40,
+              paddingLeft: 40,
+              overflowY: "hidden"
+            },
+            overlay: {
+              background: theme.colors.overlay
+            }
+          }}
         >
-          <Box height={42}>
-            <props.icon size={42} />
-          </Box>
-          <Text
-            mx={2}
-            as="span"
-            variant="title"
-            fontSize={28}
-            textAlign="center"
-          >
-            {props.title}
-          </Text>
-        </Flex>
-        {props.content}
-        <Flex
-          flexDirection="row"
-          my={1}
-          justifyContent="center"
-          alignItems="center"
-        >
-          <RebassButton
-            variant="primary"
-            mx={1}
-            width={"25%"}
-            onClick={props.positiveButton.click}
-          >
-            {props.positiveButton.text || "OK"}
-          </RebassButton>
-          <RebassButton
-            variant="secondary"
-            width={"25%"}
-            onClick={props.negativeButton.click}
-          >
-            {props.negativeButton.text || "Cancel"}
-          </RebassButton>
-        </Flex>
-      </Flex>
-    </Modal>
+          <Flex flexDirection="column">
+            <Flex
+              flexDirection="row"
+              alignItems="center"
+              alignSelf="center"
+              justifyContent="center"
+              color="primary"
+              py={2}
+            >
+              <Box height={42}>
+                <props.icon size={42} />
+              </Box>
+              <Text
+                mx={2}
+                as="span"
+                variant="title"
+                fontSize={28}
+                textAlign="center"
+              >
+                {props.title}
+              </Text>
+            </Flex>
+            {props.content}
+            <Flex
+              flexDirection="row"
+              my={1}
+              justifyContent="center"
+              alignItems="center"
+            >
+              <RebassButton
+                variant="primary"
+                mx={1}
+                width={"25%"}
+                onClick={props.positiveButton.click}
+              >
+                {props.positiveButton.text || "OK"}
+              </RebassButton>
+              <RebassButton
+                variant="secondary"
+                width={"25%"}
+                onClick={props.negativeButton.click}
+              >
+                {props.negativeButton.text || "Cancel"}
+              </RebassButton>
+            </Flex>
+          </Flex>
+        </Modal>
+      )}
+    </ThemeProvider>
   );
 };
 
@@ -193,23 +196,21 @@ export const CreateNotebookDialog = props => {
 };
 
 const ConfirmationDialog = props => (
-  <ThemeProvider theme={theme}>
-    <Dialog
-      open={true}
-      title={props.title}
-      icon={props.icon}
-      content={
-        <Box my={1}>
-          <Text>{props.message}</Text>
-        </Box>
-      }
-      positiveButton={{
-        text: "Yes",
-        click: props.onYes
-      }}
-      negativeButton={{ text: "No", click: props.onNo }}
-    />
-  </ThemeProvider>
+  <Dialog
+    open={true}
+    title={props.title}
+    icon={props.icon}
+    content={
+      <Box my={1}>
+        <Text>{props.message}</Text>
+      </Box>
+    }
+    positiveButton={{
+      text: "Yes",
+      click: props.onYes
+    }}
+    negativeButton={{ text: "No", click: props.onNo }}
+  />
 );
 
 export const ask = (icon, title, message) => {
