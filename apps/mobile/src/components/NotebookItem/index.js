@@ -283,7 +283,6 @@ export const NotebookItem = ({
                   }}
                   textStyle={{
                     color: colors.pri,
-
                     fontFamily: WEIGHT.regular,
                     fontSize: SIZE.sm,
                   }}>
@@ -320,23 +319,17 @@ export const NotebookItem = ({
                 </MenuItem>
 
                 <MenuItem
-                  textStyle={{
-                    color: colors.pri,
-
-                    fontFamily: WEIGHT.regular,
-                    fontSize: SIZE.sm,
-                  }}>
-                  Pin
-                </MenuItem>
-                <MenuItem
                   onPress={() => {
                     hideMenu();
+                    db.pinItem(item.type, item.dateCreated);
+                    refresh();
+
                     ToastEvent.show(
-                      'Note added to favorites.',
-                      'success',
+                      `Notebook ${item.pinned ? 'unpinned' : 'pinned'}`,
+                      item.pinned ? 'error' : 'success',
                       3000,
                       () => {},
-                      'Ok',
+                      '',
                     );
                   }}
                   textStyle={{
@@ -345,7 +338,31 @@ export const NotebookItem = ({
                     fontFamily: WEIGHT.regular,
                     fontSize: SIZE.sm,
                   }}>
-                  Favorite
+                  {item.pinned ? 'Unpin' : 'Pin'}
+                </MenuItem>
+                <MenuItem
+                  onPress={() => {
+                    hideMenu();
+                    db.favoriteItem(item.type, item.dateCreated);
+
+                    refresh();
+                    ToastEvent.show(
+                      `Notebook ${
+                        item.favorite ? 'removed' : 'added'
+                      } to favorites.`,
+                      item.favorite ? 'error' : 'success',
+                      3000,
+                      () => {},
+                      '',
+                    );
+                  }}
+                  textStyle={{
+                    color: colors.pri,
+
+                    fontFamily: WEIGHT.regular,
+                    fontSize: SIZE.sm,
+                  }}>
+                  {item.favorite ? 'Unfavorite' : 'Favorite'}
                 </MenuItem>
 
                 <MenuItem

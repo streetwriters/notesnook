@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import {COLOR_SCHEME, opacity, pv, br, SIZE, WEIGHT} from '../../common/common';
 import {Search} from '../../components/SearchInput';
-import {w, h, SideMenuEvent, getElevation} from '../../utils/utils';
+import {w, h, SideMenuEvent, getElevation, ToastEvent} from '../../utils/utils';
 import {Header} from '../../components/header';
 import {NotesList} from '../../components/NotesList';
 import {db} from '../../../App';
@@ -88,17 +88,18 @@ export const Home = ({navigation}) => {
   const onSubmitEditing = async () => {
     if (!text || text.length < 1) {
       setSearch(false);
-      if (allNotes) {
-        setNotes(allNotes);
-      } else {
-        fetchNotes();
-      }
+
+      fetchNotes();
     } else {
-      setSearch(true);
       setKeyword(text);
       searchResults = await db.searchNotes(text);
-      if (searchResults) {
-        setNotes(searchResults);
+      console.log(searchResults, 'hello');
+      if (searchResults && searchResults.length > 0) {
+        setNotes([...[]]);
+        setSearch(true);
+        setNotes([...searchResults]);
+      } else {
+        ToastEvent.show('No search results found', 'error', 3000, () => {}, '');
       }
     }
   };
@@ -106,11 +107,7 @@ export const Home = ({navigation}) => {
   const onBlur = () => {
     if (text && text.length < 2) {
       setSearch(false);
-      if (allNotes) {
-        setNotes(allNotes);
-      } else {
-        fetchNotes();
-      }
+      fetchNotes();
     }
   };
 
@@ -121,11 +118,8 @@ export const Home = ({navigation}) => {
   const clearSearch = () => {
     searchResults = null;
     setSearch(false);
-    if (allNotes) {
-      setNotes(allNotes);
-    } else {
-      fetchNotes();
-    }
+
+    fetchNotes();
   };
 
   // Render

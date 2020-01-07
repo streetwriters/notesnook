@@ -56,7 +56,7 @@ export const NotesList = ({
     setPinned([...pinnedItems]);
   }, [notes]);
 
-  return isGrouped ? (
+  return isGrouped && !isSearch ? (
     <SectionList
       sections={notes}
       keyExtractor={(item, index) => item.dateCreated.toString()}
@@ -352,7 +352,7 @@ export const NotesList = ({
   ) : (
     <FlatList
       data={notes}
-      keyExtractor={(item, index) => item.dateCreated.toString()}
+      //keyExtractor={(item, index) => item.dateCreated.toString()}
       ListFooterComponent={
         <View
           style={{
@@ -367,244 +367,6 @@ export const NotesList = ({
               fontFamily: WEIGHT.regular,
             }}>
             - End -
-          </Text>
-        </View>
-      }
-      ListEmptyComponent={
-        <View
-          style={{
-            height: '80%',
-            width: '100%',
-            alignItems: 'center',
-            alignSelf: 'center',
-            justifyContent: 'center',
-            opacity: 0.8,
-          }}>
-          <Animatable.View
-            animation={slideRight}
-            iterationCount="infinite"
-            duration={3000}
-            iterationDelay={0}
-            direction="alternate"
-            easing="ease-in"
-            useNativeDriver={true}
-            style={{
-              backgroundColor: colors.shade,
-              width: '50%',
-              padding: 5,
-              borderRadius: 5,
-              marginBottom: 10,
-            }}>
-            {isFavorites ? (
-              <Icon
-                name="star"
-                size={SIZE.xl}
-                color={colors.accent}
-                style={{
-                  position: 'absolute',
-                  right: 5,
-                  bottom: 0,
-                }}
-              />
-            ) : null}
-
-            <View
-              style={{
-                width: '90%',
-                height: 10,
-                borderRadius: 5,
-                backgroundColor: colors.accent,
-                marginBottom: 8,
-              }}
-            />
-            <View
-              style={{
-                width: '70%',
-                height: 10,
-                borderRadius: 5,
-                backgroundColor: colors.accent,
-                marginBottom: 8,
-              }}
-            />
-            <View
-              style={{
-                flexDirection: 'row',
-              }}>
-              <View
-                style={{
-                  width: '15%',
-                  height: 8,
-                  borderRadius: 5,
-                  backgroundColor: colors.icon,
-                  marginRight: '5%',
-                }}
-              />
-              <View
-                style={{
-                  width: '15%',
-                  height: 8,
-                  borderRadius: 5,
-                  backgroundColor: colors.icon,
-                }}
-              />
-            </View>
-          </Animatable.View>
-
-          <Animatable.View
-            animation={slideLeft}
-            iterationCount="infinite"
-            duration={3000}
-            iterationDelay={0}
-            direction="alternate"
-            easing="ease-in"
-            useNativeDriver={true}
-            style={{
-              backgroundColor: colors.shade,
-              width: '50%',
-              padding: 5,
-              borderRadius: 5,
-              marginBottom: 10,
-            }}>
-            {isFavorites ? (
-              <Icon
-                name="star"
-                size={SIZE.xl}
-                color={colors.accent}
-                style={{
-                  position: 'absolute',
-                  right: 5,
-                  bottom: 0,
-                }}
-              />
-            ) : null}
-
-            <View
-              style={{
-                width: '90%',
-                height: 10,
-                borderRadius: 5,
-                backgroundColor: colors.accent,
-                marginBottom: 8,
-              }}
-            />
-            <View
-              style={{
-                width: '70%',
-                height: 10,
-                borderRadius: 5,
-                backgroundColor: colors.accent,
-                marginBottom: 8,
-              }}
-            />
-            <View
-              style={{
-                flexDirection: 'row',
-              }}>
-              <View
-                style={{
-                  width: '15%',
-                  height: 8,
-                  borderRadius: 5,
-                  backgroundColor: colors.icon,
-                  marginRight: '5%',
-                }}
-              />
-              <View
-                style={{
-                  width: '15%',
-                  height: 8,
-                  borderRadius: 5,
-                  backgroundColor: colors.icon,
-                }}
-              />
-            </View>
-          </Animatable.View>
-          <Animatable.View
-            animation={slideRight}
-            iterationCount="infinite"
-            duration={3000}
-            iterationDelay={0}
-            direction="alternate"
-            easing="ease-in"
-            useNativeDriver={true}
-            style={{
-              backgroundColor: colors.shade,
-              width: '50%',
-              padding: 5,
-              borderRadius: 5,
-              marginBottom: 10,
-            }}>
-            {isFavorites ? (
-              <Icon
-                name="star"
-                size={SIZE.xl}
-                color={colors.accent}
-                style={{
-                  position: 'absolute',
-                  right: 5,
-                  bottom: 0,
-                }}
-              />
-            ) : null}
-
-            <View
-              style={{
-                width: '90%',
-                height: 10,
-                borderRadius: 5,
-                backgroundColor: colors.accent,
-                marginBottom: 8,
-              }}
-            />
-            <View
-              style={{
-                width: '70%',
-                height: 10,
-                borderRadius: 5,
-                backgroundColor: colors.accent,
-                marginBottom: 8,
-              }}
-            />
-            <View
-              style={{
-                flexDirection: 'row',
-              }}>
-              <View
-                style={{
-                  width: '15%',
-                  height: 8,
-                  borderRadius: 5,
-                  backgroundColor: colors.icon,
-                  marginRight: '5%',
-                }}
-              />
-              <View
-                style={{
-                  width: '15%',
-                  height: 8,
-                  borderRadius: 5,
-                  backgroundColor: colors.icon,
-                }}
-              />
-            </View>
-          </Animatable.View>
-
-          <Text
-            style={{
-              color: colors.pri,
-              fontSize: SIZE.md,
-              fontFamily: WEIGHT.regular,
-              marginTop: 20,
-            }}>
-            {emptyPlaceholderText}
-          </Text>
-          <Text
-            style={{
-              fontSize: SIZE.sm,
-              color: colors.icon,
-              marginTop: 20,
-            }}>
-            No Notes found
           </Text>
         </View>
       }
@@ -648,7 +410,12 @@ export const NotesList = ({
         </View>
       }
       renderItem={({item, index}) => (
-        <NoteItem item={item} numColumns={numColumns} index={index} />
+        <NoteItem
+          item={item}
+          refresh={() => refresh()}
+          numColumns={numColumns}
+          index={index}
+        />
       )}
     />
   );

@@ -1,5 +1,12 @@
 import React, {useEffect, useState} from 'react';
-import {Dimensions, KeyboardAvoidingView} from 'react-native';
+import {
+  Dimensions,
+  KeyboardAvoidingView,
+  View,
+  Text,
+  FlatList,
+  Platform,
+} from 'react-native';
 
 import {Header} from '../../components/header';
 import {AnimatedSafeAreaView} from '../Home';
@@ -7,7 +14,10 @@ import {useAppContext} from '../../provider/useAppContext';
 import * as Animatable from 'react-native-animatable';
 import {Search} from '../../components/SearchInput';
 import {db} from '../../../App';
-import {NotesList} from '../../components/NotesList';
+import Icon from 'react-native-vector-icons/Feather';
+import {SIZE, WEIGHT} from '../../common/common';
+import NoteItem from '../../components/NoteItem';
+import {NotebookItem} from '../../components/NotebookItem';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
@@ -36,6 +46,29 @@ export const Favorites = ({navigation}) => {
     let favs = db.getFavorites();
     if (!favs) return;
     setFavs([...favs]);
+  };
+
+  const slideRight = {
+    0: {
+      transform: [{translateX: -4}],
+    },
+    0.5: {
+      transform: [{translateX: 0}],
+    },
+    1: {
+      transform: [{translateX: 4}],
+    },
+  };
+  const slideLeft = {
+    0: {
+      transform: [{translateX: 4}],
+    },
+    0.5: {
+      transform: [{translateX: 0}],
+    },
+    1: {
+      transform: [{translateX: -4}],
+    },
   };
 
   // Effects
@@ -90,12 +123,114 @@ export const Favorites = ({navigation}) => {
           ) : null}
         </Animatable.View>
 
-        <NotesList
-          margin={margin}
-          refresh={() => {
-            fetchFavs();
+        <FlatList
+          //keyExtractor={item => item.dateCreated.toString()}
+          style={{
+            width: '100%',
+            alignSelf: 'center',
+            height: '100%',
           }}
-          onScroll={y => {
+          contentContainerStyle={{
+            height: '100%',
+          }}
+          ListHeaderComponent={
+            <View
+              style={{
+                marginTop:
+                  Platform.OS == 'ios'
+                    ? favs[0]
+                      ? 135
+                      : 135 - 60
+                    : favs[0]
+                    ? 175
+                    : 175 - 60,
+              }}></View>
+          }
+          ListEmptyComponent={
+            <View
+              style={{
+                height: '80%',
+                width: '100%',
+                alignItems: 'center',
+                alignSelf: 'center',
+                justifyContent: 'center',
+                opacity: 0.8,
+              }}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignSelf: 'center',
+                  justifyContent: 'space-around',
+                }}>
+                <Animatable.View
+                  animation={slideLeft}
+                  iterationCount="infinite"
+                  duration={3000}
+                  iterationDelay={0}
+                  direction="alternate"
+                  easing="ease-in"
+                  useNativeDriver={true}
+                  style={{
+                    padding: 5,
+                    borderRadius: 5,
+                    marginBottom: 10,
+                  }}>
+                  <Icon name="star" size={SIZE.xl} color="orange" />
+                </Animatable.View>
+                <Animatable.View
+                  animation={slideLeft}
+                  iterationCount="infinite"
+                  duration={3000}
+                  iterationDelay={0}
+                  direction="alternate"
+                  easing="ease-in"
+                  useNativeDriver={true}
+                  style={{
+                    padding: 5,
+                    borderRadius: 5,
+                    marginBottom: 10,
+                    marginTop: -30,
+                  }}>
+                  <Icon name="star" size={SIZE.xxl} color="orange" />
+                </Animatable.View>
+                <Animatable.View
+                  animation={slideLeft}
+                  iterationCount="infinite"
+                  duration={3000}
+                  iterationDelay={0}
+                  direction="alternate"
+                  easing="ease-in"
+                  useNativeDriver={true}
+                  style={{
+                    padding: 5,
+                    borderRadius: 5,
+                    marginBottom: 10,
+                  }}>
+                  <Icon name="star" size={SIZE.xl} color="orange" />
+                </Animatable.View>
+              </View>
+              <Text
+                style={{
+                  color: colors.pri,
+                  fontSize: SIZE.md,
+                  fontFamily: WEIGHT.regular,
+                  marginTop: 20,
+                }}>
+                Favorite notes & notebooks appear here.
+              </Text>
+              <Text
+                style={{
+                  fontSize: SIZE.sm,
+                  color: colors.icon,
+                  marginTop: 20,
+                }}>
+                Favorites are empty.
+              </Text>
+            </View>
+          }
+          data={favs}
+          onScroll={event => {
+            let y = event.nativeEvent.contentOffset.y;
             if (buttonHide) return;
             if (y < 30) setHideHeader(false);
             if (y > offsetY) {
@@ -111,11 +246,25 @@ export const Favorites = ({navigation}) => {
             }
             offsetY = y;
           }}
-          isFavorites={true}
-          isSearch={false}
-          emptyPlaceholderText="Your favorite notes will appear here"
-          notes={favs}
-          keyword={''}
+          renderItem={({item, index}) =>
+            item.type === 'note' ? (
+              <NoteItem
+                item={item}
+                refresh={() => {
+                  fetchFavs();
+                }}
+                index={index}
+              />
+            ) : (
+              <NotebookItem
+                item={item}
+                refresh={() => {
+                  fetchFavs();
+                }}
+                index={index}
+              />
+            )
+          }
         />
       </KeyboardAvoidingView>
     </AnimatedSafeAreaView>

@@ -26,29 +26,6 @@ export const Trash = ({navigation}) => {
     setTrash([...allTrash]);
   }, []);
 
-  const slideRight = {
-    0: {
-      transform: [{translateX: -4}],
-    },
-    0.5: {
-      transform: [{translateX: 0}],
-    },
-    1: {
-      transform: [{translateX: 4}],
-    },
-  };
-  const slideLeft = {
-    0: {
-      transform: [{translateX: 4}],
-    },
-    0.5: {
-      transform: [{translateX: 0}],
-    },
-    1: {
-      transform: [{translateX: -4}],
-    },
-  };
-
   const rotate = {
     0: {
       transform: [{rotateZ: '0deg'}, {translateX: 0}, {translateY: 0}],

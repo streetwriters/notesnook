@@ -101,9 +101,8 @@ export const AddNotebookDialog = ({visible, close, toEdit = null}) => {
       title,
       description,
       topics,
-      timestamp: toEdit ? toEdit.dateCreated : null,
+      timestamp: toEdit && toEdit.dateCreated ? toEdit.dateCreated : null,
     });
-    console.log(title, description, topics, toEdit.dateCreated);
 
     ToastEvent.show('New notebook added', 'success', 3000, () => {}, '');
     setTopics(['']);
