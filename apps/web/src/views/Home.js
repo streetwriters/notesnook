@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Flex, Text, Box } from "rebass";
 import * as Icon from "react-feather";
 import { db, ev, sendNewNoteEvent } from "../common";
-import { GroupedVirtuoso as List } from "react-virtuoso";
+import { GroupedVirtuoso as GroupList, Virtuoso as List } from "react-virtuoso";
 import Button from "../components/button";
 import Search from "../components/search";
 import Note from "../components/note";
@@ -13,6 +13,7 @@ function Home() {
     groupCounts: [],
     groups: []
   });
+
   //const [pinnedItems, setPinnedItems] = useState([]);
   useEffect(() => {
     function onRefreshNotes() {
@@ -27,32 +28,59 @@ function Home() {
   }, []);
   return (
     <Flex flexDirection="column" flex="1 1 auto">
-      {notes.items.length > 0 ? (
+      {(notes.items && notes.items.length > 0) ||
+      (!notes.items && notes.length > 0) ? (
         <Flex flexDirection="column" flex="1 1 auto">
-          <Search placeholder="Search" />
-          <List
-            style={{
-              width: "100%",
-              flex: "1 1 auto",
-              height: "auto",
-              overflowX: "hidden"
+          <Search
+            placeholder="Search"
+            onChange={() => {
+              if (document.getElementById("searchInput").value === "") {
+                let groups = db.groupNotes(undefined, true);
+                setNotes(groups);
+              } else {
+                let groups = db.searchNotes(
+                  document.getElementById("searchInput").value
+                );
+                setNotes(groups);
+              }
             }}
-            groupCounts={notes.groupCounts}
-            group={groupIndex =>
-              notes.groups[groupIndex].title === "Pinned" ? (
-                <Box px={3} bg="background" py={1} />
-              ) : (
-                <Box px={3} bg="background">
-                  <Text variant="heading" color="primary" fontSize={15}>
-                    {notes.groups[groupIndex].title}
-                  </Text>
-                </Box>
-              )
-            }
-            item={(index, groupIndex) => (
-              <Note index={index} item={notes.items[index]} />
-            )}
           />
+          {!notes.items ? (
+            <List
+              style={{
+                width: "100%",
+                flex: "1 1 auto",
+                height: "auto",
+                overflowX: "hidden"
+              }}
+              totalCount={notes.length}
+              item={index => <Note index={index} item={notes[index]} />}
+            ></List>
+          ) : (
+            <GroupList
+              style={{
+                width: "100%",
+                flex: "1 1 auto",
+                height: "auto",
+                overflowX: "hidden"
+              }}
+              groupCounts={notes.groupCounts}
+              group={groupIndex =>
+                notes.groups[groupIndex].title === "Pinned" ? (
+                  <Box px={3} bg="background" py={1} />
+                ) : (
+                  <Box px={3} bg="background">
+                    <Text variant="heading" color="primary" fontSize={15}>
+                      {notes.groups[groupIndex].title}
+                    </Text>
+                  </Box>
+                )
+              }
+              item={(index, groupIndex) => (
+                <Note index={index} item={notes.items[index]} />
+              )}
+            />
+          )}
           <Button
             Icon={Icon.Plus}
             content="Make a new note"

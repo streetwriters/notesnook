@@ -18,6 +18,7 @@ const Search = props => (
       id="searchInput"
       variant="search"
       placeholder={props.placeholder}
+      onChange={props.onChange}
       my={2}
     />
     <Box
