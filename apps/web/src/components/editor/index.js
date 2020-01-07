@@ -154,7 +154,12 @@ const Editor = props => {
         fontWeight="heading"
         fontSize="heading"
         display={["none", "flex", "flex"]}
-        sx={{ borderWidth: 0, ":focus": { outline: "none" } }}
+        sx={{
+          borderWidth: 0,
+          ":focus": { outline: "none" },
+          paddingTop: 0,
+          paddingBottom: 3
+        }}
         px={2}
         onChange={e => (title = e.target.value)}
       />
