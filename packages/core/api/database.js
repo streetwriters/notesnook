@@ -56,7 +56,10 @@ class Database {
   }
 
   getFavorites() {
-    return tfun.filter(".favorite == true")(this.getNotes());
+    return tfun.filter(".favorite == true")([
+      ...this.getNotes(),
+      ...this.getNotebooks()
+    ]);
   }
 
   getPinned() {
