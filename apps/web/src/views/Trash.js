@@ -4,7 +4,7 @@ import * as Icon from "react-feather";
 import ListView from "../components/listview";
 
 const dropdownRefs = [];
-const menuItems = [
+const menuItems = item => [
   { title: "Restore" },
   {
     title: "Delete",
