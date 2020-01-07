@@ -1,14 +1,45 @@
 import React from "react";
-import { db } from "../common";
+import { db, ev } from "../common";
 import * as Icon from "react-feather";
 import ListView from "../components/listview";
+import { ask } from "../components/dialogs";
 
 const dropdownRefs = [];
 const menuItems = item => [
-  { title: "Restore" },
+  {
+    title: "Restore",
+    onClick: async () => {
+      ask(
+        Icon.Star,
+        "Restore",
+        `Are you sure you want to restore this item to ${item.type}?`
+      ).then(res => {
+        if (res) {
+          let itemType = item.type[0] + item.type.substring(1);
+          showSnack(itemType + " Restored", Icon.Check);
+          db.restoreItem(item.dateCreated);
+          ev.emit(`refreshTrash`);
+        }
+      });
+    }
+  },
   {
     title: "Delete",
-    color: "red"
+    color: "red",
+    onClick: async () => {
+      ask(
+        Icon.Star,
+        "Delete",
+        `Are you sure you want to permanently delete this item?`
+      ).then(res => {
+        if (res) {
+          let itemType = item.type[0] + item.type.substring(1);
+          showSnack(itemType + "Permanently Deleted!", Icon.Trash2);
+          //place permanent delete here
+          ev.emit(`refreshTrash`);
+        }
+      });
+    }
   }
 ];
 
