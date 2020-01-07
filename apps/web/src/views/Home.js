@@ -7,6 +7,22 @@ import Button from "../components/button";
 import Search from "../components/search";
 import Note from "../components/note";
 
+function SearchBox(props) {
+  return (
+    <Search
+      placeholder="Search"
+      onChange={e => {
+        let data =
+          e.target.value.length > 2
+            ? db.searchNotes(e.target.value)
+            : db.groupNotes(undefined, true);
+        data = !data ? [] : data;
+        props.setNotes(data);
+      }}
+    />
+  );
+}
+
 function Home() {
   const [notes, setNotes] = useState({
     items: [],
@@ -28,24 +44,10 @@ function Home() {
   }, []);
   return (
     <Flex flexDirection="column" flex="1 1 auto">
-      {(notes.items && notes.items.length > 0) ||
-      (!notes.items && notes.length > 0) ? (
+      {notes && (notes.length || (notes.items && notes.items.length)) ? (
         <Flex flexDirection="column" flex="1 1 auto">
-          <Search
-            placeholder="Search"
-            onChange={() => {
-              if (document.getElementById("searchInput").value === "") {
-                let groups = db.groupNotes(undefined, true);
-                setNotes(groups);
-              } else {
-                let groups = db.searchNotes(
-                  document.getElementById("searchInput").value
-                );
-                setNotes(groups);
-              }
-            }}
-          />
-          {!notes.items ? (
+          <SearchBox setNotes={setNotes} />
+          {notes.items === undefined ? (
             <List
               style={{
                 width: "100%",
@@ -88,22 +90,35 @@ function Home() {
           />
         </Flex>
       ) : (
-        <Flex
-          flex="1 1 auto"
-          alignItems="center"
-          justifyContent="center"
-          color="#9b9b9b"
-          flexDirection="column"
-        >
-          <Icon.Edit size={72} strokeWidth={1.5} />
-          <Text variant="title">You have no notes</Text>
-          <Button
-            Icon={Icon.Edit2}
-            onClick={sendNewNoteEvent}
-            content="Let's make some"
-            style={{ marginTop: 2, textAlign: "center" }}
-            width={"auto"}
-          />
+        <Flex flexDirection="column" flex="1 1 auto">
+          {notes.items === undefined && <SearchBox setNotes={setNotes} />}
+          <Flex
+            flex="1 1 auto"
+            alignItems="center"
+            justifyContent="center"
+            color="#9b9b9b"
+            flexDirection="column"
+          >
+            {notes.items === undefined ? (
+              <Icon.Search size={72} strokeWidth={1.5} />
+            ) : (
+              <Icon.Edit size={72} strokeWidth={1.5} />
+            )}
+            <Text variant="title">
+              {notes.items === undefined
+                ? "We found nothing for that query."
+                : "You have no notes"}
+            </Text>
+            {notes.items !== undefined && (
+              <Button
+                Icon={Icon.Edit2}
+                onClick={sendNewNoteEvent}
+                content="Let's make some"
+                style={{ marginTop: 2, textAlign: "center" }}
+                width={"auto"}
+              />
+            )}
+          </Flex>
         </Flex>
       )}
     </Flex>
