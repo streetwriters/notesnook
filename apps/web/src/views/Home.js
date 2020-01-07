@@ -42,6 +42,7 @@ function Home() {
       ev.removeListener("refreshNotes", onRefreshNotes);
     };
   }, []);
+  //TODO remove all these ternary operators (they are absolutely horrid).
   return (
     <Flex flexDirection="column" flex="1 1 auto">
       {notes && (notes.length || (notes.items && notes.items.length)) ? (
