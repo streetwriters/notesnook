@@ -9,9 +9,9 @@ const menuItems = item => [
     title: "Unfavorite",
     onClick: async () =>
       db.favoriteItem(item.type, item.dateCreated).then(() => {
-        let itemType = item.type[0].toUpperCase() + item.type.substring(1);
-        showSnack(itemType + " favorited!", Icon.Check);
-        ev.emit(`refresh${itemType}s`);
+        let itemType = item.type[0] + item.type.substring(1);
+        showSnack(itemType + " Unfavorited!", Icon.Check);
+        ev.emit(`refreshFavorites`);
       })
   },
   {

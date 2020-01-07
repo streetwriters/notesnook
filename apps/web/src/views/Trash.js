@@ -16,7 +16,7 @@ function Trash() {
   return (
     <ListView
       type="Trash"
-      getItems={db.getTrash}
+      getItems={db.getTrash.bind(db)}
       menu={{ menuItems, dropdownRefs }}
       button={{
         callToAction: "Clear Trash",
