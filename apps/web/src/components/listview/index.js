@@ -79,7 +79,11 @@ function ListView({ type, getItems, menu, button }) {
           color="#9b9b9b"
           flexDirection="column"
         >
-          <Icon.Star size={72} strokeWidth={1.5} />
+          {type == "Favorites" ? (
+            <Icon.Star size={72} strokeWidth={1.5} />
+          ) : (
+            <Icon.Trash size={72} strokeWidth={1.5} />
+          )}
           <Text variant="title">You have no {type}.</Text>
         </Flex>
       )}
