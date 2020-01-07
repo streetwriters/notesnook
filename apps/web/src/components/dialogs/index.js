@@ -177,3 +177,23 @@ export const CreateNotebookDialog = props => {
     />
   );
 };
+
+export const ConfirmationDialog = props => {
+  return (
+    <Dialog
+      open={props.open}
+      title={props.title}
+      icon={props.icon}
+      content={
+        <Box my={1}>
+          <Text>{props.description}</Text>
+        </Box>
+      }
+      positiveButton={{
+        text: "Yes",
+        click: props.onYes
+      }}
+      negativeButton={{ text: "No", click: props.onNo }}
+    />
+  );
+};
