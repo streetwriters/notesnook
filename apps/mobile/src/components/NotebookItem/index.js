@@ -2,15 +2,7 @@ import React, {useState} from 'react';
 import {View, Text, TouchableOpacity} from 'react-native';
 import NavigationService from '../../services/NavigationService';
 import Menu, {MenuItem, MenuDivider} from 'react-native-material-menu';
-import {
-  COLOR_SCHEME,
-  SIZE,
-  ph,
-  pv,
-  opacity,
-  WEIGHT,
-  br,
-} from '../../common/common';
+import {SIZE, ph, pv, opacity, WEIGHT, br} from '../../common/common';
 import Icon from 'react-native-vector-icons/Feather';
 import {w, ToastEvent} from '../../utils/utils';
 import {db, DDS} from '../../../App';
@@ -18,6 +10,7 @@ import {Dialog} from '../Dialog';
 import {AddTopicDialog} from '../AddTopicDialog';
 import {useAppContext} from '../../provider/useAppContext';
 import {AddNotebookDialog} from '../AddNotebookDialog';
+
 export const NotebookItem = ({
   item,
   index,
@@ -59,8 +52,7 @@ export const NotebookItem = ({
       : NavigationService.navigate('Notebook', {
           notebook: item,
           note: noteToMove,
-
-          title: hideMore ? 'Choose topic' : item.title,
+          title: hideMore ? 'Choose a topic' : item.title,
           isMove: isMove ? true : false,
           hideMore: hideMore ? true : false,
         });
@@ -88,7 +80,7 @@ export const NotebookItem = ({
     <View
       style={{
         marginHorizontal: '5%',
-        paddingVertical: pv,
+        paddingVertical: isTopic ? pv / 2 : pv,
         borderRadius: br,
         justifyContent: 'flex-start',
         alignItems: 'center',
@@ -130,7 +122,11 @@ export const NotebookItem = ({
           alignItems: 'center',
           width: '100%',
         }}>
-        <TouchableOpacity onPress={navigate}>
+        <TouchableOpacity
+          style={{
+            width: '75%',
+          }}
+          onPress={navigate}>
           <Text
             numberOfLines={1}
             style={{
@@ -252,6 +248,20 @@ export const NotebookItem = ({
               </Text>
             </View>
           )}
+          {isTopic ? (
+            <Text
+              style={{
+                color: colors.icon,
+                fontSize: SIZE.xxs,
+                textAlignVertical: 'center',
+                fontFamily: WEIGHT.regular,
+                marginTop: 5,
+              }}>
+              {item.totalNotes.length == 1
+                ? item.totalNotes + ' notes'
+                : item.totalNotes + ' note'}
+            </Text>
+          ) : null}
         </TouchableOpacity>
 
         {hideMore ? null : (
@@ -371,8 +381,7 @@ export const NotebookItem = ({
                     hideMenu();
                   }}
                   textStyle={{
-                    color: colors.pri,
-
+                    color: colors.errorText,
                     fontFamily: WEIGHT.regular,
                     fontSize: SIZE.sm,
                   }}>
@@ -402,7 +411,13 @@ export const NotebookItem = ({
               }
 
               NavigationService.navigate('Home');
-              ToastEvent.show(`Note moved to ${item.title}`, 'success', 3000);
+              ToastEvent.show(
+                `Note moved to ${item.title}`,
+                'success',
+                3000,
+                () => {},
+                '',
+              );
             }}
             style={{
               borderWidth: 1,
@@ -410,7 +425,7 @@ export const NotebookItem = ({
               width: '20%',
               paddingHorizontal: ph - 5,
               borderColor: colors.nav,
-              paddingVertical: pv,
+              paddingVertical: pv - 5,
               flexDirection: 'row',
               justifyContent: 'center',
               alignItems: 'center',
@@ -418,8 +433,8 @@ export const NotebookItem = ({
             }}>
             <Text
               style={{
-                fontSize: SIZE.xs,
-                fontFamily: WEIGHT.semibold,
+                fontSize: SIZE.sm,
+                fontFamily: WEIGHT.regular,
                 color: 'white',
               }}>
               Move

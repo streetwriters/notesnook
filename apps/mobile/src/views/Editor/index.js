@@ -13,7 +13,6 @@ import {
 import {SIZE, WEIGHT} from '../../common/common';
 import WebView from 'react-native-webview';
 import Icon from 'react-native-vector-icons/Feather';
-
 import {db} from '../../../App';
 import {SideMenuEvent} from '../../utils/utils';
 import {Dialog} from '../../components/Dialog';

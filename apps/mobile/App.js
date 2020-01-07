@@ -26,7 +26,6 @@ import {
 } from './src/common/common';
 
 export const DDS = new DeviceDetectionService();
-
 export const db = new Storage(StorageInterface);
 
 const App = () => {

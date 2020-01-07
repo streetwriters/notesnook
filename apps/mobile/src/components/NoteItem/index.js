@@ -396,9 +396,10 @@ const NoteItem = props => {
                   hideMenu();
                   NavigationService.push('Folders', {
                     note: item,
-                    title: 'Choose Notebook',
+                    title: 'Choose a notebook',
                     isMove: true,
                     hideMore: true,
+                    canGoBack: true,
                   });
                 }}
                 textStyle={{
@@ -430,7 +431,7 @@ const NoteItem = props => {
                   hideMenu();
                 }}
                 textStyle={{
-                  color: colors.pri,
+                  color: colors.errorText,
                   fontFamily: WEIGHT.regular,
                   fontSize: SIZE.sm,
                 }}>

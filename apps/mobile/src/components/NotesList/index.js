@@ -13,6 +13,8 @@ import {DDS, db} from '../../../App';
 import * as Animatable from 'react-native-animatable';
 import {useAppContext} from '../../provider/useAppContext';
 import Icon from 'react-native-vector-icons/Feather';
+import {NotesPlaceHolder} from '../ListPlaceholders';
+import {slideRight, slideLeft} from '../../utils/animations';
 export const NotesList = ({
   keyword = null,
   notes,
@@ -27,28 +29,6 @@ export const NotesList = ({
   const {colors} = useAppContext();
   const [numColumns, setNumColumns] = useState(1);
   const [pinned, setPinned] = useState([]);
-  const slideRight = {
-    0: {
-      transform: [{translateX: -4}],
-    },
-    0.5: {
-      transform: [{translateX: 0}],
-    },
-    1: {
-      transform: [{translateX: 4}],
-    },
-  };
-  const slideLeft = {
-    0: {
-      transform: [{translateX: 4}],
-    },
-    0.5: {
-      transform: [{translateX: 0}],
-    },
-    1: {
-      transform: [{translateX: -4}],
-    },
-  };
 
   useEffect(() => {
     let pinnedItems = db.getPinned();
@@ -79,203 +59,38 @@ export const NotesList = ({
         onScroll(y);
       }}
       ListEmptyComponent={
-        <View
-          style={{
-            height: '80%',
-            width: '100%',
-            alignItems: 'center',
-            alignSelf: 'center',
-            justifyContent: 'center',
-            opacity: 0.8,
-          }}>
-          <Animatable.View
-            animation={slideRight}
-            iterationCount="infinite"
-            duration={3000}
-            iterationDelay={0}
-            direction="alternate"
-            easing="ease-in"
-            useNativeDriver={true}
+        pinned && pinned.length > 0 ? null : (
+          <View
             style={{
-              backgroundColor: colors.shade,
-              width: '50%',
-              padding: 5,
-              borderRadius: 5,
-              marginBottom: 10,
+              height: '80%',
+              width: '100%',
+              alignItems: 'center',
+              alignSelf: 'center',
+              justifyContent: 'center',
+              opacity: 0.8,
             }}>
-            <View
+            <NotesPlaceHolder animation={slideRight} colors={colors} />
+            <NotesPlaceHolder animation={slideLeft} colors={colors} />
+            <NotesPlaceHolder animation={slideRight} colors={colors} />
+            <Text
               style={{
-                width: '90%',
-                height: 10,
-                borderRadius: 5,
-                backgroundColor: colors.accent,
-                marginBottom: 8,
-              }}
-            />
-            <View
-              style={{
-                width: '70%',
-                height: 10,
-                borderRadius: 5,
-                backgroundColor: colors.accent,
-                marginBottom: 8,
-              }}
-            />
-            <View
-              style={{
-                flexDirection: 'row',
+                color: colors.icon,
+                fontSize: SIZE.md,
+                fontFamily: WEIGHT.regular,
+                marginTop: 20,
               }}>
-              <View
-                style={{
-                  width: '15%',
-                  height: 8,
-                  borderRadius: 5,
-                  backgroundColor: colors.icon,
-                  marginRight: '5%',
-                }}
-              />
-              <View
-                style={{
-                  width: '15%',
-                  height: 8,
-                  borderRadius: 5,
-                  backgroundColor: colors.icon,
-                }}
-              />
-            </View>
-          </Animatable.View>
-
-          <Animatable.View
-            animation={slideLeft}
-            iterationCount="infinite"
-            duration={3000}
-            easing="ease-in"
-            iterationDelay={0}
-            direction="alternate"
-            useNativeDriver={true}
-            style={{
-              backgroundColor: colors.shade,
-              width: '50%',
-              padding: 5,
-              borderRadius: 5,
-              marginBottom: 10,
-            }}>
-            <View
+              Notes you write will appear here.
+            </Text>
+            <Text
               style={{
-                width: '90%',
-                height: 10,
-                borderRadius: 5,
-                backgroundColor: colors.accent,
-                marginBottom: 8,
-              }}
-            />
-            <View
-              style={{
-                width: '70%',
-                height: 10,
-                borderRadius: 5,
-                backgroundColor: colors.accent,
-                marginBottom: 8,
-              }}
-            />
-            <View
-              style={{
-                flexDirection: 'row',
+                fontSize: SIZE.sm,
+                color: colors.icon,
+                marginTop: 20,
               }}>
-              <View
-                style={{
-                  width: '15%',
-                  height: 8,
-                  borderRadius: 5,
-                  backgroundColor: colors.icon,
-                  marginRight: '5%',
-                }}
-              />
-              <View
-                style={{
-                  width: '15%',
-                  height: 8,
-                  borderRadius: 5,
-                  backgroundColor: colors.icon,
-                }}
-              />
-            </View>
-          </Animatable.View>
-          <Animatable.View
-            easing="ease-in"
-            animation={slideRight}
-            iterationCount="infinite"
-            duration={3000}
-            useNativeDriver={true}
-            iterationDelay={0}
-            direction="alternate"
-            style={{
-              backgroundColor: colors.shade,
-              width: '50%',
-              padding: 5,
-              borderRadius: 5,
-              marginBottom: 10,
-            }}>
-            <View
-              style={{
-                width: '90%',
-                height: 10,
-                borderRadius: 5,
-                backgroundColor: colors.accent,
-                marginBottom: 8,
-              }}
-            />
-            <View
-              style={{
-                width: '70%',
-                height: 10,
-                borderRadius: 5,
-                backgroundColor: colors.accent,
-                marginBottom: 8,
-              }}
-            />
-            <View
-              style={{
-                flexDirection: 'row',
-              }}>
-              <View
-                style={{
-                  width: '15%',
-                  height: 8,
-                  borderRadius: 5,
-                  backgroundColor: colors.icon,
-                  marginRight: '5%',
-                }}
-              />
-              <View
-                style={{
-                  width: '15%',
-                  height: 8,
-                  borderRadius: 5,
-                  backgroundColor: colors.icon,
-                }}
-              />
-            </View>
-          </Animatable.View>
-
-          <Text
-            style={{
-              color: colors.icon,
-              fontSize: SIZE.md,
-              fontFamily: WEIGHT.regular,
-              marginTop: 20,
-            }}>
-            Notes you write will appear here.
-          </Text>
-          <Text
-            style={{
-              fontSize: SIZE.sm,
-              color: colors.icon,
-              marginTop: 20,
-            }}>
-            No notes found
-          </Text>
-        </View>
+              No notes found
+            </Text>
+          </View>
+        )
       }
       ListHeaderComponent={
         <View
@@ -289,7 +104,7 @@ export const NotesList = ({
                 ? 175
                 : 175 - 60,
           }}>
-          {notes[0] ? (
+          {pinned && pinned.length > 0 ? (
             <>
               <FlatList
                 data={pinned}

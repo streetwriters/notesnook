@@ -1,52 +1,13 @@
-import React, {useEffect, useState} from 'react';
-import {
-  ScrollView,
-  View,
-  Text,
-  TouchableOpacity,
-  Dimensions,
-  Image,
-  SafeAreaView,
-  Platform,
-  FlatList,
-} from 'react-native';
-import NavigationService from '../../services/NavigationService';
-import {
-  COLOR_SCHEME,
-  SIZE,
-  br,
-  ph,
-  pv,
-  opacity,
-  FONT,
-  WEIGHT,
-  onThemeUpdate,
-  clearThemeUpdateListener,
-} from '../../common/common';
-import Icon from 'react-native-vector-icons/Feather';
-import {Reminder} from '../../components/Reminder';
-import {ListItem} from '../../components/ListItem';
+import React from 'react';
+import {View, Text, TouchableOpacity, Image, FlatList} from 'react-native';
+import {SIZE, pv, opacity, WEIGHT} from '../../common/common';
 import {Header} from '../../components/header';
-import NoteItem from '../../components/NoteItem';
-import {useForceUpdate} from '../ListsEditor';
 import {AnimatedSafeAreaView} from '../Home';
-
-const w = Dimensions.get('window').width;
-const h = Dimensions.get('window').height;
+import {useAppContext} from '../../provider/useAppContext';
 
 export const AccountSettings = ({navigation}) => {
-  const [colors, setColors] = useState(COLOR_SCHEME);
-  const forceUpdate = useForceUpdate();
-  useEffect(() => {
-    onThemeUpdate(() => {
-      forceUpdate();
-    });
-    return () => {
-      clearThemeUpdateListener(() => {
-        forceUpdate();
-      });
-    };
-  }, []);
+  const {colors} = useAppContext();
+
   return (
     <AnimatedSafeAreaView
       transition="backgroundColor"

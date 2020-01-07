@@ -9,11 +9,8 @@ import {
 import NavigationService from '../../services/NavigationService';
 import {
   SIZE,
-  br,
-  ph,
   pv,
   opacity,
-  FONT,
   WEIGHT,
   COLOR_SCHEME_DARK,
   COLOR_SCHEME_LIGHT,
@@ -24,9 +21,6 @@ import {FlatList} from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-community/async-storage';
 import {AnimatedSafeAreaView} from '../Home';
 import {useAppContext} from '../../provider/useAppContext';
-
-const w = Dimensions.get('window').width;
-const h = Dimensions.get('window').height;
 
 export const Settings = ({navigation}) => {
   const {colors, changeAccentColor, changeColorScheme} = useAppContext();

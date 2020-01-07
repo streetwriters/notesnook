@@ -1,44 +1,25 @@
 import React, {useEffect, useState} from 'react';
 import {
-  ScrollView,
   View,
   Text,
   TouchableOpacity,
-  Dimensions,
-  Image,
-  SafeAreaView,
   Platform,
-  Modal,
   KeyboardAvoidingView,
+  FlatList,
 } from 'react-native';
-import NavigationService from '../../services/NavigationService';
-import {
-  COLOR_SCHEME,
-  SIZE,
-  br,
-  ph,
-  pv,
-  opacity,
-  FONT,
-  WEIGHT,
-  onThemeUpdate,
-  clearThemeUpdateListener,
-} from '../../common/common';
+import {SIZE, ph, pv, opacity, WEIGHT} from '../../common/common';
 import Icon from 'react-native-vector-icons/Feather';
-import {Reminder} from '../../components/Reminder';
-import {ListItem} from '../../components/ListItem';
-import {getElevation, h, w, timeSince} from '../../utils/utils';
-import {FlatList, TextInput} from 'react-native-gesture-handler';
-import {useForceUpdate} from '../ListsEditor';
 import {AddNotebookDialog} from '../../components/AddNotebookDialog';
 import {NotebookItem} from '../../components/NotebookItem';
 import {Search} from '../../components/SearchInput';
-import {db, DDS} from '../../../App';
+import {db} from '../../../App';
 import {Header} from '../../components/header';
 import {AnimatedSafeAreaView} from '../Home';
 import * as Animatable from 'react-native-animatable';
 import {NavigationEvents} from 'react-navigation';
 import {useAppContext} from '../../provider/useAppContext';
+import {NotebookPlaceHolder} from '../../components/ListPlaceholders';
+import {slideRight, slideLeft} from '../../utils/animations';
 export const Folders = ({navigation}) => {
   const {colors} = useAppContext();
 
@@ -56,43 +37,6 @@ export const Folders = ({navigation}) => {
   let headerHeight = 0;
   let searchHeight = 0;
   let marginSet = false;
-
-  const slideRight = {
-    0: {
-      transform: [{translateX: -4}],
-    },
-    0.5: {
-      transform: [{translateX: 0}],
-    },
-    1: {
-      transform: [{translateX: 4}],
-    },
-  };
-  const slideLeft = {
-    0: {
-      transform: [{translateX: 4}],
-    },
-    0.5: {
-      transform: [{translateX: 0}],
-    },
-    1: {
-      transform: [{translateX: -4}],
-    },
-  };
-
-  const setMarginTop = () => {
-    return;
-    if (headerHeight < 30 || searchHeight < 30) {
-      return;
-    }
-    let toAdd = h * 0.06;
-    if (marginSet) return;
-    let a = headerHeight + searchHeight + toAdd;
-    setMargin(a);
-    headerHeight = 0;
-    searchHeight = 0;
-    marginSet = true;
-  };
 
   useEffect(() => {
     setNotebooks(db.getNotebooks());
@@ -135,9 +79,8 @@ export const Folders = ({navigation}) => {
             width: '100%',
           }}>
           <Header
-            sendHeight={height => (headerHeight = height)}
             hide={hideHeader}
-            menu={true}
+            menu={params.canGoBack ? false : true}
             showSearch={() => {
               setHideHeader(false);
               countUp = 0;
@@ -145,18 +88,10 @@ export const Folders = ({navigation}) => {
             }}
             colors={colors}
             heading={params.title}
-            canGoBack={false}
+            canGoBack={params.canGoBack}
           />
           {notebooks.length == 0 ? null : (
-            <Search
-              sendHeight={height => {
-                searchHeight = height;
-                console.log(searchHeight + '' + headerHeight);
-                setMarginTop();
-              }}
-              placeholder="Search your notebook"
-              hide={hideHeader}
-            />
+            <Search placeholder="Search your notebook" hide={hideHeader} />
           )}
         </Animatable.View>
 
@@ -184,7 +119,7 @@ export const Folders = ({navigation}) => {
           ListHeaderComponent={
             <View
               style={{
-                marginTop: Platform.OS == 'ios' ? 145 : 185,
+                marginTop: Platform.OS == 'ios' ? 135 : 175,
               }}
             />
           }
@@ -200,257 +135,9 @@ export const Folders = ({navigation}) => {
                 justifyContent: 'center',
                 opacity: 0.8,
               }}>
-              <Animatable.View
-                animation={slideRight}
-                iterationCount="infinite"
-                duration={3000}
-                iterationDelay={0}
-                direction="alternate"
-                easing="ease-in"
-                useNativeDriver={true}
-                style={{
-                  backgroundColor: colors.shade,
-                  width: '50%',
-                  padding: 5,
-                  borderRadius: 5,
-                  marginBottom: 10,
-                }}>
-                <View
-                  style={{
-                    width: '50%',
-                    height: 15,
-                    borderRadius: 100,
-                    backgroundColor: colors.accent,
-                    marginBottom: 8,
-                  }}
-                />
-                <View
-                  style={{
-                    width: '70%',
-                    height: 10,
-
-                    marginBottom: 8,
-                    flexDirection: 'row',
-                  }}>
-                  <View
-                    style={{
-                      width: '30%',
-                      height: 10,
-                      borderRadius: 5,
-                      backgroundColor: colors.accent,
-                      marginRight: 8,
-                    }}
-                  />
-                  <View
-                    style={{
-                      width: '30%',
-                      height: 10,
-                      borderRadius: 5,
-                      backgroundColor: colors.accent,
-                      marginRight: 8,
-                    }}
-                  />
-                  <View
-                    style={{
-                      width: '30%',
-                      height: 10,
-                      borderRadius: 5,
-                      backgroundColor: colors.accent,
-                      marginRight: 8,
-                    }}
-                  />
-                </View>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                  }}>
-                  <View
-                    style={{
-                      width: '15%',
-                      height: 8,
-                      borderRadius: 5,
-                      backgroundColor: colors.icon,
-                      marginRight: '5%',
-                    }}
-                  />
-                  <View
-                    style={{
-                      width: '15%',
-                      height: 8,
-                      borderRadius: 5,
-                      backgroundColor: colors.icon,
-                    }}
-                  />
-                </View>
-              </Animatable.View>
-
-              <Animatable.View
-                animation={slideLeft}
-                iterationCount="infinite"
-                duration={3000}
-                iterationDelay={0}
-                direction="alternate"
-                easing="ease-in"
-                useNativeDriver={true}
-                style={{
-                  backgroundColor: colors.shade,
-                  width: '50%',
-                  padding: 5,
-                  borderRadius: 5,
-                  marginBottom: 10,
-                }}>
-                <View
-                  style={{
-                    width: '50%',
-                    height: 15,
-                    borderRadius: 100,
-                    backgroundColor: colors.accent,
-                    marginBottom: 8,
-                  }}
-                />
-                <View
-                  style={{
-                    width: '70%',
-                    height: 10,
-
-                    marginBottom: 8,
-                    flexDirection: 'row',
-                  }}>
-                  <View
-                    style={{
-                      width: '30%',
-                      height: 10,
-                      borderRadius: 5,
-                      backgroundColor: colors.accent,
-                      marginRight: 8,
-                    }}
-                  />
-                  <View
-                    style={{
-                      width: '30%',
-                      height: 10,
-                      borderRadius: 5,
-                      backgroundColor: colors.accent,
-                      marginRight: 8,
-                    }}
-                  />
-                  <View
-                    style={{
-                      width: '30%',
-                      height: 10,
-                      borderRadius: 5,
-                      backgroundColor: colors.accent,
-                      marginRight: 8,
-                    }}
-                  />
-                </View>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                  }}>
-                  <View
-                    style={{
-                      width: '15%',
-                      height: 8,
-                      borderRadius: 5,
-                      backgroundColor: colors.icon,
-                      marginRight: '5%',
-                    }}
-                  />
-                  <View
-                    style={{
-                      width: '15%',
-                      height: 8,
-                      borderRadius: 5,
-                      backgroundColor: colors.icon,
-                    }}
-                  />
-                </View>
-              </Animatable.View>
-
-              <Animatable.View
-                animation={slideRight}
-                iterationCount="infinite"
-                duration={3000}
-                iterationDelay={0}
-                direction="alternate"
-                easing="ease-in"
-                useNativeDriver={true}
-                style={{
-                  backgroundColor: colors.shade,
-                  width: '50%',
-                  padding: 5,
-                  borderRadius: 5,
-                  marginBottom: 10,
-                }}>
-                <View
-                  style={{
-                    width: '50%',
-                    height: 15,
-                    borderRadius: 100,
-                    backgroundColor: colors.accent,
-                    marginBottom: 8,
-                  }}
-                />
-                <View
-                  style={{
-                    width: '70%',
-                    height: 10,
-
-                    marginBottom: 8,
-                    flexDirection: 'row',
-                  }}>
-                  <View
-                    style={{
-                      width: '30%',
-                      height: 10,
-                      borderRadius: 5,
-                      backgroundColor: colors.accent,
-                      marginRight: 8,
-                    }}
-                  />
-                  <View
-                    style={{
-                      width: '30%',
-                      height: 10,
-                      borderRadius: 5,
-                      backgroundColor: colors.accent,
-                      marginRight: 8,
-                    }}
-                  />
-                  <View
-                    style={{
-                      width: '30%',
-                      height: 10,
-                      borderRadius: 5,
-                      backgroundColor: colors.accent,
-                      marginRight: 8,
-                    }}
-                  />
-                </View>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                  }}>
-                  <View
-                    style={{
-                      width: '15%',
-                      height: 8,
-                      borderRadius: 5,
-                      backgroundColor: colors.icon,
-                      marginRight: '5%',
-                    }}
-                  />
-                  <View
-                    style={{
-                      width: '15%',
-                      height: 8,
-                      borderRadius: 5,
-                      backgroundColor: colors.icon,
-                    }}
-                  />
-                </View>
-              </Animatable.View>
+              <NotebookPlaceHolder animation={slideRight} colors={colors} />
+              <NotebookPlaceHolder animation={slideLeft} colors={colors} />
+              <NotebookPlaceHolder animation={slideRight} colors={colors} />
 
               <Text
                 style={{

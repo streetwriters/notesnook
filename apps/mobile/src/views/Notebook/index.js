@@ -1,34 +1,15 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {
-  ScrollView,
   View,
   Text,
   TouchableOpacity,
-  Dimensions,
-  Image,
-  SafeAreaView,
   Platform,
   FlatList,
   KeyboardAvoidingView,
 } from 'react-native';
-import NavigationService from '../../services/NavigationService';
-import {
-  COLOR_SCHEME,
-  SIZE,
-  br,
-  ph,
-  pv,
-  opacity,
-  FONT,
-  WEIGHT,
-  onThemeUpdate,
-  clearThemeUpdateListener,
-} from '../../common/common';
+import {SIZE, ph, pv, opacity, WEIGHT} from '../../common/common';
 import Icon from 'react-native-vector-icons/Feather';
-import {Reminder} from '../../components/Reminder';
-import {ListItem} from '../../components/ListItem';
 import {Header} from '../../components/header';
-import NoteItem from '../../components/NoteItem';
 import {NotebookItem} from '../../components/NotebookItem';
 import {Search} from '../../components/SearchInput';
 import {useForceUpdate} from '../ListsEditor';
@@ -36,19 +17,13 @@ import {AddTopicDialog} from '../../components/AddTopicDialog';
 import {AnimatedSafeAreaView} from '../Home';
 import * as Animatable from 'react-native-animatable';
 import {NavigationEvents} from 'react-navigation';
-import {DDS} from '../../../App';
 import {useAppContext} from '../../provider/useAppContext';
-const w = Dimensions.get('window').width;
-const h = Dimensions.get('window').height;
-const AnimatedTouchableOpacity = Animatable.createAnimatableComponent(
-  TouchableOpacity,
-);
+
 export const Notebook = ({navigation}) => {
   // State
   const {colors} = useAppContext();
   const params = navigation.state.params;
   const [hideHeader, setHideHeader] = useState(false);
-  const [margin, setMargin] = useState(180);
   const [buttonHide, setButtonHide] = useState(false);
   const [numColumns, setNumColumns] = useState(1);
   const [addTopic, setAddTopic] = useState(false);
@@ -57,27 +32,10 @@ export const Notebook = ({navigation}) => {
   let offsetY = 0;
   let countUp = 0;
   let countDown = 0;
-  let headerHeight = 0;
-  let searchHeight = 0;
-  let marginSet = false;
 
   // Effects
 
   // Functions
-  const setMarginTop = () => {
-    return;
-    console.log(params.notebook);
-    if (headerHeight < 30 || searchHeight < 30) {
-      return;
-    }
-    let toAdd = h * 0.06;
-    if (marginSet) return;
-    let a = headerHeight + searchHeight + toAdd;
-    setMargin(a);
-    headerHeight = 0;
-    searchHeight = 0;
-    marginSet = true;
-  };
 
   // Render
   return (
@@ -114,7 +72,6 @@ export const Notebook = ({navigation}) => {
             width: '100%',
           }}>
           <Header
-            sendHeight={height => (headerHeight = height)}
             hide={hideHeader}
             showSearch={() => {
               setHideHeader(false);
@@ -126,14 +83,7 @@ export const Notebook = ({navigation}) => {
             canGoBack={true}
           />
 
-          <Search
-            sendHeight={height => {
-              searchHeight = height;
-              setMarginTop();
-            }}
-            placeholder={`Search in ${params.title}`}
-            hide={hideHeader}
-          />
+          <Search placeholder={`Search in ${params.title}`} hide={hideHeader} />
         </Animatable.View>
 
         <FlatList

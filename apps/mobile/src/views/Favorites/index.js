@@ -1,25 +1,22 @@
 import React, {useEffect, useState} from 'react';
 import {
-  Dimensions,
   KeyboardAvoidingView,
   View,
   Text,
   FlatList,
   Platform,
 } from 'react-native';
-
 import {Header} from '../../components/header';
 import {AnimatedSafeAreaView} from '../Home';
 import {useAppContext} from '../../provider/useAppContext';
 import * as Animatable from 'react-native-animatable';
 import {Search} from '../../components/SearchInput';
 import {db} from '../../../App';
-import Icon from 'react-native-vector-icons/Feather';
+
 import {SIZE, WEIGHT} from '../../common/common';
 import NoteItem from '../../components/NoteItem';
 import {NotebookItem} from '../../components/NotebookItem';
-const w = Dimensions.get('window').width;
-const h = Dimensions.get('window').height;
+import {FavoritesPlaceHolder} from '../../components/ListPlaceholders';
 
 export const Favorites = ({navigation}) => {
   // Global State
@@ -156,59 +153,7 @@ export const Favorites = ({navigation}) => {
                 justifyContent: 'center',
                 opacity: 0.8,
               }}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignSelf: 'center',
-                  justifyContent: 'space-around',
-                }}>
-                <Animatable.View
-                  animation={slideLeft}
-                  iterationCount="infinite"
-                  duration={3000}
-                  iterationDelay={0}
-                  direction="alternate"
-                  easing="ease-in"
-                  useNativeDriver={true}
-                  style={{
-                    padding: 5,
-                    borderRadius: 5,
-                    marginBottom: 10,
-                  }}>
-                  <Icon name="star" size={SIZE.xl} color="orange" />
-                </Animatable.View>
-                <Animatable.View
-                  animation={slideLeft}
-                  iterationCount="infinite"
-                  duration={3000}
-                  iterationDelay={0}
-                  direction="alternate"
-                  easing="ease-in"
-                  useNativeDriver={true}
-                  style={{
-                    padding: 5,
-                    borderRadius: 5,
-                    marginBottom: 10,
-                    marginTop: -30,
-                  }}>
-                  <Icon name="star" size={SIZE.xxl} color="orange" />
-                </Animatable.View>
-                <Animatable.View
-                  animation={slideLeft}
-                  iterationCount="infinite"
-                  duration={3000}
-                  iterationDelay={0}
-                  direction="alternate"
-                  easing="ease-in"
-                  useNativeDriver={true}
-                  style={{
-                    padding: 5,
-                    borderRadius: 5,
-                    marginBottom: 10,
-                  }}>
-                  <Icon name="star" size={SIZE.xl} color="orange" />
-                </Animatable.View>
-              </View>
+              <FavoritesPlaceHolder />
               <Text
                 style={{
                   color: colors.pri,

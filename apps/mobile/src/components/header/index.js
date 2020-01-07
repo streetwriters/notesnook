@@ -46,10 +46,11 @@ export const Header = ({
               NavigationService.goBack();
             }}
             style={{
-              justifyContent: 'flex-start',
+              justifyContent: 'center',
               alignItems: 'flex-start',
               height: 40,
-              width: 25,
+              width: 50,
+              marginTop: 2.5,
             }}>
             <Icon
               style={{
@@ -57,7 +58,7 @@ export const Header = ({
               }}
               color={colors.pri}
               name={'chevron-left'}
-              size={SIZE.xxxl}
+              size={SIZE.xxxl - 3}
             />
           </TouchableOpacity>
         ) : (

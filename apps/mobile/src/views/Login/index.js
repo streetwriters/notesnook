@@ -1,36 +1,17 @@
 import React, {useEffect, useState, createRef} from 'react';
 import {
-  ScrollView,
   View,
   Text,
   TouchableOpacity,
-  Dimensions,
-  Image,
   SafeAreaView,
-  Platform,
   DeviceEventEmitter,
 } from 'react-native';
 import NavigationService from '../../services/NavigationService';
-import {
-  COLOR_SCHEME,
-  SIZE,
-  br,
-  ph,
-  pv,
-  opacity,
-  FONT,
-  WEIGHT,
-  clearThemeUpdateListener,
-  onThemeUpdate,
-} from '../../common/common';
-import Icon from 'react-native-vector-icons/Feather';
-import {Reminder} from '../../components/Reminder';
-import {ListItem} from '../../components/ListItem';
-import {getElevation} from '../../utils/utils';
-import {FlatList, TextInput} from 'react-native-gesture-handler';
+import {SIZE, pv, opacity, WEIGHT} from '../../common/common';
+
+import {TextInput} from 'react-native-gesture-handler';
 import {NavigationEvents} from 'react-navigation';
 import {Header} from '../../components/header';
-import {useForceUpdate} from '../ListsEditor';
 import {DDS} from '../../../App';
 import {useAppContext} from '../../provider/useAppContext';
 export const Login = ({navigation}) => {

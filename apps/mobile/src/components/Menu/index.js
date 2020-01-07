@@ -64,6 +64,7 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
                 func: () =>
                   NavigationService.push('Folders', {
                     title: 'Notebooks',
+                    canGoBack: false,
                   }),
                 close: true,
               },
@@ -119,7 +120,7 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
             keyExtractor={(item, index) => item.name}
             renderItem={({item, index}) => (
               <TouchableOpacity
-                activeOpacity={opacity}
+                activeOpacity={opacity / 2}
                 onPress={() => {
                   item.close === false ? null : close();
 
@@ -170,6 +171,7 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
           />
 
           <TouchableOpacity
+            activeOpacity={opacity / 2}
             onPress={() => {
               close();
               NavigationService.navigate('Tags');
@@ -225,6 +227,7 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
               'water',
             ].map(item => (
               <TouchableOpacity
+                activeOpacity={opacity / 2}
                 onPress={() => {
                   close();
                   NavigationService.navigate('Notes', {
@@ -260,6 +263,7 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
             {['red', 'yellow', 'green', 'blue', 'purple', 'orange', 'gray'].map(
               item => (
                 <TouchableOpacity
+                  activeOpacity={opacity / 2}
                   style={{
                     flexDirection: 'row',
                     justifyContent: 'flex-start',
@@ -329,7 +333,7 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
 
               NavigationService.navigate('Login');
             }}
-            activeOpacity={opacity}
+            activeOpacity={opacity / 2}
             style={{
               paddingVertical: pv + 5,
 
