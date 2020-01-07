@@ -95,10 +95,12 @@ function App() {
               cursor: "col-resize"
             }}
             draggable={true}
-            onDragStart={e => {
+            onMouseDown={e => {
               startX = e.clientX;
-              let view = document.querySelector(".navigationView");
-              startWidth = view.clientWidth - 120;
+              let view = document
+                .querySelector(".navigationView")
+                .getBoundingClientRect();
+              startWidth = parseInt(view.width, 10);
             }}
             onDrag={e => {
               let view = document.querySelector(".navigationView");
@@ -106,6 +108,7 @@ function App() {
             }}
             onDragEnd={e => {
               let view = document.querySelector(".navigationView");
+              view.style.width = view.getBoundingClientRect().width;
               window.localStorage.setItem(
                 "navigationViewWidth",
                 view.style.width
