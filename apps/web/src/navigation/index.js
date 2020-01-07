@@ -49,7 +49,11 @@ export const navigationEvents = {
   onWillNavigateAway: undefined
 };
 var lastRoute = undefined;
-export function navigate(routeName, root = "navigationView", params = {}) {
+export async function navigate(
+  routeName,
+  root = "navigationView",
+  params = {}
+) {
   let route = routes[routeName];
 
   // do not navigate if the previous route is the same
@@ -62,11 +66,11 @@ export function navigate(routeName, root = "navigationView", params = {}) {
 
   if (
     navigationEvents.onWillNavigateAway &&
-    !navigationEvents.onWillNavigateAway(routeName, params)
+    !(await navigationEvents.onWillNavigateAway(routeName, params))
   ) {
-    navigationEvents.onWillNavigateAway = undefined;
     return false;
   }
+  navigationEvents.onWillNavigateAway = undefined;
 
   let rootView = document.querySelector(`.${root}`);
   if (!rootView) return false;

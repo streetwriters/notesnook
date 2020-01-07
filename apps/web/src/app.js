@@ -63,8 +63,8 @@ function App() {
         >
           {Object.values(routes).map((item, index) => (
             <NavMenuItem
-              onSelected={() => {
-                if (navigate(item.key)) {
+              onSelected={async () => {
+                if (await navigate(item.key)) {
                   setSelectedIndex(index);
                 }
               }}

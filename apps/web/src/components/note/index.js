@@ -12,8 +12,8 @@ const dropdownRefs = [];
 const menuItems = note => [
   {
     title: note.notebook.notebook ? "Move" : "Add to",
-    onClick: () => {
-      navigate(routes.notebooks.key, undefined, {
+    onClick: async () => {
+      await navigate(routes.notebooks.key, undefined, {
         intent: "moveNote",
         data: note
       });
