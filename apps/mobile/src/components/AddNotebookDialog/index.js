@@ -140,6 +140,7 @@ export const AddNotebookDialog = ({visible, close, toEdit = null}) => {
       animationType="fade"
       onShow={() => {
         refs = [];
+
         if (toEdit !== null) {
           let topicsList = [];
           toEdit.topics.forEach(item => {
@@ -234,6 +235,7 @@ export const AddNotebookDialog = ({visible, close, toEdit = null}) => {
               offset: 50 * index,
               index,
             })}
+            keyExtractor={(item, index) => item + index}
             renderItem={({item, index}) => (
               <TopicItem
                 item={item}

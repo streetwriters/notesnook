@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import {COLOR_SCHEME, SIZE, br, ph, pv, WEIGHT} from '../../common/common';
 import Icon from 'react-native-vector-icons/Feather';
+
 import {
   timeSince,
   ToastEvent,
@@ -225,8 +226,8 @@ const NoteItem = props => {
                     <Icon
                       style={{marginLeft: 10}}
                       name="star"
-                      size={SIZE.xs}
-                      color={colors.icon}
+                      size={SIZE.xs + 1}
+                      color="orange"
                     />
                   ) : null}
                   <Text
@@ -302,7 +303,14 @@ const NoteItem = props => {
             <>
               <MenuItem
                 onPress={() => {
-                  show = 'topic';
+                  db.restoreItem(item.dateCreated);
+                  ToastEvent.show(
+                    item.type == 'note' ? 'Note restored' : 'Notebook restored',
+                    'success',
+                    1000,
+                    () => {},
+                    '',
+                  );
                   hideMenu();
                 }}
                 textStyle={{
@@ -315,6 +323,7 @@ const NoteItem = props => {
               <MenuItem
                 onPress={() => {
                   show = 'topic';
+
                   hideMenu();
                 }}
                 textStyle={{
@@ -328,23 +337,17 @@ const NoteItem = props => {
           ) : (
             <>
               <MenuItem
-                textStyle={{
-                  color: colors.pri,
-
-                  fontFamily: WEIGHT.regular,
-                  fontSize: SIZE.sm,
-                }}>
-                Pin
-              </MenuItem>
-              <MenuItem
                 onPress={() => {
                   hideMenu();
+                  db.pinItem(item.type, item.dateCreated);
+                  props.refresh();
+
                   ToastEvent.show(
-                    'Note added to favorites.',
-                    'success',
+                    `Note ${item.pinned ? 'unpinned' : 'pinned'}`,
+                    item.pinned ? 'error' : 'success',
                     3000,
                     () => {},
-                    'Ok',
+                    '',
                   );
                 }}
                 textStyle={{
@@ -353,7 +356,29 @@ const NoteItem = props => {
                   fontFamily: WEIGHT.regular,
                   fontSize: SIZE.sm,
                 }}>
-                Favorite
+                {item.pinned ? 'Unpin' : 'Pin'}
+              </MenuItem>
+
+              <MenuItem
+                onPress={() => {
+                  hideMenu();
+                  db.favoriteItem(item.type, item.dateCreated);
+
+                  props.refresh();
+                  ToastEvent.show(
+                    `Note ${item.favorite ? 'removed' : 'added'} to favorites.`,
+                    item.favorite ? 'error' : 'success',
+                    3000,
+                    () => {},
+                    '',
+                  );
+                }}
+                textStyle={{
+                  color: colors.pri,
+                  fontFamily: WEIGHT.regular,
+                  fontSize: SIZE.sm,
+                }}>
+                {item.favorite ? 'Unfavorite' : 'Favorite'}
               </MenuItem>
 
               <MenuItem

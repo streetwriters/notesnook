@@ -104,6 +104,7 @@ export const Header = ({
         }}>
         <Animatable.View
           transition="opacity"
+          useNativeDriver={true}
           duration={500}
           style={{
             opacity: hide ? 1 : 0,
@@ -117,7 +118,7 @@ export const Header = ({
               width: 60,
               paddingRight: 0,
             }}>
-            <Icon name={'search'} size={SIZE.xl} color={colors.icon} />
+            <Icon name={'search'} size={SIZE.xl} color={colors.pri} />
           </TouchableOpacity>
         </Animatable.View>
         {verticalMenu ? (
@@ -129,7 +130,38 @@ export const Header = ({
               width: 60,
               paddingRight: 0,
             }}>
-            <Icon name="more-vertical" size={SIZE.xl} color={colors.pri} />
+            <Icon
+              style={{
+                position: 'absolute',
+                transform: [
+                  {
+                    translateX: 0,
+                  },
+                  {
+                    translateY: 3,
+                  },
+                ],
+              }}
+              name="arrow-down"
+              size={SIZE.lg}
+              color={colors.pri}
+            />
+            <Icon
+              style={{
+                position: 'absolute',
+                transform: [
+                  {
+                    translateX: -15,
+                  },
+                  {
+                    translateY: -3,
+                  },
+                ],
+              }}
+              name="arrow-up"
+              size={SIZE.lg}
+              color={colors.pri}
+            />
           </TouchableOpacity>
         ) : null}
       </View>

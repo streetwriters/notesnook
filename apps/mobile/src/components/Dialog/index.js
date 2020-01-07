@@ -68,7 +68,7 @@ export const Dialog = ({
                 color: colors.accent,
                 fontFamily: WEIGHT.bold,
                 marginLeft: 5,
-                fontSize: SIZE.md + 2,
+                fontSize: SIZE.md,
               }}>
               {title}
             </Text>

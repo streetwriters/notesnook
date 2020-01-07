@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import {SIZE, WEIGHT} from '../../common/common';
 import NoteItem from '../NoteItem';
-import {DDS} from '../../../App';
+import {DDS, db} from '../../../App';
 import * as Animatable from 'react-native-animatable';
 import {useAppContext} from '../../provider/useAppContext';
 import Icon from 'react-native-vector-icons/Feather';
@@ -26,7 +26,7 @@ export const NotesList = ({
 }) => {
   const {colors} = useAppContext();
   const [numColumns, setNumColumns] = useState(1);
-
+  const [pinned, setPinned] = useState([]);
   const slideRight = {
     0: {
       transform: [{translateX: -4}],
@@ -49,6 +49,12 @@ export const NotesList = ({
       transform: [{translateX: -4}],
     },
   };
+
+  useEffect(() => {
+    let pinnedItems = db.getPinned();
+
+    setPinned([...pinnedItems]);
+  }, [notes]);
 
   return isGrouped ? (
     <SectionList
@@ -285,36 +291,27 @@ export const NotesList = ({
           }}>
           {notes[0] ? (
             <>
-              {/* <NoteItem
-                customStyle={{
-                  backgroundColor: colors.shade,
-                  width: '100%',
-                  paddingHorizontal: '5%',
-                  paddingTop: 20,
-                  marginBottom: 10,
-                  marginTop: 20,
-                  borderBottomWidth: 0,
-                }}
-                pinned={true}
-                item={notes[0].data[0]}
-                numColumns={1}
-                index={0}
+              <FlatList
+                data={pinned}
+                renderItem={({item, index}) => (
+                  <NoteItem
+                    customStyle={{
+                      backgroundColor: colors.shade,
+                      width: '100%',
+                      paddingHorizontal: '5%',
+                      paddingTop: 20,
+                      marginBottom: 10,
+                      marginTop: 20,
+                      borderBottomWidth: 0,
+                    }}
+                    pinned={true}
+                    refresh={() => refresh()}
+                    item={item}
+                    numColumns={1}
+                    index={index}
+                  />
+                )}
               />
-              <NoteItem
-                customStyle={{
-                  backgroundColor: colors.shade,
-                  width: '100%',
-                  paddingHorizontal: '5%',
-                  paddingTop: 20,
-                  marginBottom: 10,
-                  marginTop: 20,
-                  borderBottomWidth: 0,
-                }}
-                pinned={true}
-                item={notes[0].data[1]}
-                numColumns={1}
-                index={0}
-              /> */}
             </>
           ) : null}
         </View>
