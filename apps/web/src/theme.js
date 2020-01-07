@@ -154,7 +154,9 @@ export default {
       color:'text',
       textAlign:'left',
       fontSize:'title',
-      fontFamily:'body'
+      fontFamily:'body',
+      py:'15px',
+      mx:'5px'
     }
   },
   shadows: shadowsLight
