@@ -4,7 +4,7 @@ import { Flex, Box, Text } from "rebass";
 function Menu(props) {
   return (
     <Flex
-      bg="navbg"
+      bg="background"
       py={1}
       sx={{
         position: "relative",
@@ -13,7 +13,7 @@ function Menu(props) {
         width: 120
       }}
     >
-      <Box width="100%" bg="navbg">
+      <Box width="100%">
         {props.menuItems.map(item => (
           <Flex
             key={item.title}
