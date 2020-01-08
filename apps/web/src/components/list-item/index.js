@@ -6,16 +6,10 @@ import Menu from "../menu";
 
 const ListItem = props => (
   <Flex
-    onClick={e => {
-      e.stopPropagation();
-      if (props.onClick) {
-        props.onClick();
-      }
-    }}
     alignItems="center"
     justifyContent="space-between"
     py={1}
-    bg={props.pinned ? "#1790F310" : "background"}
+    bg={props.pinned ? "shade" : "background"}
     px={3}
     sx={{
       position: "relative",
@@ -23,7 +17,11 @@ const ListItem = props => (
       marginTop: props.pinned ? 4 : 0,
       borderBottom: "1px solid",
       borderBottomColor: "navbg",
-      cursor: "default"
+      cursor: "default",
+      ":hover": {
+        borderBottomColor: "primary",
+        cursor: "pointer"
+      }
       //TODO add onpressed reaction
     }}
   >
@@ -55,8 +53,17 @@ const ListItem = props => (
       </Flex>
     )}
     <Box
+      onClick={e => {
+        e.stopPropagation();
+        if (props.onClick) {
+          props.onClick();
+        }
+      }}
       sx={{
-        paddingTop: props.pinned ? 4 : 0
+        paddingTop: props.pinned ? 4 : 0,
+        ":hover": {
+          cursor: "pointer"
+        }
       }}
     >
       <Flex flexDirection="row" justifyContent="space-between">
@@ -67,7 +74,12 @@ const ListItem = props => (
       <Text
         display={props.body ? "flex" : "none"}
         variant="body"
-        sx={{ marginBottom: 1 }}
+        sx={{
+          marginBottom: 1,
+          ":hover": {
+            cursor: "pointer"
+          }
+        }}
       >
         {props.body}
       </Text>
@@ -86,11 +98,13 @@ const ListItem = props => (
       ref={ref => (props.dropdownRefs[props.index] = ref)}
     >
       <DropdownTrigger>
-        <Icon.MoreVertical
-          size={24}
-          strokeWidth={1.5}
-          style={{ marginRight: -5 }}
-        />
+        <Text sx={{ ":active, :hover": { color: "primary" } }}>
+          <Icon.MoreVertical
+            size={24}
+            strokeWidth={1.5}
+            style={{ marginRight: -5 }}
+          />
+        </Text>
       </DropdownTrigger>
       <DropdownContent style={{ zIndex: 2, marginLeft: -110 }}>
         <Menu

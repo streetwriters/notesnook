@@ -184,7 +184,7 @@ function makeTheme({
   return {
     background,
     primary,
-    shade: primary + "12",
+    shade: primary + "10",
     //secondary: "",
     accent,
     //custom
