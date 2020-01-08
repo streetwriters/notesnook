@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from "react";
 import "./app.css";
 import Editor from "./components/editor";
-import { Flex, Box, Button, Text } from "rebass";
-import { Input } from "@rebass/forms";
+import { Flex, Box, Button } from "rebass";
 import { ThemeProvider } from "./utils/theme";
 import { routes, navigate } from "./navigation";
-import CheckBox from "./components/checkbox";
-import * as Icon from "react-feather";
 import "./app.css";
 import Properties from "./views/Properties";
 
