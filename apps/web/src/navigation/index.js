@@ -118,7 +118,7 @@ function ThemedComponent(props) {
       </Flex>
       {props.route.component && (
         <props.route.component
-          backAction={action => setBackAction(prev => action)}
+          backAction={action => setBackAction(() => action)}
           canGoBack={setCanGoBack}
           changeTitle={setTitle}
           {...props.params}
