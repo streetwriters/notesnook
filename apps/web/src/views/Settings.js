@@ -4,8 +4,6 @@ import * as Icon from "react-feather";
 import { Switch } from "@rebass/forms";
 import "../app.css";
 import { changeTheme, isDarkTheme, changeAccent } from "../utils/theme";
-import Account from "./Account";
-
 function Settings() {
   const [check, setCheck] = useState(isDarkTheme());
   return (
