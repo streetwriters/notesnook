@@ -32,6 +32,7 @@ const NavMenuItem = props => {
         size={25}
         strokeWidth={props.selected ? 2 : 1.3}
         style={{ marginRight: 3 }}
+        fill={props.item.color || "transparent"}
       />
       {/*  <Text sx={{ fontSize: 15, marginLeft: 1 }}>{props.item.title}</Text> */}
     </Button>

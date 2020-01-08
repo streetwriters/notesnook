@@ -9,7 +9,7 @@ function Properties() {
     <Flex
       sx={{ borderLeft: "1px solid", borderColor: "border" }}
       flexDirection="column"
-      bg="#1790F307"
+      bg="shade"
       flex="1 1 auto"
       px={2}
       py={2}

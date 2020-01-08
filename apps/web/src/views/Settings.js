@@ -11,9 +11,11 @@ function Settings() {
   return (
     <Flex flexDirection="column" flex="1 1 auto">
       <Flex flexDirection="column" flex="1 1 auto">
-        <Account />
-        {/* <Button variant="setting">General</Button>
-        <Button variant="setting" onClick={()=>{}}>Account</Button>
+        {/* <Account /> */}
+        <Button variant="setting">General</Button>
+        <Button variant="setting" onClick={() => {}}>
+          Account
+        </Button>
         <Box
           sx={{
             borderLeft: "0px Solid",
@@ -74,7 +76,7 @@ function Settings() {
         </Box>
         <Button variant="setting">Terms of Service</Button>
         <Button variant="setting">Privacy Policy</Button>
-        <Button variant="setting">About</Button> */}
+        <Button variant="setting">About</Button>
       </Flex>
     </Flex>
   );

@@ -9,6 +9,58 @@ import * as Icon from "react-feather";
 import { ThemeProvider } from "../utils/theme";
 import Favorites from "../views/Favorites";
 
+const colorRoutes = {
+  red: {
+    key: "red",
+    title: "red",
+    component: undefined,
+    icon: Icon.Circle,
+    color: "#ed2d37"
+  },
+  orange: {
+    key: "orange",
+    title: "orange",
+    component: undefined,
+    icon: Icon.Circle,
+    color: "#ec6e05"
+  },
+  yellow: {
+    key: "yellow",
+    title: "yellow",
+    component: undefined,
+    icon: Icon.Circle,
+    color: "yellow"
+  },
+  green: {
+    key: "green",
+    title: "green",
+    component: undefined,
+    icon: Icon.Circle,
+    color: "green"
+  },
+  blue: {
+    key: "blue",
+    title: "blue",
+    component: undefined,
+    icon: Icon.Circle,
+    color: "blue"
+  },
+  purple: {
+    key: "purple",
+    title: "purple",
+    component: undefined,
+    icon: Icon.Circle,
+    color: "purple"
+  },
+  gray: {
+    key: "gray",
+    title: "gray",
+    component: undefined,
+    icon: Icon.Circle,
+    color: "gray"
+  }
+};
+
 export const routes = {
   home: {
     key: "home",
@@ -40,7 +92,8 @@ export const routes = {
     component: Settings,
     icon: Icon.Settings,
     bottom: true
-  }
+  },
+  ...colorRoutes
 };
 
 const history = {};
