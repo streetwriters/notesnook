@@ -133,7 +133,7 @@ const Editor = ({navigation}) => {
           <View
             style={{
               flexDirection: 'row',
-              justifyContent: 'space-between',
+              justifyContent: 'flex-start',
               alignItems: 'center',
               paddingHorizontal: 12,
               width: '100%',
@@ -146,12 +146,19 @@ const Editor = ({navigation}) => {
                 setDialog(true);
               }}
               style={{
-                width: 50,
+                width: '12.5%',
                 height: 40,
                 justifyContent: 'center',
                 alignItems: 'flex-start',
               }}>
-              <Icon name="chevron-left" color={colors.icon} size={SIZE.xl} />
+              <Icon
+                style={{
+                  marginLeft: -7,
+                }}
+                name="chevron-left"
+                color={colors.icon}
+                size={SIZE.xxxl - 3}
+              />
             </TouchableOpacity>
 
             <TextInput
@@ -160,12 +167,13 @@ const Editor = ({navigation}) => {
               placeholderTextColor={colors.icon}
               defaultValue={title}
               style={{
-                width: '70%',
+                width: '75%',
                 fontFamily: WEIGHT.bold,
                 fontSize: SIZE.xl,
                 color: colors.pri,
                 maxWidth: '80%',
                 paddingVertical: 0,
+                paddingHorizontal: 0,
               }}
               onChangeText={onTitleTextChange}
               onSubmitEditing={saveNote}
@@ -176,7 +184,7 @@ const Editor = ({navigation}) => {
                 DDS.isTab ? setSidebar(!sidebar) : setOpen(!isOpen);
               }}
               style={{
-                width: 40,
+                width: '12.5%',
                 height: 40,
                 justifyContent: 'center',
                 alignItems: 'flex-end',

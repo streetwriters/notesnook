@@ -55,7 +55,7 @@ export const Header = ({
             }}>
             <Icon
               style={{
-                marginLeft: -10,
+                marginLeft: -5,
               }}
               color={colors.pri}
               name={'chevron-left'}
