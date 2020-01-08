@@ -13,7 +13,6 @@ const ListItem = props => (
     px={3}
     sx={{
       position: "relative",
-      marginBottom: 2,
       marginTop: props.pinned ? 4 : 0,
       borderBottom: "1px solid",
       borderBottomColor: "navbg",
