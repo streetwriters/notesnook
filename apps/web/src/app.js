@@ -21,7 +21,7 @@ const NavMenuItem = props => {
         width: "full",
         borderRadius: "none",
         textAlign: "center",
-        color: props.selected ? "primary" : "text",
+        color: props.selected ? "primary" : props.item.color || "text",
         ":hover": {
           backgroundColor: "shade"
         }
