@@ -162,8 +162,10 @@ const theme = (colors, shadows) => ({
       textAlign: "left",
       fontSize: "title",
       fontFamily: "body",
+      borderRadius: "0px",
       py: "15px",
-      mx: "5px"
+      mx: "5px",
+      "&:hover": { borderColor: "primary" }
     }
   },
   shadows: shadows

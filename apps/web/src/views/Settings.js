@@ -22,7 +22,8 @@ function Settings() {
             borderRight: "0px Solid",
             borderTop: "0px Solid",
             borderBottom: "1px Solid",
-            borderColor: "border"
+            borderColor: "border",
+            "&:hover": { borderColor: "primary" }
           }}
           py="15px"
         >
