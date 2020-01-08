@@ -8,6 +8,7 @@ import {
   FlatList,
   ActivityIndicator,
   KeyboardAvoidingView,
+  StatusBar,
 } from 'react-native';
 import {
   SIZE,

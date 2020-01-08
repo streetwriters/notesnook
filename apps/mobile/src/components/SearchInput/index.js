@@ -11,7 +11,7 @@ import {
   WEIGHT,
 } from '../../common/common';
 import Icon from 'react-native-vector-icons/Ionicons';
-import {getElevation} from '../../utils/utils';
+import {getElevation, w} from '../../utils/utils';
 import * as Animatable from 'react-native-animatable';
 import {DDS} from '../../../App';
 import {useAppContext} from '../../provider/useAppContext';
@@ -37,12 +37,12 @@ export const Search = props => {
           flexDirection: 'row',
           justifyContent: 'space-between',
           alignItems: 'center',
-          width: DDS.isTab ? '95%' : '90%',
+          paddingHorizontal: 12,
+          width: w - 12,
           alignSelf: 'center',
           borderRadius: br,
           height: '90%',
           borderWidth: props.hide ? 0 : 1.5,
-          paddingHorizontal: ph,
           borderColor: focus ? colors.accent : colors.nav,
         }}>
         <TextInput

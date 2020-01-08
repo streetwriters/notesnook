@@ -9,6 +9,7 @@ import {
   TextInput,
   BackHandler,
   TouchableOpacity,
+  StatusBar,
 } from 'react-native';
 import {SIZE, WEIGHT} from '../../common/common';
 import WebView from 'react-native-webview';
@@ -134,27 +135,23 @@ const Editor = ({navigation}) => {
               flexDirection: 'row',
               justifyContent: 'space-between',
               alignItems: 'center',
-              width: '96%',
+              paddingHorizontal: 12,
+              width: '100%',
               alignSelf: 'center',
-              marginTop: Platform.OS == 'ios' ? h * 0.01 : h * 0.04,
+              height: 50,
+              marginTop: Platform.OS == 'ios' ? 0 : StatusBar.currentHeight,
             }}>
             <TouchableOpacity
               onPress={() => {
                 setDialog(true);
               }}
               style={{
-                width: 40,
+                width: 50,
                 height: 40,
+                justifyContent: 'center',
+                alignItems: 'flex-start',
               }}>
-              <Icon
-                style={{
-                  paddingRight: 10,
-                  marginTop: 3.5,
-                }}
-                name="chevron-left"
-                color={colors.icon}
-                size={SIZE.xl}
-              />
+              <Icon name="chevron-left" color={colors.icon} size={SIZE.xl} />
             </TouchableOpacity>
 
             <TextInput
@@ -163,7 +160,7 @@ const Editor = ({navigation}) => {
               placeholderTextColor={colors.icon}
               defaultValue={title}
               style={{
-                width: '80%',
+                width: '70%',
                 fontFamily: WEIGHT.bold,
                 fontSize: SIZE.xl,
                 color: colors.pri,
@@ -182,8 +179,7 @@ const Editor = ({navigation}) => {
                 width: 40,
                 height: 40,
                 justifyContent: 'center',
-                alignItems: 'center',
-                paddingTop: 3,
+                alignItems: 'flex-end',
               }}>
               <Icon
                 name={sidebar || isOpen ? 'x' : 'menu'}

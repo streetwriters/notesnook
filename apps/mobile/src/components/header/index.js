@@ -31,7 +31,8 @@ export const Header = ({
         marginBottom: 10,
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingHorizontal: DDS.isTab ? '2.5%' : '5%',
+        paddingHorizontal: 12,
+        width: '100%',
       }}>
       <View
         style={{
@@ -129,7 +130,6 @@ export const Header = ({
               alignItems: 'flex-end',
               height: 40,
               width: 60,
-              paddingRight: 0,
             }}>
             <Icon
               style={{
@@ -139,7 +139,7 @@ export const Header = ({
                     translateX: 0,
                   },
                   {
-                    translateY: 3,
+                    translateY: 5,
                   },
                 ],
               }}
@@ -155,7 +155,7 @@ export const Header = ({
                     translateX: -15,
                   },
                   {
-                    translateY: -3,
+                    translateY: -5,
                   },
                 ],
               }}

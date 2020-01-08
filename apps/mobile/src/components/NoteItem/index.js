@@ -72,14 +72,12 @@ const NoteItem = props => {
     <View
       style={[
         {
-          marginHorizontal: '5%',
           paddingVertical: pv,
           justifyContent: 'flex-start',
           alignItems: 'center',
           flexDirection: 'row',
-          paddingHorizontal: 0,
-          width: DDS.isTab ? '95%' : '90%',
-          marginHorizontal: '5%',
+          paddingHorizontal: 12,
+          width: '100%',
           alignSelf: 'center',
           borderBottomWidth: 1,
           borderBottomColor: colors.nav,

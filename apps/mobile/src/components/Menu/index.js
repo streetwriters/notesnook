@@ -45,9 +45,10 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
       />
 
       <ScrollView
+        showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           justifyContent: 'space-between',
-          height: '100%',
+          minHeight: '100%',
         }}>
         <View>
           <FlatList

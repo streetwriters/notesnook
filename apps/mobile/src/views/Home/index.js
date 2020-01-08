@@ -210,7 +210,7 @@ export const Home = ({navigation}) => {
             }}
             activeOpacity={opacity}
             style={{
-              width: DDS.isTab ? '95%' : '90%',
+              width: '95%',
               alignSelf: 'center',
               borderRadius: br,
               backgroundColor: colors.accent,
