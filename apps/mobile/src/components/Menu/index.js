@@ -29,7 +29,7 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
   return (
     <AnimatedSafeAreaView
       transition="backgroundColor"
-      duration={300}
+      duration={400}
       style={{
         height: '100%',
         opacity: hide ? 0 : 1,
@@ -45,11 +45,8 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
       />
 
       <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{
-          justifyContent: 'space-between',
-          minHeight: '100%',
-        }}>
+        contentContainerStyle={{minHeight: '100%'}}
+        showsVerticalScrollIndicator={false}>
         <View>
           <FlatList
             data={[
@@ -212,8 +209,8 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
             </View>
           </TouchableOpacity>
 
-          <ScrollView
-            contentContainerStyle={{
+          <View
+            style={{
               flexDirection: 'row',
               flexWrap: 'wrap',
               paddingHorizontal: '5%',
@@ -253,10 +250,10 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
                 </Text>
               </TouchableOpacity>
             ))}
-          </ScrollView>
+          </View>
 
-          <ScrollView
-            contentContainerStyle={{
+          <View
+            style={{
               flexDirection: 'row',
               flexWrap: 'wrap',
               paddingHorizontal: '5%',
@@ -283,7 +280,7 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
                 </TouchableOpacity>
               ),
             )}
-          </ScrollView>
+          </View>
         </View>
 
         {/*  <View
@@ -318,46 +315,46 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
             <Icon name="star" color="#FCBA04" size={SIZE.lg} />
           </View>
         </View> */}
+      </ScrollView>
+      <View
+        style={{
+          width: '100%',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          alignSelf: 'center',
+          marginBottom: 20,
+          flexDirection: 'row',
+          backgroundColor: colors.bg,
+        }}>
+        <TouchableOpacity
+          onPress={() => {
+            close();
 
-        <View
+            NavigationService.navigate('Login');
+          }}
+          activeOpacity={opacity / 2}
           style={{
-            width: '100%',
-            justifyContent: 'space-between',
+            paddingVertical: pv + 5,
             paddingHorizontal: '5%',
+            backgroundColor: colors.shade,
+            width: '100%',
+            justifyContent: 'flex-start',
             alignItems: 'center',
-            alignSelf: 'center',
-            marginBottom: 20,
             flexDirection: 'row',
           }}>
-          <TouchableOpacity
-            onPress={() => {
-              close();
+          <Icon name="log-in" color={colors.accent} size={SIZE.lg} />
 
-              NavigationService.navigate('Login');
-            }}
-            activeOpacity={opacity / 2}
+          <Text
             style={{
-              paddingVertical: pv + 5,
-
-              width: '100%',
-              borderRadius: 5,
-              justifyContent: 'flex-start',
-              alignItems: 'center',
-              flexDirection: 'row',
+              fontFamily: WEIGHT.regular,
+              color: colors.accent,
+              fontSize: SIZE.md,
             }}>
-            <Icon name="log-in" color={colors.accent} size={SIZE.lg} />
+            {'  '}Login
+          </Text>
+        </TouchableOpacity>
 
-            <Text
-              style={{
-                fontFamily: WEIGHT.regular,
-                color: colors.accent,
-                fontSize: SIZE.md,
-              }}>
-              {'  '}Login
-            </Text>
-          </TouchableOpacity>
-
-          {/* <Text
+        {/* <Text
         style={{
           fontFamily: WEIGHT.semibold,
           color: colors.accent,
@@ -377,7 +374,7 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
         80.45/100 MB
       </Text> */}
 
-          {/*  <View
+        {/*  <View
         style={{
           borderRadius: 2.5,
           backgroundColor: colors.accent,
@@ -394,8 +391,7 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
           Basic User
         </Text>
       </View> */}
-        </View>
-      </ScrollView>
+      </View>
     </AnimatedSafeAreaView>
   );
 };

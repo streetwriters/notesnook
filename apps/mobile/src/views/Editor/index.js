@@ -171,7 +171,7 @@ const Editor = ({navigation}) => {
                 fontFamily: WEIGHT.bold,
                 fontSize: SIZE.xl,
                 color: colors.pri,
-                maxWidth: '80%',
+                maxWidth: '75%',
                 paddingVertical: 0,
                 paddingHorizontal: 0,
               }}
