@@ -60,6 +60,7 @@ const ListItem = props => (
         }
       }}
       sx={{
+        flex: "1 1 auto",
         paddingTop: props.pinned ? 4 : 0,
         ":hover": {
           cursor: "pointer"
