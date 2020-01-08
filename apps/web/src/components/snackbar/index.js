@@ -31,7 +31,7 @@ const Snackbar = props => (
         bottom: 10,
         left: "50%",
         textAlign: "center",
-        color: "fontSecondary",
+        color: "static",
         fontFamily: "body",
         fontWeight: "body",
         borderRadius: "default",

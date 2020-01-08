@@ -32,11 +32,12 @@ const ListItem = props => (
         bg="primary"
         sx={{
           borderRadius: 35,
-          width: 35,
-          height: 35,
+          width: 30,
+          height: 30,
           position: "absolute",
           top: -15,
           left: 0,
+          marginTop: 5,
           boxShadow: "2px 1px 3px #00000066"
         }}
         mx={3}
@@ -44,7 +45,7 @@ const ListItem = props => (
         justifyContent="center"
       >
         <Box
-          bg="white"
+          bg="static"
           sx={{
             borderRadius: 5,
             width: 5,

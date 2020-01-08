@@ -10,7 +10,6 @@ const colorsLight = makeTheme({
   border: "#f0f0f0",
   hover: "#e0e0e0",
   fontSecondary: "white",
-  fontTertiary: "gray",
   text: "black",
   overlay: "rgba(255, 255, 255, 0.75)"
 });
@@ -169,7 +168,6 @@ function makeTheme({
   border,
   hover,
   fontSecondary,
-  fontTertiary,
   text,
   overlay
 }) {
@@ -183,10 +181,11 @@ function makeTheme({
     border,
     hover,
     fontSecondary,
-    fontTertiary,
+    fontTertiary: "gray",
     transparent: "#00000000",
     text,
-    overlay
+    overlay,
+    static: "white"
   };
 }
 

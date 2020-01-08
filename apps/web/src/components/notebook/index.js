@@ -61,7 +61,7 @@ const Notebook = ({ item, index, onClick, onTopicClick }) => {
               sx={{
                 marginRight: 1,
                 borderRadius: "default",
-                color: "fontSecondary"
+                color: "static"
               }}
             >
               <Text className="unselectable" variant="body" fontSize={11}>

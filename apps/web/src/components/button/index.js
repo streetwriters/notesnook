@@ -13,7 +13,7 @@ const Button = props => (
     sx={{
       borderRadius: "default",
       marginBottom: 2,
-      color: "fontSecondary",
+      color: "static",
       fontFamily: "body",
       fontWeight: "body",
       ...ButtonPressedStyle,
