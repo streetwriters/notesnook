@@ -10,12 +10,8 @@ function Settings() {
   return (
     <Flex flexDirection="column" flex="1 1 auto">
       <Flex flexDirection="column" flex="1 1 auto">
-        <Button className="unselectable" variant="setting">
-          General
-        </Button>
-        <Button className="unselectable" variant="setting">
-          Account
-        </Button>
+        <Button variant="setting">General</Button>
+        <Button variant="setting">Account</Button>
         <Box
           sx={{
             borderLeft: "0px Solid",
@@ -26,7 +22,7 @@ function Settings() {
           }}
           py="15px"
         >
-          <Flex className="unselectable" fontSize="body" alignItems="center">
+          <Flex fontSize="body" alignItems="center">
             <Text px="16px" sx={{ fontFamily: "body", fontSize: "title" }}>
               Theme
             </Text>
@@ -59,7 +55,6 @@ function Settings() {
               <Text width={1 / 2}>Dark Mode</Text>{" "}
               <Flex width={1 / 2} justifyContent="right">
                 <Switch
-                  className="unselectable"
                   onClick={() => {
                     setCheck(!check);
                     changeTheme();
@@ -70,15 +65,9 @@ function Settings() {
             </Flex>
           </Flex>
         </Box>
-        <Button className="unselectable" variant="setting">
-          Terms of Service
-        </Button>
-        <Button className="unselectable" variant="setting">
-          Privacy Policy
-        </Button>
-        <Button className="unselectable" variant="setting">
-          About
-        </Button>
+        <Button variant="setting">Terms of Service</Button>
+        <Button variant="setting">Privacy Policy</Button>
+        <Button variant="setting">About</Button>
       </Flex>
     </Flex>
   );

@@ -38,13 +38,7 @@ function Menu(props) {
               }
             }}
           >
-            <Text
-              className="unselectable"
-              as="span"
-              mx={1}
-              fontFamily="body"
-              fontSize="menu"
-            >
+            <Text as="span" mx={1} fontFamily="body" fontSize="menu">
               {item.title}
             </Text>
           </Flex>

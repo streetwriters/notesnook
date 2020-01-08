@@ -64,7 +64,7 @@ const Notebook = ({ item, index, onClick, onTopicClick }) => {
                 color: "static"
               }}
             >
-              <Text className="unselectable" variant="body" fontSize={11}>
+              <Text variant="body" fontSize={11}>
                 {topic.title}
               </Text>
             </Flex>

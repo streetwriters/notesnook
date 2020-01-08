@@ -21,22 +21,12 @@ function Properties() {
       <CheckBox icon={Icon.MapPin} label="Pin" />
       <CheckBox icon={Icon.Star} label="Favorite" />
       <CheckBox icon={Icon.Lock} label="Lock" />
-      <Flex
-        className="unselectable"
-        fontSize="body"
-        sx={{ marginBottom: 2 }}
-        alignItems="center"
-      >
+      <Flex fontSize="body" sx={{ marginBottom: 2 }} alignItems="center">
         <Icon.Tag size={18} />
         <Text sx={{ marginLeft: 1 }}>Tags:</Text>
       </Flex>
       <Input sx={{ marginBottom: 2 }} variant="default" />
-      <Flex
-        className="unselectable"
-        fontSize="body"
-        sx={{ marginBottom: 2 }}
-        alignItems="center"
-      >
+      <Flex fontSize="body" sx={{ marginBottom: 2 }} alignItems="center">
         <Icon.Octagon size={18} />
         <Text sx={{ marginLeft: 1 }}>Colors:</Text>
       </Flex>

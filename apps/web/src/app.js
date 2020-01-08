@@ -15,7 +15,6 @@ const NavMenuItem = props => {
   }, [props.item.key, props.selected]);
   return (
     <Button
-      className="unselectable"
       onClick={props.onSelected}
       variant="nav"
       sx={{
@@ -132,7 +131,7 @@ function App() {
             <CheckBox icon={Icon.Star} label="Favorite" />
             <CheckBox icon={Icon.Lock} label="Lock" />
             <Flex
-              className="unselectable"
+              
               fontSize="body"
               sx={{ marginBottom: 2 }}
               alignItems="center"
@@ -142,7 +141,7 @@ function App() {
             </Flex>
             <Input sx={{ marginBottom: 2 }} variant="default" />
             <Flex
-              className="unselectable"
+              
               fontSize="body"
               sx={{ marginBottom: 2 }}
               alignItems="center"

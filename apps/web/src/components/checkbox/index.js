@@ -12,27 +12,17 @@ const CheckBox = props => {
           props.onCheckChanged(checked);
         }
       }}
-      className="unselectable"
       width="full"
       alignItems="center"
       justifyContent="space-between"
       sx={{ cursor: "pointer", marginBottom: 2 }}
     >
-      <Flex
-        className="unselectable"
-        fontSize="body"
-        sx={{ cursor: "pointer" }}
-        alignItems="center"
-      >
+      <Flex fontSize="body" sx={{ cursor: "pointer" }} alignItems="center">
         <props.icon size={18} />
         <Text sx={{ marginLeft: 1 }}>{props.label}</Text>
       </Flex>
       <Text color={checked ? "primary" : "foreground"}>
-        <Icon.CheckCircle
-          size={18}
-          className="unselectable"
-          style={{ cursor: "pointer" }}
-        />
+        <Icon.CheckCircle size={18} style={{ cursor: "pointer" }} />
       </Text>
     </Flex>
   );

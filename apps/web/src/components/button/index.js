@@ -22,7 +22,7 @@ const Button = props => (
     onClick={props.onClick}
   >
     {props.Icon && <props.Icon />}
-    <Text as="span" className="unselectable" mx={1} flex="1 1 auto">
+    <Text as="span" mx={1} flex="1 1 auto">
       {props.content}
     </Text>
   </Flex>

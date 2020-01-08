@@ -1,4 +1,4 @@
-.unselectable {
+* {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -khtml-user-select: none;
@@ -8,6 +8,6 @@
   cursor: default;
 }
 
-.unselectable::-moz-focus-inner {
+*::-moz-focus-inner {
   border: 0;
 }
