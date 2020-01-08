@@ -3,26 +3,30 @@ import { ThemeProvider as EmotionThemeProvider } from "emotion-theming";
 import { ev } from "../common";
 import { useEffect } from "react";
 
-const colorsLight = makeTheme({
-  background: "white",
-  accent: "white",
-  navbg: "#f0f0f0",
-  border: "#f0f0f0",
-  hover: "#e0e0e0",
-  fontSecondary: "white",
-  text: "black",
-  overlay: "rgba(255, 255, 255, 0.75)"
-});
-const colorsDark = makeTheme({
-  background: "#1f1f1f",
-  accent: "#000",
-  navbg: "#2b2b2b",
-  border: "#2b2b2b",
-  hover: "#3b3b3b",
-  fontSecondary: "#000",
-  text: "#fff",
-  overlay: "rgba(0, 0, 0, 0.75)"
-});
+const colorsLight = primary =>
+  makeTheme({
+    primary,
+    background: "white",
+    accent: "white",
+    navbg: "#f0f0f0",
+    border: "#f0f0f0",
+    hover: "#e0e0e0",
+    fontSecondary: "white",
+    text: "black",
+    overlay: "rgba(255, 255, 255, 0.75)"
+  });
+const colorsDark = primary =>
+  makeTheme({
+    primary,
+    background: "#1f1f1f",
+    accent: "#000",
+    navbg: "#2b2b2b",
+    border: "#2b2b2b",
+    hover: "#3b3b3b",
+    fontSecondary: "#000",
+    text: "#fff",
+    overlay: "rgba(0, 0, 0, 0.75)"
+  });
 const shadowsDark = {
   1: "0 0 0px 0px #00000000",
   2: "0 0 8px 0px #55555544",
@@ -162,6 +166,7 @@ const theme = (colors, shadows) => ({
 });
 
 function makeTheme({
+  primary,
   background,
   accent,
   navbg,
@@ -173,7 +178,7 @@ function makeTheme({
 }) {
   return {
     background,
-    primary: "#1790F3",
+    primary,
     //secondary: "",
     accent,
     //custom
@@ -189,12 +194,13 @@ function makeTheme({
   };
 }
 
-const getTheme = type =>
+const getTheme = (type, accent) =>
   type === "dark"
-    ? theme(colorsDark, shadowsDark)
-    : theme(colorsLight, shadowsLight);
+    ? theme(colorsDark(accent), shadowsDark)
+    : theme(colorsLight(accent), shadowsLight);
 
 var currentTheme = window.localStorage.getItem("theme") || "light";
+var currentAccent = window.localStorage.getItem("accent") || "#1790F3";
 
 export const ThemeProvider = props => {
   const [, updateState] = React.useState();
@@ -207,7 +213,7 @@ export const ThemeProvider = props => {
       ev.removeListener("changeTheme", updater);
     };
   }, []);
-  const theme = getTheme(currentTheme);
+  const theme = getTheme(currentTheme, currentAccent);
   return (
     <EmotionThemeProvider theme={theme}>
       {props.children instanceof Function
@@ -215,6 +221,12 @@ export const ThemeProvider = props => {
         : props.children}
     </EmotionThemeProvider>
   );
+};
+
+export const changeAccent = accent => {
+  currentAccent = accent;
+  window.localStorage.setItem("accent", accent);
+  ev.emit("changeTheme");
 };
 
 export const changeTheme = () => {

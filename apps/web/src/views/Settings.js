@@ -3,7 +3,7 @@ import { Box, Button, Flex, Text } from "rebass";
 import * as Icon from "react-feather";
 import { Switch } from "@rebass/forms";
 import "../app.css";
-import { changeTheme, isDarkTheme } from "../utils/theme";
+import { changeTheme, isDarkTheme, changeAccent } from "../utils/theme";
 
 function Settings() {
   const [check, setCheck] = useState(isDarkTheme());
@@ -46,7 +46,12 @@ function Settings() {
                 { label: "indigo", code: "#F032E6" },
                 { label: "lightpink", code: "#FABEBE" }
               ].map(color => (
-                <Box sx={{ cursor: "pointer" }}>
+                <Box
+                  sx={{ cursor: "pointer" }}
+                  onClick={() => {
+                    changeAccent(color.code);
+                  }}
+                >
                   <Icon.Circle size={50} fill={color.code} strokeWidth={0} />
                 </Box>
               ))}
