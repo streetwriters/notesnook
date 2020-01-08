@@ -36,15 +36,12 @@ export const AddTopicDialog = ({
   toEdit = null,
 }) => {
   const {colors} = useAppContext();
-  const [topics, setTopics] = useState(['']);
-  const forceUpdate = useForceUpdate();
-  const setTitleRef = createRef();
-  let description = 'my first notebook';
+  const [titleFocused, setTitleFocused] = useState(false);
+
   let title = null;
   const addNewTopic = async () => {
     if (!title)
       return ToastEvent.show('Title is required', 'error', 3000, () => {}, '');
-    console.log(notebookID, title);
     db.addTopicToNotebook(notebookID, title);
     ToastEvent.show('New topic added', 'success', 3000, () => {}, '');
     close(true);
@@ -61,16 +58,24 @@ export const AddTopicDialog = ({
         style={{
           width: '100%',
           height: '100%',
-          backgroundColor: 'rgba(255,255,255,0.3)',
+          backgroundColor: 'rgba(0,0,0,0.3)',
           justifyContent: 'center',
           alignItems: 'center',
         }}>
+        <TouchableOpacity
+          onPress={() => close()}
+          style={{
+            width: '100%',
+            height: '100%',
+            position: 'absolute',
+          }}
+        />
+
         <View
           style={{
             ...getElevation(5),
             width: '80%',
             maxHeight: 350,
-
             borderRadius: 5,
             backgroundColor: colors.bg,
             paddingHorizontal: ph,
@@ -98,13 +103,19 @@ export const AddTopicDialog = ({
             style={{
               padding: pv,
               borderWidth: 1.5,
-              borderColor: colors.nav,
+              borderColor: titleFocused ? colors.accent : colors.nav,
               paddingHorizontal: ph,
               borderRadius: 5,
               fontSize: SIZE.sm,
               fontFamily: WEIGHT.regular,
               color: colors.pri,
               marginTop: 20,
+            }}
+            onFocus={() => {
+              setTitleFocused(true);
+            }}
+            onBlur={() => {
+              setTitleFocused(false);
             }}
             defaultValue={toEdit ? toEdit.title : null}
             onChangeText={value => {

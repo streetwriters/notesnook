@@ -39,10 +39,18 @@ export const Dialog = ({
         style={{
           width: '100%',
           height: '100%',
-          backgroundColor: 'rgba(255,255,255,0.3)',
+          backgroundColor: 'rgba(0,0,0,0.3)',
           justifyContent: 'center',
           alignItems: 'center',
         }}>
+        <TouchableOpacity
+          onPress={() => close()}
+          style={{
+            width: '100%',
+            height: '100%',
+            position: 'absolute',
+          }}
+        />
         <View
           style={{
             ...getElevation(5),

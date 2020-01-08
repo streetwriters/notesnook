@@ -21,12 +21,14 @@ export const AddNotebookDialog = ({visible, close, toEdit = null}) => {
   const [topics, setTopics] = useState(['']);
   const [title, setTitle] = useState(null);
 
+  const [description, setDescription] = useState(null);
+  const [titleFocused, setTitleFocused] = useState(false);
+  const [descFocused, setDescFocused] = useState(false);
   let listRef = createRef();
   let prevItem = null;
   let prevIndex = null;
   let currentSelectedInput = null;
   let timestamp = null;
-  let description = 'my first notebook';
   let backPressCount = 0;
 
   const onSubmit = (text, index, willFocus = false) => {
@@ -162,10 +164,18 @@ export const AddNotebookDialog = ({visible, close, toEdit = null}) => {
         style={{
           width: '100%',
           height: '100%',
-          backgroundColor: 'rgba(255,255,255,0.3)',
+          backgroundColor: 'rgba(0,0,0,0.3)',
           justifyContent: 'center',
           alignItems: 'center',
         }}>
+        <TouchableOpacity
+          onPress={() => close()}
+          style={{
+            width: '100%',
+            height: '100%',
+            position: 'absolute',
+          }}
+        />
         <View
           style={{
             ...getElevation(5),
@@ -198,20 +208,52 @@ export const AddNotebookDialog = ({visible, close, toEdit = null}) => {
             style={{
               padding: pv - 5,
               borderWidth: 1.5,
-              borderColor: colors.nav,
+              borderColor: titleFocused ? colors.accent : colors.nav,
               paddingHorizontal: ph,
               borderRadius: 5,
               fontSize: SIZE.sm,
               fontFamily: WEIGHT.regular,
               color: colors.pri,
               marginTop: 20,
-              marginBottom: 10,
+              marginBottom: 5,
+            }}
+            onFocus={() => {
+              setTitleFocused(true);
+            }}
+            onBlur={() => {
+              setTitleFocused(false);
             }}
             defaultValue={toEdit ? toEdit.title : null}
             onChangeText={value => {
               setTitle(value);
             }}
             placeholder="Title of notebook"
+            placeholderTextColor={colors.icon}
+          />
+          <TextInput
+            style={{
+              padding: pv - 5,
+              borderWidth: 1.5,
+              borderColor: descFocused ? colors.accent : colors.nav,
+              paddingHorizontal: ph,
+              borderRadius: 5,
+              fontSize: SIZE.sm,
+              fontFamily: WEIGHT.regular,
+              color: colors.pri,
+              marginTop: 5,
+              marginBottom: 10,
+            }}
+            onFocus={() => {
+              setDescFocused(true);
+            }}
+            onBlur={() => {
+              setDescFocused(false);
+            }}
+            defaultValue={toEdit ? toEdit.description : null}
+            onChangeText={value => {
+              setDescription(value);
+            }}
+            placeholder="write a description"
             placeholderTextColor={colors.icon}
           />
 
@@ -253,9 +295,11 @@ export const AddNotebookDialog = ({visible, close, toEdit = null}) => {
 
           <View
             style={{
-              justifyContent: 'space-around',
+              justifyContent: 'space-between',
+
               alignItems: 'center',
               flexDirection: 'row',
+              width: '100%',
               marginTop: 20,
             }}>
             <TouchableOpacity
@@ -267,7 +311,7 @@ export const AddNotebookDialog = ({visible, close, toEdit = null}) => {
                 paddingVertical: pv,
                 paddingHorizontal: ph,
                 borderRadius: 5,
-                width: '45%',
+                width: '48%',
                 justifyContent: 'center',
                 alignItems: 'center',
                 borderColor: colors.accent,
@@ -298,7 +342,7 @@ export const AddNotebookDialog = ({visible, close, toEdit = null}) => {
                 paddingVertical: pv,
                 paddingHorizontal: ph,
                 borderRadius: 5,
-                width: '45%',
+                width: '48%',
                 justifyContent: 'center',
                 alignItems: 'center',
                 backgroundColor: colors.nav,
@@ -331,7 +375,7 @@ const TopicItem = ({
   onKeyPress,
   onBlur,
 }) => {
-  const [focus, setFocus] = useState(true);
+  const [focus, setFocus] = useState(false);
   const topicRef = ref => (refs[index] = ref);
 
   let text = item;
@@ -342,10 +386,7 @@ const TopicItem = ({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        borderRadius: 5,
-        borderWidth: 1.5,
-        borderColor: colors.nav,
-        paddingHorizontal: ph,
+
         marginTop: 10,
       }}>
       <TextInput
@@ -372,11 +413,15 @@ const TopicItem = ({
         style={{
           padding: pv - 5,
           paddingHorizontal: 0,
+          borderRadius: 5,
+          borderWidth: 1.5,
           fontSize: SIZE.sm,
+          borderColor: focus ? colors.accent : colors.nav,
           fontFamily: WEIGHT.regular,
           color: colors.pri,
-          width: '90%',
-          maxWidth: '90%',
+          paddingHorizontal: ph,
+          width: '85%',
+          maxWidth: '85%',
         }}
         defaultValue={item}
         placeholder="Add a topic"
@@ -388,11 +433,16 @@ const TopicItem = ({
         style={{
           justifyContent: 'center',
           alignItems: 'center',
+          borderWidth: 1.5,
+          borderColor: focus ? colors.accent : colors.nav,
+          borderRadius: 5,
+          width: 40,
+          height: 40,
         }}>
         <Icon
           name={!focus ? 'minus' : 'plus'}
           size={SIZE.lg}
-          color={colors.accent}
+          color={focus ? colors.accent : colors.icon}
         />
       </TouchableOpacity>
     </View>
