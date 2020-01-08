@@ -2,6 +2,7 @@ import React from "react";
 import { ThemeProvider as EmotionThemeProvider } from "emotion-theming";
 import { ev } from "../common";
 import { useEffect } from "react";
+import { addCss } from "./css";
 
 const colorsLight = primary =>
   makeTheme({
@@ -13,7 +14,8 @@ const colorsLight = primary =>
     hover: "#e0e0e0",
     fontSecondary: "white",
     text: "black",
-    overlay: "rgba(255, 255, 255, 0.75)"
+    overlay: "rgba(255, 255, 255, 0.75)",
+    secondary: "white"
   });
 const colorsDark = primary =>
   makeTheme({
@@ -25,8 +27,10 @@ const colorsDark = primary =>
     hover: "#3b3b3b",
     fontSecondary: "#000",
     text: "#fff",
-    overlay: "rgba(0, 0, 0, 0.75)"
+    overlay: "rgba(0, 0, 0, 0.75)",
+    secondary: "black"
   });
+
 const shadowsDark = {
   1: "0 0 0px 0px #00000000",
   2: "0 0 8px 0px #55555544",
@@ -174,11 +178,13 @@ function makeTheme({
   hover,
   fontSecondary,
   text,
-  overlay
+  overlay,
+  secondary
 }) {
   return {
     background,
     primary,
+    shade: primary + "12",
     //secondary: "",
     accent,
     //custom
@@ -190,7 +196,8 @@ function makeTheme({
     transparent: "#00000000",
     text,
     overlay,
-    static: "white"
+    static: "white",
+    secondary
   };
 }
 
@@ -214,6 +221,7 @@ export const ThemeProvider = props => {
     };
   }, []);
   const theme = getTheme(currentTheme, currentAccent);
+  addCss(cssTheme(theme));
   return (
     <EmotionThemeProvider theme={theme}>
       {props.children instanceof Function
@@ -241,4 +249,12 @@ export const ButtonPressedStyle = {
   ":active": {
     opacity: "0.8"
   }
+};
+
+const cssTheme = theme => {
+  let root = ":root {";
+  for (let color in theme.colors) {
+    root += `--${color}: ${theme.colors[color]};`;
+  }
+  return root + "}";
 };

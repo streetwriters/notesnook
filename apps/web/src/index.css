@@ -16,10 +16,8 @@ body,
   transition: background-color 300ms linear, border-color 300ms linear;
 }
 
-body {
+* {
   font-family: "Noto Sans", sans-serif;
-  font-weight: normal;
-  font-size: 14px;
 }
 
 @keyframes fadeUp {

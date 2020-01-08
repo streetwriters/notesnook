@@ -6,6 +6,7 @@
   -ms-user-select: none;
   user-select: none;
   cursor: default;
+  outline: none;
 }
 
 *::-moz-focus-inner {

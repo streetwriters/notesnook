@@ -33,8 +33,7 @@ function Menu(props) {
             sx={{
               color: item.color || "fontPrimary",
               ":hover": {
-                backgroundColor: "primary",
-                color: "fontSecondary"
+                backgroundColor: "shade"
               }
             }}
           >

@@ -30,7 +30,50 @@
 .ql-toolbar.ql-snow {
   width: 100%;
   border: none !important;
-  border-bottom: 1px solid #f0f0f0 !important;
-  border-top: 1px solid #f0f0f0 !important;
+  border-bottom: 1px solid var(--border) !important;
+  border-top: 1px solid var(--border) !important;
   padding: 5px !important;
+}
+
+/*Color Overrides*/
+.ql-snow.ql-toolbar button:hover,
+.ql-snow .ql-toolbar button:hover,
+.ql-snow.ql-toolbar button:focus,
+.ql-snow .ql-toolbar button:focus,
+.ql-snow.ql-toolbar button.ql-active,
+.ql-snow .ql-toolbar button.ql-active,
+.ql-snow.ql-toolbar .ql-picker-label:hover,
+.ql-snow .ql-toolbar .ql-picker-label:hover,
+.ql-snow.ql-toolbar .ql-picker-label.ql-active,
+.ql-snow .ql-toolbar .ql-picker-label.ql-active {
+  color: var(--primary) !important;
+  transition: color 300ms linear;
+}
+
+.ql-snow.ql-toolbar :not(.ql-background).ql-picker .ql-picker-item:hover,
+.ql-snow .ql-toolbar :not(.ql-background).ql-picker .ql-picker-item:hover,
+.ql-snow.ql-toolbar
+  :not(.ql-background).ql-picker
+  .ql-picker-item.ql-selected:hover,
+.ql-snow
+  .ql-toolbar
+  :not(.ql-background).ql-picker
+  .ql-picker-item.ql-selected:hover {
+  background-color: var(--shade) !important;
+}
+
+.ql-snow.ql-toolbar .ql-picker-item {
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+}
+
+.ql-snow .ql-picker {
+  color: var(--text) !important;
+}
+
+.ql-toolbar.ql-snow .ql-picker.ql-expanded .ql-picker-options {
+  border: 0px !important;
+  border-radius: 5px;
+  background-color: var(--accent) !important;
+  padding: 5px 0px !important;
 }
