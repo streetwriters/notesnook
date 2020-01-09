@@ -1,160 +1,72 @@
 import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
-import Home from "../views/Home";
-import Notebooks from "../views/Notebooks";
-import Settings from "../views/Settings";
-import Trash from "../views/Trash";
 import { Box, Flex, Heading } from "rebass";
 import * as Icon from "react-feather";
 import { ThemeProvider } from "../utils/theme";
-import Favorites from "../views/Favorites";
 
-const colorRoutes = {
-  red: {
-    key: "red",
-    title: "red",
-    component: undefined,
-    icon: Icon.Circle,
-    color: "#ed2d37"
-  },
-  orange: {
-    key: "orange",
-    title: "orange",
-    component: undefined,
-    icon: Icon.Circle,
-    color: "#ec6e05"
-  },
-  yellow: {
-    key: "yellow",
-    title: "yellow",
-    component: undefined,
-    icon: Icon.Circle,
-    color: "yellow"
-  },
-  green: {
-    key: "green",
-    title: "green",
-    component: undefined,
-    icon: Icon.Circle,
-    color: "green"
-  },
-  blue: {
-    key: "blue",
-    title: "blue",
-    component: undefined,
-    icon: Icon.Circle,
-    color: "blue"
-  },
-  purple: {
-    key: "purple",
-    title: "purple",
-    component: undefined,
-    icon: Icon.Circle,
-    color: "purple"
-  },
-  gray: {
-    key: "gray",
-    title: "gray",
-    component: undefined,
-    icon: Icon.Circle,
-    color: "gray"
-  }
-};
-
-export const routes = {
-  home: {
-    key: "home",
-    title: "Home",
-    component: Home,
-    icon: Icon.Home
-  },
-  notebooks: {
-    key: "notebooks",
-    title: "Notebooks",
-    component: Notebooks,
-    icon: Icon.Book
-  },
-  favorites: {
-    key: "favorites",
-    title: "Favorites",
-    component: Favorites,
-    icon: Icon.Star
-  },
-  trash: {
-    key: "trash",
-    title: "Trash",
-    component: Trash,
-    icon: Icon.Trash
-  },
-  settings: {
-    key: "settings",
-    title: "Settings",
-    component: Settings,
-    icon: Icon.Settings,
-    bottom: true
-  },
-  ...colorRoutes
-};
-
-const history = {};
-export const navigationEvents = {
-  onWillNavigateAway: undefined
-};
-var lastRoute = undefined;
-export async function navigate(
-  routeName,
-  root = "navigationView",
-  params = {}
-) {
-  let route = routes[routeName];
-
-  // do not navigate if the previous route is the same
-  if (!history[root]) {
-    history[root] = [];
-  }
-  if (lastRoute === route) {
-    return false;
+var lastRoute;
+export default class Navigator {
+  constructor(root, routes) {
+    this.routes = routes;
+    this.root = root;
+    this.history = [];
   }
 
-  if (
-    navigationEvents.onWillNavigateAway &&
-    !(await navigationEvents.onWillNavigateAway(routeName, params))
-  ) {
-    return false;
+  getRoute(key) {
+    return this.routes[key];
   }
-  navigationEvents.onWillNavigateAway = undefined;
 
-  let rootView = document.querySelector(`.${root}`);
-  if (!rootView) return false;
-  if (lastRoute) {
-    history[root][history[root].length] = {
-      ...lastRoute
-    };
+  getRoot() {
+    return document.querySelector(`.${this.root}`);
   }
-  ReactDOM.render(<ThemedComponent route={route} params={params} />, rootView);
-  lastRoute = route;
-  return true;
-}
 
-export function goBack(root = "navigationView") {
-  if (!history[root] || history[root].length <= 0) {
-    return;
+  navigate(routeName, params = {}) {
+    let route = this.getRoute(routeName);
+
+    if (!route || lastRoute === route) {
+      return false;
+    }
+
+    route.params = { ...route.params, ...params };
+
+    if (lastRoute) {
+      this.history.push(lastRoute);
+    }
+    lastRoute = route;
+
+    return this.renderRoute(route);
   }
-  let route = history[root].pop();
-  if (route) {
-    let rootView = document.querySelector(`.${root}`);
-    if (!rootView) return;
-    ReactDOM.render(<ThemedComponent route={route} />, rootView);
+
+  renderRoute(route) {
+    let root = this.getRoot();
+    if (!root) {
+      return false;
+    }
+    ReactDOM.render(
+      <NavigationContainer route={route} params={route.params} />,
+      root
+    );
+    return true;
+  }
+
+  goBack() {
+    let route = this.history.pop();
+    if (!route) {
+      return false;
+    }
+    this.navigate(route.key, route.params);
+    this.history.pop(); //remove the route
+    return true;
   }
 }
 
-function ThemedComponent(props) {
-  const [title, setTitle] = useState(props.route.title);
+const NavigationContainer = props => {
+  const [title, setTitle] = useState();
   const [canGoBack, setCanGoBack] = useState(false);
   const [backAction, setBackAction] = useState();
   useEffect(() => {
-    setTitle(props.route.title);
-  }, [props.route.title]);
+    setTitle(props.route.title || props.route.params.title);
+  }, [props.route.title, props.route.params]);
   return (
     <ThemeProvider>
       <Flex alignItems="center" px={3}>
@@ -179,4 +91,4 @@ function ThemedComponent(props) {
       )}
     </ThemeProvider>
   );
-}
+};

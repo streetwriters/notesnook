@@ -3,16 +3,11 @@ import "./app.css";
 import Editor from "./components/editor";
 import { Flex, Box, Button } from "rebass";
 import { ThemeProvider } from "./utils/theme";
-import { routes, navigate } from "./navigation";
+import RootNavigator from "./navigation/navigators/rootnavigator";
 import "./app.css";
 import Properties from "./views/Properties";
 
 const NavMenuItem = props => {
-  useEffect(() => {
-    if (props.selected) {
-      navigate(props.item.key);
-    }
-  }, [props.item.key, props.selected]);
   return (
     <Button
       onClick={props.onSelected}
@@ -43,7 +38,8 @@ function getNavigationViewWidth() {
   return window.localStorage.getItem("navigationViewWidth");
 }
 function App() {
-  const [selectedIndex, setSelectedIndex] = useState(1);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  RootNavigator.navigate("home");
   return (
     <ThemeProvider>
       <Flex
@@ -61,10 +57,10 @@ function App() {
           }}
           px={0}
         >
-          {Object.values(routes).map((item, index) => (
+          {Object.values(RootNavigator.routes).map((item, index) => (
             <NavMenuItem
               onSelected={async () => {
-                if (await navigate(item.key)) {
+                if (RootNavigator.navigate(item.key)) {
                   setSelectedIndex(index);
                 }
               }}
@@ -76,7 +72,7 @@ function App() {
         </Box>
         <Flex flex="1 1 auto" flexDirection="row" alignContent="stretch" px={0}>
           <Flex
-            className="navigationView"
+            className="RootNavigator"
             sx={{
               borderRight: "1px solid",
               borderColor: "border",
@@ -100,16 +96,16 @@ function App() {
             onMouseDown={e => {
               startX = e.clientX;
               let view = document
-                .querySelector(".navigationView")
+                .querySelector(".RootNavigator")
                 .getBoundingClientRect();
               startWidth = parseInt(view.width, 10);
             }}
             onDrag={e => {
-              let view = document.querySelector(".navigationView");
+              let view = document.querySelector(".RootNavigator");
               view.style.width = `${startWidth + e.clientX - startX}px`;
             }}
             onDragEnd={e => {
-              let view = document.querySelector(".navigationView");
+              let view = document.querySelector(".RootNavigator");
               view.style.width = view.getBoundingClientRect().width;
               window.localStorage.setItem(
                 "navigationViewWidth",
