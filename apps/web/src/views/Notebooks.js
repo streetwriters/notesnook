@@ -7,9 +7,8 @@ import { db, ev } from "../common";
 import { showSnack } from "../components/snackbar";
 import { Virtuoso as List } from "react-virtuoso";
 import Notebook from "../components/notebook";
-import Topic from "../components/topic";
-import Note from "../components/note";
-import { sendNewNoteEvent } from "../common";
+import Topics from "./Topics";
+import Notes from "./Notes";
 import { createRoute } from "../navigation/routes";
 import Navigator from "../navigation";
 import { CreateNotebookDialog, ask } from "../components/dialogs";
@@ -48,7 +47,8 @@ const NotebooksView = props => {
               onClick={() => {
                 NotebookNavigator.navigate("topics", {
                   title: notebooks[index].title,
-                  notebook: notebooks[index]
+                  topics: notebooks[index].topics,
+                  notebookId: notebooks[index].dateCreated
                 });
               }}
               /* onTopicClick={(notebook, topic) =>
@@ -79,78 +79,6 @@ const NotebooksView = props => {
   );
 };
 
-const TopicsView = props => {
-  let notebook = props.notebook;
-  useEffect(() => {
-    props.canGoBack(true);
-    props.backAction(() => {
-      props.canGoBack(false);
-      NotebookNavigator.goBack();
-    });
-  }, []);
-  return (
-    <Flex flexDirection="column" flex="1 1 auto">
-      <Flex flexDirection="column" flex="1 1 auto">
-        <Search placeholder="Search" />
-        <List
-          style={{
-            width: "100%",
-            flex: "1 1 auto",
-            height: "auto",
-            overflowX: "hidden"
-          }}
-          totalCount={notebook.topics.length}
-          item={index => (
-            <Topic
-              index={index}
-              item={notebook.topics[index]}
-              onClick={() => {
-                let topic = notebook.topics[index];
-                NotebookNavigator.navigate("notes", {
-                  title: topic.title,
-                  topic
-                });
-              }}
-            />
-          )}
-        />
-        <Button Icon={Icon.Plus} content={"Add more topics"} />
-      </Flex>
-    </Flex>
-  );
-};
-
-const Notes = props => {
-  let topic = props.topic;
-  useEffect(() => {
-    props.canGoBack(true);
-    props.backAction(() => {
-      props.canGoBack(false);
-      NotebookNavigator.goBack();
-    });
-  }, []);
-  return (
-    <Flex flexDirection="column" flex="1 1 auto">
-      <Search placeholder="Search" />
-      <List
-        style={{
-          width: "100%",
-          flex: "1 1 auto",
-          height: "auto",
-          overflowX: "hidden"
-        }}
-        totalCount={topic.notes.length}
-        item={index => <Note index={index} item={topic.notes[index]} />}
-      />
-      <Button
-        Icon={Icon.Plus}
-        content="Make a new note"
-        onClick={sendNewNoteEvent}
-      />
-    </Flex>
-  );
-};
-
 const Notebooks = props => {
   useEffect(() => {
     NotebookNavigator.navigate("notebooks");
@@ -168,7 +96,10 @@ export default Notebooks;
 
 const routes = {
   ...createRoute("notebooks", NotebooksView, { title: "Notebooks" }),
-  ...createRoute("topics", TopicsView),
+  ...createRoute("topics", Topics),
   ...createRoute("notes", Notes)
 };
-const NotebookNavigator = new Navigator("NotebookNavigator", routes);
+const NotebookNavigator = new Navigator("NotebookNavigator", routes, {
+  backButtonEnabled: true
+});
+export { NotebookNavigator };
