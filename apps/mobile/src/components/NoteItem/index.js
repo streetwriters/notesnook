@@ -526,7 +526,13 @@ const ActionSheetComponent = ({
       tag = tag.replace(' ', '_');
     }
     let oldProps = {...note};
-    oldProps.tags.push(tag);
+
+    if (oldProps.tags.includes(tag)) {
+      return;
+    } else {
+      oldProps.tags.push(tag);
+    }
+
     tagsInputRef.setNativeProps({
       text: '#',
     });
@@ -566,6 +572,7 @@ const ActionSheetComponent = ({
           tags: oldProps.tags,
         });
         setNote({...db.getNote(note.dateCreated)});
+
         tagsInputRef.setNativeProps({
           text: tagInputValue,
         });
@@ -787,6 +794,18 @@ const ActionSheetComponent = ({
         }}>
         {note.tags.map(tag => (
           <TouchableOpacity
+            onPress={() => {
+              let oldProps = {...note};
+
+              oldProps.tags.splice(oldProps.tags.indexOf(tag), 1);
+              db.addNote({
+                dateCreated: note.dateCreated,
+                content: note.content,
+                title: note.title,
+                tags: oldProps.tags,
+              });
+              setNote({...db.getNote(note.dateCreated)});
+            }}
             style={{
               flexDirection: 'row',
               justifyContent: 'flex-start',
