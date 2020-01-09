@@ -1,6 +1,4 @@
-import Notebooks from "../../views/Notebooks";
-import Topics from "../../views/Topics";
-import Notes from "../../views/Notes";
+import { Notebooks, Notes, Topics } from "../../views";
 import Navigator from "../index";
 import { createRoute } from "../routes";
 

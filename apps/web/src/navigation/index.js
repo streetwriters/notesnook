@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
-import { Box, Flex, Heading } from "rebass";
+import { Box, Flex, Heading, Text } from "rebass";
 import * as Icon from "react-feather";
 import { ThemeProvider } from "../utils/theme";
 
@@ -62,33 +62,37 @@ export default class Navigator {
     if (!route) {
       return false;
     }
-
+    this.lastRoute = route;
     return this.renderRoute(route);
   }
 }
 
 const NavigationContainer = props => {
-  const [title, setTitle] = useState();
-  useEffect(() => {
-    const { title } = props.route.params;
-    setTitle(props.route.title || title);
-  }, [props.navigator, props.route]);
   return (
     <ThemeProvider>
-      <Flex alignItems="center" px={3}>
-        {props.canGoBack && (
-          <Box
-            onClick={props.backAction}
-            height={42}
-            color="fontPrimary"
-            sx={{ marginLeft: -10 /*correction */ }}
-          >
-            <Icon.ChevronLeft size={42} />
-          </Box>
-        )}
-        <Heading fontSize="heading">{title}</Heading>
+      <Flex flexDirection="column" px={3}>
+        <Flex alignItems="center">
+          {props.canGoBack && (
+            <Box
+              onClick={props.backAction}
+              height={42}
+              color="fontPrimary"
+              sx={{ marginLeft: -10 /*correction */ }}
+            >
+              <Icon.ChevronLeft size={42} />
+            </Box>
+          )}
+          <Heading fontSize="heading">
+            {props.route.title || props.route.params.title}
+          </Heading>
+        </Flex>
+        <Text variant="title" color="primary">
+          {props.route.params.subtitle}
+        </Text>
       </Flex>
-      {props.route.component && <props.route.component {...props.params} />}
+      {props.route.component && (
+        <props.route.component navigator={props.navigator} {...props.params} />
+      )}
     </ThemeProvider>
   );
 };

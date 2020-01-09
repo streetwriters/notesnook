@@ -5,9 +5,9 @@ import { showSnack } from "../components/snackbar";
 import Notebook from "../components/notebook";
 import { CreateNotebookDialog, ask } from "../components/dialogs";
 import ListContainer from "../components/list-container";
-import NotebookNavigator from "../navigation/navigators/nbnavigator";
 
-const NotebooksView = props => {
+const Notebooks = props => {
+  console.log("Notebooks");
   const [open, setOpen] = useState(false);
   const [notebooks, setNotebooks] = useState([]);
   useEffect(() => {
@@ -31,15 +31,19 @@ const NotebooksView = props => {
             index={index}
             item={notebooks[index]}
             onClick={() => {
-              NotebookNavigator.navigate("topics", {
+              props.navigator.navigate("topics", {
                 title: notebooks[index].title,
                 topics: notebooks[index].topics,
-                notebookId: notebooks[index].dateCreated
+                notebook: notebooks[index]
               });
             }}
-            /* onTopicClick={(notebook, topic) =>
-                  navigate(topic, true, notebook.title)
-                } */
+            onTopicClick={(notebook, topic) =>
+              props.navigator.navigate("notes", {
+                title: notebook.title,
+                subtitle: topic.title,
+                notes: db.getTopic(notebook.dateCreated, topic.title)
+              })
+            }
           />
         )}
         button={{
@@ -63,8 +67,10 @@ const NotebooksView = props => {
   );
 };
 
-const Notebooks = props => {
+const NotebooksContainer = props => {
   useEffect(() => {
+    const NotebookNavigator = require("../navigation/navigators/nbnavigator")
+      .default;
     NotebookNavigator.navigate("notebooks");
   }, []);
   return (
@@ -76,4 +82,4 @@ const Notebooks = props => {
   );
 };
 
-export default Notebooks;
+export { NotebooksContainer, Notebooks };
