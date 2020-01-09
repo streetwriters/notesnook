@@ -5,7 +5,7 @@ import TimeAgo from "timeago-react";
 import { db, ev } from "../../common";
 import { showSnack } from "../snackbar";
 import ListItem from "../list-item";
-import { navigate, routes } from "../../navigation";
+//import RootNavigator from "../../navigation/navigators/rootnavigator";
 import { ask } from "../dialogs";
 
 const dropdownRefs = [];
@@ -13,10 +13,10 @@ const menuItems = note => [
   {
     title: note.notebook.notebook ? "Move" : "Add to",
     onClick: async () => {
-      await navigate(routes.notebooks.key, undefined, {
+      /*  RootNavigator.navigate(RootNavigator.routes.notebooks.key, {
         intent: "moveNote",
         data: note
-      });
+      }); */
     }
   },
   {
