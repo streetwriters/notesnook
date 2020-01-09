@@ -40,7 +40,7 @@ export const EditorMenu = ({
   const {colors, changeColorScheme} = useAppContext();
   const [unlock, setUnlock] = useState(false);
   const [vaultDialog, setVaultDialog] = useState(false);
-
+  const [focused, setFocused] = useState(false);
   let tagToAdd = null;
   let backPressCount = 0;
 
@@ -56,8 +56,9 @@ export const EditorMenu = ({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'flex-end',
-        paddingHorizontal: '5%',
+        paddingHorizontal: 12,
         paddingVertical: pv + 5,
+        paddingTop: index === 0 ? 5 : pv + 5,
       }}>
       <View
         style={{
@@ -238,19 +239,36 @@ export const EditorMenu = ({
         behavior={Platform.OS === 'ios' ? 'padding' : null}>
         <ScrollView
           contentContainerStyle={{
-            justifyContent: 'space-between',
-            height: '100%',
+            minHeight: '80%',
           }}>
           <View>
             <View
               style={{
-                height: 2,
+                height: 0,
                 width: '100%',
-                marginBottom: 5,
-                marginTop:
-                  Platform.OS == 'ios' ? 0 : StatusBar.currentHeight - 10,
+
+                marginTop: Platform.OS == 'ios' ? 0 : StatusBar.currentHeight,
               }}
             />
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'flex-start',
+                alignItems: 'center',
+                width: '95%',
+                alignSelf: 'center',
+                height: 50,
+              }}>
+              <Text
+                style={{
+                  fontFamily: WEIGHT.bold,
+                  fontSize: SIZE.md,
+                  color: colors.accent,
+                }}>
+                Properties
+              </Text>
+            </View>
+
             <FlatList
               data={[
                 {
@@ -314,9 +332,15 @@ export const EditorMenu = ({
                   func: () => {},
                   close: true,
                 },
+                {
+                  name: 'Export',
+                  icon: 'external-link',
+                  func: () => {},
+                  close: true,
+                },
 
                 {
-                  name: 'Delete',
+                  name: 'Delete Note',
                   icon: 'trash',
                   func: () => {},
                   close: true,
@@ -348,7 +372,7 @@ export const EditorMenu = ({
                 flexDirection: 'row',
                 justifyContent: 'space-between',
                 alignItems: 'flex-end',
-                paddingHorizontal: '5%',
+                paddingHorizontal: 12,
                 marginTop: 15,
               }}>
               <View
@@ -386,6 +410,8 @@ export const EditorMenu = ({
                 marginTop: 10,
                 borderRadius: 5,
                 backgroundColor: colors.nav,
+                borderWidth: 1.5,
+                borderColor: focused ? colors.accent : 'transparent',
               }}>
               {noteProps.tags.map(_renderTag)}
               <TextInput
@@ -400,6 +426,14 @@ export const EditorMenu = ({
                 }}
                 ref={ref => (tagsInputRef = ref)}
                 placeholderTextColor={colors.icon}
+                onFocus={() => {
+                  setFocused(true);
+                }}
+                selectionColor={colors.accent}
+                selectTextOnFocus={true}
+                onBlur={() => {
+                  setFocused(false);
+                }}
                 placeholder="#hashtag"
                 onChangeText={value => {
                   tagToAdd = value;
@@ -417,7 +451,7 @@ export const EditorMenu = ({
                 flexDirection: 'row',
                 justifyContent: 'space-between',
                 alignItems: 'flex-end',
-                paddingHorizontal: '5%',
+                paddingHorizontal: 12,
                 marginTop: 15,
               }}>
               <View
@@ -464,26 +498,27 @@ export const EditorMenu = ({
               ].map(_renderColor)}
             </ScrollView>
           </View>
-          <View
-            style={{
-              paddingHorizontal: '5%',
-              paddingVertical: pv + 5,
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}>
-            <Text
-              style={{
-                color: colors.icon,
-                fontFamily: WEIGHT.regular,
-                fontSize: SIZE.xs,
-              }}>
-              Last Synced: 5 secs ago.
-            </Text>
-            {}
-            <ActivityIndicator color={colors.accent} />
-          </View>
         </ScrollView>
+
+        <View
+          style={{
+            paddingHorizontal: '5%',
+            paddingVertical: pv + 5,
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}>
+          <Text
+            style={{
+              color: colors.icon,
+              fontFamily: WEIGHT.regular,
+              fontSize: SIZE.xs,
+            }}>
+            Last Synced: 5 secs ago.
+          </Text>
+          {}
+          <ActivityIndicator color={colors.accent} />
+        </View>
 
         <VaultDialog
           close={(item, locked) => {

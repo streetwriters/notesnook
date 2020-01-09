@@ -45,7 +45,7 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
       />
 
       <ScrollView
-        contentContainerStyle={{minHeight: '100%'}}
+        contentContainerStyle={{minHeight: '80%'}}
         showsVerticalScrollIndicator={false}>
         <View>
           <FlatList
