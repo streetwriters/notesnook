@@ -25,5 +25,7 @@ const routes = {
   ...colorRoutes
 };
 
-const RootNavigator = new Navigator("RootNavigator", routes);
+const RootNavigator = new Navigator("RootNavigator", routes, {
+  backButtonEnabled: false
+});
 export default RootNavigator;

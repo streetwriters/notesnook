@@ -4,12 +4,13 @@ import { Box, Flex, Heading } from "rebass";
 import * as Icon from "react-feather";
 import { ThemeProvider } from "../utils/theme";
 
-var lastRoute;
 export default class Navigator {
-  constructor(root, routes) {
+  constructor(root, routes, options = {}) {
     this.routes = routes;
     this.root = root;
+    this.options = options;
     this.history = [];
+    this.lastRoute = undefined;
   }
 
   getRoute(key) {
@@ -23,16 +24,16 @@ export default class Navigator {
   navigate(routeName, params = {}) {
     let route = this.getRoute(routeName);
 
-    if (!route || lastRoute === route) {
+    if (!route || this.lastRoute === route) {
       return false;
     }
 
     route.params = { ...route.params, ...params };
 
-    if (lastRoute) {
-      this.history.push(lastRoute);
+    if (this.lastRoute) {
+      this.history.push(this.lastRoute);
     }
-    lastRoute = route;
+    this.lastRoute = route;
 
     return this.renderRoute(route);
   }
@@ -43,7 +44,13 @@ export default class Navigator {
       return false;
     }
     ReactDOM.render(
-      <NavigationContainer route={route} params={route.params} />,
+      <NavigationContainer
+        navigator={this}
+        route={route}
+        params={route.params}
+        canGoBack={this.options.backButtonEnabled && this.history.length > 0}
+        backAction={() => this.goBack()}
+      />,
       root
     );
     return true;
@@ -51,44 +58,37 @@ export default class Navigator {
 
   goBack() {
     let route = this.history.pop();
+
     if (!route) {
       return false;
     }
-    this.navigate(route.key, route.params);
-    this.history.pop(); //remove the route
-    return true;
+
+    return this.renderRoute(route);
   }
 }
 
 const NavigationContainer = props => {
   const [title, setTitle] = useState();
-  const [canGoBack, setCanGoBack] = useState(false);
-  const [backAction, setBackAction] = useState();
   useEffect(() => {
-    setTitle(props.route.title || props.route.params.title);
-  }, [props.route.title, props.route.params]);
+    const { title } = props.route.params;
+    setTitle(props.route.title || title);
+  }, [props.navigator, props.route]);
   return (
     <ThemeProvider>
       <Flex alignItems="center" px={3}>
-        <Box
-          onClick={backAction}
-          display={canGoBack ? "flex" : "none"}
-          height={42}
-          color="fontPrimary"
-          sx={{ marginLeft: -10 /*correction */ }}
-        >
-          <Icon.ChevronLeft size={42} />
-        </Box>
+        {props.canGoBack && (
+          <Box
+            onClick={props.backAction}
+            height={42}
+            color="fontPrimary"
+            sx={{ marginLeft: -10 /*correction */ }}
+          >
+            <Icon.ChevronLeft size={42} />
+          </Box>
+        )}
         <Heading fontSize="heading">{title}</Heading>
       </Flex>
-      {props.route.component && (
-        <props.route.component
-          backAction={action => setBackAction(() => action)}
-          canGoBack={setCanGoBack}
-          changeTitle={setTitle}
-          {...props.params}
-        />
-      )}
+      {props.route.component && <props.route.component {...props.params} />}
     </ThemeProvider>
   );
 };
