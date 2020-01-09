@@ -39,7 +39,9 @@ function getNavigationViewWidth() {
 }
 function App() {
   const [selectedIndex, setSelectedIndex] = useState(0);
-  RootNavigator.navigate("home");
+  useEffect(() => {
+    RootNavigator.navigate("home");
+  }, []);
   return (
     <ThemeProvider>
       <Flex
