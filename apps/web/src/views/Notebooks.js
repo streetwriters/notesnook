@@ -1,17 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Flex, Text } from "rebass";
-import Button from "../components/button";
-import * as Icon from "react-feather";
-import Search from "../components/search";
+import { Flex } from "rebass";
 import { db, ev } from "../common";
 import { showSnack } from "../components/snackbar";
-import { Virtuoso as List } from "react-virtuoso";
 import Notebook from "../components/notebook";
-import Topics from "./Topics";
-import Notes from "./Notes";
-import { createRoute } from "../navigation/routes";
-import Navigator from "../navigation";
 import { CreateNotebookDialog, ask } from "../components/dialogs";
+import ListContainer from "../components/list-container";
+import NotebookNavigator from "../navigation/navigators/nbnavigator";
 
 const NotebooksView = props => {
   const [open, setOpen] = useState(false);
@@ -29,40 +23,30 @@ const NotebooksView = props => {
   }, []);
 
   return (
-    <Flex flexDirection="column" flex="1 1 auto">
-      <Flex flexDirection="column" flex="1 1 auto">
-        <Search placeholder="Search" />
-        <List
-          style={{
-            width: "100%",
-            flex: "1 1 auto",
-            height: "auto",
-            overflowX: "hidden"
-          }}
-          totalCount={notebooks.length}
-          item={index => (
-            <Notebook
-              index={index}
-              item={notebooks[index]}
-              onClick={() => {
-                NotebookNavigator.navigate("topics", {
-                  title: notebooks[index].title,
-                  topics: notebooks[index].topics,
-                  notebookId: notebooks[index].dateCreated
-                });
-              }}
-              /* onTopicClick={(notebook, topic) =>
+    <>
+      <ListContainer
+        itemsLength={notebooks.length}
+        item={index => (
+          <Notebook
+            index={index}
+            item={notebooks[index]}
+            onClick={() => {
+              NotebookNavigator.navigate("topics", {
+                title: notebooks[index].title,
+                topics: notebooks[index].topics,
+                notebookId: notebooks[index].dateCreated
+              });
+            }}
+            /* onTopicClick={(notebook, topic) =>
                   navigate(topic, true, notebook.title)
                 } */
-            />
-          )}
-        />
-        <Button
-          Icon={Icon.Plus}
-          onClick={async () => setOpen(true)}
-          content="Create a notebook"
-        />
-      </Flex>
+          />
+        )}
+        button={{
+          content: "Create a notebook",
+          onClick: async () => setOpen(true)
+        }}
+      />
       <CreateNotebookDialog
         open={open}
         onDone={async (topics, title, description) => {
@@ -75,7 +59,7 @@ const NotebooksView = props => {
         }}
         close={() => setOpen(false)}
       />
-    </Flex>
+    </>
   );
 };
 
@@ -93,13 +77,3 @@ const Notebooks = props => {
 };
 
 export default Notebooks;
-
-const routes = {
-  ...createRoute("notebooks", NotebooksView, { title: "Notebooks" }),
-  ...createRoute("topics", Topics),
-  ...createRoute("notes", Notes)
-};
-const NotebookNavigator = new Navigator("NotebookNavigator", routes, {
-  backButtonEnabled: true
-});
-export { NotebookNavigator };

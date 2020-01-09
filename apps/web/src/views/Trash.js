@@ -51,7 +51,7 @@ function Trash() {
       getItems={db.getTrash.bind(db)}
       menu={{ menuItems, dropdownRefs }}
       button={{
-        callToAction: "Clear Trash",
+        content: "Clear Trash",
         icon: Icon.Trash2,
         onClick: () => db.clearTrash()
       }}
