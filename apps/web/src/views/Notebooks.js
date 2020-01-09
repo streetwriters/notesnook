@@ -7,7 +7,6 @@ import { CreateNotebookDialog, ask } from "../components/dialogs";
 import ListContainer from "../components/list-container";
 
 const Notebooks = props => {
-  console.log("Notebooks");
   const [open, setOpen] = useState(false);
   const [notebooks, setNotebooks] = useState([]);
   useEffect(() => {

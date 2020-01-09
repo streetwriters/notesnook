@@ -16,7 +16,7 @@ const ListContainer = props => {
           height: "auto",
           overflowX: "hidden"
         }}
-        totalCount={props.itemLength}
+        totalCount={props.itemsLength}
         item={props.item}
       />
       {props.button && (
