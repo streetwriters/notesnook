@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Box, Button, Flex, Text } from "rebass";
 import * as Icon from "react-feather";
-import { Switch } from "@rebass/forms";
+import { Switch, Select } from "@rebass/forms";
 import "../app.css";
 import { changeTheme, isDarkTheme, changeAccent } from "../utils/theme";
 
@@ -87,6 +87,35 @@ const Settings = props => {
                 />
               </Flex>
             </Flex>
+            {/* <Flex flexDirection="row" justifyContent="center" pt="15px">
+              <Text width={1 / 2}>Font Size</Text>{" "}
+              <Flex width={1 / 2} justifyContent="right">
+                <Select
+                  id="country"
+                  name="country"
+                  defaultValue="46"
+                  fontSize="14px"
+                  py="0px"
+                  pr="32px"
+                  DownArrow="false"
+                >
+                  {[
+                    { label: "red", code: "12" },
+                    { label: "orange", code: "05" },
+                    { label: "yellow", code: "16" },
+                    { label: "green", code: "36" },
+                    { label: "blue", code: "46" },
+                    { label: "purple", code: "64" },
+                    { label: "gray", code: "75" },
+                    { label: "lightblue", code: "88" },
+                    { label: "indigo", code: "99" },
+                    { label: "lightpink", code: "12" }
+                  ].map(color => (
+                    <option key={color.label}>{color.code}</option>
+                  ))}
+                </Select>
+              </Flex>
+            </Flex> */}
           </Flex>
         </Box>
         <Button variant="setting">Terms of Service</Button>
