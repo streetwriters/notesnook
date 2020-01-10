@@ -27,7 +27,7 @@ import {
 
 export const DDS = new DeviceDetectionService();
 export const db = new Storage(StorageInterface);
-
+let timer = null;
 const App = () => {
   // Global State
   const [colors, setColors] = useState(COLOR_SCHEME);
@@ -40,7 +40,6 @@ const App = () => {
   const [overlay, setOverlay] = useState(false);
 
   // Variables
-  let timer = null;
 
   // Effects
   useEffect(() => {
@@ -159,7 +158,7 @@ const App = () => {
               timer = null;
               timer = setTimeout(() => {
                 setOpen(args);
-              }, 300);
+              }, 100);
             }}
             menu={
               <Menu hide={false} colors={colors} close={() => setOpen(false)} />
