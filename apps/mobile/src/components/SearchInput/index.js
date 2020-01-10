@@ -38,7 +38,7 @@ export const Search = props => {
           justifyContent: 'space-between',
           alignItems: 'center',
           paddingHorizontal: 12,
-          width: w - 12,
+          width: w - 24,
           alignSelf: 'center',
           borderRadius: br,
           height: '90%',
