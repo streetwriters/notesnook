@@ -14,7 +14,7 @@ import {useAppContext} from '../../provider/useAppContext';
 import {db} from '../../../App';
 import {NotebookItem} from '../../components/NotebookItem';
 import {Dialog} from '../../components/Dialog';
-import {ToastEvent} from '../../utils/utils';
+import {ToastEvent, w} from '../../utils/utils';
 import {TrashPlaceHolder} from '../../components/ListPlaceholders';
 
 export const Trash = ({navigation}) => {
@@ -111,8 +111,8 @@ export const Trash = ({navigation}) => {
         }}
         style={{
           borderRadius: 5,
-          width: '90%',
-          marginHorizontal: '5%',
+          width: w - 24,
+          marginHorizontal: 12,
           paddingHorizontal: ph,
           paddingVertical: pv + 5,
           flexDirection: 'row',

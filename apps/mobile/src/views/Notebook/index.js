@@ -161,8 +161,8 @@ export const Notebook = ({navigation}) => {
           }}
           style={{
             borderRadius: 5,
-            width: '90%',
-            marginHorizontal: '5%',
+            width: w - 24,
+            marginHorizontal: 12,
             paddingHorizontal: ph,
             paddingVertical: pv + 5,
             flexDirection: 'row',

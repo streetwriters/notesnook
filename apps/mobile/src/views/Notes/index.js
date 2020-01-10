@@ -23,6 +23,7 @@ import {AnimatedSafeAreaView} from '../Home';
 import {db} from '../../../App';
 import * as Animatable from 'react-native-animatable';
 import {useAppContext} from '../../provider/useAppContext';
+import {w} from '../../utils/utils';
 
 export const Notes = ({navigation}) => {
   const {colors} = useAppContext();
@@ -138,8 +139,8 @@ export const Notes = ({navigation}) => {
           }}
           style={{
             borderRadius: 5,
-            width: '90%',
-            marginHorizontal: '5%',
+            width: w - 24,
+            marginHorizontal: 12,
             paddingHorizontal: ph,
             paddingVertical: pv + 5,
             flexDirection: 'row',
