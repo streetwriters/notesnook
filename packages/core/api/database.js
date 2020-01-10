@@ -253,7 +253,7 @@ class Database {
     const id = notebook.dateCreated || Date.now();
     let topics =
       !notebook.topics || notebook.topics.length <= 0 ? [] : notebook.topics; //
-    if (notebook.topics.findIndex(topic => topic.title === "General") <= -1) {
+    if (topics.findIndex(topic => topic.title === "General") <= -1) {
       topics.splice(0, 0, makeTopic("General"));
     }
     let index = 0;
