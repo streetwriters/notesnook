@@ -15,7 +15,7 @@ import {SIZE, WEIGHT} from '../../common/common';
 import WebView from 'react-native-webview';
 import Icon from 'react-native-vector-icons/Feather';
 import {db} from '../../../App';
-import {SideMenuEvent} from '../../utils/utils';
+import {SideMenuEvent, getElevation, ToastEvent} from '../../utils/utils';
 import {Dialog} from '../../components/Dialog';
 import {DDS} from '../../../App';
 import * as Animatable from 'react-native-animatable';
@@ -23,6 +23,10 @@ import SideMenu from 'react-native-side-menu';
 import {EditorMenu} from '../../components/EditorMenu';
 import {AnimatedSafeAreaView} from '../Home';
 import {useAppContext} from '../../provider/useAppContext';
+import ActionSheet from '../../components/ActionSheet';
+import {ActionSheetComponent} from '../../components/ActionSheetComponent';
+import {VaultDialog} from '../../components/VaultDialog';
+import NavigationService from '../../services/NavigationService';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
@@ -43,6 +47,9 @@ const Editor = ({navigation}) => {
   const [dialog, setDialog] = useState(false);
   const [isOpen, setOpen] = useState(false);
   const [sidebar, setSidebar] = useState(DDS.isTab ? true : false);
+  const [vaultDialog, setVaultDialog] = useState(false);
+  const [unlock, setUnlock] = useState(false);
+  const [visible, setVisible] = useState(false);
   const [noteProps, setNoteProps] = useState({
     tags: [],
     locked: false,
@@ -55,6 +62,8 @@ const Editor = ({navigation}) => {
   let updateInterval = null;
   let lastTextChange = 0;
   let menuTimer = null;
+  let willRefresh = false;
+
   // FUNCTIONS
 
   const post = value => EditorWebView.postMessage(value);
@@ -106,6 +115,7 @@ const Editor = ({navigation}) => {
       locked: note.locked,
     };
     setNoteProps({...props});
+
     post(JSON.stringify(note.content.delta));
     setTimeout(() => {
       title = note.title;
@@ -119,6 +129,30 @@ const Editor = ({navigation}) => {
 
   const onTitleTextChange = value => {
     title = value;
+  };
+
+  const onMenuHide = () => {
+    if (show) {
+      console.log(show);
+      if (show === 'lock') {
+        if (unlock) {
+          setUnlock(false);
+        }
+        setVaultDialog(true);
+      } else if (show === 'unlock') {
+        setUnlock(true);
+        setVaultDialog(true);
+      } else if (show == 'delete') {
+        setVisible(true);
+      }
+    }
+  };
+
+  const deleteItem = async () => {
+    await db.deleteNotes([note]);
+    ToastEvent.show('Note moved to trash', 'success', 3000);
+    setVisible(false);
+    navigation.goBack();
   };
 
   const _renderEditor = () => {
@@ -139,6 +173,7 @@ const Editor = ({navigation}) => {
               width: '100%',
               alignSelf: 'center',
               height: 50,
+
               marginTop: Platform.OS == 'ios' ? 0 : StatusBar.currentHeight,
             }}>
             <TouchableOpacity
@@ -165,7 +200,7 @@ const Editor = ({navigation}) => {
               placeholder="Untitled Note"
               ref={ref => (titleRef = ref)}
               placeholderTextColor={colors.icon}
-              defaultValue={title}
+              defaultValue={note && note.title ? note.title : title}
               style={{
                 width: '75%',
                 fontFamily: WEIGHT.bold,
@@ -181,7 +216,9 @@ const Editor = ({navigation}) => {
 
             <TouchableOpacity
               onPress={() => {
-                DDS.isTab ? setSidebar(!sidebar) : setOpen(!isOpen);
+                DDS.isTab
+                  ? setSidebar(!sidebar)
+                  : ActionSheet._setModalVisible();
               }}
               style={{
                 width: '12.5%',
@@ -190,9 +227,9 @@ const Editor = ({navigation}) => {
                 alignItems: 'flex-end',
               }}>
               <Icon
-                name={sidebar || isOpen ? 'x' : 'menu'}
+                name="more-horizontal"
                 color={colors.icon}
-                size={SIZE.xl}
+                size={SIZE.xxxl}
               />
             </TouchableOpacity>
           </View>
@@ -273,6 +310,8 @@ const Editor = ({navigation}) => {
   }, []);
 
   useEffect(() => {
+    SideMenuEvent.close();
+    SideMenuEvent.disable();
     return () => {
       DDS.isTab ? SideMenuEvent.open() : null;
       SideMenuEvent.enable();
@@ -312,6 +351,7 @@ const Editor = ({navigation}) => {
             }, 1000);
           }}
         />
+
         {_renderEditor()}
       </AnimatedSafeAreaView>
       <Animatable.View
@@ -343,65 +383,91 @@ const Editor = ({navigation}) => {
         backgroundColor: colors.bg,
         flex: 1,
       }}>
-      <SideMenu
-        isOpen={isOpen}
-        bounceBackOnOverdraw={false}
-        contentContainerStyle={{
-          opacity: 0,
+      <AnimatedSafeAreaView
+        transition="backgroundColor"
+        duration={300}
+        style={{height: '100%', backgroundColor: colors.bg}}>
+        <Dialog
+          title="Close Editor"
+          visible={dialog}
+          icon="x"
+          paragraph="Are you sure you want to close editor?"
+          close={() => {
+            setDialog(false);
+          }}
+          positivePress={() => {
+            navigation.goBack();
+            setDialog(false);
+          }}
+        />
+
+        {_renderEditor()}
+      </AnimatedSafeAreaView>
+
+      <Dialog
+        visible={visible}
+        title="Delete note"
+        icon="trash"
+        paragraph="Do you want to delete this note?"
+        positiveText="Delete"
+        positivePress={deleteItem}
+        close={() => {
+          setVisible(false);
+        }}
+      />
+
+      <VaultDialog
+        close={(item, locked) => {
+          let props = {...noteProps};
+          props.locked = locked;
+          note.locked = locked;
+          setNoteProps(props);
+          setVaultDialog(false);
+          setUnlock(false);
+        }}
+        note={note}
+        timestamp={timestamp}
+        perm={true}
+        openedToUnlock={unlock}
+        visible={vaultDialog}
+      />
+      <ActionSheet
+        customStyles={{
           backgroundColor: colors.bg,
         }}
-        openMenuOffset={w / 1.2}
-        menuPosition="right"
-        onChange={args => {
-          if (noteProps.locked) {
-            db.lockNote(timestamp, 'password');
-          }
-          clearTimeout(menuTimer);
-          menuTimer = null;
-          menuTimer = setTimeout(() => {
-            setOpen(args);
-          }, 500);
-        }}
-        menu={
-          <EditorMenu
-            hide={false}
-            noteProps={noteProps}
-            note={note}
-            timestamp={timestamp}
-            updateProps={props => {
-              setNoteProps(props);
-              console.log(props, noteProps);
-              if (props.locked) {
-                saveNote(noteProps, true);
-              }
-            }}
-            update={item => {
-              note = item;
-              updateEditor();
-            }}
-          />
-        }>
-        <AnimatedSafeAreaView
-          transition="backgroundColor"
-          duration={300}
-          style={{height: '100%', backgroundColor: colors.bg}}>
-          <Dialog
-            title="Close Editor"
-            visible={dialog}
-            icon="x"
-            paragraph="Are you sure you want to close editor?"
-            close={() => {
-              setDialog(false);
-            }}
-            positivePress={() => {
-              navigation.goBack();
-              setDialog(false);
-            }}
-          />
+        initialOffsetFromBottom={0.99}
+        elevation={5}
+        overlayColor={
+          colors.night ? 'rgba(225,225,225,0.1)' : 'rgba(0,0,0,0.3)'
+        }
+        indicatorColor={colors.shade}
+        onClose={() => {
+          onMenuHide();
+          if (willRefresh) {
+            note = db.getNote(timestamp);
 
-          {_renderEditor()}
-        </AnimatedSafeAreaView>
-      </SideMenu>
+            updateEditor();
+          }
+        }}
+        children={
+          <ActionSheetComponent
+            item={note}
+            setWillRefresh={value => {
+              willRefresh = true;
+            }}
+            hasColors={true}
+            hasTags={true}
+            rowItems={['Add to', 'Share', 'Export', 'Delete']}
+            columnItems={['Dark Mode', 'Add to Vault', 'Pin', 'Favorite']}
+            close={value => {
+              if (value) {
+                show = value;
+              }
+              ActionSheet._setModalVisible();
+            }}
+          />
+        }
+      />
     </Animatable.View>
   );
 };
