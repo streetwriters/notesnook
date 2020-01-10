@@ -3,7 +3,7 @@ import { Flex } from "rebass";
 import { db, ev } from "../common";
 import { showSnack } from "../components/snackbar";
 import Notebook from "../components/notebook";
-import { CreateNotebookDialog, ask } from "../components/dialogs";
+import { CreateNotebookDialog } from "../components/dialogs";
 import ListContainer from "../components/list-container";
 
 const Notebooks = props => {

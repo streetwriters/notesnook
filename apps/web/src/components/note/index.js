@@ -5,18 +5,17 @@ import TimeAgo from "timeago-react";
 import { db, ev } from "../../common";
 import { showSnack } from "../snackbar";
 import ListItem from "../list-item";
-//import RootNavigator from "../../navigation/navigators/rootnavigator";
-import { ask } from "../dialogs";
+import { ask, moveNote } from "../dialogs";
 
 const dropdownRefs = [];
 const menuItems = note => [
   {
     title: note.notebook.notebook ? "Move" : "Add to",
     onClick: async () => {
-      /*  RootNavigator.navigate(RootNavigator.routes.notebooks.key, {
-        intent: "moveNote",
-        data: note
-      }); */
+      console.log(note.dateCreated, note.notebook);
+      if (await moveNote(note.dateCreated, note.notebook)) {
+        showSnack("Note moved successfully!");
+      }
     }
   },
   {
