@@ -5,7 +5,6 @@ import {
   Text,
   TouchableOpacity,
   Platform,
-  FlatList,
   StatusBar,
 } from 'react-native';
 import NavigationService from '../../services/NavigationService';
@@ -25,6 +24,68 @@ import {useAppContext} from '../../provider/useAppContext';
 
 export const Menu = ({close = () => {}, hide, update = () => {}}) => {
   const {colors, changeColorScheme} = useAppContext();
+
+  const listItems = [
+    {
+      name: 'Home',
+      icon: 'home',
+      func: () => NavigationService.push('Home'),
+      close: true,
+    },
+
+    {
+      name: 'Notebooks',
+      icon: 'book',
+      func: () =>
+        NavigationService.push('Folders', {
+          title: 'Notebooks',
+          canGoBack: false,
+        }),
+      close: true,
+    },
+    {
+      name: 'Lists',
+      icon: 'list',
+      func: () => NavigationService.push('Lists'),
+      close: true,
+    },
+    {
+      name: 'Favorites',
+      icon: 'star',
+      func: () => NavigationService.push('Favorites'),
+      close: true,
+    },
+
+    {
+      name: 'Dark Mode',
+      icon: 'moon',
+      func: () => {
+        if (!colors.night) {
+          AsyncStorage.setItem('theme', JSON.stringify(COLOR_SCHEME_DARK));
+          changeColorScheme(COLOR_SCHEME_DARK);
+        } else {
+          AsyncStorage.setItem('theme', JSON.stringify(COLOR_SCHEME_LIGHT));
+
+          changeColorScheme(COLOR_SCHEME_LIGHT);
+        }
+      },
+      switch: true,
+      on: colors.night ? true : false,
+      close: false,
+    },
+    {
+      name: 'Trash',
+      icon: 'trash',
+      func: () => NavigationService.push('Trash'),
+      close: true,
+    },
+    {
+      name: 'Settings',
+      icon: 'settings',
+      func: () => NavigationService.push('Settings'),
+      close: true,
+    },
+  ];
 
   return (
     <AnimatedSafeAreaView
@@ -48,77 +109,10 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
         contentContainerStyle={{minHeight: '80%'}}
         showsVerticalScrollIndicator={false}>
         <View>
-          <FlatList
-            data={[
-              {
-                name: 'Home',
-                icon: 'home',
-                func: () => NavigationService.push('Home'),
-                close: true,
-              },
-
-              {
-                name: 'Notebooks',
-                icon: 'book',
-                func: () =>
-                  NavigationService.push('Folders', {
-                    title: 'Notebooks',
-                    canGoBack: false,
-                  }),
-                close: true,
-              },
-              {
-                name: 'Lists',
-                icon: 'list',
-                func: () => NavigationService.push('Lists'),
-                close: true,
-              },
-              {
-                name: 'Favorites',
-                icon: 'star',
-                func: () => NavigationService.push('Favorites'),
-                close: true,
-              },
-
-              {
-                name: 'Dark Mode',
-                icon: 'moon',
-                func: () => {
-                  if (!colors.night) {
-                    AsyncStorage.setItem(
-                      'theme',
-                      JSON.stringify(COLOR_SCHEME_DARK),
-                    );
-                    changeColorScheme(COLOR_SCHEME_DARK);
-                  } else {
-                    AsyncStorage.setItem(
-                      'theme',
-                      JSON.stringify(COLOR_SCHEME_LIGHT),
-                    );
-
-                    changeColorScheme(COLOR_SCHEME_LIGHT);
-                  }
-                },
-                switch: true,
-                on: colors.night ? true : false,
-                close: false,
-              },
-              {
-                name: 'Trash',
-                icon: 'trash',
-                func: () => NavigationService.push('Trash'),
-                close: true,
-              },
-              {
-                name: 'Settings',
-                icon: 'settings',
-                func: () => NavigationService.push('Settings'),
-                close: true,
-              },
-            ]}
-            keyExtractor={(item, index) => item.name}
-            renderItem={({item, index}) => (
+          <View>
+            {listItems.map(item => (
               <TouchableOpacity
+                key={item.name}
                 activeOpacity={opacity / 2}
                 onPress={() => {
                   item.close === false ? null : close();
@@ -166,8 +160,8 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
                   undefined
                 )}
               </TouchableOpacity>
-            )}
-          />
+            ))}
+          </View>
 
           <TouchableOpacity
             activeOpacity={opacity / 2}
@@ -226,6 +220,7 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
               'water',
             ].map(item => (
               <TouchableOpacity
+                key={item}
                 activeOpacity={opacity / 2}
                 onPress={() => {
                   close();
@@ -262,6 +257,7 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
             {['red', 'yellow', 'green', 'blue', 'purple', 'orange', 'gray'].map(
               item => (
                 <TouchableOpacity
+                  key={item}
                   activeOpacity={opacity / 2}
                   style={{
                     flexDirection: 'row',
