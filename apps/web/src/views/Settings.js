@@ -10,8 +10,16 @@ const Settings = props => {
   return (
     <Flex flexDirection="column" flex="1 1 auto">
       <Flex flexDirection="column" flex="1 1 auto">
-        {/* <Account /> */}
-        <Button variant="setting">General</Button>
+        <Button
+          variant="setting"
+          onClick={() => {
+            props.navigator.navigate("general", {
+              title: "General"
+            });
+          }}
+        >
+          General
+        </Button>
         <Button
           variant="setting"
           onClick={() => {
@@ -108,5 +116,3 @@ const SettingsContainer = props => {
 };
 
 export { Settings, SettingsContainer };
-
-//export default Settings;

@@ -75,11 +75,11 @@ const NavigationContainer = props => {
           {props.canGoBack && (
             <Box
               onClick={props.backAction}
-              height={42}
+              height={38}
               color="fontPrimary"
-              sx={{ marginLeft: -10 /*correction */ }}
+              sx={{ marginLeft: -10 /*correction */, marginRight: 2 }}
             >
-              <Icon.ChevronLeft size={42} />
+              <Icon.ChevronLeft size={38} />
             </Box>
           )}
           <Heading fontSize="heading">

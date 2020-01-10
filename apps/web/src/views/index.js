@@ -8,3 +8,4 @@ export const Settings = require("./Settings").Settings;
 export const Trash = require("./Trash").default;
 export const Account = require("./Account").default;
 export const SettingsContainer = require("./Settings").SettingsContainer;
+export const General = require("./General").default;
