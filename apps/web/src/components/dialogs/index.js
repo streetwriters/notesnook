@@ -217,8 +217,8 @@ export const ask = (icon, title, message) => {
   const root = document.getElementById("dialogContainer");
   const perform = (result, resolve) => {
     Dialog.close();
-    resolve(result);
     ReactDOM.unmountComponentAtNode(root);
+    resolve(result);
   };
   if (root) {
     return new Promise((resolve, _) => {
@@ -235,5 +235,6 @@ export const ask = (icon, title, message) => {
       );
     });
   }
+  console.log("Notebooks");
   return Promise.reject("No element with id 'dialogContainer'");
 };
