@@ -20,6 +20,8 @@ import {NavigationEvents} from 'react-navigation';
 import {useAppContext} from '../../provider/useAppContext';
 import {NotebookPlaceHolder} from '../../components/ListPlaceholders';
 import {slideRight, slideLeft} from '../../utils/animations';
+import {useIsFocused} from 'react-navigation-hooks';
+import {w} from '../../utils/utils';
 export const Folders = ({navigation}) => {
   const {colors} = useAppContext();
 
@@ -30,6 +32,8 @@ export const Folders = ({navigation}) => {
   const [margin, setMargin] = useState(180);
   const [numColumns, setNumColumns] = useState(1);
 
+  const isFocused = useIsFocused();
+
   const params = navigation.state.params;
   let offsetY = 0;
   let countUp = 0;
@@ -39,9 +43,17 @@ export const Folders = ({navigation}) => {
   let marginSet = false;
 
   useEffect(() => {
-    setNotebooks(db.getNotebooks());
-    console.log(db.getNotebooks());
-  }, []);
+    if (isFocused) {
+      setNotebooks(db.getNotebooks());
+    }
+  }, [isFocused]);
+
+  const refreshNotebooks = () => {
+    let nb = db.getNotebooks();
+    if (nb) {
+      setNotebooks([...nb]);
+    }
+  };
 
   return (
     <AnimatedSafeAreaView
@@ -119,12 +131,17 @@ export const Folders = ({navigation}) => {
           ListHeaderComponent={
             <View
               style={{
-                marginTop: Platform.OS == 'ios' ? 135 : 175,
+                marginTop:
+                  Platform.OS == 'ios'
+                    ? notebooks[0]
+                      ? 135
+                      : 135 - 60
+                    : notebooks[0]
+                    ? 155
+                    : 155 - 60,
               }}
             />
           }
-          numColumns={numColumns}
-          key={numColumns}
           ListEmptyComponent={
             <View
               style={{
@@ -188,7 +205,7 @@ export const Folders = ({navigation}) => {
               noteToMove={params.note}
               item={item}
               numColumns={numColumns}
-              refresh={() => setNotebooks(db.getNotebooks())}
+              refresh={() => refreshNotebooks()}
               index={index}
               colors={colors}
             />
@@ -201,8 +218,8 @@ export const Folders = ({navigation}) => {
           }}
           style={{
             borderRadius: 5,
-            width: '90%',
-            marginHorizontal: '5%',
+            width: w - 24,
+            marginHorizontal: 12,
             paddingHorizontal: ph,
             paddingVertical: pv + 5,
             flexDirection: 'row',
