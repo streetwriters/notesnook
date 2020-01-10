@@ -10,6 +10,8 @@ import {Dialog} from '../Dialog';
 import {AddTopicDialog} from '../AddTopicDialog';
 import {useAppContext} from '../../provider/useAppContext';
 import {AddNotebookDialog} from '../AddNotebookDialog';
+import ActionSheet from '../ActionSheet';
+import {ActionSheetComponent} from '../ActionSheetComponent';
 
 export const NotebookItem = ({
   item,
@@ -30,6 +32,7 @@ export const NotebookItem = ({
   const [addNotebook, setAddNotebook] = useState(false);
   let setMenuRef = {};
   let show = null;
+  let willRefresh;
 
   const deleteItem = async () => {
     if (isTopic) {
@@ -39,8 +42,8 @@ export const NotebookItem = ({
       await db.deleteNotebooks([item]);
       ToastEvent.show('Notebook moved to trash', 'success', 3000);
     }
-    refresh();
     setVisible(false);
+    refresh();
   };
 
   const navigate = () => {
@@ -85,9 +88,9 @@ export const NotebookItem = ({
         justifyContent: 'flex-start',
         alignItems: 'center',
         flexDirection: 'row',
-        paddingHorizontal: 0,
-        paddingHorizontal: 12,
-        width: '100%',
+        paddingRight: 6,
+        marginHorizontal: 12,
+        width: w - 24,
         alignSelf: 'center',
         borderBottomWidth: 1,
         borderBottomColor: colors.nav,
@@ -138,7 +141,7 @@ export const NotebookItem = ({
             }}>
             {item.title}
           </Text>
-          {isTopic ? null : (
+          {isTopic || !item.description ? null : (
             <Text
               numberOfLines={numColumns === 2 ? 3 : 2}
               style={{
@@ -163,7 +166,7 @@ export const NotebookItem = ({
                 width: '80%',
                 maxWidth: '80%',
               }}>
-              {item.topics.slice(0, 2).map(topic => (
+              {item.topics.slice(1, 4).map(topic => (
                 <View
                   style={{
                     borderRadius: 5,
@@ -264,136 +267,21 @@ export const NotebookItem = ({
             </Text>
           ) : null}
         </TouchableOpacity>
-
         {hideMore ? null : (
-          <Menu
+          <TouchableOpacity
             style={{
-              borderRadius: 5,
-              backgroundColor: colors.nav,
+              width: w * 0.05,
+              justifyContent: 'center',
+              minHeight: 70,
+              alignItems: 'center',
             }}
-            onHidden={onMenuHide}
-            ref={ref => (setMenuRef[index] = ref)}
-            button={
-              <TouchableOpacity
-                style={{
-                  width: w * 0.05,
-                  justifyContent: 'center',
-                  minHeight: 70,
-                  alignItems: 'center',
-                }}
-                onPress={showMenu}>
-                <Icon name="more-vertical" size={SIZE.lg} color={colors.icon} />
-              </TouchableOpacity>
-            }>
-            {isTrash ? (
-              <>
-                <MenuItem
-                  onPress={() => {
-                    show = 'topic';
-                    hideMenu();
-                  }}
-                  textStyle={{
-                    color: colors.pri,
-                    fontFamily: WEIGHT.regular,
-                    fontSize: SIZE.sm,
-                  }}>
-                  Restore
-                </MenuItem>
-                <MenuItem
-                  onPress={() => {
-                    show = 'topic';
-                    hideMenu();
-                  }}
-                  textStyle={{
-                    color: colors.pri,
-
-                    fontFamily: WEIGHT.regular,
-                    fontSize: SIZE.sm,
-                  }}>
-                  Remove
-                </MenuItem>
-              </>
-            ) : (
-              <>
-                <MenuItem
-                  onPress={() => {
-                    show = 'topic';
-                    hideMenu();
-                  }}
-                  textStyle={{
-                    color: colors.pri,
-
-                    fontFamily: WEIGHT.regular,
-                    fontSize: SIZE.sm,
-                  }}>
-                  Edit
-                </MenuItem>
-
-                <MenuItem
-                  onPress={() => {
-                    hideMenu();
-                    db.pinItem(item.type, item.dateCreated);
-                    refresh();
-
-                    ToastEvent.show(
-                      `Notebook ${item.pinned ? 'unpinned' : 'pinned'}`,
-                      item.pinned ? 'error' : 'success',
-                      3000,
-                      () => {},
-                      '',
-                    );
-                  }}
-                  textStyle={{
-                    color: colors.pri,
-
-                    fontFamily: WEIGHT.regular,
-                    fontSize: SIZE.sm,
-                  }}>
-                  {item.pinned ? 'Unpin' : 'Pin'}
-                </MenuItem>
-                <MenuItem
-                  onPress={() => {
-                    hideMenu();
-                    db.favoriteItem(item.type, item.dateCreated);
-
-                    refresh();
-                    ToastEvent.show(
-                      `Notebook ${
-                        item.favorite ? 'removed' : 'added'
-                      } to favorites.`,
-                      item.favorite ? 'error' : 'success',
-                      3000,
-                      () => {},
-                      '',
-                    );
-                  }}
-                  textStyle={{
-                    color: colors.pri,
-
-                    fontFamily: WEIGHT.regular,
-                    fontSize: SIZE.sm,
-                  }}>
-                  {item.favorite ? 'Unfavorite' : 'Favorite'}
-                </MenuItem>
-
-                <MenuItem
-                  onPress={() => {
-                    show = 'delete';
-                    hideMenu();
-                  }}
-                  textStyle={{
-                    color: colors.errorText,
-                    fontFamily: WEIGHT.regular,
-                    fontSize: SIZE.sm,
-                  }}>
-                  Delete
-                </MenuItem>
-              </>
-            )}
-
-            <MenuDivider />
-          </Menu>
+            onPress={() => {
+              ActionSheet._setModalVisible();
+            }}>
+            <Icon name="more-horizontal" size={SIZE.lg} color={colors.icon} />
+          </TouchableOpacity>
         )}
+
         {hideMore && isTopic ? (
           <TouchableOpacity
             activeOpacity={opacity}
@@ -443,6 +331,43 @@ export const NotebookItem = ({
           </TouchableOpacity>
         ) : null}
       </View>
+
+      <ActionSheet
+        customStyles={{
+          backgroundColor: colors.bg,
+        }}
+        indicatorColor={colors.shade}
+        initialOffsetFromBottom={1}
+        onClose={() => {
+          onMenuHide();
+          if (willRefresh) {
+            refresh();
+          }
+        }}
+        children={
+          <ActionSheetComponent
+            item={item}
+            setWillRefresh={value => {
+              willRefresh = true;
+            }}
+            rowItems={
+              isTrash
+                ? ['Restore', 'Remove']
+                : [
+                    item.type == 'topic' ? 'Edit Topic' : 'Edit Notebook',
+                    'Delete',
+                  ]
+            }
+            columnItems={['Pin', 'Favorite']}
+            close={value => {
+              if (value) {
+                show = value;
+              }
+              ActionSheet._setModalVisible();
+            }}
+          />
+        }
+      />
     </View>
   );
 };

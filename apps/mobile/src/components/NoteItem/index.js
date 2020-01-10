@@ -89,8 +89,9 @@ const NoteItem = props => {
           justifyContent: 'flex-start',
           alignItems: 'center',
           flexDirection: 'row',
-          paddingHorizontal: 12,
-          width: '100%',
+          marginHorizontal: 12,
+          width: w - 24,
+          paddingRight: 6,
           alignSelf: 'center',
           borderBottomWidth: 1,
           borderBottomColor: colors.nav,
@@ -153,8 +154,6 @@ const NoteItem = props => {
             setUnlock(true);
             setVaultDialog(true);
           } else {
-            SideMenuEvent.close();
-            SideMenuEvent.disable();
             NavigationService.navigate('Editor', {
               note: item,
             });
@@ -206,28 +205,30 @@ const NoteItem = props => {
               }}>
               {!props.isTrash ? (
                 <>
-                  <View
-                    style={{
-                      marginRight: 10,
-                      flexDirection: 'row',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                    }}>
-                    {item.colors.map(item => (
-                      <View
-                        style={{
-                          width: SIZE.xs,
-                          height: SIZE.xs,
-                          borderRadius: 100,
-                          backgroundColor: item,
-                          marginRight: -4.5,
-                        }}></View>
-                    ))}
-                  </View>
+                  {item.colors.length > 0 ? (
+                    <View
+                      style={{
+                        marginRight: 10,
+                        flexDirection: 'row',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}>
+                      {item.colors.map(item => (
+                        <View
+                          style={{
+                            width: SIZE.xs,
+                            height: SIZE.xs,
+                            borderRadius: 100,
+                            backgroundColor: item,
+                            marginRight: -4.5,
+                          }}></View>
+                      ))}
+                    </View>
+                  ) : null}
 
                   {item.locked ? (
                     <Icon
-                      style={{marginLeft: 10}}
+                      style={{marginRight: 10}}
                       name="lock"
                       size={SIZE.xs}
                       color={colors.icon}
@@ -236,7 +237,7 @@ const NoteItem = props => {
 
                   {item.favorite ? (
                     <Icon
-                      style={{marginLeft: 10}}
+                      style={{marginRight: 10}}
                       name="star"
                       size={SIZE.xs + 1}
                       color="orange"
@@ -248,7 +249,7 @@ const NoteItem = props => {
                       fontSize: SIZE.xs - 1,
                       textAlignVertical: 'center',
                       fontFamily: WEIGHT.regular,
-                      marginLeft: 10,
+                      marginRight: 10,
                     }}>
                     {timeSince(item.dateCreated)}
                   </Text>
@@ -305,174 +306,11 @@ const NoteItem = props => {
           <Icon name="more-horizontal" size={SIZE.lg} color={colors.icon} />
         </TouchableOpacity>
 
-        {/* 
-        <Menu
-          style={{
-            borderRadius: 5,
-            backgroundColor: colors.nav,
-          }}
-          onHidden={onMenuHide}
-          ref={ref => (setMenuRef[props.index] = ref)}
-          button={
-            <TouchableOpacity
-              style={{
-                width: w * 0.05,
-                justifyContent: 'center',
-                minHeight: 70,
-                alignItems: 'center',
-              }}
-              onPress={showMenu}>
-              <Icon name="more-vertical" size={SIZE.lg} color={colors.icon} />
-            </TouchableOpacity>
-          }>
-          {props.isTrash ? (
-            <>
-              <MenuItem
-                onPress={() => {
-                  db.restoreItem(item.dateCreated);
-                  ToastEvent.show(
-                    item.type == 'note' ? 'Note restored' : 'Notebook restored',
-                    'success',
-                    1000,
-                    () => {},
-                    '',
-                  );
-                  hideMenu();
-                }}
-                textStyle={{
-                  color: colors.pri,
-                  fontFamily: WEIGHT.regular,
-                  fontSize: SIZE.sm,
-                }}>
-                Restore
-              </MenuItem>
-              <MenuItem
-                onPress={() => {
-                  show = 'topic';
-
-                  hideMenu();
-                }}
-                textStyle={{
-                  color: colors.pri,
-                  fontFamily: WEIGHT.regular,
-                  fontSize: SIZE.sm,
-                }}>
-                Remove
-              </MenuItem>
-            </>
-          ) : (
-            <>
-              <MenuItem
-                onPress={() => {
-                  hideMenu();
-                  db.pinItem(item.type, item.dateCreated);
-                  props.refresh();
-
-                  ToastEvent.show(
-                    `Note ${item.pinned ? 'unpinned' : 'pinned'}`,
-                    item.pinned ? 'error' : 'success',
-                    3000,
-                    () => {},
-                    '',
-                  );
-                }}
-                textStyle={{
-                  color: colors.pri,
-
-                  fontFamily: WEIGHT.regular,
-                  fontSize: SIZE.sm,
-                }}>
-                {item.pinned ? 'Unpin' : 'Pin'}
-              </MenuItem>
-
-              <MenuItem
-                onPress={() => {
-                  hideMenu();
-                  db.favoriteItem(item.type, item.dateCreated);
-
-                  props.refresh();
-                  ToastEvent.show(
-                    `Note ${item.favorite ? 'removed' : 'added'} to favorites.`,
-                    item.favorite ? 'error' : 'success',
-                    3000,
-                    () => {},
-                    '',
-                  );
-                }}
-                textStyle={{
-                  color: colors.pri,
-                  fontFamily: WEIGHT.regular,
-                  fontSize: SIZE.sm,
-                }}>
-                {item.favorite ? 'Unfavorite' : 'Favorite'}
-              </MenuItem>
-
-              <MenuItem
-                textStyle={{
-                  color: colors.pri,
-
-                  fontFamily: WEIGHT.regular,
-                  fontSize: SIZE.sm,
-                }}>
-                Share
-              </MenuItem>
-
-              <MenuItem
-                onPress={() => {
-                  hideMenu();
-                  NavigationService.push('Folders', {
-                    note: item,
-                    title: 'Choose a notebook',
-                    isMove: true,
-                    hideMore: true,
-                    canGoBack: true,
-                  });
-                }}
-                textStyle={{
-                  color: colors.pri,
-
-                  fontFamily: WEIGHT.regular,
-                  fontSize: SIZE.sm,
-                }}>
-                Add to Notebook
-              </MenuItem>
-              <MenuItem
-                onPress={() => {
-                  item.locked ? (show = 'unlock') : (show = 'lock');
-
-                  hideMenu(true);
-                }}
-                textStyle={{
-                  color: colors.pri,
-
-                  fontFamily: WEIGHT.regular,
-                  fontSize: SIZE.sm,
-                }}>
-                {item.locked ? 'Remove from vault' : 'Add to Vault'}
-              </MenuItem>
-
-              <MenuItem
-                onPress={() => {
-                  show = 'delete';
-                  hideMenu();
-                }}
-                textStyle={{
-                  color: colors.errorText,
-                  fontFamily: WEIGHT.regular,
-                  fontSize: SIZE.sm,
-                }}>
-                Delete
-              </MenuItem>
-            </>
-          )}
-        </Menu>
-      
-       */}
-
         <ActionSheet
           customStyles={{
             backgroundColor: colors.bg,
           }}
+          indicatorColor={colors.shade}
           onClose={() => {
             onMenuHide();
             if (willRefresh) {
@@ -485,11 +323,17 @@ const NoteItem = props => {
               setWillRefresh={value => {
                 willRefresh = true;
               }}
+              hasColors={true}
+              hasTags={true}
+              overlayColor={
+                colors.night ? 'rgba(225,225,225,0.1)' : 'rgba(0,0,0,0.3)'
+              }
+              rowItems={['Add to', 'Share', 'Export', 'Delete']}
+              columnItems={['Add to Vault', 'Pin', 'Favorite']}
               close={value => {
                 if (value) {
                   show = value;
                 }
-
                 ActionSheet._setModalVisible();
               }}
             />
