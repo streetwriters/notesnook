@@ -1,6 +1,6 @@
 import {
   Home,
-  Settings,
+  SettingsContainer,
   Favorites,
   Trash,
   NotebooksContainer
@@ -26,7 +26,7 @@ const routes = {
   }),
   ...createNormalRoute("favorites", Favorites, Icon.Star),
   ...createNormalRoute("trash", Trash, Icon.Trash2),
-  ...createNormalRoute("settings", Settings, Icon.Settings),
+  ...createRoute("settings", SettingsContainer, { icon: Icon.Settings }),
   ...colorRoutes
 };
 

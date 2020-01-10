@@ -1,17 +1,25 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Box, Button, Flex, Text } from "rebass";
 import * as Icon from "react-feather";
 import { Switch } from "@rebass/forms";
 import "../app.css";
 import { changeTheme, isDarkTheme, changeAccent } from "../utils/theme";
-function Settings() {
+
+const Settings = props => {
   const [check, setCheck] = useState(isDarkTheme());
   return (
     <Flex flexDirection="column" flex="1 1 auto">
       <Flex flexDirection="column" flex="1 1 auto">
         {/* <Account /> */}
         <Button variant="setting">General</Button>
-        <Button variant="setting" onClick={() => {}}>
+        <Button
+          variant="setting"
+          onClick={() => {
+            props.navigator.navigate("account", {
+              title: "Account"
+            });
+          }}
+        >
           Account
         </Button>
         <Box
@@ -79,6 +87,26 @@ function Settings() {
       </Flex>
     </Flex>
   );
-}
+};
 
-export default Settings;
+const SettingsContainer = props => {
+  useEffect(() => {
+    const SettingsNavigator = require("../navigation/navigators/settingnavigator")
+      .default;
+    //HOTFIX
+    SettingsNavigator.history = [];
+    SettingsNavigator.lastRoute = undefined;
+    SettingsNavigator.navigate("settings");
+  }, []);
+  return (
+    <Flex
+      className="SettingsNavigator"
+      flexDirection="column"
+      flex="1 1 auto"
+    />
+  );
+};
+
+export { Settings, SettingsContainer };
+
+//export default Settings;
