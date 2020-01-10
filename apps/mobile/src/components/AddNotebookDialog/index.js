@@ -99,20 +99,22 @@ export const AddNotebookDialog = ({visible, close, toEdit = null}) => {
     if (!title)
       return ToastEvent.show('Title is required', 'error', 3000, () => {}, '');
 
+    let dateCreated = toEdit && toEdit.dateCreated ? toEdit.dateCreated : null;
+
     await db.addNotebook({
       title,
       description,
       topics,
-      timestamp: toEdit && toEdit.dateCreated ? toEdit.dateCreated : null,
+      dateCreated: dateCreated,
     });
 
-    ToastEvent.show('New notebook added', 'success', 3000, () => {}, '');
-    setTopics(['']);
     prevIndex = null;
     prevItem = null;
     currentSelectedInput = null;
     refs = [];
+    setTopics(['']);
     close(true);
+    ToastEvent.show('New notebook added', 'success', 3000, () => {}, '');
   };
 
   onKeyPress = (event, index, text) => {
