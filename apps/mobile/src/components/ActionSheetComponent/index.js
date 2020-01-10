@@ -6,14 +6,21 @@ import {
   Dimensions,
   TextInput,
   FlatList,
+  Platform,
 } from 'react-native';
-import {SIZE, pv, WEIGHT, opacity} from '../../common/common';
+import {
+  SIZE,
+  pv,
+  WEIGHT,
+  opacity,
+  COLOR_SCHEME_DARK,
+  COLOR_SCHEME_LIGHT,
+} from '../../common/common';
 import Icon from 'react-native-vector-icons/Feather';
 import NavigationService from '../../services/NavigationService';
-
 import {db} from '../../../App';
-
 import {useAppContext} from '../../provider/useAppContext';
+import AsyncStorage from '@react-native-community/async-storage';
 
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
@@ -23,8 +30,12 @@ export const ActionSheetComponent = ({
   close = () => {},
   item = {},
   setWillRefresh = value => {},
+  hasColors = false,
+  hasTags = false,
+  rowItems = [],
+  columnItems = [],
 }) => {
-  const {colors} = useAppContext();
+  const {colors, changeColorScheme} = useAppContext();
   const [focused, setFocused] = useState(false);
   const [note, setNote] = useState(item ? item : {});
 
@@ -100,12 +111,160 @@ export const ActionSheetComponent = ({
     }
   };
 
+  const localRefresh = type => {
+    let toAdd;
+    switch (type) {
+      case 'note': {
+        toAdd = db.getNote(note.dateCreated);
+        break;
+      }
+      case 'notebook': {
+        toAdd = db.getNotebook(note.dateCreated);
+        break;
+      }
+      case 'topic': {
+        toAdd = db.getTopic(topic.notebookId, topic.title);
+        break;
+      }
+    }
+    setNote({...toAdd});
+  };
+
+  const rowItemsData = [
+    {
+      name: 'Add to',
+      icon: 'book',
+      func: () => {
+        close();
+        NavigationService.push('Folders', {
+          note: note,
+          title: 'Choose a notebook',
+          isMove: true,
+          hideMore: true,
+          canGoBack: true,
+        });
+      },
+    },
+    {
+      name: 'Share',
+      icon: 'share-2',
+      func: () => {
+        close();
+      },
+    },
+    {
+      name: 'Export',
+      icon: 'external-link',
+      func: () => {
+        close();
+      },
+    },
+    {
+      name: 'Delete',
+      icon: 'trash',
+      func: () => close('delete'),
+    },
+    {
+      name: 'Edit Notebook',
+      icon: 'trash',
+      func: () => {
+        close('topic');
+      },
+    },
+    {
+      name: 'Edit Topic',
+      icon: 'trash',
+      func: () => {
+        close('topic');
+      },
+    },
+    {
+      name: 'Restore',
+      icon: 'trash',
+      func: () => {
+        db.restoreItem(item.dateCreated);
+        ToastEvent.show(
+          item.type == 'note' ? 'Note restored' : 'Notebook restored',
+          'success',
+          1000,
+          () => {},
+          '',
+        );
+        close();
+      },
+    },
+    {
+      name: 'Remove',
+      icon: 'trash',
+      func: () => {
+        close();
+      },
+    },
+  ];
+
+  columnItemsData = [
+    {
+      name: 'Dark Mode',
+      icon: 'moon',
+      func: () => {
+        if (!colors.night) {
+          AsyncStorage.setItem('theme', JSON.stringify(COLOR_SCHEME_DARK));
+          changeColorScheme(COLOR_SCHEME_DARK);
+        } else {
+          AsyncStorage.setItem('theme', JSON.stringify(COLOR_SCHEME_LIGHT));
+          changeColorScheme(COLOR_SCHEME_LIGHT);
+        }
+      },
+      switch: true,
+      on: colors.night ? true : false,
+      close: false,
+    },
+    {
+      name: 'Pin',
+      icon: 'tag',
+      func: () => {
+        db.pinItem(note.type, note.dateCreated);
+        localRefresh(item.type);
+        setWillRefresh(true);
+      },
+      close: false,
+      check: true,
+      on: note.pinned,
+    },
+    {
+      name: 'Favorite',
+      icon: 'star',
+      func: () => {
+        db.favoriteItem(note.type, note.dateCreated);
+        localRefresh(item.type);
+        setWillRefresh(true);
+      },
+      close: false,
+      check: true,
+      on: note.favorite,
+    },
+    {
+      name: 'Add to Vault',
+      icon: 'lock',
+      func: () => {
+        note.locked ? close('unlock') : close('lock');
+      },
+      close: true,
+      check: true,
+      on: note.locked,
+    },
+  ];
+
   return (
-    <View>
+    <View
+      style={{
+        paddingBottom: 15,
+        backgroundColor: colors.bg,
+      }}>
       <View
         style={{
           width: w - 24,
-          justifyContent: 'space-around',
+          justifyContent: 'space-between',
           alignItems: 'center',
           marginHorizontal: 12,
           paddingVertical: 10,
@@ -113,378 +272,256 @@ export const ActionSheetComponent = ({
           borderBottomWidth: 1,
           borderBottomColor: colors.nav,
         }}>
-        <TouchableOpacity
-          onPress={() => {
-            close();
-            NavigationService.push('Folders', {
-              note: note,
-              title: 'Choose a notebook',
-              isMove: true,
-              hideMore: true,
-              canGoBack: true,
-            });
-          }}
-          style={{
-            alignItems: 'center',
-          }}>
-          <Icon
-            style={{
-              width: 50,
-              height: 50,
-              borderRadius: 100,
-              justifyContent: 'center',
-              alignItems: 'center',
-              textAlign: 'center',
-              textAlignVertical: 'center',
-              marginBottom: 5,
-            }}
-            name="arrow-right"
-            size={SIZE.lg}
-            color={colors.accent}
-          />
+        {rowItemsData.map(rowItem =>
+          rowItems.includes(rowItem.name) ? (
+            <TouchableOpacity
+              onPress={rowItem.func}
+              style={{
+                alignItems: 'center',
+                width: (w - 24) / rowItems.length,
+              }}>
+              <Icon
+                style={{
+                  width: 50,
+                  height: 40,
+                  borderRadius: 100,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  textAlign: 'center',
+                  textAlignVertical: 'center',
+                }}
+                name={rowItem.icon}
+                size={SIZE.lg}
+                color={colors.accent}
+              />
 
-          <Text
-            style={{
-              fontFamily: WEIGHT.regular,
-              fontSize: SIZE.xs + 1,
-            }}>
-            Move to
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => {
-            close();
-          }}
-          style={{
-            alignItems: 'center',
-          }}>
-          <Icon
-            style={{
-              width: 50,
-              height: 50,
-              justifyContent: 'center',
-              alignItems: 'center',
-              textAlign: 'center',
-              textAlignVertical: 'center',
-              marginBottom: 5,
-            }}
-            name="share-2"
-            size={SIZE.lg}
-            color={colors.accent}
-          />
-          <Text
-            style={{
-              fontFamily: WEIGHT.regular,
-              fontSize: SIZE.xs + 1,
-            }}>
-            Share
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => {
-            close();
-          }}
-          style={{
-            alignItems: 'center',
-          }}>
-          <Icon
-            style={{
-              width: 50,
-              height: 50,
-              justifyContent: 'center',
-              alignItems: 'center',
-              textAlign: 'center',
-              textAlignVertical: 'center',
-              marginBottom: 5,
-            }}
-            name="external-link"
-            size={SIZE.lg}
-            color={colors.accent}
-          />
-
-          <Text
-            style={{
-              fontFamily: WEIGHT.regular,
-              fontSize: SIZE.xs + 1,
-            }}>
-            Export
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => {
-            close('delete');
-          }}
-          style={{
-            alignItems: 'center',
-          }}>
-          <Icon
-            style={{
-              width: 50,
-              height: 50,
-              borderRadius: 100,
-              justifyContent: 'center',
-              alignItems: 'center',
-              textAlign: 'center',
-              textAlignVertical: 'center',
-
-              marginBottom: 5,
-            }}
-            name="trash"
-            size={SIZE.lg}
-            color={colors.accent}
-          />
-
-          <Text
-            style={{
-              fontFamily: WEIGHT.regular,
-              fontSize: SIZE.xs + 1,
-            }}>
-            Delete
-          </Text>
-        </TouchableOpacity>
+              <Text
+                style={{
+                  fontFamily: WEIGHT.regular,
+                  fontSize: SIZE.xs + 1,
+                  color: colors.pri,
+                }}>
+                {rowItem.name}
+              </Text>
+            </TouchableOpacity>
+          ) : null,
+        )}
       </View>
-      <View
-        style={{
-          flexDirection: 'row',
-          flexWrap: 'wrap',
-          paddingHorizontal: 12,
-          width: '100%',
-          marginVertical: 10,
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}>
-        {['red', 'yellow', 'green', 'blue', 'purple', 'orange', 'gray'].map(
-          color => (
+
+      {hasColors ? (
+        <View
+          style={{
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            paddingHorizontal: 12,
+            width: '100%',
+            marginVertical: 10,
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}>
+          {['red', 'yellow', 'green', 'blue', 'purple', 'orange', 'gray'].map(
+            color => (
+              <TouchableOpacity
+                onPress={() => {
+                  let noteColors = note.colors;
+
+                  if (noteColors.includes(color)) {
+                    noteColors.splice(color, 1);
+                  } else {
+                    noteColors.push(color);
+                  }
+
+                  db.addNote({
+                    dateCreated: note.dateCreated,
+                    colors: noteColors,
+                    content: note.content,
+                    title: note.title,
+                  });
+                  localRefresh(item.type);
+                  setWillRefresh(true);
+                }}
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'flex-start',
+                  alignItems: 'center',
+                  borderColor: colors.nav,
+                }}>
+                <View
+                  style={{
+                    width: (w - 12) / 10,
+                    height: (w - 12) / 10,
+                    backgroundColor: color,
+                    borderRadius: 100,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}>
+                  {note.colors.includes(color) ? (
+                    <Icon name="check" color="white" size={SIZE.lg} />
+                  ) : null}
+                </View>
+              </TouchableOpacity>
+            ),
+          )}
+        </View>
+      ) : null}
+
+      {hasTags ? (
+        <View
+          style={{
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            marginHorizontal: 12,
+            marginBottom: 0,
+            borderRadius: 5,
+            borderWidth: 1.5,
+            borderColor: focused ? colors.accent : colors.nav,
+            paddingVertical: 5,
+          }}>
+          {note.tags.map(tag => (
             <TouchableOpacity
               onPress={() => {
-                let noteColors = note.colors;
+                let oldProps = {...note};
 
-                if (noteColors.includes(color)) {
-                  noteColors.splice(color, 1);
-                } else {
-                  noteColors.push(color);
-                }
-
+                oldProps.tags.splice(oldProps.tags.indexOf(tag), 1);
                 db.addNote({
                   dateCreated: note.dateCreated,
-                  colors: noteColors,
                   content: note.content,
                   title: note.title,
+                  tags: oldProps.tags,
                 });
-                setNote({...db.getNote(note.dateCreated)});
+                localRefresh(item.type);
                 setWillRefresh(true);
               }}
               style={{
                 flexDirection: 'row',
                 justifyContent: 'flex-start',
                 alignItems: 'center',
-                borderColor: colors.nav,
+                margin: 1,
+                paddingHorizontal: 5,
+                paddingVertical: 2.5,
               }}>
-              <View
-                style={{
-                  width: (w - 12) / 10,
-                  height: (w - 12) / 10,
-                  backgroundColor: color,
-                  borderRadius: 100,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}>
-                {note.colors.includes(color) ? (
-                  <Icon name="check" color="white" size={SIZE.lg} />
-                ) : null}
-              </View>
-            </TouchableOpacity>
-          ),
-        )}
-      </View>
-
-      <View
-        style={{
-          flexDirection: 'row',
-          flexWrap: 'wrap',
-          marginHorizontal: 12,
-          marginBottom: 0,
-          borderRadius: 5,
-          borderWidth: 1.5,
-          borderColor: focused ? colors.accent : colors.nav,
-        }}>
-        {note.tags.map(tag => (
-          <TouchableOpacity
-            onPress={() => {
-              let oldProps = {...note};
-
-              oldProps.tags.splice(oldProps.tags.indexOf(tag), 1);
-              db.addNote({
-                dateCreated: note.dateCreated,
-                content: note.content,
-                title: note.title,
-                tags: oldProps.tags,
-              });
-              setNote({...db.getNote(note.dateCreated)});
-            }}
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'flex-start',
-              alignItems: 'center',
-              margin: 1,
-              paddingHorizontal: 5,
-              paddingVertical: 2.5,
-            }}>
-            <Text
-              style={{
-                fontFamily: WEIGHT.regular,
-                fontSize: SIZE.sm,
-                color: colors.pri,
-              }}>
-              <Text
-                style={{
-                  color: colors.accent,
-                }}>
-                {tag.slice(0, 1)}
-              </Text>
-              {tag.slice(1)}
-            </Text>
-          </TouchableOpacity>
-        ))}
-        <TextInput
-          style={{
-            backgroundColor: 'transparent',
-            minWidth: 100,
-            fontFamily: WEIGHT.regular,
-            color: colors.pri,
-            paddingHorizontal: 5,
-            paddingVertical: 1.5,
-            margin: 1,
-          }}
-          blurOnSubmit={false}
-          ref={ref => (tagsInputRef = ref)}
-          placeholderTextColor={colors.icon}
-          onFocus={() => {
-            setFocused(true);
-          }}
-          selectionColor={colors.accent}
-          onBlur={() => {
-            setFocused(false);
-          }}
-          placeholder="#hashtag"
-          onChangeText={value => {
-            tagToAdd = value;
-            if (tagToAdd.length > 0) backPressCount = 0;
-          }}
-          onSubmitEditing={_onSubmit}
-          onKeyPress={_onKeyPress}
-        />
-      </View>
-
-      <FlatList
-        style={{
-          marginTop: 10,
-        }}
-        data={[
-          {
-            name: 'Pin',
-            icon: 'tag',
-            func: () => {
-              db.pinItem(note.type, note.dateCreated);
-              setNote({...db.getNote(note.dateCreated)});
-              setWillRefresh(true);
-            },
-            close: false,
-            check: true,
-            on: note.pinned,
-          },
-
-          {
-            name: 'Favorite',
-            icon: 'star',
-            func: () => {
-              db.favoriteItem(note.type, note.dateCreated);
-              setNote({...db.getNote(note.dateCreated)});
-              setWillRefresh(true);
-            },
-            close: false,
-            check: true,
-            on: note.favorite,
-          },
-          {
-            name: 'Add to Vault',
-            icon: 'lock',
-            func: () => {
-              note.locked ? close('unlock') : close('lock');
-            },
-            close: true,
-            check: true,
-            on: note.locked,
-          },
-        ]}
-        keyExtractor={(item, index) => item.name}
-        renderItem={({item, index}) => (
-          <TouchableOpacity
-            activeOpacity={opacity}
-            onPress={() => {
-              item.func();
-            }}
-            style={{
-              width: '100%',
-              alignSelf: 'center',
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'flex-end',
-              paddingHorizontal: 12,
-              paddingVertical: pv + 5,
-              paddingTop: index === 0 ? 5 : pv + 5,
-            }}>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-              }}>
-              <Icon
-                style={{
-                  width: 30,
-                }}
-                name={item.icon}
-                color={colors.pri}
-                size={SIZE.md}
-              />
               <Text
                 style={{
                   fontFamily: WEIGHT.regular,
                   fontSize: SIZE.sm,
                   color: colors.pri,
                 }}>
-                {item.name}
+                <Text
+                  style={{
+                    color: colors.accent,
+                  }}>
+                  {tag.slice(0, 1)}
+                </Text>
+                {tag.slice(1)}
               </Text>
-            </View>
-            {item.switch ? (
-              <Icon
-                size={SIZE.lg + 2}
-                color={item.on ? colors.accent : colors.icon}
-                name={item.on ? 'toggle-right' : 'toggle-left'}
-              />
-            ) : (
-              undefined
-            )}
-            {item.check ? (
+            </TouchableOpacity>
+          ))}
+          <TextInput
+            style={{
+              backgroundColor: 'transparent',
+              minWidth: 100,
+              fontFamily: WEIGHT.regular,
+              color: colors.pri,
+              paddingHorizontal: 5,
+              paddingVertical: 1.5,
+              margin: 1,
+            }}
+            blurOnSubmit={false}
+            ref={ref => (tagsInputRef = ref)}
+            placeholderTextColor={colors.icon}
+            onFocus={() => {
+              setFocused(true);
+            }}
+            selectionColor={colors.accent}
+            onBlur={() => {
+              setFocused(false);
+            }}
+            placeholder="#hashtag"
+            onChangeText={value => {
+              tagToAdd = value;
+              if (tagToAdd.length > 0) backPressCount = 0;
+            }}
+            onSubmitEditing={_onSubmit}
+            onKeyPress={_onKeyPress}
+          />
+        </View>
+      ) : null}
+
+      {columnItems.length > 0 ? (
+        <View>
+          {columnItemsData.map(item =>
+            columnItems.includes(item.name) ? (
               <TouchableOpacity
+                activeOpacity={opacity}
+                onPress={() => {
+                  item.func();
+                }}
                 style={{
-                  borderWidth: 2,
-                  borderColor: item.on ? colors.accent : colors.icon,
-                  width: 23,
-                  height: 23,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  borderRadius: 100,
-                  paddingTop: 3,
+                  width: '100%',
+                  alignSelf: 'center',
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'flex-end',
+                  paddingHorizontal: 12,
+                  paddingVertical: pv + 5,
                 }}>
-                {item.on ? (
-                  <Icon size={SIZE.sm - 2} color={colors.accent} name="check" />
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                  }}>
+                  <Icon
+                    style={{
+                      width: 30,
+                    }}
+                    name={item.icon}
+                    color={colors.pri}
+                    size={SIZE.md}
+                  />
+                  <Text
+                    style={{
+                      fontFamily: WEIGHT.regular,
+                      fontSize: SIZE.sm,
+                      color: colors.pri,
+                    }}>
+                    {item.name}
+                  </Text>
+                </View>
+                {item.switch ? (
+                  <Icon
+                    size={SIZE.lg + 2}
+                    color={item.on ? colors.accent : colors.icon}
+                    name={item.on ? 'toggle-right' : 'toggle-left'}
+                  />
+                ) : (
+                  undefined
+                )}
+                {item.check ? (
+                  <TouchableOpacity
+                    style={{
+                      borderWidth: 2,
+                      borderColor: item.on ? colors.accent : colors.icon,
+                      width: 23,
+                      height: 23,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      borderRadius: 100,
+                      paddingTop: 3,
+                    }}>
+                    {item.on ? (
+                      <Icon
+                        size={SIZE.sm - 2}
+                        color={colors.accent}
+                        name="check"
+                      />
+                    ) : null}
+                  </TouchableOpacity>
                 ) : null}
               </TouchableOpacity>
-            ) : null}
-          </TouchableOpacity>
-        )}
-      />
+            ) : null,
+          )}
+        </View>
+      ) : null}
     </View>
   );
 };
