@@ -4,6 +4,7 @@ import { Flex, Box, Text, Button as RebassButton } from "rebass";
 import { Input, Checkbox, Label } from "@rebass/forms";
 import * as Icon from "react-feather";
 import { ThemeProvider } from "../../utils/theme";
+import { db } from "../../common";
 import Modal from "react-modal";
 
 const Dialog = props => {
@@ -71,8 +72,10 @@ const Dialog = props => {
             >
               <RebassButton
                 variant="primary"
+                sx={{ opacity: props.positiveButton.disabled ? 0.7 : 1 }}
                 mx={1}
                 width={"25%"}
+                disabled={props.positiveButton.disabled || false}
                 onClick={props.positiveButton.click}
               >
                 {props.positiveButton.text || "OK"}
@@ -235,6 +238,190 @@ export const ask = (icon, title, message) => {
       );
     });
   }
-  console.log("Notebooks");
+  return Promise.reject("No element with id 'dialogContainer'");
+};
+
+export const MoveDialog = props => {
+  const [items, setItems] = useState(db.getNotebooks());
+  const [type, setType] = useState("notebooks");
+  const [title, setTitle] = useState("Notebooks");
+  const [mode, setMode] = useState("read");
+  useEffect(() => {
+    MoveDialog.last = [];
+  }, []);
+  return (
+    <Dialog
+      open={true}
+      title={"Move Note"}
+      icon={Icon.Move}
+      content={
+        <Box>
+          <Flex alignContent="center" justifyContent="space-between" my={1}>
+            <Flex>
+              {type !== "notebooks" && (
+                <Text
+                  onClick={() => {
+                    let item = MoveDialog.last.pop();
+                    setType(item.type);
+                    setTitle(item.title);
+                    setItems(item.items);
+                  }}
+                  sx={{
+                    ":hover": { color: "primary" },
+                    marginRight: 2
+                  }}
+                >
+                  <Icon.ArrowLeft />
+                </Text>
+              )}
+              <Text variant="title">{title}</Text>
+            </Flex>
+            {type !== "notes" && (
+              <Text
+                onClick={() => {
+                  if (mode === "write") {
+                    setMode("read");
+                    return;
+                  }
+                  setMode("write");
+                  setTimeout(() => {
+                    MoveDialog.inputRef.focus();
+                  }, 0);
+                }}
+                sx={{
+                  ":hover": { color: "primary" }
+                }}
+              >
+                {mode === "read" ? <Icon.Plus /> : <Icon.Minus />}
+              </Text>
+            )}
+          </Flex>
+          <Input
+            ref={ref => (MoveDialog.inputRef = ref)}
+            variant="default"
+            sx={{ display: mode === "write" ? "block" : "none" }}
+            my={1}
+            placeholder={type === "notebooks" ? "Notebook name" : "Topic name"}
+            onKeyUp={async e => {
+              if (e.nativeEvent.key === "Enter" && e.target.value.length > 0) {
+                if (type === "notebooks") {
+                  await db.addNotebook({ title: e.target.value });
+                  setItems(db.getNotebooks());
+                } else {
+                  await db.addTopicToNotebook(
+                    MoveDialog.notebook.dateCreated,
+                    e.target.value
+                  );
+                  setItems(
+                    db.getNotebook(MoveDialog.notebook.dateCreated).topics
+                  );
+                }
+                MoveDialog.inputRef.value = "";
+                setMode("read");
+              }
+            }}
+          />
+          <Box
+            sx={{
+              borderWidth: 1,
+              borderStyle: "solid",
+              borderColor: "border",
+              maxHeight: 8 * 30,
+              overflowY: "auto"
+            }}
+          >
+            {items.length ? (
+              items.map(v => {
+                return (
+                  <Flex
+                    sx={{
+                      borderWidth: 1,
+                      padding: 2,
+                      borderBottomColor: "border",
+                      borderBottomStyle: "solid",
+                      ":hover": { borderBottomColor: "primary" }
+                    }}
+                    onClick={() => {
+                      MoveDialog.last.push({
+                        title: title,
+                        items: items,
+                        type: type
+                      });
+                      if (type === "notebooks") {
+                        setType("topics");
+                        MoveDialog.notebook = v;
+                        setTitle(v.title);
+                        setItems(v.topics);
+                      } else if (type === "topics") {
+                        setType("notes");
+                        MoveDialog.topic = v.title;
+                        setTitle(`${MoveDialog.notebook.title} - ${v.title}`);
+                        setItems(
+                          db.getTopic(MoveDialog.notebook.dateCreated, v.title)
+                        );
+                      }
+                    }}
+                  >
+                    <Text sx={{ width: "80%" }}>{v.title}</Text>
+                    {v.totalNotes !== undefined && (
+                      <Text sx={{ width: "20%", textAlign: "right" }}>
+                        {v.totalNotes + " Notes"}
+                      </Text>
+                    )}
+                  </Flex>
+                );
+              })
+            ) : (
+              <Text
+                py={2}
+                px={2}
+                sx={{ textAlign: "center", fontStyle: "italic" }}
+              >
+                Nothing here
+              </Text>
+            )}
+          </Box>
+        </Box>
+      }
+      positiveButton={{
+        text: "Move",
+        click: async () => {
+          if (
+            await db.moveNote(props.noteId, props.notebook, {
+              notebook: MoveDialog.notebook.dateCreated,
+              topic: MoveDialog.topic
+            })
+          ) {
+            props.onMove();
+          }
+          props.onClose();
+        },
+        disabled: type !== "notes"
+      }}
+      negativeButton={{ text: "Cancel", onClick: props.onClose }}
+    />
+  );
+};
+
+export const moveNote = (noteId, notebook) => {
+  const root = document.getElementById("dialogContainer");
+  const perform = (result, resolve) => {
+    Dialog.close();
+    ReactDOM.unmountComponentAtNode(root);
+    resolve(result);
+  };
+  if (root) {
+    return new Promise((resolve, _) => {
+      ReactDOM.render(
+        <MoveDialog
+          noteId={noteId}
+          notebook={notebook}
+          onClose={() => perform(false, resolve)}
+          onMove={() => perform(true, resolve)}
+        />,
+        root
+      );
+    });
+  }
   return Promise.reject("No element with id 'dialogContainer'");
 };
