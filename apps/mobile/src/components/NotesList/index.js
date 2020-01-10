@@ -102,8 +102,8 @@ export const NotesList = ({
                   ? 135
                   : 135 - 60
                 : notes[0]
-                ? 175
-                : 175 - 60,
+                ? 155
+                : 155 - 60,
           }}>
           {pinned && pinned.length > 0 ? (
             <>
@@ -199,8 +199,8 @@ export const NotesList = ({
                   ? 135
                   : 135 - 60
                 : notes[0]
-                ? 175
-                : 175 - 60,
+                ? 155
+                : 155 - 60,
           }}></View>
       }
       contentContainerStyle={{
