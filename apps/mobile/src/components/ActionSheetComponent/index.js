@@ -276,6 +276,7 @@ export const ActionSheetComponent = ({
           rowItems.includes(rowItem.name) ? (
             <TouchableOpacity
               onPress={rowItem.func}
+              key={rowItem.name}
               style={{
                 alignItems: 'center',
                 width: (w - 24) / rowItems.length,
@@ -322,6 +323,7 @@ export const ActionSheetComponent = ({
           {['red', 'yellow', 'green', 'blue', 'purple', 'orange', 'gray'].map(
             color => (
               <TouchableOpacity
+                key={color}
                 onPress={() => {
                   let noteColors = note.colors;
 
@@ -379,6 +381,7 @@ export const ActionSheetComponent = ({
           }}>
           {note.tags.map(tag => (
             <TouchableOpacity
+              key={tag}
               onPress={() => {
                 let oldProps = {...note};
 
@@ -452,6 +455,7 @@ export const ActionSheetComponent = ({
           {columnItemsData.map(item =>
             columnItems.includes(item.name) ? (
               <TouchableOpacity
+                key={item.name}
                 activeOpacity={opacity}
                 onPress={() => {
                   item.func();
