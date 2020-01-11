@@ -25,7 +25,15 @@ export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(
 
 export const Home = ({navigation}) => {
   // State
-  const {colors, updateAppTheme, setMenuOpen} = useAppContext();
+  const {
+    colors,
+    updateAppTheme,
+    setMenuOpen,
+    selectionMode,
+    selectedItemsList,
+    changeSelectionMode,
+    updateSelectionList,
+  } = useAppContext();
 
   const [search, setSearch] = useState(false);
   const [text, setText] = useState('');
@@ -35,6 +43,7 @@ export const Home = ({navigation}) => {
   const [notes, setNotes] = useState([]);
   const [keyword, setKeyword] = useState('');
   const isFocused = useIsFocused();
+
   // Variables
   let offsetY = 0;
   let countUp = 1;
@@ -137,12 +146,107 @@ export const Home = ({navigation}) => {
           height: '100%',
         }}>
         <Animatable.View
-          transition="backgroundColor"
+          transition={['backgroundColor', 'opacity', 'height']}
+          duration={300}
+          style={{
+            width: '100%',
+            position: 'absolute',
+            height: selectionMode ? 50 : 0,
+            opacity: selectionMode ? 1 : 0,
+            justifyContent: 'flex-end',
+            zIndex: 11,
+          }}>
+          <View
+            style={{
+              width: w - 24,
+              marginHorizontal: 12,
+              height: 50,
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}>
+            <View
+              style={{
+                justifyContent: 'space-between',
+                flexDirection: 'row',
+                alignItems: 'center',
+              }}>
+              <TouchableOpacity
+                onPress={() => {
+                  changeSelectionMode(false);
+                }}
+                hitSlop={{top: 20, bottom: 20, left: 50, right: 40}}
+                style={{
+                  justifyContent: 'center',
+                  alignItems: 'flex-start',
+                  height: 40,
+                  width: 50,
+                  marginTop: 2.5,
+                }}>
+                <Icon
+                  style={{
+                    marginLeft: -5,
+                  }}
+                  color={colors.pri}
+                  name={'chevron-left'}
+                  size={SIZE.xxxl - 3}
+                />
+              </TouchableOpacity>
+              <Text
+                style={{
+                  fontSize: SIZE.lg,
+                  fontFamily: WEIGHT.regular,
+                  color: colors.pri,
+                  textAlignVertical: 'center',
+                }}>
+                {selectedItemsList.length}
+              </Text>
+            </View>
+
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}>
+              <Icon
+                style={{
+                  paddingLeft: 25,
+                }}
+                color={colors.accent}
+                name={'plus'}
+                size={SIZE.xl}
+              />
+              <Icon
+                style={{
+                  paddingLeft: 25,
+                }}
+                color={colors.accent}
+                name={'star'}
+                size={SIZE.xl - 3}
+              />
+
+              <Icon
+                style={{
+                  paddingLeft: 25,
+                }}
+                color={colors.errorText}
+                name={'trash'}
+                size={SIZE.xl - 3}
+              />
+            </View>
+          </View>
+        </Animatable.View>
+
+        <Animatable.View
+          transition={['backgroundColor', 'opacity', 'height']}
           duration={300}
           style={{
             position: 'absolute',
-            backgroundColor: colors.night ? colors.bg : colors.bg,
+            backgroundColor: colors.bg,
             zIndex: 10,
+            height: selectionMode ? 0 : null,
+            opacity: selectionMode ? 0 : 1,
             width: '100%',
           }}>
           <Header
@@ -159,6 +263,7 @@ export const Home = ({navigation}) => {
             canGoBack={false}
             customIcon="menu"
           />
+
           {notes[0] ? (
             <Search
               clear={() => setText('')}

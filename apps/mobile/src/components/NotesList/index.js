@@ -15,6 +15,7 @@ import {useAppContext} from '../../provider/useAppContext';
 import Icon from 'react-native-vector-icons/Feather';
 import {NotesPlaceHolder} from '../ListPlaceholders';
 import {slideRight, slideLeft} from '../../utils/animations';
+import {w} from '../../utils/utils';
 export const NotesList = ({
   keyword = null,
   notes,
@@ -26,7 +27,14 @@ export const NotesList = ({
   emptyPlaceholderText = '',
   refresh = () => {},
 }) => {
-  const {colors} = useAppContext();
+  const {
+    colors,
+    selectionMode,
+    selectedItemsList,
+    changeSelectionMode,
+    updateSelectionList,
+  } = useAppContext();
+
   const [numColumns, setNumColumns] = useState(1);
   const [pinned, setPinned] = useState([]);
 
@@ -98,10 +106,10 @@ export const NotesList = ({
           style={{
             marginTop:
               Platform.OS == 'ios'
-                ? notes[0]
+                ? notes[0] && !selectionMode
                   ? 135
                   : 135 - 60
-                : notes[0]
+                : notes[0] && !selectionMode
                 ? 155
                 : 155 - 60,
           }}>
@@ -109,24 +117,27 @@ export const NotesList = ({
             <>
               <FlatList
                 data={pinned}
-                renderItem={({item, index}) => (
-                  <NoteItem
-                    customStyle={{
-                      backgroundColor: colors.shade,
-                      width: '100%',
-                      paddingHorizontal: '5%',
-                      paddingTop: 20,
-                      marginBottom: 10,
-                      marginTop: 20,
-                      borderBottomWidth: 0,
-                    }}
-                    pinned={true}
-                    refresh={() => refresh()}
-                    item={item}
-                    numColumns={1}
-                    index={index}
-                  />
-                )}
+                keyExtractor={(item, index) => item.dateCreated.toString()}
+                renderItem={({item, index}) =>
+                  item.type === 'note' ? (
+                    <NoteItem
+                      customStyle={{
+                        backgroundColor: colors.shade,
+                        width: '100%',
+                        paddingHorizontal: '5%',
+                        paddingTop: 20,
+                        marginBottom: 10,
+                        marginTop: 20,
+                        borderBottomWidth: 0,
+                      }}
+                      pinned={true}
+                      refresh={() => refresh()}
+                      item={item}
+                      numColumns={1}
+                      index={index}
+                    />
+                  ) : null
+                }
               />
             </>
           ) : null}
@@ -157,12 +168,56 @@ export const NotesList = ({
         ) : null
       }
       renderItem={({item, index}) => (
-        <NoteItem
-          item={item}
-          refresh={() => refresh()}
-          numColumns={numColumns}
-          index={index}
-        />
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            width: w - 24,
+            marginHorizontal: 12,
+          }}>
+          <TouchableOpacity
+            onPress={() => updateSelectionList(item)}
+            style={{
+              width: 50,
+              height: 70,
+              justifyContent: 'center',
+              alignItems: 'flex-start',
+              display: selectionMode ? 'flex' : 'none',
+            }}>
+            <View
+              style={{
+                borderWidth: 2,
+                borderColor: selectedItemsList.includes(item)
+                  ? colors.accent
+                  : colors.icon,
+                width: 30,
+                height: 30,
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderRadius: 100,
+                paddingTop: 4,
+              }}>
+              {selectedItemsList.includes(item) ? (
+                <Icon size={SIZE.md} color={colors.accent} name="check" />
+              ) : null}
+            </View>
+          </TouchableOpacity>
+
+          <NoteItem
+            customStyle={{
+              width: selectionMode ? w - 74 : '100%',
+              marginHorizontal: 0,
+            }}
+            onLongPress={() => {
+              changeSelectionMode(!selectionMode);
+            }}
+            item={item}
+            refresh={() => refresh()}
+            numColumns={numColumns}
+            index={index}
+          />
+        </View>
       )}
     />
   ) : (
@@ -226,12 +281,56 @@ export const NotesList = ({
         </View>
       }
       renderItem={({item, index}) => (
-        <NoteItem
-          item={item}
-          refresh={() => refresh()}
-          numColumns={numColumns}
-          index={index}
-        />
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            width: w - 24,
+            marginHorizontal: 12,
+          }}>
+          <TouchableOpacity
+            onPress={() => updateSelectionList(item)}
+            style={{
+              width: 50,
+              height: 70,
+              justifyContent: 'center',
+              alignItems: 'flex-start',
+              display: selectionMode ? 'flex' : 'none',
+            }}>
+            <View
+              style={{
+                borderWidth: 2,
+                borderColor: selectedItemsList.includes(item)
+                  ? colors.accent
+                  : colors.icon,
+                width: 30,
+                height: 30,
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderRadius: 100,
+                paddingTop: 4,
+              }}>
+              {selectedItemsList.includes(item) ? (
+                <Icon size={SIZE.md} color={colors.accent} name="check" />
+              ) : null}
+            </View>
+          </TouchableOpacity>
+
+          <NoteItem
+            customStyle={{
+              width: selectionMode ? w - 74 : '100%',
+              marginHorizontal: 0,
+            }}
+            onLongPress={() => {
+              changeSelectionMode(!selectionMode);
+            }}
+            item={item}
+            refresh={() => refresh()}
+            numColumns={numColumns}
+            index={index}
+          />
+        </View>
       )}
     />
   );

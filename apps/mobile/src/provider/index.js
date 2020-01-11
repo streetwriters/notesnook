@@ -25,6 +25,8 @@ const defaultState = {
     warningBg: '#FEEFB3',
     warningText: '#9F6000',
   },
+  selectionMode: false,
+  selectedItemsList: [],
 };
 
 const AppContext = createContext([defaultState, function() {}]);

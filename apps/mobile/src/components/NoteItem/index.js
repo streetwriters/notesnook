@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useRef} from 'react';
 import {
   View,
   Text,
@@ -45,7 +45,7 @@ const NoteItem = props => {
   const [unlock, setUnlock] = useState(false);
   const [isPerm, setIsPerm] = useState(false);
   const item = props.item;
-
+  let actionSheet;
   let show = null;
   let setMenuRef = {};
   let willRefresh = false;
@@ -90,7 +90,7 @@ const NoteItem = props => {
           alignItems: 'center',
           flexDirection: 'row',
           marginHorizontal: 12,
-          width: w - 24,
+          width: props.width,
           paddingRight: 6,
           alignSelf: 'center',
           borderBottomWidth: 1,
@@ -149,6 +149,7 @@ const NoteItem = props => {
 
       <TouchableOpacity
         activeOpacity={1}
+        onLongPress={() => props.onLongPress()}
         onPress={() => {
           if (item.locked) {
             setUnlock(true);
@@ -215,6 +216,7 @@ const NoteItem = props => {
                       }}>
                       {item.colors.map(item => (
                         <View
+                          key={item}
                           style={{
                             width: SIZE.xs,
                             height: SIZE.xs,
@@ -301,12 +303,13 @@ const NoteItem = props => {
             alignItems: 'center',
           }}
           onPress={() => {
-            ActionSheet._setModalVisible();
+            actionSheet._setModalVisible();
           }}>
           <Icon name="more-horizontal" size={SIZE.lg} color={colors.icon} />
         </TouchableOpacity>
 
         <ActionSheet
+          ref={ref => (actionSheet = ref)}
           customStyles={{
             backgroundColor: colors.bg,
           }}
@@ -316,29 +319,27 @@ const NoteItem = props => {
             if (willRefresh) {
               props.refresh();
             }
-          }}
-          children={
-            <ActionSheetComponent
-              item={item}
-              setWillRefresh={value => {
-                willRefresh = true;
-              }}
-              hasColors={true}
-              hasTags={true}
-              overlayColor={
-                colors.night ? 'rgba(225,225,225,0.1)' : 'rgba(0,0,0,0.3)'
+          }}>
+          <ActionSheetComponent
+            item={props.item}
+            setWillRefresh={value => {
+              willRefresh = true;
+            }}
+            hasColors={true}
+            hasTags={true}
+            overlayColor={
+              colors.night ? 'rgba(225,225,225,0.1)' : 'rgba(0,0,0,0.3)'
+            }
+            rowItems={['Add to', 'Share', 'Export', 'Delete']}
+            columnItems={['Add to Vault', 'Pin', 'Favorite']}
+            close={value => {
+              if (value) {
+                show = value;
               }
-              rowItems={['Add to', 'Share', 'Export', 'Delete']}
-              columnItems={['Add to Vault', 'Pin', 'Favorite']}
-              close={value => {
-                if (value) {
-                  show = value;
-                }
-                ActionSheet._setModalVisible();
-              }}
-            />
-          }
-        />
+              ActionSheet._setModalVisible();
+            }}
+          />
+        </ActionSheet>
       </View>
     </View>
   );

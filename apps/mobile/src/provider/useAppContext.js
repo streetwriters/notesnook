@@ -15,6 +15,8 @@ const useAppContext = () => {
     throw new Error('Must have dispatch defined');
   }
 
+  // Themeing
+
   async function updateAppTheme(colors = state.colors) {
     let newColors = await getColorScheme(colors);
     dispatch(draft => {
@@ -37,11 +39,37 @@ const useAppContext = () => {
     changeColorScheme();
   }
 
+  // Handling Selection Items
+
+  function changeSelectionMode(enabled) {
+    dispatch(draft => {
+      draft.selectionMode = enabled;
+      if (!enabled) {
+        draft.selectedItemsList = [...[]];
+      }
+    });
+  }
+  function updateSelectionList(item) {
+    let selectedItems = [...state.selectedItemsList];
+
+    if (selectedItems.includes(item)) {
+      selectedItems.splice(selectedItems.indexOf(item), 1);
+    } else {
+      selectedItems.push(item);
+    }
+
+    dispatch(draft => {
+      draft.selectedItemsList = selectedItems;
+    });
+  }
+
   return {
     ...state,
     updateAppTheme,
     changeColorScheme,
     changeAccentColor,
+    changeSelectionMode,
+    updateSelectionList,
   };
 };
 
