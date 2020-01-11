@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -28,7 +28,7 @@ const h = Dimensions.get('window').height;
 let tagsInputRef;
 export const ActionSheetComponent = ({
   close = () => {},
-  item = {},
+  item,
   setWillRefresh = value => {},
   hasColors = false,
   hasTags = false,
@@ -38,6 +38,10 @@ export const ActionSheetComponent = ({
   const {colors, changeColorScheme} = useAppContext();
   const [focused, setFocused] = useState(false);
   const [note, setNote] = useState(item ? item : {});
+
+  useEffect(() => {
+    setNote({...item});
+  }, [item]);
 
   let tagToAdd = null;
   let backPressCount = 0;
@@ -257,6 +261,10 @@ export const ActionSheetComponent = ({
 
   return (
     <View
+      onLayout={() => {
+        console.log(item);
+        setNote({...item});
+      }}
       style={{
         paddingBottom: 15,
         backgroundColor: colors.bg,
