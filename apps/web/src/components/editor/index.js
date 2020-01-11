@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import "./editor.css";
 import ReactQuill, { Quill } from "react-quill";
 import "react-quill/dist/quill.bubble.css";
@@ -10,6 +10,7 @@ import MagicUrl from "quill-magic-url";
 import { db, ev } from "../../common";
 import { showSnack } from "../snackbar";
 import * as Icon from "react-feather";
+import Properties from "../properties/properties";
 
 Quill.register("modules/markdownShortcuts", MarkdownShortcuts);
 Quill.register("modules/magicUrl", MagicUrl);
@@ -40,137 +41,137 @@ const modules = {
   magicUrl: true
 };
 
-let timestamp = undefined;
-let title = undefined;
-async function saveNote(quill) {
-  let content = {
-    delta: quill.getContents(),
-    text: quill.getText()
-  };
-  if (!content.delta || content.text.length <= 1) return;
-  let note = {
-    content,
-    title,
-    dateCreated: timestamp
-  };
-  timestamp = await db.addNote(note);
-}
-function startAutoSave(quill) {
-  setInterval(async () => {
-    if (Date.now() - Editor.lastSaveTimestamp <= 1000) {
-      await saveNote(quill);
-    }
-  }, 2000);
-}
-const Editor = props => {
-  const ref = ref => (Editor.quillRef = ref);
-  const titleRef = ref => (Editor.titleRef = ref);
-  useEffect(() => {
-    const quill = Editor.quillRef.getEditor();
-    quill.keyboard.addBinding(
-      {
-        key: "S",
-        shortKey: true
-      },
-      async () => {
-        await saveNote(quill);
-        showSnack("Note saved!", Icon.Check);
-      }
-    );
+export default class Editor extends React.Component {
+  title = "";
+  timeout = "";
+  timestamp = "";
 
-    let saveInterval = startAutoSave(quill);
-    function onNewNote(showToast = true) {
-      clearInterval(saveInterval);
-      saveNote(quill).then(() => {
-        title = undefined;
-        timestamp = undefined;
-        Editor.titleRef.value = "";
-        Editor.titleRef.focus();
-        quill.setText("\n");
-        Editor.lastSaveTimestamp = 0;
-        saveInterval = startAutoSave(quill);
-        if (showToast) {
-          showSnack("Let's start writing!", Icon.Edit2);
-        }
-      });
-    }
-    function onClearNote(dateCreated = undefined) {
-      if (dateCreated && dateCreated !== timestamp) return;
-      clearInterval(saveInterval);
-      title = undefined;
-      timestamp = undefined;
-      Editor.titleRef.value = "";
-      Editor.titleRef.focus();
-      quill.setText("\n");
-      Editor.lastSaveTimestamp = 0;
-    }
-    function onOpenNote(note) {
-      if (!note) return;
-      onNewNote(false);
-      setTimeout(() => {
-        timestamp = undefined;
-        title = note.title;
-        timestamp = note.dateCreated;
-        Editor.titleRef.value = note.title;
-        // quill.setText(note.content.text);
-        quill.setContents(note.content.delta);
-        quill.setSelection(note.content.text.length - 1, 0); //to move the cursor to the end
-      }, 0);
-    }
-    ev.addListener("onNewNote", onNewNote);
-    ev.addListener("onOpenNote", onOpenNote);
-    ev.addListener("onClearNote", onClearNote);
-
-    return () => {
-      clearInterval(saveInterval);
-      ev.removeListener("onNewNote", onNewNote);
-      ev.removeListener("onOpenNote", onOpenNote);
-      ev.removeListener("onClearNote", onClearNote);
-    };
-  });
-
-  useEffect(() => {
+  componentDidMount() {
     // move the toolbar outside (easiest way)
     const toolbar = document.querySelector(".ql-toolbar.ql-snow");
     const toolbarContainer = document.querySelector("#toolbar");
     if (toolbar && toolbarContainer) {
       toolbarContainer.appendChild(toolbar);
     }
-  }, []);
-  return (
-    <Flex
-      className="editor"
-      width={["0%", "50%", "55%"]}
-      flex="1 1 auto"
-      flexDirection="column"
-      onBlur={() => {
-        ev.emit("refreshNotes");
-      }}
-    >
-      <Input
-        ref={titleRef}
-        placeholder="Untitled"
-        fontFamily="heading"
-        fontWeight="heading"
-        fontSize="heading"
-        display={["none", "flex", "flex"]}
-        sx={{
-          borderWidth: 0,
-          ":focus": { outline: "none" },
-          paddingTop: 0,
-          paddingBottom: 3
-        }}
-        px={2}
-        onChange={e => (title = e.target.value)}
-      />
-      <Box id="toolbar" display={["none", "flex", "flex"]}></Box>
-      <ReactQuill
-        ref={ref}
-        modules={modules}
-        theme="snow"
-        onChange={() => (Editor.lastSaveTimestamp = Date.now())}
-      />
-    </Flex>
-  );
-};
-export default Editor;
+
+    this.quill = this.quillRef.getEditor();
+    this.quill.keyboard.addBinding(
+      {
+        key: "S",
+        shortKey: true
+      },
+      async () => {
+        await this.saveNote();
+        showSnack("Note saved!", Icon.Check);
+      }
+    );
+
+    ev.addListener("onNewNote", this.onNewNote.bind(this));
+    ev.addListener("onOpenNote", this.onOpenNote.bind(this));
+    ev.addListener("onClearNote", this.onClearNote.bind(this));
+  }
+
+  componentWillUnmount() {
+    ev.removeListener("onNewNote", this.onNewNote.bind(this));
+    ev.removeListener("onOpenNote", this.onOpenNote.bind(this));
+    ev.removeListener("onClearNote", this.onClearNote.bind(this));
+  }
+
+  onNewNote(showSnack = true, cb = null) {
+    clearTimeout(this.timeout);
+    this.saveNote().then(() => {
+      this.titleRef.value = "";
+      this.timestamp = undefined;
+      this.title = undefined;
+      this.titleRef.focus();
+      this.quill.setText("\n");
+      cb && cb();
+      if (showSnack) {
+        showSnack("Let's start writing!", Icon.Edit2);
+      }
+    });
+  }
+
+  onClearNote(dateCreated = undefined) {
+    if (dateCreated && dateCreated !== this.timestamp) return;
+    this.onNewNote(false);
+  }
+
+  onOpenNote(note) {
+    if (!note) return;
+    this.onNewNote(false, () => {
+      this.timestamp = note.dateCreated;
+      this.title = note.title;
+      this.titleRef.value = note.title;
+      this.quill.setContents(note.content.delta);
+      this.quill.setSelection(note.content.text.length - 1, 0); //to move the cursor to the end
+    });
+  }
+
+  async saveNote() {
+    let content = {
+      delta: this.quill.getContents(),
+      text: this.quill.getText()
+    };
+    if (!content.delta || content.text.length <= 1) return this.timestamp;
+    let note = {
+      content,
+      title: this.title,
+      dateCreated: this.timestamp
+    };
+    let t = await db.addNote(note);
+
+    console.log(t);
+    return t;
+  }
+
+  render() {
+    return (
+      <Flex width={["0%", "50%", "75%"]}>
+        <Flex
+          className="editor"
+          flex="1 1 auto"
+          flexDirection="column"
+          onBlur={() => {
+            ev.emit("refreshNotes");
+          }}
+        >
+          <Input
+            ref={ref => (this.titleRef = ref)}
+            placeholder="Untitled"
+            fontFamily="heading"
+            fontWeight="heading"
+            fontSize="heading"
+            display={["none", "flex", "flex"]}
+            sx={{
+              borderWidth: 0,
+              ":focus": { outline: "none" },
+              paddingTop: 0,
+              paddingBottom: 3
+            }}
+            px={2}
+            onChange={e => (this.title = e.target.value)}
+          />
+          <Box id="toolbar" display={["none", "flex", "flex"]}></Box>
+          <ReactQuill
+            ref={ref => (this.quillRef = ref)}
+            modules={modules}
+            theme="snow"
+            onChange={() => {
+              clearTimeout(this.timeout);
+              this.timeout = setTimeout(async () => {
+                this.timestamp = await this.saveNote();
+                console.log(this.timestamp);
+              }, 1000);
+            }}
+          />
+        </Flex>
+        <Properties
+          onPinned={state => {}}
+          onFavorited={state => {}}
+          onLocked={state => {}}
+        />
+      </Flex>
+    );
+  }
+}
