@@ -31,7 +31,7 @@ export const Folders = ({navigation}) => {
   const [buttonHide, setButtonHide] = useState(false);
   const [margin, setMargin] = useState(180);
   const [numColumns, setNumColumns] = useState(1);
-
+  const [pinned, setPinned] = useState([]);
   const isFocused = useIsFocused();
 
   const params = navigation.state.params;
@@ -44,7 +44,11 @@ export const Folders = ({navigation}) => {
 
   useEffect(() => {
     if (isFocused) {
-      setNotebooks(db.getNotebooks());
+      setNotebooks([...db.getNotebooks()]);
+
+      let pinItems = db.getPinned();
+
+      setPinned([...pinItems]);
     }
   }, [isFocused]);
 
@@ -139,41 +143,71 @@ export const Folders = ({navigation}) => {
                     : notebooks[0]
                     ? 155
                     : 155 - 60,
-              }}
-            />
+              }}>
+              {pinned && pinned.length > 0 ? (
+                <>
+                  <FlatList
+                    data={pinned}
+                    keyExtractor={(item, index) => item.dateCreated.toString()}
+                    renderItem={({item, index}) =>
+                      item.type === 'notebook' ? (
+                        <NoteItem
+                          customStyle={{
+                            backgroundColor: colors.shade,
+                            width: '100%',
+                            paddingHorizontal: '5%',
+                            paddingTop: 20,
+                            marginBottom: 10,
+                            marginTop: 20,
+                            borderBottomWidth: 0,
+                          }}
+                          pinned={true}
+                          refresh={() => refresh()}
+                          item={item}
+                          numColumns={1}
+                          index={index}
+                        />
+                      ) : null
+                    }
+                  />
+                </>
+              ) : null}
+            </View>
           }
           ListEmptyComponent={
-            <View
-              style={{
-                height: '80%',
-                width: '100%',
-                alignItems: 'center',
-                alignSelf: 'center',
-                justifyContent: 'center',
-                opacity: 0.8,
-              }}>
-              <NotebookPlaceHolder animation={slideRight} colors={colors} />
-              <NotebookPlaceHolder animation={slideLeft} colors={colors} />
-              <NotebookPlaceHolder animation={slideRight} colors={colors} />
+            pinned && pinned.length > 0 ? null : (
+              <View
+                style={{
+                  height: '80%',
+                  width: '100%',
+                  alignItems: 'center',
+                  alignSelf: 'center',
+                  justifyContent: 'center',
+                  opacity: 0.8,
+                }}>
+                <NotebookPlaceHolder animation={slideRight} colors={colors} />
+                <NotebookPlaceHolder animation={slideLeft} colors={colors} />
+                <NotebookPlaceHolder animation={slideRight} colors={colors} />
 
-              <Text
-                style={{
-                  color: colors.icon,
-                  fontSize: SIZE.md,
-                  fontFamily: WEIGHT.regular,
-                  marginTop: 20,
-                }}>
-                Notebooks you add will appear here
-              </Text>
-              <Text
-                style={{
-                  fontSize: SIZE.sm,
-                  color: colors.icon,
-                  marginTop: 20,
-                }}>
-                No Notebooks found
-              </Text>
-            </View>
+                <Text
+                  style={{
+                    color: colors.icon,
+                    fontSize: SIZE.md,
+                    fontFamily: WEIGHT.regular,
+                    marginTop: 20,
+                  }}>
+                  Notebooks you add will appear here
+                </Text>
+                <Text
+                  style={{
+                    fontSize: SIZE.sm,
+                    color: colors.icon,
+                    marginTop: 20,
+                  }}>
+                  No Notebooks found
+                </Text>
+              </View>
+            )
           }
           contentContainerStyle={{
             width: '100%',
