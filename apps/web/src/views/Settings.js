@@ -14,21 +14,21 @@ const Settings = props => {
           variant="setting"
           onClick={() => {
             props.navigator.navigate("general", {
-              title: "General"
+              title: Titles.general
             });
           }}
         >
-          General
+          {Titles.general}
         </Button>
         <Button
           variant="setting"
           onClick={() => {
             props.navigator.navigate("account", {
-              title: "Account"
+              title: Titles.account
             });
           }}
         >
-          Account
+          {Titles.account}
         </Button>
         <Box
           sx={{
@@ -118,9 +118,36 @@ const Settings = props => {
             </Flex> */}
           </Flex>
         </Box>
-        <Button variant="setting">Terms of Service</Button>
-        <Button variant="setting">Privacy Policy</Button>
-        <Button variant="setting">About</Button>
+        <Button
+          variant="setting"
+          onClick={() => {
+            props.navigator.navigate("TOS", {
+              title: Titles.TOS
+            });
+          }}
+        >
+          {Titles.TOS}
+        </Button>
+        <Button
+          variant="setting"
+          onClick={() => {
+            props.navigator.navigate("privacy", {
+              title: Titles.privacy
+            });
+          }}
+        >
+          {Titles.privacy}
+        </Button>
+        <Button
+          variant="setting"
+          onClick={() => {
+            props.navigator.navigate("about", {
+              title: Titles.about
+            });
+          }}
+        >
+          {Titles.about}
+        </Button>
       </Flex>
     </Flex>
   );
@@ -142,6 +169,14 @@ const SettingsContainer = props => {
       flex="1 1 auto"
     />
   );
+};
+
+const Titles = {
+  general: "General",
+  account: "Account",
+  TOS: "Terms of Service",
+  privacy: "Privacy Policy",
+  about: "About"
 };
 
 export { Settings, SettingsContainer };
