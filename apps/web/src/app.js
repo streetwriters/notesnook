@@ -5,7 +5,6 @@ import { Flex, Box, Button } from "rebass";
 import { ThemeProvider } from "./utils/theme";
 import RootNavigator from "./navigation/navigators/rootnavigator";
 import "./app.css";
-import Properties from "./views/Properties";
 
 const NavMenuItem = props => {
   return (
@@ -116,7 +115,6 @@ function App() {
             }}
           />
           <Editor />
-          <Properties />
         </Flex>
         <Box id="dialogContainer" />
         <Box id="snackbarContainer" />

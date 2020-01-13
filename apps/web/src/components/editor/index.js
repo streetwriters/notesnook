@@ -10,7 +10,7 @@ import MagicUrl from "quill-magic-url";
 import { db, ev } from "../../common";
 import { showSnack } from "../snackbar";
 import * as Icon from "react-feather";
-import Properties from "../properties/properties";
+import Properties from "../properties";
 
 Quill.register("modules/markdownShortcuts", MarkdownShortcuts);
 Quill.register("modules/magicUrl", MagicUrl);
@@ -45,6 +45,18 @@ export default class Editor extends React.Component {
   title = "";
   timeout = "";
   timestamp = "";
+  favorite = false;
+  pinned = false;
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      pinned: false,
+      favorite: false,
+      colors: [],
+      tags: []
+    };
+  }
 
   componentDidMount() {
     // move the toolbar outside (easiest way)
@@ -103,6 +115,13 @@ export default class Editor extends React.Component {
       this.timestamp = note.dateCreated;
       this.title = note.title;
       this.titleRef.value = note.title;
+      this.pinned = note.pinned;
+      this.favorite = note.favorite;
+      this.setState({
+        pinned: this.pinned,
+        favorite: this.favorite,
+        colors: note.colors
+      });
       this.quill.setContents(note.content.delta);
       this.quill.setSelection(note.content.text.length - 1, 0); //to move the cursor to the end
     });
@@ -113,16 +132,26 @@ export default class Editor extends React.Component {
       delta: this.quill.getContents(),
       text: this.quill.getText()
     };
-    if (!content.delta || content.text.length <= 1) return this.timestamp;
+    if (!this.title && (!content.delta || content.text.length <= 1))
+      return this.timestamp;
     let note = {
       content,
       title: this.title,
-      dateCreated: this.timestamp
+      dateCreated: this.timestamp,
+      favorite: this.favorite,
+      pinned: this.pinned,
+      colors: this.state.colors
+      //TODO add tags once the database is done
     };
     let t = await db.addNote(note);
-
-    console.log(t);
     return t;
+  }
+
+  save() {
+    clearTimeout(this.timeout);
+    this.timeout = setTimeout(async () => {
+      this.timestamp = await this.saveNote();
+    }, 1000);
   }
 
   render() {
@@ -150,7 +179,10 @@ export default class Editor extends React.Component {
               paddingBottom: 3
             }}
             px={2}
-            onChange={e => (this.title = e.target.value)}
+            onChange={e => {
+              this.title = e.target.value;
+              this.save();
+            }}
           />
           <Box id="toolbar" display={["none", "flex", "flex"]}></Box>
           <ReactQuill
@@ -158,17 +190,42 @@ export default class Editor extends React.Component {
             modules={modules}
             theme="snow"
             onChange={() => {
-              clearTimeout(this.timeout);
-              this.timeout = setTimeout(async () => {
-                this.timestamp = await this.saveNote();
-                console.log(this.timestamp);
-              }, 1000);
+              this.save();
             }}
           />
         </Flex>
         <Properties
-          onPinned={state => {}}
-          onFavorited={state => {}}
+          pinned={this.state.pinned}
+          favorite={this.state.favorite}
+          onPinned={state => {
+            this.pinned = state;
+            this.save();
+          }}
+          onFavorited={state => {
+            this.favorite = state;
+            this.save();
+          }}
+          selectedColors={this.state.colors}
+          colorSelected={color => {
+            if (this.state.colors.includes(color.label)) {
+              this.state.colors.splice(
+                this.state.colors.indexOf(color.label),
+                1
+              );
+            } else {
+              this.state.colors[this.state.colors.length] = color.label;
+            }
+            this.setState({ colors: this.state.colors });
+          }}
+          tags={this.state.tags}
+          addTag={tag => {
+            if (this.state.tags.includes(tag)) {
+              this.state.tags.splice(this.state.tags.indexOf(tag), 1);
+            } else {
+              this.state.tags[this.state.tags.length] = tag;
+            }
+            this.setState({ tags: this.state.tags });
+          }}
           onLocked={state => {}}
         />
       </Flex>
