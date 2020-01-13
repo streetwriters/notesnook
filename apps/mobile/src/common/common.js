@@ -90,21 +90,23 @@ export function setColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
   return COLOR_SCHEME;
 }
 
-export async function getColorScheme(colors) {
+export async function getColorScheme() {
   let accentColor = await AsyncStorage.getItem('accentColor');
   let t = await AsyncStorage.getItem('theme');
 
   if (typeof accentColor !== 'string') {
-    AsyncStorage.setItem('accentColor', colors.accent);
+    AsyncStorage.setItem('accentColor', '#0560FF');
+    setAccentColor('#0560FF');
   } else {
     setAccentColor(accentColor);
   }
 
   if (typeof t !== 'string') {
-    AsyncStorage.setItem('theme', JSON.stringify(colors));
+    AsyncStorage.setItem('theme', JSON.stringify({night: false}));
     setColorScheme(COLOR_SCHEME_LIGHT);
   } else {
     let themeToSet = JSON.parse(t);
+
     themeToSet.night
       ? setColorScheme(COLOR_SCHEME_DARK)
       : setColorScheme(COLOR_SCHEME_LIGHT);
