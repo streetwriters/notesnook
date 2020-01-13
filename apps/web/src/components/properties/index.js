@@ -71,6 +71,10 @@ const Properties = props => {
         onChecked={props.onFavorited}
       />
       <CheckBox icon={Icon.Lock} label="Lock" onChecked={props.onLocked} />
+      <Flex fontSize="body" sx={{ marginBottom: 3 }} alignItems="center">
+        <Icon.Book size={18} />
+        <Text sx={{ marginLeft: 1 }}>Move to notebook</Text>
+      </Flex>
       <Flex fontSize="body" sx={{ marginBottom: 2 }} alignItems="center">
         <Icon.Tag size={18} />
         <Text sx={{ marginLeft: 1 }}>Tags:</Text>
