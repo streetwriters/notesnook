@@ -5,8 +5,18 @@ import { Input } from "@rebass/forms";
 import CheckBox from "../checkbox";
 import { PinIcon } from "../icons";
 
+const usePersistentState = (key, def) => {
+  const defState = JSON.parse(window.localStorage.getItem(key) || def);
+  const [k, setKey] = useState(defState);
+  const _setKey = s => {
+    setKey(s);
+    window.localStorage.setItem(key, s);
+  };
+  return [k, _setKey];
+};
+
 const Properties = props => {
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = usePersistentState("propertiesVisible", false);
   return !visible ? (
     <Flex
       onClick={() => setVisible(true)}
