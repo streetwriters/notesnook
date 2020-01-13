@@ -66,32 +66,19 @@ const useAppContext = () => {
 
   // Database Control
 
-  function updateNotes() {
-    dispatch(draft => {
-      draft.notes = db.groupNotes();
-    });
-  }
-  function updateNotebooks() {
-    dispatch(draft => {
-      draft.notes = db.getNotebooks();
-    });
-  }
+  function updateDB() {
+    let notes = db.groupNotes();
+    let notebooks = db.getNotebooks();
+    let trash = db.getTrash();
+    let favorites = db.getFavorites();
+    let pinned = db.getPinned();
 
-  function updateTrash() {
     dispatch(draft => {
-      draft.notes = db.getTrash();
-    });
-  }
-
-  function updateFavorites() {
-    dispatch(draft => {
-      draft.notes = db.getFavorites();
-    });
-  }
-
-  function updatePinned() {
-    dispatch(draft => {
-      draft.notes = db.getPinned();
+      draft.notes = notes;
+      draft.notebooks = notebooks;
+      draft.trash = trash;
+      draft.favorites = favorites;
+      draft.pinned = pinned;
     });
   }
 
@@ -102,11 +89,7 @@ const useAppContext = () => {
     changeAccentColor,
     changeSelectionMode,
     updateSelectionList,
-    updateNotes,
-    updateNotebooks,
-    updateFavorites,
-    updatePinned,
-    updateTrash,
+    updateDB,
   };
 };
 
