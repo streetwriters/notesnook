@@ -32,7 +32,9 @@ export const VaultDialog = ({
         style={{
           width: '100%',
           height: '100%',
-          backgroundColor: 'rgba(255,255,255,0.3)',
+          backgroundColor: colors.night
+            ? 'rgba(255,255,255,0.3)'
+            : 'rgba(0,0,0,0.3)',
           justifyContent: 'center',
           alignItems: 'center',
         }}>
@@ -162,14 +164,14 @@ export const VaultDialog = ({
               activeOpacity={opacity}
               onPress={async () => {
                 if (openedToUnlock) {
-                  console.log(note.dateCreated, password, perm);
                   let n = db.getNote(note.dateCreated);
                   let item;
                   if (n.content.cipher) {
-                    console.log(n.content.cipher);
-
-                    item = await db.unlockNote(n.dateCreated, password, perm);
-                    console.log(item);
+                    try {
+                      item = await db.unlockNote(n.dateCreated, password, perm);
+                    } catch (error) {
+                      console.log(error);
+                    }
                   } else {
                     item = n;
                   }
@@ -180,7 +182,9 @@ export const VaultDialog = ({
                   }
                   close(item, false);
                 } else {
-                  await db.lockNote(note.dateCreated, 'password');
+                  try {
+                    await db.lockNote(note.dateCreated, 'password');
+                  } catch (error) {}
 
                   close(null, true);
                 }
