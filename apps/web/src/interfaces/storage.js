@@ -54,7 +54,7 @@ function decrypt(password, data) {
   });
 }
 
-module.exports = {
+export default {
   read,
   write,
   remove,
