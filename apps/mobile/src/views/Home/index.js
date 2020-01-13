@@ -20,7 +20,6 @@ export const Home = ({navigation}) => {
   const {colors, setMenuOpen, selectionMode, notes} = useAppContext();
   const [text, setText] = useState('');
   const [hideHeader, setHideHeader] = useState(false);
-  const [buttonHide, setButtonHide] = useState(false);
   const [keyword, setKeyword] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   // Variables
@@ -141,9 +140,6 @@ export const Home = ({navigation}) => {
 
       <NotesList
         isGrouped={true}
-        refresh={() => {
-          //fetchNotes();
-        }}
         onScroll={onScroll}
         isSearch={searchResults.length > 0 ? true : false}
         notes={searchResults.length > 0 ? searchResults : notes}

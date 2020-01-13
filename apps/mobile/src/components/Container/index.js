@@ -24,10 +24,10 @@ export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(
 );
 
 export const Container = ({
-  navigation,
   children,
   bottomButtonOnPress,
   bottomButtonText,
+  noBottomButton = false,
 }) => {
   // State
   const {colors} = useAppContext();
@@ -72,7 +72,7 @@ export const Container = ({
         }}>
         {children}
 
-        {buttonHide ? null : (
+        {buttonHide || noBottomButton ? null : (
           <TouchableOpacity
             onPress={bottomButtonOnPress}
             activeOpacity={opacity}
