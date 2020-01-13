@@ -131,6 +131,8 @@ export const ActionSheetComponent = ({
         break;
       }
     }
+
+    setWillRefresh(toAdd);
     setNote({...toAdd});
   };
 
@@ -229,7 +231,6 @@ export const ActionSheetComponent = ({
       func: () => {
         db.pinItem(note.type, note.dateCreated);
         localRefresh(item.type);
-        setWillRefresh(true);
       },
       close: false,
       check: true,
@@ -241,7 +242,6 @@ export const ActionSheetComponent = ({
       func: () => {
         db.favoriteItem(note.type, note.dateCreated);
         localRefresh(item.type);
-        setWillRefresh(true);
       },
       close: false,
       check: true,
@@ -348,7 +348,6 @@ export const ActionSheetComponent = ({
                     title: note.title,
                   });
                   localRefresh(item.type);
-                  setWillRefresh(true);
                 }}
                 style={{
                   flexDirection: 'row',
@@ -401,7 +400,6 @@ export const ActionSheetComponent = ({
                   tags: oldProps.tags,
                 });
                 localRefresh(item.type);
-                setWillRefresh(true);
               }}
               style={{
                 flexDirection: 'row',
