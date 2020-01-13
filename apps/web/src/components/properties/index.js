@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import * as Icon from "react-feather";
 import { Flex, Box, Text } from "rebass";
 import { Input } from "@rebass/forms";
@@ -6,16 +6,57 @@ import CheckBox from "../checkbox";
 import { PinIcon } from "../icons";
 
 const Properties = props => {
-  return (
+  const [visible, setVisible] = useState(false);
+  return !visible ? (
     <Flex
-      sx={{ borderLeft: "1px solid", borderColor: "border", width: "25%" }}
+      onClick={() => setVisible(true)}
+      sx={{
+        position: "absolute",
+        top: "50%",
+        right: 0,
+        height: 60,
+        color: "static",
+        borderRadius: "100px 0px 0px 100px",
+        cursor: "pointer"
+      }}
+      alignItems="center"
+      justifyContent="center"
+      bg="primary"
+    >
+      <Icon.ChevronLeft size={32} />
+    </Flex>
+  ) : (
+    <Flex
+      sx={{
+        borderLeft: "1px solid",
+        borderColor: "border",
+        width: "20%"
+      }}
       flexDirection="column"
       bg="shade"
       px={3}
       py={3}
     >
-      <Text variant="title" color="primary" my={2}>
+      <Text
+        variant="title"
+        color="primary"
+        my={2}
+        alignItems="center"
+        justifyContent="space-between"
+        sx={{ display: "flex" }}
+      >
         Properties
+        <Text
+          as="span"
+          onClick={() => setVisible(false)}
+          sx={{
+            color: "red",
+            height: 24,
+            ":active": { color: "darkRed" }
+          }}
+        >
+          <Icon.X />
+        </Text>
       </Text>
       <CheckBox
         checked={props.pinned}

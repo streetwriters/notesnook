@@ -156,7 +156,7 @@ export default class Editor extends React.Component {
 
   render() {
     return (
-      <Flex width={["0%", "50%", "75%"]}>
+      <Flex width={["0%", "50%", "77%"]}>
         <Flex
           className="editor"
           flex="1 1 auto"

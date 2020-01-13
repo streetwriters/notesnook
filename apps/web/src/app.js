@@ -78,7 +78,7 @@ function App() {
               borderRight: "1px solid",
               borderColor: "border",
               width: !getNavigationViewWidth()
-                ? ["100%", "40%", "15%"]
+                ? ["100%", "40%", "23%"]
                 : getNavigationViewWidth()
             }}
             flexDirection="column"
