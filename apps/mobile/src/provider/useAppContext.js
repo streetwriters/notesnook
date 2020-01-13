@@ -7,6 +7,7 @@ import {
   getColorScheme,
   ACCENT,
 } from '../common/common';
+import {db} from '../../App';
 
 const useAppContext = () => {
   const [state, dispatch] = useContext(AppContext);
@@ -63,6 +64,37 @@ const useAppContext = () => {
     });
   }
 
+  // Database Control
+
+  function updateNotes() {
+    dispatch(draft => {
+      draft.notes = db.groupNotes();
+    });
+  }
+  function updateNotebooks() {
+    dispatch(draft => {
+      draft.notes = db.getNotebooks();
+    });
+  }
+
+  function updateTrash() {
+    dispatch(draft => {
+      draft.notes = db.getTrash();
+    });
+  }
+
+  function updateFavorites() {
+    dispatch(draft => {
+      draft.notes = db.getFavorites();
+    });
+  }
+
+  function updatePinned() {
+    dispatch(draft => {
+      draft.notes = db.getPinned();
+    });
+  }
+
   return {
     ...state,
     updateAppTheme,
@@ -70,6 +102,11 @@ const useAppContext = () => {
     changeAccentColor,
     changeSelectionMode,
     updateSelectionList,
+    updateNotes,
+    updateNotebooks,
+    updateFavorites,
+    updatePinned,
+    updateTrash,
   };
 };
 
