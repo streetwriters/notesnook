@@ -336,7 +336,7 @@ const NoteItem = props => {
               if (value) {
                 show = value;
               }
-              ActionSheet._setModalVisible();
+              actionSheet._setModalVisible();
             }}
           />
         </ActionSheet>
