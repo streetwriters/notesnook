@@ -39,7 +39,7 @@ const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
 const NoteItem = props => {
-  const {colors} = useAppContext();
+  const {colors, updateDB} = useAppContext();
   const [visible, setVisible] = useState(false);
   const [vaultDialog, setVaultDialog] = useState(false);
   const [unlock, setUnlock] = useState(false);
@@ -79,7 +79,7 @@ const NoteItem = props => {
     await db.deleteNotes([item]);
     ToastEvent.show('Note moved to trash', 'success', 3000);
     setVisible(false);
-    props.refresh();
+    updateDB();
   };
   return (
     <View
@@ -114,7 +114,7 @@ const NoteItem = props => {
           setVaultDialog(false);
           setUnlock(false);
           setIsPerm(false);
-          props.refresh();
+          updateDB();
         }}
         note={item}
         perm={isPerm}
@@ -317,7 +317,7 @@ const NoteItem = props => {
           onClose={() => {
             onMenuHide();
             if (willRefresh) {
-              props.refresh();
+              updateDB();
             }
           }}>
           <ActionSheetComponent

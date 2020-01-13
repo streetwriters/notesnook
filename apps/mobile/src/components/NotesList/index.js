@@ -16,15 +16,12 @@ import Icon from 'react-native-vector-icons/Feather';
 import {NotesPlaceHolder} from '../ListPlaceholders';
 import {slideRight, slideLeft} from '../../utils/animations';
 import {w} from '../../utils/utils';
+import SelectionWrapper from '../SelectionWrapper';
 export const NotesList = ({
-  keyword = null,
   notes,
-  margin,
   onScroll,
   isSearch = false,
   isGrouped = false,
-  isFavorites = false,
-  emptyPlaceholderText = '',
   refresh = () => {},
 }) => {
   const {
@@ -33,17 +30,12 @@ export const NotesList = ({
     selectedItemsList,
     changeSelectionMode,
     updateSelectionList,
+    pinned,
   } = useAppContext();
 
-  const [numColumns, setNumColumns] = useState(1);
-  const [pinned, setPinned] = useState([]);
-
   useEffect(() => {
-    let pinnedItems = db.getPinned();
-
-    setPinned([...pinnedItems]);
+    console.log(notes, pinned);
   }, [notes]);
-
   return isGrouped && !isSearch ? (
     <SectionList
       sections={notes}
@@ -126,14 +118,14 @@ export const NotesList = ({
                         width: '100%',
                         paddingHorizontal: '5%',
                         paddingTop: 20,
+                        marginHorizontal: 0,
                         marginBottom: 10,
+                        paddingHorizontal: 12,
                         marginTop: 20,
                         borderBottomWidth: 0,
                       }}
                       pinned={true}
-                      refresh={() => refresh()}
                       item={item}
-                      numColumns={1}
                       index={index}
                     />
                   ) : null
@@ -168,42 +160,7 @@ export const NotesList = ({
         ) : null
       }
       renderItem={({item, index}) => (
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            width: w - 24,
-            marginHorizontal: 12,
-          }}>
-          <TouchableOpacity
-            onPress={() => updateSelectionList(item)}
-            style={{
-              width: 50,
-              height: 70,
-              justifyContent: 'center',
-              alignItems: 'flex-start',
-              display: selectionMode ? 'flex' : 'none',
-            }}>
-            <View
-              style={{
-                borderWidth: 2,
-                borderColor: selectedItemsList.includes(item)
-                  ? colors.accent
-                  : colors.icon,
-                width: 30,
-                height: 30,
-                justifyContent: 'center',
-                alignItems: 'center',
-                borderRadius: 100,
-                paddingTop: 4,
-              }}>
-              {selectedItemsList.includes(item) ? (
-                <Icon size={SIZE.md} color={colors.accent} name="check" />
-              ) : null}
-            </View>
-          </TouchableOpacity>
-
+        <SelectionWrapper item={item}>
           <NoteItem
             customStyle={{
               width: selectionMode ? w - 74 : '100%',
@@ -211,13 +168,12 @@ export const NotesList = ({
             }}
             onLongPress={() => {
               changeSelectionMode(!selectionMode);
+              updateSelectionList(item);
             }}
             item={item}
-            refresh={() => refresh()}
-            numColumns={numColumns}
             index={index}
           />
-        </View>
+        </SelectionWrapper>
       )}
     />
   ) : (
@@ -281,42 +237,7 @@ export const NotesList = ({
         </View>
       }
       renderItem={({item, index}) => (
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            width: w - 24,
-            marginHorizontal: 12,
-          }}>
-          <TouchableOpacity
-            onPress={() => updateSelectionList(item)}
-            style={{
-              width: 50,
-              height: 70,
-              justifyContent: 'center',
-              alignItems: 'flex-start',
-              display: selectionMode ? 'flex' : 'none',
-            }}>
-            <View
-              style={{
-                borderWidth: 2,
-                borderColor: selectedItemsList.includes(item)
-                  ? colors.accent
-                  : colors.icon,
-                width: 30,
-                height: 30,
-                justifyContent: 'center',
-                alignItems: 'center',
-                borderRadius: 100,
-                paddingTop: 4,
-              }}>
-              {selectedItemsList.includes(item) ? (
-                <Icon size={SIZE.md} color={colors.accent} name="check" />
-              ) : null}
-            </View>
-          </TouchableOpacity>
-
+        <SelectionWrapper item={item}>
           <NoteItem
             customStyle={{
               width: selectionMode ? w - 74 : '100%',
@@ -324,13 +245,12 @@ export const NotesList = ({
             }}
             onLongPress={() => {
               changeSelectionMode(!selectionMode);
+              updateSelectionList(item);
             }}
             item={item}
-            refresh={() => refresh()}
-            numColumns={numColumns}
             index={index}
           />
-        </View>
+        </SelectionWrapper>
       )}
     />
   );

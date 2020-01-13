@@ -24,12 +24,14 @@ export const NotebookItem = ({
   notebookID,
   numColumns,
   isTrash,
-  refresh = () => {},
+  customStyle,
+  onLongPress,
 }) => {
-  const {colors} = useAppContext();
+  const {colors, updateDB} = useAppContext();
   const [isVisible, setVisible] = useState(false);
   const [addTopic, setAddTopic] = useState(false);
   const [addNotebook, setAddNotebook] = useState(false);
+  let actionSheet;
   let setMenuRef = {};
   let show = null;
   let willRefresh;
@@ -43,7 +45,7 @@ export const NotebookItem = ({
       ToastEvent.show('Notebook moved to trash', 'success', 3000);
     }
     setVisible(false);
-    refresh();
+    updateDB();
   };
 
   const navigate = () => {
@@ -79,22 +81,23 @@ export const NotebookItem = ({
   const showMenu = () => {
     setMenuRef[index].show();
   };
+
   return (
     <View
-      style={{
-        marginHorizontal: '5%',
-        paddingVertical: isTopic ? pv / 2 : pv,
-        borderRadius: br,
-        justifyContent: 'flex-start',
-        alignItems: 'center',
-        flexDirection: 'row',
-        paddingRight: 6,
-        marginHorizontal: 12,
-        width: w - 24,
-        alignSelf: 'center',
-        borderBottomWidth: 1,
-        borderBottomColor: colors.nav,
-      }}>
+      style={[
+        {
+          paddingVertical: isTopic ? pv / 2 : pv,
+          justifyContent: 'flex-start',
+          alignItems: 'center',
+          flexDirection: 'row',
+          paddingRight: 6,
+          marginHorizontal: 12,
+          alignSelf: 'center',
+          borderBottomWidth: 1,
+          borderBottomColor: colors.nav,
+        },
+        customStyle,
+      ]}>
       <Dialog
         visible={isVisible}
         title={`Delete ${isTopic ? 'topic' : 'notebook'}`}
@@ -130,6 +133,7 @@ export const NotebookItem = ({
           style={{
             width: '75%',
           }}
+          onLongPress={onLongPress}
           onPress={navigate}>
           <Text
             numberOfLines={1}
@@ -276,7 +280,7 @@ export const NotebookItem = ({
               alignItems: 'center',
             }}
             onPress={() => {
-              ActionSheet._setModalVisible();
+              actionSheet._setModalVisible();
             }}>
             <Icon name="more-horizontal" size={SIZE.lg} color={colors.icon} />
           </TouchableOpacity>
@@ -333,6 +337,7 @@ export const NotebookItem = ({
       </View>
 
       <ActionSheet
+        ref={ref => (actionSheet = ref)}
         customStyles={{
           backgroundColor: colors.bg,
         }}
@@ -341,7 +346,7 @@ export const NotebookItem = ({
         onClose={() => {
           onMenuHide();
           if (willRefresh) {
-            refresh();
+            updateDB();
           }
         }}
         children={
@@ -363,7 +368,7 @@ export const NotebookItem = ({
               if (value) {
                 show = value;
               }
-              ActionSheet._setModalVisible();
+              actionSheet._setModalVisible();
             }}
           />
         }
