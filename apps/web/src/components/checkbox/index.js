@@ -1,15 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Flex, Text } from "rebass";
+import { Switch } from "@rebass/forms";
 import * as Icon from "react-feather";
 
 const CheckBox = props => {
-  const [checked, setChecked] = useState(props.checked);
+  const [checked, setChecked] = useState(props.checked || false);
+  useEffect(() => {
+    setChecked(props.checked);
+  }, [props.checked]);
   return (
     <Flex
       onClick={() => {
         setChecked(!checked);
-        if (props.onCheckChanged) {
-          props.onCheckChanged(checked);
+        if (props.onChecked) {
+          props.onChecked(!checked);
         }
       }}
       width="full"
@@ -21,9 +25,8 @@ const CheckBox = props => {
         <props.icon size={18} />
         <Text sx={{ marginLeft: 1 }}>{props.label}</Text>
       </Flex>
-      <Text color={checked ? "primary" : "foreground"}>
-        <Icon.CheckCircle size={18} style={{ cursor: "pointer" }} />
-      </Text>
+
+      <Switch checked={checked} />
     </Flex>
   );
 };

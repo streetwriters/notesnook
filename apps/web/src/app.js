@@ -5,7 +5,6 @@ import { Flex, Box, Button } from "rebass";
 import { ThemeProvider } from "./utils/theme";
 import RootNavigator from "./navigation/navigators/rootnavigator";
 import "./app.css";
-import Properties from "./views/Properties";
 
 const NavMenuItem = props => {
   return (
@@ -79,7 +78,7 @@ function App() {
               borderRight: "1px solid",
               borderColor: "border",
               width: !getNavigationViewWidth()
-                ? ["100%", "40%", "15%"]
+                ? ["100%", "40%", "23%"]
                 : getNavigationViewWidth()
             }}
             flexDirection="column"
@@ -116,7 +115,6 @@ function App() {
             }}
           />
           <Editor />
-          <Properties />
         </Flex>
         <Box id="dialogContainer" />
         <Box id="snackbarContainer" />
