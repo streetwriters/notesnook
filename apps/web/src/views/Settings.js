@@ -43,7 +43,7 @@ const Settings = props => {
         >
           <Flex fontSize="body" alignItems="center">
             <Text px="16px" sx={{ fontFamily: "body", fontSize: "title" }}>
-              Theme
+              {Titles.theme}
             </Text>
           </Flex>
 
@@ -174,6 +174,7 @@ const SettingsContainer = props => {
 const Titles = {
   general: "General",
   account: "Account",
+  theme: "Theme",
   TOS: "Terms of Service",
   privacy: "Privacy Policy",
   about: "About"
