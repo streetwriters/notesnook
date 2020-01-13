@@ -59,11 +59,11 @@ const Editor = ({navigation}) => {
   });
 
   // VARIABLES
-  let updateInterval = null;
-  let lastTextChange = 0;
-  let menuTimer = null;
-  let willRefresh = false;
 
+  let willRefresh = false;
+  let customNote = null;
+  let actionSheet;
+  let show;
   // FUNCTIONS
 
   const post = value => EditorWebView.postMessage(value);
@@ -81,7 +81,6 @@ const Editor = ({navigation}) => {
         delta: null,
       };
     }
-    console.log(content.text, timestamp, title);
 
     timestamp = await db.addNote({
       ...noteProps,
@@ -92,7 +91,7 @@ const Editor = ({navigation}) => {
       },
       dateCreated: timestamp,
     });
-    console.log(db.getNote(timestamp));
+
     if (lockNote && noteProps.locked) {
       db.lockNote(timestamp, 'password');
     }
@@ -133,7 +132,6 @@ const Editor = ({navigation}) => {
 
   const onMenuHide = () => {
     if (show) {
-      console.log(show);
       if (show === 'lock') {
         if (unlock) {
           setUnlock(false);
@@ -218,7 +216,7 @@ const Editor = ({navigation}) => {
               onPress={() => {
                 DDS.isTab
                   ? setSidebar(!sidebar)
-                  : ActionSheet._setModalVisible();
+                  : actionSheet._setModalVisible();
               }}
               style={{
                 width: '12.5%',
@@ -432,6 +430,7 @@ const Editor = ({navigation}) => {
         visible={vaultDialog}
       />
       <ActionSheet
+        ref={ref => (actionSheet = ref)}
         customStyles={{
           backgroundColor: colors.bg,
         }}
@@ -453,6 +452,7 @@ const Editor = ({navigation}) => {
           <ActionSheetComponent
             item={note}
             setWillRefresh={value => {
+              cutsomNote = value;
               willRefresh = true;
             }}
             hasColors={true}
@@ -463,7 +463,8 @@ const Editor = ({navigation}) => {
               if (value) {
                 show = value;
               }
-              ActionSheet._setModalVisible();
+
+              actionSheet._setModalVisible();
             }}
           />
         }
