@@ -118,14 +118,21 @@ class Database {
   }
 
   async addNote(note) {
-    if (
-      !note ||
-      (!note.title &&
-        (!note.content || !note.content.text || !note.content.delta))
-    )
-      return;
+    if (!note) return;
     let timestamp = note.dateCreated || Date.now();
     note = { ...this.notes[timestamp], ...note };
+
+    if (
+      !note.title &&
+      !note.locked &&
+      (!note.content || !note.content.text || !note.content.delta) &&
+      this.notes[timestamp]
+    ) {
+      //delete the note
+      await this.deleteNotes(note);
+      return;
+    }
+
     //add or update a note into the database
     let title =
       note.title ||
@@ -154,12 +161,14 @@ class Database {
       content: note.content,
       pinned: note.pinned || false,
       tags: note.tags || [],
+      locked: note.locked || false,
       notebook: note.notebook || {},
       colors: note.colors || [],
       favorite: note.favorite || false,
       headline:
+        !note.locked &&
         note.content.text.substring(0, 150) +
-        (note.content.text.length > 150 ? "..." : ""),
+          (note.content.text.length > 150 ? "..." : ""),
       length: note.content.text.length,
       dateEditted: Date.now(),
       dateCreated: timestamp
@@ -187,7 +196,7 @@ class Database {
     return editItem.call(this, type, id, "favorite");
   }
 
-  async deleteNotes(notes) {
+  async deleteNotes(...notes) {
     return await deleteItems.call(this, notes, KEYS.notes);
   }
 
@@ -364,7 +373,7 @@ class Database {
     return getItem.call(this, id, KEYS.notebooks);
   }
 
-  async deleteNotebooks(notebooks) {
+  async deleteNotebooks(...notebooks) {
     return await deleteItems.call(this, notebooks, KEYS.notebooks);
   }
 
