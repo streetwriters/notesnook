@@ -61,10 +61,10 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
       icon: 'moon',
       func: () => {
         if (!colors.night) {
-          AsyncStorage.setItem('theme', JSON.stringify(COLOR_SCHEME_DARK));
+          AsyncStorage.setItem('theme', JSON.stringify({night: true}));
           changeColorScheme(COLOR_SCHEME_DARK);
         } else {
-          AsyncStorage.setItem('theme', JSON.stringify(COLOR_SCHEME_LIGHT));
+          AsyncStorage.setItem('theme', JSON.stringify({night: false}));
 
           changeColorScheme(COLOR_SCHEME_LIGHT);
         }

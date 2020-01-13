@@ -109,13 +109,13 @@ export const Settings = ({navigation}) => {
                       if (!colors.night) {
                         AsyncStorage.setItem(
                           'theme',
-                          JSON.stringify(COLOR_SCHEME_DARK),
+                          JSON.stringify({night: true}),
                         );
                         changeColorScheme(COLOR_SCHEME_DARK);
                       } else {
                         AsyncStorage.setItem(
                           'theme',
-                          JSON.stringify(COLOR_SCHEME_LIGHT),
+                          JSON.stringify({night: false}),
                         );
 
                         changeColorScheme(COLOR_SCHEME_LIGHT);
