@@ -19,21 +19,21 @@ export const Notebook = ({navigation}) => {
 
   let isFocused = useIsFocused();
 
+  // State
+
+  // Variables
+  let offsetY = 0;
+  let countUp = 0;
+  let countDown = 0;
+
+  // Effects
+
+  // Functions
+
   if (!isFocused) {
     console.log('block rerender');
     return <></>;
   } else {
-    // State
-
-    // Variables
-    let offsetY = 0;
-    let countUp = 0;
-    let countDown = 0;
-
-    // Effects
-
-    // Functions
-
     // Render
     return (
       <Container

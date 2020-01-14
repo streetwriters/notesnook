@@ -26,79 +26,73 @@ export const Home = ({navigation}) => {
   // Variables
   let isFocused = useIsFocused();
 
+  let offsetY = 0;
+  let countUp = 1;
+  let countDown = 0;
+  let searchResult = null;
+
+  // Effects
+
+  useEffect(() => {
+    DDS.isTab ? setMenuOpen() : null;
+  }, []);
+
+  // Functions
+
+  const onChangeText = value => {
+    setText(value);
+  };
+  const onSubmitEditing = async () => {
+    if (!text || text.length < 1) {
+      clearSearch();
+    } else {
+      setKeyword(text);
+      searchResult = await db.searchNotes(text);
+
+      if (searchResult && searchResult.length > 0) {
+        setSearchResults([...searchResult]);
+      } else {
+        ToastEvent.show('No search results found', 'error', 3000, () => {}, '');
+      }
+    }
+  };
+
+  const onBlur = () => {
+    if (text && text.length < 1) {
+      clearSearch();
+    }
+  };
+
+  const onFocus = () => {
+    //setSearch(false);
+  };
+
+  const clearSearch = () => {
+    searchResult = null;
+    setSearchResults([...[]]);
+  };
+
+  const onScroll = y => {
+    if (searchResults.length > 0) return;
+    if (y < 30) setHideHeader(false);
+    if (y > offsetY) {
+      if (y - offsetY < 150 || countDown > 0) return;
+      countDown = 1;
+      countUp = 0;
+      setHideHeader(true);
+    } else {
+      if (offsetY - y < 150 || countUp > 0) return;
+      countDown = 0;
+      countUp = 1;
+      setHideHeader(false);
+    }
+    offsetY = y;
+  };
+
   if (!isFocused) {
     console.log('block rerender');
     return <></>;
   } else {
-    let offsetY = 0;
-    let countUp = 1;
-    let countDown = 0;
-    let searchResult = null;
-
-    // Effects
-
-    useEffect(() => {
-      DDS.isTab ? setMenuOpen() : null;
-    }, []);
-
-    // Functions
-
-    const onChangeText = value => {
-      setText(value);
-    };
-    const onSubmitEditing = async () => {
-      if (!text || text.length < 1) {
-        clearSearch();
-      } else {
-        setKeyword(text);
-        searchResult = await db.searchNotes(text);
-
-        if (searchResult && searchResult.length > 0) {
-          setSearchResults([...searchResult]);
-        } else {
-          ToastEvent.show(
-            'No search results found',
-            'error',
-            3000,
-            () => {},
-            '',
-          );
-        }
-      }
-    };
-
-    const onBlur = () => {
-      if (text && text.length < 1) {
-        clearSearch();
-      }
-    };
-
-    const onFocus = () => {
-      //setSearch(false);
-    };
-
-    const clearSearch = () => {
-      searchResult = null;
-      setSearchResults([...[]]);
-    };
-
-    const onScroll = y => {
-      if (searchResults.length > 0) return;
-      if (y < 30) setHideHeader(false);
-      if (y > offsetY) {
-        if (y - offsetY < 150 || countDown > 0) return;
-        countDown = 1;
-        countUp = 0;
-        setHideHeader(true);
-      } else {
-        if (offsetY - y < 150 || countUp > 0) return;
-        countDown = 0;
-        countUp = 1;
-        setHideHeader(false);
-      }
-      offsetY = y;
-    };
-
     // Render
     console.log('rerendering home');
     return (

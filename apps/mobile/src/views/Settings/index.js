@@ -19,7 +19,6 @@ import Icon from 'react-native-vector-icons/Feather';
 import {Header} from '../../components/header';
 import {FlatList} from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-community/async-storage';
-import {AnimatedSafeAreaView} from '../Home';
 import {useAppContext} from '../../provider/useAppContext';
 import {useIsFocused} from 'react-navigation-hooks';
 import Container from '../../components/Container';

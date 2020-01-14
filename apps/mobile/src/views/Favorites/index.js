@@ -9,6 +9,7 @@ import NoteItem from '../../components/NoteItem';
 import {NotebookItem} from '../../components/NotebookItem';
 import {FavoritesPlaceHolder} from '../../components/ListPlaceholders';
 import Container from '../../components/Container';
+import {useIsFocused} from 'react-navigation-hooks';
 
 export const Favorites = ({navigation}) => {
   // Global State
@@ -29,36 +30,35 @@ export const Favorites = ({navigation}) => {
   // Variables
   let isFocused = useIsFocused();
 
+  let offsetY = 0;
+  let countUp = 1;
+  let countDown = 0;
+
+  // Functions
+
+  // Effects
+  const onScroll = event => {
+    let y = event.nativeEvent.contentOffset.y;
+    if (buttonHide) return;
+    if (y < 30) setHideHeader(false);
+    if (y > offsetY) {
+      if (y - offsetY < 150 || countDown > 0) return;
+      countDown = 1;
+      countUp = 0;
+      setHideHeader(true);
+    } else {
+      if (offsetY - y < 150 || countUp > 0) return;
+      countDown = 0;
+      countUp = 1;
+      setHideHeader(false);
+    }
+    offsetY = y;
+  };
+  // Render
   if (!isFocused) {
     console.log('block rerender');
     return <></>;
   } else {
-    let offsetY = 0;
-    let countUp = 1;
-    let countDown = 0;
-
-    // Functions
-
-    // Effects
-    const onScroll = event => {
-      let y = event.nativeEvent.contentOffset.y;
-      if (buttonHide) return;
-      if (y < 30) setHideHeader(false);
-      if (y > offsetY) {
-        if (y - offsetY < 150 || countDown > 0) return;
-        countDown = 1;
-        countUp = 0;
-        setHideHeader(true);
-      } else {
-        if (offsetY - y < 150 || countUp > 0) return;
-        countDown = 0;
-        countUp = 1;
-        setHideHeader(false);
-      }
-      offsetY = y;
-    };
-    // Render
-
     return (
       <Container noBottomButton={true}>
         <Animatable.View

@@ -1,12 +1,6 @@
 import React, {useEffect, useState} from 'react';
-import {
-  Text,
-  TouchableOpacity,
-  SafeAreaView,
-  FlatList,
-  View,
-} from 'react-native';
-import {SIZE, ph, pv, opacity, WEIGHT} from '../../common/common';
+import {Text, FlatList, View} from 'react-native';
+import {SIZE, WEIGHT} from '../../common/common';
 import Icon from 'react-native-vector-icons/Feather';
 import {Header} from '../../components/header';
 import NoteItem from '../../components/NoteItem';
@@ -18,6 +12,7 @@ import {ToastEvent, w} from '../../utils/utils';
 import {TrashPlaceHolder} from '../../components/ListPlaceholders';
 import Container from '../../components/Container';
 import SelectionHeader from '../../components/SelectionHeader';
+import {useIsFocused} from 'react-navigation-hooks';
 
 export const Trash = ({navigation}) => {
   const {

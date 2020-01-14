@@ -1,30 +1,12 @@
 import React, {useEffect, useState} from 'react';
-import {
-  Text,
-  TouchableOpacity,
-  Dimensions,
-  KeyboardAvoidingView,
-} from 'react-native';
-import {
-  SIZE,
-  ph,
-  pv,
-  opacity,
-  WEIGHT,
-  onThemeUpdate,
-  clearThemeUpdateListener,
-} from '../../common/common';
-import Icon from 'react-native-vector-icons/Feather';
 import {Header} from '../../components/header';
 import {Search} from '../../components/SearchInput';
-import {useForceUpdate} from '../ListsEditor';
 import {NotesList} from '../../components/NotesList';
-import {AnimatedSafeAreaView} from '../Home';
 import {db} from '../../../App';
 import * as Animatable from 'react-native-animatable';
 import {useAppContext} from '../../provider/useAppContext';
-import {w} from '../../utils/utils';
 import Container from '../../components/Container';
+import {useIsFocused} from 'react-navigation-hooks';
 
 export const Notes = ({navigation}) => {
   const {colors} = useAppContext();
@@ -32,47 +14,35 @@ export const Notes = ({navigation}) => {
   const [margin, setMargin] = useState(200);
   const [buttonHide, setButtonHide] = useState(false);
   const [notes, setNotes] = useState([]);
-  const forceUpdate = useForceUpdate();
 
   let isFocused = useIsFocused();
 
+  let params = navigation.state ? navigation.state.params : null;
+  let offsetY = 0;
+  let countUp = 0;
+  let countDown = 0;
+  let headerHeight = 0;
+  let searchHeight = 0;
+  let marginSet = false;
+
+  useEffect(() => {
+    if (!params) {
+      params = {
+        heading: 'Notes',
+      };
+    }
+  }, []);
+
+  useEffect(() => {
+    let allNotes = db.getTopic(params.notebookID, params.title);
+    if (allNotes && allNotes.length > 0) {
+      setNotes(allNotes);
+    }
+  }, []);
   if (!isFocused) {
     console.log('block rerender');
     return <></>;
   } else {
-    let params = navigation.state ? navigation.state.params : null;
-    let offsetY = 0;
-    let countUp = 0;
-    let countDown = 0;
-    let headerHeight = 0;
-    let searchHeight = 0;
-    let marginSet = false;
-    useEffect(() => {
-      onThemeUpdate(() => {
-        forceUpdate();
-      });
-      return () => {
-        clearThemeUpdateListener(() => {
-          forceUpdate();
-        });
-      };
-    }, []);
-
-    useEffect(() => {
-      if (!params) {
-        params = {
-          heading: 'Notes',
-        };
-      }
-    }, []);
-
-    useEffect(() => {
-      let allNotes = db.getTopic(params.notebookID, params.title);
-      if (allNotes && allNotes.length > 0) {
-        setNotes(allNotes);
-      }
-    }, []);
-
     return (
       <Container
         bottomButtonText="Create a new note"

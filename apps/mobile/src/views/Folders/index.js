@@ -13,6 +13,7 @@ import Container from '../../components/Container';
 import SelectionHeader from '../../components/SelectionHeader';
 import SelectionWrapper from '../../components/SelectionWrapper';
 import {w} from '../../utils/utils';
+import {useIsFocused} from 'react-navigation-hooks';
 
 export const Folders = ({navigation}) => {
   const {
@@ -29,33 +30,33 @@ export const Folders = ({navigation}) => {
 
   let isFocused = useIsFocused();
 
+  const params = navigation.state.params;
+  let offsetY = 0;
+  let countUp = 0;
+  let countDown = 0;
+
+  const onScroll = event => {
+    y = event.nativeEvent.contentOffset.y;
+    if (y < 30) setHideHeader(false);
+    //if (buttonHide) return;
+    if (y > offsetY) {
+      if (y - offsetY < 150 || countDown > 0) return;
+      countDown = 1;
+      countUp = 0;
+      setHideHeader(true);
+    } else {
+      if (offsetY - y < 150 || countUp > 0) return;
+      countDown = 0;
+      countUp = 1;
+      setHideHeader(false);
+    }
+    offsetY = y;
+  };
+
   if (!isFocused) {
     console.log('block rerender');
     return <></>;
   } else {
-    const params = navigation.state.params;
-    let offsetY = 0;
-    let countUp = 0;
-    let countDown = 0;
-
-    const onScroll = event => {
-      y = event.nativeEvent.contentOffset.y;
-      if (y < 30) setHideHeader(false);
-      //if (buttonHide) return;
-      if (y > offsetY) {
-        if (y - offsetY < 150 || countDown > 0) return;
-        countDown = 1;
-        countUp = 0;
-        setHideHeader(true);
-      } else {
-        if (offsetY - y < 150 || countUp > 0) return;
-        countDown = 0;
-        countUp = 1;
-        setHideHeader(false);
-      }
-      offsetY = y;
-    };
-    console.log('rerendering folders');
     return (
       <Container
         bottomButtonText="Add a new notebook"

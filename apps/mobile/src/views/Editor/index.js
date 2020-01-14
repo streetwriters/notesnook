@@ -27,6 +27,7 @@ import ActionSheet from '../../components/ActionSheet';
 import {ActionSheetComponent} from '../../components/ActionSheetComponent';
 import {VaultDialog} from '../../components/VaultDialog';
 import NavigationService from '../../services/NavigationService';
+import {useIsFocused} from 'react-navigation-hooks';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
@@ -39,291 +40,292 @@ let timer = null;
 let note = {};
 
 const Editor = ({navigation}) => {
+  // Global State
+  const {colors} = useAppContext();
+
+  // Local State
+
+  const [dialog, setDialog] = useState(false);
+  const [isOpen, setOpen] = useState(false);
+  const [sidebar, setSidebar] = useState(DDS.isTab ? true : false);
+  const [vaultDialog, setVaultDialog] = useState(false);
+  const [unlock, setUnlock] = useState(false);
+  const [visible, setVisible] = useState(false);
+  const [noteProps, setNoteProps] = useState({
+    tags: [],
+    locked: false,
+    pinned: false,
+    favorite: false,
+    colors: [],
+  });
+
+  // VARIABLES
+
+  let willRefresh = false;
+  let customNote = null;
+  let actionSheet;
+  let show;
+  const isFocused = useIsFocused();
+  // FUNCTIONS
+
+  const post = value => EditorWebView.postMessage(value);
+
+  const onChange = data => {
+    if (data !== '') {
+      content = JSON.parse(data);
+    }
+  };
+
+  const saveNote = async (noteProps = {}, lockNote = true) => {
+    if (!content) {
+      content = {
+        text: '',
+        delta: null,
+      };
+    }
+
+    timestamp = await db.addNote({
+      ...noteProps,
+      title,
+      content: {
+        text: content.text,
+        delta: content.delta,
+      },
+      dateCreated: timestamp,
+    });
+
+    if (lockNote && noteProps.locked) {
+      db.lockNote(timestamp, 'password');
+    }
+  };
+
+  const onWebViewLoad = () => {
+    post(JSON.stringify(colors));
+    if (navigation.state.params && navigation.state.params.note) {
+      note = navigation.state.params.note;
+      updateEditor();
+    }
+  };
+
+  const updateEditor = () => {
+    let props = {
+      tags: note.tags,
+      colors: note.colors,
+      pinned: note.pinned,
+      favorite: note.favorite,
+      locked: note.locked,
+    };
+    setNoteProps({...props});
+
+    post(JSON.stringify(note.content.delta));
+    setTimeout(() => {
+      title = note.title;
+      titleRef.setNativeProps({
+        text: title,
+      });
+      timestamp = note.dateCreated;
+      content = note.content;
+    }, 200);
+  };
+
+  const onTitleTextChange = value => {
+    title = value;
+  };
+
+  const onMenuHide = () => {
+    if (show) {
+      if (show === 'lock') {
+        if (unlock) {
+          setUnlock(false);
+        }
+        setVaultDialog(true);
+      } else if (show === 'unlock') {
+        setUnlock(true);
+        setVaultDialog(true);
+      } else if (show == 'delete') {
+        setVisible(true);
+      }
+    }
+  };
+
+  const deleteItem = async () => {
+    await db.deleteNotes([note]);
+    ToastEvent.show('Note moved to trash', 'success', 3000);
+    setVisible(false);
+    navigation.goBack();
+  };
+
+  const _renderEditor = () => {
+    return (
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : null}
+        style={{height: '100%'}}>
+        <View
+          style={{
+            height: '100%',
+          }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'flex-start',
+              alignItems: 'center',
+              paddingHorizontal: 12,
+              width: '100%',
+              alignSelf: 'center',
+              height: 50,
+
+              marginTop: Platform.OS == 'ios' ? 0 : StatusBar.currentHeight,
+            }}>
+            <TouchableOpacity
+              onPress={() => {
+                setDialog(true);
+              }}
+              style={{
+                width: '12.5%',
+                height: 40,
+                justifyContent: 'center',
+                alignItems: 'flex-start',
+              }}>
+              <Icon
+                style={{
+                  marginLeft: -7,
+                }}
+                name="chevron-left"
+                color={colors.icon}
+                size={SIZE.xxxl - 3}
+              />
+            </TouchableOpacity>
+
+            <TextInput
+              placeholder="Untitled Note"
+              ref={ref => (titleRef = ref)}
+              placeholderTextColor={colors.icon}
+              defaultValue={note && note.title ? note.title : title}
+              style={{
+                width: '75%',
+                fontFamily: WEIGHT.bold,
+                fontSize: SIZE.xl,
+                color: colors.pri,
+                maxWidth: '75%',
+                paddingVertical: 0,
+                paddingHorizontal: 0,
+              }}
+              onChangeText={onTitleTextChange}
+              onSubmitEditing={saveNote}
+            />
+
+            <TouchableOpacity
+              onPress={() => {
+                DDS.isTab
+                  ? setSidebar(!sidebar)
+                  : actionSheet._setModalVisible();
+              }}
+              style={{
+                width: '12.5%',
+                height: 40,
+                justifyContent: 'center',
+                alignItems: 'flex-end',
+              }}>
+              <Icon
+                name="more-horizontal"
+                color={colors.icon}
+                size={SIZE.xxxl}
+              />
+            </TouchableOpacity>
+          </View>
+
+          <WebView
+            ref={ref => (EditorWebView = ref)}
+            onError={error => console.log(error)}
+            onLoad={onWebViewLoad}
+            javaScriptEnabled
+            onShouldStartLoadWithRequest={request => {
+              if (request.url.includes('https')) {
+                Linking.openURL(request.url);
+                return false;
+              } else {
+                return true;
+              }
+            }}
+            renderLoading={() => (
+              <View
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  backgroundColor: 'transparent',
+                }}
+              />
+            )}
+            cacheEnabled={true}
+            cacheMode="LOAD_CACHE_ELSE_NETWORK"
+            domStorageEnabled
+            scrollEnabled={false}
+            bounces={true}
+            scalesPageToFit={true}
+            source={
+              Platform.OS === 'ios'
+                ? require('./web/texteditor.html')
+                : {
+                    uri: 'file:///android_asset/texteditor.html',
+                    baseUrl: 'baseUrl:"file:///android_asset/',
+                  }
+            }
+            style={{
+              height: '100%',
+              maxHeight: '100%',
+              backgroundColor: 'transparent',
+            }}
+            onMessage={evt => {
+              if (evt.nativeEvent.data !== '') {
+                clearTimeout(timer);
+                timer = null;
+                onChange(evt.nativeEvent.data);
+                timer = setTimeout(() => {
+                  saveNote(noteProps, true);
+                  console.log('saved');
+                }, 1000);
+              }
+            }}
+          />
+        </View>
+      </KeyboardAvoidingView>
+    );
+  };
+
+  // EFFECTS
+
+  useEffect(() => {
+    let handleBack = BackHandler.addEventListener('hardwareBackPress', () => {
+      setDialog(true);
+      return true;
+    });
+    return () => {
+      handleBack.remove();
+      handleBack = null;
+      title = null;
+      content = null;
+      timer = null;
+      timestamp = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    SideMenuEvent.close();
+    SideMenuEvent.disable();
+    return () => {
+      DDS.isTab ? SideMenuEvent.open() : null;
+      SideMenuEvent.enable();
+    };
+  });
+
+  useEffect(() => {
+    EditorWebView.reload();
+  }, [colors]);
+
   if (!isFocused) {
     console.log('block rerender');
     return <></>;
   } else {
-    // Global State
-    const {colors} = useAppContext();
-
-    // Local State
-
-    const [dialog, setDialog] = useState(false);
-    const [isOpen, setOpen] = useState(false);
-    const [sidebar, setSidebar] = useState(DDS.isTab ? true : false);
-    const [vaultDialog, setVaultDialog] = useState(false);
-    const [unlock, setUnlock] = useState(false);
-    const [visible, setVisible] = useState(false);
-    const [noteProps, setNoteProps] = useState({
-      tags: [],
-      locked: false,
-      pinned: false,
-      favorite: false,
-      colors: [],
-    });
-
-    // VARIABLES
-
-    let willRefresh = false;
-    let customNote = null;
-    let actionSheet;
-    let show;
-    // FUNCTIONS
-
-    const post = value => EditorWebView.postMessage(value);
-
-    const onChange = data => {
-      if (data !== '') {
-        content = JSON.parse(data);
-      }
-    };
-
-    const saveNote = async (noteProps = {}, lockNote = true) => {
-      if (!content) {
-        content = {
-          text: '',
-          delta: null,
-        };
-      }
-
-      timestamp = await db.addNote({
-        ...noteProps,
-        title,
-        content: {
-          text: content.text,
-          delta: content.delta,
-        },
-        dateCreated: timestamp,
-      });
-
-      if (lockNote && noteProps.locked) {
-        db.lockNote(timestamp, 'password');
-      }
-    };
-
-    const onWebViewLoad = () => {
-      post(JSON.stringify(colors));
-      if (navigation.state.params && navigation.state.params.note) {
-        note = navigation.state.params.note;
-        updateEditor();
-      }
-    };
-
-    const updateEditor = () => {
-      let props = {
-        tags: note.tags,
-        colors: note.colors,
-        pinned: note.pinned,
-        favorite: note.favorite,
-        locked: note.locked,
-      };
-      setNoteProps({...props});
-
-      post(JSON.stringify(note.content.delta));
-      setTimeout(() => {
-        title = note.title;
-        titleRef.setNativeProps({
-          text: title,
-        });
-        timestamp = note.dateCreated;
-        content = note.content;
-      }, 200);
-    };
-
-    const onTitleTextChange = value => {
-      title = value;
-    };
-
-    const onMenuHide = () => {
-      if (show) {
-        if (show === 'lock') {
-          if (unlock) {
-            setUnlock(false);
-          }
-          setVaultDialog(true);
-        } else if (show === 'unlock') {
-          setUnlock(true);
-          setVaultDialog(true);
-        } else if (show == 'delete') {
-          setVisible(true);
-        }
-      }
-    };
-
-    const deleteItem = async () => {
-      await db.deleteNotes([note]);
-      ToastEvent.show('Note moved to trash', 'success', 3000);
-      setVisible(false);
-      navigation.goBack();
-    };
-
-    const _renderEditor = () => {
-      return (
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : null}
-          style={{height: '100%'}}>
-          <View
-            style={{
-              height: '100%',
-            }}>
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'flex-start',
-                alignItems: 'center',
-                paddingHorizontal: 12,
-                width: '100%',
-                alignSelf: 'center',
-                height: 50,
-
-                marginTop: Platform.OS == 'ios' ? 0 : StatusBar.currentHeight,
-              }}>
-              <TouchableOpacity
-                onPress={() => {
-                  setDialog(true);
-                }}
-                style={{
-                  width: '12.5%',
-                  height: 40,
-                  justifyContent: 'center',
-                  alignItems: 'flex-start',
-                }}>
-                <Icon
-                  style={{
-                    marginLeft: -7,
-                  }}
-                  name="chevron-left"
-                  color={colors.icon}
-                  size={SIZE.xxxl - 3}
-                />
-              </TouchableOpacity>
-
-              <TextInput
-                placeholder="Untitled Note"
-                ref={ref => (titleRef = ref)}
-                placeholderTextColor={colors.icon}
-                defaultValue={note && note.title ? note.title : title}
-                style={{
-                  width: '75%',
-                  fontFamily: WEIGHT.bold,
-                  fontSize: SIZE.xl,
-                  color: colors.pri,
-                  maxWidth: '75%',
-                  paddingVertical: 0,
-                  paddingHorizontal: 0,
-                }}
-                onChangeText={onTitleTextChange}
-                onSubmitEditing={saveNote}
-              />
-
-              <TouchableOpacity
-                onPress={() => {
-                  DDS.isTab
-                    ? setSidebar(!sidebar)
-                    : actionSheet._setModalVisible();
-                }}
-                style={{
-                  width: '12.5%',
-                  height: 40,
-                  justifyContent: 'center',
-                  alignItems: 'flex-end',
-                }}>
-                <Icon
-                  name="more-horizontal"
-                  color={colors.icon}
-                  size={SIZE.xxxl}
-                />
-              </TouchableOpacity>
-            </View>
-
-            <WebView
-              ref={ref => (EditorWebView = ref)}
-              onError={error => console.log(error)}
-              onLoad={onWebViewLoad}
-              javaScriptEnabled
-              onShouldStartLoadWithRequest={request => {
-                if (request.url.includes('https')) {
-                  Linking.openURL(request.url);
-                  return false;
-                } else {
-                  return true;
-                }
-              }}
-              renderLoading={() => (
-                <View
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    backgroundColor: 'transparent',
-                  }}
-                />
-              )}
-              cacheEnabled={true}
-              cacheMode="LOAD_CACHE_ELSE_NETWORK"
-              domStorageEnabled
-              scrollEnabled={false}
-              bounces={true}
-              scalesPageToFit={true}
-              source={
-                Platform.OS === 'ios'
-                  ? require('./web/texteditor.html')
-                  : {
-                      uri: 'file:///android_asset/texteditor.html',
-                      baseUrl: 'baseUrl:"file:///android_asset/',
-                    }
-              }
-              style={{
-                height: '100%',
-                maxHeight: '100%',
-                backgroundColor: 'transparent',
-              }}
-              onMessage={evt => {
-                if (evt.nativeEvent.data !== '') {
-                  clearTimeout(timer);
-                  timer = null;
-                  onChange(evt.nativeEvent.data);
-                  timer = setTimeout(() => {
-                    saveNote(noteProps, true);
-                    console.log('saved');
-                  }, 1000);
-                }
-              }}
-            />
-          </View>
-        </KeyboardAvoidingView>
-      );
-    };
-
-    // EFFECTS
-
-    useEffect(() => {
-      let handleBack = BackHandler.addEventListener('hardwareBackPress', () => {
-        setDialog(true);
-        return true;
-      });
-      return () => {
-        handleBack.remove();
-        handleBack = null;
-        title = null;
-        content = null;
-        timer = null;
-        timestamp = null;
-      };
-    }, []);
-
-    useEffect(() => {
-      SideMenuEvent.close();
-      SideMenuEvent.disable();
-      return () => {
-        DDS.isTab ? SideMenuEvent.open() : null;
-        SideMenuEvent.enable();
-      };
-    });
-
-    useEffect(() => {
-      EditorWebView.reload();
-    }, [colors]);
-
     return DDS.isTab ? (
       <View
         style={{
