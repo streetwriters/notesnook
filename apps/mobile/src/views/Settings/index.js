@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   ScrollView,
   View,
@@ -21,17 +21,20 @@ import {FlatList} from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-community/async-storage';
 import {AnimatedSafeAreaView} from '../Home';
 import {useAppContext} from '../../provider/useAppContext';
+import {useIsFocused} from 'react-navigation-hooks';
+import Container from '../../components/Container';
 
 export const Settings = ({navigation}) => {
   const {colors, changeAccentColor, changeColorScheme} = useAppContext();
+  //const [colors, setColors] = useState(COLOR_SCHEME_LIGHT);
+  let isFocused = useIsFocused();
+
+  if (!isFocused) {
+    console.log('block rerender');
+    return <></>;
+  }
   return (
-    <AnimatedSafeAreaView
-      transition="backgroundColor"
-      duration={300}
-      style={{
-        backgroundColor: colors.bg,
-        height: '100%',
-      }}>
+    <Container noBottomButton={true}>
       <View>
         <Header
           menu={true}
@@ -189,7 +192,7 @@ export const Settings = ({navigation}) => {
           )}
         />
       </View>
-    </AnimatedSafeAreaView>
+    </Container>
   );
 };
 

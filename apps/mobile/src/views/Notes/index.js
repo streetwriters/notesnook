@@ -24,6 +24,7 @@ import {db} from '../../../App';
 import * as Animatable from 'react-native-animatable';
 import {useAppContext} from '../../provider/useAppContext';
 import {w} from '../../utils/utils';
+import Container from '../../components/Container';
 
 export const Notes = ({navigation}) => {
   const {colors} = useAppContext();
@@ -32,51 +33,50 @@ export const Notes = ({navigation}) => {
   const [buttonHide, setButtonHide] = useState(false);
   const [notes, setNotes] = useState([]);
   const forceUpdate = useForceUpdate();
-  let params = navigation.state ? navigation.state.params : null;
-  let offsetY = 0;
-  let countUp = 0;
-  let countDown = 0;
-  let headerHeight = 0;
-  let searchHeight = 0;
-  let marginSet = false;
-  useEffect(() => {
-    onThemeUpdate(() => {
-      forceUpdate();
-    });
-    return () => {
-      clearThemeUpdateListener(() => {
+
+  let isFocused = useIsFocused();
+
+  if (!isFocused) {
+    console.log('block rerender');
+    return <></>;
+  } else {
+    let params = navigation.state ? navigation.state.params : null;
+    let offsetY = 0;
+    let countUp = 0;
+    let countDown = 0;
+    let headerHeight = 0;
+    let searchHeight = 0;
+    let marginSet = false;
+    useEffect(() => {
+      onThemeUpdate(() => {
         forceUpdate();
       });
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!params) {
-      params = {
-        heading: 'Notes',
+      return () => {
+        clearThemeUpdateListener(() => {
+          forceUpdate();
+        });
       };
-    }
-  }, []);
+    }, []);
 
-  useEffect(() => {
-    let allNotes = db.getTopic(params.notebookID, params.title);
-    if (allNotes && allNotes.length > 0) {
-      setNotes(allNotes);
-    }
-  }, []);
+    useEffect(() => {
+      if (!params) {
+        params = {
+          heading: 'Notes',
+        };
+      }
+    }, []);
 
-  return (
-    <AnimatedSafeAreaView
-      transition="backgroundColor"
-      duration={300}
-      style={{
-        height: '100%',
-        backgroundColor: colors.bg,
-      }}>
-      <KeyboardAvoidingView
-        style={{
-          height: '100%',
-        }}>
+    useEffect(() => {
+      let allNotes = db.getTopic(params.notebookID, params.title);
+      if (allNotes && allNotes.length > 0) {
+        setNotes(allNotes);
+      }
+    }, []);
+
+    return (
+      <Container
+        bottomButtonText="Create a new note"
+        bottomButtonOnPress={() => {}}>
         <Animatable.View
           transition="backgroundColor"
           duration={300}
@@ -131,37 +131,9 @@ export const Notes = ({navigation}) => {
           notes={notes}
           keyword={null}
         />
-
-        <TouchableOpacity
-          activeOpacity={opacity}
-          onPress={() => {
-            setAddNotebook(true);
-          }}
-          style={{
-            borderRadius: 5,
-            width: w - 24,
-            marginHorizontal: 12,
-            paddingHorizontal: ph,
-            paddingVertical: pv + 5,
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: 15,
-            backgroundColor: colors.accent,
-          }}>
-          <Text
-            style={{
-              fontSize: SIZE.md,
-              fontFamily: WEIGHT.semibold,
-              color: 'white',
-            }}>
-            <Icon name="plus" color="white" size={SIZE.lg} />
-            {'  '} Create a new note
-          </Text>
-        </TouchableOpacity>
-      </KeyboardAvoidingView>
-    </AnimatedSafeAreaView>
-  );
+      </Container>
+    );
+  }
 };
 
 Notes.navigationOptions = {

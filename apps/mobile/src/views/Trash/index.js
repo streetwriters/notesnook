@@ -30,122 +30,133 @@ export const Trash = ({navigation}) => {
   } = useAppContext();
 
   const [dialog, setDialog] = useState(false);
+  let isFocused = useIsFocused();
 
-  return (
-    <Container
-      bottomButtonOnPress={() => {
-        setDialog(true);
-      }}
-      bottomButtonText="Clear all trash">
-      <SelectionHeader />
-      {selectionMode ? null : (
-        <Header colors={colors} heading="Trash" canGoBack={false} menu={true} />
-      )}
-
-      <FlatList
-        keyExtractor={item => item.dateCreated.toString()}
-        style={{
-          width: '100%',
-          alignSelf: 'center',
-          height: '100%',
+  if (!isFocused) {
+    console.log('block rerender');
+    return <></>;
+  } else {
+    return (
+      <Container
+        bottomButtonOnPress={() => {
+          setDialog(true);
         }}
-        contentContainerStyle={{
-          height: '100%',
-        }}
-        data={trash}
-        ListEmptyComponent={
-          <View
-            style={{
-              height: '80%',
-              width: '100%',
-              alignItems: 'center',
-              alignSelf: 'center',
-              justifyContent: 'center',
-              opacity: 0.8,
-            }}>
-            <TrashPlaceHolder colors={colors} />
-            <Text
-              style={{
-                color: colors.icon,
-                fontSize: SIZE.md,
-                fontFamily: WEIGHT.regular,
-                marginTop: 20,
-              }}>
-              Deleted notes & notebooks appear here.
-            </Text>
-            <Text
-              style={{
-                fontSize: SIZE.sm,
-                color: colors.icon,
-                marginTop: 20,
-              }}>
-              Trash is empty
-            </Text>
-          </View>
-        }
-        renderItem={({item, index}) => (
-          <SelectionWrapper item={item}>
-            {item.type === 'note' ? (
-              <NoteItem
-                customStyle={{
-                  width: selectionMode ? w - 74 : '100%',
-                  marginHorizontal: 0,
-                }}
-                onLongPress={() => {
-                  if (!selectionMode) {
-                    updateSelectionList(item);
-                  }
-
-                  changeSelectionMode(!selectionMode);
-                }}
-                item={item}
-                index={index}
-                isTrash={true}
-              />
-            ) : (
-              <NotebookItem
-                onLongPress={() => {
-                  if (!selectionMode) {
-                    updateSelectionList(item);
-                  }
-
-                  changeSelectionMode(!selectionMode);
-                }}
-                customStyle={{
-                  width: selectionMode ? w - 74 : '100%',
-                  marginHorizontal: 0,
-                }}
-                item={item}
-                isTrash={true}
-                index={index}
-              />
-            )}
-          </SelectionWrapper>
+        bottomButtonText="Clear all trash">
+        <SelectionHeader />
+        {selectionMode ? null : (
+          <Header
+            colors={colors}
+            heading="Trash"
+            canGoBack={false}
+            menu={true}
+          />
         )}
-      />
 
-      <Dialog
-        title="Empty Trash"
-        visible={dialog}
-        close={() => {
-          setDialog(false);
-        }}
-        icon="trash"
-        paragraph="Clearing all trash cannot be undone."
-        positiveText="Clear"
-        negativeText="Cancel"
-        positivePress={async () => {
-          await db.clearTrash();
-          updateDB();
-          ToastEvent.show('Trash cleared', 'success', 1000, () => {}, '');
-          setDialog(false);
-        }}
-        negativePress={() => {
-          setDialog(false);
-        }}
-      />
-    </Container>
-  );
+        <FlatList
+          keyExtractor={item => item.dateCreated.toString()}
+          style={{
+            width: '100%',
+            alignSelf: 'center',
+            height: '100%',
+          }}
+          contentContainerStyle={{
+            height: '100%',
+          }}
+          data={trash}
+          ListEmptyComponent={
+            <View
+              style={{
+                height: '80%',
+                width: '100%',
+                alignItems: 'center',
+                alignSelf: 'center',
+                justifyContent: 'center',
+                opacity: 0.8,
+              }}>
+              <TrashPlaceHolder colors={colors} />
+              <Text
+                style={{
+                  color: colors.icon,
+                  fontSize: SIZE.md,
+                  fontFamily: WEIGHT.regular,
+                  marginTop: 20,
+                }}>
+                Deleted notes & notebooks appear here.
+              </Text>
+              <Text
+                style={{
+                  fontSize: SIZE.sm,
+                  color: colors.icon,
+                  marginTop: 20,
+                }}>
+                Trash is empty
+              </Text>
+            </View>
+          }
+          renderItem={({item, index}) => (
+            <SelectionWrapper item={item}>
+              {item.type === 'note' ? (
+                <NoteItem
+                  customStyle={{
+                    width: selectionMode ? w - 74 : '100%',
+                    marginHorizontal: 0,
+                  }}
+                  onLongPress={() => {
+                    if (!selectionMode) {
+                      updateSelectionList(item);
+                    }
+
+                    changeSelectionMode(!selectionMode);
+                  }}
+                  item={item}
+                  index={index}
+                  isTrash={true}
+                />
+              ) : (
+                <NotebookItem
+                  onLongPress={() => {
+                    if (!selectionMode) {
+                      updateSelectionList(item);
+                    }
+
+                    changeSelectionMode(!selectionMode);
+                  }}
+                  customStyle={{
+                    width: selectionMode ? w - 74 : '100%',
+                    marginHorizontal: 0,
+                  }}
+                  item={item}
+                  isTrash={true}
+                  index={index}
+                />
+              )}
+            </SelectionWrapper>
+          )}
+        />
+
+        <Dialog
+          title="Empty Trash"
+          visible={dialog}
+          close={() => {
+            setDialog(false);
+          }}
+          icon="trash"
+          paragraph="Clearing all trash cannot be undone."
+          positiveText="Clear"
+          negativeText="Cancel"
+          positivePress={async () => {
+            await db.clearTrash();
+            updateDB();
+            ToastEvent.show('Trash cleared', 'success', 1000, () => {}, '');
+            setDialog(false);
+          }}
+          negativePress={() => {
+            setDialog(false);
+          }}
+        />
+      </Container>
+    );
+  }
 };
 
 Trash.navigationOptions = {

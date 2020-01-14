@@ -1,59 +1,45 @@
 import React, {useState} from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Platform,
-  FlatList,
-  KeyboardAvoidingView,
-} from 'react-native';
-import {SIZE, ph, pv, opacity, WEIGHT} from '../../common/common';
-import Icon from 'react-native-vector-icons/Feather';
+import {View, Text, Platform} from 'react-native';
+import {SIZE, WEIGHT} from '../../common/common';
 import {Header} from '../../components/header';
 import {NotebookItem} from '../../components/NotebookItem';
 import {Search} from '../../components/SearchInput';
-import {useForceUpdate} from '../ListsEditor';
 import {AddTopicDialog} from '../../components/AddTopicDialog';
-import {AnimatedSafeAreaView} from '../Home';
 import * as Animatable from 'react-native-animatable';
-import {NavigationEvents} from 'react-navigation';
 import {useAppContext} from '../../provider/useAppContext';
+import {useIsFocused} from 'react-navigation-hooks';
+import Container from '../../components/Container';
 
 export const Notebook = ({navigation}) => {
-  // State
   const {colors} = useAppContext();
   const params = navigation.state.params;
   const [hideHeader, setHideHeader] = useState(false);
   const [buttonHide, setButtonHide] = useState(false);
-  const [numColumns, setNumColumns] = useState(1);
   const [addTopic, setAddTopic] = useState(false);
-  const forceUpdate = useForceUpdate();
-  // Variables
-  let offsetY = 0;
-  let countUp = 0;
-  let countDown = 0;
 
-  // Effects
+  let isFocused = useIsFocused();
 
-  // Functions
+  if (!isFocused) {
+    console.log('block rerender');
+    return <></>;
+  } else {
+    // State
 
-  // Render
-  return (
-    <AnimatedSafeAreaView
-      transition="backgroundColor"
-      duration={300}
-      style={{
-        height: '100%',
-        backgroundColor: colors.bg,
-      }}>
-      <NavigationEvents
-        onDidBlur={() => {
-          marginSet = false;
-        }}
-      />
-      <KeyboardAvoidingView
-        style={{
-          height: '100%',
+    // Variables
+    let offsetY = 0;
+    let countUp = 0;
+    let countDown = 0;
+
+    // Effects
+
+    // Functions
+
+    // Render
+    return (
+      <Container
+        bottomButtonText="Add new topic"
+        bottomButtonOnPress={() => {
+          setAddTopic(true);
         }}>
         <AddTopicDialog
           visible={addTopic}
@@ -111,16 +97,17 @@ export const Notebook = ({navigation}) => {
           ListHeaderComponent={
             <View
               style={{
-                marginTop: Platform.OS == 'ios' ? 145 : 185,
-              }}></View>
+                marginTop:
+                  Platform.OS == 'ios'
+                    ? notebooks[0] && !selectionMode
+                      ? 135
+                      : 135 - 60
+                    : notebooks[0] && !selectionMode
+                    ? 155
+                    : 155 - 60,
+              }}
+            />
           }
-          numColumns={numColumns}
-          key={numColumns}
-          contentContainerStyle={{
-            width: '100%',
-            alignItems: numColumns === 2 ? 'flex-start' : null,
-            alignSelf: 'center',
-          }}
           ListFooterComponent={
             <View
               style={{
@@ -146,7 +133,7 @@ export const Notebook = ({navigation}) => {
               notebookID={params.notebook.dateCreated}
               isMove={params.isMove}
               refresh={() => {
-                forceUpdate();
+                //forceUpdate();
               }}
               item={item}
               index={index}
@@ -154,36 +141,9 @@ export const Notebook = ({navigation}) => {
             />
           )}
         />
-        <TouchableOpacity
-          activeOpacity={opacity}
-          onPress={() => {
-            setAddTopic(true);
-          }}
-          style={{
-            borderRadius: 5,
-            width: w - 24,
-            marginHorizontal: 12,
-            paddingHorizontal: ph,
-            paddingVertical: pv + 5,
-            flexDirection: 'row',
-            justifyContent: 'flex-start',
-            alignItems: 'center',
-            marginBottom: 15,
-            backgroundColor: colors.accent,
-          }}>
-          <Icon name="plus" color="white" size={SIZE.lg} />
-          <Text
-            style={{
-              fontSize: SIZE.md,
-              fontFamily: WEIGHT.regular,
-              color: 'white',
-            }}>
-            {'  '}Add a new topic
-          </Text>
-        </TouchableOpacity>
-      </KeyboardAvoidingView>
-    </AnimatedSafeAreaView>
-  );
+      </Container>
+    );
+  }
 };
 
 Notebook.navigationOptions = {
