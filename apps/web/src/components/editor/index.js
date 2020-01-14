@@ -89,7 +89,7 @@ export default class Editor extends React.Component {
     ev.removeListener("onClearNote", this.onClearNote.bind(this));
   }
 
-  onNewNote(showSnack = true, cb = null) {
+  onNewNote(show = true, cb = null) {
     clearTimeout(this.timeout);
     this.saveNote().then(() => {
       this.titleRef.value = "";
@@ -98,7 +98,7 @@ export default class Editor extends React.Component {
       this.titleRef.focus();
       this.quill.setText("\n");
       cb && cb();
-      if (showSnack) {
+      if (show) {
         showSnack("Let's start writing!", Icon.Edit2);
       }
     });

@@ -48,7 +48,7 @@ const menuItems = note => [
       ).then(res => {
         if (res) {
           ev.emit("onClearNote", note.dateCreated);
-          db.deleteNotes([note])
+          db.deleteNotes(note)
             .then(
               //TODO implement undo
               () => {
