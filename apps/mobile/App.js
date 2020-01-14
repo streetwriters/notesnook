@@ -13,12 +13,12 @@ import * as Animatable from 'react-native-animatable';
 import {h, w} from './src/utils/utils';
 import {Toast} from './src/components/Toast';
 import {Menu} from './src/components/Menu';
-import SideMenu from 'react-native-side-menu';
+import SideMenu from './src/components/SideMenu';
 import Storage from 'notes-core/api/database';
 import StorageInterface from './src/utils/storage';
 import {AppProvider} from './src/provider';
 import {DeviceDetectionService} from './src/utils/deviceDetection';
-import {useAppContext} from './src/provider/useAppContext';
+
 import {
   COLOR_SCHEME,
   onThemeUpdate,
@@ -28,52 +28,48 @@ import {
 export const DDS = new DeviceDetectionService();
 export const db = new Storage(StorageInterface);
 let timer = null;
+let sideMenuRef;
 const App = () => {
   // Global State
   const [colors, setColors] = useState(COLOR_SCHEME);
 
   // Local State
   const [sidebar, setSidebar] = useState(w * 0.3);
-  const [isOpen, setOpen] = useState(false);
-  const [disableGestures, setDisableGesture] = useState(false);
   const [isIntialized, setIsInitialized] = useState(false);
-  const [overlay, setOverlay] = useState(false);
 
   // Variables
 
   // Effects
-  useEffect(() => {
-    db.init().then(() => {
-      setIsInitialized(true);
-    });
-  }, []);
 
   useEffect(() => {
     DeviceEventEmitter.addListener('openSidebar', () => {
-      DDS.isTab ? setSidebar(w * 0.3) : setOpen(true);
+      DDS.isTab
+        ? setSidebar(w * 0.3)
+        : sideMenuRef.openMenu(!sideMenuRef.isOpen);
     });
+
     DeviceEventEmitter.addListener('closeSidebar', () => {
-      DDS.isTab ? setSidebar(0) : setOpen(false);
+      DDS.isTab ? setSidebar(0) : sideMenuRef.openMenu(!sideMenuRef.isOpen);
     });
     DeviceEventEmitter.addListener('disableGesture', () => {
-      setDisableGesture(true);
+      sideMenuRef.setGestureEnabled(false);
     });
     DeviceEventEmitter.addListener('enableGesture', () => {
-      setDisableGesture(false);
+      sideMenuRef.setGestureEnabled(true);
     });
 
     return () => {
       DeviceEventEmitter.removeListener('openSidebar', () => {
-        DDS.isTab ? setSidebar('30%') : setOpen(true);
+        DDS.isTab ? setSidebar(0) : sideMenuRef.openMenu(!sideMenuRef.isOpen);
       });
       DeviceEventEmitter.removeListener('closeSidebar', () => {
-        DDS.isTab ? setSidebar('0%') : setOpen(false);
+        DDS.isTab ? setSidebar(0) : sideMenuRef.openMenu(!sideMenuRef.isOpen);
       });
       DeviceEventEmitter.removeListener('disableGesture', () => {
-        setDisableGesture(true);
+        sideMenuRef.setGestureEnabled(false);
       });
       DeviceEventEmitter.removeListener('enableGesture', () => {
-        setDisableGesture(false);
+        sideMenuRef.setGestureEnabled(true);
       });
     };
   }, []);
@@ -87,6 +83,9 @@ const App = () => {
   }, []);
 
   useEffect(() => {
+    db.init().then(() => {
+      setIsInitialized(true);
+    });
     onThemeUpdate(() => {
       setColors({...COLOR_SCHEME});
     });
@@ -102,6 +101,7 @@ const App = () => {
   if (!isIntialized) {
     return <View />;
   }
+  console.log('rerendering plain');
   return (
     <AppProvider>
       <View
@@ -139,29 +139,18 @@ const App = () => {
           </>
         ) : (
           <SideMenu
-            isOpen={isOpen}
-            disableGestures={disableGestures}
+            ref={ref => (sideMenuRef = ref)}
             bounceBackOnOverdraw={false}
             contentContainerStyle={{
               opacity: 0,
               backgroundColor: colors.bg,
             }}
-            animationFunction={(prop, value) =>
-              Animated.spring(prop, {
-                toValue: value,
-                friction: 8,
-                useNativeDriver: true,
-              })
-            }
-            onChange={args => {
-              clearTimeout(timer);
-              timer = null;
-              timer = setTimeout(() => {
-                setOpen(args);
-              }, 100);
-            }}
             menu={
-              <Menu hide={false} colors={colors} close={() => setOpen(false)} />
+              <Menu
+                hide={false}
+                colors={colors}
+                close={() => sideMenuRef.openMenu(!sideMenuRef.isOpen)}
+              />
             }
             openMenuOffset={w / 1.3}>
             <AppContainer
@@ -176,7 +165,6 @@ const App = () => {
             />
           </SideMenu>
         )}
-
         <Toast />
       </View>
     </AppProvider>
