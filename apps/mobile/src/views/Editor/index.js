@@ -310,7 +310,6 @@ const Editor = ({navigation}) => {
   }, []);
 
   useEffect(() => {
-    SideMenuEvent.close();
     SideMenuEvent.disable();
     return () => {
       DDS.isTab ? SideMenuEvent.open() : null;

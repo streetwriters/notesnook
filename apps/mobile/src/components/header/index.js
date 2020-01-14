@@ -7,6 +7,7 @@ import * as Animatable from 'react-native-animatable';
 import NavigationService from '../../services/NavigationService';
 import {DDS} from '../../../App';
 import {useAppContext} from '../../provider/useAppContext';
+let isOpen = false;
 export const Header = ({
   heading,
   canGoBack = true,
@@ -17,7 +18,6 @@ export const Header = ({
   sendHeight = e => {},
 }) => {
   const {colors} = useAppContext();
-  let isOpen = false;
 
   return (
     <Animatable.View
@@ -69,13 +69,7 @@ export const Header = ({
           <TouchableOpacity
             hitSlop={{top: 20, bottom: 20, left: 50, right: 40}}
             onPress={() => {
-              if (isOpen) {
-                SideMenuEvent.close();
-                isOpen = false;
-              } else {
-                SideMenuEvent.open();
-                isOpen = true;
-              }
+              SideMenuEvent.open();
             }}
             style={{
               justifyContent: 'center',

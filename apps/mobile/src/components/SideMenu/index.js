@@ -7,10 +7,11 @@ import {
   Dimensions,
   Animated,
   TouchableWithoutFeedback,
+  Easing,
 } from 'react-native';
 import PropTypes from 'prop-types';
 import styles from './styles';
-
+import * as Animatable from 'react-native-animatable';
 const deviceScreen = Dimensions.get('window');
 const barrierForward = deviceScreen.width / 4;
 
@@ -25,6 +26,8 @@ export default class SideMenu extends React.Component {
     this.prevLeft = 0;
     this.isOpen = !!props.isOpen;
     this.isGestureEnabled = true;
+
+    this.opacity = new Animated.Value(0);
 
     const initialMenuPositionMultiplier =
       props.menuPosition === 'right' ? -1 : 1;
@@ -105,7 +108,17 @@ export default class SideMenu extends React.Component {
     if (this.isOpen) {
       overlay = (
         <TouchableWithoutFeedback onPress={() => this.openMenu(false)}>
-          <View style={styles.overlay} />
+          <Animated.View
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              bottom: 0,
+              right: 0,
+              backgroundColor: 'black',
+              opacity: this.opacity,
+            }}
+          />
         </TouchableWithoutFeedback>
       );
     }
@@ -124,6 +137,14 @@ export default class SideMenu extends React.Component {
         {overlay}
       </Animated.View>
     );
+  }
+
+  changeOpacity(opacity) {
+    Animated.timing(this.opacity, {
+      toValue: opacity,
+      duration: 400,
+      useNativeDriver: true,
+    }).start();
   }
 
   moveLeft(offset) {
@@ -187,7 +208,9 @@ export default class SideMenu extends React.Component {
 
   openMenu(isOpen) {
     const {hiddenMenuOffset, openMenuOffset} = this.state;
+    this.changeOpacity(isOpen ? 0.4 : 0);
     this.moveLeft(isOpen ? openMenuOffset : hiddenMenuOffset);
+
     this.isOpen = isOpen;
 
     this.forceUpdate();
@@ -215,6 +238,7 @@ export default class SideMenu extends React.Component {
     return (
       <View style={styles.container} onLayout={this.onLayoutChange}>
         {menu}
+
         {this.getContentView()}
       </View>
     );
@@ -263,10 +287,11 @@ SideMenu.defaultProps = {
     ],
   }),
   animationFunction: (prop, value) =>
-    Animated.spring(prop, {
+    Animated.timing(prop, {
       toValue: value,
-      friction: 8,
+      duration: 300,
       useNativeDriver: true,
+      easing: Easing.elastic(0.5),
     }),
   isOpen: false,
 

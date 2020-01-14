@@ -43,13 +43,11 @@ const App = () => {
 
   useEffect(() => {
     DeviceEventEmitter.addListener('openSidebar', () => {
-      DDS.isTab
-        ? setSidebar(w * 0.3)
-        : sideMenuRef.openMenu(!sideMenuRef.isOpen);
+      DDS.isTab ? setSidebar(w * 0.3) : sideMenuRef.openMenu(true);
     });
 
     DeviceEventEmitter.addListener('closeSidebar', () => {
-      DDS.isTab ? setSidebar(0) : sideMenuRef.openMenu(!sideMenuRef.isOpen);
+      DDS.isTab ? setSidebar(0) : sideMenuRef.openMenu(false);
     });
     DeviceEventEmitter.addListener('disableGesture', () => {
       sideMenuRef.setGestureEnabled(false);
@@ -60,10 +58,10 @@ const App = () => {
 
     return () => {
       DeviceEventEmitter.removeListener('openSidebar', () => {
-        DDS.isTab ? setSidebar(0) : sideMenuRef.openMenu(!sideMenuRef.isOpen);
+        DDS.isTab ? setSidebar(0) : sideMenuRef.openMenu(true);
       });
       DeviceEventEmitter.removeListener('closeSidebar', () => {
-        DDS.isTab ? setSidebar(0) : sideMenuRef.openMenu(!sideMenuRef.isOpen);
+        DDS.isTab ? setSidebar(0) : sideMenuRef.openMenu(false);
       });
       DeviceEventEmitter.removeListener('disableGesture', () => {
         sideMenuRef.setGestureEnabled(false);

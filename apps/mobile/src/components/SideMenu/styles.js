@@ -28,6 +28,7 @@ export default StyleSheet.create({
   },
   overlay: {
     ...absoluteStretch,
-    backgroundColor: 'transparent',
+    backgroundColor: 'black',
+    opacity: 0,
   },
 });

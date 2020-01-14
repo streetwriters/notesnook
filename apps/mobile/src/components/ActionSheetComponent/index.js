@@ -37,10 +37,23 @@ export const ActionSheetComponent = ({
 }) => {
   const {colors, changeColorScheme} = useAppContext();
   const [focused, setFocused] = useState(false);
-  const [note, setNote] = useState(item ? item : {});
+  const [note, setNote] = useState({
+    colors: [],
+    tags: [],
+    pinned: false,
+    favorite: false,
+    locked: false,
+    content: {
+      text: '',
+      delta: {},
+    },
+    dateCreated: null,
+  });
 
   useEffect(() => {
-    setNote({...item});
+    if (item.dateCreated !== null) {
+      setNote({...item});
+    }
   }, [item]);
 
   let tagToAdd = null;
@@ -116,6 +129,7 @@ export const ActionSheetComponent = ({
   };
 
   const localRefresh = type => {
+    if (!note || !note.dateCreated) return;
     let toAdd;
     switch (type) {
       case 'note': {
@@ -229,6 +243,7 @@ export const ActionSheetComponent = ({
       name: 'Pin',
       icon: 'tag',
       func: () => {
+        if (!note.dateCreated) return;
         db.pinItem(note.type, note.dateCreated);
         localRefresh(item.type);
       },
@@ -240,6 +255,7 @@ export const ActionSheetComponent = ({
       name: 'Favorite',
       icon: 'star',
       func: () => {
+        if (!note.dateCreated) return;
         db.favoriteItem(note.type, note.dateCreated);
         localRefresh(item.type);
       },
@@ -251,6 +267,7 @@ export const ActionSheetComponent = ({
       name: 'Add to Vault',
       icon: 'lock',
       func: () => {
+        if (!note.dateCreated) return;
         note.locked ? close('unlock') : close('lock');
       },
       close: true,
@@ -364,7 +381,7 @@ export const ActionSheetComponent = ({
                     justifyContent: 'center',
                     alignItems: 'center',
                   }}>
-                  {note.colors.includes(color) ? (
+                  {note && note.colors && note.colors.includes(color) ? (
                     <Icon name="check" color="white" size={SIZE.lg} />
                   ) : null}
                 </View>
@@ -386,45 +403,47 @@ export const ActionSheetComponent = ({
             borderColor: focused ? colors.accent : colors.nav,
             paddingVertical: 5,
           }}>
-          {note.tags.map(tag => (
-            <TouchableOpacity
-              key={tag}
-              onPress={() => {
-                let oldProps = {...note};
+          {note && note.tags
+            ? note.tags.map(tag => (
+                <TouchableOpacity
+                  key={tag}
+                  onPress={() => {
+                    let oldProps = {...note};
 
-                oldProps.tags.splice(oldProps.tags.indexOf(tag), 1);
-                db.addNote({
-                  dateCreated: note.dateCreated,
-                  content: note.content,
-                  title: note.title,
-                  tags: oldProps.tags,
-                });
-                localRefresh(item.type);
-              }}
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'flex-start',
-                alignItems: 'center',
-                margin: 1,
-                paddingHorizontal: 5,
-                paddingVertical: 2.5,
-              }}>
-              <Text
-                style={{
-                  fontFamily: WEIGHT.regular,
-                  fontSize: SIZE.sm,
-                  color: colors.pri,
-                }}>
-                <Text
+                    oldProps.tags.splice(oldProps.tags.indexOf(tag), 1);
+                    db.addNote({
+                      dateCreated: note.dateCreated,
+                      content: note.content,
+                      title: note.title,
+                      tags: oldProps.tags,
+                    });
+                    localRefresh(item.type);
+                  }}
                   style={{
-                    color: colors.accent,
+                    flexDirection: 'row',
+                    justifyContent: 'flex-start',
+                    alignItems: 'center',
+                    margin: 1,
+                    paddingHorizontal: 5,
+                    paddingVertical: 2.5,
                   }}>
-                  {tag.slice(0, 1)}
-                </Text>
-                {tag.slice(1)}
-              </Text>
-            </TouchableOpacity>
-          ))}
+                  <Text
+                    style={{
+                      fontFamily: WEIGHT.regular,
+                      fontSize: SIZE.sm,
+                      color: colors.pri,
+                    }}>
+                    <Text
+                      style={{
+                        color: colors.accent,
+                      }}>
+                      {tag.slice(0, 1)}
+                    </Text>
+                    {tag.slice(1)}
+                  </Text>
+                </TouchableOpacity>
+              ))
+            : null}
           <TextInput
             style={{
               backgroundColor: 'transparent',
