@@ -20,8 +20,7 @@ import Icon from 'react-native-vector-icons/Feather';
 import NavigationService from '../../services/NavigationService';
 import {db} from '../../../App';
 import {useAppContext} from '../../provider/useAppContext';
-import AsyncStorage from '@react-native-community/async-storage';
-
+import FastStorage from 'react-native-fast-storage';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
@@ -228,10 +227,10 @@ export const ActionSheetComponent = ({
       icon: 'moon',
       func: () => {
         if (!colors.night) {
-          AsyncStorage.setItem('theme', JSON.stringify({night: true}));
+          FastStorage.setItem('theme', JSON.stringify({night: true}));
           changeColorScheme(COLOR_SCHEME_DARK);
         } else {
-          AsyncStorage.setItem('theme', JSON.stringify({night: false}));
+          FastStorage.setItem('theme', JSON.stringify({night: false}));
           changeColorScheme(COLOR_SCHEME_LIGHT);
         }
       },

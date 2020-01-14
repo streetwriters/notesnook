@@ -18,10 +18,9 @@ import {
 } from '../../common/common';
 import Icon from 'react-native-vector-icons/Feather';
 import {h} from '../../utils/utils';
-import AsyncStorage from '@react-native-community/async-storage';
 import {AnimatedSafeAreaView} from '../../views/Home';
 import {useAppContext} from '../../provider/useAppContext';
-
+import FastStorage from 'react-native-fast-storage';
 export const Menu = ({close = () => {}, hide, update = () => {}}) => {
   const {colors, changeColorScheme} = useAppContext();
 
@@ -61,10 +60,10 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
       icon: 'moon',
       func: () => {
         if (!colors.night) {
-          AsyncStorage.setItem('theme', JSON.stringify({night: true}));
+          FastStorage.setItem('theme', JSON.stringify({night: true}));
           changeColorScheme(COLOR_SCHEME_DARK);
         } else {
-          AsyncStorage.setItem('theme', JSON.stringify({night: false}));
+          FastStorage.setItem('theme', JSON.stringify({night: false}));
 
           changeColorScheme(COLOR_SCHEME_LIGHT);
         }

@@ -26,7 +26,6 @@
 		655394CA23888EBE008A1476 /* Quicksand-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 655394C223888EBE008A1476 /* Quicksand-Regular.ttf */; };
 		655394CB23888EBE008A1476 /* Quicksand-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 655394C323888EBE008A1476 /* Quicksand-SemiBold.ttf */; };
 		655394CC23888EBE008A1476 /* Quicksand-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 655394C423888EBE008A1476 /* Quicksand-Light.ttf */; };
-		655E77352380917B0049D452 /* Ionicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 655E772F2380917B0049D452 /* Ionicons.ttf */; };
 		656C396C23A41CA20060E3AB /* NotoSerif-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 656C396923A41CA20060E3AB /* NotoSerif-Bold.ttf */; };
 		656C396D23A41CA20060E3AB /* NotoSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 656C396A23A41CA20060E3AB /* NotoSans-Regular.ttf */; };
 		656C396E23A41CA20060E3AB /* NotoSerif-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 656C396B23A41CA20060E3AB /* NotoSerif-Regular.ttf */; };
@@ -88,7 +87,6 @@
 		655394C223888EBE008A1476 /* Quicksand-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Regular.ttf"; sourceTree = "<group>"; };
 		655394C323888EBE008A1476 /* Quicksand-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-SemiBold.ttf"; sourceTree = "<group>"; };
 		655394C423888EBE008A1476 /* Quicksand-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Light.ttf"; sourceTree = "<group>"; };
-		655E772F2380917B0049D452 /* Ionicons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Ionicons.ttf; sourceTree = "<group>"; };
 		656C396923A41CA20060E3AB /* NotoSerif-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "NotoSerif-Bold.ttf"; sourceTree = "<group>"; };
 		656C396A23A41CA20060E3AB /* NotoSans-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "NotoSans-Regular.ttf"; sourceTree = "<group>"; };
 		656C396B23A41CA20060E3AB /* NotoSerif-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "NotoSerif-Regular.ttf"; sourceTree = "<group>"; };
@@ -225,14 +223,6 @@
 			path = fonts;
 			sourceTree = "<group>";
 		};
-		655E772D2380917B0049D452 /* Fonts */ = {
-			isa = PBXGroup;
-			children = (
-				655E772F2380917B0049D452 /* Ionicons.ttf */,
-			);
-			path = Fonts;
-			sourceTree = "<group>";
-		};
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
@@ -244,7 +234,6 @@
 			isa = PBXGroup;
 			children = (
 				655394BB23888EBE008A1476 /* web */,
-				655E772D2380917B0049D452 /* Fonts */,
 				13B07FAE1A68108700A75B9A /* Notes */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* NotesTests */,
@@ -415,7 +404,6 @@
 				655394C723888EBE008A1476 /* fonts.css in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				655394C623888EBE008A1476 /* texteditor.html in Resources */,
-				655E77352380917B0049D452 /* Ionicons.ttf in Resources */,
 				655394CB23888EBE008A1476 /* Quicksand-SemiBold.ttf in Resources */,
 				655394CC23888EBE008A1476 /* Quicksand-Light.ttf in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
@@ -510,6 +498,7 @@
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Solid.ttf",
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Fontisto.ttf",
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Foundation.ttf",
+				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Ionicons.ttf",
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf",
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf",
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Octicons.ttf",
@@ -528,6 +517,7 @@
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FontAwesome5_Solid.ttf",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Fontisto.ttf",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Foundation.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Ionicons.ttf",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MaterialCommunityIcons.ttf",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MaterialIcons.ttf",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Octicons.ttf",

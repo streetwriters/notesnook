@@ -18,11 +18,10 @@ import {
 import Icon from 'react-native-vector-icons/Feather';
 import {Header} from '../../components/header';
 import {FlatList} from 'react-native-gesture-handler';
-import AsyncStorage from '@react-native-community/async-storage';
 import {useAppContext} from '../../provider/useAppContext';
 import {useIsFocused} from 'react-navigation-hooks';
 import Container from '../../components/Container';
-
+import FastStorage from 'react-native-fast-storage';
 export const Settings = ({navigation}) => {
   const {colors, changeAccentColor, changeColorScheme} = useAppContext();
   //const [colors, setColors] = useState(COLOR_SCHEME_LIGHT);
@@ -81,7 +80,7 @@ export const Settings = ({navigation}) => {
                         onPress={() => {
                           changeAccentColor(item);
 
-                          AsyncStorage.setItem('accentColor', item);
+                          FastStorage.setItem('accentColor', item);
                         }}
                         style={{
                           flexDirection: 'row',
@@ -109,13 +108,13 @@ export const Settings = ({navigation}) => {
                   <TouchableOpacity
                     onPress={() => {
                       if (!colors.night) {
-                        AsyncStorage.setItem(
+                        FastStorage.setItem(
                           'theme',
                           JSON.stringify({night: true}),
                         );
                         changeColorScheme(COLOR_SCHEME_DARK);
                       } else {
-                        AsyncStorage.setItem(
+                        FastStorage.setItem(
                           'theme',
                           JSON.stringify({night: false}),
                         );

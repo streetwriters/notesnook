@@ -27,7 +27,7 @@ import {
 
 export const DDS = new DeviceDetectionService();
 export const db = new Storage(StorageInterface);
-let timer = null;
+
 let sideMenuRef;
 const App = () => {
   // Global State
@@ -97,7 +97,7 @@ const App = () => {
   // Render
 
   if (!isIntialized) {
-    return <View />;
+    return <></>;
   }
   console.log('rerendering plain');
   return (

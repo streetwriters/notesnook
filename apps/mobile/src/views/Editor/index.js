@@ -41,7 +41,7 @@ let note = {};
 
 const Editor = ({navigation}) => {
   // Global State
-  const {colors} = useAppContext();
+  const {colors, updateDB} = useAppContext();
 
   // Local State
 
@@ -93,7 +93,7 @@ const Editor = ({navigation}) => {
       },
       dateCreated: timestamp,
     });
-
+    updateDB();
     if (lockNote && noteProps.locked) {
       db.lockNote(timestamp, 'password');
     }
@@ -296,6 +296,7 @@ const Editor = ({navigation}) => {
 
   useEffect(() => {
     let handleBack = BackHandler.addEventListener('hardwareBackPress', () => {
+      updateDB();
       setDialog(true);
       return true;
     });

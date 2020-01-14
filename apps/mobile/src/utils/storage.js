@@ -1,21 +1,21 @@
-import AsyncStorage from '@react-native-community/async-storage';
+import FastStorage from 'react-native-fast-storage';
 import {NativeModules, Platform} from 'react-native';
 var Aes = NativeModules.Aes;
 
 async function read(key) {
-  return await AsyncStorage.getItem(key);
+  return await FastStorage.getItem(key);
 }
 
 async function write(key, data) {
-  return await AsyncStorage.setItem(key, data);
+  return await FastStorage.setItem(key, data);
 }
 
 function remove(key) {
-  AsyncStorage.removeItem(key);
+  FastStorage.removeItem(key);
 }
 
 function clear() {
-  AsyncStorage.clear();
+  FastStorage.clearStore();
 }
 
 function encrypt(password, data) {

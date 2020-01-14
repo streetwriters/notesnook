@@ -20,7 +20,8 @@ import {
 } from '../../common/common';
 import Icon from 'react-native-vector-icons/Feather';
 import {h} from '../../utils/utils';
-import AsyncStorage from '@react-native-community/async-storage';
+import FastStorage from 'react-native-fast-storage';
+
 import {AnimatedSafeAreaView} from '../../views/Home';
 import {TextInput} from 'react-native-gesture-handler';
 import {useAppContext} from '../../provider/useAppContext';
@@ -276,13 +277,13 @@ export const EditorMenu = ({
                   icon: 'moon',
                   func: () => {
                     if (!colors.night) {
-                      AsyncStorage.setItem(
+                      FastStorage.setItem(
                         'theme',
                         JSON.stringify(COLOR_SCHEME_DARK),
                       );
                       changeColorScheme(COLOR_SCHEME_DARK);
                     } else {
-                      AsyncStorage.setItem(
+                      FastStorage.setItem(
                         'theme',
                         JSON.stringify(COLOR_SCHEME_LIGHT),
                       );

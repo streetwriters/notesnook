@@ -1,6 +1,6 @@
 import {DeviceEventEmitter, StatusBar, PixelRatio} from 'react-native';
-import AsyncStorage from '@react-native-community/async-storage';
 
+import FastStorage from 'react-native-fast-storage';
 //COLOR SCHEME
 export const ACCENT = {
   color: '#0560FF',
@@ -91,18 +91,18 @@ export function setColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
 }
 
 export async function getColorScheme() {
-  let accentColor = await AsyncStorage.getItem('accentColor');
-  let t = await AsyncStorage.getItem('theme');
+  let accentColor = await FastStorage.getItem('accentColor');
+  let t = await FastStorage.getItem('theme');
 
   if (typeof accentColor !== 'string') {
-    AsyncStorage.setItem('accentColor', '#0560FF');
+    FastStorage.setItem('accentColor', '#0560FF');
     setAccentColor('#0560FF');
   } else {
     setAccentColor(accentColor);
   }
 
   if (typeof t !== 'string') {
-    AsyncStorage.setItem('theme', JSON.stringify({night: false}));
+    FastStorage.setItem('theme', JSON.stringify({night: false}));
     setColorScheme(COLOR_SCHEME_LIGHT);
   } else {
     let themeToSet = JSON.parse(t);
