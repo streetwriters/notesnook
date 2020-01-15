@@ -36,6 +36,7 @@ export default class ActionSheet extends Component {
     this.scrollAnimationEndValue;
     this.hasBounced;
     this.scrollViewRef;
+    this.layoutHasCalled = false;
   }
 
   _setModalVisible = () => {
@@ -55,26 +56,25 @@ export default class ActionSheet extends Component {
       this.setState(
         {
           modalVisible: false,
-          layoutHasCalled: false,
         },
         () => {
+          this.layoutHasCalled = false;
           if (typeof this.props.onClose === 'function') this.props.onClose();
         },
       );
-    }, 150);
+    }, 500);
   };
 
   _showModal = event => {
     let {gestureEnabled, bounceOffset, initialOffsetFromBottom} = this.props;
     let addFactor = deviceHeight * 0.1;
     let height = event.nativeEvent.layout.height;
-    console.log('layout called again');
-    if (this.state.layoutHasCalled) {
+    if (this.layoutHasCalled) {
       let diff;
       if (height > this.customComponentHeight) {
         diff = height - this.customComponentHeight;
         this._scrollTo(this.prevScroll + diff);
-        console.log(this.prevScroll);
+
         this.customComponentHeight = height;
       } else {
         diff = this.customComponentHeight - height;
@@ -85,22 +85,22 @@ export default class ActionSheet extends Component {
     } else {
       this.customComponentHeight = height;
 
-      this._scrollTo(
-        gestureEnabled
-          ? this.customComponentHeight * initialOffsetFromBottom +
-              addFactor +
-              bounceOffset
-          : this.customComponentHeight + bounceOffset,
-      );
-      this.setState({
-        layoutHasCalled: true,
-      });
+      setTimeout(() => {
+        this._scrollTo(
+          gestureEnabled
+            ? this.customComponentHeight * initialOffsetFromBottom +
+                addFactor +
+                bounceOffset
+            : this.customComponentHeight + bounceOffset,
+        );
+      }, 300);
+
+      this.layoutHasCalled = true;
     }
   };
 
   _onScrollBeginDrag = event => {
     let verticalOffset = event.nativeEvent.contentOffset.y;
-
     this.prevScroll = verticalOffset;
   };
 

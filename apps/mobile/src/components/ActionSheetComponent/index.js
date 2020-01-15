@@ -36,18 +36,22 @@ export const ActionSheetComponent = ({
 }) => {
   const {colors, changeColorScheme} = useAppContext();
   const [focused, setFocused] = useState(false);
-  const [note, setNote] = useState({
-    colors: [],
-    tags: [],
-    pinned: false,
-    favorite: false,
-    locked: false,
-    content: {
-      text: '',
-      delta: {},
-    },
-    dateCreated: null,
-  });
+  const [note, setNote] = useState(
+    item
+      ? item
+      : {
+          colors: [],
+          tags: [],
+          pinned: false,
+          favorite: false,
+          locked: false,
+          content: {
+            text: '',
+            delta: {},
+          },
+          dateCreated: null,
+        },
+  );
 
   useEffect(() => {
     if (item.dateCreated !== null) {
@@ -277,10 +281,6 @@ export const ActionSheetComponent = ({
 
   return (
     <View
-      onLayout={() => {
-        console.log(item);
-        setNote({...item});
-      }}
       style={{
         paddingBottom: 15,
         backgroundColor: colors.bg,
