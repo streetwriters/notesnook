@@ -26,7 +26,7 @@ export default class SideMenu extends React.Component {
     this.prevLeft = 0;
     this.isOpen = !!props.isOpen;
     this.isGestureEnabled = true;
-
+    this.overlay;
     this.opacity = new Animated.Value(0);
 
     const initialMenuPositionMultiplier =
@@ -103,25 +103,7 @@ export default class SideMenu extends React.Component {
    * @return {React.Component}
    */
   getContentView() {
-    let overlay = null;
-
-    if (this.isOpen) {
-      overlay = (
-        <TouchableWithoutFeedback onPress={() => this.openMenu(false)}>
-          <Animated.View
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              bottom: 0,
-              right: 0,
-              backgroundColor: 'black',
-              opacity: this.opacity,
-            }}
-          />
-        </TouchableWithoutFeedback>
-      );
-    }
+    //let overlay = null;
 
     const {width, height} = this.state;
     const ref = sideMenu => (this.sideMenu = sideMenu);
@@ -134,17 +116,49 @@ export default class SideMenu extends React.Component {
     return (
       <Animated.View style={style} ref={ref} {...this.responder.panHandlers}>
         {this.props.children}
-        {overlay}
+
+        <TouchableWithoutFeedback onPress={() => this.openMenu(false)}>
+          <Animated.View
+            ref={ref => (this.overlay = ref)}
+            style={{
+              display: 'none',
+              position: 'relative',
+              top: 0,
+              left: 0,
+              bottom: 0,
+              right: 0,
+              backgroundColor: 'black',
+              opacity: this.opacity,
+            }}
+          />
+        </TouchableWithoutFeedback>
       </Animated.View>
     );
   }
 
   changeOpacity(opacity) {
+    if (opacity === 0.5) {
+      this.overlay.setNativeProps({
+        style: {
+          display: 'flex',
+          position: 'absolute',
+        },
+      });
+    }
     Animated.timing(this.opacity, {
       toValue: opacity,
       duration: 400,
       useNativeDriver: true,
-    }).start();
+    }).start(() => {
+      if (opacity === 0) {
+        this.overlay.setNativeProps({
+          style: {
+            display: 'none',
+            position: 'relative',
+          },
+        });
+      }
+    });
   }
 
   moveLeft(offset) {
@@ -170,6 +184,9 @@ export default class SideMenu extends React.Component {
         newLeft = this.menuPositionMultiplier() * this.state.openMenuOffset;
       }
 
+      let o = newLeft / this.props.openMenuOffset;
+      this.opacity.setValue(o * 0.5);
+
       this.props.onMove(newLeft);
       this.state.left.setValue(newLeft);
     }
@@ -193,7 +210,12 @@ export default class SideMenu extends React.Component {
       if (this.isOpen) {
         return touchMoved;
       }
-
+      this.overlay.setNativeProps({
+        style: {
+          display: 'flex',
+          position: 'absolute',
+        },
+      });
       const withinEdgeHitWidth =
         this.props.menuPosition === 'right'
           ? gestureState.moveX > deviceScreen.width - this.props.edgeHitWidth
@@ -208,7 +230,7 @@ export default class SideMenu extends React.Component {
 
   openMenu(isOpen) {
     const {hiddenMenuOffset, openMenuOffset} = this.state;
-    this.changeOpacity(isOpen ? 0.4 : 0);
+    this.changeOpacity(isOpen ? 0.5 : 0);
     this.moveLeft(isOpen ? openMenuOffset : hiddenMenuOffset);
 
     this.isOpen = isOpen;
