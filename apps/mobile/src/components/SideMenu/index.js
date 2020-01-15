@@ -11,7 +11,6 @@ import {
 } from 'react-native';
 import PropTypes from 'prop-types';
 import styles from './styles';
-import * as Animatable from 'react-native-animatable';
 const deviceScreen = Dimensions.get('window');
 const barrierForward = deviceScreen.width / 4;
 
@@ -120,15 +119,19 @@ export default class SideMenu extends React.Component {
         <TouchableWithoutFeedback onPress={() => this.openMenu(false)}>
           <Animated.View
             ref={ref => (this.overlay = ref)}
+            onTouchStart={() => {
+              console.log('hello');
+            }}
             style={{
               display: 'none',
               position: 'relative',
               top: 0,
+              right: 0,
               left: 0,
               bottom: 0,
-              right: 0,
               backgroundColor: 'black',
               opacity: this.opacity,
+              zIndex: 1,
             }}
           />
         </TouchableWithoutFeedback>
@@ -138,10 +141,12 @@ export default class SideMenu extends React.Component {
 
   changeOpacity(opacity) {
     if (opacity === 0.5) {
+      console.log('i am unset');
       this.overlay.setNativeProps({
         style: {
           display: 'flex',
           position: 'absolute',
+          zIndex: 1,
         },
       });
     }
@@ -150,11 +155,13 @@ export default class SideMenu extends React.Component {
       duration: 400,
       useNativeDriver: true,
     }).start(() => {
-      if (opacity === 0) {
+      if (opacity < 0.5) {
+        console.log('i am set');
         this.overlay.setNativeProps({
           style: {
             display: 'none',
             position: 'relative',
+            zIndex: -1,
           },
         });
       }
@@ -176,7 +183,13 @@ export default class SideMenu extends React.Component {
   handlePanResponderMove(e, gestureState) {
     if (this.state.left.__getValue() * this.menuPositionMultiplier() >= 0) {
       let newLeft = this.prevLeft + gestureState.dx;
-
+      this.overlay.setNativeProps({
+        style: {
+          display: 'flex',
+          position: 'absolute',
+          zIndex: 1,
+        },
+      });
       if (
         !this.props.bounceBackOnOverdraw &&
         Math.abs(newLeft) > this.state.openMenuOffset
@@ -210,12 +223,7 @@ export default class SideMenu extends React.Component {
       if (this.isOpen) {
         return touchMoved;
       }
-      this.overlay.setNativeProps({
-        style: {
-          display: 'flex',
-          position: 'absolute',
-        },
-      });
+
       const withinEdgeHitWidth =
         this.props.menuPosition === 'right'
           ? gestureState.moveX > deviceScreen.width - this.props.edgeHitWidth
