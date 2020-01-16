@@ -5,8 +5,6 @@ import {
   TouchableOpacity,
   Dimensions,
   TextInput,
-  FlatList,
-  Platform,
 } from 'react-native';
 import {
   SIZE,
@@ -21,6 +19,7 @@ import NavigationService from '../../services/NavigationService';
 import {db} from '../../../App';
 import {useAppContext} from '../../provider/useAppContext';
 import FastStorage from 'react-native-fast-storage';
+import {useTracked} from '../../provider';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
@@ -34,7 +33,13 @@ export const ActionSheetComponent = ({
   rowItems = [],
   columnItems = [],
 }) => {
-  const {colors, changeColorScheme} = useAppContext();
+  const [state, dispatch] = useTracked();
+  const {colors} = state;
+
+  // Todo
+
+  const changeColorScheme = () => {};
+
   const [focused, setFocused] = useState(false);
   const [note, setNote] = useState(
     item
@@ -149,7 +154,7 @@ export const ActionSheetComponent = ({
       }
     }
 
-    setWillRefresh(toAdd);
+    dispatch({type: 'updateNotes'});
     setNote({...toAdd});
   };
 
@@ -279,6 +284,191 @@ export const ActionSheetComponent = ({
     },
   ];
 
+  const _renderTag = tag => (
+    <TouchableOpacity
+      key={tag}
+      onPress={() => {
+        let oldProps = {...note};
+
+        oldProps.tags.splice(oldProps.tags.indexOf(tag), 1);
+        db.addNote({
+          dateCreated: note.dateCreated,
+          content: note.content,
+          title: note.title,
+          tags: oldProps.tags,
+        });
+        localRefresh(item.type);
+      }}
+      style={{
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        margin: 1,
+        paddingHorizontal: 5,
+        paddingVertical: 2.5,
+      }}>
+      <Text
+        style={{
+          fontFamily: WEIGHT.regular,
+          fontSize: SIZE.sm,
+          color: colors.pri,
+        }}>
+        <Text
+          style={{
+            color: colors.accent,
+          }}>
+          {tag.slice(0, 1)}
+        </Text>
+        {tag.slice(1)}
+      </Text>
+    </TouchableOpacity>
+  );
+
+  const _renderColor = color => (
+    <TouchableOpacity
+      key={color}
+      onPress={() => {
+        let noteColors = note.colors;
+
+        if (noteColors.includes(color)) {
+          noteColors.splice(color, 1);
+        } else {
+          noteColors.push(color);
+        }
+
+        db.addNote({
+          dateCreated: note.dateCreated,
+          colors: noteColors,
+          content: note.content,
+          title: note.title,
+        });
+        localRefresh(item.type);
+      }}
+      style={{
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        borderColor: colors.nav,
+      }}>
+      <View
+        style={{
+          width: (w - 12) / 10,
+          height: (w - 12) / 10,
+          backgroundColor: color,
+          borderRadius: 100,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        {note && note.colors && note.colors.includes(color) ? (
+          <Icon name="check" color="white" size={SIZE.lg} />
+        ) : null}
+      </View>
+    </TouchableOpacity>
+  );
+
+  const _renderRowItem = rowItem =>
+    rowItems.includes(rowItem.name) ? (
+      <TouchableOpacity
+        onPress={rowItem.func}
+        key={rowItem.name}
+        style={{
+          alignItems: 'center',
+          width: (w - 24) / rowItems.length,
+        }}>
+        <Icon
+          style={{
+            width: 50,
+            height: 40,
+            borderRadius: 100,
+            justifyContent: 'center',
+            alignItems: 'center',
+            textAlign: 'center',
+            textAlignVertical: 'center',
+          }}
+          name={rowItem.icon}
+          size={SIZE.lg}
+          color={colors.accent}
+        />
+
+        <Text
+          style={{
+            fontFamily: WEIGHT.regular,
+            fontSize: SIZE.xs + 1,
+            color: colors.pri,
+          }}>
+          {rowItem.name}
+        </Text>
+      </TouchableOpacity>
+    ) : null;
+
+  const _renderColumnItem = item =>
+    columnItems.includes(item.name) ? (
+      <TouchableOpacity
+        key={item.name}
+        activeOpacity={opacity}
+        onPress={() => {
+          item.func();
+        }}
+        style={{
+          width: '100%',
+          alignSelf: 'center',
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'flex-end',
+          paddingHorizontal: 12,
+          paddingVertical: pv + 5,
+        }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+          }}>
+          <Icon
+            style={{
+              width: 30,
+            }}
+            name={item.icon}
+            color={colors.pri}
+            size={SIZE.md}
+          />
+          <Text
+            style={{
+              fontFamily: WEIGHT.regular,
+              fontSize: SIZE.sm,
+              color: colors.pri,
+            }}>
+            {item.name}
+          </Text>
+        </View>
+        {item.switch ? (
+          <Icon
+            size={SIZE.lg + 2}
+            color={item.on ? colors.accent : colors.icon}
+            name={item.on ? 'toggle-right' : 'toggle-left'}
+          />
+        ) : (
+          undefined
+        )}
+        {item.check ? (
+          <TouchableOpacity
+            style={{
+              borderWidth: 2,
+              borderColor: item.on ? colors.accent : colors.icon,
+              width: 23,
+              height: 23,
+              justifyContent: 'center',
+              alignItems: 'center',
+              borderRadius: 100,
+              paddingTop: 3,
+            }}>
+            {item.on ? (
+              <Icon size={SIZE.sm - 2} color={colors.accent} name="check" />
+            ) : null}
+          </TouchableOpacity>
+        ) : null}
+      </TouchableOpacity>
+    ) : null;
+
   return (
     <View
       style={{
@@ -296,41 +486,7 @@ export const ActionSheetComponent = ({
           borderBottomWidth: 1,
           borderBottomColor: colors.nav,
         }}>
-        {rowItemsData.map(rowItem =>
-          rowItems.includes(rowItem.name) ? (
-            <TouchableOpacity
-              onPress={rowItem.func}
-              key={rowItem.name}
-              style={{
-                alignItems: 'center',
-                width: (w - 24) / rowItems.length,
-              }}>
-              <Icon
-                style={{
-                  width: 50,
-                  height: 40,
-                  borderRadius: 100,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  textAlign: 'center',
-                  textAlignVertical: 'center',
-                }}
-                name={rowItem.icon}
-                size={SIZE.lg}
-                color={colors.accent}
-              />
-
-              <Text
-                style={{
-                  fontFamily: WEIGHT.regular,
-                  fontSize: SIZE.xs + 1,
-                  color: colors.pri,
-                }}>
-                {rowItem.name}
-              </Text>
-            </TouchableOpacity>
-          ) : null,
-        )}
+        {rowItemsData.map(_renderRowItem)}
       </View>
 
       {hasColors ? (
@@ -345,47 +501,7 @@ export const ActionSheetComponent = ({
             justifyContent: 'space-between',
           }}>
           {['red', 'yellow', 'green', 'blue', 'purple', 'orange', 'gray'].map(
-            color => (
-              <TouchableOpacity
-                key={color}
-                onPress={() => {
-                  let noteColors = note.colors;
-
-                  if (noteColors.includes(color)) {
-                    noteColors.splice(color, 1);
-                  } else {
-                    noteColors.push(color);
-                  }
-
-                  db.addNote({
-                    dateCreated: note.dateCreated,
-                    colors: noteColors,
-                    content: note.content,
-                    title: note.title,
-                  });
-                  localRefresh(item.type);
-                }}
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'flex-start',
-                  alignItems: 'center',
-                  borderColor: colors.nav,
-                }}>
-                <View
-                  style={{
-                    width: (w - 12) / 10,
-                    height: (w - 12) / 10,
-                    backgroundColor: color,
-                    borderRadius: 100,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}>
-                  {note && note.colors && note.colors.includes(color) ? (
-                    <Icon name="check" color="white" size={SIZE.lg} />
-                  ) : null}
-                </View>
-              </TouchableOpacity>
-            ),
+            _renderColor,
           )}
         </View>
       ) : null}
@@ -402,47 +518,7 @@ export const ActionSheetComponent = ({
             borderColor: focused ? colors.accent : colors.nav,
             paddingVertical: 5,
           }}>
-          {note && note.tags
-            ? note.tags.map(tag => (
-                <TouchableOpacity
-                  key={tag}
-                  onPress={() => {
-                    let oldProps = {...note};
-
-                    oldProps.tags.splice(oldProps.tags.indexOf(tag), 1);
-                    db.addNote({
-                      dateCreated: note.dateCreated,
-                      content: note.content,
-                      title: note.title,
-                      tags: oldProps.tags,
-                    });
-                    localRefresh(item.type);
-                  }}
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'flex-start',
-                    alignItems: 'center',
-                    margin: 1,
-                    paddingHorizontal: 5,
-                    paddingVertical: 2.5,
-                  }}>
-                  <Text
-                    style={{
-                      fontFamily: WEIGHT.regular,
-                      fontSize: SIZE.sm,
-                      color: colors.pri,
-                    }}>
-                    <Text
-                      style={{
-                        color: colors.accent,
-                      }}>
-                      {tag.slice(0, 1)}
-                    </Text>
-                    {tag.slice(1)}
-                  </Text>
-                </TouchableOpacity>
-              ))
-            : null}
+          {note && note.tags ? note.tags.map(_renderTag) : null}
           <TextInput
             style={{
               backgroundColor: 'transparent',
@@ -475,80 +551,7 @@ export const ActionSheetComponent = ({
       ) : null}
 
       {columnItems.length > 0 ? (
-        <View>
-          {columnItemsData.map(item =>
-            columnItems.includes(item.name) ? (
-              <TouchableOpacity
-                key={item.name}
-                activeOpacity={opacity}
-                onPress={() => {
-                  item.func();
-                }}
-                style={{
-                  width: '100%',
-                  alignSelf: 'center',
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'flex-end',
-                  paddingHorizontal: 12,
-                  paddingVertical: pv + 5,
-                }}>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                  }}>
-                  <Icon
-                    style={{
-                      width: 30,
-                    }}
-                    name={item.icon}
-                    color={colors.pri}
-                    size={SIZE.md}
-                  />
-                  <Text
-                    style={{
-                      fontFamily: WEIGHT.regular,
-                      fontSize: SIZE.sm,
-                      color: colors.pri,
-                    }}>
-                    {item.name}
-                  </Text>
-                </View>
-                {item.switch ? (
-                  <Icon
-                    size={SIZE.lg + 2}
-                    color={item.on ? colors.accent : colors.icon}
-                    name={item.on ? 'toggle-right' : 'toggle-left'}
-                  />
-                ) : (
-                  undefined
-                )}
-                {item.check ? (
-                  <TouchableOpacity
-                    style={{
-                      borderWidth: 2,
-                      borderColor: item.on ? colors.accent : colors.icon,
-                      width: 23,
-                      height: 23,
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      borderRadius: 100,
-                      paddingTop: 3,
-                    }}>
-                    {item.on ? (
-                      <Icon
-                        size={SIZE.sm - 2}
-                        color={colors.accent}
-                        name="check"
-                      />
-                    ) : null}
-                  </TouchableOpacity>
-                ) : null}
-              </TouchableOpacity>
-            ) : null,
-          )}
-        </View>
+        <View>{columnItemsData.map(_renderColumnItem)}</View>
       ) : null}
     </View>
   );
