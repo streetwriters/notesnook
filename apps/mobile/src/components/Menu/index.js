@@ -21,8 +21,14 @@ import {h} from '../../utils/utils';
 import {AnimatedSafeAreaView} from '../../views/Home';
 import {useAppContext} from '../../provider/useAppContext';
 import FastStorage from 'react-native-fast-storage';
+import {useTracked} from '../../provider';
 export const Menu = ({close = () => {}, hide, update = () => {}}) => {
-  const {colors, changeColorScheme} = useAppContext();
+  const [state, dispatch] = useTracked();
+  const {colors} = state;
+
+  // todo
+
+  const changeColorScheme = () => {};
 
   const listItems = [
     {

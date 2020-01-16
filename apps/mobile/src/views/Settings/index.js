@@ -22,8 +22,14 @@ import {useAppContext} from '../../provider/useAppContext';
 import {useIsFocused} from 'react-navigation-hooks';
 import Container from '../../components/Container';
 import FastStorage from 'react-native-fast-storage';
+import {useTracked} from '../../provider';
 export const Settings = ({navigation}) => {
-  const {colors, changeAccentColor, changeColorScheme} = useAppContext();
+  const [state, dispatch] = useTracked();
+  const {colors} = state;
+
+  ///
+  const changeAccentColor = () => {};
+  const changeColorScheme = () => {};
   //const [colors, setColors] = useState(COLOR_SCHEME_LIGHT);
   let isFocused = useIsFocused();
 
@@ -77,6 +83,7 @@ export const Settings = ({navigation}) => {
                       '#fabebe',
                     ].map(item => (
                       <TouchableOpacity
+                        key={item}
                         onPress={() => {
                           changeAccentColor(item);
 
@@ -165,6 +172,7 @@ export const Settings = ({navigation}) => {
           keyExtractor={item => item.name}
           renderItem={({item, index}) => (
             <TouchableOpacity
+              key={item.name}
               activeOpacity={opacity}
               onPress={item.func}
               style={{

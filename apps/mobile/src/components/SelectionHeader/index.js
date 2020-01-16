@@ -5,6 +5,7 @@ import {w} from '../../utils/utils';
 import Icon from 'react-native-vector-icons/Feather';
 import * as Animatable from 'react-native-animatable';
 import {useAppContext} from '../../provider/useAppContext';
+import {useTracked} from '../../provider';
 
 export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(
   SafeAreaView,
@@ -12,12 +13,13 @@ export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(
 
 export const SelectionHeader = ({navigation}) => {
   // State
-  const {
-    colors,
-    selectionMode,
-    selectedItemsList,
-    changeSelectionMode,
-  } = useAppContext();
+  const [state, dispatch] = useTracked();
+  const {colors, selectionMode, selectedItemsList} = state;
+
+  ///
+  const updateDB = () => {};
+  const updateSelectionList = () => {};
+  const changeSelectionMode = () => {};
 
   // Render
 

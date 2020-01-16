@@ -12,12 +12,15 @@ import Icon from 'react-native-vector-icons/Feather';
 import * as Animatable from 'react-native-animatable';
 import {h, w} from '../../utils/utils';
 import {useAppContext} from '../../provider/useAppContext';
+import {useTracked} from '../../provider';
 
 const AnimatedTouchableOpacity = Animatable.createAnimatableComponent(
   TouchableOpacity,
 );
 export const Toast = () => {
-  const {colors} = useAppContext();
+  const [state, dispatch] = useTracked();
+  const {colors} = state;
+
   const [toast, setToast] = useState(false);
   const [message, setMessage] = useState([]);
   const [data, setData] = useState([]);

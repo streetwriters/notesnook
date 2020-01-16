@@ -2,13 +2,7 @@ import React, {useState, useEffect} from 'react';
 import NavigationService, {
   AppContainer,
 } from './src/services/NavigationService';
-import {
-  StatusBar,
-  View,
-  DeviceEventEmitter,
-  Platform,
-  Animated,
-} from 'react-native';
+import {StatusBar, View, DeviceEventEmitter, Platform} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import {h, w} from './src/utils/utils';
 import {Toast} from './src/components/Toast';
@@ -16,27 +10,22 @@ import {Menu} from './src/components/Menu';
 import SideMenu from './src/components/SideMenu';
 import Storage from 'notes-core/api/database';
 import StorageInterface from './src/utils/storage';
-import {AppProvider} from './src/provider';
+import {Provider, useTracked} from './src/provider';
 import {DeviceDetectionService} from './src/utils/deviceDetection';
-
-import {
-  COLOR_SCHEME,
-  onThemeUpdate,
-  clearThemeUpdateListener,
-} from './src/common/common';
+import {DialogManager} from './src/components/DialogManager';
 
 export const DDS = new DeviceDetectionService();
 export const db = new Storage(StorageInterface);
 
 let sideMenuRef;
 const App = () => {
+  const [state, dispatch] = useTracked();
+  const {colors} = state;
   // Global State
-  const [colors, setColors] = useState(COLOR_SCHEME);
 
   // Local State
   const [sidebar, setSidebar] = useState(w * 0.3);
-  const [isIntialized, setIsInitialized] = useState(false);
-
+  const [init, setInit] = useState(false);
   // Variables
 
   // Effects
@@ -82,26 +71,17 @@ const App = () => {
 
   useEffect(() => {
     db.init().then(() => {
-      setIsInitialized(true);
+      setInit(true);
     });
-    onThemeUpdate(() => {
-      setColors({...COLOR_SCHEME});
-    });
-    return () => {
-      clearThemeUpdateListener(() => {
-        setColors({...COLOR_SCHEME});
-      });
-    };
   }, []);
 
   // Render
 
-  if (!isIntialized) {
+  if (!init) {
     return <></>;
   }
-  console.log('rerendering plain');
   return (
-    <AppProvider>
+    <Provider>
       <View
         style={{
           width: '100%',
@@ -164,8 +144,14 @@ const App = () => {
           </SideMenu>
         )}
         <Toast />
+        <DialogManager
+          colors={colors}
+          update={type => {
+            dispatch({type: type});
+          }}
+        />
       </View>
-    </AppProvider>
+    </Provider>
   );
 };
 

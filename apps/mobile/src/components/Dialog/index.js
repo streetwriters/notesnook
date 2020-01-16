@@ -15,6 +15,7 @@ import {
 import Icon from 'react-native-vector-icons/Feather';
 import {getElevation} from '../../utils/utils';
 import {useAppContext} from '../../provider/useAppContext';
+import {useTracked} from '../../provider';
 
 export const Dialog = ({
   title,
@@ -26,7 +27,8 @@ export const Dialog = ({
   close = () => {},
   positivePress = () => {},
 }) => {
-  const {colors} = useAppContext();
+  const [state, dispatch] = useTracked();
+  const {colors} = state;
 
   return (
     <Modal

@@ -3,10 +3,16 @@ import {View, TouchableOpacity} from 'react-native';
 import {SIZE} from '../../common/common';
 import Icon from 'react-native-vector-icons/Feather';
 import {w} from '../../utils/utils';
-import {useAppContext} from '../../provider/useAppContext';
+import {useTracked} from '../../provider';
 
 const SelectionWrapper = ({children, item}) => {
-  const {colors, selectedItemsList, selectionMode} = useAppContext();
+  const [state, dispatch] = useTracked();
+  const {colors, selectionMode, selectedItemsList} = state;
+
+  ///
+  const updateDB = () => {};
+  const updateSelectionList = () => {};
+  const changeSelectionMode = () => {};
   return (
     <View
       style={{
@@ -14,6 +20,7 @@ const SelectionWrapper = ({children, item}) => {
         justifyContent: 'space-between',
         alignItems: 'center',
         width: w - 24,
+
         marginHorizontal: 12,
       }}>
       <TouchableOpacity
@@ -24,6 +31,7 @@ const SelectionWrapper = ({children, item}) => {
           justifyContent: 'center',
           alignItems: 'flex-start',
           display: selectionMode ? 'flex' : 'none',
+          opacity: selectionMode ? 1 : 0,
         }}>
         <View
           style={{

@@ -7,6 +7,7 @@ import * as Animatable from 'react-native-animatable';
 import NavigationService from '../../services/NavigationService';
 import {DDS} from '../../../App';
 import {useAppContext} from '../../provider/useAppContext';
+import {useTracked} from '../../provider';
 let isOpen = false;
 export const Header = ({
   heading,
@@ -17,7 +18,8 @@ export const Header = ({
   verticalMenu = false,
   sendHeight = e => {},
 }) => {
-  const {colors} = useAppContext();
+  const [state, dispatch] = useTracked();
+  const {colors} = state;
 
   return (
     <Animatable.View

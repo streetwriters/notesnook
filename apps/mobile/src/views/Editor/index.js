@@ -3,7 +3,6 @@ import {
   View,
   Platform,
   Linking,
-  DeviceEventEmitter,
   KeyboardAvoidingView,
   Dimensions,
   TextInput,
@@ -19,29 +18,31 @@ import {SideMenuEvent, getElevation, ToastEvent} from '../../utils/utils';
 import {Dialog} from '../../components/Dialog';
 import {DDS} from '../../../App';
 import * as Animatable from 'react-native-animatable';
-import SideMenu from 'react-native-side-menu';
 import {EditorMenu} from '../../components/EditorMenu';
 import {AnimatedSafeAreaView} from '../Home';
 import {useAppContext} from '../../provider/useAppContext';
 import ActionSheet from '../../components/ActionSheet';
 import {ActionSheetComponent} from '../../components/ActionSheetComponent';
 import {VaultDialog} from '../../components/VaultDialog';
-import NavigationService from '../../services/NavigationService';
 import {useIsFocused} from 'react-navigation-hooks';
+import {useTracked} from '../../provider';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
+let titleRef;
+let EditorWebView;
+let note = {};
 var timestamp = null;
 var content = null;
 var title = null;
-let titleRef;
-let EditorWebView;
 let timer = null;
-let note = {};
-
 const Editor = ({navigation}) => {
   // Global State
-  const {colors, updateDB} = useAppContext();
+  const [state, dispatch] = useTracked();
+  const {colors} = state;
+
+  ///
+  const updateDB = () => {};
 
   // Local State
 
@@ -116,20 +117,31 @@ const Editor = ({navigation}) => {
       locked: note.locked,
     };
     setNoteProps({...props});
+    console.log(JSON.stringify(note.content.delta));
 
-    post(JSON.stringify(note.content.delta));
-    setTimeout(() => {
-      title = note.title;
-      titleRef.setNativeProps({
-        text: title,
-      });
-      timestamp = note.dateCreated;
-      content = note.content;
-    }, 200);
+    if (JSON.stringify(note.content.delta) === JSON.stringify({})) {
+      console.log('i run');
+      post(`{"ops":[{"insert":"${note.content.text}"}]}`);
+    } else {
+      post(JSON.stringify(note.content.delta));
+    }
+
+    title = note.title;
+    titleRef.setNativeProps({
+      text: title,
+    });
+    timestamp = note.dateCreated;
+    content = note.content;
   };
 
   const onTitleTextChange = value => {
     title = value;
+    clearTimeout(timer);
+    timer = null;
+    timer = setTimeout(() => {
+      saveNote(noteProps, true);
+      console.log('saved');
+    }, 1000);
   };
 
   const onMenuHide = () => {

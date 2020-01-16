@@ -12,17 +12,30 @@ import {DDS} from '../../../App';
 import Container from '../../components/Container';
 import SelectionHeader from '../../components/SelectionHeader';
 import {useIsFocused} from 'react-navigation-hooks';
+import {useTracked} from '../../provider';
+
 export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(
   SafeAreaView,
 );
+let intervals;
+let counter = 0;
 
 export const Home = ({navigation}) => {
   // State
-  const {colors, setMenuOpen, selectionMode, notes} = useAppContext();
+
+  const [state, dispatch] = useTracked();
+  const {colors, selectionMode, notes} = state;
+
+  ///
+  const updateDB = () => {};
+  const updateSelectionList = () => {};
+  const changeSelectionMode = () => {};
+
   const [text, setText] = useState('');
   const [hideHeader, setHideHeader] = useState(false);
   const [keyword, setKeyword] = useState('');
   const [searchResults, setSearchResults] = useState([]);
+
   // Variables
   let isFocused = useIsFocused();
 
@@ -34,7 +47,7 @@ export const Home = ({navigation}) => {
   // Effects
 
   useEffect(() => {
-    DDS.isTab ? setMenuOpen() : null;
+    dispatch({type: 'updateNotes', boo: 'hoo'});
   }, []);
 
   // Functions
@@ -89,72 +102,67 @@ export const Home = ({navigation}) => {
     offsetY = y;
   };
 
-  if (!isFocused) {
-    console.log('block rerender');
-    return <></>;
-  } else {
-    // Render
-    console.log('rerendering home');
-    return (
-      <Container
-        bottomButtonText="Add a new note"
-        bottomButtonOnPress={() => {
-          SideMenuEvent.close();
-          SideMenuEvent.disable();
-          NavigationService.navigate('Editor');
+  // Render
+
+  return (
+    <Container
+      bottomButtonText="Add a new note"
+      bottomButtonOnPress={() => {
+        SideMenuEvent.close();
+        SideMenuEvent.disable();
+        NavigationService.navigate('Editor');
+      }}>
+      <SelectionHeader />
+      <Animatable.View
+        transition={['backgroundColor', 'opacity', 'height']}
+        duration={300}
+        style={{
+          position: 'absolute',
+          backgroundColor: colors.bg,
+          zIndex: 10,
+          height: selectionMode ? 0 : null,
+          opacity: selectionMode ? 0 : 1,
+          width: '100%',
         }}>
-        <SelectionHeader />
-        <Animatable.View
-          transition={['backgroundColor', 'opacity', 'height']}
-          duration={300}
-          style={{
-            position: 'absolute',
-            backgroundColor: colors.bg,
-            zIndex: 10,
-            height: selectionMode ? 0 : null,
-            opacity: selectionMode ? 0 : 1,
-            width: '100%',
-          }}>
-          <Header
-            menu
-            hide={hideHeader}
-            verticalMenu
-            showSearch={() => {
-              setHideHeader(false);
-              countUp = 0;
-              countDown = 0;
-            }}
-            colors={colors}
-            heading="Home"
-            canGoBack={false}
-            customIcon="menu"
-          />
-
-          {notes[0] ? (
-            <Search
-              clear={() => setText('')}
-              hide={hideHeader}
-              onChangeText={onChangeText}
-              onSubmitEditing={onSubmitEditing}
-              placeholder="Search your notes"
-              onBlur={onBlur}
-              onFocus={onFocus}
-              clearSearch={clearSearch}
-              value={text}
-            />
-          ) : null}
-        </Animatable.View>
-
-        <NotesList
-          isGrouped={true}
-          onScroll={onScroll}
-          isSearch={searchResults.length > 0 ? true : false}
-          notes={searchResults.length > 0 ? searchResults : notes}
-          keyword={keyword}
+        <Header
+          menu
+          hide={hideHeader}
+          verticalMenu
+          showSearch={() => {
+            setHideHeader(false);
+            countUp = 0;
+            countDown = 0;
+          }}
+          colors={colors}
+          heading={'Home'}
+          canGoBack={false}
+          customIcon="menu"
         />
-      </Container>
-    );
-  }
+
+        {notes[0] ? (
+          <Search
+            clear={() => setText('')}
+            hide={hideHeader}
+            onChangeText={onChangeText}
+            onSubmitEditing={onSubmitEditing}
+            placeholder="Search your notes"
+            onBlur={onBlur}
+            onFocus={onFocus}
+            clearSearch={clearSearch}
+            value={text}
+          />
+        ) : null}
+      </Animatable.View>
+
+      <NotesList
+        isGrouped={true}
+        onScroll={onScroll}
+        isSearch={searchResults.length > 0 ? true : false}
+        notes={searchResults.length > 0 ? searchResults : notes}
+        keyword={keyword}
+      />
+    </Container>
+  );
 };
 
 Home.navigationOptions = {

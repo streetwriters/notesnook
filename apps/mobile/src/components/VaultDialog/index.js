@@ -8,6 +8,7 @@ import {db} from '../../../App';
 import {useAppContext} from '../../provider/useAppContext';
 import {getElevation} from '../../utils/utils';
 import NavigationService from '../../services/NavigationService';
+import {useTracked} from '../../provider';
 
 let refs = [];
 
@@ -20,7 +21,9 @@ export const VaultDialog = ({
   perm = false,
   timestamp = null,
 }) => {
-  const {colors} = useAppContext();
+  const [state, dispatch] = useTracked();
+  const {colors} = state;
+
   const [hidden, setHidden] = useState(false);
   let password = null;
   return (

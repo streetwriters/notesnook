@@ -9,9 +9,16 @@ import * as Animatable from 'react-native-animatable';
 import {useAppContext} from '../../provider/useAppContext';
 import {useIsFocused} from 'react-navigation-hooks';
 import Container from '../../components/Container';
+import {useTracked} from '../../provider';
 
 export const Notebook = ({navigation}) => {
-  const {colors} = useAppContext();
+  const [state, dispatch] = useTracked();
+  const {colors, selectionMode, pinned, selectedItemsList} = state;
+
+  ///
+  const updateDB = () => {};
+  const updateSelectionList = () => {};
+  const changeSelectionMode = () => {};
   const params = navigation.state.params;
   const [hideHeader, setHideHeader] = useState(false);
   const [buttonHide, setButtonHide] = useState(false);
