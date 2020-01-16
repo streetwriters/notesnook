@@ -1,9 +1,6 @@
-import React, {createContext, useEffect, useState} from 'react';
-import {View, Text} from 'react-native';
-import {useImmer} from 'use-immer';
+import React, {useReducer} from 'react';
 import {DDS, db} from '../../App';
-import {getColorScheme} from '../common/common';
-
+import {createContainer} from 'react-tracked';
 const defaultState = {
   isMenuOpen: {
     current: false,
@@ -37,53 +34,21 @@ const defaultState = {
   },
 };
 
-const AppContext = createContext([defaultState, function() {}]);
+const reducer = (state, action) => {
+  switch (action.type) {
+    case 'updateNotes':
+      let notes = db.groupNotes();
+      console.log('updating notes');
+      return {
+        ...state,
+        notes: notes,
+      };
 
-const AppProvider = ({children}) => {
-  const [state, dispatch] = useImmer({...defaultState});
-  const [loading, setLoading] = useState(true);
-
-  async function init() {
-    let newColors = await getColorScheme();
-
-    dispatch(draft => {
-      draft.colors = {...newColors};
-      draft.notes = db.groupNotes();
-    });
-    setLoading(false);
+    default:
+      throw new Error('unknown action type');
   }
-
-  useEffect(() => {
-    init();
-  }, []);
-
-  useEffect(() => {
-    dispatch(draft => {
-      draft.notebooks = db.getNotebooks();
-      draft.trash = db.getTrash();
-      draft.favorites = db.getFavorites();
-      draft.pinned = db.getPinned();
-    });
-  }, []);
-
-  return (
-    <AppContext.Provider value={[state, dispatch]}>
-      {loading ? (
-        <View
-          style={{
-            width: '100%',
-            height: '100%',
-            backgroundColor: 'white',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}>
-          <Text>Loading...</Text>
-        </View>
-      ) : (
-        children
-      )}
-    </AppContext.Provider>
-  );
 };
 
-export {AppContext, AppProvider};
+const useValue = () => useReducer(reducer, defaultState);
+
+export const {Provider, useTracked} = createContainer(useValue);
