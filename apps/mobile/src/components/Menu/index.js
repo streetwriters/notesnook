@@ -41,7 +41,7 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
     {
       name: 'Home',
       icon: 'home',
-      func: () => NavigationService.push('Home'),
+      func: () => NavigationService.navigate('Home'),
       close: true,
     },
 
@@ -49,7 +49,7 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
       name: 'Notebooks',
       icon: 'book',
       func: () =>
-        NavigationService.push('Folders', {
+        NavigationService.navigate('Folders', {
           title: 'Notebooks',
           canGoBack: false,
         }),
@@ -58,13 +58,13 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
     {
       name: 'Lists',
       icon: 'list',
-      func: () => NavigationService.push('Lists'),
+      func: () => NavigationService.navigate('Lists'),
       close: true,
     },
     {
       name: 'Favorites',
       icon: 'star',
-      func: () => NavigationService.push('Favorites'),
+      func: () => NavigationService.navigate('Favorites'),
       close: true,
     },
 
@@ -88,13 +88,13 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
     {
       name: 'Trash',
       icon: 'trash',
-      func: () => NavigationService.push('Trash'),
+      func: () => NavigationService.navigate('Trash'),
       close: true,
     },
     {
       name: 'Settings',
       icon: 'settings',
-      func: () => NavigationService.push('Settings'),
+      func: () => NavigationService.navigate('Settings'),
       close: true,
     },
   ];
