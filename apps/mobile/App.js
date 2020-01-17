@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import NavigationService, {
   AppContainer,
 } from './src/services/NavigationService';
-import {StatusBar, View, DeviceEventEmitter, Platform} from 'react-native';
+import {StatusBar, View, Platform} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import {h, w} from './src/utils/utils';
 import {Toast} from './src/components/Toast';
@@ -10,9 +10,14 @@ import {Menu} from './src/components/Menu';
 import SideMenu from './src/components/SideMenu';
 import Storage from 'notes-core/api/database';
 import StorageInterface from './src/utils/storage';
-import {Provider, useTracked} from './src/provider';
+import {useTracked, ACTIONS} from './src/provider';
 import {DeviceDetectionService} from './src/utils/deviceDetection';
-import {DialogManager} from './src/components/DialogManager';
+import {
+  DialogManager,
+  _recieveEvent,
+  _unSubscribeEvent,
+} from './src/components/DialogManager';
+import {getColorScheme} from './src/common/common';
 
 export const DDS = new DeviceDetectionService();
 export const db = new Storage(StorageInterface);
@@ -21,42 +26,51 @@ let sideMenuRef;
 const App = () => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
-  // Global State
 
   // Local State
   const [sidebar, setSidebar] = useState(w * 0.3);
   const [init, setInit] = useState(false);
-  // Variables
 
   // Effects
 
-  useEffect(() => {
-    DeviceEventEmitter.addListener('openSidebar', () => {
-      DDS.isTab ? setSidebar(w * 0.3) : sideMenuRef.openMenu(true);
-    });
+  const openSidebar = () => {
+    DDS.isTab ? setSidebar(w * 0.3) : sideMenuRef.openMenu(true);
+  };
+  const closeSidebar = () => {
+    DDS.isTab ? setSidebar(0) : sideMenuRef.openMenu(false);
+  };
 
-    DeviceEventEmitter.addListener('closeSidebar', () => {
-      DDS.isTab ? setSidebar(0) : sideMenuRef.openMenu(false);
-    });
-    DeviceEventEmitter.addListener('disableGesture', () => {
-      sideMenuRef.setGestureEnabled(false);
-    });
-    DeviceEventEmitter.addListener('enableGesture', () => {
-      sideMenuRef.setGestureEnabled(true);
-    });
+  const disableGestures = () => {
+    sideMenuRef.setGestureEnabled(false);
+  };
+
+  const enableGestures = () => {
+    sideMenuRef.setGestureEnabled(true);
+  };
+
+  useEffect(() => {
+    _recieveEvent('openSidebar', openSidebar);
+    _recieveEvent('closeSidebar', closeSidebar);
+
+    _recieveEvent('disableGesture', disableGestures);
+    _recieveEvent('enableGesture', enableGestures);
 
     return () => {
-      DeviceEventEmitter.removeListener('openSidebar', () => {
-        DDS.isTab ? setSidebar(0) : sideMenuRef.openMenu(true);
-      });
-      DeviceEventEmitter.removeListener('closeSidebar', () => {
-        DDS.isTab ? setSidebar(0) : sideMenuRef.openMenu(false);
-      });
-      DeviceEventEmitter.removeListener('disableGesture', () => {
-        sideMenuRef.setGestureEnabled(false);
-      });
-      DeviceEventEmitter.removeListener('enableGesture', () => {
-        sideMenuRef.setGestureEnabled(true);
+      _unSubscribeEvent('openSidebar', openSidebar);
+      _unSubscribeEvent('closeSidebar', closeSidebar);
+
+      _unSubscribeEvent('disableGesture', disableGestures);
+      _unSubscribeEvent('enableGesture', enableGestures);
+    };
+  }, []);
+
+  useEffect(() => {
+    _recieveEvent('updateEvent', type => {
+      dispatch(type);
+    });
+    return () => {
+      _unSubscribeEvent('updateEvent', type => {
+        dispatch(type);
       });
     };
   }, []);
@@ -70,10 +84,17 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    db.init().then(() => {
-      setInit(true);
+    updateAppTheme().then(() => {
+      db.init().then(() => {
+        setInit(true);
+      });
     });
   }, []);
+
+  async function updateAppTheme(colors = state.colors) {
+    let newColors = await getColorScheme(colors);
+    dispatch({type: ACTIONS.THEME, colors: newColors});
+  }
 
   // Render
 
@@ -81,7 +102,7 @@ const App = () => {
     return <></>;
   }
   return (
-    <Provider>
+    <>
       <View
         style={{
           width: '100%',
@@ -144,14 +165,9 @@ const App = () => {
           </SideMenu>
         )}
         <Toast />
-        <DialogManager
-          colors={colors}
-          update={type => {
-            dispatch({type: 'updateNotes'});
-          }}
-        />
+        <DialogManager colors={colors} />
       </View>
-    </Provider>
+    </>
   );
 };
 
