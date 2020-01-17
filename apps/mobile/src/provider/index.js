@@ -34,11 +34,14 @@ const defaultState = {
   },
 };
 
+export const ACTIONS = {
+  NOTES: 'note',
+};
+
 const reducer = (state, action) => {
   switch (action.type) {
-    case 'updateNotes':
+    case 'note':
       let notes = db.groupNotes();
-      console.log('updating notes');
       return {
         ...state,
         notes: notes,

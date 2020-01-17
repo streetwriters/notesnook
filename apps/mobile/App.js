@@ -147,7 +147,7 @@ const App = () => {
         <DialogManager
           colors={colors}
           update={type => {
-            dispatch({type: type});
+            dispatch({type: 'updateNotes'});
           }}
         />
       </View>

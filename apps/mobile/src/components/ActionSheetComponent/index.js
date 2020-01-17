@@ -154,7 +154,7 @@ export const ActionSheetComponent = ({
       }
     }
 
-    dispatch({type: 'updateNotes'});
+    dispatch({type: type});
     setNote({...toAdd});
   };
 

@@ -12,7 +12,8 @@ import {DDS} from '../../../App';
 import Container from '../../components/Container';
 import SelectionHeader from '../../components/SelectionHeader';
 import {useIsFocused} from 'react-navigation-hooks';
-import {useTracked} from '../../provider';
+import {useTracked, ACTIONS} from '../../provider';
+import {_recieveEvent, _unSubscribeEvent} from '../../components/DialogManager';
 
 export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(
   SafeAreaView,
@@ -47,8 +48,19 @@ export const Home = ({navigation}) => {
   // Effects
 
   useEffect(() => {
-    dispatch({type: 'updateNotes', boo: 'hoo'});
+    dispatch({type: ACTIONS.NOTES});
   }, []);
+
+  useEffect(() => {
+    _recieveEvent('updateEvent', type => {
+      dispatch(type);
+    });
+    return () => {
+      _unSubscribeEvent('updateEvent', type => {
+        dispatch(type);
+      });
+    };
+  });
 
   // Functions
 

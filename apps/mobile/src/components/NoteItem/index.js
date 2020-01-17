@@ -22,7 +22,6 @@ export default class NoteItem extends React.Component {
       unlockNote: false,
       vaultDialog: false,
       isPerm: false,
-      visible: false,
     };
     this.actionSheet;
     this.show = null;
@@ -36,35 +35,6 @@ export default class NoteItem extends React.Component {
       nextState !== this.state
     );
   }
-
-  onMenuHide = () => {
-    if (this.show) {
-      if (this.show === 'delete') {
-        this.setState({
-          visible: true,
-        });
-        this.show = null;
-      } else if (this.show == 'lock') {
-        this.setState({
-          vaultDialog: true,
-        });
-        this.show = null;
-      } else if (this.show == 'unlock') {
-        this.setState({
-          unlock: true,
-          isPerm: true,
-          vaultDialog: true,
-        });
-        this.show = null;
-      }
-    }
-  };
-
-  deleteItem = async () => {
-    await db.deleteNotes([item]);
-    ToastEvent.show('Note moved to trash', 'success', 3000);
-    setVisible(false);
-  };
 
   render() {
     let {unlock, vaultDialog, isPerm, visible} = this.state;
@@ -99,19 +69,6 @@ export default class NoteItem extends React.Component {
           },
           customStyle ? customStyle : {},
         ]}>
-        <Dialog
-          visible={visible}
-          title="Delete note"
-          icon="trash"
-          paragraph="Do you want to delete this note?"
-          positiveText="Delete"
-          positivePress={this.deleteItem}
-          close={() => {
-            this.setState({
-              visible: false,
-            });
-          }}
-        />
         <VaultDialog
           close={() => {
             this.setState({
