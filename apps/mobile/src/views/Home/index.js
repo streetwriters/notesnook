@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {SafeAreaView} from 'react-native';
+import {SafeAreaView, Text} from 'react-native';
 import {Search} from '../../components/SearchInput';
 import {w, h, SideMenuEvent, ToastEvent} from '../../utils/utils';
 import {Header} from '../../components/header';
@@ -11,26 +11,28 @@ import {useAppContext} from '../../provider/useAppContext';
 import {DDS} from '../../../App';
 import Container from '../../components/Container';
 import SelectionHeader from '../../components/SelectionHeader';
-import {useIsFocused} from 'react-navigation-hooks';
-import {useTracked, ACTIONS} from '../../provider';
-import {_recieveEvent, _unSubscribeEvent} from '../../components/DialogManager';
+import {useIsFocused, useFocusEffect} from 'react-navigation-hooks';
+import {
+  _recieveEvent,
+  _unSubscribeEvent,
+  updateEvent,
+} from '../../components/DialogManager';
 
 export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(
   SafeAreaView,
 );
-let intervals;
-let counter = 0;
 
 export const Home = ({navigation}) => {
   // State
-
-  const [state, dispatch] = useTracked();
-  const {colors, selectionMode, notes} = state;
-
-  ///
-  const updateDB = () => {};
-  const updateSelectionList = () => {};
-  const changeSelectionMode = () => {};
+  const {
+    colors,
+    selectionMode,
+    pinned,
+    notes,
+    updateDB,
+    updateSelectionList,
+    changeSelectionMode,
+  } = useAppContext();
 
   const [text, setText] = useState('');
   const [hideHeader, setHideHeader] = useState(false);
@@ -47,7 +49,18 @@ export const Home = ({navigation}) => {
   // Effects
 
   useEffect(() => {
+<<<<<<< HEAD
     dispatch({type: ACTIONS.NOTES, payload: 'hello there'});
+=======
+    _recieveEvent('updateEvent', () => {
+      updateDB();
+    });
+    return () => {
+      _unSubscribeEvent('updateEvent', () => {
+        updateDB();
+      });
+    };
+>>>>>>> cfee96fb230bdd33c710a5e72a80ccf2b82a8646
   }, []);
 
   // Functions
@@ -103,7 +116,7 @@ export const Home = ({navigation}) => {
   };
 
   // Render
-
+  console.log('rerender');
   return (
     <Container
       bottomButtonText="Add a new note"
@@ -130,6 +143,7 @@ export const Home = ({navigation}) => {
           hide={hideHeader}
           verticalMenu
           showSearch={() => {
+            let counter = updateCounter;
             setHideHeader(false);
             countUp = 0;
             countDown = 0;

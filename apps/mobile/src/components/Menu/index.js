@@ -22,11 +22,14 @@ import {
 import Icon from 'react-native-vector-icons/Feather';
 import {AnimatedSafeAreaView} from '../../views/Home';
 import FastStorage from 'react-native-fast-storage';
+<<<<<<< HEAD
 import {useTracked, ACTIONS} from '../../provider';
 
+=======
+ 
+>>>>>>> cfee96fb230bdd33c710a5e72a80ccf2b82a8646
 export const Menu = ({close = () => {}, hide, update = () => {}}) => {
-  const [state, dispatch] = useTracked();
-  const {colors} = state;
+  const {colors} = useAppContext();
 
   // todo
 

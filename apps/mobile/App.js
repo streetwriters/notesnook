@@ -10,6 +10,7 @@ import {Menu} from './src/components/Menu';
 import SideMenu from './src/components/SideMenu';
 import Storage from 'notes-core/api/database';
 import StorageInterface from './src/utils/storage';
+<<<<<<< HEAD
 import {useTracked, ACTIONS} from './src/provider';
 import {DeviceDetectionService} from './src/utils/deviceDetection';
 import {
@@ -18,14 +19,26 @@ import {
   _unSubscribeEvent,
 } from './src/components/DialogManager';
 import {getColorScheme} from './src/common/common';
+=======
+import {DeviceDetectionService} from './src/utils/deviceDetection';
+import {DialogManager} from './src/components/DialogManager';
+import {useAppContext} from './src/provider/useAppContext';
+import {AppProvider} from './src/provider';
+import {COLOR_SCHEME_LIGHT} from './src/common/common';
+>>>>>>> cfee96fb230bdd33c710a5e72a80ccf2b82a8646
 
 export const DDS = new DeviceDetectionService();
 export const db = new Storage(StorageInterface);
 
 let sideMenuRef;
 const App = () => {
+<<<<<<< HEAD
   const [state, dispatch] = useTracked();
   const {colors} = state;
+=======
+  const [colors, setColors] = useState(COLOR_SCHEME_LIGHT);
+  // Global State
+>>>>>>> cfee96fb230bdd33c710a5e72a80ccf2b82a8646
 
   // Local State
   const [sidebar, setSidebar] = useState(w * 0.3);
@@ -89,7 +102,7 @@ const App = () => {
         setInit(true);
       });
     });
-  }, []);
+  });
 
   async function updateAppTheme(colors = state.colors) {
     let newColors = await getColorScheme(colors);
@@ -97,12 +110,16 @@ const App = () => {
   }
 
   // Render
-
   if (!init) {
     return <></>;
   }
+
   return (
+<<<<<<< HEAD
     <>
+=======
+    <AppProvider>
+>>>>>>> cfee96fb230bdd33c710a5e72a80ccf2b82a8646
       <View
         style={{
           width: '100%',
@@ -165,9 +182,15 @@ const App = () => {
           </SideMenu>
         )}
         <Toast />
+<<<<<<< HEAD
         <DialogManager colors={colors} />
       </View>
     </>
+=======
+      </View>
+      <DialogManager colors={colors} />
+    </AppProvider>
+>>>>>>> cfee96fb230bdd33c710a5e72a80ccf2b82a8646
   );
 };
 
