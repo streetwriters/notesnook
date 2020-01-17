@@ -24,19 +24,15 @@ import {useAppContext} from '../../provider/useAppContext';
 import {useIsFocused} from 'react-navigation-hooks';
 import Container from '../../components/Container';
 import FastStorage from 'react-native-fast-storage';
- 
+import {useTracked} from '../../provider';
 export const Settings = ({navigation}) => {
-  const {colors, changeAccentColor, changeColorScheme} = useAppContext();
+  const [state, dispatch] = useTracked();
+  const {colors} = state;
 
-<<<<<<< HEAD
   ///
   function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
     let newColors = setColorScheme(colors, accent);
     StatusBar.setBarStyle(newColors.night ? 'light-content' : 'dark-content');
-=======
-  //const [colors, setColors] = useState(COLOR_SCHEME_LIGHT);
-  let isFocused = useIsFocused();
->>>>>>> cfee96fb230bdd33c710a5e72a80ccf2b82a8646
 
     dispatch({type: ACTIONS.THEME, colors: newColors});
   }

@@ -4,10 +4,11 @@ import {SIZE, pv, opacity, WEIGHT} from '../../common/common';
 import {Header} from '../../components/header';
 import {AnimatedSafeAreaView} from '../Home';
 import {useAppContext} from '../../provider/useAppContext';
- 
+import {useTracked} from '../../provider';
 
 export const AccountSettings = ({navigation}) => {
-  const {colors} = useAppContext();
+  const [state, dispatch] = useTracked();
+  const {colors} = state;
 
   return (
     <AnimatedSafeAreaView

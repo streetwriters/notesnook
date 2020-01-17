@@ -1,9 +1,6 @@
-import React, {createContext, useEffect, useState} from 'react';
-import {View, Text} from 'react-native';
-import {useImmer} from 'use-immer';
+import React, {useReducer} from 'react';
 import {DDS, db} from '../../App';
-import {getColorScheme} from '../common/common';
-
+import {createContainer} from 'react-tracked';
 const defaultState = {
   isMenuOpen: {
     current: false,
@@ -35,11 +32,8 @@ const defaultState = {
     warningBg: '#FEEFB3',
     warningText: '#9F6000',
   },
-  selectionMode: false,
-  selectedItemsList: [],
 };
 
-<<<<<<< HEAD
 export const ACTIONS = {
   NOTES: 'note',
   NOTEBOOKS: 'notebook',
@@ -71,49 +65,9 @@ const reducer = (state, action) => {
     }
     default:
       throw new Error('unknown action type');
-=======
-const AppContext = createContext([defaultState, function() {}]);
-
-const AppProvider = ({children}) => {
-  const [state, dispatch] = useImmer({...defaultState});
-  const [loading, setLoading] = useState(true);
-
-  async function init() {
-    let newColors = await getColorScheme();
-    dispatch(draft => {
-      draft.colors = {...newColors};
-      draft.notes = db.groupNotes();
-      draft.notebooks = db.getNotebooks();
-      draft.trash = db.getTrash();
-      draft.favorites = db.getFavorites();
-      draft.pinned = db.getPinned();
-    });
-    setLoading(false);
->>>>>>> cfee96fb230bdd33c710a5e72a80ccf2b82a8646
   }
-
-  useEffect(() => {
-    init();
-  }, []);
-
-  return (
-    <AppContext.Provider value={[state, dispatch]}>
-      {loading ? (
-        <View
-          style={{
-            width: '100%',
-            height: '100%',
-            backgroundColor: 'white',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}>
-          <Text>Loading...</Text>
-        </View>
-      ) : (
-        children
-      )}
-    </AppContext.Provider>
-  );
 };
 
-export {AppProvider, AppContext};
+const useValue = () => useReducer(reducer, defaultState);
+
+export const {Provider, useTracked} = createContainer(useValue);

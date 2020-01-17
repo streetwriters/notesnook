@@ -3,18 +3,16 @@ import {View, TouchableOpacity} from 'react-native';
 import {SIZE} from '../../common/common';
 import Icon from 'react-native-vector-icons/Feather';
 import {w} from '../../utils/utils';
-import {useAppContext} from '../../provider/useAppContext';
+import {useTracked} from '../../provider';
 
 const SelectionWrapper = ({children, item}) => {
-  const {
-    colors,
-    selectionMode,
-    selectedItemsList,
-    updateDB,
-    updateSelectionList,
-    changeSelectionMode,
-  } = useAppContext();
+  const [state, dispatch] = useTracked();
+  const {colors, selectionMode, selectedItemsList} = state;
 
+  ///
+  const updateDB = () => {};
+  const updateSelectionList = () => {};
+  const changeSelectionMode = () => {};
   return (
     <View
       style={{

@@ -13,12 +13,13 @@ import {getElevation, ToastEvent} from '../../utils/utils';
 import {FlatList, TextInput} from 'react-native-gesture-handler';
 import {db, DDS} from '../../../App';
 import {useAppContext} from '../../provider/useAppContext';
- 
+import {useTracked} from '../../provider';
 
 let refs = [];
 
 export const AddNotebookDialog = ({visible, close, toEdit = null}) => {
-  const {colors} = useAppContext();
+  const [state, dispatch] = useTracked();
+  const {colors} = state;
 
   const [topics, setTopics] = useState(['']);
   const [title, setTitle] = useState(null);

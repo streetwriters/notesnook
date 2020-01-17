@@ -67,11 +67,7 @@ export default class NoteItem extends React.Component {
       update,
       index,
     } = this.props;
-<<<<<<< HEAD
     console.log('rendering', index);
-=======
-    console.log('rerendering', index);
->>>>>>> cfee96fb230bdd33c710a5e72a80ccf2b82a8646
     return (
       <View
         style={[

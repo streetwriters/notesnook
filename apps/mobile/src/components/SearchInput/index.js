@@ -15,9 +15,10 @@ import {getElevation, w} from '../../utils/utils';
 import * as Animatable from 'react-native-animatable';
 import {DDS} from '../../../App';
 import {useAppContext} from '../../provider/useAppContext';
- 
+import {useTracked} from '../../provider';
 export const Search = props => {
-  const {colors} = useAppContext();
+  const [state, dispatch] = useTracked();
+  const {colors} = state;
 
   const [focus, setFocus] = useState(false);
 

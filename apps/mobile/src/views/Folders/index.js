@@ -14,18 +14,16 @@ import SelectionHeader from '../../components/SelectionHeader';
 import SelectionWrapper from '../../components/SelectionWrapper';
 import {w} from '../../utils/utils';
 import {useIsFocused} from 'react-navigation-hooks';
- 
+import {useTracked} from '../../provider';
 
 export const Folders = ({navigation}) => {
-  const {
-    colors,
-    selectionMode,
-    pinned,
-    notebooks,
-    updateDB,
-    updateSelectionList,
-    changeSelectionMode,
-  } = useAppContext();
+  const [state, dispatch] = useTracked();
+  const {colors, selectionMode, pinned, notebooks} = state;
+
+  ///
+  const updateDB = () => {};
+  const updateSelectionList = () => {};
+  const changeSelectionMode = () => {};
 
   const [addNotebook, setAddNotebook] = useState(false);
   const [hideHeader, setHideHeader] = useState(false);

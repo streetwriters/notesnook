@@ -27,9 +27,11 @@ export const NotebookItem = ({
   customStyle,
   onLongPress,
 }) => {
-  const {colors, updateDB} = useAppContext();
+  const [state, dispatch] = useTracked();
+  const {colors} = state;
 
   ///
+  const updateDB = () => {};
 
   const [isVisible, setVisible] = useState(false);
   const [addTopic, setAddTopic] = useState(false);

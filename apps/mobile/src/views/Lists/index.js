@@ -24,13 +24,14 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import {Reminder} from '../../components/Reminder';
 import {ListItem} from '../../components/ListItem';
 import {useAppContext} from '../../provider/useAppContext';
- 
+import {useTracked} from '../../provider';
 
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
 export const Lists = ({navigation}) => {
-  const {colors} = useAppContext();
+  const [state, dispatch] = useTracked();
+  const {colors} = state;
 
   return (
     <SafeAreaView>

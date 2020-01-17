@@ -13,17 +13,15 @@ import {TrashPlaceHolder} from '../../components/ListPlaceholders';
 import Container from '../../components/Container';
 import SelectionHeader from '../../components/SelectionHeader';
 import {useIsFocused} from 'react-navigation-hooks';
- 
+import {useTracked} from '../../provider';
 
 export const Trash = ({navigation}) => {
-  const {
-    colors,
-    selectionMode,
-    updateDB,
-    updateSelectionList,
-    changeSelectionMode,
-    trash,
-  } = useAppContext();
+  const [state, dispatch] = useTracked();
+  const {colors, selectionMode, trash} = state;
+
+  const updateDB = () => {};
+  const changeSelectionMode = () => {};
+  const updateSelectionList = () => {};
 
   const [dialog, setDialog] = useState(false);
   let isFocused = useIsFocused();

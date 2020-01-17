@@ -25,7 +25,8 @@ import FastStorage from 'react-native-fast-storage';
 import {useTracked, ACTIONS} from '../../provider';
 
 export const Menu = ({close = () => {}, hide, update = () => {}}) => {
-  const {colors} = useAppContext();
+  const [state, dispatch] = useTracked();
+  const {colors} = state;
 
   // todo
 

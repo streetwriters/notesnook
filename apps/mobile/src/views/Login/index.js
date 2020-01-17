@@ -14,9 +14,10 @@ import {NavigationEvents} from 'react-navigation';
 import {Header} from '../../components/header';
 import {DDS} from '../../../App';
 import {useAppContext} from '../../provider/useAppContext';
-
+import {useTracked} from '../../provider';
 export const Login = ({navigation}) => {
-  const {colors} = useAppContext();
+  const [state, dispatch] = useTracked();
+  const {colors} = state;
 
   useEffect(() => {
     DeviceEventEmitter.emit('hide');

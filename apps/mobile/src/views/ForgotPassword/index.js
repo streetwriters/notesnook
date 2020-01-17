@@ -33,17 +33,16 @@ import {NavigationEvents} from 'react-navigation';
 import {Header} from '../../components/header';
 import {useForceUpdate} from '../ListsEditor';
 import {useAppContext} from '../../provider/useAppContext';
- 
+import {useTracked} from '../../provider';
 
 export const ForgotPassword = ({navigation}) => {
-  const {
-    colors,
-    updateDB,
-    updateSelectionList,
-    changeSelectionMode,
-  } = useAppContext();
+  const [state, dispatch] = useTracked();
+  const {colors, selectionMode, pinned, selectedItemsList} = state;
 
   ///
+  const updateDB = () => {};
+  const updateSelectionList = () => {};
+  const changeSelectionMode = () => {};
 
   useEffect(() => {
     DeviceEventEmitter.emit('hide');

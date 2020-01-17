@@ -20,8 +20,7 @@ import Icon from 'react-native-vector-icons/Feather';
 import NavigationService from '../../services/NavigationService';
 import {db} from '../../../App';
 import FastStorage from 'react-native-fast-storage';
-
-import {_recieveEvent, _unSubscribeEvent} from '../DialogManager';
+import {useTracked} from '../../provider';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
@@ -35,11 +34,11 @@ export const ActionSheetComponent = ({
   rowItems = [],
   columnItems = [],
 }) => {
-  const {colors, updateDB, changeColorScheme} = useAppContext();
+  const [state, dispatch] = useTracked();
+  const {colors} = state;
 
   // Todo
 
-<<<<<<< HEAD
   function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
     let newColors = setColorScheme(colors, accent);
     StatusBar.setBarStyle(newColors.night ? 'light-content' : 'dark-content');
@@ -47,8 +46,6 @@ export const ActionSheetComponent = ({
     dispatch({type: ACTIONS.THEME, colors: newColors});
   }
 
-=======
->>>>>>> cfee96fb230bdd33c710a5e72a80ccf2b82a8646
   const [focused, setFocused] = useState(false);
   const [note, setNote] = useState(
     item
@@ -163,7 +160,7 @@ export const ActionSheetComponent = ({
       }
     }
 
-    updateDB();
+    dispatch({type: type});
     setNote({...toAdd});
   };
 

@@ -69,10 +69,6 @@ export class DialogManager extends Component {
     super(props);
     this.actionSheet;
     this.opened = false;
-<<<<<<< HEAD
-=======
-
->>>>>>> cfee96fb230bdd33c710a5e72a80ccf2b82a8646
     this.state = {
       item: {},
       actionSheetData: {

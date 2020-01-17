@@ -13,10 +13,6 @@ import {
 } from '../../common/common';
 import Icon from 'react-native-vector-icons/Feather';
 import {getElevation, ToastEvent} from '../../utils/utils';
-<<<<<<< HEAD
-=======
- 
->>>>>>> cfee96fb230bdd33c710a5e72a80ccf2b82a8646
 import {dialogActions, updateEvent} from '../DialogManager';
 import {db} from '../../../App';
 
