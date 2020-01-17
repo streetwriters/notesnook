@@ -55,6 +55,7 @@ const AppProvider = ({children}) => {
       draft.favorites = db.getFavorites();
       draft.pinned = db.getPinned();
     });
+    setLoading(false);
   }
 
   useEffect(() => {
@@ -63,7 +64,6 @@ const AppProvider = ({children}) => {
 
   return (
     <AppContext.Provider value={[state, dispatch]}>
-      {children}
       {loading ? (
         <View
           style={{
