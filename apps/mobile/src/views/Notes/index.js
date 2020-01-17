@@ -7,16 +7,17 @@ import * as Animatable from 'react-native-animatable';
 import {useAppContext} from '../../provider/useAppContext';
 import Container from '../../components/Container';
 import {useIsFocused} from 'react-navigation-hooks';
-import {useTracked} from '../../provider';
+ 
 
 export const Notes = ({navigation}) => {
-  const [state, dispatch] = useTracked();
-  const {colors, selectionMode, pinned, selectedItemsList} = state;
+  const {
+    colors,
+    selectionMode,
+    updateDB,
+    updateSelectionList,
+    changeSelectionMode,
+  } = useAppContext();
 
-  ///
-  const updateDB = () => {};
-  const updateSelectionList = () => {};
-  const changeSelectionMode = () => {};
   const [hideHeader, setHideHeader] = useState(false);
   const [margin, setMargin] = useState(200);
   const [buttonHide, setButtonHide] = useState(false);

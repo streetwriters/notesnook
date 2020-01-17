@@ -25,7 +25,7 @@ import ActionSheet from '../../components/ActionSheet';
 import {ActionSheetComponent} from '../../components/ActionSheetComponent';
 import {VaultDialog} from '../../components/VaultDialog';
 import {useIsFocused} from 'react-navigation-hooks';
-import {useTracked} from '../../provider';
+ 
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
@@ -38,11 +38,7 @@ var title = null;
 let timer = null;
 const Editor = ({navigation}) => {
   // Global State
-  const [state, dispatch] = useTracked();
-  const {colors} = state;
-
-  ///
-  const updateDB = () => {};
+  const {colors, updateDB} = useAppContext();
 
   // Local State
 

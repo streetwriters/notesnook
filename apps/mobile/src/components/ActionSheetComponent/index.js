@@ -19,7 +19,8 @@ import NavigationService from '../../services/NavigationService';
 import {db} from '../../../App';
 import {useAppContext} from '../../provider/useAppContext';
 import FastStorage from 'react-native-fast-storage';
-import {useTracked} from '../../provider';
+
+import {_recieveEvent, _unSubscribeEvent} from '../DialogManager';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
@@ -33,12 +34,9 @@ export const ActionSheetComponent = ({
   rowItems = [],
   columnItems = [],
 }) => {
-  const [state, dispatch] = useTracked();
-  const {colors} = state;
+  const {colors, updateDB, changeColorScheme} = useAppContext();
 
   // Todo
-
-  const changeColorScheme = () => {};
 
   const [focused, setFocused] = useState(false);
   const [note, setNote] = useState(
@@ -154,7 +152,7 @@ export const ActionSheetComponent = ({
       }
     }
 
-    dispatch({type: type});
+    updateDB();
     setNote({...toAdd});
   };
 

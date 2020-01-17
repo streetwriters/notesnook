@@ -49,8 +49,7 @@ export default class NoteItem extends React.Component {
       update,
       index,
     } = this.props;
-
-    console.log('rerendering' + index);
+    console.log('rerendering', index);
     return (
       <View
         style={[
@@ -69,20 +68,6 @@ export default class NoteItem extends React.Component {
           },
           customStyle ? customStyle : {},
         ]}>
-        <VaultDialog
-          close={() => {
-            this.setState({
-              vaultDialog: false,
-              unlock: false,
-              isPerm: false,
-            });
-          }}
-          note={item}
-          perm={isPerm}
-          openedToUnlock={unlock}
-          visible={vaultDialog}
-        />
-
         {pinned ? (
           <View
             style={{

@@ -19,7 +19,7 @@ import NavigationService from '../../services/NavigationService';
 import * as Animatable from 'react-native-animatable';
 import {useAppContext} from '../../provider/useAppContext';
 import {DDS} from '../../../App';
-import {useTracked} from '../../provider';
+ 
 export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(
   SafeAreaView,
 );
@@ -31,8 +31,7 @@ export const Container = ({
   noBottomButton = false,
 }) => {
   // State
-  const [state, dispatch] = useTracked();
-  const {colors} = state;
+  const {colors} = useAppContext();
 
   const [buttonHide, setButtonHide] = useState(false);
 

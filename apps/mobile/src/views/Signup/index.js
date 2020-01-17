@@ -12,11 +12,10 @@ import {NavigationEvents} from 'react-navigation';
 import {Header} from '../../components/header';
 import {DDS} from '../../../App';
 import {useAppContext} from '../../provider/useAppContext';
-import {useTracked} from '../../provider';
+ 
 
 export const Signup = ({navigation}) => {
-  const [state, dispatch] = useTracked();
-  const {colors} = state;
+  const {colors} = useAppContext();
   useEffect(() => {
     DeviceEventEmitter.emit('hide');
     return () => {

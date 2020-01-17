@@ -28,7 +28,7 @@ import {FlatList, TextInput} from 'react-native-gesture-handler';
 import {useForceUpdate} from '../../views/ListsEditor';
 import {db} from '../../../App';
 import {useAppContext} from '../../provider/useAppContext';
-import {useTracked} from '../../provider';
+ 
 
 export const AddTopicDialog = ({
   visible,
@@ -36,8 +36,7 @@ export const AddTopicDialog = ({
   notebookID,
   toEdit = null,
 }) => {
-  const [state, dispatch] = useTracked();
-  const {colors} = state;
+  const {colors} = useAppContext();
   const [titleFocused, setTitleFocused] = useState(false);
 
   let title = null;

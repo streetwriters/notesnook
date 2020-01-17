@@ -26,7 +26,7 @@ import {AnimatedSafeAreaView} from '../../views/Home';
 import {TextInput} from 'react-native-gesture-handler';
 import {useAppContext} from '../../provider/useAppContext';
 import {VaultDialog} from '../VaultDialog';
-import {useTracked} from '../../provider';
+ 
 
 let tagsInputRef;
 let tagsList;
@@ -39,11 +39,9 @@ export const EditorMenu = ({
   note,
   timestamp,
 }) => {
-  const [state, dispatch] = useTracked();
-  const {colors} = state;
+  const {colors, changeColorScheme} = useAppContext();
   // Todo
 
-  const changeColorScheme = () => {};
   ///////
 
   const [unlock, setUnlock] = useState(false);

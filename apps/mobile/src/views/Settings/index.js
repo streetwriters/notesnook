@@ -22,14 +22,10 @@ import {useAppContext} from '../../provider/useAppContext';
 import {useIsFocused} from 'react-navigation-hooks';
 import Container from '../../components/Container';
 import FastStorage from 'react-native-fast-storage';
-import {useTracked} from '../../provider';
+ 
 export const Settings = ({navigation}) => {
-  const [state, dispatch] = useTracked();
-  const {colors} = state;
+  const {colors, changeAccentColor, changeColorScheme} = useAppContext();
 
-  ///
-  const changeAccentColor = () => {};
-  const changeColorScheme = () => {};
   //const [colors, setColors] = useState(COLOR_SCHEME_LIGHT);
   let isFocused = useIsFocused();
 

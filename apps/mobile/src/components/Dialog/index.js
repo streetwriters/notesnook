@@ -13,7 +13,7 @@ import {
 } from '../../common/common';
 import Icon from 'react-native-vector-icons/Feather';
 import {getElevation, ToastEvent} from '../../utils/utils';
-import {useTracked} from '../../provider';
+ 
 import {dialogActions, updateEvent} from '../DialogManager';
 import {db} from '../../../App';
 

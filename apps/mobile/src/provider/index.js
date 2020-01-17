@@ -1,6 +1,9 @@
-import React, {useReducer} from 'react';
+import React, {createContext, useEffect, useState} from 'react';
+import {View, Text} from 'react-native';
+import {useImmer} from 'use-immer';
 import {DDS, db} from '../../App';
-import {createContainer} from 'react-tracked';
+import {getColorScheme} from '../common/common';
+
 const defaultState = {
   isMenuOpen: {
     current: false,
@@ -32,26 +35,51 @@ const defaultState = {
     warningBg: '#FEEFB3',
     warningText: '#9F6000',
   },
+  selectionMode: false,
+  selectedItemsList: [],
 };
 
-export const ACTIONS = {
-  NOTES: 'note',
-};
+const AppContext = createContext([defaultState, function() {}]);
 
-const reducer = (state, action) => {
-  switch (action.type) {
-    case 'note':
-      let notes = db.groupNotes();
-      return {
-        ...state,
-        notes: notes,
-      };
+const AppProvider = ({children}) => {
+  const [state, dispatch] = useImmer({...defaultState});
+  const [loading, setLoading] = useState(true);
 
-    default:
-      throw new Error('unknown action type');
+  async function init() {
+    let newColors = await getColorScheme();
+    dispatch(draft => {
+      draft.colors = {...newColors};
+      draft.notes = db.groupNotes();
+      draft.notebooks = db.getNotebooks();
+      draft.trash = db.getTrash();
+      draft.favorites = db.getFavorites();
+      draft.pinned = db.getPinned();
+    });
   }
+
+  useEffect(() => {
+    init();
+  }, []);
+
+  return (
+    <AppContext.Provider value={[state, dispatch]}>
+      {children}
+      {loading ? (
+        <View
+          style={{
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'white',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <Text>Loading...</Text>
+        </View>
+      ) : (
+        children
+      )}
+    </AppContext.Provider>
+  );
 };
 
-const useValue = () => useReducer(reducer, defaultState);
-
-export const {Provider, useTracked} = createContainer(useValue);
+export {AppProvider, AppContext};

@@ -9,7 +9,7 @@ import {w} from '../../utils/utils';
 import SelectionWrapper from '../SelectionWrapper';
 import ActionSheet from '../ActionSheet';
 import {ActionSheetComponent} from '../ActionSheetComponent';
-import {useTracked} from '../../provider';
+ 
 
 export const NotesList = ({
   notes,
@@ -18,12 +18,14 @@ export const NotesList = ({
   isGrouped = false,
   refresh = () => {},
 }) => {
-  const [state, dispatch] = useTracked();
-  const {colors, selectionMode, pinned, selectedItemsList} = state;
-
-  ///
-  const updateSelectionList = () => {};
-  const changeSelectionMode = () => {};
+  const {
+    colors,
+    selectionMode,
+    pinned,
+    selectedItemsList,
+    updateSelectionList,
+    changeSelectionMode,
+  } = useAppContext();
 
   const _renderItem = ({item, index}) => (
     <SelectionWrapper item={item}>

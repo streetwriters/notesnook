@@ -10,17 +10,18 @@ import {Menu} from './src/components/Menu';
 import SideMenu from './src/components/SideMenu';
 import Storage from 'notes-core/api/database';
 import StorageInterface from './src/utils/storage';
-import {Provider, useTracked} from './src/provider';
 import {DeviceDetectionService} from './src/utils/deviceDetection';
 import {DialogManager} from './src/components/DialogManager';
+import {useAppContext} from './src/provider/useAppContext';
+import {AppProvider} from './src/provider';
+import {COLOR_SCHEME_LIGHT} from './src/common/common';
 
 export const DDS = new DeviceDetectionService();
 export const db = new Storage(StorageInterface);
 
 let sideMenuRef;
 const App = () => {
-  const [state, dispatch] = useTracked();
-  const {colors} = state;
+  const [colors, setColors] = useState(COLOR_SCHEME_LIGHT);
   // Global State
 
   // Local State
@@ -73,15 +74,15 @@ const App = () => {
     db.init().then(() => {
       setInit(true);
     });
-  }, []);
+  });
 
   // Render
-
   if (!init) {
     return <></>;
   }
+
   return (
-    <Provider>
+    <AppProvider>
       <View
         style={{
           width: '100%',
@@ -144,14 +145,9 @@ const App = () => {
           </SideMenu>
         )}
         <Toast />
-        <DialogManager
-          colors={colors}
-          update={type => {
-            dispatch({type: 'updateNotes'});
-          }}
-        />
       </View>
-    </Provider>
+      <DialogManager colors={colors} />
+    </AppProvider>
   );
 };
 

@@ -5,13 +5,13 @@ import {SIZE, pv, WEIGHT} from '../../common/common';
 import {Header} from '../../components/header';
 import {useAppContext} from '../../provider/useAppContext';
 import {TagsPlaceHolder} from '../../components/ListPlaceholders';
-import {useTracked} from '../../provider';
+ 
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
 export const Tags = ({navigation}) => {
-  const [state, dispatch] = useTracked();
-  const {colors} = state;
+  const {colors, tags} = useAppContext();
+
   let isFocused = useIsFocused();
 
   if (!isFocused) {

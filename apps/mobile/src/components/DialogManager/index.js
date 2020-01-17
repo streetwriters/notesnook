@@ -3,6 +3,7 @@ import {DeviceEventEmitter} from 'react-native';
 import {ActionSheetComponent} from '../ActionSheetComponent';
 import ActionSheet from '../ActionSheet';
 import {Dialog} from '../Dialog';
+import {VaultDialog} from '../VaultDialog';
 export const ActionSheetEvent = (item, colors, tags, rowItems, columnItems) => {
   DeviceEventEmitter.emit('ActionSheetEvent', {
     item,
@@ -56,6 +57,8 @@ export class DialogManager extends Component {
   constructor(props) {
     super(props);
     this.actionSheet;
+    this.opened = false;
+
     this.state = {
       item: {},
       actionSheetData: {
@@ -72,7 +75,15 @@ export class DialogManager extends Component {
         action: 0,
         icon: '',
       },
+      isPerm: false,
     };
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return (
+      JSON.stringify(nextProps) !== JSON.stringify(this.props) ||
+      nextState !== this.state
+    );
   }
 
   _showActionSheet = data => {
@@ -120,6 +131,13 @@ export class DialogManager extends Component {
     this.simpleDialog.hide();
   };
 
+  _showVaultDialog = () => {
+    this.vaultDialogRef.open();
+  };
+  _hideVaultDialog = () => {
+    this.vaultDialogRef.close();
+  };
+
   onActionSheetHide = () => {
     if (this.show) {
       if (this.show === 'delete') {
@@ -127,16 +145,13 @@ export class DialogManager extends Component {
 
         this.show = null;
       } else if (this.show == 'lock') {
-        this.setState({
-          vaultDialog: true,
-        });
+        this._showVaultDialog();
         this.show = null;
       } else if (this.show == 'unlock') {
         this.setState({
-          unlock: true,
           isPerm: true,
-          vaultDialog: true,
         });
+        this._showVaultDialog();
         this.show = null;
       }
     }
@@ -144,8 +159,15 @@ export class DialogManager extends Component {
   };
 
   render() {
-    let {colors, update} = this.props;
-    let {actionSheetData, item, simpleDialog} = this.state;
+    let {colors} = this.props;
+    let {
+      actionSheetData,
+      item,
+      simpleDialog,
+      isPerm,
+      vaultDialog,
+      unlock,
+    } = this.state;
     return (
       <>
         <ActionSheet
@@ -186,6 +208,15 @@ export class DialogManager extends Component {
           item={item}
           colors={colors}
           template={simpleDialog}
+        />
+
+        <VaultDialog
+          ref={ref => (this.vaultDialogRef = ref)}
+          colors={colors}
+          note={item}
+          perm={isPerm}
+          openedToUnlock={false}
+          visible={vaultDialog}
         />
       </>
     );

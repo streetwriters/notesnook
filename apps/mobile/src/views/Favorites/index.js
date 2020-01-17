@@ -10,15 +10,17 @@ import {NotebookItem} from '../../components/NotebookItem';
 import {FavoritesPlaceHolder} from '../../components/ListPlaceholders';
 import Container from '../../components/Container';
 import {useIsFocused} from 'react-navigation-hooks';
-import {useTracked} from '../../provider';
+ 
 
 export const Favorites = ({navigation}) => {
   // Global State
-  const [state, dispatch] = useTracked();
-  const {colors, selectionMode, pinned, selectedItemsList, favorites} = state;
-
-  const updateSelectionList = () => {};
-  const changeSelectionMode = () => {};
+  const {
+    colors,
+    selectionMode,
+    favorites,
+    updateSelectionList,
+    changeSelectionMode,
+  } = useAppContext();
 
   // Local State
   const [text, setText] = useState('');
