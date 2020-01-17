@@ -18,6 +18,7 @@ import {
   _unSubscribeEvent,
 } from './src/components/DialogManager';
 import {getColorScheme} from './src/common/common';
+import {useAppContext} from './src/provider/useAppContext';
 
 export const DDS = new DeviceDetectionService();
 export const db = new Storage(StorageInterface);
@@ -25,8 +26,7 @@ export const db = new Storage(StorageInterface);
 let sideMenuRef;
 const App = () => {
   const [state, dispatch] = useTracked();
-  const {colors} = state;
-
+  const [colors] = state;
   // Local State
   const [sidebar, setSidebar] = useState(w * 0.3);
   const [init, setInit] = useState(false);

@@ -15,6 +15,7 @@ import Icon from 'react-native-vector-icons/Feather';
 import {getElevation, ToastEvent} from '../../utils/utils';
 import {dialogActions, updateEvent} from '../DialogManager';
 import {db} from '../../../App';
+import {ACTIONS} from '../../provider';
 
 export class Dialog extends Component {
   constructor(props) {
@@ -43,6 +44,16 @@ export class Dialog extends Component {
           visible: false,
         });
         NavigationService.goBack();
+
+        break;
+      }
+      case dialogActions.ACTION_EMPTY_TRASH: {
+        await db.clearTrash();
+        updateEvent({type: ACTIONS.TRASH});
+        ToastEvent.show('Trash cleared', 'success', 1000, () => {}, '');
+        this.setState({
+          visible: false,
+        });
 
         break;
       }

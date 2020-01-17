@@ -20,7 +20,7 @@ import Icon from 'react-native-vector-icons/Feather';
 import NavigationService from '../../services/NavigationService';
 import {db} from '../../../App';
 import FastStorage from 'react-native-fast-storage';
-import {useTracked} from '../../provider';
+import {useTracked, ACTIONS} from '../../provider';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
@@ -260,6 +260,7 @@ export const ActionSheetComponent = ({
         if (!note.dateCreated) return;
         db.pinItem(note.type, note.dateCreated);
         localRefresh(item.type);
+        dispatch({type: ACTIONS.PINNED});
       },
       close: false,
       check: true,
