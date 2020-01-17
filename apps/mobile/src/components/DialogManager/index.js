@@ -59,9 +59,19 @@ export const TEMPLATE_EXIT = type => {
   };
 };
 
+export const TEMPLATE_EMPTY_TRASH = {
+  title: 'Empty Trash',
+  paragraph: 'Are you sure you want to clear the trash?',
+  icon: 'trash',
+  positiveText: 'Clear',
+  negativeText: 'Cancel',
+  action: dialogActions.ACTION_EMPTY_TRASH,
+};
+
 export const dialogActions = {
   ACTION_DELETE: 511,
   ACTION_EXIT: 512,
+  ACTION_EMPTY_TRASH: 513,
 };
 
 export class DialogManager extends Component {

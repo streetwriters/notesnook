@@ -12,6 +12,7 @@ import {useAppContext} from '../../provider/useAppContext';
 import {AddNotebookDialog} from '../AddNotebookDialog';
 import ActionSheet from '../ActionSheet';
 import {ActionSheetComponent} from '../ActionSheetComponent';
+import {useTracked} from '../../provider';
 
 export const NotebookItem = ({
   item,
@@ -175,27 +176,29 @@ export const NotebookItem = ({
                 width: '80%',
                 maxWidth: '80%',
               }}>
-              {item.topics.slice(1, 4).map(topic => (
-                <View
-                  style={{
-                    borderRadius: 5,
-                    backgroundColor: colors.accent,
-                    paddingHorizontal: ph / 1.5,
-                    paddingVertical: pv / 4,
-                    marginRight: 10,
-                  }}>
-                  <Text
-                    numberOfLines={1}
-                    style={{
-                      color: 'white',
-                      fontFamily: WEIGHT.regular,
-                      fontSize: SIZE.xxs,
-                      maxWidth: '100%',
-                    }}>
-                    {topic.title}
-                  </Text>
-                </View>
-              ))}
+              {item && item.topics
+                ? item.topics.slice(1, 4).map(topic => (
+                    <View
+                      style={{
+                        borderRadius: 5,
+                        backgroundColor: colors.accent,
+                        paddingHorizontal: ph / 1.5,
+                        paddingVertical: pv / 4,
+                        marginRight: 10,
+                      }}>
+                      <Text
+                        numberOfLines={1}
+                        style={{
+                          color: 'white',
+                          fontFamily: WEIGHT.regular,
+                          fontSize: SIZE.xxs,
+                          maxWidth: '100%',
+                        }}>
+                        {topic.title}
+                      </Text>
+                    </View>
+                  ))
+                : null}
             </View>
           )}
 

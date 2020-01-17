@@ -3,16 +3,12 @@ import {View, TouchableOpacity} from 'react-native';
 import {SIZE} from '../../common/common';
 import Icon from 'react-native-vector-icons/Feather';
 import {w} from '../../utils/utils';
-import {useTracked} from '../../provider';
+import {useTracked, ACTIONS} from '../../provider';
 
 const SelectionWrapper = ({children, item}) => {
   const [state, dispatch] = useTracked();
   const {colors, selectionMode, selectedItemsList} = state;
 
-  ///
-  const updateDB = () => {};
-  const updateSelectionList = () => {};
-  const changeSelectionMode = () => {};
   return (
     <View
       style={{
@@ -24,7 +20,9 @@ const SelectionWrapper = ({children, item}) => {
         marginHorizontal: 12,
       }}>
       <TouchableOpacity
-        onPress={() => updateSelectionList(item)}
+        onPress={() => {
+          dispatch({type: ACTIONS.SELECTED_ITEMS, item: item});
+        }}
         style={{
           width: 50,
           height: 70,

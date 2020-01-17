@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {View, Text, FlatList, Platform, SectionList} from 'react-native';
 import {SIZE, WEIGHT} from '../../common/common';
 import NoteItem from '../NoteItem';
@@ -7,20 +7,18 @@ import {slideRight, slideLeft} from '../../utils/animations';
 import {w} from '../../utils/utils';
 import SelectionWrapper from '../SelectionWrapper';
 
-import {useTracked} from '../../provider';
+import {useTracked, ACTIONS} from '../../provider';
 
 export const NotesList = ({
   onScroll,
   isSearch = false,
   isGrouped = false,
   refresh = () => {},
+  searchResults,
 }) => {
   const [state, dispatch] = useTracked();
-  const {colors, selectionMode, pinned, selectedItemsList} = state;
+  const {colors, selectionMode} = state;
   const notes = [...state.notes];
-  ///
-  const updateSelectionList = () => {};
-  const changeSelectionMode = () => {};
 
   const _renderItem = ({item, index}) => (
     <SelectionWrapper item={item}>
@@ -31,11 +29,11 @@ export const NotesList = ({
           marginHorizontal: 0,
         }}
         onLongPress={() => {
-          changeSelectionMode(!selectionMode);
-          updateSelectionList(item);
+          dispatch({type: ACTIONS.SELECTION_MODE, enabled: !selectionMode});
+          dispatch({type: ACTIONS.SELECTED_ITEMS, item: item});
         }}
         update={() => {
-          dispatch({type: 'updateNotes'});
+          dispatch({type: ACTIONS.NOTES});
         }}
         item={item}
         index={index}
@@ -61,35 +59,7 @@ export const NotesList = ({
             ? 155
             : 155 - 60,
       }}>
-      {pinned && pinned.length > 0 ? (
-        <>
-          <FlatList
-            data={pinned}
-            keyExtractor={(item, index) => item.dateCreated.toString()}
-            renderItem={({item, index}) =>
-              item.type === 'note' ? (
-                <NoteItem
-                  colors={colors}
-                  customStyle={{
-                    backgroundColor: colors.shade,
-                    width: '100%',
-                    paddingHorizontal: '5%',
-                    paddingTop: 20,
-                    marginHorizontal: 0,
-                    marginBottom: 10,
-                    paddingHorizontal: 12,
-                    marginTop: 20,
-                    borderBottomWidth: 0,
-                  }}
-                  pinned={true}
-                  item={item}
-                  index={index}
-                />
-              ) : null
-            }
-          />
-        </>
-      ) : null}
+      <PinnedItems />
     </View>
   );
 
@@ -111,39 +81,38 @@ export const NotesList = ({
     </View>
   ) : null;
 
-  const _ListEmptyComponent =
-    pinned && pinned.length > 0 ? null : (
-      <View
+  const _ListEmptyComponent = (
+    <View
+      style={{
+        height: '80%',
+        width: '100%',
+        alignItems: 'center',
+        alignSelf: 'center',
+        justifyContent: 'center',
+        opacity: 0.8,
+      }}>
+      <NotesPlaceHolder animation={slideRight} colors={colors} />
+      <NotesPlaceHolder animation={slideLeft} colors={colors} />
+      <NotesPlaceHolder animation={slideRight} colors={colors} />
+      <Text
         style={{
-          height: '80%',
-          width: '100%',
-          alignItems: 'center',
-          alignSelf: 'center',
-          justifyContent: 'center',
-          opacity: 0.8,
+          color: colors.icon,
+          fontSize: SIZE.md,
+          fontFamily: WEIGHT.regular,
+          marginTop: 20,
         }}>
-        <NotesPlaceHolder animation={slideRight} colors={colors} />
-        <NotesPlaceHolder animation={slideLeft} colors={colors} />
-        <NotesPlaceHolder animation={slideRight} colors={colors} />
-        <Text
-          style={{
-            color: colors.icon,
-            fontSize: SIZE.md,
-            fontFamily: WEIGHT.regular,
-            marginTop: 20,
-          }}>
-          Notes you write will appear here.
-        </Text>
-        <Text
-          style={{
-            fontSize: SIZE.sm,
-            color: colors.icon,
-            marginTop: 20,
-          }}>
-          No notes found
-        </Text>
-      </View>
-    );
+        Notes you write will appear here.
+      </Text>
+      <Text
+        style={{
+          fontSize: SIZE.sm,
+          color: colors.icon,
+          marginTop: 20,
+        }}>
+        No notes found
+      </Text>
+    </View>
+  );
 
   const _renderSectionHeader = ({section: {title}}) => (
     <Text
@@ -199,7 +168,7 @@ export const NotesList = ({
     />
   ) : (
     <FlatList
-      data={notes}
+      data={searchResults}
       keyExtractor={_listKeyExtractor}
       ListFooterComponent={_ListFooterComponent}
       onScroll={_onScroll}
@@ -214,5 +183,44 @@ export const NotesList = ({
       }}
       renderItem={_renderItem}
     />
+  );
+};
+
+const PinnedItems = () => {
+  const [state, dispatch] = useTracked();
+  const {pinned, colors} = state;
+
+  useEffect(() => {
+    dispatch({type: ACTIONS.PINNED});
+  }, []);
+
+  return (
+    <>
+      <FlatList
+        data={pinned}
+        keyExtractor={(item, index) => item.dateCreated.toString()}
+        renderItem={({item, index}) =>
+          item.type === 'note' ? (
+            <NoteItem
+              colors={colors}
+              customStyle={{
+                backgroundColor: colors.shade,
+                width: '100%',
+                paddingHorizontal: '5%',
+                paddingTop: 20,
+                marginHorizontal: 0,
+                marginBottom: 10,
+                paddingHorizontal: 12,
+                marginTop: 20,
+                borderBottomWidth: 0,
+              }}
+              pinned={true}
+              item={item}
+              index={index}
+            />
+          ) : null
+        }
+      />
+    </>
   );
 };

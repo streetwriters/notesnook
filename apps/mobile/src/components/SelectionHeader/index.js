@@ -1,11 +1,18 @@
 import React from 'react';
-import {SafeAreaView, TouchableOpacity, View, Text} from 'react-native';
+import {
+  SafeAreaView,
+  TouchableOpacity,
+  View,
+  Text,
+  StatusBar,
+  Platform,
+} from 'react-native';
 import {SIZE, WEIGHT} from '../../common/common';
 import {w} from '../../utils/utils';
 import Icon from 'react-native-vector-icons/Feather';
 import * as Animatable from 'react-native-animatable';
 import {useAppContext} from '../../provider/useAppContext';
-import {useTracked} from '../../provider';
+import {useTracked, ACTIONS} from '../../provider';
 
 export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(
   SafeAreaView,
@@ -16,11 +23,6 @@ export const SelectionHeader = ({navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors, selectionMode, selectedItemsList} = state;
 
-  ///
-  const updateDB = () => {};
-  const updateSelectionList = () => {};
-  const changeSelectionMode = () => {};
-
   // Render
 
   return (
@@ -30,8 +32,10 @@ export const SelectionHeader = ({navigation}) => {
       style={{
         width: '100%',
         position: 'absolute',
-        height: selectionMode ? 50 : 0,
+        height: selectionMode ? 50 + StatusBar.currentHeight : 0,
         opacity: selectionMode ? 1 : 0,
+        backgroundColor: colors.bg,
+        paddingTop: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight,
         justifyContent: 'flex-end',
         zIndex: 11,
       }}>
@@ -52,7 +56,7 @@ export const SelectionHeader = ({navigation}) => {
           }}>
           <TouchableOpacity
             onPress={() => {
-              changeSelectionMode(false);
+              dispatch({type: ACTIONS.SELECTION_MODE, enabled: !selectionMode});
             }}
             hitSlop={{top: 20, bottom: 20, left: 50, right: 40}}
             style={{
