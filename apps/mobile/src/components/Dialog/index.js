@@ -13,7 +13,6 @@ import {
 } from '../../common/common';
 import Icon from 'react-native-vector-icons/Feather';
 import {getElevation, ToastEvent} from '../../utils/utils';
-import {useTracked} from '../../provider';
 import {dialogActions, updateEvent} from '../DialogManager';
 import {db} from '../../../App';
 
@@ -32,13 +31,19 @@ export class Dialog extends Component {
       case dialogActions.ACTION_DELETE: {
         await db.deleteNotes([item]);
         ToastEvent.show('Note moved to trash', 'success', 3000);
+        updateEvent({type: item.type});
+
         this.setState({
           visible: false,
         });
-        updateEvent({type: item.type});
         break;
       }
       case dialogActions.ACTION_EXIT: {
+        this.setState({
+          visible: false,
+        });
+        NavigationService.goBack();
+
         break;
       }
     }
