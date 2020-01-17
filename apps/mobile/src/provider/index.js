@@ -42,16 +42,13 @@ export const ACTIONS = {
   PINNED: 'pinned',
   FAVORITES: 'favorites',
   SELECTION_MODE: 'selectionMode',
-  SELECTED_ITEMS_LIST: 'selectedItemsList',
+  SELECTED_ITEMS: 'selectedItemsList',
   THEME: 'theme',
-  CHANGE_THEME: 'changeTheme',
-  CHANGE_ACCENT: 'changeAccent',
 };
 
 const reducer = (state, action) => {
   switch (action.type) {
     case ACTIONS.NOTES:
-      console.log(action.payload);
       let notes = db.groupNotes();
       return {
         ...state,
@@ -63,6 +60,51 @@ const reducer = (state, action) => {
         colors: {...action.colors},
       };
     }
+    case ACTIONS.NOTEBOOKS: {
+      let notebooks = [...db.getNotebooks()];
+      return {
+        ...state,
+        notebooks: notebooks,
+      };
+    }
+    case ACTIONS.PINNED: {
+      let pinned = [...db.getPinned()];
+      return {
+        ...state,
+        pinned: pinned,
+      };
+    }
+    case ACTIONS.TAGS: {
+      return {
+        ...state,
+      };
+    }
+    case ACTIONS.FAVORITES: {
+      let favorites = [db.getFavorites()];
+      return {
+        ...state,
+        favorites: favorites,
+      };
+    }
+    case ACTIONS.SELECTION_MODE: {
+      return {
+        ...state,
+        selectionMode: action.enabled,
+        selectedItemsList: [],
+      };
+    }
+    case ACTIONS.SELECTED_ITEMS: {
+      let selectedItems = [...state.selectedItemsList];
+      if (selectedItems.includes(action.item)) {
+        selectedItems.splice(selectedItems.indexOf(action.item), 1);
+      } else {
+        selectedItems.push(action.item);
+      }
+      return {
+        ...state,
+        selectedItemsList: selectedItems,
+      };
+    }
     default:
       throw new Error('unknown action type');
   }
@@ -70,4 +112,6 @@ const reducer = (state, action) => {
 
 const useValue = () => useReducer(reducer, defaultState);
 
-export const {Provider, useTracked} = createContainer(useValue);
+export const {Provider, useTracked, useTrackedState} = createContainer(
+  useValue,
+);
