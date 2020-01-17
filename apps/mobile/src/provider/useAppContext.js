@@ -1,5 +1,5 @@
 import {useContext} from 'react';
-import {AppContext} from '.';
+import {AppContext, useTrackedState} from '.';
 import {StatusBar} from 'react-native';
 import {
   COLOR_SCHEME,
@@ -10,12 +10,8 @@ import {
 import {db} from '../../App';
 
 const useAppContext = () => {
-  const [state, dispatch] = useContext(AppContext);
-
-  if (dispatch === undefined) {
-    throw new Error('Must have dispatch defined');
-  }
-
+  const state = useTrackedState();
+  /* 
   // Themeing
 
   async function updateAppTheme(colors = state.colors) {
@@ -80,16 +76,10 @@ const useAppContext = () => {
       draft.favorites = favorites;
       draft.pinned = pinned;
     });
-  }
+  } */
 
   return {
     ...state,
-    updateAppTheme,
-    changeColorScheme,
-    changeAccentColor,
-    changeSelectionMode,
-    updateSelectionList,
-    updateDB,
   };
 };
 

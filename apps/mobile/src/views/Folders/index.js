@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {View, Text, Platform, FlatList} from 'react-native';
 import {SIZE, WEIGHT} from '../../common/common';
 import {AddNotebookDialog} from '../../components/AddNotebookDialog';
@@ -14,16 +14,17 @@ import SelectionHeader from '../../components/SelectionHeader';
 import SelectionWrapper from '../../components/SelectionWrapper';
 import {w} from '../../utils/utils';
 import {useIsFocused} from 'react-navigation-hooks';
-import {useTracked} from '../../provider';
+import {useTracked, ACTIONS} from '../../provider';
 
 export const Folders = ({navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors, selectionMode, pinned, notebooks} = state;
 
   ///
-  const updateDB = () => {};
-  const updateSelectionList = () => {};
-  const changeSelectionMode = () => {};
+
+  useEffect(() => {
+    dispatch({type: ACTIONS.NOTEBOOKS});
+  }, []);
 
   const [addNotebook, setAddNotebook] = useState(false);
   const [hideHeader, setHideHeader] = useState(false);
@@ -136,7 +137,14 @@ export const Folders = ({navigation}) => {
                             }}
                             isMove={params.isMove}
                             onLongPress={() => {
-                              changeSelectionMode();
+                              dispatch({
+                                type: ACTIONS.SELECTION_MODE,
+                                enabled: !selectionMode,
+                              });
+                              dispatch({
+                                type: ACTIONS.SELECTED_ITEMS,
+                                item: item,
+                              });
                             }}
                             noteToMove={params.note}
                             item={item}
@@ -220,11 +228,14 @@ export const Folders = ({navigation}) => {
                 }}
                 isMove={params.isMove}
                 onLongPress={() => {
-                  if (!selectionMode) {
-                    updateSelectionList(item);
-                  }
-
-                  changeSelectionMode(!selectionMode);
+                  dispatch({
+                    type: ACTIONS.SELECTION_MODE,
+                    enabled: !selectionMode,
+                  });
+                  dispatch({
+                    type: ACTIONS.SELECTED_ITEMS,
+                    item: item,
+                  });
                 }}
                 noteToMove={params.note}
                 item={item}

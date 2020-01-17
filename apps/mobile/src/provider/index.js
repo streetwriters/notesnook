@@ -1,6 +1,7 @@
 import React, {useReducer} from 'react';
 import {DDS, db} from '../../App';
 import {createContainer} from 'react-tracked';
+import {SideMenuEvent} from '../utils/utils';
 const defaultState = {
   isMenuOpen: {
     current: false,
@@ -80,13 +81,20 @@ const reducer = (state, action) => {
       };
     }
     case ACTIONS.FAVORITES: {
-      let favorites = [db.getFavorites()];
+      let favorites = [...db.getFavorites()];
+
       return {
         ...state,
-        favorites: favorites,
+        favorites: [...favorites],
       };
     }
     case ACTIONS.SELECTION_MODE: {
+      if (action.enabled) {
+        SideMenuEvent.disable();
+      } else {
+        SideMenuEvent.enable();
+      }
+
       return {
         ...state,
         selectionMode: action.enabled,

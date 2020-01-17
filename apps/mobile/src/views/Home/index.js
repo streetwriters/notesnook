@@ -18,19 +18,11 @@ import {_recieveEvent, _unSubscribeEvent} from '../../components/DialogManager';
 export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(
   SafeAreaView,
 );
-let intervals;
-let counter = 0;
 
 export const Home = ({navigation}) => {
   // State
-
   const [state, dispatch] = useTracked();
   const {colors, selectionMode, notes} = state;
-
-  ///
-  const updateDB = () => {};
-  const updateSelectionList = () => {};
-  const changeSelectionMode = () => {};
 
   const [text, setText] = useState('');
   const [hideHeader, setHideHeader] = useState(false);
@@ -159,7 +151,7 @@ export const Home = ({navigation}) => {
         isGrouped={true}
         onScroll={onScroll}
         isSearch={searchResults.length > 0 ? true : false}
-        notes={searchResults.length > 0 ? searchResults : notes}
+        searchResults={searchResults.length > 0 ? searchResults : null}
         keyword={keyword}
       />
     </Container>
