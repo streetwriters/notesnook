@@ -8,10 +8,10 @@ import {Dialog} from '../Dialog';
 import {VaultDialog} from '../VaultDialog';
 import {db} from '../../../App';
 import {DDS} from '../../../App';
-import ActionSheet from '../ActionSheet';
-import {ActionSheetComponent} from '../ActionSheetComponent';
 import _ from 'lodash';
+
 import {ActionSheetEvent} from '../DialogManager';
+
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
