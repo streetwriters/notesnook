@@ -14,6 +14,8 @@ import {
   WEIGHT,
   COLOR_SCHEME_DARK,
   COLOR_SCHEME_LIGHT,
+  COLOR_SCHEME,
+  ACCENT,
 } from '../../common/common';
 import Icon from 'react-native-vector-icons/Feather';
 import {Header} from '../../components/header';
@@ -28,15 +30,19 @@ export const Settings = ({navigation}) => {
   const {colors} = state;
 
   ///
-  const changeAccentColor = () => {};
-  const changeColorScheme = () => {};
-  //const [colors, setColors] = useState(COLOR_SCHEME_LIGHT);
-  let isFocused = useIsFocused();
+  function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
+    let newColors = setColorScheme(colors, accent);
+    StatusBar.setBarStyle(newColors.night ? 'light-content' : 'dark-content');
 
-  if (!isFocused) {
-    console.log('block rerender');
-    return <></>;
+    dispatch({type: ACTIONS.THEME, colors: newColors});
   }
+
+  function changeAccentColor(accentColor) {
+    ACCENT.color = accentColor;
+    ACCENT.shade = accentColor + '12';
+    changeColorScheme();
+  }
+
   return (
     <Container noBottomButton={true}>
       <View>

@@ -36,17 +36,33 @@ const defaultState = {
 
 export const ACTIONS = {
   NOTES: 'note',
+  NOTEBOOKS: 'notebook',
+  TRASH: 'trash',
+  TAGS: 'tags',
+  PINNED: 'pinned',
+  FAVORITES: 'favorites',
+  SELECTION_MODE: 'selectionMode',
+  SELECTED_ITEMS_LIST: 'selectedItemsList',
+  THEME: 'theme',
+  CHANGE_THEME: 'changeTheme',
+  CHANGE_ACCENT: 'changeAccent',
 };
 
 const reducer = (state, action) => {
   switch (action.type) {
-    case 'note':
+    case ACTIONS.NOTES:
+      console.log(action.payload);
       let notes = db.groupNotes();
       return {
         ...state,
         notes: notes,
       };
-
+    case ACTIONS.THEME: {
+      return {
+        ...state,
+        colors: {...action.colors},
+      };
+    }
     default:
       throw new Error('unknown action type');
   }

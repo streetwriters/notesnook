@@ -26,6 +26,11 @@ import {ActionSheetComponent} from '../../components/ActionSheetComponent';
 import {VaultDialog} from '../../components/VaultDialog';
 import {useIsFocused} from 'react-navigation-hooks';
 import {useTracked} from '../../provider';
+import {
+  simpleDialogEvent,
+  TEMPLATE_EXIT,
+  ActionSheetEvent,
+} from '../../components/DialogManager';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
@@ -117,14 +122,8 @@ const Editor = ({navigation}) => {
       locked: note.locked,
     };
     setNoteProps({...props});
-    console.log(JSON.stringify(note.content.delta));
 
-    if (JSON.stringify(note.content.delta) === JSON.stringify({})) {
-      console.log('i run');
-      post(`{"ops":[{"insert":"${note.content.text}"}]}`);
-    } else {
-      post(JSON.stringify(note.content.delta));
-    }
+    post(JSON.stringify(note.content.delta));
 
     title = note.title;
     titleRef.setNativeProps({
@@ -140,31 +139,7 @@ const Editor = ({navigation}) => {
     timer = null;
     timer = setTimeout(() => {
       saveNote(noteProps, true);
-      console.log('saved');
     }, 1000);
-  };
-
-  const onMenuHide = () => {
-    if (show) {
-      if (show === 'lock') {
-        if (unlock) {
-          setUnlock(false);
-        }
-        setVaultDialog(true);
-      } else if (show === 'unlock') {
-        setUnlock(true);
-        setVaultDialog(true);
-      } else if (show == 'delete') {
-        setVisible(true);
-      }
-    }
-  };
-
-  const deleteItem = async () => {
-    await db.deleteNotes([note]);
-    ToastEvent.show('Note moved to trash', 'success', 3000);
-    setVisible(false);
-    navigation.goBack();
   };
 
   const _renderEditor = () => {
@@ -190,7 +165,7 @@ const Editor = ({navigation}) => {
             }}>
             <TouchableOpacity
               onPress={() => {
-                setDialog(true);
+                simpleDialogEvent(TEMPLATE_EXIT('Editor'));
               }}
               style={{
                 width: '12.5%',
@@ -230,7 +205,13 @@ const Editor = ({navigation}) => {
               onPress={() => {
                 DDS.isTab
                   ? setSidebar(!sidebar)
-                  : actionSheet._setModalVisible();
+                  : ActionSheetEvent(
+                      note,
+                      true,
+                      true,
+                      ['Add to', 'Share', 'Export', 'Delete'],
+                      ['Dark Mode', 'Add to Vault', 'Pin', 'Favorite'],
+                    );
               }}
               style={{
                 width: '12.5%',
@@ -308,8 +289,8 @@ const Editor = ({navigation}) => {
 
   useEffect(() => {
     let handleBack = BackHandler.addEventListener('hardwareBackPress', () => {
-      updateDB();
-      setDialog(true);
+      simpleDialogEvent(TEMPLATE_EXIT('Editor'));
+
       return true;
     });
     return () => {
@@ -334,162 +315,59 @@ const Editor = ({navigation}) => {
     EditorWebView.reload();
   }, [colors]);
 
-  if (!isFocused) {
-    console.log('block rerender');
-    return <></>;
-  } else {
-    return DDS.isTab ? (
-      <View
-        style={{
-          flexDirection: 'row',
-          width: '100%',
-        }}>
-        <AnimatedSafeAreaView
-          transition={['backgroundColor', 'width']}
-          duration={300}
-          style={{
-            height: '100%',
-            backgroundColor: colors.bg,
-            width: sidebar ? '70%' : '100%',
-          }}>
-          <Dialog
-            title="Close Editor"
-            visible={dialog}
-            icon="x"
-            paragraph="Are you sure you want to close editor?"
-            close={() => {
-              setDialog(false);
-            }}
-            positivePress={() => {
-              setTimeout(() => {
-                navigation.goBack();
-                setDialog(false);
-              }, 1000);
-            }}
-          />
-
-          {_renderEditor()}
-        </AnimatedSafeAreaView>
-        <Animatable.View
-          transition={['width', 'opacity']}
-          duration={300}
-          style={{
-            width: sidebar ? '30%' : '0%',
-            opacity: sidebar ? 1 : 0,
-          }}>
-          <EditorMenu
-            hide={false}
-            noteProps={noteProps}
-            updateProps={props => {
-              setNoteProps(props);
-            }}
-            close={() => {
-              setTimeout(() => {
-                setOpen(args);
-              }, 500);
-            }}
-          />
-        </Animatable.View>
-      </View>
-    ) : (
-      <Animatable.View
-        transition="backgroundColor"
+  return DDS.isTab ? (
+    <View
+      style={{
+        flexDirection: 'row',
+        width: '100%',
+      }}>
+      <AnimatedSafeAreaView
+        transition={['backgroundColor', 'width']}
         duration={300}
         style={{
+          height: '100%',
           backgroundColor: colors.bg,
-          flex: 1,
+          width: sidebar ? '70%' : '100%',
         }}>
-        <AnimatedSafeAreaView
-          transition="backgroundColor"
-          duration={300}
-          style={{height: '100%', backgroundColor: colors.bg}}>
-          <Dialog
-            title="Close Editor"
-            visible={dialog}
-            icon="x"
-            paragraph="Are you sure you want to close editor?"
-            close={() => {
-              setDialog(false);
-            }}
-            positivePress={() => {
-              navigation.goBack();
-              setDialog(false);
-            }}
-          />
-
-          {_renderEditor()}
-        </AnimatedSafeAreaView>
-
-        <Dialog
-          visible={visible}
-          title="Delete note"
-          icon="trash"
-          paragraph="Do you want to delete this note?"
-          positiveText="Delete"
-          positivePress={deleteItem}
-          close={() => {
-            setVisible(false);
-          }}
-        />
-
-        <VaultDialog
-          close={(item, locked) => {
-            let props = {...noteProps};
-            props.locked = locked;
-            note.locked = locked;
+        {_renderEditor()}
+      </AnimatedSafeAreaView>
+      <Animatable.View
+        transition={['width', 'opacity']}
+        duration={300}
+        style={{
+          width: sidebar ? '30%' : '0%',
+          opacity: sidebar ? 1 : 0,
+        }}>
+        <EditorMenu
+          hide={false}
+          noteProps={noteProps}
+          updateProps={props => {
             setNoteProps(props);
-            setVaultDialog(false);
-            setUnlock(false);
           }}
-          note={note}
-          timestamp={timestamp}
-          perm={true}
-          openedToUnlock={unlock}
-          visible={vaultDialog}
-        />
-        <ActionSheet
-          ref={ref => (actionSheet = ref)}
-          customStyles={{
-            backgroundColor: colors.bg,
+          close={() => {
+            setTimeout(() => {
+              setOpen(args);
+            }, 500);
           }}
-          initialOffsetFromBottom={0.99}
-          elevation={5}
-          overlayColor={
-            colors.night ? 'rgba(225,225,225,0.1)' : 'rgba(0,0,0,0.3)'
-          }
-          indicatorColor={colors.shade}
-          onClose={() => {
-            onMenuHide();
-            if (willRefresh) {
-              note = db.getNote(timestamp);
-
-              updateEditor();
-            }
-          }}
-          children={
-            <ActionSheetComponent
-              item={note}
-              setWillRefresh={value => {
-                cutsomNote = value;
-                willRefresh = true;
-              }}
-              hasColors={true}
-              hasTags={true}
-              rowItems={['Add to', 'Share', 'Export', 'Delete']}
-              columnItems={['Dark Mode', 'Add to Vault', 'Pin', 'Favorite']}
-              close={value => {
-                if (value) {
-                  show = value;
-                }
-
-                actionSheet._setModalVisible();
-              }}
-            />
-          }
         />
       </Animatable.View>
-    );
-  }
+    </View>
+  ) : (
+    <Animatable.View
+      transition="backgroundColor"
+      duration={300}
+      style={{
+        backgroundColor: colors.bg,
+        flex: 1,
+      }}>
+      <AnimatedSafeAreaView
+        transition="backgroundColor"
+        duration={300}
+        style={{height: '100%', backgroundColor: colors.bg}}>
+        {_renderEditor()}
+      </AnimatedSafeAreaView>
+    </Animatable.View>
+  );
 };
 
 Editor.navigationOptions = {

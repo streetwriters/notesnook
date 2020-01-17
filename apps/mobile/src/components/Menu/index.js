@@ -15,20 +15,27 @@ import {
   WEIGHT,
   COLOR_SCHEME_DARK,
   COLOR_SCHEME_LIGHT,
+  ACCENT,
+  COLOR_SCHEME,
+  setColorScheme,
 } from '../../common/common';
 import Icon from 'react-native-vector-icons/Feather';
-import {h} from '../../utils/utils';
 import {AnimatedSafeAreaView} from '../../views/Home';
-import {useAppContext} from '../../provider/useAppContext';
 import FastStorage from 'react-native-fast-storage';
-import {useTracked} from '../../provider';
+import {useTracked, ACTIONS} from '../../provider';
+
 export const Menu = ({close = () => {}, hide, update = () => {}}) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
 
   // todo
 
-  const changeColorScheme = () => {};
+  function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
+    let newColors = setColorScheme(colors, accent);
+    StatusBar.setBarStyle(newColors.night ? 'light-content' : 'dark-content');
+
+    dispatch({type: ACTIONS.THEME, colors: newColors});
+  }
 
   const listItems = [
     {

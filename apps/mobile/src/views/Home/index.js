@@ -38,7 +38,6 @@ export const Home = ({navigation}) => {
   const [searchResults, setSearchResults] = useState([]);
 
   // Variables
-  let isFocused = useIsFocused();
 
   let offsetY = 0;
   let countUp = 1;
@@ -48,19 +47,8 @@ export const Home = ({navigation}) => {
   // Effects
 
   useEffect(() => {
-    dispatch({type: ACTIONS.NOTES});
+    dispatch({type: ACTIONS.NOTES, payload: 'hello there'});
   }, []);
-
-  useEffect(() => {
-    _recieveEvent('updateEvent', type => {
-      dispatch(type);
-    });
-    return () => {
-      _unSubscribeEvent('updateEvent', type => {
-        dispatch(type);
-      });
-    };
-  });
 
   // Functions
 
@@ -120,6 +108,7 @@ export const Home = ({navigation}) => {
     <Container
       bottomButtonText="Add a new note"
       bottomButtonOnPress={() => {
+        dispatch({type: ACTIONS.NOTES});
         SideMenuEvent.close();
         SideMenuEvent.disable();
         NavigationService.navigate('Editor');
