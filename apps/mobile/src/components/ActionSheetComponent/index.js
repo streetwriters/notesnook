@@ -13,11 +13,12 @@ import {
   opacity,
   COLOR_SCHEME_DARK,
   COLOR_SCHEME_LIGHT,
+  COLOR_SCHEME,
+  ACCENT,
 } from '../../common/common';
 import Icon from 'react-native-vector-icons/Feather';
 import NavigationService from '../../services/NavigationService';
 import {db} from '../../../App';
-import {useAppContext} from '../../provider/useAppContext';
 import FastStorage from 'react-native-fast-storage';
 import {useTracked} from '../../provider';
 const w = Dimensions.get('window').width;
@@ -38,7 +39,12 @@ export const ActionSheetComponent = ({
 
   // Todo
 
-  const changeColorScheme = () => {};
+  function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
+    let newColors = setColorScheme(colors, accent);
+    StatusBar.setBarStyle(newColors.night ? 'light-content' : 'dark-content');
+
+    dispatch({type: ACTIONS.THEME, colors: newColors});
+  }
 
   const [focused, setFocused] = useState(false);
   const [note, setNote] = useState(
