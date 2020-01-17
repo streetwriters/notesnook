@@ -1,36 +1,30 @@
 import React, {useEffect, useState} from 'react';
 import {
-  View,
-  Platform,
-  Linking,
-  KeyboardAvoidingView,
-  Dimensions,
-  TextInput,
   BackHandler,
-  TouchableOpacity,
+  Dimensions,
+  KeyboardAvoidingView,
+  Linking,
+  Platform,
   StatusBar,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import {SIZE, WEIGHT} from '../../common/common';
-import WebView from 'react-native-webview';
-import Icon from 'react-native-vector-icons/Feather';
-import {db} from '../../../App';
-import {SideMenuEvent, getElevation, ToastEvent} from '../../utils/utils';
-import {Dialog} from '../../components/Dialog';
-import {DDS} from '../../../App';
 import * as Animatable from 'react-native-animatable';
-import {EditorMenu} from '../../components/EditorMenu';
-import {AnimatedSafeAreaView} from '../Home';
-import {useAppContext} from '../../provider/useAppContext';
-import ActionSheet from '../../components/ActionSheet';
-import {ActionSheetComponent} from '../../components/ActionSheetComponent';
-import {VaultDialog} from '../../components/VaultDialog';
+import Icon from 'react-native-vector-icons/Feather';
+import WebView from 'react-native-webview';
 import {useIsFocused} from 'react-navigation-hooks';
-import {useTracked} from '../../provider';
+import {db, DDS} from '../../../App';
+import {SIZE, WEIGHT} from '../../common/common';
 import {
+  ActionSheetEvent,
   simpleDialogEvent,
   TEMPLATE_EXIT,
-  ActionSheetEvent,
 } from '../../components/DialogManager';
+import {EditorMenu} from '../../components/EditorMenu';
+import {useTracked} from '../../provider';
+import {SideMenuEvent} from '../../utils/utils';
+import {AnimatedSafeAreaView} from '../Home';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 

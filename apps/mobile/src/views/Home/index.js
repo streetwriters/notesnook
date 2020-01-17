@@ -1,19 +1,15 @@
 import React, {useEffect, useState} from 'react';
 import {SafeAreaView} from 'react-native';
-import {Search} from '../../components/SearchInput';
-import {w, h, SideMenuEvent, ToastEvent} from '../../utils/utils';
+import * as Animatable from 'react-native-animatable';
+import {db} from '../../../App';
+import Container from '../../components/Container';
 import {Header} from '../../components/header';
 import {NotesList} from '../../components/NotesList';
-import {db} from '../../../App';
-import NavigationService from '../../services/NavigationService';
-import * as Animatable from 'react-native-animatable';
-import {useAppContext} from '../../provider/useAppContext';
-import {DDS} from '../../../App';
-import Container from '../../components/Container';
+import {Search} from '../../components/SearchInput';
 import SelectionHeader from '../../components/SelectionHeader';
-import {useIsFocused} from 'react-navigation-hooks';
-import {useTracked, ACTIONS} from '../../provider';
-import {_recieveEvent, _unSubscribeEvent} from '../../components/DialogManager';
+import {ACTIONS, useTracked} from '../../provider';
+import NavigationService from '../../services/NavigationService';
+import {SideMenuEvent, ToastEvent} from '../../utils/utils';
 
 export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(
   SafeAreaView,

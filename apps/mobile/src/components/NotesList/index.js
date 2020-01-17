@@ -1,13 +1,12 @@
 import React, {useEffect} from 'react';
-import {View, Text, FlatList, Platform, SectionList} from 'react-native';
+import {FlatList, Platform, SectionList, Text, View} from 'react-native';
 import {SIZE, WEIGHT} from '../../common/common';
-import NoteItem from '../NoteItem';
-import {NotesPlaceHolder} from '../ListPlaceholders';
-import {slideRight, slideLeft} from '../../utils/animations';
+import {ACTIONS, useTracked} from '../../provider';
+import {slideLeft, slideRight} from '../../utils/animations';
 import {w} from '../../utils/utils';
+import {NotesPlaceHolder} from '../ListPlaceholders';
+import NoteItem from '../NoteItem';
 import SelectionWrapper from '../SelectionWrapper';
-
-import {useTracked, ACTIONS} from '../../provider';
 
 export const NotesList = ({
   onScroll,

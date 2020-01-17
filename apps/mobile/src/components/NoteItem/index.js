@@ -1,15 +1,10 @@
 import React from 'react';
-import {View, Text, TouchableOpacity, Dimensions} from 'react-native';
-import {SIZE, ph, pv, WEIGHT} from '../../common/common';
+import {Dimensions, Text, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
-import {timeSince, ToastEvent, getElevation} from '../../utils/utils';
-import NavigationService from '../../services/NavigationService';
-import {Dialog} from '../Dialog';
-import {VaultDialog} from '../VaultDialog';
-import {db} from '../../../App';
 import {DDS} from '../../../App';
-import _ from 'lodash';
-
+import {ph, pv, SIZE, WEIGHT} from '../../common/common';
+import NavigationService from '../../services/NavigationService';
+import {getElevation, timeSince} from '../../utils/utils';
 import {ActionSheetEvent} from '../DialogManager';
 
 const w = Dimensions.get('window').width;

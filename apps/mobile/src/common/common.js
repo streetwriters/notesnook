@@ -1,6 +1,6 @@
-import {DeviceEventEmitter, StatusBar, PixelRatio} from 'react-native';
-
+import {DeviceEventEmitter, StatusBar} from 'react-native';
 import FastStorage from 'react-native-fast-storage';
+
 //COLOR SCHEME
 export const ACCENT = {
   color: '#0560FF',

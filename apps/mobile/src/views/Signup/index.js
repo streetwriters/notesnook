@@ -1,17 +1,16 @@
-import React, {useEffect, useState, createRef} from 'react';
+import React, {createRef, useEffect} from 'react';
 import {
-  View,
+  DeviceEventEmitter,
+  SafeAreaView,
   Text,
   TouchableOpacity,
-  SafeAreaView,
-  DeviceEventEmitter,
+  View,
 } from 'react-native';
-import {SIZE, pv, opacity, WEIGHT} from '../../common/common';
 import {TextInput} from 'react-native-gesture-handler';
 import {NavigationEvents} from 'react-navigation';
-import {Header} from '../../components/header';
 import {DDS} from '../../../App';
-import {useAppContext} from '../../provider/useAppContext';
+import {opacity, pv, SIZE, WEIGHT} from '../../common/common';
+import {Header} from '../../components/header';
 import {useTracked} from '../../provider';
 
 export const Signup = ({navigation}) => {

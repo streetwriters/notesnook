@@ -1,19 +1,18 @@
-import React, {useState, createRef, useEffect} from 'react';
+import React, {createRef, useState} from 'react';
 import {
-  View,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
   Text,
   TouchableOpacity,
-  Platform,
-  Modal,
-  KeyboardAvoidingView,
+  View,
 } from 'react-native';
-import {SIZE, ph, pv, opacity, WEIGHT} from '../../common/common';
-import Icon from 'react-native-vector-icons/Feather';
-import {getElevation, ToastEvent} from '../../utils/utils';
 import {FlatList, TextInput} from 'react-native-gesture-handler';
+import Icon from 'react-native-vector-icons/Feather';
 import {db, DDS} from '../../../App';
-import {useAppContext} from '../../provider/useAppContext';
+import {opacity, ph, pv, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
+import {getElevation, ToastEvent} from '../../utils/utils';
 
 let refs = [];
 

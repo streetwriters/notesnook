@@ -1,21 +1,11 @@
-import React, {Fragment, useEffect, useState, createRef} from 'react';
-import {View, TextInput, Platform, DeviceEventEmitter} from 'react-native';
-import {
-  COLOR_SCHEME,
-  SIZE,
-  br,
-  ph,
-  pv,
-  opacity,
-  FONT,
-  WEIGHT,
-} from '../../common/common';
-import Icon from 'react-native-vector-icons/Ionicons';
-import {getElevation, w} from '../../utils/utils';
+import React, {createRef, useState} from 'react';
+import {TextInput} from 'react-native';
 import * as Animatable from 'react-native-animatable';
+import Icon from 'react-native-vector-icons/Ionicons';
 import {DDS} from '../../../App';
-import {useAppContext} from '../../provider/useAppContext';
+import {br, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
+import {w} from '../../utils/utils';
 export const Search = props => {
   const [state, dispatch] = useTracked();
   const {colors} = state;

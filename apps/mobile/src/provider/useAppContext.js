@@ -1,13 +1,4 @@
-import {useContext} from 'react';
-import {AppContext, useTrackedState} from '.';
-import {StatusBar} from 'react-native';
-import {
-  COLOR_SCHEME,
-  setColorScheme,
-  getColorScheme,
-  ACCENT,
-} from '../common/common';
-import {db} from '../../App';
+import {useTrackedState} from '.';
 
 const useAppContext = () => {
   const state = useTrackedState();

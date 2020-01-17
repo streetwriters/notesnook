@@ -1,30 +1,22 @@
-import React, {useState} from 'react';
+import React from 'react';
+import {ScrollView, Text, TouchableOpacity, View} from 'react-native';
+import FastStorage from 'react-native-fast-storage';
+import {FlatList} from 'react-native-gesture-handler';
+import Icon from 'react-native-vector-icons/Feather';
 import {
-  ScrollView,
-  View,
-  Text,
-  TouchableOpacity,
-  Dimensions,
-} from 'react-native';
-import NavigationService from '../../services/NavigationService';
-import {
-  SIZE,
-  pv,
-  opacity,
-  WEIGHT,
+  ACCENT,
+  COLOR_SCHEME,
   COLOR_SCHEME_DARK,
   COLOR_SCHEME_LIGHT,
-  COLOR_SCHEME,
-  ACCENT,
+  opacity,
+  pv,
+  SIZE,
+  WEIGHT,
 } from '../../common/common';
-import Icon from 'react-native-vector-icons/Feather';
-import {Header} from '../../components/header';
-import {FlatList} from 'react-native-gesture-handler';
-import {useAppContext} from '../../provider/useAppContext';
-import {useIsFocused} from 'react-navigation-hooks';
 import Container from '../../components/Container';
-import FastStorage from 'react-native-fast-storage';
+import {Header} from '../../components/header';
 import {useTracked} from '../../provider';
+import NavigationService from '../../services/NavigationService';
 export const Settings = ({navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;

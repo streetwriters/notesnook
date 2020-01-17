@@ -1,17 +1,16 @@
 import React from 'react';
-import {View, Text} from 'react-native';
-import Icon from 'react-native-vector-icons/Feather';
+import {Text, View} from 'react-native';
 import * as Animatable from 'react-native-animatable';
-
+import Icon from 'react-native-vector-icons/Feather';
+import {SIZE} from '../../common/common';
 import {
   deleteItems,
-  rotate,
   opacity,
+  rotate,
   slideLeft,
   slideRight,
 } from '../../utils/animations';
 import {w} from '../../utils/utils';
-import {SIZE} from '../../common/common';
 
 export const NotebookPlaceHolder = ({colors, animation}) => {
   return (

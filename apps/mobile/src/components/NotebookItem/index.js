@@ -1,18 +1,16 @@
 import React, {useState} from 'react';
-import {View, Text, TouchableOpacity} from 'react-native';
-import NavigationService from '../../services/NavigationService';
-import Menu, {MenuItem, MenuDivider} from 'react-native-material-menu';
-import {SIZE, ph, pv, opacity, WEIGHT, br} from '../../common/common';
+import {Text, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
-import {w, ToastEvent} from '../../utils/utils';
-import {db, DDS} from '../../../App';
-import {Dialog} from '../Dialog';
-import {AddTopicDialog} from '../AddTopicDialog';
-import {useAppContext} from '../../provider/useAppContext';
-import {AddNotebookDialog} from '../AddNotebookDialog';
+import {db} from '../../../App';
+import {opacity, ph, pv, SIZE, WEIGHT} from '../../common/common';
+import {useTracked} from '../../provider';
+import NavigationService from '../../services/NavigationService';
+import {ToastEvent, w} from '../../utils/utils';
 import ActionSheet from '../ActionSheet';
 import {ActionSheetComponent} from '../ActionSheetComponent';
-import {useTracked} from '../../provider';
+import {AddNotebookDialog} from '../AddNotebookDialog';
+import {AddTopicDialog} from '../AddTopicDialog';
+import {Dialog} from '../Dialog';
 
 export const NotebookItem = ({
   item,

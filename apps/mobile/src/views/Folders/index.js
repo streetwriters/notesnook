@@ -1,20 +1,19 @@
-import React, {useState, useEffect} from 'react';
-import {View, Text, Platform, FlatList} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {FlatList, Platform, Text, View} from 'react-native';
+import * as Animatable from 'react-native-animatable';
+import {useIsFocused} from 'react-navigation-hooks';
 import {SIZE, WEIGHT} from '../../common/common';
 import {AddNotebookDialog} from '../../components/AddNotebookDialog';
+import Container from '../../components/Container';
+import {Header} from '../../components/header';
+import {NotebookPlaceHolder} from '../../components/ListPlaceholders';
 import {NotebookItem} from '../../components/NotebookItem';
 import {Search} from '../../components/SearchInput';
-import {Header} from '../../components/header';
-import * as Animatable from 'react-native-animatable';
-import {useAppContext} from '../../provider/useAppContext';
-import {NotebookPlaceHolder} from '../../components/ListPlaceholders';
-import {slideRight, slideLeft} from '../../utils/animations';
-import Container from '../../components/Container';
 import SelectionHeader from '../../components/SelectionHeader';
 import SelectionWrapper from '../../components/SelectionWrapper';
+import {ACTIONS, useTracked} from '../../provider';
+import {slideLeft, slideRight} from '../../utils/animations';
 import {w} from '../../utils/utils';
-import {useIsFocused} from 'react-navigation-hooks';
-import {useTracked, ACTIONS} from '../../provider';
 
 export const Folders = ({navigation}) => {
   const [state, dispatch] = useTracked();

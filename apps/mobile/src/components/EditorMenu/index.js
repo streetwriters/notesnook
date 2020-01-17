@@ -1,32 +1,29 @@
 import React, {useState} from 'react';
 import {
+  ActivityIndicator,
+  FlatList,
+  KeyboardAvoidingView,
+  Platform,
   ScrollView,
-  View,
+  StatusBar,
   Text,
   TouchableOpacity,
-  Platform,
-  FlatList,
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  StatusBar,
+  View,
 } from 'react-native';
+import FastStorage from 'react-native-fast-storage';
+import {TextInput} from 'react-native-gesture-handler';
+import Icon from 'react-native-vector-icons/Feather';
 import {
-  SIZE,
-  pv,
-  opacity,
-  WEIGHT,
   COLOR_SCHEME_DARK,
   COLOR_SCHEME_LIGHT,
+  opacity,
+  pv,
+  SIZE,
+  WEIGHT,
 } from '../../common/common';
-import Icon from 'react-native-vector-icons/Feather';
-import {h} from '../../utils/utils';
-import FastStorage from 'react-native-fast-storage';
-
-import {AnimatedSafeAreaView} from '../../views/Home';
-import {TextInput} from 'react-native-gesture-handler';
-import {useAppContext} from '../../provider/useAppContext';
-import {VaultDialog} from '../VaultDialog';
 import {useTracked} from '../../provider';
+import {AnimatedSafeAreaView} from '../../views/Home';
+import {VaultDialog} from '../VaultDialog';
 
 let tagsInputRef;
 let tagsList;

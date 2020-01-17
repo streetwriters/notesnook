@@ -1,34 +1,11 @@
-import React, {useEffect, useState, createRef} from 'react';
-import {
-  ScrollView,
-  View,
-  Text,
-  TouchableOpacity,
-  Dimensions,
-  Image,
-  SafeAreaView,
-  Platform,
-  Modal,
-} from 'react-native';
-import NavigationService from '../../services/NavigationService';
-import {
-  COLOR_SCHEME,
-  SIZE,
-  br,
-  ph,
-  pv,
-  opacity,
-  FONT,
-  WEIGHT,
-} from '../../common/common';
+import React, {useState} from 'react';
+import {Modal, Text, TouchableOpacity, View} from 'react-native';
+import {TextInput} from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/Feather';
-
-import {getElevation, h, w, timeSince, ToastEvent} from '../../utils/utils';
-import {FlatList, TextInput} from 'react-native-gesture-handler';
-import {useForceUpdate} from '../../views/ListsEditor';
 import {db} from '../../../App';
-import {useAppContext} from '../../provider/useAppContext';
+import {opacity, ph, pv, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
+import {getElevation, ToastEvent} from '../../utils/utils';
 
 export const AddTopicDialog = ({
   visible,

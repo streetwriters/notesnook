@@ -1,13 +1,11 @@
-import React, {useEffect, useState} from 'react';
-import {View, TouchableOpacity, Platform, Text, StatusBar} from 'react-native';
+import React from 'react';
+import {Platform, StatusBar, Text, TouchableOpacity, View} from 'react-native';
+import * as Animatable from 'react-native-animatable';
 import Icon from 'react-native-vector-icons/Feather';
 import {SIZE, WEIGHT} from '../../common/common';
-import {h, SideMenuEvent, getElevation} from '../../utils/utils';
-import * as Animatable from 'react-native-animatable';
-import NavigationService from '../../services/NavigationService';
-import {DDS} from '../../../App';
-import {useAppContext} from '../../provider/useAppContext';
 import {useTracked} from '../../provider';
+import NavigationService from '../../services/NavigationService';
+import {SideMenuEvent} from '../../utils/utils';
 let isOpen = false;
 export const Header = ({
   heading,

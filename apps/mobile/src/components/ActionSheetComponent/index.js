@@ -1,26 +1,26 @@
-import React, {useState, useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
-  View,
-  Text,
-  TouchableOpacity,
   Dimensions,
+  Text,
   TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
+import FastStorage from 'react-native-fast-storage';
+import Icon from 'react-native-vector-icons/Feather';
+import {db} from '../../../App';
 import {
-  SIZE,
-  pv,
-  WEIGHT,
-  opacity,
+  ACCENT,
+  COLOR_SCHEME,
   COLOR_SCHEME_DARK,
   COLOR_SCHEME_LIGHT,
-  COLOR_SCHEME,
-  ACCENT,
+  opacity,
+  pv,
+  SIZE,
+  WEIGHT,
 } from '../../common/common';
-import Icon from 'react-native-vector-icons/Feather';
+import {ACTIONS, useTracked} from '../../provider';
 import NavigationService from '../../services/NavigationService';
-import {db} from '../../../App';
-import FastStorage from 'react-native-fast-storage';
-import {useTracked, ACTIONS} from '../../provider';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 

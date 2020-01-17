@@ -1,10 +1,9 @@
 import React from 'react';
-import {View, Text, TouchableOpacity, Image, FlatList} from 'react-native';
-import {SIZE, pv, opacity, WEIGHT} from '../../common/common';
+import {FlatList, Image, Text, TouchableOpacity, View} from 'react-native';
+import {opacity, pv, SIZE, WEIGHT} from '../../common/common';
 import {Header} from '../../components/header';
-import {AnimatedSafeAreaView} from '../Home';
-import {useAppContext} from '../../provider/useAppContext';
 import {useTracked} from '../../provider';
+import {AnimatedSafeAreaView} from '../Home';
 
 export const AccountSettings = ({navigation}) => {
   const [state, dispatch] = useTracked();

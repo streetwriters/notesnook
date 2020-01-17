@@ -4,7 +4,7 @@ import NavigationService, {
 } from './src/services/NavigationService';
 import {StatusBar, View, Platform} from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import {h, w} from './src/utils/utils';
+import {w} from './src/utils/utils';
 import {Toast} from './src/components/Toast';
 import {Menu} from './src/components/Menu';
 import SideMenu from './src/components/SideMenu';
@@ -18,7 +18,6 @@ import {
   _unSubscribeEvent,
 } from './src/components/DialogManager';
 import {getColorScheme} from './src/common/common';
-import {useAppContext} from './src/provider/useAppContext';
 
 export const DDS = new DeviceDetectionService();
 export const db = new Storage(StorageInterface);

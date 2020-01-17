@@ -1,5 +1,5 @@
+import {NativeModules} from 'react-native';
 import FastStorage from 'react-native-fast-storage';
-import {NativeModules, Platform} from 'react-native';
 var Aes = NativeModules.Aes;
 
 async function read(key) {

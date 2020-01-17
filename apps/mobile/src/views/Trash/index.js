@@ -1,18 +1,18 @@
-import React, {useState, useEffect} from 'react';
-import {Text, FlatList, View} from 'react-native';
+import React, {useEffect} from 'react';
+import {FlatList, Text, View} from 'react-native';
 import {SIZE, WEIGHT} from '../../common/common';
-import {Header} from '../../components/header';
-import NoteItem from '../../components/NoteItem';
-import {NotebookItem} from '../../components/NotebookItem';
-import {w} from '../../utils/utils';
-import {TrashPlaceHolder} from '../../components/ListPlaceholders';
 import Container from '../../components/Container';
-import SelectionHeader from '../../components/SelectionHeader';
-import {useTracked, ACTIONS} from '../../provider';
 import {
   simpleDialogEvent,
   TEMPLATE_EMPTY_TRASH,
 } from '../../components/DialogManager';
+import {Header} from '../../components/header';
+import {TrashPlaceHolder} from '../../components/ListPlaceholders';
+import {NotebookItem} from '../../components/NotebookItem';
+import NoteItem from '../../components/NoteItem';
+import SelectionHeader from '../../components/SelectionHeader';
+import {ACTIONS, useTracked} from '../../provider';
+import {w} from '../../utils/utils';
 
 export const Trash = ({navigation}) => {
   const [state, dispatch] = useTracked();

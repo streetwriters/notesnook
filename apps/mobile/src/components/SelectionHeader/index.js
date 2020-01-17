@@ -1,18 +1,17 @@
 import React from 'react';
 import {
+  Platform,
   SafeAreaView,
+  StatusBar,
+  Text,
   TouchableOpacity,
   View,
-  Text,
-  StatusBar,
-  Platform,
 } from 'react-native';
-import {SIZE, WEIGHT} from '../../common/common';
-import {w} from '../../utils/utils';
-import Icon from 'react-native-vector-icons/Feather';
 import * as Animatable from 'react-native-animatable';
-import {useAppContext} from '../../provider/useAppContext';
-import {useTracked, ACTIONS} from '../../provider';
+import Icon from 'react-native-vector-icons/Feather';
+import {SIZE, WEIGHT} from '../../common/common';
+import {ACTIONS, useTracked} from '../../provider';
+import {w} from '../../utils/utils';
 
 export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(
   SafeAreaView,

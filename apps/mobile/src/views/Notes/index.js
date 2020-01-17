@@ -1,12 +1,11 @@
 import React, {useEffect, useState} from 'react';
-import {Header} from '../../components/header';
-import {Search} from '../../components/SearchInput';
-import {NotesList} from '../../components/NotesList';
-import {db} from '../../../App';
 import * as Animatable from 'react-native-animatable';
-import {useAppContext} from '../../provider/useAppContext';
-import Container from '../../components/Container';
 import {useIsFocused} from 'react-navigation-hooks';
+import {db} from '../../../App';
+import Container from '../../components/Container';
+import {Header} from '../../components/header';
+import {NotesList} from '../../components/NotesList';
+import {Search} from '../../components/SearchInput';
 import {useTracked} from '../../provider';
 
 export const Notes = ({navigation}) => {

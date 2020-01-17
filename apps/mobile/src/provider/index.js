@@ -1,5 +1,5 @@
-import React, {useReducer} from 'react';
-import {DDS, db} from '../../App';
+import {useReducer} from 'react';
+import {db} from '../../App';
 import {createContainer} from 'react-tracked';
 import {SideMenuEvent} from '../utils/utils';
 const defaultState = {

@@ -1,14 +1,13 @@
 import React, {useState} from 'react';
-import {View, Text, Platform} from 'react-native';
+import {Platform, Text, View} from 'react-native';
+import * as Animatable from 'react-native-animatable';
+import {useIsFocused} from 'react-navigation-hooks';
 import {SIZE, WEIGHT} from '../../common/common';
+import {AddTopicDialog} from '../../components/AddTopicDialog';
+import Container from '../../components/Container';
 import {Header} from '../../components/header';
 import {NotebookItem} from '../../components/NotebookItem';
 import {Search} from '../../components/SearchInput';
-import {AddTopicDialog} from '../../components/AddTopicDialog';
-import * as Animatable from 'react-native-animatable';
-import {useAppContext} from '../../provider/useAppContext';
-import {useIsFocused} from 'react-navigation-hooks';
-import Container from '../../components/Container';
 import {useTracked} from '../../provider';
 
 export const Notebook = ({navigation}) => {

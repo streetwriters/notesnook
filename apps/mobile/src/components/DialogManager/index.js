@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {DeviceEventEmitter} from 'react-native';
-import {ActionSheetComponent} from '../ActionSheetComponent';
 import ActionSheet from '../ActionSheet';
+import {ActionSheetComponent} from '../ActionSheetComponent';
 import {Dialog} from '../Dialog';
 import {VaultDialog} from '../VaultDialog';
 export const ActionSheetEvent = (item, colors, tags, rowItems, columnItems) => {

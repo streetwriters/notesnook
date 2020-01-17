@@ -1,16 +1,7 @@
 import React, {useState} from 'react';
-import {View, Text, TouchableOpacity, Platform, Dimensions} from 'react-native';
-import {
-  COLOR_SCHEME,
-  SIZE,
-  br,
-  ph,
-  pv,
-  opacity,
-  FONT,
-  WEIGHT,
-} from '../../common/common';
+import {Dimensions, Platform, Text, View} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import {br, COLOR_SCHEME, ph, SIZE, WEIGHT} from '../../common/common';
 import {getElevation} from '../../utils/utils';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;

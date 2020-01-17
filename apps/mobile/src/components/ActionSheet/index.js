@@ -1,15 +1,15 @@
+import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import {
-  View,
-  TouchableOpacity,
-  Dimensions,
-  ScrollView,
-  Modal,
-  KeyboardAvoidingView,
-  Platform,
   Animated,
+  Dimensions,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  ScrollView,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import PropTypes from 'prop-types';
 import {styles} from './styles';
 
 const deviceHeight = Dimensions.get('window').height;

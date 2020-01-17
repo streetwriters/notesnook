@@ -1,28 +1,28 @@
 import React from 'react';
 import {
+  Platform,
   ScrollView,
-  View,
+  StatusBar,
   Text,
   TouchableOpacity,
-  Platform,
-  StatusBar,
+  View,
 } from 'react-native';
-import NavigationService from '../../services/NavigationService';
+import FastStorage from 'react-native-fast-storage';
+import Icon from 'react-native-vector-icons/Feather';
 import {
-  SIZE,
-  pv,
-  opacity,
-  WEIGHT,
-  COLOR_SCHEME_DARK,
-  COLOR_SCHEME_LIGHT,
   ACCENT,
   COLOR_SCHEME,
+  COLOR_SCHEME_DARK,
+  COLOR_SCHEME_LIGHT,
+  opacity,
+  pv,
   setColorScheme,
+  SIZE,
+  WEIGHT,
 } from '../../common/common';
-import Icon from 'react-native-vector-icons/Feather';
+import {ACTIONS, useTracked} from '../../provider';
+import NavigationService from '../../services/NavigationService';
 import {AnimatedSafeAreaView} from '../../views/Home';
-import FastStorage from 'react-native-fast-storage';
-import {useTracked, ACTIONS} from '../../provider';
 
 export const Menu = ({close = () => {}, hide, update = () => {}}) => {
   const [state, dispatch] = useTracked();

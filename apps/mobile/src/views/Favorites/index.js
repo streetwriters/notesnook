@@ -1,17 +1,15 @@
-import React, {useState, useEffect} from 'react';
-import {View, Text, FlatList, Platform} from 'react-native';
-import {Header} from '../../components/header';
-import {useAppContext} from '../../provider/useAppContext';
+import React, {useEffect, useState} from 'react';
+import {FlatList, Platform, Text, View} from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import {Search} from '../../components/SearchInput';
 import {SIZE, WEIGHT} from '../../common/common';
-import NoteItem from '../../components/NoteItem';
-import {NotebookItem} from '../../components/NotebookItem';
-import {FavoritesPlaceHolder} from '../../components/ListPlaceholders';
 import Container from '../../components/Container';
-import {useIsFocused} from 'react-navigation-hooks';
-import {useTracked, ACTIONS} from '../../provider';
+import {Header} from '../../components/header';
+import {FavoritesPlaceHolder} from '../../components/ListPlaceholders';
+import {NotebookItem} from '../../components/NotebookItem';
+import NoteItem from '../../components/NoteItem';
+import {Search} from '../../components/SearchInput';
 import SelectionWrapper from '../../components/SelectionWrapper';
+import {ACTIONS, useTracked} from '../../provider';
 
 export const Favorites = ({navigation}) => {
   // Global State

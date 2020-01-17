@@ -1,38 +1,16 @@
-import React, {useEffect, useState, createRef} from 'react';
+import React, {createRef, useEffect} from 'react';
 import {
-  ScrollView,
-  View,
+  DeviceEventEmitter,
+  SafeAreaView,
   Text,
   TouchableOpacity,
-  Dimensions,
-  Image,
-  SafeAreaView,
-  Platform,
-  DeviceEventEmitter,
+  View,
 } from 'react-native';
-import NavigationService from '../../services/NavigationService';
-import {
-  COLOR_SCHEME,
-  SIZE,
-  br,
-  ph,
-  pv,
-  opacity,
-  FONT,
-  WEIGHT,
-  onThemeUpdate,
-  clearThemeUpdateListener,
-} from '../../common/common';
-import Icon from 'react-native-vector-icons/Ionicons';
-import {DDS} from '../../../App';
-import {Reminder} from '../../components/Reminder';
-import {ListItem} from '../../components/ListItem';
-import {getElevation} from '../../utils/utils';
-import {FlatList, TextInput} from 'react-native-gesture-handler';
+import {TextInput} from 'react-native-gesture-handler';
 import {NavigationEvents} from 'react-navigation';
+import {DDS} from '../../../App';
+import {opacity, pv, SIZE, WEIGHT} from '../../common/common';
 import {Header} from '../../components/header';
-import {useForceUpdate} from '../ListsEditor';
-import {useAppContext} from '../../provider/useAppContext';
 import {useTracked} from '../../provider';
 
 export const ForgotPassword = ({navigation}) => {

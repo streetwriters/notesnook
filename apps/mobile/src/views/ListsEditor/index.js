@@ -1,25 +1,15 @@
-import React, {useEffect, useState, createRef, useCallback} from 'react';
+import React, {createRef, useCallback, useState} from 'react';
 import {
-  ScrollView,
-  View,
-  Text,
-  TouchableOpacity,
-  TextInput,
-  SafeAreaView,
   Dimensions,
   FlatList,
+  SafeAreaView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import {
-  COLOR_SCHEME,
-  SIZE,
-  br,
-  ph,
-  pv,
-  opacity,
-  FONT,
-  WEIGHT,
-} from '../../common/common';
 import Icon from 'react-native-vector-icons/Ionicons';
+import {COLOR_SCHEME, opacity, ph, pv, SIZE, WEIGHT} from '../../common/common';
 
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;

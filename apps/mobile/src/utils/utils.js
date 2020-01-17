@@ -1,4 +1,4 @@
-import {Dimensions, DeviceEventEmitter} from 'react-native';
+import {DeviceEventEmitter, Dimensions} from 'react-native';
 export const getElevation = elevation => {
   return {
     elevation,

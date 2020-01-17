@@ -1,26 +1,7 @@
-import React, {useEffect, useState} from 'react';
-import {
-  ScrollView,
-  View,
-  Text,
-  TouchableOpacity,
-  Dimensions,
-  Image,
-  SafeAreaView,
-  Platform,
-} from 'react-native';
-import NavigationService from '../../services/NavigationService';
-import {
-  COLOR_SCHEME,
-  SIZE,
-  br,
-  ph,
-  pv,
-  opacity,
-  FONT,
-  WEIGHT,
-} from '../../common/common';
+import React, {useState} from 'react';
+import {Dimensions, Platform, SafeAreaView, Text, View} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import {COLOR_SCHEME, SIZE, WEIGHT} from '../../common/common';
 import {Reminder} from '../../components/Reminder';
 
 const w = Dimensions.get('window').width;

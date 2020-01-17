@@ -1,24 +1,16 @@
 import React, {useEffect, useState} from 'react';
 import {
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
   SafeAreaView,
+  Text,
   TouchableOpacity,
   View,
-  KeyboardAvoidingView,
-  Text,
-  Keyboard,
-  Platform,
 } from 'react-native';
-import {COLOR_SCHEME, opacity, pv, br, SIZE, WEIGHT} from '../../common/common';
-import {Search} from '../../components/SearchInput';
-import {w, h, SideMenuEvent, getElevation, ToastEvent} from '../../utils/utils';
-import {Header} from '../../components/header';
-import {NotesList} from '../../components/NotesList';
-import {db} from '../../../App';
-import Icon from 'react-native-vector-icons/Feather';
-import NavigationService from '../../services/NavigationService';
 import * as Animatable from 'react-native-animatable';
-import {useAppContext} from '../../provider/useAppContext';
-import {DDS} from '../../../App';
+import Icon from 'react-native-vector-icons/Feather';
+import {br, opacity, pv, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
 export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(
   SafeAreaView,

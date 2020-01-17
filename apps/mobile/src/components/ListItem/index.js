@@ -1,20 +1,10 @@
-import React, {useState} from 'react';
-import {View, Text, TouchableOpacity, Platform, Dimensions} from 'react-native';
-import {
-  COLOR_SCHEME,
-  SIZE,
-  br,
-  ph,
-  pv,
-  opacity,
-  FONT,
-  WEIGHT,
-} from '../../common/common';
-import Icon from 'react-native-vector-icons/Ionicons';
-import {getElevation} from '../../utils/utils';
+import React from 'react';
+import {Dimensions, Platform, Text, TouchableOpacity, View} from 'react-native';
 import {FlatList} from 'react-native-gesture-handler';
-import {useAppContext} from '../../provider/useAppContext';
+import Icon from 'react-native-vector-icons/Ionicons';
+import {br, ph, pv, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
+import {getElevation} from '../../utils/utils';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 export const ListItem = props => {
