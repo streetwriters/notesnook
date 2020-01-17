@@ -18,6 +18,9 @@ const h = Dimensions.get('window').height;
 export default class NoteItem extends React.Component {
   constructor(props) {
     super(props);
+    this.cipher = {
+      value: false,
+    };
     this.state = {
       unlockNote: false,
       vaultDialog: false,
@@ -30,10 +33,25 @@ export default class NoteItem extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    return (
-      JSON.stringify(nextProps) !== JSON.stringify(this.props) ||
-      nextState !== this.state
-    );
+    if (nextProps.item.locked !== this.cipher.value) {
+      return true;
+    } else {
+      return (
+        JSON.stringify(nextProps) !== JSON.stringify(this.props) ||
+        nextState !== this.state
+      );
+    }
+  }
+  componentDidUpdate() {
+    this.cipher.value = this.props.item.locked ? true : false;
+  }
+  componentWillUnmount() {
+    this.cipher.value = false;
+  }
+  componentDidMount() {
+    if (this.props.item.locked) {
+      this.cipher.value = true;
+    }
   }
 
   render() {
@@ -49,8 +67,7 @@ export default class NoteItem extends React.Component {
       update,
       index,
     } = this.props;
-
-    console.log('rerendering' + index);
+    console.log('rendering', index);
     return (
       <View
         style={[
@@ -69,20 +86,6 @@ export default class NoteItem extends React.Component {
           },
           customStyle ? customStyle : {},
         ]}>
-        <VaultDialog
-          close={() => {
-            this.setState({
-              vaultDialog: false,
-              unlock: false,
-              isPerm: false,
-            });
-          }}
-          note={item}
-          perm={isPerm}
-          openedToUnlock={unlock}
-          visible={vaultDialog}
-        />
-
         {pinned ? (
           <View
             style={{

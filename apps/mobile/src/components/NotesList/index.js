@@ -1,18 +1,15 @@
-import React, {useState, useEffect} from 'react';
+import React from 'react';
 import {View, Text, FlatList, Platform, SectionList} from 'react-native';
 import {SIZE, WEIGHT} from '../../common/common';
 import NoteItem from '../NoteItem';
-import {useAppContext} from '../../provider/useAppContext';
 import {NotesPlaceHolder} from '../ListPlaceholders';
 import {slideRight, slideLeft} from '../../utils/animations';
 import {w} from '../../utils/utils';
 import SelectionWrapper from '../SelectionWrapper';
-import ActionSheet from '../ActionSheet';
-import {ActionSheetComponent} from '../ActionSheetComponent';
+
 import {useTracked} from '../../provider';
 
 export const NotesList = ({
-  notes,
   onScroll,
   isSearch = false,
   isGrouped = false,
@@ -20,7 +17,7 @@ export const NotesList = ({
 }) => {
   const [state, dispatch] = useTracked();
   const {colors, selectionMode, pinned, selectedItemsList} = state;
-
+  const notes = [...state.notes];
   ///
   const updateSelectionList = () => {};
   const changeSelectionMode = () => {};
