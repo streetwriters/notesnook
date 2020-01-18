@@ -4,6 +4,13 @@ import ActionSheet from '../ActionSheet';
 import {ActionSheetComponent} from '../ActionSheetComponent';
 import {Dialog} from '../Dialog';
 import {VaultDialog} from '../VaultDialog';
+
+export const dialogActions = {
+  ACTION_DELETE: 511,
+  ACTION_EXIT: 512,
+  ACTION_EMPTY_TRASH: 513,
+};
+
 export const ActionSheetEvent = (item, colors, tags, rowItems, columnItems) => {
   DeviceEventEmitter.emit('ActionSheetEvent', {
     item,
@@ -66,12 +73,6 @@ export const TEMPLATE_EMPTY_TRASH = {
   positiveText: 'Clear',
   negativeText: 'Cancel',
   action: dialogActions.ACTION_EMPTY_TRASH,
-};
-
-export const dialogActions = {
-  ACTION_DELETE: 511,
-  ACTION_EXIT: 512,
-  ACTION_EMPTY_TRASH: 513,
 };
 
 export class DialogManager extends Component {

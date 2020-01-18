@@ -4,23 +4,23 @@ import {
   StackActions,
 } from 'react-navigation';
 import {createStackNavigator} from 'react-navigation-stack';
-import Home from '../views/Home/index';
-import Editor from '../views/Editor';
-import Reminders from '../views/Reminders';
-import Lists from '../views/Lists';
-import Folders from '../views/Folders';
-import Favorites from '../views/Favorites';
-import ListsEditor from '../views/ListsEditor';
-import ReminderEditor from '../views/ReminderEditor';
-import Login from '../views/Login';
-import Signup from '../views/Signup';
-import ForgotPassword from '../views/ForgotPassword';
-import Settings from '../views/Settings';
-import Trash from '../views/Trash';
-import Notes from '../views/Notes';
-import Tags from '../views/Tags';
-import Notebook from '../views/Notebook';
 import AccountSettings from '../views/AccountSettings';
+import Editor from '../views/Editor';
+import Favorites from '../views/Favorites';
+import Folders from '../views/Folders';
+import ForgotPassword from '../views/ForgotPassword';
+import Home from '../views/Home/index';
+import Lists from '../views/Lists';
+import ListsEditor from '../views/ListsEditor';
+import Login from '../views/Login';
+import Notebook from '../views/Notebook';
+import Notes from '../views/Notes';
+import ReminderEditor from '../views/ReminderEditor';
+import Reminders from '../views/Reminders';
+import Settings from '../views/Settings';
+import Signup from '../views/Signup';
+import Tags from '../views/Tags';
+import Trash from '../views/Trash';
 
 const fade = props => {
   const {position, scene} = props;

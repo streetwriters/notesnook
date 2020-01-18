@@ -25,7 +25,7 @@ export const db = new Storage(StorageInterface);
 let sideMenuRef;
 const App = () => {
   const [state, dispatch] = useTracked();
-  const [colors] = state;
+  const {colors} = state;
   // Local State
   const [sidebar, setSidebar] = useState(w * 0.3);
   const [init, setInit] = useState(false);

@@ -1,21 +1,12 @@
-import React, {useEffect, useState, createRef, Component} from 'react';
-import {View, Text, TouchableOpacity, Modal} from 'react-native';
-import NavigationService from '../../services/NavigationService';
-import {
-  COLOR_SCHEME,
-  SIZE,
-  br,
-  ph,
-  pv,
-  opacity,
-  FONT,
-  WEIGHT,
-} from '../../common/common';
+import React, {Component} from 'react';
+import {Modal, Text, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
+import {db} from '../../../App';
+import {opacity, ph, pv, SIZE, WEIGHT} from '../../common/common';
+import {ACTIONS} from '../../provider';
+import NavigationService from '../../services/NavigationService';
 import {getElevation, ToastEvent} from '../../utils/utils';
 import {dialogActions, updateEvent} from '../DialogManager';
-import {db} from '../../../App';
-import {ACTIONS} from '../../provider';
 
 export class Dialog extends Component {
   constructor(props) {
