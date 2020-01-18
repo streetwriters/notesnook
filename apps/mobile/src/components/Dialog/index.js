@@ -21,9 +21,19 @@ export class Dialog extends Component {
 
     switch (template.action) {
       case dialogActions.ACTION_DELETE: {
-        await db.deleteNotes([item]);
-        ToastEvent.show('Note moved to trash', 'success', 3000);
-        updateEvent({type: item.type});
+        if (item.type === 'note') {
+          await db.deleteNotes([item]);
+          ToastEvent.show('Note moved to trash', 'success', 3000);
+          updateEvent({type: item.type});
+        } else if (item.type === 'topic') {
+          await db.deleteTopicFromNotebook(notebookID, item.title);
+          updateEvent({type: 'notebook'});
+          ToastEvent.show('Topic moved to trash', 'success', 3000);
+        } else if (item.type === 'notebook') {
+          await db.deleteNotebooks([item]);
+          updateEvent({type: item.type});
+          ToastEvent.show('Notebook moved to trash', 'success', 3000);
+        }
 
         this.setState({
           visible: false,

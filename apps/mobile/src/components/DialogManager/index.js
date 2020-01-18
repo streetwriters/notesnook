@@ -4,6 +4,9 @@ import ActionSheet from '../ActionSheet';
 import {ActionSheetComponent} from '../ActionSheetComponent';
 import {Dialog} from '../Dialog';
 import {VaultDialog} from '../VaultDialog';
+import MoveNoteDialog from '../MoveNoteDialog';
+import {AddTopicDialog} from '../AddTopicDialog';
+import {AddNotebookDialog} from '../AddNotebookDialog';
 
 export const dialogActions = {
   ACTION_DELETE: 511,
@@ -11,13 +14,21 @@ export const dialogActions = {
   ACTION_EMPTY_TRASH: 513,
 };
 
-export const ActionSheetEvent = (item, colors, tags, rowItems, columnItems) => {
+export const ActionSheetEvent = (
+  item,
+  colors,
+  tags,
+  rowItems,
+  columnItems,
+  extraData,
+) => {
   DeviceEventEmitter.emit('ActionSheetEvent', {
     item,
     colors,
     tags,
     rowItems,
     columnItems,
+    extraData,
   });
 };
 export const ActionSheetHideEvent = () => {
@@ -30,6 +41,26 @@ export const simpleDialogEvent = data => {
 
 export const simpleDialogHideEvent = () => {
   DeviceEventEmitter.emit('simpleDialogHideEvent');
+};
+
+export const moveNoteEvent = () => {
+  DeviceEventEmitter.emit('moveNoteEvent');
+};
+export const moveNoteHideEvent = () => {
+  DeviceEventEmitter.emit('moveNoteHideEvent');
+};
+
+export const AddNotebookEvent = notebook => {
+  DeviceEventEmitter.emit('addNotebookEvent', notebook);
+};
+export const HideAddNotebookEvent = notebook => {
+  DeviceEventEmitter.emit('hideAddNotebookEvent', notebook);
+};
+export const AddTopicEvent = notebook => {
+  DeviceEventEmitter.emit('addTopicEvent', notebook);
+};
+export const HideAddTopicEvent = notebook => {
+  DeviceEventEmitter.emit('hideAddTopicEvent', notebook);
 };
 
 export const updateEvent = data => {
@@ -123,12 +154,29 @@ export class DialogManager extends Component {
     this.actionSheet._setModalVisible();
   };
 
+  _showMoveNote = () => {
+    this.moveNoteDialog.open();
+  };
+
+  _hideMoveNote = () => {
+    this.moveNoteDialog.close();
+  };
+
   componentDidMount() {
     _recieveEvent('ActionSheetEvent', this._showActionSheet);
     _recieveEvent('ActionSheetHideEvent', this._hideActionSheet);
 
     _recieveEvent('simpleDialogEvent', this._showSimpleDialog);
     _recieveEvent('simpleDialogHideEvent', this._hideActionSheet);
+
+    _recieveEvent('moveNoteEvent', this._showMoveNote);
+    _recieveEvent('moveNoteHideEvent', this._hideMoveNote);
+
+    _recieveEvent('addNotebookEvent', this.showAddNotebook);
+    _recieveEvent('hideAddNotebookEvent', this.hideAddNotebook);
+
+    _recieveEvent('addTopicEvent', this.showAddTopic);
+    _recieveEvent('hideAddTopicEvent', this.hideAddTopic);
   }
   componentWillUnmount() {
     _unSubscribeEvent('ActionSheetEvent', this._showActionSheet);
@@ -136,6 +184,40 @@ export class DialogManager extends Component {
 
     _unSubscribeEvent('simpleDialogEvent', this._showSimpleDialog);
     _unSubscribeEvent('simpleDialogHideEvent', this._hideSimpleDialog);
+
+    _unSubscribeEvent('moveNoteEvent', this._showMoveNote);
+    _unSubscribeEvent('moveNoteHideEvent', this._hideMoveNote);
+
+    _unSubscribeEvent('addNotebookEvent', this.showAddNotebook);
+    _unSubscribeEvent('hideAddNotebookEvent', this.hideAddNotebook);
+
+    _unSubscribeEvent('addTopicEvent', this.showAddTopic);
+    _unSubscribeEvent('hideAddTopicEvent', this.hideAddTopic);
+  }
+
+  showAddNotebook(notebook) {
+    this.setState(
+      {
+        item: notebook,
+      },
+      () => {
+        this.addNotebbokDialog.open();
+      },
+    );
+  }
+  hideAddNotebook() {
+    this.addNotebbokDialog.close();
+  }
+
+  showAddTOpic() {
+    this.setState({
+      item: notebook,
+    });
+    this.addTopicsDialog.open();
+  }
+
+  hideAddTopic() {
+    this.addTopicsDialog.close();
   }
 
   _showSimpleDialog = data => {
@@ -161,19 +243,25 @@ export class DialogManager extends Component {
 
   onActionSheetHide = () => {
     if (this.show) {
-      if (this.show === 'delete') {
-        this._showSimpleDialog(TEMPLATE_DELETE(this.state.item.type));
-
-        this.show = null;
-      } else if (this.show == 'lock') {
-        this._showVaultDialog();
-        this.show = null;
-      } else if (this.show == 'unlock') {
-        this.setState({
-          isPerm: true,
-        });
-        this._showVaultDialog();
-        this.show = null;
+      switch (this.show) {
+        case 'delete': {
+          this._showSimpleDialog(TEMPLATE_DELETE(this.state.item.type));
+        }
+        case 'lock': {
+          this._showVaultDialog();
+        }
+        case 'unlock': {
+          this.setState({
+            isPerm: true,
+          });
+          this._showVaultDialog();
+        }
+        case 'notebook': {
+          this.showAddNotebook();
+        }
+        case 'topic': {
+          this.showAddTOpic();
+        }
       }
     }
     this.show = null;
@@ -238,6 +326,27 @@ export class DialogManager extends Component {
           perm={isPerm}
           openedToUnlock={false}
           visible={vaultDialog}
+        />
+
+        <MoveNoteDialog
+          ref={ref => (this.moveNoteDialog = ref)}
+          colors={colors}
+        />
+
+        <AddTopicDialog
+          ref={ref => (this.addTopicsDialog = ref)}
+          toEdit={item}
+          notebookID={
+            actionSheetData.extraData
+              ? actionSheetData.extraData.notebookID
+              : null
+          }
+          colors={colors}
+        />
+        <AddNotebookDialog
+          ref={ref => (this.addNotebooksDialog = ref)}
+          toEdit={item}
+          colors={colors}
         />
       </>
     );
