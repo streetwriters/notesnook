@@ -1,16 +1,11 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {Text, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
-import {db} from '../../../App';
 import {opacity, ph, pv, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
 import NavigationService from '../../services/NavigationService';
 import {ToastEvent, w} from '../../utils/utils';
-import ActionSheet from '../ActionSheet';
-import {ActionSheetComponent} from '../ActionSheetComponent';
-import {AddNotebookDialog} from '../AddNotebookDialog';
-import {AddTopicDialog} from '../AddTopicDialog';
-import {Dialog} from '../Dialog';
+import {ActionSheetEvent, moveNoteHideEvent} from '../DialogManager';
 
 export const NotebookItem = ({
   item,
@@ -25,32 +20,10 @@ export const NotebookItem = ({
   isTrash,
   customStyle,
   onLongPress,
+  navigation,
 }) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
-
-  ///
-  const updateDB = () => {};
-
-  const [isVisible, setVisible] = useState(false);
-  const [addTopic, setAddTopic] = useState(false);
-  const [addNotebook, setAddNotebook] = useState(false);
-  let actionSheet;
-  let setMenuRef = {};
-  let show = null;
-  let willRefresh;
-
-  const deleteItem = async () => {
-    if (isTopic) {
-      await db.deleteTopicFromNotebook(notebookID, item.title);
-      ToastEvent.show('Topic moved to trash', 'success', 3000);
-    } else {
-      await db.deleteNotebooks([item]);
-      ToastEvent.show('Notebook moved to trash', 'success', 3000);
-    }
-    setVisible(false);
-    updateDB();
-  };
 
   const navigate = () => {
     isTopic
@@ -58,32 +31,12 @@ export const NotebookItem = ({
           ...item,
           notebookID,
         })
-      : NavigationService.navigate('Notebook', {
+      : navigation.navigate('Notebook', {
           notebook: item,
-          note: noteToMove,
-          title: hideMore ? 'Choose a topic' : item.title,
-          isMove: isMove ? true : false,
-          hideMore: hideMore ? true : false,
+          title: hideMore ? 'Select Topic' : item.title,
+          isMove: isMove,
+          hideMore: hideMore,
         });
-  };
-
-  const onMenuHide = () => {
-    if (show) {
-      if (show === 'delete') {
-        setVisible(true);
-        show = null;
-      } else if (show === 'topic') {
-        isTopic ? setAddTopic(true) : setAddNotebook(true);
-      }
-    }
-  };
-
-  const hideMenu = () => {
-    setMenuRef[index].hide();
-  };
-
-  const showMenu = () => {
-    setMenuRef[index].show();
   };
 
   return (
@@ -102,30 +55,6 @@ export const NotebookItem = ({
         },
         customStyle,
       ]}>
-      <Dialog
-        visible={isVisible}
-        title={`Delete ${isTopic ? 'topic' : 'notebook'}`}
-        icon="trash"
-        paragraph={`Do you want to delete this ${
-          isTopic ? 'topic' : 'notebook'
-        }?`}
-        positiveText="Delete"
-        positivePress={deleteItem}
-        close={() => setVisible(false)}
-      />
-      <AddTopicDialog
-        visible={addTopic}
-        toEdit={item}
-        close={() => setAddTopic(false)}
-      />
-      <AddNotebookDialog
-        visible={addNotebook}
-        toEdit={item}
-        close={() => {
-          setAddNotebook(false);
-        }}
-      />
-
       <View
         style={{
           flexDirection: 'row',
@@ -286,7 +215,18 @@ export const NotebookItem = ({
               alignItems: 'center',
             }}
             onPress={() => {
-              actionSheet._setModalVisible();
+              let rowItems = isTrash
+                ? ['Restore', 'Remove']
+                : [
+                    item.type == 'topic' ? 'Edit Topic' : 'Edit Notebook',
+                    'Delete',
+                  ];
+
+              let columnItems = ['Pin', 'Favorite'];
+
+              ActionSheetEvent(item, false, false, rowItems, columnItems, {
+                notebookID: notebookID,
+              });
             }}>
             <Icon name="more-horizontal" size={SIZE.lg} color={colors.icon} />
           </TouchableOpacity>
@@ -296,20 +236,22 @@ export const NotebookItem = ({
           <TouchableOpacity
             activeOpacity={opacity}
             onPress={async () => {
-              if (!noteToMove.notebook.notebook) {
+              /*  if (!noteToMove.notebook.notebook) {
                 await db.addNoteToTopic(
                   notebookID,
                   item.title,
                   noteToMove.dateCreated,
                 );
-              } else if (noteToMove.notebook.notebook) {
+              } else if (selectedItemsList) {
+
                 await db.moveNote(noteToMove.dateCreated, noteToMove.notebook, {
                   notebook: notebookID,
                   topic: item.title,
                 });
-              }
+              } */
 
-              NavigationService.navigate('Home');
+              moveNoteHideEvent();
+
               ToastEvent.show(
                 `Note moved to ${item.title}`,
                 'success',
@@ -341,44 +283,6 @@ export const NotebookItem = ({
           </TouchableOpacity>
         ) : null}
       </View>
-
-      <ActionSheet
-        ref={ref => (actionSheet = ref)}
-        customStyles={{
-          backgroundColor: colors.bg,
-        }}
-        indicatorColor={colors.shade}
-        initialOffsetFromBottom={1}
-        onClose={() => {
-          onMenuHide();
-          if (willRefresh) {
-            updateDB();
-          }
-        }}
-        children={
-          <ActionSheetComponent
-            item={item}
-            setWillRefresh={value => {
-              willRefresh = true;
-            }}
-            rowItems={
-              isTrash
-                ? ['Restore', 'Remove']
-                : [
-                    item.type == 'topic' ? 'Edit Topic' : 'Edit Notebook',
-                    'Delete',
-                  ]
-            }
-            columnItems={['Pin', 'Favorite']}
-            close={value => {
-              if (value) {
-                show = value;
-              }
-              actionSheet._setModalVisible();
-            }}
-          />
-        }
-      />
     </View>
   );
 };

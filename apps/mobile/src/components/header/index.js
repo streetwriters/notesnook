@@ -6,6 +6,7 @@ import {SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
 import NavigationService from '../../services/NavigationService';
 import {SideMenuEvent} from '../../utils/utils';
+import {moveNoteHideEvent} from '../DialogManager';
 let isOpen = false;
 export const Header = ({
   heading,
@@ -15,6 +16,8 @@ export const Header = ({
   menu,
   verticalMenu = false,
   sendHeight = e => {},
+  preventDefaultMargins,
+  navigation = null,
 }) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
@@ -27,7 +30,12 @@ export const Header = ({
         flexDirection: 'row',
         zIndex: 10,
         height: 50,
-        marginTop: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight,
+        marginTop:
+          Platform.OS === 'ios'
+            ? 0
+            : preventDefaultMargins
+            ? 0
+            : StatusBar.currentHeight,
         marginBottom: 10,
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -44,7 +52,15 @@ export const Header = ({
           <TouchableOpacity
             hitSlop={{top: 20, bottom: 20, left: 50, right: 40}}
             onPress={() => {
-              NavigationService.goBack();
+              if (navigation && preventDefaultMargins) {
+                if (navigation.state.routeName === 'Folders') {
+                  moveNoteHideEvent();
+                } else {
+                  navigation.goBack();
+                }
+              } else {
+                NavigationService.goBack();
+              }
             }}
             style={{
               justifyContent: 'center',

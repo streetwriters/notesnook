@@ -33,6 +33,7 @@ const defaultState = {
     warningBg: '#FEEFB3',
     warningText: '#9F6000',
   },
+  preventDefaultMargins: false,
 };
 
 export const ACTIONS = {
@@ -45,6 +46,8 @@ export const ACTIONS = {
   SELECTION_MODE: 'selectionMode',
   SELECTED_ITEMS: 'selectedItemsList',
   THEME: 'theme',
+  MODAL_NAVIGATOR: 'modalNavigator',
+  CLEAR_SELECTION: 'clearSelection',
 };
 
 const reducer = (state, action) => {
@@ -108,9 +111,22 @@ const reducer = (state, action) => {
       } else {
         selectedItems.push(action.item);
       }
+      console.log(action.item, selectedItems);
       return {
         ...state,
         selectedItemsList: selectedItems,
+      };
+    }
+    case ACTIONS.CLEAR_SELECTION: {
+      return {
+        ...state,
+        selectedItemsList: [],
+      };
+    }
+    case ACTIONS.MODAL_NAVIGATOR: {
+      return {
+        ...state,
+        preventDefaultMargins: action.enabled,
       };
     }
     default:
