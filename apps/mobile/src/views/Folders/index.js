@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {FlatList, Platform, Text, View} from 'react-native';
+import {FlatList, Platform, Text, View, BackHandler} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import {useIsFocused} from 'react-navigation-hooks';
 import {SIZE, WEIGHT} from '../../common/common';
@@ -17,18 +17,36 @@ import {w} from '../../utils/utils';
 
 export const Folders = ({navigation}) => {
   const [state, dispatch] = useTracked();
-  const {colors, selectionMode, pinned, notebooks} = state;
-
+  const {
+    colors,
+    selectionMode,
+    pinned,
+    notebooks,
+    preventDefaultMargins,
+    selectedItemsList,
+  } = state;
+  let isFocused = useIsFocused();
   ///
+
+  const handleBackPress = () => {
+    return true;
+  };
 
   useEffect(() => {
     dispatch({type: ACTIONS.NOTEBOOKS});
-  }, []);
+    console.log(selectedItemsList[0]);
+    let backhandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      handleBackPress,
+    );
+    return () => {
+      backhandler.remove();
+      backhandler = null;
+    };
+  }, [isFocused]);
 
   const [addNotebook, setAddNotebook] = useState(false);
   const [hideHeader, setHideHeader] = useState(false);
-
-  let isFocused = useIsFocused();
 
   const params = navigation.state.params;
   let offsetY = 0;
@@ -68,7 +86,7 @@ export const Folders = ({navigation}) => {
           close={newNotes => {
             setAddNotebook(false);
             if (newNotes) {
-              updateDB();
+              dispatch({type: ACTIONS.NOTEBOOKS});
             }
           }}
         />
@@ -83,12 +101,14 @@ export const Folders = ({navigation}) => {
             backgroundColor: colors.bg,
             height: selectionMode ? 0 : null,
             opacity: selectionMode ? 0 : 1,
-            zIndex: 10,
+            zIndex: 20,
             width: '100%',
           }}>
           <Header
             hide={hideHeader}
             menu={params.canGoBack ? false : true}
+            preventDefaultMargins={preventDefaultMargins}
+            navigation={navigation}
             showSearch={() => {
               setHideHeader(false);
               countUp = 0;
@@ -221,6 +241,7 @@ export const Folders = ({navigation}) => {
             <SelectionWrapper item={item}>
               <NotebookItem
                 hideMore={params.hideMore}
+                navigation={navigation}
                 customStyle={{
                   width: selectionMode ? w - 74 : '100%',
                   marginHorizontal: 0,

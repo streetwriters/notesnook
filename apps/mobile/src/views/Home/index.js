@@ -10,6 +10,7 @@ import SelectionHeader from '../../components/SelectionHeader';
 import {ACTIONS, useTracked} from '../../provider';
 import NavigationService from '../../services/NavigationService';
 import {SideMenuEvent, ToastEvent} from '../../utils/utils';
+import {useIsFocused} from 'react-navigation-hooks';
 
 export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(
   SafeAreaView,
@@ -25,6 +26,7 @@ export const Home = ({navigation}) => {
   const [keyword, setKeyword] = useState('');
   const [searchResults, setSearchResults] = useState([]);
 
+  const isFocused = useIsFocused();
   // Variables
 
   let offsetY = 0;
@@ -36,7 +38,7 @@ export const Home = ({navigation}) => {
 
   useEffect(() => {
     dispatch({type: ACTIONS.NOTES, payload: 'hello there'});
-  }, []);
+  }, [isFocused]);
 
   // Functions
 

@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {
   Dimensions,
+  StatusBar,
   Text,
   TextInput,
   TouchableOpacity,
@@ -16,11 +17,12 @@ import {
   COLOR_SCHEME_LIGHT,
   opacity,
   pv,
+  setColorScheme,
   SIZE,
   WEIGHT,
 } from '../../common/common';
 import {ACTIONS, useTracked} from '../../provider';
-import NavigationService from '../../services/NavigationService';
+import {moveNoteEvent} from '../DialogManager';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
@@ -169,14 +171,10 @@ export const ActionSheetComponent = ({
       name: 'Add to',
       icon: 'book',
       func: () => {
+        dispatch({type: ACTIONS.MODAL_NAVIGATOR, enabled: true});
+        dispatch({type: ACTIONS.SELECTED_ITEMS, item: note});
+        moveNoteEvent();
         close();
-        NavigationService.push('Folders', {
-          note: note,
-          title: 'Choose a notebook',
-          isMove: true,
-          hideMore: true,
-          canGoBack: true,
-        });
       },
     },
     {
@@ -202,7 +200,7 @@ export const ActionSheetComponent = ({
       name: 'Edit Notebook',
       icon: 'trash',
       func: () => {
-        close('topic');
+        close('notebook');
       },
     },
     {
