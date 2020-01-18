@@ -44,13 +44,9 @@ const Editor = ({navigation}) => {
   const updateDB = () => {};
 
   // Local State
-
-  const [dialog, setDialog] = useState(false);
   const [isOpen, setOpen] = useState(false);
   const [sidebar, setSidebar] = useState(DDS.isTab ? true : false);
-  const [vaultDialog, setVaultDialog] = useState(false);
-  const [unlock, setUnlock] = useState(false);
-  const [visible, setVisible] = useState(false);
+
   const [noteProps, setNoteProps] = useState({
     tags: [],
     locked: false,
@@ -154,7 +150,6 @@ const Editor = ({navigation}) => {
               width: '100%',
               alignSelf: 'center',
               height: 50,
-
               marginTop: Platform.OS == 'ios' ? 0 : StatusBar.currentHeight,
             }}>
             <TouchableOpacity
