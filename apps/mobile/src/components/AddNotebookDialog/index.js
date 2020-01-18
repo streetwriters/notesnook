@@ -1,4 +1,4 @@
-import React, {createRef, useState} from 'react';
+import React, {useState} from 'react';
 import {
   KeyboardAvoidingView,
   Modal,
@@ -11,46 +11,83 @@ import {FlatList, TextInput} from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/Feather';
 import {db, DDS} from '../../../App';
 import {opacity, ph, pv, SIZE, WEIGHT} from '../../common/common';
-import {useTracked} from '../../provider';
+import {ACTIONS} from '../../provider';
 import {getElevation, ToastEvent} from '../../utils/utils';
+import {updateEvent} from '../DialogManager';
 
 let refs = [];
 
-export const AddNotebookDialog = ({visible, close, toEdit = null}) => {
-  const [state, dispatch] = useTracked();
-  const {colors} = state;
+export class AddNotebookDialog extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      visible: false,
+      topics: [''],
+      title: null,
+      description: null,
+      titleFocused: false,
+      descFocused: false,
+    };
 
-  const [topics, setTopics] = useState(['']);
-  const [title, setTitle] = useState(null);
+    this.listRef;
+    this.prevItem = null;
+    this.prevIndex = null;
+    this.currentSelectedInput = null;
+    this.timestamp = null;
+    this.backPressCount = 0;
+  }
 
-  const [description, setDescription] = useState(null);
-  const [titleFocused, setTitleFocused] = useState(false);
-  const [descFocused, setDescFocused] = useState(false);
-  let listRef = createRef();
-  let prevItem = null;
-  let prevIndex = null;
-  let currentSelectedInput = null;
-  let timestamp = null;
-  let backPressCount = 0;
+  open() {
+    refs = [];
+    let {toEdit} = this.props;
 
-  const onSubmit = (text, index, willFocus = false) => {
-    console.log('here');
+    if (toEdit !== null) {
+      let topicsList = [];
+      toEdit.topics.forEach(item => {
+        if (item.title !== 'General') {
+          topicsList.push(item.title);
+        }
+      });
+      topicsList.push('');
+
+      this.setState({
+        topics: [...topicsList],
+        title: toEdit.title,
+        visible: true,
+      });
+      this.timestamp = toEdit.dateCreated;
+    }
+  }
+  close() {
+    refs = [];
+    this.prevIndex = null;
+    this.prevItem = null;
+    this.currentSelectedInput = null;
+    this.setState({
+      visible: false,
+      topics: [''],
+    });
+  }
+
+  onSubmit = (text, index, willFocus = false) => {
     let prevTopics = topics;
     prevTopics[index] = text;
-    prevIndex = index;
-    prevItem = text;
+    this.prevIndex = index;
+    this.prevItem = text;
 
     if (
       prevTopics.length === index + 1 &&
-      prevIndex !== null &&
-      prevItem !== null
+      this.prevIndex !== null &&
+      this.prevItem !== null
     ) {
       prevTopics.push('');
     }
 
     let nextTopics = [...prevTopics];
-    setTopics(nextTopics);
-    currentSelectedInput = null;
+    this.setState({
+      topics: nextTopics,
+    });
+    this.currentSelectedInput = null;
     if (!refs[index + 1]) {
       setTimeout(() => {
         if (!refs[index + 1]) return;
@@ -63,41 +100,45 @@ export const AddNotebookDialog = ({visible, close, toEdit = null}) => {
     }
   };
 
-  const onBlur = (text, index) => {};
+  onBlur = (text, index) => {};
 
-  const onFocus = index => {
-    currentSelectedInput = index;
+  onFocus = index => {
+    this.currentSelectedInput = index;
 
-    if (currentSelectedInput) {
+    if (this.currentSelectedInput) {
       let prevTopics = topics;
 
-      prevTopics[prevIndex] = prevItem;
-      if (prevTopics.length === prevIndex + 1) {
+      prevTopics[this.prevIndex] = this.prevItem;
+      if (prevTopics.length === this.prevIndex + 1) {
         prevTopics.push('');
       }
-      prevIndex = null;
-      prevItem = null;
+      this.prevIndex = null;
+      this.prevItem = null;
 
       let nextTopics = [...prevTopics];
-      setTopics(nextTopics);
+      this.setState({
+        topics: nextTopics,
+      });
     }
   };
-  const onChange = (text, index) => {
-    prevIndex = index;
-    prevItem = text;
+  onChange = (text, index) => {
+    this.prevIndex = index;
+    this.prevItem = text;
   };
 
-  const onDelete = index => {
+  onDelete = index => {
     let prevTopics = topics;
-
     if (prevTopics.length === 1) return;
     refs = [];
     prevTopics.splice(index, 1);
     let nextTopics = [...prevTopics];
-    setTopics(nextTopics);
+    this.setState({
+      topics: nextTopics,
+    });
   };
 
-  const addNewNotebook = async () => {
+  addNewNotebook = async () => {
+    let {toEdit} = this.props;
     if (!title)
       return ToastEvent.show('Title is required', 'error', 3000, () => {}, '');
 
@@ -109,263 +150,256 @@ export const AddNotebookDialog = ({visible, close, toEdit = null}) => {
       topics,
       dateCreated: dateCreated,
     });
-
-    prevIndex = null;
-    prevItem = null;
-    currentSelectedInput = null;
-    refs = [];
-    setTopics(['']);
-    close(true);
+    updateEvent({type: ACTIONS.NOTEBOOKS});
+    this.close();
     ToastEvent.show('New notebook added', 'success', 3000, () => {}, '');
   };
 
   onKeyPress = (event, index, text) => {
     if (event.nativeEvent.key === 'Backspace') {
-      if (backPressCount === 0 && (!text || text.length == 0)) {
-        backPressCount = 1;
+      if (this.backPressCount === 0 && (!text || text.length == 0)) {
+        this.backPressCount = 1;
 
         return;
       }
-
-      if (backPressCount === 1 && (!text || text.length == 0)) {
-        backPressCount = 0;
+      if (this.backPressCount === 1 && (!text || text.length == 0)) {
+        this.backPressCount = 0;
         if (!refs[index] == 0) {
           refs[index - 1].focus();
         }
-        onDelete(index);
+        this.onDelete(index);
       }
     }
   };
 
-  return (
-    <Modal
-      visible={visible}
-      transparent={true}
-      animated
-      animationType="fade"
-      onShow={() => {
-        refs = [];
-
-        if (toEdit !== null) {
-          let topicsList = [];
-          toEdit.topics.forEach(item => {
-            if (item.title !== 'General') {
-              topicsList.push(item.title);
-            }
-          });
-          topicsList.push('');
-          setTopics([...topicsList]);
-          setTitle(toEdit.title);
-          timestamp = toEdit.dateCreated;
-          setTimeout(() => {
-            console.log(timestamp, title, topics);
-          }, 400);
-        }
-      }}
-      onRequestClose={() => (refs = [])}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : null}
-        style={{
-          width: '100%',
-          height: '100%',
-          backgroundColor: 'rgba(0,0,0,0.3)',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
-        <TouchableOpacity
-          onPress={() => close()}
+  render() {
+    const {colors, toEdit} = this.props;
+    const {
+      titleFocused,
+      descFocused,
+      description,
+      title,
+      topics,
+      visible,
+    } = this.state;
+    return (
+      <Modal
+        visible={visible}
+        transparent={true}
+        animated
+        animationType="fade"
+        onRequestClose={() => (refs = [])}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : null}
           style={{
             width: '100%',
             height: '100%',
-            position: 'absolute',
-          }}
-        />
-        <View
-          style={{
-            ...getElevation(5),
-            width: DDS.isTab ? '50%' : '80%',
-            maxHeight: 350,
-            borderRadius: 5,
-            backgroundColor: colors.bg,
-            paddingHorizontal: ph,
-            paddingVertical: pv,
+            backgroundColor: 'rgba(0,0,0,0.3)',
+            justifyContent: 'center',
+            alignItems: 'center',
           }}>
+          <TouchableOpacity
+            onPress={() => close()}
+            style={{
+              width: '100%',
+              height: '100%',
+              position: 'absolute',
+            }}
+          />
           <View
             style={{
-              flexDirection: 'row',
-              justifyContent: 'center',
-              alignItems: 'center',
+              ...getElevation(5),
+              width: DDS.isTab ? '50%' : '80%',
+              maxHeight: 350,
+              borderRadius: 5,
+              backgroundColor: colors.bg,
+              paddingHorizontal: ph,
+              paddingVertical: pv,
             }}>
-            <Icon name="book-open" color={colors.accent} size={SIZE.lg} />
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <Icon name="book-open" color={colors.accent} size={SIZE.lg} />
+              <Text
+                style={{
+                  color: colors.accent,
+                  fontFamily: WEIGHT.bold,
+                  marginLeft: 5,
+                  fontSize: SIZE.md,
+                }}>
+                {toEdit ? 'Edit Notebook' : 'New Notebook'}
+              </Text>
+            </View>
+
+            <TextInput
+              style={{
+                padding: pv - 5,
+                borderWidth: 1.5,
+                borderColor: titleFocused ? colors.accent : colors.nav,
+                paddingHorizontal: ph,
+                borderRadius: 5,
+                fontSize: SIZE.sm,
+                fontFamily: WEIGHT.regular,
+                color: colors.pri,
+                marginTop: 20,
+                marginBottom: 5,
+              }}
+              onFocus={() => {
+                this.setState({
+                  titleFocused: true,
+                });
+              }}
+              onBlur={() => {
+                this.setState({
+                  titleFocused: false,
+                });
+              }}
+              defaultValue={toEdit ? toEdit.title : null}
+              onChangeText={value => {
+                this.setState({
+                  title: value,
+                });
+              }}
+              placeholder="Title of notebook"
+              placeholderTextColor={colors.icon}
+            />
+            <TextInput
+              style={{
+                padding: pv - 5,
+                borderWidth: 1.5,
+                borderColor: descFocused ? colors.accent : colors.nav,
+                paddingHorizontal: ph,
+                borderRadius: 5,
+                fontSize: SIZE.sm,
+                fontFamily: WEIGHT.regular,
+                color: colors.pri,
+                marginTop: 5,
+                marginBottom: 10,
+              }}
+              onFocus={() => {
+                this.setState({
+                  descFocused: true,
+                });
+              }}
+              onBlur={() => {
+                this.setState({
+                  descFocused: false,
+                });
+              }}
+              defaultValue={toEdit ? toEdit.description : null}
+              onChangeText={value => {
+                this.setState({
+                  description: value,
+                });
+              }}
+              placeholder="write a description"
+              placeholderTextColor={colors.icon}
+            />
+
             <Text
               style={{
-                color: colors.accent,
+                fontSize: SIZE.sm,
                 fontFamily: WEIGHT.bold,
-                marginLeft: 5,
-                fontSize: SIZE.md,
+                color: colors.pri,
               }}>
-              {toEdit ? 'Edit Notebook' : 'New Notebook'}
+              Topics:
             </Text>
-          </View>
 
-          <TextInput
-            style={{
-              padding: pv - 5,
-              borderWidth: 1.5,
-              borderColor: titleFocused ? colors.accent : colors.nav,
-              paddingHorizontal: ph,
-              borderRadius: 5,
-              fontSize: SIZE.sm,
-              fontFamily: WEIGHT.regular,
-              color: colors.pri,
-              marginTop: 20,
-              marginBottom: 5,
-            }}
-            onFocus={() => {
-              setTitleFocused(true);
-            }}
-            onBlur={() => {
-              setTitleFocused(false);
-            }}
-            defaultValue={toEdit ? toEdit.title : null}
-            onChangeText={value => {
-              setTitle(value);
-            }}
-            placeholder="Title of notebook"
-            placeholderTextColor={colors.icon}
-          />
-          <TextInput
-            style={{
-              padding: pv - 5,
-              borderWidth: 1.5,
-              borderColor: descFocused ? colors.accent : colors.nav,
-              paddingHorizontal: ph,
-              borderRadius: 5,
-              fontSize: SIZE.sm,
-              fontFamily: WEIGHT.regular,
-              color: colors.pri,
-              marginTop: 5,
-              marginBottom: 10,
-            }}
-            onFocus={() => {
-              setDescFocused(true);
-            }}
-            onBlur={() => {
-              setDescFocused(false);
-            }}
-            defaultValue={toEdit ? toEdit.description : null}
-            onChangeText={value => {
-              setDescription(value);
-            }}
-            placeholder="write a description"
-            placeholderTextColor={colors.icon}
-          />
+            <FlatList
+              data={topics}
+              ref={ref => (this.listRef = ref)}
+              removeClippedSubviews={false}
+              enableEmptySections={false}
+              getItemLayout={(data, index) => ({
+                length: 50,
+                offset: 50 * index,
+                index,
+              })}
+              keyExtractor={(item, index) => item + index}
+              renderItem={({item, index}) => (
+                <TopicItem
+                  item={item}
+                  toEdit={toEdit ? true : false}
+                  index={index}
+                  colors={colors}
+                  onSubmit={this.onSubmit}
+                  onChange={this.onChange}
+                  onFocus={this.onFocus}
+                  onDelete={this.onDelete}
+                  onKeyPress={this.onKeyPress}
+                  onBlur={this.onBlur}
+                />
+              )}
+            />
 
-          <Text
-            style={{
-              fontSize: SIZE.sm,
-              fontFamily: WEIGHT.bold,
-              color: colors.pri,
-            }}>
-            Topics:
-          </Text>
-
-          <FlatList
-            data={topics}
-            ref={listRef}
-            removeClippedSubviews={false}
-            enableEmptySections={false}
-            getItemLayout={(data, index) => ({
-              length: 50,
-              offset: 50 * index,
-              index,
-            })}
-            keyExtractor={(item, index) => item + index}
-            renderItem={({item, index}) => (
-              <TopicItem
-                item={item}
-                toEdit={toEdit ? true : false}
-                index={index}
-                colors={colors}
-                onSubmit={onSubmit}
-                onChange={onChange}
-                onFocus={onFocus}
-                onDelete={onDelete}
-                onKeyPress={onKeyPress}
-                onBlur={onBlur}
-              />
-            )}
-          />
-
-          <View
-            style={{
-              justifyContent: 'space-between',
-
-              alignItems: 'center',
-              flexDirection: 'row',
-              width: '100%',
-              marginTop: 20,
-            }}>
-            <TouchableOpacity
-              activeOpacity={opacity}
-              onPress={async () => {
-                await addNewNotebook();
-              }}
+            <View
               style={{
-                paddingVertical: pv,
-                paddingHorizontal: ph,
-                borderRadius: 5,
-                width: '48%',
-                justifyContent: 'center',
-                alignItems: 'center',
-                borderColor: colors.accent,
-                backgroundColor: colors.accent,
-                borderWidth: 1,
-              }}>
-              <Text
-                style={{
-                  fontFamily: WEIGHT.medium,
-                  color: 'white',
-                  fontSize: SIZE.sm,
-                }}>
-                Add
-              </Text>
-            </TouchableOpacity>
+                justifyContent: 'space-between',
 
-            <TouchableOpacity
-              activeOpacity={opacity}
-              onPress={() => {
-                setTopics(['']);
-                refs = [];
-                prevIndex = null;
-                prevItem = null;
-                currentSelectedInput = null;
-                close();
-              }}
-              style={{
-                paddingVertical: pv,
-                paddingHorizontal: ph,
-                borderRadius: 5,
-                width: '48%',
-                justifyContent: 'center',
                 alignItems: 'center',
-                backgroundColor: colors.nav,
+                flexDirection: 'row',
+                width: '100%',
+                marginTop: 20,
               }}>
-              <Text
+              <TouchableOpacity
+                activeOpacity={opacity}
+                onPress={async () => {
+                  await this.addNewNotebook();
+                }}
                 style={{
-                  fontFamily: WEIGHT.medium,
-                  color: colors.icon,
-                  fontSize: SIZE.sm,
+                  paddingVertical: pv,
+                  paddingHorizontal: ph,
+                  borderRadius: 5,
+                  width: '48%',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  borderColor: colors.accent,
+                  backgroundColor: colors.accent,
+                  borderWidth: 1,
                 }}>
-                Cancel
-              </Text>
-            </TouchableOpacity>
+                <Text
+                  style={{
+                    fontFamily: WEIGHT.medium,
+                    color: 'white',
+                    fontSize: SIZE.sm,
+                  }}>
+                  Add
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                activeOpacity={opacity}
+                onPress={() => {
+                  this.close();
+                }}
+                style={{
+                  paddingVertical: pv,
+                  paddingHorizontal: ph,
+                  borderRadius: 5,
+                  width: '48%',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  backgroundColor: colors.nav,
+                }}>
+                <Text
+                  style={{
+                    fontFamily: WEIGHT.medium,
+                    color: colors.icon,
+                    fontSize: SIZE.sm,
+                  }}>
+                  Cancel
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      </KeyboardAvoidingView>
-    </Modal>
-  );
-};
+        </KeyboardAvoidingView>
+      </Modal>
+    );
+  }
+}
 
 const TopicItem = ({
   item,
