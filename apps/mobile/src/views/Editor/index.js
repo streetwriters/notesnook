@@ -28,7 +28,6 @@ import {AnimatedSafeAreaView} from '../Home';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
-let titleRef;
 let EditorWebView;
 let note = {};
 var timestamp = null;
@@ -55,20 +54,19 @@ const Editor = ({navigation}) => {
     colors: [],
   });
 
-  // VARIABLES
-
-  let willRefresh = false;
-  let customNote = null;
-  let actionSheet;
-  let show;
-  const isFocused = useIsFocused();
   // FUNCTIONS
 
   const post = value => EditorWebView.postMessage(value);
 
   const onChange = data => {
     if (data !== '') {
-      content = JSON.parse(data);
+      let rawData = JSON.parse(data);
+      if (rawData.type === 'content') {
+        content = rawData;
+      } else {
+        title = rawData.value;
+        console.log(title);
+      }
     }
   };
 
@@ -116,9 +114,9 @@ const Editor = ({navigation}) => {
     post(JSON.stringify(note.content.delta));
 
     title = note.title;
-    titleRef.setNativeProps({
-      text: title,
-    });
+    //titleRef.setNativeProps({
+    // text: title,
+    // });
     timestamp = note.dateCreated;
     content = note.content;
   };
@@ -132,89 +130,84 @@ const Editor = ({navigation}) => {
     }, 1000);
   };
 
+  const params = 'platform=' + Platform.OS;
+  const sourceUri =
+    (Platform.OS === 'android' ? 'file:///android_asset/' : '') +
+    'Web.bundle/loader.html';
+  const injectedJS = `if (!window.location.search) {
+      var link = document.getElementById('progress-bar');
+      link.href = './site/index.html?${params}';
+      link.click();
+    }`;
+
   const _renderEditor = () => {
     return (
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : null}
-        style={{height: '100%'}}>
+        style={{
+          height: '100%',
+        }}>
         <View
           style={{
             height: '100%',
           }}>
           <View
             style={{
-              flexDirection: 'row',
-              justifyContent: 'flex-start',
-              alignItems: 'center',
-              paddingHorizontal: 12,
-              width: '100%',
-              alignSelf: 'center',
+              marginTop: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight,
+            }}
+          />
+          <TouchableOpacity
+            onPress={() => {
+              simpleDialogEvent(TEMPLATE_EXIT('Editor'));
+            }}
+            style={{
+              width: '12.5%',
               height: 50,
-              marginTop: Platform.OS == 'ios' ? 0 : StatusBar.currentHeight,
+              justifyContent: 'center',
+              alignItems: 'flex-start',
+              position: 'absolute',
+              left: 0,
+              top: 0,
+              marginTop: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight,
+              paddingLeft: 12,
+              zIndex: 999,
             }}>
-            <TouchableOpacity
-              onPress={() => {
-                simpleDialogEvent(TEMPLATE_EXIT('Editor'));
-              }}
+            <Icon
               style={{
-                width: '12.5%',
-                height: 40,
-                justifyContent: 'center',
-                alignItems: 'flex-start',
-              }}>
-              <Icon
-                style={{
-                  marginLeft: -7,
-                }}
-                name="chevron-left"
-                color={colors.icon}
-                size={SIZE.xxxl - 3}
-              />
-            </TouchableOpacity>
-
-            <TextInput
-              placeholder="Untitled Note"
-              ref={ref => (titleRef = ref)}
-              placeholderTextColor={colors.icon}
-              defaultValue={note && note.title ? note.title : title}
-              style={{
-                width: '75%',
-                fontFamily: WEIGHT.bold,
-                fontSize: SIZE.xl,
-                color: colors.pri,
-                maxWidth: '75%',
-                paddingVertical: 0,
-                paddingHorizontal: 0,
+                marginLeft: -7,
               }}
-              onChangeText={onTitleTextChange}
-              onSubmitEditing={saveNote}
+              name="chevron-left"
+              color={colors.icon}
+              size={SIZE.xxxl - 3}
             />
+          </TouchableOpacity>
 
-            <TouchableOpacity
-              onPress={() => {
-                DDS.isTab
-                  ? setSidebar(!sidebar)
-                  : ActionSheetEvent(
-                      note,
-                      true,
-                      true,
-                      ['Add to', 'Share', 'Export', 'Delete'],
-                      ['Dark Mode', 'Add to Vault', 'Pin', 'Favorite'],
-                    );
-              }}
-              style={{
-                width: '12.5%',
-                height: 40,
-                justifyContent: 'center',
-                alignItems: 'flex-end',
-              }}>
-              <Icon
-                name="more-horizontal"
-                color={colors.icon}
-                size={SIZE.xxxl}
-              />
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity
+            onPress={() => {
+              DDS.isTab
+                ? setSidebar(!sidebar)
+                : ActionSheetEvent(
+                    note,
+                    true,
+                    true,
+                    ['Add to', 'Share', 'Export', 'Delete'],
+                    ['Dark Mode', 'Add to Vault', 'Pin', 'Favorite'],
+                  );
+            }}
+            style={{
+              width: '12.5%',
+              height: 50,
+              justifyContent: 'center',
+              alignItems: 'flex-end',
+              position: 'absolute',
+              right: 0,
+              top: 0,
+              marginTop: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight,
+              paddingRight: 12,
+              zIndex: 999,
+            }}>
+            <Icon name="more-horizontal" color={colors.icon} size={SIZE.xxxl} />
+          </TouchableOpacity>
 
           <WebView
             ref={ref => (EditorWebView = ref)}
@@ -239,14 +232,16 @@ const Editor = ({navigation}) => {
               />
             )}
             cacheEnabled={true}
-            cacheMode="LOAD_CACHE_ELSE_NETWORK"
             domStorageEnabled
             scrollEnabled={false}
             bounces={true}
+            allowFileAccess={true}
             scalesPageToFit={true}
+            originWhitelist={'*'}
+            injectedJavaScript={Platform.OS === 'ios' ? injectedJS : null}
             source={
               Platform.OS === 'ios'
-                ? require('./web/texteditor.html')
+                ? {uri: sourceUri}
                 : {
                     uri: 'file:///android_asset/texteditor.html',
                     baseUrl: 'baseUrl:"file:///android_asset/',

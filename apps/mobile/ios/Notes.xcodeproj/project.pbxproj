@@ -29,6 +29,7 @@
 		656C396C23A41CA20060E3AB /* NotoSerif-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 656C396923A41CA20060E3AB /* NotoSerif-Bold.ttf */; };
 		656C396D23A41CA20060E3AB /* NotoSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 656C396A23A41CA20060E3AB /* NotoSans-Regular.ttf */; };
 		656C396E23A41CA20060E3AB /* NotoSerif-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 656C396B23A41CA20060E3AB /* NotoSerif-Regular.ttf */; };
+		656D9DFF23D49A4600C49628 /* Web.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 656D9DFE23D49A4600C49628 /* Web.bundle */; };
 		773523A6669C9373D8945A06 /* libPods-Notes-tvOSTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 177E12D91F5B0732079F75AB /* libPods-Notes-tvOSTests.a */; };
 /* End PBXBuildFile section */
 
@@ -90,6 +91,7 @@
 		656C396923A41CA20060E3AB /* NotoSerif-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "NotoSerif-Bold.ttf"; sourceTree = "<group>"; };
 		656C396A23A41CA20060E3AB /* NotoSans-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "NotoSans-Regular.ttf"; sourceTree = "<group>"; };
 		656C396B23A41CA20060E3AB /* NotoSerif-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "NotoSerif-Regular.ttf"; sourceTree = "<group>"; };
+		656D9DFE23D49A4600C49628 /* Web.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = Web.bundle; path = ../html/Web.bundle; sourceTree = "<group>"; };
 		6FB6DE7AD66669BE4A951A9E /* Pods-Notes-tvOSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Notes-tvOSTests.debug.xcconfig"; path = "Target Support Files/Pods-Notes-tvOSTests/Pods-Notes-tvOSTests.debug.xcconfig"; sourceTree = "<group>"; };
 		87D2DFC238DED597B12E218E /* Pods-Notes-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Notes-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-Notes-tvOSTests/Pods-Notes-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
 		89ABD2DB3BB5CC5C08F50BC5 /* libPods-NotesTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-NotesTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -158,6 +160,7 @@
 		13B07FAE1A68108700A75B9A /* Notes */ = {
 			isa = PBXGroup;
 			children = (
+				656D9DFE23D49A4600C49628 /* Web.bundle */,
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
@@ -401,6 +404,7 @@
 				656C396D23A41CA20060E3AB /* NotoSans-Regular.ttf in Resources */,
 				656C396E23A41CA20060E3AB /* NotoSerif-Regular.ttf in Resources */,
 				656C396C23A41CA20060E3AB /* NotoSerif-Bold.ttf in Resources */,
+				656D9DFF23D49A4600C49628 /* Web.bundle in Resources */,
 				655394C723888EBE008A1476 /* fonts.css in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				655394C623888EBE008A1476 /* texteditor.html in Resources */,

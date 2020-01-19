@@ -5,7 +5,7 @@
   font-weight: 400;
   font-display: swap;
   src: local('Noto Sans Italic'), local('NotoSans-Italic'),
-    url(./fonts/NotoSans-Italic.ttf) format('truetype');
+    url(./fonts/Noto_Sans/NotoSans-Italic.ttf) format('truetype');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
     U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215,
     U+FEFF, U+FFFD;
@@ -18,7 +18,7 @@
   font-weight: 700;
   font-display: swap;
   src: local('Noto Sans Bold Italic'), local('NotoSans-BoldItalic'),
-    url(./fonts/NotoSans-BoldItalic.ttf) format('truetype');
+    url(./fonts/Noto_Sans/NotoSans-BoldItalic.ttf) format('truetype');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
     U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215,
     U+FEFF, U+FFFD;
@@ -31,7 +31,7 @@
   font-weight: 400;
   font-display: swap;
   src: local('Noto Sans'), local('NotoSans'),
-    url(./fonts/NotoSans.ttf) format('truetype');
+    url(./fonts/Noto_Sans/NotoSans-Regular.ttf) format('truetype');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
     U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215,
     U+FEFF, U+FFFD;
@@ -44,7 +44,7 @@
   font-weight: 700;
   font-display: swap;
   src: local('Noto Sans Bold'), local('NotoSans-Bold'),
-    url(./fonts/NotoSans-Bold.ttf) format('truetype');
+    url(./fonts/Noto_Sans/NotoSans-Bold.ttf) format('truetype');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
     U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215,
     U+FEFF, U+FFFD;
@@ -57,7 +57,7 @@
   font-weight: 400;
   font-display: swap;
   src: local('Noto Serif Italic'), local('NotoSerif-Italic'),
-    url(./fonts/NotoSerif-Italic.ttf) format('truetype');
+    url(./fonts/Noto_Serif/NotoSerif-Italic.ttf) format('truetype');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
     U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215,
     U+FEFF, U+FFFD;
@@ -70,7 +70,7 @@
   font-weight: 700;
   font-display: swap;
   src: local('Noto Serif Bold Italic'), local('NotoSerif-BoldItalic'),
-    url(./fonts/NotoSerif-BoldItalic.ttf) format('truetype');
+    url(./fonts/Noto_Serif/NotoSerif-BoldItalic.ttf) format('truetype');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
     U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215,
     U+FEFF, U+FFFD;
@@ -83,7 +83,7 @@
   font-weight: 400;
   font-display: swap;
   src: local('Noto Serif'), local('NotoSerif'),
-    url(./fonts/NotoSerif.ttf) format('truetype');
+    url(./fonts/Noto_Serif/NotoSerif-Regular.ttf) format('truetype');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
     U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215,
     U+FEFF, U+FFFD;
@@ -96,7 +96,67 @@
   font-weight: 700;
   font-display: swap;
   src: local('Noto Serif Bold'), local('NotoSerif-Bold'),
-    url(./fonts/NotoSerif-Bold.ttf) format('truetype');
+    url(./fonts/Noto_Serif/NotoSerif-Bold.ttf) format('truetype');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215,
+    U+FEFF, U+FFFD;
+}
+
+/* latin */
+@font-face {
+  font-family: 'Quicksand';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url(./fonts/Quicksand-Light.ttf) format('truetype');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215,
+    U+FEFF, U+FFFD;
+}
+
+/* latin */
+@font-face {
+  font-family: 'Quicksand';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(./fonts/Quicksand-Regular.ttf) format('truetype');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215,
+    U+FEFF, U+FFFD;
+}
+
+/* latin */
+@font-face {
+  font-family: 'Quicksand';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(./fonts/Quicksand-Medium.ttf) format('truetype');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215,
+    U+FEFF, U+FFFD;
+}
+
+/* latin */
+@font-face {
+  font-family: 'Quicksand';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(./fonts/Quicksand-SemiBold.ttf) format('truetype');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215,
+    U+FEFF, U+FFFD;
+}
+
+/* latin */
+@font-face {
+  font-family: 'Quicksand';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(./fonts/Quicksand-Bold.ttf) format('truetype');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
     U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215,
     U+FEFF, U+FFFD;
