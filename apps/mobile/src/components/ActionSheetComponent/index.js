@@ -216,7 +216,7 @@ export const ActionSheetComponent = ({
       func: () => {
         db.restoreItem(item.dateCreated);
         ToastEvent.show(
-          item.type == 'note' ? 'Note restored' : 'Notebook restored',
+          item.type === 'note' ? 'Note restored' : 'Notebook restored',
           'success',
           1000,
           () => {},

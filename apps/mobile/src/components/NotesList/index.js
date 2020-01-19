@@ -7,7 +7,8 @@ import {w} from '../../utils/utils';
 import {NotesPlaceHolder} from '../ListPlaceholders';
 import NoteItem from '../NoteItem';
 import SelectionWrapper from '../SelectionWrapper';
-
+import PullToRefresh from '../PullToRefresh';
+let sectionListRef;
 export const NotesList = ({
   onScroll,
   isSearch = false,
@@ -42,6 +43,7 @@ export const NotesList = ({
 
   const _onScroll = event => {
     if (!event) return;
+
     y = event.nativeEvent.contentOffset.y;
     onScroll(y);
   };
@@ -147,6 +149,7 @@ export const NotesList = ({
 
   return isGrouped && !isSearch ? (
     <SectionList
+      ref={ref => (sectionListRef = ref)}
       sections={notes}
       keyExtractor={_listKeyExtractor}
       renderSectionHeader={_renderSectionHeader}

@@ -3,7 +3,7 @@ import {Modal, Text, TouchableOpacity, View} from 'react-native';
 import {TextInput} from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/Feather';
 import {opacity, ph, pv, SIZE, WEIGHT} from '../../common/common';
-import {useTracked} from '../../provider';
+
 import {getElevation, ToastEvent} from '../../utils/utils';
 
 export class AddTopicDialog extends React.Component {
@@ -40,7 +40,7 @@ export class AddTopicDialog extends React.Component {
   }
 
   render() {
-    const {visible} = this.state;
+    const {visible, titleFocused} = this.state;
     const {colors, toEdit} = this.props;
 
     return (
@@ -184,13 +184,3 @@ export class AddTopicDialog extends React.Component {
     );
   }
 }
-
-export const AddTopicDialog = ({
-  visible,
-  close = () => {},
-  notebookID,
-  toEdit = null,
-}) => {
-  const [state, dispatch] = useTracked();
-  const {colors} = state;
-};

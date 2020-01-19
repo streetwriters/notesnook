@@ -246,21 +246,26 @@ export class DialogManager extends Component {
       switch (this.show) {
         case 'delete': {
           this._showSimpleDialog(TEMPLATE_DELETE(this.state.item.type));
+          break;
         }
         case 'lock': {
           this._showVaultDialog();
+          break;
         }
         case 'unlock': {
           this.setState({
             isPerm: true,
           });
           this._showVaultDialog();
+          break;
         }
         case 'notebook': {
           this.showAddNotebook();
+          break;
         }
         case 'topic': {
           this.showAddTOpic();
+          break;
         }
       }
     }

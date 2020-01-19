@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {SafeAreaView} from 'react-native';
+import {SafeAreaView, View} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import {db} from '../../../App';
 import Container from '../../components/Container';
@@ -11,6 +11,7 @@ import {ACTIONS, useTracked} from '../../provider';
 import NavigationService from '../../services/NavigationService';
 import {SideMenuEvent, ToastEvent} from '../../utils/utils';
 import {useIsFocused} from 'react-navigation-hooks';
+import PullToRefresh from '../../components/PullToRefresh';
 
 export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(
   SafeAreaView,
@@ -20,7 +21,7 @@ export const Home = ({navigation}) => {
   // State
   const [state, dispatch] = useTracked();
   const {colors, selectionMode, notes} = state;
-
+  const [refreshing, setRefreshing] = useState(false);
   const [text, setText] = useState('');
   const [hideHeader, setHideHeader] = useState(false);
   const [keyword, setKeyword] = useState('');
