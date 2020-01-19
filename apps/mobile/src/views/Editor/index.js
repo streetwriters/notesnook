@@ -112,7 +112,12 @@ const Editor = ({navigation}) => {
     setNoteProps({...props});
 
     post(JSON.stringify(note.content.delta));
-
+    post(
+      JSON.stringify({
+        type: 'title',
+        value: note.title,
+      }),
+    );
     title = note.title;
     //titleRef.setNativeProps({
     // text: title,

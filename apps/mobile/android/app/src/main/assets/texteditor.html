@@ -1133,7 +1133,9 @@
             // Receber mensagens do RN
             document.addEventListener('message', data => {
               editor.focus();
-              if (data.data.substr(0,9) === '{"night":') {
+              if (JSON.parse(data.data).type === "title") {
+                document.getElementById('titleInput').value = JSON.parse(data.data).value
+              } else if (data.data.substr(0,9) === '{"night":') {
                 pageTheme.colors = JSON.parse(data.data);
                
       
