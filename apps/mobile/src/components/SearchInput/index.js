@@ -1,7 +1,7 @@
 import React, {createRef, useState} from 'react';
 import {TextInput} from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import Icon from 'react-native-vector-icons/Ionicons';
+import Icon from 'react-native-vector-icons/Feather';
 import {DDS} from '../../../App';
 import {br, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
@@ -30,7 +30,7 @@ export const Search = props => {
           flexDirection: 'row',
           justifyContent: 'space-between',
           alignItems: 'center',
-          paddingHorizontal: 12,
+          paddingLeft: 12,
           width: w - 24,
           alignSelf: 'center',
           borderRadius: br,
@@ -43,9 +43,8 @@ export const Search = props => {
           style={{
             fontFamily: WEIGHT.regular,
             color: colors.pri,
-            maxWidth: '90%',
-
-            width: '90%',
+            maxWidth: '85%',
+            width: '85%',
             fontSize: SIZE.md,
           }}
           onChangeText={props.onChangeText}
@@ -63,7 +62,7 @@ export const Search = props => {
           placeholderTextColor={colors.icon}
         />
         <Icon
-          style={{paddingRight: DDS.isTab ? '1.25%' : '2.5%'}}
+          style={{paddingRight: DDS.isTab ? 12 : 12}}
           onPress={() => {
             props.clear();
             props.value.length > 0 ? props.clearSearch() : null;
@@ -71,9 +70,7 @@ export const Search = props => {
               text: '',
             });
           }}
-          name={
-            props.value && props.value.length > 0 ? 'ios-close' : 'ios-search'
-          }
+          name={props.value && props.value.length > 0 ? '' : 'search'}
           color={focus ? colors.accent : colors.icon}
           size={SIZE.xl}
         />

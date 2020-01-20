@@ -12,6 +12,7 @@ import * as Animatable from 'react-native-animatable';
 import Icon from 'react-native-vector-icons/Feather';
 import {br, opacity, pv, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
+import {getElevation, w} from '../../utils/utils';
 export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(
   SafeAreaView,
 );
@@ -71,13 +72,17 @@ export const Container = ({
             onPress={bottomButtonOnPress}
             activeOpacity={opacity}
             style={{
+              ...getElevation(5),
               width: '95%',
               alignSelf: 'center',
               borderRadius: br,
               backgroundColor: colors.accent,
               justifyContent: 'center',
               alignItems: 'center',
-              marginBottom: 20,
+              marginBottom: 0,
+              position: 'absolute',
+              zIndex: 10,
+              bottom: 10,
             }}>
             <View
               style={{
@@ -88,7 +93,7 @@ export const Container = ({
                 padding: pv,
                 paddingVertical: pv + 5,
               }}>
-              <Icon name="plus" color="white" size={SIZE.lg} />
+              <Icon name="plus" color="white" size={SIZE.xl} />
               <Text
                 style={{
                   fontSize: SIZE.md,
