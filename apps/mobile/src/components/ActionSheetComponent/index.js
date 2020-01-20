@@ -30,7 +30,6 @@ let tagsInputRef;
 export const ActionSheetComponent = ({
   close = () => {},
   item,
-  setWillRefresh = value => {},
   hasColors = false,
   hasTags = false,
   rowItems = [],
@@ -144,7 +143,7 @@ export const ActionSheetComponent = ({
     }
   };
 
-  const localRefresh = type => {
+  const localRefresh = (type, nodispatch = false) => {
     if (!note || !note.dateCreated) return;
     let toAdd;
     switch (type) {
@@ -161,8 +160,9 @@ export const ActionSheetComponent = ({
         break;
       }
     }
-
-    dispatch({type: type});
+    if (!nodispatch) {
+      dispatch({type: type});
+    }
     setNote({...toAdd});
   };
 
@@ -476,6 +476,9 @@ export const ActionSheetComponent = ({
 
   return (
     <View
+      onLayout={() => {
+        localRefresh(item.type, true);
+      }}
       style={{
         paddingBottom: 15,
         backgroundColor: colors.bg,

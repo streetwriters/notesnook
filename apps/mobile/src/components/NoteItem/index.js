@@ -16,11 +16,6 @@ export default class NoteItem extends React.Component {
     this.cipher = {
       value: false,
     };
-    this.state = {
-      unlockNote: false,
-      vaultDialog: false,
-      isPerm: false,
-    };
     this.actionSheet;
     this.show = null;
     this.setMenuRef = {};
@@ -50,7 +45,6 @@ export default class NoteItem extends React.Component {
   }
 
   render() {
-    let {unlock, vaultDialog, isPerm, visible} = this.state;
     let {
       colors,
       item,
@@ -144,6 +138,7 @@ export default class NoteItem extends React.Component {
                 width: '100%',
               }}>
               <Text
+                numberOfLines={4}
                 style={{
                   fontSize: SIZE.xs + 1,
                   color: colors.pri,

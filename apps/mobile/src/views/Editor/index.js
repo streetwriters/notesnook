@@ -6,16 +6,14 @@ import {
   Linking,
   Platform,
   StatusBar,
-  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import Icon from 'react-native-vector-icons/Feather';
 import WebView from 'react-native-webview';
-import {useIsFocused} from 'react-navigation-hooks';
 import {db, DDS} from '../../../App';
-import {SIZE, WEIGHT} from '../../common/common';
+import {SIZE} from '../../common/common';
 import {
   ActionSheetEvent,
   simpleDialogEvent,
@@ -43,7 +41,6 @@ const Editor = ({navigation}) => {
   const updateDB = () => {};
 
   // Local State
-  const [isOpen, setOpen] = useState(false);
   const [sidebar, setSidebar] = useState(DDS.isTab ? true : false);
 
   const [noteProps, setNoteProps] = useState({
@@ -65,8 +62,28 @@ const Editor = ({navigation}) => {
         content = rawData;
       } else {
         title = rawData.value;
-        console.log(title);
       }
+    }
+  };
+
+  const _onMessage = evt => {
+    if (evt.nativeEvent.data !== '') {
+      clearTimeout(timer);
+      timer = null;
+      onChange(evt.nativeEvent.data);
+      timer = setTimeout(() => {
+        saveNote(noteProps, true);
+        console.log('saved');
+      }, 1000);
+    }
+  };
+
+  const _onShouldStartLoadWithRequest = request => {
+    if (request.url.includes('https')) {
+      Linking.openURL(request.url);
+      return false;
+    } else {
+      return true;
     }
   };
 
@@ -79,7 +96,6 @@ const Editor = ({navigation}) => {
     }
 
     timestamp = await db.addNote({
-      ...noteProps,
       title,
       content: {
         text: content.text,
@@ -119,20 +135,8 @@ const Editor = ({navigation}) => {
       }),
     );
     title = note.title;
-    //titleRef.setNativeProps({
-    // text: title,
-    // });
     timestamp = note.dateCreated;
     content = note.content;
-  };
-
-  const onTitleTextChange = value => {
-    title = value;
-    clearTimeout(timer);
-    timer = null;
-    timer = setTimeout(() => {
-      saveNote(noteProps, true);
-    }, 1000);
   };
 
   const params = 'platform=' + Platform.OS;
@@ -154,122 +158,100 @@ const Editor = ({navigation}) => {
         }}>
         <View
           style={{
-            height: '100%',
+            marginTop: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight,
+          }}
+        />
+        <TouchableOpacity
+          onPress={() => {
+            simpleDialogEvent(TEMPLATE_EXIT('Editor'));
+          }}
+          style={{
+            width: '12.5%',
+            height: 50,
+            justifyContent: 'center',
+            alignItems: 'flex-start',
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            marginTop: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight,
+            paddingLeft: 12,
+            zIndex: 999,
           }}>
-          <View
+          <Icon
             style={{
-              marginTop: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight,
+              marginLeft: -7,
             }}
+            name="chevron-left"
+            color={colors.icon}
+            size={SIZE.xxxl - 3}
           />
-          <TouchableOpacity
-            onPress={() => {
-              simpleDialogEvent(TEMPLATE_EXIT('Editor'));
-            }}
-            style={{
-              width: '12.5%',
-              height: 50,
-              justifyContent: 'center',
-              alignItems: 'flex-start',
-              position: 'absolute',
-              left: 0,
-              top: 0,
-              marginTop: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight,
-              paddingLeft: 12,
-              zIndex: 999,
-            }}>
-            <Icon
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => {
+            DDS.isTab
+              ? setSidebar(!sidebar)
+              : ActionSheetEvent(
+                  note,
+                  true,
+                  true,
+                  ['Add to', 'Share', 'Export', 'Delete'],
+                  ['Dark Mode', 'Add to Vault', 'Pin', 'Favorite'],
+                );
+          }}
+          style={{
+            width: '12.5%',
+            height: 50,
+            justifyContent: 'center',
+            alignItems: 'flex-end',
+            position: 'absolute',
+            right: 0,
+            top: 0,
+            marginTop: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight,
+            paddingRight: 12,
+            zIndex: 999,
+          }}>
+          <Icon name="more-horizontal" color={colors.icon} size={SIZE.xxxl} />
+        </TouchableOpacity>
+
+        <WebView
+          ref={ref => (EditorWebView = ref)}
+          onError={error => console.log(error)}
+          onLoad={onWebViewLoad}
+          javaScriptEnabled
+          onShouldStartLoadWithRequest={_onShouldStartLoadWithRequest}
+          renderLoading={() => (
+            <View
               style={{
-                marginLeft: -7,
+                width: '100%',
+                height: '100%',
+                backgroundColor: 'transparent',
               }}
-              name="chevron-left"
-              color={colors.icon}
-              size={SIZE.xxxl - 3}
             />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() => {
-              DDS.isTab
-                ? setSidebar(!sidebar)
-                : ActionSheetEvent(
-                    note,
-                    true,
-                    true,
-                    ['Add to', 'Share', 'Export', 'Delete'],
-                    ['Dark Mode', 'Add to Vault', 'Pin', 'Favorite'],
-                  );
-            }}
-            style={{
-              width: '12.5%',
-              height: 50,
-              justifyContent: 'center',
-              alignItems: 'flex-end',
-              position: 'absolute',
-              right: 0,
-              top: 0,
-              marginTop: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight,
-              paddingRight: 12,
-              zIndex: 999,
-            }}>
-            <Icon name="more-horizontal" color={colors.icon} size={SIZE.xxxl} />
-          </TouchableOpacity>
-
-          <WebView
-            ref={ref => (EditorWebView = ref)}
-            onError={error => console.log(error)}
-            onLoad={onWebViewLoad}
-            javaScriptEnabled
-            onShouldStartLoadWithRequest={request => {
-              if (request.url.includes('https')) {
-                Linking.openURL(request.url);
-                return false;
-              } else {
-                return true;
-              }
-            }}
-            renderLoading={() => (
-              <View
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  backgroundColor: 'transparent',
-                }}
-              />
-            )}
-            cacheEnabled={true}
-            domStorageEnabled
-            scrollEnabled={false}
-            bounces={true}
-            allowFileAccess={true}
-            scalesPageToFit={true}
-            originWhitelist={'*'}
-            injectedJavaScript={Platform.OS === 'ios' ? injectedJS : null}
-            source={
-              Platform.OS === 'ios'
-                ? {uri: sourceUri}
-                : {
-                    uri: 'file:///android_asset/texteditor.html',
-                    baseUrl: 'baseUrl:"file:///android_asset/',
-                  }
-            }
-            style={{
-              height: '100%',
-              maxHeight: '100%',
-              backgroundColor: 'transparent',
-            }}
-            onMessage={evt => {
-              if (evt.nativeEvent.data !== '') {
-                clearTimeout(timer);
-                timer = null;
-                onChange(evt.nativeEvent.data);
-                timer = setTimeout(() => {
-                  saveNote(noteProps, true);
-                  console.log('saved');
-                }, 1000);
-              }
-            }}
-          />
-        </View>
+          )}
+          cacheEnabled={true}
+          domStorageEnabled
+          scrollEnabled={false}
+          bounces={true}
+          allowFileAccess={true}
+          scalesPageToFit={true}
+          originWhitelist={'*'}
+          injectedJavaScript={Platform.OS === 'ios' ? injectedJS : null}
+          source={
+            Platform.OS === 'ios'
+              ? {uri: sourceUri}
+              : {
+                  uri: 'file:///android_asset/texteditor.html',
+                  baseUrl: 'baseUrl:"file:///android_asset/',
+                }
+          }
+          style={{
+            height: '100%',
+            maxHeight: '100%',
+            backgroundColor: 'transparent',
+          }}
+          onMessage={_onMessage}
+        />
       </KeyboardAvoidingView>
     );
   };
@@ -304,22 +286,17 @@ const Editor = ({navigation}) => {
     EditorWebView.reload();
   }, [colors]);
 
-  return DDS.isTab ? (
-    <View
+  return (
+    <AnimatedSafeAreaView
+      transition={['backgroundColor', 'width']}
+      duration={300}
       style={{
-        flexDirection: 'row',
-        width: '100%',
+        flex: 1,
+        backgroundColor: colors.bg,
+        height: '100%',
+        width: sidebar ? '70%' : '100%',
       }}>
-      <AnimatedSafeAreaView
-        transition={['backgroundColor', 'width']}
-        duration={300}
-        style={{
-          height: '100%',
-          backgroundColor: colors.bg,
-          width: sidebar ? '70%' : '100%',
-        }}>
-        {_renderEditor()}
-      </AnimatedSafeAreaView>
+      {_renderEditor()}
       <Animatable.View
         transition={['width', 'opacity']}
         duration={300}
@@ -327,35 +304,9 @@ const Editor = ({navigation}) => {
           width: sidebar ? '30%' : '0%',
           opacity: sidebar ? 1 : 0,
         }}>
-        <EditorMenu
-          hide={false}
-          noteProps={noteProps}
-          updateProps={props => {
-            setNoteProps(props);
-          }}
-          close={() => {
-            setTimeout(() => {
-              setOpen(args);
-            }, 500);
-          }}
-        />
+        {DDS.isTab ? <EditorMenu hide={false} /> : null}
       </Animatable.View>
-    </View>
-  ) : (
-    <Animatable.View
-      transition="backgroundColor"
-      duration={300}
-      style={{
-        backgroundColor: colors.bg,
-        flex: 1,
-      }}>
-      <AnimatedSafeAreaView
-        transition="backgroundColor"
-        duration={300}
-        style={{height: '100%', backgroundColor: colors.bg}}>
-        {_renderEditor()}
-      </AnimatedSafeAreaView>
-    </Animatable.View>
+    </AnimatedSafeAreaView>
   );
 };
 
