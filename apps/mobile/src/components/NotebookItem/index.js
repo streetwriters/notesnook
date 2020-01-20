@@ -200,7 +200,7 @@ export const NotebookItem = ({
                 fontFamily: WEIGHT.regular,
                 marginTop: 5,
               }}>
-              {item.totalNotes.length == 1
+              {item && item.totalNotes && item.totalNotes.length == 1
                 ? item.totalNotes + ' notes'
                 : item.totalNotes + ' note'}
             </Text>

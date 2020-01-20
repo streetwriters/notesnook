@@ -14,6 +14,7 @@ import SelectionWrapper from '../../components/SelectionWrapper';
 import {ACTIONS, useTracked} from '../../provider';
 import {slideLeft, slideRight} from '../../utils/animations';
 import {w} from '../../utils/utils';
+import {AddNotebookEvent} from '../../components/DialogManager';
 
 export const Folders = ({navigation}) => {
   const [state, dispatch] = useTracked();
@@ -75,7 +76,7 @@ export const Folders = ({navigation}) => {
     <Container
       bottomButtonText="Add a new notebook"
       bottomButtonOnPress={() => {
-        //setAddNotebook(true);
+        AddNotebookEvent(null);
       }}>
       <SelectionHeader />
 

@@ -51,7 +51,7 @@ export const moveNoteHideEvent = () => {
 };
 
 export const AddNotebookEvent = notebook => {
-  DeviceEventEmitter.emit('addNotebookEvent', notebook);
+  DeviceEventEmitter.emit('addNotebookEvent', {item: notebook});
 };
 export const HideAddNotebookEvent = notebook => {
   DeviceEventEmitter.emit('hideAddNotebookEvent', notebook);
@@ -195,30 +195,30 @@ export class DialogManager extends Component {
     _unSubscribeEvent('hideAddTopicEvent', this.hideAddTopic);
   }
 
-  showAddNotebook(notebook) {
+  showAddNotebook = data => {
     this.setState(
       {
-        item: notebook,
+        item: data.item ? data.item : {},
       },
       () => {
-        this.addNotebbokDialog.open();
+        this.addNotebooksDialog.open();
       },
     );
-  }
-  hideAddNotebook() {
-    this.addNotebbokDialog.close();
-  }
+  };
+  hideAddNotebook = () => {
+    this.addNotebooksDialog.close();
+  };
 
-  showAddTOpic() {
+  showAddTopic = () => {
     this.setState({
       item: notebook,
     });
     this.addTopicsDialog.open();
-  }
+  };
 
-  hideAddTopic() {
+  hideAddTopic = () => {
     this.addTopicsDialog.close();
-  }
+  };
 
   _showSimpleDialog = data => {
     this.setState(
@@ -260,7 +260,7 @@ export class DialogManager extends Component {
           break;
         }
         case 'notebook': {
-          this.showAddNotebook();
+          this.showAddNotebook({item: this.state.item});
           break;
         }
         case 'topic': {

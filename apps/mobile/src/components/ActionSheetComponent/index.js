@@ -156,10 +156,11 @@ export const ActionSheetComponent = ({
         break;
       }
       case 'topic': {
-        toAdd = db.getTopic(topic.notebookId, topic.title);
+        toAdd = db.getTopic(note.notebookId, note.title);
         break;
       }
     }
+
     if (!nodispatch) {
       dispatch({type: type});
     }

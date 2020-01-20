@@ -59,15 +59,8 @@ export const Notebook = ({navigation}) => {
     <Container
       bottomButtonText="Add new topic"
       bottomButtonOnPress={() => {
-        setAddTopic(true);
+        //setAddTopic(true);
       }}>
-      <AddTopicDialog
-        visible={addTopic}
-        notebookID={params.notebook.dateCreated}
-        close={() => {
-          setAddTopic(false);
-        }}
-      />
       <Animatable.View
         transition="backgroundColor"
         duration={300}
@@ -147,6 +140,9 @@ export const Notebook = ({navigation}) => {
             </Text>
           </View>
         }
+        keyExtractor={(item, index) =>
+          item.dateCreated.toString() + index.toString()
+        }
         renderItem={({item, index}) => (
           <NotebookItem
             hideMore={params.hideMore}
@@ -154,9 +150,7 @@ export const Notebook = ({navigation}) => {
             noteToMove={params.note}
             notebookID={params.notebook.dateCreated}
             isMove={params.isMove}
-            refresh={() => {
-              //forceUpdate();
-            }}
+            refresh={() => {}}
             item={item}
             index={index}
             colors={colors}
