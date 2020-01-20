@@ -17,6 +17,10 @@ export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(
   SafeAreaView,
 );
 
+const AnimatedTouchableOpacity = Animatable.createAnimatableComponent(
+  TouchableOpacity,
+);
+
 export const Container = ({
   children,
   bottomButtonOnPress,
@@ -31,21 +35,25 @@ export const Container = ({
 
   useEffect(() => {
     Keyboard.addListener('keyboardDidShow', () => {
-      setButtonHide(true);
+      setTimeout(() => {
+        setButtonHide(true);
+      }, 300);
     });
     Keyboard.addListener('keyboardDidHide', () => {
       setTimeout(() => {
         setButtonHide(false);
-      }, 100);
+      }, 300);
     });
     return () => {
       Keyboard.removeListener('keyboardDidShow', () => {
-        setButtonHide(true);
+        setTimeout(() => {
+          setButtonHide(true);
+        }, 300);
       });
       Keyboard.removeListener('keyboardDidHide', () => {
         setTimeout(() => {
           setButtonHide(false);
-        }, 100);
+        }, 300);
       });
     };
   }, []);
@@ -67,8 +75,11 @@ export const Container = ({
         }}>
         {children}
 
-        {buttonHide || noBottomButton ? null : (
-          <TouchableOpacity
+        {noBottomButton ? null : (
+          <AnimatedTouchableOpacity
+            transition={['translateY', 'opacity']}
+            useNativeDriver={true}
+            duration={250}
             onPress={bottomButtonOnPress}
             activeOpacity={opacity}
             style={{
@@ -83,6 +94,12 @@ export const Container = ({
               position: 'absolute',
               zIndex: 10,
               bottom: 10,
+              opacity: buttonHide ? 0 : 1,
+              transform: [
+                {
+                  translateY: buttonHide ? 200 : 0,
+                },
+              ],
             }}>
             <View
               style={{
@@ -104,7 +121,7 @@ export const Container = ({
                 {'  ' + bottomButtonText}
               </Text>
             </View>
-          </TouchableOpacity>
+          </AnimatedTouchableOpacity>
         )}
       </KeyboardAvoidingView>
     </AnimatedSafeAreaView>

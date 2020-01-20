@@ -6,6 +6,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  DeviceEventEmitter,
 } from 'react-native';
 import FastStorage from 'react-native-fast-storage';
 import Icon from 'react-native-vector-icons/Feather';
@@ -29,6 +30,8 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
   const {colors} = state;
 
   // todo
+
+  let overlayRef;
 
   function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
     let newColors = setColorScheme(colors, accent);
@@ -114,6 +117,19 @@ export const Menu = ({close = () => {}, hide, update = () => {}}) => {
           width: '100%',
           marginBottom: 5,
           marginTop: Platform.OS == 'ios' ? 0 : StatusBar.currentHeight - 10,
+        }}
+      />
+      <View
+        ref={ref => (overlayRef = ref)}
+        onLayout={() => {
+          DeviceEventEmitter.emit('sendOverlayViewRef', {ref: overlayRef});
+        }}
+        style={{
+          height: '100%',
+          width: '100%',
+          position: 'absolute',
+          zIndex: 999,
+          backgroundColor: colors.bg,
         }}
       />
 

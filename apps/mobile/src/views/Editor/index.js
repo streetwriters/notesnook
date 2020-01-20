@@ -20,11 +20,9 @@ import {
   TEMPLATE_EXIT,
 } from '../../components/DialogManager';
 import {EditorMenu} from '../../components/EditorMenu';
-import {useTracked} from '../../provider';
+import {useTracked, ACTIONS} from '../../provider';
 import {SideMenuEvent} from '../../utils/utils';
 import {AnimatedSafeAreaView} from '../Home';
-const w = Dimensions.get('window').width;
-const h = Dimensions.get('window').height;
 
 let EditorWebView;
 let note = {};
@@ -37,19 +35,8 @@ const Editor = ({navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
 
-  ///
-  const updateDB = () => {};
-
   // Local State
   const [sidebar, setSidebar] = useState(DDS.isTab ? true : false);
-
-  const [noteProps, setNoteProps] = useState({
-    tags: [],
-    locked: false,
-    pinned: false,
-    favorite: false,
-    colors: [],
-  });
 
   // FUNCTIONS
 
@@ -72,8 +59,7 @@ const Editor = ({navigation}) => {
       timer = null;
       onChange(evt.nativeEvent.data);
       timer = setTimeout(() => {
-        saveNote(noteProps, true);
-        console.log('saved');
+        saveNote(true);
       }, 1000);
     }
   };
@@ -103,8 +89,8 @@ const Editor = ({navigation}) => {
       },
       dateCreated: timestamp,
     });
-    updateDB();
-    if (lockNote && noteProps.locked) {
+
+    if (lockNote && db.getNote(timestamp).locked) {
       db.lockNote(timestamp, 'password');
     }
   };
@@ -118,15 +104,6 @@ const Editor = ({navigation}) => {
   };
 
   const updateEditor = () => {
-    let props = {
-      tags: note.tags,
-      colors: note.colors,
-      pinned: note.pinned,
-      favorite: note.favorite,
-      locked: note.locked,
-    };
-    setNoteProps({...props});
-
     post(JSON.stringify(note.content.delta));
     post(
       JSON.stringify({

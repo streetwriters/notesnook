@@ -12,7 +12,7 @@ import Icon from 'react-native-vector-icons/Feather';
 import {db, DDS} from '../../../App';
 import {opacity, ph, pv, SIZE, WEIGHT} from '../../common/common';
 import {ACTIONS} from '../../provider';
-import {getElevation, ToastEvent, timeSince} from '../../utils/utils';
+import {getElevation, ToastEvent} from '../../utils/utils';
 import {updateEvent} from '../DialogManager';
 
 let refs = [];

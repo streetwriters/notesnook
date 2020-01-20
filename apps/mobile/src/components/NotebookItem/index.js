@@ -106,6 +106,7 @@ export const NotebookItem = ({
               {item && item.topics
                 ? item.topics.slice(1, 4).map(topic => (
                     <View
+                      key={topic.dateCreated.toString() + topic.title}
                       style={{
                         borderRadius: 5,
                         backgroundColor: colors.accent,
@@ -167,18 +168,14 @@ export const NotebookItem = ({
                 alignItems: 'center',
                 marginTop: 5,
               }}>
-              <Icon
-                style={{width: 30}}
-                name="lock"
-                size={SIZE.xs}
-                color={colors.icon}
-              />
-              <Icon
-                style={{width: 30}}
-                name="star"
-                size={SIZE.xs}
-                color={colors.icon}
-              />
+              {item.favorite ? (
+                <Icon
+                  style={{width: 30}}
+                  name="star"
+                  size={SIZE.xs}
+                  color={colors.icon}
+                />
+              ) : null}
 
               <Text
                 style={{
