@@ -1,4 +1,4 @@
-import StorageInterface from "../../notes-web/src/interfaces/storage";
+import StorageInterface from "../__mocks__/storage.mock";
 import Storage from "../helpers/storage";
 const storage = new Storage(StorageInterface);
 test("add a value", async () => {
@@ -15,7 +15,7 @@ test("remove", async () => {
 
 test("clear", async () => {
   await storage.write("hello", "world");
-  await storage.clear();
+  storage.clear();
   let value = await storage.read("hello");
   expect(value).toBeUndefined();
 });

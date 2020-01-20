@@ -15,7 +15,8 @@ const KEYS = {
   notes: "notes",
   notebooks: "notebooks",
   trash: "trash",
-  tags: "tags"
+  tags: "tags",
+  user: "user"
 };
 
 function checkInitialized() {
@@ -32,6 +33,8 @@ class Database {
     this.notes = {};
     this.notebooks = {};
     this.trash = {};
+    this.tags = {};
+    this.user = {};
     this.isInitialized = false;
   }
 
@@ -40,7 +43,7 @@ class Database {
       for (let key of extractValues(KEYS)) {
         this.storage.read(key).then(data => {
           this[key] = data || {};
-          if (key === KEYS.tags) {
+          if (key === KEYS.user) {
             this.isInitialized = true;
             //TODO use index here
             resolve(true);
@@ -416,6 +419,14 @@ class Database {
   async clearTrash() {
     this[KEYS.trash] = {};
     await this.storage.write(KEYS.trash, this[KEYS.trash]);
+  }
+
+  async createUser(user) {
+    this.user = { ...this.user, ...user };
+    await this.storage.write(KEYS.user, user);
+  }
+  getUser() {
+    return this.user;
   }
 }
 
