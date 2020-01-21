@@ -1,7 +1,13 @@
 import React, {Component} from 'react';
-import {Modal, Text, TouchableOpacity, View} from 'react-native';
+import {
+  Modal,
+  Text,
+  TouchableOpacity,
+  View,
+  DeviceEventEmitter,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
-import {db} from '../../../App';
+import {db, DDS} from '../../../App';
 import {opacity, ph, pv, SIZE, WEIGHT} from '../../common/common';
 import {ACTIONS} from '../../provider';
 import NavigationService from '../../services/NavigationService';
@@ -58,6 +64,13 @@ export class Dialog extends Component {
 
         break;
       }
+      case dialogActions.ACTION_EXIT_FULLSCREEN: {
+        updateEvent({type: ACTIONS.NOTES});
+        DeviceEventEmitter.emit('closeFullScreenEditor');
+        this.setState({
+          visible: false,
+        });
+      }
     }
   };
 
@@ -98,7 +111,7 @@ export class Dialog extends Component {
             alignItems: 'center',
           }}>
           <TouchableOpacity
-            onPress={() => close()}
+            onPress={this.hide}
             style={{
               width: '100%',
               height: '100%',
@@ -108,7 +121,7 @@ export class Dialog extends Component {
           <View
             style={{
               ...getElevation(5),
-              width: '80%',
+              width: DDS.isTab ? '50%' : '80%',
               maxHeight: 350,
               borderRadius: 5,
               backgroundColor: colors.bg,

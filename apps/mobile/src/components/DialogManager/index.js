@@ -7,11 +7,20 @@ import {VaultDialog} from '../VaultDialog';
 import MoveNoteDialog from '../MoveNoteDialog';
 import {AddTopicDialog} from '../AddTopicDialog';
 import {AddNotebookDialog} from '../AddNotebookDialog';
+import {DDS} from '../../../App';
 
+export const _recieveEvent = (eventName, action) => {
+  DeviceEventEmitter.addListener(eventName, action);
+};
+
+export const _unSubscribeEvent = (eventName, action) => {
+  DeviceEventEmitter.removeListener(eventName, action);
+};
 export const dialogActions = {
   ACTION_DELETE: 511,
   ACTION_EXIT: 512,
   ACTION_EMPTY_TRASH: 513,
+  ACTION_EXIT_FULLSCREEN: 514,
 };
 
 export const ActionSheetEvent = (
@@ -67,14 +76,6 @@ export const updateEvent = data => {
   DeviceEventEmitter.emit('updateEvent', data);
 };
 
-export const _recieveEvent = (eventName, action) => {
-  DeviceEventEmitter.addListener(eventName, action);
-};
-
-export const _unSubscribeEvent = (eventName, action) => {
-  DeviceEventEmitter.removeListener(eventName, action);
-};
-
 export const TEMPLATE_DELETE = type => {
   return {
     title: `Delete ${type}`,
@@ -83,6 +84,17 @@ export const TEMPLATE_DELETE = type => {
     negativeText: 'Cancel',
     action: dialogActions.ACTION_DELETE,
     icon: 'trash',
+  };
+};
+
+export const TEMPLATE_EXIT_FULLSCREEN = () => {
+  return {
+    title: `Exit fullscreen editor?`,
+    paragraph: `Are you sure you want to exit fullscreen editor?`,
+    positiveText: 'Exit',
+    negativeText: 'Cancel',
+    action: dialogActions.ACTION_EXIT_FULLSCREEN,
+    icon: 'x',
   };
 };
 
@@ -162,7 +174,19 @@ export class DialogManager extends Component {
     this.moveNoteDialog.close();
   };
 
+  loadNote = i => {
+    if (i && i.type === 'new') {
+      setNote({});
+    } else {
+      note = i;
+      this.setState({
+        item: i,
+      });
+    }
+  };
+
   componentDidMount() {
+    _recieveEvent('loadNoteEvent', this.loadNote);
     _recieveEvent('ActionSheetEvent', this._showActionSheet);
     _recieveEvent('ActionSheetHideEvent', this._hideActionSheet);
 
@@ -179,6 +203,8 @@ export class DialogManager extends Component {
     _recieveEvent('hideAddTopicEvent', this.hideAddTopic);
   }
   componentWillUnmount() {
+    _unSubscribeEvent('loadNoteEvent', this.loadNote);
+
     _unSubscribeEvent('ActionSheetEvent', this._showActionSheet);
     _unSubscribeEvent('ActionSheetHideEvent', this._hideSimpleDialog);
 
@@ -288,6 +314,8 @@ export class DialogManager extends Component {
           ref={ref => (this.actionSheet = ref)}
           customStyles={{
             backgroundColor: colors.bg,
+            width: DDS.isTab ? '60%' : '100%',
+            alignSelf: 'center',
           }}
           indicatorColor={colors.shade}
           initialOffsetFromBottom={0.5}

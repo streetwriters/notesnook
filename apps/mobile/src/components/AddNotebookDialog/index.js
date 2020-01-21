@@ -245,6 +245,7 @@ export class AddNotebookDialog extends React.Component {
                 paddingHorizontal: ph,
                 borderRadius: 5,
                 fontSize: SIZE.sm,
+                height: 35,
                 fontFamily: WEIGHT.regular,
                 color: colors.pri,
                 marginTop: 20,
@@ -274,6 +275,7 @@ export class AddNotebookDialog extends React.Component {
                 borderColor: descFocused ? colors.accent : colors.nav,
                 paddingHorizontal: ph,
                 borderRadius: 5,
+                height: 35,
                 fontSize: SIZE.sm,
                 fontFamily: WEIGHT.regular,
                 color: colors.pri,
@@ -335,6 +337,7 @@ export class AddNotebookDialog extends React.Component {
                   paddingHorizontal: 0,
                   borderRadius: 5,
                   borderWidth: 1.5,
+                  height: 35,
                   fontSize: SIZE.sm,
                   borderColor: topicInputFoused ? colors.accent : colors.nav,
                   fontFamily: WEIGHT.regular,
@@ -352,11 +355,10 @@ export class AddNotebookDialog extends React.Component {
                   justifyContent: 'center',
                   alignItems: 'center',
                   borderWidth: 1.5,
-
                   borderColor: topicInputFoused ? colors.accent : colors.nav,
                   borderRadius: 5,
-                  width: 40,
-                  height: 40,
+                  width: '12%',
+                  height: 35,
                 }}>
                 <Icon
                   name="plus"
