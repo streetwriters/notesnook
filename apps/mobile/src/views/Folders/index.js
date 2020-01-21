@@ -15,6 +15,7 @@ import {ACTIONS, useTracked} from '../../provider';
 import {slideLeft, slideRight} from '../../utils/animations';
 import {w} from '../../utils/utils';
 import {AddNotebookEvent} from '../../components/DialogManager';
+import {DDS} from '../../../App';
 
 export const Folders = ({navigation}) => {
   const [state, dispatch] = useTracked();
@@ -171,7 +172,7 @@ export const Folders = ({navigation}) => {
             <View
               style={{
                 height: '80%',
-                width: '100%',
+                width: DDS.isTab ? '70%' : '100%',
                 alignItems: 'center',
                 alignSelf: 'center',
                 justifyContent: 'center',
@@ -204,6 +205,7 @@ export const Folders = ({navigation}) => {
         contentContainerStyle={{
           width: '100%',
           alignSelf: 'center',
+          minHeight: '100%',
         }}
         ListFooterComponent={
           <View

@@ -7,6 +7,7 @@ import {useTracked} from '../../provider';
 import NavigationService from '../../services/NavigationService';
 import {SideMenuEvent} from '../../utils/utils';
 import {moveNoteHideEvent} from '../DialogManager';
+import {DDS} from '../../../App';
 let isOpen = false;
 export const Header = ({
   heading,
@@ -81,7 +82,7 @@ export const Header = ({
         ) : (
           undefined
         )}
-        {menu ? (
+        {menu && !DDS.isTab ? (
           <TouchableOpacity
             hitSlop={{top: 20, bottom: 20, left: 50, right: 40}}
             onPress={() => {

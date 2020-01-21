@@ -31,17 +31,21 @@ export const SelectionHeader = ({navigation}) => {
       style={{
         width: '100%',
         position: 'absolute',
-        height: selectionMode ? 50 + StatusBar.currentHeight : 0,
+        height: selectionMode
+          ? Platform.OS === 'android'
+            ? 50 + StatusBar.currentHeight
+            : 50
+          : 0,
         opacity: selectionMode ? 1 : 0,
         backgroundColor: colors.bg,
         paddingTop: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight,
         justifyContent: 'flex-end',
         zIndex: 11,
+        paddingHorizontal: 12,
       }}>
       <View
         style={{
-          width: w - 24,
-          marginHorizontal: 12,
+          width: '100%',
           height: 50,
           flexDirection: 'row',
           justifyContent: 'space-between',

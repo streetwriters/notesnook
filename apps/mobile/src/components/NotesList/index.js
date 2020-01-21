@@ -8,6 +8,7 @@ import {NotesPlaceHolder} from '../ListPlaceholders';
 import NoteItem from '../NoteItem';
 import SelectionWrapper from '../SelectionWrapper';
 import PullToRefresh from '../PullToRefresh';
+import {DDS} from '../../../App';
 let sectionListRef;
 export const NotesList = ({
   onScroll,
@@ -25,7 +26,7 @@ export const NotesList = ({
       <NoteItem
         colors={colors}
         customStyle={{
-          width: selectionMode ? w - 74 : '100%',
+          width: selectionMode ? '90%' : '100%',
           marginHorizontal: 0,
         }}
         onLongPress={() => {

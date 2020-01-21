@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
-import {SafeAreaView, View} from 'react-native';
+import {SafeAreaView, View, DeviceEventEmitter} from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import {db} from '../../../App';
+import {db, DDS} from '../../../App';
 import Container from '../../components/Container';
 import {Header} from '../../components/header';
 import {NotesList} from '../../components/NotesList';
@@ -12,6 +12,7 @@ import NavigationService from '../../services/NavigationService';
 import {SideMenuEvent, ToastEvent} from '../../utils/utils';
 import {useIsFocused} from 'react-navigation-hooks';
 import PullToRefresh from '../../components/PullToRefresh';
+import Editor from '../Editor';
 
 export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(
   SafeAreaView,
@@ -100,9 +101,14 @@ export const Home = ({navigation}) => {
       bottomButtonText="Add a new note"
       bottomButtonOnPress={() => {
         dispatch({type: ACTIONS.NOTES});
-        SideMenuEvent.close();
-        SideMenuEvent.disable();
-        NavigationService.navigate('Editor');
+
+        if (DDS.isTab) {
+          DeviceEventEmitter.emit('loadNoteEvent', {type: 'new'});
+        } else {
+          SideMenuEvent.close();
+          SideMenuEvent.disable();
+          NavigationService.navigate('Editor');
+        }
       }}>
       <SelectionHeader />
       <Animatable.View

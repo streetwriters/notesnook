@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -21,36 +21,44 @@ import {
   SIZE,
   WEIGHT,
 } from '../../common/common';
-import {useTracked} from '../../provider';
+import {useTracked, ACTIONS} from '../../provider';
 import {AnimatedSafeAreaView} from '../../views/Home';
 import {VaultDialog} from '../VaultDialog';
+import {db} from '../../../App';
+import {w} from '../../utils/utils';
 
 let tagsInputRef;
 let tagsList;
-export const EditorMenu = ({
-  close = () => {},
-  hide,
-  update = () => {},
-  updateProps = () => {},
-  noteProps,
-  note,
-  timestamp,
-}) => {
+export const EditorMenu = ({updateProps = () => {}, timestamp}) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
-  // Todo
-
-  const changeColorScheme = () => {};
-  ///////
-
-  const [unlock, setUnlock] = useState(false);
-  const [vaultDialog, setVaultDialog] = useState(false);
+  const [noteProps, setNoteProps] = useState({
+    pinned: false,
+    locked: false,
+    favorite: false,
+    tags: [],
+    colors: [],
+  });
   const [focused, setFocused] = useState(false);
+
   let tagToAdd = null;
   let backPressCount = 0;
 
-  _renderListItem = ({item, index}) => (
+  function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
+    let newColors = setColorScheme(colors, accent);
+    StatusBar.setBarStyle(newColors.night ? 'light-content' : 'dark-content');
+
+    dispatch({type: ACTIONS.THEME, colors: newColors});
+  }
+  useEffect(() => {
+    if (timestamp) {
+      setNoteProps({...db.getNote(timestamp)});
+    }
+  }, [timestamp]);
+
+  const _renderListItem = item => (
     <TouchableOpacity
+      key={item.name}
       activeOpacity={opacity}
       onPress={() => {
         item.func();
@@ -61,9 +69,7 @@ export const EditorMenu = ({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'flex-end',
-        paddingHorizontal: 12,
-        paddingVertical: pv + 5,
-        paddingTop: index === 0 ? 5 : pv + 5,
+        paddingVertical: pv,
       }}>
       <View
         style={{
@@ -76,12 +82,12 @@ export const EditorMenu = ({
           }}
           name={item.icon}
           color={colors.pri}
-          size={SIZE.md}
+          size={SIZE.sm}
         />
         <Text
           style={{
             fontFamily: WEIGHT.regular,
-            fontSize: SIZE.sm,
+            fontSize: SIZE.sm - 1,
             color: colors.pri,
           }}>
           {item.name}
@@ -89,7 +95,7 @@ export const EditorMenu = ({
       </View>
       {item.switch ? (
         <Icon
-          size={SIZE.lg + 2}
+          size={SIZE.lg}
           color={item.on ? colors.accent : colors.icon}
           name={item.on ? 'toggle-right' : 'toggle-left'}
         />
@@ -101,8 +107,8 @@ export const EditorMenu = ({
           style={{
             borderWidth: 2,
             borderColor: item.on ? colors.accent : colors.icon,
-            width: 23,
-            height: 23,
+            width: 22,
+            height: 22,
             justifyContent: 'center',
             alignItems: 'center',
             borderRadius: 100,
@@ -116,28 +122,53 @@ export const EditorMenu = ({
     </TouchableOpacity>
   );
 
-  _renderTag = item => (
+  _renderTag = tag => (
     <TouchableOpacity
+      key={tag}
+      onPress={() => {
+        let oldProps = {...noteProps};
+
+        oldProps.tags.splice(oldProps.tags.indexOf(tag), 1);
+        db.addNote({
+          dateCreated: timestamp,
+          content: noteProps.content,
+          title: noteProps.title,
+          tags: oldProps.tags,
+        });
+        localRefresh();
+      }}
       style={{
         flexDirection: 'row',
         justifyContent: 'flex-start',
         alignItems: 'center',
-        margin: 5,
+        margin: 1,
         paddingHorizontal: 5,
         paddingVertical: 2.5,
-        backgroundColor: colors.accent,
-        borderRadius: 5,
       }}>
       <Text
         style={{
           fontFamily: WEIGHT.regular,
-          fontSize: SIZE.sm - 2,
-          color: 'white',
+          fontSize: SIZE.sm,
+          color: colors.pri,
         }}>
-        {item}
+        <Text
+          style={{
+            color: colors.accent,
+          }}>
+          {tag.slice(0, 1)}
+        </Text>
+        {tag.slice(1)}
       </Text>
     </TouchableOpacity>
   );
+
+  const localRefresh = () => {
+    if (!timestamp) return;
+
+    let toAdd = db.getNote(timestamp);
+
+    setNoteProps({...toAdd});
+  };
 
   _renderColor = item => (
     <TouchableOpacity
@@ -149,25 +180,20 @@ export const EditorMenu = ({
           props.colors.push(item);
         }
 
-        updateProps(props);
+        localRefresh();
       }}
       style={{
         flexDirection: 'row',
-        justifyContent: 'flex-start',
+        justifyContent: 'space-between',
         alignItems: 'center',
-        marginRight: 5,
+
         marginBottom: 5,
-        borderWidth: 1.5,
         borderRadius: 100,
-        padding: 3,
-        borderColor: noteProps.colors.includes(item)
-          ? colors.pri
-          : colors.shade,
       }}>
       <View
         style={{
-          width: 40,
-          height: 40,
+          width: (w * 0.3) / 8.5,
+          height: (w * 0.3) / 8.5,
           backgroundColor: item,
           borderRadius: 100,
           justifyContent: 'center',
@@ -180,7 +206,7 @@ export const EditorMenu = ({
     </TouchableOpacity>
   );
 
-  _onSubmit = () => {
+  const _onSubmit = () => {
     if (!tagToAdd || tagToAdd === '#') return;
 
     let tag = tagToAdd;
@@ -190,19 +216,31 @@ export const EditorMenu = ({
     if (tag.includes(' ')) {
       tag = tag.replace(' ', '_');
     }
-    let oldProps = {...noteProps};
-    oldProps.tags.push(tag);
+    let oldProps = {...note};
+
+    if (oldProps.tags.includes(tag)) {
+      return;
+    } else {
+      oldProps.tags.push(tag);
+    }
+
     tagsInputRef.setNativeProps({
       text: '#',
     });
-    updateProps(oldProps);
+    db.addNote({
+      dateCreated: timestamp,
+      content: noteProps.content,
+      title: noteProps.title,
+      tags: oldProps.tags,
+    });
+    localRefresh();
     tagToAdd = '';
     setTimeout(() => {
-      tagsInputRef.focus();
+      //tagsInputRef.focus();
     }, 300);
   };
 
-  _onKeyPress = event => {
+  const _onKeyPress = event => {
     if (event.nativeEvent.key === 'Backspace') {
       if (backPressCount === 0 && !tagToAdd) {
         backPressCount = 1;
@@ -212,13 +250,20 @@ export const EditorMenu = ({
       if (backPressCount === 1 && !tagToAdd) {
         backPressCount = 0;
 
-        let tagInputValue = noteProps.tags[noteProps.tags.length - 1];
-        let oldProps = {...noteProps};
-        if (allTags.length === 1) return;
+        let tagInputValue = note.tags[note.tags.length - 1];
+        let oldProps = {...note};
+        if (oldProps.tags.length === 1) return;
 
-        oldProps.tags.splice(allTags.length - 1);
+        oldProps.tags.splice(oldProps.tags.length - 1);
 
-        updateProps(oldProps);
+        db.addNote({
+          dateCreated: note.dateCreated,
+          content: note.content,
+          title: note.title,
+          tags: oldProps.tags,
+        });
+        localRefresh();
+
         tagsInputRef.setNativeProps({
           text: tagInputValue,
         });
@@ -236,11 +281,11 @@ export const EditorMenu = ({
       duration={300}
       style={{
         height: '100%',
-        opacity: hide ? 0 : 1,
+        opacity: 1,
         backgroundColor: colors.shade,
       }}>
       <KeyboardAvoidingView
-        style={{height: '100%'}}
+        style={{height: '100%', paddingHorizontal: 12, width: '100%'}}
         behavior={Platform.OS === 'ios' ? 'padding' : null}>
         <ScrollView
           contentContainerStyle={{
@@ -251,7 +296,6 @@ export const EditorMenu = ({
               style={{
                 height: 0,
                 width: '100%',
-
                 marginTop: Platform.OS == 'ios' ? 0 : StatusBar.currentHeight,
               }}
             />
@@ -260,7 +304,7 @@ export const EditorMenu = ({
                 flexDirection: 'row',
                 justifyContent: 'flex-start',
                 alignItems: 'center',
-                width: '95%',
+                width: '100%',
                 alignSelf: 'center',
                 height: 50,
               }}>
@@ -274,8 +318,8 @@ export const EditorMenu = ({
               </Text>
             </View>
 
-            <FlatList
-              data={[
+            <View>
+              {[
                 {
                   name: 'Dark Mode',
                   icon: 'moon',
@@ -302,10 +346,10 @@ export const EditorMenu = ({
                   name: 'Pinned',
                   icon: 'tag',
                   func: () => {
-                    let props = {...noteProps};
-                    props.pinned = !noteProps.pinned;
-
-                    updateProps(props);
+                    if (!timestamp) return;
+                    db.pinItem(note.type, note.dateCreated);
+                    localRefresh();
+                    dispatch({type: ACTIONS.PINNED});
                   },
                   close: false,
                   check: true,
@@ -316,10 +360,11 @@ export const EditorMenu = ({
                   name: 'Add to Favorites',
                   icon: 'star',
                   func: () => {
-                    let props = {...noteProps};
-                    props.favorite = !noteProps.favorite;
+                    if (!timestamp) return;
 
-                    updateProps(props);
+                    db.favoriteItem(note.type, note.dateCreated);
+                    localRefresh(item.type);
+                    dispatch({type: ACTIONS.FAVORITES});
                   },
                   close: false,
                   check: true,
@@ -355,20 +400,17 @@ export const EditorMenu = ({
                   icon: 'lock',
                   func: () => {
                     if (noteProps.locked) {
-                      setUnlock(true);
+                      //setUnlock(true);
                     } else {
-                      setUnlock(false);
+                      // setUnlock(false);
                     }
-                    setVaultDialog(true);
                   },
                   close: true,
                   check: true,
                   on: noteProps.locked,
                 },
-              ]}
-              keyExtractor={(item, index) => item.name}
-              renderItem={_renderListItem}
-            />
+              ].map(_renderListItem)}
+            </View>
 
             <TouchableOpacity
               style={{
@@ -377,7 +419,6 @@ export const EditorMenu = ({
                 flexDirection: 'row',
                 justifyContent: 'space-between',
                 alignItems: 'flex-end',
-                paddingHorizontal: 12,
                 marginTop: 15,
               }}>
               <View
@@ -405,20 +446,21 @@ export const EditorMenu = ({
               </View>
             </TouchableOpacity>
 
-            <ScrollView
-              ref={ref => (tagsList = ref)}
-              contentContainerStyle={{
+            <View
+              style={{
                 flexDirection: 'row',
                 flexWrap: 'wrap',
-                marginHorizontal: '5%',
                 marginBottom: 0,
                 marginTop: 10,
                 borderRadius: 5,
-                backgroundColor: colors.nav,
                 borderWidth: 1.5,
-                borderColor: focused ? colors.accent : 'transparent',
+                borderColor: focused ? colors.accent : colors.nav,
+                paddingVertical: 5,
+                backgroundColor: colors.nav,
               }}>
-              {noteProps.tags.map(_renderTag)}
+              {noteProps && noteProps.tags
+                ? noteProps.tags.map(_renderTag)
+                : null}
               <TextInput
                 style={{
                   backgroundColor: 'transparent',
@@ -426,16 +468,16 @@ export const EditorMenu = ({
                   fontFamily: WEIGHT.regular,
                   color: colors.pri,
                   paddingHorizontal: 5,
-                  paddingVertical: 2.5,
-                  margin: 5,
+                  paddingVertical: 1.5,
+                  margin: 1,
                 }}
+                blurOnSubmit={false}
                 ref={ref => (tagsInputRef = ref)}
                 placeholderTextColor={colors.icon}
                 onFocus={() => {
                   setFocused(true);
                 }}
                 selectionColor={colors.accent}
-                selectTextOnFocus={true}
                 onBlur={() => {
                   setFocused(false);
                 }}
@@ -444,10 +486,10 @@ export const EditorMenu = ({
                   tagToAdd = value;
                   if (tagToAdd.length > 0) backPressCount = 0;
                 }}
-                onKeyPress={_onKeyPress}
                 onSubmitEditing={_onSubmit}
+                onKeyPress={_onKeyPress}
               />
-            </ScrollView>
+            </View>
 
             <TouchableOpacity
               style={{
@@ -456,7 +498,6 @@ export const EditorMenu = ({
                 flexDirection: 'row',
                 justifyContent: 'space-between',
                 alignItems: 'flex-end',
-                paddingHorizontal: 12,
                 marginTop: 15,
               }}>
               <View
@@ -484,13 +525,14 @@ export const EditorMenu = ({
               </View>
             </TouchableOpacity>
 
-            <ScrollView
-              contentContainerStyle={{
+            <View
+              style={{
                 flexDirection: 'row',
                 flexWrap: 'wrap',
-                paddingHorizontal: '5%',
                 marginBottom: 15,
                 marginTop: 10,
+                width: '100%',
+                justifyContent: 'space-between',
               }}>
               {[
                 'red',
@@ -501,7 +543,7 @@ export const EditorMenu = ({
                 'orange',
                 'gray',
               ].map(_renderColor)}
-            </ScrollView>
+            </View>
           </View>
         </ScrollView>
 
@@ -524,24 +566,6 @@ export const EditorMenu = ({
           {}
           <ActivityIndicator color={colors.accent} />
         </View>
-
-        <VaultDialog
-          close={(item, locked) => {
-            if (item) {
-              update(item);
-            }
-            let props = {...noteProps};
-            props.locked = locked;
-            updateProps(props);
-            setVaultDialog(false);
-            setUnlock(false);
-          }}
-          note={note}
-          timestamp={timestamp}
-          perm={true}
-          openedToUnlock={unlock}
-          visible={vaultDialog}
-        />
       </KeyboardAvoidingView>
     </AnimatedSafeAreaView>
   );

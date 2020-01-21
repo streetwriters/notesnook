@@ -1,5 +1,11 @@
 import React from 'react';
-import {ScrollView, Text, TouchableOpacity, View} from 'react-native';
+import {
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+  StatusBar,
+} from 'react-native';
 import FastStorage from 'react-native-fast-storage';
 import {FlatList} from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/Feather';
@@ -12,10 +18,11 @@ import {
   pv,
   SIZE,
   WEIGHT,
+  setColorScheme,
 } from '../../common/common';
 import Container from '../../components/Container';
 import {Header} from '../../components/header';
-import {useTracked} from '../../provider';
+import {useTracked, ACTIONS} from '../../provider';
 import NavigationService from '../../services/NavigationService';
 export const Settings = ({navigation}) => {
   const [state, dispatch] = useTracked();

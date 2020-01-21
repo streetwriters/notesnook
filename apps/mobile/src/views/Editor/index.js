@@ -1,13 +1,14 @@
 import React, {useEffect, useState} from 'react';
 import {
   BackHandler,
-  Dimensions,
   KeyboardAvoidingView,
   Linking,
   Platform,
   StatusBar,
   TouchableOpacity,
   View,
+  DeviceEventEmitter,
+  ActivityIndicator,
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import Icon from 'react-native-vector-icons/Feather';
@@ -18,29 +19,77 @@ import {
   ActionSheetEvent,
   simpleDialogEvent,
   TEMPLATE_EXIT,
+  _recieveEvent,
+  _unSubscribeEvent,
+  TEMPLATE_EXIT_FULLSCREEN,
 } from '../../components/DialogManager';
-import {EditorMenu} from '../../components/EditorMenu';
 import {useTracked, ACTIONS} from '../../provider';
-import {SideMenuEvent} from '../../utils/utils';
+import {SideMenuEvent, w} from '../../utils/utils';
 import {AnimatedSafeAreaView} from '../Home';
 
 let EditorWebView;
 let note = {};
-var timestamp = null;
+let timestamp = null;
 var content = null;
 var title = null;
 let timer = null;
-const Editor = ({navigation}) => {
+let saveCounter = 0;
+const Editor = ({navigation, noMenu}) => {
   // Global State
   const [state, dispatch] = useTracked();
   const {colors} = state;
+  const [loading, setLoading] = useState(false);
 
-  // Local State
-  const [sidebar, setSidebar] = useState(DDS.isTab ? true : false);
+  let fullscreen = false;
 
   // FUNCTIONS
 
   const post = value => EditorWebView.postMessage(value);
+  useEffect(() => {
+    _recieveEvent('loadNoteEvent', loadNote);
+
+    return () => {
+      _unSubscribeEvent('loadNoteEvent', loadNote);
+    };
+  }, []);
+
+  const loadNote = item => {
+    if (note && note.dateCreated) {
+      saveNote(true).then(() => {
+        dispatch({type: ACTIONS.NOTES});
+        if (item && item.type === 'new') {
+          clearEditor();
+        } else {
+          note = item;
+          updateEditor();
+        }
+      });
+    } else {
+      dispatch({type: ACTIONS.NOTES});
+      if (item && item.type === 'new') {
+        clearEditor();
+      } else {
+        note = item;
+        updateEditor();
+      }
+    }
+  };
+
+  const clearEditor = () => {
+    timestamp = null;
+    title = null;
+    content = null;
+    note = {};
+    saveCounter = 0;
+
+    post('{}');
+    post(
+      JSON.stringify({
+        type: 'title',
+        value: null,
+      }),
+    );
+  };
 
   const onChange = data => {
     if (data !== '') {
@@ -59,7 +108,7 @@ const Editor = ({navigation}) => {
       timer = null;
       onChange(evt.nativeEvent.data);
       timer = setTimeout(() => {
-        saveNote(true);
+        saveNote.call(this, true);
       }, 1000);
     }
   };
@@ -73,7 +122,10 @@ const Editor = ({navigation}) => {
     }
   };
 
-  const saveNote = async (noteProps = {}, lockNote = true) => {
+  const saveNote = async (lockNote = true) => {
+    if (!title && !content) return;
+    if (title === '' && content.text === '') return;
+
     if (!content) {
       content = {
         text: '',
@@ -81,7 +133,7 @@ const Editor = ({navigation}) => {
       };
     }
 
-    timestamp = await db.addNote({
+    let dateCreated = await db.addNote({
       title,
       content: {
         text: content.text,
@@ -89,21 +141,60 @@ const Editor = ({navigation}) => {
       },
       dateCreated: timestamp,
     });
+    if (timestamp !== dateCreated) {
+      timestamp = dateCreated;
+    }
 
-    if (lockNote && db.getNote(timestamp).locked) {
-      db.lockNote(timestamp, 'password');
+    if (content.text.length < 200 || saveCounter < 2) {
+      dispatch({
+        type: ACTIONS.NOTES,
+      });
+    }
+    saveCounter++;
+    if (timestamp) {
+      let lockednote = db.getNote(timestamp);
+      if (lockNote && lockednote.locked) {
+        await db.lockNote(timestamp, 'password');
+      }
     }
   };
 
   const onWebViewLoad = () => {
-    post(JSON.stringify(colors));
-    if (navigation.state.params && navigation.state.params.note) {
+    if (noMenu) {
+      post(
+        JSON.stringify({
+          type: 'nomenu',
+          value: true,
+        }),
+      );
+    } else {
+      post(
+        JSON.stringify({
+          type: 'nomenu',
+          value: false,
+        }),
+      );
+    }
+
+    if (navigation && navigation.state.params && navigation.state.params.note) {
       note = navigation.state.params.note;
       updateEditor();
+    } else if (note && note.dateCreated) {
+      updateEditor();
     }
+
+    post(JSON.stringify(colors));
+
+    setTimeout(() => {
+      setLoading(false);
+    }, 1000);
   };
 
   const updateEditor = () => {
+    title = note.title;
+    timestamp = note.dateCreated;
+    content = note.content;
+    saveCounter = 0;
     post(JSON.stringify(note.content.delta));
     post(
       JSON.stringify({
@@ -111,12 +202,10 @@ const Editor = ({navigation}) => {
         value: note.title,
       }),
     );
-    title = note.title;
-    timestamp = note.dateCreated;
-    content = note.content;
   };
 
   const params = 'platform=' + Platform.OS;
+
   const sourceUri =
     (Platform.OS === 'android' ? 'file:///android_asset/' : '') +
     'Web.bundle/loader.html';
@@ -132,52 +221,100 @@ const Editor = ({navigation}) => {
         behavior={Platform.OS === 'ios' ? 'padding' : null}
         style={{
           height: '100%',
+          width: '100%',
+          backgroundColor: 'transparent',
         }}>
         <View
           style={{
             marginTop: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight,
           }}
         />
-        <TouchableOpacity
-          onPress={() => {
-            simpleDialogEvent(TEMPLATE_EXIT('Editor'));
-          }}
+
+        <Animatable.View
+          transition={['translateX', 'opacity']}
+          duration={300}
           style={{
-            width: '12.5%',
-            height: 50,
+            width: '100%',
+            height: '100%',
             justifyContent: 'center',
-            alignItems: 'flex-start',
-            position: 'absolute',
-            left: 0,
-            top: 0,
-            marginTop: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight,
-            paddingLeft: 12,
+            alignItems: 'center',
             zIndex: 999,
+            position: 'absolute',
+            backgroundColor: colors.bg,
+            opacity: loading ? 1 : 0,
+            transform: [
+              {
+                translateX: loading ? 0 : w * 1.5,
+              },
+            ],
           }}>
-          <Icon
-            style={{
-              marginLeft: -7,
+          {loading ? (
+            <ActivityIndicator color={colors.accent} size={SIZE.xxl} />
+          ) : null}
+        </Animatable.View>
+
+        {noMenu ? null : (
+          <TouchableOpacity
+            onPress={() => {
+              simpleDialogEvent(TEMPLATE_EXIT('Editor'));
             }}
-            name="chevron-left"
-            color={colors.icon}
-            size={SIZE.xxxl - 3}
-          />
-        </TouchableOpacity>
+            style={{
+              width: 60,
+              height: 50,
+              justifyContent: 'center',
+              alignItems: 'flex-start',
+              position: 'absolute',
+              left: 0,
+              top: 0,
+              marginTop: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight,
+              paddingLeft: 12,
+              zIndex: 800,
+            }}>
+            <Icon
+              style={{
+                marginLeft: -7,
+                marginTop: -3.5,
+              }}
+              name="chevron-left"
+              color={colors.icon}
+              size={SIZE.xxxl - 3}
+            />
+          </TouchableOpacity>
+        )}
 
         <TouchableOpacity
           onPress={() => {
-            DDS.isTab
-              ? setSidebar(!sidebar)
-              : ActionSheetEvent(
-                  note,
-                  true,
-                  true,
-                  ['Add to', 'Share', 'Export', 'Delete'],
-                  ['Dark Mode', 'Add to Vault', 'Pin', 'Favorite'],
-                );
+            if (fullscreen) {
+              DeviceEventEmitter.emit('closeFullScreenEditor');
+              fullscreen = false;
+              post(
+                JSON.stringify({
+                  type: 'nomenu',
+                  value: true,
+                }),
+              );
+            } else {
+              DeviceEventEmitter.emit('showFullScreenEditor');
+              fullscreen = true;
+              post(
+                JSON.stringify({
+                  type: 'nomenu',
+                  value: false,
+                }),
+              );
+            }
+
+            return;
+            ActionSheetEvent(
+              note,
+              true,
+              true,
+              ['Add to', 'Share', 'Export', 'Delete'],
+              ['Dark Mode', 'Add to Vault', 'Pin', 'Favorite'],
+            );
           }}
           style={{
-            width: '12.5%',
+            width: 60,
             height: 50,
             justifyContent: 'center',
             alignItems: 'flex-end',
@@ -186,7 +323,7 @@ const Editor = ({navigation}) => {
             top: 0,
             marginTop: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight,
             paddingRight: 12,
-            zIndex: 999,
+            zIndex: 800,
           }}>
           <Icon name="more-horizontal" color={colors.icon} size={SIZE.xxxl} />
         </TouchableOpacity>
@@ -196,7 +333,8 @@ const Editor = ({navigation}) => {
           onError={error => console.log(error)}
           onLoad={onWebViewLoad}
           javaScriptEnabled
-          onShouldStartLoadWithRequest={_onShouldStartLoadWithRequest}
+          injectedJavaScript={Platform.OS === 'ios' ? injectedJS : null}
+          //onShouldStartLoadWithRequest={_onShouldStartLoadWithRequest}
           renderLoading={() => (
             <View
               style={{
@@ -206,22 +344,19 @@ const Editor = ({navigation}) => {
               }}
             />
           )}
-          cacheEnabled={true}
+          cacheMode="LOAD_NO_CACHE"
+          cacheEnabled={false}
           domStorageEnabled
           scrollEnabled={false}
           bounces={true}
           allowFileAccess={true}
           scalesPageToFit={true}
+          allowFileAccessFromFileURLs={true}
+          allowUniversalAccessFromFileURLs={true}
           originWhitelist={'*'}
-          injectedJavaScript={Platform.OS === 'ios' ? injectedJS : null}
-          source={
-            Platform.OS === 'ios'
-              ? {uri: sourceUri}
-              : {
-                  uri: 'file:///android_asset/texteditor.html',
-                  baseUrl: 'baseUrl:"file:///android_asset/',
-                }
-          }
+          source={{
+            uri: 'http://192.168.10.9:8080/texteditor.html',
+          }}
           style={{
             height: '100%',
             maxHeight: '100%',
@@ -236,24 +371,35 @@ const Editor = ({navigation}) => {
   // EFFECTS
 
   useEffect(() => {
-    let handleBack = BackHandler.addEventListener('hardwareBackPress', () => {
-      simpleDialogEvent(TEMPLATE_EXIT('Editor'));
+    let handleBack;
+    if (!noMenu) {
+      handleBack = BackHandler.addEventListener('hardwareBackPress', () => {
+        simpleDialogEvent(TEMPLATE_EXIT_FULLSCREEN());
+        return true;
+      });
+    } else {
+      if (handleBack) {
+        handleBack.remove();
+        handleBack = null;
+      }
+    }
 
-      return true;
-    });
     return () => {
-      handleBack.remove();
-      handleBack = null;
+      if (handleBack) {
+        handleBack.remove();
+        handleBack = null;
+      }
       title = null;
       content = null;
       timer = null;
-      timestamp = null;
     };
-  }, []);
+  }, [noMenu]);
 
   useEffect(() => {
-    SideMenuEvent.disable();
+    noMenu ? null : SideMenuEvent.disable();
+
     return () => {
+      if (noMenu) return;
       DDS.isTab ? SideMenuEvent.open() : null;
       SideMenuEvent.enable();
     };
@@ -271,18 +417,11 @@ const Editor = ({navigation}) => {
         flex: 1,
         backgroundColor: colors.bg,
         height: '100%',
-        width: sidebar ? '70%' : '100%',
+        width: '100%',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
       }}>
       {_renderEditor()}
-      <Animatable.View
-        transition={['width', 'opacity']}
-        duration={300}
-        style={{
-          width: sidebar ? '30%' : '0%',
-          opacity: sidebar ? 1 : 0,
-        }}>
-        {DDS.isTab ? <EditorMenu hide={false} /> : null}
-      </Animatable.View>
     </AnimatedSafeAreaView>
   );
 };

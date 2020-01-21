@@ -22,6 +22,7 @@ export const Search = props => {
         height: 60,
         justifyContent: 'center',
         marginTop: props.hide ? -65 : 0,
+        paddingHorizontal: 12,
       }}>
       <Animatable.View
         transition={['borderWidth']}
@@ -31,7 +32,7 @@ export const Search = props => {
           justifyContent: 'space-between',
           alignItems: 'center',
           paddingLeft: 12,
-          width: w - 24,
+          width: '100%',
           alignSelf: 'center',
           borderRadius: br,
           height: '90%',

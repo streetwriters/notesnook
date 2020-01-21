@@ -1,5 +1,11 @@
 import React from 'react';
-import {Dimensions, Text, TouchableOpacity, View} from 'react-native';
+import {
+  Dimensions,
+  Text,
+  TouchableOpacity,
+  View,
+  DeviceEventEmitter,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import {DDS} from '../../../App';
 import {ph, pv, SIZE, WEIGHT} from '../../common/common';
@@ -48,12 +54,10 @@ export default class NoteItem extends React.Component {
     let {
       colors,
       item,
-      width,
       customStyle,
       onLongPress,
       isTrash,
       pinned,
-      update,
       index,
     } = this.props;
     console.log('rendering', index);
@@ -65,9 +69,7 @@ export default class NoteItem extends React.Component {
             justifyContent: 'flex-start',
             alignItems: 'center',
             flexDirection: 'row',
-            marginHorizontal: 12,
-            width: width,
-
+            maxWidth: '100%',
             paddingRight: 6,
             alignSelf: 'center',
             borderBottomWidth: 1,
@@ -110,9 +112,11 @@ export default class NoteItem extends React.Component {
                 vaultDialog: true,
               });
             } else {
-              NavigationService.navigate('Editor', {
-                note: item,
-              });
+              DDS.isTab
+                ? DeviceEventEmitter.emit('loadNoteEvent', item)
+                : NavigationService.navigate('Editor', {
+                    note: item,
+                  });
             }
           }}
           style={{

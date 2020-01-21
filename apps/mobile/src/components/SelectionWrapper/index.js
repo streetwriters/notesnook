@@ -15,21 +15,21 @@ const SelectionWrapper = ({children, item}) => {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        width: w - 24,
-
-        marginHorizontal: 12,
+        width: '100%',
+        paddingHorizontal: 12,
       }}>
-      <TouchableOpacity
+      <View
         onPress={() => {
           dispatch({type: ACTIONS.SELECTED_ITEMS, item: item});
         }}
         style={{
-          width: 50,
+          width: '10%',
           height: 70,
           justifyContent: 'center',
-          alignItems: 'flex-start',
+          alignItems: 'center',
           display: selectionMode ? 'flex' : 'none',
           opacity: selectionMode ? 1 : 0,
+          paddingRight: 10,
         }}>
         <View
           style={{
@@ -48,7 +48,7 @@ const SelectionWrapper = ({children, item}) => {
             <Icon size={SIZE.md} color={colors.accent} name="check" />
           ) : null}
         </View>
-      </TouchableOpacity>
+      </View>
 
       {children}
     </View>
