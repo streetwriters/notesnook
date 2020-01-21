@@ -2,9 +2,16 @@ import React, {useState, useEffect} from 'react';
 import NavigationService, {
   AppContainer,
 } from './src/services/NavigationService';
-import {StatusBar, View, Platform} from 'react-native';
+import {
+  StatusBar,
+  View,
+  Platform,
+  TouchableOpacity,
+  Dimensions,
+  Modal,
+} from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import {w} from './src/utils/utils';
+import {w, SideMenuEvent} from './src/utils/utils';
 import {Toast} from './src/components/Toast';
 import {Menu} from './src/components/Menu';
 import SideMenu from './src/components/SideMenu';
@@ -12,39 +19,60 @@ import Storage from 'notes-core/api/database';
 import StorageInterface from './src/utils/storage';
 import {useTracked, ACTIONS} from './src/provider';
 import {DeviceDetectionService} from './src/utils/deviceDetection';
+import Animated, {Easing} from 'react-native-reanimated';
 import {
   DialogManager,
   _recieveEvent,
   _unSubscribeEvent,
 } from './src/components/DialogManager';
 import {getColorScheme} from './src/common/common';
+import Editor from './src/views/Editor';
+import {ModalMenu} from './src/components/ModalMenu';
 
 export const DDS = new DeviceDetectionService();
 export const db = new Storage(StorageInterface);
+const {
+  Clock,
+  Value,
+  set,
+  cond,
+  startClock,
+  clockRunning,
+  timing,
+  debug,
+  stopClock,
+  block,
+} = Animated;
 
 let sideMenuRef;
+let editorRef;
 const App = () => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
+  const [width, setWidth] = useState(w);
   // Local State
-  const [sidebar, setSidebar] = useState(w * 0.3);
-  const [init, setInit] = useState(false);
 
+  const [init, setInit] = useState(false);
+  const [fullscreen, setFullscreen] = useState(false);
+  let animatedSidebarWidth = new Value(w * 0.04);
+  let animatedAppContainerWidth = new Value(w * 0.96);
+
+  let isShown = true;
   // Effects
 
   const openSidebar = () => {
-    DDS.isTab ? setSidebar(w * 0.3) : sideMenuRef.openMenu(true);
+    DDS.isTab ? sidebarAnimation() : sideMenuRef.openMenu(true);
   };
   const closeSidebar = () => {
-    DDS.isTab ? setSidebar(0) : sideMenuRef.openMenu(false);
+    DDS.isTab ? sidebarAnimation() : sideMenuRef.openMenu(false);
   };
 
   const disableGestures = () => {
-    sideMenuRef.setGestureEnabled(false);
+    DDS.isTab ? null : sideMenuRef.setGestureEnabled(false);
   };
 
   const enableGestures = () => {
-    sideMenuRef.setGestureEnabled(true);
+    DDS.isTab ? null : sideMenuRef.setGestureEnabled(true);
   };
 
   useEffect(() => {
@@ -54,7 +82,13 @@ const App = () => {
     _recieveEvent('disableGesture', disableGestures);
     _recieveEvent('enableGesture', enableGestures);
 
+    _recieveEvent('showFullScreenEditor', showFullScreenEditor);
+    _recieveEvent('closeFullScreenEditor', closeFullScreenEditor);
+
     return () => {
+      _unSubscribeEvent('showFullScreenEditor', showFullScreenEditor);
+      _unSubscribeEvent('closeFullScreenEditor', closeFullScreenEditor);
+
       _unSubscribeEvent('openSidebar', openSidebar);
       _unSubscribeEvent('closeSidebar', closeSidebar);
 
@@ -62,6 +96,32 @@ const App = () => {
       _unSubscribeEvent('enableGesture', enableGestures);
     };
   }, []);
+
+  const showFullScreenEditor = () => {
+    setFullscreen(true);
+    editorRef.setNativeProps({
+      style: {
+        position: 'absolute',
+        width: '100%',
+        zIndex: 999,
+        paddingHorizontal: 100,
+        backgroundColor: colors.bg,
+      },
+    });
+  };
+
+  const closeFullScreenEditor = () => {
+    setFullscreen(false);
+    editorRef.setNativeProps({
+      style: {
+        position: 'relative',
+        width: '68%',
+        zIndex: null,
+        paddingHorizontal: 0,
+        backgroundColor: 'transparent',
+      },
+    });
+  };
 
   useEffect(() => {
     _recieveEvent('updateEvent', type => {
@@ -95,6 +155,40 @@ const App = () => {
     dispatch({type: ACTIONS.THEME, colors: newColors});
   }
 
+  const sidebarAnimation = () => {
+    let sValue;
+    let aValue;
+    if (isShown) {
+      sValue = w * 0.04;
+      aValue = w * 0.96;
+      isShown = false;
+    } else {
+      sValue = w * 0.25;
+      aValue = w * 0.75;
+      isShown = true;
+    }
+
+    let _anim = timing(animatedSidebarWidth, {
+      duration: 200,
+      toValue: sValue,
+      easing: Easing.in(Easing.ease),
+    });
+
+    let _animS = timing(animatedAppContainerWidth, {
+      duration: 0,
+      toValue: aValue,
+      easing: Easing.inOut(Easing.ease),
+    });
+
+    if (isShown) {
+      _animS.start();
+      _anim.start();
+    } else {
+      _anim.start();
+      _animS.start();
+    }
+  };
+
   // Render
 
   if (!init) {
@@ -102,38 +196,63 @@ const App = () => {
   }
   return (
     <>
-      <View
+      <Animatable.View
+        transition="backgroundColor"
+        duration={300}
         style={{
           width: '100%',
           height: '100%',
           flexDirection: 'row',
           backgroundColor: colors.bg,
+        }}
+        onLayout={e => {
+          setWidth(Dimensions.get('window').width);
         }}>
         {DDS.isTab ? (
           <>
-            <Animatable.View
-              transition="width"
-              duration={200}
+            <ModalMenu colors={colors} />
+
+            <View
               style={{
-                width: sidebar,
+                width: '4%',
               }}>
               <Menu
                 hide={false}
+                noTextMode={true}
                 colors={colors}
                 close={() => {
                   //setSidebar('0%');
                 }}
               />
-            </Animatable.View>
-            <AppContainer
+            </View>
+
+            <View
               style={{
-                width: DDS.isTab ? '70%' : '100%',
+                width: '28%',
                 height: '100%',
-              }}
-              ref={navigatorRef => {
-                NavigationService.setTopLevelNavigator(navigatorRef);
-              }}
-            />
+                borderRightColor: colors.nav,
+                borderRightWidth: 2,
+              }}>
+              <AppContainer
+                style={{
+                  width: '100%',
+                  height: '100%',
+                }}
+                ref={navigatorRef => {
+                  NavigationService.setTopLevelNavigator(navigatorRef);
+                }}
+              />
+            </View>
+
+            <View
+              ref={ref => (editorRef = ref)}
+              style={{
+                width: '68%',
+                height: '100%',
+                backgroundColor: 'transparent',
+              }}>
+              <Editor noMenu={fullscreen ? false : true} />
+            </View>
           </>
         ) : (
           <SideMenu
@@ -165,7 +284,7 @@ const App = () => {
         )}
         <Toast />
         <DialogManager colors={colors} />
-      </View>
+      </Animatable.View>
     </>
   );
 };
