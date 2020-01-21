@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import FastStorage from 'react-native-fast-storage';
 import Icon from 'react-native-vector-icons/Feather';
-import {db} from '../../../App';
+import {db, DDS} from '../../../App';
 import {
   ACCENT,
   COLOR_SCHEME,
@@ -22,7 +22,11 @@ import {
   WEIGHT,
 } from '../../common/common';
 import {ACTIONS, useTracked} from '../../provider';
-import {moveNoteEvent} from '../DialogManager';
+import {
+  moveNoteEvent,
+  _recieveEvent,
+  _unSubscribeEvent,
+} from '../DialogManager';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
@@ -37,16 +41,6 @@ export const ActionSheetComponent = ({
 }) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
-
-  // Todo
-
-  function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
-    let newColors = setColorScheme(colors, accent);
-    StatusBar.setBarStyle(newColors.night ? 'light-content' : 'dark-content');
-
-    dispatch({type: ACTIONS.THEME, colors: newColors});
-  }
-
   const [focused, setFocused] = useState(false);
   const [note, setNote] = useState(
     item
@@ -64,6 +58,13 @@ export const ActionSheetComponent = ({
           dateCreated: null,
         },
   );
+
+  function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
+    let newColors = setColorScheme(colors, accent);
+    StatusBar.setBarStyle(newColors.night ? 'light-content' : 'dark-content');
+
+    dispatch({type: ACTIONS.THEME, colors: newColors});
+  }
 
   useEffect(() => {
     if (item.dateCreated !== null) {
@@ -358,8 +359,8 @@ export const ActionSheetComponent = ({
       }}>
       <View
         style={{
-          width: (w - 12) / 10,
-          height: (w - 12) / 10,
+          width: DDS.isTab ? (w * 0.6) / 10 : w / 10,
+          height: DDS.isTab ? (w * 0.6) / 10 : w / 10,
           backgroundColor: color,
           borderRadius: 100,
           justifyContent: 'center',
@@ -379,7 +380,7 @@ export const ActionSheetComponent = ({
         key={rowItem.name}
         style={{
           alignItems: 'center',
-          width: (w - 24) / rowItems.length,
+          width: DDS.isTab ? (w * 0.6) / rowItems.length : w / rowItems.length,
         }}>
         <Icon
           style={{
@@ -483,13 +484,14 @@ export const ActionSheetComponent = ({
       style={{
         paddingBottom: 15,
         backgroundColor: colors.bg,
+        width: '100%',
+        paddingHorizontal: 12,
       }}>
       <View
         style={{
-          width: w - 24,
+          width: '100%',
           justifyContent: 'space-between',
           alignItems: 'center',
-          marginHorizontal: 12,
           paddingVertical: 10,
           flexDirection: 'row',
           borderBottomWidth: 1,
