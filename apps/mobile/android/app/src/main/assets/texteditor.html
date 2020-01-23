@@ -1432,22 +1432,56 @@ editor.on('text-change', function(delta, oldDelta, source) {
 
   document.querySelectorAll('.ql-picker-label').forEach(e => {
     e.addEventListener('click',function(evt) {
-       
-        let top = evt.clientY;
-        let left = evt.target.offsetParent.offsetLeft;
+        
+        let top;
+        let left;
+        let menu;
+        let evtItemWidth;
+        let evtItemHeight;
 
-        let menu = evt.target.attributes.getNamedItem('aria-controls').value;
+        if (!evt.target.offsetParent) {
+         
+          let _myLocalElement = evt.path.filter(o => o.className == "ql-picker-label");
+         
+          var rect = _myLocalElement[0].getBoundingClientRect();
+           evtItemWidth = _myLocalElement[0].offsetParent.offsetWidth;
+           evtItemHeight = _myLocalElement[0].offsetParent.offsetHeight;
+
+          top = rect.top; 
+         left = rect.left;
+
+          menu = _myLocalElement[0].attributes.getNamedItem('aria-controls').value;
+        } else {
+          //left = evt.target.offsetParent.offsetLeft;
+          evtItemWidth = evt.target.offsetParent.offsetWidth;
+          evtItemHeight = evt.target.offsetParent.offsetHeight;
+
+          
+
+
+          var rect = evt.target.offsetParent.getBoundingClientRect();
+         top = rect.top; 
+         left = rect.left;
+          menu = evt.target.attributes.getNamedItem('aria-controls').value;
+        } 
+
+      
         let menuHeight = document.getElementById(menu).offsetHeight;
         let menuWidth = document.getElementById(menu).offsetWidth;
-
-        console.log(document.getElementById('toolbar').scrollLeft);
-        let scrollOffset = document.getElementById('toolbar').scrollLeft;
+        let wDiff;
+        if (menuWidth < evtItemWidth) {
+          wDiff = evtItemWidth - menuWidth;   
+          left = left + (wDiff/2);
+        } else{
+          wDiff =  menuWidth - evtItemWidth; 
+          left = left - (wDiff/2);
+        }
 
         dropDownFixPosition(
           '.ql-picker-label',
           menu,
           top,
-          left - scrollOffset,
+          left ,
           menuHeight,
           menuWidth 
         )
@@ -1460,7 +1494,7 @@ editor.on('text-change', function(delta, oldDelta, source) {
 
     let b = document.querySelector(button);
     
-    var dropDownTop = top - b.offsetHeight - height;
+    var dropDownTop = top - (b.offsetHeight/2) - height;
     
     let screenWidth = window.outerWidth;
 
