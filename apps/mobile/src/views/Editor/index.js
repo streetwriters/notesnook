@@ -256,7 +256,9 @@ const Editor = ({navigation, noMenu}) => {
         {noMenu ? null : (
           <TouchableOpacity
             onPress={() => {
-              simpleDialogEvent(TEMPLATE_EXIT('Editor'));
+              DDS.isTab
+                ? simpleDialogEvent(TEMPLATE_EXIT_FULLSCREEN())
+                : simpleDialogEvent(TEMPLATE_EXIT('Editor'));
             }}
             style={{
               width: 60,
@@ -282,51 +284,72 @@ const Editor = ({navigation, noMenu}) => {
           </TouchableOpacity>
         )}
 
-        <TouchableOpacity
-          onPress={() => {
-            if (fullscreen) {
-              DeviceEventEmitter.emit('closeFullScreenEditor');
-              fullscreen = false;
-              post(
-                JSON.stringify({
-                  type: 'nomenu',
-                  value: true,
-                }),
-              );
-            } else {
-              DeviceEventEmitter.emit('showFullScreenEditor');
-              fullscreen = true;
-              post(
-                JSON.stringify({
-                  type: 'nomenu',
-                  value: false,
-                }),
-              );
-            }
-
-            return;
-            ActionSheetEvent(
-              note,
-              true,
-              true,
-              ['Add to', 'Share', 'Export', 'Delete'],
-              ['Dark Mode', 'Add to Vault', 'Pin', 'Favorite'],
-            );
-          }}
+        <View
           style={{
-            width: 60,
-            height: 50,
-            justifyContent: 'center',
-            alignItems: 'flex-end',
+            flexDirection: 'row',
+            marginRight: 0,
             position: 'absolute',
+            marginTop: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight,
+            zIndex: 999,
             right: 0,
             top: 0,
-            marginTop: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight,
-            paddingRight: 12,
-            zIndex: 800,
           }}>
-          <Icon name="more-horizontal" color={colors.icon} size={SIZE.xxxl} />
-        </TouchableOpacity>
+          {DDS.isTab ? (
+            <TouchableOpacity
+              onPress={() => {
+                if (fullscreen) {
+                  DeviceEventEmitter.emit('closeFullScreenEditor');
+                  fullscreen = false;
+                  post(
+                    JSON.stringify({
+                      type: 'nomenu',
+                      value: true,
+                    }),
+                  );
+                } else {
+                  DeviceEventEmitter.emit('showFullScreenEditor');
+                  fullscreen = true;
+                  post(
+                    JSON.stringify({
+                      type: 'nomenu',
+                      value: false,
+                    }),
+                  );
+                }
+              }}
+              style={{
+                width: 60,
+                height: 50,
+                justifyContent: 'center',
+                alignItems: 'flex-end',
+                paddingRight: 12,
+                zIndex: 800,
+              }}>
+              <Icon name="square" color={colors.icon} size={SIZE.xxxl} />
+            </TouchableOpacity>
+          ) : null}
+          <TouchableOpacity
+            onPress={() => {
+              ActionSheetEvent(
+                note,
+                true,
+                true,
+                ['Add to', 'Share', 'Export', 'Delete'],
+                ['Dark Mode', 'Add to Vault', 'Pin', 'Favorite'],
+              );
+            }}
+            style={{
+              width: 60,
+              height: 50,
+              justifyContent: 'center',
+              alignItems: 'flex-end',
+
+              paddingRight: 12,
+              zIndex: 800,
+            }}>
+            <Icon name="more-horizontal" color={colors.icon} size={SIZE.xxxl} />
+          </TouchableOpacity>
+        </View>
 
         <WebView
           ref={ref => (EditorWebView = ref)}
@@ -334,7 +357,7 @@ const Editor = ({navigation, noMenu}) => {
           onLoad={onWebViewLoad}
           javaScriptEnabled
           injectedJavaScript={Platform.OS === 'ios' ? injectedJS : null}
-          //onShouldStartLoadWithRequest={_onShouldStartLoadWithRequest}
+          onShouldStartLoadWithRequest={_onShouldStartLoadWithRequest}
           renderLoading={() => (
             <View
               style={{
@@ -354,9 +377,14 @@ const Editor = ({navigation, noMenu}) => {
           allowFileAccessFromFileURLs={true}
           allowUniversalAccessFromFileURLs={true}
           originWhitelist={'*'}
-          source={{
-            uri: 'http://192.168.10.9:8080/texteditor.html',
-          }}
+          source={
+            Platform.OS === 'ios'
+              ? sourceUri
+              : {
+                  uri: 'file:///android_asset/texteditor.html',
+                  baseUrl: 'file:///android_asset/',
+                }
+          }
           style={{
             height: '100%',
             maxHeight: '100%',

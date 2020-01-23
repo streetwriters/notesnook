@@ -34,6 +34,7 @@ const defaultState = {
     warningText: '#9F6000',
   },
   preventDefaultMargins: false,
+  isLoginNavigator: false,
 };
 
 export const ACTIONS = {
@@ -48,6 +49,7 @@ export const ACTIONS = {
   THEME: 'theme',
   MODAL_NAVIGATOR: 'modalNavigator',
   CLEAR_SELECTION: 'clearSelection',
+  LOGIN_NAVIGATOR: 'loginNavigator',
 };
 
 const reducer = (state, action) => {
@@ -127,6 +129,12 @@ const reducer = (state, action) => {
       return {
         ...state,
         preventDefaultMargins: action.enabled,
+      };
+    }
+    case ACTIONS.LOGIN_NAVIGATOR: {
+      return {
+        ...state,
+        isLoginNavigator: action.enabled,
       };
     }
     default:

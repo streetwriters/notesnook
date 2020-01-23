@@ -32,7 +32,7 @@ const fade = props => {
 
   const opacity = position.interpolate({
     inputRange: [index - 0.7, index, index + 0.7],
-    outputRange: [0.3, 1, 0.3],
+    outputRange: [0.9, 1, 0.9],
   });
 
   return {

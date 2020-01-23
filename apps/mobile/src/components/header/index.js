@@ -1,5 +1,12 @@
 import React from 'react';
-import {Platform, StatusBar, Text, TouchableOpacity, View} from 'react-native';
+import {
+  Platform,
+  StatusBar,
+  Text,
+  TouchableOpacity,
+  View,
+  DeviceEventEmitter,
+} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import Icon from 'react-native-vector-icons/Feather';
 import {SIZE, WEIGHT} from '../../common/common';
@@ -19,6 +26,7 @@ export const Header = ({
   sendHeight = e => {},
   preventDefaultMargins,
   navigation = null,
+  isLoginNavigator,
 }) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
@@ -34,7 +42,7 @@ export const Header = ({
         marginTop:
           Platform.OS === 'ios'
             ? 0
-            : preventDefaultMargins
+            : preventDefaultMargins || isLoginNavigator
             ? 0
             : StatusBar.currentHeight,
         marginBottom: 10,
@@ -56,6 +64,12 @@ export const Header = ({
               if (navigation && preventDefaultMargins) {
                 if (navigation.state.routeName === 'Folders') {
                   moveNoteHideEvent();
+                } else {
+                  navigation.goBack();
+                }
+              } else if (navigation && isLoginNavigator) {
+                if (navigation.state.routeName === 'Login') {
+                  DeviceEventEmitter.emit('hideLoginDialog');
                 } else {
                   navigation.goBack();
                 }

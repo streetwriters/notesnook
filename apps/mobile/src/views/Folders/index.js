@@ -31,17 +31,27 @@ export const Folders = ({navigation}) => {
   ///
 
   const handleBackPress = () => {
+    alert('here');
     return true;
   };
 
   useEffect(() => {
     dispatch({type: ACTIONS.NOTEBOOKS});
-    console.log(selectedItemsList[0]);
-    let backhandler = BackHandler.addEventListener(
-      'hardwareBackPress',
-      handleBackPress,
-    );
+    let backhandler;
+    if (isFocused) {
+      backhandler = BackHandler.addEventListener(
+        'hardwareBackPress',
+        handleBackPress,
+      );
+    } else {
+      if (backhandler) {
+        backhandler.remove();
+        backhandler = null;
+      }
+    }
+
     return () => {
+      if (!backhandler) return;
       backhandler.remove();
       backhandler = null;
     };
