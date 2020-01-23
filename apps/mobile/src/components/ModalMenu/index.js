@@ -72,7 +72,7 @@ export class ModalMenu extends Component {
             this.setState({
               showMenu: true,
             });
-          }, 50);
+          }, 0);
         }}
         animationType="fade"
         onRequestClose={() => this.setState({visible: false})}>

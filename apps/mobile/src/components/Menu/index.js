@@ -411,19 +411,19 @@ export const Menu = ({
           alignSelf: 'center',
           marginBottom: 20,
           flexDirection: 'row',
-          backgroundColor: colors.bg,
         }}>
         <TouchableOpacity
           onPress={() => {
             close();
 
-            NavigationService.navigate('Login');
+            DDS.isTab
+              ? DeviceEventEmitter.emit('showLoginDialog')
+              : NavigationService.navigate('Login');
           }}
           activeOpacity={opacity / 2}
           style={{
             paddingVertical: pv + 5,
             paddingHorizontal: 12,
-            backgroundColor: colors.shade,
             width: '100%',
             justifyContent: 'flex-start',
             alignItems: 'center',
