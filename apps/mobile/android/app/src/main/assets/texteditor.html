@@ -1332,11 +1332,24 @@ const setTheme = function() {
 
 // Receber mensagens do RN
 document.addEventListener('message', data => {
+  
+
+  if (data.data === "clear") {
+  
+    editor.setText('')
+   
+  }else if (data.data === "focusEditor") {
+               
+                editor.focus();
+              } else if (data.data === 'focusTitle') {
               
-              if (JSON.parse(data.data).type === "nomenu") {
+                document.getElementById('titleInput').focus();
+              }else if (JSON.parse(data.data).type === "nomenu") {
                 let isenabled = JSON.parse(data.data).value;
                 let width = window.innerWidth;
                 let titleIn = document.getElementById('titleInput');
+              
+
                 if (isenabled) {
 
                
@@ -1355,6 +1368,7 @@ document.addEventListener('message', data => {
               }
               else if (JSON.parse(data.data).type === "title") {
                 document.getElementById('titleInput').value = JSON.parse(data.data).value
+                
               } else if (data.data.substr(0,9) === '{"night":') {
                 pageTheme.colors = JSON.parse(data.data);
                
@@ -1362,15 +1376,34 @@ document.addEventListener('message', data => {
                 
                 return;
               } else if (data.data[0] === '{') {
+               
                 const content = JSON.parse(data.data);
+      
                 editor.setContents(content,'silent');
+
+                setTimeout(() => {
+                  editor.focus();
+                  editor.setSelection(editor.getText().length -1,0);
+                },0)
+
               } else if (data.data[0] === '<') {
                editor.setContents(
                 editor.clipboard.convert(data.data, 'silent'),
                 'silent'
                 );
-              }else {
+                setTimeout(() => {
+                  editor.focus();
+                  editor.setSelection(editor.getText().length -1,0);
+                },0)
+              
+               
+
+              } else  {
                 editor.setText(data.data, 'silent')
+                setTimeout(() => {
+                  editor.focus();
+                  editor.setSelection(editor.getText().length -1,0);
+                },0)
               }
             });
 
@@ -1421,7 +1454,7 @@ editor.on('text-change', function(delta, oldDelta, source) {
             });
 
 
-
+   
 
   document.querySelectorAll('.ql-picker').forEach(e => {
     e.addEventListener('mousedown',function(e) {

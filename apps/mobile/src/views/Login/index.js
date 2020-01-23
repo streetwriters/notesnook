@@ -1,20 +1,18 @@
 import React, {createRef, useEffect} from 'react';
 import {
+  BackHandler,
   DeviceEventEmitter,
   SafeAreaView,
   Text,
   TouchableOpacity,
   View,
-  BackHandler,
 } from 'react-native';
 import {TextInput} from 'react-native-gesture-handler';
-import {NavigationEvents} from 'react-navigation';
+import {useIsFocused} from 'react-navigation-hooks';
 import {DDS} from '../../../App';
 import {opacity, pv, SIZE, WEIGHT} from '../../common/common';
 import {Header} from '../../components/header';
 import {useTracked} from '../../provider';
-import NavigationService from '../../services/NavigationService';
-import {useIsFocused} from 'react-navigation-hooks';
 
 export const Login = ({navigation}) => {
   const [state, dispatch] = useTracked();

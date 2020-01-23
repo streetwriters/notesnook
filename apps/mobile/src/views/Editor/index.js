@@ -82,13 +82,17 @@ const Editor = ({navigation, noMenu}) => {
     note = {};
     saveCounter = 0;
 
-    post('{}');
+    post('clear');
     post(
       JSON.stringify({
         type: 'title',
         value: null,
       }),
     );
+
+    wait(2000).then(() => {
+      post('focusTitle');
+    });
   };
 
   const onChange = data => {
@@ -160,6 +164,10 @@ const Editor = ({navigation, noMenu}) => {
   };
 
   const onWebViewLoad = () => {
+    EditorWebView.requestFocus();
+
+    console.log('requesting focus');
+
     if (noMenu) {
       post(
         JSON.stringify({
@@ -181,6 +189,10 @@ const Editor = ({navigation, noMenu}) => {
       updateEditor();
     } else if (note && note.dateCreated) {
       updateEditor();
+    } else {
+      wait(2000).then(() => {
+        post('focusTitle');
+      });
     }
 
     post(JSON.stringify(colors));
@@ -190,18 +202,36 @@ const Editor = ({navigation, noMenu}) => {
     }, 1000);
   };
 
+  const wait = timeout =>
+    new Promise((resolve, reject) => {
+      if (!timeout || typeof timeout !== 'number') reject();
+      setTimeout(() => {
+        resolve();
+      }, timeout);
+    });
+
   const updateEditor = () => {
     title = note.title;
     timestamp = note.dateCreated;
     content = note.content;
     saveCounter = 0;
-    post(JSON.stringify(note.content.delta));
-    post(
-      JSON.stringify({
-        type: 'title',
-        value: note.title,
-      }),
-    );
+
+    if (title !== null || title === '') {
+      post(
+        JSON.stringify({
+          type: 'title',
+          value: note.title,
+        }),
+      );
+    } else {
+      post('focusTitle');
+      post('clear');
+    }
+    if (note.content.text === '' || note.content.delta === null) {
+      post('clear');
+    } else {
+      post(JSON.stringify(note.content.delta));
+    }
   };
 
   const params = 'platform=' + Platform.OS;
@@ -381,8 +411,8 @@ const Editor = ({navigation, noMenu}) => {
             Platform.OS === 'ios'
               ? sourceUri
               : {
-                  uri: 'file:///android_asset/texteditor.html',
-                  baseUrl: 'file:///android_asset/',
+                  uri: 'http://192.168.10.7:8080/texteditor.html',
+                  baseUrl: 'http://192.168.10.7:8080/',
                 }
           }
           style={{
