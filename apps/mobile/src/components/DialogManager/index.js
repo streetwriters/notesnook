@@ -8,6 +8,7 @@ import MoveNoteDialog from '../MoveNoteDialog';
 import {AddTopicDialog} from '../AddTopicDialog';
 import {AddNotebookDialog} from '../AddNotebookDialog';
 import {DDS} from '../../../App';
+import LoginDialog from '../LoginDialog';
 
 export const _recieveEvent = (eventName, action) => {
   DeviceEventEmitter.addListener(eventName, action);
@@ -176,7 +177,9 @@ export class DialogManager extends Component {
 
   loadNote = i => {
     if (i && i.type === 'new') {
-      setNote({});
+      this.setState({
+        note: {},
+      });
     } else {
       note = i;
       this.setState({
@@ -201,7 +204,11 @@ export class DialogManager extends Component {
 
     _recieveEvent('addTopicEvent', this.showAddTopic);
     _recieveEvent('hideAddTopicEvent', this.hideAddTopic);
+
+    _recieveEvent('showLoginDialog', this.showLoginDialog);
+    _recieveEvent('hideLoginDialog', this.hideLoginDialog);
   }
+
   componentWillUnmount() {
     _unSubscribeEvent('loadNoteEvent', this.loadNote);
 
@@ -219,7 +226,18 @@ export class DialogManager extends Component {
 
     _unSubscribeEvent('addTopicEvent', this.showAddTopic);
     _unSubscribeEvent('hideAddTopicEvent', this.hideAddTopic);
+
+    _unSubscribeEvent('showLoginDialog', this.showLoginDialog);
+    _unSubscribeEvent('hideLoginDialog', this.hideLoginDialog);
   }
+
+  showLoginDialog = () => {
+    this.loginDialog.open();
+  };
+
+  hideLoginDialog = () => {
+    this.loginDialog.close();
+  };
 
   showAddNotebook = data => {
     this.setState(
@@ -381,6 +399,8 @@ export class DialogManager extends Component {
           toEdit={item}
           colors={colors}
         />
+
+        <LoginDialog colors={colors} ref={ref => (this.loginDialog = ref)} />
       </>
     );
   }

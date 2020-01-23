@@ -12,15 +12,14 @@ import {DDS} from '../../../App';
 import {opacity, pv, SIZE, WEIGHT} from '../../common/common';
 import {Header} from '../../components/header';
 import {useTracked} from '../../provider';
+import {_recieveEvent, _unSubscribeEvent} from '../../components/DialogManager';
+import {useIsFocused} from 'react-navigation-hooks';
 
 export const ForgotPassword = ({navigation}) => {
   const [state, dispatch] = useTracked();
-  const {colors, selectionMode, pinned, selectedItemsList} = state;
+  const {colors, isLoginNavigator} = state;
 
-  ///
-  const updateDB = () => {};
-  const updateSelectionList = () => {};
-  const changeSelectionMode = () => {};
+  let isFocused = useIsFocused();
 
   useEffect(() => {
     DeviceEventEmitter.emit('hide');
@@ -28,6 +27,17 @@ export const ForgotPassword = ({navigation}) => {
       DeviceEventEmitter.emit('show');
     };
   }, []);
+
+  const handleBackPress = () => {
+    navigation.goBack();
+  };
+
+  useEffect(() => {
+    _recieveEvent('goBack', handleBackPress);
+    return () => {
+      _unSubscribeEvent('goBack', handleBackPress);
+    };
+  }, [isFocused]);
 
   return (
     <SafeAreaView
@@ -41,7 +51,12 @@ export const ForgotPassword = ({navigation}) => {
         }}
       />
 
-      <Header colors={colors} heading={'Recover Password'} />
+      <Header
+        isLoginNavigator={isLoginNavigator}
+        colors={colors}
+        navigation={navigation}
+        heading={'Recover Password'}
+      />
 
       <View
         style={{

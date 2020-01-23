@@ -12,16 +12,38 @@ import {DDS} from '../../../App';
 import {opacity, pv, SIZE, WEIGHT} from '../../common/common';
 import {Header} from '../../components/header';
 import {useTracked} from '../../provider';
+import {useIsFocused} from 'react-navigation-hooks';
+import {_recieveEvent, _unSubscribeEvent} from '../../components/DialogManager';
 
 export const Signup = ({navigation}) => {
   const [state, dispatch] = useTracked();
-  const {colors} = state;
+  const {colors, isLoginNavigator} = state;
   useEffect(() => {
     DeviceEventEmitter.emit('hide');
     return () => {
       DeviceEventEmitter.emit('show');
     };
   }, []);
+
+  let isFocused = useIsFocused();
+
+  useEffect(() => {
+    DeviceEventEmitter.emit('hide');
+    return () => {
+      DeviceEventEmitter.emit('show');
+    };
+  }, []);
+
+  const handleBackPress = () => {
+    navigation.goBack();
+  };
+
+  useEffect(() => {
+    _recieveEvent('goLoginBack', handleBackPress);
+    return () => {
+      _unSubscribeEvent('goLoginBack', handleBackPress);
+    };
+  }, [isFocused]);
 
   return (
     <SafeAreaView
@@ -34,7 +56,12 @@ export const Signup = ({navigation}) => {
           DeviceEventEmitter.emit('hide');
         }}
       />
-      <Header colors={colors} heading="Create Account" />
+      <Header
+        isLoginNavigator={isLoginNavigator}
+        navigation={navigation}
+        colors={colors}
+        heading="Create Account"
+      />
 
       <View
         style={{
@@ -147,30 +174,6 @@ const renderSignup = colors => {
               color: 'white',
             }}>
             Signup
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      <View
-        style={{
-          width: '100%',
-          position: DDS.isTab ? 'absolute' : 'relative',
-          bottom: '0%',
-        }}>
-        <TouchableOpacity
-          activeOpacity={opacity}
-          style={{
-            alignItems: 'center',
-            width: '100%',
-            marginBottom: 20,
-          }}>
-          <Text
-            style={{
-              fontSize: SIZE.md,
-              fontFamily: WEIGHT.regular,
-              color: colors.accent,
-            }}>
-            Signup with G
           </Text>
         </TouchableOpacity>
       </View>

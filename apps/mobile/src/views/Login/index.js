@@ -5,6 +5,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  BackHandler,
 } from 'react-native';
 import {TextInput} from 'react-native-gesture-handler';
 import {NavigationEvents} from 'react-navigation';
@@ -13,24 +14,46 @@ import {opacity, pv, SIZE, WEIGHT} from '../../common/common';
 import {Header} from '../../components/header';
 import {useTracked} from '../../provider';
 import NavigationService from '../../services/NavigationService';
+import {useIsFocused} from 'react-navigation-hooks';
 
 export const Login = ({navigation}) => {
   const [state, dispatch] = useTracked();
-  const {colors} = state;
+  const {colors, isLoginNavigator} = state;
 
+  const isFocused = useIsFocused();
   useEffect(() => {
     DeviceEventEmitter.emit('hide');
-    return () => {
-      DeviceEventEmitter.emit('show');
-    };
   }, []);
 
   useEffect(() => {
     DeviceEventEmitter.emit('closeSidebar');
-    return () => {
-      DeviceEventEmitter.emit('openSidebar');
-    };
   }, []);
+
+  const handleBackPress = () => {
+    alert('here');
+    return true;
+  };
+
+  useEffect(() => {
+    let backhandler;
+    if (isFocused) {
+      backhandler = BackHandler.addEventListener(
+        'hardwareBackPress',
+        handleBackPress,
+      );
+    } else {
+      if (backhandler) {
+        backhandler.remove();
+        backhandler = null;
+      }
+    }
+
+    return () => {
+      if (!backhandler) return;
+      backhandler.remove();
+      backhandler = null;
+    };
+  }, [isFocused]);
 
   return (
     <SafeAreaView
@@ -38,12 +61,12 @@ export const Login = ({navigation}) => {
         backgroundColor: colors.bg,
         height: '100%',
       }}>
-      <NavigationEvents
-        onWillFocus={() => {
-          DeviceEventEmitter.emit('hide');
-        }}
+      <Header
+        navigation={navigation}
+        isLoginNavigator={isLoginNavigator}
+        olors={colors}
+        heading="Login"
       />
-      <Header colors={colors} heading="Login" />
 
       <View
         style={{
@@ -51,7 +74,7 @@ export const Login = ({navigation}) => {
           alignItems: 'center',
           width: '100%',
         }}>
-        {renderLogin(colors)}
+        {renderLogin(colors, navigation)}
       </View>
     </SafeAreaView>
   );
@@ -68,7 +91,7 @@ Login.navigationOptions = {
 
 export default Login;
 
-const renderLogin = colors => {
+const renderLogin = (colors, navigation) => {
   const _email = createRef();
   const _pass = createRef();
   return (
@@ -161,7 +184,7 @@ const renderLogin = colors => {
 
         <TouchableOpacity
           onPress={() => {
-            NavigationService.navigate('ForgotPassword');
+            navigation.navigate('ForgotPassword');
           }}
           activeOpacity={opacity}
           style={{
@@ -186,25 +209,8 @@ const renderLogin = colors => {
           bottom: '0%',
         }}>
         <TouchableOpacity
-          activeOpacity={opacity}
-          style={{
-            alignItems: 'center',
-            width: '100%',
-            marginBottom: 20,
-          }}>
-          <Text
-            style={{
-              fontSize: SIZE.md,
-              fontFamily: WEIGHT.regular,
-              color: colors.accent,
-            }}>
-            Login with G
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
           onPress={() => {
-            NavigationService.navigate('Signup');
+            navigation.navigate('Signup');
           }}
           activeOpacity={opacity}
           style={{
