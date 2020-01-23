@@ -1327,7 +1327,12 @@ const setTheme = function() {
 
                  setTheme();
 
+                 editor.once('text-change', function() {
 
+                  window.ReactNativeWebView.postMessage("loaded"); 
+
+
+});
 
 
 // Receber mensagens do RN
@@ -1336,7 +1341,7 @@ document.addEventListener('message', data => {
 
   if (data.data === "clear") {
   
-    editor.setText('')
+    editor.setText('','api')
    
   }else if (data.data === "focusEditor") {
                
@@ -1379,7 +1384,7 @@ document.addEventListener('message', data => {
                
                 const content = JSON.parse(data.data);
       
-                editor.setContents(content,'silent');
+                editor.setContents(content,'api');
 
                 setTimeout(() => {
                   editor.focus();
@@ -1388,7 +1393,7 @@ document.addEventListener('message', data => {
 
               } else if (data.data[0] === '<') {
                editor.setContents(
-                editor.clipboard.convert(data.data, 'silent'),
+                editor.clipboard.convert(data.data, 'api'),
                 'silent'
                 );
                 setTimeout(() => {
@@ -1399,7 +1404,7 @@ document.addEventListener('message', data => {
                
 
               } else  {
-                editor.setText(data.data, 'silent')
+                editor.setText(data.data, 'api')
                 setTimeout(() => {
                   editor.focus();
                   editor.setSelection(editor.getText().length -1,0);

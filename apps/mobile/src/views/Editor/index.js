@@ -9,12 +9,13 @@ import {
   View,
   DeviceEventEmitter,
   ActivityIndicator,
+  Text,
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import Icon from 'react-native-vector-icons/Feather';
 import WebView from 'react-native-webview';
 import {db, DDS} from '../../../App';
-import {SIZE} from '../../common/common';
+import {SIZE, WEIGHT} from '../../common/common';
 import {
   ActionSheetEvent,
   simpleDialogEvent,
@@ -24,7 +25,7 @@ import {
   TEMPLATE_EXIT_FULLSCREEN,
 } from '../../components/DialogManager';
 import {useTracked, ACTIONS} from '../../provider';
-import {SideMenuEvent, w} from '../../utils/utils';
+import {SideMenuEvent, w, h} from '../../utils/utils';
 import {AnimatedSafeAreaView} from '../Home';
 
 let EditorWebView;
@@ -38,7 +39,7 @@ const Editor = ({navigation, noMenu}) => {
   // Global State
   const [state, dispatch] = useTracked();
   const {colors} = state;
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   let fullscreen = false;
 
@@ -89,10 +90,7 @@ const Editor = ({navigation, noMenu}) => {
         value: null,
       }),
     );
-
-    wait(2000).then(() => {
-      post('focusTitle');
-    });
+    post('focusTitle');
   };
 
   const onChange = data => {
@@ -107,7 +105,12 @@ const Editor = ({navigation, noMenu}) => {
   };
 
   const _onMessage = evt => {
-    if (evt.nativeEvent.data !== '') {
+    if (evt.nativeEvent.data === 'loaded') {
+      setLoading(false);
+    } else if (
+      evt.nativeEvent.data !== '' &&
+      evt.nativeEvent.data !== 'loaded'
+    ) {
       clearTimeout(timer);
       timer = null;
       onChange(evt.nativeEvent.data);
@@ -164,10 +167,8 @@ const Editor = ({navigation, noMenu}) => {
   };
 
   const onWebViewLoad = () => {
-    EditorWebView.requestFocus();
-
     console.log('requesting focus');
-
+    EditorWebView.requestFocus();
     if (noMenu) {
       post(
         JSON.stringify({
@@ -190,16 +191,13 @@ const Editor = ({navigation, noMenu}) => {
     } else if (note && note.dateCreated) {
       updateEditor();
     } else {
-      wait(2000).then(() => {
-        post('focusTitle');
+      post('focusTitle');
+      wait(500).then(() => {
+        setLoading(false);
       });
     }
 
     post(JSON.stringify(colors));
-
-    setTimeout(() => {
-      setLoading(false);
-    }, 1000);
   };
 
   const wait = timeout =>
@@ -261,8 +259,9 @@ const Editor = ({navigation, noMenu}) => {
         />
 
         <Animatable.View
-          transition={['translateX', 'opacity']}
-          duration={300}
+          transition={['translateY']}
+          useNativeDriver={true}
+          duration={3000}
           style={{
             width: '100%',
             height: '100%',
@@ -271,16 +270,25 @@ const Editor = ({navigation, noMenu}) => {
             zIndex: 999,
             position: 'absolute',
             backgroundColor: colors.bg,
-            opacity: loading ? 1 : 0,
             transform: [
               {
-                translateX: loading ? 0 : w * 1.5,
+                translateY: loading ? 0 : -h * 1.5,
               },
             ],
           }}>
           {loading ? (
-            <ActivityIndicator color={colors.accent} size={SIZE.xxl} />
+            <ActivityIndicator color={colors.accent} size={SIZE.xxxl} />
           ) : null}
+
+          <Text
+            style={{
+              color: colors.accent,
+              fontFamily: WEIGHT.regular,
+              fontSize: SIZE.md,
+              marginTop: 10,
+            }}>
+            Write with confidence.
+          </Text>
         </Animatable.View>
 
         {noMenu ? null : (
@@ -320,7 +328,7 @@ const Editor = ({navigation, noMenu}) => {
             marginRight: 0,
             position: 'absolute',
             marginTop: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight,
-            zIndex: 999,
+            zIndex: 800,
             right: 0,
             top: 0,
           }}>
