@@ -64,7 +64,7 @@ export const Login = ({navigation}) => {
       <Header
         navigation={navigation}
         isLoginNavigator={isLoginNavigator}
-        olors={colors}
+        colors={colors}
         heading="Login"
       />
 
