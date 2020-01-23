@@ -1,5 +1,5 @@
 import React from 'react';
-import {Modal, DeviceEventEmitter} from 'react-native';
+import {Modal, DeviceEventEmitter, View, TouchableOpacity} from 'react-native';
 import {createAppContainer} from 'react-navigation';
 import {createStackNavigator} from 'react-navigation-stack';
 import {ACTIONS} from '../../provider';
@@ -8,6 +8,8 @@ import Notebook from '../../views/Notebook';
 import Notes from '../../views/Notes';
 import {updateEvent} from '../DialogManager';
 import * as Animatable from 'react-native-animatable';
+import {DDS} from '../../../App';
+import {getElevation} from '../../utils/utils';
 
 const fade = props => {
   const {position, scene} = props;
@@ -73,7 +75,7 @@ class MoveNoteDialog extends React.Component {
       visible: false,
       animated: false,
     };
-    this.routeName = null;
+    this.routeIndex = 0;
     this.count = 0;
   }
 
@@ -95,6 +97,7 @@ class MoveNoteDialog extends React.Component {
 
   render() {
     const {visible, animated} = this.state;
+    const {colors} = this.props;
     return (
       <Modal
         animated={true}
@@ -106,7 +109,7 @@ class MoveNoteDialog extends React.Component {
           });
         }}
         onRequestClose={() => {
-          if (!this.routeName || this.routeName === 0) {
+          if (!this.routeIndex || this.routeIndex === 0) {
             this.close();
           } else {
             DeviceEventEmitter.emit('goBack');
@@ -122,7 +125,12 @@ class MoveNoteDialog extends React.Component {
           style={{
             opacity: animated ? 1 : 0,
             flex: 1,
-            backgroundColor: 'white',
+            backgroundColor: DDS.isTab ? 'rgba(0,0,0,0.3)' : colors.bg,
+            width: '100%',
+            height: '100%',
+            alignSelf: 'center',
+            justifyContent: 'center',
+            alignItems: 'center',
             transform: [
               {
                 scaleX: animated ? 1 : 0.95,
@@ -132,13 +140,34 @@ class MoveNoteDialog extends React.Component {
               },
             ],
           }}>
-          <Navigator
-            ref={ref => (this.navigation = ref)}
-            onNavigationStateChange={state => {
-              this.routeName = state.index;
-              console.log(state);
+          <TouchableOpacity
+            onPress={() => this.close()}
+            style={{
+              width: '100%',
+              height: '100%',
+              position: 'absolute',
+              zIndex: 1,
             }}
           />
+
+          <View
+            style={{
+              ...getElevation(DDS.isTab ? 10 : 0),
+              width: DDS.isTab ? '65%' : '100%',
+              height: DDS.isTab ? '90%' : '100%',
+              borderRadius: DDS.isTab ? 5 : 0,
+              backgroundColor: colors.bg,
+              padding: 8,
+              zIndex: 10,
+            }}>
+            <Navigator
+              ref={ref => (this.navigation = ref)}
+              onNavigationStateChange={state => {
+                this.routeIndex = state.index;
+                console.log(state);
+              }}
+            />
+          </View>
         </Animatable.View>
       </Modal>
     );
