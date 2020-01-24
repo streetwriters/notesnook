@@ -117,6 +117,8 @@ export const Menu = ({
         opacity: hide ? 0 : 1,
         backgroundColor: colors.shade,
         width: '100%',
+        borderRightWidth: noTextMode ? 1 : 0,
+        borderRightColor: noTextMode ? colors.accent : 'transparent',
       }}>
       <View
         style={{

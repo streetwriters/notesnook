@@ -278,7 +278,6 @@ const Editor = ({navigation, noMenu}) => {
         style={{
           height: '100%',
           width: '100%',
-          backgroundColor: 'transparent',
         }}>
         <View
           style={{
@@ -447,8 +446,8 @@ const Editor = ({navigation, noMenu}) => {
             Platform.OS === 'ios'
               ? sourceUri
               : {
-                  uri: 'file:///android_asset/texteditor.html',
-                  baseUrl: 'file:///android_asset/',
+                  uri: 'http://192.168.10.7:8080/texteditor.html',
+                  baseUrl: 'http://192.168.10.7:8080',
                 }
           }
           style={{
@@ -509,7 +508,7 @@ const Editor = ({navigation, noMenu}) => {
       duration={300}
       style={{
         flex: 1,
-        backgroundColor: colors.bg,
+        backgroundColor: 'transparent',
         height: '100%',
         width: '100%',
         flexDirection: 'row',

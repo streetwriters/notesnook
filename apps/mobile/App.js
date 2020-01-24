@@ -25,7 +25,13 @@ import {
   _recieveEvent,
   _unSubscribeEvent,
 } from './src/components/DialogManager';
-import {getColorScheme} from './src/common/common';
+import {
+  getColorScheme,
+  COLOR_SCHEME,
+  onThemeUpdate,
+  clearThemeUpdateListener,
+  COLOR_SCHEME_DARK,
+} from './src/common/common';
 import Editor from './src/views/Editor';
 import {ModalMenu} from './src/components/ModalMenu';
 
@@ -49,22 +55,20 @@ let editorRef;
 const App = () => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
+
   const [width, setWidth] = useState(w);
   // Local State
 
   const [init, setInit] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
-  let animatedSidebarWidth = new Value(w * 0.04);
-  let animatedAppContainerWidth = new Value(w * 0.96);
 
-  let isShown = true;
   // Effects
 
   const openSidebar = () => {
-    DDS.isTab ? sidebarAnimation() : sideMenuRef.openMenu(true);
+    DDS.isTab ? null : sideMenuRef.openMenu(true);
   };
   const closeSidebar = () => {
-    DDS.isTab ? sidebarAnimation() : sideMenuRef.openMenu(false);
+    DDS.isTab ? null : sideMenuRef.openMenu(false);
   };
 
   const disableGestures = () => {
@@ -76,6 +80,7 @@ const App = () => {
   };
 
   useEffect(() => {
+    console.log(colors);
     _recieveEvent('openSidebar', openSidebar);
     _recieveEvent('closeSidebar', closeSidebar);
 
@@ -105,7 +110,6 @@ const App = () => {
         width: '100%',
         zIndex: 999,
         paddingHorizontal: 100,
-        backgroundColor: colors.bg,
       },
     });
   };
@@ -118,7 +122,6 @@ const App = () => {
         width: '68%',
         zIndex: null,
         paddingHorizontal: 0,
-        backgroundColor: 'transparent',
       },
     });
   };
@@ -150,44 +153,11 @@ const App = () => {
     });
   }, []);
 
-  async function updateAppTheme(colors = state.colors) {
+  async function updateAppTheme(colors = colors) {
     let newColors = await getColorScheme(colors);
     dispatch({type: ACTIONS.THEME, colors: newColors});
+    //setColors(newColors);
   }
-
-  const sidebarAnimation = () => {
-    let sValue;
-    let aValue;
-    if (isShown) {
-      sValue = w * 0.04;
-      aValue = w * 0.96;
-      isShown = false;
-    } else {
-      sValue = w * 0.25;
-      aValue = w * 0.75;
-      isShown = true;
-    }
-
-    let _anim = timing(animatedSidebarWidth, {
-      duration: 200,
-      toValue: sValue,
-      easing: Easing.in(Easing.ease),
-    });
-
-    let _animS = timing(animatedAppContainerWidth, {
-      duration: 0,
-      toValue: aValue,
-      easing: Easing.inOut(Easing.ease),
-    });
-
-    if (isShown) {
-      _animS.start();
-      _anim.start();
-    } else {
-      _anim.start();
-      _animS.start();
-    }
-  };
 
   // Render
 
@@ -226,7 +196,9 @@ const App = () => {
               />
             </View>
 
-            <View
+            <Animatable.View
+              transition="backgroundColor"
+              duration={300}
               style={{
                 width: '28%',
                 height: '100%',
@@ -242,7 +214,7 @@ const App = () => {
                   NavigationService.setTopLevelNavigator(navigatorRef);
                 }}
               />
-            </View>
+            </Animatable.View>
 
             <View
               ref={ref => (editorRef = ref)}

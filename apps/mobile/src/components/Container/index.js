@@ -67,7 +67,7 @@ export const Container = ({
       style={{
         height: '100%',
 
-        backgroundColor: colors.night ? colors.bg : colors.bg,
+        backgroundColor: colors.bg,
       }}>
       <KeyboardAvoidingView
         behavior="padding"

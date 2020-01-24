@@ -114,6 +114,7 @@ export async function getColorScheme() {
   }
 
   DeviceEventEmitter.emit('onThemeUpdate');
+
   return COLOR_SCHEME;
 }
 
