@@ -330,13 +330,26 @@ export class DialogManager extends Component {
       <>
         <ActionSheet
           ref={ref => (this.actionSheet = ref)}
-          customStyles={{
+          containerStyle={{
             backgroundColor: colors.bg,
-            width: DDS.isTab ? '60%' : '100%',
-            alignSelf: 'center',
+            width: DDS.isTab ? 500 : '100%',
+            alignSelf: DDS.isTab ? 'flex-end' : 'center',
+            marginRight: DDS.isTab ? 12 : null,
+            borderRadius: 10,
+            marginBottom: DDS.isTab ? 50 : 0,
           }}
+          extraScroll={DDS.isTab ? 50 : 0}
           indicatorColor={colors.shade}
-          initialOffsetFromBottom={0.5}
+          footerAlwaysVisible={DDS.isTab}
+          footerHeight={DDS.isTab ? 20 : 80}
+          footerStyle={
+            DDS.isTab
+              ? {
+                  borderRadius: 10,
+                }
+              : null
+          }
+          initialOffsetFromBottom={DDS.isTab ? 1 : 0.5}
           bounceOnOpen={true}
           gestureEnabled={true}
           onClose={() => {

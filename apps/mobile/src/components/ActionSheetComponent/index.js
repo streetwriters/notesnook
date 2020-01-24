@@ -359,8 +359,8 @@ export const ActionSheetComponent = ({
       }}>
       <View
         style={{
-          width: DDS.isTab ? (w * 0.6) / 10 : w / 10,
-          height: DDS.isTab ? (w * 0.6) / 10 : w / 10,
+          width: DDS.isTab ? 500 / 10 : w / 10,
+          height: DDS.isTab ? 500 / 10 : w / 10,
           backgroundColor: color,
           borderRadius: 100,
           justifyContent: 'center',
@@ -380,7 +380,7 @@ export const ActionSheetComponent = ({
         key={rowItem.name}
         style={{
           alignItems: 'center',
-          width: DDS.isTab ? (w * 0.6) / rowItems.length : w / rowItems.length,
+          width: DDS.isTab ? 500 / rowItems.length : w / rowItems.length,
         }}>
         <Icon
           style={{
@@ -391,16 +391,17 @@ export const ActionSheetComponent = ({
             alignItems: 'center',
             textAlign: 'center',
             textAlignVertical: 'center',
+            marginBottom: DDS.isTab ? 7 : 3.5,
           }}
           name={rowItem.icon}
-          size={SIZE.lg}
+          size={DDS.isTab ? SIZE.xl : SIZE.lg}
           color={colors.accent}
         />
 
         <Text
           style={{
             fontFamily: WEIGHT.regular,
-            fontSize: SIZE.xs + 1,
+            fontSize: DDS.isTab ? SIZE.sm : SIZE.xs + 2,
             color: colors.pri,
           }}>
           {rowItem.name}
@@ -423,7 +424,7 @@ export const ActionSheetComponent = ({
           justifyContent: 'space-between',
           alignItems: 'flex-end',
           paddingHorizontal: 12,
-          paddingVertical: pv + 5,
+          paddingVertical: pv,
         }}>
         <View
           style={{
@@ -485,7 +486,7 @@ export const ActionSheetComponent = ({
         paddingBottom: 15,
         backgroundColor: colors.bg,
         width: '100%',
-        paddingHorizontal: 12,
+        paddingHorizontal: 0,
       }}>
       <View
         style={{
@@ -563,6 +564,14 @@ export const ActionSheetComponent = ({
 
       {columnItems.length > 0 ? (
         <View>{columnItemsData.map(_renderColumnItem)}</View>
+      ) : null}
+
+      {DDS.isTab ? (
+        <View
+          style={{
+            height: 20,
+          }}
+        />
       ) : null}
     </View>
   );

@@ -1,15 +1,15 @@
-import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 import {
-  Animated,
-  Dimensions,
-  KeyboardAvoidingView,
-  Modal,
-  Platform,
-  ScrollView,
-  TouchableOpacity,
   View,
+  TouchableOpacity,
+  Dimensions,
+  ScrollView,
+  Modal,
+  KeyboardAvoidingView,
+  Platform,
+  Animated,
 } from 'react-native';
+import PropTypes from 'prop-types';
 import {styles} from './styles';
 
 const deviceHeight = Dimensions.get('window').height;
@@ -99,8 +99,9 @@ export default class ActionSheet extends Component {
       initialOffsetFromBottom,
       bounceOnOpen,
       animated,
-      defaultOverlayOpacity,
-      openAnimationDuration,
+      footerHeight,
+      footerAlwaysVisible,
+      extraScroll,
     } = this.props;
 
     let addFactor = deviceHeight * 0.1;
@@ -119,10 +120,16 @@ export default class ActionSheet extends Component {
       }
       return;
     } else {
-      this.customComponentHeight = height - 100;
+      if (footerAlwaysVisible) {
+        this.customComponentHeight = height;
+      } else {
+        this.customComponentHeight = height - footerHeight;
+      }
       let scrollOffset = gestureEnabled
-        ? this.customComponentHeight * initialOffsetFromBottom + addFactor
-        : this.customComponentHeight + addFactor;
+        ? this.customComponentHeight * initialOffsetFromBottom +
+          addFactor +
+          extraScroll
+        : this.customComponentHeight + addFactor + extraScroll;
 
       this.scrollViewRef.scrollTo({
         x: 0,
@@ -158,7 +165,7 @@ export default class ActionSheet extends Component {
     if (this.prevScroll < verticalOffset) {
       if (verticalOffset - this.prevScroll > springOffset * 0.75) {
         let addFactor = deviceHeight * 0.1;
-        this._scrollTo(this.customComponentHeight + addFactor);
+        this._scrollTo(this.customComponentHeight + addFactor + extraScroll);
       } else {
         this._scrollTo(this.prevScroll);
       }
@@ -213,7 +220,12 @@ export default class ActionSheet extends Component {
       indicatorColor,
       defaultOverlayOpacity,
       children,
-      customStyles,
+      containerStyle,
+      footerStyle,
+      footerHeight,
+      CustomHeaderComponent,
+      CustomFooterComponent,
+      headerAlwaysVisible,
     } = this.props;
 
     return (
@@ -277,7 +289,7 @@ export default class ActionSheet extends Component {
                 onLayout={this._showModal}
                 style={[
                   styles.container,
-                  customStyles,
+                  containerStyle,
                   {
                     ...getElevation(elevation),
                     zIndex: 11,
@@ -288,26 +300,33 @@ export default class ActionSheet extends Component {
                     ],
                   },
                 ]}>
-                {gestureEnabled ? (
-                  <View
-                    style={[
-                      styles.indicator,
-                      {backgroundColor: indicatorColor},
-                    ]}
-                  />
+                {gestureEnabled || headerAlwaysVisible ? (
+                  CustomHeaderComponent ? (
+                    CustomHeaderComponent
+                  ) : (
+                    <View
+                      style={[
+                        styles.indicator,
+                        {backgroundColor: indicatorColor},
+                      ]}
+                    />
+                  )
                 ) : null}
 
                 {children}
                 <View
                   style={[
                     {
-                      height: 100,
                       width: '100%',
                       backgroundColor: 'white',
                     },
-                    customStyles,
-                  ]}
-                />
+                    footerStyle,
+                    {
+                      height: footerHeight,
+                    },
+                  ]}>
+                  {CustomFooterComponent}
+                </View>
               </Animated.View>
             </ScrollView>
           </KeyboardAvoidingView>
@@ -319,18 +338,25 @@ export default class ActionSheet extends Component {
 
 ActionSheet.defaultProps = {
   children: <View />,
+  CustomFooterComponent: <View />,
+  CustomHeaderComponent: null,
+  footerAlwaysVisible: false,
+  headerAlwaysVisible: false,
+  containerStyle: {},
+  footerHeight: 80,
+  footerStyle: {},
   animated: true,
   closeOnPressBack: true,
   gestureEnabled: false,
   bounceOnOpen: false,
   bounciness: 8,
+  extraScroll: 0,
   closeAnimationDuration: 300,
   openAnimationDuration: 200,
   springOffset: 50,
   elevation: 5,
   initialOffsetFromBottom: 1,
   indicatorColor: 'gray',
-  customStyles: {},
   defaultOverlayOpacity: 0.3,
   overlayColor: 'black',
   onClose: () => {},
@@ -338,6 +364,14 @@ ActionSheet.defaultProps = {
 };
 ActionSheet.propTypes = {
   children: PropTypes.node,
+  CustomHeaderComponent: PropTypes.node,
+  CustomFooterComponent: PropTypes.node,
+  extraScroll: PropTypes.number,
+  footerAlwaysVisible: PropTypes.bool,
+  headerAlwaysVisible: PropTypes.bool,
+  containerStyle: PropTypes.object,
+  footerStyle: PropTypes.object,
+  footerHeight: PropTypes.number,
   animated: PropTypes.bool,
   closeOnPressBack: PropTypes.bool,
   gestureEnabled: PropTypes.bool,
@@ -350,7 +384,6 @@ ActionSheet.propTypes = {
   elevation: PropTypes.number,
   initialOffsetFromBottom: PropTypes.number,
   indicatorColor: PropTypes.string,
-  customStyles: PropTypes.object,
   overlayColor: PropTypes.string,
   onClose: PropTypes.func,
   onOpen: PropTypes.func,
