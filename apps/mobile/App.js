@@ -68,7 +68,6 @@ const App = () => {
   };
 
   useEffect(() => {
-    console.log(colors);
     _recieveEvent('openSidebar', openSidebar);
     _recieveEvent('closeSidebar', closeSidebar);
 
@@ -154,96 +153,102 @@ const App = () => {
   }
   return (
     <>
-      <Animatable.View
-        transition="backgroundColor"
-        duration={300}
-        style={{
-          width: '100%',
-          height: '100%',
-          flexDirection: 'row',
-          backgroundColor: colors.bg,
-        }}
-        onLayout={e => {
-          setWidth(Dimensions.get('window').width);
-        }}>
-        {DDS.isTab ? (
-          <>
-            <ModalMenu colors={colors} />
+      <Animatable.View animation="fadeIn" useNativeDriver={true} duration={600}>
+        <Animatable.View
+          transition="backgroundColor"
+          duration={300}
+          style={{
+            width: '100%',
+            height: '100%',
+            flexDirection: 'row',
+            backgroundColor: colors.bg,
+          }}
+          onLayout={e => {
+            setWidth(Dimensions.get('window').width);
+          }}>
+          {DDS.isTab ? (
+            <>
+              <ModalMenu colors={colors} />
 
-            <View
-              style={{
-                width: '4%',
-              }}>
-              <Menu
-                hide={false}
-                noTextMode={true}
-                colors={colors}
-                close={() => {
-                  //setSidebar('0%');
-                }}
-              />
-            </View>
+              <Animatable.View
+                animation="fadeIn"
+                useNativeDriver={true}
+                duration={300}
+                delay={450}
+                style={{
+                  width: '4%',
+                }}>
+                <Menu
+                  hide={false}
+                  noTextMode={true}
+                  colors={colors}
+                  close={() => {
+                    //setSidebar('0%');
+                  }}
+                />
+              </Animatable.View>
 
-            <Animatable.View
-              transition="backgroundColor"
-              duration={300}
-              style={{
-                width: '28%',
-                height: '100%',
-                borderRightColor: colors.nav,
-                borderRightWidth: 2,
-              }}>
+              <Animatable.View
+                transition="backgroundColor"
+                duration={300}
+                style={{
+                  width: '28%',
+                  height: '100%',
+                  borderRightColor: colors.nav,
+                  borderRightWidth: 2,
+                }}>
+                <AppContainer
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                  }}
+                  ref={navigatorRef => {
+                    NavigationService.setTopLevelNavigator(navigatorRef);
+                  }}
+                />
+              </Animatable.View>
+
+              <View
+                ref={ref => (editorRef = ref)}
+                style={{
+                  width: '68%',
+                  height: '100%',
+                  backgroundColor: 'transparent',
+                }}>
+                <Editor noMenu={fullscreen ? false : true} />
+              </View>
+            </>
+          ) : (
+            <SideMenu
+              ref={ref => (sideMenuRef = ref)}
+              bounceBackOnOverdraw={false}
+              contentContainerStyle={{
+                opacity: 0,
+                backgroundColor: colors.bg,
+              }}
+              menu={
+                <Menu
+                  hide={false}
+                  colors={colors}
+                  close={() => sideMenuRef.openMenu(!sideMenuRef.isOpen)}
+                />
+              }
+              openMenuOffset={w / 1.3}>
               <AppContainer
                 style={{
-                  width: '100%',
+                  width: DDS.isTab ? '70%' : '100%',
                   height: '100%',
+                  backgroundColor: colors.bg,
                 }}
                 ref={navigatorRef => {
                   NavigationService.setTopLevelNavigator(navigatorRef);
                 }}
               />
-            </Animatable.View>
-
-            <View
-              ref={ref => (editorRef = ref)}
-              style={{
-                width: '68%',
-                height: '100%',
-                backgroundColor: 'transparent',
-              }}>
-              <Editor noMenu={fullscreen ? false : true} />
-            </View>
-          </>
-        ) : (
-          <SideMenu
-            ref={ref => (sideMenuRef = ref)}
-            bounceBackOnOverdraw={false}
-            contentContainerStyle={{
-              opacity: 0,
-              backgroundColor: colors.bg,
-            }}
-            menu={
-              <Menu
-                hide={false}
-                colors={colors}
-                close={() => sideMenuRef.openMenu(!sideMenuRef.isOpen)}
-              />
-            }
-            openMenuOffset={w / 1.3}>
-            <AppContainer
-              style={{
-                width: DDS.isTab ? '70%' : '100%',
-                height: '100%',
-                backgroundColor: colors.bg,
-              }}
-              ref={navigatorRef => {
-                NavigationService.setTopLevelNavigator(navigatorRef);
-              }}
-            />
-          </SideMenu>
-        )}
-        <Toast />
-        <DialogManager colors={colors} />
+            </SideMenu>
+          )}
+          <Toast />
+          <DialogManager colors={colors} />
+        </Animatable.View>
       </Animatable.View>
     </>
   );

@@ -24,6 +24,7 @@ export const NotesList = ({
 
   const _renderItem = ({item, index}) => (
     <SelectionWrapper
+      index={index}
       currentEditingNote={
         currentEditingNote === item.dateCreated ? currentEditingNote : null
       }

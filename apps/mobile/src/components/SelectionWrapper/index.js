@@ -5,13 +5,17 @@ import Icon from 'react-native-vector-icons/Feather';
 import {w} from '../../utils/utils';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
-
-const SelectionWrapper = ({children, item, currentEditingNote}) => {
+import * as Animatable from 'react-native-animatable';
+const SelectionWrapper = ({children, item, currentEditingNote, index}) => {
   const [state, dispatch] = useTracked();
   const {colors, selectionMode, selectedItemsList} = state;
 
   return (
-    <View
+    <Animatable.View
+      animation="fadeIn"
+      useNativeDriver={true}
+      duration={300 * index + 1}
+      delay={index * 300}
       style={{
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -56,7 +60,7 @@ const SelectionWrapper = ({children, item, currentEditingNote}) => {
       </View>
 
       {children}
-    </View>
+    </Animatable.View>
   );
 };
 

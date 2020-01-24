@@ -23,12 +23,11 @@ export const Home = ({navigation}) => {
   // State
   const [state, dispatch] = useTracked();
   const {colors, selectionMode, notes} = state;
-  const [refreshing, setRefreshing] = useState(false);
   const [text, setText] = useState('');
   const [hideHeader, setHideHeader] = useState(false);
   const [keyword, setKeyword] = useState('');
   const [searchResults, setSearchResults] = useState([]);
-
+  const [loading, setLoading] = useState([]);
   const isFocused = useIsFocused();
   // Variables
 
@@ -40,7 +39,10 @@ export const Home = ({navigation}) => {
   // Effects
 
   useEffect(() => {
-    dispatch({type: ACTIONS.NOTES, payload: 'hello there'});
+    dispatch({type: ACTIONS.NOTES});
+    setTimeout(() => {
+      setLoading(false);
+    }, 2500);
   }, [isFocused]);
 
   // Functions
