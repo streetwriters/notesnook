@@ -22,7 +22,11 @@ export const NotesList = ({
   const notes = [...state.notes];
 
   const _renderItem = ({item, index}) => (
-    <SelectionWrapper item={item}>
+    <SelectionWrapper
+      currentEditingNote={
+        currentEditingNote === item.dateCreated ? currentEditingNote : null
+      }
+      item={item}>
       <NoteItem
         colors={colors}
         customStyle={{

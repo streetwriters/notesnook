@@ -5,7 +5,7 @@ import Icon from 'react-native-vector-icons/Feather';
 import {w} from '../../utils/utils';
 import {useTracked, ACTIONS} from '../../provider';
 
-const SelectionWrapper = ({children, item}) => {
+const SelectionWrapper = ({children, item, currentEditingNote}) => {
   const [state, dispatch] = useTracked();
   const {colors, selectionMode, selectedItemsList} = state;
 
@@ -17,6 +17,10 @@ const SelectionWrapper = ({children, item}) => {
         alignItems: 'center',
         width: '100%',
         paddingHorizontal: 12,
+        backgroundColor:
+          currentEditingNote === item.dateCreated
+            ? colors.shade
+            : 'transparent',
       }}>
       <View
         onPress={() => {
