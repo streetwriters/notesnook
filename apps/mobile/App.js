@@ -1,39 +1,27 @@
-import React, {useState, useEffect} from 'react';
-import NavigationService, {
-  AppContainer,
-} from './src/services/NavigationService';
-import {
-  StatusBar,
-  View,
-  Platform,
-  TouchableOpacity,
-  Dimensions,
-  Modal,
-} from 'react-native';
-import * as Animatable from 'react-native-animatable';
-import {w, SideMenuEvent} from './src/utils/utils';
-import {Toast} from './src/components/Toast';
-import {Menu} from './src/components/Menu';
-import SideMenu from './src/components/SideMenu';
 import Storage from 'notes-core/api/database';
-import StorageInterface from './src/utils/storage';
-import {useTracked, ACTIONS} from './src/provider';
-import {DeviceDetectionService} from './src/utils/deviceDetection';
-import Animated, {Easing} from 'react-native-reanimated';
+import React, {useEffect, useState} from 'react';
+import {Dimensions, Platform, StatusBar, View} from 'react-native';
+import * as Animatable from 'react-native-animatable';
+import Animated from 'react-native-reanimated';
+import {getColorScheme} from './src/common/common';
 import {
   DialogManager,
   _recieveEvent,
   _unSubscribeEvent,
 } from './src/components/DialogManager';
-import {
-  getColorScheme,
-  COLOR_SCHEME,
-  onThemeUpdate,
-  clearThemeUpdateListener,
-  COLOR_SCHEME_DARK,
-} from './src/common/common';
-import Editor from './src/views/Editor';
+import {Menu} from './src/components/Menu';
 import {ModalMenu} from './src/components/ModalMenu';
+import SideMenu from './src/components/SideMenu';
+import {Toast} from './src/components/Toast';
+import {useTracked} from './src/provider';
+import {ACTIONS} from './src/provider/actions';
+import NavigationService, {
+  AppContainer,
+} from './src/services/NavigationService';
+import {DeviceDetectionService} from './src/utils/deviceDetection';
+import StorageInterface from './src/utils/storage';
+import {w} from './src/utils/utils';
+import Editor from './src/views/Editor';
 
 export const DDS = new DeviceDetectionService();
 export const db = new Storage(StorageInterface);
