@@ -11,7 +11,7 @@ import {FlatList, TextInput} from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/Feather';
 import {db, DDS} from '../../../App';
 import {opacity, ph, pv, SIZE, WEIGHT} from '../../common/common';
-import {ACTIONS} from '../../provider';
+import {ACTIONS} from '../../provider/actions';
 import {getElevation, ToastEvent} from '../../utils/utils';
 import {updateEvent} from '../DialogManager';
 

@@ -1,7 +1,8 @@
 import React, {useEffect} from 'react';
 import {FlatList, Platform, SectionList, Text, View} from 'react-native';
 import {SIZE, WEIGHT} from '../../common/common';
-import {ACTIONS, useTracked} from '../../provider';
+import {useTracked} from '../../provider';
+import {ACTIONS} from '../../provider/actions';
 import {slideLeft, slideRight} from '../../utils/animations';
 import {w} from '../../utils/utils';
 import {NotesPlaceHolder} from '../ListPlaceholders';

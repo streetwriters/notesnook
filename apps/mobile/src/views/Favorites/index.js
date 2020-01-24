@@ -9,7 +9,8 @@ import {NotebookItem} from '../../components/NotebookItem';
 import NoteItem from '../../components/NoteItem';
 import {Search} from '../../components/SearchInput';
 import SelectionWrapper from '../../components/SelectionWrapper';
-import {ACTIONS, useTracked} from '../../provider';
+import {useTracked} from '../../provider';
+import {ACTIONS} from '../../provider/actions';
 
 export const Favorites = ({navigation}) => {
   // Global State

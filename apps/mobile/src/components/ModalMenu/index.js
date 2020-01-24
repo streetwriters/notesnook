@@ -1,18 +1,7 @@
 import React, {Component} from 'react';
-import {
-  Modal,
-  Text,
-  TouchableOpacity,
-  View,
-  DeviceEventEmitter,
-} from 'react-native';
-import Icon from 'react-native-vector-icons/Feather';
-import {db} from '../../../App';
-import {opacity, ph, pv, SIZE, WEIGHT} from '../../common/common';
-import {ACTIONS} from '../../provider';
-import NavigationService from '../../services/NavigationService';
-import {getElevation, ToastEvent, w} from '../../utils/utils';
-import {dialogActions, updateEvent} from '../DialogManager';
+import {Modal, TouchableOpacity, View, DeviceEventEmitter} from 'react-native';
+import {ACTIONS} from '../../provider/actions';
+import {getElevation, w} from '../../utils/utils';
 import * as Animatable from 'react-native-animatable';
 import {Menu} from '../Menu';
 

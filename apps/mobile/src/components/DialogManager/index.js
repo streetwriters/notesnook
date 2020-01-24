@@ -346,6 +346,7 @@ export class DialogManager extends Component {
             DDS.isTab
               ? {
                   borderRadius: 10,
+                  backgroundColor: colors.bg,
                 }
               : null
           }

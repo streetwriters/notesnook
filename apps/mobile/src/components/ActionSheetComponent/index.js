@@ -21,7 +21,8 @@ import {
   SIZE,
   WEIGHT,
 } from '../../common/common';
-import {ACTIONS, useTracked} from '../../provider';
+import {useTracked} from '../../provider';
+import {ACTIONS} from '../../provider/actions';
 import {
   moveNoteEvent,
   _recieveEvent,

@@ -21,7 +21,8 @@ import {
   SIZE,
   WEIGHT,
 } from '../../common/common';
-import {ACTIONS, useTracked} from '../../provider';
+import {useTracked} from '../../provider';
+import {ACTIONS} from '../../provider/actions';
 import NavigationService from '../../services/NavigationService';
 import {AnimatedSafeAreaView} from '../../views/Home';
 import {DDS} from '../../../App';

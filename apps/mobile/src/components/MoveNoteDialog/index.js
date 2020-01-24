@@ -2,7 +2,7 @@ import React from 'react';
 import {Modal, DeviceEventEmitter, View, TouchableOpacity} from 'react-native';
 import {createAppContainer} from 'react-navigation';
 import {createStackNavigator} from 'react-navigation-stack';
-import {ACTIONS} from '../../provider';
+import {ACTIONS} from '../../provider/actions';
 import Folders from '../../views/Folders';
 import Notebook from '../../views/Notebook';
 import Notes from '../../views/Notes';

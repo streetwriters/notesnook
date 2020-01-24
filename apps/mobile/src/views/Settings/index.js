@@ -22,7 +22,8 @@ import {
 } from '../../common/common';
 import Container from '../../components/Container';
 import {Header} from '../../components/header';
-import {useTracked, ACTIONS} from '../../provider';
+import {useTracked} from '../../provider';
+import {ACTIONS} from '../../provider/actions';
 import NavigationService from '../../services/NavigationService';
 export const Settings = ({navigation}) => {
   const [state, dispatch] = useTracked();

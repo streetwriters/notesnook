@@ -10,7 +10,8 @@ import {
 import * as Animatable from 'react-native-animatable';
 import Icon from 'react-native-vector-icons/Feather';
 import {SIZE, WEIGHT} from '../../common/common';
-import {ACTIONS, useTracked} from '../../provider';
+import {useTracked} from '../../provider';
+import {ACTIONS} from '../../provider/actions';
 import {w} from '../../utils/utils';
 
 export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(

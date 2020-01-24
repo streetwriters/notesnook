@@ -24,7 +24,8 @@ import {
   _unSubscribeEvent,
   TEMPLATE_EXIT_FULLSCREEN,
 } from '../../components/DialogManager';
-import {useTracked, ACTIONS} from '../../provider';
+import {useTracked} from '../../provider';
+import {ACTIONS} from '../../provider/actions';
 import {SideMenuEvent, w, h} from '../../utils/utils';
 import {AnimatedSafeAreaView} from '../Home';
 

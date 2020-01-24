@@ -9,7 +9,7 @@ import {
 import Icon from 'react-native-vector-icons/Feather';
 import {db, DDS} from '../../../App';
 import {opacity, ph, pv, SIZE, WEIGHT} from '../../common/common';
-import {ACTIONS} from '../../provider';
+import {ACTIONS} from '../../provider/actions';
 import NavigationService from '../../services/NavigationService';
 import {getElevation, ToastEvent} from '../../utils/utils';
 import {dialogActions, updateEvent} from '../DialogManager';

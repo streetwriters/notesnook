@@ -11,7 +11,8 @@ import {TrashPlaceHolder} from '../../components/ListPlaceholders';
 import {NotebookItem} from '../../components/NotebookItem';
 import NoteItem from '../../components/NoteItem';
 import SelectionHeader from '../../components/SelectionHeader';
-import {ACTIONS, useTracked} from '../../provider';
+import {useTracked} from '../../provider';
+import {ACTIONS} from '../../provider/actions';
 import {w} from '../../utils/utils';
 
 export const Trash = ({navigation}) => {

@@ -1,7 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {
   ActivityIndicator,
-  FlatList,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -21,9 +20,9 @@ import {
   SIZE,
   WEIGHT,
 } from '../../common/common';
-import {useTracked, ACTIONS} from '../../provider';
+import {useTracked} from '../../provider';
+import {ACTIONS} from '../../provider/actions';
 import {AnimatedSafeAreaView} from '../../views/Home';
-import {VaultDialog} from '../VaultDialog';
 import {db} from '../../../App';
 import {w} from '../../utils/utils';
 

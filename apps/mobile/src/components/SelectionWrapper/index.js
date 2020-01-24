@@ -3,7 +3,8 @@ import {View, TouchableOpacity} from 'react-native';
 import {SIZE} from '../../common/common';
 import Icon from 'react-native-vector-icons/Feather';
 import {w} from '../../utils/utils';
-import {useTracked, ACTIONS} from '../../provider';
+import {useTracked} from '../../provider';
+import {ACTIONS} from '../../provider/actions';
 
 const SelectionWrapper = ({children, item, currentEditingNote}) => {
   const [state, dispatch] = useTracked();
