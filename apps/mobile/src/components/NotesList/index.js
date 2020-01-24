@@ -18,7 +18,7 @@ export const NotesList = ({
   searchResults,
 }) => {
   const [state, dispatch] = useTracked();
-  const {colors, selectionMode} = state;
+  const {colors, selectionMode, currentEditingNote} = state;
   const notes = [...state.notes];
 
   const _renderItem = ({item, index}) => (
@@ -29,6 +29,9 @@ export const NotesList = ({
           width: selectionMode ? '90%' : '100%',
           marginHorizontal: 0,
         }}
+        currentEditingNote={
+          currentEditingNote === item.dateCreated ? currentEditingNote : null
+        }
         onLongPress={() => {
           dispatch({type: ACTIONS.SELECTION_MODE, enabled: !selectionMode});
           dispatch({type: ACTIONS.SELECTED_ITEMS, item: item});

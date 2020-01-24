@@ -62,6 +62,10 @@ const Editor = ({navigation, noMenu}) => {
           clearEditor();
         } else {
           note = item;
+          dispatch({
+            type: ACTIONS.CURRENT_EDITING_NOTE,
+            dateCreated: item.dateCreated,
+          });
           updateEditor();
         }
       });
@@ -71,6 +75,10 @@ const Editor = ({navigation, noMenu}) => {
         clearEditor();
       } else {
         note = item;
+        dispatch({
+          type: ACTIONS.CURRENT_EDITING_NOTE,
+          dateCreated: item.dateCreated,
+        });
         updateEditor();
       }
     }
@@ -148,8 +156,10 @@ const Editor = ({navigation, noMenu}) => {
       },
       dateCreated: timestamp,
     });
+
     if (timestamp !== dateCreated) {
       timestamp = dateCreated;
+      dispatch({type: ACTIONS.CURRENT_EDITING_NOTE, dateCreated: timestamp});
     }
 
     if (content.text.length < 200 || saveCounter < 2) {
@@ -419,8 +429,8 @@ const Editor = ({navigation, noMenu}) => {
             Platform.OS === 'ios'
               ? sourceUri
               : {
-                  uri: 'http://192.168.10.7:8080/texteditor.html',
-                  baseUrl: 'http://192.168.10.7:8080/',
+                  uri: 'file:///android_asset/texteditor.html',
+                  baseUrl: 'file:///android_asset/',
                 }
           }
           style={{

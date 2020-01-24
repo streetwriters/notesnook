@@ -29,6 +29,9 @@ export default class NoteItem extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
+    if (nextProps.currentEditingNote === this.props.item.dateCreated) {
+      return true;
+    }
     if (nextProps.item.locked !== this.cipher.value) {
       return true;
     } else {
@@ -59,6 +62,7 @@ export default class NoteItem extends React.Component {
       isTrash,
       pinned,
       index,
+      currentEditingNote,
     } = this.props;
     console.log('rendering', index);
     return (
@@ -70,10 +74,13 @@ export default class NoteItem extends React.Component {
             alignItems: 'center',
             flexDirection: 'row',
             maxWidth: '100%',
-            paddingRight: 6,
+            paddingRight: 12,
             alignSelf: 'center',
             borderBottomWidth: 1,
-            borderBottomColor: colors.nav,
+            borderBottomColor:
+              currentEditingNote === item.dateCreated
+                ? colors.accent
+                : colors.nav,
           },
           customStyle ? customStyle : {},
         ]}>
@@ -127,7 +134,10 @@ export default class NoteItem extends React.Component {
             <Text
               numberOfLines={1}
               style={{
-                color: colors.pri,
+                color:
+                  currentEditingNote === item.dateCreated
+                    ? colors.accent
+                    : colors.pri,
                 fontSize: SIZE.md,
                 fontFamily: WEIGHT.bold,
                 maxWidth: '95%',

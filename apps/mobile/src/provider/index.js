@@ -35,6 +35,7 @@ const defaultState = {
   },
   preventDefaultMargins: false,
   isLoginNavigator: false,
+  currenEditingNote: null,
 };
 
 export const ACTIONS = {
@@ -50,6 +51,7 @@ export const ACTIONS = {
   MODAL_NAVIGATOR: 'modalNavigator',
   CLEAR_SELECTION: 'clearSelection',
   LOGIN_NAVIGATOR: 'loginNavigator',
+  CURRENT_EDITING_NOTE: 'currentEditingNote',
 };
 
 const reducer = (state, action) => {
@@ -135,6 +137,12 @@ const reducer = (state, action) => {
       return {
         ...state,
         isLoginNavigator: action.enabled,
+      };
+    }
+    case ACTIONS.CURRENT_EDITING_NOTE: {
+      return {
+        ...state,
+        currentEditingNote: action.dateCreated,
       };
     }
     default:
