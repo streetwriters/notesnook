@@ -173,7 +173,7 @@ const App = () => {
               <Animatable.View
                 animation="fadeIn"
                 useNativeDriver={true}
-                duration={300}
+                duration={500}
                 delay={450}
                 style={{
                   width: '4%',

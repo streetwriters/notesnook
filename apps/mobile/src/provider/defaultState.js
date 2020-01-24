@@ -32,4 +32,5 @@ export const defaultState = {
   preventDefaultMargins: false,
   isLoginNavigator: false,
   currenEditingNote: null,
+  loading: true,
 };

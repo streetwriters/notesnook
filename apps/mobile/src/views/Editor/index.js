@@ -11,7 +11,6 @@ import {
   ActivityIndicator,
   Text,
 } from 'react-native';
-import * as Animatable from 'react-native-animatable';
 import Icon from 'react-native-vector-icons/Feather';
 import WebView from 'react-native-webview';
 import {db, DDS} from '../../../App';
@@ -28,7 +27,11 @@ import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {SideMenuEvent, w, h} from '../../utils/utils';
 import {AnimatedSafeAreaView} from '../Home';
+import * as Animatable from 'react-native-animatable';
 
+const AnimatedKeyboardAvoidingView = Animatable.createAnimatableComponent(
+  KeyboardAvoidingView,
+);
 let EditorWebView;
 let note = {};
 let timestamp = null;
@@ -286,39 +289,6 @@ const Editor = ({navigation, noMenu}) => {
           }}
         />
 
-        <Animatable.View
-          transition={['translateY']}
-          useNativeDriver={true}
-          duration={3000}
-          style={{
-            width: '100%',
-            height: '100%',
-            justifyContent: 'center',
-            alignItems: 'center',
-            zIndex: 999,
-            position: 'absolute',
-            backgroundColor: colors.bg,
-            transform: [
-              {
-                translateY: loading ? 0 : -h * 1.5,
-              },
-            ],
-          }}>
-          {loading ? (
-            <ActivityIndicator color={colors.accent} size={SIZE.xxxl} />
-          ) : null}
-
-          <Text
-            style={{
-              color: colors.accent,
-              fontFamily: WEIGHT.regular,
-              fontSize: SIZE.md,
-              marginTop: 10,
-            }}>
-            Write with confidence.
-          </Text>
-        </Animatable.View>
-
         {noMenu ? null : (
           <TouchableOpacity
             onPress={() => {
@@ -504,19 +474,69 @@ const Editor = ({navigation, noMenu}) => {
   }, [colors]);
 
   return (
-    <AnimatedSafeAreaView
-      transition={['backgroundColor', 'width']}
-      duration={300}
+    <Animatable.View
+      animation="fadeIn"
+      duration={500}
+      delay={1000}
+      useNativeDriver={true}
       style={{
         flex: 1,
         backgroundColor: 'transparent',
         height: '100%',
         width: '100%',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
       }}>
-      {_renderEditor()}
-    </AnimatedSafeAreaView>
+      <AnimatedSafeAreaView
+        transition={['backgroundColor', 'width']}
+        duration={300}
+        style={{
+          flex: 1,
+          backgroundColor: 'transparent',
+          height: '100%',
+          width: '100%',
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+        }}>
+        <Animatable.View
+          transition="opacity"
+          useNativeDriver={true}
+          duration={150}
+          style={{
+            width: '100%',
+            height: '100%',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 1,
+            opacity: loading ? 1 : 0,
+            position: 'absolute',
+          }}>
+          <ActivityIndicator color={colors.accent} size={SIZE.xxxl} />
+
+          <Text
+            style={{
+              color: colors.accent,
+              fontFamily: WEIGHT.regular,
+              fontSize: SIZE.md,
+              marginTop: 10,
+            }}>
+            Write with confidence.
+          </Text>
+        </Animatable.View>
+
+        <Animatable.View
+          transition={['opacity']}
+          useNativeDriver={true}
+          duration={3000}
+          delay={300}
+          style={{
+            width: '100%',
+            height: '100%',
+            zIndex: 2,
+            opacity: loading ? 0 : 1,
+          }}>
+          {_renderEditor()}
+        </Animatable.View>
+      </AnimatedSafeAreaView>
+    </Animatable.View>
   );
 };
 

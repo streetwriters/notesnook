@@ -114,45 +114,52 @@ export const Home = ({navigation}) => {
         }
       }}>
       <SelectionHeader />
-      <Animatable.View
-        transition={['backgroundColor', 'opacity', 'height']}
-        duration={300}
-        style={{
-          position: 'absolute',
-          backgroundColor: colors.bg,
-          zIndex: 10,
-          height: selectionMode ? 0 : null,
-          opacity: selectionMode ? 0 : 1,
-          width: '100%',
-        }}>
-        <Header
-          menu
-          hide={hideHeader}
-          verticalMenu
-          showSearch={() => {
-            setHideHeader(false);
-            countUp = 0;
-            countDown = 0;
-          }}
-          colors={colors}
-          heading={'Home'}
-          canGoBack={false}
-          customIcon="menu"
-        />
 
-        {notes[0] ? (
-          <Search
-            clear={() => setText('')}
+      <Animatable.View
+        animation="fadeIn"
+        useNativeDriver={true}
+        duration={600}
+        delay={700}>
+        <Animatable.View
+          transition={['backgroundColor', 'opacity', 'height']}
+          duration={300}
+          style={{
+            position: 'absolute',
+            backgroundColor: colors.bg,
+            zIndex: 10,
+            height: selectionMode ? 0 : null,
+            opacity: selectionMode ? 0 : 1,
+            width: '100%',
+          }}>
+          <Header
+            menu
             hide={hideHeader}
-            onChangeText={onChangeText}
-            onSubmitEditing={onSubmitEditing}
-            placeholder="Search your notes"
-            onBlur={onBlur}
-            onFocus={onFocus}
-            clearSearch={clearSearch}
-            value={text}
+            verticalMenu
+            showSearch={() => {
+              setHideHeader(false);
+              countUp = 0;
+              countDown = 0;
+            }}
+            colors={colors}
+            heading={'Home'}
+            canGoBack={false}
+            customIcon="menu"
           />
-        ) : null}
+
+          {notes[0] ? (
+            <Search
+              clear={() => setText('')}
+              hide={hideHeader}
+              onChangeText={onChangeText}
+              onSubmitEditing={onSubmitEditing}
+              placeholder="Search your notes"
+              onBlur={onBlur}
+              onFocus={onFocus}
+              clearSearch={clearSearch}
+              value={text}
+            />
+          ) : null}
+        </Animatable.View>
       </Animatable.View>
 
       <NotesList

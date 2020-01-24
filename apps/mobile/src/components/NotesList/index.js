@@ -1,15 +1,19 @@
 import React, {useEffect} from 'react';
-import {FlatList, Platform, SectionList, Text, View} from 'react-native';
+import {
+  ActivityIndicator,
+  FlatList,
+  Platform,
+  SectionList,
+  Text,
+  View,
+} from 'react-native';
 import {SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {slideLeft, slideRight} from '../../utils/animations';
-import {w} from '../../utils/utils';
 import {NotesPlaceHolder} from '../ListPlaceholders';
 import NoteItem from '../NoteItem';
 import SelectionWrapper from '../SelectionWrapper';
-import PullToRefresh from '../PullToRefresh';
-import {DDS} from '../../../App';
 let sectionListRef;
 export const NotesList = ({
   onScroll,
@@ -19,7 +23,7 @@ export const NotesList = ({
   searchResults,
 }) => {
   const [state, dispatch] = useTracked();
-  const {colors, selectionMode, currentEditingNote} = state;
+  const {colors, selectionMode, currentEditingNote, loading} = state;
   const notes = [...state.notes];
 
   const _renderItem = ({item, index}) => (
@@ -102,26 +106,32 @@ export const NotesList = ({
         justifyContent: 'center',
         opacity: 0.8,
       }}>
-      <NotesPlaceHolder animation={slideRight} colors={colors} />
-      <NotesPlaceHolder animation={slideLeft} colors={colors} />
-      <NotesPlaceHolder animation={slideRight} colors={colors} />
-      <Text
-        style={{
-          color: colors.icon,
-          fontSize: SIZE.md,
-          fontFamily: WEIGHT.regular,
-          marginTop: 20,
-        }}>
-        Notes you write will appear here.
-      </Text>
-      <Text
-        style={{
-          fontSize: SIZE.sm,
-          color: colors.icon,
-          marginTop: 20,
-        }}>
-        No notes found
-      </Text>
+      {loading ? (
+        <ActivityIndicator size={SIZE.xl} color={colors.accent} />
+      ) : (
+        <>
+          <NotesPlaceHolder animation={slideRight} colors={colors} />
+          <NotesPlaceHolder animation={slideLeft} colors={colors} />
+          <NotesPlaceHolder animation={slideRight} colors={colors} />
+          <Text
+            style={{
+              color: colors.icon,
+              fontSize: SIZE.md,
+              fontFamily: WEIGHT.regular,
+              marginTop: 20,
+            }}>
+            Notes you write will appear here.
+          </Text>
+          <Text
+            style={{
+              fontSize: SIZE.sm,
+              color: colors.icon,
+              marginTop: 20,
+            }}>
+            No notes found
+          </Text>
+        </>
+      )}
     </View>
   );
 
