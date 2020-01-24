@@ -176,6 +176,24 @@ const Editor = ({navigation, noMenu}) => {
     }
   };
 
+  useEffect(() => {
+    if (noMenu) {
+      post(
+        JSON.stringify({
+          type: 'nomenu',
+          value: true,
+        }),
+      );
+    } else {
+      post(
+        JSON.stringify({
+          type: 'nomenu',
+          value: false,
+        }),
+      );
+    }
+  }, [noMenu]);
+
   const onWebViewLoad = () => {
     console.log('requesting focus');
     EditorWebView.requestFocus();

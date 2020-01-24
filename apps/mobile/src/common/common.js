@@ -26,7 +26,7 @@ export var COLOR_SCHEME = {
   bg: 'white',
   navbg: '#f6fbfc',
   nav: '#f0f0f0',
-  pri: 'black',
+  pri: '#000000',
   sec: 'white',
   ...fixedColors,
 };
@@ -36,7 +36,7 @@ export const COLOR_SCHEME_LIGHT = {
   bg: 'white',
   navbg: '#f6fbfc',
   nav: '#f0f0f0',
-  pri: 'black',
+  pri: '#000000',
   sec: 'white',
   ...fixedColors,
 };
@@ -45,7 +45,7 @@ export const COLOR_SCHEME_DARK = {
   bg: '#1f1f1f',
   navbg: '#1c1c1c',
   nav: '#2b2b2b',
-  pri: 'white',
+  pri: '#ffffff',
   sec: 'black',
   ...fixedColors,
 };
