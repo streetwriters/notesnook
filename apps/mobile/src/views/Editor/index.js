@@ -1,16 +1,16 @@
 import React, {useEffect, useState} from 'react';
 import {
+  ActivityIndicator,
   BackHandler,
   KeyboardAvoidingView,
   Linking,
   Platform,
   StatusBar,
+  Text,
   TouchableOpacity,
   View,
-  DeviceEventEmitter,
-  ActivityIndicator,
-  Text,
 } from 'react-native';
+import * as Animatable from 'react-native-animatable';
 import Icon from 'react-native-vector-icons/Feather';
 import WebView from 'react-native-webview';
 import {db, DDS} from '../../../App';
@@ -19,15 +19,10 @@ import {
   ActionSheetEvent,
   simpleDialogEvent,
   TEMPLATE_EXIT,
-  _recieveEvent,
-  _unSubscribeEvent,
   TEMPLATE_EXIT_FULLSCREEN,
 } from '../../components/DialogManager';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
-import {SideMenuEvent, w, h} from '../../utils/utils';
-import {AnimatedSafeAreaView} from '../Home';
-import * as Animatable from 'react-native-animatable';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -35,13 +30,12 @@ import {
 } from '../../services/eventManager';
 import {
   eCloseFullscreenEditor,
-  eOpenFullscreenEditor,
   eOnLoadNote,
+  eOpenFullscreenEditor,
 } from '../../services/events';
+import {SideMenuEvent} from '../../utils/utils';
+import {AnimatedSafeAreaView} from '../Home';
 
-const AnimatedKeyboardAvoidingView = Animatable.createAnimatableComponent(
-  KeyboardAvoidingView,
-);
 let EditorWebView;
 let note = {};
 let timestamp = null;

@@ -1,18 +1,11 @@
-import React, {useState, useEffect} from 'react';
-
-import {
-  DeviceEventEmitter,
-  Text,
-  TouchableNativeFeedback,
-  View,
-  TouchableOpacity,
-} from 'react-native';
-import {COLOR_SCHEME, SIZE, opacity, WEIGHT, pv, ph} from '../../common/common';
-import Icon from 'react-native-vector-icons/Feather';
+import React, {useEffect, useState} from 'react';
+import {Text, TouchableOpacity} from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import {h, w} from '../../utils/utils';
-import {useAppContext} from '../../provider/useAppContext';
+import {opacity, ph, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
+import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
+import {eHideToast, eShowToast} from '../../services/events';
+import {h, w} from '../../utils/utils';
 
 const AnimatedTouchableOpacity = Animatable.createAnimatableComponent(
   TouchableOpacity,
@@ -29,60 +22,41 @@ export const Toast = () => {
     color: colors.errorText,
   });
 
-  useEffect(() => {
-    DeviceEventEmitter.addListener('showToast', data => {
-      setData(data);
-      setToast(true);
-      if (data.message) {
-        setMessage(data.message);
-      }
-      if (data.type === 'success') {
-        setToastStyle({
-          backgroundColor: colors.successBg,
-          color: colors.successText,
-        });
-      } else {
-        setToastStyle({
-          backgroundColor: colors.errorBg,
-          color: colors.errorText,
-        });
-      }
+  const showToastFunc = data => {
+    setData(data);
+    setToast(true);
+    if (data.message) {
+      setMessage(data.message);
+    }
+    if (data.type === 'success') {
+      setToastStyle({
+        backgroundColor: colors.successBg,
+        color: colors.successText,
+      });
+    } else {
+      setToastStyle({
+        backgroundColor: colors.errorBg,
+        color: colors.errorText,
+      });
+    }
 
-      setTimeout(() => {
-        setToast(false);
-      }, data.duration);
-    });
-    DeviceEventEmitter.addListener('hideToast', data => {
+    setTimeout(() => {
       setToast(false);
-    });
+    }, data.duration);
+  };
+
+  hideToastFunc = data => {
+    setToast(false);
+  };
+
+  useEffect(() => {
+    eSubscribeEvent(eShowToast, showToastFunc);
+    eSubscribeEvent(eHideToast, hideToastFunc);
 
     return () => {
-      DeviceEventEmitter.removeListener('showToast', data => {
-        setData(data);
-        setToast(true);
-        if (data.message) {
-          setMessage(data.message);
-        }
-        if (data.type === 'success') {
-          setToastStyle({
-            backgroundColor: colors.successBg,
-            color: colors.successText,
-          });
-        } else {
-          setToastStyle({
-            backgroundColor: colors.errorBg,
-            color: colors.errorText,
-          });
-        }
+      eUnSubscribeEvent('showToast', showToastFunc);
 
-        setTimeout(() => {
-          setToast(false);
-        }, data.duration);
-      });
-
-      DeviceEventEmitter.removeListener('hideToast', data => {
-        setToast(false);
-      });
+      eUnSubscribeEvent('hideToast', hideToastFunc);
     };
   }, []);
 

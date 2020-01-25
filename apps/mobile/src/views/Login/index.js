@@ -1,7 +1,6 @@
 import React, {createRef, useEffect} from 'react';
 import {
   BackHandler,
-  DeviceEventEmitter,
   SafeAreaView,
   Text,
   TouchableOpacity,
@@ -13,18 +12,17 @@ import {DDS} from '../../../App';
 import {opacity, pv, SIZE, WEIGHT} from '../../common/common';
 import {Header} from '../../components/header';
 import {useTracked} from '../../provider';
+import {eSendEvent} from '../../services/eventManager';
+import {eCloseSideMenu} from '../../services/events';
 
 export const Login = ({navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors, isLoginNavigator} = state;
 
   const isFocused = useIsFocused();
-  useEffect(() => {
-    DeviceEventEmitter.emit('hide');
-  }, []);
 
   useEffect(() => {
-    DeviceEventEmitter.emit('closeSidebar');
+    eSendEvent(eCloseSideMenu);
   }, []);
 
   const handleBackPress = () => {

@@ -39,3 +39,17 @@ export const eCloseFullscreenEditor = '518';
 export const eEnableGestures = '519';
 
 export const eDisableGestures = '520';
+
+export const eOpenModalMenu = '521';
+
+export const eCloseModalMenu = '522';
+
+export const eSendSideMenuOverlayRef = '523';
+
+export const eMoveNoteDialogNavigateBack = '524';
+
+export const eShowToast = '525';
+
+export const eHideToast = '526';
+
+export const eThemeUpdated = '527';

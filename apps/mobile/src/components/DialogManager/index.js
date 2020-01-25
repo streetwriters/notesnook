@@ -1,39 +1,35 @@
 import React, {Component} from 'react';
-import {DeviceEventEmitter} from 'react-native';
+import {DDS} from '../../../App';
+import {
+  eSendEvent,
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+} from '../../services/eventManager';
+import {
+  eCloseActionSheet,
+  eCloseAddNotebookDialog,
+  eCloseAddTopicDialog,
+  eCloseLoginDialog,
+  eCloseMoveNoteDialog,
+  eCloseSimpleDialog,
+  eDispatchAction,
+  eOnLoadNote,
+  eOpenActionSheet,
+  eOpenAddNotebookDialog,
+  eOpenAddTopicDialog,
+  eOpenLoginDialog,
+  eOpenMoveNoteDialog,
+  eOpenSimpleDialog,
+} from '../../services/events';
 import ActionSheet from '../ActionSheet';
 import {ActionSheetComponent} from '../ActionSheetComponent';
-import {Dialog} from '../Dialog';
-import {VaultDialog} from '../VaultDialog';
-import MoveNoteDialog from '../MoveNoteDialog';
-import {AddTopicDialog} from '../AddTopicDialog';
 import {AddNotebookDialog} from '../AddNotebookDialog';
-import {DDS} from '../../../App';
+import {AddTopicDialog} from '../AddTopicDialog';
+import {Dialog} from '../Dialog';
 import LoginDialog from '../LoginDialog';
-import {
-  eOpenActionSheet,
-  eCloseActionSheet,
-  eOpenSimpleDialog,
-  eCloseSimpleDialog,
-  eOpenMoveNoteDialog,
-  eCloseMoveNoteDialog,
-  eOpenAddNotebookDialog,
-  eCloseAddNotebookDialog,
-  eOpenAddTopicDialog,
-  eCloseAddTopicDialog,
-  eOpenLoginDialog,
-  eCloseLoginDialog,
-  eOnLoadNote,
-  eDispatchAction,
-} from '../../services/events';
-import {eUnSubscribeEvent, eSubscribeEvent} from '../../services/eventManager';
+import MoveNoteDialog from '../MoveNoteDialog';
+import {VaultDialog} from '../VaultDialog';
 
-export const _recieveEvent = (eventName, action) => {
-  DeviceEventEmitter.addListener(eventName, action);
-};
-
-export const _UnSubscribeEvent = (eventName, action) => {
-  DeviceEventEmitter.removeListener(eventName, action);
-};
 export const dialogActions = {
   ACTION_DELETE: 511,
   ACTION_EXIT: 512,
@@ -49,7 +45,7 @@ export const ActionSheetEvent = (
   columnItems,
   extraData,
 ) => {
-  DeviceEventEmitter.emit(eOpenActionSheet, {
+  eSendEvent(eOpenActionSheet, {
     item,
     colors,
     tags,
@@ -59,39 +55,39 @@ export const ActionSheetEvent = (
   });
 };
 export const ActionSheetHideEvent = () => {
-  DeviceEventEmitter.emit(eCloseActionSheet);
+  eSendEvent(eCloseActionSheet);
 };
 
 export const simpleDialogEvent = data => {
-  DeviceEventEmitter.emit(eOpenSimpleDialog, data);
+  eSendEvent(eOpenSimpleDialog, data);
 };
 
 export const simpleDialogHideEvent = () => {
-  DeviceEventEmitter.emit(eCloseSimpleDialog);
+  eSendEvent(eCloseSimpleDialog);
 };
 
 export const moveNoteEvent = () => {
-  DeviceEventEmitter.emit(eOpenMoveNoteDialog);
+  eSendEvent(eOpenMoveNoteDialog);
 };
 export const moveNoteHideEvent = () => {
-  DeviceEventEmitter.emit(eCloseMoveNoteDialog);
+  eSendEvent(eCloseMoveNoteDialog);
 };
 
 export const AddNotebookEvent = notebook => {
-  DeviceEventEmitter.emit(eOpenAddNotebookDialog, {item: notebook});
+  eSendEvent(eOpenAddNotebookDialog, {item: notebook});
 };
 export const HideAddNotebookEvent = notebook => {
-  DeviceEventEmitter.emit(eCloseAddNotebookDialog, notebook);
+  eSendEvent(eCloseAddNotebookDialog, notebook);
 };
 export const AddTopicEvent = notebook => {
-  DeviceEventEmitter.emit(eOpenAddTopicDialog, notebook);
+  eSendEvent(eOpenAddTopicDialog, notebook);
 };
 export const HideAddTopicEvent = notebook => {
-  DeviceEventEmitter.emit(eCloseAddTopicDialog, notebook);
+  eSendEvent(eCloseAddTopicDialog, notebook);
 };
 
 export const updateEvent = data => {
-  DeviceEventEmitter.emit(eDispatchAction, data);
+  eSendEvent(eDispatchAction, data);
 };
 
 export const TEMPLATE_DELETE = type => {

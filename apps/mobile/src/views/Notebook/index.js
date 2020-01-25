@@ -1,15 +1,15 @@
-import React, {useState, useEffect} from 'react';
-import {Platform, Text, View, FlatList, BackHandler} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {FlatList, Platform, Text, View} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import {useIsFocused} from 'react-navigation-hooks';
 import {SIZE, WEIGHT} from '../../common/common';
-import {AddTopicDialog} from '../../components/AddTopicDialog';
 import Container from '../../components/Container';
 import {Header} from '../../components/header';
 import {NotebookItem} from '../../components/NotebookItem';
 import {Search} from '../../components/SearchInput';
 import {useTracked} from '../../provider';
-import {_recieveEvent, _unSubscribeEvent} from '../../components/DialogManager';
+import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
+import {eMoveNoteDialogNavigateBack} from '../../services/events';
 
 export const Notebook = ({navigation}) => {
   const [state, dispatch] = useTracked();
@@ -22,13 +22,10 @@ export const Notebook = ({navigation}) => {
   } = state;
 
   ///
-  const updateDB = () => {};
-  const updateSelectionList = () => {};
-  const changeSelectionMode = () => {};
+
   const params = navigation.state.params;
   const [hideHeader, setHideHeader] = useState(false);
   const [buttonHide, setButtonHide] = useState(false);
-  const [addTopic, setAddTopic] = useState(false);
 
   let isFocused = useIsFocused();
 
@@ -37,9 +34,9 @@ export const Notebook = ({navigation}) => {
   };
 
   useEffect(() => {
-    _recieveEvent('goBack', handleBackPress);
+    eSubscribeEvent(eMoveNoteDialogNavigateBack, handleBackPress);
     return () => {
-      _unSubscribeEvent('goBack', handleBackPress);
+      eUnSubscribeEvent(eMoveNoteDialogNavigateBack, handleBackPress);
     };
   }, [isFocused]);
 

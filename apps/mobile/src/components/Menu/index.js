@@ -26,7 +26,12 @@ import {ACTIONS} from '../../provider/actions';
 import NavigationService from '../../services/NavigationService';
 import {AnimatedSafeAreaView} from '../../views/Home';
 import {DDS} from '../../../App';
-import {eOpenLoginDialog} from '../../services/events';
+import {
+  eOpenLoginDialog,
+  eOpenModalMenu,
+  eSendSideMenuOverlayRef,
+} from '../../services/events';
+import {eSendEvent} from '../../services/eventManager';
 
 export const Menu = ({
   close = () => {},
@@ -156,7 +161,7 @@ export const Menu = ({
         {DDS.isTab ? (
           <TouchableOpacity
             onPress={() => {
-              noTextMode ? DeviceEventEmitter.emit('modalMenuShow') : close();
+              noTextMode ? eSendEvent(eOpenModalMenu) : close();
             }}
             style={{
               alignItems: 'center',
@@ -179,7 +184,7 @@ export const Menu = ({
         <View
           ref={ref => (overlayRef = ref)}
           onLayout={() => {
-            DeviceEventEmitter.emit('sendOverlayViewRef', {ref: overlayRef});
+            eSendEvent(eSendSideMenuOverlayRef, {ref: overlayRef});
           }}
           style={{
             height: '100%',
@@ -421,7 +426,7 @@ export const Menu = ({
             close();
 
             DDS.isTab
-              ? DeviceEventEmitter.emit(eOpenLoginDialog)
+              ? eSendEvent(eOpenLoginDialog)
               : NavigationService.navigate('Login');
           }}
           activeOpacity={opacity / 2}

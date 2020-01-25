@@ -10,6 +10,8 @@ import {updateEvent} from '../DialogManager';
 import * as Animatable from 'react-native-animatable';
 import {DDS} from '../../../App';
 import {getElevation} from '../../utils/utils';
+import {eSendEvent} from '../../services/eventManager';
+import {eMoveNoteDialogNavigateBack} from '../../services/events';
 
 const fade = props => {
   const {position, scene} = props;
@@ -112,7 +114,7 @@ class MoveNoteDialog extends React.Component {
           if (!this.routeIndex || this.routeIndex === 0) {
             this.close();
           } else {
-            DeviceEventEmitter.emit('goBack');
+            eSendEvent(eMoveNoteDialogNavigateBack);
           }
         }}
         visible={visible}

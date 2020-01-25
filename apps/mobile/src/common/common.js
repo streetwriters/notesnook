@@ -1,5 +1,11 @@
-import {DeviceEventEmitter, StatusBar} from 'react-native';
+import {StatusBar} from 'react-native';
 import FastStorage from 'react-native-fast-storage';
+import {
+  eSendEvent,
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+} from '../services/eventManager';
+import {eThemeUpdated} from '../services/events';
 
 //COLOR SCHEME
 export const ACCENT = {
@@ -85,7 +91,7 @@ export const WEIGHT = {
 export function setColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
   COLOR_SCHEME = {...colors, accent: accent.color, shade: accent.shade};
 
-  DeviceEventEmitter.emit('onThemeUpdate');
+  eSendEvent(eThemeUpdated);
 
   return COLOR_SCHEME;
 }
@@ -113,7 +119,7 @@ export async function getColorScheme() {
     StatusBar.setBarStyle(themeToSet.night ? 'light-content' : 'dark-content');
   }
 
-  DeviceEventEmitter.emit('onThemeUpdate');
+  eSendEvent(eThemeUpdated);
 
   return COLOR_SCHEME;
 }
@@ -125,8 +131,8 @@ export function setAccentColor(color) {
 }
 
 export const onThemeUpdate = (func = () => {}) => {
-  return DeviceEventEmitter.addListener('onThemeUpdate', func);
+  return eSubscribeEvent(eThemeUpdated, func);
 };
 export const clearThemeUpdateListener = (func = () => {}) => {
-  return DeviceEventEmitter.removeListener('onThemeUpdate', func);
+  return eUnSubscribeEvent(eThemeUpdated, func);
 };

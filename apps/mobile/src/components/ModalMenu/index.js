@@ -1,8 +1,9 @@
 import React, {Component} from 'react';
-import {Modal, TouchableOpacity, View, DeviceEventEmitter} from 'react-native';
-import {ACTIONS} from '../../provider/actions';
-import {getElevation, w} from '../../utils/utils';
+import {Modal, TouchableOpacity, View} from 'react-native';
 import * as Animatable from 'react-native-animatable';
+import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
+import {eOpenModalMenu} from '../../services/events';
+import {getElevation, w} from '../../utils/utils';
 import {Menu} from '../Menu';
 
 export class ModalMenu extends Component {
@@ -15,11 +16,11 @@ export class ModalMenu extends Component {
   }
 
   componentDidMount() {
-    DeviceEventEmitter.addListener('modalMenuShow', this.show);
+    eSubscribeEvent(eOpenModalMenu, this.show);
   }
 
   componentWillUnmount() {
-    DeviceEventEmitter.removeListener('modalMenuShow', this.show);
+    eUnSubscribeEvent(eOpenModalMenu, this.show);
   }
 
   _onClose = () => {

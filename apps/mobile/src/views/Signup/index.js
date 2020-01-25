@@ -1,40 +1,19 @@
 import React, {createRef, useEffect} from 'react';
-import {
-  DeviceEventEmitter,
-  SafeAreaView,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {SafeAreaView, Text, TouchableOpacity, View} from 'react-native';
 import {TextInput} from 'react-native-gesture-handler';
-import {NavigationEvents} from 'react-navigation';
+import {useIsFocused} from 'react-navigation-hooks';
 import {DDS} from '../../../App';
 import {opacity, pv, SIZE, WEIGHT} from '../../common/common';
 import {Header} from '../../components/header';
 import {useTracked} from '../../provider';
-import {useIsFocused} from 'react-navigation-hooks';
-import {_recieveEvent, _unSubscribeEvent} from '../../components/DialogManager';
-import {eUnSubscribeEvent, eSubscribeEvent} from '../../services/eventManager';
+import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
 import {eLoginDialogNavigateBack} from '../../services/events';
 
 export const Signup = ({navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors, isLoginNavigator} = state;
-  useEffect(() => {
-    DeviceEventEmitter.emit('hide');
-    return () => {
-      DeviceEventEmitter.emit('show');
-    };
-  }, []);
 
   let isFocused = useIsFocused();
-
-  useEffect(() => {
-    DeviceEventEmitter.emit('hide');
-    return () => {
-      DeviceEventEmitter.emit('show');
-    };
-  }, []);
 
   const handleBackPress = () => {
     navigation.goBack();
@@ -53,11 +32,6 @@ export const Signup = ({navigation}) => {
         height: '100%',
         backgroundColor: colors.bg,
       }}>
-      <NavigationEvents
-        onWillFocus={() => {
-          DeviceEventEmitter.emit('hide');
-        }}
-      />
       <Header
         isLoginNavigator={isLoginNavigator}
         navigation={navigation}

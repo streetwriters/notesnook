@@ -13,6 +13,8 @@ import {ACTIONS} from '../../provider/actions';
 import NavigationService from '../../services/NavigationService';
 import {getElevation, ToastEvent} from '../../utils/utils';
 import {dialogActions, updateEvent} from '../DialogManager';
+import {eSendEvent} from '../../services/eventManager';
+import {eCloseFullscreenEditor} from '../../services/events';
 
 export class Dialog extends Component {
   constructor(props) {
@@ -66,7 +68,7 @@ export class Dialog extends Component {
       }
       case dialogActions.ACTION_EXIT_FULLSCREEN: {
         updateEvent({type: ACTIONS.NOTES});
-        DeviceEventEmitter.emit('closeFullScreenEditor');
+        eSendEvent(eCloseFullscreenEditor);
         this.setState({
           visible: false,
         });

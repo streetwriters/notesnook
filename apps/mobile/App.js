@@ -1,19 +1,25 @@
 import Storage from 'notes-core/api/database';
 import React, {useEffect, useState} from 'react';
-import {Dimensions, Platform, StatusBar, View} from 'react-native';
+import {Platform, StatusBar, View} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import {getColorScheme} from './src/common/common';
-import {
-  DialogManager,
-  _recieveEvent,
-  _unSubscribeEvent,
-} from './src/components/DialogManager';
+import {DialogManager} from './src/components/DialogManager';
 import {Menu} from './src/components/Menu';
 import {ModalMenu} from './src/components/ModalMenu';
 import SideMenu from './src/components/SideMenu';
 import {Toast} from './src/components/Toast';
 import {useTracked} from './src/provider';
 import {ACTIONS} from './src/provider/actions';
+import {eSubscribeEvent, eUnSubscribeEvent} from './src/services/eventManager';
+import {
+  eCloseFullscreenEditor,
+  eCloseSideMenu,
+  eDisableGestures,
+  eDispatchAction,
+  eEnableGestures,
+  eOpenFullscreenEditor,
+  eOpenSideMenu,
+} from './src/services/events';
 import NavigationService, {
   AppContainer,
 } from './src/services/NavigationService';
@@ -21,16 +27,6 @@ import {DeviceDetectionService} from './src/utils/deviceDetection';
 import StorageInterface from './src/utils/storage';
 import {w} from './src/utils/utils';
 import Editor from './src/views/Editor';
-import {eSubscribeEvent, eUnSubscribeEvent} from './src/services/eventManager';
-import {
-  eDispatchAction,
-  eOpenSideMenu,
-  eCloseSideMenu,
-  eDisableGestures,
-  eEnableGestures,
-  eOpenFullscreenEditor,
-  eCloseFullscreenEditor,
-} from './src/services/events';
 
 export const DDS = new DeviceDetectionService();
 export const db = new Storage(StorageInterface);
@@ -40,8 +36,6 @@ let editorRef;
 const App = () => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
-
-  const [width, setWidth] = useState(w);
   // Local State
 
   const [init, setInit] = useState(false);

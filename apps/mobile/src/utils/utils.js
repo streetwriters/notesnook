@@ -5,6 +5,8 @@ import {
   eCloseSideMenu,
   eDisableGestures,
   eEnableGestures,
+  eShowToast,
+  eHideToast,
 } from '../services/events';
 export const getElevation = elevation => {
   return {
@@ -48,7 +50,7 @@ export const h = Dimensions.get('window').height;
 
 export const ToastEvent = {
   show: (message, type, duration = 10000, func = null, actionText = 'Ok') => {
-    DeviceEventEmitter.emit('showToast', {
+    eSendEvent(eShowToast, {
       message,
       type,
       duration,
@@ -57,7 +59,7 @@ export const ToastEvent = {
     });
   },
   hide: (message, type, duration = 1000, func = null, actionText = 'Ok') => {
-    DeviceEventEmitter.emit('hideToast', {
+    eSendEvent(eHideToast, {
       message,
       type,
       duration,

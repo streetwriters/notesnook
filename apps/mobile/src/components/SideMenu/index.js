@@ -1,16 +1,17 @@
 // @flow
 
+import PropTypes from 'prop-types';
 import React from 'react';
 import {
-  PanResponder,
-  View,
-  Dimensions,
   Animated,
-  TouchableWithoutFeedback,
+  Dimensions,
   Easing,
-  DeviceEventEmitter,
+  PanResponder,
+  TouchableWithoutFeedback,
+  View,
 } from 'react-native';
-import PropTypes from 'prop-types';
+import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
+import {eSendSideMenuOverlayRef} from '../../services/events';
 import styles from './styles';
 const deviceScreen = Dimensions.get('window');
 const barrierForward = deviceScreen.width / 4;
@@ -309,16 +310,10 @@ export default class SideMenu extends React.Component {
   }
 
   componentDidMount() {
-    DeviceEventEmitter.addListener(
-      'sendOverlayViewRef',
-      this._getOverlayViewRef,
-    );
+    eSubscribeEvent(eSendSideMenuOverlayRef, this._getOverlayViewRef);
   }
   componentWillUnmount() {
-    DeviceEventEmitter.removeListener(
-      'sendOverlayViewRef',
-      this._getOverlayViewRef,
-    );
+    eUnSubscribeEvent(eSendSideMenuOverlayRef, this._getOverlayViewRef);
   }
 
   _getOverlayViewRef = data => {

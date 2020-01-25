@@ -23,11 +23,7 @@ import {
 } from '../../common/common';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
-import {
-  moveNoteEvent,
-  _recieveEvent,
-  _unSubscribeEvent,
-} from '../DialogManager';
+import {moveNoteEvent} from '../DialogManager';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 

@@ -1,21 +1,15 @@
 import React from 'react';
-import {
-  Platform,
-  StatusBar,
-  Text,
-  TouchableOpacity,
-  View,
-  DeviceEventEmitter,
-} from 'react-native';
+import {Platform, StatusBar, Text, TouchableOpacity, View} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import Icon from 'react-native-vector-icons/Feather';
+import {DDS} from '../../../App';
 import {SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
+import {eSendEvent} from '../../services/eventManager';
+import {eCloseLoginDialog} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
 import {SideMenuEvent} from '../../utils/utils';
 import {moveNoteHideEvent} from '../DialogManager';
-import {DDS} from '../../../App';
-import {eCloseLoginDialog} from '../../services/events';
 let isOpen = false;
 export const Header = ({
   heading,
@@ -70,7 +64,7 @@ export const Header = ({
                 }
               } else if (navigation && isLoginNavigator) {
                 if (navigation.state.routeName === 'Login') {
-                  DeviceEventEmitter.emit(eCloseLoginDialog);
+                  eSendEvent(eCloseLoginDialog);
                 } else {
                   navigation.goBack();
                 }
