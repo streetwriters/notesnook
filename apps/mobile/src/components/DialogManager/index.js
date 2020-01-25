@@ -254,6 +254,7 @@ export class DialogManager extends Component {
   };
 
   hideLoginDialog = () => {
+    alert('here');
     this.loginDialog.close();
   };
 

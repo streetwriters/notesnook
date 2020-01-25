@@ -74,7 +74,7 @@ class LoginDialog extends React.Component {
   }
 
   open() {
-    console.log(' i am called');
+    updateEvent({type: ACTIONS.LOGIN_NAVIGATOR, enabled: true});
     this.setState({
       visible: true,
     });
@@ -95,14 +95,13 @@ class LoginDialog extends React.Component {
         animated={true}
         animationType="fade"
         onShow={() => {
-          updateEvent({type: ACTIONS.LOGIN_NAVIGATOR, enabled: true});
           this.setState({
             animated: true,
           });
         }}
         onRequestClose={() => {
-          updateEvent({type: ACTIONS.LOGIN_NAVIGATOR, enabled: false});
           if (!this.routeIndex || this.routeIndex === 0) {
+            updateEvent({type: ACTIONS.LOGIN_NAVIGATOR, enabled: false});
             this.close();
           } else {
             DeviceEventEmitter.emit('goLoginBack');

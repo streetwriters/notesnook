@@ -9,6 +9,7 @@ export const reducer = (state, action) => {
       return {
         ...state,
         notes: notes,
+        loading: false,
       };
     case ACTIONS.THEME: {
       return {

@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
-import {SafeAreaView, View, DeviceEventEmitter} from 'react-native';
+import {DeviceEventEmitter, SafeAreaView} from 'react-native';
 import * as Animatable from 'react-native-animatable';
+import {useIsFocused} from 'react-navigation-hooks';
 import {db, DDS} from '../../../App';
 import Container from '../../components/Container';
 import {Header} from '../../components/header';
@@ -11,7 +12,6 @@ import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import NavigationService from '../../services/NavigationService';
 import {SideMenuEvent, ToastEvent} from '../../utils/utils';
-import {useIsFocused} from 'react-navigation-hooks';
 
 export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(
   SafeAreaView,

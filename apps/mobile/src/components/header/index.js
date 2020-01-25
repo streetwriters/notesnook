@@ -15,6 +15,7 @@ import NavigationService from '../../services/NavigationService';
 import {SideMenuEvent} from '../../utils/utils';
 import {moveNoteHideEvent} from '../DialogManager';
 import {DDS} from '../../../App';
+import {eCloseLoginDialog} from '../../services/events';
 let isOpen = false;
 export const Header = ({
   heading,
@@ -69,7 +70,7 @@ export const Header = ({
                 }
               } else if (navigation && isLoginNavigator) {
                 if (navigation.state.routeName === 'Login') {
-                  DeviceEventEmitter.emit('hideLoginDialog');
+                  DeviceEventEmitter.emit(eCloseLoginDialog);
                 } else {
                   navigation.goBack();
                 }

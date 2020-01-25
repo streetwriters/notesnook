@@ -26,6 +26,7 @@ import {ACTIONS} from '../../provider/actions';
 import NavigationService from '../../services/NavigationService';
 import {AnimatedSafeAreaView} from '../../views/Home';
 import {DDS} from '../../../App';
+import {eOpenLoginDialog} from '../../services/events';
 
 export const Menu = ({
   close = () => {},
@@ -420,7 +421,7 @@ export const Menu = ({
             close();
 
             DDS.isTab
-              ? DeviceEventEmitter.emit('showLoginDialog')
+              ? DeviceEventEmitter.emit(eOpenLoginDialog)
               : NavigationService.navigate('Login');
           }}
           activeOpacity={opacity / 2}
