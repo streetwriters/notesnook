@@ -12,8 +12,6 @@ import {ACTIONS} from '../../provider/actions';
 import NavigationService from '../../services/NavigationService';
 import {SideMenuEvent, ToastEvent} from '../../utils/utils';
 import {useIsFocused} from 'react-navigation-hooks';
-import PullToRefresh from '../../components/PullToRefresh';
-import Editor from '../Editor';
 
 export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(
   SafeAreaView,
