@@ -53,3 +53,5 @@ export const eShowToast = '525';
 export const eHideToast = '526';
 
 export const eThemeUpdated = '527';
+
+export const eScrollEvent = '528';

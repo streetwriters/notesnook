@@ -36,12 +36,9 @@ let editorRef;
 const App = () => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
-  // Local State
 
   const [init, setInit] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
-
-  // Effects
 
   const openSidebar = () => {
     DDS.isTab ? null : sideMenuRef.openMenu(true);
@@ -57,28 +54,6 @@ const App = () => {
   const enableGestures = () => {
     DDS.isTab ? null : sideMenuRef.setGestureEnabled(true);
   };
-
-  useEffect(() => {
-    eSubscribeEvent(eOpenSideMenu, openSidebar);
-    eSubscribeEvent(eCloseSideMenu, closeSidebar);
-
-    eSubscribeEvent(eDisableGestures, disableGestures);
-    eSubscribeEvent(eEnableGestures, enableGestures);
-
-    eSubscribeEvent(eOpenFullscreenEditor, showFullScreenEditor);
-    eSubscribeEvent(eCloseFullscreenEditor, closeFullScreenEditor);
-
-    return () => {
-      eUnSubscribeEvent(eOpenFullscreenEditor, showFullScreenEditor);
-      eUnSubscribeEvent(eCloseFullscreenEditor, closeFullScreenEditor);
-
-      eUnSubscribeEvent(eOpenSideMenu, openSidebar);
-      eUnSubscribeEvent(eCloseSideMenu, closeSidebar);
-
-      eUnSubscribeEvent(eDisableGestures, disableGestures);
-      eUnSubscribeEvent(eEnableGestures, enableGestures);
-    };
-  }, []);
 
   const showFullScreenEditor = () => {
     setFullscreen(true);
@@ -118,6 +93,28 @@ const App = () => {
   }, []);
 
   useEffect(() => {
+    eSubscribeEvent(eOpenSideMenu, openSidebar);
+    eSubscribeEvent(eCloseSideMenu, closeSidebar);
+
+    eSubscribeEvent(eDisableGestures, disableGestures);
+    eSubscribeEvent(eEnableGestures, enableGestures);
+
+    eSubscribeEvent(eOpenFullscreenEditor, showFullScreenEditor);
+    eSubscribeEvent(eCloseFullscreenEditor, closeFullScreenEditor);
+
+    return () => {
+      eUnSubscribeEvent(eOpenFullscreenEditor, showFullScreenEditor);
+      eUnSubscribeEvent(eCloseFullscreenEditor, closeFullScreenEditor);
+
+      eUnSubscribeEvent(eOpenSideMenu, openSidebar);
+      eUnSubscribeEvent(eCloseSideMenu, closeSidebar);
+
+      eUnSubscribeEvent(eDisableGestures, disableGestures);
+      eUnSubscribeEvent(eEnableGestures, enableGestures);
+    };
+  }, []);
+
+  useEffect(() => {
     if (Platform.OS === 'android') {
       StatusBar.setBackgroundColor('transparent');
       StatusBar.setTranslucent(true);
@@ -136,10 +133,7 @@ const App = () => {
   async function updateAppTheme(colors = colors) {
     let newColors = await getColorScheme(colors);
     dispatch({type: ACTIONS.THEME, colors: newColors});
-    //setColors(newColors);
   }
-
-  // Render
 
   if (!init) {
     return <></>;

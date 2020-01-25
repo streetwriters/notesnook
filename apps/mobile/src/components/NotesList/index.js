@@ -14,12 +14,10 @@ import {slideLeft, slideRight} from '../../utils/animations';
 import {NotesPlaceHolder} from '../ListPlaceholders';
 import NoteItem from '../NoteItem';
 import SelectionWrapper from '../SelectionWrapper';
-let sectionListRef;
+
 export const NotesList = ({
-  onScroll,
   isSearch = false,
   isGrouped = false,
-  refresh = () => {},
   searchResults,
 }) => {
   const [state, dispatch] = useTracked();
@@ -57,9 +55,9 @@ export const NotesList = ({
 
   const _onScroll = event => {
     if (!event) return;
-
     y = event.nativeEvent.contentOffset.y;
-    onScroll(y);
+
+    eSendEvent(eScrollEvent, y);
   };
 
   const _ListHeaderComponent = (
