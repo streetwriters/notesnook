@@ -22,6 +22,8 @@ import {DeviceDetectionService} from './src/utils/deviceDetection';
 import StorageInterface from './src/utils/storage';
 import {w} from './src/utils/utils';
 import Editor from './src/views/Editor';
+import {eSubscribeEvent, eUnSubscribeEvent} from './src/services/eventManager';
+import {eDispatchAction} from './src/services/events';
 
 export const DDS = new DeviceDetectionService();
 export const db = new Storage(StorageInterface);
@@ -114,11 +116,11 @@ const App = () => {
   };
 
   useEffect(() => {
-    _recieveEvent('updateEvent', type => {
+    eSubscribeEvent(eDispatchAction, type => {
       dispatch(type);
     });
     return () => {
-      _unSubscribeEvent('updateEvent', type => {
+      eUnSubscribeEvent(eDispatchAction, type => {
         dispatch(type);
       });
     };
