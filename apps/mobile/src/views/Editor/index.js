@@ -417,7 +417,7 @@ const Editor = ({navigation, noMenu}) => {
           cacheEnabled={false}
           domStorageEnabled
           scrollEnabled={false}
-          bounces={true}
+          bounces={false}
           allowFileAccess={true}
           scalesPageToFit={true}
           allowFileAccessFromFileURLs={true}
@@ -427,8 +427,8 @@ const Editor = ({navigation, noMenu}) => {
             Platform.OS === 'ios'
               ? sourceUri
               : {
-                  uri: 'file:///android_asset/texteditor.html',
-                  baseUrl: 'file:///android_asset/',
+                  uri: 'http://192.168.10.7:8080/texteditor.html',
+                  baseUrl: 'http://192.168.10.7:8080',
                 }
           }
           style={{
