@@ -28,6 +28,16 @@ import {ACTIONS} from '../../provider/actions';
 import {SideMenuEvent, w, h} from '../../utils/utils';
 import {AnimatedSafeAreaView} from '../Home';
 import * as Animatable from 'react-native-animatable';
+import {
+  eSendEvent,
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+} from '../../services/eventManager';
+import {
+  eCloseFullscreenEditor,
+  eOpenFullscreenEditor,
+  eOnLoadNote,
+} from '../../services/events';
 
 const AnimatedKeyboardAvoidingView = Animatable.createAnimatableComponent(
   KeyboardAvoidingView,
@@ -51,10 +61,10 @@ const Editor = ({navigation, noMenu}) => {
 
   const post = value => EditorWebView.postMessage(value);
   useEffect(() => {
-    _recieveEvent('loadNoteEvent', loadNote);
+    eSubscribeEvent(eOnLoadNote, loadNote);
 
     return () => {
-      _unSubscribeEvent('loadNoteEvent', loadNote);
+      eUnSubscribeEvent(eOnLoadNote, loadNote);
     };
   }, []);
 
@@ -334,8 +344,8 @@ const Editor = ({navigation, noMenu}) => {
             <TouchableOpacity
               onPress={() => {
                 if (fullscreen) {
-                  DeviceEventEmitter.emit('closeFullScreenEditor');
                   fullscreen = false;
+                  eSendEvent(eCloseFullscreenEditor);
                   post(
                     JSON.stringify({
                       type: 'nomenu',
@@ -343,7 +353,7 @@ const Editor = ({navigation, noMenu}) => {
                     }),
                   );
                 } else {
-                  DeviceEventEmitter.emit('showFullScreenEditor');
+                  eSendEvent(eOpenFullscreenEditor);
                   fullscreen = true;
                   post(
                     JSON.stringify({

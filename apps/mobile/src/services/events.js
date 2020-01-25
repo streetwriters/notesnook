@@ -25,3 +25,17 @@ export const eOpenLoginDialog = '511';
 export const eCloseLoginDialog = '512';
 
 export const eDispatchAction = '513';
+
+export const eLoginDialogNavigateBack = '514';
+
+export const eOpenSideMenu = '515';
+
+export const eCloseSideMenu = '516';
+
+export const eOpenFullscreenEditor = '517';
+
+export const eCloseFullscreenEditor = '518';
+
+export const eEnableGestures = '519';
+
+export const eDisableGestures = '520';

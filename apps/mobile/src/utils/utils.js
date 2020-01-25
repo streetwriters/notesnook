@@ -1,4 +1,11 @@
 import {DeviceEventEmitter, Dimensions} from 'react-native';
+import {eSendEvent} from '../services/eventManager';
+import {
+  eOpenSideMenu,
+  eCloseSideMenu,
+  eDisableGestures,
+  eEnableGestures,
+} from '../services/events';
 export const getElevation = elevation => {
   return {
     elevation,
@@ -62,15 +69,15 @@ export const ToastEvent = {
 
 export const SideMenuEvent = {
   open: () => {
-    DeviceEventEmitter.emit('openSidebar');
+    eSendEvent(eOpenSideMenu);
   },
   close: () => {
-    DeviceEventEmitter.emit('closeSidebar');
+    eSendEvent(eCloseSideMenu);
   },
   disable: () => {
-    DeviceEventEmitter.emit('disableGesture');
+    eSendEvent(eDisableGestures);
   },
   enable: () => {
-    DeviceEventEmitter.emit('enableGesture');
+    eSendEvent(eEnableGestures);
   },
 };

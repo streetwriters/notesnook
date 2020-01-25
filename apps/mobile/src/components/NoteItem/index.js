@@ -12,6 +12,8 @@ import {ph, pv, SIZE, WEIGHT} from '../../common/common';
 import NavigationService from '../../services/NavigationService';
 import {getElevation, timeSince} from '../../utils/utils';
 import {ActionSheetEvent} from '../DialogManager';
+import {eSendEvent} from '../../services/eventManager';
+import {eOnLoadNote} from '../../services/events';
 
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
@@ -114,7 +116,7 @@ export default class NoteItem extends React.Component {
               });
             } else {
               DDS.isTab
-                ? DeviceEventEmitter.emit('loadNoteEvent', item)
+                ? eSendEvent(eOnLoadNote, item)
                 : NavigationService.navigate('Editor', {
                     note: item,
                   });

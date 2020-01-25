@@ -2,7 +2,6 @@ import Storage from 'notes-core/api/database';
 import React, {useEffect, useState} from 'react';
 import {Dimensions, Platform, StatusBar, View} from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import Animated from 'react-native-reanimated';
 import {getColorScheme} from './src/common/common';
 import {
   DialogManager,
@@ -23,22 +22,18 @@ import StorageInterface from './src/utils/storage';
 import {w} from './src/utils/utils';
 import Editor from './src/views/Editor';
 import {eSubscribeEvent, eUnSubscribeEvent} from './src/services/eventManager';
-import {eDispatchAction} from './src/services/events';
+import {
+  eDispatchAction,
+  eOpenSideMenu,
+  eCloseSideMenu,
+  eDisableGestures,
+  eEnableGestures,
+  eOpenFullscreenEditor,
+  eCloseFullscreenEditor,
+} from './src/services/events';
 
 export const DDS = new DeviceDetectionService();
 export const db = new Storage(StorageInterface);
-const {
-  Clock,
-  Value,
-  set,
-  cond,
-  startClock,
-  clockRunning,
-  timing,
-  debug,
-  stopClock,
-  block,
-} = Animated;
 
 let sideMenuRef;
 let editorRef;
@@ -70,24 +65,24 @@ const App = () => {
   };
 
   useEffect(() => {
-    _recieveEvent('openSidebar', openSidebar);
-    _recieveEvent('closeSidebar', closeSidebar);
+    eSubscribeEvent(eOpenSideMenu, openSidebar);
+    eSubscribeEvent(eCloseSideMenu, closeSidebar);
 
-    _recieveEvent('disableGesture', disableGestures);
-    _recieveEvent('enableGesture', enableGestures);
+    eSubscribeEvent(eDisableGestures, disableGestures);
+    eSubscribeEvent(eEnableGestures, enableGestures);
 
-    _recieveEvent('showFullScreenEditor', showFullScreenEditor);
-    _recieveEvent('closeFullScreenEditor', closeFullScreenEditor);
+    eSubscribeEvent(eOpenFullscreenEditor, showFullScreenEditor);
+    eSubscribeEvent(eCloseFullscreenEditor, closeFullScreenEditor);
 
     return () => {
-      _unSubscribeEvent('showFullScreenEditor', showFullScreenEditor);
-      _unSubscribeEvent('closeFullScreenEditor', closeFullScreenEditor);
+      eUnSubscribeEvent(eOpenFullscreenEditor, showFullScreenEditor);
+      eUnSubscribeEvent(eCloseFullscreenEditor, closeFullScreenEditor);
 
-      _unSubscribeEvent('openSidebar', openSidebar);
-      _unSubscribeEvent('closeSidebar', closeSidebar);
+      eUnSubscribeEvent(eOpenSideMenu, openSidebar);
+      eUnSubscribeEvent(eCloseSideMenu, closeSidebar);
 
-      _unSubscribeEvent('disableGesture', disableGestures);
-      _unSubscribeEvent('enableGesture', enableGestures);
+      eUnSubscribeEvent(eDisableGestures, disableGestures);
+      eUnSubscribeEvent(eEnableGestures, enableGestures);
     };
   }, []);
 
@@ -99,6 +94,7 @@ const App = () => {
         width: '100%',
         zIndex: 999,
         paddingHorizontal: 100,
+        backgroundColor: colors.bg,
       },
     });
   };
@@ -111,6 +107,7 @@ const App = () => {
         width: '68%',
         zIndex: null,
         paddingHorizontal: 0,
+        backgroundColor: 'transparent',
       },
     });
   };
@@ -164,9 +161,6 @@ const App = () => {
             height: '100%',
             flexDirection: 'row',
             backgroundColor: colors.bg,
-          }}
-          onLayout={e => {
-            setWidth(Dimensions.get('window').width);
           }}>
           {DDS.isTab ? (
             <>

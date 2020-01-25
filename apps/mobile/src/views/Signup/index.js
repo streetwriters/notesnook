@@ -15,6 +15,7 @@ import {useTracked} from '../../provider';
 import {useIsFocused} from 'react-navigation-hooks';
 import {_recieveEvent, _unSubscribeEvent} from '../../components/DialogManager';
 import {eUnSubscribeEvent, eSubscribeEvent} from '../../services/eventManager';
+import {eLoginDialogNavigateBack} from '../../services/events';
 
 export const Signup = ({navigation}) => {
   const [state, dispatch] = useTracked();
@@ -40,9 +41,9 @@ export const Signup = ({navigation}) => {
   };
 
   useEffect(() => {
-    eSubscribeEvent('goLoginBack', handleBackPress);
+    eSubscribeEvent(eLoginDialogNavigateBack, handleBackPress);
     return () => {
-      eUnSubscribeEvent('goLoginBack', handleBackPress);
+      eUnSubscribeEvent(eLoginDialogNavigateBack, handleBackPress);
     };
   }, [isFocused]);
 

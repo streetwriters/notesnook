@@ -14,6 +14,8 @@ import {Header} from '../../components/header';
 import {useTracked} from '../../provider';
 import {_recieveEvent, _unSubscribeEvent} from '../../components/DialogManager';
 import {useIsFocused} from 'react-navigation-hooks';
+import {eLoginDialogNavigateBack} from '../../services/events';
+import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
 
 export const ForgotPassword = ({navigation}) => {
   const [state, dispatch] = useTracked();
@@ -33,9 +35,9 @@ export const ForgotPassword = ({navigation}) => {
   };
 
   useEffect(() => {
-    _recieveEvent('goBack', handleBackPress);
+    eSubscribeEvent(eLoginDialogNavigateBack, handleBackPress);
     return () => {
-      _unSubscribeEvent('goBack', handleBackPress);
+      eUnSubscribeEvent(eLoginDialogNavigateBack, handleBackPress);
     };
   }, [isFocused]);
 

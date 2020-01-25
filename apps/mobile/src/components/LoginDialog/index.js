@@ -10,6 +10,8 @@ import Signup from '../../views/Signup';
 import ForgotPassword from '../../views/ForgotPassword';
 import {DDS} from '../../../App';
 import {getElevation} from '../../utils/utils';
+import {eSendEvent} from '../../services/eventManager';
+import {eLoginDialogNavigateBack} from '../../services/events';
 
 const fade = props => {
   const {position, scene} = props;
@@ -104,7 +106,7 @@ class LoginDialog extends React.Component {
             updateEvent({type: ACTIONS.LOGIN_NAVIGATOR, enabled: false});
             this.close();
           } else {
-            DeviceEventEmitter.emit('goLoginBack');
+            eSendEvent(eLoginDialogNavigateBack);
           }
         }}
         visible={visible}

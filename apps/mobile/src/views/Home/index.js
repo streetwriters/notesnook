@@ -104,7 +104,7 @@ export const Home = ({navigation}) => {
         dispatch({type: ACTIONS.NOTES});
 
         if (DDS.isTab) {
-          DeviceEventEmitter.emit('loadNoteEvent', {type: 'new'});
+          eSendEvent(eOnLoadNote, {type: 'new'});
         } else {
           SideMenuEvent.close();
           SideMenuEvent.disable();
