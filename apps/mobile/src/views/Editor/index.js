@@ -417,8 +417,8 @@ const Editor = ({navigation, noMenu}) => {
             Platform.OS === 'ios'
               ? sourceUri
               : {
-                  uri: 'http://192.168.10.7:8080/texteditor.html',
-                  baseUrl: 'http://192.168.10.7:8080',
+                  uri: 'file:///android_asset/texteditor.html',
+                  baseUrl: 'file:///android_asset/',
                 }
           }
           style={{

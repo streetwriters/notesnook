@@ -9,12 +9,29 @@ import {AddTopicDialog} from '../AddTopicDialog';
 import {AddNotebookDialog} from '../AddNotebookDialog';
 import {DDS} from '../../../App';
 import LoginDialog from '../LoginDialog';
+import {
+  eOpenActionSheet,
+  eCloseActionSheet,
+  eOpenSimpleDialog,
+  eCloseSimpleDialog,
+  eOpenMoveNoteDialog,
+  eCloseMoveNoteDialog,
+  eOpenAddNotebookDialog,
+  eCloseAddNotebookDialog,
+  eOpenAddTopicDialog,
+  eCloseAddTopicDialog,
+  eOpenLoginDialog,
+  eCloseLoginDialog,
+  eOnLoadNote,
+  eDispatchAction,
+} from '../../services/events';
+import {eUnSubscribeEvent, eSubscribeEvent} from '../../services/eventManager';
 
 export const _recieveEvent = (eventName, action) => {
   DeviceEventEmitter.addListener(eventName, action);
 };
 
-export const _unSubscribeEvent = (eventName, action) => {
+export const _UnSubscribeEvent = (eventName, action) => {
   DeviceEventEmitter.removeListener(eventName, action);
 };
 export const dialogActions = {
@@ -32,7 +49,7 @@ export const ActionSheetEvent = (
   columnItems,
   extraData,
 ) => {
-  DeviceEventEmitter.emit('ActionSheetEvent', {
+  DeviceEventEmitter.emit(eOpenActionSheet, {
     item,
     colors,
     tags,
@@ -42,39 +59,39 @@ export const ActionSheetEvent = (
   });
 };
 export const ActionSheetHideEvent = () => {
-  DeviceEventEmitter.emit('ActionSheetHideEvent');
+  DeviceEventEmitter.emit(eCloseActionSheet);
 };
 
 export const simpleDialogEvent = data => {
-  DeviceEventEmitter.emit('simpleDialogEvent', data);
+  DeviceEventEmitter.emit(eOpenSimpleDialog, data);
 };
 
 export const simpleDialogHideEvent = () => {
-  DeviceEventEmitter.emit('simpleDialogHideEvent');
+  DeviceEventEmitter.emit(eCloseSimpleDialog);
 };
 
 export const moveNoteEvent = () => {
-  DeviceEventEmitter.emit('moveNoteEvent');
+  DeviceEventEmitter.emit(eOpenMoveNoteDialog);
 };
 export const moveNoteHideEvent = () => {
-  DeviceEventEmitter.emit('moveNoteHideEvent');
+  DeviceEventEmitter.emit(eCloseMoveNoteDialog);
 };
 
 export const AddNotebookEvent = notebook => {
-  DeviceEventEmitter.emit('addNotebookEvent', {item: notebook});
+  DeviceEventEmitter.emit(eOpenAddNotebookDialog, {item: notebook});
 };
 export const HideAddNotebookEvent = notebook => {
-  DeviceEventEmitter.emit('hideAddNotebookEvent', notebook);
+  DeviceEventEmitter.emit(eCloseAddNotebookDialog, notebook);
 };
 export const AddTopicEvent = notebook => {
-  DeviceEventEmitter.emit('addTopicEvent', notebook);
+  DeviceEventEmitter.emit(eOpenAddTopicDialog, notebook);
 };
 export const HideAddTopicEvent = notebook => {
-  DeviceEventEmitter.emit('hideAddTopicEvent', notebook);
+  DeviceEventEmitter.emit(eCloseAddTopicDialog, notebook);
 };
 
 export const updateEvent = data => {
-  DeviceEventEmitter.emit('updateEvent', data);
+  DeviceEventEmitter.emit(eDispatchAction, data);
 };
 
 export const TEMPLATE_DELETE = type => {
@@ -189,46 +206,47 @@ export class DialogManager extends Component {
   };
 
   componentDidMount() {
-    _recieveEvent('loadNoteEvent', this.loadNote);
-    _recieveEvent('ActionSheetEvent', this._showActionSheet);
-    _recieveEvent('ActionSheetHideEvent', this._hideActionSheet);
+    eSubscribeEvent(eOnLoadNote, this.loadNote);
 
-    _recieveEvent('simpleDialogEvent', this._showSimpleDialog);
-    _recieveEvent('simpleDialogHideEvent', this._hideActionSheet);
+    eSubscribeEvent(eOpenActionSheet, this._showActionSheet);
+    eSubscribeEvent(eCloseActionSheet, this._hideSimpleDialog);
 
-    _recieveEvent('moveNoteEvent', this._showMoveNote);
-    _recieveEvent('moveNoteHideEvent', this._hideMoveNote);
+    eSubscribeEvent(eOpenSimpleDialog, this._showSimpleDialog);
+    eSubscribeEvent(eCloseSimpleDialog, this._hideSimpleDialog);
 
-    _recieveEvent('addNotebookEvent', this.showAddNotebook);
-    _recieveEvent('hideAddNotebookEvent', this.hideAddNotebook);
+    eSubscribeEvent(eOpenMoveNoteDialog, this._showMoveNote);
+    eSubscribeEvent(eCloseMoveNoteDialog, this._hideMoveNote);
 
-    _recieveEvent('addTopicEvent', this.showAddTopic);
-    _recieveEvent('hideAddTopicEvent', this.hideAddTopic);
+    eSubscribeEvent(eOpenAddNotebookDialog, this.showAddNotebook);
+    eSubscribeEvent(eCloseAddNotebookDialog, this.hideAddNotebook);
 
-    _recieveEvent('showLoginDialog', this.showLoginDialog);
-    _recieveEvent('hideLoginDialog', this.hideLoginDialog);
+    eSubscribeEvent(eOpenAddTopicDialog, this.showAddTopic);
+    eSubscribeEvent(eCloseAddTopicDialog, this.hideAddTopic);
+
+    eSubscribeEvent(eOpenLoginDialog, this.showLoginDialog);
+    eSubscribeEvent(eCloseLoginDialog, this.hideLoginDialog);
   }
 
   componentWillUnmount() {
-    _unSubscribeEvent('loadNoteEvent', this.loadNote);
+    eUnSubscribeEvent(eOnLoadNote, this.loadNote);
 
-    _unSubscribeEvent('ActionSheetEvent', this._showActionSheet);
-    _unSubscribeEvent('ActionSheetHideEvent', this._hideSimpleDialog);
+    eUnSubscribeEvent(eOpenActionSheet, this._showActionSheet);
+    eUnSubscribeEvent(eCloseActionSheet, this._hideSimpleDialog);
 
-    _unSubscribeEvent('simpleDialogEvent', this._showSimpleDialog);
-    _unSubscribeEvent('simpleDialogHideEvent', this._hideSimpleDialog);
+    eUnSubscribeEvent(eOpenSimpleDialog, this._showSimpleDialog);
+    eUnSubscribeEvent(eCloseSimpleDialog, this._hideSimpleDialog);
 
-    _unSubscribeEvent('moveNoteEvent', this._showMoveNote);
-    _unSubscribeEvent('moveNoteHideEvent', this._hideMoveNote);
+    eUnSubscribeEvent(eOpenMoveNoteDialog, this._showMoveNote);
+    eUnSubscribeEvent(eCloseMoveNoteDialog, this._hideMoveNote);
 
-    _unSubscribeEvent('addNotebookEvent', this.showAddNotebook);
-    _unSubscribeEvent('hideAddNotebookEvent', this.hideAddNotebook);
+    eUnSubscribeEvent(eOpenAddNotebookDialog, this.showAddNotebook);
+    eUnSubscribeEvent(eCloseAddNotebookDialog, this.hideAddNotebook);
 
-    _unSubscribeEvent('addTopicEvent', this.showAddTopic);
-    _unSubscribeEvent('hideAddTopicEvent', this.hideAddTopic);
+    eUnSubscribeEvent(eOpenAddTopicDialog, this.showAddTopic);
+    eUnSubscribeEvent(eCloseAddTopicDialog, this.hideAddTopic);
 
-    _unSubscribeEvent('showLoginDialog', this.showLoginDialog);
-    _unSubscribeEvent('hideLoginDialog', this.hideLoginDialog);
+    eUnSubscribeEvent(eOpenLoginDialog, this.showLoginDialog);
+    eUnSubscribeEvent(eCloseLoginDialog, this.hideLoginDialog);
   }
 
   showLoginDialog = () => {
