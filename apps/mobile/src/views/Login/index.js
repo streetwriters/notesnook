@@ -100,9 +100,9 @@ const renderLogin = (colors, navigation) => {
   return (
     <View
       style={{
-        justifyContent: 'center',
-        width: '80%',
-        height: '80%',
+        justifyContent: DDS.isTab ? 'center' : 'flex-start',
+        width: '100%',
+        height: DDS.isTab ? '80%' : '100%',
         alignSelf: 'center',
       }}>
       <View>

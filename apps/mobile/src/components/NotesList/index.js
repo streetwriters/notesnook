@@ -14,6 +14,8 @@ import {slideLeft, slideRight} from '../../utils/animations';
 import {NotesPlaceHolder} from '../ListPlaceholders';
 import NoteItem from '../NoteItem';
 import SelectionWrapper from '../SelectionWrapper';
+import {eSendEvent} from '../../services/eventManager';
+import {eScrollEvent} from '../../services/events';
 
 export const NotesList = ({isGrouped = false}) => {
   const [state, dispatch] = useTracked();
@@ -58,7 +60,7 @@ export const NotesList = ({isGrouped = false}) => {
 
   const _onScroll = event => {
     if (!event) return;
-    y = event.nativeEvent.contentOffset.y;
+    let y = event.nativeEvent.contentOffset.y;
 
     eSendEvent(eScrollEvent, y);
   };

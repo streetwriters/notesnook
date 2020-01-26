@@ -256,7 +256,6 @@ export default class NoteItem extends React.Component {
             justifyContent: 'center',
             minHeight: 70,
             alignItems: 'center',
-            paddingRight: ph,
           }}>
           <TouchableOpacity
             style={{
