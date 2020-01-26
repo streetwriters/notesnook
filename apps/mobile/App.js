@@ -34,6 +34,7 @@ export const db = new Storage(StorageInterface);
 let overlayViewRef;
 let sideMenuRef;
 let editorRef;
+let outColors;
 const App = () => {
   const [state, dispatch] = useTracked();
   const {colors, loading} = state;
@@ -58,16 +59,21 @@ const App = () => {
 
   const showFullScreenEditor = () => {
     setFullscreen(true);
+
     editorRef.setNativeProps({
       style: {
         position: 'absolute',
         width: '100%',
         zIndex: 999,
         paddingHorizontal: 100,
-        backgroundColor: colors.bg,
+        backgroundColor: outColors.bg,
       },
     });
   };
+
+  useEffect(() => {
+    outColors = colors;
+  }, [colors]);
 
   const closeFullScreenEditor = () => {
     setFullscreen(false);

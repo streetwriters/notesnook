@@ -18,7 +18,7 @@ export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(
 
 export const Home = ({navigation}) => {
   const [state, dispatch] = useTracked();
-  const {notes, colors, selectionMode, loading} = state;
+  const {notes} = state;
 
   const isFocused = useIsFocused();
 

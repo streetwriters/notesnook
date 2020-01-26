@@ -417,8 +417,8 @@ const Editor = ({navigation, noMenu}) => {
               }}
             />
           )}
-          cacheMode="LOAD_NO_CACHE"
-          cacheEnabled={false}
+          cacheMode="LOAD_CACHE_ELSE_NETWORK"
+          cacheEnabled={true}
           domStorageEnabled
           scrollEnabled={false}
           bounces={false}
@@ -504,7 +504,7 @@ const Editor = ({navigation, noMenu}) => {
         duration={300}
         style={{
           flex: 1,
-          backgroundColor: 'transparent',
+          backgroundColor: DDS.isTab ? 'transparent' : colors.bg,
           height: '100%',
           width: '100%',
           flexDirection: 'row',
