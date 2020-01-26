@@ -1,8 +1,8 @@
 import Storage from 'notes-core/api/database';
 import React, {useEffect, useState} from 'react';
-import {Platform, StatusBar, View} from 'react-native';
+import {Platform, StatusBar, View, Text} from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import {getColorScheme} from './src/common/common';
+import {getColorScheme, WEIGHT, SIZE} from './src/common/common';
 import {DialogManager} from './src/components/DialogManager';
 import {Menu} from './src/components/Menu';
 import {ModalMenu} from './src/components/ModalMenu';
@@ -31,11 +31,12 @@ import Editor from './src/views/Editor';
 export const DDS = new DeviceDetectionService();
 export const db = new Storage(StorageInterface);
 
+let overlayViewRef;
 let sideMenuRef;
 let editorRef;
 const App = () => {
   const [state, dispatch] = useTracked();
-  const {colors} = state;
+  const {colors, loading} = state;
 
   const [init, setInit] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
@@ -140,99 +141,186 @@ const App = () => {
   }
   return (
     <>
-      <Animatable.View animation="fadeIn" useNativeDriver={true} duration={600}>
+      <Animatable.View
+        transition="backgroundColor"
+        duration={300}
+        style={{
+          width: '100%',
+          height: '100%',
+          flexDirection: 'row',
+          backgroundColor: colors.bg,
+        }}>
         <Animatable.View
-          transition="backgroundColor"
-          duration={300}
+          transition={['translateX']}
+          useNativeDriver={true}
+          duration={1000}
+          delay={2500}
           style={{
-            width: '100%',
+            width: '50%',
+            left: 0,
             height: '100%',
-            flexDirection: 'row',
-            backgroundColor: colors.bg,
+            position: 'absolute',
+            backgroundColor: colors.accent,
+            justifyContent: 'center',
+            alignItems: 'flex-end',
+            zIndex: 999,
+            transform: [
+              {
+                translateX: loading ? 0 : -w * 2,
+              },
+            ],
           }}>
-          {DDS.isTab ? (
-            <>
-              <ModalMenu colors={colors} />
+          <Animatable.Text
+            animation="fadeIn"
+            duration={300}
+            delay={150}
+            style={{
+              color: 'white',
+              fontFamily: WEIGHT.bold,
+              fontSize: SIZE.xxl,
+            }}>
+            notes
+          </Animatable.Text>
+          <Animatable.Text
+            animation="fadeIn"
+            duration={300}
+            delay={600}
+            style={{
+              color: 'white',
+              fontFamily: WEIGHT.regular,
+              fontSize: SIZE.md,
+              marginTop: 15,
+            }}>
+            A safe plac
+          </Animatable.Text>
+        </Animatable.View>
+        <Animatable.View
+          transition={['translateX']}
+          useNativeDriver={true}
+          duration={1000}
+          delay={2500}
+          style={{
+            width: '50%',
+            right: 0,
+            height: '100%',
+            position: 'absolute',
+            backgroundColor: colors.accent,
+            justifyContent: 'center',
+            alignItems: 'flex-start',
+            zIndex: 999,
+            transform: [
+              {
+                translateX: loading ? 0 : w * 2,
+              },
+            ],
+          }}>
+          <Animatable.Text
+            animation="fadeIn"
+            duration={300}
+            delay={150}
+            style={{
+              color: 'white',
+              fontFamily: WEIGHT.bold,
+              fontSize: SIZE.xxl,
+            }}>
+            nook
+          </Animatable.Text>
+          <Animatable.Text
+            animation="fadeIn"
+            duration={300}
+            delay={600}
+            style={{
+              color: 'white',
+              fontFamily: WEIGHT.regular,
+              fontSize: SIZE.md,
+              marginTop: 15,
+            }}>
+            e to write
+          </Animatable.Text>
+        </Animatable.View>
 
-              <Animatable.View
-                animation="fadeIn"
-                useNativeDriver={true}
-                duration={500}
-                delay={450}
-                style={{
-                  width: '4%',
-                }}>
-                <Menu
-                  hide={false}
-                  noTextMode={true}
-                  colors={colors}
-                  close={() => {
-                    //setSidebar('0%');
-                  }}
-                />
-              </Animatable.View>
+        {DDS.isTab ? (
+          <>
+            <ModalMenu colors={colors} />
 
-              <Animatable.View
-                transition="backgroundColor"
-                duration={300}
-                style={{
-                  width: '28%',
-                  height: '100%',
-                  borderRightColor: colors.nav,
-                  borderRightWidth: 2,
-                }}>
-                <AppContainer
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                  }}
-                  ref={navigatorRef => {
-                    NavigationService.setTopLevelNavigator(navigatorRef);
-                  }}
-                />
-              </Animatable.View>
+            <Animatable.View
+              animation="fadeIn"
+              useNativeDriver={true}
+              duration={500}
+              delay={450}
+              style={{
+                width: '4%',
+              }}>
+              <Menu
+                hide={false}
+                noTextMode={true}
+                colors={colors}
+                close={() => {
+                  //setSidebar('0%');
+                }}
+              />
+            </Animatable.View>
 
-              <View
-                ref={ref => (editorRef = ref)}
-                style={{
-                  width: '68%',
-                  height: '100%',
-                  backgroundColor: 'transparent',
-                }}>
-                <Editor noMenu={fullscreen ? false : true} />
-              </View>
-            </>
-          ) : (
-            <SideMenu
-              ref={ref => (sideMenuRef = ref)}
-              bounceBackOnOverdraw={false}
-              contentContainerStyle={{
-                opacity: 0,
-                backgroundColor: colors.bg,
-              }}
-              menu={
-                <Menu
-                  hide={false}
-                  colors={colors}
-                  close={() => sideMenuRef.openMenu(!sideMenuRef.isOpen)}
-                />
-              }
-              openMenuOffset={w / 1.3}>
+            <Animatable.View
+              transition="backgroundColor"
+              duration={300}
+              style={{
+                width: '28%',
+                height: '100%',
+                borderRightColor: colors.nav,
+                borderRightWidth: 2,
+              }}>
               <AppContainer
                 style={{
-                  width: DDS.isTab ? '70%' : '100%',
+                  width: '100%',
                   height: '100%',
-                  backgroundColor: colors.bg,
                 }}
                 ref={navigatorRef => {
                   NavigationService.setTopLevelNavigator(navigatorRef);
                 }}
               />
-            </SideMenu>
-          )}
-          <Toast />
-          <DialogManager colors={colors} />
-        </Animatable.View>
+            </Animatable.View>
+
+            <View
+              ref={ref => (editorRef = ref)}
+              style={{
+                width: '68%',
+                height: '100%',
+                backgroundColor: 'transparent',
+              }}>
+              <Editor noMenu={fullscreen ? false : true} />
+            </View>
+          </>
+        ) : (
+          <SideMenu
+            ref={ref => (sideMenuRef = ref)}
+            bounceBackOnOverdraw={false}
+            contentContainerStyle={{
+              opacity: 0,
+              backgroundColor: colors.bg,
+            }}
+            menu={
+              <Menu
+                hide={false}
+                colors={colors}
+                close={() => sideMenuRef.openMenu(!sideMenuRef.isOpen)}
+              />
+            }
+            openMenuOffset={w / 1.3}>
+            <AppContainer
+              style={{
+                width: DDS.isTab ? '70%' : '100%',
+                height: '100%',
+                backgroundColor: colors.bg,
+              }}
+              ref={navigatorRef => {
+                NavigationService.setTopLevelNavigator(navigatorRef);
+              }}
+            />
+          </SideMenu>
+        )}
+        <Toast />
+        <DialogManager colors={colors} />
       </Animatable.View>
     </>
   );

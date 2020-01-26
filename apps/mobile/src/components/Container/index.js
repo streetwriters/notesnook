@@ -14,10 +14,11 @@ import {br, opacity, pv, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
 import {eScrollEvent} from '../../services/events';
-import {getElevation} from '../../utils/utils';
+import {getElevation, h, w} from '../../utils/utils';
 import {Header} from '../header';
 import {Search} from '../SearchInput';
 import SelectionHeader from '../SelectionHeader';
+import {DDS} from '../../../App';
 export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(
   SafeAreaView,
 );
@@ -32,10 +33,19 @@ export const Container = ({
   bottomButtonText,
   noBottomButton = false,
   data = [],
+  heading,
+  canGoBack = true,
+  menu,
+  customIcon,
+  verticalMenu = false,
+  preventDefaultMargins,
+  navigation = null,
+  isLoginNavigator,
+  placeholder = '',
 }) => {
   // State
   const [state, dispatch] = useTracked();
-  const {colors, selectionMode, searchResults} = state;
+  const {colors, selectionMode, searchResults, loading} = state;
   const [text, setText] = useState('');
 
   const [hideHeader, setHideHeader] = useState(false);
@@ -160,18 +170,21 @@ export const Container = ({
             width: '100%',
           }}>
           <Header
-            menu
+            menu={menu}
             hide={hideHeader}
-            verticalMenu
+            verticalMenu={verticalMenu}
             showSearch={() => {
               setHideHeader(false);
               countUp = 0;
               countDown = 0;
             }}
+            navigation={navigation}
             colors={colors}
-            heading={'Home'}
-            canGoBack={false}
-            customIcon="menu"
+            isLoginNavigator={isLoginNavigator}
+            preventDefaultMargins={preventDefaultMargins}
+            heading={heading}
+            canGoBack={canGoBack}
+            customIcon={customIcon}
           />
 
           {data[0] ? (
@@ -180,7 +193,7 @@ export const Container = ({
               hide={hideHeader}
               onChangeText={onChangeText}
               onSubmitEditing={onSubmitEditing}
-              placeholder="Search your notes"
+              placeholder={placeholder}
               onBlur={onBlur}
               onFocus={onFocus}
               clearSearch={clearSearch}

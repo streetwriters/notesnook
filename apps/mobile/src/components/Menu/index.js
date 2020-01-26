@@ -192,6 +192,12 @@ export const Menu = ({
             position: 'absolute',
             zIndex: 999,
             backgroundColor: colors.bg,
+            display: 'flex',
+            transform: [
+              {
+                translateX: 0,
+              },
+            ],
           }}
         />
       )}

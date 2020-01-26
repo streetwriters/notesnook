@@ -72,7 +72,7 @@ export default class SideMenu extends React.Component {
     );
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.responder = PanResponder.create({
       onStartShouldSetResponderCapture: this.onStartShouldSetResponderCapture,
       onMoveShouldSetPanResponder: this.onMoveShouldSetPanResponder,

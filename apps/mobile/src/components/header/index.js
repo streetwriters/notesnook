@@ -10,7 +10,7 @@ import {eCloseLoginDialog} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
 import {SideMenuEvent} from '../../utils/utils';
 import {moveNoteHideEvent} from '../DialogManager';
-let isOpen = false;
+
 export const Header = ({
   heading,
   canGoBack = true,
@@ -18,7 +18,6 @@ export const Header = ({
   showSearch,
   menu,
   verticalMenu = false,
-  sendHeight = e => {},
   preventDefaultMargins,
   navigation = null,
   isLoginNavigator,

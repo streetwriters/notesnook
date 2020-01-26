@@ -10,6 +10,7 @@ import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
 import NavigationService from '../../services/NavigationService';
 import {SideMenuEvent} from '../../utils/utils';
+import SelectionHeader from '../../components/SelectionHeader';
 
 export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(
   SafeAreaView,
@@ -17,7 +18,7 @@ export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(
 
 export const Home = ({navigation}) => {
   const [state, dispatch] = useTracked();
-  const {notes} = state;
+  const {notes, colors, selectionMode, loading} = state;
 
   const isFocused = useIsFocused();
 
@@ -28,6 +29,12 @@ export const Home = ({navigation}) => {
   return (
     <Container
       bottomButtonText="Add a new note"
+      heading="Home"
+      customIcon="menu"
+      verticalMenu
+      menu
+      placeholder="Search your notes"
+      canGoBack={false}
       bottomButtonOnPress={() => {
         if (DDS.isTab) {
           eSendEvent(eOnLoadNote, {type: 'new'});
@@ -38,6 +45,8 @@ export const Home = ({navigation}) => {
         }
       }}
       data={notes ? notes : []}>
+      <SelectionHeader />
+
       <NotesList isGrouped={true} />
     </Container>
   );

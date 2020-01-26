@@ -70,10 +70,13 @@ const Editor = ({navigation, noMenu}) => {
           clearEditor();
         } else {
           note = item;
-          dispatch({
-            type: ACTIONS.CURRENT_EDITING_NOTE,
-            dateCreated: item.dateCreated,
-          });
+          if (DDS.isTab) {
+            dispatch({
+              type: ACTIONS.CURRENT_EDITING_NOTE,
+              dateCreated: item.dateCreated,
+            });
+          }
+
           updateEditor();
         }
       });
@@ -83,10 +86,12 @@ const Editor = ({navigation, noMenu}) => {
         clearEditor();
       } else {
         note = item;
-        dispatch({
-          type: ACTIONS.CURRENT_EDITING_NOTE,
-          dateCreated: item.dateCreated,
-        });
+        if (DDS.isTab) {
+          dispatch({
+            type: ACTIONS.CURRENT_EDITING_NOTE,
+            dateCreated: item.dateCreated,
+          });
+        }
         updateEditor();
       }
     }
@@ -167,7 +172,12 @@ const Editor = ({navigation, noMenu}) => {
 
     if (timestamp !== dateCreated) {
       timestamp = dateCreated;
-      dispatch({type: ACTIONS.CURRENT_EDITING_NOTE, dateCreated: timestamp});
+      if (DDS.isTab) {
+        dispatch({
+          type: ACTIONS.CURRENT_EDITING_NOTE,
+          dateCreated: timestamp,
+        });
+      }
     }
 
     if (content.text.length < 200 || saveCounter < 2) {
