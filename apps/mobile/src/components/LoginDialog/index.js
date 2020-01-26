@@ -9,7 +9,7 @@ import Login from '../../views/Login';
 import Signup from '../../views/Signup';
 import ForgotPassword from '../../views/ForgotPassword';
 import {DDS} from '../../../App';
-import {getElevation} from '../../utils/utils';
+import {getElevation, w} from '../../utils/utils';
 import {eSendEvent} from '../../services/eventManager';
 import {eLoginDialogNavigateBack} from '../../services/events';
 
@@ -147,8 +147,8 @@ class LoginDialog extends React.Component {
           <View
             style={{
               ...getElevation(DDS.isTab ? 10 : 0),
-              width: DDS.isTab ? '65%' : '100%',
-              height: DDS.isTab ? '90%' : '100%',
+              width: DDS.isTab ? 600 : '100%',
+              height: DDS.isTab ? 500 : '100%',
               borderRadius: DDS.isTab ? 5 : 0,
               backgroundColor: colors.bg,
               padding: 8,
