@@ -15,13 +15,16 @@ import {NotesPlaceHolder} from '../ListPlaceholders';
 import NoteItem from '../NoteItem';
 import SelectionWrapper from '../SelectionWrapper';
 
-export const NotesList = ({
-  isSearch = false,
-  isGrouped = false,
-  searchResults,
-}) => {
+export const NotesList = ({isGrouped = false}) => {
   const [state, dispatch] = useTracked();
-  const {colors, selectionMode, currentEditingNote, loading} = state;
+  const {
+    colors,
+    selectionMode,
+    currentEditingNote,
+    loading,
+    searchResults,
+    keyword,
+  } = state;
   const notes = [...state.notes];
 
   const _renderItem = ({item, index}) => (
@@ -165,7 +168,7 @@ export const NotesList = ({
 
   const _listKeyExtractor = (item, index) => item.dateCreated.toString();
 
-  return isGrouped && !isSearch ? (
+  return isGrouped && searchResults.length === 0 ? (
     <SectionList
       ref={ref => (sectionListRef = ref)}
       sections={notes}

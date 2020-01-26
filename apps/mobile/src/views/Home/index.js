@@ -16,18 +16,14 @@ export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(
 );
 
 export const Home = ({navigation}) => {
-  // State
   const [state, dispatch] = useTracked();
-  const {notes, searchResults, keyword} = state;
-  const isFocused = useIsFocused();
+  const {notes} = state;
 
-  // Effects
+  const isFocused = useIsFocused();
 
   useEffect(() => {
     dispatch({type: ACTIONS.NOTES});
   }, [isFocused]);
-
-  // Render
 
   return (
     <Container
@@ -41,13 +37,8 @@ export const Home = ({navigation}) => {
           NavigationService.navigate('Editor');
         }
       }}
-      data={notes}>
-      <NotesList
-        isGrouped={true}
-        isSearch={searchResults.length > 0 ? true : false}
-        searchResults={searchResults.length > 0 ? searchResults : null}
-        keyword={keyword}
-      />
+      data={notes ? notes : []}>
+      <NotesList isGrouped={true} />
     </Container>
   );
 };
