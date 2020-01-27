@@ -3,10 +3,17 @@ import {
   SettingsContainer,
   Favorites,
   Trash,
-  NotebooksContainer
+  NotebooksContainer,
+  SignIn
 } from "../../views";
 import * as Icon from "react-feather";
-import { createRoute, createNormalRoute, createColorRoute } from "../routes";
+import {
+  createRoute,
+  createNormalRoute,
+  createColorRoute,
+  createFeature,
+  createNightMode
+} from "../routes";
 import Navigator from "../index";
 
 const colorRoutes = {
@@ -27,7 +34,8 @@ const routes = {
   ...createNormalRoute("favorites", Favorites, Icon.Star),
   ...createNormalRoute("trash", Trash, Icon.Trash2),
   ...createRoute("settings", SettingsContainer, { icon: Icon.Settings }),
-  ...colorRoutes
+  ...colorRoutes,
+  ...createNormalRoute("sign-in", SignIn, Icon.LogIn) //applied in root naviga /to change later
 };
 
 const RootNavigator = new Navigator("RootNavigator", routes, {

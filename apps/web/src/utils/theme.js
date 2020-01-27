@@ -53,7 +53,8 @@ const theme = (colors, shadows) => ({
     title: 18,
     subtitle: 18,
     body: 14,
-    menu: 14
+    menu: 14,
+    subBody: 12
   },
   fontWeights: {
     body: 400,
@@ -166,6 +167,12 @@ const theme = (colors, shadows) => ({
       py: "15px",
       mx: "5px",
       "&:hover": { borderColor: "primary" }
+    },
+    links: {
+      bg: "transparent",
+      color: "primary",
+      fontSize: "subBody",
+      fontFamily: "body"
     }
   },
   shadows: shadows

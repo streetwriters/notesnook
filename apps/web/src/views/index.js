@@ -12,3 +12,4 @@ export const General = require("./General").default;
 export const About = require("./About").default;
 export const TOS = require("./TOS").default;
 export const PrivacyPolicy = require("./PrivacyPolicy").default;
+export const SignIn = require("./SignIn").default;

@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
-import { Flex, Box, Text, Button as RebassButton } from "rebass";
+import { Flex, Box, Text, Button as RebassButton, Button } from "rebass";
 import { Input, Checkbox, Label } from "@rebass/forms";
 import * as Icon from "react-feather";
 import { ThemeProvider } from "../../utils/theme";
 import { db } from "../../common";
 import Modal from "react-modal";
+import RootNavigator from "../../navigation/navigators/rootnavigator";
 
 const Dialog = props => {
   const [open, setOpen] = useState(false);
@@ -13,11 +14,14 @@ const Dialog = props => {
   useEffect(() => {
     setOpen(props.open);
   }, [props.open]);
+
   return (
     <ThemeProvider>
       {theme => (
         <Modal
           isOpen={open}
+          shouldCloseOnOverlayClick={true}
+          onRequestClose={props.closeCick}
           style={{
             content: {
               top: "50%",
@@ -50,8 +54,8 @@ const Dialog = props => {
               color="primary"
               py={2}
             >
-              <Box height={42}>
-                <props.icon size={42} />
+              <Box height={props.IconSize ? props.IconSize : 42}>
+                <props.icon size={props.IconSize ? props.IconSize : 42} />
               </Box>
               <Text
                 mx={2}
@@ -70,23 +74,28 @@ const Dialog = props => {
               justifyContent="center"
               alignItems="center"
             >
-              <RebassButton
-                variant="primary"
-                sx={{ opacity: props.positiveButton.disabled ? 0.7 : 1 }}
-                mx={1}
-                width={"25%"}
-                disabled={props.positiveButton.disabled || false}
-                onClick={props.positiveButton.click}
-              >
-                {props.positiveButton.text || "OK"}
-              </RebassButton>
-              <RebassButton
-                variant="secondary"
-                width={"25%"}
-                onClick={props.negativeButton.click}
-              >
-                {props.negativeButton.text || "Cancel"}
-              </RebassButton>
+              {props.positiveButton ? (
+                <RebassButton
+                  variant="primary"
+                  sx={{ opacity: props.positiveButton.disabled ? 0.7 : 1 }}
+                  mx={1}
+                  width={"25%"}
+                  disabled={props.positiveButton.disabled || false}
+                  onClick={props.positiveButton.click}
+                >
+                  {props.positiveButton.text || "OK"}
+                </RebassButton>
+              ) : null}
+
+              {props.negativeButton ? (
+                <RebassButton
+                  variant="secondary"
+                  width={"25%"}
+                  onClick={props.negativeButton.click}
+                >
+                  {props.negativeButton.text || "Cancel"}
+                </RebassButton>
+              ) : null}
             </Flex>
           </Flex>
         </Modal>
@@ -215,6 +224,66 @@ const ConfirmationDialog = props => (
     negativeButton={{ text: "No", click: props.onNo }}
   />
 );
+
+const SignInDialog = props => (
+  <Dialog
+    open={true}
+    title={props.title}
+    icon={props.icon}
+    IconSize={30}
+    closeCick={props.closeCick}
+    content={
+      <Box my={1}>
+        <Input
+          placeholder="Email"
+          my="10px"
+          sx={{ borderColor: "border" }}
+        ></Input>
+        <Input
+          placeholder="Password"
+          my="10px"
+          sx={{ borderColor: "border" }}
+        ></Input>
+        <Button width={1} my="10px">
+          Login
+        </Button>
+        <Flex flexDirection="row" justifyContent="space-between">
+          <Button variant="links">Create a New Account</Button>
+          <Button variant="links" alignItems="right">
+            Forgot password?
+          </Button>
+        </Flex>
+      </Box>
+    }
+  />
+);
+
+export const askSign = (icon, title, message) => {
+  const root = document.getElementById("dialogContainer");
+  const perform = (result, resolve) => {
+    Dialog.close();
+    ReactDOM.unmountComponentAtNode(root);
+    resolve(result);
+  };
+  if (root) {
+    return new Promise((resolve, _) => {
+      ReactDOM.render(
+        <SignInDialog
+          closeCick={() => {
+            perform(false, resolve);
+            RootNavigator.navigate("home");
+          }}
+          id="SignInDialog"
+          title={title}
+          message={message}
+          icon={icon}
+        />,
+        root
+      );
+    });
+  }
+  return Promise.reject("No element with id 'dialogContainer'");
+};
 
 export const ask = (icon, title, message) => {
   const root = document.getElementById("dialogContainer");
