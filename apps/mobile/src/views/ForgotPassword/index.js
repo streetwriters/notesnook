@@ -68,8 +68,8 @@ const renderForgotPassword = colors => {
     <View
       style={{
         justifyContent: DDS.isTab ? 'center' : 'space-between',
-        height: '80%',
-        width: DDS.isTab ? '60%' : '100%',
+        width: DDS.isTab ? '80%' : '100%',
+        width: DDS.isTab ? '80%' : '100%',
         alignSelf: 'center',
       }}>
       <View>

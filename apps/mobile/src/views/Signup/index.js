@@ -56,7 +56,7 @@ export const Signup = ({navigation}) => {
       <View
         style={{
           justifyContent: DDS.isTab ? 'center' : 'flex-start',
-          width: '100%',
+          width: DDS.isTab ? '80%' : '100%',
           height: DDS.isTab ? '80%' : '100%',
           alignSelf: 'center',
         }}>
