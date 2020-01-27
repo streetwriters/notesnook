@@ -193,7 +193,7 @@ export const Container = ({
             customIcon={customIcon}
           />
 
-          {data[0] || !noSearch ? (
+          {data[0] && !noSearch ? (
             <Search
               clear={() => setText('')}
               hide={hideHeader}
