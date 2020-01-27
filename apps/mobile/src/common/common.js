@@ -1,4 +1,4 @@
-import {StatusBar} from 'react-native';
+import {StatusBar, PixelRatio} from 'react-native';
 import FastStorage from 'react-native-fast-storage';
 import {
   eSendEvent,
@@ -63,14 +63,14 @@ export const COLOR_SCHEME_DARK = {
 //FONT SIZE
 
 export const SIZE = {
-  xxs: 10,
-  xs: 12,
-  sm: 15,
-  md: 18,
-  lg: 24,
-  xl: 28,
-  xxl: 32,
-  xxxl: 36,
+  xxs: PixelRatio.getFontScale() * 10,
+  xs: PixelRatio.getFontScale() * 12,
+  sm: PixelRatio.getFontScale() * 15,
+  md: PixelRatio.getFontScale() * 18,
+  lg: PixelRatio.getFontScale() * 24,
+  xl: PixelRatio.getFontScale() * 28,
+  xxl: PixelRatio.getFontScale() * 32,
+  xxxl: PixelRatio.getFontScale() * 36,
 };
 
 export const br = 5; // border radius
