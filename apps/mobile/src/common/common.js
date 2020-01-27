@@ -1,4 +1,4 @@
-import {StatusBar, PixelRatio} from 'react-native';
+import {Platform, StatusBar, Dimensions, PixelRatio} from 'react-native';
 import FastStorage from 'react-native-fast-storage';
 import {
   eSendEvent,
@@ -6,6 +6,10 @@ import {
   eUnSubscribeEvent,
 } from '../services/eventManager';
 import {eThemeUpdated} from '../services/events';
+import {DDS} from '../../App';
+
+const {height, width} = Dimensions.get('window');
+const standardLength = width > height ? width : height;
 
 //COLOR SCHEME
 export const ACCENT = {
@@ -56,26 +60,82 @@ export const COLOR_SCHEME_DARK = {
   ...fixedColors,
 };
 
-//FONT FAMILY
-//export const FONT = '';
-//export const FONT_BOLD = '';
+const windowSize = Dimensions.get('window');
+const adjustedWidth = windowSize.width * PixelRatio.get();
+const adjustedHeight = windowSize.height * PixelRatio.get();
+const pixelDensity = PixelRatio.get();
 
-//FONT SIZE
+const getDeviceSize = () => {
+  let dpi = getDpi(pixelDensity);
+  let deviceWidthInInches = adjustedWidth / dpi;
+  let deviceHeightInInches = adjustedHeight / dpi;
+  let diagonalSize = Math.sqrt(
+    Math.pow(deviceWidthInInches, 2) + Math.pow(deviceHeightInInches, 2),
+  );
+
+  return diagonalSize;
+};
+
+const getDpi = pd => {
+  if (pd === 1 || pd < 1) {
+    return 160 * pd;
+  } else if (pd > 1 && pd < 1.51) {
+    let multiplier = pd / 1.5;
+    return 240 * multiplier;
+  } else if (pd > 1.5 && pd < 2.01) {
+    let multiplier = pd / 1.5;
+    return 320 * multiplier;
+  } else if (pd > 2 && pd < 3) {
+    let multiplier = pd / 3;
+    return 430 * multiplier;
+  } else if (pd > 3) {
+    return 510;
+  }
+};
+
+export const normalize = size => {
+  let pd = pixelDensity;
+
+  if (pd === 1 || pd < 1) {
+    return correction(size, 0.75);
+  } else if (pd > 1 && pd < 1.51) {
+    return correction(size, 0.8);
+  } else if (pd > 1.5 && pd < 2.01) {
+    return correction(size, 0.84);
+  } else if (pd > 2 && pd < 3) {
+    return correction(size, 0.87);
+  } else if (pd > 3) {
+    return size;
+  }
+};
+
+const correction = (size, multiplier) => {
+  let dSize = getDeviceSize();
+  if (dSize <= 7.2) {
+    return size * multiplier;
+  } else if (dSize > 7.2 && dSize < 8.5) {
+    return size * (multiplier + 0.05);
+  } else if (dSize > 8.5 && dSize < 9.8) {
+    return size * (multiplier + 0.05);
+  } else if (dSize > 9.8) {
+    return size;
+  }
+};
 
 export const SIZE = {
-  xxs: PixelRatio.getFontScale() * 10,
-  xs: PixelRatio.getFontScale() * 12,
-  sm: PixelRatio.getFontScale() * 15,
-  md: PixelRatio.getFontScale() * 18,
-  lg: PixelRatio.getFontScale() * 24,
-  xl: PixelRatio.getFontScale() * 28,
-  xxl: PixelRatio.getFontScale() * 32,
-  xxxl: PixelRatio.getFontScale() * 36,
+  xxs: normalize(10),
+  xs: normalize(12),
+  sm: normalize(15),
+  md: normalize(18),
+  lg: normalize(24),
+  xl: normalize(28),
+  xxl: normalize(32),
+  xxxl: normalize(36),
 };
 
 export const br = 5; // border radius
-export const ph = 10; // padding horizontal
-export const pv = 10; // padding vertical
+export const ph = normalize(10); // padding horizontal
+export const pv = normalize(10); // padding vertical
 export const opacity = 0.5; // active opacity
 
 // GLOBAL FONT

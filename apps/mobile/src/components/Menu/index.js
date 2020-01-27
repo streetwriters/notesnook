@@ -20,6 +20,7 @@ import {
   setColorScheme,
   SIZE,
   WEIGHT,
+  normalize,
 } from '../../common/common';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
@@ -131,8 +132,7 @@ export const Menu = ({
         style={{
           minHeight: 2,
           width: '100%',
-
-          paddingHorizontal: 12,
+          paddingHorizontal: noTextMode ? 0 : 12,
           height: 50,
           marginBottom: 0,
           alignItems: 'center',
@@ -205,7 +205,7 @@ export const Menu = ({
       <ScrollView
         contentContainerStyle={{minHeight: '80%'}}
         style={{
-          paddingHorizontal: noTextMode ? 6 : 12,
+          paddingHorizontal: noTextMode ? 0 : 12,
         }}
         showsVerticalScrollIndicator={false}>
         <View>
@@ -225,8 +225,9 @@ export const Menu = ({
                   flexDirection: 'row',
                   justifyContent: noTextMode ? 'center' : 'space-between',
                   alignItems: 'center',
-                  paddingBottom: noTextMode ? 12 : 15,
-                  paddingTop: index === 0 ? 10 : noTextMode ? 12 : 15,
+                  paddingBottom: noTextMode ? pv + 2 : normalize(15),
+                  paddingTop:
+                    index === 0 ? pv : noTextMode ? pv + 2 : normalize(15),
                 }}>
                 <View
                   style={{
@@ -235,7 +236,7 @@ export const Menu = ({
                   }}>
                   <Icon
                     style={{
-                      minWidth: noTextMode ? 20 : 30,
+                      minWidth: noTextMode ? 5 : 30,
                     }}
                     name={item.icon}
                     color={colors.pri}
@@ -278,7 +279,7 @@ export const Menu = ({
               flexDirection: 'row',
               justifyContent: noTextMode ? 'center' : 'space-between',
               alignItems: 'flex-end',
-              marginTop: noTextMode ? 10 : 15,
+              marginTop: noTextMode ? pv : normalize(15),
             }}>
             <View
               style={{
@@ -288,7 +289,7 @@ export const Menu = ({
               }}>
               <Icon
                 style={{
-                  minWidth: noTextMode ? 20 : 30,
+                  minWidth: noTextMode ? 5 : 30,
                 }}
                 name="tag"
                 color={colors.pri}
@@ -356,8 +357,8 @@ export const Menu = ({
             style={{
               flexDirection: noTextMode ? 'column' : 'row',
               flexWrap: noTextMode ? 'nowrap' : 'wrap',
-              marginTop: 12,
-              marginBottom: 12,
+              marginTop: pv / 2,
+              marginBottom: pv / 2,
             }}>
             {['red', 'yellow', 'green', 'blue', 'purple', 'orange', 'gray'].map(
               item => (
@@ -369,12 +370,12 @@ export const Menu = ({
                     justifyContent: noTextMode ? 'center' : 'flex-start',
                     alignItems: 'center',
                     margin: noTextMode ? 0 : 5,
-                    marginTop: 12,
+                    marginTop: normalize(15),
                   }}>
                   <View
                     style={{
-                      width: noTextMode ? 20 : 30,
-                      height: noTextMode ? 20 : 30,
+                      width: noTextMode ? SIZE.md : normalize(30),
+                      height: noTextMode ? SIZE.md : normalize(30),
                       backgroundColor: item,
                       borderRadius: 100,
                     }}
@@ -421,10 +422,10 @@ export const Menu = ({
       <View
         style={{
           width: '100%',
-          justifyContent: 'space-between',
+          justifyContent: noTextMode ? 'center' : 'space-between',
           alignItems: 'center',
           alignSelf: 'center',
-          marginBottom: 20,
+          marginBottom: 15,
           flexDirection: 'row',
         }}>
         <TouchableOpacity
@@ -438,9 +439,9 @@ export const Menu = ({
           activeOpacity={opacity / 2}
           style={{
             paddingVertical: pv + 5,
-            paddingHorizontal: 12,
+            paddingHorizontal: noTextMode ? 0 : 12,
             width: '100%',
-            justifyContent: 'flex-start',
+            justifyContent: noTextMode ? 'center' : 'flex-start',
             alignItems: 'center',
             flexDirection: 'row',
           }}>

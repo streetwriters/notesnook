@@ -12,6 +12,7 @@ import {DDS} from '../../../App';
 import {getElevation, w} from '../../utils/utils';
 import {eSendEvent} from '../../services/eventManager';
 import {eLoginDialogNavigateBack} from '../../services/events';
+import {normalize} from '../../common/common';
 
 const fade = props => {
   const {position, scene} = props;
@@ -147,8 +148,8 @@ class LoginDialog extends React.Component {
           <View
             style={{
               ...getElevation(DDS.isTab ? 10 : 0),
-              width: DDS.isTab ? 600 : '100%',
-              height: DDS.isTab ? 500 : '100%',
+              width: DDS.isTab ? normalize(600) : '100%',
+              height: DDS.isTab ? normalize(500) : '100%',
               borderRadius: DDS.isTab ? 5 : 0,
               backgroundColor: colors.bg,
               padding: 8,
