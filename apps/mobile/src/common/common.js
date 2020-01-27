@@ -79,17 +79,37 @@ const getDeviceSize = () => {
 const getDpi = pd => {
   if (pd === 1 || pd < 1) {
     return 160 * pd;
-  } else if (pd > 1 && pd < 1.51) {
+  } else if (pd > 1 && pd <= 1.5) {
     let multiplier = pd / 1.5;
     return 240 * multiplier;
-  } else if (pd > 1.5 && pd < 2.01) {
+  } else if (pd > 1.5 && pd <= 2) {
     let multiplier = pd / 1.5;
     return 320 * multiplier;
-  } else if (pd > 2 && pd < 3) {
+  } else if (pd > 2 && pd <= 3) {
     let multiplier = pd / 3;
-    return 430 * multiplier;
+    return 480 * multiplier;
   } else if (pd > 3) {
     return 510;
+  }
+};
+
+const correction = (size, multiplier) => {
+  let dSize = getDeviceSize();
+
+  if (dSize > 4 && dSize <= 5.3 && pixelDensity <= 3) {
+    return size * 0.87;
+  } else if (dSize > 5.5 && dSize < 6.5 && pixelDensity <= 3) {
+    return size * 0.93;
+  } else if (dSize >= 6.5 && dSize <= 7.2) {
+    return size * multiplier;
+  } else if (dSize > 7.2 && dSize <= 8.5) {
+    return size * (multiplier + 0.05);
+  } else if (dSize > 8.5 && dSize <= 9.8) {
+    return size * (multiplier + 0.05);
+  } else if (dSize > 9.8) {
+    return size;
+  } else {
+    return size;
   }
 };
 
@@ -98,26 +118,13 @@ export const normalize = size => {
 
   if (pd === 1 || pd < 1) {
     return correction(size, 0.75);
-  } else if (pd > 1 && pd < 1.51) {
+  } else if (pd > 1 && pd <= 1.5) {
     return correction(size, 0.8);
-  } else if (pd > 1.5 && pd < 2.01) {
+  } else if (pd > 1.5 && pd <= 2) {
     return correction(size, 0.84);
-  } else if (pd > 2 && pd < 3) {
+  } else if (pd > 2 && pd <= 3) {
     return correction(size, 0.87);
   } else if (pd > 3) {
-    return size;
-  }
-};
-
-const correction = (size, multiplier) => {
-  let dSize = getDeviceSize();
-  if (dSize <= 7.2) {
-    return size * multiplier;
-  } else if (dSize > 7.2 && dSize < 8.5) {
-    return size * (multiplier + 0.05);
-  } else if (dSize > 8.5 && dSize < 9.8) {
-    return size * (multiplier + 0.05);
-  } else if (dSize > 9.8) {
     return size;
   }
 };

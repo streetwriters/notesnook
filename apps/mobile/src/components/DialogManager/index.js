@@ -356,7 +356,7 @@ export class DialogManager extends Component {
           extraScroll={DDS.isTab ? 50 : 0}
           indicatorColor={colors.shade}
           footerAlwaysVisible={DDS.isTab}
-          footerHeight={DDS.isTab ? 20 : 80}
+          footerHeight={DDS.isTab ? 20 : 10}
           footerStyle={
             DDS.isTab
               ? {

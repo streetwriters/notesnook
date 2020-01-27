@@ -318,7 +318,6 @@ export default class SideMenu extends React.Component {
 
   _getOverlayViewRef = data => {
     this.overlayViewRef = data.ref;
-    console.log(this.overlayViewRef);
   };
 
   render() {
