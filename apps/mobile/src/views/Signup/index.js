@@ -66,18 +66,20 @@ export const Signup = ({navigation}) => {
               textAlign: 'right',
               marginHorizontal: 12,
               fontFamily: WEIGHT.regular,
-              height: 25,
+
               textAlignVertical: 'bottom',
+
+              position: 'absolute',
+              right: 5,
+              top: 2.5,
             }}>
             {invalidUsername ? (
               <Icon
                 name="alert-circle"
-                size={SIZE.sm}
+                size={SIZE.xs}
                 color={colors.errorText}
               />
             ) : null}
-
-            {invalidUsername ? ' Username has invalid characters' : ''}
           </Text>
 
           <TextInput
@@ -139,182 +141,194 @@ export const Signup = ({navigation}) => {
               borderColor: colors.nav,
               marginHorizontal: 12,
               borderRadius: 5,
-              fontSize: SIZE.md,
+              fontSize: SIZE.sm,
               fontFamily: WEIGHT.regular,
             }}
             placeholder="Username (a-z _- 0-9)"
             placeholderTextColor={colors.icon}
           />
 
-          <Text
+          <View
             style={{
-              textAlign: 'right',
-              marginHorizontal: 12,
-              fontFamily: WEIGHT.regular,
-              height: 25,
-              textAlignVertical: 'bottom',
+              marginTop: 15,
             }}>
-            {invalidEmail ? (
-              <Icon
-                name="alert-circle"
-                size={SIZE.sm}
-                color={colors.errorText}
-              />
-            ) : null}
+            <Text
+              style={{
+                textAlign: 'right',
+                marginHorizontal: 12,
+                fontFamily: WEIGHT.regular,
 
-            {invalidEmail ? ' Email is invalid' : ''}
-          </Text>
+                textAlignVertical: 'bottom',
 
-          <TextInput
-            ref={_email}
-            onFocus={() => {
-              if (!invalidEmail) {
-                _email.current.setNativeProps({
-                  style: {
-                    borderColor: colors.accent,
-                  },
-                });
-              }
-            }}
-            defaultValue={email}
-            onBlur={() => {
-              if (!validateEmail(email)) {
-                setInvalidEmail(true);
-                _email.current.setNativeProps({
-                  style: {
-                    color: colors.errorText,
-                    borderColor: colors.errorText,
-                  },
-                });
-              } else {
-                _email.current.setNativeProps({
-                  style: {
-                    borderColor: colors.nav,
-                  },
-                });
-              }
-            }}
-            textContentType="emailAddress"
-            onChangeText={value => {
-              setEmail(value);
-              if (invalidEmail && validateEmail(email)) {
-                setInvalidEmail(false);
-                _email.current.setNativeProps({
-                  style: {
-                    color: colors.pri,
-                    borderColor: colors.accent,
-                  },
-                });
-              }
-            }}
-            onSubmitEditing={() => {
-              if (!validateEmail(email)) {
-                setInvalidEmail(true);
-                _email.current.setNativeProps({
-                  style: {
-                    color: colors.errorText,
-                  },
-                });
-              }
-            }}
+                position: 'absolute',
+                right: 5,
+                top: 2.5,
+              }}>
+              {invalidEmail ? (
+                <Icon
+                  name="alert-circle"
+                  size={SIZE.xs}
+                  color={colors.errorText}
+                />
+              ) : null}
+            </Text>
+
+            <TextInput
+              ref={_email}
+              onFocus={() => {
+                if (!invalidEmail) {
+                  _email.current.setNativeProps({
+                    style: {
+                      borderColor: colors.accent,
+                    },
+                  });
+                }
+              }}
+              defaultValue={email}
+              onBlur={() => {
+                if (!validateEmail(email)) {
+                  setInvalidEmail(true);
+                  _email.current.setNativeProps({
+                    style: {
+                      color: colors.errorText,
+                      borderColor: colors.errorText,
+                    },
+                  });
+                } else {
+                  _email.current.setNativeProps({
+                    style: {
+                      borderColor: colors.nav,
+                    },
+                  });
+                }
+              }}
+              textContentType="emailAddress"
+              onChangeText={value => {
+                setEmail(value);
+                if (invalidEmail && validateEmail(email)) {
+                  setInvalidEmail(false);
+                  _email.current.setNativeProps({
+                    style: {
+                      color: colors.pri,
+                      borderColor: colors.accent,
+                    },
+                  });
+                }
+              }}
+              onSubmitEditing={() => {
+                if (!validateEmail(email)) {
+                  setInvalidEmail(true);
+                  _email.current.setNativeProps({
+                    style: {
+                      color: colors.errorText,
+                    },
+                  });
+                }
+              }}
+              style={{
+                padding: pv,
+                borderWidth: 1.5,
+                borderColor: colors.nav,
+                marginHorizontal: 12,
+                borderRadius: 5,
+                fontSize: SIZE.sm,
+                fontFamily: WEIGHT.regular,
+              }}
+              placeholder="Email"
+              placeholderTextColor={colors.icon}
+            />
+          </View>
+
+          <View
             style={{
-              padding: pv,
-              borderWidth: 1.5,
-              borderColor: colors.nav,
-              marginHorizontal: 12,
-              borderRadius: 5,
-              fontSize: SIZE.md,
-              fontFamily: WEIGHT.regular,
-            }}
-            placeholder="Email"
-            placeholderTextColor={colors.icon}
-          />
-
-          <Text
-            style={{
-              textAlign: 'right',
-              marginHorizontal: 12,
-              fontFamily: WEIGHT.regular,
-              height: 25,
-              textAlignVertical: 'bottom',
+              marginTop: 15,
+              marginBottom: 15,
             }}>
-            {invalidPassword ? (
-              <Icon
-                name="alert-circle"
-                size={SIZE.sm}
-                color={colors.errorText}
-              />
-            ) : null}
+            <Text
+              style={{
+                textAlign: 'right',
+                marginHorizontal: 12,
+                fontFamily: WEIGHT.regular,
 
-            {invalidPassword ? ' Password too short' : ''}
-          </Text>
-          <TextInput
-            ref={_pass}
-            onFocus={() => {
-              if (!invalidPassword) {
-                _pass.current.setNativeProps({
-                  style: {
-                    borderColor: colors.accent,
-                  },
-                });
-              }
-            }}
-            defaultValue={password}
-            onBlur={() => {
-              if (!validatePass(password)) {
-                setInvalidPassword(true);
-                _pass.current.setNativeProps({
-                  style: {
-                    color: colors.errorText,
-                    borderColor: colors.errorText,
-                  },
-                });
-              } else {
-                _pass.current.setNativeProps({
-                  style: {
-                    borderColor: colors.nav,
-                  },
-                });
-              }
-            }}
-            onChangeText={value => {
-              setPassword(value);
+                textAlignVertical: 'bottom',
+                position: 'absolute',
+                right: 5,
+                top: 2.5,
+              }}>
+              {invalidPassword ? (
+                <Icon
+                  name="alert-circle"
+                  size={SIZE.xs}
+                  color={colors.errorText}
+                />
+              ) : null}
+            </Text>
+            <TextInput
+              ref={_pass}
+              onFocus={() => {
+                if (!invalidPassword) {
+                  _pass.current.setNativeProps({
+                    style: {
+                      borderColor: colors.accent,
+                    },
+                  });
+                }
+              }}
+              defaultValue={password}
+              onBlur={() => {
+                if (!validatePass(password)) {
+                  setInvalidPassword(true);
+                  _pass.current.setNativeProps({
+                    style: {
+                      color: colors.errorText,
+                      borderColor: colors.errorText,
+                    },
+                  });
+                } else {
+                  _pass.current.setNativeProps({
+                    style: {
+                      borderColor: colors.nav,
+                    },
+                  });
+                }
+              }}
+              onChangeText={value => {
+                setPassword(value);
 
-              if (invalidPassword && validatePass(password)) {
-                setInvalidPassword(false);
-                _pass.current.setNativeProps({
-                  style: {
-                    color: colors.pri,
-                    borderColor: colors.accent,
-                  },
-                });
-              }
-            }}
-            onSubmitEditing={() => {
-              if (!validatePass(password)) {
-                setInvalidPassword(true);
-                _pass.current.setNativeProps({
-                  style: {
-                    color: colors.errorText,
-                  },
-                });
-              }
-            }}
-            style={{
-              padding: pv,
-              borderWidth: 1.5,
-              borderColor: colors.nav,
-              marginHorizontal: 12,
-              borderRadius: 5,
-              fontSize: SIZE.md,
-              fontFamily: WEIGHT.regular,
-              marginBottom: 25,
-            }}
-            secureTextEntry={true}
-            placeholder="Password"
-            placeholderTextColor={colors.icon}
-          />
-
+                if (invalidPassword && validatePass(password)) {
+                  setInvalidPassword(false);
+                  _pass.current.setNativeProps({
+                    style: {
+                      color: colors.pri,
+                      borderColor: colors.accent,
+                    },
+                  });
+                }
+              }}
+              onSubmitEditing={() => {
+                if (!validatePass(password)) {
+                  setInvalidPassword(true);
+                  _pass.current.setNativeProps({
+                    style: {
+                      color: colors.errorText,
+                    },
+                  });
+                }
+              }}
+              style={{
+                padding: pv,
+                borderWidth: 1.5,
+                borderColor: colors.nav,
+                marginHorizontal: 12,
+                borderRadius: 5,
+                fontSize: SIZE.sm,
+                fontFamily: WEIGHT.regular,
+              }}
+              secureTextEntry={true}
+              placeholder="Password"
+              placeholderTextColor={colors.icon}
+            />
+          </View>
           <TouchableOpacity
             activeOpacity={opacity}
             style={{

@@ -180,7 +180,7 @@ const renderLogin = (colors, navigation) => {
             borderColor: colors.nav,
             marginHorizontal: 12,
             borderRadius: 5,
-            fontSize: SIZE.md,
+            fontSize: SIZE.sm,
             fontFamily: WEIGHT.regular,
           }}
           placeholder="Email"
@@ -268,8 +268,7 @@ const renderLogin = (colors, navigation) => {
               borderColor: colors.nav,
               marginHorizontal: 12,
               borderRadius: 5,
-              fontSize: SIZE.md,
-
+              fontSize: SIZE.sm,
               fontFamily: WEIGHT.regular,
             }}
             secureTextEntry={true}
