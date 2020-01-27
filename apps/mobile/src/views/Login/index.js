@@ -303,8 +303,8 @@ const renderLogin = (colors, navigation) => {
             style={{}}>
             <Text
               style={{
-                fontSize: SIZE.sm,
-                fontFamily: WEIGHT.bold,
+                fontSize: SIZE.sm - 1,
+                fontFamily: WEIGHT.regular,
                 color: colors.accent,
               }}>
               Create a New Account
@@ -318,7 +318,7 @@ const renderLogin = (colors, navigation) => {
             style={{}}>
             <Text
               style={{
-                fontSize: SIZE.sm,
+                fontSize: SIZE.sm - 1,
                 fontFamily: WEIGHT.regular,
                 color: colors.accent,
               }}>

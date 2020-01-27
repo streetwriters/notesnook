@@ -26,9 +26,7 @@ export const Header = ({
   const {colors} = state;
 
   return (
-    <Animatable.View
-      transition={['minHeight', 'marginBottom']}
-      duration={250}
+    <View
       style={{
         flexDirection: 'row',
         zIndex: 10,
@@ -185,6 +183,6 @@ export const Header = ({
           </TouchableOpacity>
         ) : null}
       </View>
-    </Animatable.View>
+    </View>
   );
 };

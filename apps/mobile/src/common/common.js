@@ -76,7 +76,7 @@ export const SIZE = {
 export const br = 5; // border radius
 export const ph = 10; // padding horizontal
 export const pv = 10; // padding vertical
-export const opacity = 0.85; // active opacity
+export const opacity = 0.5; // active opacity
 
 // GLOBAL FONT
 
