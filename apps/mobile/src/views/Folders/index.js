@@ -1,22 +1,19 @@
-import React, {useEffect, useState} from 'react';
-import {FlatList, Platform, Text, View, BackHandler} from 'react-native';
-import * as Animatable from 'react-native-animatable';
+import React, {useEffect} from 'react';
+import {BackHandler, FlatList, Platform, Text, View} from 'react-native';
 import {useIsFocused} from 'react-navigation-hooks';
+import {DDS} from '../../../App';
 import {SIZE, WEIGHT} from '../../common/common';
-import {AddNotebookDialog} from '../../components/AddNotebookDialog';
 import Container from '../../components/Container';
-import {Header} from '../../components/header';
+import {AddNotebookEvent} from '../../components/DialogManager';
 import {NotebookPlaceHolder} from '../../components/ListPlaceholders';
 import {NotebookItem} from '../../components/NotebookItem';
-import {Search} from '../../components/SearchInput';
-import SelectionHeader from '../../components/SelectionHeader';
 import SelectionWrapper from '../../components/SelectionWrapper';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
+import {eSendEvent} from '../../services/eventManager';
+import {eScrollEvent} from '../../services/events';
 import {slideLeft, slideRight} from '../../utils/animations';
 import {w} from '../../utils/utils';
-import {AddNotebookEvent} from '../../components/DialogManager';
-import {DDS} from '../../../App';
 
 export const Folders = ({navigation}) => {
   const [state, dispatch] = useTracked();
@@ -26,7 +23,6 @@ export const Folders = ({navigation}) => {
     pinned,
     notebooks,
     preventDefaultMargins,
-    selectedItemsList,
   } = state;
   let isFocused = useIsFocused();
   ///
@@ -58,70 +54,27 @@ export const Folders = ({navigation}) => {
     };
   }, [isFocused]);
 
-  const [addNotebook, setAddNotebook] = useState(false);
-  const [hideHeader, setHideHeader] = useState(false);
-
   const params = navigation.state.params;
-  let offsetY = 0;
-  let countUp = 0;
-  let countDown = 0;
 
   const onScroll = event => {
-    y = event.nativeEvent.contentOffset.y;
-    if (y < 30) setHideHeader(false);
-    //if (buttonHide) return;
-    if (y > offsetY) {
-      if (y - offsetY < 150 || countDown > 0) return;
-      countDown = 1;
-      countUp = 0;
-      setHideHeader(true);
-    } else {
-      if (offsetY - y < 150 || countUp > 0) return;
-      countDown = 0;
-      countUp = 1;
-      setHideHeader(false);
-    }
-    offsetY = y;
+    let y = event.nativeEvent.contentOffset.y;
+
+    eSendEvent(eScrollEvent, y);
   };
 
   return (
     <Container
       bottomButtonText="Add a new notebook"
+      menu={params.canGoBack ? false : true}
+      preventDefaultMargins={preventDefaultMargins}
+      heading={params.title}
+      canGoBack={params.canGoBack}
+      navigation={navigation}
+      placeholder="Search your notebook"
+      data={notebooks}
       bottomButtonOnPress={() => {
         AddNotebookEvent(null);
       }}>
-      <SelectionHeader />
-
-      <Animatable.View
-        transition={['backgroundColor', 'opacity', 'height']}
-        duration={300}
-        style={{
-          position: 'absolute',
-          backgroundColor: colors.bg,
-          height: selectionMode ? 0 : null,
-          opacity: selectionMode ? 0 : 1,
-          zIndex: 20,
-          width: '100%',
-        }}>
-        <Header
-          hide={hideHeader}
-          menu={params.canGoBack ? false : true}
-          preventDefaultMargins={preventDefaultMargins}
-          navigation={navigation}
-          showSearch={() => {
-            setHideHeader(false);
-            countUp = 0;
-            countDown = 0;
-          }}
-          colors={colors}
-          heading={params.title}
-          canGoBack={params.canGoBack}
-        />
-        {notebooks.length == 0 ? null : (
-          <Search placeholder="Search your notebook" hide={hideHeader} />
-        )}
-      </Animatable.View>
-
       <FlatList
         style={{
           width: '100%',

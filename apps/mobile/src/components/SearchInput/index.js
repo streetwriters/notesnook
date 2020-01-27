@@ -5,17 +5,16 @@ import Icon from 'react-native-vector-icons/Feather';
 import {DDS} from '../../../App';
 import {br, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
-import {w} from '../../utils/utils';
 export const Search = props => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
 
   const [focus, setFocus] = useState(false);
-
   const inputRef = createRef();
+
   return (
     <Animatable.View
-      transition={['marginTop', 'borderWidth', 'marginBottom', 'opacity']}
+      transition={['marginTop', 'opacity']}
       duration={200}
       style={{
         opacity: props.hide ? 0 : 1,

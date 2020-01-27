@@ -42,6 +42,8 @@ export const Container = ({
   navigation = null,
   isLoginNavigator,
   placeholder = '',
+  noSearch = false,
+  noSelectionHeader = false,
 }) => {
   // State
   const [state, dispatch] = useTracked();
@@ -58,14 +60,19 @@ export const Container = ({
 
   const onScroll = y => {
     if (searchResults.length > 0) return;
-    if (y < 30) setHideHeader(false);
+    if (y < 30) {
+      countUp = 1;
+      countDown = 0;
+      setHideHeader(false);
+    }
+
     if (y > offsetY) {
       if (y - offsetY < 150 || countDown > 0) return;
       countDown = 1;
       countUp = 0;
       setHideHeader(true);
     } else {
-      if (offsetY - y < 150 || countUp > 0) return;
+      if (offsetY - y < 50 || countUp > 0) return;
       countDown = 0;
       countUp = 1;
       setHideHeader(false);
@@ -147,7 +154,6 @@ export const Container = ({
       duration={300}
       style={{
         height: '100%',
-
         backgroundColor: colors.bg,
       }}>
       <KeyboardAvoidingView
@@ -156,7 +162,7 @@ export const Container = ({
         style={{
           height: '100%',
         }}>
-        <SelectionHeader />
+        {noSelectionHeader ? null : <SelectionHeader />}
 
         <Animatable.View
           transition={['backgroundColor', 'opacity', 'height']}
@@ -187,7 +193,7 @@ export const Container = ({
             customIcon={customIcon}
           />
 
-          {data[0] ? (
+          {data[0] || !noSearch ? (
             <Search
               clear={() => setText('')}
               hide={hideHeader}
@@ -215,7 +221,7 @@ export const Container = ({
               position: 'absolute',
               paddingHorizontal: 12,
               zIndex: 10,
-              bottom: 10,
+              bottom: 15,
               transform: [
                 {
                   translateY: buttonHide ? 200 : 0,

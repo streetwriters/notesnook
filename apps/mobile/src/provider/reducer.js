@@ -24,6 +24,14 @@ export const reducer = (state, action) => {
         notebooks: notebooks,
       };
     }
+    case ACTIONS.TRASH: {
+      let trash = [...db.getTrash()];
+
+      return {
+        ...state,
+        trash: trash,
+      };
+    }
     case ACTIONS.PINNED: {
       let pinned = [...db.getPinned()];
       return {

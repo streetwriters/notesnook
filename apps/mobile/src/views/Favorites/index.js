@@ -1,93 +1,38 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import {FlatList, Platform, Text, View} from 'react-native';
-import * as Animatable from 'react-native-animatable';
 import {SIZE, WEIGHT} from '../../common/common';
 import Container from '../../components/Container';
-import {Header} from '../../components/header';
 import {FavoritesPlaceHolder} from '../../components/ListPlaceholders';
 import {NotebookItem} from '../../components/NotebookItem';
 import NoteItem from '../../components/NoteItem';
-import {Search} from '../../components/SearchInput';
 import SelectionWrapper from '../../components/SelectionWrapper';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
+import {eSendEvent} from '../../services/eventManager';
+import {eScrollEvent} from '../../services/events';
 
 export const Favorites = ({navigation}) => {
-  // Global State
   const [state, dispatch] = useTracked();
   const {colors, selectionMode, favorites} = state;
-
-  // Local State
-  const [text, setText] = useState('');
-  const [hideHeader, setHideHeader] = useState(false);
-  const [buttonHide, setButtonHide] = useState(false);
-
-  // Variables
-
-  let offsetY = 0;
-  let countUp = 1;
-  let countDown = 0;
 
   useEffect(() => {
     dispatch({type: ACTIONS.FAVORITES});
   }, []);
 
-  // Functions
-
-  // Effects
   const onScroll = event => {
     let y = event.nativeEvent.contentOffset.y;
-    if (buttonHide) return;
-    if (y < 30) setHideHeader(false);
-    if (y > offsetY) {
-      if (y - offsetY < 150 || countDown > 0) return;
-      countDown = 1;
-      countUp = 0;
-      setHideHeader(true);
-    } else {
-      if (offsetY - y < 150 || countUp > 0) return;
-      countDown = 0;
-      countUp = 1;
-      setHideHeader(false);
-    }
-    offsetY = y;
+    eSendEvent(eScrollEvent, y);
   };
-  // Render
 
   return (
-    <Container noBottomButton={true}>
-      <Animatable.View
-        transition="backgroundColor"
-        duration={300}
-        style={{
-          position: 'absolute',
-          backgroundColor: colors.night ? colors.bg : colors.bg,
-          zIndex: 10,
-          width: '100%',
-        }}>
-        <Header
-          menu={true}
-          hide={hideHeader}
-          showSearch={() => {
-            setHideHeader(false);
-            countUp = 0;
-            countDown = 0;
-          }}
-          colors={colors}
-          heading="Favorites"
-          canGoBack={false}
-          customIcon="menu"
-        />
-        {favorites.length > 0 ? (
-          <Search
-            clear={() => setText('')}
-            hide={hideHeader}
-            placeholder="Search your notes"
-            value={text}
-          />
-        ) : null}
-      </Animatable.View>
-
+    <Container
+      menu={true}
+      heading="Favorites"
+      placeholder="Search your notes"
+      canGoBack={false}
+      customIcon="menu"
+      data={favorites}
+      noBottomButton={true}>
       <FlatList
         keyExtractor={item => item.dateCreated.toString()}
         style={{

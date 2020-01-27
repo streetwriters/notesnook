@@ -6,11 +6,9 @@ import {
   simpleDialogEvent,
   TEMPLATE_EMPTY_TRASH,
 } from '../../components/DialogManager';
-import {Header} from '../../components/header';
 import {TrashPlaceHolder} from '../../components/ListPlaceholders';
 import {NotebookItem} from '../../components/NotebookItem';
 import NoteItem from '../../components/NoteItem';
-import SelectionHeader from '../../components/SelectionHeader';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {w} from '../../utils/utils';
@@ -23,7 +21,7 @@ export const Trash = ({navigation}) => {
     dispatch({
       type: ACTIONS.TRASH,
     });
-  });
+  }, []);
 
   const _renderItem = ({item, index}) => (
     <SelectionWrapper item={item}>
@@ -71,7 +69,7 @@ export const Trash = ({navigation}) => {
     </SelectionWrapper>
   );
 
-  _ListEmptyComponent = (
+  const _ListEmptyComponent = (
     <View
       style={{
         height: '80%',
@@ -107,13 +105,19 @@ export const Trash = ({navigation}) => {
       bottomButtonOnPress={() => {
         simpleDialogEvent(TEMPLATE_EMPTY_TRASH);
       }}
+      noSearch={true}
+      heading="Trash"
+      canGoBack={false}
+      menu={true}
       bottomButtonText="Clear all trash">
-      <SelectionHeader />
-      {selectionMode ? null : (
-        <Header colors={colors} heading="Trash" canGoBack={false} menu={true} />
-      )}
-
       <FlatList
+        ListHeaderComponent={
+          <View
+            style={{
+              marginTop: Platform.OS == 'ios' ? 135 - 60 : 155 - 60,
+            }}
+          />
+        }
         keyExtractor={item => item.dateCreated.toString()}
         style={{
           width: '100%',
