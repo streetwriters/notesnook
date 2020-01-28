@@ -120,15 +120,23 @@ class Database {
     }
   }
 
-  async addNote(note) {
-    if (!note) return;
-    let timestamp = note.dateCreated || Date.now();
-    note = { ...this.notes[timestamp], ...note };
+  async addNote(_note) {
+    if (!_note || !_note.content) return;
+    let timestamp = _note.dateCreated || Date.now();
+    let note = { ...this.notes[timestamp], ..._note };
 
     if (
-      !note.title &&
+      !this.notes[timestamp] &&
+      (note.content.text.length <= 0 || !note.content.delta) &&
+      (!note.title || note.title.length <= 0)
+    ) {
+      return;
+    }
+
+    if (
+      (!note.title || note.title.length <= 0) &&
       !note.locked &&
-      (!note.content || !note.content.text || !note.content.delta) &&
+      note.content.text.length <= 0 &&
       this.notes[timestamp]
     ) {
       //delete the note
@@ -433,8 +441,10 @@ class Database {
 export default Database;
 
 async function deleteItems(items, key) {
-  if (!items || items.length <= 0 || !this[key] || this[key].length <= 0)
+  if (!items || items.length <= 0 || !this[key] || this[key].length <= 0) {
+    console.log(items, items.length);
     return false;
+  }
   for (let item of items) {
     if (!item) continue;
     if (this[key].hasOwnProperty(item.dateCreated)) {

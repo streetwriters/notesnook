@@ -273,28 +273,28 @@ test("delete topic from notebook", () =>
 
 test("delete note", () =>
   noteTest().then(async ({ db, timestamp }) => {
-    await db.deleteNotes([{ dateCreated: timestamp }]);
+    expect(await db.deleteNotes({ dateCreated: timestamp })).toBe(true);
     let note = db.getNote(timestamp);
     expect(note).toBeUndefined();
   }));
 
 test("delete notebook", () =>
   notebookTest().then(async ({ db, timestamp }) => {
-    await db.deleteNotebooks([{ dateCreated: timestamp }]);
+    expect(await db.deleteNotebooks({ dateCreated: timestamp })).toBe(true);
     let notebook = db.getNotebook(timestamp);
     expect(notebook).toBeUndefined();
   }));
 
 test("trash should not be empty", () =>
   notebookTest().then(async ({ db, timestamp }) => {
-    await db.deleteNotebooks([{ dateCreated: timestamp }]);
+    expect(await db.deleteNotebooks({ dateCreated: timestamp })).toBe(true);
     let trash = db.getTrash();
     expect(trash.length).toBeGreaterThan(0);
   }));
 
 test("restore an item from trash", () =>
   notebookTest().then(async ({ db, timestamp }) => {
-    await db.deleteNotebooks([{ dateCreated: timestamp }]);
+    expect(await db.deleteNotebooks({ dateCreated: timestamp })).toBe(true);
     let trash = db.getTrash();
     expect(trash.length).toBeGreaterThan(0);
     await db.restoreItem(timestamp);
@@ -304,7 +304,7 @@ test("restore an item from trash", () =>
 
 test("clear trash should clear the trash", () =>
   notebookTest().then(async ({ db, timestamp }) => {
-    await db.deleteNotebooks([{ dateCreated: timestamp }]);
+    expect(await db.deleteNotebooks({ dateCreated: timestamp })).toBe(true);
     let trash = db.getTrash();
     expect(trash.length).toBeGreaterThan(0);
     await db.clearTrash();
@@ -340,15 +340,9 @@ test("empty notebook should not be added", () =>
     expect(res).toBeUndefined();
   }));
 
-test("deletion of unknown item should return false", () =>
-  databaseTest().then(async db => {
-    let res = await db.deleteNotes(undefined);
-    expect(res).toBe(false);
-  }));
-
 test("deletion of invalid items should cause continue and return true", () =>
   databaseTest().then(async db => {
-    let res = await db.deleteNotes([null, null, "something"]);
+    let res = await db.deleteNotes(null, null, "something");
     expect(res).toBe(true);
   }));
 
