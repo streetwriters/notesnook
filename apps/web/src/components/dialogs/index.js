@@ -6,7 +6,6 @@ import * as Icon from "react-feather";
 import { ThemeProvider } from "../../utils/theme";
 import { db } from "../../common";
 import Modal from "react-modal";
-import RootNavigator from "../../navigation/navigators/rootnavigator";
 
 const Dialog = props => {
   const [open, setOpen] = useState(false);
@@ -54,8 +53,8 @@ const Dialog = props => {
               color="primary"
               py={2}
             >
-              <Box height={props.IconSize ? props.IconSize : 42}>
-                <props.icon size={props.IconSize ? props.IconSize : 42} />
+              <Box height={props.iconSize || 42}>
+                <props.icon size={props.iconSize || 42} />
               </Box>
               <Text
                 mx={2}
@@ -74,7 +73,7 @@ const Dialog = props => {
               justifyContent="center"
               alignItems="center"
             >
-              {props.positiveButton ? (
+              {props.positiveButton && (
                 <RebassButton
                   variant="primary"
                   sx={{ opacity: props.positiveButton.disabled ? 0.7 : 1 }}
@@ -85,9 +84,9 @@ const Dialog = props => {
                 >
                   {props.positiveButton.text || "OK"}
                 </RebassButton>
-              ) : null}
+              )}
 
-              {props.negativeButton ? (
+              {props.negativeButton && (
                 <RebassButton
                   variant="secondary"
                   width={"25%"}
@@ -95,7 +94,7 @@ const Dialog = props => {
                 >
                   {props.negativeButton.text || "Cancel"}
                 </RebassButton>
-              ) : null}
+              )}
             </Flex>
           </Flex>
         </Modal>
@@ -258,7 +257,7 @@ const SignInDialog = props => (
   />
 );
 
-export const askSign = (icon, title, message) => {
+export const showSignInDialog = (icon, title, message) => {
   const root = document.getElementById("dialogContainer");
   const perform = (result, resolve) => {
     Dialog.close();
@@ -271,7 +270,6 @@ export const askSign = (icon, title, message) => {
         <SignInDialog
           closeCick={() => {
             perform(false, resolve);
-            RootNavigator.navigate("home");
           }}
           id="SignInDialog"
           title={title}

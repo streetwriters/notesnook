@@ -3,22 +3,18 @@ import {
   SettingsContainer,
   Favorites,
   Trash,
-  NotebooksContainer,
-  SignIn
+  NotebooksContainer
 } from "../../views";
 import * as Icon from "react-feather";
 import {
   createRoute,
   createNormalRoute,
   createColorRoute,
-  createFeature,
-  createNightMode
+  createDeadRoute
 } from "../routes";
 import Navigator from "../index";
-import { navButton } from "../navbuttons";
-import { askSign } from "../../components/dialogs";
-import React from "react";
-import { changeTheme, isDarkTheme } from "../../utils/theme";
+import { showSignInDialog } from "../../components/dialogs";
+import { changeTheme } from "../../utils/theme";
 
 /*For color Search*/
 const colorRoutes = {
@@ -39,21 +35,13 @@ const routes = {
   ...createNormalRoute("favorites", Favorites, Icon.Star),
   ...createNormalRoute("trash", Trash, Icon.Trash2),
   ...createRoute("settings", SettingsContainer, { icon: Icon.Settings }),
-  ...navButton(
-    "nightmode",
-    () => {
-      changeTheme();
-    },
-    Icon.Moon
-  ),
+  ...createDeadRoute("nightmode", Icon.Moon, () => {
+    changeTheme();
+  }),
   ...colorRoutes,
-  ...navButton(
-    "signin",
-    () => {
-      askSign(Icon.LogIn, "Login", "");
-    },
-    Icon.LogIn
-  )
+  ...createDeadRoute("signin", Icon.LogIn, () => {
+    showSignInDialog(Icon.LogIn, "Login", "");
+  })
 };
 
 const RootNavigator = new Navigator("RootNavigator", routes, {

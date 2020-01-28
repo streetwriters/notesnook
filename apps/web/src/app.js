@@ -5,8 +5,6 @@ import { Flex, Box, Button } from "rebass";
 import { ThemeProvider } from "./utils/theme";
 import RootNavigator from "./navigation/navigators/rootnavigator";
 import "./app.css";
-import { askSign } from "./components/dialogs";
-import * as Icon from "react-feather";
 
 const NavMenuItem = props => {
   return (
@@ -31,33 +29,6 @@ const NavMenuItem = props => {
         fill={props.item.color || "transparent"}
       />
       {/*  <Text sx={{ fontSize: 15, marginLeft: 1 }}>{props.item.title}</Text> */}
-    </Button>
-  );
-};
-
-const NavButtonItem = props => {
-  return (
-    <Button
-      //onClick={() => askSign(Icon.LogIn, "Login", "")}
-      onClick={props.onclick}
-      variant="nav"
-      sx={{
-        width: "full",
-        borderRadius: "none",
-        color: "text",
-        textAlign: "center",
-        ":hover": {
-          backgroundColor: "shade"
-        }
-      }}
-      px={0}
-    >
-      <props.icon
-        size={25}
-        strokeWidth={2}
-        style={{ marginRight: 3 }}
-        fill={"transparent"}
-      />
     </Button>
   );
 };
@@ -88,23 +59,21 @@ function App() {
           }}
           px={0}
         >
-          {Object.values(RootNavigator.routes).map((item, index) =>
-            item.key ? (
-              <NavMenuItem
-                onSelected={async () => {
-                  if (RootNavigator.navigate(item.key)) {
-                    setSelectedIndex(index);
-                  }
-                }}
-                key={item.key}
-                item={item}
-                selected={selectedIndex === index}
-              />
-            ) : (
-              <NavButtonItem onclick={item.onclick} icon={item.icon} />
-              //console.log(item, index)
-            )
-          )}
+          {Object.values(RootNavigator.routes).map((item, index) => (
+            <NavMenuItem
+              onSelected={async () => {
+                if (item.onClick) {
+                  return item.onClick();
+                }
+                if (RootNavigator.navigate(item.key)) {
+                  setSelectedIndex(index);
+                }
+              }}
+              key={item.key}
+              item={item}
+              selected={selectedIndex === index}
+            />
+          ))}
         </Box>
         <Flex flex="1 1 auto" flexDirection="row" alignContent="stretch" px={0}>
           <Flex

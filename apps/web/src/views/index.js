@@ -9,7 +9,4 @@ export const Trash = require("./Trash").default;
 export const Account = require("./Account").default;
 export const SettingsContainer = require("./Settings").SettingsContainer;
 export const General = require("./General").default;
-export const About = require("./About").default;
 export const TOS = require("./TOS").default;
-export const PrivacyPolicy = require("./PrivacyPolicy").default;
-export const SignIn = require("./SignIn").default;
