@@ -39,6 +39,7 @@ function getNavigationViewWidth() {
 }
 function App() {
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [hideNavigationView, setHideNavigationView] = useState(false);
   useEffect(() => {
     RootNavigator.navigate("home");
   }, []);
@@ -65,6 +66,10 @@ function App() {
                 if (item.onClick) {
                   return item.onClick();
                 }
+                if (selectedIndex === index) {
+                  setHideNavigationView(!hideNavigationView);
+                  return;
+                }
                 if (RootNavigator.navigate(item.key)) {
                   setSelectedIndex(index);
                 }
@@ -78,6 +83,9 @@ function App() {
         <Flex flex="1 1 auto" flexDirection="row" alignContent="stretch" px={0}>
           <Flex
             className="RootNavigator"
+            style={{
+              display: hideNavigationView ? "none" : "flex"
+            }}
             sx={{
               borderRight: "1px solid",
               borderColor: "border",
@@ -89,35 +97,37 @@ function App() {
             flex="1 1 auto"
             //style={{ width: "362px" }}
           />
-          <Box
-            className="resize-handle"
-            bg="border"
-            sx={{
-              width: 5,
-              opacity: 0,
-              cursor: "col-resize"
-            }}
-            draggable={true}
-            onMouseDown={e => {
-              startX = e.clientX;
-              let view = document
-                .querySelector(".RootNavigator")
-                .getBoundingClientRect();
-              startWidth = parseInt(view.width, 10);
-            }}
-            onDrag={e => {
-              let view = document.querySelector(".RootNavigator");
-              view.style.width = `${startWidth + e.clientX - startX}px`;
-            }}
-            onDragEnd={e => {
-              let view = document.querySelector(".RootNavigator");
-              view.style.width = view.getBoundingClientRect().width;
-              window.localStorage.setItem(
-                "navigationViewWidth",
-                view.style.width
-              );
-            }}
-          />
+          {!hideNavigationView && (
+            <Box
+              className="resize-handle"
+              bg="border"
+              sx={{
+                width: 5,
+                opacity: 0,
+                cursor: "col-resize"
+              }}
+              draggable={true}
+              onMouseDown={e => {
+                startX = e.clientX;
+                let view = document
+                  .querySelector(".RootNavigator")
+                  .getBoundingClientRect();
+                startWidth = parseInt(view.width, 10);
+              }}
+              onDrag={e => {
+                let view = document.querySelector(".RootNavigator");
+                view.style.width = `${startWidth + e.clientX - startX}px`;
+              }}
+              onDragEnd={e => {
+                let view = document.querySelector(".RootNavigator");
+                view.style.width = view.getBoundingClientRect().width;
+                window.localStorage.setItem(
+                  "navigationViewWidth",
+                  view.style.width
+                );
+              }}
+            />
+          )}
           <Editor />
         </Flex>
         <Box id="dialogContainer" />

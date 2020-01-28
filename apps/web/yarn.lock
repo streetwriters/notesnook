@@ -6861,6 +6861,11 @@ node-fetch@^1.0.1:
     encoding "^0.1.11"
     is-stream "^1.0.1"
 
+node-fetch@^2.6.0:
+  version "2.6.0"
+  resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.0.tgz#e633456386d4aa55863f676a7ab0daa8fdecb0fd"
+  integrity sha512-8dG4H5ujfvFiqDmVu9fQ5bOHUC15JMjMY/Zumv26oOvvVJjM67KF8koCWIabKQ1GJIa9r2mMZscBq/TbdOcmNA==
+
 node-forge@0.9.0:
   version "0.9.0"
   resolved "https://registry.yarnpkg.com/node-forge/-/node-forge-0.9.0.tgz#d624050edbb44874adca12bb9a52ec63cb782579"
@@ -6991,9 +6996,10 @@ normalize-url@^3.0.0, normalize-url@^3.0.1:
 
 "notes-core@https://github.com/thecodrr/notes-core.git":
   version "0.3.0"
-  resolved "https://github.com/thecodrr/notes-core.git#5edc73b089e3b0fef585bf877f62feb4d49e2ff9"
+  resolved "https://github.com/thecodrr/notes-core.git#5093b6af27faa620c7dcb611c678041a4c024596"
   dependencies:
     fuzzysearch "^1.0.3"
+    node-fetch "^2.6.0"
     transfun "^1.0.2"
 
 npm-bundled@^1.0.1:
