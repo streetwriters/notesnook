@@ -15,7 +15,12 @@ import {
   createNightMode
 } from "../routes";
 import Navigator from "../index";
+import { navButton } from "../navbuttons";
+import { askSign } from "../../components/dialogs";
+import React from "react";
+import { changeTheme, isDarkTheme } from "../../utils/theme";
 
+/*For color Search*/
 const colorRoutes = {
   ...createColorRoute("red", "#ed2d37"),
   ...createColorRoute("orange", "#ec6e05"),
@@ -34,8 +39,21 @@ const routes = {
   ...createNormalRoute("favorites", Favorites, Icon.Star),
   ...createNormalRoute("trash", Trash, Icon.Trash2),
   ...createRoute("settings", SettingsContainer, { icon: Icon.Settings }),
+  ...navButton(
+    "nightmode",
+    () => {
+      changeTheme();
+    },
+    Icon.Moon
+  ),
   ...colorRoutes,
-  ...createNormalRoute("sign-in", SignIn, Icon.LogIn) //applied in root naviga /to change later
+  ...navButton(
+    "signin",
+    () => {
+      askSign(Icon.LogIn, "Login", "");
+    },
+    Icon.LogIn
+  )
 };
 
 const RootNavigator = new Navigator("RootNavigator", routes, {
