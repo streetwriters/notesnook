@@ -1,11 +1,13 @@
 import React, {useEffect, useState} from 'react';
 import {Text, TouchableOpacity} from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import {opacity, ph, SIZE, WEIGHT} from '../../common/common';
+import {opacity, ph, SIZE, WEIGHT, normalize, pv} from '../../common/common';
 import {useTracked} from '../../provider';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
 import {eHideToast, eShowToast} from '../../services/events';
 import {h, w} from '../../utils/utils';
+import Icon from 'react-native-vector-icons/Feather';
+import {DDS} from '../../../App';
 
 const AnimatedTouchableOpacity = Animatable.createAnimatableComponent(
   TouchableOpacity,
@@ -73,13 +75,10 @@ export const Toast = () => {
       style={{
         ...toastStyle,
         height: 60,
-        width: '90%',
-        marginHorizontal: w * 0.05,
-
+        width: DDS.isTab ? normalize(350) : w - 24,
+        marginHorizontal: 12,
         position: 'absolute',
-        bottom: h * 0.025,
-        fontFamily: WEIGHT.regular,
-        fontSize: SIZE.md,
+        bottom: 15,
         zIndex: 999,
         borderRadius: 5,
         paddingHorizontal: ph + 5,
@@ -98,9 +97,19 @@ export const Toast = () => {
           ...toastStyle,
           backgroundColor: 'transparent',
           fontFamily: WEIGHT.regular,
-          fontSize: SIZE.md,
+          fontSize: SIZE.sm,
         }}>
-        {message}
+        <Icon
+          name={
+            toastStyle.color === colors.errorText
+              ? 'alert-circle'
+              : 'check-circle'
+          }
+          color={toastStyle.color}
+          size={SIZE.sm}
+        />
+        {'  '}
+        Email address is invalid
       </Text>
 
       <TouchableOpacity activeOpacity={1}>
@@ -108,7 +117,7 @@ export const Toast = () => {
           style={{
             ...toastStyle,
             fontFamily: WEIGHT.bold,
-            fontSize: SIZE.md,
+            fontSize: SIZE.sm,
           }}>
           {data.actionText}
         </Text>
