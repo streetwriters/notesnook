@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import ReactDOM from "react-dom";
 import { Box, Flex, Heading, Text } from "rebass";
 import * as Icon from "react-feather";
