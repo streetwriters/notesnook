@@ -1,19 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 import * as Icon from "react-feather";
-import { Flex, Box, Text } from "rebass";
+import { Flex, Text } from "rebass";
 import { Input } from "@rebass/forms";
 import CheckBox from "../checkbox";
 import { PinIcon } from "../icons";
-
-const usePersistentState = (key, def) => {
-  const defState = JSON.parse(window.localStorage.getItem(key) || def);
-  const [k, setKey] = useState(defState);
-  const _setKey = s => {
-    setKey(s);
-    window.localStorage.setItem(key, s);
-  };
-  return [k, _setKey];
-};
+import { usePersistentState } from "../../utils/hooks";
 
 const Properties = props => {
   const [visible, setVisible] = usePersistentState("propertiesVisible", false);

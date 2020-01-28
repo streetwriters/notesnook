@@ -39,7 +39,7 @@ function getNavigationViewWidth() {
 }
 function App() {
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [hideNavigationView, setHideNavigationView] = useState(false);
+  const [show, setShow] = useState(false);
   useEffect(() => {
     RootNavigator.navigate("home");
   }, []);
@@ -67,7 +67,7 @@ function App() {
                   return item.onClick();
                 }
                 if (selectedIndex === index) {
-                  setHideNavigationView(!hideNavigationView);
+                  setShow(s => !s);
                   return;
                 }
                 if (RootNavigator.navigate(item.key)) {
@@ -84,7 +84,7 @@ function App() {
           <Flex
             className="RootNavigator"
             style={{
-              display: hideNavigationView ? "none" : "flex"
+              display: show ? "flex" : "none"
             }}
             sx={{
               borderRight: "1px solid",
@@ -97,7 +97,7 @@ function App() {
             flex="1 1 auto"
             //style={{ width: "362px" }}
           />
-          {!hideNavigationView && (
+          {show && (
             <Box
               className="resize-handle"
               bg="border"
