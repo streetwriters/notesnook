@@ -154,6 +154,7 @@ export class DialogManager extends Component {
         icon: '',
       },
       isPerm: false,
+      shareAfterUnlock: false,
     };
   }
 
@@ -318,6 +319,14 @@ export class DialogManager extends Component {
           this._showVaultDialog();
           break;
         }
+        case 'unlock_share': {
+          this.setState({
+            isPerm: false,
+            shareAfterUnlock: true,
+          });
+          this._showVaultDialog();
+          break;
+        }
         case 'notebook': {
           this.showAddNotebook({item: this.state.item});
           break;
@@ -340,6 +349,7 @@ export class DialogManager extends Component {
       isPerm,
       vaultDialog,
       unlock,
+      shareAfterUnlock,
     } = this.state;
     return (
       <>
@@ -404,6 +414,7 @@ export class DialogManager extends Component {
           colors={colors}
           note={item}
           perm={isPerm}
+          shareAfterUnlock={shareAfterUnlock}
           openedToUnlock={false}
           visible={vaultDialog}
         />

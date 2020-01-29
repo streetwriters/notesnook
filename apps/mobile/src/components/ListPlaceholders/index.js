@@ -2,7 +2,7 @@ import React from 'react';
 import {Text, View} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import Icon from 'react-native-vector-icons/Feather';
-import {SIZE, WEIGHT} from '../../common/common';
+import {SIZE, WEIGHT, normalize} from '../../common/common';
 import {
   deleteItems,
   opacity,
@@ -150,12 +150,12 @@ export const NotesPlaceHolder = ({colors, animation, right, top}) => {
           opacity: 0.5,
           elevation: 5,
           position: 'absolute',
-          left: -50,
-          top: -50,
+          left: -normalize(50),
+          top: -normalize(50),
         }}>
         <View
           style={{
-            width: 10,
+            width: normalize(10),
             height: '100%',
             opacity: 1,
             elevation: 1,
@@ -169,9 +169,9 @@ export const NotesPlaceHolder = ({colors, animation, right, top}) => {
           style={{
             backgroundColor: colors.nav,
             borderRadius: 5,
-            padding: 5,
-            paddingBottom: 10,
-            paddingLeft: 15,
+            padding: normalize(5),
+            paddingBottom: normalize(10),
+            paddingLeft: normalize(15),
           }}>
           <Text
             style={{
@@ -185,51 +185,51 @@ export const NotesPlaceHolder = ({colors, animation, right, top}) => {
           <View
             style={{
               width: '100%',
-              height: 8,
+              height: normalize(8),
               opacity: 0.5,
               borderRadius: 5,
               backgroundColor: colors.accent,
-              marginBottom: 8,
+              marginBottom: normalize(8),
             }}
           />
           <View
             style={{
               width: '100%',
-              height: 8,
+              height: normalize(8),
               opacity: 0.5,
               borderRadius: 5,
               backgroundColor: colors.accent,
-              marginBottom: 8,
+              marginBottom: normalize(8),
             }}
           />
           <View
             style={{
               width: '100%',
-              height: 8,
+              height: normalize(8),
               opacity: 0.5,
               borderRadius: 5,
               backgroundColor: colors.accent,
-              marginBottom: 8,
+              marginBottom: normalize(8),
             }}
           />
           <View
             style={{
               width: '100%',
-              height: 8,
+              height: normalize(8),
               opacity: 0.5,
               borderRadius: 5,
               backgroundColor: colors.accent,
-              marginBottom: 8,
+              marginBottom: normalize(8),
             }}
           />
           <View
             style={{
-              width: '70%',
-              height: 8,
+              width: '100%',
+              height: normalize(8),
               opacity: 0.5,
               borderRadius: 5,
               backgroundColor: colors.accent,
-              marginBottom: 8,
+              marginBottom: normalize(8),
             }}
           />
           <View
@@ -239,7 +239,7 @@ export const NotesPlaceHolder = ({colors, animation, right, top}) => {
             <View
               style={{
                 width: '15%',
-                height: 8,
+                height: normalize(8),
                 borderRadius: 5,
                 backgroundColor: colors.icon,
                 marginRight: '5%',
@@ -248,7 +248,7 @@ export const NotesPlaceHolder = ({colors, animation, right, top}) => {
             <View
               style={{
                 width: '15%',
-                height: 8,
+                height: normalize(8),
                 borderRadius: 5,
                 backgroundColor: colors.icon,
               }}
@@ -273,7 +273,7 @@ export const NotesPlaceHolder = ({colors, animation, right, top}) => {
         }}>
         <View
           style={{
-            width: 10,
+            width: normalize(10),
             height: '100%',
             opacity: 1,
             elevation: 1,
@@ -287,9 +287,9 @@ export const NotesPlaceHolder = ({colors, animation, right, top}) => {
           style={{
             backgroundColor: colors.nav,
             borderRadius: 5,
-            padding: 5,
-            paddingBottom: 10,
-            paddingLeft: 15,
+            padding: normalize(5),
+            paddingBottom: normalize(10),
+            paddingLeft: normalize(15),
           }}>
           <Text
             style={{
@@ -303,51 +303,51 @@ export const NotesPlaceHolder = ({colors, animation, right, top}) => {
           <View
             style={{
               width: '100%',
-              height: 8,
+              height: normalize(8),
               opacity: 0.5,
               borderRadius: 5,
               backgroundColor: colors.accent,
-              marginBottom: 8,
+              marginBottom: normalize(8),
             }}
           />
           <View
             style={{
               width: '100%',
-              height: 8,
+              height: normalize(8),
               opacity: 0.5,
               borderRadius: 5,
               backgroundColor: colors.accent,
-              marginBottom: 8,
+              marginBottom: normalize(8),
             }}
           />
           <View
             style={{
               width: '100%',
-              height: 8,
+              height: normalize(8),
               opacity: 0.5,
               borderRadius: 5,
               backgroundColor: colors.accent,
-              marginBottom: 8,
+              marginBottom: normalize(8),
             }}
           />
           <View
             style={{
               width: '100%',
-              height: 8,
+              height: normalize(8),
               opacity: 0.5,
               borderRadius: 5,
               backgroundColor: colors.accent,
-              marginBottom: 8,
+              marginBottom: normalize(8),
             }}
           />
           <View
             style={{
-              width: '70%',
-              height: 8,
+              width: '100%',
+              height: normalize(8),
               opacity: 0.5,
               borderRadius: 5,
               backgroundColor: colors.accent,
-              marginBottom: 8,
+              marginBottom: normalize(8),
             }}
           />
           <View
@@ -357,7 +357,7 @@ export const NotesPlaceHolder = ({colors, animation, right, top}) => {
             <View
               style={{
                 width: '15%',
-                height: 8,
+                height: normalize(8),
                 borderRadius: 5,
                 backgroundColor: colors.icon,
                 marginRight: '5%',
@@ -366,7 +366,7 @@ export const NotesPlaceHolder = ({colors, animation, right, top}) => {
             <View
               style={{
                 width: '15%',
-                height: 8,
+                height: normalize(8),
                 borderRadius: 5,
                 backgroundColor: colors.icon,
               }}

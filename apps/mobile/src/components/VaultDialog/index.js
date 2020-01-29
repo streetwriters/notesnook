@@ -23,12 +23,22 @@ export class VaultDialog extends Component {
       visible: true,
     });
   };
-  close = () => {
+  close = (share = false, item = null) => {
     this.setState(
       {
         visible: false,
       },
+
       () => {
+        if (share && note) {
+          let m = `${item.title}\n \n ${item.content.text}`;
+
+          Share.open({
+            title: 'Share note to',
+            failOnCancel: false,
+            message: m,
+          });
+        }
         updateEvent({type: this.props.note.type});
       },
     );
@@ -53,7 +63,7 @@ export class VaultDialog extends Component {
         });
       }
 
-      this.close();
+      this.close(this.props.shareAfterUnlock, item);
     } else {
       await db.lockNote(this.props.note.dateCreated, 'password');
       this.close();

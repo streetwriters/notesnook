@@ -24,6 +24,7 @@ import {
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {moveNoteEvent} from '../DialogManager';
+import Share from 'react-native-share';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
@@ -180,7 +181,18 @@ export const ActionSheetComponent = ({
       name: 'Share',
       icon: 'share-2',
       func: () => {
-        close();
+        if (note.locked) {
+          close('unlock_share');
+        } else {
+          close();
+          let m = `${note.title}\n \n ${note.content.text}`;
+
+          Share.open({
+            title: 'Share note to',
+            failOnCancel: false,
+            message: m,
+          });
+        }
       },
     },
     {
@@ -233,7 +245,7 @@ export const ActionSheetComponent = ({
     },
   ];
 
-  columnItemsData = [
+  const columnItemsData = [
     {
       name: 'Dark Mode',
       icon: 'moon',
