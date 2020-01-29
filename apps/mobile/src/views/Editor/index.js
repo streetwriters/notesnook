@@ -214,7 +214,7 @@ const Editor = ({navigation, noMenu}) => {
 
   const onWebViewLoad = () => {
     console.log('requesting focus');
-    EditorWebView.requestFocus();
+    //EditorWebView.requestFocus();
     if (noMenu) {
       post(
         JSON.stringify({
@@ -279,14 +279,13 @@ const Editor = ({navigation, noMenu}) => {
   };
 
   const params = 'platform=' + Platform.OS;
-
   const sourceUri =
     (Platform.OS === 'android' ? 'file:///android_asset/' : '') +
     'Web.bundle/loader.html';
   const injectedJS = `if (!window.location.search) {
-      var link = document.getElementById('progress-bar');
-      link.href = './site/index.html?${params}';
-      link.click();
+         var link = document.getElementById('progress-bar');
+          link.href = './site/index.html?${params}';
+          link.click();  
     }`;
 
   const _renderEditor = () => {
@@ -405,7 +404,7 @@ const Editor = ({navigation, noMenu}) => {
           ref={ref => (EditorWebView = ref)}
           onError={error => console.log(error)}
           onLoad={onWebViewLoad}
-          javaScriptEnabled
+          javaScriptEnabled={true}
           injectedJavaScript={Platform.OS === 'ios' ? injectedJS : null}
           onShouldStartLoadWithRequest={_onShouldStartLoadWithRequest}
           renderLoading={() => (
@@ -417,19 +416,20 @@ const Editor = ({navigation, noMenu}) => {
               }}
             />
           )}
-          cacheMode="LOAD_CACHE_ELSE_NETWORK"
+          cacheMode="LOAD_DEFAULT"
           cacheEnabled={true}
-          domStorageEnabled
+          domStorageEnabled={true}
           scrollEnabled={false}
           bounces={false}
           allowFileAccess={true}
           scalesPageToFit={true}
+          allowingReadAccessToURL={Platform.OS === 'android' ? true : null}
           allowFileAccessFromFileURLs={true}
           allowUniversalAccessFromFileURLs={true}
-          originWhitelist={'*'}
+          originWhitelist={['*']}
           source={
             Platform.OS === 'ios'
-              ? sourceUri
+              ? {uri: sourceUri}
               : {
                   uri: 'file:///android_asset/texteditor.html',
                   baseUrl: 'file:///android_asset/',

@@ -83,19 +83,22 @@ const getDpi = pd => {
     let multiplier = pd / 1.5;
     return 240 * multiplier;
   } else if (pd > 1.5 && pd <= 2) {
-    let multiplier = pd / 1.5;
+    let multiplier = pd / 2;
     return 320 * multiplier;
   } else if (pd > 2 && pd <= 3) {
     let multiplier = pd / 3;
     return 480 * multiplier;
-  } else if (pd > 3) {
-    return 510;
+  } else if (pd > 3 && pd <= 3.5) {
+    let multiplier = pd / 3.5;
+    return 520 * multiplier;
+  } else if (pd > 3.5) {
+    return 550;
   }
 };
 
 const correction = (size, multiplier) => {
   let dSize = getDeviceSize();
-
+  console.log(getDeviceSize());
   if (dSize > 4 && dSize <= 5.3 && pixelDensity <= 3) {
     return size * 0.87;
   } else if (dSize > 5.5 && dSize < 6.5 && pixelDensity <= 3) {
@@ -115,6 +118,7 @@ const correction = (size, multiplier) => {
 
 export const normalize = size => {
   let pd = pixelDensity;
+  console.log(pd);
 
   if (pd === 1 || pd < 1) {
     return correction(size, 0.75);
