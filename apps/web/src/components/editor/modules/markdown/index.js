@@ -64,6 +64,17 @@ class MarkdownShortcuts {
         }
       },
       {
+        name: "code-block",
+        pattern: /^`{3}(?:\s|\n)/g,
+        action: (text, selection) => {
+          // Need to defer this action https://github.com/quilljs/quill/issues/1134
+          setTimeout(() => {
+            this.quill.formatLine(selection.index, 1, "code-block", true);
+            this.quill.deleteText(selection.index - 4, 4);
+          }, 0);
+        }
+      },
+      {
         name: "bolditalic",
         pattern: /(?:\*|_){3}(.+?)(?:\*|_){3}/g,
         action: (text, selection, pattern, lineStart) => {
@@ -142,7 +153,7 @@ class MarkdownShortcuts {
           }, 0);
         }
       },
-      /* {
+      {
         name: "code",
         pattern: /(?:`)(.+?)(?:`)/g,
         action: (text, selection, pattern, lineStart) => {
@@ -161,7 +172,7 @@ class MarkdownShortcuts {
             this.quill.insertText(this.quill.getSelection(), " ");
           }, 0);
         }
-      }, */
+      },
       {
         name: "hr",
         pattern: /^([-*]\s?){3}/g,
