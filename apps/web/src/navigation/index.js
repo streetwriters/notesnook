@@ -58,12 +58,18 @@ export default class Navigator {
 
   goBack() {
     let route = this.history.pop();
-
     if (!route) {
       return false;
     }
     this.lastRoute = route;
     return this.renderRoute(route);
+  }
+
+  restore() {
+    if (!this.lastRoute) {
+      return false;
+    }
+    return this.renderRoute(this.lastRoute);
   }
 }
 

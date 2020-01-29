@@ -157,10 +157,9 @@ const SettingsContainer = props => {
   useEffect(() => {
     const SettingsNavigator = require("../navigation/navigators/settingnavigator")
       .default;
-    //HOTFIX
-    SettingsNavigator.history = [];
-    SettingsNavigator.lastRoute = undefined;
-    SettingsNavigator.navigate("settings");
+    if (!SettingsNavigator.restore()) {
+      SettingsNavigator.navigate("settings");
+    }
   }, []);
   return (
     <Flex

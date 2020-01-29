@@ -70,10 +70,9 @@ const NotebooksContainer = props => {
   useEffect(() => {
     const NotebookNavigator = require("../navigation/navigators/nbnavigator")
       .default;
-    //HOTFIX
-    NotebookNavigator.history = [];
-    NotebookNavigator.lastRoute = undefined;
-    NotebookNavigator.navigate("notebooks");
+    if (!NotebookNavigator.restore()) {
+      NotebookNavigator.navigate("notebooks");
+    }
   }, []);
   return (
     <Flex

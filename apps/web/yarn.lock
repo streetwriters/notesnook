@@ -8722,11 +8722,6 @@ react-simple-dropdown@^3.2.3:
     classnames "^2.1.2"
     prop-types "^15.5.8"
 
-react-tracked@^1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/react-tracked/-/react-tracked-1.0.2.tgz#a24690b4d7b013289239051c2ca1d389ff4d52fe"
-  integrity sha512-X5zvLOd0vRlzsNn6hSUrmVDE6inEEP5wOpBptTKKCLuX7UHmtPGi87qTIop9bUib8pF1qo3YQLU8T4T7m4hOBw==
-
 react-virtuoso@^0.12.3:
   version "0.12.3"
   resolved "https://registry.yarnpkg.com/react-virtuoso/-/react-virtuoso-0.12.3.tgz#9fcb32a8dc2ba7b282a3410825c2be85783f8717"
