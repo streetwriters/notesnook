@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import { Box, Flex, Heading, Text } from "rebass";
 import * as Icon from "react-feather";
 import { ThemeProvider } from "../utils/theme";
+import { ev } from "../common";
 
 export default class Navigator {
   constructor(root, routes, options = {}) {
@@ -83,11 +84,23 @@ const NavigationContainer = props => {
               onClick={props.backAction}
               height={38}
               color="fontPrimary"
-              sx={{ marginLeft: -10 /*correction */, marginRight: 2 }}
+              sx={{ marginLeft: -2 /*correction */, marginRight: 2 }}
             >
               <Icon.ChevronLeft size={38} />
             </Box>
           )}
+          <Box
+            onClick={() => ev.emit("openSideMenu")}
+            height={38}
+            color="fontPrimary"
+            sx={{
+              marginLeft: -5 /*correction */,
+              marginRight: 1,
+              display: ["block", "none", "none"]
+            }}
+          >
+            <Icon.Menu size={38} />
+          </Box>
           <Heading fontSize="heading">
             {props.route.title || props.route.params.title}
           </Heading>

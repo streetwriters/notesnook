@@ -15,10 +15,10 @@ const Properties = props => {
         position: "absolute",
         top: "50%",
         right: 0,
-        height: 60,
         color: "static",
         borderRadius: "100px 0px 0px 100px",
-        cursor: "pointer"
+        cursor: "pointer",
+        height: [0, 0, 60]
       }}
       alignItems="center"
       justifyContent="center"
@@ -31,7 +31,7 @@ const Properties = props => {
       sx={{
         borderLeft: "1px solid",
         borderColor: "border",
-        width: "20%"
+        width: [0, 0, "20%"]
       }}
       flexDirection="column"
       bg="shade"

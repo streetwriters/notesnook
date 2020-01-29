@@ -44,11 +44,11 @@ const shadowsLight = {
 };
 
 const theme = (colors, shadows) => ({
-  breakpoints: ["480px", "834px", "1200px"],
+  breakpoints: ["480px", "1000px", "1000px"],
   colors: colors,
   space: [0, 5, 10, 12, 15],
   fontSizes: {
-    heading: 36,
+    heading: 32,
     input: 16,
     title: 18,
     subtitle: 18,
