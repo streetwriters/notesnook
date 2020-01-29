@@ -11,20 +11,14 @@ export function createRoute(key, component, props = {}, params = {}) {
   };
 }
 
-export function createColorRoute(key, color) {
-  return createRoute(key, undefined, { icon: Icon.Circle, color });
+export function createColorRoute(key, color, props = {}) {
+  return createRoute(key, undefined, { icon: Icon.Circle, color, ...props });
 }
 
-export function createNormalRoute(key, component, icon) {
-  return createRoute(key, component, { title: component.name, icon });
+export function createNormalRoute(key, component, icon, props = {}) {
+  return createRoute(key, component, { title: component.name, icon, ...props });
 }
 
-export function createDeadRoute(key, icon, onClick) {
-  return createRoute(key, undefined, { icon, onClick, isDead: true });
-}
-
-export function makeBottomRoute(route) {
-  let key = Object.keys(route)[0];
-  route[key].bottom = true;
-  return route;
+export function createDeadRoute(key, icon, props = {}) {
+  return createRoute(key, undefined, { icon, ...props });
 }

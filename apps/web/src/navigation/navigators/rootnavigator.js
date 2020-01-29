@@ -10,12 +10,11 @@ import {
   createRoute,
   createNormalRoute,
   createColorRoute,
-  createDeadRoute,
-  makeBottomRoute
+  createDeadRoute
 } from "../routes";
 import Navigator from "../index";
 import { showSignInDialog } from "../../components/dialogs";
-import { changeTheme } from "../../utils/theme";
+import { changeTheme, isDarkTheme } from "../../utils/theme";
 
 /*For color Search*/
 const colorRoutes = {
@@ -29,19 +28,19 @@ const colorRoutes = {
 };
 
 const bottomRoutes = {
-  ...makeBottomRoute(
-    createDeadRoute("nightmode", Icon.Moon, () => {
-      changeTheme();
-    })
-  ),
-  ...makeBottomRoute(
-    createDeadRoute("signin", Icon.LogIn, () => {
-      showSignInDialog(Icon.LogIn, "Login", "");
-    })
-  ),
-  ...makeBottomRoute(
-    createRoute("settings", SettingsContainer, { icon: Icon.Settings })
-  )
+  ...createDeadRoute("nightmode", Icon.Moon, {
+    onClick: () => changeTheme(),
+    bottom: true,
+    isToggled: () => isDarkTheme()
+  }),
+  ...createDeadRoute("signin", Icon.LogIn, {
+    onClick: () => showSignInDialog(Icon.LogIn, "Login", ""),
+    bottom: true
+  }),
+  ...createRoute("settings", SettingsContainer, {
+    icon: Icon.Settings,
+    bottom: true
+  })
 };
 
 const routes = {
