@@ -54,6 +54,34 @@ const EditorSettings = ({navigation}) => {
             name={colors.night ? 'toggle-right' : 'toggle-left'}
           />
         </TouchableOpacity>
+        <TouchableOpacity
+          activeOpacity={opacity}
+          style={{
+            width: '100%',
+            marginHorizontal: 0,
+            paddingVertical: pv,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            borderBottomWidth: 1,
+            paddingBottom: pv + 5,
+            borderBottomColor: colors.nav,
+          }}>
+          <Text
+            style={{
+              fontSize: SIZE.md,
+              fontFamily: WEIGHT.regular,
+              textAlignVertical: 'center',
+              color: colors.pri,
+            }}>
+            Show keyboard on open
+          </Text>
+          <Icon
+            size={SIZE.xl}
+            color={colors.night ? colors.accent : colors.icon}
+            name={colors.night ? 'toggle-right' : 'toggle-left'}
+          />
+        </TouchableOpacity>
       </View>
     </Container>
   );

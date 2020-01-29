@@ -2,7 +2,7 @@ import React from 'react';
 import {Text, View} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import Icon from 'react-native-vector-icons/Feather';
-import {SIZE} from '../../common/common';
+import {SIZE, WEIGHT} from '../../common/common';
 import {
   deleteItems,
   opacity,
@@ -100,64 +100,281 @@ export const NotebookPlaceHolder = ({colors, animation}) => {
   );
 };
 
-export const NotesPlaceHolder = ({colors, animation}) => {
+export const NotesPlaceHolder = ({colors, animation, right, top}) => {
+  const slideRight = {
+    0: {
+      transform: [
+        {translateX: -2},
+        {
+          translateY: -2,
+        },
+      ],
+    },
+    0.5: {
+      transform: [
+        {translateX: 0},
+        {
+          translateY: 0,
+        },
+      ],
+    },
+    1: {
+      transform: [
+        {translateX: 2},
+        {
+          translateY: -2,
+        },
+      ],
+    },
+  };
+
   return (
-    <Animatable.View
-      animation={animation}
-      iterationCount="infinite"
-      duration={3000}
-      iterationDelay={0}
-      direction="alternate"
-      easing="ease-in"
-      useNativeDriver={true}
+    <View
       style={{
-        backgroundColor: colors.shade,
         width: '50%',
-        padding: 5,
-        borderRadius: 5,
-        marginBottom: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
       }}>
-      <View
+      <Animatable.View
+        animation={slideRight}
+        iterationCount="infinite"
+        duration={3000}
+        iterationDelay={0}
+        direction="alternate"
+        easing="ease-in"
+        useNativeDriver={true}
         style={{
-          width: '90%',
-          height: 10,
+          backgroundColor: colors.bg,
+          width: '100%',
           borderRadius: 5,
-          backgroundColor: colors.accent,
-          marginBottom: 8,
-        }}
-      />
-      <View
-        style={{
-          width: '70%',
-          height: 10,
-          borderRadius: 5,
-          backgroundColor: colors.accent,
-          marginBottom: 8,
-        }}
-      />
-      <View
-        style={{
-          flexDirection: 'row',
+          opacity: 0.5,
+          elevation: 5,
+          position: 'absolute',
+          left: -50,
+          top: -50,
         }}>
         <View
           style={{
-            width: '15%',
-            height: 8,
+            width: 10,
+            height: '100%',
+            opacity: 1,
+            elevation: 1,
             borderRadius: 5,
-            backgroundColor: colors.icon,
-            marginRight: '5%',
+            backgroundColor: colors.accent,
+            position: 'absolute',
+            left: 0,
           }}
         />
         <View
           style={{
-            width: '15%',
-            height: 8,
+            backgroundColor: colors.nav,
             borderRadius: 5,
-            backgroundColor: colors.icon,
+            padding: 5,
+            paddingBottom: 10,
+            paddingLeft: 15,
+          }}>
+          <Text
+            style={{
+              color: colors.accent,
+              fontFamily: WEIGHT.bold,
+              fontSize: SIZE.md,
+            }}>
+            Title
+          </Text>
+
+          <View
+            style={{
+              width: '100%',
+              height: 8,
+              opacity: 0.5,
+              borderRadius: 5,
+              backgroundColor: colors.accent,
+              marginBottom: 8,
+            }}
+          />
+          <View
+            style={{
+              width: '100%',
+              height: 8,
+              opacity: 0.5,
+              borderRadius: 5,
+              backgroundColor: colors.accent,
+              marginBottom: 8,
+            }}
+          />
+          <View
+            style={{
+              width: '100%',
+              height: 8,
+              opacity: 0.5,
+              borderRadius: 5,
+              backgroundColor: colors.accent,
+              marginBottom: 8,
+            }}
+          />
+          <View
+            style={{
+              width: '100%',
+              height: 8,
+              opacity: 0.5,
+              borderRadius: 5,
+              backgroundColor: colors.accent,
+              marginBottom: 8,
+            }}
+          />
+          <View
+            style={{
+              width: '70%',
+              height: 8,
+              opacity: 0.5,
+              borderRadius: 5,
+              backgroundColor: colors.accent,
+              marginBottom: 8,
+            }}
+          />
+          <View
+            style={{
+              flexDirection: 'row',
+            }}>
+            <View
+              style={{
+                width: '15%',
+                height: 8,
+                borderRadius: 5,
+                backgroundColor: colors.icon,
+                marginRight: '5%',
+              }}
+            />
+            <View
+              style={{
+                width: '15%',
+                height: 8,
+                borderRadius: 5,
+                backgroundColor: colors.icon,
+              }}
+            />
+          </View>
+        </View>
+      </Animatable.View>
+
+      <Animatable.View
+        animation={slideRight}
+        iterationCount="infinite"
+        duration={3000}
+        iterationDelay={0}
+        direction="alternate"
+        easing="ease-in"
+        useNativeDriver={true}
+        style={{
+          backgroundColor: colors.bg,
+          width: '100%',
+          borderRadius: 5,
+          elevation: 10,
+        }}>
+        <View
+          style={{
+            width: 10,
+            height: '100%',
+            opacity: 1,
+            elevation: 1,
+            borderRadius: 5,
+            backgroundColor: colors.accent,
+            position: 'absolute',
+            left: 0,
           }}
         />
-      </View>
-    </Animatable.View>
+        <View
+          style={{
+            backgroundColor: colors.nav,
+            borderRadius: 5,
+            padding: 5,
+            paddingBottom: 10,
+            paddingLeft: 15,
+          }}>
+          <Text
+            style={{
+              color: colors.accent,
+              fontFamily: WEIGHT.bold,
+              fontSize: SIZE.md,
+            }}>
+            Title
+          </Text>
+
+          <View
+            style={{
+              width: '100%',
+              height: 8,
+              opacity: 0.5,
+              borderRadius: 5,
+              backgroundColor: colors.accent,
+              marginBottom: 8,
+            }}
+          />
+          <View
+            style={{
+              width: '100%',
+              height: 8,
+              opacity: 0.5,
+              borderRadius: 5,
+              backgroundColor: colors.accent,
+              marginBottom: 8,
+            }}
+          />
+          <View
+            style={{
+              width: '100%',
+              height: 8,
+              opacity: 0.5,
+              borderRadius: 5,
+              backgroundColor: colors.accent,
+              marginBottom: 8,
+            }}
+          />
+          <View
+            style={{
+              width: '100%',
+              height: 8,
+              opacity: 0.5,
+              borderRadius: 5,
+              backgroundColor: colors.accent,
+              marginBottom: 8,
+            }}
+          />
+          <View
+            style={{
+              width: '70%',
+              height: 8,
+              opacity: 0.5,
+              borderRadius: 5,
+              backgroundColor: colors.accent,
+              marginBottom: 8,
+            }}
+          />
+          <View
+            style={{
+              flexDirection: 'row',
+            }}>
+            <View
+              style={{
+                width: '15%',
+                height: 8,
+                borderRadius: 5,
+                backgroundColor: colors.icon,
+                marginRight: '5%',
+              }}
+            />
+            <View
+              style={{
+                width: '15%',
+                height: 8,
+                borderRadius: 5,
+                backgroundColor: colors.icon,
+              }}
+            />
+          </View>
+        </View>
+      </Animatable.View>
+    </View>
   );
 };
 

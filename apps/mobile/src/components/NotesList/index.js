@@ -113,9 +113,7 @@ export const NotesList = ({isGrouped = false}) => {
         <ActivityIndicator size={SIZE.xl} color={colors.accent} />
       ) : (
         <>
-          <NotesPlaceHolder animation={slideRight} colors={colors} />
-          <NotesPlaceHolder animation={slideLeft} colors={colors} />
-          <NotesPlaceHolder animation={slideRight} colors={colors} />
+          <NotesPlaceHolder colors={colors} />
           <Text
             style={{
               color: colors.icon,

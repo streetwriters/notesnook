@@ -88,9 +88,7 @@ export const Settings = ({navigation}) => {
               borderBottomColor: colors.nav,
               width: item.step ? '85%' : w - 24,
               marginHorizontal: 12,
-
               paddingVertical: pv + 5,
-
               marginLeft: item.step ? '10%' : 12,
             }}>
             <Text
