@@ -50,8 +50,8 @@ export const ActionSheetComponent = ({
           favorite: false,
           locked: false,
           content: {
-            text: '',
-            delta: {},
+            text: null,
+            delta: null,
           },
           dateCreated: null,
         },
@@ -419,7 +419,8 @@ export const ActionSheetComponent = ({
     ) : null;
 
   const _renderColumnItem = item =>
-    columnItems.includes(item.name) ? (
+    (note.dateCreated && columnItems.includes(item.name)) ||
+    item.name === 'Dark Mode' ? (
       <TouchableOpacity
         key={item.name}
         activeOpacity={opacity}
@@ -497,20 +498,35 @@ export const ActionSheetComponent = ({
         width: '100%',
         paddingHorizontal: 0,
       }}>
-      <View
-        style={{
-          width: '100%',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          paddingVertical: 10,
-          flexDirection: 'row',
-          borderBottomWidth: 1,
-          borderBottomColor: colors.nav,
-        }}>
-        {rowItemsData.map(_renderRowItem)}
-      </View>
+      {!note.dateCreated ? (
+        <Text
+          style={{
+            width: '100%',
+            textAlign: 'center',
+            marginVertical: 10,
+            color: colors.icon,
+            fontFamily: WEIGHT.regular,
+          }}>
+          Please start writing to save your note.
+        </Text>
+      ) : null}
 
-      {hasColors ? (
+      {note.dateCreated ? (
+        <View
+          style={{
+            width: '100%',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            paddingVertical: 10,
+            flexDirection: 'row',
+            borderBottomWidth: 1,
+            borderBottomColor: colors.nav,
+          }}>
+          {rowItemsData.map(_renderRowItem)}
+        </View>
+      ) : null}
+
+      {hasColors && note.dateCreated ? (
         <View
           style={{
             flexDirection: 'row',
@@ -527,7 +543,7 @@ export const ActionSheetComponent = ({
         </View>
       ) : null}
 
-      {hasTags ? (
+      {hasTags && note.dateCreated ? (
         <View
           style={{
             flexDirection: 'row',

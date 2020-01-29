@@ -450,9 +450,14 @@ const Editor = ({navigation, noMenu}) => {
 
   useEffect(() => {
     let handleBack;
-    if (!noMenu) {
+    if (!noMenu && DDS.isTab) {
       handleBack = BackHandler.addEventListener('hardwareBackPress', () => {
         simpleDialogEvent(TEMPLATE_EXIT_FULLSCREEN());
+        return true;
+      });
+    } else if (noMenu && !DDS.isTab) {
+      handleBack = BackHandler.addEventListener('hardwareBackPress', () => {
+        simpleDialogEvent(TEMPLATE_EXIT());
         return true;
       });
     } else {
@@ -469,6 +474,7 @@ const Editor = ({navigation, noMenu}) => {
       }
       title = null;
       content = null;
+      timestamp = null;
       timer = null;
     };
   }, [noMenu]);
