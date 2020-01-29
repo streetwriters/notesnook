@@ -5,6 +5,7 @@ import { Flex, Box, Button } from "rebass";
 import { ThemeProvider } from "./utils/theme";
 import RootNavigator from "./navigation/navigators/rootnavigator";
 import "./app.css";
+import { usePersistentState } from "./utils/hooks";
 
 const NavMenuItem = props => {
   return (
@@ -38,10 +39,13 @@ function getNavigationViewWidth() {
   return window.localStorage.getItem("navigationViewWidth");
 }
 function App() {
-  const [selectedIndex, setSelectedIndex] = useState(0);
-  const [show, setShow] = useState(false);
+  const [selectedIndex, setSelectedIndex] = usePersistentState(
+    "navSelectedIndex",
+    0
+  );
+  const [show, setShow] = usePersistentState("navContainerState", true);
   useEffect(() => {
-    RootNavigator.navigate("home");
+    RootNavigator.navigate(Object.keys(RootNavigator.routes)[selectedIndex]);
   }, []);
   return (
     <ThemeProvider>
@@ -67,7 +71,7 @@ function App() {
                   return item.onClick();
                 }
                 if (selectedIndex === index) {
-                  setShow(s => !s);
+                  setShow(!show);
                   return;
                 }
                 if (RootNavigator.navigate(item.key)) {
