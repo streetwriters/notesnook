@@ -37,6 +37,7 @@ const modules = {
     ["link", "image", "video"],
     [{ direction: "rtl" }, "clean"]
   ],
+  syntax: true,
   markdownShortcuts: {},
   magicUrl: true
 };
