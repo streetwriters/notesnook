@@ -10,7 +10,8 @@ import {
   createRoute,
   createNormalRoute,
   createColorRoute,
-  createDeadRoute
+  createDeadRoute,
+  makeBottomRoute
 } from "../routes";
 import Navigator from "../index";
 import { showSignInDialog } from "../../components/dialogs";
@@ -27,6 +28,22 @@ const colorRoutes = {
   ...createColorRoute("gray", "gray")
 };
 
+const bottomRoutes = {
+  ...makeBottomRoute(
+    createDeadRoute("nightmode", Icon.Moon, () => {
+      changeTheme();
+    })
+  ),
+  ...makeBottomRoute(
+    createDeadRoute("signin", Icon.LogIn, () => {
+      showSignInDialog(Icon.LogIn, "Login", "");
+    })
+  ),
+  ...makeBottomRoute(
+    createRoute("settings", SettingsContainer, { icon: Icon.Settings })
+  )
+};
+
 const routes = {
   ...createNormalRoute("home", Home, Icon.Home),
   ...createRoute("notebooks", NotebooksContainer, {
@@ -34,14 +51,8 @@ const routes = {
   }),
   ...createNormalRoute("favorites", Favorites, Icon.Star),
   ...createNormalRoute("trash", Trash, Icon.Trash2),
-  ...createRoute("settings", SettingsContainer, { icon: Icon.Settings }),
-  ...createDeadRoute("nightmode", Icon.Moon, () => {
-    changeTheme();
-  }),
   ...colorRoutes,
-  ...createDeadRoute("signin", Icon.LogIn, () => {
-    showSignInDialog(Icon.LogIn, "Login", "");
-  })
+  ...bottomRoutes
 };
 
 const RootNavigator = new Navigator("RootNavigator", routes, {

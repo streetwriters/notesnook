@@ -16,8 +16,6 @@ const NavMenuItem = props => {
       sx={{
         width: "full",
         borderRadius: "none",
-        borderLeft: props.selected && "3px solid",
-        borderColor: "primary",
         textAlign: "center",
         color: props.selected ? "primary" : props.item.color || "text",
         transition: "color 100ms linear",
@@ -82,39 +80,70 @@ function App() {
         height="100%"
         alignContent="stretch"
       >
-        <Box
+        <Flex
+          flexDirection="column"
+          justifyContent="space-between"
           sx={{
             zIndex: 999,
             borderRight: "1px solid",
             borderRightColor: "primary",
             minWidth: ["85%", 60, 60],
             maxWidth: ["85%", 60, 60],
-            display: [sideMenuOpen ? "block" : "none", "block", "block"],
+            display: [sideMenuOpen ? "flex" : "none", "flex", "flex"],
             position: ["absolute", "relative", "relative"]
           }}
           bg={"shade"}
           px={0}
         >
-          {Object.values(RootNavigator.routes).map((item, index) => (
-            <NavMenuItem
-              onSelected={async () => {
-                if (item.onClick) {
-                  return item.onClick();
-                }
-                if (selectedIndex === index) {
-                  setShow(!show);
-                  return;
-                }
-                if (RootNavigator.navigate(item.key)) {
-                  setSelectedIndex(index);
-                }
-              }}
-              key={item.key}
-              item={item}
-              selected={selectedIndex === index}
-            />
-          ))}
-        </Box>
+          <Box>
+            {Object.values(RootNavigator.routes).map(
+              (item, index) =>
+                !item.bottom && (
+                  <NavMenuItem
+                    onSelected={async () => {
+                      if (item.onClick) {
+                        return item.onClick();
+                      }
+                      if (selectedIndex === index) {
+                        setShow(!show);
+                        return;
+                      }
+                      if (RootNavigator.navigate(item.key)) {
+                        setSelectedIndex(index);
+                      }
+                    }}
+                    key={item.key}
+                    item={item}
+                    selected={selectedIndex === index}
+                  />
+                )
+            )}
+          </Box>
+          <Box>
+            {Object.values(RootNavigator.routes).map(
+              (item, index) =>
+                item.bottom && (
+                  <NavMenuItem
+                    onSelected={async () => {
+                      if (item.onClick) {
+                        return item.onClick();
+                      }
+                      if (selectedIndex === index) {
+                        setShow(!show);
+                        return;
+                      }
+                      if (RootNavigator.navigate(item.key)) {
+                        setSelectedIndex(index);
+                      }
+                    }}
+                    key={item.key}
+                    item={item}
+                    selected={selectedIndex === index}
+                  />
+                )
+            )}
+          </Box>
+        </Flex>
         <Flex flex="1 1 auto" flexDirection="row" alignContent="stretch" px={0}>
           <Flex
             className="RootNavigator"
