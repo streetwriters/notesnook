@@ -21,6 +21,8 @@ import Settings from '../views/Settings';
 import Signup from '../views/Signup';
 import Tags from '../views/Tags';
 import Trash from '../views/Trash';
+import AppearanceSettings from '../views/AppearanceSettings';
+import EditorSettings from '../views/EditorSettings';
 
 const fade = props => {
   const {position, scene} = props;
@@ -94,9 +96,14 @@ const TopLevelNavigator = createStackNavigator(
     Notebook: {
       screen: Notebook,
     },
-
     AccountSettings: {
       screen: AccountSettings,
+    },
+    AppearanceSettings: {
+      screen: AppearanceSettings,
+    },
+    EditorSettings: {
+      screen: EditorSettings,
     },
   },
   {

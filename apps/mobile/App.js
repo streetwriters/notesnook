@@ -31,7 +31,6 @@ import Editor from './src/views/Editor';
 export const DDS = new DeviceDetectionService();
 export const db = new Storage(StorageInterface);
 
-let overlayViewRef;
 let sideMenuRef;
 let editorRef;
 let outColors;
