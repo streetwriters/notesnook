@@ -10,6 +10,7 @@ import {
   months,
   getLastWeekTimestamp
 } from "../utils/date";
+import setManipulator from "../utils/set";
 
 const KEYS = {
   notes: "notes",
@@ -17,6 +18,10 @@ const KEYS = {
   trash: "trash",
   tags: "tags",
   user: "user"
+};
+
+const TYPES = {
+  note: "note"
 };
 
 function checkInitialized() {
@@ -120,80 +125,56 @@ class Database {
     }
   }
 
-  async addNote(_note) {
-    if (!_note || !_note.content) return;
-    let timestamp = _note.dateCreated || Date.now();
-    let note = { ...this.notes[timestamp], ..._note };
+  async addNote(n) {
+    if (!n) return;
 
-    if (
-      !this.notes[timestamp] &&
-      (note.content.text.length <= 0 || !note.content.delta) &&
-      (!note.title || note.title.length <= 0)
-    ) {
+    let timestamp = n.dateCreated || Date.now();
+    let oldNote = this.notes[timestamp];
+    let note = {
+      ...oldNote,
+      ...n
+    };
+
+    if (isNoteEmpty(note)) {
+      if (oldNote) await this.deleteNotes(note);
       return;
     }
 
-    if (
-      (!note.title || note.title.length <= 0) &&
-      !note.locked &&
-      note.content.text.length <= 0 &&
-      this.notes[timestamp]
-    ) {
-      //delete the note
-      await this.deleteNotes(note);
-      return;
-    }
-
-    //add or update a note into the database
-    let title =
-      note.title ||
-      note.content.text
-        .split(" ")
-        .slice(0, 3)
-        .join(" ");
-
-    //if note exists
-    if (this.notes[timestamp] !== undefined) {
-      let oldNote = this.notes[timestamp];
-      //if we are having new colors
-      if (oldNote.colors !== note.colors && note.colors) {
-        note.colors = mergeDedupe([oldNote.colors, note.colors]);
-      }
-      //if we are having new tags
-      //TODO add new tags to the tags collection...
-      if (oldNote.tags !== note.tags && note.tags) {
-        note.tags = mergeDedupe([oldNote.tags, note.tags]);
-      }
-    }
-
-    this.notes[timestamp] = {
-      type: "note",
-      title,
-      content: note.content,
-      pinned: note.pinned || false,
+    note = {
+      type: TYPES.note,
+      title: getNoteTitle(note),
+      content: getNoteContent(note),
+      pinned: !!note.pinned,
       tags: note.tags || [],
-      locked: note.locked || false,
+      locked: !!note.locked,
       notebook: note.notebook || {},
       colors: note.colors || [],
-      favorite: note.favorite || false,
-      headline:
-        !note.locked &&
-        note.content.text.substring(0, 150) +
-          (note.content.text.length > 150 ? "..." : ""),
-      length: note.content.text.length,
+      favorite: !!note.favorite,
+      headline: getNoteHeadline(note),
       dateEditted: Date.now(),
       dateCreated: timestamp
     };
+
+    if (oldNote) {
+      note.colors = setManipulator.union(oldNote.colors, note.colors);
+      await this.updateTags(setManipulator.complement(note.tags, oldNote.tags));
+      note.tags = setManipulator.union(oldNote.tags, note.tags);
+    } else {
+      await this.updateTags(note.tags);
+    }
+
+    this.notes[timestamp] = note;
     await this.storage.write(KEYS.notes, this.notes);
     return timestamp;
   }
 
-  //TODO only send unique values here...
   async updateTags(tags) {
     for (let tag of tags) {
-      this[KEYS.tags][tag] = {
+      if (!tag || tag.trim().length <= 0) continue;
+      let oldCount = this.tags[tag] ? this.tags[tag].count : 0;
+      this.tags[tag] = {
         title: tag,
-        count: this[KEYS.tags][tag].count + 1
+        count: oldCount + 1
       };
     }
     await this.storage.write(KEYS.tags, this[KEYS.tags]);
@@ -442,15 +423,15 @@ export default Database;
 
 async function deleteItems(items, key) {
   if (!items || items.length <= 0 || !this[key] || this[key].length <= 0) {
-    console.log(items, items.length);
     return false;
   }
   for (let item of items) {
     if (!item) continue;
     if (this[key].hasOwnProperty(item.dateCreated)) {
       //delete note from the notebook too.
-      if (item.type === "note" && item.notebook.hasOwnProperty("topic")) {
+      if (item.type === "note") {
         if (
+          item.notebook.hasOwnProperty("topic") &&
           !(await this.deleteNoteFromTopic(
             item.notebook.notebook,
             item.notebook.topic,
@@ -458,6 +439,15 @@ async function deleteItems(items, key) {
           ))
         ) {
           continue;
+        }
+        //TODO test
+        if (item.tags.length > 0) {
+          for (let tag of item.tags) {
+            this.tags[tag] = {
+              ...this.tags[tag],
+              count: this.tags[tag].count - 1
+            };
+          }
         }
       } else if (item.type === "notebook") {
         let skip = false;
@@ -471,9 +461,7 @@ async function deleteItems(items, key) {
             }
           }
         }
-        if (skip) {
-          continue;
-        }
+        if (skip) continue;
       }
       //put into trash
       this[KEYS.trash][item.dateCreated] = this[key][item.dateCreated];
@@ -566,4 +554,41 @@ async function editItem(type, id, prop) {
 
 function mergeDedupe(arr) {
   return [...new Set([].concat(...arr))];
+}
+
+function isNoteEmpty(note) {
+  return (
+    !note.content ||
+    !note.content.delta ||
+    (!note.locked &&
+      (!note.title || note.title.trim().length <= 0) &&
+      (!note.content.text || note.content.text.trim().length <= 0))
+  );
+}
+
+function getNoteHeadline(note) {
+  if (note.locked) return "";
+  return (
+    note.content.text.substring(0, 150) +
+    (note.content.text.length > 150 ? "..." : "")
+  );
+}
+
+function getNoteTitle(note) {
+  if (note.title && note.title.length > 0) return note.title.trim();
+  return note.content.text
+    .split(" ")
+    .slice(0, 3)
+    .join(" ")
+    .trim();
+}
+
+function getNoteContent(note) {
+  if (note.locked) {
+    return note.content;
+  }
+  return {
+    text: note.content.text.trim(),
+    delta: note.content.delta
+  };
 }

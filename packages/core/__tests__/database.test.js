@@ -141,6 +141,57 @@ test("update note", () =>
     expect(note.colors).toStrictEqual(["red", "blue"]);
   }));
 
+test("updating empty note should delete it", () =>
+  noteTest().then(async ({ db, timestamp }) => {
+    let updateTimestamp = await db.addNote({
+      dateCreated: timestamp,
+      title: "\n\n",
+      content: {
+        text: "",
+        delta: []
+      },
+      pinned: true,
+      favorite: true,
+      colors: ["red", "blue"]
+    });
+    expect(updateTimestamp).toBeUndefined();
+  }));
+
+test("updating note with duplicate colors", () =>
+  noteTest({
+    ...TEST_NOTE,
+    colors: ["red", "blue"]
+  }).then(async ({ db, timestamp }) => {
+    let updateTimestamp = await db.addNote({
+      dateCreated: timestamp,
+      colors: ["red", "red", "blue", "blue"]
+    });
+    expect(updateTimestamp).toBe(timestamp);
+    let note = db.getNote(updateTimestamp);
+    expect(note.colors).toStrictEqual(["red", "blue"]);
+  }));
+
+test("updating note with new tags", () =>
+  noteTest({
+    ...TEST_NOTE,
+    tags: ["hello", "world"]
+  }).then(async ({ db, timestamp }) => {
+    let updateTimestamp = await db.addNote({
+      dateCreated: timestamp,
+      tags: ["new", "tag", "goes", "here"]
+    });
+    expect(updateTimestamp).toBe(timestamp);
+    let note = db.getNote(updateTimestamp);
+    expect(note.tags).toStrictEqual([
+      "hello",
+      "world",
+      "new",
+      "tag",
+      "goes",
+      "here"
+    ]);
+  }));
+
 test("note with text longer than 150 characters should have ... in the headline", () =>
   noteTest({
     content: {
