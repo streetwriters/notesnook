@@ -267,7 +267,7 @@ test("add note to topic", async () =>
     let topicIndex = notebook.topics.findIndex(t => t.title === topic);
     expect(notebook.topics[topicIndex].notes[0]).toBe(noteTimestamp);
     let note = db.getNote(noteTimestamp);
-    expect(note.notebook.notebook).toBe(timestamp);
+    expect(note.notebook.id).toBe(timestamp);
   }));
 
 test("duplicate note to topic should not be added", async () =>
@@ -290,8 +290,8 @@ test("move note", async () =>
     let notebook2 = await db.addNotebook(TEST_NOTEBOOK2);
     let res = await db.moveNote(
       timestamp,
-      { notebook: notebook1, topic: "Home" },
-      { notebook: notebook2, topic: "Home2" }
+      { id: notebook1, topic: "Home" },
+      { id: notebook2, topic: "Home2" }
     );
     expect(res).toBe(true);
   }));
@@ -324,28 +324,38 @@ test("delete topic from notebook", () =>
 
 test("delete note", () =>
   noteTest().then(async ({ db, timestamp }) => {
-    expect(await db.deleteNotes({ dateCreated: timestamp })).toBe(true);
+    expect(await db.deleteNotes(timestamp)).toBe(true);
     let note = db.getNote(timestamp);
     expect(note).toBeUndefined();
   }));
 
+test("deleting note that is in a notebook should delete it from the notebook", () =>
+  topicNoteTest().then(async ({ db, timestamp, topic, noteTimestamp }) => {
+    expect(await db.deleteNotes(noteTimestamp)).toBe(true);
+    let notebook = db.getNotebook(timestamp);
+    let topicIndex = notebook.topics.findIndex(t => t.title === topic);
+    expect(notebook.topics[topicIndex].notes.includes(noteTimestamp)).toBe(
+      false
+    );
+  }));
+
 test("delete notebook", () =>
   notebookTest().then(async ({ db, timestamp }) => {
-    expect(await db.deleteNotebooks({ dateCreated: timestamp })).toBe(true);
+    expect(await db.deleteNotebooks(timestamp)).toBe(true);
     let notebook = db.getNotebook(timestamp);
     expect(notebook).toBeUndefined();
   }));
 
 test("trash should not be empty", () =>
   notebookTest().then(async ({ db, timestamp }) => {
-    expect(await db.deleteNotebooks({ dateCreated: timestamp })).toBe(true);
+    expect(await db.deleteNotebooks(timestamp)).toBe(true);
     let trash = db.getTrash();
     expect(trash.length).toBeGreaterThan(0);
   }));
 
 test("restore an item from trash", () =>
   notebookTest().then(async ({ db, timestamp }) => {
-    expect(await db.deleteNotebooks({ dateCreated: timestamp })).toBe(true);
+    expect(await db.deleteNotebooks(timestamp)).toBe(true);
     let trash = db.getTrash();
     expect(trash.length).toBeGreaterThan(0);
     await db.restoreItem(timestamp);
@@ -355,7 +365,7 @@ test("restore an item from trash", () =>
 
 test("clear trash should clear the trash", () =>
   notebookTest().then(async ({ db, timestamp }) => {
-    expect(await db.deleteNotebooks({ dateCreated: timestamp })).toBe(true);
+    expect(await db.deleteNotebooks(timestamp)).toBe(true);
     let trash = db.getTrash();
     expect(trash.length).toBeGreaterThan(0);
     await db.clearTrash();
@@ -414,20 +424,19 @@ test("moving note to non-existent notebook should return false", () =>
   databaseTest().then(async db => {
     let res = await await db.moveNote(
       29,
-      { notebook: 2, topic: "2" },
-      { notebook: 5, topic: "123" }
+      { id: 2, topic: "2" },
+      { id: 5, topic: "123" }
     );
     expect(res).toBe(false);
   }));
 
-test("moving note to same notebook should return false", () =>
+test("moving note to same notebook should throw", () =>
   databaseTest().then(async db => {
-    let res = await db.moveNote(
-      29,
-      { notebook: 2, topic: "2" },
-      { notebook: 2, topic: "2" }
+    db.moveNote(29, { id: 2, topic: "2" }, { id: 2, topic: "2" }).catch(err =>
+      expect(err.message).toContain(
+        "Moving to the same notebook and topic is not possible."
+      )
     );
-    expect(res).toBe(false);
   }));
 
 test("search with empty query should return []", () =>
