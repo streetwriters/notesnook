@@ -164,15 +164,11 @@ export const Container = ({
         }}>
         {noSelectionHeader ? null : <SelectionHeader />}
 
-        <Animatable.View
-          transition={['backgroundColor', 'opacity', 'height']}
-          duration={300}
+        <View
           style={{
             position: 'absolute',
             backgroundColor: colors.bg,
-            zIndex: 800,
-            height: selectionMode ? 0 : null,
-            opacity: selectionMode ? 0 : 1,
+            zIndex: 999,
             width: '100%',
           }}>
           <Header
@@ -206,7 +202,7 @@ export const Container = ({
               value={text}
             />
           ) : null}
-        </Animatable.View>
+        </View>
 
         {children}
 

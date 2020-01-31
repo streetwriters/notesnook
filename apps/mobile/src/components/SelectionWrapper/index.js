@@ -46,31 +46,33 @@ const SelectionWrapper = ({children, item, currentEditingNote, index}) => {
         style={{
           display: selectionMode ? 'flex' : 'none',
           opacity: selectionMode ? 1 : 0,
+          width: '10%',
+          height: 70,
+          justifyContent: 'center',
+          alignItems: 'center',
+          paddingRight: 8,
         }}>
         <TouchableWithoutFeedback
           onPress={() => {
             dispatch({type: ACTIONS.SELECTED_ITEMS, item: item});
           }}
           style={{
-            width: '10%',
-            height: 70,
             justifyContent: 'center',
             alignItems: 'center',
-            paddingRight: 15,
           }}>
           <View
             style={{
               borderWidth: 2,
               borderColor: selected ? colors.accent : colors.icon,
-              width: 30,
-              height: 30,
+              width: 25,
+              height: 25,
               justifyContent: 'center',
               alignItems: 'center',
               borderRadius: 100,
-              paddingTop: 4,
+              paddingTop: 2,
             }}>
             {selected ? (
-              <Icon size={SIZE.md} color={colors.accent} name="check" />
+              <Icon size={SIZE.sm} color={colors.accent} name="check" />
             ) : null}
           </View>
         </TouchableWithoutFeedback>

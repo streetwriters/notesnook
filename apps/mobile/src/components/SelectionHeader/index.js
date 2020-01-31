@@ -27,22 +27,23 @@ export const SelectionHeader = ({navigation}) => {
 
   return (
     <Animatable.View
-      transition={['backgroundColor', 'opacity', 'height']}
-      duration={300}
+      transition={['translateY']}
+      duration={700}
+      useNativeDriver={true}
       style={{
         width: '100%',
         position: 'absolute',
-        height: selectionMode
-          ? Platform.OS === 'android'
-            ? 50 + StatusBar.currentHeight
-            : 50
-          : 0,
-        opacity: selectionMode ? 1 : 0,
+        height: Platform.OS === 'android' ? 50 + StatusBar.currentHeight : 50,
         backgroundColor: colors.bg,
         paddingTop: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight,
         justifyContent: 'flex-end',
-        zIndex: 11,
+        zIndex: 999,
         paddingHorizontal: 12,
+        transform: [
+          {
+            translateY: selectionMode ? 0 : -100,
+          },
+        ],
       }}>
       <View
         style={{
