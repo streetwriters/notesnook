@@ -122,6 +122,33 @@ export const NotesPlaceHolder = ({colors, animation, right, top}) => {
       transform: [
         {translateX: 2},
         {
+          translateY: 2,
+        },
+      ],
+    },
+  };
+
+  const slideLeft = {
+    0: {
+      transform: [
+        {translateX: 2},
+        {
+          translateY: 2,
+        },
+      ],
+    },
+    0.5: {
+      transform: [
+        {translateX: 0},
+        {
+          translateY: 0,
+        },
+      ],
+    },
+    1: {
+      transform: [
+        {translateX: -2},
+        {
           translateY: -2,
         },
       ],
@@ -136,7 +163,7 @@ export const NotesPlaceHolder = ({colors, animation, right, top}) => {
         justifyContent: 'center',
       }}>
       <Animatable.View
-        animation={slideRight}
+        animation={slideLeft}
         iterationCount="infinite"
         duration={3000}
         iterationDelay={0}
@@ -571,6 +598,55 @@ export const TrashPlaceHolder = ({colors, animation}) => {
 };
 
 export const FavoritesPlaceHolder = ({colors, animation}) => {
+  const slideRight = {
+    0: {
+      transform: [
+        {scaleX: 0.5},
+        {
+          scaleY: 0.5,
+        },
+        {
+          translateX: 2,
+        },
+        {
+          translateY: 2,
+        },
+      ],
+      opacity: 0,
+    },
+    0.6: {
+      transform: [
+        {scaleX: 0.7},
+        {
+          scaleY: 0.7,
+        },
+        {
+          translateX: 0,
+        },
+        {
+          translateY: 0,
+        },
+      ],
+
+      opacity: 1,
+    },
+    1: {
+      transform: [
+        {scaleX: 1},
+        {
+          scaleY: 1,
+        },
+        {
+          translateX: -2,
+        },
+        {
+          translateY: -2,
+        },
+      ],
+      opacity: 0,
+    },
+  };
+
   return (
     <View
       style={{
@@ -579,11 +655,11 @@ export const FavoritesPlaceHolder = ({colors, animation}) => {
         justifyContent: 'space-around',
       }}>
       <Animatable.View
-        animation={slideLeft}
+        animation={slideRight}
         iterationCount="infinite"
-        duration={3000}
+        duration={6000}
         iterationDelay={0}
-        direction="alternate"
+        direction="normal"
         easing="ease-in"
         useNativeDriver={true}
         style={{
@@ -593,12 +669,14 @@ export const FavoritesPlaceHolder = ({colors, animation}) => {
         }}>
         <Icon name="star" size={SIZE.xl} color="orange" />
       </Animatable.View>
+
       <Animatable.View
-        animation={slideLeft}
+        animation={slideRight}
         iterationCount="infinite"
-        duration={3000}
-        iterationDelay={0}
-        direction="alternate"
+        duration={7000}
+        delay={1500}
+        iterationDelay={500}
+        direction="normal"
         easing="ease-in"
         useNativeDriver={true}
         style={{
@@ -609,12 +687,14 @@ export const FavoritesPlaceHolder = ({colors, animation}) => {
         }}>
         <Icon name="star" size={SIZE.xxl} color="orange" />
       </Animatable.View>
+
       <Animatable.View
-        animation={slideLeft}
+        animation={slideRight}
         iterationCount="infinite"
-        duration={3000}
-        iterationDelay={0}
-        direction="alternate"
+        duration={5000}
+        delay={3000}
+        iterationDelay={1000}
+        direction="normal"
         easing="ease-in"
         useNativeDriver={true}
         style={{

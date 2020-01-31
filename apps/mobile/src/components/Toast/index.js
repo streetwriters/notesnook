@@ -109,7 +109,7 @@ export const Toast = () => {
           size={SIZE.sm}
         />
         {'  '}
-        Email address is invalid
+        {message}
       </Text>
 
       <TouchableOpacity activeOpacity={1}>

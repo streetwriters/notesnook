@@ -30,7 +30,8 @@ export class Dialog extends Component {
     switch (template.action) {
       case dialogActions.ACTION_DELETE: {
         if (item.type === 'note') {
-          await db.deleteNotes([item]);
+          await db.deleteNotes(item.dateCreated);
+
           ToastEvent.show('Note moved to trash', 'success', 3000);
           updateEvent({type: item.type});
         } else if (item.type === 'topic') {
@@ -38,7 +39,7 @@ export class Dialog extends Component {
           updateEvent({type: 'notebook'});
           ToastEvent.show('Topic moved to trash', 'success', 3000);
         } else if (item.type === 'notebook') {
-          await db.deleteNotebooks([item]);
+          await db.deleteNotebooks(item.dateCreated);
           updateEvent({type: item.type});
           ToastEvent.show('Notebook moved to trash', 'success', 3000);
         }

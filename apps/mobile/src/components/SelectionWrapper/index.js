@@ -1,14 +1,29 @@
-import React from 'react';
-import {View, TouchableOpacity} from 'react-native';
-import {SIZE} from '../../common/common';
+import React, {useEffect, useState} from 'react';
+import {TouchableWithoutFeedback, View} from 'react-native';
+import * as Animatable from 'react-native-animatable';
 import Icon from 'react-native-vector-icons/Feather';
-import {w} from '../../utils/utils';
+import {SIZE} from '../../common/common';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
-import * as Animatable from 'react-native-animatable';
 const SelectionWrapper = ({children, item, currentEditingNote, index}) => {
   const [state, dispatch] = useTracked();
   const {colors, selectionMode, selectedItemsList} = state;
+  const [selected, setSelected] = useState(false);
+  useEffect(() => {
+    let exists = selectedItemsList.filter(
+      o => o.dateCreated === item.dateCreated,
+    );
+
+    if (exists[0]) {
+      if (!selected) {
+        setSelected(true);
+      }
+    } else {
+      if (selected) {
+        setSelected(false);
+      }
+    }
+  }, [selectedItemsList]);
 
   return (
     <Animatable.View
@@ -28,37 +43,38 @@ const SelectionWrapper = ({children, item, currentEditingNote, index}) => {
             : 'transparent',
       }}>
       <View
-        onPress={() => {
-          dispatch({type: ACTIONS.SELECTED_ITEMS, item: item});
-        }}
         style={{
-          width: '10%',
-          height: 70,
-          justifyContent: 'center',
-          alignItems: 'center',
           display: selectionMode ? 'flex' : 'none',
           opacity: selectionMode ? 1 : 0,
-          paddingRight: 10,
         }}>
-        <View
+        <TouchableWithoutFeedback
+          onPress={() => {
+            dispatch({type: ACTIONS.SELECTED_ITEMS, item: item});
+          }}
           style={{
-            borderWidth: 2,
-            borderColor: selectedItemsList.includes(item)
-              ? colors.accent
-              : colors.icon,
-            width: 30,
-            height: 30,
+            width: '10%',
+            height: 70,
             justifyContent: 'center',
             alignItems: 'center',
-            borderRadius: 100,
-            paddingTop: 4,
+            paddingRight: 15,
           }}>
-          {selectedItemsList.includes(item) ? (
-            <Icon size={SIZE.md} color={colors.accent} name="check" />
-          ) : null}
-        </View>
+          <View
+            style={{
+              borderWidth: 2,
+              borderColor: selected ? colors.accent : colors.icon,
+              width: 30,
+              height: 30,
+              justifyContent: 'center',
+              alignItems: 'center',
+              borderRadius: 100,
+              paddingTop: 4,
+            }}>
+            {selected ? (
+              <Icon size={SIZE.md} color={colors.accent} name="check" />
+            ) : null}
+          </View>
+        </TouchableWithoutFeedback>
       </View>
-
       {children}
     </Animatable.View>
   );
