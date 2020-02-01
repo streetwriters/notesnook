@@ -526,6 +526,7 @@ const Editor = ({navigation, noMenu}) => {
             justifyContent: 'center',
             alignItems: 'center',
             zIndex: 1,
+            backgroundColor: colors.bg,
             opacity: loading ? 1 : 0,
             position: 'absolute',
           }}>

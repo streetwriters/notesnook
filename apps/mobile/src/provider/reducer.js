@@ -8,7 +8,7 @@ export const reducer = (state, action) => {
       let notes = db.groupNotes();
       return {
         ...state,
-        notes: notes,
+        notes: [...notes],
         loading: false,
       };
     case ACTIONS.THEME: {

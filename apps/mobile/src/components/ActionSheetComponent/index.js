@@ -148,6 +148,7 @@ export const ActionSheetComponent = ({
     switch (type) {
       case 'note': {
         toAdd = db.getNote(note.dateCreated);
+
         break;
       }
       case 'notebook': {
@@ -162,7 +163,10 @@ export const ActionSheetComponent = ({
 
     if (!nodispatch) {
       dispatch({type: type});
+      dispatch({type: ACTIONS.PINNED});
+      dispatch({type: ACTIONS.FAVORITES});
     }
+    console.log(toAdd);
     setNote({...toAdd});
   };
 
@@ -265,9 +269,9 @@ export const ActionSheetComponent = ({
     {
       name: 'Pin',
       icon: 'tag',
-      func: () => {
+      func: async () => {
         if (!note.dateCreated) return;
-        db.pinItem(note.type, note.dateCreated);
+        await db.pinItem(note.type, note.dateCreated);
         localRefresh(item.type);
         dispatch({type: ACTIONS.PINNED});
       },
@@ -278,10 +282,11 @@ export const ActionSheetComponent = ({
     {
       name: 'Favorite',
       icon: 'star',
-      func: () => {
+      func: async () => {
         if (!note.dateCreated) return;
-        db.favoriteItem(note.type, note.dateCreated);
+        await db.favoriteItem(note.type, note.dateCreated);
         localRefresh(item.type);
+        dispatch({type: ACTIONS.FAVORITES});
       },
       close: false,
       check: true,

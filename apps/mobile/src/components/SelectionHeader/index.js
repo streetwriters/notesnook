@@ -28,7 +28,7 @@ export const SelectionHeader = ({navigation}) => {
   return (
     <Animatable.View
       transition={['translateY']}
-      duration={700}
+      duration={300}
       useNativeDriver={true}
       style={{
         width: '100%',

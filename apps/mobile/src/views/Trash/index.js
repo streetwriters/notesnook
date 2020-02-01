@@ -12,6 +12,7 @@ import NoteItem from '../../components/NoteItem';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {w} from '../../utils/utils';
+import SelectionWrapper from '../../components/SelectionWrapper';
 
 export const Trash = ({navigation}) => {
   const [state, dispatch] = useTracked();
@@ -24,7 +25,7 @@ export const Trash = ({navigation}) => {
   }, []);
 
   const _renderItem = ({item, index}) => (
-    <SelectionWrapper item={item}>
+    <SelectionWrapper colors={colors} item={item}>
       {item.type === 'note' ? (
         <NoteItem
           customStyle={{
@@ -41,6 +42,7 @@ export const Trash = ({navigation}) => {
               item: item,
             });
           }}
+          colors={colors}
           item={item}
           index={index}
           isTrash={true}
