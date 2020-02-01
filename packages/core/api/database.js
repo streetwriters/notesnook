@@ -191,10 +191,11 @@ class Database {
     return getItem.call(this, id, KEYS.notes);
   }
 
-  searchNotes(query) {
+  searchNotes(query, notes = null) {
     if (!query) return [];
+    if (!notes) notes = this.getNotes();
     return tfun.filter(v => fuzzysearch(query, v.title + " " + v.content.text))(
-      extractValues(this.notes)
+      notes
     );
   }
 
