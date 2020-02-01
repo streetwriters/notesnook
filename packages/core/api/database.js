@@ -64,14 +64,14 @@ class Database {
   }
 
   getFavorites() {
-    return tfun.filter(".favorite == true")([
+    return tfun.filter(".favorite === true")([
       ...this.getNotes(),
       ...this.getNotebooks()
     ]);
   }
 
   getPinned() {
-    return tfun.filter(".pinned == true")(this.getNotes());
+    return tfun.filter(".pinned === true")(this.getNotes());
   }
 
   getTag(tag) {
@@ -84,7 +84,7 @@ class Database {
    */
   groupNotes(by, special = false) {
     let notes = !special
-      ? tfun.filter(".pinned == false")(this.getNotes())
+      ? tfun.filter(".pinned === false")(this.getNotes())
       : this.getNotes();
     switch (by) {
       case "abc":
@@ -231,6 +231,13 @@ class Database {
   getNotebooks() {
     checkInitialized.call(this);
     return extractValues(this.notebooks);
+  }
+
+  searchNotebooks(query) {
+    if (!query) return [];
+    return tfun.filter(v => fuzzysearch(query, v.title + " " + v.description))(
+      this.getNotebooks()
+    );
   }
 
   async addNotebook(notebook) {

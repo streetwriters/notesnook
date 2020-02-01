@@ -246,6 +246,16 @@ test("get all notebooks", () =>
     expect(notebooks.length).toBeGreaterThan(0);
   }));
 
+test("search all notebooks", () =>
+  notebookTest({
+    ...TEST_NOTEBOOK,
+    title: "I will be searched.",
+    description: "searched description"
+  }).then(({ db }) => {
+    let filtered = db.searchNotebooks("searhed");
+    expect(filtered.length).toBeGreaterThan(0);
+  }));
+
 test("get a notebook", () =>
   notebookTest().then(({ db, timestamp }) => {
     let notebook = db.getNotebook(timestamp);
