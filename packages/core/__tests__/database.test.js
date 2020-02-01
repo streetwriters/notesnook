@@ -203,6 +203,22 @@ test("note with text longer than 150 characters should have ... in the headline"
     expect(note.headline.includes("...")).toBe(true);
   }));
 
+test("get tags", () =>
+  noteTest({
+    ...TEST_NOTE,
+    tags: ["new", "tag", "goes", "here"]
+  }).then(async ({ db }) => {
+    expect(db.getTags().length).toBeGreaterThan(0);
+  }));
+
+test("get notes in tag", () =>
+  noteTest({
+    ...TEST_NOTE,
+    tags: ["new", "tag", "goes", "here"]
+  }).then(async ({ db }) => {
+    expect(db.getTag("tag")[0].tags.includes("tag")).toBe(true);
+  }));
+
 test("get favorites", () =>
   noteTest({
     pinned: true,

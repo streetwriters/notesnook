@@ -74,6 +74,10 @@ class Database {
     return tfun.filter(".pinned == true")(this.getNotes());
   }
 
+  getTag(tag) {
+    return tfun.filter(`.tags.includes('${tag}')`)(this.getNotes());
+  }
+
   /**
    * @param {string} by One from 'abc', 'month', 'year' or 'week'. Leave it empty for default grouping.
    * @param {boolean} special Should only be used in the React app.
@@ -157,27 +161,18 @@ class Database {
 
     if (oldNote) {
       note.colors = setManipulator.union(oldNote.colors, note.colors);
-      await this.updateTags(setManipulator.complement(note.tags, oldNote.tags));
+      await updateTags.call(
+        this,
+        setManipulator.complement(note.tags, oldNote.tags)
+      );
       note.tags = setManipulator.union(oldNote.tags, note.tags);
     } else {
-      await this.updateTags(note.tags);
+      await updateTags.call(this, note.tags);
     }
 
     this.notes[timestamp] = note;
     await this.storage.write(KEYS.notes, this.notes);
     return timestamp;
-  }
-
-  async updateTags(tags) {
-    for (let tag of tags) {
-      if (!tag || tag.trim().length <= 0) continue;
-      let oldCount = this.tags[tag] ? this.tags[tag].count : 0;
-      this.tags[tag] = {
-        title: tag,
-        count: oldCount + 1
-      };
-    }
-    await this.storage.write(KEYS.tags, this[KEYS.tags]);
   }
 
   pinItem(type, id) {
@@ -421,6 +416,10 @@ class Database {
   getUser() {
     return this.user;
   }
+
+  getTags() {
+    return extractValues(this.tags);
+  }
 }
 
 export default Database;
@@ -588,4 +587,16 @@ function getNoteContent(note) {
     text: note.content.text.trim(),
     delta: note.content.delta
   };
+}
+
+async function updateTags(tags) {
+  for (let tag of tags) {
+    if (!tag || tag.trim().length <= 0) continue;
+    let oldCount = this.tags[tag] ? this.tags[tag].count : 0;
+    this.tags[tag] = {
+      title: tag,
+      count: oldCount + 1
+    };
+  }
+  await this.storage.write(KEYS.tags, this[KEYS.tags]);
 }
