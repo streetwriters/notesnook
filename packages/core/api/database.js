@@ -388,6 +388,7 @@ class Database {
         return await this.addNoteToTopic(to.id, to.topic, noteId);
       }
     }
+
     return false;
   }
 

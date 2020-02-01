@@ -285,15 +285,17 @@ test("get topic", async () =>
 test("move note", async () =>
   noteTest().then(async ({ db, timestamp }) => {
     let notebook1 = await db.addNotebook(TEST_NOTEBOOK);
-    expect(await db.addTopicToNotebook(notebook1, "Home")).toBe(true);
-    expect(await db.addNoteToTopic(notebook1, "Home", timestamp)).toBe(true);
-    let notebook2 = await db.addNotebook(TEST_NOTEBOOK2);
-    let res = await db.moveNote(
-      timestamp,
-      { id: notebook1, topic: "Home" },
-      { id: notebook2, topic: "Home2" }
-    );
-    expect(res).toBe(true);
+    await db.addTopicToNotebook(notebook1, "Home");
+    await db.addNoteToTopic(notebook1, "Home", timestamp);
+    setTimeout(async () => {
+      let notebook2 = await db.addNotebook(TEST_NOTEBOOK2);
+      let res = await db.moveNote(
+        timestamp,
+        { id: notebook1, topic: "Home" },
+        { id: notebook2, topic: "Home2" }
+      );
+      expect(res).toBe(true);
+    }, 1000);
   }));
 
 test("deletion of note from invalid topic should return false", () =>
