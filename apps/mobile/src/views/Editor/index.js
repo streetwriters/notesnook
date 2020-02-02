@@ -295,6 +295,7 @@ const Editor = ({navigation, noMenu}) => {
     }`;
 
   const timeConverter = timestamp => {
+    if (!timestamp) return;
     var d = new Date(timestamp), // Convert the passed timestamp to milliseconds
       yyyy = d.getFullYear(),
       mm = ('0' + (d.getMonth() + 1)).slice(-2), // Months are zero based. Add leading 0.
