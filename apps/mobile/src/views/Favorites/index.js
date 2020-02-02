@@ -1,5 +1,5 @@
-import React, {useEffect} from 'react';
-import {FlatList, Platform, Text, View} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {FlatList, Platform, Text, View, RefreshControl} from 'react-native';
 import {SIZE, WEIGHT} from '../../common/common';
 import Container from '../../components/Container';
 import {FavoritesPlaceHolder} from '../../components/ListPlaceholders';
@@ -14,7 +14,7 @@ import {eScrollEvent} from '../../services/events';
 export const Favorites = ({navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors, selectionMode, favorites} = state;
-
+  const [refreshing, setRefreshing] = useState(false);
   useEffect(() => {
     dispatch({type: ACTIONS.FAVORITES});
   }, []);
@@ -35,6 +35,20 @@ export const Favorites = ({navigation}) => {
       noBottomButton={true}>
       <FlatList
         keyExtractor={item => item.dateCreated.toString()}
+        refreshControl={
+          <RefreshControl
+            tintColor={colors.accent}
+            colors={[colors.accent]}
+            progressViewOffset={165}
+            onRefresh={() => {
+              setRefreshing(true);
+              setTimeout(() => {
+                setRefreshing(false);
+              }, 1000);
+            }}
+            refreshing={refreshing}
+          />
+        }
         style={{
           width: '100%',
           alignSelf: 'center',

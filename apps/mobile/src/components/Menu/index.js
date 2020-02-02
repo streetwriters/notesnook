@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Platform,
   ScrollView,
@@ -26,7 +26,7 @@ import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import NavigationService from '../../services/NavigationService';
 import {AnimatedSafeAreaView} from '../../views/Home';
-import {DDS} from '../../../App';
+import {DDS, db} from '../../../App';
 import {
   eOpenLoginDialog,
   eOpenModalMenu,
@@ -42,7 +42,7 @@ export const Menu = ({
 }) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
-
+  const [tags, setTags] = useState([]);
   // todo
 
   let overlayRef;
@@ -53,6 +53,17 @@ export const Menu = ({
 
     dispatch({type: ACTIONS.THEME, colors: newColors});
   }
+
+  useEffect(() => {
+    let allTags = db.getTags();
+    let tagsToAdd = [];
+    allTags.sort((a, b) => {
+      return a.count > b.count;
+    });
+
+    setTags([...allTags]);
+    console.log(allTags);
+  }, []);
 
   const listItems = [
     {
@@ -315,22 +326,16 @@ export const Menu = ({
                 flexWrap: 'wrap',
                 marginBottom: 0,
               }}>
-              {[
-                'home',
-                'office',
-                'work',
-                'book_notes',
-                'poem',
-                'lists',
-                'water',
-              ].map(item => (
+              {tags.map(item => (
                 <TouchableOpacity
-                  key={item}
+                  key={item.title}
                   activeOpacity={opacity / 2}
                   onPress={() => {
                     close();
                     NavigationService.navigate('Notes', {
-                      heading: item,
+                      heading: item.title,
+                      tag: item,
+                      type: 'tag',
                     });
                   }}
                   style={{
@@ -339,6 +344,7 @@ export const Menu = ({
                     alignItems: 'center',
                     padding: 5,
                     paddingLeft: 2.5,
+                    marginTop: 5,
                   }}>
                   <Text
                     style={{
@@ -346,8 +352,25 @@ export const Menu = ({
                       fontSize: SIZE.xs + 1,
                       color: colors.icon,
                     }}>
-                    #{item}
+                    #{item.title}
                   </Text>
+                  {item.count > 1 ? (
+                    <Text
+                      style={{
+                        color: 'white',
+                        backgroundColor: colors.accent,
+                        fontSize: SIZE.xxs - 2,
+                        minWidth: 10,
+                        minHeight: 10,
+                        marginTop: -10,
+                        borderRadius: 2,
+                        textAlign: 'center',
+                        padding: 0,
+                        paddingHorizontal: 1,
+                      }}>
+                      {item.count}
+                    </Text>
+                  ) : null}
                 </TouchableOpacity>
               ))}
             </View>
@@ -378,8 +401,21 @@ export const Menu = ({
                       height: noTextMode ? SIZE.md : normalize(30),
                       backgroundColor: item,
                       borderRadius: 100,
-                    }}
-                  />
+                    }}></View>
+                  <Text
+                    style={{
+                      color: colors.pri,
+                      fontSize: SIZE.xxs - 2,
+                      minWidth: 10,
+                      minHeight: 10,
+                      borderRadius: 2,
+                      textAlign: 'center',
+                      padding: 0,
+                      paddingHorizontal: 1,
+                      position: 'absolute',
+                      top: -5,
+                      right: -10,
+                    }}></Text>
                 </TouchableOpacity>
               ),
             )}

@@ -166,9 +166,10 @@ export const Container = ({
 
         <View
           style={{
-            position: 'absolute',
+            position: selectionMode ? 'relative' : 'absolute',
             backgroundColor: colors.bg,
             zIndex: 999,
+            display: selectionMode ? 'none' : 'flex',
             width: '100%',
           }}>
           <Header

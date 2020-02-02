@@ -29,6 +29,7 @@ import {Dialog} from '../Dialog';
 import LoginDialog from '../LoginDialog';
 import MoveNoteDialog from '../MoveNoteDialog';
 import {VaultDialog} from '../VaultDialog';
+import {timeConverter} from '../../utils/utils';
 
 export const dialogActions = {
   ACTION_DELETE: 511,
@@ -132,6 +133,19 @@ export const TEMPLATE_EXIT = type => {
     negativeText: 'Cancel',
     action: dialogActions.ACTION_EXIT,
     icon: 'x',
+  };
+};
+
+export const TEMPLATE_INFO = dateCreated => {
+  return {
+    title: `Note Info`,
+    paragraph: `Created on ${timeConverter(dateCreated)}`,
+    positiveText: ``,
+    negativeText: '',
+    noButtons: true,
+    noTitle: true,
+    action: dialogActions.ACTION_CLOSE,
+    icon: 'info',
   };
 };
 

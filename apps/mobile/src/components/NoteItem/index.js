@@ -110,7 +110,7 @@ export default class NoteItem extends React.Component {
         ) : null}
 
         <TouchableOpacity
-          activeOpacity={1}
+          activeOpacity={0.8}
           onLongPress={() => onLongPress()}
           onPress={() => {
             if (item.locked) {

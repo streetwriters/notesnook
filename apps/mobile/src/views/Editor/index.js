@@ -20,6 +20,7 @@ import {
   simpleDialogEvent,
   TEMPLATE_EXIT,
   TEMPLATE_EXIT_FULLSCREEN,
+  TEMPLATE_INFO,
 } from '../../components/DialogManager';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
@@ -33,12 +34,13 @@ import {
   eOnLoadNote,
   eOpenFullscreenEditor,
 } from '../../services/events';
-import {SideMenuEvent} from '../../utils/utils';
+import {SideMenuEvent, timeConverter} from '../../utils/utils';
 import {AnimatedSafeAreaView} from '../Home';
 
 let EditorWebView;
 let note = {};
 let timestamp = null;
+let dateEdited = null;
 var content = null;
 var title = null;
 let timer = null;
@@ -260,9 +262,11 @@ const Editor = ({navigation, noMenu}) => {
   const updateEditor = () => {
     title = note.title;
     timestamp = note.dateCreated;
+    dateEdited = note.dateEditted;
     content = note.content;
     saveCounter = 0;
-    console.log('here');
+
+    console.log(note);
     if (title !== null || title === '') {
       post(
         JSON.stringify({
@@ -293,71 +297,6 @@ const Editor = ({navigation, noMenu}) => {
           link.href = './site/index.html?${params}';
           link.click();  
     }`;
-
-  const timeConverter = timestamp => {
-    if (!timestamp) return;
-    var d = new Date(timestamp), // Convert the passed timestamp to milliseconds
-      yyyy = d.getFullYear(),
-      mm = ('0' + (d.getMonth() + 1)).slice(-2), // Months are zero based. Add leading 0.
-      dd = ('0' + d.getDate()).slice(-2), // Add leading 0.
-      currentDay = d.getDay(),
-      hh = d.getHours(),
-      h = hh,
-      min = ('0' + d.getMinutes()).slice(-2), // Add leading 0.
-      ampm = 'AM',
-      time;
-    let days = [
-      'Sunday',
-      'Monday',
-      'Tuesday',
-      'Wednesday',
-      'Thursday',
-      'Friday',
-      'Saturday',
-    ];
-    var months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-
-    if (hh > 12) {
-      h = hh - 12;
-      ampm = 'PM';
-    } else if (hh === 12) {
-      h = 12;
-      ampm = 'PM';
-    } else if (hh == 0) {
-      h = 12;
-    }
-
-    // ie: 2013-02-18, 8:35 AM
-    time =
-      days[currentDay] +
-      ' ' +
-      dd +
-      ' ' +
-      months[d.getMonth()] +
-      ', ' +
-      yyyy +
-      ', ' +
-      h +
-      ':' +
-      min +
-      ' ' +
-      ampm;
-
-    return time;
-  };
 
   const _renderEditor = () => {
     return (
@@ -480,15 +419,19 @@ const Editor = ({navigation, noMenu}) => {
             flexDirection: 'row',
             alignItems: 'center',
             paddingLeft: noMenu ? 12 : 12 + 50,
+            zIndex: 999,
           }}>
           <Text
+            onPress={() => {
+              simpleDialogEvent(TEMPLATE_INFO(timestamp));
+            }}
             style={{
               color: colors.icon,
               fontSize: SIZE.xxs,
               textAlignVertical: 'center',
               fontFamily: WEIGHT.regular,
             }}>
-            {timeConverter(timestamp)}
+            {timeConverter(dateEdited)}
           </Text>
         </View>
         <WebView

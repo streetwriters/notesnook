@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {FlatList, Text, View, Platform} from 'react-native';
+import {FlatList, Text, View, Platform, RefreshControl} from 'react-native';
 import {db} from '../../../App';
 import Container from '../../components/Container';
 import NoteItem from '../../components/NoteItem';
@@ -13,7 +13,7 @@ export const Notes = ({navigation}) => {
   const {colors, selectionMode, currentEditingNote} = state;
   const allNotes = state.notes;
   const [notes, setNotes] = useState([]);
-
+  const [refreshing, setRefreshing] = useState(false);
   let params = navigation.state ? navigation.state.params : null;
 
   useEffect(() => {
@@ -115,6 +115,20 @@ export const Notes = ({navigation}) => {
       bottomButtonOnPress={() => {}}>
       <FlatList
         data={notes}
+        refreshControl={
+          <RefreshControl
+            tintColor={colors.accent}
+            colors={[colors.accent]}
+            progressViewOffset={165}
+            onRefresh={() => {
+              setRefreshing(true);
+              setTimeout(() => {
+                setRefreshing(false);
+              }, 1000);
+            }}
+            refreshing={refreshing}
+          />
+        }
         keyExtractor={_listKeyExtractor}
         ListFooterComponent={_ListFooterComponent}
         onScroll={_onScroll}

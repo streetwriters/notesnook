@@ -1,5 +1,12 @@
-import React, {useEffect} from 'react';
-import {BackHandler, FlatList, Platform, Text, View} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {
+  BackHandler,
+  FlatList,
+  Platform,
+  Text,
+  View,
+  RefreshControl,
+} from 'react-native';
 import {useIsFocused} from 'react-navigation-hooks';
 import {DDS} from '../../../App';
 import {SIZE, WEIGHT} from '../../common/common';
@@ -24,7 +31,9 @@ export const Folders = ({navigation}) => {
     notebooks,
     preventDefaultMargins,
   } = state;
+  const [refreshing, setRefreshing] = useState(false);
   let isFocused = useIsFocused();
+
   ///
 
   const handleBackPress = () => {
@@ -80,6 +89,20 @@ export const Folders = ({navigation}) => {
         style={{
           width: '100%',
         }}
+        refreshControl={
+          <RefreshControl
+            tintColor={colors.accent}
+            colors={[colors.accent]}
+            progressViewOffset={165}
+            onRefresh={() => {
+              setRefreshing(true);
+              setTimeout(() => {
+                setRefreshing(false);
+              }, 1000);
+            }}
+            refreshing={refreshing}
+          />
+        }
         onScroll={onScroll}
         ListHeaderComponent={
           <View

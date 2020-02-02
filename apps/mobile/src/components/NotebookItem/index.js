@@ -64,8 +64,10 @@ export const NotebookItem = ({
           width: '100%',
         }}>
         <TouchableOpacity
+          activeOpacity={0.8}
           style={{
-            width: '75%',
+            width: '90%',
+            maxWidth: '90%',
             minHeight: 50,
             justifyContent: 'center',
           }}

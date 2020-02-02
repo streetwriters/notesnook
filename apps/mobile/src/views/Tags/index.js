@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Dimensions,
   FlatList,
@@ -6,6 +6,7 @@ import {
   Text,
   View,
   TouchableOpacity,
+  RefreshControl,
 } from 'react-native';
 import {pv, SIZE, WEIGHT} from '../../common/common';
 import {Header} from '../../components/header';
@@ -20,7 +21,7 @@ const h = Dimensions.get('window').height;
 export const Tags = ({navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors, tags} = state;
-
+  const [refreshing, setRefreshing] = useState(false);
   useEffect(() => {
     dispatch({type: ACTIONS.TAGS});
   }, []);
@@ -44,6 +45,20 @@ export const Tags = ({navigation}) => {
           style={{
             height: '100%',
           }}
+          refreshControl={
+            <RefreshControl
+              tintColor={colors.accent}
+              colors={[colors.accent]}
+              progressViewOffset={165}
+              onRefresh={() => {
+                setRefreshing(true);
+                setTimeout(() => {
+                  setRefreshing(false);
+                }, 1000);
+              }}
+              refreshing={refreshing}
+            />
+          }
           contentContainerStyle={{
             height: '100%',
           }}

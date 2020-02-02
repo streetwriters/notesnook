@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {FlatList, Platform, Text, View} from 'react-native';
+import {FlatList, Platform, Text, View, RefreshControl} from 'react-native';
 import {useIsFocused} from 'react-navigation-hooks';
 import {SIZE, WEIGHT} from '../../common/common';
 import Container from '../../components/Container';
@@ -16,6 +16,7 @@ export const Notebook = ({navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors, selectionMode, preventDefaultMargins} = state;
   const [topics, setTopics] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
   let params = navigation.state.params;
 
   let isFocused = useIsFocused();
@@ -106,6 +107,20 @@ export const Notebook = ({navigation}) => {
         //setAddTopic(true);
       }}>
       <FlatList
+        refreshControl={
+          <RefreshControl
+            tintColor={colors.accent}
+            colors={[colors.accent]}
+            progressViewOffset={165}
+            onRefresh={() => {
+              setRefreshing(true);
+              setTimeout(() => {
+                setRefreshing(false);
+              }, 1000);
+            }}
+            refreshing={refreshing}
+          />
+        }
         style={{
           width: '100%',
         }}

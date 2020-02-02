@@ -158,15 +158,17 @@ export class Dialog extends Component {
                 <Icon name={icon} color={colors.accent} size={SIZE.lg} />
               ) : null}
 
-              <Text
-                style={{
-                  color: colors.accent,
-                  fontFamily: WEIGHT.bold,
-                  marginLeft: 5,
-                  fontSize: SIZE.md,
-                }}>
-                {title}
-              </Text>
+              {template.noTitle ? null : (
+                <Text
+                  style={{
+                    color: colors.accent,
+                    fontFamily: WEIGHT.bold,
+                    marginLeft: 5,
+                    fontSize: SIZE.md,
+                  }}>
+                  {title}
+                </Text>
+              )}
             </View>
 
             {paragraph ? (
@@ -182,58 +184,60 @@ export class Dialog extends Component {
               </Text>
             ) : null}
 
-            <View
-              style={{
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                flexDirection: 'row',
-                marginTop: 20,
-              }}>
-              <TouchableOpacity
-                activeOpacity={opacity}
-                onPress={this._onClose}
+            {template.noButtons ? null : (
+              <View
                 style={{
-                  paddingVertical: pv,
-                  paddingHorizontal: ph,
-                  borderRadius: 5,
-                  width: '48%',
-                  justifyContent: 'center',
+                  justifyContent: 'space-between',
                   alignItems: 'center',
-                  backgroundColor: colors.nav,
+                  flexDirection: 'row',
+                  marginTop: 20,
                 }}>
-                <Text
+                <TouchableOpacity
+                  activeOpacity={opacity}
+                  onPress={this._onClose}
                   style={{
-                    fontFamily: WEIGHT.medium,
-                    color: colors.icon,
-                    fontSize: SIZE.sm,
+                    paddingVertical: pv,
+                    paddingHorizontal: ph,
+                    borderRadius: 5,
+                    width: '48%',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    backgroundColor: colors.nav,
                   }}>
-                  {negativeText}
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                activeOpacity={opacity}
-                onPress={this._onPress}
-                style={{
-                  paddingVertical: pv,
-                  paddingHorizontal: ph,
-                  borderRadius: 5,
-                  width: '48%',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  borderColor: colors.accent,
-                  backgroundColor: colors.accent,
-                  borderWidth: 1,
-                }}>
-                <Text
+                  <Text
+                    style={{
+                      fontFamily: WEIGHT.medium,
+                      color: colors.icon,
+                      fontSize: SIZE.sm,
+                    }}>
+                    {negativeText}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  activeOpacity={opacity}
+                  onPress={this._onPress}
                   style={{
-                    fontFamily: WEIGHT.medium,
-                    color: 'white',
-                    fontSize: SIZE.sm,
+                    paddingVertical: pv,
+                    paddingHorizontal: ph,
+                    borderRadius: 5,
+                    width: '48%',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    borderColor: colors.accent,
+                    backgroundColor: colors.accent,
+                    borderWidth: 1,
                   }}>
-                  {positiveText}
-                </Text>
-              </TouchableOpacity>
-            </View>
+                  <Text
+                    style={{
+                      fontFamily: WEIGHT.medium,
+                      color: 'white',
+                      fontSize: SIZE.sm,
+                    }}>
+                    {positiveText}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
         </View>
       </Modal>

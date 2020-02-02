@@ -1,5 +1,5 @@
-import React, {useEffect} from 'react';
-import {FlatList, Text, View} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {FlatList, Text, View, RefreshControl} from 'react-native';
 import {SIZE, WEIGHT} from '../../common/common';
 import Container from '../../components/Container';
 import {
@@ -17,7 +17,7 @@ import SelectionWrapper from '../../components/SelectionWrapper';
 export const Trash = ({navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors, selectionMode, trash} = state;
-
+  const [refreshing, setRefreshing] = useState(false);
   useEffect(() => {
     dispatch({
       type: ACTIONS.TRASH,
@@ -113,6 +113,20 @@ export const Trash = ({navigation}) => {
       menu={true}
       bottomButtonText="Clear all trash">
       <FlatList
+        refreshControl={
+          <RefreshControl
+            tintColor={colors.accent}
+            colors={[colors.accent]}
+            progressViewOffset={165}
+            onRefresh={() => {
+              setRefreshing(true);
+              setTimeout(() => {
+                setRefreshing(false);
+              }, 1000);
+            }}
+            refreshing={refreshing}
+          />
+        }
         ListHeaderComponent={
           <View
             style={{

@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -6,6 +6,7 @@ import {
   SectionList,
   Text,
   View,
+  RefreshControl,
 } from 'react-native';
 import {SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
@@ -28,7 +29,7 @@ export const NotesList = ({isGrouped = false}) => {
     keyword,
   } = state;
   const notes = [...state.notes];
-
+  const [refreshing, setRefreshing] = useState(false);
   const _renderItem = ({item, index}) => (
     <SelectionWrapper
       index={index}
@@ -172,6 +173,20 @@ export const NotesList = ({isGrouped = false}) => {
     <SectionList
       ref={ref => (sectionListRef = ref)}
       sections={notes}
+      refreshControl={
+        <RefreshControl
+          tintColor={colors.accent}
+          colors={[colors.accent]}
+          progressViewOffset={165}
+          onRefresh={() => {
+            setRefreshing(true);
+            setTimeout(() => {
+              setRefreshing(false);
+            }, 1000);
+          }}
+          refreshing={refreshing}
+        />
+      }
       keyExtractor={_listKeyExtractor}
       renderSectionHeader={_renderSectionHeader}
       onScroll={_onScroll}
