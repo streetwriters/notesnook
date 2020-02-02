@@ -258,7 +258,7 @@ class Database {
     let topics =
       !notebook.topics || notebook.topics.length <= 0 ? [] : notebook.topics; //
     if (topics.findIndex(topic => topic.title === "General") <= -1) {
-      topics.splice(0, 0, makeTopic("General"));
+      topics.splice(0, 0, makeTopic("General", id));
     }
     let index = 0;
 
@@ -272,7 +272,7 @@ class Database {
       }
       if (typeof topic === "string") {
         if (topic.trim().length <= 0) topics.splice(index, 1);
-        topics[index] = makeTopic(topic);
+        topics[index] = makeTopic(topic, id);
       }
       index++;
     }
@@ -297,7 +297,7 @@ class Database {
     return notebookTopicFn.call(this, notebookId, topic, notebook => {
       if (notebook.topics.findIndex(t => t.title === topic) > -1)
         return Promise.resolve(false); //check for duplicates
-      notebook.topics[notebook.topics.length] = makeTopic(topic);
+      notebook.topics[notebook.topics.length] = makeTopic(topic, notebookId);
       return Promise.resolve(true);
     });
   }
@@ -528,9 +528,10 @@ function getItem(id, key) {
   }
 }
 
-function makeTopic(topic) {
+function makeTopic(topic, notebookId) {
   return {
     type: "topic",
+    notebookId,
     title: topic,
     dateCreated: Date.now(),
     totalNotes: 0,
