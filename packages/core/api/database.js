@@ -190,11 +190,11 @@ class Database {
   }
 
   pinNote(id) {
-    return editItem.call(this, "note", id, "pinned");
+    return editItems.call(this, "note", "pinned", id);
   }
 
-  favoriteNote(id) {
-    return editItem.call(this, "note", id, "favorite");
+  favoriteNotes(...ids) {
+    return editItems.call(this, "note", "favorite", ids);
   }
 
   async deleteNotes(...noteIds) {
@@ -308,11 +308,11 @@ class Database {
   }
 
   pinNotebook(id) {
-    return editItem.call(this, "notebook", id, "pinned");
+    return editItems.call(this, "notebook", "pinned", id);
   }
 
-  favoriteNotebook(id) {
-    return editItem.call(this, "notebook", id, "favorite");
+  favoriteNotebooks(...ids) {
+    return editItems.call(this, "notebook", "favorite", ids);
   }
 
   addTopicToNotebook(notebookId, topic) {
@@ -396,25 +396,25 @@ class Database {
     return await deleteItems.call(this, notebookIds, KEYS.notebooks);
   }
 
-  async moveNote(noteId, from, to) {
-    if (!noteId || !to || !to.id || !to.topic) {
-      throw new Error(`Error: Failed to move note.`);
-    }
-    if (!from.id && !from.topic) {
-      return await this.addNoteToTopic(to.id, to.topic, noteId);
-    } else {
-      if (from.id === to.id && from.topic === to.topic) {
-        throw new Error(
-          "Moving to the same notebook and topic is not possible."
-        );
+  async moveNotes(from, to, ...noteIds) {
+    for (let noteId of noteIds) {
+      if (!noteId || !to || !to.id || !to.topic) {
+        throw new Error(`Error: Failed to move note.`);
       }
+      if (!from.id && !from.topic) {
+        await this.addNoteToTopic(to.id, to.topic, noteId);
+      } else {
+        if (from.id === to.id && from.topic === to.topic) {
+          throw new Error(
+            "Moving to the same notebook and topic is not possible."
+          );
+        }
 
-      if (await this.deleteNoteFromTopic(from.id, from.topic, noteId)) {
-        return await this.addNoteToTopic(to.id, to.topic, noteId);
+        if (await this.deleteNoteFromTopic(from.id, from.topic, noteId)) {
+          await this.addNoteToTopic(to.id, to.topic, noteId);
+        }
       }
     }
-
-    return false;
   }
 
   async restoreItem(id) {
@@ -561,10 +561,9 @@ function makeTopic(topic, notebookId) {
   };
 }
 
-async function editItem(type, id, prop) {
-  switch (type) {
-    case "notebook":
-    case "note":
+async function editItems(type, prop, ...ids) {
+  if (type === "note" || type === "notebook") {
+    for (let id of ids) {
       let col = type == "note" ? this.notes : this.notebooks;
       let func = type == "note" ? this.addNote : this.addNotebook;
       if (col[id] === undefined) {
@@ -573,9 +572,9 @@ async function editItem(type, id, prop) {
       let state = col[id][prop];
       let edit = { [prop]: !state };
       await func.call(this, { ...col[id], ...edit });
-      break;
-    default:
-      throw new Error("Invalid type given to pinItem");
+    }
+  } else {
+    throw new Error("Invalid type given to pinItem");
   }
 }
 

@@ -311,12 +311,13 @@ test("move note", async () =>
     await db.addNoteToTopic(notebook1, "Home", timestamp);
     setTimeout(async () => {
       let notebook2 = await db.addNotebook(TEST_NOTEBOOK2);
-      let res = await db.moveNote(
-        timestamp,
+      await db.moveNotes(
         { id: notebook1, topic: "Home" },
-        { id: notebook2, topic: "Home2" }
+        { id: notebook2, topic: "Home2" },
+        timestamp
       );
-      expect(res).toBe(true);
+      let note = db.getNote(timestamp);
+      expect(note.notebook.id).toBe(notebook2);
     }, 1000);
   }));
 
@@ -439,24 +440,19 @@ test("deletion of invalid topic from notebook should return false", () =>
 
 test("moving note with wrong id should throw", () =>
   databaseTest().then(async db => {
-    db.moveNote(0, undefined, undefined).catch(err =>
+    db.moveNotes(undefined, undefined, 0).catch(err =>
       expect(err.message).toContain("Failed to move note.")
     );
   }));
 
 test("moving note to non-existent notebook should return false", () =>
   databaseTest().then(async db => {
-    let res = await await db.moveNote(
-      29,
-      { id: 2, topic: "2" },
-      { id: 5, topic: "123" }
-    );
-    expect(res).toBe(false);
+    await db.moveNotes({ id: 2, topic: "2" }, { id: 5, topic: "123" }, 23);
   }));
 
 test("moving note to same notebook should throw", () =>
   databaseTest().then(async db => {
-    db.moveNote(29, { id: 2, topic: "2" }, { id: 2, topic: "2" }).catch(err =>
+    db.moveNotes({ id: 2, topic: "2" }, { id: 2, topic: "2" }, 23).catch(err =>
       expect(err.message).toContain(
         "Moving to the same notebook and topic is not possible."
       )
@@ -528,13 +524,13 @@ test("pin notebook", () =>
 
 test("favorite note", () =>
   noteTest().then(async ({ db, timestamp }) => {
-    await db.favoriteNote(timestamp);
+    await db.favoriteNotes(timestamp);
     expect(db.getNote(timestamp).favorite).toBe(true);
   }));
 
 test("favorite notebook", () =>
   notebookTest().then(async ({ db, timestamp }) => {
-    await db.favoriteNotebook(timestamp);
+    await db.favoriteNotebooks(timestamp);
     expect(db.getNotebook(timestamp).favorite).toBe(true);
   }));
 
