@@ -149,10 +149,10 @@ class Database {
       title: getNoteTitle(note),
       content: getNoteContent(note),
       pinned: !!note.pinned,
-      tags: note.tags || [],
       locked: !!note.locked,
       notebook: note.notebook || {},
       colors: note.colors || [],
+      tags: note.tags || [],
       favorite: !!note.favorite,
       headline: getNoteHeadline(note),
       dateEditted: Date.now(),
@@ -161,13 +161,8 @@ class Database {
 
     if (oldNote) {
       note.colors = setManipulator.union(oldNote.colors, note.colors);
-      await updateTags.call(
-        this,
-        setManipulator.complement(note.tags, oldNote.tags)
-      );
-      note.tags = setManipulator.union(oldNote.tags, note.tags);
     } else {
-      await updateTags.call(this, note.tags);
+      await addTags.call(this, note.tags);
     }
 
     this.notes[timestamp] = note;
@@ -175,12 +170,31 @@ class Database {
     return timestamp;
   }
 
-  pinItem(type, id) {
-    return editItem.call(this, type, id, "pinned");
+  async addTag(noteId, tag) {
+    if (!this.notes[noteId])
+      throw new Error("Couldn't add tag. This note doesn't exist.");
+    this.notes[noteId].tags.push(tag);
+    await addTags.call(this, [tag]);
+    await this.storage.write(KEYS.notes, this.notes);
   }
 
-  favoriteItem(type, id) {
-    return editItem.call(this, type, id, "favorite");
+  async removeTag(noteId, tag) {
+    if (!this.notes[noteId])
+      throw new Error("Couldn't remove tag. This note doesn't exist.");
+    let tags = this.notes[noteId].tags;
+    if (tags.indexOf(tag) <= -1)
+      throw new Error("This note is not tagged by the specified tag.");
+    this.notes[noteId].tags.splice(tags.indexOf(tag), 1);
+    await removeTags.call(this, [tag]);
+    await this.storage.write(KEYS.notes, this.notes);
+  }
+
+  pinNote(id) {
+    return editItem.call(this, "note", id, "pinned");
+  }
+
+  favoriteNote(id) {
+    return editItem.call(this, "note", id, "favorite");
   }
 
   async deleteNotes(...noteIds) {
@@ -291,6 +305,14 @@ class Database {
     };
     await this.storage.write(KEYS.notebooks, this.notebooks);
     return id;
+  }
+
+  pinNotebook(id) {
+    return editItem.call(this, "notebook", id, "pinned");
+  }
+
+  favoriteNotebook(id) {
+    return editItem.call(this, "notebook", id, "favorite");
   }
 
   addTopicToNotebook(notebookId, topic) {
@@ -598,7 +620,7 @@ function getNoteContent(note) {
   };
 }
 
-async function updateTags(tags) {
+async function addTags(tags) {
   for (let tag of tags) {
     if (!tag || tag.trim().length <= 0) continue;
     let oldCount = this.tags[tag] ? this.tags[tag].count : 0;
@@ -607,5 +629,21 @@ async function updateTags(tags) {
       count: oldCount + 1
     };
   }
-  await this.storage.write(KEYS.tags, this[KEYS.tags]);
+  await this.storage.write(KEYS.tags, this.tags);
+}
+
+async function removeTags(tags) {
+  for (let tag of tags) {
+    if (!tag || tag.trim().length <= 0 || !this.tags[tag]) continue;
+    let oldCount = this.tags[tag].count;
+    if (oldCount <= 1) {
+      delete this.tags[tag];
+    } else {
+      this.tags[tag] = {
+        title: tag,
+        count: oldCount - 1
+      };
+    }
+  }
+  await this.storage.write(KEYS.tags, this.tags);
 }

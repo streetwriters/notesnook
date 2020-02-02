@@ -171,25 +171,21 @@ test("updating note with duplicate colors", () =>
     expect(note.colors).toStrictEqual(["red", "blue"]);
   }));
 
-test("updating note with new tags", () =>
-  noteTest({
-    ...TEST_NOTE,
-    tags: ["hello", "world"]
-  }).then(async ({ db, timestamp }) => {
-    let updateTimestamp = await db.addNote({
-      dateCreated: timestamp,
-      tags: ["new", "tag", "goes", "here"]
-    });
-    expect(updateTimestamp).toBe(timestamp);
-    let note = db.getNote(updateTimestamp);
-    expect(note.tags).toStrictEqual([
-      "hello",
-      "world",
-      "new",
-      "tag",
-      "goes",
-      "here"
-    ]);
+test("add tag to note", () =>
+  noteTest().then(async ({ db, timestamp }) => {
+    await db.addTag(timestamp, "hello");
+    expect(db.getNote(timestamp).tags[0]).toBe("hello");
+    expect(db.getTags()[0].title).toBe("hello");
+  }));
+
+test("remove tag from note", () =>
+  noteTest().then(async ({ db, timestamp }) => {
+    await db.addTag(timestamp, "hello");
+    expect(db.getNote(timestamp).tags[0]).toBe("hello");
+    expect(db.getTags()[0].title).toBe("hello");
+    await db.removeTag(timestamp, "hello");
+    expect(db.getNote(timestamp).tags.length).toBe(0);
+    expect(db.getTags().length).toBe(0);
   }));
 
 test("note with text longer than 150 characters should have ... in the headline", () =>
@@ -486,18 +482,10 @@ test("Operations on uninitialized database should throw", () => {
 
 test("edit item with wrong id should throw", () =>
   databaseTest().then(async db => {
-    db.pinItem("notebook", 1242141).catch(err => {
+    db.pinNotebook(1242141).catch(err => {
       expect(err.message).toContain("Wrong notebook id");
     });
   }));
-
-test("edit item with wrong type should throw", () => {
-  databaseTest().then(async db => {
-    db.pinItem("notebok", 1242141).catch(err => {
-      expect(err.message).toContain("Invalid type");
-    });
-  });
-});
 
 test("restoring an invalid item from trash should throw", () =>
   databaseTest().then(async db => {
@@ -528,25 +516,25 @@ test("get grouped notes default (special)", () => groupedTest("", true));
 
 test("pin note", () =>
   noteTest().then(async ({ db, timestamp }) => {
-    await db.pinItem("note", timestamp);
+    await db.pinNote(timestamp);
     expect(db.getNote(timestamp).pinned).toBe(true);
   }));
 
 test("pin notebook", () =>
   notebookTest().then(async ({ db, timestamp }) => {
-    await db.pinItem("notebook", timestamp);
+    await db.pinNotebook(timestamp);
     expect(db.getNotebook(timestamp).pinned).toBe(true);
   }));
 
 test("favorite note", () =>
   noteTest().then(async ({ db, timestamp }) => {
-    await db.favoriteItem("note", timestamp);
+    await db.favoriteNote(timestamp);
     expect(db.getNote(timestamp).favorite).toBe(true);
   }));
 
 test("favorite notebook", () =>
   notebookTest().then(async ({ db, timestamp }) => {
-    await db.favoriteItem("notebook", timestamp);
+    await db.favoriteNotebook(timestamp);
     expect(db.getNotebook(timestamp).favorite).toBe(true);
   }));
 
