@@ -93,6 +93,7 @@ export const Tags = ({navigation}) => {
           }
           renderItem={({item, index}) => (
             <TouchableOpacity
+              key={item.title}
               onPress={() => {
                 NavigationService.navigate('Notes', {
                   type: 'tag',

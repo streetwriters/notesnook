@@ -80,7 +80,6 @@ export const NotebookItem = ({
               fontSize: SIZE.sm + 1,
               color: colors.pri,
               maxWidth: '100%',
-              marginBottom: 5,
             }}>
             {item.title}
           </Text>
@@ -105,7 +104,6 @@ export const NotebookItem = ({
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
-                marginTop: 5,
                 width: '80%',
                 maxWidth: '80%',
                 flexWrap: 'wrap',
@@ -119,8 +117,8 @@ export const NotebookItem = ({
                         backgroundColor: colors.accent,
                         paddingHorizontal: ph / 1.5,
                         paddingVertical: pv / 4,
-                        marginRight: 10,
-                        marginVertical: 4,
+                        marginRight: 5,
+                        marginVertical: 2.5,
                       }}>
                       <Text
                         numberOfLines={1}

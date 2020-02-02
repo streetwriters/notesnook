@@ -133,8 +133,8 @@ export const normalize = size => {
 };
 
 export const SIZE = {
-  xxs: normalize(10),
-  xs: normalize(12),
+  xxs: 10,
+  xs: 12,
   sm: normalize(15),
   md: normalize(18),
   lg: normalize(24),

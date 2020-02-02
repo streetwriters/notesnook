@@ -3,21 +3,20 @@ import {
   ActivityIndicator,
   FlatList,
   Platform,
+  RefreshControl,
   SectionList,
   Text,
   View,
-  RefreshControl,
 } from 'react-native';
 import {SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
-import {slideLeft, slideRight} from '../../utils/animations';
-import {NotesPlaceHolder} from '../ListPlaceholders';
-import NoteItem from '../NoteItem';
-import SelectionWrapper from '../SelectionWrapper';
 import {eSendEvent} from '../../services/eventManager';
 import {eScrollEvent} from '../../services/events';
 import {ToastEvent} from '../../utils/utils';
+import {NotesPlaceHolder} from '../ListPlaceholders';
+import NoteItem from '../NoteItem';
+import SelectionWrapper from '../SelectionWrapper';
 
 export const NotesList = ({isGrouped = false}) => {
   const [state, dispatch] = useTracked();

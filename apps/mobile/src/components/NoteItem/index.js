@@ -140,7 +140,6 @@ export default class NoteItem extends React.Component {
                 fontSize: SIZE.sm + 1,
                 fontFamily: WEIGHT.bold,
                 maxWidth: '95%',
-                marginBottom: 5,
               }}>
               {item.title.replace('\n', '')}
             </Text>
@@ -171,7 +170,7 @@ export default class NoteItem extends React.Component {
                   justifyContent: 'flex-start',
                   alignItems: 'center',
                   width: '100%',
-                  marginTop: 10,
+                  marginTop: 5,
                 }}>
                 {!isTrash ? (
                   <>

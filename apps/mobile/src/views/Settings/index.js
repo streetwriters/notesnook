@@ -93,7 +93,7 @@ export const Settings = ({navigation}) => {
             }}>
             <Text
               style={{
-                fontSize: item.step ? SIZE.sm : SIZE.md,
+                fontSize: SIZE.md,
                 fontFamily: WEIGHT.regular,
                 textAlignVertical: 'center',
                 color: colors.pri,

@@ -70,7 +70,12 @@ export const Toast = () => {
       style={{
         width: '100%',
         alignItems: 'center',
+        height: 60,
         opacity: toast ? 1 : 0,
+        bottom: 100,
+        position: 'absolute',
+
+        zIndex: 999,
         transform: [
           {
             translateY: toast ? 0 : 300,
@@ -83,13 +88,8 @@ export const Toast = () => {
           ...toastStyle,
           maxWidth: DDS.isTab ? normalize(350) : w - 24,
           minWidth: DDS.isTab ? normalize(250) : w / 2,
-          marginHorizontal: 12,
-          position: 'absolute',
           alignSelf: 'center',
-          bottom: 100,
-          zIndex: 999,
           borderRadius: 5,
-
           paddingHorizontal: ph,
           paddingVertical: pv,
           justifyContent: 'center',

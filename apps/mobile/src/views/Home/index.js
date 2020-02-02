@@ -5,12 +5,12 @@ import {useIsFocused} from 'react-navigation-hooks';
 import {DDS} from '../../../App';
 import Container from '../../components/Container';
 import {NotesList} from '../../components/NotesList';
+import SelectionHeader from '../../components/SelectionHeader';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
 import NavigationService from '../../services/NavigationService';
 import {SideMenuEvent} from '../../utils/utils';
-import SelectionHeader from '../../components/SelectionHeader';
 
 export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(
   SafeAreaView,
@@ -19,7 +19,6 @@ export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(
 export const Home = ({navigation}) => {
   const [state, dispatch] = useTracked();
   const {notes} = state;
-
   const isFocused = useIsFocused();
 
   useEffect(() => {
