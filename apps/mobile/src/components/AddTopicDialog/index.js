@@ -5,6 +5,9 @@ import Icon from 'react-native-vector-icons/Feather';
 import {opacity, ph, pv, SIZE, WEIGHT} from '../../common/common';
 
 import {getElevation, ToastEvent} from '../../utils/utils';
+import {db} from '../../../App';
+import {eSendEvent} from '../../services/eventManager';
+import {eOnNewTopicAdded} from '../../services/events';
 
 export class AddTopicDialog extends React.Component {
   constructor(props) {
@@ -21,10 +24,10 @@ export class AddTopicDialog extends React.Component {
     if (!this.title)
       return ToastEvent.show('Title is required', 'error', 3000, () => {}, '');
 
-    //db.addTopicToNotebook(toEdit.dateCreated, title);
-
+    db.addTopicToNotebook(this.props.notebookID, this.title);
+    eSendEvent(eOnNewTopicAdded);
     ToastEvent.show('New topic added', 'success', 3000, () => {}, '');
-    close(true);
+    this.close();
   };
 
   open() {
@@ -49,7 +52,10 @@ export class AddTopicDialog extends React.Component {
         animated
         animationType="fade"
         transparent={true}
-        onRequestClose={() => (refs = [])}>
+        onRequestClose={() => {
+          refs = [];
+          this.close();
+        }}>
         <View
           style={{
             width: '100%',
@@ -59,7 +65,7 @@ export class AddTopicDialog extends React.Component {
             alignItems: 'center',
           }}>
           <TouchableOpacity
-            onPress={() => close()}
+            onPress={() => this.close()}
             style={{
               width: '100%',
               height: '100%',

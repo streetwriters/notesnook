@@ -295,7 +295,7 @@ export class DialogManager extends Component {
     this.addNotebooksDialog.close();
   };
 
-  showAddTopic = () => {
+  showAddTopic = notebook => {
     this.setState({
       item: notebook,
     });
@@ -452,11 +452,11 @@ export class DialogManager extends Component {
 
         <AddTopicDialog
           ref={ref => (this.addTopicsDialog = ref)}
-          toEdit={item}
+          toEdit={item.type === 'topic' ? item : null}
           notebookID={
             actionSheetData.extraData
               ? actionSheetData.extraData.notebookID
-              : null
+              : item.dateCreated
           }
           colors={colors}
         />

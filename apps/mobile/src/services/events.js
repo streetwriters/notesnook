@@ -55,3 +55,5 @@ export const eHideToast = '526';
 export const eThemeUpdated = '527';
 
 export const eScrollEvent = '528';
+
+export const eOnNewTopicAdded = '529';

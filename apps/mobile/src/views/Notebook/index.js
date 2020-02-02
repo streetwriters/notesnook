@@ -10,7 +10,15 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent,
 } from '../../services/eventManager';
-import {eMoveNoteDialogNavigateBack, eScrollEvent} from '../../services/events';
+import {
+  eMoveNoteDialogNavigateBack,
+  eScrollEvent,
+  eOnNewTopicAdded,
+} from '../../services/events';
+import SelectionHeader from '../../components/SelectionHeader';
+import SelectionWrapper from '../../components/SelectionWrapper';
+import {AddTopicEvent} from '../../components/DialogManager';
+import {db} from '../../../App';
 
 export const Notebook = ({navigation}) => {
   const [state, dispatch] = useTracked();
@@ -18,13 +26,28 @@ export const Notebook = ({navigation}) => {
   const [topics, setTopics] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   let params = navigation.state.params;
-
+  let notebook;
   let isFocused = useIsFocused();
 
   useEffect(() => {
+    params = navigation.state.params;
     let topic = params.notebook.topics;
-
+    notebook = params.notebook;
+    console.log(navigation);
     setTopics([...topic]);
+  }, []);
+
+  useEffect(() => {
+    eSubscribeEvent(eOnNewTopicAdded, () => {
+      notebook = db.getNotebook(navigation.state.params.notebook.dateCreated);
+      setTopics([...notebook.topics]);
+    });
+    return () => {
+      eUnSubscribeEvent(eOnNewTopicAdded, () => {
+        notebook = db.getNotebook(navigation.state.params.notebook.dateCreated);
+        setTopics([...notebook.topics]);
+      });
+    };
   }, []);
 
   const handleBackPress = () => {
@@ -47,18 +70,34 @@ export const Notebook = ({navigation}) => {
     item.dateCreated.toString() + index.toString();
 
   const renderItem = ({item, index}) => (
-    <NotebookItem
-      hideMore={params.hideMore}
-      isTopic={true}
-      noteToMove={params.note}
-      notebookID={params.notebook.dateCreated}
-      isMove={params.isMove}
-      refresh={() => {}}
-      item={item}
-      index={index}
-      colors={colors}
-      data={topics}
-    />
+    <SelectionWrapper item={item}>
+      <NotebookItem
+        hideMore={params.hideMore}
+        isTopic={true}
+        customStyle={{
+          width: selectionMode ? w - 74 : '100%',
+          marginHorizontal: 0,
+        }}
+        onLongPress={() => {
+          dispatch({
+            type: ACTIONS.SELECTION_MODE,
+            enabled: !selectionMode,
+          });
+          dispatch({
+            type: ACTIONS.SELECTED_ITEMS,
+            item: item,
+          });
+        }}
+        noteToMove={params.note}
+        notebookID={params.notebook.dateCreated}
+        isMove={params.isMove}
+        refresh={() => {}}
+        item={item}
+        index={index}
+        colors={colors}
+        data={topics}
+      />
+    </SelectionWrapper>
   );
 
   const ListFooterComponent = (
@@ -102,9 +141,11 @@ export const Notebook = ({navigation}) => {
       placeholder={`Search in "${params.title}"`}
       heading={params.title}
       canGoBack={true}
-      data={params.notebook.topics}
+      data={topics}
       bottomButtonOnPress={() => {
-        //setAddTopic(true);
+        console.log(navigation.state.params.notebook);
+        let n = navigation.state.params.notebook;
+        AddTopicEvent(n);
       }}>
       <FlatList
         refreshControl={
