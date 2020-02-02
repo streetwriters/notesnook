@@ -76,8 +76,7 @@ export default class NoteItem extends React.Component {
             alignItems: 'center',
             flexDirection: 'row',
             maxWidth: '100%',
-            paddingRight: 12,
-
+            paddingRight: 6,
             alignSelf: 'center',
             borderBottomWidth: 1,
             borderBottomColor: colors.nav,
@@ -139,7 +138,7 @@ export default class NoteItem extends React.Component {
                 color: colors.pri,
                 fontSize: SIZE.sm + 1,
                 fontFamily: WEIGHT.bold,
-                maxWidth: '95%',
+                maxWidth: '100%',
               }}>
               {item.title.replace('\n', '')}
             </Text>
@@ -257,14 +256,12 @@ export default class NoteItem extends React.Component {
 
         <View
           style={{
-            width: DDS.isTab ? w * 0.7 * 0.05 : w * 0.05,
             justifyContent: 'center',
             minHeight: 70,
             alignItems: 'center',
           }}>
           <TouchableOpacity
             style={{
-              width: w * 0.05,
               justifyContent: 'center',
               minHeight: 70,
               alignItems: 'center',

@@ -139,7 +139,7 @@ export const TEMPLATE_EXIT = type => {
 export const TEMPLATE_INFO = dateCreated => {
   return {
     title: `Note Info`,
-    paragraph: `Created on ${timeConverter(dateCreated)}`,
+    paragraph: `Created on ${timeConverter(dateCreated)} `,
     positiveText: ``,
     negativeText: '',
     noButtons: true,

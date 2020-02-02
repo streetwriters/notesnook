@@ -6,33 +6,32 @@ import {
   Text,
   TouchableOpacity,
   View,
-  DeviceEventEmitter,
 } from 'react-native';
 import FastStorage from 'react-native-fast-storage';
 import Icon from 'react-native-vector-icons/Feather';
+import {db, DDS} from '../../../App';
 import {
   ACCENT,
   COLOR_SCHEME,
   COLOR_SCHEME_DARK,
   COLOR_SCHEME_LIGHT,
+  normalize,
   opacity,
   pv,
   setColorScheme,
   SIZE,
   WEIGHT,
-  normalize,
 } from '../../common/common';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
-import NavigationService from '../../services/NavigationService';
-import {AnimatedSafeAreaView} from '../../views/Home';
-import {DDS, db} from '../../../App';
+import {eSendEvent} from '../../services/eventManager';
 import {
   eOpenLoginDialog,
   eOpenModalMenu,
   eSendSideMenuOverlayRef,
 } from '../../services/events';
-import {eSendEvent} from '../../services/eventManager';
+import NavigationService from '../../services/NavigationService';
+import {AnimatedSafeAreaView} from '../../views/Home';
 
 export const Menu = ({
   close = () => {},
@@ -350,9 +349,17 @@ export const Menu = ({
                     style={{
                       fontFamily: WEIGHT.regular,
                       fontSize: SIZE.xs + 1,
+                      color: colors.accent,
+                    }}>
+                    #
+                  </Text>
+                  <Text
+                    style={{
+                      fontFamily: WEIGHT.regular,
+                      fontSize: SIZE.xs + 1,
                       color: colors.icon,
                     }}>
-                    #{item.title}
+                    {item.title}
                   </Text>
                   {item.count > 1 ? (
                     <Text

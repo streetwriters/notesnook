@@ -74,7 +74,6 @@ export const Toast = () => {
         opacity: toast ? 1 : 0,
         bottom: 100,
         position: 'absolute',
-
         zIndex: 999,
         transform: [
           {

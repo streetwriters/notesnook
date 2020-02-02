@@ -49,7 +49,6 @@ export const NotebookItem = ({
           alignItems: 'center',
           flexDirection: 'row',
           paddingRight: 6,
-          marginHorizontal: 12,
           alignSelf: 'center',
           borderBottomWidth: 1,
           borderBottomColor: colors.nav,
