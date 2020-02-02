@@ -121,9 +121,7 @@ export default class SideMenu extends React.Component {
         <TouchableWithoutFeedback onPress={() => this.openMenu(false)}>
           <Animated.View
             ref={ref => (this.overlay = ref)}
-            onTouchStart={() => {
-              console.log('hello');
-            }}
+            onTouchStart={() => {}}
             style={{
               display: 'none',
               position: 'relative',

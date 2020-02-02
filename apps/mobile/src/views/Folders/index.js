@@ -43,7 +43,7 @@ export const Folders = ({navigation}) => {
 
   useEffect(() => {
     dispatch({type: ACTIONS.NOTEBOOKS});
-    console.log(notebooks);
+
     let backhandler;
     if (isFocused) {
       backhandler = BackHandler.addEventListener(

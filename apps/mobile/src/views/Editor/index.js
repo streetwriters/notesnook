@@ -218,7 +218,6 @@ const Editor = ({navigation, noMenu}) => {
   }, [noMenu]);
 
   const onWebViewLoad = () => {
-    console.log('requesting focus');
     //EditorWebView.requestFocus();
     if (noMenu) {
       post(
@@ -266,7 +265,6 @@ const Editor = ({navigation, noMenu}) => {
     content = note.content;
     saveCounter = 0;
 
-    console.log(note);
     if (title !== null || title === '') {
       post(
         JSON.stringify({
@@ -283,7 +281,6 @@ const Editor = ({navigation, noMenu}) => {
     } else if (note.content.delta) {
       post(JSON.stringify(note.content.delta));
     } else {
-      console.log('herrree');
       post(JSON.stringify({type: 'text', value: note.content.text}));
     }
   };

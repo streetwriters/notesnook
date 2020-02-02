@@ -66,7 +66,7 @@ export default class NoteItem extends React.Component {
       pinned,
       index,
     } = this.props;
-    console.log('rendering', index);
+
     return (
       <View
         style={[

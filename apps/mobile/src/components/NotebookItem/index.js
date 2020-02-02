@@ -241,8 +241,6 @@ export const NotebookItem = ({
           <TouchableOpacity
             activeOpacity={opacity}
             onPress={async () => {
-              console.log(selectedItemsList, item);
-
               /*  let noteIds = [];
               selectedItemsList.forEach(item => noteIds.push(item.dateCreated));
               if (!noteToMove.notebook.notebook) {

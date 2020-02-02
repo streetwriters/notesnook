@@ -30,8 +30,6 @@ export default class PullToRefresh extends Component {
   }
 
   onPanResponderMove = (event, gestureEvent) => {
-    console.log(this.prevScroll);
-
     this.listRef.getScrollResponder().scrollTo({
       x: 0,
       y: this.prevScroll + gestureEvent.dy * -1,

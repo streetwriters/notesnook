@@ -82,7 +82,6 @@ class MoveNoteDialog extends React.Component {
   }
 
   open() {
-    console.log(' i am called');
     this.setState({
       visible: true,
     });
@@ -166,7 +165,6 @@ class MoveNoteDialog extends React.Component {
               ref={ref => (this.navigation = ref)}
               onNavigationStateChange={state => {
                 this.routeIndex = state.index;
-                console.log(state);
               }}
             />
           </View>

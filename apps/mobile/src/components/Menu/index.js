@@ -61,7 +61,6 @@ export const Menu = ({
     });
 
     setTags([...allTags]);
-    console.log(allTags);
   }, []);
 
   const listItems = [

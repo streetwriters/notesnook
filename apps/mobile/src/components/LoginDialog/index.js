@@ -160,7 +160,6 @@ class LoginDialog extends React.Component {
               ref={ref => (this.navigation = ref)}
               onNavigationStateChange={state => {
                 this.routeIndex = state.index;
-                console.log(state);
               }}
             />
           </View>

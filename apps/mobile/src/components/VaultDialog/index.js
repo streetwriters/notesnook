@@ -51,9 +51,7 @@ export class VaultDialog extends Component {
       if (n.content.cipher) {
         try {
           item = await db.unlockNote(n.dateCreated, password, this.props.perm);
-        } catch (error) {
-          console.log(error);
-        }
+        } catch (error) {}
       } else {
         item = n;
       }

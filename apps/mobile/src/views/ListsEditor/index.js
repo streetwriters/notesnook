@@ -105,15 +105,13 @@ const ListsEditor = ({navigation}) => {
             deleteMode={deleteMode}
             addToDeleteList={index => {
               let items = deleteItemsList;
-              console.log(items);
+
               if (items.includes(index)) {
                 let i = items.indexOf(index);
                 items.splice(i, 1);
                 setDeleteItemsList(items);
-                console.log(JSON.stringify(deleteItemsList), 'splice');
               } else {
                 items[items.length] = index;
-                console.log(JSON.stringify(items), 'here');
 
                 setDeleteItemsList(items);
               }
@@ -160,7 +158,6 @@ const ListsEditor = ({navigation}) => {
                 prevIndex = null;
                 prevItem = null;
                 setListData(oldData);
-                console.log(oldData);
                 forceUpdate();
               }
             }}

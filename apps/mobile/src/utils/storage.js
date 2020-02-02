@@ -36,9 +36,8 @@ function decrypt(password, data) {
   let key;
   return Aes.pbkdf2(password, 'salt', 5000, 256).then(aes => {
     key = aes;
-    console.log(data, key);
+
     return Aes.decrypt(data.cipher, key, data.iv).then(e => {
-      console.log(e);
       return e;
     });
   });

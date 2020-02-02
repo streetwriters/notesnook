@@ -38,12 +38,14 @@ export class AddNotebookDialog extends React.Component {
     this.timestamp = null;
     this.backPressCount = 0;
     this.currentInputValue = null;
+    this.titleRef;
+    this.descriptionRef;
   }
 
   open = () => {
     refs = [];
     let {toEdit} = this.props;
-    console.log(toEdit);
+
     if (toEdit && toEdit.type === 'notebook') {
       let topicsList = [];
       toEdit.topics.forEach(item => {
@@ -211,7 +213,6 @@ export class AddNotebookDialog extends React.Component {
               ...getElevation(5),
               width: DDS.isTab ? '50%' : '80%',
               maxHeight: '80%',
-              height: '80%',
               borderRadius: 5,
               backgroundColor: colors.bg,
               paddingHorizontal: ph,
@@ -238,6 +239,7 @@ export class AddNotebookDialog extends React.Component {
             </View>
 
             <TextInput
+              ref={ref => (this.titleRef = ref)}
               style={{
                 padding: pv - 5,
                 borderWidth: 1.5,
@@ -265,10 +267,14 @@ export class AddNotebookDialog extends React.Component {
               onChangeText={value => {
                 this.title = value;
               }}
+              onSubmitEditing={() => {
+                this.descriptionRef.focus();
+              }}
               placeholder="Title of notebook"
               placeholderTextColor={colors.icon}
             />
             <TextInput
+              ref={ref => (this.descriptionRef = ref)}
               style={{
                 padding: pv - 5,
                 borderWidth: 1.5,
@@ -295,6 +301,9 @@ export class AddNotebookDialog extends React.Component {
               defaultValue={toEdit ? toEdit.description : null}
               onChangeText={value => {
                 this.description = value;
+              }}
+              onSubmitEditing={() => {
+                this.topicInputRef.focus();
               }}
               placeholder="write a description"
               placeholderTextColor={colors.icon}

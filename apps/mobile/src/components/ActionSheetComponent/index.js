@@ -125,7 +125,7 @@ export const ActionSheetComponent = ({
   const localRefresh = (type, nodispatch = false) => {
     if (!note || !note.dateCreated) return;
     let toAdd;
-    console.log(type);
+
     switch (type) {
       case 'note': {
         toAdd = db.getNote(note.dateCreated);
@@ -136,9 +136,8 @@ export const ActionSheetComponent = ({
         break;
       }
       case 'topic': {
-        console.log(note, 'topics');
         toAdd = db.getTopic(note.notebookId, note.title);
-        console.log(toAdd, 'heree');
+
         break;
       }
     }
@@ -486,7 +485,6 @@ export const ActionSheetComponent = ({
         if (!item.dateDeleted) {
           localRefresh(item.type, true);
         }
-        console.log(note.dateCreated, 'here');
       }}
       style={{
         paddingBottom: 15,

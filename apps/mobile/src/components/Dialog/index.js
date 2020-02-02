@@ -93,7 +93,6 @@ export class Dialog extends Component {
     let {template, item} = this.props;
     if (dialogActions.ACTION_TRASH === template.action) {
       // delete item forever.
-      console.log('deleted forever');
     }
     this.setState({
       visible: false,
