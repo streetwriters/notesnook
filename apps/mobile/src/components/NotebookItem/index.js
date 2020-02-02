@@ -6,6 +6,7 @@ import {useTracked} from '../../provider';
 import NavigationService from '../../services/NavigationService';
 import {ToastEvent, w} from '../../utils/utils';
 import {ActionSheetEvent, moveNoteHideEvent} from '../DialogManager';
+import {db} from '../../../App';
 
 export const NotebookItem = ({
   item,
@@ -65,6 +66,8 @@ export const NotebookItem = ({
         <TouchableOpacity
           style={{
             width: '75%',
+            minHeight: 50,
+            justifyContent: 'center',
           }}
           onLongPress={onLongPress}
           onPress={navigate}>
@@ -72,9 +75,10 @@ export const NotebookItem = ({
             numberOfLines={1}
             style={{
               fontFamily: WEIGHT.bold,
-              fontSize: SIZE.md,
+              fontSize: SIZE.sm + 1,
               color: colors.pri,
               maxWidth: '100%',
+              marginBottom: 5,
             }}>
             {item.title}
           </Text>
@@ -100,8 +104,8 @@ export const NotebookItem = ({
                 flexDirection: 'row',
                 alignItems: 'center',
                 marginTop: 5,
-                width: '95%',
-                maxWidth: '95%',
+                width: '80%',
+                maxWidth: '80%',
                 flexWrap: 'wrap',
               }}>
               {item && item.topics
@@ -190,7 +194,7 @@ export const NotebookItem = ({
               </Text>
             </View>
           )}
-          {isTopic ? (
+          {isTopic && item.totalNotes > 0 ? (
             <Text
               style={{
                 color: colors.icon,
@@ -199,16 +203,18 @@ export const NotebookItem = ({
                 fontFamily: WEIGHT.regular,
                 marginTop: 5,
               }}>
-              {item && item.totalNotes && item.totalNotes.length == 1
+              {item && item.totalNotes && item.totalNotes > 1
                 ? item.totalNotes + ' notes'
-                : item.totalNotes + ' note'}
+                : item.totalNotes === 1
+                ? item.totalNotes + ' note'
+                : null}
             </Text>
           ) : null}
         </TouchableOpacity>
-        {hideMore ? null : (
+        {hideMore ||
+        (item.title === 'General' && item.type === 'topic') ? null : (
           <TouchableOpacity
             style={{
-              width: w * 0.05,
               justifyContent: 'center',
               minHeight: 70,
               alignItems: 'center',
@@ -221,7 +227,8 @@ export const NotebookItem = ({
                     'Delete',
                   ];
 
-              let columnItems = ['Pin', 'Favorite'];
+              let columnItems =
+                item.type === 'topic' ? [] : ['Pin', 'Favorite'];
 
               ActionSheetEvent(item, false, false, rowItems, columnItems, {
                 notebookID: notebookID,
@@ -236,21 +243,33 @@ export const NotebookItem = ({
             activeOpacity={opacity}
             onPress={async () => {
               console.log(selectedItemsList, item);
-              /*  if (!noteToMove.notebook.notebook) {
+
+              /*  let noteIds = [];
+              selectedItemsList.forEach(item => noteIds.push(item.dateCreated));
+              if (!noteToMove.notebook.notebook) {
+                await db.moveNotes(null, {
+                  topic: item.title,
+                  id: item.notebookId,
+                });
                 await db.addNoteToTopic(
                   notebookID,
                   item.title,
                   noteToMove.dateCreated,
                 );
               } else if (selectedItemsList) {
-
+                
+                await db.moveNotes(null, {
+                  topic: item.title,
+                  id: item.notebookId,
+                });
                 await db.moveNote(noteToMove.dateCreated, noteToMove.notebook, {
                   notebook: notebookID,
                   topic: item.title,
-                });
-              } */
+                }); 
 
-              // moveNoteHideEvent();
+              }*/
+
+              moveNoteHideEvent();
 
               ToastEvent.show(
                 `Note moved to ${item.title}`,

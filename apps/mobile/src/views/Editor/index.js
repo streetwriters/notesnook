@@ -294,6 +294,70 @@ const Editor = ({navigation, noMenu}) => {
           link.click();  
     }`;
 
+  const timeConverter = timestamp => {
+    var d = new Date(timestamp), // Convert the passed timestamp to milliseconds
+      yyyy = d.getFullYear(),
+      mm = ('0' + (d.getMonth() + 1)).slice(-2), // Months are zero based. Add leading 0.
+      dd = ('0' + d.getDate()).slice(-2), // Add leading 0.
+      currentDay = d.getDay(),
+      hh = d.getHours(),
+      h = hh,
+      min = ('0' + d.getMinutes()).slice(-2), // Add leading 0.
+      ampm = 'AM',
+      time;
+    let days = [
+      'Sunday',
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+    ];
+    var months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+
+    if (hh > 12) {
+      h = hh - 12;
+      ampm = 'PM';
+    } else if (hh === 12) {
+      h = 12;
+      ampm = 'PM';
+    } else if (hh == 0) {
+      h = 12;
+    }
+
+    // ie: 2013-02-18, 8:35 AM
+    time =
+      days[currentDay] +
+      ' ' +
+      dd +
+      ' ' +
+      months[d.getMonth()] +
+      ', ' +
+      yyyy +
+      ', ' +
+      h +
+      ':' +
+      min +
+      ' ' +
+      ampm;
+
+    return time;
+  };
+
   const _renderEditor = () => {
     return (
       <KeyboardAvoidingView
@@ -305,8 +369,7 @@ const Editor = ({navigation, noMenu}) => {
         <View
           style={{
             marginTop: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight,
-          }}
-        />
+          }}></View>
 
         {noMenu ? null : (
           <TouchableOpacity
@@ -330,7 +393,7 @@ const Editor = ({navigation, noMenu}) => {
             <Icon
               style={{
                 marginLeft: -7,
-                marginTop: -3.5,
+                marginTop: -1.5,
               }}
               name="chevron-left"
               color={colors.icon}
@@ -405,6 +468,28 @@ const Editor = ({navigation, noMenu}) => {
           </TouchableOpacity>
         </View>
 
+        <View
+          style={{
+            paddingHorizontal: 12,
+            marginTop:
+              Platform.OS === 'ios' ? 45 : StatusBar.currentHeight + 45,
+            width: '100%',
+            position: 'absolute',
+            justifyContent: 'space-between',
+            flexDirection: 'row',
+            alignItems: 'center',
+            paddingLeft: noMenu ? 12 : 12 + 50,
+          }}>
+          <Text
+            style={{
+              color: colors.icon,
+              fontSize: SIZE.xxs,
+              textAlignVertical: 'center',
+              fontFamily: WEIGHT.regular,
+            }}>
+            {timeConverter(timestamp)}
+          </Text>
+        </View>
         <WebView
           ref={ref => (EditorWebView = ref)}
           onError={error => console.log(error)}

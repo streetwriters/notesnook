@@ -140,7 +140,7 @@ export const NotesList = ({isGrouped = false}) => {
     <Text
       style={{
         fontFamily: WEIGHT.bold,
-        fontSize: SIZE.sm,
+        fontSize: SIZE.xs + 1,
         color: colors.accent,
         paddingHorizontal: 12,
         width: '100%',

@@ -125,10 +125,10 @@ export const ActionSheetComponent = ({
   const localRefresh = (type, nodispatch = false) => {
     if (!note || !note.dateCreated) return;
     let toAdd;
+    console.log(type);
     switch (type) {
       case 'note': {
         toAdd = db.getNote(note.dateCreated);
-
         break;
       }
       case 'notebook': {
@@ -136,10 +136,13 @@ export const ActionSheetComponent = ({
         break;
       }
       case 'topic': {
+        console.log(note, 'topics');
         toAdd = db.getTopic(note.notebookId, note.title);
+        console.log(toAdd, 'heree');
         break;
       }
     }
+    if (!toAdd || !toAdd.dateCreated) return;
 
     if (!nodispatch) {
       dispatch({type: type});
@@ -410,7 +413,7 @@ export const ActionSheetComponent = ({
 
   const _renderColumnItem = item =>
     (note.dateCreated && columnItems.includes(item.name)) ||
-    item.name === 'Dark Mode' ? (
+    (item.name === 'Dark Mode' && columnItems.includes(item.name)) ? (
       <TouchableOpacity
         key={item.name}
         activeOpacity={opacity}

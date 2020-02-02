@@ -137,7 +137,7 @@ export default class NoteItem extends React.Component {
               numberOfLines={1}
               style={{
                 color: colors.pri,
-                fontSize: SIZE.md,
+                fontSize: SIZE.sm + 1,
                 fontFamily: WEIGHT.bold,
                 maxWidth: '95%',
                 marginBottom: 5,
@@ -153,7 +153,7 @@ export default class NoteItem extends React.Component {
               <Text
                 numberOfLines={2}
                 style={{
-                  fontSize: SIZE.sm,
+                  fontSize: SIZE.sm - 1,
                   color: colors.pri + 'B3',
                   fontFamily: WEIGHT.regular,
                   width: '100%',
@@ -278,7 +278,7 @@ export default class NoteItem extends React.Component {
                 isTrash
                   ? ['Remove', 'Restore']
                   : ['Add to', 'Share', 'Export', 'Delete'],
-                [],
+                isTrash ? [] : ['Pin', 'Favorite', 'Add to Vault'],
               );
             }}>
             <Icon name="more-horizontal" size={SIZE.lg} color={colors.icon} />
