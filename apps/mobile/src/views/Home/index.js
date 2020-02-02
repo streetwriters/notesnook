@@ -28,12 +28,12 @@ export const Home = ({navigation}) => {
 
   return (
     <Container
-      bottomButtonText="Add a new note"
+      bottomButtonText="Create a new note"
       heading="Home"
       customIcon="menu"
       verticalMenu
       menu
-      placeholder="Search your notes"
+      placeholder="Search all notes"
       canGoBack={false}
       bottomButtonOnPress={() => {
         if (DDS.isTab) {

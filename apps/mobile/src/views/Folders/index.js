@@ -74,13 +74,13 @@ export const Folders = ({navigation}) => {
 
   return (
     <Container
-      bottomButtonText="Add a new notebook"
+      bottomButtonText="Create a new notebook"
       menu={params.canGoBack ? false : true}
       preventDefaultMargins={preventDefaultMargins}
       heading={params.title}
       canGoBack={params.canGoBack}
       navigation={navigation}
-      placeholder="Search your notebook"
+      placeholder="Search all notebooks"
       data={notebooks}
       bottomButtonOnPress={() => {
         AddNotebookEvent(null);

@@ -63,65 +63,71 @@ export const Toast = () => {
   }, []);
 
   return (
-    <AnimatedTouchableOpacity
-      activeOpacity={opacity + 0.1}
-      onPress={() => {
-        alert('hello');
-      }}
-      transition="translateY"
-      duration={250}
+    <Animatable.View
+      transition={['translateY', 'opacity']}
+      duration={500}
       useNativeDriver={true}
-      pointerEvents="box-only"
       style={{
-        ...toastStyle,
-        height: 60,
-        width: DDS.isTab ? normalize(350) : w - 24,
-        marginHorizontal: 12,
-        position: 'absolute',
-        bottom: 15,
-        zIndex: 999,
-        borderRadius: 5,
-        paddingHorizontal: ph + 5,
-        justifyContent: 'space-between',
-        elevation: 25,
-        flexDirection: 'row',
+        width: '100%',
         alignItems: 'center',
+        opacity: toast ? 1 : 0,
         transform: [
           {
-            translateY: toast ? 0 : 150,
+            translateY: toast ? 0 : 300,
           },
         ],
       }}>
-      <Text
+      <AnimatedTouchableOpacity
+        activeOpacity={opacity + 0.1}
         style={{
           ...toastStyle,
-          backgroundColor: 'transparent',
-          fontFamily: WEIGHT.regular,
-          fontSize: SIZE.sm,
-        }}>
-        <Icon
-          name={
-            toastStyle.color === colors.errorText
-              ? 'alert-circle'
-              : 'check-circle'
-          }
-          color={toastStyle.color}
-          size={SIZE.sm}
-        />
-        {'  '}
-        {message}
-      </Text>
+          maxWidth: DDS.isTab ? normalize(350) : w - 24,
+          minWidth: DDS.isTab ? normalize(250) : w / 2,
+          marginHorizontal: 12,
+          position: 'absolute',
+          alignSelf: 'center',
+          bottom: 100,
+          zIndex: 999,
+          borderRadius: 5,
 
-      <TouchableOpacity activeOpacity={1}>
+          paddingHorizontal: ph,
+          paddingVertical: pv,
+          justifyContent: 'center',
+          elevation: 25,
+          flexDirection: 'row',
+          alignItems: 'center',
+        }}>
         <Text
           style={{
             ...toastStyle,
-            fontFamily: WEIGHT.bold,
+            backgroundColor: 'transparent',
+            fontFamily: WEIGHT.regular,
             fontSize: SIZE.sm,
           }}>
-          {data.actionText}
+          <Icon
+            name={
+              toastStyle.color === colors.errorText
+                ? 'alert-circle'
+                : 'check-circle'
+            }
+            color={toastStyle.color}
+            size={SIZE.sm}
+          />
+          {'  '}
+          {message}
         </Text>
-      </TouchableOpacity>
-    </AnimatedTouchableOpacity>
+
+        <TouchableOpacity activeOpacity={1}>
+          <Text
+            style={{
+              ...toastStyle,
+              fontFamily: WEIGHT.bold,
+              fontSize: SIZE.sm,
+            }}>
+            {data.actionText}
+          </Text>
+        </TouchableOpacity>
+      </AnimatedTouchableOpacity>
+    </Animatable.View>
   );
 };

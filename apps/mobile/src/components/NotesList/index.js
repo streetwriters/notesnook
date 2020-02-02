@@ -17,6 +17,7 @@ import NoteItem from '../NoteItem';
 import SelectionWrapper from '../SelectionWrapper';
 import {eSendEvent} from '../../services/eventManager';
 import {eScrollEvent} from '../../services/events';
+import {ToastEvent} from '../../utils/utils';
 
 export const NotesList = ({isGrouped = false}) => {
   const [state, dispatch] = useTracked();
@@ -182,6 +183,7 @@ export const NotesList = ({isGrouped = false}) => {
             setRefreshing(true);
             setTimeout(() => {
               setRefreshing(false);
+              ToastEvent.show('Sync Complete', 'success');
             }, 1000);
           }}
           refreshing={refreshing}

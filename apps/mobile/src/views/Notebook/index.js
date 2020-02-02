@@ -96,10 +96,10 @@ export const Notebook = ({navigation}) => {
 
   return (
     <Container
-      bottomButtonText="Add new topic"
+      bottomButtonText="Create a new topic"
       preventDefaultMargins={preventDefaultMargins}
       navigation={navigation}
-      placeholder={`Search in ${params.title}`}
+      placeholder={`Search in "${params.title}"`}
       heading={params.title}
       canGoBack={true}
       data={params.notebook.topics}
