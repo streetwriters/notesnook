@@ -11,9 +11,13 @@ import {DDS} from '../../../App';
 import {ph, pv, SIZE, WEIGHT} from '../../common/common';
 import NavigationService from '../../services/NavigationService';
 import {getElevation, timeSince} from '../../utils/utils';
-import {ActionSheetEvent} from '../DialogManager';
+import {
+  ActionSheetEvent,
+  TEMPLATE_TRASH,
+  simpleDialogEvent,
+} from '../DialogManager';
 import {eSendEvent} from '../../services/eventManager';
-import {eOnLoadNote} from '../../services/events';
+import {eOnLoadNote, eOpenSimpleDialog} from '../../services/events';
 
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
@@ -117,6 +121,8 @@ export default class NoteItem extends React.Component {
             } else {
               DDS.isTab
                 ? eSendEvent(eOnLoadNote, item)
+                : isTrash
+                ? simpleDialogEvent(TEMPLATE_TRASH(item.type))
                 : NavigationService.navigate('Editor', {
                     note: item,
                   });
@@ -267,10 +273,12 @@ export default class NoteItem extends React.Component {
             onPress={() => {
               ActionSheetEvent(
                 item,
-                true,
-                true,
-                ['Add to', 'Share', 'Export', 'Delete'],
-                ['Add to Vault', 'Pin', 'Favorite'],
+                isTrash ? false : true,
+                isTrash ? false : true,
+                isTrash
+                  ? ['Remove', 'Restore']
+                  : ['Add to', 'Share', 'Export', 'Delete'],
+                [],
               );
             }}>
             <Icon name="more-horizontal" size={SIZE.lg} color={colors.icon} />

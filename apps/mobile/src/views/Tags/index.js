@@ -1,11 +1,19 @@
 import React, {useEffect} from 'react';
-import {Dimensions, FlatList, SafeAreaView, Text, View} from 'react-native';
+import {
+  Dimensions,
+  FlatList,
+  SafeAreaView,
+  Text,
+  View,
+  TouchableOpacity,
+} from 'react-native';
 import {pv, SIZE, WEIGHT} from '../../common/common';
 import {Header} from '../../components/header';
 import {TagsPlaceHolder} from '../../components/ListPlaceholders';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {db} from '../../../App';
+import NavigationService from '../../services/NavigationService';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
@@ -69,7 +77,14 @@ export const Tags = ({navigation}) => {
             </View>
           }
           renderItem={({item, index}) => (
-            <View
+            <TouchableOpacity
+              onPress={() => {
+                NavigationService.navigate('Notes', {
+                  type: 'tag',
+                  title: item.title,
+                  tag: item,
+                });
+              }}
               style={{
                 flexDirection: 'row',
                 justifyContent: 'flex-start',
@@ -101,7 +116,7 @@ export const Tags = ({navigation}) => {
                   {item.count} note
                 </Text>
               </Text>
-            </View>
+            </TouchableOpacity>
           )}
         />
       </View>

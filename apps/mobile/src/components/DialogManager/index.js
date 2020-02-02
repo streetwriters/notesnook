@@ -35,6 +35,7 @@ export const dialogActions = {
   ACTION_EXIT: 512,
   ACTION_EMPTY_TRASH: 513,
   ACTION_EXIT_FULLSCREEN: 514,
+  ACTION_TRASH: 515,
 };
 
 export const ActionSheetEvent = (
@@ -97,6 +98,17 @@ export const TEMPLATE_DELETE = type => {
     positiveText: 'Delete',
     negativeText: 'Cancel',
     action: dialogActions.ACTION_DELETE,
+    icon: 'trash',
+  };
+};
+
+export const TEMPLATE_TRASH = type => {
+  return {
+    title: `Delete ${type}`,
+    paragraph: `Restore or delete ${type} forever`,
+    positiveText: 'Restore',
+    negativeText: 'Delete',
+    action: dialogActions.ACTION_TRASH,
     icon: 'trash',
   };
 };

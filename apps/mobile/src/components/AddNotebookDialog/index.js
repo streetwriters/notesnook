@@ -31,7 +31,6 @@ export class AddNotebookDialog extends React.Component {
     };
     this.title = null;
     this.description = null;
-
     this.listRef;
     this.prevItem = null;
     this.prevIndex = null;
@@ -123,6 +122,7 @@ export class AddNotebookDialog extends React.Component {
   };
 
   onSubmit = () => {
+    let {topics} = this.state;
     if (
       !this.currentInputValue ||
       this.currentInputValue === '' ||

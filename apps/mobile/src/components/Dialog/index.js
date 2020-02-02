@@ -74,10 +74,20 @@ export class Dialog extends Component {
           visible: false,
         });
       }
+      case dialogActions.ACTION_TRASH: {
+        db.restoreItem(item.dateCreated);
+        updateEvent({type: ACTIONS.TRASH});
+        this.hide();
+      }
     }
   };
 
   _onClose = () => {
+    let {template, item} = this.props;
+    if (dialogActions.ACTION_TRASH === template.action) {
+      // delete item forever.
+      console.log('deleted forever');
+    }
     this.setState({
       visible: false,
     });
@@ -174,6 +184,27 @@ export class Dialog extends Component {
               }}>
               <TouchableOpacity
                 activeOpacity={opacity}
+                onPress={this._onClose}
+                style={{
+                  paddingVertical: pv,
+                  paddingHorizontal: ph,
+                  borderRadius: 5,
+                  width: '48%',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  backgroundColor: colors.nav,
+                }}>
+                <Text
+                  style={{
+                    fontFamily: WEIGHT.medium,
+                    color: colors.icon,
+                    fontSize: SIZE.sm,
+                  }}>
+                  {negativeText}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                activeOpacity={opacity}
                 onPress={this._onPress}
                 style={{
                   paddingVertical: pv,
@@ -193,28 +224,6 @@ export class Dialog extends Component {
                     fontSize: SIZE.sm,
                   }}>
                   {positiveText}
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                activeOpacity={opacity}
-                onPress={this._onClose}
-                style={{
-                  paddingVertical: pv,
-                  paddingHorizontal: ph,
-                  borderRadius: 5,
-                  width: '48%',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  backgroundColor: colors.nav,
-                }}>
-                <Text
-                  style={{
-                    fontFamily: WEIGHT.medium,
-                    color: colors.icon,
-                    fontSize: SIZE.sm,
-                  }}>
-                  {negativeText}
                 </Text>
               </TouchableOpacity>
             </View>

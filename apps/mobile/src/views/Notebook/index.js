@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {FlatList, Platform, Text, View} from 'react-native';
 import {useIsFocused} from 'react-navigation-hooks';
 import {SIZE, WEIGHT} from '../../common/common';
@@ -15,10 +15,16 @@ import {eMoveNoteDialogNavigateBack, eScrollEvent} from '../../services/events';
 export const Notebook = ({navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors, selectionMode, preventDefaultMargins} = state;
-
-  const params = navigation.state.params;
+  const [topics, setTopics] = useState([]);
+  let params = navigation.state.params;
 
   let isFocused = useIsFocused();
+
+  useEffect(() => {
+    let topic = params.notebook.topics;
+
+    setTopics([...topic]);
+  }, []);
 
   const handleBackPress = () => {
     navigation.goBack();
@@ -50,11 +56,11 @@ export const Notebook = ({navigation}) => {
       item={item}
       index={index}
       colors={colors}
-      data={params.notebooks.topics}
+      data={topics}
     />
   );
 
-  ListFooterComponent = (
+  const ListFooterComponent = (
     <View
       style={{
         height: 150,
@@ -72,15 +78,15 @@ export const Notebook = ({navigation}) => {
     </View>
   );
 
-  ListHeaderComponent = (
+  const ListHeaderComponent = (
     <View
       style={{
         marginTop:
           Platform.OS == 'ios'
-            ? params.notebook.topics[0] && !selectionMode
+            ? topics[0] && !selectionMode
               ? 135
               : 135 - 60
-            : params.notebook.topics[0] && !selectionMode
+            : topics[0] && !selectionMode
             ? 155
             : 155 - 60,
       }}
@@ -95,6 +101,7 @@ export const Notebook = ({navigation}) => {
       placeholder={`Search in ${params.title}`}
       heading={params.title}
       canGoBack={true}
+      data={params.notebook.topics}
       bottomButtonOnPress={() => {
         //setAddTopic(true);
       }}>
@@ -102,7 +109,7 @@ export const Notebook = ({navigation}) => {
         style={{
           width: '100%',
         }}
-        data={params.notebook.topics}
+        data={topics}
         onScroll={onScroll}
         ListHeaderComponent={ListHeaderComponent}
         ListFooterComponent={ListFooterComponent}

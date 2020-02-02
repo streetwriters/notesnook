@@ -23,7 +23,7 @@ export const NotebookItem = ({
   navigation,
 }) => {
   const [state, dispatch] = useTracked();
-  const {colors} = state;
+  const {colors, selectedItemsList} = state;
 
   const navigate = () => {
     isTopic
@@ -100,8 +100,9 @@ export const NotebookItem = ({
                 flexDirection: 'row',
                 alignItems: 'center',
                 marginTop: 5,
-                width: '80%',
-                maxWidth: '80%',
+                width: '95%',
+                maxWidth: '95%',
+                flexWrap: 'wrap',
               }}>
               {item && item.topics
                 ? item.topics.slice(1, 4).map(topic => (
@@ -113,6 +114,7 @@ export const NotebookItem = ({
                         paddingHorizontal: ph / 1.5,
                         paddingVertical: pv / 4,
                         marginRight: 10,
+                        marginVertical: 4,
                       }}>
                       <Text
                         numberOfLines={1}
@@ -233,6 +235,7 @@ export const NotebookItem = ({
           <TouchableOpacity
             activeOpacity={opacity}
             onPress={async () => {
+              console.log(selectedItemsList, item);
               /*  if (!noteToMove.notebook.notebook) {
                 await db.addNoteToTopic(
                   notebookID,
@@ -247,7 +250,7 @@ export const NotebookItem = ({
                 });
               } */
 
-              moveNoteHideEvent();
+              // moveNoteHideEvent();
 
               ToastEvent.show(
                 `Note moved to ${item.title}`,

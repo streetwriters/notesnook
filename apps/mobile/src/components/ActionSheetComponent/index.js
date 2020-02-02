@@ -81,22 +81,11 @@ export const ActionSheetComponent = ({
     if (tag.includes(' ')) {
       tag = tag.replace(' ', '_');
     }
-    let oldProps = {...note};
-
-    if (oldProps.tags.includes(tag)) {
-      return;
-    } else {
-      oldProps.tags.push(tag);
-    }
-
     tagsInputRef.setNativeProps({
       text: '',
     });
 
-    await db.addNote({
-      dateCreated: note.dateCreated,
-      tags: oldProps.tags,
-    });
+    await db.addTag(note.dateCreated, tag);
     setNote({...db.getNote(note.dateCreated)});
     tagToAdd = '';
   };
@@ -114,13 +103,12 @@ export const ActionSheetComponent = ({
         let tagInputValue = note.tags[note.tags.length - 1];
         let oldProps = {...note};
         if (oldProps.tags.length === 0) return;
+        //oldProps.tags.splice(oldProps.tags.length - 1);
+        await db.removeTag(
+          note.dateCreated,
+          oldProps.tags[oldProps.tags.length - 1],
+        );
 
-        oldProps.tags.splice(oldProps.tags.length - 1);
-
-        await db.addNote({
-          dateCreated: note.dateCreated,
-          tags: oldProps.tags,
-        });
         setNote({...db.getNote(note.dateCreated)});
 
         tagsInputRef.setNativeProps({
@@ -262,9 +250,13 @@ export const ActionSheetComponent = ({
       icon: 'tag',
       func: async () => {
         if (!note.dateCreated) return;
-        await db.pinItem(note.type, note.dateCreated);
-        localRefresh(item.type);
+        if (note.type === 'note') {
+          await db.pinNote(note.dateCreated);
+        } else {
+          await db.pinNotebook(note.dateCreated);
+        }
         dispatch({type: ACTIONS.PINNED});
+        localRefresh(item.type);
       },
       close: false,
       check: true,
@@ -275,9 +267,13 @@ export const ActionSheetComponent = ({
       icon: 'star',
       func: async () => {
         if (!note.dateCreated) return;
-        await db.favoriteItem(note.type, note.dateCreated);
-        localRefresh(item.type);
+        if (note.type === 'note') {
+          await db.favoriteNotes([note.dateCreated]);
+        } else {
+          await db.favoriteNotebooks([note.dateCreated]);
+        }
         dispatch({type: ACTIONS.FAVORITES});
+        localRefresh(item.type);
       },
       close: false,
       check: true,
@@ -484,7 +480,10 @@ export const ActionSheetComponent = ({
   return (
     <View
       onLayout={() => {
-        localRefresh(item.type, true);
+        if (!item.dateDeleted) {
+          localRefresh(item.type, true);
+        }
+        console.log(note.dateCreated, 'here');
       }}
       style={{
         paddingBottom: 15,

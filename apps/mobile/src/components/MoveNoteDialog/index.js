@@ -159,7 +159,7 @@ class MoveNoteDialog extends React.Component {
               height: DDS.isTab ? '90%' : '100%',
               borderRadius: DDS.isTab ? 5 : 0,
               backgroundColor: colors.bg,
-              padding: 8,
+              padding: DDS.isTab ? 8 : 0,
               zIndex: 10,
             }}>
             <Navigator
