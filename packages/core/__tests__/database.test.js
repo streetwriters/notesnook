@@ -384,6 +384,8 @@ test("restore an item from trash", () =>
     let trash = db.getTrash();
     expect(trash.length).toBeGreaterThan(0);
     await db.restoreItem(timestamp);
+    trash = db.getTrash();
+    expect(trash.length).toBe(0);
     let notebook = db.getNotebook(timestamp);
     expect(notebook.dateCreated).toBe(timestamp);
   }));

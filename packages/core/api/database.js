@@ -426,6 +426,8 @@ class Database {
     delete this.trash[id].dType;
     let item = this.trash[id];
     this[type][id] = item;
+    delete this.trash[id];
+    await this.storage.write(KEYS.trash, this.trash);
     await this.storage.write(type, this[type]);
   }
 
