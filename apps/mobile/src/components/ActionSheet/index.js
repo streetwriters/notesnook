@@ -110,12 +110,14 @@ export default class ActionSheet extends Component {
       let diff;
       if (height > this.customComponentHeight) {
         diff = height - this.customComponentHeight;
-        this._scrollTo(this.prevScroll + diff);
+        //this._scrollTo(this.prevScroll + diff + 15);
 
         this.customComponentHeight = height;
       } else {
         diff = this.customComponentHeight - height;
-        this._scrollTo(this.prevScroll - diff);
+
+        // this._scrollTo(this.prevScroll - diff - 7);
+
         this.customComponentHeight = height;
       }
       return;
@@ -244,8 +246,7 @@ export default class ActionSheet extends Component {
             style={{
               width: '100%',
             }}
-            enabled={Platform.OS === 'ios' ? true : false}
-            behavior="position">
+            behavior={Platform.OS === 'ios' ? 'padding' : null}>
             <ScrollView
               bounces={false}
               ref={ref => (this.scrollViewRef = ref)}

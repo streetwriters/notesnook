@@ -73,13 +73,11 @@ export const ActionSheetComponent = ({
   let tagToAdd = null;
   let backPressCount = 0;
 
-  const _onSubmit = () => {
-    if (!tagToAdd || tagToAdd === '#') return;
+  const _onSubmit = async () => {
+    if (!tagToAdd || tagToAdd === '') return;
 
     let tag = tagToAdd;
-    if (tag[0] !== '#') {
-      tag = '#' + tag;
-    }
+
     if (tag.includes(' ')) {
       tag = tag.replace(' ', '_');
     }
@@ -92,22 +90,18 @@ export const ActionSheetComponent = ({
     }
 
     tagsInputRef.setNativeProps({
-      text: '#',
+      text: '',
     });
-    db.addNote({
+
+    await db.addNote({
       dateCreated: note.dateCreated,
-      content: note.content,
-      title: note.title,
       tags: oldProps.tags,
     });
     setNote({...db.getNote(note.dateCreated)});
     tagToAdd = '';
-    setTimeout(() => {
-      //tagsInputRef.focus();
-    }, 300);
   };
 
-  const _onKeyPress = event => {
+  const _onKeyPress = async event => {
     if (event.nativeEvent.key === 'Backspace') {
       if (backPressCount === 0 && !tagToAdd) {
         backPressCount = 1;
@@ -119,14 +113,12 @@ export const ActionSheetComponent = ({
 
         let tagInputValue = note.tags[note.tags.length - 1];
         let oldProps = {...note};
-        if (oldProps.tags.length === 1) return;
+        if (oldProps.tags.length === 0) return;
 
         oldProps.tags.splice(oldProps.tags.length - 1);
 
-        db.addNote({
+        await db.addNote({
           dateCreated: note.dateCreated,
-          content: note.content,
-          title: note.title,
           tags: oldProps.tags,
         });
         setNote({...db.getNote(note.dateCreated)});
@@ -136,7 +128,7 @@ export const ActionSheetComponent = ({
         });
 
         setTimeout(() => {
-          tagsInputRef.focus();
+          //tagsInputRef.focus();
         }, 300);
       }
     }
@@ -166,7 +158,6 @@ export const ActionSheetComponent = ({
       dispatch({type: ACTIONS.PINNED});
       dispatch({type: ACTIONS.FAVORITES});
     }
-    console.log(toAdd);
     setNote({...toAdd});
   };
 
@@ -308,14 +299,12 @@ export const ActionSheetComponent = ({
   const _renderTag = tag => (
     <TouchableOpacity
       key={tag}
-      onPress={() => {
+      onPress={async () => {
         let oldProps = {...note};
 
         oldProps.tags.splice(oldProps.tags.indexOf(tag), 1);
-        db.addNote({
+        await db.addNote({
           dateCreated: note.dateCreated,
-          content: note.content,
-          title: note.title,
           tags: oldProps.tags,
         });
         localRefresh(item.type);

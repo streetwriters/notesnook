@@ -12,6 +12,7 @@
 		13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB11A68108700A75B9A /* LaunchScreen.xib */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
+		2241ADEB42028CF0AD5587E2 /* libPods-Notes.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 654E157423E6A5D9008A3451 /* libPods-Notes.a */; };
 		2AC5332F791F4AC973615596 /* libPods-Notes-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36FE4CF96F141D64B0A0C1FF /* libPods-Notes-tvOS.a */; };
 		2D02E4BC1E0B4A80006451C7 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		2D02E4BD1E0B4A84006451C7 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
@@ -24,6 +25,7 @@
 		653FA3DC23D5DD1B004DA60B /* NotoSerif-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 653FA3D923D5DD1B004DA60B /* NotoSerif-Regular.ttf */; };
 		656D9DFF23D49A4600C49628 /* Web.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 656D9DFE23D49A4600C49628 /* Web.bundle */; };
 		773523A6669C9373D8945A06 /* libPods-Notes-tvOSTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 177E12D91F5B0732079F75AB /* libPods-Notes-tvOSTests.a */; };
+		CE84FC9EAE5373A65AB003DE /* libPods-Notes.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 654E158023E6AD1E008A3451 /* libPods-Notes.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -77,6 +79,12 @@
 		653FA3D723D5DD1B004DA60B /* NotoSans-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "NotoSans-Regular.ttf"; path = "../../../../../html/Web.bundle/site/fonts/Noto_Sans/NotoSans-Regular.ttf"; sourceTree = "<group>"; };
 		653FA3D823D5DD1B004DA60B /* NotoSerif-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "NotoSerif-Bold.ttf"; path = "../../../../../html/Web.bundle/site/fonts/Noto_Serif/NotoSerif-Bold.ttf"; sourceTree = "<group>"; };
 		653FA3D923D5DD1B004DA60B /* NotoSerif-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "NotoSerif-Regular.ttf"; path = "../../../../../html/Web.bundle/site/fonts/Noto_Serif/NotoSerif-Regular.ttf"; sourceTree = "<group>"; };
+		654E157223E69FBE008A3451 /* libReactNativeShareExtension.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libReactNativeShareExtension.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		654E157423E6A5D9008A3451 /* libPods-Notes.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = "libPods-Notes.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		654E157623E6A655008A3451 /* libReactNativeShareExtension.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libReactNativeShareExtension.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		654E157E23E6AD17008A3451 /* libReactNativeShareExtension.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libReactNativeShareExtension.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		654E158023E6AD1E008A3451 /* libPods-Notes.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = "libPods-Notes.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		654E158C23E6AEE6008A3451 /* libReact-Core.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = "libReact-Core.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		656D9DFE23D49A4600C49628 /* Web.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = Web.bundle; path = ../html/Web.bundle; sourceTree = "<group>"; };
 		6FB6DE7AD66669BE4A951A9E /* Pods-Notes-tvOSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Notes-tvOSTests.debug.xcconfig"; path = "Target Support Files/Pods-Notes-tvOSTests/Pods-Notes-tvOSTests.debug.xcconfig"; sourceTree = "<group>"; };
 		87D2DFC238DED597B12E218E /* Pods-Notes-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Notes-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-Notes-tvOSTests/Pods-Notes-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -104,6 +112,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				58062BBC8B02A59BE1E73AED /* libPods-Notes.a in Frameworks */,
+				2241ADEB42028CF0AD5587E2 /* libPods-Notes.a in Frameworks */,
+				CE84FC9EAE5373A65AB003DE /* libPods-Notes.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -161,6 +171,12 @@
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				654E158C23E6AEE6008A3451 /* libReact-Core.a */,
+				654E158023E6AD1E008A3451 /* libPods-Notes.a */,
+				654E157E23E6AD17008A3451 /* libReactNativeShareExtension.a */,
+				654E157623E6A655008A3451 /* libReactNativeShareExtension.a */,
+				654E157423E6A5D9008A3451 /* libPods-Notes.a */,
+				654E157223E69FBE008A3451 /* libReactNativeShareExtension.a */,
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				ED2971642150620600B7C4FE /* JavaScriptCore.framework */,
 				FF962EEB8D0C9B17231DA150 /* libPods-Notes.a */,
@@ -724,7 +740,6 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = NO;
-				"FRAMEWORK_SEARCH_PATHS[arch=*]" = "../node_modules/react-native-fast-storage/ios";
 				INFOPLIST_FILE = Notes/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = (
@@ -745,7 +760,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CURRENT_PROJECT_VERSION = 1;
-				"FRAMEWORK_SEARCH_PATHS[arch=*]" = "../node_modules/react-native-fast-storage/ios";
 				INFOPLIST_FILE = Notes/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = (

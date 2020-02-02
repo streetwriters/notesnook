@@ -40,8 +40,10 @@ export const reducer = (state, action) => {
       };
     }
     case ACTIONS.TAGS: {
+      let tagList = db.getTags();
       return {
         ...state,
+        tags: [...tagList],
       };
     }
     case ACTIONS.FAVORITES: {

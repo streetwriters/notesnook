@@ -1,17 +1,21 @@
-import React, {useEffect, useState} from 'react';
-import {View, Text, Dimensions, SafeAreaView, FlatList} from 'react-native';
-
-import {SIZE, pv, WEIGHT} from '../../common/common';
+import React, {useEffect} from 'react';
+import {Dimensions, FlatList, SafeAreaView, Text, View} from 'react-native';
+import {pv, SIZE, WEIGHT} from '../../common/common';
 import {Header} from '../../components/header';
-import {useAppContext} from '../../provider/useAppContext';
 import {TagsPlaceHolder} from '../../components/ListPlaceholders';
 import {useTracked} from '../../provider';
+import {ACTIONS} from '../../provider/actions';
+import {db} from '../../../App';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
 export const Tags = ({navigation}) => {
   const [state, dispatch] = useTracked();
-  const {colors} = state;
+  const {colors, tags} = state;
+
+  useEffect(() => {
+    dispatch({type: ACTIONS.TAGS});
+  }, []);
 
   return (
     <SafeAreaView
@@ -21,7 +25,13 @@ export const Tags = ({navigation}) => {
       }}>
       <Header canGoBack={false} heading="Tags" menu={true} />
 
-      <View style={{width: '90%', alignSelf: 'center', height: '100%'}}>
+      <View
+        style={{
+          width: '100%',
+          alignSelf: 'center',
+          height: '100%',
+          paddingHorizontal: 12,
+        }}>
         <FlatList
           style={{
             height: '100%',
@@ -29,7 +39,7 @@ export const Tags = ({navigation}) => {
           contentContainerStyle={{
             height: '100%',
           }}
-          data={[]}
+          data={tags}
           ListEmptyComponent={
             <View
               style={{
@@ -64,10 +74,10 @@ export const Tags = ({navigation}) => {
                 flexDirection: 'row',
                 justifyContent: 'flex-start',
                 alignItems: 'center',
-                margin: 5,
+                margin: 0,
                 paddingVertical: pv,
                 borderBottomWidth: 1.5,
-                borderBottomColor: colors.navbg,
+                borderBottomColor: colors.nav,
               }}>
               <Text
                 style={{
@@ -81,15 +91,14 @@ export const Tags = ({navigation}) => {
                   }}>
                   #
                 </Text>
-                {item.slice(1)}
-
+                {item.title}
                 {'\n'}
                 <Text
                   style={{
                     fontSize: SIZE.xs,
                     color: colors.icon,
                   }}>
-                  10 notes
+                  {item.count} note
                 </Text>
               </Text>
             </View>

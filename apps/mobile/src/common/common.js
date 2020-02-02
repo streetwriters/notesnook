@@ -98,7 +98,7 @@ const getDpi = pd => {
 
 const correction = (size, multiplier) => {
   let dSize = getDeviceSize();
-  console.log(getDeviceSize());
+
   if (dSize > 4 && dSize <= 5.3 && pixelDensity <= 3) {
     return size * 0.87;
   } else if (dSize > 5.5 && dSize < 6.5 && pixelDensity <= 3) {
@@ -118,7 +118,6 @@ const correction = (size, multiplier) => {
 
 export const normalize = size => {
   let pd = pixelDensity;
-  console.log(pd);
 
   if (pd === 1 || pd < 1) {
     return correction(size, 0.75);

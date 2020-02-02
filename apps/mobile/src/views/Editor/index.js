@@ -172,6 +172,9 @@ const Editor = ({navigation, noMenu}) => {
 
     if (timestamp !== dateCreated) {
       timestamp = dateCreated;
+
+      note = db.getNote(timestamp);
+
       if (DDS.isTab) {
         dispatch({
           type: ACTIONS.CURRENT_EDITING_NOTE,
@@ -259,7 +262,7 @@ const Editor = ({navigation, noMenu}) => {
     timestamp = note.dateCreated;
     content = note.content;
     saveCounter = 0;
-
+    console.log('here');
     if (title !== null || title === '') {
       post(
         JSON.stringify({
@@ -271,10 +274,13 @@ const Editor = ({navigation, noMenu}) => {
       post('focusTitle');
       post('clear');
     }
-    if (note.content.text === '' || note.content.delta === null) {
+    if (note.content.text === '' && note.content.delta === null) {
       post('clear');
-    } else {
+    } else if (note.content.delta) {
       post(JSON.stringify(note.content.delta));
+    } else {
+      console.log('herrree');
+      post(JSON.stringify({type: 'text', value: note.content.text}));
     }
   };
 
@@ -392,7 +398,6 @@ const Editor = ({navigation, noMenu}) => {
               height: 50,
               justifyContent: 'center',
               alignItems: 'flex-end',
-
               paddingRight: 12,
               zIndex: 800,
             }}>
@@ -431,8 +436,8 @@ const Editor = ({navigation, noMenu}) => {
             Platform.OS === 'ios'
               ? {uri: sourceUri}
               : {
-                  uri: 'file:///android_asset/texteditor.html',
-                  baseUrl: 'file:///android_asset/',
+                  uri: 'http://192.168.10.12:8080/texteditor.html',
+                  baseUrl: 'http://192.168.10.12:8080/',
                 }
           }
           style={{
