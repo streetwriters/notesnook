@@ -273,7 +273,7 @@ export default class NoteItem extends React.Component {
                 isTrash ? false : true,
                 isTrash
                   ? ['Remove', 'Restore']
-                  : ['Add to', 'Share', 'Export', 'Delete'],
+                  : ['Add to', 'Share', 'Export', 'Delete', 'Open'],
                 isTrash ? [] : ['Pin', 'Favorite', 'Add to Vault'],
               );
             }}>

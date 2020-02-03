@@ -25,6 +25,7 @@ import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {moveNoteEvent} from '../DialogManager';
 import Share from 'react-native-share';
+import {timeConverter} from '../../utils/utils';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
@@ -207,6 +208,11 @@ export const ActionSheetComponent = ({
       },
     },
     {
+      name: 'Open',
+      icon: 'arrow-up-right',
+      func: () => {},
+    },
+    {
       name: 'Restore',
       icon: 'trash',
       func: () => {
@@ -381,7 +387,7 @@ export const ActionSheetComponent = ({
         key={rowItem.name}
         style={{
           alignItems: 'center',
-          width: DDS.isTab ? 500 / rowItems.length : w / rowItems.length,
+          width: (w - 24) / rowItems.length,
         }}>
         <Icon
           style={{
@@ -402,7 +408,7 @@ export const ActionSheetComponent = ({
         <Text
           style={{
             fontFamily: WEIGHT.regular,
-            fontSize: DDS.isTab ? SIZE.sm : SIZE.xs + 2,
+            fontSize: DDS.isTab ? SIZE.sm : SIZE.xs + 1,
             color: colors.pri,
           }}>
           {rowItem.name}
@@ -503,7 +509,79 @@ export const ActionSheetComponent = ({
           }}>
           Please start writing to save your note.
         </Text>
-      ) : null}
+      ) : (
+        <View
+          style={{
+            paddingHorizontal: 12,
+            alignItems: 'center',
+            marginVertical: 10,
+          }}>
+          <Text
+            numberOfLines={1}
+            style={{
+              color: colors.pri,
+              fontSize: SIZE.sm + 1,
+              fontFamily: WEIGHT.bold,
+              maxWidth: '100%',
+            }}>
+            {note.title.replace('\n', '')}
+          </Text>
+          <Text
+            numberOfLines={2}
+            style={{
+              fontSize: SIZE.sm - 1,
+              color: colors.pri + 'B3',
+              fontFamily: WEIGHT.regular,
+              width: '100%',
+              textAlign: 'center',
+              maxWidth: '100%',
+            }}>
+            {note.type === 'notebook' && note.description
+              ? note.description
+              : null}
+            {note.type === 'note'
+              ? note.headline[item.headline.length - 1] === '\n'
+                ? note.headline.slice(0, note.headline.length - 1)
+                : note.headline
+              : null}
+          </Text>
+
+          <Text
+            style={{
+              color: colors.icon,
+              fontSize: SIZE.xs - 1,
+              textAlignVertical: 'center',
+              fontFamily: WEIGHT.regular,
+              marginTop: 2.5,
+            }}>
+            {note.type === 'note'
+              ? 'Last edited on ' + timeConverter(note.dateEditted)
+              : null}
+            {note.type !== 'note' && !note.dateDeleted
+              ? 'Created on ' + timeConverter(note.dateCreated)
+              : null}
+            {note.dateDeleted
+              ? 'Deleted on ' + timeConverter(note.dateDeleted)
+              : null}
+          </Text>
+
+          <Text
+            style={{
+              color: colors.accent,
+              fontSize: SIZE.xs - 1,
+              textAlignVertical: 'center',
+              fontFamily: WEIGHT.regular,
+              marginTop: 2,
+              borderWidth: 1,
+              textAlign: 'center',
+              borderColor: colors.accent,
+              paddingHorizontal: 5,
+              borderRadius: 2,
+            }}>
+            Synced
+          </Text>
+        </View>
+      )}
 
       {note.dateCreated ? (
         <View
@@ -513,8 +591,7 @@ export const ActionSheetComponent = ({
             alignItems: 'center',
             paddingVertical: 10,
             flexDirection: 'row',
-            borderBottomWidth: 1,
-            borderBottomColor: colors.nav,
+            paddingHorizontal: 12,
           }}>
           {rowItemsData.map(_renderRowItem)}
         </View>
@@ -540,44 +617,95 @@ export const ActionSheetComponent = ({
       {hasTags && note.dateCreated ? (
         <View
           style={{
-            flexDirection: 'row',
-            flexWrap: 'wrap',
             marginHorizontal: 12,
-            marginBottom: 0,
-            borderRadius: 5,
-            borderWidth: 1.5,
-            borderColor: focused ? colors.accent : colors.nav,
-            paddingVertical: 5,
           }}>
-          {note && note.tags ? note.tags.map(_renderTag) : null}
-          <TextInput
+          <View
             style={{
-              backgroundColor: 'transparent',
-              minWidth: 100,
-              fontFamily: WEIGHT.regular,
-              color: colors.pri,
-              paddingHorizontal: 5,
-              paddingVertical: 1.5,
-              margin: 1,
-            }}
-            blurOnSubmit={false}
-            ref={ref => (tagsInputRef = ref)}
-            placeholderTextColor={colors.icon}
-            onFocus={() => {
-              setFocused(true);
-            }}
-            selectionColor={colors.accent}
-            onBlur={() => {
-              setFocused(false);
-            }}
-            placeholder="#hashtag"
-            onChangeText={value => {
-              tagToAdd = value;
-              if (tagToAdd.length > 0) backPressCount = 0;
-            }}
-            onSubmitEditing={_onSubmit}
-            onKeyPress={_onKeyPress}
-          />
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+              borderRadius: 5,
+              borderWidth: 1.5,
+              borderColor: focused ? colors.accent : colors.nav,
+              paddingVertical: 5,
+            }}>
+            {note && note.tags ? note.tags.map(_renderTag) : null}
+            <TextInput
+              style={{
+                backgroundColor: 'transparent',
+                minWidth: 100,
+                fontFamily: WEIGHT.regular,
+                color: colors.pri,
+                paddingHorizontal: 5,
+                paddingVertical: 1.5,
+                margin: 1,
+              }}
+              blurOnSubmit={false}
+              ref={ref => (tagsInputRef = ref)}
+              placeholderTextColor={colors.icon}
+              onFocus={() => {
+                setFocused(true);
+              }}
+              selectionColor={colors.accent}
+              onBlur={() => {
+                setFocused(false);
+              }}
+              placeholder="#hashtag"
+              onChangeText={value => {
+                tagToAdd = value;
+                if (tagToAdd.length > 0) backPressCount = 0;
+              }}
+              onSubmitEditing={_onSubmit}
+              onKeyPress={_onKeyPress}
+            />
+          </View>
+          <View
+            style={{
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+              marginBottom: 5,
+              marginTop: 5,
+              alignItems: 'center',
+            }}>
+            <Text
+              style={{
+                fontFamily: WEIGHT.regular,
+                fontSize: SIZE.xs,
+                color: colors.accent,
+              }}>
+              Suggestions:{' '}
+            </Text>
+            {['Notes', 'Nook'].map(tag => (
+              <TouchableOpacity
+                key={tag}
+                onPress={async () => {}}
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'flex-start',
+                  alignItems: 'center',
+                  margin: 1,
+                  marginRight: 3,
+                  paddingHorizontal: 5,
+                  paddingVertical: 1,
+                  backgroundColor: colors.shade,
+                  borderRadius: 2.5,
+                }}>
+                <Text
+                  style={{
+                    fontFamily: WEIGHT.regular,
+                    fontSize: SIZE.xs,
+                    color: colors.pri,
+                  }}>
+                  <Text
+                    style={{
+                      color: colors.accent,
+                    }}>
+                    #
+                  </Text>
+                  {tag}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
         </View>
       ) : null}
 
