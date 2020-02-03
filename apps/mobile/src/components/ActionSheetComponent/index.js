@@ -332,9 +332,9 @@ export const ActionSheetComponent = ({
           style={{
             color: colors.accent,
           }}>
-          {tag.slice(0, 1)}
+          #
         </Text>
-        {tag.slice(1)}
+        {tag}
       </Text>
     </TouchableOpacity>
   );

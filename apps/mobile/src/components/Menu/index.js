@@ -331,7 +331,7 @@ export const Menu = ({
                   onPress={() => {
                     close();
                     NavigationService.navigate('Notes', {
-                      heading: item.title,
+                      title: item.title,
                       tag: item,
                       type: 'tag',
                     });

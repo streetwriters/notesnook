@@ -108,10 +108,12 @@ export const Notes = ({navigation}) => {
     <Container
       bottomButtonText="Create a new note"
       canGoBack={false}
-      heading={params.title}
+      heading={'#' + params.title}
       canGoBack={true}
       data={notes}
-      placeholder={`Search in ${params.title}`}
+      placeholder={`Search in ${
+        params.type == 'tag' ? '#' + params.title : params.title
+      }`}
       bottomButtonOnPress={() => {}}>
       <FlatList
         data={notes}

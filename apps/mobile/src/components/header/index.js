@@ -113,7 +113,14 @@ export const Header = ({
             color: colors.pri,
             fontFamily: WEIGHT.bold,
           }}>
-          {heading}
+          <Text
+            style={{
+              color: colors.accent,
+            }}>
+            {heading.slice(0, 1) === '#' ? '#' : null}
+          </Text>
+
+          {heading.slice(0, 1) === '#' ? heading.slice(1) : heading}
         </Text>
       </View>
       <View
