@@ -20,6 +20,7 @@ import {
   setColorScheme,
   SIZE,
   WEIGHT,
+  ph,
 } from '../../common/common';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
@@ -565,21 +566,61 @@ export const ActionSheetComponent = ({
               : null}
           </Text>
 
-          <Text
-            style={{
-              color: colors.accent,
-              fontSize: SIZE.xs - 1,
-              textAlignVertical: 'center',
-              fontFamily: WEIGHT.regular,
-              marginTop: 2,
-              borderWidth: 1,
-              textAlign: 'center',
-              borderColor: colors.accent,
-              paddingHorizontal: 5,
-              borderRadius: 2,
-            }}>
-            Synced
-          </Text>
+          {note.type !== 'notebook' ? null : (
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '100%',
+                maxWidth: '100%',
+                flexWrap: 'wrap',
+              }}>
+              {note && note.topics
+                ? note.topics.slice(1, 4).map(topic => (
+                    <View
+                      key={topic.dateCreated.toString() + topic.title}
+                      style={{
+                        borderRadius: 5,
+                        backgroundColor: colors.accent,
+                        paddingHorizontal: ph / 1.5,
+                        paddingVertical: pv / 4,
+                        marginRight: 5,
+                        marginVertical: 2.5,
+                      }}>
+                      <Text
+                        numberOfLines={1}
+                        style={{
+                          color: 'white',
+                          fontFamily: WEIGHT.regular,
+                          fontSize: SIZE.xxs,
+                          maxWidth: '100%',
+                        }}>
+                        {topic.title}
+                      </Text>
+                    </View>
+                  ))
+                : null}
+            </View>
+          )}
+
+          {note.type !== 'note' ? null : (
+            <Text
+              style={{
+                color: colors.accent,
+                fontSize: SIZE.xs - 1,
+                textAlignVertical: 'center',
+                fontFamily: WEIGHT.regular,
+                marginTop: 2,
+                borderWidth: 1,
+                textAlign: 'center',
+                borderColor: colors.accent,
+                paddingHorizontal: 5,
+                borderRadius: 2,
+              }}>
+              Synced
+            </Text>
+          )}
         </View>
       )}
 
