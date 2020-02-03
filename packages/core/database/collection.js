@@ -1,43 +1,46 @@
 import Indexer from "./indexer";
 
-export default class Collection extends Indexer {
+export default class Collection {
   constructor(context, type) {
-    super(context, type);
-    this.collection = new Map();
+    this.map = new Map();
+    this.indexer = new Indexer(context, type);
   }
 
-  async initCollection() {
-    await this.initIndexer();
+  async init() {
+    await this.indexer.init();
+    for (let id of this.indexer.indices) {
+      this.map.set(id, await this.indexer.read(id));
+    }
   }
 
   async addItem(item) {
-    this.collection.set(item.id, item);
-    await this.write(item.id, item);
-    await this.index(item.id);
+    let exists = this.map.has(item.id);
+    await this.updateItem(item);
+    if (!exists) {
+      await this.indexer.index(item.id);
+    }
+  }
+
+  async updateItem(item) {
+    this.map.set(item.id, item);
+    await this.indexer.write(item.id, item);
   }
 
   async removeItem(id) {
-    if (this.collection.delete(id)) {
-      this.remove(id);
-      await this.deindex(id);
+    if (this.map.delete(id)) {
+      this.indexer.remove(id);
+      await this.indexer.deindex(id);
     }
   }
 
-  async getItem(id) {
-    if (this.collection.has(id)) {
-      return this.collection.get(id);
-    } else {
-      return await this.read(id);
-    }
+  getItem(id) {
+    return this.map.get(id);
   }
 
-  async getAllItems() {
+  getAllItems() {
     let items = [];
-    for (let id of await this.getIndices()) {
-      let item = await this.getItem(id);
-      if (item) {
-        items[items.length] = item;
-      }
+    for (let value of this.map.values()) {
+      items[items.length] = value;
     }
     return items;
   }
