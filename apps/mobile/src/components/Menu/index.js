@@ -40,8 +40,7 @@ export const Menu = ({
   noTextMode = false,
 }) => {
   const [state, dispatch] = useTracked();
-  const {colors} = state;
-  const [tags, setTags] = useState([]);
+  const {colors, tags} = state;
   // todo
 
   let overlayRef;
@@ -53,15 +52,14 @@ export const Menu = ({
     dispatch({type: ACTIONS.THEME, colors: newColors});
   }
 
-  useEffect(() => {
-    let allTags = db.getTags();
-    let tagsToAdd = [];
+  /*  useEffect(() => {
+    let allTags = tags;
     allTags.sort((a, b) => {
       return a.count > b.count;
     });
 
     setTags([...allTags]);
-  }, []);
+  }, []); */
 
   const listItems = [
     {

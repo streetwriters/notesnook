@@ -7,6 +7,7 @@ import {
   View,
   TouchableOpacity,
   RefreshControl,
+  Platform,
 } from 'react-native';
 import {pv, SIZE, WEIGHT} from '../../common/common';
 import {Header} from '../../components/header';
@@ -15,25 +16,26 @@ import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {db} from '../../../App';
 import NavigationService from '../../services/NavigationService';
+import Container from '../../components/Container';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
 export const Tags = ({navigation}) => {
   const [state, dispatch] = useTracked();
-  const {colors, tags} = state;
+  const {colors, tags, selectionMode} = state;
   const [refreshing, setRefreshing] = useState(false);
   useEffect(() => {
     dispatch({type: ACTIONS.TAGS});
   }, []);
 
   return (
-    <SafeAreaView
-      style={{
-        height: '100%',
-        backgroundColor: colors.bg,
-      }}>
-      <Header canGoBack={false} heading="Tags" menu={true} />
-
+    <Container
+      canGoBack={false}
+      heading="Tags"
+      noBottomButton={true}
+      placeholder="Search for #tags"
+      data={tags}
+      menu>
       <View
         style={{
           width: '100%',
@@ -45,6 +47,20 @@ export const Tags = ({navigation}) => {
           style={{
             height: '100%',
           }}
+          ListHeaderComponent={
+            <View
+              style={{
+                marginTop:
+                  Platform.OS == 'ios'
+                    ? tags[0] && !selectionMode
+                      ? 135
+                      : 135 - 60
+                    : tags[0] && !selectionMode
+                    ? 155
+                    : 155 - 60,
+              }}
+            />
+          }
           refreshControl={
             <RefreshControl
               tintColor={colors.accent}
@@ -129,14 +145,18 @@ export const Tags = ({navigation}) => {
                     fontSize: SIZE.xs,
                     color: colors.icon,
                   }}>
-                  {item.count} note
+                  {item && item.count && item.count > 1
+                    ? item.count + ' notes'
+                    : item.count === 1
+                    ? item.count + ' note'
+                    : null}
                 </Text>
               </Text>
             </TouchableOpacity>
           )}
         />
       </View>
-    </SafeAreaView>
+    </Container>
   );
 };
 
