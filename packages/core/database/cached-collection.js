@@ -1,6 +1,6 @@
 import Indexer from "./indexer";
 
-export default class Collection {
+export default class CachedCollection {
   constructor(context, type) {
     this.map = new Map();
     this.indexer = new Indexer(context, type);
@@ -14,6 +14,8 @@ export default class Collection {
   }
 
   async addItem(item) {
+    if (!item.id) throw new Error("The item must contain the id field.");
+
     let exists = this.map.has(item.id);
     await this.updateItem(item);
     if (!exists) {
@@ -22,6 +24,8 @@ export default class Collection {
   }
 
   async updateItem(item) {
+    if (!item.id) throw new Error("The item must contain the id field.");
+
     this.map.set(item.id, item);
     await this.indexer.write(item.id, item);
   }

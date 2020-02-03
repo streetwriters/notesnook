@@ -1,12 +1,14 @@
-import Collection from "../database/collection";
+import CachedCollection from "../database/cached-collection";
 import fuzzysearch from "fuzzysearch";
 import Tags from "./tags";
 import { groupBy } from "../utils";
+import sort from "fast-sort";
 import {
   getWeekGroupFromTimestamp,
   months,
   getLastWeekTimestamp
 } from "../utils/date";
+import Storage from "../database/storage";
 var tfun = require("transfun/transfun.js").tfun;
 if (!tfun) {
   tfun = global.tfun;
@@ -14,7 +16,8 @@ if (!tfun) {
 
 export default class Notes {
   constructor(context) {
-    this.collection = new Collection(context, "notes");
+    this.collection = new CachedCollection(context, "notes");
+    this.deltaStorage = new Storage(context);
     this.tagsCollection = new Tags(context);
   }
 
@@ -25,7 +28,7 @@ export default class Notes {
   async add(noteArg) {
     if (!noteArg) return;
 
-    let id = noteArg.id || Date.now();
+    let id = noteArg.id || Date.now().toString() + "_note";
     let oldNote = this.get(id);
     let note = {
       ...oldNote,
@@ -37,11 +40,13 @@ export default class Notes {
       return;
     }
 
+    await this.deltaStorage.write(id + "_delta", note.content.delta);
+
     note = {
       id,
       type: "note",
       title: getNoteTitle(note),
-      content: getNoteContent(note),
+      content: getNoteContent(note, id),
       pinned: !!note.pinned,
       locked: !!note.locked,
       notebook: note.notebook || {},
@@ -50,7 +55,7 @@ export default class Notes {
       favorite: !!note.favorite,
       headline: getNoteHeadline(note),
       dateEdited: Date.now(),
-      dateCreated: id
+      dateCreated: note.dateCreated || Date.now()
     };
 
     if (oldNote) {
@@ -62,7 +67,11 @@ export default class Notes {
     }
 
     await this.collection.addItem(note);
-    return id;
+    return note.id;
+  }
+
+  async delta(id) {
+    return await this.deltaStorage.read(id + "_delta");
   }
 
   get(id) {
@@ -103,7 +112,8 @@ export default class Notes {
     switch (by) {
       case "abc":
         return groupBy(
-          notes.sort((a, b) => a.title.localeCompare(b.title)),
+          //notes.sort((a, b) => a.title.localeCompare(b.title)),
+          sort(notes).asc(t => t.title),
           note => note.title[0].toUpperCase(),
           special
         );
@@ -266,12 +276,13 @@ function getNoteTitle(note) {
     .trim();
 }
 
-function getNoteContent(note) {
+function getNoteContent(note, id) {
   if (note.locked) {
     return note.content;
   }
+
   return {
     text: note.content.text.trim(),
-    delta: note.content.delta
+    delta: id + "_delta"
   };
 }

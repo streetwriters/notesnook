@@ -1,15 +1,13 @@
-import Convert from "../utils/convert";
-
 export default class Storage {
   constructor(context) {
     this.storage = context;
   }
   async write(key, data) {
-    await this.storage.write(key, Convert.toString(data));
+    await this.storage.write(key, data);
   }
   async read(key) {
     let data = await this.storage.read(key);
-    return Convert.fromString(data);
+    return data;
   }
   clear() {
     this.storage.clear();

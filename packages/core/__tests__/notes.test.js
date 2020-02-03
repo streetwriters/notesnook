@@ -64,7 +64,22 @@ test("add note", () =>
     expect(id).toBeDefined();
     let note = db.notes.get(id);
     expect(note).toBeDefined();
-    expect(note.content).toStrictEqual(TEST_NOTE.content);
+    expect(note.content.text).toStrictEqual(TEST_NOTE.content.text);
+  }));
+
+test("get delta of note", () =>
+  noteTest().then(async ({ db, id }) => {
+    expect(id).toBeDefined();
+    let delta = await db.notes.delta(id);
+    expect(delta).toStrictEqual(TEST_NOTE.content.delta);
+  }));
+
+test("delete note", () =>
+  noteTest().then(async ({ db, id }) => {
+    expect(id).toBeDefined();
+    await db.notes.delete(id);
+    let note = db.notes.get(id);
+    expect(note).toBeUndefined();
   }));
 
 test("get all notes", () =>
@@ -102,7 +117,7 @@ test("update note", () =>
     id = await db.notes.add(noteData);
     let note = db.notes.get(id);
     expect(note.title).toBe(noteData.title);
-    expect(note.content).toStrictEqual(noteData.content);
+    expect(note.content.text).toStrictEqual(noteData.content.text);
     expect(note.pinned).toBe(true);
     expect(note.favorite).toBe(true);
   }));
@@ -226,7 +241,7 @@ test("lock and unlock note", () =>
     expect(note.locked).toBe(true);
     expect(note.content.iv).toBeDefined();
     note = await db.notes.unlock(id, "password123");
-    expect(note.dateCreated).toBe(id);
+    expect(note.id).toBe(id);
     expect(note.content.text).toBe(TEST_NOTE.content.text);
     await db.notes.unlock(id, "password123", true);
     note = db.notes.get(id);
