@@ -222,19 +222,6 @@ export default class Notes {
       for (let id of noteIds) {
         let note = this.get(id);
         if (!note) continue;
-        /*  if (note.notebook && note.notebook.id & note.notebook.topic) {
-          if (
-            note.notebook.id === notebook.id &&
-            note.notebook.topic === topic.title
-          ) {
-            continue;
-          }
-          let topic = this.notebooks
-            .topics(note.notebook.id)
-            .topic(note.notebook.topic);
-          if (!topic) continue;
-          await topic.delete(id);
-        } */
         await topic.add(id);
       }
     });
