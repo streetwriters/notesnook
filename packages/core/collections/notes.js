@@ -176,6 +176,7 @@ export default class Notes {
         await this.tagsCollection.remove(tag);
       }
       await this.collection.removeItem(id);
+      this.deltaStorage.remove(id + "_delta");
     }
   }
 

@@ -45,6 +45,7 @@ test("delete note", () =>
     expect(topic.all.findIndex(v => v.id === id)).toBeGreaterThan(-1);
     await db.notes.delete(id);
     let note = db.notes.get(id);
+    expect(await db.notes.delta(id)).toBeUndefined();
     expect(note).toBeUndefined();
     expect(topic.all.findIndex(v => v.id === id)).toBe(-1);
   }));
