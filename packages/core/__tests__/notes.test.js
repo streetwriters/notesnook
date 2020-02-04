@@ -241,12 +241,13 @@ test("move note", () =>
     let topics = db.notebooks.topics(notebookId);
     let topic = await topics.add("Home");
     await topic.add(id);
-
-    let notebookId2 = await db.notebooks.add({ title: "Hello2" });
-    await db.notebooks.topics(notebookId2).add("Home2");
-    await db.notes.move({ id: notebookId2, topic: "Home2" }, id);
-    let note = db.notes.get(id);
-    expect(note.notebook.id).toBe(notebookId2);
+    setTimeout(async () => {
+      let notebookId2 = await db.notebooks.add({ title: "Hello2" });
+      await db.notebooks.topics(notebookId2).add("Home2");
+      await db.notes.move({ id: notebookId2, topic: "Home2" }, id);
+      let note = db.notes.get(id);
+      expect(note.notebook.id).toBe(notebookId2);
+    }, 1000);
   }));
 
 test("moving note to same notebook and topic should do nothing", () =>
