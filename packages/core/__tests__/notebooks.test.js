@@ -1,27 +1,4 @@
-import DB from "../api";
-import StorageInterface from "../__mocks__/storage.mock";
-
-const TEST_NOTEBOOK = {
-  title: "Test Notebook",
-  description: "Test Description",
-  topics: ["hello", "hello", "    "]
-};
-const TEST_NOTEBOOK2 = {
-  title: "Test Notebook 2",
-  description: "Test Description 2",
-  topics: ["Home2"]
-};
-
-function databaseTest() {
-  let db = new DB(StorageInterface);
-  return db.init().then(() => db);
-}
-
-const notebookTest = (notebook = TEST_NOTEBOOK) =>
-  databaseTest().then(async db => {
-    let id = await db.notebooks.add(notebook);
-    return { db, id };
-  });
+import { StorageInterface, notebookTest, TEST_NOTEBOOK } from "./utils";
 
 beforeEach(async () => {
   StorageInterface.clear();
@@ -76,32 +53,4 @@ test("unfavorite a notebook", () =>
     await db.notebooks.unfavorite(id);
     let notebook = db.notebooks.get(id);
     expect(notebook.favorite).toBe(false);
-  }));
-
-test("get empty topic", () =>
-  notebookTest().then(({ db, id }) => {
-    let notes = db.notebooks.topics(id).get("General");
-    expect(notes.length).toBe(0);
-  }));
-
-test("getting invalid topic should throw", () =>
-  notebookTest().then(({ db, id }) => {
-    expect(() => db.notebooks.topics(id).get("invalid")).toThrow();
-  }));
-
-test("add topic to notebook", () =>
-  notebookTest().then(async ({ db, id }) => {
-    let topics = db.notebooks.topics(id);
-    await topics.add("Home");
-    expect(topics.all.length).toBeGreaterThan(1);
-    expect(topics.all.findIndex(v => v.title === "Home")).toBeGreaterThan(-1);
-  }));
-
-test("duplicate topic to notebook should not be added", () =>
-  notebookTest().then(async ({ db, id }) => {
-    let topics = db.notebooks.topics(id);
-    await topics.add("Home");
-    let len = topics.all.length;
-    await topics.add("Home");
-    expect(topics.all.length).toBe(len);
   }));

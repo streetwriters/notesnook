@@ -1,49 +1,11 @@
-import DB from "../api";
-import StorageInterface from "../__mocks__/storage.mock";
-import { getLastWeekTimestamp } from "../utils/date";
-
-var TEST_NOTE = {
-  content: { delta: "I am a delta", text: "I am a text" }
-};
-
-const LONG_TEXT =
-  "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.";
-
-function databaseTest() {
-  let db = new DB(StorageInterface);
-  return db.init().then(() => db);
-}
-
-const noteTest = (note = TEST_NOTE) =>
-  databaseTest().then(async db => {
-    let id = await db.notes.add(note);
-    return { db, id };
-  });
-
-const groupedTest = (type, special = false) =>
-  noteTest().then(async ({ db }) => {
-    await db.notes.add({ ...TEST_NOTE, title: "HELLO WHAT!" });
-    await db.notes.add({
-      ...TEST_NOTE,
-      title: "Some title",
-      dateCreated: getLastWeekTimestamp() - 604800000
-    });
-    await db.notes.add({
-      ...TEST_NOTE,
-      title: "Some title and title title",
-      dateCreated: getLastWeekTimestamp() - 604800000 * 2
-    });
-    let grouped = db.notes.group(type, special);
-    if (special) {
-      expect(grouped.items.length).toBeGreaterThan(0);
-      expect(grouped.groups.length).toBeGreaterThan(0);
-      expect(grouped.groupCounts.length).toBeGreaterThan(0);
-      return;
-    }
-    expect(grouped.length).toBeGreaterThan(0);
-    expect(grouped[0].data.length).toBeGreaterThan(0);
-    expect(grouped[0].title.length).toBeGreaterThan(0);
-  });
+import {
+  StorageInterface,
+  databaseTest,
+  noteTest,
+  groupedTest,
+  LONG_TEXT,
+  TEST_NOTE
+} from "./utils";
 
 beforeEach(async () => {
   StorageInterface.clear();
@@ -246,4 +208,49 @@ test("lock and unlock note", () =>
     await db.notes.unlock(id, "password123", true);
     note = db.notes.get(id);
     expect(note.locked).toBe(false);
+  }));
+
+test("add note to topic", () =>
+  noteTest().then(async ({ db, id }) => {
+    let notebookId = await db.notebooks.add({ title: "Hello" });
+    let topics = db.notebooks.topics(notebookId);
+    let topic = await topics.add("Home");
+    await topic.add(id);
+    expect(topic.all.length).toBe(1);
+    let note = db.notes.get(id);
+    expect(note.notebook.id).toBe(notebookId);
+  }));
+
+test("duplicate note to topic should not be added", () =>
+  noteTest().then(async ({ db, id }) => {
+    let notebookId = await db.notebooks.add({ title: "Hello" });
+    let topics = db.notebooks.topics(notebookId);
+    let topic = await topics.add("Home");
+    await topic.add(id);
+    expect(topic.all.length).toBe(1);
+  }));
+
+test("move note", () =>
+  noteTest().then(async ({ db, id }) => {
+    let notebookId = await db.notebooks.add({ title: "Hello" });
+    let topics = db.notebooks.topics(notebookId);
+    let topic = await topics.add("Home");
+    await topic.add(id);
+
+    let notebookId2 = await db.notebooks.add({ title: "Hello2" });
+    await db.notebooks.topics(notebookId2).add("Home2");
+    await db.notes.move({ id: notebookId2, topic: "Home2" }, id);
+    let note = db.notes.get(id);
+    expect(note.notebook.id).toBe(notebookId2);
+  }));
+
+test("moving note to same notebook and topic should do nothing", () =>
+  noteTest().then(async ({ db, id }) => {
+    let notebookId = await db.notebooks.add({ title: "Hello" });
+    let topics = db.notebooks.topics(notebookId);
+    let topic = await topics.add("Home");
+    await topic.add(id);
+    await db.notes.move({ id: notebookId, topic: "Home" }, id);
+    let note = db.notes.get(id);
+    expect(note.notebook.id).toBe(notebookId);
   }));

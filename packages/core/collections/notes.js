@@ -9,6 +9,7 @@ import {
   getLastWeekTimestamp
 } from "../utils/date";
 import Storage from "../database/storage";
+import Notebooks from "./notebooks";
 var tfun = require("transfun/transfun.js").tfun;
 if (!tfun) {
   tfun = global.tfun;
@@ -21,8 +22,14 @@ export default class Notes {
     this.tagsCollection = new Tags(context);
   }
 
-  async init() {
+  /**
+   *
+   * @param {Notebooks} notebooks
+   */
+  async init(notebooks) {
     await this.collection.init();
+    this.notebooks = notebooks;
+    await this.tagsCollection.init();
   }
 
   async add(noteArg) {
@@ -201,6 +208,36 @@ export default class Notes {
     note.tags.splice(note.tags.indexOf(tag), 1);
     await this.tagsCollection.remove(tag);
     await this.collection.addItem(note);
+  }
+
+  async move(to, ...noteIds) {
+    if (!to) throw new Error("The destination notebook cannot be undefined.");
+    if (!to.id || !to.topic)
+      throw new Error(
+        "The destination notebook must contain notebookId and topic."
+      );
+    let topic = this.notebooks.topics(to.id).topic(to.topic);
+    if (!topic) throw new Error("No such topic exists.");
+    await topic.transaction(async () => {
+      for (let id of noteIds) {
+        let note = this.get(id);
+        if (!note) continue;
+        /*  if (note.notebook && note.notebook.id & note.notebook.topic) {
+          if (
+            note.notebook.id === notebook.id &&
+            note.notebook.topic === topic.title
+          ) {
+            continue;
+          }
+          let topic = this.notebooks
+            .topics(note.notebook.id)
+            .topic(note.notebook.topic);
+          if (!topic) continue;
+          await topic.delete(id);
+        } */
+        await topic.add(id);
+      }
+    });
   }
 
   async favorite(id) {

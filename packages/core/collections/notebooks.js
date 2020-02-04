@@ -9,6 +9,12 @@ export default class Notebooks {
   constructor(context) {
     this.context = context;
     this.collection = new CachedCollection(context, "notebooks");
+    this.notes = undefined;
+  }
+
+  init(notes) {
+    this.notes = notes;
+    return this.collection.init();
   }
 
   async add(notebookArg) {
@@ -24,11 +30,11 @@ export default class Notebooks {
       ...oldNotebook,
       ...notebookArg
     };
-    if (oldNotebook && oldNotebook.topics) {
-      notebook.topics = [...oldNotebook.topics];
-    }
-    if (notebookArg.topics) {
+    /* if (notebookArg.topics) {
       notebook.topics = [...notebook.topics, ...notebookArg.topics];
+    } */
+    if (oldNotebook && oldNotebook.topics) {
+      notebook.topics = [...notebook.topics, ...oldNotebook.topics];
     }
 
     let topics = notebook.topics || [];
@@ -90,7 +96,7 @@ export default class Notebooks {
   }
 
   topics(id) {
-    return new Topics(this, id);
+    return new Topics(this, this.notes, id);
   }
 
   pin(id) {

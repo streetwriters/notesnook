@@ -6,8 +6,10 @@ class DB {
     this.context = context;
   }
   async init() {
-    this.notes = new Notes(this.context);
     this.notebooks = new Notebooks(this.context);
+    this.notes = new Notes(this.context);
+    await this.notes.init(this.notebooks);
+    await this.notebooks.init(this.notes);
   }
 }
 

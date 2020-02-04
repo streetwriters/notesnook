@@ -5,6 +5,10 @@ export default class Tags {
     this.collection = new CachedCollection(context, "tags");
   }
 
+  init() {
+    return this.collection.init();
+  }
+
   async add(id) {
     if (!id || id.trim().length <= 0) return;
     let tag = (await this.collection.getItem(id)) || {
