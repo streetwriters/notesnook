@@ -86,7 +86,16 @@ export default class Notebooks {
     return this.collection.getItem(id);
   }
 
-  delete(...ids) {}
+  async delete(...ids) {
+    for (let id of ids) {
+      let notebook = this.get(id);
+      if (!notebook) continue;
+      await this.collection.transaction(() =>
+        this.topics(id).delete(...notebook.topics)
+      );
+      await this.collection.removeItem(id);
+    }
+  }
 
   filter(query) {
     if (!query) return [];

@@ -4,6 +4,7 @@ export default class CachedCollection {
   constructor(context, type) {
     this.map = new Map();
     this.indexer = new Indexer(context, type);
+    this.transactionOpen = false;
   }
 
   async init() {
@@ -13,7 +14,17 @@ export default class CachedCollection {
     }
   }
 
+  /**
+   *
+   * @param {Promise} ops
+   */
+  transaction(ops) {
+    this.transactionOpen = true;
+    return ops().then(() => Promise.resolve((this.transactionOpen = false)));
+  }
+
   async addItem(item) {
+    if (this.transactionOpen) return;
     if (!item.id) throw new Error("The item must contain the id field.");
 
     let exists = this.map.has(item.id);
@@ -24,6 +35,7 @@ export default class CachedCollection {
   }
 
   async updateItem(item) {
+    if (this.transactionOpen) return;
     if (!item.id) throw new Error("The item must contain the id field.");
 
     this.map.set(item.id, item);
@@ -31,6 +43,7 @@ export default class CachedCollection {
   }
 
   async removeItem(id) {
+    if (this.transactionOpen) return;
     if (this.map.delete(id)) {
       this.indexer.remove(id);
       await this.indexer.deindex(id);

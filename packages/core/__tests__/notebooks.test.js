@@ -1,4 +1,9 @@
-import { StorageInterface, notebookTest, TEST_NOTEBOOK } from "./utils";
+import {
+  StorageInterface,
+  notebookTest,
+  TEST_NOTEBOOK,
+  TEST_NOTE
+} from "./utils";
 
 beforeEach(async () => {
   StorageInterface.clear();
@@ -53,4 +58,18 @@ test("unfavorite a notebook", () =>
     await db.notebooks.unfavorite(id);
     let notebook = db.notebooks.get(id);
     expect(notebook.favorite).toBe(false);
+  }));
+
+test("delete a notebook", () =>
+  notebookTest().then(async ({ db, id }) => {
+    let noteId = await db.notes.add(TEST_NOTE);
+    await db.notebooks
+      .topics(id)
+      .topic("General")
+      .add(noteId);
+    let note = await db.notes.get(noteId);
+    expect(note.notebook.id).toBe(id);
+    await db.notebooks.delete(id);
+    note = await db.notes.get(noteId);
+    expect(note.notebook.id).toBeUndefined();
   }));

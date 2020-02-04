@@ -161,24 +161,17 @@ export default class Notes {
   }
 
   async delete(...ids) {
-    if (!ids || ids.length <= 0) {
-      return false;
-    }
-
     for (let id of ids) {
       let item = this.get(id);
       if (!id) continue;
-      /* TODO if (
-        item.notebook.hasOwnProperty("topic") &&
-        !(await this.deleteNoteFromTopic(
-          item.notebook.id,
-          item.notebook.topic,
-          item.dateCreated
-        ))
-      ) {
-        continue;
+      if (item.notebook && item.notebook.id && item.notebook.topic) {
+        await this.collection.transaction(() =>
+          this.notebooks
+            .topics(item.notebook.id)
+            .topic(item.notebook.topic)
+            .delete(id)
+        );
       }
-      */
       for (let tag of item.tags) {
         await this.tagsCollection.remove(tag);
       }
@@ -219,11 +212,7 @@ export default class Notes {
     let topic = this.notebooks.topics(to.id).topic(to.topic);
     if (!topic) throw new Error("No such topic exists.");
     await topic.transaction(async () => {
-      for (let id of noteIds) {
-        let note = this.get(id);
-        if (!note) continue;
-        await topic.add(id);
-      }
+      await topic.add(...noteIds);
     });
   }
 

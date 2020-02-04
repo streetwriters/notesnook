@@ -4,7 +4,8 @@ import {
   noteTest,
   groupedTest,
   LONG_TEXT,
-  TEST_NOTE
+  TEST_NOTE,
+  TEST_NOTEBOOK
 } from "./utils";
 
 beforeEach(async () => {
@@ -23,7 +24,6 @@ test("add invalid note", () =>
 
 test("add note", () =>
   noteTest().then(async ({ db, id }) => {
-    expect(id).toBeDefined();
     let note = db.notes.get(id);
     expect(note).toBeDefined();
     expect(note.content.text).toStrictEqual(TEST_NOTE.content.text);
@@ -31,17 +31,22 @@ test("add note", () =>
 
 test("get delta of note", () =>
   noteTest().then(async ({ db, id }) => {
-    expect(id).toBeDefined();
     let delta = await db.notes.delta(id);
     expect(delta).toStrictEqual(TEST_NOTE.content.delta);
   }));
 
 test("delete note", () =>
   noteTest().then(async ({ db, id }) => {
-    expect(id).toBeDefined();
+    let notebookId = await db.notebooks.add(TEST_NOTEBOOK);
+    let topic = await db.notebooks
+      .topics(notebookId)
+      .topic("General")
+      .add(id);
+    expect(topic.all.findIndex(v => v.id === id)).toBeGreaterThan(-1);
     await db.notes.delete(id);
     let note = db.notes.get(id);
     expect(note).toBeUndefined();
+    expect(topic.all.findIndex(v => v.id === id)).toBe(-1);
   }));
 
 test("get all notes", () =>
