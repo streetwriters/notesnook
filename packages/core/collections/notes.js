@@ -10,6 +10,7 @@ import {
 } from "../utils/date";
 import Storage from "../database/storage";
 import Notebooks from "./notebooks";
+import Note from "../models/note";
 var tfun = require("transfun/transfun.js").tfun;
 if (!tfun) {
   tfun = global.tfun;
@@ -36,7 +37,7 @@ export default class Notes {
     if (!noteArg) return;
 
     let id = noteArg.id || Date.now().toString() + "_note";
-    let oldNote = this.get(id);
+    let oldNote = this.collection.getItem(id);
     let note = {
       ...oldNote,
       ...noteArg
@@ -77,12 +78,10 @@ export default class Notes {
     return note.id;
   }
 
-  async delta(id) {
-    return await this.deltaStorage.read(id + "_delta");
-  }
-
-  get(id) {
-    return this.collection.getItem(id);
+  note(id) {
+    let note = this.collection.getItem(id);
+    if (!note) return undefined;
+    return new Note(this, note);
   }
 
   get all() {
@@ -162,13 +161,13 @@ export default class Notes {
 
   async delete(...ids) {
     for (let id of ids) {
-      let item = this.get(id);
-      if (!id) continue;
+      let item = this.note(id);
+      if (!item) continue;
       if (item.notebook && item.notebook.id && item.notebook.topic) {
         await this.collection.transaction(() =>
           this.notebooks
-            .topics(item.notebook.id)
-            .topic(item.notebook.topic)
+            .notebook(item.notebook.id)
+            .topics.topic(item.notebook.topic)
             .delete(id)
         );
       }
@@ -184,82 +183,17 @@ export default class Notes {
     return this.tagsCollection.all();
   }
 
-  async tag(id, tag) {
-    let note = await this.get(id);
-    if (!note)
-      throw new Error(`Couldn't add tag. No note found with id: ${id}.`);
-    note.tags.push(tag);
-    await this.tagsCollection.add(tag);
-    await this.collection.addItem(note);
-  }
-
-  async untag(id, tag) {
-    let note = await this.get(id);
-    if (!note)
-      throw new Error(`Couldn't add tag. No note found with id: ${id}.`);
-    if (note.tags.indexOf(tag) <= -1)
-      throw new Error("This note is not tagged by the specified tag.");
-    note.tags.splice(note.tags.indexOf(tag), 1);
-    await this.tagsCollection.remove(tag);
-    await this.collection.addItem(note);
-  }
-
   async move(to, ...noteIds) {
     if (!to) throw new Error("The destination notebook cannot be undefined.");
     if (!to.id || !to.topic)
       throw new Error(
         "The destination notebook must contain notebookId and topic."
       );
-    let topic = this.notebooks.topics(to.id).topic(to.topic);
+    let topic = this.notebooks.notebook(to.id).topics.topic(to.topic);
     if (!topic) throw new Error("No such topic exists.");
     await topic.transaction(async () => {
       await topic.add(...noteIds);
     });
-  }
-
-  async favorite(id) {
-    await this.add({ id, favorite: true });
-  }
-
-  async unfavorite(id) {
-    await this.add({ id, favorite: false });
-  }
-
-  async pin(id) {
-    await this.add({ id, pinned: true });
-  }
-
-  async unpin(id) {
-    await this.add({ id, pinned: false });
-  }
-
-  async lock(id, password) {
-    let note = await this.get(id);
-    if (!note)
-      throw new Error(`Couldn't lock note. No note found with id: ${id}.`);
-    note.content = await this.collection.indexer.encrypt(
-      password,
-      JSON.stringify(note.content)
-    );
-    note.locked = true;
-    await this.collection.addItem(note);
-    return true;
-  }
-
-  async unlock(id, password, perm = false) {
-    let note = await this.get(id);
-    if (!note)
-      throw new Error(`Couldn't unlock note. No note found with id: ${id}.`);
-    let decrypted = await this.collection.indexer.decrypt(
-      password,
-      note.content
-    );
-    if (perm) {
-      note.locked = false;
-      note.content = JSON.parse(decrypted);
-      await this.collection.addItem(note);
-    }
-    return { ...note, content: JSON.parse(decrypted) };
   }
 }
 

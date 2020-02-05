@@ -12,7 +12,7 @@ beforeEach(async () => {
 test("add a notebook", () =>
   notebookTest().then(({ db, id }) => {
     expect(id).toBeDefined();
-    let notebook = db.notebooks.get(id);
+    let notebook = db.notebooks.notebook(id);
     expect(notebook).toBeDefined();
     expect(notebook.title).toBe(TEST_NOTEBOOK.title);
   }));
@@ -34,42 +34,46 @@ test("search all notebooks", () =>
 
 test("pin a notebook", () =>
   notebookTest().then(async ({ db, id }) => {
-    await db.notebooks.pin(id);
-    let notebook = db.notebooks.get(id);
-    expect(notebook.pinned).toBe(true);
+    let notebook = db.notebooks.notebook(id);
+    await notebook.pin();
+    expect(notebook.data.pinned).toBe(true);
   }));
 
 test("unpin a notebook", () =>
   notebookTest().then(async ({ db, id }) => {
-    await db.notebooks.unpin(id);
-    let notebook = db.notebooks.get(id);
-    expect(notebook.pinned).toBe(false);
+    let notebook = db.notebooks.notebook(id);
+    await notebook.pin();
+    expect(notebook.data.pinned).toBe(true);
+    await notebook.pin();
+    expect(notebook.data.pinned).toBe(false);
   }));
 
 test("favorite a notebook", () =>
   notebookTest().then(async ({ db, id }) => {
-    await db.notebooks.favorite(id);
-    let notebook = db.notebooks.get(id);
-    expect(notebook.favorite).toBe(true);
+    let notebook = db.notebooks.notebook(id);
+    await notebook.favorite();
+    expect(notebook.data.favorite).toBe(true);
   }));
 
 test("unfavorite a notebook", () =>
   notebookTest().then(async ({ db, id }) => {
-    await db.notebooks.unfavorite(id);
-    let notebook = db.notebooks.get(id);
-    expect(notebook.favorite).toBe(false);
+    let notebook = db.notebooks.notebook(id);
+    await notebook.favorite();
+    expect(notebook.data.favorite).toBe(true);
+    await notebook.favorite();
+    expect(notebook.data.favorite).toBe(false);
   }));
 
 test("delete a notebook", () =>
   notebookTest().then(async ({ db, id }) => {
     let noteId = await db.notes.add(TEST_NOTE);
     await db.notebooks
-      .topics(id)
-      .topic("General")
+      .notebook(id)
+      .topics.topic("General")
       .add(noteId);
-    let note = await db.notes.get(noteId);
+    let note = db.notes.note(noteId);
     expect(note.notebook.id).toBe(id);
     await db.notebooks.delete(id);
-    note = await db.notes.get(noteId);
+    note = db.notes.note(noteId);
     expect(note.notebook.id).toBeUndefined();
   }));

@@ -1,6 +1,6 @@
 import CachedCollection from "../database/cached-collection";
 import fuzzysearch from "fuzzysearch";
-import Topics from "./topics";
+import Notebook from "../models/notebook";
 var tfun = require("transfun/transfun.js").tfun;
 if (!tfun) {
   tfun = global.tfun;
@@ -82,16 +82,18 @@ export default class Notebooks {
     return this.collection.getAllItems();
   }
 
-  get(id) {
-    return this.collection.getItem(id);
+  notebook(id) {
+    let notebook = this.collection.getItem(id);
+    if (!notebook) return;
+    return new Notebook(this, notebook);
   }
 
   async delete(...ids) {
     for (let id of ids) {
-      let notebook = this.get(id);
+      let notebook = this.notebook(id);
       if (!notebook) continue;
       await this.collection.transaction(() =>
-        this.topics(id).delete(...notebook.topics)
+        notebook.topics.delete(...notebook.topics.all)
       );
       await this.collection.removeItem(id);
     }
@@ -102,23 +104,6 @@ export default class Notebooks {
     return tfun.filter(v => fuzzysearch(query, v.title + " " + v.description))(
       this.all
     );
-  }
-
-  topics(id) {
-    return new Topics(this, this.notes, id);
-  }
-
-  pin(id) {
-    return this.add({ id, pinned: true });
-  }
-  unpin(id) {
-    return this.add({ id, pinned: false });
-  }
-  favorite(id) {
-    return this.add({ id, favorite: true });
-  }
-  unfavorite(id) {
-    return this.add({ id, favorite: false });
   }
 }
 

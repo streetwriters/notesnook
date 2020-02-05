@@ -24,14 +24,14 @@ test("add invalid note", () =>
 
 test("add note", () =>
   noteTest().then(async ({ db, id }) => {
-    let note = db.notes.get(id);
-    expect(note).toBeDefined();
-    expect(note.content.text).toStrictEqual(TEST_NOTE.content.text);
+    let note = db.notes.note(id);
+    expect(note.data).toBeDefined();
+    expect(note.text).toStrictEqual(TEST_NOTE.content.text);
   }));
 
 test("get delta of note", () =>
   noteTest().then(async ({ db, id }) => {
-    let delta = await db.notes.delta(id);
+    let delta = await db.notes.note(id).delta();
     expect(delta).toStrictEqual(TEST_NOTE.content.delta);
   }));
 
@@ -39,14 +39,12 @@ test("delete note", () =>
   noteTest().then(async ({ db, id }) => {
     let notebookId = await db.notebooks.add(TEST_NOTEBOOK);
     let topic = await db.notebooks
-      .topics(notebookId)
-      .topic("General")
+      .notebook(notebookId)
+      .topics.topic("General")
       .add(id);
     expect(topic.all.findIndex(v => v.id === id)).toBeGreaterThan(-1);
     await db.notes.delete(id);
-    let note = db.notes.get(id);
-    expect(await db.notes.delta(id)).toBeUndefined();
-    expect(note).toBeUndefined();
+    expect(db.notes.note(id)).toBeUndefined();
     expect(topic.all.findIndex(v => v.id === id)).toBe(-1);
   }));
 
@@ -65,7 +63,7 @@ test("search all notes", () =>
 
 test("note without a title should get title from content", () =>
   noteTest().then(async ({ db, id }) => {
-    let note = db.notes.get(id);
+    let note = db.notes.note(id);
     expect(note.title).toBe("I am a");
   }));
 
@@ -83,11 +81,11 @@ test("update note", () =>
       // colors: ["red", "blue"]
     };
     id = await db.notes.add(noteData);
-    let note = db.notes.get(id);
+    let note = db.notes.note(id);
     expect(note.title).toBe(noteData.title);
-    expect(note.content.text).toStrictEqual(noteData.content.text);
-    expect(note.pinned).toBe(true);
-    expect(note.favorite).toBe(true);
+    expect(note.text).toStrictEqual(noteData.content.text);
+    expect(note.data.pinned).toBe(true);
+    expect(note.data.favorite).toBe(true);
   }));
 
 test("updating empty note should delete it", () =>
@@ -101,24 +99,26 @@ test("updating empty note should delete it", () =>
       }
     });
     expect(id).toBeUndefined();
-    let note = db.notes.get(id);
+    let note = db.notes.note(id);
     expect(note).toBeUndefined();
   }));
 
 test("add tag to note", () =>
   noteTest().then(async ({ db, id }) => {
-    await db.notes.tag(id, "hello");
-    expect(db.notes.get(id).tags[0]).toBe("hello");
+    let note = db.notes.note(id);
+    await note.tag("hello");
+    expect(note.tags[0]).toBe("hello");
     expect(db.notes.tags[0].title).toBe("hello");
   }));
 
 test("remove tag from note", () =>
   noteTest().then(async ({ db, id }) => {
-    await db.notes.tag(id, "hello");
-    expect(db.notes.get(id).tags[0]).toBe("hello");
+    let note = db.notes.note(id);
+    await note.tag("hello");
+    expect(note.tags[0]).toBe("hello");
     expect(db.notes.tags[0].title).toBe("hello");
-    await db.notes.untag(id, "hello");
-    expect(db.notes.get(id).tags.length).toBe(0);
+    await note.untag("hello");
+    expect(note.tags.length).toBe(0);
     expect(db.notes.tags.length).toBe(0);
   }));
 
@@ -129,7 +129,7 @@ test("note with text longer than 150 characters should have ... in the headline"
       delta: []
     }
   }).then(({ db, id }) => {
-    let note = db.notes.get(id);
+    let note = db.notes.note(id);
     expect(note.headline.includes("...")).toBe(true);
   }));
 
@@ -192,45 +192,48 @@ test("get grouped notes default (special)", () => groupedTest("", true));
 
 test("pin note", () =>
   noteTest().then(async ({ db, id }) => {
-    await db.notes.pin(id);
-    expect(db.notes.get(id).pinned).toBe(true);
+    let note = db.notes.note(id);
+    await note.pin();
+    expect(note.data.pinned).toBe(true);
   }));
 
 test("favorite note", () =>
   noteTest().then(async ({ db, id }) => {
-    await db.notes.favorite(id);
-    expect(db.notes.get(id).favorite).toBe(true);
+    let note = db.notes.note(id);
+    await note.favorite();
+    expect(note.data.favorite).toBe(true);
   }));
 
 test("lock and unlock note", () =>
   noteTest().then(async ({ db, id }) => {
-    expect(await db.notes.lock(id, "password123")).toBe(true);
-    let note = db.notes.get(id);
-    expect(note.locked).toBe(true);
-    expect(note.content.iv).toBeDefined();
-    note = await db.notes.unlock(id, "password123");
+    let note = db.notes.note(id);
+    await note.lock("password123");
+    expect(note.data.locked).toBe(true);
+    expect(note.data.content.iv).toBeDefined();
+    note = await note.unlock("password123");
     expect(note.id).toBe(id);
     expect(note.content.text).toBe(TEST_NOTE.content.text);
-    await db.notes.unlock(id, "password123", true);
-    note = db.notes.get(id);
-    expect(note.locked).toBe(false);
+    note = db.notes.note(id);
+    await note.unlock("password123", true);
+    note = db.notes.note(id);
+    expect(note.data.locked).toBe(false);
   }));
 
 test("add note to topic", () =>
   noteTest().then(async ({ db, id }) => {
     let notebookId = await db.notebooks.add({ title: "Hello" });
-    let topics = db.notebooks.topics(notebookId);
+    let topics = db.notebooks.notebook(notebookId).topics;
     let topic = await topics.add("Home");
     await topic.add(id);
     expect(topic.all.length).toBe(1);
-    let note = db.notes.get(id);
+    let note = db.notes.note(id);
     expect(note.notebook.id).toBe(notebookId);
   }));
 
 test("duplicate note to topic should not be added", () =>
   noteTest().then(async ({ db, id }) => {
     let notebookId = await db.notebooks.add({ title: "Hello" });
-    let topics = db.notebooks.topics(notebookId);
+    let topics = db.notebooks.notebook(notebookId).topics;
     let topic = await topics.add("Home");
     await topic.add(id);
     expect(topic.all.length).toBe(1);
@@ -239,14 +242,14 @@ test("duplicate note to topic should not be added", () =>
 test("move note", () =>
   noteTest().then(async ({ db, id }) => {
     let notebookId = await db.notebooks.add({ title: "Hello" });
-    let topics = db.notebooks.topics(notebookId);
+    let topics = db.notebooks.notebook(notebookId).topics;
     let topic = await topics.add("Home");
     await topic.add(id);
     setTimeout(async () => {
       let notebookId2 = await db.notebooks.add({ title: "Hello2" });
-      await db.notebooks.topics(notebookId2).add("Home2");
+      await db.notebooks.notebook(notebookId2).topics.add("Home2");
       await db.notes.move({ id: notebookId2, topic: "Home2" }, id);
-      let note = db.notes.get(id);
+      let note = db.notes.note(id);
       expect(note.notebook.id).toBe(notebookId2);
     }, 1000);
   }));
@@ -254,10 +257,10 @@ test("move note", () =>
 test("moving note to same notebook and topic should do nothing", () =>
   noteTest().then(async ({ db, id }) => {
     let notebookId = await db.notebooks.add({ title: "Hello" });
-    let topics = db.notebooks.topics(notebookId);
+    let topics = db.notebooks.notebook(notebookId).topics;
     let topic = await topics.add("Home");
     await topic.add(id);
     await db.notes.move({ id: notebookId, topic: "Home" }, id);
-    let note = db.notes.get(id);
+    let note = db.notes.note(id);
     expect(note.notebook.id).toBe(notebookId);
   }));
