@@ -40,7 +40,7 @@ export const ActionSheetComponent = ({
   columnItems = [],
 }) => {
   const [state, dispatch] = useTracked();
-  const {colors} = state;
+  const {colors, tags} = state;
   const [focused, setFocused] = useState(false);
   const [note, setNote] = useState(
     item
@@ -107,7 +107,7 @@ export const ActionSheetComponent = ({
         let tagInputValue = note.tags[note.tags.length - 1];
         let oldProps = {...note};
         if (oldProps.tags.length === 0) return;
-        //oldProps.tags.splice(oldProps.tags.length - 1);
+
         await db.notes
           .note(note.id)
           .untag(oldProps.tags[oldProps.tags.length - 1]);
@@ -117,10 +117,6 @@ export const ActionSheetComponent = ({
         tagsInputRef.setNativeProps({
           text: tagInputValue,
         });
-
-        setTimeout(() => {
-          //tagsInputRef.focus();
-        }, 300);
       }
     }
   };
@@ -218,7 +214,8 @@ export const ActionSheetComponent = ({
       name: 'Restore',
       icon: 'trash',
       func: () => {
-        db.restoreItem(item.dateCreated);
+        // TODO
+        //db.restoreItem(item.dateCreated);
         ToastEvent.show(
           item.type === 'note' ? 'Note restored' : 'Notebook restored',
           'success',
@@ -712,37 +709,39 @@ export const ActionSheetComponent = ({
               }}>
               Suggestions:{' '}
             </Text>
-            {['Notes', 'Nook'].map(tag => (
-              <TouchableOpacity
-                key={tag}
-                onPress={async () => {}}
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'flex-start',
-                  alignItems: 'center',
-                  margin: 1,
-                  marginRight: 3,
-                  paddingHorizontal: 5,
-                  paddingVertical: 1,
-                  backgroundColor: colors.shade,
-                  borderRadius: 2.5,
-                }}>
-                <Text
+            {tags
+              .filter(o => o.count > 1)
+              .map(tag => (
+                <TouchableOpacity
+                  key={tag}
+                  onPress={async () => {}}
                   style={{
-                    fontFamily: WEIGHT.regular,
-                    fontSize: SIZE.xs,
-                    color: colors.pri,
+                    flexDirection: 'row',
+                    justifyContent: 'flex-start',
+                    alignItems: 'center',
+                    margin: 1,
+                    marginRight: 3,
+                    paddingHorizontal: 5,
+                    paddingVertical: 1,
+                    backgroundColor: colors.shade,
+                    borderRadius: 2.5,
                   }}>
                   <Text
                     style={{
-                      color: colors.accent,
+                      fontFamily: WEIGHT.regular,
+                      fontSize: SIZE.xs,
+                      color: colors.pri,
                     }}>
-                    #
+                    <Text
+                      style={{
+                        color: colors.accent,
+                      }}>
+                      #
+                    </Text>
+                    {tag.title}
                   </Text>
-                  {tag}
-                </Text>
-              </TouchableOpacity>
-            ))}
+                </TouchableOpacity>
+              ))}
           </View>
         </View>
       ) : null}

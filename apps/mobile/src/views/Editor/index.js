@@ -281,7 +281,6 @@ const Editor = ({navigation, noMenu}) => {
       post('clear');
     } else if (note.content.delta) {
       let delta = await db.notes.note(id).delta();
-      console.log(delta);
       post(JSON.stringify(delta));
     } else {
       post(JSON.stringify({type: 'text', value: note.content.text}));
