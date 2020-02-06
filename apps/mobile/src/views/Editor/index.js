@@ -194,7 +194,6 @@ const Editor = ({navigation, noMenu}) => {
     if (id) {
       let lockednote = db.notes.note(id);
       if (lockNote && lockednote.locked) {
-        // TODO
         await db.notes.note(id).lock('password');
       }
     }

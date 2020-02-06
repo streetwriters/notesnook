@@ -344,6 +344,8 @@ export const ActionSheetComponent = ({
         } else {
           noteColors.push(color);
         }
+
+        //db.notes.note(note.id).
         // TODO
         /*  db.addNote({
           dateCreated: note.dateCreated,

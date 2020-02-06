@@ -26,8 +26,8 @@ export const reducer = (state, action) => {
       };
     }
     case ACTIONS.TRASH: {
-      let trash = [];
-      // TODO
+      let trash = db.trash.all;
+
       return {
         ...state,
         trash: trash,

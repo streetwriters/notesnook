@@ -60,9 +60,7 @@ export class Dialog extends Component {
         break;
       }
       case dialogActions.ACTION_EMPTY_TRASH: {
-        // TODO
-        //await db.clearTrash();
-
+        await db.trash.clear();
         updateEvent({type: ACTIONS.TRASH});
         ToastEvent.show('Trash cleared', 'error', 1000, () => {}, '');
         this.setState({
@@ -79,8 +77,7 @@ export class Dialog extends Component {
         });
       }
       case dialogActions.ACTION_TRASH: {
-        // TODO
-        //db.restoreItem(item.dateCreated);
+        db.trash.restore(item.id);
         ToastEvent.show(
           item.type.slice(0, 1).toUpperCase() +
             item.type.slice(1) +
@@ -98,6 +95,7 @@ export class Dialog extends Component {
     let {template, item} = this.props;
     if (dialogActions.ACTION_TRASH === template.action) {
       // delete item forever.
+      db.trash.delete(item.id);
     }
     this.setState({
       visible: false,

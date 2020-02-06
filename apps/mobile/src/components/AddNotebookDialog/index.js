@@ -112,7 +112,6 @@ export class AddNotebookDialog extends React.Component {
 
     let id = toEdit && toEdit.id ? toEdit.id : null;
 
-    // TODO
     await db.notebooks.add({
       title: this.title,
       description: this.description,
