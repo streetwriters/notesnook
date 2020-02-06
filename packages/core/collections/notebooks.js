@@ -38,35 +38,6 @@ export default class Notebooks {
       ...oldNotebook,
       ...notebookArg
     };
-    /* if (notebookArg.topics) {
-      notebook.topics = [...notebook.topics, ...notebookArg.topics];
-    } */
-    if (oldNotebook && oldNotebook.topics) {
-      notebook.topics = [...notebook.topics, ...oldNotebook.topics];
-    }
-
-    let topics =
-      notebook.topics.filter((v, i) => notebook.topics.indexOf(v) === i) || [];
-    if (!oldNotebook) {
-      topics[0] = makeTopic("General", id);
-    }
-
-    for (let i = 0; i < topics.length; i++) {
-      let topic = topics[i];
-
-      let isEmpty =
-        !topic || (typeof topic === "string" && topic.trim().length <= 0);
-
-      if (isEmpty) {
-        topics.splice(i, 1);
-        i--;
-        continue;
-      }
-
-      if (typeof topic === "string") {
-        topics[i] = makeTopic(topic, id);
-      }
-    }
 
     notebook = {
       id,
@@ -77,11 +48,18 @@ export default class Notebooks {
       dateEdited: Date.now(),
       pinned: !!notebook.pinned,
       favorite: !!notebook.favorite,
-      topics,
+      topics: notebook.topics || [],
       totalNotes: 0
     };
+    if (!oldNotebook) {
+      notebook.topics.splice(0, 0, "General");
+    }
 
     await this.collection.addItem(notebook);
+
+    //if (!oldNotebook) {
+    await this.notebook(notebook.id).topics.add(...notebook.topics);
+    //}
     return notebook.id;
   }
 
@@ -113,16 +91,4 @@ export default class Notebooks {
       this.all
     );
   }
-}
-
-function makeTopic(topic, notebookId) {
-  return {
-    type: "topic",
-    notebookId,
-    title: topic,
-    id: Date.now(),
-    dateCreated: Date.now(),
-    totalNotes: 0,
-    notes: []
-  };
 }

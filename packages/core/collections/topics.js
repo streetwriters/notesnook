@@ -19,12 +19,20 @@ export default class Topics {
     return this.all.findIndex(v => v.title === (topic.title || topic)) > -1;
   }
 
-  async add(topic) {
-    await this.notebooks.add({
-      id: this.notebookId,
-      topics: [topic]
-    });
-    return this.topic(topic);
+  async add(...topics) {
+    let notebook = this.notebooks.notebook(this.notebookId);
+    let uniqueTopics = [...notebook.data.topics, ...topics];
+    uniqueTopics = uniqueTopics.filter(
+      (v, i) =>
+        v &&
+        (v.title || v).trim().length > 0 &&
+        uniqueTopics.findIndex(t => (v.title || v) === (t.title || t)) === i
+    );
+    notebook.data.topics = [];
+    for (let topic of uniqueTopics) {
+      notebook.data.topics.push(makeTopic(topic, this.notebookId));
+    }
+    await this.notebooks.collection.addItem(notebook.data);
   }
 
   get all() {
@@ -51,9 +59,18 @@ export default class Topics {
         allTopics.splice(i, 1);
       }
     }
-    await this.notebooks.add({
-      id: this.notebookId,
-      topics: allTopics
-    });
+    await this.notebooks.add({ id: this.notebookId, topics: allTopics });
   }
+}
+
+function makeTopic(topic, notebookId) {
+  if (typeof topic !== "string") return topic;
+  return {
+    type: "topic",
+    notebookId,
+    title: topic,
+    dateCreated: Date.now(),
+    totalNotes: 0,
+    notes: []
+  };
 }

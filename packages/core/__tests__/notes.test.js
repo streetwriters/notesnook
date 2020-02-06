@@ -223,7 +223,8 @@ test("add note to topic", () =>
   noteTest().then(async ({ db, id }) => {
     let notebookId = await db.notebooks.add({ title: "Hello" });
     let topics = db.notebooks.notebook(notebookId).topics;
-    let topic = await topics.add("Home");
+    await topics.add("Home");
+    let topic = topics.topic("Home");
     await topic.add(id);
     expect(topic.all.length).toBe(1);
     let note = db.notes.note(id);
@@ -234,7 +235,8 @@ test("duplicate note to topic should not be added", () =>
   noteTest().then(async ({ db, id }) => {
     let notebookId = await db.notebooks.add({ title: "Hello" });
     let topics = db.notebooks.notebook(notebookId).topics;
-    let topic = await topics.add("Home");
+    await topics.add("Home");
+    let topic = topics.topic("Home");
     await topic.add(id);
     expect(topic.all.length).toBe(1);
   }));
@@ -243,7 +245,8 @@ test("move note", () =>
   noteTest().then(async ({ db, id }) => {
     let notebookId = await db.notebooks.add({ title: "Hello" });
     let topics = db.notebooks.notebook(notebookId).topics;
-    let topic = await topics.add("Home");
+    await topics.add("Home");
+    let topic = topics.topic("Home");
     await topic.add(id);
     setTimeout(async () => {
       let notebookId2 = await db.notebooks.add({ title: "Hello2" });
@@ -258,7 +261,8 @@ test("moving note to same notebook and topic should do nothing", () =>
   noteTest().then(async ({ db, id }) => {
     let notebookId = await db.notebooks.add({ title: "Hello" });
     let topics = db.notebooks.notebook(notebookId).topics;
-    let topic = await topics.add("Home");
+    await topics.add("Home");
+    let topic = topics.topic("Home");
     await topic.add(id);
     await db.notes.move({ id: notebookId, topic: "Home" }, id);
     let note = db.notes.note(id);

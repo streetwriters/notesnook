@@ -64,9 +64,10 @@ export default class Topic {
     return await this.save();
   }
 
-  save() {
+  async save() {
     if (this.transactionOpen) return this;
-    return this.topics.add(this.topic);
+    await this.topics.add(this.topic);
+    return this;
   }
 
   get all() {

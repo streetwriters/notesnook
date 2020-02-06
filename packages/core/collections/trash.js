@@ -78,8 +78,10 @@ export default class Trash {
         await this.notebooks.add(item);
         let notebook = this.notebooks.notebook(item.id);
         for (let topic of topics) {
-          let t = await notebook.topics.add(topic.title);
-          await t.add(...topic.notes);
+          await notebook.topics.add(topic.title || topic);
+          let t = notebook.topics.topic(topic.title || topic);
+          if (!t) continue;
+          if (topic.notes) await t.add(...topic.notes);
         }
       }
       await this.collection.removeItem(id);

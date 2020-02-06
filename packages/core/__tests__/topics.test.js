@@ -1,4 +1,4 @@
-import { notebookTest, StorageInterface } from "./utils";
+import { notebookTest, StorageInterface, TEST_NOTE } from "./utils";
 
 beforeEach(() => StorageInterface.clear());
 
@@ -8,9 +8,9 @@ test("get empty topic", () =>
     expect(topic.all.length).toBe(0);
   }));
 
-test("getting invalid topic should throw", () =>
+test("getting invalid topic should return undefined", () =>
   notebookTest().then(({ db, id }) => {
-    expect(() => db.notebooks.topics(id).get("invalid")).toThrow();
+    expect(db.notebooks.notebook(id).topics.topic("invalid")).toBeUndefined();
   }));
 
 test("add topic to notebook", () =>
@@ -19,6 +19,16 @@ test("add topic to notebook", () =>
     await topics.add("Home");
     expect(topics.all.length).toBeGreaterThan(1);
     expect(topics.all.findIndex(v => v.title === "Home")).toBeGreaterThan(-1);
+  }));
+
+test("update topic", () =>
+  notebookTest().then(async ({ db, id }) => {
+    let topics = db.notebooks.notebook(id).topics;
+    await topics.add("Home");
+    let topic = topics.topic("Home");
+    let noteId = await db.notes.add(TEST_NOTE);
+    await topic.add(noteId);
+    expect(topics.all.find(v => v.title === "Home").notes.length).toBe(1);
   }));
 
 test("duplicate topic to notebook should not be added", () =>
@@ -33,7 +43,8 @@ test("duplicate topic to notebook should not be added", () =>
 test("get topic", () =>
   notebookTest().then(async ({ db, id }) => {
     let topics = db.notebooks.notebook(id).topics;
-    let topic = await topics.add("Home");
+    await topics.add("Home");
+    let topic = topics.topic("Home");
     let noteId = await db.notes.add({ content: { text: "Hello", delta: [] } });
     await topic.add(noteId);
     expect(topic.all[0].content.text).toBe("Hello");
