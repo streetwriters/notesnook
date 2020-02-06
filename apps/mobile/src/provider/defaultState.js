@@ -10,6 +10,7 @@ export const defaultState = {
   favorites: [],
   pinned: [],
   tags: [],
+  colorNotes: [],
   colors: {
     night: false,
     bg: 'white',

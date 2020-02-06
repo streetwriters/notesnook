@@ -41,7 +41,7 @@ export const Menu = ({
   noTextMode = false,
 }) => {
   const [state, dispatch] = useTracked();
-  const {colors, tags} = state;
+  const {colors, tags, colorNotes} = state;
   // todo
 
   let overlayRef;
@@ -386,42 +386,61 @@ export const Menu = ({
               marginTop: pv / 2,
               marginBottom: pv / 2,
             }}>
-            {['red', 'yellow', 'green', 'blue', 'purple', 'orange', 'gray'].map(
-              item => (
-                <TouchableOpacity
-                  key={item}
-                  activeOpacity={opacity / 2}
+            {colorNotes.map(item => (
+              <TouchableOpacity
+                key={item.id}
+                activeOpacity={opacity / 2}
+                onPress={() => {
+                  NavigationService.navigate('Notes', {
+                    type: 'color',
+                    title: item.title,
+                    color: item,
+                  });
+                }}
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: noTextMode ? 'center' : 'flex-start',
+                  alignItems: 'center',
+                  margin: noTextMode ? 0 : 5,
+                  marginLeft: 0,
+                  marginRight: noTextMode ? 0 : 15,
+                  marginTop: normalize(15),
+                }}>
+                <View
                   style={{
-                    flexDirection: 'row',
-                    justifyContent: noTextMode ? 'center' : 'flex-start',
-                    alignItems: 'center',
-                    margin: noTextMode ? 0 : 5,
-                    marginTop: normalize(15),
+                    width: noTextMode ? SIZE.md : normalize(30),
+                    height: noTextMode ? SIZE.md : normalize(30),
+                    backgroundColor: item.title,
+                    borderRadius: 100,
+                  }}></View>
+                <Text
+                  style={{
+                    color: colors.pri,
+                    fontSize: SIZE.xxs - 2,
+                    minWidth: 12,
+                    minHeight: 12,
+                    borderWidth: 0.5,
+                    paddingHorizontal: 2,
+                    borderColor: item.title,
+                    borderRadius: 100,
+                    textAlign: 'center',
+                    position: 'absolute',
+                    bottom: -5,
+                    right:
+                      item.count < 10
+                        ? -8
+                        : item.count >= 10 && item.count < 100
+                        ? -10
+                        : item.count >= 100 && item.count < 1000
+                        ? -12
+                        : item.count > 1000
+                        ? -14
+                        : -8,
                   }}>
-                  <View
-                    style={{
-                      width: noTextMode ? SIZE.md : normalize(30),
-                      height: noTextMode ? SIZE.md : normalize(30),
-                      backgroundColor: item,
-                      borderRadius: 100,
-                    }}></View>
-                  <Text
-                    style={{
-                      color: colors.pri,
-                      fontSize: SIZE.xxs - 2,
-                      minWidth: 10,
-                      minHeight: 10,
-                      borderRadius: 2,
-                      textAlign: 'center',
-                      padding: 0,
-                      paddingHorizontal: 1,
-                      position: 'absolute',
-                      top: -5,
-                      right: -10,
-                    }}></Text>
-                </TouchableOpacity>
-              ),
-            )}
+                  {item.count + 10}
+                </Text>
+              </TouchableOpacity>
+            ))}
           </View>
         </View>
 

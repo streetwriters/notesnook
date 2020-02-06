@@ -44,6 +44,7 @@ export const Container = ({
   placeholder = '',
   noSearch = false,
   noSelectionHeader = false,
+  headerColor = null,
 }) => {
   // State
   const [state, dispatch] = useTracked();
@@ -181,6 +182,7 @@ export const Container = ({
               countUp = 0;
               countDown = 0;
             }}
+            headerColor={headerColor}
             navigation={navigation}
             colors={colors}
             isLoginNavigator={isLoginNavigator}
@@ -195,6 +197,7 @@ export const Container = ({
               clear={() => setText('')}
               hide={hideHeader}
               onChangeText={onChangeText}
+              headerColor={headerColor}
               onSubmitEditing={onSubmitEditing}
               placeholder={placeholder}
               onBlur={onBlur}
@@ -234,7 +237,7 @@ export const Container = ({
 
                 alignSelf: 'center',
                 borderRadius: br,
-                backgroundColor: colors.accent,
+                backgroundColor: headerColor ? headerColor : colors.accent,
                 justifyContent: 'center',
                 alignItems: 'center',
                 marginBottom: 0,

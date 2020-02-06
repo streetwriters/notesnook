@@ -342,12 +342,10 @@ export const ActionSheetComponent = ({
         if (noteColors.includes(color)) {
           await db.notes.note(note.id).uncolor(color);
         } else {
-          noteColors.push(color);
+          await db.notes.note(note.id).color(color);
         }
-
-        await db.notes.note(note.id).color(color);
-
-        localRefresh(item.type);
+        dispatch({type: ACTIONS.COLORS});
+        localRefresh(note.type);
       }}
       style={{
         flexDirection: 'row',

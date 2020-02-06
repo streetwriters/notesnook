@@ -10,7 +10,7 @@ import {ACTIONS} from '../../provider/actions';
 
 export const Notes = ({navigation}) => {
   const [state, dispatch] = useTracked();
-  const {colors, selectionMode, currentEditingNote} = state;
+  const {colors, selectionMode, currentEditingNote, colorNotes} = state;
   const allNotes = state.notes;
   const [notes, setNotes] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
@@ -28,6 +28,11 @@ export const Notes = ({navigation}) => {
     if (params.type === 'tag') {
       let notesInTag = db.notes.tagged(params.tag.title);
       setNotes([...notesInTag]);
+    } else if (params.type == 'color') {
+      let notesInColors = db.notes.colored(params.color.id);
+      console.log(notesInColors);
+      setNotes([...notesInColors]);
+      //setNotes(...);
     } else {
       let allNotes = db.notebooks
         .notebook(params.notebookID)
@@ -36,7 +41,7 @@ export const Notes = ({navigation}) => {
         setNotes(allNotes);
       }
     }
-  }, [allNotes]);
+  }, [allNotes, colorNotes]);
 
   const _renderItem = ({item, index}) => (
     <SelectionWrapper
@@ -110,7 +115,12 @@ export const Notes = ({navigation}) => {
     <Container
       bottomButtonText="Create a new note"
       canGoBack={false}
-      heading={'#' + params.title}
+      heading={
+        params.type == 'tag'
+          ? '#' + params.title
+          : params.title.slice(0, 1).toUpperCase() + params.title.slice(1)
+      }
+      headerColor={params.type == 'color' ? params.title : null}
       canGoBack={true}
       data={notes}
       placeholder={`Search in ${

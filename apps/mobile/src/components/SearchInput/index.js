@@ -61,7 +61,11 @@ export const Search = props => {
           borderRadius: br,
           height: '90%',
           borderWidth: props.hide ? 0 : 1.5,
-          borderColor: focus ? colors.accent : colors.nav,
+          borderColor: focus
+            ? props.headerColor
+              ? props.headerColor
+              : colors.accent
+            : colors.nav,
         }}>
         <TextInput
           ref={inputRef}
@@ -96,7 +100,13 @@ export const Search = props => {
             });
           }}
           name={props.value && props.value.length > 0 ? '' : 'search'}
-          color={focus ? colors.accent : colors.icon}
+          color={
+            focus
+              ? props.headerColor
+                ? props.headerColor
+                : colors.accent
+              : colors.icon
+          }
           size={SIZE.xl}
         />
       </Animated.View>

@@ -21,6 +21,7 @@ export const Header = ({
   preventDefaultMargins,
   navigation = null,
   isLoginNavigator,
+  headerColor,
 }) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
@@ -110,7 +111,7 @@ export const Header = ({
         <Text
           style={{
             fontSize: SIZE.xl,
-            color: colors.pri,
+            color: headerColor ? headerColor : colors.pri,
             fontFamily: WEIGHT.bold,
           }}>
           <Text

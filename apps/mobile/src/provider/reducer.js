@@ -55,6 +55,13 @@ export const reducer = (state, action) => {
         favorites: [...favorites],
       };
     }
+    case ACTIONS.COLORS: {
+      let colors = db.notes.colors;
+      return {
+        ...state,
+        colorNotes: [...colors],
+      };
+    }
     case ACTIONS.SELECTION_MODE: {
       if (action.enabled) {
         SideMenuEvent.disable();

@@ -22,6 +22,7 @@ export default class NoteItem extends React.Component {
     this.cipher = {
       value: false,
     };
+    this.colors = [];
     this.actionSheet;
     this.show = null;
     this.setMenuRef = {};
@@ -29,7 +30,10 @@ export default class NoteItem extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    if (nextProps.item.locked !== this.cipher.value) {
+    if (
+      nextProps.item.locked !== this.cipher.value ||
+      nextProps.item.colors.length !== this.colors.length
+    ) {
       return true;
     } else {
       return (
@@ -39,12 +43,15 @@ export default class NoteItem extends React.Component {
     }
   }
   componentDidUpdate() {
+    this.colors = [...this.props.item.colors];
     this.cipher.value = this.props.item.locked ? true : false;
   }
   componentWillUnmount() {
+    this.colors = [];
     this.cipher.value = false;
   }
   componentDidMount() {
+    this.colors = [];
     if (this.props.item.locked) {
       this.cipher.value = true;
     }
@@ -60,7 +67,8 @@ export default class NoteItem extends React.Component {
       pinned,
       index,
     } = this.props;
-    console.log('rerendering', index, item.content.text.length);
+
+    console.log('rerendering again', index);
     return (
       <View
         style={[

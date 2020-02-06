@@ -12,4 +12,5 @@ export const ACTIONS = {
   CLEAR_SELECTION: 'clearSelection',
   LOGIN_NAVIGATOR: 'loginNavigator',
   CURRENT_EDITING_NOTE: 'currentEditingNote',
+  COLORS: 'colorNotes',
 };

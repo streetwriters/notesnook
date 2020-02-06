@@ -2,7 +2,7 @@ import React, {useEffect} from 'react';
 import {SafeAreaView} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import {useIsFocused} from 'react-navigation-hooks';
-import {DDS} from '../../../App';
+import {DDS, db} from '../../../App';
 import Container from '../../components/Container';
 import {NotesList} from '../../components/NotesList';
 import SelectionHeader from '../../components/SelectionHeader';
@@ -22,6 +22,7 @@ export const Home = ({navigation}) => {
   const isFocused = useIsFocused();
 
   useEffect(() => {
+    dispatch({type: ACTIONS.COLORS});
     dispatch({type: ACTIONS.NOTES});
   }, [isFocused]);
 
