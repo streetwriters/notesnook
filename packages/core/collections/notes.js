@@ -85,6 +85,11 @@ export default class Notes {
     return note.id;
   }
 
+  /**
+   *
+   * @param {string} id The id of note
+   * @returns {Note} The note of the given id
+   */
   note(id) {
     let note = this.collection.getItem(id);
     if (!note) return undefined;

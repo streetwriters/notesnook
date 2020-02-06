@@ -38,10 +38,18 @@ export default class Topics {
     await this.notebooks.collection.addItem(notebook.data);
   }
 
+  /**
+   * @returns {Array} an array containing all the topics
+   */
   get all() {
     return this.notebooks.notebook(this.notebookId).data.topics;
   }
 
+  /**
+   *
+   * @param {string | Object} topic can be an object or string containing the topic title.
+   * @returns {Topic} The topic by the given title
+   */
   topic(topic) {
     if (typeof topic === "string") {
       topic = this.all.find(t => t.title === topic);

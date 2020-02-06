@@ -67,6 +67,11 @@ export default class Notebooks {
     return this.collection.getAllItems();
   }
 
+  /**
+   *
+   * @param {string} id The id of the notebook
+   * @returns {Notebook} The notebook of the given id
+   */
   notebook(id) {
     let notebook = this.collection.getItem(id);
     if (!notebook) return;
