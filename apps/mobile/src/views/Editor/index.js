@@ -174,8 +174,17 @@ const Editor = ({navigation, noMenu}) => {
 
     if (id !== rId) {
       id = rId;
-
       note = db.notes.note(id);
+      if (note) {
+        note = note.data;
+      } else {
+        setTimeout(() => {
+          note = db.notes.note(id);
+          if (note) {
+            note = note.data;
+          }
+        }, 500);
+      }
 
       if (DDS.isTab) {
         dispatch({

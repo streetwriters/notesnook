@@ -26,7 +26,7 @@ import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {moveNoteEvent} from '../DialogManager';
 import Share from 'react-native-share';
-import {timeConverter} from '../../utils/utils';
+import {timeConverter, ToastEvent} from '../../utils/utils';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
@@ -127,11 +127,32 @@ export const ActionSheetComponent = ({
 
     switch (type) {
       case 'note': {
-        toAdd = db.notes.note(note.id).data;
+        toAdd = db.notes.note(note.id);
+        if (toAdd) {
+          toAdd = toAdd.data;
+        } else {
+          setTimeout(() => {
+            toAdd = db.notes.note(note.id);
+            if (toAdd) {
+              toAdd = toAdd.data;
+            }
+          }, 500);
+        }
+
         break;
       }
       case 'notebook': {
-        toAdd = db.notebooks.notebook(note.id).data;
+        toAdd = db.notebooks.notebook(note.id);
+        if (toAdd) {
+          toAdd = toAdd.data;
+        } else {
+          setTimeout(() => {
+            toAdd = db.notebooks.notebook(note.id);
+            if (toAdd) {
+              toAdd = toAdd.data;
+            }
+          }, 500);
+        }
         break;
       }
       case 'topic': {
@@ -213,9 +234,10 @@ export const ActionSheetComponent = ({
     {
       name: 'Restore',
       icon: 'trash',
-      func: () => {
-        // TODO
-        //db.restoreItem(item.dateCreated);
+      func: async () => {
+        await db.trash.restore(note.id);
+        dispatch({type: ACTIONS.TRASH});
+        localRefresh(note.type);
         ToastEvent.show(
           item.type === 'note' ? 'Note restored' : 'Notebook restored',
           'success',

@@ -22,6 +22,7 @@ export const Trash = ({navigation}) => {
     dispatch({
       type: ACTIONS.TRASH,
     });
+    console.log(trash);
   }, []);
 
   const _renderItem = ({item, index}) => (
