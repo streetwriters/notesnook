@@ -3,11 +3,13 @@ import FastStorage from 'react-native-fast-storage';
 var Aes = NativeModules.Aes;
 
 async function read(key) {
-  return await FastStorage.getItem(key);
+  let json = await FastStorage.getItem(key);
+  return JSON.parse(json);
 }
 
 async function write(key, data) {
-  return await FastStorage.setItem(key, data);
+  let json = JSON.stringify(data);
+  return await FastStorage.setItem(key, json);
 }
 
 function remove(key) {

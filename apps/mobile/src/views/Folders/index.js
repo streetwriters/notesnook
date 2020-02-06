@@ -120,7 +120,7 @@ export const Folders = ({navigation}) => {
               <>
                 <FlatList
                   data={pinned}
-                  keyExtractor={(item, index) => item.dateCreated.toString()}
+                  keyExtractor={(item, index) => item.id.toString()}
                   renderItem={({item, index}) =>
                     item.type === 'notebook' ? (
                       <SelectionWrapper item={item}>
@@ -213,7 +213,7 @@ export const Folders = ({navigation}) => {
           </View>
         }
         data={notebooks}
-        keyExtractor={(item, index) => item.dateCreated.toString()}
+        keyExtractor={(item, index) => item.id.toString()}
         renderItem={({item, index}) => (
           <SelectionWrapper item={item}>
             <NotebookItem

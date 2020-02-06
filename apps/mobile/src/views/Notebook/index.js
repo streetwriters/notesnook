@@ -1,9 +1,12 @@
 import React, {useEffect, useState} from 'react';
-import {FlatList, Platform, Text, View, RefreshControl} from 'react-native';
+import {FlatList, Platform, RefreshControl, Text, View} from 'react-native';
 import {useIsFocused} from 'react-navigation-hooks';
+import {db} from '../../../App';
 import {SIZE, WEIGHT} from '../../common/common';
 import Container from '../../components/Container';
+import {AddTopicEvent} from '../../components/DialogManager';
 import {NotebookItem} from '../../components/NotebookItem';
+import SelectionWrapper from '../../components/SelectionWrapper';
 import {useTracked} from '../../provider';
 import {
   eSendEvent,
@@ -12,13 +15,9 @@ import {
 } from '../../services/eventManager';
 import {
   eMoveNoteDialogNavigateBack,
-  eScrollEvent,
   eOnNewTopicAdded,
+  eScrollEvent,
 } from '../../services/events';
-import SelectionHeader from '../../components/SelectionHeader';
-import SelectionWrapper from '../../components/SelectionWrapper';
-import {AddTopicEvent} from '../../components/DialogManager';
-import {db} from '../../../App';
 
 export const Notebook = ({navigation}) => {
   const [state, dispatch] = useTracked();
@@ -29,24 +28,27 @@ export const Notebook = ({navigation}) => {
   let notebook;
   let isFocused = useIsFocused();
 
+  const onLoad = () => {
+    topics = db.notebooks.notebook(navigation.state.params.notebook.dateCreated)
+      .topics;
+    notebook = db.notebooks.notebook(
+      navigation.state.params.notebook.dateCreated,
+    );
+
+    setTopics([...topics]);
+  };
+
   useEffect(() => {
     params = navigation.state.params;
     let topic = params.notebook.topics;
     notebook = params.notebook;
-    console.log(navigation);
     setTopics([...topic]);
   }, []);
 
   useEffect(() => {
-    eSubscribeEvent(eOnNewTopicAdded, () => {
-      notebook = db.getNotebook(navigation.state.params.notebook.dateCreated);
-      setTopics([...notebook.topics]);
-    });
+    eSubscribeEvent(eOnNewTopicAdded, onLoad);
     return () => {
-      eUnSubscribeEvent(eOnNewTopicAdded, () => {
-        notebook = db.getNotebook(navigation.state.params.notebook.dateCreated);
-        setTopics([...notebook.topics]);
-      });
+      eUnSubscribeEvent(eOnNewTopicAdded, onLoad);
     };
   }, []);
 
@@ -89,7 +91,7 @@ export const Notebook = ({navigation}) => {
           });
         }}
         noteToMove={params.note}
-        notebookID={params.notebook.dateCreated}
+        notebookID={params.notebook.id}
         isMove={params.isMove}
         refresh={() => {}}
         item={item}
@@ -143,7 +145,6 @@ export const Notebook = ({navigation}) => {
       canGoBack={true}
       data={topics}
       bottomButtonOnPress={() => {
-        console.log(navigation.state.params.notebook);
         let n = navigation.state.params.notebook;
         AddTopicEvent(n);
       }}>

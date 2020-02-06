@@ -1,4 +1,4 @@
-import Storage from 'notes-core/api/database';
+import Storage from 'notes-core/api/index';
 import React, {useEffect, useState} from 'react';
 import {Platform, StatusBar, View, Text} from 'react-native';
 import * as Animatable from 'react-native-animatable';

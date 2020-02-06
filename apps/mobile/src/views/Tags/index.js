@@ -2,21 +2,18 @@ import React, {useEffect, useState} from 'react';
 import {
   Dimensions,
   FlatList,
-  SafeAreaView,
-  Text,
-  View,
-  TouchableOpacity,
-  RefreshControl,
   Platform,
+  RefreshControl,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import {pv, SIZE, WEIGHT} from '../../common/common';
-import {Header} from '../../components/header';
+import Container from '../../components/Container';
 import {TagsPlaceHolder} from '../../components/ListPlaceholders';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
-import {db} from '../../../App';
 import NavigationService from '../../services/NavigationService';
-import Container from '../../components/Container';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 

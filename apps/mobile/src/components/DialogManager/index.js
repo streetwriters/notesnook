@@ -456,7 +456,7 @@ export class DialogManager extends Component {
           notebookID={
             actionSheetData.extraData
               ? actionSheetData.extraData.notebookID
-              : item.dateCreated
+              : item.id
           }
           colors={colors}
         />

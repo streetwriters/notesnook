@@ -87,8 +87,10 @@ export const ActionSheetComponent = ({
       text: '',
     });
 
-    await db.addTag(note.dateCreated, tag);
-    setNote({...db.getNote(note.dateCreated)});
+    await db.notes.note(note.id).tag(tag);
+
+    setNote({...db.notes.note(note.id).data});
+
     tagToAdd = '';
   };
 
@@ -106,12 +108,11 @@ export const ActionSheetComponent = ({
         let oldProps = {...note};
         if (oldProps.tags.length === 0) return;
         //oldProps.tags.splice(oldProps.tags.length - 1);
-        await db.removeTag(
-          note.dateCreated,
-          oldProps.tags[oldProps.tags.length - 1],
-        );
+        await db.notes
+          .note(note.id)
+          .untag(oldProps.tags[oldProps.tags.length - 1]);
 
-        setNote({...db.getNote(note.dateCreated)});
+        setNote({...db.notes.note(note.id).data});
 
         tagsInputRef.setNativeProps({
           text: tagInputValue,
@@ -125,25 +126,25 @@ export const ActionSheetComponent = ({
   };
 
   const localRefresh = (type, nodispatch = false) => {
-    if (!note || !note.dateCreated) return;
+    if (!note || !note.id) return;
     let toAdd;
 
     switch (type) {
       case 'note': {
-        toAdd = db.getNote(note.dateCreated);
+        toAdd = db.notes.note(note.id).data;
         break;
       }
       case 'notebook': {
-        toAdd = db.getNotebook(note.dateCreated);
+        toAdd = db.notebooks.notebook(note.id).data;
         break;
       }
       case 'topic': {
-        toAdd = db.getTopic(note.notebookId, note.title);
+        toAdd = db.notebooks.notebook(note.notebookId).topics.topic(note.title);
 
         break;
       }
     }
-    if (!toAdd || !toAdd.dateCreated) return;
+    if (!toAdd || !toAdd.id) return;
 
     if (!nodispatch) {
       dispatch({type: type});
@@ -258,11 +259,11 @@ export const ActionSheetComponent = ({
       name: 'Pin',
       icon: 'tag',
       func: async () => {
-        if (!note.dateCreated) return;
+        if (!note.id) return;
         if (note.type === 'note') {
-          await db.pinNote(note.dateCreated);
+          await db.notes.note(note.id).pin();
         } else {
-          await db.pinNotebook(note.dateCreated);
+          await db.notebooks.notebook(note.id).pin();
         }
         dispatch({type: ACTIONS.PINNED});
         localRefresh(item.type);
@@ -275,11 +276,11 @@ export const ActionSheetComponent = ({
       name: 'Favorite',
       icon: 'star',
       func: async () => {
-        if (!note.dateCreated) return;
+        if (!note.id) return;
         if (note.type === 'note') {
-          await db.favoriteNotes([note.dateCreated]);
+          await db.notes.note(note.id).favorite();
         } else {
-          await db.favoriteNotebooks([note.dateCreated]);
+          await db.notebooks.notebook(note.id).favorite();
         }
         dispatch({type: ACTIONS.FAVORITES});
         localRefresh(item.type);
@@ -292,7 +293,7 @@ export const ActionSheetComponent = ({
       name: 'Add to Vault',
       icon: 'lock',
       func: () => {
-        if (!note.dateCreated) return;
+        if (!note.id) return;
         note.locked ? close('unlock') : close('lock');
       },
       close: true,
@@ -307,11 +308,7 @@ export const ActionSheetComponent = ({
       onPress={async () => {
         let oldProps = {...note};
 
-        oldProps.tags.splice(oldProps.tags.indexOf(tag), 1);
-        await db.addNote({
-          dateCreated: note.dateCreated,
-          tags: oldProps.tags,
-        });
+        await db.notes.note(note.id).untag(oldProps.tags.indexOf(tag));
         localRefresh(item.type);
       }}
       style={{
@@ -350,13 +347,13 @@ export const ActionSheetComponent = ({
         } else {
           noteColors.push(color);
         }
-
-        db.addNote({
+        // TODO
+        /*  db.addNote({
           dateCreated: note.dateCreated,
           colors: noteColors,
           content: note.content,
           title: note.title,
-        });
+        }); */
         localRefresh(item.type);
       }}
       style={{
@@ -418,7 +415,7 @@ export const ActionSheetComponent = ({
     ) : null;
 
   const _renderColumnItem = item =>
-    (note.dateCreated && columnItems.includes(item.name)) ||
+    (note.id && columnItems.includes(item.name)) ||
     (item.name === 'Dark Mode' && columnItems.includes(item.name)) ? (
       <TouchableOpacity
         key={item.name}
@@ -499,7 +496,7 @@ export const ActionSheetComponent = ({
         width: '100%',
         paddingHorizontal: 0,
       }}>
-      {!note.dateCreated ? (
+      {!note.id ? (
         <Text
           style={{
             width: '100%',
@@ -556,7 +553,7 @@ export const ActionSheetComponent = ({
               marginTop: 2.5,
             }}>
             {note.type === 'note'
-              ? 'Last edited on ' + timeConverter(note.dateEditted)
+              ? 'Last edited on ' + timeConverter(note.dateEdited)
               : null}
             {note.type !== 'note' && !note.dateDeleted
               ? 'Created on ' + timeConverter(note.dateCreated)
@@ -624,7 +621,7 @@ export const ActionSheetComponent = ({
         </View>
       )}
 
-      {note.dateCreated ? (
+      {note.id ? (
         <View
           style={{
             width: '100%',
@@ -638,7 +635,7 @@ export const ActionSheetComponent = ({
         </View>
       ) : null}
 
-      {hasColors && note.dateCreated ? (
+      {hasColors && note.id ? (
         <View
           style={{
             flexDirection: 'row',
@@ -655,7 +652,7 @@ export const ActionSheetComponent = ({
         </View>
       ) : null}
 
-      {hasTags && note.dateCreated ? (
+      {hasTags && note.id ? (
         <View
           style={{
             marginHorizontal: 12,

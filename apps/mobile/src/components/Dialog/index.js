@@ -30,16 +30,18 @@ export class Dialog extends Component {
     switch (template.action) {
       case dialogActions.ACTION_DELETE: {
         if (item.type === 'note') {
-          await db.deleteNotes(item.dateCreated);
+          await db.notes.delete(item.id);
 
           ToastEvent.show('Note moved to trash', 'error', 3000);
           updateEvent({type: item.type});
         } else if (item.type === 'topic') {
-          await db.deleteTopicFromNotebook(notebookID, item.title);
+          //TODO
+          //db.notebooks.notebook(notebookID).topic
+          //await db.deleteTopicFromNotebook(notebookID, item.title);
           updateEvent({type: 'notebook'});
           ToastEvent.show('Topic deleted', 'error', 3000);
         } else if (item.type === 'notebook') {
-          await db.deleteNotebooks(item.dateCreated);
+          await db.notebooks.delete(item.id);
           updateEvent({type: item.type});
           ToastEvent.show('Notebook moved to trash', 'error', 3000);
         }
@@ -58,7 +60,9 @@ export class Dialog extends Component {
         break;
       }
       case dialogActions.ACTION_EMPTY_TRASH: {
-        await db.clearTrash();
+        // TODO
+        //await db.clearTrash();
+
         updateEvent({type: ACTIONS.TRASH});
         ToastEvent.show('Trash cleared', 'error', 1000, () => {}, '');
         this.setState({
@@ -75,7 +79,8 @@ export class Dialog extends Component {
         });
       }
       case dialogActions.ACTION_TRASH: {
-        db.restoreItem(item.dateCreated);
+        // TODO
+        //db.restoreItem(item.dateCreated);
         ToastEvent.show(
           item.type.slice(0, 1).toUpperCase() +
             item.type.slice(1) +

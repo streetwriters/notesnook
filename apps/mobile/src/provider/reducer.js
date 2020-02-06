@@ -5,7 +5,8 @@ import {ACTIONS} from './actions';
 export const reducer = (state, action) => {
   switch (action.type) {
     case ACTIONS.NOTES:
-      let notes = db.groupNotes();
+      let notes = db.notes.group();
+
       return {
         ...state,
         notes: [...notes],
@@ -18,36 +19,36 @@ export const reducer = (state, action) => {
       };
     }
     case ACTIONS.NOTEBOOKS: {
-      let notebooks = [...db.getNotebooks()];
+      let notebooks = [...db.notebooks.all];
       return {
         ...state,
         notebooks: notebooks,
       };
     }
     case ACTIONS.TRASH: {
-      let trash = [...db.getTrash()];
-
+      let trash = [];
+      // TODO
       return {
         ...state,
         trash: trash,
       };
     }
     case ACTIONS.PINNED: {
-      let pinned = [...db.getPinned()];
+      let pinned = [...db.notes.pinned];
       return {
         ...state,
         pinned: pinned,
       };
     }
     case ACTIONS.TAGS: {
-      let tagList = db.getTags();
+      let tagList = db.notes.tags;
       return {
         ...state,
         tags: [...tagList],
       };
     }
     case ACTIONS.FAVORITES: {
-      let favorites = [...db.getFavorites()];
+      let favorites = [...db.notes.favorites];
 
       return {
         ...state,
@@ -74,7 +75,7 @@ export const reducer = (state, action) => {
       } else {
         selectedItems.push(action.item);
       }
-      console.log(action.item, selectedItems);
+
       return {
         ...state,
         selectedItemsList: selectedItems,
@@ -101,7 +102,7 @@ export const reducer = (state, action) => {
     case ACTIONS.CURRENT_EDITING_NOTE: {
       return {
         ...state,
-        currentEditingNote: action.dateCreated,
+        currentEditingNote: action.id,
       };
     }
     default:

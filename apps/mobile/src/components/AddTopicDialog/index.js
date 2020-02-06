@@ -24,7 +24,8 @@ export class AddTopicDialog extends React.Component {
     if (!this.title)
       return ToastEvent.show('Title is required', 'error', 3000, () => {}, '');
 
-    db.addTopicToNotebook(this.props.notebookID, this.title);
+    await db.notebooks.notebook(this.props.notebookID).topics.add(this.title);
+
     eSendEvent(eOnNewTopicAdded);
     ToastEvent.show('New topic added', 'success', 3000, () => {}, '');
     this.close();

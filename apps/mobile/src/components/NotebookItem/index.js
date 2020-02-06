@@ -241,30 +241,16 @@ export const NotebookItem = ({
           <TouchableOpacity
             activeOpacity={opacity}
             onPress={async () => {
-              /*  let noteIds = [];
-              selectedItemsList.forEach(item => noteIds.push(item.dateCreated));
-              if (!noteToMove.notebook.notebook) {
-                await db.moveNotes(null, {
-                  topic: item.title,
-                  id: item.notebookId,
-                });
-                await db.addNoteToTopic(
-                  notebookID,
-                  item.title,
-                  noteToMove.dateCreated,
-                );
-              } else if (selectedItemsList) {
-                
-                await db.moveNotes(null, {
-                  topic: item.title,
-                  id: item.notebookId,
-                });
-                await db.moveNote(noteToMove.dateCreated, noteToMove.notebook, {
-                  notebook: notebookID,
-                  topic: item.title,
-                }); 
+              let noteIds = [];
+              selectedItemsList.forEach(item => noteIds.push(item.id));
 
-              }*/
+              db.notes.move(
+                {
+                  topic: item.title,
+                  id: item.notebookID,
+                },
+                noteIds,
+              );
 
               moveNoteHideEvent();
 

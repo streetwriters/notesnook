@@ -1207,6 +1207,8 @@
       document.getElementById('titleInput').onchange = function () {
         editor.focus();
 
+        console.log(JSON.stringify(editor.getContents()));
+        
         var titleMessage = {
           type: 'title',
           value: document.getElementById('titleInput').value
@@ -1625,9 +1627,12 @@
 
         let m = {};
         m.delta = editor.getContents();
+    
         m.text = editor.getText();
+
         m.html = editor.root.innerHTML;
         m.type = 'content';
+       
         window.ReactNativeWebView.postMessage(JSON.stringify(m));
       });
 

@@ -50,7 +50,7 @@ export class VaultDialog extends Component {
       let item;
       if (n.content.cipher) {
         try {
-          item = await db.unlockNote(n.dateCreated, password, this.props.perm);
+          item = await db.notes.note(n.id).unlock(password, this.props.perm);
         } catch (error) {}
       } else {
         item = n;
@@ -63,7 +63,7 @@ export class VaultDialog extends Component {
 
       this.close(this.props.shareAfterUnlock, item);
     } else {
-      await db.lockNote(this.props.note.dateCreated, 'password');
+      await db.notes.note(this.props.note.id).lock('password');
       this.close();
     }
   };

@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from 'react';
 import {TouchableWithoutFeedback, View} from 'react-native';
-import * as Animatable from 'react-native-animatable';
 import Icon from 'react-native-vector-icons/Feather';
 import {SIZE} from '../../common/common';
 import {useTracked} from '../../provider';
@@ -26,11 +25,7 @@ const SelectionWrapper = ({children, item, currentEditingNote, index}) => {
   }, [selectedItemsList]);
 
   return (
-    <Animatable.View
-      animation="fadeIn"
-      useNativeDriver={true}
-      duration={300 * index + 1}
-      delay={index * 300}
+    <View
       style={{
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -78,7 +73,7 @@ const SelectionWrapper = ({children, item, currentEditingNote, index}) => {
         </TouchableWithoutFeedback>
       </View>
       {children}
-    </Animatable.View>
+    </View>
   );
 };
 

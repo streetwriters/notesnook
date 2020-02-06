@@ -1,23 +1,17 @@
 import React from 'react';
-import {
-  Dimensions,
-  Text,
-  TouchableOpacity,
-  View,
-  DeviceEventEmitter,
-} from 'react-native';
+import {Dimensions, Text, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import {DDS} from '../../../App';
 import {ph, pv, SIZE, WEIGHT} from '../../common/common';
+import {eSendEvent} from '../../services/eventManager';
+import {eOnLoadNote} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
 import {getElevation, timeSince} from '../../utils/utils';
 import {
   ActionSheetEvent,
-  TEMPLATE_TRASH,
   simpleDialogEvent,
+  TEMPLATE_TRASH,
 } from '../DialogManager';
-import {eSendEvent} from '../../services/eventManager';
-import {eOnLoadNote, eOpenSimpleDialog} from '../../services/events';
 
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
@@ -66,7 +60,7 @@ export default class NoteItem extends React.Component {
       pinned,
       index,
     } = this.props;
-
+    console.log('rerendering', index, item.content.text.length);
     return (
       <View
         style={[

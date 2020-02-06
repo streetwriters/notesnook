@@ -35,7 +35,7 @@ export class AddNotebookDialog extends React.Component {
     this.prevItem = null;
     this.prevIndex = null;
     this.currentSelectedInput = null;
-    this.timestamp = null;
+    this.id = null;
     this.backPressCount = 0;
     this.currentInputValue = null;
     this.titleRef;
@@ -53,7 +53,7 @@ export class AddNotebookDialog extends React.Component {
           topicsList.push(item.title);
         }
       });
-      this.timestamp = toEdit.dateCreated;
+      this.id = toEdit.id;
       this.title = toEdit.title;
       this.description = toEdit.description;
 
@@ -76,7 +76,7 @@ export class AddNotebookDialog extends React.Component {
     this.currentSelectedInput = null;
     this.title = null;
     this.description = null;
-    this.timestamp = null;
+    this.id = null;
     this.setState({
       visible: false,
       topics: [],
@@ -110,14 +110,16 @@ export class AddNotebookDialog extends React.Component {
     if (!this.title)
       return ToastEvent.show('Title is required', 'error', 3000, () => {}, '');
 
-    let dateCreated = toEdit && toEdit.dateCreated ? toEdit.dateCreated : null;
+    let id = toEdit && toEdit.id ? toEdit.id : null;
 
-    await db.addNotebook({
+    // TODO
+    await db.notebooks.add({
       title: this.title,
       description: this.description,
       topics,
-      dateCreated: dateCreated,
+      id: id,
     });
+
     updateEvent({type: ACTIONS.NOTEBOOKS});
     this.close();
     ToastEvent.show('New notebook added', 'success', 3000, () => {}, '');

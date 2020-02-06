@@ -34,7 +34,7 @@ export const NotesList = ({isGrouped = false}) => {
     <SelectionWrapper
       index={index}
       currentEditingNote={
-        currentEditingNote === item.dateCreated ? currentEditingNote : null
+        currentEditingNote === item.id ? currentEditingNote : null
       }
       item={item}>
       <NoteItem
@@ -44,7 +44,7 @@ export const NotesList = ({isGrouped = false}) => {
           marginHorizontal: 0,
         }}
         currentEditingNote={
-          currentEditingNote === item.dateCreated ? currentEditingNote : null
+          currentEditingNote === item.id ? currentEditingNote : null
         }
         onLongPress={() => {
           dispatch({type: ACTIONS.SELECTION_MODE, enabled: !selectionMode});
@@ -167,7 +167,7 @@ export const NotesList = ({isGrouped = false}) => {
       }}></View>
   );
 
-  const _listKeyExtractor = (item, index) => item.dateCreated.toString();
+  const _listKeyExtractor = (item, index) => item.id.toString();
 
   return isGrouped && searchResults.length === 0 ? (
     <SectionList
@@ -237,7 +237,7 @@ const PinnedItems = () => {
     <>
       <FlatList
         data={pinned}
-        keyExtractor={(item, index) => item.dateCreated.toString()}
+        keyExtractor={(item, index) => item.id.toString()}
         renderItem={({item, index}) =>
           item.type === 'note' ? (
             <NoteItem

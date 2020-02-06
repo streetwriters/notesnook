@@ -26,10 +26,12 @@ export const Notes = ({navigation}) => {
 
   useEffect(() => {
     if (params.type === 'tag') {
-      let notesInTag = db.getTag(params.tag.title);
+      let notesInTag = db.notes.tagged(params.tag.title);
       setNotes([...notesInTag]);
     } else {
-      let allNotes = db.getTopic(params.notebookID, params.title);
+      let allNotes = db.notebooks
+        .notebook(params.notebookID)
+        .topics.topic(params.title);
       if (allNotes && allNotes.length > 0) {
         setNotes(allNotes);
       }

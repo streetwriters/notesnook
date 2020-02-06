@@ -39,7 +39,7 @@ import {AnimatedSafeAreaView} from '../Home';
 
 let EditorWebView;
 let note = {};
-let timestamp = null;
+let id = null;
 let dateEdited = null;
 var content = null;
 var title = null;
@@ -65,7 +65,7 @@ const Editor = ({navigation, noMenu}) => {
   }, []);
 
   const loadNote = item => {
-    if (note && note.dateCreated) {
+    if (note && note.id) {
       saveNote(true).then(() => {
         dispatch({type: ACTIONS.NOTES});
         if (item && item.type === 'new') {
@@ -75,7 +75,7 @@ const Editor = ({navigation, noMenu}) => {
           if (DDS.isTab) {
             dispatch({
               type: ACTIONS.CURRENT_EDITING_NOTE,
-              dateCreated: item.dateCreated,
+              id: item.id,
             });
           }
 
@@ -91,7 +91,7 @@ const Editor = ({navigation, noMenu}) => {
         if (DDS.isTab) {
           dispatch({
             type: ACTIONS.CURRENT_EDITING_NOTE,
-            dateCreated: item.dateCreated,
+            id: item.id,
           });
         }
         updateEditor();
@@ -100,7 +100,7 @@ const Editor = ({navigation, noMenu}) => {
   };
 
   const clearEditor = () => {
-    timestamp = null;
+    id = null;
     title = null;
     content = null;
     note = {};
@@ -163,24 +163,24 @@ const Editor = ({navigation, noMenu}) => {
       };
     }
 
-    let dateCreated = await db.addNote({
+    let rId = await db.notes.add({
       title,
       content: {
         text: content.text,
         delta: content.delta,
       },
-      dateCreated: timestamp,
+      id: id,
     });
 
-    if (timestamp !== dateCreated) {
-      timestamp = dateCreated;
+    if (id !== rId) {
+      id = rId;
 
-      note = db.getNote(timestamp);
+      note = db.notes.note(id);
 
       if (DDS.isTab) {
         dispatch({
           type: ACTIONS.CURRENT_EDITING_NOTE,
-          dateCreated: timestamp,
+          id: id,
         });
       }
     }
@@ -191,10 +191,11 @@ const Editor = ({navigation, noMenu}) => {
       });
     }
     saveCounter++;
-    if (timestamp) {
-      let lockednote = db.getNote(timestamp);
+    if (id) {
+      let lockednote = db.notes.note(id);
       if (lockNote && lockednote.locked) {
-        await db.lockNote(timestamp, 'password');
+        // TODO
+        await db.notes.note(id).lock('password');
       }
     }
   };
@@ -238,7 +239,7 @@ const Editor = ({navigation, noMenu}) => {
     if (navigation && navigation.state.params && navigation.state.params.note) {
       note = navigation.state.params.note;
       updateEditor();
-    } else if (note && note.dateCreated) {
+    } else if (note && note.id) {
       updateEditor();
     } else {
       post('focusTitle');
@@ -258,9 +259,9 @@ const Editor = ({navigation, noMenu}) => {
       }, timeout);
     });
 
-  const updateEditor = () => {
+  const updateEditor = async () => {
     title = note.title;
-    timestamp = note.dateCreated;
+    id = note.id;
     dateEdited = note.dateEditted;
     content = note.content;
     saveCounter = 0;
@@ -279,7 +280,9 @@ const Editor = ({navigation, noMenu}) => {
     if (note.content.text === '' && note.content.delta === null) {
       post('clear');
     } else if (note.content.delta) {
-      post(JSON.stringify(note.content.delta));
+      let delta = await db.notes.note(id).delta();
+
+      post(JSON.stringify(delta));
     } else {
       post(JSON.stringify({type: 'text', value: note.content.text}));
     }
@@ -420,7 +423,7 @@ const Editor = ({navigation, noMenu}) => {
           }}>
           <Text
             onPress={() => {
-              simpleDialogEvent(TEMPLATE_INFO(timestamp));
+              simpleDialogEvent(TEMPLATE_INFO(note.dateCreated));
             }}
             style={{
               color: colors.icon,
@@ -505,7 +508,7 @@ const Editor = ({navigation, noMenu}) => {
       }
       title = null;
       content = null;
-      timestamp = null;
+      id = null;
       timer = null;
     };
   }, [noMenu]);
