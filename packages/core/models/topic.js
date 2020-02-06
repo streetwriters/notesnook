@@ -48,6 +48,7 @@ export default class Topic {
         notebook: { id: this.topics.notebookId, topic: this.topic.title }
       });
     }
+    this.topic.totalNotes++;
     return await this.save();
   }
 
@@ -61,6 +62,7 @@ export default class Topic {
         notebook: {}
       });
     }
+    this.topic.totalNotes--;
     return await this.save();
   }
 

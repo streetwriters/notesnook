@@ -29,8 +29,11 @@ export default class Topics {
         uniqueTopics.findIndex(t => (v.title || v) === (t.title || t)) === i
     );
     notebook.data.topics = [];
+    notebook.data.totalNotes = 0;
     for (let topic of uniqueTopics) {
-      notebook.data.topics.push(makeTopic(topic, this.notebookId));
+      let t = makeTopic(topic, this.notebookId);
+      notebook.data.topics.push(t);
+      notebook.data.totalNotes += t.totalNotes;
     }
     await this.notebooks.collection.addItem(notebook.data);
   }

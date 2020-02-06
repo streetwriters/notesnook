@@ -227,6 +227,8 @@ test("add note to topic", () =>
     let topic = topics.topic("Home");
     await topic.add(id);
     expect(topic.all.length).toBe(1);
+    expect(topic.topic.totalNotes).toBe(1);
+    expect(db.notebooks.notebook(notebookId).data.totalNotes).toBe(1);
     let note = db.notes.note(id);
     expect(note.notebook.id).toBe(notebookId);
   }));
