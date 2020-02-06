@@ -1,6 +1,7 @@
 import Notebooks from "./notebooks";
 import Notes from "./notes";
 import Topic from "../models/topic";
+import { qclone } from "qclone";
 
 export default class Topics {
   /**
@@ -59,7 +60,7 @@ export default class Topics {
   }
 
   async delete(...topics) {
-    let allTopics = JSON.parse(JSON.stringify(this.all)); //FIXME: make a deep copy
+    let allTopics = qclone(this.all); //FIXME: make a deep copy
     for (let i = 0; i < allTopics.length; i++) {
       let topic = allTopics[i];
       if (!topic) continue;
