@@ -28,10 +28,10 @@ export default class Tags {
     if (!id || id.trim().length <= 0) return;
     let tag = this.collection.getItem(id);
     if (!tag) return;
-    if (tag.count <= 1) {
+    tag.count--;
+    if (tag.count === 0) {
       await this.collection.removeItem(id);
     } else {
-      tag.count--;
       await this.collection.addItem(tag);
     }
   }
