@@ -21,7 +21,8 @@ export default class Notes {
   constructor(context) {
     this.collection = new CachedCollection(context, "notes");
     this.deltaStorage = new Storage(context);
-    this.tagsCollection = new Tags(context);
+    this.tagsCollection = new Tags(context, "tags");
+    this.colorsCollection = new Tags(context, "colors");
   }
 
   /**
@@ -34,6 +35,7 @@ export default class Notes {
     this.notebooks = notebooks;
     this.trash = trash;
     await this.tagsCollection.init();
+    await this.colorsCollection.init();
   }
 
   async add(noteArg) {
@@ -69,9 +71,11 @@ export default class Notes {
       dateCreated: note.dateCreated || Date.now()
     };
 
-    if (oldNote) {
-      // note.colors = setManipulator.union(oldNote.colors, note.colors);
-    } else {
+    if (!oldNote) {
+      for (let color of note.colors) {
+        await this.colorsCollection.add(color);
+      }
+
       for (let tag of note.tags) {
         await this.tagsCollection.add(tag);
       }
@@ -184,6 +188,10 @@ export default class Notes {
 
   get tags() {
     return this.tagsCollection.all();
+  }
+
+  get colors() {
+    return this.colorsCollection.all();
   }
 
   async move(to, ...noteIds) {

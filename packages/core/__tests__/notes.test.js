@@ -122,6 +122,25 @@ test("remove tag from note", () =>
     expect(db.notes.tags.length).toBe(0);
   }));
 
+test("color a note", () =>
+  noteTest().then(async ({ db, id }) => {
+    let note = db.notes.note(id);
+    await note.color("red");
+    expect(note.colors[0]).toBe("red");
+    expect(db.notes.colors[0].title).toBe("red");
+  }));
+
+test("uncolor a note", () =>
+  noteTest().then(async ({ db, id }) => {
+    let note = db.notes.note(id);
+    await note.color("red");
+    expect(note.colors.length).toBe(1);
+    expect(db.notes.colors.length).toBe(1);
+    await note.uncolor("red");
+    expect(note.colors.length).toBe(0);
+    expect(db.notes.colors.length).toBe(0);
+  }));
+
 test("note with text longer than 150 characters should have ... in the headline", () =>
   noteTest({
     content: {

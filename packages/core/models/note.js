@@ -27,6 +27,10 @@ export default class Note {
     return this.note.tags;
   }
 
+  get colors() {
+    return this.note.colors;
+  }
+
   get id() {
     return this.note.id;
   }
@@ -43,20 +47,18 @@ export default class Note {
     return this.notes.deltaStorage.read(this.note.id + "_delta");
   }
 
-  async tag(tag) {
-    if (this.note.tags.indexOf(tag) > -1)
-      throw new Error("Cannot add a duplicate tag.");
-    this.note.tags.push(tag);
-    await this.notes.tagsCollection.add(tag);
-    await this.notes.collection.addItem(this.note);
+  color(color) {
+    return addTag.call(this, color, "colorsCollection", "colors");
+  }
+  uncolor(color) {
+    return removeTag.call(this, color, "colorsCollection", "colors");
   }
 
-  async untag(tag) {
-    if (this.note.tags.indexOf(tag) <= -1)
-      throw new Error("This note is not tagged by the specified tag.");
-    this.note.tags.splice(this.note.tags.indexOf(tag), 1);
-    await this.notes.tagsCollection.remove(tag);
-    await this.notes.collection.addItem(this.note);
+  tag(tag) {
+    return addTag.call(this, tag, "tagsCollection", "tags");
+  }
+  untag(tag) {
+    return removeTag.call(this, tag, "tagsCollection", "tags");
   }
 
   async save() {
@@ -98,4 +100,20 @@ export default class Note {
     }
     return { ...this.note, content: JSON.parse(decrypted) };
   }
+}
+
+async function addTag(tag, collection, array) {
+  if (this.note[array].indexOf(tag) > -1)
+    throw new Error("Cannot add a duplicate tag.");
+  this.note[array].push(tag);
+  await this.notes[collection].add(tag);
+  await this.notes.collection.addItem(this.note);
+}
+
+async function removeTag(tag, collection, array) {
+  if (this.note[array].indexOf(tag) <= -1)
+    throw new Error("This note is not tagged by the specified tag.");
+  this.note[array].splice(this.note[array].indexOf(tag), 1);
+  await this.notes[collection].remove(tag);
+  await this.notes.collection.addItem(this.note);
 }

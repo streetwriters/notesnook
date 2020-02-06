@@ -1,8 +1,8 @@
 import CachedCollection from "../database/cached-collection";
 
 export default class Tags {
-  constructor(context) {
-    this.collection = new CachedCollection(context, "tags");
+  constructor(context, name) {
+    this.collection = new CachedCollection(context, name);
   }
 
   init() {
