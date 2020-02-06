@@ -112,6 +112,13 @@ export const reducer = (state, action) => {
         currentEditingNote: action.id,
       };
     }
+    case ACTIONS.SEARCH_RESULTS: {
+      let results = action.results;
+      return {
+        ...state,
+        searchResults: [...results],
+      };
+    }
     default:
       throw new Error('unknown action type');
   }

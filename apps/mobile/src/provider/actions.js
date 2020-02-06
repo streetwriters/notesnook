@@ -13,4 +13,5 @@ export const ACTIONS = {
   LOGIN_NAVIGATOR: 'loginNavigator',
   CURRENT_EDITING_NOTE: 'currentEditingNote',
   COLORS: 'colorNotes',
+  SEARCH_RESULTS: 'searchResults',
 };

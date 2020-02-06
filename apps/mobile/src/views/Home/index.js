@@ -32,6 +32,7 @@ export const Home = ({navigation}) => {
       heading="Home"
       customIcon="menu"
       verticalMenu
+      type="notes"
       menu
       placeholder="Search all notes"
       canGoBack={false}

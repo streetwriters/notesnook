@@ -20,15 +20,9 @@ import SelectionWrapper from '../SelectionWrapper';
 
 export const NotesList = ({isGrouped = false}) => {
   const [state, dispatch] = useTracked();
-  const {
-    colors,
-    selectionMode,
-    currentEditingNote,
-    loading,
-    searchResults,
-    keyword,
-  } = state;
+  const {colors, selectionMode, currentEditingNote, loading, keyword} = state;
   const notes = [...state.notes];
+  const searchResults = [...state.searchResults];
   const [refreshing, setRefreshing] = useState(false);
   const _renderItem = ({item, index}) => (
     <SelectionWrapper
@@ -164,7 +158,34 @@ export const NotesList = ({isGrouped = false}) => {
             : notes[0]
             ? 155
             : 155 - 60,
-      }}></View>
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingHorizontal: 12,
+      }}>
+      <Text
+        style={{
+          fontFamily: WEIGHT.bold,
+          color: colors.accent,
+          fontSize: SIZE.xs,
+        }}>
+        Search Results for War
+      </Text>
+      <Text
+        onPress={() => {
+          dispatch({
+            type: ACTIONS.SEARCH_RESULTS,
+            results: [],
+          });
+        }}
+        style={{
+          fontFamily: WEIGHT.regular,
+          color: colors.errorText,
+          fontSize: SIZE.xs,
+        }}>
+        Clear
+      </Text>
+    </View>
   );
 
   const _listKeyExtractor = (item, index) => item.id.toString();

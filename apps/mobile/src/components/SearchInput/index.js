@@ -11,7 +11,7 @@ const {Value, timing, block} = Animated;
 
 export const Search = props => {
   const [state, dispatch] = useTracked();
-  const {colors} = state;
+  const {colors, searchResults} = state;
 
   const [focus, setFocus] = useState(false);
   const inputRef = createRef();
@@ -94,12 +94,12 @@ export const Search = props => {
           style={{paddingRight: DDS.isTab ? 12 : 12}}
           onPress={() => {
             props.clear();
-            props.value.length > 0 ? props.clearSearch() : null;
+            searchResults.length > 0 ? props.clearSearch() : null;
             inputRef.current.setNativeProps({
               text: '',
             });
           }}
-          name={props.value && props.value.length > 0 ? '' : 'search'}
+          name={searchResults.length > 0 ? 'x' : 'search'}
           color={
             focus
               ? props.headerColor

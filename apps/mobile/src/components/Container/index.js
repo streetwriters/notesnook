@@ -18,7 +18,8 @@ import {getElevation, h, w} from '../../utils/utils';
 import {Header} from '../header';
 import {Search} from '../SearchInput';
 import SelectionHeader from '../SelectionHeader';
-import {DDS} from '../../../App';
+import {DDS, db} from '../../../App';
+import {ACTIONS} from '../../provider/actions';
 export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(
   SafeAreaView,
 );
@@ -45,6 +46,7 @@ export const Container = ({
   noSearch = false,
   noSelectionHeader = false,
   headerColor = null,
+  type = null,
 }) => {
   // State
   const [state, dispatch] = useTracked();
@@ -82,17 +84,25 @@ export const Container = ({
   };
 
   const onChangeText = value => {
-    //setText(value);
+    setText(value);
   };
   const onSubmitEditing = async () => {
     if (!text || text.length < 1) {
       clearSearch();
     } else {
       //setKeyword(text);
-      searchResult = await db.searchNotes(text);
+      if (type === 'notes') {
+        searchResult = await db.notes.filter(text);
+      } else if (type === 'notebooks') {
+        searchResult = await db.notebooks.filter(text);
+      } else if (type === 'topic') {
+        return;
+      } else {
+        return;
+      }
 
       if (searchResult && searchResult.length > 0) {
-        //setSearchResults([...searchResult]);
+        dispatch({type: ACTIONS.SEARCH_RESULTS, results: searchResult});
       } else {
         ToastEvent.show('No search results found', 'error', 3000, () => {}, '');
       }
@@ -111,7 +121,7 @@ export const Container = ({
 
   const clearSearch = () => {
     searchResult = null;
-    //setSearchResults([...[]]);
+    dispatch({type: ACTIONS.SEARCH_RESULTS, results: []});
   };
 
   useEffect(() => {
