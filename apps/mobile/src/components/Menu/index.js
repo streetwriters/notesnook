@@ -428,16 +428,16 @@ export const Menu = ({
                     bottom: -5,
                     right:
                       item.count < 10
-                        ? -8
+                        ? -6
                         : item.count >= 10 && item.count < 100
-                        ? -10
+                        ? -9
                         : item.count >= 100 && item.count < 1000
-                        ? -12
+                        ? -11
                         : item.count > 1000
                         ? -14
                         : -8,
                   }}>
-                  {item.count + 10}
+                  {item.count}
                 </Text>
               </TouchableOpacity>
             ))}
