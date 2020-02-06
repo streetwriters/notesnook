@@ -4,6 +4,8 @@ import Icon from 'react-native-vector-icons/Feather';
 import {SIZE} from '../../common/common';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
+import Animated from 'react-native-reanimated';
+
 const SelectionWrapper = ({children, item, currentEditingNote, index}) => {
   const [state, dispatch] = useTracked();
   const {colors, selectionMode, selectedItemsList} = state;
@@ -72,6 +74,7 @@ const SelectionWrapper = ({children, item, currentEditingNote, index}) => {
           </View>
         </TouchableWithoutFeedback>
       </View>
+
       {children}
     </View>
   );

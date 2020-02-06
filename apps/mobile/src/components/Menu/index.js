@@ -6,6 +6,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  SafeAreaView,
 } from 'react-native';
 import FastStorage from 'react-native-fast-storage';
 import Icon from 'react-native-vector-icons/Feather';
@@ -124,14 +125,12 @@ export const Menu = ({
   ];
 
   return (
-    <AnimatedSafeAreaView
-      transition="backgroundColor"
-      duration={400}
+    <SafeAreaView
       style={{
         height: '100%',
         opacity: hide ? 0 : 1,
-        backgroundColor: colors.shade,
         width: '100%',
+        backgroundColor: colors.shade,
         borderRightWidth: noTextMode ? 1 : 0,
         borderRightColor: noTextMode ? colors.accent : 'transparent',
       }}>
@@ -537,6 +536,6 @@ export const Menu = ({
         </Text>
       </View> */}
       </View>
-    </AnimatedSafeAreaView>
+    </SafeAreaView>
   );
 };

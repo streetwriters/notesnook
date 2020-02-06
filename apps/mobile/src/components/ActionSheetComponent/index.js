@@ -336,23 +336,17 @@ export const ActionSheetComponent = ({
   const _renderColor = color => (
     <TouchableOpacity
       key={color}
-      onPress={() => {
+      onPress={async () => {
         let noteColors = note.colors;
 
         if (noteColors.includes(color)) {
-          noteColors.splice(color, 1);
+          await db.notes.note(note.id).uncolor(color);
         } else {
           noteColors.push(color);
         }
 
-        //db.notes.note(note.id).
-        // TODO
-        /*  db.addNote({
-          dateCreated: note.dateCreated,
-          colors: noteColors,
-          content: note.content,
-          title: note.title,
-        }); */
+        await db.notes.note(note.id).color(color);
+
         localRefresh(item.type);
       }}
       style={{

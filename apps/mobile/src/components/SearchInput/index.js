@@ -1,19 +1,44 @@
-import React, {createRef, useState} from 'react';
+import React, {createRef, useState, useEffect} from 'react';
 import {TextInput} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import Icon from 'react-native-vector-icons/Feather';
 import {DDS} from '../../../App';
 import {br, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
+import Animated, {Easing} from 'react-native-reanimated';
+
+const {Value, timing, block} = Animated;
+
 export const Search = props => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
 
   const [focus, setFocus] = useState(false);
   const inputRef = createRef();
+  const _marginAnim = new Value(0);
+  const _opacity = new Value(1);
+  const _borderAnim = new Value(1.5);
+
+  useEffect(() => {
+    timing(_marginAnim, {
+      toValue: props.hide ? -65 : 0,
+      duration: 230,
+      easing: Easing.inOut(Easing.ease),
+    }).start();
+    timing(_opacity, {
+      toValue: props.hide ? 0 : 1,
+      duration: 250,
+      easing: Easing.inOut(Easing.ease),
+    }).start();
+    timing(_borderAnim, {
+      toValue: props.hide ? 0 : 1.5,
+      duration: 270,
+      easing: Easing.inOut(Easing.ease),
+    }).start();
+  }, [props.hide]);
 
   return (
-    <Animatable.View
+    <Animated.View
       transition={['marginTop', 'opacity']}
       duration={200}
       style={{
@@ -23,7 +48,7 @@ export const Search = props => {
         marginTop: props.hide ? -65 : 0,
         paddingHorizontal: 12,
       }}>
-      <Animatable.View
+      <Animated.View
         transition={['borderWidth']}
         duration={300}
         style={{
@@ -74,7 +99,7 @@ export const Search = props => {
           color={focus ? colors.accent : colors.icon}
           size={SIZE.xl}
         />
-      </Animatable.View>
-    </Animatable.View>
+      </Animated.View>
+    </Animated.View>
   );
 };

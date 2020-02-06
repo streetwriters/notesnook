@@ -27,6 +27,7 @@ import {DeviceDetectionService} from './src/utils/deviceDetection';
 import StorageInterface from './src/utils/storage';
 import {w} from './src/utils/utils';
 import Editor from './src/views/Editor';
+import Animated, {Easing} from 'react-native-reanimated';
 
 export const DDS = new DeviceDetectionService();
 export const db = new Storage(StorageInterface);
@@ -34,6 +35,9 @@ export const db = new Storage(StorageInterface);
 let sideMenuRef;
 let editorRef;
 let outColors;
+
+const {color, Value, timing, interpolate} = Animated;
+
 const App = () => {
   const [state, dispatch] = useTracked();
   const {colors, loading} = state;
