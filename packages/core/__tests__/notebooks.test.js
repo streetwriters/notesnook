@@ -71,6 +71,12 @@ test("delete a notebook", () =>
       .notebook(id)
       .topics.topic("General")
       .add(noteId);
+    expect(
+      db.notebooks
+        .notebook(id)
+        .topics.topic("General")
+        .has(noteId)
+    ).toBe(true);
     let note = db.notes.note(noteId);
     expect(note.notebook.id).toBe(id);
     await db.notebooks.delete(id);

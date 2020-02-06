@@ -11,6 +11,7 @@ import {
 import Storage from "../database/storage";
 import Notebooks from "./notebooks";
 import Note from "../models/note";
+import Trash from "./trash";
 var tfun = require("transfun/transfun.js").tfun;
 if (!tfun) {
   tfun = global.tfun;
@@ -26,10 +27,12 @@ export default class Notes {
   /**
    *
    * @param {Notebooks} notebooks
+   * @param {Trash} trash
    */
-  async init(notebooks) {
+  async init(notebooks, trash) {
     await this.collection.init();
     this.notebooks = notebooks;
+    this.trash = trash;
     await this.tagsCollection.init();
   }
 
@@ -175,7 +178,7 @@ export default class Notes {
         await this.tagsCollection.remove(tag);
       }
       await this.collection.removeItem(id);
-      this.deltaStorage.remove(id + "_delta");
+      await this.trash.add(item.data);
     }
   }
 

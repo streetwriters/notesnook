@@ -1,6 +1,8 @@
 import CachedCollection from "../database/cached-collection";
 import fuzzysearch from "fuzzysearch";
 import Notebook from "../models/notebook";
+import Notes from "./notes";
+import Trash from "./trash";
 var tfun = require("transfun/transfun.js").tfun;
 if (!tfun) {
   tfun = global.tfun;
@@ -12,8 +14,14 @@ export default class Notebooks {
     this.notes = undefined;
   }
 
-  init(notes) {
+  /**
+   *
+   * @param {Notes} notes
+   * @param {Trash} trash
+   */
+  init(notes, trash) {
     this.notes = notes;
+    this.trash = trash;
     return this.collection.init();
   }
 
@@ -37,20 +45,19 @@ export default class Notebooks {
       notebook.topics = [...notebook.topics, ...oldNotebook.topics];
     }
 
-    let topics = notebook.topics || [];
+    let topics =
+      notebook.topics.filter((v, i) => notebook.topics.indexOf(v) === i) || [];
     if (!oldNotebook) {
       topics[0] = makeTopic("General", id);
     }
 
     for (let i = 0; i < topics.length; i++) {
       let topic = topics[i];
-      let isDuplicate =
-        topics.findIndex(t => t.title === (topic || topic.title)) > -1; //check for duplicate
 
       let isEmpty =
         !topic || (typeof topic === "string" && topic.trim().length <= 0);
 
-      if (isEmpty || isDuplicate) {
+      if (isEmpty) {
         topics.splice(i, 1);
         i--;
         continue;
@@ -96,6 +103,7 @@ export default class Notebooks {
         notebook.topics.delete(...notebook.topics.all)
       );
       await this.collection.removeItem(id);
+      await this.trash.add(notebook.data);
     }
   }
 

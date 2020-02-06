@@ -15,6 +15,10 @@ export default class Topics {
     this.notes = notes;
   }
 
+  exists(topic) {
+    return this.all.findIndex(v => v.title === (topic.title || topic)) > -1;
+  }
+
   async add(topic) {
     await this.notebooks.add({
       id: this.notebookId,
@@ -36,23 +40,20 @@ export default class Topics {
   }
 
   async delete(...topics) {
-    let notebook = this.notebooks.notebook(this.notebookId);
-    if (!notebook) return;
-    notebook = notebook.data;
-    for (let topic of topics) {
+    let allTopics = JSON.parse(JSON.stringify(this.all)); //FIXME: make a deep copy
+    for (let i = 0; i < allTopics.length; i++) {
+      let topic = allTopics[i];
       if (!topic) continue;
-      let index = notebook.topics.findIndex(
-        t => t.title === topic.title || topic
-      );
-      if (index <= -1) continue;
-      topic = notebook.topics[index];
+      let index = topics.findIndex(t => (t.title || t) === topic.title);
       let t = this.topic(topic);
       await t.transaction(() => t.delete(...topic.notes), false);
-      notebook.topics.splice(index, 1);
+      if (index > -1) {
+        allTopics.splice(i, 1);
+      }
     }
     await this.notebooks.add({
-      id: notebook.id,
-      topics: notebook.topics
+      id: this.notebookId,
+      topics: allTopics
     });
   }
 }

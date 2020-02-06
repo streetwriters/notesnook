@@ -50,6 +50,10 @@ export default class CachedCollection {
     }
   }
 
+  exists(id) {
+    return this.map.has(id);
+  }
+
   getItem(id) {
     return this.map.get(id);
   }
