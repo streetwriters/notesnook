@@ -4,7 +4,7 @@ import Icon from 'react-native-vector-icons/Feather';
 import {DDS} from '../../../App';
 import {ph, pv, SIZE, WEIGHT} from '../../common/common';
 import {eSendEvent} from '../../services/eventManager';
-import {eOnLoadNote} from '../../services/events';
+import {eOnLoadNote, eOpenVaultDialog} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
 import {getElevation, timeSince} from '../../utils/utils';
 import {
@@ -115,10 +115,7 @@ export default class NoteItem extends React.Component {
           onLongPress={() => onLongPress()}
           onPress={() => {
             if (item.locked) {
-              this.setState({
-                unlock: true,
-                vaultDialog: true,
-              });
+              eSendEvent(eOpenVaultDialog, {unlock: true, i: item});
             } else {
               DDS.isTab
                 ? eSendEvent(eOnLoadNote, item)

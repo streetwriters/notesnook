@@ -46,7 +46,8 @@ export class VaultDialog extends Component {
 
   onPress = async () => {
     if (this.props.note.locked) {
-      let n = db.getNote(this.props.note.dateCreated);
+      let n = db.notes.note(this.props.note.id).data;
+
       let item;
       if (n.content.cipher) {
         try {

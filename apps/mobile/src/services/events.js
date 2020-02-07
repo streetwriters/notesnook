@@ -57,3 +57,7 @@ export const eThemeUpdated = '527';
 export const eScrollEvent = '528';
 
 export const eOnNewTopicAdded = '529';
+
+export const eOpenVaultDialog = '530';
+
+export const eCloseVaultDialog = '531';

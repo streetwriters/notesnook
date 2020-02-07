@@ -172,7 +172,8 @@ const Editor = ({navigation, noMenu}) => {
       id: id,
     });
 
-    if (id !== rId) {
+    if (id !== rId && !note.locked) {
+      console.log('HERE_ MESSING UP THINGS');
       id = rId;
       note = db.notes.note(id);
       if (note) {
@@ -288,7 +289,15 @@ const Editor = ({navigation, noMenu}) => {
     if (note.content.text === '' && note.content.delta === null) {
       post('clear');
     } else if (note.content.delta) {
-      let delta = await db.notes.note(id).delta();
+      let delta;
+      console.log('HERE', note.content.delta);
+
+      if (note.content.delta !== note.id + '_delta') {
+        delta = note.content.delta;
+      } else {
+        delta = await db.notes.note(id).delta();
+      }
+      console.log('HERE', delta);
       post(JSON.stringify(delta));
     } else {
       post(JSON.stringify({type: 'text', value: note.content.text}));

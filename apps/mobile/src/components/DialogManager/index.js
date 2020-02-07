@@ -20,6 +20,8 @@ import {
   eOpenLoginDialog,
   eOpenMoveNoteDialog,
   eOpenSimpleDialog,
+  eOpenVaultDialog,
+  eCloseVaultDialog,
 } from '../../services/events';
 import ActionSheet from '../ActionSheet';
 import {ActionSheetComponent} from '../ActionSheetComponent';
@@ -248,6 +250,9 @@ export class DialogManager extends Component {
 
     eSubscribeEvent(eOpenLoginDialog, this.showLoginDialog);
     eSubscribeEvent(eCloseLoginDialog, this.hideLoginDialog);
+
+    eSubscribeEvent(eOpenVaultDialog, this._showVaultDialog);
+    eSubscribeEvent(eCloseVaultDialog, this._hideVaultDialog);
   }
 
   componentWillUnmount() {
@@ -270,6 +275,9 @@ export class DialogManager extends Component {
 
     eUnSubscribeEvent(eOpenLoginDialog, this.showLoginDialog);
     eUnSubscribeEvent(eCloseLoginDialog, this.hideLoginDialog);
+
+    eUnSubscribeEvent(eOpenVaultDialog, this._showVaultDialog);
+    eUnSubscribeEvent(eCloseVaultDialog, this._hideVaultDialog);
   }
 
   showLoginDialog = () => {
@@ -320,10 +328,15 @@ export class DialogManager extends Component {
     this.simpleDialog.hide();
   };
 
-  _showVaultDialog = () => {
+  _showVaultDialog = data => {
+    if (data && data.i) {
+      this.setState({
+        item: data.i,
+      });
+    }
     this.vaultDialogRef.open();
   };
-  _hideVaultDialog = () => {
+  _hideVaultDialog = item => {
     this.vaultDialogRef.close();
   };
 
