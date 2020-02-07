@@ -20,6 +20,7 @@
     "fuzzysearch": "^1.0.3",
     "node-fetch": "^2.6.0",
     "qclone": "^1.0.4",
+    "teleport-javascript": "^1.0.0",
     "transfun": "^1.0.2"
   }
 }
