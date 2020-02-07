@@ -44,8 +44,7 @@ export default class Note {
   }
 
   delta() {
-    if (this.note.locked) return [];
-    return this.notes.deltaStorage.read(this.note.content.delta);
+    return this.notes.deltaStorage.read(this.note.id + "_delta");
   }
 
   color(color) {
@@ -81,15 +80,18 @@ export default class Note {
   }
 
   async lock(password) {
+    let delta = await this.delta();
+    if (delta) {
+      delta = await this.notes.collection.indexer.encrypt(
+        password,
+        JSON.stringify(delta)
+      );
+      await this.notes.deltaStorage.write(this.note.content.delta, delta);
+    }
     this.note.content = await this.notes.collection.indexer.encrypt(
       password,
       JSON.stringify(this.note.content)
     );
-    let delta = await this.notes.collection.indexer.encrypt(
-      password,
-      JSON.stringify(await this.delta())
-    );
-    await this.notes.deltaStorage.write(this.note.content.delta, delta);
     this.note.locked = true;
     return await this.notes.collection.addItem(this.note);
   }
@@ -109,7 +111,7 @@ export default class Note {
     }
     return {
       ...this.note,
-      content: { ...decrypted, delta: delta }
+      content: { ...decrypted, delta }
     };
   }
 }
