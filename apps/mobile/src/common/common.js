@@ -1,4 +1,4 @@
-import {Platform, StatusBar, Dimensions, PixelRatio} from 'react-native';
+import {Dimensions, PixelRatio, StatusBar} from 'react-native';
 import FastStorage from 'react-native-fast-storage';
 import {
   eSendEvent,
@@ -6,7 +6,6 @@ import {
   eUnSubscribeEvent,
 } from '../services/eventManager';
 import {eThemeUpdated} from '../services/events';
-import {DDS} from '../../App';
 
 const {height, width} = Dimensions.get('window');
 const standardLength = width > height ? width : height;

@@ -290,14 +290,13 @@ const Editor = ({navigation, noMenu}) => {
       post('clear');
     } else if (note.content.delta) {
       let delta;
-      console.log('HERE', note.content.delta);
 
       if (note.content.delta !== note.id + '_delta') {
         delta = note.content.delta;
       } else {
         delta = await db.notes.note(id).delta();
       }
-      console.log('HERE', delta);
+
       post(JSON.stringify(delta));
     } else {
       post(JSON.stringify({type: 'text', value: note.content.text}));
