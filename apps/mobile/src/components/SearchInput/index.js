@@ -73,7 +73,7 @@ export const Search = props => {
             color: colors.pri,
             maxWidth: '85%',
             width: '85%',
-            fontSize: SIZE.md,
+            fontSize: SIZE.sm,
           }}
           onChangeText={props.onChangeText}
           onSubmitEditing={props.onSubmitEditing}

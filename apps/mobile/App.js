@@ -315,7 +315,7 @@ const App = () => {
                 close={() => sideMenuRef.openMenu(!sideMenuRef.isOpen)}
               />
             }
-            openMenuOffset={w / 1.3}>
+            openMenuOffset={w / 1.5}>
             <AppContainer
               style={{
                 width: DDS.isTab ? '70%' : '100%',

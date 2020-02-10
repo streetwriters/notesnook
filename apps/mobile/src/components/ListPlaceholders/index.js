@@ -657,6 +657,24 @@ export const FavoritesPlaceHolder = ({colors, animation}) => {
       <Animatable.View
         animation={slideRight}
         iterationCount="infinite"
+        duration={5000}
+        delay={3000}
+        iterationDelay={1000}
+        direction="normal"
+        easing="ease-in"
+        useNativeDriver={true}
+        style={{
+          padding: 5,
+          borderRadius: 5,
+          marginBottom: 10,
+          marginTop: -30,
+        }}>
+        <Icon name="star" size={SIZE.xl} color="orange" />
+      </Animatable.View>
+
+      <Animatable.View
+        animation={slideRight}
+        iterationCount="infinite"
         duration={6000}
         iterationDelay={0}
         direction="normal"
@@ -701,6 +719,24 @@ export const FavoritesPlaceHolder = ({colors, animation}) => {
           padding: 5,
           borderRadius: 5,
           marginBottom: 10,
+        }}>
+        <Icon name="star" size={SIZE.xl} color="orange" />
+      </Animatable.View>
+
+      <Animatable.View
+        animation={slideRight}
+        iterationCount="infinite"
+        duration={5000}
+        delay={3000}
+        iterationDelay={1000}
+        direction="normal"
+        easing="ease-in"
+        useNativeDriver={true}
+        style={{
+          padding: 5,
+          borderRadius: 5,
+          marginBottom: 10,
+          marginTop: -30,
         }}>
         <Icon name="star" size={SIZE.xl} color="orange" />
       </Animatable.View>

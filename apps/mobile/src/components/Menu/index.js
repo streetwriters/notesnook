@@ -1,16 +1,16 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import {
   Platform,
+  SafeAreaView,
   ScrollView,
   StatusBar,
   Text,
   TouchableOpacity,
   View,
-  SafeAreaView,
 } from 'react-native';
 import FastStorage from 'react-native-fast-storage';
 import Icon from 'react-native-vector-icons/Feather';
-import {db, DDS} from '../../../App';
+import {DDS} from '../../../App';
 import {
   ACCENT,
   COLOR_SCHEME,
@@ -32,7 +32,6 @@ import {
   eSendSideMenuOverlayRef,
 } from '../../services/events';
 import NavigationService from '../../services/NavigationService';
-import {AnimatedSafeAreaView} from '../../views/Home';
 
 export const Menu = ({
   close = () => {},
@@ -53,14 +52,9 @@ export const Menu = ({
     dispatch({type: ACTIONS.THEME, colors: newColors});
   }
 
-  /*  useEffect(() => {
-    let allTags = tags;
-    allTags.sort((a, b) => {
-      return a.count > b.count;
-    });
-
-    setTags([...allTags]);
-  }, []); */
+  useEffect(() => {
+    dispatch({type: ACTIONS.TAGS});
+  }, []);
 
   const listItems = [
     {
@@ -139,7 +133,7 @@ export const Menu = ({
           minHeight: 2,
           width: '100%',
           paddingHorizontal: noTextMode ? 0 : 12,
-          height: 50,
+          height: DDS.isTab ? 50 : 0,
           marginBottom: 0,
           alignItems: 'center',
           flexDirection: 'row',
@@ -153,7 +147,7 @@ export const Menu = ({
                 : 0
               : StatusBar.currentHeight,
         }}>
-        {noTextMode ? null : (
+        {noTextMode || !DDS.isTab ? null : (
           <Text
             style={{
               fontSize: SIZE.xxl,
@@ -215,233 +209,232 @@ export const Menu = ({
         }}
         showsVerticalScrollIndicator={false}>
         <View>
-          <View>
-            {listItems.map((item, index) => (
-              <TouchableOpacity
-                key={item.name}
-                activeOpacity={opacity / 2}
-                onPress={() => {
-                  item.close === false ? null : close();
+          {listItems.map((item, index) => (
+            <TouchableOpacity
+              key={item.name}
+              activeOpacity={opacity / 2}
+              onPress={() => {
+                item.close === false ? null : close();
 
-                  item.func();
-                }}
-                style={{
-                  width: '100%',
-                  alignSelf: 'center',
-                  flexDirection: 'row',
-                  justifyContent: noTextMode ? 'center' : 'space-between',
-                  alignItems: 'center',
-                  paddingBottom: noTextMode ? pv + 2 : normalize(15),
-                  paddingTop:
-                    index === 0 ? pv : noTextMode ? pv + 2 : normalize(15),
-                }}>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                  }}>
-                  <Icon
-                    style={{
-                      minWidth: noTextMode ? 5 : 30,
-                    }}
-                    name={item.icon}
-                    color={colors.pri}
-                    size={SIZE.md}
-                  />
-                  {noTextMode ? null : (
-                    <Text
-                      style={{
-                        fontFamily: WEIGHT.regular,
-                        fontSize: SIZE.sm,
-                        color: colors.pri,
-                      }}>
-                      {item.name}
-                    </Text>
-                  )}
-                </View>
-
-                {item.switch && !noTextMode ? (
-                  <Icon
-                    size={SIZE.lg}
-                    color={item.on ? colors.accent : colors.icon}
-                    name={item.on ? 'toggle-right' : 'toggle-left'}
-                  />
-                ) : (
-                  undefined
-                )}
-              </TouchableOpacity>
-            ))}
-          </View>
-
-          <TouchableOpacity
-            activeOpacity={opacity / 2}
-            onPress={() => {
-              close();
-              NavigationService.navigate('Tags');
-            }}
-            style={{
-              width: '100%',
-              alignSelf: 'center',
-              flexDirection: 'row',
-              justifyContent: noTextMode ? 'center' : 'space-between',
-              alignItems: 'flex-end',
-              marginTop: noTextMode ? pv : normalize(15),
-            }}>
-            <View
+                item.func();
+              }}
               style={{
+                width: '100%',
+                alignSelf: 'center',
                 flexDirection: 'row',
-                justifyContent: noTextMode ? 'center' : 'flex-start',
+                justifyContent: noTextMode ? 'center' : 'space-between',
                 alignItems: 'center',
+                paddingBottom: noTextMode ? pv + 2 : normalize(15),
+                paddingTop:
+                  index === 0 ? pv : noTextMode ? pv + 2 : normalize(15),
               }}>
-              <Icon
+              <View
                 style={{
-                  minWidth: noTextMode ? 5 : 30,
-                }}
-                name="tag"
-                color={colors.pri}
-                size={SIZE.md}
-              />
-              {noTextMode ? null : (
-                <Text
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                }}>
+                <Icon
                   style={{
-                    fontFamily: WEIGHT.regular,
-                    fontSize: SIZE.sm,
-                    color: colors.pri,
-                  }}>
-                  Tags
-                </Text>
-              )}
-            </View>
-          </TouchableOpacity>
-
-          {noTextMode ? null : (
-            <View
-              style={{
-                flexDirection: 'row',
-                flexWrap: 'wrap',
-                marginBottom: 0,
-              }}>
-              {tags.map(item => (
-                <TouchableOpacity
-                  key={item.title}
-                  activeOpacity={opacity / 2}
-                  onPress={() => {
-                    close();
-                    NavigationService.navigate('Notes', {
-                      title: item.title,
-                      tag: item,
-                      type: 'tag',
-                    });
+                    minWidth: noTextMode ? 5 : 30,
                   }}
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'flex-start',
-                    alignItems: 'center',
-                    padding: 5,
-                    paddingLeft: 2.5,
-                    marginTop: 5,
-                  }}>
+                  name={item.icon}
+                  color={colors.accent}
+                  size={SIZE.md}
+                />
+                {noTextMode ? null : (
                   <Text
                     style={{
                       fontFamily: WEIGHT.regular,
-                      fontSize: SIZE.xs + 1,
-                      color: colors.accent,
+                      fontSize: SIZE.sm,
+                      color: colors.pri,
                     }}>
-                    #
+                    {item.name}
                   </Text>
-                  <Text
-                    style={{
-                      fontFamily: WEIGHT.regular,
-                      fontSize: SIZE.xs + 1,
-                      color: colors.icon,
-                    }}>
-                    {item.title}
-                  </Text>
-                  {item.count > 1 ? (
-                    <Text
-                      style={{
-                        color: 'white',
-                        backgroundColor: colors.accent,
-                        fontSize: SIZE.xxs - 2,
-                        minWidth: 10,
-                        minHeight: 10,
-                        marginTop: -10,
-                        borderRadius: 2,
-                        textAlign: 'center',
-                        padding: 0,
-                        paddingHorizontal: 1,
-                      }}>
-                      {item.count}
-                    </Text>
-                  ) : null}
-                </TouchableOpacity>
-              ))}
-            </View>
-          )}
+                )}
+              </View>
 
+              {item.switch && !noTextMode ? (
+                <Icon
+                  size={SIZE.lg}
+                  color={item.on ? colors.accent : colors.icon}
+                  name={item.on ? 'toggle-right' : 'toggle-left'}
+                />
+              ) : (
+                undefined
+              )}
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        <TouchableOpacity
+          activeOpacity={opacity / 2}
+          onPress={() => {
+            close();
+            NavigationService.navigate('Tags');
+          }}
+          style={{
+            width: '100%',
+            alignSelf: 'center',
+            flexDirection: 'row',
+            justifyContent: noTextMode ? 'center' : 'space-between',
+            alignItems: 'flex-end',
+            marginTop: noTextMode ? pv : normalize(15),
+          }}>
           <View
             style={{
-              flexDirection: noTextMode ? 'column' : 'row',
-              flexWrap: noTextMode ? 'nowrap' : 'wrap',
-              marginTop: pv / 2,
-              marginBottom: pv / 2,
+              flexDirection: 'row',
+              justifyContent: noTextMode ? 'center' : 'flex-start',
+              alignItems: 'center',
             }}>
-            {colorNotes.map(item => (
+            <Icon
+              style={{
+                minWidth: noTextMode ? 5 : 30,
+              }}
+              name="tag"
+              color={colors.accent}
+              size={SIZE.md}
+            />
+            {noTextMode ? null : (
+              <Text
+                style={{
+                  fontFamily: WEIGHT.regular,
+                  fontSize: SIZE.sm,
+                  color: colors.pri,
+                }}>
+                Tags
+              </Text>
+            )}
+          </View>
+        </TouchableOpacity>
+
+        {noTextMode ? null : (
+          <View
+            style={{
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+              marginBottom: 0,
+            }}>
+            {tags.map(item => (
               <TouchableOpacity
-                key={item.id}
+                key={item.title}
                 activeOpacity={opacity / 2}
                 onPress={() => {
+                  close();
                   NavigationService.navigate('Notes', {
-                    type: 'color',
                     title: item.title,
-                    color: item,
+                    tag: item,
+                    type: 'tag',
                   });
                 }}
                 style={{
                   flexDirection: 'row',
-                  justifyContent: noTextMode ? 'center' : 'flex-start',
+                  justifyContent: 'flex-start',
                   alignItems: 'center',
-                  margin: noTextMode ? 0 : 5,
-                  marginLeft: 0,
-                  marginRight: noTextMode ? 0 : 15,
-                  marginTop: normalize(15),
+                  padding: 5,
+                  paddingLeft: 2.5,
+                  marginTop: 5,
                 }}>
-                <View
-                  style={{
-                    width: noTextMode ? SIZE.md : normalize(30),
-                    height: noTextMode ? SIZE.md : normalize(30),
-                    backgroundColor: item.title,
-                    borderRadius: 100,
-                  }}></View>
                 <Text
                   style={{
-                    color: colors.pri,
-                    fontSize: SIZE.xxs - 2,
-                    minWidth: 12,
-                    minHeight: 12,
-                    borderWidth: 0.5,
-                    paddingHorizontal: 2,
-                    borderColor: item.title,
-                    borderRadius: 100,
-                    textAlign: 'center',
-                    position: 'absolute',
-                    bottom: -5,
-                    right:
-                      item.count < 10
-                        ? -6
-                        : item.count >= 10 && item.count < 100
-                        ? -9
-                        : item.count >= 100 && item.count < 1000
-                        ? -11
-                        : item.count > 1000
-                        ? -14
-                        : -8,
+                    fontFamily: WEIGHT.regular,
+                    fontSize: SIZE.xs + 1,
+                    color: colors.accent,
                   }}>
-                  {item.count}
+                  #
                 </Text>
+                <Text
+                  style={{
+                    fontFamily: WEIGHT.regular,
+                    fontSize: SIZE.xs + 1,
+                    color: colors.icon,
+                  }}>
+                  {item.title}
+                </Text>
+                {item.count > 1 ? (
+                  <Text
+                    style={{
+                      color: 'white',
+                      backgroundColor: colors.accent,
+                      fontSize: SIZE.xxs - 2,
+                      minWidth: 10,
+                      minHeight: 10,
+                      marginTop: -10,
+                      borderRadius: 2,
+                      textAlign: 'center',
+                      padding: 0,
+                      paddingHorizontal: 1,
+                    }}>
+                    {item.count}
+                  </Text>
+                ) : null}
               </TouchableOpacity>
             ))}
           </View>
+        )}
+
+        <View
+          style={{
+            flexDirection: noTextMode ? 'column' : 'row',
+            flexWrap: noTextMode ? 'nowrap' : 'wrap',
+            marginTop: pv / 2,
+            marginBottom: pv / 2,
+          }}>
+          {colorNotes.map(item => (
+            <TouchableOpacity
+              key={item.id}
+              activeOpacity={opacity / 2}
+              onPress={() => {
+                NavigationService.navigate('Notes', {
+                  type: 'color',
+                  title: item.title,
+                  color: item,
+                });
+                close();
+              }}
+              style={{
+                flexDirection: 'row',
+                justifyContent: noTextMode ? 'center' : 'flex-start',
+                alignItems: 'center',
+                margin: noTextMode ? 0 : 5,
+                marginLeft: 0,
+                marginRight: noTextMode ? 0 : 15,
+                marginTop: normalize(15),
+              }}>
+              <View
+                style={{
+                  width: noTextMode ? SIZE.md : normalize(30),
+                  height: noTextMode ? SIZE.md : normalize(30),
+                  backgroundColor: item.title,
+                  borderRadius: 100,
+                }}></View>
+              <Text
+                style={{
+                  color: colors.pri,
+                  fontSize: SIZE.xxs - 2,
+                  minWidth: 12,
+                  minHeight: 12,
+                  borderWidth: 0.5,
+                  paddingHorizontal: 2,
+                  borderColor: item.title,
+                  borderRadius: 100,
+                  textAlign: 'center',
+                  position: 'absolute',
+                  bottom: -5,
+                  right:
+                    item.count < 10
+                      ? -6
+                      : item.count >= 10 && item.count < 100
+                      ? -9
+                      : item.count >= 100 && item.count < 1000
+                      ? -11
+                      : item.count > 1000
+                      ? -14
+                      : -8,
+                }}>
+                {item.count}
+              </Text>
+            </TouchableOpacity>
+          ))}
         </View>
 
         {/*  <View

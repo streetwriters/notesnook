@@ -173,7 +173,6 @@ const Editor = ({navigation, noMenu}) => {
     });
 
     if (id !== rId && !note.locked) {
-      console.log('HERE_ MESSING UP THINGS');
       id = rId;
       note = db.notes.note(id);
       if (note) {
@@ -543,70 +542,58 @@ const Editor = ({navigation, noMenu}) => {
   }, [colors]);
 
   return (
-    <Animatable.View
-      animation="fadeIn"
-      duration={500}
-      delay={1000}
-      useNativeDriver={true}
+    <AnimatedSafeAreaView
+      transition={['backgroundColor', 'width']}
+      duration={300}
       style={{
         flex: 1,
-        backgroundColor: 'transparent',
+        backgroundColor: DDS.isTab ? 'transparent' : colors.bg,
         height: '100%',
         width: '100%',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
       }}>
-      <AnimatedSafeAreaView
-        transition={['backgroundColor', 'width']}
-        duration={300}
+      <Animatable.View
+        transition="opacity"
+        useNativeDriver={true}
+        duration={150}
         style={{
-          flex: 1,
-          backgroundColor: DDS.isTab ? 'transparent' : colors.bg,
-          height: '100%',
           width: '100%',
-          flexDirection: 'row',
-          justifyContent: 'space-between',
+          height: '100%',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 1,
+          backgroundColor: colors.bg,
+          opacity: loading ? 1 : 0,
+          position: 'absolute',
         }}>
-        <Animatable.View
-          transition="opacity"
-          useNativeDriver={true}
-          duration={150}
-          style={{
-            width: '100%',
-            height: '100%',
-            justifyContent: 'center',
-            alignItems: 'center',
-            zIndex: 1,
-            backgroundColor: colors.bg,
-            opacity: loading ? 1 : 0,
-            position: 'absolute',
-          }}>
-          <ActivityIndicator color={colors.accent} size={SIZE.xxxl} />
+        <ActivityIndicator color={colors.accent} size={SIZE.xxxl} />
 
-          <Text
-            style={{
-              color: colors.accent,
-              fontFamily: WEIGHT.regular,
-              fontSize: SIZE.md,
-              marginTop: 10,
-            }}>
-            Write with confidence.
-          </Text>
-        </Animatable.View>
-
-        <Animatable.View
-          transition={['opacity']}
-          useNativeDriver={true}
-          duration={3000}
-          delay={300}
+        <Text
           style={{
-            width: '100%',
-            height: '100%',
-            zIndex: 2,
-            opacity: loading ? 0 : 1,
+            color: colors.accent,
+            fontFamily: WEIGHT.regular,
+            fontSize: SIZE.md,
+            marginTop: 10,
           }}>
-          {_renderEditor()}
-        </Animatable.View>
-      </AnimatedSafeAreaView>
-    </Animatable.View>
+          Write with confidence.
+        </Text>
+      </Animatable.View>
+
+      <Animatable.View
+        transition={['opacity']}
+        useNativeDriver={true}
+        duration={3000}
+        delay={300}
+        style={{
+          width: '100%',
+          height: '100%',
+          zIndex: 2,
+          opacity: loading ? 0 : 1,
+        }}>
+        {_renderEditor()}
+      </Animatable.View>
+    </AnimatedSafeAreaView>
   );
 };
 

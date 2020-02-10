@@ -108,6 +108,7 @@ const TopLevelNavigator = createStackNavigator(
   },
   {
     initialRouteName: 'Home',
+
     defaultNavigationOptions: {
       gesturesEnabled: false,
       headerStyle: {
@@ -116,6 +117,9 @@ const TopLevelNavigator = createStackNavigator(
         height: 0,
       },
     },
+    cardOverlayEnabled: false,
+    cardShadowEnabled: false,
+    animationEnabled: false,
     transitionConfig: () => ({
       screenInterpolator: props => {
         return fade(props);
