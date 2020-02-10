@@ -1386,7 +1386,7 @@
     color: ${pageTheme.colors.icon};
     display: inline-block;
     float: left;
-    font-size: ${pageTheme.factor * 16};
+    font-size:${(pageTheme.colors.factor * 16)};
     font-weight: 500;
     height: 24px;
     position: relative;
@@ -1441,7 +1441,7 @@
     padding: 5px 12px;
     white-space: nowrap;
     position: absolute;
-    font-size: ${pageTheme.factor * 12};
+    font-size:${(pageTheme.colors.factor * 12)};
   }
   
   .ql-snow .ql-tooltip a.ql-action::after {
@@ -1457,6 +1457,12 @@
     border: 1px solid ${pageTheme.colors.nav};
     background-color:transparent;
   }
+  .ql-snow.ql-toolbar button,
+    .ql-snow .ql-toolbar button {
+      
+      height: ${(pageTheme.colors.factor * 32)};
+      width: ${(pageTheme.colors.factor * 36)};
+    }
   
 
   .ql-toolbar {
@@ -1478,8 +1484,8 @@
   }
   
   #titleInput {
-    color:${pageTheme.colors.pri}
-    font-size:${pageTheme.factor * 28}
+    color:${pageTheme.colors.pri};
+    font-size:${28 * pageTheme.colors.factor};
     
   }
   #titleInput::-webkit-input-placeholder {
@@ -1491,7 +1497,7 @@
     border-color:${pageTheme.colors.nav};
   }
   .ql-container {
-    font-size:${pageTheme.factor * 20}
+    font-size:${(pageTheme.colors.factor * 18)};
     color:${pageTheme.colors.pri};
   }
  
