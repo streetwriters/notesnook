@@ -103,6 +103,8 @@ const correction = (size, multiplier) => {
     return size * 0.87;
   } else if (dSize > 5.5 && dSize < 6.5 && pixelDensity <= 3) {
     return size * 0.93;
+  } else if (dSize <= 5.7 && pixelDensity > 3) {
+    return size * 0.9;
   } else if (dSize >= 6.5 && dSize <= 7.2) {
     return size * multiplier;
   } else if (dSize > 7.2 && dSize <= 8.5) {
@@ -128,7 +130,7 @@ export const normalize = size => {
   } else if (pd > 2 && pd <= 3) {
     return correction(size, 0.87);
   } else if (pd > 3) {
-    return size;
+    return correction(size, 1);
   }
 };
 
