@@ -37,6 +37,7 @@ const modules = {
     ["link", "image", "video"],
     [{ direction: "rtl" }, "clean"]
   ],
+  syntax: true,
   markdownShortcuts: {},
   magicUrl: true
 };
@@ -207,24 +208,23 @@ export default class Editor extends React.Component {
           }}
           selectedColors={this.state.colors}
           colorSelected={color => {
-            if (this.state.colors.includes(color.label)) {
-              this.state.colors.splice(
-                this.state.colors.indexOf(color.label),
-                1
-              );
+            let colors = [...this.state.colors];
+            if (colors.includes(color.label)) {
+              colors.splice(colors.indexOf(color.label), 1);
             } else {
-              this.state.colors[this.state.colors.length] = color.label;
+              colors[colors.length] = color.label;
             }
-            this.setState({ colors: this.state.colors });
+            this.setState({ colors });
           }}
           tags={this.state.tags}
           addTag={tag => {
-            if (this.state.tags.includes(tag)) {
-              this.state.tags.splice(this.state.tags.indexOf(tag), 1);
+            let tags = [...this.state.tags];
+            if (tags.includes(tag)) {
+              tags.splice(tags.indexOf(tag), 1);
             } else {
-              this.state.tags[this.state.tags.length] = tag;
+              tags[this.state.tags.length] = tag;
             }
-            this.setState({ tags: this.state.tags });
+            this.setState({ tags });
           }}
           onLocked={state => {}}
         />

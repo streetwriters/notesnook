@@ -7,11 +7,23 @@ import RootNavigator from "./navigation/navigators/rootnavigator";
 import "./app.css";
 import { usePersistentState } from "./utils/hooks";
 import { ev } from "./common";
+import { useTheme } from "emotion-theming";
 
 const NavMenuItem = props => {
+  const [fill, setFill] = useState();
+  const [toggle, setToggle] = useState(
+    props.item.isToggled && props.item.isToggled()
+  );
+  const theme = useTheme();
+  useEffect(() => {
+    setFill(toggle ? theme.colors.text : props.item.color || "transparent");
+  }, [props.item, toggle, theme.colors]);
   return (
     <Button
-      onClick={props.onSelected}
+      onClick={() => {
+        props.onSelected();
+        setToggle(props.item.isToggled && props.item.isToggled());
+      }}
       variant="nav"
       sx={{
         width: "full",
@@ -33,9 +45,9 @@ const NavMenuItem = props => {
       >
         <props.item.icon
           size={24}
-          strokeWidth={props.item.color ? 0 : props.selected ? 2 : 1.3}
+          strokeWidth={props.selected ? 2 : 1.3}
           style={{ marginRight: 2 }}
-          fill={props.item.color || "transparent"}
+          fill={fill}
         />
         <Text
           sx={{
