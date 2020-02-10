@@ -6,6 +6,7 @@ import { GroupedVirtuoso as GroupList, Virtuoso as List } from "react-virtuoso";
 import Button from "../components/button";
 import Search from "../components/search";
 import Note from "../components/note";
+import { HomeAnim } from "./Placeholders";
 
 function SearchBox(props) {
   return (
@@ -103,12 +104,16 @@ function Home() {
             {notes.items === undefined ? (
               <Icon.Search size={72} strokeWidth={1.5} />
             ) : (
-              <Icon.Edit size={72} strokeWidth={1.5} />
+              // <Icon.Moon size={72} strokeWidth={1.5} />
+              <>
+                <HomeAnim marginB="-70px" marginR="60px" />
+                <HomeAnim marginB="20px" />
+              </>
             )}
-            <Text variant="title">
+            <Text variant="body">
               {notes.items === undefined
                 ? "We found nothing for that query."
-                : "You have no notes"}
+                : "Notes you write will appear here."}
             </Text>
             {notes.items !== undefined && (
               <Button
