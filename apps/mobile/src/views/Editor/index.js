@@ -14,7 +14,7 @@ import * as Animatable from 'react-native-animatable';
 import Icon from 'react-native-vector-icons/Feather';
 import WebView from 'react-native-webview';
 import {db, DDS} from '../../../App';
-import {SIZE, WEIGHT} from '../../common/common';
+import {SIZE, WEIGHT, normalize} from '../../common/common';
 import {
   ActionSheetEvent,
   simpleDialogEvent,
@@ -255,8 +255,9 @@ const Editor = ({navigation, noMenu}) => {
         setLoading(false);
       });
     }
-
-    post(JSON.stringify(colors));
+    let c = {...colors};
+    c.factor = normalize(1);
+    post(JSON.stringify(c));
   };
 
   const wait = timeout =>
@@ -479,8 +480,8 @@ const Editor = ({navigation, noMenu}) => {
             Platform.OS === 'ios'
               ? {uri: sourceUri}
               : {
-                  uri: 'file:///android_asset/texteditor.html',
-                  baseUrl: 'file:///android_asset/',
+                  uri: 'http://192.168.10.7:8080/texteditor.html',
+                  baseUrl: 'http://192.168.10.7:8080/',
                 }
           }
           style={{
