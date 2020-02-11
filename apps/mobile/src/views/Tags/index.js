@@ -14,6 +14,7 @@ import {TagsPlaceHolder} from '../../components/ListPlaceholders';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import NavigationService from '../../services/NavigationService';
+import {ToastEvent} from '../../utils/utils';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
@@ -63,11 +64,19 @@ export const Tags = ({navigation}) => {
               tintColor={colors.accent}
               colors={[colors.accent]}
               progressViewOffset={165}
-              onRefresh={() => {
+              onRefresh={async () => {
                 setRefreshing(true);
-                setTimeout(() => {
+                try {
+                  await db.sync();
+
+                  dispatch({type: ACTIONS.TAGS});
+                  dispatch({type: ACTIONS.USER});
                   setRefreshing(false);
-                }, 1000);
+                  ToastEvent.show('Sync Complete', 'success');
+                } catch (e) {
+                  setRefreshing(false);
+                  ToastEvent.show('Sync failed, network error', 'error');
+                }
               }}
               refreshing={refreshing}
             />

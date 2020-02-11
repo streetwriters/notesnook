@@ -20,7 +20,7 @@ import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
 import {eScrollEvent} from '../../services/events';
 import {slideLeft, slideRight} from '../../utils/animations';
-import {w} from '../../utils/utils';
+import {w, ToastEvent} from '../../utils/utils';
 
 export const Folders = ({navigation}) => {
   const [state, dispatch] = useTracked();
@@ -95,11 +95,19 @@ export const Folders = ({navigation}) => {
             tintColor={colors.accent}
             colors={[colors.accent]}
             progressViewOffset={165}
-            onRefresh={() => {
+            onRefresh={async () => {
               setRefreshing(true);
-              setTimeout(() => {
+              try {
+                await db.sync();
+                dispatch({type: ACTIONS.NOTEBOOKS});
+                dispatch({type: ACTIONS.PINNED});
+                dispatch({type: ACTIONS.USER});
                 setRefreshing(false);
-              }, 1000);
+                ToastEvent.show('Sync Complete', 'success');
+              } catch (e) {
+                setRefreshing(false);
+                ToastEvent.show('Sync failed, network error', 'error');
+              }
             }}
             refreshing={refreshing}
           />

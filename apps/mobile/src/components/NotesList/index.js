@@ -199,8 +199,7 @@ export const NotesList = ({isGrouped = false}) => {
               await db.sync();
               dispatch({type: ACTIONS.NOTES});
               dispatch({type: ACTIONS.PINNED});
-              dispatch({type: ACTIONS.FAVORITES});
-
+              dispatch({type: ACTIONS.USER});
               setRefreshing(false);
               ToastEvent.show('Sync Complete', 'success');
             } catch (e) {

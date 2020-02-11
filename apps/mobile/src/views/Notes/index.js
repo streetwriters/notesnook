@@ -7,6 +7,7 @@ import SelectionWrapper from '../../components/SelectionWrapper';
 import {useTracked} from '../../provider';
 import {SIZE, WEIGHT} from '../../common/common';
 import {ACTIONS} from '../../provider/actions';
+import {ToastEvent} from '../../utils/utils';
 
 export const Notes = ({navigation}) => {
   const [state, dispatch] = useTracked();
@@ -24,14 +25,14 @@ export const Notes = ({navigation}) => {
     }
   }, []);
 
-  useEffect(() => {
+  const init = () => {
     eSendEvent(eScrollEvent, 0);
     if (params.type === 'tag') {
       let notesInTag = db.notes.tagged(params.tag.title);
       setNotes([...notesInTag]);
     } else if (params.type == 'color') {
       let notesInColors = db.notes.colored(params.color.id);
-      console.log(notesInColors);
+
       setNotes([...notesInColors]);
       //setNotes(...);
     } else {
@@ -42,6 +43,10 @@ export const Notes = ({navigation}) => {
         setNotes(allNotes);
       }
     }
+  };
+
+  useEffect(() => {
+    init();
   }, [allNotes, colorNotes]);
 
   const _renderItem = ({item, index}) => (
@@ -135,11 +140,19 @@ export const Notes = ({navigation}) => {
             tintColor={colors.accent}
             colors={[colors.accent]}
             progressViewOffset={165}
-            onRefresh={() => {
+            onRefresh={async () => {
               setRefreshing(true);
-              setTimeout(() => {
+              try {
+                await db.sync();
+
+                init();
+                dispatch({type: ACTIONS.USER});
                 setRefreshing(false);
-              }, 1000);
+                ToastEvent.show('Sync Complete', 'success');
+              } catch (e) {
+                setRefreshing(false);
+                ToastEvent.show('Sync failed, network error', 'error');
+              }
             }}
             refreshing={refreshing}
           />

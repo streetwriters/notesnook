@@ -10,6 +10,7 @@ import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
 import {eScrollEvent} from '../../services/events';
+import {ToastEvent} from '../../utils/utils';
 
 export const Favorites = ({navigation}) => {
   const [state, dispatch] = useTracked();
@@ -40,11 +41,19 @@ export const Favorites = ({navigation}) => {
             tintColor={colors.accent}
             colors={[colors.accent]}
             progressViewOffset={165}
-            onRefresh={() => {
+            onRefresh={async () => {
               setRefreshing(true);
-              setTimeout(() => {
+              try {
+                await db.sync();
+
+                dispatch({type: ACTIONS.FAVORITES});
+                dispatch({type: ACTIONS.USER});
                 setRefreshing(false);
-              }, 1000);
+                ToastEvent.show('Sync Complete', 'success');
+              } catch (e) {
+                setRefreshing(false);
+                ToastEvent.show('Sync failed, network error', 'error');
+              }
             }}
             refreshing={refreshing}
           />

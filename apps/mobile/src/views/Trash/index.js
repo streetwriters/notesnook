@@ -11,7 +11,7 @@ import {NotebookItem} from '../../components/NotebookItem';
 import NoteItem from '../../components/NoteItem';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
-import {w} from '../../utils/utils';
+import {w, ToastEvent} from '../../utils/utils';
 import SelectionWrapper from '../../components/SelectionWrapper';
 
 export const Trash = ({navigation}) => {
@@ -111,11 +111,19 @@ export const Trash = ({navigation}) => {
             tintColor={colors.accent}
             colors={[colors.accent]}
             progressViewOffset={165}
-            onRefresh={() => {
+            onRefresh={async () => {
               setRefreshing(true);
-              setTimeout(() => {
+              try {
+                await db.sync();
+
+                dispatch({type: ACTIONS.TRASH});
+                dispatch({type: ACTIONS.USER});
                 setRefreshing(false);
-              }, 1000);
+                ToastEvent.show('Sync Complete', 'success');
+              } catch (e) {
+                setRefreshing(false);
+                ToastEvent.show('Sync failed, network error', 'error');
+              }
             }}
             refreshing={refreshing}
           />

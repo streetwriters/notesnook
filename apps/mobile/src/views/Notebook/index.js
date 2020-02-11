@@ -18,6 +18,7 @@ import {
   eOnNewTopicAdded,
   eScrollEvent,
 } from '../../services/events';
+import {ToastEvent} from '../../utils/utils';
 
 export const Notebook = ({navigation}) => {
   const [state, dispatch] = useTracked();
@@ -157,11 +158,19 @@ export const Notebook = ({navigation}) => {
             tintColor={colors.accent}
             colors={[colors.accent]}
             progressViewOffset={165}
-            onRefresh={() => {
+            onRefresh={async () => {
               setRefreshing(true);
-              setTimeout(() => {
+              try {
+                await db.sync();
+
+                onLoad();
+                dispatch({type: ACTIONS.USER});
                 setRefreshing(false);
-              }, 1000);
+                ToastEvent.show('Sync Complete', 'success');
+              } catch (e) {
+                setRefreshing(false);
+                ToastEvent.show('Sync failed, network error', 'error');
+              }
             }}
             refreshing={refreshing}
           />
