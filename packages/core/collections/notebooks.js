@@ -91,8 +91,8 @@ export default class Notebooks {
 
   filter(query) {
     if (!query) return [];
-    return tfun.filter(v => fuzzysearch(query, v.title + " " + v.description))(
-      this.all
-    );
+    let queryFn = v => fuzzysearch(query, v.title + " " + v.description);
+    if (query instanceof Function) queryFn = query;
+    return tfun.filter(queryFn)(this.all);
   }
 }

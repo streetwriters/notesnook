@@ -117,9 +117,9 @@ export default class Notes {
 
   filter(query) {
     if (!query) return [];
-    return tfun.filter(v => fuzzysearch(query, v.title + " " + v.content.text))(
-      this.all
-    );
+    let queryFn = v => fuzzysearch(query, v.title + " " + v.content.text);
+    if (query instanceof Function) queryFn = query;
+    return tfun.filter(queryFn)(this.all);
   }
 
   group(by, special = false) {

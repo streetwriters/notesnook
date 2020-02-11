@@ -2,6 +2,7 @@ import Notes from "../collections/notes";
 import Notebooks from "../collections/notebooks";
 import Trash from "../collections/trash";
 import User from "../models/user";
+import Sync from "./sync";
 
 class Database {
   constructor(context) {
@@ -15,6 +16,11 @@ class Database {
     await this.notes.init(this.notebooks, this.trash);
     await this.notebooks.init(this.notes, this.trash);
     await this.trash.init(this.notes, this.notebooks);
+    this.syncer = new Sync(this);
+  }
+
+  sync() {
+    return this.syncer.start();
   }
 }
 

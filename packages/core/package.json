@@ -10,7 +10,8 @@
     "babel-jest": "^24.9.0",
     "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.7.0",
-    "jest": "^24.9.0"
+    "jest": "^24.9.0",
+    "node-fetch": "^2.6.0"
   },
   "scripts": {
     "test": "jest"
@@ -18,9 +19,7 @@
   "dependencies": {
     "fast-sort": "^2.0.1",
     "fuzzysearch": "^1.0.3",
-    "node-fetch": "^2.6.0",
     "qclone": "^1.0.4",
-    "teleport-javascript": "^1.0.0",
     "transfun": "^1.0.2"
   }
 }

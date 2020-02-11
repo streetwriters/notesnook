@@ -11,7 +11,7 @@ export default class User {
     this.context = context;
   }
 
-  async user() {
+  async get() {
     return this.context.read("user");
   }
 
@@ -25,11 +25,11 @@ export default class User {
     await this.context.write("user", user);
   }
 
-  async refreshToken() {
+  async token() {
     let user = await this.user();
-    if (!user) return false;
+    if (!user) return;
     if (user.expiry < Date.now()) {
-      return true;
+      return user.accessToken;
     }
     let response = await authRequest("oauth/token", {
       refresh_token: user.refreshToken,
@@ -44,7 +44,7 @@ export default class User {
       expiry: dt.getTime()
     };
     await this.context.write("user", user);
-    return true;
+    return user.accessToken;
   }
 
   logout() {

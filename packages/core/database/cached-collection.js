@@ -30,7 +30,7 @@ export default class CachedCollection {
     let exists = this.map.has(item.id);
     await this.updateItem(item);
     if (!exists) {
-      item.dateCreated = Date.now();
+      item.dateCreated = item.dateCreated || Date.now();
       await this.indexer.index(item.id);
     }
   }
@@ -38,7 +38,10 @@ export default class CachedCollection {
   async updateItem(item) {
     if (this.transactionOpen) return;
     if (!item.id) throw new Error("The item must contain the id field.");
-    item.dateEdited = Date.now();
+    // if item is newly synced, remote will be true.
+    item.dateEdited = item.remote ? item.dateEdited : Date.now();
+    // the item has become local now, so remove the flag.
+    delete item.remote;
     this.map.set(item.id, item);
     await this.indexer.write(item.id, item);
   }
