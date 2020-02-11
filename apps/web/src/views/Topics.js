@@ -16,7 +16,11 @@ const Topics = props => {
             props.navigator.navigate("notes", {
               title: props.notebook.title,
               subtitle: topic.title,
-              notes: db.getTopic(props.notebook.dateCreated, topic.title)
+              notes: db.notebooks
+                .notebook(props.notebook.id)
+                .topics.topic(
+                  topic.title
+                ) /*db.getTopic(props.notebook.dateCreated, topic.title)*/
             });
           }}
         />

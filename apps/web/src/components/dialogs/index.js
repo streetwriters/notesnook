@@ -309,7 +309,7 @@ export const ask = (icon, title, message) => {
 };
 
 export const MoveDialog = props => {
-  const [items, setItems] = useState(db.getNotebooks());
+  const [items, setItems] = useState(db.notebooks.all /*db.getNotebooks()*/);
   const [type, setType] = useState("notebooks");
   const [title, setTitle] = useState("Notebooks");
   const [mode, setMode] = useState("read");
@@ -372,15 +372,21 @@ export const MoveDialog = props => {
             onKeyUp={async e => {
               if (e.nativeEvent.key === "Enter" && e.target.value.length > 0) {
                 if (type === "notebooks") {
-                  await db.addNotebook({ title: e.target.value });
-                  setItems(db.getNotebooks());
+                  await db.notebooks.add({
+                    title: e.target.value
+                  }); /*db.addNotebook({ title: e.target.value });*/
+                  setItems(db.notebooks.all /*db.getNotebooks()*/);
                 } else {
-                  await db.addTopicToNotebook(
+                  await db.notebooks
+                    .notebook(MoveDialog.notebook.id)
+                    .topics.add(e.target.value);
+                  /*db.addTopicToNotebook(
                     MoveDialog.notebook.dateCreated,
                     e.target.value
-                  );
+                  );*/
                   setItems(
-                    db.getNotebook(MoveDialog.notebook.dateCreated).topics
+                    /*db.getNotebook(MoveDialog.notebook.dateCreated).topics*/
+                    db.notebooks.notebook(MoveDialog.notebook.id).topics
                   );
                 }
                 MoveDialog.inputRef.value = "";
@@ -424,7 +430,10 @@ export const MoveDialog = props => {
                         MoveDialog.topic = v.title;
                         setTitle(`${MoveDialog.notebook.title} - ${v.title}`);
                         setItems(
-                          db.getTopic(MoveDialog.notebook.dateCreated, v.title)
+                          /*db.getTopic(MoveDialog.notebook.dateCreated, v.title)*/
+                          db.notebooks
+                            .notebook(MoveDialog.notebook.id)
+                            .topics.exists(v.title)
                         );
                       }
                     }}
@@ -454,10 +463,13 @@ export const MoveDialog = props => {
         text: "Move",
         click: async () => {
           if (
-            await db.moveNote(props.noteId, props.notebook, {
+            await db.notes.move(
+              MoveDialog.topic,
+              props.noteId
+            ) /*db.moveNote(props.noteId, props.notebook, {
               notebook: MoveDialog.notebook.dateCreated,
               topic: MoveDialog.topic
-            })
+            })*/
           ) {
             props.onMove();
           }

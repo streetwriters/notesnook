@@ -15,8 +15,8 @@ function SearchBox(props) {
       onChange={e => {
         let data =
           e.target.value.length > 2
-            ? db.searchNotes(e.target.value)
-            : db.groupNotes(undefined, true);
+            ? db.notes.filter(e.target.value)
+            : db.notes.group(undefined, true);
         data = !data ? [] : data;
         props.setNotes(data);
       }}
@@ -34,7 +34,7 @@ function Home() {
   //const [pinnedItems, setPinnedItems] = useState([]);
   useEffect(() => {
     function onRefreshNotes() {
-      let groups = db.groupNotes(undefined, true);
+      let groups = db.notes.group(undefined, true);
       setNotes(groups);
     }
     onRefreshNotes();

@@ -5,6 +5,7 @@ import App from "./App";
 import * as serviceWorker from "./serviceWorker";
 import Modal from "react-modal";
 import { db } from "./common";
+
 db.init();
 Modal.setAppElement("#root");
 ReactDOM.render(<App />, document.getElementById("root"));

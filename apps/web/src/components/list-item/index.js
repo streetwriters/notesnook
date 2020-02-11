@@ -78,7 +78,8 @@ const ListItem = props => (
           marginBottom: 1,
           ":hover": {
             cursor: "pointer"
-          }
+          },
+          flexWrap: "wrap"
         }}
       >
         {props.body}

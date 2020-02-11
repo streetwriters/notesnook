@@ -10,18 +10,24 @@ const menuItems = notebook => [
   {
     title: notebook.pinned ? "Unpin" : "Pin",
     onClick: async () =>
-      db.pinItem("notebook", notebook.dateCreated).then(() => {
-        showSnack("Notebook pinned!", Icon.Check);
-        ev.emit("refreshNotebooks");
-      })
+      db.notebooks
+        .notebook(notebook.id)
+        .pin() /*db.pinItem("notebook", notebook.dateCreated)*/
+        .then(() => {
+          showSnack("Notebook pinned!", Icon.Check);
+          ev.emit("refreshNotebooks");
+        })
   },
   {
     title: notebook.favorite ? "Unfavorite" : "Favorite",
     onClick: async () =>
-      db.favoriteItem("notebook", notebook.dateCreated).then(() => {
-        showSnack("Notebook favorited!", Icon.Check);
-        ev.emit("refreshNotebooks");
-      })
+      db.notebooks
+        .notebook(notebook.id)
+        .favorite() /*db.favoriteItem("notebook", notebook.dateCreated)*/
+        .then(() => {
+          showSnack("Notebook favorited!", Icon.Check);
+          ev.emit("refreshNotebooks");
+        })
   },
   { title: "Edit" },
   { title: "Share" },
@@ -29,7 +35,7 @@ const menuItems = notebook => [
     title: "Delete",
     color: "red",
     onClick: () => {
-      db.deleteNotebooks([notebook]).then(
+      db.notebooks.delete(notebook.id) /*db.deleteNotebooks([notebook])*/.then(
         //TODO implement undo
         () => {
           showSnack("Notebook deleted!", Icon.Check);
@@ -54,7 +60,7 @@ const Notebook = ({ item, index, onClick, onTopicClick }) => {
                 onTopicClick(notebook, topic);
                 e.stopPropagation();
               }}
-              key={topic.dateCreated + topic.title}
+              key={topic.id + topic.title}
               bg="primary"
               px={1}
               py={1}
@@ -73,7 +79,7 @@ const Notebook = ({ item, index, onClick, onTopicClick }) => {
       }
       info={
         <Flex justifyContent="center" alignItems="center">
-          {new Date(notebook.dateCreated).toDateString().substring(4)}
+          {new Date(notebook.id).toDateString().substring(4)}
           <Text as="span" mx={1}>
             •
           </Text>

@@ -6,6 +6,7 @@
     "@rebass/forms": "^4.0.6",
     "emotion-theming": "^10.0.19",
     "events": "^3.0.0",
+    "localforage": "^1.7.3",
     "notes-core": "npm:@streetwriters/notesnook-core@latest",
     "quill-magic-url": "^1.0.3",
     "quill-markdown-shortcuts": "^0.0.10",

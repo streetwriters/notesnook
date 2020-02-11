@@ -12,8 +12,8 @@ const menuItems = note => [
   {
     title: note.notebook.notebook ? "Move" : "Add to",
     onClick: async () => {
-      console.log(note.dateCreated, note.notebook);
-      if (await moveNote(note.dateCreated, note.notebook)) {
+      console.log(note.id, note.notebook);
+      if (await moveNote(note.id, note.notebook)) {
         showSnack("Note moved successfully!");
       }
     }
@@ -21,34 +21,41 @@ const menuItems = note => [
   {
     title: note.pinned ? "Unpin" : "Pin",
     onClick: async () =>
-      db.pinItem("note", note.dateCreated).then(() => {
-        showSnack("Note pinned!", Icon.Check);
-        ev.emit("refreshNotes");
-      })
+      db.notes
+        .note(note.id)
+        .pin() /*db.pinItem("note", note.dateCreated)*/
+        .then(() => {
+          showSnack("Note pinned!", Icon.Check);
+          ev.emit("refreshNotes");
+        })
   },
   {
     title: note.favorite ? "Unfavorite" : "Favorite",
     onClick: async () =>
-      db.favoriteItem("note", note.dateCreated).then(() => {
-        showSnack("Note favorited!", Icon.Check);
-        ev.emit("refreshNotes");
-      })
+      db.notes
+        .note(note.id)
+        .favorite() /*db.favoriteItem("note", note.dateCreated)*/
+        .then(() => {
+          showSnack("Note favorited!", Icon.Check);
+          ev.emit("refreshNotes");
+        })
   },
   { title: "Edit" },
   { title: note.locked ? "Remove lock" : "Lock" }, //TODO
   { title: "Share" },
   {
-    title: "Delete",
+    title: "Move to Trash",
     color: "red",
     onClick: () => {
       ask(
         Icon.Trash2,
         "Delete",
-        "Are you sure you want to delete this note? It will be moved to trash and permanently deleted after 7 days."
+        "Are you sure you want to move this note to Trash? It will be moved to Trash and permanently deleted after 7 days."
       ).then(res => {
         if (res) {
-          ev.emit("onClearNote", note.dateCreated);
-          db.deleteNotes(note)
+          ev.emit("onClearNote", note.id);
+          db.notes
+            .delete(note.id) /*db.deleteNotes(note)*/
             .then(
               //TODO implement undo
               () => {

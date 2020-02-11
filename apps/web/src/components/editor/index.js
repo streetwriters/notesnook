@@ -45,7 +45,7 @@ const modules = {
 export default class Editor extends React.Component {
   title = "";
   timeout = "";
-  timestamp = "";
+  id = "";
   favorite = false;
   pinned = false;
 
@@ -94,7 +94,7 @@ export default class Editor extends React.Component {
     clearTimeout(this.timeout);
     this.saveNote().then(() => {
       this.titleRef.value = "";
-      this.timestamp = undefined;
+      this.id = undefined;
       this.title = undefined;
       this.titleRef.focus();
       this.quill.setText("\n");
@@ -105,15 +105,15 @@ export default class Editor extends React.Component {
     });
   }
 
-  onClearNote(dateCreated = undefined) {
-    if (dateCreated && dateCreated !== this.timestamp) return;
+  onClearNote(id = undefined) {
+    if (id && id !== this.id) return;
     this.onNewNote(false);
   }
 
   onOpenNote(note) {
     if (!note) return;
     this.onNewNote(false, () => {
-      this.timestamp = note.dateCreated;
+      this.id = note.id;
       this.title = note.title;
       this.titleRef.value = note.title;
       this.pinned = note.pinned;
@@ -134,24 +134,24 @@ export default class Editor extends React.Component {
       text: this.quill.getText()
     };
     if (!this.title && (!content.delta || content.text.length <= 1))
-      return this.timestamp;
+      return this.id;
     let note = {
       content,
       title: this.title,
-      dateCreated: this.timestamp,
+      id: this.id,
       favorite: this.favorite,
       pinned: this.pinned,
       colors: this.state.colors
       //TODO add tags once the database is done
     };
-    let t = await db.addNote(note);
+    let t = await db.notes.add(note); //db.addNote(note);
     return t;
   }
 
   save() {
     clearTimeout(this.timeout);
     this.timeout = setTimeout(async () => {
-      this.timestamp = await this.saveNote();
+      this.id = await this.saveNote();
     }, 1000);
   }
 
@@ -190,8 +190,13 @@ export default class Editor extends React.Component {
             ref={ref => (this.quillRef = ref)}
             modules={modules}
             theme="snow"
-            onChange={() => {
+            onChange={e => {
               this.save();
+
+              console.log(this.quill.getText());
+              if (this.quill.getText().length < 20) {
+                ev.emit("refreshNotes");
+              }
             }}
           />
         </Flex>

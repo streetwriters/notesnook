@@ -11,7 +11,8 @@ const Notebooks = props => {
   const [notebooks, setNotebooks] = useState([]);
   useEffect(() => {
     function onRefresh() {
-      setNotebooks(db.getNotebooks());
+      console.log(db.notebooks.all);
+      setNotebooks(db.notebooks.all);
     }
     onRefresh();
     ev.addListener("refreshNotebooks", onRefresh);
@@ -40,7 +41,10 @@ const Notebooks = props => {
               props.navigator.navigate("notes", {
                 title: notebook.title,
                 subtitle: topic.title,
-                notes: db.getTopic(notebook.dateCreated, topic.title)
+                //notes: db.notebooks.notebook(notebook.dateCreated, topic.title)
+                notes: db.notebooks
+                  .notebook(notebook.id)
+                  .topics.topic(topic.title)
               })
             }
           />
@@ -53,14 +57,24 @@ const Notebooks = props => {
       <CreateNotebookDialog
         open={open}
         onDone={async (topics, title, description) => {
-          if (await db.addNotebook({ title, description, topics })) {
-            setNotebooks(db.getNotebooks());
+          if (
+            await db.notebooks.add({
+              title,
+              description,
+              topics
+            }) /*addNotebook({ title, description, topics }))*/
+          ) {
+            setNotebooks(db.notebooks.all /*db.getNotebooks()*/);
             setOpen(false);
           } else {
             showSnack("Please fill out the notebook title.");
           }
+
+          console.log(db.notebooks.notebook());
         }}
-        close={() => setOpen(false)}
+        close={() => {
+          setOpen(false);
+        }}
       />
     </>
   );

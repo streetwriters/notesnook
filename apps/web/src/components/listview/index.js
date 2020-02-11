@@ -11,7 +11,7 @@ function ListView({ type, getItems, menu, button }) {
 
   useEffect(() => {
     function onRefreshItems() {
-      setItems(getItems());
+      setItems(getItems);
     }
     onRefreshItems();
     ev.addListener(`refresh${type}`, onRefreshItems);

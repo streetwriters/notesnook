@@ -1,18 +1,16 @@
+import localforage from "localforage";
+
 async function read(key) {
-  return new Promise((resolve, reject) =>
-    resolve(window.localStorage.getItem(key))
-  );
+  return localforage.getItem(key);
 }
 async function write(key, data) {
-  return new Promise((resolve, reject) =>
-    resolve(window.localStorage.setItem(key, data))
-  );
+  return localforage.setItem(key, data);
 }
 function remove(key) {
-  window.localStorage.removeItem(key);
+  return localforage.removeItem(key);
 }
 function clear() {
-  window.localStorage.clear();
+  return localforage.clear();
 }
 
 function encrypt(password, data) {

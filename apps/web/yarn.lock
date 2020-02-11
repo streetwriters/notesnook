@@ -4350,6 +4350,11 @@ fast-levenshtein@~2.0.6:
   resolved "https://registry.yarnpkg.com/fast-levenshtein/-/fast-levenshtein-2.0.6.tgz#3d8a5c66883a16a30ca8643e851f19baa7797917"
   integrity sha1-PYpcZog6FqMMqGQ+hR8Zuqd5eRc=
 
+fast-sort@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/fast-sort/-/fast-sort-2.0.1.tgz#71d932d2de380d0d6ca449fdc5dbdefdc437e84a"
+  integrity sha512-61gSQXW5KavRau+RBlQbpD3q+tUyrHSKiU/wob4RP58s99uIpydII6MaRpA+t6Td6/WhvU0lgL8UoMPKKv4xYg==
+
 faye-websocket@^0.10.0:
   version "0.10.0"
   resolved "https://registry.yarnpkg.com/faye-websocket/-/faye-websocket-0.10.0.tgz#4e492f8d04dfb6f89003507f6edbf2d501e7c6f4"
@@ -5173,6 +5178,11 @@ ignore@^4.0.6:
   version "4.0.6"
   resolved "https://registry.yarnpkg.com/ignore/-/ignore-4.0.6.tgz#750e3db5862087b4737ebac8207ffd1ef27b25fc"
   integrity sha512-cyFDKrqc/YdcWFniJhzI42+AzS+gNwmUzOSFcRCQYwySuBBBy/KjuxWLZ/FHEH6Moq1NizMOBWyTcv8O4OZIMg==
+
+immediate@~3.0.5:
+  version "3.0.6"
+  resolved "https://registry.yarnpkg.com/immediate/-/immediate-3.0.6.tgz#9db1dbd0faf8de6fbe0f5dd5e56bb606280de69b"
+  integrity sha1-nbHb0Pr43m++D13V5Wu2BigN5ps=
 
 immer@1.10.0:
   version "1.10.0"
@@ -6329,6 +6339,13 @@ levn@^0.3.0, levn@~0.3.0:
     prelude-ls "~1.1.2"
     type-check "~0.3.2"
 
+lie@3.1.1:
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/lie/-/lie-3.1.1.tgz#9a436b2cc7746ca59de7a41fa469b3efb76bd87e"
+  integrity sha1-mkNrLMd0bKWd56QfpGmz77dr2H4=
+  dependencies:
+    immediate "~3.0.5"
+
 lines-and-columns@^1.1.6:
   version "1.1.6"
   resolved "https://registry.yarnpkg.com/lines-and-columns/-/lines-and-columns-1.1.6.tgz#1c00c743b433cd0a4e80758f7b64a57440d9ff00"
@@ -6375,6 +6392,13 @@ loader-utils@1.2.3, loader-utils@^1.0.1, loader-utils@^1.0.2, loader-utils@^1.1.
     big.js "^5.2.2"
     emojis-list "^2.0.0"
     json5 "^1.0.1"
+
+localforage@^1.7.3:
+  version "1.7.3"
+  resolved "https://registry.yarnpkg.com/localforage/-/localforage-1.7.3.tgz#0082b3ca9734679e1bd534995bdd3b24cf10f204"
+  integrity sha512-1TulyYfc4udS7ECSBT2vwJksWbkwwTX8BzeUIiq8Y07Riy7bDAAnxDaPU/tWyOVmQAcWJIEIFP9lPfBGqVoPgQ==
+  dependencies:
+    lie "3.1.1"
 
 locate-path@^2.0.0:
   version "2.0.0"
@@ -6995,11 +7019,14 @@ normalize-url@^3.0.0, normalize-url@^3.0.1:
   integrity sha512-U+JJi7duF1o+u2pynbp2zXDW2/PADgC30f0GsHZtRh+HOcXHnw137TrNlyxxRvWW5fjKd3bcLHPxofWuCjaeZg==
 
 "notes-core@https://github.com/thecodrr/notes-core.git":
-  version "0.3.0"
-  resolved "https://github.com/thecodrr/notes-core.git#5093b6af27faa620c7dcb611c678041a4c024596"
+  version "1.1.0"
+  resolved "https://github.com/thecodrr/notes-core.git#80e2c67fa8c9105db42ddac62e6054b139d9ad68"
   dependencies:
+    fast-sort "^2.0.1"
     fuzzysearch "^1.0.3"
     node-fetch "^2.6.0"
+    qclone "^1.0.4"
+    teleport-javascript "^1.0.0"
     transfun "^1.0.2"
 
 npm-bundled@^1.0.1:
@@ -8432,6 +8459,11 @@ q@^1.1.2:
   version "1.5.1"
   resolved "https://registry.yarnpkg.com/q/-/q-1.5.1.tgz#7e32f75b41381291d04611f1bf14109ac00651d7"
   integrity sha1-fjL3W0E4EpHQRhHxvxQQmsAGUdc=
+
+qclone@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/qclone/-/qclone-1.0.4.tgz#a0e6657f6a77c5e5dfa75139670a177547120c4e"
+  integrity sha512-PJerDoeC0mU6WCBfshfgu6oYPju7CDHlvF/7tt/ZVN37L04nZ0zZSgs0Ds3QyX7psfPA91DvkTR80WTW79Uy+Q==
 
 qs@6.7.0:
   version "6.7.0"
@@ -9950,6 +9982,11 @@ tar@^4:
     mkdirp "^0.5.0"
     safe-buffer "^5.1.2"
     yallist "^3.0.3"
+
+teleport-javascript@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/teleport-javascript/-/teleport-javascript-1.0.0.tgz#c9397fad598d662027e4d3a5fa7e7da1c8361547"
+  integrity sha512-j1llvWVFyEn/6XIFDfX5LAU43DXe0GCt3NfXDwJ8XpRRMkS+i50SAkonAONBy+vxwPFBd50MFU8a2uj8R/ccLg==
 
 terser-webpack-plugin@1.4.1, terser-webpack-plugin@^1.4.1:
   version "1.4.1"

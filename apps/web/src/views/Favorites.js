@@ -15,11 +15,16 @@ const menuItems = item => [
         "Are you sure you want to remove this item from favorites?"
       ).then(res => {
         if (res) {
-          db.favoriteItem(item.type, item.dateCreated).then(() => {
-            let itemType = item.type[0] + item.type.substring(1);
-            showSnack(itemType + " Unfavorited!", Icon.Check);
-            ev.emit(`refreshFavorites`);
-          });
+          item.type === "notes"
+            ? db.notes.favorites(item.id)
+            : db.notebooks
+                .notebook(item.id)
+                .favorite() /*db.favoriteItem(item.type, item.dateCreated)*/
+                .then(() => {
+                  let itemType = item.type[0] + item.type.substring(1);
+                  showSnack(itemType + " Unfavorited!", Icon.Check);
+                  ev.emit(`refreshFavorites`);
+                });
         }
       });
     }
@@ -35,10 +40,14 @@ const menuItems = item => [
       ).then(res => {
         if (res) {
           let itemType = item.type[0] + item.type.substring(1);
-          db["delete" + itemType]([item]).then(() => {
-            showSnack(itemType + " Deleted!", Icon.Trash);
-            ev.emit(`refreshFavorites`);
-          });
+          itemType === "notes"
+            ? db.notes.delete([item])
+            : db.notebooks
+                .delete([item]) /*db["delete" + itemType]([item])*/
+                .then(() => {
+                  showSnack(itemType + " Deleted!", Icon.Trash);
+                  ev.emit(`refreshFavorites`);
+                });
         }
       });
     }
@@ -49,7 +58,7 @@ function Favorites() {
   return (
     <ListItem
       type="Favorites"
-      getItems={db.getFavorites.bind(db)}
+      getItems={db.notes.favorites /*db.getFavorites.bind(db)*/}
       menu={{ menuItems, dropdownRefs }}
       button={undefined}
     />
