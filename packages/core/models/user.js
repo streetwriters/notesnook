@@ -73,8 +73,8 @@ function userFromResponse(response) {
   dt.setDate(dt.getDate() + 1);
   let user = {
     ...response.payload,
-    accessToken: response.accessToken,
-    refreshToken: response.refreshToken,
+    accessToken: response.access_token,
+    refreshToken: response.refresh_token,
     scopes: response.scopes,
     expiry: dt.getTime()
   };
