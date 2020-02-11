@@ -67,8 +67,7 @@ export default class Notes {
       tags: note.tags || [],
       favorite: !!note.favorite,
       headline: getNoteHeadline(note),
-      dateEdited: Date.now(),
-      dateCreated: note.dateCreated || Date.now()
+      dateCreated: note.dateCreated
     };
 
     if (!oldNote) {

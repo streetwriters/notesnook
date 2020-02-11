@@ -30,6 +30,7 @@ export default class CachedCollection {
     let exists = this.map.has(item.id);
     await this.updateItem(item);
     if (!exists) {
+      item.dateCreated = Date.now();
       await this.indexer.index(item.id);
     }
   }
@@ -37,7 +38,7 @@ export default class CachedCollection {
   async updateItem(item) {
     if (this.transactionOpen) return;
     if (!item.id) throw new Error("The item must contain the id field.");
-
+    item.dateEdited = Date.now();
     this.map.set(item.id, item);
     await this.indexer.write(item.id, item);
   }

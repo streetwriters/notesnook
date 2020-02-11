@@ -76,12 +76,13 @@ export default class Topics {
 }
 
 function makeTopic(topic, notebookId) {
-  if (typeof topic !== "string") return topic;
+  if (typeof topic !== "string") return { ...topic, dateEdited: Date.now() };
   return {
     type: "topic",
     notebookId,
     title: topic,
     dateCreated: Date.now(),
+    dateEdited: Date.now(),
     totalNotes: 0,
     notes: []
   };
