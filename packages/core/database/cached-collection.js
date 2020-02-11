@@ -28,9 +28,11 @@ export default class CachedCollection {
     if (!item.id) throw new Error("The item must contain the id field.");
 
     let exists = this.map.has(item.id);
-    await this.updateItem(item);
     if (!exists) {
       item.dateCreated = item.dateCreated || Date.now();
+    }
+    await this.updateItem(item);
+    if (!exists) {
       await this.indexer.index(item.id);
     }
   }

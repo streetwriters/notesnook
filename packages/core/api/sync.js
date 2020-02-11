@@ -26,7 +26,7 @@
  * And then it should continue.
  */
 import Database from "./index";
-import { HOST } from "../utils/constants";
+import { HOST,HEADERS } from "../utils/constants";
 import fetch from "node-fetch";
 
 export default class Sync {
@@ -54,13 +54,14 @@ export default class Sync {
     let lastSyncedTimestamp = user.lastSyncedTimestamp || 0;
     let serverResponse = await this._fetch(lastSyncedTimestamp);
     let data = this._merge({ serverResponse, lastSyncedTimestamp, user });
-    await this.db.user.set({ lastSyncedTimestamp: data.lastSynced });
+    await this.db.user.set({ lastSynced: data.lastSynced });
     await this._send(data);
     return true;
   }
 
   _merge({ serverResponse, lastSyncedTimestamp, user }) {
     const { notes, notebooks /* tags, colors, trash */ } = serverResponse;
+   
     notes.forEach(async note => {
       note = JSON.parse(note.data);
       let localNote = this.db.notes.note(note.id);
@@ -78,6 +79,7 @@ export default class Sync {
     // TODO trash, colors, tags
     return {
       notes: this.db.notes
+        .all
         .filter(v => v.dateEdited > lastSyncedTimestamp)
         .map(v => ({
           dateEdited: v.dateEdited,
@@ -86,6 +88,7 @@ export default class Sync {
           userId: user.Id
         })),
       notebooks: this.db.notebooks
+        .all
         .filter(v => v.dateEdited > lastSyncedTimestamp)
         .map(v => ({
           dateEdited: v.dateEdited,
@@ -101,7 +104,11 @@ export default class Sync {
   }
 
   async _send(data) {
+   
+
     //TODO encrypt the payload
+    let token = await this.db.user.token();
+    if (!token) return;
     let response = await fetch(`${HOST}sync`, {
       method: "POST",
       headers: { ...HEADERS, Authorization: `Bearer ${token}` },

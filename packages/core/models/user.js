@@ -32,9 +32,9 @@ export default class User {
   }
 
   async token() {
-    let user = await this.user();
+    let user = await this.get();
     if (!user) return;
-    if (user.expiry < Date.now()) {
+    if (user.expiry > Date.now()) {
       return user.accessToken;
     }
     let response = await authRequest("oauth/token", {
