@@ -11,6 +11,7 @@ export const defaultState = {
   pinned: [],
   tags: [],
   colorNotes: [],
+  user: {},
   colors: {
     night: false,
     bg: 'white',

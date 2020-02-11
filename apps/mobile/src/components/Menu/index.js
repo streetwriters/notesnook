@@ -22,15 +22,12 @@ import {
   setColorScheme,
   SIZE,
   WEIGHT,
+  ph,
 } from '../../common/common';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
-import {
-  eOpenLoginDialog,
-  eOpenModalMenu,
-  eSendSideMenuOverlayRef,
-} from '../../services/events';
+import {eOpenModalMenu, eSendSideMenuOverlayRef} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
 
 export const Menu = ({
@@ -74,12 +71,7 @@ export const Menu = ({
         }),
       close: true,
     },
-    {
-      name: 'Lists',
-      icon: 'list',
-      func: () => NavigationService.navigate('Lists'),
-      close: true,
-    },
+
     {
       name: 'Favorites',
       icon: 'star',
@@ -88,7 +80,16 @@ export const Menu = ({
     },
 
     {
-      name: 'Dark Mode',
+      name: 'Trash',
+      icon: 'trash',
+      func: () => NavigationService.navigate('Trash'),
+      close: true,
+    },
+  ];
+
+  const listItems2 = [
+    {
+      name: 'Night mode',
       icon: 'moon',
       func: () => {
         if (!colors.night) {
@@ -105,12 +106,6 @@ export const Menu = ({
       close: false,
     },
     {
-      name: 'Trash',
-      icon: 'trash',
-      func: () => NavigationService.navigate('Trash'),
-      close: true,
-    },
-    {
       name: 'Settings',
       icon: 'settings',
       func: () => NavigationService.navigate('Settings'),
@@ -124,7 +119,7 @@ export const Menu = ({
         height: '100%',
         opacity: hide ? 0 : 1,
         width: '100%',
-        backgroundColor: colors.shade,
+        backgroundColor: 'transparent',
         borderRightWidth: noTextMode ? 1 : 0,
         borderRightColor: noTextMode ? colors.accent : 'transparent',
       }}>
@@ -132,7 +127,7 @@ export const Menu = ({
         style={{
           minHeight: 2,
           width: '100%',
-          paddingHorizontal: noTextMode ? 0 : 12,
+          paddingHorizontal: noTextMode ? 0 : ph,
           height: DDS.isTab ? 50 : 0,
           marginBottom: 0,
           alignItems: 'center',
@@ -235,7 +230,7 @@ export const Menu = ({
                 }}>
                 <Icon
                   style={{
-                    minWidth: noTextMode ? 5 : 30,
+                    minWidth: noTextMode ? 5 : 40,
                   }}
                   name={item.icon}
                   color={colors.accent}
@@ -288,7 +283,7 @@ export const Menu = ({
             }}>
             <Icon
               style={{
-                minWidth: noTextMode ? 5 : 30,
+                minWidth: noTextMode ? 5 : 40,
               }}
               name="tag"
               color={colors.accent}
@@ -298,7 +293,7 @@ export const Menu = ({
               <Text
                 style={{
                   fontFamily: WEIGHT.regular,
-                  fontSize: SIZE.sm,
+                  fontSize: SIZE.sm - 1,
                   color: colors.pri,
                 }}>
                 Tags
@@ -473,13 +468,13 @@ export const Menu = ({
       <View
         style={{
           width: '100%',
-          justifyContent: noTextMode ? 'center' : 'space-between',
+          justifyContent: noTextMode ? 'center' : 'center',
           alignItems: 'center',
           alignSelf: 'center',
           marginBottom: 15,
-          flexDirection: 'row',
+          paddingHorizontal: ph,
         }}>
-        <TouchableOpacity
+        {/*  <TouchableOpacity
           onPress={() => {
             close();
 
@@ -496,7 +491,14 @@ export const Menu = ({
             alignItems: 'center',
             flexDirection: 'row',
           }}>
-          <Icon name="log-in" color={colors.accent} size={SIZE.lg} />
+          <Icon
+            style={{
+              minWidth: 40,
+            }}
+            name="log-in"
+            color={colors.accent}
+            size={SIZE.lg}
+          />
 
           {noTextMode ? null : (
             <Text
@@ -508,45 +510,138 @@ export const Menu = ({
               {'  '}Login
             </Text>
           )}
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
-        {/* <Text
-        style={{
-          fontFamily: WEIGHT.semibold,
-          color: colors.accent,
-          fontSize: SIZE.md,
-          marginTop: 10,
-        }}>
-        Hi, Ammar!
-      </Text>
-
-      <Text
-        style={{
-          fontFamily: WEIGHT.regular,
-          color: colors.accent,
-          fontSize: SIZE.xs,
-          marginTop: 10,
-        }}>
-        80.45/100 MB
-      </Text> */}
-
-        {/*  <View
-        style={{
-          borderRadius: 2.5,
-          backgroundColor: colors.accent,
-          marginTop: 10,
-          paddingHorizontal: 5,
-          paddingVertical: 2,
-        }}>
-        <Text
+        <View
           style={{
-            fontFamily: WEIGHT.bold,
-            fontSize: SIZE.xxs,
-            color: 'white',
+            width: '100%',
           }}>
-          Basic User
-        </Text>
-      </View> */}
+          {listItems2.map((item, index) => (
+            <TouchableOpacity
+              key={item.name}
+              activeOpacity={opacity / 2}
+              onPress={() => {
+                item.close === false ? null : close();
+
+                item.func();
+              }}
+              style={{
+                width: '100%',
+                alignSelf: 'center',
+                flexDirection: 'row',
+                justifyContent: noTextMode ? 'center' : 'space-between',
+                alignItems: 'center',
+                paddingBottom: noTextMode ? pv + 2 : normalize(15),
+                paddingTop:
+                  index === 0 ? pv : noTextMode ? pv + 2 : normalize(15),
+              }}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                }}>
+                <Icon
+                  style={{
+                    minWidth: noTextMode ? 5 : 40,
+                  }}
+                  name={item.icon}
+                  color={colors.accent}
+                  size={SIZE.md}
+                />
+                {noTextMode ? null : (
+                  <Text
+                    style={{
+                      fontFamily: WEIGHT.regular,
+                      fontSize: SIZE.sm - 1,
+                      color: colors.pri,
+                    }}>
+                    {item.name}
+                  </Text>
+                )}
+              </View>
+
+              {item.switch && !noTextMode ? (
+                <Icon
+                  size={SIZE.lg}
+                  color={item.on ? colors.accent : colors.icon}
+                  name={item.on ? 'toggle-right' : 'toggle-left'}
+                />
+              ) : (
+                undefined
+              )}
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        <View
+          style={{
+            width: '100%',
+            borderRadius: 5,
+            backgroundColor: colors.shade,
+          }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              backgroundColor: colors.accent,
+              borderRadius: 5,
+              paddingHorizontal: 5,
+              paddingVertical: 5,
+              elevation: 2,
+            }}>
+            <Text
+              style={{
+                fontFamily: WEIGHT.regular,
+                color: 'white',
+                fontSize: SIZE.xs,
+              }}>
+              <Icon name="user" /> ammarahmed6506
+            </Text>
+            <Text
+              style={{
+                fontFamily: WEIGHT.regular,
+                fontSize: SIZE.xs,
+                color: 'white',
+              }}>
+              Basic
+            </Text>
+          </View>
+
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+
+              paddingHorizontal: 5,
+              paddingVertical: pv,
+            }}>
+            <Text
+              style={{
+                fontFamily: WEIGHT.regular,
+                color: colors.pri,
+                fontSize: SIZE.xxs,
+              }}>
+              <Icon color={colors.accent} name="refresh-ccw" /> Synced 3 mins
+              ago.
+            </Text>
+
+            <TouchableOpacity
+              style={{
+                borderWidth: 1,
+                borderColor: colors.accent,
+                width: 16,
+                height: 16,
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderRadius: 100,
+                paddingTop: 1.5,
+              }}>
+              <Icon size={SIZE.xxs} color={colors.accent} name="check" />
+            </TouchableOpacity>
+          </View>
+        </View>
       </View>
     </SafeAreaView>
   );

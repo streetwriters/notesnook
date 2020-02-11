@@ -137,11 +137,11 @@ export const SIZE = {
   xxs: 10,
   xs: 12,
   sm: normalize(15),
-  md: normalize(18),
+  md: normalize(17),
   lg: normalize(24),
-  xl: normalize(28),
-  xxl: normalize(32),
-  xxxl: normalize(36),
+  xl: normalize(27),
+  xxl: normalize(31),
+  xxxl: normalize(34),
 };
 
 export const br = 5; // border radius

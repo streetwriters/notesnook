@@ -18,6 +18,13 @@ export const reducer = (state, action) => {
         colors: {...action.colors},
       };
     }
+    case ACTIONS.USER: {
+      let user = action.user;
+      return {
+        ...state,
+        user: user,
+      };
+    }
     case ACTIONS.NOTEBOOKS: {
       let notebooks = [...db.notebooks.all];
       return {

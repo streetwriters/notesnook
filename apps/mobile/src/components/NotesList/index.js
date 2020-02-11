@@ -112,19 +112,11 @@ export const NotesList = ({isGrouped = false}) => {
           <Text
             style={{
               color: colors.icon,
-              fontSize: SIZE.md,
+              fontSize: SIZE.sm,
               fontFamily: WEIGHT.regular,
-              marginTop: 20,
+              marginTop: 35,
             }}>
             Notes you write will appear here.
-          </Text>
-          <Text
-            style={{
-              fontSize: SIZE.sm,
-              color: colors.icon,
-              marginTop: 20,
-            }}>
-            No notes found
           </Text>
         </>
       )}

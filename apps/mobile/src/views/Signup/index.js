@@ -2,30 +2,35 @@ import React, {createRef, useEffect, useState} from 'react';
 import {SafeAreaView, Text, TouchableOpacity, View} from 'react-native';
 import {TextInput} from 'react-native-gesture-handler';
 import {useIsFocused} from 'react-navigation-hooks';
-import {DDS} from '../../../App';
+import {DDS, db} from '../../../App';
 import {opacity, pv, SIZE, WEIGHT} from '../../common/common';
 import {Header} from '../../components/header';
 import {useTracked} from '../../provider';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
 import {eLoginDialogNavigateBack} from '../../services/events';
+
+const _email = createRef();
+const _pass = createRef();
+const _username = createRef();
+
 import {
   validateUsername,
   validateEmail,
   validatePass,
 } from '../../services/validation';
 import Icon from 'react-native-vector-icons/Feather';
+import {ToastEvent} from '../../utils/utils';
+import {ACTIONS} from '../../provider/actions';
 export const Signup = ({navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors, isLoginNavigator} = state;
-  const _email = createRef();
-  const _pass = createRef();
-  const _username = createRef();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
+  const [invalidUsername, setInvalidUsername] = useState(false);
   const [invalidEmail, setInvalidEmail] = useState(false);
   const [invalidPassword, setInvalidPassword] = useState(false);
-  const [invalidUsername, setInvalidUsername] = useState(false);
 
   let isFocused = useIsFocused();
 
@@ -39,6 +44,29 @@ export const Signup = ({navigation}) => {
       eUnSubscribeEvent(eLoginDialogNavigateBack, handleBackPress);
     };
   }, [isFocused]);
+
+  const _signUp = async () => {
+    if (!invalidEmail && !invalidPassword && !invalidUsername) {
+      try {
+        await db.user.signup(username, email, password);
+      } catch (e) {
+        console.log(e, 'signup');
+      }
+
+      let user;
+
+      try {
+        user = await db.user.user.get();
+        dispatch({type: ACTIONS.USER, user: user});
+      } catch (e) {
+        console.log('e', 'getUSer');
+      }
+
+      console.log(user);
+    } else {
+      ToastEvent.show('Signup failed', 'error');
+    }
+  };
 
   return (
     <SafeAreaView
@@ -331,6 +359,7 @@ export const Signup = ({navigation}) => {
           </View>
           <TouchableOpacity
             activeOpacity={opacity}
+            onPress={_signUp}
             style={{
               padding: pv,
               backgroundColor: colors.accent,

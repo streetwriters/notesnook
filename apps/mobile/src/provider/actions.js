@@ -14,4 +14,5 @@ export const ACTIONS = {
   CURRENT_EDITING_NOTE: 'currentEditingNote',
   COLORS: 'colorNotes',
   SEARCH_RESULTS: 'searchResults',
+  USER: 'getUser',
 };
