@@ -1,6 +1,6 @@
 import React from 'react';
 import {Text, TouchableOpacity, View} from 'react-native';
-import Icon from 'react-native-vector-icons/Feather';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {opacity, pv, SIZE, WEIGHT} from '../../common/common';
 import Container from '../../components/Container';
 import {useTracked} from '../../provider';
@@ -51,7 +51,7 @@ const EditorSettings = ({navigation}) => {
           <Icon
             size={SIZE.xl}
             color={colors.night ? colors.accent : colors.icon}
-            name={colors.night ? 'toggle-right' : 'toggle-left'}
+            name={colors.night ? 'toggle-switch' : 'toggle-switch-off'}
           />
         </TouchableOpacity>
         <TouchableOpacity

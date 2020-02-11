@@ -8,7 +8,7 @@ import {
   View,
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import Icon from 'react-native-vector-icons/Feather';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
@@ -69,7 +69,6 @@ export const SelectionHeader = ({navigation}) => {
               alignItems: 'flex-start',
               height: 40,
               width: 50,
-              marginTop: 2.5,
             }}>
             <Icon
               style={{
@@ -119,7 +118,7 @@ export const SelectionHeader = ({navigation}) => {
               paddingLeft: 25,
             }}
             color={colors.errorText}
-            name={'trash'}
+            name={'delete'}
             size={SIZE.xl - 3}
           />
         </View>

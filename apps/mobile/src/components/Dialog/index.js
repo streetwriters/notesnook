@@ -6,7 +6,7 @@ import {
   View,
   DeviceEventEmitter,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/Feather';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {db, DDS} from '../../../App';
 import {opacity, ph, pv, SIZE, WEIGHT} from '../../common/common';
 import {ACTIONS} from '../../provider/actions';

@@ -1,7 +1,7 @@
 import React, {createRef, useEffect, useState} from 'react';
 import {TextInput} from 'react-native';
 import Animated, {Easing} from 'react-native-reanimated';
-import Icon from 'react-native-vector-icons/Feather';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {DDS} from '../../../App';
 import {br, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
@@ -98,7 +98,7 @@ export const Search = props => {
               text: '',
             });
           }}
-          name={searchResults.length > 0 ? 'x' : 'search'}
+          name={searchResults.length > 0 ? 'x' : 'magnify'}
           color={
             focus
               ? props.headerColor

@@ -1,29 +1,9 @@
 import React from 'react';
-import {
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-  StatusBar,
-} from 'react-native';
-import FastStorage from 'react-native-fast-storage';
+import {Text, TouchableOpacity, View} from 'react-native';
 import {FlatList} from 'react-native-gesture-handler';
-import Icon from 'react-native-vector-icons/Feather';
-import {
-  ACCENT,
-  COLOR_SCHEME,
-  COLOR_SCHEME_DARK,
-  COLOR_SCHEME_LIGHT,
-  opacity,
-  pv,
-  SIZE,
-  WEIGHT,
-  setColorScheme,
-} from '../../common/common';
+import {opacity, pv, SIZE, WEIGHT} from '../../common/common';
 import Container from '../../components/Container';
-import {Header} from '../../components/header';
 import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
 import NavigationService from '../../services/NavigationService';
 import {w} from '../../utils/utils';
 export const Settings = ({navigation}) => {

@@ -6,7 +6,7 @@ import {useTracked} from '../../provider';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
 import {eHideToast, eShowToast} from '../../services/events';
 import {h, w} from '../../utils/utils';
-import Icon from 'react-native-vector-icons/Feather';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {DDS} from '../../../App';
 
 const AnimatedTouchableOpacity = Animatable.createAnimatableComponent(
@@ -106,8 +106,8 @@ export const Toast = () => {
           <Icon
             name={
               toastStyle.color === colors.errorText
-                ? 'alert-circle'
-                : 'check-circle'
+                ? 'alert-circle-outline'
+                : 'check-circle-outline'
             }
             color={toastStyle.color}
             size={SIZE.sm}

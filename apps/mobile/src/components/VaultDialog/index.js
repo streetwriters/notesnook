@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {View, Text, TouchableOpacity, Modal} from 'react-native';
 import {SIZE, ph, pv, opacity, WEIGHT} from '../../common/common';
-import Icon from 'react-native-vector-icons/Feather';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {TextInput} from 'react-native-gesture-handler';
 import {db} from '../../../App';
 import {getElevation} from '../../utils/utils';

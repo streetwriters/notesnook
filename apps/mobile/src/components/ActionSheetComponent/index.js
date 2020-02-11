@@ -8,7 +8,7 @@ import {
   View,
 } from 'react-native';
 import FastStorage from 'react-native-fast-storage';
-import Icon from 'react-native-vector-icons/Feather';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {db, DDS} from '../../../App';
 import {
   ACCENT,
@@ -174,7 +174,7 @@ export const ActionSheetComponent = ({
   const rowItemsData = [
     {
       name: 'Add to',
-      icon: 'book',
+      icon: 'book-outline',
       func: () => {
         dispatch({type: ACTIONS.MODAL_NAVIGATOR, enabled: true});
         dispatch({type: ACTIONS.SELECTED_ITEMS, item: note});
@@ -209,31 +209,31 @@ export const ActionSheetComponent = ({
     },
     {
       name: 'Delete',
-      icon: 'trash',
+      icon: 'delete',
       func: () => close('delete'),
     },
     {
       name: 'Edit Notebook',
-      icon: 'trash',
+      icon: 'square-edit-outline',
       func: () => {
         close('notebook');
       },
     },
     {
       name: 'Edit Topic',
-      icon: 'trash',
+      icon: 'square-edit-outline',
       func: () => {
         close('topic');
       },
     },
     {
       name: 'Open',
-      icon: 'arrow-up-right',
+      icon: 'open-in-app',
       func: () => {},
     },
     {
       name: 'Restore',
-      icon: 'trash',
+      icon: 'delete-restore',
       func: async () => {
         await db.trash.restore(note.id);
         dispatch({type: ACTIONS.TRASH});
@@ -250,7 +250,7 @@ export const ActionSheetComponent = ({
     },
     {
       name: 'Remove',
-      icon: 'trash',
+      icon: 'delete',
       func: () => {
         close();
       },
@@ -260,7 +260,7 @@ export const ActionSheetComponent = ({
   const columnItemsData = [
     {
       name: 'Dark Mode',
-      icon: 'moon',
+      icon: 'theme-light-dark',
       func: () => {
         if (!colors.night) {
           FastStorage.setItem('theme', JSON.stringify({night: true}));
@@ -276,7 +276,7 @@ export const ActionSheetComponent = ({
     },
     {
       name: 'Pin',
-      icon: 'tag',
+      icon: 'tag-outline',
       func: async () => {
         if (!note.id) return;
         if (note.type === 'note') {
@@ -310,7 +310,7 @@ export const ActionSheetComponent = ({
     },
     {
       name: 'Add to Vault',
-      icon: 'lock',
+      icon: 'shield',
       func: () => {
         if (!note.id) return;
         note.locked ? close('unlock') : close('lock');
@@ -471,27 +471,19 @@ export const ActionSheetComponent = ({
           <Icon
             size={SIZE.lg + 2}
             color={item.on ? colors.accent : colors.icon}
-            name={item.on ? 'toggle-right' : 'toggle-left'}
+            name={item.on ? 'toggle-switch' : 'toggle-switch-off'}
           />
         ) : (
           undefined
         )}
         {item.check ? (
-          <TouchableOpacity
-            style={{
-              borderWidth: 2,
-              borderColor: item.on ? colors.accent : colors.icon,
-              width: 23,
-              height: 23,
-              justifyContent: 'center',
-              alignItems: 'center',
-              borderRadius: 100,
-              paddingTop: 3,
-            }}>
-            {item.on ? (
-              <Icon size={SIZE.sm - 2} color={colors.accent} name="check" />
-            ) : null}
-          </TouchableOpacity>
+          <Icon
+            name={
+              item.on ? 'check-circle-outline' : 'checkbox-blank-circle-outline'
+            }
+            color={item.on ? colors.accent : colors.icon}
+            size={SIZE.lg + 2}
+          />
         ) : null}
       </TouchableOpacity>
     ) : null;

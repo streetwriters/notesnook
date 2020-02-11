@@ -1,7 +1,7 @@
 import React from 'react';
 import {Modal, Text, TouchableOpacity, View} from 'react-native';
 import {TextInput} from 'react-native-gesture-handler';
-import Icon from 'react-native-vector-icons/Feather';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {opacity, ph, pv, SIZE, WEIGHT} from '../../common/common';
 
 import {getElevation, ToastEvent} from '../../utils/utils';
@@ -90,7 +90,7 @@ export class AddTopicDialog extends React.Component {
                 justifyContent: 'center',
                 alignItems: 'center',
               }}>
-              <Icon name="book-open" color={colors.accent} size={SIZE.lg} />
+              <Icon name="book-outline" color={colors.accent} size={SIZE.lg} />
               <Text
                 style={{
                   color: colors.accent,

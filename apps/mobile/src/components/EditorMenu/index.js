@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import FastStorage from 'react-native-fast-storage';
 import {TextInput} from 'react-native-gesture-handler';
-import Icon from 'react-native-vector-icons/Feather';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
   COLOR_SCHEME_DARK,
   COLOR_SCHEME_LIGHT,

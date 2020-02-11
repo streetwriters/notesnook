@@ -1,6 +1,6 @@
 import React from 'react';
 import {Dimensions, Text, TouchableOpacity, View} from 'react-native';
-import Icon from 'react-native-vector-icons/Feather';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {DDS} from '../../../App';
 import {ph, pv, SIZE, WEIGHT} from '../../common/common';
 import {eSendEvent} from '../../services/eventManager';

@@ -7,7 +7,7 @@ import {
   View,
 } from 'react-native';
 import FastStorage from 'react-native-fast-storage';
-import Icon from 'react-native-vector-icons/Feather';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
   ACCENT,
   COLOR_SCHEME,
@@ -158,7 +158,7 @@ const AppearanceSettings = ({navigation}) => {
             <Icon
               size={SIZE.xl}
               color={colors.night ? colors.accent : colors.icon}
-              name={colors.night ? 'toggle-right' : 'toggle-left'}
+              name={colors.night ? 'toggle-switch' : 'toggle-switch-off'}
             />
           </TouchableOpacity>
 

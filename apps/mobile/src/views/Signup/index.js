@@ -18,7 +18,7 @@ import {
   validateEmail,
   validatePass,
 } from '../../services/validation';
-import Icon from 'react-native-vector-icons/Feather';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {ToastEvent} from '../../utils/utils';
 import {ACTIONS} from '../../provider/actions';
 export const Signup = ({navigation}) => {
@@ -103,7 +103,7 @@ export const Signup = ({navigation}) => {
             }}>
             {invalidUsername ? (
               <Icon
-                name="alert-circle"
+                name="alert-circle-outline"
                 size={SIZE.xs}
                 color={colors.errorText}
               />
@@ -194,7 +194,7 @@ export const Signup = ({navigation}) => {
               }}>
               {invalidEmail ? (
                 <Icon
-                  name="alert-circle"
+                  name="alert-circle-outline"
                   size={SIZE.xs}
                   color={colors.errorText}
                 />
@@ -285,7 +285,7 @@ export const Signup = ({navigation}) => {
               }}>
               {invalidPassword ? (
                 <Icon
-                  name="alert-circle"
+                  name="alert-circle-outline"
                   size={SIZE.xs}
                   color={colors.errorText}
                 />

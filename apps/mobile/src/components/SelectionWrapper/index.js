@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {TouchableWithoutFeedback, View} from 'react-native';
-import Icon from 'react-native-vector-icons/Feather';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {SIZE} from '../../common/common';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
@@ -57,21 +57,15 @@ const SelectionWrapper = ({children, item, currentEditingNote, index}) => {
             justifyContent: 'center',
             alignItems: 'center',
           }}>
-          <View
-            style={{
-              borderWidth: 2,
-              borderColor: selected ? colors.accent : colors.icon,
-              width: 25,
-              height: 25,
-              justifyContent: 'center',
-              alignItems: 'center',
-              borderRadius: 100,
-              paddingTop: 2,
-            }}>
-            {selected ? (
-              <Icon size={SIZE.sm} color={colors.accent} name="check" />
-            ) : null}
-          </View>
+          <Icon
+            size={SIZE.sm}
+            color={colors.accent}
+            name={
+              selected
+                ? 'check-circle-outline'
+                : 'checkbox-blank-circle-outline'
+            }
+          />
         </TouchableWithoutFeedback>
       </View>
 

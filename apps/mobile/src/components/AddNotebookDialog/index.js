@@ -8,7 +8,7 @@ import {
   View,
 } from 'react-native';
 import {FlatList, TextInput} from 'react-native-gesture-handler';
-import Icon from 'react-native-vector-icons/Feather';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {db, DDS} from '../../../App';
 import {opacity, ph, pv, SIZE, WEIGHT} from '../../common/common';
 import {ACTIONS} from '../../provider/actions';
@@ -225,7 +225,7 @@ export class AddNotebookDialog extends React.Component {
                 justifyContent: 'center',
                 alignItems: 'center',
               }}>
-              <Icon name="book-open" color={colors.accent} size={SIZE.lg} />
+              <Icon name="book-outline" color={colors.accent} size={SIZE.lg} />
               <Text
                 style={{
                   color: colors.accent,
