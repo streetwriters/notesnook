@@ -540,7 +540,7 @@ export const Menu = ({
           ))}
         </View>
 
-        {user.username ? (
+        {user && user.username ? (
           <View
             style={{
               width: '100%',
