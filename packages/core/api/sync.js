@@ -53,20 +53,23 @@ export default class Sync {
     if (!user) return false;
     let lastSyncedTimestamp = user.lastSyncedTimestamp || 0;
     let serverResponse = await this._fetch(lastSyncedTimestamp);
-    let data = this._merge(serverResponse, lastSyncedTimestamp);
+    let data = this._merge({ serverResponse, lastSyncedTimestamp, user });
+    await this.db.user.set({ lastSyncedTimestamp: data.lastSynced });
     await this._send(data);
     return true;
   }
 
-  _merge(serverResponse, lastSyncedTimestamp) {
+  _merge({ serverResponse, lastSyncedTimestamp, user }) {
     const { notes, notebooks /* tags, colors, trash */ } = serverResponse;
     notes.forEach(async note => {
+      note = JSON.parse(note.data);
       let localNote = this.db.notes.note(note.id);
       if (!localNote || note.dateEdited > localNote.data.dateEdited) {
         await this.db.notes.add({ ...note, remote: true });
       }
     });
     notebooks.forEach(async nb => {
+      nb = JSON.parse(nb.data);
       let localNb = this.db.notebooks.notebook(nb.id);
       if (!localNb || nb.dateEdited > localNb.data.dateEdited) {
         await this.db.notebooks.add({ ...nb, remote: true });
@@ -74,13 +77,26 @@ export default class Sync {
     });
     // TODO trash, colors, tags
     return {
-      notes: this.db.notes.filter(v => v.dateEdited > lastSyncedTimestamp),
-      notebooks: this.db.notebooks.filter(
-        v => v.dateEdited > lastSyncedTimestamp
-      ),
+      notes: this.db.notes
+        .filter(v => v.dateEdited > lastSyncedTimestamp)
+        .map(v => ({
+          dateEdited: v.dateEdited,
+          dateCreated: v.dateCreated,
+          data: JSON.stringify(v),
+          userId: user.Id
+        })),
+      notebooks: this.db.notebooks
+        .filter(v => v.dateEdited > lastSyncedTimestamp)
+        .map(v => ({
+          dateEdited: v.dateEdited,
+          dateCreated: v.dateCreated,
+          data: JSON.stringify(v),
+          userId: user.Id
+        })),
       tags: [],
       colors: [],
-      tags: []
+      tags: [],
+      lastSynced: Date.now()
     };
   }
 

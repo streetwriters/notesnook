@@ -15,6 +15,12 @@ export default class User {
     return this.context.read("user");
   }
 
+  async set(user) {
+    if (!user) return;
+    user = { ...(await this.get()), ...user };
+    await this.context.write("user", user);
+  }
+
   async login(username, password) {
     let response = await authRequest("oauth/token", {
       username,
