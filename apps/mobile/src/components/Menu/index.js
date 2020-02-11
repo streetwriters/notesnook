@@ -9,7 +9,7 @@ import {
   View,
 } from 'react-native';
 import FastStorage from 'react-native-fast-storage';
-import Icon from 'react-native-vector-icons/Feather';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {DDS} from '../../../App';
 import {
   ACCENT,
@@ -56,14 +56,14 @@ export const Menu = ({
   const listItems = [
     {
       name: 'Home',
-      icon: 'home',
+      icon: 'home-variant-outline',
       func: () => NavigationService.navigate('Home'),
       close: true,
     },
 
     {
       name: 'Notebooks',
-      icon: 'book',
+      icon: 'book-outline',
       func: () =>
         NavigationService.navigate('Folders', {
           title: 'Notebooks',
@@ -74,14 +74,14 @@ export const Menu = ({
 
     {
       name: 'Favorites',
-      icon: 'star',
+      icon: 'star-outline',
       func: () => NavigationService.navigate('Favorites'),
       close: true,
     },
 
     {
       name: 'Trash',
-      icon: 'trash',
+      icon: 'delete-outline',
       func: () => NavigationService.navigate('Trash'),
       close: true,
     },
@@ -90,7 +90,7 @@ export const Menu = ({
   const listItems2 = [
     {
       name: 'Night mode',
-      icon: 'moon',
+      icon: 'theme-light-dark',
       func: () => {
         if (!colors.night) {
           FastStorage.setItem('theme', JSON.stringify({night: true}));
@@ -107,7 +107,7 @@ export const Menu = ({
     },
     {
       name: 'Settings',
-      icon: 'settings',
+      icon: 'settings-outline',
       func: () => NavigationService.navigate('Settings'),
       close: true,
     },
@@ -231,10 +231,13 @@ export const Menu = ({
                 <Icon
                   style={{
                     minWidth: noTextMode ? 5 : 40,
+
+                    textAlignVertical: 'center',
+                    textAlign: 'left',
                   }}
                   name={item.icon}
                   color={colors.accent}
-                  size={SIZE.md}
+                  size={SIZE.md + 1}
                 />
                 {noTextMode ? null : (
                   <Text
@@ -285,9 +288,9 @@ export const Menu = ({
               style={{
                 minWidth: noTextMode ? 5 : 40,
               }}
-              name="tag"
+              name="tag-outline"
               color={colors.accent}
-              size={SIZE.md}
+              size={SIZE.md + 1}
             />
             {noTextMode ? null : (
               <Text
@@ -532,8 +535,8 @@ export const Menu = ({
                 justifyContent: noTextMode ? 'center' : 'space-between',
                 alignItems: 'center',
                 paddingBottom: noTextMode ? pv + 2 : normalize(15),
-                paddingTop:
-                  index === 0 ? pv : noTextMode ? pv + 2 : normalize(15),
+
+                paddingTop: noTextMode ? pv + 2 : normalize(15),
               }}>
               <View
                 style={{
@@ -546,7 +549,7 @@ export const Menu = ({
                   }}
                   name={item.icon}
                   color={colors.accent}
-                  size={SIZE.md}
+                  size={SIZE.md + 1}
                 />
                 {noTextMode ? null : (
                   <Text
@@ -562,9 +565,9 @@ export const Menu = ({
 
               {item.switch && !noTextMode ? (
                 <Icon
-                  size={SIZE.lg}
+                  size={SIZE.xl}
                   color={item.on ? colors.accent : colors.icon}
-                  name={item.on ? 'toggle-right' : 'toggle-left'}
+                  name={item.on ? 'toggle-switch' : 'toggle-switch-off'}
                 />
               ) : (
                 undefined
@@ -596,7 +599,7 @@ export const Menu = ({
                 color: 'white',
                 fontSize: SIZE.xs,
               }}>
-              <Icon name="user" /> ammarahmed6506
+              <Icon name="account-outline" /> ammarahmed6506
             </Text>
             <Text
               style={{
@@ -623,23 +626,14 @@ export const Menu = ({
                 color: colors.pri,
                 fontSize: SIZE.xxs,
               }}>
-              <Icon color={colors.accent} name="refresh-ccw" /> Synced 3 mins
-              ago.
+              <Icon color={colors.accent} name="sync" /> Synced 3 mins ago.
             </Text>
 
-            <TouchableOpacity
-              style={{
-                borderWidth: 1,
-                borderColor: colors.accent,
-                width: 16,
-                height: 16,
-                justifyContent: 'center',
-                alignItems: 'center',
-                borderRadius: 100,
-                paddingTop: 1.5,
-              }}>
-              <Icon size={SIZE.xxs} color={colors.accent} name="check" />
-            </TouchableOpacity>
+            <Icon
+              size={SIZE.sm}
+              color={colors.accent}
+              name="check-circle-outline"
+            />
           </View>
         </View>
       </View>

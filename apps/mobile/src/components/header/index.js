@@ -1,7 +1,6 @@
 import React from 'react';
 import {Platform, StatusBar, Text, TouchableOpacity, View} from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import Icon from 'react-native-vector-icons/Feather';
 import {DDS} from '../../../App';
 import {SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
@@ -10,6 +9,7 @@ import {eCloseLoginDialog} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
 import {SideMenuEvent} from '../../utils/utils';
 import {moveNoteHideEvent} from '../DialogManager';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export const Header = ({
   heading,
@@ -75,7 +75,6 @@ export const Header = ({
               alignItems: 'flex-start',
               height: 40,
               width: 50,
-              marginTop: 2.5,
             }}>
             <Icon
               style={{
@@ -99,10 +98,9 @@ export const Header = ({
               justifyContent: 'center',
               alignItems: 'flex-start',
               height: 40,
-              marginTop: 2.5,
               width: 60,
             }}>
-            <Icon color={colors.pri} name={'menu'} size={SIZE.xxxl - 3} />
+            <Icon color={colors.pri} name={'menu'} size={SIZE.xxxl} />
           </TouchableOpacity>
         ) : (
           undefined
@@ -145,7 +143,7 @@ export const Header = ({
               width: 60,
               paddingRight: 0,
             }}>
-            <Icon name={'search'} size={SIZE.xl} color={colors.icon} />
+            <Icon name={'magnify'} size={SIZE.xl} color={colors.icon} />
           </TouchableOpacity>
         </Animatable.View>
         {verticalMenu ? (
@@ -156,38 +154,7 @@ export const Header = ({
               height: 40,
               width: 60,
             }}>
-            <Icon
-              style={{
-                position: 'absolute',
-                transform: [
-                  {
-                    translateX: 0,
-                  },
-                  {
-                    translateY: 5,
-                  },
-                ],
-              }}
-              name="arrow-down"
-              size={SIZE.lg}
-              color={colors.icon}
-            />
-            <Icon
-              style={{
-                position: 'absolute',
-                transform: [
-                  {
-                    translateX: -15,
-                  },
-                  {
-                    translateY: -5,
-                  },
-                ],
-              }}
-              name="arrow-up"
-              size={SIZE.lg}
-              color={colors.icon}
-            />
+            <Icon name="sort" size={SIZE.xl} color={colors.icon} />
           </TouchableOpacity>
         ) : null}
       </View>

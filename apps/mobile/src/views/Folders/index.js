@@ -173,19 +173,11 @@ export const Folders = ({navigation}) => {
               <Text
                 style={{
                   color: colors.icon,
-                  fontSize: SIZE.md,
+                  fontSize: SIZE.sm,
                   fontFamily: WEIGHT.regular,
-                  marginTop: 20,
+                  marginTop: 30,
                 }}>
                 Notebooks you add will appear here
-              </Text>
-              <Text
-                style={{
-                  fontSize: SIZE.sm,
-                  color: colors.icon,
-                  marginTop: 20,
-                }}>
-                No Notebooks found
               </Text>
             </View>
           )

@@ -89,18 +89,10 @@ export const Tags = ({navigation}) => {
               <TagsPlaceHolder colors={colors} />
               <Text
                 style={{
-                  fontSize: SIZE.md,
+                  fontSize: SIZE.sm,
                   color: colors.icon,
                 }}>
                 Tags added to notes appear here
-              </Text>
-              <Text
-                style={{
-                  fontSize: SIZE.sm,
-                  color: colors.icon,
-                  marginTop: 20,
-                }}>
-                No tags found
               </Text>
             </View>
           }

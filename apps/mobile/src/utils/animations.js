@@ -36,16 +36,35 @@ export const rotate = {
 export const deleteItems = (tX, tY) => {
   return {
     0: {
-      transform: [{translateX: tX}, {translateY: tY}],
+      transform: [
+        {translateX: tX},
+        {translateY: tY},
+        {scaleX: 0.6},
+        {scaleY: 0.6},
+      ],
+      opacity: 0,
     },
     0.3: {
-      transform: [{translateX: 0}, {translateY: 0}],
+      transform: [
+        {translateX: 0},
+        {translateY: 0},
+        {scaleX: 0.8},
+        {scaleY: 0.8},
+      ],
+      opacity: 0.7,
     },
     0.5: {
-      transform: [{translateX: 0}, {translateY: 50}],
+      transform: [{translateX: 0}, {translateY: 50}, {scaleX: 1}, {scaleY: 1}],
+      opacity: 0.9,
     },
     1: {
-      transform: [{translateX: 0}, {translateY: 110}],
+      transform: [
+        {translateX: 0},
+        {translateY: 110},
+        {scaleX: 0.6},
+        {scaleY: 0.6},
+      ],
+      opacity: 0,
     },
   };
 };

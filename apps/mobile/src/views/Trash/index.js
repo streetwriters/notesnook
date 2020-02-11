@@ -86,19 +86,11 @@ export const Trash = ({navigation}) => {
       <Text
         style={{
           color: colors.icon,
-          fontSize: SIZE.md,
+          fontSize: SIZE.sm,
           fontFamily: WEIGHT.regular,
-          marginTop: 20,
+          marginTop: 30,
         }}>
         Deleted notes & notebooks appear here.
-      </Text>
-      <Text
-        style={{
-          fontSize: SIZE.sm,
-          color: colors.icon,
-          marginTop: 20,
-        }}>
-        Trash is empty
       </Text>
     </View>
   );

@@ -83,20 +83,12 @@ export const Favorites = ({navigation}) => {
             <FavoritesPlaceHolder />
             <Text
               style={{
-                color: colors.pri,
-                fontSize: SIZE.md,
+                color: colors.icon,
+                fontSize: SIZE.sm,
                 fontFamily: WEIGHT.regular,
-                marginTop: 20,
+                marginTop: 30,
               }}>
               Favorite notes & notebooks appear here.
-            </Text>
-            <Text
-              style={{
-                fontSize: SIZE.sm,
-                color: colors.icon,
-                marginTop: 20,
-              }}>
-              Favorites are empty.
             </Text>
           </View>
         }

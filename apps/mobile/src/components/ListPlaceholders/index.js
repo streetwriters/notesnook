@@ -415,8 +415,7 @@ export const TrashPlaceHolder = ({colors, animation}) => {
         animation={deleteItems(-50, -100)}
         iterationCount="infinite"
         duration={3000}
-        iterationDelay={4500}
-        direction="alternate"
+        iterationDelay={7000}
         easing="ease-in"
         useNativeDriver={true}
         style={{
@@ -438,8 +437,7 @@ export const TrashPlaceHolder = ({colors, animation}) => {
         animation={deleteItems(-80, -70)}
         iterationCount="infinite"
         duration={3000}
-        iterationDelay={4500}
-        direction="alternate"
+        iterationDelay={7000}
         easing="ease-in"
         useNativeDriver={true}
         style={{
@@ -461,8 +459,7 @@ export const TrashPlaceHolder = ({colors, animation}) => {
         animation={deleteItems(-120, -50)}
         iterationCount="infinite"
         duration={3000}
-        iterationDelay={4500}
-        direction="alternate"
+        iterationDelay={7000}
         easing="ease-in"
         useNativeDriver={true}
         style={{
@@ -485,8 +482,7 @@ export const TrashPlaceHolder = ({colors, animation}) => {
         animation={deleteItems(-120, -140)}
         iterationCount="infinite"
         duration={3000}
-        iterationDelay={4500}
-        direction="alternate"
+        iterationDelay={7000}
         easing="ease-in"
         useNativeDriver={true}
         style={{
@@ -551,7 +547,7 @@ export const TrashPlaceHolder = ({colors, animation}) => {
             animation={opacity}
             iterationCount="infinite"
             duration={3000}
-            iterationDelay={4500}
+            iterationDelay={3500}
             direction="alternate"
             easing="ease-in"
             useNativeDriver={true}
@@ -745,6 +741,55 @@ export const FavoritesPlaceHolder = ({colors, animation}) => {
 };
 
 export const TagsPlaceHolder = ({colors, animation}) => {
+  const slideRight = {
+    0: {
+      transform: [
+        {scaleX: 0.8},
+        {
+          scaleY: 0.8,
+        },
+        {
+          translateX: 2,
+        },
+        {
+          translateY: 2,
+        },
+      ],
+      opacity: 0,
+    },
+    0.6: {
+      transform: [
+        {scaleX: 0.9},
+        {
+          scaleY: 0.9,
+        },
+        {
+          translateX: 0,
+        },
+        {
+          translateY: 0,
+        },
+      ],
+
+      opacity: 1,
+    },
+    1: {
+      transform: [
+        {scaleX: 1},
+        {
+          scaleY: 1,
+        },
+        {
+          translateX: -2,
+        },
+        {
+          translateY: -2,
+        },
+      ],
+      opacity: 0,
+    },
+  };
+
   return (
     <View
       style={{
@@ -756,22 +801,19 @@ export const TagsPlaceHolder = ({colors, animation}) => {
       <Animatable.View
         animation={slideRight}
         iterationCount="infinite"
-        duration={3000}
-        iterationDelay={0}
-        direction="alternate"
+        duration={11000}
+        iterationDelay={500}
         easing="ease-in"
         useNativeDriver={true}
         style={{
           flexDirection: 'row',
           alignItems: 'center',
           position: 'absolute',
-          left: 50,
+          left: 10,
           top: 60,
         }}>
         <View
           style={{
-            backgroundColor: colors.shade,
-
             borderRadius: 5,
             flexDirection: 'row',
             alignItems: 'center',
@@ -782,65 +824,45 @@ export const TagsPlaceHolder = ({colors, animation}) => {
               color: colors.accent,
               fontSize: SIZE.sm,
             }}>
-            #
+            #presentations
           </Text>
-          <View
-            style={{
-              width: 40,
-              backgroundColor: colors.accent,
-              height: 12,
-              borderRadius: 100,
-            }}
-          />
-        </View>
-      </Animatable.View>
-      <Animatable.View
-        animation={slideLeft}
-        iterationCount="infinite"
-        duration={3000}
-        iterationDelay={0}
-        direction="alternate"
-        easing="ease-in"
-        useNativeDriver={true}
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          position: 'absolute',
-          left: 70,
-          top: 100,
-        }}>
-        <View
-          style={{
-            backgroundColor: colors.shade,
-
-            borderRadius: 5,
-            flexDirection: 'row',
-            alignItems: 'center',
-            padding: 4,
-          }}>
-          <Text
-            style={{
-              color: colors.accent,
-              fontSize: SIZE.sm,
-            }}>
-            #
-          </Text>
-          <View
-            style={{
-              width: 40,
-              backgroundColor: colors.accent,
-              height: 12,
-              borderRadius: 100,
-            }}
-          />
         </View>
       </Animatable.View>
       <Animatable.View
         animation={slideRight}
         iterationCount="infinite"
-        duration={3000}
-        iterationDelay={0}
-        direction="alternate"
+        duration={10000}
+        iterationDelay={1000}
+        easing="ease-in"
+        useNativeDriver={true}
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          position: 'absolute',
+          left: 0,
+          top: 100,
+        }}>
+        <View
+          style={{
+            borderRadius: 5,
+            flexDirection: 'row',
+            alignItems: 'center',
+            padding: 4,
+          }}>
+          <Text
+            style={{
+              color: colors.accent,
+              fontSize: SIZE.sm,
+            }}>
+            #morningcoffee
+          </Text>
+        </View>
+      </Animatable.View>
+      <Animatable.View
+        animation={slideRight}
+        iterationCount="infinite"
+        duration={15000}
+        iterationDelay={1500}
         easing="ease-in"
         useNativeDriver={true}
         style={{
@@ -852,8 +874,6 @@ export const TagsPlaceHolder = ({colors, animation}) => {
         }}>
         <View
           style={{
-            backgroundColor: colors.shade,
-
             borderRadius: 5,
             flexDirection: 'row',
             alignItems: 'center',
@@ -864,24 +884,15 @@ export const TagsPlaceHolder = ({colors, animation}) => {
               color: colors.accent,
               fontSize: SIZE.sm,
             }}>
-            #
+            #quotesonlife
           </Text>
-          <View
-            style={{
-              width: 40,
-              backgroundColor: colors.accent,
-              height: 12,
-              borderRadius: 100,
-            }}
-          />
         </View>
       </Animatable.View>
       <Animatable.View
-        animation={slideLeft}
+        animation={slideRight}
         iterationCount="infinite"
-        duration={3000}
-        iterationDelay={0}
-        direction="alternate"
+        duration={8000}
+        iterationDelay={1500}
         easing="ease-in"
         useNativeDriver={true}
         style={{
@@ -893,8 +904,6 @@ export const TagsPlaceHolder = ({colors, animation}) => {
         }}>
         <View
           style={{
-            backgroundColor: colors.shade,
-
             borderRadius: 5,
             flexDirection: 'row',
             alignItems: 'center',
@@ -905,37 +914,26 @@ export const TagsPlaceHolder = ({colors, animation}) => {
               color: colors.accent,
               fontSize: SIZE.sm,
             }}>
-            #
+            #workinprogress
           </Text>
-          <View
-            style={{
-              width: 40,
-              backgroundColor: colors.accent,
-              height: 12,
-              borderRadius: 100,
-            }}
-          />
         </View>
       </Animatable.View>
       <Animatable.View
         animation={slideRight}
         iterationCount="infinite"
-        duration={3000}
-        iterationDelay={0}
-        direction="alternate"
+        duration={12000}
+        iterationDelay={2000}
         easing="ease-in"
         useNativeDriver={true}
         style={{
           flexDirection: 'row',
           alignItems: 'center',
           position: 'absolute',
-          left: 50,
+          left: 20,
           top: 140,
         }}>
         <View
           style={{
-            backgroundColor: colors.shade,
-
             borderRadius: 5,
             flexDirection: 'row',
             alignItems: 'center',
@@ -946,24 +944,15 @@ export const TagsPlaceHolder = ({colors, animation}) => {
               color: colors.accent,
               fontSize: SIZE.sm,
             }}>
-            #
+            #todolists
           </Text>
-          <View
-            style={{
-              width: 40,
-              backgroundColor: colors.accent,
-              height: 12,
-              borderRadius: 100,
-            }}
-          />
         </View>
       </Animatable.View>
       <Animatable.View
-        animation={slideLeft}
+        animation={slideRight}
         iterationCount="infinite"
-        duration={3000}
+        duration={10000}
         iterationDelay={0}
-        direction="alternate"
         easing="ease-in"
         useNativeDriver={true}
         style={{
@@ -975,8 +964,6 @@ export const TagsPlaceHolder = ({colors, animation}) => {
         }}>
         <View
           style={{
-            backgroundColor: colors.shade,
-
             borderRadius: 5,
             flexDirection: 'row',
             alignItems: 'center',
@@ -987,16 +974,8 @@ export const TagsPlaceHolder = ({colors, animation}) => {
               color: colors.accent,
               fontSize: SIZE.sm,
             }}>
-            #
+            #myschoolwork
           </Text>
-          <View
-            style={{
-              width: 40,
-              backgroundColor: colors.accent,
-              height: 12,
-              borderRadius: 100,
-            }}
-          />
         </View>
       </Animatable.View>
     </View>

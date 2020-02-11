@@ -9,7 +9,7 @@ import {
   View,
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import Icon from 'react-native-vector-icons/Feather';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {br, opacity, pv, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
