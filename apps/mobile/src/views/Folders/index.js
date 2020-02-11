@@ -42,6 +42,7 @@ export const Folders = ({navigation}) => {
   };
 
   useEffect(() => {
+    eSendEvent(eScrollEvent, 0);
     dispatch({type: ACTIONS.NOTEBOOKS});
 
     let backhandler;

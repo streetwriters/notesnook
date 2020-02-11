@@ -184,7 +184,7 @@ export const ActionSheetComponent = ({
     },
     {
       name: 'Share',
-      icon: 'share-2',
+      icon: 'share-variant',
       func: () => {
         if (note.locked) {
           close('unlock_share');
@@ -202,7 +202,7 @@ export const ActionSheetComponent = ({
     },
     {
       name: 'Export',
-      icon: 'external-link',
+      icon: 'export',
       func: () => {
         close();
       },
@@ -501,7 +501,7 @@ export const ActionSheetComponent = ({
         width: '100%',
         paddingHorizontal: 0,
       }}>
-      {!note.id ? (
+      {!note.id && !note.dateCreated ? (
         <Text
           style={{
             width: '100%',
@@ -626,7 +626,7 @@ export const ActionSheetComponent = ({
         </View>
       )}
 
-      {note.id ? (
+      {note.id || note.dateCreated ? (
         <View
           style={{
             width: '100%',
@@ -657,7 +657,7 @@ export const ActionSheetComponent = ({
         </View>
       ) : null}
 
-      {hasTags && note.id ? (
+      {hasTags && (note.id || note.dateCreated) ? (
         <View
           style={{
             marginHorizontal: 12,

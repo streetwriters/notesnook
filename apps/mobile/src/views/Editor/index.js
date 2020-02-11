@@ -421,7 +421,7 @@ const Editor = ({navigation, noMenu}) => {
               paddingRight: 12,
               zIndex: 800,
             }}>
-            <Icon name="more-horizontal" color={colors.icon} size={SIZE.xxxl} />
+            <Icon name="dots-horizontal" color={colors.icon} size={SIZE.xxxl} />
           </TouchableOpacity>
         </View>
 

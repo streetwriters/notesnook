@@ -101,7 +101,7 @@ export const TEMPLATE_DELETE = type => {
     positiveText: 'Delete',
     negativeText: 'Cancel',
     action: dialogActions.ACTION_DELETE,
-    icon: 'trash',
+    icon: 'delete',
   };
 };
 
@@ -112,7 +112,7 @@ export const TEMPLATE_TRASH = type => {
     positiveText: 'Restore',
     negativeText: 'Delete',
     action: dialogActions.ACTION_TRASH,
-    icon: 'trash',
+    icon: 'delete-restore',
   };
 };
 
@@ -123,7 +123,7 @@ export const TEMPLATE_EXIT_FULLSCREEN = () => {
     positiveText: 'Exit',
     negativeText: 'Cancel',
     action: dialogActions.ACTION_EXIT_FULLSCREEN,
-    icon: 'x',
+    icon: 'close',
   };
 };
 
@@ -134,7 +134,7 @@ export const TEMPLATE_EXIT = type => {
     positiveText: `Close`,
     negativeText: 'Cancel',
     action: dialogActions.ACTION_EXIT,
-    icon: 'x',
+    icon: 'close',
   };
 };
 
@@ -147,14 +147,14 @@ export const TEMPLATE_INFO = dateCreated => {
     noButtons: true,
     noTitle: true,
     action: dialogActions.ACTION_CLOSE,
-    icon: 'info',
+    icon: 'information-outline',
   };
 };
 
 export const TEMPLATE_EMPTY_TRASH = {
   title: 'Empty Trash',
   paragraph: 'Are you sure you want to clear the trash?',
-  icon: 'trash',
+  icon: 'delete-outline',
   positiveText: 'Clear',
   negativeText: 'Cancel',
   action: dialogActions.ACTION_EMPTY_TRASH,

@@ -233,7 +233,7 @@ export const NotebookItem = ({
                 notebookID: notebookID,
               });
             }}>
-            <Icon name="more-horizontal" size={SIZE.lg} color={colors.icon} />
+            <Icon name="dots-horizontal" size={SIZE.lg} color={colors.icon} />
           </TouchableOpacity>
         )}
 

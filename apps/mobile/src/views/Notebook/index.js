@@ -29,16 +29,19 @@ export const Notebook = ({navigation}) => {
   let isFocused = useIsFocused();
 
   const onLoad = () => {
-    topics = db.notebooks.notebook(navigation.state.params.notebook.dateCreated)
-      .topics;
-    notebook = db.notebooks.notebook(
-      navigation.state.params.notebook.dateCreated,
-    );
+    let allTopics;
 
-    setTopics([...topics]);
+    allTopics = db.notebooks.notebook(navigation.state.params.notebook.id).data
+      .topics;
+    console.log(allTopics);
+
+    notebook = db.notebooks.notebook(navigation.state.params.notebook.id);
+
+    setTopics(allTopics);
   };
 
   useEffect(() => {
+    eSendEvent(eScrollEvent, 0);
     params = navigation.state.params;
     let topic = params.notebook.topics;
     notebook = params.notebook;

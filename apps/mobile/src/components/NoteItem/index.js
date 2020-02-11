@@ -276,7 +276,7 @@ export default class NoteItem extends React.Component {
                 isTrash ? [] : ['Pin', 'Favorite', 'Add to Vault'],
               );
             }}>
-            <Icon name="more-horizontal" size={SIZE.lg} color={colors.icon} />
+            <Icon name="dots-horizontal" size={SIZE.lg} color={colors.icon} />
           </TouchableOpacity>
         </View>
       </View>

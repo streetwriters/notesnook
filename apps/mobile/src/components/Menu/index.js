@@ -29,7 +29,7 @@ import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
 import {eOpenModalMenu, eSendSideMenuOverlayRef} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
-import {timeSince} from '../../utils/utils';
+import {timeSince, getElevation} from '../../utils/utils';
 
 export const Menu = ({
   close = () => {},
@@ -540,7 +540,7 @@ export const Menu = ({
           ))}
         </View>
 
-        {user && user.username ? (
+        {!user && !user.username ? (
           <View
             style={{
               width: '100%',
@@ -562,6 +562,8 @@ export const Menu = ({
                 onPress={async () => {
                   //await db.sync();
                   console.log(await db.sync(), 'SYNCED');
+                  dispatch({type: ACTIONS.NOTES});
+                  dispatch({type: ACTIONS.PINNED});
                 }}
                 style={{
                   fontFamily: WEIGHT.regular,
@@ -619,19 +621,23 @@ export const Menu = ({
             }}
             activeOpacity={opacity / 2}
             style={{
+              ...getElevation(2),
               paddingVertical: pv + 5,
-              paddingHorizontal: noTextMode ? 0 : 12,
               width: '100%',
               justifyContent: noTextMode ? 'center' : 'flex-start',
               alignItems: 'center',
               flexDirection: 'row',
+              backgroundColor: colors.accent,
+              borderRadius: 5,
+              paddingHorizontal: 6,
             }}>
             <Icon
               style={{
                 minWidth: 40,
+                textAlign: 'left',
               }}
-              name="log-in"
-              color={colors.accent}
+              name="login"
+              color="white"
               size={SIZE.lg}
             />
 
@@ -639,10 +645,10 @@ export const Menu = ({
               <Text
                 style={{
                   fontFamily: WEIGHT.regular,
-                  color: colors.accent,
+                  color: 'white',
                   fontSize: SIZE.md,
                 }}>
-                {'  '}Login
+                Login
               </Text>
             )}
           </TouchableOpacity>

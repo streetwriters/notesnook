@@ -17,6 +17,7 @@ import {ToastEvent} from '../../utils/utils';
 import {NotesPlaceHolder} from '../ListPlaceholders';
 import NoteItem from '../NoteItem';
 import SelectionWrapper from '../SelectionWrapper';
+import {db} from '../../../App';
 
 export const NotesList = ({isGrouped = false}) => {
   const [state, dispatch] = useTracked();
@@ -24,6 +25,7 @@ export const NotesList = ({isGrouped = false}) => {
   const notes = [...state.notes];
   const searchResults = [...state.searchResults];
   const [refreshing, setRefreshing] = useState(false);
+
   const _renderItem = ({item, index}) => (
     <SelectionWrapper
       index={index}
@@ -191,12 +193,20 @@ export const NotesList = ({isGrouped = false}) => {
           tintColor={colors.accent}
           colors={[colors.accent]}
           progressViewOffset={165}
-          onRefresh={() => {
+          onRefresh={async () => {
             setRefreshing(true);
-            setTimeout(() => {
+            try {
+              await db.sync();
+              dispatch({type: ACTIONS.NOTES});
+              dispatch({type: ACTIONS.PINNED});
+              dispatch({type: ACTIONS.FAVORITES});
+
               setRefreshing(false);
               ToastEvent.show('Sync Complete', 'success');
-            }, 1000);
+            } catch (e) {
+              setRefreshing(false);
+              ToastEvent.show('Sync failed, network error', 'error');
+            }
           }}
           refreshing={refreshing}
         />
@@ -258,13 +268,13 @@ const PinnedItems = () => {
               customStyle={{
                 backgroundColor: colors.shade,
                 width: '100%',
-                paddingHorizontal: '5%',
-                paddingTop: 20,
-                marginHorizontal: 0,
-                marginBottom: 10,
                 paddingHorizontal: 12,
+                paddingTop: 20,
+                paddingRight: 18,
+                marginBottom: 10,
                 marginTop: 20,
                 borderBottomWidth: 0,
+                marginHorizontal: 0,
               }}
               pinned={true}
               item={item}

@@ -25,6 +25,7 @@ export const Notes = ({navigation}) => {
   }, []);
 
   useEffect(() => {
+    eSendEvent(eScrollEvent, 0);
     if (params.type === 'tag') {
       let notesInTag = db.notes.tagged(params.tag.title);
       setNotes([...notesInTag]);
