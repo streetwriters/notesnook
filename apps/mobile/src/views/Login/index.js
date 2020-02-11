@@ -23,6 +23,7 @@ import {
 } from '../../services/validation';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {ToastEvent} from '../../utils/utils';
+import {ACTIONS} from '../../provider/actions';
 
 export const Login = ({navigation}) => {
   const [state, dispatch] = useTracked();
@@ -33,10 +34,10 @@ export const Login = ({navigation}) => {
   const _username = createRef();
   const [loggingIn, setLoggingIn] = useState(false);
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [password, setPassword] = useState('loveyouall123');
   const [invalidEmail, setInvalidEmail] = useState(false);
   const [invalidPassword, setInvalidPassword] = useState(false);
-  const [username, setUsername] = useState('');
+  const [username, setUsername] = useState('ammarahmed');
   const [invalidUsername, setInvalidUsername] = useState(false);
 
   const isFocused = useIsFocused();
@@ -77,30 +78,29 @@ export const Login = ({navigation}) => {
     _pass.current.blur();
 
     setTimeout(() => {
-      setStatus('Syncing...');
-
       setTimeout(() => {
         navigation.navigate('Home');
-
-        ToastEvent.show(`Logged in as ${'ammarahmed'}`, 'success');
       }, 500);
     }, 300);
-
-    return;
+    setStatus('Logging in...');
     if (!invalidPassword && !invalidUsername) {
       try {
         await db.user.login(username, password);
       } catch (e) {
-        console.log(e, 'signup');
+        console.log(e);
+        setLoggingIn(false);
       }
 
       let user;
 
       try {
-        user = await db.user.user.get();
+        user = await db.user.get();
+        console.log('user', user);
         dispatch({type: ACTIONS.USER, user: user});
+        ToastEvent.show(`Logged in as ${'ammarahmed'}`, 'success');
       } catch (e) {
-        console.log('e', 'getUSer');
+        console.log(e, 'getUSer');
+        ToastEvent.show(`Login Failed`, 'error');
       }
 
       console.log(user);

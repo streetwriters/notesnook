@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import FastStorage from 'react-native-fast-storage';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {DDS} from '../../../App';
+import {DDS, db} from '../../../App';
 import {
   ACCENT,
   COLOR_SCHEME,
@@ -29,6 +29,7 @@ import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
 import {eOpenModalMenu, eSendSideMenuOverlayRef} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
+import {timeSince} from '../../utils/utils';
 
 export const Menu = ({
   close = () => {},
@@ -37,7 +38,8 @@ export const Menu = ({
   noTextMode = false,
 }) => {
   const [state, dispatch] = useTracked();
-  const {colors, tags, colorNotes} = state;
+  const {colors, tags, colorNotes, user} = state;
+
   // todo
 
   let overlayRef;
@@ -477,44 +479,6 @@ export const Menu = ({
           marginBottom: 15,
           paddingHorizontal: ph,
         }}>
-        {/*  <TouchableOpacity
-          onPress={() => {
-            close();
-
-            DDS.isTab
-              ? eSendEvent(eOpenLoginDialog)
-              : NavigationService.navigate('Login');
-          }}
-          activeOpacity={opacity / 2}
-          style={{
-            paddingVertical: pv + 5,
-            paddingHorizontal: noTextMode ? 0 : 12,
-            width: '100%',
-            justifyContent: noTextMode ? 'center' : 'flex-start',
-            alignItems: 'center',
-            flexDirection: 'row',
-          }}>
-          <Icon
-            style={{
-              minWidth: 40,
-            }}
-            name="log-in"
-            color={colors.accent}
-            size={SIZE.lg}
-          />
-
-          {noTextMode ? null : (
-            <Text
-              style={{
-                fontFamily: WEIGHT.regular,
-                color: colors.accent,
-                fontSize: SIZE.md,
-              }}>
-              {'  '}Login
-            </Text>
-          )}
-        </TouchableOpacity> */}
-
         <View
           style={{
             width: '100%',
@@ -576,66 +540,113 @@ export const Menu = ({
           ))}
         </View>
 
-        <View
-          style={{
-            width: '100%',
-            borderRadius: 5,
-            backgroundColor: colors.shade,
-          }}>
+        {user.username ? (
           <View
             style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              backgroundColor: colors.accent,
+              width: '100%',
               borderRadius: 5,
-              paddingHorizontal: 5,
-              paddingVertical: 5,
-              elevation: 2,
+              backgroundColor: colors.shade,
             }}>
-            <Text
+            <View
               style={{
-                fontFamily: WEIGHT.regular,
-                color: 'white',
-                fontSize: SIZE.xs,
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                backgroundColor: colors.accent,
+                borderRadius: 5,
+                paddingHorizontal: 5,
+                paddingVertical: 5,
+                elevation: 2,
               }}>
-              <Icon name="account-outline" /> ammarahmed6506
-            </Text>
-            <Text
-              style={{
-                fontFamily: WEIGHT.regular,
-                fontSize: SIZE.xs,
-                color: 'white',
-              }}>
-              Basic
-            </Text>
-          </View>
+              <Text
+                onPress={async () => {
+                  //await db.sync();
+                  console.log(await db.sync(), 'SYNCED');
+                }}
+                style={{
+                  fontFamily: WEIGHT.regular,
+                  color: 'white',
+                  fontSize: SIZE.xs,
+                }}>
+                <Icon name="account-outline" /> {user.username}
+              </Text>
+              <Text
+                style={{
+                  fontFamily: WEIGHT.regular,
+                  fontSize: SIZE.xs,
+                  color: 'white',
+                }}>
+                Basic
+              </Text>
+            </View>
 
-          <View
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+
+                paddingHorizontal: 5,
+                paddingVertical: pv,
+              }}>
+              <Text
+                style={{
+                  fontFamily: WEIGHT.regular,
+                  color: colors.pri,
+                  fontSize: SIZE.xxs,
+                }}>
+                <Icon color={colors.accent} name="sync" /> Synced{' '}
+                {user.lastSynced && user.lastSynced !== 0
+                  ? timeSince(user.lastSynced)
+                  : 'never'}
+              </Text>
+
+              <Icon
+                size={SIZE.sm}
+                color={colors.accent}
+                name="check-circle-outline"
+              />
+            </View>
+          </View>
+        ) : (
+          <TouchableOpacity
+            onPress={() => {
+              close();
+
+              DDS.isTab
+                ? eSendEvent(eOpenLoginDialog)
+                : NavigationService.navigate('Login');
+            }}
+            activeOpacity={opacity / 2}
             style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
+              paddingVertical: pv + 5,
+              paddingHorizontal: noTextMode ? 0 : 12,
+              width: '100%',
+              justifyContent: noTextMode ? 'center' : 'flex-start',
               alignItems: 'center',
-
-              paddingHorizontal: 5,
-              paddingVertical: pv,
+              flexDirection: 'row',
             }}>
-            <Text
-              style={{
-                fontFamily: WEIGHT.regular,
-                color: colors.pri,
-                fontSize: SIZE.xxs,
-              }}>
-              <Icon color={colors.accent} name="sync" /> Synced 3 mins ago.
-            </Text>
-
             <Icon
-              size={SIZE.sm}
+              style={{
+                minWidth: 40,
+              }}
+              name="log-in"
               color={colors.accent}
-              name="check-circle-outline"
+              size={SIZE.lg}
             />
-          </View>
-        </View>
+
+            {noTextMode ? null : (
+              <Text
+                style={{
+                  fontFamily: WEIGHT.regular,
+                  color: colors.accent,
+                  fontSize: SIZE.md,
+                }}>
+                {'  '}Login
+              </Text>
+            )}
+          </TouchableOpacity>
+        )}
       </View>
     </SafeAreaView>
   );

@@ -201,8 +201,10 @@ const Editor = ({navigation, noMenu}) => {
     }
     saveCounter++;
     if (id) {
+      console.log(id, 'ID');
+
       let lockednote = db.notes.note(id);
-      if (lockNote && lockednote.locked) {
+      if (lockNote && lockednote && lockednote.locked) {
         await db.notes.note(id).lock('password');
       }
     }
@@ -480,8 +482,8 @@ const Editor = ({navigation, noMenu}) => {
             Platform.OS === 'ios'
               ? {uri: sourceUri}
               : {
-                  uri: 'http://192.168.10.7:8080/texteditor.html',
-                  baseUrl: 'http://192.168.10.7:8080/',
+                  uri: 'file:///android_asset/texteditor.html',
+                  baseUrl: 'file:///android_asset/',
                 }
           }
           style={{
