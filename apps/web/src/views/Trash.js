@@ -14,12 +14,11 @@ const menuItems = item => [
         Icon.Star,
         "Restore",
         `Are you sure you want to restore this item to ${item.type}?`
-      ).then(res => {
+      ).then(async res => {
         if (res) {
           let itemType = item.type[0] + item.type.substring(1);
           showSnack(itemType + " Restored", Icon.Check);
-          //db.restoreItem(item.dateCreated);
-          db.trash.restore(item.id);
+          await db.trash.restore(item.id);
           ev.emit(`refreshTrash`);
         }
       });
@@ -33,11 +32,11 @@ const menuItems = item => [
         Icon.Star,
         "Delete",
         `Are you sure you want to permanently delete this item?`
-      ).then(res => {
+      ).then(async res => {
         if (res) {
           let itemType = item.type[0] + item.type.substring(1);
           showSnack(itemType + "Permanently Deleted!", Icon.Trash2);
-          //place permanent delete here
+          await db.trash.delete(item.id);
           ev.emit(`refreshTrash`);
         }
       });
@@ -49,12 +48,12 @@ function Trash() {
   return (
     <ListView
       type="Trash"
-      getItems={db.trash.all /*db.getTrash.bind(db)*/}
+      getItems={db.trash.al}
       menu={{ menuItems, dropdownRefs }}
       button={{
         content: "Clear Trash",
         icon: Icon.Trash2,
-        onClick: () => db.trash.clear() /*db.clearTrash()*/
+        onClick: async () => await db.trash.clear()
       }}
     />
   );

@@ -12,7 +12,7 @@ const menuItems = notebook => [
     onClick: async () =>
       db.notebooks
         .notebook(notebook.id)
-        .pin() /*db.pinItem("notebook", notebook.dateCreated)*/
+        .pin()
         .then(() => {
           showSnack("Notebook pinned!", Icon.Check);
           ev.emit("refreshNotebooks");
@@ -23,7 +23,7 @@ const menuItems = notebook => [
     onClick: async () =>
       db.notebooks
         .notebook(notebook.id)
-        .favorite() /*db.favoriteItem("notebook", notebook.dateCreated)*/
+        .favorite()
         .then(() => {
           showSnack("Notebook favorited!", Icon.Check);
           ev.emit("refreshNotebooks");
@@ -35,7 +35,7 @@ const menuItems = notebook => [
     title: "Delete",
     color: "red",
     onClick: () => {
-      db.notebooks.delete(notebook.id) /*db.deleteNotebooks([notebook])*/.then(
+      db.notebooks.delete(notebook.id).then(
         //TODO implement undo
         () => {
           showSnack("Notebook deleted!", Icon.Check);

@@ -23,7 +23,7 @@ const menuItems = note => [
     onClick: async () =>
       db.notes
         .note(note.id)
-        .pin() /*db.pinItem("note", note.dateCreated)*/
+        .pin()
         .then(() => {
           showSnack("Note pinned!", Icon.Check);
           ev.emit("refreshNotes");
@@ -34,7 +34,7 @@ const menuItems = note => [
     onClick: async () =>
       db.notes
         .note(note.id)
-        .favorite() /*db.favoriteItem("note", note.dateCreated)*/
+        .favorite()
         .then(() => {
           showSnack("Note favorited!", Icon.Check);
           ev.emit("refreshNotes");
@@ -55,7 +55,7 @@ const menuItems = note => [
         if (res) {
           ev.emit("onClearNote", note.id);
           db.notes
-            .delete(note.id) /*db.deleteNotes(note)*/
+            .delete(note.id)
             .then(
               //TODO implement undo
               () => {

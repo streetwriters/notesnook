@@ -309,7 +309,7 @@ export const ask = (icon, title, message) => {
 };
 
 export const MoveDialog = props => {
-  const [items, setItems] = useState(db.notebooks.all /*db.getNotebooks()*/);
+  const [items, setItems] = useState(db.notebooks.all);
   const [type, setType] = useState("notebooks");
   const [title, setTitle] = useState("Notebooks");
   const [mode, setMode] = useState("read");
@@ -374,18 +374,13 @@ export const MoveDialog = props => {
                 if (type === "notebooks") {
                   await db.notebooks.add({
                     title: e.target.value
-                  }); /*db.addNotebook({ title: e.target.value });*/
-                  setItems(db.notebooks.all /*db.getNotebooks()*/);
+                  });
+                  setItems(db.notebooks.all);
                 } else {
                   await db.notebooks
                     .notebook(MoveDialog.notebook.id)
                     .topics.add(e.target.value);
-                  /*db.addTopicToNotebook(
-                    MoveDialog.notebook.dateCreated,
-                    e.target.value
-                  );*/
                   setItems(
-                    /*db.getNotebook(MoveDialog.notebook.dateCreated).topics*/
                     db.notebooks.notebook(MoveDialog.notebook.id).topics
                   );
                 }
@@ -430,10 +425,9 @@ export const MoveDialog = props => {
                         MoveDialog.topic = v.title;
                         setTitle(`${MoveDialog.notebook.title} - ${v.title}`);
                         setItems(
-                          /*db.getTopic(MoveDialog.notebook.dateCreated, v.title)*/
                           db.notebooks
                             .notebook(MoveDialog.notebook.id)
-                            .topics.exists(v.title)
+                            .topics.topic(v.title).all
                         );
                       }
                     }}
@@ -462,18 +456,14 @@ export const MoveDialog = props => {
       positiveButton={{
         text: "Move",
         click: async () => {
-          if (
-            await db.notes.move(
-              MoveDialog.topic,
-              props.noteId
-            ) /*db.moveNote(props.noteId, props.notebook, {
-              notebook: MoveDialog.notebook.dateCreated,
-              topic: MoveDialog.topic
-            })*/
-          ) {
+          try {
+            await db.notes.move(MoveDialog.topic, props.noteId);
             props.onMove();
+          } catch (e) {
+            console.log(e);
+          } finally {
+            props.onClose();
           }
-          props.onClose();
         },
         disabled: type !== "notes"
       }}

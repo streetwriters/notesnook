@@ -18,9 +18,7 @@ const Topics = props => {
               subtitle: topic.title,
               notes: db.notebooks
                 .notebook(props.notebook.id)
-                .topics.topic(
-                  topic.title
-                ) /*db.getTopic(props.notebook.dateCreated, topic.title)*/
+                .topics.topic(topic.title).all
             });
           }}
         />

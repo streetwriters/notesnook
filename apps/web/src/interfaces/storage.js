@@ -1,5 +1,10 @@
 import localforage from "localforage";
 
+localforage.config({
+  name: "Notesnook",
+  driver: [localforage.INDEXEDDB, localforage.WEBSQL, localforage.LOCALSTORAGE]
+});
+
 async function read(key) {
   return localforage.getItem(key);
 }

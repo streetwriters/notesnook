@@ -112,7 +112,9 @@ export default class Editor extends React.Component {
 
   onOpenNote(note) {
     if (!note) return;
-    this.onNewNote(false, () => {
+    this.onNewNote(false, async () => {
+      let dbNote = db.notes.note(note.id);
+      if (!dbNote) return this.onNewNote(false);
       this.id = note.id;
       this.title = note.title;
       this.titleRef.value = note.title;
@@ -123,7 +125,8 @@ export default class Editor extends React.Component {
         favorite: this.favorite,
         colors: note.colors
       });
-      this.quill.setContents(note.content.delta);
+      let delta = await dbNote.delta();
+      this.quill.setContents(delta);
       this.quill.setSelection(note.content.text.length - 1, 0); //to move the cursor to the end
     });
   }
@@ -144,8 +147,7 @@ export default class Editor extends React.Component {
       colors: this.state.colors
       //TODO add tags once the database is done
     };
-    let t = await db.notes.add(note); //db.addNote(note);
-    return t;
+    return await db.notes.add(note);
   }
 
   save() {
