@@ -48,13 +48,13 @@ const theme = (colors, shadows) => ({
   colors: colors,
   space: [0, 5, 10, 12, 15],
   fontSizes: {
-    heading: 32,
-    input: 16,
-    title: 18,
-    subtitle: 18,
-    body: 14,
-    menu: 14,
-    subBody: 12
+    heading: 26,
+    input: 14,
+    title: 16,
+    subtitle: 16,
+    body: 12,
+    menu: 12,
+    subBody: 10
   },
   fontWeights: {
     body: 400,

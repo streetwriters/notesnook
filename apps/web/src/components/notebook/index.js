@@ -62,7 +62,7 @@ const Notebook = ({ item, index, onClick, onTopicClick }) => {
               }}
               key={topic.id + topic.title}
               bg="primary"
-              px={1}
+              px={2}
               py={1}
               sx={{
                 marginRight: 1,

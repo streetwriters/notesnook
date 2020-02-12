@@ -179,7 +179,7 @@ export default class Editor extends React.Component {
               borderWidth: 0,
               ":focus": { outline: "none" },
               paddingTop: 0,
-              paddingBottom: 3
+              paddingBottom: 0
             }}
             px={2}
             onChange={e => {

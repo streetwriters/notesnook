@@ -38,7 +38,7 @@ const Properties = props => {
         flexDirection="column"
         bg="background"
         px={3}
-        py={3}
+        py={0}
       >
         <Text
           variant="title"

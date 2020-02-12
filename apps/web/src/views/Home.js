@@ -54,10 +54,10 @@ function Home() {
         groupCounts={notes.groupCounts}
         group={groupIndex =>
           notes.groups[groupIndex].title === "Pinned" ? (
-            <Box px={3} bg="background" py={1} />
+            <Box px={2} bg="background" py={1} />
           ) : (
-            <Box px={3} bg="background">
-              <Text variant="heading" color="primary" fontSize={15}>
+            <Box px={2} bg="background">
+              <Text variant="heading" color="primary" fontSize={13}>
                 {notes.groups[groupIndex].title}
               </Text>
             </Box>

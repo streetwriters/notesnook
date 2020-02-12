@@ -77,7 +77,7 @@ export default class Navigator {
 const NavigationContainer = props => {
   return (
     <ThemeProvider>
-      <Flex flexDirection="column" px={3}>
+      <Flex flexDirection="column" px={2}>
         <Flex alignItems="center">
           {props.canGoBack && (
             <Box

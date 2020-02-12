@@ -44,7 +44,7 @@ const NavMenuItem = props => {
         sx={{ marginLeft: [2, 0, 0] }}
       >
         <props.item.icon
-          size={24}
+          size={18}
           strokeWidth={props.selected ? 2 : 1.3}
           style={{ marginRight: 2 }}
           fill={fill}
@@ -101,8 +101,8 @@ function App() {
             zIndex: 999,
             borderRight: "1px solid",
             borderRightColor: "primary",
-            minWidth: ["85%", 60, 60],
-            maxWidth: ["85%", 60, 60],
+            minWidth: ["85%", 50, 50],
+            maxWidth: ["85%", 50, 50],
             display: [sideMenuOpen ? "flex" : "none", "flex", "flex"],
             position: ["absolute", "relative", "relative"],
             overflow: "scroll",

@@ -10,7 +10,7 @@ const ListItem = props => (
     justifyContent="space-between"
     py={1}
     bg={props.pinned ? "shade" : "background"}
-    px={3}
+    px={2}
     sx={{
       position: "relative",
       marginTop: props.pinned ? 4 : 0,
@@ -37,7 +37,7 @@ const ListItem = props => (
           marginTop: 5,
           boxShadow: "2px 1px 3px #00000066"
         }}
-        mx={3}
+        mx={2}
         alignItems="center"
         justifyContent="center"
       >
@@ -88,7 +88,7 @@ const ListItem = props => (
       <Text
         display={props.info ? "flex" : "none"}
         variant="body"
-        fontSize={12}
+        fontSize={10}
         color="fontTertiary"
       >
         {props.info}

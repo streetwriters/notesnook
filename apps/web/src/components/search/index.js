@@ -5,7 +5,7 @@ import * as Icon from "react-feather";
 import "./search.css";
 const Search = props => (
   <Flex
-    px={3}
+    px={2}
     flexDirection="row"
     justifyContent="center"
     alignItems="center"
@@ -19,7 +19,6 @@ const Search = props => (
       name="search"
       placeholder={props.placeholder}
       onChange={props.onChange}
-      my={2}
     />
     <Box
       id="searchIcon"
