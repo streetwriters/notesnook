@@ -6,7 +6,6 @@ import { GroupedVirtuoso as GroupList, Virtuoso as List } from "react-virtuoso";
 import Button from "../components/button";
 import Search from "../components/search";
 import Note from "../components/note";
-import { HomeAnim } from "./Placeholders";
 
 function SearchBox(props) {
   return (
@@ -30,11 +29,70 @@ function Home() {
     groupCounts: [],
     groups: []
   });
+  useEffect(() => {
+    function onRefreshNotes() {
+      let groups = db.notes.group(undefined, true);
+      setNotes(groups);
+      console.log("refreshing notes");
+    }
+    onRefreshNotes();
+    ev.addListener("refreshNotes", onRefreshNotes);
+    return () => {
+      ev.removeListener("refreshNotes", onRefreshNotes);
+    };
+  }, []);
+  return (
+    <Flex flexDirection="column" flex="1 1 auto">
+      <SearchBox setNotes={setNotes} />
+      <GroupList
+        style={{
+          width: "100%",
+          flex: "1 1 auto",
+          height: "auto",
+          overflowX: "hidden"
+        }}
+        groupCounts={notes.groupCounts}
+        group={groupIndex =>
+          notes.groups[groupIndex].title === "Pinned" ? (
+            <Box px={3} bg="background" py={1} />
+          ) : (
+            <Box px={3} bg="background">
+              <Text variant="heading" color="primary" fontSize={15}>
+                {notes.groups[groupIndex].title}
+              </Text>
+            </Box>
+          )
+        }
+        item={(index, groupIndex) => (
+          <Note index={index} item={notes.items[index]} />
+        )}
+      />
+      <Button
+        Icon={Icon.Plus}
+        content="Make a new note"
+        onClick={sendNewNoteEvent}
+      />
+    </Flex>
+  );
+}
+export default Home;
+/* 
+import { HomeAnim } from "./Placeholders";
+
+
+
+function Home() {
+  const [notes, setNotes] = useState({
+    items: [],
+    groupCounts: [],
+    groups: []
+  });
 
   //const [pinnedItems, setPinnedItems] = useState([]);
   useEffect(() => {
     function onRefreshNotes() {
-      let groups = db.notes.group(undefined, true);
+      let groups = db.notes.group();
+      console.log(groups);
       setNotes(groups);
     }
     onRefreshNotes();
@@ -132,3 +190,4 @@ function Home() {
 }
 
 export default Home;
+ */
