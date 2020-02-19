@@ -20,35 +20,37 @@ function ListView({ type, getItems, menu, button }) {
     };
   }, [getItems, type]);
   return (
-    <ListContainer
-      itemsLength={items.length}
-      item={index => {
-        const item = items[index];
-        return (
-          <ListItem
-            title={item.title}
-            body={item.headline}
-            index={index}
-            onClick={() => {}} //TODO
-            info={
-              <Flex justifyContent="center" alignItems="center">
-                <TimeAgo datetime={item.dateDeleted || item.dateCreated} />
-                <Text as="span" mx={1}>
-                  •
-                </Text>
-                <Text color="primary">
-                  {item.type[0].toUpperCase() + item.type.substring(1)}
-                </Text>
-              </Flex>
-            }
-            menuData={item}
-            menuItems={menu.menuItems(item)}
-            dropdownRefs={menu.dropdownRefs}
-          />
-        );
-      }}
-      button={button}
-    />
+    items && (
+      <ListContainer
+        itemsLength={items.length}
+        item={index => {
+          const item = items[index];
+          return (
+            <ListItem
+              title={item.title}
+              body={item.headline}
+              index={index}
+              onClick={() => {}} //TODO
+              info={
+                <Flex justifyContent="center" alignItems="center">
+                  <TimeAgo datetime={item.dateDeleted || item.dateCreated} />
+                  <Text as="span" mx={1}>
+                    •
+                  </Text>
+                  <Text color="primary">
+                    {item.type[0].toUpperCase() + item.type.substring(1)}
+                  </Text>
+                </Flex>
+              }
+              menuData={item}
+              menuItems={menu.menuItems(item)}
+              dropdownRefs={menu.dropdownRefs}
+            />
+          );
+        }}
+        button={button}
+      />
+    )
   );
 }
 
