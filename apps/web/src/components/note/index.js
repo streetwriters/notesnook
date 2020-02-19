@@ -76,7 +76,7 @@ function sendOpenNoteEvent(note) {
 
 const Note = ({ item, index }) => {
   const note = item;
-  return (
+  return note ? (
     <ListItem
       title={note.title}
       body={note.headline}
@@ -94,7 +94,7 @@ const Note = ({ item, index }) => {
       menuItems={menuItems(note)}
       dropdownRefs={dropdownRefs}
     />
-  );
+  ) : null;
 };
 
 export default Note;

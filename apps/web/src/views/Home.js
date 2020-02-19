@@ -57,7 +57,7 @@ function Home() {
             <Box px={2} bg="background" py={1} />
           ) : (
             <Box px={2} bg="background">
-              <Text variant="heading" color="primary" fontSize={13}>
+              <Text variant="heading" color="primary" fontSize="subtitle">
                 {notes.groups[groupIndex].title}
               </Text>
             </Box>
