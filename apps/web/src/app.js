@@ -109,7 +109,8 @@ function App() {
             scrollbarWidth: "none",
             //TODO: need to test this on webkit and internet explorer
             "::-webkit-scrollbar": { width: 0, height: 0 },
-            "-ms-overflow-style": "none"
+            msOverflowStyle: "none"
+            //"-ms-overflow-style": "none"
           }}
           bg={"shade"}
           px={0}

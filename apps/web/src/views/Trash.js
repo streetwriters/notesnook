@@ -48,7 +48,7 @@ function Trash() {
   return (
     <ListView
       type="Trash"
-      getItems={db.trash.al}
+      getItems={db.trash.all}
       menu={{ menuItems, dropdownRefs }}
       button={{
         content: "Clear Trash",

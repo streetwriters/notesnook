@@ -154,6 +154,7 @@ export default class Editor extends React.Component {
     clearTimeout(this.timeout);
     this.timeout = setTimeout(async () => {
       this.id = await this.saveNote();
+      ev.emit("refreshNotes");
     }, 1000);
   }
 
@@ -192,13 +193,8 @@ export default class Editor extends React.Component {
             ref={ref => (this.quillRef = ref)}
             modules={modules}
             theme="snow"
-            onChange={e => {
+            onChange={() => {
               this.save();
-
-              console.log(this.quill.getText());
-              if (this.quill.getText().length < 20) {
-                ev.emit("refreshNotes");
-              }
             }}
           />
         </Flex>

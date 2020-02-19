@@ -139,6 +139,7 @@ const Properties = props => {
               justifyContent="center"
               alignItems="center"
               onClick={() => props.colorSelected && props.colorSelected(color)}
+              key={color.label}
             >
               <Icon.Circle
                 size={40}

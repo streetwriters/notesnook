@@ -33,7 +33,6 @@ function Home() {
     function onRefreshNotes() {
       let groups = db.notes.group(undefined, true);
       setNotes(groups);
-      console.log("refreshing notes");
     }
     onRefreshNotes();
     ev.addListener("refreshNotes", onRefreshNotes);
