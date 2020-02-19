@@ -64,9 +64,11 @@ const NavMenuItem = props => {
 };
 
 var startX, startWidth;
+
 function getNavigationViewWidth() {
   return window.localStorage.getItem("navigationViewWidth");
 }
+
 function App() {
   const [selectedIndex, setSelectedIndex] = usePersistentState(
     "navSelectedIndex",
@@ -83,7 +85,7 @@ function App() {
     return () => {
       ev.removeListener("openSideMenu", openSideMenu);
     };
-  }, []);
+  });
   return (
     <ThemeProvider>
       <Flex
@@ -102,7 +104,12 @@ function App() {
             minWidth: ["85%", 60, 60],
             maxWidth: ["85%", 60, 60],
             display: [sideMenuOpen ? "flex" : "none", "flex", "flex"],
-            position: ["absolute", "relative", "relative"]
+            position: ["absolute", "relative", "relative"],
+            overflow: "scroll",
+            scrollbarWidth: "none",
+            //TODO: need to test this on webkit and internet explorer
+            "::-webkit-scrollbar": { width: 0, height: 0 },
+            "-ms-overflow-style": "none"
           }}
           bg={"shade"}
           px={0}
