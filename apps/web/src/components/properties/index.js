@@ -86,10 +86,14 @@ const Properties = props => {
           variant="default"
           placeholder="#tag"
           sx={{ marginBottom: 2 }}
-          onKeyUp={e => {
-            if (e.key === "Enter" || e.key === " " || e.key === ",") {
-              props.addTag && props.addTag(e.target.value);
-              e.target.value = "";
+          onKeyUp={event => {
+            if (
+              event.key === "Enter" ||
+              event.key === " " ||
+              event.key === ","
+            ) {
+              props.addTag && props.addTag(event.target.value);
+              event.target.value = "";
             }
           }}
         />
@@ -101,7 +105,7 @@ const Properties = props => {
           flexWrap="wrap"
         >
           {props.tags &&
-            props.tags.map(v => (
+            props.tags.map(tag => (
               <Text
                 sx={{
                   backgroundColor: "primary",
@@ -112,7 +116,7 @@ const Properties = props => {
                   marginRight: 1
                 }}
               >
-                #{v}
+                #{tag}
               </Text>
             ))}
         </Flex>
