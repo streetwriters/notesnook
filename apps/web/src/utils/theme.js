@@ -44,22 +44,22 @@ const shadowsLight = {
 };
 
 const theme = (colors, shadows) => ({
-  breakpoints: ["480px", "1000px", "1000px"],
+  breakpoints: ["30rem", "62.5rem", "62.5rem"],
   colors: colors,
-  space: [0, 5, 10, 12, 15],
+  space: [0, "0.3125rem", "0.625rem", "0.75rem", "0.9375rem"],
   fontSizes: {
-    heading: 26,
-    input: 14,
-    title: 16,
-    subtitle: 16,
-    body: 12,
-    menu: 12,
-    subBody: 10
+    heading: "2rem",
+    input: "0.875rem",
+    title: "1rem",
+    subtitle: "1rem",
+    body: "0.75rem",
+    menu: "0.75rem",
+    subBody: "0.625rem"
   },
   fontWeights: {
     body: 400,
-    heading: 800,
-    bold: 800
+    heading: 700,
+    bold: 700
   },
   fonts: {
     body: "Noto Sans, sans-serif",
