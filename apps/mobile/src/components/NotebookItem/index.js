@@ -7,6 +7,7 @@ import NavigationService from '../../services/NavigationService';
 import {ToastEvent, w} from '../../utils/utils';
 import {ActionSheetEvent, moveNoteHideEvent} from '../DialogManager';
 import {db} from '../../../App';
+import {ACTIONS} from '../../provider/actions';
 
 export const NotebookItem = ({
   item,
@@ -30,7 +31,6 @@ export const NotebookItem = ({
     isTopic
       ? NavigationService.navigate('Notes', {
           ...item,
-          notebookID,
         })
       : navigation.navigate('Notebook', {
           notebook: item,
@@ -65,8 +65,8 @@ export const NotebookItem = ({
         <TouchableOpacity
           activeOpacity={0.8}
           style={{
-            width: '90%',
-            maxWidth: '90%',
+            width: hideMore ? '80%' : '90%',
+            maxWidth: hideMore ? '80%' : '90%',
             minHeight: 50,
             justifyContent: 'center',
           }}
@@ -243,14 +243,15 @@ export const NotebookItem = ({
             onPress={async () => {
               let noteIds = [];
               selectedItemsList.forEach(item => noteIds.push(item.id));
-
+              console.log(noteIds);
               db.notes.move(
                 {
                   topic: item.title,
-                  id: item.notebookID,
+                  id: item.notebookId,
                 },
-                noteIds,
+                ...noteIds,
               );
+              dispatch({type: ACTIONS.CLEAR_SELECTION});
 
               moveNoteHideEvent();
 
