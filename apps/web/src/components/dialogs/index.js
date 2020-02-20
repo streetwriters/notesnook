@@ -34,7 +34,7 @@ const Dialog = props => {
               backgroundColor: theme.colors.background,
               color: theme.colors.text,
               boxShadow: theme.shadows["3"],
-              width: "20%",
+              width: "25%",
               paddingRight: 40,
               paddingLeft: 40,
               overflowY: "hidden"
@@ -53,14 +53,14 @@ const Dialog = props => {
               color="primary"
               py={2}
             >
-              <Box height={props.iconSize || 18}>
-                <props.icon size={props.iconSize || 18} />
+              <Box height={props.iconSize || 32}>
+                <props.icon size={props.iconSize || 32} />
               </Box>
               <Text
                 mx={2}
                 as="span"
                 variant="title"
-                fontSize={16}
+                fontSize={22}
                 textAlign="center"
               >
                 {props.title}
@@ -457,7 +457,10 @@ export const MoveDialog = props => {
         text: "Move",
         click: async () => {
           try {
-            await db.notes.move({id: MoveDialog.notebook.id, topic: MoveDialog.topic}, props.noteId);
+            await db.notes.move(
+              { id: MoveDialog.notebook.id, topic: MoveDialog.topic },
+              props.noteId
+            );
             props.onMove();
           } catch (e) {
             console.log(e);
