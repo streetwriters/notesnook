@@ -35,9 +35,12 @@ export class Dialog extends Component {
           ToastEvent.show('Note moved to trash', 'error', 3000);
           updateEvent({type: item.type});
         } else if (item.type === 'topic') {
+          console.log(item);
           //TODO
-          //db.notebooks.notebook(notebookID).topic
-          //await db.deleteTopicFromNotebook(notebookID, item.title);
+
+          await db.notebooks
+            .notebook(item.notebookId)
+            .topics.delete(item.title);
           updateEvent({type: 'notebook'});
           ToastEvent.show('Topic deleted', 'error', 3000);
         } else if (item.type === 'notebook') {
