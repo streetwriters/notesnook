@@ -42,7 +42,8 @@ const bottomRoutes = {
   ...createRoute("settings", SettingsContainer, {
     icon: Icon.Settings,
     bottom: true,
-    title: "Settings"
+    title: "Settings",
+    topBarHidden: true
   })
 };
 
@@ -50,7 +51,8 @@ const routes = {
   ...createNormalRoute("home", Home, Icon.Home),
   ...createRoute("notebooks", NotebooksContainer, {
     icon: Icon.Book,
-    title: "Notebooks"
+    title: "Notebooks",
+    topBarHidden: true
   }),
   ...createNormalRoute("favorites", Favorites, Icon.Star),
   ...createNormalRoute("trash", Trash, Icon.Trash2),

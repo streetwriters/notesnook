@@ -84,27 +84,31 @@ const NavigationContainer = props => {
               onClick={props.backAction}
               height={38}
               color="fontPrimary"
-              sx={{ marginLeft: -2 /*correction */, marginRight: 2 }}
+              sx={{ marginLeft: -1, marginRight: 2 }}
             >
               <Icon.ChevronLeft size={38} />
             </Box>
           )}
-          <Box
-            onClick={() => ev.emit("openSideMenu")}
-            height={36}
-            color="fontPrimary"
-            sx={{
-              marginRight: 3,
-              display: ["block", "none", "none"]
-            }}
-          >
-            <Icon.Menu size={36} />
-          </Box>
-          <Heading fontSize="heading">
-            {props.route.title || props.route.params.title}
-          </Heading>
+          {!props.route.topBarHidden && (
+            <>
+              <Box
+                onClick={() => ev.emit("openSideMenu")}
+                height={36}
+                color="fontPrimary"
+                sx={{
+                  marginRight: 3,
+                  display: [props.canGoBack ? "none" : "block", "none", "none"]
+                }}
+              >
+                <Icon.Menu size={36} />
+              </Box>
+              <Heading fontSize="heading">
+                {props.route.title || props.route.params.title}
+              </Heading>
+            </>
+          )}
         </Flex>
-        <Text variant="title" color="primary">
+        <Text variant="title" color="primary" sx={{ marginBottom: 1 }}>
           {props.route.params.subtitle}
         </Text>
       </Flex>
