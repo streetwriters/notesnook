@@ -193,7 +193,7 @@ function makeTheme({
   return {
     background,
     primary,
-    shade: primary + "10",
+    shade: hexToRGB(primary, 0.1),
     //secondary: "",
     accent,
     //custom
@@ -202,7 +202,7 @@ function makeTheme({
     hover,
     fontSecondary,
     fontTertiary: "gray",
-    transparent: "#00000000",
+    transparent: "transparent",
     text,
     overlay,
     static: "white",
@@ -266,4 +266,21 @@ const cssTheme = theme => {
     root += `--${color}: ${theme.colors[color]};`;
   }
   return root + "}";
+};
+
+const hexToRGB = (hex, alpha = 1) => {
+  let parseString = hex;
+  if (hex.startsWith("#")) {
+    parseString = hex.slice(1, 7);
+  }
+  if (parseString.length !== 6) {
+    return null;
+  }
+  const r = parseInt(parseString.slice(0, 2), 16);
+  const g = parseInt(parseString.slice(2, 4), 16);
+  const b = parseInt(parseString.slice(4, 6), 16);
+  if (isNaN(r) || isNaN(g) || isNaN(b)) {
+    return null;
+  }
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 };

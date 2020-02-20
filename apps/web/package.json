@@ -11,6 +11,7 @@
     "quill-magic-url": "^1.0.3",
     "quill-markdown-shortcuts": "^0.0.10",
     "react": "^16.11.0",
+    "react-app-polyfill": "^1.0.6",
     "react-dom": "^16.11.0",
     "react-feather": "^2.0.3",
     "react-modal": "^3.11.1",
@@ -38,12 +39,15 @@
     "production": [
       ">0.2%",
       "not dead",
-      "not op_mini all"
+      "not op_mini all",
+      "ie >= 9"
     ],
     "development": [
       "last 1 chrome version",
       "last 1 firefox version",
-      "last 1 safari version"
+      "last 1 safari version",
+      "last 3 ie version",
+      "last 4 edge version"
     ]
   }
 }
