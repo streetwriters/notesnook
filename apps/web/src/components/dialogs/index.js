@@ -40,6 +40,7 @@ const Dialog = props => {
               overflowY: "hidden"
             },
             overlay: {
+              zIndex: 999,
               background: theme.colors.overlay
             }
           }}
@@ -224,26 +225,21 @@ const ConfirmationDialog = props => (
   />
 );
 
-const SignInDialog = props => (
+const LoginDialog = props => (
   <Dialog
     open={true}
     title={props.title}
     icon={props.icon}
-    IconSize={30}
-    closeCick={props.closeCick}
+    onCloseClick={props.onCloseClick}
     content={
       <Box my={1}>
+        <Input variant="default" placeholder="Email"></Input>
         <Input
-          placeholder="Email"
-          my="10px"
-          sx={{ borderColor: "border" }}
-        ></Input>
-        <Input
+          variant="default"
           placeholder="Password"
-          my="10px"
-          sx={{ borderColor: "border" }}
+          sx={{ marginTop: 2 }}
         ></Input>
-        <Button width={1} my="10px">
+        <Button width={1} my={2}>
           Login
         </Button>
         <Flex flexDirection="row" justifyContent="space-between">
@@ -267,11 +263,10 @@ export const showSignInDialog = (icon, title, message) => {
   if (root) {
     return new Promise((resolve, _) => {
       ReactDOM.render(
-        <SignInDialog
-          closeCick={() => {
+        <LoginDialog
+          onCloseClick={() => {
             perform(false, resolve);
           }}
-          id="SignInDialog"
           title={title}
           message={message}
           icon={icon}

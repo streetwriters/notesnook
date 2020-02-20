@@ -125,6 +125,9 @@ const theme = (colors, shadows) => ({
       ":focus": {
         outline: "none"
       },
+      ":hover": {
+        cursor: "pointer"
+      },
       ...ButtonPressedStyle
     },
     secondary: {
@@ -152,27 +155,16 @@ const theme = (colors, shadows) => ({
         outline: "none"
       }
     },
-    setting: {
-      bg: "transparent",
-      borderLeft: "0px Solid",
-      borderRight: "0px Solid",
-      borderTop: "0px Solid",
-      borderBottom: "1px Solid",
-      borderColor: "border",
-      color: "text",
-      textAlign: "left",
-      fontSize: "title",
-      fontFamily: "body",
-      borderRadius: "0px",
-      py: "15px",
-      mx: "5px",
-      "&:hover": { borderColor: "primary" }
-    },
     links: {
+      variant: "buttons.primary",
       bg: "transparent",
       color: "primary",
       fontSize: "subBody",
-      fontFamily: "body"
+      fontFamily: "body",
+      py: 0,
+      px: 0,
+      my: 0,
+      mx: 0
     }
   },
   shadows: shadows
