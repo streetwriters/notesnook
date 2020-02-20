@@ -91,15 +91,14 @@ const NavigationContainer = props => {
           )}
           <Box
             onClick={() => ev.emit("openSideMenu")}
-            height={38}
+            height={36}
             color="fontPrimary"
             sx={{
-              marginLeft: -5 /*correction */,
-              marginRight: 1,
+              marginRight: 3,
               display: ["block", "none", "none"]
             }}
           >
-            <Icon.Menu size={38} />
+            <Icon.Menu size={36} />
           </Box>
           <Heading fontSize="heading">
             {props.route.title || props.route.params.title}

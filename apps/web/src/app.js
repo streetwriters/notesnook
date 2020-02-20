@@ -44,7 +44,7 @@ const NavMenuItem = props => {
         sx={{ marginLeft: [2, 0, 0] }}
       >
         <props.item.icon
-          size={18}
+          size={"1.125rem"}
           strokeWidth={props.selected ? 2 : 1.3}
           style={{ marginRight: 2 }}
           fill={fill}
@@ -52,7 +52,7 @@ const NavMenuItem = props => {
         <Text
           sx={{
             display: ["flex", "none", "none"],
-            fontSize: 15,
+            fontSize: "title",
             marginLeft: 1
           }}
         >
@@ -89,22 +89,36 @@ function App() {
   return (
     <ThemeProvider>
       <Flex
-        bg="background"
+        bg={"background"}
         sx={{ color: "text" }}
         height="100%"
         alignContent="stretch"
       >
-        <Flex
+        <Box
+          display={[sideMenuOpen ? "block" : "none", "none", "none"]}
+          width={"full"}
+          height={"full"}
+          bg={"#00000099"}
+          sx={{ position: "absolute", zIndex: 999 }}
+          onClick={() => setSideMenuOpen(false)}
+        />
+        <Box
           flexDirection="column"
           justifyContent="space-between"
           sx={{
             zIndex: 999,
-            borderRight: "1px solid",
+            borderRightStyle: "solid",
+            borderRightWidth: [0, "1px", "1px"],
             borderRightColor: "primary",
             minWidth: ["85%", 50, 50],
             maxWidth: ["85%", 50, 50],
+            height: "full",
             display: [sideMenuOpen ? "flex" : "none", "flex", "flex"],
-            position: ["absolute", "relative", "relative"],
+            position: [
+              sideMenuOpen ? "absolute" : "relative",
+              "relative",
+              "relative"
+            ],
             overflow: "scroll",
             scrollbarWidth: "none",
             //TODO: need to test this on webkit and internet explorer
@@ -112,7 +126,7 @@ function App() {
             msOverflowStyle: "none"
             //"-ms-overflow-style": "none"
           }}
-          bg={"shade"}
+          bg={["background", "shade", "shade"]}
           px={0}
         >
           <Box>
@@ -121,16 +135,14 @@ function App() {
                 !item.bottom && (
                   <NavMenuItem
                     onSelected={async () => {
-                      if (item.onClick) {
-                        return item.onClick();
-                      }
-                      if (selectedIndex === index) {
+                      if (selectedIndex === index || !sideMenuOpen) {
                         setShow(!show);
                         return;
                       }
                       if (RootNavigator.navigate(item.key)) {
                         setSelectedIndex(index);
                       }
+                      setSideMenuOpen(false);
                     }}
                     key={item.key}
                     item={item}
@@ -155,6 +167,7 @@ function App() {
                       if (RootNavigator.navigate(item.key)) {
                         setSelectedIndex(index);
                       }
+                      setSideMenuOpen(false);
                     }}
                     key={item.key}
                     item={item}
@@ -163,7 +176,7 @@ function App() {
                 )
             )}
           </Box>
-        </Flex>
+        </Box>
         <Flex flex="1 1 auto" flexDirection="row" alignContent="stretch" px={0}>
           <Flex
             className="RootNavigator"

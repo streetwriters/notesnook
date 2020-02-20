@@ -31,26 +31,29 @@ const bottomRoutes = {
   ...createDeadRoute("nightmode", Icon.Moon, {
     onClick: () => changeTheme(),
     bottom: true,
-    isToggled: () => isDarkTheme()
+    isToggled: () => isDarkTheme(),
+    title: "Night mode"
   }),
   ...createDeadRoute("signin", Icon.LogIn, {
     onClick: () => showSignInDialog(Icon.LogIn, "Login", ""),
-    bottom: true
+    bottom: true,
+    title: "Login"
   }),
   ...createRoute("settings", SettingsContainer, {
     icon: Icon.Settings,
-    bottom: true
+    bottom: true,
+    title: "Settings"
   })
 };
 
 const routes = {
   ...createNormalRoute("home", Home, Icon.Home),
   ...createRoute("notebooks", NotebooksContainer, {
-    icon: Icon.Book
+    icon: Icon.Book,
+    title: "Notebooks"
   }),
   ...createNormalRoute("favorites", Favorites, Icon.Star),
   ...createNormalRoute("trash", Trash, Icon.Trash2),
-  ...colorRoutes,
   ...bottomRoutes
 };
 
