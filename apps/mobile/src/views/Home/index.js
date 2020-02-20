@@ -23,6 +23,13 @@ export const Home = ({navigation}) => {
   const isFocused = useIsFocused();
 
   useEffect(() => {
+    if (isFocused) {
+      dispatch({
+        type: ACTIONS.CURRENT_SCREEN,
+        screen: 'home',
+      });
+    }
+
     eSendEvent(eScrollEvent, 0);
     dispatch({type: ACTIONS.COLORS});
     dispatch({type: ACTIONS.NOTES});

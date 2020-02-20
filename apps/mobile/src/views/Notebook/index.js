@@ -19,6 +19,7 @@ import {
   eScrollEvent,
 } from '../../services/events';
 import {ToastEvent, w} from '../../utils/utils';
+import {ACTIONS} from '../../provider/actions';
 
 export const Notebook = ({navigation}) => {
   const [state, dispatch] = useTracked();
@@ -61,6 +62,13 @@ export const Notebook = ({navigation}) => {
   };
 
   useEffect(() => {
+    if (isFocused) {
+      dispatch({
+        type: ACTIONS.CURRENT_SCREEN,
+        screen: 'notebook',
+      });
+    }
+
     eSubscribeEvent(eMoveNoteDialogNavigateBack, handleBackPress);
     return () => {
       eUnSubscribeEvent(eMoveNoteDialogNavigateBack, handleBackPress);

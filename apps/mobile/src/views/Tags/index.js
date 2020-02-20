@@ -24,6 +24,10 @@ export const Tags = ({navigation}) => {
   const [refreshing, setRefreshing] = useState(false);
   useEffect(() => {
     dispatch({type: ACTIONS.TAGS});
+    dispatch({
+      type: ACTIONS.CURRENT_SCREEN,
+      screen: 'tags',
+    });
   }, []);
 
   return (

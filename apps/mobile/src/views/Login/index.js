@@ -83,15 +83,18 @@ export const Login = ({navigation}) => {
       }, 500);
     }, 300);
     setStatus('Logging in...');
+
     if (!invalidPassword && !invalidUsername) {
       try {
+        console.log('here reacched');
         await db.user.login(username, password);
       } catch (e) {
-        console.log(e);
+        console.log(e, 'ERROR');
         setLoggingIn(false);
       }
 
       let user;
+      console.log(await db.user.get());
 
       try {
         user = await db.user.get();

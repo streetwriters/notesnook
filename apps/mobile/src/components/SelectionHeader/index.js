@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {
   Platform,
   SafeAreaView,
@@ -12,9 +12,10 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
-import {w} from '../../utils/utils';
+import {w, ToastEvent} from '../../utils/utils';
 import {eSendEvent} from '../../services/eventManager';
 import {eOpenMoveNoteDialog} from '../../services/events';
+import {db} from '../../../App';
 
 export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(
   SafeAreaView,
@@ -23,9 +24,11 @@ export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(
 export const SelectionHeader = ({navigation}) => {
   // State
   const [state, dispatch] = useTracked();
-  const {colors, selectionMode, selectedItemsList} = state;
+  const {colors, selectionMode, selectedItemsList, currentScreen} = state;
 
-  // Render
+  useEffect(() => {
+    console.log(currentScreen);
+  }, [currentScreen]);
 
   return (
     <Animatable.View
@@ -98,42 +101,111 @@ export const SelectionHeader = ({navigation}) => {
             justifyContent: 'space-between',
             alignItems: 'center',
           }}>
-          <TouchableOpacity
-            onPress={() => {
-              dispatch({type: ACTIONS.SELECTION_MODE, enabled: false});
-              eSendEvent(eOpenMoveNoteDialog);
-            }}>
-            <Icon
-              style={{
-                paddingLeft: 25,
-              }}
-              color={colors.accent}
-              name={'plus'}
-              size={SIZE.xl}
-            />
-          </TouchableOpacity>
+          {currentScreen === 'trash' || currentScreen === 'notebooks' ? null : (
+            <TouchableOpacity
+              onPress={() => {
+                dispatch({type: ACTIONS.SELECTION_MODE, enabled: false});
+                eSendEvent(eOpenMoveNoteDialog);
+              }}>
+              <Icon
+                style={{
+                  paddingLeft: 25,
+                }}
+                color={colors.accent}
+                name={'plus'}
+                size={SIZE.xl}
+              />
+            </TouchableOpacity>
+          )}
+          {currentScreen === 'trash' || currentScreen === 'notebooks' ? null : (
+            <TouchableOpacity
+              onPress={async () => {
+                if (selectedItemsList.length > 0) {
+                  selectedItemsList.forEach(async item => {
+                    await db.notes.note(item.id).favorite();
+                  });
+                  dispatch({type: ACTIONS.SELECTION_MODE, enabled: false});
+                  dispatch({type: ACTIONS.NOTES});
+                  dispatch({type: ACTIONS.CLEAR_SELECTION});
+                  ToastEvent.show('Notes added to favorites');
+                }
+              }}>
+              <Icon
+                style={{
+                  paddingLeft: 25,
+                }}
+                color={colors.accent}
+                name={'star'}
+                size={SIZE.xl - 3}
+              />
+            </TouchableOpacity>
+          )}
 
-          <TouchableOpacity>
-            <Icon
-              style={{
-                paddingLeft: 25,
-              }}
-              color={colors.accent}
-              name={'star'}
-              size={SIZE.xl - 3}
-            />
-          </TouchableOpacity>
+          {currentScreen === 'trash' ? null : (
+            <TouchableOpacity
+              onPress={async () => {
+                if (selectedItemsList.length > 0) {
+                  let noteIds = [];
+                  selectedItemsList.forEach(item => {
+                    noteIds.push(item.id);
+                  });
+                  if (currentScreen === 'notebooks') {
+                    await db.notebooks.delete(...noteIds);
+                    dispatch({type: ACTIONS.NOTEBOOKS});
+                    ToastEvent.show('Notebooks moved to trash');
+                  } else if (currentScreen === 'notebook') {
+                    ToastEvent.show('Topics moved to trash');
+                    // TODO
+                  } else {
+                    await db.notes.delete(...noteIds);
+                    dispatch({type: ACTIONS.NOTES});
+                    ToastEvent.show('Notes moved to trash');
+                  }
 
-          <TouchableOpacity>
-            <Icon
-              style={{
-                paddingLeft: 25,
-              }}
-              color={colors.errorText}
-              name={'delete'}
-              size={SIZE.xl - 3}
-            />
-          </TouchableOpacity>
+                  dispatch({type: ACTIONS.SELECTION_MODE, enabled: false});
+
+                  dispatch({type: ACTIONS.CLEAR_SELECTION});
+                }
+              }}>
+              <Icon
+                style={{
+                  paddingLeft: 25,
+                }}
+                color={colors.errorText}
+                name={'delete'}
+                size={SIZE.xl - 3}
+              />
+            </TouchableOpacity>
+          )}
+
+          {currentScreen === 'trash' ? (
+            <TouchableOpacity
+              onPress={async () => {
+                if (selectedItemsList.length > 0) {
+                  let noteIds = [];
+                  selectedItemsList.forEach(item => {
+                    noteIds.push(item.id);
+                  });
+
+                  await db.trash.restore(...noteIds);
+                  console.log(noteIds);
+                  dispatch({type: ACTIONS.TRASH});
+                  dispatch({type: ACTIONS.SELECTION_MODE, enabled: false});
+
+                  dispatch({type: ACTIONS.CLEAR_SELECTION});
+                  ToastEvent.show('Notes moved to trash');
+                }
+              }}>
+              <Icon
+                style={{
+                  paddingLeft: 25,
+                }}
+                color={colors.errorText}
+                name="delete-restore"
+                size={SIZE.xl - 3}
+              />
+            </TouchableOpacity>
+          ) : null}
         </View>
       </View>
     </Animatable.View>

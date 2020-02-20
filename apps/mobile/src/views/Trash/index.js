@@ -22,7 +22,11 @@ export const Trash = ({navigation}) => {
     dispatch({
       type: ACTIONS.TRASH,
     });
-    console.log(trash);
+
+    dispatch({
+      type: ACTIONS.CURRENT_SCREEN,
+      screen: 'trash',
+    });
   }, []);
 
   const _renderItem = ({item, index}) => (

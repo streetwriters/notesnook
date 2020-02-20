@@ -17,6 +17,10 @@ export const Favorites = ({navigation}) => {
   const {colors, selectionMode, favorites} = state;
   const [refreshing, setRefreshing] = useState(false);
   useEffect(() => {
+    dispatch({
+      type: ACTIONS.CURRENT_SCREEN,
+      screen: 'favorites',
+    });
     dispatch({type: ACTIONS.FAVORITES});
   }, []);
 

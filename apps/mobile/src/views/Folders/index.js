@@ -45,6 +45,15 @@ export const Folders = ({navigation}) => {
     eSendEvent(eScrollEvent, 0);
     dispatch({type: ACTIONS.NOTEBOOKS});
 
+    if (isFocused) {
+      if (isFocused) {
+        dispatch({
+          type: ACTIONS.CURRENT_SCREEN,
+          screen: 'notebooks',
+        });
+      }
+    }
+
     let backhandler;
     if (isFocused) {
       backhandler = BackHandler.addEventListener(
