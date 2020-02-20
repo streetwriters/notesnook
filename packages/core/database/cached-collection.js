@@ -50,10 +50,9 @@ export default class CachedCollection {
 
   async removeItem(id) {
     if (this.transactionOpen) return;
-    if (this.map.delete(id)) {
-      await this.indexer.remove(id);
-      await this.indexer.deindex(id);
-    }
+    await this.indexer.deindex(id);
+    await this.indexer.remove(id);
+    this.map.delete(id);
   }
 
   exists(id) {
