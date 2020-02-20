@@ -176,6 +176,9 @@ export const Header = ({
             </MenuItem>
             <MenuDivider />
             <MenuItem
+              textStyle={{
+                fontFamily: WEIGHT.regular,
+              }}
               onPress={() => {
                 dispatch({type: ACTIONS.NOTES, sort: null});
                 menuRef.current?.hide();
@@ -183,6 +186,9 @@ export const Header = ({
               Default
             </MenuItem>
             <MenuItem
+              textStyle={{
+                fontFamily: WEIGHT.regular,
+              }}
               onPress={() => {
                 dispatch({type: ACTIONS.NOTES, sort: 'abc'});
                 menuRef.current?.hide();
@@ -190,6 +196,9 @@ export const Header = ({
               Alphabetical
             </MenuItem>
             <MenuItem
+              textStyle={{
+                fontFamily: WEIGHT.regular,
+              }}
               onPress={() => {
                 dispatch({type: ACTIONS.NOTES, sort: 'year'});
                 menuRef.current?.hide();
@@ -197,6 +206,9 @@ export const Header = ({
               By year
             </MenuItem>
             <MenuItem
+              textStyle={{
+                fontFamily: WEIGHT.regular,
+              }}
               onPress={() => {
                 dispatch({type: ACTIONS.NOTES, sort: 'month'});
                 menuRef.current?.hide();
@@ -204,6 +216,9 @@ export const Header = ({
               By month
             </MenuItem>
             <MenuItem
+              textStyle={{
+                fontFamily: WEIGHT.regular,
+              }}
               onPress={() => {
                 dispatch({type: ACTIONS.NOTES, sort: 'week'});
                 menuRef.current?.hide();

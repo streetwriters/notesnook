@@ -27,6 +27,7 @@ import {ACTIONS} from '../../provider/actions';
 import {moveNoteEvent} from '../DialogManager';
 import Share from 'react-native-share';
 import {timeConverter, ToastEvent} from '../../utils/utils';
+import NavigationService from '../../services/NavigationService';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
@@ -229,7 +230,12 @@ export const ActionSheetComponent = ({
     {
       name: 'Open',
       icon: 'open-in-app',
-      func: () => {},
+      func: () => {
+        NavigationService.navigate('Editor', {
+          note: item,
+        });
+        close();
+      },
     },
     {
       name: 'Restore',

@@ -232,7 +232,7 @@ export const Menu = ({
                 }}>
                 <Icon
                   style={{
-                    minWidth: noTextMode ? 5 : 40,
+                    minWidth: noTextMode ? 5 : 35,
 
                     textAlignVertical: 'center',
                     textAlign: 'left',
@@ -288,7 +288,7 @@ export const Menu = ({
             }}>
             <Icon
               style={{
-                minWidth: noTextMode ? 5 : 40,
+                minWidth: noTextMode ? 5 : 35,
               }}
               name="tag-outline"
               color={colors.accent}
@@ -509,7 +509,7 @@ export const Menu = ({
                 }}>
                 <Icon
                   style={{
-                    minWidth: noTextMode ? 5 : 40,
+                    minWidth: noTextMode ? 5 : 35,
                   }}
                   name={item.icon}
                   color={colors.accent}
@@ -633,7 +633,7 @@ export const Menu = ({
             }}>
             <Icon
               style={{
-                minWidth: 40,
+                minWidth: 35,
                 textAlign: 'left',
               }}
               name="login"
