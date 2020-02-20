@@ -35,7 +35,7 @@ export default class Trash {
     for (let id of ids) {
       if (!this.collection.exists(id)) return;
       if (id.indexOf("note") > -1)
-        this.deltaStorage.remove(id.replace("_deleted", "") + "_delta");
+        await this.deltaStorage.remove(id.replace("_deleted", "") + "_delta");
       await this.collection.removeItem(id);
     }
   }

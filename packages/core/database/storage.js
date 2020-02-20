@@ -9,11 +9,11 @@ export default class Storage {
     let data = await this.storage.read(key);
     return data;
   }
-  clear() {
-    this.storage.clear();
+  async clear() {
+    await this.storage.clear();
   }
-  remove(key) {
-    this.storage.remove(key);
+  async remove(key) {
+    await this.storage.remove(key);
   }
   encrypt(password, data) {
     return this.storage.encrypt(password, data);
