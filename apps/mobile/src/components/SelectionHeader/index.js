@@ -13,6 +13,8 @@ import {SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {w} from '../../utils/utils';
+import {eSendEvent} from '../../services/eventManager';
+import {eOpenMoveNoteDialog} from '../../services/events';
 
 export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(
   SafeAreaView,
@@ -76,7 +78,7 @@ export const SelectionHeader = ({navigation}) => {
               }}
               color={colors.pri}
               name={'chevron-left'}
-              size={SIZE.xxxl - 3}
+              size={SIZE.xxxl}
             />
           </TouchableOpacity>
           <Text
@@ -96,31 +98,42 @@ export const SelectionHeader = ({navigation}) => {
             justifyContent: 'space-between',
             alignItems: 'center',
           }}>
-          <Icon
-            style={{
-              paddingLeft: 25,
-            }}
-            color={colors.accent}
-            name={'plus'}
-            size={SIZE.xl}
-          />
-          <Icon
-            style={{
-              paddingLeft: 25,
-            }}
-            color={colors.accent}
-            name={'star'}
-            size={SIZE.xl - 3}
-          />
+          <TouchableOpacity
+            onPress={() => {
+              dispatch({type: ACTIONS.SELECTION_MODE, enabled: false});
+              eSendEvent(eOpenMoveNoteDialog);
+            }}>
+            <Icon
+              style={{
+                paddingLeft: 25,
+              }}
+              color={colors.accent}
+              name={'plus'}
+              size={SIZE.xl}
+            />
+          </TouchableOpacity>
 
-          <Icon
-            style={{
-              paddingLeft: 25,
-            }}
-            color={colors.errorText}
-            name={'delete'}
-            size={SIZE.xl - 3}
-          />
+          <TouchableOpacity>
+            <Icon
+              style={{
+                paddingLeft: 25,
+              }}
+              color={colors.accent}
+              name={'star'}
+              size={SIZE.xl - 3}
+            />
+          </TouchableOpacity>
+
+          <TouchableOpacity>
+            <Icon
+              style={{
+                paddingLeft: 25,
+              }}
+              color={colors.errorText}
+              name={'delete'}
+              size={SIZE.xl - 3}
+            />
+          </TouchableOpacity>
         </View>
       </View>
     </Animatable.View>
