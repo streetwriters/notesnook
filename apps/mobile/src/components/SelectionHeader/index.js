@@ -127,7 +127,7 @@ export const SelectionHeader = ({navigation}) => {
                   dispatch({type: ACTIONS.SELECTION_MODE, enabled: false});
                   dispatch({type: ACTIONS.NOTES});
                   dispatch({type: ACTIONS.CLEAR_SELECTION});
-                  ToastEvent.show('Notes added to favorites');
+                  ToastEvent.show('Notes added to favorites', 'success');
                 }
               }}>
               <Icon
@@ -188,12 +188,12 @@ export const SelectionHeader = ({navigation}) => {
                   });
 
                   await db.trash.restore(...noteIds);
+
                   console.log(noteIds);
                   dispatch({type: ACTIONS.TRASH});
                   dispatch({type: ACTIONS.SELECTION_MODE, enabled: false});
-
                   dispatch({type: ACTIONS.CLEAR_SELECTION});
-                  ToastEvent.show('Notes moved to trash');
+                  ToastEvent.show('Restore complete', 'success');
                 }
               }}>
               <Icon

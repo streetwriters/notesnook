@@ -273,6 +273,7 @@ const Editor = ({navigation, noMenu}) => {
     id = note.id;
     dateEdited = note.dateEdited;
     content = note.content;
+    content.delta = await db.notes.note(id).delta();
     saveCounter = 0;
 
     if (title !== null || title === '') {
@@ -297,12 +298,10 @@ const Editor = ({navigation, noMenu}) => {
     } else if (note.content.delta) {
       let delta;
 
-      if (!note.content.delta.includes('_note_delta')) {
+      if (typeof note.content.delta !== 'string') {
         delta = note.content.delta;
       } else {
         delta = await db.notes.note(id).delta();
-
-        console.log(delta, 'sending delta', note.id);
       }
 
       post(JSON.stringify(delta));
