@@ -55,6 +55,7 @@ function Trash() {
         icon: Icon.Trash2,
         onClick: async () => await db.trash.clear()
       }}
+      onClick={item => {}}
     />
   );
 }
