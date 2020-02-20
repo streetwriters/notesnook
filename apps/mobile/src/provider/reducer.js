@@ -5,7 +5,12 @@ import {ACTIONS} from './actions';
 export const reducer = (state, action) => {
   switch (action.type) {
     case ACTIONS.NOTES:
-      let notes = db.notes.group();
+      let notes;
+      if (action.sort) {
+        notes = db.notes.group(action.sort);
+      } else {
+        notes = db.notes.group();
+      }
 
       return {
         ...state,

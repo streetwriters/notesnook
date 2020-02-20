@@ -287,21 +287,32 @@ const Editor = ({navigation, noMenu}) => {
     } else {
       post('focusTitle');
       post('clear');
+      wait(500).then(() => {
+        setLoading(false);
+      });
     }
     if (note.content.text === '' && note.content.delta === null) {
       post('clear');
+      wait(500).then(() => {
+        setLoading(false);
+      });
     } else if (note.content.delta) {
       let delta;
 
-      if (note.content.delta !== note.id + '_delta') {
+      if (!note.content.delta.includes('_note_delta')) {
         delta = note.content.delta;
       } else {
         delta = await db.notes.note(id).delta();
+
+        console.log(delta, 'sending delta', note.id);
       }
 
       post(JSON.stringify(delta));
     } else {
       post(JSON.stringify({type: 'text', value: note.content.text}));
+      wait(2000).then(() => {
+        setLoading(false);
+      });
     }
   };
 
