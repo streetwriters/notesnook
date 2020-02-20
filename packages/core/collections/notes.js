@@ -53,7 +53,9 @@ export default class Notes {
       return;
     }
 
-    await this.deltaStorage.write(id + "_delta", note.content.delta);
+    if (!(note.content.delta instanceof String)) {
+      await this.deltaStorage.write(id + "_delta", note.content.delta);
+    }
 
     note = {
       id,
@@ -119,7 +121,9 @@ export default class Notes {
     if (!query) return [];
     let queryFn = v => fuzzysearch(query, v.title + " " + v.content.text);
     if (query instanceof Function) queryFn = query;
-    return tfun.filter(queryFn)(this.all);
+    let c = tfun.filter(queryFn)(this.all);
+
+    return c;
   }
 
   group(by, special = false) {
