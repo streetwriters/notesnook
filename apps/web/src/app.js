@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./app.css";
 import Editor from "./components/editor";
-import { Flex, Box, Button, Text } from "rebass";
+import { Flex, Box, Button, Text, Heading } from "rebass";
 import { ThemeProvider } from "./utils/theme";
 import RootNavigator from "./navigation/navigators/rootnavigator";
 import "./app.css";
@@ -104,7 +104,6 @@ function App() {
         />
         <Box
           flexDirection="column"
-          justifyContent="space-between"
           sx={{
             zIndex: 999,
             borderRightStyle: "solid",
@@ -129,53 +128,69 @@ function App() {
           bg={["background", "shade", "shade"]}
           px={0}
         >
-          <Box>
-            {Object.values(RootNavigator.routes).map(
-              (item, index) =>
-                !item.bottom && (
-                  <NavMenuItem
-                    onSelected={async () => {
-                      if (selectedIndex === index || !sideMenuOpen) {
-                        setShow(!show);
-                        return;
-                      }
-                      if (RootNavigator.navigate(item.key)) {
-                        setSelectedIndex(index);
-                      }
-                      setSideMenuOpen(false);
-                    }}
-                    key={item.key}
-                    item={item}
-                    selected={selectedIndex === index}
-                  />
-                )
-            )}
-          </Box>
-          <Box>
-            {Object.values(RootNavigator.routes).map(
-              (item, index) =>
-                item.bottom && (
-                  <NavMenuItem
-                    onSelected={async () => {
-                      if (item.onClick) {
-                        return item.onClick();
-                      }
-                      if (selectedIndex === index) {
-                        setShow(!show);
-                        return;
-                      }
-                      if (RootNavigator.navigate(item.key)) {
-                        setSelectedIndex(index);
-                      }
-                      setSideMenuOpen(false);
-                    }}
-                    key={item.key}
-                    item={item}
-                    selected={selectedIndex === index}
-                  />
-                )
-            )}
-          </Box>
+          {sideMenuOpen && (
+            <Heading
+              color="primary"
+              fontSize={28}
+              mx={2}
+              style={{ marginTop: 2 }}
+            >
+              notesnook
+            </Heading>
+          )}
+          <Flex
+            flex="1 1 auto"
+            flexDirection="column"
+            justifyContent="space-between"
+          >
+            <Box>
+              {Object.values(RootNavigator.routes).map(
+                (item, index) =>
+                  !item.bottom && (
+                    <NavMenuItem
+                      onSelected={async () => {
+                        if (selectedIndex === index || !sideMenuOpen) {
+                          setShow(!show);
+                          return;
+                        }
+                        if (RootNavigator.navigate(item.key)) {
+                          setSelectedIndex(index);
+                        }
+                        setSideMenuOpen(false);
+                      }}
+                      key={item.key}
+                      item={item}
+                      selected={selectedIndex === index}
+                    />
+                  )
+              )}
+            </Box>
+            <Box>
+              {Object.values(RootNavigator.routes).map(
+                (item, index) =>
+                  item.bottom && (
+                    <NavMenuItem
+                      onSelected={async () => {
+                        if (item.onClick) {
+                          return item.onClick();
+                        }
+                        if (selectedIndex === index) {
+                          setShow(!show);
+                          return;
+                        }
+                        if (RootNavigator.navigate(item.key)) {
+                          setSelectedIndex(index);
+                        }
+                        setSideMenuOpen(false);
+                      }}
+                      key={item.key}
+                      item={item}
+                      selected={selectedIndex === index}
+                    />
+                  )
+              )}
+            </Box>
+          </Flex>
         </Box>
         <Flex flex="1 1 auto" flexDirection="row" alignContent="stretch" px={0}>
           <Flex
