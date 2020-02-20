@@ -10,7 +10,7 @@ import { ask, moveNote } from "../dialogs";
 const dropdownRefs = [];
 const menuItems = note => [
   {
-    title: note.notebook.notebook ? "Move" : "Add to",
+    title: note.notebook ? "Move" : "Add to",
     onClick: async () => {
       console.log(note.id, note.notebook);
       if (await moveNote(note.id, note.notebook)) {

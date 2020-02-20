@@ -53,14 +53,14 @@ const Dialog = props => {
               color="primary"
               py={2}
             >
-              <Box height={props.iconSize || 42}>
-                <props.icon size={props.iconSize || 42} />
+              <Box height={props.iconSize || 18}>
+                <props.icon size={props.iconSize || 18} />
               </Box>
               <Text
                 mx={2}
                 as="span"
                 variant="title"
-                fontSize={28}
+                fontSize={16}
                 textAlign="center"
               >
                 {props.title}
@@ -90,7 +90,7 @@ const Dialog = props => {
                 <RebassButton
                   variant="secondary"
                   width={"25%"}
-                  onClick={props.negativeButton.click}
+                  onClick={props.negativeButton.onClick}
                 >
                   {props.negativeButton.text || "Cancel"}
                 </RebassButton>
@@ -457,7 +457,7 @@ export const MoveDialog = props => {
         text: "Move",
         click: async () => {
           try {
-            await db.notes.move(MoveDialog.topic, props.noteId);
+            await db.notes.move({id: MoveDialog.notebook.id, topic: MoveDialog.topic}, props.noteId);
             props.onMove();
           } catch (e) {
             console.log(e);
