@@ -201,8 +201,6 @@ const Editor = ({navigation, noMenu}) => {
     }
     saveCounter++;
     if (id) {
-      console.log(id, 'ID');
-
       let lockednote = db.notes.note(id);
       if (lockNote && lockednote && lockednote.locked) {
         await db.notes.note(id).lock('password');

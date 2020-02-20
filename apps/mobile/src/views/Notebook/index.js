@@ -18,7 +18,7 @@ import {
   eOnNewTopicAdded,
   eScrollEvent,
 } from '../../services/events';
-import {ToastEvent} from '../../utils/utils';
+import {ToastEvent, w} from '../../utils/utils';
 
 export const Notebook = ({navigation}) => {
   const [state, dispatch] = useTracked();

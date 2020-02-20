@@ -8,6 +8,8 @@ import {useTracked} from '../../provider';
 import {SIZE, WEIGHT} from '../../common/common';
 import {ACTIONS} from '../../provider/actions';
 import {ToastEvent} from '../../utils/utils';
+import {eSendEvent} from '../../services/eventManager';
+import {eScrollEvent} from '../../services/events';
 
 export const Notes = ({navigation}) => {
   const [state, dispatch] = useTracked();
@@ -34,11 +36,13 @@ export const Notes = ({navigation}) => {
       let notesInColors = db.notes.colored(params.color.id);
 
       setNotes([...notesInColors]);
-      //setNotes(...);
     } else {
       let allNotes = db.notebooks
-        .notebook(params.notebookID)
-        .topics.topic(params.title);
+        .notebook(params.notebookId)
+        .topics.topic(params.title).all;
+
+      console.log(allNotes, 'here getting topics');
+
       if (allNotes && allNotes.length > 0) {
         setNotes(allNotes);
       }

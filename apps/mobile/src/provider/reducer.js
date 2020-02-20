@@ -84,7 +84,6 @@ export const reducer = (state, action) => {
       return {
         ...state,
         selectionMode: action.enabled,
-        selectedItemsList: [],
       };
     }
     case ACTIONS.SELECTED_ITEMS: {

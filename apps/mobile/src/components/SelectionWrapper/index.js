@@ -58,7 +58,7 @@ const SelectionWrapper = ({children, item, currentEditingNote, index}) => {
             alignItems: 'center',
           }}>
           <Icon
-            size={SIZE.sm}
+            size={SIZE.lg}
             color={colors.accent}
             name={
               selected
