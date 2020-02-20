@@ -52,6 +52,12 @@ export const reducer = (state, action) => {
         pinned: pinned,
       };
     }
+    case ACTIONS.CURRENT_SCREEN: {
+      return {
+        ...state,
+        currentScreen: action.screen,
+      };
+    }
     case ACTIONS.TAGS: {
       let tagList = db.notes.tags;
       return {
@@ -61,7 +67,6 @@ export const reducer = (state, action) => {
     }
     case ACTIONS.FAVORITES: {
       let favorites = [...db.notes.favorites];
-
       return {
         ...state,
         favorites: [...favorites],

@@ -12,6 +12,7 @@ export const defaultState = {
   tags: [],
   colorNotes: [],
   user: {},
+  currentScreen: 'home',
   colors: {
     night: false,
     bg: 'white',

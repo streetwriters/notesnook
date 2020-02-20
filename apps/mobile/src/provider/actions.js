@@ -15,4 +15,5 @@ export const ACTIONS = {
   COLORS: 'colorNotes',
   SEARCH_RESULTS: 'searchResults',
   USER: 'getUser',
+  CURRENT_SCREEN: 'currentScreen',
 };
