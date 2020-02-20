@@ -7,6 +7,8 @@ import DropdownTrigger from "./dropdown-trigger";
 import DropdownContent from "./dropdown-content";
 import "./styles/Dropdown.css";
 
+var lastOpenedDropdown;
+
 class Dropdown extends Component {
   displayName = "Dropdown";
 
@@ -76,11 +78,16 @@ class Dropdown extends Component {
 
   _onToggleClick(event) {
     event.preventDefault();
+    if (lastOpenedDropdown) {
+      lastOpenedDropdown.hide();
+    }
     if (this.isActive()) {
       this.hide();
     } else {
+      lastOpenedDropdown = this;
       this.show();
     }
+
     event.stopPropagation();
   }
 

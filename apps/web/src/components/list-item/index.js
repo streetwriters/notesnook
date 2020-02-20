@@ -52,8 +52,8 @@ const ListItem = props => (
       </Flex>
     )}
     <Box
-      onClick={e => {
-        e.stopPropagation();
+      onClick={() => {
+        //e.stopPropagation();
         if (props.onClick) {
           props.onClick();
         }
