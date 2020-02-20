@@ -1,7 +1,7 @@
 import React from "react";
 import { db, ev } from "../common";
 import * as Icon from "react-feather";
-import ListItem from "../components/listview";
+import ListView from "../components/listview";
 import { showSnack } from "../components/snackbar";
 import { ask } from "../components/dialogs";
 const dropdownRefs = [];
@@ -54,13 +54,22 @@ const menuItems = item => [
 
 function Favorites() {
   return (
-    <ListItem
+    <ListView
       type="Favorites"
       getItems={db.notes.favorites}
       menu={{ menuItems, dropdownRefs }}
       button={undefined}
+      onClick={item => {
+        if (item.type === "note") {
+          sendOpenNoteEvent(item);
+        }
+      }}
     />
   );
+}
+
+function sendOpenNoteEvent(note) {
+  ev.emit("onOpenNote", note);
 }
 
 export default Favorites;

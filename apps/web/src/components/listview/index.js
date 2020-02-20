@@ -6,7 +6,7 @@ import ListItem from "../list-item";
 import TimeAgo from "timeago-react";
 import ListContainer from "../list-container";
 
-function ListView({ type, getItems, menu, button }) {
+function ListView({ type, getItems, menu, button, onClick }) {
   const [items, setItems] = useState([]);
 
   useEffect(() => {
@@ -30,7 +30,7 @@ function ListView({ type, getItems, menu, button }) {
               title={item.title}
               body={item.headline}
               index={index}
-              onClick={() => {}} //TODO
+              onClick={onClick.bind(this, item)} //TODO
               info={
                 <Flex justifyContent="center" alignItems="center">
                   <TimeAgo datetime={item.dateDeleted || item.dateCreated} />
