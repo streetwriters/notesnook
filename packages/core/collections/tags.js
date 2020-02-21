@@ -20,7 +20,7 @@ export default class Tags {
     await this.collection.addItem(tag);
   }
 
-  all() {
+  get all() {
     return this.collection.getAllItems();
   }
 

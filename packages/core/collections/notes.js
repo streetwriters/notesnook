@@ -21,8 +21,6 @@ export default class Notes {
   constructor(context) {
     this.collection = new CachedCollection(context, "notes");
     this.deltaStorage = new Storage(context);
-    this.tagsCollection = new Tags(context, "tags");
-    this.colorsCollection = new Tags(context, "colors");
   }
 
   /**
@@ -30,12 +28,14 @@ export default class Notes {
    * @param {Notebooks} notebooks
    * @param {Trash} trash
    */
-  async init(notebooks, trash) {
+  async init(notebooks, trash, tags, colors) {
     await this.collection.init();
     this.notebooks = notebooks;
     this.trash = trash;
-    await this.tagsCollection.init();
-    await this.colorsCollection.init();
+//    await this.tagsCollection.init();
+//    await this.colorsCollection.init();
+    this.tagsCollection = tags;
+    this.colorsCollection = colors;
   }
 
   async add(noteArg) {
@@ -192,14 +192,6 @@ export default class Notes {
       await this.collection.removeItem(id);
       await this.trash.add(item.data);
     }
-  }
-
-  get tags() {
-    return this.tagsCollection.all();
-  }
-
-  get colors() {
-    return this.colorsCollection.all();
   }
 
   async move(to, ...noteIds) {

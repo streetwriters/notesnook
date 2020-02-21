@@ -108,7 +108,7 @@ test("add tag to note", () =>
     let note = db.notes.note(id);
     await note.tag("hello");
     expect(note.tags[0]).toBe("hello");
-    expect(db.notes.tags[0].title).toBe("hello");
+    expect(db.tags.all[0].title).toBe("hello");
   }));
 
 test("remove tag from note", () =>
@@ -116,10 +116,10 @@ test("remove tag from note", () =>
     let note = db.notes.note(id);
     await note.tag("hello");
     expect(note.tags[0]).toBe("hello");
-    expect(db.notes.tags[0].title).toBe("hello");
+    expect(db.tags.all[0].title).toBe("hello");
     await note.untag("hello");
     expect(note.tags.length).toBe(0);
-    expect(db.notes.tags.length).toBe(0);
+    expect(db.tags.all.length).toBe(0);
   }));
 
 test("color a note", () =>
@@ -127,7 +127,7 @@ test("color a note", () =>
     let note = db.notes.note(id);
     await note.color("red");
     expect(note.colors[0]).toBe("red");
-    expect(db.notes.colors[0].title).toBe("red");
+    expect(db.colors.all[0].title).toBe("red");
   }));
 
 test("uncolor a note", () =>
@@ -135,10 +135,10 @@ test("uncolor a note", () =>
     let note = db.notes.note(id);
     await note.color("red");
     expect(note.colors.length).toBe(1);
-    expect(db.notes.colors.length).toBe(1);
+    expect(db.colors.all.length).toBe(1);
     await note.uncolor("red");
     expect(note.colors.length).toBe(0);
-    expect(db.notes.colors.length).toBe(0);
+    expect(db.colors.all.length).toBe(0);
   }));
 
 test("note with text longer than 150 characters should have ... in the headline", () =>
@@ -157,7 +157,7 @@ test("get tags", () =>
     ...TEST_NOTE,
     tags: ["new", "tag", "goes", "here"]
   }).then(async ({ db }) => {
-    expect(db.notes.tags.length).toBeGreaterThan(0);
+    expect(db.tags.all.length).toBeGreaterThan(0);
   }));
 
 test("get notes in tag", () =>

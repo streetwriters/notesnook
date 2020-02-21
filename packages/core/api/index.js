@@ -16,11 +16,11 @@ class Database {
     this.user = new User(this.context);
     this.tags = new Tags(this.context, "tags");
     this.colors = new Tags(this.context, "colors");
-    await this.notes.init(this.notebooks, this.trash);
-    await this.notebooks.init(this.notes, this.trash);
-    await this.trash.init(this.notes, this.notebooks);
     await this.tags.init();
     await this.colors.init();
+    await this.notes.init(this.notebooks, this.trash, this.tags, this.colors);
+    await this.notebooks.init(this.notes, this.trash);
+    await this.trash.init(this.notes, this.notebooks);
     this.syncer = new Sync(this);
   }
 
