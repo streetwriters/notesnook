@@ -20,7 +20,8 @@
     "react-simple-dropdown": "^3.2.3",
     "react-virtuoso": "^0.12.3",
     "rebass": "^4.0.7",
-    "timeago-react": "^3.0.0"
+    "timeago-react": "^3.0.0",
+    "zustand": "^2.2.3"
   },
   "devDependencies": {
     "babel-loader": "8.0.6"
