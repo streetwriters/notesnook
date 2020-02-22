@@ -26,9 +26,11 @@ export default class Trash {
   async add(item) {
     if (this._collection.exists(item.id + "_deleted"))
       throw new Error("This item has already been deleted.");
-    item.dateDeleted = Date.now();
-    item.id = item.id + "_deleted";
-    await this._collection.addItem(item);
+    await this._collection.addItem({
+      ...item,
+      dateDeleted: Date.now(),
+      id: item.id + "_deleted"
+    });
   }
 
   async delete(...ids) {
@@ -42,7 +44,7 @@ export default class Trash {
 
   async restore(...ids) {
     for (let id of ids) {
-      let item = this._collection.getItem(id);
+      let item = { ...this._collection.getItem(id) };
       if (!item) continue;
       delete item.dateDeleted;
       item.id = item.id.replace("_deleted", "");
