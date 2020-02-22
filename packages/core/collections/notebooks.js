@@ -54,10 +54,10 @@ export default class Notebooks {
 
     await this._collection.addItem(notebook);
 
-    //if (!oldNotebook) {
-    await this.notebook(notebook.id).topics.add(...notebook.topics);
-    //}
-    return notebook.id;
+    if (!oldNotebook) {
+      await this.notebook(notebook).topics.add(...notebook.topics);
+    }
+    return notebook;
   }
 
   get all() {
@@ -70,7 +70,7 @@ export default class Notebooks {
    * @returns {Notebook} The notebook of the given id
    */
   notebook(id) {
-    let notebook = this._collection.getItem(id);
+    let notebook = id.type ? id : this._collection.getItem(id);
     if (!notebook) return;
     return new Notebook(this, notebook);
   }

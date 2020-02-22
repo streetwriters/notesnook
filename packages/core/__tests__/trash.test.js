@@ -25,7 +25,7 @@ test("delete a note", () =>
 
 test("restore a deleted note", () =>
   noteTest().then(async ({ db, id }) => {
-    let nbId = await db.notebooks.add(TEST_NOTEBOOK);
+    let { id: nbId } = await db.notebooks.add(TEST_NOTEBOOK);
     await db.notebooks
       .notebook(nbId)
       .topics.topic("General")
@@ -47,7 +47,7 @@ test("restore a deleted note", () =>
 
 test("restore a deleted note that's in a deleted notebook", () =>
   noteTest().then(async ({ db, id }) => {
-    let nbId = await db.notebooks.add(TEST_NOTEBOOK);
+    let { id: nbId } = await db.notebooks.add(TEST_NOTEBOOK);
     await db.notebooks
       .notebook(nbId)
       .topics.topic("General")

@@ -21,8 +21,8 @@ function databaseTest() {
 
 const notebookTest = (notebook = TEST_NOTEBOOK) =>
   databaseTest().then(async db => {
-    let id = await db.notebooks.add(notebook);
-    return { db, id };
+    let nb = await db.notebooks.add(notebook);
+    return { db, id: nb ? nb.id : undefined };
   });
 
 var TEST_NOTE = {

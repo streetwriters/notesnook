@@ -251,7 +251,7 @@ test("lock and unlock note", () =>
 
 test("add note to topic", () =>
   noteTest().then(async ({ db, id }) => {
-    let notebookId = await db.notebooks.add({ title: "Hello" });
+    let { id: notebookId } = await db.notebooks.add({ title: "Hello" });
     let topics = db.notebooks.notebook(notebookId).topics;
     await topics.add("Home");
     let topic = topics.topic("Home");
@@ -292,7 +292,7 @@ test("move note", () =>
 
 test("moving note to same notebook and topic should do nothing", () =>
   noteTest().then(async ({ db, id }) => {
-    let notebookId = await db.notebooks.add({ title: "Hello" });
+    const { id: notebookId } = await db.notebooks.add({ title: "Hello" });
     let topics = db.notebooks.notebook(notebookId).topics;
     await topics.add("Home");
     let topic = topics.topic("Home");
