@@ -26,14 +26,6 @@ export const AccountSettings = ({navigation}) => {
 
           alignSelf: 'center',
         }}>
-        <Image
-          source={require('../../assets/images/user.jpg')}
-          style={{
-            width: 120,
-            height: 120,
-            borderRadius: 100,
-          }}
-        />
         <Text
           style={{
             color: colors.pri,
