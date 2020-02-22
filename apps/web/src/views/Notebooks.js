@@ -5,21 +5,11 @@ import { showSnack } from "../components/snackbar";
 import Notebook from "../components/notebook";
 import { CreateNotebookDialog } from "../components/dialogs";
 import ListContainer from "../components/list-container";
+import useStore from "../common/store";
 
 const Notebooks = props => {
   const [open, setOpen] = useState(false);
-  const [notebooks, setNotebooks] = useState([]);
-  useEffect(() => {
-    function onRefresh() {
-      setNotebooks(db.notebooks.all);
-    }
-    onRefresh();
-    ev.addListener("refreshNotebooks", onRefresh);
-    return () => {
-      ev.removeListener("refreshNotebooks", onRefresh);
-      Notebooks.onRefresh = undefined;
-    };
-  }, []);
+  const notebooks = useStore(state => state.notebooks);
 
   return (
     <>
@@ -62,7 +52,7 @@ const Notebooks = props => {
               topics
             })
           ) {
-            setNotebooks(db.notebooks.all);
+            //setNotebooks(db.notebooks.all);
             setOpen(false);
           } else {
             showSnack("Please fill out the notebook title.");
