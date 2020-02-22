@@ -112,7 +112,7 @@ export default class AddNotebookDialog extends React.Component {
         }
         positiveButton={{
           text: "Add",
-          click: () => {
+          onClick: () => {
             if (!this.title.trim().length)
               return showSnack("Please enter the notebook title.");
             props.onDone({
@@ -122,7 +122,7 @@ export default class AddNotebookDialog extends React.Component {
             });
           }
         }}
-        negativeButton={{ text: "Cancel", click: props.close }}
+        negativeButton={{ text: "Cancel", onClick: props.close }}
       />
     );
   }

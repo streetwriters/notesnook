@@ -77,7 +77,7 @@ export default class Dialog extends React.Component {
                     mx={1}
                     width={"25%"}
                     disabled={props.positiveButton.disabled || false}
-                    onClick={props.positiveButton.click}
+                    onClick={props.positiveButton.onClick}
                   >
                     {props.positiveButton.text || "OK"}
                   </RebassButton>
@@ -110,7 +110,7 @@ export const showDialog = dialog => {
   if (root) {
     return new Promise(resolve => {
       const PropDialog = dialog(perform.bind(this, resolve));
-      ReactDOM.render(<PropDialog />, root);
+      ReactDOM.render(PropDialog, root);
     });
   }
   return Promise.reject("No element with id 'dialogContainer'");

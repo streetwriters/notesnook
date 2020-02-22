@@ -2,7 +2,7 @@ import React from "react";
 import { db, ev } from "../common";
 import * as Icon from "react-feather";
 import ListView from "../components/listview";
-import { ask } from "../components/dialogs";
+import { confirm } from "../components/dialogs/confirm";
 import { showSnack } from "../components/snackbar";
 
 const dropdownRefs = [];
@@ -10,7 +10,7 @@ const menuItems = item => [
   {
     title: "Restore",
     onClick: async () => {
-      ask(
+      confirm(
         Icon.Star,
         "Restore",
         `Are you sure you want to restore this item to ${item.type}?`
@@ -28,7 +28,7 @@ const menuItems = item => [
     title: "Delete",
     color: "red",
     onClick: async () => {
-      ask(
+      confirm(
         Icon.Star,
         "Delete",
         `Are you sure you want to permanently delete this item?`

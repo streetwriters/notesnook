@@ -13,7 +13,7 @@ import {
   createDeadRoute
 } from "../routes";
 import Navigator from "../index";
-import { showSignInDialog } from "../../components/dialogs";
+import { showLogInDialog } from "../../components/dialogs/logindialog";
 import { changeTheme, isDarkTheme } from "../../utils/theme";
 
 /*For color Search*/
@@ -34,7 +34,7 @@ const bottomRoutes = {
     isToggled: () => isDarkTheme()
   }),
   ...createDeadRoute("signin", Icon.LogIn, {
-    onClick: () => showSignInDialog(Icon.LogIn, "Login", ""),
+    onClick: () => showLogInDialog(),
     bottom: true
   }),
   ...createRoute("settings", SettingsContainer, {

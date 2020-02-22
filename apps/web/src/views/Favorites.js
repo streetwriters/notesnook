@@ -3,13 +3,13 @@ import { db, ev } from "../common";
 import * as Icon from "react-feather";
 import ListView from "../components/listview";
 import { showSnack } from "../components/snackbar";
-import { ask } from "../components/dialogs";
+import { confirm } from "../components/dialogs/confirm";
 const dropdownRefs = [];
 const menuItems = item => [
   {
     title: "Unfavorite",
     onClick: async () => {
-      ask(
+      confirm(
         Icon.Star,
         "Unfavorite",
         "Are you sure you want to remove this item from favorites?"
@@ -33,7 +33,7 @@ const menuItems = item => [
     title: "Delete",
     color: "red",
     onClick: async () => {
-      ask(
+      confirm(
         Icon.Trash2,
         "Delete",
         "Are you sure you want to delete this note? It will be moved to trash and permanently deleted after 7 days."

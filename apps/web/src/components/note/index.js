@@ -5,15 +5,15 @@ import TimeAgo from "timeago-react";
 import { db, ev } from "../../common";
 import { showSnack } from "../snackbar";
 import ListItem from "../list-item";
-import { ask, moveNote } from "../dialogs";
+import { confirm } from "../dialogs/confirm";
+import { showMoveNoteDialog } from "../dialogs/movenotedialog";
 
 const dropdownRefs = [];
 const menuItems = note => [
   {
     title: note.notebook ? "Move" : "Add to",
     onClick: async () => {
-      console.log(note.id, note.notebook);
-      if (await moveNote(note.id, note.notebook)) {
+      if (await showMoveNoteDialog(note.id)) {
         showSnack("Note moved successfully!");
       }
     }
@@ -47,10 +47,10 @@ const menuItems = note => [
     title: "Move to Trash",
     color: "red",
     onClick: () => {
-      ask(
+      confirm(
         Icon.Trash2,
         "Delete",
-        "Are you sure you want to move this note to Trash? It will be moved to Trash and permanently deleted after 7 days."
+        "Are you sure you want to delete this note?"
       ).then(res => {
         if (res) {
           ev.emit("onClearNote", note.id);
