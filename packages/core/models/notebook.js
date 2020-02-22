@@ -25,8 +25,10 @@ export default class Notebook {
   }
 
   toggle(prop) {
-    this.notebook[prop] = !this.notebook[prop];
-    return this.notebooks.add(this.notebook);
+    return this.notebooks.add({
+      id: this.notebook.id,
+      [prop]: !this.notebook[prop]
+    });
   }
 
   pin() {

@@ -36,6 +36,7 @@ test("pin a notebook", () =>
   notebookTest().then(async ({ db, id }) => {
     let notebook = db.notebooks.notebook(id);
     await notebook.pin();
+    notebook = db.notebooks.notebook(id);
     expect(notebook.data.pinned).toBe(true);
   }));
 
@@ -43,8 +44,10 @@ test("unpin a notebook", () =>
   notebookTest().then(async ({ db, id }) => {
     let notebook = db.notebooks.notebook(id);
     await notebook.pin();
+    notebook = db.notebooks.notebook(id);
     expect(notebook.data.pinned).toBe(true);
     await notebook.pin();
+    notebook = db.notebooks.notebook(id);
     expect(notebook.data.pinned).toBe(false);
   }));
 
@@ -52,6 +55,7 @@ test("favorite a notebook", () =>
   notebookTest().then(async ({ db, id }) => {
     let notebook = db.notebooks.notebook(id);
     await notebook.favorite();
+    notebook = db.notebooks.notebook(id);
     expect(notebook.data.favorite).toBe(true);
   }));
 
@@ -59,8 +63,10 @@ test("unfavorite a notebook", () =>
   notebookTest().then(async ({ db, id }) => {
     let notebook = db.notebooks.notebook(id);
     await notebook.favorite();
+    notebook = db.notebooks.notebook(id);
     expect(notebook.data.favorite).toBe(true);
     await notebook.favorite();
+    notebook = db.notebooks.notebook(id);
     expect(notebook.data.favorite).toBe(false);
   }));
 
