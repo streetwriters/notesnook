@@ -1,14 +1,45 @@
 import React from 'react';
-import {Text, TouchableOpacity, View, ScrollView} from 'react-native';
-import {opacity, pv, SIZE, WEIGHT} from '../../common/common';
+import {
+  Text,
+  TouchableOpacity,
+  View,
+  ScrollView,
+  StatusBar,
+} from 'react-native';
+import {
+  opacity,
+  pv,
+  SIZE,
+  WEIGHT,
+  ACCENT,
+  COLOR_SCHEME,
+  COLOR_SCHEME_DARK,
+  COLOR_SCHEME_LIGHT,
+  setColorScheme,
+} from '../../common/common';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Container from '../../components/Container';
 import {useTracked} from '../../provider';
-import NavigationService from '../../services/NavigationService';
 import {w} from '../../utils/utils';
+import {ACTIONS} from '../../provider/actions';
+import FastStorage from 'react-native-fast-storage';
 export const Settings = ({navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors, user} = state;
+
+  function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
+    let newColors = setColorScheme(colors, accent);
+    StatusBar.setBarStyle(newColors.night ? 'light-content' : 'dark-content');
+
+    dispatch({type: ACTIONS.THEME, colors: newColors});
+  }
+
+  function changeAccentColor(accentColor) {
+    ACCENT.color = accentColor;
+    ACCENT.shade = accentColor + '12';
+    changeColorScheme();
+  }
+
   return (
     <Container
       menu={true}
