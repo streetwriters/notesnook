@@ -14,7 +14,7 @@ export default class Dialog extends React.Component {
       <ThemeProvider>
         {theme => (
           <Modal
-            isOpen={true}
+            isOpen={props.isOpen || false}
             shouldCloseOnOverlayClick={true}
             onRequestClose={props.closeCick}
             style={{

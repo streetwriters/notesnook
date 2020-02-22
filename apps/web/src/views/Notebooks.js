@@ -52,7 +52,7 @@ const Notebooks = props => {
   );
 };
 
-const NotebooksContainer = props => {
+const NotebooksContainer = () => {
   useEffect(() => {
     const NotebookNavigator = require("../navigation/navigators/nbnavigator")
       .default;

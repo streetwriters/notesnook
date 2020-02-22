@@ -2,7 +2,7 @@ import React from "react";
 import { Flex, Box, Text, Button as RebassButton } from "rebass";
 import { Input, Checkbox, Label } from "@rebass/forms";
 import * as Icon from "react-feather";
-import Dialog, { showDialog } from "./dialog";
+import Dialog from "./dialog";
 import { showSnack } from "../snackbar";
 
 export default class AddNotebookDialog extends React.Component {
@@ -27,7 +27,7 @@ export default class AddNotebookDialog extends React.Component {
     const props = this.props;
     return (
       <Dialog
-        open={props.isOpen}
+        isOpen={props.isOpen}
         title="Notebook"
         icon={Icon.BookOpen}
         content={
@@ -51,7 +51,7 @@ export default class AddNotebookDialog extends React.Component {
               Topics (optional):
             </Text>
             <Box sx={{ maxHeight: 44 * 5, overflowY: "auto", marginBottom: 1 }}>
-              {this.topics.map((value, index) => (
+              {this.state.topics.map((value, index) => (
                 <Flex
                   key={index.toString()}
                   flexDirection="row"
@@ -60,7 +60,7 @@ export default class AddNotebookDialog extends React.Component {
                   <Input
                     ref={ref => (this._inputRefs[index] = ref)}
                     variant="default"
-                    value={this.topics[index]}
+                    value={this.state.topics[index]}
                     placeholder="Topic name"
                     onFocus={e => {
                       this.lastLength = e.nativeEvent.target.value.length;

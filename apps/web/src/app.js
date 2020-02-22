@@ -8,6 +8,7 @@ import "./app.css";
 import { usePersistentState } from "./utils/hooks";
 import { ev } from "./common";
 import { useTheme } from "emotion-theming";
+import useStore from "./common/store";
 
 const NavMenuItem = props => {
   const [fill, setFill] = useState();
@@ -75,17 +76,15 @@ function App() {
     0
   );
   const [show, setShow] = usePersistentState("navContainerState", true);
-  const [sideMenuOpen, setSideMenuOpen] = useState(false);
+  const initStore = useStore(state => state.init);
+  const isSideMenuOpen = useStore(state => state.isSideMenuOpen);
+  useEffect(() => {
+    initStore();
+  }, [initStore]);
+
   useEffect(() => {
     RootNavigator.navigate(Object.keys(RootNavigator.routes)[selectedIndex]);
-    function openSideMenu() {
-      setSideMenuOpen(true);
-    }
-    ev.addListener("openSideMenu", openSideMenu);
-    return () => {
-      ev.removeListener("openSideMenu", openSideMenu);
-    };
-  });
+  }, []);
   return (
     <ThemeProvider>
       <Flex
@@ -103,7 +102,7 @@ function App() {
             borderRightColor: "primary",
             minWidth: ["85%", 50, 50],
             maxWidth: ["85%", 50, 50],
-            display: [sideMenuOpen ? "flex" : "none", "flex", "flex"],
+            display: [isSideMenuOpen ? "flex" : "none", "flex", "flex"],
             position: ["absolute", "relative", "relative"],
             overflow: "scroll",
             scrollbarWidth: "none",
