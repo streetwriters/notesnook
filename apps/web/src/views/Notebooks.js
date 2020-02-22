@@ -3,14 +3,14 @@ import { Flex } from "rebass";
 import { db, ev } from "../common";
 import { showSnack } from "../components/snackbar";
 import Notebook from "../components/notebook";
-import { CreateNotebookDialog } from "../components/dialogs";
+import AddNotebookDialog from "../components/dialogs/addnotebookdialog";
 import ListContainer from "../components/list-container";
 import useStore from "../common/store";
 
 const Notebooks = props => {
   const [open, setOpen] = useState(false);
   const notebooks = useStore(state => state.notebooks);
-
+  const addNotebook = useStore(state => state.addNotebook);
   return (
     <>
       <ListContainer
@@ -40,6 +40,13 @@ const Notebooks = props => {
         button={{
           content: "Create a notebook",
           onClick: async () => setOpen(true)
+        }}
+      />
+      <AddNotebookDialog
+        isOpen={open}
+        onDone={addNotebook}
+        close={() => {
+          setOpen(false);
         }}
       />
     </>
