@@ -8,34 +8,34 @@ export default class Notebook {
    * @param {Object} notebook
    */
   constructor(notebooks, notebook) {
-    this.notebook = notebook;
-    this.notebooks = notebooks;
+    this._notebook = notebook;
+    this._notebooks = notebooks;
   }
 
   get title() {
-    return this.notebook.title;
+    return this._notebook.title;
   }
 
   get data() {
-    return this.notebook;
+    return this._notebook;
   }
 
   get topics() {
-    return new Topics(this.notebooks, this.notebooks.notes, this.notebook.id);
+    return new Topics(this._notebooks, this._notebook.id);
   }
 
-  toggle(prop) {
-    return this.notebooks.add({
-      id: this.notebook.id,
-      [prop]: !this.notebook[prop]
+  _toggle(prop) {
+    return this._notebooks.add({
+      id: this._notebook.id,
+      [prop]: !this._notebook[prop]
     });
   }
 
   pin() {
-    return this.toggle("pinned");
+    return this._toggle("pinned");
   }
 
   favorite() {
-    return this.toggle("favorite");
+    return this._toggle("favorite");
   }
 }

@@ -19,8 +19,8 @@ if (!tfun) {
 
 export default class Notes {
   constructor(context) {
-    this.collection = new CachedCollection(context, "notes");
-    this.deltaStorage = new Storage(context);
+    this._collection = new CachedCollection(context, "notes");
+    this._deltaStorage = new Storage(context);
   }
 
   /**
@@ -29,20 +29,18 @@ export default class Notes {
    * @param {Trash} trash
    */
   async init(notebooks, trash, tags, colors) {
-    await this.collection.init();
-    this.notebooks = notebooks;
-    this.trash = trash;
-//    await this.tagsCollection.init();
-//    await this.colorsCollection.init();
-    this.tagsCollection = tags;
-    this.colorsCollection = colors;
+    await this._collection.init();
+    this._notebooks = notebooks;
+    this._trash = trash;
+    this._tagsCollection = tags;
+    this._colorsCollection = colors;
   }
 
   async add(noteArg) {
     if (!noteArg) return;
 
     let id = noteArg.id || Date.now().toString() + "_note";
-    let oldNote = this.collection.getItem(id);
+    let oldNote = this._collection.getItem(id);
     let note = {
       ...oldNote,
       ...noteArg
@@ -54,7 +52,7 @@ export default class Notes {
     }
 
     if (!(note.content.delta instanceof String)) {
-      await this.deltaStorage.write(id + "_delta", note.content.delta);
+      await this._deltaStorage.write(id + "_delta", note.content.delta);
     }
 
     note = {
@@ -74,15 +72,15 @@ export default class Notes {
 
     if (!oldNote) {
       for (let color of note.colors) {
-        await this.colorsCollection.add(color);
+        await this._colorsCollection.add(color);
       }
 
       for (let tag of note.tags) {
-        await this.tagsCollection.add(tag);
+        await this._tagsCollection.add(tag);
       }
     }
 
-    await this.collection.addItem(note);
+    await this._collection.addItem(note);
     return note.id;
   }
 
@@ -92,13 +90,13 @@ export default class Notes {
    * @returns {Note} The note of the given id
    */
   note(id) {
-    let note = this.collection.getItem(id);
+    let note = this._collection.getItem(id);
     if (!note) return undefined;
     return new Note(this, note);
   }
 
   get all() {
-    return this.collection.getAllItems();
+    return this._collection.getAllItems();
   }
 
   get pinned() {
@@ -121,9 +119,7 @@ export default class Notes {
     if (!query) return [];
     let queryFn = v => fuzzysearch(query, v.title + " " + v.content.text);
     if (query instanceof Function) queryFn = query;
-    let c = tfun.filter(queryFn)(this.all);
-
-    return c;
+    return tfun.filter(queryFn)(this.all);
   }
 
   group(by, special = false) {
@@ -179,18 +175,18 @@ export default class Notes {
       let item = this.note(id);
       if (!item) continue;
       if (item.notebook && item.notebook.id && item.notebook.topic) {
-        await this.collection.transaction(() =>
-          this.notebooks
+        await this._collection.transaction(() =>
+          this._notebooks
             .notebook(item.notebook.id)
             .topics.topic(item.notebook.topic)
             .delete(id)
         );
       }
       for (let tag of item.tags) {
-        await this.tagsCollection.remove(tag);
+        await this._tagsCollection.remove(tag);
       }
-      await this.collection.removeItem(id);
-      await this.trash.add(item.data);
+      await this._collection.removeItem(id);
+      await this._trash.add(item.data);
     }
   }
 
@@ -200,7 +196,7 @@ export default class Notes {
       throw new Error(
         "The destination notebook must contain notebookId and topic."
       );
-    let topic = this.notebooks.notebook(to.id).topics.topic(to.topic);
+    let topic = this._notebooks.notebook(to.id).topics.topic(to.topic);
     if (!topic) throw new Error("No such topic exists.");
     await topic.transaction(async () => {
       await topic.add(...noteIds);

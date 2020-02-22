@@ -17,10 +17,10 @@ test("delete a note", () =>
       .add(id);
     await db.notes.delete(id);
     expect(db.trash.all.length).toBe(1);
-    expect(await db.trash.deltaStorage.read(id + "_delta")).toBeDefined();
+    expect(await db.trash._deltaStorage.read(id + "_delta")).toBeDefined();
     await db.trash.delete(db.trash.all[0].id);
     expect(db.trash.all.length).toBe(0);
-    expect(await db.trash.deltaStorage.read(id + "_delta")).toBeUndefined();
+    expect(await db.trash._deltaStorage.read(id + "_delta")).toBeUndefined();
   }));
 
 test("restore a deleted note", () =>

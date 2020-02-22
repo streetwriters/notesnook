@@ -47,7 +47,9 @@ test("get topic", () =>
     let topic = topics.topic("Home");
     let noteId = await db.notes.add({ content: { text: "Hello", delta: [] } });
     await topic.add(noteId);
+    topic = topics.topic("Home");
     expect(topic.all[0].content.text).toBe("Hello");
+    expect(topic.totalNotes).toBe(1);
   }));
 
 test("delete a topic", () =>

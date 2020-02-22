@@ -213,6 +213,7 @@ test("pin note", () =>
   noteTest().then(async ({ db, id }) => {
     let note = db.notes.note(id);
     await note.pin();
+    note = db.notes.note(id);
     expect(note.data.pinned).toBe(true);
   }));
 
@@ -220,6 +221,7 @@ test("favorite note", () =>
   noteTest().then(async ({ db, id }) => {
     let note = db.notes.note(id);
     await note.favorite();
+    note = db.notes.note(id);
     expect(note.data.favorite).toBe(true);
   }));
 
@@ -232,6 +234,7 @@ test("lock and unlock note", () =>
   }).then(async ({ db, id }) => {
     let note = db.notes.note(id);
     await note.lock("password123");
+    note = db.notes.note(id);
     expect(note.data.locked).toBe(true);
     expect(note.data.content.iv).toBeDefined();
     expect((await note.delta()).iv).toBeDefined();
@@ -253,8 +256,9 @@ test("add note to topic", () =>
     await topics.add("Home");
     let topic = topics.topic("Home");
     await topic.add(id);
+    topic = topics.topic("Home");
     expect(topic.all.length).toBe(1);
-    expect(topic.topic.totalNotes).toBe(1);
+    expect(topic.totalNotes).toBe(1);
     expect(db.notebooks.notebook(notebookId).data.totalNotes).toBe(1);
     let note = db.notes.note(id);
     expect(note.notebook.id).toBe(notebookId);

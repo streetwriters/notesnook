@@ -9,9 +9,7 @@ if (!tfun) {
 }
 export default class Notebooks {
   constructor(context) {
-    this.context = context;
-    this.collection = new CachedCollection(context, "notebooks");
-    this.notes = undefined;
+    this._collection = new CachedCollection(context, "notebooks");
   }
 
   /**
@@ -20,16 +18,16 @@ export default class Notebooks {
    * @param {Trash} trash
    */
   init(notes, trash) {
-    this.notes = notes;
-    this.trash = trash;
-    return this.collection.init();
+    this._trash = trash;
+    this._notes = notes;
+    return this._collection.init();
   }
 
   async add(notebookArg) {
     if (!notebookArg) throw new Error("Notebook cannot be undefined or null.");
     //TODO reliably and efficiently check for duplicates.
     const id = notebookArg.id || Date.now().toString() + "_notebook";
-    let oldNotebook = this.collection.getItem(id);
+    let oldNotebook = this._collection.getItem(id);
 
     if (!oldNotebook && !notebookArg.title)
       throw new Error("Notebook must contain at least a title.");
@@ -54,7 +52,7 @@ export default class Notebooks {
       notebook.topics.splice(0, 0, "General");
     }
 
-    await this.collection.addItem(notebook);
+    await this._collection.addItem(notebook);
 
     //if (!oldNotebook) {
     await this.notebook(notebook.id).topics.add(...notebook.topics);
@@ -63,7 +61,7 @@ export default class Notebooks {
   }
 
   get all() {
-    return this.collection.getAllItems();
+    return this._collection.getAllItems();
   }
 
   /**
@@ -72,7 +70,7 @@ export default class Notebooks {
    * @returns {Notebook} The notebook of the given id
    */
   notebook(id) {
-    let notebook = this.collection.getItem(id);
+    let notebook = this._collection.getItem(id);
     if (!notebook) return;
     return new Notebook(this, notebook);
   }
@@ -81,11 +79,11 @@ export default class Notebooks {
     for (let id of ids) {
       let notebook = this.notebook(id);
       if (!notebook) continue;
-      await this.collection.transaction(() =>
-        notebook.topics.delete(...notebook.topics.all)
+      await this._collection.transaction(() =>
+        notebook.topics.delete(...notebook.data.topics)
       );
-      await this.collection.removeItem(id);
-      await this.trash.add(notebook.data);
+      await this._collection.removeItem(id);
+      await this._trash.add(notebook.data);
     }
   }
 

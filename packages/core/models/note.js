@@ -7,127 +7,129 @@ export default class Note {
    * @param {Object} note
    */
   constructor(notes, note) {
-    this.note = note;
-    this.notes = notes;
+    this._note = note;
+    this._notes = notes;
   }
 
   get data() {
-    return this.note;
+    return this._note;
   }
 
   get headline() {
-    return this.note.headline;
+    return this._note.headline;
   }
 
   get title() {
-    return this.note.title;
+    return this._note.title;
   }
 
   get tags() {
-    return this.note.tags;
+    return this._note.tags;
   }
 
   get colors() {
-    return this.note.colors;
+    return this._note.colors;
   }
 
   get id() {
-    return this.note.id;
+    return this._note.id;
   }
 
   get notebook() {
-    return this.note.notebook;
+    return this._note.notebook;
   }
 
   get text() {
-    return this.note.content.text;
+    return this._note.content.text;
   }
 
   delta() {
-    return this.notes.deltaStorage.read(this.note.id + "_delta");
+    return this._notes._deltaStorage.read(this._note.id + "_delta");
   }
 
   color(color) {
-    return addTag.call(this, color, "colorsCollection", "colors");
+    return addTag.call(this, color, "_colorsCollection", "colors");
   }
   uncolor(color) {
-    return removeTag.call(this, color, "colorsCollection", "colors");
+    return removeTag.call(this, color, "_colorsCollection", "colors");
   }
 
   tag(tag) {
-    return addTag.call(this, tag, "tagsCollection", "tags");
+    return addTag.call(this, tag, "_tagsCollection", "tags");
   }
   untag(tag) {
-    return removeTag.call(this, tag, "tagsCollection", "tags");
+    return removeTag.call(this, tag, "_tagsCollection", "tags");
   }
 
-  async save() {
-    await this.notes.add(this.note);
-    return this;
-  }
-
-  toggle(prop) {
-    this.note[prop] = !this.note[prop];
-    return this.save();
+  _toggle(prop) {
+    return this._notes.add({ id: this._note.id, [prop]: !this._note[prop] });
   }
 
   favorite() {
-    return this.toggle("favorite");
+    return this._toggle("favorite");
   }
 
   pin() {
-    return this.toggle("pinned");
+    return this._toggle("pinned");
   }
 
   async lock(password) {
     let delta = await this.delta();
     if (delta) {
-      delta = await this.notes.collection.indexer.encrypt(
+      delta = await this._notes._collection.indexer.encrypt(
         password,
         JSON.stringify(delta)
       );
-      await this.notes.deltaStorage.write(this.note.content.delta, delta);
+      await this._notes._deltaStorage.write(this._note.content.delta, delta);
     }
-    this.note.content = await this.notes.collection.indexer.encrypt(
+    const note = { ...this._note };
+    note.content = await this._notes._collection.indexer.encrypt(
       password,
-      JSON.stringify(this.note.content)
+      JSON.stringify(this._note.content)
     );
-    this.note.locked = true;
-    return await this.notes.collection.addItem(this.note);
+    note.locked = true;
+    return await this._notes._collection.addItem(note);
   }
 
   async unlock(password, perm = false) {
     let decrypted = JSON.parse(
-      await this.notes.collection.indexer.decrypt(password, this.note.content)
+      await this._notes._collection.indexer.decrypt(
+        password,
+        this._note.content
+      )
     );
     let delta = JSON.parse(
-      await this.notes.collection.indexer.decrypt(password, await this.delta())
+      await this._notes._collection.indexer.decrypt(
+        password,
+        await this.delta()
+      )
     );
     if (perm) {
-      this.note.locked = false;
-      this.note.content = decrypted;
-      await this.notes.collection.addItem(this.note);
-      await this.notes.deltaStorage.write(this.note.content.delta, delta);
+      const note = { ...this._note, locked: false, content: decrypted };
+      note.locked = false;
+      note.content = decrypted;
+      await this._notes._collection.addItem(note);
+      await this._notes._deltaStorage.write(note.content.delta, delta);
     }
     return {
-      ...this.note,
+      ...this._note,
       content: { ...decrypted, delta }
     };
   }
 }
 
 async function addTag(tag, collection, array) {
-  if (this.note[array].indexOf(tag) > -1)
+  if (this._note[array].indexOf(tag) > -1)
     throw new Error("Cannot add a duplicate tag.");
-  this.note[array].push(tag);
-  await this.notes[collection].add(tag);
-  await this.notes.collection.addItem(this.note);
+  this._note[array].push(tag);
+  await this._notes[collection].add(tag);
+  await this._notes._collection.addItem(this._note);
 }
 
 async function removeTag(tag, collection, array) {
-  if (this.note[array].indexOf(tag) <= -1)
+  if (this._note[array].indexOf(tag) <= -1)
     throw new Error("This note is not tagged by the specified tag.");
-  this.note[array].splice(this.note[array].indexOf(tag), 1);
-  await this.notes[collection].remove(tag);
-  await this.notes.collection.addItem(this.note);
+  this._note[array].splice(this._note[array].indexOf(tag), 1);
+  await this._notes[collection].remove(tag);
+  await this._notes._collection.addItem(this._note);
 }

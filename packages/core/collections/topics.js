@@ -7,43 +7,50 @@ export default class Topics {
   /**
    *
    * @param {Notebooks} notebooks
-   * @param {Notes} notes
    * @param {string} notebookId
    */
-  constructor(notebooks, notes, notebookId) {
-    this.notebooks = notebooks;
-    this.notebookId = notebookId;
-    this.notes = notes;
+  constructor(notebooks, notebookId) {
+    this._notebooks = notebooks;
+    this._notebookId = notebookId;
   }
 
-  exists(topic) {
+  has(topic) {
     return this.all.findIndex(v => v.title === (topic.title || topic)) > -1;
   }
 
-  async add(...topics) {
-    let notebook = this.notebooks.notebook(this.notebookId);
-    let uniqueTopics = [...notebook.data.topics, ...topics];
-    uniqueTopics = uniqueTopics.filter(
-      (v, i) =>
-        v &&
-        (v.title || v).trim().length > 0 &&
-        uniqueTopics.findIndex(t => (v.title || v) === (t.title || t)) === i
-    );
-    notebook.data.topics = [];
-    notebook.data.totalNotes = 0;
-    for (let topic of uniqueTopics) {
-      let t = makeTopic(topic, this.notebookId);
-      notebook.data.topics.push(t);
-      notebook.data.totalNotes += t.totalNotes;
+  _dedupe(source) {
+    let length = source.length,
+      seen = new Map();
+    for (let index = 0; index < length; index++) {
+      let value = source[index];
+      let title = value.title || value;
+      if (title.trim().length <= 0) continue;
+      seen.set(title, value);
     }
-    await this.notebooks.collection.addItem(notebook.data);
+    return seen;
+  }
+
+  async add(...topics) {
+    let notebook = { ...this._notebooks.notebook(this._notebookId).data };
+    let allTopics = [...notebook.topics, ...topics];
+    const unique = this._dedupe(allTopics);
+
+    notebook.topics = [];
+    notebook.totalNotes = 0;
+    unique.forEach(t => {
+      let topic = makeTopic(t, this._notebookId);
+      notebook.topics.push(topic);
+      notebook.totalNotes += topic.totalNotes;
+    });
+
+    return this._notebooks._collection.addItem(notebook);
   }
 
   /**
    * @returns {Array} an array containing all the topics
    */
   get all() {
-    return this.notebooks.notebook(this.notebookId).data.topics;
+    return this._notebooks.notebook(this._notebookId).data.topics;
   }
 
   /**
@@ -71,7 +78,7 @@ export default class Topics {
         allTopics.splice(i, 1);
       }
     }
-    await this.notebooks.add({ id: this.notebookId, topics: allTopics });
+    await this._notebooks.add({ id: this._notebookId, topics: allTopics });
   }
 }
 
