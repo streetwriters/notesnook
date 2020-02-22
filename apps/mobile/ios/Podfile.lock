@@ -188,6 +188,8 @@ PODS:
   - react-native-fast-storage (0.1.4):
     - MMKV (= 1.0.23)
     - React
+  - react-native-orientation (3.1.3):
+    - React
   - react-native-webview (7.5.1):
     - React
   - React-RCTActionSheet (0.61.5):
@@ -258,6 +260,7 @@ DEPENDENCIES:
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - react-native-aes (from `../node_modules/react-native-aes-crypto`)
   - react-native-fast-storage (from `../node_modules/react-native-fast-storage`)
+  - react-native-orientation (from `../node_modules/react-native-orientation`)
   - react-native-webview (from `../node_modules/react-native-webview`)
   - React-RCTActionSheet (from `../node_modules/react-native/Libraries/ActionSheetIOS`)
   - React-RCTAnimation (from `../node_modules/react-native/Libraries/NativeAnimation`)
@@ -316,6 +319,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-aes-crypto"
   react-native-fast-storage:
     :path: "../node_modules/react-native-fast-storage"
+  react-native-orientation:
+    :path: "../node_modules/react-native-orientation"
   react-native-webview:
     :path: "../node_modules/react-native-webview"
   React-RCTActionSheet:
@@ -372,6 +377,7 @@ SPEC CHECKSUMS:
   React-jsinspector: fa0ecc501688c3c4c34f28834a76302233e29dc0
   react-native-aes: 22ea989d641f53ea7722fe6b146349ed66e6455d
   react-native-fast-storage: bc274e68f7d87ffe777a1d20479544b7cd429b1d
+  react-native-orientation: f1caf84d65f1a4fd4511a18f2b924e634ad7a628
   react-native-webview: 2aadbfef6b9eaa9e89b306ae3e31e6e870a6306d
   React-RCTActionSheet: 600b4d10e3aea0913b5a92256d2719c0cdd26d76
   React-RCTAnimation: 791a87558389c80908ed06cc5dfc5e7920dfa360

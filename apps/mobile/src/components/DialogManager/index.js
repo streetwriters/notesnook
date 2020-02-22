@@ -375,6 +375,10 @@ export class DialogManager extends Component {
           this.showAddTOpic();
           break;
         }
+        case 'movenote': {
+          moveNoteEvent();
+          break;
+        }
       }
     }
     this.show = null;

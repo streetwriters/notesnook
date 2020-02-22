@@ -30,7 +30,7 @@ export const Settings = ({navigation}) => {
 
   function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
     let newColors = setColorScheme(colors, accent);
-    StatusBar.setBarStyle(newColors.night ? 'light-content' : 'dark-content');
+    StatusBar.setBarStyle(colors.night ? 'light-content' : 'dark-content');
 
     dispatch({type: ACTIONS.THEME, colors: newColors});
   }

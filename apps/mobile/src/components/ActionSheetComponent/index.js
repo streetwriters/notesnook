@@ -63,7 +63,7 @@ export const ActionSheetComponent = ({
 
   function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
     let newColors = setColorScheme(colors, accent);
-    StatusBar.setBarStyle(newColors.night ? 'light-content' : 'dark-content');
+    StatusBar.setBarStyle(colors.night ? 'light-content' : 'dark-content');
 
     dispatch({type: ACTIONS.THEME, colors: newColors});
   }
@@ -180,8 +180,8 @@ export const ActionSheetComponent = ({
       func: () => {
         dispatch({type: ACTIONS.MODAL_NAVIGATOR, enabled: true});
         dispatch({type: ACTIONS.SELECTED_ITEMS, item: note});
-        moveNoteEvent();
-        close();
+
+        close('movenote');
       },
     },
     {

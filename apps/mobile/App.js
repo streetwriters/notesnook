@@ -10,6 +10,8 @@ import SideMenu from './src/components/SideMenu';
 import {Toast} from './src/components/Toast';
 import {useTracked} from './src/provider';
 import {ACTIONS} from './src/provider/actions';
+import Orientation from 'react-native-orientation';
+
 import {eSubscribeEvent, eUnSubscribeEvent} from './src/services/eventManager';
 import {
   eCloseFullscreenEditor,
@@ -28,6 +30,7 @@ import StorageInterface from './src/utils/storage';
 import {w} from './src/utils/utils';
 import Editor from './src/views/Editor';
 import Animated, {Easing} from 'react-native-reanimated';
+import {useForceUpdate} from './src/views/ListsEditor';
 
 export const DDS = new DeviceDetectionService();
 export const db = new Storage(StorageInterface);
@@ -41,7 +44,7 @@ const {color, Value, timing, interpolate} = Animated;
 const App = () => {
   const [state, dispatch] = useTracked();
   const {colors, loading} = state;
-
+  const forceUpdate = useForceUpdate();
   const [init, setInit] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
 
@@ -91,7 +94,16 @@ const App = () => {
     });
   };
 
+  const _onOrientationChange = o => {
+    // Currently orientation is locked on tablet.
+    /* DDS.checkOrientation();
+    setTimeout(() => {
+      alert('here');
+      forceUpdate();
+    }, 1000); */
+  };
   useEffect(() => {
+    Orientation.addOrientationListener(_onOrientationChange);
     eSubscribeEvent(eDispatchAction, type => {
       dispatch(type);
     });
@@ -99,10 +111,12 @@ const App = () => {
       eUnSubscribeEvent(eDispatchAction, type => {
         dispatch(type);
       });
+      Orientation.removeOrientationListener(_onOrientationChange);
     };
   }, []);
 
   useEffect(() => {
+    Orientation.lockToLandscape();
     eSubscribeEvent(eOpenSideMenu, openSidebar);
     eSubscribeEvent(eCloseSideMenu, closeSidebar);
 

@@ -165,7 +165,7 @@ const Editor = ({navigation, noMenu}) => {
       id: id,
     });
 
-    if (id !== rId && note && !note.locked) {
+    if (id !== rId && !note?.locked) {
       id = rId;
       note = db.notes.note(id);
       if (note) {
