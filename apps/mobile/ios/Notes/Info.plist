@@ -41,6 +41,7 @@
 	<string></string>
 	<key>UIAppFonts</key>
 	<array>
+		<string>MaterialCommunityIcons.ttf</string>
 		<string>NotoSerif-Regular.ttf</string>
 		<string>NotoSerif-Bold.ttf</string>
 		<string>NotoSans-Regular.ttf</string>
