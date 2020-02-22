@@ -10,3 +10,5 @@ export const Account = require("./Account").default;
 export const SettingsContainer = require("./Settings").SettingsContainer;
 export const General = require("./General").default;
 export const TOS = require("./TOS").default;
+export const Tags = require("./Tags").Tags;
+export const TagsContainer = require("./Tags").TagsContainer;

@@ -134,10 +134,12 @@ export default class Editor extends React.Component {
       this.titleRef.value = note.title;
       this.pinned = note.pinned;
       this.favorite = note.favorite;
+      this.tags = note.tags;
       this.setState({
         pinned: this.pinned,
         favorite: this.favorite,
-        colors: note.colors
+        colors: note.colors,
+        tags: note.tags
       });
       let delta = await dbNote.delta();
       this.quill.setContents(delta);
@@ -156,10 +158,10 @@ export default class Editor extends React.Component {
       content,
       title: this.title,
       id: this.id,
-      favorite: this.state.favorite,
-      pinned: this.state.pinned,
-      colors: this.state.colors
-      //TODO add tags once the database is done
+      favorite: this.favorite,
+      pinned: this.pinned,
+      colors: this.state.colors,
+      //tags: this.state.tags
     };
     return await db.notes.add(note);
   }
@@ -234,7 +236,7 @@ export default class Editor extends React.Component {
             this.setState({ colors });
           }}
           tags={this.state.tags}
-          addTag={tag => {
+          addTag={async tag => {
             let tags = [...this.state.tags];
             if (tags.includes(tag)) {
               tags.splice(tags.indexOf(tag), 1);
@@ -242,6 +244,8 @@ export default class Editor extends React.Component {
               tags[this.state.tags.length] = tag;
             }
             this.setState({ tags });
+            if (this.id)
+              await db.notes.note(this.id).tag(tag);
           }}
           onLocked={state => {}}
         />

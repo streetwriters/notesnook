@@ -92,7 +92,9 @@ const Properties = props => {
               event.key === " " ||
               event.key === ","
             ) {
-              props.addTag && props.addTag(event.target.value);
+              props.addTag &&
+                event.target.value &&
+                props.addTag(event.target.value);
               event.target.value = "";
             }
           }}
