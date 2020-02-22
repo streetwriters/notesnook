@@ -258,6 +258,9 @@ export default class ActionSheet extends Component {
               overScrollMode="always"
               style={[styles.scrollview]}>
               <Animated.View
+                onTouchStart={this._hideModal}
+                onTouchEnd={this._hideModal}
+                onTouchMove={this._hideModal}
                 style={{
                   height: '100%',
                   width: '100%',
@@ -267,6 +270,7 @@ export default class ActionSheet extends Component {
                   zIndex: 1,
                 }}
               />
+
               <View
                 onTouchMove={this._onTouchMove}
                 onTouchStart={this._onTouchStart}
@@ -274,17 +278,7 @@ export default class ActionSheet extends Component {
                 style={{
                   height: deviceHeight * 1.1,
                   width: '100%',
-                  zIndex: 10,
-                }}>
-                <TouchableOpacity
-                  onPress={this._hideModal}
-                  onLongPress={this._hideModal}
-                  style={{
-                    height: deviceHeight,
-                    width: '100%',
-                  }}
-                />
-              </View>
+                }}></View>
 
               <Animated.View
                 onLayout={this._showModal}
@@ -294,6 +288,7 @@ export default class ActionSheet extends Component {
                   {
                     ...getElevation(elevation),
                     zIndex: 11,
+
                     transform: [
                       {
                         translateY: this.transformValue,

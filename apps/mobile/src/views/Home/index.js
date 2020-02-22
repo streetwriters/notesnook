@@ -11,7 +11,7 @@ import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
 import NavigationService from '../../services/NavigationService';
 import {SideMenuEvent} from '../../utils/utils';
-import {eScrollEvent} from '../../services/events';
+import {eScrollEvent, eOnLoadNote} from '../../services/events';
 let count = 0;
 export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(
   SafeAreaView,

@@ -44,7 +44,7 @@ export class ModalMenu extends Component {
           this.setState({
             visible: 'false',
           });
-        }, 200);
+        }, 100);
       },
     );
   };
@@ -56,7 +56,7 @@ export class ModalMenu extends Component {
       <Modal
         visible={visible}
         transparent={true}
-        animated
+        animated={false}
         onShow={() => {
           setTimeout(() => {
             this.setState({
@@ -64,7 +64,6 @@ export class ModalMenu extends Component {
             });
           }, 0);
         }}
-        animationType="fade"
         onRequestClose={() => this.setState({visible: false})}>
         <View
           style={{
@@ -94,7 +93,7 @@ export class ModalMenu extends Component {
               zIndex: 10,
               transform: [
                 {
-                  translateX: showMenu ? 0 : -(w * 0.3),
+                  translateX: showMenu ? 0 : -w,
                 },
               ],
             }}>

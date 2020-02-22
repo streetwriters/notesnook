@@ -50,8 +50,7 @@ const Editor = ({navigation, noMenu}) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
   const [loading, setLoading] = useState(true);
-
-  let fullscreen = false;
+  const [fullscreen, setFullscreen] = useState(false);
 
   // FUNCTIONS
 
@@ -105,14 +104,8 @@ const Editor = ({navigation, noMenu}) => {
     content = null;
     note = {};
     saveCounter = 0;
+    EditorWebView.reload();
 
-    post('clear');
-    post(
-      JSON.stringify({
-        type: 'title',
-        value: null,
-      }),
-    );
     post('focusTitle');
   };
 
@@ -377,28 +370,17 @@ const Editor = ({navigation, noMenu}) => {
             right: 0,
             top: 0,
           }}>
-          {DDS.isTab ? (
+          {DDS.isTab && !fullscreen ? (
             <TouchableOpacity
               onPress={() => {
-                if (fullscreen) {
-                  fullscreen = false;
-                  eSendEvent(eCloseFullscreenEditor);
-                  post(
-                    JSON.stringify({
-                      type: 'nomenu',
-                      value: true,
-                    }),
-                  );
-                } else {
-                  eSendEvent(eOpenFullscreenEditor);
-                  fullscreen = true;
-                  post(
-                    JSON.stringify({
-                      type: 'nomenu',
-                      value: false,
-                    }),
-                  );
-                }
+                eSendEvent(eOpenFullscreenEditor);
+                setFullscreen(true);
+                post(
+                  JSON.stringify({
+                    type: 'nomenu',
+                    value: false,
+                  }),
+                );
               }}
               style={{
                 width: 60,
@@ -408,7 +390,7 @@ const Editor = ({navigation, noMenu}) => {
                 paddingRight: 12,
                 zIndex: 800,
               }}>
-              <Icon name="square" color={colors.icon} size={SIZE.xxxl} />
+              <Icon name="fullscreen" color={colors.icon} size={SIZE.xxxl} />
             </TouchableOpacity>
           ) : null}
           <TouchableOpacity
@@ -505,8 +487,19 @@ const Editor = ({navigation, noMenu}) => {
     );
   };
 
+  const closeFullscreen = () => {
+    setFullscreen(false);
+  };
+
   // EFFECTS
 
+  useEffect(() => {
+    eSubscribeEvent(eCloseFullscreenEditor, closeFullscreen);
+
+    return () => {
+      eUnSubscribeEvent(eCloseFullscreenEditor, closeFullscreen);
+    };
+  });
   useEffect(() => {
     let handleBack;
     if (!noMenu && DDS.isTab) {

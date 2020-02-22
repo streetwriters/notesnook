@@ -130,7 +130,7 @@ export const Menu = ({
           minHeight: 2,
           width: '100%',
           paddingHorizontal: noTextMode ? 0 : ph,
-          height: DDS.isTab ? 50 : 0,
+          height: DDS.isTab && noTextMode ? 50 : 0,
           marginBottom: 0,
           alignItems: 'center',
           flexDirection: 'row',
@@ -144,21 +144,10 @@ export const Menu = ({
                 : 0
               : StatusBar.currentHeight,
         }}>
-        {noTextMode || !DDS.isTab ? null : (
-          <Text
-            style={{
-              fontSize: SIZE.xxl,
-              fontFamily: WEIGHT.bold,
-              color: colors.accent,
-            }}>
-            notesnook
-          </Text>
-        )}
-
-        {DDS.isTab ? (
+        {DDS.isTab && noTextMode ? (
           <TouchableOpacity
             onPress={() => {
-              noTextMode ? eSendEvent(eOpenModalMenu) : close();
+              eSendEvent(eOpenModalMenu);
             }}
             style={{
               alignItems: 'center',
@@ -169,8 +158,8 @@ export const Menu = ({
               style={{
                 marginTop: noTextMode ? 0 : 7.5,
               }}
-              name={noTextMode ? 'menu' : 'x'}
-              size={noTextMode ? SIZE.lg : SIZE.xxl}
+              name="menu"
+              size={SIZE.lg}
               color={colors.pri}
             />
           </TouchableOpacity>
@@ -629,17 +618,17 @@ export const Menu = ({
               justifyContent: noTextMode ? 'center' : 'flex-start',
               alignItems: 'center',
               flexDirection: 'row',
-              backgroundColor: colors.accent,
+              backgroundColor: noTextMode ? 'transparent' : colors.accent,
               borderRadius: 5,
-              paddingHorizontal: 6,
+              paddingHorizontal: noTextMode ? 0 : 6,
             }}>
             <Icon
               style={{
-                minWidth: 35,
+                minWidth: noTextMode ? 5 : 35,
                 textAlign: 'left',
               }}
               name="login"
-              color="white"
+              color={noTextMode ? colors.accent : 'white'}
               size={SIZE.lg}
             />
 

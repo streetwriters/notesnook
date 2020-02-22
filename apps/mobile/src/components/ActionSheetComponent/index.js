@@ -384,8 +384,8 @@ export const ActionSheetComponent = ({
       }}>
       <View
         style={{
-          width: DDS.isTab ? 500 / 10 : w / 10,
-          height: DDS.isTab ? 500 / 10 : w / 10,
+          width: DDS.isTab ? 400 / 10 : w / 10,
+          height: DDS.isTab ? 400 / 10 : w / 10,
           backgroundColor: color,
           borderRadius: 100,
           justifyContent: 'center',
@@ -405,7 +405,9 @@ export const ActionSheetComponent = ({
         key={rowItem.name}
         style={{
           alignItems: 'center',
-          width: (w - 24) / rowItems.length,
+          width: DDS.isTab
+            ? (400 - 24) / rowItems.length
+            : (w - 25) / rowItems.length,
         }}>
         <Icon
           style={{

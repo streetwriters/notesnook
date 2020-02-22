@@ -78,6 +78,7 @@ export class Dialog extends Component {
         this.setState({
           visible: false,
         });
+        break;
       }
       case dialogActions.ACTION_TRASH: {
         db.trash.restore(item.id);
@@ -90,6 +91,7 @@ export class Dialog extends Component {
         );
         updateEvent({type: ACTIONS.TRASH});
         this.hide();
+        break;
       }
     }
   };
@@ -146,7 +148,7 @@ export class Dialog extends Component {
           <View
             style={{
               ...getElevation(5),
-              width: DDS.isTab ? '50%' : '80%',
+              width: DDS.isTab ? '40%' : '80%',
               maxHeight: 350,
               borderRadius: 5,
               backgroundColor: colors.bg,

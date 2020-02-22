@@ -17,7 +17,7 @@ import {ToastEvent, hexToRGBA} from '../../utils/utils';
 import {NotesPlaceHolder} from '../ListPlaceholders';
 import NoteItem from '../NoteItem';
 import SelectionWrapper from '../SelectionWrapper';
-import {db} from '../../../App';
+import {db, DDS} from '../../../App';
 
 export const NotesList = ({isGrouped = false}) => {
   const [state, dispatch] = useTracked();
@@ -68,7 +68,9 @@ export const NotesList = ({isGrouped = false}) => {
         marginTop:
           Platform.OS == 'ios'
             ? notes[0] && !selectionMode
-              ? 135
+              ? DDS.isTab
+                ? 115
+                : 135
               : 135 - 60
             : notes[0] && !selectionMode
             ? 155
@@ -147,7 +149,9 @@ export const NotesList = ({isGrouped = false}) => {
         marginTop:
           Platform.OS == 'ios'
             ? notes[0]
-              ? 135
+              ? DDS.isTab
+                ? 115
+                : 135
               : 135 - 60
             : notes[0]
             ? 155
