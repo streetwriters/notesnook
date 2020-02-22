@@ -29,7 +29,7 @@ import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
 import {eOpenModalMenu, eSendSideMenuOverlayRef} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
-import {timeSince, getElevation} from '../../utils/utils';
+import {timeSince, getElevation, hexToRGBA} from '../../utils/utils';
 
 export const Menu = ({
   close = () => {},
@@ -545,7 +545,9 @@ export const Menu = ({
             style={{
               width: '100%',
               borderRadius: 5,
-              backgroundColor: colors.shade,
+              backgroundColor: Platform.ios
+                ? hexToRGBA(colors.accent + '19')
+                : hexToRGBA(colors.shade),
             }}>
             <View
               style={{

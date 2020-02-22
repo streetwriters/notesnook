@@ -1,5 +1,5 @@
 import React from 'react';
-import {Text, View} from 'react-native';
+import {Text, View, Platform} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {SIZE, WEIGHT, normalize} from '../../common/common';
@@ -10,7 +10,7 @@ import {
   slideLeft,
   slideRight,
 } from '../../utils/animations';
-import {w} from '../../utils/utils';
+import {w, hexToRGBA} from '../../utils/utils';
 
 export const NotebookPlaceHolder = ({colors, animation}) => {
   return (
@@ -23,7 +23,9 @@ export const NotebookPlaceHolder = ({colors, animation}) => {
       easing="ease-in"
       useNativeDriver={true}
       style={{
-        backgroundColor: colors.shade,
+        backgroundColor: Platform.ios
+          ? hexToRGBA(colors.accent + '19')
+          : hexToRGBA(colors.shade),
         width: '50%',
         padding: 5,
         borderRadius: 5,
@@ -539,7 +541,9 @@ export const TrashPlaceHolder = ({colors, animation}) => {
           style={{
             width: 80,
             height: 100,
-            backgroundColor: colors.shade,
+            backgroundColor: Platform.ios
+              ? hexToRGBA(colors.accent + '19')
+              : hexToRGBA(colors.shade),
             borderRadius: 5,
             zIndex: 10,
           }}>

@@ -24,7 +24,7 @@ import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {AnimatedSafeAreaView} from '../../views/Home';
 import {db} from '../../../App';
-import {w} from '../../utils/utils';
+import {w, hexToRGBA} from '../../utils/utils';
 
 let tagsInputRef;
 let tagsList;
@@ -281,7 +281,9 @@ export const EditorMenu = ({updateProps = () => {}, timestamp}) => {
       style={{
         height: '100%',
         opacity: 1,
-        backgroundColor: colors.shade,
+        backgroundColor: Platform.ios
+          ? hexToRGBA(colors.accent + '19')
+          : hexToRGBA(colors.shade),
       }}>
       <KeyboardAvoidingView
         style={{height: '100%', paddingHorizontal: 12, width: '100%'}}

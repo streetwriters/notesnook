@@ -6,6 +6,7 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  Platform,
 } from 'react-native';
 import FastStorage from 'react-native-fast-storage';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -26,7 +27,7 @@ import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {moveNoteEvent} from '../DialogManager';
 import Share from 'react-native-share';
-import {timeConverter, ToastEvent} from '../../utils/utils';
+import {timeConverter, ToastEvent, hexToRGBA} from '../../utils/utils';
 import NavigationService from '../../services/NavigationService';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
@@ -737,7 +738,9 @@ export const ActionSheetComponent = ({
                     marginRight: 3,
                     paddingHorizontal: 5,
                     paddingVertical: 1,
-                    backgroundColor: colors.shade,
+                    backgroundColor: Platform.ios
+                      ? hexToRGBA(colors.accent + '19')
+                      : hexToRGBA(colors.shade),
                     borderRadius: 2.5,
                   }}>
                   <Text

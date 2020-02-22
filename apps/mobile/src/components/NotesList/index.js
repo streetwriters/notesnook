@@ -13,7 +13,7 @@ import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
 import {eScrollEvent} from '../../services/events';
-import {ToastEvent} from '../../utils/utils';
+import {ToastEvent, hexToRGBA} from '../../utils/utils';
 import {NotesPlaceHolder} from '../ListPlaceholders';
 import NoteItem from '../NoteItem';
 import SelectionWrapper from '../SelectionWrapper';
@@ -265,7 +265,9 @@ const PinnedItems = () => {
             <NoteItem
               colors={colors}
               customStyle={{
-                backgroundColor: colors.shade,
+                backgroundColor: Platform.ios
+                  ? hexToRGBA(colors.accent + '19')
+                  : hexToRGBA(colors.shade),
                 width: '100%',
                 paddingHorizontal: 12,
                 paddingTop: 20,

@@ -5,6 +5,7 @@ import {
   View,
   ScrollView,
   StatusBar,
+  Platform,
 } from 'react-native';
 import {
   opacity,
@@ -20,7 +21,7 @@ import {
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Container from '../../components/Container';
 import {useTracked} from '../../provider';
-import {w} from '../../utils/utils';
+import {w, hexToRGBA} from '../../utils/utils';
 import {ACTIONS} from '../../provider/actions';
 import FastStorage from 'react-native-fast-storage';
 export const Settings = ({navigation}) => {
@@ -89,7 +90,9 @@ export const Settings = ({navigation}) => {
             flexWrap: 'wrap',
           }}
           style={{
-            backgroundColor: colors.shade,
+            backgroundColor: Platform.ios
+              ? hexToRGBA(colors.accent + '19')
+              : hexToRGBA(colors.shade),
             borderRadius: 5,
             padding: 5,
             marginTop: 10,
@@ -174,56 +177,6 @@ export const Settings = ({navigation}) => {
             color={colors.night ? colors.accent : colors.icon}
             name={colors.night ? 'toggle-switch' : 'toggle-switch-off'}
           />
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={() => {
-            if (!colors.night) {
-              FastStorage.setItem('theme', JSON.stringify({night: true}));
-              changeColorScheme(COLOR_SCHEME_DARK);
-            } else {
-              FastStorage.setItem('theme', JSON.stringify({night: false}));
-
-              changeColorScheme(COLOR_SCHEME_LIGHT);
-            }
-          }}
-          activeOpacity={opacity}
-          style={{
-            width: '100%',
-            marginHorizontal: 0,
-            paddingBottom: 20,
-            paddingTop: 0,
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}>
-          <Text
-            style={{
-              fontSize: SIZE.sm,
-              fontFamily: WEIGHT.regular,
-              textAlignVertical: 'center',
-              color: colors.pri,
-            }}>
-            Font scaling
-          </Text>
-
-          <View
-            style={{
-              borderBottomWidth: 1,
-              borderColor: colors.nav,
-              paddingVertical: 1,
-              paddingHorizontal: 5,
-            }}>
-            <Text
-              style={{
-                fontSize: SIZE.xs,
-                fontFamily: WEIGHT.regular,
-                textAlignVertical: 'center',
-                color: colors.pri,
-              }}>
-              1.0x
-            </Text>
-          </View>
         </TouchableOpacity>
 
         <Text
@@ -318,55 +271,56 @@ export const Settings = ({navigation}) => {
           Logged in as:
         </Text>
 
-        <View
-          style={{
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            alignSelf: 'center',
-            flexDirection: 'row',
-            width: '100%',
-            paddingVertical: pv,
-            marginBottom: pv + 5,
-            marginTop: pv,
-            backgroundColor: colors.accent,
-            borderRadius: 5,
-            padding: 5,
-          }}>
+        {user ? (
           <View
             style={{
-              flexDirection: 'row',
-              justifyContent: 'center',
+              justifyContent: 'space-between',
               alignItems: 'center',
-            }}>
-            <Icon size={SIZE.lg} color="white" name="account-outline" />
-            <Text
-              style={{
-                color: 'white',
-                marginLeft: 5,
-                fontFamily: WEIGHT.regular,
-                fontSize: SIZE.sm,
-              }}>
-              {user.username}
-            </Text>
-          </View>
-
-          <View
-            style={{
+              alignSelf: 'center',
+              flexDirection: 'row',
+              width: '100%',
+              paddingVertical: pv,
+              marginBottom: pv + 5,
+              marginTop: pv,
+              backgroundColor: colors.accent,
               borderRadius: 5,
               padding: 5,
-              paddingVertical: 2.5,
-              backgroundColor: 'white',
             }}>
-            <Text
+            <View
               style={{
-                color: colors.accent,
-                fontFamily: WEIGHT.regular,
-                fontSize: SIZE.xs,
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
               }}>
-              Pro
-            </Text>
+              <Icon size={SIZE.lg} color="white" name="account-outline" />
+              <Text
+                style={{
+                  color: 'white',
+                  marginLeft: 5,
+                  fontFamily: WEIGHT.regular,
+                  fontSize: SIZE.sm,
+                }}>
+                {user.username}
+              </Text>
+            </View>{' '}
+            <View
+              style={{
+                borderRadius: 5,
+                padding: 5,
+                paddingVertical: 2.5,
+                backgroundColor: 'white',
+              }}>
+              <Text
+                style={{
+                  color: colors.accent,
+                  fontFamily: WEIGHT.regular,
+                  fontSize: SIZE.xs,
+                }}>
+                Pro
+              </Text>
+            </View>
           </View>
-        </View>
+        ) : null}
 
         {[
           {

@@ -31,7 +31,8 @@ import {Dialog} from '../Dialog';
 import LoginDialog from '../LoginDialog';
 import MoveNoteDialog from '../MoveNoteDialog';
 import {VaultDialog} from '../VaultDialog';
-import {timeConverter} from '../../utils/utils';
+import {timeConverter, hexToRGBA} from '../../utils/utils';
+import {Platform} from 'react-native';
 
 export const dialogActions = {
   ACTION_DELETE: 511,
@@ -403,7 +404,11 @@ export class DialogManager extends Component {
             marginBottom: DDS.isTab ? 50 : 0,
           }}
           extraScroll={DDS.isTab ? 50 : 0}
-          indicatorColor={colors.shade}
+          indicatorColor={
+            Platform.ios
+              ? hexToRGBA(colors.accent + '19')
+              : hexToRGBA(colors.shade)
+          }
           footerAlwaysVisible={DDS.isTab}
           footerHeight={DDS.isTab ? 20 : 10}
           footerStyle={
