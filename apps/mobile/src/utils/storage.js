@@ -4,7 +4,8 @@ var Aes = NativeModules.Aes;
 
 async function read(key) {
   let json = await FastStorage.getItem(key);
-  return JSON.parse(json);
+
+  return !json ? undefined : JSON.parse(json);
 }
 
 async function write(key, data) {
