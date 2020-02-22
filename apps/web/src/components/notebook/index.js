@@ -79,7 +79,7 @@ const Notebook = ({ item, index, onClick, onTopicClick }) => {
       }
       info={
         <Flex justifyContent="center" alignItems="center">
-          {new Date(notebook.id).toDateString().substring(4)}
+          {new Date(notebook.dateCreated).toDateString().substring(4)}
           <Text as="span" mx={1}>
             •
           </Text>
