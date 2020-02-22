@@ -20,25 +20,29 @@ const menuItems = note => [
   },
   {
     title: note.pinned ? "Unpin" : "Pin",
-    onClick: async () =>
+    onClick: async () => {
       db.notes
         .note(note.id)
         .pin()
         .then(() => {
           showSnack("Note pinned!", Icon.Check);
           ev.emit("refreshNotes");
-        })
+        });
+      sendNotePinnedEvent(note.pinned, note.id);
+    }
   },
   {
     title: note.favorite ? "Unfavorite" : "Favorite",
-    onClick: async () =>
+    onClick: async () => {
       db.notes
         .note(note.id)
         .favorite()
         .then(() => {
           showSnack("Note favorited!", Icon.Check);
           ev.emit("refreshNotes");
-        })
+        });
+      sendNoteFavoriteEvent(note.favorite, note.id);
+    }
   },
   { title: "Edit" },
   { title: note.locked ? "Remove lock" : "Lock" }, //TODO
@@ -72,6 +76,14 @@ const menuItems = note => [
 
 function sendOpenNoteEvent(note) {
   ev.emit("onOpenNote", note);
+}
+
+function sendNoteFavoriteEvent(favorite, id) {
+  ev.emit("onNoteFavorited", favorite, id);
+}
+
+function sendNotePinnedEvent(pinned, id) {
+  ev.emit("onNotePinned", pinned, id);
 }
 
 const Note = ({ item, index }) => {

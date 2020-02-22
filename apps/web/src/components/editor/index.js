@@ -82,12 +82,26 @@ export default class Editor extends React.Component {
     ev.addListener("onNewNote", this.onNewNote.bind(this));
     ev.addListener("onOpenNote", this.onOpenNote.bind(this));
     ev.addListener("onClearNote", this.onClearNote.bind(this));
+    ev.addListener("onNoteFavorited", this.onNoteFavorite.bind(this));
+    ev.addListener("onNotePinned", this.onNotePin.bind(this));
   }
 
   componentWillUnmount() {
     ev.removeListener("onNewNote", this.onNewNote.bind(this));
     ev.removeListener("onOpenNote", this.onOpenNote.bind(this));
     ev.removeListener("onClearNote", this.onClearNote.bind(this));
+    ev.removeListener("onNoteFavorited", this.onNoteFavorite.bind(this));
+    ev.removeListener("onNotePinned", this.onNotePin.bind(this));
+  }
+
+  onNoteFavorite(favorite, id) {
+    if (id && id !== this.id) return;
+    this.setState({ favorite });
+  }
+
+  onNotePin(pinned, id) {
+    if (id && id !== this.id) return;
+    this.setState({ pinned });
   }
 
   onNewNote(show = true, cb = null) {
@@ -142,8 +156,8 @@ export default class Editor extends React.Component {
       content,
       title: this.title,
       id: this.id,
-      favorite: this.favorite,
-      pinned: this.pinned,
+      favorite: this.state.favorite,
+      pinned: this.state.pinned,
       colors: this.state.colors
       //TODO add tags once the database is done
     };
