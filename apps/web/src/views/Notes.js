@@ -1,5 +1,4 @@
 import React from "react";
-import * as Icon from "react-feather";
 import Note from "../components/note";
 import { sendNewNoteEvent } from "../common";
 import ListContainer from "../components/list-container";

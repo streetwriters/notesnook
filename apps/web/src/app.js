@@ -6,7 +6,6 @@ import { ThemeProvider } from "./utils/theme";
 import RootNavigator from "./navigation/navigators/rootnavigator";
 import "./app.css";
 import { usePersistentState } from "./utils/hooks";
-import { ev } from "./common";
 import { useTheme } from "emotion-theming";
 import useStore from "./common/store";
 
@@ -66,10 +65,6 @@ const NavMenuItem = props => {
 
 var startX, startWidth;
 
-function getNavigationViewWidth() {
-  return window.localStorage.getItem("navigationViewWidth");
-}
-
 function App() {
   const [selectedIndex, setSelectedIndex] = usePersistentState(
     "navSelectedIndex",
@@ -84,6 +79,7 @@ function App() {
 
   useEffect(() => {
     RootNavigator.navigate(Object.keys(RootNavigator.routes)[selectedIndex]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
     <ThemeProvider>
@@ -199,7 +195,7 @@ function App() {
               let view = document.querySelector(".RootNavigator");
               view.style.width = `${startWidth + e.clientX - startX}px`;
             }}
-            onDragEnd={e => {
+            onDragEnd={() => {
               let view = document.querySelector(".RootNavigator");
               view.style.width = view.getBoundingClientRect().width;
               window.localStorage.setItem(

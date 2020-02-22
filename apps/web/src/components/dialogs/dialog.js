@@ -1,10 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import ReactDOM from "react-dom";
-import { Flex, Box, Text, Button as RebassButton, Button } from "rebass";
-import { Input, Checkbox, Label } from "@rebass/forms";
-import * as Icon from "react-feather";
+import { Flex, Box, Text, Button as RebassButton } from "rebass";
 import { ThemeProvider } from "../../utils/theme";
-import { db } from "../../common";
 import Modal from "react-modal";
 
 export default class Dialog extends React.Component {

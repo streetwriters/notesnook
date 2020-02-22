@@ -1,9 +1,7 @@
-import React, { useState, useEffect } from "react";
-import ReactDOM from "react-dom";
-import { Flex, Box, Text, Button as RebassButton, Button } from "rebass";
-import { Input, Checkbox, Label } from "@rebass/forms";
+import React from "react";
+import { Flex, Box, Button } from "rebass";
+import { Input } from "@rebass/forms";
 import * as Icon from "react-feather";
-import { db } from "../../common";
 import Dialog, { showDialog } from "./dialog";
 
 const LoginDialog = props => (
