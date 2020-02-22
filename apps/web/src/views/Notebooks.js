@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Flex } from "rebass";
-import { db, ev } from "../common";
-import { showSnack } from "../components/snackbar";
+import { db } from "../common";
 import Notebook from "../components/notebook";
 import AddNotebookDialog from "../components/dialogs/addnotebookdialog";
 import ListContainer from "../components/list-container";
