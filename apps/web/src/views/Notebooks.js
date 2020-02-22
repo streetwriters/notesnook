@@ -42,26 +42,6 @@ const Notebooks = props => {
           onClick: async () => setOpen(true)
         }}
       />
-      <CreateNotebookDialog
-        open={open}
-        onDone={async (topics, title, description) => {
-          if (
-            await db.notebooks.add({
-              title,
-              description,
-              topics
-            })
-          ) {
-            //setNotebooks(db.notebooks.all);
-            setOpen(false);
-          } else {
-            showSnack("Please fill out the notebook title.");
-          }
-        }}
-        close={() => {
-          setOpen(false);
-        }}
-      />
     </>
   );
 };
