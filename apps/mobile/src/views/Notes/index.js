@@ -1,5 +1,12 @@
 import React, {useEffect, useState} from 'react';
-import {FlatList, Text, View, Platform, RefreshControl} from 'react-native';
+import {
+  FlatList,
+  Text,
+  View,
+  Platform,
+  RefreshControl,
+  ActivityIndicator,
+} from 'react-native';
 import {db} from '../../../App';
 import Container from '../../components/Container';
 import NoteItem from '../../components/NoteItem';
@@ -10,6 +17,7 @@ import {ACTIONS} from '../../provider/actions';
 import {ToastEvent} from '../../utils/utils';
 import {eSendEvent} from '../../services/eventManager';
 import {eScrollEvent} from '../../services/events';
+import {NotesPlaceHolder} from '../../components/ListPlaceholders';
 
 export const Notes = ({navigation}) => {
   const [state, dispatch] = useTracked();
@@ -119,6 +127,31 @@ export const Notes = ({navigation}) => {
       }}></View>
   );
 
+  const _ListEmptyComponent = (
+    <View
+      style={{
+        height: '80%',
+        width: '100%',
+        alignItems: 'center',
+        alignSelf: 'center',
+        justifyContent: 'center',
+        opacity: 0.8,
+      }}>
+      <>
+        <NotesPlaceHolder colors={colors} />
+        <Text
+          style={{
+            color: colors.icon,
+            fontSize: SIZE.sm,
+            fontFamily: WEIGHT.regular,
+            marginTop: 35,
+          }}>
+          Add some notes to this {params.type ? params.type : 'topic.'}
+        </Text>
+      </>
+    </View>
+  );
+
   const _listKeyExtractor = (item, index) => item.dateCreated.toString();
 
   return (
@@ -165,6 +198,7 @@ export const Notes = ({navigation}) => {
         ListFooterComponent={_ListFooterComponent}
         onScroll={_onScroll}
         ListHeaderComponent={_ListHeaderComponent_S}
+        ListEmptyComponent={_ListEmptyComponent}
         contentContainerStyle={{
           width: '100%',
           alignSelf: 'center',
