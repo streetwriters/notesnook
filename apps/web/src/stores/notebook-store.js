@@ -15,7 +15,12 @@ function notebookStore(set) {
         set(state => state.notebooks.push(nb));
       }
     },
-    delete: function() {},
+    delete: async function(id, index) {
+      await db.notebooks.delete(id);
+      set(state => {
+        state.notebooks.splice(index, 1);
+      });
+    },
     update: function() {},
     pin: async function(notebook, index) {
       await db.notebooks.notebook(notebook).pin();

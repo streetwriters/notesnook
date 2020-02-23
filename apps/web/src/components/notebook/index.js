@@ -2,8 +2,6 @@ import React from "react";
 import { Flex, Text } from "rebass";
 import * as Icon from "react-feather";
 import ListItem from "../list-item";
-import { db, ev } from "../../common";
-import { showSnack } from "../snackbar";
 import { store } from "../../stores/notebook-store";
 
 const dropdownRefs = [];
@@ -21,15 +19,7 @@ const menuItems = (notebook, index) => [
   {
     title: "Delete",
     color: "red",
-    onClick: () => {
-      db.notebooks.delete(notebook.id).then(
-        //TODO implement undo
-        () => {
-          showSnack("Notebook deleted!", Icon.Check);
-          ev.emit("refreshNotebooks");
-        }
-      );
-    }
+    onClick: () => store.getState().delete(notebook.id, index)
   }
 ];
 
