@@ -54,7 +54,7 @@ export const Settings = ({navigation}) => {
     ACCENT.shade = accentColor + '12';
     changeColorScheme();
   }
-  console.log(settings);
+
   return (
     <Container
       menu={true}
@@ -73,6 +73,190 @@ export const Settings = ({navigation}) => {
         style={{
           paddingHorizontal: 12,
         }}>
+        {user ? (
+          <>
+            <Text
+              style={{
+                fontSize: SIZE.xs,
+                fontFamily: WEIGHT.bold,
+                textAlignVertical: 'center',
+                color: colors.accent,
+
+                borderBottomColor: colors.nav,
+                borderBottomWidth: 0.5,
+                paddingBottom: 3,
+              }}>
+              Account Settings
+            </Text>
+            <Text
+              style={{
+                fontSize: SIZE.sm,
+                fontFamily: WEIGHT.regular,
+                textAlignVertical: 'center',
+                color: colors.pri,
+                marginTop: pv + 5,
+              }}>
+              Logged in as:
+            </Text>
+
+            <View
+              style={{
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                alignSelf: 'center',
+                flexDirection: 'row',
+                width: '100%',
+                paddingVertical: pv,
+                marginBottom: pv + 5,
+                marginTop: pv,
+                backgroundColor: colors.accent,
+                borderRadius: 5,
+                padding: 5,
+              }}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <Icon size={SIZE.lg} color="white" name="account-outline" />
+                <Text
+                  style={{
+                    color: 'white',
+                    marginLeft: 5,
+                    fontFamily: WEIGHT.regular,
+                    fontSize: SIZE.sm,
+                  }}>
+                  {user.username}
+                </Text>
+              </View>
+              <View
+                style={{
+                  borderRadius: 5,
+                  padding: 5,
+                  paddingVertical: 2.5,
+                  backgroundColor: 'white',
+                }}>
+                <Text
+                  style={{
+                    color: colors.accent,
+                    fontFamily: WEIGHT.regular,
+                    fontSize: SIZE.xs,
+                  }}>
+                  Pro
+                </Text>
+              </View>
+            </View>
+
+            {[
+              {
+                name: 'Backup my notes',
+              },
+
+              {
+                name: 'My vault',
+              },
+              {
+                name: 'Subscription status',
+              },
+              {
+                name: 'Change password',
+              },
+              {
+                name: 'Logout',
+              },
+            ].map(item => (
+              <TouchableOpacity
+                key={item.name}
+                activeOpacity={opacity}
+                style={{
+                  width: '100%',
+
+                  paddingVertical: pv + 5,
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}>
+                <Text
+                  style={{
+                    fontSize: SIZE.sm,
+                    fontFamily: WEIGHT.regular,
+                    textAlignVertical: 'center',
+                    color: colors.pri,
+                  }}>
+                  {item.name}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </>
+        ) : (
+          <>
+            <TouchableOpacity
+              onPress={() => {
+                DDS.isTab
+                  ? eSendEvent(eOpenLoginDialog)
+                  : NavigationService.navigate('Login');
+              }}
+              activeOpacity={opacity / 2}
+              style={{
+                paddingVertical: 12,
+                marginVertical: 5,
+                width: '100%',
+                flexDirection: 'row',
+                alignItems: 'center',
+                backgroundColor: colors.shade,
+                borderRadius: 5,
+                paddingHorizontal: 6,
+              }}>
+              <Icon
+                style={{
+                  width: 40,
+                  textAlign: 'center',
+                  backgroundColor: colors.accent,
+                  height: 40,
+                  borderRadius: 100,
+                  textAlignVertical: 'center',
+                }}
+                name="account-outline"
+                color="white"
+                size={SIZE.lg}
+              />
+              <View
+                style={{
+                  marginLeft: 10,
+                }}>
+                <Text
+                  style={{
+                    fontFamily: WEIGHT.regular,
+                    color: colors.icon,
+                    fontSize: SIZE.xs,
+                  }}>
+                  You are not logged in
+                </Text>
+                <Text
+                  style={{
+                    color: colors.accent,
+                  }}>
+                  Login to enable sync.
+                </Text>
+              </View>
+
+              <Icon
+                style={{
+                  width: 40,
+                  textAlign: 'center',
+                  position: 'absolute',
+                  height: 40,
+                  right: 6,
+                  textAlignVertical: 'center',
+                }}
+                name="chevron-right"
+                color={colors.accent}
+                size={SIZE.lg}
+              />
+            </TouchableOpacity>
+          </>
+        )}
         <Text
           style={{
             fontSize: SIZE.xs,
@@ -381,164 +565,6 @@ export const Settings = ({navigation}) => {
             }
           />
         </TouchableOpacity>
-
-        <Text
-          style={{
-            fontSize: SIZE.xs,
-            fontFamily: WEIGHT.bold,
-            textAlignVertical: 'center',
-            color: colors.accent,
-
-            borderBottomColor: colors.nav,
-            borderBottomWidth: 0.5,
-            paddingBottom: 3,
-          }}>
-          Account Settings
-        </Text>
-
-        {user ? (
-          <>
-            <Text
-              style={{
-                fontSize: SIZE.sm,
-                fontFamily: WEIGHT.regular,
-                textAlignVertical: 'center',
-                color: colors.pri,
-                marginTop: pv + 5,
-              }}>
-              Logged in as:
-            </Text>
-
-            <View
-              style={{
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                alignSelf: 'center',
-                flexDirection: 'row',
-                width: '100%',
-                paddingVertical: pv,
-                marginBottom: pv + 5,
-                marginTop: pv,
-                backgroundColor: colors.accent,
-                borderRadius: 5,
-                padding: 5,
-              }}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}>
-                <Icon size={SIZE.lg} color="white" name="account-outline" />
-                <Text
-                  style={{
-                    color: 'white',
-                    marginLeft: 5,
-                    fontFamily: WEIGHT.regular,
-                    fontSize: SIZE.sm,
-                  }}>
-                  {user.username}
-                </Text>
-              </View>
-              <View
-                style={{
-                  borderRadius: 5,
-                  padding: 5,
-                  paddingVertical: 2.5,
-                  backgroundColor: 'white',
-                }}>
-                <Text
-                  style={{
-                    color: colors.accent,
-                    fontFamily: WEIGHT.regular,
-                    fontSize: SIZE.xs,
-                  }}>
-                  Pro
-                </Text>
-              </View>
-            </View>
-
-            {[
-              {
-                name: 'Backup my notes',
-              },
-
-              {
-                name: 'My vault',
-              },
-              {
-                name: 'Subscription status',
-              },
-              {
-                name: 'Change password',
-              },
-              {
-                name: 'Logout',
-              },
-            ].map(item => (
-              <TouchableOpacity
-                key={item.name}
-                activeOpacity={opacity}
-                style={{
-                  width: '100%',
-
-                  paddingVertical: pv + 5,
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}>
-                <Text
-                  style={{
-                    fontSize: SIZE.sm,
-                    fontFamily: WEIGHT.regular,
-                    textAlignVertical: 'center',
-                    color: colors.pri,
-                  }}>
-                  {item.name}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </>
-        ) : (
-          <TouchableOpacity
-            onPress={() => {
-              DDS.isTab
-                ? eSendEvent(eOpenLoginDialog)
-                : NavigationService.navigate('Login');
-            }}
-            activeOpacity={opacity / 2}
-            style={{
-              ...getElevation(2),
-              paddingVertical: pv + 5,
-              marginVertical: pv + 5,
-              width: '100%',
-              justifyContent: 'flex-start',
-              alignItems: 'center',
-              flexDirection: 'row',
-              backgroundColor: colors.accent,
-              borderRadius: 5,
-              paddingHorizontal: 6,
-            }}>
-            <Icon
-              style={{
-                minWidth: 35,
-                textAlign: 'left',
-              }}
-              name="login"
-              color="white"
-              size={SIZE.lg}
-            />
-
-            <Text
-              style={{
-                fontFamily: WEIGHT.regular,
-                color: 'white',
-                fontSize: SIZE.md,
-              }}>
-              Login
-            </Text>
-          </TouchableOpacity>
-        )}
 
         <Text
           style={{
