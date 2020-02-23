@@ -4,7 +4,9 @@ import createStore from "../common/store";
 function notebookStore(set) {
   return {
     init: function() {
-      set(state => (state.notebooks = db.notebooks.all));
+      set(state => {
+        state.notebooks = db.notebooks.all;
+      });
     },
     notebooks: [],
     add: async function(nb) {

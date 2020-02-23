@@ -1,4 +1,3 @@
-import { db } from "../common/index";
 import createStore from "../common/store";
 
 function appStore(set) {
