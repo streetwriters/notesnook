@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import { Box, Flex, Heading, Text } from "rebass";
 import * as Icon from "react-feather";
 import { ThemeProvider } from "../utils/theme";
-import { ev } from "../common";
+import { useStore } from "../stores/app-store";
 
 export default class Navigator {
   constructor(root, routes, options = {}) {
@@ -75,6 +75,7 @@ export default class Navigator {
 }
 
 const NavigationContainer = props => {
+  const openSideMenu = useStore(store => store.openSideMenu);
   return (
     <ThemeProvider>
       <Flex flexDirection="column" px={2}>
@@ -90,7 +91,7 @@ const NavigationContainer = props => {
             </Box>
           )}
           <Box
-            onClick={() => ev.emit("openSideMenu")}
+            onClick={openSideMenu}
             height={38}
             color="fontPrimary"
             sx={{
