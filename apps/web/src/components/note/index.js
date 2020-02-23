@@ -21,7 +21,7 @@ const menuItems = (note, index, groupIndex) => [
   },
   {
     title: note.pinned ? "Unpin" : "Pin",
-    onClick: () => store.getState().pin(note, index)
+    onClick: () => store.getState().pin(note)
   },
   {
     title: note.favorite ? "Unfavorite" : "Favorite",

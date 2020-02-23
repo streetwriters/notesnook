@@ -25,7 +25,7 @@ function noteStore(set) {
         }
       });
     },
-    pin: async function(note, index) {
+    pin: async function(note) {
       await db.notes.note(note).pin();
       set(state => {
         state.notes = db.notes.group(undefined, true);
