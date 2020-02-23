@@ -1,20 +1,14 @@
-import { db } from "./index";
+import produce from "immer";
 import create from "zustand";
 
-const [useStore] = create(set => ({
-  init: () => {
-    console.log("initializing state...");
-    set({
-      notebooks: db.notebooks.all
-    });
-  },
-  notebooks: [],
-  isSideMenuOpen: false,
-  addNotebook: async notebook => {
-    if (await db.notebooks.add(notebook)) {
-      set({ notebooks: db.notebooks.all });
-    }
-  }
-}));
+function immer(config) {
+  return function(set, get, api) {
+    return config(fn => set(produce(fn)), get, api);
+  };
+}
 
-export default useStore;
+function createStore(store) {
+  return create(immer(store));
+}
+
+export default createStore;

@@ -4,12 +4,14 @@ import { db } from "../common";
 import Notebook from "../components/notebook";
 import AddNotebookDialog from "../components/dialogs/addnotebookdialog";
 import ListContainer from "../components/list-container";
-import useStore from "../common/store";
+import { useStore, store } from "../common/notebook-store";
 
 const Notebooks = props => {
   const [open, setOpen] = useState(false);
+  useEffect(() => store.getState().init(), []);
   const notebooks = useStore(state => state.notebooks);
   const addNotebook = useStore(state => state.addNotebook);
+
   return (
     <>
       <ListContainer
