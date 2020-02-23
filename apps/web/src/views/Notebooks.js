@@ -10,7 +10,7 @@ const Notebooks = props => {
   const [open, setOpen] = useState(false);
   useEffect(() => store.getState().init(), []);
   const notebooks = useStore(state => state.notebooks);
-  const addNotebook = useStore(state => state.addNotebook);
+  const add = useStore(state => state.add);
 
   return (
     <>
@@ -45,7 +45,7 @@ const Notebooks = props => {
       />
       <AddNotebookDialog
         isOpen={open}
-        onDone={addNotebook}
+        onDone={add}
         close={() => {
           setOpen(false);
         }}
