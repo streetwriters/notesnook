@@ -152,6 +152,21 @@ export const Notes = ({navigation}) => {
     </View>
   );
 
+  const _onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await db.sync();
+
+      init();
+      dispatch({type: ACTIONS.USER});
+      setRefreshing(false);
+      ToastEvent.show('Sync Complete', 'success');
+    } catch (e) {
+      setRefreshing(false);
+      ToastEvent.show('Sync failed, network error', 'error');
+    }
+  };
+
   const _listKeyExtractor = (item, index) => item.dateCreated.toString();
 
   return (
@@ -177,20 +192,7 @@ export const Notes = ({navigation}) => {
             tintColor={colors.accent}
             colors={[colors.accent]}
             progressViewOffset={165}
-            onRefresh={async () => {
-              setRefreshing(true);
-              try {
-                await db.sync();
-
-                init();
-                dispatch({type: ACTIONS.USER});
-                setRefreshing(false);
-                ToastEvent.show('Sync Complete', 'success');
-              } catch (e) {
-                setRefreshing(false);
-                ToastEvent.show('Sync failed, network error', 'error');
-              }
-            }}
+            onRefresh={_onRefresh}
             refreshing={refreshing}
           />
         }
