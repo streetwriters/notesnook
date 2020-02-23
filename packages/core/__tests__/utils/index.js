@@ -56,6 +56,8 @@ const groupedTest = (type, special = false) =>
       expect(grouped.items.length).toBeGreaterThan(0);
       expect(grouped.groups.length).toBeGreaterThan(0);
       expect(grouped.groupCounts.length).toBeGreaterThan(0);
+      // check order
+      expect(grouped.groups[0].title).toBe("Pinned");
       return;
     }
     expect(grouped.length).toBeGreaterThan(0);
