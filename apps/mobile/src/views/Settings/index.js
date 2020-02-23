@@ -401,7 +401,7 @@ export const Settings = ({navigation}) => {
             onPress={item.func}
             style={{
               width: item.step ? '85%' : w - 24,
-              paddingBottom: pv + 5,
+              paddingVertical: pv + 5,
             }}>
             <Text
               style={{
