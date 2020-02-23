@@ -90,7 +90,7 @@ export default class Notes {
    * @returns {Note} The note of the given id
    */
   note(id) {
-    let note = this._collection.getItem(id);
+    let note = id.type ? id : this._collection.getItem(id);
     if (!note) return undefined;
     return new Note(this, note);
   }
