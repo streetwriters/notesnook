@@ -7,6 +7,7 @@ import Button from "../components/button";
 import Search from "../components/search";
 import Note from "../components/note";
 import { useStore, store } from "../stores/note-store";
+import { useStore as useEditorStore } from "../stores/editor-store";
 
 function SearchBox(props) {
   return (
@@ -27,6 +28,7 @@ function SearchBox(props) {
 function Home() {
   useEffect(() => store.getState().init(), []);
   const notes = useStore(store => store.notes);
+  const clearSession = useEditorStore(store => store.clearSession);
   return (
     <Flex flexDirection="column" flex="1 1 auto">
       <SearchBox />
@@ -60,7 +62,7 @@ function Home() {
       <Button
         Icon={Icon.Plus}
         content="Make a new note"
-        onClick={sendNewNoteEvent}
+        onClick={() => clearSession()}
       />
     </Flex>
   );

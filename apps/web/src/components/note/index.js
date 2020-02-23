@@ -2,12 +2,13 @@ import React from "react";
 import { Flex } from "rebass";
 import * as Icon from "react-feather";
 import TimeAgo from "timeago-react";
-import { db, ev } from "../../common";
+import { ev } from "../../common";
 import { showSnack } from "../snackbar";
 import ListItem from "../list-item";
 import { confirm } from "../dialogs/confirm";
 import { showMoveNoteDialog } from "../dialogs/movenotedialog";
 import { store } from "../../stores/note-store";
+import { store as editorStore } from "../../stores/editor-store";
 
 const dropdownRefs = [];
 const menuItems = (note, index, groupIndex) => [
@@ -70,7 +71,9 @@ export default class Note extends React.Component {
         title={note.title}
         body={note.headline}
         index={index}
-        onClick={sendOpenNoteEvent.bind(this, note)}
+        onClick={async () => {
+          await editorStore.getState().newSession(note);
+        }}
         info={
           <Flex justifyContent="center" alignItems="center">
             <TimeAgo datetime={note.dateCreated} />

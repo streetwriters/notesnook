@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "./editor.css";
 import ReactQuill, { Quill } from "react-quill";
 import "react-quill/dist/quill.bubble.css";
@@ -11,7 +11,8 @@ import { db, ev } from "../../common";
 import { showSnack } from "../snackbar";
 import * as Icon from "react-feather";
 import Properties from "../properties";
-import { store } from "../../stores/note-store";
+//import { store } from "../../stores/note-store";
+import { useStore } from "../../stores/editor-store";
 
 Quill.register("modules/markdownShortcuts", MarkdownShortcuts);
 Quill.register("modules/magicUrl", MagicUrl);
@@ -43,23 +44,86 @@ const modules = {
   magicUrl: true
 };
 
-export default class Editor extends React.Component {
-  title = "";
-  timeout = "";
-  id = "";
-  favorite = false;
-  pinned = false;
+function Editor() {
+  const title = useStore(store => store.session.title);
+  const delta = useStore(store => store.session.content.delta);
+  const setSession = useStore(store => store.setSession);
+  console.log(delta, title);
+  useEffect(() => {
+    // move the toolbar outside (easiest way)
+    const toolbar = document.querySelector(".ql-toolbar.ql-snow");
+    const toolbarContainer = document.querySelector("#toolbar");
+    if (toolbar && toolbarContainer) {
+      toolbarContainer.appendChild(toolbar);
+    }
+  }, []);
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      pinned: false,
-      favorite: false,
-      colors: [],
-      tags: []
-    };
+  return (
+    <Flex width={["0%", "0%", "100%"]}>
+      <Flex className="editor" flex="1 1 auto" flexDirection="column">
+        <TitleBox
+          title={title}
+          setTitle={title =>
+            setSession(state => {
+              state.session.title = title;
+            })
+          }
+        />
+        <Box id="toolbar" display={["none", "flex", "flex"]} />
+        <ReactQuill
+          modules={modules}
+          theme="snow"
+          defaultValue={delta}
+          onChange={(content, delta, source, editor) => {
+            if (source === "api") return;
+            setSession(state => {
+              state.session.content = {
+                delta: editor.getContents(),
+                text: editor.getText()
+              };
+            });
+          }}
+        />
+      </Flex>
+    </Flex>
+  );
+}
+
+export default Editor;
+
+class TitleBox extends React.Component {
+  shouldComponentUpdate(nextProps) {
+    return nextProps.title !== this.props.title;
   }
+  render() {
+    const { title, setTitle } = this.props;
+    return (
+      <Input
+        autoFocus
+        placeholder="Untitled"
+        fontFamily="heading"
+        fontWeight="heading"
+        fontSize="heading"
+        display={["none", "flex", "flex"]}
+        sx={{
+          borderWidth: 0,
+          ":focus": { outline: "none" },
+          paddingTop: 0,
+          paddingBottom: 0
+        }}
+        px={2}
+        value={title}
+        onChange={e => {
+          setTitle(e.target.value);
+        }}
+      />
+    );
+  }
+}
 
+/* 
+
+export default class Editor extends React.Component {
   componentDidMount() {
     // move the toolbar outside (easiest way)
     const toolbar = document.querySelector(".ql-toolbar.ql-snow");
@@ -80,15 +144,15 @@ export default class Editor extends React.Component {
       }
     );
 
-    ev.addListener("onNewNote", this.onNewNote.bind(this));
-    ev.addListener("onOpenNote", this.onOpenNote.bind(this));
-    ev.addListener("onClearNote", this.onClearNote.bind(this));
+    // ev.addListener("onNewNote", this.onNewNote.bind(this));
+    // ev.addListener("onOpenNote", this.onOpenNote.bind(this));
+    // ev.addListener("onClearNote", this.onClearNote.bind(this));
   }
 
   componentWillUnmount() {
-    ev.removeListener("onNewNote", this.onNewNote.bind(this));
-    ev.removeListener("onOpenNote", this.onOpenNote.bind(this));
-    ev.removeListener("onClearNote", this.onClearNote.bind(this));
+    //  ev.removeListener("onNewNote", this.onNewNote.bind(this));
+    //  ev.removeListener("onOpenNote", this.onOpenNote.bind(this));
+    //  ev.removeListener("onClearNote", this.onClearNote.bind(this));
   }
 
   onNewNote(show = true, cb = null) {
@@ -164,7 +228,6 @@ export default class Editor extends React.Component {
       <Flex width={["0%", "0%", "100%"]}>
         <Flex className="editor" flex="1 1 auto" flexDirection="column">
           <Input
-            ref={ref => (this.titleRef = ref)}
             placeholder="Untitled"
             fontFamily="heading"
             fontWeight="heading"
@@ -182,7 +245,7 @@ export default class Editor extends React.Component {
               this.save();
             }}
           />
-          <Box id="toolbar" display={["none", "flex", "flex"]}></Box>
+          <Box id="toolbar" display={["none", "flex", "flex"]} />
           <ReactQuill
             ref={ref => (this.quillRef = ref)}
             modules={modules}
@@ -192,7 +255,7 @@ export default class Editor extends React.Component {
             }}
           />
         </Flex>
-        <Properties
+        {/* <Properties
           pinned={this.state.pinned}
           favorite={this.state.favorite}
           onPinned={state => {
@@ -225,7 +288,9 @@ export default class Editor extends React.Component {
           }}
           onLocked={state => {}}
         />
+ }
       </Flex>
     );
   }
 }
+ */
