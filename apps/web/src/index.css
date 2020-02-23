@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css?family=Noto+Sans:400,700|Noto+Serif:400,700&display=swap");
+@import url("https://fonts.googleapis.com/css?family=Noto+Sans+JP|Noto+Serif&display=swap");
 
 :root,
 body,
@@ -17,7 +17,7 @@ body,
 }
 
 * {
-  font-family: "Noto Sans", sans-serif;
+  font-family: "Noto Sans JP", sans-serif;
 }
 
 @keyframes fadeUp {

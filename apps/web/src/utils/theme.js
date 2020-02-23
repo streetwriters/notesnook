@@ -58,11 +58,11 @@ const theme = (colors, shadows) => ({
   },
   fontWeights: {
     body: 400,
-    heading: 800,
-    bold: 800
+    heading: 700,
+    bold: 700
   },
   fonts: {
-    body: "Noto Sans, sans-serif",
+    body: "Noto Sans JP, sans-serif",
     heading: "Noto Serif, serif"
   },
   sizes: {
