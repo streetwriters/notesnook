@@ -7,6 +7,9 @@ import {
 } from '../services/eventManager';
 import {eThemeUpdated} from '../services/events';
 
+export const scale = {
+  fontScale: 1,
+};
 const {height, width} = Dimensions.get('window');
 const standardLength = width > height ? width : height;
 
@@ -134,19 +137,32 @@ export const normalize = size => {
 };
 
 export const SIZE = {
-  xxs: 10,
-  xs: 12,
-  sm: normalize(15),
-  md: normalize(17),
-  lg: normalize(24),
-  xl: normalize(27),
-  xxl: normalize(31),
-  xxxl: normalize(34),
+  xxs: 10 * scale.fontScale,
+  xs: 12 * scale.fontScale,
+  sm: normalize(15) * scale.fontScale,
+  md: normalize(17) * scale.fontScale,
+  lg: normalize(24) * scale.fontScale,
+  xl: normalize(27) * scale.fontScale,
+  xxl: normalize(31) * scale.fontScale,
+  xxxl: normalize(34) * scale.fontScale,
 };
 
+export function updateSize() {
+  SIZE.xxs = 10 * scale.fontScale;
+  SIZE.xs = 12 * scale.fontScale;
+  SIZE.sm = normalize(15) * scale.fontScale;
+  SIZE.md = normalize(17) * scale.fontScale;
+  SIZE.lg = normalize(24) * scale.fontScale;
+  SIZE.xl = normalize(27) * scale.fontScale;
+  SIZE.xxl = normalize(31) * scale.fontScale;
+  SIZE.xxxl = normalize(34) * scale.fontScale;
+  ph = normalize(10) * scale.fontScale;
+  pv = normalize(10) * scale.fontScale;
+}
+
 export const br = 5; // border radius
-export const ph = normalize(10); // padding horizontal
-export const pv = normalize(10); // padding vertical
+export var ph = normalize(10); // padding horizontal
+export var pv = normalize(10); // padding vertical
 export const opacity = 0.5; // active opacity
 
 // GLOBAL FONT

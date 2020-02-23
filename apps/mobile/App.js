@@ -2,7 +2,13 @@ import Storage from 'notes-core/api/index';
 import React, {useEffect, useState} from 'react';
 import {Platform, StatusBar, View, Text} from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import {getColorScheme, WEIGHT, SIZE} from './src/common/common';
+import {
+  getColorScheme,
+  WEIGHT,
+  SIZE,
+  scale,
+  updateSize,
+} from './src/common/common';
 import {DialogManager} from './src/components/DialogManager';
 import {Menu} from './src/components/Menu';
 import {ModalMenu} from './src/components/ModalMenu';
@@ -153,17 +159,6 @@ const App = () => {
         let user = await db.user.get();
         dispatch({type: ACTIONS.USER, user: user});
 
-        let s = await FastStorage.getItem('settings');
-        if (typeof s !== 'string') {
-          s = defaultState.settings;
-          s = JSON.stringify(s);
-          await FastStorage.setItem('settings', s);
-          dispatch({type: ACTIONS.SETTINGS, s});
-        } else {
-          s = JSON.parse(s);
-          dispatch({type: ACTIONS.SETTINGS, settings: s});
-        }
-
         setInit(true);
       });
     });
@@ -171,6 +166,21 @@ const App = () => {
 
   async function updateAppTheme(colors = colors) {
     let newColors = await getColorScheme(colors);
+    let s = await FastStorage.getItem('settings');
+    if (typeof s !== 'string') {
+      s = defaultState.settings;
+
+      s = JSON.stringify(s);
+      await FastStorage.setItem('settings', s);
+      dispatch({type: ACTIONS.SETTINGS, s});
+    } else {
+      s = JSON.parse(s);
+      scale.fontScale = s.fontScale;
+      console.log(scale.fontScale);
+      updateSize();
+      console.log(SIZE.lg);
+      dispatch({type: ACTIONS.SETTINGS, settings: {...s}});
+    }
     dispatch({type: ACTIONS.THEME, colors: newColors});
   }
 

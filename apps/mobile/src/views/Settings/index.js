@@ -21,11 +21,14 @@ import {
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Container from '../../components/Container';
 import {useTracked} from '../../provider';
-import {w, hexToRGBA} from '../../utils/utils';
+import {w, hexToRGBA, getElevation} from '../../utils/utils';
 import {ACTIONS} from '../../provider/actions';
 import FastStorage from 'react-native-fast-storage';
 import {DDS} from '../../../App';
 import {updateEvent} from '../../components/DialogManager';
+import {eSendEvent} from '../../services/eventManager';
+import {eOpenLoginDialog} from '../../services/events';
+import NavigationService from '../../services/NavigationService';
 
 export async function setSetting(settings, name, value) {
   let s = {...settings};
@@ -206,8 +209,10 @@ export const Settings = ({navigation}) => {
               : scale === 1.4
               ? (scale = 1.5)
               : scale === 1.5
-              ? (scale = 1)
-              : (scale = 1);
+              ? (scale = 0.8)
+              : scale === 0.8
+              ? (scale = 0.9)
+              : (scale = 0.9 ? (scale = 1) : (scale = 1));
 
             await setSetting(settings, 'fontScale', scale);
           }}
@@ -219,8 +224,6 @@ export const Settings = ({navigation}) => {
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-between',
-            borderBottomWidth: 1,
-            borderBottomColor: colors.nav,
           }}>
           <Text
             style={{
@@ -496,7 +499,46 @@ export const Settings = ({navigation}) => {
               </TouchableOpacity>
             ))}
           </>
-        ) : null}
+        ) : (
+          <TouchableOpacity
+            onPress={() => {
+              DDS.isTab
+                ? eSendEvent(eOpenLoginDialog)
+                : NavigationService.navigate('Login');
+            }}
+            activeOpacity={opacity / 2}
+            style={{
+              ...getElevation(2),
+              paddingVertical: pv + 5,
+              marginVertical: pv + 5,
+              width: '100%',
+              justifyContent: 'flex-start',
+              alignItems: 'center',
+              flexDirection: 'row',
+              backgroundColor: colors.accent,
+              borderRadius: 5,
+              paddingHorizontal: 6,
+            }}>
+            <Icon
+              style={{
+                minWidth: 35,
+                textAlign: 'left',
+              }}
+              name="login"
+              color="white"
+              size={SIZE.lg}
+            />
+
+            <Text
+              style={{
+                fontFamily: WEIGHT.regular,
+                color: 'white',
+                fontSize: SIZE.md,
+              }}>
+              Login
+            </Text>
+          </TouchableOpacity>
+        )}
 
         <Text
           style={{
