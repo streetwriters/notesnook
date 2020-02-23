@@ -1,5 +1,6 @@
 import React from "react";
 import { Flex, Box, Text } from "rebass";
+import Dropdown from "../dropdown";
 
 function Menu(props) {
   return (
@@ -19,6 +20,7 @@ function Menu(props) {
             key={item.title}
             onClick={e => {
               e.stopPropagation();
+              Dropdown.closeLastOpened();
               if (props.dropdownRef) {
                 props.dropdownRef.hide();
               }

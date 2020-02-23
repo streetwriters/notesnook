@@ -10,6 +10,9 @@ import "./styles/Dropdown.css";
 var lastOpenedDropdown;
 
 class Dropdown extends Component {
+  static closeLastOpened() {
+    if (lastOpenedDropdown) lastOpenedDropdown.hide();
+  }
   displayName = "Dropdown";
 
   componentDidMount() {
