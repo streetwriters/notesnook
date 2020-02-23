@@ -221,7 +221,7 @@ const ConfirmationDialog = props => (
       text: "Yes",
       click: props.onYes
     }}
-    negativeButton={{ text: "No", click: props.onNo }}
+    negativeButton={{ text: "No", onClick: props.onNo }}
   />
 );
 
