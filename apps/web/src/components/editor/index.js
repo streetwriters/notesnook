@@ -11,6 +11,7 @@ import { db, ev } from "../../common";
 import { showSnack } from "../snackbar";
 import * as Icon from "react-feather";
 import Properties from "../properties";
+import { store } from "../../stores/note-store";
 
 Quill.register("modules/markdownShortcuts", MarkdownShortcuts);
 Quill.register("modules/magicUrl", MagicUrl);
@@ -154,21 +155,14 @@ export default class Editor extends React.Component {
     clearTimeout(this.timeout);
     this.timeout = setTimeout(async () => {
       this.id = await this.saveNote();
-      ev.emit("refreshNotes");
+      store.getState().init();
     }, 1000);
   }
 
   render() {
     return (
       <Flex width={["0%", "0%", "100%"]}>
-        <Flex
-          className="editor"
-          flex="1 1 auto"
-          flexDirection="column"
-          onBlur={() => {
-            ev.emit("refreshNotes");
-          }}
-        >
+        <Flex className="editor" flex="1 1 auto" flexDirection="column">
           <Input
             ref={ref => (this.titleRef = ref)}
             placeholder="Untitled"
