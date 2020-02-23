@@ -12,6 +12,12 @@ export const defaultState = {
   tags: [],
   colorNotes: [],
   user: {},
+  settings: {
+    showToolbarOnTop: false,
+    showKeyboardOnOpen: false,
+    fontScale: 1,
+    forcePortraitOnTablet: false,
+  },
   currentScreen: 'home',
   colors: {
     night: false,

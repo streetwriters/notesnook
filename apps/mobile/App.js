@@ -31,7 +31,8 @@ import {w} from './src/utils/utils';
 import Editor from './src/views/Editor';
 import Animated, {Easing} from 'react-native-reanimated';
 import {useForceUpdate} from './src/views/ListsEditor';
-
+import FastStorage from 'react-native-fast-storage';
+import {defaultState} from './src/provider/defaultState';
 export const DDS = new DeviceDetectionService();
 export const db = new Storage(StorageInterface);
 
@@ -151,6 +152,17 @@ const App = () => {
       db.init().then(async () => {
         let user = await db.user.get();
         dispatch({type: ACTIONS.USER, user: user});
+
+        let s = await FastStorage.getItem('settings');
+        if (typeof s !== 'string') {
+          s = defaultState.settings;
+          s = JSON.stringify(s);
+          await FastStorage.setItem('settings', s);
+          dispatch({type: ACTIONS.SETTINGS, s});
+        } else {
+          s = JSON.parse(s);
+          dispatch({type: ACTIONS.SETTINGS, settings: s});
+        }
 
         setInit(true);
       });

@@ -16,4 +16,5 @@ export const ACTIONS = {
   SEARCH_RESULTS: 'searchResults',
   USER: 'getUser',
   CURRENT_SCREEN: 'currentScreen',
+  SETTINGS: 'getSettings',
 };

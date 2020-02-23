@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {
   Text,
   TouchableOpacity,
@@ -24,9 +24,20 @@ import {useTracked} from '../../provider';
 import {w, hexToRGBA} from '../../utils/utils';
 import {ACTIONS} from '../../provider/actions';
 import FastStorage from 'react-native-fast-storage';
+import {DDS} from '../../../App';
+import {updateEvent} from '../../components/DialogManager';
+
+export async function setSetting(settings, name, value) {
+  let s = {...settings};
+  s[name] = value;
+  await FastStorage.setItem('settings', JSON.stringify(s));
+
+  updateEvent({type: ACTIONS.SETTINGS, settings: s});
+}
+
 export const Settings = ({navigation}) => {
   const [state, dispatch] = useTracked();
-  const {colors, user} = state;
+  const {colors, user, settings} = state;
 
   function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
     let newColors = setColorScheme(colors, accent);
@@ -40,7 +51,7 @@ export const Settings = ({navigation}) => {
     ACCENT.shade = accentColor + '12';
     changeColorScheme();
   }
-
+  console.log(settings);
   return (
     <Container
       menu={true}
@@ -180,6 +191,107 @@ export const Settings = ({navigation}) => {
           />
         </TouchableOpacity>
 
+        <TouchableOpacity
+          onPress={async () => {
+            let scale = settings.fontScale;
+
+            scale === 1
+              ? (scale = 1.1)
+              : scale === 1.1
+              ? (scale = 1.2)
+              : scale === 1.2
+              ? (scale = 1.3)
+              : scale === 1.3
+              ? (scale = 1.4)
+              : scale === 1.4
+              ? (scale = 1.5)
+              : scale === 1.5
+              ? (scale = 1)
+              : (scale = 1);
+
+            await setSetting(settings, 'fontScale', scale);
+          }}
+          activeOpacity={opacity}
+          style={{
+            width: '100%',
+            marginHorizontal: 0,
+            paddingVertical: pv + 5,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            borderBottomWidth: 1,
+            borderBottomColor: colors.nav,
+          }}>
+          <Text
+            style={{
+              fontSize: SIZE.sm,
+              fontFamily: WEIGHT.regular,
+              textAlignVertical: 'center',
+              color: colors.pri,
+            }}>
+            Font Scaling
+          </Text>
+
+          <View
+            style={{
+              borderBottomWidth: 1,
+              borderColor: colors.nav,
+              paddingVertical: 1,
+              paddingHorizontal: 5,
+            }}>
+            <Text
+              style={{
+                fontSize: SIZE.xs,
+                fontFamily: WEIGHT.regular,
+                textAlignVertical: 'center',
+                color: colors.pri,
+              }}>
+              {settings.fontScale + 'X'}
+            </Text>
+          </View>
+        </TouchableOpacity>
+
+        {DDS.isTab ? (
+          <TouchableOpacity
+            onPress={async () => {
+              await setSetting(
+                settings,
+                'forcePortraitOnTablet',
+                !settings.forcePortraitOnTablet,
+              );
+            }}
+            activeOpacity={opacity}
+            style={{
+              width: '100%',
+              marginHorizontal: 0,
+              paddingVertical: pv + 5,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}>
+            <Text
+              style={{
+                fontSize: SIZE.sm,
+                fontFamily: WEIGHT.regular,
+                textAlignVertical: 'center',
+                color: colors.pri,
+              }}>
+              Force portrait mode
+            </Text>
+            <Icon
+              size={SIZE.xl}
+              color={
+                settings.forcePortraitOnTablet ? colors.accent : colors.icon
+              }
+              name={
+                settings.forcePortraitOnTablet
+                  ? 'toggle-switch'
+                  : 'toggle-switch-off'
+              }
+            />
+          </TouchableOpacity>
+        ) : null}
+
         <Text
           style={{
             fontSize: SIZE.xs,
@@ -196,6 +308,13 @@ export const Settings = ({navigation}) => {
 
         <TouchableOpacity
           activeOpacity={opacity}
+          onPress={async () => {
+            await setSetting(
+              settings,
+              'showToolbarOnTop',
+              !settings.showToolbarOnTop,
+            );
+          }}
           style={{
             width: '100%',
             marginHorizontal: 0,
@@ -216,12 +335,21 @@ export const Settings = ({navigation}) => {
           </Text>
           <Icon
             size={SIZE.xl}
-            color={colors.night ? colors.accent : colors.icon}
-            name={colors.night ? 'toggle-switch' : 'toggle-switch-off'}
+            color={settings.showToolbarOnTop ? colors.accent : colors.icon}
+            name={
+              settings.showToolbarOnTop ? 'toggle-switch' : 'toggle-switch-off'
+            }
           />
         </TouchableOpacity>
         <TouchableOpacity
           activeOpacity={opacity}
+          onPress={async () => {
+            await setSetting(
+              settings,
+              'showKeyboardOnOpen',
+              !settings.showKeyboardOnOpen,
+            );
+          }}
           style={{
             width: '100%',
             marginHorizontal: 0,
@@ -242,8 +370,12 @@ export const Settings = ({navigation}) => {
           </Text>
           <Icon
             size={SIZE.xl}
-            color={colors.night ? colors.accent : colors.icon}
-            name={colors.night ? 'toggle-switch' : 'toggle-switch-off'}
+            color={settings.showKeyboardOnOpen ? colors.accent : colors.icon}
+            name={
+              settings.showKeyboardOnOpen
+                ? 'toggle-switch'
+                : 'toggle-switch-off'
+            }
           />
         </TouchableOpacity>
 

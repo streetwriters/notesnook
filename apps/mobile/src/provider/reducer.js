@@ -36,6 +36,13 @@ export const reducer = (state, action) => {
         notebooks: db.notebooks.all,
       };
     }
+    case ACTIONS.SETTINGS: {
+      console.log('here', action.settings);
+      return {
+        ...state,
+        settings: {...action.settings},
+      };
+    }
     case ACTIONS.TRASH: {
       return {
         ...state,
