@@ -6,7 +6,7 @@ import Dialog, { showDialog } from "./dialog";
 
 const LoginDialog = props => (
   <Dialog
-    open={true}
+    isOpen={true}
     title={"Login"}
     icon={Icon.LogIn}
     onCloseClick={props.onClose}

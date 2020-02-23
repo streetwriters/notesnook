@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Flex, Text, Box } from "rebass";
 import * as Icon from "react-feather";
-import { db, ev, sendNewNoteEvent } from "../common";
+import { db, sendNewNoteEvent } from "../common";
 import { GroupedVirtuoso as GroupList } from "react-virtuoso";
 import Button from "../components/button";
 import Search from "../components/search";
 import Note from "../components/note";
+import { useStore, store } from "../stores/note-store";
 
 function SearchBox(props) {
   return (
@@ -24,25 +25,11 @@ function SearchBox(props) {
 }
 
 function Home() {
-  const [notes, setNotes] = useState({
-    items: [],
-    groupCounts: [],
-    groups: []
-  });
-  useEffect(() => {
-    function onRefreshNotes() {
-      let groups = db.notes.group(undefined, true);
-      setNotes(groups);
-    }
-    onRefreshNotes();
-    ev.addListener("refreshNotes", onRefreshNotes);
-    return () => {
-      ev.removeListener("refreshNotes", onRefreshNotes);
-    };
-  }, []);
+  useEffect(() => store.getState().init(), []);
+  const notes = useStore(store => store.notes);
   return (
     <Flex flexDirection="column" flex="1 1 auto">
-      <SearchBox setNotes={setNotes} />
+      <SearchBox />
       <GroupList
         style={{
           width: "100%",
@@ -63,7 +50,11 @@ function Home() {
           )
         }
         item={(index, groupIndex) => (
-          <Note index={index} item={notes.items[index]} />
+          <Note
+            index={index}
+            groupIndex={groupIndex}
+            item={notes.items[index]}
+          />
         )}
       />
       <Button

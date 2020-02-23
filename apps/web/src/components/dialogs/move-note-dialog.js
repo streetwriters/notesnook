@@ -22,7 +22,7 @@ export default class MoveDialog extends React.Component {
     const props = this.props;
     return (
       <Dialog
-        open={true}
+        isOpen={true}
         title={"Move Note"}
         icon={Icon.Move}
         content={

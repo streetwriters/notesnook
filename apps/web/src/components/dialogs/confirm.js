@@ -5,7 +5,7 @@ import Dialog, { showDialog } from "./dialog";
 function Confirm(props) {
   return (
     <Dialog
-      open={true}
+      isOpen={true}
       title={props.title}
       icon={props.icon}
       content={
