@@ -4,7 +4,7 @@ import { db } from "../common";
 import Notebook from "../components/notebook";
 import AddNotebookDialog from "../components/dialogs/addnotebookdialog";
 import ListContainer from "../components/list-container";
-import { useStore, store } from "../common/notebook-store";
+import { useStore, store } from "../stores/notebook-store";
 
 const Notebooks = props => {
   const [open, setOpen] = useState(false);

@@ -4,7 +4,7 @@ import * as Icon from "react-feather";
 import ListItem from "../list-item";
 import { db, ev } from "../../common";
 import { showSnack } from "../snackbar";
-import { store } from "../../common/notebook-store";
+import { store } from "../../stores/notebook-store";
 
 const dropdownRefs = [];
 const menuItems = (notebook, index) => [

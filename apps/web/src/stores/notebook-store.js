@@ -1,5 +1,5 @@
-import { db } from "./index";
-import createStore from "./store";
+import { db } from "../common/index";
+import createStore from "../common/store";
 
 function notebookStore(set) {
   return {

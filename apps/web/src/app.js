@@ -71,12 +71,8 @@ function App() {
     0
   );
   const [show, setShow] = usePersistentState("navContainerState", true);
-  const initStore = useStore(state => state.init);
-  const isSideMenuOpen = useStore(state => state.isSideMenuOpen);
-  useEffect(() => {
-    initStore();
-  }, [initStore]);
 
+  const isSideMenuOpen = useStore(state => state.isSideMenuOpen);
   useEffect(() => {
     RootNavigator.navigate(Object.keys(RootNavigator.routes)[selectedIndex]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
