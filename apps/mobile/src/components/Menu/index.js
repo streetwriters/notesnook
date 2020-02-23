@@ -604,44 +604,56 @@ export const Menu = ({
         ) : (
           <TouchableOpacity
             onPress={() => {
-              close();
-
               DDS.isTab
                 ? eSendEvent(eOpenLoginDialog)
                 : NavigationService.navigate('Login');
             }}
             activeOpacity={opacity / 2}
             style={{
-              ...getElevation(2),
-              paddingVertical: pv + 5,
-              width: '100%',
-              justifyContent: noTextMode ? 'center' : 'flex-start',
-              alignItems: 'center',
-              flexDirection: 'row',
-              backgroundColor: noTextMode ? 'transparent' : colors.accent,
+              paddingVertical: 12,
+              marginVertical: 5,
+              marginTop: pv + 5,
               borderRadius: 5,
-              paddingHorizontal: noTextMode ? 0 : 6,
+              width: '100%',
+              flexDirection: 'row',
+              alignItems: 'center',
+              backgroundColor: colors.shade,
+
+              paddingHorizontal: 12,
             }}>
             <Icon
               style={{
-                minWidth: noTextMode ? 5 : 35,
-                textAlign: 'left',
+                width: 30,
+                textAlign: 'center',
+                backgroundColor: colors.accent,
+                height: 30,
+                borderRadius: 100,
+                textAlignVertical: 'center',
               }}
-              name="login"
-              color={noTextMode ? colors.accent : 'white'}
-              size={SIZE.lg}
+              name="account-outline"
+              color="white"
+              size={SIZE.md}
             />
-
-            {noTextMode ? null : (
+            <View
+              style={{
+                marginLeft: 10,
+              }}>
               <Text
                 style={{
                   fontFamily: WEIGHT.regular,
-                  color: 'white',
-                  fontSize: SIZE.md,
+                  color: colors.icon,
+                  fontSize: SIZE.xs,
                 }}>
-                Login
+                You are not logged in
               </Text>
-            )}
+              <Text
+                style={{
+                  color: colors.accent,
+                  fontSize: SIZE.sm - 2,
+                }}>
+                Login to sync notes.
+              </Text>
+            </View>
           </TouchableOpacity>
         )}
       </View>

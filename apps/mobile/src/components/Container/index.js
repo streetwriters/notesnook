@@ -13,7 +13,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {br, opacity, pv, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
-import {eScrollEvent} from '../../services/events';
+import {eScrollEvent, eOpenLoginDialog} from '../../services/events';
 import {getElevation, h, w} from '../../utils/utils';
 import {Header} from '../header';
 import {Search} from '../SearchInput';

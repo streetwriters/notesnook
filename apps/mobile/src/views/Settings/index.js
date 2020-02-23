@@ -199,8 +199,8 @@ export const Settings = ({navigation}) => {
               }}
               activeOpacity={opacity / 2}
               style={{
-                paddingVertical: 12,
-                marginVertical: 5,
+                paddingVertical: pv + 5,
+                marginBottom: pv + 5,
                 width: '100%',
                 flexDirection: 'row',
                 alignItems: 'center',
@@ -237,7 +237,7 @@ export const Settings = ({navigation}) => {
                   style={{
                     color: colors.accent,
                   }}>
-                  Login to enable sync.
+                  Login to sync notes.
                 </Text>
               </View>
 
