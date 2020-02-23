@@ -116,7 +116,7 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    Orientation.lockToLandscape();
+    DDS.isTab ? Orientation.lockToLandscape() : Orientation.lockToPortrait();
     eSubscribeEvent(eOpenSideMenu, openSidebar);
     eSubscribeEvent(eCloseSideMenu, closeSidebar);
 

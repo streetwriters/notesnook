@@ -14,7 +14,7 @@ export const reducer = (state, action) => {
 
       return {
         ...state,
-        notes: [...notes],
+        notes: notes,
         loading: false,
       };
     case ACTIONS.THEME: {
@@ -31,22 +31,19 @@ export const reducer = (state, action) => {
       };
     }
     case ACTIONS.NOTEBOOKS: {
-      let notebooks = [...db.notebooks.all];
       return {
         ...state,
-        notebooks: notebooks,
+        notebooks: db.notebooks.all,
       };
     }
     case ACTIONS.TRASH: {
-      let trash = db.trash.all;
-
       return {
         ...state,
-        trash: trash,
+        trash: db.trash.all,
       };
     }
     case ACTIONS.PINNED: {
-      let pinned = [...db.notes.pinned];
+      let pinned = db.notes.pinned;
       return {
         ...state,
         pinned: pinned,
@@ -59,24 +56,21 @@ export const reducer = (state, action) => {
       };
     }
     case ACTIONS.TAGS: {
-      let tagList = db.notes.tags;
       return {
         ...state,
-        tags: [...tagList],
+        tags: db.tags.all,
       };
     }
     case ACTIONS.FAVORITES: {
-      let favorites = [...db.notes.favorites];
       return {
         ...state,
-        favorites: [...favorites],
+        favorites: db.notes.favorites,
       };
     }
     case ACTIONS.COLORS: {
-      let colors = db.notes.colors;
       return {
         ...state,
-        colorNotes: [...colors],
+        colorNotes: db.colors.all,
       };
     }
     case ACTIONS.SELECTION_MODE: {
