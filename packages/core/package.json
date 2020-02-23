@@ -10,8 +10,7 @@
     "babel-jest": "^24.9.0",
     "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.7.0",
-    "jest": "^24.9.0",
-    "node-fetch": "^2.6.0"
+    "jest": "^24.9.0"
   },
   "scripts": {
     "test": "jest"

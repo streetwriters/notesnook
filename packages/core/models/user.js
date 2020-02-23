@@ -1,6 +1,5 @@
 import { HOST, HEADERS } from "../utils/constants";
 import StorageInterface from "../database/storage";
-import fetch from "node-fetch";
 
 export default class User {
   /**

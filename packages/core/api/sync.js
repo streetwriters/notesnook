@@ -26,8 +26,7 @@
  * And then it should continue.
  */
 import Database from "./index";
-import { HOST,HEADERS } from "../utils/constants";
-import fetch from "node-fetch";
+import { HOST, HEADERS } from "../utils/constants";
 
 export default class Sync {
   /**
@@ -61,7 +60,7 @@ export default class Sync {
 
   _merge({ serverResponse, lastSyncedTimestamp, user }) {
     const { notes, notebooks /* tags, colors, trash */ } = serverResponse;
-   
+
     notes.forEach(async note => {
       note = JSON.parse(note.data);
       let localNote = this.db.notes.note(note.id);
@@ -78,8 +77,7 @@ export default class Sync {
     });
     // TODO trash, colors, tags
     return {
-      notes: this.db.notes
-        .all
+      notes: this.db.notes.all
         .filter(v => v.dateEdited > lastSyncedTimestamp)
         .map(v => ({
           dateEdited: v.dateEdited,
@@ -87,8 +85,7 @@ export default class Sync {
           data: JSON.stringify(v),
           userId: user.Id
         })),
-      notebooks: this.db.notebooks
-        .all
+      notebooks: this.db.notebooks.all
         .filter(v => v.dateEdited > lastSyncedTimestamp)
         .map(v => ({
           dateEdited: v.dateEdited,
@@ -104,8 +101,6 @@ export default class Sync {
   }
 
   async _send(data) {
-   
-
     //TODO encrypt the payload
     let token = await this.db.user.token();
     if (!token) return;
