@@ -21,8 +21,15 @@ import {db, DDS} from '../../../App';
 
 export const NotesList = ({isGrouped = false}) => {
   const [state, dispatch] = useTracked();
-  const {colors, selectionMode, currentEditingNote, loading, keyword} = state;
-  const notes = [...state.notes];
+  const {
+    colors,
+    selectionMode,
+    currentEditingNote,
+    loading,
+    keyword,
+    notes,
+  } = state;
+
   const searchResults = [...state.searchResults];
   const [refreshing, setRefreshing] = useState(false);
 
