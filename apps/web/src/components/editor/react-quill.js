@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import { Box } from "rebass";
 import Quill from "quill";
 import "quill/dist/quill.snow.css";
 import MarkdownShortcuts from "./modules/markdown";

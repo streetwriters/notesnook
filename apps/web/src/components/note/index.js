@@ -2,7 +2,6 @@ import React from "react";
 import { Flex } from "rebass";
 import * as Icon from "react-feather";
 import TimeAgo from "timeago-react";
-import { ev } from "../../common";
 import { showSnack } from "../snackbar";
 import ListItem from "../list-item";
 import { confirm } from "../dialogs/confirm";
@@ -47,10 +46,6 @@ const menuItems = (note, index, groupIndex) => [
     }
   }
 ];
-
-function sendOpenNoteEvent(note) {
-  ev.emit("onOpenNote", note);
-}
 
 export default class Note extends React.Component {
   shouldComponentUpdate(nextProps) {

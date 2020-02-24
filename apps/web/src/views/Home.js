@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Flex, Text, Box } from "rebass";
 import * as Icon from "react-feather";
-import { db, sendNewNoteEvent } from "../common";
+import { db } from "../common";
 import { GroupedVirtuoso as GroupList } from "react-virtuoso";
 import Button from "../components/button";
 import Search from "../components/search";

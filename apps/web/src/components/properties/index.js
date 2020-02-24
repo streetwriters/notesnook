@@ -6,7 +6,7 @@ import CheckBox from "../checkbox";
 import { PinIcon } from "../icons";
 import { usePersistentState } from "../../utils/hooks";
 import { useStore } from "../../stores/editor-store";
-import { COLORS, db } from "../../common";
+import { COLORS } from "../../common";
 
 const Properties = props => {
   const [visible, setVisible] = usePersistentState("propertiesVisible", false);
