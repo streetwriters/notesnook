@@ -28,7 +28,7 @@ function SearchBox(props) {
 function Home() {
   useEffect(() => store.getState().init(), []);
   const notes = useStore(store => store.notes);
-  const clearSession = useEditorStore(store => store.clearSession);
+  const newSession = useEditorStore(store => store.newSession);
   return (
     <Flex flexDirection="column" flex="1 1 auto">
       <SearchBox />
@@ -51,18 +51,20 @@ function Home() {
             </Box>
           )
         }
-        item={(index, groupIndex) => (
-          <Note
-            index={index}
-            groupIndex={groupIndex}
-            item={notes.items[index]}
-          />
-        )}
+        item={(index, groupIndex) =>
+          notes.groupCounts[groupIndex] && (
+            <Note
+              index={index}
+              groupIndex={groupIndex}
+              item={notes.items[index]}
+            />
+          )
+        }
       />
       <Button
         Icon={Icon.Plus}
         content="Make a new note"
-        onClick={() => clearSession()}
+        onClick={() => newSession()}
       />
     </Flex>
   );

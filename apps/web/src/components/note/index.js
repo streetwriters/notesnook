@@ -59,7 +59,8 @@ export default class Note extends React.Component {
     return (
       prevItem.pinned !== nextItem.pinned ||
       prevItem.favorite !== nextItem.favorite ||
-      prevItem.headline !== nextItem.headline
+      prevItem.headline !== nextItem.headline ||
+      prevItem.title !== nextItem.title
     );
   }
 
@@ -72,7 +73,7 @@ export default class Note extends React.Component {
         body={note.headline}
         index={index}
         onClick={async () => {
-          await editorStore.getState().newSession(note);
+          await editorStore.getState().openSession(note);
         }}
         info={
           <Flex justifyContent="center" alignItems="center">

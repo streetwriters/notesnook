@@ -45,11 +45,11 @@ export default class ReactQuill extends Component {
     return this.props.readOnly !== nextProps.readOnly || nextProps.refresh;
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate() {
     if (this.props.refresh) {
       this.quill.setContents(this.props.initialContent);
+      if (!this.props.initialContent.ops.length) return;
       const text = this.quill.getText();
-      if (text.trim().length <= 0) return;
       if (text[text.length - 1] !== " ") {
         this.quill.insertText(text.length - 1, " ");
       }
@@ -63,7 +63,8 @@ export default class ReactQuill extends Component {
       container,
       readOnly,
       initialContent,
-      onChange
+      onChange,
+      onSave
     } = this.props;
 
     this.quill = new Quill("#quill", {
@@ -79,6 +80,16 @@ export default class ReactQuill extends Component {
 
     if (onChange) {
       this.quill.on("text-change", this.textChangeHandler);
+    }
+
+    if (onSave) {
+      this.quill.keyboard.addBinding(
+        {
+          key: "S",
+          shortKey: true
+        },
+        onSave.bind(this, this.quill)
+      );
     }
   }
 
