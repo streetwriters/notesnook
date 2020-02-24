@@ -121,8 +121,8 @@ export default class Note {
 async function addTag(tag, collection, array) {
   if (this._note[array].indexOf(tag) > -1)
     throw new Error("Cannot add a duplicate tag.");
-  const note = { ...this._note };
-  note[array].push(tag);
+  let arr = [...this._note[array], tag];
+  const note = { ...this._note, [array]: arr };
   await this._notes[collection].add(tag);
   await this._notes._collection.addItem(note);
 }
@@ -130,8 +130,9 @@ async function addTag(tag, collection, array) {
 async function removeTag(tag, collection, array) {
   if (this._note[array].indexOf(tag) <= -1)
     throw new Error("This note is not tagged by the specified tag.");
-  const note = { ...this._note };
-  note[array].splice(note[array].indexOf(tag), 1);
+  let arr = [...this._note[array]];
+  arr.splice(arr.indexOf(tag), 1);
+  const note = { ...this._note, [array]: arr };
   await this._notes[collection].remove(tag);
   await this._notes._collection.addItem(note);
 }
