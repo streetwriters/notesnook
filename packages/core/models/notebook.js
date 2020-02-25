@@ -34,8 +34,4 @@ export default class Notebook {
   pin() {
     return this._toggle("pinned");
   }
-
-  favorite() {
-    return this._toggle("favorite");
-  }
 }
