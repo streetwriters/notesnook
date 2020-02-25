@@ -30,7 +30,7 @@ function ListView({ items, menu, button, onClick }) {
                 </Flex>
               }
               menuData={item}
-              menuItems={menu.menuItems(item)}
+              menuItems={menu.menuItems(item, index)}
               dropdownRefs={menu.dropdownRefs}
             />
           );
