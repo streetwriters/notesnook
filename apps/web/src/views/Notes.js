@@ -10,7 +10,13 @@ const Notes = props => {
       itemsLength={props.notes.length}
       button={{
         content: "Make a new note",
-        onClick: sendNewNoteEvent
+        onClick: () =>
+          sendNewNoteEvent({
+            colors: [],
+            tags: [],
+            notebook: {},
+            ...props.context
+          })
       }}
     />
   );

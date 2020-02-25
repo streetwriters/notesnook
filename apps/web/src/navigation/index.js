@@ -102,7 +102,7 @@ const NavigationContainer = props => {
           >
             <Icon.Menu size={38} />
           </Box>
-          <Heading fontSize="heading">
+          <Heading fontSize="heading" color={props.route.titleColor || "text"}>
             {props.route.title || props.route.params.title}
           </Heading>
         </Flex>
