@@ -4,6 +4,7 @@ import {
   Favorites,
   Trash,
   NotebooksContainer,
+  Notes,
   TagsContainer
 } from "../../views";
 import * as Icon from "react-feather";
@@ -16,17 +17,53 @@ import {
 import Navigator from "../index";
 import { showSignInDialog } from "../../components/dialogs";
 import { changeTheme, isDarkTheme } from "../../utils/theme";
+import { db } from "../../common";
 
 /*For color Search*/
 const colorRoutes = {
-  ...createColorRoute("red", "#ed2d37"),
-  ...createColorRoute("orange", "#ec6e05"),
-  ...createColorRoute("yellow", "yellow"),
-  ...createColorRoute("green", "green"),
-  ...createColorRoute("blue", "blue"),
-  ...createColorRoute("purple", "purple"),
-  ...createColorRoute("gray", "gray")
+  ...createColorRoute("Red", Notes, "#ed2d37", {
+    onClick: () => {
+      onClickMethod("Red", "red");
+    }
+  }),
+  ...createColorRoute("Orange", Notes, "#ec6e05", {
+    onClick: () => {
+      onClickMethod("Orange", "orange");
+    }
+  }),
+  ...createColorRoute("Yellow", Notes, "yellow", {
+    onClick: () => {
+      onClickMethod("Yellow", "yellow");
+    }
+  }),
+  ...createColorRoute("Green", Notes, "green", {
+    onClick: () => {
+      onClickMethod("Green", "green");
+    }
+  }),
+  ...createColorRoute("Blue", Notes, "blue", {
+    onClick: () => {
+      onClickMethod("Blue", "blue");
+    }
+  }),
+  ...createColorRoute("Purple", Notes, "purple", {
+    onClick: () => {
+      onClickMethod("Purple", "purple");
+    }
+  }),
+  ...createColorRoute("Gray", Notes, "gray", {
+    onClick: () => {
+      onClickMethod("Gray", "gray");
+    }
+  })
 };
+
+function onClickMethod(Title, label) {
+  RootNavigator.navigate(Title, {
+    notes: db.notes.colored(label),
+    context: { colors: [label] }
+  });
+}
 
 const bottomRoutes = {
   ...createDeadRoute("nightmode", Icon.Moon, {

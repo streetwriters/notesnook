@@ -28,7 +28,9 @@ const Tags = props => {
           onClick={() => {
             const notesOfTag = db.notes.tagged(tags[index].title);
             props.navigator.navigate("notes", {
-              notes: notesOfTag,title:tags[index].title
+              notes: notesOfTag,
+              title: tags[index].title,
+              context: { tags: [tags[index].title] }
             });
           }}
         />

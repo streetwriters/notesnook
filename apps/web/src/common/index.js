@@ -5,6 +5,6 @@ import events from "events";
 export const db = new Database(StorageInterface);
 export const ev = new events.EventEmitter();
 console.log("from common", db);
-export function sendNewNoteEvent() {
-  ev.emit("onNewNote");
+export function sendNewNoteEvent(context) {
+  ev.emit("onNewNote", context);
 }
