@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Flex, Text } from "rebass";
-import { ev } from "../../common";
 import ListItem from "../list-item";
 import TimeAgo from "timeago-react";
 import ListContainer from "../list-container";
