@@ -67,7 +67,7 @@ const ListItem = props => (
       }}
     >
       <Flex flexDirection="row" justifyContent="space-between">
-        <Text fontFamily="heading" fontSize="title" fontWeight="bold">
+        <Text fontFamily={"heading"} fontSize="title" fontWeight={"bold"}>
           {props.title}
         </Text>
       </Flex>

@@ -3,7 +3,8 @@ import {
   SettingsContainer,
   Favorites,
   Trash,
-  NotebooksContainer
+  NotebooksContainer,
+  TagsContainer
 } from "../../views";
 import * as Icon from "react-feather";
 import {
@@ -50,6 +51,7 @@ const routes = {
   }),
   ...createNormalRoute("favorites", Favorites, Icon.Star),
   ...createNormalRoute("trash", Trash, Icon.Trash2),
+  ...createRoute("tags", TagsContainer, { icon: Icon.Tag }),
   ...colorRoutes,
   ...bottomRoutes
 };
