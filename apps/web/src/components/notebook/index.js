@@ -18,17 +18,6 @@ const menuItems = notebook => [
           ev.emit("refreshNotebooks");
         })
   },
-  {
-    title: notebook.favorite ? "Unfavorite" : "Favorite",
-    onClick: async () =>
-      db.notebooks
-        .notebook(notebook.id)
-        .favorite()
-        .then(() => {
-          showSnack("Notebook favorited!", Icon.Check);
-          ev.emit("refreshNotebooks");
-        })
-  },
   { title: "Edit" },
   { title: "Share" },
   {
