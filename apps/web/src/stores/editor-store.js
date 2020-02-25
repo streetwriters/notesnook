@@ -80,11 +80,14 @@ function editorStore(set, get) {
         }, 500);
       });
     },
-    newSession: function() {
+    newSession: function(context = {}) {
       set(state => {
         clearTimeout(state.session.timeout);
-        state.session = DEFAULT_SESSION;
-        state.session.state = SESSION_STATES.new;
+        state.session = {
+          ...DEFAULT_SESSION,
+          ...context,
+          state: SESSION_STATES.new
+        };
       });
     },
     setColor: function(color) {
