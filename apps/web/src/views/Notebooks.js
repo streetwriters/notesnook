@@ -8,7 +8,7 @@ import { useStore, store } from "../stores/notebook-store";
 
 const Notebooks = props => {
   const [open, setOpen] = useState(false);
-  useEffect(() => store.getState().init(), []);
+  useEffect(() => store.getState().refresh(), []);
   const notebooks = useStore(state => state.notebooks);
   const add = useStore(state => state.add);
 

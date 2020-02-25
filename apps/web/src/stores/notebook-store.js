@@ -1,9 +1,10 @@
 import { db } from "../common/index";
 import createStore from "../common/store";
+import { store as trashStore } from "./trash-store";
 
 function notebookStore(set) {
   return {
-    init: function() {
+    refresh: function() {
       set(state => {
         state.notebooks = db.notebooks.all;
       });
@@ -19,16 +20,13 @@ function notebookStore(set) {
       await db.notebooks.delete(id);
       set(state => {
         state.notebooks.splice(index, 1);
+        trashStore.getState().refresh();
       });
     },
     update: function() {},
     pin: async function(notebook, index) {
       await db.notebooks.notebook(notebook).pin();
       set(state => (state.notebooks[index].pinned = !notebook.pinned));
-    },
-    favorite: async function(notebook, index) {
-      await db.notebooks.notebook(notebook).favorite();
-      set(state => (state.notebooks[index].favorite = !notebook.favorite));
     }
   };
 }

@@ -10,10 +10,6 @@ const menuItems = (notebook, index) => [
     title: notebook.pinned ? "Unpin" : "Pin",
     onClick: () => store.getState().pin(notebook, index)
   },
-  {
-    title: notebook.favorite ? "Unfavorite" : "Favorite",
-    onClick: () => store.getState().favorite(notebook, index)
-  },
   { title: "Edit" },
   { title: "Share" },
   {

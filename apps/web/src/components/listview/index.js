@@ -5,7 +5,7 @@ import ListItem from "../list-item";
 import TimeAgo from "timeago-react";
 import ListContainer from "../list-container";
 
-function ListView({ items, menu, button, onClick }) {
+function ListView({ items, menu, button, onClick, noType }) {
   return (
     items && (
       <ListContainer
@@ -17,16 +17,18 @@ function ListView({ items, menu, button, onClick }) {
               title={item.title}
               body={item.headline}
               index={index}
-              onClick={onClick.bind(this, item)} //TODO
+              onClick={onClick && onClick.bind(this, item)}
               info={
                 <Flex justifyContent="center" alignItems="center">
                   <TimeAgo datetime={item.dateDeleted || item.dateCreated} />
                   <Text as="span" mx={1}>
                     •
                   </Text>
-                  <Text color="primary">
-                    {item.type[0].toUpperCase() + item.type.substring(1)}
-                  </Text>
+                  {!noType && (
+                    <Text color="primary">
+                      {item.type[0].toUpperCase() + item.type.substring(1)}
+                    </Text>
+                  )}
                 </Flex>
               }
               menuData={item}

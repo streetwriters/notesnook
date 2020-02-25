@@ -26,7 +26,7 @@ function SearchBox(props) {
 }
 
 function Home() {
-  useEffect(() => store.getState().init(), []);
+  useEffect(() => store.getState().refresh(), []);
   const notes = useStore(store => store.notes);
   const newSession = useEditorStore(store => store.newSession);
   return (

@@ -1,5 +1,5 @@
 import createStore from "../common/store";
-import { store as notestore } from "./note-store";
+import { store as notestore, LIST_TYPES } from "./note-store";
 import { db } from "../common";
 
 const SESSION_STATES = {
@@ -47,7 +47,7 @@ function editorStore(set, get) {
         };
       });
     },
-    saveSession: function() {
+    saveSession: function(oldSession) {
       const { session } = get();
       const { title, id, content, pinned, favorite } = session;
       let note = {
@@ -60,17 +60,23 @@ function editorStore(set, get) {
       db.notes.add(note).then(id => {
         set(state => {
           state.session.id = id;
-          notestore.getState().init();
+          notestore.getState().refresh();
+
+          // we update favorites only if favorites has changed
+          if (!oldSession || oldSession.favorite !== session.favorite) {
+            notestore.getState().refreshList(LIST_TYPES.fav);
+          }
         });
       });
     },
     setSession: function(session) {
+      const oldSession = get().session;
       set(state => {
         state.session.state = SESSION_STATES.stale;
         session(state);
         clearTimeout(state.session.timeout);
         state.session.timeout = setTimeout(() => {
-          get().saveSession();
+          get().saveSession(oldSession);
         }, 500);
       });
     },
