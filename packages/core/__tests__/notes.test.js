@@ -107,6 +107,7 @@ test("add tag to note", () =>
   noteTest().then(async ({ db, id }) => {
     let note = db.notes.note(id);
     await note.tag("hello");
+    note = db.notes.note(id);
     expect(note.tags[0]).toBe("hello");
     expect(db.tags.all[0].title).toBe("hello");
   }));
@@ -115,9 +116,11 @@ test("remove tag from note", () =>
   noteTest().then(async ({ db, id }) => {
     let note = db.notes.note(id);
     await note.tag("hello");
+    note = db.notes.note(id);
     expect(note.tags[0]).toBe("hello");
     expect(db.tags.all[0].title).toBe("hello");
     await note.untag("hello");
+    note = db.notes.note(id);
     expect(note.tags.length).toBe(0);
     expect(db.tags.all.length).toBe(0);
   }));
@@ -126,6 +129,7 @@ test("color a note", () =>
   noteTest().then(async ({ db, id }) => {
     let note = db.notes.note(id);
     await note.color("red");
+    note = db.notes.note(id);
     expect(note.colors[0]).toBe("red");
     expect(db.colors.all[0].title).toBe("red");
   }));
@@ -134,9 +138,11 @@ test("uncolor a note", () =>
   noteTest().then(async ({ db, id }) => {
     let note = db.notes.note(id);
     await note.color("red");
-    expect(note.colors.length).toBe(1);
-    expect(db.colors.all.length).toBe(1);
+    note = db.notes.note(id);
+    expect(note.colors[0]).toBe("red");
+    expect(db.colors.all[0].title).toBe("red");
     await note.uncolor("red");
+    note = db.notes.note(id);
     expect(note.colors.length).toBe(0);
     expect(db.colors.all.length).toBe(0);
   }));
