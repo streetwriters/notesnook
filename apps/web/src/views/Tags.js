@@ -18,23 +18,23 @@ const Tags = props => {
   return (
     <ListContainer
       itemsLength={tags.length}
-      item={index => (
-        <ListItem
-          isTag
-          dropdownRefs={[]}
-          menuItems={[]}
-          index={index}
-          title={<TagNode title={tags[index].title} />}
-          onClick={() => {
-            const notesOfTag = db.notes.tagged(tags[index].title);
-            props.navigator.navigate("notes", {
-              notes: notesOfTag,
-              title: tags[index].title,
-              context: { tags: [tags[index].title] }
-            });
-          }}
-        />
-      )}
+      item={index => {
+        let title = tags[index].title;
+        return (
+          <ListItem
+            index={index}
+            title={<TagNode title={title} />}
+            onClick={() => {
+              const notesOfTag = db.notes.tagged(title);
+              props.navigator.navigate("notes", {
+                notes: notesOfTag,
+                title: "#" + title,
+                context: { tags: [title] }
+              });
+            }}
+          />
+        );
+      }}
     />
   );
 };
