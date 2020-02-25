@@ -1,6 +1,7 @@
 import { db } from "../common/index";
 import createStore from "../common/store";
 import { store as trashStore } from "./trash-store";
+import { store as editorStore } from "./editor-store";
 
 const LIST_TYPES = {
   fav: "favorites"
@@ -41,6 +42,7 @@ function noteStore(set, get) {
       await db.notes.note(note).pin();
       set(state => {
         state.notes = db.notes.group(undefined, true);
+        syncEditor(note, "pinned");
       });
     },
     favorite: async function(note, index) {
@@ -50,12 +52,21 @@ function noteStore(set, get) {
           index = state.notes.items.findIndex(n => n.id === note.id);
           if (index < 0) return;
         }
-        console.log(index, state.notes.items[index]);
         state.notes.items[index].favorite = !note.favorite;
+        syncEditor(note, "favorite");
       });
       get().refreshList(LIST_TYPES.fav);
     }
   };
+}
+
+function syncEditor(note, action) {
+  const editorState = editorStore.getState();
+  if (editorState.session.id === note.id) {
+    editorState.setSession(
+      state => (state.session[action] = !state.session[action])
+    );
+  }
 }
 
 const [useStore, store] = createStore(noteStore);

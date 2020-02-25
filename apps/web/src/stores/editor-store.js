@@ -62,7 +62,7 @@ function editorStore(set, get) {
           state.session.id = id;
           notestore.getState().refresh();
 
-          // we update favorites only if favorites has changed
+          // we update favorites only if favorite has changed
           if (!oldSession || oldSession.favorite !== session.favorite) {
             notestore.getState().refreshList(LIST_TYPES.fav);
           }

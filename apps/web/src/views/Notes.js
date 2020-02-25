@@ -1,6 +1,5 @@
 import React from "react";
 import Note from "../components/note";
-import { sendNewNoteEvent } from "../common";
 import ListContainer from "../components/list-container";
 
 const Notes = props => {
@@ -10,13 +9,13 @@ const Notes = props => {
       itemsLength={props.notes.length}
       button={{
         content: "Make a new note",
-        onClick: () =>
-          sendNewNoteEvent({
+        onClick: () => {}
+        /* sendNewNoteEvent({
             colors: [],
             tags: [],
             notebook: {},
             ...props.context
-          })
+          }) */
       }}
     />
   );
