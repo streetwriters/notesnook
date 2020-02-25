@@ -20,13 +20,16 @@ function ListView({ items, menu, button, onClick, noType }) {
               info={
                 <Flex justifyContent="center" alignItems="center">
                   <TimeAgo datetime={item.dateDeleted || item.dateCreated} />
-                  <Text as="span" mx={1}>
-                    •
-                  </Text>
                   {!noType && (
-                    <Text color="primary">
-                      {item.type[0].toUpperCase() + item.type.substring(1)}
-                    </Text>
+                    <>
+                      <Text as="span" mx={1}>
+                        •
+                      </Text>
+
+                      <Text color="primary">
+                        {item.type[0].toUpperCase() + item.type.substring(1)}
+                      </Text>
+                    </>
                   )}
                 </Flex>
               }
