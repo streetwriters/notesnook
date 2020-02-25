@@ -6,7 +6,7 @@ const LIST_TYPES = {
   fav: "favorites"
 };
 
-function noteStore(set) {
+function noteStore(set, get) {
   return {
     notes: {
       items: [],
@@ -46,13 +46,14 @@ function noteStore(set) {
     favorite: async function(note, index) {
       await db.notes.note(note).favorite();
       set(state => {
-        if (index < 0) {
-          index = state.notes.findIndex(n => n.id === note.id);
+        if (index < 0 || !index) {
+          index = state.notes.items.findIndex(n => n.id === note.id);
           if (index < 0) return;
         }
+        console.log(index, state.notes.items[index]);
         state.notes.items[index].favorite = !note.favorite;
-        state.initList("favorites");
       });
+      get().refreshList(LIST_TYPES.fav);
     }
   };
 }
