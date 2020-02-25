@@ -15,7 +15,7 @@ const menuItems = item => [
         "Are you sure you want to remove this item from favorites?"
       ).then(res => {
         if (res) {
-          (item.type === "notes"
+          (item.type === "note"
             ? db.notes.note(item.id)
             : db.notebooks.notebook(item.id)
           )
@@ -40,7 +40,7 @@ const menuItems = item => [
       ).then(res => {
         if (res) {
           let itemType = item.type[0] + item.type.substring(1);
-          (itemType === "notes" ? db.notes : db.notebooks)
+          (itemType === "note" ? db.notes : db.notebooks)
             .delete(item.id)
             .then(() => {
               showSnack(itemType + " Deleted!", Icon.Trash);
