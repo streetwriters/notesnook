@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import * as Icon from "react-feather";
 import ListView from "../components/listview";
 import { confirm } from "../components/dialogs/confirm";
@@ -8,7 +8,7 @@ const dropdownRefs = [];
 const menuItems = (item, index) => [
   {
     title: "Restore",
-    onClick: () => store.getState().restore(item, index)
+    onClick: () => store.getState().restore(item.id, index)
   },
   {
     title: "Delete",
@@ -20,7 +20,7 @@ const menuItems = (item, index) => [
         `Are you sure you want to permanently delete this item?`
       ).then(async res => {
         if (res) {
-          await store.getState().delete(item, index);
+          await store.getState().delete(item.id, index);
         }
       });
     }
@@ -28,12 +28,13 @@ const menuItems = (item, index) => [
 ];
 
 function Trash() {
+  useEffect(() => store.getState().refresh(), []);
   const items = useStore(store => store.trash);
   const clearTrash = useStore(store => store.clear);
   return (
     <ListView
       type="Trash"
-      getItems={items}
+      items={items}
       menu={{ menuItems, dropdownRefs }}
       button={{
         content: "Clear Trash",

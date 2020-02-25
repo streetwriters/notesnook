@@ -3,7 +3,7 @@ import createStore from "../common/store";
 
 function trashStore(set) {
   return {
-    init: function() {
+    refresh: function() {
       set(state => {
         state.trash = db.trash.all;
       });
