@@ -1,43 +1,26 @@
 import React from "react";
-import { db, ev } from "../common";
 import * as Icon from "react-feather";
 import ListView from "../components/listview";
 import { confirm } from "../components/dialogs/confirm";
-import { showSnack } from "../components/snackbar";
+import { useStore, store } from "../stores/trash-store";
 
 const dropdownRefs = [];
-const menuItems = item => [
+const menuItems = (item, index) => [
   {
     title: "Restore",
-    onClick: async () => {
-      confirm(
-        Icon.Star,
-        "Restore",
-        `Are you sure you want to restore this item to ${item.type}?`
-      ).then(async res => {
-        if (res) {
-          let itemType = item.type[0] + item.type.substring(1);
-          showSnack(itemType + " Restored", Icon.Check);
-          await db.trash.restore(item.id);
-          ev.emit(`refreshTrash`);
-        }
-      });
-    }
+    onClick: () => store.getState().restore(item, index)
   },
   {
     title: "Delete",
     color: "red",
-    onClick: async () => {
+    onClick: () => {
       confirm(
-        Icon.Star,
+        Icon.Trash2,
         "Delete",
         `Are you sure you want to permanently delete this item?`
       ).then(async res => {
         if (res) {
-          let itemType = item.type[0] + item.type.substring(1);
-          showSnack(itemType + "Permanently Deleted!", Icon.Trash2);
-          await db.trash.delete(item.id);
-          ev.emit(`refreshTrash`);
+          await store.getState().delete(item, index);
         }
       });
     }
@@ -45,17 +28,28 @@ const menuItems = item => [
 ];
 
 function Trash() {
+  const items = useStore(store => store.trash);
+  const clearTrash = useStore(store => store.clear);
   return (
     <ListView
       type="Trash"
-      getItems={db.trash.all}
+      getItems={items}
       menu={{ menuItems, dropdownRefs }}
       button={{
         content: "Clear Trash",
         icon: Icon.Trash2,
-        onClick: async () => await db.trash.clear()
+        onClick: function() {
+          confirm(
+            Icon.Trash2,
+            "Clear",
+            `This action is irreversible. Are you sure you want to proceed?s`
+          ).then(async res => {
+            if (res) {
+              await clearTrash();
+            }
+          });
+        }
       }}
-      onClick={item => {}}
     />
   );
 }

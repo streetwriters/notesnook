@@ -5,19 +5,7 @@ import ListItem from "../list-item";
 import TimeAgo from "timeago-react";
 import ListContainer from "../list-container";
 
-function ListView({ type, getItems, menu, button, onClick }) {
-  const [items, setItems] = useState([]);
-
-  useEffect(() => {
-    function onRefreshItems() {
-      setItems(getItems);
-    }
-    onRefreshItems();
-    ev.addListener(`refresh${type}`, onRefreshItems);
-    return () => {
-      ev.removeListener(`refresh${type}`, onRefreshItems);
-    };
-  }, [getItems, type]);
+function ListView({ items, menu, button, onClick }) {
   return (
     items && (
       <ListContainer
