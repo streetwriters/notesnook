@@ -5,14 +5,14 @@ import events from "events";
 export const db = new Database(StorageInterface);
 export const ev = new events.EventEmitter();
 
-export const COLORS = [
-  { label: "red", code: "#ed2d37" },
-  { label: "orange", code: "#ec6e05" },
-  { label: "yellow", code: "yellow" },
-  { label: "green", code: "green" },
-  { label: "blue", code: "blue" },
-  { label: "purple", code: "purple" },
-  { label: "gray", code: "gray" }
-];
+export const COLORS = {
+  red: "#ed2d37",
+  orange: "#ec6e05",
+  yellow: "yellow",
+  green: "green",
+  blue: "blue",
+  purple: "purple",
+  gray: "gray"
+};
 
 export const DEFAULT_CONTEXT = { colors: [], tags: [], notebook: {} };

@@ -7,6 +7,7 @@ import { PinIcon } from "../icons";
 import { usePersistentState } from "../../utils/hooks";
 import { useStore } from "../../stores/editor-store";
 import { COLORS } from "../../common";
+import { objectMap } from "../../utils/object";
 
 const Properties = props => {
   const [visible, setVisible] = usePersistentState("propertiesVisible", false);
@@ -141,21 +142,21 @@ const Properties = props => {
           <Text sx={{ marginLeft: 1 }}>Colors:</Text>
         </Flex>
         <Flex flexWrap="wrap" sx={{ marginBottom: 2 }}>
-          {COLORS.map(color => (
+          {objectMap(COLORS, (label, code) => (
             <Flex
               sx={{ position: "relative" }}
               justifyContent="center"
               alignItems="center"
-              onClick={() => setColor(color.label)}
-              key={color.label}
+              onClick={() => setColor(label)}
+              key={label}
             >
               <Icon.Circle
                 size={40}
                 style={{ cursor: "pointer" }}
-                fill={color.code}
+                fill={code}
                 strokeWidth={0}
               />
-              {colors.includes(color.label) && (
+              {colors.includes(label) && (
                 <Icon.Check
                   style={{
                     position: "absolute",

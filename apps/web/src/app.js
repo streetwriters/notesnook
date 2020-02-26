@@ -3,11 +3,18 @@ import "./app.css";
 import Editor from "./components/editor";
 import { Flex, Box, Button, Text } from "rebass";
 import { ThemeProvider } from "./utils/theme";
-import RootNavigator from "./navigation/navigators/rootnavigator";
+import RootNavigator, {
+  bottomRoutes,
+  routes
+} from "./navigation/navigators/rootnavigator";
 import "./app.css";
 import { usePersistentState } from "./utils/hooks";
 import { useTheme } from "emotion-theming";
-import useStore from "./common/store";
+import { useStore } from "./stores/app-store";
+import { useStore as useNotesStore } from "./stores/note-store";
+import { COLORS } from "./common";
+import { toTitleCase } from "./utils/string";
+import * as Icon from "react-feather";
 
 const NavMenuItem = props => {
   const [fill, setFill] = useState();
@@ -41,7 +48,7 @@ const NavMenuItem = props => {
       <Flex
         justifyContent={["flex-start", "center", "center"]}
         alignItems="center"
-        sx={{ marginLeft: [2, 0, 0] }}
+        sx={{ position: "relative", marginLeft: [2, 0, 0] }}
       >
         <props.item.icon
           size={18}
@@ -58,12 +65,15 @@ const NavMenuItem = props => {
         >
           {props.item.title}
         </Text>
+        {props.item.count && (
+          <Text sx={{ position: "absolute", top: -8, right: 10 }} fontSize={9}>
+            {props.item.count > 99 ? "99+" : props.item.count}
+          </Text>
+        )}
       </Flex>
     </Button>
   );
 };
-
-var startX, startWidth;
 
 function App() {
   const [selectedIndex, setSelectedIndex] = usePersistentState(
@@ -72,11 +82,16 @@ function App() {
   );
   const [show, setShow] = usePersistentState("navContainerState", true);
 
-  const isSideMenuOpen = useStore(state => state.isSideMenuOpen);
+  const isSideMenuOpen = useStore(store => store.isSideMenuOpen);
+  const refreshColors = useStore(store => store.refreshColors);
+  const setSelectedContext = useNotesStore(store => store.setSelectedContext);
   useEffect(() => {
     RootNavigator.navigate(Object.keys(RootNavigator.routes)[selectedIndex]);
+    refreshColors();
+    console.log(colors);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  const colors = useStore(store => store.colors);
   return (
     <ThemeProvider>
       <Flex
@@ -95,64 +110,74 @@ function App() {
             minWidth: ["85%", 50, 50],
             maxWidth: ["85%", 50, 50],
             display: [isSideMenuOpen ? "flex" : "none", "flex", "flex"],
-            position: ["absolute", "relative", "relative"],
-            overflow: "scroll",
-            scrollbarWidth: "none",
-            //TODO: need to test this on webkit and internet explorer
-            "::-webkit-scrollbar": { width: 0, height: 0 },
-            msOverflowStyle: "none"
-            //"-ms-overflow-style": "none"
+            position: ["absolute", "relative", "relative"]
           }}
           bg={"shade"}
           px={0}
         >
-          <Box>
-            {Object.values(RootNavigator.routes).map(
-              (item, index) =>
-                !item.bottom && (
-                  <NavMenuItem
-                    onSelected={async () => {
-                      if (item.onClick) {
-                        return item.onClick();
-                      }
-                      if (selectedIndex === index) {
-                        setShow(!show);
-                        return;
-                      }
-                      if (RootNavigator.navigate(item.key)) {
-                        setSelectedIndex(index);
-                      }
-                    }}
-                    key={item.key}
-                    item={item}
-                    selected={selectedIndex === index}
-                  />
-                )
-            )}
+          <Box
+            sx={{
+              overflow: "scroll",
+              scrollbarWidth: "none",
+              //TODO: need to test this on webkit and internet explorer
+              "::-webkit-scrollbar": { width: 0, height: 0 },
+              msOverflowStyle: "none"
+              //"-ms-overflow-style": "none"
+            }}
+          >
+            {Object.values(routes).map((item, index) => (
+              <NavMenuItem
+                onSelected={async () => {
+                  if (selectedIndex === index) {
+                    setShow(!show);
+                    return;
+                  }
+                  if (RootNavigator.navigate(item.key)) {
+                    setSelectedIndex(index);
+                  }
+                }}
+                key={item.key}
+                item={item}
+                selected={selectedIndex === index}
+              />
+            ))}
+            {colors.map(color => {
+              return (
+                <NavMenuItem
+                  onSelected={async () => {
+                    setSelectedContext({ type: "color", value: color.title });
+                    RootNavigator.navigate("color", {
+                      title: toTitleCase(color.title),
+                      context: { colors: [color.title] }
+                    });
+                  }}
+                  key={color.title}
+                  item={{
+                    color: COLORS[color.title],
+                    title: toTitleCase(color.title),
+                    icon: Icon.Circle,
+                    count: color.count
+                  }}
+                />
+              );
+            })}
           </Box>
           <Box>
-            {Object.values(RootNavigator.routes).map(
-              (item, index) =>
-                item.bottom && (
-                  <NavMenuItem
-                    onSelected={async () => {
-                      if (item.onClick) {
-                        return item.onClick();
-                      }
-                      if (selectedIndex === index) {
-                        setShow(!show);
-                        return;
-                      }
-                      if (RootNavigator.navigate(item.key)) {
-                        setSelectedIndex(index);
-                      }
-                    }}
-                    key={item.key}
-                    item={item}
-                    selected={selectedIndex === index}
-                  />
-                )
-            )}
+            {Object.values(bottomRoutes).map((item, index) => (
+              <NavMenuItem
+                onSelected={async () => {
+                  if (item.onClick) {
+                    return item.onClick();
+                  }
+                  if (RootNavigator.navigate(item.key)) {
+                    setSelectedIndex(index);
+                  }
+                }}
+                key={item.key}
+                item={item}
+                selected={selectedIndex === index}
+              />
+            ))}
           </Box>
         </Flex>
         <Flex flex="1 1 auto" flexDirection="row" alignContent="stretch" px={0}>
@@ -169,36 +194,6 @@ function App() {
             flexDirection="column"
             flex="1 1 auto"
             //style={{ width: "362px" }}
-          />
-          <Box
-            className="resize-handle"
-            bg="border"
-            sx={{
-              width: 5,
-              display: ["none", "none", show ? "block" : "none"],
-              opacity: 0,
-              cursor: "col-resize"
-            }}
-            draggable={true}
-            onMouseDown={e => {
-              startX = e.clientX;
-              let view = document
-                .querySelector(".RootNavigator")
-                .getBoundingClientRect();
-              startWidth = parseInt(view.width, 10);
-            }}
-            onDrag={e => {
-              let view = document.querySelector(".RootNavigator");
-              view.style.width = `${startWidth + e.clientX - startX}px`;
-            }}
-            onDragEnd={() => {
-              let view = document.querySelector(".RootNavigator");
-              view.style.width = view.getBoundingClientRect().width;
-              window.localStorage.setItem(
-                "navigationViewWidth",
-                view.style.width
-              );
-            }}
           />
           <Editor />
         </Flex>

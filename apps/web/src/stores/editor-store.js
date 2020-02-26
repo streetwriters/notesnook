@@ -1,5 +1,6 @@
 import createStore from "../common/store";
 import { store as notestore, LIST_TYPES } from "./note-store";
+import { store as appStore } from "./app-store";
 import { db } from "../common";
 
 const SESSION_STATES = {
@@ -61,7 +62,10 @@ function editorStore(set, get) {
       };
       db.notes.add(note).then(id => {
         if (tags.length > 0) updateContext("tags", tags);
-        if (colors.length > 0) updateContext("colors", colors);
+        if (colors.length > 0) {
+          updateContext("colors", colors);
+          appStore.getState().refreshColors();
+        }
 
         set(state => {
           state.session.id = id;
@@ -96,7 +100,7 @@ function editorStore(set, get) {
       });
     },
     setColor: function(color) {
-      setTagOrColor(get().session, "colors", color, "color", set);
+      setTagOrColor(get().session, "colors", color, "color", get().setSession);
     },
     setTag: function(tag) {
       setTagOrColor(get().session, "tags", tag, "tag", get().setSession);
@@ -105,6 +109,7 @@ function editorStore(set, get) {
 }
 
 function setTagOrColor(session, array, value, func, set) {
+  console.log(arguments);
   const { [array]: arr, id } = session;
   let note = db.notes.note(id);
   if (!note) return;
@@ -132,7 +137,6 @@ function updateContext(key, array) {
   if (context.type === type) {
     array.forEach(value => {
       if (context.value === value) {
-        console.log("updating according to context");
         notestore.getState().setSelectedContext(context);
       }
     });
