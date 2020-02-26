@@ -11,8 +11,14 @@ export function createRoute(key, component, props = {}, params = {}) {
   };
 }
 
-export function createColorRoute(key, color, props = {}) {
-  return createRoute(key, undefined, { icon: Icon.Circle, color, ...props });
+export function createColorRoute(key, component, color, props = {}) {
+  return createRoute(key, component, {
+    title: key,
+    titleColor: color,
+    icon: Icon.Circle,
+    color,
+    ...props
+  });
 }
 
 export function createNormalRoute(key, component, icon, props = {}) {

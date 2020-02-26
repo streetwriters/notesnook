@@ -104,7 +104,7 @@ export default class Editor extends React.Component {
     this.setState({ pinned });
   }
 
-  onNewNote(show = true, cb = null) {
+  onNewNote(context, show = true, cb = null) {
     clearTimeout(this.timeout);
     this.saveNote().then(() => {
       this.titleRef.value = "";
@@ -112,6 +112,12 @@ export default class Editor extends React.Component {
       this.title = undefined;
       this.titleRef.focus();
       this.quill.setText("\n");
+      this.setState({
+        colors: [...this.state.colors, ...context.colors],
+        tags: [...this.state.tags, ...context.tags]
+      });
+      console.log(this.state.colors);
+      ev.emit("refreshNotes");
       cb && cb();
       if (show) {
         showSnack("Let's start writing!", Icon.Edit2);
@@ -121,14 +127,14 @@ export default class Editor extends React.Component {
 
   onClearNote(id = undefined) {
     if (id && id !== this.id) return;
-    this.onNewNote(false);
+    this.onNewNote(null, false);
   }
 
   onOpenNote(note) {
     if (!note) return;
-    this.onNewNote(false, async () => {
+    this.onNewNote(null, false, async () => {
       let dbNote = db.notes.note(note.id);
-      if (!dbNote) return this.onNewNote(false);
+      if (!dbNote) return this.onNewNote(null, false);
       this.id = note.id;
       this.title = note.title;
       this.titleRef.value = note.title;
@@ -160,7 +166,7 @@ export default class Editor extends React.Component {
       id: this.id,
       favorite: this.favorite,
       pinned: this.pinned,
-      colors: this.state.colors,
+      colors: this.state.colors
       //tags: this.state.tags
     };
     return await db.notes.add(note);
@@ -244,8 +250,7 @@ export default class Editor extends React.Component {
               tags[this.state.tags.length] = tag;
             }
             this.setState({ tags });
-            if (this.id)
-              await db.notes.note(this.id).tag(tag);
+            if (this.id) await db.notes.note(this.id).tag(tag);
           }}
           onLocked={state => {}}
         />
