@@ -145,6 +145,7 @@ function App() {
               return (
                 <NavMenuItem
                   onSelected={async () => {
+                    setSelectedIndex(-1);
                     setSelectedContext({ type: "color", value: color.title });
                     RootNavigator.navigate("color", {
                       title: toTitleCase(color.title),
