@@ -1,5 +1,5 @@
 import createStore from "../common/store";
-import { store as notestore, LIST_TYPES } from "./note-store";
+import { store as noteStore, LIST_TYPES } from "./note-store";
 import { store as appStore } from "./app-store";
 import { db } from "../common";
 
@@ -33,6 +33,7 @@ function editorStore(set, get) {
         text: note.content.text,
         delta: await db.notes.note(note).delta()
       };
+      noteStore.getState().setSelectedNote(note.id);
       set(state => {
         clearTimeout(state.session.timeout);
         state.session = {
@@ -66,15 +67,16 @@ function editorStore(set, get) {
           updateContext("colors", colors);
           appStore.getState().refreshColors();
         }
-
         set(state => {
+          if (state.session.id === "") {
+            noteStore.getState().setSelectedNote(id);
+          }
           state.session.id = id;
-          state.session.state = SESSION_STATES.stale;
-          notestore.getState().refresh();
+          noteStore.getState().refresh();
 
           // we update favorites only if favorite has changed
           if (!oldSession || oldSession.favorite !== session.favorite) {
-            notestore.getState().refreshList(LIST_TYPES.fav);
+            noteStore.getState().refreshList(LIST_TYPES.fav);
           }
         });
       });
@@ -82,6 +84,7 @@ function editorStore(set, get) {
     setSession: function(session) {
       const oldSession = get().session;
       set(state => {
+        state.session.state = SESSION_STATES.stale;
         session(state);
         clearTimeout(state.session.timeout);
         state.session.timeout = setTimeout(() => {
@@ -132,12 +135,12 @@ function setTagOrColor(session, array, value, func, set) {
 function updateContext(key, array) {
   let type = key === "colors" ? "color" : "tag";
   // update notes if the selected context (the current view in the navigator) is a tag or color
-  const notesState = notestore.getState();
+  const notesState = noteStore.getState();
   const context = notesState.selectedContext;
   if (context.type === type) {
     array.forEach(value => {
       if (context.value === value) {
-        notestore.getState().setSelectedContext(context);
+        noteStore.getState().setSelectedContext(context);
       }
     });
   }

@@ -9,16 +9,24 @@ const ListContainer = props => {
   return (
     <Flex flexDirection="column" flex="1 1 auto">
       <Search placeholder="Search" />
-      <List
-        style={{
-          width: "100%",
-          flex: "1 1 auto",
-          height: "auto",
-          overflowX: "hidden"
+      <Flex
+        flexDirection="column"
+        flex="1 1 auto"
+        sx={{
+          marginTop: 2
         }}
-        totalCount={props.itemsLength}
-        item={props.item}
-      />
+      >
+        <List
+          style={{
+            width: "100%",
+            flex: "1 1 auto",
+            height: "auto",
+            overflowX: "hidden"
+          }}
+          totalCount={props.itemsLength}
+          item={props.item}
+        />
+      </Flex>
       {props.button && (
         <Button
           Icon={props.button.icon || Icon.Plus}

@@ -17,6 +17,12 @@ function noteStore(set, get) {
     favorites: [],
     selectedNotes: [],
     selectedContext: {},
+    selectedNote: 0,
+    setSelectedNote: function(id) {
+      set(state => {
+        state.selectedNote = id;
+      });
+    },
     refresh: function() {
       set(state => {
         //TODO save group type

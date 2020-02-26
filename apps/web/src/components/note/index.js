@@ -66,6 +66,7 @@ export default class Note extends React.Component {
       <ListItem
         title={note.title}
         body={note.headline}
+        id={note.id}
         index={index}
         onClick={async () => {
           await editorStore.getState().openSession(note);
