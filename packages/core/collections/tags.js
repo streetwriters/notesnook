@@ -11,11 +11,13 @@ export default class Tags {
 
   async add(id) {
     if (!id || id.trim().length <= 0) return;
-    let tag = (await this._collection.getItem(id)) || {
-      id,
-      title: id,
-      count: 0
-    };
+    let tag = this._collection.exists(id)
+      ? { ...(await this._collection.getItem(id)) }
+      : {
+          id,
+          title: id,
+          count: 0
+        };
     tag.count++;
     await this._collection.addItem(tag);
   }
@@ -28,6 +30,7 @@ export default class Tags {
     if (!id || id.trim().length <= 0) return;
     let tag = this._collection.getItem(id);
     if (!tag) return;
+    tag = { ...tag };
     tag.count--;
     if (tag.count === 0) {
       await this._collection.removeItem(id);
