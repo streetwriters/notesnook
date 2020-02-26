@@ -27,8 +27,8 @@ export default class TitleBox extends React.Component {
         sx={{
           borderWidth: 0,
           ":focus": { outline: "none" },
-          paddingTop: 0,
-          paddingBottom: 0
+          paddingTop: 1,
+          paddingBottom: 1
         }}
         px={2}
         value={title}

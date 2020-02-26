@@ -37,9 +37,10 @@ const NavMenuItem = props => {
         borderRadius: "none",
         textAlign: "center",
         color: props.selected ? "primary" : props.item.color || "text",
-        transition: "color 100ms linear",
+        transition: "color 100ms, background-color 100ms linear",
         ":hover": {
-          color: "primary"
+          color: "primary",
+          backgroundColor: "shade"
         }
       }}
       px={0}
@@ -112,7 +113,7 @@ function App() {
             display: [isSideMenuOpen ? "flex" : "none", "flex", "flex"],
             position: ["absolute", "relative", "relative"]
           }}
-          bg={"shade"}
+          bg={"background"}
           px={0}
         >
           <Box
@@ -176,7 +177,6 @@ function App() {
                 }}
                 key={item.key}
                 item={item}
-                selected={selectedIndex === index}
               />
             ))}
           </Box>

@@ -30,12 +30,14 @@ export const bottomRoutes = {
 };
 
 export const routes = {
-  ...createNormalRoute("home", Home, Icon.Home),
+  ...createNormalRoute("home", Home, Icon.Home, { title: "Home" }),
   ...createRoute("notebooks", NotebooksContainer, {
     icon: Icon.Book
   }),
-  ...createNormalRoute("favorites", Favorites, Icon.Star),
-  ...createNormalRoute("trash", Trash, Icon.Trash2),
+  ...createNormalRoute("favorites", Favorites, Icon.Star, {
+    title: "Favorites"
+  }),
+  ...createNormalRoute("trash", Trash, Icon.Trash, { title: "Trash" }),
   ...createRoute("tags", TagsContainer, { icon: Icon.Tag })
 };
 
