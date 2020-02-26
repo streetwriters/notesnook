@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Box, Button, Flex, Text } from "rebass";
 import * as Icon from "react-feather";
-import { Switch, Select } from "@rebass/forms";
+import { Switch } from "@rebass/forms";
 import "../app.css";
 import { changeTheme, isDarkTheme, changeAccent } from "../utils/theme";
 

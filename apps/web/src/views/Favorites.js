@@ -1,71 +1,31 @@
-import React from "react";
-import { db, ev } from "../common";
-import * as Icon from "react-feather";
+import React, { useEffect } from "react";
 import ListView from "../components/listview";
-import { showSnack } from "../components/snackbar";
-import { ask } from "../components/dialogs";
+import { useStore, store, LIST_TYPES } from "../stores/note-store";
+import { useStore as useEditorStore } from "../stores/editor-store";
 const dropdownRefs = [];
 const menuItems = item => [
   {
     title: "Unfavorite",
-    onClick: async () => {
-      ask(
-        Icon.Star,
-        "Unfavorite",
-        "Are you sure you want to remove this item from favorites?"
-      ).then(res => {
-        if (res) {
-          db.notes
-            .note(item.id)
-            .favorite()
-            .then(() => {
-              let itemType = item.type[0] + item.type.substring(1);
-              showSnack(itemType + " Unfavorited!", Icon.Check);
-              ev.emit(`refreshFavorites`);
-            });
-        }
-      });
-    }
-  },
-  {
-    title: "Delete",
-    color: "red",
-    onClick: async () => {
-      ask(
-        Icon.Trash2,
-        "Delete",
-        "Are you sure you want to delete this note? It will be moved to trash and permanently deleted after 7 days."
-      ).then(res => {
-        if (res) {
-          let itemType = item.type[0] + item.type.substring(1);
-          db.notes.delete(item.id).then(() => {
-            showSnack(itemType + " Deleted!", Icon.Trash);
-            ev.emit(`refreshFavorites`);
-          });
-        }
-      });
-    }
+    onClick: () => store.getState().favorite(item)
   }
 ];
 
 function Favorites() {
+  useEffect(() => store.getState().refreshList(LIST_TYPES.fav), []);
+  const items = useStore(store => store.favorites);
+  const openSession = useEditorStore(store => store.openSession);
   return (
     <ListView
       type="Favorites"
-      getItems={db.notes.favorites}
+      items={items}
       menu={{ menuItems, dropdownRefs }}
+      noType
       button={undefined}
-      onClick={item => {
-        if (item.type === "note") {
-          sendOpenNoteEvent(item);
-        }
+      onClick={async item => {
+        await openSession(item);
       }}
     />
   );
-}
-
-function sendOpenNoteEvent(note) {
-  ev.emit("onOpenNote", note);
 }
 
 export default Favorites;

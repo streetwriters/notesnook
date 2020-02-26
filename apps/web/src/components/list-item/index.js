@@ -94,27 +94,29 @@ const ListItem = props => (
         {props.info}
       </Text>
     </Box>
-    <Dropdown
-      style={{ zIndex: 1, marginRight: -4 }}
-      ref={ref => (props.dropdownRefs[props.index] = ref)}
-    >
-      <DropdownTrigger>
-        <Text sx={{ ":active, :hover": { color: "primary" } }}>
-          <Icon.MoreVertical
-            size={24}
-            strokeWidth={1.5}
-            style={{ marginRight: -5 }}
+    {props.menuItems && props.dropdownRefs && (
+      <Dropdown
+        style={{ zIndex: 1, marginRight: -4 }}
+        ref={ref => (props.dropdownRefs[props.index] = ref)}
+      >
+        <DropdownTrigger>
+          <Text sx={{ ":active, :hover": { color: "primary" } }}>
+            <Icon.MoreVertical
+              size={24}
+              strokeWidth={1.5}
+              style={{ marginRight: -5 }}
+            />
+          </Text>
+        </DropdownTrigger>
+        <DropdownContent style={{ zIndex: 2, marginLeft: -110 }}>
+          <Menu
+            dropdownRef={props.dropdownRefs[props.index]}
+            menuItems={props.menuItems}
+            data={props.menuData}
           />
-        </Text>
-      </DropdownTrigger>
-      <DropdownContent style={{ zIndex: 2, marginLeft: -110 }}>
-        <Menu
-          dropdownRef={props.dropdownRefs[props.index]}
-          menuItems={props.menuItems}
-          data={props.menuData}
-        />
-      </DropdownContent>
-    </Dropdown>
+        </DropdownContent>
+      </Dropdown>
+    )}
   </Flex>
 );
 

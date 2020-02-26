@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Flex, Text, Box } from "rebass";
 import * as Icon from "react-feather";
-import { db, ev, sendNewNoteEvent } from "../common";
-import { GroupedVirtuoso as GroupList, Virtuoso as List } from "react-virtuoso";
+import { db } from "../common";
+import { GroupedVirtuoso as GroupList } from "react-virtuoso";
 import Button from "../components/button";
 import Search from "../components/search";
 import Note from "../components/note";
+import { useStore, store } from "../stores/note-store";
+import { useStore as useEditorStore } from "../stores/editor-store";
 
 function SearchBox(props) {
   return (
@@ -24,25 +26,12 @@ function SearchBox(props) {
 }
 
 function Home() {
-  const [notes, setNotes] = useState({
-    items: [],
-    groupCounts: [],
-    groups: []
-  });
-  useEffect(() => {
-    function onRefreshNotes() {
-      let groups = db.notes.group(undefined, true);
-      setNotes(groups);
-    }
-    onRefreshNotes();
-    ev.addListener("refreshNotes", onRefreshNotes);
-    return () => {
-      ev.removeListener("refreshNotes", onRefreshNotes);
-    };
-  }, []);
+  useEffect(() => store.getState().refresh(), []);
+  const notes = useStore(store => store.notes);
+  const newSession = useEditorStore(store => store.newSession);
   return (
     <Flex flexDirection="column" flex="1 1 auto">
-      <SearchBox setNotes={setNotes} />
+      <SearchBox />
       <GroupList
         style={{
           width: "100%",
@@ -62,14 +51,20 @@ function Home() {
             </Box>
           )
         }
-        item={(index, groupIndex) => (
-          <Note index={index} item={notes.items[index]} />
-        )}
+        item={(index, groupIndex) =>
+          notes.groupCounts[groupIndex] && (
+            <Note
+              index={index}
+              groupIndex={groupIndex}
+              item={notes.items[index]}
+            />
+          )
+        }
       />
       <Button
         Icon={Icon.Plus}
         content="Make a new note"
-        onClick={sendNewNoteEvent}
+        onClick={() => newSession()}
       />
     </Flex>
   );

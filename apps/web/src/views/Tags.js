@@ -3,6 +3,7 @@ import { Flex, Text } from "rebass";
 import ListContainer from "../components/list-container";
 import ListItem from "../components/list-item";
 import { db } from "../common";
+import { store } from "../stores/note-store";
 
 const TagNode = ({ title }) => (
   <Text as="span" fontFamily={"body"} fontSize="title" fontWeight={"body"}>
@@ -18,23 +19,24 @@ const Tags = props => {
   return (
     <ListContainer
       itemsLength={tags.length}
-      item={index => (
-        <ListItem
-          isTag
-          dropdownRefs={[]}
-          menuItems={[]}
-          index={index}
-          title={<TagNode title={tags[index].title} />}
-          onClick={() => {
-            const notesOfTag = db.notes.tagged(tags[index].title);
-            props.navigator.navigate("notes", {
-              notes: notesOfTag,
-              title: tags[index].title,
-              context: { tags: [tags[index].title] }
-            });
-          }}
-        />
-      )}
+      item={index => {
+        let title = tags[index].title;
+        return (
+          <ListItem
+            index={index}
+            title={<TagNode title={title} />}
+            onClick={() => {
+              store
+                .getState()
+                .setSelectedContext({ type: "tag", value: title });
+              props.navigator.navigate("notes", {
+                title: "#" + title,
+                context: { tags: [title] }
+              });
+            }}
+          />
+        );
+      }}
     />
   );
 };

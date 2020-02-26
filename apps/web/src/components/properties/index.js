@@ -5,9 +5,25 @@ import { Input } from "@rebass/forms";
 import CheckBox from "../checkbox";
 import { PinIcon } from "../icons";
 import { usePersistentState } from "../../utils/hooks";
+import { useStore } from "../../stores/editor-store";
+import { COLORS } from "../../common";
+import { objectMap } from "../../utils/object";
 
 const Properties = props => {
   const [visible, setVisible] = usePersistentState("propertiesVisible", false);
+  const pinned = useStore(store => store.session.pinned);
+  const favorite = useStore(store => store.session.favorite);
+  const colors = useStore(store => store.session.colors);
+  const tags = useStore(store => store.session.tags);
+
+  const setSession = useStore(store => store.setSession);
+  const setColor = useStore(store => store.setColor);
+  const setTag = useStore(store => store.setTag);
+  function changeState(prop, value) {
+    setSession(state => {
+      state.session[prop] = value;
+    });
+  }
   return (
     <>
       <Box
@@ -30,6 +46,8 @@ const Properties = props => {
       </Box>
       <Box
         sx={{
+          position: visible ? "absolute" : "relative",
+          right: 0,
           display: visible ? "flex" : "none",
           borderLeft: "1px solid",
           borderColor: "border",
@@ -62,16 +80,16 @@ const Properties = props => {
           </Text>
         </Text>
         <CheckBox
-          checked={props.pinned}
+          checked={pinned}
           icon={PinIcon}
           label="Pin"
-          onChecked={props.onPinned}
+          onChecked={state => changeState("pinned", state)}
         />
         <CheckBox
           icon={Icon.Star}
-          checked={props.favorite}
+          checked={favorite}
           label="Favorite"
-          onChecked={props.onFavorited}
+          onChecked={state => changeState("favorite", state)}
         />
         <CheckBox icon={Icon.Lock} label="Lock" onChecked={props.onLocked} />
         <Flex fontSize="body" sx={{ marginBottom: 3 }} alignItems="center">
@@ -92,9 +110,7 @@ const Properties = props => {
               event.key === " " ||
               event.key === ","
             ) {
-              props.addTag &&
-                event.target.value &&
-                props.addTag(event.target.value);
+              setTag(event.target.value);
               event.target.value = "";
             }
           }}
@@ -106,59 +122,50 @@ const Properties = props => {
           justifyContent="flex-start"
           flexWrap="wrap"
         >
-          {props.tags &&
-            props.tags.map(tag => (
-              <Text
-                sx={{
-                  backgroundColor: "primary",
-                  color: "static",
-                  borderRadius: "default",
-                  padding: "2px 5px 2px 5px",
-                  marginBottom: 1,
-                  marginRight: 1
-                }}
-              >
-                #{tag}
-              </Text>
-            ))}
+          {tags.map(tag => (
+            <Text
+              sx={{
+                backgroundColor: "primary",
+                color: "static",
+                borderRadius: "default",
+                padding: "2px 5px 2px 5px",
+                marginBottom: 1,
+                marginRight: 1
+              }}
+            >
+              #{tag}
+            </Text>
+          ))}
         </Flex>
         <Flex fontSize="body" sx={{ marginBottom: 2 }} alignItems="center">
           <Icon.Octagon size={18} />
           <Text sx={{ marginLeft: 1 }}>Colors:</Text>
         </Flex>
         <Flex flexWrap="wrap" sx={{ marginBottom: 2 }}>
-          {[
-            { label: "red", code: "#ed2d37" },
-            { label: "orange", code: "#ec6e05" },
-            { label: "yellow", code: "yellow" },
-            { label: "green", code: "green" },
-            { label: "blue", code: "blue" },
-            { label: "purple", code: "purple" },
-            { label: "gray", code: "gray" }
-          ].map(color => (
+          {objectMap(COLORS, (label, code) => (
             <Flex
               sx={{ position: "relative" }}
               justifyContent="center"
               alignItems="center"
-              onClick={() => props.colorSelected && props.colorSelected(color)}
-              key={color.label}
+              onClick={() => setColor(label)}
+              key={label}
             >
               <Icon.Circle
                 size={40}
                 style={{ cursor: "pointer" }}
-                fill={color.code}
+                fill={code}
                 strokeWidth={0}
               />
-              {props.selectedColors &&
-                props.selectedColors.includes(color.label) && (
-                  <Icon.Check
-                    style={{
-                      position: "absolute",
-                      color: "white"
-                    }}
-                    size={20}
-                  />
-                )}
+              {colors.includes(label) && (
+                <Icon.Check
+                  style={{
+                    position: "absolute",
+                    cursor: "pointer",
+                    color: "white"
+                  }}
+                  size={20}
+                />
+              )}
             </Flex>
           ))}
         </Flex>
@@ -167,4 +174,4 @@ const Properties = props => {
   );
 };
 
-export default Properties;
+export default React.memo(Properties);

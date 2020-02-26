@@ -1,25 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { Flex } from "rebass";
-import { db, ev } from "../common";
-import { showSnack } from "../components/snackbar";
+import { db } from "../common";
 import Notebook from "../components/notebook";
-import { CreateNotebookDialog } from "../components/dialogs";
+import AddNotebookDialog from "../components/dialogs/addnotebookdialog";
 import ListContainer from "../components/list-container";
+import { useStore, store } from "../stores/notebook-store";
 
 const Notebooks = props => {
   const [open, setOpen] = useState(false);
-  const [notebooks, setNotebooks] = useState([]);
-  useEffect(() => {
-    function onRefresh() {
-      setNotebooks(db.notebooks.all);
-    }
-    onRefresh();
-    ev.addListener("refreshNotebooks", onRefresh);
-    return () => {
-      ev.removeListener("refreshNotebooks", onRefresh);
-      Notebooks.onRefresh = undefined;
-    };
-  }, []);
+  useEffect(() => store.getState().refresh(), []);
+  const notebooks = useStore(state => state.notebooks);
+  const add = useStore(state => state.add);
 
   return (
     <>
@@ -52,22 +43,9 @@ const Notebooks = props => {
           onClick: async () => setOpen(true)
         }}
       />
-      <CreateNotebookDialog
-        open={open}
-        onDone={async (topics, title, description) => {
-          if (
-            await db.notebooks.add({
-              title,
-              description,
-              topics
-            })
-          ) {
-            setNotebooks(db.notebooks.all);
-            setOpen(false);
-          } else {
-            showSnack("Please fill out the notebook title.");
-          }
-        }}
+      <AddNotebookDialog
+        isOpen={open}
+        onDone={add}
         close={() => {
           setOpen(false);
         }}
@@ -76,7 +54,7 @@ const Notebooks = props => {
   );
 };
 
-const NotebooksContainer = props => {
+const NotebooksContainer = () => {
   useEffect(() => {
     const NotebookNavigator = require("../navigation/navigators/nbnavigator")
       .default;
