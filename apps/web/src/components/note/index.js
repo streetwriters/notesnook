@@ -73,8 +73,8 @@ export default class Note extends React.Component {
         info={
           <Flex justifyContent="center" alignItems="center">
             <TimeAgo datetime={note.dateCreated} />
-            {note.locked && <Icon.Lock size={16} style={{ marginLeft: 5 }} />}
-            {note.favorite && <Icon.Star size={16} style={{ marginLeft: 5 }} />}
+            {note.locked && <Icon.Lock size={13} style={{ marginLeft: 5 }} />}
+            {note.favorite && <Icon.Star size={13} style={{ marginLeft: 5 }} />}
           </Flex>
         }
         pinned={note.pinned}
