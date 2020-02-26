@@ -49,17 +49,23 @@ function editorStore(set, get) {
     },
     saveSession: function(oldSession) {
       const { session } = get();
-      const { title, id, content, pinned, favorite } = session;
+      const { title, id, content, pinned, favorite, tags, colors } = session;
       let note = {
         content,
         title,
         id,
         favorite,
-        pinned
+        pinned,
+        tags,
+        colors
       };
       db.notes.add(note).then(id => {
+        if (tags.length > 0) updateContext("tags", tags);
+        if (colors.length > 0) updateContext("colors", colors);
+
         set(state => {
           state.session.id = id;
+          state.session.state = SESSION_STATES.stale;
           notestore.getState().refresh();
 
           // we update favorites only if favorite has changed
@@ -72,7 +78,6 @@ function editorStore(set, get) {
     setSession: function(session) {
       const oldSession = get().session;
       set(state => {
-        state.session.state = SESSION_STATES.stale;
         session(state);
         clearTimeout(state.session.timeout);
         state.session.timeout = setTimeout(() => {
@@ -94,7 +99,7 @@ function editorStore(set, get) {
       setTagOrColor(get().session, "colors", color, "color", set);
     },
     setTag: function(tag) {
-      setTagOrColor(get().session, "tags", tag, "tag", set);
+      setTagOrColor(get().session, "tags", tag, "tag", get().setSession);
     }
   };
 }
@@ -115,6 +120,21 @@ function setTagOrColor(session, array, value, func, set) {
       set(state => {
         state.session[array].push(value);
       });
+    });
+  }
+}
+
+function updateContext(key, array) {
+  let type = key === "colors" ? "color" : "tag";
+  // update notes if the selected context (the current view in the navigator) is a tag or color
+  const notesState = notestore.getState();
+  const context = notesState.selectedContext;
+  if (context.type === type) {
+    array.forEach(value => {
+      if (context.value === value) {
+        console.log("updating according to context");
+        notestore.getState().setSelectedContext(context);
+      }
     });
   }
 }

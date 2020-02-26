@@ -3,6 +3,7 @@ import { Flex, Text } from "rebass";
 import ListContainer from "../components/list-container";
 import ListItem from "../components/list-item";
 import { db } from "../common";
+import { store } from "../stores/note-store";
 
 const TagNode = ({ title }) => (
   <Text as="span" fontFamily={"body"} fontSize="title" fontWeight={"body"}>
@@ -25,9 +26,10 @@ const Tags = props => {
             index={index}
             title={<TagNode title={title} />}
             onClick={() => {
-              const notesOfTag = db.notes.tagged(title);
+              store
+                .getState()
+                .setSelectedContext({ type: "tag", value: title });
               props.navigator.navigate("notes", {
-                notes: notesOfTag,
                 title: "#" + title,
                 context: { tags: [title] }
               });

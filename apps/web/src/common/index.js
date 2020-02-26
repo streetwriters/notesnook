@@ -14,3 +14,5 @@ export const COLORS = [
   { label: "purple", code: "purple" },
   { label: "gray", code: "gray" }
 ];
+
+export const DEFAULT_CONTEXT = { colors: [], tags: [], notebook: {} };

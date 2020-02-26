@@ -15,6 +15,8 @@ function noteStore(set, get) {
       groups: []
     },
     favorites: [],
+    selectedNotes: [],
+    selectedContext: {},
     refresh: function() {
       set(state => {
         //TODO save group type
@@ -24,6 +26,29 @@ function noteStore(set, get) {
     refreshList: function(listType) {
       set(state => {
         state[listType] = db.notes[listType];
+      });
+    },
+    setSelectedContext: function(context) {
+      let notes = [];
+      switch (context.type) {
+        case "tag":
+          notes = db.notes.tagged(context.value);
+          break;
+        case "color":
+          notes = db.notes.colored(context.value);
+          break;
+        default:
+          return;
+      }
+      set(state => {
+        state.selectedContext = context;
+        state.selectedNotes = notes;
+      });
+    },
+    clearSelectedContext: function() {
+      set(state => {
+        state.selectedContext = {};
+        state.selectedNotes = [];
       });
     },
     delete: async function(id, info) {
