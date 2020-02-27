@@ -25,7 +25,7 @@ function encrypt(password, data) {
   let key;
   return Aes.pbkdf2('password', 'salt', 5000, 256).then(aes => {
     key = aes;
-
+    console.log(aes);
     return Aes.randomKey(16).then(iv => {
       return Aes.encrypt(data, key, iv).then(cipher => ({
         cipher,

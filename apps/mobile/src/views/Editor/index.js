@@ -239,6 +239,7 @@ const Editor = ({navigation, noMenu}) => {
 
     if (navigation && navigation.state.params && navigation.state.params.note) {
       note = navigation.state.params.note;
+      console.log(navigation.state.params.note);
       updateEditor();
     } else if (note && note.id) {
       updateEditor();
@@ -266,7 +267,9 @@ const Editor = ({navigation, noMenu}) => {
     id = note.id;
     dateEdited = note.dateEdited;
     content = note.content;
-    content.delta = await db.notes.note(id).delta();
+    if (!note.locked) {
+      content.delta = await db.notes.note(id).delta();
+    }
     saveCounter = 0;
 
     if (title !== null || title === '') {
@@ -290,7 +293,7 @@ const Editor = ({navigation, noMenu}) => {
       });
     } else if (note.content.delta) {
       let delta;
-
+      console.log(note.content.delta, 'HERE');
       if (typeof note.content.delta !== 'string') {
         delta = note.content.delta;
       } else {
@@ -528,6 +531,7 @@ const Editor = ({navigation, noMenu}) => {
       content = null;
       id = null;
       timer = null;
+      note = {};
     };
   }, [noMenu]);
 
