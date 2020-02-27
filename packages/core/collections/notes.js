@@ -127,14 +127,10 @@ export default class Notes {
     let notes = !special
       ? tfun.filter(".pinned === false")(this.all)
       : this.all;
+    notes = sort(notes).desc(t => t.dateCreated);
     switch (by) {
       case "abc":
-        return groupBy(
-          //notes.sort((a, b) => a.title.localeCompare(b.title)),
-          sort(notes).asc(t => t.title),
-          note => note.title[0].toUpperCase(),
-          special
-        );
+        return groupBy(notes, note => note.title[0].toUpperCase(), special);
       case "month":
         return groupBy(
           notes,
