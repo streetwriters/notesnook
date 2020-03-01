@@ -6,21 +6,42 @@ import Dialog from "./dialog";
 import { showSnack } from "../snackbar";
 
 export default class AddNotebookDialog extends React.Component {
+  MAX_AVAILABLE_HEIGHT = window.innerHeight * 0.3;
   title = [];
   description = [];
   _inputRefs = [];
   lastLength = 0;
   state = {
     topics: [""],
-    open: false
+    open: false,
+    focusedInputIndex: -1
   };
 
-  addTopic(index) {
+  performActionOnTopic(index) {
     const topics = this.state.topics.slice();
-    topics.splice(index + 1, 0, "");
+    if (this.state.focusedInputIndex !== index) {
+      this.removeTopic(index, topics);
+    } else {
+      this.addTopic(index, topics);
+    }
+  }
+
+  removeTopic(index, topics) {
+    this._action(topics, index - 1, 1);
+  }
+
+  addTopic(index, topics) {
+    this._action(topics, index + 1, 0, "");
+  }
+
+  _action(topics, index, deleteCount, replaceItem) {
+    if (!topics) {
+      topics = this.state.topics.slice();
+    }
+    topics.splice(index, deleteCount, replaceItem);
     this.setState({ topics }, () =>
       setTimeout(() => {
-        this._inputRefs[index + 1].focus();
+        this._inputRefs[index].focus();
       }, 0)
     );
   }
@@ -53,11 +74,19 @@ export default class AddNotebookDialog extends React.Component {
             <Text variant="body" fontWeight="bold" my={1}>
               Topics (optional):
             </Text>
-            <Box sx={{ maxHeight: 44 * 5, overflowY: "auto", marginBottom: 1 }}>
+            <Box
+              sx={{
+                maxHeight: this.MAX_AVAILABLE_HEIGHT,
+                overflowY: "auto",
+                marginBottom: 1
+              }}
+            >
               {this.state.topics.map((value, index) => (
                 <Flex
                   key={index.toString()}
                   flexDirection="row"
+                  onFocus={() => this.setState({ focusedInputIndex: index })}
+                  onBlur={() => this.setState({ focusedInputIndex: -1 })}
                   sx={{ marginBottom: 1 }}
                 >
                   <Input
@@ -83,16 +112,7 @@ export default class AddNotebookDialog extends React.Component {
                         this.lastLength === 0 &&
                         index > 0
                       ) {
-                        this.setState(
-                          {
-                            topics: this.state.topics.splice(index, 1)
-                          },
-                          () => {
-                            setTimeout(() => {
-                              this._inputRefs[index - 1].focus();
-                            }, 0);
-                          }
-                        );
+                        this.removeTopic(index);
                       }
                       this.lastLength = e.nativeEvent.target.value.length;
                     }}
@@ -102,10 +122,14 @@ export default class AddNotebookDialog extends React.Component {
                     sx={{ marginLeft: 1 }}
                     px={2}
                     py={1}
-                    onClick={() => this.addTopic(index)}
+                    onClick={() => this.performActionOnTopic(index)}
                   >
                     <Box height={20}>
-                      <Icon.Plus size={20} />
+                      {this.state.focusedInputIndex === index ? (
+                        <Icon.Plus size={20} />
+                      ) : (
+                        <Icon.Minus size={20} />
+                      )}
                     </Box>
                   </RebassButton>
                 </Flex>
