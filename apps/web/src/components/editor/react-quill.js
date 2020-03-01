@@ -47,8 +47,12 @@ export default class ReactQuill extends Component {
   componentDidUpdate() {
     if (this.props.refresh) {
       this.quill.setContents(this.props.initialContent);
-      console.log(this.props.initialContent);
-      if (!this.props.initialContent.ops.length) return;
+      if (
+        !this.props.initialContent ||
+        !this.props.initialContent.ops ||
+        !this.props.initialContent.ops.length
+      )
+        return;
       const text = this.quill.getText();
       if (text[text.length - 1] !== " ") {
         this.quill.insertText(text.length - 1, " ");
