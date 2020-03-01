@@ -1,7 +1,6 @@
 import localforage from "localforage";
 import { encode, decode } from "../utils/base64";
 import { hexToBuffer, bufferToHex } from "../utils/hex";
-
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
 
