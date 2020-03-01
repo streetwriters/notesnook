@@ -54,7 +54,8 @@ test("restore a deleted note that's in a deleted notebook", () =>
       .add(id);
     await db.notes.delete(id);
     await db.notebooks.delete(nbId);
-    await db.trash.restore(db.trash.all[0].id);
+    const deletedNote = db.trash.all.find(v => v.id.includes(id));
+    await db.trash.restore(deletedNote.id);
     let note = db.notes.note(id);
     expect(note).toBeDefined();
     expect(db.notes.note(id).notebook).toStrictEqual({});
