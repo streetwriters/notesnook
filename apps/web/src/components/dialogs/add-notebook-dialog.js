@@ -7,13 +7,12 @@ import { showSnack } from "../snackbar";
 
 export default class AddNotebookDialog extends React.Component {
   MAX_AVAILABLE_HEIGHT = window.innerHeight * 0.3;
-  title = [];
-  description = [];
+  title = "";
+  description = "";
   _inputRefs = [];
   lastLength = 0;
   state = {
     topics: [""],
-    open: false,
     focusedInputIndex: -1
   };
 
@@ -44,6 +43,23 @@ export default class AddNotebookDialog extends React.Component {
         this._inputRefs[index].focus();
       }, 0)
     );
+  }
+
+  UNSAFE_componentWillReceiveProps(nextProps) {
+    if (nextProps.isOpen === false) {
+      this._reset();
+    }
+  }
+
+  _reset() {
+    this.title = "";
+    this.description = "";
+    this._inputRefs = [];
+    this.lastLength = 0;
+    this.setState({
+      topics: [""],
+      focusedInputIndex: -1
+    });
   }
 
   render() {
