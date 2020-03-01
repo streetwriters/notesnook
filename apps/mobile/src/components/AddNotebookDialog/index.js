@@ -108,31 +108,33 @@ export class AddNotebookDialog extends React.Component {
     if (this.currentInputValue) {
       this.onSubmit();
     }
-    setTimeout(async () => {
-      let {topics} = this.state;
-      let {toEdit} = this.props;
-      if (!this.title)
-        return ToastEvent.show(
-          'Title is required',
-          'error',
-          3000,
-          () => {},
-          '',
-        );
+    let {topics} = this.state;
+    let {toEdit} = this.props;
+    if (!this.title)
+      return ToastEvent.show('Title is required', 'error', 3000, () => {}, '');
 
-      let id = toEdit && toEdit.id ? toEdit.id : null;
+    let id = toEdit && toEdit.id ? toEdit.id : null;
 
+    if (id) {
+      await db.notebooks.add({
+        title: this.title,
+        description: this.description,
+        id: id,
+      });
+
+      await db.notebooks.notebook(id).topics.add(...topics);
+    } else {
       await db.notebooks.add({
         title: this.title,
         description: this.description,
         topics,
         id: id,
       });
+    }
 
-      updateEvent({type: ACTIONS.NOTEBOOKS});
-      this.close();
-      ToastEvent.show('New notebook added', 'success', 3000, () => {}, '');
-    }, 200);
+    updateEvent({type: ACTIONS.NOTEBOOKS});
+    this.close();
+    ToastEvent.show('New notebook added', 'success', 3000, () => {}, '');
   };
 
   onSubmit = () => {
@@ -157,6 +159,7 @@ export class AddNotebookDialog extends React.Component {
       setTimeout(() => {
         this.listRef.scrollToEnd({animated: true});
       }, 30);
+      this.currentInputValue = null;
     } else {
       prevTopics[this.prevIndex] = this.currentInputValue;
       this.setState({
