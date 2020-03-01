@@ -11,12 +11,14 @@ export default class AddNotebookDialog extends React.Component {
   _inputRefs = [];
   lastLength = 0;
   state = {
-    topics: [],
+    topics: [""],
     open: false
   };
 
   addTopic(index) {
-    this.setState({ topics: this.state.topics.splice(index + 1, 0, "") }, () =>
+    const topics = this.state.topics.slice();
+    topics.splice(index + 1, 0, "");
+    this.setState({ topics }, () =>
       setTimeout(() => {
         this._inputRefs[index + 1].focus();
       }, 0)
