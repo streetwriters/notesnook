@@ -14,7 +14,7 @@ import * as Animatable from 'react-native-animatable';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import WebView from 'react-native-webview';
 import {db, DDS} from '../../../App';
-import {SIZE, WEIGHT, normalize} from '../../common/common';
+import {SIZE, WEIGHT, normalize, opacity} from '../../common/common';
 import {
   ActionSheetEvent,
   simpleDialogEvent,
@@ -62,6 +62,13 @@ const Editor = ({navigation, noMenu}) => {
       eUnSubscribeEvent(eOnLoadNote, loadNote);
     };
   }, []);
+
+  useEffect(() => {
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 3000);
+  }, [colors.bg]);
 
   const loadNote = item => {
     if (note && note.id) {
@@ -156,6 +163,8 @@ const Editor = ({navigation, noMenu}) => {
       };
     }
 
+    console.log(content.delta, 'i am called');
+
     let rId = await db.notes.add({
       title,
       content: {
@@ -239,7 +248,7 @@ const Editor = ({navigation, noMenu}) => {
 
     if (navigation && navigation.state.params && navigation.state.params.note) {
       note = navigation.state.params.note;
-      console.log(navigation.state.params.note);
+
       updateEditor();
     } else if (note && note.id) {
       updateEditor();
@@ -263,6 +272,7 @@ const Editor = ({navigation, noMenu}) => {
     });
 
   const updateEditor = async () => {
+    console.log('before', content, title, id);
     title = note.title;
     id = note.id;
     dateEdited = note.dateEdited;
@@ -270,6 +280,9 @@ const Editor = ({navigation, noMenu}) => {
     if (!note.locked) {
       content.delta = await db.notes.note(id).delta();
     }
+
+    console.log('after', content, title, id);
+
     saveCounter = 0;
 
     if (title !== null || title === '') {
@@ -588,11 +601,7 @@ const Editor = ({navigation, noMenu}) => {
         </Text>
       </Animatable.View>
 
-      <Animatable.View
-        transition={['opacity']}
-        useNativeDriver={true}
-        duration={3000}
-        delay={300}
+      <View
         style={{
           width: '100%',
           height: '100%',
@@ -600,7 +609,7 @@ const Editor = ({navigation, noMenu}) => {
           opacity: loading ? 0 : 1,
         }}>
         {_renderEditor()}
-      </Animatable.View>
+      </View>
     </AnimatedSafeAreaView>
   );
 };
