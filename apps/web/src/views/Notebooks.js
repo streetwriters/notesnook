@@ -40,7 +40,9 @@ const Notebooks = props => {
         )}
         button={{
           content: "Create a notebook",
-          onClick: async () => setOpen(true)
+          onClick: async () => {
+            setOpen(true);
+          }
         }}
       />
       <AddNotebookDialog

@@ -4,6 +4,7 @@ import { Input, Checkbox, Label } from "@rebass/forms";
 import * as Icon from "react-feather";
 import Dialog from "./dialog";
 import { showSnack } from "../snackbar";
+import { useEffect } from "react";
 
 export default class AddNotebookDialog extends React.Component {
   title = [];
@@ -33,6 +34,7 @@ export default class AddNotebookDialog extends React.Component {
         content={
           <Box my={1}>
             <Input
+              autoFocus
               variant="default"
               onChange={e => (this.title = e.target.value)}
               placeholder="Enter name"
