@@ -64,11 +64,11 @@ export default class CachedCollection {
     return this.map.get(id);
   }
 
-  getAllItems() {
+  getAllItems(sortFn = u => u.dateCreated) {
     let items = [];
     this.map.forEach(value => {
       items[items.length] = value;
     });
-    return sort(items).desc(u => u.dateCreated);
+    return sort(items).desc(sortFn);
   }
 }

@@ -20,7 +20,7 @@ export default class Trash {
   }
 
   get all() {
-    return this._collection.getAllItems();
+    return this._collection.getAllItems(u => u.dateDeleted);
   }
 
   async add(item) {
