@@ -11,7 +11,7 @@ export default class MoveDialog extends React.Component {
   selectedNotebook;
   selectedTopic;
   state = {
-    items: [],
+    items: db.notebooks.all,
     type: "notebooks",
     title: "Notebooks",
     mode: "read"
