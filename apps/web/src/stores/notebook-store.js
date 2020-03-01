@@ -13,7 +13,9 @@ function notebookStore(set) {
     add: async function(nb) {
       let notebook = await db.notebooks.add(nb);
       if (notebook) {
-        set(state => state.notebooks.push(nb));
+        set(state => {
+          state.notebooks.push(nb);
+        });
       }
     },
     delete: async function(id, index) {

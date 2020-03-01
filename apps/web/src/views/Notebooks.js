@@ -47,7 +47,10 @@ const Notebooks = props => {
       />
       <AddNotebookDialog
         isOpen={open}
-        onDone={add}
+        onDone={async nb => {
+          await add(nb);
+          setOpen(false);
+        }}
         close={() => {
           setOpen(false);
         }}
