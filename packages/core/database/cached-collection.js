@@ -1,4 +1,5 @@
 import Indexer from "./indexer";
+import sort from "fast-sort";
 
 export default class CachedCollection {
   constructor(context, type) {
@@ -65,9 +66,9 @@ export default class CachedCollection {
 
   getAllItems() {
     let items = [];
-    for (let value of this.map.values()) {
+    this.map.forEach(value => {
       items[items.length] = value;
-    }
-    return items;
+    });
+    return sort(items).desc(u => u.dateCreated);
   }
 }
