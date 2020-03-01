@@ -130,7 +130,11 @@ const Properties = props => {
                 borderRadius: "default",
                 padding: "2px 5px 2px 5px",
                 marginBottom: 1,
-                marginRight: 1
+                marginRight: 1,
+                cursor: "pointer"
+              }}
+              onClick={() => {
+                setTag(tag);
               }}
             >
               #{tag}
