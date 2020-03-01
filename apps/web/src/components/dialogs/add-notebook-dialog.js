@@ -4,7 +4,6 @@ import { Input, Checkbox, Label } from "@rebass/forms";
 import * as Icon from "react-feather";
 import Dialog from "./dialog";
 import { showSnack } from "../snackbar";
-import { useEffect } from "react";
 
 export default class AddNotebookDialog extends React.Component {
   title = [];
