@@ -4,19 +4,34 @@ import * as Icon from "react-feather";
 import Dropdown, { DropdownTrigger, DropdownContent } from "../dropdown";
 import Menu from "../menu";
 import { useStore } from "../../stores/note-store";
+import useContextMenu from "../../utils/useContextMenu";
+
+const ActionsMenu = props => (
+  <Menu
+    id={props.id}
+    dropdownRef={props.dropdownRefs[props.index]}
+    menuItems={props.menuItems}
+    data={props.menuData}
+    style={props.style}
+  />
+);
 
 const ListItem = props => {
   const selectedNote = useStore(store => store.selectedNote);
   const isSelected = selectedNote === props.id;
+  const [parentRef, closeContextMenu] = useContextMenu(
+    `contextMenu${props.index}`
+  );
   return (
     <Flex
+      ref={parentRef}
       alignItems="center"
       justifyContent="space-between"
       py={1}
       bg={props.pinned || isSelected ? "shade" : "background"}
       px={2}
       sx={{
-        position: "relative",
+        //position: "relative",
         marginTop: props.pinned ? 4 : 0,
         borderBottom: "1px solid",
         borderBottomColor: "navbg",
@@ -103,7 +118,7 @@ const ListItem = props => {
           style={{ zIndex: 1, marginRight: -4 }}
           ref={ref => (props.dropdownRefs[props.index] = ref)}
         >
-          <DropdownTrigger>
+          <DropdownTrigger onClick={() => closeContextMenu()}>
             <Text sx={{ ":active, :hover": { color: "primary" } }}>
               <Icon.MoreVertical
                 size={24}
@@ -113,14 +128,19 @@ const ListItem = props => {
             </Text>
           </DropdownTrigger>
           <DropdownContent style={{ zIndex: 2, marginLeft: -110 }}>
-            <Menu
-              dropdownRef={props.dropdownRefs[props.index]}
-              menuItems={props.menuItems}
-              data={props.menuData}
-            />
+            <ActionsMenu {...props} />
           </DropdownContent>
         </Dropdown>
       )}
+      <ActionsMenu
+        {...props}
+        id={`contextMenu${props.index}`}
+        style={{
+          position: "absolute",
+          display: "none",
+          zIndex: 999
+        }}
+      />
     </Flex>
   );
 };

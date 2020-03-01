@@ -5,13 +5,16 @@ import Dropdown from "../dropdown";
 function Menu(props) {
   return (
     <Flex
+      id={props.id}
       bg="background"
       py={1}
+      style={props.style}
       sx={{
         position: "relative",
         borderRadius: "default",
         boxShadow: 2,
-        width: 120
+        width: 120,
+        ...props.sx
       }}
     >
       <Box width="100%">
