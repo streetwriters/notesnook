@@ -11,7 +11,6 @@ const menuItems = (notebook, index) => [
     onClick: () => store.getState().pin(notebook, index)
   },
   { title: "Edit" },
-  { title: "Share" },
   {
     title: "Delete",
     color: "red",

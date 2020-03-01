@@ -27,9 +27,8 @@ const menuItems = (note, index, groupIndex) => [
     title: note.favorite ? "Unfavorite" : "Favorite",
     onClick: () => store.getState().favorite(note, index)
   },
-  { title: "Edit" },
+  { title: "Edit", onClick: () => editorStore.getState().openSession(note) },
   { title: note.locked ? "Remove lock" : "Lock" }, //TODO
-  { title: "Share" },
   {
     title: "Move to Trash",
     color: "red",
