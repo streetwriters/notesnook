@@ -208,7 +208,7 @@ export const Login = ({navigation}) => {
                   }}
                   defaultValue={username}
                   onBlur={() => {
-                    if (!validateUsername(username)) {
+                    if (!validateUsername(username) && username.length > 0) {
                       setInvalidUsername(true);
                       _username.current.setNativeProps({
                         style: {
@@ -217,6 +217,7 @@ export const Login = ({navigation}) => {
                         },
                       });
                     } else {
+                      setInvalidUsername(false);
                       _username.current.setNativeProps({
                         style: {
                           borderColor: colors.nav,
@@ -378,7 +379,7 @@ export const Login = ({navigation}) => {
                     }}
                     defaultValue={password}
                     onBlur={() => {
-                      if (!validatePass(password)) {
+                      if (!validatePass(password) && password.length > 0) {
                         setInvalidPassword(true);
                         _pass.current.setNativeProps({
                           style: {
@@ -387,6 +388,7 @@ export const Login = ({navigation}) => {
                           },
                         });
                       } else {
+                        setInvalidPassword(false);
                         _pass.current.setNativeProps({
                           style: {
                             borderColor: colors.nav,
