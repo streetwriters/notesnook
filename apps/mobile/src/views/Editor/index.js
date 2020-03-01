@@ -536,7 +536,6 @@ const Editor = ({navigation, noMenu}) => {
       });
     } else if (!DDS.isTab) {
       handleBack = BackHandler.addEventListener('hardwareBackPress', () => {
-        console.log('tapCOunt', tapCount);
         if (tapCount > 0) {
           tapCount = 0;
           title = null;
@@ -554,7 +553,6 @@ const Editor = ({navigation, noMenu}) => {
         }
       });
     } else {
-      console.log(' I RUN EVERYTIME');
       if (handleBack) {
         handleBack.remove();
         handleBack = null;
