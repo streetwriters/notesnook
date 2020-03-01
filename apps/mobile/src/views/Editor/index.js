@@ -34,8 +34,9 @@ import {
   eOnLoadNote,
   eOpenFullscreenEditor,
 } from '../../services/events';
-import {SideMenuEvent, timeConverter} from '../../utils/utils';
+import {SideMenuEvent, timeConverter, ToastEvent} from '../../utils/utils';
 import {AnimatedSafeAreaView} from '../Home';
+import NavigationService from '../../services/NavigationService';
 
 let EditorWebView;
 let note = {};
@@ -45,6 +46,7 @@ var content = null;
 var title = null;
 let timer = null;
 let saveCounter = 0;
+let tapCount = 0;
 const Editor = ({navigation, noMenu}) => {
   // Global State
   const [state, dispatch] = useTracked();
@@ -348,9 +350,17 @@ const Editor = ({navigation, noMenu}) => {
         {noMenu ? null : (
           <TouchableOpacity
             onPress={() => {
-              DDS.isTab
-                ? simpleDialogEvent(TEMPLATE_EXIT_FULLSCREEN())
-                : simpleDialogEvent(TEMPLATE_EXIT('Editor'));
+              if (DDS.isTab) {
+                simpleDialogEvent(TEMPLATE_EXIT_FULLSCREEN());
+              } else {
+                tapCount = 0;
+                title = null;
+                content = null;
+                note = null;
+                id = null;
+
+                NavigationService.goBack();
+              }
             }}
             style={{
               width: 60,
@@ -516,6 +526,7 @@ const Editor = ({navigation, noMenu}) => {
       eUnSubscribeEvent(eCloseFullscreenEditor, closeFullscreen);
     };
   });
+
   useEffect(() => {
     let handleBack;
     if (!noMenu && DDS.isTab) {
@@ -523,12 +534,27 @@ const Editor = ({navigation, noMenu}) => {
         simpleDialogEvent(TEMPLATE_EXIT_FULLSCREEN());
         return true;
       });
-    } else if (noMenu && !DDS.isTab) {
+    } else if (!DDS.isTab) {
       handleBack = BackHandler.addEventListener('hardwareBackPress', () => {
-        simpleDialogEvent(TEMPLATE_EXIT());
-        return true;
+        console.log('tapCOunt', tapCount);
+        if (tapCount > 0) {
+          tapCount = 0;
+          title = null;
+          content = null;
+          note = null;
+          id = null;
+          return false;
+        } else {
+          tapCount = 1;
+          setTimeout(() => {
+            tapCount = 0;
+          }, 3000);
+          ToastEvent.show('Press back again to exit editor', 'success');
+          return true;
+        }
       });
     } else {
+      console.log(' I RUN EVERYTIME');
       if (handleBack) {
         handleBack.remove();
         handleBack = null;
