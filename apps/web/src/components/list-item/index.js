@@ -9,10 +9,10 @@ import useContextMenu from "../../utils/useContextMenu";
 const ActionsMenu = props => (
   <Menu
     id={props.id}
-    dropdownRef={props.dropdownRefs[props.index]}
     menuItems={props.menuItems}
     data={props.menuData}
     style={props.style}
+    closeMenu={props.closeMenu}
   />
 );
 
@@ -130,7 +130,10 @@ const ListItem = props => {
               </Text>
             </DropdownTrigger>
             <DropdownContent style={{ zIndex: 2, marginLeft: -130 }}>
-              <ActionsMenu {...props} />
+              <ActionsMenu
+                {...props}
+                closeMenu={() => props.dropdownRefs[props.index].hide()}
+              />
             </DropdownContent>
           </Dropdown>
         )}
@@ -144,6 +147,7 @@ const ListItem = props => {
             display: "none",
             zIndex: 999
           }}
+          closeMenu={() => closeContextMenu()}
         />
       )}
     </Flex>
