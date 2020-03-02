@@ -3,6 +3,8 @@ import fuzzysearch from "fuzzysearch";
 import Notebook from "../models/notebook";
 import Notes from "./notes";
 import Trash from "./trash";
+import sort from "fast-sort";
+
 var tfun = require("transfun/transfun.js").tfun;
 if (!tfun) {
   tfun = global.tfun;
@@ -61,7 +63,7 @@ export default class Notebooks {
   }
 
   get all() {
-    return this._collection.getAllItems();
+    return sort(this._collection.getAllItems()).desc(t => t.pinned);
   }
 
   get pinned() {
