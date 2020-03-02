@@ -20,11 +20,13 @@ const Tags = props => {
     <ListContainer
       itemsLength={tags.length}
       item={index => {
-        let title = tags[index].title;
+        const { title, count } = tags[index];
+
         return (
           <ListItem
             index={index}
             title={<TagNode title={title} />}
+            info={`${count} notes`}
             onClick={() => {
               store
                 .getState()
