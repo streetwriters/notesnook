@@ -34,8 +34,6 @@ export const Folders = ({navigation}) => {
   const [refreshing, setRefreshing] = useState(false);
   let isFocused = useIsFocused();
 
-  ///
-
   const handleBackPress = () => {
     alert('here');
     return true;
@@ -143,20 +141,20 @@ export const Folders = ({navigation}) => {
                         <NotebookItem
                           hideMore={params.hideMore}
                           customStyle={{
-                            width: selectionMode ? w - 74 : '100%',
+                            backgroundColor: Platform.ios
+                              ? hexToRGBA(colors.accent + '19')
+                              : hexToRGBA(colors.shade),
+                            width: '100%',
+                            paddingHorizontal: 12,
+                            paddingTop: 20,
+                            paddingRight: 18,
+                            marginBottom: 10,
+                            marginTop: 20,
+                            borderBottomWidth: 0,
                             marginHorizontal: 0,
                           }}
                           isMove={params.isMove}
-                          onLongPress={() => {
-                            dispatch({
-                              type: ACTIONS.SELECTION_MODE,
-                              enabled: !selectionMode,
-                            });
-                            dispatch({
-                              type: ACTIONS.SELECTED_ITEMS,
-                              item: item,
-                            });
-                          }}
+                          onLongPress={() => {}}
                           noteToMove={params.note}
                           item={item}
                           pinned={true}

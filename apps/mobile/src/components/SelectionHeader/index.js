@@ -122,8 +122,15 @@ export const SelectionHeader = ({navigation}) => {
           {currentScreen === 'trash' || currentScreen === 'notebooks' ? null : (
             <TouchableOpacity
               onPress={async () => {
+                let favCount = 0;
+                let unFavCount = 0;
                 if (selectedItemsList.length > 0) {
                   selectedItemsList.forEach(async item => {
+                    if (item.favorite) {
+                      favCount += 1;
+                    } else {
+                      unFavCount += 1;
+                    }
                     await db.notes.note(item.id).favorite();
                     dispatch({type: ACTIONS.NOTES});
                     dispatch({type: ACTIONS.FAVORITES});
@@ -133,7 +140,13 @@ export const SelectionHeader = ({navigation}) => {
 
                   dispatch({type: ACTIONS.CLEAR_SELECTION});
 
-                  ToastEvent.show('Notes added to favorites', 'success');
+                  ToastEvent.show(
+                    favCount +
+                      ' notes added to favorites &' +
+                      unFavCount +
+                      'removed',
+                    'success',
+                  );
                 }
               }}>
               <Icon
