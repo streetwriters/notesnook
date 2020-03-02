@@ -269,7 +269,7 @@ const PinnedItems = () => {
   return (
     <>
       <FlatList
-        data={pinned}
+        data={pinned.notes}
         keyExtractor={(item, index) => item.id.toString()}
         renderItem={({item, index}) =>
           item.type === 'note' ? (

@@ -50,10 +50,15 @@ export const reducer = (state, action) => {
       };
     }
     case ACTIONS.PINNED: {
-      let pinned = db.notes.pinned;
+      let notes = db.notes.pinned;
+      let notebooks = db.notebooks.pinned;
+
       return {
         ...state,
-        pinned: pinned,
+        pinned: {
+          notes,
+          notebooks,
+        },
       };
     }
     case ACTIONS.CURRENT_SCREEN: {

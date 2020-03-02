@@ -40,6 +40,10 @@ export const Folders = ({navigation}) => {
   };
 
   useEffect(() => {
+    dispatch({type: ACTIONS.PINNED});
+  }, []);
+
+  useEffect(() => {
     eSendEvent(eScrollEvent, 0);
     dispatch({type: ACTIONS.NOTEBOOKS});
 
@@ -130,38 +134,36 @@ export const Folders = ({navigation}) => {
                   ? 155
                   : 155 - 60,
             }}>
-            {pinned && pinned.length > 0 ? (
+            {pinned && pinned.notebooks && pinned.notebooks.length > 0 ? (
               <>
                 <FlatList
-                  data={pinned}
+                  data={pinned.notebooks}
                   keyExtractor={(item, index) => item.id.toString()}
                   renderItem={({item, index}) =>
                     item.type === 'notebook' ? (
-                      <SelectionWrapper item={item}>
-                        <NotebookItem
-                          hideMore={params.hideMore}
-                          customStyle={{
-                            backgroundColor: Platform.ios
-                              ? hexToRGBA(colors.accent + '19')
-                              : hexToRGBA(colors.shade),
-                            width: '100%',
-                            paddingHorizontal: 12,
-                            paddingTop: 20,
-                            paddingRight: 18,
-                            marginBottom: 10,
-                            marginTop: 20,
-                            borderBottomWidth: 0,
-                            marginHorizontal: 0,
-                          }}
-                          isMove={params.isMove}
-                          onLongPress={() => {}}
-                          noteToMove={params.note}
-                          item={item}
-                          pinned={true}
-                          index={index}
-                          colors={colors}
-                        />
-                      </SelectionWrapper>
+                      <NotebookItem
+                        hideMore={params.hideMore}
+                        customStyle={{
+                          backgroundColor: Platform.ios
+                            ? hexToRGBA(colors.accent + '19')
+                            : hexToRGBA(colors.shade),
+                          width: '100%',
+                          paddingHorizontal: 12,
+                          paddingTop: 20,
+                          paddingRight: 18,
+                          marginBottom: 10,
+                          marginTop: 20,
+                          borderBottomWidth: 0,
+                          marginHorizontal: 0,
+                        }}
+                        isMove={params.isMove}
+                        onLongPress={() => {}}
+                        noteToMove={params.note}
+                        item={item}
+                        pinned={true}
+                        index={index}
+                        colors={colors}
+                      />
                     ) : null
                   }
                 />
@@ -170,31 +172,29 @@ export const Folders = ({navigation}) => {
           </View>
         }
         ListEmptyComponent={
-          pinned && pinned.length > 0 ? null : (
-            <View
-              style={{
-                height: '80%',
-                width: DDS.isTab ? '70%' : '100%',
-                alignItems: 'center',
-                alignSelf: 'center',
-                justifyContent: 'center',
-                opacity: 0.8,
-              }}>
-              <NotebookPlaceHolder animation={slideRight} colors={colors} />
-              <NotebookPlaceHolder animation={slideLeft} colors={colors} />
-              <NotebookPlaceHolder animation={slideRight} colors={colors} />
+          <View
+            style={{
+              height: '80%',
+              width: DDS.isTab ? '70%' : '100%',
+              alignItems: 'center',
+              alignSelf: 'center',
+              justifyContent: 'center',
+              opacity: 0.8,
+            }}>
+            <NotebookPlaceHolder animation={slideRight} colors={colors} />
+            <NotebookPlaceHolder animation={slideLeft} colors={colors} />
+            <NotebookPlaceHolder animation={slideRight} colors={colors} />
 
-              <Text
-                style={{
-                  color: colors.icon,
-                  fontSize: SIZE.sm,
-                  fontFamily: WEIGHT.regular,
-                  marginTop: 30,
-                }}>
-                Notebooks you add will appear here
-              </Text>
-            </View>
-          )
+            <Text
+              style={{
+                color: colors.icon,
+                fontSize: SIZE.sm,
+                fontFamily: WEIGHT.regular,
+                marginTop: 30,
+              }}>
+              Notebooks you add will appear here
+            </Text>
+          </View>
         }
         contentContainerStyle={{
           width: '100%',
