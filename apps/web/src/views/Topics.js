@@ -1,9 +1,10 @@
 import React from "react";
 import Topic from "../components/topic";
-import { db } from "../common";
 import ListContainer from "../components/list-container";
+import { useStore } from "../stores/note-store";
 
 const Topics = props => {
+  const setSelectedContext = useStore(store => store.setSelectedContext);
   return (
     <ListContainer
       itemsLength={props.topics.length}
@@ -13,12 +14,14 @@ const Topics = props => {
           item={props.topics[index]}
           onClick={() => {
             let topic = props.topics[index];
+            setSelectedContext({
+              type: "topic",
+              value: topic.title,
+              notebook: props.notebook
+            });
             props.navigator.navigate("notes", {
               title: props.notebook.title,
-              subtitle: topic.title,
-              notes: db.notebooks
-                .notebook(props.notebook.id)
-                .topics.topic(topic.title).all
+              subtitle: topic.title
             });
           }}
         />

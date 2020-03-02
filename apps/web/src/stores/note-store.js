@@ -43,6 +43,11 @@ function noteStore(set, get) {
         case "color":
           notes = db.notes.colored(context.value);
           break;
+        case "topic":
+          notes = db.notebooks
+            .notebook(context.notebook.id)
+            .topics.topic(context.value).all;
+          break;
         default:
           return;
       }

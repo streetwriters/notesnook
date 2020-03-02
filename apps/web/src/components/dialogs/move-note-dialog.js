@@ -133,7 +133,7 @@ export default class MoveDialog extends React.Component {
                             type: "notes",
                             title: `${this.selectedNotebook.title} - ${item.title}`,
                             items: db.notebooks
-                              .notebook(this.notebook.id)
+                              .notebook(this.selectedNotebook.id)
                               .topics.topic(item.title).all
                           });
                           this.selectedTopic = item.title;
@@ -163,10 +163,15 @@ export default class MoveDialog extends React.Component {
         }
         positiveButton={{
           text: "Move",
-          click: async () => {
+          onClick: async () => {
             try {
               await db.notes.move(
                 { id: this.selectedNotebook.id, topic: this.selectedTopic },
+                props.noteId
+              );
+              console.log(
+                this.selectedNotebook.id,
+                this.selectedTopic,
                 props.noteId
               );
               props.onMove();
