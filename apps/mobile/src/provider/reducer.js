@@ -105,9 +105,11 @@ export const reducer = (state, action) => {
         selectedItems.push(action.item);
       }
       history.selectedItemsList = selectedItems;
+
       return {
         ...state,
         selectedItemsList: selectedItems,
+        selectionMode: selectedItems.length > 0 ? true : false,
       };
     }
     case ACTIONS.CLEAR_SELECTION: {
