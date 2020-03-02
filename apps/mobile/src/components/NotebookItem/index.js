@@ -243,7 +243,7 @@ export const NotebookItem = ({
             onPress={async () => {
               let noteIds = [];
               selectedItemsList.forEach(item => noteIds.push(item.id));
-              console.log(noteIds);
+           
               db.notes.move(
                 {
                   topic: item.title,

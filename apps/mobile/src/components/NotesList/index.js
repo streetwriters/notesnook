@@ -194,7 +194,7 @@ export const NotesList = ({isGrouped = false}) => {
   );
 
   const _listKeyExtractor = (item, index) => item.id.toString();
-  console.log(notes);
+ 
   return isGrouped && searchResults.length === 0 ? (
     <SectionList
       ref={ref => (sectionListRef = ref)}

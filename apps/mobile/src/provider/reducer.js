@@ -1,5 +1,5 @@
 import {db} from '../../App';
-import {SideMenuEvent} from '../utils/utils';
+import {SideMenuEvent, history} from '../utils/utils';
 import {ACTIONS} from './actions';
 
 export const reducer = (state, action) => {
@@ -99,13 +99,14 @@ export const reducer = (state, action) => {
       } else {
         selectedItems.push(action.item);
       }
-
+      history.selectedItemsList = selectedItems;
       return {
         ...state,
         selectedItemsList: selectedItems,
       };
     }
     case ACTIONS.CLEAR_SELECTION: {
+      history.selectedItemsList = [];
       return {
         ...state,
         selectedItemsList: [],
