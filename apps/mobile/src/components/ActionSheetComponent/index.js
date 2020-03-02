@@ -439,7 +439,7 @@ export const ActionSheetComponent = ({
           }}
           name={rowItem.icon}
           size={DDS.isTab ? SIZE.xl : SIZE.lg}
-          color={colors.accent}
+          color={rowItem.name === 'Delete' ? colors.errorText : colors.accent}
         />
 
         <Text
