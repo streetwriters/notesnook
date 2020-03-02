@@ -47,7 +47,7 @@ const invisibleRoutes = {
 
 const RootNavigator = new Navigator(
   "RootNavigator",
-  { ...routes, ...invisibleRoutes },
+  { ...routes, ...bottomRoutes, ...invisibleRoutes },
   {
     backButtonEnabled: false
   }
