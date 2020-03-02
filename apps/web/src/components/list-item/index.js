@@ -114,33 +114,36 @@ const ListItem = props => {
         </Text>
       </Box>
       {props.menuItems && props.dropdownRefs && (
-        <Dropdown
-          style={{ zIndex: 1, marginRight: -4 }}
-          ref={ref => (props.dropdownRefs[props.index] = ref)}
-        >
-          <DropdownTrigger onClick={() => closeContextMenu()}>
-            <Text sx={{ ":active, :hover": { color: "primary" } }}>
-              <Icon.MoreVertical
-                size={24}
-                strokeWidth={1.5}
-                style={{ marginRight: -5 }}
-              />
-            </Text>
-          </DropdownTrigger>
-          <DropdownContent style={{ zIndex: 2, marginLeft: -110 }}>
-            <ActionsMenu {...props} />
-          </DropdownContent>
-        </Dropdown>
+        <>
+          {" "}
+          <Dropdown
+            style={{ zIndex: 1, marginRight: -4 }}
+            ref={ref => (props.dropdownRefs[props.index] = ref)}
+          >
+            <DropdownTrigger onClick={() => closeContextMenu()}>
+              <Text sx={{ ":active, :hover": { color: "primary" } }}>
+                <Icon.MoreVertical
+                  size={24}
+                  strokeWidth={1.5}
+                  style={{ marginRight: -5 }}
+                />
+              </Text>
+            </DropdownTrigger>
+            <DropdownContent style={{ zIndex: 2, marginLeft: -110 }}>
+              <ActionsMenu {...props} />
+            </DropdownContent>
+          </Dropdown>
+          <ActionsMenu
+            {...props}
+            id={`contextMenu${props.index}`}
+            style={{
+              position: "absolute",
+              display: "none",
+              zIndex: 999
+            }}
+          />
+        </>
       )}
-      <ActionsMenu
-        {...props}
-        id={`contextMenu${props.index}`}
-        style={{
-          position: "absolute",
-          display: "none",
-          zIndex: 999
-        }}
-      />
     </Flex>
   );
 };
