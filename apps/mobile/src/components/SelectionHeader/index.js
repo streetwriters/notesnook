@@ -125,10 +125,14 @@ export const SelectionHeader = ({navigation}) => {
                 if (selectedItemsList.length > 0) {
                   selectedItemsList.forEach(async item => {
                     await db.notes.note(item.id).favorite();
+                    dispatch({type: ACTIONS.NOTES});
+                    dispatch({type: ACTIONS.FAVORITES});
                   });
+
                   dispatch({type: ACTIONS.SELECTION_MODE, enabled: false});
-                  dispatch({type: ACTIONS.NOTES});
+
                   dispatch({type: ACTIONS.CLEAR_SELECTION});
+
                   ToastEvent.show('Notes added to favorites', 'success');
                 }
               }}>
