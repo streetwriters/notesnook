@@ -64,6 +64,10 @@ export default class Notebooks {
     return this._collection.getAllItems();
   }
 
+  get pinned() {
+    return tfun.filter(".pinned === true")(this.all);
+  }
+
   /**
    *
    * @param {string} id The id of the notebook
