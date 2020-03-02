@@ -40,39 +40,31 @@ export const Folders = ({navigation}) => {
   };
 
   useEffect(() => {
-    dispatch({type: ACTIONS.PINNED});
-  }, []);
-
-  useEffect(() => {
-    eSendEvent(eScrollEvent, 0);
-    dispatch({type: ACTIONS.NOTEBOOKS});
-
     if (isFocused) {
+      dispatch({type: ACTIONS.PINNED});
+      dispatch({type: ACTIONS.NOTEBOOKS});
       dispatch({
         type: ACTIONS.CURRENT_SCREEN,
         screen: 'notebooks',
       });
     }
+  }, [isFocused]);
 
+  useEffect(() => {
+    eSendEvent(eScrollEvent, 0);
     let backhandler;
-    if (isFocused) {
-      backhandler = BackHandler.addEventListener(
-        'hardwareBackPress',
-        handleBackPress,
-      );
-    } else {
-      if (backhandler) {
-        backhandler.remove();
-        backhandler = null;
-      }
-    }
+
+    backhandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      handleBackPress,
+    );
 
     return () => {
       if (!backhandler) return;
       backhandler.remove();
       backhandler = null;
     };
-  }, [isFocused]);
+  }, []);
 
   const params = navigation.state.params;
 

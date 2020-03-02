@@ -1,5 +1,6 @@
 import {NativeModules} from 'react-native';
 import FastStorage from 'react-native-fast-storage';
+
 var Aes = NativeModules.Aes;
 
 async function read(key) {
@@ -25,12 +26,16 @@ function encrypt(password, data) {
   let key;
   return Aes.pbkdf2('password', 'salt', 5000, 256).then(aes => {
     key = aes;
-    console.log(aes);
     return Aes.randomKey(16).then(iv => {
-      return Aes.encrypt(data, key, iv).then(cipher => ({
-        cipher,
-        iv,
-      }));
+      return Aes.encrypt(data, key, iv).then(cipher => {
+        return Aes.hmac256(cipher, key).then(hash => {
+          return {
+            hash,
+            cipher,
+            iv,
+          };
+        });
+      });
     });
   });
 }
@@ -40,8 +45,13 @@ function decrypt(password, data) {
   return Aes.pbkdf2(password, 'salt', 5000, 256).then(aes => {
     key = aes;
 
-    return Aes.decrypt(data.cipher, key, data.iv).then(e => {
-      return e;
+    return Aes.hmac256(data.cipher, key).then(hash => {
+      if (hash !== data.hash) {
+        throw new Error('Wrong password');
+      }
+      return Aes.decrypt(data.cipher, key, data.iv).then(e => {
+        return e;
+      });
     });
   });
 }

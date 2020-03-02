@@ -35,7 +35,6 @@ export const Notebook = ({navigation}) => {
 
     allTopics = db.notebooks.notebook(navigation.state.params.notebook.id).data
       .topics;
-    console.log(allTopics);
 
     notebook = db.notebooks.notebook(navigation.state.params.notebook.id);
 
@@ -67,13 +66,15 @@ export const Notebook = ({navigation}) => {
         type: ACTIONS.CURRENT_SCREEN,
         screen: 'notebook',
       });
+      onLoad();
     }
-
+  }, [isFocused]);
+  useEffect(() => {
     eSubscribeEvent(eMoveNoteDialogNavigateBack, handleBackPress);
     return () => {
       eUnSubscribeEvent(eMoveNoteDialogNavigateBack, handleBackPress);
     };
-  }, [isFocused]);
+  }, []);
 
   const onScroll = event => {
     let y = event.nativeEvent.contentOffset.y;

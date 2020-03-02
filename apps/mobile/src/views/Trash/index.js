@@ -13,21 +13,26 @@ import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {w, ToastEvent} from '../../utils/utils';
 import SelectionWrapper from '../../components/SelectionWrapper';
+import {useIsFocused} from 'react-navigation-hooks';
 
 export const Trash = ({navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors, selectionMode, trash} = state;
   const [refreshing, setRefreshing] = useState(false);
-  useEffect(() => {
-    dispatch({
-      type: ACTIONS.TRASH,
-    });
+  const isFocused = useIsFocused();
 
-    dispatch({
-      type: ACTIONS.CURRENT_SCREEN,
-      screen: 'trash',
-    });
-  }, []);
+  useEffect(() => {
+    if (isFocused) {
+      dispatch({
+        type: ACTIONS.TRASH,
+      });
+
+      dispatch({
+        type: ACTIONS.CURRENT_SCREEN,
+        screen: 'trash',
+      });
+    }
+  }, [isFocused]);
 
   const _renderItem = ({item, index}) => (
     <SelectionWrapper colors={colors} item={item}>

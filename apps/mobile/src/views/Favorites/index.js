@@ -11,18 +11,23 @@ import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
 import {eScrollEvent} from '../../services/events';
 import {ToastEvent, w} from '../../utils/utils';
+import {useIsFocused} from 'react-navigation-hooks';
 
 export const Favorites = ({navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors, selectionMode, favorites} = state;
   const [refreshing, setRefreshing] = useState(false);
+  const isFocused = useIsFocused();
+
   useEffect(() => {
-    dispatch({
-      type: ACTIONS.CURRENT_SCREEN,
-      screen: 'favorites',
-    });
-    dispatch({type: ACTIONS.FAVORITES});
-  }, []);
+    if (isFocused) {
+      dispatch({
+        type: ACTIONS.CURRENT_SCREEN,
+        screen: 'favorites',
+      });
+      dispatch({type: ACTIONS.FAVORITES});
+    }
+  }, [isFocused]);
 
   const onScroll = event => {
     let y = event.nativeEvent.contentOffset.y;
