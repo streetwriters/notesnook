@@ -156,12 +156,12 @@ export const NotesList = ({isGrouped = false}) => {
       style={{
         marginTop:
           Platform.OS == 'ios'
-            ? notes[0]
+            ? notes[0] && !selectionMode
               ? DDS.isTab
                 ? 115
                 : 135
               : 135 - 60
-            : notes[0]
+            : notes[0] && !selectionMode
             ? 155
             : 155 - 60,
         flexDirection: 'row',
