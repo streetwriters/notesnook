@@ -1,5 +1,5 @@
 import Topics from "../collections/topics";
-
+import { qclone } from "qclone";
 export default class Topic {
   /**
    *
@@ -30,7 +30,7 @@ export default class Topic {
   }
 
   async add(...noteIds) {
-    const topic = { ...this._topic };
+    const topic = qclone(this._topic);
     for (let noteId of noteIds) {
       let note = this._topics._notebooks._notes.note(noteId);
       if (this.has(noteId) || !note) continue;
