@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {createRef} from 'react';
 import {Modal, Text, TouchableOpacity, View} from 'react-native';
 import {TextInput} from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -18,6 +18,7 @@ export class AddTopicDialog extends React.Component {
     };
 
     this.title;
+    this.titleRef = createRef();
   }
 
   addNewTopic = async () => {
@@ -52,6 +53,9 @@ export class AddTopicDialog extends React.Component {
         animated
         animationType="fade"
         transparent={true}
+        onShow={() => {
+          this.titleRef.current?.focus();
+        }}
         onRequestClose={() => {
           refs = [];
           this.close();
@@ -102,6 +106,7 @@ export class AddTopicDialog extends React.Component {
             </View>
 
             <TextInput
+              ref={this.titleRef}
               style={{
                 padding: pv,
                 borderWidth: 1.5,

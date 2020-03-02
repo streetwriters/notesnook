@@ -206,9 +206,7 @@ export class AddNotebookDialog extends React.Component {
         animated
         animationType="fade"
         onShow={() => {
-          setTimeout(() => {
-            this.titleRef.focus();
-          }, 300);
+          this.titleRef.focus();
         }}
         onRequestClose={this.close}>
         <KeyboardAvoidingView
