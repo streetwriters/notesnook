@@ -20,13 +20,7 @@ const Topic = ({ item, index, onClick }) => {
     <ListItem
       onClick={onClick}
       title={topic.title}
-      info={
-        <Text>
-          <Text as="span" color="text">
-            {topic.totalNotes} Notes
-          </Text>
-        </Text>
-      }
+      info={`${topic.totalNotes} Notes`}
       index={index}
       dropdownRefs={dropdownRefs}
       menuData={topic}
