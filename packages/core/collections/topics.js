@@ -31,7 +31,7 @@ export default class Topics {
   }
 
   async add(...topics) {
-    let notebook = { ...this._notebooks.notebook(this._notebookId).data };
+    let notebook = qclone(this._notebooks.notebook(this._notebookId).data);
     let allTopics = [...notebook.topics, ...topics];
     const unique = this._dedupe(allTopics);
 
