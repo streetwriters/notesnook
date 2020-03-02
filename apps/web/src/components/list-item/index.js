@@ -23,100 +23,99 @@ const ListItem = props => {
     `contextMenu${props.index}`
   );
   return (
-    <Flex
-      ref={parentRef}
-      alignItems="center"
-      justifyContent="space-between"
-      py={2}
-      bg={props.pinned || isSelected ? "shade" : "background"}
-      px={2}
-      sx={{
-        //position: "relative",
-        marginTop: props.pinned ? 4 : 0,
-        borderBottom: "1px solid",
-        borderBottomColor: "navbg",
-        cursor: "default",
-        ":hover": {
-          borderBottomColor: "primary",
-          cursor: "pointer"
-        }
-        //TODO add onpressed reaction
-      }}
-    >
-      {props.pinned && (
-        <Flex
-          bg="primary"
-          sx={{
-            borderRadius: 35,
-            width: 30,
-            height: 30,
-            position: "absolute",
-            top: 10,
-            left: 0,
-            marginTop: 0,
-            boxShadow: "2px 1px 3px #00000066"
-          }}
-          mx={2}
-          alignItems="center"
-          justifyContent="center"
-        >
-          <Box
-            bg="static"
-            sx={{
-              borderRadius: 5,
-              width: 5,
-              height: 5
-            }}
-          />
-        </Flex>
-      )}
-      <Box
-        onClick={() => {
-          //e.stopPropagation();
-          if (props.onClick) {
-            props.onClick();
-          }
-        }}
+    <Flex ref={parentRef}>
+      <Flex
+        flex="1 1 auto"
+        alignItems="center"
+        justifyContent="space-between"
+        bg={props.pinned || isSelected ? "shade" : "background"}
+        px={2}
         sx={{
-          flex: "1 1 auto",
-          paddingTop: props.pinned ? 4 : 0,
+          position: "relative",
+          marginTop: props.pinned ? 4 : 0,
+          paddingTop: props.pinned ? 0 : 2,
+          paddingBottom: 2,
+          borderBottom: "1px solid",
+          borderBottomColor: "navbg",
+          cursor: "default",
           ":hover": {
+            borderBottomColor: "primary",
             cursor: "pointer"
           }
+          //TODO add onpressed reaction
         }}
       >
-        <Flex flexDirection="row" justifyContent="space-between">
-          <Text fontFamily={"heading"} fontSize="title" fontWeight={"bold"}>
-            {props.title}
-          </Text>
-        </Flex>
-        <Text
-          display={props.body ? "flex" : "none"}
-          variant="body"
+        {props.pinned && (
+          <Flex
+            bg="primary"
+            sx={{
+              position: "absolute",
+              top: -15,
+              left: 0,
+              borderRadius: 35,
+              width: 30,
+              height: 30,
+              boxShadow: "2px 1px 3px #00000066"
+            }}
+            mx={2}
+            alignItems="center"
+            justifyContent="center"
+          >
+            <Box
+              bg="static"
+              sx={{
+                borderRadius: 5,
+                width: 5,
+                height: 5
+              }}
+            />
+          </Flex>
+        )}
+        <Box
+          onClick={() => {
+            //e.stopPropagation();
+            if (props.onClick) {
+              props.onClick();
+            }
+          }}
           sx={{
-            marginBottom: 1,
+            flex: "1 1 auto",
+            paddingTop: props.pinned ? 4 : 0,
             ":hover": {
               cursor: "pointer"
-            },
-            flexWrap: "wrap"
+            }
           }}
         >
-          {props.body}
-        </Text>
-        {props.subBody && props.subBody}
-        <Text
-          display={props.info ? "flex" : "none"}
-          variant="body"
-          fontSize={11}
-          color="fontTertiary"
-          sx={{ marginTop: 2 }}
-        >
-          {props.info}
-        </Text>
-      </Box>
-      {props.menuItems && props.dropdownRefs && (
-        <>
-          {" "}
+          <Flex flexDirection="row" justifyContent="space-between">
+            <Text fontFamily={"heading"} fontSize="title" fontWeight={"bold"}>
+              {props.title}
+            </Text>
+          </Flex>
+          <Text
+            display={props.body ? "flex" : "none"}
+            variant="body"
+            sx={{
+              marginBottom: 1,
+              ":hover": {
+                cursor: "pointer"
+              },
+              flexWrap: "wrap"
+            }}
+          >
+            {props.body}
+          </Text>
+          {props.subBody && props.subBody}
+          <Text
+            display={props.info ? "flex" : "none"}
+            variant="body"
+            fontSize={11}
+            color="fontTertiary"
+            sx={{ marginTop: 2 }}
+          >
+            {props.info}
+          </Text>
+        </Box>
+        {props.menuItems && props.dropdownRefs && (
           <Dropdown
             style={{ zIndex: 1, marginRight: -4 }}
             ref={ref => (props.dropdownRefs[props.index] = ref)}
@@ -134,16 +133,18 @@ const ListItem = props => {
               <ActionsMenu {...props} />
             </DropdownContent>
           </Dropdown>
-          <ActionsMenu
-            {...props}
-            id={`contextMenu${props.index}`}
-            style={{
-              position: "absolute",
-              display: "none",
-              zIndex: 999
-            }}
-          />
-        </>
+        )}
+      </Flex>
+      {props.menuItems && props.dropdownRefs && (
+        <ActionsMenu
+          {...props}
+          id={`contextMenu${props.index}`}
+          style={{
+            position: "absolute",
+            display: "none",
+            zIndex: 999
+          }}
+        />
       )}
     </Flex>
   );
