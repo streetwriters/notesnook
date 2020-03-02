@@ -205,6 +205,11 @@ export class AddNotebookDialog extends React.Component {
         transparent={true}
         animated
         animationType="fade"
+        onShow={() => {
+          setTimeout(() => {
+            this.titleRef.focus();
+          }, 300);
+        }}
         onRequestClose={this.close}>
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : null}
