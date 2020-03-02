@@ -15,7 +15,7 @@ export default class TitleBox extends React.Component {
   }
 
   render() {
-    const { title, setTitle } = this.props;
+    const { title, setTitle, sx } = this.props;
     return (
       <Input
         ref={ref => (this.inputRef = ref)}
@@ -25,12 +25,12 @@ export default class TitleBox extends React.Component {
         fontWeight="heading"
         fontSize="heading"
         display={["none", "flex", "flex"]}
+        px={2}
         sx={{
           borderWidth: 0,
-          ":focus": { outline: "none" }
+          ":focus": { outline: "none" },
+          ...sx
         }}
-        py={2}
-        px={2}
         value={title}
         onChange={e => {
           setTitle(e.target.value);

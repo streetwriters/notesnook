@@ -10,6 +10,7 @@ const SESSION_STATES = {
 
 const DEFAULT_SESSION = {
   state: "",
+  isSaving: false,
   title: "",
   timeout: 0,
   id: "",
@@ -17,6 +18,7 @@ const DEFAULT_SESSION = {
   favorite: false,
   tags: [],
   colors: [],
+  dateEdited: 0,
   content: {
     text: "",
     delta: {
@@ -44,12 +46,16 @@ function editorStore(set, get) {
           favorite: note.favorite,
           colors: note.colors,
           tags: note.tags,
+          dateEdited: note.dateEdited,
           content,
           state: SESSION_STATES.new
         };
       });
     },
     saveSession: function(oldSession) {
+      set(state => {
+        state.session.isSaving = true;
+      });
       const { session } = get();
       const { title, id, content, pinned, favorite, tags, colors } = session;
       let note = {
@@ -72,6 +78,7 @@ function editorStore(set, get) {
             noteStore.getState().setSelectedNote(id);
           }
           state.session.id = id;
+          state.session.isSaving = false;
           noteStore.getState().refresh();
 
           // we update favorites only if favorite has changed
