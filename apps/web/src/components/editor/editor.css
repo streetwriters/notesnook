@@ -144,3 +144,14 @@
 .ql-editor.ql-blank::before {
   color: var(--placeholder) !important;
 }
+
+.ql-editor .ql-syntax,
+code {
+  font-family: monospace !important;
+  font-size: 14px;
+}
+
+.ql-editor .ql-syntax * {
+  font-family: monospace !important;
+  font-size: 14px;
+}
