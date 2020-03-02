@@ -19,6 +19,7 @@ export default class TitleBox extends React.Component {
     return (
       <Input
         ref={ref => (this.inputRef = ref)}
+        maxLength={120}
         placeholder="Untitled"
         fontFamily="heading"
         fontWeight="heading"
