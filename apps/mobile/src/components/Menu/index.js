@@ -189,7 +189,7 @@ export const Menu = ({
       )}
 
       <ScrollView
-        contentContainerStyle={{minHeight: '80%'}}
+        contentContainerStyle={{minHeight: '50%'}}
         style={{
           paddingHorizontal: noTextMode ? 0 : 12,
         }}
