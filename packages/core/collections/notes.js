@@ -51,7 +51,7 @@ export default class Notes {
       return;
     }
 
-    if (!(note.content.delta instanceof String)) {
+    if (note.content.delta.ops) {
       await this._deltaStorage.write(id + "_delta", note.content.delta);
     }
 
