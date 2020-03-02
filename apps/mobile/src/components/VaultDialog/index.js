@@ -8,6 +8,7 @@ import {getElevation} from '../../utils/utils';
 import NavigationService from '../../services/NavigationService';
 
 import {updateEvent} from '../DialogManager';
+import Share from 'react-native-share';
 
 export class VaultDialog extends Component {
   constructor(props) {
@@ -24,24 +25,19 @@ export class VaultDialog extends Component {
     });
   };
   close = (share = false, item = null) => {
-    this.setState(
-      {
-        visible: false,
-      },
+    if (share && item) {
+      let m = `${item.title}\n \n ${item.content.text}`;
+      Share.open({
+        title: 'Share note to',
+        failOnCancel: false,
+        message: m,
+      });
+      updateEvent({type: item.type});
+    }
 
-      () => {
-        if (share && note) {
-          let m = `${item.title}\n \n ${item.content.text}`;
-
-          Share.open({
-            title: 'Share note to',
-            failOnCancel: false,
-            message: m,
-          });
-        }
-        updateEvent({type: this.props.note.type});
-      },
-    );
+    this.setState({
+      visible: false,
+    });
   };
 
   onPress = async () => {
