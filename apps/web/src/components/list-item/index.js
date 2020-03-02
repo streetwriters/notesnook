@@ -27,7 +27,7 @@ const ListItem = props => {
       ref={parentRef}
       alignItems="center"
       justifyContent="space-between"
-      py={1}
+      py={2}
       bg={props.pinned || isSelected ? "shade" : "background"}
       px={2}
       sx={{
@@ -51,9 +51,9 @@ const ListItem = props => {
             width: 30,
             height: 30,
             position: "absolute",
-            top: -15,
+            top: 10,
             left: 0,
-            marginTop: 5,
+            marginTop: 0,
             boxShadow: "2px 1px 3px #00000066"
           }}
           mx={2}
@@ -107,8 +107,9 @@ const ListItem = props => {
         <Text
           display={props.info ? "flex" : "none"}
           variant="body"
-          fontSize={10}
+          fontSize={11}
           color="fontTertiary"
+          sx={{ marginTop: 2 }}
         >
           {props.info}
         </Text>
@@ -129,7 +130,7 @@ const ListItem = props => {
                 />
               </Text>
             </DropdownTrigger>
-            <DropdownContent style={{ zIndex: 2, marginLeft: -110 }}>
+            <DropdownContent style={{ zIndex: 2, marginLeft: -130 }}>
               <ActionsMenu {...props} />
             </DropdownContent>
           </Dropdown>

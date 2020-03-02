@@ -48,13 +48,13 @@ const theme = (colors, shadows) => ({
   colors: colors,
   space: [0, 5, 10, 12, 15],
   fontSizes: {
-    heading: 26,
+    heading: 28,
     input: 14,
-    title: 16,
+    title: 18,
     subtitle: 16,
-    body: 12,
-    menu: 12,
-    subBody: 10
+    body: 14,
+    menu: 14,
+    subBody: 11
   },
   fontWeights: {
     body: 400,
@@ -209,7 +209,7 @@ const getTheme = (type, accent) =>
     : theme(colorsLight(accent), shadowsLight);
 
 var currentTheme = window.localStorage.getItem("theme") || "light";
-var currentAccent = window.localStorage.getItem("accent") || "#1790F3";
+var currentAccent = window.localStorage.getItem("accent") || "#0560ff";
 
 export const ThemeProvider = props => {
   const [, updateState] = React.useState();

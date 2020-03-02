@@ -10,7 +10,8 @@ const Search = props => (
     justifyContent="center"
     alignItems="center"
     sx={{
-      position: "relative"
+      position: "relative",
+      marginBottom: 0
     }}
   >
     <Input

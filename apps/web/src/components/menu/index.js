@@ -13,11 +13,21 @@ function Menu(props) {
         position: "relative",
         borderRadius: "default",
         boxShadow: 2,
-        width: 120,
+        width: 140,
         ...props.sx
       }}
     >
       <Box width="100%">
+        <Text
+          fontFamily="body"
+          fontSize="body"
+          color="primary"
+          py={"8px"}
+          px={3}
+          sx={{ borderBottom: "1px solid", borderBottomColor: "border" }}
+        >
+          Properties
+        </Text>
         {props.menuItems.map(item => (
           <Flex
             key={item.title}
@@ -33,8 +43,8 @@ function Menu(props) {
             }}
             flexDirection="row"
             alignItems="center"
-            py={1}
-            px={2}
+            py={"8px"}
+            px={3}
             sx={{
               color: item.color || "fontPrimary",
               ":hover": {
@@ -42,7 +52,7 @@ function Menu(props) {
               }
             }}
           >
-            <Text as="span" mx={1} fontFamily="body" fontSize="menu">
+            <Text as="span" fontFamily="body" fontSize="menu">
               {item.title}
             </Text>
           </Flex>

@@ -44,7 +44,12 @@ function Home() {
           notes.groups[groupIndex].title === "Pinned" ? (
             <Box px={2} bg="background" py={1} />
           ) : (
-            <Box px={2} bg="background">
+            <Box
+              mx={2}
+              bg="background"
+              py={2}
+              sx={{ borderBottom: "1px solid", borderBottomColor: "primary" }}
+            >
               <Text variant="heading" color="primary" fontSize="subtitle">
                 {notes.groups[groupIndex].title}
               </Text>

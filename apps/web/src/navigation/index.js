@@ -81,7 +81,7 @@ const NavigationContainer = props => {
     <ThemeProvider>
       <Flex flexDirection="column" px={2}>
         {(props.route.title || props.route.params.title) && (
-          <Flex alignItems="center" py={1}>
+          <Flex alignItems="center" py={2}>
             {props.canGoBack && (
               <Box
                 onClick={props.backAction}

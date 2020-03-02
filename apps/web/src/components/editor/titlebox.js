@@ -27,10 +27,9 @@ export default class TitleBox extends React.Component {
         display={["none", "flex", "flex"]}
         sx={{
           borderWidth: 0,
-          ":focus": { outline: "none" },
-          paddingTop: 1,
-          paddingBottom: 1
+          ":focus": { outline: "none" }
         }}
+        py={2}
         px={2}
         value={title}
         onChange={e => {

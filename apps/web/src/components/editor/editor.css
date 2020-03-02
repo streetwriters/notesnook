@@ -33,6 +33,7 @@
   border-bottom: 1px solid var(--border) !important;
   border-top: 1px solid var(--border) !important;
   padding: 5px !important;
+  padding-bottom: 10px !important;
 }
 
 /*Color Overrides*/

@@ -9,8 +9,8 @@ const Button = props => {
     <Flex
       bg="primary"
       width={props.width}
-      py={2}
-      px={2}
+      py={3}
+      px={3}
       mx={2}
       flexDirection="row"
       alignItems="center"
@@ -30,7 +30,7 @@ const Button = props => {
       onClick={props.onClick}
     >
       {props.Icon && <props.Icon />}
-      <Text as="span" mx={1} fontSize={14} flex="1 1 auto">
+      <Text as="span" mx={1} fontSize={"body"} flex="1 1 auto">
         {props.content}
       </Text>
     </Flex>
