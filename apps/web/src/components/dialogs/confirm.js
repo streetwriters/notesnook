@@ -10,7 +10,7 @@ function Confirm(props) {
       icon={props.icon}
       content={
         <Box my={1}>
-          <Text>{props.message}</Text>
+          <Text textAlign="center">{props.message}</Text>
         </Box>
       }
       positiveButton={{

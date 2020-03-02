@@ -14,7 +14,7 @@ const colorsLight = primary =>
     hover: "#e0e0e0",
     fontSecondary: "white",
     text: "#000000",
-    overlay: "rgba(255, 255, 255, 0.75)",
+    overlay: "rgba(0, 0, 0, 0.1)",
     secondary: "white"
   });
 const colorsDark = primary =>
@@ -27,7 +27,7 @@ const colorsDark = primary =>
     hover: "#3b3b3b",
     fontSecondary: "#000",
     text: "#ffffff",
-    overlay: "rgba(0, 0, 0, 0.75)",
+    overlay: "rgba(255, 255, 255, 0.5)",
     secondary: "black"
   });
 

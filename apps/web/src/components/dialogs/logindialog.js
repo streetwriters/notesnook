@@ -10,6 +10,8 @@ const LoginDialog = props => (
     title={"Login"}
     icon={Icon.LogIn}
     onCloseClick={props.onClose}
+    negativeButton={{ onClick: props.onClose }}
+    positiveButton={{ text: "Login" }}
     content={
       <Box my={1}>
         <Input variant="default" placeholder="Email"></Input>
@@ -18,10 +20,11 @@ const LoginDialog = props => (
           placeholder="Password"
           sx={{ marginTop: 2 }}
         ></Input>
-        <Button width={1} my={2}>
-          Login
-        </Button>
-        <Flex flexDirection="row" justifyContent="space-between">
+        <Flex
+          flexDirection="row"
+          justifyContent="space-between"
+          sx={{ marginTop: 2 }}
+        >
           <Button variant="links">Create a New Account</Button>
           <Button variant="links" alignItems="right">
             Forgot password?

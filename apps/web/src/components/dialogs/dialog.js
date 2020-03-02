@@ -13,7 +13,7 @@ export default class Dialog extends React.Component {
           <Modal
             isOpen={props.isOpen || false}
             shouldCloseOnOverlayClick={true}
-            onRequestClose={props.closeCick}
+            onRequestClose={props.negativeButton.onClick}
             style={{
               content: {
                 top: "50%",
@@ -28,8 +28,8 @@ export default class Dialog extends React.Component {
                 color: theme.colors.text,
                 boxShadow: theme.shadows["3"],
                 width: "25%",
-                paddingRight: 40,
-                paddingLeft: 40,
+                paddingRight: 20,
+                paddingLeft: 20,
                 overflowY: "hidden"
               },
               overlay: {
@@ -45,7 +45,7 @@ export default class Dialog extends React.Component {
                 alignSelf="center"
                 justifyContent="center"
                 color="primary"
-                py={2}
+                sx={{ paddingBottom: 2 }}
               >
                 <Box height={props.iconSize || 32}>
                   <props.icon size={props.iconSize || 32} />
@@ -63,7 +63,7 @@ export default class Dialog extends React.Component {
               {props.content}
               <Flex
                 flexDirection="row"
-                my={1}
+                sx={{ marginTop: 3 }}
                 justifyContent="center"
                 alignItems="center"
               >
@@ -72,7 +72,7 @@ export default class Dialog extends React.Component {
                     variant="primary"
                     sx={{ opacity: props.positiveButton.disabled ? 0.7 : 1 }}
                     mx={1}
-                    width={"25%"}
+                    width={"50%"}
                     disabled={props.positiveButton.disabled || false}
                     onClick={props.positiveButton.onClick}
                   >
@@ -83,7 +83,7 @@ export default class Dialog extends React.Component {
                 {props.negativeButton && (
                   <RebassButton
                     variant="secondary"
-                    width={"25%"}
+                    width={"50%"}
                     onClick={props.negativeButton.onClick}
                   >
                     {props.negativeButton.text || "Cancel"}
