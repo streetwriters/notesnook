@@ -14,7 +14,7 @@ import NavigationService from '../../services/NavigationService';
 import {getElevation, ToastEvent, editing} from '../../utils/utils';
 import {dialogActions, updateEvent} from '../DialogManager';
 import {eSendEvent} from '../../services/eventManager';
-import {eCloseFullscreenEditor} from '../../services/events';
+import {eCloseFullscreenEditor, eOnLoadNote} from '../../services/events';
 
 export class Dialog extends Component {
   constructor(props) {
@@ -51,7 +51,12 @@ export class Dialog extends Component {
           visible: false,
         });
         if (editing.currentlyEditing) {
-          NavigationService.goBack();
+          if (DDS.isTab) {
+            eSendEvent(eCloseFullscreenEditor);
+            eSendEvent(eOnLoadNote, {type: 'new'});
+          } else {
+            NavigationService.goBack();
+          }
         }
         break;
       }

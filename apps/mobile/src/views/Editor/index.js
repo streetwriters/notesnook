@@ -407,6 +407,7 @@ const Editor = ({navigation, noMenu}) => {
               onPress={() => {
                 eSendEvent(eOpenFullscreenEditor);
                 setFullscreen(true);
+                editing.isFullscreen = true;
                 post(
                   JSON.stringify({
                     type: 'nomenu',
@@ -535,10 +536,12 @@ const Editor = ({navigation, noMenu}) => {
 
   useEffect(() => {
     editing.currentlyEditing = true;
+
     let handleBack;
     if (!noMenu && DDS.isTab) {
       handleBack = BackHandler.addEventListener('hardwareBackPress', () => {
         simpleDialogEvent(TEMPLATE_EXIT_FULLSCREEN());
+        editing.isFullscreen = false;
         return true;
       });
     } else if (!DDS.isTab) {
