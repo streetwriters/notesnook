@@ -43,8 +43,8 @@ export default class Topic {
         )
           return this;
         await this._topics._notebooks
-          .topics(note.notebook.id)
-          .topic(note.notebook.topic)
+          .notebook(note.notebook.id)
+          .topics.topic(note.notebook.topic)
           .delete(note.id);
       }
       await this._topics._notebooks._notes.add({

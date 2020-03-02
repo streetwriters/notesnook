@@ -280,19 +280,24 @@ test("duplicate note to topic should not be added", () =>
     expect(topic.all.length).toBe(1);
   }));
 
-test("move note", () =>
+test("move note", done =>
   noteTest().then(async ({ db, id }) => {
-    let notebookId = await db.notebooks.add({ title: "Hello" });
+    let { id: notebookId } = await db.notebooks.add({ title: "Hello" });
     let topics = db.notebooks.notebook(notebookId).topics;
     await topics.add("Home");
     let topic = topics.topic("Home");
     await topic.add(id);
     setTimeout(async () => {
-      let notebookId2 = await db.notebooks.add({ title: "Hello2" });
-      await db.notebooks.notebook(notebookId2).topics.add("Home2");
-      await db.notes.move({ id: notebookId2, topic: "Home2" }, id);
-      let note = db.notes.note(id);
-      expect(note.notebook.id).toBe(notebookId2);
+      try {
+        let { id: notebookId2 } = await db.notebooks.add({ title: "Hello2" });
+        await db.notebooks.notebook(notebookId2).topics.add("Home2");
+        await db.notes.move({ id: notebookId2, topic: "Home2" }, id);
+        let note = db.notes.note(id);
+        expect(note.notebook.id).toBe(notebookId2);
+        done();
+      } catch (error) {
+        done(error);
+      }
     }, 1000);
   }));
 

@@ -195,9 +195,7 @@ export default class Notes {
       );
     let topic = this._notebooks.notebook(to.id).topics.topic(to.topic);
     if (!topic) throw new Error("No such topic exists.");
-    await topic.transaction(async () => {
-      await topic.add(...noteIds);
-    });
+    await topic.add(...noteIds);
   }
 }
 
