@@ -10,7 +10,7 @@ import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
 import {eScrollEvent} from '../../services/events';
-import {ToastEvent} from '../../utils/utils';
+import {ToastEvent, w} from '../../utils/utils';
 
 export const Favorites = ({navigation}) => {
   const [state, dispatch] = useTracked();
