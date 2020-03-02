@@ -14,7 +14,8 @@ function notebookStore(set) {
       let notebook = await db.notebooks.add(nb);
       if (notebook) {
         set(state => {
-          state.notebooks.push(nb);
+          //TODO investigate ways to improve perf
+          state.notebooks = db.notebooks.all;
         });
       }
     },
