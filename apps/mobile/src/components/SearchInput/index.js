@@ -98,7 +98,7 @@ export const Search = props => {
               text: '',
             });
           }}
-          name={searchResults.length > 0 ? 'x' : 'magnify'}
+          name={searchResults.length > 0 ? 'close' : 'magnify'}
           color={
             focus
               ? props.headerColor
