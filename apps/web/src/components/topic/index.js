@@ -1,5 +1,4 @@
 import React from "react";
-import { Text } from "rebass";
 import * as Icon from "react-feather";
 import ListItem from "../list-item";
 
