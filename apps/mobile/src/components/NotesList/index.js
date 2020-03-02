@@ -194,7 +194,7 @@ export const NotesList = ({isGrouped = false}) => {
   );
 
   const _listKeyExtractor = (item, index) => item.id.toString();
- 
+
   return isGrouped && searchResults.length === 0 ? (
     <SectionList
       ref={ref => (sectionListRef = ref)}
@@ -288,6 +288,7 @@ const PinnedItems = () => {
                 borderBottomWidth: 0,
                 marginHorizontal: 0,
               }}
+              onLongPress={() => {}}
               pinned={true}
               item={item}
               index={index}
