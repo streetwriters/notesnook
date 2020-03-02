@@ -6,7 +6,7 @@ import { db } from "../common";
 import { store } from "../stores/note-store";
 
 const TagNode = ({ title }) => (
-  <Text as="span" fontFamily={"body"} fontSize="title" fontWeight={"body"}>
+  <Text as="span" variant="title">
     <Text as="span" color="primary">
       {"#"}
     </Text>
