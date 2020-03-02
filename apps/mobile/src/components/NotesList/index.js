@@ -18,6 +18,7 @@ import {NotesPlaceHolder} from '../ListPlaceholders';
 import NoteItem from '../NoteItem';
 import SelectionWrapper from '../SelectionWrapper';
 import {db, DDS} from '../../../App';
+import {inputRef} from '../SearchInput';
 
 export const NotesList = ({isGrouped = false}) => {
   const [state, dispatch] = useTracked();
@@ -178,6 +179,9 @@ export const NotesList = ({isGrouped = false}) => {
       </Text>
       <Text
         onPress={() => {
+          inputRef.current?.setNativeProps({
+            text: '',
+          });
           dispatch({
             type: ACTIONS.SEARCH_RESULTS,
             results: [],
