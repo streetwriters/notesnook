@@ -10,7 +10,7 @@ beforeEach(() => StorageInterface.clear());
 
 test("delete a note", () =>
   noteTest().then(async ({ db, id }) => {
-    let nbId = await db.notebooks.add(TEST_NOTEBOOK);
+    let { id: nbId } = await db.notebooks.add(TEST_NOTEBOOK);
     await db.notebooks
       .notebook(nbId)
       .topics.topic("General")

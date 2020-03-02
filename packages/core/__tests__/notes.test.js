@@ -37,11 +37,11 @@ test("get delta of note", () =>
 
 test("delete note", () =>
   noteTest().then(async ({ db, id }) => {
-    let notebookId = await db.notebooks.add(TEST_NOTEBOOK);
-    let topic = await db.notebooks
-      .notebook(notebookId)
-      .topics.topic("General")
-      .add(id);
+    let { id: notebookId } = await db.notebooks.add(TEST_NOTEBOOK);
+    let topics = db.notebooks.notebook(notebookId).topics;
+    let topic = topics.topic("General");
+    await topic.add(id);
+    topic = topics.topic("General");
     expect(topic.all.findIndex(v => v.id === id)).toBeGreaterThan(-1);
     await db.notes.delete(id);
     expect(db.notes.note(id)).toBeUndefined();
@@ -272,11 +272,12 @@ test("add note to topic", () =>
 
 test("duplicate note to topic should not be added", () =>
   noteTest().then(async ({ db, id }) => {
-    let notebookId = await db.notebooks.add({ title: "Hello" });
+    let { id: notebookId } = await db.notebooks.add({ title: "Hello" });
     let topics = db.notebooks.notebook(notebookId).topics;
     await topics.add("Home");
     let topic = topics.topic("Home");
     await topic.add(id);
+    topic = topics.topic("Home");
     expect(topic.all.length).toBe(1);
   }));
 

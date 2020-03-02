@@ -26,7 +26,10 @@ const notebookTest = (notebook = TEST_NOTEBOOK) =>
   });
 
 var TEST_NOTE = {
-  content: { delta: "I am a delta", text: "I am a text" }
+  content: {
+    delta: { ops: [{ type: "insert", text: "I am a delta" }] },
+    text: "I am a text"
+  }
 };
 
 const LONG_TEXT =
