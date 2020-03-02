@@ -41,7 +41,7 @@ export const Notes = ({navigation}) => {
       init();
       dispatch({
         type: ACTIONS.CURRENT_SCREEN,
-        screen: param.type,
+        screen: params.type,
       });
     }
   }, [isFocused, allNotes, colorNotes]);
