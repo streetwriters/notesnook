@@ -13,7 +13,7 @@ const colorsLight = primary =>
     border: "#f0f0f0",
     hover: "#e0e0e0",
     fontSecondary: "white",
-    text: "black",
+    text: "#000000",
     overlay: "rgba(255, 255, 255, 0.75)",
     secondary: "white"
   });
@@ -26,7 +26,7 @@ const colorsDark = primary =>
     border: "#2b2b2b",
     hover: "#3b3b3b",
     fontSecondary: "#000",
-    text: "#fff",
+    text: "#ffffff",
     overlay: "rgba(0, 0, 0, 0.75)",
     secondary: "black"
   });
@@ -196,6 +196,7 @@ function makeTheme({
     fontTertiary: "gray",
     transparent: "transparent",
     text,
+    placeholder: hexToRGB(text, 0.6),
     overlay,
     static: "white",
     secondary

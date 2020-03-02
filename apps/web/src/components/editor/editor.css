@@ -140,3 +140,7 @@
   background-color: var(--accent) !important;
   padding: 5px 0px !important;
 }
+
+.ql-editor.ql-blank::before {
+  color: var(--placeholder) !important;
+}
