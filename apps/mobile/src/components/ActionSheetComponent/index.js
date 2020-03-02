@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, createRef} from 'react';
 import {
   Dimensions,
   StatusBar,
@@ -32,7 +32,7 @@ import NavigationService from '../../services/NavigationService';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
-let tagsInputRef;
+const tagsInputRef = createRef();
 export const ActionSheetComponent = ({
   close = () => {},
   item,
@@ -78,14 +78,16 @@ export const ActionSheetComponent = ({
   let backPressCount = 0;
 
   const _onSubmit = async () => {
-    if (!tagToAdd || tagToAdd === '') return;
-
+    if (!tagToAdd || tagToAdd === '' || tagToAdd.trimStart().length == 0) {
+      ToastEvent.show('Empty Tag', 'success');
+      return;
+    }
     let tag = tagToAdd;
 
     if (tag.includes(' ')) {
       tag = tag.replace(' ', '_');
     }
-    tagsInputRef.setNativeProps({
+    tagsInputRef.current?.setNativeProps({
       text: '',
     });
 
@@ -116,10 +118,20 @@ export const ActionSheetComponent = ({
 
         setNote({...db.notes.note(note.id).data});
 
-        tagsInputRef.setNativeProps({
+        tagsInputRef.current?.setNativeProps({
           text: tagInputValue,
         });
       }
+    } else if (event.nativeEvent.key === ' ') {
+      _onSubmit();
+      tagsInputRef.current?.setNativeProps({
+        text: '',
+      });
+    } else if (event.nativeE.key === ',') {
+      _onSubmit();
+      tagsInputRef.current?.setNativeProps({
+        text: '',
+      });
     }
   };
 
@@ -333,9 +345,14 @@ export const ActionSheetComponent = ({
       key={tag}
       onPress={async () => {
         let oldProps = {...note};
-
-        await db.notes.note(note.id).untag(oldProps.tags.indexOf(tag));
-        localRefresh(item.type);
+        try {
+          await db.notes
+            .note(note.id)
+            .untag(oldProps.tags[oldProps.tags.indexOf(tag)]);
+          localRefresh(oldProps.type);
+        } catch (e) {
+          localRefresh(oldProps.type);
+        }
       }}
       style={{
         flexDirection: 'row',
@@ -680,11 +697,21 @@ export const ActionSheetComponent = ({
               borderColor: focused ? colors.accent : colors.nav,
               paddingVertical: 5,
             }}>
+            <TouchableOpacity
+              onPress={() => {
+                tagsInputRef.current?.focus();
+              }}
+              style={{
+                position: 'absolute',
+                width: '100%',
+                height: '100%',
+              }}></TouchableOpacity>
             {note && note.tags ? note.tags.map(_renderTag) : null}
             <TextInput
               style={{
                 backgroundColor: 'transparent',
                 minWidth: 100,
+                zIndex: 10,
                 fontFamily: WEIGHT.regular,
                 color: colors.pri,
                 paddingHorizontal: 5,
@@ -692,7 +719,7 @@ export const ActionSheetComponent = ({
                 margin: 1,
               }}
               blurOnSubmit={false}
-              ref={ref => (tagsInputRef = ref)}
+              ref={tagsInputRef}
               placeholderTextColor={colors.icon}
               onFocus={() => {
                 setFocused(true);
