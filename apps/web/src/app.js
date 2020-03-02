@@ -86,6 +86,7 @@ function App() {
   const isSideMenuOpen = useStore(store => store.isSideMenuOpen);
   const refreshColors = useStore(store => store.refreshColors);
   const setSelectedContext = useNotesStore(store => store.setSelectedContext);
+
   useEffect(() => {
     RootNavigator.navigate(selectedKey);
     refreshColors();

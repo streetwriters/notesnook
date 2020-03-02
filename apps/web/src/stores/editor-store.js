@@ -27,17 +27,27 @@ const DEFAULT_SESSION = {
   }
 };
 
+function saveLastOpenedNote(id) {
+  if (!id) return localStorage.removeItem("lastOpenedNote");
+  localStorage.setItem("lastOpenedNote", id);
+}
+
 function editorStore(set, get) {
   return {
     session: DEFAULT_SESSION,
+    reopenLastSession: function() {
+      const id = localStorage.getItem("lastOpenedNote");
+      if (!id) return;
+      get().openSession(db.notes.note(id).data);
+    },
     openSession: async function(note) {
+      clearTimeout(get().session.timeout);
       const content = {
         text: note.content.text,
         delta: await db.notes.note(note).delta()
       };
       noteStore.getState().setSelectedNote(note.id);
       set(state => {
-        clearTimeout(state.session.timeout);
         state.session = {
           ...DEFAULT_SESSION,
           id: note.id,
@@ -51,6 +61,7 @@ function editorStore(set, get) {
           state: SESSION_STATES.new
         };
       });
+      saveLastOpenedNote(note.id);
     },
     saveSession: function(oldSession) {
       set(state => {
@@ -73,41 +84,46 @@ function editorStore(set, get) {
           updateContext("colors", colors);
           appStore.getState().refreshColors();
         }
+        let notesState = noteStore.getState();
+        if (get().session.id === "") {
+          noteStore.getState().setSelectedNote(id);
+        }
+
         set(state => {
-          if (state.session.id === "") {
-            noteStore.getState().setSelectedNote(id);
-          }
           state.session.id = id;
           state.session.isSaving = false;
-          noteStore.getState().refresh();
-
-          // we update favorites only if favorite has changed
-          if (!oldSession || oldSession.favorite !== session.favorite) {
-            noteStore.getState().refreshList(LIST_TYPES.fav);
-          }
         });
+
+        notesState.refresh();
+        saveLastOpenedNote(id);
+
+        // we update favorites only if favorite has changed
+        if (!oldSession || oldSession.favorite !== session.favorite) {
+          notesState.refreshList(LIST_TYPES.fav);
+        }
       });
     },
     setSession: function(session) {
       const oldSession = get().session;
+      clearTimeout(oldSession.timeout);
       set(state => {
         state.session.state = SESSION_STATES.stale;
         session(state);
-        clearTimeout(state.session.timeout);
         state.session.timeout = setTimeout(() => {
           get().saveSession(oldSession);
         }, 500);
       });
     },
     newSession: function(context = {}) {
+      clearTimeout(get().session.timeout);
       set(state => {
-        clearTimeout(state.session.timeout);
         state.session = {
           ...DEFAULT_SESSION,
           ...context,
           state: SESSION_STATES.new
         };
       });
+      saveLastOpenedNote();
     },
     setColor: function(color) {
       setTagOrColor(get().session, "colors", color, "color", get().setSession);

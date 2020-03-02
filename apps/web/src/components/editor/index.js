@@ -28,6 +28,8 @@ function Editor() {
   const sessionState = useStore(store => store.session.state);
   const setSession = useStore(store => store.setSession);
   const saveSession = useStore(store => store.saveSession);
+  const reopenLastSession = useStore(store => store.reopenLastSession);
+
   useEffect(() => {
     // move the toolbar outside (easiest way)
     const toolbar = document.querySelector(".ql-toolbar.ql-snow");
@@ -36,6 +38,10 @@ function Editor() {
       toolbarContainer.appendChild(toolbar);
     }
   }, []);
+
+  useEffect(() => {
+    reopenLastSession();
+  }, [reopenLastSession]);
 
   return (
     <Flex width={["0%", "0%", "100%"]} sx={{ position: "relative" }}>
