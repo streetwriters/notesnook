@@ -34,7 +34,12 @@ import {
   eOnLoadNote,
   eOpenFullscreenEditor,
 } from '../../services/events';
-import {SideMenuEvent, timeConverter, ToastEvent} from '../../utils/utils';
+import {
+  SideMenuEvent,
+  timeConverter,
+  ToastEvent,
+  editing,
+} from '../../utils/utils';
 import {AnimatedSafeAreaView} from '../Home';
 import NavigationService from '../../services/NavigationService';
 
@@ -47,6 +52,7 @@ var title = null;
 let timer = null;
 let saveCounter = 0;
 let tapCount = 0;
+
 const Editor = ({navigation, noMenu}) => {
   // Global State
   const [state, dispatch] = useTracked();
@@ -358,7 +364,7 @@ const Editor = ({navigation, noMenu}) => {
                 content = null;
                 note = null;
                 id = null;
-
+                ToastEvent.show('Note Saved!', 'success');
                 NavigationService.goBack();
               }
             }}
@@ -528,6 +534,7 @@ const Editor = ({navigation, noMenu}) => {
   });
 
   useEffect(() => {
+    editing.currentlyEditing = true;
     let handleBack;
     if (!noMenu && DDS.isTab) {
       handleBack = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -542,6 +549,7 @@ const Editor = ({navigation, noMenu}) => {
           content = null;
           note = null;
           id = null;
+          ToastEvent.show('Note Saved!', 'success');
           return false;
         } else {
           tapCount = 1;
@@ -560,6 +568,7 @@ const Editor = ({navigation, noMenu}) => {
     }
 
     return () => {
+      editing.currentlyEditing = false;
       if (handleBack) {
         handleBack.remove();
         handleBack = null;

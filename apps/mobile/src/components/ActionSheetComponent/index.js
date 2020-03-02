@@ -42,7 +42,7 @@ export const ActionSheetComponent = ({
   columnItems = [],
 }) => {
   const [state, dispatch] = useTracked();
-  const {colors, tags} = state;
+  const {colors, tags, currentEditingNote} = state;
   const [focused, setFocused] = useState(false);
   const [note, setNote] = useState(
     item

@@ -11,7 +11,7 @@ import {db, DDS} from '../../../App';
 import {opacity, ph, pv, SIZE, WEIGHT} from '../../common/common';
 import {ACTIONS} from '../../provider/actions';
 import NavigationService from '../../services/NavigationService';
-import {getElevation, ToastEvent} from '../../utils/utils';
+import {getElevation, ToastEvent, editing} from '../../utils/utils';
 import {dialogActions, updateEvent} from '../DialogManager';
 import {eSendEvent} from '../../services/eventManager';
 import {eCloseFullscreenEditor} from '../../services/events';
@@ -35,13 +35,11 @@ export class Dialog extends Component {
           ToastEvent.show('Note moved to trash', 'error', 3000);
           updateEvent({type: item.type});
         } else if (item.type === 'topic') {
-          console.log(item);
-          //TODO
-
           await db.notebooks
             .notebook(item.notebookId)
             .topics.delete(item.title);
           updateEvent({type: 'notebook'});
+
           ToastEvent.show('Topic deleted', 'error', 3000);
         } else if (item.type === 'notebook') {
           await db.notebooks.delete(item.id);
@@ -52,6 +50,9 @@ export class Dialog extends Component {
         this.setState({
           visible: false,
         });
+        if (editing.currentlyEditing) {
+          NavigationService.goBack();
+        }
         break;
       }
       case dialogActions.ACTION_EXIT: {

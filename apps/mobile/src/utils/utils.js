@@ -18,6 +18,10 @@ export const getElevation = elevation => {
   };
 };
 
+export const editing = {
+  currentlyEditing: false,
+};
+
 export function timeSince(date) {
   var seconds = Math.floor((new Date() - date) / 1000);
 
