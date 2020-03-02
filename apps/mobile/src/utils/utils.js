@@ -20,6 +20,11 @@ export const getElevation = elevation => {
 
 export const editing = {
   currentlyEditing: false,
+  isFullscreen: false,
+};
+
+export const history = {
+  selectedItemsList: [],
 };
 
 export function timeSince(date) {

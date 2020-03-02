@@ -355,17 +355,11 @@ const Editor = ({navigation, noMenu}) => {
 
         {noMenu ? null : (
           <TouchableOpacity
-            onPress={() => {
+            onPress={async () => {
               if (DDS.isTab) {
                 simpleDialogEvent(TEMPLATE_EXIT_FULLSCREEN());
               } else {
-                tapCount = 0;
-                title = null;
-                content = null;
-                note = null;
-                id = null;
-                ToastEvent.show('Note Saved!', 'success');
-                NavigationService.goBack();
+                await closeEditor();
               }
             }}
             style={{
@@ -534,6 +528,33 @@ const Editor = ({navigation, noMenu}) => {
     };
   });
 
+  const closeEditor = async () => {
+    await saveNote();
+    title = null;
+    content = null;
+    note = null;
+    id = null;
+    dateEdited = null;
+    tapCount = 0;
+    NavigationService.goBack();
+    ToastEvent.show('Note Saved!', 'success');
+  };
+
+  const _onHardwareBackPress = async () => {
+    if (tapCount > 0) {
+      await closeEditor();
+
+      return true;
+    } else {
+      tapCount = 1;
+      setTimeout(() => {
+        tapCount = 0;
+      }, 3000);
+      ToastEvent.show('Press back again to exit editor', 'success');
+      return true;
+    }
+  };
+
   useEffect(() => {
     editing.currentlyEditing = true;
 
@@ -545,24 +566,10 @@ const Editor = ({navigation, noMenu}) => {
         return true;
       });
     } else if (!DDS.isTab) {
-      handleBack = BackHandler.addEventListener('hardwareBackPress', () => {
-        if (tapCount > 0) {
-          tapCount = 0;
-          title = null;
-          content = null;
-          note = null;
-          id = null;
-          ToastEvent.show('Note Saved!', 'success');
-          return false;
-        } else {
-          tapCount = 1;
-          setTimeout(() => {
-            tapCount = 0;
-          }, 3000);
-          ToastEvent.show('Press back again to exit editor', 'success');
-          return true;
-        }
-      });
+      handleBack = BackHandler.addEventListener(
+        'hardwareBackPress',
+        _onHardwareBackPress,
+      );
     } else {
       if (handleBack) {
         handleBack.remove();

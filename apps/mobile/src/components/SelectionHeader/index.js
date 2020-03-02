@@ -14,8 +14,9 @@ import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {w, ToastEvent} from '../../utils/utils';
 import {eSendEvent} from '../../services/eventManager';
-import {eOpenMoveNoteDialog} from '../../services/events';
+import {eOpenMoveNoteDialog, eOpenSimpleDialog} from '../../services/events';
 import {db} from '../../../App';
+import {TEMPLATE_DELETE} from '../DialogManager';
 
 export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(
   SafeAreaView,
@@ -105,6 +106,7 @@ export const SelectionHeader = ({navigation}) => {
             <TouchableOpacity
               onPress={() => {
                 dispatch({type: ACTIONS.SELECTION_MODE, enabled: false});
+                dispatch({type: ACTIONS.CLEAR_SELECTION});
                 eSendEvent(eOpenMoveNoteDialog);
               }}>
               <Icon
@@ -144,6 +146,8 @@ export const SelectionHeader = ({navigation}) => {
           {currentScreen === 'trash' ? null : (
             <TouchableOpacity
               onPress={async () => {
+                eSendEvent(eOpenSimpleDialog, TEMPLATE_DELETE('item'));
+                return;
                 if (selectedItemsList.length > 0) {
                   let noteIds = [];
                   selectedItemsList.forEach(item => {
