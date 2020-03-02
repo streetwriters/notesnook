@@ -46,12 +46,10 @@ export const Folders = ({navigation}) => {
     dispatch({type: ACTIONS.NOTEBOOKS});
 
     if (isFocused) {
-      if (isFocused) {
-        dispatch({
-          type: ACTIONS.CURRENT_SCREEN,
-          screen: 'notebooks',
-        });
-      }
+      dispatch({
+        type: ACTIONS.CURRENT_SCREEN,
+        screen: 'notebooks',
+      });
     }
 
     let backhandler;
