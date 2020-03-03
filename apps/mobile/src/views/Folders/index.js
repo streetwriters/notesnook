@@ -222,11 +222,15 @@ export const Folders = ({navigation}) => {
                 marginHorizontal: 0,
               }}
               isMove={params.isMove}
+              selectionMode={selectionMode}
               onLongPress={() => {
-                dispatch({
-                  type: ACTIONS.SELECTION_MODE,
-                  enabled: !selectionMode,
-                });
+                if (!selectionMode) {
+                  dispatch({
+                    type: ACTIONS.SELECTION_MODE,
+                    enabled: !selectionMode,
+                  });
+                }
+
                 dispatch({
                   type: ACTIONS.SELECTED_ITEMS,
                   item: item,

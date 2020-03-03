@@ -23,11 +23,16 @@ export const NotebookItem = ({
   customStyle,
   onLongPress,
   navigation,
+  selectionMode,
 }) => {
   const [state, dispatch] = useTracked();
   const {colors, selectedItemsList} = state;
 
   const navigate = () => {
+    if (selectionMode) {
+      onLongPress();
+      return;
+    }
     isTopic
       ? NavigationService.navigate('Notes', {
           ...item,
