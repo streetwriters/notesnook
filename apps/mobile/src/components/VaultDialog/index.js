@@ -9,6 +9,9 @@ import NavigationService from '../../services/NavigationService';
 
 import {updateEvent} from '../DialogManager';
 import Share from 'react-native-share';
+import {eSendEvent} from '../../services/eventManager';
+import {eOnLoadNote} from '../../services/events';
+import {openEditorAnimation} from '../../utils/animations';
 
 export class VaultDialog extends Component {
   constructor(props) {
@@ -52,15 +55,16 @@ export class VaultDialog extends Component {
         item = n;
       }
       if (!this.props.perm) {
-        NavigationService.navigate('Editor', {
-          note: item,
-        });
+        eSendEvent(eOnLoadNote, item);
+        if (!DDS.isTab) {
+          openEditorAnimation();
+        }
       }
 
       this.close(this.props.shareAfterUnlock, item);
     } else {
       await db.notes.note(this.props.note.id).lock('password');
-      this.close(false, item);
+      this.close(false, this.props.note);
     }
   };
 
