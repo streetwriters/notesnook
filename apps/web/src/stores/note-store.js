@@ -1,6 +1,5 @@
 import { db } from "../common/index";
 import createStore from "../common/store";
-import { store as trashStore } from "./trash-store";
 import { store as editorStore } from "./editor-store";
 
 const LIST_TYPES = {
@@ -62,17 +61,11 @@ function noteStore(set, get) {
         state.selectedNotes = [];
       });
     },
-    delete: async function(id, info) {
+    delete: async function(id) {
       await db.notes.delete(id);
-      set(state => {
-        state.notes.items.splice(info.index, 1);
-        state.notes.groupCounts[info.groupIndex]--;
-        if (state.notes.groupCounts[info.groupIndex] <= 0) {
-          state.notes.groups.splice(info.groupIndex, 1);
-          state.notes.groupCounts.splice(info.groupIndex, 1);
-        }
-        trashStore.getState().refresh();
-      });
+      const state = get();
+      state.setSelectedContext(state.selectedContext);
+      state.refresh();
       const editorState = editorStore.getState();
       if (editorState.session.id === id) {
         editorState.newSession();

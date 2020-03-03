@@ -10,7 +10,7 @@ import { store, useStore } from "../../stores/note-store";
 import { store as editorStore } from "../../stores/editor-store";
 
 const dropdownRefs = [];
-const menuItems = (note, index, groupIndex) => [
+const menuItems = (note, index) => [
   {
     title: note.notebook ? "Move" : "Add to",
     onClick: async () => {
@@ -39,7 +39,7 @@ const menuItems = (note, index, groupIndex) => [
         "Are you sure you want to delete this note?"
       ).then(async res => {
         if (res) {
-          await store.getState().delete(note.id, { index, groupIndex });
+          await store.getState().delete(note.id);
         }
       });
     }
@@ -47,7 +47,7 @@ const menuItems = (note, index, groupIndex) => [
 ];
 
 function Note(props) {
-  const { item, index, groupIndex } = props;
+  const { item, index } = props;
   const note = item;
   const selectedNote = useStore(store => store.selectedNote);
   const isOpened = selectedNote === note.id;
@@ -72,7 +72,7 @@ function Note(props) {
       }
       pinned={note.pinned}
       menuData={note}
-      menuItems={menuItems(note, index, groupIndex)}
+      menuItems={menuItems(note, index)}
       dropdownRefs={dropdownRefs}
     />
   );
