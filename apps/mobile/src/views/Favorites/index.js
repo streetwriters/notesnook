@@ -121,11 +121,14 @@ export const Favorites = ({navigation}) => {
                   marginHorizontal: 0,
                 }}
                 colors={colors}
+                selectionMode={selectionMode}
                 onLongPress={() => {
-                  dispatch({
-                    type: ACTIONS.SELECTION_MODE,
-                    enabled: !selectionMode,
-                  });
+                  if (!selectionMode) {
+                    dispatch({
+                      type: ACTIONS.SELECTION_MODE,
+                      enabled: !selectionMode,
+                    });
+                  }
                   dispatch({
                     type: ACTIONS.SELECTED_ITEMS,
                     item: item,
@@ -137,11 +140,14 @@ export const Favorites = ({navigation}) => {
               />
             ) : (
               <NotebookItem
+                selectionMode={selectionMode}
                 onLongPress={() => {
-                  dispatch({
-                    type: ACTIONS.SELECTION_MODE,
-                    enabled: !selectionMode,
-                  });
+                  if (!selectionMode) {
+                    dispatch({
+                      type: ACTIONS.SELECTION_MODE,
+                      enabled: !selectionMode,
+                    });
+                  }
                   dispatch({
                     type: ACTIONS.SELECTED_ITEMS,
                     item: item,

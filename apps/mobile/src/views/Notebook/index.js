@@ -93,11 +93,15 @@ export const Notebook = ({navigation}) => {
           width: selectionMode ? w - 74 : '100%',
           marginHorizontal: 0,
         }}
+        selectionMode={selectionMode}
         onLongPress={() => {
-          dispatch({
-            type: ACTIONS.SELECTION_MODE,
-            enabled: !selectionMode,
-          });
+          if (!selectionMode) {
+            dispatch({
+              type: ACTIONS.SELECTION_MODE,
+              enabled: !selectionMode,
+            });
+          }
+
           dispatch({
             type: ACTIONS.SELECTED_ITEMS,
             item: item,

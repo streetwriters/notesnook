@@ -82,9 +82,18 @@ export const Notes = ({navigation}) => {
         currentEditingNote={
           currentEditingNote === item.dateCreated ? currentEditingNote : null
         }
+        selectionMode={selectionMode}
         onLongPress={() => {
-          dispatch({type: ACTIONS.SELECTION_MODE, enabled: !selectionMode});
-          dispatch({type: ACTIONS.SELECTED_ITEMS, item: item});
+          if (!selectionMode) {
+            dispatch({
+              type: ACTIONS.SELECTION_MODE,
+              enabled: !selectionMode,
+            });
+          }
+          dispatch({
+            type: ACTIONS.SELECTED_ITEMS,
+            item: item,
+          });
         }}
         update={() => {}}
         item={item}
