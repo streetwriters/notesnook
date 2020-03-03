@@ -26,9 +26,7 @@ function notebookStore(set, get) {
     update: function() {},
     pin: async function(notebook, index) {
       await db.notebooks.notebook(notebook).pin();
-      set(state => {
-        state.notebooks[index].pinned = !notebook.pinned;
-      });
+      get().refresh();
     }
   };
 }
