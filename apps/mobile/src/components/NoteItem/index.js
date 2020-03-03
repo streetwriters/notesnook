@@ -12,6 +12,7 @@ import {
   simpleDialogEvent,
   TEMPLATE_TRASH,
 } from '../DialogManager';
+import {openEditorAnimation} from '../../utils/animations';
 
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
@@ -116,14 +117,15 @@ export default class NoteItem extends React.Component {
           onPress={() => {
             if (item.locked) {
               eSendEvent(eOpenVaultDialog, {unlock: true, i: item});
+              return;
+            }
+            if (DDS.isTab) {
+              eSendEvent(eOnLoadNote, item);
+            } else if (isTrash) {
+              simpleDialogEvent(TEMPLATE_TRASH(item.type));
             } else {
-              DDS.isTab
-                ? eSendEvent(eOnLoadNote, item)
-                : isTrash
-                ? simpleDialogEvent(TEMPLATE_TRASH(item.type))
-                : NavigationService.navigate('Editor', {
-                    note: item,
-                  });
+              eSendEvent(eOnLoadNote, item);
+              openEditorAnimation();
             }
           }}
           style={{

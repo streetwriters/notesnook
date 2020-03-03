@@ -39,6 +39,7 @@ import Animated, {Easing} from 'react-native-reanimated';
 import {useForceUpdate} from './src/views/ListsEditor';
 import FastStorage from 'react-native-fast-storage';
 import {defaultState} from './src/provider/defaultState';
+import {EditorPosition} from './src/utils/animations';
 export const DDS = new DeviceDetectionService();
 export const db = new Storage(StorageInterface);
 
@@ -176,9 +177,9 @@ const App = () => {
     } else {
       s = JSON.parse(s);
       scale.fontScale = s.fontScale;
-      console.log(scale.fontScale);
+
       updateSize();
-      console.log(SIZE.lg);
+
       dispatch({type: ACTIONS.SETTINGS, settings: {...s}});
     }
     dispatch({type: ACTIONS.THEME, colors: newColors});
@@ -367,7 +368,27 @@ const App = () => {
             />
           </SideMenu>
         )}
+
+        <Animated.View
+          ref={ref => (editorRef = ref)}
+          style={{
+            width: '100%',
+            height: '100%',
+            position: 'absolute',
+            zIndex: 10,
+            backgroundColor: colors.bg,
+            elevation: 10,
+            transform: [
+              {
+                translateX: EditorPosition,
+              },
+            ],
+          }}>
+          <Editor noMenu={false} />
+        </Animated.View>
+
         <Toast />
+
         <DialogManager colors={colors} />
       </Animatable.View>
     </>
