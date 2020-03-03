@@ -3,6 +3,7 @@ import { store as appStore } from "../stores/app-store";
 import { store as notesStore } from "../stores/note-store";
 import { store as nbStore } from "../stores/notebook-store";
 import { db } from "./index";
+import { showMoveNoteDialog } from "../components/dialogs/movenotedialog";
 
 function createOption(icon, onClick) {
   return {
@@ -53,7 +54,13 @@ const UnfavoriteOption = createOption(Icon.Star, function(state) {
   notesStore.getState().refresh();
 });
 
-const AddToNotebookOption = createOption(Icon.Plus, function() {});
+const AddToNotebookOption = createOption(Icon.Plus, async function(state) {
+  const items = state.selectedItems.map(item => item.id);
+  if (await showMoveNoteDialog(items)) {
+    //TODO show proper snack
+    console.log("Notes moved successfully!");
+  }
+});
 
 const NotesOptions = createOptions([AddToNotebookOption, FavoriteOption]);
 const NotebooksOptions = createOptions();

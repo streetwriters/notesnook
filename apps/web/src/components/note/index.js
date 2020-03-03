@@ -14,7 +14,7 @@ const menuItems = (note, index, groupIndex) => [
   {
     title: note.notebook ? "Move" : "Add to",
     onClick: async () => {
-      if (await showMoveNoteDialog(note.id)) {
+      if (await showMoveNoteDialog([note.id])) {
         showSnack("Note moved successfully!");
       }
     }

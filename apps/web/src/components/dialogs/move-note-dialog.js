@@ -167,16 +167,11 @@ export default class MoveDialog extends React.Component {
             try {
               await db.notes.move(
                 { id: this.selectedNotebook.id, topic: this.selectedTopic },
-                props.noteId
-              );
-              console.log(
-                this.selectedNotebook.id,
-                this.selectedTopic,
-                props.noteId
+                ...props.noteIds
               );
               props.onMove();
             } catch (e) {
-              console.log(e);
+              console.error(e);
             } finally {
               props.onClose();
             }
@@ -189,11 +184,10 @@ export default class MoveDialog extends React.Component {
   }
 }
 
-export const showMoveNoteDialog = (noteId, notebook) => {
+export const showMoveNoteDialog = noteIds => {
   return showDialog(perform => (
     <MoveDialog
-      noteId={noteId}
-      notebook={notebook}
+      noteIds={noteIds}
       onClose={() => perform(false)}
       onMove={() => perform(true)}
     />
