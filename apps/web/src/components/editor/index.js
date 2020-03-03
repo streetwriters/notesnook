@@ -10,7 +10,7 @@ import { timeConverter } from "../../utils/time";
 import { countWords } from "../../utils/string";
 import { useTheme } from "emotion-theming";
 
-const TextSeperator = props => {
+const TextSeperator = () => {
   const theme = useTheme();
   return (
     <Text as="span" mx={1}>
