@@ -50,17 +50,12 @@ export class VaultDialog extends Component {
       let n = db.notes.note(this.props.note.id).data;
 
       let item;
-      if (n.content.cipher) {
-        try {
-          item = await db.notes
-            .note(n.id)
-            .unlock(this.password, this.props.perm);
-        } catch (error) {
-          ToastEvent.show('Password incorrect, unable to unlock note');
-          return;
-        }
-      } else {
-        item = n;
+
+      try {
+        item = await db.notes.note(n.id).unlock(this.password, this.props.perm);
+      } catch (error) {
+        ToastEvent.show('Password incorrect, unable to unlock note');
+        return;
       }
 
       if (!this.props.perm) {
@@ -69,7 +64,6 @@ export class VaultDialog extends Component {
           openEditorAnimation();
         }
       }
-
       this.close(this.props.shareAfterUnlock, item);
     } else {
       await db.notes.note(this.props.note.id).lock('password');
