@@ -14,7 +14,8 @@ function notebookStore(set) {
       let notebook = await db.notebooks.add(nb);
       if (notebook) {
         set(state => {
-          state.notebooks.push(nb);
+          //TODO investigate ways to improve perf
+          state.notebooks = db.notebooks.all;
         });
       }
     },
@@ -28,7 +29,9 @@ function notebookStore(set) {
     update: function() {},
     pin: async function(notebook, index) {
       await db.notebooks.notebook(notebook).pin();
-      set(state => (state.notebooks[index].pinned = !notebook.pinned));
+      set(state => {
+        state.notebooks[index].pinned = !notebook.pinned;
+      });
     }
   };
 }

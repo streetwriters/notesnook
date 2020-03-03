@@ -77,19 +77,19 @@ const NavMenuItem = props => {
 };
 
 function App() {
-  const [selectedIndex, setSelectedIndex] = usePersistentState(
-    "navSelectedIndex",
-    0
+  const [selectedKey, setSelectedKey] = usePersistentState(
+    "navSelectedKey",
+    "home"
   );
   const [show, setShow] = usePersistentState("navContainerState", true);
 
   const isSideMenuOpen = useStore(store => store.isSideMenuOpen);
   const refreshColors = useStore(store => store.refreshColors);
   const setSelectedContext = useNotesStore(store => store.setSelectedContext);
+
   useEffect(() => {
-    RootNavigator.navigate(Object.keys(RootNavigator.routes)[selectedIndex]);
+    RootNavigator.navigate(selectedKey);
     refreshColors();
-    console.log(colors);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const colors = useStore(store => store.colors);
@@ -129,24 +129,24 @@ function App() {
             {Object.values(routes).map((item, index) => (
               <NavMenuItem
                 onSelected={async () => {
-                  if (selectedIndex === index) {
+                  if (selectedKey === item.key) {
                     setShow(!show);
                     return;
                   }
                   if (RootNavigator.navigate(item.key)) {
-                    setSelectedIndex(index);
+                    setSelectedKey(item.key);
                   }
                 }}
                 key={item.key}
                 item={item}
-                selected={selectedIndex === index}
+                selected={selectedKey === item.key}
               />
             ))}
             {colors.map(color => {
               return (
                 <NavMenuItem
                   onSelected={async () => {
-                    setSelectedIndex(-1);
+                    setSelectedKey(undefined);
                     setSelectedContext({ type: "color", value: color.title });
                     RootNavigator.navigate("color", {
                       title: toTitleCase(color.title),
@@ -172,11 +172,12 @@ function App() {
                     return item.onClick();
                   }
                   if (RootNavigator.navigate(item.key)) {
-                    setSelectedIndex(index);
+                    setSelectedKey(item.key);
                   }
                 }}
                 key={item.key}
                 item={item}
+                selected={selectedKey === item.key}
               />
             ))}
           </Box>

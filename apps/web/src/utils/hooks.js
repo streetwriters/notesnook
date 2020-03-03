@@ -1,7 +1,8 @@
 import { useState } from "react";
 
 export const usePersistentState = (key, def) => {
-  const defState = JSON.parse(window.localStorage.getItem(key) || def);
+  let value = window.localStorage.getItem(key) || def;
+  const defState = tryParse(value);
   const [k, setKey] = useState(defState);
   const _setKey = s => {
     setKey(s);
@@ -9,3 +10,11 @@ export const usePersistentState = (key, def) => {
   };
   return [k, _setKey];
 };
+
+function tryParse(val) {
+  try {
+    return JSON.parse(val);
+  } catch (e) {
+    return val;
+  }
+}
