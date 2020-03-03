@@ -124,6 +124,7 @@ function editorStore(set, get) {
         };
       });
       saveLastOpenedNote();
+      noteStore.getState().setSelectedNote(0);
     },
     setColor: function(color) {
       setTagOrColor(get().session, "colors", color, "color", get().setSession);
