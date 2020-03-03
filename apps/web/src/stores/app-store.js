@@ -30,8 +30,8 @@ function appStore(set, get) {
       });
     },
     selectItem: function(item) {
+      const index = get().selectedItems.findIndex(v => item.id === v.id);
       set(state => {
-        const index = state.selectedItems.findIndex(v => item.id === v.id);
         if (index >= 0) {
           state.selectedItems.splice(index, 1);
         } else {

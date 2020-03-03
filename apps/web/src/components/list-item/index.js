@@ -71,6 +71,10 @@ const ListItem = props => {
   );
 
   useEffect(() => {
+    if (!isSelectionMode) setIsSelected(false);
+  }, [isSelectionMode]);
+
+  useEffect(() => {
     if (props.selectable) {
       setMenuItems([
         selectMenuItem(isSelected, toggleSelection),
