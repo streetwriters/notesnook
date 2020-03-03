@@ -57,7 +57,7 @@ export default class Topic {
   }
 
   async delete(...noteIds) {
-    const topic = { ...this._topic };
+    const topic = qclone(this._topic);
     for (let noteId of noteIds) {
       if (!this.has(noteId)) return this;
       let index = topic.notes.findIndex(n => n === noteId);
