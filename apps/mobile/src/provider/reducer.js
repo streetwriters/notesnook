@@ -105,7 +105,9 @@ export const reducer = (state, action) => {
         selectedItems.push(action.item);
       }
       history.selectedItemsList = selectedItems;
-
+      if (selectedItems.length === 0) {
+        SideMenuEvent.enable();
+      }
       return {
         ...state,
         selectedItemsList: selectedItems,
@@ -114,6 +116,7 @@ export const reducer = (state, action) => {
     }
     case ACTIONS.CLEAR_SELECTION: {
       history.selectedItemsList = [];
+      SideMenuEvent.enable();
       return {
         ...state,
         selectedItemsList: [],
