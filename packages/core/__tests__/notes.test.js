@@ -231,23 +231,31 @@ test("favorite note", () =>
     expect(note.data.favorite).toBe(true);
   }));
 
-test("lock and unlock note", () =>
-  noteTest({
-    content: {
-      delta: { ops: [{ insert: "I am a text", type: "text" }] },
-      text: "I am a text"
-    }
-  }).then(async ({ db, id }) => {
+test("lock a note", () =>
+  noteTest().then(async ({ db, id }) => {
     let note = db.notes.note(id);
     await note.lock("password123");
     note = db.notes.note(id);
     expect(note.data.locked).toBe(true);
     expect(note.data.content.iv).toBeDefined();
     expect((await note.delta()).iv).toBeDefined();
+  }));
+
+test("unlock a locked note", () =>
+  noteTest().then(async ({ db, id }) => {
+    let note = db.notes.note(id);
+    await note.lock("password123");
+    note = db.notes.note(id);
     note = await note.unlock("password123");
     expect(note.id).toBe(id);
     expect(note.content.text).toBe(TEST_NOTE.content.text);
     expect(note.content.delta.ops).toBeDefined();
+  }));
+
+test("permanently unlock a locked note", () =>
+  noteTest().then(async ({ db, id }) => {
+    let note = db.notes.note(id);
+    await note.lock("password123");
     note = db.notes.note(id);
     await note.unlock("password123", true);
     note = db.notes.note(id);

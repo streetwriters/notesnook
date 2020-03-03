@@ -1,4 +1,5 @@
 import Notes from "../collections/notes";
+import { qclone } from "qclone";
 
 export default class Note {
   /**
@@ -74,13 +75,13 @@ export default class Note {
   }
 
   async lock(password) {
-    let delta = await this.delta();
+    let delta = qclone(await this.delta());
     if (delta) {
       delta = await this._notes._collection.indexer.encrypt(
         password,
         JSON.stringify(delta)
       );
-      await this._notes._deltaStorage.write(this._note.content.delta, delta);
+      await this._notes._deltaStorage.write(this._note.id + "_delta", delta);
     }
     const note = { ...this._note };
     note.content = await this._notes._collection.indexer.encrypt(
@@ -109,7 +110,7 @@ export default class Note {
       note.locked = false;
       note.content = decrypted;
       await this._notes._collection.addItem(note);
-      await this._notes._deltaStorage.write(note.content.delta, delta);
+      await this._notes._deltaStorage.write(note.id + "_delta", delta);
     }
     return {
       ...this._note,
