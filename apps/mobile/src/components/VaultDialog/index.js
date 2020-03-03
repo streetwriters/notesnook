@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component, createRef} from 'react';
 import {View, Text, TouchableOpacity, Modal} from 'react-native';
 import {SIZE, ph, pv, opacity, WEIGHT} from '../../common/common';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -13,7 +13,7 @@ import {eSendEvent} from '../../services/eventManager';
 import {eOnLoadNote} from '../../services/events';
 import {openEditorAnimation} from '../../utils/animations';
 import {ACTIONS} from '../../provider/actions';
-
+const passInputRef = createRef();
 export class VaultDialog extends Component {
   constructor(props) {
     super(props);
@@ -82,7 +82,13 @@ export class VaultDialog extends Component {
     const {visible} = this.state;
 
     return (
-      <Modal visible={visible} transparent={true} onRequestClose={this.close}>
+      <Modal
+        onShow={() => {
+          passInputRef.current?.focus();
+        }}
+        visible={visible}
+        transparent={true}
+        onRequestClose={this.close}>
         <View
           style={{
             width: '100%',
@@ -139,6 +145,7 @@ export class VaultDialog extends Component {
 
             {note.locked ? (
               <TextInput
+                ref={passInputRef}
                 style={{
                   padding: pv - 5,
                   borderWidth: 1.5,
