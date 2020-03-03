@@ -117,14 +117,9 @@ const TopLevelNavigator = createStackNavigator(
         height: 0,
       },
     },
-    cardOverlayEnabled: false,
-    cardShadowEnabled: false,
+    cardOverlayEnabled: true,
+    cardShadowEnabled: true,
     animationEnabled: false,
-    transitionConfig: () => ({
-      screenInterpolator: props => {
-        return fade(props);
-      },
-    }),
   },
 );
 
