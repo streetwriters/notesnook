@@ -20,7 +20,7 @@ import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
 import {eScrollEvent} from '../../services/events';
 import {slideLeft, slideRight} from '../../utils/animations';
-import {w, ToastEvent} from '../../utils/utils';
+import {w, ToastEvent, hexToRGBA} from '../../utils/utils';
 
 export const Folders = ({navigation}) => {
   const [state, dispatch] = useTracked();
