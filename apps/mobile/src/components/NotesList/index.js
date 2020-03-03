@@ -50,8 +50,11 @@ export const NotesList = ({isGrouped = false}) => {
         currentEditingNote={
           currentEditingNote === item.id ? currentEditingNote : null
         }
+        selectionMode={selectionMode}
         onLongPress={() => {
-          dispatch({type: ACTIONS.SELECTION_MODE, enabled: !selectionMode});
+          if (!selectionMode) {
+            dispatch({type: ACTIONS.SELECTION_MODE, enabled: true});
+          }
           dispatch({type: ACTIONS.SELECTED_ITEMS, item: item});
         }}
         update={() => {

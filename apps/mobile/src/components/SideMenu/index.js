@@ -20,6 +20,10 @@ function shouldOpenMenu(dx) {
   return dx > barrierForward;
 }
 
+const gestures = {
+  enabled: true,
+};
+
 export default class SideMenu extends React.Component {
   constructor(props) {
     super(props);
@@ -70,9 +74,7 @@ export default class SideMenu extends React.Component {
         ),
       ),
     );
-  }
 
-  UNSAFE_componentWillMount() {
     this.responder = PanResponder.create({
       onStartShouldSetResponderCapture: this.onStartShouldSetResponderCapture,
       onMoveShouldSetPanResponder: this.onMoveShouldSetPanResponder,
@@ -111,6 +113,7 @@ export default class SideMenu extends React.Component {
     const style = [
       styles.frontView,
       {width, height},
+
       this.props.animationStyle(this.state.left),
     ];
 
@@ -131,7 +134,7 @@ export default class SideMenu extends React.Component {
               bottom: 0,
               backgroundColor: 'black',
               opacity: this.opacity,
-              zIndex: 999,
+              zIndex: 1,
             }}
           />
         </TouchableWithoutFeedback>
@@ -145,7 +148,7 @@ export default class SideMenu extends React.Component {
         style: {
           display: 'flex',
           position: 'absolute',
-          zIndex: 999,
+          zIndex: 1,
         },
       });
     }
@@ -185,7 +188,7 @@ export default class SideMenu extends React.Component {
         style: {
           display: 'flex',
           position: 'absolute',
-          zIndex: 999,
+          zIndex: 1,
         },
       });
       if (
@@ -236,8 +239,9 @@ export default class SideMenu extends React.Component {
     this.openMenu(shouldOpenMenu(offsetLeft));
   }
 
-  handleMoveShouldSetPanResponder(e, gestureState) {
-    if (this.gesturesAreEnabled()) {
+  handleMoveShouldSetPanResponder = (e, gestureState) => {
+    console.log(gestures.enabled);
+    if (gestures.enabled) {
       const x = Math.round(Math.abs(gestureState.dx));
       const y = Math.round(Math.abs(gestureState.dy));
 
@@ -253,11 +257,12 @@ export default class SideMenu extends React.Component {
           : gestureState.moveX < this.props.edgeHitWidth;
 
       const swipingToOpen = this.menuPositionMultiplier() * gestureState.dx > 0;
+
       return withinEdgeHitWidth && touchMoved && swipingToOpen;
     }
 
     return false;
-  }
+  };
 
   openMenu(isOpen) {
     const {hiddenMenuOffset, openMenuOffset} = this.state;
@@ -300,14 +305,12 @@ export default class SideMenu extends React.Component {
   }
 
   setGestureEnabled(enabled) {
-    this.isGestureEnabled = enabled;
-  }
-
-  gesturesAreEnabled() {
-    return this.isGestureEnabled;
+    gestures.enabled = enabled;
   }
 
   componentDidMount() {
+    this.setGestureEnabled(true);
+
     eSubscribeEvent(eSendSideMenuOverlayRef, this._getOverlayViewRef);
   }
   componentWillUnmount() {
@@ -329,7 +332,7 @@ export default class SideMenu extends React.Component {
     );
 
     return (
-      <View style={styles.container} onLayout={this.onLayoutChange}>
+      <View style={[styles.container]} onLayout={this.onLayoutChange}>
         {menu}
 
         {this.getContentView()}

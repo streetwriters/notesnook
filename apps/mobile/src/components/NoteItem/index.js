@@ -33,7 +33,8 @@ export default class NoteItem extends React.Component {
   shouldComponentUpdate(nextProps, nextState) {
     if (
       nextProps.item.locked !== this.cipher.value ||
-      nextProps.item.colors.length !== this.colors.length
+      nextProps.item.colors.length !== this.colors.length ||
+      nextProps.selectionMode !== this.props.selectionMode
     ) {
       return true;
     } else {
@@ -115,7 +116,10 @@ export default class NoteItem extends React.Component {
           activeOpacity={0.8}
           onLongPress={() => onLongPress()}
           onPress={() => {
-            if (item.locked) {
+            if (this.props.selectionMode) {
+              this.props.onLongPress();
+              return;
+            } else if (item.locked) {
               eSendEvent(eOpenVaultDialog, {unlock: true, i: item});
               return;
             }

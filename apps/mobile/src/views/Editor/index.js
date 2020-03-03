@@ -39,6 +39,7 @@ import {
   timeConverter,
   ToastEvent,
 } from '../../utils/utils';
+import {TabRouter} from 'react-navigation';
 
 const EditorWebView = createRef();
 let note = {};
@@ -74,6 +75,7 @@ const Editor = ({navigation, noMenu}) => {
   }, []);
 
   const loadNote = async item => {
+    noMenu ? null : SideMenuEvent.disable();
     if (note && note.id) {
       dispatch({type: ACTIONS.NOTES});
       if (item && item.type === 'new') {
@@ -327,6 +329,9 @@ const Editor = ({navigation, noMenu}) => {
         ToastEvent.show('Note Saved!', 'success');
       }
       await clearEditor();
+      if (noMenu) return true;
+      DDS.isTab ? SideMenuEvent.open() : null;
+      SideMenuEvent.enable();
 
       return true;
     } else {
@@ -375,16 +380,6 @@ const Editor = ({navigation, noMenu}) => {
     };
   }, [noMenu]);
 
-  useEffect(() => {
-    noMenu ? null : SideMenuEvent.disable();
-
-    return () => {
-      if (noMenu) return;
-      DDS.isTab ? SideMenuEvent.open() : null;
-      SideMenuEvent.enable();
-    };
-  });
-
   return (
     <SafeAreaView
       style={{
@@ -417,7 +412,8 @@ const Editor = ({navigation, noMenu}) => {
                   ToastEvent.show('Note Saved!', 'success');
                 }
                 await clearEditor();
-                ToastEvent.show('Note Saved!', 'success');
+                DDS.isTab ? SideMenuEvent.open() : null;
+                SideMenuEvent.enable();
               }
             }}
             style={{
