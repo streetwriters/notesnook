@@ -1205,32 +1205,49 @@
         }
         return whiteSpace;
       }
-      document.getElementById('titleInput').onchange = function () {
-        editor.focus();
+      var changeInterval = null;
 
-        console.log(JSON.stringify(editor.getContents()));
+      document.getElementById('titleInput').onchange = onChangetitle()
+
+
+      document.getElementById('titleInput').onkeydown = function (evt) {
+
+        var titleMessage = {
+          type: 'title',
+          value: document.getElementById('titleInput').value
+        }
+
+        window.ReactNativeWebView.postMessage(JSON.stringify(titleMessage));
+      }
+
+      document.getElementById('titleInput').onkeyup = function (evt) {
+
+        var titleMessage = {
+          type: 'title',
+          value: document.getElementById('titleInput').value
+        }
+
+        window.ReactNativeWebView.postMessage(JSON.stringify(titleMessage));
+      }
+
+
+
+
+
+
+      function onChangetitle() {
+        editor.focus();
 
         var titleMessage = {
           type: 'title',
           value: document.getElementById('titleInput').value
         }
         window.ReactNativeWebView.postMessage(JSON.stringify(titleMessage));
+        console.log(JSON.stringify(editor.getContents()));
 
 
       }
 
-
-      document.querySelector('#titleInput').addEventListener('keypress', function (evt) {
-        var real_val = this.value + String.fromCharCode(evt.which);
-        if (evt.which == 8) real_val = real_val.substr(0, real_val.length - 2);
-
-        var titleMessage = {
-          type: 'title',
-          value: real_val
-        }
-        window.ReactNativeWebView.postMessage(JSON.stringify(titleMessage));
-        ///alert(real_val);
-      }, false);
 
 
 

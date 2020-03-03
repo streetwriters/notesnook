@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   View,
   SafeAreaView,
+  Keyboard,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import WebView from 'react-native-webview';
@@ -113,6 +114,12 @@ const Editor = ({navigation, noMenu}) => {
     saveCounter = 0;
     post('clear');
     post(JSON.stringify({type: 'text', value: ''}));
+    post(
+      JSON.stringify({
+        type: 'title',
+        value: '',
+      }),
+    );
     post('focusTitle');
   };
 
@@ -128,6 +135,7 @@ const Editor = ({navigation, noMenu}) => {
   };
 
   const _onMessage = evt => {
+    console.log(evt.nativeEvent.data);
     if (evt.nativeEvent.data === 'loaded') {
     } else if (
       evt.nativeEvent.data !== '' &&
@@ -158,7 +166,7 @@ const Editor = ({navigation, noMenu}) => {
     if (!content) {
       content = {
         text: '',
-        delta: null,
+        delta: {ops: []},
       };
     }
 
@@ -170,7 +178,7 @@ const Editor = ({navigation, noMenu}) => {
       },
       id: id,
     });
-
+    console.log('here', title, id);
     if (id !== rId && !note?.locked) {
       id = rId;
       note = db.notes.note(id);
@@ -328,6 +336,7 @@ const Editor = ({navigation, noMenu}) => {
       if (note && note.id) {
         ToastEvent.show('Note Saved!', 'success');
       }
+      Keyboard.dismiss();
       await clearEditor();
       if (noMenu) return true;
       DDS.isTab ? SideMenuEvent.open() : null;
@@ -408,6 +417,7 @@ const Editor = ({navigation, noMenu}) => {
                 simpleDialogEvent(TEMPLATE_EXIT_FULLSCREEN());
               } else {
                 exitEditorAnimation();
+                Keyboard.dismiss();
                 if (note && note.id) {
                   ToastEvent.show('Note Saved!', 'success');
                 }
