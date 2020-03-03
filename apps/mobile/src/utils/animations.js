@@ -1,3 +1,28 @@
+import Animated, {Easing} from 'react-native-reanimated';
+import {Dimensions} from 'react-native';
+
+const {color, Value, timing} = Animated;
+
+export const EditorPosition = new Value(Dimensions.get('window').width * 1.5);
+
+export function openEditorAnimation() {
+  let openConfigH = {
+    duration: 300,
+    toValue: 0,
+    easing: Easing.inOut(Easing.ease),
+  };
+  timing(EditorPosition, openConfigH).start();
+}
+
+export function exitEditorAnimation() {
+  let openConfigH = {
+    duration: 300,
+    toValue: Dimensions.get('window').width * 1.5,
+    easing: Easing.inOut(Easing.ease),
+  };
+  timing(EditorPosition, openConfigH).start();
+}
+
 export const slideRight = {
   0: {
     transform: [{translateX: -4}],

@@ -193,22 +193,21 @@ export const NotebookItem = ({
               </Text>
             </View>
           )}
-          {isTopic && item.totalNotes > 0 ? (
-            <Text
-              style={{
-                color: colors.icon,
-                fontSize: SIZE.xxs,
-                textAlignVertical: 'center',
-                fontFamily: WEIGHT.regular,
-                marginTop: 5,
-              }}>
-              {item && item.totalNotes && item.totalNotes > 1
-                ? item.totalNotes + ' notes'
-                : item.totalNotes === 1
-                ? item.totalNotes + ' note'
-                : null}
-            </Text>
-          ) : null}
+
+          <Text
+            style={{
+              color: colors.icon,
+              fontSize: SIZE.xxs,
+              textAlignVertical: 'center',
+              fontFamily: WEIGHT.regular,
+              marginTop: 5,
+            }}>
+            {item && item.totalNotes && item.totalNotes > 1
+              ? item.totalNotes + ' notes'
+              : item.totalNotes === 1
+              ? item.totalNotes + ' note'
+              : '0 notes'}
+          </Text>
         </TouchableOpacity>
         {hideMore ||
         (item.title === 'General' && item.type === 'topic') ? null : (
@@ -243,7 +242,7 @@ export const NotebookItem = ({
             onPress={async () => {
               let noteIds = [];
               selectedItemsList.forEach(item => noteIds.push(item.id));
-              console.log(noteIds);
+
               db.notes.move(
                 {
                   topic: item.title,

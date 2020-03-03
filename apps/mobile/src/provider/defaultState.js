@@ -8,7 +8,10 @@ export const defaultState = {
   notebooks: [],
   trash: [],
   favorites: [],
-  pinned: [],
+  pinned: {
+    notes: [],
+    notebooks: [],
+  },
   tags: [],
   colorNotes: [],
   user: {},

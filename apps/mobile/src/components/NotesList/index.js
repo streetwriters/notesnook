@@ -18,6 +18,7 @@ import {NotesPlaceHolder} from '../ListPlaceholders';
 import NoteItem from '../NoteItem';
 import SelectionWrapper from '../SelectionWrapper';
 import {db, DDS} from '../../../App';
+import {inputRef} from '../SearchInput';
 
 export const NotesList = ({isGrouped = false}) => {
   const [state, dispatch] = useTracked();
@@ -155,12 +156,12 @@ export const NotesList = ({isGrouped = false}) => {
       style={{
         marginTop:
           Platform.OS == 'ios'
-            ? notes[0]
+            ? notes[0] && !selectionMode
               ? DDS.isTab
                 ? 115
                 : 135
               : 135 - 60
-            : notes[0]
+            : notes[0] && !selectionMode
             ? 155
             : 155 - 60,
         flexDirection: 'row',
@@ -178,6 +179,9 @@ export const NotesList = ({isGrouped = false}) => {
       </Text>
       <Text
         onPress={() => {
+          inputRef.current?.setNativeProps({
+            text: '',
+          });
           dispatch({
             type: ACTIONS.SEARCH_RESULTS,
             results: [],
@@ -194,7 +198,7 @@ export const NotesList = ({isGrouped = false}) => {
   );
 
   const _listKeyExtractor = (item, index) => item.id.toString();
-  console.log(notes);
+
   return isGrouped && searchResults.length === 0 ? (
     <SectionList
       ref={ref => (sectionListRef = ref)}
@@ -269,7 +273,7 @@ const PinnedItems = () => {
   return (
     <>
       <FlatList
-        data={pinned}
+        data={pinned.notes}
         keyExtractor={(item, index) => item.id.toString()}
         renderItem={({item, index}) =>
           item.type === 'note' ? (
@@ -288,6 +292,7 @@ const PinnedItems = () => {
                 borderBottomWidth: 0,
                 marginHorizontal: 0,
               }}
+              onLongPress={() => {}}
               pinned={true}
               item={item}
               index={index}

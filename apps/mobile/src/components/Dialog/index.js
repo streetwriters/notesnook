@@ -11,16 +11,17 @@ import {db, DDS} from '../../../App';
 import {opacity, ph, pv, SIZE, WEIGHT} from '../../common/common';
 import {ACTIONS} from '../../provider/actions';
 import NavigationService from '../../services/NavigationService';
-import {getElevation, ToastEvent} from '../../utils/utils';
+import {getElevation, ToastEvent, editing, history} from '../../utils/utils';
 import {dialogActions, updateEvent} from '../DialogManager';
 import {eSendEvent} from '../../services/eventManager';
-import {eCloseFullscreenEditor} from '../../services/events';
+import {eCloseFullscreenEditor, eOnLoadNote} from '../../services/events';
 
 export class Dialog extends Component {
   constructor(props) {
     super(props);
     this.state = {
       visible: false,
+      selecteItemsLength: 0,
     };
   }
 
@@ -29,29 +30,41 @@ export class Dialog extends Component {
 
     switch (template.action) {
       case dialogActions.ACTION_DELETE: {
-        if (item.type === 'note') {
-          await db.notes.delete(item.id);
-
-          ToastEvent.show('Note moved to trash', 'error', 3000);
-          updateEvent({type: item.type});
-        } else if (item.type === 'topic') {
-          console.log(item);
-          //TODO
-
-          await db.notebooks
-            .notebook(item.notebookId)
-            .topics.delete(item.title);
-          updateEvent({type: 'notebook'});
-          ToastEvent.show('Topic deleted', 'error', 3000);
-        } else if (item.type === 'notebook') {
-          await db.notebooks.delete(item.id);
-          updateEvent({type: item.type});
-          ToastEvent.show('Notebook moved to trash', 'error', 3000);
+        if (item.id && history.selectedItemsList.length === 0) {
+          history.selectedItemsList = [];
+          history.selectedItemsList.push(item);
         }
+        history.selectedItemsList.forEach(async i => {
+          if (i.type === 'note') {
+            await db.notes.delete(i.id);
+            ToastEvent.show('Notes moved to trash', 'error', 3000);
+            updateEvent({type: i.type});
+          } else if (i.type === 'topic') {
+            await db.notebooks.notebook(i.notebookId).topics.delete(i.title);
+            updateEvent({type: 'notebook'});
+
+            ToastEvent.show('Topics deleted', 'error', 3000);
+          } else if (i.type === 'notebook') {
+            await db.notebooks.delete(i.id);
+            updateEvent({type: i.type});
+            ToastEvent.show('Notebooks moved to trash', 'error', 3000);
+          }
+        });
+
+        updateEvent({type: ACTIONS.CLEAR_SELECTION});
+        updateEvent({type: ACTIONS.SELECTION_MODE, enabled: false});
 
         this.setState({
           visible: false,
         });
+        if (editing.currentlyEditing) {
+          if (DDS.isTab) {
+            eSendEvent(eCloseFullscreenEditor);
+            eSendEvent(eOnLoadNote, {type: 'new'});
+          } else {
+            NavigationService.goBack();
+          }
+        }
         break;
       }
       case dialogActions.ACTION_EXIT: {
@@ -81,7 +94,7 @@ export class Dialog extends Component {
         break;
       }
       case dialogActions.ACTION_TRASH: {
-        db.trash.restore(item.id);
+        await db.trash.restore(i.id);
         ToastEvent.show(
           item.type.slice(0, 1).toUpperCase() +
             item.type.slice(1) +
@@ -89,6 +102,7 @@ export class Dialog extends Component {
           'success',
           3000,
         );
+
         updateEvent({type: ACTIONS.TRASH});
         this.hide();
         break;
@@ -108,8 +122,10 @@ export class Dialog extends Component {
   };
 
   show = () => {
+    console.log(history.selectedItemsList.length, 'length');
     this.setState({
       visible: true,
+      selectedItemsLength: history.selectedItemsList.length,
     });
   };
   hide = () => {
@@ -187,7 +203,11 @@ export class Dialog extends Component {
                   textAlign: 'center',
                   marginTop: 10,
                 }}>
-                {paragraph}
+                {this.state.selectedItemsLength > 0
+                  ? 'Delete ' +
+                    this.state.selectedItemsLength +
+                    ' selected items?'
+                  : paragraph}
               </Text>
             ) : null}
 

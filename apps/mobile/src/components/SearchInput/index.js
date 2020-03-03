@@ -8,12 +8,14 @@ import {useTracked} from '../../provider';
 
 const {Value, timing, block} = Animated;
 
+export const inputRef = createRef();
+
 export const Search = props => {
   const [state, dispatch] = useTracked();
   const {colors, searchResults} = state;
 
   const [focus, setFocus] = useState(false);
-  const inputRef = createRef();
+
   const _marginAnim = new Value(0);
   const _opacity = new Value(1);
   const _borderAnim = new Value(1.5);
@@ -98,7 +100,7 @@ export const Search = props => {
               text: '',
             });
           }}
-          name={searchResults.length > 0 ? 'x' : 'magnify'}
+          name={searchResults.length > 0 ? 'close' : 'magnify'}
           color={
             focus
               ? props.headerColor

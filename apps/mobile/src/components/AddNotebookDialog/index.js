@@ -108,33 +108,42 @@ export class AddNotebookDialog extends React.Component {
     if (this.currentInputValue) {
       this.onSubmit();
     }
-    let {topics} = this.state;
-    let {toEdit} = this.props;
-    if (!this.title)
-      return ToastEvent.show('Title is required', 'error', 3000, () => {}, '');
 
-    let id = toEdit && toEdit.id ? toEdit.id : null;
+    setTimeout(async () => {
+      let {topics} = this.state;
+      let {toEdit} = this.props;
+      if (!this.title)
+        return ToastEvent.show(
+          'Title is required',
+          'error',
+          3000,
+          () => {},
+          '',
+        );
 
-    if (id) {
-      await db.notebooks.add({
-        title: this.title,
-        description: this.description,
-        id: id,
-      });
+      let id = toEdit && toEdit.id ? toEdit.id : null;
 
-      await db.notebooks.notebook(id).topics.add(...topics);
-    } else {
-      await db.notebooks.add({
-        title: this.title,
-        description: this.description,
-        topics,
-        id: id,
-      });
-    }
+      if (id) {
+        await db.notebooks.add({
+          title: this.title,
+          description: this.description,
+          id: id,
+        });
 
-    updateEvent({type: ACTIONS.NOTEBOOKS});
-    this.close();
-    ToastEvent.show('New notebook added', 'success', 3000, () => {}, '');
+        await db.notebooks.notebook(id).topics.add(...topics);
+      } else {
+        await db.notebooks.add({
+          title: this.title,
+          description: this.description,
+          topics,
+          id: id,
+        });
+      }
+      this.close();
+      updateEvent({type: ACTIONS.NOTEBOOKS});
+
+      ToastEvent.show('New notebook added', 'success', 3000, () => {}, '');
+    }, 100);
   };
 
   onSubmit = () => {
@@ -205,6 +214,9 @@ export class AddNotebookDialog extends React.Component {
         transparent={true}
         animated
         animationType="fade"
+        onShow={() => {
+          this.titleRef.focus();
+        }}
         onRequestClose={this.close}>
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : null}

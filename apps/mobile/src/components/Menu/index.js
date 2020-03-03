@@ -30,6 +30,7 @@ import {eSendEvent} from '../../services/eventManager';
 import {eOpenModalMenu, eSendSideMenuOverlayRef} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
 import {timeSince, getElevation, hexToRGBA} from '../../utils/utils';
+import {inputRef} from '../SearchInput';
 
 export const Menu = ({
   close = () => {},
@@ -189,7 +190,7 @@ export const Menu = ({
       )}
 
       <ScrollView
-        contentContainerStyle={{minHeight: '80%'}}
+        contentContainerStyle={{minHeight: '50%'}}
         style={{
           paddingHorizontal: noTextMode ? 0 : 12,
         }}
@@ -201,7 +202,12 @@ export const Menu = ({
               activeOpacity={opacity / 2}
               onPress={() => {
                 item.close === false ? null : close();
-
+                if (item.close) {
+                  inputRef.current?.setNativeProps({
+                    text: '',
+                  });
+                  dispatch({type: ACTIONS.SEARCH_RESULTS, results: []});
+                }
                 item.func();
               }}
               style={{

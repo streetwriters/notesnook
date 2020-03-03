@@ -18,6 +18,7 @@ import {ToastEvent} from '../../utils/utils';
 import {eSendEvent} from '../../services/eventManager';
 import {eScrollEvent} from '../../services/events';
 import {NotesPlaceHolder} from '../../components/ListPlaceholders';
+import {useIsFocused} from 'react-navigation-hooks';
 
 export const Notes = ({navigation}) => {
   const [state, dispatch] = useTracked();
@@ -25,6 +26,7 @@ export const Notes = ({navigation}) => {
   const allNotes = state.notes;
   const [notes, setNotes] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
+  const isFocused = useIsFocused();
   let params = navigation.state ? navigation.state.params : null;
 
   useEffect(() => {
@@ -34,6 +36,15 @@ export const Notes = ({navigation}) => {
       };
     }
   }, []);
+  useEffect(() => {
+    if (isFocused) {
+      init();
+      dispatch({
+        type: ACTIONS.CURRENT_SCREEN,
+        screen: params.type,
+      });
+    }
+  }, [isFocused, allNotes, colorNotes]);
 
   const init = () => {
     eSendEvent(eScrollEvent, 0);
@@ -49,17 +60,11 @@ export const Notes = ({navigation}) => {
         .notebook(params.notebookId)
         .topics.topic(params.title).all;
 
-      console.log(allNotes, 'here getting topics');
-
       if (allNotes && allNotes.length > 0) {
         setNotes(allNotes);
       }
     }
   };
-
-  useEffect(() => {
-    init();
-  }, [allNotes, colorNotes]);
 
   const _renderItem = ({item, index}) => (
     <SelectionWrapper

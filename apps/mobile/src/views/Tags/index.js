@@ -15,6 +15,7 @@ import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import NavigationService from '../../services/NavigationService';
 import {ToastEvent} from '../../utils/utils';
+import {useIsFocused} from 'react-navigation-hooks';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
@@ -22,13 +23,16 @@ export const Tags = ({navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors, tags, selectionMode} = state;
   const [refreshing, setRefreshing] = useState(false);
+  const isFocused = useIsFocused();
   useEffect(() => {
-    dispatch({type: ACTIONS.TAGS});
-    dispatch({
-      type: ACTIONS.CURRENT_SCREEN,
-      screen: 'tags',
-    });
-  }, []);
+    if (isFocused) {
+      dispatch({type: ACTIONS.TAGS});
+      dispatch({
+        type: ACTIONS.CURRENT_SCREEN,
+        screen: 'tags',
+      });
+    }
+  }, [isFocused]);
 
   return (
     <Container

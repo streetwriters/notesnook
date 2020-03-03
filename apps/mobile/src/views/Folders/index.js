@@ -34,45 +34,37 @@ export const Folders = ({navigation}) => {
   const [refreshing, setRefreshing] = useState(false);
   let isFocused = useIsFocused();
 
-  ///
-
   const handleBackPress = () => {
     alert('here');
     return true;
   };
 
   useEffect(() => {
+    if (isFocused) {
+      dispatch({type: ACTIONS.PINNED});
+      dispatch({type: ACTIONS.NOTEBOOKS});
+      dispatch({
+        type: ACTIONS.CURRENT_SCREEN,
+        screen: 'notebooks',
+      });
+    }
+  }, [isFocused]);
+
+  useEffect(() => {
     eSendEvent(eScrollEvent, 0);
-    dispatch({type: ACTIONS.NOTEBOOKS});
-
-    if (isFocused) {
-      if (isFocused) {
-        dispatch({
-          type: ACTIONS.CURRENT_SCREEN,
-          screen: 'notebooks',
-        });
-      }
-    }
-
     let backhandler;
-    if (isFocused) {
-      backhandler = BackHandler.addEventListener(
-        'hardwareBackPress',
-        handleBackPress,
-      );
-    } else {
-      if (backhandler) {
-        backhandler.remove();
-        backhandler = null;
-      }
-    }
+
+    backhandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      handleBackPress,
+    );
 
     return () => {
       if (!backhandler) return;
       backhandler.remove();
       backhandler = null;
     };
-  }, [isFocused]);
+  }, []);
 
   const params = navigation.state.params;
 
@@ -134,38 +126,36 @@ export const Folders = ({navigation}) => {
                   ? 155
                   : 155 - 60,
             }}>
-            {pinned && pinned.length > 0 ? (
+            {pinned && pinned.notebooks && pinned.notebooks.length > 0 ? (
               <>
                 <FlatList
-                  data={pinned}
+                  data={pinned.notebooks}
                   keyExtractor={(item, index) => item.id.toString()}
                   renderItem={({item, index}) =>
                     item.type === 'notebook' ? (
-                      <SelectionWrapper item={item}>
-                        <NotebookItem
-                          hideMore={params.hideMore}
-                          customStyle={{
-                            width: selectionMode ? w - 74 : '100%',
-                            marginHorizontal: 0,
-                          }}
-                          isMove={params.isMove}
-                          onLongPress={() => {
-                            dispatch({
-                              type: ACTIONS.SELECTION_MODE,
-                              enabled: !selectionMode,
-                            });
-                            dispatch({
-                              type: ACTIONS.SELECTED_ITEMS,
-                              item: item,
-                            });
-                          }}
-                          noteToMove={params.note}
-                          item={item}
-                          pinned={true}
-                          index={index}
-                          colors={colors}
-                        />
-                      </SelectionWrapper>
+                      <NotebookItem
+                        hideMore={params.hideMore}
+                        customStyle={{
+                          backgroundColor: Platform.ios
+                            ? hexToRGBA(colors.accent + '19')
+                            : hexToRGBA(colors.shade),
+                          width: '100%',
+                          paddingHorizontal: 12,
+                          paddingTop: 20,
+                          paddingRight: 18,
+                          marginBottom: 10,
+                          marginTop: 20,
+                          borderBottomWidth: 0,
+                          marginHorizontal: 0,
+                        }}
+                        isMove={params.isMove}
+                        onLongPress={() => {}}
+                        noteToMove={params.note}
+                        item={item}
+                        pinned={true}
+                        index={index}
+                        colors={colors}
+                      />
                     ) : null
                   }
                 />
@@ -174,31 +164,29 @@ export const Folders = ({navigation}) => {
           </View>
         }
         ListEmptyComponent={
-          pinned && pinned.length > 0 ? null : (
-            <View
-              style={{
-                height: '80%',
-                width: DDS.isTab ? '70%' : '100%',
-                alignItems: 'center',
-                alignSelf: 'center',
-                justifyContent: 'center',
-                opacity: 0.8,
-              }}>
-              <NotebookPlaceHolder animation={slideRight} colors={colors} />
-              <NotebookPlaceHolder animation={slideLeft} colors={colors} />
-              <NotebookPlaceHolder animation={slideRight} colors={colors} />
+          <View
+            style={{
+              height: '80%',
+              width: DDS.isTab ? '70%' : '100%',
+              alignItems: 'center',
+              alignSelf: 'center',
+              justifyContent: 'center',
+              opacity: 0.8,
+            }}>
+            <NotebookPlaceHolder animation={slideRight} colors={colors} />
+            <NotebookPlaceHolder animation={slideLeft} colors={colors} />
+            <NotebookPlaceHolder animation={slideRight} colors={colors} />
 
-              <Text
-                style={{
-                  color: colors.icon,
-                  fontSize: SIZE.sm,
-                  fontFamily: WEIGHT.regular,
-                  marginTop: 30,
-                }}>
-                Notebooks you add will appear here
-              </Text>
-            </View>
-          )
+            <Text
+              style={{
+                color: colors.icon,
+                fontSize: SIZE.sm,
+                fontFamily: WEIGHT.regular,
+                marginTop: 30,
+              }}>
+              Notebooks you add will appear here
+            </Text>
+          </View>
         }
         contentContainerStyle={{
           width: '100%',

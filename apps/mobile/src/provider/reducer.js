@@ -1,5 +1,5 @@
 import {db} from '../../App';
-import {SideMenuEvent} from '../utils/utils';
+import {SideMenuEvent, history} from '../utils/utils';
 import {ACTIONS} from './actions';
 
 export const reducer = (state, action) => {
@@ -50,10 +50,15 @@ export const reducer = (state, action) => {
       };
     }
     case ACTIONS.PINNED: {
-      let pinned = db.notes.pinned;
+      let notes = db.notes.pinned;
+      let notebooks = db.notebooks.pinned;
+
       return {
         ...state,
-        pinned: pinned,
+        pinned: {
+          notes,
+          notebooks,
+        },
       };
     }
     case ACTIONS.CURRENT_SCREEN: {
@@ -99,13 +104,16 @@ export const reducer = (state, action) => {
       } else {
         selectedItems.push(action.item);
       }
+      history.selectedItemsList = selectedItems;
 
       return {
         ...state,
         selectedItemsList: selectedItems,
+        selectionMode: selectedItems.length > 0 ? true : false,
       };
     }
     case ACTIONS.CLEAR_SELECTION: {
+      history.selectedItemsList = [];
       return {
         ...state,
         selectedItemsList: [],

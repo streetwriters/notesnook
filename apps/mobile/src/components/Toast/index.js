@@ -65,16 +65,17 @@ export const Toast = () => {
   return (
     <Animatable.View
       transition={['translateY', 'opacity']}
-      duration={500}
+      duration={10}
+      delay={toast ? 300 : 0}
       useNativeDriver={true}
       style={{
         width: '100%',
         alignItems: 'center',
         height: 60,
-        opacity: toast ? 1 : 0,
         bottom: 100,
         position: 'absolute',
         zIndex: 999,
+        elevation: 15,
         transform: [
           {
             translateY: toast ? 0 : 300,
@@ -83,6 +84,8 @@ export const Toast = () => {
       }}>
       <AnimatedTouchableOpacity
         activeOpacity={opacity + 0.1}
+        transition={['opacity']}
+        duration={300}
         style={{
           ...toastStyle,
           maxWidth: DDS.isTab ? normalize(350) : w - 24,
@@ -91,6 +94,7 @@ export const Toast = () => {
           borderRadius: 5,
           paddingHorizontal: ph,
           paddingVertical: pv,
+          opacity: toast ? 1 : 0,
           justifyContent: 'center',
           elevation: 25,
           flexDirection: 'row',

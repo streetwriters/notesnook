@@ -18,6 +18,15 @@ export const getElevation = elevation => {
   };
 };
 
+export const editing = {
+  currentlyEditing: false,
+  isFullscreen: false,
+};
+
+export const history = {
+  selectedItemsList: [],
+};
+
 export function timeSince(date) {
   var seconds = Math.floor((new Date() - date) / 1000);
 
@@ -49,7 +58,7 @@ export const w = Dimensions.get('window').width;
 export const h = Dimensions.get('window').height;
 
 export const ToastEvent = {
-  show: (message, type, duration = 1000, func = null, actionText = '') => {
+  show: (message, type, duration = 3000, func = null, actionText = '') => {
     eSendEvent(eShowToast, {
       message,
       type,
@@ -58,7 +67,7 @@ export const ToastEvent = {
       actionText,
     });
   },
-  hide: (message, type, duration = 1000, func = null, actionText = '') => {
+  hide: (message, type, duration = 3000, func = null, actionText = '') => {
     eSendEvent(eHideToast, {
       message,
       type,
