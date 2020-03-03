@@ -22,15 +22,26 @@ const ListItem = props => {
   const [parentRef, closeContextMenu] = useContextMenu(
     `contextMenu${props.index}`
   );
+  const menuItems = [
+    { title: isSelected ? "Unselect" : "Select", onClick: () => {} },
+    ...props.menuItems
+  ];
   return (
-    <Flex ref={parentRef}>
+    <Flex
+      ref={parentRef}
+      bg={props.pinned || isSelected ? "shade" : "background"}
+      alignItems="center"
+    >
+      <Box width={24} sx={{ marginLeft: 3, marginRight: 1 }}>
+        <Icon.Circle />
+      </Box>
       <Flex
         flex="1 1 auto"
         alignItems="center"
         justifyContent="space-between"
-        bg={props.pinned || isSelected ? "shade" : "background"}
         px={2}
         sx={{
+          width: "full",
           position: "relative",
           marginTop: props.pinned ? 4 : 0,
           paddingTop: props.pinned ? 0 : 2,
@@ -132,6 +143,7 @@ const ListItem = props => {
             <DropdownContent style={{ zIndex: 2, marginLeft: -130 }}>
               <ActionsMenu
                 {...props}
+                menuItems={menuItems}
                 closeMenu={() => props.dropdownRefs[props.index].hide()}
               />
             </DropdownContent>
@@ -141,6 +153,7 @@ const ListItem = props => {
       {props.menuItems && props.dropdownRefs && (
         <ActionsMenu
           {...props}
+          menuItems={menuItems}
           id={`contextMenu${props.index}`}
           style={{
             position: "absolute",
