@@ -3,8 +3,8 @@ import {View, Text, TouchableOpacity, Modal} from 'react-native';
 import {SIZE, ph, pv, opacity, WEIGHT} from '../../common/common';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {TextInput} from 'react-native-gesture-handler';
-import {db} from '../../../App';
-import {getElevation} from '../../utils/utils';
+import {db, DDS} from '../../../App';
+import {getElevation, ToastEvent} from '../../utils/utils';
 import NavigationService from '../../services/NavigationService';
 
 import {updateEvent} from '../DialogManager';
@@ -12,6 +12,7 @@ import Share from 'react-native-share';
 import {eSendEvent} from '../../services/eventManager';
 import {eOnLoadNote} from '../../services/events';
 import {openEditorAnimation} from '../../utils/animations';
+import {ACTIONS} from '../../provider/actions';
 
 export class VaultDialog extends Component {
   constructor(props) {
@@ -36,7 +37,9 @@ export class VaultDialog extends Component {
         message: m,
       });
     }
-    updateEvent({type: item.type});
+
+    updateEvent({type: ACTIONS.NOTES});
+
     this.setState({
       visible: false,
     });
@@ -49,11 +52,17 @@ export class VaultDialog extends Component {
       let item;
       if (n.content.cipher) {
         try {
-          item = await db.notes.note(n.id).unlock(password, this.props.perm);
-        } catch (error) {}
+          item = await db.notes
+            .note(n.id)
+            .unlock(this.password, this.props.perm);
+        } catch (error) {
+          ToastEvent.show('Password incorrect, unable to unlock note');
+          return;
+        }
       } else {
         item = n;
       }
+
       if (!this.props.perm) {
         eSendEvent(eOnLoadNote, item);
         if (!DDS.isTab) {
@@ -141,7 +150,7 @@ export class VaultDialog extends Component {
                   fontFamily: WEIGHT.regular,
                 }}
                 onChangeText={value => {
-                  password = value;
+                  this.password = value;
                 }}
                 secureTextEntry
                 placeholder="Password"
