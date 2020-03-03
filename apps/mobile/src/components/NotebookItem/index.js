@@ -4,7 +4,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {opacity, ph, pv, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
 import NavigationService from '../../services/NavigationService';
-import {ToastEvent, w} from '../../utils/utils';
+import {ToastEvent, w, getElevation} from '../../utils/utils';
 import {ActionSheetEvent, moveNoteHideEvent} from '../DialogManager';
 import {db} from '../../../App';
 import {ACTIONS} from '../../provider/actions';
@@ -24,6 +24,7 @@ export const NotebookItem = ({
   onLongPress,
   navigation,
   selectionMode,
+  pinned,
 }) => {
   const [state, dispatch] = useTracked();
   const {colors, selectedItemsList} = state;
@@ -60,6 +61,31 @@ export const NotebookItem = ({
         },
         customStyle,
       ]}>
+      {pinned ? (
+        <View
+          style={{
+            ...getElevation(3),
+            width: 30,
+            height: 30,
+            backgroundColor: colors.accent,
+            borderRadius: 100,
+            position: 'absolute',
+            left: 20,
+            top: -15,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <View
+            style={{
+              width: 5,
+              height: 5,
+              backgroundColor: 'white',
+              borderRadius: 100,
+            }}
+          />
+        </View>
+      ) : null}
+
       <View
         style={{
           flexDirection: 'row',
