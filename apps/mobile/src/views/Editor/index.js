@@ -105,7 +105,7 @@ const Editor = ({navigation, noMenu}) => {
   };
 
   const clearEditor = async () => {
-    await saveNote();
+    await saveNote(true);
     title = null;
     content = null;
     note = null;
@@ -177,7 +177,6 @@ const Editor = ({navigation, noMenu}) => {
       },
       id: id,
     });
-    console.log('here', title, id);
     if (id !== rId && !note?.locked) {
       id = rId;
       note = db.notes.note(id);
@@ -191,12 +190,12 @@ const Editor = ({navigation, noMenu}) => {
           }
         }, 500);
       }
-      if (id) {
-        dispatch({
-          type: ACTIONS.CURRENT_EDITING_NOTE,
-          id: id,
-        });
-      }
+    }
+    if (id) {
+      dispatch({
+        type: ACTIONS.CURRENT_EDITING_NOTE,
+        id: id,
+      });
     }
 
     if (content.text.length < 200 || saveCounter < 2) {
@@ -206,8 +205,10 @@ const Editor = ({navigation, noMenu}) => {
     }
     saveCounter++;
     if (id) {
-      let lockednote = db.notes.note(id);
+      let lockednote = db.notes.note(id).data;
+      console.log(id, lockednote);
       if (lockNote && lockednote && lockednote.locked) {
+        console.log('CRASH AFTER HERE');
         await db.notes.note(id).lock('password');
       }
     }

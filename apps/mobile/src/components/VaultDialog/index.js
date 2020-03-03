@@ -43,6 +43,7 @@ export class VaultDialog extends Component {
     this.setState({
       visible: false,
     });
+    this.props.reset();
   };
 
   onPress = async () => {

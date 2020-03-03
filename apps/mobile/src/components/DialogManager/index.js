@@ -464,6 +464,12 @@ export class DialogManager extends Component {
           colors={colors}
           note={item}
           perm={isPerm}
+          reset={() => {
+            this.setState({
+              isPerm: false,
+              shareAfterUnlock: false,
+            });
+          }}
           shareAfterUnlock={shareAfterUnlock}
           openedToUnlock={false}
           visible={vaultDialog}
