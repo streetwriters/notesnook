@@ -24,7 +24,8 @@ export default class Notebook extends React.Component {
     const nextItem = nextProps.item;
     return (
       prevItem.pinned !== nextItem.pinned ||
-      prevItem.favorite !== nextItem.favorite
+      prevItem.favorite !== nextItem.favorite ||
+      prevItem !== nextItem
     );
   }
   render() {

@@ -2,7 +2,7 @@ import { db } from "../common/index";
 import createStore from "../common/store";
 import { store as trashStore } from "./trash-store";
 
-function notebookStore(set) {
+function notebookStore(set, get) {
   return {
     refresh: function() {
       set(state => {
@@ -13,10 +13,7 @@ function notebookStore(set) {
     add: async function(nb) {
       let notebook = await db.notebooks.add(nb);
       if (notebook) {
-        set(state => {
-          //TODO investigate ways to improve perf
-          state.notebooks = db.notebooks.all;
-        });
+        get().refresh();
       }
     },
     delete: async function(id, index) {
