@@ -20,6 +20,24 @@ function selectMenuItem(isSelected) {
   return { title: isSelected ? "Unselect" : "Select", onClick: () => {} };
 }
 
+const ItemSelector = () => {
+  const [isSelected, setIsSelected] = useState(false);
+  return (
+    <Box
+      width={24}
+      sx={{
+        marginLeft: 3,
+        marginRight: 1,
+        color: "primary",
+        cursor: "pointer"
+      }}
+      onClick={() => setIsSelected(isSelected => !isSelected)}
+    >
+      {isSelected ? <Icon.CheckCircle /> : <Icon.Circle />}
+    </Box>
+  );
+};
+
 const ListItem = props => {
   const selectedNote = useStore(store => store.selectedNote);
   const isOpened = selectedNote === props.id;
@@ -37,9 +55,7 @@ const ListItem = props => {
       bg={props.pinned || isOpened ? "shade" : "background"}
       alignItems="center"
     >
-      <Box width={24} sx={{ marginLeft: 3, marginRight: 1 }}>
-        <Icon.Circle />
-      </Box>
+      <ItemSelector />
       <Flex
         flex="1 1 auto"
         alignItems="center"
