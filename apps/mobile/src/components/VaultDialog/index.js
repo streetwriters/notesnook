@@ -32,9 +32,8 @@ export class VaultDialog extends Component {
         failOnCancel: false,
         message: m,
       });
-      updateEvent({type: item.type});
     }
-
+    updateEvent({type: item.type});
     this.setState({
       visible: false,
     });
@@ -61,7 +60,7 @@ export class VaultDialog extends Component {
       this.close(this.props.shareAfterUnlock, item);
     } else {
       await db.notes.note(this.props.note.id).lock('password');
-      this.close();
+      this.close(false, item);
     }
   };
 
