@@ -113,6 +113,7 @@ export default class MoveDialog extends React.Component {
                         padding: 2,
                         borderBottomColor: "border",
                         borderBottomStyle: "solid",
+                        cursor: "pointer",
                         ":hover": { borderBottomColor: "primary" }
                       }}
                       onClick={() => {
