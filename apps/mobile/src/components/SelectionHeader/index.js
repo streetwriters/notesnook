@@ -68,6 +68,8 @@ export const SelectionHeader = ({navigation}) => {
           <TouchableOpacity
             onPress={() => {
               dispatch({type: ACTIONS.SELECTION_MODE, enabled: !selectionMode});
+
+              dispatch({type: ACTIONS.CLEAR_SELECTION});
             }}
             hitSlop={{top: 20, bottom: 20, left: 50, right: 40}}
             style={{
