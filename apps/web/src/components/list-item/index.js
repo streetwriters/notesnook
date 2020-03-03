@@ -52,8 +52,6 @@ const ItemSelector = ({ isSelected, toggleSelection }) => {
 };
 
 const ListItem = props => {
-  //const selectedNote = useStore(store => store.selectedNote);
-  // const isOpened = selectedNote === props.id;
   const [parentRef, closeContextMenu] = useContextMenu(
     `contextMenu${props.index}`
   );
@@ -90,7 +88,11 @@ const ListItem = props => {
       alignItems="center"
       sx={{
         borderBottom: "1px solid",
-        borderBottomColor: "navbg"
+        borderBottomColor: "border",
+        cursor: "pointer",
+        ":hover": {
+          borderBottomColor: "primary"
+        }
       }}
     >
       {isSelectionMode && (
@@ -109,12 +111,8 @@ const ListItem = props => {
           position: "relative",
           marginTop: props.pinned ? 4 : 0,
           paddingTop: props.pinned ? 0 : 2,
-          paddingBottom: 2,
-          cursor: "default",
-          ":hover": {
-            borderBottomColor: "primary",
-            cursor: "pointer"
-          }
+          paddingBottom: 2
+
           //TODO add onpressed reaction
         }}
       >
@@ -161,11 +159,14 @@ const ListItem = props => {
             }
           }}
         >
-          <Flex flexDirection="row" justifyContent="space-between">
-            <Text fontFamily={"heading"} fontSize="title" fontWeight={"bold"}>
-              {props.title}
-            </Text>
-          </Flex>
+          <Text
+            color={props.focused ? "primary" : "text"}
+            fontFamily={"heading"}
+            fontSize="title"
+            fontWeight={"bold"}
+          >
+            {props.title}
+          </Text>
           <Text
             display={props.body ? "flex" : "none"}
             variant="body"
