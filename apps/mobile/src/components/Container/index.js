@@ -14,7 +14,7 @@ import {br, opacity, pv, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
 import {eScrollEvent, eOpenLoginDialog} from '../../services/events';
-import {getElevation, h, w} from '../../utils/utils';
+import {getElevation, h, w, ToastEvent} from '../../utils/utils';
 import {Header} from '../header';
 import {Search} from '../SearchInput';
 import SelectionHeader from '../SelectionHeader';
@@ -88,6 +88,7 @@ export const Container = ({
   };
   const onSubmitEditing = async () => {
     if (!text || text.length < 1) {
+      ToastEvent.show('Please enter a search keyword');
       clearSearch();
     } else {
       //setKeyword(text);

@@ -94,13 +94,9 @@ export const Search = props => {
         <Icon
           style={{paddingRight: DDS.isTab ? 12 : 12}}
           onPress={() => {
-            props.clear();
-            searchResults.length > 0 ? props.clearSearch() : null;
-            inputRef.current.setNativeProps({
-              text: '',
-            });
+            props.onSubmitEditing();
           }}
-          name={searchResults.length > 0 ? 'close' : 'magnify'}
+          name="magnify"
           color={
             focus
               ? props.headerColor
