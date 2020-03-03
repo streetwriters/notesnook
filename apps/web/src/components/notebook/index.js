@@ -33,6 +33,8 @@ export default class Notebook extends React.Component {
     console.log("rendering notebook", notebook.id);
     return (
       <ListItem
+        selectable
+        item={notebook}
         onClick={onClick}
         title={notebook.title}
         body={notebook.description}

@@ -12,6 +12,7 @@ import { createRoute, createNormalRoute, createDeadRoute } from "../routes";
 import Navigator from "../index";
 import { showLogInDialog } from "../../components/dialogs/logindialog";
 import { changeTheme, isDarkTheme } from "../../utils/theme";
+import SelectionModeOptions from "../../common/selectionoptions";
 
 export const bottomRoutes = {
   ...createDeadRoute("nightmode", Icon.Moon, {
@@ -30,19 +31,32 @@ export const bottomRoutes = {
 };
 
 export const routes = {
-  ...createNormalRoute("home", Home, Icon.Home, { title: "Home" }),
+  ...createNormalRoute("home", Home, Icon.Home, {
+    title: "Home",
+    options: SelectionModeOptions.NotesOptions
+  }),
   ...createRoute("notebooks", NotebooksContainer, {
-    icon: Icon.Book
+    icon: Icon.Book,
+    options: SelectionModeOptions.NotebooksOptions
   }),
   ...createNormalRoute("favorites", Favorites, Icon.Star, {
-    title: "Favorites"
+    title: "Favorites",
+    options: SelectionModeOptions.FavoritesOptions
   }),
-  ...createNormalRoute("trash", Trash, Icon.Trash, { title: "Trash" }),
-  ...createRoute("tags", TagsContainer, { icon: Icon.Tag })
+  ...createNormalRoute("trash", Trash, Icon.Trash, {
+    title: "Trash",
+    options: SelectionModeOptions.TrashOptions
+  }),
+  ...createRoute("tags", TagsContainer, {
+    icon: Icon.Tag,
+    options: SelectionModeOptions.NotesOptions
+  })
 };
 
 const invisibleRoutes = {
-  ...createNormalRoute("color", Notes, Icon.Circle)
+  ...createNormalRoute("color", Notes, Icon.Circle, {
+    options: SelectionModeOptions.NotesOptions
+  })
 };
 
 const RootNavigator = new Navigator(

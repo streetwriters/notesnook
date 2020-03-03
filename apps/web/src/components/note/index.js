@@ -63,6 +63,8 @@ export default class Note extends React.Component {
     const note = item;
     return (
       <ListItem
+        selectable
+        item={note}
         title={note.title}
         body={note.headline}
         id={note.id}

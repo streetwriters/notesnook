@@ -24,6 +24,7 @@ const Tags = props => {
 
         return (
           <ListItem
+            selectable={false}
             index={index}
             title={<TagNode title={title} />}
             info={`${count} notes`}

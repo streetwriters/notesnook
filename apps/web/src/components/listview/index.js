@@ -13,6 +13,8 @@ function ListView({ items, menu, button, onClick, noType }) {
           const item = items[index];
           return (
             <ListItem
+              selectable
+              item={item}
               title={item.title}
               body={item.headline}
               index={index}

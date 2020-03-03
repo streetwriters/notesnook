@@ -17,6 +17,8 @@ const Topic = ({ item, index, onClick }) => {
   const topic = item;
   return (
     <ListItem
+      selectable
+      item={topic}
       onClick={onClick}
       title={topic.title}
       info={`${topic.totalNotes} Notes`}

@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Flex, Box, Text } from "rebass";
 import * as Icon from "react-feather";
 import Dropdown, { DropdownTrigger, DropdownContent } from "../dropdown";
 import Menu from "../menu";
-import { useStore } from "../../stores/note-store";
 import {
   store as appStore,
   useStore as useAppStore
@@ -20,22 +19,22 @@ const ActionsMenu = props => (
   />
 );
 
-function selectMenuItem(isSelected, setIsSelected) {
+function selectMenuItem(isSelected, toggleSelection) {
   return {
     title: isSelected ? "Unselect" : "Select",
     onClick: () => {
       const appState = appStore.getState();
       if (!appState.isSelectionMode) {
         appState.enterSelectionMode();
-        setIsSelected(true);
+        toggleSelection();
       } else {
-        setIsSelected(!isSelected);
+        toggleSelection();
       }
     }
   };
 }
 
-const ItemSelector = ({ isSelected, setIsSelected }) => {
+const ItemSelector = ({ isSelected, toggleSelection }) => {
   return (
     <Box
       width={24}
@@ -45,7 +44,7 @@ const ItemSelector = ({ isSelected, setIsSelected }) => {
         color: "primary",
         cursor: "pointer"
       }}
-      onClick={() => setIsSelected(isSelected => !isSelected)}
+      onClick={() => toggleSelection()}
     >
       {isSelected ? <Icon.CheckCircle /> : <Icon.Circle />}
     </Box>
@@ -59,14 +58,26 @@ const ListItem = props => {
     `contextMenu${props.index}`
   );
   const isSelectionMode = useAppStore(store => store.isSelectionMode);
+  const selectItem = useAppStore(store => store.selectItem);
   const [isSelected, setIsSelected] = useState(false);
   const [menuItems, setMenuItems] = useState(props.menuItems);
+
+  const toggleSelection = useCallback(
+    function toggleSelection() {
+      setIsSelected(state => !state);
+      selectItem(props.item);
+    },
+    [setIsSelected, selectItem, props.item]
+  );
+
   useEffect(() => {
-    setMenuItems([
-      selectMenuItem(isSelected, setIsSelected),
-      ...props.menuItems
-    ]);
-  }, [props.menuItems, isSelected]);
+    if (props.selectable) {
+      setMenuItems([
+        selectMenuItem(isSelected, toggleSelection),
+        ...props.menuItems
+      ]);
+    }
+  }, [props.menuItems, isSelected, props.selectable, toggleSelection]);
 
   return (
     <Flex
@@ -79,7 +90,10 @@ const ListItem = props => {
       }}
     >
       {isSelectionMode && (
-        <ItemSelector isSelected={isSelected} setIsSelected={setIsSelected} />
+        <ItemSelector
+          isSelected={isSelected}
+          toggleSelection={toggleSelection}
+        />
       )}
       <Flex
         flex="1 1 auto"
@@ -130,7 +144,7 @@ const ListItem = props => {
           onClick={() => {
             //e.stopPropagation();
             if (isSelectionMode) {
-              setIsSelected(state => !state);
+              toggleSelection();
             } else if (props.onClick) {
               props.onClick();
             }

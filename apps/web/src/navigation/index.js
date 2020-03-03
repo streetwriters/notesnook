@@ -80,40 +80,55 @@ export default class Navigator {
 
 const NavigationContainer = props => {
   const openSideMenu = useStore(store => store.openSideMenu);
-  console.log(props);
+  const isSelectionMode = useStore(store => store.isSelectionMode);
   return (
     <ThemeProvider>
       <Flex flexDirection="column" px={2}>
         {(props.route.title || props.route.params.title) && (
-          <Flex alignItems="center" py={2}>
-            {props.canGoBack && (
+          <Flex alignItems="center" justifyContent="space-between">
+            <Flex alignItems="center" py={2}>
+              {props.canGoBack && (
+                <Box
+                  onClick={props.backAction}
+                  height={38}
+                  color="fontPrimary"
+                  sx={{ marginLeft: -2 /*correction */, marginRight: 2 }}
+                >
+                  <Icon.ChevronLeft size={38} />
+                </Box>
+              )}
               <Box
-                onClick={props.backAction}
+                onClick={openSideMenu}
                 height={38}
                 color="fontPrimary"
-                sx={{ marginLeft: -2 /*correction */, marginRight: 2 }}
+                sx={{
+                  marginLeft: -5 /*correction */,
+                  marginRight: 1,
+                  display: ["block", "none", "none"]
+                }}
               >
-                <Icon.ChevronLeft size={38} />
+                <Icon.Menu size={38} />
               </Box>
+              <Heading
+                fontSize="heading"
+                color={props.route.titleColor || "text"}
+              >
+                {props.route.title || props.route.params.title}
+              </Heading>
+            </Flex>
+            {props.route.options && isSelectionMode && (
+              <Flex>
+                {props.route.options.map(option => (
+                  <Box
+                    onClick={option.onClick}
+                    mx={2}
+                    sx={{ cursor: "pointer" }}
+                  >
+                    <option.icon />
+                  </Box>
+                ))}
+              </Flex>
             )}
-            <Box
-              onClick={openSideMenu}
-              height={38}
-              color="fontPrimary"
-              sx={{
-                marginLeft: -5 /*correction */,
-                marginRight: 1,
-                display: ["block", "none", "none"]
-              }}
-            >
-              <Icon.Menu size={38} />
-            </Box>
-            <Heading
-              fontSize="heading"
-              color={props.route.titleColor || "text"}
-            >
-              {props.route.title || props.route.params.title}
-            </Heading>
           </Flex>
         )}
         <Text variant="title" color="primary">
