@@ -1,24 +1,58 @@
 import * as Icon from "react-feather";
-import { store } from "../stores/app-store";
+import { store as appStore } from "../stores/app-store";
+import { store as notesStore } from "../stores/note-store";
+import { store as nbStore } from "../stores/notebook-store";
 import { db } from "./index";
 
 function createOption(icon, onClick) {
-  return { icon, onClick: onClick.bind(this, store.getState()) };
+  return {
+    icon,
+    onClick: async () => {
+      await onClick.call(this, appStore.getState());
+      appStore.getState().exitSelectionMode();
+    }
+  };
 }
 
 function createOptions(options = []) {
   return [...options, DeleteOption];
 }
 
-const DeleteOption = createOption(Icon.Trash2, function(state) {
+const DeleteOption = createOption(Icon.Trash2, async function(state) {
+  const item = state.selectedItems[0];
   const items = state.selectedItems.map(item => item.id);
-  const item = items[0];
+
   if (item.type === "note") {
-    db.notes.delete(...item);
+    await db.notes.delete(...items);
+    notesStore.getState().refresh();
+  } else if (item.type === "notebook") {
+    await db.notebooks.delete(...items);
+    nbStore.getState().refresh();
+  } else if (item.notebookId) {
+    // its a topic
+    await db.notebooks.notebook(item.notebookId).topics.delete(...items);
+    // TODO refresh topics
   }
 });
-const FavoriteOption = createOption(Icon.Star, function() {});
-const UnfavoriteOption = createOption(Icon.Star, function() {});
+
+const FavoriteOption = createOption(Icon.Star, function(state) {
+  // we know only notes can be favorited
+  state.selectedItems.forEach(async item => {
+    if (item.favorite) return;
+    await db.notes.note(item.id).favorite();
+  });
+  notesStore.getState().refresh();
+});
+
+const UnfavoriteOption = createOption(Icon.Star, function(state) {
+  // we know only notes can be favorited
+  state.selectedItems.forEach(async item => {
+    if (!item.favorite) return;
+    await db.notes.note(item.id).favorite();
+  });
+  notesStore.getState().refresh();
+});
+
 const AddToNotebookOption = createOption(Icon.Plus, function() {});
 
 const NotesOptions = createOptions([AddToNotebookOption, FavoriteOption]);
