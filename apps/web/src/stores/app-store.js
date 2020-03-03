@@ -4,6 +4,7 @@ import { db } from "../common";
 function appStore(set) {
   return {
     isSideMenuOpen: false,
+    isSelectionMode: false,
     closeSideMenu: function() {
       set(state => (state.isSideMenuOpen = false));
     },
@@ -14,6 +15,16 @@ function appStore(set) {
     refreshColors: function() {
       set(state => {
         state.colors = db.colors.all;
+      });
+    },
+    enterSelectionMode: function() {
+      set(state => {
+        state.isSelectionMode = true;
+      });
+    },
+    exitSelectionMode: function() {
+      set(state => {
+        state.isSelectionMode = false;
       });
     }
   };

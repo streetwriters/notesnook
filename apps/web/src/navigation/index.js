@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import { Box, Flex, Heading, Text } from "rebass";
 import * as Icon from "react-feather";
 import { ThemeProvider } from "../utils/theme";
-import { useStore } from "../stores/app-store";
+import { useStore, store } from "../stores/app-store";
 
 export default class Navigator {
   constructor(root, routes, options = {}) {
@@ -44,6 +44,10 @@ export default class Navigator {
     if (!root) {
       return false;
     }
+
+    // exit selection mode on navigate
+    store.getState().exitSelectionMode();
+
     ReactDOM.render(
       <NavigationContainer
         navigator={this}

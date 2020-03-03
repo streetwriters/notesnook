@@ -4,6 +4,10 @@ import * as Icon from "react-feather";
 import Dropdown, { DropdownTrigger, DropdownContent } from "../dropdown";
 import Menu from "../menu";
 import { useStore } from "../../stores/note-store";
+import {
+  store as appStore,
+  useStore as useAppStore
+} from "../../stores/app-store";
 import useContextMenu from "../../utils/useContextMenu";
 
 const ActionsMenu = props => (
@@ -16,12 +20,22 @@ const ActionsMenu = props => (
   />
 );
 
-function selectMenuItem(isSelected) {
-  return { title: isSelected ? "Unselect" : "Select", onClick: () => {} };
+function selectMenuItem(isSelected, setIsSelected) {
+  return {
+    title: isSelected ? "Unselect" : "Select",
+    onClick: () => {
+      const appState = appStore.getState();
+      if (!appState.isSelectionMode) {
+        appState.enterSelectionMode();
+        setIsSelected(true);
+      } else {
+        setIsSelected(!isSelected);
+      }
+    }
+  };
 }
 
-const ItemSelector = () => {
-  const [isSelected, setIsSelected] = useState(false);
+const ItemSelector = ({ isSelected, setIsSelected }) => {
   return (
     <Box
       width={24}
@@ -39,23 +53,34 @@ const ItemSelector = () => {
 };
 
 const ListItem = props => {
-  const selectedNote = useStore(store => store.selectedNote);
-  const isOpened = selectedNote === props.id;
+  //const selectedNote = useStore(store => store.selectedNote);
+  // const isOpened = selectedNote === props.id;
   const [parentRef, closeContextMenu] = useContextMenu(
     `contextMenu${props.index}`
   );
+  const isSelectionMode = useAppStore(store => store.isSelectionMode);
+  const [isSelected, setIsSelected] = useState(false);
   const [menuItems, setMenuItems] = useState(props.menuItems);
   useEffect(() => {
-    setMenuItems([selectMenuItem(false), ...props.menuItems]);
-  }, [props.menuItems]);
+    setMenuItems([
+      selectMenuItem(isSelected, setIsSelected),
+      ...props.menuItems
+    ]);
+  }, [props.menuItems, isSelected]);
 
   return (
     <Flex
       ref={parentRef}
-      bg={props.pinned || isOpened ? "shade" : "background"}
+      bg={props.pinned ? "shade" : "background"}
       alignItems="center"
+      sx={{
+        borderBottom: "1px solid",
+        borderBottomColor: "navbg"
+      }}
     >
-      <ItemSelector />
+      {isSelectionMode && (
+        <ItemSelector isSelected={isSelected} setIsSelected={setIsSelected} />
+      )}
       <Flex
         flex="1 1 auto"
         alignItems="center"
@@ -67,8 +92,6 @@ const ListItem = props => {
           marginTop: props.pinned ? 4 : 0,
           paddingTop: props.pinned ? 0 : 2,
           paddingBottom: 2,
-          borderBottom: "1px solid",
-          borderBottomColor: "navbg",
           cursor: "default",
           ":hover": {
             borderBottomColor: "primary",
@@ -106,7 +129,9 @@ const ListItem = props => {
         <Box
           onClick={() => {
             //e.stopPropagation();
-            if (props.onClick) {
+            if (isSelectionMode) {
+              setIsSelected(state => !state);
+            } else if (props.onClick) {
               props.onClick();
             }
           }}

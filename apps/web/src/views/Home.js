@@ -48,7 +48,11 @@ function Home() {
               mx={2}
               bg="background"
               py={2}
-              sx={{ borderBottom: "1px solid", borderBottomColor: "primary" }}
+              sx={{
+                borderBottom: "1px solid",
+                borderBottomColor: "primary",
+                marginBottom: 2
+              }}
             >
               <Text variant="heading" color="primary" fontSize="subtitle">
                 {notes.groups[groupIndex].title}
