@@ -37,7 +37,11 @@ export default class AddNotebookDialog extends React.Component {
     if (!topics) {
       topics = this.state.topics.slice();
     }
-    topics.splice(index, deleteCount, replaceItem);
+    if (replaceItem !== undefined)
+      topics.splice(index, deleteCount, replaceItem);
+    else topics.splice(index, deleteCount);
+
+    console.log(topics);
     this.setState({ topics }, () =>
       setTimeout(() => {
         this._inputRefs[index].focus();
