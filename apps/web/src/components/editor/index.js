@@ -59,20 +59,26 @@ function Editor() {
             paddingBottom: dateEdited > 0 ? 0 : 2
           }}
         />
-        {dateEdited > 0 && (
-          <Text
-            fontSize={"subBody"}
-            mx={2}
-            color="fontTertiary"
-            sx={{ display: "flex", alignItems: "center", marginBottom: 2 }}
-          >
-            {timeConverter(dateEdited)}
-            <TextSeperator />
-            {countWords(text) + " words"}
-            <TextSeperator />
-            {isSaving ? "Saving" : "Saved"}
-          </Text>
-        )}
+        <Text
+          fontSize={"subBody"}
+          mx={2}
+          color="fontTertiary"
+          sx={{ display: "flex", alignItems: "center", marginBottom: 2 }}
+        >
+          {dateEdited > 0 && (
+            <>
+              {timeConverter(dateEdited)}
+              <TextSeperator />
+            </>
+          )}
+          {text.length > 0 && (
+            <>
+              {countWords(text) + " words"}
+              <TextSeperator />
+            </>
+          )}
+          {isSaving ? "Saving" : "Saved"}
+        </Text>
         <Box id="toolbar" display={["none", "flex", "flex"]} />
         <ReactQuill
           refresh={sessionState === SESSION_STATES.new}
