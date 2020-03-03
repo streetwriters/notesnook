@@ -38,7 +38,7 @@ export const NotebookItem = ({
       ? NavigationService.navigate('Notes', {
           ...item,
         })
-      : navigation.navigate('Notebook', {
+      : NavigationService.navigate('Notebook', {
           notebook: item,
           title: hideMore ? 'Select Topic' : item.title,
           isMove: isMove,
@@ -204,18 +204,24 @@ export const NotebookItem = ({
                 alignItems: 'center',
                 marginTop: 5,
               }}>
-              {item.favorite ? (
-                <Icon
-                  style={{width: 30}}
-                  name="star"
-                  size={SIZE.xs}
-                  color={colors.icon}
-                />
-              ) : null}
+              <Text
+                style={{
+                  color: colors.icon,
+                  fontSize: SIZE.xxs,
+                  textAlignVertical: 'center',
+                  fontFamily: WEIGHT.regular,
+                }}>
+                {item && item.totalNotes && item.totalNotes > 1
+                  ? item.totalNotes + ' notes'
+                  : item.totalNotes === 1
+                  ? item.totalNotes + ' note'
+                  : '0 notes'}
+              </Text>
 
               <Text
                 style={{
                   color: colors.accent,
+                  marginLeft: 10,
                   fontSize: SIZE.xxs,
                   textAlignVertical: 'center',
                   fontFamily: WEIGHT.regular,
@@ -224,21 +230,6 @@ export const NotebookItem = ({
               </Text>
             </View>
           )}
-
-          <Text
-            style={{
-              color: colors.icon,
-              fontSize: SIZE.xxs,
-              textAlignVertical: 'center',
-              fontFamily: WEIGHT.regular,
-              marginTop: 5,
-            }}>
-            {item && item.totalNotes && item.totalNotes > 1
-              ? item.totalNotes + ' notes'
-              : item.totalNotes === 1
-              ? item.totalNotes + ' note'
-              : '0 notes'}
-          </Text>
         </TouchableOpacity>
         {hideMore ||
         (item.title === 'General' && item.type === 'topic') ? null : (
