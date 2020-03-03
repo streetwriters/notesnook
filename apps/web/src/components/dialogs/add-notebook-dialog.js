@@ -101,8 +101,6 @@ export default class AddNotebookDialog extends React.Component {
                 <Flex
                   key={index.toString()}
                   flexDirection="row"
-                  onFocus={() => this.setState({ focusedInputIndex: index })}
-                  onBlur={() => this.setState({ focusedInputIndex: -1 })}
                   sx={{ marginBottom: 1 }}
                 >
                   <Input
@@ -112,6 +110,8 @@ export default class AddNotebookDialog extends React.Component {
                     placeholder="Topic name"
                     onFocus={e => {
                       this.lastLength = e.nativeEvent.target.value.length;
+                      if (this.state.focusedInputIndex === index) return;
+                      this.setState({ focusedInputIndex: index });
                     }}
                     onChange={e => {
                       const { topics } = this.state;
