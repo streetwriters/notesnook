@@ -230,8 +230,7 @@ export const NotebookItem = ({
                     'Delete',
                   ];
 
-              let columnItems =
-                item.type === 'topic' ? [] : ['Pin', 'Favorite'];
+              let columnItems = item.type === 'topic' ? [] : ['Pin'];
 
               ActionSheetEvent(item, false, false, rowItems, columnItems, {
                 notebookID: notebookID,

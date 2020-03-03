@@ -39,7 +39,7 @@ export class Dialog extends Component {
           history.selectedItemsList = [];
           history.selectedItemsList.push(item);
         }
-        console.log(history.selectedItemsList.length, 'BREAK', item);
+
         history.selectedItemsList.forEach(async i => {
           if (i.type === 'note') {
             await db.notes.delete(i.id);
