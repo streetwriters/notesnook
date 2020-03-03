@@ -6,6 +6,7 @@ const {color, Value, timing} = Animated;
 export const EditorPosition = new Value(Dimensions.get('window').width * 1.5);
 
 export function openEditorAnimation() {
+  editing.currentlyEditing = true;
   let openConfigH = {
     duration: 300,
     toValue: 0,
@@ -15,6 +16,7 @@ export function openEditorAnimation() {
 }
 
 export function exitEditorAnimation() {
+  editing.currentlyEditing = false;
   let openConfigH = {
     duration: 300,
     toValue: Dimensions.get('window').width * 1.5,

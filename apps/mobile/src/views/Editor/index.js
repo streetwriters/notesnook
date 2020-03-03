@@ -135,7 +135,6 @@ const Editor = ({navigation, noMenu}) => {
   };
 
   const _onMessage = evt => {
-    console.log(evt.nativeEvent.data);
     if (evt.nativeEvent.data === 'loaded') {
     } else if (
       evt.nativeEvent.data !== '' &&
@@ -354,8 +353,6 @@ const Editor = ({navigation, noMenu}) => {
   };
 
   useEffect(() => {
-    editing.currentlyEditing = true;
-
     let handleBack;
     if (!noMenu && DDS.isTab) {
       handleBack = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -376,7 +373,6 @@ const Editor = ({navigation, noMenu}) => {
     }
 
     return () => {
-      editing.currentlyEditing = false;
       if (handleBack) {
         handleBack.remove();
         handleBack = null;

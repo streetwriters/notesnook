@@ -14,7 +14,12 @@ import NavigationService from '../../services/NavigationService';
 import {getElevation, ToastEvent, editing, history} from '../../utils/utils';
 import {dialogActions, updateEvent} from '../DialogManager';
 import {eSendEvent} from '../../services/eventManager';
-import {eCloseFullscreenEditor, eOnLoadNote} from '../../services/events';
+import {
+  eCloseFullscreenEditor,
+  eOnLoadNote,
+  eOnNewTopicAdded,
+} from '../../services/events';
+import {exitEditorAnimation} from '../../utils/animations';
 
 export class Dialog extends Component {
   constructor(props) {
@@ -30,10 +35,11 @@ export class Dialog extends Component {
 
     switch (template.action) {
       case dialogActions.ACTION_DELETE: {
-        if (item.id && history.selectedItemsList.length === 0) {
+        if (item.dateCreated && history.selectedItemsList.length === 0) {
           history.selectedItemsList = [];
           history.selectedItemsList.push(item);
         }
+        console.log(history.selectedItemsList.length, 'BREAK', item);
         history.selectedItemsList.forEach(async i => {
           if (i.type === 'note') {
             await db.notes.delete(i.id);
@@ -41,6 +47,8 @@ export class Dialog extends Component {
             updateEvent({type: i.type});
           } else if (i.type === 'topic') {
             await db.notebooks.notebook(i.notebookId).topics.delete(i.title);
+
+            eSendEvent(eOnNewTopicAdded);
             updateEvent({type: 'notebook'});
 
             ToastEvent.show('Topics deleted', 'error', 3000);
@@ -58,11 +66,11 @@ export class Dialog extends Component {
           visible: false,
         });
         if (editing.currentlyEditing) {
+          eSendEvent(eOnLoadNote, {type: 'new'});
           if (DDS.isTab) {
             eSendEvent(eCloseFullscreenEditor);
-            eSendEvent(eOnLoadNote, {type: 'new'});
           } else {
-            NavigationService.goBack();
+            exitEditorAnimation();
           }
         }
         break;
