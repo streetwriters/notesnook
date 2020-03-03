@@ -11,38 +11,34 @@ export default class AddNotebookDialog extends React.Component {
   description = "";
   _inputRefs = [];
   lastLength = 0;
+  topics = [""];
   state = {
     topics: [""],
-    focusedInputIndex: -1
+    focusedInputIndex: 0
   };
 
   performActionOnTopic(index) {
-    const topics = this.state.topics.slice();
     if (this.state.focusedInputIndex !== index) {
-      this.removeTopic(index, topics);
+      this.removeTopic(index);
     } else {
-      this.addTopic(index, topics);
+      this.addTopic(index);
     }
   }
 
-  removeTopic(index, topics) {
-    this._action(topics, index - 1, 1);
+  removeTopic(index) {
+    this._action(index, 1);
   }
 
-  addTopic(index, topics) {
-    this._action(topics, index + 1, 0, "");
+  addTopic(index) {
+    this._action(index + 1, 0, "");
   }
 
-  _action(topics, index, deleteCount, replaceItem) {
-    if (!topics) {
-      topics = this.state.topics.slice();
-    }
+  _action(index, deleteCount, replaceItem) {
     if (replaceItem !== undefined)
-      topics.splice(index, deleteCount, replaceItem);
-    else topics.splice(index, deleteCount);
+      this.topics.splice(index, deleteCount, replaceItem);
+    else this.topics.splice(index, deleteCount);
 
-    console.log(topics);
-    this.setState({ topics }, () =>
+    this.setState({ topics: this.topics }, () =>
       setTimeout(() => {
         this._inputRefs[index].focus();
       }, 0)
@@ -62,7 +58,7 @@ export default class AddNotebookDialog extends React.Component {
     this.lastLength = 0;
     this.setState({
       topics: [""],
-      focusedInputIndex: -1
+      focusedInputIndex: 0
     });
   }
 
@@ -101,16 +97,18 @@ export default class AddNotebookDialog extends React.Component {
                 marginBottom: 1
               }}
             >
-              {this.state.topics.map((value, index) => (
+              {this.topics.map((value, index) => (
                 <Flex
                   key={index.toString()}
                   flexDirection="row"
                   sx={{ marginBottom: 1 }}
                 >
                   <Input
-                    ref={ref => (this._inputRefs[index] = ref)}
+                    ref={ref => {
+                      this._inputRefs[index] = ref;
+                      if (ref) ref.value = value; // set default value
+                    }}
                     variant="default"
-                    value={this.state.topics[index]}
                     placeholder="Topic name"
                     onFocus={e => {
                       this.lastLength = e.nativeEvent.target.value.length;
@@ -118,11 +116,7 @@ export default class AddNotebookDialog extends React.Component {
                       this.setState({ focusedInputIndex: index });
                     }}
                     onChange={e => {
-                      const { topics } = this.state;
-                      topics[index] = e.target.value;
-                      this.setState({
-                        topics
-                      });
+                      this.topics[index] = e.target.value;
                     }}
                     onKeyUp={e => {
                       if (e.nativeEvent.key === "Enter") {
@@ -165,7 +159,7 @@ export default class AddNotebookDialog extends React.Component {
             props.onDone({
               title: this.title,
               description: this.description,
-              topics: this.state.topics
+              topics: this.topics
             });
           }
         }}
