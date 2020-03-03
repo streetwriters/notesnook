@@ -2,6 +2,7 @@ import * as Icon from "react-feather";
 import { store as appStore } from "../stores/app-store";
 import { store as notesStore } from "../stores/note-store";
 import { store as nbStore } from "../stores/notebook-store";
+import { store as editorStore } from "../stores/editor-store";
 import { db } from "./index";
 import { showMoveNoteDialog } from "../components/dialogs/movenotedialog";
 
@@ -21,7 +22,16 @@ function createOptions(options = []) {
 
 const DeleteOption = createOption(Icon.Trash2, async function(state) {
   const item = state.selectedItems[0];
-  const items = state.selectedItems.map(item => item.id);
+  var isAnyNoteOpened = false;
+  const editorState = editorStore.getState();
+  const items = state.selectedItems.map(item => {
+    if (item.id === editorState.session.id) isAnyNoteOpened = true;
+    return item.id;
+  });
+
+  if (isAnyNoteOpened) {
+    editorState.newSession();
+  }
 
   if (item.type === "note") {
     await db.notes.delete(...items);

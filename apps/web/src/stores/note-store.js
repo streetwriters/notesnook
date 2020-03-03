@@ -73,6 +73,10 @@ function noteStore(set, get) {
         }
         trashStore.getState().refresh();
       });
+      const editorState = editorStore.getState();
+      if (editorState.session.id === id) {
+        editorState.newSession();
+      }
     },
     pin: async function(note) {
       await db.notes.note(note).pin();
