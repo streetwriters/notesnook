@@ -323,8 +323,11 @@ const Editor = ({navigation, noMenu}) => {
   const _onHardwareBackPress = async () => {
     if (tapCount > 0) {
       exitEditorAnimation();
+      if (note && note.id) {
+        ToastEvent.show('Note Saved!', 'success');
+      }
       await clearEditor();
-      ToastEvent.show('Note Saved!', 'success');
+
       return true;
     } else {
       tapCount = 1;
@@ -410,6 +413,9 @@ const Editor = ({navigation, noMenu}) => {
                 simpleDialogEvent(TEMPLATE_EXIT_FULLSCREEN());
               } else {
                 exitEditorAnimation();
+                if (note && note.id) {
+                  ToastEvent.show('Note Saved!', 'success');
+                }
                 await clearEditor();
                 ToastEvent.show('Note Saved!', 'success');
               }

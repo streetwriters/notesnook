@@ -131,7 +131,7 @@ export default class SideMenu extends React.Component {
               bottom: 0,
               backgroundColor: 'black',
               opacity: this.opacity,
-              zIndex: 1,
+              zIndex: 999,
             }}
           />
         </TouchableWithoutFeedback>
@@ -145,7 +145,7 @@ export default class SideMenu extends React.Component {
         style: {
           display: 'flex',
           position: 'absolute',
-          zIndex: 1,
+          zIndex: 999,
         },
       });
     }
@@ -185,7 +185,7 @@ export default class SideMenu extends React.Component {
         style: {
           display: 'flex',
           position: 'absolute',
-          zIndex: 1,
+          zIndex: 999,
         },
       });
       if (

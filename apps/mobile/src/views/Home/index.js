@@ -12,6 +12,7 @@ import {eSendEvent} from '../../services/eventManager';
 import NavigationService from '../../services/NavigationService';
 import {SideMenuEvent} from '../../utils/utils';
 import {eScrollEvent, eOnLoadNote} from '../../services/events';
+import {openEditorAnimation} from '../../utils/animations';
 let count = 0;
 export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(
   SafeAreaView,
@@ -51,7 +52,8 @@ export const Home = ({navigation}) => {
         } else {
           SideMenuEvent.close();
           SideMenuEvent.disable();
-          NavigationService.navigate('Editor');
+          eSendEvent(eOnLoadNote, {type: 'new'});
+          openEditorAnimation();
         }
       }}
       data={notes ? notes : []}>

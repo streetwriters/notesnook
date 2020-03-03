@@ -371,13 +371,19 @@ const App = () => {
 
         <Animated.View
           ref={ref => (editorRef = ref)}
+          onResponderTerminationRequest={true}
+          onStartShouldSetResponderCapture={false}
+          onStartShouldSetResponder={false}
+          onMoveShouldSetResponder={false}
+          onMoveShouldSetResponderCapture={false}
           style={{
             width: '100%',
             height: '100%',
+            alignSelf: 'flex-end',
             position: 'absolute',
-            zIndex: 10,
             backgroundColor: colors.bg,
             elevation: 10,
+
             transform: [
               {
                 translateX: EditorPosition,
