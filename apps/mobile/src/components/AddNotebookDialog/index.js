@@ -105,10 +105,6 @@ export class AddNotebookDialog extends React.Component {
   };
 
   addNewNotebook = async () => {
-    if (this.currentInputValue) {
-      this.onSubmit();
-    }
-
     setTimeout(async () => {
       let {topics} = this.state;
       let {toEdit} = this.props;
@@ -123,6 +119,13 @@ export class AddNotebookDialog extends React.Component {
 
       let id = toEdit && toEdit.id ? toEdit.id : null;
 
+      let t = [...topics];
+      if (
+        this.currentInputValue &&
+        this.currentInputValue.trim().length !== 0
+      ) {
+        t.push(this.currentInputValue);
+      }
       if (id) {
         await db.notebooks.add({
           title: this.title,
@@ -130,12 +133,12 @@ export class AddNotebookDialog extends React.Component {
           id: id,
         });
 
-        await db.notebooks.notebook(id).topics.add(...topics);
+        await db.notebooks.notebook(id).topics.add(...t);
       } else {
         await db.notebooks.add({
           title: this.title,
           description: this.description,
-          topics,
+          topics: t,
           id: id,
         });
       }
