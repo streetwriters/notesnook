@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Flex, Box, Text } from "rebass";
 import * as Icon from "react-feather";
 import Dropdown, { DropdownTrigger, DropdownContent } from "../dropdown";
@@ -16,20 +16,25 @@ const ActionsMenu = props => (
   />
 );
 
+function selectMenuItem(isSelected) {
+  return { title: isSelected ? "Unselect" : "Select", onClick: () => {} };
+}
+
 const ListItem = props => {
   const selectedNote = useStore(store => store.selectedNote);
-  const isSelected = selectedNote === props.id;
+  const isOpened = selectedNote === props.id;
   const [parentRef, closeContextMenu] = useContextMenu(
     `contextMenu${props.index}`
   );
-  const menuItems = [
-    { title: isSelected ? "Unselect" : "Select", onClick: () => {} },
-    ...props.menuItems
-  ];
+  const [menuItems, setMenuItems] = useState(props.menuItems);
+  useEffect(() => {
+    setMenuItems([selectMenuItem(false), ...props.menuItems]);
+  }, [props.menuItems]);
+
   return (
     <Flex
       ref={parentRef}
-      bg={props.pinned || isSelected ? "shade" : "background"}
+      bg={props.pinned || isOpened ? "shade" : "background"}
       alignItems="center"
     >
       <Box width={24} sx={{ marginLeft: 3, marginRight: 1 }}>
