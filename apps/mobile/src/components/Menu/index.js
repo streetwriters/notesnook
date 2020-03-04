@@ -309,61 +309,64 @@ export const Menu = ({
               flexWrap: 'wrap',
               marginBottom: 0,
             }}>
-            {tags.map(item => (
-              <TouchableOpacity
-                key={item.title}
-                activeOpacity={opacity / 2}
-                onPress={() => {
-                  close();
-                  NavigationService.navigate('Notes', {
-                    title: item.title,
-                    tag: item,
-                    type: 'tag',
-                  });
-                }}
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'flex-start',
-                  alignItems: 'center',
-                  padding: 5,
-                  paddingLeft: 2.5,
-                  marginTop: 5,
-                }}>
-                <Text
+            {tags
+              .filter(o => o.count > 1)
+              .slice(0, tags.length > 10 ? 10 : tags.length)
+              .map(item => (
+                <TouchableOpacity
+                  key={item.title}
+                  activeOpacity={opacity / 2}
+                  onPress={() => {
+                    close();
+                    NavigationService.navigate('Notes', {
+                      title: item.title,
+                      tag: item,
+                      type: 'tag',
+                    });
+                  }}
                   style={{
-                    fontFamily: WEIGHT.regular,
-                    fontSize: SIZE.xs + 1,
-                    color: colors.accent,
+                    flexDirection: 'row',
+                    justifyContent: 'flex-start',
+                    alignItems: 'center',
+                    padding: 5,
+                    paddingLeft: 2.5,
+                    marginTop: 5,
                   }}>
-                  #
-                </Text>
-                <Text
-                  style={{
-                    fontFamily: WEIGHT.regular,
-                    fontSize: SIZE.xs + 1,
-                    color: colors.icon,
-                  }}>
-                  {item.title}
-                </Text>
-                {item.count > 1 ? (
                   <Text
                     style={{
-                      color: 'white',
-                      backgroundColor: colors.accent,
-                      fontSize: SIZE.xxs - 2,
-                      minWidth: 10,
-                      minHeight: 10,
-                      marginTop: -10,
-                      borderRadius: 2,
-                      textAlign: 'center',
-                      padding: 0,
-                      paddingHorizontal: 1,
+                      fontFamily: WEIGHT.regular,
+                      fontSize: SIZE.xs + 1,
+                      color: colors.accent,
                     }}>
-                    {item.count}
+                    #
                   </Text>
-                ) : null}
-              </TouchableOpacity>
-            ))}
+                  <Text
+                    style={{
+                      fontFamily: WEIGHT.regular,
+                      fontSize: SIZE.xs + 1,
+                      color: colors.icon,
+                    }}>
+                    {item.title}
+                  </Text>
+                  {item.count > 1 ? (
+                    <Text
+                      style={{
+                        color: 'white',
+                        backgroundColor: colors.accent,
+                        fontSize: SIZE.xxs - 2,
+                        minWidth: 10,
+                        minHeight: 10,
+                        marginTop: -10,
+                        borderRadius: 2,
+                        textAlign: 'center',
+                        padding: 0,
+                        paddingHorizontal: 1,
+                      }}>
+                      {item.count}
+                    </Text>
+                  ) : null}
+                </TouchableOpacity>
+              ))}
           </View>
         )}
 
