@@ -61,3 +61,5 @@ export const eOnNewTopicAdded = '529';
 export const eOpenVaultDialog = '530';
 
 export const eCloseVaultDialog = '531';
+
+export const refreshNotesPage = '532';

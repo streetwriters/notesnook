@@ -32,6 +32,7 @@ import {
   eCloseFullscreenEditor,
   eOnLoadNote,
   eOpenFullscreenEditor,
+  refreshNotesPage,
 } from '../../services/events';
 import {exitEditorAnimation} from '../../utils/animations';
 import {
@@ -106,6 +107,7 @@ const Editor = ({navigation, noMenu}) => {
 
   const clearEditor = async () => {
     await saveNote(true);
+    setDateEdited(0);
     title = null;
     content = null;
     note = null;
@@ -191,7 +193,47 @@ const Editor = ({navigation, noMenu}) => {
         }, 500);
       }
     }
+
     if (id) {
+      switch (editing.actionAfterFirstSave.type) {
+        case 'topic': {
+          await db.notes.move(
+            {
+              topic: editing.actionAfterFirstSave.id,
+              id: editing.actionAfterFirstSave.notebook,
+            },
+            id,
+          );
+          editing.actionAfterFirstSave = {
+            type: null,
+          };
+
+          break;
+        }
+        case 'tag': {
+          await db.notes.note(note.id).tag(editing.actionAfterFirstSave.id);
+          editing.actionAfterFirstSave = {
+            type: null,
+          };
+
+          break;
+        }
+        case 'color': {
+          console.log('I WORKED');
+
+          await db.notes.note(id).color(editing.actionAfterFirstSave.id);
+
+          editing.actionAfterFirstSave = {
+            type: null,
+          };
+
+          break;
+        }
+        default: {
+          break;
+        }
+      }
+
       dispatch({
         type: ACTIONS.CURRENT_EDITING_NOTE,
         id: id,
@@ -202,13 +244,13 @@ const Editor = ({navigation, noMenu}) => {
       dispatch({
         type: ACTIONS.NOTES,
       });
+      eSendEvent(refreshNotesPage);
     }
     saveCounter++;
     if (id) {
       let lockednote = db.notes.note(id).data;
-      console.log(id, lockednote);
+
       if (lockNote && lockednote && lockednote.locked) {
-        console.log('CRASH AFTER HERE');
         await db.notes.note(id).lock('password');
       }
     }

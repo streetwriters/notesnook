@@ -7,18 +7,27 @@ import {
   RefreshControl,
   ActivityIndicator,
 } from 'react-native';
-import {db} from '../../../App';
+import {db, DDS} from '../../../App';
 import Container from '../../components/Container';
 import NoteItem from '../../components/NoteItem';
 import SelectionWrapper from '../../components/SelectionWrapper';
 import {useTracked} from '../../provider';
 import {SIZE, WEIGHT} from '../../common/common';
 import {ACTIONS} from '../../provider/actions';
-import {ToastEvent} from '../../utils/utils';
-import {eSendEvent} from '../../services/eventManager';
-import {eScrollEvent} from '../../services/events';
+import {ToastEvent, editing, SideMenuEvent} from '../../utils/utils';
+import {
+  eSendEvent,
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+} from '../../services/eventManager';
+import {
+  eScrollEvent,
+  refreshNotesPage,
+  eOnLoadNote,
+} from '../../services/events';
 import {NotesPlaceHolder} from '../../components/ListPlaceholders';
 import {useIsFocused} from 'react-navigation-hooks';
+import {openEditorAnimation} from '../../utils/animations';
 
 export const Notes = ({navigation}) => {
   const [state, dispatch] = useTracked();
@@ -43,13 +52,29 @@ export const Notes = ({navigation}) => {
         type: ACTIONS.CURRENT_SCREEN,
         screen: params.type,
       });
+    } else {
+      editing.actionAfterFirstSave = {
+        type: null,
+      };
     }
   }, [isFocused, allNotes, colorNotes]);
+
+  useEffect(() => {
+    eSubscribeEvent(refreshNotesPage, init);
+
+    return () => {
+      eUnSubscribeEvent(refreshNotesPage, init);
+      editing.actionAfterFirstSave = {
+        type: null,
+      };
+    };
+  }, []);
 
   const init = () => {
     eSendEvent(eScrollEvent, 0);
     if (params.type === 'tag') {
       let notesInTag = db.notes.tagged(params.tag.title);
+
       setNotes([...notesInTag]);
     } else if (params.type == 'color') {
       let notesInColors = db.notes.colored(params.color.id);
@@ -61,7 +86,7 @@ export const Notes = ({navigation}) => {
         .topics.topic(params.title).all;
 
       if (allNotes && allNotes.length > 0) {
-        setNotes(allNotes);
+        setNotes([...allNotes]);
       }
     }
   };
@@ -198,7 +223,34 @@ export const Notes = ({navigation}) => {
       placeholder={`Search in ${
         params.type == 'tag' ? '#' + params.title : params.title
       }`}
-      bottomButtonOnPress={() => {}}>
+      bottomButtonOnPress={() => {
+        if (params.type === 'tag') {
+          editing.actionAfterFirstSave = {
+            type: 'tag',
+            id: params.tag.title,
+          };
+        } else if (params.type == 'color') {
+          editing.actionAfterFirstSave = {
+            type: 'color',
+            id: params.color.id,
+          };
+        } else {
+          editing.actionAfterFirstSave = {
+            type: 'topic',
+            id: params.title,
+            notebook: params.notebookId,
+          };
+        }
+
+        if (DDS.isTab) {
+          eSendEvent(eOnLoadNote, {type: 'new'});
+        } else {
+          SideMenuEvent.close();
+          SideMenuEvent.disable();
+          eSendEvent(eOnLoadNote, {type: 'new'});
+          openEditorAnimation();
+        }
+      }}>
       <FlatList
         data={notes}
         refreshControl={

@@ -21,6 +21,9 @@ export const getElevation = elevation => {
 export const editing = {
   currentlyEditing: false,
   isFullscreen: false,
+  actionAfterFirstSave: {
+    type: null,
+  },
 };
 
 export const history = {
