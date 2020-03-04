@@ -8,7 +8,7 @@
 }
 
 .ql-container.ql-snow {
-  overflow-y: none;
+  overflow-y: hidden;
 }
 
 /*Quill Toolbar*/
