@@ -9,6 +9,7 @@ import { useStore, SESSION_STATES } from "../../stores/editor-store";
 import { timeConverter } from "../../utils/time";
 import { countWords } from "../../utils/string";
 import { useTheme } from "emotion-theming";
+import { useStore as useAppStore } from "../../stores/app-store";
 
 const TextSeperator = () => {
   const theme = useTheme();
@@ -30,6 +31,7 @@ function Editor() {
   const setSession = useStore(store => store.setSession);
   const saveSession = useStore(store => store.saveSession);
   const reopenLastSession = useStore(store => store.reopenLastSession);
+  const hideProperties = useAppStore(store => store.hideProperties);
 
   useEffect(() => {
     // move the toolbar outside (easiest way)
@@ -45,7 +47,13 @@ function Editor() {
   }, [reopenLastSession]);
 
   return (
-    <Flex width={["0%", "0%", "100%"]} sx={{ position: "relative" }}>
+    <Flex
+      width={["0%", "0%", "100%"]}
+      sx={{ position: "relative" }}
+      onFocus={() => {
+        hideProperties();
+      }}
+    >
       <Flex className="editor" flex="1 1 auto" flexDirection="column">
         <TitleBox
           shouldFocus={sessionState === SESSION_STATES.new}
