@@ -1,25 +1,19 @@
 import React, {Component} from 'react';
-import {
-  Modal,
-  Text,
-  TouchableOpacity,
-  View,
-  DeviceEventEmitter,
-} from 'react-native';
+import {Modal, Text, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {db, DDS} from '../../../App';
 import {opacity, ph, pv, SIZE, WEIGHT} from '../../common/common';
 import {ACTIONS} from '../../provider/actions';
-import NavigationService from '../../services/NavigationService';
-import {getElevation, ToastEvent, editing, history} from '../../utils/utils';
-import {dialogActions, updateEvent} from '../DialogManager';
 import {eSendEvent} from '../../services/eventManager';
 import {
   eCloseFullscreenEditor,
   eOnLoadNote,
   eOnNewTopicAdded,
 } from '../../services/events';
+import NavigationService from '../../services/NavigationService';
 import {exitEditorAnimation} from '../../utils/animations';
+import {editing, getElevation, history, ToastEvent} from '../../utils/utils';
+import {dialogActions, updateEvent} from '../DialogManager';
 
 export class Dialog extends Component {
   constructor(props) {
