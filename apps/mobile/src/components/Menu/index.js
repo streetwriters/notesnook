@@ -402,8 +402,8 @@ export const Menu = ({
               }}>
               <View
                 style={{
-                  width: noTextMode ? SIZE.md : normalize(30),
-                  height: noTextMode ? SIZE.md : normalize(30),
+                  width: noTextMode ? SIZE.md : normalize(35),
+                  height: noTextMode ? SIZE.md : normalize(35),
                   backgroundColor: item.title,
                   borderRadius: 100,
                 }}></View>
@@ -413,25 +413,13 @@ export const Menu = ({
                   fontSize: SIZE.xxs - 2,
                   minWidth: 12,
                   minHeight: 12,
-                  borderWidth: 0.5,
                   paddingHorizontal: 2,
-                  borderColor: item.title,
-                  borderRadius: 100,
                   textAlign: 'center',
                   position: 'absolute',
                   bottom: -5,
-                  right:
-                    item.count < 10
-                      ? -6
-                      : item.count >= 10 && item.count < 100
-                      ? -9
-                      : item.count >= 100 && item.count < 1000
-                      ? -11
-                      : item.count > 1000
-                      ? -14
-                      : -8,
+                  right: item.count < 10 ? -6 : -8,
                 }}>
-                {item.count}
+                {item.count > 99 ? '99+' : item.count}
               </Text>
             </TouchableOpacity>
           ))}
