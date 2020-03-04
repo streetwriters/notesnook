@@ -111,7 +111,7 @@ const Properties = props => {
               event.key === ","
             ) {
               const value = event.target.value;
-              setTag(value.substring(0, value.length - 1));
+              setTag(value.trim().replace(",", ""));
               event.target.value = "";
             }
           }}
