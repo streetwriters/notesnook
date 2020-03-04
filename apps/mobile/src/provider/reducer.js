@@ -111,7 +111,7 @@ export const reducer = (state, action) => {
       return {
         ...state,
         selectedItemsList: selectedItems,
-        selectionMode: selectedItems.length > 0 ? true : false,
+        selectionMode: selectedItems.length > 0 ? state.selectionMode : false,
       };
     }
     case ACTIONS.CLEAR_SELECTION: {

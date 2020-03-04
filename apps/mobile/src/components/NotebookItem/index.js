@@ -34,16 +34,25 @@ export const NotebookItem = ({
       onLongPress();
       return;
     }
-    isTopic
-      ? NavigationService.navigate('Notes', {
-          ...item,
-        })
-      : NavigationService.navigate('Notebook', {
-          notebook: item,
-          title: hideMore ? 'Select Topic' : item.title,
-          isMove: isMove,
-          hideMore: hideMore,
-        });
+    if (isTopic) {
+      NavigationService.navigate('Notes', {
+        ...item,
+      });
+    } else {
+      hideMore
+        ? navigation.navigate('Notebook', {
+            notebook: item,
+            title: hideMore ? 'Select Topic' : item.title,
+            isMove: isMove,
+            hideMore: hideMore,
+          })
+        : NavigationService.navigate('Notebook', {
+            notebook: item,
+            title: hideMore ? 'Select Topic' : item.title,
+            isMove: isMove,
+            hideMore: hideMore,
+          });
+    }
   };
 
   return (
