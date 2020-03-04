@@ -28,6 +28,7 @@ function appStore(set, get) {
       set(state => {
         state.propState = true;
       });
+    },
     enterSelectionMode: function() {
       set(state => {
         state.isSelectionMode = true;
