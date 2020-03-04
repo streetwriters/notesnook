@@ -338,7 +338,7 @@ export const Menu = ({
                   <Text
                     style={{
                       fontFamily: WEIGHT.regular,
-                      fontSize: SIZE.xs,
+                      fontSize: SIZE.sm - 1,
                       color: colors.accent,
                     }}>
                     #
@@ -346,7 +346,7 @@ export const Menu = ({
                   <Text
                     style={{
                       fontFamily: WEIGHT.regular,
-                      fontSize: SIZE.xs,
+                      fontSize: SIZE.sm - 1,
                       color: colors.icon,
                     }}>
                     {item.title + ' '}
@@ -356,7 +356,7 @@ export const Menu = ({
                       style={{
                         color: 'white',
                         backgroundColor: colors.accent,
-                        fontSize: SIZE.xxs - 2,
+                        fontSize: SIZE.xxs,
                         minWidth: 12,
                         minHeight: 12,
                         borderRadius: 2,
@@ -410,7 +410,7 @@ export const Menu = ({
               <Text
                 style={{
                   color: colors.pri,
-                  fontSize: SIZE.xxs - 2,
+                  fontSize: SIZE.xxs,
                   minWidth: 12,
                   minHeight: 12,
                   paddingHorizontal: 2,
