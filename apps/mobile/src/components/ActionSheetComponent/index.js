@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   View,
   Platform,
+  ToastAndroid,
 } from 'react-native';
 import FastStorage from 'react-native-fast-storage';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -94,7 +95,7 @@ export const ActionSheetComponent = ({
     await db.notes.note(note.id).tag(tag);
 
     setNote({...db.notes.note(note.id).data});
-
+    dispatch({type: ACTIONS.TAGS});
     tagToAdd = '';
   };
 
@@ -127,7 +128,7 @@ export const ActionSheetComponent = ({
       tagsInputRef.current?.setNativeProps({
         text: '',
       });
-    } else if (event.nativeE.key === ',') {
+    } else if (event.nativeEvent.key === ',') {
       _onSubmit();
       tagsInputRef.current?.setNativeProps({
         text: '',
@@ -692,6 +693,77 @@ export const ActionSheetComponent = ({
             style={{
               flexDirection: 'row',
               flexWrap: 'wrap',
+              marginBottom: 5,
+              marginTop: 5,
+              alignItems: 'center',
+            }}>
+            <Text
+              style={{
+                fontFamily: WEIGHT.regular,
+                fontSize: SIZE.xs,
+                color: colors.accent,
+              }}>
+              Suggestions:{' '}
+            </Text>
+            {tags
+              .filter(o => o.count > 1 && !note.tags.find(t => t === o.title))
+              .map(tag => (
+                <TouchableOpacity
+                  key={tag.title}
+                  onPress={() => {
+                    tagToAdd = tag.title;
+                    _onSubmit();
+                  }}
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'flex-start',
+                    alignItems: 'center',
+                    margin: 1,
+                    marginRight: 5,
+                    paddingHorizontal: 5,
+                    paddingVertical: 1,
+                    borderRadius: 2.5,
+                    borderBottomWidth: 1,
+                    borderBottomColor: colors.nav,
+                  }}>
+                  <Text
+                    style={{
+                      fontFamily: WEIGHT.regular,
+                      fontSize: SIZE.xs,
+                      color: colors.pri,
+                    }}>
+                    <Text
+                      style={{
+                        color: colors.accent,
+                      }}>
+                      #
+                    </Text>
+                    {tag.title}{' '}
+                  </Text>
+                  <View
+                    style={{
+                      borderRadius: 2.5,
+                      backgroundColor: colors.accent,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}>
+                    <Text
+                      style={{
+                        color: 'white',
+                        fontSize: SIZE.xxs - 2,
+                        minWidth: 12,
+                        textAlign: 'center',
+                      }}>
+                      {tag.count}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
+          </View>
+          <View
+            style={{
+              flexDirection: 'row',
+              flexWrap: 'wrap',
               borderRadius: 5,
               borderWidth: 1.5,
               borderColor: focused ? colors.accent : colors.nav,
@@ -736,58 +808,6 @@ export const ActionSheetComponent = ({
               onSubmitEditing={_onSubmit}
               onKeyPress={_onKeyPress}
             />
-          </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              flexWrap: 'wrap',
-              marginBottom: 5,
-              marginTop: 5,
-              alignItems: 'center',
-            }}>
-            <Text
-              style={{
-                fontFamily: WEIGHT.regular,
-                fontSize: SIZE.xs,
-                color: colors.accent,
-              }}>
-              Suggestions:{' '}
-            </Text>
-            {tags
-              .filter(o => o.count > 1)
-              .map(tag => (
-                <TouchableOpacity
-                  key={tag}
-                  onPress={async () => {}}
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'flex-start',
-                    alignItems: 'center',
-                    margin: 1,
-                    marginRight: 3,
-                    paddingHorizontal: 5,
-                    paddingVertical: 1,
-                    backgroundColor: Platform.ios
-                      ? hexToRGBA(colors.accent + '19')
-                      : hexToRGBA(colors.shade),
-                    borderRadius: 2.5,
-                  }}>
-                  <Text
-                    style={{
-                      fontFamily: WEIGHT.regular,
-                      fontSize: SIZE.xs,
-                      color: colors.pri,
-                    }}>
-                    <Text
-                      style={{
-                        color: colors.accent,
-                      }}>
-                      #
-                    </Text>
-                    {tag.title}
-                  </Text>
-                </TouchableOpacity>
-              ))}
           </View>
         </View>
       ) : null}
