@@ -272,7 +272,7 @@ export const ActionSheetComponent = ({
       name: 'Remove',
       icon: 'delete',
       func: () => {
-        close();
+        close('permanant_delete');
       },
     },
   ];

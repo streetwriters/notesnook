@@ -40,6 +40,7 @@ export const dialogActions = {
   ACTION_EMPTY_TRASH: 513,
   ACTION_EXIT_FULLSCREEN: 514,
   ACTION_TRASH: 515,
+  ACTION_PERMANANT_DELETE: 516,
 };
 
 export const ActionSheetEvent = (
@@ -104,6 +105,15 @@ export const TEMPLATE_DELETE = type => {
     action: dialogActions.ACTION_DELETE,
     icon: 'delete',
   };
+};
+
+export const TEMPLATE_PERMANANT_DELETE = {
+  title: `Delete Permanantly`,
+  paragraph: `Are you sure you want to delete this item permanantly from trash?`,
+  positiveText: 'Delete',
+  negativeText: 'Cancel',
+  action: dialogActions.ACTION_PERMANANT_DELETE,
+  icon: 'delete',
 };
 
 export const TEMPLATE_TRASH = type => {
@@ -346,6 +356,10 @@ export class DialogManager extends Component {
       switch (this.show) {
         case 'delete': {
           this._showSimpleDialog(TEMPLATE_DELETE(this.state.item.type));
+          break;
+        }
+        case 'permanant_delete': {
+          this._showSimpleDialog(TEMPLATE_PERMANANT_DELETE);
           break;
         }
         case 'lock': {

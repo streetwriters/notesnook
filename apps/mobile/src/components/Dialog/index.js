@@ -75,6 +75,21 @@ export class Dialog extends Component {
         }
         break;
       }
+      case dialogActions.ACTION_PERMANANT_DELETE: {
+        if (item.dateCreated && history.selectedItemsList.length === 0) {
+          history.selectedItemsList = [];
+          history.selectedItemsList.push(item);
+        }
+        let ids = [];
+        history.selectedItemsList.forEach(item => ids.push(item.id));
+
+        await db.trash.delete(...ids);
+        updateEvent({type: ACTIONS.TRASH});
+        updateEvent({type: ACTIONS.CLEAR_SELECTION});
+        updateEvent({type: ACTIONS.SELECTION_MODE, enabled: false});
+        ToastEvent.show('Item permanantly deleted');
+        break;
+      }
       case dialogActions.ACTION_EXIT: {
         this.setState({
           visible: false,
@@ -86,7 +101,10 @@ export class Dialog extends Component {
       case dialogActions.ACTION_EMPTY_TRASH: {
         await db.trash.clear();
         updateEvent({type: ACTIONS.TRASH});
-        ToastEvent.show('Trash cleared', 'error', 1000, () => {}, '');
+
+        updateEvent({type: ACTIONS.CLEAR_SELECTION});
+        updateEvent({type: ACTIONS.SELECTION_MODE, enabled: false});
+        ToastEvent.show('Trash cleared', 'error');
         this.setState({
           visible: false,
         });
