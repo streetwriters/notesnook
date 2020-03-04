@@ -22,6 +22,7 @@ const TextSeperator = () => {
 function Editor() {
   const title = useStore(store => store.session.title);
   const dateEdited = useStore(store => store.session.dateEdited);
+  const id = useStore(store => store.session.id);
   const text = useStore(store => store.session.content.text);
   const isSaving = useStore(store => store.session.isSaving);
   const delta = useStore(store => store.session.content.delta);
@@ -56,14 +57,19 @@ function Editor() {
           }
           sx={{
             paddingTop: 2,
-            paddingBottom: dateEdited > 0 ? 0 : 2
+            paddingBottom: 0
           }}
         />
         <Text
           fontSize={"subBody"}
           mx={2}
           color="fontTertiary"
-          sx={{ display: "flex", alignItems: "center", marginBottom: 2 }}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            marginTop: 2,
+            marginBottom: dateEdited || text.length || id.length ? 2 : 0
+          }}
         >
           {dateEdited > 0 && (
             <>
@@ -77,7 +83,7 @@ function Editor() {
               <TextSeperator />
             </>
           )}
-          {isSaving ? "Saving" : "Saved"}
+          {id.length > 0 && <>{isSaving ? "Saving" : "Saved"}</>}
         </Text>
         <Box id="toolbar" display={["none", "flex", "flex"]} />
         <ReactQuill
