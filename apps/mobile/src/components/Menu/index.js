@@ -329,13 +329,16 @@ export const Menu = ({
                     justifyContent: 'flex-start',
                     alignItems: 'center',
                     padding: 5,
-                    paddingLeft: 2.5,
+                    paddingHorizontal: 0,
+                    marginLeft: 5,
                     marginTop: 5,
+                    borderBottomWidth: 1,
+                    borderBottomColor: colors.nav,
                   }}>
                   <Text
                     style={{
                       fontFamily: WEIGHT.regular,
-                      fontSize: SIZE.xs + 1,
+                      fontSize: SIZE.xs,
                       color: colors.accent,
                     }}>
                     #
@@ -343,10 +346,10 @@ export const Menu = ({
                   <Text
                     style={{
                       fontFamily: WEIGHT.regular,
-                      fontSize: SIZE.xs + 1,
+                      fontSize: SIZE.xs,
                       color: colors.icon,
                     }}>
-                    {item.title}
+                    {item.title + ' '}
                   </Text>
                   {item.count > 1 ? (
                     <Text
@@ -354,15 +357,14 @@ export const Menu = ({
                         color: 'white',
                         backgroundColor: colors.accent,
                         fontSize: SIZE.xxs - 2,
-                        minWidth: 10,
-                        minHeight: 10,
-                        marginTop: -10,
+                        minWidth: 12,
+                        minHeight: 12,
                         borderRadius: 2,
                         textAlign: 'center',
                         padding: 0,
                         paddingHorizontal: 1,
                       }}>
-                      {item.count}
+                      {item.count > 99 ? '99+' : item.count}
                     </Text>
                   ) : null}
                 </TouchableOpacity>
