@@ -4,7 +4,6 @@ import { Box, Flex, Text } from "rebass";
 import { Input } from "@rebass/forms";
 import CheckBox from "../checkbox";
 import { PinIcon } from "../icons";
-import { usePersistentState } from "../../utils/hooks";
 import { useStore } from "../../stores/editor-store";
 import { COLORS } from "../../common";
 import { objectMap } from "../../utils/object";

@@ -21,12 +21,12 @@ function appStore(set, get) {
     },
     hideProperties: function() {
       set(state => {
-        state.propState = false;
+        state.arePropertiesVisible = false;
       });
     },
     showProperties: function() {
       set(state => {
-        state.propState = true;
+        state.arePropertiesVisible = true;
       });
     },
     enterSelectionMode: function() {
