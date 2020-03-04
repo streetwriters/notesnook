@@ -4,6 +4,7 @@ import { db } from "../common";
 function appStore(set, get) {
   return {
     isSideMenuOpen: false,
+    arePropertiesVisible: false,
     isSelectionMode: false,
     selectedItems: [],
     colors: [],
@@ -18,6 +19,15 @@ function appStore(set, get) {
         state.colors = db.colors.all;
       });
     },
+    hideProperties: function() {
+      set(state => {
+        state.propState = false;
+      });
+    },
+    showProperties: function() {
+      set(state => {
+        state.propState = true;
+      });
     enterSelectionMode: function() {
       set(state => {
         state.isSelectionMode = true;

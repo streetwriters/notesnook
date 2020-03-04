@@ -8,9 +8,9 @@ import { usePersistentState } from "../../utils/hooks";
 import { useStore } from "../../stores/editor-store";
 import { COLORS } from "../../common";
 import { objectMap } from "../../utils/object";
+import { useStore as useAppStore } from "../../stores/app-store";
 
 const Properties = props => {
-  const [visible, setVisible] = usePersistentState("propertiesVisible", false);
   const pinned = useStore(store => store.session.pinned);
   const favorite = useStore(store => store.session.favorite);
   const colors = useStore(store => store.session.colors);
@@ -24,12 +24,18 @@ const Properties = props => {
       state.session[prop] = value;
     });
   }
+  const hideProperties = useAppStore(store => store.hideProperties);
+  const showProperties = useAppStore(store => store.showProperties);
+  const arePropertiesVisible = useAppStore(store => store.arePropertiesVisible);
+
   return (
     <>
       <Box
-        onClick={() => setVisible(true)}
+        onClick={() => {
+          showProperties();
+        }}
         sx={{
-          display: visible ? "none" : "flex",
+          display: arePropertiesVisible ? "none" : "flex",
           position: "absolute",
           top: "50%",
           right: 0,
@@ -46,9 +52,9 @@ const Properties = props => {
       </Box>
       <Box
         sx={{
-          position: visible ? "absolute" : "relative",
+          position: arePropertiesVisible ? "absolute" : "relative",
           right: 0,
-          display: visible ? "flex" : "none",
+          display: arePropertiesVisible ? "flex" : "none",
           borderLeft: "1px solid",
           borderColor: "border",
           width: [0, 0, "20%"]
@@ -69,7 +75,9 @@ const Properties = props => {
           Properties
           <Text
             as="span"
-            onClick={() => setVisible(false)}
+            onClick={() => {
+              hideProperties();
+            }}
             sx={{
               color: "red",
               height: 24,

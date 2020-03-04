@@ -3,6 +3,7 @@ import Quill from "quill";
 import "quill/dist/quill.snow.css";
 import MarkdownShortcuts from "./modules/markdown";
 import MagicUrl from "quill-magic-url";
+import { store as useAppStore } from "../../stores/app-store";
 
 Quill.register("modules/markdownShortcuts", MarkdownShortcuts);
 Quill.register("modules/magicUrl", MagicUrl);
@@ -105,9 +106,15 @@ export default class ReactQuill extends Component {
     if (source === "api") return;
     this.props.onChange(this.quill);
   };
-
   render() {
-    console.log("rendering + ", this.props.refresh);
-    return <pre id="quill" />;
+    return (
+      <pre
+        id="quill"
+        onFocus={() => {
+          //hideProperties();
+          useAppStore.getState().hideProperties();
+        }}
+      />
+    );
   }
 }
