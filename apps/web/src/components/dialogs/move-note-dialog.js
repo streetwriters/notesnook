@@ -81,13 +81,14 @@ export default class MoveDialog extends React.Component {
                       title: e.target.value
                     });
                     this.setState({ items: db.notebooks.all });
+                    console.log("type is notebook condition");
                   } else {
                     await db.notebooks
                       .notebook(this.selectedNotebook.id)
                       .topics.add(e.target.value);
                     this.setState({
                       items: db.notebooks.notebook(this.selectedNotebook.id)
-                        .topics
+                        .topics.all
                     });
                   }
                   this._inputRef.value = "";
