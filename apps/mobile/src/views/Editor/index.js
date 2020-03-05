@@ -4,12 +4,11 @@ import {
   KeyboardAvoidingView,
   Linking,
   Platform,
+  SafeAreaView,
   StatusBar,
   Text,
   TouchableOpacity,
   View,
-  SafeAreaView,
-  Keyboard,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import WebView from 'react-native-webview';
@@ -41,7 +40,6 @@ import {
   timeConverter,
   ToastEvent,
 } from '../../utils/utils';
-import {TabRouter} from 'react-navigation';
 
 const EditorWebView = createRef();
 let note = {};
@@ -151,7 +149,7 @@ const Editor = ({navigation, noMenu}) => {
       onChange(evt.nativeEvent.data);
       timer = setTimeout(() => {
         saveNote.call(this, true);
-      }, 1000);
+      }, 500);
     }
   };
 
