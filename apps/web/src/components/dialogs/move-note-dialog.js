@@ -4,6 +4,7 @@ import { Input } from "@rebass/forms";
 import * as Icon from "react-feather";
 import { db } from "../../common";
 import Dialog, { showDialog } from "./dialog";
+import { toTitleCase } from "../../utils/string";
 
 export default class MoveDialog extends React.Component {
   history = [];
@@ -23,7 +24,7 @@ export default class MoveDialog extends React.Component {
     return (
       <Dialog
         isOpen={true}
-        title={"Move Note"}
+        title={type === "notes" ? "Move Note" : "Select " + toTitleCase(type.substring(0, type.length - 1))}
         icon={Icon.Move}
         content={
           <Box>
