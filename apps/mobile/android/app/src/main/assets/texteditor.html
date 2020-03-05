@@ -1543,7 +1543,6 @@
           setTimeout(() => {
             if (JSON.parse(data.data).value.length > 0) {
               editor.focus();
-              editor.setSelection(editor.getText().length - 1, 0);
             } else {
               document.getElementById('titleInput').focus();
             }
@@ -1602,9 +1601,9 @@
           editor.setContents(content, 'api');
 
           setTimeout(() => {
-            editor.focus();
+
             editor.setSelection(editor.getText().length - 1, 0);
-          }, 0)
+          }, 500)
 
         } else if (data.data[0] === '<') {
           editor.setContents(
@@ -1612,7 +1611,6 @@
             'silent'
           );
           setTimeout(() => {
-            editor.focus();
             editor.setSelection(editor.getText().length - 1, 0);
           }, 0)
 

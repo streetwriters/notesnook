@@ -77,11 +77,13 @@ const Editor = ({navigation, noMenu}) => {
   }, []);
 
   const loadNote = async item => {
+    EditorWebView.current?.requestFocus();
     noMenu ? null : SideMenuEvent.disable();
     if (note && note.id) {
       dispatch({type: ACTIONS.NOTES});
       if (item && item.type === 'new') {
         await clearEditor();
+
         post('focusTitle');
       } else {
         note = item;
@@ -95,6 +97,7 @@ const Editor = ({navigation, noMenu}) => {
       dispatch({type: ACTIONS.NOTES});
       if (item && item.type === 'new') {
         await clearEditor();
+
         post('focusTitle');
       } else {
         note = item;
@@ -295,8 +298,6 @@ const Editor = ({navigation, noMenu}) => {
     if (note && note.id) {
       updateEditor();
     } else {
-      console.log('i am called');
-      EditorWebView.current?.requestFocus();
       post('focusTitle');
     }
     let c = {...colors};
