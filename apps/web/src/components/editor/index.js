@@ -47,14 +47,15 @@ function Editor() {
   }, [reopenLastSession]);
 
   return (
-    <Flex
-      width={["0%", "0%", "100%"]}
-      sx={{ position: "relative" }}
-      onFocus={() => {
-        hideProperties();
-      }}
-    >
-      <Flex className="editor" flex="1 1 auto" flexDirection="column">
+    <Flex width={["0%", "0%", "100%"]} sx={{ position: "relative" }}>
+      <Flex
+        className="editor"
+        flex="1 1 auto"
+        flexDirection="column"
+        onFocus={() => {
+          hideProperties();
+        }}
+      >
         <TitleBox
           shouldFocus={sessionState === SESSION_STATES.new}
           title={title}
