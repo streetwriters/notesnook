@@ -1207,7 +1207,7 @@
       }
       var changeInterval = null;
 
-      document.getElementById('titleInput').onchange = onChangetitle()
+      document.getElementById('titleInput').onsubmit = onChangetitle()
 
 
       document.getElementById('titleInput').onkeydown = function (evt) {
@@ -1536,25 +1536,34 @@
       // Receber mensagens do RN
       document.addEventListener('message', data => {
 
+
         if (JSON.parse(data.data).type === "text") {
           editor.setText(JSON.parse(data.data).value, 'api')
 
           setTimeout(() => {
-            editor.focus();
-            editor.setSelection(editor.getText().length - 1, 0);
+            if (JSON.parse(data.data).value.length > 0) {
+              editor.focus();
+              editor.setSelection(editor.getText().length - 1, 0);
+            } else {
+              document.getElementById('titleInput').focus();
+            }
+
           }, 0)
         }
 
-        else if (data.data === "clear") {
+        else if (data.data == "clear") {
 
           editor.setText('', 'api')
 
-        } else if (data.data === "focusEditor") {
+        } else if (data.data == "focusEditor") {
 
           editor.focus();
-        } else if (data.data === 'focusTitle') {
+        } else if (data.data == 'focusTitle') {
+
 
           document.getElementById('titleInput').focus();
+
+
         } else if (JSON.parse(data.data).type === "nomenu") {
           let isenabled = JSON.parse(data.data).value;
           let width = window.innerWidth;

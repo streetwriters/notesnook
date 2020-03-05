@@ -82,6 +82,7 @@ const Editor = ({navigation, noMenu}) => {
       dispatch({type: ACTIONS.NOTES});
       if (item && item.type === 'new') {
         await clearEditor();
+        post('focusTitle');
       } else {
         note = item;
         dispatch({
@@ -94,6 +95,7 @@ const Editor = ({navigation, noMenu}) => {
       dispatch({type: ACTIONS.NOTES});
       if (item && item.type === 'new') {
         await clearEditor();
+        post('focusTitle');
       } else {
         note = item;
         dispatch({
@@ -122,7 +124,6 @@ const Editor = ({navigation, noMenu}) => {
         value: '',
       }),
     );
-    post('focusTitle');
   };
 
   const onChange = data => {
@@ -275,7 +276,6 @@ const Editor = ({navigation, noMenu}) => {
   }, [noMenu]);
 
   const onWebViewLoad = () => {
-    //EditorWebView.requestFocus();
     if (noMenu) {
       post(
         JSON.stringify({
@@ -295,6 +295,8 @@ const Editor = ({navigation, noMenu}) => {
     if (note && note.id) {
       updateEditor();
     } else {
+      console.log('i am called');
+      EditorWebView.current?.requestFocus();
       post('focusTitle');
     }
     let c = {...colors};
@@ -378,11 +380,14 @@ const Editor = ({navigation, noMenu}) => {
       if (note && note.id) {
         ToastEvent.show('Note Saved!', 'success');
       }
-      Keyboard.dismiss();
+
       await clearEditor();
+
       if (noMenu) return true;
       DDS.isTab ? SideMenuEvent.open() : null;
       SideMenuEvent.enable();
+      EditorWebView.current?.reload();
+      // Keyboard.dismiss();
 
       return true;
     } else {
@@ -456,11 +461,11 @@ const Editor = ({navigation, noMenu}) => {
                 simpleDialogEvent(TEMPLATE_EXIT_FULLSCREEN());
               } else {
                 exitEditorAnimation();
-                Keyboard.dismiss();
                 if (note && note.id) {
                   ToastEvent.show('Note Saved!', 'success');
                 }
                 await clearEditor();
+                EditorWebView.current?.reload();
                 DDS.isTab ? SideMenuEvent.open() : null;
                 SideMenuEvent.enable();
               }
