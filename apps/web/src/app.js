@@ -88,7 +88,7 @@ function App() {
   const refreshColors = useStore(store => store.refreshColors);
   const setSelectedContext = useNotesStore(store => store.setSelectedContext);
 
-  const isFocusModeEnabled = appStore(store => store.isFocusModeEnabled);
+  const isFocusModeEnabled = useAppStore(store => store.isFocusModeEnabled);
 
   useEffect(() => {
     RootNavigator.navigate(selectedKey);
