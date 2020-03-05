@@ -1205,16 +1205,45 @@
         }
         return whiteSpace;
       }
-      document.getElementById('titleInput').onchange = function () {
-        editor.focus();
 
-        console.log(JSON.stringify(editor.getContents()));
+
+      document.getElementById('titleInput').onchange = onChangetitle()
+
+
+      document.getElementById('titleInput').onkeydown = function (evt) {
+
+        var titleMessage = {
+          type: 'title',
+          value: document.getElementById('titleInput').value
+        }
+
+        window.ReactNativeWebView.postMessage(JSON.stringify(titleMessage));
+      }
+
+      document.getElementById('titleInput').onkeyup = function (evt) {
+
+        var titleMessage = {
+          type: 'title',
+          value: document.getElementById('titleInput').value
+        }
+
+        window.ReactNativeWebView.postMessage(JSON.stringify(titleMessage));
+      }
+
+
+
+
+
+
+      function onChangetitle() {
+        editor.focus();
 
         var titleMessage = {
           type: 'title',
           value: document.getElementById('titleInput').value
         }
         window.ReactNativeWebView.postMessage(JSON.stringify(titleMessage));
+        console.log(JSON.stringify(editor.getContents()));
 
 
       }
