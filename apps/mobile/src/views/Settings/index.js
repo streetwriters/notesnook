@@ -120,6 +120,7 @@ export const Settings = ({navigation}) => {
                   alignItems: 'center',
                 }}>
                 <Icon size={SIZE.lg} color="white" name="account-outline" />
+
                 <Text
                   style={{
                     color: 'white',
@@ -208,19 +209,18 @@ export const Settings = ({navigation}) => {
                 borderRadius: 5,
                 paddingHorizontal: 6,
               }}>
-              <Icon
+              <View
                 style={{
                   width: 40,
-                  textAlign: 'center',
                   backgroundColor: colors.accent,
                   height: 40,
                   borderRadius: 100,
-                  textAlignVertical: 'center',
-                }}
-                name="account-outline"
-                color="white"
-                size={SIZE.lg}
-              />
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                <Icon size={SIZE.lg} color="white" name="account-outline" />
+              </View>
+              <Icon name="account-outline" color="white" size={SIZE.lg} />
               <View
                 style={{
                   marginLeft: 10,
@@ -241,19 +241,21 @@ export const Settings = ({navigation}) => {
                 </Text>
               </View>
 
-              <Icon
+              <View
                 style={{
                   width: 40,
-                  textAlign: 'center',
-                  position: 'absolute',
                   height: 40,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  position: 'absolute',
                   right: 6,
-                  textAlignVertical: 'center',
-                }}
-                name="chevron-right"
-                color={colors.accent}
-                size={SIZE.lg}
-              />
+                }}>
+                <Icon
+                  name="chevron-right"
+                  color={colors.accent}
+                  size={SIZE.lg}
+                />
+              </View>
             </TouchableOpacity>
           </>
         )}
@@ -323,13 +325,13 @@ export const Settings = ({navigation}) => {
                 flexDirection: 'row',
                 justifyContent: 'center',
                 alignItems: 'center',
-                marginRight: 10,
+                marginHorizontal: 5,
                 marginVertical: 5,
               }}>
               <View
                 style={{
-                  width: 35,
-                  height: 35,
+                  width: w / 5 - 22,
+                  height: w / 5 - 22,
                   backgroundColor: item,
                   borderRadius: 100,
                   justifyContent: 'center',

@@ -620,19 +620,26 @@ export const Menu = ({
 
               paddingHorizontal: 12,
             }}>
-            <Icon
+            <View
               style={{
                 width: 30,
-                textAlign: 'center',
+
                 backgroundColor: colors.accent,
                 height: 30,
                 borderRadius: 100,
-                textAlignVertical: 'center',
-              }}
-              name="account-outline"
-              color="white"
-              size={SIZE.md}
-            />
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
+              <Icon
+                style={{
+                  textAlign: 'center',
+                  textAlignVertical: 'center',
+                }}
+                name="account-outline"
+                color="white"
+                size={SIZE.md}
+              />
+            </View>
             <View
               style={{
                 marginLeft: 10,
