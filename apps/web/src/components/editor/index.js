@@ -31,6 +31,7 @@ function Editor() {
   const setSession = useStore(store => store.setSession);
   const saveSession = useStore(store => store.saveSession);
   const reopenLastSession = useStore(store => store.reopenLastSession);
+  const isFocusModeEnabled = useAppStore(store => store.isFocusModeEnabled);
   const hideProperties = useAppStore(store => store.hideProperties);
 
   useEffect(() => {
@@ -47,7 +48,14 @@ function Editor() {
   }, [reopenLastSession]);
 
   return (
-    <Flex width={["0%", "0%", "100%"]} sx={{ position: "relative" }}>
+    <Flex
+      width={["0%", "0%", "100%"]}
+      sx={{
+        position: "relative",
+        marginLeft: isFocusModeEnabled ? "25%" : "0px",
+        marginRight: isFocusModeEnabled ? "25%" : "0px"
+      }}
+    >
       <Flex
         className="editor"
         flex="1 1 auto"

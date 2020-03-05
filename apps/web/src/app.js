@@ -15,6 +15,7 @@ import { useStore as useNotesStore } from "./stores/note-store";
 import { COLORS } from "./common";
 import { toTitleCase } from "./utils/string";
 import * as Icon from "react-feather";
+import { useStore as useAppStore } from "./stores/app-store";
 
 const NavMenuItem = props => {
   const [fill, setFill] = useState();
@@ -87,11 +88,17 @@ function App() {
   const refreshColors = useStore(store => store.refreshColors);
   const setSelectedContext = useNotesStore(store => store.setSelectedContext);
 
+  const isFocusModeEnabled = appStore(store => store.isFocusModeEnabled);
+
   useEffect(() => {
     RootNavigator.navigate(selectedKey);
     refreshColors();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    isFocusModeEnabled ? setShow(false) : setShow(true);
+  }, [isFocusModeEnabled]);
   const colors = useStore(store => store.colors);
   return (
     <ThemeProvider>
@@ -101,87 +108,92 @@ function App() {
         height="100%"
         alignContent="stretch"
       >
-        <Flex
-          flexDirection="column"
-          justifyContent="space-between"
-          sx={{
-            zIndex: 999,
-            borderRight: "1px solid",
-            borderRightColor: "primary",
-            minWidth: ["85%", 50, 50],
-            maxWidth: ["85%", 50, 50],
-            display: [isSideMenuOpen ? "flex" : "none", "flex", "flex"],
-            position: ["absolute", "relative", "relative"]
-          }}
-          bg={"background"}
-          px={0}
-        >
-          <Box
+        {!isFocusModeEnabled && (
+          <Flex
+            flexDirection="column"
+            justifyContent="space-between"
             sx={{
-              overflow: "scroll",
-              scrollbarWidth: "none",
-              //TODO: need to test this on webkit and internet explorer
-              "::-webkit-scrollbar": { width: 0, height: 0 },
-              msOverflowStyle: "none"
-              //"-ms-overflow-style": "none"
+              zIndex: 999,
+              borderRight: "1px solid",
+              borderRightColor: "primary",
+              minWidth: ["85%", 50, 50],
+              maxWidth: ["85%", 50, 50],
+              display: [isSideMenuOpen ? "flex" : "none", "flex", "flex"],
+              position: ["absolute", "relative", "relative"]
             }}
+            bg={"background"}
+            px={0}
           >
-            {Object.values(routes).map((item, index) => (
-              <NavMenuItem
-                onSelected={async () => {
-                  if (selectedKey === item.key) {
-                    setShow(!show);
-                    return;
-                  }
-                  if (RootNavigator.navigate(item.key)) {
-                    setSelectedKey(item.key);
-                  }
-                }}
-                key={item.key}
-                item={item}
-                selected={selectedKey === item.key}
-              />
-            ))}
-            {colors.map(color => {
-              return (
+            <Box
+              sx={{
+                overflow: "scroll",
+                scrollbarWidth: "none",
+                //TODO: need to test this on webkit and internet explorer
+                "::-webkit-scrollbar": { width: 0, height: 0 },
+                msOverflowStyle: "none"
+                //"-ms-overflow-style": "none"
+              }}
+            >
+              {Object.values(routes).map((item, index) => (
                 <NavMenuItem
                   onSelected={async () => {
-                    setSelectedKey(undefined);
-                    setSelectedContext({ type: "color", value: color.title });
-                    RootNavigator.navigate("color", {
-                      title: toTitleCase(color.title),
-                      context: { colors: [color.title] }
-                    });
+                    if (selectedKey === item.key) {
+                      setShow(!show);
+                      return;
+                    }
+                    if (RootNavigator.navigate(item.key)) {
+                      setSelectedKey(item.key);
+                    }
                   }}
-                  key={color.title}
-                  item={{
-                    color: COLORS[color.title],
-                    title: toTitleCase(color.title),
-                    icon: Icon.Circle,
-                    count: color.count
-                  }}
+                  key={item.key}
+                  item={item}
+                  selected={selectedKey === item.key}
                 />
-              );
-            })}
-          </Box>
-          <Box>
-            {Object.values(bottomRoutes).map((item, index) => (
-              <NavMenuItem
-                onSelected={async () => {
-                  if (item.onClick) {
-                    return item.onClick();
-                  }
-                  if (RootNavigator.navigate(item.key)) {
-                    setSelectedKey(item.key);
-                  }
-                }}
-                key={item.key}
-                item={item}
-                selected={selectedKey === item.key}
-              />
-            ))}
-          </Box>
-        </Flex>
+              ))}
+              {colors.map(color => {
+                return (
+                  <NavMenuItem
+                    onSelected={async () => {
+                      setSelectedKey(undefined);
+                      setSelectedContext({
+                        type: "color",
+                        value: color.title
+                      });
+                      RootNavigator.navigate("color", {
+                        title: toTitleCase(color.title),
+                        context: { colors: [color.title] }
+                      });
+                    }}
+                    key={color.title}
+                    item={{
+                      color: COLORS[color.title],
+                      title: toTitleCase(color.title),
+                      icon: Icon.Circle,
+                      count: color.count
+                    }}
+                  />
+                );
+              })}
+            </Box>
+            <Box>
+              {Object.values(bottomRoutes).map((item, index) => (
+                <NavMenuItem
+                  onSelected={async () => {
+                    if (item.onClick) {
+                      return item.onClick();
+                    }
+                    if (RootNavigator.navigate(item.key)) {
+                      setSelectedKey(item.key);
+                    }
+                  }}
+                  key={item.key}
+                  item={item}
+                  selected={selectedKey === item.key}
+                />
+              ))}
+            </Box>
+          </Flex>
+        )}
         <Flex flex="1 1 auto" flexDirection="row" alignContent="stretch" px={0}>
           <Flex
             className="RootNavigator"
