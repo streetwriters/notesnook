@@ -2,6 +2,7 @@ import createStore from "../common/store";
 import { store as noteStore, LIST_TYPES } from "./note-store";
 import { store as appStore } from "./app-store";
 import { db } from "../common";
+import { showPasswordDialog } from "../components/dialogs/passworddialog";
 
 const SESSION_STATES = {
   stale: "stale",
@@ -42,10 +43,27 @@ function editorStore(set, get) {
     },
     openSession: async function(note) {
       clearTimeout(get().session.timeout);
-      const content = {
-        text: note.content.text,
-        delta: await db.notes.note(note).delta()
-      };
+      let content = {};
+      if (!note.locked) {
+        content = {
+          text: note.content.text,
+          delta: await db.notes.note(note).delta()
+        };
+      } else {
+        const result = await showPasswordDialog("unlock_note", password => {
+          return db.vault
+            .open(note.id, password)
+            .then(note => {
+              content = note.content;
+              return true;
+            })
+            .catch(e => {
+              console.log(e);
+              return false;
+            });
+        });
+        if (!result) return;
+      }
       noteStore.getState().setSelectedNote(note.id);
       set(state => {
         state.session = {
@@ -61,7 +79,7 @@ function editorStore(set, get) {
           state: SESSION_STATES.new
         };
       });
-      saveLastOpenedNote(note.id);
+      saveLastOpenedNote(!note.locked ? note.id : undefined);
     },
     saveSession: function(oldSession) {
       set(state => {

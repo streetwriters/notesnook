@@ -88,25 +88,24 @@ function noteStore(set, get) {
           if (index < 0) return;
         }
         state.notes.items[index].favorite = !note.favorite;
-        syncEditor(note, "favorite");
       });
+      syncEditor(note, "favorite");
       get().refreshList(LIST_TYPES.fav);
     },
-    unlock: function unlock(note, index) {
-      showPasswordDialog("unlock_note")
-        .then(password => {
-          if (!password) return;
-          return db.vault.remove(note.id, password);
-        })
-        .then(() => {
+    unlock: function(note, index) {
+      showPasswordDialog("unlock_note", password => {
+        return db.vault
+          .remove(note.id, password)
+          .then(() => true)
+          .catch(() => false);
+      }).then(res => {
+        if (res) {
           set(state => {
             state.notes.items[index].locked = false;
           });
-        })
-        .catch(({ message }) => {
-          if (message === "ERR_WRNG_PWD") unlock(note, index);
-          else console.log(message);
-        });
+          syncEditor(note, "locked");
+        }
+      });
     },
     lock: function lock(note, index) {
       db.vault
@@ -115,6 +114,7 @@ function noteStore(set, get) {
           set(state => {
             state.notes.items[index].locked = true;
           });
+          syncEditor(note, "locked");
         })
         .catch(async ({ message }) => {
           switch (message) {

@@ -55,21 +55,17 @@ function appStore(set, get) {
       }
     },
     createVault: function() {
-      return showPasswordDialog("create_vault").then(password => {
-        if (!password) return false;
-        return db.vault.create(password);
-      });
+      return showPasswordDialog("create_vault", password =>
+        db.vault.create(password)
+      );
     },
-    unlockVault: function unlockVault() {
-      return showPasswordDialog("unlock_vault")
-        .then(password => {
-          if (!password) return false;
-          return db.vault.unlock(password);
-        })
-        .catch(({ message }) => {
-          if (message === "ERR_WRNG_PWD") return unlockVault();
-          else return false;
-        });
+    unlockVault: function() {
+      return showPasswordDialog("unlock_vault", password => {
+        return db.vault
+          .unlock(password)
+          .then(() => true)
+          .catch(() => false);
+      });
     }
   };
 }
