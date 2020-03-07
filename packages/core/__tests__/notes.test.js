@@ -230,7 +230,7 @@ test("favorite note", () =>
     note = db.notes.note(id);
     expect(note.data.favorite).toBe(true);
   }));
-
+/* 
 test("lock a note", () =>
   noteTest().then(async ({ db, id }) => {
     let note = db.notes.note(id);
@@ -261,7 +261,7 @@ test("permanently unlock a locked note", () =>
     note = db.notes.note(id);
     expect((await note.delta()).ops).toBeDefined();
     expect(note.data.locked).toBe(false);
-  }));
+  })); */
 
 test("add note to topic", () =>
   noteTest().then(async ({ db, id }) => {

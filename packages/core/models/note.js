@@ -74,7 +74,7 @@ export default class Note {
     return this._toggle("pinned");
   }
 
-  async lock(password) {
+  async _lock(password) {
     let delta = qclone(await this.delta());
     if (delta) {
       delta = await this._notes._collection.indexer.encrypt(
@@ -92,7 +92,7 @@ export default class Note {
     return await this._notes._collection.addItem(note);
   }
 
-  async unlock(password, perm = false) {
+  async _unlock(password, perm = false) {
     let decrypted = JSON.parse(
       await this._notes._collection.indexer.decrypt(
         password,
