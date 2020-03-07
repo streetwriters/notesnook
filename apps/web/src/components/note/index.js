@@ -8,6 +8,8 @@ import { confirm } from "../dialogs/confirm";
 import { showMoveNoteDialog } from "../dialogs/movenotedialog";
 import { store, useStore } from "../../stores/note-store";
 import { store as editorStore } from "../../stores/editor-store";
+import { showPasswordDialog } from "../dialogs/passworddialog";
+import { db } from "../../common";
 
 const dropdownRefs = [];
 const menuItems = (note, index) => [
@@ -42,7 +44,16 @@ const menuItems = (note, index) => [
   {
     title: "Move to Trash",
     color: "red",
-    onClick: () => {
+    onClick: async () => {
+      if (note.locked) {
+        const res = await showPasswordDialog("unlock_note", password => {
+          return db.vault
+            .unlock(password)
+            .then(() => true)
+            .catch(() => false);
+        });
+        if (!res) return;
+      }
       confirm(
         Icon.Trash2,
         "Delete",
