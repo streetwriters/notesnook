@@ -8,7 +8,7 @@ import { useStore } from "../../stores/editor-store";
 import { COLORS } from "../../common";
 import { objectMap } from "../../utils/object";
 import { useStore as useAppStore } from "../../stores/app-store";
-
+import { motion } from "framer-motion";
 const Properties = props => {
   const pinned = useStore(store => store.session.pinned);
   const favorite = useStore(store => store.session.favorite);
@@ -28,6 +28,7 @@ const Properties = props => {
       state.session[prop] = value;
     });
   }
+
   return (
     !isFocusModeEnabled && (
       <>
@@ -49,137 +50,160 @@ const Properties = props => {
         >
           <Icon.ChevronLeft size={32} />
         </Box>
-        <Box
-          sx={{
-            position: arePropertiesVisible ? "absolute" : "relative",
-            right: 0,
-            display: arePropertiesVisible ? "flex" : "none",
-            borderLeft: "1px solid",
-            borderColor: "border",
-            width: [0, 0, "20%"]
+
+        <motion.div
+          animate={{ x: arePropertiesVisible ? 0 : 800 }}
+          transition={{
+            duration: 0.5,
+            bounceDamping: 1,
+            bounceStiffness: 1,
+            ease: "easeOut"
           }}
-          flexDirection="column"
-          bg="background"
-          px={3}
-          py={0}
+          initial={false}
+          style={{
+            position: "absolute",
+            right: 0,
+            display: "flex",
+            width: 280,
+            height: "100%"
+          }}
         >
-          <Text
-            variant="title"
-            color="primary"
-            my={2}
-            alignItems="center"
-            justifyContent="space-between"
-            sx={{ display: "flex" }}
-          >
-            Properties
-            <Text
-              as="span"
-              onClick={() => hideProperties()}
-              sx={{
-                color: "red",
-                height: 24,
-                ":active": { color: "darkRed" }
-              }}
-            >
-              <Icon.X />
-            </Text>
-          </Text>
-          <CheckBox
-            checked={pinned}
-            icon={PinIcon}
-            label="Pin"
-            onChecked={state => changeState("pinned", state)}
-          />
-          <CheckBox
-            icon={Icon.Star}
-            checked={favorite}
-            label="Favorite"
-            onChecked={state => changeState("favorite", state)}
-          />
-          <CheckBox icon={Icon.Lock} label="Lock" onChecked={props.onLocked} />
-          <Flex fontSize="body" sx={{ marginBottom: 3 }} alignItems="center">
-            <Icon.Book size={18} />
-            <Text sx={{ marginLeft: 1 }}>Move to notebook</Text>
-          </Flex>
-          <Flex fontSize="body" sx={{ marginBottom: 2 }} alignItems="center">
-            <Icon.Tag size={18} />
-            <Text sx={{ marginLeft: 1 }}>Tags:</Text>
-          </Flex>
-          <Input
-            variant="default"
-            placeholder="#tag"
-            sx={{ marginBottom: 2 }}
-            onKeyUp={event => {
-              if (
-                event.key === "Enter" ||
-                event.key === " " ||
-                event.key === ","
-              ) {
-                const value = event.target.value;
-                setTag(value.trim().replace(",", ""));
-                event.target.value = "";
-              }
+          <Box
+            sx={{
+              position: "absolute",
+              right: 0,
+              display: "flex",
+              width: [0, 0, "100%"],
+              height: "100%",
+              boxShadow: "-1px 1px 10px 0px #888888"
             }}
-          />
-          <Flex
-            fontSize="body"
-            sx={{ marginBottom: 2 }}
-            alignItems="center"
-            justifyContent="flex-start"
-            flexWrap="wrap"
+            flexDirection="column"
+            bg="background"
+            px={3}
+            py={0}
           >
-            {tags.map(tag => (
+            <Text
+              variant="title"
+              color="primary"
+              my={2}
+              alignItems="center"
+              justifyContent="space-between"
+              sx={{ display: "flex" }}
+            >
+              Properties
               <Text
+                as="span"
+                onClick={() => hideProperties()}
                 sx={{
-                  backgroundColor: "primary",
-                  color: "static",
-                  borderRadius: "default",
-                  padding: "2px 5px 2px 5px",
-                  marginBottom: 1,
-                  marginRight: 1,
-                  cursor: "pointer"
-                }}
-                onClick={() => {
-                  setTag(tag);
+                  color: "red",
+                  height: 24,
+                  ":active": { color: "darkRed" }
                 }}
               >
-                #{tag}
+                <Icon.X />
               </Text>
-            ))}
-          </Flex>
-          <Flex fontSize="body" sx={{ marginBottom: 2 }} alignItems="center">
-            <Icon.Octagon size={18} />
-            <Text sx={{ marginLeft: 1 }}>Colors:</Text>
-          </Flex>
-          <Flex flexWrap="wrap" sx={{ marginBottom: 2 }}>
-            {objectMap(COLORS, (label, code) => (
-              <Flex
-                sx={{ position: "relative" }}
-                justifyContent="center"
-                alignItems="center"
-                onClick={() => setColor(label)}
-                key={label}
-              >
-                <Icon.Circle
-                  size={40}
-                  style={{ cursor: "pointer" }}
-                  fill={code}
-                  strokeWidth={0}
-                />
-                {colors.includes(label) && (
-                  <Icon.Check
-                    style={{
-                      position: "absolute",
-                      cursor: "pointer",
-                      color: "white"
-                    }}
-                    size={20}
+            </Text>
+            <CheckBox
+              checked={pinned}
+              icon={PinIcon}
+              label="Pin"
+              onChecked={state => changeState("pinned", state)}
+            />
+            <CheckBox
+              icon={Icon.Star}
+              checked={favorite}
+              label="Favorite"
+              onChecked={state => changeState("favorite", state)}
+            />
+            <CheckBox
+              icon={Icon.Lock}
+              label="Lock"
+              onChecked={props.onLocked}
+            />
+            <Flex fontSize="body" sx={{ marginBottom: 3 }} alignItems="center">
+              <Icon.Book size={18} />
+              <Text sx={{ marginLeft: 1 }}>Move to notebook</Text>
+            </Flex>
+            <Flex fontSize="body" sx={{ marginBottom: 2 }} alignItems="center">
+              <Icon.Tag size={18} />
+              <Text sx={{ marginLeft: 1 }}>Tags:</Text>
+            </Flex>
+            <Input
+              variant="default"
+              placeholder="#tag"
+              sx={{ marginBottom: 2 }}
+              onKeyUp={event => {
+                if (
+                  event.key === "Enter" ||
+                  event.key === " " ||
+                  event.key === ","
+                ) {
+                  const value = event.target.value;
+                  setTag(value.trim().replace(",", ""));
+                  event.target.value = "";
+                }
+              }}
+            />
+            <Flex
+              fontSize="body"
+              sx={{ marginBottom: 2 }}
+              alignItems="center"
+              justifyContent="flex-start"
+              flexWrap="wrap"
+            >
+              {tags.map(tag => (
+                <Text
+                  sx={{
+                    backgroundColor: "primary",
+                    color: "static",
+                    borderRadius: "default",
+                    padding: "2px 5px 2px 5px",
+                    marginBottom: 1,
+                    marginRight: 1,
+                    cursor: "pointer"
+                  }}
+                  onClick={() => {
+                    setTag(tag);
+                  }}
+                >
+                  #{tag}
+                </Text>
+              ))}
+            </Flex>
+            <Flex fontSize="body" sx={{ marginBottom: 2 }} alignItems="center">
+              <Icon.Octagon size={18} />
+              <Text sx={{ marginLeft: 1 }}>Colors:</Text>
+            </Flex>
+            <Flex flexWrap="wrap" sx={{ marginBottom: 2 }}>
+              {objectMap(COLORS, (label, code) => (
+                <Flex
+                  sx={{ position: "relative" }}
+                  justifyContent="center"
+                  alignItems="center"
+                  onClick={() => setColor(label)}
+                  key={label}
+                >
+                  <Icon.Circle
+                    size={40}
+                    style={{ cursor: "pointer" }}
+                    fill={code}
+                    strokeWidth={0}
                   />
-                )}
-              </Flex>
-            ))}
-          </Flex>
-        </Box>
+                  {colors.includes(label) && (
+                    <Icon.Check
+                      style={{
+                        position: "absolute",
+                        cursor: "pointer",
+                        color: "white"
+                      }}
+                      size={20}
+                    />
+                  )}
+                </Flex>
+              ))}
+            </Flex>
+          </Box>
+        </motion.div>
       </>
     )
   );
