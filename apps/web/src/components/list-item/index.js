@@ -8,6 +8,7 @@ import {
   useStore as useAppStore
 } from "../../stores/app-store";
 import useContextMenu from "../../utils/useContextMenu";
+import { useTheme } from "emotion-theming";
 
 const ActionsMenu = props => (
   <Menu
@@ -59,7 +60,7 @@ const ListItem = props => {
   const selectItem = useAppStore(store => store.selectItem);
   const [isSelected, setIsSelected] = useState(false);
   const [menuItems, setMenuItems] = useState(props.menuItems);
-
+  const theme = useTheme();
   const toggleSelection = useCallback(
     function toggleSelection() {
       setIsSelected(state => !state);
@@ -198,9 +199,11 @@ const ListItem = props => {
           >
             <DropdownTrigger onClick={() => closeContextMenu()}>
               <Text sx={{ ":active, :hover": { color: "primary" } }}>
+                
                 <Icon.MoreVertical
-                  size={24}
-                  strokeWidth={1.5}
+                  size={22}
+                  strokeWidth={2}
+                  color={theme.colors.icon}
                   style={{ marginRight: -5 }}
                 />
               </Text>

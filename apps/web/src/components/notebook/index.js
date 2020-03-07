@@ -40,7 +40,7 @@ export default class Notebook extends React.Component {
         title={notebook.title}
         body={notebook.description}
         subBody={
-          <Flex sx={{ marginBottom: 1 }}>
+          <Flex sx={{ marginBottom:1,marginTop:1 }}>
             {notebook.topics.slice(1, 4).map(topic => (
               <Flex
                 onClick={e => {
@@ -49,12 +49,14 @@ export default class Notebook extends React.Component {
                 }}
                 key={topic.id + topic.title}
                 bg="primary"
-                px={2}
-                py={1}
+                px={1}
                 sx={{
                   marginRight: 1,
                   borderRadius: "default",
-                  color: "static"
+                  color: "static",
+                  paddingTop:0.4,
+                  paddingBottom:0.4
+                  
                 }}
               >
                 <Text variant="body" fontSize={11}>
