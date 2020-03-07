@@ -9,7 +9,5 @@ export function toTitleCase(str) {
 export function countWords(str) {
   str = str.trim();
   if (!str.length) return 0;
-
   return str.split(/\W+\S/).length;
 }
-

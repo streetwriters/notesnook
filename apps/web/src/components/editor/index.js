@@ -100,7 +100,7 @@ function Editor() {
               <TextSeperator />
             </>
           )}
-          {id.length > 0 && <>{isSaving ? "Saving" : "Saved"}</>}
+          {id && id.length > 0 && <>{isSaving ? "Saving" : "Saved"}</>}
         </Text>
         <Box id="toolbar" display={["none", "flex", "flex"]} />
         <ReactQuill

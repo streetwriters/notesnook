@@ -57,7 +57,7 @@ export default class AddNotebookDialog extends React.Component {
     if (!this.props.notebook) return;
     const { title, description, id, topics } = this.props.notebook;
     this.setState({
-      topics: topics.map(topic => topic.title);
+      topics: topics.map(topic => topic.title)
     });
     this.title = title;
     this.description = description;
