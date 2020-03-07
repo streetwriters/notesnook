@@ -3,14 +3,19 @@ import { Flex, Text } from "rebass";
 import * as Icon from "react-feather";
 import ListItem from "../list-item";
 import { store } from "../../stores/notebook-store";
+import { showEditNoteDialog } from "../dialogs/addnotebookdialog";
 
 const dropdownRefs = [];
+
 const menuItems = (notebook, index) => [
   {
     title: notebook.pinned ? "Unpin" : "Pin",
     onClick: () => store.getState().pin(notebook, index)
   },
-  { title: "Edit" },
+  {
+    title: "Edit",
+    onClick: () => showEditNoteDialog(notebook)
+  },
   {
     title: "Delete",
     color: "red",
