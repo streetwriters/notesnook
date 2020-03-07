@@ -28,7 +28,17 @@ const menuItems = (note, index) => [
     onClick: () => store.getState().favorite(note, index)
   },
   { title: "Edit", onClick: () => editorStore.getState().openSession(note) },
-  { title: note.locked ? "Remove lock" : "Lock" }, //TODO
+  {
+    title: note.locked ? "Unlock" : "Lock",
+    onClick: async () => {
+      const { unlock, lock } = store.getState();
+      if (!note.locked) {
+        lock(note, index);
+      } else {
+        unlock(note, index);
+      }
+    }
+  },
   {
     title: "Move to Trash",
     color: "red",
@@ -85,6 +95,7 @@ export default React.memo(Note, function(prevProps, nextProps) {
     prevItem.pinned === nextItem.pinned &&
     prevItem.favorite === nextItem.favorite &&
     prevItem.headline === nextItem.headline &&
-    prevItem.title === nextItem.title
+    prevItem.title === nextItem.title &&
+    prevItem.locked === nextItem.locked
   );
 });

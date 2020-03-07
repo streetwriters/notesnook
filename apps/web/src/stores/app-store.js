@@ -1,5 +1,6 @@
 import createStore from "../common/store";
 import { db } from "../common";
+import { showPasswordDialog } from "../components/dialogs/passworddialog";
 
 function appStore(set, get) {
   return {
@@ -52,6 +53,23 @@ function appStore(set, get) {
       if (get().selectedItems.length <= 0) {
         get().exitSelectionMode();
       }
+    },
+    createVault: function() {
+      return showPasswordDialog("create_vault").then(password => {
+        if (!password) return false;
+        return db.vault.create(password);
+      });
+    },
+    unlockVault: function unlockVault() {
+      return showPasswordDialog("unlock_vault")
+        .then(password => {
+          if (!password) return false;
+          return db.vault.unlock(password);
+        })
+        .catch(({ message }) => {
+          if (message === "ERR_WRNG_PWD") return unlockVault();
+          else return false;
+        });
     }
   };
 }

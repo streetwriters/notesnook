@@ -1,6 +1,8 @@
 import { db } from "../common/index";
 import createStore from "../common/store";
 import { store as editorStore } from "./editor-store";
+import { store as appStore } from "./app-store";
+import { showPasswordDialog } from "../components/dialogs/passworddialog";
 
 const LIST_TYPES = {
   fav: "favorites"
@@ -89,6 +91,46 @@ function noteStore(set, get) {
         syncEditor(note, "favorite");
       });
       get().refreshList(LIST_TYPES.fav);
+    },
+    unlock: function unlock(note, index) {
+      showPasswordDialog("unlock_note")
+        .then(password => {
+          if (!password) return;
+          return db.vault.remove(note.id, password);
+        })
+        .then(() => {
+          set(state => {
+            state.notes.items[index].locked = false;
+          });
+        })
+        .catch(({ message }) => {
+          if (message === "ERR_WRNG_PWD") unlock(note, index);
+          else console.log(message);
+        });
+    },
+    lock: function lock(note, index) {
+      db.vault
+        .add(note.id)
+        .then(() => {
+          set(state => {
+            state.notes.items[index].locked = true;
+          });
+        })
+        .catch(async ({ message }) => {
+          switch (message) {
+            case "ERR_NO_VAULT":
+              return appStore.getState().createVault();
+            case "ERR_VAULT_LOCKED":
+              return appStore.getState().unlockVault();
+            default:
+              return false;
+          }
+        })
+        .then(result => {
+          if (result === true) {
+            lock(note, index);
+          }
+        });
     }
   };
 }
