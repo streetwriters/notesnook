@@ -17,6 +17,7 @@ const DEFAULT_SESSION = {
   id: "",
   pinned: false,
   favorite: false,
+  locked: false,
   tags: [],
   colors: [],
   dateEdited: 0,
@@ -58,8 +59,8 @@ function editorStore(set, get) {
               return true;
             })
             .catch(e => {
-              console.log(e);
-              return false;
+              if (e.message === "ERR_WRNG_PwD") return false;
+              else console.error(e);
             });
         });
         if (!result) return;
@@ -73,6 +74,7 @@ function editorStore(set, get) {
           pinned: note.pinned,
           favorite: note.favorite,
           colors: note.colors,
+          locked: note.locked,
           tags: note.tags,
           dateEdited: note.dateEdited,
           content,
@@ -86,7 +88,17 @@ function editorStore(set, get) {
         state.session.isSaving = true;
       });
       const { session } = get();
-      const { title, id, content, pinned, favorite, tags, colors } = session;
+      const {
+        title,
+        id,
+        content,
+        pinned,
+        favorite,
+        locked,
+        tags,
+        colors
+      } = session;
+
       let note = {
         content,
         title,
@@ -96,6 +108,7 @@ function editorStore(set, get) {
         tags,
         colors
       };
+
       db.notes.add(note).then(id => {
         if (tags.length > 0) updateContext("tags", tags);
         if (colors.length > 0) {
@@ -113,7 +126,7 @@ function editorStore(set, get) {
         });
 
         notesState.refresh();
-        saveLastOpenedNote(id);
+        saveLastOpenedNote(locked ? undefined : id);
 
         // we update favorites only if favorite has changed
         if (!oldSession || oldSession.favorite !== session.favorite) {
@@ -143,6 +156,14 @@ function editorStore(set, get) {
       });
       saveLastOpenedNote();
       noteStore.getState().setSelectedNote(0);
+    },
+    toggleLocked: function() {
+      const { session } = get();
+      if (session.locked) {
+        noteStore.getState().unlock(session.id);
+      } else {
+        noteStore.getState().lock(session.id);
+      }
     },
     setColor: function(color) {
       setTagOrColor(get().session, "colors", color, "color", get().setSession);

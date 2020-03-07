@@ -10,9 +10,12 @@ const CheckBox = props => {
   return (
     <Flex
       onClick={() => {
-        setChecked(!checked);
         if (props.onChecked) {
           props.onChecked(!checked);
+          setChecked(!checked);
+        }
+        if (props.onClick) {
+          props.onClick();
         }
       }}
       width="full"

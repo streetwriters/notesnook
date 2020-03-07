@@ -64,6 +64,7 @@ function Home() {
           notes.groupCounts[groupIndex] && (
             <Note
               index={index}
+              pinnable={true}
               groupIndex={groupIndex}
               item={notes.items[index]}
             />

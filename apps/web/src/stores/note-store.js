@@ -36,6 +36,7 @@ function noteStore(set, get) {
       });
     },
     setSelectedContext: function(context) {
+      console.log("setting context");
       let notes = [];
       switch (context.type) {
         case "tag":
@@ -77,44 +78,34 @@ function noteStore(set, get) {
       await db.notes.note(note).pin();
       set(state => {
         state.notes = db.notes.group(undefined, true);
-        syncEditor(note, "pinned");
       });
+      syncEditor(note.id, "pinned");
     },
-    favorite: async function(note, index) {
+    favorite: async function(note) {
       await db.notes.note(note).favorite();
-      set(state => {
-        if (index < 0 || !index) {
-          index = state.notes.items.findIndex(n => n.id === note.id);
-          if (index < 0) return;
-        }
-        state.notes.items[index].favorite = !note.favorite;
-      });
-      syncEditor(note, "favorite");
+      setValue(set, note.id, "favorite", !note.favorite);
       get().refreshList(LIST_TYPES.fav);
     },
-    unlock: function(note, index) {
+    unlock: function(noteId) {
       showPasswordDialog("unlock_note", password => {
         return db.vault
-          .remove(note.id, password)
+          .remove(noteId, password)
           .then(() => true)
-          .catch(() => false);
+          .catch(e => {
+            if (e.message === "ERR_WRNG_PWD") return false;
+            else console.error(e);
+          });
       }).then(res => {
         if (res) {
-          set(state => {
-            state.notes.items[index].locked = false;
-          });
-          syncEditor(note, "locked");
+          setValue(set, noteId, "locked", false);
         }
       });
     },
-    lock: function lock(note, index) {
+    lock: function lock(noteId) {
       db.vault
-        .add(note.id)
+        .add(noteId)
         .then(() => {
-          set(state => {
-            state.notes.items[index].locked = true;
-          });
-          syncEditor(note, "locked");
+          setValue(set, noteId, "locked", true);
         })
         .catch(async ({ message }) => {
           switch (message) {
@@ -128,20 +119,32 @@ function noteStore(set, get) {
         })
         .then(result => {
           if (result === true) {
-            lock(note, index);
+            lock(noteId);
           }
         });
     }
   };
 }
 
-function syncEditor(note, action) {
+function syncEditor(noteId, action) {
   const editorState = editorStore.getState();
-  if (editorState.session.id === note.id) {
+  if (editorState.session.id === noteId) {
     editorState.setSession(
       state => (state.session[action] = !state.session[action])
     );
   }
+}
+
+function setValue(set, noteId, prop, value) {
+  set(state => {
+    const arr = !state.selectedNotes.length
+      ? state.notes.items
+      : state.selectedNotes;
+    let index = arr.findIndex(n => n.id === noteId);
+    if (index < 0) return;
+    arr[index][prop] = value;
+  });
+  syncEditor(noteId, prop);
 }
 
 const [useStore, store] = createStore(noteStore);

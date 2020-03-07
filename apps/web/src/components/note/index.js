@@ -25,7 +25,7 @@ const menuItems = (note, index) => [
   },
   {
     title: note.favorite ? "Unfavorite" : "Favorite",
-    onClick: () => store.getState().favorite(note, index)
+    onClick: () => store.getState().favorite(note)
   },
   { title: "Edit", onClick: () => editorStore.getState().openSession(note) },
   {
@@ -33,9 +33,9 @@ const menuItems = (note, index) => [
     onClick: async () => {
       const { unlock, lock } = store.getState();
       if (!note.locked) {
-        lock(note, index);
+        lock(note.id);
       } else {
-        unlock(note, index);
+        unlock(note.id);
       }
     }
   },
@@ -80,7 +80,7 @@ function Note(props) {
           {note.favorite && <Icon.Star size={13} style={{ marginLeft: 5 }} />}
         </Flex>
       }
-      pinned={note.pinned}
+      pinned={props.pinnable && note.pinned}
       menuData={note}
       menuItems={menuItems(note, index)}
       dropdownRefs={dropdownRefs}

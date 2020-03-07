@@ -5,17 +5,17 @@ import Dialog, { showDialog } from "./dialog";
 import * as Icon from "react-feather";
 
 function PasswordDialog(props) {
-  let password = "";
   const [isWrong, setIsWrong] = useState(false);
   const passwordRef = useRef();
   const submit = useCallback(async () => {
+    const password = passwordRef.current.value;
     if (await props.validate(password)) {
       props.onDone();
     } else {
       setIsWrong(true);
       passwordRef.current.focus();
     }
-  }, [setIsWrong, password, props]);
+  }, [setIsWrong, props]);
   return (
     <Dialog
       isOpen={true}
@@ -28,7 +28,6 @@ function PasswordDialog(props) {
             autoFocus
             variant={isWrong ? "error" : "default"}
             type="password"
-            onChange={e => (password = e.target.value)}
             placeholder="Enter vault password"
             onKeyUp={async e => {
               if (e.key === "Enter") {

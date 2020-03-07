@@ -12,12 +12,15 @@ import { useStore as useAppStore } from "../../stores/app-store";
 const Properties = props => {
   const pinned = useStore(store => store.session.pinned);
   const favorite = useStore(store => store.session.favorite);
+  const locked = useStore(store => store.session.locked);
   const colors = useStore(store => store.session.colors);
   const tags = useStore(store => store.session.tags);
 
   const setSession = useStore(store => store.setSession);
   const setColor = useStore(store => store.setColor);
   const setTag = useStore(store => store.setTag);
+  const toggleLocked = useStore(store => store.toggleLocked);
+
   function changeState(prop, value) {
     setSession(state => {
       state.session[prop] = value;
@@ -92,13 +95,13 @@ const Properties = props => {
           label="Pin"
           onChecked={state => changeState("pinned", state)}
         />
+        <CheckBox icon={Icon.Star} checked={favorite} label="Favorite" />
         <CheckBox
-          icon={Icon.Star}
-          checked={favorite}
-          label="Favorite"
-          onChecked={state => changeState("favorite", state)}
+          icon={Icon.Lock}
+          label="Lock"
+          checked={locked}
+          onClick={toggleLocked}
         />
-        <CheckBox icon={Icon.Lock} label="Lock" onChecked={props.onLocked} />
         <Flex fontSize="body" sx={{ marginBottom: 3 }} alignItems="center">
           <Icon.Book size={18} />
           <Text sx={{ marginLeft: 1 }}>Move to notebook</Text>
