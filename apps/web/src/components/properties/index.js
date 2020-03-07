@@ -139,6 +139,10 @@ const Properties = props => {
                   event.key === ","
                 ) {
                   const value = event.target.value;
+                  if (value.trim().length === 0) {
+                    event.target.value = "";
+                    return;
+                  }
                   setTag(value.trim().replace(",", ""));
                   event.target.value = "";
                 }
