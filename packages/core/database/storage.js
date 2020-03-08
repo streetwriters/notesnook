@@ -2,18 +2,20 @@ export default class Storage {
   constructor(context) {
     this.storage = context;
   }
-  async write(key, data) {
-    await this.storage.write(key, data);
+  write(key, data) {
+    return this.storage.write(key, data);
   }
-  async read(key) {
-    let data = await this.storage.read(key);
-    return data;
+  readMulti(keys) {
+    return this.storage.readMulti(keys);
   }
-  async clear() {
-    await this.storage.clear();
+  read(key) {
+    return this.storage.read(key);
   }
-  async remove(key) {
-    await this.storage.remove(key);
+  clear() {
+    return this.storage.clear();
+  }
+  remove(key) {
+    return this.storage.remove(key);
   }
   encrypt(password, data) {
     return this.storage.encrypt(password, data);

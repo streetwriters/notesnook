@@ -10,9 +10,8 @@ export default class CachedCollection {
 
   async init() {
     await this.indexer.init();
-    for (let id of this.indexer.indices) {
-      this.map.set(id, await this.indexer.read(id));
-    }
+    const data = await this.indexer.readMulti(this.indexer.indices);
+    this.map = new Map(data);
   }
 
   /**
