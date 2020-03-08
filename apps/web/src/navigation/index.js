@@ -122,6 +122,7 @@ const NavigationContainer = props => {
               <Flex>
                 {props.route.options.map(option => (
                   <Box
+                    key={option.icon.name}
                     onClick={option.onClick}
                     mx={2}
                     sx={{ cursor: "pointer" }}

@@ -52,7 +52,7 @@ export default class Notebook extends React.Component {
                   onTopicClick(notebook, topic);
                   e.stopPropagation();
                 }}
-                key={topic.id + topic.title}
+                key={topic.id}
                 bg="primary"
                 px={1}
                 sx={{

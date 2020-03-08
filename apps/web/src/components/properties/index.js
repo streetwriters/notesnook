@@ -160,6 +160,7 @@ const Properties = props => {
             >
               {tags.map(tag => (
                 <Text
+                  key={tag}
                   sx={{
                     backgroundColor: "primary",
                     color: "static",

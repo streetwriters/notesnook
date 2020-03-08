@@ -88,6 +88,7 @@ function Note(props) {
         <Flex justifyContent="center" alignItems="center">
           {note.colors.map((item, index) => (
             <Box
+              key={item}
               style={{
                 width: 13,
                 marginLeft: index ? -8 : 0,

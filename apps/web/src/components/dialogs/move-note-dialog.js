@@ -24,7 +24,11 @@ export default class MoveDialog extends React.Component {
     return (
       <Dialog
         isOpen={true}
-        title={type === "notes" ? "Move Note" : "Select " + toTitleCase(type.substring(0, type.length - 1))}
+        title={
+          type === "notes"
+            ? "Move Note"
+            : "Select " + toTitleCase(type.substring(0, type.length - 1))
+        }
         icon={Icon.Move}
         content={
           <Box>
@@ -109,6 +113,7 @@ export default class MoveDialog extends React.Component {
                 items.map(item => {
                   return (
                     <Flex
+                      key={item.title + item.dateCreated}
                       sx={{
                         borderWidth: 1,
                         padding: 2,
