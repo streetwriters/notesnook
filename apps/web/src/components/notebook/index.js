@@ -3,14 +3,19 @@ import { Flex, Text } from "rebass";
 import * as Icon from "react-feather";
 import ListItem from "../list-item";
 import { store } from "../../stores/notebook-store";
+import { showEditNoteDialog } from "../dialogs/addnotebookdialog";
 
 const dropdownRefs = [];
+
 const menuItems = (notebook, index) => [
   {
     title: notebook.pinned ? "Unpin" : "Pin",
     onClick: () => store.getState().pin(notebook, index)
   },
-  { title: "Edit" },
+  {
+    title: "Edit",
+    onClick: () => showEditNoteDialog(notebook)
+  },
   {
     title: "Delete",
     color: "red",
@@ -40,7 +45,7 @@ export default class Notebook extends React.Component {
         title={notebook.title}
         body={notebook.description}
         subBody={
-          <Flex sx={{ marginBottom: 1 }}>
+          <Flex sx={{ marginBottom: 1, marginTop: 1 }}>
             {notebook.topics.slice(1, 4).map(topic => (
               <Flex
                 onClick={e => {
@@ -49,12 +54,13 @@ export default class Notebook extends React.Component {
                 }}
                 key={topic.id + topic.title}
                 bg="primary"
-                px={2}
-                py={1}
+                px={1}
                 sx={{
                   marginRight: 1,
                   borderRadius: "default",
-                  color: "static"
+                  color: "static",
+                  paddingTop: 0.4,
+                  paddingBottom: 0.4
                 }}
               >
                 <Text variant="body" fontSize={11}>

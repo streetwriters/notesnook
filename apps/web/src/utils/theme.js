@@ -15,7 +15,8 @@ const colorsLight = primary =>
     fontSecondary: "white",
     text: "#000000",
     overlay: "rgba(0, 0, 0, 0.1)",
-    secondary: "white"
+    secondary: "white",
+    icon:'#909090'
   });
 const colorsDark = primary =>
   makeTheme({
@@ -28,7 +29,8 @@ const colorsDark = primary =>
     fontSecondary: "#000",
     text: "#ffffff",
     overlay: "rgba(255, 255, 255, 0.5)",
-    secondary: "black"
+    secondary: "black",
+    icon:'#909090'
   });
 
 const shadowsDark = {
@@ -191,7 +193,8 @@ function makeTheme({
   fontSecondary,
   text,
   overlay,
-  secondary
+  secondary,
+  icon
 }) {
   return {
     background,
@@ -210,7 +213,8 @@ function makeTheme({
     placeholder: hexToRGB(text, 0.6),
     overlay,
     static: "white",
-    secondary
+    secondary,
+    icon
   };
 }
 

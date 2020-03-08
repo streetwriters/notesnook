@@ -1,5 +1,5 @@
 import React from "react";
-import { Flex } from "rebass";
+import { Flex, Box } from "rebass";
 import * as Icon from "react-feather";
 import TimeAgo from "timeago-react";
 import { showSnack } from "../snackbar";
@@ -86,9 +86,28 @@ function Note(props) {
       }}
       info={
         <Flex justifyContent="center" alignItems="center">
-          <TimeAgo datetime={note.dateCreated} />
+          {note.colors.map(item => (
+            <Box
+              style={{
+                width: 13,
+                marginLeft: -3,
+                height: 13,
+                backgroundColor: item,
+                borderRadius: 100
+              }}
+            />
+          ))}
+
+          <TimeAgo style={{ marginLeft: 5 }} datetime={note.dateCreated} />
           {note.locked && <Icon.Lock size={13} style={{ marginLeft: 5 }} />}
-          {note.favorite && <Icon.Star size={13} style={{ marginLeft: 5 }} />}
+          {note.favorite && (
+            <Icon.Star
+              stroke={0}
+              fill="#ffd27d"
+              size={13}
+              style={{ marginLeft: 5 }}
+            />
+          )}
         </Flex>
       }
       pinned={props.pinnable && note.pinned}

@@ -2,8 +2,9 @@ import React from "react";
 import { Flex, Box, Text, Button as RebassButton } from "rebass";
 import { Input, Checkbox, Label } from "@rebass/forms";
 import * as Icon from "react-feather";
-import Dialog from "./dialog";
+import Dialog, { showDialog } from "./dialog";
 import { showSnack } from "../snackbar";
+import { store } from "../../stores/notebook-store";
 
 export default class AddNotebookDialog extends React.Component {
   MAX_AVAILABLE_HEIGHT = window.innerHeight * 0.3;
@@ -12,6 +13,7 @@ export default class AddNotebookDialog extends React.Component {
   _inputRefs = [];
   lastLength = 0;
   topics = [""];
+  id = undefined;
   state = {
     topics: [""],
     focusedInputIndex: 0
@@ -51,6 +53,17 @@ export default class AddNotebookDialog extends React.Component {
     }
   }
 
+  componentDidMount() {
+    if (!this.props.notebook) return;
+    const { title, description, id, topics } = this.props.notebook;
+    this.setState({
+      topics: topics.map(topic => topic.title)
+    });
+    this.title = title;
+    this.description = description;
+    this.id = id;
+  }
+
   _reset() {
     this.title = "";
     this.description = "";
@@ -76,12 +89,14 @@ export default class AddNotebookDialog extends React.Component {
               variant="default"
               onChange={e => (this.title = e.target.value)}
               placeholder="Enter name"
+              defaultValue={this.title}
             />
             <Input
               variant="default"
               sx={{ marginTop: 1 }}
               onChange={e => (this.description = e.target.value)}
               placeholder="Enter description (optional)"
+              defaultValue={this.description}
             />
             <Label alignItems="center" my={1}>
               <Checkbox variant="checkbox" />
@@ -97,7 +112,7 @@ export default class AddNotebookDialog extends React.Component {
                 marginBottom: 1
               }}
             >
-              {this.topics.map((value, index) => (
+              {this.state.topics.map((value, index) => (
                 <Flex
                   key={index.toString()}
                   flexDirection="row"
@@ -152,14 +167,15 @@ export default class AddNotebookDialog extends React.Component {
           </Box>
         }
         positiveButton={{
-          text: "Add",
+          text: props.edit ? "Edit" : "Add",
           onClick: () => {
             if (!this.title.trim().length)
               return showSnack("Please enter the notebook title.");
             props.onDone({
               title: this.title,
               description: this.description,
-              topics: this.topics
+              topics: this.topics,
+              id: this.id
             });
           }
         }}
@@ -168,3 +184,20 @@ export default class AddNotebookDialog extends React.Component {
     );
   }
 }
+
+export const showEditNoteDialog = notebook => {
+  return showDialog(perform => (
+    <AddNotebookDialog
+      isOpen={true}
+      notebook={notebook}
+      edit={true}
+      onDone={async nb => {
+        await store.getState().add(nb);
+        perform(false);
+      }}
+      close={() => {
+        perform(false);
+      }}
+    />
+  ));
+};

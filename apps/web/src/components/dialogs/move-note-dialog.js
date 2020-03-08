@@ -4,6 +4,7 @@ import { Input } from "@rebass/forms";
 import * as Icon from "react-feather";
 import { db } from "../../common";
 import Dialog, { showDialog } from "./dialog";
+import { toTitleCase } from "../../utils/string";
 
 export default class MoveDialog extends React.Component {
   history = [];
@@ -23,7 +24,7 @@ export default class MoveDialog extends React.Component {
     return (
       <Dialog
         isOpen={true}
-        title={"Move Note"}
+        title={type === "notes" ? "Move Note" : "Select " + toTitleCase(type.substring(0, type.length - 1))}
         icon={Icon.Move}
         content={
           <Box>
@@ -83,11 +84,11 @@ export default class MoveDialog extends React.Component {
                     this.setState({ items: db.notebooks.all });
                   } else {
                     await db.notebooks
-                      .notebook(MoveDialog.notebook.id)
+                      .notebook(this.selectedNotebook.id)
                       .topics.add(e.target.value);
                     this.setState({
-                      items: db.notebooks.notebook(MoveDialog.notebook.id)
-                        .topics
+                      items: db.notebooks.notebook(this.selectedNotebook.id)
+                        .topics.all
                     });
                   }
                   this._inputRef.value = "";

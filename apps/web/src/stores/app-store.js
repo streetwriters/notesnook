@@ -5,19 +5,34 @@ import { showPasswordDialog } from "../components/dialogs/passworddialog";
 function appStore(set, get) {
   return {
     isSideMenuOpen: false,
+    isFocusModeEnabled: false,
     arePropertiesVisible: false,
     isSelectionMode: false,
     selectedItems: [],
     colors: [],
     closeSideMenu: function() {
-      set(state => (state.isSideMenuOpen = false));
+      set(state => {
+        state.isSideMenuOpen = false;
+      });
     },
     openSideMenu: function() {
-      set(state => (state.isSideMenuOpen = true));
+      set(state => {
+        state.isSideMenuOpen = true;
+      });
     },
     refreshColors: function() {
       set(state => {
         state.colors = db.colors.all;
+      });
+    },
+    enableFocusMode: function() {
+      set(state => {
+        state.isFocusModeEnabled = true;
+      });
+    },
+    disableFocusMode: function() {
+      set(state => {
+        state.isFocusModeEnabled = false;
       });
     },
     hideProperties: function() {
