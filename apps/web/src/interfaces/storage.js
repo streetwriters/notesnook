@@ -1,12 +1,14 @@
 import localforage from "localforage";
+import { extendPrototype } from "localforage-getitems";
 import { encode, decode } from "../utils/base64";
 import { hexToBuffer, bufferToHex } from "../utils/hex";
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
 
+extendPrototype(localforage);
+
 localforage.config({
   name: "Notesnook",
-  storeName: "Notesnook store",
   driver: [localforage.INDEXEDDB, localforage.WEBSQL, localforage.LOCALSTORAGE]
 });
 
@@ -15,6 +17,7 @@ function read(key) {
 }
 
 function readMulti(keys) {
+  if (keys.length <= 0) return {};
   return localforage.getItems(keys);
 }
 
