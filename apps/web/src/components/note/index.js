@@ -126,6 +126,7 @@ export default React.memo(Note, function(prevProps, nextProps) {
     prevItem.favorite === nextItem.favorite &&
     prevItem.headline === nextItem.headline &&
     prevItem.title === nextItem.title &&
-    prevItem.locked === nextItem.locked
+    prevItem.locked === nextItem.locked &&
+    JSON.stringify(prevItem.colors) === JSON.stringify(nextItem.colors)
   );
 });
