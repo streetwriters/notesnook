@@ -82,6 +82,7 @@ const NavigationContainer = props => {
   const openSideMenu = useStore(store => store.openSideMenu);
   const isSelectionMode = useStore(store => store.isSelectionMode);
   const exitSelectionMode = useStore(store => store.exitSelectionMode);
+  const selectAll = useStore(store => store.selectAll);
   return (
     <ThemeProvider>
       <Flex flexDirection="column" px={2}>
@@ -132,19 +133,32 @@ const NavigationContainer = props => {
             )}
           </Flex>
         )}
-        {(props.route.params.subtitle || isSelectionMode) && (
+        {props.route.params.subtitle && (
           <Text
             variant="title"
             color="primary"
-            onClick={() => exitSelectionMode()}
             sx={{
               marginBottom: 2,
               cursor: isSelectionMode ? "pointer" : "normal"
             }}
           >
             {props.route.params.subtitle}
-            {isSelectionMode && "\nUnselect All"}
           </Text>
+        )}
+        {isSelectionMode && (
+          <Flex alignItems="center" mb={2} sx={{ cursor: "pointer" }}>
+            <Text variant="title" color="primary" onClick={() => selectAll()}>
+              Select all
+            </Text>
+            <Text
+              ml={2}
+              variant="title"
+              color="primary"
+              onClick={() => exitSelectionMode()}
+            >
+              Unselect
+            </Text>
+          </Flex>
         )}
       </Flex>
       {props.route.component && (

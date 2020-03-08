@@ -57,6 +57,7 @@ const ListItem = props => {
     `contextMenu${props.index}`
   );
   const isSelectionMode = useAppStore(store => store.isSelectionMode);
+  const shouldSelectAll = useAppStore(store => store.shouldSelectAll);
   const selectItem = useAppStore(store => store.selectItem);
   const [isSelected, setIsSelected] = useState(false);
   const [menuItems, setMenuItems] = useState(props.menuItems);
@@ -72,6 +73,10 @@ const ListItem = props => {
   useEffect(() => {
     if (!isSelectionMode) setIsSelected(false);
   }, [isSelectionMode]);
+
+  useEffect(() => {
+    if (shouldSelectAll) setIsSelected(true);
+  }, [shouldSelectAll]);
 
   useEffect(() => {
     if (props.selectable) {
@@ -199,7 +204,6 @@ const ListItem = props => {
           >
             <DropdownTrigger onClick={() => closeContextMenu()}>
               <Text sx={{ ":active, :hover": { color: "primary" } }}>
-                
                 <Icon.MoreVertical
                   size={22}
                   strokeWidth={2}

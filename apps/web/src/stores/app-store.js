@@ -8,6 +8,7 @@ function appStore(set, get) {
     isFocusModeEnabled: false,
     arePropertiesVisible: false,
     isSelectionMode: false,
+    shouldSelectAll: false,
     selectedItems: [],
     colors: [],
     closeSideMenu: function() {
@@ -64,10 +65,17 @@ function appStore(set, get) {
         } else {
           state.selectedItems.push(item);
         }
+        state.shouldSelectAll = false;
       });
       if (get().selectedItems.length <= 0) {
         get().exitSelectionMode();
       }
+    },
+    selectAll() {
+      if (!get().isSelectionMode) return;
+      set(state => {
+        state.shouldSelectAll = true;
+      });
     },
     createVault: function() {
       return showPasswordDialog("create_vault", password =>
