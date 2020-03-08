@@ -8,6 +8,8 @@ import { confirm } from "../dialogs/confirm";
 import { showMoveNoteDialog } from "../dialogs/movenotedialog";
 import { store, useStore } from "../../stores/note-store";
 import { store as editorStore } from "../../stores/editor-store";
+import { showPasswordDialog } from "../dialogs/passworddialog";
+import { db } from "../../common";
 
 const dropdownRefs = [];
 const menuItems = (note, index) => [
@@ -25,14 +27,33 @@ const menuItems = (note, index) => [
   },
   {
     title: note.favorite ? "Unfavorite" : "Favorite",
-    onClick: () => store.getState().favorite(note, index)
+    onClick: () => store.getState().favorite(note)
   },
   { title: "Edit", onClick: () => editorStore.getState().openSession(note) },
-  { title: note.locked ? "Remove lock" : "Lock" }, //TODO
+  {
+    title: note.locked ? "Unlock" : "Lock",
+    onClick: async () => {
+      const { unlock, lock } = store.getState();
+      if (!note.locked) {
+        lock(note.id);
+      } else {
+        unlock(note.id);
+      }
+    }
+  },
   {
     title: "Move to Trash",
     color: "red",
-    onClick: () => {
+    onClick: async () => {
+      if (note.locked) {
+        const res = await showPasswordDialog("unlock_note", password => {
+          return db.vault
+            .unlock(password)
+            .then(() => true)
+            .catch(() => false);
+        });
+        if (!res) return;
+      }
       confirm(
         Icon.Trash2,
         "Delete",
@@ -89,7 +110,7 @@ function Note(props) {
           )}
         </Flex>
       }
-      pinned={note.pinned}
+      pinned={props.pinnable && note.pinned}
       menuData={note}
       menuItems={menuItems(note, index)}
       dropdownRefs={dropdownRefs}
@@ -104,6 +125,7 @@ export default React.memo(Note, function(prevProps, nextProps) {
     prevItem.pinned === nextItem.pinned &&
     prevItem.favorite === nextItem.favorite &&
     prevItem.headline === nextItem.headline &&
-    prevItem.title === nextItem.title
+    prevItem.title === nextItem.title &&
+    prevItem.locked === nextItem.locked
   );
 });

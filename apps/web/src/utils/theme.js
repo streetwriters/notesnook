@@ -97,6 +97,17 @@ const theme = (colors, shadows) => ({
         outline: "none",
         boxShadow: 4
       }
+    },
+    error: {
+      variant: "forms.default",
+      borderColor: "red",
+      ":focus": {
+        outline: "none",
+        borderColor: "red"
+      },
+      ":hover": {
+        borderColor: "red"
+      }
     }
   },
   text: {

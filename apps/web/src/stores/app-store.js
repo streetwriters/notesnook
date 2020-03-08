@@ -1,5 +1,6 @@
 import createStore from "../common/store";
 import { db } from "../common";
+import { showPasswordDialog } from "../components/dialogs/passworddialog";
 
 function appStore(set, get) {
   return {
@@ -67,6 +68,19 @@ function appStore(set, get) {
       if (get().selectedItems.length <= 0) {
         get().exitSelectionMode();
       }
+    },
+    createVault: function() {
+      return showPasswordDialog("create_vault", password =>
+        db.vault.create(password)
+      );
+    },
+    unlockVault: function() {
+      return showPasswordDialog("unlock_vault", password => {
+        return db.vault
+          .unlock(password)
+          .then(() => true)
+          .catch(() => false);
+      });
     }
   };
 }

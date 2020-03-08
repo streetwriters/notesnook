@@ -12,12 +12,14 @@ import { motion } from "framer-motion";
 const Properties = props => {
   const pinned = useStore(store => store.session.pinned);
   const favorite = useStore(store => store.session.favorite);
+  const locked = useStore(store => store.session.locked);
   const colors = useStore(store => store.session.colors);
   const tags = useStore(store => store.session.tags);
 
   const setSession = useStore(store => store.setSession);
   const setColor = useStore(store => store.setColor);
   const setTag = useStore(store => store.setTag);
+  const toggleLocked = useStore(store => store.toggleLocked);
   const hideProperties = useAppStore(store => store.hideProperties);
   const showProperties = useAppStore(store => store.showProperties);
   const arePropertiesVisible = useAppStore(store => store.arePropertiesVisible);
@@ -118,7 +120,8 @@ const Properties = props => {
             <CheckBox
               icon={Icon.Lock}
               label="Lock"
-              onChecked={props.onLocked}
+              checked={locked}
+              onClick={toggleLocked}
             />
             <Flex fontSize="body" sx={{ marginBottom: 3 }} alignItems="center">
               <Icon.Book size={18} />
