@@ -1,6 +1,6 @@
 import * as Icon from "react-feather";
 import { store as appStore } from "../stores/app-store";
-import { store as notesStore } from "../stores/note-store";
+import { store as notesStore, LIST_TYPES } from "../stores/note-store";
 import { store as nbStore } from "../stores/notebook-store";
 import { store as editorStore } from "../stores/editor-store";
 import { db } from "./index";
@@ -61,7 +61,7 @@ const UnfavoriteOption = createOption(Icon.Star, function(state) {
     if (!item.favorite) return;
     await db.notes.note(item.id).favorite();
   });
-  notesStore.getState().refresh();
+  notesStore.getState().refreshList(LIST_TYPES.fav);
 });
 
 const AddToNotebookOption = createOption(Icon.Plus, async function(state) {
