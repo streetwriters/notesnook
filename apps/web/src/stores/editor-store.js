@@ -114,11 +114,12 @@ function editorStore(set, get) {
         : db.notes.add.bind(db.notes);
 
       func(note).then(id => {
-        if (tags.length > 0) updateContext("tags", tags);
-        if (oldSession.colors.length > 0 || colors.length > 0) {
+        if (oldSession.tags.length !== tags.length) updateContext("tags", tags);
+        if (oldSession.colors.length !== colors.length) {
           updateContext("colors", colors);
           appStore.getState().refreshColors();
         }
+
         let notesState = noteStore.getState();
         if (get().session.id === "") {
           noteStore.getState().setSelectedNote(id);
@@ -203,12 +204,10 @@ function updateContext(key, array) {
   // update notes if the selected context (the current view in the navigator) is a tag or color
   const notesState = noteStore.getState();
   const context = notesState.selectedContext;
+  console.log(context);
   if (context.type === type) {
-    array.forEach(value => {
-      if (context.value === value) {
-        noteStore.getState().setSelectedContext(context);
-      }
-    });
+    const isValue = array.some(value => value === context.value);
+    if (isValue) noteStore.getState().setSelectedContext(context);
   }
 }
 
