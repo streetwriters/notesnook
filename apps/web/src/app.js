@@ -98,7 +98,7 @@ function App() {
 
   useEffect(() => {
     isFocusModeEnabled ? setShow(false) : setShow(true);
-  }, [isFocusModeEnabled]);
+  }, [isFocusModeEnabled, setShow]);
   const colors = useStore(store => store.colors);
   return (
     <ThemeProvider>
