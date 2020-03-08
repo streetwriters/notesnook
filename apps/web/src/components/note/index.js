@@ -86,11 +86,11 @@ function Note(props) {
       }}
       info={
         <Flex justifyContent="center" alignItems="center">
-          {note.colors.map(item => (
+          {note.colors.map((item, index) => (
             <Box
               style={{
                 width: 13,
-                marginLeft: -3,
+                marginLeft: index ? -8 : 0,
                 height: 13,
                 backgroundColor: item,
                 borderRadius: 100
