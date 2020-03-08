@@ -51,7 +51,7 @@ export default class Notes {
       return;
     }
 
-    if (note.content.delta.ops) {
+    if (note.content.delta && note.content.delta.ops) {
       await this._deltaStorage.write(id + "_delta", note.content.delta);
     }
 
@@ -59,7 +59,7 @@ export default class Notes {
       id,
       type: "note",
       title: getNoteTitle(note),
-      content: getNoteContent(note, id),
+      content: getNoteContent(note),
       pinned: !!note.pinned,
       locked: !!note.locked,
       notebook: note.notebook || {},
@@ -200,12 +200,12 @@ export default class Notes {
 }
 
 function isNoteEmpty(note) {
+  const isTitleEmpty = !note.title || note.title.trim().length <= 0;
+  const isTextEmpty =
+    !note.content.text || note.content.text.trim().length <= 0;
+  const hasDelta = note.content.delta !== undefined;
   return (
-    !note.content ||
-    !note.content.delta ||
-    (!note.locked &&
-      (!note.title || note.title.trim().length <= 0) &&
-      (!note.content.text || note.content.text.trim().length <= 0))
+    !note.content || (!note.locked && isTitleEmpty && isTextEmpty && !hasDelta)
   );
 }
 
@@ -226,13 +226,12 @@ function getNoteTitle(note) {
     .trim();
 }
 
-function getNoteContent(note, id) {
+function getNoteContent(note) {
   if (note.locked) {
     return note.content;
   }
 
   return {
-    text: note.content.text.trim(),
-    delta: id + "_delta"
+    text: note.content.text.trim()
   };
 }

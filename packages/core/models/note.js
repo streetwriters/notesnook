@@ -73,50 +73,6 @@ export default class Note {
   pin() {
     return this._toggle("pinned");
   }
-
-  async _lock(password) {
-    let delta = qclone(await this.delta());
-    if (delta) {
-      delta = await this._notes._collection.indexer.encrypt(
-        password,
-        JSON.stringify(delta)
-      );
-      await this._notes._deltaStorage.write(this._note.id + "_delta", delta);
-    }
-    const note = { ...this._note };
-    note.content = await this._notes._collection.indexer.encrypt(
-      password,
-      JSON.stringify(this._note.content)
-    );
-    note.locked = true;
-    return await this._notes._collection.addItem(note);
-  }
-
-  async _unlock(password, perm = false) {
-    let decrypted = JSON.parse(
-      await this._notes._collection.indexer.decrypt(
-        password,
-        this._note.content
-      )
-    );
-    let delta = JSON.parse(
-      await this._notes._collection.indexer.decrypt(
-        password,
-        await this.delta()
-      )
-    );
-    if (perm) {
-      const note = { ...this._note, locked: false, content: decrypted };
-      note.locked = false;
-      note.content = decrypted;
-      await this._notes._collection.addItem(note);
-      await this._notes._deltaStorage.write(note.id + "_delta", delta);
-    }
-    return {
-      ...this._note,
-      content: { ...decrypted, delta }
-    };
-  }
 }
 
 async function addTag(tag, collection, array) {
