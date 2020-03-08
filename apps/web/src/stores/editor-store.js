@@ -115,7 +115,7 @@ function editorStore(set, get) {
 
       func(note).then(id => {
         if (tags.length > 0) updateContext("tags", tags);
-        if (oldSession.colors.length > 0) {
+        if (oldSession.colors.length > 0 || colors.length > 0) {
           updateContext("colors", colors);
           appStore.getState().refreshColors();
         }
