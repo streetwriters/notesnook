@@ -54,7 +54,8 @@ export const routes = {
 };
 
 const invisibleRoutes = {
-  ...createNormalRoute("color", Notes, Icon.Circle, {
+  ...createRoute("color", Notes, {
+    icon: Icon.Circle,
     options: SelectionModeOptions.NotesOptions
   })
 };

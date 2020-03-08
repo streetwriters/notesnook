@@ -159,10 +159,14 @@ function App() {
                         type: "color",
                         value: color.title
                       });
-                      RootNavigator.navigate("color", {
-                        title: toTitleCase(color.title),
-                        context: { colors: [color.title] }
-                      });
+                      RootNavigator.navigate(
+                        "color",
+                        {
+                          title: toTitleCase(color.title),
+                          context: { colors: [color.title] }
+                        },
+                        true
+                      );
                     }}
                     key={color.title}
                     item={{

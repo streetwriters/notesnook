@@ -22,10 +22,10 @@ export default class Navigator {
     return document.querySelector(`.${this.root}`);
   }
 
-  navigate(routeName, params = {}) {
+  navigate(routeName, params = {}, force = false) {
     let route = this.getRoute(routeName);
 
-    if (!route || this.lastRoute === route) {
+    if (!force && (!route || this.lastRoute === route)) {
       return false;
     }
 
