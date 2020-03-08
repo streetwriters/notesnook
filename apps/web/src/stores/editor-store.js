@@ -109,7 +109,11 @@ function editorStore(set, get) {
         colors
       };
 
-      db.notes.add(note).then(id => {
+      const func = locked
+        ? db.vault.save.bind(db.vault)
+        : db.notes.add.bind(db.notes);
+
+      func(note).then(id => {
         if (tags.length > 0) updateContext("tags", tags);
         if (colors.length > 0) {
           updateContext("colors", colors);
