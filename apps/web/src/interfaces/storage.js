@@ -6,18 +6,26 @@ const decoder = new TextDecoder();
 
 localforage.config({
   name: "Notesnook",
+  storeName: "Notesnook store",
   driver: [localforage.INDEXEDDB, localforage.WEBSQL, localforage.LOCALSTORAGE]
 });
 
-async function read(key) {
+function read(key) {
   return localforage.getItem(key);
 }
-async function write(key, data) {
+
+function readMulti(keys) {
+  return localforage.getItems(keys);
+}
+
+function write(key, data) {
   return localforage.setItem(key, data);
 }
+
 function remove(key) {
   return localforage.removeItem(key);
 }
+
 function clear() {
   return localforage.clear();
 }
@@ -52,6 +60,7 @@ async function decrypt(password, data) {
 
 export default {
   read,
+  readMulti,
   write,
   remove,
   clear,
