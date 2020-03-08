@@ -121,7 +121,7 @@ function Editor() {
           }}
         />
       </Flex>
-      <Properties />
+      {id && <Properties />}
     </Flex>
   );
 }
