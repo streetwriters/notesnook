@@ -19,14 +19,14 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [8.x, 10.x, 12.x, 13.x]
+        node-version: [12.x, 13.x]
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
       - name: Setup SSH
-      - uses: kielabokkie/ssh-key-and-known-hosts-action@v1.0.1
+        uses: kielabokkie/ssh-key-and-known-hosts-action@v1.0.1
         with:
           ssh-private-key: ${{ secrets.GH_SSH_KEY }}
           ssh-host: github.com
