@@ -99,7 +99,7 @@ const AppearanceSettings = ({navigation}) => {
                 onPress={() => {
                   changeAccentColor(item);
 
-                  FastStorage.setItem('accentColor', item);
+                  FastStorage.setString('accentColor', item);
                 }}
                 style={{
                   flexDirection: 'row',
@@ -127,10 +127,10 @@ const AppearanceSettings = ({navigation}) => {
           <TouchableOpacity
             onPress={() => {
               if (!colors.night) {
-                FastStorage.setItem('theme', JSON.stringify({night: true}));
+                FastStorage.setString('theme', JSON.stringify({night: true}));
                 changeColorScheme(COLOR_SCHEME_DARK);
               } else {
-                FastStorage.setItem('theme', JSON.stringify({night: false}));
+                FastStorage.setString('theme', JSON.stringify({night: false}));
 
                 changeColorScheme(COLOR_SCHEME_LIGHT);
               }
@@ -165,10 +165,10 @@ const AppearanceSettings = ({navigation}) => {
           <TouchableOpacity
             onPress={() => {
               if (!colors.night) {
-                FastStorage.setItem('theme', JSON.stringify({night: true}));
+                FastStorage.setString('theme', JSON.stringify({night: true}));
                 changeColorScheme(COLOR_SCHEME_DARK);
               } else {
-                FastStorage.setItem('theme', JSON.stringify({night: false}));
+                FastStorage.setString('theme', JSON.stringify({night: false}));
 
                 changeColorScheme(COLOR_SCHEME_LIGHT);
               }

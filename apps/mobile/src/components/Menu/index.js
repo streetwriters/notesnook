@@ -96,10 +96,10 @@ export const Menu = ({
       icon: 'theme-light-dark',
       func: () => {
         if (!colors.night) {
-          FastStorage.setItem('theme', JSON.stringify({night: true}));
+          FastStorage.setString('theme', JSON.stringify({night: true}));
           changeColorScheme(COLOR_SCHEME_DARK);
         } else {
-          FastStorage.setItem('theme', JSON.stringify({night: false}));
+          FastStorage.setString('theme', JSON.stringify({night: false}));
 
           changeColorScheme(COLOR_SCHEME_LIGHT);
         }

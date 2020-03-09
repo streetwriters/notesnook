@@ -167,12 +167,12 @@ const App = () => {
 
   async function updateAppTheme(colors = colors) {
     let newColors = await getColorScheme(colors);
-    let s = await FastStorage.getItem('settings');
+    let s = await FastStorage.getString('settings');
     if (typeof s !== 'string') {
       s = defaultState.settings;
 
       s = JSON.stringify(s);
-      await FastStorage.setItem('settings', s);
+      await FastStorage.setString('settings', s);
       dispatch({type: ACTIONS.SETTINGS, s});
     } else {
       s = JSON.parse(s);

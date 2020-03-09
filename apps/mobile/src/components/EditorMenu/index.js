@@ -326,13 +326,13 @@ export const EditorMenu = ({updateProps = () => {}, timestamp}) => {
                   icon: 'moon',
                   func: () => {
                     if (!colors.night) {
-                      FastStorage.setItem(
+                      FastStorage.setString(
                         'theme',
                         JSON.stringify(COLOR_SCHEME_DARK),
                       );
                       changeColorScheme(COLOR_SCHEME_DARK);
                     } else {
-                      FastStorage.setItem(
+                      FastStorage.setString(
                         'theme',
                         JSON.stringify(COLOR_SCHEME_LIGHT),
                       );

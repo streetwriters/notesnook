@@ -33,7 +33,7 @@ import NavigationService from '../../services/NavigationService';
 export async function setSetting(settings, name, value) {
   let s = {...settings};
   s[name] = value;
-  await FastStorage.setItem('settings', JSON.stringify(s));
+  await FastStorage.setString('settings', JSON.stringify(s));
 
   updateEvent({type: ACTIONS.SETTINGS, settings: s});
 }
@@ -319,7 +319,7 @@ export const Settings = ({navigation}) => {
               onPress={() => {
                 changeAccentColor(item);
 
-                FastStorage.setItem('accentColor', item);
+                FastStorage.setString('accentColor', item);
               }}
               style={{
                 flexDirection: 'row',
@@ -347,10 +347,10 @@ export const Settings = ({navigation}) => {
         <TouchableOpacity
           onPress={() => {
             if (!colors.night) {
-              FastStorage.setItem('theme', JSON.stringify({night: true}));
+              FastStorage.setString('theme', JSON.stringify({night: true}));
               changeColorScheme(COLOR_SCHEME_DARK);
             } else {
-              FastStorage.setItem('theme', JSON.stringify({night: false}));
+              FastStorage.setString('theme', JSON.stringify({night: false}));
 
               changeColorScheme(COLOR_SCHEME_LIGHT);
             }

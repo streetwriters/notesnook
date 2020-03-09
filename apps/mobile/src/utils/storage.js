@@ -1,18 +1,33 @@
 import {NativeModules} from 'react-native';
-import FastStorage from 'react-native-fast-storage';
+import FastStorage, {getArray, setArray} from 'react-native-fast-storage';
 
 var Aes = NativeModules.Aes;
 
-async function read(key) {
-  let json = await FastStorage.getItem(key);
-
-  return !json ? undefined : JSON.parse(json);
+async function read(key, isArray) {
+  let data;
+  if (isArray) {
+    data = await getArray(key);
+  } else {
+    data = await FastStorage.getMap(key);
+  }
+  return !data ? undefined : data;
 }
 
 async function write(key, data) {
-  let json = JSON.stringify(data);
+  if (Array.isArray(data)) {
+    return await setArray(key, data);
+  } else {
+    return await FastStorage.setMap(key, data);
+  }
+}
 
-  return await FastStorage.setItem(key, json);
+async function readMulti(keys) {
+  if (keys.length <= 0) {
+    return [];
+  } else {
+    let data = await FastStorage.getMultipleItems(keys);
+    return !data ? undefined : data;
+  }
 }
 
 function remove(key) {
@@ -48,4 +63,4 @@ function decrypt(password, data) {
   });
 }
 
-export default {read, write, remove, clear, encrypt, decrypt};
+export default {read, write, readMulti, remove, clear, encrypt, decrypt};

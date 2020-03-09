@@ -187,18 +187,18 @@ export function setColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
 }
 
 export async function getColorScheme() {
-  let accentColor = await FastStorage.getItem('accentColor');
-  let t = await FastStorage.getItem('theme');
+  let accentColor = await FastStorage.getString('accentColor');
+  let t = await FastStorage.getString('theme');
 
   if (typeof accentColor !== 'string') {
-    FastStorage.setItem('accentColor', '#0560FF');
+    FastStorage.setString('accentColor', '#0560FF');
     setAccentColor('#0560FF');
   } else {
     setAccentColor(accentColor);
   }
 
   if (typeof t !== 'string') {
-    FastStorage.setItem('theme', JSON.stringify({night: false}));
+    FastStorage.setString('theme', JSON.stringify({night: false}));
     setColorScheme(COLOR_SCHEME_LIGHT);
   } else {
     let themeToSet = JSON.parse(t);
