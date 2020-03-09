@@ -28,7 +28,7 @@ jobs:
       - name: Setup SSH
         uses: pioug/la-cle@v1.0.0
         with:
-          GH_SS_KEY: ${{ secrets.GH_SSH_KEY }}
+          GH_SSH_KEY: ${{ secrets.GH_SSH_KEY }}
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
         with:
