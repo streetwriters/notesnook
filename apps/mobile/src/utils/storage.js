@@ -7,17 +7,15 @@ async function read(key, isArray = false) {
   let data;
   if (isArray) {
     data = await getArray(key);
-    data.push('hello');
   } else {
     data = await FastStorage.getMap(key);
   }
-  console.log('READ', data, key);
+
   return data;
 }
 
 async function write(key, data) {
   if (data.length !== undefined) {
-    console.log(data, key);
     return await setArray(key, data);
   } else {
     return await FastStorage.setMap(key, data);

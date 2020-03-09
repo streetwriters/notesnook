@@ -98,20 +98,19 @@ export const Container = ({
       data[0].data ? db.notes.all : data,
       text,
     );
-
-    if (!searchResults && searchResults.length < 0) {
-      ToastEvent.show('No search results found', 'error', 3000, () => {}, '');
+    if (!searchResult || searchResult.length === 0) {
+      ToastEvent.show('No search results found for ' + text, 'error');
       return;
+    } else {
+      dispatch({
+        type: ACTIONS.SEARCH_RESULTS,
+        results: {
+          type,
+          results: searchResult,
+          keyword: text,
+        },
+      });
     }
-
-    dispatch({
-      type: ACTIONS.SEARCH_RESULTS,
-      results: {
-        type,
-        results: searchResult,
-        keyword: text,
-      },
-    });
   };
 
   const onBlur = () => {

@@ -206,7 +206,14 @@ export const Menu = ({
                   inputRef.current?.setNativeProps({
                     text: '',
                   });
-                  dispatch({type: ACTIONS.SEARCH_RESULTS, results: []});
+                  dispatch({
+                    type: ACTIONS.SEARCH_RESULTS,
+                    results: {
+                      type: null,
+                      results: [],
+                      keyword: null,
+                    },
+                  });
                 }
                 item.func();
               }}
