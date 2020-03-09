@@ -22,6 +22,7 @@ import {eScrollEvent} from '../../services/events';
 import {slideLeft, slideRight} from '../../utils/animations';
 import {w, ToastEvent, hexToRGBA} from '../../utils/utils';
 import {inputRef} from '../../components/SearchInput';
+import SimpleList from '../../components/SimpleList';
 
 export const Folders = ({navigation}) => {
   const [state, dispatch] = useTracked();
@@ -71,11 +72,51 @@ export const Folders = ({navigation}) => {
 
   const params = navigation.state.params;
 
-  const onScroll = event => {
-    let y = event.nativeEvent.contentOffset.y;
-
-    eSendEvent(eScrollEvent, y);
+  const _onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await db.sync();
+      dispatch({type: ACTIONS.NOTEBOOKS});
+      dispatch({type: ACTIONS.PINNED});
+      dispatch({type: ACTIONS.USER});
+      setRefreshing(false);
+      ToastEvent.show('Sync Complete', 'success');
+    } catch (e) {
+      setRefreshing(false);
+      ToastEvent.show('Sync failed, network error', 'error');
+    }
   };
+
+  const _renderItem = ({item, index}) => (
+    <SelectionWrapper item={item}>
+      <NotebookItem
+        hideMore={params.hideMore}
+        navigation={navigation}
+        customStyle={{
+          width: selectionMode ? w - 74 : '100%',
+          marginHorizontal: 0,
+        }}
+        isMove={params.isMove}
+        selectionMode={selectionMode}
+        onLongPress={() => {
+          if (!selectionMode) {
+            dispatch({
+              type: ACTIONS.SELECTION_MODE,
+              enabled: !selectionMode,
+            });
+          }
+
+          dispatch({
+            type: ACTIONS.SELECTED_ITEMS,
+            item: item,
+          });
+        }}
+        noteToMove={params.note}
+        item={item}
+        index={index}
+      />
+    </SelectionWrapper>
+  );
 
   return (
     <Container
@@ -91,216 +132,22 @@ export const Folders = ({navigation}) => {
       bottomButtonOnPress={() => {
         AddNotebookEvent(null);
       }}>
-      <FlatList
-        style={{
-          width: '100%',
-        }}
-        refreshControl={
-          <RefreshControl
-            tintColor={colors.accent}
-            colors={[colors.accent]}
-            progressViewOffset={165}
-            onRefresh={async () => {
-              setRefreshing(true);
-              try {
-                await db.sync();
-                dispatch({type: ACTIONS.NOTEBOOKS});
-                dispatch({type: ACTIONS.PINNED});
-                dispatch({type: ACTIONS.USER});
-                setRefreshing(false);
-                ToastEvent.show('Sync Complete', 'success');
-              } catch (e) {
-                setRefreshing(false);
-                ToastEvent.show('Sync failed, network error', 'error');
-              }
-            }}
-            refreshing={refreshing}
-          />
-        }
-        onScroll={onScroll}
-        ListHeaderComponent={
-          searchResults.type === 'notebooks' &&
-          searchResults.results.length > 0 ? (
-            <View
-              style={{
-                marginTop:
-                  Platform.OS == 'ios'
-                    ? notebooks[0] && !selectionMode
-                      ? 135
-                      : 135 - 60
-                    : notebooks[0] && !selectionMode
-                    ? 155
-                    : 155 - 60,
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                paddingHorizontal: 12,
-              }}>
-              <Text
-                style={{
-                  fontFamily: WEIGHT.bold,
-                  color: colors.accent,
-                  fontSize: SIZE.xs,
-                }}>
-                Search Results for {searchResults.keyword}
-              </Text>
-              <Text
-                onPress={() => {
-                  inputRef.current?.setNativeProps({
-                    text: '',
-                  });
-                  dispatch({
-                    type: ACTIONS.SEARCH_RESULTS,
-                    results: {
-                      results: [],
-                      type: null,
-                      keyword: null,
-                    },
-                  });
-                }}
-                style={{
-                  fontFamily: WEIGHT.regular,
-                  color: colors.errorText,
-                  fontSize: SIZE.xs,
-                }}>
-                Clear
-              </Text>
-            </View>
-          ) : (
-            <View
-              style={{
-                marginTop:
-                  Platform.OS == 'ios'
-                    ? notebooks[0] && !selectionMode
-                      ? 135
-                      : 135 - 60
-                    : notebooks[0] && !selectionMode
-                    ? 155
-                    : 155 - 60,
-              }}>
-              {pinned && pinned.notebooks && pinned.notebooks.length > 0 ? (
-                <>
-                  <FlatList
-                    data={pinned.notebooks}
-                    keyExtractor={(item, index) => item.id.toString()}
-                    renderItem={({item, index}) =>
-                      item.type === 'notebook' ? (
-                        <NotebookItem
-                          hideMore={params.hideMore}
-                          customStyle={{
-                            backgroundColor: Platform.ios
-                              ? hexToRGBA(colors.accent + '19')
-                              : hexToRGBA(colors.shade),
-                            width: '100%',
-                            paddingHorizontal: 12,
-                            paddingTop: 20,
-                            paddingRight: 18,
-                            marginBottom: 10,
-                            marginTop: 20,
-                            borderBottomWidth: 0,
-                            marginHorizontal: 0,
-                          }}
-                          isMove={params.isMove}
-                          onLongPress={() => {}}
-                          noteToMove={params.note}
-                          item={item}
-                          pinned={true}
-                          index={index}
-                          colors={colors}
-                        />
-                      ) : null
-                    }
-                  />
-                </>
-              ) : null}
-            </View>
-          )
-        }
-        ListEmptyComponent={
-          <View
-            style={{
-              height: '80%',
-              width: DDS.isTab ? '70%' : '100%',
-              alignItems: 'center',
-              alignSelf: 'center',
-              justifyContent: 'center',
-              opacity: 0.8,
-            }}>
+      <SimpleList
+        data={notebooks}
+        type="notebooks"
+        refreshing={refreshing}
+        focused={isFocused}
+        onRefresh={_onRefresh}
+        renderItem={_renderItem}
+        placeholder={
+          <>
             <NotebookPlaceHolder animation={slideRight} colors={colors} />
             <NotebookPlaceHolder animation={slideLeft} colors={colors} />
             <NotebookPlaceHolder animation={slideRight} colors={colors} />
-
-            <Text
-              style={{
-                color: colors.icon,
-                fontSize: SIZE.sm,
-                fontFamily: WEIGHT.regular,
-                marginTop: 30,
-              }}>
-              Notebooks you add will appear here
-            </Text>
-          </View>
+          </>
         }
-        contentContainerStyle={{
-          width: '100%',
-          alignSelf: 'center',
-          minHeight: '100%',
-        }}
-        ListFooterComponent={
-          <View
-            style={{
-              height: 150,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}>
-            <Text
-              style={{
-                color: colors.navbg,
-                fontSize: SIZE.sm,
-                fontFamily: WEIGHT.regular,
-              }}>
-              - End -
-            </Text>
-          </View>
-        }
-        data={
-          searchResults &&
-          searchResults.results.length > 0 &&
-          searchResults.type === 'notebooks'
-            ? searchResults.results
-            : notebooks
-        }
-        keyExtractor={(item, index) => item.id.toString()}
-        renderItem={({item, index}) => (
-          <SelectionWrapper item={item}>
-            <NotebookItem
-              hideMore={params.hideMore}
-              navigation={navigation}
-              customStyle={{
-                width: selectionMode ? w - 74 : '100%',
-                marginHorizontal: 0,
-              }}
-              isMove={params.isMove}
-              selectionMode={selectionMode}
-              onLongPress={() => {
-                if (!selectionMode) {
-                  dispatch({
-                    type: ACTIONS.SELECTION_MODE,
-                    enabled: !selectionMode,
-                  });
-                }
-
-                dispatch({
-                  type: ACTIONS.SELECTED_ITEMS,
-                  item: item,
-                });
-              }}
-              noteToMove={params.note}
-              item={item}
-              index={index}
-            />
-          </SelectionWrapper>
-        )}
+        pinned={pinned}
+        placeholderText="Notebooks you add will appear here"
       />
     </Container>
   );

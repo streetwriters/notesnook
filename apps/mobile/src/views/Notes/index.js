@@ -29,6 +29,7 @@ import {NotesPlaceHolder} from '../../components/ListPlaceholders';
 import {useIsFocused} from 'react-navigation-hooks';
 import {openEditorAnimation} from '../../utils/animations';
 import {inputRef} from '../../components/SearchInput';
+import SimpleList from '../../components/SimpleList';
 
 export const Notes = ({navigation}) => {
   const [state, dispatch] = useTracked();
@@ -37,7 +38,6 @@ export const Notes = ({navigation}) => {
   const [notes, setNotes] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const isFocused = useIsFocused();
-  const searchResults = {...state.searchResults};
   let params = navigation.state ? navigation.state.params : null;
 
   useEffect(() => {
@@ -129,118 +129,6 @@ export const Notes = ({navigation}) => {
     </SelectionWrapper>
   );
 
-  const _onScroll = event => {
-    if (!event) return;
-    let y = event.nativeEvent.contentOffset.y;
-
-    eSendEvent(eScrollEvent, y);
-  };
-
-  const _ListFooterComponent = notes[0] ? (
-    <View
-      style={{
-        height: 150,
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}>
-      <Text
-        style={{
-          color: colors.navbg,
-          fontSize: SIZE.sm,
-          fontFamily: WEIGHT.regular,
-        }}>
-        - End -
-      </Text>
-    </View>
-  ) : null;
-
-  const _ListHeaderComponent_S =
-    searchResults.type === 'notes' && searchResults.results.length > 0 ? (
-      <View
-        style={{
-          marginTop:
-            Platform.OS == 'ios'
-              ? notes[0]
-                ? 135
-                : 135 - 60
-              : notes[0]
-              ? 155
-              : 155 - 60,
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          paddingHorizontal: 12,
-        }}>
-        <Text
-          style={{
-            fontFamily: WEIGHT.bold,
-            color: colors.accent,
-            fontSize: SIZE.xs,
-          }}>
-          Search Results for {searchResults.keyword}
-        </Text>
-        <Text
-          onPress={() => {
-            inputRef.current?.setNativeProps({
-              text: '',
-            });
-            dispatch({
-              type: ACTIONS.SEARCH_RESULTS,
-              results: {
-                results: [],
-                type: null,
-                keyword: null,
-              },
-            });
-          }}
-          style={{
-            fontFamily: WEIGHT.regular,
-            color: colors.errorText,
-            fontSize: SIZE.xs,
-          }}>
-          Clear
-        </Text>
-      </View>
-    ) : (
-      <View
-        style={{
-          marginTop:
-            Platform.OS == 'ios'
-              ? notes[0]
-                ? 135
-                : 135 - 60
-              : notes[0]
-              ? 155
-              : 155 - 60,
-        }}
-      />
-    );
-
-  const _ListEmptyComponent = (
-    <View
-      style={{
-        height: '80%',
-        width: '100%',
-        alignItems: 'center',
-        alignSelf: 'center',
-        justifyContent: 'center',
-        opacity: 0.8,
-      }}>
-      <>
-        <NotesPlaceHolder colors={colors} />
-        <Text
-          style={{
-            color: colors.icon,
-            fontSize: SIZE.sm,
-            fontFamily: WEIGHT.regular,
-            marginTop: 35,
-          }}>
-          Add some notes to this {params.type ? params.type : 'topic.'}
-        </Text>
-      </>
-    </View>
-  );
-
   const _onRefresh = async () => {
     setRefreshing(true);
     try {
@@ -256,7 +144,34 @@ export const Notes = ({navigation}) => {
     }
   };
 
-  const _listKeyExtractor = (item, index) => item.dateCreated.toString();
+  const _bottomBottomOnPress = () => {
+    if (params.type === 'tag') {
+      editing.actionAfterFirstSave = {
+        type: 'tag',
+        id: params.tag.title,
+      };
+    } else if (params.type == 'color') {
+      editing.actionAfterFirstSave = {
+        type: 'color',
+        id: params.color.id,
+      };
+    } else {
+      editing.actionAfterFirstSave = {
+        type: 'topic',
+        id: params.title,
+        notebook: params.notebookId,
+      };
+    }
+
+    if (DDS.isTab) {
+      eSendEvent(eOnLoadNote, {type: 'new'});
+    } else {
+      SideMenuEvent.close();
+      SideMenuEvent.disable();
+      eSendEvent(eOnLoadNote, {type: 'new'});
+      openEditorAnimation();
+    }
+  };
 
   return (
     <Container
@@ -274,65 +189,18 @@ export const Notes = ({navigation}) => {
       placeholder={`Search in ${
         params.type == 'tag' ? '#' + params.title : params.title
       }`}
-      bottomButtonOnPress={() => {
-        if (params.type === 'tag') {
-          editing.actionAfterFirstSave = {
-            type: 'tag',
-            id: params.tag.title,
-          };
-        } else if (params.type == 'color') {
-          editing.actionAfterFirstSave = {
-            type: 'color',
-            id: params.color.id,
-          };
-        } else {
-          editing.actionAfterFirstSave = {
-            type: 'topic',
-            id: params.title,
-            notebook: params.notebookId,
-          };
-        }
-
-        if (DDS.isTab) {
-          eSendEvent(eOnLoadNote, {type: 'new'});
-        } else {
-          SideMenuEvent.close();
-          SideMenuEvent.disable();
-          eSendEvent(eOnLoadNote, {type: 'new'});
-          openEditorAnimation();
-        }
-      }}>
-      <FlatList
-        data={
-          searchResults.type === 'notes' &&
-          isFocused &&
-          searchResults.results.length > 0
-            ? searchResults.results
-            : notes
-        }
-        refreshControl={
-          <RefreshControl
-            tintColor={colors.accent}
-            colors={[colors.accent]}
-            progressViewOffset={165}
-            onRefresh={_onRefresh}
-            refreshing={refreshing}
-          />
-        }
-        keyExtractor={_listKeyExtractor}
-        ListFooterComponent={_ListFooterComponent}
-        onScroll={_onScroll}
-        ListHeaderComponent={_ListHeaderComponent_S}
-        ListEmptyComponent={_ListEmptyComponent}
-        contentContainerStyle={{
-          width: '100%',
-          alignSelf: 'center',
-          minHeight: '100%',
-        }}
-        style={{
-          height: '100%',
-        }}
+      bottomButtonOnPress={_bottomBottomOnPress}>
+      <SimpleList
+        data={notes}
+        type="notes"
+        refreshing={refreshing}
+        focused={isFocused}
+        onRefresh={_onRefresh}
         renderItem={_renderItem}
+        placeholder={<NotesPlaceHolder colors={colors} />}
+        placeholderText={`Add some notes to this" ${
+          params.type ? params.type : 'topic.'
+        }`}
       />
     </Container>
   );

@@ -16,6 +16,7 @@ const SimpleList = ({
   focused,
   refreshing,
   placeholderText,
+  pinned = null,
 }) => {
   const [state, dispatch] = useTracked();
   const {colors, selectionMode} = state;
@@ -104,8 +105,43 @@ const SimpleList = ({
               : data[0] && !selectionMode
               ? 155
               : 155 - 60,
-        }}
-      />
+        }}>
+        {pinned && pinned.notebooks && pinned.notebooks.length > 0 ? (
+          <>
+            <FlatList
+              data={pinned.notebooks}
+              keyExtractor={(item, index) => item.id.toString()}
+              renderItem={({item, index}) =>
+                item.type === 'notebook' ? (
+                  <NotebookItem
+                    hideMore={params.hideMore}
+                    customStyle={{
+                      backgroundColor: Platform.ios
+                        ? hexToRGBA(colors.accent + '19')
+                        : hexToRGBA(colors.shade),
+                      width: '100%',
+                      paddingHorizontal: 12,
+                      paddingTop: 20,
+                      paddingRight: 18,
+                      marginBottom: 10,
+                      marginTop: 20,
+                      borderBottomWidth: 0,
+                      marginHorizontal: 0,
+                    }}
+                    isMove={params.isMove}
+                    onLongPress={() => {}}
+                    noteToMove={params.note}
+                    item={item}
+                    pinned={true}
+                    index={index}
+                    colors={colors}
+                  />
+                ) : null
+              }
+            />
+          </>
+        ) : null}
+      </View>
     );
 
   const _ListEmptyComponent = (

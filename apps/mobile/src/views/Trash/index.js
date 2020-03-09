@@ -15,13 +15,13 @@ import {w, ToastEvent} from '../../utils/utils';
 import SelectionWrapper from '../../components/SelectionWrapper';
 import {useIsFocused} from 'react-navigation-hooks';
 import {inputRef} from '../../components/SearchInput';
+import SimpleList from '../../components/SimpleList';
 
 export const Trash = ({navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors, selectionMode, trash} = state;
   const [refreshing, setRefreshing] = useState(false);
   const isFocused = useIsFocused();
-  const searchResults = {...state.searchResults};
   useEffect(() => {
     if (isFocused) {
       dispatch({
@@ -88,28 +88,20 @@ export const Trash = ({navigation}) => {
     </SelectionWrapper>
   );
 
-  const _ListEmptyComponent = (
-    <View
-      style={{
-        height: '80%',
-        width: '100%',
-        alignItems: 'center',
-        alignSelf: 'center',
-        justifyContent: 'center',
-        opacity: 0.8,
-      }}>
-      <TrashPlaceHolder colors={colors} />
-      <Text
-        style={{
-          color: colors.icon,
-          fontSize: SIZE.sm,
-          fontFamily: WEIGHT.regular,
-          marginTop: 30,
-        }}>
-        Deleted notes & notebooks appear here.
-      </Text>
-    </View>
-  );
+  const _onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await db.sync();
+
+      dispatch({type: ACTIONS.TRASH});
+      dispatch({type: ACTIONS.USER});
+      setRefreshing(false);
+      ToastEvent.show('Sync Complete', 'success');
+    } catch (e) {
+      setRefreshing(false);
+      ToastEvent.show('Sync failed, network error', 'error');
+    }
+  };
 
   return (
     <Container
@@ -124,109 +116,15 @@ export const Trash = ({navigation}) => {
       type="trash"
       data={trash}
       bottomButtonText="Clear all trash">
-      <FlatList
-        refreshControl={
-          <RefreshControl
-            tintColor={colors.accent}
-            colors={[colors.accent]}
-            progressViewOffset={165}
-            onRefresh={async () => {
-              setRefreshing(true);
-              try {
-                await db.sync();
-
-                dispatch({type: ACTIONS.TRASH});
-                dispatch({type: ACTIONS.USER});
-                setRefreshing(false);
-                ToastEvent.show('Sync Complete', 'success');
-              } catch (e) {
-                setRefreshing(false);
-                ToastEvent.show('Sync failed, network error', 'error');
-              }
-            }}
-            refreshing={refreshing}
-          />
-        }
-        ListHeaderComponent={
-          searchResults.type === 'trash' && searchResults.results.length > 0 ? (
-            <View
-              style={{
-                marginTop:
-                  Platform.OS == 'ios'
-                    ? trash[0]
-                      ? 135
-                      : 135 - 60
-                    : trash[0]
-                    ? 155
-                    : 155 - 60,
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                paddingHorizontal: 12,
-              }}>
-              <Text
-                style={{
-                  fontFamily: WEIGHT.bold,
-                  color: colors.accent,
-                  fontSize: SIZE.xs,
-                }}>
-                Search Results for {searchResults.keyword}
-              </Text>
-              <Text
-                onPress={() => {
-                  inputRef.current?.setNativeProps({
-                    text: '',
-                  });
-                  dispatch({
-                    type: ACTIONS.SEARCH_RESULTS,
-                    results: {
-                      results: [],
-                      type: null,
-                      keyword: null,
-                    },
-                  });
-                }}
-                style={{
-                  fontFamily: WEIGHT.regular,
-                  color: colors.errorText,
-                  fontSize: SIZE.xs,
-                }}>
-                Clear
-              </Text>
-            </View>
-          ) : (
-            <View
-              style={{
-                marginTop:
-                  Platform.OS == 'ios'
-                    ? trash[0]
-                      ? 135
-                      : 135 - 60
-                    : trash[0]
-                    ? 155
-                    : 155 - 60,
-              }}
-            />
-          )
-        }
-        keyExtractor={item => item.dateCreated.toString()}
-        style={{
-          width: '100%',
-          alignSelf: 'center',
-          height: '100%',
-        }}
-        contentContainerStyle={{
-          height: '100%',
-        }}
-        data={
-          searchResults.type === 'trash' &&
-          searchResults.results.length > 0 &&
-          isFocused
-            ? searchResults.results
-            : trash
-        }
-        ListEmptyComponent={_ListEmptyComponent}
+      <SimpleList
+        data={trash}
+        type="trash"
+        refreshing={refreshing}
+        focused={isFocused}
+        onRefresh={_onRefresh}
         renderItem={_renderItem}
+        placeholder={<TrashPlaceHolder colors={colors} />}
+        placeholderText="Deleted notes & notebooks appear here."
       />
     </Container>
   );

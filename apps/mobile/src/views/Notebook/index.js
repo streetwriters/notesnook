@@ -1,13 +1,12 @@
 import React, {useEffect, useState} from 'react';
-import {FlatList, Platform, RefreshControl, Text, View} from 'react-native';
 import {useIsFocused} from 'react-navigation-hooks';
 import {db} from '../../../App';
-import {SIZE, WEIGHT} from '../../common/common';
 import Container from '../../components/Container';
 import {AddTopicEvent} from '../../components/DialogManager';
 import {NotebookItem} from '../../components/NotebookItem';
 import SelectionWrapper from '../../components/SelectionWrapper';
 import {useTracked} from '../../provider';
+import {ACTIONS} from '../../provider/actions';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -19,15 +18,15 @@ import {
   eScrollEvent,
 } from '../../services/events';
 import {ToastEvent, w} from '../../utils/utils';
-import {ACTIONS} from '../../provider/actions';
-import {inputRef} from '../../components/SearchInput';
+import SimpleList from '../../components/SimpleList';
+import {NotebookPlaceHolder} from '../../components/ListPlaceholders';
 
 export const Notebook = ({navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors, selectionMode, preventDefaultMargins} = state;
   const [topics, setTopics] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
-  const searchResults = {...state.searchResults};
+
   let params = navigation.state.params;
   let notebook;
   let isFocused = useIsFocused();
@@ -78,15 +77,7 @@ export const Notebook = ({navigation}) => {
     };
   }, []);
 
-  const onScroll = event => {
-    let y = event.nativeEvent.contentOffset.y;
-    eSendEvent(eScrollEvent, y);
-  };
-
-  const keyExtractor = (item, index) =>
-    item.dateCreated.toString() + index.toString();
-
-  const renderItem = ({item, index}) => (
+  const _renderItem = ({item, index}) => (
     <SelectionWrapper item={item}>
       <NotebookItem
         hideMore={params.hideMore}
@@ -121,85 +112,20 @@ export const Notebook = ({navigation}) => {
     </SelectionWrapper>
   );
 
-  const ListFooterComponent = (
-    <View
-      style={{
-        height: 150,
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}>
-      <Text
-        style={{
-          color: colors.navbg,
-          fontSize: SIZE.sm,
-          fontFamily: WEIGHT.regular,
-        }}>
-        - End -
-      </Text>
-    </View>
-  );
+  const _onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await db.sync();
 
-  const ListHeaderComponent =
-    searchResults.type === 'topics' && searchResults.results.length > 0 ? (
-      <View
-        style={{
-          marginTop:
-            Platform.OS == 'ios'
-              ? topics[0] && !selectionMode
-                ? 135
-                : 135 - 60
-              : topics[0] && !selectionMode
-              ? 155
-              : 155 - 60,
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          paddingHorizontal: 12,
-        }}>
-        <Text
-          style={{
-            fontFamily: WEIGHT.bold,
-            color: colors.accent,
-            fontSize: SIZE.xs,
-          }}>
-          Search Results for {searchResults.keyword}
-        </Text>
-        <Text
-          onPress={() => {
-            inputRef.current?.setNativeProps({
-              text: '',
-            });
-            dispatch({
-              type: ACTIONS.SEARCH_RESULTS,
-              results: {
-                results: [],
-                type: null,
-                keyword: null,
-              },
-            });
-          }}
-          style={{
-            fontFamily: WEIGHT.regular,
-            color: colors.errorText,
-            fontSize: SIZE.xs,
-          }}>
-          Clear
-        </Text>
-      </View>
-    ) : (
-      <View
-        style={{
-          marginTop:
-            Platform.OS == 'ios'
-              ? topics[0] && !selectionMode
-                ? 135
-                : 135 - 60
-              : topics[0] && !selectionMode
-              ? 155
-              : 155 - 60,
-        }}
-      />
-    );
+      onLoad();
+      dispatch({type: ACTIONS.USER});
+      setRefreshing(false);
+      ToastEvent.show('Sync Complete', 'success');
+    } catch (e) {
+      setRefreshing(false);
+      ToastEvent.show('Sync failed, network error', 'error');
+    }
+  };
 
   return (
     <Container
@@ -215,44 +141,15 @@ export const Notebook = ({navigation}) => {
         let n = navigation.state.params.notebook;
         AddTopicEvent(n);
       }}>
-      <FlatList
-        refreshControl={
-          <RefreshControl
-            tintColor={colors.accent}
-            colors={[colors.accent]}
-            progressViewOffset={165}
-            onRefresh={async () => {
-              setRefreshing(true);
-              try {
-                await db.sync();
-
-                onLoad();
-                dispatch({type: ACTIONS.USER});
-                setRefreshing(false);
-                ToastEvent.show('Sync Complete', 'success');
-              } catch (e) {
-                setRefreshing(false);
-                ToastEvent.show('Sync failed, network error', 'error');
-              }
-            }}
-            refreshing={refreshing}
-          />
-        }
-        style={{
-          width: '100%',
-        }}
-        data={
-          searchResults.type === 'topics' &&
-          searchResults.results.length > 0 &&
-          isFocused
-            ? searchResults.results
-            : topics
-        }
-        onScroll={onScroll}
-        ListHeaderComponent={ListHeaderComponent}
-        ListFooterComponent={ListFooterComponent}
-        keyExtractor={keyExtractor}
-        renderItem={renderItem}
+      <SimpleList
+        data={topics}
+        type="topics"
+        refreshing={refreshing}
+        focused={isFocused}
+        onRefresh={_onRefresh}
+        renderItem={_renderItem}
+        placeholder={<NotebookPlaceHolder colors={colors} />}
+        placeholderText="Topics added to notebook appear here."
       />
     </Container>
   );
