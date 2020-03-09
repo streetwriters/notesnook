@@ -84,7 +84,7 @@ function Editor() {
           sx={{
             display: "flex",
             alignItems: "center",
-            marginTop: 2,
+            marginTop: dateEdited || text.length || id.length ? 0 : 2,
             marginBottom: dateEdited || text.length || id.length ? 2 : 0
           }}
         >
