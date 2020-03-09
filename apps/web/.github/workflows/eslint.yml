@@ -25,10 +25,10 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-      - name: setup-git-credentials
-        uses: fusion-engineering/setup-git-credentials@v2
+      - name: La clé
+        uses: pioug/la-cle@v1.0.0
         with:
-          credentials: https://thecodrr:906f774ee6db40be3bbf7816eecd2328db73b720@github.com/
+          GH_SSH_KEY: ${{ secrets.GH_SSH_KEY }} 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
         with:
