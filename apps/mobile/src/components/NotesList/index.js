@@ -19,14 +19,15 @@ import NoteItem from '../NoteItem';
 import SelectionWrapper from '../SelectionWrapper';
 import {db, DDS} from '../../../App';
 import {inputRef} from '../SearchInput';
+import {useIsFocused} from 'react-navigation-hooks';
 
 const sectionListRef = createRef();
 export const NotesList = ({isGrouped = false}) => {
   const [state, dispatch] = useTracked();
   const {colors, selectionMode, currentEditingNote, loading, notes} = state;
-
-  const searchResults = {...state.searchResults};
+  const isFocused = useIsFocused();
   const [refreshing, setRefreshing] = useState(false);
+  const searchResults = {...state.searchResults};
 
   const _renderItem = ({item, index}) => (
     <SelectionWrapper
@@ -200,9 +201,7 @@ export const NotesList = ({isGrouped = false}) => {
 
   const _listKeyExtractor = (item, index) => item.id.toString();
 
-  return isGrouped &&
-    searchResults.results.length === 0 &&
-    searchResults.type !== 'notes' ? (
+  return searchResults.type !== 'notes' && isFocused ? (
     <SectionList
       ref={sectionListRef}
       sections={notes}
@@ -247,7 +246,7 @@ export const NotesList = ({isGrouped = false}) => {
     />
   ) : (
     <FlatList
-      data={searchResults.results}
+      data={searchResults.type === 'notes' ? searchResults.results : []}
       keyExtractor={_listKeyExtractor}
       ListFooterComponent={_ListFooterComponent}
       onScroll={_onScroll}
