@@ -200,13 +200,16 @@ export default class Notes {
 }
 
 function isNoteEmpty(note) {
-  const isTitleEmpty = !note.title || note.title.trim().length <= 0;
-  const isTextEmpty =
-    !note.content.text || note.content.text.trim().length <= 0;
-  const hasDelta = note.content.delta !== undefined;
-  return (
-    !note.content || (!note.locked && isTitleEmpty && isTextEmpty && !hasDelta)
-  );
+  if (!note.content) return true;
+  const {
+    title,
+    content: { delta, text },
+    locked
+  } = note;
+  const isTitleEmpty = !title || !title.trim().length;
+  const isTextEmpty = !text || !text.trim().length;
+  const isDeltaEmpty = !delta || !delta.ops;
+  return !locked && isTitleEmpty && isTextEmpty && isDeltaEmpty;
 }
 
 function getNoteHeadline(note) {
