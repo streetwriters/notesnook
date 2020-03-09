@@ -6883,7 +6883,7 @@ normalize-url@^3.0.0, normalize-url@^3.0.1:
 
 "notes-core@https://github.com/thecodrr/notes-core.git":
   version "1.2.0"
-  resolved "https://github.com/thecodrr/notes-core.git#479f290b1b8c929eba45e27b1a8293f1a221de8a"
+  resolved "https://github.com/thecodrr/notes-core.git#c5f5a15cba00e0d56aa99fac19277b1ce3cd0454"
   dependencies:
     fast-sort "^2.0.1"
     fuzzysearch "^1.0.3"
