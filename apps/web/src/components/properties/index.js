@@ -66,7 +66,7 @@ const Properties = props => {
             position: "absolute",
             right: 0,
             display: "flex",
-            width: 280,
+            width: 300,
             height: "100%"
           }}
         >
@@ -74,10 +74,12 @@ const Properties = props => {
             sx={{
               position: "absolute",
               right: 0,
+              overflowY: "auto",
+              overflowX: "hidden",
               display: "flex",
               width: [0, 0, "100%"],
               height: "100%",
-              boxShadow: "-1px 1px 10px 0px #888888"
+              boxShadow: "-1px 1px 10px 0px #88888890"
             }}
             flexDirection="column"
             bg="background"
