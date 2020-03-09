@@ -144,7 +144,7 @@ export const reducer = (state, action) => {
       let results = action.results;
       return {
         ...state,
-        searchResults: [...results],
+        searchResults: {...results},
       };
     }
     default:

@@ -90,24 +90,28 @@ export const Container = ({
     if (!text || text.length < 1) {
       ToastEvent.show('Please enter a search keyword');
       clearSearch();
-    } else {
-      //setKeyword(text);
-      if (type === 'notes') {
-        searchResult = await db.notes.filter(text);
-      } else if (type === 'notebooks') {
-        searchResult = await db.notebooks.filter(text);
-      } else if (type === 'topic') {
-        return;
-      } else {
-        return;
-      }
-
-      if (searchResult && searchResult.length > 0) {
-        dispatch({type: ACTIONS.SEARCH_RESULTS, results: searchResult});
-      } else {
-        ToastEvent.show('No search results found', 'error', 3000, () => {}, '');
-      }
+      return;
     }
+    if (!type) return;
+
+    searchResult = await db.lookup[type](
+      data[0].data ? db.notes.all : data,
+      text,
+    );
+
+    if (!searchResults && searchResults.length < 0) {
+      ToastEvent.show('No search results found', 'error', 3000, () => {}, '');
+      return;
+    }
+
+    dispatch({
+      type: ACTIONS.SEARCH_RESULTS,
+      results: {
+        type,
+        results: searchResult,
+        keyword: text,
+      },
+    });
   };
 
   const onBlur = () => {
@@ -122,7 +126,14 @@ export const Container = ({
 
   const clearSearch = () => {
     searchResult = null;
-    dispatch({type: ACTIONS.SEARCH_RESULTS, results: []});
+    dispatch({
+      type: ACTIONS.SEARCH_RESULTS,
+      results: {
+        results: [],
+        type: null,
+        keyword: null,
+      },
+    });
   };
 
   useEffect(() => {

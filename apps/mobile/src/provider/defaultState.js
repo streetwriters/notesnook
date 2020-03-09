@@ -45,6 +45,10 @@ export const defaultState = {
   isLoginNavigator: false,
   currenEditingNote: null,
   loading: true,
-  searchResults: [],
+  searchResults: {
+    results: [],
+    type: null,
+    keyword: null,
+  },
   keyword: [],
 };
