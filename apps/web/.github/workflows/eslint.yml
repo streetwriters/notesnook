@@ -17,7 +17,7 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v1
       - name: Setup SSH
         uses: webfactory/ssh-agent@v0.2.0
         with:
@@ -28,6 +28,8 @@ jobs:
           node-version: 12.x
       - run: npm install
       - name: ESLint Action
-        uses: hallee/eslint-action@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: reviewdog/action-eslint@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-pr-review
+          level: 'warning'
