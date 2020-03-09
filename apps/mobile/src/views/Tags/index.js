@@ -16,6 +16,7 @@ import {ACTIONS} from '../../provider/actions';
 import NavigationService from '../../services/NavigationService';
 import {ToastEvent} from '../../utils/utils';
 import {useIsFocused} from 'react-navigation-hooks';
+import {inputRef} from '../../components/SearchInput';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
@@ -24,6 +25,7 @@ export const Tags = ({navigation}) => {
   const {colors, tags, selectionMode} = state;
   const [refreshing, setRefreshing] = useState(false);
   const isFocused = useIsFocused();
+  const searchResults = {...state.searchResults};
   useEffect(() => {
     if (isFocused) {
       dispatch({type: ACTIONS.TAGS});
@@ -41,6 +43,7 @@ export const Tags = ({navigation}) => {
       noBottomButton={true}
       placeholder="Search for #tags"
       data={tags}
+      type="tags"
       menu>
       <View
         style={{
@@ -54,18 +57,67 @@ export const Tags = ({navigation}) => {
             height: '100%',
           }}
           ListHeaderComponent={
-            <View
-              style={{
-                marginTop:
-                  Platform.OS == 'ios'
-                    ? tags[0] && !selectionMode
-                      ? 135
-                      : 135 - 60
-                    : tags[0] && !selectionMode
-                    ? 155
-                    : 155 - 60,
-              }}
-            />
+            searchResults.type === 'tags' &&
+            searchResults.results.length > 0 ? (
+              <View
+                style={{
+                  marginTop:
+                    Platform.OS == 'ios'
+                      ? tags[0] && !selectionMode
+                        ? 135
+                        : 135 - 60 && !selectionMode
+                      : tags[0]
+                      ? 155
+                      : 155 - 60,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  paddingHorizontal: 0,
+                }}>
+                <Text
+                  style={{
+                    fontFamily: WEIGHT.bold,
+                    color: colors.accent,
+                    fontSize: SIZE.xs,
+                  }}>
+                  Search Results for {searchResults.keyword}
+                </Text>
+                <Text
+                  onPress={() => {
+                    inputRef.current?.setNativeProps({
+                      text: '',
+                    });
+                    dispatch({
+                      type: ACTIONS.SEARCH_RESULTS,
+                      results: {
+                        results: [],
+                        type: null,
+                        keyword: null,
+                      },
+                    });
+                  }}
+                  style={{
+                    fontFamily: WEIGHT.regular,
+                    color: colors.errorText,
+                    fontSize: SIZE.xs,
+                  }}>
+                  Clear
+                </Text>
+              </View>
+            ) : (
+              <View
+                style={{
+                  marginTop:
+                    Platform.OS == 'ios'
+                      ? tags[0] && !selectionMode
+                        ? 135
+                        : 135 - 60
+                      : tags[0] && !selectionMode
+                      ? 155
+                      : 155 - 60,
+                }}
+              />
+            )
           }
           refreshControl={
             <RefreshControl
@@ -76,7 +128,6 @@ export const Tags = ({navigation}) => {
                 setRefreshing(true);
                 try {
                   await db.sync();
-
                   dispatch({type: ACTIONS.TAGS});
                   dispatch({type: ACTIONS.USER});
                   setRefreshing(false);
@@ -92,7 +143,13 @@ export const Tags = ({navigation}) => {
           contentContainerStyle={{
             height: '100%',
           }}
-          data={tags}
+          data={
+            searchResults.type === 'tags' &&
+            isFocused &&
+            searchResults.results.length > 0
+              ? searchResults.results
+              : tags
+          }
           ListEmptyComponent={
             <View
               style={{
