@@ -28,6 +28,7 @@ import {
 import {NotesPlaceHolder} from '../../components/ListPlaceholders';
 import {useIsFocused} from 'react-navigation-hooks';
 import {openEditorAnimation} from '../../utils/animations';
+import {inputRef} from '../../components/SearchInput';
 
 export const Notes = ({navigation}) => {
   const [state, dispatch] = useTracked();
@@ -36,6 +37,7 @@ export const Notes = ({navigation}) => {
   const [notes, setNotes] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const isFocused = useIsFocused();
+  const searchResults = {...state.searchResults};
   let params = navigation.state ? navigation.state.params : null;
 
   useEffect(() => {
@@ -152,19 +154,67 @@ export const Notes = ({navigation}) => {
     </View>
   ) : null;
 
-  const _ListHeaderComponent_S = (
-    <View
-      style={{
-        marginTop:
-          Platform.OS == 'ios'
-            ? notes[0]
-              ? 135
-              : 135 - 60
-            : notes[0]
-            ? 155
-            : 155 - 60,
-      }}></View>
-  );
+  const _ListHeaderComponent_S =
+    searchResults.type === 'notes' && searchResults.results.length > 0 ? (
+      <View
+        style={{
+          marginTop:
+            Platform.OS == 'ios'
+              ? notes[0]
+                ? 135
+                : 135 - 60
+              : notes[0]
+              ? 155
+              : 155 - 60,
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          paddingHorizontal: 12,
+        }}>
+        <Text
+          style={{
+            fontFamily: WEIGHT.bold,
+            color: colors.accent,
+            fontSize: SIZE.xs,
+          }}>
+          Search Results for {searchResults.keyword}
+        </Text>
+        <Text
+          onPress={() => {
+            inputRef.current?.setNativeProps({
+              text: '',
+            });
+            dispatch({
+              type: ACTIONS.SEARCH_RESULTS,
+              results: {
+                results: [],
+                type: null,
+                keyword: null,
+              },
+            });
+          }}
+          style={{
+            fontFamily: WEIGHT.regular,
+            color: colors.errorText,
+            fontSize: SIZE.xs,
+          }}>
+          Clear
+        </Text>
+      </View>
+    ) : (
+      <View
+        style={{
+          marginTop:
+            Platform.OS == 'ios'
+              ? notes[0]
+                ? 135
+                : 135 - 60
+              : notes[0]
+              ? 155
+              : 155 - 60,
+        }}
+      />
+    );
 
   const _ListEmptyComponent = (
     <View
@@ -220,6 +270,7 @@ export const Notes = ({navigation}) => {
       headerColor={params.type == 'color' ? params.title : null}
       canGoBack={true}
       data={notes}
+      type="notes"
       placeholder={`Search in ${
         params.type == 'tag' ? '#' + params.title : params.title
       }`}
@@ -252,7 +303,13 @@ export const Notes = ({navigation}) => {
         }
       }}>
       <FlatList
-        data={notes}
+        data={
+          searchResults.type === 'notes' &&
+          isFocused &&
+          searchResults.results.length > 0
+            ? searchResults.results
+            : notes
+        }
         refreshControl={
           <RefreshControl
             tintColor={colors.accent}
