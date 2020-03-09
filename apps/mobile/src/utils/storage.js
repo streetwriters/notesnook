@@ -16,7 +16,7 @@ async function read(key, isArray = false) {
 
 async function write(key, data) {
   if (data.length !== undefined) {
-    return await setArray(key, data);
+    return await setArray(key, data.slice());
   } else {
     return await FastStorage.setMap(key, data);
   }
