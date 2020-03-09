@@ -5,6 +5,7 @@ import Notebook from "../components/notebook";
 import AddNotebookDialog from "../components/dialogs/addnotebookdialog";
 import ListContainer from "../components/list-container";
 import { useStore, store } from "../stores/notebook-store";
+import NotebooksPlaceholder from "../components/placeholders/notebooks-placeholder";
 
 const Notebooks = props => {
   const [open, setOpen] = useState(false);
@@ -16,6 +17,7 @@ const Notebooks = props => {
     <>
       <ListContainer
         itemsLength={notebooks.length}
+        placeholder={NotebooksPlaceholder}
         item={index => (
           <Notebook
             index={index}

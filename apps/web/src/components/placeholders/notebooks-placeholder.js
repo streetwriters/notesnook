@@ -2,7 +2,6 @@ import { motion } from "framer-motion";
 import React from "react";
 import { Box, Flex, Text } from "rebass";
 
-
 const NotebooksPlaceholder = props => {
   return (
     <>
@@ -38,9 +37,7 @@ const NotebooksPlaceholder = props => {
               width: "130px",
               backgroundColor: "#c9c9c9",
               height: "150px",
-
               borderRadius: "5px",
-
               boxShadow: "2px 2px 15px 0px #00000040"
             }}
           >
@@ -50,7 +47,6 @@ const NotebooksPlaceholder = props => {
               sx={{
                 borderRadius: "5px",
                 boxShadow: "1px 1px 5px 0px #00000060",
-                borderRadius: "5px",
                 height: "150px",
                 width: "120px",
                 justifyContent: "center",
@@ -144,13 +140,12 @@ const NotebooksPlaceholder = props => {
       </Flex>
 
       <Text
-        color="icon"
-        width="80%"
+        color="gray"
         marginTop={50}
         alignSelf="center"
         sx={{
           textAlign: "center",
-          fontSize: "body"
+          fontSize: "title"
         }}
       >
         Notebooks you add will appear here.
