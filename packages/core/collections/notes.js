@@ -1,6 +1,5 @@
 import CachedCollection from "../database/cached-collection";
 import fuzzysearch from "fuzzysearch";
-import Tags from "./tags";
 import { groupBy } from "../utils";
 import sort from "fast-sort";
 import {
@@ -114,13 +113,6 @@ export default class Notes {
 
   colored(color) {
     return tfun.filter(`.colors.includes('${color}')`)(this.all);
-  }
-
-  filter(query) {
-    if (!query) return [];
-    let queryFn = v => fuzzysearch(query, v.title + " " + v.content.text);
-    if (query instanceof Function) queryFn = query;
-    return tfun.filter(queryFn)(this.all);
   }
 
   group(by, special = false) {

@@ -5,6 +5,7 @@ import Tags from "../collections/tags";
 import User from "../models/user";
 import Sync from "./sync";
 import Vault from "./vault";
+import Lookup from "./lookup";
 
 class Database {
   constructor(context) {
@@ -24,6 +25,7 @@ class Database {
     await this.trash.init(this.notes, this.notebooks);
     this.syncer = new Sync(this);
     this.vault = new Vault(this, this.context);
+    this.lookup = new Lookup();
   }
 
   sync() {

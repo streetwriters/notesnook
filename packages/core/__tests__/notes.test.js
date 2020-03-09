@@ -53,14 +53,6 @@ test("get all notes", () =>
     expect(db.notes.all.length).toBeGreaterThan(0);
   }));
 
-test("search all notes", () =>
-  noteTest({
-    content: { delta: "5", text: "5" }
-  }).then(async ({ db }) => {
-    let filtered = db.notes.filter("5");
-    expect(filtered.length).toBeGreaterThan(0);
-  }));
-
 test("note without a title should get title from content", () =>
   noteTest().then(async ({ db, id }) => {
     let note = db.notes.note(id);
