@@ -110,6 +110,7 @@ const Editor = ({navigation, noMenu}) => {
 
   const clearEditor = async () => {
     await saveNote(true);
+
     setDateEdited(0);
     title = null;
     content = null;
@@ -164,8 +165,7 @@ const Editor = ({navigation, noMenu}) => {
 
   const saveNote = async (lockNote = true) => {
     if (!title && !content) return;
-    if (title === '' && content.text === '') return;
-
+    if (title.trim().length === 0 && content.text.trim().length === 0) return;
     if (!content) {
       content = {
         text: '',
@@ -173,6 +173,7 @@ const Editor = ({navigation, noMenu}) => {
       };
     }
 
+    console.log(id, title, content);
     let rId = await db.notes.add({
       title,
       content: {
@@ -221,8 +222,6 @@ const Editor = ({navigation, noMenu}) => {
           break;
         }
         case 'color': {
-          console.log('I WORKED');
-
           await db.notes.note(id).color(editing.actionAfterFirstSave.id);
 
           editing.actionAfterFirstSave = {

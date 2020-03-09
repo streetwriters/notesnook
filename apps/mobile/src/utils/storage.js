@@ -3,18 +3,21 @@ import FastStorage, {getArray, setArray} from 'react-native-fast-storage';
 
 var Aes = NativeModules.Aes;
 
-async function read(key, isArray) {
+async function read(key, isArray = false) {
   let data;
   if (isArray) {
     data = await getArray(key);
+    data.push('hello');
   } else {
     data = await FastStorage.getMap(key);
   }
-  return !data ? undefined : data;
+  console.log('READ', data, key);
+  return data;
 }
 
 async function write(key, data) {
-  if (Array.isArray(data)) {
+  if (data.length !== undefined) {
+    console.log(data, key);
     return await setArray(key, data);
   } else {
     return await FastStorage.setMap(key, data);
@@ -25,7 +28,7 @@ async function readMulti(keys) {
   if (keys.length <= 0) {
     return [];
   } else {
-    let data = await FastStorage.getMultipleItems(keys);
+    let data = await FastStorage.getMultipleItems(keys.slice());
     return !data ? undefined : data;
   }
 }
