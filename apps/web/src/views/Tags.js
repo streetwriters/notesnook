@@ -4,6 +4,7 @@ import ListContainer from "../components/list-container";
 import ListItem from "../components/list-item";
 import { db } from "../common";
 import { store } from "../stores/note-store";
+import TagsPlaceholder from "../components/placeholders/tags-placeholder";
 
 const TagNode = ({ title }) => (
   <Text as="span" variant="title">
@@ -18,6 +19,7 @@ const Tags = props => {
   const tags = db.tags.all;
   return (
     <ListContainer
+      placeholder={TagsPlaceholder}
       itemsLength={tags.length}
       item={index => {
         const { title, count } = tags[index];

@@ -2,6 +2,44 @@ import { motion } from "framer-motion";
 import React from "react";
 import { Flex, Text } from "rebass";
 
+const animatedTags = [
+  {
+    delay: 3,
+    marginTop: "-50px",
+    size: 14,
+    text: "presentations",
+    left: "25px"
+  },
+  {
+    delay: 12,
+    marginTop: "20px",
+    size: 16,
+    text: "quotesonlife",
+    left: "90px"
+  },
+  {
+    delay: 18,
+    marginTop: "-25px",
+    size: 18,
+    text: "workinprogress",
+    left: "70px"
+  },
+  {
+    delay: 24,
+    marginTop: "0px",
+    size: 14,
+    text: "todolists",
+    left: "35px"
+  },
+  {
+    delay: 30,
+    marginTop: "40px",
+    size: 24,
+    text: "myschoolwork",
+    left: "50px"
+  }
+];
+
 const TagsPlaceholder = props => {
   return (
     <>
@@ -16,43 +54,7 @@ const TagsPlaceholder = props => {
           justifyContent: "center"
         }}
       >
-        {[
-          {
-            delay: 3,
-            marginTop: "-50px",
-            size: 14,
-            text: "presentations",
-            left: "25px"
-          },
-          {
-            delay: 12,
-            marginTop: "20px",
-            size: 16,
-            text: "quotesonlife",
-            left: "90px"
-          },
-          {
-            delay: 18,
-            marginTop: "-25px",
-            size: 18,
-            text: "workinprogress",
-            left: "70px"
-          },
-          {
-            delay: 24,
-            marginTop: "0px",
-            size: 14,
-            text: "todolists",
-            left: "35px"
-          },
-          {
-            delay: 30,
-            marginTop: "40px",
-            size: 24,
-            text: "myschoolwork",
-            left: "50px"
-          }
-        ].map(item => (
+        {animatedTags.map(item => (
           <motion.div
             style={{
               padding: 0,
@@ -62,7 +64,7 @@ const TagsPlaceholder = props => {
               position: "absolute"
             }}
             animate={{
-              opacity: [0, 0.5, 1, 0.5, 0],
+              opacity: [0.1, 0.5, 1, 0.5, 0],
               scaleX: [0.7, 0.75, 0.85, 0.9, 1],
               scaleY: [0.7, 0.75, 0.85, 0.9, 1]
             }}
@@ -84,13 +86,12 @@ const TagsPlaceholder = props => {
       </Flex>
 
       <Text
-        color="icon"
-        width="80%"
+        color="gray"
         marginTop={50}
         alignSelf="center"
         sx={{
           textAlign: "center",
-          fontSize: "body"
+          fontSize: "title"
         }}
       >
         Tags added to notes appear here.
