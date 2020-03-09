@@ -14,13 +14,14 @@ import {ACTIONS} from '../../provider/actions';
 import {w, ToastEvent} from '../../utils/utils';
 import SelectionWrapper from '../../components/SelectionWrapper';
 import {useIsFocused} from 'react-navigation-hooks';
+import {inputRef} from '../../components/SearchInput';
 
 export const Trash = ({navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors, selectionMode, trash} = state;
   const [refreshing, setRefreshing] = useState(false);
   const isFocused = useIsFocused();
-
+  const searchResults = {...state.searchResults};
   useEffect(() => {
     if (isFocused) {
       dispatch({
@@ -115,10 +116,13 @@ export const Trash = ({navigation}) => {
       bottomButtonOnPress={() => {
         simpleDialogEvent(TEMPLATE_EMPTY_TRASH);
       }}
-      noSearch={true}
+      placeholder="Search in trash"
+      noSearch={false}
       heading="Trash"
       canGoBack={false}
       menu={true}
+      type="trash"
+      data={trash}
       bottomButtonText="Clear all trash">
       <FlatList
         refreshControl={
@@ -144,11 +148,66 @@ export const Trash = ({navigation}) => {
           />
         }
         ListHeaderComponent={
-          <View
-            style={{
-              marginTop: Platform.OS == 'ios' ? 135 - 60 : 155 - 60,
-            }}
-          />
+          searchResults.type === 'trash' && searchResults.results.length > 0 ? (
+            <View
+              style={{
+                marginTop:
+                  Platform.OS == 'ios'
+                    ? trash[0]
+                      ? 135
+                      : 135 - 60
+                    : trash[0]
+                    ? 155
+                    : 155 - 60,
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                paddingHorizontal: 12,
+              }}>
+              <Text
+                style={{
+                  fontFamily: WEIGHT.bold,
+                  color: colors.accent,
+                  fontSize: SIZE.xs,
+                }}>
+                Search Results for {searchResults.keyword}
+              </Text>
+              <Text
+                onPress={() => {
+                  inputRef.current?.setNativeProps({
+                    text: '',
+                  });
+                  dispatch({
+                    type: ACTIONS.SEARCH_RESULTS,
+                    results: {
+                      results: [],
+                      type: null,
+                      keyword: null,
+                    },
+                  });
+                }}
+                style={{
+                  fontFamily: WEIGHT.regular,
+                  color: colors.errorText,
+                  fontSize: SIZE.xs,
+                }}>
+                Clear
+              </Text>
+            </View>
+          ) : (
+            <View
+              style={{
+                marginTop:
+                  Platform.OS == 'ios'
+                    ? trash[0]
+                      ? 135
+                      : 135 - 60
+                    : trash[0]
+                    ? 155
+                    : 155 - 60,
+              }}
+            />
+          )
         }
         keyExtractor={item => item.dateCreated.toString()}
         style={{
@@ -159,7 +218,13 @@ export const Trash = ({navigation}) => {
         contentContainerStyle={{
           height: '100%',
         }}
-        data={trash}
+        data={
+          searchResults.type === 'trash' &&
+          searchResults.results.length > 0 &&
+          isFocused
+            ? searchResults.results
+            : trash
+        }
         ListEmptyComponent={_ListEmptyComponent}
         renderItem={_renderItem}
       />
