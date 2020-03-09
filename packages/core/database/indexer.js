@@ -8,7 +8,7 @@ export default class Indexer extends Storage {
   }
 
   async init() {
-    this.indices = (await this.read(this.type)) || [];
+    this.indices = (await this.read(this.type, true)) || [];
   }
 
   async exists(key) {

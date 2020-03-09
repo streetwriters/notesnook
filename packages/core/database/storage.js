@@ -8,8 +8,8 @@ export default class Storage {
   readMulti(keys) {
     return this.storage.readMulti(keys);
   }
-  read(key) {
-    return this.storage.read(key);
+  read(key, isArray = false) {
+    return this.storage.read(key, isArray);
   }
   clear() {
     return this.storage.clear();
