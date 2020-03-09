@@ -9,20 +9,29 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
-
+        
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
   build:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [8.x, 10.x, 12.x, 13.x]
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
-
-    - name: ESLint Action
-      uses: stefanoeb/eslint-action@1.0.2
+      
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
       with:
-        files: .
+        node-version: ${{ matrix.node-version }}
+    - run: npm install
+    - run: npm start
+      
+    - name: ESLint Action
+      uses: hallee/eslint-action@1.0.1
