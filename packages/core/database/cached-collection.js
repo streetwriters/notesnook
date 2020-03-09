@@ -11,7 +11,7 @@ export default class CachedCollection {
   async init() {
     await this.indexer.init();
     const data = await this.indexer.readMulti(this.indexer.indices);
-    this.map = new Map(data);
+    if (data.length > 0) this.map = new Map(data);
   }
 
   /**
