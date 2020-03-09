@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, createRef} from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -20,18 +20,12 @@ import SelectionWrapper from '../SelectionWrapper';
 import {db, DDS} from '../../../App';
 import {inputRef} from '../SearchInput';
 
+const sectionListRef = createRef();
 export const NotesList = ({isGrouped = false}) => {
   const [state, dispatch] = useTracked();
-  const {
-    colors,
-    selectionMode,
-    currentEditingNote,
-    loading,
-    keyword,
-    notes,
-  } = state;
+  const {colors, selectionMode, currentEditingNote, loading, notes} = state;
 
-  const searchResults = [...state.searchResults];
+  const searchResults = {...state.searchResults};
   const [refreshing, setRefreshing] = useState(false);
 
   const _renderItem = ({item, index}) => (
@@ -178,7 +172,7 @@ export const NotesList = ({isGrouped = false}) => {
           color: colors.accent,
           fontSize: SIZE.xs,
         }}>
-        Search Results for War
+        Search Results for {searchResults.keyword}
       </Text>
       <Text
         onPress={() => {
@@ -187,7 +181,11 @@ export const NotesList = ({isGrouped = false}) => {
           });
           dispatch({
             type: ACTIONS.SEARCH_RESULTS,
-            results: [],
+            results: {
+              results: [],
+              type: null,
+              keyword: null,
+            },
           });
         }}
         style={{
@@ -202,9 +200,11 @@ export const NotesList = ({isGrouped = false}) => {
 
   const _listKeyExtractor = (item, index) => item.id.toString();
 
-  return isGrouped && searchResults.length === 0 ? (
+  return isGrouped &&
+    searchResults.results.length === 0 &&
+    searchResults.type !== 'notes' ? (
     <SectionList
-      ref={ref => (sectionListRef = ref)}
+      ref={sectionListRef}
       sections={notes}
       refreshControl={
         <RefreshControl
@@ -247,7 +247,7 @@ export const NotesList = ({isGrouped = false}) => {
     />
   ) : (
     <FlatList
-      data={searchResults}
+      data={searchResults.results}
       keyExtractor={_listKeyExtractor}
       ListFooterComponent={_ListFooterComponent}
       onScroll={_onScroll}
