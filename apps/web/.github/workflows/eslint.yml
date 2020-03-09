@@ -34,5 +34,5 @@ jobs:
       - run: npm install
       - name: ESLint Action
         uses: hallee/eslint-action@master
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
