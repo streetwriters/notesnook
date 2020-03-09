@@ -26,9 +26,9 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
       - name: Setup SSH
-        uses: pioug/la-cle@v1.0.0
+        uses: webfactory/ssh-agent@v0.2.0
         with:
-          GH_SSH_KEY: ${{ secrets.GH_SSH_KEY }}
+          ssh-private-key: ${{ secrets.GH_SSH_KEY }}
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
         with:
