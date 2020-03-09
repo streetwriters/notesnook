@@ -12,12 +12,14 @@ import {eSendEvent} from '../../services/eventManager';
 import {eScrollEvent} from '../../services/events';
 import {ToastEvent, w} from '../../utils/utils';
 import {useIsFocused} from 'react-navigation-hooks';
+import {inputRef} from '../../components/SearchInput';
 
 export const Favorites = ({navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors, selectionMode, favorites} = state;
   const [refreshing, setRefreshing] = useState(false);
   const isFocused = useIsFocused();
+  const searchResults = {...state.searchResults};
 
   useEffect(() => {
     if (isFocused) {
@@ -42,6 +44,7 @@ export const Favorites = ({navigation}) => {
       canGoBack={false}
       customIcon="menu"
       data={favorites}
+      type="notes"
       noBottomButton={true}>
       <FlatList
         keyExtractor={item => item.dateCreated.toString()}
@@ -76,17 +79,66 @@ export const Favorites = ({navigation}) => {
           height: '100%',
         }}
         ListHeaderComponent={
-          <View
-            style={{
-              marginTop:
-                Platform.OS == 'ios'
-                  ? favorites[0]
-                    ? 135
-                    : 135 - 60
-                  : favorites[0]
-                  ? 155
-                  : 155 - 60,
-            }}></View>
+          searchResults.type === 'notes' && searchResults.results.length > 0 ? (
+            <View
+              style={{
+                marginTop:
+                  Platform.OS == 'ios'
+                    ? favorites[0]
+                      ? 135
+                      : 135 - 60
+                    : favorites[0]
+                    ? 155
+                    : 155 - 60,
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                paddingHorizontal: 12,
+              }}>
+              <Text
+                style={{
+                  fontFamily: WEIGHT.bold,
+                  color: colors.accent,
+                  fontSize: SIZE.xs,
+                }}>
+                Search Results for {searchResults.keyword}
+              </Text>
+              <Text
+                onPress={() => {
+                  inputRef.current?.setNativeProps({
+                    text: '',
+                  });
+                  dispatch({
+                    type: ACTIONS.SEARCH_RESULTS,
+                    results: {
+                      results: [],
+                      type: null,
+                      keyword: null,
+                    },
+                  });
+                }}
+                style={{
+                  fontFamily: WEIGHT.regular,
+                  color: colors.errorText,
+                  fontSize: SIZE.xs,
+                }}>
+                Clear
+              </Text>
+            </View>
+          ) : (
+            <View
+              style={{
+                marginTop:
+                  Platform.OS == 'ios'
+                    ? favorites[0]
+                      ? 135
+                      : 135 - 60
+                    : favorites[0]
+                    ? 155
+                    : 155 - 60,
+              }}
+            />
+          )
         }
         ListEmptyComponent={
           <View
@@ -110,7 +162,13 @@ export const Favorites = ({navigation}) => {
             </Text>
           </View>
         }
-        data={favorites}
+        data={
+          searchResults.type === 'notes' &&
+          isFocused &&
+          searchResults.results.length > 0
+            ? searchResults.results
+            : favorites
+        }
         onScroll={onScroll}
         renderItem={({item, index}) => (
           <SelectionWrapper item={item}>
