@@ -25,10 +25,11 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-      - name: La clé
-        uses: pioug/la-cle@v1.0.0
+      - name: Setup SSH
+      - uses: kielabokkie/ssh-key-and-known-hosts-action@v1.0.1
         with:
-          GH_SSH_KEY: ${{ secrets.GH_SSH_KEY }} 
+          ssh-private-key: ${{ secrets.GH_SSH_KEY }}
+          ssh-host: github.com
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
         with:
