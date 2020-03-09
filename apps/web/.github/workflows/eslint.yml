@@ -30,7 +30,7 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      - run: npm install https://thecodrr@github.com/thecodrr/notes-core.git
+      - run: npm install https://github.com/thecodrr/notes-core.git
       - run: npm install
       - run: npm start
 
