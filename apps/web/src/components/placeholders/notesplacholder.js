@@ -115,13 +115,12 @@ const NotesPlaceholder = props => {
         ))}
       </Flex>
       <Text
-        color="icon"
-        width="80%"
+        color="gray"
         marginTop={50}
         alignSelf="center"
         sx={{
           textAlign: "center",
-          fontSize: "body"
+          fontSize: "title"
         }}
       >
         Notes you write appear here.

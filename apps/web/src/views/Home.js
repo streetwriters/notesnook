@@ -8,6 +8,8 @@ import Search from "../components/search";
 import Note from "../components/note";
 import { useStore, store } from "../stores/note-store";
 import { useStore as useEditorStore } from "../stores/editor-store";
+import ListContainer from "../components/list-container";
+import NotesPlaceholder from "../components/placeholders/notesplacholder";
 
 function SearchBox(props) {
   return (
@@ -30,8 +32,12 @@ function Home() {
   const notes = useStore(store => store.notes);
   const newSession = useEditorStore(store => store.newSession);
   return (
-    <Flex flexDirection="column" flex="1 1 auto">
-      <SearchBox />
+    <ListContainer
+      itemsLength={notes.items.length}
+      placeholder={NotesPlaceholder}
+      searchPlaceholder={"Search your notes"}
+      button={{ content: "Make a new note", onClick: () => newSession() }}
+    >
       <GroupList
         style={{
           width: "100%",
@@ -71,12 +77,7 @@ function Home() {
           )
         }
       />
-      <Button
-        Icon={Icon.Plus}
-        content="Make a new note"
-        onClick={() => newSession()}
-      />
-    </Flex>
+    </ListContainer>
   );
 }
 export default Home;
