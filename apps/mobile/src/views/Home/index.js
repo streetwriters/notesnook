@@ -59,7 +59,7 @@ export const Home = ({navigation}) => {
       data={notes ? notes : []}>
       <SelectionHeader />
 
-      <NotesList isGrouped={true} />
+      <NotesList />
     </Container>
   );
 };
