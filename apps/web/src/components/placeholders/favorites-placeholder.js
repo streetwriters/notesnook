@@ -31,7 +31,7 @@ const FavoritesPlaceholder = props => {
               position: "relative"
             }}
             animate={{
-              opacity: [0, 0.5, 1, 0.5, 0],
+              opacity: [0.1, 0.5, 1, 0.5, 0],
               scaleX: [0.7, 0.75, 0.85, 0.9, 1],
               scaleY: [0.7, 0.75, 0.85, 0.9, 1]
             }}
@@ -48,13 +48,12 @@ const FavoritesPlaceholder = props => {
       </Flex>
 
       <Text
-        color="icon"
-        width="80%"
+        color="gray"
         marginTop={50}
         alignSelf="center"
         sx={{
           textAlign: "center",
-          fontSize: "body"
+          fontSize: "title"
         }}
       >
         Notes you favorite appear here.

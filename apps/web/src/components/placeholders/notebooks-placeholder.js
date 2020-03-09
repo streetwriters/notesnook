@@ -105,7 +105,6 @@ const NotebooksPlaceholder = props => {
               sx={{
                 borderRadius: "5px",
                 boxShadow: "1px 1px 5px 0px #00000060",
-                borderRadius: "5px",
                 height: "150px",
                 width: "120px",
                 justifyContent: "center",

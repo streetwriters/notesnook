@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import ListView from "../components/listview";
 import { useStore, store, LIST_TYPES } from "../stores/note-store";
 import { useStore as useEditorStore } from "../stores/editor-store";
+import FavoritesPlaceholder from "../components/placeholders/favorites-placeholder";
 const dropdownRefs = [];
 const menuItems = item => [
   {
@@ -17,6 +18,7 @@ function Favorites() {
   return (
     <ListView
       type="Favorites"
+      placeholder={FavoritesPlaceholder}
       items={items}
       menu={{ menuItems, dropdownRefs }}
       noType

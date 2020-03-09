@@ -4,10 +4,11 @@ import ListItem from "../list-item";
 import TimeAgo from "timeago-react";
 import ListContainer from "../list-container";
 
-function ListView({ items, menu, button, onClick, noType }) {
+function ListView({ items, menu, button, onClick, noType, placeholder }) {
   return (
     items && (
       <ListContainer
+        placeholder={placeholder}
         itemsLength={items.length}
         item={index => {
           const item = items[index];
