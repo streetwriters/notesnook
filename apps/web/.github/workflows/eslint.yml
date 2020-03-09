@@ -5,8 +5,8 @@ on: pull_request
 jobs:
   eslint:
     runs-on: ubuntu-latest
-    env:
-      GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
     steps:
       - uses: actions/checkout@v1
-      - uses: hallee/eslint-action@master
+      - uses: 18F/github-action-eslint@1.0.0
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
