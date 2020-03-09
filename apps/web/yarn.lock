@@ -6321,10 +6321,9 @@ loader-utils@^1.0.1, loader-utils@^1.0.2, loader-utils@^1.1.0, loader-utils@^1.2
     emojis-list "^3.0.0"
     json5 "^1.0.1"
 
-localforage-getitems@^1.4.2:
+"localforage-getitems@https://github.com/thecodrr/localForage-getItems.git":
   version "1.4.2"
-  resolved "https://registry.yarnpkg.com/localforage-getitems/-/localforage-getitems-1.4.2.tgz#bddd3e716e7df339dc5a5cc26e2dd1decec76606"
-  integrity sha512-3Y1DAAlRjGlhWAXoD1DR8M+7WF9DC6t8CvYZ7YKVnIJBpima8j4RsWUv1ryJKB+fTPozfDxeqrN7ooqzBPyB4g==
+  resolved "https://github.com/thecodrr/localForage-getItems.git#183391aa58cde335b760e37a1c1af5ec17df6f4a"
   dependencies:
     localforage ">=1.4.0"
 
@@ -6884,7 +6883,7 @@ normalize-url@^3.0.0, normalize-url@^3.0.1:
 
 "notes-core@https://github.com/thecodrr/notes-core.git":
   version "1.2.0"
-  resolved "https://github.com/thecodrr/notes-core.git#0efb3e81c5859430894022d6f738a7dab127e14f"
+  resolved "https://github.com/thecodrr/notes-core.git#479f290b1b8c929eba45e27b1a8293f1a221de8a"
   dependencies:
     fast-sort "^2.0.1"
     fuzzysearch "^1.0.3"
