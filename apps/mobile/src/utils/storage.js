@@ -11,7 +11,7 @@ async function read(key, isArray = false) {
     data = await FastStorage.getMap(key);
   }
 
-  return data;
+  return isArray ? data.slice() : data;
 }
 
 async function write(key, data) {
