@@ -27,6 +27,12 @@ function notebookStore(set, get) {
     pin: async function(notebook, index) {
       await db.notebooks.notebook(notebook).pin();
       get().refresh();
+    },
+    selectedNotebookTopics: [],
+    setSelectedNotebookTopics: function(id) {
+      set(state => {
+        state.selectedNotebookTopics = db.notebooks.notebook(id).topics.all;
+      });
     }
   };
 }

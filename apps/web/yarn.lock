@@ -6881,9 +6881,9 @@ normalize-url@^3.0.0, normalize-url@^3.0.1:
   resolved "https://registry.yarnpkg.com/normalize-url/-/normalize-url-3.3.0.tgz#b2e1c4dc4f7c6d57743df733a4f5978d18650559"
   integrity sha512-U+JJi7duF1o+u2pynbp2zXDW2/PADgC30f0GsHZtRh+HOcXHnw137TrNlyxxRvWW5fjKd3bcLHPxofWuCjaeZg==
 
-"notes-core@https://github.com/thecodrr/notes-core.git":
+"notes-core@https://906f774ee6db40be3bbf7816eecd2328db73b720@github.com/thecodrr/notes-core.git":
   version "1.2.0"
-  resolved "https://github.com/thecodrr/notes-core.git#30da62525362ecb89f735e915a6144be2224f08f"
+  resolved "https://906f774ee6db40be3bbf7816eecd2328db73b720@github.com/thecodrr/notes-core.git#e858b028761d39b008d4b42c74c73c2c887715f5"
   dependencies:
     fast-sort "^2.0.1"
     fuzzysearch "^1.0.3"

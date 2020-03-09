@@ -1,19 +1,35 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Topic from "../components/topic";
 import ListContainer from "../components/list-container";
-import { useStore } from "../stores/note-store";
+import * as Icon from "react-feather";
+import { useStore as useNoteStore } from "../stores/note-store";
+import { useStore as useNbStore } from "../stores/notebook-store";
+import { showTopicDialog } from "../components/dialogs/topicdialog";
 
 const Topics = props => {
-  const setSelectedContext = useStore(store => store.setSelectedContext);
+  const setSelectedContext = useNoteStore(store => store.setSelectedContext);
+  const setSelectedNotebookTopics = useNbStore(
+    store => store.setSelectedNotebookTopics
+  );
+  const selectedNotebookTopics = useNbStore(
+    store => store.selectedNotebookTopics
+  );
+
+  const [topics, setTopics] = useState([]);
+  useEffect(() => {
+    setSelectedNotebookTopics(props.notebook.id);
+    setTopics(selectedNotebookTopics);
+  }, [selectedNotebookTopics]);
+
   return (
     <ListContainer
-      itemsLength={props.topics.length}
+      itemsLength={topics.length}
       item={index => (
         <Topic
           index={index}
-          item={props.topics[index]}
+          item={topics[index]}
           onClick={() => {
-            let topic = props.topics[index];
+            let topic = topics[index];
             setSelectedContext({
               type: "topic",
               value: topic.title,
@@ -27,7 +43,10 @@ const Topics = props => {
         />
       )}
       button={{
-        content: "Add more topics"
+        content: "Add more topics",
+        onClick: async () => {
+          await showTopicDialog(Icon.Book, "Topic", props.notebook.id);
+        }
       }}
     />
   );
