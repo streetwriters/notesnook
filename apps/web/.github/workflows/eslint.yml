@@ -23,4 +23,6 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: ESLint Action
-      uses: hallee/eslint-action@1.0.1
+      uses: stefanoeb/eslint-action@1.0.2
+      with:
+        files: .
