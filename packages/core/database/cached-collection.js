@@ -10,7 +10,7 @@ export default class CachedCollection {
 
   async init() {
     await this.indexer.init();
-    const data = await this.indexer.readMulti(sort(this.indexer.indices).asc());
+    const data = await this.indexer.readMulti(this.indexer.indices);
     this.map = new Map(data);
   }
 
