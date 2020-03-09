@@ -20,12 +20,14 @@ import {
 } from '../../services/events';
 import {ToastEvent, w} from '../../utils/utils';
 import {ACTIONS} from '../../provider/actions';
+import {inputRef} from '../../components/SearchInput';
 
 export const Notebook = ({navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors, selectionMode, preventDefaultMargins} = state;
   const [topics, setTopics] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
+  const searchResults = {...state.searchResults};
   let params = navigation.state.params;
   let notebook;
   let isFocused = useIsFocused();
@@ -137,20 +139,67 @@ export const Notebook = ({navigation}) => {
     </View>
   );
 
-  const ListHeaderComponent = (
-    <View
-      style={{
-        marginTop:
-          Platform.OS == 'ios'
-            ? topics[0] && !selectionMode
-              ? 135
-              : 135 - 60
-            : topics[0] && !selectionMode
-            ? 155
-            : 155 - 60,
-      }}
-    />
-  );
+  const ListHeaderComponent =
+    searchResults.type === 'topics' && searchResults.results.length > 0 ? (
+      <View
+        style={{
+          marginTop:
+            Platform.OS == 'ios'
+              ? topics[0] && !selectionMode
+                ? 135
+                : 135 - 60
+              : topics[0] && !selectionMode
+              ? 155
+              : 155 - 60,
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          paddingHorizontal: 12,
+        }}>
+        <Text
+          style={{
+            fontFamily: WEIGHT.bold,
+            color: colors.accent,
+            fontSize: SIZE.xs,
+          }}>
+          Search Results for {searchResults.keyword}
+        </Text>
+        <Text
+          onPress={() => {
+            inputRef.current?.setNativeProps({
+              text: '',
+            });
+            dispatch({
+              type: ACTIONS.SEARCH_RESULTS,
+              results: {
+                results: [],
+                type: null,
+                keyword: null,
+              },
+            });
+          }}
+          style={{
+            fontFamily: WEIGHT.regular,
+            color: colors.errorText,
+            fontSize: SIZE.xs,
+          }}>
+          Clear
+        </Text>
+      </View>
+    ) : (
+      <View
+        style={{
+          marginTop:
+            Platform.OS == 'ios'
+              ? topics[0] && !selectionMode
+                ? 135
+                : 135 - 60
+              : topics[0] && !selectionMode
+              ? 155
+              : 155 - 60,
+        }}
+      />
+    );
 
   return (
     <Container
@@ -160,6 +209,7 @@ export const Notebook = ({navigation}) => {
       placeholder={`Search in "${params.title}"`}
       heading={params.title}
       canGoBack={true}
+      type="topics"
       data={topics}
       bottomButtonOnPress={() => {
         let n = navigation.state.params.notebook;
@@ -191,7 +241,13 @@ export const Notebook = ({navigation}) => {
         style={{
           width: '100%',
         }}
-        data={topics}
+        data={
+          searchResults.type === 'topics' &&
+          searchResults.results.length > 0 &&
+          isFocused
+            ? searchResults.results
+            : topics
+        }
         onScroll={onScroll}
         ListHeaderComponent={ListHeaderComponent}
         ListFooterComponent={ListFooterComponent}
