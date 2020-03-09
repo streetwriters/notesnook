@@ -25,7 +25,9 @@ function clear() {
 }
 
 function encrypt(password, data) {
-  return new Promise((resolve, reject) => resolve({ iv: "", cipher: data }));
+  return new Promise((resolve, reject) =>
+    resolve({ iv: "some iv", cipher: data })
+  );
 }
 function decrypt(password, data) {
   return new Promise((resolve, reject) => resolve(data.cipher));

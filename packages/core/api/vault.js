@@ -28,7 +28,7 @@ export default class Vault {
 
   async unlock(password) {
     const lockKey = await this._context.read("lockKey");
-    if (!this._exists(lockKey)) throw new Error("ERR_NO_VAULT");
+    if (!(await this._exists(lockKey))) throw new Error("ERR_NO_VAULT");
     var data;
     try {
       data = await this._context.decrypt(password, lockKey);
@@ -102,7 +102,6 @@ export default class Vault {
       this._password,
       JSON.stringify(deltaArg)
     );
-    console.log(delta);
     await this._context.write(this._deltaId(id), delta);
   }
 
