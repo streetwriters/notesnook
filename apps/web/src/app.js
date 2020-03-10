@@ -87,7 +87,6 @@ function App() {
   const isSideMenuOpen = useStore(store => store.isSideMenuOpen);
   const refreshColors = useStore(store => store.refreshColors);
   const setSelectedContext = useNotesStore(store => store.setSelectedContext);
-
   const isFocusModeEnabled = useAppStore(store => store.isFocusModeEnabled);
 
   useEffect(() => {
@@ -97,8 +96,8 @@ function App() {
   }, []);
 
   useEffect(() => {
-    isFocusModeEnabled ? setShow(false) : setShow(true);
-  }, [isFocusModeEnabled, setShow]);
+    if (isFocusModeEnabled) setShow(false);
+  }, [isFocusModeEnabled, setShow, show]);
   const colors = useStore(store => store.colors);
   return (
     <ThemeProvider>
