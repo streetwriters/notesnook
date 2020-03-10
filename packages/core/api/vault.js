@@ -10,13 +10,12 @@ export default class Vault {
     this._context = context;
     this._key = "Notesnook";
     this._password = "";
+    this.ERRORS = {
+      noVault: "ERR_NO_VAULT",
+      vaultLocked: "ERR_VAULT_LOCKED",
+      wrongPassword: "ERR_WRONG_PASSWORD"
+    };
   }
-
-  ERRORS = {
-    noVault: "ERR_NO_VAULT",
-    vaultLocked: "ERR_VAULT_LOCKED",
-    wrongPassword: "ERR_WRONG_PASSWORD"
-  };
 
   async create(password) {
     const lockKey = await this._context.read("lockKey");
