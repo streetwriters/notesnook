@@ -1,12 +1,12 @@
 import {NativeModules} from 'react-native';
-import FastStorage, {getArray, setArray} from 'react-native-fast-storage';
+import MMKV from 'react-native-mmkv-storage';
 
 var Aes = NativeModules.Aes;
 
 async function read(key, isArray = false) {
   let data;
   if (isArray) {
-    data = await getArray(key);
+    data = await MMKV.getArray(key);
   } else {
     data = await MMKV.getMap(key);
   }
@@ -16,7 +16,7 @@ async function read(key, isArray = false) {
 
 async function write(key, data) {
   if (data.length !== undefined) {
-    return await setArray(key, data.slice());
+    return await MMKV.setArray(key, data.slice());
   } else {
     return await MMKV.setMap(key, data);
   }
