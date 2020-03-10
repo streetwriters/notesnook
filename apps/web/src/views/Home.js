@@ -1,31 +1,11 @@
 import React, { useEffect } from "react";
-import { Flex, Text, Box } from "rebass";
-import * as Icon from "react-feather";
-import { db } from "../common";
+import { Text, Box } from "rebass";
 import { GroupedVirtuoso as GroupList } from "react-virtuoso";
-import Button from "../components/button";
-import Search from "../components/search";
 import Note from "../components/note";
 import { useStore, store } from "../stores/note-store";
 import { useStore as useEditorStore } from "../stores/editor-store";
 import ListContainer from "../components/list-container";
 import NotesPlaceholder from "../components/placeholders/notesplacholder";
-
-function SearchBox(props) {
-  return (
-    <Search
-      placeholder="Search"
-      onChange={e => {
-        let data =
-          e.target.value.length > 2
-            ? db.notes.filter(e.target.value)
-            : db.notes.group(undefined, true);
-        data = !data ? [] : data;
-        props.setNotes(data);
-      }}
-    />
-  );
-}
 
 function Home() {
   useEffect(() => store.getState().refresh(), []);

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Topic from "../components/topic";
+import { Flex } from "rebass";
 import ListContainer from "../components/list-container";
 import * as Icon from "react-feather";
 import { useStore as useNoteStore } from "../stores/note-store";
@@ -17,13 +18,17 @@ const Topics = props => {
 
   const [topics, setTopics] = useState([]);
   useEffect(() => {
-    setSelectedNotebookTopics(props.notebook.id);
     setTopics(selectedNotebookTopics);
   }, [selectedNotebookTopics]);
+
+  useEffect(() => {
+    setSelectedNotebookTopics(props.notebook.id);
+  }, [setSelectedNotebookTopics, props.notebook.id]);
 
   return (
     <ListContainer
       itemsLength={topics.length}
+      placeholder={Flex}
       item={index => (
         <Topic
           index={index}
