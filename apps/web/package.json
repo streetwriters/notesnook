@@ -5,7 +5,6 @@
   "dependencies": {
     "@rebass/forms": "^4.0.6",
     "emotion-theming": "^10.0.19",
-    "events": "^3.0.0",
     "framer-motion": "^1.9.1",
     "immer": "^5.3.6",
     "localforage": "^1.7.3",

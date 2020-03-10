@@ -10,6 +10,7 @@ function appStore(set, get) {
     isSelectionMode: false,
     shouldSelectAll: false,
     selectedItems: [],
+    theme: {},
     colors: [],
     closeSideMenu: function() {
       set(state => {
@@ -88,6 +89,11 @@ function appStore(set, get) {
           .unlock(password)
           .then(() => true)
           .catch(() => false);
+      });
+    },
+    setTheme: function(theme) {
+      set(state => {
+        state.theme = theme;
       });
     }
   };

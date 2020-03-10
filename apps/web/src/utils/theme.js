@@ -1,7 +1,6 @@
 import React from "react";
 import { ThemeProvider as EmotionThemeProvider } from "emotion-theming";
-import { ev } from "../common";
-import { useEffect } from "react";
+import { store, useStore } from "../stores/app-store";
 import { addCss } from "./css";
 
 const colorsLight = primary =>
@@ -16,7 +15,7 @@ const colorsLight = primary =>
     text: "#000000",
     overlay: "rgba(0, 0, 0, 0.1)",
     secondary: "white",
-    icon:'#909090'
+    icon: "#909090"
   });
 const colorsDark = primary =>
   makeTheme({
@@ -30,7 +29,7 @@ const colorsDark = primary =>
     text: "#ffffff",
     overlay: "rgba(255, 255, 255, 0.5)",
     secondary: "black",
-    icon:'#909090'
+    icon: "#909090"
   });
 
 const shadowsDark = {
@@ -227,18 +226,11 @@ var currentTheme = window.localStorage.getItem("theme") || "light";
 var currentAccent = window.localStorage.getItem("accent") || "#0560ff";
 
 export const ThemeProvider = props => {
-  const [, updateState] = React.useState();
-  useEffect(() => {
-    function updater() {
-      updateState({});
-    }
-    ev.addListener("changeTheme", updater);
-    return () => {
-      ev.removeListener("changeTheme", updater);
-    };
-  }, []);
-  const theme = getTheme(currentTheme, currentAccent);
+  let theme = useStore(store => store.theme);
+
+  theme = theme.colors ? theme : getTheme(currentTheme, currentAccent);
   addCss(cssTheme(theme));
+
   return (
     <EmotionThemeProvider theme={theme}>
       {props.children instanceof Function
@@ -251,13 +243,17 @@ export const ThemeProvider = props => {
 export const changeAccent = accent => {
   currentAccent = accent;
   window.localStorage.setItem("accent", accent);
-  ev.emit("changeTheme");
+  const theme = getTheme(currentTheme, currentAccent);
+  addCss(cssTheme(theme));
+  store.getState().setTheme(theme);
 };
 
 export const changeTheme = () => {
   currentTheme = currentTheme === "dark" ? "light" : "dark";
   window.localStorage.setItem("theme", currentTheme);
-  ev.emit("changeTheme");
+  const theme = getTheme(currentTheme, currentAccent);
+  addCss(cssTheme(theme));
+  store.getState().setTheme(theme);
 };
 
 export const isDarkTheme = () => currentTheme === "dark";
