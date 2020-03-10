@@ -77,7 +77,6 @@ export class VaultDialog extends Component {
     goToEditor = false,
     share = false,
   }) => {
-    console.log(item);
     this.setState({
       visible: true,
       note: item,
