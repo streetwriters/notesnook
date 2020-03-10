@@ -47,7 +47,6 @@ export default class Navigator {
 
     // exit selection mode on navigate
     store.getState().exitSelectionMode();
-
     ReactDOM.render(
       <NavigationContainer
         navigator={this}
