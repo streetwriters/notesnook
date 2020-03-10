@@ -1,9 +1,5 @@
 import Database from "./index";
 
-const ERRORS = {
-  noVault: "ERR_NO_VAULT",
-  vaultLocked: "ERR_VAULT_LOCKED"
-};
 export default class Vault {
   /**
    *
@@ -15,6 +11,12 @@ export default class Vault {
     this._key = "Notesnook";
     this._password = "";
   }
+
+  ERRORS = {
+    noVault: "ERR_NO_VAULT",
+    vaultLocked: "ERR_VAULT_LOCKED",
+    wrongPassword: "ERR_WRONG_PASSWORD"
+  };
 
   async create(password) {
     const lockKey = await this._context.read("lockKey");
@@ -33,10 +35,10 @@ export default class Vault {
     try {
       data = await this._context.decrypt(password, lockKey);
     } catch (e) {
-      throw new Error("ERR_WRNG_PWD");
+      throw new Error(this.ERRORS.wrongPassword);
     }
     if (data !== this._key) {
-      throw new Error("ERR_WRNG_PWD");
+      throw new Error(this.ERRORS.wrongPassword);
     }
     this._password = password;
     return true;
@@ -53,11 +55,11 @@ export default class Vault {
 
   async _check() {
     if (!(await this._exists())) {
-      throw new Error(ERRORS.noVault);
+      throw new Error(this.ERRORS.noVault);
     }
 
     if (await this._locked()) {
-      throw new Error(ERRORS.vaultLocked);
+      throw new Error(this.ERRORS.vaultLocked);
     }
   }
 
