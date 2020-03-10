@@ -30,6 +30,9 @@ import {moveNoteEvent} from '../DialogManager';
 import Share from 'react-native-share';
 import {timeConverter, ToastEvent, hexToRGBA} from '../../utils/utils';
 import NavigationService from '../../services/NavigationService';
+import {eSendEvent} from '../../services/eventManager';
+import {eOpenVaultDialog} from '../../services/events';
+import {openVault} from '../VaultDialog';
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
@@ -202,7 +205,7 @@ export const ActionSheetComponent = ({
       icon: 'share-variant',
       func: () => {
         if (note.locked) {
-          close('unlock_share');
+          openVault(item, false, true, false, false, true);
         } else {
           close();
           let m = `${note.title}\n \n ${note.content.text}`;
@@ -333,7 +336,33 @@ export const ActionSheetComponent = ({
       icon: 'shield',
       func: () => {
         if (!note.id) return;
-        note.locked ? close('unlock') : close('lock');
+
+        if (note.locked) {
+          close();
+          openVault(note, true, false, true, false, false);
+
+          return;
+        } else {
+          db.vault
+            .add(note.id)
+            .then(() => {
+              close();
+            })
+            .catch(async e => {
+              switch (e.message) {
+                case db.vault.ERRORS.noVault:
+                  close();
+                  openVault(note, false);
+                  break;
+                case db.vault.ERRORS.vaultLocked:
+                  openVault(note, true, true);
+
+                  break;
+                case db.vault.ERRORS.wrongPassword:
+                  break;
+              }
+            });
+        }
       },
       close: true,
       check: true,

@@ -106,7 +106,7 @@ const App = () => {
     // Currently orientation is locked on tablet.
     /* DDS.checkOrientation();
     setTimeout(() => {
-      alert('here');
+     
       forceUpdate();
     }, 1000); */
   };

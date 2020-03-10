@@ -13,6 +13,7 @@ import {
   TEMPLATE_TRASH,
 } from '../DialogManager';
 import {openEditorAnimation} from '../../utils/animations';
+import {openVault} from '../VaultDialog';
 
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
@@ -120,7 +121,8 @@ export default class NoteItem extends React.Component {
               this.props.onLongPress();
               return;
             } else if (item.locked) {
-              eSendEvent(eOpenVaultDialog, {unlock: true, i: item});
+              openVault(item, false, true, false, true, false);
+
               return;
             }
             if (DDS.isTab) {

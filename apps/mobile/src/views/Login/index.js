@@ -47,7 +47,6 @@ export const Login = ({navigation}) => {
   }, []);
 
   const handleBackPress = () => {
-    alert('here');
     return true;
   };
 

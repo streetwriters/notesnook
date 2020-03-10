@@ -39,7 +39,6 @@ export const Folders = ({navigation}) => {
   let isFocused = useIsFocused();
 
   const handleBackPress = () => {
-    alert('here');
     return true;
   };
 

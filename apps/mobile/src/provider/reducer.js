@@ -37,7 +37,6 @@ export const reducer = (state, action) => {
       };
     }
     case ACTIONS.SETTINGS: {
-      console.log('here', action.settings);
       return {
         ...state,
         settings: {...action.settings},
