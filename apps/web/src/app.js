@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./app.css";
 import Editor from "./components/editor";
+import { motion } from "framer-motion";
 import { Flex, Box, Button, Text } from "rebass";
 import { ThemeProvider } from "./utils/theme";
 import RootNavigator, {
@@ -198,20 +199,30 @@ function App() {
           </Flex>
         )}
         <Flex flex="1 1 auto" flexDirection="row" alignContent="stretch" px={0}>
-          <Flex
-            className="RootNavigator"
+          <motion.div
+            initial={{ width: "30%", opacity: 1, scaleY: 1 }}
+            animate={{
+              width: show ? "0%" : "30%",
+              scaleY: show ? 0.8 : 1,
+              opacity: show ? 0 : 1,
+              zIndex: show ? -1 : 0
+            }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
             style={{
-              display: show ? "flex" : "none"
+              display: "flex",
+              flex: "1 1 auto"
             }}
-            sx={{
-              borderRight: "1px solid",
-              borderColor: "border",
-              width: ["100%", "100%", "30%"]
-            }}
-            flexDirection="column"
-            flex="1 1 auto"
-            //style={{ width: "362px" }}
-          />
+          >
+            <Flex
+              className="RootNavigator"
+              flex="1 1 auto"
+              flexDirection="column"
+              sx={{
+                borderRight: "1px solid",
+                borderColor: "border"
+              }}
+            />
+          </motion.div>
           <Editor />
         </Flex>
         <Box id="dialogContainer" />
