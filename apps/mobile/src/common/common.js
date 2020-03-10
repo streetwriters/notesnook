@@ -1,5 +1,5 @@
 import {Dimensions, PixelRatio, StatusBar, Platform} from 'react-native';
-import FastStorage from 'react-native-fast-storage';
+import MMKV from 'react-native-mmkv-storage';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -187,18 +187,18 @@ export function setColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
 }
 
 export async function getColorScheme() {
-  let accentColor = await FastStorage.getString('accentColor');
-  let t = await FastStorage.getString('theme');
+  let accentColor = await MMKV.getString('accentColor');
+  let t = await MMKV.getString('theme');
 
   if (typeof accentColor !== 'string') {
-    FastStorage.setString('accentColor', '#0560FF');
+    MMKV.setString('accentColor', '#0560FF');
     setAccentColor('#0560FF');
   } else {
     setAccentColor(accentColor);
   }
 
   if (typeof t !== 'string') {
-    FastStorage.setString('theme', JSON.stringify({night: false}));
+    MMKV.setString('theme', JSON.stringify({night: false}));
     setColorScheme(COLOR_SCHEME_LIGHT);
   } else {
     let themeToSet = JSON.parse(t);

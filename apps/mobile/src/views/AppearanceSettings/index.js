@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import FastStorage from 'react-native-fast-storage';
+import MMKV from 'react-native-mmkv-storage';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
   ACCENT,
@@ -99,7 +99,7 @@ const AppearanceSettings = ({navigation}) => {
                 onPress={() => {
                   changeAccentColor(item);
 
-                  FastStorage.setString('accentColor', item);
+                  MMKV.setString('accentColor', item);
                 }}
                 style={{
                   flexDirection: 'row',
@@ -127,10 +127,10 @@ const AppearanceSettings = ({navigation}) => {
           <TouchableOpacity
             onPress={() => {
               if (!colors.night) {
-                FastStorage.setString('theme', JSON.stringify({night: true}));
+                MMKV.setString('theme', JSON.stringify({night: true}));
                 changeColorScheme(COLOR_SCHEME_DARK);
               } else {
-                FastStorage.setString('theme', JSON.stringify({night: false}));
+                MMKV.setString('theme', JSON.stringify({night: false}));
 
                 changeColorScheme(COLOR_SCHEME_LIGHT);
               }
@@ -165,10 +165,10 @@ const AppearanceSettings = ({navigation}) => {
           <TouchableOpacity
             onPress={() => {
               if (!colors.night) {
-                FastStorage.setString('theme', JSON.stringify({night: true}));
+                MMKV.setString('theme', JSON.stringify({night: true}));
                 changeColorScheme(COLOR_SCHEME_DARK);
               } else {
-                FastStorage.setString('theme', JSON.stringify({night: false}));
+                MMKV.setString('theme', JSON.stringify({night: false}));
 
                 changeColorScheme(COLOR_SCHEME_LIGHT);
               }

@@ -37,7 +37,7 @@ import {w} from './src/utils/utils';
 import Editor from './src/views/Editor';
 import Animated, {Easing} from 'react-native-reanimated';
 import {useForceUpdate} from './src/views/ListsEditor';
-import FastStorage from 'react-native-fast-storage';
+import MMKV from 'react-native-mmkv-storage';
 import {defaultState} from './src/provider/defaultState';
 import {EditorPosition} from './src/utils/animations';
 export const DDS = new DeviceDetectionService();
@@ -167,12 +167,12 @@ const App = () => {
 
   async function updateAppTheme(colors = colors) {
     let newColors = await getColorScheme(colors);
-    let s = await FastStorage.getString('settings');
+    let s = await MMKV.getString('settings');
     if (typeof s !== 'string') {
       s = defaultState.settings;
 
       s = JSON.stringify(s);
-      await FastStorage.setString('settings', s);
+      await MMKV.setString('settings', s);
       dispatch({type: ACTIONS.SETTINGS, s});
     } else {
       s = JSON.parse(s);

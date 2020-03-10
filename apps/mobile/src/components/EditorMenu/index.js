@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import FastStorage from 'react-native-fast-storage';
+import MMKV from 'react-native-mmkv-storage';
 import {TextInput} from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
@@ -326,13 +326,13 @@ export const EditorMenu = ({updateProps = () => {}, timestamp}) => {
                   icon: 'moon',
                   func: () => {
                     if (!colors.night) {
-                      FastStorage.setString(
+                      MMKV.setString(
                         'theme',
                         JSON.stringify(COLOR_SCHEME_DARK),
                       );
                       changeColorScheme(COLOR_SCHEME_DARK);
                     } else {
-                      FastStorage.setString(
+                      MMKV.setString(
                         'theme',
                         JSON.stringify(COLOR_SCHEME_LIGHT),
                       );

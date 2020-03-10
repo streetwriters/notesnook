@@ -8,7 +8,7 @@ async function read(key, isArray = false) {
   if (isArray) {
     data = await getArray(key);
   } else {
-    data = await FastStorage.getMap(key);
+    data = await MMKV.getMap(key);
   }
 
   return isArray ? data.slice() : data;
@@ -18,7 +18,7 @@ async function write(key, data) {
   if (data.length !== undefined) {
     return await setArray(key, data.slice());
   } else {
-    return await FastStorage.setMap(key, data);
+    return await MMKV.setMap(key, data);
   }
 }
 
@@ -26,17 +26,17 @@ async function readMulti(keys) {
   if (keys.length <= 0) {
     return [];
   } else {
-    let data = await FastStorage.getMultipleItems(keys.slice());
+    let data = await MMKV.getMultipleItems(keys.slice());
     return !data ? undefined : data;
   }
 }
 
 function remove(key) {
-  FastStorage.removeItem(key);
+  MMKV.removeItem(key);
 }
 
 function clear() {
-  FastStorage.clearStore();
+  MMKV.clearStore();
 }
 
 function encrypt(password, data) {

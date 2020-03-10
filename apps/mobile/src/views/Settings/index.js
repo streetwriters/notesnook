@@ -23,7 +23,7 @@ import Container from '../../components/Container';
 import {useTracked} from '../../provider';
 import {w, hexToRGBA, getElevation} from '../../utils/utils';
 import {ACTIONS} from '../../provider/actions';
-import FastStorage from 'react-native-fast-storage';
+import MMKV from 'react-native-mmkv-storage';
 import {DDS} from '../../../App';
 import {updateEvent} from '../../components/DialogManager';
 import {eSendEvent} from '../../services/eventManager';
@@ -33,7 +33,7 @@ import NavigationService from '../../services/NavigationService';
 export async function setSetting(settings, name, value) {
   let s = {...settings};
   s[name] = value;
-  await FastStorage.setString('settings', JSON.stringify(s));
+  await MMKV.setString('settings', JSON.stringify(s));
 
   updateEvent({type: ACTIONS.SETTINGS, settings: s});
 }
@@ -319,7 +319,7 @@ export const Settings = ({navigation}) => {
               onPress={() => {
                 changeAccentColor(item);
 
-                FastStorage.setString('accentColor', item);
+                MMKV.setString('accentColor', item);
               }}
               style={{
                 flexDirection: 'row',
@@ -347,10 +347,10 @@ export const Settings = ({navigation}) => {
         <TouchableOpacity
           onPress={() => {
             if (!colors.night) {
-              FastStorage.setString('theme', JSON.stringify({night: true}));
+              MMKV.setString('theme', JSON.stringify({night: true}));
               changeColorScheme(COLOR_SCHEME_DARK);
             } else {
-              FastStorage.setString('theme', JSON.stringify({night: false}));
+              MMKV.setString('theme', JSON.stringify({night: false}));
 
               changeColorScheme(COLOR_SCHEME_LIGHT);
             }
