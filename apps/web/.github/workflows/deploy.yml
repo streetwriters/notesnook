@@ -3,15 +3,20 @@ on:
   push:
     branches:
       - master
+  pull_request:
+    branches:
+      - master
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    env:
+      GH_DEPLOY_KEY: ${{ secrets.GH_DEPLOY_KEY }}
     steps:
       - name: Checkout 🛎️
         uses: actions/checkout@v2 # If you're using actions/checkout@v2 you must set persist-credentials to false in most cases for the deployment to work correctly.
         with:
           persist-credentials: false
-      
+
       - name: Setup SSH
         uses: webfactory/ssh-agent@v0.2.0
         with:
@@ -22,13 +27,12 @@ jobs:
         with:
           node-version: 12.x
       - run: npm install
-      - run: npm build
-        
+
       - name: Build and Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@releases/v3
+        uses: amondnet/now-deployment@v2
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH: gh-pages # The branch the action should deploy to.
-          FOLDER: build # The folder the action should deploy.
-          COMMIT_MESSAGE: "Deploying to space..."
-     
+          zeit-token: ${{ secrets.ZEIT_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          now-args: "--prod"
+          now-org-id: "Wst8mhjfr4LzbjOe956M2Z4t"
+          now-project-id: "QmStgLZ26V8aowiAAdyYaFVjRDWP9T8GEUoR9iJFSSnpWJ"

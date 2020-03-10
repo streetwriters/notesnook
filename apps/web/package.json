@@ -31,6 +31,7 @@
     "typescript": "^3.8.3"
   },
   "scripts": {
+    "preinstall": "chmod +x ./scripts/ci.sh && ./scripts/ci.sh",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
