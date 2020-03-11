@@ -23,6 +23,14 @@ export default class Topics {
       seen = new Map();
     for (let index = 0; index < length; index++) {
       let value = source[index];
+      if (value.id) {
+        seen.set(value.id, {
+          ...seen.get(value.id),
+          ...value,
+          id: value.title
+        });
+        continue;
+      }
       let title = value.title || value;
       if (title.trim().length <= 0) continue;
       seen.set(title, value);
@@ -32,6 +40,7 @@ export default class Topics {
 
   async add(...topics) {
     let notebook = qclone(this._notebooks.notebook(this._notebookId).data);
+
     let allTopics = [...notebook.topics, ...topics];
     const unique = this._dedupe(allTopics);
 
@@ -86,6 +95,7 @@ function makeTopic(topic, notebookId) {
   if (typeof topic !== "string") return { ...topic, dateEdited: Date.now() };
   return {
     type: "topic",
+    id: topic,
     notebookId,
     title: topic,
     dateCreated: Date.now(),
