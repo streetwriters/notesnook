@@ -97,8 +97,12 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (isFocusModeEnabled) setShow(false);
-  }, [isFocusModeEnabled, setShow, show]);
+    if (isFocusModeEnabled) {
+      setShow(false);
+    } else {
+      setShow(true);
+    }
+  }, [isFocusModeEnabled]);
   const colors = useStore(store => store.colors);
   return (
     <ThemeProvider>
@@ -206,10 +210,10 @@ function App() {
           <motion.div
             initial={{ width: "30%", opacity: 1, scaleY: 1 }}
             animate={{
-              width: show ? "0%" : "30%",
-              scaleY: show ? 0.8 : 1,
-              opacity: show ? 0 : 1,
-              zIndex: show ? -1 : 0
+              width: show ? "30%" : "0%",
+              scaleY: show ? 1 : 0.8,
+              opacity: show ? 1 : 0,
+              zIndex: show ? 0 : -1
             }}
             transition={{ duration: 0.3, ease: "easeOut" }}
             style={{
