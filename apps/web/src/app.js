@@ -141,6 +141,9 @@ function App() {
                       setShow(!show);
                       return;
                     }
+                    if (item.onClick) {
+                      return item.onClick();
+                    }
                     if (RootNavigator.navigate(item.key)) {
                       setSelectedKey(item.key);
                     }
