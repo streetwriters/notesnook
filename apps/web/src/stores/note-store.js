@@ -15,7 +15,6 @@ function noteStore(set, get) {
       groupCounts: [],
       groups: []
     },
-    favorites: [],
     selectedNotes: [],
     selectedContext: {},
     selectedNote: 0,
@@ -30,13 +29,7 @@ function noteStore(set, get) {
         state.notes = db.notes.group(undefined, true);
       });
     },
-    refreshList: function(listType) {
-      set(state => {
-        state[listType] = db.notes[listType];
-      });
-    },
     setSelectedContext: function(context) {
-      console.log("setting context");
       let notes = [];
       switch (context.type) {
         case "tag":
@@ -49,6 +42,9 @@ function noteStore(set, get) {
           notes = db.notebooks
             .notebook(context.notebook.id)
             .topics.topic(context.value).all;
+          break;
+        case "favorites":
+          notes = db.notes.favorites;
           break;
         default:
           return;
@@ -84,7 +80,6 @@ function noteStore(set, get) {
     favorite: async function(note) {
       await db.notes.note(note).favorite();
       setValue(set, note.id, "favorite", !note.favorite);
-      get().refreshList(LIST_TYPES.fav);
     },
     unlock: function(noteId) {
       showPasswordDialog("unlock_note", password => {
