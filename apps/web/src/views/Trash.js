@@ -1,8 +1,12 @@
 import React, { useEffect } from "react";
 import * as Icon from "react-feather";
-import ListView from "../components/listview";
+import { Flex, Text } from "rebass";
+import ListItem from "../list-item";
+import TimeAgo from "timeago-react";
+import ListContainer from "../components/list-container";
 import { confirm } from "../components/dialogs/confirm";
 import { useStore, store } from "../stores/trash-store";
+import { toTitleCase } from "../utils/string";
 
 const dropdownRefs = [];
 const menuItems = (item, index) => [
@@ -27,15 +31,43 @@ const menuItems = (item, index) => [
   }
 ];
 
+const TrashItem = props => (index, item) => (
+  <ListItem
+    selectable
+    item={item}
+    title={item.title}
+    body={item.headline}
+    index={index}
+    info={
+      <Flex justifyContent="center" alignItems="center">
+        <TimeAgo datetime={item.dateDeleted || item.dateCreated} />
+        <Text as="span" mx={1}>
+          •
+        </Text>
+        <Text color="primary">{toTitleCase(item.type)}</Text>
+      </Flex>
+    }
+    menuData={item}
+    menuItems={menuItems(item, index)}
+    dropdownRefs={dropdownRefs}
+  />
+);
+
 function Trash() {
   useEffect(() => store.getState().refresh(), []);
   const items = useStore(store => store.trash);
   const clearTrash = useStore(store => store.clear);
   return (
-    <ListView
-      type="Trash"
+    <ListContainer
+      itemsLength={items.length}
+      searchPlaceholder={"Search trash"}
+      searchParams={{
+        type: "trash",
+        items: items,
+        item: TrashItem()
+      }}
       items={items}
-      menu={{ menuItems, dropdownRefs }}
+      item={index => TrashItem()(index, items[index])}
       button={{
         content: "Clear Trash",
         icon: Icon.Trash2,
