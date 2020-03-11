@@ -104,7 +104,7 @@ function Note(props) {
           {note.favorite && (
             <Icon.Star
               stroke={0}
-              fill="#ffd27d"
+              fill="#ffd700"
               size={13}
               style={{ marginLeft: 5 }}
             />
