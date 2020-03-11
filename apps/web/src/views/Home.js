@@ -7,24 +7,19 @@ import { useStore as useEditorStore } from "../stores/editor-store";
 import ListContainer from "../components/list-container";
 import NotesPlaceholder from "../components/placeholders/notesplacholder";
 
-function Home(props) {
+function Home() {
   useEffect(() => store.getState().refresh(), []);
   const notes = useStore(store => store.notes);
   const newSession = useEditorStore(store => store.newSession);
   return (
     <ListContainer
-      term={props.term}
-      itemsLength={notes.items.length}
+      items={notes.items}
+      type="notes"
+      item={(index, item) => (
+        <Note index={index} pinnable={false} item={item} />
+      )}
       placeholder={NotesPlaceholder}
-      searchPlaceholder={"Search your notes"}
       button={{ content: "Make a new note", onClick: () => newSession() }}
-      searchParams={{
-        items: notes.items,
-        type: "notes",
-        item: (index, item) => (
-          <Note index={index} pinnable={false} item={item} />
-        )
-      }}
     >
       <GroupList
         style={{
@@ -56,12 +51,7 @@ function Home(props) {
         }
         item={(index, groupIndex) =>
           notes.groupCounts[groupIndex] && (
-            <Note
-              index={index}
-              pinnable={true}
-              groupIndex={groupIndex}
-              item={notes.items[index]}
-            />
+            <Note index={index} pinnable={true} item={notes.items[index]} />
           )
         }
       />

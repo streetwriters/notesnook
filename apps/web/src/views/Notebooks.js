@@ -7,27 +7,6 @@ import ListContainer from "../components/list-container";
 import { useStore, store } from "../stores/notebook-store";
 import NotebooksPlaceholder from "../components/placeholders/notebooks-placeholder";
 
-const NotebookItem = props => (index, item) => (
-  <Notebook
-    index={index}
-    item={item}
-    onClick={() => {
-      props.navigator.navigate("topics", {
-        title: item.title,
-        topics: item.topics,
-        notebook: item
-      });
-    }}
-    onTopicClick={(notebook, topic) =>
-      props.navigator.navigate("notes", {
-        title: notebook.title,
-        subtitle: topic.title,
-        notes: db.notebooks.notebook(notebook.id).topics.topic(topic.title).all
-      })
-    }
-  />
-);
-
 const Notebooks = props => {
   const [open, setOpen] = useState(false);
   useEffect(() => store.getState().refresh(), []);
@@ -36,16 +15,31 @@ const Notebooks = props => {
   return (
     <>
       <ListContainer
-        searchPlaceholder="Search your notebooks"
-        term={props.term}
-        itemsLength={notebooks.length}
+        type="notebooks"
+        items={notebooks}
+        item={(index, item) => (
+          <Notebook
+            index={index}
+            item={item}
+            onClick={() => {
+              props.navigator.navigate("topics", {
+                title: item.title,
+                topics: item.topics,
+                notebook: item
+              });
+            }}
+            onTopicClick={(notebook, topic) =>
+              props.navigator.navigate("notes", {
+                title: notebook.title,
+                subtitle: topic.title,
+                notes: db.notebooks
+                  .notebook(notebook.id)
+                  .topics.topic(topic.title).all
+              })
+            }
+          />
+        )}
         placeholder={NotebooksPlaceholder}
-        searchParams={{
-          items: notebooks,
-          type: "notebooks",
-          item: NotebookItem(props)
-        }}
-        item={index => NotebookItem(props)(index, notebooks[index])}
         button={{
           content: "Create a notebook",
           onClick: async () => {

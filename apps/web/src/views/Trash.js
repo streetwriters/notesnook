@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import * as Icon from "react-feather";
 import { Flex, Text } from "rebass";
-import ListItem from "../list-item";
+import ListItem from "../components/list-item";
 import TimeAgo from "timeago-react";
 import ListContainer from "../components/list-container";
 import { confirm } from "../components/dialogs/confirm";
@@ -31,43 +31,35 @@ const menuItems = (item, index) => [
   }
 ];
 
-const TrashItem = props => (index, item) => (
-  <ListItem
-    selectable
-    item={item}
-    title={item.title}
-    body={item.headline}
-    index={index}
-    info={
-      <Flex justifyContent="center" alignItems="center">
-        <TimeAgo datetime={item.dateDeleted || item.dateCreated} />
-        <Text as="span" mx={1}>
-          •
-        </Text>
-        <Text color="primary">{toTitleCase(item.type)}</Text>
-      </Flex>
-    }
-    menuData={item}
-    menuItems={menuItems(item, index)}
-    dropdownRefs={dropdownRefs}
-  />
-);
-
 function Trash() {
   useEffect(() => store.getState().refresh(), []);
   const items = useStore(store => store.trash);
   const clearTrash = useStore(store => store.clear);
   return (
     <ListContainer
-      itemsLength={items.length}
-      searchPlaceholder={"Search trash"}
-      searchParams={{
-        type: "trash",
-        items: items,
-        item: TrashItem()
-      }}
+      type="trash"
       items={items}
-      item={index => TrashItem()(index, items[index])}
+      item={(index, item) => (
+        <ListItem
+          selectable
+          item={item}
+          title={item.title}
+          body={item.headline}
+          index={index}
+          info={
+            <Flex justifyContent="center" alignItems="center">
+              <TimeAgo datetime={item.dateDeleted || item.dateCreated} />
+              <Text as="span" mx={1}>
+                •
+              </Text>
+              <Text color="primary">{toTitleCase(item.type)}</Text>
+            </Flex>
+          }
+          menuData={item}
+          menuItems={menuItems(item, index)}
+          dropdownRefs={dropdownRefs}
+        />
+      )}
       button={{
         content: "Clear Trash",
         icon: Icon.Trash2,

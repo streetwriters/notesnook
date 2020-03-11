@@ -1,15 +1,23 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Flex } from "rebass";
 import Button from "../button";
 import Search from "../search";
 import * as Icon from "react-feather";
 import { Virtuoso as List } from "react-virtuoso";
-import RootNavigator from "../../navigation/navigators/rootnavigator";
-
+import { useStore as useSearchStore } from "../../stores/searchstore";
 const ListContainer = props => {
+  const setSearchContext = useSearchStore(store => store.setSearchContext);
+  useEffect(() => {
+    if (props.noSearch) return;
+    setSearchContext({
+      items: props.items,
+      item: props.item,
+      type: props.type
+    });
+  }, [setSearchContext, props.item, props.items, props.type, props.noSearch]);
   return (
     <Flex flexDirection="column" flex="1 1 auto">
-      {!props.itemsLength && props.placeholder ? (
+      {!props.items.length && props.placeholder ? (
         <Flex
           flexDirection="column"
           alignSelf="center"
@@ -20,21 +28,7 @@ const ListContainer = props => {
         </Flex>
       ) : (
         <>
-          {!props.noSearch && (
-            <Search
-              autoFocus={!!props.term}
-              defaultValue={props.term}
-              placeholder={props.searchPlaceholder}
-              onChange={e => {
-                if (e.target.value.length > 2) {
-                  RootNavigator.navigate("search", {
-                    term: e.target.value,
-                    ...props.searchParams
-                  });
-                }
-              }}
-            />
-          )}
+          {!props.noSearch && <Search type={props.type} />}
           <Flex
             flexDirection="column"
             flex="1 1 auto"
@@ -50,8 +44,8 @@ const ListContainer = props => {
                   height: "auto",
                   overflowX: "hidden"
                 }}
-                totalCount={props.itemsLength}
-                item={props.item}
+                totalCount={props.items.length}
+                item={index => props.item(index, props.items[index])}
               />
             )}
           </Flex>

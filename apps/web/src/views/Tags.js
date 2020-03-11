@@ -3,7 +3,7 @@ import { Flex, Text } from "rebass";
 import ListContainer from "../components/list-container";
 import ListItem from "../components/list-item";
 import { db } from "../common";
-import { store } from "../stores/note-store";
+import { useStore } from "../stores/note-store";
 import TagsPlaceholder from "../components/placeholders/tags-placeholder";
 
 const TagNode = ({ title }) => (
@@ -14,35 +14,34 @@ const TagNode = ({ title }) => (
     {title}
   </Text>
 );
-const TagItem = props => (index, item) => {
-  const { title, count } = item;
-  return (
-    <ListItem
-      item={item}
-      selectable={false}
-      index={index}
-      title={<TagNode title={title} />}
-      info={`${count} notes`}
-      onClick={() => {
-        store.getState().setSelectedContext({ type: "tag", value: title });
-        props.navigator.navigate("notes", {
-          title: "#" + title,
-          context: { tags: [title] }
-        });
-      }}
-    />
-  );
-};
+
 const Tags = props => {
+  const setSelectedContext = useStore(store => store.setSelectedContext);
   const tags = db.tags.all;
   return (
     <ListContainer
-      term={props.term}
+      type="tags"
+      items={tags}
+      item={(index, item) => {
+        const { title, count } = item;
+        return (
+          <ListItem
+            item={item}
+            selectable={false}
+            index={index}
+            title={<TagNode title={title} />}
+            info={`${count} notes`}
+            onClick={() => {
+              setSelectedContext({ type: "tag", value: title });
+              props.navigator.navigate("notes", {
+                title: "#" + title,
+                context: { tags: [title] }
+              });
+            }}
+          />
+        );
+      }}
       placeholder={TagsPlaceholder}
-      itemsLength={tags.length}
-      searchPlaceholder="Search tags"
-      searchParams={{ type: "tags", items: tags, item: TagItem(props) }}
-      item={index => TagItem(props)(index, tags[index])}
     />
   );
 };
