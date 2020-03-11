@@ -10,6 +10,7 @@ import { timeConverter } from "../../utils/time";
 import { countWords } from "../../utils/string";
 import { useTheme } from "emotion-theming";
 import { useStore as useAppStore } from "../../stores/app-store";
+import Animated from "../animated";
 
 const TextSeperator = () => {
   const theme = useTheme();
@@ -48,12 +49,16 @@ function Editor() {
   }, [reopenLastSession]);
 
   return (
-    <Flex
+    <Animated.Flex
       width={["0%", "0%", "100%"]}
+      initial={{ marginRight: 0 }}
+      animate={{
+        marginRight: isFocusModeEnabled ? "25%" : 0
+      }}
+      transition={{ duration: 0.3, ease: "easeIn" }}
       sx={{
-        position: "relative",
-        marginLeft: isFocusModeEnabled ? "25%" : "0px",
-        marginRight: isFocusModeEnabled ? "25%" : "0px"
+        marginLeft: isFocusModeEnabled ? "25%" : 0,
+        position: "relative"
       }}
     >
       <Flex
@@ -122,7 +127,7 @@ function Editor() {
         />
       </Flex>
       {id && <Properties />}
-    </Flex>
+    </Animated.Flex>
   );
 }
 
