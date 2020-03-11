@@ -61,14 +61,14 @@ const Notebooks = props => {
   );
 };
 
-const NotebooksContainer = props => {
+const NotebooksContainer = () => {
   useEffect(() => {
     const NotebookNavigator = require("../navigation/navigators/nbnavigator")
       .default;
-    if (!NotebookNavigator.restore(props)) {
+    if (!NotebookNavigator.restore()) {
       NotebookNavigator.navigate("notebooks");
     }
-  }, [props]);
+  }, []);
   return (
     <Flex
       className="NotebookNavigator"

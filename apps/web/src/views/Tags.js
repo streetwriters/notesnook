@@ -46,14 +46,14 @@ const Tags = props => {
   );
 };
 
-const TagsContainer = props => {
+const TagsContainer = () => {
   useEffect(() => {
     const TagNavigator = require("../navigation/navigators/tagnavigator")
       .default;
-    if (!TagNavigator.restore(props)) {
+    if (!TagNavigator.restore()) {
       TagNavigator.navigate("tags");
     }
-  }, [props]);
+  }, []);
   return (
     <Flex className="TagNavigator" flexDirection="column" flex="1 1 auto" />
   );
