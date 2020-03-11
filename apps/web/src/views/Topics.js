@@ -7,6 +7,25 @@ import { useStore as useNoteStore } from "../stores/note-store";
 import { useStore as useNbStore } from "../stores/notebook-store";
 import { showTopicDialog } from "../components/dialogs/topicdialog";
 
+const TopicItem = props => (setSelectedContext, index, item) => (
+  <Topic
+    index={index}
+    item={item}
+    onClick={() => {
+      let topic = item;
+      setSelectedContext({
+        type: "topic",
+        value: topic.title,
+        notebook: props.notebook
+      });
+      props.navigator.navigate("notes", {
+        title: props.notebook.title,
+        subtitle: topic.title
+      });
+    }}
+  />
+);
+
 const Topics = props => {
   const setSelectedContext = useNoteStore(store => store.setSelectedContext);
   const setSelectedNotebookTopics = useNbStore(
@@ -28,25 +47,15 @@ const Topics = props => {
   return (
     <ListContainer
       itemsLength={topics.length}
+      term={props.term}
       placeholder={Flex}
-      item={index => (
-        <Topic
-          index={index}
-          item={topics[index]}
-          onClick={() => {
-            let topic = topics[index];
-            setSelectedContext({
-              type: "topic",
-              value: topic.title,
-              notebook: props.notebook
-            });
-            props.navigator.navigate("notes", {
-              title: props.notebook.title,
-              subtitle: topic.title
-            });
-          }}
-        />
-      )}
+      searchPlaceholder="Search notebook topics"
+      searchParams={{
+        type: "topics",
+        items: topics,
+        item: TopicItem(props).bind(this, setSelectedContext)
+      }}
+      item={index => TopicItem(props)(setSelectedContext, index, topics[index])}
       button={{
         content: "Add more topics",
         onClick: async () => {
