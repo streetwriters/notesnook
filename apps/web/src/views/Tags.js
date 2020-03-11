@@ -14,46 +14,47 @@ const TagNode = ({ title }) => (
     {title}
   </Text>
 );
-
-const Tags = props => {
-  const tags = db.tags.all;
+const TagItem = props => (index, item) => {
+  const { title, count } = item;
   return (
-    <ListContainer
-      placeholder={TagsPlaceholder}
-      itemsLength={tags.length}
-      item={index => {
-        const { title, count } = tags[index];
-
-        return (
-          <ListItem
-            selectable={false}
-            index={index}
-            title={<TagNode title={title} />}
-            info={`${count} notes`}
-            onClick={() => {
-              store
-                .getState()
-                .setSelectedContext({ type: "tag", value: title });
-              props.navigator.navigate("notes", {
-                title: "#" + title,
-                context: { tags: [title] }
-              });
-            }}
-          />
-        );
+    <ListItem
+      item={item}
+      selectable={false}
+      index={index}
+      title={<TagNode title={title} />}
+      info={`${count} notes`}
+      onClick={() => {
+        store.getState().setSelectedContext({ type: "tag", value: title });
+        props.navigator.navigate("notes", {
+          title: "#" + title,
+          context: { tags: [title] }
+        });
       }}
     />
   );
 };
+const Tags = props => {
+  const tags = db.tags.all;
+  return (
+    <ListContainer
+      term={props.term}
+      placeholder={TagsPlaceholder}
+      itemsLength={tags.length}
+      searchPlaceholder="Search tags"
+      searchParams={{ type: "tags", items: tags, item: TagItem(props) }}
+      item={index => TagItem(props)(index, tags[index])}
+    />
+  );
+};
 
-const TagsContainer = () => {
+const TagsContainer = props => {
   useEffect(() => {
     const TagNavigator = require("../navigation/navigators/tagnavigator")
       .default;
-    if (!TagNavigator.restore()) {
+    if (!TagNavigator.restore(props)) {
       TagNavigator.navigate("tags");
     }
-  }, []);
+  }, [props]);
   return (
     <Flex className="TagNavigator" flexDirection="column" flex="1 1 auto" />
   );
