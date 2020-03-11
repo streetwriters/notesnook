@@ -18,6 +18,8 @@ const Search = props => (
       id="searchInput"
       variant="default"
       name="search"
+      autoFocus={props.autoFocus}
+      defaultValue={props.defaultValue}
       placeholder={props.placeholder}
       onChange={props.onChange}
     />

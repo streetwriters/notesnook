@@ -4,11 +4,12 @@ import Button from "../button";
 import Search from "../search";
 import * as Icon from "react-feather";
 import { Virtuoso as List } from "react-virtuoso";
+import RootNavigator from "../../navigation/navigators/rootnavigator";
 
 const ListContainer = props => {
   return (
     <Flex flexDirection="column" flex="1 1 auto">
-      {!props.itemsLength ? (
+      {!props.itemsLength && props.placeholder ? (
         <Flex
           flexDirection="column"
           alignSelf="center"
@@ -19,7 +20,21 @@ const ListContainer = props => {
         </Flex>
       ) : (
         <>
-          <Search placeholder={props.searchPlaceholder} />
+          {!props.noSearch && (
+            <Search
+              autoFocus={!!props.term}
+              defaultValue={props.term}
+              placeholder={props.searchPlaceholder}
+              onChange={e => {
+                if (e.target.value.length > 2) {
+                  RootNavigator.navigate("search", {
+                    term: e.target.value,
+                    ...props.searchParams
+                  });
+                }
+              }}
+            />
+          )}
           <Flex
             flexDirection="column"
             flex="1 1 auto"

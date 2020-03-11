@@ -44,7 +44,6 @@ export default class Navigator {
     if (!root) {
       return false;
     }
-
     // exit selection mode on navigate
     store.getState().exitSelectionMode();
     ReactDOM.render(
@@ -60,20 +59,27 @@ export default class Navigator {
     return true;
   }
 
-  goBack() {
+  goBack(params = {}) {
     let route = this.history.pop();
     if (!route) {
       return false;
     }
     this.lastRoute = route;
-    return this.renderRoute(route);
+    return this.renderRoute(this._mergeParams(route, params));
   }
 
-  restore() {
+  restore(params = {}) {
     if (!this.lastRoute) {
       return false;
     }
-    return this.renderRoute(this.lastRoute);
+    return this.renderRoute(this._mergeParams(this.lastRoute, params));
+  }
+
+  _mergeParams(route, params) {
+    return {
+      ...route,
+      params: { ...route.params, ...params }
+    };
   }
 }
 

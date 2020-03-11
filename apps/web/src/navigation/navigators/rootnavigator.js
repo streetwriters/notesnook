@@ -1,7 +1,6 @@
 import {
   Home,
   SettingsContainer,
-  Favorites,
   Trash,
   NotebooksContainer,
   TagsContainer,
@@ -13,6 +12,8 @@ import Navigator from "../index";
 import { showLogInDialog } from "../../components/dialogs/logindialog";
 import { changeTheme, isDarkTheme } from "../../utils/theme";
 import SelectionModeOptions from "../../common/selectionoptions";
+import Search from "../../views/Search";
+import { store } from "../../stores/note-store";
 
 export const bottomRoutes = {
   ...createDeadRoute("nightmode", Icon.Moon, {
@@ -39,9 +40,15 @@ export const routes = {
     icon: Icon.Book,
     options: SelectionModeOptions.NotebooksOptions
   }),
-  ...createNormalRoute("favorites", Favorites, Icon.Star, {
+  ...createNormalRoute("favorites", Notes, Icon.Star, {
     title: "Favorites",
-    options: SelectionModeOptions.FavoritesOptions
+    options: SelectionModeOptions.FavoritesOptions,
+    onClick: () => {
+      store.getState().setSelectedContext({
+        type: "favorites"
+      });
+      RootNavigator.navigate("favorites");
+    }
   }),
   ...createNormalRoute("trash", Trash, Icon.Trash, {
     title: "Trash",
@@ -57,7 +64,8 @@ const invisibleRoutes = {
   ...createRoute("color", Notes, {
     icon: Icon.Circle,
     options: SelectionModeOptions.NotesOptions
-  })
+  }),
+  ...createRoute("search", Search, { title: "Search" })
 };
 
 const RootNavigator = new Navigator(
