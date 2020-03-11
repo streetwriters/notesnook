@@ -16,12 +16,20 @@ const Notes = props => {
       clearSelectedContext();
     };
   }, [clearSelectedContext]);
-  console.log("refreshing notesssss", selectedNotes);
   return (
     <ListContainer
       item={index => (
         <Note index={index} pinnable={false} item={selectedNotes[index]} />
       )}
+      term={props.term}
+      searchPlaceholder="Search notes"
+      searchParams={{
+        type: "notes",
+        items: selectedNotes,
+        item: (index, item) => (
+          <Note index={index} pinnable={false} item={item} />
+        )
+      }}
       itemsLength={selectedNotes.length}
       button={{
         content: "Make a new note",
