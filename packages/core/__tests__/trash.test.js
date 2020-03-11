@@ -17,10 +17,10 @@ test("delete a note", () =>
       .add(id);
     await db.notes.delete(id);
     expect(db.trash.all.length).toBe(1);
-    expect(await db.trash._deltaStorage.read(id + "_delta")).toBeDefined();
+    expect(await db.context.read(id + "_delta")).toBeDefined();
     await db.trash.delete(db.trash.all[0].id);
     expect(db.trash.all.length).toBe(0);
-    expect(await db.trash._deltaStorage.read(id + "_delta")).toBeUndefined();
+    expect(await db.context.read(id + "_delta")).toBeUndefined();
   }));
 
 test("restore a deleted note", () =>
@@ -43,6 +43,28 @@ test("restore a deleted note", () =>
     ).toBe(true);
     expect(db.notes.note(id).notebook.id).toBe(nbId);
     expect(db.notes.note(id).notebook.topic).toBe("General");
+  }));
+
+test("delete a locked note", () =>
+  noteTest().then(async ({ db, id }) => {
+    await db.vault.create("password");
+    await db.vault.add(id);
+    await db.notes.delete(id);
+    expect(db.trash.all.length).toBe(1);
+    expect(await db.context.read(id + "_delta")).toBeDefined();
+  }));
+
+test("restore a deleted locked note", () =>
+  noteTest().then(async ({ db, id }) => {
+    await db.vault.create("password");
+    await db.vault.add(id);
+    await db.notes.delete(id);
+    expect(db.trash.all.length).toBe(1);
+    expect(await db.context.read(id + "_delta")).toBeDefined();
+    await db.trash.restore(db.trash.all[0].id);
+    expect(db.trash.all.length).toBe(0);
+    let note = db.notes.note(id);
+    expect(note).toBeDefined();
   }));
 
 test("restore a deleted note that's in a deleted notebook", () =>
