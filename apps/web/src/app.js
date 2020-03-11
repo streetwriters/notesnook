@@ -142,6 +142,7 @@ function App() {
                       return;
                     }
                     if (item.onClick) {
+                      setSelectedKey(item.key);
                       return item.onClick();
                     }
                     if (RootNavigator.navigate(item.key)) {
