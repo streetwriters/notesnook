@@ -102,7 +102,9 @@ function App() {
     } else {
       setShow(true);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isFocusModeEnabled]);
+
   const colors = useStore(store => store.colors);
   return (
     <ThemeProvider>
