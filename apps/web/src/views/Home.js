@@ -7,16 +7,24 @@ import { useStore as useEditorStore } from "../stores/editor-store";
 import ListContainer from "../components/list-container";
 import NotesPlaceholder from "../components/placeholders/notesplacholder";
 
-function Home() {
+function Home(props) {
   useEffect(() => store.getState().refresh(), []);
   const notes = useStore(store => store.notes);
   const newSession = useEditorStore(store => store.newSession);
   return (
     <ListContainer
+      term={props.term}
       itemsLength={notes.items.length}
       placeholder={NotesPlaceholder}
       searchPlaceholder={"Search your notes"}
       button={{ content: "Make a new note", onClick: () => newSession() }}
+      searchParams={{
+        items: notes.items,
+        type: "notes",
+        item: (index, item) => (
+          <Note index={index} pinnable={false} item={item} />
+        )
+      }}
     >
       <GroupList
         style={{
