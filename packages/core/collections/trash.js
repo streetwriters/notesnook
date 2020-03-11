@@ -2,6 +2,8 @@ import CachedCollection from "../database/cached-collection";
 import Notes from "./notes";
 import Notebooks from "./notebooks";
 import Storage from "../database/storage";
+import { get7DayTimestamp } from "../utils/date";
+
 export default class Trash {
   constructor(context) {
     this._collection = new CachedCollection(context, "trash");
@@ -17,6 +19,16 @@ export default class Trash {
     this._notes = notes;
     this._notebooks = notebooks;
     await this._collection.init();
+    await this.cleanup();
+  }
+
+  async cleanup() {
+    const sevenDayPreviousTimestamp = Date.now() - get7DayTimestamp();
+    this.all.forEach(async item => {
+      if (item.dateDeleted < sevenDayPreviousTimestamp) {
+        await this.delete(item.id);
+      }
+    });
   }
 
   get all() {

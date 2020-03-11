@@ -5,7 +5,8 @@ import sort from "fast-sort";
 import {
   getWeekGroupFromTimestamp,
   months,
-  getLastWeekTimestamp
+  getLastWeekTimestamp,
+  get7DayTimestamp
 } from "../utils/date";
 import Storage from "../database/storage";
 import Notebooks from "./notebooks";
@@ -144,7 +145,7 @@ export default class Notes {
       default:
         let timestamps = {
           recent: getLastWeekTimestamp(7),
-          lastWeek: getLastWeekTimestamp(7) - 604800000 //seven day timestamp value
+          lastWeek: getLastWeekTimestamp(7) - get7DayTimestamp() //seven day timestamp value
         };
         return groupBy(
           notes,

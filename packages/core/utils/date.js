@@ -50,11 +50,9 @@ function getWeeksInYear(year) {
   return weeks;
 }
 
-/* function getDayTimestamp(last) {
-  to = new Date().getDate() - last;
-  date = new Date();
-  return date.setDate(to);
-} */
+export function get7DayTimestamp() {
+  return 604800000;
+}
 
 export function getLastWeekTimestamp() {
   const t = new Date().getDate() + (6 - new Date().getDay() - 1) - 6;
