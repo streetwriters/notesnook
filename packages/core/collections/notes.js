@@ -174,6 +174,9 @@ export default class Notes {
       for (let tag of item.tags) {
         await this._tagsCollection.remove(tag);
       }
+      for (let color of item.colors) {
+        await this._colorsCollection.remove(color);
+      }
       await this._collection.removeItem(id);
       await this._trash.add(item.data);
     }
