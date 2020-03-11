@@ -1,38 +1,49 @@
 import React, { useState } from "react";
-import { Flex, Box, Button, Text } from "rebass";
+import { Flex, Box, Text } from "rebass";
 import { Input } from "@rebass/forms";
 import * as Icon from "react-feather";
 import Dialog, { showDialog } from "./dialog";
-import { showSignUpDialog } from "./signupdialog";
 import { db } from "../../common";
 
-const LoginDialog = props => {
-  const [username, setUsername] = useState();
+const SignUpDialog = props => {
+  const [username, setUserName] = useState();
+  const [email, setEmail] = useState();
   const [password, setPassword] = useState();
+  const [confirmPassword, setConfirmPassword] = useState();
   const [errorMessage, setErrorMessage] = useState();
-
   return (
     <Dialog
       isOpen={true}
-      title={"Login"}
+      title={"Sign Up"}
       icon={Icon.LogIn}
       onCloseClick={props.onClose}
       negativeButton={{ onClick: props.onClose }}
       positiveButton={{
-        text: "Login",
+        text: "Sign Up",
         onClick: () => {
           setErrorMessage();
+
           if (username === "" || username === undefined) {
             setErrorMessage("Please enter your username.");
             return;
           }
 
-          if (password === "" || password === undefined) {
-            setErrorMessage("Please enter your password.");
+          if (email === "" || email === undefined) {
+            setErrorMessage("Please enter your email address.");
             return;
           }
 
-          db.user.login(username, password);
+          if (password !== confirmPassword) {
+            setErrorMessage("Passwords do not match! Please try again.");
+            return;
+          }
+
+          if (password === undefined || password === "") {
+            setErrorMessage("Please enter password.");
+            return;
+          }
+
+          db.user.signup(username, email, password);
         }
       }}
       content={
@@ -41,7 +52,14 @@ const LoginDialog = props => {
             variant="default"
             placeholder="Username"
             onChange={e => {
-              setUsername(e.target.value);
+              setUserName(e.target.value);
+            }}
+          ></Input>
+          <Input
+            variant="default"
+            placeholder="Email"
+            onChange={e => {
+              setEmail(e.target.value);
             }}
           ></Input>
           <Input
@@ -53,24 +71,19 @@ const LoginDialog = props => {
               setPassword(e.target.value);
             }}
           ></Input>
+          <Input
+            type="password"
+            variant="default"
+            placeholder="Confirm Password"
+            sx={{ marginTop: 2 }}
+            onChange={e => {
+              setConfirmPassword(e.target.value);
+            }}
+          ></Input>
           <Flex
             flexDirection="row"
             justifyContent="space-between"
             sx={{ marginTop: 2 }}
-          >
-            <Button
-              variant="links"
-              onClick={() => {
-                showSignUpDialog();
-              }}
-            >
-              Create a New Account
-            </Button>
-          </Flex>
-          <Flex
-            flexDirection="row"
-            justifyContent="space-between"
-            sx={{ marginTop: errorMessage ? 2 : 0 }}
           >
             <Text
               fontSize="subBody"
@@ -86,6 +99,6 @@ const LoginDialog = props => {
   );
 };
 
-export const showLogInDialog = () => {
-  return showDialog(perform => <LoginDialog onClose={() => perform(false)} />);
+export const showSignUpDialog = () => {
+  return showDialog(perform => <SignUpDialog onClose={() => perform(false)} />);
 };
