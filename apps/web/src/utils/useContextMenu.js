@@ -18,6 +18,7 @@ function contextMenuHandler(event, ref, menuId) {
 
     event.preventDefault();
     const menu = document.getElementById(menuId);
+    if (!menu) return;
     menu.style.display = "block";
     positionMenu(event, menu);
     oldOpenedMenu = menu;
