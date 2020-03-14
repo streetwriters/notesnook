@@ -30,7 +30,7 @@ import {AddTopicDialog} from '../AddTopicDialog';
 import {Dialog} from '../Dialog';
 import LoginDialog from '../LoginDialog';
 import MoveNoteDialog from '../MoveNoteDialog';
-import {VaultDialog} from '../VaultDialog';
+import {VaultDialog, openVault} from '../VaultDialog';
 import {timeConverter, hexToRGBA} from '../../utils/utils';
 import {Platform} from 'react-native';
 
@@ -334,7 +334,12 @@ export class DialogManager extends Component {
     if (this.show) {
       switch (this.show) {
         case 'delete': {
-          this._showSimpleDialog(TEMPLATE_DELETE(this.state.item.type));
+          if (this.state.item.locked) {
+            openVault(this.state.item, true, true, false, false, false, true);
+          } else {
+            this._showSimpleDialog(TEMPLATE_DELETE(this.state.item.type));
+          }
+
           break;
         }
         case 'permanant_delete': {

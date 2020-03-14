@@ -121,7 +121,7 @@ export default class NoteItem extends React.Component {
               this.props.onLongPress();
               return;
             } else if (item.locked) {
-              openVault(item, false, true, false, true, false);
+              openVault(item, true, true, false, true, false);
 
               return;
             }

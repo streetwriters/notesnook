@@ -339,7 +339,7 @@ export const ActionSheetComponent = ({
 
         if (note.locked) {
           close();
-          openVault(note, true, false, true, false, false);
+          openVault(note, true, true, true, false, false);
 
           return;
         } else {

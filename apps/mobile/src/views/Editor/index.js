@@ -172,87 +172,91 @@ const Editor = ({navigation, noMenu}) => {
         delta: {ops: []},
       };
     }
-
-    console.log(id, title, content);
-    let rId = await db.notes.add({
-      title,
-      content: {
-        text: content.text,
-        delta: content.delta,
-      },
-      id: id,
-    });
-    if (id !== rId && !note?.locked) {
-      id = rId;
-      note = db.notes.note(id);
-      if (note) {
-        note = note.data;
-      } else {
-        setTimeout(() => {
-          note = db.notes.note(id);
-          if (note) {
-            note = note.data;
-          }
-        }, 500);
-      }
-    }
-
-    if (id) {
-      switch (editing.actionAfterFirstSave.type) {
-        case 'topic': {
-          await db.notes.move(
-            {
-              topic: editing.actionAfterFirstSave.id,
-              id: editing.actionAfterFirstSave.notebook,
-            },
-            id,
-          );
-          editing.actionAfterFirstSave = {
-            type: null,
-          };
-
-          break;
-        }
-        case 'tag': {
-          await db.notes.note(note.id).tag(editing.actionAfterFirstSave.id);
-          editing.actionAfterFirstSave = {
-            type: null,
-          };
-
-          break;
-        }
-        case 'color': {
-          await db.notes.note(id).color(editing.actionAfterFirstSave.id);
-
-          editing.actionAfterFirstSave = {
-            type: null,
-          };
-
-          break;
-        }
-        default: {
-          break;
-        }
-      }
-
-      dispatch({
-        type: ACTIONS.CURRENT_EDITING_NOTE,
+    let lockedNote = id ? db.notes.note(id).data.locked : null;
+    if (!lockedNote) {
+      let rId = await db.notes.add({
+        title,
+        content: {
+          text: content.text,
+          delta: content.delta,
+        },
         id: id,
       });
-    }
+      if (id !== rId) {
+        id = rId;
+        note = db.notes.note(id);
+        if (note) {
+          note = note.data;
+        } else {
+          setTimeout(() => {
+            note = db.notes.note(id);
+            if (note) {
+              note = note.data;
+            }
+          }, 500);
+        }
+      }
 
-    if (content.text.length < 200 || saveCounter < 2) {
-      dispatch({
-        type: ACTIONS.NOTES,
-      });
-      eSendEvent(refreshNotesPage);
-    }
-    saveCounter++;
-    if (id) {
-      let lockednote = db.notes.note(id).data;
+      if (id) {
+        switch (editing.actionAfterFirstSave.type) {
+          case 'topic': {
+            await db.notes.move(
+              {
+                topic: editing.actionAfterFirstSave.id,
+                id: editing.actionAfterFirstSave.notebook,
+              },
+              id,
+            );
+            editing.actionAfterFirstSave = {
+              type: null,
+            };
 
-      if (lockNote && lockednote && lockednote.locked) {
-        await db.notes.note(id).lock('password');
+            break;
+          }
+          case 'tag': {
+            await db.notes.note(note.id).tag(editing.actionAfterFirstSave.id);
+            editing.actionAfterFirstSave = {
+              type: null,
+            };
+
+            break;
+          }
+          case 'color': {
+            await db.notes.note(id).color(editing.actionAfterFirstSave.id);
+
+            editing.actionAfterFirstSave = {
+              type: null,
+            };
+
+            break;
+          }
+          default: {
+            break;
+          }
+        }
+        dispatch({
+          type: ACTIONS.CURRENT_EDITING_NOTE,
+          id: id,
+        });
+      }
+
+      if (content.text.length < 200 || saveCounter < 2) {
+        dispatch({
+          type: ACTIONS.NOTES,
+        });
+        eSendEvent(refreshNotesPage);
+      }
+      saveCounter++;
+    } else {
+      if (id) {
+        await db.vault.save({
+          title,
+          content: {
+            text: content.text,
+            delta: content.delta,
+          },
+          id: id,
+        });
       }
     }
   };
@@ -591,7 +595,7 @@ const Editor = ({navigation, noMenu}) => {
             />
           )}
           cacheMode="LOAD_DEFAULT"
-          cacheEnabled={true}
+          cacheEnabled={false}
           domStorageEnabled={true}
           scrollEnabled={false}
           bounces={false}
