@@ -4,7 +4,10 @@ import { createRoute } from "../routes";
 import SelectionModeOptions from "../../common/selectionoptions";
 
 const routes = {
-  ...createRoute("notebooks", Notebooks, { title: "Notebooks" }),
+  ...createRoute("notebooks", Notebooks, {
+    title: "Notebooks",
+    options: SelectionModeOptions.NotebooksOptions
+  }),
   ...createRoute("topics", Topics, {
     options: SelectionModeOptions.TopicOptions
   }),

@@ -37,8 +37,7 @@ export const routes = {
     options: SelectionModeOptions.NotesOptions
   }),
   ...createRoute("notebooks", NotebooksContainer, {
-    icon: Icon.Book,
-    options: SelectionModeOptions.NotebooksOptions
+    icon: Icon.Book
   }),
   ...createNormalRoute("favorites", Notes, Icon.Star, {
     title: "Favorites",
@@ -55,8 +54,7 @@ export const routes = {
     options: SelectionModeOptions.TrashOptions
   }),
   ...createRoute("tags", TagsContainer, {
-    icon: Icon.Tag,
-    options: SelectionModeOptions.NotesOptions
+    icon: Icon.Tag
   })
 };
 

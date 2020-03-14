@@ -92,79 +92,85 @@ const NavigationContainer = props => {
     <ThemeProvider>
       <Flex flexDirection="column" px={2}>
         {(props.route.title || props.route.params.title) && (
-          <Flex alignItems="center" justifyContent="space-between">
-            <Flex alignItems="center" py={2}>
-              {props.canGoBack && (
+          <>
+            <Flex alignItems="center" justifyContent="space-between">
+              <Flex alignItems="center" py={2}>
+                {props.canGoBack && (
+                  <Box
+                    onClick={props.backAction}
+                    height={38}
+                    color="fontPrimary"
+                    sx={{ marginLeft: -2 /*correction */, marginRight: 2 }}
+                  >
+                    <Icon.ChevronLeft size={38} />
+                  </Box>
+                )}
                 <Box
-                  onClick={props.backAction}
+                  onClick={openSideMenu}
                   height={38}
                   color="fontPrimary"
-                  sx={{ marginLeft: -2 /*correction */, marginRight: 2 }}
+                  sx={{
+                    marginLeft: -5 /*correction */,
+                    marginRight: 1,
+                    display: ["block", "none", "none"]
+                  }}
                 >
-                  <Icon.ChevronLeft size={38} />
+                  <Icon.Menu size={38} />
                 </Box>
+                <Heading
+                  fontSize="heading"
+                  color={props.route.titleColor || "text"}
+                >
+                  {props.route.title || props.route.params.title}
+                </Heading>
+              </Flex>
+              {props.route.options && isSelectionMode && (
+                <Flex>
+                  {props.route.options.map(option => (
+                    <Box
+                      key={option.icon.name}
+                      onClick={option.onClick}
+                      mx={2}
+                      sx={{ cursor: "pointer" }}
+                    >
+                      <option.icon />
+                    </Box>
+                  ))}
+                </Flex>
               )}
-              <Box
-                onClick={openSideMenu}
-                height={38}
-                color="fontPrimary"
+            </Flex>
+            {props.route.params.subtitle && (
+              <Text
+                variant="title"
+                color="primary"
                 sx={{
-                  marginLeft: -5 /*correction */,
-                  marginRight: 1,
-                  display: ["block", "none", "none"]
+                  marginBottom: 2,
+                  cursor: isSelectionMode ? "pointer" : "normal"
                 }}
               >
-                <Icon.Menu size={38} />
-              </Box>
-              <Heading
-                fontSize="heading"
-                color={props.route.titleColor || "text"}
-              >
-                {props.route.title || props.route.params.title}
-              </Heading>
-            </Flex>
-            {props.route.options && isSelectionMode && (
-              <Flex>
-                {props.route.options.map(option => (
-                  <Box
-                    key={option.icon.name}
-                    onClick={option.onClick}
-                    mx={2}
-                    sx={{ cursor: "pointer" }}
-                  >
-                    <option.icon />
-                  </Box>
-                ))}
+                {props.route.params.subtitle}
+              </Text>
+            )}
+            {isSelectionMode && (
+              <Flex alignItems="center" mb={2} sx={{ cursor: "pointer" }}>
+                <Text
+                  variant="title"
+                  color="primary"
+                  onClick={() => selectAll()}
+                >
+                  Select all
+                </Text>
+                <Text
+                  ml={2}
+                  variant="title"
+                  color="primary"
+                  onClick={() => exitSelectionMode()}
+                >
+                  Unselect
+                </Text>
               </Flex>
             )}
-          </Flex>
-        )}
-        {props.route.params.subtitle && (
-          <Text
-            variant="title"
-            color="primary"
-            sx={{
-              marginBottom: 2,
-              cursor: isSelectionMode ? "pointer" : "normal"
-            }}
-          >
-            {props.route.params.subtitle}
-          </Text>
-        )}
-        {isSelectionMode && (
-          <Flex alignItems="center" mb={2} sx={{ cursor: "pointer" }}>
-            <Text variant="title" color="primary" onClick={() => selectAll()}>
-              Select all
-            </Text>
-            <Text
-              ml={2}
-              variant="title"
-              color="primary"
-              onClick={() => exitSelectionMode()}
-            >
-              Unselect
-            </Text>
-          </Flex>
+          </>
         )}
       </Flex>
       {props.route.component && (
