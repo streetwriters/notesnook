@@ -14,12 +14,6 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import WebView from 'react-native-webview';
 import {db, DDS} from '../../../App';
 import {normalize, SIZE, WEIGHT} from '../../common/common';
-import {
-  ActionSheetEvent,
-  simpleDialogEvent,
-  TEMPLATE_EXIT_FULLSCREEN,
-  TEMPLATE_INFO,
-} from '../../components/DialogManager';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {
@@ -40,6 +34,14 @@ import {
   timeConverter,
   ToastEvent,
 } from '../../utils/utils';
+import {
+  ActionSheetEvent,
+  simpleDialogEvent,
+} from '../../components/DialogManager/recievers';
+import {
+  TEMPLATE_INFO,
+  TEMPLATE_EXIT_FULLSCREEN,
+} from '../../components/DialogManager/templates';
 
 const EditorWebView = createRef();
 let note = {};
@@ -50,7 +52,7 @@ let timer = null;
 let saveCounter = 0;
 let tapCount = 0;
 
-const Editor = ({navigation, noMenu}) => {
+const Editor = ({noMenu}) => {
   // Global State
   const [state, dispatch] = useTracked();
   const {colors} = state;
@@ -623,15 +625,6 @@ const Editor = ({navigation, noMenu}) => {
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
-};
-
-Editor.navigationOptions = {
-  header: null,
-  headerStyle: {
-    backgroundColor: 'transparent',
-    borderBottomWidth: 0,
-    height: 0,
-  },
 };
 
 export default Editor;

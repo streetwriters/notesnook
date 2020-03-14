@@ -2,7 +2,6 @@ import React, {useEffect, useState} from 'react';
 import {useIsFocused} from 'react-navigation-hooks';
 import {db} from '../../../App';
 import Container from '../../components/Container';
-import {AddTopicEvent} from '../../components/DialogManager';
 import {NotebookItem} from '../../components/NotebookItem';
 import SelectionWrapper from '../../components/SelectionWrapper';
 import {useTracked} from '../../provider';
@@ -20,6 +19,7 @@ import {
 import {ToastEvent, w} from '../../utils/utils';
 import SimpleList from '../../components/SimpleList';
 import {NotebookPlaceHolder} from '../../components/ListPlaceholders';
+import {AddTopicEvent} from '../../components/DialogManager/recievers';
 
 export const Notebook = ({navigation}) => {
   const [state, dispatch] = useTracked();

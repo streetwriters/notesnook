@@ -1,4 +1,4 @@
-import React, {useEffect, useState, createRef} from 'react';
+import React, {createRef, useEffect, useState} from 'react';
 import {
   Dimensions,
   StatusBar,
@@ -6,10 +6,9 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-  Platform,
-  ToastAndroid,
 } from 'react-native';
 import MMKV from 'react-native-mmkv-storage';
+import Share from 'react-native-share';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {db, DDS} from '../../../App';
 import {
@@ -18,21 +17,18 @@ import {
   COLOR_SCHEME_DARK,
   COLOR_SCHEME_LIGHT,
   opacity,
+  ph,
   pv,
   setColorScheme,
   SIZE,
   WEIGHT,
-  ph,
 } from '../../common/common';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
-import {moveNoteEvent} from '../DialogManager';
-import Share from 'react-native-share';
-import {timeConverter, ToastEvent, hexToRGBA} from '../../utils/utils';
 import NavigationService from '../../services/NavigationService';
-import {eSendEvent} from '../../services/eventManager';
-import {eOpenVaultDialog} from '../../services/events';
-import {openVault} from '../VaultDialog';
+import {timeConverter, ToastEvent} from '../../utils/utils';
+import {openVault} from '../../services/eventManager';
+
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 

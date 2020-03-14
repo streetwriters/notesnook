@@ -5,8 +5,6 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {TextInput} from 'react-native-gesture-handler';
 import {db, DDS} from '../../../App';
 import {getElevation, ToastEvent, editing} from '../../utils/utils';
-
-import {updateEvent} from '../DialogManager';
 import Share from 'react-native-share';
 import {
   eSendEvent,
@@ -22,30 +20,10 @@ import {
 import {openEditorAnimation} from '../../utils/animations';
 import {ACTIONS} from '../../provider/actions';
 import {Toast} from '../Toast';
+import {updateEvent} from '../DialogManager/recievers';
 
 const passInputRef = createRef();
 const confirmPassRef = createRef();
-
-export const openVault = (
-  item,
-  novault = false,
-  locked = false,
-  permanant = false,
-  editor = false,
-  share = false,
-  deleteNote = false,
-) => {
-  console.log(editor, 'hello');
-  eSendEvent(eOpenVaultDialog, {
-    item,
-    novault,
-    locked,
-    permanant,
-    goToEditor: editor,
-    share,
-    deleteNote,
-  });
-};
 
 export class VaultDialog extends Component {
   constructor(props) {

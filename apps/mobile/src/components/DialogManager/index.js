@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
 import {DDS} from '../../../App';
 import {
-  eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
+  openVault,
 } from '../../services/eventManager';
 import {
   eCloseActionSheet,
@@ -12,7 +12,6 @@ import {
   eCloseLoginDialog,
   eCloseMoveNoteDialog,
   eCloseSimpleDialog,
-  eDispatchAction,
   eOnLoadNote,
   eOpenActionSheet,
   eOpenAddNotebookDialog,
@@ -20,8 +19,6 @@ import {
   eOpenLoginDialog,
   eOpenMoveNoteDialog,
   eOpenSimpleDialog,
-  eOpenVaultDialog,
-  eCloseVaultDialog,
 } from '../../services/events';
 import ActionSheet from '../ActionSheet';
 import {ActionSheetComponent} from '../ActionSheetComponent';
@@ -30,146 +27,11 @@ import {AddTopicDialog} from '../AddTopicDialog';
 import {Dialog} from '../Dialog';
 import LoginDialog from '../LoginDialog';
 import MoveNoteDialog from '../MoveNoteDialog';
-import {VaultDialog, openVault} from '../VaultDialog';
-import {timeConverter, hexToRGBA} from '../../utils/utils';
+import {VaultDialog} from '../VaultDialog';
+import {hexToRGBA} from '../../utils/utils';
 import {Platform} from 'react-native';
-
-export const dialogActions = {
-  ACTION_DELETE: 511,
-  ACTION_EXIT: 512,
-  ACTION_EMPTY_TRASH: 513,
-  ACTION_EXIT_FULLSCREEN: 514,
-  ACTION_TRASH: 515,
-  ACTION_PERMANANT_DELETE: 516,
-};
-
-export const ActionSheetEvent = (
-  item,
-  colors,
-  tags,
-  rowItems,
-  columnItems,
-  extraData,
-) => {
-  eSendEvent(eOpenActionSheet, {
-    item,
-    colors,
-    tags,
-    rowItems,
-    columnItems,
-    extraData,
-  });
-};
-export const ActionSheetHideEvent = () => {
-  eSendEvent(eCloseActionSheet);
-};
-
-export const simpleDialogEvent = data => {
-  eSendEvent(eOpenSimpleDialog, data);
-};
-
-export const simpleDialogHideEvent = () => {
-  eSendEvent(eCloseSimpleDialog);
-};
-
-export const moveNoteEvent = () => {
-  eSendEvent(eOpenMoveNoteDialog);
-};
-export const moveNoteHideEvent = () => {
-  eSendEvent(eCloseMoveNoteDialog);
-};
-
-export const AddNotebookEvent = notebook => {
-  eSendEvent(eOpenAddNotebookDialog, {item: notebook});
-};
-export const HideAddNotebookEvent = notebook => {
-  eSendEvent(eCloseAddNotebookDialog, notebook);
-};
-export const AddTopicEvent = notebook => {
-  eSendEvent(eOpenAddTopicDialog, notebook);
-};
-export const HideAddTopicEvent = notebook => {
-  eSendEvent(eCloseAddTopicDialog, notebook);
-};
-
-export const updateEvent = data => {
-  eSendEvent(eDispatchAction, data);
-};
-
-export const TEMPLATE_DELETE = type => {
-  return {
-    title: `Delete ${type}`,
-    paragraph: `Are you sure you want to delete this ${type}`,
-    positiveText: 'Delete',
-    negativeText: 'Cancel',
-    action: dialogActions.ACTION_DELETE,
-    icon: 'delete',
-  };
-};
-
-export const TEMPLATE_PERMANANT_DELETE = {
-  title: `Delete Permanantly`,
-  paragraph: `Are you sure you want to delete this item permanantly from trash?`,
-  positiveText: 'Delete',
-  negativeText: 'Cancel',
-  action: dialogActions.ACTION_PERMANANT_DELETE,
-  icon: 'delete',
-};
-
-export const TEMPLATE_TRASH = type => {
-  return {
-    title: `Delete ${type}`,
-    paragraph: `Restore or delete ${type} forever`,
-    positiveText: 'Restore',
-    negativeText: 'Delete',
-    action: dialogActions.ACTION_TRASH,
-    icon: 'delete-restore',
-  };
-};
-
-export const TEMPLATE_EXIT_FULLSCREEN = () => {
-  return {
-    title: `Exit fullscreen editor?`,
-    paragraph: `Are you sure you want to exit fullscreen editor?`,
-    positiveText: 'Exit',
-    negativeText: 'Cancel',
-    action: dialogActions.ACTION_EXIT_FULLSCREEN,
-    icon: 'close',
-  };
-};
-
-export const TEMPLATE_EXIT = type => {
-  return {
-    title: `Close ${type}`,
-    paragraph: `Are you sure you want to close ${type}`,
-    positiveText: `Close`,
-    negativeText: 'Cancel',
-    action: dialogActions.ACTION_EXIT,
-    icon: 'close',
-  };
-};
-
-export const TEMPLATE_INFO = dateCreated => {
-  return {
-    title: `Note Info`,
-    paragraph: `Created on ${timeConverter(dateCreated)} `,
-    positiveText: ``,
-    negativeText: '',
-    noButtons: true,
-    noTitle: true,
-    action: dialogActions.ACTION_CLOSE,
-    icon: 'information-outline',
-  };
-};
-
-export const TEMPLATE_EMPTY_TRASH = {
-  title: 'Empty Trash',
-  paragraph: 'Are you sure you want to clear the trash?',
-  icon: 'delete-outline',
-  positiveText: 'Clear',
-  negativeText: 'Cancel',
-  action: dialogActions.ACTION_EMPTY_TRASH,
-};
+import {TEMPLATE_DELETE, TEMPLATE_PERMANANT_DELETE} from './templates';
+import {moveNoteEvent} from './recievers';
 
 export class DialogManager extends Component {
   constructor(props) {

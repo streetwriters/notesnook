@@ -13,7 +13,7 @@ import {db, DDS} from '../../../App';
 import {opacity, ph, pv, SIZE, WEIGHT} from '../../common/common';
 import {ACTIONS} from '../../provider/actions';
 import {getElevation, ToastEvent} from '../../utils/utils';
-import {updateEvent} from '../DialogManager';
+import {updateEvent} from '../DialogManager/recievers';
 
 let refs = [];
 

@@ -25,10 +25,10 @@ import {w, hexToRGBA, getElevation} from '../../utils/utils';
 import {ACTIONS} from '../../provider/actions';
 import MMKV from 'react-native-mmkv-storage';
 import {DDS} from '../../../App';
-import {updateEvent} from '../../components/DialogManager';
 import {eSendEvent} from '../../services/eventManager';
 import {eOpenLoginDialog} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
+import {updateEvent} from '../../components/DialogManager/recievers';
 
 export async function setSetting(settings, name, value) {
   let s = {...settings};
@@ -330,8 +330,8 @@ export const Settings = ({navigation}) => {
               }}>
               <View
                 style={{
-                  width: w / 5 - 22,
-                  height: w / 5 - 22,
+                  width: w / 5 - 35,
+                  height: w / 5 - 35,
                   backgroundColor: item,
                   borderRadius: 100,
                   justifyContent: 'center',

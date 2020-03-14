@@ -17,7 +17,6 @@ import {Toast} from './src/components/Toast';
 import {useTracked} from './src/provider';
 import {ACTIONS} from './src/provider/actions';
 import Orientation from 'react-native-orientation';
-
 import {eSubscribeEvent, eUnSubscribeEvent} from './src/services/eventManager';
 import {
   eCloseFullscreenEditor,
@@ -35,8 +34,7 @@ import {DeviceDetectionService} from './src/utils/deviceDetection';
 import StorageInterface from './src/utils/storage';
 import {w} from './src/utils/utils';
 import Editor from './src/views/Editor';
-import Animated, {Easing} from 'react-native-reanimated';
-import {useForceUpdate} from './src/views/ListsEditor';
+import Animated from 'react-native-reanimated';
 import MMKV from 'react-native-mmkv-storage';
 import {defaultState} from './src/provider/defaultState';
 import {EditorPosition} from './src/utils/animations';
@@ -47,12 +45,9 @@ let sideMenuRef;
 let editorRef;
 let outColors;
 
-const {color, Value, timing, interpolate} = Animated;
-
 const App = () => {
   const [state, dispatch] = useTracked();
   const {colors, loading} = state;
-  const forceUpdate = useForceUpdate();
   const [init, setInit] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
 

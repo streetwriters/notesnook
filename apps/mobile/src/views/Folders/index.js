@@ -1,28 +1,18 @@
 import React, {useEffect, useState} from 'react';
-import {
-  BackHandler,
-  FlatList,
-  Platform,
-  Text,
-  View,
-  RefreshControl,
-} from 'react-native';
+import {BackHandler} from 'react-native';
 import {useIsFocused} from 'react-navigation-hooks';
-import {DDS} from '../../../App';
-import {SIZE, WEIGHT} from '../../common/common';
 import Container from '../../components/Container';
-import {AddNotebookEvent} from '../../components/DialogManager';
 import {NotebookPlaceHolder} from '../../components/ListPlaceholders';
 import {NotebookItem} from '../../components/NotebookItem';
 import SelectionWrapper from '../../components/SelectionWrapper';
+import SimpleList from '../../components/SimpleList';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
 import {eScrollEvent} from '../../services/events';
 import {slideLeft, slideRight} from '../../utils/animations';
-import {w, ToastEvent, hexToRGBA} from '../../utils/utils';
-import {inputRef} from '../../components/SearchInput';
-import SimpleList from '../../components/SimpleList';
+import {ToastEvent, w} from '../../utils/utils';
+import {AddNotebookEvent} from '../../components/DialogManager/recievers';
 
 export const Folders = ({navigation}) => {
   const [state, dispatch] = useTracked();
@@ -33,7 +23,6 @@ export const Folders = ({navigation}) => {
     notebooks,
     preventDefaultMargins,
   } = state;
-  const searchResults = {...state.searchResults};
 
   const [refreshing, setRefreshing] = useState(false);
   let isFocused = useIsFocused();

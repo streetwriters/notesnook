@@ -13,7 +13,8 @@ import {
 import NavigationService from '../../services/NavigationService';
 import {exitEditorAnimation} from '../../utils/animations';
 import {editing, getElevation, history, ToastEvent} from '../../utils/utils';
-import {dialogActions, updateEvent} from '../DialogManager';
+import {updateEvent} from '../DialogManager/recievers';
+import {dialogActions} from '../DialogManager/dialogActions';
 
 export class Dialog extends Component {
   constructor(props) {

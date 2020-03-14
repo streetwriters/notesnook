@@ -6,12 +6,13 @@ import {ACTIONS} from '../../provider/actions';
 import Folders from '../../views/Folders';
 import Notebook from '../../views/Notebook';
 import Notes from '../../views/Notes';
-import {updateEvent} from '../DialogManager';
+
 import * as Animatable from 'react-native-animatable';
 import {DDS} from '../../../App';
 import {getElevation} from '../../utils/utils';
 import {eSendEvent} from '../../services/eventManager';
 import {eMoveNoteDialogNavigateBack} from '../../services/events';
+import {updateEvent} from '../DialogManager/recievers';
 
 const fade = props => {
   const {position, scene} = props;

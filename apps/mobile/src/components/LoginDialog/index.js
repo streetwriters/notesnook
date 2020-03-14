@@ -3,7 +3,6 @@ import {Modal, DeviceEventEmitter, View, TouchableOpacity} from 'react-native';
 import {createAppContainer} from 'react-navigation';
 import {createStackNavigator} from 'react-navigation-stack';
 import {ACTIONS} from '../../provider/actions';
-import {updateEvent} from '../DialogManager';
 import * as Animatable from 'react-native-animatable';
 import Login from '../../views/Login';
 import Signup from '../../views/Signup';
@@ -13,6 +12,7 @@ import {getElevation, w} from '../../utils/utils';
 import {eSendEvent} from '../../services/eventManager';
 import {eLoginDialogNavigateBack} from '../../services/events';
 import {normalize} from '../../common/common';
+import {updateEvent} from '../DialogManager/recievers';
 
 const fade = props => {
   const {position, scene} = props;

@@ -3,17 +3,12 @@ import {Dimensions, Text, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {DDS} from '../../../App';
 import {ph, pv, SIZE, WEIGHT} from '../../common/common';
-import {eSendEvent} from '../../services/eventManager';
-import {eOnLoadNote, eOpenVaultDialog} from '../../services/events';
-import NavigationService from '../../services/NavigationService';
-import {getElevation, timeSince} from '../../utils/utils';
-import {
-  ActionSheetEvent,
-  simpleDialogEvent,
-  TEMPLATE_TRASH,
-} from '../DialogManager';
+import {eSendEvent, openVault} from '../../services/eventManager';
+import {eOnLoadNote} from '../../services/events';
 import {openEditorAnimation} from '../../utils/animations';
-import {openVault} from '../VaultDialog';
+import {getElevation, timeSince} from '../../utils/utils';
+import {ActionSheetEvent, simpleDialogEvent} from '../DialogManager/recievers';
+import {TEMPLATE_TRASH} from '../DialogManager/templates';
 
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
