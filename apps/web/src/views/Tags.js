@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import { Flex, Text } from "rebass";
 import ListContainer from "../components/list-container";
 import ListItem from "../components/list-item";
-import { db } from "../common";
 import { useStore as useNotesStore } from "../stores/note-store";
 import { useStore, store } from "../stores/tag-store";
 import TagsPlaceholder from "../components/placeholders/tags-placeholder";

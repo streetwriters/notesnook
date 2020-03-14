@@ -5,6 +5,7 @@ import { store as nbStore } from "../stores/notebook-store";
 import { store as editorStore } from "../stores/editor-store";
 import { db } from "./index";
 import { showMoveNoteDialog } from "../components/dialogs/movenotedialog";
+import { confirm } from "../components/dialogs/confirm";
 
 function createOption(icon, onClick) {
   return {
@@ -21,6 +22,10 @@ function createOptions(options = []) {
 }
 
 const DeleteOption = createOption(Icon.Trash2, async function(state) {
+  if (
+    !(await confirm(Icon.Trash2, "Delete", "Are you sure you want to proceed?"))
+  )
+    return;
   const item = state.selectedItems[0];
   var isAnyNoteOpened = false;
   const editorState = editorStore.getState();

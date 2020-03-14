@@ -1,6 +1,5 @@
 import createStore from "../common/store";
 import { db } from "../common";
-import { showPasswordDialog } from "../components/dialogs/passworddialog";
 
 function tagStore(set, get) {
   return {
