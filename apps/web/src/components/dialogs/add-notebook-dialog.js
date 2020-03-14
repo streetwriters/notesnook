@@ -69,6 +69,8 @@ export default class AddNotebookDialog extends React.Component {
     this.description = "";
     this._inputRefs = [];
     this.lastLength = 0;
+    this.topics = [];
+    this.id = undefined;
     this.setState({
       topics: [""],
       focusedInputIndex: 0
