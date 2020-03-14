@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import "./editor.css";
 import ReactQuill from "./react-quill";
 import { Flex, Box, Text } from "rebass";
@@ -11,6 +11,7 @@ import { countWords } from "../../utils/string";
 import { useTheme } from "emotion-theming";
 import { useStore as useAppStore } from "../../stores/app-store";
 import Animated from "../animated";
+import { Input } from "@rebass/forms";
 
 const TextSeperator = () => {
   const theme = useTheme();
@@ -31,9 +32,11 @@ function Editor() {
   const sessionState = useStore(store => store.session.state);
   const setSession = useStore(store => store.setSession);
   const saveSession = useStore(store => store.saveSession);
+  const newSession = useStore(store => store.newSession);
   const reopenLastSession = useStore(store => store.reopenLastSession);
   const isFocusModeEnabled = useAppStore(store => store.isFocusModeEnabled);
   const hideProperties = useAppStore(store => store.hideProperties);
+  const quillRef = useRef();
 
   useEffect(() => {
     // move the toolbar outside (easiest way)
@@ -108,7 +111,37 @@ function Editor() {
           {id && id.length > 0 && <>{isSaving ? "Saving" : "Saved"}</>}
         </Text>
         <Box id="toolbar" display={["none", "flex", "flex"]} />
+        <Flex
+          sx={{
+            borderBottom: "1px solid",
+            borderColor: "border",
+            fontSize: 13
+          }}
+        >
+          <Text variant="menu" ml={1} onClick={() => newSession()}>
+            <span style={{ textDecoration: "underline" }}>N</span>ew
+          </Text>
+          <Text
+            variant="menu"
+            onClick={() => quillRef.current.quill.history.undo()}
+          >
+            Undo
+          </Text>
+          <Text
+            variant="menu"
+            onClick={() => quillRef.current.quill.history.redo()}
+          >
+            Redo
+          </Text>
+          <Text variant="menu" onClick={() => saveSession()}>
+            <span style={{ textDecoration: "underline" }}>S</span>ave
+          </Text>
+          <Text variant="menu">
+            <span style={{ textDecoration: "underline" }}>E</span>xport
+          </Text>
+        </Flex>
         <ReactQuill
+          ref={quillRef}
           refresh={sessionState === SESSION_STATES.new}
           initialContent={delta}
           placeholder="Type anything here"

@@ -125,6 +125,15 @@ const theme = (colors, shadows) => ({
       fontFamily: "body",
       fontWeight: "body",
       fontSize: "body"
+    },
+    menu: {
+      pt: 1,
+      pb: 2,
+      px: 2,
+      cursor: "pointer",
+      ":hover": {
+        backgroundColor: "shade"
+      }
     }
   },
   buttons: {
