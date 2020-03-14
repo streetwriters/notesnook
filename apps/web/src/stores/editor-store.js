@@ -1,6 +1,7 @@
 import createStore from "../common/store";
 import { store as noteStore, LIST_TYPES } from "./note-store";
 import { store as appStore } from "./app-store";
+import { store as tagStore } from "./tag-store";
 import { db } from "../common";
 import { showPasswordDialog } from "../components/dialogs/passworddialog";
 
@@ -205,10 +206,12 @@ function updateContext(key, array) {
   // update notes if the selected context (the current view in the navigator) is a tag or color
   const notesState = noteStore.getState();
   const context = notesState.selectedContext;
-  console.log(context);
   if (context.type === type) {
     const isValue = array.some(value => value === context.value);
     if (isValue) noteStore.getState().setSelectedContext(context);
+  }
+  if (type === "tag") {
+    tagStore.getState().refreshTags();
   }
 }
 

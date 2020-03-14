@@ -3,7 +3,8 @@ import { Flex, Text } from "rebass";
 import ListContainer from "../components/list-container";
 import ListItem from "../components/list-item";
 import { db } from "../common";
-import { useStore } from "../stores/note-store";
+import { useStore as useNotesStore } from "../stores/note-store";
+import { useStore, store } from "../stores/tag-store";
 import TagsPlaceholder from "../components/placeholders/tags-placeholder";
 
 const TagNode = ({ title }) => (
@@ -16,8 +17,11 @@ const TagNode = ({ title }) => (
 );
 
 const Tags = props => {
-  const setSelectedContext = useStore(store => store.setSelectedContext);
-  const tags = db.tags.all;
+  const setSelectedContext = useNotesStore(store => store.setSelectedContext);
+  const tags = useStore(store => store.tags);
+  useEffect(() => {
+    store.getState().refreshTags();
+  }, []);
   return (
     <ListContainer
       type="tags"
