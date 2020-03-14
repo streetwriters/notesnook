@@ -1,34 +1,34 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import {
+  Platform,
+  ScrollView,
+  StatusBar,
   Text,
   TouchableOpacity,
   View,
-  ScrollView,
-  StatusBar,
-  Platform,
 } from 'react-native';
+import MMKV from 'react-native-mmkv-storage';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {DDS} from '../../../App';
 import {
-  opacity,
-  pv,
-  SIZE,
-  WEIGHT,
   ACCENT,
   COLOR_SCHEME,
   COLOR_SCHEME_DARK,
   COLOR_SCHEME_LIGHT,
+  opacity,
+  pv,
   setColorScheme,
+  SIZE,
+  WEIGHT,
 } from '../../common/common';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Container from '../../components/Container';
+import {updateEvent} from '../../components/DialogManager/recievers';
 import {useTracked} from '../../provider';
-import {w, hexToRGBA, getElevation} from '../../utils/utils';
 import {ACTIONS} from '../../provider/actions';
-import MMKV from 'react-native-mmkv-storage';
-import {DDS} from '../../../App';
 import {eSendEvent} from '../../services/eventManager';
 import {eOpenLoginDialog} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
-import {updateEvent} from '../../components/DialogManager/recievers';
+import {hexToRGBA, w} from '../../utils/utils';
 
 export async function setSetting(settings, name, value) {
   let s = {...settings};

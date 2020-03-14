@@ -1,17 +1,17 @@
 import React from 'react';
-import {Modal, DeviceEventEmitter, View, TouchableOpacity} from 'react-native';
+import {Modal, TouchableOpacity, View} from 'react-native';
+import * as Animatable from 'react-native-animatable';
 import {createAppContainer} from 'react-navigation';
 import {createStackNavigator} from 'react-navigation-stack';
-import {ACTIONS} from '../../provider/actions';
-import * as Animatable from 'react-native-animatable';
-import Login from '../../views/Login';
-import Signup from '../../views/Signup';
-import ForgotPassword from '../../views/ForgotPassword';
 import {DDS} from '../../../App';
-import {getElevation, w} from '../../utils/utils';
+import {normalize} from '../../common/common';
+import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
 import {eLoginDialogNavigateBack} from '../../services/events';
-import {normalize} from '../../common/common';
+import {getElevation} from '../../utils/utils';
+import ForgotPassword from '../../views/ForgotPassword';
+import Login from '../../views/Login';
+import Signup from '../../views/Signup';
 import {updateEvent} from '../DialogManager/recievers';
 
 const fade = props => {

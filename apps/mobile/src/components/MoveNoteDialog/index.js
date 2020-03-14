@@ -1,17 +1,16 @@
 import React from 'react';
-import {Modal, DeviceEventEmitter, View, TouchableOpacity} from 'react-native';
+import {Modal, TouchableOpacity, View} from 'react-native';
+import * as Animatable from 'react-native-animatable';
 import {createAppContainer} from 'react-navigation';
 import {createStackNavigator} from 'react-navigation-stack';
+import {DDS} from '../../../App';
 import {ACTIONS} from '../../provider/actions';
+import {eSendEvent} from '../../services/eventManager';
+import {eMoveNoteDialogNavigateBack} from '../../services/events';
+import {getElevation} from '../../utils/utils';
 import Folders from '../../views/Folders';
 import Notebook from '../../views/Notebook';
 import Notes from '../../views/Notes';
-
-import * as Animatable from 'react-native-animatable';
-import {DDS} from '../../../App';
-import {getElevation} from '../../utils/utils';
-import {eSendEvent} from '../../services/eventManager';
-import {eMoveNoteDialogNavigateBack} from '../../services/events';
 import {updateEvent} from '../DialogManager/recievers';
 
 const fade = props => {
