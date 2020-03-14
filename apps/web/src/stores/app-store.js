@@ -50,11 +50,13 @@ function appStore(set, get) {
     enterSelectionMode: function() {
       set(state => {
         state.isSelectionMode = true;
+        state.shouldSelectAll = false;
       });
     },
     exitSelectionMode: function() {
       set(state => {
         state.isSelectionMode = false;
+        state.shouldSelectAll = false;
         state.selectedItems = [];
       });
     },
@@ -66,11 +68,15 @@ function appStore(set, get) {
         } else {
           state.selectedItems.push(item);
         }
-        state.shouldSelectAll = false;
       });
       if (get().selectedItems.length <= 0) {
         get().exitSelectionMode();
       }
+    },
+    setSelectedItems: function(items) {
+      set(state => {
+        state.selectedItems = items;
+      });
     },
     selectAll() {
       if (!get().isSelectionMode) return;

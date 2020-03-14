@@ -83,7 +83,7 @@ const UnfavoriteOption = createOption(Icon.Star, function(state) {
     if (!item.favorite) return;
     await db.notes.note(item.id).favorite();
   });
-  notesStore.getState().refreshList(LIST_TYPES.fav);
+  notesStore.getState().setSelectedContext({ type: "favorites" });
 });
 
 const AddToNotebookOption = createOption(Icon.Plus, async function(state) {

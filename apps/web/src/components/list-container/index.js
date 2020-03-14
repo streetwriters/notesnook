@@ -5,8 +5,16 @@ import Search from "../search";
 import * as Icon from "react-feather";
 import { Virtuoso as List } from "react-virtuoso";
 import { useStore as useSearchStore } from "../../stores/searchstore";
+import { useStore as useAppStore } from "../../stores/app-store";
+
 const ListContainer = props => {
   const setSearchContext = useSearchStore(store => store.setSearchContext);
+  const shouldSelectAll = useAppStore(store => store.shouldSelectAll);
+  const setSelectedItems = useAppStore(store => store.setSelectedItems);
+  useEffect(() => {
+    if (shouldSelectAll) setSelectedItems(props.items);
+  }, [shouldSelectAll, setSelectedItems, props.items]);
+
   useEffect(() => {
     if (props.noSearch) return;
     setSearchContext({

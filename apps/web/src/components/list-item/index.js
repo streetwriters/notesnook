@@ -9,6 +9,7 @@ import {
 } from "../../stores/app-store";
 import useContextMenu from "../../utils/useContextMenu";
 import { useTheme } from "emotion-theming";
+import { isShorthandPropertyAssignment } from "typescript";
 
 const ActionsMenu = props => (
   <Menu
@@ -57,26 +58,23 @@ const ListItem = props => {
     `contextMenu${props.index}`
   );
   const isSelectionMode = useAppStore(store => store.isSelectionMode);
-  const shouldSelectAll = useAppStore(store => store.shouldSelectAll);
+  const selectedItems = useAppStore(store => store.selectedItems);
+  const isSelected =
+    selectedItems.findIndex(item => props.item.id === item.id) > -1;
   const selectItem = useAppStore(store => store.selectItem);
-  const [isSelected, setIsSelected] = useState(false);
   const [menuItems, setMenuItems] = useState(props.menuItems);
   const theme = useTheme();
+
   const toggleSelection = useCallback(
     function toggleSelection() {
-      setIsSelected(state => !state);
       selectItem(props.item);
     },
-    [setIsSelected, selectItem, props.item]
+    [selectItem, props.item]
   );
 
   useEffect(() => {
     if (!isSelectionMode && isSelected) toggleSelection();
   }, [isSelectionMode, toggleSelection, isSelected]);
-
-  useEffect(() => {
-    if (shouldSelectAll && !isSelected) toggleSelection();
-  }, [shouldSelectAll, toggleSelection, isSelected]);
 
   useEffect(() => {
     if (props.selectable) {
