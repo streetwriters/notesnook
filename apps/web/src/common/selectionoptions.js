@@ -77,10 +77,15 @@ const AddToNotebookOption = createOption(Icon.Plus, async function(state) {
   }
 });
 
+const RestoreOption = createOption(Icon.RefreshCcw, async function(state) {
+  const items = state.selectedItems.map(item => item.id);
+  await db.trash.restore(items);
+});
+
 const NotesOptions = createOptions([AddToNotebookOption, FavoriteOption]);
 const NotebooksOptions = createOptions();
 const TopicOptions = createOptions();
-const TrashOptions = createOptions();
+const TrashOptions = createOptions([RestoreOption]);
 const FavoritesOptions = createOptions([UnfavoriteOption]);
 
 export default {
