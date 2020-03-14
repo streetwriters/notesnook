@@ -186,6 +186,19 @@ const theme = (colors, shadows) => ({
       px: 0,
       my: 0,
       mx: 0
+    },
+    setting: {
+      bg: "transparent",
+      borderBottom: "1px Solid",
+      borderColor: "border",
+      color: "text",
+      textAlign: "left",
+      fontSize: "body",
+      borderRadius: 0,
+      py: 4,
+      px: 4,
+      "&:hover": { borderColor: "primary" },
+      "&:active": { color: "gray" }
     }
   },
   shadows: shadows

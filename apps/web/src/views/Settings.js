@@ -1,57 +1,69 @@
 import React, { useState, useEffect } from "react";
-import { Box, Button, Flex, Text } from "rebass";
+import { Box, Button, Flex, Text, Image } from "rebass";
 import * as Icon from "react-feather";
 import { Switch } from "@rebass/forms";
 import "../app.css";
 import { changeTheme, isDarkTheme, changeAccent } from "../utils/theme";
+import { useTheme } from "emotion-theming";
 
 const Settings = props => {
   const [check, setCheck] = useState(isDarkTheme());
+  const theme = useTheme();
   return (
     <Flex flexDirection="column" flex="1 1 auto">
       <Flex flexDirection="column" flex="1 1 auto">
-        <Button
-          variant="setting"
-          onClick={() => {
-            props.navigator.navigate("general", {
-              title: Titles.general
-            });
-          }}
+        <Flex
+          flexDirection="row"
+          bg="shade"
+          mx={4}
+          sx={{ borderRadius: "default" }}
         >
-          {Titles.general}
-        </Button>
-        <Button
-          variant="setting"
-          onClick={() => {
-            props.navigator.navigate("account", {
-              title: Titles.account
-            });
-          }}
-        >
-          {Titles.account}
-        </Button>
+          <Flex
+            flexDirection="column"
+            justifyContent="center"
+            alignItems="center"
+          >
+            <Image
+              width="40px"
+              src={process.env.PUBLIC_URL + "/square.jpg"}
+              sx={{ borderRadius: 20 }}
+              m={4}
+            />
+          </Flex>
+          <Flex flexDirection="column" justifyContent="center">
+            <Flex fontSize="subBody" color="gray">
+              You are not logged in
+            </Flex>
+            <Flex fontSize="body" color="primary">
+              Login to sync notes.
+            </Flex>
+          </Flex>
+        </Flex>
+        <Box px={4} fontSize="body" fontWeight="bold" color="primary">
+          Appearance
+        </Box>
         <Box
           sx={{
-            borderLeft: "0px Solid",
-            borderRight: "0px Solid",
-            borderTop: "0px Solid",
             borderBottom: "1px Solid",
             borderColor: "border",
             "&:hover": { borderColor: "primary" }
           }}
-          py="15px"
+          py={4}
         >
           <Flex fontSize="body" alignItems="center">
-            <Text px="16px" sx={{ fontFamily: "body", fontSize: "title" }}>
-              {Titles.theme}
+            <Text px={4} sx={{ fontSize: "body" }}>
+              {Titles.accent}
             </Text>
           </Flex>
 
-          <Flex flexDirection="column" justifyContent="center" mx="7%">
+          <Flex flexDirection="column" justifyContent="center" mx={4}>
             <Flex
               flexWrap="wrap"
-              sx={{ marginBottom: 2 }}
+              sx={{ marginBottom: 2, borderRadius: "default" }}
               justifyContent="left"
+              my={4}
+              bg="shade"
+              p={1}
             >
               {[
                 { label: "red", code: "#ed2d37" },
@@ -65,58 +77,51 @@ const Settings = props => {
                 { label: "indigo", code: "#F032E6" },
                 { label: "lightpink", code: "#FABEBE" }
               ].map(color => (
-                <Box
-                  sx={{ cursor: "pointer" }}
+                <Flex
+                  sx={{ position: "relative" }}
+                  justifyContent="center"
+                  alignItems="center"
                   onClick={() => {
                     changeAccent(color.code);
                   }}
                 >
-                  <Icon.Circle size={50} fill={color.code} strokeWidth={0} />
-                </Box>
+                  {color.code === theme.colors.primary && (
+                    <Icon.Check
+                      style={{
+                        position: "absolute",
+                        cursor: "pointer",
+                        color: "white"
+                      }}
+                      size={20}
+                    />
+                  )}
+                  <Icon.Circle
+                    size={40}
+                    style={{ cursor: "pointer" }}
+                    fill={color.code}
+                    strokeWidth={0}
+                  />
+                </Flex>
               ))}
             </Flex>
-            <Flex flexDirection="row" justifyContent="center">
-              <Text width={1 / 2}>Dark Mode</Text>{" "}
-              <Flex width={1 / 2} justifyContent="right">
-                <Switch
-                  onClick={() => {
-                    setCheck(!check);
-                    changeTheme();
-                  }}
-                  checked={check}
-                />
-              </Flex>
-            </Flex>
-            {/* <Flex flexDirection="row" justifyContent="center" pt="15px">
-              <Text width={1 / 2}>Font Size</Text>{" "}
-              <Flex width={1 / 2} justifyContent="right">
-                <Select
-                  id="country"
-                  name="country"
-                  defaultValue="46"
-                  fontSize="14px"
-                  py="0px"
-                  pr="32px"
-                  DownArrow="false"
-                >
-                  {[
-                    { label: "red", code: "12" },
-                    { label: "orange", code: "05" },
-                    { label: "yellow", code: "16" },
-                    { label: "green", code: "36" },
-                    { label: "blue", code: "46" },
-                    { label: "purple", code: "64" },
-                    { label: "gray", code: "75" },
-                    { label: "lightblue", code: "88" },
-                    { label: "indigo", code: "99" },
-                    { label: "lightpink", code: "12" }
-                  ].map(color => (
-                    <option key={color.label}>{color.code}</option>
-                  ))}
-                </Select>
-              </Flex>
-            </Flex> */}
           </Flex>
+          <Flex flexDirection="row" px="16px">
+            <Text width={1 / 2} fontSize="body">
+              Dark Mode
+            </Text>{" "}
+            <Flex width={1 / 2} justifyContent="flex-end">
+              <Switch
+                onClick={() => {
+                  setCheck(!check);
+                  changeTheme();
+                }}
+                checked={check}
+              />
+            </Flex>
+          </Flex>
+        </Box>
+        <Box px={4} fontSize="body" fontWeight="bold" color="primary">
+          Other
         </Box>
         <Button
           variant="setting"
@@ -173,7 +178,7 @@ const SettingsContainer = props => {
 const Titles = {
   general: "General",
   account: "Account",
-  theme: "Theme",
+  accent: "Accent Color",
   TOS: "Terms of Service",
   privacy: "Privacy Policy",
   about: "About"
