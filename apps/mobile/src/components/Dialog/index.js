@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import {Modal, Text, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {db, DDS} from '../../../App';
 import {opacity, ph, pv, SIZE, WEIGHT} from '../../common/common';
 import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
@@ -12,7 +11,14 @@ import {
 } from '../../services/events';
 import NavigationService from '../../services/NavigationService';
 import {exitEditorAnimation} from '../../utils/animations';
-import {editing, getElevation, history, ToastEvent} from '../../utils/utils';
+import {
+  editing,
+  getElevation,
+  history,
+  ToastEvent,
+  db,
+  DDS,
+} from '../../utils/utils';
 import {updateEvent} from '../DialogManager/recievers';
 import {dialogActions} from '../DialogManager/dialogActions';
 

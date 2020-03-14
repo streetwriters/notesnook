@@ -11,7 +11,7 @@ import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
 import {eScrollEvent} from '../../services/events';
 import {slideLeft, slideRight} from '../../utils/animations';
-import {ToastEvent, w} from '../../utils/utils';
+import {ToastEvent, w, db} from '../../utils/utils';
 import {AddNotebookEvent} from '../../components/DialogManager/recievers';
 
 export const Folders = ({navigation}) => {

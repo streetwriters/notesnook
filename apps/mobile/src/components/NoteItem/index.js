@@ -1,12 +1,11 @@
 import React from 'react';
 import {Dimensions, Text, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {DDS} from '../../../App';
 import {ph, pv, SIZE, WEIGHT} from '../../common/common';
 import {eSendEvent, openVault} from '../../services/eventManager';
 import {eOnLoadNote} from '../../services/events';
 import {openEditorAnimation} from '../../utils/animations';
-import {getElevation, timeSince} from '../../utils/utils';
+import {getElevation, timeSince, DDS} from '../../utils/utils';
 import {ActionSheetEvent, simpleDialogEvent} from '../DialogManager/recievers';
 import {TEMPLATE_TRASH} from '../DialogManager/templates';
 

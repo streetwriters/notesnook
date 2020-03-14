@@ -13,11 +13,11 @@ import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
 import {eScrollEvent} from '../../services/events';
-import {ToastEvent, hexToRGBA} from '../../utils/utils';
+import {ToastEvent, hexToRGBA, DDS, db} from '../../utils/utils';
 import {NotesPlaceHolder} from '../ListPlaceholders';
 import NoteItem from '../NoteItem';
 import SelectionWrapper from '../SelectionWrapper';
-import {db, DDS} from '../../../App';
+
 import {inputRef} from '../SearchInput';
 import {useIsFocused} from 'react-navigation-hooks';
 

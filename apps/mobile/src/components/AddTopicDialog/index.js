@@ -4,8 +4,8 @@ import {TextInput} from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {opacity, ph, pv, SIZE, WEIGHT} from '../../common/common';
 
-import {getElevation, ToastEvent} from '../../utils/utils';
-import {db} from '../../../App';
+import {getElevation, ToastEvent, db} from '../../utils/utils';
+
 import {eSendEvent} from '../../services/eventManager';
 import {eOnNewTopicAdded} from '../../services/events';
 

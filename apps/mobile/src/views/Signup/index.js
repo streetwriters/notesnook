@@ -2,7 +2,6 @@ import React, {createRef, useEffect, useState} from 'react';
 import {SafeAreaView, Text, TouchableOpacity, View} from 'react-native';
 import {TextInput} from 'react-native-gesture-handler';
 import {useIsFocused} from 'react-navigation-hooks';
-import {DDS, db} from '../../../App';
 import {opacity, pv, SIZE, WEIGHT} from '../../common/common';
 import {Header} from '../../components/header';
 import {useTracked} from '../../provider';
@@ -12,15 +11,15 @@ import * as Animatable from 'react-native-animatable';
 const _email = createRef();
 const _pass = createRef();
 const _username = createRef();
-
 import {
   validateUsername,
   validateEmail,
   validatePass,
 } from '../../services/validation';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {ToastEvent} from '../../utils/utils';
+import {ToastEvent, db, DDS} from '../../utils/utils';
 import {ACTIONS} from '../../provider/actions';
+
 export const Signup = ({navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors, isLoginNavigator} = state;

@@ -7,7 +7,7 @@ import NoteItem from '../../components/NoteItem';
 import SelectionWrapper from '../../components/SelectionWrapper';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
-import {ToastEvent, w} from '../../utils/utils';
+import {ToastEvent, w, db} from '../../utils/utils';
 import SimpleList from '../../components/SimpleList';
 
 export const Favorites = ({navigation}) => {

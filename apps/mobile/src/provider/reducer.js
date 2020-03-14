@@ -1,5 +1,4 @@
-import {db} from '../../App';
-import {SideMenuEvent, history} from '../utils/utils';
+import {SideMenuEvent, history, db} from '../utils/utils';
 import {ACTIONS} from './actions';
 
 export const reducer = (state, action) => {

@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import WebView from 'react-native-webview';
-import {db, DDS} from '../../../App';
+
 import {normalize, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
@@ -33,6 +33,8 @@ import {
   SideMenuEvent,
   timeConverter,
   ToastEvent,
+  DDS,
+  db,
 } from '../../utils/utils';
 import {
   ActionSheetEvent,

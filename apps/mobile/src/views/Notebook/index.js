@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from 'react';
 import {useIsFocused} from 'react-navigation-hooks';
-import {db} from '../../../App';
 import Container from '../../components/Container';
 import {NotebookItem} from '../../components/NotebookItem';
 import SelectionWrapper from '../../components/SelectionWrapper';
@@ -16,7 +15,7 @@ import {
   eOnNewTopicAdded,
   eScrollEvent,
 } from '../../services/events';
-import {ToastEvent, w} from '../../utils/utils';
+import {ToastEvent, w, db} from '../../utils/utils';
 import SimpleList from '../../components/SimpleList';
 import {NotebookPlaceHolder} from '../../components/ListPlaceholders';
 import {AddTopicEvent} from '../../components/DialogManager/recievers';

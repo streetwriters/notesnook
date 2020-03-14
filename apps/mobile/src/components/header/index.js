@@ -1,13 +1,13 @@
 import React, {createRef} from 'react';
 import {Platform, StatusBar, Text, TouchableOpacity, View} from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import {DDS} from '../../../App';
+
 import {SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
 import {eSendEvent} from '../../services/eventManager';
 import {eCloseLoginDialog} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
-import {SideMenuEvent} from '../../utils/utils';
+import {SideMenuEvent, DDS} from '../../utils/utils';
 import {moveNoteHideEvent} from '../DialogManager';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Menu, {MenuItem, MenuDivider} from 'react-native-material-menu';

@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {FlatList, Text, View, RefreshControl} from 'react-native';
-import {SIZE, WEIGHT} from '../../common/common';
+import {useIsFocused} from 'react-navigation-hooks';
 import Container from '../../components/Container';
 import {
   simpleDialogEvent,
@@ -9,13 +8,11 @@ import {
 import {TrashPlaceHolder} from '../../components/ListPlaceholders';
 import {NotebookItem} from '../../components/NotebookItem';
 import NoteItem from '../../components/NoteItem';
+import SelectionWrapper from '../../components/SelectionWrapper';
+import SimpleList from '../../components/SimpleList';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
-import {w, ToastEvent} from '../../utils/utils';
-import SelectionWrapper from '../../components/SelectionWrapper';
-import {useIsFocused} from 'react-navigation-hooks';
-import {inputRef} from '../../components/SearchInput';
-import SimpleList from '../../components/SimpleList';
+import {db, ToastEvent, w} from '../../utils/utils';
 
 export const Trash = ({navigation}) => {
   const [state, dispatch] = useTracked();

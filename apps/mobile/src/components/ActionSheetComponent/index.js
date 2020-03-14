@@ -10,7 +10,6 @@ import {
 import MMKV from 'react-native-mmkv-storage';
 import Share from 'react-native-share';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {db, DDS} from '../../../App';
 import {
   ACCENT,
   COLOR_SCHEME,
@@ -26,7 +25,7 @@ import {
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import NavigationService from '../../services/NavigationService';
-import {timeConverter, ToastEvent} from '../../utils/utils';
+import {timeConverter, ToastEvent, DDS, db} from '../../utils/utils';
 import {openVault} from '../../services/eventManager';
 
 const w = Dimensions.get('window').width;

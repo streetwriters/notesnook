@@ -4,9 +4,9 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {opacity, ph, pv, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
 import NavigationService from '../../services/NavigationService';
-import {ToastEvent, w, getElevation} from '../../utils/utils';
+import {ToastEvent, w, getElevation, db, DDS} from '../../utils/utils';
 import {ActionSheetEvent, moveNoteHideEvent} from '../DialogManager';
-import {db} from '../../../App';
+
 import {ACTIONS} from '../../provider/actions';
 
 export const NotebookItem = ({

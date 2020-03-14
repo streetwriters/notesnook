@@ -3,8 +3,8 @@ import {View, Text, TouchableOpacity, Modal, ToastAndroid} from 'react-native';
 import {SIZE, ph, pv, opacity, WEIGHT} from '../../common/common';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {TextInput} from 'react-native-gesture-handler';
-import {db, DDS} from '../../../App';
-import {getElevation, ToastEvent, editing} from '../../utils/utils';
+
+import {getElevation, ToastEvent, db, DDS} from '../../utils/utils';
 import Share from 'react-native-share';
 import {
   eSendEvent,

@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import {TextInput} from 'react-native-gesture-handler';
 import {useIsFocused} from 'react-navigation-hooks';
-import {DDS, db} from '../../../App';
+
 import {opacity, pv, SIZE, WEIGHT} from '../../common/common';
 import {Header} from '../../components/header';
 import {useTracked} from '../../provider';
@@ -22,7 +22,7 @@ import {
   validateUsername,
 } from '../../services/validation';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {ToastEvent} from '../../utils/utils';
+import {ToastEvent, db, DDS} from '../../utils/utils';
 import {ACTIONS} from '../../provider/actions';
 
 export const Login = ({navigation}) => {

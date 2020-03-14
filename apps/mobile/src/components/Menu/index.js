@@ -10,7 +10,6 @@ import {
 } from 'react-native';
 import MMKV from 'react-native-mmkv-storage';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {DDS, db} from '../../../App';
 import {
   ACCENT,
   COLOR_SCHEME,
@@ -29,7 +28,7 @@ import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
 import {eOpenModalMenu, eSendSideMenuOverlayRef} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
-import {timeSince, getElevation, hexToRGBA} from '../../utils/utils';
+import {timeSince, getElevation, hexToRGBA, db, DDS} from '../../utils/utils';
 import {inputRef} from '../SearchInput';
 
 export const Menu = ({

@@ -9,7 +9,6 @@ import {
 } from 'react-native';
 import MMKV from 'react-native-mmkv-storage';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {DDS} from '../../../App';
 import {
   ACCENT,
   COLOR_SCHEME,
@@ -28,7 +27,7 @@ import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
 import {eOpenLoginDialog} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
-import {hexToRGBA, w} from '../../utils/utils';
+import {hexToRGBA, w, DDS} from '../../utils/utils';
 
 export async function setSetting(settings, name, value) {
   let s = {...settings};

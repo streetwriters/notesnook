@@ -5,9 +5,8 @@ import {opacity, ph, SIZE, WEIGHT, normalize, pv} from '../../common/common';
 import {useTracked} from '../../provider';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
 import {eHideToast, eShowToast} from '../../services/events';
-import {h, w} from '../../utils/utils';
+import {h, w, DDS} from '../../utils/utils';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {DDS} from '../../../App';
 
 const AnimatedTouchableOpacity = Animatable.createAnimatableComponent(
   TouchableOpacity,

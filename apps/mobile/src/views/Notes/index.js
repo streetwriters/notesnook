@@ -1,35 +1,24 @@
 import React, {useEffect, useState} from 'react';
-import {
-  FlatList,
-  Text,
-  View,
-  Platform,
-  RefreshControl,
-  ActivityIndicator,
-} from 'react-native';
-import {db, DDS} from '../../../App';
+import {useIsFocused} from 'react-navigation-hooks';
 import Container from '../../components/Container';
+import {NotesPlaceHolder} from '../../components/ListPlaceholders';
 import NoteItem from '../../components/NoteItem';
 import SelectionWrapper from '../../components/SelectionWrapper';
+import SimpleList from '../../components/SimpleList';
 import {useTracked} from '../../provider';
-import {SIZE, WEIGHT} from '../../common/common';
 import {ACTIONS} from '../../provider/actions';
-import {ToastEvent, editing, SideMenuEvent} from '../../utils/utils';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
 } from '../../services/eventManager';
 import {
+  eOnLoadNote,
   eScrollEvent,
   refreshNotesPage,
-  eOnLoadNote,
 } from '../../services/events';
-import {NotesPlaceHolder} from '../../components/ListPlaceholders';
-import {useIsFocused} from 'react-navigation-hooks';
 import {openEditorAnimation} from '../../utils/animations';
-import {inputRef} from '../../components/SearchInput';
-import SimpleList from '../../components/SimpleList';
+import {db, DDS, editing, SideMenuEvent, ToastEvent} from '../../utils/utils';
 
 export const Notes = ({navigation}) => {
   const [state, dispatch] = useTracked();

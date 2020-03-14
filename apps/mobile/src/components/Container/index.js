@@ -12,14 +12,14 @@ import * as Animatable from 'react-native-animatable';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {br, opacity, pv, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
+import {ACTIONS} from '../../provider/actions';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
-import {eScrollEvent, eOpenLoginDialog} from '../../services/events';
-import {getElevation, h, w, ToastEvent} from '../../utils/utils';
+import {eScrollEvent} from '../../services/events';
+import {db, getElevation, ToastEvent} from '../../utils/utils';
 import {Header} from '../header';
 import {Search} from '../SearchInput';
 import SelectionHeader from '../SelectionHeader';
-import {DDS, db} from '../../../App';
-import {ACTIONS} from '../../provider/actions';
+
 export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(
   SafeAreaView,
 );

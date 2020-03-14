@@ -1,4 +1,3 @@
-import Storage from 'notes-core/api/index';
 import React, {useEffect, useState} from 'react';
 import {Platform, StatusBar, View, Text} from 'react-native';
 import * as Animatable from 'react-native-animatable';
@@ -30,16 +29,12 @@ import {
 import NavigationService, {
   AppContainer,
 } from './src/services/NavigationService';
-import {DeviceDetectionService} from './src/utils/deviceDetection';
-import StorageInterface from './src/utils/storage';
-import {w} from './src/utils/utils';
+import {w, DDS, db} from './src/utils/utils';
 import Editor from './src/views/Editor';
 import Animated from 'react-native-reanimated';
 import MMKV from 'react-native-mmkv-storage';
 import {defaultState} from './src/provider/defaultState';
 import {EditorPosition} from './src/utils/animations';
-export const DDS = new DeviceDetectionService();
-export const db = new Storage(StorageInterface);
 
 let sideMenuRef;
 let editorRef;

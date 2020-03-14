@@ -1,4 +1,5 @@
-import {DeviceEventEmitter, Dimensions} from 'react-native';
+import Storage from 'notes-core/api/index';
+import {Dimensions} from 'react-native';
 import {eSendEvent} from '../services/eventManager';
 import {
   eOpenSideMenu,
@@ -8,6 +9,11 @@ import {
   eShowToast,
   eHideToast,
 } from '../services/events';
+import {DeviceDetectionService} from './deviceDetection';
+import StorageInterface from './storage';
+export const DDS = new DeviceDetectionService();
+export const db = new Storage(StorageInterface);
+
 export const getElevation = elevation => {
   return {
     elevation,

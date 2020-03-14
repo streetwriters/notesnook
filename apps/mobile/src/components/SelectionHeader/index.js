@@ -12,10 +12,10 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
-import {w, ToastEvent} from '../../utils/utils';
+import {w, ToastEvent, db} from '../../utils/utils';
 import {eSendEvent} from '../../services/eventManager';
 import {eOpenMoveNoteDialog, eOpenSimpleDialog} from '../../services/events';
-import {db} from '../../../App';
+
 import {TEMPLATE_DELETE} from '../DialogManager';
 
 export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(

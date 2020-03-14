@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import {DDS} from '../../../App';
 import {
   eSubscribeEvent,
   eUnSubscribeEvent,
@@ -28,7 +27,7 @@ import {Dialog} from '../Dialog';
 import LoginDialog from '../LoginDialog';
 import MoveNoteDialog from '../MoveNoteDialog';
 import {VaultDialog} from '../VaultDialog';
-import {hexToRGBA} from '../../utils/utils';
+import {hexToRGBA, DDS} from '../../utils/utils';
 import {Platform} from 'react-native';
 import {TEMPLATE_DELETE, TEMPLATE_PERMANANT_DELETE} from './templates';
 import {moveNoteEvent} from './recievers';
