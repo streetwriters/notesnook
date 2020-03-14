@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Text, TouchableOpacity} from 'react-native';
+import {Text, TouchableOpacity, Keyboard} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import {opacity, ph, SIZE, WEIGHT, normalize, pv} from '../../common/common';
 import {useTracked} from '../../provider';
@@ -12,11 +12,11 @@ import {DDS} from '../../../App';
 const AnimatedTouchableOpacity = Animatable.createAnimatableComponent(
   TouchableOpacity,
 );
-export const Toast = () => {
+export const Toast = ({context = 'global'}) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
-
   const [toast, setToast] = useState(false);
+  const [keyboard, setKeyboard] = useState(false);
   const [message, setMessage] = useState([]);
   const [data, setData] = useState([]);
   const [toastStyle, setToastStyle] = useState({
@@ -26,10 +26,14 @@ export const Toast = () => {
 
   const showToastFunc = data => {
     setData(data);
-    setToast(true);
+
+    if (data.context === context) {
+      setToast(true);
+    }
     if (data.message) {
       setMessage(data.message);
     }
+
     if (data.type === 'success') {
       setToastStyle({
         backgroundColor: colors.successBg,
@@ -47,15 +51,27 @@ export const Toast = () => {
     }, data.duration);
   };
 
-  hideToastFunc = data => {
+  const hideToastFunc = data => {
     setToast(false);
   };
 
+  const _onKeyboardShow = () => {
+    setKeyboard(true);
+  };
+
+  const _onKeyboardHide = () => {
+    setKeyboard(false);
+  };
+
   useEffect(() => {
+    Keyboard.addListener('keyboardDidShow', _onKeyboardShow);
+    Keyboard.addListener('keyboardDidHide', _onKeyboardHide);
     eSubscribeEvent(eShowToast, showToastFunc);
     eSubscribeEvent(eHideToast, hideToastFunc);
 
     return () => {
+      Keyboard.removeListener('keyboardDidShow', _onKeyboardShow);
+      Keyboard.removeListener('keyboardDidHide', _onKeyboardHide);
       eUnSubscribeEvent('showToast', showToastFunc);
 
       eUnSubscribeEvent('hideToast', hideToastFunc);
@@ -72,7 +88,7 @@ export const Toast = () => {
         width: '100%',
         alignItems: 'center',
         height: 60,
-        bottom: 100,
+        bottom: keyboard ? 30 : 100,
         position: 'absolute',
         zIndex: 999,
         elevation: 15,

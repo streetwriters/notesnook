@@ -21,6 +21,7 @@ import {
 } from '../../services/events';
 import {openEditorAnimation} from '../../utils/animations';
 import {ACTIONS} from '../../provider/actions';
+import {Toast} from '../Toast';
 
 const passInputRef = createRef();
 const confirmPassRef = createRef();
@@ -114,7 +115,8 @@ export class VaultDialog extends Component {
   onPress = async () => {
     if (!this.state.novault) {
       if (this.password.length < 3) {
-        ToastAndroid.show('Password too short', 300);
+        ToastEvent.show('Password too short', 'error', 'local');
+
         return;
       }
       if (
@@ -122,14 +124,15 @@ export class VaultDialog extends Component {
         this.password.trim() !== 0 &&
         this.state.passwordsDontMatch
       ) {
-        ToastAndroid.show('Passwords do not match', 300);
+        ToastEvent.show('Passwords do not match', 'error', 'local');
+
         return;
       } else {
         this._createVault();
       }
     } else if (this.state.locked) {
       if (!this.password || this.password.trim() === 0) {
-        ToastAndroid.show('Please enter a valid password', 300);
+        ToastEvent.show('Password is invalid', 'error', 'local');
         this.setState({
           wrongPassword: true,
         });
@@ -156,7 +159,7 @@ export class VaultDialog extends Component {
 
   async _lockNote() {
     if (!this.password || this.password.trim() === 0) {
-      ToastAndroid.show('Please enter a valid password', 300);
+      ToastEvent.show('Password is invalid', 'error', 'local');
       return;
     } else {
       db.vault.add(this.state.note.id).then(e => {
@@ -167,7 +170,8 @@ export class VaultDialog extends Component {
 
   async _unlockNote() {
     if (!this.password || this.password.trim() === 0) {
-      ToastAndroid.show('Please enter a valid password', 300);
+      ToastEvent.show('Password is invalid', 'error', 'local');
+
       return;
     } else {
       if (this.state.permanant) {
@@ -200,7 +204,7 @@ export class VaultDialog extends Component {
     updateEvent({type: ACTIONS.FAVORITES});
     eSendEvent(refreshNotesPage);
     this.close();
-    ToastEvent.show('Note deleted', 'success');
+    ToastEvent.show('Note deleted', 'success', 'local');
   }
 
   async _createVault() {
@@ -208,7 +212,7 @@ export class VaultDialog extends Component {
     if (this.state.note && this.state.note.id && !this.state.note.locked) {
       await db.vault.add(this.state.note.id);
       this.close();
-      ToastEvent.show('Note added to vault', 'success');
+      ToastEvent.show('Note added to vault', 'success', 'local');
     }
   }
 
@@ -244,7 +248,7 @@ export class VaultDialog extends Component {
 
   _takeErrorAction(e) {
     if (e.message === db.vault.ERRORS.wrongPassword) {
-      ToastAndroid.show('Password is incorrect', 300);
+      ToastEvent.show('Password is incorrect', 'error', 'local');
       this.setState({
         wrongPassword: true,
       });
@@ -347,7 +351,7 @@ export class VaultDialog extends Component {
                   : this.state.goToEditor
                   ? 'Unlock note to open it in editor'
                   : 'Enter vault password to unlock note.'
-                : 'Do you want to lock this note?'}
+                : 'Enter vault password to lock note.'}
             </Text>
 
             {note.locked || locked || permanant ? (
@@ -493,6 +497,7 @@ export class VaultDialog extends Component {
             </View>
           </View>
         </View>
+        <Toast context="local" />
       </Modal>
     );
   }
