@@ -6,6 +6,7 @@ import { store as editorStore } from "../stores/editor-store";
 import { db } from "./index";
 import { showMoveNoteDialog } from "../components/dialogs/movenotedialog";
 import { confirm } from "../components/dialogs/confirm";
+import { showPasswordDialog } from "../components/dialogs/passworddialog";
 
 function createOption(icon, onClick) {
   return {
@@ -29,8 +30,24 @@ const DeleteOption = createOption(Icon.Trash2, async function(state) {
   const item = state.selectedItems[0];
   var isAnyNoteOpened = false;
   const editorState = editorStore.getState();
-  const items = state.selectedItems.map(item => {
+  const items = state.selectedItems.map(async item => {
     if (item.id === editorState.session.id) isAnyNoteOpened = true;
+    if (item.locked) {
+      if (
+        !(await confirm(
+          Icon.Trash2,
+          "Delete",
+          "This is a locked note. Are you sure you want to delete it?"
+        )) ||
+        !(await showPasswordDialog("unlock_note", password => {
+          return db.vault
+            .unlock(password)
+            .then(() => true)
+            .catch(() => false);
+        }))
+      )
+        return 0;
+    }
     return item.id;
   });
 
