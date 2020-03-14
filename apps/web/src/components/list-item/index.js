@@ -71,12 +71,12 @@ const ListItem = props => {
   );
 
   useEffect(() => {
-    if (!isSelectionMode) setIsSelected(false);
-  }, [isSelectionMode]);
+    if (!isSelectionMode && isSelected) toggleSelection();
+  }, [isSelectionMode, toggleSelection, isSelected]);
 
   useEffect(() => {
-    if (shouldSelectAll) setIsSelected(true);
-  }, [shouldSelectAll]);
+    if (shouldSelectAll && !isSelected) toggleSelection();
+  }, [shouldSelectAll, toggleSelection, isSelected]);
 
   useEffect(() => {
     if (props.selectable) {
