@@ -4,10 +4,6 @@ import { store as editorStore } from "./editor-store";
 import { store as appStore } from "./app-store";
 import { showPasswordDialog } from "../components/dialogs/passworddialog";
 
-const LIST_TYPES = {
-  fav: "favorites"
-};
-
 function noteStore(set, get) {
   return {
     notes: {
@@ -144,4 +140,4 @@ function setValue(set, noteId, prop, value) {
 
 const [useStore, store] = createStore(noteStore);
 
-export { useStore, store, LIST_TYPES };
+export { useStore, store };

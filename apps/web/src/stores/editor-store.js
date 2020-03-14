@@ -1,5 +1,5 @@
 import createStore from "../common/store";
-import { store as noteStore, LIST_TYPES } from "./note-store";
+import { store as noteStore } from "./note-store";
 import { store as appStore } from "./app-store";
 import { store as tagStore } from "./tag-store";
 import { db } from "../common";
@@ -137,7 +137,7 @@ function editorStore(set, get) {
 
         // we update favorites only if favorite has changed
         if (!oldSession || oldSession.favorite !== session.favorite) {
-          notesState.refreshList(LIST_TYPES.fav);
+          notesState.setSelectedContext({ type: "favorites" });
         }
       });
     },
