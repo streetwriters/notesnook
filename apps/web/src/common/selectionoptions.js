@@ -1,6 +1,6 @@
 import * as Icon from "react-feather";
 import { store as appStore } from "../stores/app-store";
-import { store as notesStore, LIST_TYPES } from "../stores/note-store";
+import { store as notesStore } from "../stores/note-store";
 import { store as nbStore } from "../stores/notebook-store";
 import { store as editorStore } from "../stores/editor-store";
 import { db } from "./index";

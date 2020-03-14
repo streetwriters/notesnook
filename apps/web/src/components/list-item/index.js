@@ -9,7 +9,6 @@ import {
 } from "../../stores/app-store";
 import useContextMenu from "../../utils/useContextMenu";
 import { useTheme } from "emotion-theming";
-import { isShorthandPropertyAssignment } from "typescript";
 
 const ActionsMenu = props => (
   <Menu
