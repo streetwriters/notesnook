@@ -37,6 +37,7 @@ import {
   TEMPLATE_INFO,
   TEMPLATE_EXIT_FULLSCREEN,
 } from '../../components/DialogManager/templates';
+import {sideMenuRef} from '../../utils/refs';
 
 const EditorWebView = createRef();
 let note = {};
