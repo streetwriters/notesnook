@@ -28,7 +28,7 @@ const Settings = props => {
             width: 40,
             height: 40,
             borderRadius: 80,
-            color: "secondary"
+            color: "static"
           }}
         >
           <Icon.User style={{ margin: 2 }} size={20} />
@@ -45,7 +45,7 @@ const Settings = props => {
       <Box
         px={2}
         mt={2}
-        fontSize="body"
+        fontSize="subtitle"
         fontFamily="heading"
         fontWeight="bold"
         color="primary"
@@ -61,15 +61,6 @@ const Settings = props => {
         py={2}
       >
         <Flex
-          fontSize="body"
-          alignItems="center"
-          px={2}
-          sx={{ fontSize: "body" }}
-        >
-          {Titles.accent}
-        </Flex>
-
-        <Flex
           flexWrap="wrap"
           sx={{
             marginBottom: 2,
@@ -77,7 +68,6 @@ const Settings = props => {
           }}
           justifyContent="left"
           mx={2}
-          my={2}
           bg="shade"
           p={1}
         >
@@ -120,21 +110,24 @@ const Settings = props => {
             </Flex>
           ))}
         </Flex>
-        <Flex flexDirection="row" px={2} justifyContent="space-between">
-          <Text fontSize="body">Dark Mode</Text>
-          <Switch
-            onClick={() => {
-              setCheck(!check);
-              changeTheme();
-            }}
-            checked={check}
-          />
+        <Flex
+          flexDirection="row"
+          px={2}
+          justifyContent="space-between"
+          alignItems="center"
+          onClick={() => {
+            setCheck(!check);
+            changeTheme();
+          }}
+        >
+          <Text fontSize="body">{check ? "Light Mode" : "Dark Mode"}</Text>
+          {check ? <Icon.Sun /> : <Icon.Moon />}
         </Flex>
       </Box>
       <Box
         px={2}
         mt={2}
-        fontSize="body"
+        fontSize="subtitle"
         fontFamily="heading"
         fontWeight="bold"
         color="primary"
