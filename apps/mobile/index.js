@@ -7,8 +7,6 @@ import App from './App';
 import {name as appName} from './app.json';
 import React from 'react';
 import {Provider} from './src/provider';
-import {scale} from './src/common/common';
-
 const AppProvider = () => {
   return (
     <Provider>

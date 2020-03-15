@@ -9,11 +9,11 @@ import {
 } from 'react-native';
 import {FlatList, TextInput} from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-
 import {opacity, ph, pv, SIZE, WEIGHT} from '../../common/common';
 import {ACTIONS} from '../../provider/actions';
 import {getElevation, ToastEvent, db, DDS} from '../../utils/utils';
 import {updateEvent} from '../DialogManager/recievers';
+import {Toast} from '../Toast';
 
 let refs = [];
 
@@ -108,14 +108,8 @@ export class AddNotebookDialog extends React.Component {
     setTimeout(async () => {
       let {topics} = this.state;
       let {toEdit} = this.props;
-      if (!this.title)
-        return ToastEvent.show(
-          'Title is required',
-          'error',
-          3000,
-          () => {},
-          '',
-        );
+      if (!this.title || this.title.trim().length === 0)
+        return ToastEvent.show('Title is required', 'error', 'local');
 
       let id = toEdit && toEdit.id ? toEdit.id : null;
 
@@ -151,11 +145,7 @@ export class AddNotebookDialog extends React.Component {
 
   onSubmit = () => {
     let {topics} = this.state;
-    if (
-      !this.currentInputValue ||
-      this.currentInputValue === '' ||
-      this.currentInputValue === ' '
-    )
+    if (!this.currentInputValue || this.currentInputValue.trim().length === 0)
       return;
 
     let prevTopics = [...topics];
@@ -335,7 +325,7 @@ export class AddNotebookDialog extends React.Component {
               onSubmitEditing={() => {
                 this.topicInputRef.focus();
               }}
-              placeholder="write a description"
+              placeholder="Short description about notebook"
               placeholderTextColor={colors.icon}
             />
 
@@ -494,6 +484,7 @@ export class AddNotebookDialog extends React.Component {
             </View>
           </View>
         </KeyboardAvoidingView>
+        <Toast context="local" />
       </Modal>
     );
   }

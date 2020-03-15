@@ -10,6 +10,7 @@ import {
   eOpenAddTopicDialog,
   eOpenMoveNoteDialog,
   eOpenSimpleDialog,
+  eDispatchAction,
 } from '../../services/events';
 
 export const ActionSheetEvent = (

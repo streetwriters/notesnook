@@ -346,14 +346,15 @@ export const ActionSheetComponent = ({
             .catch(async e => {
               switch (e.message) {
                 case db.vault.ERRORS.noVault:
-                  close();
                   openVault(note, false);
+                  close();
                   break;
                 case db.vault.ERRORS.vaultLocked:
                   openVault(note, true, true);
-
+                  close();
                   break;
                 case db.vault.ERRORS.wrongPassword:
+                  close();
                   break;
               }
             });

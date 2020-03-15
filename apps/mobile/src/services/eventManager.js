@@ -1,4 +1,5 @@
 import {DeviceEventEmitter} from 'react-native';
+import {eOpenVaultDialog} from './events';
 
 export const eSubscribeEvent = (eventName, action) => {
   DeviceEventEmitter.addListener(eventName, action);
