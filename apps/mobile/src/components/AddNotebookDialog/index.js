@@ -301,13 +301,15 @@ export class AddNotebookDialog extends React.Component {
                 borderColor: descFocused ? colors.accent : colors.nav,
                 paddingHorizontal: ph,
                 borderRadius: 5,
-                height: 35,
-                fontSize: SIZE.sm,
+                minHeight: 35,
+                fontSize: SIZE.xs + 1,
                 fontFamily: WEIGHT.regular,
                 color: colors.pri,
                 marginTop: 5,
                 marginBottom: 10,
               }}
+              textAlignVertical="top"
+              numberOfLines={2}
               onFocus={() => {
                 this.setState({
                   descFocused: true,
@@ -325,7 +327,8 @@ export class AddNotebookDialog extends React.Component {
               onSubmitEditing={() => {
                 this.topicInputRef.focus();
               }}
-              placeholder="Short description about notebook"
+              multiline
+              placeholder="Write a short description about notebook (optional)"
               placeholderTextColor={colors.icon}
             />
 
