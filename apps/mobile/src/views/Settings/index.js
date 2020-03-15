@@ -219,7 +219,7 @@ export const Settings = ({navigation}) => {
                 }}>
                 <Icon size={SIZE.lg} color="white" name="account-outline" />
               </View>
-              <Icon name="account-outline" color="white" size={SIZE.lg} />
+
               <View
                 style={{
                   marginLeft: 10,

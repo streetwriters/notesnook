@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {View, Platform, StatusBar} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import {Menu} from './src/components/Menu';

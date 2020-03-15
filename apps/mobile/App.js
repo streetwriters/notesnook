@@ -91,11 +91,8 @@ const App = () => {
           backgroundColor: colors.bg,
         }}>
         <Loading />
-
         <I.Initialize />
-
         <Toast />
-
         <DialogManager colors={colors} />
       </Animatable.View>
     </>

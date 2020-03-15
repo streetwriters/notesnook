@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import Animated from 'react-native-reanimated';
 import {Menu} from './src/components/Menu';
 import SideMenu from './src/components/SideMenu';
@@ -54,7 +54,7 @@ export const Initialize = () => {
           }}
         />
       </SideMenu>
-      )}
+
       <Animated.View
         ref={ref => (editorRef = ref)}
         onResponderTerminationRequest={true}
@@ -69,7 +69,6 @@ export const Initialize = () => {
           position: 'absolute',
           backgroundColor: colors.bg,
           elevation: 10,
-
           transform: [
             {
               translateX: EditorPosition,
