@@ -7,11 +7,12 @@ import {useTracked} from '../../provider';
 import {eSendEvent} from '../../services/eventManager';
 import {eCloseLoginDialog} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
-import {SideMenuEvent, DDS} from '../../utils/utils';
+import {DDS} from '../../utils/utils';
 import {moveNoteHideEvent} from '../DialogManager';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Menu, {MenuItem, MenuDivider} from 'react-native-material-menu';
 import {ACTIONS} from '../../provider/actions';
+import {sideMenuRef} from '../../utils/refs';
 export const Header = ({
   heading,
   canGoBack = true,
@@ -93,7 +94,7 @@ export const Header = ({
           <TouchableOpacity
             hitSlop={{top: 20, bottom: 20, left: 50, right: 40}}
             onPress={() => {
-              SideMenuEvent.open();
+              sideMenuRef.current?.openMenu(true);
             }}
             style={{
               justifyContent: 'center',

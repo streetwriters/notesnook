@@ -28,14 +28,7 @@ import {
   refreshNotesPage,
 } from '../../services/events';
 import {exitEditorAnimation} from '../../utils/animations';
-import {
-  editing,
-  SideMenuEvent,
-  timeConverter,
-  ToastEvent,
-  DDS,
-  db,
-} from '../../utils/utils';
+import {editing, timeConverter, ToastEvent, DDS, db} from '../../utils/utils';
 import {
   ActionSheetEvent,
   simpleDialogEvent,
@@ -80,7 +73,7 @@ const Editor = ({noMenu}) => {
 
   const loadNote = async item => {
     EditorWebView.current?.requestFocus();
-    noMenu ? null : SideMenuEvent.disable();
+    noMenu ? null : sideMenuRef.current?.setGestureEnabled(false);
     if (note && note.id) {
       dispatch({type: ACTIONS.NOTES});
       if (item && item.type === 'new') {
@@ -390,8 +383,8 @@ const Editor = ({noMenu}) => {
       await clearEditor();
 
       if (noMenu) return true;
-      DDS.isTab ? SideMenuEvent.open() : null;
-      SideMenuEvent.enable();
+      DDS.isTab ? sideMenuRef.current?.openMenu(true) : null;
+      sideMenuRef.current?.setGestureEnabled(true);
       EditorWebView.current?.reload();
       // Keyboard.dismiss();
 
@@ -472,8 +465,8 @@ const Editor = ({noMenu}) => {
                 }
                 await clearEditor();
                 EditorWebView.current?.reload();
-                DDS.isTab ? SideMenuEvent.open() : null;
-                SideMenuEvent.enable();
+                DDS.isTab ? sideMenuRef.current?.openMenu(true) : null;
+                sideMenuRef.current?.setGestureEnabled(true);
               }
             }}
             style={{

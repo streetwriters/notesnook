@@ -18,7 +18,8 @@ import {
   refreshNotesPage,
 } from '../../services/events';
 import {openEditorAnimation} from '../../utils/animations';
-import {db, DDS, editing, SideMenuEvent, ToastEvent} from '../../utils/utils';
+import {db, DDS, editing, ToastEvent} from '../../utils/utils';
+import {sideMenuRef} from '../../utils/refs';
 
 export const Notes = ({navigation}) => {
   const [state, dispatch] = useTracked();
@@ -155,8 +156,8 @@ export const Notes = ({navigation}) => {
     if (DDS.isTab) {
       eSendEvent(eOnLoadNote, {type: 'new'});
     } else {
-      SideMenuEvent.close();
-      SideMenuEvent.disable();
+      sideMenuRef.current?.openMenu(false);
+      sideMenuRef.current?.setGestureEnabled(false);
       eSendEvent(eOnLoadNote, {type: 'new'});
       openEditorAnimation();
     }

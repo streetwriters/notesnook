@@ -8,9 +8,10 @@ import SelectionHeader from '../../components/SelectionHeader';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
-import {SideMenuEvent, DDS} from '../../utils/utils';
+import {DDS} from '../../utils/utils';
 import {eScrollEvent, eOnLoadNote} from '../../services/events';
 import {openEditorAnimation} from '../../utils/animations';
+import {sideMenuRef} from '../../utils/refs';
 let count = 0;
 export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(
   SafeAreaView,
@@ -48,8 +49,8 @@ export const Home = ({navigation}) => {
         if (DDS.isTab) {
           eSendEvent(eOnLoadNote, {type: 'new'});
         } else {
-          SideMenuEvent.close();
-          SideMenuEvent.disable();
+          sideMenuRef.current?.openMenu(false);
+          sideMenuRef.current?.setGestureEnabled(false);
           eSendEvent(eOnLoadNote, {type: 'new'});
           openEditorAnimation();
         }

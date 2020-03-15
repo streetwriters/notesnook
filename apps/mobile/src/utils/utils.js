@@ -168,21 +168,6 @@ export const timeConverter = timestamp => {
   return time;
 };
 
-export const SideMenuEvent = {
-  open: () => {
-    eSendEvent(eOpenSideMenu);
-  },
-  close: () => {
-    eSendEvent(eCloseSideMenu);
-  },
-  disable: () => {
-    eSendEvent(eDisableGestures);
-  },
-  enable: () => {
-    eSendEvent(eEnableGestures);
-  },
-};
-
 const isValidHex = hex => /^#([A-Fa-f0-9]{3,4}){1,2}$/.test(hex);
 
 const getChunksFromString = (st, chunkSize) =>

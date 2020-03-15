@@ -1,13 +1,7 @@
 import React, {useEffect, useState} from 'react';
-import {Platform, StatusBar, View, Text} from 'react-native';
+import {Platform, StatusBar, View} from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import {
-  getColorScheme,
-  WEIGHT,
-  SIZE,
-  scale,
-  updateSize,
-} from './src/common/common';
+import {getColorScheme, scale, updateSize} from './src/common/common';
 import {DialogManager} from './src/components/DialogManager';
 import {Menu} from './src/components/Menu';
 import {ModalMenu} from './src/components/ModalMenu';
@@ -19,12 +13,8 @@ import Orientation from 'react-native-orientation';
 import {eSubscribeEvent, eUnSubscribeEvent} from './src/services/eventManager';
 import {
   eCloseFullscreenEditor,
-  eCloseSideMenu,
-  eDisableGestures,
   eDispatchAction,
-  eEnableGestures,
   eOpenFullscreenEditor,
-  eOpenSideMenu,
 } from './src/services/events';
 import NavigationService, {
   AppContainer,
@@ -35,31 +25,17 @@ import Animated from 'react-native-reanimated';
 import MMKV from 'react-native-mmkv-storage';
 import {defaultState} from './src/provider/defaultState';
 import {EditorPosition} from './src/utils/animations';
+import {sideMenuRef} from './src/utils/refs';
+import {Loading} from './Loading';
 
-let sideMenuRef;
 let editorRef;
 let outColors;
 
 const App = () => {
   const [state, dispatch] = useTracked();
-  const {colors, loading} = state;
+  const {colors} = state;
   const [init, setInit] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
-
-  const openSidebar = () => {
-    DDS.isTab ? null : sideMenuRef.openMenu(true);
-  };
-  const closeSidebar = () => {
-    DDS.isTab ? null : sideMenuRef.openMenu(false);
-  };
-
-  const disableGestures = () => {
-    DDS.isTab ? null : sideMenuRef.setGestureEnabled(false);
-  };
-
-  const enableGestures = () => {
-    DDS.isTab ? null : sideMenuRef.setGestureEnabled(true);
-  };
 
   const showFullScreenEditor = () => {
     setFullscreen(true);
@@ -115,11 +91,6 @@ const App = () => {
 
   useEffect(() => {
     DDS.isTab ? Orientation.lockToLandscape() : Orientation.lockToPortrait();
-    eSubscribeEvent(eOpenSideMenu, openSidebar);
-    eSubscribeEvent(eCloseSideMenu, closeSidebar);
-
-    eSubscribeEvent(eDisableGestures, disableGestures);
-    eSubscribeEvent(eEnableGestures, enableGestures);
 
     eSubscribeEvent(eOpenFullscreenEditor, showFullScreenEditor);
     eSubscribeEvent(eCloseFullscreenEditor, closeFullScreenEditor);
@@ -127,12 +98,6 @@ const App = () => {
     return () => {
       eUnSubscribeEvent(eOpenFullscreenEditor, showFullScreenEditor);
       eUnSubscribeEvent(eCloseFullscreenEditor, closeFullScreenEditor);
-
-      eUnSubscribeEvent(eOpenSideMenu, openSidebar);
-      eUnSubscribeEvent(eCloseSideMenu, closeSidebar);
-
-      eUnSubscribeEvent(eDisableGestures, disableGestures);
-      eUnSubscribeEvent(eEnableGestures, enableGestures);
     };
   }, []);
 
@@ -189,99 +154,10 @@ const App = () => {
           flexDirection: 'row',
           backgroundColor: colors.bg,
         }}>
-        <Animatable.View
-          transition={['translateX']}
-          useNativeDriver={true}
-          duration={1000}
-          delay={2500}
-          style={{
-            width: '50%',
-            left: 0,
-            height: '100%',
-            position: 'absolute',
-            backgroundColor: colors.accent,
-            justifyContent: 'center',
-            alignItems: 'flex-end',
-            zIndex: 999,
-            transform: [
-              {
-                translateX: loading ? 0 : -w * 2,
-              },
-            ],
-          }}>
-          <Animatable.Text
-            animation="fadeIn"
-            duration={300}
-            delay={150}
-            style={{
-              color: 'white',
-              fontFamily: WEIGHT.bold,
-              fontSize: SIZE.xxl,
-            }}>
-            notes
-          </Animatable.Text>
-          <Animatable.Text
-            animation="fadeIn"
-            duration={300}
-            delay={600}
-            style={{
-              color: 'white',
-              fontFamily: WEIGHT.regular,
-              fontSize: SIZE.md,
-              marginTop: 15,
-            }}>
-            A safe plac
-          </Animatable.Text>
-        </Animatable.View>
-        <Animatable.View
-          transition={['translateX']}
-          useNativeDriver={true}
-          duration={1000}
-          delay={2500}
-          style={{
-            width: '50%',
-            right: 0,
-            height: '100%',
-            position: 'absolute',
-            backgroundColor: colors.accent,
-            justifyContent: 'center',
-            alignItems: 'flex-start',
-            zIndex: 999,
-            transform: [
-              {
-                translateX: loading ? 0 : w * 2,
-              },
-            ],
-          }}>
-          <Animatable.Text
-            animation="fadeIn"
-            duration={300}
-            delay={150}
-            style={{
-              color: 'white',
-              fontFamily: WEIGHT.bold,
-              fontSize: SIZE.xxl,
-            }}>
-            nook
-          </Animatable.Text>
-          <Animatable.Text
-            animation="fadeIn"
-            duration={300}
-            delay={600}
-            style={{
-              color: 'white',
-              fontFamily: WEIGHT.regular,
-              fontSize: SIZE.md,
-              marginTop: 15,
-            }}>
-            e to write
-          </Animatable.Text>
-        </Animatable.View>
-
+        <Loading />
         {DDS.isTab ? (
           <>
             <ModalMenu colors={colors} />
-
             <Animatable.View
               animation="fadeIn"
               useNativeDriver={true}
@@ -332,7 +208,7 @@ const App = () => {
           </>
         ) : (
           <SideMenu
-            ref={ref => (sideMenuRef = ref)}
+            ref={sideMenuRef}
             bounceBackOnOverdraw={false}
             contentContainerStyle={{
               opacity: 0,
@@ -342,7 +218,9 @@ const App = () => {
               <Menu
                 hide={false}
                 colors={colors}
-                close={() => sideMenuRef.openMenu(!sideMenuRef.isOpen)}
+                close={() =>
+                  sideMenuRef.current?.openMenu(!sideMenuRef.current?.isOpen)
+                }
               />
             }
             openMenuOffset={w / 1.5}>
