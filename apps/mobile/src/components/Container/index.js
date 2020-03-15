@@ -144,7 +144,7 @@ export const Container = ({
     Keyboard.addListener('keyboardDidHide', () => {
       setTimeout(() => {
         setButtonHide(false);
-      }, 300);
+      }, 0);
     });
     return () => {
       Keyboard.removeListener('keyboardDidShow', () => {
@@ -155,7 +155,7 @@ export const Container = ({
       Keyboard.removeListener('keyboardDidHide', () => {
         setTimeout(() => {
           setButtonHide(false);
-        }, 300);
+        }, 0);
       });
     };
   }, []);
@@ -235,7 +235,7 @@ export const Container = ({
           <Animatable.View
             transition={['translateY', 'opacity']}
             useNativeDriver={true}
-            duration={250}
+            duration={300}
             style={{
               width: '100%',
               opacity: buttonHide ? 0 : 1,
