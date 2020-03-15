@@ -15,7 +15,7 @@ import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
 import {eScrollEvent} from '../../services/events';
-import {db, getElevation, ToastEvent} from '../../utils/utils';
+import {db, getElevation, ToastEvent, DDS} from '../../utils/utils';
 import {Header} from '../header';
 import {Search} from '../SearchInput';
 import SelectionHeader from '../SelectionHeader';
@@ -138,22 +138,26 @@ export const Container = ({
   useEffect(() => {
     Keyboard.addListener('keyboardDidShow', () => {
       setTimeout(() => {
+        if (DDS.isTab) return;
         setButtonHide(true);
       }, 300);
     });
     Keyboard.addListener('keyboardDidHide', () => {
       setTimeout(() => {
+        if (DDS.isTab) return;
         setButtonHide(false);
       }, 0);
     });
     return () => {
       Keyboard.removeListener('keyboardDidShow', () => {
         setTimeout(() => {
+          if (DDS.isTab) return;
           setButtonHide(true);
         }, 300);
       });
       Keyboard.removeListener('keyboardDidHide', () => {
         setTimeout(() => {
+          if (DDS.isTab) return;
           setButtonHide(false);
         }, 0);
       });
