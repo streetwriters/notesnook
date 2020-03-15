@@ -153,6 +153,7 @@ export const Header = ({
             ref={menuRef}
             style={{
               borderRadius: 5,
+              backgroundColor: colors.bg,
             }}
             button={
               <TouchableOpacity
@@ -179,6 +180,7 @@ export const Header = ({
             <MenuItem
               textStyle={{
                 fontFamily: WEIGHT.regular,
+                color: colors.pri,
               }}
               onPress={() => {
                 dispatch({type: ACTIONS.NOTES, sort: null});
@@ -189,6 +191,7 @@ export const Header = ({
             <MenuItem
               textStyle={{
                 fontFamily: WEIGHT.regular,
+                color: colors.pri,
               }}
               onPress={() => {
                 dispatch({type: ACTIONS.NOTES, sort: 'abc'});
@@ -199,6 +202,7 @@ export const Header = ({
             <MenuItem
               textStyle={{
                 fontFamily: WEIGHT.regular,
+                color: colors.pri,
               }}
               onPress={() => {
                 dispatch({type: ACTIONS.NOTES, sort: 'year'});
@@ -209,6 +213,7 @@ export const Header = ({
             <MenuItem
               textStyle={{
                 fontFamily: WEIGHT.regular,
+                color: colors.pri,
               }}
               onPress={() => {
                 dispatch({type: ACTIONS.NOTES, sort: 'month'});
@@ -219,6 +224,7 @@ export const Header = ({
             <MenuItem
               textStyle={{
                 fontFamily: WEIGHT.regular,
+                color: colors.pri,
               }}
               onPress={() => {
                 dispatch({type: ACTIONS.NOTES, sort: 'week'});
