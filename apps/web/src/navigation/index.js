@@ -1,6 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { Box, Flex, Heading, Text } from "rebass";
+import Animated from "../components/animated";
+import { AnimatePresence } from "framer-motion";
 import * as Icon from "react-feather";
 import { ThemeProvider } from "../utils/theme";
 import { useStore, store } from "../stores/app-store";
@@ -47,13 +49,27 @@ export default class Navigator {
     // exit selection mode on navigate
     store.getState().exitSelectionMode();
     ReactDOM.render(
-      <NavigationContainer
-        navigator={this}
-        route={route}
-        params={route.params}
-        canGoBack={this.options.backButtonEnabled && this.history.length > 0}
-        backAction={() => this.goBack()}
-      />,
+      <AnimatePresence exitBeforeEnter={true}>
+        <Animated.Flex
+          key={route.key}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
+          exit={{ opacity: 0 }}
+          flexDirection="column"
+          flex="1 1 auto"
+        >
+          <NavigationContainer
+            navigator={this}
+            route={route}
+            params={route.params}
+            canGoBack={
+              this.options.backButtonEnabled && this.history.length > 0
+            }
+            backAction={() => this.goBack()}
+          />
+        </Animated.Flex>
+      </AnimatePresence>,
       root
     );
     return true;
