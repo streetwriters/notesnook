@@ -15,20 +15,24 @@ const Settings = props => {
         <Flex
           flexDirection="row"
           bg="shade"
-          mx={4}
+          mx={2}
+          p={2}
           sx={{ borderRadius: "default" }}
         >
           <Flex
             flexDirection="column"
             justifyContent="center"
             alignItems="center"
+            bg="primary"
+            mr={2}
+            sx={{
+              width: 40,
+              height: 40,
+              borderRadius: 80,
+              color: "secondary"
+            }}
           >
-            <Image
-              width="40px"
-              src={process.env.PUBLIC_URL + "/square.jpg"}
-              sx={{ borderRadius: 20 }}
-              m={4}
-            />
+            <Icon.User style={{ margin: 2 }} size={20} />
           </Flex>
           <Flex flexDirection="column" justifyContent="center">
             <Flex fontSize="subBody" color="gray">
@@ -39,7 +43,14 @@ const Settings = props => {
             </Flex>
           </Flex>
         </Flex>
-        <Box px={4} fontSize="body" fontWeight="bold" color="primary">
+        <Box
+          px={2}
+          mt={2}
+          fontSize="body"
+          fontFamily="heading"
+          fontWeight="bold"
+          color="primary"
+        >
           Appearance
         </Box>
         <Box
@@ -48,20 +59,23 @@ const Settings = props => {
             borderColor: "border",
             "&:hover": { borderColor: "primary" }
           }}
-          py={4}
+          py={2}
         >
-          <Flex fontSize="body" alignItems="center">
-            <Text px={4} sx={{ fontSize: "body" }}>
-              {Titles.accent}
-            </Text>
+          <Flex
+            fontSize="body"
+            alignItems="center"
+            px={2}
+            sx={{ fontSize: "body" }}
+          >
+            {Titles.accent}
           </Flex>
 
-          <Flex flexDirection="column" justifyContent="center" mx={4}>
+          <Flex flexDirection="column" justifyContent="center" mx={2}>
             <Flex
               flexWrap="wrap"
               sx={{ marginBottom: 2, borderRadius: "default" }}
               justifyContent="left"
-              my={4}
+              my={2}
               bg="shade"
               p={1}
             >
@@ -105,22 +119,25 @@ const Settings = props => {
               ))}
             </Flex>
           </Flex>
-          <Flex flexDirection="row" px="16px">
-            <Text width={1 / 2} fontSize="body">
-              Dark Mode
-            </Text>{" "}
-            <Flex width={1 / 2} justifyContent="flex-end">
-              <Switch
-                onClick={() => {
-                  setCheck(!check);
-                  changeTheme();
-                }}
-                checked={check}
-              />
-            </Flex>
+          <Flex flexDirection="row" px={2} justifyContent="space-between">
+            <Text fontSize="body">Dark Mode</Text>
+            <Switch
+              onClick={() => {
+                setCheck(!check);
+                changeTheme();
+              }}
+              checked={check}
+            />
           </Flex>
         </Box>
-        <Box px={4} fontSize="body" fontWeight="bold" color="primary">
+        <Box
+          px={2}
+          mt={2}
+          fontSize="body"
+          fontFamily="heading"
+          fontWeight="bold"
+          color="primary"
+        >
           Other
         </Box>
         <Button

@@ -195,10 +195,11 @@ const theme = (colors, shadows) => ({
       textAlign: "left",
       fontSize: "body",
       borderRadius: 0,
-      py: 4,
-      px: 4,
-      "&:hover": { borderColor: "primary" },
-      "&:active": { color: "gray" }
+      py: 2,
+      px: 2,
+      outline: "none",
+      ":hover": { borderColor: "primary" },
+      ":active": { color: "gray" }
     }
   },
   shadows: shadows
