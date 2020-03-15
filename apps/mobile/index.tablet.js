@@ -1,15 +1,15 @@
-import React, {useEffect} from 'react';
-import {View, Platform, StatusBar} from 'react-native';
+import React, {createRef, useEffect} from 'react';
+import {Platform, StatusBar, View} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import {Menu} from './src/components/Menu';
 import {ModalMenu} from './src/components/ModalMenu';
+import {useTracked} from './src/provider';
 import NavigationService, {
   AppContainer,
 } from './src/services/NavigationService';
 import Editor from './src/views/Editor';
-import {useTracked} from './src/provider';
 
-let editorRef;
+const editorRef = createRef();
 let outColors;
 
 export const Initialize = () => {
@@ -25,7 +25,7 @@ export const Initialize = () => {
   const showFullScreenEditor = () => {
     setFullscreen(true);
 
-    editorRef.setNativeProps({
+    editorRef.current?.setNativeProps({
       style: {
         position: 'absolute',
         width: '100%',
@@ -38,7 +38,7 @@ export const Initialize = () => {
 
   const closeFullScreenEditor = () => {
     setFullscreen(false);
-    editorRef.setNativeProps({
+    editorRef.current?.setNativeProps({
       style: {
         position: 'relative',
         width: '68%',
@@ -68,7 +68,15 @@ export const Initialize = () => {
   }, []);
 
   return (
-    <>
+    <Animatable.View
+      transition="backgroundColor"
+      duration={300}
+      style={{
+        width: '100%',
+        height: '100%',
+        flexDirection: 'row',
+        backgroundColor: colors.bg,
+      }}>
       <ModalMenu colors={colors} />
       <Animatable.View
         animation="fadeIn"
@@ -100,7 +108,7 @@ export const Initialize = () => {
         />
       </Animatable.View>
       <View
-        ref={ref => (editorRef = ref)}
+        ref={editorRef}
         style={{
           width: '68%',
           height: '100%',
@@ -108,6 +116,6 @@ export const Initialize = () => {
         }}>
         <Editor noMenu={fullscreen ? false : true} />
       </View>
-    </>
+    </Animatable.View>
   );
 };

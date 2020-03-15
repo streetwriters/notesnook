@@ -1,6 +1,7 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, createRef} from 'react';
 import Animated from 'react-native-reanimated';
 import {Menu} from './src/components/Menu';
+import * as Animatable from 'react-native-animatable';
 import SideMenu from './src/components/SideMenu';
 import NavigationService, {
   AppContainer,
@@ -12,7 +13,7 @@ import Editor from './src/views/Editor';
 import {useTracked} from './src/provider';
 import {StatusBar, Platform} from 'react-native';
 
-let editorRef;
+const editorRef = createRef();
 export const Initialize = () => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
@@ -25,7 +26,15 @@ export const Initialize = () => {
     }
   }, []);
   return (
-    <>
+    <Animatable.View
+      transition="backgroundColor"
+      duration={300}
+      style={{
+        width: '100%',
+        height: '100%',
+        flexDirection: 'row',
+        backgroundColor: colors.bg,
+      }}>
       <SideMenu
         ref={sideMenuRef}
         bounceBackOnOverdraw={false}
@@ -56,7 +65,7 @@ export const Initialize = () => {
       </SideMenu>
 
       <Animated.View
-        ref={ref => (editorRef = ref)}
+        ref={editorRef}
         onResponderTerminationRequest={true}
         onStartShouldSetResponderCapture={false}
         onStartShouldSetResponder={false}
@@ -77,6 +86,6 @@ export const Initialize = () => {
         }}>
         <Editor noMenu={false} />
       </Animated.View>
-    </>
+    </Animatable.View>
   );
 };

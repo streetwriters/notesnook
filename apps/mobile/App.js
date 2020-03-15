@@ -1,11 +1,8 @@
 import React, {useEffect, useState} from 'react';
-import * as Animatable from 'react-native-animatable';
 import MMKV from 'react-native-mmkv-storage';
 import Orientation from 'react-native-orientation';
 import {Loading} from './Loading';
 import {getColorScheme, scale, updateSize} from './src/common/common';
-import {DialogManager} from './src/components/DialogManager';
-import {Toast} from './src/components/Toast';
 import {useTracked} from './src/provider';
 import {ACTIONS} from './src/provider/actions';
 import {defaultState} from './src/provider/defaultState';
@@ -17,7 +14,6 @@ const I = DDS.isTab ? require('./index.tablet') : require('./index.mobile');
 
 const App = () => {
   const [state, dispatch] = useTracked();
-  const {colors} = state;
   const [init, setInit] = useState(false);
 
   const _onOrientationChange = o => {
@@ -81,20 +77,8 @@ const App = () => {
   }
   return (
     <>
-      <Animatable.View
-        transition="backgroundColor"
-        duration={300}
-        style={{
-          width: '100%',
-          height: '100%',
-          flexDirection: 'row',
-          backgroundColor: colors.bg,
-        }}>
-        <Loading />
-        <I.Initialize />
-        <Toast />
-        <DialogManager colors={colors} />
-      </Animatable.View>
+      <I.Initialize />
+      <Loading />
     </>
   );
 };

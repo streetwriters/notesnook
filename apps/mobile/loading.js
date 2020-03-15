@@ -3,6 +3,8 @@ import {SIZE, WEIGHT} from './src/common/common';
 import * as Animatable from 'react-native-animatable';
 import {useTracked} from './src/provider';
 import {w} from './src/utils/utils';
+import {DialogManager} from './src/components/DialogManager';
+import {Toast} from './src/components/Toast';
 
 export const Loading = () => {
   const [state, dispatch] = useTracked();
@@ -98,6 +100,8 @@ export const Loading = () => {
           e to write
         </Animatable.Text>
       </Animatable.View>
+      <Toast />
+      <DialogManager colors={colors} />
     </>
   );
 };
