@@ -9,6 +9,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Keyboard,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import WebView from 'react-native-webview';
@@ -56,12 +57,16 @@ const Editor = ({noMenu}) => {
   const [dateEdited, setDateEdited] = useState(0);
   // FUNCTIONS
 
-  const post = value => EditorWebView.current?.postMessage(value);
+  const post = message =>
+    EditorWebView.current?.postMessage(JSON.stringify(message));
 
   useEffect(() => {
     let c = {...colors};
     c.factor = normalize(1);
-    post(JSON.stringify(c));
+    post({
+      type: 'theme',
+      value: colors,
+    });
   }, [colors.bg]);
 
   useEffect(() => {
@@ -79,8 +84,9 @@ const Editor = ({noMenu}) => {
       dispatch({type: ACTIONS.NOTES});
       if (item && item.type === 'new') {
         await clearEditor();
-
-        post('focusTitle');
+        post({
+          type: 'focusTitle',
+        });
       } else {
         note = item;
         dispatch({
@@ -93,8 +99,9 @@ const Editor = ({noMenu}) => {
       dispatch({type: ACTIONS.NOTES});
       if (item && item.type === 'new') {
         await clearEditor();
-
-        post('focusTitle');
+        post({
+          type: 'focusTitle',
+        });
       } else {
         note = item;
         dispatch({
@@ -108,7 +115,6 @@ const Editor = ({noMenu}) => {
 
   const clearEditor = async () => {
     await saveNote(true);
-
     setDateEdited(0);
     title = null;
     content = null;
@@ -116,14 +122,15 @@ const Editor = ({noMenu}) => {
     id = null;
     tapCount = 0;
     saveCounter = 0;
-    post('clear');
-    post(JSON.stringify({type: 'text', value: ''}));
-    post(
-      JSON.stringify({
-        type: 'title',
-        value: '',
-      }),
-    );
+    post({
+      type: 'clearEditor',
+    });
+    post({
+      type: 'clearEditor',
+    });
+    post({
+      type: 'blur',
+    });
   };
 
   const onChange = data => {
@@ -163,7 +170,7 @@ const Editor = ({noMenu}) => {
 
   const saveNote = async (lockNote = true) => {
     if (!title && !content) return;
-    if (title.trim().length === 0 && content.text.trim().length === 0) return;
+    if (title?.trim().length === 0 && content.text?.trim().length === 0) return;
     if (!content) {
       content = {
         text: '',
@@ -261,56 +268,45 @@ const Editor = ({noMenu}) => {
 
   useEffect(() => {
     if (noMenu) {
-      post(
-        JSON.stringify({
-          type: 'nomenu',
-          value: true,
-        }),
-      );
+      post({
+        type: 'nomenu',
+        value: true,
+      });
     } else {
-      post(
-        JSON.stringify({
-          type: 'nomenu',
-          value: false,
-        }),
-      );
+      post({
+        type: 'nomenu',
+        value: false,
+      });
     }
   }, [noMenu]);
 
   const onWebViewLoad = () => {
     if (noMenu) {
-      post(
-        JSON.stringify({
-          type: 'nomenu',
-          value: true,
-        }),
-      );
+      post({
+        type: 'nomenu',
+        value: true,
+      });
     } else {
-      post(
-        JSON.stringify({
-          type: 'nomenu',
-          value: false,
-        }),
-      );
+      post({
+        type: 'nomenu',
+        value: false,
+      });
     }
 
     if (note && note.id) {
       updateEditor();
     } else {
-      post('focusTitle');
+      post({
+        type: 'focusTitle',
+      });
     }
     let c = {...colors};
     c.factor = normalize(1);
-    post(JSON.stringify(c));
-  };
-
-  const wait = timeout =>
-    new Promise((resolve, reject) => {
-      if (!timeout || typeof timeout !== 'number') reject();
-      setTimeout(() => {
-        resolve();
-      }, timeout);
+    post({
+      type: 'theme',
+      value: colors,
     });
+  };
 
   const updateEditor = async () => {
     title = note.title;
@@ -331,11 +327,20 @@ const Editor = ({noMenu}) => {
         }),
       );
     } else {
-      post('focusTitle');
-      post('clear');
+      post({
+        type: 'clearTitle',
+      });
+      post({
+        type: 'clearEditor',
+      });
+      post({
+        type: 'focusTitle',
+      });
     }
     if (note.content.text === '' && note.content.delta === null) {
-      post('clear');
+      post({
+        type: 'clearEditor',
+      });
     } else if (note.content.delta) {
       let delta;
       if (typeof note.content.delta !== 'string') {
@@ -344,9 +349,12 @@ const Editor = ({noMenu}) => {
         delta = await db.notes.note(id).delta();
       }
 
-      post(JSON.stringify(delta));
+      post({
+        type: 'delta',
+        value: delta,
+      });
     } else {
-      post(JSON.stringify({type: 'text', value: note.content.text}));
+      post({type: 'text', value: note.content.text});
     }
   };
 
@@ -380,15 +388,10 @@ const Editor = ({noMenu}) => {
       if (note && note.id) {
         ToastEvent.show('Note Saved!', 'success');
       }
-
       await clearEditor();
-
       if (noMenu) return true;
       DDS.isTab ? sideMenuRef.current?.openMenu(true) : null;
       sideMenuRef.current?.setGestureEnabled(true);
-      EditorWebView.current?.reload();
-      // Keyboard.dismiss();
-
       return true;
     } else {
       tapCount = 1;
@@ -465,7 +468,6 @@ const Editor = ({noMenu}) => {
                   ToastEvent.show('Note Saved!', 'success');
                 }
                 await clearEditor();
-                EditorWebView.current?.reload();
                 DDS.isTab ? sideMenuRef.current?.openMenu(true) : null;
                 sideMenuRef.current?.setGestureEnabled(true);
               }
