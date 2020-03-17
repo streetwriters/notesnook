@@ -12,7 +12,7 @@ import { showPasswordDialog } from "../dialogs/passworddialog";
 import { db } from "../../common";
 
 const dropdownRefs = [];
-const menuItems = (note, index) => [
+const menuItems = (note, index, context) => [
   {
     title: note.notebook ? "Move" : "Add to",
     onClick: async () => {
@@ -39,6 +39,25 @@ const menuItems = (note, index) => [
       } else {
         unlock(note.id);
       }
+    }
+  },
+  {
+    invisible: !context,
+    title: "Remove",
+    onClick: async () => {
+      confirm(
+        Icon.Book,
+        "Remove",
+        "Are you sure you want to Remove this note?"
+      ).then(async res => {
+        if (res) {
+          await db.notebooks
+            .notebook(context.notebook.id)
+            .topics.topic(context.value)
+            .delete(note.id);
+          await store.getState().setSelectedContext(context);
+        }
+      });
     }
   },
   {
@@ -113,7 +132,7 @@ function Note(props) {
       }
       pinned={props.pinnable && note.pinned}
       menuData={note}
-      menuItems={menuItems(note, index)}
+      menuItems={menuItems(note, index, props.context)}
       dropdownRefs={dropdownRefs}
     />
   );

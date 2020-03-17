@@ -11,6 +11,7 @@ const Notes = props => {
   const clearSelectedContext = useNotesStore(
     store => store.clearSelectedContext
   );
+  const selectedContext = useNotesStore(store => store.selectedContext);
   useEffect(() => {
     return () => {
       clearSelectedContext();
@@ -21,7 +22,12 @@ const Notes = props => {
       type="notes"
       items={selectedNotes}
       item={(index, item) => (
-        <Note index={index} pinnable={false} item={item} />
+        <Note
+          index={index}
+          pinnable={false}
+          item={item}
+          context={selectedContext}
+        />
       )}
       button={{
         content: "Make a new note",
