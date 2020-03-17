@@ -46,7 +46,7 @@ const ItemSelector = ({ isSelected, toggleSelection }) => {
       }}
       onClick={() => toggleSelection()}
     >
-      {isSelected ? <Icon.Check /> : <Icon.Circle />}
+      {isSelected ? <Icon.Check /> : <Icon.CircleEmpty />}
     </Box>
   );
 };
