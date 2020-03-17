@@ -44,7 +44,7 @@ export class Dialog extends Component {
         history.selectedItemsList.forEach(async i => {
           if (i.type === 'note') {
             await db.notes.delete(i.id);
-            ToastEvent.show('Notes moved to trash', 'error', 3000);
+            ToastEvent.show('Notes moved to trash', 'error');
             updateEvent({type: i.type});
             updateEvent({type: ACTIONS.PINNED});
           } else if (i.type === 'topic') {
@@ -53,12 +53,12 @@ export class Dialog extends Component {
             eSendEvent(eOnNewTopicAdded);
             updateEvent({type: 'notebook'});
 
-            ToastEvent.show('Topics deleted', 'error', 3000);
+            ToastEvent.show('Topics deleted', 'error');
           } else if (i.type === 'notebook') {
             await db.notebooks.delete(i.id);
             updateEvent({type: i.type});
             updateEvent({type: ACTIONS.PINNED});
-            ToastEvent.show('Notebooks moved to trash', 'error', 3000);
+            ToastEvent.show('Notebooks moved to trash', 'error');
           }
         });
 
@@ -126,7 +126,6 @@ export class Dialog extends Component {
             item.type.slice(1) +
             ' restored',
           'success',
-          3000,
         );
 
         updateEvent({type: ACTIONS.TRASH});

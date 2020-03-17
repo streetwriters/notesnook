@@ -273,7 +273,7 @@ export const NotebookItem = ({
               let noteIds = [];
               selectedItemsList.forEach(item => noteIds.push(item.id));
 
-              db.notes.move(
+              await db.notes.move(
                 {
                   topic: item.title,
                   id: item.notebookId,
@@ -284,13 +284,7 @@ export const NotebookItem = ({
 
               moveNoteHideEvent();
 
-              ToastEvent.show(
-                `Note moved to ${item.title}`,
-                'success',
-                3000,
-                () => {},
-                '',
-              );
+              ToastEvent.show(`Note moved to ${item.title}`, 'success');
             }}
             style={{
               borderWidth: 1,
