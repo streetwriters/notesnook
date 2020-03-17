@@ -20,6 +20,7 @@ const createIcon = name => {
   return props => (
     <Animated.Box
       sx={props.sx}
+      height={(props.size || 24) + "px"}
       whileHover={{ scale: 1.1 }}
       transition={{ duration: 0.3, ease: "easeOut" }}
     >

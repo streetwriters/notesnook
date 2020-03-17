@@ -29,7 +29,7 @@ const Button = props => {
       }}
       onClick={props.onClick}
     >
-      {props.Icon && <props.Icon />}
+      {props.Icon && <props.Icon color="static" />}
       <Text as="span" mx={1} fontSize={"body"} flex="1 1 auto">
         {props.content}
       </Text>
