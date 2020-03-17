@@ -48,8 +48,11 @@ export const Trash = createIcon(Icons.mdiTrashCanOutline);
 export const Search = createIcon(Icons.mdiMagnify);
 export const Menu = createIcon(Icons.mdiHamburger);
 export const Login = createIcon(Icons.mdiLogin);
+export const FocusMode = createIcon(Icons.mdiFullscreen);
+export const NormalMode = createIcon(Icons.mdiFullscreenExit);
 export const Settings = createIcon(Icons.mdiCogOutline);
 export const Home = createIcon(Icons.mdiHomeOutline);
+export const Restore = createIcon(Icons.mdiRecycle);
 
 /** Properties Icons */
 export const ChevronLeft = createIcon(Icons.mdiChevronLeft);

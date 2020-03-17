@@ -1,14 +1,10 @@
 import React from "react";
-import * as Icon from "react-feather";
 import ListItem from "../list-item";
 
 const dropdownRefs = [];
 const menuItems = [
-  { title: "Favorite", icon: Icon.Heart },
-  { title: "Share", icon: Icon.Share2 },
   {
     title: "Delete",
-    icon: Icon.Trash,
     color: "red"
   }
 ];

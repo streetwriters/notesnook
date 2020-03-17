@@ -1,5 +1,3 @@
-import * as Icon from "react-feather";
-
 export function createRoute(key, component, props = {}, params = {}) {
   return {
     [key]: {
@@ -9,16 +7,6 @@ export function createRoute(key, component, props = {}, params = {}) {
       params
     }
   };
-}
-
-export function createColorRoute(key, component, color, props = {}) {
-  return createRoute(key, component, {
-    title: key,
-    titleColor: color,
-    icon: Icon.Circle,
-    color,
-    ...props
-  });
 }
 
 export function createNormalRoute(key, component, icon, props = {}) {

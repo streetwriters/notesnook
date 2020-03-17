@@ -1,4 +1,4 @@
-import * as Icon from "react-feather";
+import * as Icon from "../components/icons";
 import { store as appStore } from "../stores/app-store";
 import { store as notesStore } from "../stores/note-store";
 import { store as nbStore } from "../stores/notebook-store";
@@ -6,7 +6,6 @@ import { store as editorStore } from "../stores/editor-store";
 import { db } from "./index";
 import { showMoveNoteDialog } from "../components/dialogs/movenotedialog";
 import { confirm } from "../components/dialogs/confirm";
-import { showPasswordDialog } from "../components/dialogs/passworddialog";
 
 function createOption(icon, onClick) {
   return {
@@ -22,9 +21,9 @@ function createOptions(options = []) {
   return [...options, DeleteOption];
 }
 
-const DeleteOption = createOption(Icon.Trash2, async function(state) {
+const DeleteOption = createOption(Icon.Trash, async function(state) {
   if (
-    !(await confirm(Icon.Trash2, "Delete", "Are you sure you want to proceed?"))
+    !(await confirm(Icon.Trash, "Delete", "Are you sure you want to proceed?"))
   )
     return;
   const item = state.selectedItems[0];
@@ -79,7 +78,7 @@ const AddToNotebookOption = createOption(Icon.Plus, async function(state) {
   }
 });
 
-const RestoreOption = createOption(Icon.RefreshCcw, async function(state) {
+const RestoreOption = createOption(Icon.Restore, async function(state) {
   const items = state.selectedItems.map(item => item.id);
   await db.trash.restore(items);
 });

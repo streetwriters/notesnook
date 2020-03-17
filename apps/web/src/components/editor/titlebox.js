@@ -2,33 +2,18 @@ import React from "react";
 import "./editor.css";
 import { Input } from "@rebass/forms";
 import { Flex } from "rebass";
-import * as Icon from "react-feather";
+import * as Icon from "../icons";
 import { store as appStore } from "../../stores/app-store";
 
 export default class TitleBox extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      iconType: Icon.PlusCircle
-    };
-    //this.ChangeIcon.bind(this);
-  }
-
-  ChangeIcon() {
-    this.setState({
-      iconType:
-        this.state.iconType === Icon.PlusCircle
-          ? Icon.MinusCircle
-          : Icon.PlusCircle
-    });
-  }
+  state = { isFocusMode: false };
 
   inputRef;
   shouldComponentUpdate(nextProps, nextState) {
     return (
       nextProps.title !== this.props.title ||
       nextProps.shouldFocus ||
-      nextState.iconType !== this.state.iconType
+      nextState.isFocusMode !== this.state.isFocusMode
     );
   }
 
@@ -65,15 +50,21 @@ export default class TitleBox extends React.Component {
           alignItems="center"
           pr={3}
           onClick={() => {
-            if (this.state.iconType === Icon.PlusCircle) {
-              appStore.getState().enableFocusMode();
+            const { enableFocusMode, disableFocusMode } = appStore.getState();
+            if (!this.state.isFocusMode) {
+              enableFocusMode();
+              this.setState({ isFocusMode: true });
             } else {
-              appStore.getState().disableFocusMode();
+              disableFocusMode();
+              this.setState({ isFocusMode: false });
             }
-            this.ChangeIcon();
           }}
         >
-          <this.state.iconType size="30px"></this.state.iconType>
+          {this.state.isFocusMode ? (
+            <Icon.NormalMode size={30} />
+          ) : (
+            <Icon.FocusMode size={30} />
+          )}
         </Flex>
       </Flex>
     );

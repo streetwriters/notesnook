@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { Flex } from "rebass";
 import Button from "../button";
 import Search from "../search";
-import * as Icon from "react-feather";
+import * as Icon from "../icons";
 import { Virtuoso as List } from "react-virtuoso";
 import { useStore as useSearchStore } from "../../stores/searchstore";
 import { useStore as useAppStore } from "../../stores/app-store";

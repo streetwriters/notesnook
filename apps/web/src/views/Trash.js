@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import * as Icon from "react-feather";
+import * as Icon from "../components/icons";
 import { Flex, Text } from "rebass";
 import ListItem from "../components/list-item";
 import TimeAgo from "timeago-react";
@@ -19,7 +19,7 @@ const menuItems = (item, index) => [
     color: "red",
     onClick: () => {
       confirm(
-        Icon.Trash2,
+        Icon.Trash,
         "Delete",
         `Are you sure you want to permanently delete this item?`
       ).then(async res => {
@@ -62,10 +62,10 @@ function Trash() {
       )}
       button={{
         content: "Clear Trash",
-        icon: Icon.Trash2,
+        icon: Icon.Trash,
         onClick: function() {
           confirm(
-            Icon.Trash2,
+            Icon.Trash,
             "Clear",
             `This action is irreversible. Are you sure you want to proceed?s`
           ).then(async res => {

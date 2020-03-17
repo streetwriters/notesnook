@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Flex, Box, Text } from "rebass";
 import { Input } from "@rebass/forms";
-import * as Icon from "react-feather";
+import * as Icon from "../icons";
 import Dialog, { showDialog } from "./dialog";
 import { db } from "../../common";
 
@@ -15,7 +15,7 @@ const SignUpDialog = props => {
     <Dialog
       isOpen={true}
       title={"Sign Up"}
-      icon={Icon.LogIn}
+      icon={Icon.User}
       onCloseClick={props.onClose}
       negativeButton={{ onClick: props.onClose }}
       positiveButton={{

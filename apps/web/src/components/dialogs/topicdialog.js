@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Box } from "rebass";
 import { Input } from "@rebass/forms";
+import * as Icon from "../icons";
 import { db } from "../../common";
 import Dialog, { showDialog } from "./dialog";
 import { store } from "../../stores/notebook-store";
@@ -32,11 +33,11 @@ const TopicDialog = props => {
   );
 };
 
-export const showTopicDialog = (icon, title, notebook) => {
+export const showTopicDialog = notebook => {
   return showDialog(perform => (
     <TopicDialog
-      title={title}
-      icon={icon}
+      title={"Topic"}
+      icon={Icon.Topic}
       onNo={() => {
         perform(false);
       }}
