@@ -1,14 +1,14 @@
 import React from "react";
-import * as Icon from "react-feather";
+import * as Icon from "../icons";
 import { Box, Flex, Text } from "rebass";
 import { Input } from "@rebass/forms";
 import CheckBox from "../checkbox";
-import { PinIcon } from "../icons";
 import { useStore } from "../../stores/editor-store";
 import { COLORS } from "../../common";
 import { objectMap } from "../../utils/object";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { motion } from "framer-motion";
+
 const Properties = props => {
   const pinned = useStore(store => store.session.pinned);
   const favorite = useStore(store => store.session.favorite);
@@ -104,12 +104,12 @@ const Properties = props => {
                   ":active": { color: "darkRed" }
                 }}
               >
-                <Icon.X />
+                <Icon.Close />
               </Text>
             </Text>
             <CheckBox
               checked={pinned}
-              icon={PinIcon}
+              icon={Icon.Pin}
               label="Pin"
               onChecked={state => changeState("pinned", state)}
             />
@@ -126,7 +126,7 @@ const Properties = props => {
               onClick={toggleLocked}
             />
             <Flex fontSize="body" sx={{ marginBottom: 3 }} alignItems="center">
-              <Icon.Book size={18} />
+              <Icon.Notebook size={18} />
               <Text sx={{ marginLeft: 1 }}>Move to notebook</Text>
             </Flex>
             <Flex fontSize="body" sx={{ marginBottom: 2 }} alignItems="center">
@@ -181,7 +181,7 @@ const Properties = props => {
               ))}
             </Flex>
             <Flex fontSize="body" sx={{ marginBottom: 2 }} alignItems="center">
-              <Icon.Octagon size={18} />
+              <Icon.Color size={18} />
               <Text sx={{ marginLeft: 1 }}>Colors:</Text>
             </Flex>
             <Flex flexWrap="wrap" sx={{ marginBottom: 2 }}>

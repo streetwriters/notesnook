@@ -3,21 +3,18 @@ import "./editor.css";
 import ReactQuill from "./react-quill";
 import { Flex, Box, Text } from "rebass";
 import TitleBox from "./title-box";
-import * as Icon from "react-feather";
+import * as Icon from "../icons";
 import Properties from "../properties";
 import { useStore, SESSION_STATES } from "../../stores/editor-store";
 import { timeConverter } from "../../utils/time";
 import { countWords } from "../../utils/string";
-import { useTheme } from "emotion-theming";
 import { useStore as useAppStore } from "../../stores/app-store";
 import Animated from "../animated";
-import { Input } from "@rebass/forms";
 
 const TextSeperator = () => {
-  const theme = useTheme();
   return (
     <Text as="span" mx={1}>
-      <Icon.Circle size={6} fill={theme.colors.fontTertiary} />
+      <Icon.Circle size={6} color={"fontTertiary"} />
     </Text>
   );
 };

@@ -1,6 +1,6 @@
 import React from "react";
 import { Flex, Box } from "rebass";
-import * as Icon from "react-feather";
+import * as Icon from "../icons";
 import TimeAgo from "timeago-react";
 import { showSnack } from "../snackbar";
 import ListItem from "../list-item";
@@ -10,6 +10,7 @@ import { store, useStore } from "../../stores/note-store";
 import { store as editorStore } from "../../stores/editor-store";
 import { showPasswordDialog } from "../dialogs/passworddialog";
 import { db } from "../../common";
+import { useTheme } from "emotion-theming";
 
 const dropdownRefs = [];
 const menuItems = (note, index, context) => [
@@ -74,7 +75,7 @@ const menuItems = (note, index, context) => [
         if (!res) return;
       }
       confirm(
-        Icon.Trash2,
+        Icon.Trash,
         "Delete",
         "Are you sure you want to delete this note?"
       ).then(async res => {
@@ -91,6 +92,7 @@ function Note(props) {
   const note = item;
   const selectedNote = useStore(store => store.selectedNote);
   const isOpened = selectedNote === note.id;
+  const theme = useTheme();
   return (
     <ListItem
       selectable
@@ -111,22 +113,23 @@ function Note(props) {
               style={{
                 width: 13,
                 marginLeft: index ? -8 : 0,
+                marginRight: index === note.colors.length - 1 ? 5 : 0,
                 height: 13,
                 backgroundColor: item,
                 borderRadius: 100
               }}
             />
           ))}
-
-          <TimeAgo style={{ marginLeft: 5 }} datetime={note.dateCreated} />
-          {note.locked && <Icon.Lock size={13} style={{ marginLeft: 5 }} />}
-          {note.favorite && (
-            <Icon.Star
-              stroke={0}
-              fill="#ffd700"
+          <TimeAgo datetime={note.dateCreated} />
+          {note.locked && (
+            <Icon.Lock
               size={13}
-              style={{ marginLeft: 5 }}
+              color={theme.colors.fontTertiary}
+              sx={{ ml: 1 }}
             />
+          )}
+          {note.favorite && (
+            <Icon.Star color={theme.colors.favorite} size={13} sx={{ ml: 1 }} />
           )}
         </Flex>
       }

@@ -33,3 +33,7 @@ body,
     opacity: 1;
   }
 }
+
+svg {
+  width: 1.5rem;
+}

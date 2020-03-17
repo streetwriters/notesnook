@@ -1,6 +1,5 @@
 import React from "react";
 import { Flex, Text } from "rebass";
-import * as Icon from "react-feather";
 import ListItem from "../list-item";
 import { store } from "../../stores/notebook-store";
 import { showEditNoteDialog } from "../dialogs/addnotebookdialog";
@@ -77,9 +76,6 @@ export default class Notebook extends React.Component {
               •
             </Text>
             <Text>{notebook.totalNotes} Notes</Text>
-            {notebook.favorite && (
-              <Icon.Star size={16} style={{ marginLeft: 5 }} />
-            )}
           </Flex>
         }
         pinned={notebook.pinned}

@@ -47,14 +47,12 @@ export default class Dialog extends React.Component {
                 color="primary"
                 sx={{ paddingBottom: 2 }}
               >
-                <Box height={props.iconSize || 32}>
-                  <props.icon size={props.iconSize || 32} />
-                </Box>
+                <props.icon size={props.iconSize || 38} color="primary" />
                 <Text
-                  mx={2}
+                  mx={1}
                   as="span"
                   variant="title"
-                  fontSize={22}
+                  fontSize={"heading"}
                   textAlign="center"
                 >
                   {props.title}

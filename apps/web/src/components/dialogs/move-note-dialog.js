@@ -1,7 +1,7 @@
 import React from "react";
 import { Flex, Box, Text } from "rebass";
 import { Input } from "@rebass/forms";
-import * as Icon from "react-feather";
+import * as Icon from "../icons";
 import { db } from "../../common";
 import Dialog, { showDialog } from "./dialog";
 import { toTitleCase } from "../../utils/string";
@@ -29,7 +29,13 @@ export default class MoveDialog extends React.Component {
             ? "Move Note"
             : "Select " + toTitleCase(type.substring(0, type.length - 1))
         }
-        icon={Icon.Move}
+        icon={
+          type === "notes"
+            ? Icon.Move
+            : type === "topics"
+            ? Icon.Topic
+            : Icon.Notebook
+        }
         content={
           <Box>
             <Flex alignContent="center" justifyContent="space-between" my={1}>

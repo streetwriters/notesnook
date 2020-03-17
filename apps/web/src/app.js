@@ -15,25 +15,14 @@ import { useStore } from "./stores/app-store";
 import { useStore as useNotesStore } from "./stores/note-store";
 import { COLORS } from "./common";
 import { toTitleCase } from "./utils/string";
-import * as Icon from "react-feather";
+import * as Icon from "./components/icons";
 import { useStore as useAppStore } from "./stores/app-store";
 import Animated from "./components/animated";
 
 const NavMenuItem = props => {
-  const [fill, setFill] = useState();
-  const [toggle, setToggle] = useState(
-    props.item.isToggled && props.item.isToggled()
-  );
-  const theme = useTheme();
-  useEffect(() => {
-    setFill(toggle ? theme.colors.text : props.item.color || "transparent");
-  }, [props.item, toggle, theme.colors]);
   return (
     <Button
-      onClick={() => {
-        props.onSelected();
-        setToggle(props.item.isToggled && props.item.isToggled());
-      }}
+      onClick={() => props.onSelected()}
       variant="nav"
       sx={{
         width: "full",
@@ -56,9 +45,8 @@ const NavMenuItem = props => {
       >
         <props.item.icon
           size={18}
-          strokeWidth={props.selected ? 2 : 1.3}
-          style={{ marginRight: 2 }}
-          fill={fill}
+          sx={{ marginRight: "2px" }}
+          color={props.selected ? "primary" : props.item.color || "icon"}
         />
         <Text
           sx={{

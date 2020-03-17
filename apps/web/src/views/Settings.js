@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Box, Button, Flex, Text, Image } from "rebass";
-import * as Icon from "react-feather";
+import * as Icon from "../components/icons";
 import { Switch } from "@rebass/forms";
 import "../app.css";
 import { changeTheme, isDarkTheme, changeAccent } from "../utils/theme";
@@ -27,11 +27,10 @@ const Settings = props => {
           sx={{
             width: 40,
             height: 40,
-            borderRadius: 80,
-            color: "static"
+            borderRadius: 80
           }}
         >
-          <Icon.User style={{ margin: 2 }} size={20} />
+          <Icon.User color="static" />
         </Flex>
         <Flex flexDirection="column" justifyContent="center">
           <Flex fontSize="subBody" color="gray">
@@ -92,20 +91,19 @@ const Settings = props => {
               }}
             >
               {color.code === theme.colors.primary && (
-                <Icon.Check
-                  style={{
+                <Icon.Checkmark
+                  sx={{
                     position: "absolute",
-                    cursor: "pointer",
-                    color: "white"
+                    cursor: "pointer"
                   }}
+                  color="static"
                   size={20}
                 />
               )}
               <Icon.Circle
                 size={40}
-                style={{ cursor: "pointer" }}
-                fill={color.code}
-                strokeWidth={0}
+                sx={{ cursor: "pointer" }}
+                color={color.code}
               />
             </Flex>
           ))}
@@ -120,8 +118,8 @@ const Settings = props => {
             changeTheme();
           }}
         >
-          <Text fontSize="body">{check ? "Light Mode" : "Dark Mode"}</Text>
-          {check ? <Icon.Sun /> : <Icon.Moon />}
+          <Text fontSize="body">Dark Mode</Text>
+          {check ? <Icon.Check /> : <Icon.CircleEmpty />}
         </Flex>
       </Box>
       <Box

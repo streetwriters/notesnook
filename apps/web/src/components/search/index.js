@@ -1,10 +1,11 @@
 import React from "react";
 import { Flex, Box } from "rebass";
 import { Input } from "@rebass/forms";
-import * as Icon from "react-feather";
+import * as Icon from "../icons";
 import { useStore } from "../../stores/searchstore";
 import "./search.css";
 import RootNavigator from "../../navigation/navigators/rootnavigator";
+
 var query = "";
 const Search = props => {
   const search = useStore(store => store.search);
@@ -46,7 +47,7 @@ const Search = props => {
           height: 24
         }}
       >
-        <Icon.Search />
+        <Icon.Search size={28} />
       </Box>
     </Flex>
   );

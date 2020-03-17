@@ -2,7 +2,7 @@ import React, { useState, useRef, useCallback } from "react";
 import { Box, Text, Flex } from "rebass";
 import { Input } from "@rebass/forms";
 import Dialog, { showDialog } from "./dialog";
-import * as Icon from "react-feather";
+import * as Icon from "../icons";
 
 function PasswordDialog(props) {
   const [isWrong, setIsWrong] = useState(false);
@@ -38,8 +38,8 @@ function PasswordDialog(props) {
             }}
           />
           {isWrong && (
-            <Flex alignItems="center" color="red" mt={2}>
-              <Icon.AlertTriangle size={16} />
+            <Flex alignItems="center" color="error" mt={2}>
+              <Icon.Alert size={16} color="error" />
               <Text ml={1} fontSize={"subBody"}>
                 Wrong password
               </Text>
@@ -61,7 +61,7 @@ function getDialogData(type) {
     case "create_vault":
       return {
         title: "Set Up Your Vault",
-        icon: Icon.Shield,
+        icon: Icon.Vault,
         positiveButtonText: "Done"
       };
     case "unlock_vault":

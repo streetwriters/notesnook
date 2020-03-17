@@ -15,7 +15,7 @@ const colorsLight = primary =>
     text: "#000000",
     overlay: "rgba(0, 0, 0, 0.1)",
     secondary: "white",
-    icon: "#909090"
+    icon: "#3b3b3b"
   });
 const colorsDark = primary =>
   makeTheme({
@@ -29,7 +29,7 @@ const colorsDark = primary =>
     text: "#ffffff",
     overlay: "rgba(255, 255, 255, 0.5)",
     secondary: "black",
-    icon: "#909090"
+    icon: "#dbdbdb"
   });
 
 const shadowsDark = {
@@ -236,7 +236,9 @@ function makeTheme({
     overlay,
     static: "white",
     secondary,
-    icon
+    icon,
+    error: "red",
+    favorite: "#ffd700"
   };
 }
 

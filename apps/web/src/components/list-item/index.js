@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { Flex, Box, Text } from "rebass";
-import * as Icon from "react-feather";
+import * as Icon from "../icons";
 import Dropdown, { DropdownTrigger, DropdownContent } from "../dropdown";
 import Menu from "../menu";
 import {
@@ -8,7 +8,6 @@ import {
   useStore as useAppStore
 } from "../../stores/app-store";
 import useContextMenu from "../../utils/useContextMenu";
-import { useTheme } from "emotion-theming";
 
 const ActionsMenu = props => (
   <Menu
@@ -47,7 +46,7 @@ const ItemSelector = ({ isSelected, toggleSelection }) => {
       }}
       onClick={() => toggleSelection()}
     >
-      {isSelected ? <Icon.CheckCircle /> : <Icon.Circle />}
+      {isSelected ? <Icon.Check /> : <Icon.Circle />}
     </Box>
   );
 };
@@ -62,7 +61,6 @@ const ListItem = props => {
     selectedItems.findIndex(item => props.item.id === item.id) > -1;
   const selectItem = useAppStore(store => store.selectItem);
   const [menuItems, setMenuItems] = useState(props.menuItems);
-  const theme = useTheme();
 
   const toggleSelection = useCallback(
     function toggleSelection() {
@@ -204,7 +202,7 @@ const ListItem = props => {
                 <Icon.MoreVertical
                   size={22}
                   strokeWidth={2}
-                  color={theme.colors.icon}
+                  color="icon"
                   style={{ marginRight: -5 }}
                 />
               </Text>

@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import React from "react";
-import * as Icon from "react-feather";
+import * as Icon from "../icons";
 import { Flex, Text } from "rebass";
 
 const FavoritesPlaceholder = props => {
@@ -42,7 +42,7 @@ const FavoritesPlaceholder = props => {
               loop: Infinity
             }}
           >
-            <Icon.Star fill="orange" size={item.size} stroke={0} />
+            <Icon.Star color="favorite" size={item.size} />
           </motion.div>
         ))}
       </Flex>

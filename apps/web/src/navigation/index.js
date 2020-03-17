@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import { Box, Flex, Heading, Text } from "rebass";
 import Animated from "../components/animated";
 import { AnimatePresence } from "framer-motion";
-import * as Icon from "react-feather";
+import * as Icon from "../components/icons";
 import { ThemeProvider } from "../utils/theme";
 import { useStore, store } from "../stores/app-store";
 
@@ -114,20 +114,18 @@ const NavigationContainer = props => {
                 {props.canGoBack && (
                   <Box
                     onClick={props.backAction}
+                    ml={-5}
                     height={38}
-                    color="fontPrimary"
-                    sx={{ marginLeft: -2 /*correction */, marginRight: 2 }}
+                    width={38}
                   >
-                    <Icon.ChevronLeft size={38} />
+                    <Icon.ChevronLeft size={38} color="fontPrimary" />
                   </Box>
                 )}
                 <Box
                   onClick={openSideMenu}
                   height={38}
-                  color="fontPrimary"
+                  ml={-5}
                   sx={{
-                    marginLeft: -5 /*correction */,
-                    marginRight: 1,
                     display: ["block", "none", "none"]
                   }}
                 >

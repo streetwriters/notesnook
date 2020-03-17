@@ -1,10 +1,11 @@
 import React from "react";
 import { Flex, Box, Text, Button as RebassButton } from "rebass";
 import { Input, Checkbox, Label } from "@rebass/forms";
-import * as Icon from "react-feather";
+import * as Icon from "../icons";
 import Dialog, { showDialog } from "./dialog";
 import { showSnack } from "../snackbar";
 import { store } from "../../stores/notebook-store";
+import { useTheme } from "emotion-theming";
 
 export default class AddNotebookDialog extends React.Component {
   MAX_AVAILABLE_HEIGHT = window.innerHeight * 0.3;
@@ -83,7 +84,7 @@ export default class AddNotebookDialog extends React.Component {
       <Dialog
         isOpen={props.isOpen}
         title="Notebook"
-        icon={Icon.BookOpen}
+        icon={Icon.Notebook}
         content={
           <Box my={1}>
             <Input
@@ -100,10 +101,6 @@ export default class AddNotebookDialog extends React.Component {
               placeholder="Enter description (optional)"
               defaultValue={this.description}
             />
-            <Label alignItems="center" my={1}>
-              <Checkbox variant="checkbox" />
-              Locked?
-            </Label>
             <Text variant="body" fontWeight="bold" my={1}>
               Topics (optional):
             </Text>
@@ -157,9 +154,9 @@ export default class AddNotebookDialog extends React.Component {
                   >
                     <Box height={20}>
                       {this.state.focusedInputIndex === index ? (
-                        <Icon.Plus size={20} />
+                        <Icon.Plus size={22} />
                       ) : (
-                        <Icon.Minus size={20} />
+                        <Icon.Minus size={22} />
                       )}
                     </Box>
                   </RebassButton>

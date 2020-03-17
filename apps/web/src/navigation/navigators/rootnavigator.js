@@ -6,7 +6,7 @@ import {
   TagsContainer,
   Notes
 } from "../../views";
-import * as Icon from "react-feather";
+import * as Icon from "../../components/icons";
 import { createRoute, createNormalRoute, createDeadRoute } from "../routes";
 import Navigator from "../index";
 import { showLogInDialog } from "../../components/dialogs/logindialog";
@@ -16,12 +16,12 @@ import Search from "../../views/Search";
 import { store } from "../../stores/note-store";
 
 export const bottomRoutes = {
-  ...createDeadRoute("nightmode", Icon.Moon, {
+  ...createDeadRoute("nightmode", Icon.Theme, {
     onClick: () => changeTheme(),
     bottom: true,
     isToggled: () => isDarkTheme()
   }),
-  ...createDeadRoute("signin", Icon.LogIn, {
+  ...createDeadRoute("signin", Icon.Login, {
     onClick: () => showLogInDialog(),
     bottom: true
   }),
@@ -37,9 +37,9 @@ export const routes = {
     options: SelectionModeOptions.NotesOptions
   }),
   ...createRoute("notebooks", NotebooksContainer, {
-    icon: Icon.Book
+    icon: Icon.Notebook
   }),
-  ...createNormalRoute("favorites", Notes, Icon.Star, {
+  ...createNormalRoute("favorites", Notes, Icon.StarOutline, {
     title: "Favorites",
     options: SelectionModeOptions.FavoritesOptions,
     onClick: () => {
