@@ -100,6 +100,17 @@ export class DialogManager extends Component {
     }
   };
 
+  showAddTopic = notebook => {
+    this.setState({
+      item: notebook,
+    });
+    this.addTopicsDialog.open();
+  };
+
+  hideAddTopic = () => {
+    this.addTopicsDialog.close();
+  };
+
   componentDidMount() {
     eSubscribeEvent(eOnLoadNote, this.loadNote);
 
@@ -166,17 +177,6 @@ export class DialogManager extends Component {
     this.addNotebooksDialog.close();
   };
 
-  showAddTopic = notebook => {
-    this.setState({
-      item: notebook,
-    });
-    this.addTopicsDialog.open();
-  };
-
-  hideAddTopic = () => {
-    this.addTopicsDialog.close();
-  };
-
   _showSimpleDialog = data => {
     this.setState(
       {
@@ -238,7 +238,7 @@ export class DialogManager extends Component {
           break;
         }
         case 'topic': {
-          this.showAddTOpic();
+          this.showAddTopic();
           break;
         }
         case 'movenote': {
