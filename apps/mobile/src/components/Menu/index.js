@@ -606,6 +606,8 @@ export const Menu = ({
               DDS.isTab
                 ? eSendEvent(eOpenLoginDialog)
                 : NavigationService.navigate('Login');
+
+              close();
             }}
             activeOpacity={opacity / 2}
             style={{

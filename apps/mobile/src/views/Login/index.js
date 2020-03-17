@@ -39,7 +39,7 @@ export const Login = ({navigation}) => {
   const [invalidPassword, setInvalidPassword] = useState(false);
   const [username, setUsername] = useState('ammarahmed');
   const [invalidUsername, setInvalidUsername] = useState(false);
-
+  const [loginError, setLoginError] = useState(false);
   const isFocused = useIsFocused();
 
   useEffect(() => {
@@ -76,11 +76,6 @@ export const Login = ({navigation}) => {
     _username.current.blur();
     _pass.current.blur();
 
-    setTimeout(() => {
-      setTimeout(() => {
-        navigation.navigate('Home');
-      }, 500);
-    }, 300);
     setStatus('Logging in...');
 
     if (!invalidPassword && !invalidUsername) {
@@ -89,7 +84,11 @@ export const Login = ({navigation}) => {
         await db.user.login(username, password);
       } catch (e) {
         console.log(e, 'ERROR');
+        ToastEvent.show('Network error, failed to login', 'error');
+        setLoginError(true);
+
         setLoggingIn(false);
+        return;
       }
 
       let user;
@@ -100,13 +99,16 @@ export const Login = ({navigation}) => {
         console.log('user', user);
         dispatch({type: ACTIONS.USER, user: user});
         ToastEvent.show(`Logged in as ${'ammarahmed'}`, 'success');
+        navigation.goBack();
       } catch (e) {
         console.log(e, 'getUSer');
+        setLoginError(true);
         ToastEvent.show(`Login Failed`, 'error');
       }
 
       console.log(user);
     } else {
+      setLoginError(true);
       ToastEvent.show('Login failed', 'error');
     }
   };
