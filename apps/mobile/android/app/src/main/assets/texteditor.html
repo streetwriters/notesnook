@@ -1536,87 +1536,91 @@
       // Receber mensagens do RN
       document.addEventListener('message', data => {
 
+        /*
+        the data object
+        params:action,type,data;
+        first we parse the data object;
+        */
+        let message = JSON.parse(data.data);
+        let type = message.type;
+        let value;
+        if (message.value && message.type !== 'nomenu') {
+          value = message.value;
+        } else {
+          value = message.value
+        }
+        switch (type) {
 
-        if (JSON.parse(data.data).type === "text") {
-          editor.setText(JSON.parse(data.data).value, 'api')
-
-          setTimeout(() => {
-            if (JSON.parse(data.data).value.length > 0) {
-              editor.focus();
+          case "blur":
+            document.getElementById('titleInput').blur();
+            editor.blur();
+            break;
+          case "text":
+            editor.setText(value, 'api')
+            setTimeout(() => {
+              if (message.focus === "editor") {
+                editor.focus();
+              } else {
+                document.getElementById('titleInput').focus();
+              }
+            }, 0)
+            break;
+          case "clearEditor":
+            editor.setText('', 'api');
+            break;
+          case "clearTitle":
+            document.getElementById('titleInput').value = '';
+            break;
+          case "focusEditor":
+            editor.focus();
+            break;
+          case "focusTitle":
+            document.getElementById('titleInput').focus();
+            break;
+          case "nomenu":
+            let isenabled = value;
+            let width = window.innerWidth;
+            let titleIn = document.getElementById('titleInput');
+            if (isenabled) {
+              titleIn.style.width = width - 72;
+              titleIn.style['margin-left'] = 12;
+              titleIn.style['margin-right'] = 60;
             } else {
-              document.getElementById('titleInput').focus();
+              titleIn.style.width = width - 120;
+              titleIn.style['margin-left'] = 60;
+              titleIn.style['margin-right'] = 60;
             }
+            break;
+          case "title":
+            document.getElementById('titleInput').value = JSON.parse(data.data).value
+            break;
+          case "theme":
+            pageTheme.colors = value;
+            setTheme();
+            break;
 
-          }, 0)
+          case "delta":
+
+            const content = value
+            editor.setContents(content, 'api');
+            setTimeout(() => {
+              editor.setSelection(editor.getText().length - 1, 0);
+            }, 500)
+
+            break;
+          case "html":
+            editor.setContents(
+              editor.clipboard.convert(value, 'api'),
+              'silent'
+            );
+            setTimeout(() => {
+              editor.setSelection(editor.getText().length - 1, 0);
+            }, 0);
+            break;
+          default:
+            break;
         }
 
-        else if (data.data == "clear") {
-
-          editor.setText('', 'api')
-
-        } else if (data.data == "focusEditor") {
-
-          editor.focus();
-        } else if (data.data == 'focusTitle') {
-
-
-          document.getElementById('titleInput').focus();
-
-
-        } else if (JSON.parse(data.data).type === "nomenu") {
-          let isenabled = JSON.parse(data.data).value;
-          let width = window.innerWidth;
-          let titleIn = document.getElementById('titleInput');
-
-
-          if (isenabled) {
-
-
-
-            titleIn.style.width = width - 72;
-            titleIn.style['margin-left'] = 12;
-            titleIn.style['margin-right'] = 60;
-          } else {
-
-            titleIn.style.width = width - 120;
-            titleIn.style['margin-left'] = 60;
-            titleIn.style['margin-right'] = 60;
-
-          }
-
-        }
-        else if (JSON.parse(data.data).type === "title") {
-          document.getElementById('titleInput').value = JSON.parse(data.data).value
-
-        } else if (data.data.substr(0, 9) === '{"night":') {
-          pageTheme.colors = JSON.parse(data.data);
-
-          setTheme();
-
-          return;
-        } else if (data.data[0] === '{') {
-
-          const content = JSON.parse(data.data);
-
-          editor.setContents(content, 'api');
-
-          setTimeout(() => {
-
-            editor.setSelection(editor.getText().length - 1, 0);
-          }, 500)
-
-        } else if (data.data[0] === '<') {
-          editor.setContents(
-            editor.clipboard.convert(data.data, 'api'),
-            'silent'
-          );
-          setTimeout(() => {
-            editor.setSelection(editor.getText().length - 1, 0);
-          }, 0)
-
-
-
-        }
       });
 
 
