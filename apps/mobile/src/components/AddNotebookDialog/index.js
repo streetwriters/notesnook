@@ -139,6 +139,7 @@ export class AddNotebookDialog extends React.Component {
       }
       this.close();
       updateEvent({type: ACTIONS.NOTEBOOKS});
+      updateEvent({type: ACTIONS.PINNED});
 
       ToastEvent.show('New notebook added', 'success', 'local');
     }, 100);
