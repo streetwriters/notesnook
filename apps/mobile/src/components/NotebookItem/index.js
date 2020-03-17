@@ -205,28 +205,28 @@ export const NotebookItem = ({
             </View>
           ) : null}
 
-          {isTopic || isTrash ? null : (
-            <View
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'flex-start',
+              alignItems: 'center',
+              marginTop: 5,
+            }}>
+            <Text
               style={{
-                flexDirection: 'row',
-                justifyContent: 'flex-start',
-                alignItems: 'center',
-                marginTop: 5,
+                color: colors.icon,
+                fontSize: SIZE.xxs,
+                textAlignVertical: 'center',
+                fontFamily: WEIGHT.regular,
               }}>
-              <Text
-                style={{
-                  color: colors.icon,
-                  fontSize: SIZE.xxs,
-                  textAlignVertical: 'center',
-                  fontFamily: WEIGHT.regular,
-                }}>
-                {item && item.totalNotes && item.totalNotes > 1
-                  ? item.totalNotes + ' notes'
-                  : item.totalNotes === 1
-                  ? item.totalNotes + ' note'
-                  : '0 notes'}
-              </Text>
+              {item && item.totalNotes && item.totalNotes > 1
+                ? item.totalNotes + ' notes'
+                : item.totalNotes === 1
+                ? item.totalNotes + ' note'
+                : '0 notes'}
+            </Text>
 
+            {isTopic || isTrash ? null : (
               <Text
                 style={{
                   color: colors.accent,
@@ -237,8 +237,8 @@ export const NotebookItem = ({
                 }}>
                 {new Date(item.dateCreated).toDateString().substring(4)}
               </Text>
-            </View>
-          )}
+            )}
+          </View>
         </TouchableOpacity>
         {hideMore ||
         (item.title === 'General' && item.type === 'topic') ? null : (
