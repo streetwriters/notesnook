@@ -553,7 +553,7 @@ export const ActionSheetComponent = ({
         }
       }}
       style={{
-        paddingBottom: 15,
+        paddingBottom: 30,
         backgroundColor: colors.bg,
         width: '100%',
         paddingHorizontal: 0,
