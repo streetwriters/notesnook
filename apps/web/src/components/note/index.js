@@ -47,9 +47,9 @@ const menuItems = (note, index, context) => [
     title: "Remove",
     onClick: async () => {
       confirm(
-        Icon.Book,
-        "Remove",
-        "Are you sure you want to Remove this note?"
+        Icon.Topic,
+        "Remove from Topic",
+        "Are you sure you want to remove this note?"
       ).then(async res => {
         if (res) {
           await db.notebooks
