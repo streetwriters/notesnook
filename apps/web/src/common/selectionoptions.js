@@ -30,7 +30,7 @@ const DeleteOption = createOption(Icon.Trash2, async function(state) {
   const item = state.selectedItems[0];
   var isAnyNoteOpened = false;
   const editorState = editorStore.getState();
-  const items = state.selectedItems.map(async item => {
+  const items = state.selectedItems.map(item => {
     if (item.id === editorState.session.id) isAnyNoteOpened = true;
     if (item.locked) return 0;
     return item.id;
