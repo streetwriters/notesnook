@@ -8,15 +8,7 @@ import { DEFAULT_CONTEXT } from "../common";
 const Notes = props => {
   const newSession = useStore(store => store.newSession);
   const selectedNotes = useNotesStore(store => store.selectedNotes);
-  const clearSelectedContext = useNotesStore(
-    store => store.clearSelectedContext
-  );
   const selectedContext = useNotesStore(store => store.selectedContext);
-  useEffect(() => {
-    return () => {
-      clearSelectedContext();
-    };
-  }, [clearSelectedContext]);
   return (
     <ListContainer
       type="notes"
