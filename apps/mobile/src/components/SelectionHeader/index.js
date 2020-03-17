@@ -15,8 +15,7 @@ import {ACTIONS} from '../../provider/actions';
 import {w, ToastEvent, db} from '../../utils/utils';
 import {eSendEvent} from '../../services/eventManager';
 import {eOpenMoveNoteDialog, eOpenSimpleDialog} from '../../services/events';
-
-import {TEMPLATE_DELETE} from '../DialogManager';
+import {TEMPLATE_DELETE} from '../DialogManager/templates';
 
 export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(
   SafeAreaView,
@@ -128,10 +127,10 @@ export const SelectionHeader = ({navigation}) => {
                 let unFavCount = 0;
                 if (selectedItemsList.length > 0) {
                   selectedItemsList.forEach(async item => {
-                    if (item.favorite) {
+                    if (!item.favorite) {
                       favCount += 1;
                     } else {
-                      unFavCount += 1;
+                      return;
                     }
                     await db.notes.note(item.id).favorite();
                     dispatch({type: ACTIONS.NOTES});
@@ -143,10 +142,7 @@ export const SelectionHeader = ({navigation}) => {
                   dispatch({type: ACTIONS.CLEAR_SELECTION});
 
                   ToastEvent.show(
-                    favCount +
-                      ' notes added to favorites &' +
-                      unFavCount +
-                      'removed',
+                    favCount + ' notes added to favorites',
                     'success',
                   );
                 }
