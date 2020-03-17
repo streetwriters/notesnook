@@ -5,7 +5,7 @@ import {inputRef} from '../../components/SearchInput';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
-import {eScrollEvent} from '../../services/events';
+import {eScrollEvent, eClearSearch} from '../../services/events';
 import {NotebookItem} from '../NotebookItem';
 import {hexToRGBA} from '../../utils/utils';
 
