@@ -82,9 +82,12 @@ export const ActionSheetComponent = ({
       return;
     }
     let tag = tagToAdd;
-
+    tag = tag.trim();
     if (tag.includes(' ')) {
       tag = tag.replace(' ', '_');
+    }
+    if (tag.includes(',')) {
+      tag = tag.replace(',', '');
     }
     tagsInputRef.current?.setNativeProps({
       text: '',
@@ -126,11 +129,13 @@ export const ActionSheetComponent = ({
       tagsInputRef.current?.setNativeProps({
         text: '',
       });
+      return;
     } else if (event.nativeEvent.key === ',') {
       _onSubmit();
       tagsInputRef.current?.setNativeProps({
         text: '',
       });
+      return;
     }
   };
 
