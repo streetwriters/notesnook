@@ -26,7 +26,11 @@ import {
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
-import {eOpenModalMenu, eSendSideMenuOverlayRef} from '../../services/events';
+import {
+  eOpenModalMenu,
+  eSendSideMenuOverlayRef,
+  eClearSearch,
+} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
 import {timeSince, getElevation, hexToRGBA, db, DDS} from '../../utils/utils';
 import {inputRef} from '../SearchInput';
@@ -202,17 +206,7 @@ export const Menu = ({
               onPress={() => {
                 item.close === false ? null : close();
                 if (item.close) {
-                  inputRef.current?.setNativeProps({
-                    text: '',
-                  });
-                  dispatch({
-                    type: ACTIONS.SEARCH_RESULTS,
-                    results: {
-                      type: null,
-                      results: [],
-                      keyword: null,
-                    },
-                  });
+                  eSendEvent(eClearSearch);
                 }
                 item.func();
               }}

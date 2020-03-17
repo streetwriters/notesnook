@@ -79,17 +79,7 @@ const SimpleList = ({
         </Text>
         <Text
           onPress={() => {
-            inputRef.current?.setNativeProps({
-              text: '',
-            });
-            dispatch({
-              type: ACTIONS.SEARCH_RESULTS,
-              results: {
-                results: [],
-                type: null,
-                keyword: null,
-              },
-            });
+            eSendEvent(eClearSearch);
           }}
           style={{
             fontFamily: WEIGHT.regular,

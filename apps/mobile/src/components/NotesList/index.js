@@ -12,7 +12,7 @@ import {SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
-import {eScrollEvent} from '../../services/events';
+import {eScrollEvent, eClearSearch} from '../../services/events';
 import {ToastEvent, hexToRGBA, DDS, db} from '../../utils/utils';
 import {NotesPlaceHolder} from '../ListPlaceholders';
 import NoteItem from '../NoteItem';
@@ -177,17 +177,7 @@ export const NotesList = ({isGrouped = false}) => {
       </Text>
       <Text
         onPress={() => {
-          inputRef.current?.setNativeProps({
-            text: '',
-          });
-          dispatch({
-            type: ACTIONS.SEARCH_RESULTS,
-            results: {
-              results: [],
-              type: null,
-              keyword: null,
-            },
-          });
+          eSendEvent(eClearSearch);
         }}
         style={{
           fontFamily: WEIGHT.regular,

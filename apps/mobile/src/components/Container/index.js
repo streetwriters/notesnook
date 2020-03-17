@@ -14,10 +14,10 @@ import {br, opacity, pv, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
-import {eScrollEvent} from '../../services/events';
+import {eScrollEvent, eClearSearch} from '../../services/events';
 import {db, getElevation, ToastEvent, DDS} from '../../utils/utils';
 import {Header} from '../header';
-import {Search} from '../SearchInput';
+import {Search, inputRef} from '../SearchInput';
 import SelectionHeader from '../SelectionHeader';
 
 export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(
@@ -125,6 +125,10 @@ export const Container = ({
 
   const clearSearch = () => {
     searchResult = null;
+    setText(null);
+    inputRef.current?.setNativeProps({
+      text: '',
+    });
     dispatch({
       type: ACTIONS.SEARCH_RESULTS,
       results: {
@@ -136,6 +140,7 @@ export const Container = ({
   };
 
   useEffect(() => {
+    eSubscribeEvent(eClearSearch, clearSearch);
     Keyboard.addListener('keyboardDidShow', () => {
       setTimeout(() => {
         if (DDS.isTab) return;
@@ -149,6 +154,7 @@ export const Container = ({
       }, 0);
     });
     return () => {
+      eUnSubscribeEvent(eClearSearch, clearSearch);
       Keyboard.removeListener('keyboardDidShow', () => {
         setTimeout(() => {
           if (DDS.isTab) return;
