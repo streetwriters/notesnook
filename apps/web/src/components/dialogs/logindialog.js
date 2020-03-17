@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Flex, Box, Button, Text } from "rebass";
 import { Input } from "@rebass/forms";
-import * as Icon from "react-feather";
+import * as Icon from "../icons";
 import Dialog, { showDialog } from "./dialog";
 import { showSignUpDialog } from "./signupdialog";
 import { db } from "../../common";
@@ -15,7 +15,7 @@ const LoginDialog = props => {
     <Dialog
       isOpen={true}
       title={"Login"}
-      icon={Icon.LogIn}
+      icon={Icon.Login}
       onCloseClick={props.onClose}
       negativeButton={{ onClick: props.onClose }}
       positiveButton={{
@@ -32,7 +32,14 @@ const LoginDialog = props => {
             return;
           }
 
-          db.user.login(username, password);
+          db.user
+            .login(username, password)
+            .then(() => {
+              props.onClose();
+            })
+            .catch(() => {
+              setErrorMessage("Failed to login. Please try again.");
+            });
         }
       }}
       content={
@@ -87,5 +94,5 @@ const LoginDialog = props => {
 };
 
 export const showLogInDialog = () => {
-  return showDialog(perform => <LoginDialog onClose={() => perform(false)} />);
+  return showDialog(perform => <LoginDialog onClose={() => perform()} />);
 };

@@ -17,6 +17,7 @@ import { COLORS } from "./common";
 import { toTitleCase } from "./utils/string";
 import * as Icon from "./components/icons";
 import { useStore as useAppStore } from "./stores/app-store";
+import { useStore as useUserStore } from "./stores/user-store";
 import Animated from "./components/animated";
 
 const NavMenuItem = props => {
@@ -78,10 +79,12 @@ function App() {
   const refreshColors = useStore(store => store.refreshColors);
   const setSelectedContext = useNotesStore(store => store.setSelectedContext);
   const isFocusModeEnabled = useAppStore(store => store.isFocusModeEnabled);
+  const initUser = useUserStore(store => store.init);
 
   useEffect(() => {
     RootNavigator.navigate(selectedKey);
     refreshColors();
+    initUser();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -95,6 +98,7 @@ function App() {
   }, [isFocusModeEnabled]);
 
   const colors = useStore(store => store.colors);
+  const isLoggedIn = useUserStore(store => store.isLoggedIn);
   return (
     <ThemeProvider>
       <Flex
@@ -185,7 +189,9 @@ function App() {
               <NavMenuItem
                 onSelected={async () => {
                   if (item.onClick) {
-                    return item.onClick();
+                    item.onClick();
+                    if (item.component) setSelectedKey(item.key);
+                    return;
                   }
                   if (RootNavigator.navigate(item.key)) {
                     setSelectedKey(item.key);

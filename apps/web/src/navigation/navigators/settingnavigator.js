@@ -4,7 +4,7 @@ import { createRoute } from "../routes";
 
 const routes = {
   ...createRoute("settings", Settings, { title: "Settings" }),
-  ...createRoute("account", Account),
+  ...createRoute("account", Account, { title: "Account" }),
   ...createRoute("general", General),
   ...createRoute("TOS", TOS),
   ...createRoute("about", TOS),

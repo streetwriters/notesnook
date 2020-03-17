@@ -4,30 +4,35 @@ import {
   Trash,
   NotebooksContainer,
   TagsContainer,
-  Notes
+  Notes,
+  Account
 } from "../../views";
 import * as Icon from "../../components/icons";
 import { createRoute, createNormalRoute, createDeadRoute } from "../routes";
 import Navigator from "../index";
-import { showLogInDialog } from "../../components/dialogs/logindialog";
 import { changeTheme, isDarkTheme } from "../../utils/theme";
 import SelectionModeOptions from "../../common/selectionoptions";
 import Search from "../../views/Search";
-import { store } from "../../stores/note-store";
+import { store as noteStore } from "../../stores/note-store";
+import { store as userStore } from "../../stores/user-store";
+import { showLogInDialog } from "../../components/dialogs/logindialog";
 
 export const bottomRoutes = {
   ...createDeadRoute("nightmode", Icon.Theme, {
     onClick: () => changeTheme(),
-    bottom: true,
     isToggled: () => isDarkTheme()
   }),
-  ...createDeadRoute("signin", Icon.Login, {
-    onClick: () => showLogInDialog(),
-    bottom: true
+  ...createNormalRoute("account", Account, Icon.User, {
+    onClick: async () => {
+      if (userStore.getState().isLoggedIn) {
+        RootNavigator.navigate("account");
+      } else {
+        await showLogInDialog();
+      }
+    }
   }),
   ...createRoute("settings", SettingsContainer, {
-    icon: Icon.Settings,
-    bottom: true
+    icon: Icon.Settings
   })
 };
 
@@ -43,7 +48,7 @@ export const routes = {
     title: "Favorites",
     options: SelectionModeOptions.FavoritesOptions,
     onClick: () => {
-      store.getState().setSelectedContext({
+      noteStore.getState().setSelectedContext({
         type: "favorites"
       });
       RootNavigator.navigate("favorites");

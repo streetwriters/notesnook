@@ -43,7 +43,14 @@ const SignUpDialog = props => {
             return;
           }
 
-          db.user.signup(username, email, password);
+          db.user
+            .signup(username, email, password)
+            .then(() => {
+              props.onClose();
+            })
+            .catch(() => {
+              setErrorMessage("Couldn't signup. Please try again.");
+            });
         }
       }}
       content={
@@ -58,6 +65,7 @@ const SignUpDialog = props => {
           <Input
             variant="default"
             placeholder="Email"
+            sx={{ marginTop: 2 }}
             onChange={e => {
               setEmail(e.target.value);
             }}
@@ -100,5 +108,5 @@ const SignUpDialog = props => {
 };
 
 export const showSignUpDialog = () => {
-  return showDialog(perform => <SignUpDialog onClose={() => perform(false)} />);
+  return showDialog(perform => <SignUpDialog onClose={() => perform()} />);
 };

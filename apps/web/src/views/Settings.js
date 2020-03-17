@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { Box, Button, Flex, Text, Image } from "rebass";
+import { Box, Button, Flex, Text } from "rebass";
 import * as Icon from "../components/icons";
-import { Switch } from "@rebass/forms";
 import "../app.css";
 import { changeTheme, isDarkTheme, changeAccent } from "../utils/theme";
 import { useTheme } from "emotion-theming";
+import { useStore as useUserStore } from "../stores/user-store";
 
 const Settings = props => {
   const [check, setCheck] = useState(isDarkTheme());
   const theme = useTheme();
+  const user = useUserStore(store => store.user);
+  const isLoggedIn = useUserStore(store => store.isLoggedIn);
   return (
     <Flex flexDirection="column" flex="1 1 auto">
       <Flex
@@ -16,7 +18,8 @@ const Settings = props => {
         bg="shade"
         mx={2}
         p={2}
-        sx={{ borderRadius: "default" }}
+        sx={{ borderRadius: "default", cursor: "pointer" }}
+        onClick={() => props.navigator.navigate("account")}
       >
         <Flex
           flexDirection="column"
@@ -33,12 +36,21 @@ const Settings = props => {
           <Icon.User color="static" />
         </Flex>
         <Flex flexDirection="column" justifyContent="center">
-          <Flex fontSize="subBody" color="gray">
-            You are not logged in
-          </Flex>
-          <Flex fontSize="body" color="primary">
-            Login to sync notes.
-          </Flex>
+          {isLoggedIn ? (
+            <>
+              <Text variant="title">{user.username}</Text>
+              <Text fontSize="subBody">{user.email}</Text>
+            </>
+          ) : (
+            <>
+              <Text fontSize="subBody" color="gray">
+                You are not logged in
+              </Text>
+              <Text fontSize="body" color="primary">
+                Login to sync notes.
+              </Text>
+            </>
+          )}
         </Flex>
       </Flex>
       <Box
