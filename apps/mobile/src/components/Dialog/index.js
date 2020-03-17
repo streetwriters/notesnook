@@ -65,9 +65,6 @@ export class Dialog extends Component {
         updateEvent({type: ACTIONS.CLEAR_SELECTION});
         updateEvent({type: ACTIONS.SELECTION_MODE, enabled: false});
 
-        this.setState({
-          visible: false,
-        });
         if (editing.currentlyEditing) {
           eSendEvent(eOnLoadNote, {type: 'new'});
           if (DDS.isTab) {
@@ -76,6 +73,7 @@ export class Dialog extends Component {
             exitEditorAnimation();
           }
         }
+        this.hide();
         break;
       }
       case dialogActions.ACTION_PERMANANT_DELETE: {
@@ -87,10 +85,12 @@ export class Dialog extends Component {
         history.selectedItemsList.forEach(item => ids.push(item.id));
 
         await db.trash.delete(...ids);
+
         updateEvent({type: ACTIONS.TRASH});
         updateEvent({type: ACTIONS.CLEAR_SELECTION});
         updateEvent({type: ACTIONS.SELECTION_MODE, enabled: false});
         ToastEvent.show('Item permanantly deleted');
+        this.hide();
         break;
       }
       case dialogActions.ACTION_EXIT: {
@@ -98,7 +98,7 @@ export class Dialog extends Component {
           visible: false,
         });
         NavigationService.goBack();
-
+        this.hide();
         break;
       }
       case dialogActions.ACTION_EMPTY_TRASH: {
@@ -108,22 +108,19 @@ export class Dialog extends Component {
         updateEvent({type: ACTIONS.CLEAR_SELECTION});
         updateEvent({type: ACTIONS.SELECTION_MODE, enabled: false});
         ToastEvent.show('Trash cleared', 'error');
-        this.setState({
-          visible: false,
-        });
+        this.hide();
 
         break;
       }
       case dialogActions.ACTION_EXIT_FULLSCREEN: {
         updateEvent({type: ACTIONS.NOTES});
         eSendEvent(eCloseFullscreenEditor);
-        this.setState({
-          visible: false,
-        });
+        this.hide();
         break;
       }
       case dialogActions.ACTION_TRASH: {
         await db.trash.restore(i.id);
+        this.hide();
         ToastEvent.show(
           item.type.slice(0, 1).toUpperCase() +
             item.type.slice(1) +
