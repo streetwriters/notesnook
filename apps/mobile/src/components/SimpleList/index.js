@@ -19,6 +19,9 @@ const SimpleList = ({
   refreshing,
   placeholderText,
   pinned = null,
+  isMove,
+  hideMore,
+  noteToMove,
 }) => {
   const [state, dispatch] = useTracked();
   const {colors, selectionMode} = state;
@@ -116,7 +119,7 @@ const SimpleList = ({
               renderItem={({item, index}) =>
                 item.type === 'notebook' ? (
                   <NotebookItem
-                    hideMore={params.hideMore}
+                    hideMore={hideMore}
                     customStyle={{
                       backgroundColor: Platform.ios
                         ? hexToRGBA(colors.accent + '19')
@@ -130,9 +133,9 @@ const SimpleList = ({
                       borderBottomWidth: 0,
                       marginHorizontal: 0,
                     }}
-                    isMove={params.isMove}
+                    isMove={isMove}
                     onLongPress={() => {}}
-                    noteToMove={params.note}
+                    noteToMove={noteToMove}
                     item={item}
                     pinned={true}
                     index={index}

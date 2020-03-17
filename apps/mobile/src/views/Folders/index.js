@@ -127,6 +127,9 @@ export const Folders = ({navigation}) => {
         focused={isFocused}
         onRefresh={_onRefresh}
         renderItem={_renderItem}
+        hideMore={params.hideMore}
+        isMove={params.isMove}
+        noteToMove={params.note}
         placeholder={
           <>
             <NotebookPlaceHolder animation={slideRight} colors={colors} />
