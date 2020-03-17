@@ -46,6 +46,7 @@ export class Dialog extends Component {
             await db.notes.delete(i.id);
             ToastEvent.show('Notes moved to trash', 'error', 3000);
             updateEvent({type: i.type});
+            updateEvent({type: ACTIONS.PINNED});
           } else if (i.type === 'topic') {
             await db.notebooks.notebook(i.notebookId).topics.delete(i.title);
 
@@ -56,6 +57,7 @@ export class Dialog extends Component {
           } else if (i.type === 'notebook') {
             await db.notebooks.delete(i.id);
             updateEvent({type: i.type});
+            updateEvent({type: ACTIONS.PINNED});
             ToastEvent.show('Notebooks moved to trash', 'error', 3000);
           }
         });
