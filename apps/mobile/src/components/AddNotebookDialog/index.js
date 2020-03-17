@@ -119,6 +119,7 @@ export class AddNotebookDialog extends React.Component {
         this.currentInputValue.trim().length !== 0
       ) {
         t.push(this.currentInputValue);
+        this.currentInputValue = null;
       }
       if (id) {
         await db.notebooks.add({
