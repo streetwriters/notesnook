@@ -9,12 +9,18 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Keyboard,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import WebView from 'react-native-webview';
-
 import {normalize, SIZE, WEIGHT} from '../../common/common';
+import {
+  ActionSheetEvent,
+  simpleDialogEvent,
+} from '../../components/DialogManager/recievers';
+import {
+  TEMPLATE_EXIT_FULLSCREEN,
+  TEMPLATE_INFO,
+} from '../../components/DialogManager/templates';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {
@@ -29,16 +35,8 @@ import {
   refreshNotesPage,
 } from '../../services/events';
 import {exitEditorAnimation} from '../../utils/animations';
-import {editing, timeConverter, ToastEvent, DDS, db} from '../../utils/utils';
-import {
-  ActionSheetEvent,
-  simpleDialogEvent,
-} from '../../components/DialogManager/recievers';
-import {
-  TEMPLATE_INFO,
-  TEMPLATE_EXIT_FULLSCREEN,
-} from '../../components/DialogManager/templates';
 import {sideMenuRef} from '../../utils/refs';
+import {db, DDS, editing, timeConverter, ToastEvent} from '../../utils/utils';
 
 const EditorWebView = createRef();
 let note = {};
@@ -48,7 +46,7 @@ var title = null;
 let timer = null;
 let saveCounter = 0;
 let tapCount = 0;
-
+let canSave = false;
 const Editor = ({noMenu}) => {
   // Global State
   const [state, dispatch] = useTracked();
@@ -87,6 +85,7 @@ const Editor = ({noMenu}) => {
         post({
           type: 'focusTitle',
         });
+        canSave = true;
       } else {
         note = item;
         dispatch({
@@ -102,6 +101,7 @@ const Editor = ({noMenu}) => {
         post({
           type: 'focusTitle',
         });
+        canSave = true;
       } else {
         note = item;
         dispatch({
@@ -122,11 +122,12 @@ const Editor = ({noMenu}) => {
     id = null;
     tapCount = 0;
     saveCounter = 0;
+    canSave = false;
     post({
       type: 'clearEditor',
     });
     post({
-      type: 'clearEditor',
+      type: 'clearTitle',
     });
     post({
       type: 'blur',
@@ -170,7 +171,16 @@ const Editor = ({noMenu}) => {
 
   const saveNote = async (lockNote = true) => {
     if (!title && !content) return;
-    if (title?.trim().length === 0 && content.text?.trim().length === 0) return;
+    if (title === '' && content.text === '') return;
+    if (
+      title &&
+      title.trim().length === 0 &&
+      content &&
+      content?.text?.trim().length === 0
+    )
+      return;
+    if (!canSave) return;
+
     if (!content) {
       content = {
         text: '',
@@ -320,12 +330,10 @@ const Editor = ({noMenu}) => {
     saveCounter = 0;
 
     if (title !== null || title === '') {
-      post(
-        JSON.stringify({
-          type: 'title',
-          value: note.title,
-        }),
-      );
+      post({
+        type: 'title',
+        value: note.title,
+      });
     } else {
       post({
         type: 'clearTitle',
@@ -348,7 +356,6 @@ const Editor = ({noMenu}) => {
       } else {
         delta = await db.notes.note(id).delta();
       }
-
       post({
         type: 'delta',
         value: delta,
@@ -356,6 +363,7 @@ const Editor = ({noMenu}) => {
     } else {
       post({type: 'text', value: note.content.text});
     }
+    canSave = true;
   };
 
   const params = 'platform=' + Platform.OS;
