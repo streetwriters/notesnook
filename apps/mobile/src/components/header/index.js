@@ -8,11 +8,11 @@ import {eSendEvent} from '../../services/eventManager';
 import {eCloseLoginDialog} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
 import {DDS} from '../../utils/utils';
-import {moveNoteHideEvent} from '../DialogManager';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Menu, {MenuItem, MenuDivider} from 'react-native-material-menu';
 import {ACTIONS} from '../../provider/actions';
 import {sideMenuRef} from '../../utils/refs';
+import {moveNoteHideEvent} from '../DialogManager/recievers';
 export const Header = ({
   heading,
   canGoBack = true,
