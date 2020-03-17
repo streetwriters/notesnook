@@ -8,6 +8,7 @@ import {getElevation, ToastEvent, db} from '../../utils/utils';
 
 import {eSendEvent} from '../../services/eventManager';
 import {eOnNewTopicAdded} from '../../services/events';
+import {Toast} from '../Toast';
 
 export class AddTopicDialog extends React.Component {
   constructor(props) {
@@ -23,13 +24,13 @@ export class AddTopicDialog extends React.Component {
 
   addNewTopic = async () => {
     if (!this.title)
-      return ToastEvent.show('Title is required', 'error', 3000, () => {}, '');
+      return ToastEvent.show('Title is required', 'error', 'local');
 
     await db.notebooks.notebook(this.props.notebookID).topics.add(this.title);
     this.close();
     eSendEvent(eOnNewTopicAdded);
 
-    ToastEvent.show('New topic added', 'success', 3000, () => {}, '');
+    ToastEvent.show('New topic added', 'success');
   };
 
   open() {
@@ -192,6 +193,7 @@ export class AddTopicDialog extends React.Component {
             </View>
           </View>
         </View>
+        <Toast context="local" />
       </Modal>
     );
   }
