@@ -53,7 +53,7 @@ export default class User {
   }
 
   logout() {
-    this.context.clear();
+    return this.context.clear();
   }
 
   async signup(username, email, password) {
