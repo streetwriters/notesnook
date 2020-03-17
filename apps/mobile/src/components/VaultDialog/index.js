@@ -41,6 +41,7 @@ export class VaultDialog extends Component {
       deleteNote: false,
     };
     this.password = null;
+    this.confirmPassword = null;
   }
 
   componentDidMount() {
@@ -62,7 +63,6 @@ export class VaultDialog extends Component {
     share = false,
     deleteNote = false,
   }) => {
-    console.log(goToEditor, 'goToEditor');
     this.setState({
       visible: true,
       note: item,
@@ -97,17 +97,15 @@ export class VaultDialog extends Component {
 
         return;
       }
-      if (
-        this.password &&
-        this.password.trim() !== 0 &&
-        this.state.passwordsDontMatch
-      ) {
+      if (this.password !== this.confirmPassword) {
         ToastEvent.show('Passwords do not match', 'error', 'local');
-
+        this.setState({
+          passwordsDontMatch: true,
+        });
         return;
-      } else {
-        this._createVault();
       }
+
+      this._createVault();
     } else if (this.state.locked) {
       if (!this.password || this.password.trim() === 0) {
         ToastEvent.show('Password is invalid', 'error', 'local');
@@ -395,6 +393,7 @@ export class VaultDialog extends Component {
                   }}
                   secureTextEntry
                   onChangeText={value => {
+                    this.confirmPassword = value;
                     if (value !== this.password) {
                       this.setState({
                         passwordsDontMatch: true,
