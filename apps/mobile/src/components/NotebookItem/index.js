@@ -5,9 +5,9 @@ import {opacity, ph, pv, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
 import NavigationService from '../../services/NavigationService';
 import {ToastEvent, w, getElevation, db, DDS} from '../../utils/utils';
-import {ActionSheetEvent, moveNoteHideEvent} from '../DialogManager';
 
 import {ACTIONS} from '../../provider/actions';
+import {moveNoteHideEvent, ActionSheetEvent} from '../DialogManager/recievers';
 
 export const NotebookItem = ({
   item,
