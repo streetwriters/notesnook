@@ -101,9 +101,12 @@ export class DialogManager extends Component {
   };
 
   showAddTopic = notebook => {
-    this.setState({
-      item: notebook,
-    });
+    if (notebook) {
+      this.setState({
+        item: notebook,
+      });
+    }
+
     this.addTopicsDialog.open();
   };
 
@@ -200,7 +203,6 @@ export class DialogManager extends Component {
           } else {
             this._showSimpleDialog(TEMPLATE_DELETE(this.state.item.type));
           }
-
           break;
         }
         case 'permanant_delete': {
