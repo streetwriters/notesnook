@@ -434,7 +434,7 @@ export const Settings = ({navigation}) => {
                 textAlignVertical: 'center',
                 color: colors.pri,
               }}>
-              {settings.fontScale + 'X'}
+              {settings.fontScale ? settings.fontScale + 'X' : '1X'}
             </Text>
           </View>
         </TouchableOpacity>

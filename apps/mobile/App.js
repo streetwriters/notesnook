@@ -57,14 +57,17 @@ const App = () => {
     let s = await MMKV.getString('settings');
     if (typeof s !== 'string') {
       s = defaultState.settings;
-
       s = JSON.stringify(s);
+      s.fontScale = 1;
       await MMKV.setString('settings', s);
       dispatch({type: ACTIONS.SETTINGS, s});
     } else {
       s = JSON.parse(s);
-      scale.fontScale = s.fontScale;
-
+      if (s.fontScale) {
+        scale.fontScale = s.fontScale;
+      } else {
+        scale.fontScale = 1;
+      }
       updateSize();
 
       dispatch({type: ACTIONS.SETTINGS, settings: {...s}});
