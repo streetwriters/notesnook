@@ -165,28 +165,6 @@ export const SelectionHeader = () => {
               onPress={async () => {
                 eSendEvent(eOpenSimpleDialog, TEMPLATE_DELETE('item'));
                 return;
-                if (selectedItemsList.length > 0) {
-                  let noteIds = [];
-                  selectedItemsList.forEach(item => {
-                    noteIds.push(item.id);
-                  });
-                  if (currentScreen === 'notebooks') {
-                    await db.notebooks.delete(...noteIds);
-                    dispatch({type: ACTIONS.NOTEBOOKS});
-                    ToastEvent.show('Notebooks moved to trash');
-                  } else if (currentScreen === 'notebook') {
-                    ToastEvent.show('Topics moved to trash');
-                    // TODO
-                  } else {
-                    await db.notes.delete(...noteIds);
-                    dispatch({type: ACTIONS.NOTES});
-                    ToastEvent.show('Notes moved to trash');
-                  }
-
-                  dispatch({type: ACTIONS.SELECTION_MODE, enabled: false});
-
-                  dispatch({type: ACTIONS.CLEAR_SELECTION});
-                }
               }}>
               <Icon
                 style={{
