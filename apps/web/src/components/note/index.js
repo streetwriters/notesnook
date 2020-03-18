@@ -43,7 +43,7 @@ const menuItems = (note, index, context) => [
     }
   },
   {
-    invisible: !context,
+    invisible: context ? (context.type === "topic" ? false : true) : true,
     title: "Remove",
     onClick: async () => {
       confirm(

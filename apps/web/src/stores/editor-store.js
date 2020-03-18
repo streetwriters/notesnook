@@ -11,6 +11,7 @@ const SESSION_STATES = {
 };
 
 const DEFAULT_SESSION = {
+  notebook: undefined,
   state: "",
   isSaving: false,
   title: "",
