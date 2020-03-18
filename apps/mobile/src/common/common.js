@@ -11,7 +11,6 @@ export const scale = {
   fontScale: 1,
 };
 const {height, width} = Dimensions.get('window');
-const standardLength = width > height ? width : height;
 
 //COLOR SCHEME
 export const ACCENT = {
@@ -102,7 +101,7 @@ const correction = (size, multiplier) => {
   let dSize = getDeviceSize();
 
   if (dSize > 4 && dSize <= 5.3 && pixelDensity <= 3) {
-    return size * 0.87;
+    return size * 0.92;
   } else if (dSize > 5.5 && dSize < 6.5 && pixelDensity <= 3) {
     if (Platform.OS === 'ios') {
       return size;
@@ -125,7 +124,6 @@ const correction = (size, multiplier) => {
 
 export const normalize = size => {
   let pd = pixelDensity;
-  console.log(pd);
   if (pd === 1 || pd < 1) {
     return correction(size, 0.75);
   } else if (pd > 1 && pd <= 1.5) {

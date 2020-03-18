@@ -256,7 +256,7 @@ export const NotesList = ({isGrouped = false}) => {
 
 const PinnedItems = () => {
   const [state, dispatch] = useTracked();
-  const {pinned, colors} = state;
+  const {pinned, colors, selectionMode} = state;
 
   useEffect(() => {
     dispatch({type: ACTIONS.PINNED});
@@ -269,26 +269,43 @@ const PinnedItems = () => {
         keyExtractor={(item, index) => item.id.toString()}
         renderItem={({item, index}) =>
           item.type === 'note' ? (
-            <NoteItem
-              colors={colors}
-              customStyle={{
-                backgroundColor: Platform.ios
-                  ? hexToRGBA(colors.accent + '19')
-                  : hexToRGBA(colors.shade),
-                width: '100%',
-                paddingHorizontal: 12,
-                paddingTop: 20,
-                paddingRight: 18,
-                marginBottom: 10,
-                marginTop: 20,
-                borderBottomWidth: 0,
-                marginHorizontal: 0,
-              }}
-              onLongPress={() => {}}
-              pinned={true}
-              item={item}
+            <SelectionWrapper
               index={index}
-            />
+              currentEditingNote={false}
+              pinned={true}
+              background={
+                Platform.ios
+                  ? hexToRGBA(colors.accent + '19')
+                  : hexToRGBA(colors.shade)
+              }
+              item={item}>
+              <NoteItem
+                colors={colors}
+                customStyle={{
+                  width: selectionMode ? '90%' : '100%',
+                  marginHorizontal: 0,
+                  paddingTop: 15,
+                  paddingRight: 18,
+                  marginBottom: 10,
+                  marginTop: 15,
+                  borderBottomWidth: 0,
+                }}
+                currentEditingNote={false}
+                pinned={true}
+                selectionMode={selectionMode}
+                onLongPress={() => {
+                  if (!selectionMode) {
+                    dispatch({type: ACTIONS.SELECTION_MODE, enabled: true});
+                  }
+                  dispatch({type: ACTIONS.SELECTED_ITEMS, item: item});
+                }}
+                update={() => {
+                  dispatch({type: ACTIONS.NOTES});
+                }}
+                item={item}
+                index={index}
+              />
+            </SelectionWrapper>
           ) : null
         }
       />

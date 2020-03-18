@@ -5,8 +5,16 @@ import {SIZE} from '../../common/common';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import Animated from 'react-native-reanimated';
+import {getElevation} from '../../utils/utils';
 
-const SelectionWrapper = ({children, item, currentEditingNote, index}) => {
+const SelectionWrapper = ({
+  children,
+  item,
+  currentEditingNote,
+  index,
+  background,
+  pinned,
+}) => {
   const [state, dispatch] = useTracked();
   const {colors, selectionMode, selectedItemsList} = state;
   const [selected, setSelected] = useState(false);
@@ -34,11 +42,44 @@ const SelectionWrapper = ({children, item, currentEditingNote, index}) => {
         alignItems: 'center',
         width: '100%',
         paddingHorizontal: 12,
+        marginTop:
+          index === 0 && pinned && !selectionMode
+            ? 15
+            : index === 0 && pinned && selectionMode
+            ? 30
+            : 0,
         backgroundColor:
           currentEditingNote === item.dateCreated
             ? colors.shade
+            : background
+            ? background
             : 'transparent',
       }}>
+      {pinned ? (
+        <View
+          style={{
+            ...getElevation(3),
+            width: 30,
+            height: 30,
+            backgroundColor: colors.accent,
+            borderRadius: 100,
+            position: 'absolute',
+            left: 20,
+            top: -15,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <View
+            style={{
+              width: 5,
+              height: 5,
+              backgroundColor: 'white',
+              borderRadius: 100,
+            }}
+          />
+        </View>
+      ) : null}
+
       <View
         style={{
           display: selectionMode ? 'flex' : 'none',

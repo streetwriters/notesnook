@@ -82,31 +82,6 @@ export default class NoteItem extends React.Component {
           },
           customStyle ? customStyle : {},
         ]}>
-        {pinned ? (
-          <View
-            style={{
-              ...getElevation(3),
-              width: 30,
-              height: 30,
-              backgroundColor: colors.accent,
-              borderRadius: 100,
-              position: 'absolute',
-              left: 20,
-              top: -15,
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <View
-              style={{
-                width: 5,
-                height: 5,
-                backgroundColor: 'white',
-                borderRadius: 100,
-              }}
-            />
-          </View>
-        ) : null}
-
         <TouchableOpacity
           activeOpacity={0.8}
           onLongPress={() => onLongPress()}

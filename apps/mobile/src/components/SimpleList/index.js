@@ -7,7 +7,8 @@ import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
 import {eScrollEvent, eClearSearch} from '../../services/events';
 import {NotebookItem} from '../NotebookItem';
-import {hexToRGBA} from '../../utils/utils';
+import {hexToRGBA, getElevation} from '../../utils/utils';
+import SelectionWrapper from '../SelectionWrapper';
 
 const SimpleList = ({
   data,
@@ -108,29 +109,45 @@ const SimpleList = ({
               keyExtractor={(item, index) => item.id.toString()}
               renderItem={({item, index}) =>
                 item.type === 'notebook' ? (
-                  <NotebookItem
-                    hideMore={hideMore}
-                    customStyle={{
-                      backgroundColor: Platform.ios
-                        ? hexToRGBA(colors.accent + '19')
-                        : hexToRGBA(colors.shade),
-                      width: '100%',
-                      paddingHorizontal: 12,
-                      paddingTop: 20,
-                      paddingRight: 18,
-                      marginBottom: 10,
-                      marginTop: 20,
-                      borderBottomWidth: 0,
-                      marginHorizontal: 0,
-                    }}
-                    isMove={isMove}
-                    onLongPress={() => {}}
-                    noteToMove={noteToMove}
-                    item={item}
-                    pinned={true}
+                  <SelectionWrapper
                     index={index}
-                    colors={colors}
-                  />
+                    currentEditingNote={false}
+                    pinned={true}
+                    background={
+                      Platform.ios
+                        ? hexToRGBA(colors.accent + '19')
+                        : hexToRGBA(colors.shade)
+                    }
+                    item={item}>
+                    <NotebookItem
+                      hideMore={hideMore}
+                      customStyle={{
+                        width: '100%',
+                        paddingTop: 15,
+                        paddingRight: 18,
+                        marginBottom: 10,
+                        marginTop: 15,
+                        borderBottomWidth: 0,
+                        marginHorizontal: 0,
+                      }}
+                      isMove={isMove}
+                      selectionMode={selectionMode}
+                      onLongPress={() => {
+                        if (!selectionMode) {
+                          dispatch({
+                            type: ACTIONS.SELECTION_MODE,
+                            enabled: true,
+                          });
+                        }
+                        dispatch({type: ACTIONS.SELECTED_ITEMS, item: item});
+                      }}
+                      noteToMove={noteToMove}
+                      item={item}
+                      pinned={true}
+                      index={index}
+                      colors={colors}
+                    />
+                  </SelectionWrapper>
                 ) : null
               }
             />

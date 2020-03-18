@@ -70,31 +70,6 @@ export const NotebookItem = ({
         },
         customStyle,
       ]}>
-      {pinned ? (
-        <View
-          style={{
-            ...getElevation(3),
-            width: 30,
-            height: 30,
-            backgroundColor: colors.accent,
-            borderRadius: 100,
-            position: 'absolute',
-            left: 20,
-            top: -15,
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}>
-          <View
-            style={{
-              width: 5,
-              height: 5,
-              backgroundColor: 'white',
-              borderRadius: 100,
-            }}
-          />
-        </View>
-      ) : null}
-
       <View
         style={{
           flexDirection: 'row',
