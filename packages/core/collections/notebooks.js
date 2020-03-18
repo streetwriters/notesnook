@@ -4,6 +4,7 @@ import Notebook from "../models/notebook";
 import Notes from "./notes";
 import Trash from "./trash";
 import sort from "fast-sort";
+import getId from "../utils/id"
 
 var tfun = require("transfun/transfun.js").tfun;
 if (!tfun) {
@@ -28,7 +29,7 @@ export default class Notebooks {
   async add(notebookArg) {
     if (!notebookArg) throw new Error("Notebook cannot be undefined or null.");
     //TODO reliably and efficiently check for duplicates.
-    const id = notebookArg.id || Date.now().toString() + "_notebook";
+    const id = notebookArg.id || getId();
     let oldNotebook = this._collection.getItem(id);
 
     if (!oldNotebook && !notebookArg.title)

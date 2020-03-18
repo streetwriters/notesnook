@@ -50,17 +50,19 @@ export default class Sync {
   async start() {
     let user = await this.db.user.get();
     if (!user) return false;
-    let lastSyncedTimestamp = user.lastSyncedTimestamp || 0;
+    let lastSyncedTimestamp = user.lastSynced || 0;
     let serverResponse = await this._fetch(lastSyncedTimestamp);
     let data = this._merge({ serverResponse, lastSyncedTimestamp, user });
-    await this.db.user.set({ lastSynced: data.lastSynced });
     await this._send(data);
+    await this.db.user.set({ lastSynced: data.lastSynced });
     return true;
   }
+  
 
   _merge({ serverResponse, lastSyncedTimestamp, user }) {
     const { notes, notebooks /* tags, colors, trash */ } = serverResponse;
 
+    if (notes)
     notes.forEach(async note => {
       note = JSON.parse(note.data);
       let localNote = this.db.notes.note(note.id);
@@ -68,6 +70,7 @@ export default class Sync {
         await this.db.notes.add({ ...note, remote: true });
       }
     });
+    if(notebooks)
     notebooks.forEach(async nb => {
       nb = JSON.parse(nb.data);
       let localNb = this.db.notebooks.notebook(nb.id);
@@ -80,22 +83,24 @@ export default class Sync {
       notes: this.db.notes.all
         .filter(v => v.dateEdited > lastSyncedTimestamp)
         .map(v => ({
+          id: v.id,
           dateEdited: v.dateEdited,
           dateCreated: v.dateCreated,
           data: JSON.stringify(v),
-          userId: user.Id
+          userId: user.Id,
         })),
       notebooks: this.db.notebooks.all
         .filter(v => v.dateEdited > lastSyncedTimestamp)
         .map(v => ({
+          id: v.id,
           dateEdited: v.dateEdited,
           dateCreated: v.dateCreated,
           data: JSON.stringify(v),
-          userId: user.Id
+          userId: user.Id,
         })),
       tags: [],
       colors: [],
-      tags: [],
+      trash: [],
       lastSynced: Date.now()
     };
   }

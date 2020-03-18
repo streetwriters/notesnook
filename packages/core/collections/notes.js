@@ -12,6 +12,7 @@ import Storage from "../database/storage";
 import Notebooks from "./notebooks";
 import Note from "../models/note";
 import Trash from "./trash";
+import getId from "../utils/id"
 var tfun = require("transfun/transfun.js").tfun;
 if (!tfun) {
   tfun = global.tfun;
@@ -39,7 +40,7 @@ export default class Notes {
   async add(noteArg) {
     if (!noteArg) return;
 
-    let id = noteArg.id || Date.now().toString() + "_note";
+    let id = noteArg.id || getId();
     let oldNote = this._collection.getItem(id);
     let note = {
       ...oldNote,
