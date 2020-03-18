@@ -63,7 +63,7 @@ export default class User {
       email
     });
     let user = userFromResponse(response);
-    await this.context.write(user.username, user);
+    await this.context.write("user", user);
   }
 }
 
