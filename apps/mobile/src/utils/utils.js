@@ -31,6 +31,11 @@ export const editing = {
     type: null,
   },
 };
+export const selection = {
+  data: [],
+  type: null,
+  selectedItems: [],
+};
 
 export const history = {
   selectedItemsList: [],

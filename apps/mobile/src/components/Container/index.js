@@ -15,7 +15,7 @@ import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
 import {eScrollEvent, eClearSearch} from '../../services/events';
-import {db, getElevation, ToastEvent, DDS} from '../../utils/utils';
+import {db, getElevation, ToastEvent, DDS, selection} from '../../utils/utils';
 import {Header} from '../header';
 import {Search, inputRef} from '../SearchInput';
 import SelectionHeader from '../SelectionHeader';
@@ -171,6 +171,8 @@ export const Container = ({
   }, []);
 
   useEffect(() => {
+    selection.data = data;
+    selection.type = type;
     eSubscribeEvent(eScrollEvent, onScroll);
 
     return () => {
@@ -194,7 +196,7 @@ export const Container = ({
         style={{
           height: '100%',
         }}>
-        {noSelectionHeader ? null : <SelectionHeader />}
+        {noSelectionHeader ? null : <SelectionHeader items={data} />}
 
         <View
           style={{

@@ -17,4 +17,5 @@ export const ACTIONS = {
   USER: 'getUser',
   CURRENT_SCREEN: 'currentScreen',
   SETTINGS: 'getSettings',
+  SELECT_ALL: 'selectAll',
 };

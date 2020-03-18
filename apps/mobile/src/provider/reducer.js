@@ -96,6 +96,14 @@ export const reducer = (state, action) => {
         selectionMode: action.enabled,
       };
     }
+    case ACTIONS.SELECT_ALL: {
+      console.log(action.selected);
+
+      return {
+        ...state,
+        selectedItemsList: action.selected,
+      };
+    }
     case ACTIONS.SELECTED_ITEMS: {
       let selectedItems = [...state.selectedItemsList];
       if (selectedItems.includes(action.item)) {

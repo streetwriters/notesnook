@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Platform,
   SafeAreaView,
@@ -12,7 +12,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
-import {w, ToastEvent, db} from '../../utils/utils';
+import {w, ToastEvent, db, selection} from '../../utils/utils';
 import {eSendEvent} from '../../services/eventManager';
 import {eOpenMoveNoteDialog, eOpenSimpleDialog} from '../../services/events';
 import {TEMPLATE_DELETE} from '../DialogManager/templates';
@@ -21,12 +21,14 @@ export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(
   SafeAreaView,
 );
 
-export const SelectionHeader = ({navigation}) => {
+export const SelectionHeader = () => {
   // State
   const [state, dispatch] = useTracked();
   const {colors, selectionMode, selectedItemsList, currentScreen} = state;
+  const [selectAll, setSelectAll] = useState(false);
 
   useEffect(() => {
+    console.log(selection.data, selection.type);
     console.log(currentScreen);
   }, [currentScreen]);
 
@@ -38,7 +40,7 @@ export const SelectionHeader = ({navigation}) => {
       style={{
         width: '100%',
         position: 'absolute',
-        height: Platform.OS === 'android' ? 50 + StatusBar.currentHeight : 50,
+        height: Platform.OS === 'android' ? 80 + StatusBar.currentHeight : 80,
         backgroundColor: colors.bg,
         paddingTop: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight,
         justifyContent: 'flex-end',
@@ -67,7 +69,6 @@ export const SelectionHeader = ({navigation}) => {
           <TouchableOpacity
             onPress={() => {
               dispatch({type: ACTIONS.SELECTION_MODE, enabled: !selectionMode});
-
               dispatch({type: ACTIONS.CLEAR_SELECTION});
             }}
             hitSlop={{top: 20, bottom: 20, left: 50, right: 40}}
@@ -86,6 +87,7 @@ export const SelectionHeader = ({navigation}) => {
               size={SIZE.xxxl}
             />
           </TouchableOpacity>
+
           <Text
             style={{
               fontSize: SIZE.lg,
@@ -93,7 +95,7 @@ export const SelectionHeader = ({navigation}) => {
               color: colors.pri,
               textAlignVertical: 'center',
             }}>
-            {selectedItemsList.length}
+            {selectAll ? 'All' : selectedItemsList.length}
           </Text>
         </View>
 
@@ -227,6 +229,44 @@ export const SelectionHeader = ({navigation}) => {
           ) : null}
         </View>
       </View>
+
+      <TouchableOpacity
+        onPress={() => {
+          if (selectAll) {
+            dispatch({type: ACTIONS.SELECT_ALL, selected: []});
+          } else {
+            dispatch({
+              type: ACTIONS.SELECT_ALL,
+              selected:
+                selection.type === 'notes' ? db.notes.all : selection.data,
+            });
+          }
+
+          setSelectAll(!selectAll);
+        }}
+        hitSlop={{top: 20, bottom: 20, left: 20, right: 40}}
+        style={{
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: 40,
+          flexDirection: 'row',
+          alignSelf: 'flex-start',
+        }}>
+        <Icon
+          style={{}}
+          color={selectAll ? colors.accent : colors.icon}
+          name={
+            selectAll ? 'check-circle-outline' : 'checkbox-blank-circle-outline'
+          }
+          size={SIZE.lg}
+        />
+        <Text
+          style={{
+            marginLeft: 10,
+          }}>
+          Select All
+        </Text>
+      </TouchableOpacity>
     </Animatable.View>
   );
 };
