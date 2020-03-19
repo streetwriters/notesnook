@@ -43,7 +43,7 @@ export default class Sync {
 
   async _fetch(lastSyncedTimestamp) {
     let token = await this.db.user.token();
-    if (!token) return;
+    if (!token) throw new Error("You are not logged in");
     let response = await fetch(`${HOST}sync?lst=${lastSyncedTimestamp}`, {
       headers: { ...HEADERS, Authorization: `Bearer ${token}` }
     });
@@ -53,13 +53,12 @@ export default class Sync {
 
   async start() {
     let user = await this.db.user.get();
-    if (!user) return false;
+    if (!user) throw new Error("You need to login to sync.");
     let lastSyncedTimestamp = user.lastSynced || 0;
     let serverResponse = await this._fetch(lastSyncedTimestamp);
     let data = await this._merge({ serverResponse, lastSyncedTimestamp, user });
     await this._send(data);
     await this.db.user.set({ lastSynced: data.lastSynced });
-    return true;
   }
 
   async _merge({ serverResponse, lastSyncedTimestamp, user }) {

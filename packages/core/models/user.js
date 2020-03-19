@@ -33,6 +33,9 @@ export default class User {
   async token() {
     let user = await this.get();
     if (!user) return;
+    if (!user.accessToken) {
+      return await this.context.remove("user");
+    }
     if (user.expiry > Date.now()) {
       return user.accessToken;
     }
@@ -44,8 +47,8 @@ export default class User {
     dt.setDate(dt.getDate() + 1);
     user = {
       ...user,
-      accessToken: response.accessToken,
-      refreshToken: response.refreshToken,
+      accessToken: response.access_token,
+      refreshToken: response.refresh_token,
       expiry: dt.getTime()
     };
     await this.context.write("user", user);
