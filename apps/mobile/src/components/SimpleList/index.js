@@ -164,7 +164,7 @@ const SimpleList = ({
         alignItems: 'center',
         alignSelf: 'center',
         justifyContent: 'center',
-        opacity: 0.8,
+        opacity: 1,
       }}>
       <>
         {placeholder}

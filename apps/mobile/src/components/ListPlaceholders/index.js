@@ -10,95 +10,177 @@ import {
   slideLeft,
   slideRight,
 } from '../../utils/animations';
-import {w, hexToRGBA} from '../../utils/utils';
+import {w, hexToRGBA, getElevation} from '../../utils/utils';
 
 export const NotebookPlaceHolder = ({colors, animation}) => {
-  return (
-    <Animatable.View
-      animation={animation}
-      iterationCount="infinite"
-      duration={3000}
-      iterationDelay={0}
-      direction="alternate"
-      easing="ease-in"
-      useNativeDriver={true}
-      style={{
-        backgroundColor: Platform.ios
-          ? hexToRGBA(colors.accent + '19')
-          : hexToRGBA(colors.shade),
-        width: '50%',
-        padding: 5,
-        borderRadius: 5,
-        marginBottom: 10,
-      }}>
-      <View
-        style={{
-          width: '50%',
-          height: 15,
-          borderRadius: 100,
-          backgroundColor: colors.accent,
-          marginBottom: 8,
-        }}
-      />
-      <View
-        style={{
-          width: '70%',
-          height: 10,
+  const slideRight = {
+    0: {
+      transform: [
+        {translateX: -2},
+        {
+          translateY: -2,
+        },
+      ],
+    },
+    0.5: {
+      transform: [
+        {translateX: 0},
+        {
+          translateY: 0,
+        },
+      ],
+    },
+    1: {
+      transform: [
+        {translateX: 2},
+        {
+          translateY: 2,
+        },
+      ],
+    },
+  };
 
-          marginBottom: 8,
-          flexDirection: 'row',
-        }}>
-        <View
-          style={{
-            width: '30%',
-            height: 10,
-            borderRadius: 5,
-            backgroundColor: colors.accent,
-            marginRight: 8,
-          }}
-        />
-        <View
-          style={{
-            width: '30%',
-            height: 10,
-            borderRadius: 5,
-            backgroundColor: colors.accent,
-            marginRight: 8,
-          }}
-        />
-        <View
-          style={{
-            width: '30%',
-            height: 10,
-            borderRadius: 5,
-            backgroundColor: colors.accent,
-            marginRight: 8,
-          }}
-        />
-      </View>
-      <View
+  const slideLeft = {
+    0: {
+      transform: [
+        {translateX: 2},
+        {
+          translateY: 2,
+        },
+      ],
+    },
+    0.5: {
+      transform: [
+        {translateX: 0},
+        {
+          translateY: 0,
+        },
+      ],
+    },
+    1: {
+      transform: [
+        {translateX: -2},
+        {
+          translateY: -2,
+        },
+      ],
+    },
+  };
+
+  return (
+    <View
+      style={{
+        height: 200,
+      }}>
+      <Animatable.View
+        animation={slideLeft}
+        iterationCount="infinite"
+        duration={3000}
+        iterationDelay={0}
+        direction="alternate"
+        easing="ease-in"
+        useNativeDriver={true}
         style={{
-          flexDirection: 'row',
+          ...getElevation(5),
+          backgroundColor: '#a9a9a9',
+          width: 130,
+          borderRadius: 5,
+          height: 150,
+          zIndex: 10,
         }}>
         <View
           style={{
-            width: '15%',
-            height: 8,
+            ...getElevation(3),
+            backgroundColor: colors.accent,
+            width: 120,
             borderRadius: 5,
-            backgroundColor: colors.icon,
-            marginRight: '5%',
-          }}
-        />
+            height: 150,
+            alignSelf: 'flex-start',
+            justifyContent: 'center',
+          }}>
+          <View
+            style={{
+              width: '100%',
+              height: 8,
+              backgroundColor: 'white',
+              marginBottom: 15,
+            }}></View>
+          <Text
+            style={{
+              fontFamily: WEIGHT.bold,
+              fontSize: SIZE.xs,
+              color: 'white',
+              textAlign: 'center',
+            }}>
+            My Notebook
+          </Text>
+          <Text
+            style={{
+              fontFamily: WEIGHT.regular,
+              fontSize: SIZE.xxs,
+              color: 'white',
+              textAlign: 'center',
+            }}>
+            Keep it orgainzed
+          </Text>
+        </View>
+      </Animatable.View>
+      <Animatable.View
+        animation={slideRight}
+        iterationCount="infinite"
+        duration={3000}
+        iterationDelay={0}
+        direction="alternate"
+        easing="ease-in"
+        useNativeDriver={true}
+        style={{
+          ...getElevation(5),
+          backgroundColor: '#a9a9a9',
+          width: 130,
+          borderRadius: 5,
+          height: 150,
+          position: 'absolute',
+          left: 35,
+          top: 60,
+        }}>
         <View
           style={{
-            width: '15%',
-            height: 8,
+            ...getElevation(3),
+            backgroundColor: colors.accent,
+            width: 120,
             borderRadius: 5,
-            backgroundColor: colors.icon,
-          }}
-        />
-      </View>
-    </Animatable.View>
+            height: 150,
+            alignSelf: 'flex-start',
+            justifyContent: 'center',
+          }}>
+          <View
+            style={{
+              width: '100%',
+              height: 8,
+              backgroundColor: 'white',
+              marginBottom: 15,
+            }}></View>
+          <Text
+            style={{
+              fontFamily: WEIGHT.bold,
+              fontSize: SIZE.xs,
+              color: 'white',
+              textAlign: 'center',
+            }}>
+            My Notebook
+          </Text>
+          <Text
+            style={{
+              fontFamily: WEIGHT.regular,
+              fontSize: SIZE.xxs,
+              color: 'white',
+              textAlign: 'center',
+            }}>
+            Keep it orgainzed
+          </Text>
+        </View>
+      </Animatable.View>
+    </View>
   );
 };
 

@@ -133,8 +133,6 @@ export const Folders = ({navigation}) => {
         placeholder={
           <>
             <NotebookPlaceHolder animation={slideRight} colors={colors} />
-            <NotebookPlaceHolder animation={slideLeft} colors={colors} />
-            <NotebookPlaceHolder animation={slideRight} colors={colors} />
           </>
         }
         pinned={pinned}
