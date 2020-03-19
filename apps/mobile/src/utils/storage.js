@@ -41,7 +41,7 @@ function clear() {
 
 function encrypt(password, data) {
   let key;
-  return Aes.pbkdf2('password', 'salt', 5000, 256).then(aes => {
+  return Aes.pbkdf2(password, 'salt', 5000, 256).then(aes => {
     key = aes;
     return Aes.randomKey(16).then(iv => {
       return Aes.encrypt(data, key, iv).then(cipher => {
