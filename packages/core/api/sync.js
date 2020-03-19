@@ -56,13 +56,13 @@ export default class Sync {
     if (!user) return false;
     let lastSyncedTimestamp = user.lastSynced || 0;
     let serverResponse = await this._fetch(lastSyncedTimestamp);
-    let data = this._merge({ serverResponse, lastSyncedTimestamp, user });
+    let data = await this._merge({ serverResponse, lastSyncedTimestamp, user });
     await this._send(data);
     await this.db.user.set({ lastSynced: data.lastSynced });
     return true;
   }
 
-  _merge({ serverResponse, lastSyncedTimestamp, user }) {
+  async _merge({ serverResponse, lastSyncedTimestamp, user }) {
     const { notes, synced, notebooks } = serverResponse;
 
     if (synced) {
@@ -88,9 +88,21 @@ export default class Sync {
     // TODO trash, colors, tags
     return {
       notes: prepareForServer(this.db.notes.all, user, lastSyncedTimestamp),
-      notebooks: prepareForServer(this.db.notebooks.all, user, lastSyncedTimestamp),
-      delta: prepareForServer(await this.db.delta.all(), user, lastSyncedTimestamp),
-      text: prepareForServer(await this.db.text.all(), user, lastSyncedTimestamp),
+      notebooks: prepareForServer(
+        this.db.notebooks.all,
+        user,
+        lastSyncedTimestamp
+      ),
+      delta: prepareForServer(
+        await this.db.delta.all(),
+        user,
+        lastSyncedTimestamp
+      ),
+      text: prepareForServer(
+        await this.db.text.all(),
+        user,
+        lastSyncedTimestamp
+      ),
       tags: [],
       colors: [],
       trash: [],
