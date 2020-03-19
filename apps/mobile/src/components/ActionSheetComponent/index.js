@@ -378,6 +378,7 @@ export const ActionSheetComponent = ({
             .note(note.id)
             .untag(oldProps.tags[oldProps.tags.indexOf(tag)]);
           localRefresh(oldProps.type);
+          dispatch({type: ACTIONS.TAGS});
         } catch (e) {
           localRefresh(oldProps.type);
         }
