@@ -40,6 +40,10 @@ export default class Note {
     return this._note.notebook;
   }
 
+  get dateEdited() {
+    return this._note.dateEdited;
+  }
+
   delta() {
     return this._notes._deltaCollection.get(this._note.content.delta);
   }

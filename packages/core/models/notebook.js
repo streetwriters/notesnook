@@ -24,6 +24,10 @@ export default class Notebook {
     return new Topics(this._notebooks, this._notebook.id);
   }
 
+  get dateEdited() {
+    return this._notebook.dateEdited;
+  }
+
   _toggle(prop) {
     return this._notebooks.add({
       id: this._notebook.id,
