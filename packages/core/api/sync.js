@@ -133,7 +133,7 @@ async function syncArrayWithDatabase(array, get, set) {
   array.forEach(async item => await syncWithDatabase(item, get, set));
 }
 
-async function prepareForServer(array, user, lastSyncedTimestamp) {
+function prepareForServer(array, user, lastSyncedTimestamp) {
   return tfun
     .filter(item => item.dateEdited > lastSyncedTimestamp)(array)
     .map(item => ({
