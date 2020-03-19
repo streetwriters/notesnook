@@ -41,4 +41,8 @@ export default class Content {
   multi(ids) {
     return this._collection.getItems(ids);
   }
+
+  all() {
+    return this._collection.getItems(this._collection.indexer.indices);
+  }
 }

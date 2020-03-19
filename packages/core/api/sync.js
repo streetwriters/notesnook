@@ -27,6 +27,10 @@
  */
 import Database from "./index";
 import { HOST, HEADERS } from "../utils/constants";
+var tfun = require("transfun/transfun.js").tfun;
+if (!tfun) {
+  tfun = global.tfun;
+}
 
 export default class Sync {
   /**
@@ -57,47 +61,36 @@ export default class Sync {
     await this.db.user.set({ lastSynced: data.lastSynced });
     return true;
   }
-  
 
   _merge({ serverResponse, lastSyncedTimestamp, user }) {
-    const { notes, notebooks /* tags, colors, trash */ } = serverResponse;
+    const { notes, synced, notebooks } = serverResponse;
 
-    if (notes)
-    notes.forEach(async note => {
-      note = JSON.parse(note.data);
-      let localNote = this.db.notes.note(note.id);
-      if (!localNote || note.dateEdited > localNote.data.dateEdited) {
-        await this.db.notes.add({ ...note, remote: true });
-      }
-    });
-    if(notebooks)
-    notebooks.forEach(async nb => {
-      nb = JSON.parse(nb.data);
-      let localNb = this.db.notebooks.notebook(nb.id);
-      if (!localNb || nb.dateEdited > localNb.data.dateEdited) {
-        await this.db.notebooks.add({ ...nb, remote: true });
-      }
-    });
+    if (synced) {
+      syncArrayWithDatabase(
+        notes,
+        id => this.db.notes.note(id).data,
+        item => this.db.notes.add(item)
+      );
+      syncArrayWithDatabase(
+        notebooks,
+        id => this.db.notebooks.notebook(id).data,
+        item => this.db.notebooks.add(item)
+      );
+
+      ["delta", "text"].forEach(type => {
+        syncArrayWithDatabase(
+          serverResponse[type],
+          id => this.db[type].raw(id),
+          item => this.db[type].add(item)
+        );
+      });
+    }
     // TODO trash, colors, tags
     return {
-      notes: this.db.notes.all
-        .filter(v => v.dateEdited > lastSyncedTimestamp)
-        .map(v => ({
-          id: v.id,
-          dateEdited: v.dateEdited,
-          dateCreated: v.dateCreated,
-          data: JSON.stringify(v),
-          userId: user.Id,
-        })),
-      notebooks: this.db.notebooks.all
-        .filter(v => v.dateEdited > lastSyncedTimestamp)
-        .map(v => ({
-          id: v.id,
-          dateEdited: v.dateEdited,
-          dateCreated: v.dateCreated,
-          data: JSON.stringify(v),
-          userId: user.Id,
-        })),
+      notes: prepareForServer(this.db.notes.all, user, lastSyncedTimestamp),
+      notebooks: prepareForServer(this.db.notebooks.all, user, lastSyncedTimestamp),
+      delta: prepareForServer(await this.db.delta.all(), user, lastSyncedTimestamp),
+      text: prepareForServer(await this.db.text.all(), user, lastSyncedTimestamp),
       tags: [],
       colors: [],
       trash: [],
@@ -116,4 +109,27 @@ export default class Sync {
     });
     return response.ok;
   }
+}
+
+async function syncWithDatabase(remoteItem, get, add) {
+  let localItem = await get(remoteItem.id);
+  if (!localItem || remoteItem.dateEdited > localItem.dateEdited) {
+    await add({ ...JSON.parse(remoteItem.data), remote: true });
+  }
+}
+
+async function syncArrayWithDatabase(array, get, set) {
+  array.forEach(async item => await syncWithDatabase(item, get, set));
+}
+
+async function prepareForServer(array, user, lastSyncedTimestamp) {
+  return tfun
+    .filter(item => item.dateEdited > lastSyncedTimestamp)(array)
+    .map(item => ({
+      id: item.id,
+      dateEdited: item.dateEdited,
+      dateCreated: item.dateCreated,
+      data: JSON.stringify(item),
+      userId: user.Id
+    }));
 }
