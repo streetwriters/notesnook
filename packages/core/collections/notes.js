@@ -8,13 +8,11 @@ import {
   getLastWeekTimestamp,
   get7DayTimestamp
 } from "../utils/date";
-import Storage from "../database/storage";
 import Notebooks from "./notebooks";
 import Note from "../models/note";
 import Trash from "./trash";
 import getId from "../utils/id";
 import Tags from "./tags";
-import Delta from "./content";
 import Content from "./content";
 
 var tfun = require("transfun/transfun.js").tfun;
@@ -48,6 +46,10 @@ export default class Notes {
 
   async add(noteArg) {
     if (!noteArg) return;
+    if (noteArg.remote){
+      await this._collection.addItem(noteArg);
+      return;
+    }
 
     let id = noteArg.id || getId();
     let oldNote = this._collection.getItem(id);
