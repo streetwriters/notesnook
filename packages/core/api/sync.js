@@ -64,7 +64,7 @@ export default class Sync {
   async _merge({ serverResponse, lastSyncedTimestamp, user }) {
     const { notes, synced, notebooks } = serverResponse;
 
-    if (synced) {
+    if (!synced) {
       syncArrayWithDatabase(
         notes,
         id => this.db.notes.note(id).data,
