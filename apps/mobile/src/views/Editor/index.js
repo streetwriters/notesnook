@@ -33,6 +33,7 @@ import {
   eOnLoadNote,
   eOpenFullscreenEditor,
   refreshNotesPage,
+  eClearEditor,
 } from '../../services/events';
 import {exitEditorAnimation} from '../../utils/animations';
 import {sideMenuRef} from '../../utils/refs';
@@ -115,6 +116,7 @@ const Editor = ({noMenu}) => {
 
   const clearEditor = async () => {
     await saveNote(true);
+
     setDateEdited(0);
     title = null;
     content = null;
@@ -133,6 +135,35 @@ const Editor = ({noMenu}) => {
       type: 'blur',
     });
   };
+
+  const onCallClear = () => {
+    canSave = false;
+    exitEditorAnimation();
+    setDateEdited(0);
+    title = null;
+    content = null;
+    note = null;
+    id = null;
+    tapCount = 0;
+    saveCounter = 0;
+    post({
+      type: 'clearEditor',
+    });
+    post({
+      type: 'clearTitle',
+    });
+    post({
+      type: 'blur',
+    });
+  };
+
+  useEffect(() => {
+    eSubscribeEvent(eClearEditor, onCallClear);
+
+    return () => {
+      eUnSubscribeEvent(eClearEditor, onCallClear);
+    };
+  }, []);
 
   const onChange = data => {
     if (data !== '') {
@@ -170,16 +201,16 @@ const Editor = ({noMenu}) => {
   };
 
   const saveNote = async (lockNote = true) => {
+    if (!canSave) return;
+    console.log('reaching here and making shit ton.');
     if (!title && !content) return;
-    if (title === '' && content.text === '') return;
     if (
       title &&
       title.trim().length === 0 &&
       content &&
-      content?.text?.trim().length === 0
+      content.text.length === 0
     )
       return;
-    if (!canSave) return;
 
     if (!content) {
       content = {

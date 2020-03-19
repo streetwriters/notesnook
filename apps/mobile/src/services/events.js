@@ -65,3 +65,5 @@ export const eCloseVaultDialog = '531';
 export const refreshNotesPage = '532';
 
 export const eClearSearch = '533';
+
+export const eClearEditor = '534';

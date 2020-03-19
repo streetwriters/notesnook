@@ -8,6 +8,7 @@ import {
   eCloseFullscreenEditor,
   eOnLoadNote,
   eOnNewTopicAdded,
+  eClearEditor,
 } from '../../services/events';
 import NavigationService from '../../services/NavigationService';
 import {exitEditorAnimation} from '../../utils/animations';
@@ -43,10 +44,13 @@ export class Dialog extends Component {
 
         history.selectedItemsList.forEach(async i => {
           if (i.type === 'note') {
+            console.log(i.id);
             await db.notes.delete(i.id);
             ToastEvent.show('Notes moved to trash', 'error');
             updateEvent({type: i.type});
             updateEvent({type: ACTIONS.PINNED});
+
+            eSendEvent(eClearEditor);
           } else if (i.type === 'topic') {
             await db.notebooks.notebook(i.notebookId).topics.delete(i.title);
 
@@ -65,14 +69,6 @@ export class Dialog extends Component {
         updateEvent({type: ACTIONS.CLEAR_SELECTION});
         updateEvent({type: ACTIONS.SELECTION_MODE, enabled: false});
 
-        if (editing.currentlyEditing) {
-          eSendEvent(eOnLoadNote, {type: 'new'});
-          if (DDS.isTab) {
-            eSendEvent(eCloseFullscreenEditor);
-          } else {
-            exitEditorAnimation();
-          }
-        }
         this.hide();
         break;
       }
