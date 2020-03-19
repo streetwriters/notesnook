@@ -264,9 +264,6 @@ export const ActionSheetComponent = ({
         ToastEvent.show(
           item.type === 'note' ? 'Note restored' : 'Notebook restored',
           'success',
-          1000,
-          () => {},
-          '',
         );
         close();
       },
