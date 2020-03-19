@@ -12,7 +12,11 @@ import Storage from "../database/storage";
 import Notebooks from "./notebooks";
 import Note from "../models/note";
 import Trash from "./trash";
-import getId from "../utils/id"
+import getId from "../utils/id";
+import Tags from "./tags";
+import Delta from "./content";
+import Content from "./content";
+
 var tfun = require("transfun/transfun.js").tfun;
 if (!tfun) {
   tfun = global.tfun;
@@ -21,20 +25,25 @@ if (!tfun) {
 export default class Notes {
   constructor(context) {
     this._collection = new CachedCollection(context, "notes");
-    this._deltaStorage = new Storage(context);
   }
 
   /**
    *
    * @param {Notebooks} notebooks
    * @param {Trash} trash
+   * @param {Tags} tags
+   * @param {Tags} colors
+   * @param {Content} delta
+   * @param {Content} text
    */
-  async init(notebooks, trash, tags, colors) {
+  async init(notebooks, trash, tags, colors, delta, text) {
     await this._collection.init();
     this._notebooks = notebooks;
     this._trash = trash;
     this._tagsCollection = tags;
     this._colorsCollection = colors;
+    this._deltaCollection = delta;
+    this._textCollection = text;
   }
 
   async add(noteArg) {
@@ -42,6 +51,14 @@ export default class Notes {
 
     let id = noteArg.id || getId();
     let oldNote = this._collection.getItem(id);
+    let deltaId = 0;
+    let textId = 0;
+
+    if (oldNote && oldNote.content) {
+      deltaId = oldNote.content.delta;
+      textId = oldNote.content.text;
+    }
+
     let note = {
       ...oldNote,
       ...noteArg
@@ -53,21 +70,33 @@ export default class Notes {
     }
 
     if (note.content.delta && note.content.delta.ops) {
-      await this._deltaStorage.write(id + "_delta", note.content.delta);
+      deltaId = await this._deltaCollection.add({
+        id: deltaId,
+        data: note.content.delta
+      });
+    }
+
+    if (note.content.text !== textId) {
+      textId = await this._textCollection.add({
+        id: textId,
+        data: note.content.text
+      });
+      note.title = getNoteTitle(note);
+      note.headline = getNoteHeadline(note);
     }
 
     note = {
       id,
       type: "note",
-      title: getNoteTitle(note),
-      content: getNoteContent(note),
+      title: note.title,
+      content: { text: textId, delta: deltaId },
       pinned: !!note.pinned,
       locked: !!note.locked,
       notebook: note.notebook || {},
       colors: note.colors || [],
       tags: note.tags || [],
       favorite: !!note.favorite,
-      headline: getNoteHeadline(note),
+      headline: note.headline,
       dateCreated: note.dateCreated
     };
 
@@ -224,14 +253,4 @@ function getNoteTitle(note) {
     .slice(0, 3)
     .join(" ")
     .trim();
-}
-
-function getNoteContent(note) {
-  if (note.locked) {
-    return note.content;
-  }
-
-  return {
-    text: note.content.text.trim()
-  };
 }

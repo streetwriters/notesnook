@@ -26,7 +26,7 @@ test("add note", () =>
   noteTest().then(async ({ db, id }) => {
     let note = db.notes.note(id);
     expect(note.data).toBeDefined();
-    expect(note.text).toStrictEqual(TEST_NOTE.content.text);
+    expect(await note.text()).toStrictEqual(TEST_NOTE.content.text);
   }));
 
 test("get delta of note", () =>
@@ -75,7 +75,7 @@ test("update note", () =>
     id = await db.notes.add(noteData);
     let note = db.notes.note(id);
     expect(note.title).toBe(noteData.title);
-    expect(note.text).toStrictEqual(noteData.content.text);
+    expect(await note.text()).toStrictEqual(noteData.content.text);
     expect(note.data.pinned).toBe(true);
     expect(note.data.favorite).toBe(true);
   }));

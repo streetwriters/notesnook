@@ -6,6 +6,7 @@ import User from "../models/user";
 import Sync from "./sync";
 import Vault from "./vault";
 import Lookup from "./lookup";
+import Content from "../collections/content";
 
 class Database {
   constructor(context) {
@@ -18,11 +19,22 @@ class Database {
     this.user = new User(this.context);
     this.tags = new Tags(this.context, "tags");
     this.colors = new Tags(this.context, "colors");
+    this.delta = new Content(this.context, "delta");
+    this.text = new Content(this.context, "text");
+    await this.delta.init();
+    await this.text.init();
     await this.tags.init();
     await this.colors.init();
-    await this.notes.init(this.notebooks, this.trash, this.tags, this.colors);
+    await this.notes.init(
+      this.notebooks,
+      this.trash,
+      this.tags,
+      this.colors,
+      this.delta,
+      this.text
+    );
     await this.notebooks.init(this.notes, this.trash);
-    await this.trash.init(this.notes, this.notebooks);
+    await this.trash.init(this.notes, this.notebooks, this.delta);
     this.syncer = new Sync(this);
     this.vault = new Vault(this, this.context);
     this.lookup = new Lookup();

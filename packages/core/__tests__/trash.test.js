@@ -8,19 +8,15 @@ import {
 
 beforeEach(() => StorageInterface.clear());
 
-test("delete a note", () =>
+test("permanently delete a note", () =>
   noteTest().then(async ({ db, id }) => {
-    let { id: nbId } = await db.notebooks.add(TEST_NOTEBOOK);
-    await db.notebooks
-      .notebook(nbId)
-      .topics.topic("General")
-      .add(id);
+    const note = db.notes.note(id);
     await db.notes.delete(id);
     expect(db.trash.all.length).toBe(1);
-    expect(await db.context.read(id + "_delta")).toBeDefined();
+    expect(await note.delta()).toBeDefined();
     await db.trash.delete(db.trash.all[0].id);
     expect(db.trash.all.length).toBe(0);
-    expect(await db.context.read(id + "_delta")).toBeUndefined();
+    expect(await db.delta.get(note.data.content.delta)).toBeUndefined();
   }));
 
 test("restore a deleted note", () =>
@@ -47,23 +43,25 @@ test("restore a deleted note", () =>
 
 test("delete a locked note", () =>
   noteTest().then(async ({ db, id }) => {
+    const note = db.notes.note(id);
     await db.vault.create("password");
     await db.vault.add(id);
     await db.notes.delete(id);
     expect(db.trash.all.length).toBe(1);
-    expect(await db.context.read(id + "_delta")).toBeDefined();
+    expect(await db.delta.get(note.data.content.delta)).toBeDefined();
   }));
 
 test("restore a deleted locked note", () =>
   noteTest().then(async ({ db, id }) => {
+    let note = db.notes.note(id);
     await db.vault.create("password");
     await db.vault.add(id);
     await db.notes.delete(id);
     expect(db.trash.all.length).toBe(1);
-    expect(await db.context.read(id + "_delta")).toBeDefined();
+    expect(await db.delta.get(note.data.content.delta)).toBeDefined();
     await db.trash.restore(db.trash.all[0].id);
     expect(db.trash.all.length).toBe(0);
-    let note = db.notes.note(id);
+    note = db.notes.note(id);
     expect(note).toBeDefined();
   }));
 

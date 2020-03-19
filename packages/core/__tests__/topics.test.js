@@ -60,7 +60,7 @@ test("get topic", () =>
     let noteId = await db.notes.add({ content: { text: "Hello", delta: [] } });
     await topic.add(noteId);
     topic = topics.topic("Home");
-    expect(topic.all[0].content.text).toBe("Hello");
+    expect(await db.text.get(topic.all[0].content.text)).toBe("Hello");
     expect(topic.totalNotes).toBe(1);
   }));
 

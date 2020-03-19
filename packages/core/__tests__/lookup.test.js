@@ -14,7 +14,8 @@ beforeEach(async () => {
   StorageInterface.clear();
 });
 
-test("search notes", () =>
+//TODO
+test.skip("search notes", () =>
   noteTest({
     content: { delta: "5", text: "5" }
   }).then(async ({ db }) => {

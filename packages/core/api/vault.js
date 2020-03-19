@@ -1,5 +1,5 @@
 import Database from "./index";
-
+import getId from "../utils/id";
 export default class Vault {
   /**
    *
@@ -85,49 +85,56 @@ export default class Vault {
   async save(note) {
     if (!note) return;
     await this._check();
-    let id = note.id || Date.now().toString() + "_note";
+    let id = note.id || getId();
     return await this._lockNote(id, note);
   }
 
-  _encryptText(text) {
-    return this._context.encrypt(this._password, JSON.stringify({ text }));
-  }
-  async _decryptText(text) {
-    const decrypted = await this._context.decrypt(this._password, text);
-    return JSON.parse(decrypted);
+  async _encryptContent(content, ids) {
+    let { text, delta } = { ...content };
+    let { deltaId, textId } = ids;
+
+    if (!delta.ops) delta = await this._db.delta.get(deltaId);
+    if (text === textId) text = await this._db.text.get(textId);
+
+    text = await this._context.encrypt(this._password, text);
+    delta = await this._context.encrypt(this._password, delta);
+
+    await this._db.text.add({ id: textId, data: text });
+    await this._db.delta.add({ id: deltaId, data: delta });
   }
 
-  async _encryptDelta(id, deltaArg) {
-    if (!deltaArg) return;
-    const delta = await this._context.encrypt(
-      this._password,
-      JSON.stringify(deltaArg)
-    );
-    await this._context.write(this._deltaId(id), delta);
-  }
+  async _decryptContent(content) {
+    let { text, delta } = { ...content };
 
-  async _decryptDelta(id) {
-    const delta = await this._context.read(this._deltaId(id));
-    const decrypted = await this._context.decrypt(this._password, delta);
-    return JSON.parse(decrypted);
-  }
+    text = await this._db.text.get(text);
+    text = await this._context.decrypt(this._password, text);
 
-  _deltaId(id) {
-    return id + "_delta";
+    delta = await this._db.text.get(delta);
+    delta = await this._context.decrypt(this._password, delta);
+
+    return {
+      delta,
+      text
+    };
   }
 
   async _lockNote(id, note) {
     if (!note) return;
 
-    let delta = note.content.delta;
-    if (!delta) delta = await this._context.read(this._deltaId(id));
-    await this._encryptDelta(id, delta);
+    let oldNote = this._db.notes.note(id);
 
-    const content = await this._encryptText(note.content.text);
+    let deltaId = 0;
+    let textId = 0;
+
+    if (oldNote && oldNote.data.content) {
+      deltaId = oldNote.data.content.delta;
+      textId = oldNote.data.content.text;
+    }
+
+    await this._encryptContent(note.content, { textId, deltaId });
 
     return await this._db.notes.add({
       id,
-      content,
       locked: true
     });
   }
@@ -135,21 +142,21 @@ export default class Vault {
   async _unlockNote(note, perm = false) {
     if (!note.locked) return;
 
-    let decrypted = await this._decryptText(note.content);
-    let delta = await this._decryptDelta(note.id);
+    let { delta, text } = await this._decryptContent(note.content);
 
     if (perm) {
       await this._db.notes.add({
         id: note.id,
-        content: decrypted,
         locked: false
       });
-      return await this._context.write(this._deltaId(note.id), delta);
+      await this._db.delta.add({ id: note.content.delta, data: delta });
+      await this._db.text.add({ id: note.content.text, data: text });
+      return;
     }
 
     return {
       ...note,
-      content: { ...decrypted, delta }
+      content: { delta }
     };
   }
 }

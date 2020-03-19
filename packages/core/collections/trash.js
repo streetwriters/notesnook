@@ -1,23 +1,24 @@
 import CachedCollection from "../database/cached-collection";
 import Notes from "./notes";
 import Notebooks from "./notebooks";
-import Storage from "../database/storage";
+import Delta from "./content";
 import { get7DayTimestamp } from "../utils/date";
 
 export default class Trash {
   constructor(context) {
     this._collection = new CachedCollection(context, "trash");
-    this._deltaStorage = new Storage(context);
   }
 
   /**
    *
    * @param {Notes} notes
    * @param {Notebooks} notebooks
+   * @param {Delta} delta
    */
-  async init(notes, notebooks) {
+  async init(notes, notebooks, delta) {
     this._notes = notes;
     this._notebooks = notebooks;
+    this._deltaCollection = delta;
     await this._collection.init();
     await this.cleanup();
   }
@@ -36,20 +37,22 @@ export default class Trash {
   }
 
   async add(item) {
-    if (this._collection.exists(item.id + "_deleted"))
+    if (this._collection.exists(item.id))
       throw new Error("This item has already been deleted.");
     await this._collection.addItem({
       ...item,
-      dateDeleted: Date.now(),
-      id: item.id + "_deleted"
+      dateDeleted: Date.now()
     });
   }
 
   async delete(...ids) {
     for (let id of ids) {
-      if (!this._collection.exists(id)) return;
-      if (id.indexOf("note") > -1)
-        await this._deltaStorage.remove(id.replace("_deleted", "") + "_delta");
+      if (!id) continue;
+      let item = this._collection.getItem(id);
+      if (!item) continue;
+      if (item.type === "note") {
+        await this._deltaCollection.remove(item.content.delta);
+      }
       await this._collection.removeItem(id);
     }
   }
@@ -59,7 +62,6 @@ export default class Trash {
       let item = { ...this._collection.getItem(id) };
       if (!item) continue;
       delete item.dateDeleted;
-      item.id = item.id.replace("_deleted", "");
       if (item.type === "note") {
         let { notebook } = item;
         item.notebook = {};

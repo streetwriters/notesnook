@@ -4,7 +4,7 @@ import Notebook from "../models/notebook";
 import Notes from "./notes";
 import Trash from "./trash";
 import sort from "fast-sort";
-import getId from "../utils/id"
+import getId from "../utils/id";
 
 var tfun = require("transfun/transfun.js").tfun;
 if (!tfun) {

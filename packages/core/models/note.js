@@ -40,12 +40,12 @@ export default class Note {
     return this._note.notebook;
   }
 
-  get text() {
-    return this._note.content.text;
+  delta() {
+    return this._notes._deltaCollection.get(this._note.content.delta);
   }
 
-  delta() {
-    return this._notes._deltaStorage.read(this._note.id + "_delta");
+  text() {
+    return this._notes._textCollection.get(this._note.content.text);
   }
 
   color(color) {

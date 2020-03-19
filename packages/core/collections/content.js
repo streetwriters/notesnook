@@ -1,0 +1,30 @@
+import IndexedCollection from "../database/indexed-collection";
+import getId from "../utils/id";
+
+export default class Content {
+  constructor(context, name) {
+    this._collection = new IndexedCollection(context, name);
+  }
+
+  init() {
+    return this._collection.init();
+  }
+
+  async add(content) {
+    if (!content) return;
+    const id = content.id || getId();
+    await this._collection.addItem({ id, data: content.data || content });
+    return id;
+  }
+
+  async get(id) {
+    const content = await this._collection.getItem(id);
+    if (!content) return;
+    return content.data;
+  }
+
+  remove(id) {
+    if (!id) return;
+    return this._collection.removeItem(id);
+  }
+}
