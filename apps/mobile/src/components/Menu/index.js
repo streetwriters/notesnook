@@ -402,25 +402,25 @@ export const Menu = ({
               }}>
               <View
                 style={{
-                  width: noTextMode ? SIZE.md : normalize(35),
-                  height: noTextMode ? SIZE.md : normalize(35),
+                  width: noTextMode ? SIZE.md : normalize(45),
+                  height: noTextMode ? SIZE.md : normalize(45),
                   backgroundColor: item.title,
                   borderRadius: 100,
-                }}></View>
-              <Text
-                style={{
-                  color: colors.pri,
-                  fontSize: SIZE.xxs,
-                  minWidth: 12,
-                  minHeight: 12,
-                  paddingHorizontal: 2,
-                  textAlign: 'center',
-                  position: 'absolute',
-                  bottom: -5,
-                  right: item.count < 10 ? -6 : -8,
+                  justifyContent: 'center',
                 }}>
-                {item.count > 99 ? '99+' : item.count}
-              </Text>
+                <Text
+                  style={{
+                    color: colors.pri,
+                    fontSize: SIZE.xxs,
+                    minWidth: 12,
+                    minHeight: 12,
+
+                    paddingHorizontal: 2,
+                    textAlign: 'center',
+                  }}>
+                  {item.count > 99 ? '99+' : '99+'}
+                </Text>
+              </View>
             </TouchableOpacity>
           ))}
         </View>
