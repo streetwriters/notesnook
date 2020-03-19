@@ -71,6 +71,7 @@ export default class Notes {
 
     if (note.content.delta && note.content.delta.ops) {
       deltaId = await this._deltaCollection.add({
+        noteId: id,
         id: deltaId,
         data: note.content.delta
       });
@@ -78,6 +79,7 @@ export default class Notes {
 
     if (note.content.text !== textId) {
       textId = await this._textCollection.add({
+        noteId: id,
         id: textId,
         data: note.content.text
       });

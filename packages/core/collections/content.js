@@ -13,18 +13,32 @@ export default class Content {
   async add(content) {
     if (!content) return;
     const id = content.id || getId();
-    await this._collection.addItem({ id, data: content.data || content });
+    await this._collection.addItem({
+      noteId: content.noteId,
+      id,
+      data: content.data || content
+    });
     return id;
   }
 
   async get(id) {
-    const content = await this._collection.getItem(id);
+    const content = await this.raw(id);
     if (!content) return;
     return content.data;
+  }
+
+  async raw(id) {
+    const content = await this._collection.getItem(id);
+    if (!content) return;
+    return content;
   }
 
   remove(id) {
     if (!id) return;
     return this._collection.removeItem(id);
+  }
+
+  multi(ids) {
+    return this._collection.getItems(ids);
   }
 }

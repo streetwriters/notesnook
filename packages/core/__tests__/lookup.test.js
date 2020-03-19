@@ -15,12 +15,12 @@ beforeEach(async () => {
 });
 
 //TODO
-test.skip("search notes", () =>
+test("search notes", () =>
   noteTest({
     content: { delta: "5", text: "5" }
   }).then(async ({ db }) => {
     await db.notes.add(TEST_NOTE);
-    let filtered = db.lookup.notes(db.notes.all, "5");
+    let filtered = await db.lookup.notes(db.notes.all, "5");
     expect(filtered.length).toBe(1);
   }));
 

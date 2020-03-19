@@ -41,4 +41,12 @@ export default class IndexedCollection {
   getItem(id) {
     return this.indexer.read(id);
   }
+
+  async getItems(indices) {
+    const data = await this.indexer.readMulti(indices);
+    return data.reduce((total, current) => {
+      total.push(current[1]);
+      return total;
+    }, []);
+  }
 }
