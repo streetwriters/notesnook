@@ -410,7 +410,7 @@ export const Menu = ({
                 }}>
                 <Text
                   style={{
-                    color: colors.pri,
+                    color: 'white',
                     fontSize: SIZE.xxs,
                     minWidth: 12,
                     minHeight: 12,
@@ -418,7 +418,7 @@ export const Menu = ({
                     paddingHorizontal: 2,
                     textAlign: 'center',
                   }}>
-                  {item.count > 99 ? '99+' : '99+'}
+                  {item.count > 99 ? '99+' : item.count}
                 </Text>
               </View>
             </TouchableOpacity>
