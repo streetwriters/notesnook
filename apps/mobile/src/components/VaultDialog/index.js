@@ -78,6 +78,8 @@ export class VaultDialog extends Component {
   close = () => {
     updateEvent({type: ACTIONS.NOTES});
 
+    this.password = null;
+    this.confirmPassword = null;
     this.setState({
       visible: false,
       note: {},
@@ -87,6 +89,7 @@ export class VaultDialog extends Component {
       share: false,
       novault: false,
       deleteNote: false,
+      passwordsDontMatch: false,
     });
   };
 
