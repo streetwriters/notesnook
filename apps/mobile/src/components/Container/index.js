@@ -21,9 +21,7 @@ import {Search} from '../SearchInput';
 import SelectionHeader from '../SelectionHeader';
 import {inputRef} from '../../utils/refs';
 
-export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(
-  SafeAreaView,
-);
+const AnimatedSafeAreaView = Animatable.createAnimatableComponent(SafeAreaView);
 
 const AnimatedTouchableOpacity = Animatable.createAnimatableComponent(
   TouchableOpacity,

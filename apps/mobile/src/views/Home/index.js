@@ -1,6 +1,4 @@
 import React, {useEffect} from 'react';
-import {SafeAreaView} from 'react-native';
-import * as Animatable from 'react-native-animatable';
 import {useIsFocused} from 'react-navigation-hooks';
 import Container from '../../components/Container';
 import {NotesList} from '../../components/NotesList';
@@ -13,9 +11,6 @@ import {eScrollEvent, eOnLoadNote} from '../../services/events';
 import {openEditorAnimation} from '../../utils/animations';
 import {sideMenuRef} from '../../utils/refs';
 let count = 0;
-export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(
-  SafeAreaView,
-);
 
 export const Home = ({navigation}) => {
   const [state, dispatch] = useTracked();

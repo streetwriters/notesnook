@@ -17,10 +17,6 @@ import {eSendEvent} from '../../services/eventManager';
 import {eOpenMoveNoteDialog, eOpenSimpleDialog} from '../../services/events';
 import {TEMPLATE_DELETE} from '../DialogManager/templates';
 
-export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(
-  SafeAreaView,
-);
-
 export const SelectionHeader = () => {
   // State
   const [state, dispatch] = useTracked();

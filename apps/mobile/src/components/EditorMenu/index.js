@@ -22,8 +22,9 @@ import {
 } from '../../common/common';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
-import {AnimatedSafeAreaView} from '../../views/Home';
+
 import {w, hexToRGBA, db} from '../../utils/utils';
+import {AnimatedSafeAreaView} from '../../utils/refs';
 
 let tagsInputRef;
 let tagsList;
