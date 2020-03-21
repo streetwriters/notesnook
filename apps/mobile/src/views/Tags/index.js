@@ -1,23 +1,14 @@
 import React, {useEffect, useState} from 'react';
-import {
-  Dimensions,
-  FlatList,
-  Platform,
-  RefreshControl,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {Dimensions, Text, TouchableOpacity, View} from 'react-native';
+import {useIsFocused} from 'react-navigation-hooks';
 import {pv, SIZE, WEIGHT} from '../../common/common';
 import Container from '../../components/Container';
 import {TagsPlaceHolder} from '../../components/ListPlaceholders';
+import SimpleList from '../../components/SimpleList';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import NavigationService from '../../services/NavigationService';
-import {ToastEvent} from '../../utils/utils';
-import {useIsFocused} from 'react-navigation-hooks';
-import {inputRef} from '../../components/SearchInput';
-import SimpleList from '../../components/SimpleList';
+
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 

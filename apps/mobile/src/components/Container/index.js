@@ -17,8 +17,9 @@ import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
 import {eScrollEvent, eClearSearch} from '../../services/events';
 import {db, getElevation, ToastEvent, DDS, selection} from '../../utils/utils';
 import {Header} from '../header';
-import {Search, inputRef} from '../SearchInput';
+import {Search} from '../SearchInput';
 import SelectionHeader from '../SelectionHeader';
+import {inputRef} from '../../utils/refs';
 
 export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(
   SafeAreaView,

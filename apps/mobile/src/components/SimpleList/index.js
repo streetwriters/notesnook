@@ -1,7 +1,6 @@
 import React, {useState} from 'react';
 import {FlatList, Platform, RefreshControl, Text, View} from 'react-native';
 import {SIZE, WEIGHT} from '../../common/common';
-import {inputRef} from '../../components/SearchInput';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';

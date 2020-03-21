@@ -6,10 +6,9 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {br, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
 import {DDS} from '../../utils/utils';
+import {inputRef} from '../../utils/refs';
 
 const {Value, timing, block} = Animated;
-
-export const inputRef = createRef();
 
 export const Search = props => {
   const [state, dispatch] = useTracked();

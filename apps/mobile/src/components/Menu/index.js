@@ -414,7 +414,6 @@ export const Menu = ({
                     fontSize: SIZE.xxs,
                     minWidth: 12,
                     minHeight: 12,
-
                     paddingHorizontal: 2,
                     textAlign: 'center',
                   }}>

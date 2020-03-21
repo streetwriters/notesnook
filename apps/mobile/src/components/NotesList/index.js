@@ -17,8 +17,6 @@ import {ToastEvent, hexToRGBA, DDS, db} from '../../utils/utils';
 import {NotesPlaceHolder} from '../ListPlaceholders';
 import NoteItem from '../NoteItem';
 import SelectionWrapper from '../SelectionWrapper';
-
-import {inputRef} from '../SearchInput';
 import {useIsFocused} from 'react-navigation-hooks';
 
 const sectionListRef = createRef();
