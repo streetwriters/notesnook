@@ -91,7 +91,7 @@ export default class Trash {
               .add(item.id);
           }
         }
-      } else {
+      } else if (item.type === "notebook") {
         const { topics } = item;
         item.topics = [];
         await this._notebooks.add(item);
