@@ -13,8 +13,8 @@ import Animated from "../animated";
 
 const TextSeperator = () => {
   return (
-    <Text as="span" mx={1}>
-      <Icon.Circle size={6} color={"fontTertiary"} />
+    <Text mx={1} fontSize="20px">
+      •
     </Text>
   );
 };

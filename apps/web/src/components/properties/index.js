@@ -50,7 +50,7 @@ const Properties = props => {
           justifyContent="center"
           bg="primary"
         >
-          <Icon.ChevronLeft size={32} />
+          <Icon.ChevronLeft color="static" size={32} />
         </Box>
 
         <motion.div
@@ -196,7 +196,7 @@ const Properties = props => {
                   <Icon.Circle
                     size={40}
                     style={{ cursor: "pointer" }}
-                    fill={code}
+                    color={code}
                     strokeWidth={0}
                   />
                   {colors.includes(label) && (
