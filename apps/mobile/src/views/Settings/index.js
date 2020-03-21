@@ -27,15 +27,7 @@ import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
 import {eOpenLoginDialog} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
-import {hexToRGBA, w, DDS} from '../../utils/utils';
-
-export async function setSetting(settings, name, value) {
-  let s = {...settings};
-  s[name] = value;
-  await MMKV.setString('settings', JSON.stringify(s));
-
-  updateEvent({type: ACTIONS.SETTINGS, settings: s});
-}
+import {hexToRGBA, w, DDS, setSetting} from '../../utils/utils';
 
 export const Settings = ({navigation}) => {
   const [state, dispatch] = useTracked();

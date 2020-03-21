@@ -11,8 +11,19 @@ import {
 } from '../services/events';
 import {DeviceDetectionService} from './deviceDetection';
 import StorageInterface from './storage';
+import MMKV from 'react-native-mmkv-storage';
+import {updateEvent} from '../components/DialogManager/recievers';
+import {ACTIONS} from '../provider/actions';
 export const DDS = new DeviceDetectionService();
 export const db = new Storage(StorageInterface);
+
+export async function setSetting(settings, name, value) {
+  let s = {...settings};
+  s[name] = value;
+  await MMKV.setString('settings', JSON.stringify(s));
+
+  updateEvent({type: ACTIONS.SETTINGS, settings: s});
+}
 
 export const getElevation = elevation => {
   return {
