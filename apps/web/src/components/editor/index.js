@@ -3,7 +3,6 @@ import "./editor.css";
 import ReactQuill from "./react-quill";
 import { Flex, Box, Text } from "rebass";
 import TitleBox from "./title-box";
-import * as Icon from "../icons";
 import Properties from "../properties";
 import { useStore, SESSION_STATES } from "../../stores/editor-store";
 import { timeConverter } from "../../utils/time";
@@ -13,7 +12,7 @@ import Animated from "../animated";
 
 const TextSeperator = () => {
   return (
-    <Text mx={1} fontSize="20px">
+    <Text as="span" mx={1} mt={"-3px"} fontSize="20px">
       •
     </Text>
   );
