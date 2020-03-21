@@ -4,7 +4,7 @@ import * as Icons from "@mdi/js";
 import { useTheme } from "emotion-theming";
 import Animated from "../animated";
 
-const Icon = ({ name, size = 24, color = "text", rotate }) => {
+const Icon = ({ name, size = 24, color = "icon", rotate }) => {
   const theme = useTheme();
   return (
     <MDIIcon
