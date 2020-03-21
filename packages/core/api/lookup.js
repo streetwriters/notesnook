@@ -18,7 +18,6 @@ export default class Lookup {
   async notes(array, query) {
     const textIds = array.map(v => v.content.text);
     const textArray = await this._db.text.multi(textIds);
-    console.log(textArray, textIds);
     const filteredText = tfun.filter(text => fuzzysearch(query, text.data))(
       textArray
     );

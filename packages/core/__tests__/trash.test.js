@@ -31,6 +31,8 @@ test("restore a deleted note", () =>
     expect(db.trash.all.length).toBe(0);
     let note = db.notes.note(id);
     expect(note).toBeDefined();
+    expect(await note.text()).toBe(TEST_NOTE.content.text);
+    expect(await note.delta()).toStrictEqual(TEST_NOTE.content.delta);
     expect(
       db.notebooks
         .notebook(nbId)
