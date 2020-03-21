@@ -10,9 +10,8 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
-import {eSendSideMenuOverlayRef} from '../../services/events';
 import styles from './styles';
+import {sideMenuOverlayRef} from '../../utils/refs';
 const deviceScreen = Dimensions.get('window');
 const barrierForward = deviceScreen.width / 4;
 
@@ -201,7 +200,7 @@ export default class SideMenu extends React.Component {
       let o = newLeft / this.props.openMenuOffset;
       this.opacity.setValue(o * 0.5);
       if (o > 0.015) {
-        this.overlayViewRef.setNativeProps({
+        sideMenuOverlayRef.setNativeProps({
           style: {
             display: 'none',
             position: 'relative',
@@ -213,7 +212,7 @@ export default class SideMenu extends React.Component {
           },
         });
       } else {
-        this.overlayViewRef.setNativeProps({
+        sideMenuOverlayRef.setNativeProps({
           style: {
             display: 'flex',
             position: 'absolute',
@@ -268,7 +267,7 @@ export default class SideMenu extends React.Component {
     const {hiddenMenuOffset, openMenuOffset} = this.state;
 
     if (isOpen) {
-      this.overlayViewRef.setNativeProps({
+      sideMenuOverlayRef.setNativeProps({
         style: {
           display: 'none',
           position: 'relative',
@@ -281,7 +280,7 @@ export default class SideMenu extends React.Component {
       });
     } else {
       setTimeout(() => {
-        this.overlayViewRef.setNativeProps({
+        sideMenuOverlayRef.setNativeProps({
           style: {
             display: 'flex',
             position: 'absolute',
@@ -310,16 +309,7 @@ export default class SideMenu extends React.Component {
 
   componentDidMount() {
     this.setGestureEnabled(true);
-
-    eSubscribeEvent(eSendSideMenuOverlayRef, this._getOverlayViewRef);
   }
-  componentWillUnmount() {
-    eUnSubscribeEvent(eSendSideMenuOverlayRef, this._getOverlayViewRef);
-  }
-
-  _getOverlayViewRef = data => {
-    this.overlayViewRef = data.ref;
-  };
 
   render() {
     const boundryStyle =

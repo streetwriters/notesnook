@@ -4,6 +4,7 @@ import {SafeAreaView} from 'react-native';
 export const sideMenuRef = createRef();
 
 export const inputRef = createRef();
+export const sideMenuOverlayRef = createRef();
 
 export const AnimatedSafeAreaView = Animatable.createAnimatableComponent(
   SafeAreaView,

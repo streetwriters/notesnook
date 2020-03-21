@@ -17,23 +17,22 @@ import {
   COLOR_SCHEME_LIGHT,
   normalize,
   opacity,
+  ph,
   pv,
   setColorScheme,
   SIZE,
   WEIGHT,
-  ph,
 } from '../../common/common';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
 import {
+  eClearSearch,
   eOpenModalMenu,
   eSendSideMenuOverlayRef,
-  eClearSearch,
 } from '../../services/events';
 import NavigationService from '../../services/NavigationService';
-import {timeSince, getElevation, hexToRGBA, db, DDS} from '../../utils/utils';
-import {inputRef} from '../SearchInput';
+import {db, DDS, hexToRGBA, timeSince} from '../../utils/utils';
 
 export const Menu = ({
   close = () => {},
@@ -45,8 +44,6 @@ export const Menu = ({
   const {colors, tags, colorNotes, user} = state;
 
   // todo
-
-  let overlayRef;
 
   function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
     let newColors = setColorScheme(colors, accent);
@@ -172,10 +169,7 @@ export const Menu = ({
 
       {DDS.isTab ? null : (
         <View
-          ref={ref => (overlayRef = ref)}
-          onLayout={() => {
-            eSendEvent(eSendSideMenuOverlayRef, {ref: overlayRef});
-          }}
+          ref={eSendSideMenuOverlayRef}
           style={{
             height: '100%',
             width: '100%',
