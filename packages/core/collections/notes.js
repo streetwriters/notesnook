@@ -241,8 +241,8 @@ function isNoteEmpty(note) {
     locked
   } = note;
   const isTitleEmpty = !title || !title.trim().length;
-  const isTextEmpty = !text || !text.trim().length;
-  const isDeltaEmpty = !delta || !delta.ops;
+  const isTextEmpty = !isHex(text) && (!text || !text.trim().length);
+  const isDeltaEmpty = !isHex(delta) && (!delta || !delta.ops);
   return !locked && isTitleEmpty && isTextEmpty && isDeltaEmpty;
 }
 
