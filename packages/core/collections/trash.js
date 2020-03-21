@@ -103,7 +103,7 @@ export default class Trash {
           if (topic.notes) await t.add(...topic.notes);
         }
       }
-      await this._collection.removeItem(id);
+      await this._collection.indexer.deindex(id); // we only deindex
     }
   }
 
