@@ -5,13 +5,14 @@ import { motion } from "framer-motion";
 import { useTheme } from "emotion-theming";
 import Animated from "../animated";
 
-const Icon = ({ name, size = 24, color = "text" }) => {
+const Icon = ({ name, size = 24, color = "text", rotate }) => {
   const theme = useTheme();
   return (
     <MDIIcon
       path={name}
       size={size + "px"}
       color={theme.colors[color] || color}
+      spin={rotate}
     />
   );
 };
@@ -23,6 +24,7 @@ const createIcon = name => {
       height={(props.size || 24) + "px"}
       whileHover={{ scale: 1.1 }}
       transition={{ duration: 0.3, ease: "easeOut" }}
+      animate={props.animation}
     >
       <Icon name={name} {...props} />
     </Animated.Box>
@@ -54,6 +56,8 @@ export const NormalMode = createIcon(Icons.mdiFullscreenExit);
 export const Settings = createIcon(Icons.mdiCogOutline);
 export const Home = createIcon(Icons.mdiHomeOutline);
 export const Restore = createIcon(Icons.mdiRecycle);
+export const Sync = createIcon(Icons.mdiSync);
+export const Loading = createIcon(Icons.mdiLoading);
 
 /** Properties Icons */
 export const ChevronLeft = createIcon(Icons.mdiChevronLeft);

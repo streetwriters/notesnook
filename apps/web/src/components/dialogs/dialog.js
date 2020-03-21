@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { Flex, Box, Text, Button as RebassButton } from "rebass";
 import { ThemeProvider } from "../../utils/theme";
+import * as Icon from "../icons";
 import Modal from "react-modal";
 
 export default class Dialog extends React.Component {
@@ -72,9 +73,16 @@ export default class Dialog extends React.Component {
                     mx={1}
                     width={"50%"}
                     disabled={props.positiveButton.disabled || false}
-                    onClick={props.positiveButton.onClick}
+                    onClick={
+                      !props.positiveButton.disabled &&
+                      props.positiveButton.onClick
+                    }
                   >
-                    {props.positiveButton.text || "OK"}
+                    {props.positiveButton.loading ? (
+                      <Icon.Loading rotate={true} color="static" />
+                    ) : (
+                      props.positiveButton.text || "OK"
+                    )}
                   </RebassButton>
                 )}
 

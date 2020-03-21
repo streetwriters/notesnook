@@ -18,7 +18,7 @@ function read(key) {
 }
 
 function readMulti(keys) {
-  if (keys.length <= 0) return {};
+  if (keys.length <= 0) return [];
   return localforage.getItems(sort(keys).asc());
 }
 

@@ -25,6 +25,11 @@ function noteStore(set, get) {
         state.notes = db.notes.group(undefined, true);
       });
     },
+    refreshSelectedContext: function() {
+      const { setSelectedContext, selectedContext } = get();
+      if (!selectedContext.type) return;
+      setSelectedContext(selectedContext);
+    },
     setSelectedContext: function(context) {
       let notes = [];
       switch (context.type) {

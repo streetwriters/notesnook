@@ -4,13 +4,15 @@ import { Input } from "@rebass/forms";
 import * as Icon from "../icons";
 import Dialog, { showDialog } from "./dialog";
 import { showSignUpDialog } from "./signupdialog";
+import { useStore } from "../../stores/user-store";
 import { db } from "../../common";
 
 const LoginDialog = props => {
   const [username, setUsername] = useState();
   const [password, setPassword] = useState();
   const [errorMessage, setErrorMessage] = useState();
-
+  const isLoggingIn = useStore(store => store.isLoggingIn);
+  const login = useStore(store => store.login);
   return (
     <Dialog
       isOpen={true}
@@ -20,6 +22,8 @@ const LoginDialog = props => {
       negativeButton={{ onClick: props.onClose }}
       positiveButton={{
         text: "Login",
+        loading: isLoggingIn,
+        disabled: isLoggingIn,
         onClick: () => {
           setErrorMessage();
           if (username === "" || username === undefined) {
@@ -32,19 +36,19 @@ const LoginDialog = props => {
             return;
           }
 
-          db.user
-            .login(username, password)
+          login(username, password)
             .then(() => {
               props.onClose();
             })
-            .catch(() => {
-              setErrorMessage("Failed to login. Please try again.");
+            .catch(e => {
+              setErrorMessage(e.message);
             });
         }
       }}
       content={
         <Box my={1}>
           <Input
+            autoFocus
             variant="default"
             placeholder="Username"
             onChange={e => {

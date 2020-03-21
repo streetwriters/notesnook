@@ -21,6 +21,14 @@ import { useStore as useUserStore } from "./stores/user-store";
 import Animated from "./components/animated";
 
 const NavMenuItem = props => {
+  const [isLoading, setIsLoading] = useState(false);
+  const isSyncing = useUserStore(store => store.isSyncing);
+  useEffect(() => {
+    if (props.item.animatable) {
+      if (props.item.key === "sync") setIsLoading(isSyncing);
+    }
+  }, [isSyncing, setIsLoading, props.item]);
+
   return (
     <Button
       onClick={() => props.onSelected()}
@@ -48,6 +56,7 @@ const NavMenuItem = props => {
           size={18}
           sx={{ marginRight: "2px" }}
           color={props.selected ? "primary" : props.item.color || "icon"}
+          rotate={isLoading}
         />
         <Text
           sx={{
@@ -189,7 +198,7 @@ function App() {
               <NavMenuItem
                 onSelected={async () => {
                   if (item.onClick) {
-                    item.onClick();
+                    await item.onClick();
                     if (item.component) setSelectedKey(item.key);
                     return;
                   }

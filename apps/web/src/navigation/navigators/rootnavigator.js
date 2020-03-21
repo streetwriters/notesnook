@@ -16,19 +16,22 @@ import Search from "../../views/Search";
 import { store as noteStore } from "../../stores/note-store";
 import { store as userStore } from "../../stores/user-store";
 import { showLogInDialog } from "../../components/dialogs/logindialog";
+import { db } from "../../common";
 
 export const bottomRoutes = {
   ...createDeadRoute("nightmode", Icon.Theme, {
-    onClick: () => changeTheme(),
-    isToggled: () => isDarkTheme()
+    onClick: () => changeTheme()
+  }),
+  ...createDeadRoute("sync", Icon.Sync, {
+    onClick: async () => userStore.getState().sync(),
+    animatable: true
   }),
   ...createNormalRoute("account", Account, Icon.User, {
     onClick: async () => {
-      if (userStore.getState().isLoggedIn) {
-        RootNavigator.navigate("account");
-      } else {
+      if (!userStore.getState().isLoggedIn) {
         await showLogInDialog();
       }
+      RootNavigator.navigate("account");
     }
   }),
   ...createRoute("settings", SettingsContainer, {
