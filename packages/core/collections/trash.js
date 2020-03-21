@@ -1,7 +1,7 @@
 import CachedCollection from "../database/cached-collection";
 import Notes from "./notes";
 import Notebooks from "./notebooks";
-import Delta from "./content";
+import Content from "./content";
 import { get7DayTimestamp } from "../utils/date";
 
 export default class Trash {
@@ -13,12 +13,14 @@ export default class Trash {
    *
    * @param {Notes} notes
    * @param {Notebooks} notebooks
-   * @param {Delta} delta
+   * @param {Content} delta
+   * @param {Content} text
    */
-  async init(notes, notebooks, delta) {
+  async init(notes, notebooks, delta, text) {
     this._notes = notes;
     this._notebooks = notebooks;
     this._deltaCollection = delta;
+    this._textCollection = text;
     await this._collection.init();
     await this.cleanup();
   }
@@ -52,6 +54,7 @@ export default class Trash {
       if (!item) continue;
       if (item.type === "note") {
         await this._deltaCollection.remove(item.content.delta);
+        await this._textCollection.remove(item.content.text);
       }
       await this._collection.removeItem(id);
     }
