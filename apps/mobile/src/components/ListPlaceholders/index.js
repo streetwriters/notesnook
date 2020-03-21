@@ -1,16 +1,10 @@
 import React from 'react';
-import {Text, View, Platform} from 'react-native';
+import {Platform, Text, View} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {SIZE, WEIGHT, normalize} from '../../common/common';
-import {
-  deleteItems,
-  opacity,
-  rotate,
-  slideLeft,
-  slideRight,
-} from '../../utils/animations';
-import {w, hexToRGBA, getElevation} from '../../utils/utils';
+import {normalize, SIZE, WEIGHT} from '../../common/common';
+import {deleteItems, opacity, rotate} from '../../utils/animations';
+import {getElevation, hexToRGBA, w} from '../../utils/utils';
 
 export const NotebookPlaceHolder = ({colors, animation}) => {
   const slideRight = {

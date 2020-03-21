@@ -1,12 +1,11 @@
-import React, {createRef, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {TextInput} from 'react-native';
 import Animated, {Easing} from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-
 import {br, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
-import {DDS} from '../../utils/utils';
 import {inputRef} from '../../utils/refs';
+import {DDS} from '../../utils/utils';
 
 const {Value, timing, block} = Animated;
 

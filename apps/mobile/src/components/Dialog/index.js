@@ -5,23 +5,14 @@ import {opacity, ph, pv, SIZE, WEIGHT} from '../../common/common';
 import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
 import {
-  eCloseFullscreenEditor,
-  eOnLoadNote,
-  eOnNewTopicAdded,
   eClearEditor,
+  eCloseFullscreenEditor,
+  eOnNewTopicAdded,
 } from '../../services/events';
 import NavigationService from '../../services/NavigationService';
-import {exitEditorAnimation} from '../../utils/animations';
-import {
-  editing,
-  getElevation,
-  history,
-  ToastEvent,
-  db,
-  DDS,
-} from '../../utils/utils';
-import {updateEvent} from '../DialogManager/recievers';
+import {db, DDS, getElevation, history, ToastEvent} from '../../utils/utils';
 import {dialogActions} from '../DialogManager/dialogActions';
+import {updateEvent} from '../DialogManager/recievers';
 
 export class Dialog extends Component {
   constructor(props) {

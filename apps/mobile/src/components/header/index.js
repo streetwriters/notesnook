@@ -1,7 +1,6 @@
 import React, {createRef} from 'react';
 import {Platform, StatusBar, Text, TouchableOpacity, View} from 'react-native';
 import * as Animatable from 'react-native-animatable';
-
 import {SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
 import {eSendEvent} from '../../services/eventManager';
@@ -13,6 +12,7 @@ import Menu, {MenuItem, MenuDivider} from 'react-native-material-menu';
 import {ACTIONS} from '../../provider/actions';
 import {sideMenuRef} from '../../utils/refs';
 import {moveNoteHideEvent} from '../DialogManager/recievers';
+
 export const Header = ({
   heading,
   canGoBack = true,

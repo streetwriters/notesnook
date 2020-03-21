@@ -3,11 +3,10 @@ import {Text, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {opacity, ph, pv, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
-import NavigationService from '../../services/NavigationService';
-import {ToastEvent, w, getElevation, db, DDS} from '../../utils/utils';
-
 import {ACTIONS} from '../../provider/actions';
-import {moveNoteHideEvent, ActionSheetEvent} from '../DialogManager/recievers';
+import NavigationService from '../../services/NavigationService';
+import {db, ToastEvent} from '../../utils/utils';
+import {ActionSheetEvent, moveNoteHideEvent} from '../DialogManager/recievers';
 
 export const NotebookItem = ({
   item,

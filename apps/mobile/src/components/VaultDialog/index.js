@@ -1,26 +1,25 @@
 import React, {Component, createRef} from 'react';
-import {View, Text, TouchableOpacity, Modal, ToastAndroid} from 'react-native';
-import {SIZE, ph, pv, opacity, WEIGHT} from '../../common/common';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {Modal, Text, TouchableOpacity, View} from 'react-native';
 import {TextInput} from 'react-native-gesture-handler';
-
-import {getElevation, ToastEvent, db, DDS} from '../../utils/utils';
 import Share from 'react-native-share';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {opacity, ph, pv, SIZE, WEIGHT} from '../../common/common';
+import {ACTIONS} from '../../provider/actions';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
 } from '../../services/eventManager';
 import {
+  eCloseVaultDialog,
   eOnLoadNote,
   eOpenVaultDialog,
-  eCloseVaultDialog,
   refreshNotesPage,
 } from '../../services/events';
 import {openEditorAnimation} from '../../utils/animations';
-import {ACTIONS} from '../../provider/actions';
-import {Toast} from '../Toast';
+import {db, DDS, getElevation, ToastEvent} from '../../utils/utils';
 import {updateEvent} from '../DialogManager/recievers';
+import {Toast} from '../Toast';
 
 const passInputRef = createRef();
 const confirmPassRef = createRef();

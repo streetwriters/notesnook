@@ -4,7 +4,6 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {SIZE} from '../../common/common';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
-import Animated from 'react-native-reanimated';
 import {getElevation} from '../../utils/utils';
 
 const SelectionWrapper = ({

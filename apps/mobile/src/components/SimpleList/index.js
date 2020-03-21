@@ -1,12 +1,12 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {FlatList, Platform, RefreshControl, Text, View} from 'react-native';
 import {SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
-import {eScrollEvent, eClearSearch} from '../../services/events';
+import {eClearSearch, eScrollEvent} from '../../services/events';
+import {hexToRGBA} from '../../utils/utils';
 import {NotebookItem} from '../NotebookItem';
-import {hexToRGBA, getElevation} from '../../utils/utils';
 import SelectionWrapper from '../SelectionWrapper';
 
 const SimpleList = ({

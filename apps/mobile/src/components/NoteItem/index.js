@@ -5,7 +5,7 @@ import {ph, pv, SIZE, WEIGHT} from '../../common/common';
 import {eSendEvent, openVault} from '../../services/eventManager';
 import {eOnLoadNote} from '../../services/events';
 import {openEditorAnimation} from '../../utils/animations';
-import {getElevation, timeSince, DDS} from '../../utils/utils';
+import {DDS, timeSince} from '../../utils/utils';
 import {ActionSheetEvent, simpleDialogEvent} from '../DialogManager/recievers';
 import {TEMPLATE_TRASH} from '../DialogManager/templates';
 

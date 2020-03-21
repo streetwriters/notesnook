@@ -1,20 +1,13 @@
 import React, {useEffect, useState} from 'react';
-import {
-  Platform,
-  SafeAreaView,
-  StatusBar,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {Platform, StatusBar, Text, TouchableOpacity, View} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
-import {w, ToastEvent, db, selection} from '../../utils/utils';
 import {eSendEvent} from '../../services/eventManager';
 import {eOpenMoveNoteDialog, eOpenSimpleDialog} from '../../services/events';
+import {db, selection, ToastEvent} from '../../utils/utils';
 import {TEMPLATE_DELETE} from '../DialogManager/templates';
 
 export const SelectionHeader = () => {

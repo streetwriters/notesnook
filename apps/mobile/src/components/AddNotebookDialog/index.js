@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {
   KeyboardAvoidingView,
   Modal,
@@ -11,7 +11,7 @@ import {FlatList, TextInput} from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {opacity, ph, pv, SIZE, WEIGHT} from '../../common/common';
 import {ACTIONS} from '../../provider/actions';
-import {getElevation, ToastEvent, db, DDS} from '../../utils/utils';
+import {db, DDS, getElevation, ToastEvent} from '../../utils/utils';
 import {updateEvent} from '../DialogManager/recievers';
 import {Toast} from '../Toast';
 
