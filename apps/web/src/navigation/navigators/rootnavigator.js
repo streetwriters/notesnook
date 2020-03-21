@@ -10,13 +10,12 @@ import {
 import * as Icon from "../../components/icons";
 import { createRoute, createNormalRoute, createDeadRoute } from "../routes";
 import Navigator from "../index";
-import { changeTheme, isDarkTheme } from "../../utils/theme";
+import { changeTheme } from "../../utils/theme";
 import SelectionModeOptions from "../../common/selectionoptions";
 import Search from "../../views/Search";
 import { store as noteStore } from "../../stores/note-store";
 import { store as userStore } from "../../stores/user-store";
 import { showLogInDialog } from "../../components/dialogs/logindialog";
-import { db } from "../../common";
 
 export const bottomRoutes = {
   ...createDeadRoute("nightmode", Icon.Theme, {

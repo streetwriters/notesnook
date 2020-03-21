@@ -1,11 +1,10 @@
 import React from "react";
 import { Flex, Box, Text, Button as RebassButton } from "rebass";
-import { Input, Checkbox, Label } from "@rebass/forms";
+import { Input } from "@rebass/forms";
 import * as Icon from "../icons";
 import Dialog, { showDialog } from "./dialog";
 import { showSnack } from "../snackbar";
 import { store } from "../../stores/notebook-store";
-import { useTheme } from "emotion-theming";
 
 export default class AddNotebookDialog extends React.Component {
   MAX_AVAILABLE_HEIGHT = window.innerHeight * 0.3;

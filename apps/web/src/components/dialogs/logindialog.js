@@ -5,7 +5,6 @@ import * as Icon from "../icons";
 import Dialog, { showDialog } from "./dialog";
 import { showSignUpDialog } from "./signupdialog";
 import { useStore } from "../../stores/user-store";
-import { db } from "../../common";
 
 const LoginDialog = props => {
   const [username, setUsername] = useState();

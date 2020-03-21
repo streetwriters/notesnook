@@ -10,7 +10,6 @@ import RootNavigator, {
 } from "./navigation/navigators/rootnavigator";
 import "./app.css";
 import { usePersistentState } from "./utils/hooks";
-import { useTheme } from "emotion-theming";
 import { useStore } from "./stores/app-store";
 import { useStore as useNotesStore } from "./stores/note-store";
 import { COLORS } from "./common";
@@ -107,7 +106,6 @@ function App() {
   }, [isFocusModeEnabled]);
 
   const colors = useStore(store => store.colors);
-  const isLoggedIn = useUserStore(store => store.isLoggedIn);
   return (
     <ThemeProvider>
       <Flex

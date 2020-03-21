@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { Flex, Box, Text, Button as RebassButton } from "rebass";
+import { Flex, Text, Button as RebassButton } from "rebass";
 import { ThemeProvider } from "../../utils/theme";
 import * as Icon from "../icons";
 import Modal from "react-modal";

@@ -1,7 +1,6 @@
 import React from "react";
 import MDIIcon from "@mdi/react";
 import * as Icons from "@mdi/js";
-import { motion } from "framer-motion";
 import { useTheme } from "emotion-theming";
 import Animated from "../animated";
 

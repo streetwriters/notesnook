@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import Note from "../components/note";
 import ListContainer from "../components/list-container";
 import { useStore } from "../stores/editor-store";

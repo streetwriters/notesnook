@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import Topic from "../components/topic";
 import { Flex } from "rebass";
 import ListContainer from "../components/list-container";
-import * as Icon from "../components/icons";
 import { useStore as useNoteStore } from "../stores/note-store";
 import { useStore as useNbStore } from "../stores/notebook-store";
 import { showTopicDialog } from "../components/dialogs/topicdialog";
