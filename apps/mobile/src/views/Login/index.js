@@ -14,7 +14,7 @@ import {opacity, pv, SIZE, WEIGHT} from '../../common/common';
 import {Header} from '../../components/header';
 import {useTracked} from '../../provider';
 import {eSendEvent} from '../../services/eventManager';
-import {eCloseSideMenu} from '../../services/events';
+import {eCloseSideMenu, refreshNotesPage} from '../../services/events';
 import * as Animatable from 'react-native-animatable';
 import {
   validateEmail,
@@ -86,7 +86,7 @@ export const Login = ({navigation}) => {
         console.log(e, 'ERROR');
 
         setTimeout(() => {
-          ToastEvent.show('Network error, failed to login', 'error');
+          ToastEvent.show(e.message, 'error');
           setLoggingIn(false);
         }, 500);
 
@@ -100,12 +100,14 @@ export const Login = ({navigation}) => {
         user = await db.user.get();
         console.log('user', user);
         dispatch({type: ACTIONS.USER, user: user});
-        ToastEvent.show(`Logged in as ${'ammarahmed'}`, 'success');
+        ToastEvent.show(`Logged in as ${user.username}`, 'success');
         navigation.goBack();
+        await db.sync();
+        eSendEvent(refreshNotesPage);
+        dispatch({type: ACTIONS.ALL});
       } catch (e) {
         console.log(e, 'getUSer');
-
-        ToastEvent.show(`Login Failed`, 'error');
+        ToastEvent.show(e.message, 'error');
       }
 
       console.log(user);

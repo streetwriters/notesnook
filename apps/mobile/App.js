@@ -46,7 +46,7 @@ const App = () => {
       db.init().then(async () => {
         let user = await db.user.get();
         dispatch({type: ACTIONS.USER, user: user});
-
+        dispatch({type: ACTIONS.ALL});
         setInit(true);
       });
     });

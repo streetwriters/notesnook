@@ -338,9 +338,7 @@ export class VaultDialog extends Component {
                 style={{
                   padding: pv - 5,
                   borderWidth: 1.5,
-                  borderColor: this.state.wrongPassword
-                    ? colors.errorText
-                    : colors.nav,
+                  borderColor: wrongPassword ? colors.errorText : colors.nav,
                   paddingHorizontal: ph,
                   borderRadius: 5,
                   marginTop: 10,

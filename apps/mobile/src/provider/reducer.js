@@ -4,6 +4,24 @@ import {sideMenuRef} from '../utils/refs';
 
 export const reducer = (state, action) => {
   switch (action.type) {
+    case ACTIONS.ALL: {
+      let notes = db.notes.pinned;
+      let notebooks = db.notebooks.pinned;
+      return {
+        ...state,
+        notes: db.notes.group(),
+        user: action.user,
+        notebooks: db.notebooks.all,
+        trash: db.trash.all,
+        pinned: {
+          notes,
+          notebooks,
+        },
+        tags: db.tags.all,
+        favorites: db.notes.favorites,
+        colorNotes: db.colors.all,
+      };
+    }
     case ACTIONS.NOTES:
       let notes;
       if (action.sort) {
