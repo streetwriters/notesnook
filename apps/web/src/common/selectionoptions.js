@@ -3,6 +3,7 @@ import { store as appStore } from "../stores/app-store";
 import { store as notesStore } from "../stores/note-store";
 import { store as nbStore } from "../stores/notebook-store";
 import { store as editorStore } from "../stores/editor-store";
+import { store as trashStore } from "../stores/trash-store";
 import { db } from "./index";
 import { showMoveNoteDialog } from "../components/dialogs/movenotedialog";
 import { confirm } from "../components/dialogs/confirm";
@@ -80,7 +81,8 @@ const AddToNotebookOption = createOption(Icon.Plus, async function(state) {
 
 const RestoreOption = createOption(Icon.Restore, async function(state) {
   const items = state.selectedItems.map(item => item.id);
-  await db.trash.restore(items);
+  await db.trash.restore(...items);
+  trashStore.getState().refresh();
 });
 
 const NotesOptions = createOptions([AddToNotebookOption, FavoriteOption]);
