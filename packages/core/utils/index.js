@@ -67,3 +67,9 @@ function groupBySpecial(arr, key) {
   g.groups.splice(0, 0, { title: "Pinned" });
   return g;
 }
+
+var hexPattern = /([A-F]|[a-f]|\d)*/;
+export function isHex(input) {
+  if (!input.match || input.length < 16) return false;
+  return input.match(hexPattern)[0] === input;
+}

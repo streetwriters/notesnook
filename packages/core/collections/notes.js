@@ -1,6 +1,6 @@
 import CachedCollection from "../database/cached-collection";
 import fuzzysearch from "fuzzysearch";
-import { groupBy } from "../utils";
+import { groupBy, isHex } from "../utils";
 import sort from "fast-sort";
 import {
   getWeekGroupFromTimestamp,
@@ -46,9 +46,8 @@ export default class Notes {
 
   async add(noteArg) {
     if (!noteArg) return;
-    if (noteArg.remote){
-      await this._collection.addItem(noteArg);
-      return;
+    if (noteArg.remote) {
+      return await this._collection.addItem(noteArg);
     }
 
     let id = noteArg.id || getId();
@@ -71,19 +70,24 @@ export default class Notes {
       return;
     }
 
-    if (note.content.delta && note.content.delta.ops) {
+    const { text, delta } = note.content;
+
+    if (!textId && isHex(text)) textId = text;
+    if (!deltaId && isHex(delta)) deltaId = delta;
+
+    if (delta && delta.ops) {
       deltaId = await this._deltaCollection.add({
         noteId: id,
         id: deltaId,
-        data: note.content.delta
+        data: delta
       });
     }
 
-    if (note.content.text !== textId) {
+    if (text !== textId) {
       textId = await this._textCollection.add({
         noteId: id,
         id: textId,
-        data: note.content.text
+        data: text
       });
       note.title = getNoteTitle(note);
       note.headline = getNoteHeadline(note);

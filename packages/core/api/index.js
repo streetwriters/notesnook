@@ -34,7 +34,7 @@ class Database {
       this.text
     );
     await this.notebooks.init(this.notes, this.trash);
-    await this.trash.init(this.notes, this.notebooks, this.delta);
+    await this.trash.init(this.notes, this.notebooks, this.delta, this.text);
     this.syncer = new Sync(this);
     this.vault = new Vault(this, this.context);
     this.lookup = new Lookup(this);
