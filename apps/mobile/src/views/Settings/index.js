@@ -27,7 +27,7 @@ import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
 import {eOpenLoginDialog} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
-import {hexToRGBA, w, DDS, setSetting} from '../../utils/utils';
+import {hexToRGBA, w, DDS, setSetting, db, ToastEvent} from '../../utils/utils';
 
 export const Settings = ({navigation}) => {
   const [state, dispatch] = useTracked();
@@ -143,24 +143,35 @@ export const Settings = ({navigation}) => {
             {[
               {
                 name: 'Backup my notes',
+                func: () => {},
               },
 
               {
                 name: 'My vault',
+                func: () => {},
               },
               {
                 name: 'Subscription status',
+                func: () => {},
               },
               {
                 name: 'Change password',
+                func: () => {},
               },
               {
                 name: 'Logout',
+                func: async () => {
+                  await db.user.logout();
+                  dispatch({type: ACTIONS.USER, user: null});
+                  dispatch({type: ACTIONS.ALL});
+                  ToastEvent.show('Logged out, syncing disabled', 'success');
+                },
               },
             ].map(item => (
               <TouchableOpacity
                 key={item.name}
                 activeOpacity={opacity}
+                onPress={item.func}
                 style={{
                   width: '100%',
 

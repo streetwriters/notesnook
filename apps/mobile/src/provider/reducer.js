@@ -7,10 +7,11 @@ export const reducer = (state, action) => {
     case ACTIONS.ALL: {
       let notes = db.notes.pinned;
       let notebooks = db.notebooks.pinned;
+
       return {
         ...state,
         notes: db.notes.group(),
-        user: action.user,
+
         notebooks: db.notebooks.all,
         trash: db.trash.all,
         pinned: {
