@@ -200,7 +200,7 @@ export default class SideMenu extends React.Component {
       let o = newLeft / this.props.openMenuOffset;
       this.opacity.setValue(o * 0.5);
       if (o > 0.015) {
-        sideMenuOverlayRef.setNativeProps({
+        sideMenuOverlayRef.current?.setNativeProps({
           style: {
             display: 'none',
             position: 'relative',
@@ -212,7 +212,7 @@ export default class SideMenu extends React.Component {
           },
         });
       } else {
-        sideMenuOverlayRef.setNativeProps({
+        sideMenuOverlayRef.current?.setNativeProps({
           style: {
             display: 'flex',
             position: 'absolute',
@@ -267,7 +267,7 @@ export default class SideMenu extends React.Component {
     const {hiddenMenuOffset, openMenuOffset} = this.state;
 
     if (isOpen) {
-      sideMenuOverlayRef.setNativeProps({
+      sideMenuOverlayRef.current.setNativeProps({
         style: {
           display: 'none',
           position: 'relative',
@@ -280,7 +280,7 @@ export default class SideMenu extends React.Component {
       });
     } else {
       setTimeout(() => {
-        sideMenuOverlayRef.setNativeProps({
+        sideMenuOverlayRef.current.setNativeProps({
           style: {
             display: 'flex',
             position: 'absolute',
