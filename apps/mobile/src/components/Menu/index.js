@@ -26,13 +26,10 @@ import {
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
-import {
-  eClearSearch,
-  eOpenModalMenu,
-  eSendSideMenuOverlayRef,
-} from '../../services/events';
+import {eClearSearch, eOpenModalMenu} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
 import {db, DDS, hexToRGBA, timeSince} from '../../utils/utils';
+import {sideMenuOverlayRef} from '../../utils/refs';
 
 export const Menu = ({
   close = () => {},
@@ -169,7 +166,7 @@ export const Menu = ({
 
       {DDS.isTab ? null : (
         <View
-          ref={eSendSideMenuOverlayRef}
+          ref={sideMenuOverlayRef}
           style={{
             height: '100%',
             width: '100%',
