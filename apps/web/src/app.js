@@ -185,7 +185,7 @@ function App() {
                     color: COLORS[color.title],
                     title: toTitleCase(color.title),
                     icon: Icon.Circle,
-                    count: color.count
+                    count: color.noteIds.length
                   }}
                 />
               );

@@ -26,14 +26,14 @@ const Tags = props => {
       type="tags"
       items={tags}
       item={(index, item) => {
-        const { title, count } = item;
+        const { title, noteIds } = item;
         return (
           <ListItem
             item={item}
             selectable={false}
             index={index}
             title={<TagNode title={title} />}
-            info={`${count} notes`}
+            info={`${noteIds.length} notes`}
             onClick={() => {
               setSelectedContext({ type: "tag", value: title });
               props.navigator.navigate("notes", {
