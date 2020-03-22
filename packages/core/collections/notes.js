@@ -110,11 +110,11 @@ export default class Notes {
 
     if (!oldNote) {
       for (let color of note.colors) {
-        await this._colorsCollection.add(color);
+        await this._colorsCollection.add(color, id);
       }
 
       for (let tag of note.tags) {
-        await this._tagsCollection.add(tag);
+        await this._tagsCollection.add(tag, id);
       }
     }
 
@@ -147,11 +147,15 @@ export default class Notes {
   }
 
   tagged(tag) {
-    return tfun.filter(`.tags.includes('${tag}')`)(this.all);
+    return this._tagsCollection
+      .get(tag)
+      .map(id => this._collection.getItem(id));
   }
 
   colored(color) {
-    return tfun.filter(`.colors.includes('${color}')`)(this.all);
+    return this._colorsCollection
+      .get(color)
+      .map(id => this._collection.getItem(id));
   }
 
   group(by, special = false) {
@@ -211,10 +215,10 @@ export default class Notes {
         );
       }
       for (let tag of item.tags) {
-        await this._tagsCollection.remove(tag);
+        await this._tagsCollection.remove(tag, id);
       }
       for (let color of item.colors) {
-        await this._colorsCollection.remove(color);
+        await this._colorsCollection.remove(color, id);
       }
       await this._collection.removeIndex(id);
       await this._trash.add(item.data);

@@ -84,7 +84,7 @@ async function addTag(tag, collection, array) {
     throw new Error("Cannot add a duplicate tag.");
   let arr = [...this._note[array], tag];
   const note = { ...this._note, [array]: arr };
-  await this._notes[collection].add(tag);
+  await this._notes[collection].add(tag, note.id);
   await this._notes._collection.addItem(note);
 }
 
@@ -94,6 +94,6 @@ async function removeTag(tag, collection, array) {
   let arr = [...this._note[array]];
   arr.splice(arr.indexOf(tag), 1);
   const note = { ...this._note, [array]: arr };
-  await this._notes[collection].remove(tag);
+  await this._notes[collection].remove(tag, note.id);
   await this._notes._collection.addItem(note);
 }

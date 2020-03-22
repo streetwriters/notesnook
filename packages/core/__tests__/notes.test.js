@@ -95,50 +95,6 @@ test("updating empty note should delete it", () =>
     expect(note).toBeUndefined();
   }));
 
-test("add tag to note", () =>
-  noteTest().then(async ({ db, id }) => {
-    let note = db.notes.note(id);
-    await note.tag("hello");
-    note = db.notes.note(id);
-    expect(note.tags[0]).toBe("hello");
-    expect(db.tags.all[0].title).toBe("hello");
-  }));
-
-test("remove tag from note", () =>
-  noteTest().then(async ({ db, id }) => {
-    let note = db.notes.note(id);
-    await note.tag("hello");
-    note = db.notes.note(id);
-    expect(note.tags[0]).toBe("hello");
-    expect(db.tags.all[0].title).toBe("hello");
-    await note.untag("hello");
-    note = db.notes.note(id);
-    expect(note.tags.length).toBe(0);
-    expect(db.tags.all.length).toBe(0);
-  }));
-
-test("color a note", () =>
-  noteTest().then(async ({ db, id }) => {
-    let note = db.notes.note(id);
-    await note.color("red");
-    note = db.notes.note(id);
-    expect(note.colors[0]).toBe("red");
-    expect(db.colors.all[0].title).toBe("red");
-  }));
-
-test("uncolor a note", () =>
-  noteTest().then(async ({ db, id }) => {
-    let note = db.notes.note(id);
-    await note.color("red");
-    note = db.notes.note(id);
-    expect(note.colors[0]).toBe("red");
-    expect(db.colors.all[0].title).toBe("red");
-    await note.uncolor("red");
-    note = db.notes.note(id);
-    expect(note.colors.length).toBe(0);
-    expect(db.colors.all.length).toBe(0);
-  }));
-
 test("note with text longer than 150 characters should have ... in the headline", () =>
   noteTest({
     content: {
@@ -148,27 +104,6 @@ test("note with text longer than 150 characters should have ... in the headline"
   }).then(({ db, id }) => {
     let note = db.notes.note(id);
     expect(note.headline.includes("...")).toBe(true);
-  }));
-
-test("get tags", () =>
-  noteTest({
-    ...TEST_NOTE,
-    tags: ["new", "tag", "goes", "here"]
-  }).then(async ({ db }) => {
-    expect(db.tags.all.length).toBeGreaterThan(0);
-  }));
-
-test("get notes in tag", () =>
-  noteTest({
-    ...TEST_NOTE,
-    tags: ["new", "tag", "goes", "here"]
-  }).then(async ({ db }) => {
-    expect(db.notes.tagged("tag")[0].tags).toStrictEqual([
-      "new",
-      "tag",
-      "goes",
-      "here"
-    ]);
   }));
 
 test("get favorite notes", () =>
