@@ -172,9 +172,9 @@ class Prepare {
     this._lastSyncedTimestamp = lastSyncedTimestamp;
     return {
       notes: this._prepareForServer(this._db.notes.all),
-      notebooks: this._prepareForServer(this.db.notebooks.all),
-      delta: this._prepareForServer(await this.db.delta.all()),
-      text: this._prepareForServer(await this.db.text.all()),
+      notebooks: this._prepareForServer(this._db.notebooks.all),
+      delta: this._prepareForServer(await this._db.delta.all()),
+      text: this._prepareForServer(await this._db.text.all()),
       tags: this._prepareForServer(this._db.tags.all),
       colors: this._prepareForServer(this._db.colors.all),
       trash: [],
