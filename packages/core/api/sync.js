@@ -62,7 +62,7 @@ export default class Sync {
   }
 
   async _merge({ serverResponse, lastSyncedTimestamp, user }) {
-    const { notes, synced, notebooks,delta, text } = serverResponse;
+    const { notes, synced, notebooks, delta, text } = serverResponse;
 
     if (!synced) {
       await syncArrayWithDatabase(
@@ -76,16 +76,16 @@ export default class Sync {
         item => this.db.notebooks.add(item)
       );
 
-        await syncArrayWithDatabase(
-          delta,
-          id => this.db.delta.raw(id),
-          item => this.db.delta.add(item)
-        );
-        await syncArrayWithDatabase(
-          text,
-          id => this.db.text.raw(id),
-          item => this.db.text.add(item)
-        );
+      await syncArrayWithDatabase(
+        delta,
+        id => this.db.delta.raw(id),
+        item => this.db.delta.add(item)
+      );
+      await syncArrayWithDatabase(
+        text,
+        id => this.db.text.raw(id),
+        item => this.db.text.add(item)
+      );
     }
     // TODO trash, colors, tags
     return {
@@ -133,7 +133,9 @@ async function syncWithDatabase(remoteItem, get, add) {
 }
 
 async function syncArrayWithDatabase(array, get, set) {
-  return Promise.all(array.map(async item => await syncWithDatabase(item, get, set)));
+  return Promise.all(
+    array.map(async item => await syncWithDatabase(item, get, set))
+  );
 }
 
 function prepareForServer(array, user, lastSyncedTimestamp) {
