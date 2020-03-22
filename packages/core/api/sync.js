@@ -96,7 +96,6 @@ class Merger {
 
   async _mergeItem(remoteItem, get, add) {
     let localItem = await get(remoteItem.id);
-    if (localItem.dateDeleted) return; // let's not add items that are in trash
     if (!localItem || remoteItem.dateEdited > localItem.dateEdited) {
       await add({ ...JSON.parse(remoteItem.data), remote: true });
     }
