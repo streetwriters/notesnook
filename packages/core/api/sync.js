@@ -190,7 +190,7 @@ class Prepare {
         dateEdited: item.dateEdited,
         dateCreated: item.dateCreated,
         data: JSON.stringify(item),
-        userId: user.Id
+        userId: this._user.Id
       }))(array);
   }
 }
