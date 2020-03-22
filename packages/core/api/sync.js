@@ -56,60 +56,20 @@ export default class Sync {
     if (!user) throw new Error("You need to login to sync.");
     let lastSyncedTimestamp = user.lastSynced || 0;
     let serverResponse = await this._fetch(lastSyncedTimestamp);
-    let data = await this._merge({ serverResponse, lastSyncedTimestamp, user });
+
+    // we prepare local data before merging so we always have correct data
+    const prepare = new Prepare(this.db, user);
+    const data = await prepare.get(lastSyncedTimestamp);
+
+    // merge the server response
+    const merger = new Merger(this.db);
+    await merger.merge(serverResponse);
+
+    // send the data back to server
     await this._send(data);
+
+    // update our lastSynced time
     await this.db.user.set({ lastSynced: data.lastSynced });
-  }
-
-  async _merge({ serverResponse, lastSyncedTimestamp, user }) {
-    const { notes, synced, notebooks, delta, text } = serverResponse;
-
-    if (!synced) {
-      await syncArrayWithDatabase(
-        notes,
-        id => this.db.notes.note(id),
-        item => this.db.notes.add(item)
-      );
-      await syncArrayWithDatabase(
-        notebooks,
-        id => this.db.notebooks.notebook(id),
-        item => this.db.notebooks.add(item)
-      );
-
-      await syncArrayWithDatabase(
-        delta,
-        id => this.db.delta.raw(id),
-        item => this.db.delta.add(item)
-      );
-      await syncArrayWithDatabase(
-        text,
-        id => this.db.text.raw(id),
-        item => this.db.text.add(item)
-      );
-    }
-    // TODO trash, colors, tags
-    return {
-      notes: prepareForServer(this.db.notes.all, user, lastSyncedTimestamp),
-      notebooks: prepareForServer(
-        this.db.notebooks.all,
-        user,
-        lastSyncedTimestamp
-      ),
-      delta: prepareForServer(
-        await this.db.delta.all(),
-        user,
-        lastSyncedTimestamp
-      ),
-      text: prepareForServer(
-        await this.db.text.all(),
-        user,
-        lastSyncedTimestamp
-      ),
-      tags: [],
-      colors: [],
-      trash: [],
-      lastSynced: Date.now()
-    };
   }
 
   async _send(data) {
@@ -125,27 +85,112 @@ export default class Sync {
   }
 }
 
-async function syncWithDatabase(remoteItem, get, add) {
-  let localItem = await get(remoteItem.id);
-  if (!localItem || remoteItem.dateEdited > localItem.dateEdited) {
-    await add({ ...JSON.parse(remoteItem.data), remote: true });
+class Merger {
+  /**
+   *
+   * @param {Database} db
+   */
+  constructor(db) {
+    this._db = db;
+  }
+
+  async _mergeItem(remoteItem, get, add) {
+    let localItem = await get(remoteItem.id);
+    if (!localItem || remoteItem.dateEdited > localItem.dateEdited) {
+      await add({ ...JSON.parse(remoteItem.data), remote: true });
+    }
+  }
+
+  async _mergeArray(array, get, set) {
+    return Promise.all(
+      array.map(async item => await this._mergeItem(item, get, set))
+    );
+  }
+
+  async merge(serverResponse) {
+    const {
+      notes,
+      synced,
+      notebooks,
+      delta,
+      text,
+      tags,
+      colors
+    } = serverResponse;
+
+    if (!synced) {
+      await this._mergeArray(
+        notes,
+        id => this._db.notes.note(id),
+        item => this._db.notes.add(item)
+      );
+      await this._mergeArray(
+        notebooks,
+        id => this._db.notebooks.notebook(id),
+        item => this._db.notebooks.add(item)
+      );
+
+      await this._mergeArray(
+        delta,
+        id => this._db.delta.raw(id),
+        item => this._db.delta.add(item)
+      );
+      await this._mergeArray(
+        text,
+        id => this._db.text.raw(id),
+        item => this._db.text.add(item)
+      );
+
+      await this._mergeArray(
+        tags,
+        id => this._db.tags.raw(id),
+        item => this._db.tags.merge(item)
+      );
+
+      await this._mergeArray(
+        colors,
+        id => this._db.colors.raw(id),
+        item => this._db.colors.merge(item)
+      );
+    }
   }
 }
 
-async function syncArrayWithDatabase(array, get, set) {
-  return Promise.all(
-    array.map(async item => await syncWithDatabase(item, get, set))
-  );
-}
+class Prepare {
+  /**
+   *
+   * @param {Database} db
+   * @param {Object} user
+   * @param {Number} lastSyncedTimestamp
+   */
+  constructor(db, user) {
+    this._db = db;
+    this._user = user;
+  }
 
-function prepareForServer(array, user, lastSyncedTimestamp) {
-  return tfun
-    .filter(item => item.dateEdited > lastSyncedTimestamp)(array)
-    .map(item => ({
-      id: item.id,
-      dateEdited: item.dateEdited,
-      dateCreated: item.dateCreated,
-      data: JSON.stringify(item),
-      userId: user.Id
-    }));
+  async get(lastSyncedTimestamp) {
+    this._lastSyncedTimestamp = lastSyncedTimestamp;
+    return {
+      notes: this._prepareForServer(this._db.notes.all),
+      notebooks: this._prepareForServer(this.db.notebooks.all),
+      delta: this._prepareForServer(await this.db.delta.all()),
+      text: this._prepareForServer(await this.db.text.all()),
+      tags: this._prepareForServer(this._db.tags.all),
+      colors: this._prepareForServer(this._db.colors.all),
+      trash: [],
+      lastSynced: Date.now()
+    };
+  }
+
+  _prepareForServer(array) {
+    return tfun
+      .filter(`.dateEdited > ${this._lastSyncedTimestamp}`)
+      .map(item => ({
+        id: item.id,
+        dateEdited: item.dateEdited,
+        dateCreated: item.dateCreated,
+        data: JSON.stringify(item),
+        userId: user.Id
+      }))(array);
+  }
 }

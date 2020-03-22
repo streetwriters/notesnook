@@ -1,6 +1,7 @@
 import CachedCollection from "../database/cached-collection";
 import getId from "../utils/id";
 import { qclone } from "qclone";
+import set from "../utils/set";
 
 export default class Tags {
   constructor(context, name) {
@@ -15,6 +16,21 @@ export default class Tags {
     const tagItem = this.all.find(t => t.title === tag);
     if (!tagItem) return [];
     return tagItem.noteIds;
+  }
+
+  async merge(tag) {
+    if (!tag) return;
+    const oldTag = this.all.find(t => t.id === tag.id);
+    if (!oldTag) return;
+    const noteIds = set.union(oldTag.noteIds, tag.noteIds);
+    const dateEdited =
+      tag.dateEdited > oldTag.dateEdited ? tag.dateEdited : oldTag.dateEdited;
+    tag = {
+      ...oldTag,
+      noteIds,
+      dateEdited
+    };
+    await this._collection.addItem(tag);
   }
 
   async add(tagTitle, noteId) {
