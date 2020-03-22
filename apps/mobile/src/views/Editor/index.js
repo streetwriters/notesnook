@@ -202,7 +202,7 @@ const Editor = ({noMenu}) => {
 
   const saveNote = async (lockNote = true) => {
     if (!canSave) return;
-    console.log('reaching here and making shit ton.');
+
     if (!title && !content) return;
     if (
       title &&

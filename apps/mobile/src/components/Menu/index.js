@@ -408,7 +408,7 @@ export const Menu = ({
                     paddingHorizontal: 2,
                     textAlign: 'center',
                   }}>
-                  {item.count > 99 ? '99+' : item.count}
+                  {item.noteIds.length > 99 ? '99+' : item.noteIds.length}
                 </Text>
               </View>
             </TouchableOpacity>

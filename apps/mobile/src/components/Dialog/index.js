@@ -35,7 +35,6 @@ export class Dialog extends Component {
 
         history.selectedItemsList.forEach(async i => {
           if (i.type === 'note') {
-            console.log(i.id);
             await db.notes.delete(i.id);
             ToastEvent.show('Notes moved to trash', 'error');
             updateEvent({type: i.type});
@@ -134,7 +133,6 @@ export class Dialog extends Component {
   };
 
   show = () => {
-    console.log(history.selectedItemsList.length, 'length');
     this.setState({
       visible: true,
       selectedItemsLength: history.selectedItemsList.length,

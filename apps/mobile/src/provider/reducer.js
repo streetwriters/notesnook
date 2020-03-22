@@ -116,8 +116,6 @@ export const reducer = (state, action) => {
       };
     }
     case ACTIONS.SELECT_ALL: {
-      console.log(action.selected);
-
       return {
         ...state,
         selectedItemsList: action.selected,

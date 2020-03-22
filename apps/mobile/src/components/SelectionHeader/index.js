@@ -16,10 +16,7 @@ export const SelectionHeader = () => {
   const {colors, selectionMode, selectedItemsList, currentScreen} = state;
   const [selectAll, setSelectAll] = useState(false);
 
-  useEffect(() => {
-    console.log(selection.data, selection.type);
-    console.log(currentScreen);
-  }, [currentScreen]);
+  useEffect(() => {}, [currentScreen]);
 
   return (
     <Animatable.View
@@ -177,7 +174,6 @@ export const SelectionHeader = () => {
 
                   await db.trash.restore(...noteIds);
 
-                  console.log(noteIds);
                   dispatch({type: ACTIONS.TRASH});
                   dispatch({type: ACTIONS.SELECTION_MODE, enabled: false});
                   dispatch({type: ACTIONS.CLEAR_SELECTION});

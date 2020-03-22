@@ -239,7 +239,6 @@ export default class SideMenu extends React.Component {
   }
 
   handleMoveShouldSetPanResponder = (e, gestureState) => {
-    console.log(gestures.enabled);
     if (gestures.enabled) {
       const x = Math.round(Math.abs(gestureState.dx));
       const y = Math.round(Math.abs(gestureState.dy));
