@@ -1,5 +1,7 @@
 import CachedCollection from "../database/cached-collection";
 import getId from "../utils/id";
+import { qclone } from "qclone";
+
 export default class Tags {
   constructor(context, name) {
     this._collection = new CachedCollection(context, name);
@@ -37,8 +39,9 @@ export default class Tags {
 
   async remove(tagTitle, noteId) {
     if (!tagTitle || !noteId) return;
-    const tag = this.all.find(t => t.title === tagTitle);
+    let tag = this.all.find(t => t.title === tagTitle);
     if (!tag) return;
+    tag = qclone(tag);
     const noteIndex = tag.noteIds.indexOf(noteId);
     if (noteIndex <= -1) return;
     tag.noteIds.splice(noteIndex, 1);
