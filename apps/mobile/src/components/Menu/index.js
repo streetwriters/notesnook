@@ -301,7 +301,7 @@ export const Menu = ({
               marginBottom: 0,
             }}>
             {tags
-              .filter(o => o.count > 1)
+              .filter(o => o.noteIds.length > 1)
               .slice(0, tags.length > 10 ? 10 : tags.length)
               .map(item => (
                 <TouchableOpacity
@@ -342,7 +342,7 @@ export const Menu = ({
                     }}>
                     {item.title + ' '}
                   </Text>
-                  {item.count > 1 ? (
+                  {item.noteIds.length > 1 ? (
                     <Text
                       style={{
                         color: 'white',
@@ -355,7 +355,7 @@ export const Menu = ({
                         padding: 0,
                         paddingHorizontal: 1,
                       }}>
-                      {item.count > 99 ? '99+' : item.count}
+                      {item.noteIds.length > 99 ? '99+' : item.noteIds.length}
                     </Text>
                   ) : null}
                 </TouchableOpacity>

@@ -181,7 +181,7 @@ const SimpleList = ({
   );
 
   const _listKeyExtractor = (item, index) =>
-    item.dateCreated.toString() + index.toString();
+    item.id.toString() + index.toString();
 
   return (
     <FlatList

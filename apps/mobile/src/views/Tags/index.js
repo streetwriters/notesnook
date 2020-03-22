@@ -8,6 +8,7 @@ import SimpleList from '../../components/SimpleList';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import NavigationService from '../../services/NavigationService';
+import {db} from '../../utils/utils';
 
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
@@ -69,10 +70,10 @@ export const Tags = ({navigation}) => {
             fontSize: SIZE.xs,
             color: colors.icon,
           }}>
-          {item && item.count && item.count > 1
-            ? item.count + ' notes'
-            : item.count === 1
-            ? item.count + ' note'
+          {item && item.noteIds.length && item.noteIds.length > 1
+            ? item.noteIds.length + ' notes'
+            : item.noteIds.length === 1
+            ? item.noteIds.length + ' note'
             : null}
         </Text>
       </Text>
