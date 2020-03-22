@@ -96,6 +96,7 @@ class Merger {
 
   async _mergeItem(remoteItem, get, add) {
     let localItem = await get(remoteItem.id);
+    if (localItem.dateDeleted) return; // let's not add items that are in trash
     if (!localItem || remoteItem.dateEdited > localItem.dateEdited) {
       await add({ ...JSON.parse(remoteItem.data), remote: true });
     }
@@ -115,7 +116,8 @@ class Merger {
       delta,
       text,
       tags,
-      colors
+      colors,
+      trash
     } = serverResponse;
 
     if (!synced) {
@@ -152,6 +154,12 @@ class Merger {
         id => this._db.colors.raw(id),
         item => this._db.colors.merge(item)
       );
+
+      await this._mergeArray(
+        trash,
+        () => undefined,
+        item => this._db.trash.add(item)
+      );
     }
   }
 }
@@ -177,7 +185,7 @@ class Prepare {
       text: this._prepareForServer(await this._db.text.all()),
       tags: this._prepareForServer(this._db.tags.all),
       colors: this._prepareForServer(this._db.colors.all),
-      trash: [],
+      trash: this._prepareForServer(this._db.trash.all),
       lastSynced: Date.now()
     };
   }
