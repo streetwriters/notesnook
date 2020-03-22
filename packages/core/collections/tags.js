@@ -18,6 +18,12 @@ export default class Tags {
     return tagItem.noteIds;
   }
 
+  raw(id) {
+    const tagItem = this.all.find(t => t.id === id);
+    if (!tagItem) return;
+    return tagItem;
+  }
+
   async merge(tag) {
     if (!tag) return;
     const oldTag = this.all.find(t => t.id === tag.id);
