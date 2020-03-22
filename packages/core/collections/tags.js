@@ -27,7 +27,7 @@ export default class Tags {
   async merge(tag) {
     if (!tag) return;
     const oldTag = this.all.find(t => t.id === tag.id);
-    if (!oldTag) return;
+    if (!oldTag) return await this._collection.addItem(tag);
     const noteIds = set.union(oldTag.noteIds, tag.noteIds);
     const dateEdited =
       tag.dateEdited > oldTag.dateEdited ? tag.dateEdited : oldTag.dateEdited;
