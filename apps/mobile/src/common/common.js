@@ -189,14 +189,14 @@ export async function getColorScheme() {
   let t = await MMKV.getString('theme');
 
   if (typeof accentColor !== 'string') {
-    MMKV.setString('accentColor', '#0560FF');
+    MMKV.setStringAsync('accentColor', '#0560FF');
     setAccentColor('#0560FF');
   } else {
     setAccentColor(accentColor);
   }
 
   if (typeof t !== 'string') {
-    MMKV.setString('theme', JSON.stringify({night: false}));
+    MMKV.setStringAsync('theme', JSON.stringify({night: false}));
     setColorScheme(COLOR_SCHEME_LIGHT);
   } else {
     let themeToSet = JSON.parse(t);

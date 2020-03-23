@@ -326,13 +326,13 @@ export const EditorMenu = ({updateProps = () => {}, timestamp}) => {
                   icon: 'moon',
                   func: () => {
                     if (!colors.night) {
-                      MMKV.setString(
+                      MMKV.setStringAsync(
                         'theme',
                         JSON.stringify(COLOR_SCHEME_DARK),
                       );
                       changeColorScheme(COLOR_SCHEME_DARK);
                     } else {
-                      MMKV.setString(
+                      MMKV.setStringAsync(
                         'theme',
                         JSON.stringify(COLOR_SCHEME_LIGHT),
                       );

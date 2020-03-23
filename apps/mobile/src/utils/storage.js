@@ -6,9 +6,9 @@ var Aes = NativeModules.Aes;
 async function read(key, isArray = false) {
   let data;
   if (isArray) {
-    data = await MMKV.getArray(key);
+    data = await MMKV.getArrayAsync(key);
   } else {
-    data = await MMKV.getMap(key);
+    data = await MMKV.getMapAsync(key);
   }
 
   return isArray ? data.slice() : data;
@@ -16,9 +16,9 @@ async function read(key, isArray = false) {
 
 async function write(key, data) {
   if (data.length !== undefined) {
-    return await MMKV.setArray(key, data.slice());
+    return await MMKV.setArrayAsync(key, data.slice());
   } else {
-    return await MMKV.setMap(key, data);
+    return await MMKV.setMapAsync(key, data);
   }
 }
 
@@ -26,7 +26,7 @@ async function readMulti(keys) {
   if (keys.length <= 0) {
     return [];
   } else {
-    let data = await MMKV.getMultipleItems(keys.slice());
+    let data = await MMKV.getMultipleItemsAsync(keys.slice());
     return !data ? undefined : data;
   }
 }

@@ -99,7 +99,7 @@ const AppearanceSettings = ({navigation}) => {
                 onPress={() => {
                   changeAccentColor(item);
 
-                  MMKV.setString('accentColor', item);
+                  MMKV.setStringAsync('accentColor', item);
                 }}
                 style={{
                   flexDirection: 'row',
@@ -127,10 +127,10 @@ const AppearanceSettings = ({navigation}) => {
           <TouchableOpacity
             onPress={() => {
               if (!colors.night) {
-                MMKV.setString('theme', JSON.stringify({night: true}));
+                MMKV.setStringAsync('theme', JSON.stringify({night: true}));
                 changeColorScheme(COLOR_SCHEME_DARK);
               } else {
-                MMKV.setString('theme', JSON.stringify({night: false}));
+                MMKV.setStringAsync('theme', JSON.stringify({night: false}));
 
                 changeColorScheme(COLOR_SCHEME_LIGHT);
               }
@@ -165,10 +165,10 @@ const AppearanceSettings = ({navigation}) => {
           <TouchableOpacity
             onPress={() => {
               if (!colors.night) {
-                MMKV.setString('theme', JSON.stringify({night: true}));
+                MMKV.setStringAsync('theme', JSON.stringify({night: true}));
                 changeColorScheme(COLOR_SCHEME_DARK);
               } else {
-                MMKV.setString('theme', JSON.stringify({night: false}));
+                MMKV.setStringAsync('theme', JSON.stringify({night: false}));
 
                 changeColorScheme(COLOR_SCHEME_LIGHT);
               }

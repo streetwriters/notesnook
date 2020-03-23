@@ -58,7 +58,7 @@ const App = () => {
       s = defaultState.settings;
       s = JSON.stringify(s);
       s.fontScale = 1;
-      await MMKV.setString('settings', s);
+      await MMKV.setStringAsync('settings', s);
       dispatch({type: ACTIONS.SETTINGS, s});
     } else {
       s = JSON.parse(s);

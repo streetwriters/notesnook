@@ -283,10 +283,10 @@ export const ActionSheetComponent = ({
       icon: 'theme-light-dark',
       func: () => {
         if (!colors.night) {
-          MMKV.setString('theme', JSON.stringify({night: true}));
+          MMKV.setStringAsync('theme', JSON.stringify({night: true}));
           changeColorScheme(COLOR_SCHEME_DARK);
         } else {
-          MMKV.setString('theme', JSON.stringify({night: false}));
+          MMKV.setStringAsync('theme', JSON.stringify({night: false}));
           changeColorScheme(COLOR_SCHEME_LIGHT);
         }
       },

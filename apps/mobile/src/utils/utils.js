@@ -20,7 +20,7 @@ export const db = new Storage(StorageInterface);
 export async function setSetting(settings, name, value) {
   let s = {...settings};
   s[name] = value;
-  await MMKV.setString('settings', JSON.stringify(s));
+  await MMKV.setStringAsync('settings', JSON.stringify(s));
 
   updateEvent({type: ACTIONS.SETTINGS, settings: s});
 }
