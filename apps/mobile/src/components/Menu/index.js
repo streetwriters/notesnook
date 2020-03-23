@@ -608,14 +608,13 @@ export const Menu = ({
               width: '100%',
               flexDirection: 'row',
               alignItems: 'center',
-              backgroundColor: colors.shade,
-
-              paddingHorizontal: 12,
+              justifyContent: noTextMode ? 'center' : 'flex-start',
+              backgroundColor: noTextMode ? 'transparent' : colors.shade,
+              paddingHorizontal: noTextMode ? 0 : 12,
             }}>
             <View
               style={{
                 width: 30,
-
                 backgroundColor: colors.accent,
                 height: 30,
                 borderRadius: 100,
@@ -632,26 +631,28 @@ export const Menu = ({
                 size={SIZE.md}
               />
             </View>
-            <View
-              style={{
-                marginLeft: 10,
-              }}>
-              <Text
+            {noTextMode ? null : (
+              <View
                 style={{
-                  fontFamily: WEIGHT.regular,
-                  color: colors.icon,
-                  fontSize: SIZE.xs,
+                  marginLeft: 10,
                 }}>
-                You are not logged in
-              </Text>
-              <Text
-                style={{
-                  color: colors.accent,
-                  fontSize: SIZE.sm - 2,
-                }}>
-                Login to sync notes.
-              </Text>
-            </View>
+                <Text
+                  style={{
+                    fontFamily: WEIGHT.regular,
+                    color: colors.icon,
+                    fontSize: SIZE.xs,
+                  }}>
+                  You are not logged in
+                </Text>
+                <Text
+                  style={{
+                    color: colors.accent,
+                    fontSize: SIZE.sm - 2,
+                  }}>
+                  Login to sync notes.
+                </Text>
+              </View>
+            )}
           </TouchableOpacity>
         )}
       </View>

@@ -1,4 +1,4 @@
-import React, {createRef, useEffect} from 'react';
+import React, {createRef, useEffect, useState} from 'react';
 import {Platform, StatusBar, View} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import {Menu} from './src/components/Menu';
@@ -8,6 +8,11 @@ import NavigationService, {
   AppContainer,
 } from './src/services/NavigationService';
 import Editor from './src/views/Editor';
+import {eSubscribeEvent} from './src/services/eventManager';
+import {
+  eOpenFullscreenEditor,
+  eCloseFullscreenEditor,
+} from './src/services/events';
 
 const editorRef = createRef();
 let outColors;

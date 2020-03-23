@@ -47,7 +47,7 @@ var title = null;
 let timer = null;
 let saveCounter = 0;
 let tapCount = 0;
-let canSave = false;
+let canSave = true;
 const Editor = ({noMenu}) => {
   // Global State
   const [state, dispatch] = useTracked();
@@ -77,7 +77,7 @@ const Editor = ({noMenu}) => {
   }, []);
 
   const loadNote = async item => {
-    EditorWebView.current?.requestFocus();
+    //EditorWebView.current?.requestFocus();
     noMenu ? null : sideMenuRef.current?.setGestureEnabled(false);
     if (note && note.id) {
       dispatch({type: ACTIONS.NOTES});
@@ -89,6 +89,7 @@ const Editor = ({noMenu}) => {
         canSave = true;
       } else {
         note = item;
+        canSave = false;
         dispatch({
           type: ACTIONS.CURRENT_EDITING_NOTE,
           id: item.id,
@@ -105,6 +106,7 @@ const Editor = ({noMenu}) => {
         canSave = true;
       } else {
         note = item;
+        canSave = false;
         dispatch({
           type: ACTIONS.CURRENT_EDITING_NOTE,
           id: item.id,
@@ -168,6 +170,7 @@ const Editor = ({noMenu}) => {
   const onChange = data => {
     if (data !== '') {
       let rawData = JSON.parse(data);
+
       if (rawData.type === 'content') {
         content = rawData;
       } else {
@@ -185,6 +188,7 @@ const Editor = ({noMenu}) => {
       clearTimeout(timer);
       timer = null;
       onChange(evt.nativeEvent.data);
+
       timer = setTimeout(() => {
         saveNote.call(this, true);
       }, 500);
@@ -202,13 +206,15 @@ const Editor = ({noMenu}) => {
 
   const saveNote = async (lockNote = true) => {
     if (!canSave) return;
-
     if (!title && !content) return;
+    if (!title && content && content.text.length <= 2) return;
+    if (!title && content && !content.text) return;
     if (
       title &&
-      title.trim().length === 0 &&
+      title.trim().length <= 1 &&
       content &&
-      content.text.length === 0
+      content.text &&
+      content.text.length <= 2
     )
       return;
 
@@ -615,6 +621,17 @@ const Editor = ({noMenu}) => {
               fontFamily: WEIGHT.regular,
             }}>
             {timeConverter(dateEdited)}
+          </Text>
+
+          <Text
+            style={{
+              color: colors.icon,
+              fontSize: SIZE.xxs,
+              textAlignVertical: 'center',
+              fontFamily: WEIGHT.regular,
+              marginLeft: 10,
+            }}>
+            {dateEdited ? 'Saved' : ''}
           </Text>
         </View>
         <WebView
