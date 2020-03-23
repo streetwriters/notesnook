@@ -195,7 +195,10 @@ class Prepare {
 
   _prepareForServer(array) {
     return tfun
-      .filter(`.deleted === true || .dateEdited > ${this._lastSyncedTimestamp}`)
+      .filter(
+        item =>
+          item.deleted === true || item.dateEdited > this._lastSyncedTimestamp
+      )
       .map(item => ({
         id: item.id,
         dateEdited: item.dateEdited,
