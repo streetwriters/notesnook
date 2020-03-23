@@ -34,7 +34,7 @@ export const SelectionHeader = () => {
         paddingHorizontal: 12,
         transform: [
           {
-            translateY: selectionMode ? 0 : -100,
+            translateY: selectionMode ? 0 : -150,
           },
         ],
       }}>
