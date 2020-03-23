@@ -51,7 +51,7 @@ export default class CachedCollection {
   async removeItem(id) {
     if (this.transactionOpen) return;
     await this.indexer.write(id, { id, deleted: true });
-    this.map.set(id, { deleted: true });
+    this.map.set(id, { id, deleted: true });
   }
 
   exists(id) {
