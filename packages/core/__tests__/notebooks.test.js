@@ -67,6 +67,7 @@ test("delete a notebook", () =>
     let note = db.notes.note(noteId);
     expect(note.notebook.id).toBe(id);
     await db.notebooks.delete(id);
+    expect(db.notebooks.notebook(id).data.deleted).toBe(true);
     note = db.notes.note(noteId);
     expect(note.notebook.id).toBeUndefined();
   }));

@@ -96,7 +96,11 @@ class Merger {
 
   async _mergeItem(remoteItem, get, add) {
     let localItem = await get(remoteItem.id);
-    if (!localItem || remoteItem.dateEdited > localItem.dateEdited) {
+    if (
+      !localItem ||
+      remoteItem.deleted ||
+      remoteItem.dateEdited > localItem.dateEdited
+    ) {
       await add({ ...JSON.parse(remoteItem.data), remote: true });
     }
   }
@@ -191,7 +195,7 @@ class Prepare {
 
   _prepareForServer(array) {
     return tfun
-      .filter(`.dateEdited > ${this._lastSyncedTimestamp}`)
+      .filter(`.deleted || .dateEdited > ${this._lastSyncedTimestamp}`)
       .map(item => ({
         id: item.id,
         dateEdited: item.dateEdited,

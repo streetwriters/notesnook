@@ -33,9 +33,8 @@ export default class Topic {
     const topic = qclone(this._topic);
     for (let noteId of noteIds) {
       let note = this._topics._notebooks._notes.note(noteId);
-      if (this.has(noteId) || !note) continue;
+      if (this.has(noteId) || !note || note.data.deleted) continue;
       topic.notes.push(noteId);
-
       if (note.notebook && note.notebook.id && note.notebook.topic) {
         if (
           note.notebook.id === this._topics.notebookId &&

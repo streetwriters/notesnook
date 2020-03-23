@@ -89,7 +89,7 @@ export default class Notebooks {
       await this._collection.transaction(() =>
         notebook.topics.delete(...notebook.data.topics)
       );
-      await this._collection.removeIndex(id);
+      await this._collection.removeItem(id);
       await this._trash.add(notebook.data);
     }
   }

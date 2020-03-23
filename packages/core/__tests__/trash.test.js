@@ -16,7 +16,8 @@ test("permanently delete a note", () =>
     expect(await note.delta()).toBeDefined();
     await db.trash.delete(db.trash.all[0].id);
     expect(db.trash.all.length).toBe(0);
-    expect(await db.delta.get(note.data.content.delta)).toBeUndefined();
+    const delta = await db.delta.raw(note.data.content.delta);
+    expect(delta.deleted).toBe(true);
   }));
 
 test("restore a deleted note", () =>
@@ -77,7 +78,7 @@ test("restore a deleted note that's in a deleted notebook", () =>
     await db.notes.delete(id);
     await db.notebooks.delete(nbId);
     const deletedNote = db.trash.all.find(
-      v => v.id.includes(id) && v.type === "note"
+      v => v.itemId.includes(id) && v.type === "note"
     );
     await db.trash.restore(deletedNote.id);
     let note = db.notes.note(id);
@@ -93,7 +94,7 @@ test("delete a notebook", () =>
       .topics.topic("General")
       .add(noteId);
     await db.notebooks.delete(id);
-    expect(db.notebooks.notebook(id)).toBeUndefined();
+    expect(db.notebooks.notebook(id).data.deleted).toBe(true);
     expect(db.notes.note(noteId).notebook).toStrictEqual({});
   }));
 
@@ -122,7 +123,7 @@ test("restore a notebook that has deleted notes", () =>
     await db.notebooks.delete(id);
     await db.notes.delete(noteId);
     const deletedNotebook = db.trash.all.find(
-      v => v.id.includes(id) && v.type === "notebook"
+      v => v.itemId.includes(id) && v.type === "notebook"
     );
     await db.trash.restore(deletedNotebook.id);
     let notebook = db.notebooks.notebook(id);

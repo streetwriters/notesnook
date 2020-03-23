@@ -2,6 +2,7 @@ import CachedCollection from "../database/cached-collection";
 import Notes from "./notes";
 import Notebooks from "./notebooks";
 import Content from "./content";
+import getId from "../utils/id";
 import { get7DayTimestamp } from "../utils/date";
 
 export default class Trash {
@@ -39,10 +40,10 @@ export default class Trash {
   }
 
   async add(item) {
-    if (this._collection.exists(item.id))
-      throw new Error("This item has already been deleted.");
     await this._collection.addItem({
       ...item,
+      id: getId(),
+      itemId: item.id,
       dateDeleted: Date.now()
     });
   }
@@ -65,6 +66,9 @@ export default class Trash {
       let item = { ...this._collection.getItem(id) };
       if (!item) continue;
       delete item.dateDeleted;
+      delete item.id;
+      item.id = item.itemId;
+      delete item.itemId;
       if (item.type === "note") {
         let { notebook } = item;
         item.notebook = {};
@@ -73,14 +77,12 @@ export default class Trash {
         if (notebook && notebook.id && notebook.topic) {
           const { id, topic } = notebook;
 
-          // if the notebook has been deleted
-          if (!this._notebooks._collection.exists(id)) {
+          // if the notebook or topic has been deleted
+          if (
+            !this._notebooks._collection.exists(id) ||
+            !this._notebooks.notebook(id).topics.has(topic)
+          ) {
             notebook = {};
-          } else {
-            // if the topic has been deleted
-            if (!this._notebooks.notebook(id).topics.has(topic)) {
-              notebook = {};
-            }
           }
 
           // restore the note to the topic it was in before deletion
@@ -97,13 +99,13 @@ export default class Trash {
         await this._notebooks.add(item);
         let notebook = this._notebooks.notebook(item.id);
         for (let topic of topics) {
-          await notebook.topics.add(topic.title || topic);
-          let t = notebook.topics.topic(topic.title || topic);
+          await notebook.topics.add(topic.title);
+          let t = notebook.topics.topic(topic.title);
           if (!t) continue;
           if (topic.notes) await t.add(...topic.notes);
         }
       }
-      await this._collection.removeIndex(id); // we only deindex
+      await this._collection.removeItem(id);
     }
   }
 

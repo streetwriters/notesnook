@@ -50,18 +50,12 @@ export default class CachedCollection {
 
   async removeItem(id) {
     if (this.transactionOpen) return;
-    await this.indexer.remove(id);
-    await this.removeIndex(id);
-  }
-
-  async removeIndex(id) {
-    if (!id) return;
-    await this.indexer.deindex(id);
-    this.map.delete(id);
+    await this.indexer.write(id, { id, deleted: true });
+    this.map.set(id, { deleted: true });
   }
 
   exists(id) {
-    return this.map.has(id);
+    return this.map.has(id) && !this.map.get(id).deleted;
   }
 
   getItem(id) {
@@ -71,6 +65,7 @@ export default class CachedCollection {
   getAllItems(sortFn = u => u.dateCreated) {
     let items = [];
     this.map.forEach(value => {
+      if (value.deleted) return; // if item is deleted we skip it.
       items[items.length] = value;
     });
     return sort(items).desc(sortFn);

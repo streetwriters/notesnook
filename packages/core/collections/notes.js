@@ -220,7 +220,7 @@ export default class Notes {
       for (let color of item.colors) {
         await this._colorsCollection.remove(color, id);
       }
-      await this._collection.removeIndex(id);
+      await this._collection.removeItem(id);
       await this._trash.add(item.data);
     }
   }
