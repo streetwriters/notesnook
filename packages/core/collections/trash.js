@@ -44,6 +44,9 @@ export default class Trash {
   }
 
   async add(item) {
+    if (item.dateDeleted) {
+      return await this._collection.addItem(item);
+    }
     await this._collection.addItem({
       ...item,
       id: getId(),
