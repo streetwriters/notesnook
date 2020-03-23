@@ -13,7 +13,7 @@ export class DeviceDetectionService {
     this.isPhoneOrTablet();
     this.isIosOrAndroid();
     this.detectIphoneX();
-    this.checkOrientation();
+    //this.checkOrientation();
   }
 
   checkOrientation() {
