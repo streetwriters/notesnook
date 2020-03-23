@@ -35,6 +35,10 @@ export default class Trash {
     });
   }
 
+  get raw() {
+    return this._collection.getRaw();
+  }
+
   get all() {
     return this._collection.getAllItems(u => u.dateDeleted);
   }

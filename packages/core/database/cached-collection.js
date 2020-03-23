@@ -62,10 +62,14 @@ export default class CachedCollection {
     return this.map.get(id);
   }
 
+  getRaw() {
+    return Array.from(this.map.values());
+  }
+
   getAllItems(sortFn = u => u.dateCreated) {
     let items = [];
     this.map.forEach(value => {
-      if (value.deleted) return; // if item is deleted we skip it.
+      if (value.deleted) return;
       items[items.length] = value;
     });
     return sort(items).desc(sortFn);

@@ -148,13 +148,13 @@ class Merger {
 
       await this._mergeArray(
         tags,
-        id => this._db.tags.raw(id),
+        id => this._db.tags.tag(id),
         item => this._db.tags.merge(item)
       );
 
       await this._mergeArray(
         colors,
-        id => this._db.colors.raw(id),
+        id => this._db.colors.tag(id),
         item => this._db.colors.merge(item)
       );
 
@@ -182,20 +182,20 @@ class Prepare {
   async get(lastSyncedTimestamp) {
     this._lastSyncedTimestamp = lastSyncedTimestamp;
     return {
-      notes: this._prepareForServer(this._db.notes.all),
-      notebooks: this._prepareForServer(this._db.notebooks.all),
+      notes: this._prepareForServer(this._db.notes.raw),
+      notebooks: this._prepareForServer(this._db.notebooks.raw),
       delta: this._prepareForServer(await this._db.delta.all()),
       text: this._prepareForServer(await this._db.text.all()),
-      tags: this._prepareForServer(this._db.tags.all),
-      colors: this._prepareForServer(this._db.colors.all),
-      trash: this._prepareForServer(this._db.trash.all),
+      tags: this._prepareForServer(this._db.tags.raw),
+      colors: this._prepareForServer(this._db.colors.raw),
+      trash: this._prepareForServer(this._db.trash.raw),
       lastSynced: Date.now()
     };
   }
 
   _prepareForServer(array) {
     return tfun
-      .filter(`.deleted || .dateEdited > ${this._lastSyncedTimestamp}`)
+      .filter(`.deleted === true || .dateEdited > ${this._lastSyncedTimestamp}`)
       .map(item => ({
         id: item.id,
         dateEdited: item.dateEdited,

@@ -63,6 +63,10 @@ export default class Notebooks {
     return notebook;
   }
 
+  get raw() {
+    return this._collection.getRaw();
+  }
+
   get all() {
     return sort(this._collection.getAllItems()).desc(t => t.pinned);
   }

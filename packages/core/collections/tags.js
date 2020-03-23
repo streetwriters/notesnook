@@ -12,13 +12,13 @@ export default class Tags {
     return this._collection.init();
   }
 
-  get(tag) {
+  notes(tag) {
     const tagItem = this.all.find(t => t.title === tag);
     if (!tagItem) return [];
     return tagItem.noteIds;
   }
 
-  raw(id) {
+  tag(id) {
     const tagItem = this.all.find(t => t.id === id);
     if (!tagItem) return;
     return tagItem;
@@ -53,6 +53,10 @@ export default class Tags {
     };
 
     await this._collection.addItem(tag);
+  }
+
+  get raw() {
+    return this._collection.getRaw();
   }
 
   get all() {

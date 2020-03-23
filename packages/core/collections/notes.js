@@ -134,6 +134,10 @@ export default class Notes {
     return new Note(this, note);
   }
 
+  get raw() {
+    return this._collection.getRaw();
+  }
+
   get all() {
     return this._collection.getAllItems();
   }
@@ -148,13 +152,13 @@ export default class Notes {
 
   tagged(tag) {
     return this._tagsCollection
-      .get(tag)
+      .notes(tag)
       .map(id => this._collection.getItem(id));
   }
 
   colored(color) {
     return this._colorsCollection
-      .get(color)
+      .notes(color)
       .map(id => this._collection.getItem(id));
   }
 
