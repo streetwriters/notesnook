@@ -53,12 +53,18 @@ const App = () => {
 
   async function Initialize(colors = colors) {
     let newColors = await getColorScheme(colors);
-    let s = await MMKV.getStringAsync('settings');
+
+    let s;
+    try {
+      s = await MMKV.getStringAsync('settings');
+    } catch (e) {}
     if (typeof s !== 'string') {
       s = defaultState.settings;
       s = JSON.stringify(s);
       s.fontScale = 1;
+
       await MMKV.setStringAsync('settings', s);
+
       dispatch({type: ACTIONS.SETTINGS, s});
     } else {
       s = JSON.parse(s);

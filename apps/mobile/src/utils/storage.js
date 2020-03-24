@@ -6,9 +6,17 @@ var Aes = NativeModules.Aes;
 async function read(key, isArray = false) {
   let data;
   if (isArray) {
-    data = await MMKV.getArrayAsync(key);
+    try {
+      data = await MMKV.getArrayAsync(key);
+    } catch (e) {
+      data = [];
+    }
   } else {
-    data = await MMKV.getMapAsync(key);
+    try {
+      data = await MMKV.getMapAsync(key);
+    } catch (e) {
+      data = null;
+    }
   }
 
   return isArray ? data.slice() : data;
