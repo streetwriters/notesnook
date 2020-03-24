@@ -30,7 +30,12 @@ export default class IndexedCollection {
   }
 
   async removeItem(id) {
-    await this.indexer.write(id, { id, deleted: true });
+    await this.indexer.write(id, {
+      id,
+      deleted: true,
+      dateCreated: Date.now(),
+      dateEdited: Date.now()
+    });
   }
 
   exists(id) {

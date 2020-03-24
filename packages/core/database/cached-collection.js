@@ -50,8 +50,14 @@ export default class CachedCollection {
 
   async removeItem(id) {
     if (this.transactionOpen) return;
-    await this.indexer.write(id, { id, deleted: true });
-    this.map.set(id, { id, deleted: true });
+    const deletedItem = {
+      id,
+      deleted: true,
+      dateEdited: Date.now(),
+      dateCreated: Date.now()
+    };
+    await this.indexer.write(id, deletedItem);
+    this.map.set(id, deletedItem);
   }
 
   exists(id) {
