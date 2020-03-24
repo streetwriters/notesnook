@@ -185,8 +185,8 @@ export function setColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
 }
 
 export async function getColorScheme() {
-  let accentColor = await MMKV.getString('accentColor');
-  let t = await MMKV.getString('theme');
+  let accentColor = await MMKV.getStringAsync('accentColor');
+  let t = await MMKV.getStringAsync('theme');
 
   if (typeof accentColor !== 'string') {
     MMKV.setStringAsync('accentColor', '#0560FF');
