@@ -69,7 +69,7 @@ export default class Sync {
     await this._send(data);
 
     // update our lastSynced time
-    if (!mergeResult && areAllEmpty(data))
+    if (mergeResult && !areAllEmpty(data))
       await this.db.user.set({ lastSynced: data.lastSynced });
   }
 
