@@ -63,13 +63,14 @@ export default class Sync {
 
     // merge the server response
     const merger = new Merger(this.db);
-    await merger.merge(serverResponse);
+    const mergeResult = await merger.merge(serverResponse);
 
     // send the data back to server
     await this._send(data);
 
     // update our lastSynced time
-    await this.db.user.set({ lastSynced: data.lastSynced });
+    if (!serverResponse.synced && !mergeResult && areAllEmpty(data))
+      await this.db.user.set({ lastSynced: data.lastSynced });
   }
 
   async _send(data) {
@@ -122,48 +123,47 @@ class Merger {
       colors,
       trash
     } = serverResponse;
+    if (synced || areAllEmpty(serverResponse)) return false;
+    await this._mergeArray(
+      notes,
+      id => this._db.notes.note(id),
+      item => this._db.notes.add(item)
+    );
+    await this._mergeArray(
+      notebooks,
+      id => this._db.notebooks.notebook(id),
+      item => this._db.notebooks.add(item)
+    );
 
-    if (!synced) {
-      await this._mergeArray(
-        notes,
-        id => this._db.notes.note(id),
-        item => this._db.notes.add(item)
-      );
-      await this._mergeArray(
-        notebooks,
-        id => this._db.notebooks.notebook(id),
-        item => this._db.notebooks.add(item)
-      );
+    await this._mergeArray(
+      delta,
+      id => this._db.delta.raw(id),
+      item => this._db.delta.add(item)
+    );
+    await this._mergeArray(
+      text,
+      id => this._db.text.raw(id),
+      item => this._db.text.add(item)
+    );
 
-      await this._mergeArray(
-        delta,
-        id => this._db.delta.raw(id),
-        item => this._db.delta.add(item)
-      );
-      await this._mergeArray(
-        text,
-        id => this._db.text.raw(id),
-        item => this._db.text.add(item)
-      );
+    await this._mergeArray(
+      tags,
+      id => this._db.tags.tag(id),
+      item => this._db.tags.merge(item)
+    );
 
-      await this._mergeArray(
-        tags,
-        id => this._db.tags.tag(id),
-        item => this._db.tags.merge(item)
-      );
+    await this._mergeArray(
+      colors,
+      id => this._db.colors.tag(id),
+      item => this._db.colors.merge(item)
+    );
 
-      await this._mergeArray(
-        colors,
-        id => this._db.colors.tag(id),
-        item => this._db.colors.merge(item)
-      );
-
-      await this._mergeArray(
-        trash,
-        () => undefined,
-        item => this._db.trash.add(item)
-      );
-    }
+    await this._mergeArray(
+      trash,
+      () => undefined,
+      item => this._db.trash.add(item)
+    );
+    return true;
   }
 }
 
@@ -207,4 +207,9 @@ class Prepare {
         userId: this._user.Id
       }))(array);
   }
+}
+
+function areAllEmpty(obj) {
+  const arrays = Object.values(obj).filter(v => v.length !== undefined);
+  return arrays.every(array => array.length === 0);
 }
