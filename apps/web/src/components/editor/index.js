@@ -148,7 +148,7 @@ function Editor() {
           onChange={editor => {
             setSession(state => {
               state.session.content = {
-                delta: editor.getContents(),
+                delta: { ops: editor.getContents().ops },
                 text: editor.getText()
               };
             });
