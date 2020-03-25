@@ -26,15 +26,26 @@ export default class Tags {
 
   async merge(tag) {
     if (!tag) return;
+    if (tag.deleted) {
+      await this._collection.addItem(tag);
+      return;
+    }
     const oldTag = this.all.find(t => t.id === tag.id);
     if (!oldTag) return await this._collection.addItem(tag);
-    const noteIds = set.union(oldTag.noteIds, tag.noteIds);
+
+    const deletedIds = set.union(oldTag.deletedIds, tag.deletedIds);
+    const noteIds = set.difference(
+      set.union(oldTag.noteIds, tag.noteIds),
+      deletedIds
+    );
+
     const dateEdited =
       tag.dateEdited > oldTag.dateEdited ? tag.dateEdited : oldTag.dateEdited;
     tag = {
       ...oldTag,
       noteIds,
-      dateEdited
+      dateEdited,
+      deletedIds
     };
     await this._collection.addItem(tag);
   }
@@ -46,10 +57,12 @@ export default class Tags {
     let tag = { ...oldTag, title: tagTitle };
     let id = tag.id || getId();
     let notes = tag.noteIds || [];
+    let deletedIds = tag.deletedIds || [];
     tag = {
       id,
       title: tag.title,
-      noteIds: [...notes, noteId]
+      noteIds: [...notes, noteId],
+      deletedIds
     };
 
     await this._collection.addItem(tag);
@@ -71,7 +84,8 @@ export default class Tags {
     const noteIndex = tag.noteIds.indexOf(noteId);
     if (noteIndex <= -1) return;
     tag.noteIds.splice(noteIndex, 1);
+    tag.deletedIds.push(noteId);
     if (tag.noteIds.length > 0) await this._collection.addItem(tag);
-    await this._collection.removeItem(tag.id);
+    else await this._collection.removeItem(tag.id);
   }
 }
