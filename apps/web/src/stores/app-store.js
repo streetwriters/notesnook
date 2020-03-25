@@ -3,6 +3,7 @@ import { db } from "../common";
 import { showPasswordDialog } from "../components/dialogs/passworddialog";
 import { store as noteStore } from "./note-store";
 import { store as notebookStore } from "./notebook-store";
+import { store as trashStore } from "./trash-store";
 
 function appStore(set, get) {
   return {
@@ -18,6 +19,8 @@ function appStore(set, get) {
       noteStore.getState().refresh();
       notebookStore.getState().refresh();
       noteStore.getState().refreshSelectedContext();
+      trashStore.getState().refresh();
+      get().refreshColors();
     },
     closeSideMenu: function() {
       set(state => {
