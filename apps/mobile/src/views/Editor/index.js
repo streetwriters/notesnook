@@ -29,11 +29,11 @@ import {
   eUnSubscribeEvent,
 } from '../../services/eventManager';
 import {
+  eClearEditor,
   eCloseFullscreenEditor,
   eOnLoadNote,
   eOpenFullscreenEditor,
   refreshNotesPage,
-  eClearEditor,
 } from '../../services/events';
 import {exitEditorAnimation} from '../../utils/animations';
 import {sideMenuRef} from '../../utils/refs';
@@ -47,7 +47,7 @@ var title = null;
 let timer = null;
 let saveCounter = 0;
 let tapCount = 0;
-let canSave = true;
+let canSave = false;
 const Editor = ({noMenu}) => {
   // Global State
   const [state, dispatch] = useTracked();
@@ -118,7 +118,6 @@ const Editor = ({noMenu}) => {
 
   const clearEditor = async () => {
     await saveNote(true);
-
     setDateEdited(0);
     title = null;
     content = null;
@@ -187,8 +186,12 @@ const Editor = ({noMenu}) => {
     ) {
       clearTimeout(timer);
       timer = null;
+      if (!canSave) {
+        setTimeout(() => {
+          canSave = true;
+        }, 2000);
+      }
       onChange(evt.nativeEvent.data);
-
       timer = setTimeout(() => {
         saveNote.call(this, true);
       }, 500);
@@ -204,26 +207,55 @@ const Editor = ({noMenu}) => {
     }
   };
 
+  const addToCollection = async id => {
+    switch (editing.actionAfterFirstSave.type) {
+      case 'topic': {
+        await db.notes.move(
+          {
+            topic: editing.actionAfterFirstSave.id,
+            id: editing.actionAfterFirstSave.notebook,
+          },
+          id,
+        );
+        editing.actionAfterFirstSave = {
+          type: null,
+        };
+
+        break;
+      }
+      case 'tag': {
+        await db.notes.note(note.id).tag(editing.actionAfterFirstSave.id);
+        editing.actionAfterFirstSave = {
+          type: null,
+        };
+
+        break;
+      }
+      case 'color': {
+        await db.notes.note(id).color(editing.actionAfterFirstSave.id);
+
+        editing.actionAfterFirstSave = {
+          type: null,
+        };
+
+        break;
+      }
+      default: {
+        break;
+      }
+    }
+  };
+
   const saveNote = async (lockNote = true) => {
     if (!canSave) return;
     if (!title && !content) return;
-    if (!title && content && content.text.length <= 2) return;
-    if (!title && content && !content.text) return;
-    if (
-      title &&
-      title.trim().length <= 1 &&
-      content &&
-      content.text &&
-      content.text.length <= 2
-    )
-      return;
-
     if (!content) {
       content = {
         text: '',
         delta: {ops: []},
       };
     }
+
     let lockedNote = id ? db.notes.note(id).data.locked : null;
     if (!lockedNote) {
       let rId = await db.notes.add({
@@ -250,42 +282,7 @@ const Editor = ({noMenu}) => {
       }
 
       if (id) {
-        switch (editing.actionAfterFirstSave.type) {
-          case 'topic': {
-            await db.notes.move(
-              {
-                topic: editing.actionAfterFirstSave.id,
-                id: editing.actionAfterFirstSave.notebook,
-              },
-              id,
-            );
-            editing.actionAfterFirstSave = {
-              type: null,
-            };
-
-            break;
-          }
-          case 'tag': {
-            await db.notes.note(note.id).tag(editing.actionAfterFirstSave.id);
-            editing.actionAfterFirstSave = {
-              type: null,
-            };
-
-            break;
-          }
-          case 'color': {
-            await db.notes.note(id).color(editing.actionAfterFirstSave.id);
-
-            editing.actionAfterFirstSave = {
-              type: null,
-            };
-
-            break;
-          }
-          default: {
-            break;
-          }
-        }
+        await addToCollection(id);
         dispatch({
           type: ACTIONS.CURRENT_EDITING_NOTE,
           id: id,
@@ -359,7 +356,7 @@ const Editor = ({noMenu}) => {
     title = note.title;
     id = note.id;
     setDateEdited(note.dateEdited);
-    content = note.content;
+    content = {...note.content};
     if (!note.locked) {
       content.delta = await db.notes.note(id).delta();
     }
@@ -386,10 +383,10 @@ const Editor = ({noMenu}) => {
       post({
         type: 'clearEditor',
       });
-    } else if (note.content.delta) {
+    } else if (content.delta) {
       let delta;
-      if (typeof note.content.delta !== 'string') {
-        delta = note.content.delta;
+      if (typeof content.delta !== 'string') {
+        delta = content.delta;
       } else {
         delta = await db.notes.note(id).delta();
       }
@@ -400,7 +397,6 @@ const Editor = ({noMenu}) => {
     } else {
       post({type: 'text', value: note.content.text});
     }
-    canSave = true;
   };
 
   const params = 'platform=' + Platform.OS;

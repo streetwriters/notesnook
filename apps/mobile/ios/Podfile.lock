@@ -19,7 +19,7 @@ PODS:
     - DoubleConversion
     - glog
   - glog (0.3.5)
-  - MMKV (1.0.23)
+  - MMKV (1.0.24)
   - RCTRequired (0.61.5)
   - RCTTypeSafety (0.61.5):
     - FBLazyVector (= 0.61.5)
@@ -185,8 +185,8 @@ PODS:
   - React-jsinspector (0.61.5)
   - react-native-aes (1.3.6):
     - React
-  - react-native-mmkv-storage (0.1.5):
-    - MMKV (= 1.0.23)
+  - react-native-mmkv-storage (0.2.2):
+    - MMKV (= 1.0.24)
     - React
   - react-native-orientation (3.1.3):
     - React
@@ -365,7 +365,7 @@ SPEC CHECKSUMS:
   FBReactNativeSpec: 118d0d177724c2d67f08a59136eb29ef5943ec75
   Folly: 30e7936e1c45c08d884aa59369ed951a8e68cf51
   glog: 1f3da668190260b06b429bb211bfbee5cd790c28
-  MMKV: 031ae51aedc0af1b250922f7ed8a6b6ee2f94c4c
+  MMKV: 758b2edee46b08bdd958db4169191afb9a6d4ebd
   RCTRequired: b153add4da6e7dbc44aebf93f3cf4fcae392ddf1
   RCTTypeSafety: 9aa1b91d7f9310fc6eadc3cf95126ffe818af320
   React: b6a59ef847b2b40bb6e0180a97d0ca716969ac78
@@ -376,7 +376,7 @@ SPEC CHECKSUMS:
   React-jsiexecutor: d5525f9ed5f782fdbacb64b9b01a43a9323d2386
   React-jsinspector: fa0ecc501688c3c4c34f28834a76302233e29dc0
   react-native-aes: 22ea989d641f53ea7722fe6b146349ed66e6455d
-  react-native-mmkv-storage: fe0db5290c1321b4be87765a88c6fd302ccd541e
+  react-native-mmkv-storage: 4f85ac485ff25ad5b9f7b3c6cd4c8bb067b1028c
   react-native-orientation: f1caf84d65f1a4fd4511a18f2b924e634ad7a628
   react-native-webview: 2aadbfef6b9eaa9e89b306ae3e31e6e870a6306d
   React-RCTActionSheet: 600b4d10e3aea0913b5a92256d2719c0cdd26d76

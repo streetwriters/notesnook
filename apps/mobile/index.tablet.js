@@ -8,10 +8,11 @@ import NavigationService, {
   AppContainer,
 } from './src/services/NavigationService';
 import Editor from './src/views/Editor';
-import {eSubscribeEvent} from './src/services/eventManager';
+import {eSubscribeEvent, eSendEvent} from './src/services/eventManager';
 import {
   eOpenFullscreenEditor,
   eCloseFullscreenEditor,
+  eOnLoadNote,
 } from './src/services/events';
 
 const editorRef = createRef();
@@ -55,6 +56,7 @@ export const Initialize = () => {
   };
 
   useEffect(() => {
+    eSendEvent(eOnLoadNote, {type: 'new'});
     eSubscribeEvent(eOpenFullscreenEditor, showFullScreenEditor);
     eSubscribeEvent(eCloseFullscreenEditor, closeFullScreenEditor);
 

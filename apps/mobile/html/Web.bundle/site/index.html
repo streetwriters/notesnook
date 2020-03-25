@@ -1677,7 +1677,7 @@
 
 
         let m = {};
-        m.delta = editor.getContents();
+        m.delta = { ops: editor.getContents().ops }
 
         m.text = editor.getText();
 

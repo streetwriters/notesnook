@@ -35,6 +35,7 @@ async function readMulti(keys) {
     return [];
   } else {
     let data = await MMKV.getMultipleItemsAsync(keys.slice());
+
     return !data ? undefined : data;
   }
 }
