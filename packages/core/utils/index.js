@@ -70,6 +70,7 @@ function groupBySpecial(arr, key) {
 
 var hexPattern = /([A-F]|[a-f]|\d)*/;
 export function isHex(input) {
+  if (typeof input !== "string") return false;
   if (!input.match || input.length < 16) return false;
   return input.match(hexPattern)[0] === input;
 }

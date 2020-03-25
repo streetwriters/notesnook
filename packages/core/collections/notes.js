@@ -75,7 +75,7 @@ export default class Notes {
     if (!textId && isHex(text)) textId = text;
     if (!deltaId && isHex(delta)) deltaId = delta;
 
-    if (delta && delta.ops) {
+    if (delta && typeof delta === "object") {
       deltaId = await this._deltaCollection.add({
         noteId: id,
         id: deltaId,
