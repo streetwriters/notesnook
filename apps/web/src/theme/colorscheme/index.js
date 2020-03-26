@@ -8,7 +8,7 @@ const colorSchemes = {
 
 class ColorSchemeFactory {
   constructor(theme, accent) {
-    return colorSchemes[theme](accent);
+    return new colorSchemes[theme](accent);
   }
 }
 export default ColorSchemeFactory;
