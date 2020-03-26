@@ -31,6 +31,7 @@ import {hexToRGBA, DDS} from '../../utils/utils';
 import {Platform} from 'react-native';
 import {TEMPLATE_DELETE, TEMPLATE_PERMANANT_DELETE} from './templates';
 import {moveNoteEvent} from './recievers';
+import MergeEditor from '../MergeEditor';
 
 export class DialogManager extends Component {
   constructor(props) {
@@ -343,6 +344,8 @@ export class DialogManager extends Component {
         />
 
         <LoginDialog colors={colors} ref={ref => (this.loginDialog = ref)} />
+
+        <MergeEditor />
       </>
     );
   }

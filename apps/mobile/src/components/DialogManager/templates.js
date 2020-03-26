@@ -32,6 +32,15 @@ export const TEMPLATE_TRASH = type => {
   };
 };
 
+export const TEMPLATE_APPLY_CHANGES = {
+  title: `Apply Changes`,
+  paragraph: `Apply selected changes to note?`,
+  positiveText: 'Apply',
+  negativeText: 'Cancel',
+  action: dialogActions.ACTION_APPLY_CHANGES,
+  icon: 'check',
+};
+
 export const TEMPLATE_EXIT_FULLSCREEN = () => {
   return {
     title: `Exit fullscreen editor?`,

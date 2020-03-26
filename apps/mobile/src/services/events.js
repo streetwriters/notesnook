@@ -67,3 +67,5 @@ export const refreshNotesPage = '532';
 export const eClearSearch = '533';
 
 export const eClearEditor = '534';
+
+export const eApplyChanges = '535';

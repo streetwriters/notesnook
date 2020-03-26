@@ -348,7 +348,7 @@ const Editor = ({noMenu}) => {
     c.factor = normalize(1);
     post({
       type: 'theme',
-      value: colors,
+      value: c,
     });
   };
 
@@ -357,10 +357,6 @@ const Editor = ({noMenu}) => {
     id = note.id;
     setDateEdited(note.dateEdited);
     content = {...note.content};
-    if (!note.locked) {
-      content.delta = await db.notes.note(id).delta();
-    }
-
     saveCounter = 0;
 
     if (title !== null || title === '') {
@@ -383,10 +379,10 @@ const Editor = ({noMenu}) => {
       post({
         type: 'clearEditor',
       });
-    } else if (content.delta) {
+    } else if (note.content.delta) {
       let delta;
-      if (typeof content.delta !== 'string') {
-        delta = content.delta;
+      if (typeof note.content.delta !== 'string') {
+        delta = note.content.delta;
       } else {
         delta = await db.notes.note(id).delta();
       }

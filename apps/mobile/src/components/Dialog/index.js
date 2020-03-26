@@ -8,6 +8,7 @@ import {
   eClearEditor,
   eCloseFullscreenEditor,
   eOnNewTopicAdded,
+  eApplyChanges,
 } from '../../services/events';
 import NavigationService from '../../services/NavigationService';
 import {db, DDS, getElevation, history, ToastEvent} from '../../utils/utils';
@@ -115,6 +116,11 @@ export class Dialog extends Component {
         );
 
         updateEvent({type: ACTIONS.TRASH});
+        this.hide();
+        break;
+      }
+      case dialogActions.ACTION_APPLY_CHANGES: {
+        eSendEvent(eApplyChanges);
         this.hide();
         break;
       }
