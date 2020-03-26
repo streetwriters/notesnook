@@ -1,8 +1,8 @@
 import React from "react";
 import { Flex, Text } from "rebass";
-import { ButtonPressedStyle } from "../../utils/theme";
 import { useTheme } from "emotion-theming";
 
+//TODO use normal button
 function Button(props) {
   const theme = useTheme();
   return (
@@ -24,7 +24,6 @@ function Button(props) {
           cursor: "pointer",
           bg: theme.colors.primary + "dd"
         },
-        ...ButtonPressedStyle,
         ...props.style
       }}
       onClick={props.onClick}

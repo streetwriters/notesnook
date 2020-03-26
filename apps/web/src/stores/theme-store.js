@@ -1,6 +1,6 @@
 import createStore from "../common/store";
 
-function themeStore(set) {
+function themeStore(set, get) {
   return {
     theme: "light",
     accent: "#0560ff",
@@ -8,6 +8,10 @@ function themeStore(set) {
       set(state => {
         state.theme = theme;
       });
+    },
+    toggleNightMode: function() {
+      const theme = get().theme;
+      get().setTheme(theme === "dark" ? "light" : "dark");
     },
     setAccent: function(accent) {
       set(state => {

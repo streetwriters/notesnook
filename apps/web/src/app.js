@@ -3,7 +3,7 @@ import "./app.css";
 import Editor from "./components/editor";
 import { motion } from "framer-motion";
 import { Flex, Box, Button, Text } from "rebass";
-import { ThemeProvider } from "./utils/theme";
+import ThemeProvider from "./components/theme-provider";
 import RootNavigator, {
   bottomRoutes,
   routes

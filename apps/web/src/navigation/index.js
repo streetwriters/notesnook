@@ -4,7 +4,7 @@ import { Box, Flex, Heading, Text } from "rebass";
 import Animated from "../components/animated";
 import { AnimatePresence } from "framer-motion";
 import * as Icon from "../components/icons";
-import { ThemeProvider } from "../utils/theme";
+import ThemeProvider from "../components/theme-provider";
 import { useStore, store } from "../stores/app-store";
 
 class Navigator {

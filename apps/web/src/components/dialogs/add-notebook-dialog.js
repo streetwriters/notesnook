@@ -3,7 +3,6 @@ import { Flex, Box, Text, Button as RebassButton } from "rebass";
 import { Input } from "@rebass/forms";
 import * as Icon from "../icons";
 import Dialog, { showDialog } from "./dialog";
-import { showSnack } from "../snackbar";
 import { store } from "../../stores/notebook-store";
 
 class AddNotebookDialog extends React.Component {
@@ -167,8 +166,6 @@ class AddNotebookDialog extends React.Component {
         positiveButton={{
           text: props.edit ? "Edit" : "Add",
           onClick: () => {
-            if (!this.title.trim().length)
-              return showSnack("Please enter the notebook title.");
             props.onDone({
               title: this.title,
               description: this.description,

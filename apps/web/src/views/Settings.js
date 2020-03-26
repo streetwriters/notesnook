@@ -1,16 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Box, Button, Flex, Text } from "rebass";
 import * as Icon from "../components/icons";
 import "../app.css";
-import { changeTheme, isDarkTheme, changeAccent } from "../utils/theme";
-import { useTheme } from "emotion-theming";
 import { useStore as useUserStore } from "../stores/user-store";
+import { useStore as useThemeStore } from "../stores/theme-store";
 
 function Settings(props) {
-  const [check, setCheck] = useState(isDarkTheme());
-  const theme = useTheme();
+  const theme = useThemeStore(store => store.theme);
+  const accent = useThemeStore(store => store.accent);
+  const toggleNightMode = useThemeStore(store => store.theme);
+  const setAccent = useThemeStore(store => store.theme);
   const user = useUserStore(store => store.user);
   const isLoggedIn = useUserStore(store => store.isLoggedIn);
+
   return (
     <Flex flexDirection="column" flex="1 1 auto">
       <Flex
@@ -99,10 +101,10 @@ function Settings(props) {
               justifyContent="center"
               alignItems="center"
               onClick={() => {
-                changeAccent(color.code);
+                setAccent(color.code);
               }}
             >
-              {color.code === theme.colors.primary && (
+              {color.code === accent && (
                 <Icon.Checkmark
                   sx={{
                     position: "absolute",
@@ -125,13 +127,10 @@ function Settings(props) {
           px={2}
           justifyContent="space-between"
           alignItems="center"
-          onClick={() => {
-            setCheck(!check);
-            changeTheme();
-          }}
+          onClick={() => toggleNightMode()}
         >
           <Text fontSize="body">Dark Mode</Text>
-          {check ? <Icon.Check /> : <Icon.CircleEmpty />}
+          {theme === "dark" ? <Icon.Check /> : <Icon.CircleEmpty />}
         </Flex>
       </Box>
       <Box

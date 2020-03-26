@@ -2,7 +2,6 @@ import React from "react";
 import { Flex, Box } from "rebass";
 import * as Icon from "../icons";
 import TimeAgo from "timeago-react";
-import { showSnack } from "../snackbar";
 import ListItem from "../list-item";
 import { confirm } from "../dialogs/confirm";
 import { showMoveNoteDialog } from "../dialogs/movenotedialog";
@@ -19,7 +18,7 @@ function menuItems(note, context) {
       title: note.notebook ? "Move" : "Add to",
       onClick: async () => {
         if (await showMoveNoteDialog([note.id])) {
-          showSnack("Note moved successfully!");
+          console.log("Note moved successfully!");
         }
       }
     },
