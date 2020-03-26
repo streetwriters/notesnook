@@ -5,11 +5,20 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import WebView from 'react-native-webview';
 import {normalize, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
-import {eApplyChanges, eShowMergeDialog} from '../../services/events';
+import {
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+  eSendEvent,
+} from '../../services/eventManager';
+import {
+  eApplyChanges,
+  eShowMergeDialog,
+  refreshNotesPage,
+} from '../../services/events';
 import {getElevation, h, db} from '../../utils/utils';
-import {simpleDialogEvent} from '../DialogManager/recievers';
+import {simpleDialogEvent, updateEvent} from '../DialogManager/recievers';
 import {TEMPLATE_APPLY_CHANGES} from '../DialogManager/templates';
+import {ACTIONS} from '../../provider/actions';
 
 const {Value, timing} = Animated;
 const firstWebViewHeight = new Value(h * 0.5 - 50);
@@ -144,7 +153,7 @@ const MergeEditor = () => {
         },
         id: note.id,
       });
-    } else {
+    } else if (keepContentFrom === 'secondary') {
       await db.notes.add({
         content: {
           text: secondaryText,
@@ -162,7 +171,7 @@ const MergeEditor = () => {
         },
         id: null,
       });
-    } else {
+    } else if (copyToSave === 'secondary') {
       await db.notes.add({
         content: {
           text: secondaryText,
@@ -171,7 +180,9 @@ const MergeEditor = () => {
         id: null,
       });
     }
-
+    eSendEvent(refreshNotesPage);
+    updateEvent({type: ACTIONS.NOTES});
+    updateEvent({type: ACTIONS.FAVORITES});
     close();
   };
 
