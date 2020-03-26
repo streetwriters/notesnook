@@ -5,7 +5,6 @@ class DarkColorSchemeFactory {
   constructor(accent) {
     return {
       primary: accent,
-      shade: hexToRGB(accent, 0.1),
       placeholder: hexToRGB("#ffffff", 0.6),
       background: "#1f1f1f",
       accent: "#000",
@@ -17,7 +16,7 @@ class DarkColorSchemeFactory {
       overlay: "rgba(255, 255, 255, 0.5)",
       secondary: "black",
       icon: "#dbdbdb",
-      ...new StaticColorSchemeFactory()
+      ...new StaticColorSchemeFactory(accent)
     };
   }
 }

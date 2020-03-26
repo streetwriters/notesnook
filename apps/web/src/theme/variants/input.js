@@ -1,7 +1,7 @@
 class InputFactory {
   constructor() {
     return {
-      default: new Default(),
+      input: new Default(),
       error: new Error()
     };
   }
@@ -22,7 +22,7 @@ class Default {
         borderColor: "primary"
       },
       ":hover": {
-        borderColor: "shade"
+        borderColor: "dimPrimary"
       }
     };
   }
@@ -31,7 +31,7 @@ class Default {
 class Error {
   constructor() {
     return {
-      variant: "forms.default",
+      variant: "forms.input",
       borderColor: "red",
       ":focus": {
         outline: "none",

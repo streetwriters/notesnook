@@ -1,96 +1,48 @@
 import React, { useState } from "react";
-import { Flex, Box, Button, Text } from "rebass";
-import { Input } from "@rebass/forms";
+import { Button, Text } from "rebass";
+import Input from "../inputs";
 import * as Icon from "../icons";
 import Dialog, { showDialog } from "./dialog";
 import { showSignUpDialog } from "./signupdialog";
 import { useStore } from "../../stores/user-store";
+import PasswordInput from "../inputs/password";
+import Form from "../form";
 
 function LoginDialog(props) {
-  const [username, setUsername] = useState();
-  const [password, setPassword] = useState();
-  const [errorMessage, setErrorMessage] = useState();
+  const { onClose } = props;
+  const [error, setError] = useState();
   const isLoggingIn = useStore(store => store.isLoggingIn);
   const login = useStore(store => store.login);
+  const form = { error: true };
+
   return (
     <Dialog
       isOpen={true}
       title={"Login"}
       icon={Icon.Login}
-      onCloseClick={props.onClose}
-      negativeButton={{ onClick: props.onClose }}
+      onCloseClick={onClose}
+      negativeButton={{ onClick: onClose }}
       positiveButton={{
         text: "Login",
         loading: isLoggingIn,
         disabled: isLoggingIn,
         onClick: () => {
-          setErrorMessage();
-          if (username === "" || username === undefined) {
-            setErrorMessage("Please enter your username.");
-            return;
-          }
-
-          if (password === "" || password === undefined) {
-            setErrorMessage("Please enter your password.");
-            return;
-          }
-
-          login(username, password)
-            .then(() => {
-              props.onClose();
-            })
-            .catch(e => {
-              setErrorMessage(e.message);
-            });
+          setError();
+          if (!form.error) return;
+          login(form)
+            .then(onClose)
+            .catch(e => setError(e.message));
         }
       }}
       content={
-        <Box my={1}>
-          <Input
-            autoFocus
-            variant="default"
-            placeholder="Username"
-            onChange={e => {
-              setUsername(e.target.value);
-            }}
-          ></Input>
-          <Input
-            type="password"
-            variant="default"
-            placeholder="Password"
-            sx={{ marginTop: 2 }}
-            onChange={e => {
-              setPassword(e.target.value);
-            }}
-          ></Input>
-          <Flex
-            flexDirection="row"
-            justifyContent="space-between"
-            sx={{ marginTop: 2 }}
-          >
-            <Button
-              variant="links"
-              onClick={() => {
-                showSignUpDialog();
-              }}
-            >
-              Create a New Account
-            </Button>
-          </Flex>
-          <Flex
-            flexDirection="row"
-            justifyContent="space-between"
-            sx={{ marginTop: errorMessage ? 2 : 0 }}
-          >
-            <Text
-              fontSize="subBody"
-              color="red"
-              sx={{ display: errorMessage ? "flex" : "none" }}
-            >
-              {errorMessage}
-            </Text>
-          </Flex>
-        </Box>
+        <Form mt={1} gutter={2} form={form}>
+          <Input autoFocus name="username" title="Username" />
+          <PasswordInput />
+          <Button variant="anchor" onClick={showSignUpDialog()}>
+            Create a New Account
+          </Button>
+          {error && <Text variant="error">{error}</Text>}
+        </Form>
       }
     />
   );

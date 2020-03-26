@@ -12,7 +12,11 @@ function ThemeProvider(props) {
   injectCss(factory.transform("css"));
   const theme = factory.construct({ theme: themeType, accent, scale: 1 });
   return (
-    <EmotionThemeProvider theme={theme}>{props.children}</EmotionThemeProvider>
+    <EmotionThemeProvider theme={theme}>
+      {props.children instanceof Function
+        ? props.children(theme)
+        : props.children}
+    </EmotionThemeProvider>
   );
 }
 export default ThemeProvider;

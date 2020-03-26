@@ -15,9 +15,8 @@ class LightColorSchemeFactory {
       overlay: "rgba(0, 0, 0, 0.1)",
       secondary: "white",
       icon: "#3b3b3b",
-      shade: hexToRGB(accent, 0.1),
       placeholder: hexToRGB("#000000", 0.6),
-      ...new StaticColorSchemeFactory()
+      ...new StaticColorSchemeFactory(accent)
     };
   }
 }

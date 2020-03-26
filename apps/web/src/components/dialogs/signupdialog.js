@@ -1,107 +1,43 @@
 import React, { useState } from "react";
-import { Flex, Box, Text } from "rebass";
-import { Input } from "@rebass/forms";
+import { Text } from "rebass";
+import Input from "../inputs";
 import * as Icon from "../icons";
 import Dialog, { showDialog } from "./dialog";
-import { db } from "../../common";
+//import { db } from "../../common";
+import EmailInput from "../inputs/email";
+import PasswordInput from "../inputs/password";
+import Form from "../form";
 
 function SignUpDialog(props) {
-  const [username, setUserName] = useState();
-  const [email, setEmail] = useState();
-  const [password, setPassword] = useState();
-  const [confirmPassword, setConfirmPassword] = useState();
-  const [errorMessage, setErrorMessage] = useState();
+  const { onClose } = props;
+  const [error, setError] = useState();
+  const form = { error: true };
+
   return (
     <Dialog
       isOpen={true}
       title={"Sign Up"}
       icon={Icon.User}
-      onCloseClick={props.onClose}
-      negativeButton={{ onClick: props.onClose }}
+      onCloseClick={onClose}
+      negativeButton={{ onClick: onClose }}
       positiveButton={{
         text: "Sign Up",
         onClick: () => {
-          setErrorMessage();
-
-          if (username === "" || username === undefined) {
-            setErrorMessage("Please enter your username.");
-            return;
-          }
-
-          if (email === "" || email === undefined) {
-            setErrorMessage("Please enter your email address.");
-            return;
-          }
-
-          if (password !== confirmPassword) {
-            setErrorMessage("Passwords do not match! Please try again.");
-            return;
-          }
-
-          if (password === undefined || password === "") {
-            setErrorMessage("Please enter password.");
-            return;
-          }
-
-          db.user
-            .signup(username, email, password)
-            .then(() => {
-              props.onClose();
-            })
-            .catch(() => {
-              setErrorMessage("Couldn't signup. Please try again.");
-            });
+          setError();
+          if (form.error) return;
+          /*  db.user
+            .signup(form)
+            .then(onClose)
+            .catch(error => setError(`Couldn't signup. Error: ${error}`)); */
         }
       }}
       content={
-        <Box my={1}>
-          <Input
-            variant="default"
-            placeholder="Username"
-            onChange={e => {
-              setUserName(e.target.value);
-            }}
-          ></Input>
-          <Input
-            variant="default"
-            placeholder="Email"
-            sx={{ marginTop: 2 }}
-            onChange={e => {
-              setEmail(e.target.value);
-            }}
-          ></Input>
-          <Input
-            type="password"
-            variant="default"
-            placeholder="Password"
-            sx={{ marginTop: 2 }}
-            onChange={e => {
-              setPassword(e.target.value);
-            }}
-          ></Input>
-          <Input
-            type="password"
-            variant="default"
-            placeholder="Confirm Password"
-            sx={{ marginTop: 2 }}
-            onChange={e => {
-              setConfirmPassword(e.target.value);
-            }}
-          ></Input>
-          <Flex
-            flexDirection="row"
-            justifyContent="space-between"
-            sx={{ marginTop: 2 }}
-          >
-            <Text
-              fontSize="subBody"
-              color="red"
-              sx={{ display: errorMessage ? "flex" : "none" }}
-            >
-              {errorMessage}
-            </Text>
-          </Flex>
-        </Box>
+        <Form mt={1} gutter={2} form={form}>
+          <Input autoFocus title="Username" name="username" />
+          <EmailInput />
+          <PasswordInput confirm />
+          {error && <Text variant="error">{error}</Text>}
+        </Form>
       }
     />
   );

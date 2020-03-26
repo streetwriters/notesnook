@@ -4,7 +4,8 @@ class TextFactory {
       default: new Default(),
       heading: new Heading(),
       title: new Title(),
-      body: new Body()
+      body: new Body(),
+      error: new Error()
     };
   }
 }
@@ -41,6 +42,12 @@ class Title {
 
 class Body {
   constructor() {
-    return { variant: "text.default", fontWeight: "body", fontSize: "body" };
+    return { variant: "text.default", fontSize: "body" };
+  }
+}
+
+class Error {
+  constructor() {
+    return { variant: "text.default", fontSize: "subBody", color: "error" };
   }
 }
