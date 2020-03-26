@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { Button, Text } from "rebass";
+import { Box, Button, Text } from "rebass";
 import Input from "../inputs";
 import * as Icon from "../icons";
 import Dialog, { showDialog } from "./dialog";
 import { showSignUpDialog } from "./signupdialog";
 import { useStore } from "../../stores/user-store";
 import PasswordInput from "../inputs/password";
-import Form from "../form";
+import Dropper from "../dropper";
 
 function LoginDialog(props) {
   const { onClose } = props;
@@ -35,14 +35,16 @@ function LoginDialog(props) {
         }
       }}
     >
-      <Form mt={1} gutter={2} form={form}>
-        <Input autoFocus name="username" title="Username" />
-        <PasswordInput />
+      <Box mt={1}>
+        <Dropper mt={2} form={form}>
+          <Input autoFocus name="username" title="Username" />
+          <PasswordInput />
+        </Dropper>
         <Button variant="anchor" onClick={showSignUpDialog}>
           Create a New Account
         </Button>
         {error && <Text variant="error">{error}</Text>}
-      </Form>
+      </Box>
     </Dialog>
   );
 }

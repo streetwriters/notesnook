@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { Text } from "rebass";
+import { Text, Box } from "rebass";
 import Input from "../inputs";
 import * as Icon from "../icons";
 import Dialog, { showDialog } from "./dialog";
 //import { db } from "../../common";
 import EmailInput from "../inputs/email";
 import PasswordInput from "../inputs/password";
-import Form from "../form";
+import Dropper from "../dropper";
 
 function SignUpDialog(props) {
   const { onClose } = props;
@@ -32,12 +32,14 @@ function SignUpDialog(props) {
         }
       }}
     >
-      <Form mt={1} gutter={2} form={form}>
-        <Input autoFocus title="Username" name="username" />
-        <EmailInput />
-        <PasswordInput confirm />
+      <Box mt={1}>
+        <Dropper mt={2} form={form}>
+          <Input autoFocus title="Username" name="username" />
+          <EmailInput />
+          <PasswordInput confirm />
+        </Dropper>
         {error && <Text variant="error">{error}</Text>}
-      </Form>
+      </Box>
     </Dialog>
   );
 }

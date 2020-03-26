@@ -2,7 +2,7 @@ import React from "react";
 import Input from "./index";
 import { isValidEmail } from "../../utils/validation";
 
-function EmailInput() {
+function EmailInput(props) {
   return (
     <Input
       title="Email"
@@ -10,6 +10,7 @@ function EmailInput() {
       type="email"
       error="Email is not valid."
       validate={isValidEmail}
+      {...props}
     />
   );
 }
