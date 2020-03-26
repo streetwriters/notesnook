@@ -1,19 +1,15 @@
-import React, {useState, createRef, useEffect} from 'react';
-import {Modal, View, TouchableOpacity, Text} from 'react-native';
-import WebView from 'react-native-webview';
-import {h, getElevation} from '../../utils/utils';
-import {useTracked} from '../../provider';
-import {SIZE, WEIGHT, normalize} from '../../common/common';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import React, {createRef, useEffect, useState} from 'react';
+import {Modal, Text, TouchableOpacity, View} from 'react-native';
 import Animated, {Easing} from 'react-native-reanimated';
-import {
-  eSubscribeEvent,
-  eUnSubscribeEvent,
-  eSendEvent,
-} from '../../services/eventManager';
-import {eApplyChanges, eOpenSimpleDialog} from '../../services/events';
-import {TEMPLATE_APPLY_CHANGES} from '../DialogManager/templates';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import WebView from 'react-native-webview';
+import {normalize, SIZE, WEIGHT} from '../../common/common';
+import {useTracked} from '../../provider';
+import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
+import {eApplyChanges, eShowMergeDialog} from '../../services/events';
+import {getElevation, h, db} from '../../utils/utils';
 import {simpleDialogEvent} from '../DialogManager/recievers';
+import {TEMPLATE_APPLY_CHANGES} from '../DialogManager/templates';
 
 const {Value, timing} = Animated;
 const firstWebViewHeight = new Value(h * 0.5 - 50);
@@ -21,8 +17,9 @@ const secondWebViewHeight = new Value(h * 0.5 - 50);
 
 const primaryWebView = createRef();
 const secondaryWebView = createRef();
+let note = null;
 
-export function openEditorAnimation(
+function openEditorAnimation(
   heightToAnimate,
   extendedHeight = null,
   siblingStatus,
@@ -45,7 +42,7 @@ export function openEditorAnimation(
   timing(heightToAnimate, openConfig).start();
 }
 
-export function closeEditorAnimation(heightToAnimate, heightToExtend = null) {
+function closeEditorAnimation(heightToAnimate, heightToExtend = null) {
   let closeConfig = {
     duration: 300,
     toValue: 0,
@@ -65,15 +62,15 @@ export function closeEditorAnimation(heightToAnimate, heightToExtend = null) {
 }
 
 let primaryDelta = null;
-let primaryText = 'Hello world, I am primary text conflict';
+let primaryText = '';
 
 let secondaryDelta = null;
-let secondaryText = 'Hello world, I am secondary text confilict';
+let secondaryText = '';
 
 const MergeEditor = () => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
-  const [visible, setVisible] = useState(true);
+  const [visible, setVisible] = useState(false);
   const [primary, setPrimary] = useState(true);
   const [secondary, setSecondary] = useState(true);
   const [keepContentFrom, setKeepContentFrom] = useState(null);
@@ -88,8 +85,8 @@ const MergeEditor = () => {
 
   const onPrimaryWebViewLoad = () => {
     postMessageToPrimaryWebView({
-      type: 'text',
-      value: primaryText,
+      type: 'delta',
+      value: primaryDelta,
     });
     let c = {...colors};
     c.factor = normalize(1);
@@ -101,8 +98,8 @@ const MergeEditor = () => {
 
   const onSecondaryWebViewLoad = () => {
     postMessageToSecondaryWebView({
-      type: 'text',
-      value: secondaryText,
+      type: 'delta',
+      value: secondaryDelta,
     });
     let c = {...colors};
     c.factor = normalize(1);
@@ -122,11 +119,7 @@ const MergeEditor = () => {
   };
 
   const onMessageFromPrimaryWebView = evt => {
-    if (evt.nativeEvent.data === 'loaded') {
-    } else if (
-      evt.nativeEvent.data !== '' &&
-      evt.nativeEvent.data !== 'loaded'
-    ) {
+    if (evt.nativeEvent.data !== '') {
       let data = JSON.parse(evt.nativeEvent.data);
       primaryDelta = data.delta;
       primaryText = data.text;
@@ -134,11 +127,7 @@ const MergeEditor = () => {
   };
 
   const onMessageFromSecondaryWebView = evt => {
-    if (evt.nativeEvent.data === 'loaded') {
-    } else if (
-      evt.nativeEvent.data !== '' &&
-      evt.nativeEvent.data !== 'loaded'
-    ) {
+    if (evt.nativeEvent.data !== '') {
       let data = JSON.parse(evt.nativeEvent.data);
       secondaryDelta = data.delta;
       secondaryText = data.text;
@@ -146,15 +135,69 @@ const MergeEditor = () => {
     }
   };
 
-  const applyChanges = () => {
-    alert('hello');
+  const applyChanges = async () => {
+    if (keepContentFrom === 'primary') {
+      await db.notes.add({
+        content: {
+          text: primaryText,
+          delta: primaryDelta,
+        },
+        id: note.id,
+      });
+    } else {
+      await db.notes.add({
+        content: {
+          text: secondaryText,
+          delta: secondaryDelta,
+        },
+        id: note.id,
+      });
+    }
+
+    if (copyToSave === 'primary') {
+      await db.notes.add({
+        content: {
+          text: primaryText,
+          delta: primaryDelta,
+        },
+        id: null,
+      });
+    } else {
+      await db.notes.add({
+        content: {
+          text: secondaryText,
+          delta: secondaryDelta,
+        },
+        id: null,
+      });
+    }
+
+    close();
+  };
+
+  const show = async item => {
+    note = item;
+    primaryDelta = await db.notes.note(note.id).delta();
+    secondaryDelta = await db.notes.note(note.id).delta();
+    setVisible(true);
+    postMessageToPrimaryWebView({
+      type: 'delta',
+      value: primaryDelta,
+    });
+    postMessageToSecondaryWebView({
+      type: 'delta',
+      value: secondaryDelta,
+    });
+
+    openEditorAnimation(firstWebViewHeight, secondWebViewHeight, true);
   };
 
   useEffect(() => {
     eSubscribeEvent(eApplyChanges, applyChanges);
-
+    eSubscribeEvent(eShowMergeDialog, show);
     return () => {
       eUnSubscribeEvent(eApplyChanges, applyChanges);
+      eUnSubscribeEvent(eShowMergeDialog, show);
     };
   });
 
@@ -196,6 +239,21 @@ const MergeEditor = () => {
   const onPressDiscardFromSecondaryWebView = () => {
     setDiscardedContent('secondary');
     simpleDialogEvent(TEMPLATE_APPLY_CHANGES);
+  };
+
+  const close = () => {
+    setVisible(false);
+    setPrimary(true);
+    setSecondary(true);
+    setCopyToSave(null);
+    setDiscardedContent(null);
+    setKeepContentFrom(null);
+    primaryDelta = null;
+    secondaryDelta = null;
+    primaryText = null;
+    secondaryText = null;
+    note = null;
+    openEditorAnimation(firstWebViewHeight, secondWebViewHeight, true);
   };
 
   const params = 'platform=' + Platform.OS;
@@ -240,6 +298,7 @@ const MergeEditor = () => {
                 textAlignVertical: 'center',
                 marginLeft: -8,
               }}
+              onPress={close}
               size={SIZE.xxl}
               name="chevron-left"
             />

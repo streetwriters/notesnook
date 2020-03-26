@@ -3,7 +3,7 @@ import {Dimensions, Text, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {ph, pv, SIZE, WEIGHT} from '../../common/common';
 import {eSendEvent, openVault} from '../../services/eventManager';
-import {eOnLoadNote} from '../../services/events';
+import {eOnLoadNote, eShowMergeDialog} from '../../services/events';
 import {openEditorAnimation} from '../../utils/animations';
 import {DDS, timeSince} from '../../utils/utils';
 import {ActionSheetEvent, simpleDialogEvent} from '../DialogManager/recievers';
@@ -86,6 +86,8 @@ export default class NoteItem extends React.Component {
           activeOpacity={0.8}
           onLongPress={() => onLongPress()}
           onPress={() => {
+            eSendEvent(eShowMergeDialog, item);
+            return;
             if (this.props.selectionMode) {
               this.props.onLongPress();
               return;

@@ -69,3 +69,5 @@ export const eClearSearch = '533';
 export const eClearEditor = '534';
 
 export const eApplyChanges = '535';
+
+export const eShowMergeDialog = '536';

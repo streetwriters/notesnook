@@ -1127,7 +1127,7 @@
             imageType: 'image/jpeg'
           },
         },
-        placeholder: 'Start writing your note',
+        placeholder: ' ',
       });
 
 
@@ -1447,12 +1447,7 @@
 
       setTheme();
 
-      editor.once('text-change', function () {
-
-        window.ReactNativeWebView.postMessage("loaded");
-
-
-      });
+      
 
 
       // Receber mensagens do RN
