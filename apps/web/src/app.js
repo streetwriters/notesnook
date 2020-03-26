@@ -34,8 +34,9 @@ function App() {
     <ThemeProvider>
       <Flex bg="background" height="100%">
         <NavigationMenu toggleNavigationContainer={() => setShow(!show)} />
-        <Flex flex="1 1 auto">
+        <Flex variant="rowFill">
           <Animated.Flex
+            variant="columnFill"
             className="RootNavigator"
             initial={{ width: "30%", opacity: 1, scaleY: 1 }}
             animate={{
@@ -45,8 +46,6 @@ function App() {
               zIndex: show ? 0 : -1
             }}
             transition={{ duration: 0.3, ease: "easeOut" }}
-            flex="1 1 auto"
-            flexDirection="column"
             sx={{
               borderRight: "1px solid",
               borderColor: "border"

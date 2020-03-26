@@ -59,9 +59,7 @@ function TagsContainer() {
       TagNavigator.navigate("tags");
     }
   }, []);
-  return (
-    <Flex className="TagNavigator" flexDirection="column" flex="1 1 auto" />
-  );
+  return <Flex variant="columnFill" className="TagNavigator" />;
 }
 
 export { Tags, TagsContainer };

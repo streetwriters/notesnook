@@ -69,13 +69,7 @@ function NotebooksContainer() {
       NotebookNavigator.navigate("notebooks");
     }
   }, []);
-  return (
-    <Flex
-      className="NotebookNavigator"
-      flexDirection="column"
-      flex="1 1 auto"
-    />
-  );
+  return <Flex variant="columnFill" className="NotebookNavigator" />;
 }
 
 export { NotebooksContainer, Notebooks };

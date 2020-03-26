@@ -71,7 +71,7 @@ class Notebook extends React.Component {
           </Flex>
         }
         info={
-          <Flex justifyContent="center" alignItems="center">
+          <Flex variant="rowCenter">
             {new Date(notebook.dateCreated).toDateString().substring(4)}
             <Text as="span" mx={1}>
               •

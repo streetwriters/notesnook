@@ -34,25 +34,6 @@ function Properties() {
   return (
     !isFocusModeEnabled && (
       <>
-        <Box
-          onClick={() => showProperties()}
-          sx={{
-            display: arePropertiesVisible ? "none" : "flex",
-            position: "absolute",
-            top: "50%",
-            right: 0,
-            color: "static",
-            borderRadius: "100px 0px 0px 100px",
-            cursor: "pointer",
-            height: [0, 0, 60]
-          }}
-          alignItems="center"
-          justifyContent="center"
-          bg="primary"
-        >
-          <Icon.ChevronLeft color="static" size={32} />
-        </Box>
-
         <motion.div
           animate={{ x: arePropertiesVisible ? 0 : 800 }}
           transition={{
@@ -187,9 +168,8 @@ function Properties() {
             <Flex flexWrap="wrap" sx={{ marginBottom: 2 }}>
               {objectMap(COLORS, (label, code) => (
                 <Flex
+                  variant="rowCenter"
                   sx={{ position: "relative" }}
-                  justifyContent="center"
-                  alignItems="center"
                   onClick={() => setColor(label)}
                   key={label}
                 >

@@ -61,9 +61,8 @@ function Editor() {
       }}
     >
       <Flex
+        variant="columnFill"
         className="editor"
-        flex="1 1 auto"
-        flexDirection="column"
         onFocus={() => {
           hideProperties();
         }}

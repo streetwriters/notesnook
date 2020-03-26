@@ -11,13 +11,10 @@ function Search(props) {
   const search = useStore(store => store.search);
   return (
     <Flex
+      variant="rowCenter"
       px={2}
-      flexDirection="row"
-      justifyContent="center"
-      alignItems="center"
       sx={{
-        position: "relative",
-        marginBottom: 0
+        position: "relative"
       }}
     >
       <Input

@@ -24,26 +24,15 @@ function ListContainer(props) {
     });
   }, [setSearchContext, props.item, props.items, props.type, props.noSearch]);
   return (
-    <Flex flexDirection="column" flex="1 1 auto">
+    <Flex variant="columnFill">
       {!props.items.length && props.placeholder ? (
-        <Flex
-          flexDirection="column"
-          alignSelf="center"
-          justifyContent="center"
-          flex="1 1 auto"
-        >
+        <Flex variant="columnCenterFill">
           <props.placeholder />
         </Flex>
       ) : (
         <>
           {!props.noSearch && <Search type={props.type} />}
-          <Flex
-            flexDirection="column"
-            flex="1 1 auto"
-            sx={{
-              marginTop: 2
-            }}
-          >
+          <Flex variant="columnFill" mt={2}>
             {props.children || (
               <List
                 style={{

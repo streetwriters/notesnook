@@ -107,7 +107,7 @@ function Note(props) {
         await editorStore.getState().openSession(note);
       }}
       info={
-        <Flex justifyContent="center" alignItems="center">
+        <Flex variant="rowCenter">
           {note.colors.map((item, index) => (
             <Box
               key={item}

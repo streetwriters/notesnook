@@ -49,7 +49,7 @@ function Trash() {
           body={item.headline}
           index={index}
           info={
-            <Flex justifyContent="center" alignItems="center">
+            <Flex variant="rowCenter">
               <TimeAgo datetime={item.dateDeleted || item.dateCreated} />
               <Text as="span" mx={1}>
                 •

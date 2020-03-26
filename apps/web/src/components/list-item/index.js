@@ -121,6 +121,7 @@ function ListItem(props) {
       >
         {props.pinned && (
           <Flex
+            variant="rowCenter"
             bg="primary"
             sx={{
               position: "absolute",
@@ -132,8 +133,6 @@ function ListItem(props) {
               boxShadow: "2px 1px 3px #00000066"
             }}
             mx={2}
-            alignItems="center"
-            justifyContent="center"
           >
             <Box
               bg="static"

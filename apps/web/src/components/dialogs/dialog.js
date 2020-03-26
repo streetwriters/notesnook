@@ -38,14 +38,14 @@ function Dialog(props) {
           }}
         >
           <Flex flexDirection="column">
-            <Flex alignItems="center" justifyContent="center" pb={2}>
+            <Flex variant="rowCenter" pb={2}>
               <props.icon size={props.iconSize || 38} color="primary" />
               <Text variant="heading" color="primary" mx={1}>
                 {props.title}
               </Text>
             </Flex>
             {props.children}
-            <Flex mt={3} justifyContent="center" alignItems="center">
+            <Flex variant="rowCenter" mt={3}>
               {props.positiveButton && (
                 <RebassButton
                   variant="primary"

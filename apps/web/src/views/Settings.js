@@ -14,9 +14,8 @@ function Settings(props) {
   const isLoggedIn = useUserStore(store => store.isLoggedIn);
 
   return (
-    <Flex flexDirection="column" flex="1 1 auto">
+    <Flex variant="columnFill">
       <Flex
-        flexDirection="row"
         bg="shade"
         mx={2}
         p={2}
@@ -24,9 +23,7 @@ function Settings(props) {
         onClick={() => props.navigator.navigate("account")}
       >
         <Flex
-          flexDirection="column"
-          justifyContent="center"
-          alignItems="center"
+          variant="columnCenter"
           bg="primary"
           mr={2}
           sx={{
@@ -37,7 +34,7 @@ function Settings(props) {
         >
           <Icon.User color="static" />
         </Flex>
-        <Flex flexDirection="column" justifyContent="center">
+        <Flex variant="columnCenter">
           {isLoggedIn ? (
             <>
               <Text variant="title">{user.username}</Text>
@@ -97,9 +94,8 @@ function Settings(props) {
             { label: "lightpink", code: "#FABEBE" }
           ].map(color => (
             <Flex
+              variant="rowCenter"
               sx={{ position: "relative" }}
-              justifyContent="center"
-              alignItems="center"
               onClick={() => {
                 setAccent(color.code);
               }}
@@ -185,13 +181,7 @@ function SettingsContainer() {
       SettingsNavigator.navigate("settings");
     }
   }, []);
-  return (
-    <Flex
-      className="SettingsNavigator"
-      flexDirection="column"
-      flex="1 1 auto"
-    />
-  );
+  return <Flex variant="columnFill" className="SettingsNavigator" />;
 }
 
 const Titles = {
