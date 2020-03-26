@@ -6,7 +6,7 @@ import Dialog, { showDialog } from "./dialog";
 import { showSignUpDialog } from "./signupdialog";
 import { useStore } from "../../stores/user-store";
 
-const LoginDialog = props => {
+function LoginDialog(props) {
   const [username, setUsername] = useState();
   const [password, setPassword] = useState();
   const [errorMessage, setErrorMessage] = useState();
@@ -94,7 +94,7 @@ const LoginDialog = props => {
       }
     />
   );
-};
+}
 
 export const showLogInDialog = () => {
   return showDialog(perform => <LoginDialog onClose={() => perform()} />);

@@ -6,7 +6,7 @@ import { db } from "../../common";
 import Dialog, { showDialog } from "./dialog";
 import { toTitleCase } from "../../utils/string";
 
-export default class MoveDialog extends React.Component {
+class MoveDialog extends React.Component {
   history = [];
   _inputRef;
   selectedNotebook;
@@ -197,7 +197,7 @@ export default class MoveDialog extends React.Component {
   }
 }
 
-export const showMoveNoteDialog = noteIds => {
+export function showMoveNoteDialog(noteIds) {
   return showDialog(perform => (
     <MoveDialog
       noteIds={noteIds}
@@ -205,4 +205,4 @@ export const showMoveNoteDialog = noteIds => {
       onMove={() => perform(true)}
     />
   ));
-};
+}

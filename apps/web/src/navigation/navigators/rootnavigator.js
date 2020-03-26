@@ -80,4 +80,5 @@ const RootNavigator = new Navigator(
     backButtonEnabled: false
   }
 );
+
 export default RootNavigator;

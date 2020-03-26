@@ -10,7 +10,9 @@ const routes = {
   ...createRoute("about", TOS),
   ...createRoute("privacy", TOS)
 };
+
 const SettingsNavigator = new Navigator("SettingsNavigator", routes, {
   backButtonEnabled: true
 });
+
 export default SettingsNavigator;

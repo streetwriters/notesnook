@@ -9,7 +9,7 @@ import { objectMap } from "../../utils/object";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { motion } from "framer-motion";
 
-const Properties = props => {
+function Properties() {
   const pinned = useStore(store => store.session.pinned);
   const favorite = useStore(store => store.session.favorite);
   const locked = useStore(store => store.session.locked);
@@ -217,6 +217,5 @@ const Properties = props => {
       </>
     )
   );
-};
-
+}
 export default React.memo(Properties);

@@ -5,24 +5,25 @@ import { store } from "../../stores/notebook-store";
 import { showEditNoteDialog } from "../dialogs/addnotebookdialog";
 
 const dropdownRefs = [];
+function menuItems(notebook, index) {
+  return [
+    {
+      title: notebook.pinned ? "Unpin" : "Pin",
+      onClick: () => store.getState().pin(notebook, index)
+    },
+    {
+      title: "Edit",
+      onClick: () => showEditNoteDialog(notebook)
+    },
+    {
+      title: "Delete",
+      color: "red",
+      onClick: () => store.getState().delete(notebook.id, index)
+    }
+  ];
+}
 
-const menuItems = (notebook, index) => [
-  {
-    title: notebook.pinned ? "Unpin" : "Pin",
-    onClick: () => store.getState().pin(notebook, index)
-  },
-  {
-    title: "Edit",
-    onClick: () => showEditNoteDialog(notebook)
-  },
-  {
-    title: "Delete",
-    color: "red",
-    onClick: () => store.getState().delete(notebook.id, index)
-  }
-];
-
-export default class Notebook extends React.Component {
+class Notebook extends React.Component {
   shouldComponentUpdate(nextProps) {
     const prevItem = this.props.item;
     const nextItem = nextProps.item;
@@ -87,3 +88,4 @@ export default class Notebook extends React.Component {
     );
   }
 }
+export default Notebook;

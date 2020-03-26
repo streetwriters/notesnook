@@ -9,7 +9,7 @@ var parameters = {
   opacity: "0.5"
 };
 
-const NotesPlaceholder = props => {
+function NotesPlaceholder() {
   return (
     <>
       <Flex
@@ -127,6 +127,5 @@ const NotesPlaceholder = props => {
       </Text>
     </>
   );
-};
-
+}
 export default NotesPlaceholder;

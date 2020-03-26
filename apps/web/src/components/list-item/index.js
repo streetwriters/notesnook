@@ -9,15 +9,17 @@ import {
 } from "../../stores/app-store";
 import useContextMenu from "../../utils/useContextMenu";
 
-const ActionsMenu = props => (
-  <Menu
-    id={props.id}
-    menuItems={props.menuItems}
-    data={props.menuData}
-    style={props.style}
-    closeMenu={props.closeMenu}
-  />
-);
+function ActionsMenu(props) {
+  return (
+    <Menu
+      id={props.id}
+      menuItems={props.menuItems}
+      data={props.menuData}
+      style={props.style}
+      closeMenu={props.closeMenu}
+    />
+  );
+}
 
 function selectMenuItem(isSelected, toggleSelection) {
   return {
@@ -51,7 +53,7 @@ const ItemSelector = ({ isSelected, toggleSelection }) => {
   );
 };
 
-const ListItem = props => {
+function ListItem(props) {
   const [parentRef, closeContextMenu] = useContextMenu(
     `contextMenu${props.index}`
   );
@@ -232,6 +234,5 @@ const ListItem = props => {
       )}
     </Flex>
   );
-};
-
+}
 export default ListItem;

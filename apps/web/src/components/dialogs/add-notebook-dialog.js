@@ -6,7 +6,7 @@ import Dialog, { showDialog } from "./dialog";
 import { showSnack } from "../snackbar";
 import { store } from "../../stores/notebook-store";
 
-export default class AddNotebookDialog extends React.Component {
+class AddNotebookDialog extends React.Component {
   MAX_AVAILABLE_HEIGHT = window.innerHeight * 0.3;
   title = "";
   description = "";
@@ -183,7 +183,7 @@ export default class AddNotebookDialog extends React.Component {
   }
 }
 
-export const showEditNoteDialog = notebook => {
+export function showEditNoteDialog(notebook) {
   return showDialog(perform => (
     <AddNotebookDialog
       isOpen={true}
@@ -198,4 +198,6 @@ export const showEditNoteDialog = notebook => {
       }}
     />
   ));
-};
+}
+
+export default AddNotebookDialog;

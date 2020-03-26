@@ -13,79 +13,81 @@ import { db } from "../../common";
 import { useTheme } from "emotion-theming";
 
 const dropdownRefs = [];
-const menuItems = (note, index, context) => [
-  {
-    title: note.notebook ? "Move" : "Add to",
-    onClick: async () => {
-      if (await showMoveNoteDialog([note.id])) {
-        showSnack("Note moved successfully!");
-      }
-    }
-  },
-  {
-    title: note.pinned ? "Unpin" : "Pin",
-    onClick: () => store.getState().pin(note)
-  },
-  {
-    title: note.favorite ? "Unfavorite" : "Favorite",
-    onClick: () => store.getState().favorite(note)
-  },
-  { title: "Edit", onClick: () => editorStore.getState().openSession(note) },
-  {
-    title: note.locked ? "Unlock" : "Lock",
-    onClick: async () => {
-      const { unlock, lock } = store.getState();
-      if (!note.locked) {
-        lock(note.id);
-      } else {
-        unlock(note.id);
-      }
-    }
-  },
-  {
-    invisible: context ? (context.type === "topic" ? false : true) : true,
-    title: "Remove",
-    onClick: async () => {
-      confirm(
-        Icon.Topic,
-        "Remove from Topic",
-        "Are you sure you want to remove this note?"
-      ).then(async res => {
-        if (res) {
-          await db.notebooks
-            .notebook(context.notebook.id)
-            .topics.topic(context.value)
-            .delete(note.id);
-          await store.getState().setSelectedContext(context);
+function menuItems(note, context) {
+  return [
+    {
+      title: note.notebook ? "Move" : "Add to",
+      onClick: async () => {
+        if (await showMoveNoteDialog([note.id])) {
+          showSnack("Note moved successfully!");
         }
-      });
-    }
-  },
-  {
-    title: "Move to Trash",
-    color: "red",
-    onClick: async () => {
-      if (note.locked) {
-        const res = await showPasswordDialog("unlock_note", password => {
-          return db.vault
-            .unlock(password)
-            .then(() => true)
-            .catch(() => false);
+      }
+    },
+    {
+      title: note.pinned ? "Unpin" : "Pin",
+      onClick: () => store.getState().pin(note)
+    },
+    {
+      title: note.favorite ? "Unfavorite" : "Favorite",
+      onClick: () => store.getState().favorite(note)
+    },
+    { title: "Edit", onClick: () => editorStore.getState().openSession(note) },
+    {
+      title: note.locked ? "Unlock" : "Lock",
+      onClick: async () => {
+        const { unlock, lock } = store.getState();
+        if (!note.locked) {
+          lock(note.id);
+        } else {
+          unlock(note.id);
+        }
+      }
+    },
+    {
+      invisible: context ? (context.type === "topic" ? false : true) : true,
+      title: "Remove",
+      onClick: async () => {
+        confirm(
+          Icon.Topic,
+          "Remove from Topic",
+          "Are you sure you want to remove this note?"
+        ).then(async res => {
+          if (res) {
+            await db.notebooks
+              .notebook(context.notebook.id)
+              .topics.topic(context.value)
+              .delete(note.id);
+            await store.getState().setSelectedContext(context);
+          }
         });
-        if (!res) return;
       }
-      confirm(
-        Icon.Trash,
-        "Delete",
-        "Are you sure you want to delete this note?"
-      ).then(async res => {
-        if (res) {
-          await store.getState().delete(note.id);
+    },
+    {
+      title: "Move to Trash",
+      color: "red",
+      onClick: async () => {
+        if (note.locked) {
+          const res = await showPasswordDialog("unlock_note", password => {
+            return db.vault
+              .unlock(password)
+              .then(() => true)
+              .catch(() => false);
+          });
+          if (!res) return;
         }
-      });
+        confirm(
+          Icon.Trash,
+          "Delete",
+          "Are you sure you want to delete this note?"
+        ).then(async res => {
+          if (res) {
+            await store.getState().delete(note.id);
+          }
+        });
+      }
     }
-  }
-];
+  ];
+}
 
 function Note(props) {
   const { item, index } = props;
@@ -135,7 +137,7 @@ function Note(props) {
       }
       pinned={props.pinnable && note.pinned}
       menuData={note}
-      menuItems={menuItems(note, index, props.context)}
+      menuItems={menuItems(note, props.context)}
       dropdownRefs={dropdownRefs}
     />
   );

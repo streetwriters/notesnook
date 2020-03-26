@@ -5,7 +5,7 @@ import * as Icon from "../icons";
 import Dialog, { showDialog } from "./dialog";
 import { db } from "../../common";
 
-const SignUpDialog = props => {
+function SignUpDialog(props) {
   const [username, setUserName] = useState();
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
@@ -105,8 +105,8 @@ const SignUpDialog = props => {
       }
     />
   );
-};
+}
 
-export const showSignUpDialog = () => {
+export function showSignUpDialog() {
   return showDialog(perform => <SignUpDialog onClose={() => perform()} />);
-};
+}

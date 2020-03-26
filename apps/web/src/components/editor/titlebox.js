@@ -5,7 +5,7 @@ import { Flex } from "rebass";
 import * as Icon from "../icons";
 import { store as appStore } from "../../stores/app-store";
 
-export default class TitleBox extends React.Component {
+class TitleBox extends React.Component {
   state = { isFocusMode: false };
 
   inputRef;
@@ -70,3 +70,4 @@ export default class TitleBox extends React.Component {
     );
   }
 }
+export default TitleBox;

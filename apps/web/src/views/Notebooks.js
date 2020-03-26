@@ -7,7 +7,7 @@ import ListContainer from "../components/list-container";
 import { useStore, store } from "../stores/notebook-store";
 import NotebooksPlaceholder from "../components/placeholders/notebooks-placeholder";
 
-const Notebooks = props => {
+function Notebooks(props) {
   const [open, setOpen] = useState(false);
   useEffect(() => store.getState().refresh(), []);
   const notebooks = useStore(state => state.notebooks);
@@ -59,9 +59,9 @@ const Notebooks = props => {
       />
     </>
   );
-};
+}
 
-const NotebooksContainer = () => {
+function NotebooksContainer() {
   useEffect(() => {
     const NotebookNavigator = require("../navigation/navigators/nbnavigator")
       .default;
@@ -76,6 +76,6 @@ const NotebooksContainer = () => {
       flex="1 1 auto"
     />
   );
-};
+}
 
 export { NotebooksContainer, Notebooks };

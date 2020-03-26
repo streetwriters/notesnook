@@ -6,7 +6,7 @@ import { useStore as useNoteStore } from "../stores/note-store";
 import { useStore as useNbStore } from "../stores/notebook-store";
 import { showTopicDialog } from "../components/dialogs/topicdialog";
 
-const Topics = props => {
+function Topics(props) {
   const setSelectedContext = useNoteStore(store => store.setSelectedContext);
   const setSelectedNotebookTopics = useNbStore(
     store => store.setSelectedNotebookTopics
@@ -55,6 +55,5 @@ const Topics = props => {
       }}
     />
   );
-};
-
+}
 export default Topics;

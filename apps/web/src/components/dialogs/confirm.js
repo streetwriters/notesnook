@@ -22,7 +22,7 @@ function Confirm(props) {
   );
 }
 
-export const confirm = (icon, title, message) => {
+export function confirm(icon, title, message) {
   return showDialog(perform => (
     <Confirm
       title={title}
@@ -32,4 +32,4 @@ export const confirm = (icon, title, message) => {
       onYes={() => perform(true)}
     />
   ));
-};
+}

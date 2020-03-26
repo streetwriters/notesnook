@@ -3,7 +3,7 @@ import { Flex, Text } from "rebass";
 import { ButtonPressedStyle } from "../../utils/theme";
 import { useTheme } from "emotion-theming";
 
-const Button = props => {
+function Button(props) {
   const theme = useTheme();
   return (
     <Flex
@@ -35,5 +35,5 @@ const Button = props => {
       </Text>
     </Flex>
   );
-};
+}
 export default Button;

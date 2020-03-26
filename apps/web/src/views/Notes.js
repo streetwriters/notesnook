@@ -5,7 +5,7 @@ import { useStore } from "../stores/editor-store";
 import { useStore as useNotesStore } from "../stores/note-store";
 import { DEFAULT_CONTEXT } from "../common";
 
-const Notes = props => {
+function Notes(props) {
   const newSession = useStore(store => store.newSession);
   const selectedNotes = useNotesStore(store => store.selectedNotes);
   const selectedContext = useNotesStore(store => store.selectedContext);
@@ -31,6 +31,5 @@ const Notes = props => {
       }}
     />
   );
-};
-
+}
 export default Notes;

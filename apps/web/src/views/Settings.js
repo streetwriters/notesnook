@@ -6,7 +6,7 @@ import { changeTheme, isDarkTheme, changeAccent } from "../utils/theme";
 import { useTheme } from "emotion-theming";
 import { useStore as useUserStore } from "../stores/user-store";
 
-const Settings = props => {
+function Settings(props) {
   const [check, setCheck] = useState(isDarkTheme());
   const theme = useTheme();
   const user = useUserStore(store => store.user);
@@ -176,9 +176,9 @@ const Settings = props => {
       </Button>
     </Flex>
   );
-};
+}
 
-const SettingsContainer = props => {
+function SettingsContainer() {
   useEffect(() => {
     const SettingsNavigator = require("../navigation/navigators/settingnavigator")
       .default;
@@ -193,7 +193,7 @@ const SettingsContainer = props => {
       flex="1 1 auto"
     />
   );
-};
+}
 
 const Titles = {
   general: "General",

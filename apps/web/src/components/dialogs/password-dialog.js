@@ -81,7 +81,7 @@ function getDialogData(type) {
   }
 }
 
-export const showPasswordDialog = (type, validate) => {
+export function showPasswordDialog(type, validate) {
   const { title, icon, positiveButtonText } = getDialogData(type);
   return showDialog(perform => (
     <PasswordDialog
@@ -93,4 +93,4 @@ export const showPasswordDialog = (type, validate) => {
       onDone={() => perform(true)}
     />
   ));
-};
+}

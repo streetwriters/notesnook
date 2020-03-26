@@ -19,7 +19,7 @@ import { useStore as useAppStore } from "./stores/app-store";
 import { useStore as useUserStore } from "./stores/user-store";
 import Animated from "./components/animated";
 
-const NavMenuItem = props => {
+function NavMenuItem(props) {
   const [isLoading, setIsLoading] = useState(false);
   const isSyncing = useUserStore(store => store.isSyncing);
   useEffect(() => {
@@ -74,7 +74,7 @@ const NavMenuItem = props => {
       </Flex>
     </Button>
   );
-};
+}
 
 function App() {
   const [selectedKey, setSelectedKey] = usePersistentState(
@@ -244,5 +244,4 @@ function App() {
     </ThemeProvider>
   );
 }
-
 export default App;

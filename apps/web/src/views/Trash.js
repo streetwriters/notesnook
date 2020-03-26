@@ -9,27 +9,29 @@ import { useStore, store } from "../stores/trash-store";
 import { toTitleCase } from "../utils/string";
 
 const dropdownRefs = [];
-const menuItems = (item, index) => [
-  {
-    title: "Restore",
-    onClick: () => store.getState().restore(item.id, index)
-  },
-  {
-    title: "Delete",
-    color: "red",
-    onClick: () => {
-      confirm(
-        Icon.Trash,
-        "Delete",
-        `Are you sure you want to permanently delete this item?`
-      ).then(async res => {
-        if (res) {
-          await store.getState().delete(item.id, index);
-        }
-      });
+function menuItems(item, index) {
+  return [
+    {
+      title: "Restore",
+      onClick: () => store.getState().restore(item.id, index)
+    },
+    {
+      title: "Delete",
+      color: "red",
+      onClick: () => {
+        confirm(
+          Icon.Trash,
+          "Delete",
+          `Are you sure you want to permanently delete this item?`
+        ).then(async res => {
+          if (res) {
+            await store.getState().delete(item.id, index);
+          }
+        });
+      }
     }
-  }
-];
+  ];
+}
 
 function Trash() {
   useEffect(() => store.getState().refresh(), []);
@@ -78,5 +80,4 @@ function Trash() {
     />
   );
 }
-
 export default Trash;

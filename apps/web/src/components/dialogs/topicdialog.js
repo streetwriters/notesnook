@@ -6,7 +6,7 @@ import { db } from "../../common";
 import Dialog, { showDialog } from "./dialog";
 import { store } from "../../stores/notebook-store";
 
-const TopicDialog = props => {
+function TopicDialog(props) {
   const [topic, setTopic] = useState();
   return (
     <Dialog
@@ -31,9 +31,9 @@ const TopicDialog = props => {
       negativeButton={{ text: "Cancel", onClick: props.onNo }}
     />
   );
-};
+}
 
-export const showTopicDialog = notebook => {
+export function showTopicDialog(notebook) {
   return showDialog(perform => (
     <TopicDialog
       title={"Topic"}
@@ -49,4 +49,4 @@ export const showTopicDialog = notebook => {
       }}
     />
   ));
-};
+}

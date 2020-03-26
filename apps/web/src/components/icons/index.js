@@ -4,7 +4,7 @@ import * as Icons from "@mdi/js";
 import { useTheme } from "emotion-theming";
 import Animated from "../animated";
 
-const Icon = ({ name, size = 24, color = "icon", rotate }) => {
+function Icon({ name, size = 24, color = "icon", rotate }) {
   const theme = useTheme();
   return (
     <MDIIcon
@@ -14,21 +14,23 @@ const Icon = ({ name, size = 24, color = "icon", rotate }) => {
       spin={rotate}
     />
   );
-};
+}
 
-const createIcon = name => {
-  return props => (
-    <Animated.Box
-      sx={props.sx}
-      height={(props.size || 24) + "px"}
-      whileHover={{ scale: 1.1 }}
-      transition={{ duration: 0.3, ease: "easeOut" }}
-      animate={props.animation}
-    >
-      <Icon name={name} {...props} />
-    </Animated.Box>
-  );
-};
+function createIcon(name) {
+  return function(props) {
+    return (
+      <Animated.Box
+        sx={props.sx}
+        height={(props.size || 24) + "px"}
+        whileHover={{ scale: 1.1 }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
+        animate={props.animation}
+      >
+        <Icon name={name} {...props} />
+      </Animated.Box>
+    );
+  };
+}
 
 export const Plus = createIcon(Icons.mdiPlus);
 export const Minus = createIcon(Icons.mdiMinus);

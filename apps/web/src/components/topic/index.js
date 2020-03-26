@@ -9,7 +9,7 @@ const menuItems = [
   }
 ];
 
-const Topic = ({ item, index, onClick }) => {
+function Topic({ item, index, onClick }) {
   const topic = item;
   return (
     <ListItem
@@ -24,6 +24,5 @@ const Topic = ({ item, index, onClick }) => {
       menuItems={menuItems}
     />
   );
-};
-
+}
 export default Topic;

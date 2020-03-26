@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Flex, Text } from "rebass";
 import { Switch } from "@rebass/forms";
 
-const CheckBox = props => {
+function CheckBox(props) {
   const [checked, setChecked] = useState(props.checked || false);
   useEffect(() => {
     setChecked(props.checked);
@@ -31,6 +31,5 @@ const CheckBox = props => {
       <Switch checked={checked} />
     </Flex>
   );
-};
-
+}
 export default CheckBox;

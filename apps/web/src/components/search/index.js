@@ -7,7 +7,7 @@ import "./search.css";
 import RootNavigator from "../../navigation/navigators/rootnavigator";
 
 var query = "";
-const Search = props => {
+function Search(props) {
   const search = useStore(store => store.search);
   return (
     <Flex
@@ -51,5 +51,5 @@ const Search = props => {
       </Box>
     </Flex>
   );
-};
+}
 export default Search;

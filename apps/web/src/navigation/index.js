@@ -7,7 +7,7 @@ import * as Icon from "../components/icons";
 import { ThemeProvider } from "../utils/theme";
 import { useStore, store } from "../stores/app-store";
 
-export default class Navigator {
+class Navigator {
   constructor(root, routes, options = {}) {
     this.routes = routes;
     this.root = root;
@@ -98,8 +98,9 @@ export default class Navigator {
     };
   }
 }
+export default Navigator;
 
-const NavigationContainer = props => {
+function NavigationContainer(props) {
   const openSideMenu = useStore(store => store.openSideMenu);
   const isSelectionMode = useStore(store => store.isSelectionMode);
   const exitSelectionMode = useStore(store => store.exitSelectionMode);
@@ -192,4 +193,4 @@ const NavigationContainer = props => {
       )}
     </ThemeProvider>
   );
-};
+}

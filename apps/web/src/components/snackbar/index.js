@@ -22,29 +22,31 @@ export function showSnack(message, icon = undefined) {
   }
 }
 
-const Snackbar = props => (
-  <ThemeProvider>
-    <Flex
-      id="snackbar"
-      sx={{
-        position: "absolute",
-        bottom: 10,
-        left: "50%",
-        textAlign: "center",
-        color: "static",
-        fontFamily: "body",
-        fontWeight: "body",
-        borderRadius: "default",
-        animation: "1s ease-out fadeUp"
-      }}
-      alignItems="center"
-      flexDirection="row"
-      bg="primary"
-      py={2}
-      px={2}
-    >
-      {props.Icon && <props.Icon size={18} />}
-      <Text mx={1}>{props.message}</Text>
-    </Flex>
-  </ThemeProvider>
-);
+function Snackbar(props) {
+  return (
+    <ThemeProvider>
+      <Flex
+        id="snackbar"
+        sx={{
+          position: "absolute",
+          bottom: 10,
+          left: "50%",
+          textAlign: "center",
+          color: "static",
+          fontFamily: "body",
+          fontWeight: "body",
+          borderRadius: "default",
+          animation: "1s ease-out fadeUp"
+        }}
+        alignItems="center"
+        flexDirection="row"
+        bg="primary"
+        py={2}
+        px={2}
+      >
+        {props.Icon && <props.Icon size={18} />}
+        <Text mx={1}>{props.message}</Text>
+      </Flex>
+    </ThemeProvider>
+  );
+}

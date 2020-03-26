@@ -40,7 +40,7 @@ const animatedTags = [
   }
 ];
 
-const TagsPlaceholder = props => {
+function TagsPlaceholder() {
   return (
     <>
       <Flex
@@ -98,6 +98,5 @@ const TagsPlaceholder = props => {
       </Text>
     </>
   );
-};
-
+}
 export default TagsPlaceholder;

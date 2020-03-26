@@ -7,7 +7,7 @@ import { Virtuoso as List } from "react-virtuoso";
 import { useStore as useSearchStore } from "../../stores/searchstore";
 import { useStore as useAppStore } from "../../stores/app-store";
 
-const ListContainer = props => {
+function ListContainer(props) {
   const setSearchContext = useSearchStore(store => store.setSearchContext);
   const shouldSelectAll = useAppStore(store => store.shouldSelectAll);
   const setSelectedItems = useAppStore(store => store.setSelectedItems);
@@ -68,6 +68,5 @@ const ListContainer = props => {
       )}
     </Flex>
   );
-};
-
+}
 export default ListContainer;

@@ -6,16 +6,18 @@ import { useStore as useNotesStore } from "../stores/note-store";
 import { useStore, store } from "../stores/tag-store";
 import TagsPlaceholder from "../components/placeholders/tags-placeholder";
 
-const TagNode = ({ title }) => (
-  <Text as="span" variant="title">
-    <Text as="span" color="primary">
-      {"#"}
+function TagNode({ title }) {
+  return (
+    <Text as="span" variant="title">
+      <Text as="span" color="primary">
+        {"#"}
+      </Text>
+      {title}
     </Text>
-    {title}
-  </Text>
-);
+  );
+}
 
-const Tags = props => {
+function Tags(props) {
   const setSelectedContext = useNotesStore(store => store.setSelectedContext);
   const tags = useStore(store => store.tags);
   useEffect(() => {
@@ -47,9 +49,9 @@ const Tags = props => {
       placeholder={TagsPlaceholder}
     />
   );
-};
+}
 
-const TagsContainer = () => {
+function TagsContainer() {
   useEffect(() => {
     const TagNavigator = require("../navigation/navigators/tagnavigator")
       .default;
@@ -60,6 +62,6 @@ const TagsContainer = () => {
   return (
     <Flex className="TagNavigator" flexDirection="column" flex="1 1 auto" />
   );
-};
+}
 
 export { Tags, TagsContainer };

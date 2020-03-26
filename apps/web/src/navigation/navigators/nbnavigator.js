@@ -13,7 +13,9 @@ const routes = {
   }),
   ...createRoute("notes", Notes, { options: SelectionModeOptions.NotesOptions })
 };
+
 const NotebookNavigator = new Navigator("NotebookNavigator", routes, {
   backButtonEnabled: true
 });
+
 export default NotebookNavigator;

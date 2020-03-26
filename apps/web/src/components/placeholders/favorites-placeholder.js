@@ -3,7 +3,7 @@ import React from "react";
 import * as Icon from "../icons";
 import { Flex, Text } from "rebass";
 
-const FavoritesPlaceholder = props => {
+function FavoritesPlaceholder() {
   return (
     <>
       <Flex
@@ -60,6 +60,5 @@ const FavoritesPlaceholder = props => {
       </Text>
     </>
   );
-};
-
+}
 export default FavoritesPlaceholder;

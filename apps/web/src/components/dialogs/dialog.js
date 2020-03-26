@@ -104,7 +104,7 @@ export default class Dialog extends React.Component {
   }
 }
 
-export const showDialog = dialog => {
+export function showDialog(dialog) {
   const root = document.getElementById("dialogContainer");
   const perform = (resolve, result) => {
     ReactDOM.unmountComponentAtNode(root);
@@ -117,4 +117,4 @@ export const showDialog = dialog => {
     });
   }
   return Promise.reject("No element with id 'dialogContainer'");
-};
+}

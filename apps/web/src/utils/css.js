@@ -13,6 +13,7 @@ export function addCss(rule) {
   else css.appendChild(document.createTextNode(rule));
   head.insertBefore(css, getRootStylesheet());
 }
+
 function getRootStylesheet() {
   for (let sty of document.getElementsByTagName("style")) {
     if (sty.innerHTML.includes("#root")) {

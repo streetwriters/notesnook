@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import React from "react";
 import { Box, Flex, Text } from "rebass";
 
-const NotebooksPlaceholder = props => {
+function NotebooksPlaceholder() {
   return (
     <>
       <Flex
@@ -151,6 +151,6 @@ const NotebooksPlaceholder = props => {
       </Text>
     </>
   );
-};
+}
 
 export default NotebooksPlaceholder;

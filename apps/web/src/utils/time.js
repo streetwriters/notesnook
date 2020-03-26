@@ -7,6 +7,7 @@ const days = [
   "Friday",
   "Saturday"
 ];
+
 const months = [
   "Jan",
   "Feb",
@@ -21,7 +22,8 @@ const months = [
   "Nov",
   "Dec"
 ];
-export const timeConverter = timestamp => {
+
+export function timeConverter(timestamp) {
   if (!timestamp) return;
   var d = new Date(timestamp), // Convert the passed timestamp to milliseconds
     yyyy = d.getFullYear(),
@@ -60,4 +62,4 @@ export const timeConverter = timestamp => {
     ampm;
 
   return time;
-};
+}
