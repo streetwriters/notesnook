@@ -1,4 +1,4 @@
-export function addCss(rule) {
+export function injectCss(rule) {
   let variableCss = document.getElementById("variables");
   let head = document.getElementsByTagName("head")[0];
   if (variableCss) {

@@ -13,7 +13,6 @@ function appStore(set, get) {
     isSelectionMode: false,
     shouldSelectAll: false,
     selectedItems: [],
-    theme: {},
     colors: [],
     refreshApp: function() {
       noteStore.getState().refresh();
@@ -105,11 +104,6 @@ function appStore(set, get) {
           .unlock(password)
           .then(() => true)
           .catch(() => false);
-      });
-    },
-    setTheme: function(theme) {
-      set(state => {
-        state.theme = theme;
       });
     }
   };
