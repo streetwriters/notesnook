@@ -1,14 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import "./app.css";
 import Editor from "./components/editor";
 import { motion } from "framer-motion";
-import { Flex, Box, Button, Text } from "rebass";
+import { Flex, Box } from "rebass";
 import ThemeProvider from "./components/theme-provider";
 import RootNavigator, {
   bottomRoutes,
   routes
 } from "./navigation/navigators/rootnavigator";
-import "./app.css";
 import { usePersistentState } from "./utils/hooks";
 import { useStore } from "./stores/app-store";
 import { useStore as useNotesStore } from "./stores/note-store";
@@ -18,63 +17,7 @@ import * as Icon from "./components/icons";
 import { useStore as useAppStore } from "./stores/app-store";
 import { useStore as useUserStore } from "./stores/user-store";
 import Animated from "./components/animated";
-
-function NavMenuItem(props) {
-  const [isLoading, setIsLoading] = useState(false);
-  const isSyncing = useUserStore(store => store.isSyncing);
-  useEffect(() => {
-    if (props.item.animatable) {
-      if (props.item.key === "sync") setIsLoading(isSyncing);
-    }
-  }, [isSyncing, setIsLoading, props.item]);
-
-  return (
-    <Button
-      onClick={() => props.onSelected()}
-      variant="nav"
-      sx={{
-        width: "full",
-        borderRadius: "none",
-        textAlign: "center",
-        color: props.selected ? "primary" : props.item.color || "text",
-        transition: "color 100ms, background-color 100ms linear",
-        ":hover": {
-          color: "primary",
-          backgroundColor: "shade"
-        }
-      }}
-      px={0}
-      py={3}
-    >
-      <Flex
-        justifyContent={["flex-start", "center", "center"]}
-        alignItems="center"
-        sx={{ position: "relative", marginLeft: [2, 0, 0] }}
-      >
-        <props.item.icon
-          size={18}
-          sx={{ marginRight: "2px" }}
-          color={props.selected ? "primary" : props.item.color || "icon"}
-          rotate={isLoading}
-        />
-        <Text
-          sx={{
-            display: ["flex", "none", "none"],
-            fontSize: 15,
-            marginLeft: 1
-          }}
-        >
-          {props.item.title}
-        </Text>
-        {props.item.count && (
-          <Text sx={{ position: "absolute", top: -8, right: 10 }} fontSize={9}>
-            {props.item.count > 99 ? "99+" : props.item.count}
-          </Text>
-        )}
-      </Flex>
-    </Button>
-  );
-}
+import NavItem from "./components/navitem";
 
 function App() {
   const [selectedKey, setSelectedKey] = usePersistentState(
@@ -143,7 +86,7 @@ function App() {
             }}
           >
             {Object.values(routes).map((item, index) => (
-              <NavMenuItem
+              <NavItem
                 onSelected={async () => {
                   if (selectedKey === item.key) {
                     setShow(!show);
@@ -164,7 +107,7 @@ function App() {
             ))}
             {colors.map(color => {
               return (
-                <NavMenuItem
+                <NavItem
                   onSelected={async () => {
                     setSelectedKey(undefined);
                     setSelectedContext({
@@ -193,7 +136,7 @@ function App() {
           </Box>
           <Box>
             {Object.values(bottomRoutes).map((item, index) => (
-              <NavMenuItem
+              <NavItem
                 onSelected={async () => {
                   if (item.onClick) {
                     await item.onClick();

@@ -16,14 +16,13 @@ export default ButtonFactory;
 class Default {
   constructor() {
     return {
+      bg: "transparent",
       fontFamily: "body",
       fontWeight: "body",
       borderRadius: "default",
+      cursor: "pointer",
       ":focus": {
         outline: "none"
-      },
-      ":hover": {
-        cursor: "pointer"
       }
     };
   }
@@ -72,7 +71,7 @@ class List {
 class Anchor {
   constructor() {
     return {
-      variant: "button.default",
+      variant: "buttons.default",
       color: "primary",
       fontSize: "subBody",
       p: 0,
@@ -84,8 +83,8 @@ class Anchor {
 class Menu {
   constructor() {
     return {
-      variant: "button.default",
-      cursor: "pointer",
+      variant: "buttons.default",
+      borderRadius: "none",
       ":hover": {
         backgroundColor: "shade"
       }
