@@ -31,15 +31,14 @@ function SignUpDialog(props) {
             .catch(error => setError(`Couldn't signup. Error: ${error}`)); */
         }
       }}
-      content={
-        <Form mt={1} gutter={2} form={form}>
-          <Input autoFocus title="Username" name="username" />
-          <EmailInput />
-          <PasswordInput confirm />
-          {error && <Text variant="error">{error}</Text>}
-        </Form>
-      }
-    />
+    >
+      <Form mt={1} gutter={2} form={form}>
+        <Input autoFocus title="Username" name="username" />
+        <EmailInput />
+        <PasswordInput confirm />
+        {error && <Text variant="error">{error}</Text>}
+      </Form>
+    </Dialog>
   );
 }
 

@@ -34,17 +34,16 @@ function LoginDialog(props) {
             .catch(e => setError(e.message));
         }
       }}
-      content={
-        <Form mt={1} gutter={2} form={form}>
-          <Input autoFocus name="username" title="Username" />
-          <PasswordInput />
-          <Button variant="anchor" onClick={showSignUpDialog()}>
-            Create a New Account
-          </Button>
-          {error && <Text variant="error">{error}</Text>}
-        </Form>
-      }
-    />
+    >
+      <Form mt={1} gutter={2} form={form}>
+        <Input autoFocus name="username" title="Username" />
+        <PasswordInput />
+        <Button variant="anchor" onClick={showSignUpDialog}>
+          Create a New Account
+        </Button>
+        {error && <Text variant="error">{error}</Text>}
+      </Form>
+    </Dialog>
   );
 }
 

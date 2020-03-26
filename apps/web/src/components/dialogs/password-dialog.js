@@ -21,38 +21,37 @@ function PasswordDialog(props) {
       isOpen={true}
       title={props.title}
       icon={props.icon}
-      content={
-        <Box my={1}>
-          <Input
-            ref={passwordRef}
-            autoFocus
-            variant={isWrong ? "error" : "default"}
-            type="password"
-            placeholder="Enter vault password"
-            onKeyUp={async e => {
-              if (e.key === "Enter") {
-                await submit();
-              } else {
-                setIsWrong(false);
-              }
-            }}
-          />
-          {isWrong && (
-            <Flex alignItems="center" color="error" mt={2}>
-              <Icon.Alert size={16} color="error" />
-              <Text ml={1} fontSize={"subBody"}>
-                Wrong password
-              </Text>
-            </Flex>
-          )}
-        </Box>
-      }
       positiveButton={{
         text: props.positiveButtonText,
         onClick: submit
       }}
       negativeButton={{ text: "Cancel", onClick: props.onCancel }}
-    />
+    >
+      <Box my={1}>
+        <Input
+          ref={passwordRef}
+          autoFocus
+          variant={isWrong ? "error" : "default"}
+          type="password"
+          placeholder="Enter vault password"
+          onKeyUp={async e => {
+            if (e.key === "Enter") {
+              await submit();
+            } else {
+              setIsWrong(false);
+            }
+          }}
+        />
+        {isWrong && (
+          <Flex alignItems="center" color="error" mt={2}>
+            <Icon.Alert size={16} color="error" />
+            <Text ml={1} fontSize={"subBody"}>
+              Wrong password
+            </Text>
+          </Flex>
+        )}
+      </Box>
+    </Dialog>
   );
 }
 

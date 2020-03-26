@@ -38,32 +38,14 @@ function Dialog(props) {
           }}
         >
           <Flex flexDirection="column">
-            <Flex
-              flexDirection="row"
-              alignItems="center"
-              alignSelf="center"
-              justifyContent="center"
-              color="primary"
-              sx={{ paddingBottom: 2 }}
-            >
+            <Flex alignItems="center" justifyContent="center" pb={2}>
               <props.icon size={props.iconSize || 38} color="primary" />
-              <Text
-                mx={1}
-                as="span"
-                variant="title"
-                fontSize={"heading"}
-                textAlign="center"
-              >
+              <Text variant="heading" color="primary" mx={1}>
                 {props.title}
               </Text>
             </Flex>
-            {props.content}
-            <Flex
-              flexDirection="row"
-              sx={{ marginTop: 3 }}
-              justifyContent="center"
-              alignItems="center"
-            >
+            {props.children}
+            <Flex mt={3} justifyContent="center" alignItems="center">
               {props.positiveButton && (
                 <RebassButton
                   variant="primary"

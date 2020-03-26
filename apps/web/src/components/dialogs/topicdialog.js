@@ -13,23 +13,22 @@ function TopicDialog(props) {
       isOpen={true}
       title={props.title}
       icon={props.icon}
-      content={
-        <Box my={1}>
-          <Input
-            variant="default"
-            placeholder="name"
-            onChange={e => {
-              setTopic(e.target.value);
-            }}
-          ></Input>
-        </Box>
-      }
       positiveButton={{
         text: "Add",
         onClick: props.onYes.bind(this, topic)
       }}
       negativeButton={{ text: "Cancel", onClick: props.onNo }}
-    />
+    >
+      <Box my={1}>
+        <Input
+          variant="default"
+          placeholder="name"
+          onChange={e => {
+            setTopic(e.target.value);
+          }}
+        ></Input>
+      </Box>
+    </Dialog>
   );
 }
 

@@ -83,86 +83,6 @@ class AddNotebookDialog extends React.Component {
         isOpen={props.isOpen}
         title="Notebook"
         icon={Icon.Notebook}
-        content={
-          <Box my={1}>
-            <Input
-              autoFocus
-              variant="default"
-              onChange={e => (this.title = e.target.value)}
-              placeholder="Enter name"
-              defaultValue={this.title}
-            />
-            <Input
-              variant="default"
-              sx={{ marginTop: 1 }}
-              onChange={e => (this.description = e.target.value)}
-              placeholder="Enter description (optional)"
-              defaultValue={this.description}
-            />
-            <Text variant="body" fontWeight="bold" my={1}>
-              Topics (optional):
-            </Text>
-            <Box
-              sx={{
-                maxHeight: this.MAX_AVAILABLE_HEIGHT,
-                overflowY: "auto",
-                marginBottom: 1
-              }}
-            >
-              {this.state.topics.map((value, index) => (
-                <Flex
-                  key={index.toString()}
-                  flexDirection="row"
-                  sx={{ marginBottom: 1 }}
-                >
-                  <Input
-                    ref={ref => {
-                      this._inputRefs[index] = ref;
-                      if (ref) ref.value = value; // set default value
-                    }}
-                    variant="default"
-                    placeholder="Topic name"
-                    onFocus={e => {
-                      this.lastLength = e.nativeEvent.target.value.length;
-                      if (this.state.focusedInputIndex === index) return;
-                      this.setState({ focusedInputIndex: index });
-                    }}
-                    onChange={e => {
-                      this.topics[index] = e.target.value;
-                    }}
-                    onKeyUp={e => {
-                      if (e.nativeEvent.key === "Enter") {
-                        this.addTopic(index);
-                      } else if (
-                        e.nativeEvent.key === "Backspace" &&
-                        this.lastLength === 0 &&
-                        index > 0
-                      ) {
-                        this.removeTopic(index);
-                      }
-                      this.lastLength = e.nativeEvent.target.value.length;
-                    }}
-                  />
-                  <RebassButton
-                    variant="tertiary"
-                    sx={{ marginLeft: 1 }}
-                    px={2}
-                    py={1}
-                    onClick={() => this.performActionOnTopic(index)}
-                  >
-                    <Box height={20}>
-                      {this.state.focusedInputIndex === index ? (
-                        <Icon.Plus size={22} />
-                      ) : (
-                        <Icon.Minus size={22} />
-                      )}
-                    </Box>
-                  </RebassButton>
-                </Flex>
-              ))}
-            </Box>
-          </Box>
-        }
         positiveButton={{
           text: props.edit ? "Edit" : "Add",
           onClick: () => {
@@ -175,7 +95,86 @@ class AddNotebookDialog extends React.Component {
           }
         }}
         negativeButton={{ text: "Cancel", onClick: props.close }}
-      />
+      >
+        <Box my={1}>
+          <Input
+            autoFocus
+            variant="default"
+            onChange={e => (this.title = e.target.value)}
+            placeholder="Enter name"
+            defaultValue={this.title}
+          />
+          <Input
+            variant="default"
+            sx={{ marginTop: 1 }}
+            onChange={e => (this.description = e.target.value)}
+            placeholder="Enter description (optional)"
+            defaultValue={this.description}
+          />
+          <Text variant="body" fontWeight="bold" my={1}>
+            Topics (optional):
+          </Text>
+          <Box
+            sx={{
+              maxHeight: this.MAX_AVAILABLE_HEIGHT,
+              overflowY: "auto",
+              marginBottom: 1
+            }}
+          >
+            {this.state.topics.map((value, index) => (
+              <Flex
+                key={index.toString()}
+                flexDirection="row"
+                sx={{ marginBottom: 1 }}
+              >
+                <Input
+                  ref={ref => {
+                    this._inputRefs[index] = ref;
+                    if (ref) ref.value = value; // set default value
+                  }}
+                  variant="default"
+                  placeholder="Topic name"
+                  onFocus={e => {
+                    this.lastLength = e.nativeEvent.target.value.length;
+                    if (this.state.focusedInputIndex === index) return;
+                    this.setState({ focusedInputIndex: index });
+                  }}
+                  onChange={e => {
+                    this.topics[index] = e.target.value;
+                  }}
+                  onKeyUp={e => {
+                    if (e.nativeEvent.key === "Enter") {
+                      this.addTopic(index);
+                    } else if (
+                      e.nativeEvent.key === "Backspace" &&
+                      this.lastLength === 0 &&
+                      index > 0
+                    ) {
+                      this.removeTopic(index);
+                    }
+                    this.lastLength = e.nativeEvent.target.value.length;
+                  }}
+                />
+                <RebassButton
+                  variant="tertiary"
+                  sx={{ marginLeft: 1 }}
+                  px={2}
+                  py={1}
+                  onClick={() => this.performActionOnTopic(index)}
+                >
+                  <Box height={20}>
+                    {this.state.focusedInputIndex === index ? (
+                      <Icon.Plus size={22} />
+                    ) : (
+                      <Icon.Minus size={22} />
+                    )}
+                  </Box>
+                </RebassButton>
+              </Flex>
+            ))}
+          </Box>
+        </Box>
+      </Dialog>
     );
   }
 }

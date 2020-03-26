@@ -8,17 +8,16 @@ function Confirm(props) {
       isOpen={true}
       title={props.title}
       icon={props.icon}
-      content={
-        <Box my={1}>
-          <Text textAlign="center">{props.message}</Text>
-        </Box>
-      }
       positiveButton={{
         text: "Yes",
         onClick: props.onYes
       }}
       negativeButton={{ text: "No", onClick: props.onNo }}
-    />
+    >
+      <Box my={1}>
+        <Text textAlign="center">{props.message}</Text>
+      </Box>
+    </Dialog>
   );
 }
 
