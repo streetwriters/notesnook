@@ -4,7 +4,11 @@ import FontFactory from "./font";
 import TransformerFactory from "./transformer";
 
 class ThemeFactory {
-  constructor(config) {
+  transform(type) {
+    return new TransformerFactory(type, this);
+  }
+
+  construct(config) {
     return {
       breakpoints: ["480px", "1000px", "1000px"],
       space: [0, 5, 10, 15, 20, 25, 30, 35],
@@ -14,10 +18,6 @@ class ThemeFactory {
       ...new FontFactory(config.scale),
       ...new VariantsFactory()
     };
-  }
-
-  transform(type) {
-    return new TransformerFactory(type, this);
   }
 }
 

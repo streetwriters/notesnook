@@ -4,15 +4,15 @@ import { useStore } from "../../stores/theme-store";
 import ThemeFactory from "../../theme";
 import { injectCss } from "../../utils/css";
 
+const factory = new ThemeFactory();
+
 function ThemeProvider(props) {
-  const theme = useStore(store => store.theme);
+  const themeType = useStore(store => store.theme);
   const accent = useStore(store => store.accent);
-  const factory = new ThemeFactory({ theme, accent, scale: 1 });
   injectCss(factory.transform("css"));
+  const theme = factory.construct({ theme: themeType, accent, scale: 1 });
   return (
-    <EmotionThemeProvider theme={factory}>
-      {props.children}
-    </EmotionThemeProvider>
+    <EmotionThemeProvider theme={theme}>{props.children}</EmotionThemeProvider>
   );
 }
 export default ThemeProvider;
