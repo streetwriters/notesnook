@@ -12,7 +12,6 @@ import { createRoute, createNormalRoute, createDeadRoute } from "../routes";
 import Navigator from "../index";
 import SelectionModeOptions from "../../common/selectionoptions";
 import Search from "../../views/Search";
-import { store as noteStore } from "../../stores/note-store";
 import { store as userStore } from "../../stores/user-store";
 import { store as themeStore } from "../../stores/theme-store";
 import { showLogInDialog } from "../../components/dialogs/logindialog";
@@ -29,8 +28,8 @@ export const bottomRoutes = {
     onClick: async () => {
       if (!userStore.getState().isLoggedIn) {
         await showLogInDialog();
-      }
-      RootNavigator.navigate("account");
+        return false;
+      } else return RootNavigator.navigate("account");
     }
   }),
   ...createRoute("settings", SettingsContainer, {
@@ -49,12 +48,7 @@ export const routes = {
   ...createNormalRoute("favorites", Notes, Icon.StarOutline, {
     title: "Favorites",
     options: SelectionModeOptions.FavoritesOptions,
-    onClick: () => {
-      noteStore.getState().setSelectedContext({
-        type: "favorites"
-      });
-      RootNavigator.navigate("favorites");
-    }
+    context: { type: "favorites" }
   }),
   ...createNormalRoute("trash", Trash, Icon.Trash, {
     title: "Trash",

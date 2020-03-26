@@ -1,43 +1,25 @@
 import React, { useEffect } from "react";
 import "./app.css";
 import Editor from "./components/editor";
-import { motion } from "framer-motion";
 import { Flex, Box } from "rebass";
 import ThemeProvider from "./components/theme-provider";
-import RootNavigator, {
-  bottomRoutes,
-  routes
-} from "./navigation/navigators/rootnavigator";
 import { usePersistentState } from "./utils/hooks";
 import { useStore } from "./stores/app-store";
-import { useStore as useNotesStore } from "./stores/note-store";
-import { COLORS } from "./common";
-import { toTitleCase } from "./utils/string";
-import * as Icon from "./components/icons";
 import { useStore as useAppStore } from "./stores/app-store";
 import { useStore as useUserStore } from "./stores/user-store";
 import Animated from "./components/animated";
-import NavItem from "./components/navitem";
+import NavigationMenu from "./components/navigationmenu";
 
 function App() {
-  const [selectedKey, setSelectedKey] = usePersistentState(
-    "navSelectedKey",
-    "home"
-  );
-  const [show, setShow] = usePersistentState("navContainerState", true);
-
-  const isSideMenuOpen = useStore(store => store.isSideMenuOpen);
+  const [show, setShow] = usePersistentState("isContainerVisible", true);
   const refreshColors = useStore(store => store.refreshColors);
-  const setSelectedContext = useNotesStore(store => store.setSelectedContext);
   const isFocusModeEnabled = useAppStore(store => store.isFocusModeEnabled);
   const initUser = useUserStore(store => store.init);
 
   useEffect(() => {
-    RootNavigator.navigate(selectedKey);
     refreshColors();
     initUser();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [refreshColors, initUser]);
 
   useEffect(() => {
     if (isFocusModeEnabled) {
@@ -48,114 +30,13 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isFocusModeEnabled]);
 
-  const colors = useStore(store => store.colors);
   return (
     <ThemeProvider>
-      <Flex
-        bg="background"
-        sx={{ color: "text" }}
-        height="100%"
-        alignContent="stretch"
-      >
-        <Animated.Flex
-          flexDirection="column"
-          justifyContent="space-between"
-          initial={{ opacity: 1 }}
-          animate={{ opacity: isFocusModeEnabled ? 0 : 1 }}
-          transition={{ duration: 0.3, ease: "easeOut" }}
-          sx={{
-            zIndex: 999,
-            borderRight: "1px solid",
-            borderRightColor: "primary",
-            minWidth: ["85%", 50, 50],
-            maxWidth: ["85%", 50, 50],
-            display: [isSideMenuOpen ? "flex" : "none", "flex", "flex"],
-            position: ["absolute", "relative", "relative"]
-          }}
-          bg={"background"}
-          px={0}
-        >
-          <Box
-            sx={{
-              overflow: "scroll",
-              scrollbarWidth: "none",
-              //TODO: need to test this on webkit and internet explorer
-              "::-webkit-scrollbar": { width: 0, height: 0 },
-              msOverflowStyle: "none"
-              //"-ms-overflow-style": "none"
-            }}
-          >
-            {Object.values(routes).map((item, index) => (
-              <NavItem
-                onSelected={async () => {
-                  if (selectedKey === item.key) {
-                    setShow(!show);
-                    return;
-                  }
-                  if (item.onClick) {
-                    setSelectedKey(item.key);
-                    return item.onClick();
-                  }
-                  if (RootNavigator.navigate(item.key)) {
-                    setSelectedKey(item.key);
-                  }
-                }}
-                key={item.key}
-                item={item}
-                selected={selectedKey === item.key}
-              />
-            ))}
-            {colors.map(color => {
-              return (
-                <NavItem
-                  onSelected={async () => {
-                    setSelectedKey(undefined);
-                    setSelectedContext({
-                      type: "color",
-                      value: color.title
-                    });
-                    RootNavigator.navigate(
-                      "color",
-                      {
-                        title: toTitleCase(color.title),
-                        context: { colors: [color.title] }
-                      },
-                      true
-                    );
-                  }}
-                  key={color.title}
-                  item={{
-                    color: COLORS[color.title],
-                    title: toTitleCase(color.title),
-                    icon: Icon.Circle,
-                    count: color.noteIds.length
-                  }}
-                />
-              );
-            })}
-          </Box>
-          <Box>
-            {Object.values(bottomRoutes).map((item, index) => (
-              <NavItem
-                onSelected={async () => {
-                  if (item.onClick) {
-                    await item.onClick();
-                    if (item.component) setSelectedKey(item.key);
-                    return;
-                  }
-                  if (RootNavigator.navigate(item.key)) {
-                    setSelectedKey(item.key);
-                  }
-                }}
-                key={item.key}
-                item={item}
-                selected={selectedKey === item.key}
-              />
-            ))}
-          </Box>
-        </Animated.Flex>
-        <Flex flex="1 1 auto" flexDirection="row" alignContent="stretch" px={0}>
-          <motion.div
+      <Flex bg="background" height="100%">
+        <NavigationMenu toggleNavigationContainer={() => setShow(!show)} />
+        <Flex flex="1 1 auto">
+          <Animated.Flex
+            className="RootNavigator"
             initial={{ width: "30%", opacity: 1, scaleY: 1 }}
             animate={{
               width: show ? "30%" : "0%",
@@ -164,21 +45,13 @@ function App() {
               zIndex: show ? 0 : -1
             }}
             transition={{ duration: 0.3, ease: "easeOut" }}
-            style={{
-              display: "flex",
-              flex: "1 1 auto"
+            flex="1 1 auto"
+            flexDirection="column"
+            sx={{
+              borderRight: "1px solid",
+              borderColor: "border"
             }}
-          >
-            <Flex
-              className="RootNavigator"
-              flex="1 1 auto"
-              flexDirection="column"
-              sx={{
-                borderRight: "1px solid",
-                borderColor: "border"
-              }}
-            />
-          </motion.div>
+          />
           <Editor />
         </Flex>
         <Box id="dialogContainer" />
