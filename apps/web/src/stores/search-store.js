@@ -14,10 +14,12 @@ function searchStore(set, get) {
         state.item = context.item;
       });
     },
-    search: function(query) {
+    search: async function(query) {
       const { items, type } = get();
+      const results = await db.lookup[type](items, query);
+      console.log(query, results);
       set(state => {
-        state.results = db.lookup[type](items, query);
+        state.results = results;
       });
     }
   };
