@@ -15,19 +15,18 @@ export default class Lookup {
     this._db = db;
   }
 
-  async notes(array, query) {
-    const textIds = array.map(v => v.content.text);
-    const textArray = await this._db.text.multi(textIds);
-    const filteredText = tfun.filter(text => fuzzysearch(query, text.data))(
-      textArray
-    );
-    const filteredByText = filteredText.map(text =>
-      array.find(note => note.id === text.noteId)
-    );
-    const filteredByTitle = tfun.filter(note => fuzzysearch(query, note.title))(
-      array
-    );
-    return set.union(filteredByText, filteredByTitle);
+  notes(notes, query) {
+    return new Promise(resolve => {
+      const results = [];
+      let index = 0,
+        max = notes.length;
+      notes.forEach(async note => {
+        const text = await this._db.text.get(note.content.text);
+        const title = note.title;
+        if (fuzzysearch(query, text + title)) results.push(note);
+        if (++index >= max) return resolve(results);
+      });
+    });
   }
 
   notebooks(array, query) {
