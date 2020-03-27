@@ -35,6 +35,7 @@ const modules = {
 };
 
 export default class ReactQuill extends Component {
+  /** @private */
   quill;
   getEditor() {
     return this.quill.editor;
@@ -45,18 +46,11 @@ export default class ReactQuill extends Component {
   }
 
   componentDidUpdate() {
-    if (this.props.refresh) {
-      this.quill.setContents(this.props.initialContent);
-      if (
-        !this.props.initialContent ||
-        !this.props.initialContent.ops ||
-        !this.props.initialContent.ops.length
-      )
-        return;
+    const { initialContent, refresh } = this.props;
+    if (refresh) {
+      this.quill.setContents(initialContent);
+      if (!initialContent.ops || !initialContent.ops.length) return;
       const text = this.quill.getText();
-      if (text[text.length - 1] !== " ") {
-        this.quill.insertText(text.length - 1, " ");
-      }
       this.quill.setSelection(text.length, 0);
     }
   }
@@ -78,6 +72,7 @@ export default class ReactQuill extends Component {
       theme: "snow",
       readOnly
     });
+
     if (initialContent) {
       this.quill.setContents(initialContent);
     }
@@ -102,7 +97,7 @@ export default class ReactQuill extends Component {
   }
 
   textChangeHandler = (delta, oldDelta, source) => {
-    if (source === "api") return;
+    if (source !== "user") return;
     this.props.onChange(this.quill);
   };
 
