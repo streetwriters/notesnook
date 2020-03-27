@@ -8,7 +8,7 @@ import { useStore as useThemeStore } from "../stores/theme-store";
 function Settings(props) {
   const theme = useThemeStore(store => store.theme);
   const accent = useThemeStore(store => store.accent);
-  const toggleNightMode = useThemeStore(store => store.theme);
+  const toggleNightMode = useThemeStore(store => store.toggleNightMode);
   const setAccent = useThemeStore(store => store.theme);
   const user = useUserStore(store => store.user);
   const isLoggedIn = useUserStore(store => store.isLoggedIn);
