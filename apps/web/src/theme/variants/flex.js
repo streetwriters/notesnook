@@ -36,7 +36,7 @@ class Fill {
 class CenterFill {
   constructor(direction) {
     return {
-      variant: `${direction}Center`,
+      variant: `variants.${direction}Center`,
       flex: "1 1 auto",
       flexDirection: direction
     };
