@@ -17,7 +17,7 @@ import { objectMap } from "../../utils/object";
 function NavigationMenu(props) {
   const { toggleNavigationContainer } = props;
   const [selectedRoute, setSelectedRoute] = usePersistentState("route", "home");
-  const isFocusModeEnabled = useAppStore(store => store.isFocusModeEnabled);
+  const isFocusMode = useAppStore(store => store.isFocusMode);
   const colors = useStore(store => store.colors);
   const isSideMenuOpen = useStore(store => store.isSideMenuOpen);
 
@@ -32,8 +32,8 @@ function NavigationMenu(props) {
       justifyContent="space-between"
       initial={{ opacity: 1 }}
       animate={{
-        opacity: isFocusModeEnabled ? 0 : 1,
-        visibility: isFocusModeEnabled ? "hidden" : "visible"
+        opacity: isFocusMode ? 0 : 1,
+        visibility: isFocusMode ? "hidden" : "visible"
       }}
       transition={{ duration: 0.3, ease: "easeOut" }}
       sx={{

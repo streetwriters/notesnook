@@ -23,7 +23,7 @@ function Properties() {
   const hideProperties = useAppStore(store => store.hideProperties);
   //const showProperties = useAppStore(store => store.showProperties);
   const arePropertiesVisible = useAppStore(store => store.arePropertiesVisible);
-  const isFocusModeEnabled = useAppStore(store => store.isFocusModeEnabled);
+  const isFocusMode = useAppStore(store => store.isFocusMode);
 
   function changeState(prop, value) {
     setSession(state => {
@@ -32,7 +32,7 @@ function Properties() {
   }
 
   return (
-    !isFocusModeEnabled && (
+    !isFocusMode && (
       <>
         <motion.div
           animate={{ x: arePropertiesVisible ? 0 : 800 }}

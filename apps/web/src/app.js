@@ -13,7 +13,7 @@ import NavigationMenu from "./components/navigationmenu";
 function App() {
   const [show, setShow] = usePersistentState("isContainerVisible", true);
   const refreshColors = useStore(store => store.refreshColors);
-  const isFocusModeEnabled = useAppStore(store => store.isFocusModeEnabled);
+  const isFocusMode = useAppStore(store => store.isFocusMode);
   const initUser = useUserStore(store => store.init);
 
   useEffect(() => {
@@ -22,13 +22,13 @@ function App() {
   }, [refreshColors, initUser]);
 
   useEffect(() => {
-    if (isFocusModeEnabled) {
+    if (isFocusMode) {
       setShow(false);
     } else {
       setShow(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isFocusModeEnabled]);
+  }, [isFocusMode]);
 
   return (
     <ThemeProvider>

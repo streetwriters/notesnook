@@ -30,10 +30,9 @@ function Editor() {
   const saveSession = useStore(store => store.saveSession);
   const newSession = useStore(store => store.newSession);
   const reopenLastSession = useStore(store => store.reopenLastSession);
-  const isFocusModeEnabled = useAppStore(store => store.isFocusModeEnabled);
+  const isFocusMode = useAppStore(store => store.isFocusMode);
   const hideProperties = useAppStore(store => store.hideProperties);
   const quillRef = useRef();
-
   useEffect(() => {
     // move the toolbar outside (easiest way)
     const toolbar = document.querySelector(".ql-toolbar.ql-snow");
@@ -52,11 +51,11 @@ function Editor() {
       width={["0%", "0%", "100%"]}
       initial={{ marginRight: 0 }}
       animate={{
-        marginRight: isFocusModeEnabled ? "25%" : 0
+        marginRight: isFocusMode ? "25%" : 0
       }}
       transition={{ duration: 0.3, ease: "easeIn" }}
       sx={{
-        marginLeft: isFocusModeEnabled ? "25%" : 0,
+        marginLeft: isFocusMode ? "25%" : 0,
         position: "relative"
       }}
     >
