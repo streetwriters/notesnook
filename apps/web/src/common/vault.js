@@ -16,5 +16,34 @@ class Vault {
         .catch(() => false);
     });
   }
+
+  static unlockNote(id, done) {
+    showPasswordDialog("unlock_note", password => {
+      return db.vault
+        .remove(id, password)
+        .then(() => true)
+        .catch(e => {
+          if (e.message === "ERR_WRNG_PWD") return false;
+          else console.error(e);
+        });
+    }).then(res => res && done());
+  }
+
+  static lockNote(id, done) {
+    db.vault
+      .add(id)
+      .then(done)
+      .catch(({ message }) => {
+        switch (message) {
+          case "ERR_NO_VAULT":
+            return Vault.createVault();
+          case "ERR_VAULT_LOCKED":
+            return Vault.unlockVault();
+          default:
+            return false;
+        }
+      })
+      .then(result => result && this.lock(id));
+  }
 }
 export default Vault;

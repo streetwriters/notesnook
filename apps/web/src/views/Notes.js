@@ -7,19 +7,14 @@ import { DEFAULT_CONTEXT } from "../common";
 
 function Notes(props) {
   const newSession = useStore(store => store.newSession);
-  const selectedNotes = useNotesStore(store => store.selectedNotes);
-  const selectedContext = useNotesStore(store => store.selectedContext);
+  const context = useNotesStore(store => store.context);
+
   return (
     <ListContainer
       type="notes"
-      items={selectedNotes}
+      items={context.notes}
       item={(index, item) => (
-        <Note
-          index={index}
-          pinnable={false}
-          item={item}
-          context={selectedContext}
-        />
+        <Note index={index} pinnable={false} item={item} context={context} />
       )}
       button={{
         content: "Make a new note",

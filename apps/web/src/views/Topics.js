@@ -7,7 +7,7 @@ import { useStore as useNbStore } from "../stores/notebook-store";
 import { showTopicDialog } from "../components/dialogs/topicdialog";
 
 function Topics(props) {
-  const setSelectedContext = useNoteStore(store => store.setSelectedContext);
+  const setContext = useNoteStore(store => store.setContext);
   const setSelectedNotebookTopics = useNbStore(
     store => store.setSelectedNotebookTopics
   );
@@ -34,7 +34,7 @@ function Topics(props) {
           item={item}
           onClick={() => {
             let topic = item;
-            setSelectedContext({
+            setContext({
               type: "topic",
               value: topic.title,
               notebook: props.notebook

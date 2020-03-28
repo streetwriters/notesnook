@@ -138,7 +138,7 @@ function editorStore(set, get) {
 
         // we update favorites only if favorite has changed
         if (!oldSession || oldSession.favorite !== session.favorite) {
-          notesState.setSelectedContext({ type: "favorites" });
+          notesState.setContext({ type: "favorites" });
         }
       });
     },
@@ -206,10 +206,10 @@ function updateContext(key, array) {
   let type = key === "colors" ? "color" : "tag";
   // update notes if the selected context (the current view in the navigator) is a tag or color
   const notesState = noteStore.getState();
-  const context = notesState.selectedContext;
+  const context = notesState.context;
   if (context.type === type) {
     const isValue = array.some(value => value === context.value);
-    if (isValue) noteStore.getState().setSelectedContext(context);
+    if (isValue) noteStore.getState().setContext(context);
   }
   if (type === "tag") {
     tagStore.getState().refreshTags();

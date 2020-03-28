@@ -18,7 +18,7 @@ function TagNode({ title }) {
 }
 
 function Tags(props) {
-  const setSelectedContext = useNotesStore(store => store.setSelectedContext);
+  const setContext = useNotesStore(store => store.setContext);
   const tags = useStore(store => store.tags);
   useEffect(() => {
     store.getState().refreshTags();
@@ -37,7 +37,7 @@ function Tags(props) {
             title={<TagNode title={title} />}
             info={`${noteIds.length} notes`}
             onClick={() => {
-              setSelectedContext({ type: "tag", value: title });
+              setContext({ type: "tag", value: title });
               props.navigator.navigate("notes", {
                 title: "#" + title,
                 context: { tags: [title] }

@@ -14,7 +14,7 @@ class AppStore extends BaseStore {
   refresh = () => {
     noteStore.getState().refresh();
     notebookStore.getState().refresh();
-    noteStore.getState().refreshSelectedContext();
+    noteStore.getState().refreshContext();
     trashStore.getState().refresh();
     this.refreshColors();
   };

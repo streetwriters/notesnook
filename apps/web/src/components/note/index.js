@@ -56,7 +56,7 @@ function menuItems(note, context) {
               .notebook(context.notebook.id)
               .topics.topic(context.value)
               .delete(note.id);
-            await store.getState().setSelectedContext(context);
+            await store.getState().setContext(context);
           }
         });
       }
