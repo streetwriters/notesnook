@@ -62,6 +62,7 @@ class List {
       variant: "buttons.tertiary",
       border: "0px solid",
       borderBottom: "1px solid",
+      borderBottomColor: "border",
       borderRadius: 0,
       p: 2
     };
