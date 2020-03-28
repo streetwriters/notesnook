@@ -3,6 +3,7 @@ import createStore from "../common/store";
 import { store as editorStore } from "./editor-store";
 import { store as appStore } from "./app-store";
 import { showPasswordDialog } from "../components/dialogs/passworddialog";
+import Vault from "../common/vault";
 
 function noteStore(set, get) {
   return {
@@ -106,9 +107,9 @@ function noteStore(set, get) {
         .catch(async ({ message }) => {
           switch (message) {
             case "ERR_NO_VAULT":
-              return appStore.getState().createVault();
+              return Vault.createVault();
             case "ERR_VAULT_LOCKED":
-              return appStore.getState().unlockVault();
+              return Vault.unlockVault();
             default:
               return false;
           }
