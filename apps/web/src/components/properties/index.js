@@ -21,7 +21,7 @@ function Properties() {
   const setTag = useStore(store => store.setTag);
   const toggleLocked = useStore(store => store.toggleLocked);
   const hideProperties = useAppStore(store => store.hideProperties);
-  const showProperties = useAppStore(store => store.showProperties);
+  //const showProperties = useAppStore(store => store.showProperties);
   const arePropertiesVisible = useAppStore(store => store.arePropertiesVisible);
   const isFocusModeEnabled = useAppStore(store => store.isFocusModeEnabled);
 

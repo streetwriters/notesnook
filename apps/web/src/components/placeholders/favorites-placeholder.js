@@ -3,6 +3,7 @@ import React from "react";
 import * as Icon from "../icons";
 import { Flex, Text } from "rebass";
 
+//TODO refactor this
 function FavoritesPlaceholder() {
   return (
     <>

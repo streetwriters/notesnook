@@ -1,156 +1,59 @@
-import { motion } from "framer-motion";
 import React from "react";
 import { Box, Flex, Text } from "rebass";
+import Placeholder from "./index";
+import { getRandom } from "../../utils/random";
 
+const titles = ["Yearbook 2020", "Semester 5", "Final Project", "Ready. Go"];
+const descriptions = [
+  "Thoughts & Stuff",
+  "Ugh. Can't handle it anymore.",
+  "Have to organize all this :(",
+  "What the heck!"
+];
 function NotebooksPlaceholder() {
   return (
-    <>
-      <Flex
-        style={{
-          width: "300px",
-          position: "relative",
-          alignSelf: "center",
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "center"
-        }}
-      >
-        <motion.div
-          animate={{
-            x: 2,
-            y: 2
-          }}
-          style={{
-            position: "absolute",
-            bottom: "50px",
-            right: "120px",
-            zIndex: 999
-          }}
-          transition={{
-            duration: 4,
-            ease: "linear",
-            yoyo: Infinity
+    <Placeholder
+      items={[0, 1]}
+      renderItem={item => (
+        <Flex
+          mt={-80 * item}
+          ml={80 * item}
+          opacity={!item ? 0.7 : 1}
+          height="150px"
+          sx={{
+            zIndex: item,
+            bg: "hover",
+            borderRadius: "default",
+            boxShadow: "2px 2px 7px 0px #00000040"
           }}
         >
-          <Box
-            style={{
-              width: "130px",
-              backgroundColor: "#c9c9c9",
-              height: "150px",
-              borderRadius: "5px",
-              boxShadow: "2px 2px 15px 0px #00000040"
+          <Flex
+            variant="columnCenter"
+            bg="background"
+            mr={2}
+            width={120}
+            sx={{
+              borderRadius: "default",
+              boxShadow: "1px 1px 5px 0px #00000060"
             }}
           >
-            <Flex
-              backgroundColor="primary"
-              opacity={1}
-              sx={{
-                borderRadius: "5px",
-                boxShadow: "1px 1px 5px 0px #00000060",
-                height: "150px",
-                width: "120px",
-                justifyContent: "center",
-                alignItems: "center",
-                flexDirection: "column"
-              }}
+            <Box m={3} height={10} width={"100%"} bg="primary" />
+            <Text
+              color="primary"
+              fontSize={"body"}
+              fontFamily="heading"
+              textAlign="center"
+              px={1}
             >
-              <Box
-                style={{
-                  height: 10,
-                  width: "120px",
-                  backgroundColor: "white",
-                  marginBottom: "20px",
-                  top: 15
-                }}
-              ></Box>
-              <Text
-                color="white"
-                fontSize={14}
-                fontFamily="heading"
-                textAlign="center"
-                px={1}
-              >
-                My Notebook
-                <Text color="white" fontSize={11}>
-                  Keep it all organized
-                </Text>
+              {titles[getRandom(0, 3)]}
+              <Text color="dimPrimary" wrap="wrap" fontSize="subBody">
+                {descriptions[getRandom(0, 3)]}
               </Text>
-            </Flex>
-          </Box>
-        </motion.div>
-
-        <motion.div
-          animate={{
-            x: -2,
-            y: -2
-          }}
-          transition={{
-            duration: 4,
-            ease: "linear",
-            yoyo: Infinity
-          }}
-        >
-          <Box
-            style={{
-              width: "130px",
-              backgroundColor: "#c9c9c9",
-              height: "150px",
-              borderRadius: "5px",
-              boxShadow: "2px 2px 15px 0px #00000040"
-            }}
-          >
-            <Flex
-              backgroundColor="primary"
-              opacity={0.5}
-              sx={{
-                borderRadius: "5px",
-                boxShadow: "1px 1px 5px 0px #00000060",
-                height: "150px",
-                width: "120px",
-                justifyContent: "center",
-                alignItems: "center",
-                flexDirection: "column"
-              }}
-            >
-              <Box
-                style={{
-                  height: 10,
-                  width: "120px",
-                  backgroundColor: "white",
-                  marginBottom: "20px",
-                  top: 15
-                }}
-              ></Box>
-              <Text
-                color="white"
-                fontSize={14}
-                fontFamily="heading"
-                textAlign="center"
-                px={1}
-              >
-                My Notebook
-                <Text color="white" fontSize={11}>
-                  Keep it flowing
-                </Text>
-              </Text>
-            </Flex>
-          </Box>
-        </motion.div>
-      </Flex>
-
-      <Text
-        color="gray"
-        marginTop={50}
-        alignSelf="center"
-        sx={{
-          textAlign: "center",
-          fontSize: "title"
-        }}
-      >
-        Notebooks you add will appear here.
-      </Text>
-    </>
+            </Text>
+          </Flex>
+        </Flex>
+      )}
+    ></Placeholder>
   );
 }
-
 export default NotebooksPlaceholder;

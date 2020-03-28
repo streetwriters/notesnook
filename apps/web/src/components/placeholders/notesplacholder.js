@@ -1,131 +1,57 @@
-import { motion } from "framer-motion";
 import React from "react";
-import { Box, Flex, Text } from "rebass";
-var parameters = {
-  padding: "4px",
-  margin: "3px",
-  width: "170px",
-  shadow: "primary",
-  opacity: "0.5"
-};
+import { Text, Flex, Box } from "rebass";
+import Placeholder from "./index";
+import * as Icon from "../icons";
+import { getRandom } from "../../utils/random";
+
+const colors = ["hover", "primary", "dimPrimary", "shade"];
+const icons = [Icon.Vault, Icon.Pin, Icon.Star];
+const titles = ["Assignment #4", "Git Workflow", "Project Aurora"];
+const words = Array(25).fill(0);
 
 function NotesPlaceholder() {
   return (
-    <>
-      <Flex
-        style={{
-          position: "relative",
-          width: "250px",
-          alignItems: "center",
-          justifyContent: "center"
-        }}
-      >
-        {[
-          {
-            right: "0px",
-            bottom: "-50px",
-            opacity: "0.7",
-            x: 2,
-            y: 2,
-            pos: "absolute"
-          },
-          {
-            right: null,
-            bottom: null,
-            opacity: "0.9",
-            x: -2,
-            y: -2,
-            pos: "relative"
-          }
-        ].map(item => (
-          <motion.div
-            style={{
-              position: item.pos,
-              left: item.right,
-              marginTop: item.bottom,
-              boxShadow: "2px 2px 15px 0px #00000060",
-              borderRadius: "5px"
-            }}
-            animate={{
-              x: item.x,
-              y: item.y
-            }}
-            transition={{
-              duration: 4,
-              ease: "linear",
-              yoyo: Infinity
+    <Placeholder
+      items={titles}
+      label="Notes you write will appear here"
+      renderItem={(_, index) => {
+        const Icon = icons[index];
+        return (
+          <Flex
+            width="55%"
+            bg="bgSecondary"
+            opacity={0.9}
+            mt={index && -50}
+            ml={-40 + index * 60}
+            sx={{
+              boxShadow: "2px 2px 7px 0px #00000040",
+              borderRadius: "default"
             }}
           >
-            <Flex
-              className="home-animation"
-              flexDirection="row"
-              bg="#f0f0f0"
-              opacity={item.opacity}
-            >
-              <Flex>
-                <Box
-                  width={1}
-                  bg="primary"
-                  sx={{ borderRadius: "25px" }}
-                  px={parameters.padding}
-                  height="100%"
-                ></Box>
+            <Flex flex="1 1 auto" flexDirection="column" p={1}>
+              <Flex alignItems="center" justifyContent="space-between">
+                <Text variant="title" color="primary" mb={1}>
+                  {titles[index]}
+                </Text>
+                <Icon size={20} color="dimPrimary" />
               </Flex>
-              <Flex sx={{}} flexDirection="column" px="5px" py="5px">
-                <Box
-                  sx={{
-                    fontFamily: "heading"
-                  }}
-                  color="primary"
-                >
-                  Title
-                </Box>
-                {[1, 2, 3, 4].map(item => (
+              <Flex flexWrap="wrap">
+                {words.map(() => (
                   <Box
-                    opacity={parameters.opacity}
-                    bg={parameters.shadow}
+                    width={getRandom(20, 50)}
+                    py={"4px"}
+                    mr={1}
+                    my={"3px"}
                     sx={{ borderRadius: "25px" }}
-                    py={parameters.padding}
-                    my={parameters.margin}
-                    width={parameters.width}
-                  ></Box>
+                    bg={colors[getRandom(0, 3)]}
+                  />
                 ))}
-
-                <Flex flexDirection="row">
-                  <Box
-                    width={1 / 6}
-                    py={parameters.padding}
-                    my={parameters.margin}
-                    sx={{ borderRadius: "25px" }}
-                    bg="icon"
-                  ></Box>
-                  <Box
-                    width={1 / 6}
-                    height={1}
-                    py={parameters.padding}
-                    my={parameters.margin}
-                    mx="10px"
-                    sx={{ borderRadius: "25px" }}
-                    bg="icon"
-                  ></Box>
-                </Flex>
               </Flex>
             </Flex>
-          </motion.div>
-        ))}
-      </Flex>
-      <Text
-        color="gray"
-        marginTop={50}
-        alignSelf="center"
-        sx={{
-          textAlign: "center",
-          fontSize: "title"
-        }}
-      >
-        Notes you write appear here.
-      </Text>
-    </>
+          </Flex>
+        );
+      }}
+    />
   );
 }
 export default NotesPlaceholder;

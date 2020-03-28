@@ -1,102 +1,83 @@
-import { motion } from "framer-motion";
-import React from "react";
-import { Flex, Text } from "rebass";
+import React, { useState, useEffect } from "react";
+import Animated from "../animated";
+import { Text, Flex } from "rebass";
+import { getRandom } from "../../utils/random";
+import Placeholder from "./index";
+import { useAnimation } from "framer-motion";
 
-const animatedTags = [
-  {
-    delay: 3,
-    marginTop: "-50px",
-    size: 14,
-    text: "presentations",
-    left: "25px"
-  },
-  {
-    delay: 12,
-    marginTop: "20px",
-    size: 16,
-    text: "quotesonlife",
-    left: "90px"
-  },
-  {
-    delay: 18,
-    marginTop: "-25px",
-    size: 18,
-    text: "workinprogress",
-    left: "70px"
-  },
-  {
-    delay: 24,
-    marginTop: "0px",
-    size: 14,
-    text: "todolists",
-    left: "35px"
-  },
-  {
-    delay: 30,
-    marginTop: "40px",
-    size: 24,
-    text: "myschoolwork",
-    left: "50px"
-  }
+const tags = [
+  "presentations",
+  "quotesonlife",
+  "workinprogress",
+  "goodlife",
+  "school",
+  "lessons",
+  "essays",
+  "disasters",
+  "todolists",
+  "myschoolwork"
 ];
 
 function TagsPlaceholder() {
   return (
-    <>
-      <Flex
-        style={{
-          width: "300px",
-          position: "relative",
-          height: "100px",
-          alignSelf: "center",
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "center"
-        }}
-      >
-        {animatedTags.map(item => (
-          <motion.div
-            style={{
-              padding: 0,
-              margin: 0,
-              marginTop: item.marginTop,
-              left: item.left,
-              position: "absolute"
-            }}
-            animate={{
-              opacity: [0.1, 0.5, 1, 0.5, 0],
-              scaleX: [0.7, 0.75, 0.85, 0.9, 1],
-              scaleY: [0.7, 0.75, 0.85, 0.9, 1]
-            }}
-            transition={{
-              duration: 12,
-              ease: "linear",
-              delay: item.delay,
-              loop: Infinity
-            }}
-          >
-            <Text color="text" fontSize={item.size} as="span">
-              <Text as="span" color="primary">
-                #
-              </Text>
-              {item.text}
-            </Text>
-          </motion.div>
-        ))}
-      </Flex>
-
-      <Text
-        color="gray"
-        marginTop={50}
-        alignSelf="center"
-        sx={{
-          textAlign: "center",
-          fontSize: "title"
-        }}
-      >
-        Tags added to notes appear here.
-      </Text>
-    </>
+    <Placeholder
+      items={[0]}
+      renderItem={() => (
+        <Flex
+          width={"80%"}
+          opacity={0.9}
+          alignItems="center"
+          justifyContent="center"
+          p={2}
+          sx={{
+            borderRadius: "default"
+          }}
+        >
+          <Text fontSize={40} color="primary">
+            #
+          </Text>
+          <TagSlider />
+        </Flex>
+      )}
+    ></Placeholder>
   );
 }
 export default TagsPlaceholder;
+
+function TagSlider() {
+  const [tag, setTag] = useState(getRandomTag());
+  const controls = useAnimation();
+  useEffect(() => {
+    animate(controls, setTag);
+  }, [controls]);
+  return (
+    <Animated.Box
+      initial={{ opacity: 0, y: -50 }}
+      animate={controls}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+      sx={{ fontSize: 40, color: "primary" }}
+    >
+      {tag}
+    </Animated.Box>
+  );
+}
+
+async function animate(controls, setTag) {
+  await controls.start({ opacity: 1, y: 0 });
+  await controls.start({
+    opacity: 0,
+    y: 50,
+    transition: { delay: 1, duration: 0.4 }
+  });
+  await controls.start({
+    opacity: 0,
+    y: -50,
+    transition: { duration: 0 }
+  });
+  setTag(getRandomTag());
+  await animate(controls, setTag);
+}
+
+function getRandomTag() {
+  return tags[getRandom(0, tags.length - 1)];
+}
