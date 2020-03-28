@@ -6,11 +6,12 @@ class FontFactory {
       fontSizes: new FontSizeFactory(scale),
       fontWeights: {
         body: 400,
-        bold: 700
+        heading: 400,
+        bold: 400
       },
       fonts: {
-        body: "Noto Sans JP, sans-serif",
-        heading: "Noto Serif, serif"
+        body: "DM Sans, sans-serif",
+        heading: `"DM Serif Text", serif`
       }
     };
   }

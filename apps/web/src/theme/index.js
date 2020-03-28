@@ -5,7 +5,8 @@ import TransformerFactory from "./transformer";
 
 class ThemeFactory {
   transform(type, theme) {
-    return new TransformerFactory(type, theme);
+    const factory = new TransformerFactory();
+    return factory.construct(type, theme);
   }
 
   construct(config) {

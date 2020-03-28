@@ -14,7 +14,7 @@ function NavItem(props) {
   }, [isSyncing, setIsLoading, animatable, key]);
 
   return (
-    <Button variant="menu" py={3} title={title} onClick={props.onSelected}>
+    <Button variant="icon" py={3} title={title} onClick={props.onSelected}>
       <Flex
         justifyContent={["flex-start", "center", "center"]}
         alignItems="center"

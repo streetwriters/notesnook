@@ -12,7 +12,8 @@ function Menu(props) {
       sx={{
         position: "relative",
         borderRadius: "default",
-        boxShadow: 2,
+        border: "2px solid",
+        borderColor: "border",
         width: 140,
         ...props.sx
       }}

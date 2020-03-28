@@ -9,6 +9,7 @@ import { timeConverter } from "../../utils/time";
 import { countWords } from "../../utils/string";
 import { useStore as useAppStore } from "../../stores/app-store";
 import Animated from "../animated";
+import EditorMenu from "./editormenu";
 
 const TextSeperator = () => {
   return (
@@ -33,6 +34,7 @@ function Editor() {
   const isFocusMode = useAppStore(store => store.isFocusMode);
   const hideProperties = useAppStore(store => store.hideProperties);
   const quillRef = useRef();
+
   useEffect(() => {
     // move the toolbar outside (easiest way)
     const toolbar = document.querySelector(".ql-toolbar.ql-snow");
@@ -63,7 +65,7 @@ function Editor() {
         variant="columnFill"
         className="editor"
         onFocus={() => {
-          hideProperties();
+          //hideProperties();
         }}
       >
         <TitleBox
@@ -105,35 +107,7 @@ function Editor() {
           {id && id.length > 0 && <>{isSaving ? "Saving" : "Saved"}</>}
         </Text>
         <Box id="toolbar" display={["none", "flex", "flex"]} />
-        <Flex
-          sx={{
-            borderBottom: "1px solid",
-            borderColor: "border",
-            fontSize: 13
-          }}
-        >
-          <Text variant="menu" ml={1} onClick={() => newSession()}>
-            <span style={{ textDecoration: "underline" }}>N</span>ew
-          </Text>
-          <Text
-            variant="menu"
-            onClick={() => quillRef.current.quill.history.undo()}
-          >
-            Undo
-          </Text>
-          <Text
-            variant="menu"
-            onClick={() => quillRef.current.quill.history.redo()}
-          >
-            Redo
-          </Text>
-          <Text variant="menu" onClick={() => saveSession()}>
-            <span style={{ textDecoration: "underline" }}>S</span>ave
-          </Text>
-          <Text variant="menu">
-            <span style={{ textDecoration: "underline" }}>E</span>xport
-          </Text>
-        </Flex>
+        <EditorMenu quill={quillRef.current && quillRef.current.quill} />
         <ReactQuill
           ref={quillRef}
           refresh={sessionState === SESSION_STATES.new}

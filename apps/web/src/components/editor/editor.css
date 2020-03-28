@@ -32,6 +32,7 @@
   border: none !important;
   border-top: 1px solid var(--border) !important;
   padding: 5px !important;
+  padding-left: 0px !important;
 }
 
 /*Color Overrides*/

@@ -38,7 +38,7 @@ function NavigationMenu(props) {
       transition={{ duration: 0.3, ease: "easeOut" }}
       sx={{
         borderRight: "1px solid",
-        borderRightColor: "primary",
+        borderRightColor: "border",
         minWidth: ["85%", 50, 50],
         maxWidth: ["85%", 50, 50],
         display: [isSideMenuOpen ? "flex" : "none", "flex", "flex"],

@@ -7,7 +7,8 @@ class ButtonFactory {
       tertiary: new Tertiary(),
       list: new List(),
       anchor: new Anchor(),
-      menu: new Menu()
+      menu: new Menu(),
+      icon: new Icon()
     };
   }
 }
@@ -81,10 +82,25 @@ class Anchor {
   }
 }
 
+class Icon {
+  constructor() {
+    return {
+      variant: "buttons.default",
+      color: "text",
+      borderRadius: "none",
+      ":hover": {
+        backgroundColor: "shade"
+      }
+    };
+  }
+}
+
 class Menu {
   constructor() {
     return {
       variant: "buttons.default",
+      color: "text",
+      p: 2,
       borderRadius: "none",
       ":hover": {
         backgroundColor: "shade"

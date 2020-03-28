@@ -5,7 +5,7 @@ const transformers = {
 };
 
 class TransformerFactory {
-  constructor(type, theme) {
+  construct(type, theme) {
     return transformers[type](theme);
   }
 }

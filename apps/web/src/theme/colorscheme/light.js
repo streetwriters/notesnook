@@ -8,7 +8,7 @@ class LightColorSchemeFactory {
       background: "white",
       accent: "white",
       bgSecondary: "#f0f0f0",
-      border: "#f0f0f0",
+      border: "#e0e0e0",
       hover: "#e0e0e0",
       fontSecondary: "white",
       text: "#000000",
