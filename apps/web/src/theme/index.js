@@ -4,8 +4,8 @@ import FontFactory from "./font";
 import TransformerFactory from "./transformer";
 
 class ThemeFactory {
-  transform(type) {
-    return new TransformerFactory(type, this);
+  transform(type, theme) {
+    return new TransformerFactory(type, theme);
   }
 
   construct(config) {

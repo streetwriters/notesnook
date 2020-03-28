@@ -19,7 +19,6 @@ function Search(props) {
     >
       <Input
         id="searchInput"
-        variant="default"
         name="search"
         autoFocus={!!query}
         defaultValue={query}
@@ -39,9 +38,8 @@ function Search(props) {
         sx={{
           position: "absolute",
           right: 0,
-          marginRight: 20,
-          color: "hover",
-          height: 24
+          mr: 3,
+          color: "hover"
         }}
       >
         <Icon.Search size={28} />

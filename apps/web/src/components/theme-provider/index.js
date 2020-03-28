@@ -9,9 +9,9 @@ const factory = new ThemeFactory();
 function ThemeProvider(props) {
   const themeType = useStore(store => store.theme);
   const accent = useStore(store => store.accent);
-  injectCss(factory.transform("css"));
   const theme = factory.construct({ theme: themeType, accent, scale: 1 });
-  console.log("theme", theme);
+  injectCss(factory.transform("css", theme));
+
   return (
     <EmotionThemeProvider theme={theme}>
       {props.children instanceof Function
