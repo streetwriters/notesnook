@@ -93,8 +93,8 @@ function NavigationMenu(props) {
           <NavItem
             onSelected={async () => {
               const shouldSelect =
-                (item.component && item.onClick && (await item.onClick())) ||
-                RootNavigator.navigate(item.key);
+                (item.onClick && (await item.onClick())) ||
+                (item.component && RootNavigator.navigate(item.key));
               if (shouldSelect) setSelectedRoute(item.key);
             }}
             key={item.key}
