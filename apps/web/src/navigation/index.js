@@ -5,7 +5,8 @@ import Animated from "../components/animated";
 import { AnimatePresence } from "framer-motion";
 import * as Icon from "../components/icons";
 import ThemeProvider from "../components/theme-provider";
-import { useStore, store } from "../stores/app-store";
+import { useStore } from "../stores/app-store";
+import { store as selectionStore } from "../stores/selection-store";
 
 class Navigator {
   constructor(root, routes, options = {}) {
@@ -47,7 +48,7 @@ class Navigator {
       return false;
     }
     // exit selection mode on navigate
-    store.getState().exitSelectionMode();
+    selectionStore.getState().toggleSelectionMode(false);
     ReactDOM.render(
       <AnimatePresence exitBeforeEnter={true}>
         <Animated.Flex
@@ -101,7 +102,7 @@ class Navigator {
 export default Navigator;
 
 function NavigationContainer(props) {
-  const openSideMenu = useStore(store => store.openSideMenu);
+  const toggleSideMenu = useStore(store => store.toggleSideMenu);
   const isSelectionMode = useStore(store => store.isSelectionMode);
   const exitSelectionMode = useStore(store => store.exitSelectionMode);
   const selectAll = useStore(store => store.selectAll);
@@ -123,7 +124,7 @@ function NavigationContainer(props) {
                   </Box>
                 )}
                 <Box
-                  onClick={openSideMenu}
+                  onClick={toggleSideMenu}
                   height={38}
                   ml={-5}
                   sx={{

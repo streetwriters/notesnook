@@ -1,5 +1,5 @@
 import * as Icon from "../components/icons";
-import { store as appStore } from "../stores/app-store";
+import { store as selectionStore } from "../stores/app-store";
 import { store as notesStore } from "../stores/note-store";
 import { store as nbStore } from "../stores/notebook-store";
 import { store as editorStore } from "../stores/editor-store";
@@ -12,8 +12,8 @@ function createOption(icon, onClick) {
   return {
     icon,
     onClick: async () => {
-      await onClick.call(this, appStore.getState());
-      appStore.getState().exitSelectionMode();
+      await onClick.call(this, selectionStore.getState());
+      selectionStore.getState().toggleSelectionMode(false);
     }
   };
 }

@@ -5,8 +5,8 @@ import Dropdown, { DropdownTrigger, DropdownContent } from "../dropdown";
 import Menu from "../menu";
 import {
   store as appStore,
-  useStore as useAppStore
-} from "../../stores/app-store";
+  useStore as useSelectionStore
+} from "../../stores/selection-store";
 import useContextMenu from "../../utils/useContextMenu";
 
 function ActionsMenu(props) {
@@ -57,11 +57,11 @@ function ListItem(props) {
   const [parentRef, closeContextMenu] = useContextMenu(
     `contextMenu${props.index}`
   );
-  const isSelectionMode = useAppStore(store => store.isSelectionMode);
-  const selectedItems = useAppStore(store => store.selectedItems);
+  const isSelectionMode = useSelectionStore(store => store.isSelectionMode);
+  const selectedItems = useSelectionStore(store => store.selectedItems);
   const isSelected =
     selectedItems.findIndex(item => props.item.id === item.id) > -1;
-  const selectItem = useAppStore(store => store.selectItem);
+  const selectItem = useSelectionStore(store => store.selectItem);
   const [menuItems, setMenuItems] = useState(props.menuItems);
 
   const toggleSelection = useCallback(

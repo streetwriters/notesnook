@@ -5,16 +5,16 @@ import Search from "../search";
 import * as Icon from "../icons";
 import { Virtuoso as List } from "react-virtuoso";
 import { useStore as useSearchStore } from "../../stores/searchstore";
-import { useStore as useAppStore } from "../../stores/app-store";
+import { useStore as useSelectionStore } from "../../stores/selection-store";
 
 function ListContainer(props) {
   const setSearchContext = useSearchStore(store => store.setSearchContext);
-  const shouldSelectAll = useAppStore(store => store.shouldSelectAll);
-  const setSelectedItems = useAppStore(store => store.setSelectedItems);
+  const shouldSelectAll = useSelectionStore(store => store.shouldSelectAll);
+  const setSelectedItems = useSelectionStore(store => store.setSelectedItems);
+
   useEffect(() => {
     if (shouldSelectAll) setSelectedItems(props.items);
   }, [shouldSelectAll, setSelectedItems, props.items]);
-
   useEffect(() => {
     if (props.noSearch) return;
     setSearchContext({
@@ -23,6 +23,7 @@ function ListContainer(props) {
       type: props.type
     });
   }, [setSearchContext, props.item, props.items, props.type, props.noSearch]);
+
   return (
     <Flex variant="columnFill">
       {!props.items.length && props.placeholder ? (
