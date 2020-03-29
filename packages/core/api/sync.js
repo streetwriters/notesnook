@@ -53,10 +53,13 @@ export default class Sync {
 
   async throwOnConflicts() {
     let hasConflicts = await this.db.context.read("hasConflicts");
-    if (hasConflicts)
-      throw new Error(
+    if (hasConflicts) {
+      const mergeConflictError = new Error(
         "Merge conflicts detected. Please resolve all conflicts to continue syncing."
       );
+      mergeConflictError.code = "MERGE_CONFLICT";
+      throw mergeConflictError;
+    }
   }
 
   async start() {
