@@ -105,7 +105,8 @@ export default class Notes {
       tags: note.tags || [],
       favorite: !!note.favorite,
       headline: note.headline,
-      dateCreated: note.dateCreated
+      dateCreated: note.dateCreated,
+      conflicted: !!note.conflicted
     };
 
     if (!oldNote) {

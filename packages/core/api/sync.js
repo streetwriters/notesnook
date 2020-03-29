@@ -51,9 +51,20 @@ export default class Sync {
     return await response.json();
   }
 
+  async throwOnConflicts() {
+    let hasConflicts = await this.db.context.read("hasConflicts");
+    if (hasConflicts)
+      throw new Error(
+        "Merge conflicts detected. Please resolve all conflicts to continue syncing."
+      );
+  }
+
   async start() {
     let user = await this.db.user.get();
     if (!user) throw new Error("You need to login to sync.");
+
+    await this.throwOnConflicts();
+
     let lastSyncedTimestamp = user.lastSynced || 0;
     let serverResponse = await this._fetch(lastSyncedTimestamp);
 
@@ -62,9 +73,9 @@ export default class Sync {
     const data = await prepare.get(lastSyncedTimestamp);
 
     // merge the server response
-    const merger = new Merger(this.db);
+    const merger = new Merger(this.db, lastSyncedTimestamp);
     const mergeResult = await merger.merge(serverResponse);
-
+    await this.throwOnConflicts();
     // send the data back to server
     await this._send(data);
 
@@ -91,8 +102,9 @@ class Merger {
    *
    * @param {Database} db
    */
-  constructor(db) {
+  constructor(db, lastSynced) {
     this._db = db;
+    this._lastSynced = lastSynced;
   }
 
   async _mergeItem(remoteItem, get, add) {
@@ -112,6 +124,25 @@ class Merger {
     );
   }
 
+  async _mergeItemWithConflicts(remoteItem, get, add, resolve) {
+    let localItem = await get(remoteItem.id);
+    if (!localItem) {
+      await add({ ...JSON.parse(remoteItem.data), remote: true });
+    } else if (localItem.dateEdited > this._lastSynced) {
+      // we have a conflict
+      await resolve(localItem, JSON.parse(remoteItem.data));
+    }
+  }
+
+  async _mergeArrayWithConflicts(array, get, set, resolve) {
+    return Promise.all(
+      array.map(
+        async item =>
+          await this._mergeItemWithConflicts(item, get, set, resolve)
+      )
+    );
+  }
+
   async merge(serverResponse) {
     const {
       notes,
@@ -123,7 +154,9 @@ class Merger {
       colors,
       trash
     } = serverResponse;
+
     if (synced || areAllEmpty(serverResponse)) return false;
+
     await this._mergeArray(
       notes,
       id => this._db.notes.note(id),
@@ -135,11 +168,17 @@ class Merger {
       item => this._db.notebooks.add(item)
     );
 
-    await this._mergeArray(
+    await this._mergeArrayWithConflicts(
       delta,
       id => this._db.delta.raw(id),
-      item => this._db.delta.add(item)
+      item => this._db.delta.add(item),
+      async (local, remote) => {
+        await this._db.delta.add({ ...local, conflicted: remote });
+        await this._db.notes.add({ id: local.noteId, conflicted: true });
+        await this._db.context.write("hasConflicts", true);
+      }
     );
+
     await this._mergeArray(
       text,
       id => this._db.text.raw(id),
@@ -163,6 +202,7 @@ class Merger {
       () => undefined,
       item => this._db.trash.add(item)
     );
+
     return true;
   }
 }
