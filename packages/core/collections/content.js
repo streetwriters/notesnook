@@ -16,7 +16,8 @@ export default class Content {
     await this._collection.addItem({
       noteId: content.noteId,
       id,
-      data: content.data || content
+      data: content.data || content,
+      conflicted: content.conflicted || false
     });
     return id;
   }
