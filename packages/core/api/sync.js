@@ -109,12 +109,9 @@ class Merger {
 
   async _mergeItem(remoteItem, get, add) {
     let localItem = await get(remoteItem.id);
-    if (
-      !localItem ||
-      remoteItem.deleted ||
-      remoteItem.dateEdited > localItem.dateEdited
-    ) {
-      await add({ ...JSON.parse(remoteItem.data), remote: true });
+    remoteItem = { ...JSON.parse(remoteItem.data), remote: true };
+    if (!localItem || remoteItem.dateEdited > localItem.dateEdited) {
+      await add(remoteItem);
     }
   }
 
@@ -238,10 +235,7 @@ class Prepare {
       .filter(item => item.dateEdited > this._lastSyncedTimestamp)
       .map(item => ({
         id: item.id,
-        dateEdited: item.dateEdited,
-        dateCreated: item.dateCreated,
-        data: JSON.stringify(item),
-        userId: this._user.Id
+        data: JSON.stringify(item)
       }))(array);
   }
 }
