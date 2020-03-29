@@ -1,38 +1,22 @@
 import React, { useEffect, useRef } from "react";
 import "./editor.css";
 import ReactQuill from "./react-quill";
-import { Flex, Box, Text } from "rebass";
-import TitleBox from "./title-box";
+import { Flex, Box } from "rebass";
 import Properties from "../properties";
 import { useStore, SESSION_STATES } from "../../stores/editor-store";
-import { timeConverter } from "../../utils/time";
-import { countWords } from "../../utils/string";
 import { useStore as useAppStore } from "../../stores/app-store";
 import Animated from "../animated";
 import EditorMenu from "./editormenu";
-
-const TextSeperator = () => {
-  return (
-    <Text as="span" mx={1} mt={"-3px"} fontSize="20px">
-      •
-    </Text>
-  );
-};
+import Header from "./header";
 
 function Editor() {
-  const title = useStore(store => store.session.title);
-  const dateEdited = useStore(store => store.session.dateEdited);
   const id = useStore(store => store.session.id);
-  const text = useStore(store => store.session.content.text);
-  const isSaving = useStore(store => store.session.isSaving);
   const delta = useStore(store => store.session.content.delta);
   const sessionState = useStore(store => store.session.state);
   const setSession = useStore(store => store.setSession);
   const saveSession = useStore(store => store.saveSession);
-  const newSession = useStore(store => store.newSession);
   const reopenLastSession = useStore(store => store.reopenLastSession);
   const isFocusMode = useAppStore(store => store.isFocusMode);
-  const hideProperties = useAppStore(store => store.hideProperties);
   const quillRef = useRef();
 
   useEffect(() => {
@@ -68,44 +52,7 @@ function Editor() {
           //hideProperties();
         }}
       >
-        <TitleBox
-          shouldFocus={sessionState === SESSION_STATES.new}
-          title={title}
-          setTitle={title =>
-            setSession(state => {
-              state.session.title = title;
-            })
-          }
-          sx={{
-            paddingTop: 2,
-            paddingBottom: 0
-          }}
-        />
-        <Text
-          fontSize={"subBody"}
-          mx={2}
-          color="fontTertiary"
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            marginTop: dateEdited || text.length || id.length ? 0 : 2,
-            marginBottom: dateEdited || text.length || id.length ? 2 : 0
-          }}
-        >
-          {dateEdited > 0 && (
-            <>
-              {timeConverter(dateEdited)}
-              <TextSeperator />
-            </>
-          )}
-          {text.length > 0 && (
-            <>
-              {countWords(text) + " words"}
-              <TextSeperator />
-            </>
-          )}
-          {id && id.length > 0 && <>{isSaving ? "Saving" : "Saved"}</>}
-        </Text>
+        <Header />
         <Box id="toolbar" display={["none", "flex", "flex"]} />
         <EditorMenu quill={quillRef.current && quillRef.current.quill} />
         <ReactQuill
@@ -131,5 +78,4 @@ function Editor() {
     </Animated.Flex>
   );
 }
-
 export default Editor;
