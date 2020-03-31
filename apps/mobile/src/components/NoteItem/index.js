@@ -86,8 +86,11 @@ export default class NoteItem extends React.Component {
           activeOpacity={0.8}
           onLongPress={() => onLongPress()}
           onPress={() => {
-            eSendEvent(eShowMergeDialog, item);
-            return;
+            if (item.conflicted) {
+              eSendEvent(eShowMergeDialog, item);
+
+              return;
+            }
             if (this.props.selectionMode) {
               this.props.onLongPress();
               return;

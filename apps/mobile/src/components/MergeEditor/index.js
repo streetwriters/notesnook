@@ -152,6 +152,7 @@ const MergeEditor = () => {
           delta: primaryDelta,
         },
         id: note.id,
+        conflicted: false,
       });
     } else if (keepContentFrom === 'secondary') {
       await db.notes.add({
@@ -160,6 +161,7 @@ const MergeEditor = () => {
           delta: secondaryDelta,
         },
         id: note.id,
+        conflicted: false,
       });
     }
 
@@ -189,7 +191,7 @@ const MergeEditor = () => {
   const show = async item => {
     note = item;
     primaryDelta = await db.notes.note(note.id).delta();
-    secondaryDelta = await db.notes.note(note.id).delta();
+    secondaryDelta = await db.notes.note(note.id).delta().conflicted;
     setVisible(true);
     postMessageToPrimaryWebView({
       type: 'delta',
