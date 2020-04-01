@@ -34,7 +34,11 @@ class Primary {
     return {
       variant: "buttons.default",
       color: "fontSecondary",
-      bg: "primary"
+      bg: "primary",
+      transition: "opacity 300ms linear",
+      ":hover": {
+        opacity: 0.8
+      }
     };
   }
 }
