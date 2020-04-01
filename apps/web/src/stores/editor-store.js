@@ -3,219 +3,155 @@ import { store as noteStore } from "./note-store";
 import { store as appStore } from "./app-store";
 import { store as tagStore } from "./tag-store";
 import { db } from "../common";
-import { showPasswordDialog } from "../components/dialogs/passworddialog";
+import EditorNavigator from "../navigation/navigators/editornavigator";
+import BaseStore from ".";
+import Vault from "../common/vault.ts";
 
-const SESSION_STATES = {
-  stale: "stale",
-  new: "new"
-};
+const SESSION_STATES = { stale: "stale", new: "new" };
+const DEFAULT_SESSION = { timeout: undefined, state: SESSION_STATES.new };
+class EditorStore extends BaseStore {
+  session = DEFAULT_SESSION;
 
-const DEFAULT_SESSION = {
-  notebook: undefined,
-  state: "",
-  isSaving: false,
-  title: "",
-  timeout: 0,
-  id: "",
-  pinned: false,
-  favorite: false,
-  locked: false,
-  tags: [],
-  colors: [],
-  dateEdited: 0,
-  content: {
-    text: "",
-    delta: {
-      ops: []
+  openLastSession = () => {
+    const id = localStorage.getItem("lastOpenedNote");
+    if (!id) return;
+    this.openSession(db.notes.note(id).data);
+  };
+
+  openSession = async note => {
+    clearTimeout(this.session.timeout);
+
+    if (note.conflicted) {
+      return EditorNavigator.navigate("split", { note });
+    } else {
+      EditorNavigator.navigate("editor");
+    }
+
+    let content = {};
+    if (!note.locked) {
+      content = {
+        text: note.content.text,
+        delta: await db.notes.note(note).delta()
+      };
+    } else {
+      content = await Vault.openNote(note.id);
+      if (!content) return;
+    }
+
+    this.set(state => {
+      state.session = {
+        ...DEFAULT_SESSION,
+        ...note,
+        content
+      };
+    });
+
+    noteStore.setSelectedNote(note.id);
+  };
+
+  saveSession = oldSession => {
+    this.set(state => (state.session.isSaving = true));
+
+    this._saveFn(this.session.locked)(this.session).then(id => {
+      if (!oldSession) {
+        if (oldSession.tags.length !== this.session.tags.length)
+          tagStore.refresh();
+        if (oldSession.colors.length !== this.session.colors.length)
+          appStore.refreshColors();
+      }
+
+      if (!this.session.id) {
+        noteStore.setSelectedNote(id);
+      }
+
+      this.set(state => {
+        state.session.id = id;
+        state.session.isSaving = false;
+      });
+
+      noteStore.refresh();
+
+      saveLastOpenedNote(!this.session.locked && id);
+    });
+  };
+
+  newSession = (context = {}) => {
+    clearTimeout(this.session.timeout);
+    this.set(function(state) {
+      state.session = {
+        ...DEFAULT_SESSION,
+        ...context
+      };
+    });
+    saveLastOpenedNote();
+    noteStore.setSelectedNote(0);
+  };
+
+  setSession = set => {
+    clearTimeout(this.session.timeout);
+    const oldSession = { ...this.session };
+    this.set(state => {
+      state.session.state = SESSION_STATES.stale;
+      set(state);
+      state.session.timeout = setTimeout(() => {
+        this.saveSession(oldSession);
+      }, 500);
+    });
+  };
+
+  toggleLocked = () => {
+    if (this.session.locked) noteStore.unlock(this.session.id);
+    else noteStore.lock(this.session.id);
+  };
+
+  setColor = color => {
+    this._setTagOrColor("color", color);
+  };
+
+  setTag = tag => {
+    this._setTagOrColor("tag", tag);
+  };
+
+  /**
+   * @private internal
+   * @param {Boolean} isLocked
+   * @returns {(note: any) => Promise<string>}
+   */
+  _saveFn(isLocked) {
+    return isLocked
+      ? db.vault.save.bind(db.vault)
+      : db.notes.add.bind(db.notes);
+  }
+
+  _setTagOrColor(key, value) {
+    const array = key === "tag" ? "tags" : "colors";
+    const { [array]: arr, id } = this.session;
+
+    let note = db.notes.note(id);
+    if (!note) return;
+
+    let index = arr.indexOf(value);
+    if (index > -1) {
+      note[`un${key}`](value).then(() => {
+        this.set(state => state.session[array].splice(index, 1));
+      });
+    } else {
+      note[key](value).then(() => {
+        this.set(state => state.session[array].push(value));
+      });
     }
   }
-};
+}
 
 function saveLastOpenedNote(id) {
   if (!id) return localStorage.removeItem("lastOpenedNote");
   localStorage.setItem("lastOpenedNote", id);
 }
 
-function editorStore(set, get) {
-  return {
-    session: DEFAULT_SESSION,
-    reopenLastSession: function() {
-      const id = localStorage.getItem("lastOpenedNote");
-      if (!id) return;
-      get().openSession(db.notes.note(id).data);
-    },
-    openSession: async function(note) {
-      clearTimeout(get().session.timeout);
-      let content = {};
-      if (!note.locked) {
-        content = {
-          text: note.content.text,
-          delta: await db.notes.note(note).delta()
-        };
-      } else {
-        const result = await showPasswordDialog("unlock_note", password => {
-          return db.vault
-            .open(note.id, password)
-            .then(note => {
-              content = note.content;
-              return true;
-            })
-            .catch(e => {
-              if (e.message === "ERR_WRNG_PwD") return false;
-              else console.error(e);
-            });
-        });
-        if (!result) return;
-      }
-      noteStore.getState().setSelectedNote(note.id);
-      set(state => {
-        state.session = {
-          ...DEFAULT_SESSION,
-          id: note.id,
-          title: note.title,
-          pinned: note.pinned,
-          favorite: note.favorite,
-          colors: note.colors,
-          locked: note.locked,
-          tags: note.tags,
-          dateEdited: note.dateEdited,
-          content,
-          state: SESSION_STATES.new
-        };
-      });
-      saveLastOpenedNote(!note.locked ? note.id : undefined);
-    },
-    saveSession: function(oldSession) {
-      set(state => {
-        state.session.isSaving = true;
-      });
-      const { session } = get();
-      const {
-        title,
-        id,
-        content,
-        pinned,
-        favorite,
-        locked,
-        tags,
-        colors
-      } = session;
-
-      let note = {
-        content,
-        title,
-        id,
-        favorite,
-        pinned,
-        tags,
-        colors
-      };
-
-      const func = locked
-        ? db.vault.save.bind(db.vault)
-        : db.notes.add.bind(db.notes);
-
-      func(note).then(id => {
-        if (!oldSession || oldSession.tags.length !== tags.length)
-          updateContext("tags", tags);
-        if (!oldSession || oldSession.colors.length !== colors.length) {
-          updateContext("colors", colors);
-          appStore.getState().refreshColors();
-        }
-
-        let notesState = noteStore.getState();
-        if (get().session.id === "") {
-          noteStore.getState().setSelectedNote(id);
-        }
-
-        set(state => {
-          state.session.id = id;
-          state.session.isSaving = false;
-        });
-
-        notesState.refresh();
-        saveLastOpenedNote(locked ? undefined : id);
-
-        // we update favorites only if favorite has changed
-        if (!oldSession || oldSession.favorite !== session.favorite) {
-          notesState.setContext({ type: "favorites" });
-        }
-      });
-    },
-    setSession: function(session) {
-      const oldSession = get().session;
-      clearTimeout(oldSession.timeout);
-      set(state => {
-        state.session.state = SESSION_STATES.stale;
-        session(state);
-        state.session.timeout = setTimeout(() => {
-          get().saveSession(oldSession);
-        }, 500);
-      });
-    },
-    newSession: function(context = {}) {
-      clearTimeout(get().session.timeout);
-      set(state => {
-        state.session = {
-          ...DEFAULT_SESSION,
-          ...context,
-          state: SESSION_STATES.new
-        };
-      });
-      saveLastOpenedNote();
-      noteStore.getState().setSelectedNote(0);
-    },
-    toggleLocked: function() {
-      const { session } = get();
-      if (session.locked) {
-        noteStore.getState().unlock(session.id);
-      } else {
-        noteStore.getState().lock(session.id);
-      }
-    },
-    setColor: function(color) {
-      setTagOrColor(get().session, "colors", color, "color", get().setSession);
-    },
-    setTag: function(tag) {
-      setTagOrColor(get().session, "tags", tag, "tag", get().setSession);
-    }
-  };
-}
-
-function setTagOrColor(session, array, value, func, set) {
-  const { [array]: arr, id } = session;
-  let note = db.notes.note(id);
-  if (!note) return;
-  let index = arr.indexOf(value);
-  if (index > -1) {
-    note[`un${func}`](value).then(() => {
-      set(state => {
-        state.session[array].splice(index, 1);
-      });
-    });
-  } else {
-    note[func](value).then(() => {
-      set(state => {
-        state.session[array].push(value);
-      });
-    });
-  }
-}
-
-function updateContext(key, array) {
-  let type = key === "colors" ? "color" : "tag";
-  // update notes if the selected context (the current view in the navigator) is a tag or color
-  const notesState = noteStore.getState();
-  const context = notesState.context;
-  if (context.type === type) {
-    const isValue = array.some(value => value === context.value);
-    if (isValue) noteStore.getState().setContext(context);
-  }
-  if (type === "tag") {
-    tagStore.getState().refreshTags();
-  }
-}
-
-const [useStore, store] = createStore(editorStore);
-
-export { useStore, store, SESSION_STATES };
+/**
+ * @type {[import("zustand").UseStore<EditorStore>,
+ * import("zustand").StoreApi<EditorStore>]}
+ */
+const [useStore, api] = createStore(EditorStore);
+const store = api.getState();
+export { useStore, store };
