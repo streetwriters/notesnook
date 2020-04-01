@@ -42,7 +42,9 @@ export default class ReactQuill extends Component {
   }
 
   shouldComponentUpdate(nextProps) {
-    return this.props.readOnly !== nextProps.readOnly || nextProps.refresh;
+    return (
+      this.props.readOnly !== nextProps.readOnly || nextProps.refresh || false
+    );
   }
 
   componentDidUpdate() {
@@ -62,10 +64,11 @@ export default class ReactQuill extends Component {
       readOnly,
       initialContent,
       onChange,
-      onSave
+      onSave,
+      id
     } = this.props;
 
-    this.quill = new Quill("#quill", {
+    this.quill = new Quill("#" + id, {
       placeholder,
       bounds: container,
       modules,
@@ -102,6 +105,6 @@ export default class ReactQuill extends Component {
   };
 
   render() {
-    return <pre id="quill" />;
+    return <pre id={this.props.id} />;
   }
 }
