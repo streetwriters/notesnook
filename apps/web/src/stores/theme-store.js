@@ -1,26 +1,26 @@
 import createStore from "../common/store";
+import BaseStore from "./index";
 
-function themeStore(set, get) {
-  return {
-    theme: "light",
-    accent: "#0560ff",
-    setTheme: function(theme) {
-      set(state => {
-        state.theme = theme;
-      });
-    },
-    toggleNightMode: function() {
-      const theme = get().theme;
-      get().setTheme(theme === "dark" ? "light" : "dark");
-    },
-    setAccent: function(accent) {
-      set(state => {
-        state.accent = accent;
-      });
-    }
+class ThemeStore extends BaseStore {
+  theme = "light";
+  accent = "#0560ff";
+
+  setTheme = theme => {
+    this.set(state => (state.theme = theme));
+  };
+
+  toggleNightMode = () => {
+    const theme = this.theme;
+    this.setTheme(theme === "dark" ? "light" : "dark");
+  };
+
+  setAccent = accent => {
+    this.set(state => (state.accent = accent));
   };
 }
 
-const [useStore, store] = createStore(themeStore);
-
+/**
+ * @type {[import("zustand").UseStore<ThemeStore>, ThemeStore]}
+ */
+const [useStore, store] = createStore(ThemeStore);
 export { useStore, store };

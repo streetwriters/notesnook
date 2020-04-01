@@ -149,9 +149,7 @@ function saveLastOpenedNote(id) {
 }
 
 /**
- * @type {[import("zustand").UseStore<EditorStore>,
- * import("zustand").StoreApi<EditorStore>]}
+ * @type {[import("zustand").UseStore<EditorStore>, EditorStore]}
  */
-const [useStore, api] = createStore(EditorStore);
-const store = api.getState();
+const [useStore, store] = createStore(EditorStore);
 export { useStore, store };

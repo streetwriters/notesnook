@@ -1,38 +1,37 @@
 import { db } from "../common/index";
 import createStore from "../common/store";
+import BaseStore from "./index";
 
-function trashStore(set) {
-  return {
-    refresh: function() {
-      set(state => {
-        state.trash = db.trash.all;
+class TrashStore extends BaseStore {
+  trash = [];
+
+  refresh = () => {
+    this.set(state => (state.trash = db.trash.all));
+  };
+
+  delete = (id, index) => {
+    return db.trash.delete(id).then(() => {
+      this.set(state => {
+        state.trash.splice(index, 1);
       });
-    },
-    trash: [],
-    delete: function(id, index) {
-      return db.trash.delete(id).then(() => {
-        set(state => {
-          state.trash.splice(index, 1);
-        });
-      });
-    },
-    restore: function(id, index) {
-      return db.trash.restore(id).then(() => {
-        set(state => {
-          state.trash.splice(index, 1);
-        });
-      });
-    },
-    clear: function() {
-      return db.trash.clear().then(() => {
-        set(state => {
-          state.trash = [];
-        });
-      });
-    }
+    });
+  };
+
+  restore = (id, index) => {
+    return db.trash.restore(id).then(() => {
+      this.set(state => state.trash.splice(index, 1));
+    });
+  };
+
+  clear = () => {
+    return db.trash.clear().then(() => {
+      this.set(state => (state.trash = []));
+    });
   };
 }
 
-const [useStore, store] = createStore(trashStore);
-
+/**
+ * @type {[import("zustand").UseStore<TrashStore>, TrashStore]}
+ */
+const [useStore, store] = createStore(TrashStore);
 export { useStore, store };

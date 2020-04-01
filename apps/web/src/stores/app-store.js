@@ -3,6 +3,7 @@ import { db } from "../common";
 import { store as noteStore } from "./note-store";
 import { store as notebookStore } from "./notebook-store";
 import { store as trashStore } from "./trash-store";
+import { store as tagStore } from "./tag-store";
 import BaseStore from "./index";
 
 class AppStore extends BaseStore {
@@ -12,10 +13,10 @@ class AppStore extends BaseStore {
   colors = [];
 
   refresh = () => {
-    noteStore.getState().refresh();
-    notebookStore.getState().refresh();
-    noteStore.getState().refreshContext();
-    trashStore.getState().refresh();
+    noteStore.refresh();
+    notebookStore.refresh();
+    trashStore.refresh();
+    tagStore.refresh();
     this.refreshColors();
   };
 
@@ -32,6 +33,8 @@ class AppStore extends BaseStore {
   };
 }
 
+/**
+ * @type {[import("zustand").UseStore<AppStore>, AppStore]}
+ */
 const [useStore, store] = createStore(AppStore);
-
 export { useStore, store };

@@ -1,42 +1,45 @@
 import { db } from "../common/index";
 import createStore from "../common/store";
 import { store as trashStore } from "./trash-store";
+import BaseStore from "./index";
 
-function notebookStore(set, get) {
-  return {
-    refresh: function() {
-      set(state => {
-        state.notebooks = db.notebooks.all;
-      });
-    },
-    notebooks: [],
-    add: async function(nb) {
-      let notebook = await db.notebooks.add(nb);
-      if (notebook) {
-        get().refresh();
-      }
-    },
-    delete: async function(id, index) {
-      await db.notebooks.delete(id);
-      set(state => {
-        state.notebooks.splice(index, 1);
-        trashStore.getState().refresh();
-      });
-    },
-    update: function() {},
-    pin: async function(notebook, index) {
-      await db.notebooks.notebook(notebook).pin();
-      get().refresh();
-    },
-    selectedNotebookTopics: [],
-    setSelectedNotebookTopics: function(id) {
-      set(state => {
-        state.selectedNotebookTopics = db.notebooks.notebook(id).topics.all;
-      });
+class NotebookStore extends BaseStore {
+  notebooks = [];
+  selectedNotebookTopics = [];
+
+  refresh = () => {
+    this.set(state => (state.notebooks = db.notebooks.all));
+  };
+
+  add = async nb => {
+    let notebook = await db.notebooks.add(nb);
+    if (notebook) {
+      this.refresh();
     }
+  };
+
+  delete = async (id, index) => {
+    await db.notebooks.delete(id);
+    this.set(state => {
+      state.notebooks.splice(index, 1);
+      trashStore.refresh();
+    });
+  };
+
+  pin = async notebook => {
+    await db.notebooks.notebook(notebook).pin();
+    this.refresh();
+  };
+
+  setSelectedNotebookTopics = id => {
+    this.set(state => {
+      state.selectedNotebookTopics = db.notebooks.notebook(id).topics.all;
+    });
   };
 }
 
-const [useStore, store] = createStore(notebookStore);
-
+/**
+ * @type {[import("zustand").UseStore<NotebookStore>, NotebookStore]}
+ */
+const [useStore, store] = createStore(NotebookStore);
 export { useStore, store };

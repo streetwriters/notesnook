@@ -18,9 +18,12 @@ function immer(config) {
   };
 }
 
+/**
+ * @returns {[import("zustand").UseStore<any>, any]}
+ */
 function createStore(store) {
-  store = store.new ? store.new.bind(store) : store;
-  return create(immer(store));
+  const [useStore, api] = create(immer(store.new.bind(store)));
+  return [useStore, api.getState()];
 }
 
 export default createStore;

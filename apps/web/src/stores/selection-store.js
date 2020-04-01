@@ -40,6 +40,8 @@ class SelectionStore extends BaseStore {
   }
 }
 
+/**
+ * @type {[import("zustand").UseStore<SelectionStore>, SelectionStore]}
+ */
 const [useStore, store] = createStore(SelectionStore);
-
 export { useStore, store };

@@ -18,7 +18,8 @@ class NoteStore extends BaseStore {
   };
 
   refresh = () => {
-    this.set(state => (state.notes = db.notes.group(undefined, true)));
+    if (this.context) this.refreshContext();
+    else this.set(state => (state.notes = db.notes.group(undefined, true)));
   };
 
   refreshContext = () => {
@@ -53,7 +54,7 @@ class NoteStore extends BaseStore {
     await db.notes.delete(id);
     this.refreshContext();
     this.refresh();
-    const { session, newSession } = editorStore.getState();
+    const { session, newSession } = editorStore;
     if (session.id === id) {
       newSession();
     }
@@ -97,12 +98,15 @@ class NoteStore extends BaseStore {
    * @private
    */
   _syncEditor = (noteId, action) => {
-    const { session, setSession } = editorStore.getState();
+    const { session, setSession } = editorStore;
     if (session.id === noteId) {
       setSession(state => (state.session[action] = !state.session[action]));
     }
   };
 }
 
+/**
+ * @type {[import("zustand").UseStore<NoteStore>, NoteStore]}
+ */
 const [useStore, store] = createStore(NoteStore);
 export { useStore, store };

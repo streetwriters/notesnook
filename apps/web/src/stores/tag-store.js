@@ -1,17 +1,17 @@
 import createStore from "../common/store";
 import { db } from "../common";
+import BaseStore from "./index";
 
-function tagStore(set, get) {
-  return {
-    tags: [],
-    refreshTags: function() {
-      set(state => {
-        state.tags = db.tags.all;
-      });
-    }
+class TagStore extends BaseStore {
+  tags = [];
+
+  refresh = () => {
+    this.set(state => (state.tags = db.tags.all));
   };
 }
 
-const [useStore, store] = createStore(tagStore);
-
+/**
+ * @type {[import("zustand").UseStore<TagStore>, TagStore]}
+ */
+const [useStore, store] = createStore(TagStore);
 export { useStore, store };
