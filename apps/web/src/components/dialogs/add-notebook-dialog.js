@@ -186,7 +186,7 @@ export function showEditNoteDialog(notebook) {
       notebook={notebook}
       edit={true}
       onDone={async nb => {
-        await store.getState().add(nb);
+        await store.add(nb);
         perform(false);
       }}
       close={() => {

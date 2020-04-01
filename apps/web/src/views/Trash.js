@@ -13,7 +13,7 @@ function menuItems(item, index) {
   return [
     {
       title: "Restore",
-      onClick: () => store.getState().restore(item.id, index)
+      onClick: () => store.restore(item.id, index)
     },
     {
       title: "Delete",
@@ -25,7 +25,7 @@ function menuItems(item, index) {
           `Are you sure you want to permanently delete this item?`
         ).then(async res => {
           if (res) {
-            await store.getState().delete(item.id, index);
+            await store.delete(item.id, index);
           }
         });
       }
@@ -34,7 +34,7 @@ function menuItems(item, index) {
 }
 
 function Trash() {
-  useEffect(() => store.getState().refresh(), []);
+  useEffect(() => store.refresh(), []);
   const items = useStore(store => store.trash);
   const clearTrash = useStore(store => store.clear);
   return (

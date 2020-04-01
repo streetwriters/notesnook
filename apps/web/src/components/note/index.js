@@ -1,5 +1,5 @@
 import React from "react";
-import { Flex, Box } from "rebass";
+import { Flex, Box, Text } from "rebass";
 import * as Icon from "../icons";
 import TimeAgo from "timeago-react";
 import ListItem from "../list-item";
@@ -24,17 +24,17 @@ function menuItems(note, context) {
     },
     {
       title: note.pinned ? "Unpin" : "Pin",
-      onClick: () => store.getState().pin(note)
+      onClick: () => store.pin(note)
     },
     {
       title: note.favorite ? "Unfavorite" : "Favorite",
-      onClick: () => store.getState().favorite(note)
+      onClick: () => store.favorite(note)
     },
-    { title: "Edit", onClick: () => editorStore.getState().openSession(note) },
+    { title: "Edit", onClick: () => editorStore.openSession(note) },
     {
       title: note.locked ? "Unlock" : "Lock",
       onClick: async () => {
-        const { unlock, lock } = store.getState();
+        const { unlock, lock } = store;
         if (!note.locked) {
           lock(note.id);
         } else {
@@ -56,7 +56,7 @@ function menuItems(note, context) {
               .notebook(context.notebook.id)
               .topics.topic(context.value)
               .delete(note.id);
-            await store.getState().setContext(context);
+            await store.setContext(context);
           }
         });
       }
@@ -80,7 +80,7 @@ function menuItems(note, context) {
           "Are you sure you want to delete this note?"
         ).then(async res => {
           if (res) {
-            await store.getState().delete(note.id);
+            await store.delete(note.id);
           }
         });
       }
@@ -104,33 +104,50 @@ function Note(props) {
       id={note.id}
       index={index}
       onClick={async () => {
-        await editorStore.getState().openSession(note);
+        await editorStore.openSession(note);
       }}
       info={
-        <Flex variant="rowCenter">
-          {note.colors.map((item, index) => (
-            <Box
-              key={item}
-              style={{
-                width: 13,
-                marginLeft: index ? -8 : 0,
-                marginRight: index === note.colors.length - 1 ? 5 : 0,
-                height: 13,
-                backgroundColor: item,
-                borderRadius: 100
-              }}
-            />
-          ))}
-          <TimeAgo datetime={note.dateCreated} />
-          {note.locked && (
-            <Icon.Lock
-              size={13}
-              color={theme.colors.fontTertiary}
-              sx={{ ml: 1 }}
-            />
-          )}
-          {note.favorite && (
-            <Icon.Star color={theme.colors.favorite} size={13} sx={{ ml: 1 }} />
+        <Flex flex="1 1 auto" justifyContent="space-between">
+          <Flex variant="rowCenter">
+            {note.colors.map((item, index) => (
+              <Box
+                key={item}
+                style={{
+                  width: 13,
+                  marginLeft: index ? -8 : 0,
+                  marginRight: index === note.colors.length - 1 ? 5 : 0,
+                  height: 13,
+                  backgroundColor: item,
+                  borderRadius: 100
+                }}
+              />
+            ))}
+            <TimeAgo datetime={note.dateCreated} />
+            {note.locked && (
+              <Icon.Lock
+                size={13}
+                color={theme.colors.fontTertiary}
+                sx={{ ml: 1 }}
+              />
+            )}
+            {note.favorite && (
+              <Icon.Star
+                color={theme.colors.favorite}
+                size={13}
+                sx={{ ml: 1 }}
+              />
+            )}
+          </Flex>
+          {note.conflicted && (
+            <Text
+              ml={1}
+              p={1}
+              bg="error"
+              color="static"
+              sx={{ borderRadius: "default" }}
+            >
+              CONFLICT
+            </Text>
           )}
         </Flex>
       }
@@ -151,6 +168,7 @@ export default React.memo(Note, function(prevProps, nextProps) {
     prevItem.headline === nextItem.headline &&
     prevItem.title === nextItem.title &&
     prevItem.locked === nextItem.locked &&
+    prevItem.conflicted === nextItem.conflicted &&
     JSON.stringify(prevItem.colors) === JSON.stringify(nextItem.colors)
   );
 });

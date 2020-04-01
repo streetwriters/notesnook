@@ -9,7 +9,7 @@ function menuItems(notebook, index) {
   return [
     {
       title: notebook.pinned ? "Unpin" : "Pin",
-      onClick: () => store.getState().pin(notebook, index)
+      onClick: () => store.pin(notebook, index)
     },
     {
       title: "Edit",
@@ -18,7 +18,7 @@ function menuItems(notebook, index) {
     {
       title: "Delete",
       color: "red",
-      onClick: () => store.getState().delete(notebook.id, index)
+      onClick: () => store.delete(notebook.id, index)
     }
   ];
 }

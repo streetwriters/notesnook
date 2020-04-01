@@ -43,7 +43,7 @@ export function showTopicDialog(notebook) {
       onYes={async topic => {
         if (!topic) return;
         await db.notebooks.notebook(notebook).topics.add(topic);
-        store.getState().setSelectedNotebookTopics(notebook);
+        store.setSelectedNotebookTopics(notebook);
         perform(true);
       }}
     />

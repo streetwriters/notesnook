@@ -25,7 +25,7 @@ function selectMenuItem(isSelected, toggleSelection) {
   return {
     title: isSelected ? "Unselect" : "Select",
     onClick: () => {
-      const appState = appStore.getState();
+      const appState = appStore;
       if (!appState.isSelectionMode) {
         appState.enterSelectionMode();
         toggleSelection();

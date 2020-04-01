@@ -21,7 +21,7 @@ function Tags(props) {
   const setContext = useNotesStore(store => store.setContext);
   const tags = useStore(store => store.tags);
   useEffect(() => {
-    store.getState().refreshTags();
+    store.refreshTags();
   }, []);
   return (
     <ListContainer

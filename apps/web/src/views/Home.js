@@ -8,7 +8,7 @@ import ListContainer from "../components/list-container";
 import NotesPlaceholder from "../components/placeholders/notesplacholder";
 
 function Home() {
-  useEffect(() => store.getState().refresh(), []);
+  useEffect(() => store.refresh(), []);
   const notes = useStore(store => store.notes);
   const newSession = useEditorStore(store => store.newSession);
   return (

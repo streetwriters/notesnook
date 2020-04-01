@@ -1,5 +1,5 @@
 import * as Icon from "../components/icons";
-import { store as selectionStore } from "../stores/app-store";
+import { store as selectionStore } from "../stores/selection-store";
 import { store as notesStore } from "../stores/note-store";
 import { store as nbStore } from "../stores/notebook-store";
 import { store as editorStore } from "../stores/editor-store";
@@ -12,8 +12,8 @@ function createOption(icon, onClick) {
   return {
     icon,
     onClick: async () => {
-      await onClick.call(this, selectionStore.getState());
-      selectionStore.getState().toggleSelectionMode(false);
+      await onClick.call(this, selectionStore);
+      selectionStore.toggleSelectionMode(false);
     }
   };
 }
@@ -29,23 +29,22 @@ const DeleteOption = createOption(Icon.Trash, async function(state) {
     return;
   const item = state.selectedItems[0];
   var isAnyNoteOpened = false;
-  const editorState = editorStore.getState();
   const items = state.selectedItems.map(item => {
-    if (item.id === editorState.session.id) isAnyNoteOpened = true;
+    if (item.id === editorStore.session.id) isAnyNoteOpened = true;
     if (item.locked) return 0;
     return item.id;
   });
 
   if (isAnyNoteOpened) {
-    editorState.newSession();
+    editorStore.newSession();
   }
 
   if (item.type === "note") {
     await db.notes.delete(...items);
-    notesStore.getState().refresh();
+    notesStore.refresh();
   } else if (item.type === "notebook") {
     await db.notebooks.delete(...items);
-    nbStore.getState().refresh();
+    nbStore.refresh();
   } else if (item.notebookId) {
     // its a topic
     await db.notebooks.notebook(item.notebookId).topics.delete(...items);
@@ -59,7 +58,7 @@ const FavoriteOption = createOption(Icon.Star, function(state) {
     if (item.favorite) return;
     await db.notes.note(item.id).favorite();
   });
-  notesStore.getState().refresh();
+  notesStore.refresh();
 });
 
 const UnfavoriteOption = createOption(Icon.Star, function(state) {
@@ -68,7 +67,7 @@ const UnfavoriteOption = createOption(Icon.Star, function(state) {
     if (!item.favorite) return;
     await db.notes.note(item.id).favorite();
   });
-  notesStore.getState().setContext({ type: "favorites" });
+  notesStore.setContext({ type: "favorites" });
 });
 
 const AddToNotebookOption = createOption(Icon.Plus, async function(state) {
@@ -82,7 +81,7 @@ const AddToNotebookOption = createOption(Icon.Plus, async function(state) {
 const RestoreOption = createOption(Icon.Restore, async function(state) {
   const items = state.selectedItems.map(item => item.id);
   await db.trash.restore(...items);
-  trashStore.getState().refresh();
+  trashStore.refresh();
 });
 
 const NotesOptions = createOptions([AddToNotebookOption, FavoriteOption]);

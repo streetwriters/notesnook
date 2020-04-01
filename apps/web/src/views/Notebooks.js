@@ -9,7 +9,7 @@ import NotebooksPlaceholder from "../components/placeholders/notebooks-placehold
 
 function Notebooks(props) {
   const [open, setOpen] = useState(false);
-  useEffect(() => store.getState().refresh(), []);
+  useEffect(() => store.refresh(), []);
   const notebooks = useStore(state => state.notebooks);
   const add = useStore(state => state.add);
   return (

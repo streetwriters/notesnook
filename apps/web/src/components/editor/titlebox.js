@@ -50,7 +50,7 @@ class TitleBox extends React.Component {
           alignItems="center"
           pr={3}
           onClick={() => {
-            appStore.getState().toggleFocusMode();
+            appStore.toggleFocusMode();
             this.setState({ isFocusMode: !this.state.isFocusMode });
           }}
         >

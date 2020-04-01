@@ -48,7 +48,7 @@ class Navigator {
       return false;
     }
     // exit selection mode on navigate
-    selectionStore.getState().toggleSelectionMode(false);
+    selectionStore.toggleSelectionMode(false);
     ReactDOM.render(
       <AnimatePresence exitBeforeEnter={true}>
         <Animated.Flex

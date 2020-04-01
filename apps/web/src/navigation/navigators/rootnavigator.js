@@ -18,15 +18,15 @@ import { showLogInDialog } from "../../components/dialogs/logindialog";
 
 export const bottomRoutes = {
   ...createDeadRoute("nightmode", Icon.Theme, {
-    onClick: () => themeStore.getState().toggleNightMode()
+    onClick: () => themeStore.toggleNightMode()
   }),
   ...createDeadRoute("sync", Icon.Sync, {
-    onClick: async () => userStore.getState().sync(),
+    onClick: async () => userStore.sync(),
     animatable: true
   }),
   ...createNormalRoute("account", Account, Icon.User, {
     onClick: async () => {
-      if (!userStore.getState().isLoggedIn) {
+      if (!userStore.isLoggedIn) {
         await showLogInDialog();
         return false;
       } else return RootNavigator.navigate("account");
