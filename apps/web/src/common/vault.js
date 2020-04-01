@@ -29,6 +29,20 @@ class Vault {
     }).then(res => res && done());
   }
 
+  static openNote(id) {
+    return showPasswordDialog("unlock_note", password => {
+      return db.vault
+        .open(id, password)
+        .then(note => {
+          return note.content;
+        })
+        .catch(e => {
+          if (e.message === "ERR_WRNG_PwD") return;
+          else console.error(e);
+        });
+    });
+  }
+
   static lockNote(id, done) {
     db.vault
       .add(id)
@@ -43,7 +57,7 @@ class Vault {
             return false;
         }
       })
-      .then(result => result && this.lock(id));
+      .then(result => result && Vault.lockNote(id));
   }
 }
 export default Vault;
