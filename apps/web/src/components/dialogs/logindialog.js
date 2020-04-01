@@ -28,7 +28,7 @@ function LoginDialog(props) {
         disabled: isLoggingIn,
         onClick: () => {
           setError();
-          if (!form.error) return;
+          if (form.error) return;
           login(form)
             .then(onClose)
             .catch(e => setError(e.message));
