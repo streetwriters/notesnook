@@ -23,7 +23,7 @@ const months = [
   "Dec"
 ];
 
-export function timeConverter(timestamp) {
+export function timeConverter(timestamp, showSeconds = false) {
   if (!timestamp) return;
   var d = new Date(timestamp), // Convert the passed timestamp to milliseconds
     yyyy = d.getFullYear(),
@@ -32,6 +32,7 @@ export function timeConverter(timestamp) {
     hh = d.getHours(),
     h = hh,
     min = ("0" + d.getMinutes()).slice(-2), // Add leading 0.
+    sec = ("0" + d.getSeconds()).slice(-2),
     ampm = "AM",
     time;
 
@@ -58,6 +59,7 @@ export function timeConverter(timestamp) {
     h +
     ":" +
     min +
+    (showSeconds ? `:${sec}` : "") +
     " " +
     ampm;
 
