@@ -8,7 +8,7 @@ class StaticColorSchemeFactory {
       fontTertiary: "gray",
       transparent: "transparent",
       static: "white",
-      error: "red",
+      error: "#E53935",
       favorite: "#ffd700"
     };
   }
