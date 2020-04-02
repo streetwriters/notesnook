@@ -8,13 +8,24 @@ import Vault from "../common/vault.js";
 
 const SESSION_STATES = { stale: "stale", new: "new" };
 const DEFAULT_SESSION = {
-  id: 0,
-  timeout: undefined,
+  notebook: undefined,
   state: SESSION_STATES.new,
+  isSaving: false,
   title: "",
-  content: { delta: { ops: [] }, text: "" },
+  timeout: 0,
+  id: "",
+  pinned: false,
+  favorite: false,
+  locked: false,
   tags: [],
-  colors: []
+  colors: [],
+  dateEdited: 0,
+  content: {
+    text: "",
+    delta: {
+      ops: []
+    }
+  }
 };
 class EditorStore extends BaseStore {
   session = DEFAULT_SESSION;
