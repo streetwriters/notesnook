@@ -11,7 +11,10 @@ const DEFAULT_SESSION = {
   id: 0,
   timeout: undefined,
   state: SESSION_STATES.new,
-  content: { delta: { ops: [] }, text: "" }
+  title: "",
+  content: { delta: { ops: [] }, text: "" },
+  tags: [],
+  colors: []
 };
 class EditorStore extends BaseStore {
   session = DEFAULT_SESSION;
@@ -24,12 +27,6 @@ class EditorStore extends BaseStore {
 
   openSession = async note => {
     clearTimeout(this.session.timeout);
-
-    /* if (note.conflicted) {
-      return EditorNavigator.navigate("split", { note });
-    } else {
-      EditorNavigator.navigate("editor");
-    } */
 
     let content = {};
     if (!note.locked) {
@@ -55,7 +52,6 @@ class EditorStore extends BaseStore {
 
   saveSession = oldSession => {
     this.set(state => (state.session.isSaving = true));
-
     this._saveFn(this.session.locked)(this.session).then(id => {
       if (!oldSession) {
         if (oldSession.tags.length !== this.session.tags.length)
@@ -97,9 +93,11 @@ class EditorStore extends BaseStore {
     this.set(state => {
       state.session.state = SESSION_STATES.stale;
       set(state);
+
       state.session.timeout = setTimeout(() => {
+        this.session = this.get().session;
         this.saveSession(oldSession);
-      }, 500);
+      }, 1000);
     });
   };
 

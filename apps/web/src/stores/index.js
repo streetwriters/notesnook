@@ -6,6 +6,7 @@ class BaseStore {
   constructor(set, get) {
     this.set = set;
     this.get = get;
+    this.id = Math.random();
   }
 }
 
