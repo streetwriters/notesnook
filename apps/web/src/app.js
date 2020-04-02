@@ -9,6 +9,7 @@ import { useStore as useAppStore } from "./stores/app-store";
 import { useStore as useUserStore } from "./stores/user-store";
 import Animated from "./components/animated";
 import NavigationMenu from "./components/navigationmenu";
+import { EditorNavigator } from "./navigation/navigators";
 
 function App() {
   const [show, setShow] = usePersistentState("isContainerVisible", true);
@@ -29,6 +30,10 @@ function App() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isFocusMode]);
+
+  useEffect(() => {
+    EditorNavigator.navigate("editor");
+  }, []);
 
   return (
     <ThemeProvider>
@@ -51,7 +56,7 @@ function App() {
               borderColor: "border"
             }}
           />
-          <Editor />
+          <Flex width="100%" className="EditorNavigator" />
         </Flex>
         <Box id="dialogContainer" />
         <Box id="snackbarContainer" />
