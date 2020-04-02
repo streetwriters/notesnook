@@ -49,19 +49,19 @@ function Header() {
           marginBottom: dateEdited || text.length || id.length ? 2 : 0
         }}
       >
-        {dateEdited > 0 && (
+        {dateEdited > 0 ? (
           <>
             {timeConverter(dateEdited)}
             <TextSeperator />
           </>
-        )}
-        {text.length > 0 && (
+        ) : null}
+        {text.length > 0 ? (
           <>
             {countWords(text) + " words"}
             <TextSeperator />
           </>
-        )}
-        {id && id.length > 0 && <>{isSaving ? "Saving" : "Saved"}</>}
+        ) : null}
+        {id && id.length > 0 ? <>{isSaving ? "Saving" : "Saved"}</> : null}
       </Text>
     </>
   );

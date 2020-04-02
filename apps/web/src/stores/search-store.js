@@ -1,6 +1,6 @@
 import createStore from "../common/store";
 import { db } from "../common";
-import BaseStore from "..ts";
+import BaseStore from "./index";
 
 class SearchStore extends BaseStore {
   type = "";

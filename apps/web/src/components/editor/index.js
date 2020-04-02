@@ -15,7 +15,7 @@ function Editor() {
   const sessionState = useStore(store => store.session.state);
   const setSession = useStore(store => store.setSession);
   const saveSession = useStore(store => store.saveSession);
-  const reopenLastSession = useStore(store => store.reopenLastSession);
+  const openLastSession = useStore(store => store.openLastSession);
   const isFocusMode = useAppStore(store => store.isFocusMode);
   const quillRef = useRef();
 
@@ -29,8 +29,8 @@ function Editor() {
   }, []);
 
   useEffect(() => {
-    reopenLastSession();
-  }, [reopenLastSession]);
+    openLastSession();
+  }, [openLastSession]);
 
   return (
     <Animated.Flex
@@ -56,6 +56,7 @@ function Editor() {
         <Box id="toolbar" display={["none", "flex", "flex"]} />
         <EditorMenu quill={quillRef.current && quillRef.current.quill} />
         <ReactQuill
+          id="quill"
           ref={quillRef}
           refresh={sessionState === SESSION_STATES.new}
           initialContent={delta}
@@ -74,7 +75,7 @@ function Editor() {
           }}
         />
       </Flex>
-      {id && <Properties />}
+      {id ? <Properties /> : null}
     </Animated.Flex>
   );
 }

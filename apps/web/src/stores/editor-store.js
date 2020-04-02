@@ -3,12 +3,16 @@ import { store as noteStore } from "./note-store";
 import { store as appStore } from "./app-store";
 import { store as tagStore } from "./tag-store";
 import { db } from "../common";
-import EditorNavigator from "../navigation/navigators/editornavigator";
 import BaseStore from ".";
-import Vault from "../common/vault.ts";
+import Vault from "../common/vault.js";
 
 const SESSION_STATES = { stale: "stale", new: "new" };
-const DEFAULT_SESSION = { timeout: undefined, state: SESSION_STATES.new };
+const DEFAULT_SESSION = {
+  id: 0,
+  timeout: undefined,
+  state: SESSION_STATES.new,
+  content: { delta: { ops: [] }, text: "" }
+};
 class EditorStore extends BaseStore {
   session = DEFAULT_SESSION;
 
@@ -21,11 +25,11 @@ class EditorStore extends BaseStore {
   openSession = async note => {
     clearTimeout(this.session.timeout);
 
-    if (note.conflicted) {
+    /* if (note.conflicted) {
       return EditorNavigator.navigate("split", { note });
     } else {
       EditorNavigator.navigate("editor");
-    }
+    } */
 
     let content = {};
     if (!note.locked) {
@@ -152,4 +156,4 @@ function saveLastOpenedNote(id) {
  * @type {[import("zustand").UseStore<EditorStore>, EditorStore]}
  */
 const [useStore, store] = createStore(EditorStore);
-export { useStore, store };
+export { useStore, store, SESSION_STATES };
