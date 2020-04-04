@@ -79,7 +79,9 @@ export default class Notes {
       deltaId = await this._deltaCollection.add({
         noteId: id,
         id: deltaId,
-        data: delta,
+        data: delta.data || delta,
+        conflicted: delta.conflicted,
+        resolved: delta.resolved,
       });
     }
 
@@ -107,7 +109,6 @@ export default class Notes {
       headline: note.headline,
       dateCreated: note.dateCreated,
       conflicted: !!note.conflicted,
-      resolved: !!note.resolved
     };
 
     if (!oldNote) {
