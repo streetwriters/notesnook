@@ -1,13 +1,14 @@
 import React, { Component } from "react";
 import Quill from "quill";
 import "quill/dist/quill.snow.css";
+import "quill/dist/quill.core.css";
 import MarkdownShortcuts from "./modules/markdown";
 import MagicUrl from "quill-magic-url";
 
 Quill.register("modules/markdownShortcuts", MarkdownShortcuts);
 Quill.register("modules/magicUrl", MagicUrl);
 
-const modules = {
+const quillModules = {
   toolbar: [
     [{ header: [1, 2, 3, 4, 5, 6] }],
     ["bold", "italic", "underline", "strike", "blockquote"],
@@ -15,23 +16,23 @@ const modules = {
       { align: "" },
       { align: "center" },
       { align: "right" },
-      { align: "justify" }
+      { align: "justify" },
     ],
     [
       { list: "ordered" },
       { list: "bullet" },
       { indent: "-1" },
-      { indent: "+1" }
+      { indent: "+1" },
     ],
     [{ size: ["small", false, "large", "huge"] }],
     ["code-block", { script: "sub" }, { script: "super" }],
     [{ color: [] }, { background: [] }],
     ["link", "image", "video"],
-    [{ direction: "rtl" }, "clean"]
+    [{ direction: "rtl" }, "clean"],
   ],
   syntax: true,
   markdownShortcuts: {},
-  magicUrl: true
+  magicUrl: true,
 };
 
 export default class ReactQuill extends Component {
@@ -65,15 +66,16 @@ export default class ReactQuill extends Component {
       initialContent,
       onChange,
       onSave,
-      id
+      modules,
+      id,
     } = this.props;
 
     this.quill = new Quill("#" + id, {
       placeholder,
       bounds: container,
-      modules,
+      modules: modules || quillModules,
       theme: "snow",
-      readOnly
+      readOnly,
     });
 
     if (initialContent) {
@@ -88,7 +90,7 @@ export default class ReactQuill extends Component {
       this.quill.keyboard.addBinding(
         {
           key: "S",
-          shortKey: true
+          shortKey: true,
         },
         onSave.bind(this, this.quill)
       );

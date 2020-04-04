@@ -1,12 +1,14 @@
 import Editor from "../../components/editor";
+import SplitEditor from "../../components/spliteditor";
 import Navigator from "../index";
 import { createRoute } from "../routes";
 
 const routes = {
-  ...createRoute("editor", Editor)
+  ...createRoute("editor", Editor),
+  ...createRoute("split", SplitEditor),
 };
 
 const EditorNavigator = new Navigator("EditorNavigator", routes, {
-  backButtonEnabled: false
+  defaultRoute: "editor",
 });
 export default EditorNavigator;

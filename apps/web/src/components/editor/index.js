@@ -10,13 +10,12 @@ import EditorMenu from "./editormenu";
 import Header from "./header";
 
 function Editor() {
-  const id = useStore(store => store.session.id);
-  const delta = useStore(store => store.session.content.delta);
-  const sessionState = useStore(store => store.session.state);
-  const setSession = useStore(store => store.setSession);
-  const saveSession = useStore(store => store.saveSession);
-  const openLastSession = useStore(store => store.openLastSession);
-  const isFocusMode = useAppStore(store => store.isFocusMode);
+  const id = useStore((store) => store.session.id);
+  const delta = useStore((store) => store.session.content.delta);
+  const sessionState = useStore((store) => store.session.state);
+  const setSession = useStore((store) => store.setSession);
+  const saveSession = useStore((store) => store.saveSession);
+  const isFocusMode = useAppStore((store) => store.isFocusMode);
   const quillRef = useRef();
 
   useEffect(() => {
@@ -28,22 +27,19 @@ function Editor() {
     }
   }, []);
 
-  useEffect(() => {
-    openLastSession();
-  }, [openLastSession]);
-
   return (
     <Animated.Flex
       width={["0%", "0%", "100%"]}
       initial={{ marginRight: 0 }}
       animate={{
-        marginRight: isFocusMode ? "25%" : 0
+        marginRight: isFocusMode ? "25%" : 0,
       }}
       transition={{ duration: 0.3, ease: "easeIn" }}
       sx={{
         marginLeft: isFocusMode ? "25%" : 0,
-        position: "relative"
+        position: "relative",
       }}
+      flex="1 1 auto"
     >
       <Flex
         variant="columnFill"
@@ -65,11 +61,11 @@ function Editor() {
           onSave={() => {
             saveSession();
           }}
-          onChange={editor => {
-            setSession(state => {
+          onChange={(editor) => {
+            setSession((state) => {
               state.session.content = {
                 delta: { ops: editor.getContents().ops },
-                text: editor.getText()
+                text: editor.getText(),
               };
             });
           }}

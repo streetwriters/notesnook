@@ -38,7 +38,6 @@ class Navigator {
       this.history.push(this.lastRoute);
     }
     this.lastRoute = route;
-
     return this.renderRoute(route);
   }
 
@@ -95,17 +94,17 @@ class Navigator {
   _mergeParams(route, params) {
     return {
       ...route,
-      params: { ...route.params, ...params }
+      params: { ...route.params, ...params },
     };
   }
 }
 export default Navigator;
 
 function NavigationContainer(props) {
-  const toggleSideMenu = useStore(store => store.toggleSideMenu);
-  const isSelectionMode = useStore(store => store.isSelectionMode);
-  const exitSelectionMode = useStore(store => store.exitSelectionMode);
-  const selectAll = useStore(store => store.selectAll);
+  const toggleSideMenu = useStore((store) => store.toggleSideMenu);
+  const isSelectionMode = useStore((store) => store.isSelectionMode);
+  const exitSelectionMode = useStore((store) => store.exitSelectionMode);
+  const selectAll = useStore((store) => store.selectAll);
   return (
     <ThemeProvider>
       <Flex flexDirection="column" px={2}>
@@ -128,7 +127,7 @@ function NavigationContainer(props) {
                   height={38}
                   ml={-5}
                   sx={{
-                    display: ["block", "none", "none"]
+                    display: ["block", "none", "none"],
                   }}
                 >
                   <Icon.Menu size={38} />
@@ -142,7 +141,7 @@ function NavigationContainer(props) {
               </Flex>
               {props.route.options && isSelectionMode && (
                 <Flex>
-                  {props.route.options.map(option => (
+                  {props.route.options.map((option) => (
                     <Box
                       key={option.icon.name}
                       onClick={option.onClick}
@@ -161,7 +160,7 @@ function NavigationContainer(props) {
                 color="primary"
                 sx={{
                   marginBottom: 2,
-                  cursor: isSelectionMode ? "pointer" : "normal"
+                  cursor: isSelectionMode ? "pointer" : "normal",
                 }}
               >
                 {props.route.params.subtitle}

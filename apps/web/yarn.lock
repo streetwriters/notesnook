@@ -6910,7 +6910,7 @@ normalize-url@^3.0.0, normalize-url@^3.0.1:
 
 "notes-core@git+ssh://git@github.com:thecodrr/notes-core.git":
   version "1.2.0"
-  resolved "git+ssh://git@github.com:thecodrr/notes-core.git#2030036bee3a9e433a4e1716731052d7e10f18b2"
+  resolved "git+ssh://git@github.com:thecodrr/notes-core.git#069226c64718e4c4eb0e773a7c613db8435b65a8"
   dependencies:
     fast-sort "^2.0.1"
     fuzzysearch "^1.0.3"
@@ -8374,7 +8374,7 @@ quill-markdown-shortcuts@^0.0.10:
 
 quill@^1.3.1, "quill@https://github.com/thecodrr/quill.git#1.3.7":
   version "1.3.7"
-  resolved "https://github.com/thecodrr/quill.git#60cfa5a319b49760a0b0c7c4434068e2f117092f"
+  resolved "https://github.com/thecodrr/quill.git#adbb4f12348764ceca69deaf3c507d8601fdea6e"
   dependencies:
     "@mdi/svg" "^5.0.45"
     clone "^2.1.1"

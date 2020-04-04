@@ -15,27 +15,27 @@ const TextSeperator = () => {
 };
 
 function Header() {
-  const title = useStore(store => store.session.title);
-  const dateEdited = useStore(store => store.session.dateEdited);
-  const id = useStore(store => store.session.id);
-  const text = useStore(store => store.session.content.text);
-  const isSaving = useStore(store => store.session.isSaving);
-  const sessionState = useStore(store => store.session.state);
-  const setSession = useStore(store => store.setSession);
+  const title = useStore((store) => store.session.title);
+  const dateEdited = useStore((store) => store.session.dateEdited);
+  const id = useStore((store) => store.session.id);
+  const text = useStore((store) => store.session.content.text);
+  const isSaving = useStore((store) => store.session.isSaving);
+  const sessionState = useStore((store) => store.session.state);
+  const setSession = useStore((store) => store.setSession);
 
   return (
     <>
       <TitleBox
         shouldFocus={sessionState === SESSION_STATES.new}
         title={title}
-        setTitle={title =>
-          setSession(state => {
+        setTitle={(title) =>
+          setSession((state) => {
             state.session.title = title;
           })
         }
         sx={{
           paddingTop: 2,
-          paddingBottom: 0
+          paddingBottom: 0,
         }}
       />
       <Text
@@ -46,7 +46,7 @@ function Header() {
           display: "flex",
           alignItems: "center",
           marginTop: dateEdited || text.length || id.length ? 0 : 2,
-          marginBottom: dateEdited || text.length || id.length ? 2 : 0
+          marginBottom: dateEdited || text.length || id.length ? 2 : 0,
         }}
       >
         {dateEdited > 0 ? (

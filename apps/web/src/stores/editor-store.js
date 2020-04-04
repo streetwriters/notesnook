@@ -2,14 +2,16 @@ import createStore from "../common/store";
 import { store as noteStore } from "./note-store";
 import { store as appStore } from "./app-store";
 import { store as tagStore } from "./tag-store";
+import { store as mergeStore } from "./mergestore";
 import { db } from "../common";
 import BaseStore from ".";
 import Vault from "../common/vault.js";
+import EditorNavigator from "../navigation/navigators/editornavigator";
 
 const SESSION_STATES = { stale: "stale", new: "new" };
 const DEFAULT_SESSION = {
   notebook: undefined,
-  state: SESSION_STATES.new,
+  state: undefined,
   isSaving: false,
   title: "",
   timeout: 0,
@@ -30,19 +32,27 @@ const DEFAULT_SESSION = {
 class EditorStore extends BaseStore {
   session = DEFAULT_SESSION;
 
-  openLastSession = () => {
+  openLastSession = async () => {
     const id = localStorage.getItem("lastOpenedNote");
-    if (!id) return;
-    this.openSession(db.notes.note(id).data);
+    if (!id) {
+      return EditorNavigator.navigate("editor");
+    }
+    await this.openSession(db.notes.note(id).data);
   };
 
   openSession = async (note) => {
     clearTimeout(this.get().session.timeout);
 
+    if (note.conflicted) {
+      return await mergeStore.openConflict(note);
+    } else {
+      EditorNavigator.navigate("editor");
+    }
+
     let content = {};
     if (!note.locked) {
       content = {
-        text: note.content.text,
+        text: await db.notes.note(note).text(),
         delta: await db.notes.note(note).delta(),
       };
     } else {
@@ -55,9 +65,9 @@ class EditorStore extends BaseStore {
         ...DEFAULT_SESSION,
         ...note,
         content,
+        state: SESSION_STATES.new,
       };
     });
-
     noteStore.setSelectedNote(note.id);
   };
 
@@ -87,11 +97,13 @@ class EditorStore extends BaseStore {
   };
 
   newSession = (context = {}) => {
+    EditorNavigator.navigate("editor");
     clearTimeout(this.get().session.timeout);
     this.set(function (state) {
       state.session = {
         ...DEFAULT_SESSION,
         ...context,
+        state: SESSION_STATES.new,
       };
     });
     saveLastOpenedNote();
