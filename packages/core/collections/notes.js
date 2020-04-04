@@ -6,7 +6,7 @@ import {
   getWeekGroupFromTimestamp,
   months,
   getLastWeekTimestamp,
-  get7DayTimestamp
+  get7DayTimestamp,
 } from "../utils/date";
 import Notebooks from "./notebooks";
 import Note from "../models/note";
@@ -62,7 +62,7 @@ export default class Notes {
 
     let note = {
       ...oldNote,
-      ...noteArg
+      ...noteArg,
     };
 
     if (isNoteEmpty(note)) {
@@ -79,7 +79,7 @@ export default class Notes {
       deltaId = await this._deltaCollection.add({
         noteId: id,
         id: deltaId,
-        data: delta
+        data: delta,
       });
     }
 
@@ -87,7 +87,7 @@ export default class Notes {
       textId = await this._textCollection.add({
         noteId: id,
         id: textId,
-        data: text
+        data: text,
       });
       note.title = getNoteTitle(note);
       note.headline = getNoteHeadline(note);
@@ -106,7 +106,7 @@ export default class Notes {
       favorite: !!note.favorite,
       headline: note.headline,
       dateCreated: note.dateCreated,
-      conflicted: !!note.conflicted
+      conflicted: !!note.conflicted,
     };
 
     if (!oldNote) {
@@ -147,6 +147,10 @@ export default class Notes {
     return tfun.filter(".pinned === true")(this.all);
   }
 
+  get conflicted() {
+    return tfun.filter(".conflicted === true")(this.all);
+  }
+
   get favorites() {
     return tfun.filter(".favorite === true")(this.all);
   }
@@ -154,49 +158,49 @@ export default class Notes {
   tagged(tag) {
     return this._tagsCollection
       .notes(tag)
-      .map(id => this._collection.getItem(id));
+      .map((id) => this._collection.getItem(id));
   }
 
   colored(color) {
     return this._colorsCollection
       .notes(color)
-      .map(id => this._collection.getItem(id));
+      .map((id) => this._collection.getItem(id));
   }
 
   group(by, special = false) {
     let notes = !special
       ? tfun.filter(".pinned === false")(this.all)
       : this.all;
-    notes = sort(notes).desc(t => t.dateCreated);
+    notes = sort(notes).desc((t) => t.dateCreated);
     switch (by) {
       case "abc":
-        return groupBy(notes, note => note.title[0].toUpperCase(), special);
+        return groupBy(notes, (note) => note.title[0].toUpperCase(), special);
       case "month":
         return groupBy(
           notes,
-          note => months[new Date(note.dateCreated).getMonth()],
+          (note) => months[new Date(note.dateCreated).getMonth()],
           special
         );
       case "week":
         return groupBy(
           notes,
-          note => getWeekGroupFromTimestamp(note.dateCreated),
+          (note) => getWeekGroupFromTimestamp(note.dateCreated),
           special
         );
       case "year":
         return groupBy(
           notes,
-          note => new Date(note.dateCreated).getFullYear().toString(),
+          (note) => new Date(note.dateCreated).getFullYear().toString(),
           special
         );
       default:
         let timestamps = {
           recent: getLastWeekTimestamp(7),
-          lastWeek: getLastWeekTimestamp(7) - get7DayTimestamp() //seven day timestamp value
+          lastWeek: getLastWeekTimestamp(7) - get7DayTimestamp(), //seven day timestamp value
         };
         return groupBy(
           notes,
-          note =>
+          (note) =>
             note.dateCreated >= timestamps.recent
               ? "Recent"
               : note.dateCreated >= timestamps.lastWeek
@@ -247,7 +251,7 @@ function isNoteEmpty(note) {
   const {
     title,
     content: { delta, text },
-    locked
+    locked,
   } = note;
   const isTitleEmpty = !title || !title.trim().length;
   const isTextEmpty = !isHex(text) && (!text || !text.trim().length);
@@ -265,9 +269,5 @@ function getNoteHeadline(note) {
 
 function getNoteTitle(note) {
   if (note.title && note.title.length > 0) return note.title.trim();
-  return note.content.text
-    .split(" ")
-    .slice(0, 3)
-    .join(" ")
-    .trim();
+  return note.content.text.split(" ").slice(0, 3).join(" ").trim();
 }

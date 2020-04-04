@@ -7,6 +7,7 @@ import Sync from "./sync";
 import Vault from "./vault";
 import Lookup from "./lookup";
 import Content from "../collections/content";
+import Conflict from "./conflicts";
 
 class Database {
   constructor(context) {
@@ -37,6 +38,7 @@ class Database {
     await this.trash.init(this.notes, this.notebooks, this.delta, this.text);
     this.syncer = new Sync(this);
     this.vault = new Vault(this, this.context);
+    this.conflicts = new Conflicts(this);
     this.lookup = new Lookup(this);
   }
 

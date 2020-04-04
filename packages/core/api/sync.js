@@ -45,7 +45,7 @@ export default class Sync {
     let token = await this.db.user.token();
     if (!token) throw new Error("You are not logged in");
     let response = await fetch(`${HOST}sync?lst=${lastSyncedTimestamp}`, {
-      headers: { ...HEADERS, Authorization: `Bearer ${token}` }
+      headers: { ...HEADERS, Authorization: `Bearer ${token}` },
     });
     //TODO decrypt the response.
     return await response.json();
@@ -66,6 +66,7 @@ export default class Sync {
     let user = await this.db.user.get();
     if (!user) throw new Error("You need to login to sync.");
 
+    await this.db.conflicts.recalculate();
     await this.throwOnConflicts();
 
     let lastSyncedTimestamp = user.lastSynced || 0;
@@ -94,7 +95,7 @@ export default class Sync {
     let response = await fetch(`${HOST}sync`, {
       method: "POST",
       headers: { ...HEADERS, Authorization: `Bearer ${token}` },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     });
     return response.ok;
   }
@@ -120,7 +121,7 @@ class Merger {
 
   async _mergeArray(array, get, set) {
     return Promise.all(
-      array.map(async item => await this._mergeItem(item, get, set))
+      array.map(async (item) => await this._mergeItem(item, get, set))
     );
   }
 
@@ -137,7 +138,7 @@ class Merger {
   async _mergeArrayWithConflicts(array, get, set, resolve) {
     return Promise.all(
       array.map(
-        async item =>
+        async (item) =>
           await this._mergeItemWithConflicts(item, get, set, resolve)
       )
     );
@@ -152,26 +153,26 @@ class Merger {
       text,
       tags,
       colors,
-      trash
+      trash,
     } = serverResponse;
 
     if (synced || areAllEmpty(serverResponse)) return false;
 
     await this._mergeArray(
       notes,
-      id => this._db.notes.note(id),
-      item => this._db.notes.add(item)
+      (id) => this._db.notes.note(id),
+      (item) => this._db.notes.add(item)
     );
     await this._mergeArray(
       notebooks,
-      id => this._db.notebooks.notebook(id),
-      item => this._db.notebooks.add(item)
+      (id) => this._db.notebooks.notebook(id),
+      (item) => this._db.notebooks.add(item)
     );
 
     await this._mergeArrayWithConflicts(
       delta,
-      id => this._db.delta.raw(id),
-      item => this._db.delta.add(item),
+      (id) => this._db.delta.raw(id),
+      (item) => this._db.delta.add(item),
       async (local, remote) => {
         await this._db.delta.add({ ...local, conflicted: remote });
         await this._db.notes.add({ id: local.noteId, conflicted: true });
@@ -181,26 +182,26 @@ class Merger {
 
     await this._mergeArray(
       text,
-      id => this._db.text.raw(id),
-      item => this._db.text.add(item)
+      (id) => this._db.text.raw(id),
+      (item) => this._db.text.add(item)
     );
 
     await this._mergeArray(
       tags,
-      id => this._db.tags.tag(id),
-      item => this._db.tags.merge(item)
+      (id) => this._db.tags.tag(id),
+      (item) => this._db.tags.merge(item)
     );
 
     await this._mergeArray(
       colors,
-      id => this._db.colors.tag(id),
-      item => this._db.colors.merge(item)
+      (id) => this._db.colors.tag(id),
+      (item) => this._db.colors.merge(item)
     );
 
     await this._mergeArray(
       trash,
       () => undefined,
-      item => this._db.trash.add(item)
+      (item) => this._db.trash.add(item)
     );
 
     return true;
@@ -229,21 +230,21 @@ class Prepare {
       tags: this._prepareForServer(this._db.tags.raw),
       colors: this._prepareForServer(this._db.colors.raw),
       trash: this._prepareForServer(this._db.trash.raw),
-      lastSynced: Date.now()
+      lastSynced: Date.now(),
     };
   }
 
   _prepareForServer(array) {
     return tfun
-      .filter(item => item.dateEdited > this._lastSyncedTimestamp)
-      .map(item => ({
+      .filter((item) => item.dateEdited > this._lastSyncedTimestamp)
+      .map((item) => ({
         id: item.id,
-        data: JSON.stringify(item)
+        data: JSON.stringify(item),
       }))(array);
   }
 }
 
 function areAllEmpty(obj) {
-  const arrays = Object.values(obj).filter(v => v.length !== undefined);
-  return arrays.every(array => array.length === 0);
+  const arrays = Object.values(obj).filter((v) => v.length !== undefined);
+  return arrays.every((array) => array.length === 0);
 }
