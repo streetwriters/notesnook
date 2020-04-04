@@ -7,7 +7,7 @@ import Sync from "./sync";
 import Vault from "./vault";
 import Lookup from "./lookup";
 import Content from "../collections/content";
-import Conflict from "./conflicts";
+import Conflicts from "./conflicts";
 
 class Database {
   constructor(context) {
