@@ -107,6 +107,7 @@ export default class Notes {
       headline: note.headline,
       dateCreated: note.dateCreated,
       conflicted: !!note.conflicted,
+      resolved: !!note.resolved
     };
 
     if (!oldNote) {

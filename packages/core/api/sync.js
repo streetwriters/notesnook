@@ -129,6 +129,8 @@ class Merger {
     let localItem = await get(remoteItem.id);
     if (!localItem) {
       await add({ ...JSON.parse(remoteItem.data), remote: true });
+    } else if (localItem.resolved) {
+      await add({...localItem, resolved: false});
     } else if (localItem.dateEdited > this._lastSynced) {
       // we have a conflict
       await resolve(localItem, JSON.parse(remoteItem.data));
