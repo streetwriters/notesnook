@@ -7,10 +7,13 @@ import Dialog, { showDialog } from "./dialog";
 import EmailInput from "../inputs/email";
 import PasswordInput from "../inputs/password";
 import Dropper from "../dropper";
+import { useStore } from "../../stores/user-store";
 
 function SignUpDialog(props) {
   const { onClose } = props;
   const [error, setError] = useState();
+  const isSigningIn = useStore((store) => store.isSigningIn);
+  const signup = useStore((store) => store.signup);
   const form = { error: true };
 
   return (
@@ -22,14 +25,15 @@ function SignUpDialog(props) {
       negativeButton={{ onClick: onClose }}
       positiveButton={{
         text: "Sign Up",
+        loading: isSigningIn,
+        disabled: isSigningIn,
         onClick: () => {
           setError();
           if (form.error) return;
-          /*  db.user
-            .signup(form)
+          signup(form)
             .then(onClose)
-            .catch(error => setError(`Couldn't signup. Error: ${error}`)); */
-        }
+            .catch((e) => setError(e.message));
+        },
       }}
     >
       <Box mt={1}>
@@ -45,5 +49,5 @@ function SignUpDialog(props) {
 }
 
 export function showSignUpDialog() {
-  return showDialog(perform => <SignUpDialog onClose={() => perform()} />);
+  return showDialog((perform) => <SignUpDialog onClose={() => perform()} />);
 }
