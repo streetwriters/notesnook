@@ -10,7 +10,7 @@ class Conflicts {
   }
 
   async recalculate() {
-    if (this._db.notes.conflicted.length < 0) {
+    if (this._db.notes.conflicted.length <= 0) {
       await this._db.context.write("hasConflicts", false);
     }
   }
