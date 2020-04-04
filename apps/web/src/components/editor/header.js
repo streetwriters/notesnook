@@ -1,6 +1,8 @@
 import React from "react";
 import "./editor.css";
-import { Text } from "rebass";
+import { Flex, Text } from "rebass";
+import * as Icon from "../icons";
+import { useStore as useAppStore } from "../../stores/app-store";
 import TitleBox from "./title-box";
 import { useStore, SESSION_STATES } from "../../stores/editor-store";
 import { timeConverter } from "../../utils/time";
@@ -22,48 +24,65 @@ function Header() {
   const isSaving = useStore((store) => store.session.isSaving);
   const sessionState = useStore((store) => store.session.state);
   const setSession = useStore((store) => store.setSession);
+  const isFocusMode = useAppStore((store) => store.isFocusMode);
+  const toggleFocusMode = useAppStore((store) => store.toggleFocusMode);
 
   return (
-    <>
-      <TitleBox
-        shouldFocus={sessionState === SESSION_STATES.new}
-        title={title}
-        setTitle={(title) =>
-          setSession((state) => {
-            state.session.title = title;
-          })
-        }
-        sx={{
-          paddingTop: 2,
-          paddingBottom: 0,
-        }}
-      />
-      <Text
-        fontSize={"subBody"}
-        mx={2}
-        color="fontTertiary"
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          marginTop: dateEdited || text.length || id.length ? 0 : 2,
-          marginBottom: dateEdited || text.length || id.length ? 2 : 0,
+    <Flex>
+      <Flex flex="1 1 auto" flexDirection="column">
+        <TitleBox
+          shouldFocus={sessionState === SESSION_STATES.new}
+          title={title}
+          setTitle={(title) =>
+            setSession((state) => {
+              state.session.title = title;
+            })
+          }
+          sx={{
+            paddingTop: 2,
+            paddingBottom: 0,
+          }}
+        />
+        <Text
+          fontSize={"subBody"}
+          mx={2}
+          color="fontTertiary"
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            marginTop: dateEdited || text.length || id.length ? 0 : 2,
+            marginBottom: dateEdited || text.length || id.length ? 2 : 0,
+          }}
+        >
+          {dateEdited > 0 ? (
+            <>
+              {timeConverter(dateEdited)}
+              <TextSeperator />
+            </>
+          ) : null}
+          {text.length > 0 ? (
+            <>
+              {countWords(text) + " words"}
+              <TextSeperator />
+            </>
+          ) : null}
+          {id && id.length > 0 ? <>{isSaving ? "Saving" : "Saved"}</> : null}
+        </Text>
+      </Flex>
+      <Flex
+        alignItems="center"
+        pr={3}
+        onClick={() => {
+          toggleFocusMode();
         }}
       >
-        {dateEdited > 0 ? (
-          <>
-            {timeConverter(dateEdited)}
-            <TextSeperator />
-          </>
-        ) : null}
-        {text.length > 0 ? (
-          <>
-            {countWords(text) + " words"}
-            <TextSeperator />
-          </>
-        ) : null}
-        {id && id.length > 0 ? <>{isSaving ? "Saving" : "Saved"}</> : null}
-      </Text>
-    </>
+        {isFocusMode ? (
+          <Icon.NormalMode size={30} />
+        ) : (
+          <Icon.FocusMode size={30} />
+        )}
+      </Flex>
+    </Flex>
   );
 }
 export default Header;

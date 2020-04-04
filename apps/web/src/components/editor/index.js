@@ -30,14 +30,14 @@ function Editor() {
   return (
     <Animated.Flex
       width={["0%", "0%", "100%"]}
-      initial={{ marginRight: 0 }}
+      initial={{ width: "100%" }}
       animate={{
-        marginRight: isFocusMode ? "25%" : 0,
+        width: isFocusMode ? "55%" : "100%",
       }}
       transition={{ duration: 0.3, ease: "easeIn" }}
       sx={{
-        marginLeft: isFocusMode ? "25%" : 0,
         position: "relative",
+        alignSelf: isFocusMode ? "center" : "stretch",
       }}
       flex="1 1 auto"
     >
