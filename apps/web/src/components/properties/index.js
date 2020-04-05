@@ -1,6 +1,6 @@
 import React from "react";
 import * as Icon from "../icons";
-import { Box, Flex, Text, Button } from "rebass";
+import { Flex, Text, Button } from "rebass";
 import { Input } from "@rebass/forms";
 import { useStore } from "../../stores/editor-store";
 import { COLORS } from "../../common";
