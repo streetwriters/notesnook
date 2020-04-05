@@ -10,23 +10,24 @@ import { useStore as useAppStore } from "../../stores/app-store";
 import { motion } from "framer-motion";
 
 function Properties() {
-  const pinned = useStore(store => store.session.pinned);
-  const favorite = useStore(store => store.session.favorite);
-  const locked = useStore(store => store.session.locked);
-  const colors = useStore(store => store.session.colors);
-  const tags = useStore(store => store.session.tags);
+  const pinned = useStore((store) => store.session.pinned);
+  const favorite = useStore((store) => store.session.favorite);
+  const locked = useStore((store) => store.session.locked);
+  const colors = useStore((store) => store.session.colors);
+  const tags = useStore((store) => store.session.tags);
 
-  const setSession = useStore(store => store.setSession);
-  const setColor = useStore(store => store.setColor);
-  const setTag = useStore(store => store.setTag);
-  const toggleLocked = useStore(store => store.toggleLocked);
-  const hideProperties = useAppStore(store => store.hideProperties);
+  const setSession = useStore((store) => store.setSession);
+  const setColor = useStore((store) => store.setColor);
+  const setTag = useStore((store) => store.setTag);
+  const toggleLocked = useStore((store) => store.toggleLocked);
+  //const hideProperties = useAppStore((store) => store.hideProperties);
   //const showProperties = useAppStore(store => store.showProperties);
-  const arePropertiesVisible = useAppStore(store => store.arePropertiesVisible);
-  const isFocusMode = useAppStore(store => store.isFocusMode);
+  const arePropertiesVisible = useStore((store) => store.arePropertiesVisible);
+  const toggleProperties = useStore((store) => store.toggleProperties);
+  const isFocusMode = useAppStore((store) => store.isFocusMode);
 
   function changeState(prop, value) {
-    setSession(state => {
+    setSession((state) => {
       state.session[prop] = value;
     });
   }
@@ -40,7 +41,7 @@ function Properties() {
             duration: 0.5,
             bounceDamping: 1,
             bounceStiffness: 1,
-            ease: "easeOut"
+            ease: "easeOut",
           }}
           initial={false}
           style={{
@@ -48,7 +49,7 @@ function Properties() {
             right: 0,
             display: "flex",
             width: 300,
-            height: "100%"
+            height: "100%",
           }}
         >
           <Box
@@ -60,7 +61,7 @@ function Properties() {
               display: "flex",
               width: [0, 0, "100%"],
               height: "100%",
-              boxShadow: "-1px 1px 10px 0px #88888890"
+              boxShadow: "-1px 1px 10px 0px #88888890",
             }}
             flexDirection="column"
             bg="background"
@@ -78,11 +79,11 @@ function Properties() {
               Properties
               <Text
                 as="span"
-                onClick={() => hideProperties()}
+                onClick={() => toggleProperties()}
                 sx={{
                   color: "red",
                   height: 24,
-                  ":active": { color: "darkRed" }
+                  ":active": { color: "darkRed" },
                 }}
               >
                 <Icon.Close />
@@ -92,13 +93,13 @@ function Properties() {
               checked={pinned}
               icon={Icon.Pin}
               label="Pin"
-              onChecked={state => changeState("pinned", state)}
+              onChecked={(state) => changeState("pinned", state)}
             />
             <CheckBox
               icon={Icon.Star}
               checked={favorite}
               label="Favorite"
-              onChecked={state => changeState("favorite", state)}
+              onChecked={(state) => changeState("favorite", state)}
             />
             <CheckBox
               icon={Icon.Lock}
@@ -118,7 +119,7 @@ function Properties() {
               variant="default"
               placeholder="#tag"
               sx={{ marginBottom: 2 }}
-              onKeyUp={event => {
+              onKeyUp={(event) => {
                 if (
                   event.key === "Enter" ||
                   event.key === " " ||
@@ -141,7 +142,7 @@ function Properties() {
               justifyContent="flex-start"
               flexWrap="wrap"
             >
-              {tags.map(tag => (
+              {tags.map((tag) => (
                 <Text
                   key={tag}
                   sx={{
@@ -151,7 +152,7 @@ function Properties() {
                     padding: "2px 5px 2px 5px",
                     marginBottom: 1,
                     marginRight: 1,
-                    cursor: "pointer"
+                    cursor: "pointer",
                   }}
                   onClick={() => {
                     setTag(tag);
@@ -184,7 +185,7 @@ function Properties() {
                       style={{
                         position: "absolute",
                         cursor: "pointer",
-                        color: "white"
+                        color: "white",
                       }}
                       size={20}
                     />

@@ -17,7 +17,7 @@ function Icon({ name, size = 24, color = "icon", rotate }) {
 }
 
 function createIcon(name) {
-  return function(props) {
+  return function (props) {
     return (
       <Animated.Box
         sx={props.sx}
@@ -71,3 +71,5 @@ export const Pin = createIcon(Icons.mdiPinOutline);
 export const User = createIcon(Icons.mdiAccountOutline);
 export const Theme = createIcon(Icons.mdiThemeLightDark);
 export const Checkmark = createIcon(Icons.mdiCheck);
+
+export const Properties = createIcon(Icons.mdiDotsHorizontal);

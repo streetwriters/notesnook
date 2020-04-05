@@ -26,6 +26,7 @@ function Header() {
   const setSession = useStore((store) => store.setSession);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
   const toggleFocusMode = useAppStore((store) => store.toggleFocusMode);
+  const toggleProperties = useStore((store) => store.toggleProperties);
 
   return (
     <Flex>
@@ -81,6 +82,9 @@ function Header() {
         ) : (
           <Icon.FocusMode size={30} />
         )}
+      </Flex>
+      <Flex alignItems="center" onClick={() => toggleProperties()} pr={3}>
+        <Icon.Properties size={30} />
       </Flex>
     </Flex>
   );

@@ -31,6 +31,7 @@ const DEFAULT_SESSION = {
 };
 class EditorStore extends BaseStore {
   session = DEFAULT_SESSION;
+  arePropertiesVisible = false;
 
   openLastSession = async () => {
     const id = localStorage.getItem("lastOpenedNote");
@@ -135,6 +136,12 @@ class EditorStore extends BaseStore {
 
   setTag = (tag) => {
     this._setTagOrColor("tag", tag);
+  };
+
+  toggleProperties = () => {
+    this.set(
+      (state) => (state.arePropertiesVisible = !state.arePropertiesVisible)
+    );
   };
 
   /**
