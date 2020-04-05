@@ -4,12 +4,13 @@ import * as Icons from "@mdi/js";
 import { useTheme } from "emotion-theming";
 import Animated from "../animated";
 
-function Icon({ name, size = 24, color = "icon", rotate }) {
+function Icon({ name, size = 24, color = "icon", stroke, rotate }) {
   const theme = useTheme();
   return (
     <MDIIcon
       path={name}
       size={size + "px"}
+      stroke={stroke}
       color={theme.colors[color] || color}
       spin={rotate}
     />
@@ -64,8 +65,8 @@ export const Loading = createIcon(Icons.mdiLoading);
 export const ChevronLeft = createIcon(Icons.mdiChevronLeft);
 export const Close = createIcon(Icons.mdiClose);
 export const Tag = createIcon(Icons.mdiTagOutline);
-export const Color = createIcon(Icons.mdiSelectColor);
 export const Pin = createIcon(Icons.mdiPinOutline);
+export const PinFilled = createIcon(Icons.mdiPin);
 
 /** Settings Icons */
 export const User = createIcon(Icons.mdiAccountOutline);

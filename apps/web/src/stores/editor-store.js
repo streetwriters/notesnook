@@ -31,7 +31,7 @@ const DEFAULT_SESSION = {
 };
 class EditorStore extends BaseStore {
   session = DEFAULT_SESSION;
-  arePropertiesVisible = false;
+  arePropertiesVisible = true;
 
   openLastSession = async () => {
     const id = localStorage.getItem("lastOpenedNote");
@@ -75,7 +75,7 @@ class EditorStore extends BaseStore {
   saveSession = (oldSession) => {
     this.set((state) => (state.session.isSaving = true));
     this._saveFn()(this.get().session).then((id) => {
-      if (!oldSession) {
+      if (oldSession) {
         if (oldSession.tags.length !== this.get().session.tags.length)
           tagStore.refresh();
         if (oldSession.colors.length !== this.get().session.colors.length)
@@ -111,17 +111,20 @@ class EditorStore extends BaseStore {
     noteStore.setSelectedNote(0);
   };
 
-  setSession = (set) => {
+  setSession = (set, immediate = false) => {
     clearTimeout(this.get().session.timeout);
     const oldSession = { ...this.get().session };
     this.set((state) => {
       state.session.state = SESSION_STATES.stale;
       set(state);
 
-      state.session.timeout = setTimeout(() => {
-        this.session = this.get().session;
-        this.saveSession(oldSession);
-      }, 1000);
+      state.session.timeout = setTimeout(
+        () => {
+          this.session = this.get().session;
+          this.saveSession(oldSession);
+        },
+        immediate ? 0 : 500
+      );
     });
   };
 
@@ -165,11 +168,11 @@ class EditorStore extends BaseStore {
     let index = arr.indexOf(value);
     if (index > -1) {
       note[`un${key}`](value).then(() => {
-        this.set((state) => state.session[array].splice(index, 1));
+        this.setSession((state) => state.session[array].splice(index, 1), true);
       });
     } else {
       note[key](value).then(() => {
-        this.set((state) => state.session[array].push(value));
+        this.setSession((state) => state.session[array].push(value), true);
       });
     }
   }

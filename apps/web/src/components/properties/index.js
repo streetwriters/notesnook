@@ -1,32 +1,40 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import * as Icon from "../icons";
-import { Box, Flex, Text } from "rebass";
+import { Box, Flex, Text, Button } from "rebass";
 import { Input } from "@rebass/forms";
 import CheckBox from "../checkbox";
-import { useStore } from "../../stores/editor-store";
+import { useStore, store } from "../../stores/editor-store";
 import { COLORS } from "../../common";
 import { objectMap } from "../../utils/object";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { motion } from "framer-motion";
 
-function Properties() {
-  const pinned = useStore((store) => store.session.pinned);
-  const favorite = useStore((store) => store.session.favorite);
-  const locked = useStore((store) => store.session.locked);
-  const colors = useStore((store) => store.session.colors);
-  const tags = useStore((store) => store.session.tags);
+const tools = [
+  { key: "pinned", icons: { on: Icon.PinFilled, off: Icon.Pin }, label: "Pin" },
+  {
+    key: "favorite",
+    icons: { on: Icon.Star, off: Icon.StarOutline },
+    label: "Favorite",
+  },
+  { key: "locked", icons: { on: Icon.Lock, off: Icon.Unlock }, label: "Lock" },
+];
 
+function Properties() {
+  const colors = useStore((store) => store.session.colors);
+  const toggleLocked = useStore((store) => store.toggleLocked);
+  const tags = useStore((store) => store.session.tags);
   const setSession = useStore((store) => store.setSession);
   const setColor = useStore((store) => store.setColor);
   const setTag = useStore((store) => store.setTag);
-  const toggleLocked = useStore((store) => store.toggleLocked);
-  //const hideProperties = useAppStore((store) => store.hideProperties);
-  //const showProperties = useAppStore(store => store.showProperties);
   const arePropertiesVisible = useStore((store) => store.arePropertiesVisible);
   const toggleProperties = useStore((store) => store.toggleProperties);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
 
   function changeState(prop, value) {
+    if (prop === "locked") {
+      toggleLocked();
+      return;
+    }
     setSession((state) => {
       state.session[prop] = value;
     });
@@ -38,7 +46,7 @@ function Properties() {
         <motion.div
           animate={{ x: arePropertiesVisible ? 0 : 800 }}
           transition={{
-            duration: 0.5,
+            duration: 0.3,
             bounceDamping: 1,
             bounceStiffness: 1,
             ease: "easeOut",
@@ -51,6 +59,7 @@ function Properties() {
             width: 300,
             height: "100%",
           }}
+          onBlur={() => toggleProperties()}
         >
           <Box
             sx={{
@@ -61,7 +70,8 @@ function Properties() {
               display: "flex",
               width: [0, 0, "100%"],
               height: "100%",
-              boxShadow: "-1px 1px 10px 0px #88888890",
+              borderLeft: "1px solid",
+              borderLeftColor: "border",
             }}
             flexDirection="column"
             bg="background"
@@ -89,34 +99,36 @@ function Properties() {
                 <Icon.Close />
               </Text>
             </Text>
-            <CheckBox
-              checked={pinned}
-              icon={Icon.Pin}
-              label="Pin"
-              onChecked={(state) => changeState("pinned", state)}
-            />
-            <CheckBox
-              icon={Icon.Star}
-              checked={favorite}
-              label="Favorite"
-              onChecked={(state) => changeState("favorite", state)}
-            />
-            <CheckBox
-              icon={Icon.Lock}
-              label="Lock"
-              checked={locked}
-              onClick={toggleLocked}
-            />
-            <Flex fontSize="body" sx={{ marginBottom: 3 }} alignItems="center">
-              <Icon.Notebook size={18} />
-              <Text sx={{ marginLeft: 1 }}>Move to notebook</Text>
+            <Flex mb={1}>
+              {tools.map((tool) => (
+                <Toggle
+                  {...tool}
+                  toggleKey={tool.key}
+                  onToggle={(state) => changeState(tool.key, state)}
+                />
+              ))}
             </Flex>
-            <Flex fontSize="body" sx={{ marginBottom: 2 }} alignItems="center">
-              <Icon.Tag size={18} />
-              <Text sx={{ marginLeft: 1 }}>Tags:</Text>
+            <Button>Add to notebook</Button>
+            <Flex flexDirection="column" sx={{ my: 2 }}>
+              {objectMap(COLORS, (label, code) => (
+                <Flex
+                  justifyContent="space-between"
+                  alignItems="center"
+                  onClick={() => setColor(label)}
+                  sx={{ cursor: "pointer" }}
+                >
+                  <Flex key={label} my={1}>
+                    <Icon.Circle size={24} color={code} />
+                    <Text ml={2}>{label}</Text>
+                  </Flex>
+                  {colors.includes(label) && (
+                    <Icon.Checkmark color="primary" size={20} />
+                  )}
+                </Flex>
+              ))}
             </Flex>
+
             <Input
-              variant="default"
               placeholder="#tag"
               sx={{ marginBottom: 2 }}
               onKeyUp={(event) => {
@@ -162,41 +174,30 @@ function Properties() {
                 </Text>
               ))}
             </Flex>
-            <Flex fontSize="body" sx={{ marginBottom: 2 }} alignItems="center">
-              <Icon.Color size={18} />
-              <Text sx={{ marginLeft: 1 }}>Colors:</Text>
-            </Flex>
-            <Flex flexWrap="wrap" sx={{ marginBottom: 2 }}>
-              {objectMap(COLORS, (label, code) => (
-                <Flex
-                  variant="rowCenter"
-                  sx={{ position: "relative" }}
-                  onClick={() => setColor(label)}
-                  key={label}
-                >
-                  <Icon.Circle
-                    size={40}
-                    style={{ cursor: "pointer" }}
-                    color={code}
-                    strokeWidth={0}
-                  />
-                  {colors.includes(label) && (
-                    <Icon.Check
-                      style={{
-                        position: "absolute",
-                        cursor: "pointer",
-                        color: "white",
-                      }}
-                      size={20}
-                    />
-                  )}
-                </Flex>
-              ))}
-            </Flex>
           </Box>
         </motion.div>
       </>
     )
+  );
+}
+
+function Toggle(props) {
+  const { icons, label, onToggle, toggleKey } = props;
+  const isOn = useStore((store) => store.session[toggleKey]);
+  return (
+    <Flex
+      variant="columnCenter"
+      width="33%"
+      py={2}
+      mr={1}
+      sx={{ borderRadius: "default", cursor: "pointer" }}
+      onClick={() => onToggle(!isOn)}
+    >
+      {isOn ? <icons.on color="primary" /> : <icons.off />}
+      <Text mt={1} color={isOn ? "primary" : "text"}>
+        {label}
+      </Text>
+    </Flex>
   );
 }
 export default React.memo(Properties);
