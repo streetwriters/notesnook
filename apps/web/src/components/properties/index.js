@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import * as Icon from "../icons";
 import { Box, Flex, Text, Button } from "rebass";
 import { Input } from "@rebass/forms";
-import CheckBox from "../checkbox";
-import { useStore, store } from "../../stores/editor-store";
+import { useStore } from "../../stores/editor-store";
 import { COLORS } from "../../common";
 import { objectMap } from "../../utils/object";
 import { useStore as useAppStore } from "../../stores/app-store";
-import { motion } from "framer-motion";
+import Animated from "../animated";
+import Toggle from "./toggle";
 
 const tools = [
   { key: "pinned", icons: { on: Icon.PinFilled, off: Icon.Pin }, label: "Pin" },
@@ -43,7 +43,7 @@ function Properties() {
   return (
     !isFocusMode && (
       <>
-        <motion.div
+        <Animated.Flex
           animate={{ x: arePropertiesVisible ? 0 : 800 }}
           transition={{
             duration: 0.3,
@@ -55,19 +55,15 @@ function Properties() {
           style={{
             position: "absolute",
             right: 0,
-            display: "flex",
             width: 300,
             height: "100%",
           }}
           onBlur={() => toggleProperties()}
         >
-          <Box
+          <Flex
             sx={{
-              position: "absolute",
-              right: 0,
               overflowY: "auto",
               overflowX: "hidden",
-              display: "flex",
               width: [0, 0, "100%"],
               height: "100%",
               borderLeft: "1px solid",
@@ -174,30 +170,10 @@ function Properties() {
                 </Text>
               ))}
             </Flex>
-          </Box>
-        </motion.div>
+          </Flex>
+        </Animated.Flex>
       </>
     )
-  );
-}
-
-function Toggle(props) {
-  const { icons, label, onToggle, toggleKey } = props;
-  const isOn = useStore((store) => store.session[toggleKey]);
-  return (
-    <Flex
-      variant="columnCenter"
-      width="33%"
-      py={2}
-      mr={1}
-      sx={{ borderRadius: "default", cursor: "pointer" }}
-      onClick={() => onToggle(!isOn)}
-    >
-      {isOn ? <icons.on color="primary" /> : <icons.off />}
-      <Text mt={1} color={isOn ? "primary" : "text"}>
-        {label}
-      </Text>
-    </Flex>
   );
 }
 export default React.memo(Properties);
