@@ -105,15 +105,16 @@ function Properties() {
               ))}
             </Flex>
             <Button color="static">Add to notebook</Button>
-            <Flex flexDirection="column" sx={{ my: 2 }}>
+            <Flex flexDirection="column">
               {objectMap(COLORS, (label, code) => (
                 <Flex
                   justifyContent="space-between"
                   alignItems="center"
                   onClick={() => setColor(label)}
                   sx={{ cursor: "pointer" }}
+                  mt={4}
                 >
-                  <Flex key={label} my={1}>
+                  <Flex key={label}>
                     <Icon.Circle size={24} color={code} />
                     <Text ml={1} color="text">
                       {toTitleCase(label)}
@@ -128,7 +129,7 @@ function Properties() {
 
             <Input
               placeholder="#tag"
-              sx={{ marginBottom: 2 }}
+              mt={4}
               onKeyUp={(event) => {
                 if (
                   event.key === "Enter" ||
