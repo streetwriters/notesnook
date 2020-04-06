@@ -1,16 +1,16 @@
-import {Dimensions, PixelRatio, StatusBar, Platform} from 'react-native';
+import { Dimensions, PixelRatio, StatusBar, Platform } from 'react-native';
 import MMKV from 'react-native-mmkv-storage';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
 } from '../services/eventManager';
-import {eThemeUpdated} from '../services/events';
+import { eThemeUpdated } from '../services/events';
 
 export const scale = {
   fontScale: 1,
 };
-const {height, width} = Dimensions.get('window');
+const { height, width } = Dimensions.get('window');
 
 //COLOR SCHEME
 export const ACCENT = {
@@ -169,15 +169,15 @@ export const opacity = 0.5; // active opacity
 // GLOBAL FONT
 
 export const WEIGHT = {
-  light: 'NotoSans',
-  regular: 'NotoSans',
-  medium: 'NotoSans',
-  semibold: 'NotoSerif',
-  bold: 'NotoSerif-Bold',
+  light: 'DMSans-Regular',
+  regular: 'DMSans-Regular',
+  medium: 'DMSans-Regular',
+  semibold: 'DMSerifText-Regular',
+  bold: 'DMSerifText-Regular',
 };
 
 export function setColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
-  COLOR_SCHEME = {...colors, accent: accent.color, shade: accent.shade};
+  COLOR_SCHEME = { ...colors, accent: accent.color, shade: accent.shade };
 
   eSendEvent(eThemeUpdated);
 
@@ -188,11 +188,11 @@ export async function getColorScheme() {
   let accentColor;
   try {
     accentColor = await MMKV.getStringAsync('accentColor');
-  } catch (e) {}
+  } catch (e) { }
   let t;
   try {
     t = await MMKV.getStringAsync('theme');
-  } catch (e) {}
+  } catch (e) { }
 
   if (typeof accentColor !== 'string') {
     MMKV.setStringAsync('accentColor', '#0560FF');
@@ -202,7 +202,7 @@ export async function getColorScheme() {
   }
 
   if (typeof t !== 'string') {
-    MMKV.setStringAsync('theme', JSON.stringify({night: false}));
+    MMKV.setStringAsync('theme', JSON.stringify({ night: false }));
     setColorScheme(COLOR_SCHEME_LIGHT);
   } else {
     let themeToSet = JSON.parse(t);
@@ -224,9 +224,9 @@ export function setAccentColor(color) {
   return ACCENT;
 }
 
-export const onThemeUpdate = (func = () => {}) => {
+export const onThemeUpdate = (func = () => { }) => {
   return eSubscribeEvent(eThemeUpdated, func);
 };
-export const clearThemeUpdateListener = (func = () => {}) => {
+export const clearThemeUpdateListener = (func = () => { }) => {
   return eUnSubscribeEvent(eThemeUpdated, func);
 };

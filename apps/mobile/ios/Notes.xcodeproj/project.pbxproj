@@ -20,10 +20,9 @@
 		2DCD954D1E0B4F2C00145EB5 /* NotesTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* NotesTests.m */; };
 		4FFCB73C43232E07469EEB31 /* libPods-NotesTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 89ABD2DB3BB5CC5C08F50BC5 /* libPods-NotesTests.a */; };
 		58062BBC8B02A59BE1E73AED /* libPods-Notes.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF962EEB8D0C9B17231DA150 /* libPods-Notes.a */; };
-		653FA3DA23D5DD1B004DA60B /* NotoSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 653FA3D723D5DD1B004DA60B /* NotoSans-Regular.ttf */; };
-		653FA3DB23D5DD1B004DA60B /* NotoSerif-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 653FA3D823D5DD1B004DA60B /* NotoSerif-Bold.ttf */; };
-		653FA3DC23D5DD1B004DA60B /* NotoSerif-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 653FA3D923D5DD1B004DA60B /* NotoSerif-Regular.ttf */; };
 		656D9DFF23D49A4600C49628 /* Web.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 656D9DFE23D49A4600C49628 /* Web.bundle */; };
+		659063E5243B0DE9004C1699 /* DMSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 659063E4243B0DE8004C1699 /* DMSans-Regular.ttf */; };
+		659063E7243B10F1004C1699 /* DMSerifText-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 659063E6243B10F0004C1699 /* DMSerifText-Regular.ttf */; };
 		773523A6669C9373D8945A06 /* libPods-Notes-tvOSTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 177E12D91F5B0732079F75AB /* libPods-Notes-tvOSTests.a */; };
 		CE84FC9EAE5373A65AB003DE /* libPods-Notes.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 654E158023E6AD1E008A3451 /* libPods-Notes.a */; };
 /* End PBXBuildFile section */
@@ -86,6 +85,9 @@
 		654E158023E6AD1E008A3451 /* libPods-Notes.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = "libPods-Notes.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		654E158C23E6AEE6008A3451 /* libReact-Core.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = "libReact-Core.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		656D9DFE23D49A4600C49628 /* Web.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = Web.bundle; path = ../html/Web.bundle; sourceTree = "<group>"; };
+		659063E2243B0DE6004C1699 /* DMSans-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "DMSans-Bold.ttf"; sourceTree = "<group>"; };
+		659063E4243B0DE8004C1699 /* DMSans-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "DMSans-Regular.ttf"; sourceTree = "<group>"; };
+		659063E6243B10F0004C1699 /* DMSerifText-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "DMSerifText-Regular.ttf"; sourceTree = "<group>"; };
 		6FB6DE7AD66669BE4A951A9E /* Pods-Notes-tvOSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Notes-tvOSTests.debug.xcconfig"; path = "Target Support Files/Pods-Notes-tvOSTests/Pods-Notes-tvOSTests.debug.xcconfig"; sourceTree = "<group>"; };
 		87D2DFC238DED597B12E218E /* Pods-Notes-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Notes-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-Notes-tvOSTests/Pods-Notes-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
 		89ABD2DB3BB5CC5C08F50BC5 /* libPods-NotesTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-NotesTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -231,6 +233,9 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				659063E6243B10F0004C1699 /* DMSerifText-Regular.ttf */,
+				659063E4243B0DE8004C1699 /* DMSans-Regular.ttf */,
+				659063E2243B0DE6004C1699 /* DMSans-Bold.ttf */,
 				655394BB23888EBE008A1476 /* web */,
 				13B07FAE1A68108700A75B9A /* Notes */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
@@ -396,10 +401,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				653FA3DA23D5DD1B004DA60B /* NotoSans-Regular.ttf in Resources */,
-				653FA3DC23D5DD1B004DA60B /* NotoSerif-Regular.ttf in Resources */,
+				659063E7243B10F1004C1699 /* DMSerifText-Regular.ttf in Resources */,
+				659063E5243B0DE9004C1699 /* DMSans-Regular.ttf in Resources */,
 				656D9DFF23D49A4600C49628 /* Web.bundle in Resources */,
-				653FA3DB23D5DD1B004DA60B /* NotoSerif-Bold.ttf in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
 			);
