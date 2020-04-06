@@ -5,17 +5,17 @@ class ThemeStore extends BaseStore {
   theme = "light";
   accent = "#0560ff";
 
-  setTheme = theme => {
-    this.set(state => (state.theme = theme));
+  setTheme = (theme) => {
+    this.set((state) => (state.theme = theme));
   };
 
   toggleNightMode = () => {
-    const theme = this.theme;
+    const theme = this.get().theme;
     this.setTheme(theme === "dark" ? "light" : "dark");
   };
 
-  setAccent = accent => {
-    this.set(state => (state.accent = accent));
+  setAccent = (accent) => {
+    this.set((state) => (state.accent = accent));
   };
 }
 
