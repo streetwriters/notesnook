@@ -3,9 +3,9 @@ import { Flex, Button, Text } from "rebass";
 import { useStore as useUserStore } from "../../stores/user-store";
 
 function NavItem(props) {
-  const { key, animatable, icon: Icon, color, title } = props.item;
+  const { key, animatable, icon: Icon, color, title, count } = props.item;
   const [isLoading, setIsLoading] = useState(false);
-  const isSyncing = useUserStore(store => store.isSyncing);
+  const isSyncing = useUserStore((store) => store.isSyncing);
 
   useEffect(() => {
     if (animatable) {
@@ -19,6 +19,7 @@ function NavItem(props) {
         justifyContent={["flex-start", "center", "center"]}
         alignItems="center"
         ml={[2, 0, 0]}
+        sx={{ position: "relative" }}
       >
         <Icon
           size={18}
@@ -28,11 +29,9 @@ function NavItem(props) {
         <Text variant="body" display={["flex", "none", "none"]} ml={1}>
           {title}
         </Text>
-        {/* {count && (
-          <Text sx={{ position: "absolute", top: -8, right: 10 }} fontSize={9}>
-            {count > 99 ? "99+" : count}
-          </Text>
-        )} */}
+        <Text sx={{ position: "absolute", top: -2, right: 0 }} fontSize={9}>
+          {count > 99 ? "99+" : count}
+        </Text>
       </Flex>
     </Button>
   );
