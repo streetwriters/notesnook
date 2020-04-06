@@ -1,13 +1,13 @@
 import React from 'react';
-import {Dimensions, Text, TouchableOpacity, View} from 'react-native';
+import { Dimensions, Text, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {ph, pv, SIZE, WEIGHT} from '../../common/common';
-import {eSendEvent, openVault} from '../../services/eventManager';
-import {eOnLoadNote, eShowMergeDialog} from '../../services/events';
-import {openEditorAnimation} from '../../utils/animations';
-import {DDS, timeSince} from '../../utils/utils';
-import {ActionSheetEvent, simpleDialogEvent} from '../DialogManager/recievers';
-import {TEMPLATE_TRASH} from '../DialogManager/templates';
+import { ph, pv, SIZE, WEIGHT } from '../../common/common';
+import { eSendEvent, openVault } from '../../services/eventManager';
+import { eOnLoadNote, eShowMergeDialog } from '../../services/events';
+import { openEditorAnimation } from '../../utils/animations';
+import { DDS, timeSince } from '../../utils/utils';
+import { ActionSheetEvent, simpleDialogEvent } from '../DialogManager/recievers';
+import { TEMPLATE_TRASH } from '../DialogManager/templates';
 
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
@@ -178,7 +178,7 @@ export default class NoteItem extends React.Component {
 
                     {item.locked ? (
                       <Icon
-                        style={{marginRight: 10}}
+                        style={{ marginRight: 10 }}
                         name="lock"
                         size={SIZE.xs}
                         color={colors.icon}
@@ -187,7 +187,7 @@ export default class NoteItem extends React.Component {
 
                     {item.favorite ? (
                       <Icon
-                        style={{marginRight: 10}}
+                        style={{ marginRight: 10 }}
                         name="star"
                         size={SIZE.xs + 1}
                         color="orange"
@@ -230,6 +230,31 @@ export default class NoteItem extends React.Component {
                     </Text>
                   </>
                 ) : null}
+
+                {
+                  item.conflicted ? <View
+                    style={{
+                      backgroundColor: colors.errorText,
+                      borderRadius: 2.5,
+                      paddingHorizontal: 4,
+                      position: 'absolute',
+                      right: 20
+                    }}
+                  >
+                    <Text
+                      style={
+                        {
+                          fontSize: SIZE.xs - 1,
+                          color: 'white',
+                        }
+                      }
+                    >
+                      conflicts
+                      </Text>
+                  </View> : null
+                }
+
+
               </View>
             </View>
           </>
