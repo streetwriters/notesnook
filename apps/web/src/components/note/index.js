@@ -8,7 +8,7 @@ import { showMoveNoteDialog } from "../dialogs/movenotedialog";
 import { store, useStore } from "../../stores/note-store";
 import { store as editorStore } from "../../stores/editor-store";
 import { showPasswordDialog } from "../dialogs/passworddialog";
-import { db } from "../../common";
+import { db, COLORS } from "../../common";
 import { useTheme } from "emotion-theming";
 
 const dropdownRefs = [];
@@ -20,15 +20,15 @@ function menuItems(note, context) {
         if (await showMoveNoteDialog([note.id])) {
           console.log("Note moved successfully!");
         }
-      }
+      },
     },
     {
       title: note.pinned ? "Unpin" : "Pin",
-      onClick: () => store.pin(note)
+      onClick: () => store.pin(note),
     },
     {
       title: note.favorite ? "Unfavorite" : "Favorite",
-      onClick: () => store.favorite(note)
+      onClick: () => store.favorite(note),
     },
     { title: "Edit", onClick: () => editorStore.openSession(note) },
     {
@@ -40,7 +40,7 @@ function menuItems(note, context) {
         } else {
           unlock(note.id);
         }
-      }
+      },
     },
     {
       invisible: context ? (context.type === "topic" ? false : true) : true,
@@ -50,7 +50,7 @@ function menuItems(note, context) {
           Icon.Topic,
           "Remove from Topic",
           "Are you sure you want to remove this note?"
-        ).then(async res => {
+        ).then(async (res) => {
           if (res) {
             await db.notebooks
               .notebook(context.notebook.id)
@@ -59,14 +59,14 @@ function menuItems(note, context) {
             await store.setContext(context);
           }
         });
-      }
+      },
     },
     {
       title: "Move to Trash",
       color: "red",
       onClick: async () => {
         if (note.locked) {
-          const res = await showPasswordDialog("unlock_note", password => {
+          const res = await showPasswordDialog("unlock_note", (password) => {
             return db.vault
               .unlock(password)
               .then(() => true)
@@ -78,20 +78,20 @@ function menuItems(note, context) {
           Icon.Trash,
           "Delete",
           "Are you sure you want to delete this note?"
-        ).then(async res => {
+        ).then(async (res) => {
           if (res) {
             await store.delete(note.id);
           }
         });
-      }
-    }
+      },
+    },
   ];
 }
 
 function Note(props) {
   const { item, index } = props;
   const note = item;
-  const selectedNote = useStore(store => store.selectedNote);
+  const selectedNote = useStore((store) => store.selectedNote);
   const isOpened = selectedNote === note.id;
   const theme = useTheme();
   return (
@@ -117,8 +117,8 @@ function Note(props) {
                   marginLeft: index ? -8 : 0,
                   marginRight: index === note.colors.length - 1 ? 5 : 0,
                   height: 13,
-                  backgroundColor: item,
-                  borderRadius: 100
+                  backgroundColor: COLORS[item],
+                  borderRadius: 100,
                 }}
               />
             ))}
@@ -159,7 +159,7 @@ function Note(props) {
   );
 }
 
-export default React.memo(Note, function(prevProps, nextProps) {
+export default React.memo(Note, function (prevProps, nextProps) {
   const prevItem = prevProps.item;
   const nextItem = nextProps.item;
   return (

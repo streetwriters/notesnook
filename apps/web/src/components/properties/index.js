@@ -8,6 +8,7 @@ import { objectMap } from "../../utils/object";
 import { useStore as useAppStore } from "../../stores/app-store";
 import Animated from "../animated";
 import Toggle from "./toggle";
+import { toTitleCase } from "../../utils/string";
 
 const tools = [
   { key: "pinned", icons: { on: Icon.PinFilled, off: Icon.Pin }, label: "Pin" },
@@ -114,8 +115,8 @@ function Properties() {
                 >
                   <Flex key={label} my={1}>
                     <Icon.Circle size={24} color={code} />
-                    <Text ml={2} color="text">
-                      {label}
+                    <Text ml={1} color="text">
+                      {toTitleCase(label)}
                     </Text>
                   </Flex>
                   {colors.includes(label) && (
