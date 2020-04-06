@@ -76,7 +76,6 @@ function Properties() {
           >
             <Text
               variant="title"
-              color="primary"
               my={2}
               alignItems="center"
               justifyContent="space-between"
@@ -104,7 +103,7 @@ function Properties() {
                 />
               ))}
             </Flex>
-            <Button>Add to notebook</Button>
+            <Button color="static">Add to notebook</Button>
             <Flex flexDirection="column" sx={{ my: 2 }}>
               {objectMap(COLORS, (label, code) => (
                 <Flex
@@ -115,7 +114,9 @@ function Properties() {
                 >
                   <Flex key={label} my={1}>
                     <Icon.Circle size={24} color={code} />
-                    <Text ml={2}>{label}</Text>
+                    <Text ml={2} color="text">
+                      {label}
+                    </Text>
                   </Flex>
                   {colors.includes(label) && (
                     <Icon.Checkmark color="primary" size={20} />

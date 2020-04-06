@@ -2,7 +2,7 @@ class InputFactory {
   constructor() {
     return {
       input: new Default(),
-      error: new Error()
+      error: new Error(),
     };
   }
 }
@@ -17,13 +17,14 @@ class Default {
       fontFamily: "body",
       fontWeight: "body",
       fontSize: "input",
+      color: "text",
       ":focus": {
         outline: "none",
-        borderColor: "primary"
+        borderColor: "primary",
       },
       ":hover": {
-        borderColor: "dimPrimary"
-      }
+        borderColor: "dimPrimary",
+      },
     };
   }
 }
@@ -35,11 +36,11 @@ class Error {
       borderColor: "red",
       ":focus": {
         outline: "none",
-        borderColor: "red"
+        borderColor: "red",
       },
       ":hover": {
-        borderColor: "darkred"
-      }
+        borderColor: "darkred",
+      },
     };
   }
 }

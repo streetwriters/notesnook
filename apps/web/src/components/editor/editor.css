@@ -36,6 +36,10 @@
 }
 
 /*Color Overrides*/
+.ql-toolbar.ql-snow svg {
+  fill: var(--text) !important;
+}
+
 .ql-snow.ql-toolbar button:hover,
 .ql-snow .ql-toolbar button:hover,
 .ql-snow.ql-toolbar button:focus,
@@ -47,6 +51,7 @@
 .ql-snow.ql-toolbar .ql-picker-label.ql-active,
 .ql-snow .ql-toolbar .ql-picker-label.ql-active {
   color: var(--primary) !important;
+  fill: var(--primary) !important;
   transition: color 300ms linear;
 }
 
@@ -79,6 +84,7 @@
 .ql-snow.ql-toolbar .ql-picker-item.ql-selected .ql-stroke-miter,
 .ql-snow .ql-toolbar .ql-picker-item.ql-selected .ql-stroke-miter {
   stroke: var(--primary) !important;
+  fill: var(--primary) !important;
 }
 
 .ql-snow.ql-toolbar button:hover .ql-fill,
@@ -110,6 +116,7 @@
 .ql-snow.ql-toolbar .ql-picker-item.ql-selected .ql-stroke.ql-fill,
 .ql-snow .ql-toolbar .ql-picker-item.ql-selected .ql-stroke.ql-fill {
   fill: var(--primary) !important;
+  stroke: var(--primary) !important;
 }
 
 .ql-snow.ql-toolbar :not(.ql-background).ql-picker .ql-picker-item:hover,
@@ -158,4 +165,5 @@ code {
 
 .ql-editor {
   font-size: 16px;
+  color: var(--text) !important;
 }

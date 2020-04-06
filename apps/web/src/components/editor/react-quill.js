@@ -30,7 +30,7 @@ const quillModules = {
     ["link", "image", "video"],
     [{ direction: "rtl" }, "clean"],
   ],
-  syntax: true,
+  // syntax: true,
   markdownShortcuts: {},
   magicUrl: true,
 };
@@ -98,6 +98,7 @@ export default class ReactQuill extends Component {
   }
 
   componentWillUnmount() {
+    if (!this.quill) return;
     this.quill.off("text-change", this.textChangeHandler);
   }
 
