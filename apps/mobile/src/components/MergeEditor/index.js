@@ -1,10 +1,10 @@
-import React, {createRef, useEffect, useState} from 'react';
-import {Modal, Text, TouchableOpacity, View} from 'react-native';
-import Animated, {Easing} from 'react-native-reanimated';
+import React, { createRef, useEffect, useState } from 'react';
+import { Modal, Text, TouchableOpacity, View } from 'react-native';
+import Animated, { Easing } from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import WebView from 'react-native-webview';
-import {normalize, SIZE, WEIGHT} from '../../common/common';
-import {useTracked} from '../../provider';
+import { normalize, SIZE, WEIGHT } from '../../common/common';
+import { useTracked } from '../../provider';
 import {
   eSubscribeEvent,
   eUnSubscribeEvent,
@@ -15,15 +15,14 @@ import {
   eShowMergeDialog,
   refreshNotesPage,
 } from '../../services/events';
-import {getElevation, h, db} from '../../utils/utils';
-import {simpleDialogEvent, updateEvent} from '../DialogManager/recievers';
-import {TEMPLATE_APPLY_CHANGES} from '../DialogManager/templates';
-import {ACTIONS} from '../../provider/actions';
+import { getElevation, h, db } from '../../utils/utils';
+import { simpleDialogEvent, updateEvent } from '../DialogManager/recievers';
+import { TEMPLATE_APPLY_CHANGES } from '../DialogManager/templates';
+import { ACTIONS } from '../../provider/actions';
 
-const {Value, timing} = Animated;
+const { Value, timing } = Animated;
 const firstWebViewHeight = new Value(h * 0.5 - 50);
 const secondWebViewHeight = new Value(h * 0.5 - 50);
-
 const primaryWebView = createRef();
 const secondaryWebView = createRef();
 let note = null;
@@ -78,7 +77,7 @@ let secondaryText = '';
 
 const MergeEditor = () => {
   const [state, dispatch] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
   const [visible, setVisible] = useState(false);
   const [primary, setPrimary] = useState(true);
   const [secondary, setSecondary] = useState(true);
@@ -97,7 +96,7 @@ const MergeEditor = () => {
       type: 'delta',
       value: primaryDelta,
     });
-    let c = {...colors};
+    let c = { ...colors };
     c.factor = normalize(1);
     postMessageToPrimaryWebView({
       type: 'theme',
@@ -110,7 +109,7 @@ const MergeEditor = () => {
       type: 'delta',
       value: secondaryDelta,
     });
-    let c = {...colors};
+    let c = { ...colors };
     c.factor = normalize(1);
     postMessageToSecondaryWebView({
       type: 'theme',
@@ -182,8 +181,8 @@ const MergeEditor = () => {
       });
     }
     eSendEvent(refreshNotesPage);
-    updateEvent({type: ACTIONS.NOTES});
-    updateEvent({type: ACTIONS.FAVORITES});
+    updateEvent({ type: ACTIONS.NOTES });
+    updateEvent({ type: ACTIONS.FAVORITES });
     close();
   };
 
@@ -468,11 +467,11 @@ const MergeEditor = () => {
             onMessage={onMessageFromPrimaryWebView}
             source={
               Platform.OS === 'ios'
-                ? {uri: sourceUri}
+                ? { uri: sourceUri }
                 : {
-                    uri: 'file:///android_asset/plaineditor.html',
-                    baseUrl: 'file:///android_asset/',
-                  }
+                  uri: 'file:///android_asset/plaineditor.html',
+                  baseUrl: 'file:///android_asset/',
+                }
             }
           />
         </Animated.View>
@@ -647,11 +646,11 @@ const MergeEditor = () => {
             onMessage={onMessageFromSecondaryWebView}
             source={
               Platform.OS === 'ios'
-                ? {uri: sourceUri}
+                ? { uri: sourceUri }
                 : {
-                    uri: 'file:///android_asset/plaineditor.html',
-                    baseUrl: 'file:///android_asset/',
-                  }
+                  uri: 'file:///android_asset/plaineditor.html',
+                  baseUrl: 'file:///android_asset/',
+                }
             }
           />
         </Animated.View>
