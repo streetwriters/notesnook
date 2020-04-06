@@ -140,7 +140,6 @@ const MergeEditor = () => {
       let data = JSON.parse(evt.nativeEvent.data);
       secondaryDelta = data.delta;
       secondaryText = data.text;
-      //Handle Here
     }
   };
 
