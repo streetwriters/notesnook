@@ -6,7 +6,7 @@ class TextFactory {
       title: new Title(),
       body: new Body(),
       subBody: new SubBody(),
-      error: new Error()
+      error: new Error(),
     };
   }
 }
@@ -16,7 +16,7 @@ class Default {
   constructor() {
     return {
       color: "text",
-      fontFamily: "body"
+      fontFamily: "body",
     };
   }
 }
@@ -27,7 +27,7 @@ class Heading {
       variant: "text.default",
       fontFamily: "heading",
       fontWeight: "bold",
-      fontSize: "heading"
+      fontSize: "heading",
     };
   }
 }
@@ -36,7 +36,7 @@ class Title {
   constructor() {
     return {
       variant: "text.heading",
-      fontSize: "title"
+      fontSize: "title",
     };
   }
 }

@@ -7,10 +7,10 @@ import AccentItem from "../components/accent-item";
 import accents from "../theme/accents";
 
 function Settings(props) {
-  const theme = useThemeStore(store => store.theme);
-  const toggleNightMode = useThemeStore(store => store.toggleNightMode);
-  const user = useUserStore(store => store.user);
-  const isLoggedIn = useUserStore(store => store.isLoggedIn);
+  const theme = useThemeStore((store) => store.theme);
+  const toggleNightMode = useThemeStore((store) => store.toggleNightMode);
+  const user = useUserStore((store) => store.user);
+  const isLoggedIn = useUserStore((store) => store.isLoggedIn);
 
   return (
     <Flex variant="columnFill" mx={2}>
@@ -26,7 +26,7 @@ function Settings(props) {
           mr={2}
           size={40}
           sx={{
-            borderRadius: 80
+            borderRadius: 80,
           }}
         >
           <Icon.User color="static" />
@@ -54,7 +54,7 @@ function Settings(props) {
         sx={{
           borderBottom: "1px Solid",
           borderColor: "border",
-          ":hover": { borderColor: "primary" }
+          ":hover": { borderColor: "primary" },
         }}
       >
         <Flex
@@ -64,10 +64,10 @@ function Settings(props) {
           p={1}
           bg="shade"
           sx={{
-            borderRadius: "default"
+            borderRadius: "default",
           }}
         >
-          {accents.map(color => (
+          {accents.map((color) => (
             <AccentItem code={color.code} label={color.label} />
           ))}
         </Flex>
@@ -77,19 +77,21 @@ function Settings(props) {
           onClick={() => toggleNightMode()}
           py={2}
         >
-          <Text fontSize="body">Dark Mode</Text>
+          <Text color="text" fontSize="body">
+            Dark Mode
+          </Text>
           {theme === "dark" ? <Icon.Check /> : <Icon.CircleEmpty />}
         </Flex>
       </Box>
       <Text my={2} variant="title" color="primary">
         Other
       </Text>
-      {["Terms of Service", "Privacy Policy", "About"].map(title => (
+      {["Terms of Service", "Privacy Policy", "About"].map((title) => (
         <Button
           variant="list"
           onClick={() =>
             props.navigator.navigate("TOS", {
-              title
+              title,
             })
           }
         >
