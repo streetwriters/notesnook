@@ -27,16 +27,15 @@ function SignUpDialog(props) {
         text: "Sign Up",
         loading: isSigningIn,
         disabled: isSigningIn,
-        onClick: () => {
-          setError();
-          if (form.error) return;
-          signup(form)
-            .then(onClose)
-            .catch((e) => setError(e.message));
-        },
+        onClick: () => submit(setError, form, signup, onClose),
       }}
     >
-      <Box mt={1}>
+      <Box
+        mt={1}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") submit(setError, form, signup, onClose);
+        }}
+      >
         <Dropper mt={2} form={form}>
           <Input autoFocus title="Username" name="username" />
           <EmailInput />
@@ -46,6 +45,14 @@ function SignUpDialog(props) {
       </Box>
     </Dialog>
   );
+}
+
+function submit(setError, form, signup, onClose) {
+  setError();
+  if (form.error) return;
+  signup(form)
+    .then(onClose)
+    .catch((e) => setError(e.message));
 }
 
 export function showSignUpDialog() {

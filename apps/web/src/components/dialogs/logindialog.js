@@ -26,16 +26,15 @@ function LoginDialog(props) {
         text: "Login",
         loading: isLoggingIn,
         disabled: isLoggingIn,
-        onClick: () => {
-          setError();
-          if (form.error) return;
-          login(form)
-            .then(onClose)
-            .catch((e) => setError(e.message));
-        },
+        onClick: () => submit(setError, form, login, onClose),
       }}
     >
-      <Box mt={1}>
+      <Box
+        mt={1}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") submit(setError, form, login, onClose);
+        }}
+      >
         <Dropper mt={2} form={form}>
           <Input autoFocus name="username" title="Username" />
           <PasswordInput />
@@ -47,6 +46,14 @@ function LoginDialog(props) {
       </Box>
     </Dialog>
   );
+}
+
+function submit(setError, form, login, onClose) {
+  setError();
+  if (form.error) return;
+  login(form)
+    .then(onClose)
+    .catch((e) => setError(e.message));
 }
 
 export const showLogInDialog = () => {
