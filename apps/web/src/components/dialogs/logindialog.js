@@ -11,8 +11,8 @@ import Dropper from "../dropper";
 function LoginDialog(props) {
   const { onClose } = props;
   const [error, setError] = useState();
-  const isLoggingIn = useStore(store => store.isLoggingIn);
-  const login = useStore(store => store.login);
+  const isLoggingIn = useStore((store) => store.isLoggingIn);
+  const login = useStore((store) => store.login);
   const form = { error: true };
 
   return (
@@ -31,8 +31,8 @@ function LoginDialog(props) {
           if (form.error) return;
           login(form)
             .then(onClose)
-            .catch(e => setError(e.message));
-        }
+            .catch((e) => setError(e.message));
+        },
       }}
     >
       <Box mt={1}>
@@ -50,5 +50,5 @@ function LoginDialog(props) {
 }
 
 export const showLogInDialog = () => {
-  return showDialog(perform => <LoginDialog onClose={() => perform()} />);
+  return showDialog((perform) => <LoginDialog onClose={() => perform()} />);
 };

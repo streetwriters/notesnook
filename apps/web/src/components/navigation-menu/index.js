@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { Box } from "rebass";
 import RootNavigator, {
   bottomRoutes,
-  routes
+  routes,
 } from "../../navigation/navigators/rootnavigator";
 import { usePersistentState } from "../../utils/hooks";
 import { useStore } from "../../stores/app-store";
@@ -17,9 +17,9 @@ import { objectMap } from "../../utils/object";
 function NavigationMenu(props) {
   const { toggleNavigationContainer } = props;
   const [selectedRoute, setSelectedRoute] = usePersistentState("route", "home");
-  const isFocusMode = useAppStore(store => store.isFocusMode);
-  const colors = useStore(store => store.colors);
-  const isSideMenuOpen = useStore(store => store.isSideMenuOpen);
+  const isFocusMode = useAppStore((store) => store.isFocusMode);
+  const colors = useStore((store) => store.colors);
+  const isSideMenuOpen = useStore((store) => store.isSideMenuOpen);
 
   useEffect(() => {
     RootNavigator.navigate(selectedRoute);
@@ -33,7 +33,7 @@ function NavigationMenu(props) {
       initial={{ opacity: 1 }}
       animate={{
         opacity: isFocusMode ? 0 : 1,
-        visibility: isFocusMode ? "hidden" : "visible"
+        visibility: isFocusMode ? "hidden" : "visible",
       }}
       transition={{ duration: 0.3, ease: "easeOut" }}
       sx={{
@@ -42,7 +42,7 @@ function NavigationMenu(props) {
         minWidth: ["85%", 50, 50],
         maxWidth: ["85%", 50, 50],
         display: [isSideMenuOpen ? "flex" : "none", "flex", "flex"],
-        position: ["absolute", "relative", "relative"]
+        position: ["absolute", "relative", "relative"],
       }}
       bg={"background"}
       px={0}
@@ -52,7 +52,7 @@ function NavigationMenu(props) {
           overflow: "scroll",
           scrollbarWidth: "none",
           "::-webkit-scrollbar": { width: 0, height: 0 },
-          msOverflowStyle: "none"
+          msOverflowStyle: "none",
         }}
       >
         {objectMap(routes, (_, item) => (
@@ -67,14 +67,14 @@ function NavigationMenu(props) {
             }}
           />
         ))}
-        {colors.map(color => {
+        {colors.map((color) => {
           return (
             <NavItem
               onSelected={async () => {
                 setSelectedRoute(undefined);
                 RootNavigator.navigate("color", {
                   title: toTitleCase(color.title),
-                  context: { type: "color", colors: [color.title] }
+                  context: { type: "color", colors: [color.title] },
                 });
               }}
               key={color.title}
@@ -82,19 +82,19 @@ function NavigationMenu(props) {
                 color: COLORS[color.title],
                 title: toTitleCase(color.title),
                 icon: Icon.Circle,
-                count: color.noteIds.length
+                count: color.noteIds.length,
               }}
             />
           );
         })}
       </Box>
       <Box>
-        {Object.values(bottomRoutes).map(item => (
+        {Object.values(bottomRoutes).map((item) => (
           <NavItem
             onSelected={async () => {
-              const shouldSelect =
-                (item.onClick && (await item.onClick())) ||
-                (item.component && RootNavigator.navigate(item.key));
+              const shouldSelect = item.onClick
+                ? await item.onClick()
+                : item.component && RootNavigator.navigate(item.key);
               if (shouldSelect) setSelectedRoute(item.key);
             }}
             key={item.key}
