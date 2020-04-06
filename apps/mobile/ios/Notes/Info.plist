@@ -41,10 +41,9 @@
 	<string></string>
 	<key>UIAppFonts</key>
 	<array>
+		<string>DMSerifText-Regular.ttf</string>
+		<string>DMSans-Regular.ttf</string>
 		<string>MaterialCommunityIcons.ttf</string>
-		<string>NotoSerif-Regular.ttf</string>
-		<string>NotoSerif-Bold.ttf</string>
-		<string>NotoSans-Regular.ttf</string>
 		<string>Feather.ttf</string>
 		<string>Quicksand-SemiBold.ttf</string>
 		<string>Quicksand-Medium.ttf</string>

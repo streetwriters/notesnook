@@ -21,8 +21,8 @@
 		4FFCB73C43232E07469EEB31 /* libPods-NotesTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 89ABD2DB3BB5CC5C08F50BC5 /* libPods-NotesTests.a */; };
 		58062BBC8B02A59BE1E73AED /* libPods-Notes.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF962EEB8D0C9B17231DA150 /* libPods-Notes.a */; };
 		656D9DFF23D49A4600C49628 /* Web.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 656D9DFE23D49A4600C49628 /* Web.bundle */; };
-		659063E5243B0DE9004C1699 /* DMSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 659063E4243B0DE8004C1699 /* DMSans-Regular.ttf */; };
-		659063E7243B10F1004C1699 /* DMSerifText-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 659063E6243B10F0004C1699 /* DMSerifText-Regular.ttf */; };
+		659063ED243B132E004C1699 /* DMSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 659063EC243B132E004C1699 /* DMSans-Regular.ttf */; };
+		65A9D59A243B1394005DD7B5 /* DMSerifText-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 65A9D599243B1394005DD7B5 /* DMSerifText-Regular.ttf */; };
 		773523A6669C9373D8945A06 /* libPods-Notes-tvOSTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 177E12D91F5B0732079F75AB /* libPods-Notes-tvOSTests.a */; };
 		CE84FC9EAE5373A65AB003DE /* libPods-Notes.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 654E158023E6AD1E008A3451 /* libPods-Notes.a */; };
 /* End PBXBuildFile section */
@@ -75,9 +75,6 @@
 		36FE4CF96F141D64B0A0C1FF /* libPods-Notes-tvOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Notes-tvOS.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		44BBC9BD618AE3BC78E5ED24 /* Pods-Notes-tvOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Notes-tvOS.release.xcconfig"; path = "Target Support Files/Pods-Notes-tvOS/Pods-Notes-tvOS.release.xcconfig"; sourceTree = "<group>"; };
 		58ACEDFE1446560AB8875A8B /* Pods-Notes.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Notes.debug.xcconfig"; path = "Target Support Files/Pods-Notes/Pods-Notes.debug.xcconfig"; sourceTree = "<group>"; };
-		653FA3D723D5DD1B004DA60B /* NotoSans-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "NotoSans-Regular.ttf"; path = "../../../../../html/Web.bundle/site/fonts/Noto_Sans/NotoSans-Regular.ttf"; sourceTree = "<group>"; };
-		653FA3D823D5DD1B004DA60B /* NotoSerif-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "NotoSerif-Bold.ttf"; path = "../../../../../html/Web.bundle/site/fonts/Noto_Serif/NotoSerif-Bold.ttf"; sourceTree = "<group>"; };
-		653FA3D923D5DD1B004DA60B /* NotoSerif-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "NotoSerif-Regular.ttf"; path = "../../../../../html/Web.bundle/site/fonts/Noto_Serif/NotoSerif-Regular.ttf"; sourceTree = "<group>"; };
 		654E157223E69FBE008A3451 /* libReactNativeShareExtension.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libReactNativeShareExtension.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		654E157423E6A5D9008A3451 /* libPods-Notes.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = "libPods-Notes.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		654E157623E6A655008A3451 /* libReactNativeShareExtension.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libReactNativeShareExtension.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -85,9 +82,8 @@
 		654E158023E6AD1E008A3451 /* libPods-Notes.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = "libPods-Notes.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		654E158C23E6AEE6008A3451 /* libReact-Core.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = "libReact-Core.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		656D9DFE23D49A4600C49628 /* Web.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = Web.bundle; path = ../html/Web.bundle; sourceTree = "<group>"; };
-		659063E2243B0DE6004C1699 /* DMSans-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "DMSans-Bold.ttf"; sourceTree = "<group>"; };
-		659063E4243B0DE8004C1699 /* DMSans-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "DMSans-Regular.ttf"; sourceTree = "<group>"; };
-		659063E6243B10F0004C1699 /* DMSerifText-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "DMSerifText-Regular.ttf"; sourceTree = "<group>"; };
+		659063EC243B132E004C1699 /* DMSans-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "DMSans-Regular.ttf"; path = "../html/Web.bundle/site/fonts/DMSans-Regular.ttf"; sourceTree = "<group>"; };
+		65A9D599243B1394005DD7B5 /* DMSerifText-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "DMSerifText-Regular.ttf"; sourceTree = "<group>"; };
 		6FB6DE7AD66669BE4A951A9E /* Pods-Notes-tvOSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Notes-tvOSTests.debug.xcconfig"; path = "Target Support Files/Pods-Notes-tvOSTests/Pods-Notes-tvOSTests.debug.xcconfig"; sourceTree = "<group>"; };
 		87D2DFC238DED597B12E218E /* Pods-Notes-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Notes-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-Notes-tvOSTests/Pods-Notes-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
 		89ABD2DB3BB5CC5C08F50BC5 /* libPods-NotesTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-NotesTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -216,9 +212,6 @@
 		655394BF23888EBE008A1476 /* fonts */ = {
 			isa = PBXGroup;
 			children = (
-				653FA3D723D5DD1B004DA60B /* NotoSans-Regular.ttf */,
-				653FA3D823D5DD1B004DA60B /* NotoSerif-Bold.ttf */,
-				653FA3D923D5DD1B004DA60B /* NotoSerif-Regular.ttf */,
 			);
 			path = fonts;
 			sourceTree = "<group>";
@@ -233,9 +226,8 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
-				659063E6243B10F0004C1699 /* DMSerifText-Regular.ttf */,
-				659063E4243B0DE8004C1699 /* DMSans-Regular.ttf */,
-				659063E2243B0DE6004C1699 /* DMSans-Bold.ttf */,
+				65A9D599243B1394005DD7B5 /* DMSerifText-Regular.ttf */,
+				659063EC243B132E004C1699 /* DMSans-Regular.ttf */,
 				655394BB23888EBE008A1476 /* web */,
 				13B07FAE1A68108700A75B9A /* Notes */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
@@ -401,11 +393,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				659063E7243B10F1004C1699 /* DMSerifText-Regular.ttf in Resources */,
-				659063E5243B0DE9004C1699 /* DMSans-Regular.ttf in Resources */,
 				656D9DFF23D49A4600C49628 /* Web.bundle in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
+				659063ED243B132E004C1699 /* DMSans-Regular.ttf in Resources */,
+				65A9D59A243B1394005DD7B5 /* DMSerifText-Regular.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
