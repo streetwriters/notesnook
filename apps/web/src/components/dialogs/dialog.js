@@ -8,7 +8,7 @@ import Modal from "react-modal";
 function Dialog(props) {
   return (
     <ThemeProvider>
-      {theme => (
+      {(theme) => (
         <Modal
           isOpen={props.isOpen || false}
           shouldCloseOnOverlayClick={true}
@@ -29,12 +29,12 @@ function Dialog(props) {
               width: "25%",
               paddingRight: 20,
               paddingLeft: 20,
-              overflowY: "hidden"
+              overflowY: "hidden",
             },
             overlay: {
               zIndex: 999,
-              background: theme.colors.overlay
-            }
+              background: theme.colors.overlay,
+            },
           }}
         >
           <Flex flexDirection="column">
@@ -54,8 +54,9 @@ function Dialog(props) {
                   width={"50%"}
                   disabled={props.positiveButton.disabled || false}
                   onClick={
-                    !props.positiveButton.disabled &&
-                    props.positiveButton.onClick
+                    !props.positiveButton.disabled
+                      ? props.positiveButton.onClick
+                      : undefined
                   }
                 >
                   {props.positiveButton.loading ? (
@@ -91,7 +92,7 @@ export function showDialog(dialog) {
     resolve(result);
   };
   if (root) {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       const PropDialog = dialog(perform.bind(this, resolve));
       ReactDOM.render(PropDialog, root);
     });
