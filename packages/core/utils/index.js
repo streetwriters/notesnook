@@ -3,14 +3,6 @@ if (!tfun) {
   tfun = global.tfun;
 }
 
-export function extractValues(obj) {
-  const t = [];
-  for (let key in obj) {
-    t[t.length] = obj[key];
-  }
-  return t;
-}
-
 export function groupBy(arr, key, special = false) {
   if (special) {
     return groupBySpecial(arr, key);
@@ -18,12 +10,12 @@ export function groupBy(arr, key, special = false) {
   let retVal = [];
   for (let val of arr) {
     let v = key(val);
-    let index = retVal.findIndex(a => a.title === v);
+    let index = retVal.findIndex((a) => a.title === v);
     if (index === -1) {
       index = retVal.length;
       retVal[retVal.length] = {
         title: v,
-        data: []
+        data: [],
       };
     }
     retVal[index].data.push(val);
@@ -40,6 +32,7 @@ function groupBySpecial(arr, key) {
   let pinned = [];
   for (let val of arr) {
     if (val.pinned) {
+      //TODO test
       pinned[pinned.length] = val;
       continue;
     }
@@ -57,7 +50,7 @@ function groupBySpecial(arr, key) {
     groups[groupIndex] = { title: groupTitle };
     _groups[groupTitle] = {
       index: i,
-      groupIndex
+      groupIndex,
     };
   }
 
