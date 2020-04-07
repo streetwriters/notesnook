@@ -1,4 +1,4 @@
-import React, {createRef, useEffect, useState} from 'react';
+import React, { createRef, useEffect, useState } from 'react';
 import {
   BackHandler,
   SafeAreaView,
@@ -7,14 +7,14 @@ import {
   View,
   ActivityIndicator,
 } from 'react-native';
-import {TextInput} from 'react-native-gesture-handler';
-import {useIsFocused} from 'react-navigation-hooks';
+import { TextInput } from 'react-native-gesture-handler';
+import { useIsFocused } from 'react-navigation-hooks';
 
-import {opacity, pv, SIZE, WEIGHT} from '../../common/common';
-import {Header} from '../../components/header';
-import {useTracked} from '../../provider';
-import {eSendEvent} from '../../services/eventManager';
-import {eCloseSideMenu, refreshNotesPage} from '../../services/events';
+import { opacity, pv, SIZE, WEIGHT } from '../../common/common';
+import { Header } from '../../components/header';
+import { useTracked } from '../../provider';
+import { eSendEvent } from '../../services/eventManager';
+import { eCloseSideMenu, refreshNotesPage } from '../../services/events';
 import * as Animatable from 'react-native-animatable';
 import {
   validateEmail,
@@ -22,22 +22,22 @@ import {
   validateUsername,
 } from '../../services/validation';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {ToastEvent, db, DDS} from '../../utils/utils';
-import {ACTIONS} from '../../provider/actions';
+import { ToastEvent, db, DDS } from '../../utils/utils';
+import { ACTIONS } from '../../provider/actions';
 
-export const Login = ({navigation}) => {
+export const Login = ({ navigation }) => {
   const [state, dispatch] = useTracked();
-  const {colors, isLoginNavigator} = state;
+  const { colors, isLoginNavigator } = state;
   const _email = createRef();
   const _pass = createRef();
   const [status, setStatus] = useState('Logging in...');
   const _username = createRef();
   const [loggingIn, setLoggingIn] = useState(false);
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('loveyouall123');
+  const [password, setPassword] = useState('google123');
   const [invalidEmail, setInvalidEmail] = useState(false);
   const [invalidPassword, setInvalidPassword] = useState(false);
-  const [username, setUsername] = useState('ammarahmed');
+  const [username, setUsername] = useState('thecodrr');
   const [invalidUsername, setInvalidUsername] = useState(false);
 
   const isFocused = useIsFocused();
@@ -94,17 +94,17 @@ export const Login = ({navigation}) => {
       }
 
       let user;
-      console.log(await db.user.get());
+
 
       try {
         user = await db.user.get();
         console.log('user', user);
-        dispatch({type: ACTIONS.USER, user: user});
-        ToastEvent.show(`Logged in as ${user.username}`, 'success');
+        dispatch({ type: ACTIONS.USER, user: user });
+        ToastEvent.show(`Logged in as ${username}`, 'success');
         navigation.goBack();
         await db.sync();
         eSendEvent(refreshNotesPage);
-        dispatch({type: ACTIONS.ALL});
+        dispatch({ type: ACTIONS.ALL });
       } catch (e) {
         console.log(e, 'getUSer');
         ToastEvent.show(e.message, 'error');

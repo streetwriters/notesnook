@@ -1,6 +1,6 @@
-import {history, db} from '../utils/utils';
-import {ACTIONS} from './actions';
-import {sideMenuRef} from '../utils/refs';
+import { history, db } from '../utils/utils';
+import { ACTIONS } from './actions';
+import { sideMenuRef } from '../utils/refs';
 
 export const reducer = (state, action) => {
   switch (action.type) {
@@ -11,7 +11,6 @@ export const reducer = (state, action) => {
       return {
         ...state,
         notes: db.notes.group(),
-
         notebooks: db.notebooks.all,
         trash: db.trash.all,
         pinned: {
@@ -39,7 +38,7 @@ export const reducer = (state, action) => {
     case ACTIONS.THEME: {
       return {
         ...state,
-        colors: {...action.colors},
+        colors: { ...action.colors },
       };
     }
     case ACTIONS.USER: {
@@ -58,7 +57,7 @@ export const reducer = (state, action) => {
     case ACTIONS.SETTINGS: {
       return {
         ...state,
-        settings: {...action.settings},
+        settings: { ...action.settings },
       };
     }
     case ACTIONS.TRASH: {
@@ -168,7 +167,7 @@ export const reducer = (state, action) => {
       let results = action.results;
       return {
         ...state,
-        searchResults: {...results},
+        searchResults: { ...results },
       };
     }
     default:
