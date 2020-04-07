@@ -109,6 +109,7 @@ function Properties() {
             <Flex flexDirection="column">
               {objectMap(COLORS, (label, code) => (
                 <Flex
+                  key={label}
                   justifyContent="space-between"
                   alignItems="center"
                   onClick={() => setColor(label)}
