@@ -18,10 +18,10 @@ function TagNode({ title }) {
 }
 
 function Tags(props) {
-  const setContext = useNotesStore(store => store.setContext);
-  const tags = useStore(store => store.tags);
+  const setContext = useNotesStore((store) => store.setContext);
+  const tags = useStore((store) => store.tags);
   useEffect(() => {
-    store.refreshTags();
+    store.refresh();
   }, []);
   return (
     <ListContainer
@@ -40,7 +40,7 @@ function Tags(props) {
               setContext({ type: "tag", value: title });
               props.navigator.navigate("notes", {
                 title: "#" + title,
-                context: { tags: [title] }
+                context: { tags: [title] },
               });
             }}
           />
