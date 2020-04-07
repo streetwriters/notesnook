@@ -17,7 +17,7 @@ export default class Content {
       noteId: content.noteId,
       id,
       data: content.data || content,
-      conflicted: !!content.conflicted,
+      conflicted: content.conflicted,
       resolved: !!content.resolved,
     });
     return id;
