@@ -45,11 +45,18 @@ export const routes = {
   ...createRoute("notebooks", NotebooksContainer, {
     icon: Icon.Notebook,
   }),
-  ...createNormalRoute("favorites", Notes, Icon.StarOutline, {
-    title: "Favorites",
-    options: SelectionModeOptions.FavoritesOptions,
-    context: { type: "favorites" },
-  }),
+  ...createRoute(
+    "favorites",
+    Notes,
+    {
+      icon: Icon.StarOutline,
+      title: "Favorites",
+      options: SelectionModeOptions.FavoritesOptions,
+    },
+    {
+      context: { type: "favorites" },
+    }
+  ),
   ...createNormalRoute("trash", Trash, Icon.Trash, {
     title: "Trash",
     options: SelectionModeOptions.TrashOptions,
