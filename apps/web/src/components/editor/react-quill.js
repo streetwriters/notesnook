@@ -10,7 +10,7 @@ Quill.register("modules/magicUrl", MagicUrl);
 
 const quillModules = {
   toolbar: [
-    [{ header: [1, 2, 3, 4, 5, 6] }],
+    [{ header: [false, 1, 2, 3, 4, 5, 6] }],
     ["bold", "italic", "underline", "strike", "blockquote"],
     [
       { align: "" },
