@@ -14,7 +14,7 @@ function createOption(icon, onClick) {
     onClick: async () => {
       await onClick.call(this, selectionStore);
       selectionStore.toggleSelectionMode(false);
-    }
+    },
   };
 }
 
@@ -22,15 +22,15 @@ function createOptions(options = []) {
   return [...options, DeleteOption];
 }
 
-const DeleteOption = createOption(Icon.Trash, async function(state) {
+const DeleteOption = createOption(Icon.Trash, async function (state) {
   if (
     !(await confirm(Icon.Trash, "Delete", "Are you sure you want to proceed?"))
   )
     return;
   const item = state.selectedItems[0];
   var isAnyNoteOpened = false;
-  const items = state.selectedItems.map(item => {
-    if (item.id === editorStore.session.id) isAnyNoteOpened = true;
+  const items = state.selectedItems.map((item) => {
+    if (item.id === editorStore.get().session.id) isAnyNoteOpened = true;
     if (item.locked) return 0;
     return item.id;
   });
@@ -52,34 +52,34 @@ const DeleteOption = createOption(Icon.Trash, async function(state) {
   }
 });
 
-const FavoriteOption = createOption(Icon.Star, function(state) {
+const FavoriteOption = createOption(Icon.Star, function (state) {
   // we know only notes can be favorited
-  state.selectedItems.forEach(async item => {
+  state.selectedItems.forEach(async (item) => {
     if (item.favorite) return;
     await db.notes.note(item.id).favorite();
   });
   notesStore.refresh();
 });
 
-const UnfavoriteOption = createOption(Icon.Star, function(state) {
+const UnfavoriteOption = createOption(Icon.Star, function (state) {
   // we know only notes can be favorited
-  state.selectedItems.forEach(async item => {
+  state.selectedItems.forEach(async (item) => {
     if (!item.favorite) return;
     await db.notes.note(item.id).favorite();
   });
   notesStore.setContext({ type: "favorites" });
 });
 
-const AddToNotebookOption = createOption(Icon.Plus, async function(state) {
-  const items = state.selectedItems.map(item => item.id);
+const AddToNotebookOption = createOption(Icon.Plus, async function (state) {
+  const items = state.selectedItems.map((item) => item.id);
   if (await showMoveNoteDialog(items)) {
     //TODO show proper snack
     console.log("Notes moved successfully!");
   }
 });
 
-const RestoreOption = createOption(Icon.Restore, async function(state) {
-  const items = state.selectedItems.map(item => item.id);
+const RestoreOption = createOption(Icon.Restore, async function (state) {
+  const items = state.selectedItems.map((item) => item.id);
   await db.trash.restore(...items);
   trashStore.refresh();
 });
@@ -95,5 +95,5 @@ export default {
   NotesOptions,
   TopicOptions,
   TrashOptions,
-  FavoritesOptions
+  FavoritesOptions,
 };
