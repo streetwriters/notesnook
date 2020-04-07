@@ -52,8 +52,8 @@ class UserStore extends BaseStore {
       .then(() => {
         appStore.refresh();
       })
-      .catch((err) => {
-        if (err.code === "MERGE_CONFLICT") appStore.refresh();
+      .catch(async (err) => {
+        if (err.code === "MERGE_CONFLICT") await appStore.refresh();
         else console.error(err);
       })
       .finally(() => {
@@ -62,12 +62,12 @@ class UserStore extends BaseStore {
   };
 
   logout = () => {
-    db.user.logout().then(() => {
+    db.user.logout().then(async () => {
       this.set((state) => {
         state.user = undefined;
         state.isLoggedIn = false;
       });
-      appStore.refresh();
+      await appStore.refresh();
     });
   };
 }
