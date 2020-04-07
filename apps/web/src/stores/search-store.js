@@ -8,19 +8,18 @@ class SearchStore extends BaseStore {
   item = undefined;
   results = [];
 
-  setSearchContext = context => {
-    this.set(state => {
+  setSearchContext = (context) => {
+    this.set((state) => {
       state.type = context.type;
       state.items = context.items;
       state.item = context.item;
     });
   };
 
-  search = async query => {
-    const { items, type } = this;
+  search = async (query) => {
+    const { items, type } = this.get();
     const results = await db.lookup[type](items, query);
-    console.log(query, results);
-    this.set(state => (state.results = results));
+    this.set((state) => (state.results = results));
   };
 }
 
