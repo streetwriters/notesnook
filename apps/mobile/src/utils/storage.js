@@ -1,4 +1,4 @@
-import {NativeModules} from 'react-native';
+import { NativeModules } from 'react-native';
 import MMKV from 'react-native-mmkv-storage';
 
 var Aes = NativeModules.Aes;
@@ -11,6 +11,8 @@ async function read(key, isArray = false) {
     } catch (e) {
       data = [];
     }
+  } else if (key === "hasConflicts") {
+    return await MMKV.getBoolAsync(key);
   } else {
     try {
       data = await MMKV.getMapAsync(key);
@@ -25,9 +27,12 @@ async function read(key, isArray = false) {
 async function write(key, data) {
   if (data.length !== undefined) {
     return await MMKV.setArrayAsync(key, data.slice());
+  } else if (typeof data === 'boolean') {
+    return await MMKV.setBoolAsync(key, data);
   } else {
     return await MMKV.setMapAsync(key, data);
   }
+
 }
 
 async function readMulti(keys) {
@@ -73,4 +78,4 @@ function decrypt(password, data) {
   });
 }
 
-export default {read, write, readMulti, remove, clear, encrypt, decrypt};
+export default { read, write, readMulti, remove, clear, encrypt, decrypt };
