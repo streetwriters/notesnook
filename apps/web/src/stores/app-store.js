@@ -21,15 +21,15 @@ class AppStore extends BaseStore {
   };
 
   refreshColors = () => {
-    this.set(state => (state.colors = db.colors.all));
+    this.set((state) => (state.colors = db.colors.all));
   };
 
   toggleFocusMode = () => {
-    this.set(state => (state.isFocusMode = !state.isFocusMode));
+    this.set((state) => (state.isFocusMode = !state.isFocusMode));
   };
 
   toggleSideMenu = () => {
-    this.set(state => (state.isSideMenuOpen = !state.isSideMenuOpen));
+    this.set((state) => (state.isSideMenuOpen = !state.isSideMenuOpen));
   };
 }
 

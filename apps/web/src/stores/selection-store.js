@@ -6,8 +6,8 @@ class SelectionStore extends BaseStore {
   shouldSelectAll = false;
   isSelectionMode = false;
 
-  toggleSelectionMode = toggleState => {
-    this.set(state => {
+  toggleSelectionMode = (toggleState) => {
+    this.set((state) => {
       const isSelectionMode =
         toggleState !== undefined ? toggleState : !state.isSelectionMode;
       state.isSelectionMode = isSelectionMode;
@@ -16,27 +16,27 @@ class SelectionStore extends BaseStore {
     });
   };
 
-  selectItem = item => {
-    const index = this.selectedItems.findIndex(v => item.id === v.id);
-    this.set(state => {
+  selectItem = (item) => {
+    const index = this.get().selectedItems.findIndex((v) => item.id === v.id);
+    this.set((state) => {
       if (index >= 0) {
         state.selectedItems.splice(index, 1);
       } else {
         state.selectedItems.push(item);
       }
     });
-    if (this.selectedItems.length <= 0) {
+    if (this.get().selectedItems.length <= 0) {
       this.toggleSelectionMode();
     }
   };
 
   setSelectedItems(items) {
-    this.set(state => (state.selectedItems = items));
+    this.set((state) => (state.selectedItems = items));
   }
 
   selectAll() {
-    if (!this.isSelectionMode) return;
-    this.set(state => (state.shouldSelectAll = true));
+    if (!this.get().isSelectionMode) return;
+    this.set((state) => (state.shouldSelectAll = true));
   }
 }
 

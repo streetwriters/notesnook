@@ -8,26 +8,26 @@ class NoteStore extends BaseStore {
   notes = {
     items: [],
     groupCounts: [],
-    groups: []
+    groups: [],
   };
   context = undefined;
   selectedNote = 0;
 
-  setSelectedNote = id => {
-    this.set(state => (state.selectedNote = id));
+  setSelectedNote = (id) => {
+    this.set((state) => (state.selectedNote = id));
   };
 
   refresh = () => {
-    if (this.context) this.refreshContext();
-    else this.set(state => (state.notes = db.notes.group(undefined, true)));
+    if (this.get().context) this.refreshContext();
+    else this.set((state) => (state.notes = db.notes.group(undefined, true)));
   };
 
   refreshContext = () => {
-    if (!this.context) return;
+    if (!this.get().context) return;
     this.setContext(this.context);
   };
 
-  setContext = context => {
+  setContext = (context) => {
     let notes = [];
     switch (context.type) {
       case "tag":
@@ -47,35 +47,35 @@ class NoteStore extends BaseStore {
       default:
         return;
     }
-    this.set(state => (state.context = { ...context, notes }));
+    this.set((state) => (state.context = { ...context, notes }));
   };
 
-  delete = async id => {
+  delete = async (id) => {
     await db.notes.delete(id);
     this.refreshContext();
     this.refresh();
-    const { session, newSession } = editorStore;
+    const { session, newSession } = editorStore.get();
     if (session.id === id) {
       newSession();
     }
   };
 
-  pin = async note => {
+  pin = async (note) => {
     await db.notes.note(note).pin();
     this.refresh();
     this._syncEditor(note.id, "pinned");
   };
 
-  favorite = async note => {
+  favorite = async (note) => {
     await db.notes.note(note).favorite();
     this._setValue(note.id, "favorite", !note.favorite);
   };
 
-  unlock = id => {
+  unlock = (id) => {
     Vault.unlockNote(id, () => this._setValue(id, "locked", false));
   };
 
-  lock = id => {
+  lock = (id) => {
     Vault.lockNote(id, () => this._setValue(id, "locked", true));
   };
 
@@ -83,10 +83,10 @@ class NoteStore extends BaseStore {
    * @private
    */
   _setValue = (noteId, prop, value) => {
-    this.set(state => {
+    this.set((state) => {
       const { context, notes } = state;
       const arr = !context ? notes.items : context.notes;
-      let index = arr.findIndex(note => note.id === noteId);
+      let index = arr.findIndex((note) => note.id === noteId);
       if (index < 0) return;
 
       arr[index][prop] = value;
@@ -98,9 +98,9 @@ class NoteStore extends BaseStore {
    * @private
    */
   _syncEditor = (noteId, action) => {
-    const { session, setSession } = editorStore;
+    const { session, setSession } = editorStore.get();
     if (session.id === noteId) {
-      setSession(state => (state.session[action] = !state.session[action]));
+      setSession((state) => (state.session[action] = !state.session[action]));
     }
   };
 }
