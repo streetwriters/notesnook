@@ -17,8 +17,11 @@ export default class Content {
       noteId: content.noteId,
       id,
       data: content.data || content,
-      conflicted: content.conflicted,
+      conflicted: content.conflicted || false,
       resolved: !!content.resolved,
+      dateEdited: content.dateEdited,
+      dateCreated: content.dateCreated,
+      remote: content.remote,
     });
     return id;
   }

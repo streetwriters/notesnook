@@ -176,8 +176,8 @@ class Merger {
       (id) => this._db.delta.raw(id),
       (item) => this._db.delta.add(item),
       async (local, remote) => {
-        await this._db.notes.add({ id: local.noteId, conflicted: true });
         await this._db.delta.add({ ...local, conflicted: remote });
+        await this._db.notes.add({ id: local.noteId, conflicted: true });
         await this._db.context.write("hasConflicts", true);
       }
     );
