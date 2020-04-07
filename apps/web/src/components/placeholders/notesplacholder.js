@@ -14,6 +14,7 @@ function NotesPlaceholder() {
         const Icon = icons[index];
         return (
           <Flex
+            key={"note-" + index}
             width="55%"
             bg="bgSecondary"
             opacity={0.9}
@@ -21,7 +22,7 @@ function NotesPlaceholder() {
             ml={-40 + index * 60}
             sx={{
               boxShadow: "2px 2px 7px 0px #00000040",
-              borderRadius: "default"
+              borderRadius: "default",
             }}
           >
             <Flex flex="0.06 1 auto" bg="primary" sx={{ borderRadius: 25 }} />
@@ -33,8 +34,9 @@ function NotesPlaceholder() {
                 <Icon size={20} color="dimPrimary" />
               </Flex>
               <Flex flexDirection="column">
-                {lines.map(() => (
+                {lines.map((_, index) => (
                   <Box
+                    key={index}
                     width={"100%"}
                     py={"4px"}
                     mr={1}

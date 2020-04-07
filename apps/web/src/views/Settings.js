@@ -68,7 +68,11 @@ function Settings(props) {
           }}
         >
           {accents.map((color) => (
-            <AccentItem code={color.code} label={color.label} />
+            <AccentItem
+              key={color.code}
+              code={color.code}
+              label={color.label}
+            />
           ))}
         </Flex>
         <Flex
@@ -88,6 +92,7 @@ function Settings(props) {
       </Text>
       {["Terms of Service", "Privacy Policy", "About"].map((title) => (
         <Button
+          key={title}
           variant="list"
           onClick={() =>
             props.navigator.navigate("TOS", {

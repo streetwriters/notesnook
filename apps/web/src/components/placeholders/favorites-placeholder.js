@@ -12,7 +12,7 @@ function FavoritesPlaceholder() {
           position: "relative",
           height: "100px",
           alignSelf: "center",
-          flexDirection: "row"
+          flexDirection: "row",
         }}
       >
         {[
@@ -22,25 +22,26 @@ function FavoritesPlaceholder() {
           { delay: 10, marginTop: "0px", size: 30 },
           { delay: 7, marginTop: "-30px", size: 25 },
           { delay: 2, marginTop: "20px", size: 25 },
-          { delay: 4, marginTop: "10px", size: 25 }
-        ].map(item => (
+          { delay: 4, marginTop: "10px", size: 25 },
+        ].map((item) => (
           <motion.div
+            key={item.delay}
             style={{
               padding: 0,
               margin: 0,
               marginTop: item.marginTop,
-              position: "relative"
+              position: "relative",
             }}
             animate={{
               opacity: [0.1, 0.5, 1, 0.5, 0],
               scaleX: [0.7, 0.75, 0.85, 0.9, 1],
-              scaleY: [0.7, 0.75, 0.85, 0.9, 1]
+              scaleY: [0.7, 0.75, 0.85, 0.9, 1],
             }}
             transition={{
               duration: 7,
               ease: "linear",
               delay: item.delay,
-              loop: Infinity
+              loop: Infinity,
             }}
           >
             <Icon.Star color="favorite" size={item.size} />
@@ -54,7 +55,7 @@ function FavoritesPlaceholder() {
         alignSelf="center"
         sx={{
           textAlign: "center",
-          fontSize: "title"
+          fontSize: "title",
         }}
       >
         Notes you favorite appear here.

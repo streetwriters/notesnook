@@ -8,14 +8,15 @@ const descriptions = [
   "Thoughts & Stuff",
   "Ugh. Can't handle it anymore.",
   "Have to organize all this :(",
-  "What the heck!"
+  "What the heck!",
 ];
 function NotebooksPlaceholder() {
   return (
     <Placeholder
       items={[0, 1]}
-      renderItem={item => (
+      renderItem={(item) => (
         <Flex
+          key={"notebook" + item}
           mt={-80 * item}
           ml={80 * item}
           opacity={!item ? 0.7 : 1}
@@ -24,7 +25,7 @@ function NotebooksPlaceholder() {
             zIndex: item,
             bg: "hover",
             borderRadius: "default",
-            boxShadow: "2px 2px 7px 0px #00000040"
+            boxShadow: "2px 2px 7px 0px #00000040",
           }}
         >
           <Flex
@@ -34,7 +35,7 @@ function NotebooksPlaceholder() {
             width={120}
             sx={{
               borderRadius: "default",
-              boxShadow: "1px 1px 5px 0px #00000060"
+              boxShadow: "1px 1px 5px 0px #00000060",
             }}
           >
             <Box m={3} height={10} width={"100%"} bg="primary" />

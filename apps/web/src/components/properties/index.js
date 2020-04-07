@@ -96,9 +96,10 @@ function Properties() {
               </Text>
             </Text>
             <Flex mb={1}>
-              {tools.map((tool) => (
+              {tools.map((tool, _) => (
                 <Toggle
                   {...tool}
+                  key={tool.key}
                   toggleKey={tool.key}
                   onToggle={(state) => changeState(tool.key, state)}
                 />

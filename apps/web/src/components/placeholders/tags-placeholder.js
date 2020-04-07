@@ -15,7 +15,7 @@ const tags = [
   "essays",
   "disasters",
   "todolists",
-  "myschoolwork"
+  "myschoolwork",
 ];
 
 function TagsPlaceholder() {
@@ -24,13 +24,14 @@ function TagsPlaceholder() {
       items={[0]}
       renderItem={() => (
         <Flex
+          key="tagplaceholder"
           width={"80%"}
           opacity={0.9}
           alignItems="center"
           justifyContent="center"
           p={2}
           sx={{
-            borderRadius: "default"
+            borderRadius: "default",
           }}
         >
           <Text fontSize={40} color="primary">
@@ -67,12 +68,12 @@ async function animate(controls, setTag) {
   await controls.start({
     opacity: 0,
     y: 50,
-    transition: { delay: 1, duration: 0.4 }
+    transition: { delay: 1, duration: 0.4 },
   });
   await controls.start({
     opacity: 0,
     y: -50,
-    transition: { duration: 0 }
+    transition: { duration: 0 },
   });
   setTag(getRandomTag());
   await animate(controls, setTag);
