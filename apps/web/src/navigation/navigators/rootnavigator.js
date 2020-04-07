@@ -26,7 +26,7 @@ export const bottomRoutes = {
   }),
   ...createNormalRoute("account", Account, Icon.User, {
     onClick: async () => {
-      if (!userStore.isLoggedIn) {
+      if (!userStore.get().isLoggedIn) {
         await showLogInDialog();
         return false;
       } else return RootNavigator.navigate("account");
