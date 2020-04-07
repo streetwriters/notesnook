@@ -5,7 +5,7 @@ import {
   groupedTest,
   LONG_TEXT,
   TEST_NOTE,
-  TEST_NOTEBOOK
+  TEST_NOTEBOOK,
 } from "./utils";
 
 beforeEach(async () => {
@@ -13,7 +13,7 @@ beforeEach(async () => {
 });
 
 test("add invalid note", () =>
-  databaseTest().then(async db => {
+  databaseTest().then(async (db) => {
     let id = await db.notes.add();
     expect(id).toBeUndefined();
     id = await db.notes.add({});
@@ -42,10 +42,10 @@ test("delete note", () =>
     let topic = topics.topic("General");
     await topic.add(id);
     topic = topics.topic("General");
-    expect(topic.all.findIndex(v => v.id === id)).toBeGreaterThan(-1);
+    expect(topic.all.findIndex((v) => v.id === id)).toBeGreaterThan(-1);
     await db.notes.delete(id);
-    expect(db.notes.note(id).data.deleted).toBe(true);
-    expect(topic.all.findIndex(v => v.id === id)).toBe(-1);
+    expect(db.notes.note(id)).toBeUndefined();
+    expect(topic.all.findIndex((v) => v.id === id)).toBe(-1);
   }));
 
 test("get all notes", () =>
@@ -66,10 +66,10 @@ test("update note", () =>
       title: "I am a new title",
       content: {
         text: LONG_TEXT,
-        delta: []
+        delta: [],
       },
       pinned: true,
-      favorite: true
+      favorite: true,
       // colors: ["red", "blue"]
     };
     id = await db.notes.add(noteData);
@@ -87,8 +87,8 @@ test("updating empty note should delete it", () =>
       title: "\n\n",
       content: {
         text: "",
-        delta: []
-      }
+        delta: [],
+      },
     });
     expect(id).toBeUndefined();
     let note = db.notes.note(id);
@@ -99,8 +99,8 @@ test("note with text longer than 150 characters should have ... in the headline"
   noteTest({
     content: {
       text: LONG_TEXT,
-      delta: []
-    }
+      delta: [],
+    },
   }).then(({ db, id }) => {
     let note = db.notes.note(id);
     expect(note.headline.includes("...")).toBe(true);
@@ -109,7 +109,7 @@ test("note with text longer than 150 characters should have ... in the headline"
 test("get favorite notes", () =>
   noteTest({
     favorite: true,
-    content: { delta: "Hello", text: "Hello" }
+    content: { delta: "Hello", text: "Hello" },
   }).then(({ db }) => {
     expect(db.notes.favorites.length).toBeGreaterThan(0);
   }));
@@ -117,7 +117,7 @@ test("get favorite notes", () =>
 test("get pinned notes", () =>
   noteTest({
     pinned: true,
-    content: { delta: "Hello", text: "Hello" }
+    content: { delta: "Hello", text: "Hello" },
   }).then(({ db }) => {
     expect(db.notes.pinned.length).toBeGreaterThan(0);
   }));
@@ -184,7 +184,7 @@ test("duplicate note to topic should not be added", () =>
     expect(topic.all.length).toBe(1);
   }));
 
-test("move note", done =>
+test("move note", (done) =>
   noteTest().then(async ({ db, id }) => {
     let { id: notebookId } = await db.notebooks.add({ title: "Hello" });
     let topics = db.notebooks.notebook(notebookId).topics;

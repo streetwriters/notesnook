@@ -133,7 +133,7 @@ export default class Notes {
   note(id) {
     if (!id) return;
     let note = id.type ? id : this._collection.getItem(id);
-    if (!note) return;
+    if (!note || note.deleted) return;
     return new Note(this, note);
   }
 
