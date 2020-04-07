@@ -147,7 +147,10 @@ const MergeEditor = () => {
       await db.notes.add({
         content: {
           text: primaryText,
-          delta: primaryDelta,
+          delta: {
+            data: primaryDelta,
+            resolved: true
+          },
         },
         id: note.id,
         conflicted: false,
@@ -156,7 +159,10 @@ const MergeEditor = () => {
       await db.notes.add({
         content: {
           text: secondaryText,
-          delta: secondaryDelta,
+          delta: {
+            data: primaryDelta,
+            resolved: true
+          },
         },
         id: note.id,
         conflicted: false,
