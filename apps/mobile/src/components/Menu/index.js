@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, { useEffect } from 'react';
 import {
   Platform,
   SafeAreaView,
@@ -23,22 +23,22 @@ import {
   SIZE,
   WEIGHT,
 } from '../../common/common';
-import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
-import {eSendEvent} from '../../services/eventManager';
-import {eClearSearch, eOpenModalMenu} from '../../services/events';
+import { useTracked } from '../../provider';
+import { ACTIONS } from '../../provider/actions';
+import { eSendEvent } from '../../services/eventManager';
+import { eClearSearch, eOpenModalMenu } from '../../services/events';
 import NavigationService from '../../services/NavigationService';
-import {db, DDS, hexToRGBA, timeSince} from '../../utils/utils';
-import {sideMenuOverlayRef} from '../../utils/refs';
+import { db, DDS, hexToRGBA, timeSince } from '../../utils/utils';
+import { sideMenuOverlayRef } from '../../utils/refs';
 
 export const Menu = ({
-  close = () => {},
+  close = () => { },
   hide,
-  update = () => {},
+  update = () => { },
   noTextMode = false,
 }) => {
   const [state, dispatch] = useTracked();
-  const {colors, tags, colorNotes, user} = state;
+  const { colors, tags, colorNotes, user } = state;
 
   // todo
 
@@ -46,11 +46,11 @@ export const Menu = ({
     let newColors = setColorScheme(colors, accent);
     StatusBar.setBarStyle(colors.night ? 'light-content' : 'dark-content');
 
-    dispatch({type: ACTIONS.THEME, colors: newColors});
+    dispatch({ type: ACTIONS.THEME, colors: newColors });
   }
 
   useEffect(() => {
-    dispatch({type: ACTIONS.TAGS});
+    dispatch({ type: ACTIONS.TAGS });
   }, []);
 
   const listItems = [
@@ -93,10 +93,10 @@ export const Menu = ({
       icon: 'theme-light-dark',
       func: () => {
         if (!colors.night) {
-          MMKV.setStringAsync('theme', JSON.stringify({night: true}));
+          MMKV.setStringAsync('theme', JSON.stringify({ night: true }));
           changeColorScheme(COLOR_SCHEME_DARK);
         } else {
-          MMKV.setStringAsync('theme', JSON.stringify({night: false}));
+          MMKV.setStringAsync('theme', JSON.stringify({ night: false }));
 
           changeColorScheme(COLOR_SCHEME_LIGHT);
         }
@@ -137,10 +137,10 @@ export const Menu = ({
             Platform.OS == 'ios'
               ? 0
               : DDS.isTab
-              ? noTextMode
-                ? StatusBar.currentHeight
-                : 0
-              : StatusBar.currentHeight,
+                ? noTextMode
+                  ? StatusBar.currentHeight
+                  : 0
+                : StatusBar.currentHeight,
         }}>
         {DDS.isTab && noTextMode ? (
           <TouchableOpacity
@@ -184,7 +184,7 @@ export const Menu = ({
       )}
 
       <ScrollView
-        contentContainerStyle={{minHeight: '50%'}}
+        contentContainerStyle={{ minHeight: '50%' }}
         style={{
           paddingHorizontal: noTextMode ? 0 : 12,
         }}
@@ -246,8 +246,8 @@ export const Menu = ({
                   name={item.on ? 'toggle-right' : 'toggle-left'}
                 />
               ) : (
-                undefined
-              )}
+                  undefined
+                )}
             </TouchableOpacity>
           ))}
         </View>
@@ -512,8 +512,8 @@ export const Menu = ({
                   name={item.on ? 'toggle-switch' : 'toggle-switch-off'}
                 />
               ) : (
-                undefined
-              )}
+                  undefined
+                )}
             </TouchableOpacity>
           ))}
         </View>
@@ -535,15 +535,15 @@ export const Menu = ({
                 backgroundColor: colors.accent,
                 borderRadius: 5,
                 paddingHorizontal: 5,
-                paddingVertical: 5,
+                paddingVertical: 8,
                 elevation: 2,
               }}>
               <Text
                 onPress={async () => {
                   //await db.sync();
                   console.log(await db.sync(), 'SYNCED');
-                  dispatch({type: ACTIONS.NOTES});
-                  dispatch({type: ACTIONS.PINNED});
+                  dispatch({ type: ACTIONS.NOTES });
+                  dispatch({ type: ACTIONS.PINNED });
                 }}
                 style={{
                   fontFamily: WEIGHT.regular,
@@ -569,92 +569,92 @@ export const Menu = ({
                 alignItems: 'center',
 
                 paddingHorizontal: 5,
-                paddingVertical: pv,
+                paddingVertical: pv + 5,
               }}>
               <Text
                 style={{
                   fontFamily: WEIGHT.regular,
                   color: colors.pri,
-                  fontSize: SIZE.xxs,
+                  fontSize: SIZE.xs,
                 }}>
-                <Icon color={colors.accent} name="sync" /> Synced{' '}
+                <Icon color={colors.accent} name="sync" size={SIZE.xs} /> Synced{' '}
                 {user.lastSynced && user.lastSynced !== 0
                   ? timeSince(user.lastSynced)
                   : 'never'}
               </Text>
 
               <Icon
-                size={SIZE.sm}
+                size={SIZE.md}
                 color={colors.accent}
                 name="check-circle-outline"
               />
             </View>
           </View>
         ) : (
-          <TouchableOpacity
-            onPress={() => {
-              DDS.isTab
-                ? eSendEvent(eOpenLoginDialog)
-                : NavigationService.navigate('Login');
+            <TouchableOpacity
+              onPress={() => {
+                DDS.isTab
+                  ? eSendEvent(eOpenLoginDialog)
+                  : NavigationService.navigate('Login');
 
-              close();
-            }}
-            activeOpacity={opacity / 2}
-            style={{
-              paddingVertical: 12,
-              marginVertical: 5,
-              marginTop: pv + 5,
-              borderRadius: 5,
-              width: '100%',
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: noTextMode ? 'center' : 'flex-start',
-              backgroundColor: noTextMode ? 'transparent' : colors.shade,
-              paddingHorizontal: noTextMode ? 0 : 12,
-            }}>
-            <View
+                close();
+              }}
+              activeOpacity={opacity / 2}
               style={{
-                width: 30,
-                backgroundColor: colors.accent,
-                height: 30,
-                borderRadius: 100,
+                paddingVertical: 12,
+                marginVertical: 5,
+                marginTop: pv + 5,
+                borderRadius: 5,
+                width: '100%',
+                flexDirection: 'row',
                 alignItems: 'center',
-                justifyContent: 'center',
+                justifyContent: noTextMode ? 'center' : 'flex-start',
+                backgroundColor: noTextMode ? 'transparent' : colors.shade,
+                paddingHorizontal: noTextMode ? 0 : 12,
               }}>
-              <Icon
-                style={{
-                  textAlign: 'center',
-                  textAlignVertical: 'center',
-                }}
-                name="account-outline"
-                color="white"
-                size={SIZE.md}
-              />
-            </View>
-            {noTextMode ? null : (
               <View
                 style={{
-                  marginLeft: 10,
+                  width: 30,
+                  backgroundColor: colors.accent,
+                  height: 30,
+                  borderRadius: 100,
+                  alignItems: 'center',
+                  justifyContent: 'center',
                 }}>
-                <Text
+                <Icon
                   style={{
-                    fontFamily: WEIGHT.regular,
-                    color: colors.icon,
-                    fontSize: SIZE.xs,
-                  }}>
-                  You are not logged in
-                </Text>
-                <Text
-                  style={{
-                    color: colors.accent,
-                    fontSize: SIZE.sm - 2,
-                  }}>
-                  Login to sync notes.
-                </Text>
+                    textAlign: 'center',
+                    textAlignVertical: 'center',
+                  }}
+                  name="account-outline"
+                  color="white"
+                  size={SIZE.md}
+                />
               </View>
-            )}
-          </TouchableOpacity>
-        )}
+              {noTextMode ? null : (
+                <View
+                  style={{
+                    marginLeft: 10,
+                  }}>
+                  <Text
+                    style={{
+                      fontFamily: WEIGHT.regular,
+                      color: colors.icon,
+                      fontSize: SIZE.xs,
+                    }}>
+                    You are not logged in
+                </Text>
+                  <Text
+                    style={{
+                      color: colors.accent,
+                      fontSize: SIZE.sm - 2,
+                    }}>
+                    Login to sync notes.
+                </Text>
+                </View>
+              )}
+            </TouchableOpacity>
+          )}
       </View>
     </SafeAreaView>
   );
