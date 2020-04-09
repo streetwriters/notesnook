@@ -28,6 +28,11 @@ export default class Notebooks {
 
   async add(notebookArg) {
     if (!notebookArg) throw new Error("Notebook cannot be undefined or null.");
+
+    if (notebookArg.remote) {
+      return await this._collection.addItem(notebookArg);
+    }
+
     //TODO reliably and efficiently check for duplicates.
     const id = notebookArg.id || getId();
     let oldNotebook = this._collection.getItem(id);
@@ -37,7 +42,7 @@ export default class Notebooks {
 
     let notebook = {
       ...oldNotebook,
-      ...notebookArg
+      ...notebookArg,
     };
 
     notebook = {
@@ -49,7 +54,7 @@ export default class Notebooks {
       pinned: !!notebook.pinned,
       favorite: !!notebook.favorite,
       topics: notebook.topics || [],
-      totalNotes: 0
+      totalNotes: 0,
     };
     if (!oldNotebook) {
       notebook.topics.splice(0, 0, "General");
@@ -60,7 +65,7 @@ export default class Notebooks {
     if (!oldNotebook) {
       await this.notebook(notebook).topics.add(...notebook.topics);
     }
-    return notebook;
+    return id;
   }
 
   get raw() {
@@ -68,7 +73,7 @@ export default class Notebooks {
   }
 
   get all() {
-    return sort(this._collection.getAllItems()).desc(t => t.pinned);
+    return sort(this._collection.getAllItems()).desc((t) => t.pinned);
   }
 
   get pinned() {
@@ -100,7 +105,7 @@ export default class Notebooks {
 
   filter(query) {
     if (!query) return [];
-    let queryFn = v => fuzzysearch(query, v.title + " " + v.description);
+    let queryFn = (v) => fuzzysearch(query, v.title + " " + v.description);
     if (query instanceof Function) queryFn = query;
     return tfun.filter(queryFn)(this.all);
   }

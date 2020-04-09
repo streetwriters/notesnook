@@ -37,7 +37,7 @@ test("get delta of note", () =>
 
 test("delete note", () =>
   noteTest().then(async ({ db, id }) => {
-    let { id: notebookId } = await db.notebooks.add(TEST_NOTEBOOK);
+    let notebookId = await db.notebooks.add(TEST_NOTEBOOK);
     let topics = db.notebooks.notebook(notebookId).topics;
     let topic = topics.topic("General");
     await topic.add(id);
@@ -160,7 +160,7 @@ test("favorite note", () =>
 
 test("add note to topic", () =>
   noteTest().then(async ({ db, id }) => {
-    let { id: notebookId } = await db.notebooks.add({ title: "Hello" });
+    let notebookId = await db.notebooks.add({ title: "Hello" });
     let topics = db.notebooks.notebook(notebookId).topics;
     await topics.add("Home");
     let topic = topics.topic("Home");
@@ -175,7 +175,7 @@ test("add note to topic", () =>
 
 test("duplicate note to topic should not be added", () =>
   noteTest().then(async ({ db, id }) => {
-    let { id: notebookId } = await db.notebooks.add({ title: "Hello" });
+    let notebookId = await db.notebooks.add({ title: "Hello" });
     let topics = db.notebooks.notebook(notebookId).topics;
     await topics.add("Home");
     let topic = topics.topic("Home");
@@ -186,14 +186,14 @@ test("duplicate note to topic should not be added", () =>
 
 test("move note", (done) =>
   noteTest().then(async ({ db, id }) => {
-    let { id: notebookId } = await db.notebooks.add({ title: "Hello" });
+    let notebookId = await db.notebooks.add({ title: "Hello" });
     let topics = db.notebooks.notebook(notebookId).topics;
     await topics.add("Home");
     let topic = topics.topic("Home");
     await topic.add(id);
     setTimeout(async () => {
       try {
-        let { id: notebookId2 } = await db.notebooks.add({ title: "Hello2" });
+        let notebookId2 = await db.notebooks.add({ title: "Hello2" });
         await db.notebooks.notebook(notebookId2).topics.add("Home2");
         await db.notes.move({ id: notebookId2, topic: "Home2" }, id);
         let note = db.notes.note(id);
@@ -207,7 +207,7 @@ test("move note", (done) =>
 
 test("moving note to same notebook and topic should do nothing", () =>
   noteTest().then(async ({ db, id }) => {
-    const { id: notebookId } = await db.notebooks.add({ title: "Hello" });
+    const notebookId = await db.notebooks.add({ title: "Hello" });
     let topics = db.notebooks.notebook(notebookId).topics;
     await topics.add("Home");
     let topic = topics.topic("Home");

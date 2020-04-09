@@ -13,13 +13,13 @@ export default class Tags {
   }
 
   notes(tag) {
-    const tagItem = this.all.find(t => t.title === tag);
+    const tagItem = this.all.find((t) => t.title === tag);
     if (!tagItem) return [];
     return tagItem.noteIds;
   }
 
   tag(id) {
-    const tagItem = this.all.find(t => t.id === id);
+    const tagItem = this.all.find((t) => t.id === id);
     if (!tagItem) return;
     return tagItem;
   }
@@ -30,7 +30,7 @@ export default class Tags {
       await this._collection.addItem(tag);
       return;
     }
-    const oldTag = this.all.find(t => t.id === tag.id);
+    const oldTag = this.all.find((t) => t.id === tag.id);
     if (!oldTag) return await this._collection.addItem(tag);
 
     const deletedIds = set.union(oldTag.deletedIds, tag.deletedIds);
@@ -45,14 +45,14 @@ export default class Tags {
       ...oldTag,
       noteIds,
       dateEdited,
-      deletedIds
+      deletedIds,
     };
     await this._collection.addItem(tag);
   }
 
   async add(tagTitle, noteId) {
     if (!tagTitle || !noteId) return;
-    const oldTag = this.all.find(t => t.title === tagTitle) || {};
+    const oldTag = this.all.find((t) => t.title === tagTitle) || {};
 
     let tag = { ...oldTag, title: tagTitle };
     let id = tag.id || getId();
@@ -62,10 +62,11 @@ export default class Tags {
       id,
       title: tag.title,
       noteIds: [...notes, noteId],
-      deletedIds
+      deletedIds,
     };
 
     await this._collection.addItem(tag);
+    return id;
   }
 
   get raw() {
@@ -78,7 +79,7 @@ export default class Tags {
 
   async remove(tagTitle, noteId) {
     if (!tagTitle || !noteId) return;
-    let tag = this.all.find(t => t.title === tagTitle);
+    let tag = this.all.find((t) => t.title === tagTitle);
     if (!tag) return;
     tag = qclone(tag);
     const noteIndex = tag.noteIds.indexOf(noteId);

@@ -1,0 +1,91 @@
+import StorageInterface from "../../../__mocks__/storage.mock";
+import Prepare from "../prepare";
+import {
+  noteTest,
+  TEST_NOTE,
+  TEST_NOTEBOOK,
+  databaseTest,
+} from "../../../__tests__/utils";
+
+function getMainCollectionParams(name, testItem) {
+  return [
+    name,
+    (db, collection) => db[collection].add(testItem),
+    (db, collection) =>
+      db[collection].add({
+        ...testItem,
+        id: Math.random().toString(),
+        remote: true,
+        dateEdited: 1,
+      }),
+  ];
+}
+
+function getTagsCollectionParams(name, testItem) {
+  return [
+    name,
+    (db, collection) => db[collection].add(testItem + Math.random(), 2),
+    (db, collection) =>
+      db[collection]._collection.addItem({
+        title: testItem + MAX_ITEMS + 1,
+        noteIds: [2],
+        deletedIds: [],
+        id: Math.random().toString(),
+        remote: true,
+        dateEdited: 1,
+      }),
+  ];
+}
+
+const MAX_ITEMS = 5;
+
+const tests = [
+  getMainCollectionParams("notes", TEST_NOTE),
+  getMainCollectionParams("notebooks", TEST_NOTEBOOK),
+  getTagsCollectionParams("tags", "someTag"),
+  getTagsCollectionParams("colors", "red"),
+  getMainCollectionParams("trash", {
+    id: 2141,
+    type: "note",
+    title: "someTitle",
+  }),
+  getMainCollectionParams("delta", { ops: [{ insert: "true" }] }),
+  getMainCollectionParams("text", "true"),
+];
+
+describe.each(tests)("%s preparation", (collection, add, addExtra) => {
+  beforeEach(() => {
+    StorageInterface.clear();
+  });
+
+  test(`prepare ${collection} when user has never synced before`, () => {
+    return databaseTest().then(async (db) => {
+      await Promise.all(
+        Array(MAX_ITEMS)
+          .fill(0)
+          .map(() => add(db, collection))
+      );
+      const prepare = new Prepare(db);
+      const data = await prepare.get(0);
+      expect(data[collection].length).toBe(MAX_ITEMS);
+      expect(data[collection].every((item) => !!item.data)).toBeTruthy();
+      expect(data.lastSynced).toBeGreaterThan(0);
+    });
+  });
+
+  test(`prepare ${collection} when user has synced before`, () => {
+    return databaseTest().then(async (db) => {
+      await Promise.all(
+        Array(MAX_ITEMS)
+          .fill(0)
+          .map(() => add(db, collection))
+      );
+      await addExtra(db, collection);
+      const prepare = new Prepare(db);
+      const data = await prepare.get(10);
+      expect(data[collection].length).toBe(MAX_ITEMS);
+      expect(data[collection].every((item) => !!item.data)).toBeTruthy();
+      expect(data.lastSynced).toBeGreaterThan(0);
+    });
+  });
+});
