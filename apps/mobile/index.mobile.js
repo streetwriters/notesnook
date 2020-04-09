@@ -1,22 +1,21 @@
-import React, {useEffect, createRef} from 'react';
+import React, { useEffect, createRef } from 'react';
 import Animated from 'react-native-reanimated';
-import {Menu} from './src/components/Menu';
+import { Menu } from './src/components/Menu';
 import * as Animatable from 'react-native-animatable';
 import SideMenu from './src/components/SideMenu';
-import NavigationService, {
-  AppContainer,
-} from './src/services/NavigationService';
-import {EditorPosition} from './src/utils/animations';
-import {sideMenuRef} from './src/utils/refs';
-import {DDS, w} from './src/utils/utils';
+import { EditorPosition } from './src/utils/animations';
+import { sideMenuRef } from './src/utils/refs';
+import { DDS, w } from './src/utils/utils';
 import Editor from './src/views/Editor';
-import {useTracked} from './src/provider';
-import {StatusBar, Platform} from 'react-native';
+import { useTracked } from './src/provider';
+import { StatusBar, Platform } from 'react-native';
+import { AppContainer } from './src/services/AppContainer';
+import NavigationService from './src/services/NavigationService';
 
 const editorRef = createRef();
 export const Initialize = () => {
   const [state, dispatch] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
 
   useEffect(() => {
     if (Platform.OS === 'android') {

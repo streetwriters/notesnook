@@ -1,4 +1,4 @@
-import React, {createRef, useEffect, useState} from 'react';
+import React, { createRef, useEffect, useState } from 'react';
 import {
   Dimensions,
   StatusBar,
@@ -22,18 +22,18 @@ import {
   SIZE,
   WEIGHT,
 } from '../../common/common';
-import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
+import { useTracked } from '../../provider';
+import { ACTIONS } from '../../provider/actions';
 import NavigationService from '../../services/NavigationService';
-import {timeConverter, ToastEvent, DDS, db} from '../../utils/utils';
-import {openVault} from '../../services/eventManager';
+import { timeConverter, ToastEvent, DDS, db } from '../../utils/utils';
+import { openVault } from '../../services/eventManager';
 
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
 
 const tagsInputRef = createRef();
 export const ActionSheetComponent = ({
-  close = () => {},
+  close = () => { },
   item,
   hasColors = false,
   hasTags = false,
@@ -41,35 +41,35 @@ export const ActionSheetComponent = ({
   columnItems = [],
 }) => {
   const [state, dispatch] = useTracked();
-  const {colors, tags, currentEditingNote} = state;
+  const { colors, tags, currentEditingNote } = state;
   const [focused, setFocused] = useState(false);
   const [note, setNote] = useState(
     item
       ? item
       : {
-          colors: [],
-          tags: [],
-          pinned: false,
-          favorite: false,
-          locked: false,
-          content: {
-            text: null,
-            delta: null,
-          },
-          dateCreated: null,
+        colors: [],
+        tags: [],
+        pinned: false,
+        favorite: false,
+        locked: false,
+        content: {
+          text: null,
+          delta: null,
         },
+        dateCreated: null,
+      },
   );
 
   function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
     let newColors = setColorScheme(colors, accent);
     StatusBar.setBarStyle(colors.night ? 'light-content' : 'dark-content');
 
-    dispatch({type: ACTIONS.THEME, colors: newColors});
+    dispatch({ type: ACTIONS.THEME, colors: newColors });
   }
 
   useEffect(() => {
     if (item.dateCreated !== null) {
-      setNote({...item});
+      setNote({ ...item });
     }
   }, [item]);
 
@@ -95,8 +95,8 @@ export const ActionSheetComponent = ({
 
     await db.notes.note(note.id).tag(tag);
 
-    setNote({...db.notes.note(note.id).data});
-    dispatch({type: ACTIONS.TAGS});
+    setNote({ ...db.notes.note(note.id).data });
+    dispatch({ type: ACTIONS.TAGS });
     tagToAdd = '';
   };
 
@@ -111,14 +111,14 @@ export const ActionSheetComponent = ({
         backPressCount = 0;
 
         let tagInputValue = note.tags[note.tags.length - 1];
-        let oldProps = {...note};
+        let oldProps = { ...note };
         if (oldProps.tags.length === 0) return;
 
         await db.notes
           .note(note.id)
           .untag(oldProps.tags[oldProps.tags.length - 1]);
 
-        setNote({...db.notes.note(note.id).data});
+        setNote({ ...db.notes.note(note.id).data });
 
         tagsInputRef.current?.setNativeProps({
           text: tagInputValue,
@@ -182,11 +182,11 @@ export const ActionSheetComponent = ({
     if (!toAdd || !toAdd.id) return;
 
     if (!nodispatch) {
-      dispatch({type: type});
-      dispatch({type: ACTIONS.PINNED});
-      dispatch({type: ACTIONS.FAVORITES});
+      dispatch({ type: type });
+      dispatch({ type: ACTIONS.PINNED });
+      dispatch({ type: ACTIONS.FAVORITES });
     }
-    setNote({...toAdd});
+    setNote({ ...toAdd });
   };
 
   const rowItemsData = [
@@ -194,8 +194,8 @@ export const ActionSheetComponent = ({
       name: 'Add to',
       icon: 'book-outline',
       func: () => {
-        dispatch({type: ACTIONS.MODAL_NAVIGATOR, enabled: true});
-        dispatch({type: ACTIONS.SELECTED_ITEMS, item: note});
+        dispatch({ type: ACTIONS.MODAL_NAVIGATOR, enabled: true });
+        dispatch({ type: ACTIONS.SELECTED_ITEMS, item: note });
 
         close('movenote');
       },
@@ -259,7 +259,7 @@ export const ActionSheetComponent = ({
       icon: 'delete-restore',
       func: async () => {
         await db.trash.restore(note.id);
-        dispatch({type: ACTIONS.TRASH});
+        dispatch({ type: ACTIONS.TRASH });
         localRefresh(note.type);
         ToastEvent.show(
           item.type === 'note' ? 'Note restored' : 'Notebook restored',
@@ -283,10 +283,10 @@ export const ActionSheetComponent = ({
       icon: 'theme-light-dark',
       func: () => {
         if (!colors.night) {
-          MMKV.setStringAsync('theme', JSON.stringify({night: true}));
+          MMKV.setStringAsync('theme', JSON.stringify({ night: true }));
           changeColorScheme(COLOR_SCHEME_DARK);
         } else {
-          MMKV.setStringAsync('theme', JSON.stringify({night: false}));
+          MMKV.setStringAsync('theme', JSON.stringify({ night: false }));
           changeColorScheme(COLOR_SCHEME_LIGHT);
         }
       },
@@ -304,7 +304,7 @@ export const ActionSheetComponent = ({
         } else {
           await db.notebooks.notebook(note.id).pin();
         }
-        dispatch({type: ACTIONS.PINNED});
+        dispatch({ type: ACTIONS.PINNED });
         localRefresh(item.type);
       },
       close: false,
@@ -321,7 +321,7 @@ export const ActionSheetComponent = ({
         } else {
           await db.notebooks.notebook(note.id).favorite();
         }
-        dispatch({type: ACTIONS.FAVORITES});
+        dispatch({ type: ACTIONS.FAVORITES });
         localRefresh(item.type);
       },
       close: false,
@@ -372,13 +372,13 @@ export const ActionSheetComponent = ({
     <TouchableOpacity
       key={tag}
       onPress={async () => {
-        let oldProps = {...note};
+        let oldProps = { ...note };
         try {
           await db.notes
             .note(note.id)
             .untag(oldProps.tags[oldProps.tags.indexOf(tag)]);
           localRefresh(oldProps.type);
-          dispatch({type: ACTIONS.TAGS});
+          dispatch({ type: ACTIONS.TAGS });
         } catch (e) {
           localRefresh(oldProps.type);
         }
@@ -419,7 +419,7 @@ export const ActionSheetComponent = ({
         } else {
           await db.notes.note(note.id).color(color);
         }
-        dispatch({type: ACTIONS.COLORS});
+        dispatch({ type: ACTIONS.COLORS });
         localRefresh(note.type);
       }}
       style={{
@@ -484,64 +484,64 @@ export const ActionSheetComponent = ({
 
   const _renderColumnItem = item =>
     (note.id && columnItems.includes(item.name)) ||
-    (item.name === 'Dark Mode' && columnItems.includes(item.name)) ? (
-      <TouchableOpacity
-        key={item.name}
-        activeOpacity={opacity}
-        onPress={() => {
-          item.func();
-        }}
-        style={{
-          width: '100%',
-          alignSelf: 'center',
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'flex-end',
-          paddingHorizontal: 12,
-          paddingVertical: pv,
-        }}>
-        <View
+      (item.name === 'Dark Mode' && columnItems.includes(item.name)) ? (
+        <TouchableOpacity
+          key={item.name}
+          activeOpacity={opacity}
+          onPress={() => {
+            item.func();
+          }}
           style={{
+            width: '100%',
+            alignSelf: 'center',
             flexDirection: 'row',
-            alignItems: 'center',
+            justifyContent: 'space-between',
+            alignItems: 'flex-end',
+            paddingHorizontal: 12,
+            paddingVertical: pv,
           }}>
-          <Icon
+          <View
             style={{
-              width: 30,
-            }}
-            name={item.icon}
-            color={colors.pri}
-            size={SIZE.md}
-          />
-          <Text
-            style={{
-              fontFamily: WEIGHT.regular,
-              fontSize: SIZE.sm,
-              color: colors.pri,
+              flexDirection: 'row',
+              alignItems: 'center',
             }}>
-            {item.name}
-          </Text>
-        </View>
-        {item.switch ? (
-          <Icon
-            size={SIZE.lg + 2}
-            color={item.on ? colors.accent : colors.icon}
-            name={item.on ? 'toggle-switch' : 'toggle-switch-off'}
-          />
-        ) : (
-          undefined
-        )}
-        {item.check ? (
-          <Icon
-            name={
-              item.on ? 'check-circle-outline' : 'checkbox-blank-circle-outline'
-            }
-            color={item.on ? colors.accent : colors.icon}
-            size={SIZE.lg + 2}
-          />
-        ) : null}
-      </TouchableOpacity>
-    ) : null;
+            <Icon
+              style={{
+                width: 30,
+              }}
+              name={item.icon}
+              color={colors.pri}
+              size={SIZE.md}
+            />
+            <Text
+              style={{
+                fontFamily: WEIGHT.regular,
+                fontSize: SIZE.sm,
+                color: colors.pri,
+              }}>
+              {item.name}
+            </Text>
+          </View>
+          {item.switch ? (
+            <Icon
+              size={SIZE.lg + 2}
+              color={item.on ? colors.accent : colors.icon}
+              name={item.on ? 'toggle-switch' : 'toggle-switch-off'}
+            />
+          ) : (
+              undefined
+            )}
+          {item.check ? (
+            <Icon
+              name={
+                item.on ? 'check-circle-outline' : 'checkbox-blank-circle-outline'
+              }
+              color={item.on ? colors.accent : colors.icon}
+              size={SIZE.lg + 2}
+            />
+          ) : null}
+        </TouchableOpacity>
+      ) : null;
 
   return (
     <View
@@ -568,73 +568,73 @@ export const ActionSheetComponent = ({
           Please start writing to save your note.
         </Text>
       ) : (
-        <View
-          style={{
-            paddingHorizontal: 12,
-            alignItems: 'center',
-            marginVertical: 10,
-          }}>
-          <Text
-            numberOfLines={1}
+          <View
             style={{
-              color: colors.pri,
-              fontSize: SIZE.sm + 1,
-              fontFamily: WEIGHT.bold,
-              maxWidth: '100%',
+              paddingHorizontal: 12,
+              alignItems: 'center',
+              marginVertical: 10,
             }}>
-            {note.title.replace('\n', '')}
-          </Text>
-          <Text
-            numberOfLines={2}
-            style={{
-              fontSize: SIZE.sm - 1,
-              color: colors.pri + 'B3',
-              fontFamily: WEIGHT.regular,
-              width: '100%',
-              textAlign: 'center',
-              maxWidth: '100%',
-            }}>
-            {note.type === 'notebook' && note.description
-              ? note.description
-              : null}
-            {note.type === 'note'
-              ? note.headline[item.headline.length - 1] === '\n'
-                ? note.headline.slice(0, note.headline.length - 1)
-                : note.headline
-              : null}
-          </Text>
-
-          <Text
-            style={{
-              color: colors.icon,
-              fontSize: SIZE.xs - 1,
-              textAlignVertical: 'center',
-              fontFamily: WEIGHT.regular,
-              marginTop: 2.5,
-            }}>
-            {note.type === 'note'
-              ? 'Last edited on ' + timeConverter(note.dateEdited)
-              : null}
-            {note.type !== 'note' && !note.dateDeleted
-              ? 'Created on ' + timeConverter(note.dateCreated)
-              : null}
-            {note.dateDeleted
-              ? 'Deleted on ' + timeConverter(note.dateDeleted)
-              : null}
-          </Text>
-
-          {note.type !== 'notebook' ? null : (
-            <View
+            <Text
+              numberOfLines={1}
               style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: '100%',
+                color: colors.pri,
+                fontSize: SIZE.sm + 1,
+                fontFamily: WEIGHT.bold,
                 maxWidth: '100%',
-                flexWrap: 'wrap',
               }}>
-              {note && note.topics
-                ? note.topics.slice(1, 4).map(topic => (
+              {note.title.replace('\n', '')}
+            </Text>
+            <Text
+              numberOfLines={2}
+              style={{
+                fontSize: SIZE.sm - 1,
+                color: colors.pri + 'B3',
+                fontFamily: WEIGHT.regular,
+                width: '100%',
+                textAlign: 'center',
+                maxWidth: '100%',
+              }}>
+              {note.type === 'notebook' && note.description
+                ? note.description
+                : null}
+              {note.type === 'note'
+                ? note.headline[item.headline.length - 1] === '\n'
+                  ? note.headline.slice(0, note.headline.length - 1)
+                  : note.headline
+                : null}
+            </Text>
+
+            <Text
+              style={{
+                color: colors.icon,
+                fontSize: SIZE.xs - 1,
+                textAlignVertical: 'center',
+                fontFamily: WEIGHT.regular,
+                marginTop: 2.5,
+              }}>
+              {note.type === 'note'
+                ? 'Last edited on ' + timeConverter(note.dateEdited)
+                : null}
+              {note.type !== 'note' && !note.dateDeleted
+                ? 'Created on ' + timeConverter(note.dateCreated)
+                : null}
+              {note.dateDeleted
+                ? 'Deleted on ' + timeConverter(note.dateDeleted)
+                : null}
+            </Text>
+
+            {note.type !== 'notebook' ? null : (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '100%',
+                  maxWidth: '100%',
+                  flexWrap: 'wrap',
+                }}>
+                {note && note.topics
+                  ? note.topics.slice(1, 4).map(topic => (
                     <View
                       key={topic.dateCreated.toString() + topic.title}
                       style={{
@@ -657,29 +657,29 @@ export const ActionSheetComponent = ({
                       </Text>
                     </View>
                   ))
-                : null}
-            </View>
-          )}
+                  : null}
+              </View>
+            )}
 
-          {note.type !== 'note' ? null : (
-            <Text
-              style={{
-                color: colors.accent,
-                fontSize: SIZE.xs - 1,
-                textAlignVertical: 'center',
-                fontFamily: WEIGHT.regular,
-                marginTop: 2,
-                borderWidth: 1,
-                textAlign: 'center',
-                borderColor: colors.accent,
-                paddingHorizontal: 5,
-                borderRadius: 2,
-              }}>
-              Synced
-            </Text>
-          )}
-        </View>
-      )}
+            {note.type !== 'note' ? null : (
+              <Text
+                style={{
+                  color: colors.accent,
+                  fontSize: SIZE.xs - 1,
+                  textAlignVertical: 'center',
+                  fontFamily: WEIGHT.regular,
+                  marginTop: 2,
+                  borderWidth: 1,
+                  textAlign: 'center',
+                  borderColor: colors.accent,
+                  paddingHorizontal: 5,
+                  borderRadius: 2,
+                }}>
+                Synced
+              </Text>
+            )}
+          </View>
+        )}
 
       {note.id || note.dateCreated ? (
         <View
