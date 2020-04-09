@@ -1,17 +1,17 @@
-import React, {useEffect, useState} from 'react';
-import {TextInput} from 'react-native';
-import Animated, {Easing} from 'react-native-reanimated';
+import React, { useEffect, useState } from 'react';
+import { TextInput } from 'react-native';
+import Animated, { Easing } from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {br, SIZE, WEIGHT} from '../../common/common';
-import {useTracked} from '../../provider';
-import {inputRef} from '../../utils/refs';
-import {DDS} from '../../utils/utils';
+import { br, SIZE, WEIGHT } from '../../common/common';
+import { useTracked } from '../../provider';
+import { inputRef } from '../../utils/refs';
+import { DDS } from '../../utils/utils';
 
-const {Value, timing, block} = Animated;
+const { Value, timing, block } = Animated;
 
 export const Search = props => {
   const [state, dispatch] = useTracked();
-  const {colors, searchResults} = state;
+  const { colors, searchResults } = state;
 
   const [focus, setFocus] = useState(false);
 
@@ -91,7 +91,7 @@ export const Search = props => {
           placeholderTextColor={colors.icon}
         />
         <Icon
-          style={{paddingRight: DDS.isTab ? 12 : 12}}
+          style={{ paddingRight: DDS.isTab ? 12 : 12 }}
           onPress={() => {
             props.onSubmitEditing();
           }}
