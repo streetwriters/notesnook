@@ -1,4 +1,8 @@
 import Database from "../index";
+var tfun = require("transfun/transfun.js").tfun;
+if (!tfun) {
+  tfun = global.tfun;
+}
 
 class Prepare {
   /**
