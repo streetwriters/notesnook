@@ -204,13 +204,20 @@ export const NotesList = ({ isGrouped = false }) => {
               await db.sync();
               dispatch({ type: ACTIONS.NOTES });
               dispatch({ type: ACTIONS.PINNED });
-              dispatch({ type: ACTIONS.USER });
+              let user = await db.user.get();
+              dispatch({ type: ACTIONS.USER, user: user });
               setRefreshing(false);
               ToastEvent.show('Sync Complete', 'success');
             } catch (e) {
               setRefreshing(false);
+              dispatch({ type: ACTIONS.NOTES });
+              dispatch({ type: ACTIONS.PINNED });
+              let user = await db.user.get();
+              dispatch({ type: ACTIONS.USER, user: user });
               ToastEvent.show(e.message, 'error');
             }
+
+
           }}
           refreshing={refreshing}
         />

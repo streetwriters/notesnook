@@ -21,6 +21,7 @@ import { TEMPLATE_APPLY_CHANGES } from '../DialogManager/templates';
 import { ACTIONS } from '../../provider/actions';
 
 const { Value, timing } = Animated;
+
 const firstWebViewHeight = new Value(h * 0.5 - 50);
 const secondWebViewHeight = new Value(h * 0.5 - 50);
 const primaryWebView = createRef();
@@ -127,6 +128,7 @@ const MergeEditor = () => {
   };
 
   const onMessageFromPrimaryWebView = evt => {
+    alert('helloworld');
     if (evt.nativeEvent.data !== '') {
       let data = JSON.parse(evt.nativeEvent.data);
       primaryDelta = data.delta;
@@ -135,6 +137,7 @@ const MergeEditor = () => {
   };
 
   const onMessageFromSecondaryWebView = evt => {
+
     if (evt.nativeEvent.data !== '') {
       let data = JSON.parse(evt.nativeEvent.data);
       secondaryDelta = data.delta;
@@ -143,6 +146,7 @@ const MergeEditor = () => {
   };
 
   const applyChanges = async () => {
+
     if (keepContentFrom === 'primary') {
       await db.notes.add({
         content: {
@@ -194,18 +198,14 @@ const MergeEditor = () => {
 
   const show = async item => {
     note = item;
-    primaryDelta = await db.notes.note(note.id).delta();
-    secondaryDelta = await db.notes.note(note.id).delta().conflicted;
-    setVisible(true);
-    postMessageToPrimaryWebView({
-      type: 'delta',
-      value: primaryDelta,
-    });
-    postMessageToSecondaryWebView({
-      type: 'delta',
-      value: secondaryDelta,
-    });
 
+
+
+    let rawDelta = await db.delta.raw(note.content.delta);
+    primaryDelta = rawDelta.data;
+    secondaryDelta = rawDelta.conflicted.data;
+
+    setVisible(true);
     openEditorAnimation(firstWebViewHeight, secondWebViewHeight, true);
   };
 
@@ -284,7 +284,7 @@ const MergeEditor = () => {
     }`;
 
   return (
-    <Modal transparent={true} animated animationType="fade" visible={visible}>
+    <Modal transparent={false} animated animationType="fade" visible={visible}>
       <View
         style={{
           height: '100%',
