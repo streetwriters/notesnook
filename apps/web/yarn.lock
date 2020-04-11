@@ -6910,7 +6910,7 @@ normalize-url@^3.0.0, normalize-url@^3.0.1:
 
 "notes-core@git+ssh://git@github.com:thecodrr/notes-core.git":
   version "1.2.0"
-  resolved "git+ssh://git@github.com:thecodrr/notes-core.git#3974ae93daf2bdc3da7b286fb66b34015c076bef"
+  resolved "git+ssh://git@github.com:thecodrr/notes-core.git#47dcb328be59c040c7ea50a6e1f26a2572ee1270"
   dependencies:
     fast-sort "^2.0.1"
     fuzzysearch "^1.0.3"
