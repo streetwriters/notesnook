@@ -128,7 +128,7 @@ const MergeEditor = () => {
   };
 
   const onMessageFromPrimaryWebView = evt => {
-    alert('helloworld');
+
     if (evt.nativeEvent.data !== '') {
       let data = JSON.parse(evt.nativeEvent.data);
       primaryDelta = data.delta;

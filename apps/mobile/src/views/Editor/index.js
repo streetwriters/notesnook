@@ -1,4 +1,4 @@
-import React, {createRef, useEffect, useState} from 'react';
+import React, { createRef, useEffect, useState } from 'react';
 import {
   BackHandler,
   KeyboardAvoidingView,
@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import WebView from 'react-native-webview';
-import {normalize, SIZE, WEIGHT} from '../../common/common';
+import { normalize, SIZE, WEIGHT } from '../../common/common';
 import {
   ActionSheetEvent,
   simpleDialogEvent,
@@ -21,8 +21,8 @@ import {
   TEMPLATE_EXIT_FULLSCREEN,
   TEMPLATE_INFO,
 } from '../../components/DialogManager/templates';
-import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
+import { useTracked } from '../../provider';
+import { ACTIONS } from '../../provider/actions';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -35,9 +35,9 @@ import {
   eOpenFullscreenEditor,
   refreshNotesPage,
 } from '../../services/events';
-import {exitEditorAnimation} from '../../utils/animations';
-import {sideMenuRef} from '../../utils/refs';
-import {db, DDS, editing, timeConverter, ToastEvent} from '../../utils/utils';
+import { exitEditorAnimation } from '../../utils/animations';
+import { sideMenuRef } from '../../utils/refs';
+import { db, DDS, editing, timeConverter, ToastEvent } from '../../utils/utils';
 
 const EditorWebView = createRef();
 let note = {};
@@ -48,10 +48,10 @@ let timer = null;
 let saveCounter = 0;
 let tapCount = 0;
 let canSave = false;
-const Editor = ({noMenu}) => {
+const Editor = ({ noMenu }) => {
   // Global State
   const [state, dispatch] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
   const [fullscreen, setFullscreen] = useState(false);
   const [dateEdited, setDateEdited] = useState(0);
   // FUNCTIONS
@@ -60,7 +60,7 @@ const Editor = ({noMenu}) => {
     EditorWebView.current?.postMessage(JSON.stringify(message));
 
   useEffect(() => {
-    let c = {...colors};
+    let c = { ...colors };
     c.factor = normalize(1);
     post({
       type: 'theme',
@@ -80,7 +80,7 @@ const Editor = ({noMenu}) => {
     //EditorWebView.current?.requestFocus();
     noMenu ? null : sideMenuRef.current?.setGestureEnabled(false);
     if (note && note.id) {
-      dispatch({type: ACTIONS.NOTES});
+      dispatch({ type: ACTIONS.NOTES });
       if (item && item.type === 'new') {
         await clearEditor();
         post({
@@ -97,7 +97,7 @@ const Editor = ({noMenu}) => {
         updateEditor();
       }
     } else {
-      dispatch({type: ACTIONS.NOTES});
+      dispatch({ type: ACTIONS.NOTES });
       if (item && item.type === 'new') {
         await clearEditor();
         post({
@@ -249,10 +249,13 @@ const Editor = ({noMenu}) => {
   const saveNote = async (lockNote = true) => {
     if (!canSave) return;
     if (!title && !content) return;
+    if (content && content.text.trim().length === 0 && title && title.trim().length == 0) return;
+    if (!content && title && title.trim().length === 0) return;
+    if (!title && content && content.text.trim.length === 0) return;
     if (!content) {
       content = {
         text: '',
-        delta: {ops: []},
+        delta: { ops: [] },
       };
     }
 
@@ -344,7 +347,7 @@ const Editor = ({noMenu}) => {
         type: 'focusTitle',
       });
     }
-    let c = {...colors};
+    let c = { ...colors };
     c.factor = normalize(1);
     post({
       type: 'theme',
@@ -356,7 +359,7 @@ const Editor = ({noMenu}) => {
     title = note.title;
     id = note.id;
     setDateEdited(note.dateEdited);
-    content = {...note.content};
+    content = { ...note.content };
     saveCounter = 0;
 
     if (title !== null || title === '') {
@@ -391,7 +394,7 @@ const Editor = ({noMenu}) => {
         value: delta,
       });
     } else {
-      post({type: 'text', value: note.content.text});
+      post({ type: 'text', value: note.content.text });
     }
   };
 
@@ -655,11 +658,11 @@ const Editor = ({noMenu}) => {
           originWhitelist={['*']}
           source={
             Platform.OS === 'ios'
-              ? {uri: sourceUri}
+              ? { uri: sourceUri }
               : {
-                  uri: 'file:///android_asset/texteditor.html',
-                  baseUrl: 'file:///android_asset/',
-                }
+                uri: 'file:///android_asset/texteditor.html',
+                baseUrl: 'file:///android_asset/',
+              }
           }
           style={{
             height: '100%',
