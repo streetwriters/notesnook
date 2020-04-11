@@ -43,13 +43,12 @@ export default class User {
       refresh_token: user.refreshToken,
       grant_type: "refresh_token",
     });
-    var dt = new Date();
-    dt.setDate(dt.getSeconds() + response.expiry);
+
     user = {
       ...user,
       accessToken: response.access_token,
       refreshToken: response.refresh_token,
-      expiry: dt.getTime(),
+      expiry: Date.now() + response.expiry * 100,
     };
     await this.context.write("user", user);
   }
@@ -70,14 +69,12 @@ export default class User {
 }
 
 function userFromResponse(response) {
-  var dt = new Date();
-  dt.setDate(dt.getSeconds() + response.expiry);
   let user = {
     ...response.payload,
     accessToken: response.access_token,
     refreshToken: response.refresh_token,
     scopes: response.scopes,
-    expiry: dt.getTime(),
+    expiry: Date.now() + response.expiry * 100,
   };
   return user;
 }
