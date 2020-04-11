@@ -1,29 +1,18 @@
 import React, { createRef, useEffect, useState } from 'react';
-import {
-  BackHandler,
-  SafeAreaView,
-  Text,
-  TouchableOpacity,
-  View,
-  ActivityIndicator,
-} from 'react-native';
+import { ActivityIndicator, BackHandler, SafeAreaView, Text, TouchableOpacity, View } from 'react-native';
+import * as Animatable from 'react-native-animatable';
 import { TextInput } from 'react-native-gesture-handler';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useIsFocused } from 'react-navigation-hooks';
-
 import { opacity, pv, SIZE, WEIGHT } from '../../common/common';
 import { Header } from '../../components/header';
 import { useTracked } from '../../provider';
+import { ACTIONS } from '../../provider/actions';
 import { eSendEvent } from '../../services/eventManager';
 import { eCloseSideMenu, refreshNotesPage } from '../../services/events';
-import * as Animatable from 'react-native-animatable';
-import {
-  validateEmail,
-  validatePass,
-  validateUsername,
-} from '../../services/validation';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { ToastEvent, db, DDS } from '../../utils/utils';
-import { ACTIONS } from '../../provider/actions';
+import { validatePass, validateUsername } from '../../services/validation';
+import { db, DDS, ToastEvent } from '../../utils/utils';
+
 
 export const Login = ({ navigation }) => {
   const [state, dispatch] = useTracked();
@@ -94,8 +83,6 @@ export const Login = ({ navigation }) => {
       }
 
       let user;
-
-
       try {
         user = await db.user.get();
         console.log('user', user);

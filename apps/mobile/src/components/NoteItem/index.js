@@ -65,7 +65,8 @@ export default class NoteItem extends React.Component {
       index,
     } = this.props;
 
-    console.log('rerendering again', index);
+
+    console.log('rerendering again', item);
     return (
       <View
         style={[
@@ -249,7 +250,7 @@ export default class NoteItem extends React.Component {
                         }
                       }
                     >
-                      conflicts
+                      CONFLICTS
                       </Text>
                   </View> : null
                 }

@@ -567,7 +567,6 @@ export const Menu = ({
                 flexDirection: 'row',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-
                 paddingHorizontal: 5,
                 paddingVertical: pv + 5,
               }}>
