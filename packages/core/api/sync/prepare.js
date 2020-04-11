@@ -23,17 +23,21 @@ class Prepare {
       tags: this._prepareForServer(this._db.tags.raw),
       colors: this._prepareForServer(this._db.colors.raw),
       trash: this._prepareForServer(this._db.trash.raw),
-      lastSynced: Date.now(),
     };
   }
 
   _prepareForServer(array) {
     return tfun
       .filter((item) => item.dateEdited > this._lastSyncedTimestamp)
-      .map((item) => ({
-        id: item.id,
-        data: JSON.stringify(item),
-      }))(array);
+      .map((item) => {
+        // in case of resolved delta, we do not want to send this key to the server
+        if (item.resolved) delete item.resolved;
+
+        return {
+          id: item.id,
+          data: JSON.stringify(item),
+        };
+      })(array);
   }
 }
 export default Prepare;

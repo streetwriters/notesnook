@@ -54,12 +54,9 @@ export default class Sync {
     return await response.json();
   }
 
-  async throwOnConflicts(lastSynced) {
+  async throwOnConflicts() {
     let hasConflicts = await this.db.context.read("hasConflicts");
     if (hasConflicts) {
-      if (lastSynced) {
-        await this.db.user.set({ lastSynced });
-      }
       const mergeConflictError = new Error(
         "Merge conflicts detected. Please resolve all conflicts to continue syncing."
       );
@@ -84,15 +81,14 @@ export default class Sync {
 
     // merge the server response
     const merger = new Merger(this.db, lastSyncedTimestamp);
-    const mergeResult = await merger.merge(serverResponse);
-    await this.throwOnConflicts(data.lastSynced);
+    await merger.merge(serverResponse);
+    await this.throwOnConflicts();
 
     // send the data back to server
-    await this._send(data);
+    const lastSynced = await this._send(data);
 
     // update our lastSynced time
-    if (mergeResult || !areAllEmpty(data))
-      await this.db.user.set({ lastSynced: data.lastSynced });
+    if (lastSynced) await this.db.user.set({ lastSynced });
   }
 
   async _send(data) {
@@ -104,6 +100,10 @@ export default class Sync {
       headers: { ...HEADERS, Authorization: `Bearer ${token}` },
       body: JSON.stringify(data),
     });
-    return response.ok;
+    if (response.ok) {
+      const json = await response.json();
+      return json.lastSynced;
+    }
+    throw new Error("Failed to sync with the server.");
   }
 }

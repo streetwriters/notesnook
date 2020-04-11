@@ -18,7 +18,7 @@ export default class Content {
       id,
       data: content.data || content,
       conflicted: content.conflicted || false,
-      //resolved: !!content.resolved,
+      resolved: !!content.resolved,
       dateEdited: content.dateEdited,
       dateCreated: content.dateCreated,
       remote: content.remote,

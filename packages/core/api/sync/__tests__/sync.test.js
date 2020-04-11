@@ -43,7 +43,7 @@ test("sync without merge conflicts, cause merge conflicts, resolve them and then
     // 3. start sync
     fetchMock
       .once(JSON.stringify({ notes: [], synced: false }))
-      .once(JSON.stringify({}), { status: 200 });
+      .once(JSON.stringify({ lastSynced: Date.now() }), { status: 200 });
     await db.sync();
 
     const user = await db.user.get();
@@ -70,7 +70,7 @@ test("sync without merge conflicts, cause merge conflicts, resolve them and then
 
     fetchMock
       .once(JSON.stringify({ notes: [], delta: [delta], synced: false }))
-      .once(JSON.stringify({}), { status: 200 });
+      .once(JSON.stringify({ lastSynced: Date.now() }), { status: 200 });
 
     await expect(db.sync()).rejects.toThrow(
       "Merge conflicts detected. Please resolve all conflicts to continue syncing."
@@ -96,7 +96,7 @@ test("sync without merge conflicts, cause merge conflicts, resolve them and then
     // 7. Resync (no conflicts should appear)
     fetchMock
       .once(JSON.stringify({ notes: [], delta: [delta], synced: false }))
-      .once(JSON.stringify({}), { status: 200 });
+      .once(JSON.stringify({ lastSynced: Date.now() }), { status: 200 });
     await expect(db.sync()).resolves.toBeUndefined();
   });
 });

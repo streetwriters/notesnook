@@ -31,10 +31,10 @@ class Merger {
 
     remoteItem = { ...JSON.parse(remoteItem.data), remote: true };
 
-    if (!localItem) {
-      await add(remoteItem);
-    } else if (localItem.dateEdited > this._lastSynced) {
+    if (!localItem.resolved && localItem.dateEdited > this._lastSynced) {
       await resolve(localItem, remoteItem);
+    } else if (localItem.resolved) {
+      await add({ ...localItem, resolved: false });
     } else {
       await add(remoteItem);
     }

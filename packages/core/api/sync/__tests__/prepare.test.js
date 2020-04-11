@@ -69,7 +69,6 @@ describe.each(tests)("%s preparation", (collection, add, addExtra) => {
       const data = await prepare.get(0);
       expect(data[collection].length).toBe(MAX_ITEMS);
       expect(data[collection].every((item) => !!item.data)).toBeTruthy();
-      expect(data.lastSynced).toBeGreaterThan(0);
     });
   });
 
@@ -85,7 +84,6 @@ describe.each(tests)("%s preparation", (collection, add, addExtra) => {
       const data = await prepare.get(10);
       expect(data[collection].length).toBe(MAX_ITEMS);
       expect(data[collection].every((item) => !!item.data)).toBeTruthy();
-      expect(data.lastSynced).toBeGreaterThan(0);
     });
   });
 });
