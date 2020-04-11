@@ -7,7 +7,7 @@ async function read(key) {
 async function readMulti(keys) {
   return new Promise((resolve, reject) => {
     const result = [];
-    keys.forEach(key => {
+    keys.forEach((key) => {
       result.push([key, storage[key]]);
     });
     resolve(result);
@@ -24,20 +24,10 @@ function clear() {
   storage = {};
 }
 
-function encrypt(password, data) {
-  return new Promise((resolve, reject) =>
-    resolve({ iv: "some iv", cipher: data })
-  );
-}
-function decrypt(password, data) {
-  return new Promise((resolve, reject) => resolve(data.cipher));
-}
 module.exports = {
   read,
   readMulti,
   write,
   remove,
   clear,
-  encrypt,
-  decrypt
 };

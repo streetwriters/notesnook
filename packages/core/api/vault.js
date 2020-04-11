@@ -13,14 +13,14 @@ export default class Vault {
     this.ERRORS = {
       noVault: "ERR_NO_VAULT",
       vaultLocked: "ERR_VAULT_LOCKED",
-      wrongPassword: "ERR_WRONG_PASSWORD"
+      wrongPassword: "ERR_WRONG_PASSWORD",
     };
   }
 
   async create(password) {
     const lockKey = await this._context.read("lockKey");
     if (!lockKey || !lockKey.cipher || !lockKey.iv) {
-      const encryptedData = await this._context.encrypt(password, this._key);
+      const encryptedData = await this._db.crypto.encrypt(password, this._key);
       await this._context.write("lockKey", encryptedData);
       this._password = password;
     }
@@ -32,7 +32,7 @@ export default class Vault {
     if (!(await this._exists(lockKey))) throw new Error("ERR_NO_VAULT");
     var data;
     try {
-      data = await this._context.decrypt(password, lockKey);
+      data = this._db.crypto.decrypt(password, lockKey);
     } catch (e) {
       throw new Error(this.ERRORS.wrongPassword);
     }
@@ -96,8 +96,8 @@ export default class Vault {
     if (!delta.ops) delta = await this._db.delta.get(deltaId);
     if (text === textId) text = await this._db.text.get(textId);
 
-    text = await this._context.encrypt(this._password, text);
-    delta = await this._context.encrypt(this._password, delta);
+    text = this._db.crypto.encrypt(this._password, text);
+    delta = this._db.crypto.encrypt(this._password, delta);
 
     await this._db.text.add({ id: textId, data: text });
     await this._db.delta.add({ id: deltaId, data: delta });
@@ -107,14 +107,14 @@ export default class Vault {
     let { text, delta } = { ...content };
 
     text = await this._db.text.get(text);
-    text = await this._context.decrypt(this._password, text);
+    text = this._db.crypto.decrypt(this._password, text);
 
     delta = await this._db.text.get(delta);
-    delta = await this._context.decrypt(this._password, delta);
+    delta = JSON.parse(this._db.crypto.decrypt(this._password, delta));
 
     return {
       delta,
-      text
+      text,
     };
   }
 
@@ -135,7 +135,7 @@ export default class Vault {
 
     return await this._db.notes.add({
       id,
-      locked: true
+      locked: true,
     });
   }
 
@@ -147,7 +147,7 @@ export default class Vault {
     if (perm) {
       await this._db.notes.add({
         id: note.id,
-        locked: false
+        locked: false,
       });
       await this._db.delta.add({ id: note.content.delta, data: delta });
       await this._db.text.add({ id: note.content.text, data: text });
@@ -156,7 +156,7 @@ export default class Vault {
 
     return {
       ...note,
-      content: { delta }
+      content: { delta },
     };
   }
 }

@@ -38,7 +38,8 @@ class Crypto {
     return { key, salt: saltHex };
   }
 
-  encrypt({ password, data }) {
+  encrypt(password, data) {
+    if (typeof data === "object") data = JSON.stringify(data);
     this._throwIfNotReady();
     const { key, salt } = this._deriveKey(
       password,
@@ -65,7 +66,7 @@ class Crypto {
     };
   }
 
-  decrypt({ password, data: { salt, iv, cipher } }) {
+  decrypt(password, { salt, iv, cipher }) {
     this._throwIfNotReady();
     const { key } = this._deriveKey(
       password,

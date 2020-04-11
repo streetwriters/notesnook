@@ -5,7 +5,7 @@ beforeEach(async () => {
 });
 
 test("create vault", () =>
-  databaseTest().then(async db => {
+  databaseTest().then(async (db) => {
     expect(await db.vault.create("password")).toBe(true);
     const lockKey = await db.context.read("lockKey");
     expect(lockKey).toBeDefined();
@@ -14,29 +14,29 @@ test("create vault", () =>
   }));
 
 test("unlock vault", () =>
-  databaseTest().then(async db => {
+  databaseTest().then(async (db) => {
     expect(await db.vault.create("password")).toBe(true);
     expect(await db.vault.unlock("password")).toBe(true);
   }));
 
 test("unlock non-existent vault", () =>
-  databaseTest().then(async db => {
+  databaseTest().then(async (db) => {
     db.vault
       .unlock("password")
-      .catch(err => expect(err.message).toBe("ERR_NO_VAULT"));
+      .catch((err) => expect(err.message).toBe("ERR_NO_VAULT"));
   }));
 
 test("unlock vault with wrong password", () =>
-  databaseTest().then(async db => {
+  databaseTest().then(async (db) => {
     await db.vault.create("password");
-    db.vault
+    return db.vault
       .unlock("passwrd")
-      .catch(err => expect(err.message).toBe("ERR_WRNG_PWD"));
+      .catch((err) => expect(err.message).toBe("ERR_WRONG_PASSWORD"));
   }));
 
 test("lock a note when no vault has been created", () =>
   noteTest().then(({ db, id }) => {
-    db.vault.add(id).catch(err => {
+    return db.vault.add(id).catch((err) => {
       expect(err.message).toBe("ERR_NO_VAULT");
     });
   }));

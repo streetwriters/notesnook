@@ -8,6 +8,7 @@ import Vault from "./vault";
 import Lookup from "./lookup";
 import Content from "../collections/content";
 import Conflicts from "./conflicts";
+import Crypto from "../utils/crypto";
 
 class Database {
   constructor(context) {
@@ -40,6 +41,8 @@ class Database {
     this.vault = new Vault(this, this.context);
     this.conflicts = new Conflicts(this);
     this.lookup = new Lookup(this);
+    this.crypto = new Crypto();
+    await this.crypto.init();
   }
 
   sync() {
