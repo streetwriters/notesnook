@@ -36,9 +36,9 @@ class Merger {
       await resolve(localItem, remoteItem);
     } else if (localItem.resolved) {
       await add({ ...localItem, resolved: false });
-    } /*  else {
+    } else {
       await add(remoteItem);
-    } */
+    }
   }
 
   async _mergeArrayWithConflicts(array, get, set, resolve) {
