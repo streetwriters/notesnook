@@ -1,14 +1,17 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import MMKV from 'react-native-mmkv-storage';
 import Orientation from 'react-native-orientation';
-import {Loading} from './Loading';
-import {getColorScheme, scale, updateSize} from './src/common/common';
-import {useTracked} from './src/provider';
-import {ACTIONS} from './src/provider/actions';
-import {defaultState} from './src/provider/defaultState';
-import {eSubscribeEvent, eUnSubscribeEvent} from './src/services/eventManager';
-import {eDispatchAction} from './src/services/events';
-import {db, DDS} from './src/utils/utils';
+import { Loading } from './Loading';
+import { getColorScheme, scale, updateSize } from './src/common/common';
+import { useTracked } from './src/provider';
+import { ACTIONS } from './src/provider/actions';
+import { defaultState } from './src/provider/defaultState';
+import { eSubscribeEvent, eUnSubscribeEvent } from './src/services/eventManager';
+import { eDispatchAction } from './src/services/events';
+import { db, DDS } from './src/utils/utils';
+import { test } from './src/utils/storage';
+
+
 
 const App = () => {
   const [state, dispatch] = useTracked();
@@ -43,8 +46,9 @@ const App = () => {
   useEffect(() => {
     Initialize().then(() => {
       db.init().then(async () => {
+
         let user = await db.user.get();
-        dispatch({type: ACTIONS.USER, user: user});
+        dispatch({ type: ACTIONS.USER, user: user });
 
         setInit(true);
       });
@@ -57,7 +61,7 @@ const App = () => {
     let s;
     try {
       s = await MMKV.getStringAsync('settings');
-    } catch (e) {}
+    } catch (e) { }
     if (typeof s !== 'string') {
       s = defaultState.settings;
       s = JSON.stringify(s);
@@ -65,7 +69,7 @@ const App = () => {
 
       await MMKV.setStringAsync('settings', s);
 
-      dispatch({type: ACTIONS.SETTINGS, s});
+      dispatch({ type: ACTIONS.SETTINGS, s });
     } else {
       s = JSON.parse(s);
       if (s.fontScale) {
@@ -75,9 +79,9 @@ const App = () => {
       }
       updateSize();
 
-      dispatch({type: ACTIONS.SETTINGS, settings: {...s}});
+      dispatch({ type: ACTIONS.SETTINGS, settings: { ...s } });
     }
-    dispatch({type: ACTIONS.THEME, colors: newColors});
+    dispatch({ type: ACTIONS.THEME, colors: newColors });
   }
 
   if (!init) {

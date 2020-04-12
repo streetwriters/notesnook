@@ -19,6 +19,7 @@
 #import <FlipperKitNetworkPlugin/FlipperKitNetworkPlugin.h>
 #import <SKIOSNetworkPlugin/SKIOSNetworkAdapter.h>
 #import <FlipperKitReactPlugin/FlipperKitReactPlugin.h>
+
 static void InitializeFlipper(UIApplication *application) {
   FlipperClient *client = [FlipperClient sharedClient];
   SKDescriptorMapper *layoutDescriptorMapper = [[SKDescriptorMapper alloc] initWithDefaults];
@@ -29,14 +30,6 @@ static void InitializeFlipper(UIApplication *application) {
   [client start];
 }
 #endif
-@implementation AppDelegate
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
-{
-#if DEBUG
-  InitializeFlipper(application);
-#endif
-
-
 
 @implementation AppDelegate
 
@@ -46,7 +39,7 @@ static void InitializeFlipper(UIApplication *application) {
 
   #if DEBUG
   InitializeFlipper(application);
-#endif
+  #endif
 
   RCTBridge *bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:launchOptions];
   RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:bridge

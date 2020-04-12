@@ -1,5 +1,7 @@
 import { NativeModules } from 'react-native';
 import MMKV from 'react-native-mmkv-storage';
+import Sodium from "react-native-sodium";
+import { func } from 'prop-types';
 
 var Aes = NativeModules.Aes;
 
@@ -53,29 +55,22 @@ function clear() {
   MMKV.clearStore();
 }
 
+
+
+
+
 function encrypt(password, data) {
-  let key;
-  return Aes.pbkdf2(password, 'salt', 5000, 256).then(aes => {
-    key = aes;
-    return Aes.randomKey(16).then(iv => {
-      return Aes.encrypt(data, key, iv).then(cipher => {
-        return {
-          cipher,
-          iv,
-        };
-      });
-    });
-  });
+
+  return Sodium.encrypt({ password: password }, data).then(result => result);
 }
 
 function decrypt(password, data) {
-  let key;
-  return Aes.pbkdf2(password, 'salt', 5000, 256).then(aes => {
-    key = aes;
-    return Aes.decrypt(data.cipher, key, data.iv).then(e => {
-      return e;
-    });
-  });
+  return Sodium.decrypt({ password: password }, data).then(result => result);
 }
 
-export default { read, write, readMulti, remove, clear, encrypt, decrypt };
+function deriveKey(passoword) {
+  return Sodium.deriveKey('password').then(result => result);
+}
+
+
+export default { read, write, readMulti, remove, clear, encrypt, decrypt, deriveKey };

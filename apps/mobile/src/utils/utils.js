@@ -1,35 +1,31 @@
 import Storage from 'notes-core/api/index';
-import {Dimensions} from 'react-native';
-import {eSendEvent} from '../services/eventManager';
+import { Dimensions } from 'react-native';
+import { eSendEvent } from '../services/eventManager';
 import {
-  eOpenSideMenu,
-  eCloseSideMenu,
-  eDisableGestures,
-  eEnableGestures,
   eShowToast,
   eHideToast,
 } from '../services/events';
-import {DeviceDetectionService} from './deviceDetection';
+import { DeviceDetectionService } from './deviceDetection';
 import StorageInterface from './storage';
 import MMKV from 'react-native-mmkv-storage';
-import {updateEvent} from '../components/DialogManager/recievers';
-import {ACTIONS} from '../provider/actions';
+import { updateEvent } from '../components/DialogManager/recievers';
+import { ACTIONS } from '../provider/actions';
 export const DDS = new DeviceDetectionService();
 export const db = new Storage(StorageInterface);
 
 export async function setSetting(settings, name, value) {
-  let s = {...settings};
+  let s = { ...settings };
   s[name] = value;
   await MMKV.setStringAsync('settings', JSON.stringify(s));
 
-  updateEvent({type: ACTIONS.SETTINGS, settings: s});
+  updateEvent({ type: ACTIONS.SETTINGS, settings: s });
 }
 
 export const getElevation = elevation => {
   return {
     elevation,
     shadowColor: 'black',
-    shadowOffset: {width: 0.3 * elevation, height: 0.5 * elevation},
+    shadowOffset: { width: 0.3 * elevation, height: 0.5 * elevation },
     shadowOpacity: 0.2,
     shadowRadius: 0.7 * elevation,
   };
