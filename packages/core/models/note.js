@@ -1,10 +1,7 @@
-import Notes from "../collections/notes";
-import { qclone } from "qclone";
-
 export default class Note {
   /**
    *
-   * @param {Notes} notes
+   * @param {import('../collections/notes').default} notes
    * @param {Object} note
    */
   constructor(notes, note) {

@@ -1,7 +1,4 @@
 import CachedCollection from "../database/cached-collection";
-import Notes from "./notes";
-import Notebooks from "./notebooks";
-import Content from "./content";
 import getId from "../utils/id";
 import { get7DayTimestamp } from "../utils/date";
 
@@ -12,10 +9,10 @@ export default class Trash {
 
   /**
    *
-   * @param {Notes} notes
-   * @param {Notebooks} notebooks
-   * @param {Content} delta
-   * @param {Content} text
+   * @param {import('./notes').default} notes
+   * @param {import('./notebooks').default} notebooks
+   * @param {import('./content').default} delta
+   * @param {import('./content').default} text
    */
   async init(notes, notebooks, delta, text) {
     this._notes = notes;
@@ -28,7 +25,7 @@ export default class Trash {
 
   async cleanup() {
     const sevenDayPreviousTimestamp = Date.now() - get7DayTimestamp();
-    this.all.forEach(async item => {
+    this.all.forEach(async (item) => {
       if (item.dateDeleted < sevenDayPreviousTimestamp) {
         await this.delete(item.id);
       }
@@ -40,7 +37,7 @@ export default class Trash {
   }
 
   get all() {
-    return this._collection.getAllItems(u => u.dateDeleted);
+    return this._collection.getAllItems((u) => u.dateDeleted);
   }
 
   async add(item) {
@@ -51,7 +48,7 @@ export default class Trash {
       ...item,
       id: getId(),
       itemId: item.id,
-      dateDeleted: Date.now()
+      dateDeleted: Date.now(),
     });
   }
 
@@ -94,10 +91,7 @@ export default class Trash {
 
           // restore the note to the topic it was in before deletion
           if (notebook.id && notebook.topic) {
-            await this._notebooks
-              .notebook(id)
-              .topics.topic(topic)
-              .add(item.id);
+            await this._notebooks.notebook(id).topics.topic(topic).add(item.id);
           }
         }
       } else if (item.type === "notebook") {

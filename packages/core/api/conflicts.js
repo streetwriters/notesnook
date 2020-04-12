@@ -1,9 +1,7 @@
-import Database from "./index";
-
 class Conflicts {
   /**
    *
-   * @param {Database} db
+   * @param {import('./index').default} db
    */
   constructor(db) {
     this._db = db;

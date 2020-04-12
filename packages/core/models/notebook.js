@@ -1,10 +1,9 @@
-import Notebooks from "../collections/notebooks";
 import Topics from "../collections/topics";
 
 export default class Notebook {
   /**
    *
-   * @param {Notebooks} notebooks
+   * @param {import ('../collections/notebooks').default} notebooks
    * @param {Object} notebook
    */
   constructor(notebooks, notebook) {
@@ -31,7 +30,7 @@ export default class Notebook {
   _toggle(prop) {
     return this._notebooks.add({
       id: this._notebook.id,
-      [prop]: !this._notebook[prop]
+      [prop]: !this._notebook[prop],
     });
   }
 

@@ -1,9 +1,8 @@
-import Topics from "../collections/topics";
 import { qclone } from "qclone";
 export default class Topic {
   /**
    *
-   * @param {Topics} topics
+   * @param {import('../collections/topics').default} topics
    * @param {Object} topic
    */
   constructor(topics, topic) {
@@ -26,7 +25,7 @@ export default class Topic {
   }
 
   has(noteId) {
-    return this._topic.notes.findIndex(n => n === noteId) > -1;
+    return this._topic.notes.findIndex((n) => n === noteId) > -1;
   }
 
   async add(...noteIds) {
@@ -48,7 +47,7 @@ export default class Topic {
       }
       await this._topics._notebooks._notes.add({
         id: noteId,
-        notebook: { id: this._topics._notebookId, topic: topic.title }
+        notebook: { id: this._topics._notebookId, topic: topic.title },
       });
       topic.totalNotes++;
     }
@@ -59,11 +58,11 @@ export default class Topic {
     const topic = qclone(this._topic);
     for (let noteId of noteIds) {
       if (!this.has(noteId)) return this;
-      let index = topic.notes.findIndex(n => n === noteId);
+      let index = topic.notes.findIndex((n) => n === noteId);
       topic.notes.splice(index, 1);
       await this._topics._notebooks._notes.add({
         id: noteId,
-        notebook: {}
+        notebook: {},
       });
       topic.totalNotes--;
     }
@@ -78,10 +77,10 @@ export default class Topic {
 
   get all() {
     return this._topic.notes
-      .map(note => {
+      .map((note) => {
         let fullNote = this._topics._notebooks._notes.note(note);
         if (fullNote) return fullNote.data;
       })
-      .filter(v => v);
+      .filter((v) => v);
   }
 }

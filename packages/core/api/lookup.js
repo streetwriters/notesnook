@@ -1,6 +1,4 @@
 import fuzzysearch from "fuzzysearch";
-import Database from "./index";
-import set from "../utils/set";
 var tfun = require("transfun/transfun.js").tfun;
 if (!tfun) {
   tfun = global.tfun;
@@ -9,18 +7,18 @@ if (!tfun) {
 export default class Lookup {
   /**
    *
-   * @param {Database} db
+   * @param {import('./index').default} db
    */
   constructor(db) {
     this._db = db;
   }
 
   notes(notes, query) {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       const results = [];
       let index = 0,
         max = notes.length;
-      notes.forEach(async note => {
+      notes.forEach(async (note) => {
         const text = await this._db.text.get(note.content.text);
         const title = note.title;
         if (fuzzysearch(query, text + title)) results.push(note);
@@ -31,9 +29,9 @@ export default class Lookup {
 
   notebooks(array, query) {
     return tfun.filter(
-      nb =>
+      (nb) =>
         fuzzysearch(query, nb.title + " " + nb.description) ||
-        nb.topics.some(topic => fuzzysearch(query, topic.title))
+        nb.topics.some((topic) => fuzzysearch(query, topic.title))
     )(array);
   }
 
@@ -50,6 +48,6 @@ export default class Lookup {
   }
 
   _byTitle(array, query) {
-    return tfun.filter(item => fuzzysearch(query, item.title))(array);
+    return tfun.filter((item) => fuzzysearch(query, item.title))(array);
   }
 }

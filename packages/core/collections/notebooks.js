@@ -1,8 +1,6 @@
 import CachedCollection from "../database/cached-collection";
 import fuzzysearch from "fuzzysearch";
 import Notebook from "../models/notebook";
-import Notes from "./notes";
-import Trash from "./trash";
 import sort from "fast-sort";
 import getId from "../utils/id";
 
@@ -17,8 +15,8 @@ export default class Notebooks {
 
   /**
    *
-   * @param {Notes} notes
-   * @param {Trash} trash
+   * @param {import('./notes').default} notes
+   * @param {import('./trash').default} trash
    */
   init(notes, trash) {
     this._trash = trash;

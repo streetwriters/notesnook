@@ -1,9 +1,9 @@
-import Database from "./index";
 import getId from "../utils/id";
+
 export default class Vault {
   /**
    *
-   * @param {Database} database
+   * @param {import('./index').default} database
    */
   constructor(database, context) {
     this._db = database;

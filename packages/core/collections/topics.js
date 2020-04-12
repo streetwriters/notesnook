@@ -1,12 +1,10 @@
-import Notebooks from "./notebooks";
-import Notes from "./notes";
 import Topic from "../models/topic";
 import { qclone } from "qclone";
 
 export default class Topics {
   /**
    *
-   * @param {Notebooks} notebooks
+   * @param {import('./notebooks').default} notebooks
    * @param {string} notebookId
    */
   constructor(notebooks, notebookId) {
@@ -15,7 +13,7 @@ export default class Topics {
   }
 
   has(topic) {
-    return this.all.findIndex(v => v.title === (topic.title || topic)) > -1;
+    return this.all.findIndex((v) => v.title === (topic.title || topic)) > -1;
   }
 
   _dedupe(source) {
@@ -27,7 +25,7 @@ export default class Topics {
         seen.set(value.id, {
           ...seen.get(value.id),
           ...value,
-          id: value.title
+          id: value.title,
         });
         continue;
       }
@@ -46,7 +44,7 @@ export default class Topics {
 
     notebook.topics = [];
     notebook.totalNotes = 0;
-    unique.forEach(t => {
+    unique.forEach((t) => {
       let topic = makeTopic(t, this._notebookId);
       notebook.topics.push(topic);
       notebook.totalNotes += topic.totalNotes;
@@ -69,7 +67,7 @@ export default class Topics {
    */
   topic(topic) {
     if (typeof topic === "string") {
-      topic = this.all.find(t => t.title === topic);
+      topic = this.all.find((t) => t.title === topic);
     }
     if (!topic) return;
     return new Topic(this, topic);
@@ -80,7 +78,7 @@ export default class Topics {
     for (let i = 0; i < allTopics.length; i++) {
       let topic = allTopics[i];
       if (!topic) continue;
-      let index = topics.findIndex(t => (t.title || t) === topic.title);
+      let index = topics.findIndex((t) => (t.title || t) === topic.title);
       let t = this.topic(topic);
       await t.transaction(() => t.delete(...topic.notes), false);
       if (index > -1) {
@@ -101,6 +99,6 @@ function makeTopic(topic, notebookId) {
     dateCreated: Date.now(),
     dateEdited: Date.now(),
     totalNotes: 0,
-    notes: []
+    notes: [],
   };
 }
