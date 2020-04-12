@@ -55,10 +55,6 @@ function clear() {
   MMKV.clearStore();
 }
 
-
-
-
-
 function encrypt(password, data) {
 
   return Sodium.encrypt({ password: password }, data).then(result => result);
