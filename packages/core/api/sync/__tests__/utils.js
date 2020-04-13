@@ -1,3 +1,22 @@
+import "jest-fetch-mock";
+
+const SUCCESS_LOGIN_RESPONSE = {
+  access_token: "access_token",
+  refresh_token: "refresh_token",
+  payload: {
+    username: "thecodrr",
+    email: process.env.EMAIL,
+    lastSynced: 0,
+  },
+  scopes: "sync",
+  expiry: 36000,
+};
+
+async function login(db) {
+  fetchMock.mockResponseOnce(JSON.stringify(SUCCESS_LOGIN_RESPONSE));
+  await db.user.login("username", "password");
+}
+
 function mainCollectionParams(collection, itemKey, item) {
   async function addItem(db) {
     const id = await db[collection].add(item);
@@ -32,4 +51,11 @@ function tagsCollectionParams(collection, item) {
   return [collection, addItem, editItem, getItem];
 }
 
-export { tagsCollectionParams, mainCollectionParams };
+function getEncrypted(item) {
+  return {
+    iv: "some_iv",
+    cipher: JSON.stringify(item),
+  };
+}
+
+export { tagsCollectionParams, mainCollectionParams, login, getEncrypted };

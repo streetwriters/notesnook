@@ -1,11 +1,13 @@
 import StorageInterface from "../../../__mocks__/storage.mock";
 import Prepare from "../prepare";
+import { enableFetchMocks, disableFetchMocks } from "jest-fetch-mock";
 import {
   noteTest,
   TEST_NOTE,
   TEST_NOTEBOOK,
   databaseTest,
 } from "../../../__tests__/utils";
+import { login } from "./utils";
 
 function getMainCollectionParams(name, testItem) {
   return [
@@ -54,12 +56,18 @@ const tests = [
 ];
 
 describe.each(tests)("%s preparation", (collection, add, addExtra) => {
+  beforeAll(() => {
+    enableFetchMocks();
+  });
+
   beforeEach(() => {
+    fetch.resetMocks();
     StorageInterface.clear();
   });
 
   test(`prepare ${collection} when user has never synced before`, () => {
     return databaseTest().then(async (db) => {
+      await login(db);
       await Promise.all(
         Array(MAX_ITEMS)
           .fill(0)
@@ -68,12 +76,15 @@ describe.each(tests)("%s preparation", (collection, add, addExtra) => {
       const prepare = new Prepare(db);
       const data = await prepare.get(0);
       expect(data[collection].length).toBe(MAX_ITEMS);
-      expect(data[collection].every((item) => !!item.data)).toBeTruthy();
+      expect(
+        data[collection].every((item) => !!item.iv && !!item.cipher)
+      ).toBeTruthy();
     });
   });
 
   test(`prepare ${collection} when user has synced before`, () => {
     return databaseTest().then(async (db) => {
+      await login(db);
       await Promise.all(
         Array(MAX_ITEMS)
           .fill(0)
@@ -83,7 +94,9 @@ describe.each(tests)("%s preparation", (collection, add, addExtra) => {
       const prepare = new Prepare(db);
       const data = await prepare.get(10);
       expect(data[collection].length).toBe(MAX_ITEMS);
-      expect(data[collection].every((item) => !!item.data)).toBeTruthy();
+      expect(
+        data[collection].every((item) => !!item.iv && !!item.cipher)
+      ).toBeTruthy();
     });
   });
 });

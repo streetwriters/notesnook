@@ -10,8 +10,13 @@ export default class User {
     this.context = context;
   }
 
-  async get() {
+  get() {
     return this.context.read("user");
+  }
+
+  async key() {
+    const user = await this.get();
+    return user.key;
   }
 
   async set(user) {

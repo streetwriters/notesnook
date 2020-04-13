@@ -4,18 +4,7 @@ import StorageInterface from "../../../__mocks__/storage.mock";
 //import Sync from "../sync";
 //import Prepare from "../prepare";
 import { databaseTest, TEST_NOTE } from "../../../__tests__/utils";
-
-const SUCCESS_LOGIN_RESPONSE = {
-  access_token: "access_token",
-  refresh_token: "refresh_token",
-  payload: {
-    username: "thecodrr",
-    email: process.env.EMAIL,
-    lastSynced: 0,
-  },
-  scopes: "sync",
-  expiry: 36000,
-};
+import { login, getEncrypted } from "./utils";
 
 beforeAll(() => {
   enableFetchMocks();
@@ -34,8 +23,7 @@ test("syncing when user is not logged in should throw", () =>
 test("sync without merge conflicts, cause merge conflicts, resolve them and then resync", () => {
   return databaseTest().then(async (db) => {
     // 1. login
-    fetchMock.mockResponseOnce(JSON.stringify(SUCCESS_LOGIN_RESPONSE));
-    await db.user.login("username", "password");
+    await login(db);
 
     // 2. create local note
     const noteId = await db.notes.add(TEST_NOTE);
@@ -60,7 +48,7 @@ test("sync without merge conflicts, cause merge conflicts, resolve them and then
     const deltaId = db.notes.note(noteId).data.content.delta;
     const delta = {
       id: deltaId,
-      data: JSON.stringify({
+      data: getEncrypted({
         id: deltaId,
         dateEdited: Date.now(),
         conflicted: false,

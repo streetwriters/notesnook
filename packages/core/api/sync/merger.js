@@ -11,9 +11,17 @@ class Merger {
     this._lastSynced = lastSynced;
   }
 
+  async _deserialize(item) {
+    const deserialized = JSON.parse(
+      await this._db.context.decrypt(this.key, item.data)
+    );
+    deserialized.remote = true;
+    return deserialized;
+  }
+
   async _mergeItem(remoteItem, get, add) {
     let localItem = await get(remoteItem.id);
-    remoteItem = { ...JSON.parse(remoteItem.data), remote: true };
+    remoteItem = await this._deserialize(remoteItem);
     if (!localItem || remoteItem.dateEdited > localItem.dateEdited) {
       await add(remoteItem);
     }
@@ -29,7 +37,7 @@ class Merger {
   async _mergeItemWithConflicts(remoteItem, get, add, resolve) {
     let localItem = await get(remoteItem.id);
 
-    remoteItem = { ...JSON.parse(remoteItem.data), remote: true };
+    remoteItem = await this._deserialize(remoteItem);
     if (!localItem) {
       await add(remoteItem);
     } else if (!localItem.resolved && localItem.dateEdited > this._lastSynced) {
@@ -65,6 +73,7 @@ class Merger {
     } = serverResponse;
 
     if (synced || areAllEmpty(serverResponse)) return false;
+    this.key = await this._db.user.key();
 
     await this._mergeArray(
       notes,

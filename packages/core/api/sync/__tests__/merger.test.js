@@ -6,7 +6,9 @@ import {
   TEST_NOTE,
   TEST_NOTEBOOK,
 } from "../../../__tests__/utils";
+import { enableFetchMocks, disableFetchMocks } from "jest-fetch-mock";
 import { tagsCollectionParams, mainCollectionParams } from "./utils";
+import { login, getEncrypted } from "./utils";
 
 const emptyServerResponse = {
   notes: [],
@@ -19,10 +21,6 @@ const emptyServerResponse = {
 };
 
 const testItem = { id: "someId", dateEdited: 2 };
-
-beforeEach(() => {
-  StorageInterface.clear();
-});
 
 test("server response with all arrays empty should cause early return", async () => {
   const merger = new Merger();
@@ -46,11 +44,21 @@ const tests = [
 describe.each(tests)(
   "general %s syncing tests",
   (collection, add, edit, get) => {
+    beforeAll(() => {
+      enableFetchMocks();
+    });
+
+    beforeEach(() => {
+      fetch.resetMocks();
+      StorageInterface.clear();
+    });
+
     test(`merge ${collection} into empty database`, () =>
       databaseTest().then(async (db) => {
+        await login(db);
         const merger = new Merger(db, 0);
         const result = await merger.merge({
-          [collection]: [{ id: testItem.id, data: JSON.stringify(testItem) }],
+          [collection]: [{ id: testItem.id, data: getEncrypted(testItem) }],
           synced: false,
         });
         expect(result).toBe(true);
@@ -62,11 +70,12 @@ describe.each(tests)(
 
     test(`merge local and remote ${collection}`, () =>
       databaseTest().then(async (db) => {
+        await login(db);
         const merger = new Merger(db, 0);
         const item = await add(db);
         item.title = "Google";
         const result = await merger.merge({
-          [collection]: [{ id: item.id, data: JSON.stringify(item) }],
+          [collection]: [{ id: item.id, data: getEncrypted(item) }],
           synced: false,
         });
         expect(result).toBe(true);
@@ -76,12 +85,13 @@ describe.each(tests)(
 
     test(`local ${collection} are more updated than remote ones`, () =>
       databaseTest().then(async (db) => {
+        await login(db);
         const merger = new Merger(db, 0);
         const item = await add(db);
         await edit(db, item);
         item.title = "Google";
         const result = await merger.merge({
-          [collection]: [{ id: item.id, data: JSON.stringify(item) }],
+          [collection]: [{ id: item.id, data: getEncrypted(item) }],
           synced: false,
         });
         expect(result).toBe(true);
@@ -93,6 +103,7 @@ describe.each(tests)(
 
 test("local delta updated after lastSyncedTimestamp should cause merge conflict", () => {
   return noteTest().then(async ({ db, id }) => {
+    await login(db);
     const content = {
       text: "my name is abdullah",
       delta: { ops: [{ insert: "my name is abdullah" }] },
@@ -103,7 +114,7 @@ test("local delta updated after lastSyncedTimestamp should cause merge conflict"
       delta: [
         {
           id: deltaId,
-          data: JSON.stringify({
+          data: getEncrypted({
             id: deltaId,
             noteId: id,
             data: JSON.stringify(content.delta),
