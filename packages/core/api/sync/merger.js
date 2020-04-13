@@ -13,7 +13,7 @@ class Merger {
 
   async _deserialize(item) {
     const deserialized = JSON.parse(
-      await this._db.context.decrypt(this.key, item.data)
+      await this._db.context.decrypt({ key: this.key }, item.data)
     );
     deserialized.remote = true;
     return deserialized;

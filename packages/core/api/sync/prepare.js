@@ -28,7 +28,7 @@ class Prepare {
   }
 
   _serialize(item) {
-    return this._db.context.encrypt(this.key, JSON.stringify(item));
+    return this._db.context.encrypt({ key: this.key }, JSON.stringify(item));
   }
 
   _prepareForServer(array) {
