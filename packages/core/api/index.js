@@ -1,4 +1,5 @@
 import Notes from "../collections/notes";
+import Storage from "../database/storage";
 import Notebooks from "../collections/notebooks";
 import Trash from "../collections/trash";
 import Tags from "../collections/tags";
@@ -11,7 +12,7 @@ import Conflicts from "./conflicts";
 
 class Database {
   constructor(context) {
-    this.context = context;
+    this.context = new Storage(context);
   }
   async init() {
     this.notebooks = new Notebooks(this.context);
