@@ -16,7 +16,7 @@ export default class User {
 
   async key() {
     const user = await this.get();
-    return user.key;
+    return { key: user.key, salt: user.salt };
   }
 
   async set(user) {
@@ -31,7 +31,7 @@ export default class User {
       password,
       grant_type: "password",
     });
-    const key = await this.context.deriveKey(password);
+    const key = await this.context.deriveKey(password, response.payload.salt);
     let user = userFromResponse(response, key);
     await this.context.write("user", user);
   }
@@ -69,7 +69,7 @@ export default class User {
       password,
       email,
     });
-    const key = await this.context.deriveKey(password);
+    const key = await this.context.deriveKey(password, response.payload.salt);
     let user = userFromResponse(response, key);
     await this.context.write("user", user);
   }
