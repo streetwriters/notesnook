@@ -7,7 +7,7 @@ async function read(key) {
 async function readMulti(keys) {
   return new Promise((resolve, reject) => {
     const result = [];
-    keys.forEach(key => {
+    keys.forEach((key) => {
       result.push([key, storage[key]]);
     });
     resolve(result);
@@ -29,9 +29,17 @@ function encrypt(password, data) {
     resolve({ iv: "some iv", cipher: data })
   );
 }
+
 function decrypt(password, data) {
   return new Promise((resolve, reject) => resolve(data.cipher));
 }
+
+function deriveKey(password, salt) {
+  return new Promise((resolve, reject) =>
+    resolve({ key: password, salt: "salt" })
+  );
+}
+
 module.exports = {
   read,
   readMulti,
@@ -39,5 +47,6 @@ module.exports = {
   remove,
   clear,
   encrypt,
-  decrypt
+  decrypt,
+  deriveKey,
 };
