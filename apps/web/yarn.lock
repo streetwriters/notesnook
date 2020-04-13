@@ -6268,7 +6268,7 @@ levn@^0.3.0, levn@~0.3.0:
     prelude-ls "~1.1.2"
     type-check "~0.3.2"
 
-libsodium-wrappers@^0.7.6:
+libsodium-wrappers@0.7.6, libsodium-wrappers@^0.7.6:
   version "0.7.6"
   resolved "https://registry.yarnpkg.com/libsodium-wrappers/-/libsodium-wrappers-0.7.6.tgz#baed4c16d4bf9610104875ad8a8e164d259d48fb"
   integrity sha512-OUO2CWW5bHdLr6hkKLHIKI4raEkZrf3QHkhXsJ1yCh6MZ3JDA7jFD3kCATNquuGSG6MjjPHQIQms0y0gBDzjQg==
@@ -6910,7 +6910,7 @@ normalize-url@^3.0.0, normalize-url@^3.0.1:
 
 "notes-core@git+ssh://git@github.com:thecodrr/notes-core.git":
   version "1.2.0"
-  resolved "git+ssh://git@github.com:thecodrr/notes-core.git#47dcb328be59c040c7ea50a6e1f26a2572ee1270"
+  resolved "git+ssh://git@github.com:thecodrr/notes-core.git#d0e226b0ba97a44f7098955ee6d982904a51be9d"
   dependencies:
     fast-sort "^2.0.1"
     fuzzysearch "^1.0.3"

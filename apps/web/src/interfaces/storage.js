@@ -1,7 +1,9 @@
 import localforage from "localforage";
 import { extendPrototype } from "localforage-getitems";
 import sort from "fast-sort";
+import Crypto from "./crypto";
 
+const crypto = new Crypto();
 extendPrototype(localforage);
 
 localforage.config({
@@ -36,4 +38,7 @@ export default {
   write,
   remove,
   clear,
+  deriveKey: crypto.deriveKey,
+  encrypt: crypto.encrypt,
+  decrypt: crypto.decrypt,
 };
