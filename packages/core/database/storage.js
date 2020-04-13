@@ -17,4 +17,10 @@ export default class Storage {
   remove(key) {
     return this.storage.remove(key);
   }
+  encrypt(password, data) {
+    return this.storage.encrypt(password, data);
+  }
+  decrypt(password, cipher) {
+    return this.storage.decrypt(password, cipher);
+  }
 }

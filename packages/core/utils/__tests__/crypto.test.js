@@ -8,13 +8,18 @@ test("libsodium should load", async () => {
 
 test("crypto should throw if init has not been called", () => {
   const crypto = new Crypto();
-  expect(() => crypto.encrypt("i_am_a_password", "hello world")).toThrow();
+  expect(() =>
+    crypto.encrypt({ password: "i_am_a_password", data: "hello world" })
+  ).toThrow();
 });
 
 test("encrypt should encrypt the data", async () => {
   const crypto = new Crypto();
   await crypto.init();
-  const result = crypto.encrypt("i_am_a_password", "hello world");
+  const result = crypto.encrypt({
+    password: "i_am_a_password",
+    data: "hello world",
+  });
   expect(result.cipher).not.toBe("hello world");
   expect(result.iv).toBeDefined();
   expect(result.salt).toBeDefined();
@@ -23,8 +28,14 @@ test("encrypt should encrypt the data", async () => {
 test("decrypt should result in plain text", async () => {
   const crypto = new Crypto();
   await crypto.init();
-  const result = crypto.encrypt("i_am_a_password", "hello world");
+  const result = crypto.encrypt({
+    password: "i_am_a_password",
+    data: "hello world",
+  });
 
-  const decrypted = crypto.decrypt("i_am_a_password", { ...result });
+  const decrypted = crypto.decrypt({
+    password: "i_am_a_password",
+    data: { ...result },
+  });
   expect(decrypted).toBe("hello world");
 });
