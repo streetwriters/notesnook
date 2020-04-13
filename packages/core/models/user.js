@@ -26,7 +26,8 @@ export default class User {
       password,
       grant_type: "password",
     });
-    let user = userFromResponse(response);
+    const key = await this.context.deriveKey(password);
+    let user = userFromResponse(response, key);
     await this.context.write("user", user);
   }
 
@@ -63,18 +64,20 @@ export default class User {
       password,
       email,
     });
-    let user = userFromResponse(response);
+    const key = await this.context.deriveKey(password);
+    let user = userFromResponse(response, key);
     await this.context.write("user", user);
   }
 }
 
-function userFromResponse(response) {
+async function userFromResponse(response, key) {
   let user = {
     ...response.payload,
     accessToken: response.access_token,
     refreshToken: response.refresh_token,
     scopes: response.scopes,
     expiry: Date.now() + response.expiry * 100,
+    key,
   };
   return user;
 }

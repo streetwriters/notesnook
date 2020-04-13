@@ -23,4 +23,7 @@ export default class Storage {
   decrypt(password, cipher) {
     return this.storage.decrypt(password, cipher);
   }
+  deriveKey(password) {
+    return this.storage.deriveKey(password, null, true);
+  }
 }
