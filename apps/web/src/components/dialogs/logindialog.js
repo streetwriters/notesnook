@@ -8,12 +8,12 @@ import { useStore } from "../../stores/user-store";
 import PasswordInput from "../inputs/password";
 import Dropper from "../dropper";
 
+const form = { error: true };
 function LoginDialog(props) {
   const { onClose } = props;
   const [error, setError] = useState();
   const isLoggingIn = useStore((store) => store.isLoggingIn);
   const login = useStore((store) => store.login);
-  const form = { error: true };
 
   return (
     <Dialog
@@ -51,6 +51,7 @@ function LoginDialog(props) {
 function submit(setError, form, login, onClose) {
   setError();
   if (form.error) return;
+
   login(form)
     .then(onClose)
     .catch((e) => setError(e.message));

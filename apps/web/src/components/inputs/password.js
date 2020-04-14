@@ -12,7 +12,10 @@ function PasswordInput(props) {
           title="Confirm Password"
           type="password"
           error="Passwords do not match"
-          validate={(password, form) => form.password === password}
+          name="confirm"
+          validate={(password, form) =>
+            !form.password || form.password === password
+          }
         />
       )}
     </Dropper>

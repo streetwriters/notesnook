@@ -9,12 +9,12 @@ import PasswordInput from "../inputs/password";
 import Dropper from "../dropper";
 import { useStore } from "../../stores/user-store";
 
+const form = { error: true };
 function SignUpDialog(props) {
   const { onClose } = props;
   const [error, setError] = useState();
   const isSigningIn = useStore((store) => store.isSigningIn);
   const signup = useStore((store) => store.signup);
-  const form = { error: true };
 
   return (
     <Dialog
@@ -49,6 +49,10 @@ function SignUpDialog(props) {
 
 function submit(setError, form, signup, onClose) {
   setError();
+  if (form.password !== form.confirm) {
+    form.error = true;
+    setError("Passwords do not match.");
+  }
   if (form.error) return;
   signup(form)
     .then(onClose)
