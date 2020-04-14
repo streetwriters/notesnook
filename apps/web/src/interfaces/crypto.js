@@ -27,7 +27,7 @@ class Crypto {
       3, // operations limit
       1024 * 1024 * 8, // memory limit (8MB)
       this.sodium.crypto_pwhash_ALG_ARGON2I13,
-      exportKey ? "hex" : "uint8array"
+      exportKey ? "base64" : "uint8array"
     );
     const saltHex = this.sodium.to_base64(salt);
     this.sodium.memzero(salt);
@@ -45,7 +45,7 @@ class Crypto {
       salt = result.salt;
     } else if (passwordOrKey.key && passwordOrKey.salt) {
       salt = passwordOrKey.salt;
-      key = this.sodium.from_hex(passwordOrKey.key);
+      key = this.sodium.from_base64(passwordOrKey.key);
     }
     return { key, salt };
   };
@@ -80,6 +80,7 @@ class Crypto {
       cipher,
       iv,
       salt,
+      length: data.length,
     };
   };
 
@@ -90,9 +91,7 @@ class Crypto {
    */
   decrypt = async (passwordOrKey, { iv, cipher }) => {
     await this._initialize();
-
     const { key } = await this._getKey(passwordOrKey);
-    console.log(key, iv, cipher, passwordOrKey);
 
     const plainText = this.sodium.crypto_aead_xchacha20poly1305_ietf_decrypt(
       undefined,
