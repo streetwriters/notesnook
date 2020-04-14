@@ -1,6 +1,6 @@
 import createStore from "../common/store";
 import BaseStore from "./index";
-import Config from "../common/config";
+import Config from "../utils/config";
 
 class ThemeStore extends BaseStore {
   theme = Config.get("theme", "light");
