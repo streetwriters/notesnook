@@ -99,13 +99,11 @@ class AddNotebookDialog extends React.Component {
         <Box my={1}>
           <Input
             autoFocus
-            variant="default"
             onChange={(e) => (this.title = e.target.value)}
             placeholder="Enter name"
             defaultValue={this.title}
           />
           <Input
-            variant="default"
             sx={{ marginTop: 1 }}
             onChange={(e) => (this.description = e.target.value)}
             placeholder="Enter description (optional)"
@@ -128,7 +126,6 @@ class AddNotebookDialog extends React.Component {
                     this._inputRefs[index] = ref;
                     if (ref) ref.value = value; // set default value
                   }}
-                  variant="default"
                   placeholder="Topic name"
                   onFocus={(e) => {
                     this.lastLength = e.nativeEvent.target.value.length;
