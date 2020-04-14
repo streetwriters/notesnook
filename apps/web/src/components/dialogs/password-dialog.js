@@ -23,7 +23,7 @@ function PasswordDialog(props) {
       icon={props.icon}
       positiveButton={{
         text: props.positiveButtonText,
-        onClick: submit
+        onClick: submit,
       }}
       negativeButton={{ text: "Cancel", onClick: props.onCancel }}
     >
@@ -31,10 +31,10 @@ function PasswordDialog(props) {
         <Input
           ref={passwordRef}
           autoFocus
-          variant={isWrong ? "error" : "default"}
+          variant={isWrong ? "error" : "input"}
           type="password"
           placeholder="Enter vault password"
-          onKeyUp={async e => {
+          onKeyUp={async (e) => {
             if (e.key === "Enter") {
               await submit();
             } else {
@@ -61,19 +61,19 @@ function getDialogData(type) {
       return {
         title: "Set Up Your Vault",
         icon: Icon.Vault,
-        positiveButtonText: "Done"
+        positiveButtonText: "Done",
       };
     case "unlock_vault":
       return {
         title: "Unlock Vault",
         icon: Icon.Unlock,
-        positiveButtonText: "Unlock"
+        positiveButtonText: "Unlock",
       };
     case "unlock_note":
       return {
         title: "Unlock Note",
         icon: Icon.Unlock,
-        positiveButtonText: "Unlock"
+        positiveButtonText: "Unlock",
       };
     default:
       return;
@@ -82,7 +82,7 @@ function getDialogData(type) {
 
 export function showPasswordDialog(type, validate) {
   const { title, icon, positiveButtonText } = getDialogData(type);
-  return showDialog(perform => (
+  return showDialog((perform) => (
     <PasswordDialog
       title={title}
       icon={icon}

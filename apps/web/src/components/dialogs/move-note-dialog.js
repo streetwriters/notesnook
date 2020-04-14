@@ -15,7 +15,7 @@ class MoveDialog extends React.Component {
     items: db.notebooks.all,
     type: "notebooks",
     title: "Notebooks",
-    mode: "read"
+    mode: "read",
   };
 
   render() {
@@ -51,7 +51,7 @@ class MoveDialog extends React.Component {
               props.onClose();
             }
           },
-          disabled: type !== "notes"
+          disabled: type !== "notes",
         }}
         negativeButton={{ text: "Cancel", onClick: props.onClose }}
       >
@@ -66,7 +66,7 @@ class MoveDialog extends React.Component {
                 sx={{
                   display: this.history.length ? "block" : "none",
                   ":hover": { color: "primary" },
-                  marginRight: 2
+                  marginRight: 2,
                 }}
               >
                 <Icon.ArrowLeft />
@@ -86,23 +86,22 @@ class MoveDialog extends React.Component {
               }}
               sx={{
                 display: type === "notes" ? "none" : "block",
-                ":hover": { color: "primary" }
+                ":hover": { color: "primary" },
               }}
             >
               {mode === "read" ? <Icon.Plus /> : <Icon.Minus />}
             </Text>
           </Flex>
           <Input
-            ref={ref => (this._inputRef = ref)}
-            variant="default"
+            ref={(ref) => (this._inputRef = ref)}
             sx={{ display: mode === "write" ? "block" : "none" }}
             my={1}
             placeholder={type === "notebooks" ? "Notebook name" : "Topic name"}
-            onKeyUp={async e => {
+            onKeyUp={async (e) => {
               if (e.nativeEvent.key === "Enter" && e.target.value.length > 0) {
                 if (type === "notebooks") {
                   await db.notebooks.add({
-                    title: e.target.value
+                    title: e.target.value,
                   });
                   this.setState({ items: db.notebooks.all });
                 } else {
@@ -111,7 +110,7 @@ class MoveDialog extends React.Component {
                     .topics.add(e.target.value);
                   this.setState({
                     items: db.notebooks.notebook(this.selectedNotebook.id)
-                      .topics.all
+                      .topics.all,
                   });
                 }
                 this._inputRef.value = "";
@@ -125,11 +124,11 @@ class MoveDialog extends React.Component {
               borderStyle: "solid",
               borderColor: "border",
               maxHeight: 8 * 30,
-              overflowY: "auto"
+              overflowY: "auto",
             }}
           >
             {items.length ? (
-              items.map(item => {
+              items.map((item) => {
                 return (
                   <Flex
                     key={item.title + item.dateCreated}
@@ -139,19 +138,19 @@ class MoveDialog extends React.Component {
                       borderBottomColor: "border",
                       borderBottomStyle: "solid",
                       cursor: "pointer",
-                      ":hover": { borderBottomColor: "primary" }
+                      ":hover": { borderBottomColor: "primary" },
                     }}
                     onClick={() => {
                       this.history.push({
                         title,
                         items,
-                        type
+                        type,
                       });
                       if (type === "notebooks") {
                         this.setState({
                           type: "topics",
                           items: item.topics,
-                          title: item.title
+                          title: item.title,
                         });
                         this.selectedNotebook = item;
                       } else if (type === "topics") {
@@ -160,7 +159,7 @@ class MoveDialog extends React.Component {
                           title: `${this.selectedNotebook.title} - ${item.title}`,
                           items: db.notebooks
                             .notebook(this.selectedNotebook.id)
-                            .topics.topic(item.title).all
+                            .topics.topic(item.title).all,
                         });
                         this.selectedTopic = item.title;
                       }
@@ -192,7 +191,7 @@ class MoveDialog extends React.Component {
 }
 
 export function showMoveNoteDialog(noteIds) {
-  return showDialog(perform => (
+  return showDialog((perform) => (
     <MoveDialog
       noteIds={noteIds}
       onClose={() => perform(false)}

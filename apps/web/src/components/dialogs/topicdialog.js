@@ -15,15 +15,14 @@ function TopicDialog(props) {
       icon={props.icon}
       positiveButton={{
         text: "Add",
-        onClick: props.onYes.bind(this, topic)
+        onClick: props.onYes.bind(this, topic),
       }}
       negativeButton={{ text: "Cancel", onClick: props.onNo }}
     >
       <Box my={1}>
         <Input
-          variant="default"
           placeholder="name"
-          onChange={e => {
+          onChange={(e) => {
             setTopic(e.target.value);
           }}
         ></Input>
@@ -33,14 +32,14 @@ function TopicDialog(props) {
 }
 
 export function showTopicDialog(notebook) {
-  return showDialog(perform => (
+  return showDialog((perform) => (
     <TopicDialog
       title={"Topic"}
       icon={Icon.Topic}
       onNo={() => {
         perform(false);
       }}
-      onYes={async topic => {
+      onYes={async (topic) => {
         if (!topic) return;
         await db.notebooks.notebook(notebook).topics.add(topic);
         store.setSelectedNotebookTopics(notebook);
