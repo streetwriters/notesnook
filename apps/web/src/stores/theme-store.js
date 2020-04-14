@@ -1,12 +1,14 @@
 import createStore from "../common/store";
 import BaseStore from "./index";
+import Config from "../common/config";
 
 class ThemeStore extends BaseStore {
-  theme = "light";
-  accent = "#0560ff";
+  theme = Config.get("theme", "light");
+  accent = Config.get("accent", "#0560ff");
 
   setTheme = (theme) => {
     this.set((state) => (state.theme = theme));
+    Config.set("theme", theme);
   };
 
   toggleNightMode = () => {
@@ -16,6 +18,7 @@ class ThemeStore extends BaseStore {
 
   setAccent = (accent) => {
     this.set((state) => (state.accent = accent));
+    Config.set("accent", accent);
   };
 }
 
