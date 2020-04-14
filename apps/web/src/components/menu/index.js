@@ -15,7 +15,7 @@ function Menu(props) {
         border: "2px solid",
         borderColor: "border",
         width: 140,
-        ...props.sx
+        ...props.sx,
       }}
     >
       <Box width="100%">
@@ -30,11 +30,11 @@ function Menu(props) {
           Properties
         </Text>
         {props.menuItems.map(
-          item =>
+          (item) =>
             !item.invisible && (
               <Flex
                 key={item.title}
-                onClick={e => {
+                onClick={(e) => {
                   e.stopPropagation();
                   Dropdown.closeLastOpened();
                   if (props.closeMenu) {
@@ -49,10 +49,10 @@ function Menu(props) {
                 py={"8px"}
                 px={3}
                 sx={{
-                  color: item.color || "fontPrimary",
+                  color: item.color || "text",
                   ":hover": {
-                    backgroundColor: "shade"
-                  }
+                    backgroundColor: "shade",
+                  },
                 }}
               >
                 <Text as="span" fontFamily="body" fontSize="menu">
