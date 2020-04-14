@@ -75,7 +75,7 @@ export default class User {
   }
 }
 
-async function userFromResponse(response, key) {
+function userFromResponse(response, key) {
   let user = {
     ...response.payload,
     accessToken: response.access_token,
