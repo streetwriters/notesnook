@@ -18,13 +18,14 @@ class NoteStore extends BaseStore {
   };
 
   refresh = () => {
-    if (this.get().context) this.refreshContext();
-    else this.set((state) => (state.notes = db.notes.group(undefined, true)));
+    this.refreshContext();
+    this.set((state) => (state.notes = db.notes.group(undefined, true)));
   };
 
   refreshContext = () => {
-    if (!this.get().context) return;
-    this.setContext(this.context);
+    const context = this.get().context;
+    if (!context) return;
+    this.setContext(context);
   };
 
   setContext = (context) => {
