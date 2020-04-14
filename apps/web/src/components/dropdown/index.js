@@ -1,8 +1,6 @@
 import React, { cloneElement, Component } from "react";
 import PropTypes from "prop-types";
 import { findDOMNode } from "react-dom";
-import cx from "classnames";
-
 import DropdownTrigger from "./dropdown-trigger";
 import DropdownContent from "./dropdown-content";
 import "./styles/Dropdown.css";
@@ -29,7 +27,7 @@ class Dropdown extends Component {
     super(props);
 
     this.state = {
-      active: false
+      active: false,
     };
 
     this._onWindowClick = this._onWindowClick.bind(this);
@@ -45,7 +43,7 @@ class Dropdown extends Component {
   hide() {
     this.setState(
       {
-        active: false
+        active: false,
       },
       () => {
         if (this.props.onHide) {
@@ -58,7 +56,7 @@ class Dropdown extends Component {
   show() {
     this.setState(
       {
-        active: true
+        active: true,
       },
       () => {
         if (this.props.onShow) {
@@ -94,29 +92,38 @@ class Dropdown extends Component {
     event.stopPropagation();
   }
 
+  cx(classes) {
+    let names = "";
+    for (let c in classes) {
+      if (classes[c]) names += c;
+    }
+    return names;
+  }
+
   render() {
     const { children, className, disabled, removeElement } = this.props;
     // create component classes
     const active = this.isActive();
-    const dropdownClasses = cx({
+
+    const dropdownClasses = this.cx({
       dropdown: true,
       "dropdown--active": active,
-      "dropdown--disabled": disabled
+      "dropdown--disabled": disabled,
     });
     // stick callback on trigger element
-    const boundChildren = React.Children.map(children, child => {
+    const boundChildren = React.Children.map(children, (child) => {
       if (child.type === DropdownTrigger) {
         const originalOnClick = child.props.onClick;
         child = cloneElement(child, {
           ref: "trigger",
-          onClick: event => {
+          onClick: (event) => {
             if (!disabled) {
               this._onToggleClick(event);
               if (originalOnClick) {
                 originalOnClick.apply(child, arguments);
               }
             }
-          }
+          },
         });
       } else if (child.type === DropdownContent && removeElement && !active) {
         child = null;
@@ -145,11 +152,11 @@ Dropdown.propTypes = {
   children: PropTypes.node,
   className: PropTypes.string,
   removeElement: PropTypes.bool,
-  style: PropTypes.object
+  style: PropTypes.object,
 };
 
 Dropdown.defaultProps = {
-  className: ""
+  className: "",
 };
 
 export { DropdownTrigger, DropdownContent };
