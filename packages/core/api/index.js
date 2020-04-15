@@ -14,8 +14,10 @@ class Database {
   constructor(context) {
     this.context = new Storage(context);
   }
+
   async init() {
-    this.notebooks = new Notebooks(this.context);
+    this.notes = await Notes.new(this);
+    /* this.notebooks = new Notebooks(this.context);
     this.notes = new Notes(this.context);
     this.trash = new Trash(this.context);
     this.user = new User(this.context);
@@ -40,7 +42,7 @@ class Database {
     this.syncer = new Sync(this);
     this.vault = new Vault(this, this.context);
     this.conflicts = new Conflicts(this);
-    this.lookup = new Lookup(this);
+    this.lookup = new Lookup(this); */
   }
 
   sync() {

@@ -1,6 +1,5 @@
-import CachedCollection from "../database/cached-collection";
-import fuzzysearch from "fuzzysearch";
 import { groupBy, isHex } from "../utils";
+import Collection from "./collection";
 import sort from "fast-sort";
 import {
   getWeekGroupFromTimestamp,
@@ -8,42 +7,14 @@ import {
   getLastWeekTimestamp,
   get7DayTimestamp,
 } from "../utils/date";
-import Notebooks from "./notebooks";
 import Note from "../models/note";
-import Trash from "./trash";
 import getId from "../utils/id";
-import Tags from "./tags";
-import Content from "./content";
-
 var tfun = require("transfun/transfun.js").tfun;
 if (!tfun) {
   tfun = global.tfun;
 }
 
-export default class Notes {
-  constructor(context) {
-    this._collection = new CachedCollection(context, "notes");
-  }
-
-  /**
-   *
-   * @param {Notebooks} notebooks
-   * @param {Trash} trash
-   * @param {Tags} tags
-   * @param {Tags} colors
-   * @param {Content} delta
-   * @param {Content} text
-   */
-  async init(notebooks, trash, tags, colors, delta, text) {
-    await this._collection.init();
-    this._notebooks = notebooks;
-    this._trash = trash;
-    this._tagsCollection = tags;
-    this._colorsCollection = colors;
-    this._deltaCollection = delta;
-    this._textCollection = text;
-  }
-
+export default class Notes extends Collection {
   async add(noteArg) {
     if (!noteArg) return;
     if (noteArg.remote) {
@@ -76,7 +47,7 @@ export default class Notes {
     if (!deltaId && isHex(delta)) deltaId = delta;
 
     if (delta && typeof delta === "object") {
-      deltaId = await this._deltaCollection.add({
+      deltaId = await this._db.delta.add({
         noteId: id,
         id: deltaId,
         data: delta.data || delta,
@@ -86,7 +57,7 @@ export default class Notes {
     }
 
     if (text !== textId) {
-      textId = await this._textCollection.add({
+      textId = await this._db.text.add({
         noteId: id,
         id: textId,
         data: text,
@@ -113,11 +84,11 @@ export default class Notes {
 
     if (!oldNote) {
       for (let color of note.colors) {
-        await this._colorsCollection.add(color, id);
+        await this._db.colors.add(color, id);
       }
 
       for (let tag of note.tags) {
-        await this._tagsCollection.add(tag, id);
+        await this._db.tags.add(tag, id);
       }
     }
 
@@ -158,13 +129,11 @@ export default class Notes {
   }
 
   tagged(tag) {
-    return this._tagsCollection
-      .notes(tag)
-      .map((id) => this._collection.getItem(id));
+    return this._db.tags.notes(tag).map((id) => this._collection.getItem(id));
   }
 
   colored(color) {
-    return this._colorsCollection
+    return this._db.colors
       .notes(color)
       .map((id) => this._collection.getItem(id));
   }
@@ -219,20 +188,20 @@ export default class Notes {
       if (!item) continue;
       if (item.notebook && item.notebook.id && item.notebook.topic) {
         await this._collection.transaction(() =>
-          this._notebooks
+          this._db.notebooks
             .notebook(item.notebook.id)
             .topics.topic(item.notebook.topic)
             .delete(id)
         );
       }
       for (let tag of item.tags) {
-        await this._tagsCollection.remove(tag, id);
+        await this._db.tags.remove(tag, id);
       }
       for (let color of item.colors) {
-        await this._colorsCollection.remove(color, id);
+        await this._db.colors.remove(color, id);
       }
       await this._collection.removeItem(id);
-      await this._trash.add(item.data);
+      await this._db.trash.add(item.data);
     }
   }
 
@@ -242,7 +211,7 @@ export default class Notes {
       throw new Error(
         "The destination notebook must contain notebookId and topic."
       );
-    let topic = this._notebooks.notebook(to.id).topics.topic(to.topic);
+    let topic = this._db.notebooks.notebook(to.id).topics.topic(to.topic);
     if (!topic) throw new Error("No such topic exists.");
     await topic.add(...noteIds);
   }
