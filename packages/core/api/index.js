@@ -17,6 +17,7 @@ class Database {
 
   async init() {
     this.notes = await Notes.new(this);
+    this.notebooks = await Notebooks.new(this);
     /* this.notebooks = new Notebooks(this.context);
     this.notes = new Notes(this.context);
     this.trash = new Trash(this.context);

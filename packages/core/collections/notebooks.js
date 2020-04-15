@@ -1,29 +1,14 @@
-import CachedCollection from "../database/cached-collection";
+import Collection from "./collection";
 import fuzzysearch from "fuzzysearch";
 import Notebook from "../models/notebook";
 import sort from "fast-sort";
 import getId from "../utils/id";
-
 var tfun = require("transfun/transfun.js").tfun;
 if (!tfun) {
   tfun = global.tfun;
 }
-export default class Notebooks {
-  constructor(context) {
-    this._collection = new CachedCollection(context, "notebooks");
-  }
 
-  /**
-   *
-   * @param {import('./notes').default} notes
-   * @param {import('./trash').default} trash
-   */
-  init(notes, trash) {
-    this._trash = trash;
-    this._notes = notes;
-    return this._collection.init();
-  }
-
+export default class Notebooks extends Collection {
   async add(notebookArg) {
     if (!notebookArg) throw new Error("Notebook cannot be undefined or null.");
 
@@ -97,7 +82,7 @@ export default class Notebooks {
         notebook.topics.delete(...notebook.data.topics)
       );
       await this._collection.removeItem(id);
-      await this._trash.add(notebook.data);
+      await this._db.trash.add(notebook.data);
     }
   }
 
