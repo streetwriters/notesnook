@@ -5,7 +5,11 @@ class Collection {
   static async new(db, name = undefined, cached = true) {
     const collection = new this(db, name || this.name.toLowerCase(), cached);
     await collection._collection.init();
+
     if (collection.init) await collection.init();
+    if (collection.clear)
+      this._db.ev.subscribe("clear", collection._collection.clear);
+
     return collection;
   }
 

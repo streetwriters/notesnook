@@ -1,17 +1,17 @@
 import { HOST, HEADERS } from "../utils/constants";
-import StorageInterface from "../database/storage";
 
 export default class User {
   /**
    *
-   * @param {StorageInterface} context
+   * @param {import("../api").default} db
    */
-  constructor(context) {
-    this.context = context;
+  constructor(db) {
+    this._db = db;
+    this._context = db._context;
   }
 
   get() {
-    return this.context.read("user");
+    return this._context.read("user");
   }
 
   async key() {
@@ -22,7 +22,7 @@ export default class User {
   async set(user) {
     if (!user) return;
     user = { ...(await this.get()), ...user };
-    await this.context.write("user", user);
+    await this._context.write("user", user);
   }
 
   async login(username, password) {
@@ -31,16 +31,16 @@ export default class User {
       password,
       grant_type: "password",
     });
-    const key = await this.context.deriveKey(password, response.payload.salt);
+    const key = await this._context.deriveKey(password, response.payload.salt);
     let user = userFromResponse(response, key);
-    await this.context.write("user", user);
+    await this._context.write("user", user);
   }
 
   async token() {
     let user = await this.get();
     if (!user) return;
     if (!user.accessToken) {
-      return await this.context.remove("user");
+      return await this._context.remove("user");
     }
     if (user.expiry > Date.now()) {
       return user.accessToken;
@@ -56,11 +56,12 @@ export default class User {
       refreshToken: response.refresh_token,
       expiry: Date.now() + response.expiry * 100,
     };
-    await this.context.write("user", user);
+    await this._context.write("user", user);
   }
 
   logout() {
-    return this.context.clear();
+    this._db.ev.publish("clear");
+    return this._context.clear();
   }
 
   async signup(username, email, password) {
@@ -69,9 +70,9 @@ export default class User {
       password,
       email,
     });
-    const key = await this.context.deriveKey(password, response.payload.salt);
+    const key = await this._context.deriveKey(password, response.payload.salt);
     let user = userFromResponse(response, key);
-    await this.context.write("user", user);
+    await this._context.write("user", user);
   }
 }
 

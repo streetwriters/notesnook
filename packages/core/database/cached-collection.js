@@ -14,6 +14,10 @@ export default class CachedCollection {
     if (data.length > 0) this.map = new Map(data);
   }
 
+  clear = () => {
+    this.map.clear();
+  };
+
   /**
    *
    * @param {Promise} ops
@@ -54,7 +58,7 @@ export default class CachedCollection {
       id,
       deleted: true,
       dateEdited: Date.now(),
-      dateCreated: Date.now()
+      dateCreated: Date.now(),
     };
     await this.indexer.write(id, deletedItem);
     this.map.set(id, deletedItem);
@@ -72,9 +76,9 @@ export default class CachedCollection {
     return Array.from(this.map.values());
   }
 
-  getAllItems(sortFn = u => u.dateCreated) {
+  getAllItems(sortFn = (u) => u.dateCreated) {
     let items = [];
-    this.map.forEach(value => {
+    this.map.forEach((value) => {
       if (value.deleted) return;
       items[items.length] = value;
     });
