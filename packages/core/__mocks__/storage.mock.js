@@ -26,12 +26,21 @@ function clear() {
 
 function encrypt(password, data) {
   return new Promise((resolve, reject) =>
-    resolve({ iv: "some iv", cipher: data })
+    resolve({
+      iv: "some iv",
+      cipher: data,
+      salt: "i am some salt",
+      length: data.length,
+      key: password,
+    })
   );
 }
 
-function decrypt(password, data) {
-  return new Promise((resolve, reject) => resolve(data.cipher));
+function decrypt(key, data) {
+  return new Promise((resolve, reject) => {
+    if (key.password === data.key.password) resolve(data.cipher);
+    else reject("Wrong password");
+  });
 }
 
 function deriveKey(password, salt) {
