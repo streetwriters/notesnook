@@ -25,7 +25,8 @@ function clear() {
 }
 
 function encrypt(password, data) {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
+    if (typeof data === "object") reject("data cannot be object.");
     resolve({
       iv: "some iv",
       cipher: data,

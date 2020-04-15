@@ -109,7 +109,10 @@ export default class Vault {
     if (text === textId) text = await this._db.text.get(textId);
 
     text = await this._context.encrypt({ password: this._password }, text);
-    delta = await this._context.encrypt({ password: this._password }, delta);
+    delta = await this._context.encrypt(
+      { password: this._password },
+      JSON.stringify(delta)
+    );
 
     await this._db.text.add({ id: textId, data: text });
     await this._db.delta.add({ id: deltaId, data: delta });
