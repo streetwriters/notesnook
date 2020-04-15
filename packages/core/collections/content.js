@@ -12,6 +12,14 @@ export default class Content {
 
   async add(content) {
     if (!content) return;
+
+    if (content.id && (await this._collection.exists(content.id))) {
+      content = {
+        ...(await this.raw(content.id)),
+        ...content,
+      };
+    }
+
     const id = content.id || getId();
     await this._collection.addItem({
       noteId: content.noteId,

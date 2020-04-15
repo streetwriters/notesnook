@@ -67,8 +67,8 @@ export default class Vault {
 
   async add(id) {
     await this._check();
-    const note = this._db.notes.note(id).data;
-    await this._lockNote(id, note);
+    //const note = this._db.notes.note(id).data;
+    await this._lockNote(id);
   }
 
   async remove(id, password) {
@@ -122,16 +122,14 @@ export default class Vault {
   }
 
   async _lockNote(id, note) {
-    if (!note) return;
-
-    let oldNote = this._db.notes.note(id);
+    note = note || this._db.notes.note(id).data;
 
     let deltaId = 0;
     let textId = 0;
 
-    if (oldNote && oldNote.data.content) {
-      deltaId = oldNote.data.content.delta;
-      textId = oldNote.data.content.text;
+    if (note && note.content) {
+      deltaId = note.content.delta;
+      textId = note.content.text;
     }
 
     await this._encryptContent(note.content, { textId, deltaId });
