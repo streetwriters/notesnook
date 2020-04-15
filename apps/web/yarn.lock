@@ -6583,7 +6583,7 @@ levn@^0.3.0, levn@~0.3.0:
     prelude-ls "~1.1.2"
     type-check "~0.3.2"
 
-libsodium-wrappers@0.7.6, libsodium-wrappers@^0.7.6:
+libsodium-wrappers@0.7.6:
   version "0.7.6"
   resolved "https://registry.yarnpkg.com/libsodium-wrappers/-/libsodium-wrappers-0.7.6.tgz#baed4c16d4bf9610104875ad8a8e164d259d48fb"
   integrity sha512-OUO2CWW5bHdLr6hkKLHIKI4raEkZrf3QHkhXsJ1yCh6MZ3JDA7jFD3kCATNquuGSG6MjjPHQIQms0y0gBDzjQg==
@@ -7253,11 +7253,10 @@ normalize-url@^3.0.0, normalize-url@^3.0.1:
 
 "notes-core@git+ssh://git@github.com:streetwriters/notesnook-core.git":
   version "1.3.0"
-  resolved "git+ssh://git@github.com:streetwriters/notesnook-core.git#51209ca353908393e54e810382c940eb158849fc"
+  resolved "git+ssh://git@github.com:streetwriters/notesnook-core.git#9d45d4a13f74ceb5221a38425663a285561307c4"
   dependencies:
     fast-sort "^2.0.1"
     fuzzysearch "^1.0.3"
-    libsodium-wrappers "^0.7.6"
     qclone "^1.0.4"
     transfun "^1.0.2"
 

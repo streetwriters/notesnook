@@ -69,7 +69,6 @@ class NoteStore extends BaseStore {
 
   favorite = async (note) => {
     await db.notes.note(note).favorite();
-    this.refreshContext.defer();
     this._setValue(note.id, "favorite", !note.favorite);
   };
 
@@ -94,6 +93,7 @@ class NoteStore extends BaseStore {
       arr[index][prop] = value;
       this._syncEditor(noteId, prop);
     });
+    this.refresh.defer();
   };
 
   /**
