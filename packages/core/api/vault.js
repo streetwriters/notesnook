@@ -159,7 +159,7 @@ export default class Vault {
 
     return {
       ...note,
-      content: { delta },
+      content: { delta, text },
     };
   }
 }
