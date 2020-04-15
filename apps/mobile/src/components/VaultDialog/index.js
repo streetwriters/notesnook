@@ -1,10 +1,10 @@
-import React, {Component, createRef} from 'react';
-import {Modal, Text, TouchableOpacity, View} from 'react-native';
-import {TextInput} from 'react-native-gesture-handler';
+import React, { Component, createRef } from 'react';
+import { Modal, Text, TouchableOpacity, View } from 'react-native';
+import { TextInput } from 'react-native-gesture-handler';
 import Share from 'react-native-share';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {opacity, ph, pv, SIZE, WEIGHT} from '../../common/common';
-import {ACTIONS} from '../../provider/actions';
+import { opacity, ph, pv, SIZE, WEIGHT } from '../../common/common';
+import { ACTIONS } from '../../provider/actions';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -16,10 +16,10 @@ import {
   eOpenVaultDialog,
   refreshNotesPage,
 } from '../../services/events';
-import {openEditorAnimation} from '../../utils/animations';
-import {db, DDS, getElevation, ToastEvent} from '../../utils/utils';
-import {updateEvent} from '../DialogManager/recievers';
-import {Toast} from '../Toast';
+import { openEditorAnimation } from '../../utils/animations';
+import { db, DDS, getElevation, ToastEvent } from '../../utils/utils';
+import { updateEvent } from '../DialogManager/recievers';
+import { Toast } from '../Toast';
 
 const passInputRef = createRef();
 const confirmPassRef = createRef();
@@ -75,7 +75,7 @@ export class VaultDialog extends Component {
   };
 
   close = () => {
-    updateEvent({type: ACTIONS.NOTES});
+    updateEvent({ type: ACTIONS.NOTES });
 
     this.password = null;
     this.confirmPassword = null;
@@ -161,10 +161,13 @@ export class VaultDialog extends Component {
   }
 
   async _openNote() {
+
     db.vault
       .open(this.state.note.id, this.password)
-      .then(async () => {
+      .then(async (note) => {
+
         if (this.state.goToEditor) {
+
           this._openInEditor(note);
         } else if (this.state.share) {
           this._shareNote(note);
@@ -173,13 +176,14 @@ export class VaultDialog extends Component {
         }
       })
       .catch(e => {
+
         this._takeErrorAction(e);
       });
   }
   async _deleteNote() {
     await db.notes.delete(this.state.note.id);
-    updateEvent({type: ACTIONS.NOTES});
-    updateEvent({type: ACTIONS.FAVORITES});
+    updateEvent({ type: ACTIONS.NOTES });
+    updateEvent({ type: ACTIONS.FAVORITES });
     eSendEvent(refreshNotesPage);
     this.close();
     ToastEvent.show('Note deleted', 'success', 'local');
@@ -206,7 +210,9 @@ export class VaultDialog extends Component {
   }
 
   _openInEditor(note) {
+
     eSendEvent(eOnLoadNote, note);
+
     if (!DDS.isTab) {
       openEditorAnimation();
     }
@@ -237,7 +243,7 @@ export class VaultDialog extends Component {
   }
 
   render() {
-    const {colors} = this.props;
+    const { colors } = this.props;
     const {
       note,
       visible,
@@ -295,14 +301,14 @@ export class VaultDialog extends Component {
                 {!novault
                   ? 'Create vault'
                   : note.locked
-                  ? this.state.deleteNote
-                    ? 'Delete note'
-                    : this.state.share
-                    ? 'Share note'
-                    : this.state.goToEditor
-                    ? 'Unlock note'
-                    : 'Unlock note'
-                  : 'Lock note'}
+                    ? this.state.deleteNote
+                      ? 'Delete note'
+                      : this.state.share
+                        ? 'Share note'
+                        : this.state.goToEditor
+                          ? 'Unlock note'
+                          : 'Unlock note'
+                    : 'Lock note'}
               </Text>
             </View>
 
@@ -320,16 +326,16 @@ export class VaultDialog extends Component {
               {!novault
                 ? 'Set a password to create vault'
                 : permanant
-                ? 'Enter password to remove note from vault.'
-                : note.locked
-                ? this.state.deleteNote
-                  ? 'Unlock note to delete it.'
-                  : this.state.share
-                  ? 'Unlock note to share it.'
-                  : this.state.goToEditor
-                  ? 'Unlock note to open it in editor'
-                  : 'Enter vault password to unlock note.'
-                : 'Enter vault password to lock note.'}
+                  ? 'Enter password to remove note from vault.'
+                  : note.locked
+                    ? this.state.deleteNote
+                      ? 'Unlock note to delete it.'
+                      : this.state.share
+                        ? 'Unlock note to share it.'
+                        : this.state.goToEditor
+                          ? 'Unlock note to open it in editor'
+                          : 'Enter vault password to unlock note.'
+                    : 'Enter vault password to lock note.'}
             </Text>
 
             {note.locked || locked || permanant ? (
@@ -442,10 +448,10 @@ export class VaultDialog extends Component {
                     ? this.state.deleteNote
                       ? 'Delete'
                       : this.state.share
-                      ? 'Share '
-                      : this.state.goToEditor
-                      ? 'Open'
-                      : 'Unlock'
+                        ? 'Share '
+                        : this.state.goToEditor
+                          ? 'Open'
+                          : 'Unlock'
                     : 'Lock'}
                 </Text>
               </TouchableOpacity>
