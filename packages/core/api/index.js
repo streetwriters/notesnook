@@ -9,6 +9,7 @@ import Vault from "./vault";
 import Lookup from "./lookup";
 import Content from "../collections/content";
 import Conflicts from "./sync/conflicts";
+import EventManager from "../utils/event-manager";
 
 class Database {
   constructor(context) {
@@ -21,6 +22,7 @@ class Database {
     this.vault = new Vault(this);
     this.conflicts = new Conflicts(this);
     this.lookup = new Lookup(this);
+    this.ev = new EventManager();
 
     // collections
     /** @type {Notes} */
