@@ -69,15 +69,16 @@ class NoteStore extends BaseStore {
 
   favorite = async (note) => {
     await db.notes.note(note).favorite();
+    this.refreshContext.defer();
     this._setValue(note.id, "favorite", !note.favorite);
   };
 
-  unlock = (id) => {
-    Vault.unlockNote(id, () => this._setValue(id, "locked", false));
+  unlock = async (id) => {
+    await Vault.unlockNote(id, () => this._setValue(id, "locked", false));
   };
 
-  lock = (id) => {
-    Vault.lockNote(id, () => this._setValue(id, "locked", true));
+  lock = async (id) => {
+    await Vault.lockNote(id, () => this._setValue(id, "locked", true));
   };
 
   /**
@@ -93,7 +94,6 @@ class NoteStore extends BaseStore {
       arr[index][prop] = value;
       this._syncEditor(noteId, prop);
     });
-    this.refresh.defer();
   };
 
   /**

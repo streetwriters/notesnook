@@ -18,7 +18,7 @@ class Vault {
   }
 
   static unlockNote(id, done) {
-    showPasswordDialog("unlock_note", (password) => {
+    return showPasswordDialog("unlock_note", (password) => {
       return db.vault
         .remove(id, password)
         .then(() => true)
@@ -47,7 +47,7 @@ class Vault {
   }
 
   static lockNote(id, done) {
-    db.vault
+    return db.vault
       .add(id)
       .then(done)
       .catch(({ message }) => {

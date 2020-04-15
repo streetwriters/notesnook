@@ -7253,7 +7253,7 @@ normalize-url@^3.0.0, normalize-url@^3.0.1:
 
 "notes-core@git+ssh://git@github.com:streetwriters/notesnook-core.git":
   version "1.3.0"
-  resolved "git+ssh://git@github.com:streetwriters/notesnook-core.git#9d45d4a13f74ceb5221a38425663a285561307c4"
+  resolved "git+ssh://git@github.com:streetwriters/notesnook-core.git#9168dd22b467caf873bcdd00171693912d2b672a"
   dependencies:
     fast-sort "^2.0.1"
     fuzzysearch "^1.0.3"
