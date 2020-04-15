@@ -34,9 +34,9 @@ class Database {
     /** @type {Trash} */
     this.trash = await Trash.new(this);
     /** @type {Content} */
-    this.delta = await Content.new(this, false, "delta");
+    this.delta = await Content.new(this, "delta", false);
     /** @type {Content} */
-    this.text = await Content.new(this, false, "text");
+    this.text = await Content.new(this, "text", false);
   }
 
   sync() {

@@ -2,8 +2,8 @@ import CachedCollection from "../database/cached-collection";
 import IndexedCollection from "../database/indexed-collection";
 
 class Collection {
-  static async new(db, cached = true, name = undefined) {
-    const collection = new this(db, cached, name || this.name.toLowerCase());
+  static async new(db, name = undefined, cached = true) {
+    const collection = new this(db, name || this.name.toLowerCase(), cached);
     await collection._collection.init();
     if (collection.init) await collection.init();
     return collection;
@@ -13,7 +13,7 @@ class Collection {
    *
    * @param {import("../api").default} db
    */
-  constructor(db, cached, name) {
+  constructor(db, name, cached) {
     this._db = db;
     if (cached) this._collection = new CachedCollection(this._db.context, name);
     else this._collection = new IndexedCollection(this._db.context, name);
