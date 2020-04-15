@@ -38,14 +38,14 @@ class Crypto {
   };
 
   _getKey = async (passwordOrKey) => {
-    let key, salt;
-    if (passwordOrKey.password) {
-      const result = await this.deriveKey(passwordOrKey.password);
+    let { salt, key, password } = passwordOrKey;
+    if (password) {
+      const result = await this.deriveKey(password, salt);
       key = result.key;
       salt = result.salt;
-    } else if (passwordOrKey.key && passwordOrKey.salt) {
+    } else if (key && salt) {
       salt = passwordOrKey.salt;
-      key = this.sodium.from_base64(passwordOrKey.key);
+      key = this.sodium.from_base64(key);
     }
     return { key, salt };
   };
@@ -89,9 +89,9 @@ class Crypto {
    * @param {{password: string}|{key:string, salt: string}} passwordOrKey - password or derived key
    * @param {{salt: string, iv: string, cipher: string}} cipher - the cipher data
    */
-  decrypt = async (passwordOrKey, { iv, cipher }) => {
+  decrypt = async (passwordOrKey, { iv, cipher, salt }) => {
     await this._initialize();
-    const { key } = await this._getKey(passwordOrKey);
+    const { key } = await this._getKey({ salt, ...passwordOrKey });
 
     const plainText = this.sodium.crypto_aead_xchacha20poly1305_ietf_decrypt(
       undefined,
