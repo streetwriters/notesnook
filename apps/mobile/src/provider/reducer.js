@@ -1,6 +1,7 @@
 import { history, db } from '../utils/utils';
 import { ACTIONS } from './actions';
 import { sideMenuRef } from '../utils/refs';
+import storage from '../utils/storage';
 
 export const reducer = (state, action) => {
   switch (action.type) {
@@ -21,6 +22,23 @@ export const reducer = (state, action) => {
         favorites: db.notes.favorites,
         colorNotes: db.colors.all,
       };
+    }
+    case ACTIONS.CLEAR_ALL: {
+      storage.clear();
+      return {
+        ...state,
+        notes: [],
+        notebooks: [],
+        trash: [],
+        pinned: {
+          notes: [],
+          notebooks: []
+        },
+        tags: [],
+        favorites: [],
+        colorNotes: [],
+        user: null
+      }
     }
     case ACTIONS.NOTES:
       let notes;

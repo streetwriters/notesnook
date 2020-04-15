@@ -19,4 +19,5 @@ export const ACTIONS = {
   SETTINGS: 'getSettings',
   SELECT_ALL: 'selectAll',
   ALL: 'all',
+  CLEAR_ALL: 'allClear'
 };
