@@ -18,7 +18,7 @@ class Database {
   async init() {
     this.user = new User(this.context);
     this.syncer = new Sync(this);
-    this.vault = new Vault(this, this.context);
+    this.vault = new Vault(this);
     this.conflicts = new Conflicts(this);
     this.lookup = new Lookup(this);
 
