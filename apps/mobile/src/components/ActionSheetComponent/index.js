@@ -26,7 +26,8 @@ import { useTracked } from '../../provider';
 import { ACTIONS } from '../../provider/actions';
 import NavigationService from '../../services/NavigationService';
 import { timeConverter, ToastEvent, DDS, db } from '../../utils/utils';
-import { openVault } from '../../services/eventManager';
+import { openVault, eSendEvent } from '../../services/eventManager';
+import { refreshNotesPage } from '../../services/events';
 
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
@@ -343,6 +344,9 @@ export const ActionSheetComponent = ({
           db.vault
             .add(note.id)
             .then(() => {
+              dispatch({ type: ACTIONS.NOTES })
+              eSendEvent(refreshNotesPage);
+              dispatch({ type: ACTIONS.PINNED });
               close();
             })
             .catch(async e => {
