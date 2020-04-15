@@ -5,7 +5,7 @@ class EventManager {
 
   subscribe(name, handler) {
     if (!name || !handler) throw new Error("name and handler are required.");
-    if (!this._registry[name]) this._registry.name = [];
+    if (!this._registry[name]) this._registry[name] = [];
     this._registry[name].push(handler);
   }
 
