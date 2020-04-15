@@ -7,8 +7,8 @@ class Collection {
     await collection._collection.init();
 
     if (collection.init) await collection.init();
-    if (collection.clear)
-      this._db.ev.subscribe("clear", collection._collection.clear);
+    if (collection._collection.clear)
+      this._db.ev.subscribe("clear", () => collection._collection.clear());
 
     return collection;
   }
