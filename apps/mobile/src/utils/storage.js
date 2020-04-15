@@ -1,11 +1,9 @@
-import { NativeModules } from 'react-native';
 import MMKV from 'react-native-mmkv-storage';
 import Sodium from "react-native-sodium";
-import { func } from 'prop-types';
-
-var Aes = NativeModules.Aes;
 
 async function read(key, isArray = false) {
+  console.log(key, isArray, 'HERE');
+  //console.log("DATA_VAULT", await MMKV.getMapAsync('vaultKey'))
   let data;
   if (isArray) {
     try {
@@ -23,11 +21,12 @@ async function read(key, isArray = false) {
     }
   }
 
+
   return isArray ? data.slice() : data;
 }
 
 async function write(key, data) {
-  if (data.length !== undefined) {
+  if (Array.isArray(data)) {
     return await MMKV.setArrayAsync(key, data.slice());
   } else if (typeof data === 'boolean') {
     return await MMKV.setBoolAsync(key, data);
@@ -47,25 +46,36 @@ async function readMulti(keys) {
   }
 }
 
-function remove(key) {
-  MMKV.removeItem(key);
+async function remove(key) {
+  return await MMKV.removeItem(key);
 }
 
-function clear() {
-  MMKV.clearStore();
+async function clear() {
+  return await MMKV.clearStore();
 }
 
 function encrypt(password, data) {
-
-  return Sodium.encrypt({ password: password }, data).then(result => result);
+  console.log(password, data, 'encrypting');
+  return Sodium.encrypt(password, data).then(result => result);
 }
 
 function decrypt(password, data) {
-  return Sodium.decrypt({ password: password }, data).then(result => result);
+  console.log(data, password, 'decrypting');
+  return Sodium.decrypt(password, data).then(result => result);
+
 }
 
-function deriveKey(passoword) {
-  return Sodium.deriveKey('password').then(result => result);
+async function deriveKey(password, salt) {
+  console.log('here', password, salt);
+  try {
+
+    let data = await Sodium.deriveKey(password, salt)
+    console.log('key', data.key);
+    return data.key
+  } catch (e) {
+    console.log(e);
+  }
+
 }
 
 
