@@ -16,34 +16,27 @@ class Database {
   }
 
   async init() {
-    this.notes = await Notes.new(this);
-    this.notebooks = await Notebooks.new(this);
-    /* this.notebooks = new Notebooks(this.context);
-    this.notes = new Notes(this.context);
-    this.trash = new Trash(this.context);
     this.user = new User(this.context);
-    this.tags = new Tags(this.context, "tags");
-    this.colors = new Tags(this.context, "colors");
-    this.delta = new Content(this.context, "delta");
-    this.text = new Content(this.context, "text");
-    await this.delta.init();
-    await this.text.init();
-    await this.tags.init();
-    await this.colors.init();
-    await this.notes.init(
-      this.notebooks,
-      this.trash,
-      this.tags,
-      this.colors,
-      this.delta,
-      this.text
-    );
-    await this.notebooks.init(this.notes, this.trash);
-    await this.trash.init(this.notes, this.notebooks, this.delta, this.text);
     this.syncer = new Sync(this);
     this.vault = new Vault(this, this.context);
     this.conflicts = new Conflicts(this);
-    this.lookup = new Lookup(this); */
+    this.lookup = new Lookup(this);
+
+    // collections
+    /** @type {Notes} */
+    this.notes = await Notes.new(this);
+    /** @type {Notebooks} */
+    this.notebooks = await Notebooks.new(this);
+    /** @type {Tags} */
+    this.tags = await Tags.new(this, "tags");
+    /** @type {Tags} */
+    this.colors = await Tags.new(this, "colors");
+    /** @type {Trash} */
+    this.trash = await Trash.new(this);
+    /** @type {Content} */
+    this.delta = await Content.new(this, false, "delta");
+    /** @type {Content} */
+    this.text = await Content.new(this, false, "text");
   }
 
   sync() {

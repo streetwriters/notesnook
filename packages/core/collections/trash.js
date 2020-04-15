@@ -1,25 +1,9 @@
-import CachedCollection from "../database/cached-collection";
+import Collection from "./collection";
 import getId from "../utils/id";
 import { get7DayTimestamp } from "../utils/date";
 
-export default class Trash {
-  constructor(context) {
-    this._collection = new CachedCollection(context, "trash");
-  }
-
-  /**
-   *
-   * @param {import('./notes').default} notes
-   * @param {import('./notebooks').default} notebooks
-   * @param {import('./content').default} delta
-   * @param {import('./content').default} text
-   */
-  async init(notes, notebooks, delta, text) {
-    this._notes = notes;
-    this._notebooks = notebooks;
-    this._deltaCollection = delta;
-    this._textCollection = text;
-    await this._collection.init();
+export default class Trash extends Collection {
+  async init() {
     await this.cleanup();
   }
 
@@ -58,8 +42,8 @@ export default class Trash {
       let item = this._collection.getItem(id);
       if (!item) continue;
       if (item.type === "note") {
-        await this._deltaCollection.remove(item.content.delta);
-        await this._textCollection.remove(item.content.text);
+        await this._db.delta.remove(item.content.delta);
+        await this._db.text.remove(item.content.text);
       }
       await this._collection.removeItem(id);
     }
@@ -76,29 +60,32 @@ export default class Trash {
       if (item.type === "note") {
         let { notebook } = item;
         item.notebook = {};
-        await this._notes.add(item);
+        await this._db.notes.add(item);
 
         if (notebook && notebook.id && notebook.topic) {
           const { id, topic } = notebook;
 
           // if the notebook or topic has been deleted
           if (
-            !this._notebooks._collection.exists(id) ||
-            !this._notebooks.notebook(id).topics.has(topic)
+            !this._db.notebooks._collection.exists(id) ||
+            !this._db.notebooks.notebook(id).topics.has(topic)
           ) {
             notebook = {};
           }
 
           // restore the note to the topic it was in before deletion
           if (notebook.id && notebook.topic) {
-            await this._notebooks.notebook(id).topics.topic(topic).add(item.id);
+            await this._db.notebooks
+              .notebook(id)
+              .topics.topic(topic)
+              .add(item.id);
           }
         }
       } else if (item.type === "notebook") {
         const { topics } = item;
         item.topics = [];
-        await this._notebooks.add(item);
-        let notebook = this._notebooks.notebook(item.id);
+        await this._db.notebooks.add(item);
+        let notebook = this._db.notebooks.notebook(item.id);
         for (let topic of topics) {
           await notebook.topics.add(topic.title);
           let t = notebook.topics.topic(topic.title);

@@ -105,7 +105,7 @@ export default class Notes extends Collection {
     if (!id) return;
     let note = id.type ? id : this._collection.getItem(id);
     if (!note || note.deleted) return;
-    return new Note(this, note);
+    return new Note(note, this._db);
   }
 
   get raw() {

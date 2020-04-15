@@ -3,12 +3,12 @@ import Topics from "../collections/topics";
 export default class Notebook {
   /**
    *
-   * @param {import ('../collections/notebooks').default} notebooks
    * @param {Object} notebook
+   * @param {import ('../api').default} db
    */
-  constructor(notebooks, notebook) {
+  constructor(notebook, db) {
     this._notebook = notebook;
-    this._notebooks = notebooks;
+    this._db = db;
   }
 
   get title() {
@@ -20,7 +20,7 @@ export default class Notebook {
   }
 
   get topics() {
-    return new Topics(this._notebooks, this._notebook.id);
+    return new Topics(this._notebook.id, this._db);
   }
 
   get dateEdited() {
@@ -28,7 +28,7 @@ export default class Notebook {
   }
 
   _toggle(prop) {
-    return this._notebooks.add({
+    return this._db.notebooks.add({
       id: this._notebook.id,
       [prop]: !this._notebook[prop],
     });

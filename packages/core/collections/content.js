@@ -1,15 +1,7 @@
-import IndexedCollection from "../database/indexed-collection";
+import Collection from "./collection";
 import getId from "../utils/id";
 
-export default class Content {
-  constructor(context, name) {
-    this._collection = new IndexedCollection(context, name);
-  }
-
-  init() {
-    return this._collection.init();
-  }
-
+export default class Content extends Collection {
   async add(content) {
     if (!content) return;
 

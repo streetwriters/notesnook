@@ -1,12 +1,12 @@
 export default class Note {
   /**
    *
-   * @param {import('../collections/notes').default} notes
+   * @param {import('../api').default} db
    * @param {Object} note
    */
-  constructor(notes, note) {
+  constructor(note, db) {
     this._note = note;
-    this._notes = notes;
+    this._db = db;
   }
 
   get data() {
@@ -42,29 +42,29 @@ export default class Note {
   }
 
   delta() {
-    return this._notes._deltaCollection.get(this._note.content.delta);
+    return this._db.delta.get(this._note.content.delta);
   }
 
   text() {
-    return this._notes._textCollection.get(this._note.content.text);
+    return this._db.text.get(this._note.content.text);
   }
 
   color(color) {
-    return addTag.call(this, color, "_colorsCollection", "colors");
+    return addTag.call(this, color, "colors");
   }
   uncolor(color) {
-    return removeTag.call(this, color, "_colorsCollection", "colors");
+    return removeTag.call(this, color, "colors");
   }
 
   tag(tag) {
-    return addTag.call(this, tag, "_tagsCollection", "tags");
+    return addTag.call(this, tag, "tags");
   }
   untag(tag) {
-    return removeTag.call(this, tag, "_tagsCollection", "tags");
+    return removeTag.call(this, tag, "tags");
   }
 
   _toggle(prop) {
-    return this._notes.add({ id: this._note.id, [prop]: !this._note[prop] });
+    return this._db.notes.add({ id: this._note.id, [prop]: !this._note[prop] });
   }
 
   favorite() {
@@ -76,21 +76,21 @@ export default class Note {
   }
 }
 
-async function addTag(tag, collection, array) {
+async function addTag(tag, array) {
   if (this._note[array].indexOf(tag) > -1)
     throw new Error("Cannot add a duplicate tag.");
   let arr = [...this._note[array], tag];
   const note = { ...this._note, [array]: arr };
-  await this._notes[collection].add(tag, note.id);
-  await this._notes._collection.addItem(note);
+  await this._db[array].add(tag, note.id);
+  await this._db.notes._collection.addItem(note);
 }
 
-async function removeTag(tag, collection, array) {
+async function removeTag(tag, array) {
   if (this._note[array].indexOf(tag) <= -1)
     throw new Error("This note is not tagged by the specified tag.");
   let arr = [...this._note[array]];
   arr.splice(arr.indexOf(tag), 1);
   const note = { ...this._note, [array]: arr };
-  await this._notes[collection].remove(tag, note.id);
-  await this._notes._collection.addItem(note);
+  await this._db[array].remove(tag, note.id);
+  await this._db.notes._collection.addItem(note);
 }

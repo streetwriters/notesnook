@@ -4,11 +4,11 @@ import { qclone } from "qclone";
 export default class Topics {
   /**
    *
-   * @param {import('./notebooks').default} notebooks
+   * @param {import('../api').default} db
    * @param {string} notebookId
    */
-  constructor(notebooks, notebookId) {
-    this._notebooks = notebooks;
+  constructor(notebookId, db) {
+    this._db = db;
     this._notebookId = notebookId;
   }
 
@@ -37,7 +37,7 @@ export default class Topics {
   }
 
   async add(...topics) {
-    let notebook = qclone(this._notebooks.notebook(this._notebookId).data);
+    let notebook = qclone(this._db.notebooks.notebook(this._notebookId).data);
 
     let allTopics = [...notebook.topics, ...topics];
     const unique = this._dedupe(allTopics);
@@ -50,14 +50,14 @@ export default class Topics {
       notebook.totalNotes += topic.totalNotes;
     });
 
-    return this._notebooks._collection.addItem(notebook);
+    return this._db.notebooks._collection.addItem(notebook);
   }
 
   /**
    * @returns {Array} an array containing all the topics
    */
   get all() {
-    return this._notebooks.notebook(this._notebookId).data.topics;
+    return this._db.notebooks.notebook(this._notebookId).data.topics;
   }
 
   /**
@@ -70,7 +70,7 @@ export default class Topics {
       topic = this.all.find((t) => t.title === topic);
     }
     if (!topic) return;
-    return new Topic(this, topic);
+    return new Topic(topic, this._notebookId, this._db);
   }
 
   async delete(...topics) {
@@ -85,7 +85,7 @@ export default class Topics {
         allTopics.splice(i, 1);
       }
     }
-    await this._notebooks.add({ id: this._notebookId, topics: allTopics });
+    await this._db.notebooks.add({ id: this._notebookId, topics: allTopics });
   }
 }
 
