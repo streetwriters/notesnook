@@ -1,6 +1,6 @@
 /**
  * GENERAL PROCESS:
- * make a get request to server with current lastSyncedTimestamp
+ * make a get request to server with current lastSynced
  * parse the response. the response should contain everything that user has on the server
  * decrypt the response
  * merge everything into the database and look for conflicts
@@ -10,12 +10,12 @@
 
 /**
  * MERGING:
- * Locally, get everything that was editted/added after the lastSyncedTimestamp
+ * Locally, get everything that was editted/added after the lastSynced
  * Run forEach loop on the server response.
  * Add items that do not exist in the local collections
  * Remove items (without asking) that need to be removed
- * Update items that were editted before the lastSyncedTimestamp
- * Try to merge items that were edited after the lastSyncedTimestamp
+ * Update items that were editted before the lastSynced
+ * Try to merge items that were edited after the lastSynced
  * Items in which the content has changed, send them for conflict resolution
  * Otherwise, keep the most recently updated copy.
  */
@@ -25,9 +25,8 @@
  * Syncing should pause until all the conflicts have been resolved
  * And then it should continue.
  */
-import Database from "../index";
 import { HOST, HEADERS } from "../../utils/constants";
-import Prepare from "./prepare";
+import Collector from "./collector";
 import Merger from "./merger";
 import { areAllEmpty } from "./utils";
 var tfun = require("transfun/transfun.js").tfun;
@@ -38,63 +37,50 @@ if (!tfun) {
 export default class Sync {
   /**
    *
-   * @param {Database} db
+   * @param {import("../index").default} db
    */
   constructor(db) {
-    this.db = db;
+    this._db = db;
+    this._collector = new Collector(this._db);
+    this._merger = new Merger(this._db);
   }
 
-  async _fetch(lastSyncedTimestamp) {
-    let token = await this.db.user.token();
-    if (!token) throw new Error("You are not logged in");
-    let response = await fetch(`${HOST}sync?lst=${lastSyncedTimestamp}`, {
+  async _fetch(lastSynced, token) {
+    let response = await fetch(`${HOST}sync?lst=${lastSynced}`, {
       headers: { ...HEADERS, Authorization: `Bearer ${token}` },
     });
-    //TODO decrypt the response.
     return await response.json();
   }
 
-  async throwOnConflicts() {
-    let hasConflicts = await this.db.context.read("hasConflicts");
-    if (hasConflicts) {
-      const mergeConflictError = new Error(
-        "Merge conflicts detected. Please resolve all conflicts to continue syncing."
-      );
-      mergeConflictError.code = "MERGE_CONFLICT";
-      throw mergeConflictError;
-    }
-  }
-
   async start() {
-    let user = await this.db.user.get();
-    if (!user) throw new Error("You need to login to sync.");
+    let user = await this._db.user.get();
+    let token = await this._db.user.token();
+    if (!user || !token) throw new Error("You need to login to sync.");
 
-    await this.db.conflicts.recalculate();
-    await this.throwOnConflicts();
+    // update the conflicts status and if find any, throw
+    await this._db.conflicts.recalculate();
+    await this._db.conflicts.check();
 
-    let lastSyncedTimestamp = user.lastSynced || 0;
-    let serverResponse = await this._fetch(lastSyncedTimestamp);
+    let lastSynced = user.lastSynced || 0;
+    let serverResponse = await this._fetch(lastSynced, token);
 
     // we prepare local data before merging so we always have correct data
-    const prepare = new Prepare(this.db, user);
-    const data = await prepare.get(lastSyncedTimestamp);
+    const data = await this._collector.collect(lastSynced);
 
     // merge the server response
-    const merger = new Merger(this.db, lastSyncedTimestamp);
-    await merger.merge(serverResponse);
-    await this.throwOnConflicts();
+    await this._merger.merge(serverResponse, lastSynced);
+
+    // check for conflicts and throw
+    await this._db.conflicts.check();
 
     // send the data back to server
-    const lastSynced = await this._send(data);
+    lastSynced = await this._send(data, token);
 
     // update our lastSynced time
-    if (lastSynced) await this.db.user.set({ lastSynced });
+    if (lastSynced) await this._db.user.set({ lastSynced });
   }
 
-  async _send(data) {
-    //TODO encrypt the payload
-    let token = await this.db.user.token();
-    if (!token) return;
+  async _send(data, token) {
     let response = await fetch(`${HOST}sync`, {
       method: "POST",
       headers: { ...HEADERS, Authorization: `Bearer ${token}` },

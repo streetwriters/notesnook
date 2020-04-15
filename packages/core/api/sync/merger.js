@@ -6,9 +6,8 @@ class Merger {
    *
    * @param {Database} db
    */
-  constructor(db, lastSynced) {
+  constructor(db) {
     this._db = db;
-    this._lastSynced = lastSynced;
   }
 
   async _deserialize(item) {
@@ -59,8 +58,9 @@ class Merger {
     );
   }
 
-  async merge(serverResponse) {
+  async merge(serverResponse, lastSynced) {
     if (!serverResponse) return false;
+    this._lastSynced = lastSynced;
     const {
       notes,
       synced,

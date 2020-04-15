@@ -1,5 +1,5 @@
 import StorageInterface from "../../../__mocks__/storage.mock";
-import Prepare from "../prepare";
+import Collector from "../collector";
 import { enableFetchMocks, disableFetchMocks } from "jest-fetch-mock";
 import {
   noteTest,
@@ -73,8 +73,8 @@ describe.each(tests)("%s preparation", (collection, add, addExtra) => {
           .fill(0)
           .map(() => add(db, collection))
       );
-      const prepare = new Prepare(db);
-      const data = await prepare.get(0);
+      const collector = new Collector(db);
+      const data = await collector.collect(0);
       expect(data[collection].length).toBe(MAX_ITEMS);
       expect(
         data[collection].every((item) => !!item.iv && !!item.cipher)
@@ -91,8 +91,8 @@ describe.each(tests)("%s preparation", (collection, add, addExtra) => {
           .map(() => add(db, collection))
       );
       await addExtra(db, collection);
-      const prepare = new Prepare(db);
-      const data = await prepare.get(10);
+      const collector = new Collector(db);
+      const data = await collector.collect(10);
       expect(data[collection].length).toBe(MAX_ITEMS);
       expect(
         data[collection].every((item) => !!item.iv && !!item.cipher)

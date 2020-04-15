@@ -2,7 +2,7 @@
 import { enableFetchMocks, disableFetchMocks } from "jest-fetch-mock";
 import StorageInterface from "../../../__mocks__/storage.mock";
 //import Sync from "../sync";
-//import Prepare from "../prepare";
+//import Collector from "../prepare";
 import { databaseTest, TEST_NOTE } from "../../../__tests__/utils";
 import { login, getEncrypted } from "./utils";
 

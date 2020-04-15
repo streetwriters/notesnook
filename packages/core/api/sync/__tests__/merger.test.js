@@ -56,13 +56,16 @@ describe.each(tests)(
     test(`merge ${collection} into empty database`, () =>
       databaseTest().then(async (db) => {
         await login(db);
-        const merger = new Merger(db, 0);
-        const result = await merger.merge({
-          [collection]: [
-            { id: testItem.id, ...(await getEncrypted(testItem)) },
-          ],
-          synced: false,
-        });
+        const merger = new Merger(db);
+        const result = await merger.merge(
+          {
+            [collection]: [
+              { id: testItem.id, ...(await getEncrypted(testItem)) },
+            ],
+            synced: false,
+          },
+          0
+        );
         expect(result).toBe(true);
         expect(db[collection].all[0].id).toStrictEqual(testItem.id);
         expect(db[collection].all[0].dateEdited).toStrictEqual(
@@ -73,13 +76,16 @@ describe.each(tests)(
     test(`merge local and remote ${collection}`, () =>
       databaseTest().then(async (db) => {
         await login(db);
-        const merger = new Merger(db, 0);
+        const merger = new Merger(db);
         const item = await add(db);
         item.title = "Google";
-        const result = await merger.merge({
-          [collection]: [{ id: item.id, ...(await getEncrypted(item)) }],
-          synced: false,
-        });
+        const result = await merger.merge(
+          {
+            [collection]: [{ id: item.id, ...(await getEncrypted(item)) }],
+            synced: false,
+          },
+          0
+        );
         expect(result).toBe(true);
         expect(db[collection].all.length).toBe(1);
         expect(db[collection].all[0]).toStrictEqual(item);
@@ -88,14 +94,17 @@ describe.each(tests)(
     test(`local ${collection} are more updated than remote ones`, () =>
       databaseTest().then(async (db) => {
         await login(db);
-        const merger = new Merger(db, 0);
+        const merger = new Merger(db);
         const item = await add(db);
         await edit(db, item);
         item.title = "Google";
-        const result = await merger.merge({
-          [collection]: [{ id: item.id, ...(await getEncrypted(item)) }],
-          synced: false,
-        });
+        const result = await merger.merge(
+          {
+            [collection]: [{ id: item.id, ...(await getEncrypted(item)) }],
+            synced: false,
+          },
+          0
+        );
         expect(result).toBe(true);
         expect(db[collection].all.length).toBe(1);
         expect(db[collection].all[0]).toStrictEqual(get(db, item));
@@ -111,22 +120,25 @@ test("local delta updated after lastSyncedTimestamp should cause merge conflict"
       delta: { ops: [{ insert: "my name is abdullah" }] },
     };
     const deltaId = db.notes.note(id).data.content.delta;
-    const merger = new Merger(db, 200);
-    const result = await merger.merge({
-      delta: [
-        {
-          id: deltaId,
-          ...(await getEncrypted({
+    const merger = new Merger(db);
+    const result = await merger.merge(
+      {
+        delta: [
+          {
             id: deltaId,
-            noteId: id,
-            data: JSON.stringify(content.delta),
-            dateEdited: 2919,
-            conflicted: false,
-            resolved: false,
-          })),
-        },
-      ],
-    });
+            ...(await getEncrypted({
+              id: deltaId,
+              noteId: id,
+              data: JSON.stringify(content.delta),
+              dateEdited: 2919,
+              conflicted: false,
+              resolved: false,
+            })),
+          },
+        ],
+      },
+      200
+    );
     const localDelta = await db.delta.raw(deltaId);
     expect(localDelta.conflicted.id).toBe(deltaId);
     expect(localDelta.conflicted.noteId).toBe(id);
