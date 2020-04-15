@@ -1,4 +1,5 @@
 import "jest-fetch-mock";
+import Storage from "../../../__mocks__/storage.mock";
 
 const SUCCESS_LOGIN_RESPONSE = {
   access_token: "access_token",
@@ -52,10 +53,7 @@ function tagsCollectionParams(collection, item) {
 }
 
 function getEncrypted(item) {
-  return {
-    iv: "some_iv",
-    cipher: JSON.stringify(item),
-  };
+  return Storage.encrypt("password", JSON.stringify(item));
 }
 
 export { tagsCollectionParams, mainCollectionParams, login, getEncrypted };

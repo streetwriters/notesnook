@@ -15,7 +15,7 @@ async function readMulti(keys) {
 }
 
 async function write(key, data) {
-  return new Promise((resolve, reject) => resolve((storage[key] = data)));
+  return new Promise((resolve) => resolve((storage[key] = data)));
 }
 function remove(key) {
   delete storage[key];
@@ -25,15 +25,15 @@ function clear() {
 }
 
 function encrypt(password, data) {
-  return new Promise((resolve, reject) =>
+  return new Promise((resolve) => {
     resolve({
       iv: "some iv",
       cipher: data,
       salt: "i am some salt",
       length: data.length,
       key: password,
-    })
-  );
+    });
+  });
 }
 
 function decrypt(key, data) {

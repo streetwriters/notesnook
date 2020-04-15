@@ -7,11 +7,11 @@ beforeEach(async () => {
 test("create vault", () =>
   databaseTest().then(async (db) => {
     await expect(db.vault.create("password")).resolves.toBe(true);
-    const lockKey = await db.context.read("lockKey");
-    expect(lockKey).toBeDefined();
-    expect(lockKey.iv).toBeDefined();
-    expect(lockKey.cipher).toBeDefined();
-    expect(lockKey.length).toBeDefined();
+    const vaultKey = await db.context.read("vaultKey");
+    expect(vaultKey).toBeDefined();
+    expect(vaultKey.iv).toBeDefined();
+    expect(vaultKey.cipher).toBeDefined();
+    expect(vaultKey.length).toBeDefined();
   }));
 
 test("unlock vault", () =>

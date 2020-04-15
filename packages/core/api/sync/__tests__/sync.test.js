@@ -48,12 +48,12 @@ test("sync without merge conflicts, cause merge conflicts, resolve them and then
     const deltaId = db.notes.note(noteId).data.content.delta;
     const delta = {
       id: deltaId,
-      ...getEncrypted({
+      ...(await getEncrypted({
         id: deltaId,
         dateEdited: Date.now(),
         conflicted: false,
         data: { ops: [{ insert: "text" }] },
-      }),
+      })),
     };
 
     fetchMock

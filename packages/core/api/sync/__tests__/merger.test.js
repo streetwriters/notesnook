@@ -58,7 +58,9 @@ describe.each(tests)(
         await login(db);
         const merger = new Merger(db, 0);
         const result = await merger.merge({
-          [collection]: [{ id: testItem.id, ...getEncrypted(testItem) }],
+          [collection]: [
+            { id: testItem.id, ...(await getEncrypted(testItem)) },
+          ],
           synced: false,
         });
         expect(result).toBe(true);
@@ -75,7 +77,7 @@ describe.each(tests)(
         const item = await add(db);
         item.title = "Google";
         const result = await merger.merge({
-          [collection]: [{ id: item.id, ...getEncrypted(item) }],
+          [collection]: [{ id: item.id, ...(await getEncrypted(item)) }],
           synced: false,
         });
         expect(result).toBe(true);
@@ -91,7 +93,7 @@ describe.each(tests)(
         await edit(db, item);
         item.title = "Google";
         const result = await merger.merge({
-          [collection]: [{ id: item.id, ...getEncrypted(item) }],
+          [collection]: [{ id: item.id, ...(await getEncrypted(item)) }],
           synced: false,
         });
         expect(result).toBe(true);
@@ -114,14 +116,14 @@ test("local delta updated after lastSyncedTimestamp should cause merge conflict"
       delta: [
         {
           id: deltaId,
-          ...getEncrypted({
+          ...(await getEncrypted({
             id: deltaId,
             noteId: id,
             data: JSON.stringify(content.delta),
             dateEdited: 2919,
             conflicted: false,
             resolved: false,
-          }),
+          })),
         },
       ],
     });

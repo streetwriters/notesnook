@@ -29,6 +29,7 @@ class Prepare {
   }
 
   _serialize(item) {
+    if (!item) return;
     return this._db.context.encrypt(this.key, JSON.stringify(item));
   }
 
