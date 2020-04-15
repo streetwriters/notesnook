@@ -58,8 +58,6 @@ class Crypto {
   encrypt = async (passwordOrKey, data) => {
     await this._initialize();
 
-    if (typeof data === "object") data = JSON.stringify(data);
-
     const { key, salt } = await this._getKey(passwordOrKey);
 
     const nonce = this.sodium.randombytes_buf(
