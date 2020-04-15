@@ -7,7 +7,7 @@ export default class User {
    */
   constructor(db) {
     this._db = db;
-    this._context = db._context;
+    this._context = db.context;
   }
 
   get() {
