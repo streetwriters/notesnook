@@ -17,25 +17,34 @@ export default class Vault {
     };
   }
 
+  async _getKey() {
+    if (await this._exists()) return await this._context.read("vaultKey");
+  }
+
+  async _setKey(vaultKey) {
+    if (!vaultKey) return;
+    await this._context.write("vaultKey", vaultKey);
+  }
+
   async create(password) {
-    const lockKey = await this._context.read("lockKey");
-    if (!lockKey || !lockKey.cipher || !lockKey.iv) {
+    const vaultKey = await this._context.read("vaultKey");
+    if (!vaultKey || !vaultKey.cipher || !vaultKey.iv) {
       const encryptedData = await this._context.encrypt(
         { password },
         this._key
       );
-      await this._context.write("lockKey", encryptedData);
+      await this._context.write("vaultKey", encryptedData);
       this._password = password;
     }
     return true;
   }
 
   async unlock(password) {
-    const lockKey = await this._context.read("lockKey");
-    if (!(await this._exists(lockKey))) throw new Error("ERR_NO_VAULT");
+    const vaultKey = await this._context.read("vaultKey");
+    if (!(await this._exists(vaultKey))) throw new Error("ERR_NO_VAULT");
     var data;
     try {
-      data = await this._context.decrypt({ password }, lockKey);
+      data = await this._context.decrypt({ password }, vaultKey);
     } catch (e) {
       throw new Error(this.ERRORS.wrongPassword);
     }
@@ -46,9 +55,9 @@ export default class Vault {
     return true;
   }
 
-  async _exists(lockKey) {
-    if (!lockKey) lockKey = await this._context.read("lockKey");
-    return lockKey && lockKey.cipher && lockKey.iv;
+  async _exists(vaultKey) {
+    if (!vaultKey) vaultKey = await this._context.read("vaultKey");
+    return vaultKey && vaultKey.cipher && vaultKey.iv;
   }
 
   async _locked() {

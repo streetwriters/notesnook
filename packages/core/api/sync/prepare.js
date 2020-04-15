@@ -24,6 +24,7 @@ class Prepare {
       tags: await this._prepareForServer(this._db.tags.raw),
       colors: await this._prepareForServer(this._db.colors.raw),
       trash: await this._prepareForServer(this._db.trash.raw),
+      vaultKey: await this._serialize(await this._db.vault._getKey()),
     };
   }
 

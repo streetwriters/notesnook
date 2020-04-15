@@ -70,10 +70,15 @@ class Merger {
       tags,
       colors,
       trash,
+      vaultKey,
     } = serverResponse;
 
     if (synced || areAllEmpty(serverResponse)) return false;
     this.key = await this._db.user.key();
+
+    if (vaultKey) {
+      await this._db.vault._setKey(await this._deserialize(vaultKey));
+    }
 
     await this._mergeArray(
       notes,
