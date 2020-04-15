@@ -73,5 +73,7 @@ test("unlock a note permanently", () =>
     await db.vault.remove(id, "password");
     const note = db.notes.note(id);
     expect(note.id).toBe(id);
-    expect((await note.delta()).ops).toBeDefined();
+    const delta = await db.delta.raw(note.data.content.delta);
+    expect(delta.data.ops).toBeDefined();
+    expect(typeof delta.data.ops).toBe("object");
   }));

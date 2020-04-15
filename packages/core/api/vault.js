@@ -115,6 +115,8 @@ export default class Vault {
     delta = await this._db.text.get(delta);
     delta = await this._context.decrypt({ password: this._password }, delta);
 
+    if (typeof delta === "string") delta = JSON.parse(delta);
+
     return {
       delta,
       text,
