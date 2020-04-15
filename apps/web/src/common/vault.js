@@ -23,7 +23,7 @@ class Vault {
         .remove(id, password)
         .then(() => true)
         .catch((e) => {
-          if (e.message === "ERR_WRNG_PWD") return false;
+          if (e.message === db.vault.ERRORS.wrongPassword) return false;
           else console.error(e);
         });
     }).then((res) => res && done());
@@ -39,7 +39,7 @@ class Vault {
             return true;
           })
           .catch((e) => {
-            if (e.message === "ERR_WRNG_PwD") return;
+            if (e.message === db.vault.ERRORS.wrongPassword) return false;
             else console.error(e);
           });
       });
@@ -52,9 +52,9 @@ class Vault {
       .then(done)
       .catch(({ message }) => {
         switch (message) {
-          case "ERR_NO_VAULT":
+          case db.vault.ERRORS.noVault:
             return Vault.createVault();
-          case "ERR_VAULT_LOCKED":
+          case db.vault.ERRORS.vaultLocked:
             return Vault.unlockVault();
           default:
             return false;
