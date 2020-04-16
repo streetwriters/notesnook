@@ -14,7 +14,7 @@ import Colors from "../menu/colors";
 
 function menuItems(note, context) {
   return [
-    { component: Colors },
+    { title: "colors", component: Colors },
     {
       title: note.notebook ? "Move" : "Add to",
       onClick: async () => {
