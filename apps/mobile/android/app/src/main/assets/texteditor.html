@@ -546,6 +546,7 @@
     .ql-snow .ql-toolbar button svg {
       float: left;
       height: 100%;
+      fill: 'white';
     }
 
     .ql-snow.ql-toolbar button:active:hover,
@@ -732,6 +733,7 @@
     .ql-snow .ql-icon-picker .ql-picker-label svg {
       right: 4px;
     }
+
 
     .ql-snow .ql-icon-picker .ql-picker-options {
       padding: 4px 0px;
@@ -1510,6 +1512,11 @@
     font-size:${(pageTheme.colors.factor * 18)};
     color:${pageTheme.colors.pri};
   }
+
+
+  svg {
+      fill: ${pageTheme.colors.pri} !important;
+    }
  
                 `
         css.appendChild(document.createTextNode(node));

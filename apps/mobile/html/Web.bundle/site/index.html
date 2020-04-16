@@ -1511,6 +1511,10 @@
     font-size:${(pageTheme.colors.factor * 18)};
     color:${pageTheme.colors.pri};
   }
+
+  svg {
+      fill: ${pageTheme.colors.pri} !important;
+    }
  
                 `
         css.appendChild(document.createTextNode(node));
