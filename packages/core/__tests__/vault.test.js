@@ -46,6 +46,8 @@ test("lock a note", () =>
     await db.vault.add(id);
     const note = db.notes.note(id);
 
+    expect(note.headline).toBe("");
+
     const delta = await db.delta.raw(note.data.content.delta);
     expect(delta.noteId).toBeDefined();
     expect(delta.data.iv).toBeDefined();
@@ -73,6 +75,7 @@ test("unlock a note permanently", () =>
     await db.vault.remove(id, "password");
     const note = db.notes.note(id);
     expect(note.id).toBe(id);
+    expect(note.headline).not.toBe("");
     const delta = await db.delta.raw(note.data.content.delta);
     expect(delta.data.ops).toBeDefined();
     expect(typeof delta.data.ops).toBe("object");

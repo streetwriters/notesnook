@@ -194,9 +194,13 @@ export default class Vault {
       await this._db.notes.add({
         id: note.id,
         locked: false,
+        content: {
+          delta,
+          text,
+        },
       });
-      await this._db.delta.add({ id: note.content.delta, data: delta });
-      await this._db.text.add({ id: note.content.text, data: text });
+      //await this._db.delta.add({ id: note.content.delta, data: delta });
+      // await this._db.text.add({ id: note.content.text, data: text });
       return;
     }
 
