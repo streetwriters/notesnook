@@ -1,4 +1,3 @@
-import AccountSettings from '../views/AccountSettings';
 import Editor from '../views/Editor';
 import Favorites from '../views/Favorites';
 import Folders from '../views/Folders';
@@ -15,8 +14,6 @@ import Settings from '../views/Settings';
 import Signup from '../views/Signup';
 import Tags from '../views/Tags';
 import Trash from '../views/Trash';
-import AppearanceSettings from '../views/AppearanceSettings';
-import EditorSettings from '../views/EditorSettings';
 import { createStackNavigator } from 'react-navigation-stack';
 
 const fade = props => {
@@ -91,16 +88,7 @@ export const TopLevelNavigator = createStackNavigator(
     },
     Notebook: {
       screen: Notebook,
-    },
-    AccountSettings: {
-      screen: AccountSettings,
-    },
-    AppearanceSettings: {
-      screen: AppearanceSettings,
-    },
-    EditorSettings: {
-      screen: EditorSettings,
-    },
+    }
   },
   {
     initialRouteName: 'Home',
