@@ -88,7 +88,8 @@ export const TopLevelNavigator = createStackNavigator(
     },
     Notebook: {
       screen: Notebook,
-    }
+    },
+
   },
   {
     initialRouteName: 'Home',
