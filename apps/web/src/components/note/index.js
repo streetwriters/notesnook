@@ -12,7 +12,6 @@ import { db, COLORS } from "../../common";
 import { useTheme } from "emotion-theming";
 import Colors from "../menu/colors";
 
-const dropdownRefs = [];
 function menuItems(note, context) {
   return [
     { component: Colors },
@@ -156,7 +155,6 @@ function Note(props) {
       pinned={props.pinnable && note.pinned}
       menuData={note}
       menuItems={menuItems(note, props.context)}
-      dropdownRefs={dropdownRefs}
     />
   );
 }

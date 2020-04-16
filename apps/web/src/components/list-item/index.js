@@ -1,11 +1,10 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { Flex, Box, Text } from "rebass";
 import * as Icon from "../icons";
-import Dropdown, { DropdownTrigger, DropdownContent } from "../dropdown";
 import Menu from "../menu";
 import {
   store as appStore,
-  useStore as useSelectionStore
+  useStore as useSelectionStore,
 } from "../../stores/selection-store";
 import useContextMenu from "../../utils/useContextMenu";
 
@@ -32,7 +31,7 @@ function selectMenuItem(isSelected, toggleSelection) {
       } else {
         toggleSelection();
       }
-    }
+    },
   };
 }
 
@@ -44,7 +43,7 @@ const ItemSelector = ({ isSelected, toggleSelection }) => {
         marginLeft: 3,
         marginRight: 1,
         color: "primary",
-        cursor: "pointer"
+        cursor: "pointer",
       }}
       onClick={() => toggleSelection()}
     >
@@ -57,11 +56,11 @@ function ListItem(props) {
   const [parentRef, closeContextMenu] = useContextMenu(
     `contextMenu${props.index}`
   );
-  const isSelectionMode = useSelectionStore(store => store.isSelectionMode);
-  const selectedItems = useSelectionStore(store => store.selectedItems);
+  const isSelectionMode = useSelectionStore((store) => store.isSelectionMode);
+  const selectedItems = useSelectionStore((store) => store.selectedItems);
   const isSelected =
-    selectedItems.findIndex(item => props.item.id === item.id) > -1;
-  const selectItem = useSelectionStore(store => store.selectItem);
+    selectedItems.findIndex((item) => props.item.id === item.id) > -1;
+  const selectItem = useSelectionStore((store) => store.selectItem);
   const [menuItems, setMenuItems] = useState(props.menuItems);
 
   const toggleSelection = useCallback(
@@ -79,7 +78,7 @@ function ListItem(props) {
     if (props.selectable) {
       setMenuItems([
         selectMenuItem(isSelected, toggleSelection),
-        ...props.menuItems
+        ...props.menuItems,
       ]);
     }
   }, [props.menuItems, isSelected, props.selectable, toggleSelection]);
@@ -94,8 +93,8 @@ function ListItem(props) {
         borderBottomColor: "border",
         cursor: "pointer",
         ":hover": {
-          borderBottomColor: "primary"
-        }
+          borderBottomColor: "primary",
+        },
       }}
     >
       {isSelectionMode && (
@@ -114,7 +113,7 @@ function ListItem(props) {
           position: "relative",
           marginTop: props.pinned ? 4 : 0,
           paddingTop: props.pinned ? 0 : 2,
-          paddingBottom: 2
+          paddingBottom: 2,
 
           //TODO add onpressed reaction
         }}
@@ -130,7 +129,7 @@ function ListItem(props) {
               borderRadius: 35,
               width: 30,
               height: 30,
-              boxShadow: "2px 1px 3px #00000066"
+              boxShadow: "2px 1px 3px #00000066",
             }}
             mx={2}
           >
@@ -139,7 +138,7 @@ function ListItem(props) {
               sx={{
                 borderRadius: 5,
                 width: 5,
-                height: 5
+                height: 5,
               }}
             />
           </Flex>
@@ -157,8 +156,8 @@ function ListItem(props) {
             flex: "1 1 auto",
             paddingTop: props.pinned ? 4 : 0,
             ":hover": {
-              cursor: "pointer"
-            }
+              cursor: "pointer",
+            },
           }}
         >
           <Text
@@ -175,9 +174,9 @@ function ListItem(props) {
             sx={{
               marginBottom: 1,
               ":hover": {
-                cursor: "pointer"
+                cursor: "pointer",
               },
-              flexWrap: "wrap"
+              flexWrap: "wrap",
             }}
           >
             {props.body}
@@ -193,32 +192,16 @@ function ListItem(props) {
             {props.info}
           </Text>
         </Box>
-        {props.menuItems && props.dropdownRefs && (
-          <Dropdown
-            style={{ zIndex: 1, marginRight: -4 }}
-            ref={ref => (props.dropdownRefs[props.index] = ref)}
-          >
-            <DropdownTrigger onClick={() => closeContextMenu()}>
-              <Text sx={{ ":active, :hover": { color: "primary" } }}>
-                <Icon.MoreVertical
-                  size={22}
-                  strokeWidth={2}
-                  color="icon"
-                  style={{ marginRight: -5 }}
-                />
-              </Text>
-            </DropdownTrigger>
-            <DropdownContent style={{ zIndex: 2, marginLeft: -130 }}>
-              <ActionsMenu
-                {...props}
-                menuItems={menuItems}
-                closeMenu={() => props.dropdownRefs[props.index].hide()}
-              />
-            </DropdownContent>
-          </Dropdown>
+        {props.menuItems && (
+          <Icon.MoreVertical
+            size={22}
+            strokeWidth={2}
+            color="icon"
+            style={{ marginRight: -5 }}
+          />
         )}
       </Flex>
-      {props.menuItems && props.dropdownRefs && (
+      {props.menuItems && (
         <ActionsMenu
           {...props}
           menuItems={menuItems}
@@ -226,7 +209,7 @@ function ListItem(props) {
           style={{
             position: "absolute",
             display: "none",
-            zIndex: 999
+            zIndex: 999,
           }}
           closeMenu={() => closeContextMenu()}
         />

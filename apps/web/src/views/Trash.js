@@ -8,12 +8,11 @@ import { confirm } from "../components/dialogs/confirm";
 import { useStore, store } from "../stores/trash-store";
 import { toTitleCase } from "../utils/string";
 
-const dropdownRefs = [];
 function menuItems(item, index) {
   return [
     {
       title: "Restore",
-      onClick: () => store.restore(item.id, index)
+      onClick: () => store.restore(item.id, index),
     },
     {
       title: "Delete",
@@ -23,20 +22,20 @@ function menuItems(item, index) {
           Icon.Trash,
           "Delete",
           `Are you sure you want to permanently delete this item?`
-        ).then(async res => {
+        ).then(async (res) => {
           if (res) {
             await store.delete(item.id, index);
           }
         });
-      }
-    }
+      },
+    },
   ];
 }
 
 function Trash() {
   useEffect(() => store.refresh(), []);
-  const items = useStore(store => store.trash);
-  const clearTrash = useStore(store => store.clear);
+  const items = useStore((store) => store.trash);
+  const clearTrash = useStore((store) => store.clear);
   return (
     <ListContainer
       type="trash"
@@ -59,23 +58,22 @@ function Trash() {
           }
           menuData={item}
           menuItems={menuItems(item, index)}
-          dropdownRefs={dropdownRefs}
         />
       )}
       button={{
         content: "Clear Trash",
         icon: Icon.Trash,
-        onClick: function() {
+        onClick: function () {
           confirm(
             Icon.Trash,
             "Clear",
             `This action is irreversible. Are you sure you want to proceed?s`
-          ).then(async res => {
+          ).then(async (res) => {
             if (res) {
               await clearTrash();
             }
           });
-        }
+        },
       }}
     />
   );

@@ -4,22 +4,21 @@ import ListItem from "../list-item";
 import { store } from "../../stores/notebook-store";
 import { showEditNoteDialog } from "../dialogs/addnotebookdialog";
 
-const dropdownRefs = [];
 function menuItems(notebook, index) {
   return [
     {
       title: notebook.pinned ? "Unpin" : "Pin",
-      onClick: () => store.pin(notebook, index)
+      onClick: () => store.pin(notebook, index),
     },
     {
       title: "Edit",
-      onClick: () => showEditNoteDialog(notebook)
+      onClick: () => showEditNoteDialog(notebook),
     },
     {
       title: "Delete",
       color: "red",
-      onClick: () => store.delete(notebook.id, index)
-    }
+      onClick: () => store.delete(notebook.id, index),
+    },
   ];
 }
 
@@ -46,9 +45,9 @@ class Notebook extends React.Component {
         body={notebook.description}
         subBody={
           <Flex sx={{ marginBottom: 1, marginTop: 1 }}>
-            {notebook.topics.slice(1, 4).map(topic => (
+            {notebook.topics.slice(1, 4).map((topic) => (
               <Flex
-                onClick={e => {
+                onClick={(e) => {
                   onTopicClick(notebook, topic);
                   e.stopPropagation();
                 }}
@@ -60,7 +59,7 @@ class Notebook extends React.Component {
                   borderRadius: "default",
                   color: "static",
                   paddingTop: 0.4,
-                  paddingBottom: 0.4
+                  paddingBottom: 0.4,
                 }}
               >
                 <Text variant="body" fontSize={11}>
@@ -80,7 +79,6 @@ class Notebook extends React.Component {
           </Flex>
         }
         pinned={notebook.pinned}
-        dropdownRefs={dropdownRefs}
         index={index}
         menuData={notebook}
         menuItems={menuItems(notebook, index)}

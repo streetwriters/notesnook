@@ -1,6 +1,4 @@
 import { useEffect, useRef } from "react";
-import Dropdown from "../components/dropdown";
-
 var oldOpenedMenu;
 
 function isMouseInside(e, element) {
@@ -13,7 +11,6 @@ function contextMenuHandler(event, ref, menuId) {
     isMouseInside(event, ref.current) &&
     !isMouseInside(event, oldOpenedMenu)
   ) {
-    Dropdown.closeLastOpened();
     dismissMenu(oldOpenedMenu);
 
     event.preventDefault();
@@ -41,7 +38,7 @@ function useContextMenu(menuId) {
   const ref = useRef();
   useEffect(() => {
     const parent = ref.current;
-    const handler = e => contextMenuHandler(e, ref, menuId);
+    const handler = (e) => contextMenuHandler(e, ref, menuId);
     parent.addEventListener("contextmenu", handler);
     window.onkeydown = onKeyDown;
     window.onclick = onClick;
@@ -72,7 +69,7 @@ function getPosition(e) {
 
   return {
     x: posx - 50,
-    y: posy - 100
+    y: posy - 100,
   };
 }
 
