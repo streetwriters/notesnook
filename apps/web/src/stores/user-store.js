@@ -2,6 +2,7 @@ import createStore from "../common/store";
 import { db } from "../common";
 import { store as appStore } from "./app-store";
 import BaseStore from "./index";
+import RootNavigator from "../navigation/navigators/rootnavigator";
 
 class UserStore extends BaseStore {
   isLoggedIn = false;
@@ -62,12 +63,13 @@ class UserStore extends BaseStore {
   };
 
   logout = () => {
-    db.user.logout().then(async () => {
+    return db.user.logout().then(async () => {
       this.set((state) => {
         state.user = undefined;
         state.isLoggedIn = false;
       });
       await appStore.refresh();
+      RootNavigator.navigate("home");
     });
   };
 }

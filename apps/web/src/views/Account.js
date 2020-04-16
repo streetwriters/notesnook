@@ -1,7 +1,9 @@
 import React from "react";
 import { Flex, Button, Image, Text } from "rebass";
+import { useStore } from "../stores/user-store";
 
 function Account() {
+  const logout = useStore((store) => store.logout);
   return (
     <Flex variant="columnFill">
       <Image
@@ -30,7 +32,14 @@ function Account() {
       <Button variant="list">Vault</Button>
       <Button variant="list">My Subscription</Button>
       <Button variant="list">Change Password</Button>
-      <Button variant="list">Logout</Button>
+      <Button
+        variant="list"
+        onClick={async () => {
+          await logout();
+        }}
+      >
+        Logout
+      </Button>
     </Flex>
   );
 }
