@@ -31,7 +31,7 @@ function Menu(props) {
         </Text>
         {props.menuItems.map(
           (item) =>
-            !item.invisible && (
+            !item.visible && (
               <Flex
                 key={item.title}
                 onClick={(e) => {
@@ -55,9 +55,13 @@ function Menu(props) {
                   },
                 }}
               >
-                <Text as="span" fontFamily="body" fontSize="menu">
-                  {item.title}
-                </Text>
+                {item.component ? (
+                  <item.component data={props.data} />
+                ) : (
+                  <Text as="span" fontFamily="body" fontSize="menu">
+                    {item.title}
+                  </Text>
+                )}
               </Flex>
             )
         )}

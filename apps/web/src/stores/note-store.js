@@ -81,6 +81,18 @@ class NoteStore extends BaseStore {
     await Vault.lockNote(id, () => this._setValue(id, "locked", true));
   };
 
+  setColor = async (id, color) => {
+    const note = db.notes.note(id);
+    if (!note) return;
+    let index = note.data.colors.indexOf(color);
+    if (index > -1) {
+      await note.uncolor(color);
+    } else {
+      await note.color(color);
+    }
+    this._setValue(id, "colors", db.notes.note(id).data.colors);
+  };
+
   /**
    * @private
    */
@@ -92,17 +104,17 @@ class NoteStore extends BaseStore {
       if (index < 0) return;
 
       arr[index][prop] = value;
-      this._syncEditor(noteId, prop);
+      this._syncEditor(noteId, prop, value);
     });
   };
 
   /**
    * @private
    */
-  _syncEditor = (noteId, action) => {
+  _syncEditor = (noteId, action, value) => {
     const { session, setSession } = editorStore.get();
     if (session.id === noteId) {
-      setSession((state) => (state.session[action] = !state.session[action]));
+      setSession((state) => (state.session[action] = value));
     }
   };
 }

@@ -10,10 +10,12 @@ import { store as editorStore } from "../../stores/editor-store";
 import { showPasswordDialog } from "../dialogs/passworddialog";
 import { db, COLORS } from "../../common";
 import { useTheme } from "emotion-theming";
+import Colors from "../menu/colors";
 
 const dropdownRefs = [];
 function menuItems(note, context) {
   return [
+    { component: Colors },
     {
       title: note.notebook ? "Move" : "Add to",
       onClick: async () => {
@@ -43,7 +45,7 @@ function menuItems(note, context) {
       },
     },
     {
-      invisible: context ? (context.type === "topic" ? false : true) : true,
+      visible: context ? (context.type === "topic" ? true : false) : false,
       title: "Remove",
       onClick: async () => {
         confirm(
