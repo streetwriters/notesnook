@@ -2,7 +2,7 @@ import MMKV from 'react-native-mmkv-storage';
 import Sodium from "react-native-sodium";
 
 async function read(key, isArray = false) {
-  console.log(key, isArray, 'HERE');
+
   //console.log("DATA_VAULT", await MMKV.getMapAsync('vaultKey'))
   let data;
   if (isArray) {
@@ -55,25 +55,25 @@ async function clear() {
 }
 
 function encrypt(password, data) {
-  console.log(password, data, 'encrypting');
+
   return Sodium.encrypt(password, data).then(result => result);
 }
 
 function decrypt(password, data) {
-  console.log(data, password, 'decrypting');
+
   return Sodium.decrypt(password, data).then(result => result);
 
 }
 
 async function deriveKey(password, salt) {
-  console.log('here', password, salt);
+
   try {
 
     let data = await Sodium.deriveKey(password, salt)
-    console.log('key', data.key);
+
     return data.key
   } catch (e) {
-    console.log(e);
+
   }
 
 }
