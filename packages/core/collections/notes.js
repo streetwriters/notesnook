@@ -221,26 +221,33 @@ function isNoteEmpty(note) {
   if (!note.content) return true;
   const {
     title,
-    content: { delta, text },
+    content: { delta },
     locked,
   } = note;
+  const text = getText(note);
+
   const isTitleEmpty = !title || !title.trim().length;
-  let textLength =
-    text.data != null ? text.data.trim().length : text.trim().length;
-  const isTextEmpty = !isHex(text) && (!text || !textLength);
+  const isTextEmpty = !isHex(text) && (!text || !text.trim().length);
   const isDeltaEmpty = !isHex(delta) && (!delta || !delta.ops);
   return !locked && isTitleEmpty && isTextEmpty && isDeltaEmpty;
 }
 
 function getNoteHeadline(note) {
   if (note.locked) return "";
-  return (
-    note.content.text.substring(0, 150) +
-    (note.content.text.length > 150 ? "..." : "")
-  );
+  const text = getText(note);
+  return text.substring(0, 150) + (text.length > 150 ? "..." : "");
 }
 
 function getNoteTitle(note) {
   if (note.title && note.title.length > 0) return note.title.trim();
-  return note.content.text.split(" ").slice(0, 3).join(" ").trim();
+  const text = getText(note);
+  return text.split(" ").slice(0, 3).join(" ").trim();
+}
+
+function getText(note) {
+  if (!note.content || !note.content.text) return "";
+  const { text } = note.content;
+  if (text.data != null) return text.data;
+  else if (text != null) return text;
+  else return "";
 }
