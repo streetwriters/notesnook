@@ -8,9 +8,9 @@ import { useStore as useSearchStore } from "../../stores/searchstore";
 import { useStore as useSelectionStore } from "../../stores/selection-store";
 
 function ListContainer(props) {
-  const setSearchContext = useSearchStore(store => store.setSearchContext);
-  const shouldSelectAll = useSelectionStore(store => store.shouldSelectAll);
-  const setSelectedItems = useSelectionStore(store => store.setSelectedItems);
+  const setSearchContext = useSearchStore((store) => store.setSearchContext);
+  const shouldSelectAll = useSelectionStore((store) => store.shouldSelectAll);
+  const setSelectedItems = useSelectionStore((store) => store.setSelectedItems);
 
   useEffect(() => {
     if (shouldSelectAll) setSelectedItems(props.items);
@@ -20,7 +20,7 @@ function ListContainer(props) {
     setSearchContext({
       items: props.items,
       item: props.item,
-      type: props.type
+      type: props.type,
     });
   }, [setSearchContext, props.item, props.items, props.type, props.noSearch]);
 
@@ -34,18 +34,18 @@ function ListContainer(props) {
         <>
           {!props.noSearch && <Search type={props.type} />}
           <Flex variant="columnFill" mt={2}>
-            {props.children || (
+            {props.children || props.items.length > 0 ? (
               <List
                 style={{
                   width: "100%",
                   flex: "1 1 auto",
                   height: "auto",
-                  overflowX: "hidden"
+                  overflowX: "hidden",
                 }}
                 totalCount={props.items.length}
-                item={index => props.item(index, props.items[index])}
+                item={(index) => props.item(index, props.items[index])}
               />
-            )}
+            ) : null}
           </Flex>
         </>
       )}
