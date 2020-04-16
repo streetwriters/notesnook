@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
+import ReactDOM from "react-dom";
 import { Flex, Box, Text } from "rebass";
 import * as Icon from "../icons";
 import Menu from "../menu";
@@ -7,18 +8,6 @@ import {
   useStore as useSelectionStore,
 } from "../../stores/selection-store";
 import useContextMenu from "../../utils/useContextMenu";
-
-function ActionsMenu(props) {
-  return (
-    <Menu
-      id={props.id}
-      menuItems={props.menuItems}
-      data={props.menuData}
-      style={props.style}
-      closeMenu={props.closeMenu}
-    />
-  );
-}
 
 function selectMenuItem(isSelected, toggleSelection) {
   return {
@@ -53,9 +42,8 @@ const ItemSelector = ({ isSelected, toggleSelection }) => {
 };
 
 function ListItem(props) {
-  const [parentRef, closeContextMenu] = useContextMenu(
-    `contextMenu${props.index}`
-  );
+  const menuId = `contextMenu${props.index}`;
+  const [parentRef, closeMenu, openMenu] = useContextMenu(menuId);
   const isSelectionMode = useSelectionStore((store) => store.isSelectionMode);
   const selectedItems = useSelectionStore((store) => store.selectedItems);
   const isSelected =
@@ -198,22 +186,27 @@ function ListItem(props) {
             strokeWidth={2}
             color="icon"
             style={{ marginRight: -5 }}
+            onClick={(e) => {
+              openMenu(e.nativeEvent, menuId, true);
+            }}
           />
         )}
       </Flex>
-      {props.menuItems && (
-        <ActionsMenu
-          {...props}
-          menuItems={menuItems}
-          id={`contextMenu${props.index}`}
-          style={{
-            position: "absolute",
-            display: "none",
-            zIndex: 999,
-          }}
-          closeMenu={() => closeContextMenu()}
-        />
-      )}
+      {props.menuItems &&
+        ReactDOM.createPortal(
+          <Menu
+            id={menuId}
+            menuItems={menuItems}
+            data={props.menuData}
+            style={{
+              position: "absolute",
+              display: "none",
+              zIndex: 999,
+            }}
+            closeMenu={() => closeMenu()}
+          />,
+          document.body
+        )}
     </Flex>
   );
 }

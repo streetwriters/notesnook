@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 var oldOpenedMenu;
+var isOpening = false;
 
 function isMouseInside(e, element) {
   if (!e || !element) return false;
@@ -12,13 +13,8 @@ function contextMenuHandler(event, ref, menuId) {
     !isMouseInside(event, oldOpenedMenu)
   ) {
     dismissMenu(oldOpenedMenu);
-
     event.preventDefault();
-    const menu = document.getElementById(menuId);
-    if (!menu) return;
-    menu.style.display = "block";
-    positionMenu(event, menu);
-    oldOpenedMenu = menu;
+    openMenu(event, menuId);
   }
 }
 
@@ -27,11 +23,29 @@ function onKeyDown(event) {
 }
 
 function onClick() {
+  if (isOpening) {
+    isOpening = false;
+    return;
+  }
   dismissMenu(oldOpenedMenu);
 }
 
 function dismissMenu(menu) {
-  if (menu) menu.style.display = "none";
+  if (menu) {
+    menu.style.display = "none";
+    oldOpenedMenu = undefined;
+  }
+}
+
+function openMenu(event, menuId, withOnClick = false) {
+  if (withOnClick) {
+    isOpening = true;
+  }
+  const menu = document.getElementById(menuId);
+  if (!menu) return;
+  menu.style.display = "block";
+  positionMenu(event, menu);
+  oldOpenedMenu = menu;
 }
 
 function useContextMenu(menuId) {
@@ -46,7 +60,7 @@ function useContextMenu(menuId) {
       parent.removeEventListener("contextmenu", handler);
     };
   });
-  return [ref, onClick];
+  return [ref, onClick, openMenu];
 }
 
 function getPosition(e) {
@@ -68,8 +82,8 @@ function getPosition(e) {
   }
 
   return {
-    x: posx - 50,
-    y: posy - 100,
+    x: posx,
+    y: posy,
   };
 }
 

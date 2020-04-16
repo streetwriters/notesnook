@@ -26,6 +26,7 @@ function createIcon(name) {
         whileHover={{ scale: 1.1 }}
         transition={{ duration: 0.3, ease: "easeOut" }}
         animate={props.animation}
+        onClick={props.onClick}
       >
         <Icon name={name} {...props} />
       </Animated.Box>
