@@ -2,8 +2,6 @@ import MMKV from 'react-native-mmkv-storage';
 import Sodium from "react-native-sodium";
 
 async function read(key, isArray = false) {
-
-  //console.log("DATA_VAULT", await MMKV.getMapAsync('vaultKey'))
   let data;
   if (isArray) {
     try {
