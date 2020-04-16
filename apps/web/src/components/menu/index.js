@@ -49,6 +49,7 @@ function Menu(props) {
                 px={3}
                 sx={{
                   color: item.color || "text",
+                  cursor: "pointer",
                   ":hover": {
                     backgroundColor: "shade",
                   },
