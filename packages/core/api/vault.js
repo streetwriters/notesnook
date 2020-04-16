@@ -199,8 +199,6 @@ export default class Vault {
           text,
         },
       });
-      //await this._db.delta.add({ id: note.content.delta, data: delta });
-      // await this._db.text.add({ id: note.content.text, data: text });
       return;
     }
 
