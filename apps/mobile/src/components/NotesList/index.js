@@ -18,6 +18,7 @@ import { NotesPlaceHolder } from '../ListPlaceholders';
 import NoteItem from '../NoteItem';
 import SelectionWrapper from '../SelectionWrapper';
 import { useIsFocused } from 'react-navigation-hooks';
+import { useSafeArea } from 'react-native-safe-area-context';
 
 const sectionListRef = createRef();
 export const NotesList = ({ isGrouped = false }) => {
@@ -26,7 +27,7 @@ export const NotesList = ({ isGrouped = false }) => {
   const isFocused = useIsFocused();
   const [refreshing, setRefreshing] = useState(false);
   const searchResults = { ...state.searchResults };
-
+  const insets = useSafeArea();
   const _renderItem = ({ item, index }) => (
     <SelectionWrapper
       index={index}
@@ -77,8 +78,8 @@ export const NotesList = ({ isGrouped = false }) => {
                 : 135
               : 135 - 60
             : notes[0] && !selectionMode
-              ? 155
-              : 155 - 60,
+              ? 155 - insets.top
+              : (155 - 60) - insets.top,
       }}>
       <PinnedItems />
     </View>
@@ -202,22 +203,16 @@ export const NotesList = ({ isGrouped = false }) => {
             setRefreshing(true);
             try {
               await db.sync();
-              dispatch({ type: ACTIONS.NOTES });
-              dispatch({ type: ACTIONS.PINNED });
-              let user = await db.user.get();
-              dispatch({ type: ACTIONS.USER, user: user });
               setRefreshing(false);
               ToastEvent.show('Sync Complete', 'success');
             } catch (e) {
               setRefreshing(false);
-              dispatch({ type: ACTIONS.NOTES });
-              dispatch({ type: ACTIONS.PINNED });
-              let user = await db.user.get();
-              dispatch({ type: ACTIONS.USER, user: user });
               ToastEvent.show(e.message, 'error');
             }
-
-
+            dispatch({ type: ACTIONS.NOTES });
+            dispatch({ type: ACTIONS.PINNED });
+            let user = await db.user.get();
+            dispatch({ type: ACTIONS.USER, user: user });
           }}
           refreshing={refreshing}
         />

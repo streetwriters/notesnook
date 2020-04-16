@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -10,18 +10,19 @@ import {
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {br, opacity, pv, SIZE, WEIGHT} from '../../common/common';
-import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
-import {eScrollEvent, eClearSearch} from '../../services/events';
-import {db, getElevation, ToastEvent, DDS, selection} from '../../utils/utils';
-import {Header} from '../header';
-import {Search} from '../SearchInput';
+import { br, opacity, pv, SIZE, WEIGHT } from '../../common/common';
+import { useTracked } from '../../provider';
+import { ACTIONS } from '../../provider/actions';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/eventManager';
+import { eScrollEvent, eClearSearch } from '../../services/events';
+import { db, getElevation, ToastEvent, DDS, selection } from '../../utils/utils';
+import { Header } from '../header';
+import { Search } from '../SearchInput';
 import SelectionHeader from '../SelectionHeader';
-import {inputRef} from '../../utils/refs';
+import { inputRef } from '../../utils/refs';
+import { useSafeArea } from 'react-native-safe-area-context';
 
-const AnimatedSafeAreaView = Animatable.createAnimatableComponent(SafeAreaView);
+const AnimatedKeyboardAvoidingView = Animatable.createAnimatableComponent(KeyboardAvoidingView);
 
 const AnimatedTouchableOpacity = Animatable.createAnimatableComponent(
   TouchableOpacity,
@@ -49,11 +50,13 @@ export const Container = ({
 }) => {
   // State
   const [state, dispatch] = useTracked();
-  const {colors, selectionMode, searchResults, loading} = state;
+  const { colors, selectionMode, searchResults, loading } = state;
   const [text, setText] = useState('');
-
   const [hideHeader, setHideHeader] = useState(false);
   const [buttonHide, setButtonHide] = useState(false);
+  const insets = useSafeArea();
+
+
 
   let offsetY = 0;
   let countUp = 1;
@@ -182,123 +185,121 @@ export const Container = ({
   // Render
 
   return (
-    <AnimatedSafeAreaView
+
+    <AnimatedKeyboardAvoidingView
       transition="backgroundColor"
       duration={300}
       style={{
         height: '100%',
         backgroundColor: colors.bg,
-      }}>
-      <KeyboardAvoidingView
-        behavior="padding"
-        enabled={Platform.OS === 'ios' ? true : false}
+        paddingTop: insets.top
+      }}
+      behavior="padding"
+      enabled={Platform.OS === 'ios' ? true : false}
+    >
+      {noSelectionHeader ? null : <SelectionHeader items={data} />}
+
+      <View
         style={{
-          height: '100%',
+          position: selectionMode ? 'relative' : 'absolute',
+          backgroundColor: colors.bg,
+          zIndex: 999,
+          display: selectionMode ? 'none' : 'flex',
+          width: '100%',
         }}>
-        {noSelectionHeader ? null : <SelectionHeader items={data} />}
+        <Header
+          menu={menu}
+          hide={hideHeader}
+          verticalMenu={verticalMenu}
+          showSearch={() => {
+            setHideHeader(false);
+            countUp = 0;
+            countDown = 0;
+          }}
+          headerColor={headerColor}
+          navigation={navigation}
+          colors={colors}
+          isLoginNavigator={isLoginNavigator}
+          preventDefaultMargins={preventDefaultMargins}
+          heading={heading}
+          canGoBack={canGoBack}
+          customIcon={customIcon}
+        />
 
-        <View
-          style={{
-            position: selectionMode ? 'relative' : 'absolute',
-            backgroundColor: colors.bg,
-            zIndex: 999,
-            display: selectionMode ? 'none' : 'flex',
-            width: '100%',
-          }}>
-          <Header
-            menu={menu}
+        {data[0] && !noSearch ? (
+          <Search
+            clear={() => setText('')}
             hide={hideHeader}
-            verticalMenu={verticalMenu}
-            showSearch={() => {
-              setHideHeader(false);
-              countUp = 0;
-              countDown = 0;
-            }}
+            onChangeText={onChangeText}
             headerColor={headerColor}
-            navigation={navigation}
-            colors={colors}
-            isLoginNavigator={isLoginNavigator}
-            preventDefaultMargins={preventDefaultMargins}
-            heading={heading}
-            canGoBack={canGoBack}
-            customIcon={customIcon}
+            onSubmitEditing={onSubmitEditing}
+            placeholder={placeholder}
+            onBlur={onBlur}
+            onFocus={onFocus}
+            clearSearch={clearSearch}
+            value={text}
           />
+        ) : null}
+      </View>
 
-          {data[0] && !noSearch ? (
-            <Search
-              clear={() => setText('')}
-              hide={hideHeader}
-              onChangeText={onChangeText}
-              headerColor={headerColor}
-              onSubmitEditing={onSubmitEditing}
-              placeholder={placeholder}
-              onBlur={onBlur}
-              onFocus={onFocus}
-              clearSearch={clearSearch}
-              value={text}
-            />
-          ) : null}
-        </View>
+      {children}
 
-        {children}
-
-        {noBottomButton ? null : (
-          <Animatable.View
-            transition={['translateY', 'opacity']}
-            useNativeDriver={true}
-            duration={300}
+      {noBottomButton ? null : (
+        <Animatable.View
+          transition={['translateY', 'opacity']}
+          useNativeDriver={true}
+          duration={300}
+          style={{
+            width: '100%',
+            opacity: buttonHide ? 0 : 1,
+            position: 'absolute',
+            paddingHorizontal: 12,
+            zIndex: 10,
+            bottom: 15,
+            transform: [
+              {
+                translateY: buttonHide ? 200 : 0,
+              },
+            ],
+          }}>
+          <AnimatedTouchableOpacity
+            onPress={bottomButtonOnPress}
+            activeOpacity={opacity}
             style={{
+              ...getElevation(5),
               width: '100%',
-              opacity: buttonHide ? 0 : 1,
-              position: 'absolute',
-              paddingHorizontal: 12,
-              zIndex: 10,
-              bottom: 15,
-              transform: [
-                {
-                  translateY: buttonHide ? 200 : 0,
-                },
-              ],
-            }}>
-            <AnimatedTouchableOpacity
-              onPress={bottomButtonOnPress}
-              activeOpacity={opacity}
-              style={{
-                ...getElevation(5),
-                width: '100%',
 
-                alignSelf: 'center',
-                borderRadius: br,
-                backgroundColor: headerColor ? headerColor : colors.accent,
-                justifyContent: 'center',
+              alignSelf: 'center',
+              borderRadius: br,
+              backgroundColor: headerColor ? headerColor : colors.accent,
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginBottom: 0,
+            }}>
+            <View
+              style={{
+                justifyContent: 'flex-start',
                 alignItems: 'center',
-                marginBottom: 0,
+                flexDirection: 'row',
+                width: '100%',
+                padding: pv,
+                paddingVertical: pv + 5,
               }}>
-              <View
+              <Icon name="plus" color="white" size={SIZE.xl} />
+              <Text
                 style={{
-                  justifyContent: 'flex-start',
-                  alignItems: 'center',
-                  flexDirection: 'row',
-                  width: '100%',
-                  padding: pv,
-                  paddingVertical: pv + 5,
+                  fontSize: SIZE.md,
+                  color: 'white',
+                  fontFamily: WEIGHT.regular,
+                  textAlignVertical: 'center',
                 }}>
-                <Icon name="plus" color="white" size={SIZE.xl} />
-                <Text
-                  style={{
-                    fontSize: SIZE.md,
-                    color: 'white',
-                    fontFamily: WEIGHT.regular,
-                    textAlignVertical: 'center',
-                  }}>
-                  {'  ' + bottomButtonText}
-                </Text>
-              </View>
-            </AnimatedTouchableOpacity>
-          </Animatable.View>
-        )}
-      </KeyboardAvoidingView>
-    </AnimatedSafeAreaView>
+                {'  ' + bottomButtonText}
+              </Text>
+            </View>
+          </AnimatedTouchableOpacity>
+        </Animatable.View>
+      )}
+    </AnimatedKeyboardAvoidingView>
   );
 };
 

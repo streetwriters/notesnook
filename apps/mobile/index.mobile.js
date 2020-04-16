@@ -11,6 +11,7 @@ import { useTracked } from './src/provider';
 import { StatusBar, Platform } from 'react-native';
 import { AppContainer } from './src/services/AppContainer';
 import NavigationService from './src/services/NavigationService';
+import { useSafeArea } from 'react-native-safe-area-context';
 
 const editorRef = createRef();
 export const Initialize = () => {

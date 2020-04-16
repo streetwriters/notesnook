@@ -42,11 +42,11 @@ export const Search = props => {
       transition={['marginTop', 'opacity']}
       duration={200}
       style={{
-        opacity: props.hide ? 0 : 1,
+        opacity: _opacity,
         height: 60,
         justifyContent: 'center',
-        marginTop: props.hide ? -65 : 0,
-        paddingHorizontal: 12,
+        marginTop: _marginAnim,
+        paddingHorizontal: 12
       }}>
       <Animated.View
         transition={['borderWidth']}
@@ -60,7 +60,7 @@ export const Search = props => {
           alignSelf: 'center',
           borderRadius: br,
           height: '90%',
-          borderWidth: props.hide ? 0 : 1.5,
+          borderWidth: _borderAnim,
           borderColor: focus
             ? props.headerColor
               ? props.headerColor

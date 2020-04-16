@@ -71,7 +71,9 @@ export const Login = ({ navigation }) => {
       try {
         console.log('here reacched');
         await db.user.login(username, password);
+
       } catch (e) {
+
         console.log(e, 'ERROR');
 
         setTimeout(() => {

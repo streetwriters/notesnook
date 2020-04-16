@@ -9,9 +9,7 @@ import { defaultState } from './src/provider/defaultState';
 import { eSubscribeEvent, eUnSubscribeEvent } from './src/services/eventManager';
 import { eDispatchAction } from './src/services/events';
 import { db, DDS } from './src/utils/utils';
-import { test } from './src/utils/storage';
-
-
+import { SafeAreaContext, SafeAreaProvider } from 'react-native-safe-area-context';
 
 const App = () => {
   const [state, dispatch] = useTracked();
@@ -88,10 +86,15 @@ const App = () => {
     return <></>;
   }
   return (
-    <>
-      <I.Initialize />
-      <Loading />
-    </>
+
+
+    <SafeAreaProvider>
+      <>
+        <I.Initialize />
+        <Loading />
+      </>
+    </SafeAreaProvider>
+
   );
 };
 
