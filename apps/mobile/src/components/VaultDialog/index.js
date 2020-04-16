@@ -322,6 +322,7 @@ export class VaultDialog extends Component {
                 maxWidth: '90%',
                 alignSelf: 'center',
                 marginTop: 10,
+                marginBottom: 10
               }}>
               {!novault
                 ? 'Set a password to create vault'
