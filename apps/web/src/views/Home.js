@@ -9,8 +9,9 @@ import NotesPlaceholder from "../components/placeholders/notesplacholder";
 
 function Home() {
   useEffect(() => store.refresh(), []);
-  const notes = useStore(store => store.notes);
-  const newSession = useEditorStore(store => store.newSession);
+  const notes = useStore((store) => store.notes);
+  const newSession = useEditorStore((store) => store.newSession);
+  console.log(notes);
   return (
     <ListContainer
       items={notes.items}
@@ -26,11 +27,12 @@ function Home() {
           width: "100%",
           flex: "1 1 auto",
           height: "auto",
-          overflowX: "hidden"
+          overflowX: "hidden",
         }}
         groupCounts={notes.groupCounts}
-        group={groupIndex =>
-          notes.groups[groupIndex].title === "Pinned" ? (
+        group={(groupIndex) => {
+          if (!notes.groups[groupIndex]) return;
+          return notes.groups[groupIndex].title === "Pinned" ? (
             <Box px={2} bg="background" py={1} />
           ) : (
             <Box mx={2} bg="background" py={0}>
@@ -38,8 +40,8 @@ function Home() {
                 {notes.groups[groupIndex].title}
               </Text>
             </Box>
-          )
-        }
+          );
+        }}
         item={(index, groupIndex) =>
           notes.groupCounts[groupIndex] && (
             <Note index={index} pinnable={true} item={notes.items[index]} />
