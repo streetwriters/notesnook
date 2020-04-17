@@ -35,7 +35,6 @@ function Menu(props) {
                 key={item.title}
                 onClick={(e) => {
                   e.stopPropagation();
-                  //Dropdown.closeLastOpened();
                   if (props.closeMenu) {
                     props.closeMenu();
                   }
