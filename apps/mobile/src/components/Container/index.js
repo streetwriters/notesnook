@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -10,19 +10,21 @@ import {
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { br, opacity, pv, SIZE, WEIGHT } from '../../common/common';
-import { useTracked } from '../../provider';
-import { ACTIONS } from '../../provider/actions';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/eventManager';
-import { eScrollEvent, eClearSearch } from '../../services/events';
-import { db, getElevation, ToastEvent, DDS, selection } from '../../utils/utils';
-import { Header } from '../header';
-import { Search } from '../SearchInput';
+import {br, opacity, pv, SIZE, WEIGHT} from '../../common/common';
+import {useTracked} from '../../provider';
+import {ACTIONS} from '../../provider/actions';
+import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
+import {eScrollEvent, eClearSearch} from '../../services/events';
+import {db, getElevation, ToastEvent, DDS, selection} from '../../utils/utils';
+import {Header} from '../header';
+import {Search} from '../SearchInput';
 import SelectionHeader from '../SelectionHeader';
-import { inputRef } from '../../utils/refs';
-import { useSafeArea } from 'react-native-safe-area-context';
+import {inputRef} from '../../utils/refs';
+import {useSafeArea} from 'react-native-safe-area-context';
 
-const AnimatedKeyboardAvoidingView = Animatable.createAnimatableComponent(KeyboardAvoidingView);
+const AnimatedKeyboardAvoidingView = Animatable.createAnimatableComponent(
+  KeyboardAvoidingView,
+);
 
 const AnimatedTouchableOpacity = Animatable.createAnimatableComponent(
   TouchableOpacity,
@@ -50,13 +52,11 @@ export const Container = ({
 }) => {
   // State
   const [state, dispatch] = useTracked();
-  const { colors, selectionMode, searchResults, loading } = state;
+  const {colors, selectionMode, searchResults, loading} = state;
   const [text, setText] = useState('');
   const [hideHeader, setHideHeader] = useState(false);
   const [buttonHide, setButtonHide] = useState(false);
   const insets = useSafeArea();
-
-
 
   let offsetY = 0;
   let countUp = 1;
@@ -185,18 +185,16 @@ export const Container = ({
   // Render
 
   return (
-
     <AnimatedKeyboardAvoidingView
       transition="backgroundColor"
       duration={300}
       style={{
         height: '100%',
         backgroundColor: colors.bg,
-        paddingTop: insets.top
+        paddingTop: insets.top,
       }}
       behavior="padding"
-      enabled={Platform.OS === 'ios' ? true : false}
-    >
+      enabled={Platform.OS === 'ios' ? true : false}>
       {noSelectionHeader ? null : <SelectionHeader items={data} />}
 
       <View
@@ -255,7 +253,7 @@ export const Container = ({
             position: 'absolute',
             paddingHorizontal: 12,
             zIndex: 10,
-            bottom: 15,
+            bottom: Platform.OS === 'ios' ? insets.bottom : 15,
             transform: [
               {
                 translateY: buttonHide ? 200 : 0,
