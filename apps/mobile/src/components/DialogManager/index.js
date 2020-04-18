@@ -210,31 +210,15 @@ export class DialogManager extends Component {
           this._showSimpleDialog(TEMPLATE_PERMANANT_DELETE);
           break;
         }
-        case 'lock': {
-          this._showVaultDialog();
-
-          break;
-        }
         case 'novault': {
-          this.setState({
-            vaultExists: false,
-          });
-          this._showVaultDialog();
+          openVault(this.state.item, false);
+        }
+        case 'vaultlocked': {
+          openVault(this.state.item, true, true);
+          break;
         }
         case 'unlock': {
-          this.setState({
-            isPerm: true,
-          });
-          this._showVaultDialog();
-          break;
-        }
-        case 'unlock_share': {
-          this.setState({
-            isPerm: false,
-            shareAfterUnlock: true,
-          });
-          this._showVaultDialog();
-          break;
+          openVault(this.state.item, true, true, true, false, false);
         }
         case 'notebook': {
           this.showAddNotebook({item: this.state.item});
