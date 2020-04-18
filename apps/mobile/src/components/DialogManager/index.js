@@ -212,13 +212,15 @@ export class DialogManager extends Component {
         }
         case 'novault': {
           openVault(this.state.item, false);
+          break;
         }
-        case 'vaultlocked': {
+        case 'locked': {
           openVault(this.state.item, true, true);
           break;
         }
         case 'unlock': {
           openVault(this.state.item, true, true, true, false, false);
+          break;
         }
         case 'notebook': {
           this.showAddNotebook({item: this.state.item});
