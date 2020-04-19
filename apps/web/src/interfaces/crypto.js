@@ -5,7 +5,7 @@ class Crypto {
   }
   async _initialize() {
     if (this.isReady) return;
-    const _sodium = require("libsodium-wrappers");
+    const { default: _sodium } = await import("libsodium-wrappers");
     await _sodium.ready;
     this.sodium = _sodium;
     this.isReady = true;

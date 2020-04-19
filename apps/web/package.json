@@ -10,7 +10,7 @@
     "fast-sort": "^2.1.1",
     "framer-motion": "^1.10.3",
     "immer": "^6.0.3",
-    "libsodium-wrappers": "0.7.6",
+    "libsodium-wrappers": "https://github.com/streetwriters/libsodium-packages.git#libsodium-wrappers",
     "localforage": "^1.7.3",
     "localforage-getitems": "https://github.com/thecodrr/localForage-getItems.git",
     "notes-core": "npm:@streetwriters/notesnook-core@latest",
@@ -34,6 +34,7 @@
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-react": "^7.19.0",
     "eslint-plugin-react-hooks": "^3.0.0",
+    "source-map-explorer": "^2.4.2",
     "typescript": "^3.8.3"
   },
   "scripts": {
