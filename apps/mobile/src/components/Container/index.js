@@ -3,10 +3,11 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   Platform,
-  SafeAreaView,
   Text,
   TouchableOpacity,
   View,
+  StatusBar,
+  SafeAreaView,
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -20,15 +21,12 @@ import {Header} from '../header';
 import {Search} from '../SearchInput';
 import SelectionHeader from '../SelectionHeader';
 import {inputRef} from '../../utils/refs';
-import {useSafeArea} from 'react-native-safe-area-context';
-
-const AnimatedKeyboardAvoidingView = Animatable.createAnimatableComponent(
-  KeyboardAvoidingView,
-);
 
 const AnimatedTouchableOpacity = Animatable.createAnimatableComponent(
   TouchableOpacity,
 );
+
+const AnimatedSafeAreaView = Animatable.createAnimatableComponent(SafeAreaView);
 
 export const Container = ({
   children,
@@ -56,7 +54,6 @@ export const Container = ({
   const [text, setText] = useState('');
   const [hideHeader, setHideHeader] = useState(false);
   const [buttonHide, setButtonHide] = useState(false);
-  const insets = useSafeArea();
 
   let offsetY = 0;
   let countUp = 1;
@@ -185,119 +182,120 @@ export const Container = ({
   // Render
 
   return (
-    <AnimatedKeyboardAvoidingView
-      transition="backgroundColor"
-      duration={300}
-      style={{
-        height: '100%',
-        backgroundColor: colors.bg,
-        paddingTop: insets.top,
-      }}
+    <KeyboardAvoidingView
       behavior="padding"
       enabled={Platform.OS === 'ios' ? true : false}>
-      {noSelectionHeader ? null : <SelectionHeader items={data} />}
-
-      <View
+      <AnimatedSafeAreaView
+        transition="backgroundColor"
+        duration={300}
         style={{
-          position: selectionMode ? 'relative' : 'absolute',
+          height: '100%',
           backgroundColor: colors.bg,
-          zIndex: 999,
-          display: selectionMode ? 'none' : 'flex',
-          width: '100%',
+          paddingTop: StatusBar.currentHeight,
         }}>
-        <Header
-          menu={menu}
-          hide={hideHeader}
-          verticalMenu={verticalMenu}
-          showSearch={() => {
-            setHideHeader(false);
-            countUp = 0;
-            countDown = 0;
-          }}
-          headerColor={headerColor}
-          navigation={navigation}
-          colors={colors}
-          isLoginNavigator={isLoginNavigator}
-          preventDefaultMargins={preventDefaultMargins}
-          heading={heading}
-          canGoBack={canGoBack}
-          customIcon={customIcon}
-        />
+        {noSelectionHeader ? null : <SelectionHeader items={data} />}
 
-        {data[0] && !noSearch ? (
-          <Search
-            clear={() => setText('')}
-            hide={hideHeader}
-            onChangeText={onChangeText}
-            headerColor={headerColor}
-            onSubmitEditing={onSubmitEditing}
-            placeholder={placeholder}
-            onBlur={onBlur}
-            onFocus={onFocus}
-            clearSearch={clearSearch}
-            value={text}
-          />
-        ) : null}
-      </View>
-
-      {children}
-
-      {noBottomButton ? null : (
-        <Animatable.View
-          transition={['translateY', 'opacity']}
-          useNativeDriver={true}
-          duration={300}
+        <View
           style={{
+            position: selectionMode ? 'relative' : 'absolute',
+            backgroundColor: colors.bg,
+            zIndex: 999,
+            display: selectionMode ? 'none' : 'flex',
             width: '100%',
-            opacity: buttonHide ? 0 : 1,
-            position: 'absolute',
-            paddingHorizontal: 12,
-            zIndex: 10,
-            bottom: Platform.OS === 'ios' ? insets.bottom : 15,
-            transform: [
-              {
-                translateY: buttonHide ? 200 : 0,
-              },
-            ],
           }}>
-          <AnimatedTouchableOpacity
-            onPress={bottomButtonOnPress}
-            activeOpacity={opacity}
-            style={{
-              ...getElevation(5),
-              width: '100%',
+          <Header
+            menu={menu}
+            hide={hideHeader}
+            verticalMenu={verticalMenu}
+            showSearch={() => {
+              setHideHeader(false);
+              countUp = 0;
+              countDown = 0;
+            }}
+            headerColor={headerColor}
+            navigation={navigation}
+            colors={colors}
+            isLoginNavigator={isLoginNavigator}
+            preventDefaultMargins={preventDefaultMargins}
+            heading={heading}
+            canGoBack={canGoBack}
+            customIcon={customIcon}
+          />
 
-              alignSelf: 'center',
-              borderRadius: br,
-              backgroundColor: headerColor ? headerColor : colors.accent,
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginBottom: 0,
+          {data[0] && !noSearch ? (
+            <Search
+              clear={() => setText('')}
+              hide={hideHeader}
+              onChangeText={onChangeText}
+              headerColor={headerColor}
+              onSubmitEditing={onSubmitEditing}
+              placeholder={placeholder}
+              onBlur={onBlur}
+              onFocus={onFocus}
+              clearSearch={clearSearch}
+              value={text}
+            />
+          ) : null}
+        </View>
+
+        {children}
+
+        {noBottomButton ? null : (
+          <Animatable.View
+            transition={['translateY', 'opacity']}
+            useNativeDriver={true}
+            duration={300}
+            style={{
+              width: '100%',
+              opacity: buttonHide ? 0 : 1,
+              position: 'absolute',
+              paddingHorizontal: 12,
+              zIndex: 10,
+              transform: [
+                {
+                  translateY: buttonHide ? 200 : 0,
+                },
+              ],
             }}>
-            <View
+            <AnimatedTouchableOpacity
+              onPress={bottomButtonOnPress}
+              activeOpacity={opacity}
               style={{
-                justifyContent: 'flex-start',
-                alignItems: 'center',
-                flexDirection: 'row',
+                ...getElevation(5),
                 width: '100%',
-                padding: pv,
-                paddingVertical: pv + 5,
+
+                alignSelf: 'center',
+                borderRadius: br,
+                backgroundColor: headerColor ? headerColor : colors.accent,
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginBottom: 0,
               }}>
-              <Icon name="plus" color="white" size={SIZE.xl} />
-              <Text
+              <View
                 style={{
-                  fontSize: SIZE.md,
-                  color: 'white',
-                  fontFamily: WEIGHT.regular,
-                  textAlignVertical: 'center',
+                  justifyContent: 'flex-start',
+                  alignItems: 'center',
+                  flexDirection: 'row',
+                  width: '100%',
+                  padding: pv,
+                  paddingVertical: pv + 5,
                 }}>
-                {'  ' + bottomButtonText}
-              </Text>
-            </View>
-          </AnimatedTouchableOpacity>
-        </Animatable.View>
-      )}
-    </AnimatedKeyboardAvoidingView>
+                <Icon name="plus" color="white" size={SIZE.xl} />
+                <Text
+                  style={{
+                    fontSize: SIZE.md,
+                    color: 'white',
+                    fontFamily: WEIGHT.regular,
+                    textAlignVertical: 'center',
+                  }}>
+                  {'  ' + bottomButtonText}
+                </Text>
+              </View>
+            </AnimatedTouchableOpacity>
+          </Animatable.View>
+        )}
+      </AnimatedSafeAreaView>
+    </KeyboardAvoidingView>
   );
 };
 

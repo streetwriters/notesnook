@@ -38,7 +38,6 @@ import {
 import {exitEditorAnimation} from '../../utils/animations';
 import {sideMenuRef} from '../../utils/refs';
 import {db, DDS, editing, timeConverter, ToastEvent} from '../../utils/utils';
-import {useSafeArea} from 'react-native-safe-area-context';
 
 const EditorWebView = createRef();
 let note = {};
@@ -57,7 +56,7 @@ const Editor = ({noMenu}) => {
   const {colors} = state;
   const [fullscreen, setFullscreen] = useState(false);
   const [dateEdited, setDateEdited] = useState(0);
-  const insets = useSafeArea();
+
   // FUNCTIONS
 
   const post = message =>
@@ -518,7 +517,7 @@ const Editor = ({noMenu}) => {
               position: 'absolute',
               left: 0,
               top: 0,
-              marginTop: Platform.OS === 'ios' ? 0 : insets.top,
+              marginTop: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight,
               paddingLeft: 12,
               zIndex: 800,
             }}>
@@ -539,7 +538,7 @@ const Editor = ({noMenu}) => {
             flexDirection: 'row',
             marginRight: 0,
             position: 'absolute',
-            marginTop: Platform.OS === 'ios' ? 0 : insets.top,
+            marginTop: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight,
             zIndex: 800,
             right: 0,
             top: 0,
@@ -593,7 +592,8 @@ const Editor = ({noMenu}) => {
         <View
           style={{
             paddingHorizontal: 12,
-            marginTop: Platform.OS === 'ios' ? 45 : insets.top + 45,
+            marginTop:
+              Platform.OS === 'ios' ? 45 : StatusBar.currentHeight + 45,
             width: '100%',
             position: 'absolute',
             justifyContent: 'flex-start',

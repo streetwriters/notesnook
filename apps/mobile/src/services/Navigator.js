@@ -14,10 +14,11 @@ import Settings from '../views/Settings';
 import Signup from '../views/Signup';
 import Tags from '../views/Tags';
 import Trash from '../views/Trash';
-import { createStackNavigator } from 'react-navigation-stack';
+import {createStackNavigator} from 'react-navigation-stack';
+import {Animated} from 'react-native';
 
 const fade = props => {
-  const { position, scene } = props;
+  const {position, scene} = props;
 
   const index = scene.index;
 
@@ -31,10 +32,9 @@ const fade = props => {
 
   return {
     opacity,
-    transform: [{ translateX }, { translateY }],
+    transform: [{translateX}, {translateY}],
   };
 };
-
 
 export const TopLevelNavigator = createStackNavigator(
   {
@@ -89,11 +89,9 @@ export const TopLevelNavigator = createStackNavigator(
     Notebook: {
       screen: Notebook,
     },
-
   },
   {
     initialRouteName: 'Home',
-
     defaultNavigationOptions: {
       gesturesEnabled: false,
       headerStyle: {
@@ -102,8 +100,14 @@ export const TopLevelNavigator = createStackNavigator(
         height: 0,
       },
     },
-    cardOverlayEnabled: true,
-    cardShadowEnabled: true,
+    transitionConfig: () => ({
+      transitionSpec: {
+        timing: Animated.timing,
+      },
+      screenInterpolator: () => {},
+    }),
+    cardOverlayEnabled: false,
+    cardShadowEnabled: false,
     animationEnabled: false,
   },
 );

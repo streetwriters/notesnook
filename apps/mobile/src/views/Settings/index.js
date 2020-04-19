@@ -21,23 +21,22 @@ import {
   WEIGHT,
 } from '../../common/common';
 import Container from '../../components/Container';
-import { useTracked } from '../../provider';
-import { ACTIONS } from '../../provider/actions';
-import { eSendEvent } from '../../services/eventManager';
-import { eOpenLoginDialog } from '../../services/events';
+import {useTracked} from '../../provider';
+import {ACTIONS} from '../../provider/actions';
+import {eSendEvent} from '../../services/eventManager';
+import {eOpenLoginDialog} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
-import { hexToRGBA, w, DDS, setSetting, db, ToastEvent } from '../../utils/utils';
-import { useSafeArea } from 'react-native-safe-area-context';
+import {hexToRGBA, w, DDS, setSetting, db, ToastEvent} from '../../utils/utils';
 
-export const Settings = ({ navigation }) => {
+export const Settings = ({navigation}) => {
   const [state, dispatch] = useTracked();
-  const { colors, user, settings } = state;
-  const insets = useSafeArea();
+  const {colors, user, settings} = state;
+
   function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
     let newColors = setColorScheme(colors, accent);
     StatusBar.setBarStyle(colors.night ? 'light-content' : 'dark-content');
 
-    dispatch({ type: ACTIONS.THEME, colors: newColors });
+    dispatch({type: ACTIONS.THEME, colors: newColors});
   }
 
   function changeAccentColor(accentColor) {
@@ -56,7 +55,7 @@ export const Settings = ({ navigation }) => {
       noBottomButton={true}>
       <View
         style={{
-          marginTop: Platform.OS == 'ios' ? 135 - 60 : (155 - insets.top) - 60,
+          marginTop: Platform.OS == 'ios' ? 135 - 60 : 155 - 60,
         }}
       />
 
@@ -143,27 +142,27 @@ export const Settings = ({ navigation }) => {
             {[
               {
                 name: 'Backup my notes',
-                func: () => { },
+                func: () => {},
               },
 
               {
                 name: 'My vault',
-                func: () => { },
+                func: () => {},
               },
               {
                 name: 'Subscription status',
-                func: () => { },
+                func: () => {},
               },
               {
                 name: 'Change password',
-                func: () => { },
+                func: () => {},
               },
               {
                 name: 'Logout',
                 func: async () => {
                   await db.user.logout();
-                  dispatch({ type: ACTIONS.USER, user: null });
-                  dispatch({ type: ACTIONS.CLEAR_ALL });
+                  dispatch({type: ACTIONS.USER, user: null});
+                  dispatch({type: ACTIONS.CLEAR_ALL});
                   ToastEvent.show('Logged out, syncing disabled', 'success');
                 },
               },
@@ -193,74 +192,74 @@ export const Settings = ({ navigation }) => {
             ))}
           </>
         ) : (
-            <>
-              <TouchableOpacity
-                onPress={() => {
-                  DDS.isTab
-                    ? eSendEvent(eOpenLoginDialog)
-                    : NavigationService.navigate('Login');
-                }}
-                activeOpacity={opacity / 2}
+          <>
+            <TouchableOpacity
+              onPress={() => {
+                DDS.isTab
+                  ? eSendEvent(eOpenLoginDialog)
+                  : NavigationService.navigate('Login');
+              }}
+              activeOpacity={opacity / 2}
+              style={{
+                paddingVertical: pv + 5,
+                marginBottom: pv + 5,
+                width: '100%',
+                flexDirection: 'row',
+                alignItems: 'center',
+                backgroundColor: colors.shade,
+                borderRadius: 5,
+                paddingHorizontal: 6,
+              }}>
+              <View
                 style={{
-                  paddingVertical: pv + 5,
-                  marginBottom: pv + 5,
-                  width: '100%',
-                  flexDirection: 'row',
+                  width: 40,
+                  backgroundColor: colors.accent,
+                  height: 40,
+                  borderRadius: 100,
                   alignItems: 'center',
-                  backgroundColor: colors.shade,
-                  borderRadius: 5,
-                  paddingHorizontal: 6,
+                  justifyContent: 'center',
                 }}>
-                <View
-                  style={{
-                    width: 40,
-                    backgroundColor: colors.accent,
-                    height: 40,
-                    borderRadius: 100,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}>
-                  <Icon size={SIZE.lg} color="white" name="account-outline" />
-                </View>
+                <Icon size={SIZE.lg} color="white" name="account-outline" />
+              </View>
 
-                <View
+              <View
+                style={{
+                  marginLeft: 10,
+                }}>
+                <Text
                   style={{
-                    marginLeft: 10,
+                    fontFamily: WEIGHT.regular,
+                    color: colors.icon,
+                    fontSize: SIZE.xs,
                   }}>
-                  <Text
-                    style={{
-                      fontFamily: WEIGHT.regular,
-                      color: colors.icon,
-                      fontSize: SIZE.xs,
-                    }}>
-                    You are not logged in
+                  You are not logged in
                 </Text>
-                  <Text
-                    style={{
-                      color: colors.accent,
-                    }}>
-                    Login to sync notes.
+                <Text
+                  style={{
+                    color: colors.accent,
+                  }}>
+                  Login to sync notes.
                 </Text>
-                </View>
+              </View>
 
-                <View
-                  style={{
-                    width: 40,
-                    height: 40,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    position: 'absolute',
-                    right: 6,
-                  }}>
-                  <Icon
-                    name="chevron-right"
-                    color={colors.accent}
-                    size={SIZE.lg}
-                  />
-                </View>
-              </TouchableOpacity>
-            </>
-          )}
+              <View
+                style={{
+                  width: 40,
+                  height: 40,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  position: 'absolute',
+                  right: 6,
+                }}>
+                <Icon
+                  name="chevron-right"
+                  color={colors.accent}
+                  size={SIZE.lg}
+                />
+              </View>
+            </TouchableOpacity>
+          </>
+        )}
         <Text
           style={{
             fontSize: SIZE.xs,
@@ -349,10 +348,10 @@ export const Settings = ({ navigation }) => {
         <TouchableOpacity
           onPress={() => {
             if (!colors.night) {
-              MMKV.setStringAsync('theme', JSON.stringify({ night: true }));
+              MMKV.setStringAsync('theme', JSON.stringify({night: true}));
               changeColorScheme(COLOR_SCHEME_DARK);
             } else {
-              MMKV.setStringAsync('theme', JSON.stringify({ night: false }));
+              MMKV.setStringAsync('theme', JSON.stringify({night: false}));
 
               changeColorScheme(COLOR_SCHEME_LIGHT);
             }
@@ -389,18 +388,18 @@ export const Settings = ({ navigation }) => {
             scale === 1
               ? (scale = 1.1)
               : scale === 1.1
-                ? (scale = 1.2)
-                : scale === 1.2
-                  ? (scale = 1.3)
-                  : scale === 1.3
-                    ? (scale = 1.4)
-                    : scale === 1.4
-                      ? (scale = 1.5)
-                      : scale === 1.5
-                        ? (scale = 0.8)
-                        : scale === 0.8
-                          ? (scale = 0.9)
-                          : (scale = 0.9 ? (scale = 1) : (scale = 1));
+              ? (scale = 1.2)
+              : scale === 1.2
+              ? (scale = 1.3)
+              : scale === 1.3
+              ? (scale = 1.4)
+              : scale === 1.4
+              ? (scale = 1.5)
+              : scale === 1.5
+              ? (scale = 0.8)
+              : scale === 0.8
+              ? (scale = 0.9)
+              : (scale = 0.9 ? (scale = 1) : (scale = 1));
 
             await setSetting(settings, 'fontScale', scale);
           }}
@@ -588,15 +587,15 @@ export const Settings = ({ navigation }) => {
         {[
           {
             name: 'Terms of Service',
-            func: () => { },
+            func: () => {},
           },
           {
             name: 'Privacy Policy',
-            func: () => { },
+            func: () => {},
           },
           {
             name: 'About',
-            func: () => { },
+            func: () => {},
           },
         ].map(item => (
           <TouchableOpacity

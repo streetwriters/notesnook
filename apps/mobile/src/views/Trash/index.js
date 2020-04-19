@@ -118,7 +118,7 @@ export const Trash = ({navigation}) => {
         focused={isFocused}
         onRefresh={_onRefresh}
         renderItem={_renderItem}
-        placeholder={<TrashPlaceHolder colors={colors} />}
+        //placeholder={<TrashPlaceHolder colors={colors} />}
         placeholderText="Deleted notes & notebooks appear here."
       />
     </Container>
