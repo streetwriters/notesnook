@@ -63,13 +63,14 @@ export const Notes = ({navigation}) => {
   }, []);
 
   const init = () => {
+    console.log(params.color);
     eSendEvent(eScrollEvent, 0);
     if (params.type === 'tag') {
       let notesInTag = db.notes.tagged(params.tag.title);
 
       setNotes([...notesInTag]);
     } else if (params.type == 'color') {
-      let notesInColors = db.notes.colored(params.color.id);
+      let notesInColors = db.notes.colored(params.color.title);
 
       setNotes([...notesInColors]);
     } else {
