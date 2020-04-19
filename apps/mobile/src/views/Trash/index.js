@@ -1,20 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import { useIsFocused } from 'react-navigation-hooks';
+import React, {useEffect, useState} from 'react';
+import {useIsFocused} from 'react-navigation-hooks';
 import Container from '../../components/Container';
-import { TrashPlaceHolder } from '../../components/ListPlaceholders';
-import { NotebookItem } from '../../components/NotebookItem';
+import {TrashPlaceHolder} from '../../components/ListPlaceholders';
+import {NotebookItem} from '../../components/NotebookItem';
 import NoteItem from '../../components/NoteItem';
 import SelectionWrapper from '../../components/SelectionWrapper';
 import SimpleList from '../../components/SimpleList';
-import { useTracked } from '../../provider';
-import { ACTIONS } from '../../provider/actions';
-import { db, ToastEvent, w } from '../../utils/utils';
-import { simpleDialogEvent } from '../../components/DialogManager/recievers';
-import { TEMPLATE_EMPTY_TRASH } from '../../components/DialogManager/templates';
+import {useTracked} from '../../provider';
+import {ACTIONS} from '../../provider/actions';
+import {db, ToastEvent, w} from '../../utils/utils';
+import {simpleDialogEvent} from '../../components/DialogManager/recievers';
+import {TEMPLATE_EMPTY_TRASH} from '../../components/DialogManager/templates';
 
-export const Trash = ({ navigation }) => {
+export const Trash = ({navigation}) => {
   const [state, dispatch] = useTracked();
-  const { colors, selectionMode, trash } = state;
+  const {colors, selectionMode, trash} = state;
   const [refreshing, setRefreshing] = useState(false);
   const isFocused = useIsFocused();
   useEffect(() => {
@@ -30,7 +30,7 @@ export const Trash = ({ navigation }) => {
     }
   }, [isFocused]);
 
-  const _renderItem = ({ item, index }) => (
+  const _renderItem = ({item, index}) => (
     <SelectionWrapper colors={colors} item={item}>
       {item.type === 'note' ? (
         <NoteItem
@@ -57,29 +57,29 @@ export const Trash = ({ navigation }) => {
           isTrash={true}
         />
       ) : (
-          <NotebookItem
-            selectionMode={selectionMode}
-            onLongPress={() => {
-              if (!selectionMode) {
-                dispatch({
-                  type: ACTIONS.SELECTION_MODE,
-                  enabled: !selectionMode,
-                });
-              }
+        <NotebookItem
+          selectionMode={selectionMode}
+          onLongPress={() => {
+            if (!selectionMode) {
               dispatch({
-                type: ACTIONS.SELECTED_ITEMS,
-                item: item,
+                type: ACTIONS.SELECTION_MODE,
+                enabled: !selectionMode,
               });
-            }}
-            customStyle={{
-              width: selectionMode ? w - 74 : '100%',
-              marginHorizontal: 0,
-            }}
-            item={item}
-            isTrash={true}
-            index={index}
-          />
-        )}
+            }
+            dispatch({
+              type: ACTIONS.SELECTED_ITEMS,
+              item: item,
+            });
+          }}
+          customStyle={{
+            width: selectionMode ? w - 74 : '100%',
+            marginHorizontal: 0,
+          }}
+          item={item}
+          isTrash={true}
+          index={index}
+        />
+      )}
     </SelectionWrapper>
   );
 
@@ -88,8 +88,8 @@ export const Trash = ({ navigation }) => {
     try {
       await db.sync();
 
-      dispatch({ type: ACTIONS.TRASH });
-      dispatch({ type: ACTIONS.USER });
+      dispatch({type: ACTIONS.TRASH});
+      dispatch({type: ACTIONS.USER});
       setRefreshing(false);
       ToastEvent.show('Sync Complete', 'success');
     } catch (e) {
