@@ -167,14 +167,14 @@ export const Notes = ({navigation}) => {
   return (
     <Container
       bottomButtonText="Create a new note"
-      canGoBack={false}
+      canGoBack={params.type === 'color' ? false : true}
+      menu={params.type === 'color' ? true : false}
       heading={
         params.type == 'tag'
           ? '#' + params.title
           : params.title.slice(0, 1).toUpperCase() + params.title.slice(1)
       }
       headerColor={params.type == 'color' ? params.title : null}
-      canGoBack={true}
       data={notes}
       type="notes"
       placeholder={`Search in ${

@@ -1,4 +1,4 @@
-import React, { createRef, useEffect, useState } from 'react';
+import React, {createRef, useEffect, useState} from 'react';
 import {
   BackHandler,
   KeyboardAvoidingView,
@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import WebView from 'react-native-webview';
-import { normalize, SIZE, WEIGHT } from '../../common/common';
+import {normalize, SIZE, WEIGHT} from '../../common/common';
 import {
   ActionSheetEvent,
   simpleDialogEvent,
@@ -21,8 +21,8 @@ import {
   TEMPLATE_EXIT_FULLSCREEN,
   TEMPLATE_INFO,
 } from '../../components/DialogManager/templates';
-import { useTracked } from '../../provider';
-import { ACTIONS } from '../../provider/actions';
+import {useTracked} from '../../provider';
+import {ACTIONS} from '../../provider/actions';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -35,10 +35,10 @@ import {
   eOpenFullscreenEditor,
   refreshNotesPage,
 } from '../../services/events';
-import { exitEditorAnimation } from '../../utils/animations';
-import { sideMenuRef } from '../../utils/refs';
-import { db, DDS, editing, timeConverter, ToastEvent } from '../../utils/utils';
-import { useSafeArea } from 'react-native-safe-area-context';
+import {exitEditorAnimation} from '../../utils/animations';
+import {sideMenuRef} from '../../utils/refs';
+import {db, DDS, editing, timeConverter, ToastEvent} from '../../utils/utils';
+import {useSafeArea} from 'react-native-safe-area-context';
 
 const EditorWebView = createRef();
 let note = {};
@@ -49,10 +49,12 @@ let timer = null;
 let saveCounter = 0;
 let tapCount = 0;
 let canSave = false;
-const Editor = ({ noMenu }) => {
+let handleBack;
+
+const Editor = ({noMenu}) => {
   // Global State
   const [state, dispatch] = useTracked();
-  const { colors } = state;
+  const {colors} = state;
   const [fullscreen, setFullscreen] = useState(false);
   const [dateEdited, setDateEdited] = useState(0);
   const insets = useSafeArea();
@@ -62,7 +64,7 @@ const Editor = ({ noMenu }) => {
     EditorWebView.current?.postMessage(JSON.stringify(message));
 
   useEffect(() => {
-    let c = { ...colors };
+    let c = {...colors};
     c.factor = normalize(1);
     post({
       type: 'theme',
@@ -80,9 +82,10 @@ const Editor = ({ noMenu }) => {
 
   const loadNote = async item => {
     //EditorWebView.current?.requestFocus();
+    editing.currentlyEditing = true;
     noMenu ? null : sideMenuRef.current?.setGestureEnabled(false);
     if (note && note.id) {
-      dispatch({ type: ACTIONS.NOTES });
+      dispatch({type: ACTIONS.NOTES});
       if (item && item.type === 'new') {
         await clearEditor();
         post({
@@ -99,7 +102,7 @@ const Editor = ({ noMenu }) => {
         updateEditor();
       }
     } else {
-      dispatch({ type: ACTIONS.NOTES });
+      dispatch({type: ACTIONS.NOTES});
       if (item && item.type === 'new') {
         await clearEditor();
         post({
@@ -142,22 +145,7 @@ const Editor = ({ noMenu }) => {
   const onCallClear = () => {
     canSave = false;
     exitEditorAnimation();
-    setDateEdited(0);
-    title = null;
-    content = null;
-    note = null;
-    id = null;
-    tapCount = 0;
-    saveCounter = 0;
-    post({
-      type: 'clearEditor',
-    });
-    post({
-      type: 'clearTitle',
-    });
-    post({
-      type: 'blur',
-    });
+    clearEditor();
   };
 
   useEffect(() => {
@@ -251,13 +239,19 @@ const Editor = ({ noMenu }) => {
   const saveNote = async (lockNote = true) => {
     if (!canSave) return;
     if (!title && !content) return;
-    if (content && content.text.trim().length === 0 && title && title.trim().length == 0) return;
+    if (
+      content &&
+      content.text.trim().length === 0 &&
+      title &&
+      title.trim().length == 0
+    )
+      return;
     if (!content && title && title.trim().length === 0) return;
     if (!title && content && content.text.trim.length === 0) return;
     if (!content) {
       content = {
         text: '',
-        delta: { ops: [] },
+        delta: {ops: []},
       };
     }
 
@@ -349,7 +343,7 @@ const Editor = ({ noMenu }) => {
         type: 'focusTitle',
       });
     }
-    let c = { ...colors };
+    let c = {...colors};
     c.factor = normalize(1);
     post({
       type: 'theme',
@@ -361,7 +355,7 @@ const Editor = ({ noMenu }) => {
     title = note.title;
     id = note.id;
     setDateEdited(note.dateEdited);
-    content = { ...note.content };
+    content = {...note.content};
     saveCounter = 0;
 
     if (title !== null || title === '') {
@@ -396,7 +390,7 @@ const Editor = ({ noMenu }) => {
         value: delta,
       });
     } else {
-      post({ type: 'text', value: note.content.text });
+      post({type: 'text', value: note.content.text});
     }
   };
 
@@ -425,44 +419,39 @@ const Editor = ({ noMenu }) => {
   });
 
   const _onHardwareBackPress = async () => {
-    if (tapCount > 0) {
-      exitEditorAnimation();
-      if (note && note.id) {
-        ToastEvent.show('Note Saved!', 'success');
+    if (editing.currentlyEditing) {
+      if (tapCount > 0) {
+        exitEditorAnimation();
+        if (note && note.id) {
+          ToastEvent.show('Note Saved!', 'success');
+        }
+        await clearEditor();
+        if (handleBack) {
+          handleBack.remove();
+          handleBack = null;
+        }
+        if (noMenu) return true;
+        DDS.isTab ? sideMenuRef.current?.openMenu(true) : null;
+        sideMenuRef.current?.setGestureEnabled(true);
+        return true;
+      } else {
+        tapCount = 1;
+        setTimeout(() => {
+          tapCount = 0;
+        }, 3000);
+        ToastEvent.show('Press back again to exit editor', 'success');
+        return true;
       }
-      await clearEditor();
-      if (noMenu) return true;
-      DDS.isTab ? sideMenuRef.current?.openMenu(true) : null;
-      sideMenuRef.current?.setGestureEnabled(true);
-      return true;
-    } else {
-      tapCount = 1;
-      setTimeout(() => {
-        tapCount = 0;
-      }, 3000);
-      ToastEvent.show('Press back again to exit editor', 'success');
-      return true;
     }
   };
 
   useEffect(() => {
-    let handleBack;
     if (!noMenu && DDS.isTab) {
       handleBack = BackHandler.addEventListener('hardwareBackPress', () => {
         simpleDialogEvent(TEMPLATE_EXIT_FULLSCREEN());
         editing.isFullscreen = false;
         return true;
       });
-    } else if (!DDS.isTab) {
-      handleBack = BackHandler.addEventListener(
-        'hardwareBackPress',
-        _onHardwareBackPress,
-      );
-    } else {
-      if (handleBack) {
-        handleBack.remove();
-        handleBack = null;
-      }
     }
 
     return () => {
@@ -470,13 +459,23 @@ const Editor = ({ noMenu }) => {
         handleBack.remove();
         handleBack = null;
       }
-      title = null;
-      content = null;
-      id = null;
-      timer = null;
-      note = {};
     };
   }, [noMenu]);
+
+  useEffect(() => {
+    if (!DDS.isTab) {
+      handleBack = BackHandler.addEventListener(
+        'hardwareBackPress',
+        _onHardwareBackPress,
+      );
+    }
+    return () => {
+      if (handleBack) {
+        handleBack.remove();
+        handleBack = null;
+      }
+    };
+  }, []);
 
   return (
     <SafeAreaView
@@ -497,11 +496,13 @@ const Editor = ({ noMenu }) => {
         <View
           style={{
             marginTop: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight,
-          }}></View>
+          }}
+        />
 
         {noMenu ? null : (
           <TouchableOpacity
             onPress={async () => {
+              editing.currentlyEditing = true;
               if (DDS.isTab) {
                 simpleDialogEvent(TEMPLATE_EXIT_FULLSCREEN());
               } else {
@@ -512,6 +513,10 @@ const Editor = ({ noMenu }) => {
                 await clearEditor();
                 DDS.isTab ? sideMenuRef.current?.openMenu(true) : null;
                 sideMenuRef.current?.setGestureEnabled(true);
+                if (handleBack) {
+                  handleBack.remove();
+                  handleBack = null;
+                }
               }
             }}
             style={{
@@ -597,8 +602,7 @@ const Editor = ({ noMenu }) => {
         <View
           style={{
             paddingHorizontal: 12,
-            marginTop:
-              Platform.OS === 'ios' ? 45 : insets.top + 45,
+            marginTop: Platform.OS === 'ios' ? 45 : insets.top + 45,
             width: '100%',
             position: 'absolute',
             justifyContent: 'flex-start',
@@ -660,11 +664,11 @@ const Editor = ({ noMenu }) => {
           originWhitelist={['*']}
           source={
             Platform.OS === 'ios'
-              ? { uri: sourceUri }
+              ? {uri: sourceUri}
               : {
-                uri: 'file:///android_asset/texteditor.html',
-                baseUrl: 'file:///android_asset/',
-              }
+                  uri: 'file:///android_asset/texteditor.html',
+                  baseUrl: 'file:///android_asset/',
+                }
           }
           style={{
             height: '100%',

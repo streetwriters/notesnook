@@ -98,7 +98,8 @@ export const NotebookPlaceHolder = ({colors, animation}) => {
               height: 8,
               backgroundColor: 'white',
               marginBottom: 15,
-            }}></View>
+            }}
+          />
           <Text
             style={{
               fontFamily: WEIGHT.bold,
@@ -153,7 +154,8 @@ export const NotebookPlaceHolder = ({colors, animation}) => {
               height: 8,
               backgroundColor: 'white',
               marginBottom: 15,
-            }}></View>
+            }}
+          />
           <Text
             style={{
               fontFamily: WEIGHT.bold,
@@ -489,104 +491,7 @@ export const TrashPlaceHolder = ({colors, animation}) => {
       style={{
         alignItems: 'center',
       }}>
-      <Animatable.View
-        animation={deleteItems(-50, -100)}
-        iterationCount="infinite"
-        duration={3000}
-        iterationDelay={7000}
-        easing="ease-in"
-        useNativeDriver={true}
-        style={{
-          width: 30,
-          height: 30,
-          backgroundColor: colors.errorBg,
-          borderRadius: 5,
-          transform: [
-            {
-              translateX: -50,
-            },
-            {
-              translateY: -100,
-            },
-          ],
-        }}
-      />
-      <Animatable.View
-        animation={deleteItems(-80, -70)}
-        iterationCount="infinite"
-        duration={3000}
-        iterationDelay={7000}
-        easing="ease-in"
-        useNativeDriver={true}
-        style={{
-          width: 25,
-          height: 25,
-          backgroundColor: colors.errorBg,
-          borderRadius: 5,
-          transform: [
-            {
-              translateX: -80,
-            },
-            {
-              translateY: -70,
-            },
-          ],
-        }}
-      />
-      <Animatable.View
-        animation={deleteItems(-120, -50)}
-        iterationCount="infinite"
-        duration={3000}
-        iterationDelay={7000}
-        easing="ease-in"
-        useNativeDriver={true}
-        style={{
-          width: 40,
-          height: 40,
-          backgroundColor: colors.errorBg,
-          borderRadius: 5,
-          transform: [
-            {
-              translateX: -120,
-            },
-            {
-              translateY: -50,
-            },
-          ],
-        }}
-      />
-
-      <Animatable.View
-        animation={deleteItems(-120, -140)}
-        iterationCount="infinite"
-        duration={3000}
-        iterationDelay={7000}
-        easing="ease-in"
-        useNativeDriver={true}
-        style={{
-          width: 20,
-          height: 20,
-          backgroundColor: colors.errorBg,
-          borderRadius: 5,
-          transform: [
-            {
-              translateX: -120,
-            },
-            {
-              translateY: -140,
-            },
-          ],
-        }}
-      />
-
-      <Animatable.View
-        animation={rotate}
-        iterationCount="infinite"
-        duration={3000}
-        iterationDelay={3500}
-        direction="alternate"
-        easing="ease-in"
-        useNativeDriver={true}
+      <View
         style={{
           width: 100,
           height: 15,
@@ -607,7 +512,7 @@ export const TrashPlaceHolder = ({colors, animation}) => {
             marginTop: -9,
           }}
         />
-      </Animatable.View>
+      </View>
 
       <View
         style={{
@@ -623,14 +528,7 @@ export const TrashPlaceHolder = ({colors, animation}) => {
             borderRadius: 5,
             zIndex: 10,
           }}>
-          <Animatable.View
-            animation={opacity}
-            iterationCount="infinite"
-            duration={3000}
-            iterationDelay={3500}
-            direction="alternate"
-            easing="ease-in"
-            useNativeDriver={true}
+          <View
             style={{
               flexDirection: 'row',
               width: '90%',
@@ -666,7 +564,7 @@ export const TrashPlaceHolder = ({colors, animation}) => {
                 zIndex: 10,
               }}
             />
-          </Animatable.View>
+          </View>
         </View>
       </View>
     </View>
