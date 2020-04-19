@@ -115,7 +115,7 @@ function NavigationContainer(props) {
                 {props.canGoBack && (
                   <Box
                     onClick={props.backAction}
-                    ml={-5}
+                    ml={-2}
                     height={38}
                     width={38}
                   >

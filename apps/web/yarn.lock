@@ -7274,9 +7274,9 @@ normalize-url@^3.0.0, normalize-url@^3.0.1:
   resolved "https://registry.yarnpkg.com/normalize-url/-/normalize-url-3.3.0.tgz#b2e1c4dc4f7c6d57743df733a4f5978d18650559"
   integrity sha512-U+JJi7duF1o+u2pynbp2zXDW2/PADgC30f0GsHZtRh+HOcXHnw137TrNlyxxRvWW5fjKd3bcLHPxofWuCjaeZg==
 
-"notes-core@git+ssh://git@github.com:streetwriters/notesnook-core.git":
+"notes-core@https://github.com/streetwriters/notesnook-core.git":
   version "1.3.0"
-  resolved "git+ssh://git@github.com:streetwriters/notesnook-core.git#ed5ead55bed5ff5ec976ed46dc517854b407aff7"
+  resolved "https://github.com/streetwriters/notesnook-core.git#ed5ead55bed5ff5ec976ed46dc517854b407aff7"
   dependencies:
     fast-sort "^2.0.1"
     fuzzysearch "^1.0.3"

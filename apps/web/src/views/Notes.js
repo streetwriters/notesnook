@@ -16,6 +16,7 @@ function Notes(props) {
     }
   }, [props.context, setContext]);
 
+  console.log(context);
   if (!context) return null;
   return (
     <ListContainer

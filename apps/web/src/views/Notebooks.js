@@ -10,8 +10,8 @@ import NotebooksPlaceholder from "../components/placeholders/notebooks-placehold
 function Notebooks(props) {
   const [open, setOpen] = useState(false);
   useEffect(() => store.refresh(), []);
-  const notebooks = useStore(state => state.notebooks);
-  const add = useStore(state => state.add);
+  const notebooks = useStore((state) => state.notebooks);
+  const add = useStore((state) => state.add);
   return (
     <>
       <ListContainer
@@ -25,7 +25,7 @@ function Notebooks(props) {
               props.navigator.navigate("topics", {
                 title: item.title,
                 topics: item.topics,
-                notebook: item
+                notebook: item,
               });
             }}
             onTopicClick={(notebook, topic) =>
@@ -34,7 +34,10 @@ function Notebooks(props) {
                 subtitle: topic.title,
                 notes: db.notebooks
                   .notebook(notebook.id)
-                  .topics.topic(topic.title).all
+                  .topics.topic(topic.title).all,
+                context: {
+                  notebook: { id: notebook.id, topic: topic.title },
+                },
               })
             }
           />
@@ -44,12 +47,12 @@ function Notebooks(props) {
           content: "Create a notebook",
           onClick: async () => {
             setOpen(true);
-          }
+          },
         }}
       />
       <AddNotebookDialog
         isOpen={open}
-        onDone={async nb => {
+        onDone={async (nb) => {
           await add(nb);
           setOpen(false);
         }}

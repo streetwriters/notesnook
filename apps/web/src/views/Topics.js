@@ -7,12 +7,12 @@ import { useStore as useNbStore } from "../stores/notebook-store";
 import { showTopicDialog } from "../components/dialogs/topicdialog";
 
 function Topics(props) {
-  const setContext = useNoteStore(store => store.setContext);
+  const setContext = useNoteStore((store) => store.setContext);
   const setSelectedNotebookTopics = useNbStore(
-    store => store.setSelectedNotebookTopics
+    (store) => store.setSelectedNotebookTopics
   );
   const selectedNotebookTopics = useNbStore(
-    store => store.selectedNotebookTopics
+    (store) => store.selectedNotebookTopics
   );
 
   const [topics, setTopics] = useState([]);
@@ -37,11 +37,14 @@ function Topics(props) {
             setContext({
               type: "topic",
               value: topic.title,
-              notebook: props.notebook
+              notebook: props.notebook,
             });
             props.navigator.navigate("notes", {
               title: props.notebook.title,
-              subtitle: topic.title
+              subtitle: topic.title,
+              context: {
+                notebook: { id: props.notebook.id, topic: topic.title },
+              },
             });
           }}
         />
@@ -51,7 +54,7 @@ function Topics(props) {
         content: "Add more topics",
         onClick: async () => {
           await showTopicDialog(props.notebook.id);
-        }
+        },
       }}
     />
   );

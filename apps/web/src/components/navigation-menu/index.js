@@ -74,7 +74,11 @@ function NavigationMenu(props) {
                 setSelectedRoute(undefined);
                 RootNavigator.navigate("color", {
                   title: toTitleCase(color.title),
-                  context: { type: "color", colors: [color.title] },
+                  context: {
+                    type: "color",
+                    colors: [color.title],
+                    value: color.title,
+                  },
                 });
               }}
               key={color.title}

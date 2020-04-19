@@ -74,12 +74,17 @@ class EditorStore extends BaseStore {
 
   saveSession = (oldSession) => {
     this.set((state) => (state.session.isSaving = true));
-    this._saveFn()(this.get().session).then((id) => {
+    this._saveFn()(this.get().session).then(async (id) => {
       if (oldSession) {
         if (oldSession.tags.length !== this.get().session.tags.length)
           tagStore.refresh();
         if (oldSession.colors.length !== this.get().session.colors.length)
           appStore.refreshColors();
+
+        if (oldSession.notebook)
+          if (oldSession.state === "new" && oldSession.notebook.topic) {
+            await db.notes.move(oldSession.notebook, id);
+          }
       }
 
       if (!this.get().session.id) {
@@ -115,12 +120,14 @@ class EditorStore extends BaseStore {
     clearTimeout(this.get().session.timeout);
     const oldSession = { ...this.get().session };
     this.set((state) => {
-      state.session.state = SESSION_STATES.stale;
       set(state);
 
       state.session.timeout = setTimeout(
         () => {
           this.session = this.get().session;
+          this.set((state) => {
+            state.session.state = SESSION_STATES.stale;
+          });
           this.saveSession(oldSession);
         },
         immediate ? 0 : 500

@@ -54,7 +54,7 @@ export const routes = {
       options: SelectionModeOptions.FavoritesOptions,
     },
     {
-      context: { type: "favorites" },
+      context: { type: "favorites", favorite: true },
     }
   ),
   ...createNormalRoute("trash", Trash, Icon.Trash, {
