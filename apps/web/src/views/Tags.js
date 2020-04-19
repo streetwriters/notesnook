@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import { Flex, Text } from "rebass";
 import ListContainer from "../components/list-container";
 import ListItem from "../components/list-item";
-import { useStore as useNotesStore } from "../stores/note-store";
 import { useStore, store } from "../stores/tag-store";
 import TagsPlaceholder from "../components/placeholders/tags-placeholder";
 
@@ -18,7 +17,6 @@ function TagNode({ title }) {
 }
 
 function Tags(props) {
-  const setContext = useNotesStore((store) => store.setContext);
   const tags = useStore((store) => store.tags);
   useEffect(() => {
     store.refresh();
@@ -37,10 +35,9 @@ function Tags(props) {
             title={<TagNode title={title} />}
             info={`${noteIds.length} notes`}
             onClick={() => {
-              setContext({ type: "tag", value: title });
               props.navigator.navigate("notes", {
                 title: "#" + title,
-                context: { tags: [title] },
+                context: { type: "tag", value: title },
               });
             }}
           />

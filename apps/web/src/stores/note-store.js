@@ -36,12 +36,11 @@ class NoteStore extends BaseStore {
         break;
       case "color":
         notes = db.notes.colored(context.value);
-        //console.log(context.value, " I am in notesStore");
         break;
       case "topic":
         notes = db.notebooks
-          .notebook(context.notebook.id)
-          .topics.topic(context.value).all;
+          .notebook(context.value.id)
+          .topics.topic(context.value.topic).all;
         break;
       case "favorites":
         notes = db.notes.favorites;

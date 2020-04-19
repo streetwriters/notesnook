@@ -76,7 +76,6 @@ function NavigationMenu(props) {
                   title: toTitleCase(color.title),
                   context: {
                     type: "color",
-                    colors: [color.title],
                     value: color.title,
                   },
                 });

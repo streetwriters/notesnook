@@ -16,7 +16,6 @@ function Notes(props) {
     }
   }, [props.context, setContext]);
 
-  console.log(context);
   if (!context) return null;
   return (
     <ListContainer
@@ -27,11 +26,7 @@ function Notes(props) {
       )}
       button={{
         content: "Make a new note",
-        onClick: () =>
-          newSession({
-            ...DEFAULT_CONTEXT,
-            ...props.context,
-          }),
+        onClick: () => newSession(props.context),
       }}
     />
   );

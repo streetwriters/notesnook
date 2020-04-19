@@ -20,6 +20,7 @@ const DEFAULT_SESSION = {
   favorite: false,
   locked: false,
   tags: [],
+  context: undefined,
   colors: [],
   dateEdited: 0,
   content: {
@@ -75,16 +76,19 @@ class EditorStore extends BaseStore {
   saveSession = (oldSession) => {
     this.set((state) => (state.session.isSaving = true));
     this._saveFn()(this.get().session).then(async (id) => {
-      if (oldSession) {
+      storeSync: if (oldSession) {
         if (oldSession.tags.length !== this.get().session.tags.length)
           tagStore.refresh();
+
         if (oldSession.colors.length !== this.get().session.colors.length)
           appStore.refreshColors();
 
-        if (oldSession.notebook)
-          if (oldSession.state === "new" && oldSession.notebook.topic) {
-            await db.notes.move(oldSession.notebook, id);
-          }
+        if (oldSession.state !== "new" || !oldSession.context) break storeSync;
+
+        const { type, value } = oldSession.context;
+        if (type === "topic") await db.notes.move(value, id);
+        else if (type === "color") await db.notes.note(id).color(value);
+        else if (type === "tag") await db.notes.note(id).tag(value);
       }
 
       if (!this.get().session.id) {
@@ -108,7 +112,7 @@ class EditorStore extends BaseStore {
     this.set(function (state) {
       state.session = {
         ...DEFAULT_SESSION,
-        ...context,
+        context,
         state: SESSION_STATES.new,
       };
     });
@@ -124,10 +128,8 @@ class EditorStore extends BaseStore {
 
       state.session.timeout = setTimeout(
         () => {
+          this.set((state) => (state.session.state = SESSION_STATES.stale));
           this.session = this.get().session;
-          this.set((state) => {
-            state.session.state = SESSION_STATES.stale;
-          });
           this.saveSession(oldSession);
         },
         immediate ? 0 : 500

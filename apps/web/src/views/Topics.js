@@ -2,12 +2,10 @@ import React, { useState, useEffect } from "react";
 import Topic from "../components/topic";
 import { Flex } from "rebass";
 import ListContainer from "../components/list-container";
-import { useStore as useNoteStore } from "../stores/note-store";
 import { useStore as useNbStore } from "../stores/notebook-store";
 import { showTopicDialog } from "../components/dialogs/topicdialog";
 
 function Topics(props) {
-  const setContext = useNoteStore((store) => store.setContext);
   const setSelectedNotebookTopics = useNbStore(
     (store) => store.setSelectedNotebookTopics
   );
@@ -34,16 +32,12 @@ function Topics(props) {
           item={item}
           onClick={() => {
             let topic = item;
-            setContext({
-              type: "topic",
-              value: topic.title,
-              notebook: props.notebook,
-            });
             props.navigator.navigate("notes", {
               title: props.notebook.title,
               subtitle: topic.title,
               context: {
-                notebook: { id: props.notebook.id, topic: topic.title },
+                type: "topic",
+                value: { id: props.notebook.id, topic: topic.title },
               },
             });
           }}
