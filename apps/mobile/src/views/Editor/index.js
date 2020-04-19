@@ -421,18 +421,7 @@ const Editor = ({noMenu}) => {
   const _onHardwareBackPress = async () => {
     if (editing.currentlyEditing) {
       if (tapCount > 0) {
-        exitEditorAnimation();
-        if (note && note.id) {
-          ToastEvent.show('Note Saved!', 'success');
-        }
-        await clearEditor();
-        if (handleBack) {
-          handleBack.remove();
-          handleBack = null;
-        }
-        if (noMenu) return true;
-        DDS.isTab ? sideMenuRef.current?.openMenu(true) : null;
-        sideMenuRef.current?.setGestureEnabled(true);
+        _onBackPress();
         return true;
       } else {
         tapCount = 1;
@@ -477,6 +466,25 @@ const Editor = ({noMenu}) => {
     };
   }, []);
 
+  const _onBackPress = async () => {
+    editing.currentlyEditing = true;
+    if (DDS.isTab) {
+      simpleDialogEvent(TEMPLATE_EXIT_FULLSCREEN());
+    } else {
+      exitEditorAnimation();
+      if (note && note.id) {
+        ToastEvent.show('Note Saved!', 'success');
+      }
+      await clearEditor();
+      DDS.isTab ? sideMenuRef.current?.openMenu(true) : null;
+      sideMenuRef.current?.setGestureEnabled(true);
+      if (handleBack) {
+        handleBack.remove();
+        handleBack = null;
+      }
+    }
+  };
+
   return (
     <SafeAreaView
       style={{
@@ -501,24 +509,7 @@ const Editor = ({noMenu}) => {
 
         {noMenu ? null : (
           <TouchableOpacity
-            onPress={async () => {
-              editing.currentlyEditing = true;
-              if (DDS.isTab) {
-                simpleDialogEvent(TEMPLATE_EXIT_FULLSCREEN());
-              } else {
-                exitEditorAnimation();
-                if (note && note.id) {
-                  ToastEvent.show('Note Saved!', 'success');
-                }
-                await clearEditor();
-                DDS.isTab ? sideMenuRef.current?.openMenu(true) : null;
-                sideMenuRef.current?.setGestureEnabled(true);
-                if (handleBack) {
-                  handleBack.remove();
-                  handleBack = null;
-                }
-              }
-            }}
+            onPress={_onBackPress}
             style={{
               width: 60,
               height: 50,
