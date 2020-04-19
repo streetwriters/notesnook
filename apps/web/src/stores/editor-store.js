@@ -76,6 +76,7 @@ class EditorStore extends BaseStore {
   saveSession = (oldSession) => {
     this.set((state) => (state.session.isSaving = true));
     this._saveFn()(this.get().session).then(async (id) => {
+      /* eslint-disable */
       storeSync: if (oldSession) {
         if (oldSession.tags.length !== this.get().session.tags.length)
           tagStore.refresh();
@@ -90,6 +91,7 @@ class EditorStore extends BaseStore {
         else if (type === "color") await db.notes.note(id).color(value);
         else if (type === "tag") await db.notes.note(id).tag(value);
       }
+      /* eslint-enable */
 
       if (!this.get().session.id) {
         noteStore.setSelectedNote(id);

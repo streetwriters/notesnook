@@ -3,7 +3,6 @@ import Note from "../components/note";
 import ListContainer from "../components/list-container";
 import { useStore } from "../stores/editor-store";
 import { useStore as useNotesStore } from "../stores/note-store";
-import { DEFAULT_CONTEXT } from "../common";
 
 function Notes(props) {
   const newSession = useStore((store) => store.newSession);
