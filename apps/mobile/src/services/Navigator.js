@@ -15,7 +15,7 @@ import Signup from '../views/Signup';
 import Tags from '../views/Tags';
 import Trash from '../views/Trash';
 import {createStackNavigator} from 'react-navigation-stack';
-
+import {Animated} from 'react-native';
 const fade = props => {
   const {position, scene} = props;
 
@@ -99,6 +99,13 @@ export const TopLevelNavigator = createStackNavigator(
         height: 0,
       },
     },
+    animationEnabled: false,
+    transitionConfig: () => ({
+      transitionSpec: {
+        duration: 0,
+        timing: Animated.timing,
+      },
+    }),
     cardOverlayEnabled: true,
     cardShadowEnabled: true,
     animationEnabled: false,
