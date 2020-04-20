@@ -371,7 +371,7 @@ SideMenu.defaultProps = {
       toValue: value,
       duration: 300,
       useNativeDriver: true,
-      easing: Easing.elastic(0.5),
+      easing: Easing.elastic(1),
     }),
   isOpen: false,
 

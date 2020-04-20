@@ -92,9 +92,6 @@ export const TopLevelNavigator = createStackNavigator(
   {
     initialRouteName: 'Home',
     defaultNavigationOptions: {
-      cardOverlayEnabled: true,
-      cardShadowEnabled: true,
-      animationEnabled: false,
       gestureEnabled: false,
       headerStyle: {
         backgroundColor: 'transparent',
@@ -102,5 +99,8 @@ export const TopLevelNavigator = createStackNavigator(
         height: 0,
       },
     },
+    cardOverlayEnabled: true,
+    cardShadowEnabled: true,
+    animationEnabled: false,
   },
 );
