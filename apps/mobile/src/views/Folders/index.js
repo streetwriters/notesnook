@@ -13,6 +13,7 @@ import {eScrollEvent} from '../../services/events';
 import {slideLeft, slideRight} from '../../utils/animations';
 import {ToastEvent, w, db} from '../../utils/utils';
 import {AddNotebookEvent} from '../../components/DialogManager/recievers';
+import NavigationService from '../../services/NavigationService';
 
 export const Folders = ({navigation}) => {
   const [state, dispatch] = useTracked();
@@ -28,7 +29,12 @@ export const Folders = ({navigation}) => {
   let isFocused = useIsFocused();
 
   const handleBackPress = () => {
-    return true;
+    if (navigation.state.params.isMove) {
+      return true;
+    } else {
+      NavigationService.goBack();
+      return true;
+    }
   };
 
   useEffect(() => {

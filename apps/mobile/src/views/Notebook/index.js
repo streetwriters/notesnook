@@ -69,6 +69,7 @@ export const Notebook = ({navigation}) => {
       onLoad();
     }
   }, [isFocused]);
+
   useEffect(() => {
     eSubscribeEvent(eMoveNoteDialogNavigateBack, handleBackPress);
     return () => {
