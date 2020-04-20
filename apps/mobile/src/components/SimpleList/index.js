@@ -1,14 +1,14 @@
 import React from 'react';
-import { FlatList, Platform, RefreshControl, Text, View } from 'react-native';
-import { SIZE, WEIGHT } from '../../common/common';
-import { useTracked } from '../../provider';
-import { ACTIONS } from '../../provider/actions';
-import { eSendEvent } from '../../services/eventManager';
-import { eClearSearch, eScrollEvent } from '../../services/events';
-import { hexToRGBA } from '../../utils/utils';
-import { NotebookItem } from '../NotebookItem';
+import {FlatList, Platform, RefreshControl, Text, View} from 'react-native';
+import {SIZE, WEIGHT} from '../../common/common';
+import {useTracked} from '../../provider';
+import {ACTIONS} from '../../provider/actions';
+import {eSendEvent} from '../../services/eventManager';
+import {eClearSearch, eScrollEvent} from '../../services/events';
+import {hexToRGBA} from '../../utils/utils';
+import {NotebookItem} from '../NotebookItem';
 import SelectionWrapper from '../SelectionWrapper';
-import { useSafeArea } from 'react-native-safe-area-context';
+import {useSafeArea} from 'react-native-safe-area-context';
 
 const SimpleList = ({
   data,
@@ -25,8 +25,8 @@ const SimpleList = ({
   noteToMove,
 }) => {
   const [state, dispatch] = useTracked();
-  const { colors, selectionMode } = state;
-  const searchResults = { ...state.searchResults };
+  const {colors, selectionMode} = state;
+  const searchResults = {...state.searchResults};
   const insets = useSafeArea();
   const _onScroll = event => {
     if (!event) return;
@@ -63,8 +63,8 @@ const SimpleList = ({
                 ? 135
                 : 135 - 60
               : data[0] && !selectionMode
-                ? 155 - insets.top
-                : (155 - insets.top) - 60,
+              ? 155 - insets.top
+              : 155 - insets.top - 60,
           flexDirection: 'row',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -91,70 +91,70 @@ const SimpleList = ({
         </Text>
       </View>
     ) : (
-        <View
-          style={{
-            marginTop:
-              Platform.OS == 'ios'
-                ? data[0] && !selectionMode
-                  ? 135
-                  : 135 - 60
-                : data[0] && !selectionMode
-                  ? 155
-                  : 155 - 60,
-          }}>
-          {pinned && pinned.notebooks && pinned.notebooks.length > 0 ? (
-            <>
-              <FlatList
-                data={pinned.notebooks}
-                keyExtractor={(item, index) => item.id.toString()}
-                renderItem={({ item, index }) =>
-                  item.type === 'notebook' ? (
-                    <SelectionWrapper
-                      index={index}
-                      currentEditingNote={false}
+      <View
+        style={{
+          marginTop:
+            Platform.OS == 'ios'
+              ? data[0] && !selectionMode
+                ? 135
+                : 135 - 60
+              : data[0] && !selectionMode
+              ? 155
+              : 155 - 60,
+        }}>
+        {pinned && pinned.notebooks && pinned.notebooks.length > 0 ? (
+          <>
+            <FlatList
+              data={pinned.notebooks}
+              keyExtractor={(item, index) => item.id.toString()}
+              renderItem={({item, index}) =>
+                item.type === 'notebook' ? (
+                  <SelectionWrapper
+                    index={index}
+                    currentEditingNote={false}
+                    pinned={true}
+                    background={
+                      Platform.ios
+                        ? hexToRGBA(colors.accent + '19')
+                        : hexToRGBA(colors.shade)
+                    }
+                    item={item}>
+                    <NotebookItem
+                      hideMore={hideMore}
+                      customStyle={{
+                        width: '100%',
+                        paddingTop: 15,
+                        paddingRight: 18,
+                        marginBottom: 10,
+                        marginTop: 15,
+                        borderBottomWidth: 0,
+                        marginHorizontal: 0,
+                      }}
+                      isMove={isMove}
+                      selectionMode={selectionMode}
+                      onLongPress={() => {
+                        if (!selectionMode) {
+                          dispatch({
+                            type: ACTIONS.SELECTION_MODE,
+                            enabled: true,
+                          });
+                        }
+                        dispatch({type: ACTIONS.SELECTED_ITEMS, item: item});
+                      }}
+                      noteToMove={noteToMove}
+                      item={item}
                       pinned={true}
-                      background={
-                        Platform.ios
-                          ? hexToRGBA(colors.accent + '19')
-                          : hexToRGBA(colors.shade)
-                      }
-                      item={item}>
-                      <NotebookItem
-                        hideMore={hideMore}
-                        customStyle={{
-                          width: '100%',
-                          paddingTop: 15,
-                          paddingRight: 18,
-                          marginBottom: 10,
-                          marginTop: 15,
-                          borderBottomWidth: 0,
-                          marginHorizontal: 0,
-                        }}
-                        isMove={isMove}
-                        selectionMode={selectionMode}
-                        onLongPress={() => {
-                          if (!selectionMode) {
-                            dispatch({
-                              type: ACTIONS.SELECTION_MODE,
-                              enabled: true,
-                            });
-                          }
-                          dispatch({ type: ACTIONS.SELECTED_ITEMS, item: item });
-                        }}
-                        noteToMove={noteToMove}
-                        item={item}
-                        pinned={true}
-                        index={index}
-                        colors={colors}
-                      />
-                    </SelectionWrapper>
-                  ) : null
-                }
-              />
-            </>
-          ) : null}
-        </View>
-      );
+                      index={index}
+                      colors={colors}
+                    />
+                  </SelectionWrapper>
+                ) : null
+              }
+            />
+          </>
+        ) : null}
+      </View>
+    );
 
   const _ListEmptyComponent = (
     <View
@@ -188,8 +188,8 @@ const SimpleList = ({
     <FlatList
       data={
         searchResults.type === type &&
-          focused &&
-          searchResults.results.length > 0
+        focused &&
+        searchResults.results.length > 0
           ? searchResults.results
           : data
       }

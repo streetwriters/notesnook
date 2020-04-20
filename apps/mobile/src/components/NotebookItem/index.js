@@ -163,9 +163,9 @@ export const NotebookItem = ({
                   textAlignVertical: 'center',
                   fontFamily: WEIGHT.regular,
                 }}>
-                {'Deleted on: ' +
-                  new Date(item.dateDeleted).toISOString().slice(0, 10) +
-                  '   '}
+                {'Deleted on: ' + item && item.dateDeleted
+                  ? new Date(item.dateDeleted).toISOString().slice(0, 10)
+                  : null + '   '}
               </Text>
               <Text
                 style={{

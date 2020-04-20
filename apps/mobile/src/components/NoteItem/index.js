@@ -1,13 +1,13 @@
 import React from 'react';
-import { Dimensions, Text, TouchableOpacity, View } from 'react-native';
+import {Dimensions, Text, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { ph, pv, SIZE, WEIGHT } from '../../common/common';
-import { eSendEvent, openVault } from '../../services/eventManager';
-import { eOnLoadNote, eShowMergeDialog } from '../../services/events';
-import { openEditorAnimation } from '../../utils/animations';
-import { DDS, timeSince } from '../../utils/utils';
-import { ActionSheetEvent, simpleDialogEvent } from '../DialogManager/recievers';
-import { TEMPLATE_TRASH } from '../DialogManager/templates';
+import {ph, pv, SIZE, WEIGHT} from '../../common/common';
+import {eSendEvent, openVault} from '../../services/eventManager';
+import {eOnLoadNote, eShowMergeDialog} from '../../services/events';
+import {openEditorAnimation} from '../../utils/animations';
+import {DDS, timeSince} from '../../utils/utils';
+import {ActionSheetEvent, simpleDialogEvent} from '../DialogManager/recievers';
+import {TEMPLATE_TRASH} from '../DialogManager/templates';
 
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
@@ -64,9 +64,6 @@ export default class NoteItem extends React.Component {
       pinned,
       index,
     } = this.props;
-
-
-    console.log('rerendering again', item);
     return (
       <View
         style={[
@@ -172,14 +169,15 @@ export default class NoteItem extends React.Component {
                               borderRadius: 100,
                               backgroundColor: item,
                               marginRight: -4.5,
-                            }}></View>
+                            }}
+                          />
                         ))}
                       </View>
                     ) : null}
 
                     {item.locked ? (
                       <Icon
-                        style={{ marginRight: 10 }}
+                        style={{marginRight: 10}}
                         name="lock"
                         size={SIZE.xs}
                         color={colors.icon}
@@ -188,7 +186,7 @@ export default class NoteItem extends React.Component {
 
                     {item.favorite ? (
                       <Icon
-                        style={{ marginRight: 10 }}
+                        style={{marginRight: 10}}
                         name="star"
                         size={SIZE.xs + 1}
                         color="orange"
@@ -216,9 +214,9 @@ export default class NoteItem extends React.Component {
                         textAlignVertical: 'center',
                         fontFamily: WEIGHT.regular,
                       }}>
-                      {'Deleted on: ' +
-                        new Date(item.dateDeleted).toISOString().slice(0, 10) +
-                        '   '}
+                      {'Deleted on: ' + item && item.dateDeleted
+                        ? new Date(item.dateDeleted).toISOString().slice(0, 10)
+                        : null + '   '}
                     </Text>
                     <Text
                       style={{
@@ -232,30 +230,24 @@ export default class NoteItem extends React.Component {
                   </>
                 ) : null}
 
-                {
-                  item.conflicted ? <View
+                {item.conflicted ? (
+                  <View
                     style={{
                       backgroundColor: colors.errorText,
                       borderRadius: 2.5,
                       paddingHorizontal: 4,
                       position: 'absolute',
-                      right: 20
-                    }}
-                  >
+                      right: 20,
+                    }}>
                     <Text
-                      style={
-                        {
-                          fontSize: SIZE.xs - 1,
-                          color: 'white',
-                        }
-                      }
-                    >
+                      style={{
+                        fontSize: SIZE.xs - 1,
+                        color: 'white',
+                      }}>
                       CONFLICTS
-                      </Text>
-                  </View> : null
-                }
-
-
+                    </Text>
+                  </View>
+                ) : null}
               </View>
             </View>
           </>
