@@ -12,6 +12,7 @@ import Menu, {MenuItem, MenuDivider} from 'react-native-material-menu';
 import {ACTIONS} from '../../provider/actions';
 import {sideMenuRef} from '../../utils/refs';
 import {moveNoteHideEvent} from '../DialogManager/recievers';
+import {useSafeArea} from 'react-native-safe-area-context';
 const menuRef = createRef();
 export const Header = ({
   heading,
@@ -27,6 +28,7 @@ export const Header = ({
 }) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
+  const insets = useSafeArea();
 
   return (
     <View
@@ -36,10 +38,10 @@ export const Header = ({
         height: 50,
         marginTop:
           Platform.OS === 'ios'
-            ? 0
+            ? insets.top
             : preventDefaultMargins || isLoginNavigator
             ? 0
-            : StatusBar.currentHeight,
+            : insets.top,
         marginBottom: 10,
         justifyContent: 'space-between',
         alignItems: 'center',

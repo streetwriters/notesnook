@@ -21,6 +21,7 @@ import {Header} from '../header';
 import {Search} from '../SearchInput';
 import SelectionHeader from '../SelectionHeader';
 import {inputRef} from '../../utils/refs';
+import {useSafeArea} from 'react-native-safe-area-context';
 
 const AnimatedTouchableOpacity = Animatable.createAnimatableComponent(
   TouchableOpacity,
@@ -54,7 +55,7 @@ export const Container = ({
   const [text, setText] = useState('');
   const [hideHeader, setHideHeader] = useState(false);
   const [buttonHide, setButtonHide] = useState(false);
-
+  const insets = useSafeArea();
   let offsetY = 0;
   let countUp = 1;
   let countDown = 0;
@@ -191,7 +192,7 @@ export const Container = ({
         style={{
           height: '100%',
           backgroundColor: colors.bg,
-          paddingTop: StatusBar.currentHeight,
+          paddingTop: insets.top,
         }}>
         {noSelectionHeader ? null : <SelectionHeader items={data} />}
 
@@ -250,6 +251,7 @@ export const Container = ({
               opacity: buttonHide ? 0 : 1,
               position: 'absolute',
               paddingHorizontal: 12,
+              bottom: insets.bottom + 20,
               zIndex: 10,
               transform: [
                 {
