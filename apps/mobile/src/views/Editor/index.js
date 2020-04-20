@@ -82,6 +82,12 @@ const Editor = ({noMenu}) => {
   const loadNote = async item => {
     //EditorWebView.current?.requestFocus();
     editing.currentlyEditing = true;
+    if (!DDS.isTab) {
+      handleBack = BackHandler.addEventListener(
+        'hardwareBackPress',
+        _onHardwareBackPress,
+      );
+    }
     noMenu ? null : sideMenuRef.current?.setGestureEnabled(false);
     if (note && note.id) {
       dispatch({type: ACTIONS.NOTES});
@@ -449,21 +455,6 @@ const Editor = ({noMenu}) => {
       }
     };
   }, [noMenu]);
-
-  useEffect(() => {
-    if (!DDS.isTab) {
-      handleBack = BackHandler.addEventListener(
-        'hardwareBackPress',
-        _onHardwareBackPress,
-      );
-    }
-    return () => {
-      if (handleBack) {
-        handleBack.remove();
-        handleBack = null;
-      }
-    };
-  }, []);
 
   const _onBackPress = async () => {
     editing.currentlyEditing = true;
