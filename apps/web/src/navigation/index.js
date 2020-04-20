@@ -17,7 +17,7 @@ class Navigator {
 
   onLoad = () => {
     const route = Config.get(this.root, this.getRoute(this.options.default));
-    this.navigate(route.key, route.params);
+    this.navigate(route.key, route.params, true);
   };
 
   getRoute(key) {
