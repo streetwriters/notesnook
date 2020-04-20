@@ -1,3 +1,6 @@
+/**
+ * 
+
 import React, {useState} from 'react';
 import {Dimensions, Platform, SafeAreaView, Text, View} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -42,3 +45,4 @@ Reminders.navigationOptions = {
 };
 
 export default Reminders;
+ */

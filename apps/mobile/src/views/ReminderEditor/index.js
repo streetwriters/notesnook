@@ -1,3 +1,7 @@
+/**
+ * 
+
+
 import React, {createRef, useCallback, useState} from 'react';
 import {Dimensions, SafeAreaView, Text, TextInput, View} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -122,3 +126,4 @@ ReminderEditor.navigationOptions = {
 };
 
 export default ReminderEditor;
+ */
