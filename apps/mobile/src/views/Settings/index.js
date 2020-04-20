@@ -481,7 +481,7 @@ export const Settings = ({navigation}) => {
             />
           </TouchableOpacity>
         ) : null}
-
+        {/* 
         <Text
           style={{
             fontSize: SIZE.xs,
@@ -568,6 +568,8 @@ export const Settings = ({navigation}) => {
             }
           />
         </TouchableOpacity>
+
+         */}
 
         <Text
           style={{

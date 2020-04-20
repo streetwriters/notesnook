@@ -15,7 +15,6 @@ const App = () => {
   const [state, dispatch] = useTracked();
   const [init, setInit] = useState(false);
   const I = DDS.isTab ? require('./index.tablet') : require('./index.mobile');
-  console.log(DDS.isTab, 'TABLET');
   const _onOrientationChange = o => {
     // Currently orientation is locked on tablet.
     /* DDS.checkOrientation();
