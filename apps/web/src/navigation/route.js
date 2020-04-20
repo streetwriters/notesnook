@@ -94,7 +94,7 @@ function Route(props) {
         )}
       </Flex>
       {props.route.component && (
-        <Suspense fallback={<Text>Loading...</Text>}>
+        <Suspense fallback={<Text></Text>}>
           <props.route.component navigator={navigator} {...props.params} />
         </Suspense>
       )}
