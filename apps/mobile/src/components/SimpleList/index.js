@@ -63,8 +63,8 @@ const SimpleList = ({
                 ? 135
                 : 135 - 60
               : data[0] && !selectionMode
-              ? 155 - insets.top
-              : 155 - insets.top - 60,
+              ? 135 - insets.top
+              : 135 - insets.top - 60,
           flexDirection: 'row',
           alignItems: 'center',
           justifyContent: 'space-between',

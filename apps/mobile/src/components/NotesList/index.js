@@ -18,6 +18,7 @@ import {NotesPlaceHolder} from '../ListPlaceholders';
 import NoteItem from '../NoteItem';
 import SelectionWrapper from '../SelectionWrapper';
 import {useIsFocused} from 'react-navigation-hooks';
+import {useSafeArea} from 'react-native-safe-area-context';
 
 const sectionListRef = createRef();
 export const NotesList = ({isGrouped = false}) => {
@@ -26,6 +27,7 @@ export const NotesList = ({isGrouped = false}) => {
   const isFocused = useIsFocused();
   const [refreshing, setRefreshing] = useState(false);
   const searchResults = {...state.searchResults};
+  const insets = useSafeArea();
   const _renderItem = ({item, index}) => (
     <SelectionWrapper
       index={index}
@@ -71,13 +73,11 @@ export const NotesList = ({isGrouped = false}) => {
         marginTop:
           Platform.OS == 'ios'
             ? notes[0] && !selectionMode
-              ? DDS.isTab
-                ? 115
-                : 135
+              ? 135
               : 135 - 60
             : notes[0] && !selectionMode
-            ? 155
-            : 155 - 60,
+            ? 135
+            : 135 - 60 - insets.top,
       }}>
       <PinnedItems />
     </View>
@@ -152,13 +152,11 @@ export const NotesList = ({isGrouped = false}) => {
         marginTop:
           Platform.OS == 'ios'
             ? notes[0] && !selectionMode
-              ? DDS.isTab
-                ? 115
-                : 135
+              ? 135
               : 135 - 60
             : notes[0] && !selectionMode
-            ? 155
-            : 155 - 60,
+            ? 135
+            : 135 - 60 - insets.top,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
