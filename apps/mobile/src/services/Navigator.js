@@ -46,9 +46,6 @@ export const TopLevelNavigator = createStackNavigator(
         gesturesEnabled: false,
       },
     },
-    Reminders: {
-      screen: Reminders,
-    },
     Lists: {
       screen: Lists,
     },
@@ -60,9 +57,6 @@ export const TopLevelNavigator = createStackNavigator(
     },
     ListsEditor: {
       screen: ListsEditor,
-    },
-    ReminderEditor: {
-      screen: ReminderEditor,
     },
     Login: {
       screen: Login,
