@@ -1,4 +1,4 @@
-import React, { Suspense } from "react";
+import React from "react";
 import { Box, Flex, Heading, Text } from "rebass";
 import * as Icon from "../components/icons";
 import ThemeProvider from "../components/theme-provider";
@@ -94,9 +94,7 @@ function Route(props) {
         )}
       </Flex>
       {props.route.component && (
-        <Suspense fallback={<Text></Text>}>
-          <props.route.component navigator={navigator} {...props.params} />
-        </Suspense>
+        <props.route.component navigator={navigator} {...props.params} />
       )}
     </ThemeProvider>
   );
