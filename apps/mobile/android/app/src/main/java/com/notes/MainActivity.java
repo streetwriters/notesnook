@@ -53,6 +53,12 @@ public class MainActivity extends ReactActivity {
     return "Notes";
   }
 
+    @Override
+    public void invokeDefaultOnBackPressed() {
+        moveTaskToBack(true);
+    }
+
+
    
 
 }
