@@ -1,4 +1,4 @@
-import React, { useEffect, useState, createRef } from 'react';
+import React, {useEffect, useState, createRef} from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -8,27 +8,25 @@ import {
   Text,
   View,
 } from 'react-native';
-import { SIZE, WEIGHT } from '../../common/common';
-import { useTracked } from '../../provider';
-import { ACTIONS } from '../../provider/actions';
-import { eSendEvent } from '../../services/eventManager';
-import { eScrollEvent, eClearSearch } from '../../services/events';
-import { ToastEvent, hexToRGBA, DDS, db } from '../../utils/utils';
-import { NotesPlaceHolder } from '../ListPlaceholders';
+import {SIZE, WEIGHT} from '../../common/common';
+import {useTracked} from '../../provider';
+import {ACTIONS} from '../../provider/actions';
+import {eSendEvent} from '../../services/eventManager';
+import {eScrollEvent, eClearSearch} from '../../services/events';
+import {ToastEvent, hexToRGBA, DDS, db} from '../../utils/utils';
+import {NotesPlaceHolder} from '../ListPlaceholders';
 import NoteItem from '../NoteItem';
 import SelectionWrapper from '../SelectionWrapper';
-import { useIsFocused } from 'react-navigation-hooks';
-import { useSafeArea } from 'react-native-safe-area-context';
+import {useIsFocused} from 'react-navigation-hooks';
 
 const sectionListRef = createRef();
-export const NotesList = ({ isGrouped = false }) => {
+export const NotesList = ({isGrouped = false}) => {
   const [state, dispatch] = useTracked();
-  const { colors, selectionMode, currentEditingNote, loading, notes } = state;
+  const {colors, selectionMode, currentEditingNote, loading, notes} = state;
   const isFocused = useIsFocused();
   const [refreshing, setRefreshing] = useState(false);
-  const searchResults = { ...state.searchResults };
-  const insets = useSafeArea();
-  const _renderItem = ({ item, index }) => (
+  const searchResults = {...state.searchResults};
+  const _renderItem = ({item, index}) => (
     <SelectionWrapper
       index={index}
       currentEditingNote={
@@ -47,12 +45,12 @@ export const NotesList = ({ isGrouped = false }) => {
         selectionMode={selectionMode}
         onLongPress={() => {
           if (!selectionMode) {
-            dispatch({ type: ACTIONS.SELECTION_MODE, enabled: true });
+            dispatch({type: ACTIONS.SELECTION_MODE, enabled: true});
           }
-          dispatch({ type: ACTIONS.SELECTED_ITEMS, item: item });
+          dispatch({type: ACTIONS.SELECTED_ITEMS, item: item});
         }}
         update={() => {
-          dispatch({ type: ACTIONS.NOTES });
+          dispatch({type: ACTIONS.NOTES});
         }}
         item={item}
         index={index}
@@ -78,8 +76,8 @@ export const NotesList = ({ isGrouped = false }) => {
                 : 135
               : 135 - 60
             : notes[0] && !selectionMode
-              ? 155 - insets.top
-              : (155 - 60) - insets.top,
+            ? 155
+            : 155 - 60,
       }}>
       <PinnedItems />
     </View>
@@ -116,23 +114,23 @@ export const NotesList = ({ isGrouped = false }) => {
       {loading ? (
         <ActivityIndicator size={SIZE.xl} color={colors.accent} />
       ) : (
-          <>
-            <NotesPlaceHolder colors={colors} />
-            <Text
-              style={{
-                color: colors.icon,
-                fontSize: SIZE.sm,
-                fontFamily: WEIGHT.regular,
-                marginTop: 35,
-              }}>
-              Notes you write will appear here.
+        <>
+          <NotesPlaceHolder colors={colors} />
+          <Text
+            style={{
+              color: colors.icon,
+              fontSize: SIZE.sm,
+              fontFamily: WEIGHT.regular,
+              marginTop: 35,
+            }}>
+            Notes you write will appear here.
           </Text>
-          </>
-        )}
+        </>
+      )}
     </View>
   );
 
-  const _renderSectionHeader = ({ section: { title } }) => (
+  const _renderSectionHeader = ({section: {title}}) => (
     <Text
       style={{
         fontFamily: WEIGHT.bold,
@@ -159,8 +157,8 @@ export const NotesList = ({ isGrouped = false }) => {
                 : 135
               : 135 - 60
             : notes[0] && !selectionMode
-              ? 155
-              : 155 - 60,
+            ? 155
+            : 155 - 60,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -209,10 +207,10 @@ export const NotesList = ({ isGrouped = false }) => {
               setRefreshing(false);
               ToastEvent.show(e.message, 'error');
             }
-            dispatch({ type: ACTIONS.NOTES });
-            dispatch({ type: ACTIONS.PINNED });
+            dispatch({type: ACTIONS.NOTES});
+            dispatch({type: ACTIONS.PINNED});
             let user = await db.user.get();
-            dispatch({ type: ACTIONS.USER, user: user });
+            dispatch({type: ACTIONS.USER, user: user});
           }}
           refreshing={refreshing}
         />
@@ -235,31 +233,31 @@ export const NotesList = ({ isGrouped = false }) => {
       renderItem={_renderItem}
     />
   ) : (
-      <FlatList
-        data={searchResults.type === 'notes' ? searchResults.results : []}
-        keyExtractor={_listKeyExtractor}
-        ListFooterComponent={_ListFooterComponent}
-        onScroll={_onScroll}
-        ListHeaderComponent={_ListHeaderComponent_S}
-        contentContainerStyle={{
-          width: '100%',
-          alignSelf: 'center',
-          minHeight: '100%',
-        }}
-        style={{
-          height: '100%',
-        }}
-        renderItem={_renderItem}
-      />
-    );
+    <FlatList
+      data={searchResults.type === 'notes' ? searchResults.results : []}
+      keyExtractor={_listKeyExtractor}
+      ListFooterComponent={_ListFooterComponent}
+      onScroll={_onScroll}
+      ListHeaderComponent={_ListHeaderComponent_S}
+      contentContainerStyle={{
+        width: '100%',
+        alignSelf: 'center',
+        minHeight: '100%',
+      }}
+      style={{
+        height: '100%',
+      }}
+      renderItem={_renderItem}
+    />
+  );
 };
 
 const PinnedItems = () => {
   const [state, dispatch] = useTracked();
-  const { pinned, colors, selectionMode } = state;
+  const {pinned, colors, selectionMode} = state;
 
   useEffect(() => {
-    dispatch({ type: ACTIONS.PINNED });
+    dispatch({type: ACTIONS.PINNED});
   }, []);
 
   return (
@@ -267,7 +265,7 @@ const PinnedItems = () => {
       <FlatList
         data={pinned.notes}
         keyExtractor={(item, index) => item.id.toString()}
-        renderItem={({ item, index }) =>
+        renderItem={({item, index}) =>
           item.type === 'note' ? (
             <SelectionWrapper
               index={index}
@@ -295,12 +293,12 @@ const PinnedItems = () => {
                 selectionMode={selectionMode}
                 onLongPress={() => {
                   if (!selectionMode) {
-                    dispatch({ type: ACTIONS.SELECTION_MODE, enabled: true });
+                    dispatch({type: ACTIONS.SELECTION_MODE, enabled: true});
                   }
-                  dispatch({ type: ACTIONS.SELECTED_ITEMS, item: item });
+                  dispatch({type: ACTIONS.SELECTED_ITEMS, item: item});
                 }}
                 update={() => {
-                  dispatch({ type: ACTIONS.NOTES });
+                  dispatch({type: ACTIONS.NOTES});
                 }}
                 item={item}
                 index={index}

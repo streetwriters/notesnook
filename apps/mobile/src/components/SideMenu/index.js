@@ -180,6 +180,34 @@ export default class SideMenu extends React.Component {
     return this.props.menuPosition === 'right' ? -1 : 1;
   }
 
+  doAfterShow() {
+    sideMenuOverlayRef.current?.setNativeProps({
+      style: {
+        display: 'none',
+        position: 'relative',
+        transform: [
+          {
+            translateX: -deviceScreen.width * 2,
+          },
+        ],
+      },
+    });
+  }
+
+  doAfterHide() {
+    sideMenuOverlayRef.current?.setNativeProps({
+      style: {
+        display: 'flex',
+        position: 'absolute',
+        transform: [
+          {
+            translateX: 0,
+          },
+        ],
+      },
+    });
+  }
+
   handlePanResponderMove(e, gestureState) {
     if (this.state.left.__getValue() * this.menuPositionMultiplier() >= 0) {
       let newLeft = this.prevLeft + gestureState.dx;
@@ -199,32 +227,11 @@ export default class SideMenu extends React.Component {
 
       let o = newLeft / this.props.openMenuOffset;
       this.opacity.setValue(o * 0.5);
-      if (o > 0.015) {
-        sideMenuOverlayRef.current?.setNativeProps({
-          style: {
-            display: 'none',
-            position: 'relative',
-            transform: [
-              {
-                translateX: -deviceScreen.width * 2,
-              },
-            ],
-          },
-        });
+      if (o > 0.1) {
+        this.doAfterShow();
       } else {
-        sideMenuOverlayRef.current?.setNativeProps({
-          style: {
-            display: 'flex',
-            position: 'absolute',
-            transform: [
-              {
-                translateX: 0,
-              },
-            ],
-          },
-        });
+        this.doAfterHide();
       }
-
       this.props.onMove(newLeft);
       this.state.left.setValue(newLeft);
     }
@@ -246,6 +253,7 @@ export default class SideMenu extends React.Component {
       const touchMoved = x > this.props.toleranceX && y < this.props.toleranceY;
 
       if (this.isOpen) {
+        this.doAfterShow();
         return touchMoved;
       }
 
@@ -266,30 +274,17 @@ export default class SideMenu extends React.Component {
     const {hiddenMenuOffset, openMenuOffset} = this.state;
 
     if (isOpen) {
-      sideMenuOverlayRef.current.setNativeProps({
-        style: {
-          display: 'none',
-          position: 'relative',
-          transform: [
-            {
-              translateX: -deviceScreen.width * 2,
-            },
-          ],
-        },
-      });
+      this.doAfterShow();
+      setTimeout(() => {
+        if (this.isOpen) {
+          this.doAfterShow();
+        }
+      }, 500);
     } else {
       setTimeout(() => {
-        sideMenuOverlayRef.current.setNativeProps({
-          style: {
-            display: 'flex',
-            position: 'absolute',
-            transform: [
-              {
-                translateX: 0,
-              },
-            ],
-          },
-        });
+        if (!this.isOpen) {
+          this.doAfterHide();
+        }
       }, 500);
     }
 

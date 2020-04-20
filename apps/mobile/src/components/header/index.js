@@ -1,18 +1,17 @@
-import React, { createRef } from 'react';
-import { Platform, StatusBar, Text, TouchableOpacity, View } from 'react-native';
+import React, {createRef} from 'react';
+import {Platform, StatusBar, Text, TouchableOpacity, View} from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import { SIZE, WEIGHT } from '../../common/common';
-import { useTracked } from '../../provider';
-import { eSendEvent } from '../../services/eventManager';
-import { eCloseLoginDialog } from '../../services/events';
+import {SIZE, WEIGHT} from '../../common/common';
+import {useTracked} from '../../provider';
+import {eSendEvent} from '../../services/eventManager';
+import {eCloseLoginDialog} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
-import { DDS } from '../../utils/utils';
+import {DDS} from '../../utils/utils';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import Menu, { MenuItem, MenuDivider } from 'react-native-material-menu';
-import { ACTIONS } from '../../provider/actions';
-import { sideMenuRef } from '../../utils/refs';
-import { moveNoteHideEvent } from '../DialogManager/recievers';
-import { useSafeArea } from 'react-native-safe-area-context';
+import Menu, {MenuItem, MenuDivider} from 'react-native-material-menu';
+import {ACTIONS} from '../../provider/actions';
+import {sideMenuRef} from '../../utils/refs';
+import {moveNoteHideEvent} from '../DialogManager/recievers';
 const menuRef = createRef();
 export const Header = ({
   heading,
@@ -27,8 +26,7 @@ export const Header = ({
   headerColor,
 }) => {
   const [state, dispatch] = useTracked();
-  const { colors } = state;
-  const insets = useSafeArea();
+  const {colors} = state;
 
   return (
     <View
@@ -38,10 +36,10 @@ export const Header = ({
         height: 50,
         marginTop:
           Platform.OS === 'ios'
-            ? insets.top
+            ? 0
             : preventDefaultMargins || isLoginNavigator
-              ? 0
-              : insets.top,
+            ? 0
+            : StatusBar.currentHeight,
         marginBottom: 10,
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -56,7 +54,7 @@ export const Header = ({
         }}>
         {canGoBack ? (
           <TouchableOpacity
-            hitSlop={{ top: 20, bottom: 20, left: 50, right: 40 }}
+            hitSlop={{top: 20, bottom: 20, left: 50, right: 40}}
             onPress={() => {
               if (navigation && preventDefaultMargins) {
                 if (navigation.state.routeName === 'Folders') {
@@ -90,11 +88,11 @@ export const Header = ({
             />
           </TouchableOpacity>
         ) : (
-            undefined
-          )}
+          undefined
+        )}
         {menu && !DDS.isTab ? (
           <TouchableOpacity
-            hitSlop={{ top: 20, bottom: 20, left: 50, right: 40 }}
+            hitSlop={{top: 20, bottom: 20, left: 50, right: 40}}
             onPress={() => {
               sideMenuRef.current?.openMenu(true);
             }}
@@ -107,8 +105,8 @@ export const Header = ({
             <Icon color={colors.pri} name={'menu'} size={SIZE.xxxl} />
           </TouchableOpacity>
         ) : (
-            undefined
-          )}
+          undefined
+        )}
 
         <Text
           style={{
@@ -185,7 +183,7 @@ export const Header = ({
                 color: colors.pri,
               }}
               onPress={() => {
-                dispatch({ type: ACTIONS.NOTES, sort: null });
+                dispatch({type: ACTIONS.NOTES, sort: null});
                 menuRef.current?.hide();
               }}>
               Default
@@ -196,7 +194,7 @@ export const Header = ({
                 color: colors.pri,
               }}
               onPress={() => {
-                dispatch({ type: ACTIONS.NOTES, sort: 'abc' });
+                dispatch({type: ACTIONS.NOTES, sort: 'abc'});
                 menuRef.current?.hide();
               }}>
               Alphabetical
@@ -207,7 +205,7 @@ export const Header = ({
                 color: colors.pri,
               }}
               onPress={() => {
-                dispatch({ type: ACTIONS.NOTES, sort: 'year' });
+                dispatch({type: ACTIONS.NOTES, sort: 'year'});
                 menuRef.current?.hide();
               }}>
               By year
@@ -218,7 +216,7 @@ export const Header = ({
                 color: colors.pri,
               }}
               onPress={() => {
-                dispatch({ type: ACTIONS.NOTES, sort: 'month' });
+                dispatch({type: ACTIONS.NOTES, sort: 'month'});
                 menuRef.current?.hide();
               }}>
               By month
@@ -229,7 +227,7 @@ export const Header = ({
                 color: colors.pri,
               }}
               onPress={() => {
-                dispatch({ type: ACTIONS.NOTES, sort: 'week' });
+                dispatch({type: ACTIONS.NOTES, sort: 'week'});
                 menuRef.current?.hide();
               }}>
               By week
