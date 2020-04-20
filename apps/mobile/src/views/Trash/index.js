@@ -14,8 +14,10 @@ import {TEMPLATE_EMPTY_TRASH} from '../../components/DialogManager/templates';
 
 export const Trash = ({navigation}) => {
   const [state, dispatch] = useTracked();
-  const {colors, selectionMode, trash} = state;
+  const {colors, selectionMode} = state;
+  const trash = [...trash];
   const [refreshing, setRefreshing] = useState(false);
+
   const isFocused = useIsFocused();
   useEffect(() => {
     if (isFocused) {
@@ -87,15 +89,14 @@ export const Trash = ({navigation}) => {
     setRefreshing(true);
     try {
       await db.sync();
-
-      dispatch({type: ACTIONS.TRASH});
-      dispatch({type: ACTIONS.USER});
       setRefreshing(false);
       ToastEvent.show('Sync Complete', 'success');
     } catch (e) {
       setRefreshing(false);
       ToastEvent.show('Sync failed, network error', 'error');
     }
+    dispatch({type: ACTIONS.TRASH});
+    dispatch({type: ACTIONS.USER});
   };
 
   return (

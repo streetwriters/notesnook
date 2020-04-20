@@ -46,7 +46,6 @@ const App = () => {
       db.init().then(async () => {
         let user = await db.user.get();
         dispatch({type: ACTIONS.USER, user: user});
-
         setInit(true);
       });
     });
@@ -78,6 +77,7 @@ const App = () => {
 
       dispatch({type: ACTIONS.SETTINGS, settings: {...s}});
     }
+
     dispatch({type: ACTIONS.THEME, colors: newColors});
   }
 
