@@ -35,7 +35,6 @@ class Notebook extends React.Component {
   render() {
     const { item, index, onClick, onTopicClick } = this.props;
     const notebook = item;
-    console.log("rendering notebook", notebook.id);
     return (
       <ListItem
         selectable

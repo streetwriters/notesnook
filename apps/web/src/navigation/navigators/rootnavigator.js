@@ -1,20 +1,18 @@
-import {
-  Home,
-  SettingsContainer,
-  Trash,
-  NotebooksContainer,
-  TagsContainer,
-  Notes,
-  Account,
-} from "../../views";
+import { Home, Trash, Notes, Account } from "../../views";
 import * as Icon from "../../components/icons";
-import { createRoute, createNormalRoute, createDeadRoute } from "../routes";
+import {
+  createRoute,
+  createNavigatorRoute,
+  createNormalRoute,
+  createDeadRoute,
+} from "../routes";
 import Navigator from "../index";
 import SelectionModeOptions from "../../common/selectionoptions";
 import Search from "../../views/Search";
 import { store as userStore } from "../../stores/user-store";
 import { store as themeStore } from "../../stores/theme-store";
 import { showLogInDialog } from "../../components/dialogs/logindialog";
+import { NotebookNavigator, TagNavigator, SettingsNavigator } from "./index";
 
 export const bottomRoutes = {
   ...createDeadRoute("nightmode", Icon.Theme, {
@@ -32,9 +30,7 @@ export const bottomRoutes = {
       } else return RootNavigator.navigate("account");
     },
   }),
-  ...createRoute("settings", SettingsContainer, {
-    icon: Icon.Settings,
-  }),
+  ...createNavigatorRoute("settings", Icon.Settings, SettingsNavigator),
 };
 
 export const routes = {
@@ -42,9 +38,7 @@ export const routes = {
     title: "Home",
     options: SelectionModeOptions.NotesOptions,
   }),
-  ...createRoute("notebooks", NotebooksContainer, {
-    icon: Icon.Notebook,
-  }),
+  ...createNavigatorRoute("notebooks", Icon.Notebook, NotebookNavigator),
   ...createRoute(
     "favorites",
     Notes,
@@ -61,9 +55,7 @@ export const routes = {
     title: "Trash",
     options: SelectionModeOptions.TrashOptions,
   }),
-  ...createRoute("tags", TagsContainer, {
-    icon: Icon.Tag,
-  }),
+  ...createNavigatorRoute("tags", Icon.Tag, TagNavigator),
 };
 
 const invisibleRoutes = {
@@ -79,6 +71,7 @@ const RootNavigator = new Navigator(
   { ...routes, ...bottomRoutes, ...invisibleRoutes },
   {
     backButtonEnabled: false,
+    default: "home",
   }
 );
 

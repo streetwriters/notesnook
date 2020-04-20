@@ -1,12 +1,18 @@
+import NavigationContainer from "./container";
+
 export function createRoute(key, component, props = {}, params = {}) {
   return {
     [key]: {
       key,
       component,
       ...props,
-      params
-    }
+      params,
+    },
   };
+}
+
+export function createNavigatorRoute(key, icon, navigator) {
+  return createRoute(key, NavigationContainer, { icon }, { navigator });
 }
 
 export function createNormalRoute(key, component, icon, props = {}) {

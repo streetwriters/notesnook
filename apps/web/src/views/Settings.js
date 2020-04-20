@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Box, Button, Flex, Text } from "rebass";
 import * as Icon from "../components/icons";
 import { useStore as useUserStore } from "../stores/user-store";
@@ -107,15 +107,4 @@ function Settings(props) {
   );
 }
 
-function SettingsContainer() {
-  useEffect(() => {
-    const SettingsNavigator = require("../navigation/navigators/settingnavigator")
-      .default;
-    if (!SettingsNavigator.restore()) {
-      SettingsNavigator.navigate("settings");
-    }
-  }, []);
-  return <Flex variant="columnFill" className="SettingsNavigator" />;
-}
-
-export { Settings, SettingsContainer };
+export default Settings;

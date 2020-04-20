@@ -6,16 +6,18 @@ import SelectionModeOptions from "../../common/selectionoptions";
 const routes = {
   ...createRoute("notebooks", Notebooks, {
     title: "Notebooks",
-    options: SelectionModeOptions.NotebooksOptions
+    options: SelectionModeOptions.NotebooksOptions,
   }),
   ...createRoute("topics", Topics, {
-    options: SelectionModeOptions.TopicOptions
+    options: SelectionModeOptions.TopicOptions,
   }),
-  ...createRoute("notes", Notes, { options: SelectionModeOptions.NotesOptions })
+  ...createRoute("notes", Notes, {
+    options: SelectionModeOptions.NotesOptions,
+  }),
 };
 
 const NotebookNavigator = new Navigator("NotebookNavigator", routes, {
-  backButtonEnabled: true
+  backButtonEnabled: true,
+  default: "notebooks",
 });
-
 export default NotebookNavigator;

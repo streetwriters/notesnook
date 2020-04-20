@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { Flex } from "rebass";
 import { db } from "../common";
 import Notebook from "../components/notebook";
 import AddNotebookDialog from "../components/dialogs/addnotebookdialog";
@@ -64,15 +63,13 @@ function Notebooks(props) {
   );
 }
 
-function NotebooksContainer() {
-  useEffect(() => {
-    const NotebookNavigator = require("../navigation/navigators/nbnavigator")
-      .default;
-    if (!NotebookNavigator.restore()) {
-      NotebookNavigator.navigate("notebooks");
-    }
-  }, []);
-  return <Flex variant="columnFill" className="NotebookNavigator" />;
-}
+/* function NotebooksContainer() {
+  return (
+    <NavigationContainer
+      variant="columnFill"
+      navigator={require("../navigation/navigators/nbnavigator").default}
+    />
+  );
+} */
 
-export { NotebooksContainer, Notebooks };
+export default Notebooks;

@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Flex, Text } from "rebass";
+import { Text } from "rebass";
 import ListContainer from "../components/list-container";
 import ListItem from "../components/list-item";
 import { useStore, store } from "../stores/tag-store";
@@ -48,15 +48,4 @@ function Tags(props) {
   );
 }
 
-function TagsContainer() {
-  useEffect(() => {
-    const TagNavigator = require("../navigation/navigators/tagnavigator")
-      .default;
-    if (!TagNavigator.restore()) {
-      TagNavigator.navigate("tags");
-    }
-  }, []);
-  return <Flex variant="columnFill" className="TagNavigator" />;
-}
-
-export { Tags, TagsContainer };
+export default Tags;

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Box } from "rebass";
 import RootNavigator, {
   bottomRoutes,
@@ -20,11 +20,6 @@ function NavigationMenu(props) {
   const isFocusMode = useAppStore((store) => store.isFocusMode);
   const colors = useStore((store) => store.colors);
   const isSideMenuOpen = useStore((store) => store.isSideMenuOpen);
-
-  useEffect(() => {
-    RootNavigator.navigate(selectedRoute);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   return (
     <Animated.Flex

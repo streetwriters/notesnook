@@ -1,12 +1,10 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { Box, Flex, Heading, Text } from "rebass";
 import Animated from "../components/animated";
 import { AnimatePresence } from "framer-motion";
-import * as Icon from "../components/icons";
-import ThemeProvider from "../components/theme-provider";
-import { useStore } from "../stores/app-store";
 import { store as selectionStore } from "../stores/selection-store";
+import Route from "./route";
+import Config from "../utils/config";
 
 class Navigator {
   constructor(root, routes, options = {}) {
@@ -17,8 +15,22 @@ class Navigator {
     this.lastRoute = undefined;
   }
 
+  onLoad = () => {
+    const route = Config.get(this.root, this.getRoute(this.options.default));
+    this.navigate(route.key, route.params);
+  };
+
   getRoute(key) {
     return this.routes[key];
+  }
+
+  setLastRoute(route) {
+    this.lastRoute = route;
+    // cache the route in localStorage
+    // NOTE: we delete the navigator key if any so it's always new across refreshes
+    const copy = { ...route, params: { ...route.params } };
+    if (copy.params.navigator) delete copy.params.navigator;
+    Config.set(this.root, copy);
   }
 
   getRoot() {
@@ -37,7 +49,7 @@ class Navigator {
     if (this.lastRoute) {
       this.history.push(this.lastRoute);
     }
-    this.lastRoute = route;
+    this.setLastRoute(route);
     return this.renderRoute(route);
   }
 
@@ -59,7 +71,7 @@ class Navigator {
           flexDirection="column"
           flex="1 1 auto"
         >
-          <NavigationContainer
+          <Route
             navigator={this}
             route={route}
             params={route.params}
@@ -80,7 +92,7 @@ class Navigator {
     if (!route) {
       return false;
     }
-    this.lastRoute = route;
+    this.setLastRoute(route);
     return this.renderRoute(this._mergeParams(route, params));
   }
 
@@ -99,98 +111,3 @@ class Navigator {
   }
 }
 export default Navigator;
-
-function NavigationContainer(props) {
-  const toggleSideMenu = useStore((store) => store.toggleSideMenu);
-  const isSelectionMode = useStore((store) => store.isSelectionMode);
-  const exitSelectionMode = useStore((store) => store.exitSelectionMode);
-  const selectAll = useStore((store) => store.selectAll);
-  return (
-    <ThemeProvider>
-      <Flex flexDirection="column" px={2}>
-        {(props.route.title || props.route.params.title) && (
-          <>
-            <Flex alignItems="center" justifyContent="space-between">
-              <Flex alignItems="center" py={2}>
-                {props.canGoBack && (
-                  <Box
-                    onClick={props.backAction}
-                    ml={-2}
-                    height={38}
-                    width={38}
-                  >
-                    <Icon.ChevronLeft size={38} color="fontPrimary" />
-                  </Box>
-                )}
-                <Box
-                  onClick={toggleSideMenu}
-                  height={38}
-                  ml={-5}
-                  sx={{
-                    display: ["block", "none", "none"],
-                  }}
-                >
-                  <Icon.Menu size={38} />
-                </Box>
-                <Heading
-                  fontSize="heading"
-                  color={props.route.titleColor || "text"}
-                >
-                  {props.route.title || props.route.params.title}
-                </Heading>
-              </Flex>
-              {props.route.options && isSelectionMode && (
-                <Flex>
-                  {props.route.options.map((option) => (
-                    <Box
-                      key={option.icon.name}
-                      onClick={option.onClick}
-                      mx={2}
-                      sx={{ cursor: "pointer" }}
-                    >
-                      <option.icon />
-                    </Box>
-                  ))}
-                </Flex>
-              )}
-            </Flex>
-            {props.route.params.subtitle && (
-              <Text
-                variant="title"
-                color="primary"
-                sx={{
-                  marginBottom: 2,
-                  cursor: isSelectionMode ? "pointer" : "normal",
-                }}
-              >
-                {props.route.params.subtitle}
-              </Text>
-            )}
-            {isSelectionMode && (
-              <Flex alignItems="center" mb={2} sx={{ cursor: "pointer" }}>
-                <Text
-                  variant="title"
-                  color="primary"
-                  onClick={() => selectAll()}
-                >
-                  Select all
-                </Text>
-                <Text
-                  ml={2}
-                  variant="title"
-                  color="primary"
-                  onClick={() => exitSelectionMode()}
-                >
-                  Unselect
-                </Text>
-              </Flex>
-            )}
-          </>
-        )}
-      </Flex>
-      {props.route.component && (
-        <props.route.component navigator={props.navigator} {...props.params} />
-      )}
-    </ThemeProvider>
-  );
-}

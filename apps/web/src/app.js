@@ -9,6 +9,8 @@ import { useStore as useEditorStore } from "./stores/editor-store";
 import { useStore as useUserStore } from "./stores/user-store";
 import Animated from "./components/animated";
 import NavigationMenu from "./components/navigationmenu";
+import NavigationContainer from "./navigation/container";
+import RootNavigator from "./navigation/navigators/rootnavigator";
 
 function App() {
   const [show, setShow] = usePersistentState("isContainerVisible", true);
@@ -42,7 +44,6 @@ function App() {
         <Flex variant="rowFill">
           <Animated.Flex
             variant="columnFill"
-            className="RootNavigator"
             initial={{ width: "30%", opacity: 1, scaleY: 1 }}
             animate={{
               width: show ? "30%" : "0%",
@@ -55,7 +56,12 @@ function App() {
               borderRight: "1px solid",
               borderColor: "border",
             }}
-          />
+          >
+            <NavigationContainer
+              navigator={RootNavigator}
+              variant="columnFill"
+            />
+          </Animated.Flex>
           <Flex width="100%" className="EditorNavigator" />
         </Flex>
         <Box id="dialogContainer" />
