@@ -16,8 +16,12 @@ class Navigator {
   }
 
   onLoad = () => {
-    const route = Config.get(this.root, this.getRoute(this.options.default));
-    this.navigate(route.key, route.params, true);
+    const opts = Config.get(this.root, {
+      history: [],
+      lastRoute: this.getRoute(this.options.default),
+    });
+    this.history = opts.history;
+    this.navigate(opts.lastRoute.key, opts.lastRoute.params, true);
   };
 
   getRoute(key) {
@@ -30,7 +34,10 @@ class Navigator {
     // NOTE: we delete the navigator key if any so it's always new across refreshes
     const copy = { ...route, params: { ...route.params } };
     if (copy.params.navigator) delete copy.params.navigator;
-    Config.set(this.root, copy);
+    Config.set(this.root, {
+      history: this.history,
+      lastRoute: copy,
+    });
   }
 
   getRoot() {
@@ -89,9 +96,9 @@ class Navigator {
 
   goBack(params = {}) {
     let route = this.history.pop();
-    if (!route) {
-      return false;
-    }
+    if (!route) return false;
+    if (!route.component) route.component = this.getRoute(route.key).component;
+
     this.setLastRoute(route);
     return this.renderRoute(this._mergeParams(route, params));
   }
