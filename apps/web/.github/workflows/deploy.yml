@@ -17,11 +17,6 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Setup SSH
-        uses: webfactory/ssh-agent@v0.2.0
-        with:
-          ssh-private-key: ${{ secrets.GH_SSH_KEY }}
-
       - name: Use Node.js 12.x
         uses: actions/setup-node@v1
         with:
