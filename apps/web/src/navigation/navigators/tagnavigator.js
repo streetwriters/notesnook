@@ -5,11 +5,14 @@ import SelectionModeOptions from "../../common/selectionoptions";
 
 const routes = {
   ...createRoute("tags", Tags, { title: "Tags" }),
-  ...createRoute("notes", Notes, { options: SelectionModeOptions.NotesOptions })
+  ...createRoute("notes", Notes, {
+    options: SelectionModeOptions.NotesOptions,
+  }),
 };
 
 const TagNavigator = new Navigator("TagNavigator", routes, {
-  backButtonEnabled: true
+  backButtonEnabled: true,
+  default: "tags",
 });
 
 export default TagNavigator;
