@@ -8,7 +8,7 @@ class ButtonFactory {
       list: new List(),
       anchor: new Anchor(),
       menu: new Menu(),
-      icon: new Icon()
+      icon: new Icon(),
     };
   }
 }
@@ -20,11 +20,12 @@ class Default {
       bg: "transparent",
       fontFamily: "body",
       fontWeight: "body",
+      fontSize: "body",
       borderRadius: "default",
       cursor: "pointer",
       ":focus": {
-        outline: "none"
-      }
+        outline: "none",
+      },
     };
   }
 }
@@ -37,8 +38,8 @@ class Primary {
       bg: "primary",
       transition: "opacity 300ms linear",
       ":hover": {
-        opacity: 0.8
-      }
+        opacity: 0.8,
+      },
     };
   }
 }
@@ -56,7 +57,7 @@ class Tertiary {
       color: "text",
       bg: "transparent",
       border: "2px solid",
-      borderColor: "border"
+      borderColor: "border",
     };
   }
 }
@@ -69,7 +70,7 @@ class List {
       borderBottom: "1px solid",
       borderBottomColor: "border",
       borderRadius: 0,
-      p: 2
+      p: 2,
     };
   }
 }
@@ -81,7 +82,7 @@ class Anchor {
       color: "primary",
       fontSize: "subBody",
       p: 0,
-      m: 0
+      m: 0,
     };
   }
 }
@@ -93,8 +94,8 @@ class Icon {
       color: "text",
       borderRadius: "none",
       ":hover": {
-        backgroundColor: "shade"
-      }
+        backgroundColor: "shade",
+      },
     };
   }
 }
@@ -107,8 +108,8 @@ class Menu {
       p: 2,
       borderRadius: "none",
       ":hover": {
-        backgroundColor: "shade"
-      }
+        backgroundColor: "shade",
+      },
     };
   }
 }
