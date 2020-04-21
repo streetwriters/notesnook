@@ -71,6 +71,9 @@ class EditorStore extends BaseStore {
       };
     });
     noteStore.setSelectedNote(note.id);
+
+    if (note.locked) return;
+    saveLastOpenedNote(note.id);
   };
 
   saveSession = (oldSession) => {
