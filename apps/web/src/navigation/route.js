@@ -23,11 +23,11 @@ export default Route;
 
 function Header(props) {
   const { route, canGoBack, backAction } = props;
-  const { title, titleColor, params, options } = route;
+  const { title, titleColor, params, options, noHeader } = route;
 
   const toggleSideMenu = useStore((store) => store.toggleSideMenu);
 
-  if (!title && !params.title) return null;
+  if ((!title && !params.title) || noHeader) return null;
   return (
     <>
       <Flex alignItems="center" justifyContent="space-between">

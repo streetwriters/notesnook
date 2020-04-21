@@ -39,7 +39,7 @@ function App() {
 
   return (
     <ThemeProvider>
-      <Flex bg="background" height="100%">
+      <Flex id="app" bg="background" height="100%">
         <NavigationMenu toggleNavigationContainer={() => setShow(!show)} />
         <Flex variant="rowFill">
           <Animated.Flex
@@ -62,7 +62,7 @@ function App() {
               variant="columnFill"
             />
           </Animated.Flex>
-          <Flex width="100%" className="EditorNavigator" />
+          <Flex width={[0, 0, "100%"]} className="EditorNavigator" />
         </Flex>
         <Box id="dialogContainer" />
         <Box id="snackbarContainer" />
