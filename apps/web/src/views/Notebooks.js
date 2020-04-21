@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { db } from "../common";
 import Notebook from "../components/notebook";
 import AddNotebookDialog from "../components/dialogs/addnotebookdialog";
 import ListContainer from "../components/list-container";

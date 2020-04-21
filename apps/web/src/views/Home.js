@@ -11,6 +11,7 @@ function Home() {
   useEffect(() => store.refresh(), []);
   const notes = useStore((store) => store.notes);
   const newSession = useEditorStore((store) => store.newSession);
+
   return (
     <ListContainer
       items={notes.items}

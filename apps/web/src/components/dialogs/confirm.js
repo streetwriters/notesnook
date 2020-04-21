@@ -10,19 +10,21 @@ function Confirm(props) {
       icon={props.icon}
       positiveButton={{
         text: "Yes",
-        onClick: props.onYes
+        onClick: props.onYes,
       }}
       negativeButton={{ text: "No", onClick: props.onNo }}
     >
       <Box my={1}>
-        <Text textAlign="center">{props.message}</Text>
+        <Text textAlign="center" variant="body">
+          {props.message}
+        </Text>
       </Box>
     </Dialog>
   );
 }
 
 export function confirm(icon, title, message) {
-  return showDialog(perform => (
+  return showDialog((perform) => (
     <Confirm
       title={title}
       message={message}
