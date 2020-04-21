@@ -1,243 +1,68 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import "./app.css";
-import Editor from "./components/editor";
-import { Flex, Box, Button, Text, Heading } from "rebass";
-import { ThemeProvider } from "./utils/theme";
-import RootNavigator from "./navigation/navigators/rootnavigator";
-import "./app.css";
+import { Flex, Box } from "rebass";
+import ThemeProvider from "./components/theme-provider";
 import { usePersistentState } from "./utils/hooks";
-import { ev } from "./common";
-import { useTheme } from "emotion-theming";
-
-const NavMenuItem = props => {
-  const [fill, setFill] = useState();
-  const [toggle, setToggle] = useState(
-    props.item.isToggled && props.item.isToggled()
-  );
-  const theme = useTheme();
-  useEffect(() => {
-    setFill(toggle ? theme.colors.text : props.item.color || "transparent");
-  }, [props.item, toggle, theme.colors]);
-  return (
-    <Button
-      onClick={() => {
-        props.onSelected();
-        setToggle(props.item.isToggled && props.item.isToggled());
-      }}
-      variant="nav"
-      sx={{
-        width: "full",
-        borderRadius: "none",
-        textAlign: "center",
-        color: props.selected ? "primary" : props.item.color || "text",
-        transition: "color 100ms linear",
-        ":hover": {
-          color: "primary"
-        }
-      }}
-      px={0}
-      py={3}
-    >
-      <Flex
-        justifyContent={["flex-start", "center", "center"]}
-        alignItems="center"
-        sx={{ marginLeft: [2, 0, 0] }}
-      >
-        <props.item.icon
-          size={"1.125rem"}
-          strokeWidth={props.selected ? 2 : 1.3}
-          style={{ marginRight: 2 }}
-          fill={fill}
-        />
-        <Text
-          sx={{
-            display: ["flex", "none", "none"],
-            fontSize: "title",
-            marginLeft: 1
-          }}
-        >
-          {props.item.title}
-        </Text>
-      </Flex>
-    </Button>
-  );
-};
-
-var startX, startWidth;
-
-function getNavigationViewWidth() {
-  return window.localStorage.getItem("navigationViewWidth");
-}
+import { useStore } from "./stores/app-store";
+import { useStore as useAppStore } from "./stores/app-store";
+import { useStore as useEditorStore } from "./stores/editor-store";
+import { useStore as useUserStore } from "./stores/user-store";
+import Animated from "./components/animated";
+import NavigationMenu from "./components/navigationmenu";
+import NavigationContainer from "./navigation/container";
+import RootNavigator from "./navigation/navigators/rootnavigator";
 
 function App() {
-  const [selectedIndex, setSelectedIndex] = usePersistentState(
-    "navSelectedIndex",
-    0
-  );
-  const [show, setShow] = usePersistentState("navContainerState", true);
-  const [sideMenuOpen, setSideMenuOpen] = useState(false);
+  const [show, setShow] = usePersistentState("isContainerVisible", true);
+  const refreshColors = useStore((store) => store.refreshColors);
+  const isFocusMode = useAppStore((store) => store.isFocusMode);
+  const initUser = useUserStore((store) => store.init);
+  const openLastSession = useEditorStore((store) => store.openLastSession);
+
   useEffect(() => {
-    RootNavigator.navigate(Object.keys(RootNavigator.routes)[selectedIndex]);
-    function openSideMenu() {
-      setSideMenuOpen(true);
+    refreshColors();
+    initUser();
+  }, [refreshColors, initUser]);
+
+  useEffect(() => {
+    if (isFocusMode) {
+      setShow(false);
+    } else {
+      setShow(true);
     }
-    ev.addListener("openSideMenu", openSideMenu);
-    return () => {
-      ev.removeListener("openSideMenu", openSideMenu);
-    };
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isFocusMode]);
+
+  useEffect(() => {
+    openLastSession();
+  }, [openLastSession]);
+
   return (
     <ThemeProvider>
-      <Flex
-        bg={"background"}
-        sx={{ color: "text" }}
-        height="100%"
-        alignContent="stretch"
-      >
-        <Box
-          display={[sideMenuOpen ? "block" : "none", "none", "none"]}
-          width={"full"}
-          height={"full"}
-          bg={"#00000099"}
-          sx={{ position: "absolute", zIndex: 999 }}
-          onClick={() => setSideMenuOpen(false)}
-        />
-        <Box
-          flexDirection="column"
-          sx={{
-            zIndex: 999,
-            borderRightStyle: "solid",
-            borderRightWidth: [0, "1px", "1px"],
-            borderRightColor: "primary",
-            minWidth: ["85%", 50, 50],
-            maxWidth: ["85%", 50, 50],
-            height: "full",
-            display: [sideMenuOpen ? "flex" : "none", "flex", "flex"],
-            position: [
-              sideMenuOpen ? "absolute" : "relative",
-              "relative",
-              "relative"
-            ],
-            overflow: "scroll",
-            scrollbarWidth: "none",
-            //TODO: need to test this on webkit and internet explorer
-            "::-webkit-scrollbar": { width: 0, height: 0 },
-            msOverflowStyle: "none"
-            //"-ms-overflow-style": "none"
-          }}
-          bg={["background", "shade", "shade"]}
-          px={0}
-        >
-          {sideMenuOpen && (
-            <Heading
-              color="primary"
-              fontSize={28}
-              mx={2}
-              style={{ marginTop: 2 }}
-            >
-              notesnook
-            </Heading>
-          )}
-          <Flex
-            flex="1 1 auto"
-            flexDirection="column"
-            justifyContent="space-between"
-          >
-            <Box>
-              {Object.values(RootNavigator.routes).map(
-                (item, index) =>
-                  !item.bottom && (
-                    <NavMenuItem
-                      onSelected={async () => {
-                        if (selectedIndex === index || !sideMenuOpen) {
-                          setShow(!show);
-                          return;
-                        }
-                        if (RootNavigator.navigate(item.key)) {
-                          setSelectedIndex(index);
-                        }
-                        setSideMenuOpen(false);
-                      }}
-                      key={item.key}
-                      item={item}
-                      selected={selectedIndex === index}
-                    />
-                  )
-              )}
-            </Box>
-            <Box>
-              {Object.values(RootNavigator.routes).map(
-                (item, index) =>
-                  item.bottom && (
-                    <NavMenuItem
-                      onSelected={async () => {
-                        if (item.onClick) {
-                          return item.onClick();
-                        }
-                        if (selectedIndex === index) {
-                          setShow(!show);
-                          return;
-                        }
-                        if (RootNavigator.navigate(item.key)) {
-                          setSelectedIndex(index);
-                        }
-                        setSideMenuOpen(false);
-                      }}
-                      key={item.key}
-                      item={item}
-                      selected={selectedIndex === index}
-                    />
-                  )
-              )}
-            </Box>
-          </Flex>
-        </Box>
-        <Flex flex="1 1 auto" flexDirection="row" alignContent="stretch" px={0}>
-          <Flex
-            className="RootNavigator"
-            style={{
-              display: show ? "flex" : "none"
+      <Flex bg="background" height="100%">
+        <NavigationMenu toggleNavigationContainer={() => setShow(!show)} />
+        <Flex variant="rowFill">
+          <Animated.Flex
+            variant="columnFill"
+            initial={{ width: "30%", opacity: 1, scaleY: 1 }}
+            animate={{
+              width: show ? "30%" : "0%",
+              scaleY: show ? 1 : 0.8,
+              opacity: show ? 1 : 0,
+              zIndex: show ? 0 : -1,
             }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
             sx={{
               borderRight: "1px solid",
               borderColor: "border",
-              width: ["100%", "100%", "30%"]
             }}
-            flexDirection="column"
-            flex="1 1 auto"
-            //style={{ width: "362px" }}
-          />
-          <Box
-            className="resize-handle"
-            bg="border"
-            sx={{
-              width: 5,
-              display: ["none", "none", show ? "block" : "none"],
-              opacity: 0,
-              cursor: "col-resize"
-            }}
-            draggable={true}
-            onMouseDown={e => {
-              startX = e.clientX;
-              let view = document
-                .querySelector(".RootNavigator")
-                .getBoundingClientRect();
-              startWidth = parseInt(view.width, 10);
-            }}
-            onDrag={e => {
-              let view = document.querySelector(".RootNavigator");
-              view.style.width = `${startWidth + e.clientX - startX}px`;
-            }}
-            onDragEnd={e => {
-              let view = document.querySelector(".RootNavigator");
-              view.style.width = view.getBoundingClientRect().width;
-              window.localStorage.setItem(
-                "navigationViewWidth",
-                view.style.width
-              );
-            }}
-          />
-          <Editor />
+          >
+            <NavigationContainer
+              navigator={RootNavigator}
+              variant="columnFill"
+            />
+          </Animated.Flex>
+          <Flex width="100%" className="EditorNavigator" />
         </Flex>
         <Box id="dialogContainer" />
         <Box id="snackbarContainer" />
@@ -245,5 +70,4 @@ function App() {
     </ThemeProvider>
   );
 }
-
 export default App;

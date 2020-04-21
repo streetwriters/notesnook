@@ -1,20 +1,33 @@
-import React from "react";
-import * as Icon from "react-feather";
+import React, { useEffect } from "react";
 import Note from "../components/note";
-import { sendNewNoteEvent } from "../common";
 import ListContainer from "../components/list-container";
+import { useStore } from "../stores/editor-store";
+import { useStore as useNotesStore } from "../stores/note-store";
 
-const Notes = props => {
+function Notes(props) {
+  const newSession = useStore((store) => store.newSession);
+  const context = useNotesStore((store) => store.context);
+  const setContext = useNotesStore((store) => store.setContext);
+
+  useEffect(() => {
+    if (props.context) {
+      setContext(props.context);
+    }
+  }, [props.context, setContext]);
+
+  if (!context) return null;
   return (
     <ListContainer
-      item={index => <Note index={index} item={props.notes[index]} />}
-      itemsLength={props.notes.length}
+      type="notes"
+      items={context.notes}
+      item={(index, item) => (
+        <Note index={index} pinnable={false} item={item} context={context} />
+      )}
       button={{
         content: "Make a new note",
-        onClick: sendNewNoteEvent
+        onClick: () => newSession(props.context),
       }}
     />
   );
-};
-
+}
 export default Notes;

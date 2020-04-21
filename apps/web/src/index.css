@@ -1,5 +1,4 @@
-@import url("https://fonts.googleapis.com/css?family=Noto+Sans:400,700|Noto+Serif:400,700&display=swap");
-@import url("https://fonts.googleapis.com/css?family=Cinzel:700|Playfair+Display+SC:700|Rufina:700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&family=DM+Serif+Text:ital@0;1&display=swap");
 
 :root,
 body,
@@ -18,7 +17,7 @@ body,
 }
 
 * {
-  font-family: "Noto Sans", sans-serif;
+  font-family: "DM Sans", sans-serif;
 }
 
 @keyframes fadeUp {
@@ -33,4 +32,8 @@ body,
   100% {
     opacity: 1;
   }
+}
+
+svg {
+  width: 1.5rem;
 }

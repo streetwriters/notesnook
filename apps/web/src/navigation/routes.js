@@ -1,4 +1,4 @@
-import * as Icon from "react-feather";
+import NavigationContainer from "./container";
 
 export function createRoute(key, component, props = {}, params = {}) {
   return {
@@ -6,13 +6,13 @@ export function createRoute(key, component, props = {}, params = {}) {
       key,
       component,
       ...props,
-      params
-    }
+      params,
+    },
   };
 }
 
-export function createColorRoute(key, color, props = {}) {
-  return createRoute(key, undefined, { icon: Icon.Circle, color, ...props });
+export function createNavigatorRoute(key, icon, navigator) {
+  return createRoute(key, NavigationContainer, { icon }, { navigator });
 }
 
 export function createNormalRoute(key, component, icon, props = {}) {

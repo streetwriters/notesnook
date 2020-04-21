@@ -1,63 +1,81 @@
-import React from "react";
-import { db, ev } from "../common";
-import * as Icon from "react-feather";
-import ListView from "../components/listview";
-import { ask } from "../components/dialogs";
-import { showSnack } from "../components/snackbar";
+import React, { useEffect } from "react";
+import * as Icon from "../components/icons";
+import { Flex, Text } from "rebass";
+import ListItem from "../components/list-item";
+import TimeAgo from "timeago-react";
+import ListContainer from "../components/list-container";
+import { confirm } from "../components/dialogs/confirm";
+import { useStore, store } from "../stores/trash-store";
+import { toTitleCase } from "../utils/string";
 
-const dropdownRefs = [];
-const menuItems = item => [
-  {
-    title: "Restore",
-    onClick: async () => {
-      ask(
-        Icon.Star,
-        "Restore",
-        `Are you sure you want to restore this item to ${item.type}?`
-      ).then(async res => {
-        if (res) {
-          let itemType = item.type[0] + item.type.substring(1);
-          showSnack(itemType + " Restored", Icon.Check);
-          await db.trash.restore(item.id);
-          ev.emit(`refreshTrash`);
-        }
-      });
-    }
-  },
-  {
-    title: "Delete",
-    color: "red",
-    onClick: async () => {
-      ask(
-        Icon.Star,
-        "Delete",
-        `Are you sure you want to permanently delete this item?`
-      ).then(async res => {
-        if (res) {
-          let itemType = item.type[0] + item.type.substring(1);
-          showSnack(itemType + "Permanently Deleted!", Icon.Trash2);
-          await db.trash.delete(item.id);
-          ev.emit(`refreshTrash`);
-        }
-      });
-    }
-  }
-];
+function menuItems(item, index) {
+  return [
+    {
+      title: "Restore",
+      onClick: () => store.restore(item.id, index),
+    },
+    {
+      title: "Delete",
+      color: "red",
+      onClick: () => {
+        confirm(
+          Icon.Trash,
+          "Delete",
+          `Are you sure you want to permanently delete this item?`
+        ).then(async (res) => {
+          if (res) {
+            await store.delete(item.id, index);
+          }
+        });
+      },
+    },
+  ];
+}
 
 function Trash() {
+  useEffect(() => store.refresh(), []);
+  const items = useStore((store) => store.trash);
+  const clearTrash = useStore((store) => store.clear);
   return (
-    <ListView
-      type="Trash"
-      getItems={db.trash.all}
-      menu={{ menuItems, dropdownRefs }}
+    <ListContainer
+      type="trash"
+      items={items}
+      item={(index, item) => (
+        <ListItem
+          selectable
+          item={item}
+          title={item.title}
+          body={item.headline}
+          index={index}
+          info={
+            <Flex variant="rowCenter">
+              <TimeAgo datetime={item.dateDeleted || item.dateCreated} />
+              <Text as="span" mx={1}>
+                •
+              </Text>
+              <Text color="primary">{toTitleCase(item.type)}</Text>
+            </Flex>
+          }
+          menuData={item}
+          menuItems={menuItems(item, index)}
+        />
+      )}
       button={{
         content: "Clear Trash",
-        icon: Icon.Trash2,
-        onClick: async () => await db.trash.clear()
+        icon: Icon.Trash,
+        onClick: function () {
+          confirm(
+            Icon.Trash,
+            "Clear",
+            `This action is irreversible. Are you sure you want to proceed?s`
+          ).then(async (res) => {
+            if (res) {
+              await clearTrash();
+            }
+          });
+        },
       }}
-      onClick={item => {}}
     />
   );
 }
-
 export default Trash;

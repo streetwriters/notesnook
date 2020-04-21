@@ -1,72 +1,56 @@
 import React, { useState, useEffect } from "react";
-import { Flex } from "rebass";
-import { db, ev } from "../common";
-import { showSnack } from "../components/snackbar";
 import Notebook from "../components/notebook";
-import { CreateNotebookDialog } from "../components/dialogs";
+import AddNotebookDialog from "../components/dialogs/addnotebookdialog";
 import ListContainer from "../components/list-container";
+import { useStore, store } from "../stores/notebook-store";
+import NotebooksPlaceholder from "../components/placeholders/notebooks-placeholder";
 
-const Notebooks = props => {
+function Notebooks(props) {
   const [open, setOpen] = useState(false);
-  const [notebooks, setNotebooks] = useState([]);
-  useEffect(() => {
-    function onRefresh() {
-      setNotebooks(db.notebooks.all);
-    }
-    onRefresh();
-    ev.addListener("refreshNotebooks", onRefresh);
-    return () => {
-      ev.removeListener("refreshNotebooks", onRefresh);
-      Notebooks.onRefresh = undefined;
-    };
-  }, []);
-
+  useEffect(() => store.refresh(), []);
+  const notebooks = useStore((state) => state.notebooks);
+  const add = useStore((state) => state.add);
   return (
     <>
       <ListContainer
-        itemsLength={notebooks.length}
-        item={index => (
+        type="notebooks"
+        items={notebooks}
+        item={(index, item) => (
           <Notebook
             index={index}
-            item={notebooks[index]}
+            item={item}
             onClick={() => {
               props.navigator.navigate("topics", {
-                title: notebooks[index].title,
-                topics: notebooks[index].topics,
-                notebook: notebooks[index]
+                title: item.title,
+                topics: item.topics,
+                notebook: item,
               });
             }}
             onTopicClick={(notebook, topic) =>
               props.navigator.navigate("notes", {
                 title: notebook.title,
                 subtitle: topic.title,
-                notes: db.notebooks
-                  .notebook(notebook.id)
-                  .topics.topic(topic.title).all
+                context: {
+                  type: "topic",
+                  value: { id: notebook.id, topic: topic.title },
+                },
               })
             }
           />
         )}
+        placeholder={NotebooksPlaceholder}
         button={{
           content: "Create a notebook",
-          onClick: async () => setOpen(true)
+          onClick: async () => {
+            setOpen(true);
+          },
         }}
       />
-      <CreateNotebookDialog
-        open={open}
-        onDone={async (topics, title, description) => {
-          if (
-            await db.notebooks.add({
-              title,
-              description,
-              topics
-            })
-          ) {
-            setNotebooks(db.notebooks.all);
-            setOpen(false);
-          } else {
-            showSnack("Please fill out the notebook title.");
-          }
+      <AddNotebookDialog
+        isOpen={open}
+        onDone={async (nb) => {
+          await add(nb);
+          setOpen(false);
         }}
         close={() => {
           setOpen(false);
@@ -74,23 +58,15 @@ const Notebooks = props => {
       />
     </>
   );
-};
+}
 
-const NotebooksContainer = props => {
-  useEffect(() => {
-    const NotebookNavigator = require("../navigation/navigators/nbnavigator")
-      .default;
-    if (!NotebookNavigator.restore()) {
-      NotebookNavigator.navigate("notebooks");
-    }
-  }, []);
+/* function NotebooksContainer() {
   return (
-    <Flex
-      className="NotebookNavigator"
-      flexDirection="column"
-      flex="1 1 auto"
+    <NavigationContainer
+      variant="columnFill"
+      navigator={require("../navigation/navigators/nbnavigator").default}
     />
   );
-};
+} */
 
-export { NotebooksContainer, Notebooks };
+export default Notebooks;

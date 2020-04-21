@@ -1,65 +1,91 @@
-import {
-  Home,
-  SettingsContainer,
-  Favorites,
-  Trash,
-  NotebooksContainer
-} from "../../views";
-import * as Icon from "react-feather";
+import { Home, Trash, Notes, Account } from "../../views";
+import * as Icon from "../../components/icons";
 import {
   createRoute,
+  createNavigatorRoute,
   createNormalRoute,
-  createColorRoute,
-  createDeadRoute
+  createDeadRoute,
 } from "../routes";
 import Navigator from "../index";
-import { showSignInDialog } from "../../components/dialogs";
-import { changeTheme, isDarkTheme } from "../../utils/theme";
+import SelectionModeOptions from "../../common/selectionoptions";
+import Search from "../../views/Search";
+import { store as userStore } from "../../stores/user-store";
+import { store as themeStore } from "../../stores/theme-store";
+import { showLogInDialog } from "../../components/dialogs/logindialog";
+import { NotebookNavigator, TagNavigator, SettingsNavigator } from "./index";
 
-/*For color Search*/
-const colorRoutes = {
-  ...createColorRoute("red", "#ed2d37"),
-  ...createColorRoute("orange", "#ec6e05"),
-  ...createColorRoute("yellow", "yellow"),
-  ...createColorRoute("green", "green"),
-  ...createColorRoute("blue", "blue"),
-  ...createColorRoute("purple", "purple"),
-  ...createColorRoute("gray", "gray")
+export const bottomRoutes = {
+  ...createDeadRoute("nightmode", Icon.Theme, {
+    title: "Night mode",
+    onClick: () => themeStore.toggleNightMode(),
+  }),
+  ...createDeadRoute("sync", Icon.Sync, {
+    title: "Sync",
+    onClick: async () => userStore.sync(),
+    animatable: true,
+  }),
+  ...createNormalRoute("account", Account, Icon.User, {
+    title: "Account",
+    onClick: async () => {
+      if (!userStore.get().isLoggedIn) {
+        await showLogInDialog();
+        return false;
+      } else return RootNavigator.navigate("account");
+    },
+  }),
+  ...createNavigatorRoute(
+    "settings",
+    Icon.Settings,
+    "Settings",
+    SettingsNavigator
+  ),
 };
 
-const bottomRoutes = {
-  ...createDeadRoute("nightmode", Icon.Moon, {
-    onClick: () => changeTheme(),
-    bottom: true,
-    isToggled: () => isDarkTheme(),
-    title: "Night mode"
+export const routes = {
+  ...createNormalRoute("home", Home, Icon.Home, {
+    title: "Home",
+    options: SelectionModeOptions.NotesOptions,
   }),
-  ...createDeadRoute("signin", Icon.LogIn, {
-    onClick: () => showSignInDialog(Icon.LogIn, "Login", ""),
-    bottom: true,
-    title: "Login"
+  ...createNavigatorRoute(
+    "notebooks",
+    Icon.Notebook,
+    "Notebooks",
+    NotebookNavigator
+  ),
+  ...createRoute(
+    "favorites",
+    Notes,
+    {
+      icon: Icon.StarOutline,
+      title: "Favorites",
+      options: SelectionModeOptions.FavoritesOptions,
+    },
+    {
+      context: { type: "favorites" },
+    }
+  ),
+  ...createNormalRoute("trash", Trash, Icon.Trash, {
+    title: "Trash",
+    options: SelectionModeOptions.TrashOptions,
   }),
-  ...createRoute("settings", SettingsContainer, {
-    icon: Icon.Settings,
-    bottom: true,
-    title: "Settings",
-    topBarHidden: true
-  })
+  ...createNavigatorRoute("tags", Icon.Tag, "Tags", TagNavigator),
 };
 
-const routes = {
-  ...createNormalRoute("home", Home, Icon.Home),
-  ...createRoute("notebooks", NotebooksContainer, {
-    icon: Icon.Book,
-    title: "Notebooks",
-    topBarHidden: true
+const invisibleRoutes = {
+  ...createRoute("color", Notes, {
+    icon: Icon.Circle,
+    options: SelectionModeOptions.NotesOptions,
   }),
-  ...createNormalRoute("favorites", Favorites, Icon.Star),
-  ...createNormalRoute("trash", Trash, Icon.Trash2),
-  ...bottomRoutes
+  ...createRoute("search", Search, { title: "Search" }),
 };
 
-const RootNavigator = new Navigator("RootNavigator", routes, {
-  backButtonEnabled: false
-});
+const RootNavigator = new Navigator(
+  "RootNavigator",
+  { ...routes, ...bottomRoutes, ...invisibleRoutes },
+  {
+    backButtonEnabled: false,
+    default: "home",
+  }
+);
+
 export default RootNavigator;

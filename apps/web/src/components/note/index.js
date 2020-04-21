@@ -1,100 +1,175 @@
 import React from "react";
-import { Flex } from "rebass";
-import * as Icon from "react-feather";
+import { Flex, Box, Text } from "rebass";
+import * as Icon from "../icons";
 import TimeAgo from "timeago-react";
-import { db, ev } from "../../common";
-import { showSnack } from "../snackbar";
 import ListItem from "../list-item";
-import { ask, moveNote } from "../dialogs";
+import { confirm } from "../dialogs/confirm";
+import { showMoveNoteDialog } from "../dialogs/movenotedialog";
+import { store, useStore } from "../../stores/note-store";
+import { store as editorStore } from "../../stores/editor-store";
+import { showPasswordDialog } from "../dialogs/passworddialog";
+import { db, COLORS } from "../../common";
+import { useTheme } from "emotion-theming";
+import Colors from "../menu/colors";
 
-const dropdownRefs = [];
-const menuItems = note => [
-  {
-    title: note.notebook ? "Move" : "Add to",
-    onClick: async () => {
-      console.log(note.id, note.notebook);
-      if (await moveNote(note.id, note.notebook)) {
-        showSnack("Note moved successfully!");
-      }
-    }
-  },
-  {
-    title: note.pinned ? "Unpin" : "Pin",
-    onClick: async () =>
-      db.notes
-        .note(note.id)
-        .pin()
-        .then(() => {
-          showSnack("Note pinned!", Icon.Check);
-          ev.emit("refreshNotes");
-        })
-  },
-  {
-    title: note.favorite ? "Unfavorite" : "Favorite",
-    onClick: async () =>
-      db.notes
-        .note(note.id)
-        .favorite()
-        .then(() => {
-          showSnack("Note favorited!", Icon.Check);
-          ev.emit("refreshNotes");
-        })
-  },
-  { title: "Edit" },
-  { title: note.locked ? "Remove lock" : "Lock" }, //TODO
-  { title: "Share" },
-  {
-    title: "Move to Trash",
-    color: "red",
-    onClick: () => {
-      ask(
-        Icon.Trash2,
-        "Delete",
-        "Are you sure you want to move this note to Trash? It will be moved to Trash and permanently deleted after 7 days."
-      ).then(res => {
-        if (res) {
-          ev.emit("onClearNote", note.id);
-          db.notes
-            .delete(note.id)
-            .then(
-              //TODO implement undo
-              () => {
-                showSnack("Note deleted!", Icon.Check);
-                ev.emit("refreshNotes");
-              }
-            )
-            .catch(console.log);
+function menuItems(note, context) {
+  return [
+    { title: "colors", component: Colors },
+    {
+      title: note.notebook ? "Move" : "Add to",
+      onClick: async () => {
+        if (await showMoveNoteDialog([note.id])) {
+          console.log("Note moved successfully!");
         }
-      });
-    }
-  }
-];
-
-function sendOpenNoteEvent(note) {
-  ev.emit("onOpenNote", note);
+      },
+    },
+    {
+      title: note.pinned ? "Unpin" : "Pin",
+      onClick: () => store.pin(note),
+    },
+    {
+      title: note.favorite ? "Unfavorite" : "Favorite",
+      onClick: () => store.favorite(note),
+    },
+    { title: "Edit", onClick: () => editorStore.openSession(note) },
+    {
+      title: note.locked ? "Unlock" : "Lock",
+      onClick: async () => {
+        const { unlock, lock } = store;
+        if (!note.locked) {
+          lock(note.id);
+        } else {
+          unlock(note.id);
+        }
+      },
+    },
+    {
+      visible: context ? (context.type === "topic" ? true : false) : false,
+      title: "Remove",
+      onClick: async () => {
+        confirm(
+          Icon.Topic,
+          "Remove from Topic",
+          "Are you sure you want to remove this note?"
+        ).then(async (res) => {
+          if (res) {
+            await db.notebooks
+              .notebook(context.notebook.id)
+              .topics.topic(context.value)
+              .delete(note.id);
+            await store.setContext(context);
+          }
+        });
+      },
+    },
+    {
+      title: "Move to Trash",
+      color: "red",
+      onClick: async () => {
+        if (note.locked) {
+          const res = await showPasswordDialog("unlock_note", (password) => {
+            return db.vault
+              .unlock(password)
+              .then(() => true)
+              .catch(() => false);
+          });
+          if (!res) return;
+        }
+        confirm(
+          Icon.Trash,
+          "Delete",
+          "Are you sure you want to delete this note?"
+        ).then(async (res) => {
+          if (res) {
+            await store.delete(note.id);
+          }
+        });
+      },
+    },
+  ];
 }
 
-const Note = ({ item, index }) => {
+function Note(props) {
+  const { item, index } = props;
   const note = item;
-  return note ? (
+  const selectedNote = useStore((store) => store.selectedNote);
+  const isOpened = selectedNote === note.id;
+  const theme = useTheme();
+  return (
     <ListItem
+      selectable
+      focused={isOpened}
+      item={note}
       title={note.title}
       body={note.headline}
+      id={note.id}
       index={index}
-      onClick={sendOpenNoteEvent.bind(this, note)}
+      onClick={async () => {
+        await editorStore.openSession(note);
+      }}
       info={
-        <Flex justifyContent="center" alignItems="center">
-          <TimeAgo datetime={note.dateCreated} />
-          {note.locked && <Icon.Lock size={16} style={{ marginLeft: 5 }} />}
-          {note.favorite && <Icon.Star size={16} style={{ marginLeft: 5 }} />}
+        <Flex flex="1 1 auto" justifyContent="space-between">
+          <Flex variant="rowCenter">
+            {note.colors.map((item, index) => (
+              <Box
+                key={item}
+                style={{
+                  width: 13,
+                  marginLeft: index ? -8 : 0,
+                  marginRight: index === note.colors.length - 1 ? 5 : 0,
+                  height: 13,
+                  backgroundColor: COLORS[item],
+                  borderRadius: 100,
+                }}
+              />
+            ))}
+            <TimeAgo datetime={note.dateCreated} />
+            {note.locked && (
+              <Icon.Lock
+                size={13}
+                color={theme.colors.fontTertiary}
+                sx={{ ml: 1 }}
+              />
+            )}
+            {note.favorite && (
+              <Icon.Star
+                color={theme.colors.favorite}
+                size={13}
+                sx={{ ml: 1 }}
+              />
+            )}
+          </Flex>
+          {note.conflicted && (
+            <Text
+              ml={1}
+              p={1}
+              bg="error"
+              color="static"
+              sx={{ borderRadius: "default" }}
+            >
+              CONFLICT
+            </Text>
+          )}
         </Flex>
       }
-      pinned={note.pinned}
+      pinned={props.pinnable && note.pinned}
       menuData={note}
-      menuItems={menuItems(note)}
-      dropdownRefs={dropdownRefs}
+      menuItems={menuItems(note, props.context)}
     />
-  ) : null;
-};
+  );
+}
 
-export default Note;
+export default React.memo(Note, function (prevProps, nextProps) {
+  const prevItem = prevProps.item;
+  const nextItem = nextProps.item;
+
+  return (
+    prevItem.pinned === nextItem.pinned &&
+    prevItem.favorite === nextItem.favorite &&
+    prevItem.headline === nextItem.headline &&
+    prevItem.title === nextItem.title &&
+    prevItem.locked === nextItem.locked &&
+    prevItem.conflicted === nextItem.conflicted &&
+    JSON.stringify(prevItem.colors) === JSON.stringify(nextItem.colors)
+  );
+});

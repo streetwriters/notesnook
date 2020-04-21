@@ -50,7 +50,7 @@ class MarkdownShortcuts {
             this.quill.formatLine(selection.index, 0, "header", size - 1);
             this.quill.deleteText(selection.index - size, size);
           }, 0);
-        }
+        },
       },
       {
         name: "blockquote",
@@ -61,7 +61,7 @@ class MarkdownShortcuts {
             this.quill.formatLine(selection.index, 1, "blockquote", true);
             this.quill.deleteText(selection.index - 2, 2);
           }, 0);
-        }
+        },
       },
       {
         name: "code-block",
@@ -72,7 +72,7 @@ class MarkdownShortcuts {
             this.quill.formatLine(selection.index, 1, "code-block", true);
             this.quill.deleteText(selection.index - 4, 4);
           }, 0);
-        }
+        },
       },
       {
         name: "bolditalic",
@@ -90,11 +90,11 @@ class MarkdownShortcuts {
             this.quill.deleteText(startIndex, annotatedText.length);
             this.quill.insertText(startIndex, matchedText, {
               bold: true,
-              italic: true
+              italic: true,
             });
             this.quill.format("bold", false);
           }, 0);
-        }
+        },
       },
       {
         name: "bold",
@@ -113,7 +113,7 @@ class MarkdownShortcuts {
             this.quill.insertText(startIndex, matchedText, { bold: true });
             this.quill.format("bold", false);
           }, 0);
-        }
+        },
       },
       {
         name: "italic",
@@ -132,7 +132,7 @@ class MarkdownShortcuts {
             this.quill.insertText(startIndex, matchedText, { italic: true });
             this.quill.format("italic", false);
           }, 0);
-        }
+        },
       },
       {
         name: "strikethrough",
@@ -151,7 +151,7 @@ class MarkdownShortcuts {
             this.quill.insertText(startIndex, matchedText, { strike: true });
             this.quill.format("strike", false);
           }, 0);
-        }
+        },
       },
       {
         name: "code",
@@ -171,7 +171,7 @@ class MarkdownShortcuts {
             this.quill.format("code", false);
             this.quill.insertText(this.quill.getSelection(), " ");
           }, 0);
-        }
+        },
       },
       {
         name: "hr",
@@ -190,7 +190,7 @@ class MarkdownShortcuts {
             this.quill.insertText(startIndex + 2, "\n", Quill.sources.SILENT);
             this.quill.setSelection(startIndex + 2, Quill.sources.SILENT);
           }, 0);
-        }
+        },
       },
       {
         name: "asterisk-ul",
@@ -199,14 +199,13 @@ class MarkdownShortcuts {
           setTimeout(() => {
             let index = selection.index;
             this.quill.formatLine(index, 1, "list", "unordered");
-            console.log(text, selection, pattern);
             if (text.trim() === "*") {
               this.quill.deleteText(index, 1);
             } else if (text.trim() === "+") {
               this.quill.deleteText(index - 2, 2);
             }
           }, 0);
-        }
+        },
       },
       {
         name: "image",
@@ -227,7 +226,7 @@ class MarkdownShortcuts {
               );
             }, 0);
           }
-        }
+        },
       },
       {
         name: "link",
@@ -249,8 +248,8 @@ class MarkdownShortcuts {
               );
             }, 0);
           }
-        }
-      }
+        },
+      },
     ];
 
     // Handler that looks for insert deltas that match specific characters

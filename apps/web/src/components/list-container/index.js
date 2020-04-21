@@ -1,24 +1,59 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Flex } from "rebass";
 import Button from "../button";
 import Search from "../search";
-import * as Icon from "react-feather";
+import * as Icon from "../icons";
 import { Virtuoso as List } from "react-virtuoso";
+import { useStore as useSearchStore } from "../../stores/searchstore";
+import { useStore as useSelectionStore } from "../../stores/selection-store";
 
-const ListContainer = props => {
+function ListContainer(props) {
+  const setSearchContext = useSearchStore((store) => store.setSearchContext);
+  const shouldSelectAll = useSelectionStore((store) => store.shouldSelectAll);
+  const setSelectedItems = useSelectionStore((store) => store.setSelectedItems);
+
+  useEffect(() => {
+    if (shouldSelectAll) setSelectedItems(props.items);
+  }, [shouldSelectAll, setSelectedItems, props.items]);
+
+  useEffect(() => {
+    if (props.noSearch) return;
+    setSearchContext({
+      items: props.items,
+      item: props.item,
+      type: props.type,
+    });
+  }, [setSearchContext, props.item, props.items, props.type, props.noSearch]);
+
   return (
-    <Flex flexDirection="column" flex="1 1 auto">
-      <Search placeholder="Search" />
-      <List
-        style={{
-          width: "100%",
-          flex: "1 1 auto",
-          height: "auto",
-          overflowX: "hidden"
-        }}
-        totalCount={props.itemsLength}
-        item={props.item}
-      />
+    <Flex variant="columnFill">
+      {!props.items.length && props.placeholder ? (
+        <Flex variant="columnCenterFill">
+          <props.placeholder />
+        </Flex>
+      ) : (
+        <>
+          {!props.noSearch && <Search type={props.type} />}
+          <Flex variant="columnFill" mt={2}>
+            {props.children || props.items.length > 0 ? (
+              <List
+                style={{
+                  width: "100%",
+                  flex: "1 1 auto",
+                  height: "auto",
+                  overflowX: "hidden",
+                }}
+                totalCount={props.items.length}
+                item={(index) => {
+                  const item = props.items[index];
+                  if (!item) return null;
+                  return props.item(index, item);
+                }}
+              />
+            ) : null}
+          </Flex>
+        </>
+      )}
       {props.button && (
         <Button
           Icon={props.button.icon || Icon.Plus}
@@ -28,6 +63,5 @@ const ListContainer = props => {
       )}
     </Flex>
   );
-};
-
+}
 export default ListContainer;

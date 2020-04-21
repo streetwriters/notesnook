@@ -1,168 +1,184 @@
 import React from "react";
-import * as Icon from "react-feather";
-import { Box, Flex, Text } from "rebass";
+import * as Icon from "../icons";
+import { Flex, Text, Button } from "rebass";
 import { Input } from "@rebass/forms";
-import CheckBox from "../checkbox";
-import { PinIcon } from "../icons";
-import { usePersistentState } from "../../utils/hooks";
+import { useStore } from "../../stores/editor-store";
+import { COLORS } from "../../common";
+import { objectMap } from "../../utils/object";
+import { useStore as useAppStore } from "../../stores/app-store";
+import Animated from "../animated";
+import Toggle from "./toggle";
+import { toTitleCase } from "../../utils/string";
 
-const Properties = props => {
-  const [visible, setVisible] = usePersistentState("propertiesVisible", false);
+const tools = [
+  { key: "pinned", icons: { on: Icon.PinFilled, off: Icon.Pin }, label: "Pin" },
+  {
+    key: "favorite",
+    icons: { on: Icon.Star, off: Icon.StarOutline },
+    label: "Favorite",
+  },
+  { key: "locked", icons: { on: Icon.Lock, off: Icon.Unlock }, label: "Lock" },
+];
+
+function Properties() {
+  const colors = useStore((store) => store.session.colors);
+  const toggleLocked = useStore((store) => store.toggleLocked);
+  const tags = useStore((store) => store.session.tags);
+  const setSession = useStore((store) => store.setSession);
+  const setColor = useStore((store) => store.setColor);
+  const setTag = useStore((store) => store.setTag);
+  const arePropertiesVisible = useStore((store) => store.arePropertiesVisible);
+  const toggleProperties = useStore((store) => store.toggleProperties);
+  const isFocusMode = useAppStore((store) => store.isFocusMode);
+
+  function changeState(prop, value) {
+    if (prop === "locked") {
+      toggleLocked();
+      return;
+    }
+    setSession((state) => {
+      state.session[prop] = value;
+    });
+  }
+
   return (
-    <>
-      <Box
-        onClick={() => setVisible(true)}
-        sx={{
-          display: visible ? "none" : "flex",
-          position: "absolute",
-          top: "50%",
-          right: 0,
-          color: "static",
-          borderRadius: "100px 0px 0px 100px",
-          cursor: "pointer",
-          height: [0, 0, 60]
-        }}
-        alignItems="center"
-        justifyContent="center"
-        bg="primary"
-      >
-        <Icon.ChevronLeft size={32} />
-      </Box>
-      <Box
-        sx={{
-          display: visible ? "flex" : "none",
-          borderLeft: "1px solid",
-          borderColor: "border",
-          width: [0, 0, "20%"]
-        }}
-        flexDirection="column"
-        bg="background"
-        px={3}
-        py={0}
-      >
-        <Text
-          variant="title"
-          color="primary"
-          my={2}
-          alignItems="center"
-          justifyContent="space-between"
-          sx={{ display: "flex" }}
-        >
-          Properties
-          <Text
-            as="span"
-            onClick={() => setVisible(false)}
-            sx={{
-              color: "red",
-              height: 24,
-              ":active": { color: "darkRed" }
-            }}
-          >
-            <Icon.X />
-          </Text>
-        </Text>
-        <CheckBox
-          checked={props.pinned}
-          icon={PinIcon}
-          label="Pin"
-          onChecked={props.onPinned}
-        />
-        <CheckBox
-          icon={Icon.Star}
-          checked={props.favorite}
-          label="Favorite"
-          onChecked={props.onFavorited}
-        />
-        <CheckBox icon={Icon.Lock} label="Lock" onChecked={props.onLocked} />
-        <Flex fontSize="body" sx={{ marginBottom: 3 }} alignItems="center">
-          <Icon.Book size={18} />
-          <Text sx={{ marginLeft: 1 }}>Move to notebook</Text>
-        </Flex>
-        <Flex fontSize="body" sx={{ marginBottom: 2 }} alignItems="center">
-          <Icon.Tag size={18} />
-          <Text sx={{ marginLeft: 1 }}>Tags:</Text>
-        </Flex>
-        <Input
-          variant="default"
-          placeholder="#tag"
-          sx={{ marginBottom: 2 }}
-          onKeyUp={event => {
-            if (
-              event.key === "Enter" ||
-              event.key === " " ||
-              event.key === ","
-            ) {
-              props.addTag && props.addTag(event.target.value);
-              event.target.value = "";
-            }
+    !isFocusMode && (
+      <>
+        <Animated.Flex
+          animate={{ x: arePropertiesVisible ? 0 : 800 }}
+          transition={{
+            duration: 0.3,
+            bounceDamping: 1,
+            bounceStiffness: 1,
+            ease: "easeOut",
           }}
-        />
-        <Flex
-          fontSize="body"
-          sx={{ marginBottom: 2 }}
-          alignItems="center"
-          justifyContent="flex-start"
-          flexWrap="wrap"
+          initial={false}
+          style={{
+            position: "absolute",
+            right: 0,
+            width: 300,
+            height: "100%",
+          }}
+          onBlur={() => toggleProperties()}
         >
-          {props.tags &&
-            props.tags.map(tag => (
+          <Flex
+            sx={{
+              overflowY: "auto",
+              overflowX: "hidden",
+              width: [0, 0, "100%"],
+              height: "100%",
+              borderLeft: "1px solid",
+              borderLeftColor: "border",
+            }}
+            flexDirection="column"
+            bg="background"
+            px={3}
+            py={0}
+          >
+            <Text
+              variant="title"
+              my={2}
+              alignItems="center"
+              justifyContent="space-between"
+              sx={{ display: "flex" }}
+            >
+              Properties
               <Text
+                as="span"
+                onClick={() => toggleProperties()}
                 sx={{
-                  backgroundColor: "primary",
-                  color: "static",
-                  borderRadius: "default",
-                  padding: "2px 5px 2px 5px",
-                  marginBottom: 1,
-                  marginRight: 1
+                  color: "red",
+                  height: 24,
+                  ":active": { color: "darkRed" },
                 }}
               >
-                #{tag}
+                <Icon.Close />
               </Text>
-            ))}
-        </Flex>
-        <Flex fontSize="body" sx={{ marginBottom: 2 }} alignItems="center">
-          <Icon.Octagon size={18} />
-          <Text sx={{ marginLeft: 1 }}>Colors:</Text>
-        </Flex>
-        <Flex flexWrap="wrap" sx={{ marginBottom: 2 }}>
-          {[
-            { label: "red", code: "#ed2d37" },
-            { label: "orange", code: "#ec6e05" },
-            { label: "yellow", code: "yellow" },
-            { label: "green", code: "green" },
-            { label: "blue", code: "blue" },
-            { label: "purple", code: "purple" },
-            { label: "gray", code: "gray" }
-          ].map(color => (
-            <Flex
-              sx={{ position: "relative" }}
-              justifyContent="center"
-              alignItems="center"
-              onClick={() => props.colorSelected && props.colorSelected(color)}
-              key={color.label}
-            >
-              <Icon.Circle
-                size={40}
-                style={{ cursor: "pointer" }}
-                fill={color.code}
-                strokeWidth={0}
-              />
-              {props.selectedColors &&
-                props.selectedColors.includes(color.label) && (
-                  <Icon.Check
-                    style={{
-                      position: "absolute",
-                      color: "white"
-                    }}
-                    size={20}
-                  />
-                )}
+            </Text>
+            <Flex mb={1}>
+              {tools.map((tool, _) => (
+                <Toggle
+                  {...tool}
+                  key={tool.key}
+                  toggleKey={tool.key}
+                  onToggle={(state) => changeState(tool.key, state)}
+                />
+              ))}
             </Flex>
-          ))}
-        </Flex>
-      </Box>
-    </>
-  );
-};
+            <Button color="static">Add to notebook</Button>
+            <Flex flexDirection="column">
+              {objectMap(COLORS, (label, code) => (
+                <Flex
+                  key={label}
+                  justifyContent="space-between"
+                  alignItems="center"
+                  onClick={() => setColor(label)}
+                  sx={{ cursor: "pointer" }}
+                  mt={4}
+                >
+                  <Flex key={label}>
+                    <Icon.Circle size={24} color={code} />
+                    <Text ml={1} color="text" variant="body">
+                      {toTitleCase(label)}
+                    </Text>
+                  </Flex>
+                  {colors.includes(label) && (
+                    <Icon.Checkmark color="primary" size={20} />
+                  )}
+                </Flex>
+              ))}
+            </Flex>
 
-export default Properties;
+            <Input
+              placeholder="#tag"
+              mt={4}
+              onKeyUp={(event) => {
+                if (
+                  event.key === "Enter" ||
+                  event.key === " " ||
+                  event.key === ","
+                ) {
+                  const value = event.target.value;
+                  if (value.trim().length === 0) {
+                    event.target.value = "";
+                    return;
+                  }
+                  setTag(value.trim().replace(",", ""));
+                  event.target.value = "";
+                }
+              }}
+            />
+            <Flex
+              fontSize="body"
+              sx={{ marginBottom: 2 }}
+              alignItems="center"
+              justifyContent="flex-start"
+              flexWrap="wrap"
+            >
+              {tags.map((tag) => (
+                <Text
+                  key={tag}
+                  sx={{
+                    backgroundColor: "primary",
+                    color: "static",
+                    borderRadius: "default",
+                    padding: "2px 5px 2px 5px",
+                    marginBottom: 1,
+                    marginRight: 1,
+                    cursor: "pointer",
+                  }}
+                  onClick={() => {
+                    setTag(tag);
+                  }}
+                >
+                  #{tag}
+                </Text>
+              ))}
+            </Flex>
+          </Flex>
+        </Animated.Flex>
+      </>
+    )
+  );
+}
+export default React.memo(Properties);

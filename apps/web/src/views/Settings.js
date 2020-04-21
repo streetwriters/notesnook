@@ -1,182 +1,110 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Box, Button, Flex, Text } from "rebass";
-import * as Icon from "react-feather";
-import { Switch, Select } from "@rebass/forms";
-import "../app.css";
-import { changeTheme, isDarkTheme, changeAccent } from "../utils/theme";
+import * as Icon from "../components/icons";
+import { useStore as useUserStore } from "../stores/user-store";
+import { useStore as useThemeStore } from "../stores/theme-store";
+import AccentItem from "../components/accent-item";
+import accents from "../theme/accents";
 
-const Settings = props => {
-  const [check, setCheck] = useState(isDarkTheme());
+function Settings(props) {
+  const theme = useThemeStore((store) => store.theme);
+  const toggleNightMode = useThemeStore((store) => store.toggleNightMode);
+  const user = useUserStore((store) => store.user);
+  const isLoggedIn = useUserStore((store) => store.isLoggedIn);
+
   return (
-    <Flex flexDirection="column" flex="1 1 auto">
-      <Flex flexDirection="column" flex="1 1 auto">
-        <Button
-          variant="setting"
-          onClick={() => {
-            props.navigator.navigate("general", {
-              title: Titles.general
-            });
-          }}
-        >
-          {Titles.general}
-        </Button>
-        <Button
-          variant="setting"
-          onClick={() => {
-            props.navigator.navigate("account", {
-              title: Titles.account
-            });
-          }}
-        >
-          {Titles.account}
-        </Button>
-        <Box
+    <Flex variant="columnFill" mx={2}>
+      <Flex
+        bg="shade"
+        p={2}
+        sx={{ borderRadius: "default", cursor: "pointer" }}
+        onClick={() => props.navigator.navigate("account")}
+      >
+        <Flex
+          variant="columnCenter"
+          bg="primary"
+          mr={2}
+          size={40}
           sx={{
-            borderLeft: "0px Solid",
-            borderRight: "0px Solid",
-            borderTop: "0px Solid",
-            borderBottom: "1px Solid",
-            borderColor: "border",
-            "&:hover": { borderColor: "primary" }
-          }}
-          py="15px"
-        >
-          <Flex fontSize="body" alignItems="center">
-            <Text px="16px" sx={{ fontFamily: "body", fontSize: "title" }}>
-              {Titles.theme}
-            </Text>
-          </Flex>
-
-          <Flex flexDirection="column" justifyContent="center" mx="7%">
-            <Flex
-              flexWrap="wrap"
-              sx={{ marginBottom: 2 }}
-              justifyContent="left"
-            >
-              {[
-                { label: "red", code: "#ed2d37" },
-                { label: "orange", code: "#ec6e05" },
-                { label: "yellow", code: "yellow" },
-                { label: "green", code: "green" },
-                { label: "blue", code: "blue" },
-                { label: "purple", code: "purple" },
-                { label: "gray", code: "gray" },
-                { label: "lightblue", code: "#46F0F0" },
-                { label: "indigo", code: "#F032E6" },
-                { label: "lightpink", code: "#FABEBE" }
-              ].map(color => (
-                <Box
-                  sx={{ cursor: "pointer" }}
-                  onClick={() => {
-                    changeAccent(color.code);
-                  }}
-                >
-                  <Icon.Circle size={50} fill={color.code} strokeWidth={0} />
-                </Box>
-              ))}
-            </Flex>
-            <Flex flexDirection="row" justifyContent="center">
-              <Text width={1 / 2}>Dark Mode</Text>{" "}
-              <Flex width={1 / 2} justifyContent="right">
-                <Switch
-                  onClick={() => {
-                    setCheck(!check);
-                    changeTheme();
-                  }}
-                  checked={check}
-                />
-              </Flex>
-            </Flex>
-            {/* <Flex flexDirection="row" justifyContent="center" pt="15px">
-              <Text width={1 / 2}>Font Size</Text>{" "}
-              <Flex width={1 / 2} justifyContent="right">
-                <Select
-                  id="country"
-                  name="country"
-                  defaultValue="46"
-                  fontSize="14px"
-                  py="0px"
-                  pr="32px"
-                  DownArrow="false"
-                >
-                  {[
-                    { label: "red", code: "12" },
-                    { label: "orange", code: "05" },
-                    { label: "yellow", code: "16" },
-                    { label: "green", code: "36" },
-                    { label: "blue", code: "46" },
-                    { label: "purple", code: "64" },
-                    { label: "gray", code: "75" },
-                    { label: "lightblue", code: "88" },
-                    { label: "indigo", code: "99" },
-                    { label: "lightpink", code: "12" }
-                  ].map(color => (
-                    <option key={color.label}>{color.code}</option>
-                  ))}
-                </Select>
-              </Flex>
-            </Flex> */}
-          </Flex>
-        </Box>
-        <Button
-          variant="setting"
-          onClick={() => {
-            props.navigator.navigate("TOS", {
-              title: Titles.TOS
-            });
+            borderRadius: 80,
           }}
         >
-          {Titles.TOS}
-        </Button>
-        <Button
-          variant="setting"
-          onClick={() => {
-            props.navigator.navigate("privacy", {
-              title: Titles.privacy
-            });
-          }}
-        >
-          {Titles.privacy}
-        </Button>
-        <Button
-          variant="setting"
-          onClick={() => {
-            props.navigator.navigate("about", {
-              title: Titles.about
-            });
-          }}
-        >
-          {Titles.about}
-        </Button>
+          <Icon.User color="static" />
+        </Flex>
+        <Flex variant="columnCenter" alignItems="flex-start">
+          {isLoggedIn ? (
+            <>
+              <Text variant="title">{user.username}</Text>
+              <Text variant="subBody">{user.email}</Text>
+            </>
+          ) : (
+            <>
+              <Text variant="subBody">You are not logged in</Text>
+              <Text variant="body" color="primary">
+                Login to sync notes.
+              </Text>
+            </>
+          )}
+        </Flex>
       </Flex>
+      <Text my={2} variant="title" color="primary">
+        Appearance
+      </Text>
+      <Box
+        sx={{
+          borderBottom: "1px Solid",
+          borderColor: "border",
+          ":hover": { borderColor: "primary" },
+        }}
+      >
+        <Flex
+          flexWrap="wrap"
+          justifyContent="left"
+          mb={2}
+          p={1}
+          bg="shade"
+          sx={{
+            borderRadius: "default",
+          }}
+        >
+          {accents.map((color) => (
+            <AccentItem
+              key={color.code}
+              code={color.code}
+              label={color.label}
+            />
+          ))}
+        </Flex>
+        <Flex
+          justifyContent="space-between"
+          alignItems="center"
+          onClick={() => toggleNightMode()}
+          py={2}
+        >
+          <Text color="text" fontSize="body">
+            Dark Mode
+          </Text>
+          {theme === "dark" ? <Icon.Check /> : <Icon.CircleEmpty />}
+        </Flex>
+      </Box>
+      <Text my={2} variant="title" color="primary">
+        Other
+      </Text>
+      {["Terms of Service", "Privacy Policy", "About"].map((title) => (
+        <Button
+          key={title}
+          variant="list"
+          onClick={() =>
+            props.navigator.navigate("TOS", {
+              title,
+            })
+          }
+        >
+          {title}
+        </Button>
+      ))}
     </Flex>
   );
-};
+}
 
-const SettingsContainer = props => {
-  useEffect(() => {
-    const SettingsNavigator = require("../navigation/navigators/settingnavigator")
-      .default;
-    if (!SettingsNavigator.restore()) {
-      SettingsNavigator.navigate("settings");
-    }
-  }, []);
-  return (
-    <Flex
-      className="SettingsNavigator"
-      flexDirection="column"
-      flex="1 1 auto"
-    />
-  );
-};
-
-const Titles = {
-  general: "General",
-  account: "Account",
-  theme: "Theme",
-  TOS: "Terms of Service",
-  privacy: "Privacy Policy",
-  about: "About"
-};
-
-export { Settings, SettingsContainer };
+export default Settings;

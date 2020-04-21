@@ -1,0 +1,33 @@
+name: Build and Deploy
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    env:
+      GH_DEPLOY_KEY: ${{ secrets.GH_DEPLOY_KEY }}
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v2 # If you're using actions/checkout@v2 you must set persist-credentials to false in most cases for the deployment to work correctly.
+        with:
+          persist-credentials: false
+
+      - name: Use Node.js 12.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+      - run: npm install
+
+      - name: Build and Deploy 🚀
+        uses: amondnet/now-deployment@v2
+        with:
+          zeit-token: ${{ secrets.ZEIT_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          now-args: "--prod"
+          now-org-id: "Wst8mhjfr4LzbjOe956M2Z4t"
+          now-project-id: "QmStgLZ26V8aowiAAdyYaFVjRDWP9T8GEUoR9iJFSSnpWJ"

@@ -1,11 +1,12 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { Box, Flex, Heading, Text } from "rebass";
-import * as Icon from "react-feather";
-import { ThemeProvider } from "../utils/theme";
-import { ev } from "../common";
+import Animated from "../components/animated";
+import { AnimatePresence } from "framer-motion";
+import { store as selectionStore } from "../stores/selection-store";
+import Route from "./route";
+import Config from "../utils/config";
 
-export default class Navigator {
+class Navigator {
   constructor(root, routes, options = {}) {
     this.routes = routes;
     this.root = root;
@@ -14,18 +15,39 @@ export default class Navigator {
     this.lastRoute = undefined;
   }
 
+  onLoad = () => {
+    const opts = Config.get(this.root, {
+      history: [],
+      lastRoute: this.getRoute(this.options.default),
+    });
+    this.history = opts.history;
+    this.navigate(opts.lastRoute.key, opts.lastRoute.params, true);
+  };
+
   getRoute(key) {
     return this.routes[key];
+  }
+
+  setLastRoute(route) {
+    this.lastRoute = route;
+    // cache the route in localStorage
+    // NOTE: we delete the navigator key if any so it's always new across refreshes
+    const copy = { ...route, params: { ...route.params } };
+    if (copy.params.navigator) delete copy.params.navigator;
+    Config.set(this.root, {
+      history: this.history,
+      lastRoute: copy,
+    });
   }
 
   getRoot() {
     return document.querySelector(`.${this.root}`);
   }
 
-  navigate(routeName, params = {}) {
+  navigate(routeName, params = {}, force = false) {
     let route = this.getRoute(routeName);
 
-    if (!route || this.lastRoute === route) {
+    if (!force && (!route || this.lastRoute === route)) {
       return false;
     }
 
@@ -34,8 +56,7 @@ export default class Navigator {
     if (this.lastRoute) {
       this.history.push(this.lastRoute);
     }
-    this.lastRoute = route;
-
+    this.setLastRoute(route);
     return this.renderRoute(route);
   }
 
@@ -44,77 +65,56 @@ export default class Navigator {
     if (!root) {
       return false;
     }
+    // exit selection mode on navigate
+    selectionStore.toggleSelectionMode(false);
     ReactDOM.render(
-      <NavigationContainer
-        navigator={this}
-        route={route}
-        params={route.params}
-        canGoBack={this.options.backButtonEnabled && this.history.length > 0}
-        backAction={() => this.goBack()}
-      />,
+      <AnimatePresence exitBeforeEnter={true}>
+        <Animated.Flex
+          key={route.key}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
+          exit={{ opacity: 0 }}
+          flexDirection="column"
+          flex="1 1 auto"
+        >
+          <Route
+            navigator={this}
+            route={route}
+            params={route.params}
+            canGoBack={
+              this.options.backButtonEnabled && this.history.length > 0
+            }
+            backAction={() => this.goBack()}
+          />
+        </Animated.Flex>
+      </AnimatePresence>,
       root
     );
     return true;
   }
 
-  goBack() {
+  goBack(params = {}) {
     let route = this.history.pop();
-    if (!route) {
-      return false;
-    }
-    this.lastRoute = route;
-    return this.renderRoute(route);
+    if (!route) return false;
+    if (!route.component) route.component = this.getRoute(route.key).component;
+
+    this.setLastRoute(route);
+    return this.renderRoute(this._mergeParams(route, params));
   }
 
-  restore() {
+  restore(params = {}) {
     if (!this.lastRoute) {
       return false;
     }
-    return this.renderRoute(this.lastRoute);
+    return this.renderRoute(this._mergeParams(this.lastRoute, params));
+  }
+
+  _mergeParams(route, params) {
+    return {
+      ...route,
+      params: { ...route.params, ...params },
+    };
   }
 }
-
-const NavigationContainer = props => {
-  return (
-    <ThemeProvider>
-      <Flex flexDirection="column" px={2}>
-        <Flex alignItems="center">
-          {props.canGoBack && (
-            <Box
-              onClick={props.backAction}
-              height={38}
-              color="fontPrimary"
-              sx={{ marginLeft: -1, marginRight: 2 }}
-            >
-              <Icon.ChevronLeft size={38} />
-            </Box>
-          )}
-          {!props.route.topBarHidden && (
-            <>
-              <Box
-                onClick={() => ev.emit("openSideMenu")}
-                height={36}
-                color="fontPrimary"
-                sx={{
-                  marginRight: 3,
-                  display: [props.canGoBack ? "none" : "block", "none", "none"]
-                }}
-              >
-                <Icon.Menu size={36} />
-              </Box>
-              <Heading fontSize="heading">
-                {props.route.title || props.route.params.title}
-              </Heading>
-            </>
-          )}
-        </Flex>
-        <Text variant="title" color="primary" sx={{ marginBottom: 1 }}>
-          {props.route.params.subtitle}
-        </Text>
-      </Flex>
-      {props.route.component && (
-        <props.route.component navigator={props.navigator} {...props.params} />
-      )}
-    </ThemeProvider>
-  );
-};
+export default Navigator;

@@ -1,237 +1,78 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import "./editor.css";
-import ReactQuill, { Quill } from "react-quill";
-import "react-quill/dist/quill.bubble.css";
-import "react-quill/dist/quill.snow.css";
+import ReactQuill from "./react-quill";
 import { Flex, Box } from "rebass";
-import { Input } from "@rebass/forms";
-import MarkdownShortcuts from "./modules/markdown";
-import MagicUrl from "quill-magic-url";
-import { db, ev } from "../../common";
-import { showSnack } from "../snackbar";
-import * as Icon from "react-feather";
 import Properties from "../properties";
+import { useStore, SESSION_STATES } from "../../stores/editor-store";
+import { useStore as useAppStore } from "../../stores/app-store";
+import Animated from "../animated";
+import EditorMenu from "./editormenu";
+import Header from "./header";
 
-Quill.register("modules/markdownShortcuts", MarkdownShortcuts);
-Quill.register("modules/magicUrl", MagicUrl);
+function Editor() {
+  const id = useStore((store) => store.session.id);
+  const delta = useStore((store) => store.session.content.delta);
+  const sessionState = useStore((store) => store.session.state);
+  const setSession = useStore((store) => store.setSession);
+  const saveSession = useStore((store) => store.saveSession);
+  const isFocusMode = useAppStore((store) => store.isFocusMode);
+  const quillRef = useRef();
 
-const modules = {
-  toolbar: [
-    [{ header: [1, 2, 3, 4, 5, 6] }],
-    ["bold", "italic", "underline", "strike", "blockquote"],
-    [
-      { align: "" },
-      { align: "center" },
-      { align: "right" },
-      { align: "justify" }
-    ],
-    [
-      { list: "ordered" },
-      { list: "bullet" },
-      { indent: "-1" },
-      { indent: "+1" }
-    ],
-    [{ size: ["small", false, "large", "huge"] }],
-    ["code-block", { script: "sub" }, { script: "super" }],
-    [{ color: [] }, { background: [] }],
-    ["link", "image", "video"],
-    [{ direction: "rtl" }, "clean"]
-  ],
-  syntax: true,
-  markdownShortcuts: {},
-  magicUrl: true
-};
-
-export default class Editor extends React.Component {
-  title = "";
-  timeout = "";
-  id = "";
-  favorite = false;
-  pinned = false;
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      pinned: false,
-      favorite: false,
-      colors: [],
-      tags: []
-    };
-  }
-
-  componentDidMount() {
+  useEffect(() => {
     // move the toolbar outside (easiest way)
     const toolbar = document.querySelector(".ql-toolbar.ql-snow");
     const toolbarContainer = document.querySelector("#toolbar");
     if (toolbar && toolbarContainer) {
       toolbarContainer.appendChild(toolbar);
     }
+  }, []);
 
-    this.quill = this.quillRef.getEditor();
-    this.quill.keyboard.addBinding(
-      {
-        key: "S",
-        shortKey: true
-      },
-      async () => {
-        await this.saveNote();
-        showSnack("Note saved!", Icon.Check);
-      }
-    );
-
-    ev.addListener("onNewNote", this.onNewNote.bind(this));
-    ev.addListener("onOpenNote", this.onOpenNote.bind(this));
-    ev.addListener("onClearNote", this.onClearNote.bind(this));
-  }
-
-  componentWillUnmount() {
-    ev.removeListener("onNewNote", this.onNewNote.bind(this));
-    ev.removeListener("onOpenNote", this.onOpenNote.bind(this));
-    ev.removeListener("onClearNote", this.onClearNote.bind(this));
-  }
-
-  onNewNote(show = true, cb = null) {
-    clearTimeout(this.timeout);
-    this.saveNote().then(() => {
-      this.titleRef.value = "";
-      this.id = undefined;
-      this.title = undefined;
-      this.titleRef.focus();
-      this.quill.setText("\n");
-      cb && cb();
-      if (show) {
-        showSnack("Let's start writing!", Icon.Edit2);
-      }
-    });
-  }
-
-  onClearNote(id = undefined) {
-    if (id && id !== this.id) return;
-    this.onNewNote(false);
-  }
-
-  onOpenNote(note) {
-    if (!note) return;
-    this.onNewNote(false, async () => {
-      let dbNote = db.notes.note(note.id);
-      if (!dbNote) return this.onNewNote(false);
-      this.id = note.id;
-      this.title = note.title;
-      this.titleRef.value = note.title;
-      this.pinned = note.pinned;
-      this.favorite = note.favorite;
-      this.setState({
-        pinned: this.pinned,
-        favorite: this.favorite,
-        colors: note.colors
-      });
-      let delta = await dbNote.delta();
-      this.quill.setContents(delta);
-      this.quill.setSelection(note.content.text.length - 1, 0); //to move the cursor to the end
-    });
-  }
-
-  async saveNote() {
-    let content = {
-      delta: this.quill.getContents(),
-      text: this.quill.getText()
-    };
-    if (!this.title && (!content.delta || content.text.length <= 1))
-      return this.id;
-    let note = {
-      content,
-      title: this.title,
-      id: this.id,
-      favorite: this.favorite,
-      pinned: this.pinned,
-      colors: this.state.colors
-      //TODO add tags once the database is done
-    };
-    return await db.notes.add(note);
-  }
-
-  save() {
-    clearTimeout(this.timeout);
-    this.timeout = setTimeout(async () => {
-      this.id = await this.saveNote();
-      ev.emit("refreshNotes");
-    }, 1000);
-  }
-
-  render() {
-    return (
-      <Flex width={["0%", "0%", "100%"]}>
-        <Flex
-          className="editor"
-          flex="1 1 auto"
-          flexDirection="column"
-          onBlur={() => {
-            ev.emit("refreshNotes");
+  return (
+    <Animated.Flex
+      width={["0%", "0%", "100%"]}
+      initial={{ width: "100%" }}
+      animate={{
+        width: isFocusMode ? "55%" : "100%",
+      }}
+      transition={{ duration: 0.3, ease: "easeIn" }}
+      sx={{
+        position: "relative",
+        alignSelf: isFocusMode ? "center" : "stretch",
+      }}
+      flex="1 1 auto"
+    >
+      <Flex
+        variant="columnFill"
+        className="editor"
+        onFocus={() => {
+          //hideProperties();
+        }}
+      >
+        <Header />
+        <Box id="toolbar" display={["none", "flex", "flex"]} />
+        <EditorMenu quill={quillRef.current && quillRef.current.quill} />
+        <ReactQuill
+          id="quill"
+          ref={quillRef}
+          refresh={sessionState === SESSION_STATES.new}
+          initialContent={delta}
+          placeholder="Type anything here"
+          container=".editor"
+          onSave={() => {
+            saveSession();
           }}
-        >
-          <Input
-            ref={ref => (this.titleRef = ref)}
-            placeholder="Untitled"
-            fontFamily="heading"
-            fontWeight="heading"
-            fontSize="heading"
-            display={["none", "flex", "flex"]}
-            sx={{
-              borderWidth: 0,
-              ":focus": { outline: "none" },
-              paddingTop: 0,
-              paddingBottom: 0
-            }}
-            px={2}
-            onChange={e => {
-              this.title = e.target.value;
-              this.save();
-            }}
-          />
-          <Box id="toolbar" display={["none", "flex", "flex"]}></Box>
-          <ReactQuill
-            ref={ref => (this.quillRef = ref)}
-            modules={modules}
-            theme="snow"
-            onChange={() => {
-              this.save();
-            }}
-          />
-        </Flex>
-        <Properties
-          pinned={this.state.pinned}
-          favorite={this.state.favorite}
-          onPinned={state => {
-            this.pinned = state;
-            this.save();
+          onChange={(editor) => {
+            setSession((state) => {
+              state.session.content = {
+                delta: { ops: editor.getContents().ops },
+                text: editor.getText(),
+              };
+            });
           }}
-          onFavorited={state => {
-            this.favorite = state;
-            this.save();
-          }}
-          selectedColors={this.state.colors}
-          colorSelected={color => {
-            let colors = [...this.state.colors];
-            if (colors.includes(color.label)) {
-              colors.splice(colors.indexOf(color.label), 1);
-            } else {
-              colors[colors.length] = color.label;
-            }
-            this.setState({ colors });
-          }}
-          tags={this.state.tags}
-          addTag={tag => {
-            let tags = [...this.state.tags];
-            if (tags.includes(tag)) {
-              tags.splice(tags.indexOf(tag), 1);
-            } else {
-              tags[this.state.tags.length] = tag;
-            }
-            this.setState({ tags });
-          }}
-          onLocked={state => {}}
         />
       </Flex>
-    );
-  }
+      {id ? <Properties /> : null}
+    </Animated.Flex>
+  );
 }
+export default Editor;
