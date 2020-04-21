@@ -79,7 +79,7 @@ export default class CachedCollection {
   getAllItems(sortFn = (u) => u.dateCreated) {
     let items = [];
     this.map.forEach((value) => {
-      if (value.deleted) return;
+      if (!value || value.deleted) return;
       items[items.length] = value;
     });
     return sort(items).desc(sortFn);

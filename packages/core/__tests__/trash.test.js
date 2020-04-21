@@ -4,9 +4,15 @@ import {
   notebookTest,
   TEST_NOTE,
   TEST_NOTEBOOK,
+  databaseTest,
 } from "./utils";
 
 beforeEach(() => StorageInterface.clear());
+
+test("trash should be empty", () =>
+  databaseTest().then((db) => {
+    expect(db.trash.all.length).toBe(0);
+  }));
 
 test("permanently delete a note", () =>
   noteTest().then(async ({ db, id }) => {
