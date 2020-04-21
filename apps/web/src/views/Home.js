@@ -42,11 +42,12 @@ function Home() {
             </Box>
           );
         }}
-        item={(index, groupIndex) =>
-          notes.groupCounts[groupIndex] && (
+        item={(index, groupIndex) => {
+          if (!notes.groupCounts[groupIndex] || !notes.items[index]) return;
+          return (
             <Note index={index} pinnable={true} item={notes.items[index]} />
-          )
-        }
+          );
+        }}
       />
     </ListContainer>
   );

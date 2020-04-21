@@ -44,7 +44,11 @@ function ListContainer(props) {
                   overflowX: "hidden",
                 }}
                 totalCount={props.items.length}
-                item={(index) => props.item(index, props.items[index])}
+                item={(index) => {
+                  const item = props.items[index];
+                  if (!item) return null;
+                  return props.item(index, item);
+                }}
               />
             ) : null}
           </Flex>
