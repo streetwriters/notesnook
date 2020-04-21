@@ -13,7 +13,7 @@ function Menu(props) {
         borderRadius: "default",
         border: "2px solid",
         borderColor: "border",
-        width: 140,
+        width: 180,
         ...props.sx,
       }}
     >
