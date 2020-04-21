@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { Box, Flex } from "rebass";
+import { Flex } from "rebass";
 import RootNavigator, {
   bottomRoutes,
   routes,
