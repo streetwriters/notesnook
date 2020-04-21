@@ -31,11 +31,9 @@ function Notebooks(props) {
               props.navigator.navigate("notes", {
                 title: notebook.title,
                 subtitle: topic.title,
-                notes: db.notebooks
-                  .notebook(notebook.id)
-                  .topics.topic(topic.title).all,
                 context: {
-                  notebook: { id: notebook.id, topic: topic.title },
+                  type: "topic",
+                  value: { id: notebook.id, topic: topic.title },
                 },
               })
             }
