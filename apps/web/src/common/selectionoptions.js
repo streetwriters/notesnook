@@ -13,7 +13,7 @@ function createOption(key, icon, onClick) {
     key,
     icon,
     onClick: async () => {
-      await onClick.call(this, selectionStore);
+      await onClick.call(this, selectionStore.get());
       selectionStore.toggleSelectionMode(false);
     },
   };
