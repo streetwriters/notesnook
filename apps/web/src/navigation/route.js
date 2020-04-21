@@ -44,7 +44,7 @@ function Header(props) {
               mr: 4,
               display: ["block", "none", "none"],
             }}
-            size={38}
+            size={28}
           />
           <Heading fontSize="heading" color={titleColor || "text"}>
             {title || params.title}
