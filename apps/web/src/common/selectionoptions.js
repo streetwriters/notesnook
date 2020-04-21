@@ -31,12 +31,20 @@ const DeleteOption = createOption("deleteOption", Icon.Trash, async function (
   )
     return;
   const item = state.selectedItems[0];
+
   var isAnyNoteOpened = false;
   const items = state.selectedItems.map((item) => {
     if (item.id === editorStore.get().session.id) isAnyNoteOpened = true;
     if (item.locked) return 0;
     return item.id;
   });
+
+  if (item.dateDeleted) {
+    // we are in trash
+    await db.trash.delete(...items);
+    trashStore.refresh();
+    return;
+  }
 
   if (isAnyNoteOpened) {
     editorStore.newSession();
