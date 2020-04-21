@@ -11,8 +11,8 @@ export function createRoute(key, component, props = {}, params = {}) {
   };
 }
 
-export function createNavigatorRoute(key, icon, title, navigator) {
-  return createRoute(key, NavigationContainer, { icon, title }, { navigator });
+export function createNavigatorRoute(key, icon, navigator) {
+  return createRoute(key, NavigationContainer, { icon }, { navigator });
 }
 
 export function createNormalRoute(key, component, icon, props = {}) {
