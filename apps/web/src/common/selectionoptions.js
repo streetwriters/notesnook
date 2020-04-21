@@ -8,8 +8,9 @@ import { db } from "./index";
 import { showMoveNoteDialog } from "../components/dialogs/movenotedialog";
 import { confirm } from "../components/dialogs/confirm";
 
-function createOption(icon, onClick) {
+function createOption(key, icon, onClick) {
   return {
+    key,
     icon,
     onClick: async () => {
       await onClick.call(this, selectionStore);
@@ -22,7 +23,9 @@ function createOptions(options = []) {
   return [...options, DeleteOption];
 }
 
-const DeleteOption = createOption(Icon.Trash, async function (state) {
+const DeleteOption = createOption("deleteOption", Icon.Trash, async function (
+  state
+) {
   if (
     !(await confirm(Icon.Trash, "Delete", "Are you sure you want to proceed?"))
   )
@@ -52,7 +55,9 @@ const DeleteOption = createOption(Icon.Trash, async function (state) {
   }
 });
 
-const FavoriteOption = createOption(Icon.Star, function (state) {
+const FavoriteOption = createOption("favoriteOption", Icon.Star, function (
+  state
+) {
   // we know only notes can be favorited
   state.selectedItems.forEach(async (item) => {
     if (item.favorite) return;
@@ -61,7 +66,9 @@ const FavoriteOption = createOption(Icon.Star, function (state) {
   notesStore.refresh();
 });
 
-const UnfavoriteOption = createOption(Icon.Star, function (state) {
+const UnfavoriteOption = createOption("unfavoriteOption", Icon.Star, function (
+  state
+) {
   // we know only notes can be favorited
   state.selectedItems.forEach(async (item) => {
     if (!item.favorite) return;
@@ -70,19 +77,27 @@ const UnfavoriteOption = createOption(Icon.Star, function (state) {
   notesStore.setContext({ type: "favorites" });
 });
 
-const AddToNotebookOption = createOption(Icon.Plus, async function (state) {
-  const items = state.selectedItems.map((item) => item.id);
-  if (await showMoveNoteDialog(items)) {
-    //TODO show proper snack
-    console.log("Notes moved successfully!");
+const AddToNotebookOption = createOption(
+  "atnOption",
+  Icon.Plus,
+  async function (state) {
+    const items = state.selectedItems.map((item) => item.id);
+    if (await showMoveNoteDialog(items)) {
+      //TODO show proper snack
+      console.log("Notes moved successfully!");
+    }
   }
-});
+);
 
-const RestoreOption = createOption(Icon.Restore, async function (state) {
-  const items = state.selectedItems.map((item) => item.id);
-  await db.trash.restore(...items);
-  trashStore.refresh();
-});
+const RestoreOption = createOption(
+  "restoreOption",
+  Icon.Restore,
+  async function (state) {
+    const items = state.selectedItems.map((item) => item.id);
+    await db.trash.restore(...items);
+    trashStore.refresh();
+  }
+);
 
 const NotesOptions = createOptions([AddToNotebookOption, FavoriteOption]);
 const NotebooksOptions = createOptions();

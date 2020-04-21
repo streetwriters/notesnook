@@ -3,12 +3,16 @@ import { Box, Flex, Heading, Text } from "rebass";
 import * as Icon from "../components/icons";
 import ThemeProvider from "../components/theme-provider";
 import { useStore } from "../stores/app-store";
+import { useStore as useSelectionStore } from "../stores/selection-store";
 
 function Route(props) {
   const toggleSideMenu = useStore((store) => store.toggleSideMenu);
-  const isSelectionMode = useStore((store) => store.isSelectionMode);
-  const exitSelectionMode = useStore((store) => store.exitSelectionMode);
-  const selectAll = useStore((store) => store.selectAll);
+  const isSelectionMode = useSelectionStore((store) => store.isSelectionMode);
+  const toggleSelectionMode = useSelectionStore(
+    (store) => store.toggleSelectionMode
+  );
+  const selectAll = useSelectionStore((store) => store.selectAll);
+  const shouldSelectAll = useSelectionStore((store) => store.shouldSelectAll);
   const navigator = props.params.navigator || props.navigator;
   return (
     <ThemeProvider>
@@ -48,7 +52,7 @@ function Route(props) {
                 <Flex>
                   {props.route.options.map((option) => (
                     <Box
-                      key={option.icon.name}
+                      key={option.key}
                       onClick={option.onClick}
                       mx={2}
                       sx={{ cursor: "pointer" }}
@@ -72,21 +76,21 @@ function Route(props) {
               </Text>
             )}
             {isSelectionMode && (
-              <Flex alignItems="center" mb={2} sx={{ cursor: "pointer" }}>
-                <Text
-                  variant="title"
-                  color="primary"
-                  onClick={() => selectAll()}
-                >
-                  Select all
-                </Text>
-                <Text
-                  ml={2}
-                  variant="title"
-                  color="primary"
-                  onClick={() => exitSelectionMode()}
-                >
-                  Unselect
+              <Flex
+                alignItems="center"
+                mb={2}
+                sx={{ cursor: "pointer" }}
+                onClick={() => {
+                  if (shouldSelectAll) {
+                    toggleSelectionMode(false);
+                  } else {
+                    selectAll();
+                  }
+                }}
+              >
+                {shouldSelectAll ? <Icon.Check /> : <Icon.CircleEmpty />}
+                <Text ml={1} variant="title" color="primary">
+                  {shouldSelectAll ? "Unselect" : "Select all"}
                 </Text>
               </Flex>
             )}

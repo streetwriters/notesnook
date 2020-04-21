@@ -15,6 +15,7 @@ function ListContainer(props) {
   useEffect(() => {
     if (shouldSelectAll) setSelectedItems(props.items);
   }, [shouldSelectAll, setSelectedItems, props.items]);
+
   useEffect(() => {
     if (props.noSearch) return;
     setSearchContext({

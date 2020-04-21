@@ -4,7 +4,7 @@ import { Flex, Box, Text } from "rebass";
 import * as Icon from "../icons";
 import Menu from "../menu";
 import {
-  store as appStore,
+  store as selectionStore,
   useStore as useSelectionStore,
 } from "../../stores/selection-store";
 import useContextMenu from "../../utils/useContextMenu";
@@ -13,9 +13,9 @@ function selectMenuItem(isSelected, toggleSelection) {
   return {
     title: isSelected ? "Unselect" : "Select",
     onClick: () => {
-      const appState = appStore;
-      if (!appState.isSelectionMode) {
-        appState.enterSelectionMode();
+      const selectionState = selectionStore.get();
+      if (!selectionState.isSelectionMode) {
+        selectionState.toggleSelectionMode();
         toggleSelection();
       } else {
         toggleSelection();

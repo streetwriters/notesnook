@@ -30,14 +30,14 @@ class SelectionStore extends BaseStore {
     }
   };
 
-  setSelectedItems(items) {
+  setSelectedItems = (items) => {
     this.set((state) => (state.selectedItems = items));
-  }
+  };
 
-  selectAll() {
+  selectAll = () => {
     if (!this.get().isSelectionMode) return;
     this.set((state) => (state.shouldSelectAll = true));
-  }
+  };
 }
 
 /**
