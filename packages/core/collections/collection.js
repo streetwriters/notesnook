@@ -2,8 +2,8 @@ import CachedCollection from "../database/cached-collection";
 import IndexedCollection from "../database/indexed-collection";
 
 class Collection {
-  static async new(db, name = undefined, cached = true) {
-    const collection = new this(db, name || this.name.toLowerCase(), cached);
+  static async new(db, name, cached = true) {
+    const collection = new this(db, name, cached);
     await collection._collection.init();
 
     if (collection.init) await collection.init();

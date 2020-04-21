@@ -26,15 +26,15 @@ class Database {
 
     // collections
     /** @type {Notes} */
-    this.notes = await Notes.new(this);
+    this.notes = await Notes.new(this, "notes");
     /** @type {Notebooks} */
-    this.notebooks = await Notebooks.new(this);
+    this.notebooks = await Notebooks.new(this, "notebooks");
     /** @type {Tags} */
     this.tags = await Tags.new(this, "tags");
     /** @type {Tags} */
     this.colors = await Tags.new(this, "colors");
     /** @type {Trash} */
-    this.trash = await Trash.new(this);
+    this.trash = await Trash.new(this, "trash");
     /** @type {Content} */
     this.delta = await Content.new(this, "delta", false);
     /** @type {Content} */
