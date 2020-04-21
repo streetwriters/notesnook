@@ -1,5 +1,5 @@
 import MMKV from 'react-native-mmkv-storage';
-import Sodium from "react-native-sodium";
+import Sodium from 'react-native-sodium';
 
 async function read(key, isArray = false) {
   let data;
@@ -9,7 +9,7 @@ async function read(key, isArray = false) {
     } catch (e) {
       data = [];
     }
-  } else if (key === "hasConflicts") {
+  } else if (key === 'hasConflicts') {
     return await MMKV.getBoolAsync(key);
   } else {
     try {
@@ -18,7 +18,6 @@ async function read(key, isArray = false) {
       data = null;
     }
   }
-
 
   return isArray ? data.slice() : data;
 }
@@ -31,7 +30,6 @@ async function write(key, data) {
   } else {
     return await MMKV.setMapAsync(key, data);
   }
-
 }
 
 async function readMulti(keys) {
@@ -53,28 +51,28 @@ async function clear() {
 }
 
 function encrypt(password, data) {
-
   return Sodium.encrypt(password, data).then(result => result);
 }
 
 function decrypt(password, data) {
-
   return Sodium.decrypt(password, data).then(result => result);
-
 }
 
 async function deriveKey(password, salt) {
-
   try {
+    let data = await Sodium.deriveKey(password, salt);
 
-    let data = await Sodium.deriveKey(password, salt)
-
-    return data.key
-  } catch (e) {
-
-  }
-
+    return data.key;
+  } catch (e) {}
 }
 
-
-export default { read, write, readMulti, remove, clear, encrypt, decrypt, deriveKey };
+export default {
+  read,
+  write,
+  readMulti,
+  remove,
+  clear,
+  encrypt,
+  decrypt,
+  deriveKey,
+};

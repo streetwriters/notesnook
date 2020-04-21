@@ -14,13 +14,11 @@ import {TEMPLATE_EMPTY_TRASH} from '../../components/DialogManager/templates';
 
 export const Trash = ({navigation}) => {
   const [state, dispatch] = useTracked();
-  const {colors, selectionMode} = state;
-  const trash = [...trash];
+  const {colors, selectionMode, trash} = state;
   const [refreshing, setRefreshing] = useState(false);
 
   const isFocused = useIsFocused();
   useEffect(() => {
-    console.log(trash);
     if (isFocused) {
       dispatch({
         type: ACTIONS.TRASH,

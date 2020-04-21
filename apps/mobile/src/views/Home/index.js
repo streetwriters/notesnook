@@ -18,7 +18,14 @@ let count = 0;
 export const Home = ({navigation}) => {
   const [state, dispatch] = useTracked();
   const [refreshing, setRefreshing] = useState(false);
-  const {colors, selectionMode, currentEditingNote, loading, notes} = state;
+  const {
+    colors,
+    selectionMode,
+    currentEditingNote,
+    loading,
+    notes,
+    pinned,
+  } = state;
   const isFocused = useIsFocused();
 
   useEffect(() => {
@@ -27,11 +34,10 @@ export const Home = ({navigation}) => {
         type: ACTIONS.CURRENT_SCREEN,
         screen: 'home',
       });
+      eSendEvent(eScrollEvent, 0);
+      dispatch({type: ACTIONS.COLORS});
+      dispatch({type: ACTIONS.NOTES});
     }
-
-    eSendEvent(eScrollEvent, 0);
-    dispatch({type: ACTIONS.COLORS});
-    dispatch({type: ACTIONS.NOTES});
   }, [isFocused]);
 
   const _onRefresh = async () => {
@@ -109,6 +115,7 @@ export const Home = ({navigation}) => {
         data={notes}
         type="notes"
         isHome={true}
+        pinned={pinned}
         refreshing={refreshing}
         focused={isFocused}
         onRefresh={_onRefresh}

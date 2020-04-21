@@ -5,9 +5,10 @@ import {ph, pv, SIZE, WEIGHT} from '../../common/common';
 import {eSendEvent, openVault} from '../../services/eventManager';
 import {eOnLoadNote, eShowMergeDialog} from '../../services/events';
 import {openEditorAnimation} from '../../utils/animations';
-import {DDS, timeSince} from '../../utils/utils';
+import {DDS, timeSince, db} from '../../utils/utils';
 import {ActionSheetEvent, simpleDialogEvent} from '../DialogManager/recievers';
 import {TEMPLATE_TRASH} from '../DialogManager/templates';
+import storage from '../../utils/storage';
 
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
@@ -83,7 +84,8 @@ export default class NoteItem extends React.Component {
         <TouchableOpacity
           activeOpacity={0.8}
           onLongPress={() => onLongPress()}
-          onPress={() => {
+          onPress={async () => {
+            return;
             if (item.conflicted) {
               eSendEvent(eShowMergeDialog, item);
 
