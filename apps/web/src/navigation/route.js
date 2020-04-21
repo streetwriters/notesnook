@@ -37,16 +37,15 @@ function Header(props) {
               <Icon.ChevronLeft size={38} color="fontPrimary" />
             </Box>
           )}
-          <Box
+          <Icon.Menu
             onClick={toggleSideMenu}
-            height={38}
-            ml={-5}
             sx={{
+              ml: 0,
+              mr: 4,
               display: ["block", "none", "none"],
             }}
-          >
-            <Icon.Menu size={38} />
-          </Box>
+            size={38}
+          />
           <Heading fontSize="heading" color={titleColor || "text"}>
             {title || params.title}
           </Heading>
