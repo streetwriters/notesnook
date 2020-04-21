@@ -162,6 +162,8 @@ function Note(props) {
 export default React.memo(Note, function (prevProps, nextProps) {
   const prevItem = prevProps.item;
   const nextItem = nextProps.item;
+  // TODO need to investigate why a crash happens here.
+  if (!prevItem || !nextItem) return true;
   return (
     prevItem.pinned === nextItem.pinned &&
     prevItem.favorite === nextItem.favorite &&
