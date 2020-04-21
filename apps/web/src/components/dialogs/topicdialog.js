@@ -21,7 +21,7 @@ function TopicDialog(props) {
     >
       <Box my={1}>
         <Input
-          placeholder="name"
+          placeholder="Topic title"
           onChange={(e) => {
             setTopic(e.target.value);
           }}

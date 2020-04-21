@@ -57,11 +57,11 @@ class Notebook extends React.Component {
                   marginRight: 1,
                   borderRadius: "default",
                   color: "static",
-                  paddingTop: 0.4,
-                  paddingBottom: 0.4,
+                  paddingTop: "2px",
+                  paddingBottom: "2px",
                 }}
               >
-                <Text variant="body" fontSize={11}>
+                <Text variant="body" color="static" fontSize={11}>
                   {topic.title}
                 </Text>
               </Flex>
