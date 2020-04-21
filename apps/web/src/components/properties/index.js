@@ -118,7 +118,7 @@ function Properties() {
                 >
                   <Flex key={label}>
                     <Icon.Circle size={24} color={code} />
-                    <Text ml={1} color="text">
+                    <Text ml={1} color="text" variant="body">
                       {toTitleCase(label)}
                     </Text>
                   </Flex>

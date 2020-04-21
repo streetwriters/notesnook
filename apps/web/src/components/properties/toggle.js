@@ -15,7 +15,7 @@ function Toggle(props) {
       onClick={() => onToggle(!isOn)}
     >
       {isOn ? <icons.on color="primary" /> : <icons.off />}
-      <Text mt={1} color={isOn ? "primary" : "text"}>
+      <Text mt={1} variant="body" color={isOn ? "primary" : "text"}>
         {label}
       </Text>
     </Flex>
