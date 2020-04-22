@@ -141,7 +141,7 @@ export const Folders = ({navigation}) => {
             <NotebookPlaceHolder animation={slideRight} colors={colors} />
           </>
         }
-        pinned={pinned}
+        pinned={pinned.notebooks}
         placeholderText="Notebooks you add will appear here"
       />
     </Container>

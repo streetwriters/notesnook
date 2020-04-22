@@ -127,10 +127,10 @@ const SimpleList = ({
               ? 155 - insets.top
               : 155 - 60 - insets.top,
         }}>
-        {pinned && pinned.notebooks && pinned.notebooks.length > 0 ? (
+        {pinned && pinned.length > 0 ? (
           <>
             <FlatList
-              data={pinned.notebooks}
+              data={pinned}
               keyExtractor={(item, index) => item.id.toString()}
               renderItem={({item, index}) =>
                 item.type === 'notebook' ? (

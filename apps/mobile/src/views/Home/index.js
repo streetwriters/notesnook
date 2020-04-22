@@ -115,7 +115,7 @@ export const Home = ({navigation}) => {
         data={notes}
         type="notes"
         isHome={true}
-        pinned={pinned}
+        pinned={pinned.notes}
         refreshing={refreshing}
         focused={isFocused}
         onRefresh={_onRefresh}
