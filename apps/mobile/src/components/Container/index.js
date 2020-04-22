@@ -3,25 +3,24 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   Platform,
+  SafeAreaView,
   Text,
   TouchableOpacity,
   View,
-  StatusBar,
-  SafeAreaView,
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
+import {useSafeArea} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {br, opacity, pv, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
-import {eScrollEvent, eClearSearch} from '../../services/events';
-import {db, getElevation, ToastEvent, DDS, selection} from '../../utils/utils';
+import {eClearSearch, eScrollEvent} from '../../services/events';
+import {inputRef} from '../../utils/refs';
+import {db, DDS, getElevation, selection, ToastEvent} from '../../utils/utils';
 import {Header} from '../header';
 import {Search} from '../SearchInput';
 import SelectionHeader from '../SelectionHeader';
-import {inputRef} from '../../utils/refs';
-import {useSafeArea} from 'react-native-safe-area-context';
 
 const AnimatedTouchableOpacity = Animatable.createAnimatableComponent(
   TouchableOpacity,
@@ -196,7 +195,9 @@ export const Container = ({
         }}>
         {noSelectionHeader ? null : <SelectionHeader items={data} />}
 
-        <View
+        <Animatable.View
+          transition="backgroundColor"
+          duration={300}
           style={{
             position: selectionMode ? 'relative' : 'absolute',
             backgroundColor: colors.bg,
@@ -237,7 +238,7 @@ export const Container = ({
               value={text}
             />
           ) : null}
-        </View>
+        </Animatable.View>
 
         {children}
 

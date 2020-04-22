@@ -5,10 +5,9 @@ import {ph, pv, SIZE, WEIGHT} from '../../common/common';
 import {eSendEvent, openVault} from '../../services/eventManager';
 import {eOnLoadNote, eShowMergeDialog} from '../../services/events';
 import {openEditorAnimation} from '../../utils/animations';
-import {DDS, timeSince, db} from '../../utils/utils';
+import {DDS, timeSince} from '../../utils/utils';
 import {ActionSheetEvent, simpleDialogEvent} from '../DialogManager/recievers';
 import {TEMPLATE_TRASH} from '../DialogManager/templates';
-import storage from '../../utils/storage';
 
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;

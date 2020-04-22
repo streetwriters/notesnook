@@ -1,11 +1,10 @@
 import React from 'react';
-import {SIZE, WEIGHT} from './src/common/common';
 import * as Animatable from 'react-native-animatable';
-import {useTracked} from './src/provider';
-import {w} from './src/utils/utils';
+import {SIZE, WEIGHT} from './src/common/common';
 import {DialogManager} from './src/components/DialogManager';
 import {Toast} from './src/components/Toast';
-
+import {useTracked} from './src/provider';
+import {w} from './src/utils/utils';
 export const Loading = () => {
   const [state, dispatch] = useTracked();
   const {colors, loading} = state;
