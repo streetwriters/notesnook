@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, StatusBar, Text} from 'react-native';
+import {View, StatusBar, Text, ActivityIndicator} from 'react-native';
 import {db, timeConverter} from '../../utils/utils';
 import {simpleDialogEvent} from '../../components/DialogManager/recievers';
 import {TEMPLATE_INFO} from '../../components/DialogManager/templates';
@@ -10,14 +10,25 @@ export default class InfoBar extends React.Component {
     super(props);
     this.state = {
       dateEdited: null,
+      saving: false,
     };
     this.dateCreated = null;
   }
   setDateEdited(id) {
     console.log(id);
-    this.setState({
-      dateEdited: id,
-    });
+    this.setState(
+      {
+        saving: true,
+      },
+      () => {
+        setTimeout(() => {
+          this.setState({
+            dateEdited: id,
+            saving: false,
+          });
+        }, 500);
+      },
+    );
   }
   setDateCreated(dateCreated) {
     this.dateCreated = dateCreated;
@@ -50,16 +61,31 @@ export default class InfoBar extends React.Component {
           {timeConverter(this.state.dateEdited)}
         </Text>
 
-        <Text
+        <View
           style={{
-            color: this.props.colors.icon,
-            fontSize: SIZE.xxs,
-            textAlignVertical: 'center',
-            fontFamily: WEIGHT.regular,
-            marginLeft: 10,
+            justifyContent: 'center',
+            alignItems: 'center',
+            flexDirection: 'row',
           }}>
-          {this.state.dateEdited ? 'Saved' : ''}
-        </Text>
+          {this.state.saving ? (
+            <ActivityIndicator
+              style={{width: 16, height: 16, marginLeft: 10}}
+              color="white"
+              size={16}
+            />
+          ) : null}
+          <Text
+            style={{
+              color: this.props.colors.icon,
+              fontSize: SIZE.xxs,
+              textAlignVertical: 'center',
+              fontFamily: WEIGHT.regular,
+              marginLeft: 10,
+            }}>
+            {this.state.saving ? 'Saving' : ''}
+            {this.state.dateEdited && !this.state.saving ? 'Saved' : ''}
+          </Text>
+        </View>
       </View>
     );
   }
