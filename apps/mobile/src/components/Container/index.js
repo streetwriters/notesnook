@@ -27,7 +27,7 @@ const AnimatedTouchableOpacity = Animatable.createAnimatableComponent(
 );
 
 const AnimatedSafeAreaView = Animatable.createAnimatableComponent(SafeAreaView);
-
+let previousOffset = 0;
 export const Container = ({
   children,
   bottomButtonOnPress,
@@ -55,31 +55,21 @@ export const Container = ({
   const [hideHeader, setHideHeader] = useState(false);
   const [buttonHide, setButtonHide] = useState(false);
   const insets = useSafeArea();
-  let offsetY = 0;
-  let countUp = 1;
-  let countDown = 0;
+
   let searchResult = [];
 
-  const onScroll = y => {
+  const onScroll = currentOffset => {
     if (searchResults.length > 0) return;
-    if (y < 30) {
-      countUp = 1;
-      countDown = 0;
-      setHideHeader(false);
-    }
 
-    if (y > offsetY) {
-      if (y - offsetY < 150 || countDown > 0) return;
-      countDown = 1;
-      countUp = 0;
+    if (currentOffset > previousOffset) {
+      console.log('call A', currentOffset, previousOffset);
+
       setHideHeader(true);
     } else {
-      if (offsetY - y < 50 || countUp > 0) return;
-      countDown = 0;
-      countUp = 1;
+      console.log('call B', currentOffset, previousOffset);
       setHideHeader(false);
     }
-    offsetY = y;
+    previousOffset = currentOffset;
   };
 
   const onChangeText = value => {

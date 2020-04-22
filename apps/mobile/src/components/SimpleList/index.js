@@ -40,7 +40,6 @@ const SimpleList = ({
   const _onScroll = event => {
     if (!event) return;
     let y = event.nativeEvent.contentOffset.y;
-
     eSendEvent(eScrollEvent, y);
   };
 
