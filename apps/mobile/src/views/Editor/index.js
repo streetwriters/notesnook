@@ -38,7 +38,9 @@ import {
 import {exitEditorAnimation} from '../../utils/animations';
 import {sideMenuRef} from '../../utils/refs';
 import {db, DDS, editing, timeConverter, ToastEvent} from '../../utils/utils';
+import InfoBar from './InfoBar';
 
+const InfoBarRef = createRef();
 const EditorWebView = createRef();
 let note = {};
 let id = null;
@@ -291,6 +293,7 @@ const Editor = ({noMenu}) => {
           type: ACTIONS.CURRENT_EDITING_NOTE,
           id: id,
         });
+        setDateEdited(db.notes.note(id).data.dateEdited);
       }
 
       if (content.text.length < 200 || saveCounter < 2) {
@@ -299,9 +302,18 @@ const Editor = ({noMenu}) => {
         });
         eSendEvent(refreshNotesPage);
       }
+
+      InfoBarRef.current?.setDateEdited(db.notes.note(id).data.dateEdited);
+      InfoBarRef.current?.setDateCreated(db.notes.note(id).data.dateCreated);
+
       saveCounter++;
     } else {
       if (id) {
+        dispatch({
+          type: ACTIONS.CURRENT_EDITING_NOTE,
+          id: id,
+        });
+
         await db.vault.save({
           title,
           content: {
@@ -311,6 +323,8 @@ const Editor = ({noMenu}) => {
           id: id,
         });
       }
+      InfoBarRef.current?.setDateEdited(db.notes.note(id).data.dateEdited);
+      InfoBarRef.current?.setDateCreated(db.notes.note(id).data.dateCreated);
     }
   };
 
@@ -580,43 +594,7 @@ const Editor = ({noMenu}) => {
           </TouchableOpacity>
         </View>
 
-        <View
-          style={{
-            paddingHorizontal: 12,
-            marginTop:
-              Platform.OS === 'ios' ? 45 : StatusBar.currentHeight + 45,
-            width: '100%',
-            position: 'absolute',
-            justifyContent: 'flex-start',
-            flexDirection: 'row',
-            alignItems: 'center',
-            paddingLeft: noMenu ? 12 : 12 + 50,
-            zIndex: 999,
-          }}>
-          <Text
-            onPress={() => {
-              simpleDialogEvent(TEMPLATE_INFO(note.dateCreated));
-            }}
-            style={{
-              color: colors.icon,
-              fontSize: SIZE.xxs,
-              textAlignVertical: 'center',
-              fontFamily: WEIGHT.regular,
-            }}>
-            {timeConverter(dateEdited)}
-          </Text>
-
-          <Text
-            style={{
-              color: colors.icon,
-              fontSize: SIZE.xxs,
-              textAlignVertical: 'center',
-              fontFamily: WEIGHT.regular,
-              marginLeft: 10,
-            }}>
-            {dateEdited ? 'Saved' : ''}
-          </Text>
-        </View>
+        <InfoBar ref={InfoBarRef} colors={colors} noMenu={noMenu} />
         <WebView
           ref={EditorWebView}
           onError={error => console.log(error)}
