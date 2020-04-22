@@ -243,24 +243,47 @@ const Editor = ({noMenu}) => {
     }
   };
 
-  const saveNote = async (lockNote = true) => {
-    if (!canSave) return;
-    if (!title && !content) return;
+  const checkIfContentIsSavable = () => {
+    if (!canSave) return false;
+    if (!title && !content) return false;
     if (
       content &&
       content.text.trim().length === 0 &&
       title &&
       title.trim().length == 0
     )
-      return;
-    if (!content && title && title.trim().length === 0) return;
-    if (!title && content && content.text.trim.length === 0) return;
+      return false;
+    if (!content && title && title.trim().length === 0) return false;
+    if (!title && content && content.text.trim.length === 0) return false;
     if (!content) {
       content = {
         text: '',
         delta: {ops: []},
       };
     }
+
+    return true;
+  };
+
+  const setNoteInEditorAferSaving = (id, rId) => {
+    if (id !== rId) {
+      id = rId;
+      note = db.notes.note(id);
+      if (note) {
+        note = note.data;
+      } else {
+        setTimeout(() => {
+          note = db.notes.note(id);
+          if (note) {
+            note = note.data;
+          }
+        }, 500);
+      }
+    }
+  };
+
+  const saveNote = async (lockNote = true) => {
+    if (!checkIfContentIsSavable()) return;
 
     let lockedNote = id ? db.notes.note(id).data.locked : null;
     if (!lockedNote) {
@@ -272,20 +295,7 @@ const Editor = ({noMenu}) => {
         },
         id: id,
       });
-      if (id !== rId) {
-        id = rId;
-        note = db.notes.note(id);
-        if (note) {
-          note = note.data;
-        } else {
-          setTimeout(() => {
-            note = db.notes.note(id);
-            if (note) {
-              note = note.data;
-            }
-          }, 500);
-        }
-      }
+      setNoteInEditorAferSaving(id, rId);
 
       if (id) {
         await addToCollection(id);
@@ -293,7 +303,6 @@ const Editor = ({noMenu}) => {
           type: ACTIONS.CURRENT_EDITING_NOTE,
           id: id,
         });
-        setDateEdited(db.notes.note(id).data.dateEdited);
       }
 
       if (content.text.length < 200 || saveCounter < 2) {
@@ -373,7 +382,8 @@ const Editor = ({noMenu}) => {
   const updateEditor = async () => {
     title = note.title;
     id = note.id;
-    setDateEdited(note.dateEdited);
+    InfoBarRef.current?.setDateEdited(note.dateEdited);
+    InfoBarRef.current?.setDateCreated(note.dateCreated);
     content = {...note.content};
     saveCounter = 0;
 
