@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import "./editor.css";
 import ReactQuill from "./react-quill";
-import { Flex, Box } from "rebass";
+import { Flex } from "rebass";
 import Properties from "../properties";
 import { useStore, SESSION_STATES } from "../../stores/editor-store";
 import { useStore as useAppStore } from "../../stores/app-store";
@@ -10,7 +10,6 @@ import EditorMenu from "./editormenu";
 import Header from "./header";
 
 function Editor() {
-  const id = useStore((store) => store.session.id);
   const delta = useStore((store) => store.session.content.delta);
   const sessionState = useStore((store) => store.session.state);
   const setSession = useStore((store) => store.setSession);
