@@ -30,8 +30,8 @@ class AppStore extends BaseStore {
     this.set((state) => (state.isFocusMode = !state.isFocusMode));
   };
 
-  toggleSideMenu = () => {
-    this.set((state) => (state.isSideMenuOpen = !state.isSideMenuOpen));
+  toggleSideMenu = (toggleState) => {
+    this.set((state) => (state.isSideMenuOpen = toggleState != null ? toggleState : !state.isSideMenuOpen));
   };
 }
 

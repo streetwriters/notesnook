@@ -7,6 +7,7 @@ import { db } from "../common";
 import BaseStore from ".";
 import Vault from "../common/vault.js";
 import EditorNavigator from "../navigation/navigators/editornavigator";
+import { isMobile } from "../utils/dimensions";
 
 const SESSION_STATES = { stale: "stale", new: "new" };
 const DEFAULT_SESSION = {
@@ -32,9 +33,12 @@ const DEFAULT_SESSION = {
 };
 class EditorStore extends BaseStore {
   session = DEFAULT_SESSION;
-  arePropertiesVisible = true;
+  arePropertiesVisible = false;
 
   openLastSession = async () => {
+    // Do not reopen last session on mobile
+    if(isMobile()) return;
+    
     const id = localStorage.getItem("lastOpenedNote");
     if (!id) {
       return EditorNavigator.navigate("editor");

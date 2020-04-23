@@ -23,11 +23,11 @@ export default Route;
 
 function Header(props) {
   const { route, canGoBack, backAction } = props;
-  const { title, titleColor, params, options } = route;
+  const { title, titleColor, params, options, noHeader } = route;
 
   const toggleSideMenu = useStore((store) => store.toggleSideMenu);
 
-  if (!title && !params.title) return null;
+  if ((!title && !params.title) || noHeader) return null;
   return (
     <>
       <Flex alignItems="center" justifyContent="space-between">
@@ -37,16 +37,15 @@ function Header(props) {
               <Icon.ChevronLeft size={38} color="fontPrimary" />
             </Box>
           )}
-          <Box
+          <Icon.Menu
             onClick={toggleSideMenu}
-            height={38}
-            ml={-5}
             sx={{
+              ml: 0,
+              mr: 4,
               display: ["block", "none", "none"],
             }}
-          >
-            <Icon.Menu size={38} />
-          </Box>
+            size={28}
+          />
           <Heading fontSize="heading" color={titleColor || "text"}>
             {title || params.title}
           </Heading>

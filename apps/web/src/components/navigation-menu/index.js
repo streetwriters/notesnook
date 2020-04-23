@@ -1,5 +1,6 @@
 import React from "react";
-import { Box } from "rebass";
+import ReactDOM from "react-dom";
+import { Flex } from "rebass";
 import RootNavigator, {
   bottomRoutes,
   routes,
@@ -13,6 +14,7 @@ import { useStore as useAppStore } from "../../stores/app-store";
 import Animated from "../animated";
 import NavItem from "../navitem";
 import { objectMap } from "../../utils/object";
+import { isMobile } from "../../utils/dimensions";
 
 function NavigationMenu(props) {
   const { toggleNavigationContainer } = props;
@@ -20,15 +22,18 @@ function NavigationMenu(props) {
   const isFocusMode = useAppStore((store) => store.isFocusMode);
   const colors = useStore((store) => store.colors);
   const isSideMenuOpen = useStore((store) => store.isSideMenuOpen);
+  const toggleSideMenu = useStore((store) => store.toggleSideMenu);
 
   return (
     <Animated.Flex
       flexDirection="column"
       justifyContent="space-between"
-      initial={{ opacity: 1 }}
+      initial={{ opacity: 1, x: isMobile() ? -500 : 0 }}
       animate={{
         opacity: isFocusMode ? 0 : 1,
         visibility: isFocusMode ? "hidden" : "visible",
+        x: isMobile() ? (isSideMenuOpen ? 0 : -500) : 0,
+        zIndex: isSideMenuOpen ? 999 : 1,
       }}
       transition={{ duration: 0.3, ease: "easeOut" }}
       sx={{
@@ -36,13 +41,28 @@ function NavigationMenu(props) {
         borderRightColor: "border",
         minWidth: ["85%", 50, 50],
         maxWidth: ["85%", 50, 50],
-        display: [isSideMenuOpen ? "flex" : "none", "flex", "flex"],
+        height: ["100%", "auto", "auto"],
         position: ["absolute", "relative", "relative"],
       }}
       bg={"background"}
       px={0}
     >
-      <Box
+      {isSideMenuOpen &&
+        ReactDOM.createPortal(
+          <Flex
+            sx={{
+              position: "absolute",
+              height: "100%",
+              width: "100%",
+              zIndex: 998,
+            }}
+            bg="overlay"
+            onClick={() => toggleSideMenu()}
+          />,
+          document.getElementById("app")
+        )}
+      <Flex
+        flexDirection="column"
         sx={{
           overflow: "scroll",
           scrollbarWidth: "none",
@@ -85,8 +105,8 @@ function NavigationMenu(props) {
             />
           );
         })}
-      </Box>
-      <Box>
+      </Flex>
+      <Flex flexDirection="column">
         {Object.values(bottomRoutes).map((item) => (
           <NavItem
             onSelected={async () => {
@@ -100,7 +120,7 @@ function NavigationMenu(props) {
             selected={selectedRoute === item.key}
           />
         ))}
-      </Box>
+      </Flex>
     </Animated.Flex>
   );
 }

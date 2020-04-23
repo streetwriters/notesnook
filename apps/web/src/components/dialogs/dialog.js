@@ -4,6 +4,7 @@ import { Flex, Text, Button as RebassButton } from "rebass";
 import ThemeProvider from "../theme-provider";
 import * as Icon from "../icons";
 import Modal from "react-modal";
+import { isMobile } from "../../utils/dimensions";
 
 function Dialog(props) {
   return (
@@ -26,7 +27,7 @@ function Dialog(props) {
               backgroundColor: theme.colors.background,
               color: theme.colors.text,
               //boxShadow: theme.shadows["3"],
-              width: "25%",
+              width: isMobile() ? "80%" : "25%",
               paddingRight: 20,
               paddingLeft: 20,
               overflowY: "hidden",

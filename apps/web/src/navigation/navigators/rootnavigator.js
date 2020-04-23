@@ -16,13 +16,16 @@ import { NotebookNavigator, TagNavigator, SettingsNavigator } from "./index";
 
 export const bottomRoutes = {
   ...createDeadRoute("nightmode", Icon.Theme, {
+    title: "Night mode",
     onClick: () => themeStore.toggleNightMode(),
   }),
   ...createDeadRoute("sync", Icon.Sync, {
+    title: "Sync",
     onClick: async () => userStore.sync(),
     animatable: true,
   }),
   ...createNormalRoute("account", Account, Icon.User, {
+    title: "Account",
     onClick: async () => {
       if (!userStore.get().isLoggedIn) {
         await showLogInDialog();
@@ -30,7 +33,7 @@ export const bottomRoutes = {
       } else return RootNavigator.navigate("account");
     },
   }),
-  ...createNavigatorRoute("settings", Icon.Settings, SettingsNavigator),
+  ...createNavigatorRoute("settings", Icon.Settings, "Settings", SettingsNavigator),
 };
 
 export const routes = {
@@ -38,7 +41,7 @@ export const routes = {
     title: "Home",
     options: SelectionModeOptions.NotesOptions,
   }),
-  ...createNavigatorRoute("notebooks", Icon.Notebook, NotebookNavigator),
+  ...createNavigatorRoute("notebooks", Icon.Notebook, "Notebooks", NotebookNavigator),
   ...createRoute(
     "favorites",
     Notes,
@@ -55,7 +58,7 @@ export const routes = {
     title: "Trash",
     options: SelectionModeOptions.TrashOptions,
   }),
-  ...createNavigatorRoute("tags", Icon.Tag, TagNavigator),
+  ...createNavigatorRoute("tags", Icon.Tag, "Tags", TagNavigator),
 };
 
 const invisibleRoutes = {

@@ -56,7 +56,6 @@ function Properties() {
           style={{
             position: "absolute",
             right: 0,
-            width: 300,
             height: "100%",
           }}
           onBlur={() => toggleProperties()}
@@ -65,8 +64,8 @@ function Properties() {
             sx={{
               overflowY: "auto",
               overflowX: "hidden",
-              width: [0, 0, "100%"],
               height: "100%",
+              width: "300px",
               borderLeft: "1px solid",
               borderLeftColor: "border",
             }}

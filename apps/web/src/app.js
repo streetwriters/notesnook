@@ -11,6 +11,7 @@ import Animated from "./components/animated";
 import NavigationMenu from "./components/navigationmenu";
 import NavigationContainer from "./navigation/container";
 import RootNavigator from "./navigation/navigators/rootnavigator";
+import EditorNavigator from "./navigation/navigators/editornavigator";
 
 function App() {
   const [show, setShow] = usePersistentState("isContainerVisible", true);
@@ -37,9 +38,16 @@ function App() {
     openLastSession();
   }, [openLastSession]);
 
+  useEffect(() => {
+    EditorNavigator.onNavigate = (route) => {
+      setShow(!!!route);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[]);
+
   return (
     <ThemeProvider>
-      <Flex bg="background" height="100%">
+      <Flex id="app" bg="background" height="100%">
         <NavigationMenu toggleNavigationContainer={() => setShow(!show)} />
         <Flex variant="rowFill">
           <Animated.Flex
@@ -62,7 +70,7 @@ function App() {
               variant="columnFill"
             />
           </Animated.Flex>
-          <Flex width="100%" className="EditorNavigator" />
+          <Flex width={[show ? 0 : "100%", 0, "100%"]} className="EditorNavigator" />
         </Flex>
         <Box id="dialogContainer" />
         <Box id="snackbarContainer" />

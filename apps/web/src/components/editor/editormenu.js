@@ -10,6 +10,8 @@ function EditorMenu(props) {
   return (
     <Flex
       sx={{
+        height: [0,"100%", "100%"],
+        visibility: ["collapse", "visible", "visible"],
         borderBottom: "1px solid",
         borderColor: "border",
         fontSize: 13

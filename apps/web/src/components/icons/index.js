@@ -52,7 +52,7 @@ export const Check = createIcon(Icons.mdiCheckCircleOutline);
 export const MoreVertical = createIcon(Icons.mdiDotsVertical);
 export const Trash = createIcon(Icons.mdiTrashCanOutline);
 export const Search = createIcon(Icons.mdiMagnify);
-export const Menu = createIcon(Icons.mdiHamburger);
+export const Menu = createIcon(Icons.mdiMenu);
 export const Login = createIcon(Icons.mdiLogin);
 export const FocusMode = createIcon(Icons.mdiFullscreen);
 export const NormalMode = createIcon(Icons.mdiFullscreenExit);
@@ -75,3 +75,4 @@ export const Theme = createIcon(Icons.mdiThemeLightDark);
 export const Checkmark = createIcon(Icons.mdiCheck);
 
 export const Properties = createIcon(Icons.mdiDotsHorizontal);
+

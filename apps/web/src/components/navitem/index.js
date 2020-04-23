@@ -18,15 +18,21 @@ function NavItem(props) {
       <Flex
         justifyContent={["flex-start", "center", "center"]}
         alignItems="center"
-        ml={[2, 0, 0]}
+        ml={[1, 0, 0]}
         sx={{ position: "relative" }}
       >
         <Icon
           size={18}
+          sx={{ mr: [1, 0, 0] }}
           color={props.selected ? "primary" : color || "icon"}
           rotate={isLoading}
         />
-        <Text variant="body" display={["flex", "none", "none"]} ml={1}>
+        <Text
+          variant="body"
+          display={["flex", "none", "none"]}
+          color={props.selected ? "primary" : "text"}
+          ml={1}
+        >
           {title}
         </Text>
         <Text sx={{ position: "absolute", top: -2, right: 0 }} fontSize={9}>

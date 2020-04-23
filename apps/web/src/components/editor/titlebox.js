@@ -25,7 +25,6 @@ class TitleBox extends React.Component {
         fontWeight="heading"
         fontSize="heading"
         color="text"
-        display={["none", "flex", "flex"]}
         px={2}
         sx={{
           borderWidth: 0,

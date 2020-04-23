@@ -7,6 +7,7 @@ import TitleBox from "./title-box";
 import { useStore, SESSION_STATES } from "../../stores/editor-store";
 import { timeConverter } from "../../utils/time";
 import { countWords } from "../../utils/string";
+import EditorNavigator from "../../navigation/navigators/editornavigator";
 
 const TextSeperator = () => {
   return (
@@ -31,6 +32,11 @@ function Header() {
   return (
     <Flex>
       <Flex flex="1 1 auto" flexDirection="column">
+        <Flex justifyContent="center" alignItems="center" 
+          sx={{
+            paddingTop: [1,2,2],
+          }}>
+        <Icon.ChevronLeft size={30} onClick={() => EditorNavigator.navigate(null)}/>
         <TitleBox
           shouldFocus={sessionState === SESSION_STATES.new}
           title={title}
@@ -39,11 +45,8 @@ function Header() {
               state.session.title = title;
             })
           }
-          sx={{
-            paddingTop: 2,
-            paddingBottom: 0,
-          }}
         />
+        </Flex>
         <Text
           fontSize={"subBody"}
           mx={2}
@@ -51,8 +54,8 @@ function Header() {
           sx={{
             display: "flex",
             alignItems: "center",
-            marginTop: dateEdited || text.length || id.length ? 0 : 2,
-            marginBottom: dateEdited || text.length || id.length ? 2 : 0,
+            marginTop: dateEdited || text.length || id.length ? 0 : [0,2,2],
+            marginBottom: dateEdited || text.length || id.length ? [1,2,2] : 0,
           }}
         >
           {dateEdited > 0 ? (
@@ -71,6 +74,9 @@ function Header() {
         </Text>
       </Flex>
       <Flex
+        sx={{
+          visibility: ["collapse", "visible", "visible"]
+        }}
         alignItems="center"
         pr={3}
         onClick={() => {
