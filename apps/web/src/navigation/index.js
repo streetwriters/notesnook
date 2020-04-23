@@ -13,6 +13,7 @@ class Navigator {
     this.options = options;
     this.history = [];
     this.lastRoute = undefined;
+    this.onNavigate = () => {};
   }
 
   onLoad = () => {
@@ -46,6 +47,8 @@ class Navigator {
 
   navigate(routeName, params = {}, force = false) {
     let route = this.getRoute(routeName);
+    
+    this.onNavigate(route);
 
     if (!force && (!route || this.lastRoute === route)) {
       return false;

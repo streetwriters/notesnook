@@ -49,7 +49,7 @@ function Editor() {
         }}
       >
         <Header />
-        <Box id="toolbar" display={["none", "flex", "flex"]} />
+        <Flex id="toolbar" />
         <EditorMenu quill={quillRef.current && quillRef.current.quill} />
         <ReactQuill
           id="quill"
@@ -71,7 +71,7 @@ function Editor() {
           }}
         />
       </Flex>
-      {id ? <Properties /> : null}
+     <Properties />
     </Animated.Flex>
   );
 }

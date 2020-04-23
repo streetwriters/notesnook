@@ -75,3 +75,4 @@ export const Theme = createIcon(Icons.mdiThemeLightDark);
 export const Checkmark = createIcon(Icons.mdiCheck);
 
 export const Properties = createIcon(Icons.mdiDotsHorizontal);
+

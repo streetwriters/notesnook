@@ -33,7 +33,7 @@ const DEFAULT_SESSION = {
 };
 class EditorStore extends BaseStore {
   session = DEFAULT_SESSION;
-  arePropertiesVisible = true;
+  arePropertiesVisible = false;
 
   openLastSession = async () => {
     // Do not reopen last session on mobile
