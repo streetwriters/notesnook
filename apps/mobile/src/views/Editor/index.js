@@ -392,7 +392,8 @@ const Editor = ({noMenu}) => {
     content = {...note.content};
     saveCounter = 0;
     InfoBarRef.current?.setDateCreated(note.dateCreated);
-    let text = await db.notes.note(id).text();
+    content.text = await db.notes.note(id).text();
+
     InfoBarRef.current?.setDateEdited(note.dateEdited, text.split(' ').length);
 
     if (title !== null || title === '') {
@@ -411,23 +412,22 @@ const Editor = ({noMenu}) => {
         type: 'focusTitle',
       });
     }
-    if (note.content.text === '' && note.content.delta === null) {
+    if (content.text === '' && note.content.delta === null) {
       post({
         type: 'clearEditor',
       });
     } else if (note.content.delta) {
-      let delta;
       if (typeof note.content.delta !== 'string') {
-        delta = note.content.delta;
+        content.delta = note.content.delta;
       } else {
-        delta = await db.notes.note(id).delta();
+        content.delta = await db.notes.note(id).delta();
       }
       post({
         type: 'delta',
-        value: delta,
+        value: content.delta,
       });
     } else {
-      post({type: 'text', value: note.content.text});
+      post({type: 'text', value: content.text});
     }
   };
 
