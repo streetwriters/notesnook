@@ -312,7 +312,10 @@ const Editor = ({noMenu}) => {
         eSendEvent(refreshNotesPage);
       }
 
-      InfoBarRef.current?.setDateEdited(db.notes.note(id).data.dateEdited);
+      InfoBarRef.current?.setDateEdited(
+        db.notes.note(id).data.dateEdited,
+        content?.text?.split(' ').length,
+      );
       InfoBarRef.current?.setDateCreated(db.notes.note(id).data.dateCreated);
 
       saveCounter++;
@@ -332,7 +335,10 @@ const Editor = ({noMenu}) => {
           id: id,
         });
       }
-      InfoBarRef.current?.setDateEdited(db.notes.note(id).data.dateEdited);
+      InfoBarRef.current?.setDateEdited(
+        db.notes.note(id).data.dateEdited,
+        content?.text?.split(' ').length,
+      );
       InfoBarRef.current?.setDateCreated(db.notes.note(id).data.dateCreated);
     }
   };
@@ -382,10 +388,12 @@ const Editor = ({noMenu}) => {
   const updateEditor = async () => {
     title = note.title;
     id = note.id;
-    InfoBarRef.current?.setDateEdited(note.dateEdited);
-    InfoBarRef.current?.setDateCreated(note.dateCreated);
+
     content = {...note.content};
     saveCounter = 0;
+    InfoBarRef.current?.setDateCreated(note.dateCreated);
+    let text = await db.notes.note(id).text();
+    InfoBarRef.current?.setDateEdited(note.dateEdited, text.split(' ').length);
 
     if (title !== null || title === '') {
       post({

@@ -11,14 +11,15 @@ export default class InfoBar extends React.Component {
     this.state = {
       dateEdited: null,
       saving: false,
+      length: 0,
     };
     this.dateCreated = null;
   }
-  setDateEdited(id) {
-    console.log(id);
+  setDateEdited(id, length) {
     this.setState(
       {
         saving: true,
+        length: length,
       },
       () => {
         setTimeout(() => {
@@ -48,18 +49,33 @@ export default class InfoBar extends React.Component {
           paddingLeft: this.props.noMenu ? 12 : 12 + 50,
           zIndex: 999,
         }}>
-        <Text
-          onPress={() => {
-            simpleDialogEvent(TEMPLATE_INFO(this.dateCreated));
-          }}
-          style={{
-            color: this.props.colors.icon,
-            fontSize: SIZE.xxs,
-            textAlignVertical: 'center',
-            fontFamily: WEIGHT.regular,
-          }}>
-          {timeConverter(this.state.dateEdited)}
-        </Text>
+        {this.state.length ? (
+          <Text
+            style={{
+              color: this.props.colors.icon,
+              fontSize: SIZE.xxs,
+              textAlignVertical: 'center',
+              fontFamily: WEIGHT.regular,
+              marginRight: 5,
+            }}>
+            {this.state.length + ' words •'}
+          </Text>
+        ) : null}
+
+        {this.state.dateEdited ? (
+          <Text
+            onPress={() => {
+              simpleDialogEvent(TEMPLATE_INFO(this.dateCreated));
+            }}
+            style={{
+              color: this.props.colors.icon,
+              fontSize: SIZE.xxs,
+              textAlignVertical: 'center',
+              fontFamily: WEIGHT.regular,
+            }}>
+            {timeConverter(this.state.dateEdited)} •
+          </Text>
+        ) : null}
 
         <View
           style={{
@@ -69,9 +85,9 @@ export default class InfoBar extends React.Component {
           }}>
           {this.state.saving ? (
             <ActivityIndicator
-              style={{width: 16, height: 16, marginLeft: 10}}
+              style={{width: 14, height: 14, marginLeft: 10}}
               color="white"
-              size={16}
+              size={14}
             />
           ) : null}
           <Text

@@ -100,7 +100,7 @@ const SimpleList = ({
             color: colors.accent,
             fontSize: SIZE.xs,
           }}>
-          Search Results for {searchResults.keyword}
+          Showing Results for {searchResults.keyword}
         </Text>
         <Text
           onPress={() => {
