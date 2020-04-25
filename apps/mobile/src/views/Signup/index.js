@@ -6,6 +6,7 @@ import {
   View,
   Modal,
   Clipboard,
+  ActivityIndicator,
 } from 'react-native';
 import {TextInput} from 'react-native-gesture-handler';
 import QRCode from 'react-native-qrcode-generator';
@@ -75,7 +76,7 @@ export const Signup = ({navigation}) => {
       try {
         user = await db.user.user.get();
         let k = await db.user.key();
-        setKey(k);
+        setKey(k.key);
         dispatch({type: ACTIONS.USER, user: user});
 
         setTimeout(() => {
@@ -102,7 +103,7 @@ export const Signup = ({navigation}) => {
       <Modal
         animated={true}
         animationType="fade"
-        visible={!modalVisible}
+        visible={modalVisible}
         transparent={true}>
         <View
           style={{
@@ -166,7 +167,7 @@ export const Signup = ({navigation}) => {
             <TouchableOpacity
               activeOpacity={0.6}
               onPress={() => {
-                Clipboard.setString('string');
+                Clipboard.setString(key);
                 ToastEvent.show('Recovery key copied!', 'success', 'local');
               }}
               style={{

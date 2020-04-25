@@ -1,22 +1,28 @@
-import React, { createRef, useEffect, useState } from 'react';
-import { ActivityIndicator, BackHandler, SafeAreaView, Text, TouchableOpacity, View } from 'react-native';
+import React, {createRef, useEffect, useState} from 'react';
+import {
+  ActivityIndicator,
+  BackHandler,
+  SafeAreaView,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import { TextInput } from 'react-native-gesture-handler';
+import {TextInput} from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useIsFocused } from 'react-navigation-hooks';
-import { opacity, pv, SIZE, WEIGHT } from '../../common/common';
-import { Header } from '../../components/header';
-import { useTracked } from '../../provider';
-import { ACTIONS } from '../../provider/actions';
-import { eSendEvent } from '../../services/eventManager';
-import { eCloseSideMenu, refreshNotesPage } from '../../services/events';
-import { validatePass, validateUsername } from '../../services/validation';
-import { db, DDS, ToastEvent } from '../../utils/utils';
+import {useIsFocused} from 'react-navigation-hooks';
+import {opacity, pv, SIZE, WEIGHT} from '../../common/common';
+import {Header} from '../../components/header';
+import {useTracked} from '../../provider';
+import {ACTIONS} from '../../provider/actions';
+import {eSendEvent} from '../../services/eventManager';
+import {eCloseSideMenu, refreshNotesPage} from '../../services/events';
+import {validatePass, validateUsername} from '../../services/validation';
+import {db, DDS, ToastEvent} from '../../utils/utils';
 
-
-export const Login = ({ navigation }) => {
+export const Login = ({navigation}) => {
   const [state, dispatch] = useTracked();
-  const { colors, isLoginNavigator } = state;
+  const {colors, isLoginNavigator} = state;
   const _email = createRef();
   const _pass = createRef();
   const [status, setStatus] = useState('Logging in...');
@@ -71,11 +77,8 @@ export const Login = ({ navigation }) => {
       try {
         console.log('here reacched');
         await db.user.login(username, password);
-
       } catch (e) {
-
         console.log(e, 'ERROR');
-
         setTimeout(() => {
           ToastEvent.show(e.message, 'error');
           setLoggingIn(false);
@@ -88,12 +91,12 @@ export const Login = ({ navigation }) => {
       try {
         user = await db.user.get();
         console.log('user', user);
-        dispatch({ type: ACTIONS.USER, user: user });
+        dispatch({type: ACTIONS.USER, user: user});
         ToastEvent.show(`Logged in as ${username}`, 'success');
         navigation.goBack();
         await db.sync();
         eSendEvent(refreshNotesPage);
-        dispatch({ type: ACTIONS.ALL });
+        dispatch({type: ACTIONS.ALL});
       } catch (e) {
         console.log(e, 'getUSer');
         ToastEvent.show(e.message, 'error');

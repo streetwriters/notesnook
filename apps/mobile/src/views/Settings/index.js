@@ -62,7 +62,7 @@ export const Settings = ({navigation}) => {
       noBottomButton={true}>
       <View
         style={{
-          marginTop: Platform.OS == 'ios' ? 135 - 60 : 155 - 60,
+          marginTop: Platform.OS == 'ios' ? 125 - 60 : 125 - 60,
         }}
       />
 
@@ -130,7 +130,7 @@ export const Settings = ({navigation}) => {
             <TouchableOpacity
               activeOpacity={0.6}
               onPress={() => {
-                Clipboard.setString('string');
+                Clipboard.setString(key);
                 ToastEvent.show('Recovery key copied!', 'success', 'local');
               }}
               style={{
@@ -209,7 +209,6 @@ export const Settings = ({navigation}) => {
                 fontFamily: WEIGHT.bold,
                 textAlignVertical: 'center',
                 color: colors.accent,
-
                 borderBottomColor: colors.nav,
                 borderBottomWidth: 0.5,
                 paddingBottom: 3,
@@ -240,6 +239,7 @@ export const Settings = ({navigation}) => {
                 backgroundColor: colors.accent,
                 borderRadius: 5,
                 padding: 5,
+                paddingHorizontal: 12,
               }}>
               <View
                 style={{
@@ -282,7 +282,14 @@ export const Settings = ({navigation}) => {
                 name: 'Backup my notes',
                 func: () => {},
               },
-
+              {
+                name: 'Data recovery key',
+                func: async () => {
+                  let k = await db.user.key();
+                  setKey(k.key);
+                  setModalVisible(true);
+                },
+              },
               {
                 name: 'My vault',
                 func: () => {},
