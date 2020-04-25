@@ -5,7 +5,7 @@ import SelectionHeader from '../../components/SelectionHeader';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
-import {DDS} from '../../utils/utils';
+import {DDS, ToastEvent} from '../../utils/utils';
 import {eScrollEvent, eOnLoadNote} from '../../services/events';
 import {openEditorAnimation} from '../../utils/animations';
 import {sideMenuRef} from '../../utils/refs';

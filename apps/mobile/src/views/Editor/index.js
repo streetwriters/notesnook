@@ -388,13 +388,14 @@ const Editor = ({noMenu}) => {
   const updateEditor = async () => {
     title = note.title;
     id = note.id;
-
-    content = {...note.content};
     saveCounter = 0;
     InfoBarRef.current?.setDateCreated(note.dateCreated);
     content.text = await db.notes.note(id).text();
 
-    InfoBarRef.current?.setDateEdited(note.dateEdited, text.split(' ').length);
+    InfoBarRef.current?.setDateEdited(
+      note.dateEdited,
+      content.text.split(' ').length,
+    );
 
     if (title !== null || title === '') {
       post({
