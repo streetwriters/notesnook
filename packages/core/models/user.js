@@ -97,9 +97,9 @@ async function authRequest(endpoint, data) {
 
   if (response.ok) {
     let result = await response.json();
-    /* TODO if (result.error) {
+    if (result.error) {
       throw new Error(result.error);
-    } */
+    }
     return result;
   }
 
