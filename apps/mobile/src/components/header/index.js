@@ -1,12 +1,19 @@
 import React, {createRef} from 'react';
-import {Platform, StatusBar, Text, TouchableOpacity, View} from 'react-native';
+import {
+  Platform,
+  StatusBar,
+  Text,
+  TouchableOpacity,
+  View,
+  ActivityIndicator,
+} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import {SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
 import {eSendEvent} from '../../services/eventManager';
 import {eCloseLoginDialog} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
-import {DDS} from '../../utils/utils';
+import {DDS, w} from '../../utils/utils';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Menu, {MenuItem, MenuDivider} from 'react-native-material-menu';
 import {ACTIONS} from '../../provider/actions';
@@ -27,7 +34,7 @@ export const Header = ({
   headerColor,
 }) => {
   const [state, dispatch] = useTracked();
-  const {colors} = state;
+  const {colors, syncing} = state;
   const insets = useSafeArea();
 
   return (
@@ -48,6 +55,34 @@ export const Header = ({
         paddingHorizontal: 12,
         width: '100%',
       }}>
+      <Animatable.View
+        transition={['opacity']}
+        duration={300}
+        style={{
+          width: 40,
+          height: 40,
+          position: 'absolute',
+          left: w / 2 - 20,
+          top: -20,
+          opacity: syncing ? 1 : 0,
+          alignSelf: 'center',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 999,
+        }}>
+        <View
+          style={{
+            backgroundColor: colors.bg,
+            width: 40,
+            height: 20,
+            position: 'absolute',
+            zIndex: 10,
+            top: 0,
+          }}
+        />
+        <ActivityIndicator size={25} color={colors.accent} />
+      </Animatable.View>
+
       <View
         style={{
           flexDirection: 'row',
@@ -150,6 +185,7 @@ export const Header = ({
             <Icon name={'magnify'} size={SIZE.xl} color={colors.icon} />
           </TouchableOpacity>
         </Animatable.View>
+
         {verticalMenu ? (
           <Menu
             ref={menuRef}

@@ -23,6 +23,12 @@ export const reducer = (state, action) => {
         colorNotes: db.colors.all,
       };
     }
+    case ACTIONS.SYNCING: {
+      return {
+        ...state,
+        syncing: action.syncing,
+      };
+    }
     case ACTIONS.CLEAR_ALL: {
       storage.clear();
       return {
