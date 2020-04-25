@@ -53,6 +53,10 @@ export default class ActionSheet extends Component {
     this.isRecoiling = false;
   }
 
+  /**
+   * Open/Close the ActionSheet
+   */
+
   waitAsync = ms =>
     new Promise((resolve, reject) => {
       setTimeout(() => {
@@ -63,10 +67,16 @@ export default class ActionSheet extends Component {
   /**
    * Open/Close the ActionSheet
    */
-
-  _setModalVisible = () => {
+  _setModalVisible = visible => {
     deviceHeight = Dimensions.get('window').height;
-    if (!this.state.modalVisible) {
+    let modalVisible = this.state.modalVisible;
+    if (visible !== undefined) {
+      if (modalVisible === visible) {
+        return;
+      }
+      modalVisible = !visible;
+    }
+    if (!modalVisible) {
       this.setState({
         modalVisible: true,
         scrollable: this.props.gestureEnabled,
@@ -81,11 +91,19 @@ export default class ActionSheet extends Component {
     if (this.isClosing) return;
     this.isClosing = true;
 
-    Animated.timing(this.transformValue, {
-      toValue: this.customComponentHeight * 2,
-      duration: animated ? closeAnimationDuration : 1,
-      useNativeDriver: true,
-    }).start(() => {
+    Animated.parallel([
+      Animated.timing(this.opacityValue, {
+        toValue: 0,
+        duration: animated ? closeAnimationDuration : 1,
+        useNativeDriver: true,
+      }),
+      Animated.timing(this.transformValue, {
+        toValue: this.customComponentHeight * 2,
+        duration: animated ? closeAnimationDuration : 1,
+        useNativeDriver: true,
+      }),
+    ]).start();
+    this.waitAsync(closeAnimationDuration / 2).then(() => {
       this.scrollViewRef.current?.scrollTo({
         x: 0,
         y: 0,
@@ -115,6 +133,8 @@ export default class ActionSheet extends Component {
       footerAlwaysVisible,
       extraScroll,
       openAnimationSpeed,
+      delayActionSheetDraw,
+      delayActionSheetDrawTime,
     } = this.props;
 
     let addFactor = deviceHeight * 0.1;
@@ -152,22 +172,45 @@ export default class ActionSheet extends Component {
           extraScroll
         : this.customComponentHeight + addFactor + extraScroll;
 
-      await this.waitAsync(50);
+      if (Platform.OS === 'ios') {
+        await this.waitAsync(delayActionSheetDrawTime);
+      } else {
+        if (delayActionSheetDraw) {
+          await this.waitAsync(delayActionSheetDrawTime);
+        }
+      }
+
       this.scrollViewRef.current.scrollTo({
         x: 0,
         y: scrollOffset,
         animated: false,
       });
-      await this.waitAsync(20);
+
+      if (Platform.OS === 'ios') {
+        await this.waitAsync(delayActionSheetDrawTime / 2);
+      } else {
+        if (delayActionSheetDraw) {
+          await this.waitAsync(delayActionSheetDrawTime / 2);
+        }
+      }
+
       if (animated) {
         this.transformValue.setValue(scrollOffset);
+        Animated.parallel([
+          Animated.spring(this.transformValue, {
+            toValue: 0,
+            bounciness: bounceOnOpen ? bounciness : 1,
+            speed: openAnimationSpeed,
+            useNativeDriver: true,
+          }),
+          Animated.timing(this.opacityValue, {
+            toValue: 1,
+            duration: 150,
+            useNativeDriver: true,
+          }),
+        ]).start();
+      } else {
         this.opacityValue.setValue(1);
-        Animated.spring(this.transformValue, {
-          toValue: 0,
-          bounciness: bounceOnOpen ? bounciness : 1,
-          speed: openAnimationSpeed,
-          useNativeDriver: true,
-        }).start();
       }
 
       if (!gestureEnabled) {
@@ -293,13 +336,18 @@ export default class ActionSheet extends Component {
     return (
       <Modal
         visible={modalVisible}
-        animated={true}
-        animationType="fade"
+        animationType="none"
         supportedOrientations={SUPPORTED_ORIENTATIONS}
         onShow={() => onOpen}
         onRequestClose={this._onRequestClose}
         transparent={true}>
-        <Animated.View style={styles.parentContainer}>
+        <Animated.View
+          style={[
+            styles.parentContainer,
+            {
+              opacity: this.opacityValue,
+            },
+          ]}>
           <KeyboardAvoidingView
             style={{
               width: '100%',
@@ -418,6 +466,8 @@ ActionSheet.defaultProps = {
   bounciness: 8,
   extraScroll: 0,
   closeAnimationDuration: 300,
+  delayActionSheetDraw: false,
+  delayActionSheetDrawTime: 50,
   openAnimationSpeed: 12,
   springOffset: 50,
   elevation: 5,
@@ -441,6 +491,8 @@ ActionSheet.propTypes = {
   footerHeight: PropTypes.number,
   animated: PropTypes.bool,
   closeOnPressBack: PropTypes.bool,
+  delayActionSheetDraw: PropTypes.bool,
+  delayActionSheetDrawTime: PropTypes.number,
   gestureEnabled: PropTypes.bool,
   closeOnTouchBackdrop: PropTypes.bool,
   bounceOnOpen: PropTypes.bool,
