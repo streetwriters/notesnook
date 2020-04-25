@@ -32,20 +32,29 @@ function Header() {
   return (
     <Flex>
       <Flex flex="1 1 auto" flexDirection="column">
-        <Flex justifyContent="center" alignItems="center" 
+        <Flex
+          justifyContent="center"
+          alignItems="center"
           sx={{
-            paddingTop: [1,2,2],
-          }}>
-        <Icon.ChevronLeft size={30} onClick={() => EditorNavigator.navigate(null)}/>
-        <TitleBox
-          shouldFocus={sessionState === SESSION_STATES.new}
-          title={title}
-          setTitle={(title) =>
-            setSession((state) => {
-              state.session.title = title;
-            })
-          }
-        />
+            paddingTop: [1, 2, 2],
+          }}
+        >
+          <Icon.ChevronLeft
+            sx={{
+              display: ["block", "none", "none"],
+            }}
+            size={30}
+            onClick={() => EditorNavigator.navigate(null)}
+          />
+          <TitleBox
+            shouldFocus={sessionState === SESSION_STATES.new}
+            title={title}
+            setTitle={(title) =>
+              setSession((state) => {
+                state.session.title = title;
+              })
+            }
+          />
         </Flex>
         <Text
           fontSize={"subBody"}
@@ -54,8 +63,9 @@ function Header() {
           sx={{
             display: "flex",
             alignItems: "center",
-            marginTop: dateEdited || text.length || id.length ? 0 : [0,2,2],
-            marginBottom: dateEdited || text.length || id.length ? [1,2,2] : 0,
+            marginTop: dateEdited || text.length || id.length ? 0 : [0, 2, 2],
+            marginBottom:
+              dateEdited || text.length || id.length ? [1, 2, 2] : 0,
           }}
         >
           {dateEdited > 0 ? (
@@ -75,7 +85,7 @@ function Header() {
       </Flex>
       <Flex
         sx={{
-          visibility: ["collapse", "visible", "visible"]
+          visibility: ["collapse", "visible", "visible"],
         }}
         alignItems="center"
         pr={3}

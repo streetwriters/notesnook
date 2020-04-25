@@ -3,18 +3,18 @@ import { useStore } from "../../stores/editor-store";
 import { Flex, Button } from "rebass";
 
 function EditorMenu(props) {
-  const saveSession = useStore(store => store.saveSession);
-  const newSession = useStore(store => store.newSession);
+  const saveSession = useStore((store) => store.saveSession);
+  const newSession = useStore((store) => store.newSession);
   const { quill } = props;
 
   return (
     <Flex
       sx={{
-        height: [0,"100%", "100%"],
+        height: [0, "auto", "auto"],
         visibility: ["collapse", "visible", "visible"],
         borderBottom: "1px solid",
         borderColor: "border",
-        fontSize: 13
+        fontSize: 13,
       }}
     >
       <Button variant="menu" onClick={() => newSession()}>
