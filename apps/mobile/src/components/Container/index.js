@@ -66,20 +66,26 @@ export const Container = ({
       countUp = 1;
       countDown = 0;
       setHideHeader(false);
+      offsetY = y;
     }
 
     if (y > offsetY) {
-      if (y - offsetY < 150 || countDown > 0) return;
+      console.log('here');
+      if (y - offsetY < 100) return;
+      console.log('then here');
       countDown = 1;
       countUp = 0;
       setHideHeader(true);
+      offsetY = y;
     } else {
-      if (offsetY - y < 50 || countUp > 0) return;
+      console.log('here2');
+      if (offsetY - y < 50) return;
+      console.log('then here2');
       countDown = 0;
       countUp = 1;
       setHideHeader(false);
+      offsetY = y;
     }
-    offsetY = y;
   };
 
   const onChangeText = value => {
