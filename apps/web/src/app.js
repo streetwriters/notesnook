@@ -12,6 +12,7 @@ import NavigationMenu from "./components/navigationmenu";
 import NavigationContainer from "./navigation/container";
 import RootNavigator from "./navigation/navigators/rootnavigator";
 import EditorNavigator from "./navigation/navigators/editornavigator";
+import { isMobile } from "./utils/dimensions";
 
 function App() {
   const [show, setShow] = usePersistentState("isContainerVisible", true);
@@ -39,11 +40,12 @@ function App() {
   }, [openLastSession]);
 
   useEffect(() => {
+    if (!isMobile()) return;
     EditorNavigator.onNavigate = (route) => {
       setShow(!!!route);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <ThemeProvider>
@@ -70,7 +72,10 @@ function App() {
               variant="columnFill"
             />
           </Animated.Flex>
-          <Flex width={[show ? 0 : "100%", 0, "100%"]} className="EditorNavigator" />
+          <Flex
+            width={[show ? 0 : "100%", 0, "100%"]}
+            className="EditorNavigator"
+          />
         </Flex>
         <Box id="dialogContainer" />
         <Box id="snackbarContainer" />

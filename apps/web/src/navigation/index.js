@@ -3,9 +3,10 @@ import ReactDOM from "react-dom";
 import Animated from "../components/animated";
 import { AnimatePresence } from "framer-motion";
 import { store as selectionStore } from "../stores/selection-store";
-import {store as appStore} from "../stores/app-store";
+import { store as appStore } from "../stores/app-store";
 import Route from "./route";
 import Config from "../utils/config";
+import { isMobile } from "../utils/dimensions";
 
 class Navigator {
   constructor(root, routes, options = {}) {
@@ -48,7 +49,7 @@ class Navigator {
 
   navigate(routeName, params = {}, force = false) {
     let route = this.getRoute(routeName);
-    
+
     this.onNavigate(route);
 
     if (!force && (!route || this.lastRoute === route)) {
@@ -71,7 +72,7 @@ class Navigator {
     }
     // exit selection mode on navigate
     selectionStore.toggleSelectionMode(false);
-    
+
     ReactDOM.render(
       <AnimatePresence exitBeforeEnter={true}>
         <Animated.Flex
@@ -96,7 +97,7 @@ class Navigator {
       </AnimatePresence>,
       root
     );
-    appStore.toggleSideMenu(false);
+    if (isMobile()) appStore.toggleSideMenu(false);
     return true;
   }
 

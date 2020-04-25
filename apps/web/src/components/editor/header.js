@@ -37,6 +37,7 @@ function Header() {
           alignItems="center"
           sx={{
             paddingTop: [1, 2, 2],
+            paddingBottom: 0,
           }}
         >
           <Icon.ChevronLeft

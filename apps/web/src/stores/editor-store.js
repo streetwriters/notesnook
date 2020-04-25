@@ -37,13 +37,14 @@ class EditorStore extends BaseStore {
 
   openLastSession = async () => {
     // Do not reopen last session on mobile
-    if(isMobile()) return;
-    
+    if (isMobile()) return;
+
     const id = localStorage.getItem("lastOpenedNote");
-    if (!id) {
+    const note = db.notes.note(id);
+    if (!id || !note) {
       return EditorNavigator.navigate("editor");
     }
-    await this.openSession(db.notes.note(id).data);
+    await this.openSession(note.data);
   };
 
   openSession = async (note) => {
