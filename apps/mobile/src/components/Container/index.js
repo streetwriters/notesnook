@@ -56,33 +56,23 @@ export const Container = ({
   const [buttonHide, setButtonHide] = useState(false);
   const insets = useSafeArea();
 
-  let countUp = 1;
-  let countDown = 0;
   let searchResult = [];
 
   const onScroll = y => {
     if (searchResults.length > 0) return;
     if (y < 30) {
-      countUp = 1;
-      countDown = 0;
       setHideHeader(false);
       offsetY = y;
     }
 
     if (y > offsetY) {
-      console.log('here');
       if (y - offsetY < 100) return;
-      console.log('then here');
-      countDown = 1;
-      countUp = 0;
+
       setHideHeader(true);
       offsetY = y;
     } else {
-      console.log('here2');
       if (offsetY - y < 50) return;
-      console.log('then here2');
-      countDown = 0;
-      countUp = 1;
+
       setHideHeader(false);
       offsetY = y;
     }
