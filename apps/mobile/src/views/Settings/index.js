@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   Platform,
   ScrollView,
@@ -6,9 +6,12 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Modal,
+  Clipboard,
 } from 'react-native';
 import MMKV from 'react-native-mmkv-storage';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import QRCode from 'react-native-qrcode-generator';
 import {
   ACCENT,
   COLOR_SCHEME,
@@ -19,6 +22,7 @@ import {
   setColorScheme,
   SIZE,
   WEIGHT,
+  ph,
 } from '../../common/common';
 import Container from '../../components/Container';
 import {useTracked} from '../../provider';
@@ -27,10 +31,13 @@ import {eSendEvent} from '../../services/eventManager';
 import {eOpenLoginDialog} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
 import {hexToRGBA, w, DDS, setSetting, db, ToastEvent} from '../../utils/utils';
+import {Toast} from '../../components/Toast';
 
 export const Settings = ({navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors, user, settings} = state;
+  const [key, setKey] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
 
   function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
     let newColors = setColorScheme(colors, accent);
@@ -58,6 +65,137 @@ export const Settings = ({navigation}) => {
           marginTop: Platform.OS == 'ios' ? 135 - 60 : 155 - 60,
         }}
       />
+
+      <Modal
+        animated={true}
+        animationType="fade"
+        visible={modalVisible}
+        transparent={true}>
+        <View
+          style={{
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0,0,0,0.3)',
+          }}>
+          <View
+            style={{
+              width: '100%',
+              backgroundColor: colors.bg,
+              height: '100%',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
+            <Text
+              style={{
+                fontFamily: WEIGHT.bold,
+                fontSize: SIZE.xl,
+                color: colors.pri,
+                marginBottom: 25,
+              }}>
+              Data Recovery Key
+            </Text>
+
+            <Text
+              style={{
+                fontFamily: WEIGHT.regular,
+                fontSize: SIZE.sm,
+                maxWidth: '85%',
+                textAlign: 'center',
+                color: colors.pri,
+              }}>
+              <Text
+                style={{
+                  color: colors.errorText,
+                }}>
+                If you lose your password, you can recover your data only using
+                your recovery key.{' '}
+              </Text>
+            </Text>
+
+            <Text
+              style={{
+                fontFamily: WEIGHT.regular,
+                fontSize: SIZE.sm,
+                maxWidth: '85%',
+                textAlign: 'center',
+                marginTop: 25,
+                marginBottom: 10,
+                color: colors.pri,
+              }}>
+              Take a Sceenshot of QR-Code
+            </Text>
+
+            <QRCode value={key} size={200} bgColor="black" fgColor="white" />
+
+            <TouchableOpacity
+              activeOpacity={0.6}
+              onPress={() => {
+                Clipboard.setString('string');
+                ToastEvent.show('Recovery key copied!', 'success', 'local');
+              }}
+              style={{
+                flexDirection: 'row',
+                borderWidth: 1,
+                borderRadius: 5,
+                paddingVertical: 8,
+                paddingHorizontal: 6,
+                marginTop: 15,
+                alignItems: 'center',
+                borderColor: colors.nav,
+              }}>
+              <Text
+                numberOfLines={1}
+                style={{
+                  fontFamily: WEIGHT.regular,
+                  fontSize: 16,
+                  width: '85%',
+                  maxWidth: '85%',
+                  color: colors.pri,
+                }}>
+                {key}
+              </Text>
+              <Icon color={colors.accent} size={SIZE.lg} name="clipboard" />
+            </TouchableOpacity>
+
+            <Text
+              style={{
+                color: colors.icon,
+                fontSize: 10,
+                width: '85%',
+                maxWidth: '85%',
+              }}>
+              You can also save your recovery key from app settings on any
+              device.
+            </Text>
+
+            <TouchableOpacity
+              onPress={() => {
+                setModalVisible(false);
+              }}
+              activeOpacity={opacity}
+              style={{
+                paddingVertical: pv + 5,
+                paddingHorizontal: ph,
+                borderRadius: 5,
+                width: '90%',
+                marginTop: 20,
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: colors.accent,
+              }}>
+              <Text
+                style={{
+                  fontFamily: WEIGHT.medium,
+                  color: 'white',
+                  fontSize: SIZE.sm,
+                }}>
+                I have saved the key
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+        <Toast context="local" />
+      </Modal>
 
       <ScrollView
         style={{

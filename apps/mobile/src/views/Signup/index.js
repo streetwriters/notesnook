@@ -1,25 +1,34 @@
 import React, {createRef, useEffect, useState} from 'react';
-import {SafeAreaView, Text, TouchableOpacity, View} from 'react-native';
+import {
+  SafeAreaView,
+  Text,
+  TouchableOpacity,
+  View,
+  Modal,
+  Clipboard,
+} from 'react-native';
 import {TextInput} from 'react-native-gesture-handler';
+import QRCode from 'react-native-qrcode-generator';
 import {useIsFocused} from 'react-navigation-hooks';
-import {opacity, pv, SIZE, WEIGHT} from '../../common/common';
+import {opacity, pv, SIZE, WEIGHT, ph} from '../../common/common';
 import {Header} from '../../components/header';
 import {useTracked} from '../../provider';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
 import {eLoginDialogNavigateBack} from '../../services/events';
 import * as Animatable from 'react-native-animatable';
-const _email = createRef();
-const _pass = createRef();
-const _username = createRef();
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
   validateUsername,
   validateEmail,
   validatePass,
 } from '../../services/validation';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {ToastEvent, db, DDS} from '../../utils/utils';
 import {ACTIONS} from '../../provider/actions';
+import {Toast} from '../../components/Toast';
 
+const _email = createRef();
+const _pass = createRef();
+const _username = createRef();
 export const Signup = ({navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors, isLoginNavigator} = state;
@@ -32,6 +41,8 @@ export const Signup = ({navigation}) => {
   const [invalidEmail, setInvalidEmail] = useState(false);
   const [invalidPassword, setInvalidPassword] = useState(false);
   const [failed, setFailed] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [key, setKey] = useState('');
   let isFocused = useIsFocused();
 
   const handleBackPress = () => {
@@ -52,7 +63,6 @@ export const Signup = ({navigation}) => {
       try {
         await db.user.signup(username, email, password);
       } catch (e) {
-        console.log(e, 'signup');
         setSigningIn(false);
         setFailed(true);
         ToastEvent.show('Signup failed, Network Error', 'error');
@@ -64,15 +74,14 @@ export const Signup = ({navigation}) => {
       setStatus('Logging you in...');
       try {
         user = await db.user.user.get();
+        let k = await db.user.key();
+        setKey(k);
         dispatch({type: ACTIONS.USER, user: user});
 
         setTimeout(() => {
-          navigation.navigate('Home');
-
-          ToastEvent.show(`Logged in as ${'ammarahmed'}`, 'success');
+          setModalVisible(true);
         }, 500);
       } catch (e) {
-        console.log('e', 'getUSer');
         setSigningIn(false);
         setFailed(true);
         ToastEvent.show('Login Failed, try again', 'error');
@@ -90,6 +99,141 @@ export const Signup = ({navigation}) => {
         height: '100%',
         backgroundColor: colors.bg,
       }}>
+      <Modal
+        animated={true}
+        animationType="fade"
+        visible={!modalVisible}
+        transparent={true}>
+        <View
+          style={{
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0,0,0,0.3)',
+          }}>
+          <View
+            style={{
+              width: '100%',
+              backgroundColor: colors.bg,
+              height: '100%',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
+            <Text
+              style={{
+                fontFamily: WEIGHT.bold,
+                fontSize: SIZE.xl,
+                color: 'white',
+                marginBottom: 25,
+              }}>
+              Account Created!
+            </Text>
+
+            <Text
+              style={{
+                fontFamily: WEIGHT.regular,
+                fontSize: SIZE.sm,
+                maxWidth: '85%',
+                textAlign: 'center',
+                color: colors.pri,
+              }}>
+              Hello @ammarahmed! All your data is end-to-end encrypted. This
+              means that we cannot read your data or recover your password if
+              you forget it.{' '}
+              <Text
+                style={{
+                  color: colors.errorText,
+                }}>
+                If you lose your password, you can recover your data only using
+                your recovery key.{' '}
+              </Text>
+            </Text>
+
+            <Text
+              style={{
+                fontFamily: WEIGHT.regular,
+                fontSize: SIZE.sm,
+                maxWidth: '85%',
+                textAlign: 'center',
+                marginTop: 25,
+                marginBottom: 10,
+                color: colors.pri,
+              }}>
+              Take a Sceenshot of QR-Code
+            </Text>
+
+            <QRCode value={key} size={200} bgColor="black" fgColor="white" />
+
+            <TouchableOpacity
+              activeOpacity={0.6}
+              onPress={() => {
+                Clipboard.setString('string');
+                ToastEvent.show('Recovery key copied!', 'success', 'local');
+              }}
+              style={{
+                flexDirection: 'row',
+                borderWidth: 1,
+                borderRadius: 5,
+                paddingVertical: 8,
+                paddingHorizontal: 6,
+                marginTop: 15,
+                alignItems: 'center',
+                borderColor: colors.nav,
+              }}>
+              <Text
+                numberOfLines={1}
+                style={{
+                  fontFamily: WEIGHT.regular,
+                  fontSize: 16,
+                  width: '85%',
+                  maxWidth: '85%',
+                  color: colors.icon,
+                }}>
+                {key}
+              </Text>
+              <Icon color={colors.accent} size={SIZE.lg} name="clipboard" />
+            </TouchableOpacity>
+
+            <Text
+              style={{
+                color: colors.icon,
+                fontSize: 10,
+                width: '85%',
+                maxWidth: '85%',
+              }}>
+              You can also save your recovery key from app settings on any
+              device.
+            </Text>
+
+            <TouchableOpacity
+              onPress={() => {
+                setModalVisible(false);
+                navigation.navigate('Home');
+              }}
+              activeOpacity={opacity}
+              style={{
+                paddingVertical: pv + 5,
+                paddingHorizontal: ph,
+                borderRadius: 5,
+                width: '90%',
+                marginTop: 20,
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: colors.accent,
+              }}>
+              <Text
+                style={{
+                  fontFamily: WEIGHT.medium,
+                  color: 'white',
+                  fontSize: SIZE.sm,
+                }}>
+                I have saved the key
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+        <Toast context="local" />
+      </Modal>
+
       {signingIn ? (
         <Animatable.View
           transition="opacity"
