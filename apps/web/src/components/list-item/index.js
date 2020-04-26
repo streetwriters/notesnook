@@ -42,7 +42,7 @@ const ItemSelector = ({ isSelected, toggleSelection }) => {
 };
 
 function ListItem(props) {
-  const menuId = `contextMenu${props.index}`;
+  const menuId = `contextMenu-${props.item.id}`;
   const [parentRef, closeMenu, openMenu] = useContextMenu(menuId);
   const isSelectionMode = useSelectionStore((store) => store.isSelectionMode);
   const selectedItems = useSelectionStore((store) => store.selectedItems);
@@ -185,7 +185,7 @@ function ListItem(props) {
             size={22}
             strokeWidth={2}
             color="icon"
-            style={{ marginRight: -5 }}
+            sx={{ marginRight: -1 }}
             onClick={(e) => {
               openMenu(e.nativeEvent, menuId, true);
             }}

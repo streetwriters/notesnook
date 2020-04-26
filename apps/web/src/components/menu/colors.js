@@ -27,7 +27,6 @@ function Colors(props) {
             <Icon.Checkmark
               sx={{
                 position: "absolute",
-                top: "4px",
                 left: "5px",
                 cursor: "pointer",
               }}
