@@ -265,9 +265,10 @@ const Editor = ({noMenu}) => {
     return true;
   };
 
-  const setNoteInEditorAferSaving = (id, rId) => {
-    if (id !== rId) {
-      id = rId;
+  const setNoteInEditorAferSaving = (oldId, currentId) => {
+    console.log(oldId, currentId);
+    if (oldId !== currentId) {
+      id = currentId;
       note = db.notes.note(id);
       if (note) {
         note = note.data;
@@ -295,15 +296,8 @@ const Editor = ({noMenu}) => {
         },
         id: id,
       });
-      setNoteInEditorAferSaving(id, rId);
 
-      if (id) {
-        await addToCollection(id);
-        dispatch({
-          type: ACTIONS.CURRENT_EDITING_NOTE,
-          id: id,
-        });
-      }
+      setNoteInEditorAferSaving(id, rId);
 
       if (content.text.length < 200 || saveCounter < 2) {
         dispatch({
@@ -312,11 +306,18 @@ const Editor = ({noMenu}) => {
         eSendEvent(refreshNotesPage);
       }
 
-      InfoBarRef.current?.setDateEdited(
-        db.notes.note(id).data.dateEdited,
-        content?.text?.split(' ').length,
-      );
-      InfoBarRef.current?.setDateCreated(db.notes.note(id).data.dateCreated);
+      if (id) {
+        await addToCollection(id);
+        dispatch({
+          type: ACTIONS.CURRENT_EDITING_NOTE,
+          id: id,
+        });
+        InfoBarRef.current?.setDateEdited(
+          db.notes.note(id).data.dateEdited,
+          content?.text?.split(' ').length,
+        );
+        InfoBarRef.current?.setDateCreated(db.notes.note(id).data.dateCreated);
+      }
 
       saveCounter++;
     } else {
