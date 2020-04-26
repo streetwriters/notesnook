@@ -28,10 +28,10 @@ export const Login = ({navigation}) => {
   const _username = createRef();
   const [loggingIn, setLoggingIn] = useState(false);
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('google123');
+  const [password, setPassword] = useState('');
   const [invalidEmail, setInvalidEmail] = useState(false);
   const [invalidPassword, setInvalidPassword] = useState(false);
-  const [username, setUsername] = useState('thecodrr');
+  const [username, setUsername] = useState('');
   const [invalidUsername, setInvalidUsername] = useState(false);
 
   const isFocused = useIsFocused();
