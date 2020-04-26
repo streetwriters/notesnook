@@ -6632,20 +6632,10 @@ libsodium-wrappers@^0.7.6:
   dependencies:
     libsodium "0.7.6"
 
-"libsodium-wrappers@https://github.com/streetwriters/libsodium-packages.git#libsodium-wrappers":
-  version "0.7.6"
-  resolved "https://github.com/streetwriters/libsodium-packages.git#54be6e69164eace629688797b60ec63cb37c25c2"
-  dependencies:
-    libsodium "https://github.com/streetwriters/libsodium-packages.git#libsodium"
-
 libsodium@0.7.6:
   version "0.7.6"
   resolved "https://registry.yarnpkg.com/libsodium/-/libsodium-0.7.6.tgz#018b80c5728054817845fbffa554274441bda277"
   integrity sha512-hPb/04sEuLcTRdWDtd+xH3RXBihpmbPCsKW/Jtf4PsvdyKh+D6z2D2gvp/5BfoxseP+0FCOg66kE+0oGUE/loQ==
-
-"libsodium@https://github.com/streetwriters/libsodium-packages.git#libsodium":
-  version "0.7.6"
-  resolved "https://github.com/streetwriters/libsodium-packages.git#02113ef1e380c14a22734f4363f8204eadddcd84"
 
 lie@3.1.1:
   version "3.1.1"
@@ -7304,8 +7294,8 @@ normalize-url@^3.0.0, normalize-url@^3.0.1:
   integrity sha512-U+JJi7duF1o+u2pynbp2zXDW2/PADgC30f0GsHZtRh+HOcXHnw137TrNlyxxRvWW5fjKd3bcLHPxofWuCjaeZg==
 
 "notes-core@git+ssh://git@github.com:streetwriters/notesnook-core.git":
-  version "1.3.0"
-  resolved "git+ssh://git@github.com:streetwriters/notesnook-core.git#f1d3ccc200f76208b072414c1dc61f2bc3f148a9"
+  version "1.4.0"
+  resolved "git+ssh://git@github.com:streetwriters/notesnook-core.git#5b2832e7673d7543eef2e962aedc44cc4489dc9f"
   dependencies:
     fast-sort "^2.0.1"
     fuzzysearch "^1.0.3"
