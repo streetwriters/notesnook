@@ -1,6 +1,6 @@
 {
   "name": "notes-core",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "private": true,
   "devDependencies": {
     "@babel/core": "^7.7.4",
