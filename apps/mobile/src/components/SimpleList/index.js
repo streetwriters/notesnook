@@ -3,20 +3,20 @@ import {
   FlatList,
   Platform,
   RefreshControl,
+  SectionList,
   Text,
   View,
-  SectionList,
 } from 'react-native';
+import {useSafeArea} from 'react-native-safe-area-context';
 import {SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
 import {eClearSearch, eScrollEvent} from '../../services/events';
-import {hexToRGBA, ToastEvent, db} from '../../utils/utils';
+import {db, hexToRGBA, ToastEvent} from '../../utils/utils';
 import {NotebookItem} from '../NotebookItem';
-import SelectionWrapper from '../SelectionWrapper';
-import {useSafeArea} from 'react-native-safe-area-context';
 import NoteItem from '../NoteItem';
+import SelectionWrapper from '../SelectionWrapper';
 const sectionListRef = createRef();
 const SimpleList = ({
   data,
@@ -26,6 +26,8 @@ const SimpleList = ({
   focused,
   placeholderText,
   pinned = null,
+  customRefresh,
+  customRefreshing,
   isMove,
   hideMore,
   noteToMove,
@@ -328,9 +330,9 @@ const SimpleList = ({
         <RefreshControl
           tintColor={colors.accent}
           colors={[colors.accent]}
-          progressViewOffset={-200}
-          onRefresh={_onRefresh}
-          refreshing={refreshing}
+          progressViewOffset={150}
+          onRefresh={customRefresh ? customRefresh : _onRefresh}
+          refreshing={customRefresh ? customRefreshing : refreshing}
         />
       }
       keyExtractor={_listKeyExtractor}

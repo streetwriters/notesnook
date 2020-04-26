@@ -1,8 +1,11 @@
 import React, {useEffect, useState} from 'react';
 import {useIsFocused} from 'react-navigation-hooks';
 import Container from '../../components/Container';
+import {AddTopicEvent} from '../../components/DialogManager/recievers';
+import {NotebookPlaceHolder} from '../../components/ListPlaceholders';
 import {NotebookItem} from '../../components/NotebookItem';
 import SelectionWrapper from '../../components/SelectionWrapper';
+import SimpleList from '../../components/SimpleList';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {
@@ -15,10 +18,7 @@ import {
   eOnNewTopicAdded,
   eScrollEvent,
 } from '../../services/events';
-import {ToastEvent, w, db} from '../../utils/utils';
-import SimpleList from '../../components/SimpleList';
-import {NotebookPlaceHolder} from '../../components/ListPlaceholders';
-import {AddTopicEvent} from '../../components/DialogManager/recievers';
+import {db, ToastEvent, w} from '../../utils/utils';
 
 export const Notebook = ({navigation}) => {
   const [state, dispatch] = useTracked();
@@ -144,9 +144,9 @@ export const Notebook = ({navigation}) => {
       <SimpleList
         data={topics}
         type="topics"
-        refreshing={refreshing}
+        customRefreshing={refreshing}
         focused={isFocused}
-        onRefresh={_onRefresh}
+        customRefresh={_onRefresh}
         renderItem={_renderItem}
         placeholder={<NotebookPlaceHolder colors={colors} />}
         placeholderText="Topics added to notebook appear here."

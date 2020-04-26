@@ -1,6 +1,8 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import {useIsFocused} from 'react-navigation-hooks';
 import Container from '../../components/Container';
+import {simpleDialogEvent} from '../../components/DialogManager/recievers';
+import {TEMPLATE_EMPTY_TRASH} from '../../components/DialogManager/templates';
 import {TrashPlaceHolder} from '../../components/ListPlaceholders';
 import {NotebookItem} from '../../components/NotebookItem';
 import NoteItem from '../../components/NoteItem';
@@ -8,14 +10,11 @@ import SelectionWrapper from '../../components/SelectionWrapper';
 import SimpleList from '../../components/SimpleList';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
-import {db, ToastEvent, w} from '../../utils/utils';
-import {simpleDialogEvent} from '../../components/DialogManager/recievers';
-import {TEMPLATE_EMPTY_TRASH} from '../../components/DialogManager/templates';
+import {w} from '../../utils/utils';
 
 export const Trash = ({navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors, selectionMode, trash} = state;
-  const [refreshing, setRefreshing] = useState(false);
 
   const isFocused = useIsFocused();
   useEffect(() => {
@@ -84,20 +83,6 @@ export const Trash = ({navigation}) => {
     </SelectionWrapper>
   );
 
-  const _onRefresh = async () => {
-    setRefreshing(true);
-    try {
-      await db.sync();
-      setRefreshing(false);
-      ToastEvent.show('Sync Complete', 'success');
-    } catch (e) {
-      setRefreshing(false);
-      ToastEvent.show('Sync failed, network error', 'error');
-    }
-    dispatch({type: ACTIONS.TRASH});
-    dispatch({type: ACTIONS.USER});
-  };
-
   return (
     <Container
       bottomButtonOnPress={() => {
@@ -114,9 +99,7 @@ export const Trash = ({navigation}) => {
       <SimpleList
         data={trash}
         type="trash"
-        refreshing={refreshing}
         focused={isFocused}
-        onRefresh={_onRefresh}
         renderItem={_renderItem}
         placeholder={<TrashPlaceHolder colors={colors} />}
         placeholderText="Deleted notes & notebooks appear here."

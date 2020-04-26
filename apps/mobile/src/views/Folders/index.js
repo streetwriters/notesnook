@@ -24,8 +24,6 @@ export const Folders = ({navigation}) => {
     notebooks,
     preventDefaultMargins,
   } = state;
-
-  const [refreshing, setRefreshing] = useState(false);
   let isFocused = useIsFocused();
 
   const handleBackPress = () => {
@@ -65,21 +63,6 @@ export const Folders = ({navigation}) => {
   }, []);
 
   const params = navigation.state.params;
-
-  const _onRefresh = async () => {
-    setRefreshing(true);
-    try {
-      await db.sync();
-      dispatch({type: ACTIONS.NOTEBOOKS});
-      dispatch({type: ACTIONS.PINNED});
-      dispatch({type: ACTIONS.USER});
-      setRefreshing(false);
-      ToastEvent.show('Sync Complete', 'success');
-    } catch (e) {
-      setRefreshing(false);
-      ToastEvent.show('Sync failed, network error', 'error');
-    }
-  };
 
   const _renderItem = ({item, index}) => (
     <SelectionWrapper item={item}>
@@ -129,9 +112,7 @@ export const Folders = ({navigation}) => {
       <SimpleList
         data={notebooks}
         type="notebooks"
-        refreshing={refreshing}
         focused={isFocused}
-        onRefresh={_onRefresh}
         renderItem={_renderItem}
         hideMore={params.hideMore}
         isMove={params.isMove}

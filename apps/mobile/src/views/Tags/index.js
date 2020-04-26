@@ -1,22 +1,21 @@
-import React, { useEffect, useState } from 'react';
-import { Dimensions, Text, TouchableOpacity, View } from 'react-native';
-import { useIsFocused } from 'react-navigation-hooks';
-import { pv, SIZE, WEIGHT } from '../../common/common';
+import React, {useEffect} from 'react';
+import {Text, TouchableOpacity, View} from 'react-native';
+import {useIsFocused} from 'react-navigation-hooks';
+import {pv, SIZE, WEIGHT} from '../../common/common';
 import Container from '../../components/Container';
-import { TagsPlaceHolder } from '../../components/ListPlaceholders';
+import {TagsPlaceHolder} from '../../components/ListPlaceholders';
 import SimpleList from '../../components/SimpleList';
-import { useTracked } from '../../provider';
-import { ACTIONS } from '../../provider/actions';
+import {useTracked} from '../../provider';
+import {ACTIONS} from '../../provider/actions';
 import NavigationService from '../../services/NavigationService';
 
-export const Tags = ({ navigation }) => {
+export const Tags = ({navigation}) => {
   const [state, dispatch] = useTracked();
-  const { colors, tags } = state;
-  const [refreshing, setRefreshing] = useState(false);
+  const {colors, tags} = state;
   const isFocused = useIsFocused();
   useEffect(() => {
     if (isFocused) {
-      dispatch({ type: ACTIONS.TAGS });
+      dispatch({type: ACTIONS.TAGS});
       dispatch({
         type: ACTIONS.CURRENT_SCREEN,
         screen: 'tags',
@@ -24,11 +23,7 @@ export const Tags = ({ navigation }) => {
     }
   }, [isFocused]);
 
-  const _onRefresh = () => {
-    //Handle
-  };
-
-  const _renderItem = ({ item, index }) => (
+  const _renderItem = ({item, index}) => (
     <TouchableOpacity
       key={item.title}
       onPress={() => {
@@ -69,8 +64,8 @@ export const Tags = ({ navigation }) => {
           {item && item.noteIds.length && item.noteIds.length > 1
             ? item.noteIds.length + ' notes'
             : item.noteIds.length === 1
-              ? item.noteIds.length + ' note'
-              : null}
+            ? item.noteIds.length + ' note'
+            : null}
         </Text>
       </Text>
     </TouchableOpacity>
@@ -94,9 +89,7 @@ export const Tags = ({ navigation }) => {
         <SimpleList
           data={tags}
           type="tags"
-          refreshing={refreshing}
           focused={isFocused}
-          onRefresh={_onRefresh}
           renderItem={_renderItem}
           placeholder={<TagsPlaceHolder colors={colors} />}
           placeholderText="Tags added to notes appear here"

@@ -124,7 +124,6 @@ export const Notes = ({navigation}) => {
     setRefreshing(true);
     try {
       await db.sync();
-
       init();
       dispatch({type: ACTIONS.USER});
       setRefreshing(false);
@@ -184,9 +183,9 @@ export const Notes = ({navigation}) => {
       <SimpleList
         data={notes}
         type="notes"
-        refreshing={refreshing}
+        customRefreshing={refreshing}
         focused={isFocused}
-        onRefresh={_onRefresh}
+        customRefresh={_onRefresh}
         renderItem={_renderItem}
         placeholder={<NotesPlaceHolder colors={colors} />}
         placeholderText={`Add some notes to this" ${
