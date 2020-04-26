@@ -87,13 +87,17 @@ function NavigationMenu(props) {
             <NavItem
               onSelected={async () => {
                 setSelectedRoute(undefined);
-                RootNavigator.navigate("color", {
-                  title: toTitleCase(color.title),
-                  context: {
-                    type: "color",
-                    value: color.title,
+                RootNavigator.navigate(
+                  "color",
+                  {
+                    title: toTitleCase(color.title),
+                    context: {
+                      type: "color",
+                      value: color.title,
+                    },
                   },
-                });
+                  true
+                );
               }}
               key={color.title}
               item={{
