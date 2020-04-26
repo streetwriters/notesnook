@@ -22,7 +22,6 @@ const SimpleList = ({
   data,
   type,
   placeholder,
-  onRefresh,
   renderItem,
   focused,
   placeholderText,
