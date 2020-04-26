@@ -1,4 +1,4 @@
-import React, {createRef} from 'react';
+import React, {createRef, useState} from 'react';
 import {
   FlatList,
   Platform,
@@ -12,7 +12,7 @@ import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
 import {eClearSearch, eScrollEvent} from '../../services/events';
-import {hexToRGBA} from '../../utils/utils';
+import {hexToRGBA, ToastEvent, db} from '../../utils/utils';
 import {NotebookItem} from '../NotebookItem';
 import SelectionWrapper from '../SelectionWrapper';
 import {useSafeArea} from 'react-native-safe-area-context';
@@ -25,7 +25,6 @@ const SimpleList = ({
   onRefresh,
   renderItem,
   focused,
-  refreshing,
   placeholderText,
   pinned = null,
   isMove,
@@ -36,6 +35,7 @@ const SimpleList = ({
   const [state, dispatch] = useTracked();
   const {colors, selectionMode, syncing} = state;
   const searchResults = {...state.searchResults};
+  const [refreshing, setRefreshing] = useState(false);
   const insets = useSafeArea();
   const _onScroll = event => {
     if (!event) return;
@@ -76,6 +76,44 @@ const SimpleList = ({
       {title}
     </Text>
   );
+
+  const _onRefresh = async () => {
+    if (Platform.OS === 'ios') {
+      dispatch({
+        type: ACTIONS.SYNCING,
+        syncing: true,
+      });
+    } else {
+      setRefreshing(true);
+    }
+
+    try {
+      let user = await db.user.get();
+      dispatch({type: ACTIONS.USER, user: user});
+      await db.sync();
+      if (Platform.OS === 'ios') {
+        dispatch({
+          type: ACTIONS.SYNCING,
+          syncing: false,
+        });
+      } else {
+        setRefreshing(false);
+      }
+
+      ToastEvent.show('Sync Complete', 'success');
+    } catch (e) {
+      if (Platform.OS === 'ios') {
+        dispatch({
+          type: ACTIONS.SYNCING,
+          syncing: false,
+        });
+      } else {
+        setRefreshing(false);
+      }
+      ToastEvent.show(e.message, 'error');
+    }
+    dispatch({type: ACTIONS.ALL});
+  };
 
   const _ListHeaderComponent_S =
     searchResults.type === type && searchResults.results.length > 0 ? (
@@ -258,7 +296,7 @@ const SimpleList = ({
           tintColor={colors.accent}
           colors={[colors.accent]}
           progressViewOffset={150}
-          onRefresh={onRefresh}
+          onRefresh={_onRefresh}
           refreshing={syncing}
         />
       }

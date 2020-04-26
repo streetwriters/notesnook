@@ -13,11 +13,12 @@ import SimpleList from '../../components/SimpleList';
 import {NotesPlaceHolder} from '../../components/ListPlaceholders';
 import SelectionWrapper from '../../components/SelectionWrapper';
 import NoteItem from '../../components/NoteItem';
+import {Platform} from 'react-native';
 let count = 0;
 
 export const Home = ({navigation}) => {
   const [state, dispatch] = useTracked();
-  const [refreshing, setRefreshing] = useState(false);
+
   const {
     colors,
     selectionMode,
@@ -39,34 +40,6 @@ export const Home = ({navigation}) => {
       dispatch({type: ACTIONS.NOTES});
     }
   }, [isFocused]);
-
-  const _onRefresh = async () => {
-    dispatch({
-      type: ACTIONS.SYNCING,
-      syncing: true,
-    });
-
-    try {
-      await db.sync();
-      dispatch({
-        type: ACTIONS.SYNCING,
-        syncing: false,
-      });
-
-      ToastEvent.show('Sync Complete', 'success');
-    } catch (e) {
-      dispatch({
-        type: ACTIONS.SYNCING,
-        syncing: false,
-      });
-      ToastEvent.show(e.message, 'error');
-    }
-    dispatch({type: ACTIONS.NOTES});
-    dispatch({type: ACTIONS.PINNED});
-    let user = await db.user.get();
-    dispatch({type: ACTIONS.USER, user: user});
-  };
-
   const _renderItem = ({item, index}) => (
     <SelectionWrapper
       index={index}
@@ -127,9 +100,7 @@ export const Home = ({navigation}) => {
         type="notes"
         isHome={true}
         pinned={pinned.notes}
-        refreshing={refreshing}
         focused={isFocused}
-        onRefresh={_onRefresh}
         renderItem={_renderItem}
         placeholder={<NotesPlaceHolder colors={colors} />}
         placeholderText={`Notes you write appear here`}
