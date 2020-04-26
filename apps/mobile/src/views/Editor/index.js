@@ -44,7 +44,7 @@ const InfoBarRef = createRef();
 const EditorWebView = createRef();
 let note = {};
 let id = null;
-var content = {};
+var content = null;
 var title = null;
 let timer = null;
 let saveCounter = 0;
@@ -246,15 +246,11 @@ const Editor = ({noMenu}) => {
   const checkIfContentIsSavable = () => {
     if (!canSave) return false;
     if (!title && !content) return false;
-    if (
-      content &&
-      content.text.trim().length === 0 &&
-      title &&
-      title.trim().length == 0
-    )
+    if (content && content.text.length === 0 && title && title?.length == 0)
       return false;
-    if (!content && title && title.trim().length === 0) return false;
-    if (!title && content && content.text.trim.length === 0) return false;
+    if (!content && title && title.length === 0) return false;
+    if (!title && content.text.length === 0) return false;
+
     if (!content) {
       content = {
         text: '',
