@@ -6,6 +6,7 @@ import {
   Modal,
   Clipboard,
   ActivityIndicator,
+  Linking,
 } from 'react-native';
 import {TextInput} from 'react-native-gesture-handler';
 import QRCode from 'react-native-qrcode-generator';
@@ -136,7 +137,7 @@ export const Signup = ({navigation}) => {
                 textAlign: 'center',
                 color: colors.pri,
               }}>
-              Hello @ammarahmed! All your data is end-to-end encrypted. This
+              Hello {username}! All your data is end-to-end encrypted. This
               means that we cannot read your data or recover your password if
               you forget it.{' '}
               <Text
@@ -569,6 +570,36 @@ export const Signup = ({navigation}) => {
                     color: 'white',
                   }}>
                   Signup
+                </Text>
+              </TouchableOpacity>
+            </View>
+            <View
+              style={{
+                width: '100%',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: 150,
+              }}>
+              <TouchableOpacity
+                onPress={() => {
+                  Linking.openURL('https://notesbook.com/privacy.html');
+                }}
+                activeOpacity={opacity}
+                style={{}}>
+                <Text
+                  style={{
+                    fontSize: SIZE.xs + 1,
+                    fontFamily: WEIGHT.regular,
+                    color: colors.pri,
+                    height: 25,
+                  }}>
+                  By signing up you agree to our{' '}
+                  <Text
+                    style={{
+                      color: colors.accent,
+                    }}>
+                    privacy policy
+                  </Text>
                 </Text>
               </TouchableOpacity>
             </View>
