@@ -24,11 +24,20 @@ class Navigator {
       lastRoute: this.getRoute(this.options.default),
     });
     this.history = opts.history;
+    this.lastRoute = undefined;
     this.navigate(opts.lastRoute.key, opts.lastRoute.params, true);
   };
 
   getRoute(key) {
     return this.routes[key];
+  }
+
+  pushToHistory() {
+    const lastItem = this.history[this.history.length - 1];
+    if (this.lastRoute) {
+      if (lastItem && lastItem.key === this.lastRoute.key) return;
+      this.history.push(this.lastRoute);
+    }
   }
 
   setLastRoute(route) {
@@ -58,10 +67,9 @@ class Navigator {
 
     route.params = { ...route.params, ...params };
 
-    if (this.lastRoute) {
-      this.history.push(this.lastRoute);
-    }
+    this.pushToHistory();
     this.setLastRoute(route);
+
     return this.renderRoute(route);
   }
 
@@ -70,6 +78,7 @@ class Navigator {
     if (!root) {
       return false;
     }
+
     // exit selection mode on navigate
     selectionStore.toggleSelectionMode(false);
 
