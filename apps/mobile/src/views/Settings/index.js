@@ -8,6 +8,7 @@ import {
   View,
   Modal,
   Clipboard,
+  Linking,
 } from 'react-native';
 import MMKV from 'react-native-mmkv-storage';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -733,12 +734,10 @@ export const Settings = ({navigation}) => {
 
         {[
           {
-            name: 'Terms of Service',
-            func: () => {},
-          },
-          {
             name: 'Privacy Policy',
-            func: () => {},
+            func: () => {
+              Linking.openURL('https://www.notesbook.com/privacy.html');
+            },
           },
           {
             name: 'About',
