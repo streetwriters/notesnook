@@ -41,14 +41,24 @@ export const Home = ({navigation}) => {
   }, [isFocused]);
 
   const _onRefresh = async () => {
-    setRefreshing(true);
+    dispatch({
+      type: ACTIONS.SYNCING,
+      syncing: true,
+    });
+
     try {
       await db.sync();
-      setRefreshing(false);
+      dispatch({
+        type: ACTIONS.SYNCING,
+        syncing: false,
+      });
+
       ToastEvent.show('Sync Complete', 'success');
     } catch (e) {
-      setRefreshing(false);
-      console.log(e);
+      dispatch({
+        type: ACTIONS.SYNCING,
+        syncing: false,
+      });
       ToastEvent.show(e.message, 'error');
     }
     dispatch({type: ACTIONS.NOTES});

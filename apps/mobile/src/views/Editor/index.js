@@ -44,7 +44,7 @@ const InfoBarRef = createRef();
 const EditorWebView = createRef();
 let note = {};
 let id = null;
-var content = null;
+var content = {};
 var title = null;
 let timer = null;
 let saveCounter = 0;
@@ -386,50 +386,50 @@ const Editor = ({noMenu}) => {
   };
 
   const updateEditor = async () => {
-    title = note.title;
-    id = note.id;
-    saveCounter = 0;
-    InfoBarRef.current?.setDateCreated(note.dateCreated);
-    content.text = await db.notes.note(id).text();
-
-    InfoBarRef.current?.setDateEdited(
-      note.dateEdited,
-      content.text.split(' ').length,
-    );
-
-    if (title !== null || title === '') {
-      post({
-        type: 'title',
-        value: note.title,
-      });
-    } else {
-      post({
-        type: 'clearTitle',
-      });
-      post({
-        type: 'clearEditor',
-      });
-      post({
-        type: 'focusTitle',
-      });
-    }
-    if (content.text === '' && note.content.delta === null) {
-      post({
-        type: 'clearEditor',
-      });
-    } else if (note.content.delta) {
-      if (typeof note.content.delta !== 'string') {
-        content.delta = note.content.delta;
+    try {
+      title = note.title;
+      id = note.id;
+      saveCounter = 0;
+      InfoBarRef.current?.setDateCreated(note.dateCreated);
+      content.text = await db.notes.note(id).text();
+      InfoBarRef.current?.setDateEdited(
+        note.dateEdited,
+        content.text.split(' ').length,
+      );
+      if (title !== null || title === '') {
+        post({
+          type: 'title',
+          value: note.title,
+        });
       } else {
-        content.delta = await db.notes.note(id).delta();
+        post({
+          type: 'clearTitle',
+        });
+        post({
+          type: 'clearEditor',
+        });
+        post({
+          type: 'focusTitle',
+        });
       }
-      post({
-        type: 'delta',
-        value: content.delta,
-      });
-    } else {
-      post({type: 'text', value: content.text});
-    }
+      if (content.text === '' && note.content.delta === null) {
+        post({
+          type: 'clearEditor',
+        });
+      } else if (note.content.delta) {
+        if (typeof note.content.delta !== 'string') {
+          content.delta = note.content.delta;
+        } else {
+          content.delta = await db.notes.note(id).delta();
+        }
+        post({
+          type: 'delta',
+          value: content.delta,
+        });
+      } else {
+        post({type: 'text', value: content.text});
+      }
+    } catch (e) {}
   };
 
   const params = 'platform=' + Platform.OS;

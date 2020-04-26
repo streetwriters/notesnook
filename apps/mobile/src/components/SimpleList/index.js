@@ -34,7 +34,7 @@ const SimpleList = ({
   isHome = false,
 }) => {
   const [state, dispatch] = useTracked();
-  const {colors, selectionMode} = state;
+  const {colors, selectionMode, syncing} = state;
   const searchResults = {...state.searchResults};
   const insets = useSafeArea();
   const _onScroll = event => {
@@ -84,8 +84,8 @@ const SimpleList = ({
           marginTop:
             Platform.OS == 'ios'
               ? data[0] && !selectionMode
-                ? 135
-                : 135 - 60
+                ? 115
+                : 115 - 60
               : data[0] && !selectionMode
               ? 155 - insets.top
               : 155 - insets.top - 60,
@@ -120,8 +120,8 @@ const SimpleList = ({
           marginTop:
             Platform.OS == 'ios'
               ? data[0] && !selectionMode
-                ? 135
-                : 135 - 60
+                ? 115
+                : 115 - 60
               : data[0] && !selectionMode
               ? 155 - insets.top
               : 155 - 60 - insets.top,
@@ -257,14 +257,15 @@ const SimpleList = ({
         <RefreshControl
           tintColor={colors.accent}
           colors={[colors.accent]}
-          progressViewOffset={165}
+          progressViewOffset={150}
           onRefresh={onRefresh}
-          refreshing={refreshing}
+          refreshing={syncing}
         />
       }
       keyExtractor={_listKeyExtractor}
       renderSectionHeader={_renderSectionHeader}
       onScroll={_onScroll}
+      stickySectionHeadersEnabled={false}
       ListEmptyComponent={_ListEmptyComponent}
       ListHeaderComponent={_ListHeaderComponent_S}
       contentContainerStyle={{
@@ -292,7 +293,7 @@ const SimpleList = ({
         <RefreshControl
           tintColor={colors.accent}
           colors={[colors.accent]}
-          progressViewOffset={165}
+          progressViewOffset={-200}
           onRefresh={onRefresh}
           refreshing={refreshing}
         />
