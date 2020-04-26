@@ -266,7 +266,6 @@ const Editor = ({noMenu}) => {
   };
 
   const setNoteInEditorAferSaving = (oldId, currentId) => {
-    console.log(oldId, currentId);
     if (oldId !== currentId) {
       id = currentId;
       note = db.notes.note(id);
