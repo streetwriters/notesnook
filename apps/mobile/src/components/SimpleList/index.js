@@ -85,7 +85,6 @@ const SimpleList = ({
     } else {
       setRefreshing(true);
     }
-
     try {
       let user = await db.user.get();
       dispatch({type: ACTIONS.USER, user: user});
@@ -98,7 +97,6 @@ const SimpleList = ({
       } else {
         setRefreshing(false);
       }
-
       ToastEvent.show('Sync Complete', 'success');
     } catch (e) {
       if (Platform.OS === 'ios') {
@@ -296,7 +294,7 @@ const SimpleList = ({
           colors={[colors.accent]}
           progressViewOffset={150}
           onRefresh={_onRefresh}
-          refreshing={syncing}
+          refreshing={refreshing}
         />
       }
       keyExtractor={_listKeyExtractor}
@@ -331,7 +329,7 @@ const SimpleList = ({
           tintColor={colors.accent}
           colors={[colors.accent]}
           progressViewOffset={-200}
-          onRefresh={onRefresh}
+          onRefresh={_onRefresh}
           refreshing={refreshing}
         />
       }
