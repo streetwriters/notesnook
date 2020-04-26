@@ -48,6 +48,7 @@ export const Home = ({navigation}) => {
       ToastEvent.show('Sync Complete', 'success');
     } catch (e) {
       setRefreshing(false);
+      console.log(e);
       ToastEvent.show(e.message, 'error');
     }
     dispatch({type: ACTIONS.NOTES});

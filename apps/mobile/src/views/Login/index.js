@@ -2,7 +2,6 @@ import React, {createRef, useEffect, useState} from 'react';
 import {
   ActivityIndicator,
   BackHandler,
-  SafeAreaView,
   Text,
   TouchableOpacity,
   View,
@@ -109,7 +108,7 @@ export const Login = ({navigation}) => {
   };
 
   return (
-    <SafeAreaView
+    <View
       style={{
         backgroundColor: colors.bg,
         height: '100%',
@@ -506,7 +505,7 @@ export const Login = ({navigation}) => {
           </View>
         </>
       )}
-    </SafeAreaView>
+    </View>
   );
 };
 
