@@ -1,5 +1,6 @@
-export const HOST = "http://localhost:8000/";
+export const HOST = "http://api.notesnook.com/";
 export const HEADERS = {
   agent: "nn/1.0.0",
-  "Content-Type": "application/json"
+  origin: "notesnook.com",
+  "Content-Type": "application/json",
 };
