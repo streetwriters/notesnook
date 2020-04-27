@@ -741,7 +741,9 @@ export const Settings = ({navigation}) => {
           },
           {
             name: 'About',
-            func: () => {},
+            func: () => {
+              Linking.openURL('https://www.notesbook.com');
+            },
           },
         ].map(item => (
           <TouchableOpacity
