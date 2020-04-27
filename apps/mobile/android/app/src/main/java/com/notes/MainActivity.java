@@ -1,4 +1,4 @@
-package com.notes;
+package com.streetwriters.notesnook;
 
 import com.facebook.react.ReactActivity;
 import android.view.KeyEvent;
