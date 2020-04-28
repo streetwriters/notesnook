@@ -38,6 +38,7 @@ export const Home = ({navigation}) => {
       eSendEvent(eScrollEvent, 0);
       dispatch({type: ACTIONS.COLORS});
       dispatch({type: ACTIONS.NOTES});
+      dispatch({type: ACTIONS.PINNED});
     }
   }, [isFocused]);
   const _renderItem = ({item, index}) => (

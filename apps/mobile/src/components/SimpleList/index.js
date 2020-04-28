@@ -157,8 +157,8 @@ const SimpleList = ({
           marginTop:
             Platform.OS == 'ios'
               ? data[0] && !selectionMode
-                ? 115
-                : 115 - 60
+                ? 135
+                : 135 - 60
               : data[0] && !selectionMode
               ? 155 - insets.top
               : 155 - 60 - insets.top,

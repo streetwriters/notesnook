@@ -1,7 +1,6 @@
 platform :ios, '9.0'
 require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
 
-
 def add_flipper_pods!(versions = {})
   versions['Flipper'] ||= '~> 0.33.1'
   versions['DoubleConversion'] ||= '1.1.7'
@@ -9,11 +8,13 @@ def add_flipper_pods!(versions = {})
   versions['Flipper-Glog'] ||= '0.3.6'
   versions['Flipper-PeerTalk'] ||= '~> 0.0.4'
   versions['Flipper-RSocket'] ||= '~> 1.0'
+
   pod 'FlipperKit', versions['Flipper'], :configuration => 'Debug'
   pod 'FlipperKit/FlipperKitLayoutPlugin', versions['Flipper'], :configuration => 'Debug'
   pod 'FlipperKit/SKIOSNetworkPlugin', versions['Flipper'], :configuration => 'Debug'
   pod 'FlipperKit/FlipperKitUserDefaultsPlugin', versions['Flipper'], :configuration => 'Debug'
   pod 'FlipperKit/FlipperKitReactPlugin', versions['Flipper'], :configuration => 'Debug'
+
   # List all transitive dependencies for FlipperKit pods
   # to avoid them being linked in Release builds
   pod 'Flipper', versions['Flipper'], :configuration => 'Debug'
@@ -41,26 +42,10 @@ def flipper_post_install(installer)
       end
     end
   end
-  file_name = Dir.glob("*.xcodeproj")[0]
-  app_project = Xcodeproj::Project.open(file_name)
-  app_project.native_targets.each do |target|
-    target.build_configurations.each do |config|
-      cflags = config.build_settings['OTHER_CFLAGS'] || '$(inherited) '
-      unless cflags.include? '-DFB_SONARKIT_ENABLED=1'
-        puts 'Adding -DFB_SONARKIT_ENABLED=1 in OTHER_CFLAGS...'
-        cflags << '-DFB_SONARKIT_ENABLED=1'
-      end
-      config.build_settings['OTHER_CFLAGS'] = cflags
-    end
-    app_project.save
-  end
-  installer.pods_project.save
 end
 
-
-
-target 'Notes' do
-  # Pods for Notes
+target 'Notesnook' do
+  # Pods for Notesnook
   pod 'FBLazyVector', :path => "../node_modules/react-native/Libraries/FBLazyVector"
   pod 'FBReactNativeSpec', :path => "../node_modules/react-native/Libraries/FBReactNativeSpec"
   pod 'RCTRequired', :path => "../node_modules/react-native/Libraries/RCTRequired"
@@ -87,13 +72,13 @@ target 'Notes' do
   pod 'ReactCommon/callinvoker', :path => "../node_modules/react-native/ReactCommon"
   pod 'ReactCommon/turbomodule/core', :path => "../node_modules/react-native/ReactCommon"
   pod 'Yoga', :path => '../node_modules/react-native/ReactCommon/yoga', :modular_headers => true
-  pod 'Base64'
+
   pod 'DoubleConversion', :podspec => '../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec'
   pod 'glog', :podspec => '../node_modules/react-native/third-party-podspecs/glog.podspec'
   pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec'
-
-
-  target 'NotesTests' do
+  pod 'Base64'
+  
+  target 'NotesnookTests' do
     inherit! :complete
     # Pods for testing
   end
@@ -110,12 +95,11 @@ target 'Notes' do
   end
 end
 
-target 'Notes-tvOS' do
-  # Pods for Notes-tvOS
+target 'Notesnook-tvOS' do
+  # Pods for Notesnook-tvOS
 
-  target 'Notes-tvOSTests' do
+  target 'Notesnook-tvOSTests' do
     inherit! :search_paths
     # Pods for testing
   end
-
 end
