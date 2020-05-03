@@ -262,7 +262,7 @@ export const Login = ({navigation}) => {
                     fontSize: SIZE.sm,
                     fontFamily: WEIGHT.regular,
                   }}
-                  placeholder="Username (a-z _- 0-9)"
+                  placeholder="Username"
                   placeholderTextColor={colors.icon}
                 />
 
@@ -371,85 +371,94 @@ export const Login = ({navigation}) => {
                       />
                     ) : null}
                   </Text>
-                  <Icon
-                    name="eye"
-                    size={20}
-                    onPress={() => {
-                      setSecureEntry(!secureEntry);
-                    }}
-                    style={{
-                      position: 'absolute',
-                      right: 30,
-                      zIndex: 10,
-                    }}
-                    color={secureEntry ? colors.icon : colors.accent}
-                  />
-                  <TextInput
-                    ref={_pass}
-                    onFocus={() => {
-                      if (!invalidPassword) {
-                        _pass.current.setNativeProps({
-                          style: {
-                            borderColor: colors.accent,
-                          },
-                        });
-                      }
-                    }}
-                    defaultValue={password}
-                    onBlur={() => {
-                      if (!validatePass(password) && password?.length > 0) {
-                        setInvalidPassword(true);
-                        _pass.current.setNativeProps({
-                          style: {
-                            color: colors.errorText,
-                            borderColor: colors.errorText,
-                          },
-                        });
-                      } else {
-                        setInvalidPassword(false);
-                        _pass.current.setNativeProps({
-                          style: {
-                            borderColor: colors.nav,
-                          },
-                        });
-                      }
-                    }}
-                    onChangeText={value => {
-                      setPassword(value);
-                      if (invalidPassword && validatePass(password)) {
-                        setInvalidPassword(false);
-                        _pass.current.setNativeProps({
-                          style: {
-                            color: colors.pri,
-                            borderColor: colors.accent,
-                          },
-                        });
-                      }
-                    }}
-                    onSubmitEditing={() => {
-                      if (!validatePass(password)) {
-                        setInvalidPassword(true);
-                        _pass.current.setNativeProps({
-                          style: {
-                            color: colors.errorText,
-                          },
-                        });
-                      }
-                    }}
+
+                  <View
                     style={{
                       padding: pv,
                       borderWidth: 1.5,
                       borderColor: colors.nav,
-                      marginHorizontal: 12,
-                      paddingRight:24,
                       borderRadius: 5,
-                      fontSize: SIZE.sm,
-                      fontFamily: WEIGHT.regular,
-                    }}
-                    secureTextEntry={secureEntry}
-                    placeholder="Password"
-                    placeholderTextColor={colors.icon}
-                  />
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      marginHorizontal: 12,
+                    }}>
+                    <TextInput
+                      ref={_pass}
+                      onFocus={() => {
+                        if (!invalidPassword) {
+                          _pass.current.setNativeProps({
+                            style: {
+                              borderColor: colors.accent,
+                            },
+                          });
+                        }
+                      }}
+                      defaultValue={password}
+                      onBlur={() => {
+                        if (!validatePass(password) && password?.length > 0) {
+                          setInvalidPassword(true);
+                          _pass.current.setNativeProps({
+                            style: {
+                              color: colors.errorText,
+                              borderColor: colors.errorText,
+                            },
+                          });
+                        } else {
+                          setInvalidPassword(false);
+                          _pass.current.setNativeProps({
+                            style: {
+                              borderColor: colors.nav,
+                            },
+                          });
+                        }
+                      }}
+                      onChangeText={value => {
+                        setPassword(value);
+                        if (invalidPassword && validatePass(password)) {
+                          setInvalidPassword(false);
+                          _pass.current.setNativeProps({
+                            style: {
+                              color: colors.pri,
+                              borderColor: colors.accent,
+                            },
+                          });
+                        }
+                      }}
+                      onSubmitEditing={() => {
+                        if (!validatePass(password)) {
+                          setInvalidPassword(true);
+                          _pass.current.setNativeProps({
+                            style: {
+                              color: colors.errorText,
+                            },
+                          });
+                        }
+                      }}
+                      style={{
+                        padding: 0,
+                        fontSize: SIZE.sm,
+                        fontFamily: WEIGHT.regular,
+                        width: '85%',
+                        maxWidth: '85%',
+                      }}
+                      secureTextEntry={secureEntry}
+                      placeholder="Password"
+                      placeholderTextColor={colors.icon}
+                    />
+
+                    <Icon
+                      name="eye"
+                      size={20}
+                      onPress={() => {
+                        setSecureEntry(!secureEntry);
+                      }}
+                      style={{
+                        width: 25,
+                      }}
+                      color={secureEntry ? colors.icon : colors.accent}
+                    />
+                  </View>
 
                   {/* <View
                     style={{
