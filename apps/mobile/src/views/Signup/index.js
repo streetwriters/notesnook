@@ -36,9 +36,9 @@ export const Signup = ({navigation}) => {
   const {colors, isLoginNavigator} = state;
   const [signingIn, setSigningIn] = useState(false);
   const [status, setStatus] = useState('Creating new user...');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState(null);
+  const [password, setPassword] = useState(null);
+  const [username, setUsername] = useState(null);
   const [invalidUsername, setInvalidUsername] = useState(false);
   const [invalidEmail, setInvalidEmail] = useState(false);
   const [invalidPassword, setInvalidPassword] = useState(false);
@@ -46,7 +46,7 @@ export const Signup = ({navigation}) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState(false);
   const [key, setKey] = useState('');
-  const [passwordReEnter, setPasswordReEnter] = useState('');
+  const [passwordReEnter, setPasswordReEnter] = useState(null);
   let isFocused = useIsFocused();
 
   const handleBackPress = () => {
@@ -61,10 +61,17 @@ export const Signup = ({navigation}) => {
   }, [isFocused]);
 
   const _signUp = async () => {
+    
+    if (!password || !email || !username || !passwordReEnter){
+      ToastEvent.show('All fields are required', 'error');  
+      return;
+    }
     if (!confirmPassword){
       ToastEvent.show('Passwords do not match', 'error');  
       return;
     }
+
+
     setSigningIn(true);
     setStatus('Creating new user...');
     if (!invalidEmail && !invalidPassword && !invalidUsername) {
