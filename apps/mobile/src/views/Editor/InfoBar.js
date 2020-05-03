@@ -86,7 +86,7 @@ export default class InfoBar extends React.Component {
           {this.state.saving ? (
             <ActivityIndicator
               style={{width: 14, height: 14, marginLeft: 10}}
-              color="white"
+              color={this.props.colors.accent}
               size={14}
             />
           ) : null}
