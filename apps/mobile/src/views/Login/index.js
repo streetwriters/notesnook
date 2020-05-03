@@ -33,6 +33,7 @@ export const Login = ({navigation}) => {
   const [invalidPassword, setInvalidPassword] = useState(false);
   const [username, setUsername] = useState(null);
   const [invalidUsername, setInvalidUsername] = useState(false);
+  const [secureEntry, setSecureEntry] = useState(true);
 
   const isFocused = useIsFocused();
 
@@ -67,12 +68,12 @@ export const Login = ({navigation}) => {
 
   const _logIn = async () => {
     if (!password || password.length < 8) {
-      ToastEvent.show("Invalid username or password", 'error');
+      ToastEvent.show('Invalid username or password', 'error');
       return;
     }
     if (!username) {
-      ToastEvent.show("Invalid username or password", 'error');
-      return
+      ToastEvent.show('Invalid username or password', 'error');
+      return;
     }
     setLoggingIn(true);
     _username.current.blur();
@@ -350,6 +351,7 @@ export const Login = ({navigation}) => {
                   style={{
                     marginBottom: 15,
                     marginTop: 15,
+                    justifyContent: 'center',
                   }}>
                   <Text
                     style={{
@@ -369,6 +371,19 @@ export const Login = ({navigation}) => {
                       />
                     ) : null}
                   </Text>
+                  <Icon
+                    name="eye"
+                    size={20}
+                    onPress={() => {
+                      setSecureEntry(!secureEntry);
+                    }}
+                    style={{
+                      position: 'absolute',
+                      right: 30,
+                      zIndex: 10,
+                    }}
+                    color={secureEntry ? colors.icon : colors.accent}
+                  />
                   <TextInput
                     ref={_pass}
                     onFocus={() => {
@@ -382,7 +397,7 @@ export const Login = ({navigation}) => {
                     }}
                     defaultValue={password}
                     onBlur={() => {
-                      if (!validatePass(password) && password.length > 0) {
+                      if (!validatePass(password) && password?.length > 0) {
                         setInvalidPassword(true);
                         _pass.current.setNativeProps({
                           style: {
@@ -401,7 +416,6 @@ export const Login = ({navigation}) => {
                     }}
                     onChangeText={value => {
                       setPassword(value);
-
                       if (invalidPassword && validatePass(password)) {
                         setInvalidPassword(false);
                         _pass.current.setNativeProps({
@@ -427,14 +441,16 @@ export const Login = ({navigation}) => {
                       borderWidth: 1.5,
                       borderColor: colors.nav,
                       marginHorizontal: 12,
+                      paddingRight:24,
                       borderRadius: 5,
                       fontSize: SIZE.sm,
                       fontFamily: WEIGHT.regular,
                     }}
-                    secureTextEntry={true}
+                    secureTextEntry={secureEntry}
                     placeholder="Password"
                     placeholderTextColor={colors.icon}
                   />
+
                   {/* <View
                     style={{
                       paddingHorizontal: 12,

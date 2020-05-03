@@ -47,6 +47,7 @@ export const Signup = ({navigation}) => {
   const [confirmPassword, setConfirmPassword] = useState(false);
   const [key, setKey] = useState('');
   const [passwordReEnter, setPasswordReEnter] = useState(null);
+  const [secureEntry, setSecureEntry] = useState(true);
   let isFocused = useIsFocused();
 
   const handleBackPress = () => {
@@ -329,7 +330,7 @@ export const Signup = ({navigation}) => {
                 }}
                 defaultValue={username}
                 onBlur={() => {
-                  if (!validateUsername(username) && username.length > 0) {
+                  if (!validateUsername(username) && username?.length > 0) {
                     setInvalidUsername(true);
                     _username.current.setNativeProps({
                       style: {
@@ -421,7 +422,7 @@ export const Signup = ({navigation}) => {
                   }}
                   defaultValue={email}
                   onBlur={() => {
-                    if (!validateEmail(email) && email.length > 0) {
+                    if (!validateEmail(email) && email?.length > 0) {
                       setInvalidEmail(true);
                       _email.current.setNativeProps({
                         style: {
@@ -479,6 +480,7 @@ export const Signup = ({navigation}) => {
                 style={{
                   marginTop: 15,
                   marginBottom: 15,
+                  justifyContent:'center'
                 }}>
                 <Text
                   style={{
@@ -499,6 +501,19 @@ export const Signup = ({navigation}) => {
                     />
                   ) : null}
                 </Text>
+                <Icon
+                    name="eye"
+                    size={20}
+                    onPress={() => {
+                      setSecureEntry(!secureEntry);
+                    }}
+                    style={{
+                      position: 'absolute',
+                      right: 30,
+                      zIndex: 10,
+                    }}
+                    color={secureEntry ? colors.icon : colors.accent}
+                  />
                 <TextInput
                   ref={_pass}
                   onFocus={() => {
@@ -557,18 +572,22 @@ export const Signup = ({navigation}) => {
                     borderWidth: 1.5,
                     borderColor: colors.nav,
                     marginHorizontal: 12,
+                    paddingRight:24,
                     borderRadius: 5,
                     fontSize: SIZE.sm,
                     fontFamily: WEIGHT.regular,
                   }}
-                  secureTextEntry={true}
+                  secureTextEntry={secureEntry}
                   placeholder="Password"
                   placeholderTextColor={colors.icon}
                 />
 
-                <TextInput
+               
+              </View>
+
+              <TextInput
                   ref={_passConfirm}
-                  editable={password ? true : false}
+                  editable={password && !invalidPassword ? true : false}
                   defaultValue={passwordReEnter}
                   onChangeText={value => {
                     setPasswordReEnter(value);
@@ -611,15 +630,14 @@ export const Signup = ({navigation}) => {
                     borderColor: colors.nav,
                     marginHorizontal: 12,
                     borderRadius: 5,
-                    marginTop: 12,
+                    marginBottom: 12,
                     fontSize: SIZE.sm,
                     fontFamily: WEIGHT.regular,
                   }}
-                  secureTextEntry={true}
+                  secureTextEntry={secureEntry}
                   placeholder="Confirm Password"
                   placeholderTextColor={colors.icon}
                 />
-              </View>
               <TouchableOpacity
                 activeOpacity={opacity}
                 onPress={_signUp}
