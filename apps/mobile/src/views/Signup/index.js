@@ -30,6 +30,7 @@ import {Toast} from '../../components/Toast';
 const _email = createRef();
 const _pass = createRef();
 const _username = createRef();
+const _passConfirm = createRef();
 export const Signup = ({navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors, isLoginNavigator} = state;
@@ -43,7 +44,9 @@ export const Signup = ({navigation}) => {
   const [invalidPassword, setInvalidPassword] = useState(false);
   const [failed, setFailed] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState(false);
   const [key, setKey] = useState('');
+  const [passwordReEnter, setPasswordReEnter] = useState('');
   let isFocused = useIsFocused();
 
   const handleBackPress = () => {
@@ -58,6 +61,10 @@ export const Signup = ({navigation}) => {
   }, [isFocused]);
 
   const _signUp = async () => {
+    if (!confirmPassword){
+      ToastEvent.show('Passwords do not match', 'error');  
+      return;
+    }
     setSigningIn(true);
     setStatus('Creating new user...');
     if (!invalidEmail && !invalidPassword && !invalidUsername) {
@@ -549,6 +556,60 @@ export const Signup = ({navigation}) => {
                   }}
                   secureTextEntry={true}
                   placeholder="Password"
+                  placeholderTextColor={colors.icon}
+                />
+
+                <TextInput
+                  ref={_passConfirm}
+                  editable={password ? true : false}
+                  defaultValue={passwordReEnter}
+                  onChangeText={value => {
+                    setPasswordReEnter(value);
+                    if (value !== password) {
+                      setConfirmPassword(false);
+                      _passConfirm.current.setNativeProps({
+                        style: {
+                          borderColor: colors.errorText,
+                        },
+                      });
+                      _pass.current.setNativeProps({
+                        style: {
+                          borderColor: colors.errorText,
+                        },
+                      });
+                    } else {
+                      setConfirmPassword(true);
+                      _passConfirm.current.setNativeProps({
+                        style: {
+                          borderColor: colors.accent,
+                        },
+                      });
+                      _pass.current.setNativeProps({
+                        style: {
+                          borderColor: colors.accent,
+                        },
+                      });
+                    }
+                  }}
+                  onFocus={() => {
+                    _passConfirm.current.setNativeProps({
+                      style: {
+                        borderColor: colors.accent,
+                      },
+                    });
+                  }}
+                  style={{
+                    padding: pv,
+                    borderWidth: 1.5,
+                    borderColor: colors.nav,
+                    marginHorizontal: 12,
+                    borderRadius: 5,
+                    marginTop: 12,
+                    fontSize: SIZE.sm,
+                    fontFamily: WEIGHT.regular,
+                  }}
+                  secureTextEntry={true}
+                  placeholder="Confirm Password"
                   placeholderTextColor={colors.icon}
                 />
               </View>

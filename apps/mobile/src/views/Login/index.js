@@ -27,11 +27,11 @@ export const Login = ({navigation}) => {
   const [status, setStatus] = useState('Logging in...');
   const _username = createRef();
   const [loggingIn, setLoggingIn] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState(null);
+  const [password, setPassword] = useState(null);
   const [invalidEmail, setInvalidEmail] = useState(false);
   const [invalidPassword, setInvalidPassword] = useState(false);
-  const [username, setUsername] = useState('');
+  const [username, setUsername] = useState(null);
   const [invalidUsername, setInvalidUsername] = useState(false);
 
   const isFocused = useIsFocused();
@@ -66,6 +66,14 @@ export const Login = ({navigation}) => {
   }, [isFocused]);
 
   const _logIn = async () => {
+    if (!password || password.length < 8) {
+      ToastEvent.show("Invalid username or password", 'error');
+      return;
+    }
+    if (!username) {
+      ToastEvent.show("Invalid username or password", 'error');
+      return
+    }
     setLoggingIn(true);
     _username.current.blur();
     _pass.current.blur();
