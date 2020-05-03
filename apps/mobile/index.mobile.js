@@ -3,7 +3,7 @@ import Animated from 'react-native-reanimated';
 import { Menu } from './src/components/Menu';
 import * as Animatable from 'react-native-animatable';
 import SideMenu from './src/components/SideMenu';
-import { EditorPosition } from './src/utils/animations';
+import { EditorPosition, EditorOpacity } from './src/utils/animations';
 import { sideMenuRef } from './src/utils/refs';
 import { DDS, w } from './src/utils/utils';
 import Editor from './src/views/Editor';
@@ -78,6 +78,7 @@ export const Initialize = () => {
           position: 'absolute',
           backgroundColor: colors.bg,
           elevation: 10,
+          opacity:EditorOpacity,
           transform: [
             {
               translateX: EditorPosition,
