@@ -34,7 +34,7 @@ class Primary {
   constructor() {
     return {
       variant: "buttons.default",
-      color: "fontSecondary",
+      color: "static",
       bg: "primary",
       transition: "opacity 300ms linear",
       ":hover": {
