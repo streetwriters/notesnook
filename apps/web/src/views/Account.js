@@ -1,20 +1,24 @@
-import React from "react";
-import { Flex, Button, Image, Text } from "rebass";
-import { useStore } from "../stores/user-store";
+import React, { useEffect, useState } from "react";
+import { Flex, Button, Text } from "rebass";
+import { useStore, store } from "../stores/user-store";
 
 function Account() {
   const logout = useStore((store) => store.logout);
+  const initUser = useStore((store) => store.init);
+  const [user, setUser] = useState({});
+  useEffect(() => {
+    initUser().then(() => {
+      setUser(store.get().user);
+    });
+  }, [initUser]);
+
   return (
     <Flex variant="columnFill">
-      <Image
-        width={1 / 4}
-        alignSelf="center"
-        mt="20px"
-        src={process.env.PUBLIC_URL + "/square.jpg"}
-        sx={{ borderRadius: 50 }}
-      />
       <Text variant="title" textAlign="center" py="5px">
-        {"Alex's Account"}
+        {user.username}
+      </Text>
+      <Text variant="subtitle" textAlign="center" py="5px">
+        {user.email}
       </Text>
       <Text
         alignSelf="center"
@@ -25,13 +29,8 @@ function Account() {
         my="5px"
         sx={{ borderRadius: "5px" }}
       >
-        Pro
+        Beta
       </Text>
-      <Button variant="list">Backup</Button>
-      <Button variant="list">My Devices</Button>
-      <Button variant="list">Vault</Button>
-      <Button variant="list">My Subscription</Button>
-      <Button variant="list">Change Password</Button>
       <Button
         variant="list"
         onClick={async () => {
