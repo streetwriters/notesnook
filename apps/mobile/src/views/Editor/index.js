@@ -151,7 +151,9 @@ const Editor = ({noMenu}) => {
 
   const onCallClear = () => {
     canSave = false;
-    exitEditorAnimation();
+    if (editing.currentlyEditing) {
+      exitEditorAnimation();
+    }
     clearEditor();
   };
 
@@ -246,18 +248,17 @@ const Editor = ({noMenu}) => {
   const checkIfContentIsSavable = () => {
     if (!canSave) return false;
     if (!title && !content) return false;
-    if (content && content.text.length === 0 && title && title?.length == 0)
+    if (content && content.text.length < 2 && title && title?.length < 2)
       return false;
-    if (!content && title && title.length === 0) return false;
-    if (!title && content.text.length === 0) return false;
-
-    if (!content) {
+    if (!content && title && title.length < 2) return false;
+    if (!title && content.text.length < 2) return false;
+    if (title && !content) {
       content = {
         text: '',
         delta: {ops: []},
       };
     }
-
+  
     return true;
   };
 
@@ -387,7 +388,9 @@ const Editor = ({noMenu}) => {
       id = note.id;
       saveCounter = 0;
       InfoBarRef.current?.setDateCreated(note.dateCreated);
+
       content.text = await db.notes.note(id).text();
+
       InfoBarRef.current?.setDateEdited(
         note.dateEdited,
         content.text.split(' ').length,
