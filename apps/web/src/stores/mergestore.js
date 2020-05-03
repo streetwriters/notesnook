@@ -51,8 +51,7 @@ class MergeStore extends BaseStore {
       state.remoteDelta = undefined;
     });
     noteStore.refresh();
-    noteStore.setSelectedNote(note.id);
-    await editorStore.openSession(note.id);
+    await editorStore.openSession(note);
   };
 }
 
