@@ -131,6 +131,7 @@ const Editor = ({noMenu}) => {
   const clearEditor = async () => {
     await saveNote(true);
     setDateEdited(0);
+    InfoBarRef.current?.clear();
     title = null;
     content = null;
     note = null;
@@ -138,6 +139,7 @@ const Editor = ({noMenu}) => {
     tapCount = 0;
     saveCounter = 0;
     canSave = false;
+
     post({
       type: 'clearEditor',
     });

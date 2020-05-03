@@ -34,6 +34,14 @@ export default class InfoBar extends React.Component {
   setDateCreated(dateCreated) {
     this.dateCreated = dateCreated;
   }
+  clear() {
+    this.dateCreated = null;
+    this.setState({
+      saving:false,
+      dateEdited:null,
+      length:0
+    })
+  }
 
   render() {
     return (
