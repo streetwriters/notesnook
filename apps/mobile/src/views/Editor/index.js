@@ -389,13 +389,17 @@ const Editor = ({noMenu}) => {
     id = note.id;
     saveCounter = 0;
     InfoBarRef.current?.setDateCreated(note.dateCreated);
+    content = {};
+    content.text = '';
     try {
       content.text = await db.notes.note(id).text();
       InfoBarRef.current?.setDateEdited(
         note.dateEdited,
         content.text.split(' ').length,
       );
-    } catch (e) {}
+    } catch (e) {
+
+    }
 
     if (title !== null || title === '') {
       post({
