@@ -23,7 +23,7 @@ import {
   validateEmail,
   validatePass,
 } from '../../services/validation';
-import {ToastEvent, db, DDS} from '../../utils/utils';
+import {ToastEvent, db, DDS, getElevation} from '../../utils/utils';
 import {ACTIONS} from '../../provider/actions';
 import {Toast} from '../../components/Toast';
 
@@ -62,16 +62,14 @@ export const Signup = ({navigation}) => {
   }, [isFocused]);
 
   const _signUp = async () => {
-    
-    if (!password || !email || !username || !passwordReEnter){
-      ToastEvent.show('All fields are required', 'error');  
+    if (!password || !email || !username || !passwordReEnter) {
+      ToastEvent.show('All fields are required', 'error');
       return;
     }
-    if (!confirmPassword){
-      ToastEvent.show('Passwords do not match', 'error');  
+    if (!confirmPassword) {
+      ToastEvent.show('Passwords do not match', 'error');
       return;
     }
-
 
     setSigningIn(true);
     setStatus('Creating new user...');
@@ -476,175 +474,176 @@ export const Signup = ({navigation}) => {
                 />
               </View>
               <View
+                style={{
+                  marginBottom: 15,
+                  marginTop: 15,
+                  justifyContent: 'center',
+                }}>
+                <Text
                   style={{
-                    marginBottom: 15,
-                    marginTop: 15,
-                    justifyContent: 'center',
+                    textAlign: 'right',
+                    marginHorizontal: 12,
+                    fontFamily: WEIGHT.regular,
+                    textAlignVertical: 'bottom',
+                    position: 'absolute',
+                    right: 5,
+                    top: 2.5,
                   }}>
-                  <Text
-                    style={{
-                      textAlign: 'right',
-                      marginHorizontal: 12,
-                      fontFamily: WEIGHT.regular,
-                      textAlignVertical: 'bottom',
-                      position: 'absolute',
-                      right: 5,
-                      top: 2.5,
-                    }}>
-                    {invalidPassword ? (
-                      <Icon
-                        name="alert-circle-outline"
-                        size={SIZE.xs}
-                        color={colors.errorText}
-                      />
-                    ) : null}
-                  </Text>
-
-                  <View
-                    style={{
-                      padding: pv,
-                      borderWidth: 1.5,
-                      borderColor: colors.nav,
-                      borderRadius: 5,
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      marginHorizontal: 12,
-                    }}>
-                    <TextInput
-                      ref={_pass}
-                      onFocus={() => {
-                        if (!invalidPassword) {
-                          _pass.current.setNativeProps({
-                            style: {
-                              borderColor: colors.accent,
-                            },
-                          });
-                        }
-                      }}
-                      defaultValue={password}
-                      onBlur={() => {
-                        if (!validatePass(password) && password?.length > 0) {
-                          setInvalidPassword(true);
-                          _pass.current.setNativeProps({
-                            style: {
-                              color: colors.errorText,
-                              borderColor: colors.errorText,
-                            },
-                          });
-                        } else {
-                          setInvalidPassword(false);
-                          _pass.current.setNativeProps({
-                            style: {
-                              borderColor: colors.nav,
-                            },
-                          });
-                        }
-                      }}
-                      onChangeText={value => {
-                        setPassword(value);
-                        if (invalidPassword && validatePass(password)) {
-                          setInvalidPassword(false);
-                          _pass.current.setNativeProps({
-                            style: {
-                              color: colors.pri,
-                              borderColor: colors.accent,
-                            },
-                          });
-                        }
-                      }}
-                      onSubmitEditing={() => {
-                        if (!validatePass(password)) {
-                          setInvalidPassword(true);
-                          _pass.current.setNativeProps({
-                            style: {
-                              color: colors.errorText,
-                            },
-                          });
-                        }
-                      }}
-                      style={{
-                        padding: 0,
-                        fontSize: SIZE.sm,
-                        fontFamily: WEIGHT.regular,
-                        width: '85%',
-                        maxWidth: '85%',
-                      }}
-                      secureTextEntry={secureEntry}
-                      placeholder="Password"
-                      placeholderTextColor={colors.icon}
-                    />
-
+                  {invalidPassword ? (
                     <Icon
-                      name="eye"
-                      size={20}
-                      onPress={() => {
-                        setSecureEntry(!secureEntry);
-                      }}
-                      style={{
-                        width: 25,
-                      }}
-                      color={secureEntry ? colors.icon : colors.accent}
+                      name="alert-circle-outline"
+                      size={SIZE.xs}
+                      color={colors.errorText}
                     />
-                  </View>
-                    </View>
+                  ) : null}
+                </Text>
+
+                <View
+                  style={{
+                    borderWidth: 1.5,
+                    borderColor: colors.nav,
+                    borderRadius: 5,
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginHorizontal: 12,
+                  }}>
+                  <TextInput
+                    ref={_pass}
+                    onFocus={() => {
+                      if (!invalidPassword) {
+                        _pass.current.setNativeProps({
+                          style: {
+                            borderColor: colors.accent,
+                          },
+                        });
+                      }
+                    }}
+                    defaultValue={password}
+                    onBlur={() => {
+                      if (!validatePass(password) && password?.length > 0) {
+                        setInvalidPassword(true);
+                        _pass.current.setNativeProps({
+                          style: {
+                            color: colors.errorText,
+                            borderColor: colors.errorText,
+                          },
+                        });
+                      } else {
+                        setInvalidPassword(false);
+                        _pass.current.setNativeProps({
+                          style: {
+                            borderColor: colors.nav,
+                          },
+                        });
+                      }
+                    }}
+                    onChangeText={value => {
+                      setPassword(value);
+                      if (invalidPassword && validatePass(password)) {
+                        setInvalidPassword(false);
+                        _pass.current.setNativeProps({
+                          style: {
+                            color: colors.pri,
+                            borderColor: colors.accent,
+                          },
+                        });
+                      }
+                    }}
+                    onSubmitEditing={() => {
+                      if (!validatePass(password)) {
+                        setInvalidPassword(true);
+                        _pass.current.setNativeProps({
+                          style: {
+                            color: colors.errorText,
+                          },
+                        });
+                      }
+                    }}
+                    style={{
+                      padding:pv,
+                      fontSize: SIZE.sm,
+                      fontFamily: WEIGHT.regular,
+                      width: '85%',
+                      maxWidth: '85%',
+                    }}
+                    secureTextEntry={secureEntry}
+                    placeholder="Password"
+                    placeholderTextColor={colors.icon}
+                  />
+
+                  <Icon
+                    name="eye"
+                    size={20}
+                    onPress={() => {
+                      setSecureEntry(!secureEntry);
+                    }}
+                    style={{
+                      width: 25,
+                      marginRight:10
+                    }}
+                    color={secureEntry ? colors.icon : colors.accent}
+                  />
+                </View>
+              </View>
               <TextInput
-                  ref={_passConfirm}
-                  editable={password && !invalidPassword ? true : false}
-                  defaultValue={passwordReEnter}
-                  onChangeText={value => {
-                    setPasswordReEnter(value);
-                    if (value !== password) {
-                      setConfirmPassword(false);
-                      _passConfirm.current.setNativeProps({
-                        style: {
-                          borderColor: colors.errorText,
-                        },
-                      });
-                      _pass.current.setNativeProps({
-                        style: {
-                          borderColor: colors.errorText,
-                        },
-                      });
-                    } else {
-                      setConfirmPassword(true);
-                      _passConfirm.current.setNativeProps({
-                        style: {
-                          borderColor: colors.accent,
-                        },
-                      });
-                      _pass.current.setNativeProps({
-                        style: {
-                          borderColor: colors.accent,
-                        },
-                      });
-                    }
-                  }}
-                  onFocus={() => {
+                ref={_passConfirm}
+                editable={password && !invalidPassword ? true : false}
+                defaultValue={passwordReEnter}
+                onChangeText={value => {
+                  setPasswordReEnter(value);
+                  if (value !== password) {
+                    setConfirmPassword(false);
+                    _passConfirm.current.setNativeProps({
+                      style: {
+                        borderColor: colors.errorText,
+                      },
+                    });
+                    _pass.current.setNativeProps({
+                      style: {
+                        borderColor: colors.errorText,
+                      },
+                    });
+                  } else {
+                    setConfirmPassword(true);
                     _passConfirm.current.setNativeProps({
                       style: {
                         borderColor: colors.accent,
                       },
                     });
-                  }}
-                  style={{
-                    padding: pv,
-                    borderWidth: 1.5,
-                    borderColor: colors.nav,
-                    marginHorizontal: 12,
-                    borderRadius: 5,
-                    marginBottom: 12,
-                    fontSize: SIZE.sm,
-                    fontFamily: WEIGHT.regular,
-                  }}
-                  secureTextEntry={secureEntry}
-                  placeholder="Confirm Password"
-                  placeholderTextColor={colors.icon}
-                />
+                    _pass.current.setNativeProps({
+                      style: {
+                        borderColor: colors.accent,
+                      },
+                    });
+                  }
+                }}
+                onFocus={() => {
+                  _passConfirm.current.setNativeProps({
+                    style: {
+                      borderColor: colors.accent,
+                    },
+                  });
+                }}
+                style={{
+                  padding: pv,
+                  borderWidth: 1.5,
+                  borderColor: colors.nav,
+                  marginHorizontal: 12,
+                  borderRadius: 5,
+                  marginBottom: 12,
+                  fontSize: SIZE.sm,
+                  fontFamily: WEIGHT.regular,
+                }}
+                secureTextEntry={secureEntry}
+                placeholder="Confirm Password"
+                placeholderTextColor={colors.icon}
+              />
               <TouchableOpacity
                 activeOpacity={opacity}
                 onPress={_signUp}
                 style={{
+                  ...getElevation(10),
                   padding: pv,
                   backgroundColor: colors.accent,
                   borderRadius: 5,
@@ -658,7 +657,7 @@ export const Signup = ({navigation}) => {
                     fontFamily: WEIGHT.medium,
                     color: 'white',
                   }}>
-                  Signup
+                  Sign Up
                 </Text>
               </TouchableOpacity>
             </View>

@@ -17,7 +17,7 @@ import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
 import {eCloseSideMenu, refreshNotesPage} from '../../services/events';
 import {validatePass, validateUsername} from '../../services/validation';
-import {db, DDS, ToastEvent} from '../../utils/utils';
+import {db, DDS, ToastEvent, getElevation} from '../../utils/utils';
 
 export const Login = ({navigation}) => {
   const [state, dispatch] = useTracked();
@@ -374,7 +374,7 @@ export const Login = ({navigation}) => {
 
                   <View
                     style={{
-                      padding: pv,
+                      
                       borderWidth: 1.5,
                       borderColor: colors.nav,
                       borderRadius: 5,
@@ -436,7 +436,7 @@ export const Login = ({navigation}) => {
                         }
                       }}
                       style={{
-                        padding: 0,
+                        padding:pv,
                         fontSize: SIZE.sm,
                         fontFamily: WEIGHT.regular,
                         width: '85%',
@@ -455,6 +455,7 @@ export const Login = ({navigation}) => {
                       }}
                       style={{
                         width: 25,
+                        marginRight:10
                       }}
                       color={secureEntry ? colors.icon : colors.accent}
                     />
@@ -487,12 +488,14 @@ export const Login = ({navigation}) => {
                   activeOpacity={opacity}
                   onPress={_logIn}
                   style={{
+                    ...getElevation(10),
                     padding: pv,
                     backgroundColor: colors.accent,
                     borderRadius: 5,
                     marginHorizontal: 12,
                     marginBottom: 10,
                     alignItems: 'center',
+                   
                   }}>
                   <Text
                     style={{
@@ -529,7 +532,7 @@ export const Login = ({navigation}) => {
                       style={{
                         color: colors.accent,
                       }}>
-                      Register now
+                      Sign Up
                     </Text>
                   </Text>
                 </TouchableOpacity>
