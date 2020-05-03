@@ -397,9 +397,7 @@ const Editor = ({noMenu}) => {
         note.dateEdited,
         content.text.split(' ').length,
       );
-    } catch (e) {
-
-    }
+    } catch (e) {}
 
     if (title !== null || title === '') {
       post({

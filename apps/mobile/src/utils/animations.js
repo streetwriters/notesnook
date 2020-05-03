@@ -19,7 +19,7 @@ export function openEditorAnimation() {
   };
   
   timing(EditorOpacity, {
-    duration:150,
+    duration:300,
     toValue:1,
     easing: Easing.in(Easing.linear),
   }).start();
@@ -36,7 +36,7 @@ export function exitEditorAnimation() {
     easing: Easing.in(Easing.linear),
   };
   timing(EditorOpacity, {
-    duration:100,
+    duration:150,
     toValue:0,
     easing: Easing.in(Easing.linear),
   }).start();

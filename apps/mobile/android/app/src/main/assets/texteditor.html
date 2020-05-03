@@ -1603,9 +1603,9 @@
 
             const content = value
             editor.setContents(content, 'api');
-            setTimeout(() => {
+            /* setTimeout(() => {
               editor.setSelection(editor.getText().length - 1, 0);
-            }, 500)
+            }, 500) */
 
             break;
           case "html":
@@ -1613,9 +1613,9 @@
               editor.clipboard.convert(value, 'api'),
               'silent'
             );
-            setTimeout(() => {
+           /*  setTimeout(() => {
               editor.setSelection(editor.getText().length - 1, 0);
-            }, 0);
+            }, 0); */
             break;
           default:
             break;
