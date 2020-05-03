@@ -19,11 +19,12 @@ import {eCloseSideMenu, refreshNotesPage} from '../../services/events';
 import {validatePass, validateUsername} from '../../services/validation';
 import {db, DDS, ToastEvent, getElevation} from '../../utils/utils';
 
+
+
+
 export const Login = ({navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors, isLoginNavigator} = state;
-  const _email = createRef();
-  const _pass = createRef();
   const [status, setStatus] = useState('Logging in...');
   const _username = createRef();
   const [loggingIn, setLoggingIn] = useState(false);
@@ -34,6 +35,9 @@ export const Login = ({navigation}) => {
   const [username, setUsername] = useState(null);
   const [invalidUsername, setInvalidUsername] = useState(false);
   const [secureEntry, setSecureEntry] = useState(true);
+  const _email = createRef();
+  const _pass = createRef();
+  const _passContainer = createRef();
 
   const isFocused = useIsFocused();
 
@@ -212,7 +216,7 @@ export const Login = ({navigation}) => {
                   }}
                   defaultValue={username}
                   onBlur={() => {
-                    if (!validateUsername(username) && username.length > 0) {
+                    if (!validateUsername(username) && username?.length > 0) {
                       setInvalidUsername(true);
                       _username.current.setNativeProps({
                         style: {
@@ -373,6 +377,7 @@ export const Login = ({navigation}) => {
                   </Text>
 
                   <View
+                     ref={_passContainer}
                     style={{
                       
                       borderWidth: 1.5,
@@ -381,13 +386,14 @@ export const Login = ({navigation}) => {
                       flexDirection: 'row',
                       justifyContent: 'space-between',
                       alignItems: 'center',
+                      paddingHorizontal:10,
                       marginHorizontal: 12,
                     }}>
                     <TextInput
                       ref={_pass}
                       onFocus={() => {
                         if (!invalidPassword) {
-                          _pass.current.setNativeProps({
+                          _passContainer.current?.setNativeProps({
                             style: {
                               borderColor: colors.accent,
                             },
@@ -401,12 +407,19 @@ export const Login = ({navigation}) => {
                           _pass.current.setNativeProps({
                             style: {
                               color: colors.errorText,
+                            },
+                      
+                          });
+                          _passContainer.current?.setNativeProps({
+                            style: {
                               borderColor: colors.errorText,
                             },
                           });
+
+
                         } else {
                           setInvalidPassword(false);
-                          _pass.current.setNativeProps({
+                          _passContainer.current?.setNativeProps({
                             style: {
                               borderColor: colors.nav,
                             },
@@ -420,9 +433,14 @@ export const Login = ({navigation}) => {
                           _pass.current.setNativeProps({
                             style: {
                               color: colors.pri,
+                            },
+                          });
+                          _passContainer.current.setNativeProps({
+                            style: {
                               borderColor: colors.accent,
                             },
                           });
+                          
                         }
                       }}
                       onSubmitEditing={() => {
@@ -436,7 +454,8 @@ export const Login = ({navigation}) => {
                         }
                       }}
                       style={{
-                        padding:pv,
+                        paddingVertical:pv,
+                        paddingHorizontal:0,
                         fontSize: SIZE.sm,
                         fontFamily: WEIGHT.regular,
                         width: '85%',
@@ -455,34 +474,12 @@ export const Login = ({navigation}) => {
                       }}
                       style={{
                         width: 25,
-                        marginRight:10
                       }}
                       color={secureEntry ? colors.icon : colors.accent}
                     />
                   </View>
 
-                  {/* <View
-                    style={{
-                      paddingHorizontal: 12,
-                      alignItems: 'flex-end',
-                    }}>
-                    <TouchableOpacity
-                      onPress={() => {
-                        navigation.navigate('ForgotPassword');
-                      }}
-                      activeOpacity={opacity}
-                      style={{}}>
-                      <Text
-                        style={{
-                          fontSize: SIZE.xs,
-                          fontFamily: WEIGHT.regular,
-                          color: colors.accent,
-                          height: 25,
-                        }}>
-                        Forgot password?
-                      </Text>
-                    </TouchableOpacity>
-                  </View> */}
+            
                 </View>
                 <TouchableOpacity
                   activeOpacity={opacity}

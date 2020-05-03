@@ -31,6 +31,7 @@ const _email = createRef();
 const _pass = createRef();
 const _username = createRef();
 const _passConfirm = createRef();
+const _passContainer = createRef();
 export const Signup = ({navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors, isLoginNavigator} = state;
@@ -499,9 +500,11 @@ export const Signup = ({navigation}) => {
                 </Text>
 
                 <View
+                  ref={_passContainer}
                   style={{
                     borderWidth: 1.5,
                     borderColor: colors.nav,
+                    paddingHorizontal:10,
                     borderRadius: 5,
                     flexDirection: 'row',
                     justifyContent: 'space-between',
@@ -512,7 +515,7 @@ export const Signup = ({navigation}) => {
                     ref={_pass}
                     onFocus={() => {
                       if (!invalidPassword) {
-                        _pass.current.setNativeProps({
+                        _passContainer.current?.setNativeProps({
                           style: {
                             borderColor: colors.accent,
                           },
@@ -526,12 +529,17 @@ export const Signup = ({navigation}) => {
                         _pass.current.setNativeProps({
                           style: {
                             color: colors.errorText,
+                          },
+                        });
+                        _passContainer.current?.setNativeProps({
+                          style: {
                             borderColor: colors.errorText,
                           },
                         });
+                        
                       } else {
                         setInvalidPassword(false);
-                        _pass.current.setNativeProps({
+                        _passContainer.current?.setNativeProps({
                           style: {
                             borderColor: colors.nav,
                           },
@@ -545,7 +553,6 @@ export const Signup = ({navigation}) => {
                         _pass.current.setNativeProps({
                           style: {
                             color: colors.pri,
-                            borderColor: colors.accent,
                           },
                         });
                       }
@@ -561,7 +568,8 @@ export const Signup = ({navigation}) => {
                       }
                     }}
                     style={{
-                      padding:pv,
+                      paddingVertical:pv,
+                      paddingHorizontal:0,
                       fontSize: SIZE.sm,
                       fontFamily: WEIGHT.regular,
                       width: '85%',
@@ -580,7 +588,6 @@ export const Signup = ({navigation}) => {
                     }}
                     style={{
                       width: 25,
-                      marginRight:10
                     }}
                     color={secureEntry ? colors.icon : colors.accent}
                   />
