@@ -16,6 +16,7 @@ export default class User {
 
   async key() {
     const user = await this.get();
+    if (!user) return;
     return { key: user.key, salt: user.salt };
   }
 
