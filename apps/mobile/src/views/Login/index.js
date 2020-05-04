@@ -102,6 +102,7 @@ export const Login = ({navigation}) => {
       let user;
       try {
         user = await db.user.get();
+        eSendEvent(eStartSyncer);
         console.log('user', user);
         dispatch({type: ACTIONS.USER, user: user});
         ToastEvent.show(`Logged in as ${username}`, 'success');

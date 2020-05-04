@@ -7,7 +7,7 @@ import {useTracked} from './src/provider';
 import {ACTIONS} from './src/provider/actions';
 import {defaultState} from './src/provider/defaultState';
 import {eSubscribeEvent, eUnSubscribeEvent} from './src/services/eventManager';
-import {eDispatchAction} from './src/services/events';
+import {eDispatchAction, eStartSyncer} from './src/services/events';
 import {db, DDS} from './src/utils/utils';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 
@@ -40,10 +40,32 @@ const App = () => {
     DDS.isTab ? Orientation.lockToLandscape() : Orientation.lockToPortrait();
   }, []);
 
+  const startSyncer = () => {
+    let user = await db.user.get();
+    if (user) {
+      db.ev.subscribe('sync',async () => {
+        dispatch({type: ACTIONS.SYNCING, syncing:true});
+        await db.sync();
+        let u = await db.user.get();
+        dispatch({type: ACTIONS.USER, user: u});
+        dispatch({type: ACTIONS.SYNCING, syncing:false});
+      })
+    }
+  }
+
+  useEffect(() => {
+    eSubscribeEvent(eStartSyncer, startSyncer)
+
+    return () => {
+      eUnSubscribeEvent(eStartSyncer,startSyncer)
+    }
+  })
+
   useEffect(() => {
     Initialize().then(() => {
       db.init().then(async () => {
         let user = await db.user.get();
+        startSyncer();
         dispatch({type: ACTIONS.USER, user: user});
         setInit(true);
       });

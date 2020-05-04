@@ -93,6 +93,7 @@ export const Signup = ({navigation}) => {
         setKey(k.key);
         dispatch({type: ACTIONS.USER, user: user});
 
+        eSendEvent(eStartSyncer);
         setTimeout(() => {
           setModalVisible(true);
         }, 500);
