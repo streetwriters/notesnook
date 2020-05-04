@@ -26,7 +26,7 @@ export default class InfoBar extends React.Component {
           this.setState({
             saving: false,
           });
-        },500);
+        }, 500);
       },
     );
   }
@@ -56,6 +56,7 @@ export default class InfoBar extends React.Component {
           paddingHorizontal: 12,
           marginTop: Platform.OS === 'ios' ? 45 : StatusBar.currentHeight + 45,
           width: '100%',
+          backgroundColor: this.props.colors.bg,
           position: 'absolute',
           justifyContent: 'flex-start',
           flexDirection: 'row',
