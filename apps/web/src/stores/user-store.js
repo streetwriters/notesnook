@@ -19,6 +19,10 @@ class UserStore extends BaseStore {
         state.user = user;
         state.isLoggedIn = true;
       });
+      db.ev.subscribe("sync", () => {
+        this.sync();
+        console.log("Hello");
+      });
       this.sync();
       return true;
     });
