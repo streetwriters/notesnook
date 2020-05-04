@@ -650,7 +650,7 @@ export const Signup = ({navigation}) => {
                 activeOpacity={opacity}
                 onPress={_signUp}
                 style={{
-                  ...getElevation(10),
+                  ...getElevation(5),
                   padding: pv,
                   backgroundColor: colors.accent,
                   borderRadius: 5,

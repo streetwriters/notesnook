@@ -27,7 +27,11 @@ import {
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
-import {eClearSearch, eOpenModalMenu, refreshNotesPage} from '../../services/events';
+import {
+  eClearSearch,
+  eOpenModalMenu,
+  refreshNotesPage,
+} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
 import {db, DDS, hexToRGBA, timeSince, ToastEvent} from '../../utils/utils';
 import {sideMenuOverlayRef} from '../../utils/refs';
@@ -314,13 +318,14 @@ export const Menu = ({
                   key={item.title}
                   activeOpacity={opacity / 2}
                   onPress={() => {
-                    close();
-                    NavigationService.navigate('Notes', {
+                    let params = {
                       title: item.title,
                       tag: item,
                       type: 'tag',
-                    });
-                    
+                    };
+                    NavigationService.navigate('Notes', params);
+                    eSendEvent(refreshNotesPage, params);
+                    close();
                   }}
                   style={{
                     flexDirection: 'row',
@@ -388,7 +393,7 @@ export const Menu = ({
                   type: 'color',
                   title: item.title,
                   color: item,
-                }
+                };
                 NavigationService.navigate('Notes', params);
                 eSendEvent(refreshNotesPage, params);
                 close();

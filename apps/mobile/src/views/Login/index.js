@@ -484,7 +484,7 @@ export const Login = ({navigation}) => {
                   activeOpacity={opacity}
                   onPress={_logIn}
                   style={{
-                    ...getElevation(10),
+                    ...getElevation(5),
                     padding: pv,
                     backgroundColor: colors.accent,
                     borderRadius: 5,
