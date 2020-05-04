@@ -14,6 +14,7 @@ import EventManager from "../utils/event-manager";
 class Database {
   constructor(context) {
     this.context = new Storage(context);
+    this._syncInterval = 0;
   }
 
   async init() {
@@ -39,6 +40,11 @@ class Database {
     this.delta = await Content.new(this, "delta", false);
     /** @type {Content} */
     this.text = await Content.new(this, "text", false);
+
+    if (this._syncInterval) clearInterval(this._syncInterval);
+    this._syncInterval = setInterval(async () => {
+      this.ev.publish("sync");
+    }, 60 * 1000 * 3);
   }
 
   sync() {
