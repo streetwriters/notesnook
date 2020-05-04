@@ -392,9 +392,7 @@ export const Signup = ({navigation}) => {
                     textAlign: 'right',
                     marginHorizontal: 12,
                     fontFamily: WEIGHT.regular,
-
                     textAlignVertical: 'bottom',
-
                     position: 'absolute',
                     right: 5,
                     top: 2.5,

@@ -613,22 +613,22 @@ export const Menu = ({
                   syncing: true,
                 });
                 try {
-                  let user = await db.user.get();
-                  dispatch({type: ACTIONS.USER, user: user});
+                  if (!user) {
+                    let u = await db.user.get();
+                    dispatch({type: ACTIONS.USER, user: u});
+                  }
                   await db.sync();
-                  dispatch({
-                    type: ACTIONS.SYNCING,
-                    syncing: false,
-                  });
                   ToastEvent.show('Sync Complete', 'success');
                 } catch (e) {
-                  dispatch({
-                    type: ACTIONS.SYNCING,
-                    syncing: false,
-                  });
                   ToastEvent.show(e.message, 'error');
                 }
+                let u = await db.user.get();
+                dispatch({type: ACTIONS.USER, user: u});
                 dispatch({type: ACTIONS.ALL});
+                dispatch({
+                  type: ACTIONS.SYNCING,
+                  syncing: false,
+                });
               }}
               style={{
                 flexDirection: 'row',
@@ -683,7 +683,6 @@ export const Menu = ({
               DDS.isTab
                 ? eSendEvent(eOpenLoginDialog)
                 : NavigationService.navigate('Login');
-
               close();
             }}
             activeOpacity={opacity / 2}
