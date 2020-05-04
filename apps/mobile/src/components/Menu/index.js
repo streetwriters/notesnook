@@ -7,6 +7,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  ActivityIndicator,
 } from 'react-native';
 import MMKV from 'react-native-mmkv-storage';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -28,7 +29,7 @@ import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
 import {eClearSearch, eOpenModalMenu} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
-import {db, DDS, hexToRGBA, timeSince} from '../../utils/utils';
+import {db, DDS, hexToRGBA, timeSince, ToastEvent} from '../../utils/utils';
 import {sideMenuOverlayRef} from '../../utils/refs';
 
 export const Menu = ({
@@ -38,7 +39,7 @@ export const Menu = ({
   noTextMode = false,
 }) => {
   const [state, dispatch] = useTracked();
-  const {colors, tags, colorNotes, user, currentScreen} = state;
+  const {colors, tags, colorNotes, user, currentScreen, syncing} = state;
 
   // todo
 
@@ -375,7 +376,7 @@ export const Menu = ({
             marginTop: pv / 2,
             width: '100%',
             marginBottom: pv / 2,
-            paddingHorizontal:10,
+            paddingHorizontal: 10,
           }}>
           {colorNotes.map(item => (
             <TouchableOpacity
@@ -476,7 +477,6 @@ export const Menu = ({
           </View>
         </View> */}
       </ScrollView>
-
 
       <View
         style={{
@@ -595,7 +595,30 @@ export const Menu = ({
               </Text>
             </View>
 
-            <View
+            <TouchableOpacity
+              onPress={async () => {
+                dispatch({
+                  type: ACTIONS.SYNCING,
+                  syncing: true,
+                });
+                try {
+                  let user = await db.user.get();
+                  dispatch({type: ACTIONS.USER, user: user});
+                  await db.sync();
+                  dispatch({
+                    type: ACTIONS.SYNCING,
+                    syncing: false,
+                  });
+                  ToastEvent.show('Sync Complete', 'success');
+                } catch (e) {
+                  dispatch({
+                    type: ACTIONS.SYNCING,
+                    syncing: false,
+                  });
+                  ToastEvent.show(e.message, 'error');
+                }
+                dispatch({type: ACTIONS.ALL});
+              }}
               style={{
                 flexDirection: 'row',
                 justifyContent: 'space-between',
@@ -603,24 +626,45 @@ export const Menu = ({
                 paddingHorizontal: 5,
                 paddingVertical: pv + 5,
               }}>
-              <Text
+              <View
                 style={{
-                  fontFamily: WEIGHT.regular,
-                  color: colors.pri,
-                  fontSize: SIZE.xs,
+                  flexDirection: 'row',
+                  alignItems: 'center',
                 }}>
-                <Icon color={colors.accent} name="sync" size={SIZE.xs} /> Synced{' '}
-                {user.lastSynced && user.lastSynced !== 0
-                  ? timeSince(user.lastSynced)
-                  : 'never'}
-              </Text>
-
+                {syncing ? (
+                  <ActivityIndicator size={SIZE.xs} color={colors.accent} />
+                ) : (
+                  <Icon color={colors.accent} name="sync" size={SIZE.sm} />
+                )}
+                <Text
+                  style={{
+                    fontFamily: WEIGHT.regular,
+                    color: colors.pri,
+                    fontSize: SIZE.xs,
+                    marginLeft: 5,
+                  }}>
+                  {syncing ? 'Syncing ' : 'Synced '}
+                  {!syncing
+                    ? user.lastSynced && user.lastSynced !== 0
+                      ? timeSince(user.lastSynced)
+                      : 'never'
+                    : null}
+                  {'\n'}
+                  <Text
+                    style={{
+                      fontSize: 8,
+                      color: colors.icon,
+                    }}>
+                    Tap to sync
+                  </Text>
+                </Text>
+              </View>
               <Icon
                 size={SIZE.md}
                 color={colors.accent}
                 name="check-circle-outline"
               />
-            </View>
+            </TouchableOpacity>
           </View>
         ) : (
           <TouchableOpacity
