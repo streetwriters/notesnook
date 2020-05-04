@@ -446,9 +446,7 @@ export const Menu = ({
                   style={{
                     color: colors.icon,
                     fontSize: SIZE.xs + 1,
-                    minWidth: 16,
-                    minHeight: 16,
-                    paddingHorizontal: 2,
+                    paddingHorizontal: 5,
                     textAlign: 'center',
                   }}>
                   {item.noteIds.length > 99 ? '99+' : item.noteIds.length}
