@@ -37,6 +37,7 @@ export const Notes = ({navigation}) => {
       };
     }
   }, []);
+
   useEffect(() => {
     if (isFocused) {
       init();
@@ -45,6 +46,7 @@ export const Notes = ({navigation}) => {
         screen: params.type,
       });
     } else {
+      setNotes([]);
       editing.actionAfterFirstSave = {
         type: null,
       };
@@ -53,7 +55,6 @@ export const Notes = ({navigation}) => {
 
   useEffect(() => {
     eSubscribeEvent(refreshNotesPage, init);
-
     return () => {
       eUnSubscribeEvent(refreshNotesPage, init);
       editing.actionAfterFirstSave = {
@@ -62,8 +63,11 @@ export const Notes = ({navigation}) => {
     };
   }, []);
 
-  const init = () => {
-    console.log(params.color);
+  const init = (data) => {
+    params = navigation.state.params;
+    if (data) {
+      params = data;
+    }
     eSendEvent(eScrollEvent, 0);
     if (params.type === 'tag') {
       let notesInTag = db.notes.tagged(params.tag.title);
