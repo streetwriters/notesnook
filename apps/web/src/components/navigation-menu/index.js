@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import ReactDOM from "react-dom";
 import { Flex } from "rebass";
 import RootNavigator, {
@@ -23,6 +23,13 @@ function NavigationMenu(props) {
   const colors = useStore((store) => store.colors);
   const isSideMenuOpen = useStore((store) => store.isSideMenuOpen);
   const toggleSideMenu = useStore((store) => store.toggleSideMenu);
+
+  useEffect(() => {
+    RootNavigator.onNavigate = (route) => {
+      setSelectedRoute(route.key);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <Animated.Flex
