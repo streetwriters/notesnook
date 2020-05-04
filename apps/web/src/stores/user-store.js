@@ -3,6 +3,7 @@ import { db } from "../common";
 import { store as appStore } from "./app-store";
 import BaseStore from "./index";
 import RootNavigator from "../navigation/navigators/rootnavigator";
+import config from "../utils/config";
 
 class UserStore extends BaseStore {
   isLoggedIn = false;
@@ -68,6 +69,7 @@ class UserStore extends BaseStore {
         state.user = undefined;
         state.isLoggedIn = false;
       });
+      config.clear();
       await appStore.refresh();
       RootNavigator.navigate("home");
     });

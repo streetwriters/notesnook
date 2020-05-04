@@ -8,4 +8,8 @@ function get(key, def) {
   return JSON.parse(value);
 }
 
-export default { set, get };
+function clear() {
+  window.localStorage.clear();
+}
+
+export default { set, get, clear };
