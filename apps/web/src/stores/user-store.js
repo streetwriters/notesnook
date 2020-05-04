@@ -21,7 +21,6 @@ class UserStore extends BaseStore {
       });
       db.ev.subscribe("sync", () => {
         this.sync();
-        console.log("Hello");
       });
       this.sync();
       return true;
