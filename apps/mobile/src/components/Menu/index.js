@@ -375,6 +375,7 @@ export const Menu = ({
             marginTop: pv / 2,
             width: '100%',
             marginBottom: pv / 2,
+            paddingHorizontal:10,
           }}>
           {colorNotes.map(item => (
             <TouchableOpacity
