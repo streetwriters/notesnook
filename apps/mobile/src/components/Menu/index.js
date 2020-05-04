@@ -434,12 +434,18 @@ export const Menu = ({
                   alignItems: 'center',
                   width: '85%',
                 }}>
-                <Text>{item.title}</Text>
+                <Text
+                  style={{
+                    color: colors.pri,
+                    fontSize: SIZE.sm - 1,
+                  }}>
+                  {item.title.slice(0, 1).toUpperCase() + item.title.slice(1)}
+                </Text>
 
                 <Text
                   style={{
                     color: colors.icon,
-                    fontSize: SIZE.xxs,
+                    fontSize: SIZE.xs + 1,
                     minWidth: 16,
                     minHeight: 16,
                     paddingHorizontal: 2,
