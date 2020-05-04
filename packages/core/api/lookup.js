@@ -21,7 +21,7 @@ export default class Lookup {
       notes.forEach(async (note) => {
         const text = await this._db.text.get(note.content.text);
         const title = note.title;
-        if (fuzzysearch(query, text + title)) results.push(note);
+        if (fzs(query, text + title)) results.push(note);
         if (++index >= max) return resolve(results);
       });
     });
@@ -30,7 +30,7 @@ export default class Lookup {
   notebooks(array, query) {
     return tfun.filter(
       (nb) =>
-        fuzzysearch(query, nb.title + " " + nb.description) ||
+        fzs(query, nb.title + " " + nb.description) ||
         nb.topics.some((topic) => fuzzysearch(query, topic.title))
     )(array);
   }
@@ -48,6 +48,10 @@ export default class Lookup {
   }
 
   _byTitle(array, query) {
-    return tfun.filter((item) => fuzzysearch(query, item.title))(array);
+    return tfun.filter((item) => fzs(query, item.title))(array);
   }
+}
+
+function fzs(query, text) {
+  return fuzzysearch(query.toLowerCase(), text.toLowerCase());
 }
