@@ -379,7 +379,6 @@ export const Login = ({navigation}) => {
                   <View
                      ref={_passContainer}
                     style={{
-                      
                       borderWidth: 1.5,
                       borderColor: colors.nav,
                       borderRadius: 5,
