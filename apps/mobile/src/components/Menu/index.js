@@ -38,7 +38,7 @@ export const Menu = ({
   noTextMode = false,
 }) => {
   const [state, dispatch] = useTracked();
-  const {colors, tags, colorNotes, user} = state;
+  const {colors, tags, colorNotes, user, currentScreen} = state;
 
   // todo
 
@@ -185,9 +185,6 @@ export const Menu = ({
 
       <ScrollView
         contentContainerStyle={{minHeight: '50%'}}
-        style={{
-          paddingHorizontal: noTextMode ? 0 : 12,
-        }}
         showsVerticalScrollIndicator={false}>
         <View>
           {listItems.map((item, index) => (
@@ -203,8 +200,13 @@ export const Menu = ({
               }}
               style={{
                 width: '100%',
+                backgroundColor:
+                  item.name.toLowerCase() === currentScreen
+                    ? colors.shade
+                    : 'transparent',
                 alignSelf: 'center',
                 flexDirection: 'row',
+                paddingHorizontal: noTextMode ? 0 : 12,
                 justifyContent: noTextMode ? 'center' : 'space-between',
                 alignItems: 'center',
                 paddingBottom: noTextMode ? pv + 2 : normalize(15),
@@ -262,9 +264,12 @@ export const Menu = ({
             width: '100%',
             alignSelf: 'center',
             flexDirection: 'row',
+            paddingVertical: noTextMode ? pv + 2 : normalize(15),
+            backgroundColor:
+              currentScreen === 'tags' ? colors.shade : 'transparent',
+            paddingHorizontal: noTextMode ? 0 : 12,
             justifyContent: noTextMode ? 'center' : 'space-between',
             alignItems: 'flex-end',
-            marginTop: noTextMode ? pv : normalize(15),
           }}>
           <View
             style={{
@@ -365,9 +370,10 @@ export const Menu = ({
 
         <View
           style={{
-            flexDirection: noTextMode ? 'column' : 'row',
+            flexDirection: 'column',
             flexWrap: noTextMode ? 'nowrap' : 'wrap',
             marginTop: pv / 2,
+            width: '100%',
             marginBottom: pv / 2,
           }}>
           {colorNotes.map(item => (
@@ -388,23 +394,44 @@ export const Menu = ({
                 alignItems: 'center',
                 margin: noTextMode ? 0 : 5,
                 marginLeft: 0,
+                width: '100%',
                 marginRight: noTextMode ? 0 : 15,
                 marginTop: normalize(15),
               }}>
               <View
                 style={{
-                  width: noTextMode ? SIZE.md : normalize(45),
-                  height: noTextMode ? SIZE.md : normalize(45),
-                  backgroundColor: item.title,
-                  borderRadius: 100,
+                  width: 35,
+                  height: 35,
                   justifyContent: 'center',
+                  alignItems: 'center',
                 }}>
+                <View
+                  style={{
+                    width: SIZE.md,
+                    height: SIZE.md,
+                    backgroundColor: item.title,
+                    borderRadius: 100,
+                    justifyContent: 'center',
+                    marginRight: 10,
+                  }}
+                />
+              </View>
+
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  width: '85%',
+                }}>
+                <Text>{item.title}</Text>
+
                 <Text
                   style={{
-                    color: 'white',
+                    color: colors.icon,
                     fontSize: SIZE.xxs,
-                    minWidth: 12,
-                    minHeight: 12,
+                    minWidth: 16,
+                    minHeight: 16,
                     paddingHorizontal: 2,
                     textAlign: 'center',
                   }}>
@@ -448,6 +475,8 @@ export const Menu = ({
           </View>
         </View> */}
       </ScrollView>
+
+
       <View
         style={{
           width: '100%',
@@ -455,7 +484,6 @@ export const Menu = ({
           alignItems: 'center',
           alignSelf: 'center',
           marginBottom: 15,
-          paddingHorizontal: ph,
         }}>
         <View
           style={{
@@ -474,10 +502,14 @@ export const Menu = ({
                 width: '100%',
                 alignSelf: 'center',
                 flexDirection: 'row',
+                paddingHorizontal: ph,
+                backgroundColor:
+                  currentScreen === item.name.toLowerCase()
+                    ? colors.shade
+                    : 'transparent',
                 justifyContent: noTextMode ? 'center' : 'space-between',
                 alignItems: 'center',
                 paddingBottom: noTextMode ? pv + 2 : normalize(15),
-
                 paddingTop: noTextMode ? pv + 2 : normalize(15),
               }}>
               <View
@@ -521,7 +553,7 @@ export const Menu = ({
         {user && user.username ? (
           <View
             style={{
-              width: '100%',
+              width: '93%',
               borderRadius: 5,
               backgroundColor: Platform.ios
                 ? hexToRGBA(colors.accent + '19')
@@ -604,7 +636,7 @@ export const Menu = ({
               marginVertical: 5,
               marginTop: pv + 5,
               borderRadius: 5,
-              width: '100%',
+              width: '93%',
               flexDirection: 'row',
               alignItems: 'center',
               justifyContent: noTextMode ? 'center' : 'flex-start',
