@@ -15,21 +15,27 @@ export default class InfoBar extends React.Component {
     };
     this.dateCreated = null;
   }
-  setDateEdited(id, length) {
+
+  setSaving() {
     this.setState(
       {
         saving: true,
-        length: length,
       },
       () => {
         setTimeout(() => {
           this.setState({
-            dateEdited: id,
             saving: false,
           });
-        }, 500);
+        },500);
       },
     );
+  }
+
+  setDateEdited(id, length) {
+    this.setState({
+      dateEdited: id,
+      length: length,
+    });
   }
   setDateCreated(dateCreated) {
     this.dateCreated = dateCreated;
@@ -37,10 +43,10 @@ export default class InfoBar extends React.Component {
   clear() {
     this.dateCreated = null;
     this.setState({
-      saving:false,
-      dateEdited:null,
-      length:0
-    })
+      saving: false,
+      dateEdited: null,
+      length: 0,
+    });
   }
 
   render() {
