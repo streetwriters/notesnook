@@ -5,6 +5,7 @@ import { useStore as useUserStore } from "../stores/user-store";
 import { useStore as useThemeStore } from "../stores/theme-store";
 import AccentItem from "../components/accent-item";
 import accents from "../theme/accents";
+import { showLogInDialog } from "../components/dialogs/logindialog";
 
 function Settings(props) {
   const theme = useThemeStore((store) => store.theme);
@@ -18,7 +19,13 @@ function Settings(props) {
         bg="shade"
         p={2}
         sx={{ borderRadius: "default", cursor: "pointer" }}
-        onClick={() => props.navigator.navigate("account")}
+        onClick={async () => {
+          if (isLoggedIn) {
+            props.navigator.navigate("account");
+          } else {
+            await showLogInDialog();
+          }
+        }}
       >
         <Flex
           variant="columnCenter"
