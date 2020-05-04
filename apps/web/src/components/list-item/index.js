@@ -143,6 +143,7 @@ function ListItem(props) {
           sx={{
             flex: "1 1 auto",
             paddingTop: props.pinned ? 4 : 0,
+            width: "90%",
             ":hover": {
               cursor: "pointer",
             },
@@ -183,7 +184,6 @@ function ListItem(props) {
         {props.menuItems && (
           <Icon.MoreVertical
             size={22}
-            strokeWidth={2}
             color="icon"
             sx={{ marginRight: -1 }}
             onClick={(e) => {
