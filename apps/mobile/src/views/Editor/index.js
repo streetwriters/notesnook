@@ -55,7 +55,7 @@ let handleBack;
 const Editor = ({noMenu}) => {
   // Global State
   const [state, dispatch] = useTracked();
-  const {colors} = state;
+  const {colors, currentEditingNote} = state;
   const [fullscreen, setFullscreen] = useState(false);
   const [dateEdited, setDateEdited] = useState(0);
 
@@ -283,7 +283,6 @@ const Editor = ({noMenu}) => {
 
   const saveNote = async (lockNote = true) => {
     if (!checkIfContentIsSavable()) return;
-
     let lockedNote = id ? db.notes.note(id).data.locked : null;
     if (!lockedNote) {
       let rId = await db.notes.add({
@@ -294,52 +293,39 @@ const Editor = ({noMenu}) => {
         },
         id: id,
       });
-
       setNoteInEditorAferSaving(id, rId);
-
       if (content.text.length < 200 || saveCounter < 2) {
         dispatch({
           type: ACTIONS.NOTES,
         });
         eSendEvent(refreshNotesPage);
       }
-
+      InfoBarRef.current?.setSaving();
       if (id) {
         await addToCollection(id);
-        dispatch({
-          type: ACTIONS.CURRENT_EDITING_NOTE,
-          id: id,
-        });
-        InfoBarRef.current?.setDateEdited(
-          db.notes.note(id).data.dateEdited,
-          content?.text?.split(' ').length,
-        );
-        InfoBarRef.current?.setDateCreated(db.notes.note(id).data.dateCreated);
+        if (currentEditingNote !== id) {
+          dispatch({
+            type: ACTIONS.CURRENT_EDITING_NOTE,
+            id: id,
+          });
+        }
       }
-
       saveCounter++;
     } else {
-      if (id) {
-        dispatch({
-          type: ACTIONS.CURRENT_EDITING_NOTE,
-          id: id,
-        });
-
-        await db.vault.save({
-          title,
-          content: {
-            text: content.text,
-            delta: content.delta,
-          },
-          id: id,
-        });
-      }
-      InfoBarRef.current?.setDateEdited(
-        db.notes.note(id).data.dateEdited,
-        content?.text?.split(' ').length,
-      );
-      InfoBarRef.current?.setDateCreated(db.notes.note(id).data.dateCreated);
+      await db.vault.save({
+        title,
+        content: {
+          text: content.text,
+          delta: content.delta,
+        },
+        id: id,
+      });
     }
+    InfoBarRef.current?.setDateEdited(
+      db.notes.note(id).data.dateEdited,
+      content?.text?.split(' ').length,
+    );
+    InfoBarRef.current?.setDateCreated(db.notes.note(id).data.dateCreated);
   };
 
   useEffect(() => {
