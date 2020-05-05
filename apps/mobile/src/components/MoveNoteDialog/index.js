@@ -14,9 +14,9 @@ import {createStackNavigator} from '@react-navigation/stack';
 
 const Stack = createStackNavigator();
 const modalNavigatorRef = createRef();
-const ModalNavigator = () => {
+const ModalNavigator = ({onStateChange}) => {
   return (
-    <NavigationContainer independent={true} ref={modalNavigatorRef}>
+    <NavigationContainer onStateChange={onStateChange} independent={true} ref={modalNavigatorRef}>
       <Stack.Navigator
         initialRouteName="Folders"
         screenOptions={{
@@ -135,7 +135,11 @@ class MoveNoteDialog extends React.Component {
               padding: DDS.isTab ? 8 : 0,
               zIndex: 10,
             }}>
-            <ModalNavigator />
+            <ModalNavigator
+                onStateChange={event => {
+                  this.routeIndex = event.index;
+              }} 
+            />
           </View>
         </Animatable.View>
       </Modal>

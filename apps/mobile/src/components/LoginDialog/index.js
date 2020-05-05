@@ -16,9 +16,9 @@ import {createStackNavigator} from '@react-navigation/stack';
 const Stack = createStackNavigator();
 
 const modalNavigatorRef2 = createRef();
-const ModalNavigator = () => {
+const ModalNavigator = ({onStateChange}) => {
   return (
-    <NavigationContainer independent={true} ref={modalNavigatorRef2}>
+    <NavigationContainer onStateChange={onStateChange} independent={true} ref={modalNavigatorRef2}>
       <Stack.Navigator
         initialRouteName="Login"
         screenOptions={{
@@ -127,7 +127,11 @@ class LoginDialog extends React.Component {
               paddingVertical: 16,
               zIndex: 10,
             }}>
-            <ModalNavigator />
+            <ModalNavigator
+              onStateChange={event => {
+                  this.routeIndex = event.index;
+              }}
+            />
           </View>
         </Animatable.View>
       </Modal>
