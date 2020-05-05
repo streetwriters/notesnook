@@ -36,8 +36,8 @@ const ModalNavigator = ({onStateChange}) => {
             canGoBack: true,
           }}
         />
-        <Stack.Screen name="Notes" component={Notes} />
         <Stack.Screen name="Notebook" component={Notebook} />
+        <Stack.Screen name="Notes" component={Notes} />
       </Stack.Navigator>
     </NavigationContainer>
   );
