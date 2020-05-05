@@ -13,6 +13,7 @@ import { VaultDialog } from '../VaultDialog';
 import { moveNoteEvent } from './recievers';
 import { TEMPLATE_DELETE, TEMPLATE_PERMANANT_DELETE } from './templates';
 import MoveNoteDialog from '../MoveNoteDialog';
+import LoginDialog from '../LoginDialog';
 
 export class DialogManager extends Component {
   constructor(props) {
@@ -310,7 +311,7 @@ export class DialogManager extends Component {
           colors={colors}
         />
 
-       {/*  <LoginDialog colors={colors} ref={ref => (this.loginDialog = ref)} /> */}
+       <LoginDialog colors={colors} ref={ref => (this.loginDialog = ref)} /> 
 
         <MergeEditor />
       </>

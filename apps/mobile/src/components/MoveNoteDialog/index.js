@@ -47,7 +47,7 @@ class MoveNoteDialog extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      visible: true,
+      visible: false,
       animated: false,
     };
     this.routeIndex = 0;

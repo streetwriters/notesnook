@@ -17,11 +17,9 @@ import {eSendEvent} from '../../services/eventManager';
 import {eCloseSideMenu, refreshNotesPage} from '../../services/events';
 import {validatePass, validateUsername} from '../../services/validation';
 import {db, DDS, ToastEvent, getElevation} from '../../utils/utils';
-import { useIsFocused } from '@react-navigation/native';
+import {useIsFocused} from '@react-navigation/native';
 
-
-
-export const Login = ({navigation}) => {
+export const Login = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors, isLoginNavigator} = state;
   const [status, setStatus] = useState('Logging in...');
@@ -105,7 +103,9 @@ export const Login = ({navigation}) => {
         console.log('user', user);
         dispatch({type: ACTIONS.USER, user: user});
         ToastEvent.show(`Logged in as ${username}`, 'success');
+
         navigation.goBack();
+
         await db.sync();
         eSendEvent(refreshNotesPage);
         dispatch({type: ACTIONS.ALL});
@@ -159,6 +159,7 @@ export const Login = ({navigation}) => {
         <>
           <Header
             navigation={navigation}
+            route={route}
             isLoginNavigator={isLoginNavigator}
             colors={colors}
             heading="Login"
@@ -377,7 +378,7 @@ export const Login = ({navigation}) => {
                   </Text>
 
                   <View
-                     ref={_passContainer}
+                    ref={_passContainer}
                     style={{
                       borderWidth: 1.5,
                       borderColor: colors.nav,
@@ -385,7 +386,7 @@ export const Login = ({navigation}) => {
                       flexDirection: 'row',
                       justifyContent: 'space-between',
                       alignItems: 'center',
-                      paddingHorizontal:10,
+                      paddingHorizontal: 10,
                       marginHorizontal: 12,
                     }}>
                     <TextInput
@@ -407,15 +408,12 @@ export const Login = ({navigation}) => {
                             style: {
                               color: colors.errorText,
                             },
-                      
                           });
                           _passContainer.current?.setNativeProps({
                             style: {
                               borderColor: colors.errorText,
                             },
                           });
-
-
                         } else {
                           setInvalidPassword(false);
                           _passContainer.current?.setNativeProps({
@@ -439,7 +437,6 @@ export const Login = ({navigation}) => {
                               borderColor: colors.accent,
                             },
                           });
-                          
                         }
                       }}
                       onSubmitEditing={() => {
@@ -453,8 +450,8 @@ export const Login = ({navigation}) => {
                         }
                       }}
                       style={{
-                        paddingVertical:pv,
-                        paddingHorizontal:0,
+                        paddingVertical: pv,
+                        paddingHorizontal: 0,
                         fontSize: SIZE.sm,
                         fontFamily: WEIGHT.regular,
                         width: '85%',
@@ -477,8 +474,6 @@ export const Login = ({navigation}) => {
                       color={secureEntry ? colors.icon : colors.accent}
                     />
                   </View>
-
-            
                 </View>
                 <TouchableOpacity
                   activeOpacity={opacity}
@@ -491,7 +486,6 @@ export const Login = ({navigation}) => {
                     marginHorizontal: 12,
                     marginBottom: 10,
                     alignItems: 'center',
-                   
                   }}>
                   <Text
                     style={{

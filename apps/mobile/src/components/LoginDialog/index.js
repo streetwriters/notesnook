@@ -1,8 +1,6 @@
-/* import React from 'react';
+import React, { createRef } from 'react';
 import {Modal, TouchableOpacity, View} from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import {createAppContainer} from 'react-navigation';
-import {createStackNavigator} from 'react-navigation-stack';
 import {normalize} from '../../common/common';
 import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
@@ -12,57 +10,31 @@ import ForgotPassword from '../../views/ForgotPassword';
 import Login from '../../views/Login';
 import Signup from '../../views/Signup';
 import {updateEvent} from '../DialogManager/recievers';
+import {NavigationContainer} from '@react-navigation/native';
+import {createStackNavigator} from '@react-navigation/stack';
 
-const fade = props => {
-  const {position, scene} = props;
+const Stack = createStackNavigator();
 
-  const index = scene.index;
-
-  const translateX = 0;
-  const translateY = 0;
-
-  const opacity = position.interpolate({
-    inputRange: [index - 0.7, index, index + 0.7],
-    outputRange: [0.7, 1, 0.7],
-  });
-
-  return {
-    opacity,
-    transform: [{translateX}, {translateY}],
-  };
+const modalNavigatorRef2 = createRef();
+const ModalNavigator = () => {
+  return (
+    <NavigationContainer independent={true} ref={modalNavigatorRef2}>
+      <Stack.Navigator
+        initialRouteName="Login"
+        screenOptions={{
+          headerShown: false,
+          animationEnabled: false,
+          gestureEnabled: false,
+          cardOverlayEnabled: false,
+          cardShadowEnabled: false,
+        }}>
+        <Stack.Screen name="Login" component={Login} />
+        <Stack.Screen name="Signup" component={Signup} />
+        <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
 };
-
-const ModalNavigator = createStackNavigator(
-  {
-    Login: {
-      screen: Login,
-    },
-    Signup: {
-      screen: Signup,
-    },
-    ForgotPassword: {
-      screen: ForgotPassword,
-    },
-  },
-  {
-    initialRouteName: 'Login',
-    defaultNavigationOptions: {
-      gesturesEnabled: false,
-      headerStyle: {
-        backgroundColor: 'transparent',
-        borderBottomWidth: 0,
-        height: 0,
-      },
-    },
-    transitionConfig: () => ({
-      screenInterpolator: props => {
-        return fade(props);
-      },
-    }),
-  },
-);
-
-const Navigator = createAppContainer(ModalNavigator);
 
 class LoginDialog extends React.Component {
   constructor(props) {
@@ -155,12 +127,7 @@ class LoginDialog extends React.Component {
               paddingVertical: 16,
               zIndex: 10,
             }}>
-            <Navigator
-              ref={ref => (this.navigation = ref)}
-              onNavigationStateChange={state => {
-                this.routeIndex = state.index;
-              }}
-            />
+            <ModalNavigator />
           </View>
         </Animatable.View>
       </Modal>
@@ -169,4 +136,3 @@ class LoginDialog extends React.Component {
 }
 
 export default LoginDialog;
- */

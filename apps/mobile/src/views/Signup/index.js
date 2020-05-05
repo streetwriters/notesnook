@@ -32,7 +32,7 @@ const _pass = createRef();
 const _username = createRef();
 const _passConfirm = createRef();
 const _passContainer = createRef();
-export const Signup = ({navigation}) => {
+export const Signup = ({route,navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors, isLoginNavigator} = state;
   const [signingIn, setSigningIn] = useState(false);
@@ -285,6 +285,7 @@ export const Signup = ({navigation}) => {
             isLoginNavigator={isLoginNavigator}
             navigation={navigation}
             colors={colors}
+            route={route}
             heading="Create Account"
           />
 
