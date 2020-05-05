@@ -32,6 +32,7 @@ export const Header = ({
   navigation = null,
   isLoginNavigator,
   headerColor,
+  route,
 }) => {
   const [state, dispatch] = useTracked();
   const {colors, syncing} = state;
@@ -94,13 +95,13 @@ export const Header = ({
             hitSlop={{top: 20, bottom: 20, left: 50, right: 40}}
             onPress={() => {
               if (navigation && preventDefaultMargins) {
-                if (navigation.state.routeName === 'Folders') {
+                if (route.name === 'Folders') {
                   moveNoteHideEvent();
                 } else {
                   navigation.goBack();
                 }
               } else if (navigation && isLoginNavigator) {
-                if (navigation.state.routeName === 'Login') {
+                if (route.name === 'Login') {
                   eSendEvent(eCloseLoginDialog);
                 } else {
                   navigation.goBack();

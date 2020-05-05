@@ -12,6 +12,7 @@ import MergeEditor from '../MergeEditor';
 import { VaultDialog } from '../VaultDialog';
 import { moveNoteEvent } from './recievers';
 import { TEMPLATE_DELETE, TEMPLATE_PERMANANT_DELETE } from './templates';
+import MoveNoteDialog from '../MoveNoteDialog';
 
 export class DialogManager extends Component {
   constructor(props) {
@@ -287,11 +288,11 @@ export class DialogManager extends Component {
         />
 
         <VaultDialog colors={colors} />
-{/* 
+
         <MoveNoteDialog
           ref={ref => (this.moveNoteDialog = ref)}
           colors={colors}
-        /> */}
+        /> 
 
         <AddTopicDialog
           ref={ref => (this.addTopicsDialog = ref)}

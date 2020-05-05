@@ -1,8 +1,6 @@
-/* import React from 'react';
+import React, {createRef} from 'react';
 import {Modal, TouchableOpacity, View} from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import {createAppContainer} from 'react-navigation';
-import {createStackNavigator} from 'react-navigation-stack';
 import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
 import {eMoveNoteDialogNavigateBack} from '../../services/events';
@@ -11,69 +9,45 @@ import Folders from '../../views/Folders';
 import Notebook from '../../views/Notebook';
 import Notes from '../../views/Notes';
 import {updateEvent} from '../DialogManager/recievers';
+import {NavigationContainer} from '@react-navigation/native';
+import {createStackNavigator} from '@react-navigation/stack';
 
-const fade = props => {
-  const {position, scene} = props;
-
-  const index = scene.index;
-
-  const translateX = 0;
-  const translateY = 0;
-
-  const opacity = position.interpolate({
-    inputRange: [index - 0.7, index, index + 0.7],
-    outputRange: [0.3, 1, 0.3],
-  });
-
-  return {
-    opacity,
-    transform: [{translateX}, {translateY}],
-  };
+const Stack = createStackNavigator();
+const modalNavigatorRef = createRef();
+const ModalNavigator = () => {
+  return (
+    <NavigationContainer independent={true} ref={modalNavigatorRef}>
+      <Stack.Navigator
+        initialRouteName="Folders"
+        screenOptions={{
+          headerShown: false,
+          animationEnabled: false,
+          gestureEnabled: false,
+          cardOverlayEnabled: false,
+          cardShadowEnabled: false,
+        }}>
+        <Stack.Screen
+          name="Folders"
+          component={Folders}
+          initialParams={{
+            title: 'Select Notebook',
+            isMove: true,
+            hideMore: true,
+            canGoBack: true,
+          }}
+        />
+        <Stack.Screen name="Notes" component={Notes} />
+        <Stack.Screen name="Notebook" component={Notebook} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
 };
-
-const ModalNavigator = createStackNavigator(
-  {
-    Folders: {
-      screen: Folders,
-    },
-    Notebook: {
-      screen: Notebook,
-    },
-    Notes: {
-      screen: Notes,
-    },
-  },
-  {
-    initialRouteName: 'Folders',
-    initialRouteParams: {
-      title: 'Select Notebook',
-      isMove: true,
-      hideMore: true,
-      canGoBack: true,
-    },
-    defaultNavigationOptions: {
-      gesturesEnabled: false,
-      headerStyle: {
-        backgroundColor: 'transparent',
-        borderBottomWidth: 0,
-        height: 0,
-      },
-    },
-    transitionConfig: () => ({
-      screenInterpolator: props => {
-        return fade(props);
-      },
-    }),
-  },
-);
-
-const Navigator = createAppContainer(ModalNavigator);
 
 class MoveNoteDialog extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      visible: false,
+      visible: true,
       animated: false,
     };
     this.routeIndex = 0;
@@ -161,12 +135,7 @@ class MoveNoteDialog extends React.Component {
               padding: DDS.isTab ? 8 : 0,
               zIndex: 10,
             }}>
-            <Navigator
-              ref={ref => (this.navigation = ref)}
-              onNavigationStateChange={state => {
-                this.routeIndex = state.index;
-              }}
-            />
+            <ModalNavigator />
           </View>
         </Animatable.View>
       </Modal>
@@ -175,4 +144,3 @@ class MoveNoteDialog extends React.Component {
 }
 
 export default MoveNoteDialog;
- */

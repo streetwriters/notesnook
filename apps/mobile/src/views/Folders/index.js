@@ -35,6 +35,7 @@ export const Folders = ({route, navigation}) => {
   };
 
   useEffect(() => {
+   
     if (isFocused) {
       dispatch({type: ACTIONS.PINNED});
       dispatch({type: ACTIONS.NOTEBOOKS});
@@ -68,6 +69,7 @@ export const Folders = ({route, navigation}) => {
       <NotebookItem
         hideMore={params.hideMore}
         navigation={navigation}
+        route={route}
         customStyle={{
           width: selectionMode ? w - 74 : '100%',
           marginHorizontal: 0,
@@ -97,10 +99,11 @@ export const Folders = ({route, navigation}) => {
   return (
     <Container
       bottomButtonText="Create a new notebook"
-      menu={params.canGoBack ? false : true}
+      menu={route.params.canGoBack ? false : true}
       preventDefaultMargins={preventDefaultMargins}
       heading={params.title}
       canGoBack={params.canGoBack}
+      route={route}
       navigation={navigation}
       placeholder="Search all notebooks"
       data={notebooks}

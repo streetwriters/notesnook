@@ -47,6 +47,7 @@ export const Container = ({
   noSelectionHeader = false,
   headerColor = null,
   type = null,
+  route
 }) => {
   // State
   const [state, dispatch] = useTracked();
@@ -210,6 +211,7 @@ export const Container = ({
               countUp = 0;
               countDown = 0;
             }}
+            route={route}
             headerColor={headerColor}
             navigation={navigation}
             colors={colors}
