@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {useIsFocused} from 'react-navigation-hooks';
+import { useIsFocused } from '@react-navigation/native';
 import Container from '../../components/Container';
 import {NotesPlaceHolder} from '../../components/ListPlaceholders';
 import NoteItem from '../../components/NoteItem';
@@ -21,14 +21,14 @@ import {openEditorAnimation} from '../../utils/animations';
 import {db, DDS, editing, ToastEvent} from '../../utils/utils';
 import {sideMenuRef} from '../../utils/refs';
 
-export const Notes = ({navigation}) => {
+export const Notes = ({route,navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors, selectionMode, currentEditingNote, colorNotes} = state;
   const allNotes = state.notes;
   const [notes, setNotes] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const isFocused = useIsFocused();
-  let params = navigation.state ? navigation.state.params : null;
+  let params = route.params ? route.params : null;
 
   useEffect(() => {
     if (!params) {
@@ -64,24 +64,21 @@ export const Notes = ({navigation}) => {
   }, []);
 
   const init = (data) => {
-    params = navigation.state.params;
+    params = route.params;
     if (data) {
       params = data;
     }
     eSendEvent(eScrollEvent, 0);
     if (params.type === 'tag') {
       let notesInTag = db.notes.tagged(params.tag.title);
-
       setNotes([...notesInTag]);
     } else if (params.type == 'color') {
       let notesInColors = db.notes.colored(params.color.title);
-
       setNotes([...notesInColors]);
     } else {
       let allNotes = db.notebooks
         .notebook(params.notebookId)
         .topics.topic(params.title).all;
-
       if (allNotes && allNotes.length > 0) {
         setNotes([...allNotes]);
       }
@@ -198,10 +195,6 @@ export const Notes = ({navigation}) => {
       />
     </Container>
   );
-};
-
-Notes.navigationOptions = {
-  header: null,
 };
 
 export default Notes;

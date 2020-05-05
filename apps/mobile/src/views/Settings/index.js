@@ -780,8 +780,5 @@ export const Settings = ({navigation}) => {
   );
 };
 
-Settings.navigationOptions = {
-  header: null,
-};
 
 export default Settings;

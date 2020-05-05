@@ -1,4 +1,4 @@
-import React from 'react';
+/* import React from 'react';
 import {Modal, TouchableOpacity, View} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import {createAppContainer} from 'react-navigation';
@@ -169,3 +169,4 @@ class LoginDialog extends React.Component {
 }
 
 export default LoginDialog;
+ */

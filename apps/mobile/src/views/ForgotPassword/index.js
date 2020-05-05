@@ -1,13 +1,12 @@
 import React, {createRef, useEffect} from 'react';
 import {SafeAreaView, Text, TouchableOpacity, View} from 'react-native';
 import {TextInput} from 'react-native-gesture-handler';
-import {useIsFocused} from 'react-navigation-hooks';
 import {opacity, pv, SIZE, WEIGHT, DDS} from '../../common/common';
 import {Header} from '../../components/header';
 import {useTracked} from '../../provider';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
 import {eLoginDialogNavigateBack} from '../../services/events';
-
+import { useIsFocused } from '@react-navigation/native';
 export const ForgotPassword = ({navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors, isLoginNavigator} = state;

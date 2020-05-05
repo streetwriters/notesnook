@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import {TextInput} from 'react-native-gesture-handler';
 import QRCode from 'react-native-qrcode-generator';
-import {useIsFocused} from 'react-navigation-hooks';
+import { useIsFocused } from '@react-navigation/native';
 import {opacity, pv, SIZE, WEIGHT, ph} from '../../common/common';
 import {Header} from '../../components/header';
 import {useTracked} from '../../provider';
@@ -704,13 +704,6 @@ export const Signup = ({navigation}) => {
   );
 };
 
-Signup.navigationOptions = {
-  header: null,
-  headerStyle: {
-    backgroundColor: 'transparent',
-    borderBottomWidth: 0,
-    height: 0,
-  },
-};
+
 
 export default Signup;

@@ -1,22 +1,20 @@
-import React, { useEffect, createRef } from 'react';
-import Animated from 'react-native-reanimated';
-import { Menu } from './src/components/Menu';
+import React, {createRef, useEffect} from 'react';
+import {Platform, StatusBar, View} from 'react-native';
 import * as Animatable from 'react-native-animatable';
+import Animated from 'react-native-reanimated';
+import {Menu} from './src/components/Menu';
 import SideMenu from './src/components/SideMenu';
-import { EditorPosition, EditorOpacity } from './src/utils/animations';
-import { sideMenuRef } from './src/utils/refs';
-import { DDS, w } from './src/utils/utils';
+import {useTracked} from './src/provider';
+import {EditorOpacity, EditorPosition} from './src/utils/animations';
+import {sideMenuRef} from './src/utils/refs';
+import {DDS, w} from './src/utils/utils';
 import Editor from './src/views/Editor';
-import { useTracked } from './src/provider';
-import { StatusBar, Platform } from 'react-native';
-import { AppContainer } from './src/services/AppContainer';
-import NavigationService from './src/services/NavigationService';
-import { useSafeArea } from 'react-native-safe-area-context';
+import {NavigationStack} from './src/services/Navigator';
 
 const editorRef = createRef();
 export const Initialize = () => {
   const [state, dispatch] = useTracked();
-  const { colors } = state;
+  const {colors} = state;
 
   useEffect(() => {
     if (Platform.OS === 'android') {
@@ -52,16 +50,14 @@ export const Initialize = () => {
           />
         }
         openMenuOffset={w / 1.5}>
-        <AppContainer
+        <View
           style={{
             width: DDS.isTab ? '70%' : '100%',
             height: '100%',
             backgroundColor: colors.bg,
-          }}
-          ref={navigatorRef => {
-            NavigationService.setTopLevelNavigator(navigatorRef);
-          }}
-        />
+          }}>
+          <NavigationStack />
+        </View>
       </SideMenu>
 
       <Animated.View
@@ -78,7 +74,7 @@ export const Initialize = () => {
           position: 'absolute',
           backgroundColor: colors.bg,
           elevation: 10,
-          opacity:EditorOpacity,
+          opacity: EditorOpacity,
           transform: [
             {
               translateX: EditorPosition,

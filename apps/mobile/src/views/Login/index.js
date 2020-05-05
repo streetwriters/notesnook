@@ -9,7 +9,6 @@ import {
 import * as Animatable from 'react-native-animatable';
 import {TextInput} from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useIsFocused} from 'react-navigation-hooks';
 import {opacity, pv, SIZE, WEIGHT} from '../../common/common';
 import {Header} from '../../components/header';
 import {useTracked} from '../../provider';
@@ -18,7 +17,7 @@ import {eSendEvent} from '../../services/eventManager';
 import {eCloseSideMenu, refreshNotesPage} from '../../services/events';
 import {validatePass, validateUsername} from '../../services/validation';
 import {db, DDS, ToastEvent, getElevation} from '../../utils/utils';
-
+import { useIsFocused } from '@react-navigation/native';
 
 
 
@@ -540,15 +539,6 @@ export const Login = ({navigation}) => {
       )}
     </View>
   );
-};
-
-Login.navigationOptions = {
-  header: null,
-  headerStyle: {
-    backgroundColor: 'transparent',
-    borderBottomWidth: 0,
-    height: 0,
-  },
 };
 
 export default Login;

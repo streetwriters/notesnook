@@ -1,37 +1,17 @@
-import React, {Component} from 'react';
-import {
-  eSubscribeEvent,
-  eUnSubscribeEvent,
-  openVault,
-} from '../../services/eventManager';
-import {
-  eCloseActionSheet,
-  eCloseAddNotebookDialog,
-  eCloseAddTopicDialog,
-  eCloseLoginDialog,
-  eCloseMoveNoteDialog,
-  eCloseSimpleDialog,
-  eOnLoadNote,
-  eOpenActionSheet,
-  eOpenAddNotebookDialog,
-  eOpenAddTopicDialog,
-  eOpenLoginDialog,
-  eOpenMoveNoteDialog,
-  eOpenSimpleDialog,
-} from '../../services/events';
+import React, { Component } from 'react';
+import { Platform } from 'react-native';
+import { eSubscribeEvent, eUnSubscribeEvent, openVault } from '../../services/eventManager';
+import { eCloseActionSheet, eCloseAddNotebookDialog, eCloseAddTopicDialog, eCloseLoginDialog, eCloseMoveNoteDialog, eCloseSimpleDialog, eOnLoadNote, eOpenActionSheet, eOpenAddNotebookDialog, eOpenAddTopicDialog, eOpenLoginDialog, eOpenMoveNoteDialog, eOpenSimpleDialog } from '../../services/events';
+import { DDS, hexToRGBA } from '../../utils/utils';
 import ActionSheet from '../ActionSheet';
-import {ActionSheetComponent} from '../ActionSheetComponent';
-import {AddNotebookDialog} from '../AddNotebookDialog';
-import {AddTopicDialog} from '../AddTopicDialog';
-import {Dialog} from '../Dialog';
-import LoginDialog from '../LoginDialog';
-import MoveNoteDialog from '../MoveNoteDialog';
-import {VaultDialog} from '../VaultDialog';
-import {hexToRGBA, DDS} from '../../utils/utils';
-import {Platform} from 'react-native';
-import {TEMPLATE_DELETE, TEMPLATE_PERMANANT_DELETE} from './templates';
-import {moveNoteEvent} from './recievers';
+import { ActionSheetComponent } from '../ActionSheetComponent';
+import { AddNotebookDialog } from '../AddNotebookDialog';
+import { AddTopicDialog } from '../AddTopicDialog';
+import { Dialog } from '../Dialog';
 import MergeEditor from '../MergeEditor';
+import { VaultDialog } from '../VaultDialog';
+import { moveNoteEvent } from './recievers';
+import { TEMPLATE_DELETE, TEMPLATE_PERMANANT_DELETE } from './templates';
 
 export class DialogManager extends Component {
   constructor(props) {
@@ -307,11 +287,11 @@ export class DialogManager extends Component {
         />
 
         <VaultDialog colors={colors} />
-
+{/* 
         <MoveNoteDialog
           ref={ref => (this.moveNoteDialog = ref)}
           colors={colors}
-        />
+        /> */}
 
         <AddTopicDialog
           ref={ref => (this.addTopicsDialog = ref)}
@@ -329,7 +309,7 @@ export class DialogManager extends Component {
           colors={colors}
         />
 
-        <LoginDialog colors={colors} ref={ref => (this.loginDialog = ref)} />
+       {/*  <LoginDialog colors={colors} ref={ref => (this.loginDialog = ref)} /> */}
 
         <MergeEditor />
       </>
