@@ -40,7 +40,7 @@ const App = () => {
     DDS.isTab ? Orientation.lockToLandscape() : Orientation.lockToPortrait();
   }, []);
 
-  const startSyncer = () => {
+  const startSyncer = async () => {
     let user = await db.user.get();
     if (user) {
       db.ev.subscribe('sync',async () => {
