@@ -35,22 +35,24 @@ function ListContainer(props) {
         <>
           {!props.noSearch && <Search type={props.type} />}
           <Flex variant="columnFill" mt={2}>
-            {props.children || props.items.length > 0 ? (
-              <List
-                style={{
-                  width: "100%",
-                  flex: "1 1 auto",
-                  height: "auto",
-                  overflowX: "hidden",
-                }}
-                totalCount={props.items.length}
-                item={(index) => {
-                  const item = props.items[index];
-                  if (!item) return null;
-                  return props.item(index, item);
-                }}
-              />
-            ) : null}
+            {props.children
+              ? props.children
+              : props.items.length > 0 && (
+                  <List
+                    style={{
+                      width: "100%",
+                      flex: "1 1 auto",
+                      height: "auto",
+                      overflowX: "hidden",
+                    }}
+                    totalCount={props.items.length}
+                    item={(index) => {
+                      const item = props.items[index];
+                      if (!item) return null;
+                      return props.item(index, item);
+                    }}
+                  />
+                )}
           </Flex>
         </>
       )}

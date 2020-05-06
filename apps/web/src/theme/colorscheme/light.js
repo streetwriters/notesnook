@@ -8,7 +8,7 @@ class LightColorSchemeFactory {
       background: "white",
       accent: "white",
       bgSecondary: "#f0f0f0",
-      border: "#e0e0e0",
+      border: "#f0f0f0",
       hover: "#e0e0e0",
       fontSecondary: "white",
       text: "#000000",
@@ -16,7 +16,7 @@ class LightColorSchemeFactory {
       secondary: "white",
       icon: "#3b3b3b",
       placeholder: hexToRGB("#000000", 0.6),
-      ...new StaticColorSchemeFactory(accent)
+      ...new StaticColorSchemeFactory(accent),
     };
   }
 }

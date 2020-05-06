@@ -91,12 +91,13 @@ function menuItems(note, context) {
 }
 
 function Note(props) {
-  const { item, index } = props;
+  const { item, index, pinnable } = props;
   const note = item;
   const selectedNote = useStore((store) => store.selectedNote);
   // we will never be opening a note side-by-side in Mobile
   const isOpened = isMobile() ? false : selectedNote === note.id;
   const theme = useTheme();
+
   return (
     <ListItem
       selectable
@@ -154,7 +155,7 @@ function Note(props) {
           )}
         </Flex>
       }
-      pinned={props.pinnable && note.pinned}
+      pinned={pinnable && note.pinned}
       menuData={note}
       menuItems={menuItems(note, props.context)}
     />

@@ -149,7 +149,7 @@ function Properties() {
             />
             <Flex
               fontSize="body"
-              sx={{ marginBottom: 2 }}
+              sx={{ marginTop: 2 }}
               alignItems="center"
               justifyContent="flex-start"
               flexWrap="wrap"
