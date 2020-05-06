@@ -71,9 +71,8 @@ export const Signup = ({route,navigation}) => {
       ToastEvent.show('Passwords do not match', 'error');
       return;
     }
-
     setSigningIn(true);
-    setStatus('Creating new user...');
+    setStatus('Creating your account...');
     if (!invalidEmail && !invalidPassword && !invalidUsername) {
       try {
         await db.user.signup(username, email, password);
@@ -84,15 +83,14 @@ export const Signup = ({route,navigation}) => {
         return;
       }
 
-      let user;
-
-      setStatus('Logging you in...');
+      let user;  
       try {
         user = await db.user.user.get();
+        setStatus('Logging you in...');
         let k = await db.user.key();
         setKey(k.key);
+        setStatus('Setting up crenditials...');
         dispatch({type: ACTIONS.USER, user: user});
-
         eSendEvent(eStartSyncer);
         setTimeout(() => {
           setModalVisible(true);
@@ -102,8 +100,6 @@ export const Signup = ({route,navigation}) => {
         setFailed(true);
         ToastEvent.show('Login Failed, try again', 'error');
       }
-
-      console.log(user);
     } else {
       ToastEvent.show('Signup failed', 'error');
     }
