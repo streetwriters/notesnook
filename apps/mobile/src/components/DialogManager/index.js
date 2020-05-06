@@ -242,6 +242,8 @@ export class DialogManager extends Component {
               ? hexToRGBA(colors.accent + '19')
               : hexToRGBA(colors.shade)
           }
+          delayActionSheetDraw={true}
+          delayActionSheetDrawTime={10}
           footerAlwaysVisible={DDS.isTab}
           footerHeight={DDS.isTab ? 20 : 10}
           footerStyle={
