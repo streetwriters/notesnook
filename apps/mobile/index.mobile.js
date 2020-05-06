@@ -1,15 +1,15 @@
-import React, {createRef, useEffect} from 'react';
+import React, {createRef, useEffect, useState} from 'react';
 import {Platform, StatusBar, View} from 'react-native';
 import * as Animatable from 'react-native-animatable';
+import DrawerLayout from 'react-native-drawer-layout';
 import Animated from 'react-native-reanimated';
 import {Menu} from './src/components/Menu';
-import SideMenu from './src/components/SideMenu';
 import {useTracked} from './src/provider';
+import {NavigationStack} from './src/services/Navigator';
 import {EditorOpacity, EditorPosition} from './src/utils/animations';
 import {sideMenuRef} from './src/utils/refs';
-import {DDS, w} from './src/utils/utils';
+import {DDS} from './src/utils/utils';
 import Editor from './src/views/Editor';
-import {NavigationStack} from './src/services/Navigator';
 
 const editorRef = createRef();
 export const Initialize = () => {
@@ -23,6 +23,7 @@ export const Initialize = () => {
       StatusBar.setBarStyle(colors.night ? 'light-content' : 'dark-content');
     }
   }, []);
+
   return (
     <Animatable.View
       transition="backgroundColor"
@@ -33,23 +34,22 @@ export const Initialize = () => {
         flexDirection: 'row',
         backgroundColor: colors.bg,
       }}>
-      <SideMenu
+      <DrawerLayout
         ref={sideMenuRef}
-        bounceBackOnOverdraw={false}
-        contentContainerStyle={{
+        style={{
           opacity: 0,
           backgroundColor: colors.bg,
         }}
-        menu={
+        keyboardDismissMode="ondrag"
+        drawerWidth={300}
+        useNativeAnimations={true}
+        renderNavigationView={() => (
           <Menu
             hide={false}
             colors={colors}
-            close={() =>
-              sideMenuRef.current?.openMenu(!sideMenuRef.current?.isOpen)
-            }
+            close={() => sideMenuRef.current?.closeDrawer()}
           />
-        }
-        openMenuOffset={w / 1.5}>
+        )}>
         <View
           style={{
             width: DDS.isTab ? '70%' : '100%',
@@ -58,7 +58,7 @@ export const Initialize = () => {
           }}>
           <NavigationStack />
         </View>
-      </SideMenu>
+      </DrawerLayout>
 
       <Animated.View
         ref={editorRef}

@@ -157,8 +157,6 @@ export const Notes = ({route,navigation}) => {
     if (DDS.isTab) {
       eSendEvent(eOnLoadNote, {type: 'new'});
     } else {
-      sideMenuRef.current?.openMenu(false);
-      sideMenuRef.current?.setGestureEnabled(false);
       eSendEvent(eOnLoadNote, {type: 'new'});
       openEditorAnimation();
     }

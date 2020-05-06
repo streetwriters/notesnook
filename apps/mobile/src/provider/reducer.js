@@ -127,12 +127,6 @@ export const reducer = (state, action) => {
       };
     }
     case ACTIONS.SELECTION_MODE: {
-      if (action.enabled) {
-        sideMenuRef.current?.setGestureEnabled(false);
-      } else {
-        sideMenuRef.current?.setGestureEnabled(true);
-      }
-
       return {
         ...state,
         selectionMode: action.enabled,
@@ -152,9 +146,6 @@ export const reducer = (state, action) => {
         selectedItems.push(action.item);
       }
       history.selectedItemsList = selectedItems;
-      if (selectedItems.length === 0) {
-        sideMenuRef.current?.setGestureEnabled(true);
-      }
       return {
         ...state,
         selectedItemsList: selectedItems,
@@ -163,7 +154,6 @@ export const reducer = (state, action) => {
     }
     case ACTIONS.CLEAR_SELECTION: {
       history.selectedItemsList = [];
-      sideMenuRef.current?.setGestureEnabled(true);
       return {
         ...state,
         selectedItemsList: [],

@@ -90,7 +90,6 @@ const Editor = ({noMenu}) => {
         _onHardwareBackPress,
       );
     }
-    noMenu ? null : sideMenuRef.current?.setGestureEnabled(false);
     if (note && note.id) {
       dispatch({type: ACTIONS.NOTES});
       if (item && item.type === 'new') {
@@ -487,8 +486,6 @@ const Editor = ({noMenu}) => {
         ToastEvent.show('Note Saved!', 'success');
       }
       await clearEditor();
-      DDS.isTab ? sideMenuRef.current?.openMenu(true) : null;
-      sideMenuRef.current?.setGestureEnabled(true);
       if (handleBack) {
         handleBack.remove();
         handleBack = null;

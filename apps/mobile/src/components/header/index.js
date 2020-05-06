@@ -132,7 +132,7 @@ export const Header = ({
           <TouchableOpacity
             hitSlop={{top: 20, bottom: 20, left: 50, right: 40}}
             onPress={() => {
-              sideMenuRef.current?.openMenu(true);
+              sideMenuRef.current?.openDrawer();
             }}
             style={{
               justifyContent: 'center',

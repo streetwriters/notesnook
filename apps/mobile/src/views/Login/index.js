@@ -38,10 +38,6 @@ export const Login = ({route, navigation}) => {
 
   const isFocused = useIsFocused();
 
-  useEffect(() => {
-    eSendEvent(eCloseSideMenu);
-  }, []);
-
   const handleBackPress = () => {
     return true;
   };

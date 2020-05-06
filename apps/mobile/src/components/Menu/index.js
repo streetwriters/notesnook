@@ -35,6 +35,9 @@ import {
 import NavigationService from '../../services/NavigationService';
 import {db, DDS, hexToRGBA, timeSince, ToastEvent} from '../../utils/utils';
 import {sideMenuOverlayRef} from '../../utils/refs';
+import {createAnimatableComponent} from 'react-native-animatable';
+
+const AnimatedSafeAreaView = createAnimatableComponent(SafeAreaView);
 
 export const Menu = ({
   close = () => {},
@@ -119,12 +122,14 @@ export const Menu = ({
   ];
 
   return (
-    <SafeAreaView
+    <AnimatedSafeAreaView
+      transition="backgroundColor"
+      duration={300}
       style={{
         height: '100%',
         opacity: hide ? 0 : 1,
         width: '100%',
-        backgroundColor: 'transparent',
+        backgroundColor: colors.bg,
         borderRightWidth: noTextMode ? 1 : 0,
         borderRightColor: noTextMode ? colors.accent : 'transparent',
       }}>
@@ -168,25 +173,6 @@ export const Menu = ({
           </TouchableOpacity>
         ) : null}
       </View>
-
-      {DDS.isTab ? null : (
-        <View
-          ref={sideMenuOverlayRef}
-          style={{
-            height: '100%',
-            width: '100%',
-            position: 'absolute',
-            zIndex: 999,
-            backgroundColor: colors.bg,
-            display: 'flex',
-            transform: [
-              {
-                translateX: 0,
-              },
-            ],
-          }}
-        />
-      )}
 
       <ScrollView
         contentContainerStyle={{minHeight: '50%'}}
@@ -742,6 +728,6 @@ export const Menu = ({
           </TouchableOpacity>
         )}
       </View>
-    </SafeAreaView>
+    </AnimatedSafeAreaView>
   );
 };
