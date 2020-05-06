@@ -47,6 +47,7 @@ export const Login = ({route, navigation}) => {
   };
 
   useEffect(() => {
+    eSendEvent(eCloseSideMenu);
     let backhandler;
     if (isFocused) {
       backhandler = BackHandler.addEventListener(
@@ -61,6 +62,7 @@ export const Login = ({route, navigation}) => {
     }
 
     return () => {
+      eSendEvent(eOpenSideMenu);
       if (!backhandler) return;
       backhandler.remove();
       backhandler = null;
