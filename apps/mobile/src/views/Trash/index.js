@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {useIsFocused} from 'react-navigation-hooks';
+import { useIsFocused } from '@react-navigation/native';
 import Container from '../../components/Container';
 import {simpleDialogEvent} from '../../components/DialogManager/recievers';
 import {TEMPLATE_EMPTY_TRASH} from '../../components/DialogManager/templates';
@@ -106,10 +106,6 @@ export const Trash = ({navigation}) => {
       />
     </Container>
   );
-};
-
-Trash.navigationOptions = {
-  header: null,
 };
 
 export default Trash;

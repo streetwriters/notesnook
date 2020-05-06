@@ -6,25 +6,40 @@ const {color, Value, timing} = Animated;
 
 export const EditorPosition = new Value(Dimensions.get('window').width * 1.5);
 
+export const EditorOpacity = new Value(0);
+
 export function openEditorAnimation() {
   EditorPosition.setValue(Dimensions.get('window').width * 1.5);
+  EditorOpacity.setValue(0);
   editing.currentlyEditing = true;
   let openConfigH = {
-    duration: 300,
+    duration: 1,
     toValue: 0,
-    easing: Easing.inOut(Easing.ease),
+    easing: Easing.in(Easing.linear),
   };
+  
+  timing(EditorOpacity, {
+    duration:300,
+    toValue:1,
+    easing: Easing.in(Easing.linear),
+  }).start();
   timing(EditorPosition, openConfigH).start();
 }
 
 export function exitEditorAnimation() {
   EditorPosition.setValue(0);
+  EditorOpacity.setValue(1);
   editing.currentlyEditing = false;
   let openConfigH = {
-    duration: 300,
+    duration: 1,
     toValue: Dimensions.get('window').width * 1.5,
-    easing: Easing.inOut(Easing.ease),
+    easing: Easing.in(Easing.linear),
   };
+  timing(EditorOpacity, {
+    duration:150,
+    toValue:0,
+    easing: Easing.in(Easing.linear),
+  }).start();
   timing(EditorPosition, openConfigH).start();
 }
 

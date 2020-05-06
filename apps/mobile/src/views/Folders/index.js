@@ -1,7 +1,8 @@
-import React, {useEffect, useState} from 'react';
+import {useIsFocused} from '@react-navigation/native';
+import React, {useEffect} from 'react';
 import {BackHandler} from 'react-native';
-import {useIsFocused} from 'react-navigation-hooks';
 import Container from '../../components/Container';
+import {AddNotebookEvent} from '../../components/DialogManager/recievers';
 import {NotebookPlaceHolder} from '../../components/ListPlaceholders';
 import {NotebookItem} from '../../components/NotebookItem';
 import SelectionWrapper from '../../components/SelectionWrapper';
@@ -10,12 +11,10 @@ import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
 import {eScrollEvent} from '../../services/events';
-import {slideLeft, slideRight} from '../../utils/animations';
-import {ToastEvent, w, db} from '../../utils/utils';
-import {AddNotebookEvent} from '../../components/DialogManager/recievers';
 import NavigationService from '../../services/NavigationService';
-
-export const Folders = ({navigation}) => {
+import {slideRight} from '../../utils/animations';
+import {w} from '../../utils/utils';
+export const Folders = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const {
     colors,
@@ -27,7 +26,7 @@ export const Folders = ({navigation}) => {
   let isFocused = useIsFocused();
 
   const handleBackPress = () => {
-    if (navigation.state.params.isMove) {
+    if (route.params.isMove) {
       return true;
     } else {
       NavigationService.goBack();
@@ -36,6 +35,7 @@ export const Folders = ({navigation}) => {
   };
 
   useEffect(() => {
+   
     if (isFocused) {
       dispatch({type: ACTIONS.PINNED});
       dispatch({type: ACTIONS.NOTEBOOKS});
@@ -62,13 +62,14 @@ export const Folders = ({navigation}) => {
     };
   }, []);
 
-  const params = navigation.state.params;
+  const params = route.params;
 
   const _renderItem = ({item, index}) => (
     <SelectionWrapper item={item}>
       <NotebookItem
         hideMore={params.hideMore}
         navigation={navigation}
+        route={route}
         customStyle={{
           width: selectionMode ? w - 74 : '100%',
           marginHorizontal: 0,
@@ -98,10 +99,11 @@ export const Folders = ({navigation}) => {
   return (
     <Container
       bottomButtonText="Create a new notebook"
-      menu={params.canGoBack ? false : true}
+      menu={route.params.canGoBack ? false : true}
       preventDefaultMargins={preventDefaultMargins}
       heading={params.title}
       canGoBack={params.canGoBack}
+      route={route}
       navigation={navigation}
       placeholder="Search all notebooks"
       data={notebooks}
@@ -127,10 +129,6 @@ export const Folders = ({navigation}) => {
       />
     </Container>
   );
-};
-
-Folders.navigationOptions = {
-  header: null,
 };
 
 export default Folders;

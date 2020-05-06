@@ -55,7 +55,7 @@ let handleBack;
 const Editor = ({noMenu}) => {
   // Global State
   const [state, dispatch] = useTracked();
-  const {colors} = state;
+  const {colors, currentEditingNote} = state;
   const [fullscreen, setFullscreen] = useState(false);
   const [dateEdited, setDateEdited] = useState(0);
 
@@ -90,7 +90,6 @@ const Editor = ({noMenu}) => {
         _onHardwareBackPress,
       );
     }
-    noMenu ? null : sideMenuRef.current?.setGestureEnabled(false);
     if (note && note.id) {
       dispatch({type: ACTIONS.NOTES});
       if (item && item.type === 'new') {
@@ -131,6 +130,7 @@ const Editor = ({noMenu}) => {
   const clearEditor = async () => {
     await saveNote(true);
     setDateEdited(0);
+    InfoBarRef.current?.clear();
     title = null;
     content = null;
     note = null;
@@ -138,6 +138,7 @@ const Editor = ({noMenu}) => {
     tapCount = 0;
     saveCounter = 0;
     canSave = false;
+
     post({
       type: 'clearEditor',
     });
@@ -258,7 +259,7 @@ const Editor = ({noMenu}) => {
         delta: {ops: []},
       };
     }
-  
+
     return true;
   };
 
@@ -281,8 +282,11 @@ const Editor = ({noMenu}) => {
 
   const saveNote = async (lockNote = true) => {
     if (!checkIfContentIsSavable()) return;
-
     let lockedNote = id ? db.notes.note(id).data.locked : null;
+    post({
+      type: 'saving',
+      value: 'Saving',
+    });
     if (!lockedNote) {
       let rId = await db.notes.add({
         title,
@@ -292,52 +296,44 @@ const Editor = ({noMenu}) => {
         },
         id: id,
       });
-
       setNoteInEditorAferSaving(id, rId);
-
       if (content.text.length < 200 || saveCounter < 2) {
         dispatch({
           type: ACTIONS.NOTES,
         });
         eSendEvent(refreshNotesPage);
       }
-
+      InfoBarRef.current?.setSaving();
       if (id) {
         await addToCollection(id);
-        dispatch({
-          type: ACTIONS.CURRENT_EDITING_NOTE,
-          id: id,
-        });
-        InfoBarRef.current?.setDateEdited(
-          db.notes.note(id).data.dateEdited,
-          content?.text?.split(' ').length,
-        );
-        InfoBarRef.current?.setDateCreated(db.notes.note(id).data.dateCreated);
+        if (currentEditingNote !== id) {
+          dispatch({
+            type: ACTIONS.CURRENT_EDITING_NOTE,
+            id: id,
+          });
+        }
       }
-
       saveCounter++;
     } else {
-      if (id) {
-        dispatch({
-          type: ACTIONS.CURRENT_EDITING_NOTE,
-          id: id,
-        });
-
-        await db.vault.save({
-          title,
-          content: {
-            text: content.text,
-            delta: content.delta,
-          },
-          id: id,
-        });
-      }
-      InfoBarRef.current?.setDateEdited(
-        db.notes.note(id).data.dateEdited,
-        content?.text?.split(' ').length,
-      );
-      InfoBarRef.current?.setDateCreated(db.notes.note(id).data.dateCreated);
+      await db.vault.save({
+        title,
+        content: {
+          text: content.text,
+          delta: content.delta,
+        },
+        id: id,
+      });
     }
+    let n = db.notes.note(id).data.dateEdited;
+    post({
+      type: 'dateEdited',
+      value: timeConverter(n),
+    });
+
+    post({
+      type: 'saving',
+      value: 'Saved',
+    });
   };
 
   useEffect(() => {
@@ -383,52 +379,52 @@ const Editor = ({noMenu}) => {
   };
 
   const updateEditor = async () => {
+    title = note.title;
+    id = note.id;
+    saveCounter = 0;
+    content = {};
+    content.text = '';
     try {
-      title = note.title;
-      id = note.id;
-      saveCounter = 0;
-      InfoBarRef.current?.setDateCreated(note.dateCreated);
-
       content.text = await db.notes.note(id).text();
-
-      InfoBarRef.current?.setDateEdited(
-        note.dateEdited,
-        content.text.split(' ').length,
-      );
-      if (title !== null || title === '') {
-        post({
-          type: 'title',
-          value: note.title,
-        });
-      } else {
-        post({
-          type: 'clearTitle',
-        });
-        post({
-          type: 'clearEditor',
-        });
-        post({
-          type: 'focusTitle',
-        });
-      }
-      if (content.text === '' && note.content.delta === null) {
-        post({
-          type: 'clearEditor',
-        });
-      } else if (note.content.delta) {
-        if (typeof note.content.delta !== 'string') {
-          content.delta = note.content.delta;
-        } else {
-          content.delta = await db.notes.note(id).delta();
-        }
-        post({
-          type: 'delta',
-          value: content.delta,
-        });
-      } else {
-        post({type: 'text', value: content.text});
-      }
+      post({
+        type: 'dateEdited',
+        value: timeConverter(note.dateEdited),
+      });
     } catch (e) {}
+
+    if (title !== null || title === '') {
+      post({
+        type: 'title',
+        value: note.title,
+      });
+    } else {
+      post({
+        type: 'clearTitle',
+      });
+      post({
+        type: 'clearEditor',
+      });
+      post({
+        type: 'focusTitle',
+      });
+    }
+    if (content.text === '' && note.content.delta === null) {
+      post({
+        type: 'clearEditor',
+      });
+    } else if (note.content.delta) {
+      if (typeof note.content.delta !== 'string') {
+        content.delta = note.content.delta;
+      } else {
+        content.delta = await db.notes.note(id).delta();
+      }
+      post({
+        type: 'delta',
+        value: content.delta,
+      });
+    } else {
+      post({type: 'text', value: content.text});
+    }
   };
 
   const params = 'platform=' + Platform.OS;
@@ -498,8 +494,6 @@ const Editor = ({noMenu}) => {
         ToastEvent.show('Note Saved!', 'success');
       }
       await clearEditor();
-      DDS.isTab ? sideMenuRef.current?.openMenu(true) : null;
-      sideMenuRef.current?.setGestureEnabled(true);
       if (handleBack) {
         handleBack.remove();
         handleBack = null;
@@ -611,8 +605,6 @@ const Editor = ({noMenu}) => {
             <Icon name="dots-horizontal" color={colors.icon} size={SIZE.xxxl} />
           </TouchableOpacity>
         </View>
-
-        <InfoBar ref={InfoBarRef} colors={colors} noMenu={noMenu} />
         <WebView
           ref={EditorWebView}
           onError={error => console.log(error)}

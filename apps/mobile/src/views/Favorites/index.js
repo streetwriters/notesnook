@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from 'react';
-import {useIsFocused} from 'react-navigation-hooks';
 import Container from '../../components/Container';
 import {FavoritesPlaceHolder} from '../../components/ListPlaceholders';
 import {NotebookItem} from '../../components/NotebookItem';
@@ -9,7 +8,7 @@ import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {ToastEvent, w, db} from '../../utils/utils';
 import SimpleList from '../../components/SimpleList';
-
+import { useIsFocused } from '@react-navigation/native';
 export const Favorites = ({navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors, selectionMode, favorites} = state;
@@ -118,8 +117,5 @@ export const Favorites = ({navigation}) => {
   );
 };
 
-Favorites.navigationOptions = {
-  header: null,
-};
 
 export default Favorites;

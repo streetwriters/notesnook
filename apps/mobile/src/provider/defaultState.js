@@ -44,7 +44,7 @@ export const defaultState = {
   },
   preventDefaultMargins: false,
   isLoginNavigator: false,
-  currenEditingNote: null,
+  currentEditingNote: null,
   loading: true,
   searchResults: {
     results: [],

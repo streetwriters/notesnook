@@ -1068,16 +1068,47 @@
       background-color: transparent;
     }
 
+    .info-bar {
+      display: flex;
+      color: gray;
+      font-size: 11px;
+      position: absolute;
+      margin-top: -18px;
+      font-family: 'DM Sans';
+    }
+
     #titlebar input:focus {
       outline: none;
     }
-  </style>
 
+    #infowords {
+      margin-right: 5px;
+      margin-left: 5px;
+    }
+
+    #infodate {
+      margin-right: 5px;
+      margin-left: 5px;
+    }
+
+    #infosaved {
+      margin-right: 5px;
+      margin-left: 5px;
+    }
+  </style>
 </head>
 
 <body class="app-body">
   <div id="titlebar">
     <input id="titleInput" placeholder="Title here" />
+    <div class="info-bar">
+      <p id="infowords"></p>
+      <p>•</p>
+      <p id="infodate"></p>
+      <p>•</p>
+      <p id="infosaved"></p>
+    </div>
+
   </div>
   <div id="editor"></div>
   <div id="toolbar"></div>
@@ -1497,7 +1528,7 @@
   
   #titleInput {
     color:${pageTheme.colors.pri};
-    font-size:${28 * pageTheme.colors.factor};
+    font-size:${27 * pageTheme.colors.factor};
     
   }
   #titleInput::-webkit-input-placeholder {
@@ -1512,8 +1543,9 @@
     font-size:${(pageTheme.colors.factor * 18)};
     color:${pageTheme.colors.pri};
   }
-
-
+  .info-bar {
+    color:${pageTheme.colors.icon};
+  }
   svg {
       fill: ${pageTheme.colors.pri} !important;
     }
@@ -1528,6 +1560,8 @@
       editor.once('text-change', function () {
 
         window.ReactNativeWebView.postMessage("loaded");
+        let text = editor.getText();
+        document.getElementById("infowords").innerText = text.split(' ').length + ' words';
 
 
       });
@@ -1550,10 +1584,15 @@
           value = message.value
         }
         switch (type) {
-
           case "blur":
             document.getElementById('titleInput').blur();
             editor.blur();
+            break;
+          case "dateEdited":
+            document.getElementById('infodate').innerText = value;
+            break;
+          case "saving":
+            document.getElementById('infosaved').innerText = value;
             break;
           case "text":
             editor.setText(value, 'api')
@@ -1580,7 +1619,7 @@
           case "nomenu":
             let isenabled = value;
             let width = window.innerWidth;
-            let titleIn = document.getElementById('titleInput');
+            let titleIn = document.getElementById('titlebar');
             if (isenabled) {
               titleIn.style.width = width - 72;
               titleIn.style['margin-left'] = 12;
@@ -1603,9 +1642,9 @@
 
             const content = value
             editor.setContents(content, 'api');
-            setTimeout(() => {
+            /* setTimeout(() => {
               editor.setSelection(editor.getText().length - 1, 0);
-            }, 500)
+            }, 500) */
 
             break;
           case "html":
@@ -1613,9 +1652,9 @@
               editor.clipboard.convert(value, 'api'),
               'silent'
             );
-            setTimeout(() => {
-              editor.setSelection(editor.getText().length - 1, 0);
-            }, 0);
+            /*  setTimeout(() => {
+               editor.setSelection(editor.getText().length - 1, 0);
+             }, 0); */
             break;
           default:
             break;
@@ -1665,7 +1704,7 @@
         m.delta = { ops: editor.getContents().ops }
 
         m.text = editor.getText();
-
+        document.getElementById("infowords").innerText = m.text.split(' ').length + ' words';
         m.html = editor.root.innerHTML;
         m.type = 'content';
 

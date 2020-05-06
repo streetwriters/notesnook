@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   Platform,
   ScrollView,
@@ -52,6 +52,13 @@ export const Settings = ({navigation}) => {
     ACCENT.shade = accentColor + '12';
     changeColorScheme();
   }
+
+  useEffect(() => {
+    dispatch({
+      type: ACTIONS.CURRENT_SCREEN,
+      screen: 'settings',
+    });
+  },[])
 
   return (
     <Container
@@ -437,9 +444,6 @@ export const Settings = ({navigation}) => {
             flexWrap: 'wrap',
           }}
           style={{
-            backgroundColor: Platform.ios
-              ? hexToRGBA(colors.accent + '19')
-              : hexToRGBA(colors.shade),
             borderRadius: 5,
             padding: 5,
             marginTop: 10,
@@ -776,8 +780,5 @@ export const Settings = ({navigation}) => {
   );
 };
 
-Settings.navigationOptions = {
-  header: null,
-};
 
 export default Settings;

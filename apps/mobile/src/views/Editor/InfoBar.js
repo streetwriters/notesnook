@@ -15,24 +15,38 @@ export default class InfoBar extends React.Component {
     };
     this.dateCreated = null;
   }
-  setDateEdited(id, length) {
+
+  setSaving() {
     this.setState(
       {
         saving: true,
-        length: length,
       },
       () => {
         setTimeout(() => {
           this.setState({
-            dateEdited: id,
             saving: false,
           });
         }, 500);
       },
     );
   }
+
+  setDateEdited(id, length) {
+    this.setState({
+      dateEdited: id,
+      length: length,
+    });
+  }
   setDateCreated(dateCreated) {
     this.dateCreated = dateCreated;
+  }
+  clear() {
+    this.dateCreated = null;
+    this.setState({
+      saving: false,
+      dateEdited: null,
+      length: 0,
+    });
   }
 
   render() {
@@ -42,6 +56,7 @@ export default class InfoBar extends React.Component {
           paddingHorizontal: 12,
           marginTop: Platform.OS === 'ios' ? 45 : StatusBar.currentHeight + 45,
           width: '100%',
+          backgroundColor: this.props.colors.bg,
           position: 'absolute',
           justifyContent: 'flex-start',
           flexDirection: 'row',
@@ -86,7 +101,7 @@ export default class InfoBar extends React.Component {
           {this.state.saving ? (
             <ActivityIndicator
               style={{width: 14, height: 14, marginLeft: 10}}
-              color="white"
+              color={this.props.colors.accent}
               size={14}
             />
           ) : null}

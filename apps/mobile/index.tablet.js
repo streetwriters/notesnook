@@ -4,23 +4,18 @@ import * as Animatable from 'react-native-animatable';
 import { Menu } from './src/components/Menu';
 import { ModalMenu } from './src/components/ModalMenu';
 import { useTracked } from './src/provider';
-
+import { eSendEvent, eSubscribeEvent } from './src/services/eventManager';
+import { eCloseFullscreenEditor, eOnLoadNote, eOpenFullscreenEditor } from './src/services/events';
+import { NavigationStack } from './src/services/Navigator';
 import Editor from './src/views/Editor';
-import { eSubscribeEvent, eSendEvent } from './src/services/eventManager';
-import {
-  eOpenFullscreenEditor,
-  eCloseFullscreenEditor,
-  eOnLoadNote,
-} from './src/services/events';
-import { AppContainer } from './src/services/AppContainer';
-import NavigationService from './src/services/NavigationService';
+
 
 const editorRef = createRef();
 let outColors;
 
 export const Initialize = () => {
   const [state, dispatch] = useTracked();
-  const { colors } = state;
+  const {colors} = state;
 
   const [fullscreen, setFullscreen] = useState(false);
 
@@ -56,7 +51,7 @@ export const Initialize = () => {
   };
 
   useEffect(() => {
-    eSendEvent(eOnLoadNote, { type: 'new' });
+    eSendEvent(eOnLoadNote, {type: 'new'});
     eSubscribeEvent(eOpenFullscreenEditor, showFullScreenEditor);
     eSubscribeEvent(eCloseFullscreenEditor, closeFullScreenEditor);
 
@@ -104,15 +99,7 @@ export const Initialize = () => {
           borderRightColor: colors.nav,
           borderRightWidth: 2,
         }}>
-        <AppContainer
-          style={{
-            width: '100%',
-            height: '100%',
-          }}
-          ref={navigatorRef => {
-            NavigationService.setTopLevelNavigator(navigatorRef);
-          }}
-        />
+        <NavigationStack />
       </Animatable.View>
       <View
         ref={editorRef}

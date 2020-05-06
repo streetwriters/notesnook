@@ -73,3 +73,5 @@ export const eApplyChanges = '535';
 export const eShowMergeDialog = '536';
 
 export const eSwitchNightMode = '537';
+
+export const eStartSyncer = '538';

@@ -7,6 +7,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  ActivityIndicator,
 } from 'react-native';
 import MMKV from 'react-native-mmkv-storage';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -26,10 +27,18 @@ import {
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
-import {eClearSearch, eOpenModalMenu} from '../../services/events';
+import {
+  eClearSearch,
+  eOpenModalMenu,
+  refreshNotesPage,
+} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
-import {db, DDS, hexToRGBA, timeSince} from '../../utils/utils';
+import {db, DDS, hexToRGBA, timeSince, ToastEvent} from '../../utils/utils';
 import {sideMenuOverlayRef} from '../../utils/refs';
+import {createAnimatableComponent} from 'react-native-animatable';
+import {TimeSince} from './TimeSince';
+
+const AnimatedSafeAreaView = createAnimatableComponent(SafeAreaView);
 
 export const Menu = ({
   close = () => {},
@@ -38,7 +47,7 @@ export const Menu = ({
   noTextMode = false,
 }) => {
   const [state, dispatch] = useTracked();
-  const {colors, tags, colorNotes, user} = state;
+  const {colors, tags, colorNotes, user, currentScreen, syncing} = state;
 
   // todo
 
@@ -114,12 +123,14 @@ export const Menu = ({
   ];
 
   return (
-    <SafeAreaView
+    <AnimatedSafeAreaView
+      transition="backgroundColor"
+      duration={300}
       style={{
         height: '100%',
         opacity: hide ? 0 : 1,
         width: '100%',
-        backgroundColor: 'transparent',
+        backgroundColor: colors.bg,
         borderRightWidth: noTextMode ? 1 : 0,
         borderRightColor: noTextMode ? colors.accent : 'transparent',
       }}>
@@ -164,30 +175,8 @@ export const Menu = ({
         ) : null}
       </View>
 
-      {DDS.isTab ? null : (
-        <View
-          ref={sideMenuOverlayRef}
-          style={{
-            height: '100%',
-            width: '100%',
-            position: 'absolute',
-            zIndex: 999,
-            backgroundColor: colors.bg,
-            display: 'flex',
-            transform: [
-              {
-                translateX: 0,
-              },
-            ],
-          }}
-        />
-      )}
-
       <ScrollView
         contentContainerStyle={{minHeight: '50%'}}
-        style={{
-          paddingHorizontal: noTextMode ? 0 : 12,
-        }}
         showsVerticalScrollIndicator={false}>
         <View>
           {listItems.map((item, index) => (
@@ -203,8 +192,13 @@ export const Menu = ({
               }}
               style={{
                 width: '100%',
+                backgroundColor:
+                  item.name.toLowerCase() === currentScreen
+                    ? colors.shade
+                    : 'transparent',
                 alignSelf: 'center',
                 flexDirection: 'row',
+                paddingHorizontal: noTextMode ? 0 : 12,
                 justifyContent: noTextMode ? 'center' : 'space-between',
                 alignItems: 'center',
                 paddingBottom: noTextMode ? pv + 2 : normalize(15),
@@ -262,9 +256,12 @@ export const Menu = ({
             width: '100%',
             alignSelf: 'center',
             flexDirection: 'row',
+            paddingVertical: noTextMode ? pv + 2 : normalize(15),
+            backgroundColor:
+              currentScreen === 'tags' ? colors.shade : 'transparent',
+            paddingHorizontal: noTextMode ? 0 : 12,
             justifyContent: noTextMode ? 'center' : 'space-between',
             alignItems: 'flex-end',
-            marginTop: noTextMode ? pv : normalize(15),
           }}>
           <View
             style={{
@@ -308,12 +305,14 @@ export const Menu = ({
                   key={item.title}
                   activeOpacity={opacity / 2}
                   onPress={() => {
-                    close();
-                    NavigationService.navigate('Notes', {
+                    let params = {
                       title: item.title,
                       tag: item,
                       type: 'tag',
-                    });
+                    };
+                    NavigationService.navigate('Notes', params);
+                    eSendEvent(refreshNotesPage, params);
+                    close();
                   }}
                   style={{
                     flexDirection: 'row',
@@ -365,48 +364,69 @@ export const Menu = ({
 
         <View
           style={{
-            flexDirection: noTextMode ? 'column' : 'row',
-            flexWrap: noTextMode ? 'nowrap' : 'wrap',
-            marginTop: pv / 2,
-            marginBottom: pv / 2,
+            width: '100%',
+            paddingHorizontal: 10,
           }}>
           {colorNotes.map(item => (
             <TouchableOpacity
               key={item.id}
               activeOpacity={opacity / 2}
               onPress={() => {
-                NavigationService.navigate('Notes', {
+                let params = {
                   type: 'color',
                   title: item.title,
                   color: item,
-                });
+                };
+                NavigationService.navigate('Notes', params);
+                eSendEvent(refreshNotesPage, params);
                 close();
               }}
               style={{
                 flexDirection: 'row',
                 justifyContent: noTextMode ? 'center' : 'flex-start',
                 alignItems: 'center',
-                margin: noTextMode ? 0 : 5,
-                marginLeft: 0,
-                marginRight: noTextMode ? 0 : 15,
-                marginTop: normalize(15),
+                width: '100%',
+                paddingVertical: pv,
               }}>
               <View
                 style={{
-                  width: noTextMode ? SIZE.md : normalize(45),
-                  height: noTextMode ? SIZE.md : normalize(45),
-                  backgroundColor: item.title,
-                  borderRadius: 100,
+                  width: 35,
+                  height: 35,
                   justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <View
+                  style={{
+                    width: SIZE.md,
+                    height: SIZE.md,
+                    backgroundColor: item.title,
+                    borderRadius: 100,
+                    justifyContent: 'center',
+                    marginRight: 10,
+                  }}
+                />
+              </View>
+
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  width: '85%',
                 }}>
                 <Text
                   style={{
-                    color: 'white',
-                    fontSize: SIZE.xxs,
-                    minWidth: 12,
-                    minHeight: 12,
-                    paddingHorizontal: 2,
-                    textAlign: 'center',
+                    color: colors.pri,
+                    fontSize: SIZE.sm - 1,
+                  }}>
+                  {item.title.slice(0, 1).toUpperCase() + item.title.slice(1)}
+                </Text>
+
+                <Text
+                  style={{
+                    color: colors.icon,
+                    fontSize: SIZE.xs,
+                    paddingHorizontal: 5,
                   }}>
                   {item.noteIds.length > 99 ? '99+' : item.noteIds.length}
                 </Text>
@@ -448,6 +468,7 @@ export const Menu = ({
           </View>
         </View> */}
       </ScrollView>
+
       <View
         style={{
           width: '100%',
@@ -455,7 +476,6 @@ export const Menu = ({
           alignItems: 'center',
           alignSelf: 'center',
           marginBottom: 15,
-          paddingHorizontal: ph,
         }}>
         <View
           style={{
@@ -467,17 +487,20 @@ export const Menu = ({
               activeOpacity={opacity / 2}
               onPress={() => {
                 item.close === false ? null : close();
-
                 item.func();
               }}
               style={{
                 width: '100%',
                 alignSelf: 'center',
                 flexDirection: 'row',
+                paddingHorizontal: ph,
+                backgroundColor:
+                  currentScreen === item.name.toLowerCase()
+                    ? colors.shade
+                    : 'transparent',
                 justifyContent: noTextMode ? 'center' : 'space-between',
                 alignItems: 'center',
                 paddingBottom: noTextMode ? pv + 2 : normalize(15),
-
                 paddingTop: noTextMode ? pv + 2 : normalize(15),
               }}>
               <View
@@ -521,7 +544,7 @@ export const Menu = ({
         {user && user.username ? (
           <View
             style={{
-              width: '100%',
+              width: '93%',
               borderRadius: 5,
               backgroundColor: Platform.ios
                 ? hexToRGBA(colors.accent + '19')
@@ -562,7 +585,30 @@ export const Menu = ({
               </Text>
             </View>
 
-            <View
+            <TouchableOpacity
+              onPress={async () => {
+                dispatch({
+                  type: ACTIONS.SYNCING,
+                  syncing: true,
+                });
+                try {
+                  if (!user) {
+                    let u = await db.user.get();
+                    dispatch({type: ACTIONS.USER, user: u});
+                  }
+                  await db.sync();
+                  ToastEvent.show('Sync Complete', 'success');
+                } catch (e) {
+                  ToastEvent.show(e.message, 'error');
+                }
+                let u = await db.user.get();
+                dispatch({type: ACTIONS.USER, user: u});
+                dispatch({type: ACTIONS.ALL});
+                dispatch({
+                  type: ACTIONS.SYNCING,
+                  syncing: false,
+                });
+              }}
               style={{
                 flexDirection: 'row',
                 justifyContent: 'space-between',
@@ -570,24 +616,47 @@ export const Menu = ({
                 paddingHorizontal: 5,
                 paddingVertical: pv + 5,
               }}>
-              <Text
+              <View
                 style={{
-                  fontFamily: WEIGHT.regular,
-                  color: colors.pri,
-                  fontSize: SIZE.xs,
+                  flexDirection: 'row',
+                  alignItems: 'center',
                 }}>
-                <Icon color={colors.accent} name="sync" size={SIZE.xs} /> Synced{' '}
-                {user.lastSynced && user.lastSynced !== 0
-                  ? timeSince(user.lastSynced)
-                  : 'never'}
-              </Text>
-
+                {syncing ? (
+                  <ActivityIndicator size={SIZE.xs} color={colors.accent} />
+                ) : (
+                  <Icon color={colors.accent} name="sync" size={SIZE.sm} />
+                )}
+                <Text
+                  style={{
+                    fontFamily: WEIGHT.regular,
+                    color: colors.pri,
+                    fontSize: SIZE.xs,
+                    marginLeft: 5,
+                  }}>
+                  {syncing ? 'Syncing ' : 'Synced '}
+                  {!syncing ? (
+                    user.lastSynced && user.lastSynced !== 0 ? (
+                      <TimeSince time={user.lastSynced} />
+                    ) : (
+                      'never'
+                    )
+                  ) : null}
+                  {'\n'}
+                  <Text
+                    style={{
+                      fontSize: 8,
+                      color: colors.icon,
+                    }}>
+                    Tap to sync
+                  </Text>
+                </Text>
+              </View>
               <Icon
                 size={SIZE.md}
                 color={colors.accent}
                 name="check-circle-outline"
               />
-            </View>
+            </TouchableOpacity>
           </View>
         ) : (
           <TouchableOpacity
@@ -595,7 +664,6 @@ export const Menu = ({
               DDS.isTab
                 ? eSendEvent(eOpenLoginDialog)
                 : NavigationService.navigate('Login');
-
               close();
             }}
             activeOpacity={opacity / 2}
@@ -604,7 +672,7 @@ export const Menu = ({
               marginVertical: 5,
               marginTop: pv + 5,
               borderRadius: 5,
-              width: '100%',
+              width: '93%',
               flexDirection: 'row',
               alignItems: 'center',
               justifyContent: noTextMode ? 'center' : 'flex-start',
@@ -655,6 +723,6 @@ export const Menu = ({
           </TouchableOpacity>
         )}
       </View>
-    </SafeAreaView>
+    </AnimatedSafeAreaView>
   );
 };

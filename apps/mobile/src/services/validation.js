@@ -14,7 +14,7 @@ export function validatePass(password) {
   }
   if (password && password.length < 8 && password.length > 0) {
     return false;
-  } else if (password && password.length > 8 && password.length > 0) {
+  } else if (password && password.length >= 8 && password.length > 0) {
     return true;
   }
 }
