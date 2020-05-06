@@ -2,6 +2,8 @@ import {history, db} from '../utils/utils';
 import {ACTIONS} from './actions';
 import {sideMenuRef} from '../utils/refs';
 import storage from '../utils/storage';
+import {eSendEvent} from '../services/eventManager';
+import {eCloseSideMenu, eOpenSideMenu} from '../services/events';
 
 export const reducer = (state, action) => {
   switch (action.type) {
@@ -127,6 +129,12 @@ export const reducer = (state, action) => {
       };
     }
     case ACTIONS.SELECTION_MODE: {
+      if (action.enabled) {
+        eSendEvent(eCloseSideMenu);
+      } else {
+        eSendEvent(eOpenSideMenu);
+      }
+
       return {
         ...state,
         selectionMode: action.enabled,
@@ -146,6 +154,9 @@ export const reducer = (state, action) => {
         selectedItems.push(action.item);
       }
       history.selectedItemsList = selectedItems;
+      if (selectedItems.length === 0) {
+        eSendEvent(eOpenSideMenu);
+      }
       return {
         ...state,
         selectedItemsList: selectedItems,
@@ -154,6 +165,7 @@ export const reducer = (state, action) => {
     }
     case ACTIONS.CLEAR_SELECTION: {
       history.selectedItemsList = [];
+      eSendEvent(eOpenSideMenu);
       return {
         ...state,
         selectedItemsList: [],

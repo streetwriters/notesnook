@@ -14,7 +14,11 @@ import {Header} from '../../components/header';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
-import {eCloseSideMenu, refreshNotesPage} from '../../services/events';
+import {
+  eCloseSideMenu,
+  refreshNotesPage,
+  eOpenSideMenu,
+} from '../../services/events';
 import {validatePass, validateUsername} from '../../services/validation';
 import {db, DDS, ToastEvent, getElevation} from '../../utils/utils';
 import {useIsFocused} from '@react-navigation/native';

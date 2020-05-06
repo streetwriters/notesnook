@@ -10,11 +10,14 @@ import {EditorOpacity, EditorPosition} from './src/utils/animations';
 import {sideMenuRef} from './src/utils/refs';
 import {DDS} from './src/utils/utils';
 import Editor from './src/views/Editor';
+import { eSubscribeEvent, eUnSubscribeEvent } from './src/services/eventManager';
+import { eOpenSideMenu, eCloseSideMenu } from './src/services/events';
 
 const editorRef = createRef();
 export const Initialize = () => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
+  const [locked,setLocked] = useState(false);
 
   useEffect(() => {
     if (Platform.OS === 'android') {
@@ -23,6 +26,23 @@ export const Initialize = () => {
       StatusBar.setBarStyle(colors.night ? 'light-content' : 'dark-content');
     }
   }, []);
+
+  const setGestureDisabled = () =>{
+    setLocked(true);
+  }
+
+  const setGestureEnabled = () => {
+    setLocked(false);
+  }
+
+  useEffect(() => {
+    eSubscribeEvent(eOpenSideMenu,setGestureEnabled);
+    eSubscribeEvent(eCloseSideMenu,setGestureDisabled);
+    return () => {
+      eUnSubscribeEvent(eOpenSideMenu,setGestureEnabled);
+      eUnSubscribeEvent(eCloseSideMenu,setGestureDisabled);
+    }
+  },[])
 
   return (
     <Animatable.View
@@ -42,6 +62,7 @@ export const Initialize = () => {
         }}
         keyboardDismissMode="ondrag"
         drawerWidth={300}
+        drawerLockMode={locked? "locked-closed" : 'unlocked'}
         useNativeAnimations={true}
         renderNavigationView={() => (
           <Menu
