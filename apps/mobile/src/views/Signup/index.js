@@ -10,12 +10,19 @@ import {
 } from 'react-native';
 import {TextInput} from 'react-native-gesture-handler';
 import QRCode from 'react-native-qrcode-generator';
-import { useIsFocused } from '@react-navigation/native';
+import {useIsFocused} from '@react-navigation/native';
 import {opacity, pv, SIZE, WEIGHT, ph} from '../../common/common';
 import {Header} from '../../components/header';
 import {useTracked} from '../../provider';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
-import {eLoginDialogNavigateBack} from '../../services/events';
+import {
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+  eSendEvent,
+} from '../../services/eventManager';
+import {
+  eLoginDialogNavigateBack,
+  eCloseLoginDialog,
+} from '../../services/events';
 import * as Animatable from 'react-native-animatable';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
@@ -32,7 +39,7 @@ const _pass = createRef();
 const _username = createRef();
 const _passConfirm = createRef();
 const _passContainer = createRef();
-export const Signup = ({route,navigation}) => {
+export const Signup = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors, isLoginNavigator} = state;
   const [signingIn, setSigningIn] = useState(false);
@@ -46,7 +53,9 @@ export const Signup = ({route,navigation}) => {
   const [failed, setFailed] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState(false);
-  const [key, setKey] = useState('xyzLLbr1tafjdfklsdfjlksafjhklfadsafsljkfsfadfljkdfassafsafaffasdfsafafs');
+  const [key, setKey] = useState(
+    'xyzLLbr1tafjdfklsdfjlksafjhklfadsafsljkfsfadfljkdfassafsafaffasdfsafafs',
+  );
   const [passwordReEnter, setPasswordReEnter] = useState(null);
   const [secureEntry, setSecureEntry] = useState(true);
   let isFocused = useIsFocused();
@@ -83,7 +92,7 @@ export const Signup = ({route,navigation}) => {
         return;
       }
 
-      let user;  
+      let user;
       try {
         user = await db.user.user.get();
         setStatus('Logging you in...');
@@ -114,7 +123,7 @@ export const Signup = ({route,navigation}) => {
       <Modal
         animated={true}
         animationType="fade"
-        visible={modalVisible}
+        visible={true}
         transparent={true}>
         <View
           style={{
@@ -126,6 +135,7 @@ export const Signup = ({route,navigation}) => {
             style={{
               width: '100%',
               backgroundColor: colors.bg,
+              paddingHorizontal: DDS.isTab ? '20%' : '0%',
               height: '100%',
               alignItems: 'center',
               justifyContent: 'center',
@@ -139,7 +149,6 @@ export const Signup = ({route,navigation}) => {
               }}>
               Hi there!
             </Text>
-
             <Text
               style={{
                 fontFamily: WEIGHT.regular,
@@ -148,9 +157,8 @@ export const Signup = ({route,navigation}) => {
                 textAlign: 'center',
                 color: colors.pri,
               }}>
-              All your data is end-to-end encrypted. This
-              means that we cannot read your data or recover your password if
-              you forget it.{' '}
+              All your data is end-to-end encrypted. This means that we cannot
+              read your data or recover your password if you forget it.{' '}
               <Text
                 style={{
                   color: colors.errorText,
@@ -198,7 +206,7 @@ export const Signup = ({route,navigation}) => {
                   fontSize: SIZE.sm,
                   width: '85%',
                   maxWidth: '85%',
-                  paddingRight:10,
+                  paddingRight: 10,
                   color: colors.icon,
                 }}>
                 {key}
@@ -219,8 +227,10 @@ export const Signup = ({route,navigation}) => {
 
             <TouchableOpacity
               onPress={() => {
+                DDS.isTab
+                  ? eSendEvent(eCloseLoginDialog)
+                  : navigation.navigate('Home');
                 setModalVisible(false);
-                navigation.navigate('Home');
               }}
               activeOpacity={opacity}
               style={{
@@ -502,7 +512,7 @@ export const Signup = ({route,navigation}) => {
                   style={{
                     borderWidth: 1.5,
                     borderColor: colors.nav,
-                    paddingHorizontal:10,
+                    paddingHorizontal: 10,
                     borderRadius: 5,
                     flexDirection: 'row',
                     justifyContent: 'space-between',
@@ -534,7 +544,6 @@ export const Signup = ({route,navigation}) => {
                             borderColor: colors.errorText,
                           },
                         });
-                        
                       } else {
                         setInvalidPassword(false);
                         _passContainer.current?.setNativeProps({
@@ -566,8 +575,8 @@ export const Signup = ({route,navigation}) => {
                       }
                     }}
                     style={{
-                      paddingVertical:pv,
-                      paddingHorizontal:0,
+                      paddingVertical: pv,
+                      paddingHorizontal: 0,
                       fontSize: SIZE.sm,
                       fontFamily: WEIGHT.regular,
                       width: '85%',
@@ -671,7 +680,7 @@ export const Signup = ({route,navigation}) => {
                 width: '100%',
                 alignItems: 'center',
                 justifyContent: 'center',
-                height: 150,
+                height: 75,
               }}>
               <TouchableOpacity
                 onPress={() => {
@@ -702,7 +711,5 @@ export const Signup = ({route,navigation}) => {
     </View>
   );
 };
-
-
 
 export default Signup;
