@@ -36,6 +36,7 @@ import NavigationService from '../../services/NavigationService';
 import {db, DDS, hexToRGBA, timeSince, ToastEvent} from '../../utils/utils';
 import {sideMenuOverlayRef} from '../../utils/refs';
 import {createAnimatableComponent} from 'react-native-animatable';
+import { TimeSince } from './TimeSince';
 
 const AnimatedSafeAreaView = createAnimatableComponent(SafeAreaView);
 
@@ -643,7 +644,7 @@ export const Menu = ({
                   {syncing ? 'Syncing ' : 'Synced '}
                   {!syncing
                     ? user.lastSynced && user.lastSynced !== 0
-                      ? timeSince(user.lastSynced)
+                      ? <TimeSince time={user.lastSynced} />
                       : 'never'
                     : null}
                   {'\n'}

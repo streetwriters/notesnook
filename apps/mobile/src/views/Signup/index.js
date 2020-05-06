@@ -46,7 +46,7 @@ export const Signup = ({route,navigation}) => {
   const [failed, setFailed] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState(false);
-  const [key, setKey] = useState('');
+  const [key, setKey] = useState('xyzLLbr1tafjdfklsdfjlksafjhklfadsafsljkfsfadfljkdfassafsafaffasdfsafafs');
   const [passwordReEnter, setPasswordReEnter] = useState(null);
   const [secureEntry, setSecureEntry] = useState(true);
   let isFocused = useIsFocused();
@@ -138,10 +138,10 @@ export const Signup = ({route,navigation}) => {
               style={{
                 fontFamily: WEIGHT.bold,
                 fontSize: SIZE.xl,
-                color: 'white',
+                color: colors.accent,
                 marginBottom: 25,
               }}>
-              Account Created!
+              Hi there!
             </Text>
 
             <Text
@@ -152,7 +152,7 @@ export const Signup = ({route,navigation}) => {
                 textAlign: 'center',
                 color: colors.pri,
               }}>
-              Hello {username}! All your data is end-to-end encrypted. This
+              All your data is end-to-end encrypted. This
               means that we cannot read your data or recover your password if
               you forget it.{' '}
               <Text
@@ -190,18 +190,19 @@ export const Signup = ({route,navigation}) => {
                 borderWidth: 1,
                 borderRadius: 5,
                 paddingVertical: 8,
-                paddingHorizontal: 6,
+                paddingHorizontal: 10,
                 marginTop: 15,
                 alignItems: 'center',
                 borderColor: colors.nav,
               }}>
               <Text
-                numberOfLines={1}
+                numberOfLines={2}
                 style={{
                   fontFamily: WEIGHT.regular,
-                  fontSize: 16,
+                  fontSize: SIZE.sm,
                   width: '85%',
                   maxWidth: '85%',
+                  paddingRight:10,
                   color: colors.icon,
                 }}>
                 {key}
@@ -227,6 +228,7 @@ export const Signup = ({route,navigation}) => {
               }}
               activeOpacity={opacity}
               style={{
+                ...getElevation(5),
                 paddingVertical: pv + 5,
                 paddingHorizontal: ph,
                 borderRadius: 5,

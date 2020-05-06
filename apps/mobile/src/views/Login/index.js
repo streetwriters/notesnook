@@ -18,6 +18,7 @@ import {
   eCloseSideMenu,
   refreshNotesPage,
   eOpenSideMenu,
+  eStartSyncer,
 } from '../../services/events';
 import {validatePass, validateUsername} from '../../services/validation';
 import {db, DDS, ToastEvent, getElevation} from '../../utils/utils';
@@ -103,14 +104,15 @@ export const Login = ({route, navigation}) => {
         user = await db.user.get();
         eSendEvent(eStartSyncer);
         console.log('user', user);
+        dispatch({type:ACTIONS.SYNCING,syncing:true});
         dispatch({type: ACTIONS.USER, user: user});
         ToastEvent.show(`Logged in as ${username}`, 'success');
-
-        navigation.goBack();
-
         await db.sync();
-        eSendEvent(refreshNotesPage);
+        navigation.goBack();
         dispatch({type: ACTIONS.ALL});
+        eSendEvent(refreshNotesPage);
+        dispatch({type:ACTIONS.SYNCING,syncing:false});
+       
       } catch (e) {
         console.log(e, 'getUSer');
         ToastEvent.show(e.message, 'error');

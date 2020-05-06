@@ -48,6 +48,7 @@ const App = () => {
         await db.sync();
         let u = await db.user.get();
         dispatch({type: ACTIONS.USER, user: u});
+        dispatch({type: ACTIONS.ALL});
         dispatch({type: ACTIONS.SYNCING, syncing:false});
       })
     }
@@ -95,7 +96,6 @@ const App = () => {
         scale.fontScale = 1;
       }
       updateSize();
-
       dispatch({type: ACTIONS.SETTINGS, settings: {...s}});
     }
 
