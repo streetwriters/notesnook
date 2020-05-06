@@ -364,11 +364,7 @@ export const Menu = ({
 
         <View
           style={{
-            flexDirection: 'column',
-            flexWrap: noTextMode ? 'nowrap' : 'wrap',
-            marginTop: pv / 2,
             width: '100%',
-            marginBottom: pv / 2,
             paddingHorizontal: 10,
           }}>
           {colorNotes.map(item => (
@@ -389,11 +385,8 @@ export const Menu = ({
                 flexDirection: 'row',
                 justifyContent: noTextMode ? 'center' : 'flex-start',
                 alignItems: 'center',
-                margin: noTextMode ? 0 : 5,
-                marginLeft: 0,
                 width: '100%',
-                marginRight: noTextMode ? 0 : 15,
-                marginTop: normalize(15),
+                paddingVertical:pv 
               }}>
               <View
                 style={{

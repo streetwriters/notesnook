@@ -43,24 +43,24 @@ const App = () => {
   const startSyncer = async () => {
     let user = await db.user.get();
     if (user) {
-      db.ev.subscribe('sync',async () => {
-        dispatch({type: ACTIONS.SYNCING, syncing:true});
+      db.ev.subscribe('sync', async () => {
+        dispatch({type: ACTIONS.SYNCING, syncing: true});
         await db.sync();
         let u = await db.user.get();
         dispatch({type: ACTIONS.USER, user: u});
         dispatch({type: ACTIONS.ALL});
-        dispatch({type: ACTIONS.SYNCING, syncing:false});
-      })
+        dispatch({type: ACTIONS.SYNCING, syncing: false});
+      });
     }
-  }
+  };
 
   useEffect(() => {
-    eSubscribeEvent(eStartSyncer, startSyncer)
+    eSubscribeEvent(eStartSyncer, startSyncer);
 
     return () => {
-      eUnSubscribeEvent(eStartSyncer,startSyncer)
-    }
-  })
+      eUnSubscribeEvent(eStartSyncer, startSyncer);
+    };
+  });
 
   useEffect(() => {
     Initialize().then(() => {
