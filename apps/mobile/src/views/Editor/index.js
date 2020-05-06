@@ -90,7 +90,6 @@ const Editor = ({noMenu}) => {
         _onHardwareBackPress,
       );
     }
-    noMenu ? null : sideMenuRef.current?.setGestureEnabled(false);
     if (note && note.id) {
       dispatch({type: ACTIONS.NOTES});
       if (item && item.type === 'new') {
@@ -284,6 +283,10 @@ const Editor = ({noMenu}) => {
   const saveNote = async (lockNote = true) => {
     if (!checkIfContentIsSavable()) return;
     let lockedNote = id ? db.notes.note(id).data.locked : null;
+    post({
+      type: 'saving',
+      value: 'Saving',
+    });
     if (!lockedNote) {
       let rId = await db.notes.add({
         title,
@@ -321,11 +324,16 @@ const Editor = ({noMenu}) => {
         id: id,
       });
     }
-    InfoBarRef.current?.setDateEdited(
-      db.notes.note(id).data.dateEdited,
-      content?.text?.split(' ').length,
-    );
-    InfoBarRef.current?.setDateCreated(db.notes.note(id).data.dateCreated);
+    let n = db.notes.note(id).data.dateEdited;
+    post({
+      type: 'dateEdited',
+      value: timeConverter(n),
+    });
+
+    post({
+      type: 'saving',
+      value: 'Saved',
+    });
   };
 
   useEffect(() => {
@@ -374,15 +382,14 @@ const Editor = ({noMenu}) => {
     title = note.title;
     id = note.id;
     saveCounter = 0;
-    InfoBarRef.current?.setDateCreated(note.dateCreated);
     content = {};
     content.text = '';
     try {
       content.text = await db.notes.note(id).text();
-      InfoBarRef.current?.setDateEdited(
-        note.dateEdited,
-        content.text.split(' ').length,
-      );
+      post({
+        type: 'dateEdited',
+        value: timeConverter(note.dateEdited),
+      });
     } catch (e) {}
 
     if (title !== null || title === '') {
@@ -487,8 +494,6 @@ const Editor = ({noMenu}) => {
         ToastEvent.show('Note Saved!', 'success');
       }
       await clearEditor();
-      DDS.isTab ? sideMenuRef.current?.openMenu(true) : null;
-      sideMenuRef.current?.setGestureEnabled(true);
       if (handleBack) {
         handleBack.remove();
         handleBack = null;
@@ -600,8 +605,6 @@ const Editor = ({noMenu}) => {
             <Icon name="dots-horizontal" color={colors.icon} size={SIZE.xxxl} />
           </TouchableOpacity>
         </View>
-
-        <InfoBar ref={InfoBarRef} colors={colors} noMenu={noMenu} />
         <WebView
           ref={EditorWebView}
           onError={error => console.log(error)}

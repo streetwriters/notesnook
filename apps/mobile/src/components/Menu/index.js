@@ -35,6 +35,10 @@ import {
 import NavigationService from '../../services/NavigationService';
 import {db, DDS, hexToRGBA, timeSince, ToastEvent} from '../../utils/utils';
 import {sideMenuOverlayRef} from '../../utils/refs';
+import {createAnimatableComponent} from 'react-native-animatable';
+import {TimeSince} from './TimeSince';
+
+const AnimatedSafeAreaView = createAnimatableComponent(SafeAreaView);
 
 export const Menu = ({
   close = () => {},
@@ -119,12 +123,14 @@ export const Menu = ({
   ];
 
   return (
-    <SafeAreaView
+    <AnimatedSafeAreaView
+      transition="backgroundColor"
+      duration={300}
       style={{
         height: '100%',
         opacity: hide ? 0 : 1,
         width: '100%',
-        backgroundColor: 'transparent',
+        backgroundColor: colors.bg,
         borderRightWidth: noTextMode ? 1 : 0,
         borderRightColor: noTextMode ? colors.accent : 'transparent',
       }}>
@@ -168,25 +174,6 @@ export const Menu = ({
           </TouchableOpacity>
         ) : null}
       </View>
-
-      {DDS.isTab ? null : (
-        <View
-          ref={sideMenuOverlayRef}
-          style={{
-            height: '100%',
-            width: '100%',
-            position: 'absolute',
-            zIndex: 999,
-            backgroundColor: colors.bg,
-            display: 'flex',
-            transform: [
-              {
-                translateX: 0,
-              },
-            ],
-          }}
-        />
-      )}
 
       <ScrollView
         contentContainerStyle={{minHeight: '50%'}}
@@ -377,11 +364,7 @@ export const Menu = ({
 
         <View
           style={{
-            flexDirection: 'column',
-            flexWrap: noTextMode ? 'nowrap' : 'wrap',
-            marginTop: pv / 2,
             width: '100%',
-            marginBottom: pv / 2,
             paddingHorizontal: 10,
           }}>
           {colorNotes.map(item => (
@@ -402,11 +385,8 @@ export const Menu = ({
                 flexDirection: 'row',
                 justifyContent: noTextMode ? 'center' : 'flex-start',
                 alignItems: 'center',
-                margin: noTextMode ? 0 : 5,
-                marginLeft: 0,
                 width: '100%',
-                marginRight: noTextMode ? 0 : 15,
-                marginTop: normalize(15),
+                paddingVertical: pv,
               }}>
               <View
                 style={{
@@ -445,9 +425,8 @@ export const Menu = ({
                 <Text
                   style={{
                     color: colors.icon,
-                    fontSize: SIZE.xs + 1,
+                    fontSize: SIZE.xs,
                     paddingHorizontal: 5,
-                    textAlign: 'center',
                   }}>
                   {item.noteIds.length > 99 ? '99+' : item.noteIds.length}
                 </Text>
@@ -655,11 +634,13 @@ export const Menu = ({
                     marginLeft: 5,
                   }}>
                   {syncing ? 'Syncing ' : 'Synced '}
-                  {!syncing
-                    ? user.lastSynced && user.lastSynced !== 0
-                      ? timeSince(user.lastSynced)
-                      : 'never'
-                    : null}
+                  {!syncing ? (
+                    user.lastSynced && user.lastSynced !== 0 ? (
+                      <TimeSince time={user.lastSynced} />
+                    ) : (
+                      'never'
+                    )
+                  ) : null}
                   {'\n'}
                   <Text
                     style={{
@@ -742,6 +723,6 @@ export const Menu = ({
           </TouchableOpacity>
         )}
       </View>
-    </SafeAreaView>
+    </AnimatedSafeAreaView>
   );
 };

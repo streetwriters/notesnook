@@ -1,43 +1,19 @@
-import {
-  NavigationActions,
-  StackActions,
-} from 'react-navigation';
+import { StackActions } from '@react-navigation/routers';
+import { rootNavigatorRef } from '../utils/refs';
 
-
-
-let _navigator;
-
-function setTopLevelNavigator(navigatorRef) {
-  _navigator = navigatorRef;
+function navigate(name, params) {
+  rootNavigatorRef .current?.navigate(name, params);
 }
-
-function navigate(routeName, params) {
-  _navigator.dispatch(
-    NavigationActions.navigate({
-      routeName,
-      params,
-    }),
-  );
-}
-
-function push(routeName, params) {
-  _navigator.dispatch(
-    StackActions.push({
-      routeName,
-      params,
-    }),
-  );
-}
-
 function goBack() {
-  _navigator.dispatch(NavigationActions.back());
+   rootNavigatorRef.current?.goBack();
 }
 
-// add other navigation functions that you need and export them
+function push(...args) {
+  rootNavigatorRef.current?.dispatch(StackActions.push(...args));
+}
 
 export default {
   navigate,
-  push,
   goBack,
-  setTopLevelNavigator,
+  push,
 };

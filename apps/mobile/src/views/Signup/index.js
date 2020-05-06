@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import {TextInput} from 'react-native-gesture-handler';
 import QRCode from 'react-native-qrcode-generator';
-import {useIsFocused} from 'react-navigation-hooks';
+import { useIsFocused } from '@react-navigation/native';
 import {opacity, pv, SIZE, WEIGHT, ph} from '../../common/common';
 import {Header} from '../../components/header';
 import {useTracked} from '../../provider';
@@ -32,7 +32,7 @@ const _pass = createRef();
 const _username = createRef();
 const _passConfirm = createRef();
 const _passContainer = createRef();
-export const Signup = ({navigation}) => {
+export const Signup = ({route,navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors, isLoginNavigator} = state;
   const [signingIn, setSigningIn] = useState(false);
@@ -46,7 +46,7 @@ export const Signup = ({navigation}) => {
   const [failed, setFailed] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState(false);
-  const [key, setKey] = useState('');
+  const [key, setKey] = useState('xyzLLbr1tafjdfklsdfjlksafjhklfadsafsljkfsfadfljkdfassafsafaffasdfsafafs');
   const [passwordReEnter, setPasswordReEnter] = useState(null);
   const [secureEntry, setSecureEntry] = useState(true);
   let isFocused = useIsFocused();
@@ -71,9 +71,8 @@ export const Signup = ({navigation}) => {
       ToastEvent.show('Passwords do not match', 'error');
       return;
     }
-
     setSigningIn(true);
-    setStatus('Creating new user...');
+    setStatus('Creating your account...');
     if (!invalidEmail && !invalidPassword && !invalidUsername) {
       try {
         await db.user.signup(username, email, password);
@@ -84,15 +83,14 @@ export const Signup = ({navigation}) => {
         return;
       }
 
-      let user;
-
-      setStatus('Logging you in...');
+      let user;  
       try {
         user = await db.user.user.get();
+        setStatus('Logging you in...');
         let k = await db.user.key();
         setKey(k.key);
+        setStatus('Setting up crenditials...');
         dispatch({type: ACTIONS.USER, user: user});
-
         eSendEvent(eStartSyncer);
         setTimeout(() => {
           setModalVisible(true);
@@ -102,8 +100,6 @@ export const Signup = ({navigation}) => {
         setFailed(true);
         ToastEvent.show('Login Failed, try again', 'error');
       }
-
-      console.log(user);
     } else {
       ToastEvent.show('Signup failed', 'error');
     }
@@ -138,10 +134,10 @@ export const Signup = ({navigation}) => {
               style={{
                 fontFamily: WEIGHT.bold,
                 fontSize: SIZE.xl,
-                color: 'white',
+                color: colors.accent,
                 marginBottom: 25,
               }}>
-              Account Created!
+              Hi there!
             </Text>
 
             <Text
@@ -152,7 +148,7 @@ export const Signup = ({navigation}) => {
                 textAlign: 'center',
                 color: colors.pri,
               }}>
-              Hello {username}! All your data is end-to-end encrypted. This
+              All your data is end-to-end encrypted. This
               means that we cannot read your data or recover your password if
               you forget it.{' '}
               <Text
@@ -190,18 +186,19 @@ export const Signup = ({navigation}) => {
                 borderWidth: 1,
                 borderRadius: 5,
                 paddingVertical: 8,
-                paddingHorizontal: 6,
+                paddingHorizontal: 10,
                 marginTop: 15,
                 alignItems: 'center',
                 borderColor: colors.nav,
               }}>
               <Text
-                numberOfLines={1}
+                numberOfLines={2}
                 style={{
                   fontFamily: WEIGHT.regular,
-                  fontSize: 16,
+                  fontSize: SIZE.sm,
                   width: '85%',
                   maxWidth: '85%',
+                  paddingRight:10,
                   color: colors.icon,
                 }}>
                 {key}
@@ -227,6 +224,7 @@ export const Signup = ({navigation}) => {
               }}
               activeOpacity={opacity}
               style={{
+                ...getElevation(5),
                 paddingVertical: pv + 5,
                 paddingHorizontal: ph,
                 borderRadius: 5,
@@ -285,6 +283,7 @@ export const Signup = ({navigation}) => {
             isLoginNavigator={isLoginNavigator}
             navigation={navigation}
             colors={colors}
+            route={route}
             heading="Create Account"
           />
 
@@ -704,13 +703,6 @@ export const Signup = ({navigation}) => {
   );
 };
 
-Signup.navigationOptions = {
-  header: null,
-  headerStyle: {
-    backgroundColor: 'transparent',
-    borderBottomWidth: 0,
-    height: 0,
-  },
-};
+
 
 export default Signup;

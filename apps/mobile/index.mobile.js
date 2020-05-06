@@ -1,22 +1,23 @@
-import React, { useEffect, createRef } from 'react';
-import Animated from 'react-native-reanimated';
-import { Menu } from './src/components/Menu';
+import React, {createRef, useEffect, useState} from 'react';
+import {Platform, StatusBar, View} from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import SideMenu from './src/components/SideMenu';
-import { EditorPosition, EditorOpacity } from './src/utils/animations';
-import { sideMenuRef } from './src/utils/refs';
-import { DDS, w } from './src/utils/utils';
+import DrawerLayout from 'react-native-drawer-layout';
+import Animated from 'react-native-reanimated';
+import {Menu} from './src/components/Menu';
+import {useTracked} from './src/provider';
+import {NavigationStack} from './src/services/Navigator';
+import {EditorOpacity, EditorPosition} from './src/utils/animations';
+import {sideMenuRef} from './src/utils/refs';
+import {DDS} from './src/utils/utils';
 import Editor from './src/views/Editor';
-import { useTracked } from './src/provider';
-import { StatusBar, Platform } from 'react-native';
-import { AppContainer } from './src/services/AppContainer';
-import NavigationService from './src/services/NavigationService';
-import { useSafeArea } from 'react-native-safe-area-context';
+import { eSubscribeEvent, eUnSubscribeEvent } from './src/services/eventManager';
+import { eOpenSideMenu, eCloseSideMenu } from './src/services/events';
 
 const editorRef = createRef();
 export const Initialize = () => {
   const [state, dispatch] = useTracked();
-  const { colors } = state;
+  const {colors} = state;
+  const [locked,setLocked] = useState(false);
 
   useEffect(() => {
     if (Platform.OS === 'android') {
@@ -25,6 +26,24 @@ export const Initialize = () => {
       StatusBar.setBarStyle(colors.night ? 'light-content' : 'dark-content');
     }
   }, []);
+
+  const setGestureDisabled = () =>{
+    setLocked(true);
+  }
+
+  const setGestureEnabled = () => {
+    setLocked(false);
+  }
+
+  useEffect(() => {
+    eSubscribeEvent(eOpenSideMenu,setGestureEnabled);
+    eSubscribeEvent(eCloseSideMenu,setGestureDisabled);
+    return () => {
+      eUnSubscribeEvent(eOpenSideMenu,setGestureEnabled);
+      eUnSubscribeEvent(eCloseSideMenu,setGestureDisabled);
+    }
+  },[])
+
   return (
     <Animatable.View
       transition="backgroundColor"
@@ -35,34 +54,32 @@ export const Initialize = () => {
         flexDirection: 'row',
         backgroundColor: colors.bg,
       }}>
-      <SideMenu
+      <DrawerLayout
         ref={sideMenuRef}
-        bounceBackOnOverdraw={false}
-        contentContainerStyle={{
+        style={{
           opacity: 0,
           backgroundColor: colors.bg,
         }}
-        menu={
+        keyboardDismissMode="ondrag"
+        drawerWidth={300}
+        drawerLockMode={locked? "locked-closed" : 'unlocked'}
+        useNativeAnimations={true}
+        renderNavigationView={() => (
           <Menu
             hide={false}
             colors={colors}
-            close={() =>
-              sideMenuRef.current?.openMenu(!sideMenuRef.current?.isOpen)
-            }
+            close={() => sideMenuRef.current?.closeDrawer()}
           />
-        }
-        openMenuOffset={w / 1.5}>
-        <AppContainer
+        )}>
+        <View
           style={{
             width: DDS.isTab ? '70%' : '100%',
             height: '100%',
             backgroundColor: colors.bg,
-          }}
-          ref={navigatorRef => {
-            NavigationService.setTopLevelNavigator(navigatorRef);
-          }}
-        />
-      </SideMenu>
+          }}>
+          <NavigationStack />
+        </View>
+      </DrawerLayout>
 
       <Animated.View
         ref={editorRef}
@@ -78,7 +95,7 @@ export const Initialize = () => {
           position: 'absolute',
           backgroundColor: colors.bg,
           elevation: 10,
-          opacity:EditorOpacity,
+          opacity: EditorOpacity,
           transform: [
             {
               translateX: EditorPosition,

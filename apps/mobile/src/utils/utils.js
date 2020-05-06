@@ -128,13 +128,13 @@ export const timeConverter = timestamp => {
     ampm = 'AM',
     time;
   let days = [
-    'Sunday',
-    'Monday',
-    'Tuesday',
-    'Wednesday',
-    'Thursday',
-    'Friday',
-    'Saturday',
+    'Sun',
+    'Mon',
+    'Tue',
+    'Wed',
+    'Thu',
+    'Fri',
+    'Sat',
   ];
   var months = [
     'Jan',

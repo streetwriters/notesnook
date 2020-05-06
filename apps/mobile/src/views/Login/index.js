@@ -9,20 +9,22 @@ import {
 import * as Animatable from 'react-native-animatable';
 import {TextInput} from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useIsFocused} from 'react-navigation-hooks';
 import {opacity, pv, SIZE, WEIGHT} from '../../common/common';
 import {Header} from '../../components/header';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
-import {eCloseSideMenu, refreshNotesPage} from '../../services/events';
+import {
+  eCloseSideMenu,
+  refreshNotesPage,
+  eOpenSideMenu,
+  eStartSyncer,
+} from '../../services/events';
 import {validatePass, validateUsername} from '../../services/validation';
 import {db, DDS, ToastEvent, getElevation} from '../../utils/utils';
+import {useIsFocused} from '@react-navigation/native';
 
-
-
-
-export const Login = ({navigation}) => {
+export const Login = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors, isLoginNavigator} = state;
   const [status, setStatus] = useState('Logging in...');
@@ -41,15 +43,12 @@ export const Login = ({navigation}) => {
 
   const isFocused = useIsFocused();
 
-  useEffect(() => {
-    eSendEvent(eCloseSideMenu);
-  }, []);
-
   const handleBackPress = () => {
     return true;
   };
 
   useEffect(() => {
+    eSendEvent(eCloseSideMenu);
     let backhandler;
     if (isFocused) {
       backhandler = BackHandler.addEventListener(
@@ -64,6 +63,7 @@ export const Login = ({navigation}) => {
     }
 
     return () => {
+      eSendEvent(eOpenSideMenu);
       if (!backhandler) return;
       backhandler.remove();
       backhandler = null;
@@ -87,10 +87,9 @@ export const Login = ({navigation}) => {
 
     if (!invalidPassword && !invalidUsername) {
       try {
-        console.log('here reacched');
         await db.user.login(username, password);
+        setStatus('Fetching data...');
       } catch (e) {
-        console.log(e, 'ERROR');
         setTimeout(() => {
           ToastEvent.show(e.message, 'error');
           setLoggingIn(false);
@@ -102,22 +101,21 @@ export const Login = ({navigation}) => {
       let user;
       try {
         user = await db.user.get();
-        eSendEvent(eStartSyncer);
-        console.log('user', user);
         dispatch({type: ACTIONS.USER, user: user});
-        ToastEvent.show(`Logged in as ${username}`, 'success');
-        navigation.goBack();
+        dispatch({type:ACTIONS.SYNCING,syncing:true});
+        setStatus('Syncing your notes...');
         await db.sync();
-        eSendEvent(refreshNotesPage);
+        eSendEvent(eStartSyncer);
+        navigation.goBack();
         dispatch({type: ACTIONS.ALL});
+        eSendEvent(refreshNotesPage);
+        dispatch({type:ACTIONS.SYNCING,syncing:false});
+        ToastEvent.show(`Logged in as ${username}`, 'success');
       } catch (e) {
-        console.log(e, 'getUSer');
         ToastEvent.show(e.message, 'error');
       }
-
-      console.log(user);
     } else {
-      ToastEvent.show('Login failed', 'error');
+      ToastEvent.show('Login failed, username or passoword invalid', 'error');
     }
   };
 
@@ -160,6 +158,7 @@ export const Login = ({navigation}) => {
         <>
           <Header
             navigation={navigation}
+            route={route}
             isLoginNavigator={isLoginNavigator}
             colors={colors}
             heading="Login"
@@ -378,7 +377,7 @@ export const Login = ({navigation}) => {
                   </Text>
 
                   <View
-                     ref={_passContainer}
+                    ref={_passContainer}
                     style={{
                       borderWidth: 1.5,
                       borderColor: colors.nav,
@@ -386,7 +385,7 @@ export const Login = ({navigation}) => {
                       flexDirection: 'row',
                       justifyContent: 'space-between',
                       alignItems: 'center',
-                      paddingHorizontal:10,
+                      paddingHorizontal: 10,
                       marginHorizontal: 12,
                     }}>
                     <TextInput
@@ -408,15 +407,12 @@ export const Login = ({navigation}) => {
                             style: {
                               color: colors.errorText,
                             },
-                      
                           });
                           _passContainer.current?.setNativeProps({
                             style: {
                               borderColor: colors.errorText,
                             },
                           });
-
-
                         } else {
                           setInvalidPassword(false);
                           _passContainer.current?.setNativeProps({
@@ -440,7 +436,6 @@ export const Login = ({navigation}) => {
                               borderColor: colors.accent,
                             },
                           });
-                          
                         }
                       }}
                       onSubmitEditing={() => {
@@ -454,8 +449,8 @@ export const Login = ({navigation}) => {
                         }
                       }}
                       style={{
-                        paddingVertical:pv,
-                        paddingHorizontal:0,
+                        paddingVertical: pv,
+                        paddingHorizontal: 0,
                         fontSize: SIZE.sm,
                         fontFamily: WEIGHT.regular,
                         width: '85%',
@@ -478,8 +473,6 @@ export const Login = ({navigation}) => {
                       color={secureEntry ? colors.icon : colors.accent}
                     />
                   </View>
-
-            
                 </View>
                 <TouchableOpacity
                   activeOpacity={opacity}
@@ -492,7 +485,6 @@ export const Login = ({navigation}) => {
                     marginHorizontal: 12,
                     marginBottom: 10,
                     alignItems: 'center',
-                   
                   }}>
                   <Text
                     style={{
@@ -540,15 +532,6 @@ export const Login = ({navigation}) => {
       )}
     </View>
   );
-};
-
-Login.navigationOptions = {
-  header: null,
-  headerStyle: {
-    backgroundColor: 'transparent',
-    borderBottomWidth: 0,
-    height: 0,
-  },
 };
 
 export default Login;

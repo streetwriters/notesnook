@@ -2,6 +2,8 @@ import {history, db} from '../utils/utils';
 import {ACTIONS} from './actions';
 import {sideMenuRef} from '../utils/refs';
 import storage from '../utils/storage';
+import {eSendEvent} from '../services/eventManager';
+import {eCloseSideMenu, eOpenSideMenu} from '../services/events';
 
 export const reducer = (state, action) => {
   switch (action.type) {
@@ -128,9 +130,9 @@ export const reducer = (state, action) => {
     }
     case ACTIONS.SELECTION_MODE: {
       if (action.enabled) {
-        sideMenuRef.current?.setGestureEnabled(false);
+        eSendEvent(eCloseSideMenu);
       } else {
-        sideMenuRef.current?.setGestureEnabled(true);
+        eSendEvent(eOpenSideMenu);
       }
 
       return {
@@ -153,7 +155,7 @@ export const reducer = (state, action) => {
       }
       history.selectedItemsList = selectedItems;
       if (selectedItems.length === 0) {
-        sideMenuRef.current?.setGestureEnabled(true);
+        eSendEvent(eOpenSideMenu);
       }
       return {
         ...state,
@@ -163,7 +165,7 @@ export const reducer = (state, action) => {
     }
     case ACTIONS.CLEAR_SELECTION: {
       history.selectedItemsList = [];
-      sideMenuRef.current?.setGestureEnabled(true);
+      eSendEvent(eOpenSideMenu);
       return {
         ...state,
         selectedItemsList: [],

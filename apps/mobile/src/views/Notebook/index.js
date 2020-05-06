@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from 'react';
-import {useIsFocused} from 'react-navigation-hooks';
 import Container from '../../components/Container';
 import {AddTopicEvent} from '../../components/DialogManager/recievers';
 import {NotebookPlaceHolder} from '../../components/ListPlaceholders';
@@ -8,6 +7,7 @@ import SelectionWrapper from '../../components/SelectionWrapper';
 import SimpleList from '../../components/SimpleList';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
+import { useIsFocused } from '@react-navigation/native';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -153,10 +153,6 @@ export const Notebook = ({navigation}) => {
       />
     </Container>
   );
-};
-
-Notebook.navigationOptions = {
-  header: null,
 };
 
 export default Notebook;

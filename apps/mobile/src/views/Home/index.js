@@ -1,19 +1,18 @@
-import React, {useEffect, useState} from 'react';
-import {useIsFocused} from 'react-navigation-hooks';
+import { useIsFocused } from '@react-navigation/native';
+import React, { useEffect } from 'react';
 import Container from '../../components/Container';
-import SelectionHeader from '../../components/SelectionHeader';
-import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
-import {eSendEvent} from '../../services/eventManager';
-import {DDS, ToastEvent, db} from '../../utils/utils';
-import {eScrollEvent, eOnLoadNote} from '../../services/events';
-import {openEditorAnimation} from '../../utils/animations';
-import {sideMenuRef} from '../../utils/refs';
-import SimpleList from '../../components/SimpleList';
-import {NotesPlaceHolder} from '../../components/ListPlaceholders';
-import SelectionWrapper from '../../components/SelectionWrapper';
+import { NotesPlaceHolder } from '../../components/ListPlaceholders';
 import NoteItem from '../../components/NoteItem';
-import {Platform} from 'react-native';
+import SelectionHeader from '../../components/SelectionHeader';
+import SelectionWrapper from '../../components/SelectionWrapper';
+import SimpleList from '../../components/SimpleList';
+import { useTracked } from '../../provider';
+import { ACTIONS } from '../../provider/actions';
+import { eSendEvent } from '../../services/eventManager';
+import { eOnLoadNote, eScrollEvent } from '../../services/events';
+import { openEditorAnimation } from '../../utils/animations';
+import { sideMenuRef } from '../../utils/refs';
+import { DDS } from '../../utils/utils';
 let count = 0;
 
 export const Home = ({navigation}) => {
@@ -87,8 +86,6 @@ export const Home = ({navigation}) => {
         if (DDS.isTab) {
           eSendEvent(eOnLoadNote, {type: 'new'});
         } else {
-          sideMenuRef.current?.openMenu(false);
-          sideMenuRef.current?.setGestureEnabled(false);
           eSendEvent(eOnLoadNote, {type: 'new'});
           openEditorAnimation();
         }
@@ -110,13 +107,6 @@ export const Home = ({navigation}) => {
   );
 };
 
-Home.navigationOptions = {
-  header: null,
-  headerStyle: {
-    backgroundColor: 'transparent',
-    borderBottomWidth: 0,
-    height: 0,
-  },
-};
+
 
 export default Home;

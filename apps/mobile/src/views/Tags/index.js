@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import {Text, TouchableOpacity, View} from 'react-native';
-import {useIsFocused} from 'react-navigation-hooks';
+import { useIsFocused } from '@react-navigation/native';
 import {pv, SIZE, WEIGHT} from '../../common/common';
 import Container from '../../components/Container';
 import {TagsPlaceHolder} from '../../components/ListPlaceholders';
@@ -97,10 +97,6 @@ export const Tags = ({navigation}) => {
       </View>
     </Container>
   );
-};
-
-Tags.navigationOptions = {
-  header: null,
 };
 
 export default Tags;
