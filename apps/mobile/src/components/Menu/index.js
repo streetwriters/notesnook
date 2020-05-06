@@ -36,7 +36,7 @@ import NavigationService from '../../services/NavigationService';
 import {db, DDS, hexToRGBA, timeSince, ToastEvent} from '../../utils/utils';
 import {sideMenuOverlayRef} from '../../utils/refs';
 import {createAnimatableComponent} from 'react-native-animatable';
-import { TimeSince } from './TimeSince';
+import {TimeSince} from './TimeSince';
 
 const AnimatedSafeAreaView = createAnimatableComponent(SafeAreaView);
 
@@ -386,7 +386,7 @@ export const Menu = ({
                 justifyContent: noTextMode ? 'center' : 'flex-start',
                 alignItems: 'center',
                 width: '100%',
-                paddingVertical:pv 
+                paddingVertical: pv,
               }}>
               <View
                 style={{
@@ -425,9 +425,8 @@ export const Menu = ({
                 <Text
                   style={{
                     color: colors.icon,
-                    fontSize: SIZE.xs + 1,
+                    fontSize: SIZE.xs,
                     paddingHorizontal: 5,
-                    textAlign: 'center',
                   }}>
                   {item.noteIds.length > 99 ? '99+' : item.noteIds.length}
                 </Text>
@@ -635,11 +634,13 @@ export const Menu = ({
                     marginLeft: 5,
                   }}>
                   {syncing ? 'Syncing ' : 'Synced '}
-                  {!syncing
-                    ? user.lastSynced && user.lastSynced !== 0
-                      ? <TimeSince time={user.lastSynced} />
-                      : 'never'
-                    : null}
+                  {!syncing ? (
+                    user.lastSynced && user.lastSynced !== 0 ? (
+                      <TimeSince time={user.lastSynced} />
+                    ) : (
+                      'never'
+                    )
+                  ) : null}
                   {'\n'}
                   <Text
                     style={{
