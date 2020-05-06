@@ -1,42 +1,17 @@
-import React, {useEffect} from 'react';
-import {
-  Platform,
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  Text,
-  TouchableOpacity,
-  View,
-  ActivityIndicator,
-} from 'react-native';
+import React, { useEffect } from 'react';
+import { ActivityIndicator, Platform, SafeAreaView, ScrollView, StatusBar, Text, TouchableOpacity, View } from 'react-native';
+import { createAnimatableComponent } from 'react-native-animatable';
 import MMKV from 'react-native-mmkv-storage';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {
-  ACCENT,
-  COLOR_SCHEME,
-  COLOR_SCHEME_DARK,
-  COLOR_SCHEME_LIGHT,
-  normalize,
-  opacity,
-  ph,
-  pv,
-  setColorScheme,
-  SIZE,
-  WEIGHT,
-} from '../../common/common';
-import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
-import {eSendEvent} from '../../services/eventManager';
-import {
-  eClearSearch,
-  eOpenModalMenu,
-  refreshNotesPage,
-} from '../../services/events';
+import { ACCENT, COLOR_SCHEME, COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT, normalize, opacity, ph, pv, setColorScheme, SIZE, WEIGHT } from '../../common/common';
+import { useTracked } from '../../provider';
+import { ACTIONS } from '../../provider/actions';
+import { eSendEvent } from '../../services/eventManager';
+import { eClearSearch, refreshNotesPage, eOpenLoginDialog } from '../../services/events';
 import NavigationService from '../../services/NavigationService';
-import {db, DDS, hexToRGBA, timeSince, ToastEvent} from '../../utils/utils';
-import {sideMenuOverlayRef} from '../../utils/refs';
-import {createAnimatableComponent} from 'react-native-animatable';
-import {TimeSince} from './TimeSince';
+import { sideMenuRef } from '../../utils/refs';
+import { db, DDS, hexToRGBA, ToastEvent } from '../../utils/utils';
+import { TimeSince } from './TimeSince';
 
 const AnimatedSafeAreaView = createAnimatableComponent(SafeAreaView);
 
@@ -45,6 +20,7 @@ export const Menu = ({
   hide,
   update = () => {},
   noTextMode = false,
+  onButtonLongPress = () => {}
 }) => {
   const [state, dispatch] = useTracked();
   const {colors, tags, colorNotes, user, currentScreen, syncing} = state;
@@ -132,7 +108,7 @@ export const Menu = ({
         width: '100%',
         backgroundColor: colors.bg,
         borderRightWidth: noTextMode ? 1 : 0,
-        borderRightColor: noTextMode ? colors.accent : 'transparent',
+        borderRightColor: noTextMode ? colors.nav : 'transparent',
       }}>
       <View
         style={{
@@ -156,7 +132,7 @@ export const Menu = ({
         {DDS.isTab && noTextMode ? (
           <TouchableOpacity
             onPress={() => {
-              eSendEvent(eOpenModalMenu);
+              sideMenuRef.current?.openDrawer()
             }}
             style={{
               alignItems: 'center',

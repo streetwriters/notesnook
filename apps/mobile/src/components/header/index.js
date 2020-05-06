@@ -46,7 +46,7 @@ export const Header = ({
         height: 50,
         marginTop:
           Platform.OS === 'ios'
-            ? insets.top
+            ? preventDefaultMargins || isLoginNavigator? 0 : insets.top
             : preventDefaultMargins || isLoginNavigator
             ? 0
             : insets.top,
