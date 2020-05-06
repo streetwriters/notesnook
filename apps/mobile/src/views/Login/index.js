@@ -87,10 +87,9 @@ export const Login = ({route, navigation}) => {
 
     if (!invalidPassword && !invalidUsername) {
       try {
-        console.log('here reacched');
         await db.user.login(username, password);
+        setStatus('Fetching data...');
       } catch (e) {
-        console.log(e, 'ERROR');
         setTimeout(() => {
           ToastEvent.show(e.message, 'error');
           setLoggingIn(false);
@@ -102,25 +101,21 @@ export const Login = ({route, navigation}) => {
       let user;
       try {
         user = await db.user.get();
-        eSendEvent(eStartSyncer);
-        console.log('user', user);
-        dispatch({type:ACTIONS.SYNCING,syncing:true});
         dispatch({type: ACTIONS.USER, user: user});
-        ToastEvent.show(`Logged in as ${username}`, 'success');
+        dispatch({type:ACTIONS.SYNCING,syncing:true});
+        setStatus('Syncing your notes...');
         await db.sync();
+        eSendEvent(eStartSyncer);
         navigation.goBack();
         dispatch({type: ACTIONS.ALL});
         eSendEvent(refreshNotesPage);
         dispatch({type:ACTIONS.SYNCING,syncing:false});
-       
+        ToastEvent.show(`Logged in as ${username}`, 'success');
       } catch (e) {
-        console.log(e, 'getUSer');
         ToastEvent.show(e.message, 'error');
       }
-
-      console.log(user);
     } else {
-      ToastEvent.show('Login failed', 'error');
+      ToastEvent.show('Login failed, username or passoword invalid', 'error');
     }
   };
 
