@@ -351,7 +351,7 @@ export const ActionSheetComponent = ({
             .catch(async e => {
               switch (e.message) {
                 case db.vault.ERRORS.noVault:
-                  console.log('novault', e);
+                  
                   close('novault');
                   break;
                 case db.vault.ERRORS.vaultLocked:
