@@ -684,7 +684,7 @@ export const Signup = ({route, navigation}) => {
               }}>
               <TouchableOpacity
                 onPress={() => {
-                  Linking.openURL('https://notesbook.com/privacy.html');
+                  Linking.openURL('https://notesnook.com/privacy.html');
                 }}
                 activeOpacity={opacity}
                 style={{}}>

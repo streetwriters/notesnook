@@ -740,13 +740,13 @@ export const Settings = ({navigation}) => {
           {
             name: 'Privacy Policy',
             func: () => {
-              Linking.openURL('https://www.notesbook.com/privacy.html');
+              Linking.openURL('https://www.notesnook.com/privacy.html');
             },
           },
           {
             name: 'About',
             func: () => {
-              Linking.openURL('https://www.notesbook.com');
+              Linking.openURL('https://www.notesnook.com');
             },
           },
         ].map(item => (
