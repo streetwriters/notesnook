@@ -123,7 +123,7 @@ export const Signup = ({route, navigation}) => {
       <Modal
         animated={true}
         animationType="fade"
-        visible={true}
+        visible={modalVisible}
         transparent={true}>
         <View
           style={{
