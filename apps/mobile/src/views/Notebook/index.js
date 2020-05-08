@@ -20,30 +20,30 @@ import {
 } from '../../services/events';
 import {db, ToastEvent, w} from '../../utils/utils';
 
-export const Notebook = ({navigation}) => {
+export const Notebook = ({route,navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors, selectionMode, preventDefaultMargins} = state;
   const [topics, setTopics] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
 
-  let params = navigation.state.params;
+  let params = route.params;
   let notebook;
   let isFocused = useIsFocused();
 
   const onLoad = () => {
     let allTopics;
 
-    allTopics = db.notebooks.notebook(navigation.state.params.notebook.id).data
+    allTopics = db.notebooks.notebook(route.params.notebook.id).data
       .topics;
 
-    notebook = db.notebooks.notebook(navigation.state.params.notebook.id);
+    notebook = db.notebooks.notebook(route.params.notebook.id);
 
     setTopics(allTopics);
   };
 
   useEffect(() => {
     eSendEvent(eScrollEvent, 0);
-    params = navigation.state.params;
+    params = route.params;
     let topic = params.notebook.topics;
     notebook = params.notebook;
     setTopics([...topic]);
@@ -94,7 +94,6 @@ export const Notebook = ({navigation}) => {
               enabled: !selectionMode,
             });
           }
-
           dispatch({
             type: ACTIONS.SELECTED_ITEMS,
             item: item,

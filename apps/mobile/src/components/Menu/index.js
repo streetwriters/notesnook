@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   ActivityIndicator,
   Platform,
@@ -47,12 +47,10 @@ export const Menu = ({
   noTextMode = false,
   onButtonLongPress = () => {},
 }) => {
-  let currentScreen = '';
-  let colors = COLOR_SCHEME_LIGHT;
-  let tags = [];
-  let colorNotes = [];
-  let user = null
-  let syncing = false
+  const [state, dispatch] = useTracked();
+  const {currentScreen,colors,tags,colorNotes,user,syncing} = state;
+
+
   // todo
 
   function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
@@ -77,10 +75,7 @@ export const Menu = ({
       name: 'Notebooks',
       icon: 'book-outline',
       func: () =>
-        NavigationService.navigate('Folders', {
-          title: 'Notebooks',
-          canGoBack: false,
-        }),
+        NavigationService.navigate('Folders'),
       close: true,
     },
 

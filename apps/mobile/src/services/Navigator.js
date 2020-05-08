@@ -17,7 +17,7 @@ const Stack = createStackNavigator();
 
 export const NavigationStack = () => {
   return (
-    <NavigationContainer independent={true} ref={rootNavigatorRef}>
+    <NavigationContainer  ref={rootNavigatorRef}>
       <Stack.Navigator
         initialRouteName="Home"
         screenOptions={{

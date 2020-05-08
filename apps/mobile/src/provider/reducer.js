@@ -64,7 +64,7 @@ export const reducer = (state, action) => {
     case ACTIONS.THEME: {
       return {
         ...state,
-        colors: {...action.colors},
+        colors: action.colors,
       };
     }
     case ACTIONS.USER: {
@@ -83,7 +83,7 @@ export const reducer = (state, action) => {
     case ACTIONS.SETTINGS: {
       return {
         ...state,
-        settings: {...action.settings},
+        settings: action.settings,
       };
     }
     case ACTIONS.TRASH: {

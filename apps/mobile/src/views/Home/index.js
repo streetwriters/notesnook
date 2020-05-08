@@ -17,7 +17,6 @@ let count = 0;
 
 export const Home = ({navigation}) => {
   const [state, dispatch] = useTracked();
-
   const {
     colors,
     selectionMode,

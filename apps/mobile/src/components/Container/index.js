@@ -47,7 +47,7 @@ export const Container = ({
   noSelectionHeader = false,
   headerColor = null,
   type = null,
-  route
+  route,
 }) => {
   // State
   const [state, dispatch] = useTracked();
@@ -123,7 +123,7 @@ export const Container = ({
     if (searchResults.results && searchResults.results.length > 0) {
       searchResult = null;
       if (text) {
-      setText(null);
+        setText(null);
       }
       inputRef.current?.setNativeProps({
         text: '',
@@ -137,12 +137,17 @@ export const Container = ({
         },
       });
     }
-  
-
   };
 
   useEffect(() => {
     eSubscribeEvent(eClearSearch, clearSearch);
+
+    return () => {
+      eUnSubscribeEvent(eClearSearch, clearSearch);
+    };
+  }, []);
+
+  useEffect(() => {
     Keyboard.addListener('keyboardDidShow', () => {
       setTimeout(() => {
         if (DDS.isTab) return;
@@ -156,7 +161,6 @@ export const Container = ({
       }, 0);
     });
     return () => {
-      eUnSubscribeEvent(eClearSearch, clearSearch);
       Keyboard.removeListener('keyboardDidShow', () => {
         setTimeout(() => {
           if (DDS.isTab) return;
@@ -173,7 +177,6 @@ export const Container = ({
   }, []);
 
   useEffect(() => {
-
     selection.data = data;
     selection.type = type;
     eSubscribeEvent(eScrollEvent, onScroll);
@@ -181,10 +184,10 @@ export const Container = ({
     return () => {
       eUnSubscribeEvent(eScrollEvent, onScroll);
     };
-  },[]);
+  }, []);
 
   // Render
-
+console.log('rerendering');
   return (
     <KeyboardAvoidingView
       behavior="padding"
