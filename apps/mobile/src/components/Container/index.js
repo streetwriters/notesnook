@@ -174,7 +174,7 @@ export const Container = ({
     return () => {
       eUnSubscribeEvent(eScrollEvent, onScroll);
     };
-  });
+  },[]);
 
   // Render
 

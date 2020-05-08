@@ -16,7 +16,7 @@ export const TimeSince = ({time}) => {
       clearInterval(interval);
       interval = null;
     };
-  });
+  },[]);
 
   return <Text>{timeAgo}</Text>;
 };

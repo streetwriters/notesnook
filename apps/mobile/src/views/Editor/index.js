@@ -449,7 +449,7 @@ const Editor = ({noMenu}) => {
     return () => {
       eUnSubscribeEvent(eCloseFullscreenEditor, closeFullscreen);
     };
-  });
+  },[]);
 
   const _onHardwareBackPress = async () => {
     if (editing.currentlyEditing) {

@@ -16,7 +16,6 @@ export const SelectionHeader = () => {
   const {colors, selectionMode, selectedItemsList, currentScreen} = state;
   const [selectAll, setSelectAll] = useState(false);
 
-  useEffect(() => {}, [currentScreen]);
 
   return (
     <Animatable.View

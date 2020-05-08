@@ -216,7 +216,7 @@ const MergeEditor = () => {
       eUnSubscribeEvent(eApplyChanges, applyChanges);
       eUnSubscribeEvent(eShowMergeDialog, show);
     };
-  });
+  },[]);
 
   const onPressKeepFromPrimaryWebView = () => {
     if (keepContentFrom == 'primary') {

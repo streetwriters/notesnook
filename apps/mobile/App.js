@@ -60,7 +60,7 @@ const App = () => {
     return () => {
       eUnSubscribeEvent(eStartSyncer, startSyncer);
     };
-  });
+  },[]);
 
   useEffect(() => {
     Initialize().then(() => {
@@ -68,6 +68,7 @@ const App = () => {
         let user = await db.user.get();
         startSyncer();
         dispatch({type: ACTIONS.USER, user: user});
+        dispatch({type: ACTIONS.ALL});
         setInit(true);
       });
     });
