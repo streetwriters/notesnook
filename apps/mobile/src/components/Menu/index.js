@@ -47,9 +47,12 @@ export const Menu = ({
   noTextMode = false,
   onButtonLongPress = () => {},
 }) => {
-  const [state, dispatch] = useTracked();
-  const {colors, tags, colorNotes, user, currentScreen, syncing} = state;
-
+  let currentScreen = '';
+  let colors = COLOR_SCHEME_LIGHT;
+  let tags = [];
+  let colorNotes = [];
+  let user = null
+  let syncing = false
   // todo
 
   function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
@@ -60,7 +63,7 @@ export const Menu = ({
   }
 
   useEffect(() => {
-    dispatch({type: ACTIONS.TAGS});
+    //dispatch({type: ACTIONS.TAGS});
   }, []);
 
   const listItems = [
@@ -70,7 +73,6 @@ export const Menu = ({
       func: () => NavigationService.navigate('Home'),
       close: true,
     },
-
     {
       name: 'Notebooks',
       icon: 'book-outline',

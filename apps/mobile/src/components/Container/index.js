@@ -120,19 +120,25 @@ export const Container = ({
   };
 
   const clearSearch = () => {
-    searchResult = null;
-    setText(null);
-    inputRef.current?.setNativeProps({
-      text: '',
-    });
-    dispatch({
-      type: ACTIONS.SEARCH_RESULTS,
-      results: {
-        results: [],
-        type: null,
-        keyword: null,
-      },
-    });
+    if (searchResults.results && searchResults.results.length > 0) {
+      searchResult = null;
+      if (text) {
+      setText(null);
+      }
+      inputRef.current?.setNativeProps({
+        text: '',
+      });
+      dispatch({
+        type: ACTIONS.SEARCH_RESULTS,
+        results: {
+          results: [],
+          type: null,
+          keyword: null,
+        },
+      });
+    }
+  
+
   };
 
   useEffect(() => {
@@ -167,6 +173,7 @@ export const Container = ({
   }, []);
 
   useEffect(() => {
+
     selection.data = data;
     selection.type = type;
     eSubscribeEvent(eScrollEvent, onScroll);
