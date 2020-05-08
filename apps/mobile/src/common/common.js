@@ -6,6 +6,7 @@ import {
   eUnSubscribeEvent,
 } from '../services/eventManager';
 import { eThemeUpdated } from '../services/events';
+import { DDS } from '../utils/utils';
 
 export const scale = {
   fontScale: 1,
@@ -100,15 +101,15 @@ const getDpi = pd => {
 const correction = (size, multiplier) => {
   let dSize = getDeviceSize();
 
-  if (dSize > 4 && dSize <= 5.3 && pixelDensity <= 3) {
+  if (dSize >= 4 && dSize <= 5.3 && pixelDensity <= 3) {
     return size * 0.92;
-  } else if (dSize > 5.5 && dSize < 6.5 && pixelDensity <= 3) {
+  } else if (dSize > 5.3 && dSize < 7 && pixelDensity <= 3 && !DDS.isTab) {
     if (Platform.OS === 'ios') {
       return size;
     }
     return size * 0.93;
-  } else if (dSize <= 5.7 && pixelDensity > 3) {
-    return size * 0.9;
+  } else if (dSize <= 7 && pixelDensity > 3 && !DDS.isTab) {
+    return size * 0.96;
   } else if (dSize >= 6.5 && dSize <= 7.2) {
     return size * multiplier;
   } else if (dSize > 7.2 && dSize <= 8.5) {
