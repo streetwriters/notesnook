@@ -21,14 +21,21 @@ export const NavigationStack = () => {
       <Stack.Navigator
         initialRouteName="Home"
         screenOptions={{
-          headerShown:false,
+          headerShown: false,
           animationEnabled: false,
           gestureEnabled: false,
           cardOverlayEnabled: false,
           cardShadowEnabled: false,
         }}>
         <Stack.Screen name="Home" component={Home} />
-        <Stack.Screen name="Folders" component={Folders} />
+        <Stack.Screen
+          initialParams={{
+            title: 'Notebooks',
+            canGoBack: false,
+          }}
+          name="Folders"
+          component={Folders}
+        />
         <Stack.Screen name="Favorites" component={Favorites} />
         <Stack.Screen name="Trash" component={Trash} />
         <Stack.Screen name="Notes" component={Notes} />
@@ -41,4 +48,3 @@ export const NavigationStack = () => {
     </NavigationContainer>
   );
 };
-

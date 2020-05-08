@@ -35,7 +35,6 @@ export const Folders = ({route, navigation}) => {
   };
 
   useEffect(() => {
-   
     if (isFocused) {
       dispatch({type: ACTIONS.PINNED});
       dispatch({type: ACTIONS.NOTEBOOKS});
