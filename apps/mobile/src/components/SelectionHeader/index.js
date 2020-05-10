@@ -13,11 +13,11 @@ import {TEMPLATE_DELETE} from '../DialogManager/templates';
 export const SelectionHeader = () => {
   // State
   const [state, dispatch] = useTracked();
-  const {colors, selectionMode, selectedItemsList, currentScreen} = state;
+  const {colors, selectionMode, selectedItemsList, currentScreen,containerState} = state;
   const [selectAll, setSelectAll] = useState(false);
 
 
-  return (
+  return (containerState.noSelectionHeader ? null :
     <Animatable.View
       transition={['translateY']}
       duration={300}

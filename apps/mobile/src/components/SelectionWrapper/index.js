@@ -48,7 +48,7 @@ const SelectionWrapper = ({
             ? 30
             : 0,
         backgroundColor:
-          currentEditingNote === item.dateCreated
+          currentEditingNote === item.dateCreated || pinned
             ? colors.shade
             : background
             ? background
