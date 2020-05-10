@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from 'react';
-import Container from '../../components/Container';
 import {AddTopicEvent} from '../../components/DialogManager/recievers';
 import {NotebookPlaceHolder} from '../../components/ListPlaceholders';
 import {NotebookItem} from '../../components/NotebookItem';
@@ -7,7 +6,7 @@ import SelectionWrapper from '../../components/SelectionWrapper';
 import SimpleList from '../../components/SimpleList';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
-import { useIsFocused } from '@react-navigation/native';
+import {useIsFocused} from '@react-navigation/native';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -17,12 +16,12 @@ import {
   eMoveNoteDialogNavigateBack,
   eOnNewTopicAdded,
   eScrollEvent,
+  eSetModalNavigator,
 } from '../../services/events';
 import {db, ToastEvent, w} from '../../utils/utils';
 
-export const Notebook = ({route,navigation}) => {
+export const Notebook = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
-  const {colors, selectionMode, preventDefaultMargins} = state;
   const [topics, setTopics] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -33,11 +32,8 @@ export const Notebook = ({route,navigation}) => {
   const onLoad = () => {
     let allTopics;
 
-    allTopics = db.notebooks.notebook(route.params.notebook.id).data
-      .topics;
-
+    allTopics = db.notebooks.notebook(route.params.notebook.id).data.topics;
     notebook = db.notebooks.notebook(route.params.notebook.id);
-
     setTopics(allTopics);
   };
 
@@ -62,13 +58,71 @@ export const Notebook = ({route,navigation}) => {
 
   useEffect(() => {
     if (isFocused) {
+      onLoad();
+      dispatch({
+        type: ACTIONS.HEADER_STATE,
+        state: {
+          type: 'topics',
+          menu: false,
+          canGoBack: true,
+          heading:params.title,
+          route: route,
+          color: null,
+          navigation: navigation,
+          ind: !params.root,
+        },
+      });
+      dispatch({
+        type: ACTIONS.CONTAINER_BOTTOM_BUTTON,
+        state: {
+          visible: true,
+          bottomButtonOnPress: () => {
+            let n = route.params.notebook;
+            AddTopicEvent(n);
+          },
+          color: null,
+          bottomButtonText: 'Add new topic',
+          ind: !params.root
+        },
+      });
+      dispatch({
+        type: ACTIONS.HEADER_VERTICAL_MENU,
+        state: false,
+      });
+
+      dispatch({
+        type: ACTIONS.HEADER_TEXT_STATE,
+        state: {
+          heading: params.title,
+          ind: !params.root
+        },
+      });
+
       dispatch({
         type: ACTIONS.CURRENT_SCREEN,
         screen: 'notebook',
       });
-      onLoad();
+      if (!params.root) {
+      eSendEvent(eSetModalNavigator,true);
+      } 
     }
   }, [isFocused]);
+
+  useEffect(() => {
+    if (isFocused) {
+      dispatch({
+        type: ACTIONS.SEARCH_STATE,
+        state: {
+          placeholder: `Search in "${params.title}"`,
+          data: topics,
+          noSearch: false,
+          type: 'topics',
+          color: null,
+          ind: !params.root
+        },
+      });
+    }
+  }, [topics, isFocused]);
 
   useEffect(() => {
     eSubscribeEvent(eMoveNoteDialogNavigateBack, handleBackPress);
@@ -77,10 +131,47 @@ export const Notebook = ({route,navigation}) => {
     };
   }, []);
 
-  const _renderItem = ({item, index}) => (
+  const _onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await db.sync();
+
+      onLoad();
+      dispatch({type: ACTIONS.USER});
+      setRefreshing(false);
+      ToastEvent.show('Sync Complete', 'success');
+    } catch (e) {
+      setRefreshing(false);
+      ToastEvent.show('Sync failed, network error', 'error');
+    }
+  };
+
+  return (
+    <SimpleList
+      data={topics}
+      type="topics"
+      customRefreshing={refreshing}
+      focused={isFocused}
+      customRefresh={_onRefresh}
+      RenderItem={RenderItem}
+      placeholder={<></>}
+      placeholderText=""
+    />
+  );
+};
+
+export default Notebook;
+
+const RenderItem = ({item, index}) => {
+  const [state, dispatch] = useTracked();
+  const {colors, selectionMode, preventDefaultMargins} = state;
+  let headerState = preventDefaultMargins? state.indHeaderState : state.headerState;
+  let params = headerState.route.params? headerState.route.params : {};
+
+  return (
     <SelectionWrapper item={item}>
       <NotebookItem
-        hideMore={params.hideMore}
+        hideMore={preventDefaultMargins}
         isTopic={true}
         customStyle={{
           width: selectionMode ? w - 74 : '100%',
@@ -100,58 +191,14 @@ export const Notebook = ({route,navigation}) => {
           });
         }}
         noteToMove={params.note}
-        notebookID={params.notebook.id}
-        isMove={params.isMove}
+        notebookID={params.notebook?.id}
+        isMove={preventDefaultMargins}
         refresh={() => {}}
         item={item}
         index={index}
         colors={colors}
-        data={topics}
+        data={params.notebook?.topics}
       />
     </SelectionWrapper>
   );
-
-  const _onRefresh = async () => {
-    setRefreshing(true);
-    try {
-      await db.sync();
-
-      onLoad();
-      dispatch({type: ACTIONS.USER});
-      setRefreshing(false);
-      ToastEvent.show('Sync Complete', 'success');
-    } catch (e) {
-      setRefreshing(false);
-      ToastEvent.show('Sync failed, network error', 'error');
-    }
-  };
-
-  return (
-    <Container
-      bottomButtonText="Create a new topic"
-      preventDefaultMargins={preventDefaultMargins}
-      navigation={navigation}
-      placeholder={`Search in "${params.title}"`}
-      heading={params.title}
-      canGoBack={true}
-      type="topics"
-      data={topics}
-      bottomButtonOnPress={() => {
-        let n = navigation.state.params.notebook;
-        AddTopicEvent(n);
-      }}>
-      <SimpleList
-        data={topics}
-        type="topics"
-        customRefreshing={refreshing}
-        focused={isFocused}
-        customRefresh={_onRefresh}
-        renderItem={_renderItem}
-        placeholder={<NotebookPlaceHolder colors={colors} />}
-        placeholderText="Topics added to notebook appear here."
-      />
-    </Container>
-  );
 };
-
-export default Notebook;

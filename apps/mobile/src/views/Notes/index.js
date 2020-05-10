@@ -1,10 +1,7 @@
+import {useIsFocused} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
-import { useIsFocused } from '@react-navigation/native';
-import Container from '../../components/Container';
-import {NotesPlaceHolder} from '../../components/ListPlaceholders';
-import NoteItem from '../../components/NoteItem';
-import SelectionWrapper from '../../components/SelectionWrapper';
 import SimpleList from '../../components/SimpleList';
+import {NotebookItemWrapper} from '../../components/SimpleList/NotebookItemWrapper';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {
@@ -19,11 +16,11 @@ import {
 } from '../../services/events';
 import {openEditorAnimation} from '../../utils/animations';
 import {db, DDS, editing, ToastEvent} from '../../utils/utils';
-import {sideMenuRef} from '../../utils/refs';
+import { NoteItemWrapper } from '../../components/SimpleList/NoteItemWrapper';
 
-export const Notes = ({route,navigation}) => {
+export const Notes = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
-  const {colors, selectionMode, currentEditingNote, colorNotes} = state;
+  const {colorNotes} = state;
   const allNotes = state.notes;
   const [notes, setNotes] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
@@ -63,7 +60,7 @@ export const Notes = ({route,navigation}) => {
     };
   }, []);
 
-  const init = (data) => {
+  const init = data => {
     params = route.params;
     if (data) {
       params = data;
@@ -85,41 +82,70 @@ export const Notes = ({route,navigation}) => {
     }
   };
 
-  const _renderItem = ({item, index}) => (
-    <SelectionWrapper
-      index={index}
-      currentEditingNote={
-        currentEditingNote === item.dateCreated ? currentEditingNote : null
-      }
-      item={item}>
-      <NoteItem
-        colors={colors}
-        customStyle={{
-          width: selectionMode ? '90%' : '100%',
-          marginHorizontal: 0,
-        }}
-        currentEditingNote={
-          currentEditingNote === item.dateCreated ? currentEditingNote : null
-        }
-        selectionMode={selectionMode}
-        onLongPress={() => {
-          if (!selectionMode) {
-            dispatch({
-              type: ACTIONS.SELECTION_MODE,
-              enabled: !selectionMode,
-            });
-          }
-          dispatch({
-            type: ACTIONS.SELECTED_ITEMS,
-            item: item,
-          });
-        }}
-        update={() => {}}
-        item={item}
-        index={index}
-      />
-    </SelectionWrapper>
-  );
+  useEffect(() => {
+    if (isFocused) {
+      dispatch({
+        type: ACTIONS.HEADER_STATE,
+        state: {
+          type: 'notes',
+          menu: params.type === 'color' ? true : false,
+          canGoBack: params.type === 'color' ? false : true,
+          route: route,
+          color: params.type == 'color' ? params.title : null,
+          navigation: navigation,
+        },
+      });
+      dispatch({
+        type: ACTIONS.CONTAINER_BOTTOM_BUTTON,
+        state: {
+          visible: true,
+          color: params.type == 'color' ? params.title : null,
+          bottomButtonOnPress: _bottomBottomOnPress,
+          bottomButtonText: 'Create a new note',
+        },
+      });
+      dispatch({
+        type: ACTIONS.HEADER_VERTICAL_MENU,
+        state: false,
+      });
+      dispatch({
+        type: ACTIONS.HEADER_TEXT_STATE,
+        state: {
+          heading:
+            params.type == 'tag'
+              ? '#' + params.title
+              : params.title.slice(0, 1).toUpperCase() + params.title.slice(1),
+        },
+      });
+      init();
+      dispatch({
+        type: ACTIONS.CURRENT_SCREEN,
+        screen: params.type,
+      });
+    } else {
+      setNotes([]);
+      editing.actionAfterFirstSave = {
+        type: null,
+      };
+    }
+  }, [isFocused, allNotes, colorNotes]);
+
+  useEffect(() => {
+    if (isFocused) {
+      dispatch({
+        type: ACTIONS.SEARCH_STATE,
+        state: {
+          placeholder: `Search in ${
+            params.type == 'tag' ? '#' + params.title : params.title
+          }`,
+          data: notes,
+          noSearch: false,
+          type: 'notes',
+          color: params.type == 'color' ? params.title : null,
+        },
+      });
+    }
+  }, [favorites, isFocused]);
 
   const _onRefresh = async () => {
     setRefreshing(true);
@@ -163,35 +189,18 @@ export const Notes = ({route,navigation}) => {
   };
 
   return (
-    <Container
-      bottomButtonText="Create a new note"
-      canGoBack={params.type === 'color' ? false : true}
-      menu={params.type === 'color' ? true : false}
-      heading={
-        params.type == 'tag'
-          ? '#' + params.title
-          : params.title.slice(0, 1).toUpperCase() + params.title.slice(1)
-      }
-      headerColor={params.type == 'color' ? params.title : null}
+    <SimpleList
       data={notes}
       type="notes"
-      placeholder={`Search in ${
-        params.type == 'tag' ? '#' + params.title : params.title
+      customRefreshing={refreshing}
+      focused={isFocused}
+      customRefresh={_onRefresh}
+      RenderItem={NoteItemWrapper}
+      placeholder={<></>}
+      placeholderText={`Add some notes to this" ${
+        params.type ? params.type : 'topic.'
       }`}
-      bottomButtonOnPress={_bottomBottomOnPress}>
-      <SimpleList
-        data={notes}
-        type="notes"
-        customRefreshing={refreshing}
-        focused={isFocused}
-        customRefresh={_onRefresh}
-        renderItem={_renderItem}
-        placeholder={<NotesPlaceHolder colors={colors} />}
-        placeholderText={`Add some notes to this" ${
-          params.type ? params.type : 'topic.'
-        }`}
-      />
-    </Container>
+    />
   );
 };
 

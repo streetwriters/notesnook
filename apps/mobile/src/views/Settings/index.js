@@ -33,13 +33,15 @@ import {eOpenLoginDialog} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
 import {hexToRGBA, w, DDS, setSetting, db, ToastEvent} from '../../utils/utils';
 import {Toast} from '../../components/Toast';
+import {useIsFocused} from '@react-navigation/native';
+import * as Animatable from 'react-native-animatable';
 
-export const Settings = ({navigation}) => {
+export const Settings = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors, user, settings} = state;
   const [key, setKey] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
-
+  const isFocused = useIsFocused();
   function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
     let newColors = setColorScheme(colors, accent);
     StatusBar.setBarStyle(colors.night ? 'light-content' : 'dark-content');
@@ -54,20 +56,58 @@ export const Settings = ({navigation}) => {
   }
 
   useEffect(() => {
-    dispatch({
-      type: ACTIONS.CURRENT_SCREEN,
-      screen: 'settings',
-    });
-  },[])
+    if (isFocused) {
+      dispatch({
+        type: ACTIONS.CONTAINER_BOTTOM_BUTTON,
+        state: {
+          visible: false,
+        },
+      });
+      dispatch({
+        type: ACTIONS.HEADER_STATE,
+        state: {
+          type: null,
+          menu: true,
+          canGoBack: false,
+          route: route,
+          color: null,
+          navigation: navigation,
+        },
+      });
+      dispatch({
+        type: ACTIONS.HEADER_VERTICAL_MENU,
+        state: false,
+      });
+
+      dispatch({
+        type: ACTIONS.HEADER_TEXT_STATE,
+        state: {
+          heading: 'Settings',
+        },
+      });
+
+      dispatch({
+        type: ACTIONS.CURRENT_SCREEN,
+        screen: 'settings',
+      });
+
+      dispatch({
+        type: ACTIONS.SEARCH_STATE,
+        state: {
+          noSearch: true,
+        },
+      });
+    }
+  }, [isFocused]);
 
   return (
-    <Container
-      menu={true}
-      heading="Settings"
-      canGoBack={false}
-      noSearch={true}
-      noSelectionHeader={true}
-      noBottomButton={true}>
+    <Animatable.View
+      transition="backgroundColor"
+      duration={300}
+      style={{
+        height: '100%',
+        backgroundColor: colors.bg,
+      }}>
       <View
         style={{
           marginTop: Platform.OS == 'ios' ? 125 - 60 : 125 - 60,
@@ -631,95 +671,6 @@ export const Settings = ({navigation}) => {
             />
           </TouchableOpacity>
         ) : null}
-        {/* 
-        <Text
-          style={{
-            fontSize: SIZE.xs,
-            fontFamily: WEIGHT.bold,
-            textAlignVertical: 'center',
-            color: colors.accent,
-
-            borderBottomColor: colors.nav,
-            borderBottomWidth: 0.5,
-            paddingBottom: 3,
-          }}>
-          Editor Settings
-        </Text>
-
-        <TouchableOpacity
-          activeOpacity={opacity}
-          onPress={async () => {
-            await setSetting(
-              settings,
-              'showToolbarOnTop',
-              !settings.showToolbarOnTop,
-            );
-          }}
-          style={{
-            width: '100%',
-            marginHorizontal: 0,
-            flexDirection: 'row',
-            marginTop: pv + 5,
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            paddingBottom: pv + 5,
-          }}>
-          <Text
-            style={{
-              fontSize: SIZE.sm,
-              fontFamily: WEIGHT.regular,
-              textAlignVertical: 'center',
-              color: colors.pri,
-            }}>
-            Show toolbar on top
-          </Text>
-          <Icon
-            size={SIZE.xl}
-            color={settings.showToolbarOnTop ? colors.accent : colors.icon}
-            name={
-              settings.showToolbarOnTop ? 'toggle-switch' : 'toggle-switch-off'
-            }
-          />
-        </TouchableOpacity>
-        <TouchableOpacity
-          activeOpacity={opacity}
-          onPress={async () => {
-            await setSetting(
-              settings,
-              'showKeyboardOnOpen',
-              !settings.showKeyboardOnOpen,
-            );
-          }}
-          style={{
-            width: '100%',
-            marginHorizontal: 0,
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-
-            paddingVertical: pv + 5,
-          }}>
-          <Text
-            style={{
-              fontSize: SIZE.sm,
-              fontFamily: WEIGHT.regular,
-              textAlignVertical: 'center',
-              color: colors.pri,
-            }}>
-            Show keyboard on open
-          </Text>
-          <Icon
-            size={SIZE.xl}
-            color={settings.showKeyboardOnOpen ? colors.accent : colors.icon}
-            name={
-              settings.showKeyboardOnOpen
-                ? 'toggle-switch'
-                : 'toggle-switch-off'
-            }
-          />
-        </TouchableOpacity>
-
-         */}
 
         <Text
           style={{
@@ -776,9 +727,8 @@ export const Settings = ({navigation}) => {
           }}
         />
       </ScrollView>
-    </Container>
+    </Animatable.View>
   );
 };
-
 
 export default Settings;

@@ -1,30 +1,17 @@
-import { useIsFocused } from '@react-navigation/native';
-import React, { useEffect } from 'react';
-import Container from '../../components/Container';
-import { NotesPlaceHolder } from '../../components/ListPlaceholders';
-import NoteItem from '../../components/NoteItem';
-import SelectionHeader from '../../components/SelectionHeader';
-import SelectionWrapper from '../../components/SelectionWrapper';
+import {useIsFocused} from '@react-navigation/native';
+import React, {useEffect} from 'react';
 import SimpleList from '../../components/SimpleList';
-import { useTracked } from '../../provider';
-import { ACTIONS } from '../../provider/actions';
-import { eSendEvent } from '../../services/eventManager';
-import { eOnLoadNote, eScrollEvent } from '../../services/events';
-import { openEditorAnimation } from '../../utils/animations';
-import { sideMenuRef } from '../../utils/refs';
-import { DDS } from '../../utils/utils';
-let count = 0;
+import {NoteItemWrapper} from '../../components/SimpleList/NoteItemWrapper';
+import {useTracked} from '../../provider';
+import {ACTIONS} from '../../provider/actions';
+import {eSendEvent} from '../../services/eventManager';
+import {eOnLoadNote, eScrollEvent} from '../../services/events';
+import {openEditorAnimation} from '../../utils/animations';
+import {DDS} from '../../utils/utils';
 
-export const Home = ({navigation}) => {
+export const Home = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
-  const {
-    colors,
-    selectionMode,
-    currentEditingNote,
-    loading,
-    notes,
-    pinned,
-  } = state;
+  const {notes} = state;
   const isFocused = useIsFocused();
 
   useEffect(() => {
@@ -33,79 +20,87 @@ export const Home = ({navigation}) => {
         type: ACTIONS.CURRENT_SCREEN,
         screen: 'home',
       });
+      dispatch({
+        type: ACTIONS.HEADER_STATE,
+        state: {
+          type: 'notes',
+          menu: true,
+          canGoBack: false,
+          route: route,
+          color: null,
+          navigation: navigation,
+        },
+      });
+      dispatch({
+        type: ACTIONS.HEADER_VERTICAL_MENU,
+        state: true,
+      });
+
+      dispatch({
+        type: ACTIONS.CONTAINER_BOTTOM_BUTTON,
+        state: {
+          bottomButtonText: 'Create a new Note',
+        },
+      });
+      dispatch({
+        type: ACTIONS.HEADER_TEXT_STATE,
+        state: {
+          heading: 'Home',
+        },
+      });
+
+      dispatch({
+        type: ACTIONS.CONTAINER_BOTTOM_BUTTON,
+        state: {
+          bottomButtonText: 'Create a new note',
+          bottomButtonOnPress: () => {
+            if (DDS.isTab) {
+              eSendEvent(eOnLoadNote, {type: 'new'});
+            } else {
+              eSendEvent(eOnLoadNote, {type: 'new'});
+              openEditorAnimation();
+            }
+          },
+          color: null,
+          visible: true,
+        },
+      });
       eSendEvent(eScrollEvent, 0);
       dispatch({type: ACTIONS.COLORS});
       dispatch({type: ACTIONS.NOTES});
       dispatch({type: ACTIONS.PINNED});
     }
   }, [isFocused]);
-  const _renderItem = ({item, index}) => (
-    <SelectionWrapper
-      index={index}
-      currentEditingNote={
-        currentEditingNote === item.id ? currentEditingNote : null
-      }
-      item={item}>
-      <NoteItem
-        colors={colors}
-        customStyle={{
-          width: selectionMode ? '90%' : '100%',
-          marginHorizontal: 0,
-        }}
-        currentEditingNote={
-          currentEditingNote === item.id ? currentEditingNote : null
-        }
-        selectionMode={selectionMode}
-        onLongPress={() => {
-          if (!selectionMode) {
-            dispatch({type: ACTIONS.SELECTION_MODE, enabled: true});
-          }
-          dispatch({type: ACTIONS.SELECTED_ITEMS, item: item});
-        }}
-        update={() => {
-          dispatch({type: ACTIONS.NOTES});
-        }}
-        item={item}
-        index={index}
-      />
-    </SelectionWrapper>
-  );
+
+  useEffect(() => {
+    if (isFocused) {
+      dispatch({
+        type: ACTIONS.SEARCH_STATE,
+        state: {
+          placeholder: 'Search all notes',
+          data: notes,
+          noSearch: false,
+          type: 'notes',
+          color: null,
+        },
+      });
+    }
+  }, [notes, isFocused]);
 
   return (
-    <Container
-      bottomButtonText="Create a new note"
-      heading="Home"
-      customIcon="menu"
-      verticalMenu
-      type="notes"
-      menu
-      placeholder="Search all notes"
-      canGoBack={false}
-      bottomButtonOnPress={() => {
-        if (DDS.isTab) {
-          eSendEvent(eOnLoadNote, {type: 'new'});
-        } else {
-          eSendEvent(eOnLoadNote, {type: 'new'});
-          openEditorAnimation();
-        }
-      }}
-      data={notes ? notes : []}>
-      <SelectionHeader />
-
+    <>
       <SimpleList
         data={notes}
         type="notes"
         isHome={true}
-        pinned={pinned.notes}
+        pinned={true}
         focused={isFocused}
-        renderItem={_renderItem}
-        placeholder={<NotesPlaceHolder colors={colors} />}
+        RenderItem={NoteItemWrapper}
+        placeholder={<></>}
         placeholderText={`Notes you write appear here`}
       />
-    </Container>
+    </>
   );
 };
-
-
 
 export default Home;

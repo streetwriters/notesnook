@@ -114,6 +114,57 @@ export const Signup = ({route, navigation}) => {
     }
   };
 
+  useEffect(() => {
+    if (isFocused) {
+      dispatch({
+        type: ACTIONS.HEADER_STATE,
+        state: {
+          type: null,
+          menu: false,
+          canGoBack: true,
+          route: route,
+          color: null,
+          navigation: navigation,
+        },
+      });
+      dispatch({
+        type: ACTIONS.CONTAINER_BOTTOM_BUTTON,
+        state: {
+          visible: false,
+        },
+      });
+      dispatch({
+        type: ACTIONS.CONTAINER_STATE,
+        state: {
+          noSelectionHeader: true,
+        },
+      });
+      dispatch({
+        type: ACTIONS.HEADER_VERTICAL_MENU,
+        state: false,
+      });
+
+      dispatch({
+        type: ACTIONS.HEADER_TEXT_STATE,
+        state: {
+          heading: 'Create Account',
+        },
+      });
+
+      dispatch({
+        type: ACTIONS.CURRENT_SCREEN,
+        screen: 'signup',
+      });
+
+      dispatch({
+        type: ACTIONS.SEARCH_STATE,
+        state: {
+          noSearch: true,
+        },
+      });
+    }
+  }, [isFocused]);
+
   return (
     <View
       style={{
@@ -289,12 +340,10 @@ export const Signup = ({route, navigation}) => {
 
       {signingIn ? null : (
         <>
-          <Header
-            isLoginNavigator={isLoginNavigator}
-            navigation={navigation}
-            colors={colors}
-            route={route}
-            heading="Create Account"
+          <View
+            style={{
+              marginTop: Platform.OS == 'ios' ? 125 - 60 : 125 - 60,
+            }}
           />
 
           <View
@@ -658,7 +707,7 @@ export const Signup = ({route, navigation}) => {
                 onPress={_signUp}
                 style={{
                   ...getElevation(5),
-                  padding: pv,
+                  padding: pv+2,
                   backgroundColor: colors.accent,
                   borderRadius: 5,
                   marginHorizontal: 12,

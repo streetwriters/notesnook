@@ -119,6 +119,56 @@ export const Login = ({route, navigation}) => {
     }
   };
 
+  useEffect(() => {
+    if (isFocused) {
+      dispatch({
+        type: ACTIONS.HEADER_STATE,
+        state: {
+          type: null,
+          menu: false,
+          canGoBack: true,
+          route: route,
+          color: null,
+          navigation: navigation,
+        },
+      });
+      dispatch({
+        type: ACTIONS.CONTAINER_BOTTOM_BUTTON,
+        state: {
+          visible: false,
+        },
+      });
+      dispatch({
+        type: ACTIONS.CONTAINER_STATE,
+        state: {
+          noSelectionHeader: true,
+        },
+      });
+      dispatch({
+        type: ACTIONS.HEADER_VERTICAL_MENU,
+        state: false,
+      });
+
+      dispatch({
+        type: ACTIONS.HEADER_TEXT_STATE,
+        state: {
+          heading: 'Login',
+        },
+      });
+
+      dispatch({
+        type: ACTIONS.CURRENT_SCREEN,
+        screen: 'login',
+      });
+
+      dispatch({
+        type: ACTIONS.SEARCH_STATE,
+        state: {
+          noSearch: true,
+        },
+      });
+    }
+  }, [isFocused]);
   return (
     <View
       style={{
@@ -156,13 +206,11 @@ export const Login = ({route, navigation}) => {
 
       {loggingIn ? null : (
         <>
-          <Header
-            navigation={navigation}
-            route={route}
-            isLoginNavigator={isLoginNavigator}
-            colors={colors}
-            heading="Login"
-          />
+           <View
+        style={{
+          marginTop: Platform.OS == 'ios' ? 125 - 60 : 125 - 60,
+        }}
+      />
 
           <View
             style={{
@@ -479,7 +527,7 @@ export const Login = ({route, navigation}) => {
                   onPress={_logIn}
                   style={{
                     ...getElevation(5),
-                    padding: pv,
+                    padding: pv + 2,
                     backgroundColor: colors.accent,
                     borderRadius: 5,
                     marginHorizontal: 12,

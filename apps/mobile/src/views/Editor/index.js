@@ -1,44 +1,16 @@
-import React, {createRef, useEffect, useState} from 'react';
-import {
-  BackHandler,
-  KeyboardAvoidingView,
-  Linking,
-  Platform,
-  SafeAreaView,
-  StatusBar,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import React, { createRef, useEffect, useState } from 'react';
+import { BackHandler, KeyboardAvoidingView, Linking, Platform, SafeAreaView, StatusBar, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import WebView from 'react-native-webview';
-import {normalize, SIZE, WEIGHT} from '../../common/common';
-import {
-  ActionSheetEvent,
-  simpleDialogEvent,
-} from '../../components/DialogManager/recievers';
-import {
-  TEMPLATE_EXIT_FULLSCREEN,
-  TEMPLATE_INFO,
-} from '../../components/DialogManager/templates';
-import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
-import {
-  eSendEvent,
-  eSubscribeEvent,
-  eUnSubscribeEvent,
-} from '../../services/eventManager';
-import {
-  eClearEditor,
-  eCloseFullscreenEditor,
-  eOnLoadNote,
-  eOpenFullscreenEditor,
-  refreshNotesPage,
-} from '../../services/events';
-import {exitEditorAnimation} from '../../utils/animations';
-import {sideMenuRef} from '../../utils/refs';
-import {db, DDS, editing, timeConverter, ToastEvent} from '../../utils/utils';
-import InfoBar from './InfoBar';
+import { normalize, SIZE } from '../../common/common';
+import { ActionSheetEvent, simpleDialogEvent } from '../../components/DialogManager/recievers';
+import { TEMPLATE_EXIT_FULLSCREEN } from '../../components/DialogManager/templates';
+import { useTracked } from '../../provider';
+import { ACTIONS } from '../../provider/actions';
+import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/eventManager';
+import { eClearEditor, eCloseFullscreenEditor, eOnLoadNote, eOpenFullscreenEditor, refreshNotesPage } from '../../services/events';
+import { exitEditorAnimation } from '../../utils/animations';
+import { db, DDS, editing, timeConverter, ToastEvent } from '../../utils/utils';
 
 const InfoBarRef = createRef();
 const EditorWebView = createRef();

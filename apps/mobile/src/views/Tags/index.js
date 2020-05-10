@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import {Text, TouchableOpacity, View} from 'react-native';
-import { useIsFocused } from '@react-navigation/native';
+import {useIsFocused} from '@react-navigation/native';
 import {pv, SIZE, WEIGHT} from '../../common/common';
 import Container from '../../components/Container';
 import {TagsPlaceHolder} from '../../components/ListPlaceholders';
@@ -9,12 +9,42 @@ import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import NavigationService from '../../services/NavigationService';
 
-export const Tags = ({navigation}) => {
+export const Tags = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors, tags} = state;
   const isFocused = useIsFocused();
+
   useEffect(() => {
     if (isFocused) {
+      dispatch({
+        type: ACTIONS.HEADER_STATE,
+        state: {
+          type: 'trash',
+          menu: true,
+          canGoBack: false,
+          route: route,
+          color: null,
+          navigation: navigation,
+        },
+      });
+      dispatch({
+        type: ACTIONS.CONTAINER_BOTTOM_BUTTON,
+        state: {
+          visible: false,
+        },
+      });
+      dispatch({
+        type: ACTIONS.HEADER_VERTICAL_MENU,
+        state: false,
+      });
+
+      dispatch({
+        type: ACTIONS.HEADER_TEXT_STATE,
+        state: {
+          heading: 'Tags',
+        },
+      });
+
       dispatch({type: ACTIONS.TAGS});
       dispatch({
         type: ACTIONS.CURRENT_SCREEN,
@@ -23,7 +53,39 @@ export const Tags = ({navigation}) => {
     }
   }, [isFocused]);
 
-  const _renderItem = ({item, index}) => (
+  useEffect(() => {
+    if (isFocused) {
+      dispatch({
+        type: ACTIONS.SEARCH_STATE,
+        state: {
+          placeholder: 'Search all tags',
+          data: tags,
+          noSearch: false,
+          type: 'tags',
+          color: null,
+        },
+      });
+    }
+  }, [tags, isFocused]);
+
+  return (
+    <SimpleList
+      data={tags}
+      type="tags"
+      focused={isFocused}
+      RenderItem={RenderItem}
+      placeholder={<TagsPlaceHolder colors={colors} />}
+      placeholderText="Tags added to notes appear here"
+    />
+  );
+};
+
+export default Tags;
+
+const RenderItem = ({item, index}) => {
+  const [state, dispatch] = useTracked();
+  const {colors} = state;
+  return (
     <TouchableOpacity
       key={item.title}
       onPress={() => {
@@ -70,33 +132,4 @@ export const Tags = ({navigation}) => {
       </Text>
     </TouchableOpacity>
   );
-
-  return (
-    <Container
-      canGoBack={false}
-      heading="Tags"
-      noBottomButton={true}
-      placeholder="Search for #tags"
-      data={tags}
-      type="tags"
-      menu>
-      <View
-        style={{
-          paddingHorizontal: 12,
-          height: '100%',
-          width: '100%',
-        }}>
-        <SimpleList
-          data={tags}
-          type="tags"
-          focused={isFocused}
-          renderItem={_renderItem}
-          placeholder={<TagsPlaceHolder colors={colors} />}
-          placeholderText="Tags added to notes appear here"
-        />
-      </View>
-    </Container>
-  );
 };
-
-export default Tags;

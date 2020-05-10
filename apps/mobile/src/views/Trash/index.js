@@ -1,6 +1,5 @@
+import {useIsFocused} from '@react-navigation/native';
 import React, {useEffect} from 'react';
-import { useIsFocused } from '@react-navigation/native';
-import Container from '../../components/Container';
 import {simpleDialogEvent} from '../../components/DialogManager/recievers';
 import {TEMPLATE_EMPTY_TRASH} from '../../components/DialogManager/templates';
 import {TrashPlaceHolder} from '../../components/ListPlaceholders';
@@ -11,14 +10,49 @@ import SimpleList from '../../components/SimpleList';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {w} from '../../utils/utils';
+import {NoteItemWrapper} from '../../components/SimpleList/NoteItemWrapper';
+import {NotebookItemWrapper} from '../../components/SimpleList/NotebookItemWrapper';
 
-export const Trash = ({navigation}) => {
+export const Trash = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors, selectionMode, trash} = state;
 
   const isFocused = useIsFocused();
+
   useEffect(() => {
     if (isFocused) {
+      dispatch({
+        type: ACTIONS.HEADER_STATE,
+        state: {
+          type: 'trash',
+          menu: true,
+          canGoBack: false,
+          route: route,
+          color: null,
+          navigation: navigation,
+        },
+      });
+      dispatch({
+        type: ACTIONS.CONTAINER_BOTTOM_BUTTON,
+        state: {
+          bottomButtonText: 'Clear all trash',
+          bottomButtonOnPress: () => simpleDialogEvent(TEMPLATE_EMPTY_TRASH),
+          color: null,
+          visible: true,
+        },
+      });
+      dispatch({
+        type: ACTIONS.HEADER_VERTICAL_MENU,
+        state: false,
+      });
+
+      dispatch({
+        type: ACTIONS.HEADER_TEXT_STATE,
+        state: {
+          heading: 'Trash',
+        },
+      });
+
       dispatch({
         type: ACTIONS.TRASH,
       });
@@ -30,82 +64,39 @@ export const Trash = ({navigation}) => {
     }
   }, [isFocused]);
 
-  const _renderItem = ({item, index}) => (
-    <SelectionWrapper colors={colors} item={item}>
-      {item.type === 'note' ? (
-        <NoteItem
-          customStyle={{
-            width: selectionMode ? w - 74 : '100%',
-            marginHorizontal: 0,
-          }}
-          selectionMode={selectionMode}
-          onLongPress={() => {
-            if (!selectionMode) {
-              dispatch({
-                type: ACTIONS.SELECTION_MODE,
-                enabled: !selectionMode,
-              });
-            }
-            dispatch({
-              type: ACTIONS.SELECTED_ITEMS,
-              item: item,
-            });
-          }}
-          colors={colors}
-          item={item}
-          index={index}
-          isTrash={true}
-        />
-      ) : (
-        <NotebookItem
-          selectionMode={selectionMode}
-          onLongPress={() => {
-            if (!selectionMode) {
-              dispatch({
-                type: ACTIONS.SELECTION_MODE,
-                enabled: !selectionMode,
-              });
-            }
-            dispatch({
-              type: ACTIONS.SELECTED_ITEMS,
-              item: item,
-            });
-          }}
-          customStyle={{
-            width: selectionMode ? w - 74 : '100%',
-            marginHorizontal: 0,
-          }}
-          item={item}
-          isTrash={true}
-          index={index}
-        />
-      )}
-    </SelectionWrapper>
-  );
+  useEffect(() => {
+    if (isFocused) {
+      dispatch({
+        type: ACTIONS.SEARCH_STATE,
+        state: {
+          placeholder: 'Search all trash',
+          data: trash,
+          noSearch: false,
+          type: 'trash',
+          color: null,
+        },
+      });
+    }
+  }, [trash, isFocused]);
 
   return (
-    <Container
-      bottomButtonOnPress={() => {
-        simpleDialogEvent(TEMPLATE_EMPTY_TRASH);
-      }}
-      placeholder="Search in trash"
-      noSearch={false}
-      heading="Trash"
-      canGoBack={false}
-      menu={true}
-      type="trash"
+    <SimpleList
       data={trash}
-      bottomButtonText="Clear all trash">
-      <SimpleList
-        data={trash}
-        type="trash"
-        focused={isFocused}
-        renderItem={_renderItem}
-        placeholder={<TrashPlaceHolder colors={colors} />}
-        placeholderText="Deleted notes & notebooks appear here."
-      />
-    </Container>
+      type="trash"
+      focused={isFocused}
+      RenderItem={RenderItem}
+      placeholder={<TrashPlaceHolder colors={colors} />}
+      placeholderText="Deleted notes & notebooks appear here."
+    />
   );
 };
 
 export default Trash;
+
+const RenderItem = ({item, index}) => {
+  return item.type === 'note' ? (
+    <NoteItemWrapper item={item} index={index} isTrash={true} />
+  ) : (
+    <NotebookItemWrapper item={item} index={index} isTrash={true} />
+  );
+};
