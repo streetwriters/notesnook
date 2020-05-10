@@ -109,7 +109,7 @@ const correction = (size, multiplier) => {
     }
     return size * 0.93;
   } else if (dSize <= 7 && pixelDensity >= 3 && !DDS.isTab) {
-    return size * 0.95;
+    return size * 0.98;
   } else if (dSize >= 6.5 && dSize <= 7.2 && DDS.isTab) {
     return size * multiplier;
   } else if (dSize > 7.2 && dSize <= 8.5 && DDS.isTab) {
