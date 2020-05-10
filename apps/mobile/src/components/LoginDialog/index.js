@@ -1,4 +1,4 @@
-import React, { createRef } from 'react';
+import React, {createRef} from 'react';
 import {Modal, TouchableOpacity, View} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import {normalize} from '../../common/common';
@@ -12,13 +12,17 @@ import Signup from '../../views/Signup';
 import {updateEvent} from '../DialogManager/recievers';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
+import Container from '../Container';
 
 const Stack = createStackNavigator();
-
 const modalNavigatorRef2 = createRef();
+
 const ModalNavigator = ({onStateChange}) => {
   return (
-    <NavigationContainer onStateChange={onStateChange} independent={true} ref={modalNavigatorRef2}>
+    <NavigationContainer
+      onStateChange={onStateChange}
+      independent={true}
+      ref={modalNavigatorRef2}>
       <Stack.Navigator
         initialRouteName="Login"
         screenOptions={{
@@ -127,11 +131,13 @@ class LoginDialog extends React.Component {
               paddingVertical: 16,
               zIndex: 10,
             }}>
-            <ModalNavigator
-              onStateChange={event => {
+            <Container>
+              <ModalNavigator
+                onStateChange={event => {
                   this.routeIndex = event.index;
-              }}
-            />
+                }}
+              />
+            </Container>
           </View>
         </Animatable.View>
       </Modal>

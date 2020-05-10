@@ -90,14 +90,14 @@ export const ActionSheetComponent = ({
     if (tag.includes(',')) {
       tag = tag.replace(',', '');
     }
-    tagsInputRef.current?.setNativeProps({
-      text: '',
-    });
 
     await db.notes.note(note.id).tag(tag);
 
     setNote({...db.notes.note(note.id).data});
     dispatch({type: ACTIONS.TAGS});
+    tagsInputRef.current?.setNativeProps({
+      text: '',
+    });
     tagToAdd = '';
   };
 
@@ -351,7 +351,6 @@ export const ActionSheetComponent = ({
             .catch(async e => {
               switch (e.message) {
                 case db.vault.ERRORS.noVault:
-                  
                   close('novault');
                   break;
                 case db.vault.ERRORS.vaultLocked:
