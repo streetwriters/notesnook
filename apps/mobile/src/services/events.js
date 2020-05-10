@@ -75,3 +75,5 @@ export const eShowMergeDialog = '536';
 export const eSwitchNightMode = '537';
 
 export const eStartSyncer = '538';
+
+export const eSetModalNavigator = '539'
