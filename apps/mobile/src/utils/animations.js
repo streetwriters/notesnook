@@ -19,7 +19,7 @@ export function openEditorAnimation() {
   };
   
   timing(EditorOpacity, {
-    duration:300,
+    duration:150,
     toValue:1,
     easing: Easing.in(Easing.linear),
   }).start();
