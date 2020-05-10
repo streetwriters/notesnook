@@ -19,6 +19,7 @@ import {
   refreshNotesPage,
   eOpenSideMenu,
   eStartSyncer,
+  eSetModalNavigator,
 } from '../../services/events';
 import {validatePass, validateUsername} from '../../services/validation';
 import {db, DDS, ToastEvent, getElevation} from '../../utils/utils';
@@ -130,12 +131,14 @@ export const Login = ({route, navigation}) => {
           route: route,
           color: null,
           navigation: navigation,
+          ind:!route.params.root
         },
       });
       dispatch({
         type: ACTIONS.CONTAINER_BOTTOM_BUTTON,
         state: {
           visible: false,
+          ind:!route.params.root
         },
       });
       dispatch({
@@ -153,6 +156,7 @@ export const Login = ({route, navigation}) => {
         type: ACTIONS.HEADER_TEXT_STATE,
         state: {
           heading: 'Login',
+          ind:!route.params.root
         },
       });
 
@@ -165,8 +169,12 @@ export const Login = ({route, navigation}) => {
         type: ACTIONS.SEARCH_STATE,
         state: {
           noSearch: true,
+          ind:!route.params.root
         },
       });
+      if (!route.params.root) {
+        eSendEvent(eSetModalNavigator, true);
+      }
     }
   }, [isFocused]);
   return (

@@ -4,7 +4,7 @@ import * as Animatable from 'react-native-animatable';
 import {normalize} from '../../common/common';
 import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
-import {eLoginDialogNavigateBack} from '../../services/events';
+import {eLoginDialogNavigateBack, eSetModalNavigator} from '../../services/events';
 import {getElevation, DDS} from '../../utils/utils';
 import ForgotPassword from '../../views/ForgotPassword';
 import Login from '../../views/Login';
@@ -32,9 +32,27 @@ const ModalNavigator = ({onStateChange}) => {
           cardOverlayEnabled: false,
           cardShadowEnabled: false,
         }}>
-        <Stack.Screen name="Login" component={Login} />
-        <Stack.Screen name="Signup" component={Signup} />
-        <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
+        <Stack.Screen
+          initialParams={{
+            root: false,
+          }}
+          name="Login"
+          component={Login}
+        />
+        <Stack.Screen
+          initialParams={{
+            root: false,
+          }}
+          name="Signup"
+          component={Signup}
+        />
+        <Stack.Screen
+          initialParams={{
+            root: false,
+          }}
+          name="ForgotPassword"
+          component={ForgotPassword}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -44,7 +62,7 @@ class LoginDialog extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      visible: false,
+      visible: true,
       animated: false,
     };
     this.routeIndex = 0;
@@ -73,6 +91,7 @@ class LoginDialog extends React.Component {
         animated={true}
         animationType="fade"
         onShow={() => {
+          eSendEvent(eSetModalNavigator, true);
           this.setState({
             animated: true,
           });
@@ -80,6 +99,7 @@ class LoginDialog extends React.Component {
         onRequestClose={() => {
           if (!this.routeIndex || this.routeIndex === 0) {
             updateEvent({type: ACTIONS.LOGIN_NAVIGATOR, enabled: false});
+            eSendEvent(eSetModalNavigator, false);
             this.close();
           } else {
             eSendEvent(eLoginDialogNavigateBack);
@@ -131,7 +151,7 @@ class LoginDialog extends React.Component {
               paddingVertical: 16,
               zIndex: 10,
             }}>
-            <Container>
+            <Container root={false}>
               <ModalNavigator
                 onStateChange={event => {
                   this.routeIndex = event.index;

@@ -22,6 +22,7 @@ import {
 import {
   eLoginDialogNavigateBack,
   eCloseLoginDialog,
+  eSetModalNavigator,
 } from '../../services/events';
 import * as Animatable from 'react-native-animatable';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -125,12 +126,14 @@ export const Signup = ({route, navigation}) => {
           route: route,
           color: null,
           navigation: navigation,
+          ind:!route.params.root
         },
       });
       dispatch({
         type: ACTIONS.CONTAINER_BOTTOM_BUTTON,
         state: {
           visible: false,
+          ind:!route.params.root
         },
       });
       dispatch({
@@ -148,6 +151,7 @@ export const Signup = ({route, navigation}) => {
         type: ACTIONS.HEADER_TEXT_STATE,
         state: {
           heading: 'Create Account',
+          ind:!route.params.root
         },
       });
 
@@ -160,8 +164,12 @@ export const Signup = ({route, navigation}) => {
         type: ACTIONS.SEARCH_STATE,
         state: {
           noSearch: true,
+          ind:!route.params.root
         },
       });
+      if (!route.params.root) {
+        eSendEvent(eSetModalNavigator, true);
+      }
     }
   }, [isFocused]);
 

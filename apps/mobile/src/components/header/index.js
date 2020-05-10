@@ -8,8 +8,16 @@ import {
 import * as Animatable from 'react-native-animatable';
 import {useSafeArea} from 'react-native-safe-area-context';
 import {useTracked} from '../../provider';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
-import {eScrollEvent, eSetModalNavigator} from '../../services/events';
+import {
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+  eSendEvent,
+} from '../../services/eventManager';
+import {
+  eScrollEvent,
+  eSetModalNavigator,
+  eCloseLoginDialog,
+} from '../../services/events';
 import {DDS, selection, w} from '../../utils/utils';
 import {HeaderMenu} from './HeaderMenu';
 import {HeaderTitle} from './HeaderTitle';
@@ -24,11 +32,11 @@ function useForceUpdate() {
   const [, setTick] = useState(0);
   const update = useCallback(() => {
     setTick(tick => tick + 1);
-  }, [])
+  }, []);
   return update;
 }
 
-export const Header = ({showSearch,root}) => {
+export const Header = ({showSearch, root}) => {
   const [state, dispatch] = useTracked();
   const {
     colors,
@@ -39,7 +47,7 @@ export const Header = ({showSearch,root}) => {
   } = state;
   const [hideHeader, setHideHeader] = useState(false);
 
- let headerState = root? state.headerState : state.indHeaderState;
+  let headerState = root ? state.headerState : state.indHeaderState;
 
   const [isModalNavigator, setIsModalNavigator] = useState(false);
   const insets = useSafeArea();
@@ -138,15 +146,16 @@ export const Header = ({showSearch,root}) => {
           <TouchableOpacity
             hitSlop={{top: 20, bottom: 20, left: 50, right: 40}}
             onPress={() => {
-              headerState = root? state.headerState : state.indHeaderState;
-              console.log(headerState.route.name);
+              headerState = root ? state.headerState : state.indHeaderState;
+           
+
               if (headerState.navigation && preventDefaultMargins) {
                 if (headerState.route.name === 'Folders') {
                   moveNoteHideEvent();
                 } else {
                   headerState.navigation.goBack();
                 }
-              } else if (headerState.navigation && isLoginNavigator) {
+              } else if (headerState.navigation && isModalNavigator) {
                 if (headerState.route.name === 'Login') {
                   eSendEvent(eCloseLoginDialog);
                 } else {
