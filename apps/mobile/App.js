@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import MMKV from 'react-native-mmkv-storage';
 import Orientation from 'react-native-orientation';
-import {Loading} from './Loading';
+import {Loading} from './loading';
 import {getColorScheme, scale, updateSize} from './src/common/common';
 import {useTracked} from './src/provider';
 import {ACTIONS} from './src/provider/actions';
