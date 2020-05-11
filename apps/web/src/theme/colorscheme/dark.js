@@ -12,11 +12,11 @@ class DarkColorSchemeFactory {
       border: "#2b2b2b",
       hover: "#3b3b3b",
       fontSecondary: "#000",
-      text: "#ffffff",
+      text: "#d3d3d3",
       overlay: "rgba(255, 255, 255, 0.5)",
       secondary: "black",
       icon: "#dbdbdb",
-      ...new StaticColorSchemeFactory(accent)
+      ...new StaticColorSchemeFactory(accent),
     };
   }
 }
