@@ -57,7 +57,7 @@ export const COLOR_SCHEME_DARK = {
   bg: '#1f1f1f',
   navbg: '#1c1c1c',
   nav: '#2b2b2b',
-  pri: '#ffffff',
+  pri: '#D3D3D3',
   sec: 'black',
   ...fixedColors,
 };
