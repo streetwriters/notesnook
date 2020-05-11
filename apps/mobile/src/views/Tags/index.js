@@ -86,6 +86,11 @@ const RenderItem = ({item, index}) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
   return (
+    <View
+    style={{
+      paddingHorizontal:12
+    }}
+    >
     <TouchableOpacity
       key={item.title}
       onPress={() => {
@@ -100,13 +105,14 @@ const RenderItem = ({item, index}) => {
         justifyContent: 'flex-start',
         alignItems: 'center',
         margin: 0,
-        paddingVertical: pv,
+        paddingVertical: pv + 5,
         borderBottomWidth: 1.5,
         borderBottomColor: colors.nav,
       }}>
+        
       <Text
         style={{
-          fontFamily: WEIGHT.regular,
+          fontFamily: WEIGHT.bold,
           fontSize: SIZE.md,
           color: colors.pri,
         }}>
@@ -114,8 +120,9 @@ const RenderItem = ({item, index}) => {
           style={{
             color: colors.accent,
           }}>
-          #
+          #{' '}
         </Text>
+
         {item.title}
         {'\n'}
         <Text
@@ -131,5 +138,6 @@ const RenderItem = ({item, index}) => {
         </Text>
       </Text>
     </TouchableOpacity>
+    </View>
   );
 };

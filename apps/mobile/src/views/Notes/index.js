@@ -113,7 +113,7 @@ export const Notes = ({route, navigation}) => {
         state: {
           heading:
             params.type == 'tag'
-              ? '#' + params.title
+              ? '# ' + params.title
               : params.title.slice(0, 1).toUpperCase() + params.title.slice(1),
         },
       });
@@ -145,7 +145,7 @@ export const Notes = ({route, navigation}) => {
         },
       });
     }
-  }, [favorites, isFocused]);
+  }, [notes, isFocused]);
 
   const _onRefresh = async () => {
     setRefreshing(true);
