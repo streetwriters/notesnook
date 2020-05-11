@@ -127,8 +127,9 @@ export class AddNotebookDialog extends React.Component {
           description: this.description,
           id: id,
         });
-
+        console.log(t);
         await db.notebooks.notebook(id).topics.add(...t);
+      
       } else {
         await db.notebooks.add({
           title: this.title,
@@ -232,10 +233,10 @@ export class AddNotebookDialog extends React.Component {
           />
           <View
             style={{
-              ...getElevation(5),
-              width: DDS.isTab ? '50%' : '80%',
-              maxHeight: '80%',
-              borderRadius: 5,
+              width: DDS.isTab ? '50%' : '100%',
+              height: DDS.isTab ? '80%' : '100%',
+              maxHeight: DDS.isTab ? '80%' : '100%',
+              borderRadius: DDS.isTab ? 5 : 0,
               backgroundColor: colors.bg,
               paddingHorizontal: ph,
               paddingVertical: pv,
@@ -246,13 +247,13 @@ export class AddNotebookDialog extends React.Component {
                 justifyContent: 'center',
                 alignItems: 'center',
               }}>
-              <Icon name="book-outline" color={colors.accent} size={SIZE.lg} />
+              <Icon name="book-outline" color={colors.accent} size={SIZE.xl} />
               <Text
                 style={{
                   color: colors.accent,
                   fontFamily: WEIGHT.bold,
                   marginLeft: 5,
-                  fontSize: SIZE.md,
+                  fontSize: SIZE.xl,
                 }}>
                 {toEdit && toEdit.dateCreated
                   ? 'Edit Notebook'
@@ -263,18 +264,20 @@ export class AddNotebookDialog extends React.Component {
             <TextInput
               ref={ref => (this.titleRef = ref)}
               style={{
-                padding: pv - 5,
+                padding: pv - 2,
                 borderWidth: 1.5,
                 borderColor: titleFocused ? colors.accent : colors.nav,
                 paddingHorizontal: ph,
                 borderRadius: 5,
+                minHeight: 45,
                 fontSize: SIZE.sm,
-                height: 35,
                 fontFamily: WEIGHT.regular,
                 color: colors.pri,
                 marginTop: 20,
                 marginBottom: 5,
               }}
+              numberOfLines={1}
+              multiline={false}
               onFocus={() => {
                 this.setState({
                   titleFocused: true,
@@ -298,13 +301,12 @@ export class AddNotebookDialog extends React.Component {
             <TextInput
               ref={ref => (this.descriptionRef = ref)}
               style={{
-                padding: pv - 5,
+                padding: pv -2 ,
                 borderWidth: 1.5,
                 borderColor: descFocused ? colors.accent : colors.nav,
                 paddingHorizontal: ph,
                 borderRadius: 5,
-                minHeight: 35,
-                fontSize: SIZE.xs + 1,
+                fontSize: SIZE.sm,
                 fontFamily: WEIGHT.regular,
                 color: colors.pri,
                 marginTop: 5,
@@ -312,6 +314,7 @@ export class AddNotebookDialog extends React.Component {
               }}
               textAlignVertical="top"
               numberOfLines={2}
+              maxLength={150}
               onFocus={() => {
                 this.setState({
                   descFocused: true,
@@ -330,7 +333,7 @@ export class AddNotebookDialog extends React.Component {
                 this.topicInputRef.focus();
               }}
               multiline
-              placeholder="Write a short description about notebook (optional)"
+              placeholder="Write a short description about your notebook (optional)"
               placeholderTextColor={colors.icon}
             />
 
@@ -368,11 +371,11 @@ export class AddNotebookDialog extends React.Component {
                 }}
                 onSubmitEditing={this.onSubmit}
                 style={{
-                  padding: pv - 5,
+                  padding: pv - 2,
                   paddingHorizontal: 0,
                   borderRadius: 5,
                   borderWidth: 1.5,
-                  height: 35,
+                  minHeight: 45,
                   fontSize: SIZE.sm,
                   borderColor: topicInputFoused ? colors.accent : colors.nav,
                   fontFamily: WEIGHT.regular,
@@ -381,7 +384,7 @@ export class AddNotebookDialog extends React.Component {
                   width: '85%',
                   maxWidth: '85%',
                 }}
-                placeholder="Add a topic"
+                placeholder="Add a new topic"
                 placeholderTextColor={colors.icon}
               />
               <TouchableOpacity
@@ -393,7 +396,7 @@ export class AddNotebookDialog extends React.Component {
                   borderColor: topicInputFoused ? colors.accent : colors.nav,
                   borderRadius: 5,
                   width: '12%',
-                  height: 35,
+                  minHeight: 45,
                 }}>
                 <Icon
                   name="plus"
@@ -461,7 +464,7 @@ export class AddNotebookDialog extends React.Component {
                     color: 'white',
                     fontSize: SIZE.sm,
                   }}>
-                  Add
+                  {toEdit && toEdit.dateCreated ? 'Save' : 'Add'}
                 </Text>
               </TouchableOpacity>
 
