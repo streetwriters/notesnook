@@ -13,6 +13,7 @@ export const HeaderMenu = () => {
   return headerVerticalMenu ? (
     <Menu
       ref={menuRef}
+      animationDuration={200}
       style={{
         borderRadius: 5,
         backgroundColor: colors.bg,
