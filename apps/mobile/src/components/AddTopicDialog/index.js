@@ -3,9 +3,7 @@ import {Modal, Text, TouchableOpacity, View} from 'react-native';
 import {TextInput} from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {opacity, ph, pv, SIZE, WEIGHT} from '../../common/common';
-
 import {getElevation, ToastEvent, db} from '../../utils/utils';
-
 import {eSendEvent} from '../../services/eventManager';
 import {eOnNewTopicAdded} from '../../services/events';
 import {Toast} from '../Toast';
@@ -26,11 +24,13 @@ export class AddTopicDialog extends React.Component {
     if (!this.title)
       return ToastEvent.show('Title is required', 'error', 'local');
 
-    await db.notebooks.notebook(this.props.notebookID).topics.add(this.title);
+    if (!this.props.toEdit) {
+      await db.notebooks.notebook(this.props.notebookID).topics.add(this.title);
+    } else {
+    }
     this.close();
-    eSendEvent(eOnNewTopicAdded);
-
     ToastEvent.show('New topic added', 'success');
+    eSendEvent(eOnNewTopicAdded);
   };
 
   open() {
@@ -165,7 +165,7 @@ export class AddTopicDialog extends React.Component {
                     color: 'white',
                     fontSize: SIZE.sm,
                   }}>
-                  Add
+                  {toEdit ? 'Save' : 'Add'}
                 </Text>
               </TouchableOpacity>
 

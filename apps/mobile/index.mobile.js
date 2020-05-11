@@ -6,7 +6,7 @@ import Animated from 'react-native-reanimated';
 import {Menu} from './src/components/Menu';
 import {useTracked} from './src/provider';
 import {NavigationStack} from './src/services/Navigator';
-import {EditorOpacity, EditorPosition} from './src/utils/animations';
+import {EditorOpacity, EditorPosition, EditorScale} from './src/utils/animations';
 import {sideMenuRef} from './src/utils/refs';
 import {DDS} from './src/utils/utils';
 import Editor from './src/views/Editor';
@@ -100,6 +100,12 @@ export const Initialize = () => {
             {
               translateX: EditorPosition,
             },
+            {
+              scaleX:EditorScale,
+            },
+            {
+              scaleY:EditorScale
+            }
           ],
         }}>
         <Editor noMenu={false} />

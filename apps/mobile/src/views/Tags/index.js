@@ -1,12 +1,11 @@
-import React, {useEffect} from 'react';
-import {Text, TouchableOpacity, View} from 'react-native';
-import {useIsFocused} from '@react-navigation/native';
-import {pv, SIZE, WEIGHT} from '../../common/common';
-import Container from '../../components/Container';
-import {TagsPlaceHolder} from '../../components/ListPlaceholders';
+import { useIsFocused } from '@react-navigation/native';
+import React, { useEffect } from 'react';
+import { Text, TouchableOpacity, View } from 'react-native';
+import { pv, SIZE, WEIGHT } from '../../common/common';
+import { TagsPlaceHolder } from '../../components/ListPlaceholders';
 import SimpleList from '../../components/SimpleList';
-import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
+import { useTracked } from '../../provider';
+import { ACTIONS } from '../../provider/actions';
 import NavigationService from '../../services/NavigationService';
 
 export const Tags = ({route, navigation}) => {

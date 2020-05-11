@@ -615,6 +615,7 @@ const Editor = ({noMenu}) => {
           style={{
             height: '100%',
             maxHeight: '100%',
+            width:"100%",
             backgroundColor: 'transparent',
           }}
           onMessage={_onMessage}

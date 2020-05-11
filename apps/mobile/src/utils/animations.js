@@ -5,7 +5,7 @@ import {editing} from './utils';
 const {color, Value, timing} = Animated;
 
 export const EditorPosition = new Value(Dimensions.get('window').width * 1.5);
-
+export const EditorScale = new Value(0.99);
 export const EditorOpacity = new Value(0);
 
 export function openEditorAnimation() {
@@ -18,8 +18,13 @@ export function openEditorAnimation() {
     easing: Easing.in(Easing.linear),
   };
   
+  timing(EditorScale, {
+    duration:300,
+    toValue:1,
+    easing: Easing.in(Easing.linear),
+  }).start();
   timing(EditorOpacity, {
-    duration:150,
+    duration:50,
     toValue:1,
     easing: Easing.in(Easing.linear),
   }).start();
@@ -38,6 +43,11 @@ export function exitEditorAnimation() {
   timing(EditorOpacity, {
     duration:150,
     toValue:0,
+    easing: Easing.in(Easing.linear),
+  }).start();
+  timing(EditorScale, {
+    duration:150,
+    toValue:0.99,
     easing: Easing.in(Easing.linear),
   }).start();
   timing(EditorPosition, openConfigH).start();
