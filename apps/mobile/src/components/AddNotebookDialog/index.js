@@ -114,12 +114,17 @@ export class AddNotebookDialog extends React.Component {
       let id = toEdit && toEdit.id ? toEdit.id : null;
 
       let t = [...topics];
+      console.log(this.prevIndex, this.prevItem);
       if (
         this.currentInputValue &&
         this.currentInputValue.trim().length !== 0
       ) {
-        t.push(this.currentInputValue);
-        this.currentInputValue = null;
+        if (this.prevItem != null) {
+          t[this.prevIndex] = this.currentInputValue;
+        } else {
+          t.push(this.currentInputValue);
+          this.currentInputValue = null;
+        }
       }
       if (id) {
         await db.notebooks.add({
@@ -127,9 +132,16 @@ export class AddNotebookDialog extends React.Component {
           description: this.description,
           id: id,
         });
-        console.log(t);
-        await db.notebooks.notebook(id).topics.add(...t);
-      
+        let allTopics = toEdit.topics;
+        t.forEach((title, index) => {
+          if (allTopics[index]) {
+            allTopics[index].title = title;
+          } else {
+            allTopics.push(title);
+          }
+        });
+        console.log(allTopics);
+        await db.notebooks.notebook(id).topics.add(...allTopics);
       } else {
         await db.notebooks.add({
           title: this.title,
@@ -146,7 +158,7 @@ export class AddNotebookDialog extends React.Component {
     }, 100);
   };
 
-  onSubmit = () => {
+  onSubmit = (forward = true) => {
     let {topics} = this.state;
     if (!this.currentInputValue || this.currentInputValue.trim().length === 0)
       return;
@@ -171,7 +183,7 @@ export class AddNotebookDialog extends React.Component {
         topics: prevTopics,
       });
       this.currentInputValue = null;
-      if (prevTopics[this.prevIndex + 1]) {
+      if (prevTopics[this.prevIndex + 1] && forward) {
         this.prevIndex = this.prevIndex + 1;
         this.prevItem = prevTopics[this.prevIndex];
         this.currentInputValue = this.prevItem;
@@ -188,9 +200,11 @@ export class AddNotebookDialog extends React.Component {
         this.topicInputRef.setNativeProps({
           text: null,
         });
-        setTimeout(() => {
-          this.listRef.scrollToEnd({animated: true});
-        }, 30);
+        if (forward) {
+          setTimeout(() => {
+            this.listRef.scrollToEnd({animated: true});
+          }, 30);
+        }
       }
     }
   };
@@ -301,7 +315,7 @@ export class AddNotebookDialog extends React.Component {
             <TextInput
               ref={ref => (this.descriptionRef = ref)}
               style={{
-                padding: pv -2 ,
+                padding: pv - 2,
                 borderWidth: 1.5,
                 borderColor: descFocused ? colors.accent : colors.nav,
                 paddingHorizontal: ph,
@@ -364,7 +378,7 @@ export class AddNotebookDialog extends React.Component {
                   });
                 }}
                 onBlur={() => {
-                  this.onSubmit();
+                  this.onSubmit(false);
                   this.setState({
                     topicInputFoused: false,
                   });
