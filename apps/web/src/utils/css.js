@@ -21,3 +21,10 @@ function getRootStylesheet() {
     }
   }
 }
+
+export function changeSvgTheme(newAccent) {
+  var nodes = document.querySelectorAll('*[fill="#0560ff"]');
+  console.log(nodes);
+  for (var n = 0; n < nodes.length; ++n)
+    nodes[n].setAttribute("fill", newAccent);
+}

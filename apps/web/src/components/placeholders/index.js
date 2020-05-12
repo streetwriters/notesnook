@@ -1,8 +1,15 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Flex } from "rebass";
+import { useStore } from "../../stores/theme-store";
+import { changeSvgTheme } from "../../utils/css";
 
 function Placeholder(props) {
-  const { items, renderItem } = props;
+  const accent = useStore((store) => store.accent);
+  useEffect(() => {
+    changeSvgTheme(accent);
+  }, [accent]);
+  const { image: Image } = props;
+
   return (
     <>
       <Flex
@@ -10,7 +17,7 @@ function Placeholder(props) {
         alignSelf="stretch"
         sx={{ position: "relative" }}
       >
-        {items.map(renderItem)}
+        <Image width={"100%"} height={"200px"} />
       </Flex>
     </>
   );

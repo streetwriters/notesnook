@@ -7,6 +7,7 @@ import ListContainer from "../components/list-container";
 import { confirm } from "../components/dialogs/confirm";
 import { useStore, store } from "../stores/trash-store";
 import { toTitleCase } from "../utils/string";
+import TrashPlaceholder from "../components/placeholders/trash-placeholder";
 
 function menuItems(item, index) {
   return [
@@ -39,6 +40,7 @@ function Trash() {
   return (
     <ListContainer
       type="trash"
+      placeholder={TrashPlaceholder}
       items={items}
       item={(index, item) => (
         <ListItem

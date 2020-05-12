@@ -20,6 +20,7 @@ function Notes(props) {
     <ListContainer
       type="notes"
       items={context.notes}
+      placeholder={props.placeholder}
       item={(index, item) => (
         <Note index={index} pinnable={false} item={item} context={context} />
       )}

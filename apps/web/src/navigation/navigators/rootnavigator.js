@@ -13,6 +13,7 @@ import { store as userStore } from "../../stores/user-store";
 import { store as themeStore } from "../../stores/theme-store";
 import { showLogInDialog } from "../../components/dialogs/logindialog";
 import { NotebookNavigator, TagNavigator, SettingsNavigator } from "./index";
+import FavoritesPlaceholder from "../../components/placeholders/favorites-placeholder";
 
 export const bottomRoutes = {
   ...createDeadRoute("nightmode", Icon.Theme, {
@@ -62,6 +63,7 @@ export const routes = {
     },
     {
       context: { type: "favorites" },
+      placeholder: FavoritesPlaceholder,
     }
   ),
   ...createNormalRoute("trash", Trash, Icon.Trash, {
