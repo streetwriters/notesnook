@@ -113,12 +113,20 @@ export class AddNotebookDialog extends React.Component {
   addNewNotebook = async () => {
     setTimeout(async () => {
       let {topics} = this.state;
+      let edit = this.props.toEdit;
 
-      let toEdit = db.notebooks.notebook(this.props.toEdit.id).data;
+      console.log(this.title, "ELO");
       if (!this.title || this.title.trim().length === 0)
         return ToastEvent.show('Title is required', 'error', 'local');
 
-      let id = toEdit && toEdit.id ? toEdit.id : null;
+      let id = edit && edit.id ? edit.id : null;
+
+      let toEdit;
+      if (id) {
+       toEdit = db.notebooks.notebook(edit.id).data;
+      }
+
+
       let prevTopics = [...topics];
 
       if (
