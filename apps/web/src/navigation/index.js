@@ -19,6 +19,8 @@ class Navigator {
   }
 
   onLoad = () => {
+    if (!this.options.persist) return;
+
     const opts = Config.get(this.root, {
       history: [],
       lastRoute: this.getRoute(this.options.default),
@@ -41,6 +43,8 @@ class Navigator {
   }
 
   setLastRoute(route) {
+    if (!this.options.persist) return;
+
     this.lastRoute = route;
     // cache the route in localStorage
     // NOTE: we delete the navigator key if any so it's always new across refreshes
@@ -56,7 +60,7 @@ class Navigator {
     return document.querySelector(`.${this.root}`);
   }
 
-  navigate(routeName, params = {}, force = false) {
+  getNavigationRoute(routeName, params = {}, force = false) {
     let route = this.getRoute(routeName);
 
     this.onNavigate(route);
@@ -69,11 +73,24 @@ class Navigator {
 
     this.pushToHistory();
     this.setLastRoute(route);
+    return route;
+  }
 
+  navigate(routeName, params = {}, force = false) {
+    const route = this.getNavigationRoute(routeName, params, force);
+    if (!route) return false;
     return this.renderRoute(route);
   }
 
-  renderRoute(route) {
+  navigateWithResult(routeName, params = {}, force = false) {
+    return new Promise((resolve) => {
+      const route = this.getNavigationRoute(routeName, params, force);
+      if (!route) return false;
+      this.renderRoute(route, resolve);
+    });
+  }
+
+  renderRoute(route, onDone = null) {
     let root = this.getRoot();
     if (!root) {
       return false;
@@ -100,6 +117,7 @@ class Navigator {
             canGoBack={
               this.options.backButtonEnabled && this.history.length > 0
             }
+            onDone={onDone}
             backAction={() => this.goBack()}
           />
         </Animated.Flex>

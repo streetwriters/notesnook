@@ -33,7 +33,12 @@ export const bottomRoutes = {
       } else return RootNavigator.navigate("account");
     },
   }),
-  ...createNavigatorRoute("settings", Icon.Settings, "Settings", SettingsNavigator),
+  ...createNavigatorRoute(
+    "settings",
+    Icon.Settings,
+    "Settings",
+    SettingsNavigator
+  ),
 };
 
 export const routes = {
@@ -41,7 +46,12 @@ export const routes = {
     title: "Home",
     options: SelectionModeOptions.NotesOptions,
   }),
-  ...createNavigatorRoute("notebooks", Icon.Notebook, "Notebooks", NotebookNavigator),
+  ...createNavigatorRoute(
+    "notebooks",
+    Icon.Notebook,
+    "Notebooks",
+    NotebookNavigator
+  ),
   ...createRoute(
     "favorites",
     Notes,
@@ -75,6 +85,7 @@ const RootNavigator = new Navigator(
   {
     backButtonEnabled: false,
     default: "home",
+    persist: true,
   }
 );
 

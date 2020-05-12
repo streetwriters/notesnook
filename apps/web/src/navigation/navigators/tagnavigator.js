@@ -13,6 +13,7 @@ const routes = {
 const TagNavigator = new Navigator("TagNavigator", routes, {
   backButtonEnabled: true,
   default: "tags",
+  persist: true,
 });
 
 export default TagNavigator;

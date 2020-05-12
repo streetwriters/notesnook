@@ -14,7 +14,11 @@ function Route(props) {
         <Header {...props} />
       </Flex>
       {props.route.component && (
-        <props.route.component navigator={navigator} {...props.params} />
+        <props.route.component
+          navigator={navigator}
+          onDone={props.onDone}
+          {...props.params}
+        />
       )}
     </ThemeProvider>
   );

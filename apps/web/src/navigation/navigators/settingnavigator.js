@@ -10,6 +10,7 @@ const routes = {
 const SettingsNavigator = new Navigator("SettingsNavigator", routes, {
   backButtonEnabled: true,
   default: "settings",
+  persist: true,
 });
 
 export default SettingsNavigator;

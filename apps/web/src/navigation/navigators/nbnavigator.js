@@ -18,6 +18,7 @@ const routes = {
 
 const NotebookNavigator = new Navigator("NotebookNavigator", routes, {
   backButtonEnabled: true,
+  persist: true,
   default: "notebooks",
 });
 export default NotebookNavigator;
