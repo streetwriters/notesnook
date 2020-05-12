@@ -6,6 +6,8 @@
   <style>
     .app-body {
       margin: 0px;
+      overflow:hidden;
+      
     }
 
     .floating-toolbar {
@@ -1060,7 +1062,7 @@
       background-color: transparent;
       border: none;
       height: 50;
-      width: 100vw;
+      width: 100%;
       outline: none;
       z-index: 10;
     }
@@ -1619,16 +1621,16 @@
             break;
           case "nomenu":
             let isenabled = value;
-            let width = window.innerWidth;
+            //let width = window.innerWidth;
             let titleIn = document.getElementById('titlebar');
             if (isenabled) {
-              titleIn.style.width = width - 72;
-              titleIn.style['margin-left'] = 12;
-              titleIn.style['margin-right'] = 60;
+              //titleIn.style.width = width;
+              titleIn.style['padding-left'] = 12;
+              titleIn.style['padding-right'] = 60;
             } else {
-              titleIn.style.width = width - 120;
-              titleIn.style['margin-left'] = 60;
-              titleIn.style['margin-right'] = 60;
+              //titleIn.style.width = width - 120;
+              titleIn.style['padding-left'] = 60;
+              titleIn.style['padding-right'] = 60;
             }
             break;
           case "title":
