@@ -20,6 +20,12 @@ export default class User {
     return { key: user.key, salt: user.salt };
   }
 
+  async pro() {
+    const user = await this.get();
+    if (!user) return false;
+    return user.isPro;
+  }
+
   async set(user) {
     if (!user) return;
     user = { ...(await this.get()), ...user };
