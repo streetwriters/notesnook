@@ -5,7 +5,6 @@ import { store as tagStore } from "./tag-store";
 import { store as mergeStore } from "./mergestore";
 import { db } from "../common";
 import BaseStore from ".";
-import Vault from "../common/vault.js";
 import EditorNavigator from "../navigation/navigators/editornavigator";
 import { isMobile } from "../utils/dimensions";
 
@@ -52,9 +51,10 @@ class EditorStore extends BaseStore {
 
     if (note.conflicted) {
       return await mergeStore.openConflict(note);
-    } else {
-      EditorNavigator.navigate("editor");
     }
+
+    noteStore.setSelectedNote(note.id);
+    saveLastOpenedNote(note.id);
 
     let content = {};
     if (!note.locked) {
@@ -63,7 +63,10 @@ class EditorStore extends BaseStore {
         delta: await db.notes.note(note).delta(),
       };
     } else {
-      content = await Vault.openNote(note.id);
+      content = await EditorNavigator.navigateWithResult("unlock", {
+        id: note.id,
+      });
+      console.log(content);
       if (!content) return;
     }
 
@@ -75,10 +78,8 @@ class EditorStore extends BaseStore {
         state: SESSION_STATES.new,
       };
     });
-    noteStore.setSelectedNote(note.id);
 
-    if (note.locked) return;
-    saveLastOpenedNote(note.id);
+    EditorNavigator.navigate("editor");
   };
 
   saveSession = (oldSession) => {

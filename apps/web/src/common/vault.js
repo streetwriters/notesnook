@@ -29,23 +29,6 @@ class Vault {
     }).then((res) => res && done());
   }
 
-  static openNote(id) {
-    return new Promise((resolve) => {
-      showPasswordDialog("unlock_note", (password) => {
-        return db.vault
-          .open(id, password)
-          .then((note) => {
-            resolve(note.content);
-            return true;
-          })
-          .catch((e) => {
-            if (e.message === db.vault.ERRORS.wrongPassword) return false;
-            else console.error(e);
-          });
-      });
-    });
-  }
-
   static lockNote(id, done) {
     return db.vault
       .add(id)

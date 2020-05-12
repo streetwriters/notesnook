@@ -72,10 +72,9 @@ function App() {
               variant="columnFill"
             />
           </Animated.Flex>
-          <Flex
-            width={[show ? 0 : "100%", 0, "100%"]}
-            className="EditorNavigator"
-          />
+          <Flex width={[show ? 0 : "100%", 0, "100%"]}>
+            <NavigationContainer navigator={EditorNavigator} />
+          </Flex>
         </Flex>
         <Box id="dialogContainer" />
         <Box id="snackbarContainer" />
