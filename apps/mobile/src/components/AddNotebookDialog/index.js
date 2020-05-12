@@ -40,6 +40,7 @@ export class AddNotebookDialog extends React.Component {
     this.currentInputValue = null;
     this.titleRef;
     this.descriptionRef;
+    this.topicsToDelete = [];
   }
 
   open = () => {
@@ -89,7 +90,12 @@ export class AddNotebookDialog extends React.Component {
     let {topics} = this.state;
     let prevTopics = topics;
     refs = [];
+    let topicIndex = prevTopics[index];
     prevTopics.splice(index, 1);
+    let edit = this.props.toEdit;
+    let topicToDelete = edit.topics[topicIndex];
+    this.topicsToDelete.push(topicToDelete.id);
+
     let nextTopics = [...prevTopics];
     if (this.prevIndex === index) {
       this.prevIndex = null;
@@ -107,14 +113,14 @@ export class AddNotebookDialog extends React.Component {
   addNewNotebook = async () => {
     setTimeout(async () => {
       let {topics} = this.state;
-      let {toEdit} = this.props;
+      let toEdit = this.props.toEdit;
+      toEdit = db.notebooks.notebook(toEdit.id).data;
       if (!this.title || this.title.trim().length === 0)
         return ToastEvent.show('Title is required', 'error', 'local');
 
       let id = toEdit && toEdit.id ? toEdit.id : null;
-
       let t = [...topics];
-      console.log(this.prevIndex, this.prevItem);
+
       if (
         this.currentInputValue &&
         this.currentInputValue.trim().length !== 0
@@ -127,6 +133,13 @@ export class AddNotebookDialog extends React.Component {
         }
       }
       if (id) {
+        if (this.topicsToDelete.length > 0) {
+          await db.notebooks
+            .notebook(edit.id)
+            .topics.delete(...this.topicsToDelete);
+          toEdit = db.notebooks.notebook(toEdit.id).data;
+        }
+
         await db.notebooks.add({
           title: this.title,
           description: this.description,
@@ -140,7 +153,6 @@ export class AddNotebookDialog extends React.Component {
             allTopics.push(title);
           }
         });
-        console.log(allTopics);
         await db.notebooks.notebook(id).topics.add(...allTopics);
       } else {
         await db.notebooks.add({
