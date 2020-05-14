@@ -735,7 +735,12 @@
     .ql-snow .ql-icon-picker .ql-picker-label svg {
       right: 4px;
     }
-
+    #mdi-format-textdirection-l-to-r, 
+    #mdi-format-textdirection-r-to-l {
+      width:20px !important;
+      height:20px !important;
+      margin-top: 3px;
+    }
 
     .ql-snow .ql-icon-picker .ql-picker-options {
       padding: 4px 0px;
@@ -760,13 +765,21 @@
       padding: 0px;
       width: 20px;
     }
+    #mdi-format-align-left,
+    #mdi-format-align-center,
+    #mdi-format-align-justify,
+    #mdi-format-align-right {
+      width: 20px !important;
+      height:20px !important;
+      margin-top: -1px;
+    }
 
     .ql-snow .ql-picker:not(.ql-color-picker):not(.ql-icon-picker) svg {
       position: absolute;
-      margin-top: -9px;
       right: 0;
-      top: 50%;
+      top: calc(50% - 10px);
       width: 20px;
+      height: 20px;
     }
 
     .ql-snow .ql-picker.ql-header .ql-picker-label[data-label]:not([data-label=''])::before,
@@ -1013,6 +1026,8 @@
       border-color: #f0f0f0;
     }
 
+    
+
     .ql-toolbar.ql-snow .ql-picker.ql-expanded .ql-picker-options {
       border-color: #f0f0f0;
     }
@@ -1083,6 +1098,8 @@
     #titlebar input:focus {
       outline: none;
     }
+
+   
 
     #infowords {
       margin-right: 5px;
@@ -1281,7 +1298,7 @@
             value: document.getElementById('titleInput').value
           }
 
-          window.ReactNativeWebView.postMessage(JSON.stringify(titleMessage));
+         window.ReactNativeWebView.postMessage(JSON.stringify(titleMessage));
         }
         function onChangetitle() {
           editor.focus();
@@ -1290,7 +1307,7 @@
             type: 'title',
             value: document.getElementById('titleInput').value
           }
-          window.ReactNativeWebView.postMessage(JSON.stringify(titleMessage));
+         window.ReactNativeWebView.postMessage(JSON.stringify(titleMessage));
         }
         const setTheme = function () {
 
