@@ -23,6 +23,7 @@ import {
   eLoginDialogNavigateBack,
   eCloseLoginDialog,
   eSetModalNavigator,
+  eOpenSideMenu,
 } from '../../services/events';
 import * as Animatable from 'react-native-animatable';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -54,9 +55,7 @@ export const Signup = ({route, navigation}) => {
   const [failed, setFailed] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState(false);
-  const [key, setKey] = useState(
-    'xyzLLbr1tafjdfklsdfjlksafjhklfadsafsljkfsfadfljkdfassafsafaffasdfsafafs',
-  );
+  const [key, setKey] = useState('');
   const [passwordReEnter, setPasswordReEnter] = useState(null);
   const [secureEntry, setSecureEntry] = useState(true);
   let isFocused = useIsFocused();
@@ -69,6 +68,9 @@ export const Signup = ({route, navigation}) => {
     eSubscribeEvent(eLoginDialogNavigateBack, handleBackPress);
     return () => {
       eUnSubscribeEvent(eLoginDialogNavigateBack, handleBackPress);
+      if (params.fromHome) {
+        eSendEvent(eOpenSideMenu);
+      }
     };
   }, [isFocused]);
 
@@ -126,14 +128,14 @@ export const Signup = ({route, navigation}) => {
           route: route,
           color: null,
           navigation: navigation,
-          ind:!route.params.root
+          ind: !route.params.root,
         },
       });
       dispatch({
         type: ACTIONS.CONTAINER_BOTTOM_BUTTON,
         state: {
           visible: false,
-          ind:!route.params.root
+          ind: !route.params.root,
         },
       });
       dispatch({
@@ -151,7 +153,7 @@ export const Signup = ({route, navigation}) => {
         type: ACTIONS.HEADER_TEXT_STATE,
         state: {
           heading: 'Create Account',
-          ind:!route.params.root
+          ind: !route.params.root,
         },
       });
 
@@ -164,7 +166,7 @@ export const Signup = ({route, navigation}) => {
         type: ACTIONS.SEARCH_STATE,
         state: {
           noSearch: true,
-          ind:!route.params.root
+          ind: !route.params.root,
         },
       });
       if (!route.params.root) {
@@ -715,7 +717,7 @@ export const Signup = ({route, navigation}) => {
                 onPress={_signUp}
                 style={{
                   ...getElevation(5),
-                  padding: pv+2,
+                  padding: pv + 2,
                   backgroundColor: colors.accent,
                   borderRadius: 5,
                   marginHorizontal: 12,
