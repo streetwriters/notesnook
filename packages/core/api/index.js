@@ -10,6 +10,7 @@ import Lookup from "./lookup";
 import Content from "../collections/content";
 import Conflicts from "./sync/conflicts";
 import EventManager from "../utils/event-manager";
+import Session from "./session";
 
 class Database {
   constructor(context) {
@@ -18,6 +19,14 @@ class Database {
   }
 
   async init() {
+    this.session = new Session();
+    if (!(await this.session.valid())) {
+      throw new Error(
+        "Your system clock is not setup correctly. Please adjust your date and time and then retry."
+      );
+    }
+
+    await this.context.write("t", Date.now());
     this.user = new User(this);
     this.syncer = new Sync(this);
     this.vault = new Vault(this);
