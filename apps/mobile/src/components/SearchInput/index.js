@@ -146,8 +146,6 @@ export const Search = props => {
 
   return searchState.data[0] && !searchState.noSearch ? (
     <Animated.View
-      transition={['marginTop', 'opacity']}
-      duration={200}
       style={{
         opacity: _opacity,
         height: 60,
@@ -156,8 +154,6 @@ export const Search = props => {
         paddingHorizontal: 12,
       }}>
       <Animated.View
-        transition={['borderWidth']}
-        duration={300}
         style={{
           flexDirection: 'row',
           justifyContent: 'space-between',
@@ -210,7 +206,7 @@ export const Search = props => {
                 : colors.accent
               : colors.icon
           }
-          size={SIZE.xl}
+          size={SIZE.xxl}
         />
       </Animated.View>
     </Animated.View>
