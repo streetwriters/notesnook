@@ -48,7 +48,7 @@ function Settings(props) {
             <>
               <Text variant="subBody">You are not logged in</Text>
               <Text variant="body" color="primary">
-                Login to sync notes.
+                Login to sync your data
               </Text>
             </>
           )}
