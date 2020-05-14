@@ -20,10 +20,10 @@ export default class User {
     return { key: user.key, salt: user.salt };
   }
 
-  async pro() {
+  async isPremium() {
     const user = await this.get();
     if (!user) return false;
-    return user.isPro;
+    return user.isPremium || user.trialExpiryDate < Date.now() * 1000;
   }
 
   async set(user) {
