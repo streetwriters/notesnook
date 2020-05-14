@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Flex, Text } from "rebass";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { getRandom } from "../../utils/random";
@@ -11,6 +11,7 @@ const data = [
 
 function LoginBar() {
   const isLoggedIn = useUserStore((store) => store.isLoggedIn);
+  const [text] = useState(data[getRandom(0, data.length)]);
 
   if (isLoggedIn) return null;
   return (
@@ -23,7 +24,7 @@ function LoginBar() {
       sx={{ cursor: "pointer" }}
       onClick={showLogInDialog}
     >
-      <Text variant="body">{data[getRandom(0, data.length)]}</Text>
+      <Text variant="body">{text}</Text>
       <Text variant="subBody">Click here to login</Text>
     </Flex>
   );
