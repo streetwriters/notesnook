@@ -100,9 +100,11 @@ function Header() {
           <Icon.FocusMode size={30} />
         )}
       </Flex>
-      <Flex alignItems="center" onClick={() => toggleProperties()} pr={3}>
-        <Icon.Properties size={30} />
-      </Flex>
+      {!isFocusMode && (
+        <Flex alignItems="center" onClick={() => toggleProperties()} pr={3}>
+          <Icon.Properties size={30} />
+        </Flex>
+      )}
     </Flex>
   );
 }
