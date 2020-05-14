@@ -1,16 +1,38 @@
-import React, { createRef, useEffect, useState } from 'react';
-import { BackHandler, KeyboardAvoidingView, Linking, Platform, SafeAreaView, StatusBar, TouchableOpacity, View } from 'react-native';
+import React, {createRef, useEffect, useState} from 'react';
+import {
+  BackHandler,
+  KeyboardAvoidingView,
+  Linking,
+  Platform,
+  SafeAreaView,
+  StatusBar,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import WebView from 'react-native-webview';
-import { normalize, SIZE } from '../../common/common';
-import { ActionSheetEvent, simpleDialogEvent } from '../../components/DialogManager/recievers';
-import { TEMPLATE_EXIT_FULLSCREEN } from '../../components/DialogManager/templates';
-import { useTracked } from '../../provider';
-import { ACTIONS } from '../../provider/actions';
-import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/eventManager';
-import { eClearEditor, eCloseFullscreenEditor, eOnLoadNote, eOpenFullscreenEditor, refreshNotesPage } from '../../services/events';
-import { exitEditorAnimation } from '../../utils/animations';
-import { db, DDS, editing, timeConverter, ToastEvent } from '../../utils/utils';
+import {normalize, SIZE} from '../../common/common';
+import {
+  ActionSheetEvent,
+  simpleDialogEvent,
+} from '../../components/DialogManager/recievers';
+import {TEMPLATE_EXIT_FULLSCREEN} from '../../components/DialogManager/templates';
+import {useTracked} from '../../provider';
+import {ACTIONS} from '../../provider/actions';
+import {
+  eSendEvent,
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+} from '../../services/eventManager';
+import {
+  eClearEditor,
+  eCloseFullscreenEditor,
+  eOnLoadNote,
+  eOpenFullscreenEditor,
+  refreshNotesPage,
+} from '../../services/events';
+import {exitEditorAnimation, EditorScale} from '../../utils/animations';
+import {db, DDS, editing, timeConverter, ToastEvent} from '../../utils/utils';
 
 const InfoBarRef = createRef();
 const EditorWebView = createRef();
@@ -27,7 +49,7 @@ let handleBack;
 const Editor = ({noMenu}) => {
   // Global State
   const [state, dispatch] = useTracked();
-  const {colors, currentEditingNote} = state;
+  const {colors, currentEditingNote,premium} = state;
   const [fullscreen, setFullscreen] = useState(false);
   const [dateEdited, setDateEdited] = useState(0);
 
@@ -218,6 +240,10 @@ const Editor = ({noMenu}) => {
     }
   };
 
+  useEffect(() => {
+    EditorWebView.current?.reload();
+  },[premium])
+
   const checkIfContentIsSavable = () => {
     if (!canSave) return false;
     if (!title && !content) return false;
@@ -323,6 +349,7 @@ const Editor = ({noMenu}) => {
   }, [noMenu]);
 
   const onWebViewLoad = () => {
+    EditorWebView.current?.injectJavaScript(INJECTED_JAVASCRIPT);
     if (noMenu) {
       post({
         type: 'nomenu',
@@ -421,7 +448,7 @@ const Editor = ({noMenu}) => {
     return () => {
       eUnSubscribeEvent(eCloseFullscreenEditor, closeFullscreen);
     };
-  },[]);
+  }, []);
 
   const _onHardwareBackPress = async () => {
     if (editing.currentlyEditing) {
@@ -472,6 +499,11 @@ const Editor = ({noMenu}) => {
       }
     }
   };
+
+  const INJECTED_JAVASCRIPT = `(function() {
+   
+    loadAction(${premium});
+})();`;
 
   return (
     <SafeAreaView
@@ -582,7 +614,9 @@ const Editor = ({noMenu}) => {
           onError={error => console.log(error)}
           onLoad={onWebViewLoad}
           javaScriptEnabled={true}
-          injectedJavaScript={Platform.OS === 'ios' ? injectedJS : null}
+          injectedJavaScript={
+            Platform.OS === 'ios' ? injectedJS : null
+          }
           onShouldStartLoadWithRequest={_onShouldStartLoadWithRequest}
           renderLoading={() => (
             <View
@@ -593,6 +627,7 @@ const Editor = ({noMenu}) => {
               }}
             />
           )}
+      
           cacheMode="LOAD_DEFAULT"
           cacheEnabled={false}
           domStorageEnabled={true}
@@ -615,7 +650,7 @@ const Editor = ({noMenu}) => {
           style={{
             height: '100%',
             maxHeight: '100%',
-            width:"100%",
+            width: '100%',
             backgroundColor: 'transparent',
           }}
           onMessage={_onMessage}
