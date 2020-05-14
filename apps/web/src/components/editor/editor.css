@@ -21,9 +21,15 @@
   padding-top: 1px;
   font-size: 18px;
 }
+
 .ql-formats {
   margin-bottom: 5px;
 }
+
+.ql-formats > * {
+  margin-right: 5px !important;
+}
+
 .ql-header.ql-picker {
   width: 120px !important;
 }
