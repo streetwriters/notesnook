@@ -114,8 +114,6 @@ export class AddNotebookDialog extends React.Component {
     setTimeout(async () => {
       let {topics} = this.state;
       let edit = this.props.toEdit;
-
-      console.log(this.title, "ELO");
       if (!this.title || this.title.trim().length === 0)
         return ToastEvent.show('Title is required', 'error', 'local');
 
