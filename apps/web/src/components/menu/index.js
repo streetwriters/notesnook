@@ -1,7 +1,10 @@
 import React from "react";
 import { Flex, Box, Text } from "rebass";
+import { useStore as useUserStore } from "../../stores/user-store";
 
 function Menu(props) {
+  const isPremium = useUserStore((store) => store.isPremium);
+
   return (
     <Flex
       id={props.id}
@@ -38,12 +41,16 @@ function Menu(props) {
                   if (props.closeMenu) {
                     props.closeMenu();
                   }
-                  if (item.onClick) {
+                  const onlyPro = item.onlyPro && !isPremium;
+                  if (onlyPro && item.onClick) {
                     item.onClick(props.data);
+                  } else {
+                    // TODO show the buy dialog
                   }
                 }}
                 flexDirection="row"
                 alignItems="center"
+                justifyContent="space-between"
                 py={"8px"}
                 px={3}
                 sx={{
@@ -59,6 +66,17 @@ function Menu(props) {
                 ) : (
                   <Text as="span" fontFamily="body" fontSize="menu">
                     {item.title}
+                  </Text>
+                )}
+                {item.onlyPro && !isPremium && (
+                  <Text
+                    fontSize="menu"
+                    bg="primary"
+                    color="static"
+                    px={1}
+                    sx={{ borderRadius: "default" }}
+                  >
+                    Pro
                   </Text>
                 )}
               </Flex>

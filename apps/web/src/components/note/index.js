@@ -27,10 +27,12 @@ function menuItems(note, context) {
     {
       title: note.pinned ? "Unpin" : "Pin",
       onClick: () => store.pin(note),
+      onlyPro: true,
     },
     {
       title: note.favorite ? "Unfavorite" : "Favorite",
       onClick: () => store.favorite(note),
+      onlyPro: true,
     },
     { title: "Edit", onClick: () => editorStore.openSession(note) },
     {
@@ -43,6 +45,7 @@ function menuItems(note, context) {
           unlock(note.id);
         }
       },
+      onlyPro: true,
     },
     {
       visible: context ? (context.type === "topic" ? true : false) : false,
