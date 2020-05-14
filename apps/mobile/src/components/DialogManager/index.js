@@ -1,19 +1,40 @@
-import React, { Component } from 'react';
-import { Platform } from 'react-native';
-import { eSubscribeEvent, eUnSubscribeEvent, openVault } from '../../services/eventManager';
-import { eCloseActionSheet, eCloseAddNotebookDialog, eCloseAddTopicDialog, eCloseLoginDialog, eCloseMoveNoteDialog, eCloseSimpleDialog, eOnLoadNote, eOpenActionSheet, eOpenAddNotebookDialog, eOpenAddTopicDialog, eOpenLoginDialog, eOpenMoveNoteDialog, eOpenSimpleDialog } from '../../services/events';
-import { DDS, hexToRGBA } from '../../utils/utils';
+import React, {Component} from 'react';
+import {Platform} from 'react-native';
+import {
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+  openVault,
+} from '../../services/eventManager';
+import {
+  eCloseActionSheet,
+  eCloseAddNotebookDialog,
+  eCloseAddTopicDialog,
+  eCloseLoginDialog,
+  eCloseMoveNoteDialog,
+  eCloseSimpleDialog,
+  eOnLoadNote,
+  eOpenActionSheet,
+  eOpenAddNotebookDialog,
+  eOpenAddTopicDialog,
+  eOpenLoginDialog,
+  eOpenMoveNoteDialog,
+  eOpenSimpleDialog,
+  eOpenPremiumDialog,
+  eClosePremiumDialog
+} from '../../services/events';
+import {DDS, hexToRGBA} from '../../utils/utils';
 import ActionSheet from '../ActionSheet';
-import { ActionSheetComponent } from '../ActionSheetComponent';
-import { AddNotebookDialog } from '../AddNotebookDialog';
-import { AddTopicDialog } from '../AddTopicDialog';
-import { Dialog } from '../Dialog';
+import {ActionSheetComponent} from '../ActionSheetComponent';
+import {AddNotebookDialog} from '../AddNotebookDialog';
+import {AddTopicDialog} from '../AddTopicDialog';
+import {Dialog} from '../Dialog';
 import MergeEditor from '../MergeEditor';
-import { VaultDialog } from '../VaultDialog';
-import { moveNoteEvent } from './recievers';
-import { TEMPLATE_DELETE, TEMPLATE_PERMANANT_DELETE } from './templates';
+import {VaultDialog} from '../VaultDialog';
+import {moveNoteEvent} from './recievers';
+import {TEMPLATE_DELETE, TEMPLATE_PERMANANT_DELETE} from './templates';
 import MoveNoteDialog from '../MoveNoteDialog';
 import LoginDialog from '../LoginDialog';
+import PremiumDialog from '../Premium/PremiumDialog';
 
 export class DialogManager extends Component {
   constructor(props) {
@@ -117,6 +138,9 @@ export class DialogManager extends Component {
 
     eSubscribeEvent(eOpenLoginDialog, this.showLoginDialog);
     eSubscribeEvent(eCloseLoginDialog, this.hideLoginDialog);
+    
+    eSubscribeEvent(eOpenPremiumDialog, this.showPremiumDialog);
+    eSubscribeEvent(eClosePremiumDialog, this.hidePremiumDialog);
   }
 
   componentWillUnmount() {
@@ -139,7 +163,19 @@ export class DialogManager extends Component {
 
     eUnSubscribeEvent(eOpenLoginDialog, this.showLoginDialog);
     eUnSubscribeEvent(eCloseLoginDialog, this.hideLoginDialog);
+
+    eUnSubscribeEvent(eOpenPremiumDialog, this.showPremiumDialog);
+    eUnSubscribeEvent(eClosePremiumDialog, this.hidePremiumDialog);
   }
+
+  showPremiumDialog = () => {
+    this.premiumDialog.open();
+  };
+
+  hidePremiumDialog = () => {
+    this.premiumDialog.close();
+  };
+  
 
   showLoginDialog = () => {
     this.loginDialog.open();
@@ -295,7 +331,7 @@ export class DialogManager extends Component {
         <MoveNoteDialog
           ref={ref => (this.moveNoteDialog = ref)}
           colors={colors}
-        /> 
+        />
 
         <AddTopicDialog
           ref={ref => (this.addTopicsDialog = ref)}
@@ -312,8 +348,9 @@ export class DialogManager extends Component {
           toEdit={item}
           colors={colors}
         />
+        <PremiumDialog ref={ref => this.premiumDialog = ref}  colors={colors} />
 
-       <LoginDialog colors={colors} ref={ref => (this.loginDialog = ref)} /> 
+        <LoginDialog colors={colors} ref={ref => (this.loginDialog = ref)} />
 
         <MergeEditor />
       </>
