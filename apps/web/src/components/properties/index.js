@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import * as Icon from "../icons";
 import { Flex, Text, Button } from "rebass";
 import { Input } from "@rebass/forms";
@@ -33,15 +33,18 @@ function Properties() {
   const toggleProperties = useStore((store) => store.toggleProperties);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
 
-  function changeState(prop, value) {
-    if (prop === "locked") {
-      toggleLocked();
-      return;
-    }
-    setSession((state) => {
-      state.session[prop] = value;
-    });
-  }
+  const changeState = useCallback(
+    function changeState(prop, value) {
+      if (prop === "locked") {
+        toggleLocked();
+        return;
+      }
+      setSession((state) => {
+        state.session[prop] = value;
+      });
+    },
+    [setSession, toggleLocked]
+  );
 
   return (
     !isFocusMode && (
@@ -60,7 +63,6 @@ function Properties() {
             right: 0,
             height: "100%",
           }}
-          onBlur={() => toggleProperties()}
         >
           <Flex
             sx={{
@@ -108,7 +110,9 @@ function Properties() {
             </Flex>
             <Button
               color="static"
-              onClick={() => showMoveNoteDialog([sessionId])}
+              onClick={async () => {
+                await showMoveNoteDialog([sessionId]);
+              }}
             >
               Add to notebook
             </Button>
