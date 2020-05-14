@@ -135,7 +135,9 @@ export const UserSection = ({noTextMode}) => {
       onPress={() => {
         DDS.isTab
           ? eSendEvent(eOpenLoginDialog)
-          : NavigationService.navigate('Login');
+          : NavigationService.navigate('Login',{
+            root:true
+          });
           sideMenuRef.current?.closeDrawer();
       }}
       activeOpacity={opacity / 2}
