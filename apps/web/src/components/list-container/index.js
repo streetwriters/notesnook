@@ -6,6 +6,7 @@ import * as Icon from "../icons";
 import { Virtuoso as List } from "react-virtuoso";
 import { useStore as useSearchStore } from "../../stores/searchstore";
 import { useStore as useSelectionStore } from "../../stores/selection-store";
+import LoginBar from "../loginbar";
 
 function ListContainer(props) {
   const setSearchContext = useSearchStore((store) => store.setSearchContext);
@@ -27,6 +28,7 @@ function ListContainer(props) {
 
   return (
     <Flex variant="columnFill">
+      <LoginBar />
       {!props.items.length && props.placeholder ? (
         <Flex variant="columnCenterFill">
           <props.placeholder />
