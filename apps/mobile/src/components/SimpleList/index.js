@@ -6,16 +6,19 @@ import {
   SectionList,
   Text,
   View,
+  TouchableOpacity,
 } from 'react-native';
 import {useSafeArea} from 'react-native-safe-area-context';
-import {SIZE, WEIGHT} from '../../common/common';
+import {SIZE, WEIGHT, opacity, pv} from '../../common/common';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
-import {eClearSearch, eScrollEvent} from '../../services/events';
-import {db, ToastEvent} from '../../utils/utils';
+import {eClearSearch, eScrollEvent, eOpenLoginDialog} from '../../services/events';
+import {db, ToastEvent, DDS} from '../../utils/utils';
 import * as Animatable from 'react-native-animatable';
 import {PinnedItemList} from './PinnedItemList';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import NavigationService from '../../services/NavigationService';
 const sectionListRef = createRef();
 
 const AnimatedFlatlist = Animatable.createAnimatableComponent(FlatList);
@@ -36,7 +39,7 @@ const SimpleList = ({
   isHome = false,
 }) => {
   const [state, dispatch] = useTracked();
-  const {colors, selectionMode} = state;
+  const {colors, selectionMode, user} = state;
   const searchResults = {...state.searchResults};
   const [refreshing, setRefreshing] = useState(false);
   const insets = useSafeArea();
@@ -165,11 +168,69 @@ const SimpleList = ({
               ? 155 - insets.top
               : 155 - 60 - insets.top,
         }}>
-          {
-            pinned?   <PinnedItemList type={type} />: null
-          }
-      
-
+        {user || !data[0] ? null : (
+          <TouchableOpacity
+            onPress={() => {
+              DDS.isTab
+                ? eSendEvent(eOpenLoginDialog)
+                : NavigationService.navigate('Login', {
+                    root: true,
+                  });
+            }}
+            activeOpacity={opacity }
+            style={{
+              paddingVertical:6,
+              width: '100%',
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'flex-start',
+              backgroundColor: colors.shade,
+              paddingHorizontal: 12,
+              alignSelf:'center',
+             
+            }}>
+            <View
+              style={{
+                width: 25,
+                backgroundColor: colors.accent,
+                height: 25,
+                borderRadius: 100,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
+              <Icon
+                style={{
+                  textAlign: 'center',
+                  textAlignVertical: 'center',
+                }}
+                name="account-outline"
+                color="white"
+                size={SIZE.xs}
+              />
+            </View>
+            <View
+              style={{
+                marginLeft: 10,
+              }}>
+              <Text
+                style={{
+                  fontFamily: WEIGHT.regular,
+                  color: colors.icon,
+                  fontSize: SIZE.xxs - 1,
+                }}>
+                You are not logged in
+              </Text>
+              <Text
+                style={{
+                  color: colors.accent,
+                  fontSize: SIZE.xxs,
+                }}>
+                Login to sync your {type}.
+              </Text>
+            </View>
+          </TouchableOpacity>
+        )}
+        {pinned ? <PinnedItemList type={type} /> : null}
       </View>
     );
 
