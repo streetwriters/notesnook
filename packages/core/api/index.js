@@ -28,7 +28,7 @@ class Database {
   }
 
   async init() {
-    this.session = new Session();
+    this.session = new Session(this.context);
     this._validate();
 
     this.user = new User(this);
