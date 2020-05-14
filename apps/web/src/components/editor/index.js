@@ -5,6 +5,7 @@ import { Flex } from "rebass";
 import Properties from "../properties";
 import { useStore, SESSION_STATES } from "../../stores/editor-store";
 import { useStore as useAppStore } from "../../stores/app-store";
+import { useStore as useUserStore } from "../../stores/user-store";
 import Animated from "../animated";
 import EditorMenu from "./editormenu";
 import Header from "./header";
@@ -15,6 +16,7 @@ function Editor() {
   const setSession = useStore((store) => store.setSession);
   const saveSession = useStore((store) => store.saveSession);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
+  const isPremium = useUserStore((store) => store.isPremium);
   const quillRef = useRef();
 
   useEffect(() => {
@@ -54,6 +56,7 @@ function Editor() {
           id="quill"
           ref={quillRef}
           refresh={sessionState === SESSION_STATES.new}
+          isSimple={!isPremium}
           initialContent={delta}
           placeholder="Type anything here"
           container=".editor"
@@ -70,7 +73,7 @@ function Editor() {
           }}
         />
       </Flex>
-     <Properties />
+      <Properties />
     </Animated.Flex>
   );
 }

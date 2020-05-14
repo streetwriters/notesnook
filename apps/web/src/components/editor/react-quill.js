@@ -35,6 +35,20 @@ const quillModules = {
   magicUrl: true,
 };
 
+const simpleQuillModules = {
+  toolbar: [
+    [{ header: 1 }, { header: 2 }],
+    ["bold", "italic", "underline", "strike", "blockquote"],
+    [
+      { align: "" },
+      { align: "center" },
+      { align: "right" },
+      { align: "justify" },
+    ],
+    [{ direction: "rtl" }, "clean"],
+  ],
+};
+
 export default class ReactQuill extends Component {
   /** @private */
   quill;
@@ -44,7 +58,9 @@ export default class ReactQuill extends Component {
 
   shouldComponentUpdate(nextProps) {
     return (
-      this.props.readOnly !== nextProps.readOnly || nextProps.refresh || false
+      this.props.readOnly !== nextProps.readOnly ||
+      nextProps.refresh ||
+      this.props.isSimple !== nextProps.isSimple
     );
   }
 
@@ -68,12 +84,12 @@ export default class ReactQuill extends Component {
       onSave,
       modules,
       id,
+      isSimple,
     } = this.props;
-
     this.quill = new Quill("#" + id, {
       placeholder,
       bounds: container,
-      modules: modules || quillModules,
+      modules: modules || (isSimple ? simpleQuillModules : quillModules),
       theme: "snow",
       readOnly,
     });

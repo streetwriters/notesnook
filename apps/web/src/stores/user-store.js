@@ -11,13 +11,16 @@ class UserStore extends BaseStore {
   isSigningIn = false;
   isSyncing = false;
   user = undefined;
+  isPremium = false;
 
   init = () => {
-    return db.user.get().then((user) => {
+    return db.user.get().then(async (user) => {
       if (!user) return false;
+      const isPremium = await db.user.isPremium();
       this.set((state) => {
         state.user = user;
         state.isLoggedIn = true;
+        state.isPremium = isPremium;
       });
       db.ev.subscribe("sync", () => {
         this.sync();
