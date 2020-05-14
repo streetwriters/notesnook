@@ -42,10 +42,10 @@ function Menu(props) {
                     props.closeMenu();
                   }
                   const onlyPro = item.onlyPro && !isPremium;
-                  if (onlyPro && item.onClick) {
+                  if (onlyPro) {
+                    // TODO
+                  } else if (item.onClick) {
                     item.onClick(props.data);
-                  } else {
-                    // TODO show the buy dialog
                   }
                 }}
                 flexDirection="row"
