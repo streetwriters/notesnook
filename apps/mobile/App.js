@@ -10,6 +10,8 @@ import {eSubscribeEvent, eUnSubscribeEvent} from './src/services/eventManager';
 import {eDispatchAction, eStartSyncer} from './src/services/events';
 import {db, DDS} from './src/utils/utils';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
+import { Toast } from './src/components/Toast';
+import { DialogManager } from './src/components/DialogManager';
 
 const App = () => {
   const [state, dispatch] = useTracked();
@@ -54,7 +56,7 @@ const App = () => {
     dispatch({type: ACTIONS.USER, user: u});
     dispatch({type: ACTIONS.ALL});
     dispatch({type: ACTIONS.SYNCING, syncing: false});
-  }
+  };
 
   useEffect(() => {
     eSubscribeEvent(eStartSyncer, startSyncer);
@@ -63,7 +65,7 @@ const App = () => {
       db.ev.unsubscribe('sync', _syncFunc);
       eUnSubscribeEvent(eStartSyncer, startSyncer);
     };
-  },[]);
+  }, []);
 
   useEffect(() => {
     Initialize().then(() => {
@@ -110,12 +112,14 @@ const App = () => {
     return <></>;
   }
   return (
-    <SafeAreaProvider>
-      <>
-        <I.Initialize />
-        <Loading />
-      </>
-    </SafeAreaProvider>
+    <>
+      <SafeAreaProvider>
+        <>
+          <I.Initialize />
+        </>
+      </SafeAreaProvider>
+
+    </>
   );
 };
 
