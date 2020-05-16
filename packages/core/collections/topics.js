@@ -73,12 +73,12 @@ export default class Topics {
     return new Topic(topic, this._notebookId, this._db);
   }
 
-  async delete(...topics) {
+  async delete(...topicIds) {
     let allTopics = qclone(this.all); //FIXME: make a deep copy
     for (let i = 0; i < allTopics.length; i++) {
       let topic = allTopics[i];
       if (!topic) continue;
-      let index = topics.findIndex((t) => (t.title || t) === topic.title);
+      let index = topicIds.findIndex((id) => topic.id === id);
       let t = this.topic(topic);
       await t.transaction(() => t.delete(...topic.notes), false);
       if (index > -1) {
