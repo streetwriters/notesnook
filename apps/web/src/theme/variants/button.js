@@ -105,6 +105,7 @@ class Menu {
     return {
       variant: "buttons.default",
       color: "text",
+      fontSize: 14,
       p: 2,
       borderRadius: "none",
       ":hover": {

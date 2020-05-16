@@ -165,9 +165,14 @@ class MoveDialog extends React.Component {
                       }
                     }}
                   >
-                    <Text sx={{ width: "80%" }}>{item.title}</Text>
+                    <Text sx={{ width: "80%" }} fontSize="body">
+                      {item.title}
+                    </Text>
                     {item.totalNotes !== undefined && (
-                      <Text sx={{ width: "20%", textAlign: "right" }}>
+                      <Text
+                        sx={{ width: "20%", textAlign: "right" }}
+                        fontSize="body"
+                      >
                         {item.totalNotes + " Notes"}
                       </Text>
                     )}
