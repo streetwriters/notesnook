@@ -7,6 +7,7 @@ import { store as appStore } from "../stores/app-store";
 import Route from "./route";
 import Config from "../utils/config";
 import { isMobile } from "../utils/dimensions";
+import { qclone } from "qclone";
 
 class Navigator {
   constructor(root, routes, options = {}) {
@@ -18,7 +19,7 @@ class Navigator {
     this.onNavigate = () => {};
   }
 
-  onLoad = () => {
+  onLoad = (params = null) => {
     if (!this.options.persist) return;
 
     const opts = Config.get(this.root, {
@@ -27,18 +28,26 @@ class Navigator {
     });
     this.history = opts.history;
     this.lastRoute = undefined;
-    this.navigate(opts.lastRoute.key, opts.lastRoute.params, true);
+    this.navigate(
+      opts.lastRoute.key,
+      { ...opts.lastRoute.params, ...params, noPersist: true },
+      true
+    );
   };
 
   getRoute(key) {
-    return this.routes[key];
+    return qclone(this.routes[key]);
   }
 
   pushToHistory() {
     const lastItem = this.history[this.history.length - 1];
     if (this.lastRoute) {
       if (lastItem && lastItem.key === this.lastRoute.key) return;
-      this.history.push(this.lastRoute);
+      const route = qclone(this.lastRoute);
+      if (route.params && route.params.noPersist) {
+        route.params = {};
+      }
+      this.history.push(route);
     }
   }
 
@@ -46,9 +55,10 @@ class Navigator {
     if (!this.options.persist) return;
 
     this.lastRoute = route;
+
     // cache the route in localStorage
     // NOTE: we delete the navigator key if any so it's always new across refreshes
-    const copy = { ...route, params: { ...route.params } };
+    const copy = qclone(route);
     if (copy.params.navigator) delete copy.params.navigator;
     Config.set(this.root, {
       history: this.history,
@@ -63,11 +73,11 @@ class Navigator {
   getNavigationRoute(routeName, params = {}, force = false) {
     let route = this.getRoute(routeName);
 
-    this.onNavigate(route);
-
     if (!force && (!route || this.lastRoute === route)) {
       return false;
     }
+
+    this.onNavigate(route);
 
     route.params = { ...route.params, ...params };
 

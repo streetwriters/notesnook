@@ -4,12 +4,36 @@ import AddNotebookDialog from "../components/dialogs/addnotebookdialog";
 import ListContainer from "../components/list-container";
 import { useStore, store } from "../stores/notebook-store";
 import NotebooksPlaceholder from "../components/placeholders/notebooks-placeholder";
+import { db } from "../common";
 
 function Notebooks(props) {
   const [open, setOpen] = useState(false);
   useEffect(() => store.refresh(), []);
   const notebooks = useStore((state) => state.notebooks);
   const add = useStore((state) => state.add);
+
+  useEffect(() => {
+    if (props.id) {
+      const notebook = db.notebooks.notebook(props.id);
+      if (props.topic) {
+        props.navigator.navigate("notes", {
+          title: notebook.title,
+          subtitle: props.topic,
+          context: {
+            type: "topic",
+            value: { id: props.id, topic: props.topic },
+          },
+        });
+      } else {
+        props.navigator.navigate("topics", {
+          title: notebook.title,
+          topics: notebook.data.topics,
+          notebook: notebook.data,
+        });
+      }
+    }
+  }, [props.id, props.topic, props.navigator]);
+
   return (
     <>
       <ListContainer

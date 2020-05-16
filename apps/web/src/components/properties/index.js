@@ -1,15 +1,16 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import * as Icon from "../icons";
 import { Flex, Text, Button } from "rebass";
 import { Input } from "@rebass/forms";
 import { useStore } from "../../stores/editor-store";
-import { COLORS } from "../../common";
+import { COLORS, db } from "../../common";
 import { objectMap } from "../../utils/object";
 import { useStore as useAppStore } from "../../stores/app-store";
 import Animated from "../animated";
 import Toggle from "./toggle";
 import { toTitleCase } from "../../utils/string";
 import { showMoveNoteDialog } from "../dialogs/movenotedialog";
+import RootNavigator from "../../navigation/navigators/rootnavigator";
 
 const tools = [
   { key: "pinned", icons: { on: Icon.PinFilled, off: Icon.Pin }, label: "Pin" },
@@ -22,10 +23,12 @@ const tools = [
 ];
 
 function Properties() {
+  const [notebook, setNotebook] = useState();
   const colors = useStore((store) => store.session.colors);
   const toggleLocked = useStore((store) => store.toggleLocked);
   const tags = useStore((store) => store.session.tags);
   const sessionId = useStore((store) => store.session.id);
+  const notebookData = useStore((store) => store.session.notebook);
   const setSession = useStore((store) => store.setSession);
   const setColor = useStore((store) => store.setColor);
   const setTag = useStore((store) => store.setTag);
@@ -45,6 +48,12 @@ function Properties() {
     },
     [setSession, toggleLocked]
   );
+
+  useEffect(() => {
+    if (notebookData && notebookData.id) {
+      setNotebook(db.notebooks.notebook(notebookData.id).data);
+    }
+  }, [notebookData]);
 
   return (
     !isFocusMode && (
@@ -114,8 +123,42 @@ function Properties() {
                 await showMoveNoteDialog([sessionId]);
               }}
             >
-              Add to notebook
+              {notebook ? "Move to another notebook" : "Add to notebook"}
             </Button>
+            {notebook && (
+              <Text as="span" variant="subBody" mt={1}>
+                In{" "}
+                <Text
+                  as="span"
+                  color="primary"
+                  sx={{ cursor: "pointer" }}
+                  onClick={() => {
+                    RootNavigator.navigate(
+                      "notebooks",
+                      { params: { id: notebookData.id } },
+                      true
+                    );
+                  }}
+                >
+                  {notebook.title}
+                </Text>{" "}
+                under{" "}
+                <Text
+                  as="span"
+                  color="primary"
+                  sx={{ cursor: "pointer" }}
+                  onClick={() => {
+                    RootNavigator.navigate(
+                      "notebooks",
+                      { params: notebookData },
+                      true
+                    );
+                  }}
+                >
+                  {notebookData.topic}
+                </Text>
+              </Text>
+            )}
             <Flex flexDirection="column">
               {objectMap(COLORS, (label, code) => (
                 <Flex
@@ -177,6 +220,7 @@ function Properties() {
                     marginRight: 1,
                     cursor: "pointer",
                   }}
+                  fontSize={"subBody"}
                   onClick={() => {
                     setTag(tag);
                   }}
