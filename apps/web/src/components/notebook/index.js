@@ -2,7 +2,9 @@ import React from "react";
 import { Flex, Text } from "rebass";
 import ListItem from "../list-item";
 import { store } from "../../stores/notebook-store";
+import * as Icon from "../icons";
 import { showEditNoteDialog } from "../dialogs/addnotebookdialog";
+import { confirm } from "../dialogs/confirm";
 
 function menuItems(notebook, index) {
   return [
@@ -17,7 +19,17 @@ function menuItems(notebook, index) {
     {
       title: "Delete",
       color: "red",
-      onClick: () => store.delete(notebook.id, index),
+      onClick: () => {
+        confirm(
+          Icon.Trash,
+          "Delete Notebook",
+          "Are you sure you want to delete this notebook?"
+        ).then(async (res) => {
+          if (res) {
+            await store.delete(notebook.id, index);
+          }
+        });
+      },
     },
   ];
 }
