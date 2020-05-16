@@ -33,7 +33,7 @@ function Menu(props) {
         </Text>
         {props.menuItems.map(
           (item) =>
-            !item.visible && (
+            (item.visible === undefined || item.visible === true) && (
               <Flex
                 key={item.title}
                 onClick={(e) => {

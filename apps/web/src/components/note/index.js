@@ -48,7 +48,7 @@ function menuItems(note, context) {
       onlyPro: true,
     },
     {
-      visible: context ? (context.type === "topic" ? true : false) : false,
+      visible: context && context.type === "topic",
       title: "Remove",
       onClick: async () => {
         confirm(
