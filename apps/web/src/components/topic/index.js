@@ -1,7 +1,15 @@
 import React from "react";
 import ListItem from "../list-item";
+import { showEditTopicDialog } from "../dialogs/topicdialog";
 
-const menuItems = [
+const menuItems = (item) => [
+  {
+    title: "Edit",
+    onClick: () => {
+      showEditTopicDialog(item);
+    },
+    visible: item.title === "General",
+  },
   {
     title: "Delete",
     color: "red",
@@ -19,7 +27,7 @@ function Topic({ item, index, onClick }) {
       info={`${topic.totalNotes} Notes`}
       index={index}
       menuData={topic}
-      menuItems={menuItems}
+      menuItems={menuItems(topic)}
     />
   );
 }

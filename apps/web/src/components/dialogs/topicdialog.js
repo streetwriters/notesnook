@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef } from "react";
 import { Box } from "rebass";
 import { Input } from "@rebass/forms";
 import * as Icon from "../icons";
@@ -7,7 +7,7 @@ import Dialog, { showDialog } from "./dialog";
 import { store } from "../../stores/notebook-store";
 
 function TopicDialog(props) {
-  const [topic, setTopic] = useState();
+  const ref = useRef();
   return (
     <Dialog
       isOpen={true}
@@ -15,16 +15,18 @@ function TopicDialog(props) {
       icon={props.icon}
       positiveButton={{
         text: "Add",
-        onClick: props.onYes.bind(this, topic),
+        onClick: () => {
+          props.onYes(ref.current.value);
+        },
       }}
       negativeButton={{ text: "Cancel", onClick: props.onNo }}
     >
       <Box my={1}>
         <Input
+          autoFocus
+          ref={ref}
           placeholder="Topic title"
-          onChange={(e) => {
-            setTopic(e.target.value);
-          }}
+          defaultValue={props.topic && props.topic.title}
         ></Input>
       </Box>
     </Dialog>
@@ -43,6 +45,26 @@ export function showTopicDialog(notebook) {
         if (!topic) return;
         await db.notebooks.notebook(notebook).topics.add(topic);
         store.setSelectedNotebookTopics(notebook);
+        perform(true);
+      }}
+    />
+  ));
+}
+
+export function showEditTopicDialog(topic) {
+  return showDialog((perform) => (
+    <TopicDialog
+      title={"Topic"}
+      icon={Icon.Topic}
+      topic={topic}
+      onNo={() => {
+        perform(false);
+      }}
+      onYes={async (t) => {
+        await db.notebooks
+          .notebook(topic.notebookId)
+          .topics.add({ ...topic, title: t });
+        store.setSelectedNotebookTopics(topic.notebookId);
         perform(true);
       }}
     />
