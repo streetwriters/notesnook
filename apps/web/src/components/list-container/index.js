@@ -28,7 +28,6 @@ function ListContainer(props) {
 
   return (
     <Flex variant="columnFill">
-      <LoginBar />
       {!props.items.length && props.placeholder ? (
         <Flex variant="columnCenterFill">
           <props.placeholder />
@@ -36,6 +35,7 @@ function ListContainer(props) {
       ) : (
         <>
           {!props.noSearch && <Search type={props.type} />}
+          <LoginBar />
           <Flex variant="columnFill" mt={2}>
             {props.children
               ? props.children
