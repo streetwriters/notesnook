@@ -4,6 +4,7 @@ import { Input } from "@rebass/forms";
 import * as Icon from "../icons";
 import Dialog, { showDialog } from "./dialog";
 import { store } from "../../stores/notebook-store";
+import { qclone } from "qclone";
 
 class AddNotebookDialog extends React.Component {
   MAX_AVAILABLE_HEIGHT = window.innerHeight * 0.3;
@@ -11,10 +12,10 @@ class AddNotebookDialog extends React.Component {
   description = "";
   _inputRefs = [];
   lastLength = 0;
-  topics = [""];
+  topics = [{ title: "" }];
   id = undefined;
   state = {
-    topics: [""],
+    topics: [{ title: "" }],
     focusedInputIndex: 0,
   };
 
@@ -31,7 +32,7 @@ class AddNotebookDialog extends React.Component {
   }
 
   addTopic(index) {
-    this._action(index + 1, 0, "");
+    this._action(index + 1, 0, { title: "" });
   }
 
   _action(index, deleteCount, replaceItem) {
@@ -54,9 +55,10 @@ class AddNotebookDialog extends React.Component {
 
   componentDidMount() {
     if (!this.props.notebook) return;
-    const { title, description, id, topics } = this.props.notebook;
+    const { title, description, id, topics } = qclone(this.props.notebook);
+    this.topics = topics;
     this.setState({
-      topics: topics.map((topic) => topic.title),
+      topics: topics,
     });
     this.title = title;
     this.description = description;
@@ -68,10 +70,10 @@ class AddNotebookDialog extends React.Component {
     this.description = "";
     this._inputRefs = [];
     this.lastLength = 0;
-    this.topics = [];
+    this.topics = [{ title: "" }];
     this.id = undefined;
     this.setState({
-      topics: [""],
+      topics: [{ title: "" }],
       focusedInputIndex: 0,
     });
   }
@@ -89,7 +91,10 @@ class AddNotebookDialog extends React.Component {
             props.onDone({
               title: this.title,
               description: this.description,
-              topics: this.topics,
+              topics: this.topics.map((topic) => {
+                if (topic.id) return topic;
+                return topic.title;
+              }),
               id: this.id,
             });
           },
@@ -124,7 +129,7 @@ class AddNotebookDialog extends React.Component {
                 <Input
                   ref={(ref) => {
                     this._inputRefs[index] = ref;
-                    if (ref) ref.value = value; // set default value
+                    if (ref) ref.value = value.title; // set default value
                   }}
                   placeholder="Topic name"
                   onFocus={(e) => {
@@ -133,7 +138,7 @@ class AddNotebookDialog extends React.Component {
                     this.setState({ focusedInputIndex: index });
                   }}
                   onChange={(e) => {
-                    this.topics[index] = e.target.value;
+                    this.topics[index].title = e.target.value;
                   }}
                   onKeyUp={(e) => {
                     if (e.nativeEvent.key === "Enter") {
