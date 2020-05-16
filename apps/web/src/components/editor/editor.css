@@ -27,7 +27,7 @@
 }
 
 .ql-formats > * {
-  margin-right: 5px !important;
+  margin-left: 5px !important;
 }
 
 .ql-header.ql-picker {
@@ -172,6 +172,7 @@ code {
 .ql-editor {
   font-size: 16px;
   color: var(--text) !important;
+  padding: 10px !important;
 }
 
 .ql-editor h1,
