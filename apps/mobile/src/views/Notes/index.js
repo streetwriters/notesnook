@@ -17,6 +17,7 @@ import {
 import {openEditorAnimation} from '../../utils/animations';
 import {db, DDS, editing, ToastEvent} from '../../utils/utils';
 import { NoteItemWrapper } from '../../components/SimpleList/NoteItemWrapper';
+import { Placeholder } from '../../components/ListPlaceholders';
 
 export const Notes = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
@@ -196,7 +197,7 @@ export const Notes = ({route, navigation}) => {
       focused={isFocused}
       customRefresh={_onRefresh}
       RenderItem={NoteItemWrapper}
-      placeholder={<></>}
+      placeholder={<Placeholder type="notes"/>}
       placeholderText={`Add some notes to this" ${
         params.type ? params.type : 'topic.'
       }`}

@@ -9,6 +9,7 @@ import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
 import {eScrollEvent} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
+import { Placeholder } from '../../components/ListPlaceholders';
 export const Folders = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const {notebooks} = state;
@@ -111,7 +112,7 @@ export const Folders = ({route, navigation}) => {
       hideMore={params.hideMore}
       isMove={params.isMove}
       noteToMove={params.note}
-      placeholder={<></>}
+      placeholder={<Placeholder type="notebooks" />}
       pinned={true}
       placeholderText="Notebooks you add will appear here"
     />

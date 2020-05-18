@@ -2,7 +2,7 @@ import { useIsFocused } from '@react-navigation/native';
 import React, { useEffect } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { pv, SIZE, WEIGHT } from '../../common/common';
-import { TagsPlaceHolder } from '../../components/ListPlaceholders';
+import { Placeholder } from '../../components/ListPlaceholders';
 import SimpleList from '../../components/SimpleList';
 import { useTracked } from '../../provider';
 import { ACTIONS } from '../../provider/actions';
@@ -73,7 +73,7 @@ export const Tags = ({route, navigation}) => {
       type="tags"
       focused={isFocused}
       RenderItem={RenderItem}
-      placeholder={<TagsPlaceHolder colors={colors} />}
+      placeholder={<Placeholder type="tags" />}
       placeholderText="Tags added to notes appear here"
     />
   );

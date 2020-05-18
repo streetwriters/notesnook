@@ -19,6 +19,7 @@ import * as Animatable from 'react-native-animatable';
 import {PinnedItemList} from './PinnedItemList';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import NavigationService from '../../services/NavigationService';
+import { Placeholder } from '../ListPlaceholders';
 const sectionListRef = createRef();
 
 const AnimatedFlatlist = Animatable.createAnimatableComponent(FlatList);
@@ -246,15 +247,6 @@ const SimpleList = ({
       }}>
       <>
         {placeholder}
-        <Text
-          style={{
-            color: colors.icon,
-            fontSize: SIZE.sm,
-            fontFamily: WEIGHT.regular,
-            marginTop: 35,
-          }}>
-          {placeholderText}
-        </Text>
       </>
     </View>
   );

@@ -1,17 +1,13 @@
-import {useIsFocused} from '@react-navigation/native';
-import React, {useEffect} from 'react';
-import {simpleDialogEvent} from '../../components/DialogManager/recievers';
-import {TEMPLATE_EMPTY_TRASH} from '../../components/DialogManager/templates';
-import {TrashPlaceHolder} from '../../components/ListPlaceholders';
-import {NotebookItem} from '../../components/NotebookItem';
-import NoteItem from '../../components/NoteItem';
-import SelectionWrapper from '../../components/SelectionWrapper';
+import { useIsFocused } from '@react-navigation/native';
+import React, { useEffect } from 'react';
+import { simpleDialogEvent } from '../../components/DialogManager/recievers';
+import { TEMPLATE_EMPTY_TRASH } from '../../components/DialogManager/templates';
+import { Placeholder } from '../../components/ListPlaceholders';
 import SimpleList from '../../components/SimpleList';
-import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
-import {w} from '../../utils/utils';
-import {NoteItemWrapper} from '../../components/SimpleList/NoteItemWrapper';
-import {NotebookItemWrapper} from '../../components/SimpleList/NotebookItemWrapper';
+import { NotebookItemWrapper } from '../../components/SimpleList/NotebookItemWrapper';
+import { NoteItemWrapper } from '../../components/SimpleList/NoteItemWrapper';
+import { useTracked } from '../../provider';
+import { ACTIONS } from '../../provider/actions';
 
 export const Trash = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
@@ -85,7 +81,7 @@ export const Trash = ({route, navigation}) => {
       type="trash"
       focused={isFocused}
       RenderItem={RenderItem}
-      placeholder={<TrashPlaceHolder colors={colors} />}
+      placeholder={<Placeholder type="trash" />}
       placeholderText="Deleted notes & notebooks appear here."
     />
   );

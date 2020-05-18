@@ -5,6 +5,7 @@ import {NoteItemWrapper} from '../../components/SimpleList/NoteItemWrapper';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {db, ToastEvent} from '../../utils/utils';
+import { Placeholder } from '../../components/ListPlaceholders';
 export const Favorites = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const {favorites} = state;
@@ -88,7 +89,7 @@ export const Favorites = ({route, navigation}) => {
       focused={isFocused}
       onRefresh={_onRefresh}
       RenderItem={NoteItemWrapper}
-      placeholder={<></>}
+      placeholder={<Placeholder type="favorites" />}
       placeholderText="Notes you favorite appear here"
     />
   );
