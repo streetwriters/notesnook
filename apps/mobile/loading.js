@@ -99,8 +99,7 @@ export const Loading = () => {
           e to write
         </Animatable.Text>
       </Animatable.View>
-      <Toast />
-      <DialogManager colors={colors} />
+ 
     </>
   );
 };
