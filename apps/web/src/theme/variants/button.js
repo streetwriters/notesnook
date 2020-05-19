@@ -70,7 +70,12 @@ class List {
       borderBottom: "1px solid",
       borderBottomColor: "border",
       borderRadius: 0,
-      p: 2,
+      textAlign: "left",
+      py: 2,
+      px: 0,
+      ":hover": {
+        borderBottomColor: "primary",
+      },
     };
   }
 }

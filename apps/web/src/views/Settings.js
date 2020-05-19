@@ -12,48 +12,79 @@ function Settings(props) {
   const toggleNightMode = useThemeStore((store) => store.toggleNightMode);
   const user = useUserStore((store) => store.user);
   const isLoggedIn = useUserStore((store) => store.isLoggedIn);
+  const isPremium = useUserStore((store) => store.isPremium);
+  const logout = useUserStore((store) => store.logout);
 
   return (
     <Flex variant="columnFill" mx={2}>
+      {isLoggedIn && (
+        <Text mb={2} variant="title" color="primary">
+          Account Settings
+        </Text>
+      )}
       <Flex
         bg="shade"
         p={2}
         sx={{ borderRadius: "default", cursor: "pointer" }}
         onClick={async () => {
-          if (isLoggedIn) {
-            props.navigator.navigate("account");
-          } else {
+          if (!isLoggedIn) {
             await showLogInDialog();
           }
+          // TODO open buy premium dialog
         }}
       >
         <Flex
-          variant="columnCenter"
-          bg="primary"
-          mr={2}
-          size={40}
-          sx={{
-            borderRadius: 80,
-          }}
+          flex="1 1 auto"
+          justifyContent="space-between"
+          alignItems="center"
         >
-          <Icon.User color="static" />
-        </Flex>
-        <Flex variant="columnCenter" alignItems="flex-start">
-          {isLoggedIn ? (
-            <>
-              <Text variant="title">{user.username}</Text>
-              <Text variant="subBody">{user.email}</Text>
-            </>
-          ) : (
-            <>
-              <Text variant="subBody">You are not logged in</Text>
-              <Text variant="body" color="primary">
-                Login to sync your data
-              </Text>
-            </>
-          )}
+          <Flex>
+            <Flex
+              variant="columnCenter"
+              bg="primary"
+              mr={2}
+              size={40}
+              sx={{
+                borderRadius: 80,
+              }}
+            >
+              <Icon.User color="static" />
+            </Flex>
+            <Flex variant="columnCenter" alignItems="flex-start">
+              {isLoggedIn ? (
+                <>
+                  <Text variant="title">{user.username}</Text>
+                  <Text variant="subBody">{user.email}</Text>
+                </>
+              ) : (
+                <>
+                  <Text variant="subBody">You are not logged in</Text>
+                  <Text variant="body" color="primary">
+                    Login to sync your data
+                  </Text>
+                </>
+              )}
+            </Flex>
+          </Flex>
+          <Text
+            bg="primary"
+            sx={{ borderRadius: "default" }}
+            color="static"
+            fontSize="title"
+            px={1}
+          >
+            {isPremium ? "Pro" : "Trial"}
+          </Text>
         </Flex>
       </Flex>
+      <Button
+        variant="list"
+        onClick={async () => {
+          await logout();
+        }}
+      >
+        Logout
+      </Button>
       <Text my={2} variant="title" color="primary">
         Appearance
       </Text>
