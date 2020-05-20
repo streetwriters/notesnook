@@ -186,19 +186,20 @@ export const Settings = ({route, navigation}) => {
                 borderWidth: 1,
                 borderRadius: 5,
                 paddingVertical: 8,
-                paddingHorizontal: 6,
+                paddingHorizontal: 10,
                 marginTop: 15,
                 alignItems: 'center',
                 borderColor: colors.nav,
               }}>
               <Text
-                numberOfLines={1}
+                numberOfLines={2}
                 style={{
                   fontFamily: WEIGHT.regular,
-                  fontSize: 16,
+                  fontSize: SIZE.sm,
                   width: '85%',
                   maxWidth: '85%',
-                  color: colors.pri,
+                  paddingRight: 10,
+                  color: colors.icon,
                 }}>
                 {key}
               </Text>
@@ -339,17 +340,10 @@ export const Settings = ({route, navigation}) => {
                 },
               },
               {
-                name: 'My vault',
-                func: () => {},
-              },
-              {
                 name: 'Subscription status',
                 func: () => {},
               },
-              {
-                name: 'Change password',
-                func: () => {},
-              },
+
               {
                 name: 'Logout',
                 func: async () => {
