@@ -51,11 +51,17 @@ const App = () => {
 
   const _syncFunc = async () => {
     dispatch({type: ACTIONS.SYNCING, syncing: true});
-    await db.sync();
     let u = await db.user.get();
+    try {
+      await db.sync();
+    } catch(e) {
+
+    }
+    u = await db.user.get();
     dispatch({type: ACTIONS.USER, user: u});
     dispatch({type: ACTIONS.ALL});
     dispatch({type: ACTIONS.SYNCING, syncing: false});
+
   };
 
   useEffect(() => {
