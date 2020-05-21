@@ -10,6 +10,7 @@ import {
   EditorOpacity,
   EditorPosition,
   EditorScale,
+  EditorTranslateY,
 } from './src/utils/animations';
 import {sideMenuRef} from './src/utils/refs';
 import {DDS} from './src/utils/utils';
@@ -106,6 +107,9 @@ export const Initialize = () => {
             transform: [
               {
                 translateX: EditorPosition,
+              },
+              {
+                translateY:EditorTranslateY,
               },
               {
                 scaleX: EditorScale,
