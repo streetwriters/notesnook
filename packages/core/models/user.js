@@ -26,6 +26,15 @@ export default class User {
     return user.isPremium || user.trialExpiryDate < Date.now() * 1000;
   }
 
+  async upgrade(refno) {
+    if (!refno) return;
+    await this.set({ refno, upgrading: true });
+    let response = await authRequest("upgrade", { refno });
+    if (response.success) {
+      await this.set({ refno: null, upgrading: false });
+    }
+  }
+
   async set(user) {
     if (!user) return;
     user = { ...(await this.get()), ...user };
