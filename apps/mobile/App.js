@@ -1,17 +1,14 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import MMKV from 'react-native-mmkv-storage';
 import Orientation from 'react-native-orientation';
-import {Loading} from './loading';
-import {getColorScheme, scale, updateSize} from './src/common/common';
-import {useTracked} from './src/provider';
-import {ACTIONS} from './src/provider/actions';
-import {defaultState} from './src/provider/defaultState';
-import {eSubscribeEvent, eUnSubscribeEvent} from './src/services/eventManager';
-import {eDispatchAction, eStartSyncer} from './src/services/events';
-import {db, DDS} from './src/utils/utils';
-import {SafeAreaProvider} from 'react-native-safe-area-context';
-import { Toast } from './src/components/Toast';
-import { DialogManager } from './src/components/DialogManager';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { getColorScheme, scale, updateSize } from './src/common/common';
+import { useTracked } from './src/provider';
+import { ACTIONS } from './src/provider/actions';
+import { defaultState } from './src/provider/defaultState';
+import { eSubscribeEvent, eUnSubscribeEvent } from './src/services/eventManager';
+import { eDispatchAction, eStartSyncer } from './src/services/events';
+import { db, DDS } from './src/utils/utils';
 
 const App = () => {
   const [state, dispatch] = useTracked();
