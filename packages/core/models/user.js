@@ -29,7 +29,12 @@ export default class User {
   async upgrade(refno) {
     if (!refno) return;
     await this.set({ refno, upgrading: true });
-    let response = await authRequest("upgrade", { refno });
+    const token = await this.token();
+    let response = await authRequest(
+      "upgrade",
+      { refno },
+      { Authorization: `Bearer ${token}` }
+    );
     if (response.success) {
       await this.set({ refno: null, upgrading: false });
     }
@@ -104,10 +109,10 @@ function userFromResponse(response, key) {
   return user;
 }
 
-async function authRequest(endpoint, data) {
+async function authRequest(endpoint, data, headers = {}) {
   let response = await fetch(`${HOST}${endpoint}`, {
     method: "POST",
-    headers: HEADERS,
+    headers: { ...HEADERS, ...headers },
     body: JSON.stringify(data),
   });
 
