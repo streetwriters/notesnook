@@ -147,7 +147,6 @@ export const Header = ({showSearch, root}) => {
             hitSlop={{top: 20, bottom: 20, left: 50, right: 40}}
             onPress={() => {
               headerState = root ? state.headerState : state.indHeaderState;
-           
 
               if (headerState.navigation && preventDefaultMargins) {
                 if (headerState.route.name === 'Folders') {
@@ -169,7 +168,7 @@ export const Header = ({showSearch, root}) => {
               justifyContent: 'center',
               alignItems: 'flex-start',
               height: 40,
-              width: 50,
+              width: 60,
             }}>
             <Icon
               style={{
