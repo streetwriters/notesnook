@@ -32,6 +32,8 @@ class Database {
     this._validate();
 
     this.user = new User(this);
+    await this.user.sync();
+
     this.syncer = new Sync(this);
     this.vault = new Vault(this);
     this.conflicts = new Conflicts(this);

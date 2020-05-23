@@ -10,6 +10,14 @@ export default class User {
     this._context = db.context;
   }
 
+  async sync() {
+    var user = await this.get();
+    if (!user) return;
+    user = await authRequest("users", undefined, true, true);
+    delete user.lastSynced;
+    await this.set(user);
+  }
+
   get() {
     return this._context.read("user");
   }
@@ -29,14 +37,13 @@ export default class User {
   async upgrade(refno) {
     if (!refno) return;
     await this.set({ refno, upgrading: true });
-    const token = await this.token();
-    let response = await authRequest(
-      "upgrade",
-      { refno },
-      { Authorization: `Bearer ${token}` }
-    );
-    if (response.success) {
-      await this.set({ refno: null, upgrading: false });
+    let response = await authRequest("upgrade", { refno }, true);
+    if (response.duration) {
+      await this.set({
+        refno: undefined,
+        trialExpiryDate: response.duration,
+        upgrading: undefined,
+      });
     }
   }
 
@@ -109,11 +116,19 @@ function userFromResponse(response, key) {
   return user;
 }
 
-async function authRequest(endpoint, data, headers = {}) {
+async function authRequest(endpoint, data, auth = false, get = false) {
+  var headers = {};
+  if (auth) {
+    const token = await this.token();
+    headers = {
+      Authorization: `Bearer ${token}`,
+    };
+  }
+
   let response = await fetch(`${HOST}${endpoint}`, {
-    method: "POST",
+    method: get ? "GET" : "POST",
     headers: { ...HEADERS, ...headers },
-    body: JSON.stringify(data),
+    body: get ? undefined : JSON.stringify(data),
   });
 
   if (response.ok) {
