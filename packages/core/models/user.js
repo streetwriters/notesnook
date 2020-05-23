@@ -35,7 +35,9 @@ export default class User {
   }
 
   async upgrade(refno) {
-    if (!refno) return;
+    const user = await this.get();
+    if (!user || !refno) return;
+
     await this.set({ refno, upgrading: true });
     let response = await authRequest("upgrade", { refno }, true);
     if (response.duration) {
