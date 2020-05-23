@@ -13,7 +13,7 @@ export default class User {
   async sync() {
     var user = await this.get();
     if (!user) return;
-    user = await authRequest("users", undefined, true, true);
+    user = await authRequest.call(this, "users", undefined, true, true);
     delete user.lastSynced;
     await this.set(user);
   }
@@ -39,7 +39,7 @@ export default class User {
     if (!user || !refno) return;
 
     await this.set({ refno, upgrading: true });
-    let response = await authRequest("upgrade", { refno }, true);
+    let response = await authRequest.call(this, "upgrade", { refno }, true);
     if (response.duration) {
       await this.set({
         refno: undefined,
