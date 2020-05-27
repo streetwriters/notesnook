@@ -28,12 +28,6 @@ export default class User {
     return { key: user.key, salt: user.salt };
   }
 
-  async isPremium() {
-    const user = await this.get();
-    if (!user) return false;
-    return user.isPremium || user.trialExpiryDate < Date.now() * 1000;
-  }
-
   async upgrade(refno) {
     const user = await this.get();
     if (!user || !refno) return;
