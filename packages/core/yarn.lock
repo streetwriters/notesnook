@@ -3690,6 +3690,13 @@ nice-try@^1.0.4:
   resolved "https://registry.yarnpkg.com/nice-try/-/nice-try-1.0.5.tgz#a3378a7696ce7d223e88fc9b764bd7ef1089e366"
   integrity sha512-1nh45deeb5olNY7eX82BkPO7SSxR5SSYJiPTrTdFUVYwAl8CKMA5N9PjTYkHiRjisVcxcQ1HXdLhx2qxxJzLNQ==
 
+no-internet@^1.5.2:
+  version "1.5.2"
+  resolved "https://registry.yarnpkg.com/no-internet/-/no-internet-1.5.2.tgz#a51e8c314fd4d005c8239eda7e6c4aad7c0cadfb"
+  integrity sha512-4GnJQsc/BCwcOG+8acwAsm9bYVdgh0V5ORQTAnB+7u9hoKdR4WqSqw6Bhjo3DO/tvhad4wbrw4l07/CG6C+wDg==
+  dependencies:
+    set-interval "^2.0.1"
+
 node-fetch@2.6.0:
   version "2.6.0"
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.0.tgz#e633456386d4aa55863f676a7ab0daa8fdecb0fd"
@@ -4364,6 +4371,11 @@ set-blocking@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/set-blocking/-/set-blocking-2.0.0.tgz#045f9782d011ae9a6803ddd382b24392b3d890f7"
   integrity sha1-BF+XgtARrppoA93TgrJDkrPYkPc=
+
+set-interval@^2.0.1:
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/set-interval/-/set-interval-2.0.4.tgz#419266c0a2b05d5fd5bde6e7896b57a27d060a5a"
+  integrity sha512-Srlnjq2O84WQxv2DkTyf7S0nRebiNE+uD5nd2Iy4ISOtiZbxglSfup88vegIAYRpCn/ITS1rYmjCPuAhn/hdmg==
 
 set-value@^2.0.0, set-value@^2.0.1:
   version "2.0.1"

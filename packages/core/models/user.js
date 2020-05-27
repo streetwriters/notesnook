@@ -1,4 +1,5 @@
 import { HOST, HEADERS } from "../utils/constants";
+import noInternet from "no-internet";
 
 export default class User {
   /**
@@ -14,6 +15,7 @@ export default class User {
     var user = await this.get();
     if (!user) return;
     user = await authRequest.call(this, "users", undefined, true, true);
+    if (!user) return;
     delete user.lastSynced;
     await this.set(user);
   }
@@ -55,6 +57,7 @@ export default class User {
       password,
       grant_type: "password",
     });
+    if (!response) return;
     const key = await this._context.deriveKey(password, response.payload.salt);
     let user = userFromResponse(response, key);
     await this._context.write("user", user);
@@ -73,6 +76,7 @@ export default class User {
       refresh_token: user.refreshToken,
       grant_type: "refresh_token",
     });
+    if (!response) return;
 
     user = {
       ...user,
@@ -94,6 +98,7 @@ export default class User {
       password,
       email,
     });
+    if (!response) return;
     const key = await this._context.deriveKey(password, response.payload.salt);
     let user = userFromResponse(response, key);
     await this._context.write("user", user);
@@ -113,6 +118,11 @@ function userFromResponse(response, key) {
 }
 
 async function authRequest(endpoint, data, auth = false, get = false) {
+  const offline = await noInternet({
+    url: HOST,
+  });
+  if (offline) return;
+
   var headers = {};
   if (auth) {
     const token = await this.token();
