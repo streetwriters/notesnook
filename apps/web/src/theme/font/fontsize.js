@@ -3,7 +3,7 @@ class FontSizeFactory {
     return {
       heading: 28 * scaleFactor,
       input: 16 * scaleFactor,
-      title: 14 * scaleFactor,
+      title: 18 * scaleFactor,
       subtitle: 16 * scaleFactor,
       body: 16 * scaleFactor,
       menu: 14 * scaleFactor,

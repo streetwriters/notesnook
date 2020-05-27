@@ -4,6 +4,7 @@ class TextFactory {
       default: new Default(),
       heading: new Heading(),
       title: new Title(),
+      subtitle: new Subtitle(),
       body: new Body(),
       subBody: new SubBody(),
       error: new Error(),
@@ -37,6 +38,14 @@ class Title {
     return {
       variant: "text.heading",
       fontSize: "title",
+    };
+  }
+}
+class Subtitle {
+  constructor() {
+    return {
+      variant: "text.heading",
+      fontSize: "subtitle",
     };
   }
 }

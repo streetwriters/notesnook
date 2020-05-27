@@ -62,3 +62,7 @@ function submit(setError, form, signup, onClose) {
 export function showSignUpDialog() {
   return showDialog((perform) => <SignUpDialog onClose={() => perform()} />);
 }
+
+/**
+
+ */

@@ -10,17 +10,16 @@ class UserStore extends BaseStore {
   isLoggingIn = false;
   isSigningIn = false;
   isSyncing = false;
-  user = undefined;
-  isPremium = false;
+  isTrialExpired = false;
+  user = {};
 
   init = () => {
     return db.user.get().then(async (user) => {
       if (!user) return false;
-      const isPremium = await db.user.isPremium();
       this.set((state) => {
         state.user = user;
+        state.isTrialExpired = user.trialExpiryDate > Date.now() * 1000;
         state.isLoggedIn = true;
-        state.isPremium = isPremium;
       });
       db.ev.subscribe("sync", () => {
         this.sync();
@@ -72,7 +71,7 @@ class UserStore extends BaseStore {
   logout = () => {
     return db.user.logout().then(async () => {
       this.set((state) => {
-        state.user = undefined;
+        state.user = {};
         state.isLoggedIn = false;
       });
       config.clear();

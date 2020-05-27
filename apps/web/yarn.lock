@@ -7191,6 +7191,13 @@ no-case@^3.0.3:
     lower-case "^2.0.1"
     tslib "^1.10.0"
 
+no-internet@^1.5.2:
+  version "1.5.2"
+  resolved "https://registry.yarnpkg.com/no-internet/-/no-internet-1.5.2.tgz#a51e8c314fd4d005c8239eda7e6c4aad7c0cadfb"
+  integrity sha512-4GnJQsc/BCwcOG+8acwAsm9bYVdgh0V5ORQTAnB+7u9hoKdR4WqSqw6Bhjo3DO/tvhad4wbrw4l07/CG6C+wDg==
+  dependencies:
+    set-interval "^2.0.1"
+
 node-forge@0.9.0:
   version "0.9.0"
   resolved "https://registry.yarnpkg.com/node-forge/-/node-forge-0.9.0.tgz#d624050edbb44874adca12bb9a52ec63cb782579"
@@ -7295,10 +7302,11 @@ normalize-url@^3.0.0, normalize-url@^3.0.1:
 
 "notes-core@git+ssh://git@github.com:streetwriters/notesnook-core.git":
   version "1.5.0"
-  resolved "git+ssh://git@github.com:streetwriters/notesnook-core.git#57f6e79aa1f0ec5b861ea93cc3c0026c478deb53"
+  resolved "git+ssh://git@github.com:streetwriters/notesnook-core.git#ccddf7870901639d82a1998701b1aa3a50742091"
   dependencies:
     fast-sort "^2.0.1"
     fuzzysearch "^1.0.3"
+    no-internet "^1.5.2"
     qclone "^1.0.4"
     transfun "^1.0.2"
 
@@ -9608,6 +9616,11 @@ set-blocking@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/set-blocking/-/set-blocking-2.0.0.tgz#045f9782d011ae9a6803ddd382b24392b3d890f7"
   integrity sha1-BF+XgtARrppoA93TgrJDkrPYkPc=
+
+set-interval@^2.0.1:
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/set-interval/-/set-interval-2.0.4.tgz#419266c0a2b05d5fd5bde6e7896b57a27d060a5a"
+  integrity sha512-Srlnjq2O84WQxv2DkTyf7S0nRebiNE+uD5nd2Iy4ISOtiZbxglSfup88vegIAYRpCn/ITS1rYmjCPuAhn/hdmg==
 
 set-value@^2.0.0, set-value@^2.0.1:
   version "2.0.1"

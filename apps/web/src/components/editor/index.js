@@ -16,7 +16,7 @@ function Editor() {
   const setSession = useStore((store) => store.setSession);
   const saveSession = useStore((store) => store.saveSession);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
-  const isPremium = useUserStore((store) => store.isPremium);
+  const isPremium = useUserStore((store) => store.user.isPremium);
   const quillRef = useRef();
 
   useEffect(() => {

@@ -6,19 +6,21 @@ import { useStore as useThemeStore } from "../stores/theme-store";
 import AccentItem from "../components/accent-item";
 import accents from "../theme/accents";
 import { showLogInDialog } from "../components/dialogs/logindialog";
+import { upgrade } from "../common/upgrade";
 
 function Settings(props) {
   const theme = useThemeStore((store) => store.theme);
   const toggleNightMode = useThemeStore((store) => store.toggleNightMode);
   const user = useUserStore((store) => store.user);
   const isLoggedIn = useUserStore((store) => store.isLoggedIn);
-  const isPremium = useUserStore((store) => store.isPremium);
+  const isPremium = useUserStore((store) => store.user.isPremium);
+  const isTrialExpired = useUserStore((store) => store.isTrialExpired);
   const logout = useUserStore((store) => store.logout);
 
   return (
     <Flex variant="columnFill" mx={2}>
       {isLoggedIn && (
-        <Text mb={2} variant="title" color="primary">
+        <Text mb={2} variant="subtitle" color="primary">
           Account Settings
         </Text>
       )}
@@ -29,6 +31,8 @@ function Settings(props) {
         onClick={async () => {
           if (!isLoggedIn) {
             await showLogInDialog();
+          } else {
+            upgrade(user);
           }
           // TODO open buy premium dialog
         }}
@@ -53,7 +57,7 @@ function Settings(props) {
             <Flex variant="columnCenter" alignItems="flex-start">
               {isLoggedIn ? (
                 <>
-                  <Text variant="title">{user.username}</Text>
+                  <Text variant="subtitle">{user.username}</Text>
                   <Text variant="subBody">{user.email}</Text>
                 </>
               ) : (
@@ -66,26 +70,31 @@ function Settings(props) {
               )}
             </Flex>
           </Flex>
-          <Text
-            bg="primary"
-            sx={{ borderRadius: "default" }}
-            color="static"
-            fontSize="title"
-            px={1}
-          >
-            {isPremium ? "Pro" : "Trial"}
-          </Text>
+          {isLoggedIn && (
+            <Text
+              bg="primary"
+              sx={{ borderRadius: "default" }}
+              color="static"
+              fontSize="body"
+              px={1}
+              py={1 / 2}
+            >
+              {isPremium || isTrialExpired ? "Pro" : "Trial"}
+            </Text>
+          )}
         </Flex>
       </Flex>
-      <Button
-        variant="list"
-        onClick={async () => {
-          await logout();
-        }}
-      >
-        Logout
-      </Button>
-      <Text my={2} variant="title" color="primary">
+      {isLoggedIn && (
+        <Button
+          variant="list"
+          onClick={async () => {
+            await logout();
+          }}
+        >
+          Logout
+        </Button>
+      )}
+      <Text my={2} variant="subtitle" color="primary">
         Appearance
       </Text>
       <Box
@@ -125,7 +134,7 @@ function Settings(props) {
           {theme === "dark" ? <Icon.Check /> : <Icon.CircleEmpty />}
         </Flex>
       </Box>
-      <Text my={2} variant="title" color="primary">
+      <Text my={2} variant="subtitle" color="primary">
         Other
       </Text>
       {["Terms of Service", "Privacy Policy", "About"].map((title) => (

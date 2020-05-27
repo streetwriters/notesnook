@@ -3,7 +3,8 @@ import { Flex, Box, Text } from "rebass";
 import { useStore as useUserStore } from "../../stores/user-store";
 
 function Menu(props) {
-  const isPremium = useUserStore((store) => store.isPremium);
+  const isPremium = useUserStore((store) => store.user.isPremium);
+  const isTrialExpired = useUserStore((store) => store.isTrialExpired);
 
   return (
     <Flex
@@ -41,7 +42,7 @@ function Menu(props) {
                   if (props.closeMenu) {
                     props.closeMenu();
                   }
-                  const onlyPro = item.onlyPro && !isPremium;
+                  const onlyPro = item.onlyPro && !isPremium && isTrialExpired;
                   if (onlyPro) {
                     // TODO
                   } else if (item.onClick) {
