@@ -103,12 +103,13 @@ class PremiumDialog extends React.Component {
             </Text>
             <FlatList
               data={[
-                'Sync across unlimted devices',
+                'Sync across unlimted devices on any platform',
                 'Zero-knowledge encryption',
                 'Organize your notes using notebooks, tags and colors',
                 'Rich-text editor for all your note taking needs',
                 'Secure local vault',
               ]}
+              keyExtractor={(item,index) => item}
               renderItem={({item, index}) => (
                 <View
                   style={{
@@ -117,7 +118,7 @@ class PremiumDialog extends React.Component {
                     alignItems: 'center',
                     paddingVertical: 5,
                   }}>
-                  <Icon name="check" size={SIZE.md} color={colors.accent} />
+                  <Icon name="check" size={SIZE.lg} color={colors.accent} />
 
                   <Text
                     style={{
@@ -145,12 +146,12 @@ class PremiumDialog extends React.Component {
               }}>
               <Text
                 style={{
-                  fontSize: SIZE.sm,
+                  fontSize: SIZE.lg,
                   fontFamily: WEIGHT.medium,
                   color: colors.accent,
                   textAlign: 'center',
                 }}>
-                Buy Now
+                BUY NOW
               </Text>
             </TouchableOpacity>
 
@@ -182,7 +183,7 @@ class PremiumDialog extends React.Component {
                   color: 'white',
                   textAlign: 'center',
                 }}>
-                Start your 14 day trial today
+                Start your 14 day trial
               </Text>
             </TouchableOpacity>
             <Text

@@ -4,6 +4,7 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent,
   openVault,
+  eSendEvent,
 } from '../../services/eventManager';
 import {
   eCloseActionSheet,
@@ -251,6 +252,9 @@ export class DialogManager extends Component {
         case 'movenote': {
           moveNoteEvent();
           break;
+        }
+        case "premium": {
+          eSendEvent(eOpenPremiumDialog);
         }
       }
     }

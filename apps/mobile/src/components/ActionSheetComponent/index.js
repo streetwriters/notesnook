@@ -301,8 +301,7 @@ export const ActionSheetComponent = ({
       icon: 'tag-outline',
       func: async () => {
         if (!premiumUser) {
-          eSendEvent(eOpenPremiumDialog);
-          close();
+          close('premium');
           return;
         }
 
@@ -324,8 +323,7 @@ export const ActionSheetComponent = ({
       icon: 'star',
       func: async () => {
         if (!premiumUser) {
-          eSendEvent(eOpenPremiumDialog);
-          close();
+          close('premium');
           return;
         }
         if (!note.id) return;
@@ -346,8 +344,7 @@ export const ActionSheetComponent = ({
       icon: 'shield',
       func: () => {
         if (!premiumUser) {
-          eSendEvent(eOpenPremiumDialog);
-          close();
+          close('premium');
           return;
         }
         if (!note.id) return;
@@ -833,8 +830,7 @@ export const ActionSheetComponent = ({
             <TouchableOpacity
               onPress={() => {
                 if (!premiumUser) {
-                  eSendEvent(eOpenPremiumDialog);
-                  close();
+                  close('premium');
                   return;
                 }
                 tagsInputRef.current?.focus();
