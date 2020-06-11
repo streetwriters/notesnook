@@ -14,6 +14,7 @@ import {useIsFocused} from '@react-navigation/native';
 import {opacity, pv, SIZE, WEIGHT, ph} from '../../common/common';
 import {Header} from '../../components/header';
 import {useTracked} from '../../provider';
+
 import {
   eSubscribeEvent,
   eUnSubscribeEvent,
@@ -74,20 +75,33 @@ export const Signup = ({route, navigation}) => {
     };
   }, [isFocused]);
 
-  const _signUp = async () => {
+  const validateInfo  = () => {
     if (!password || !email || !username || !passwordReEnter) {
       ToastEvent.show('All fields are required', 'error');
-      return;
+      return false;
     }
+
     if (!confirmPassword) {
       ToastEvent.show('Passwords do not match', 'error');
-      return;
+      return false;
     }
-    setSigningIn(true);
-    setStatus('Creating your account...');
+
     if (!invalidEmail && !invalidPassword && !invalidUsername) {
+      ToastEvent.show('Signup information is invalid', 'error');
+    return false;
+    }
+
+  }
+
+  const _signUp = async () => {
+    if (!validateInfo) return;
+ 
+      setSigningIn(true);
+      setStatus('Creating your account...');
       try {
         await db.user.signup(username, email, password);
+
+
       } catch (e) {
         setSigningIn(false);
         setFailed(true);
@@ -97,6 +111,8 @@ export const Signup = ({route, navigation}) => {
 
       let user;
       try {
+
+       
         user = await db.user.user.get();
         setStatus('Logging you in...');
         let k = await db.user.key();
@@ -112,9 +128,7 @@ export const Signup = ({route, navigation}) => {
         setFailed(true);
         ToastEvent.show('Login Failed, try again', 'error');
       }
-    } else {
-      ToastEvent.show('Signup failed', 'error');
-    }
+    
   };
 
   useEffect(() => {

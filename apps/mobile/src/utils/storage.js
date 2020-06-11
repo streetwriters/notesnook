@@ -11,6 +11,12 @@ async function read(key, isArray = false) {
     }
   } else if (key === 'hasConflicts') {
     return await MMKV.getBoolAsync(key);
+  } else if (key === "t") {
+      try {
+        return await MMKV.getStringAsync(key);
+      } catch(e) {
+        return null
+      }
   } else {
     try {
       data = await MMKV.getMapAsync(key);
@@ -27,7 +33,10 @@ async function write(key, data) {
     return await MMKV.setArrayAsync(key, data.slice());
   } else if (typeof data === 'boolean') {
     return await MMKV.setBoolAsync(key, data);
+  } else if (typeof data === "number") {
+    return await MMKV.setIntAsync(key, data);
   } else {
+    console.log(key,data,"VALUE");
     return await MMKV.setMapAsync(key, data);
   }
 }

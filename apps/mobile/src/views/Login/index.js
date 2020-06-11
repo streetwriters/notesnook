@@ -72,51 +72,55 @@ export const Login = ({route, navigation}) => {
   }, [isFocused]);
 
   const _logIn = async () => {
-    if (!password || password.length < 8) {
-      ToastEvent.show('Invalid username or password', 'error');
+    if (
+      !password ||
+      password.length < 8 ||
+      !username ||
+      invalidPassword ||
+      invalidUsername
+    ) {
+      ToastEvent.show('username or password invalid', 'error');
       return;
     }
-    if (!username) {
-      ToastEvent.show('Invalid username or password', 'error');
-      return;
-    }
+
     setLoggingIn(true);
     _username.current.blur();
     _pass.current.blur();
-
     setStatus('Logging in...');
 
-    if (!invalidPassword && !invalidUsername) {
-      try {
-        await db.user.login(username, password);
+    try {
+      let res = await db.user.login(username, password);
+      if (res) {
         setStatus('Fetching data...');
-      } catch (e) {
-        setTimeout(() => {
-          ToastEvent.show(e.message, 'error');
-          setLoggingIn(false);
-        }, 500);
-
-        return;
       }
-
-      let user;
-      try {
-        user = await db.user.get();
-        dispatch({type: ACTIONS.USER, user: user});
-        dispatch({type:ACTIONS.SYNCING,syncing:true});
-        setStatus('Syncing your notes...');
-        await db.sync();
-        eSendEvent(eStartSyncer);
-        navigation.goBack();
-        dispatch({type: ACTIONS.ALL});
-        eSendEvent(refreshNotesPage);
-        dispatch({type:ACTIONS.SYNCING,syncing:false});
-        ToastEvent.show(`Logged in as ${username}`, 'success');
-      } catch (e) {
+    } catch (e) {
+      setTimeout(() => {
         ToastEvent.show(e.message, 'error');
-      }
-    } else {
-      ToastEvent.show('Login failed, username or passoword invalid', 'error');
+        setLoggingIn(false);
+      }, 500);
+
+      return;
+    }
+
+    let user;
+
+    try {
+      user = await db.user.get();
+      if (!user) throw new Error('Username or password incorrect');
+      dispatch({type: ACTIONS.USER, user: user});
+      dispatch({type: ACTIONS.SYNCING, syncing: true});
+      setStatus('Syncing your notes...');
+      await db.sync();
+      eSendEvent(eStartSyncer);
+      navigation.goBack();
+      dispatch({type: ACTIONS.ALL});
+      eSendEvent(refreshNotesPage);
+      dispatch({type: ACTIONS.SYNCING, syncing: false});
+      ToastEvent.show(`Logged in as ${username}`, 'success');
+    } catch (e) {
+      dispatch({type: ACTIONS.SYNCING, syncing: false});
+      setLoggingIn(false);
+      ToastEvent.show(e.message, 'error');
     }
   };
 
@@ -131,14 +135,14 @@ export const Login = ({route, navigation}) => {
           route: route,
           color: null,
           navigation: navigation,
-          ind:!route.params.root
+          ind: !route.params.root,
         },
       });
       dispatch({
         type: ACTIONS.CONTAINER_BOTTOM_BUTTON,
         state: {
           visible: false,
-          ind:!route.params.root
+          ind: !route.params.root,
         },
       });
       dispatch({
@@ -156,7 +160,7 @@ export const Login = ({route, navigation}) => {
         type: ACTIONS.HEADER_TEXT_STATE,
         state: {
           heading: 'Login',
-          ind:!route.params.root
+          ind: !route.params.root,
         },
       });
 
@@ -169,7 +173,7 @@ export const Login = ({route, navigation}) => {
         type: ACTIONS.SEARCH_STATE,
         state: {
           noSearch: true,
-          ind:!route.params.root
+          ind: !route.params.root,
         },
       });
       if (!route.params.root) {
@@ -214,11 +218,11 @@ export const Login = ({route, navigation}) => {
 
       {loggingIn ? null : (
         <>
-           <View
-        style={{
-          marginTop: Platform.OS == 'ios' ? 125 - 60 : 125 - 60,
-        }}
-      />
+          <View
+            style={{
+              marginTop: Platform.OS == 'ios' ? 125 - 60 : 125 - 60,
+            }}
+          />
 
           <View
             style={{
