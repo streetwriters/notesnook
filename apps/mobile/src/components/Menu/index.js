@@ -157,6 +157,7 @@ export const Menu = ({
       </View>
 
       <ScrollView
+        alwaysBounceVertical={false}
         contentContainerStyle={{minHeight: '50%'}}
         showsVerticalScrollIndicator={false}>
         {listItems.map((item, index) => (
