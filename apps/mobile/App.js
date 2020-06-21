@@ -27,17 +27,16 @@ const App = () => {
 
   useEffect(() => {
     if (!netInfo.isConnected || !netInfo.isInternetReachable) {
-      db.user.get().then(user => {
+      db.user?.get().then(user => {
         if (user) {
           ToastEvent.show('No internet connection','error');
         } else {
-
         }
       });
     } else {
-      db.user.get().then(user => {
+      db.user?.get().then(user => {
         if (user) {
-          ToastEvent.show('Internet connection restored');
+          ToastEvent.show('Internet connection restored','success');
         } else {
 
         }
