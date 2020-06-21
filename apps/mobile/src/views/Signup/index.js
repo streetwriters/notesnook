@@ -69,7 +69,7 @@ export const Signup = ({route, navigation}) => {
     eSubscribeEvent(eLoginDialogNavigateBack, handleBackPress);
     return () => {
       eUnSubscribeEvent(eLoginDialogNavigateBack, handleBackPress);
-      if (params.fromHome) {
+      if (route.params.fromHome) {
         eSendEvent(eOpenSideMenu);
       }
     };

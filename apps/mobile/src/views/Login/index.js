@@ -1,29 +1,16 @@
-import React, {createRef, useEffect, useState} from 'react';
-import {
-  ActivityIndicator,
-  BackHandler,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { useIsFocused } from '@react-navigation/native';
+import React, { createRef, useEffect, useState } from 'react';
+import { ActivityIndicator, BackHandler, Text, TouchableOpacity, View } from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import {TextInput} from 'react-native-gesture-handler';
+import { TextInput } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {opacity, pv, SIZE, WEIGHT} from '../../common/common';
-import {Header} from '../../components/header';
-import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
-import {eSendEvent} from '../../services/eventManager';
-import {
-  eCloseSideMenu,
-  refreshNotesPage,
-  eOpenSideMenu,
-  eStartSyncer,
-  eSetModalNavigator,
-} from '../../services/events';
-import {validatePass, validateUsername} from '../../services/validation';
-import {db, DDS, ToastEvent, getElevation} from '../../utils/utils';
-import {useIsFocused} from '@react-navigation/native';
+import { opacity, pv, SIZE, WEIGHT } from '../../common/common';
+import { useTracked } from '../../provider';
+import { ACTIONS } from '../../provider/actions';
+import { eSendEvent } from '../../services/eventManager';
+import { eCloseSideMenu, eOpenSideMenu, eSetModalNavigator, eStartSyncer, refreshNotesPage } from '../../services/events';
+import { validatePass, validateUsername } from '../../services/validation';
+import { db, DDS, getElevation, ToastEvent } from '../../utils/utils';
 
 export const Login = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
@@ -88,9 +75,12 @@ export const Login = ({route, navigation}) => {
     _pass.current.blur();
     setStatus('Logging in...');
 
+
     try {
-      let res = await db.user.login(username, password);
+      let res = await db.user.login(username.toLowerCase(), password);
+      console.log(res,username,password);
       if (res) {
+    
         setStatus('Fetching data...');
       }
     } catch (e) {
@@ -565,7 +555,9 @@ export const Login = ({route, navigation}) => {
                 }}>
                 <TouchableOpacity
                   onPress={() => {
-                    navigation.navigate('Signup');
+                    navigation.navigate('Signup',{
+                      root:true
+                    });
                   }}
                   activeOpacity={opacity}
                   style={{}}>
