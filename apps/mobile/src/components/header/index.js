@@ -1,18 +1,31 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, Platform, TouchableOpacity, View } from 'react-native';
+import React, {useCallback, useEffect, useState} from 'react';
+import {
+  ActivityIndicator,
+  Platform,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import { useSafeArea } from 'react-native-safe-area-context';
+import {useSafeArea} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { SIZE } from '../../common/common';
-import { useTracked } from '../../provider';
-import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/eventManager';
-import { eCloseLoginDialog, eScrollEvent, eSetModalNavigator } from '../../services/events';
+import {SIZE} from '../../common/common';
+import {useTracked} from '../../provider';
+import {
+  eSendEvent,
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+} from '../../services/eventManager';
+import {
+  eCloseLoginDialog,
+  eScrollEvent,
+  eSetModalNavigator,
+} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
-import { sideMenuRef } from '../../utils/refs';
-import { DDS, w } from '../../utils/utils';
-import { moveNoteHideEvent } from '../DialogManager/recievers';
-import { HeaderMenu } from './HeaderMenu';
-import { HeaderTitle } from './HeaderTitle';
+import {sideMenuRef} from '../../utils/refs';
+import {DDS, w} from '../../utils/utils';
+import {moveNoteHideEvent} from '../DialogManager/recievers';
+import {HeaderMenu} from './HeaderMenu';
+import {HeaderTitle} from './HeaderTitle';
 let offsetY = 0;
 
 function useForceUpdate() {
@@ -202,7 +215,10 @@ export const Header = ({showSearch, root}) => {
             opacity: hideHeader ? 1 : 0,
           }}>
           <TouchableOpacity
-            onPress={() => eSendEvent('showSearch')}
+            onPress={() => {
+              setHideHeader(false);
+              eSendEvent('showSearch');
+            }}
             style={{
               justifyContent: 'center',
               alignItems: 'flex-end',
