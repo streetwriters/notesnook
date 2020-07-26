@@ -5,30 +5,28 @@ import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
 import {eClearSearch, eScrollEvent} from '../../services/events';
 import {inputRef} from '../../utils/refs';
 import {db, DDS, selection, ToastEvent} from '../../utils/utils';
-import Animated,{Easing} from "react-native-reanimated";
+import Animated, {Easing} from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { br, WEIGHT, SIZE } from '../../common/common';
-import { TextInput } from 'react-native';
+import {br, WEIGHT, SIZE} from '../../common/common';
+import {TextInput, Text} from 'react-native';
 const {Value, timing, block} = Animated;
 let offsetY = 0;
 let searchResult = [];
 export const Search = props => {
   const [state, dispatch] = useTracked();
-  const {colors} = state;
+  const {colors, searchResults} = state;
   const [text, setText] = useState('');
   const [focus, setFocus] = useState(false);
   const [hideHeader, setHideHeader] = useState(false);
 
-  let searchState = props.root? state.searchState : state.indSearchState;
-  
+  let searchState = props.root ? state.searchState : state.indSearchState;
+
   const _marginAnim = new Value(0);
   const _opacity = new Value(1);
   const _borderAnim = new Value(1.5);
 
-
-
   const onScroll = y => {
-    if (searchResult.length > 0) return;
+    if (searchResults.results.length > 0) return;
     if (y < 30) {
       setHideHeader(false);
       offsetY = y;
@@ -52,34 +50,43 @@ export const Search = props => {
     selection.type = searchState.type;
     eSubscribeEvent(eScrollEvent, onScroll);
 
+    eSubscribeEvent('showSearch', () => {
+      setHideHeader(false);
+    });
+
     return () => {
       eUnSubscribeEvent(eScrollEvent, onScroll);
+
+      eUnSubscribeEvent('showSearch', () => {
+        setHideHeader(false);
+      });
     };
   }, []);
 
   useEffect(() => {
     timing(_marginAnim, {
-      toValue: props.hide ? -65 : 0,
+      toValue: hideHeader ? -65 : 0,
       duration: 230,
       easing: Easing.inOut(Easing.ease),
     }).start();
     timing(_opacity, {
-      toValue: props.hide ? 0 : 1,
+      toValue: hideHeader ? 0 : 1,
       duration: 250,
       easing: Easing.inOut(Easing.ease),
     }).start();
     timing(_borderAnim, {
-      toValue: props.hide ? 0 : 1.5,
+      toValue: hideHeader ? 0 : 1.5,
       duration: 270,
       easing: Easing.inOut(Easing.ease),
     }).start();
+    console.log('called');
   }, [hideHeader]);
 
   const clearSearch = () => {
     if (searchResult && searchResult.length > 0) {
       searchResult = null;
-        setText(null);
-  
+      setText(null);
+
       inputRef.current?.setNativeProps({
         text: '',
       });
@@ -110,11 +117,11 @@ export const Search = props => {
       clearSearch();
       return;
     }
-    let type = searchState.type
+    let type = searchState.type;
     if (!type) return;
 
     let data = searchState.data;
-  
+
     searchResult = await db.lookup[type](
       data[0].data ? db.notes.all : data,
       text,

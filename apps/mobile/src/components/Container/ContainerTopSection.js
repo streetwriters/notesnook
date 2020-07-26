@@ -19,7 +19,7 @@ export const ContainerTopSection = ({root}) => {
         display: selectionMode ? 'none' : 'flex',
         width: '100%',
       }}>
-      <Header root={root} />
+      <Header root={root}  />
 
       <Search root={root} />
     </Animatable.View>
