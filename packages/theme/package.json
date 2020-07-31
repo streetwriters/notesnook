@@ -1,0 +1,29 @@
+{
+  "name": "themefactory",
+  "version": "1.0.0",
+  "description": "React Rebass theme factory.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/streetwriters/themefactory.git"
+  },
+  "keywords": [
+    "theme",
+    "rebass",
+    "react"
+  ],
+  "author": "thecodrr <thecodrr@protonmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/streetwriters/themefactory/issues"
+  },
+  "homepage": "https://github.com/streetwriters/themefactory#readme",
+  "dependencies": {
+    "emotion-theming": "^10.0.27",
+    "react": "^16.13.1",
+    "utils": "https://github.com/streetwriters/utils.git"
+  }
+}
