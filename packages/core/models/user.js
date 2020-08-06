@@ -1,5 +1,4 @@
 import { HOST, HEADERS } from "../utils/constants";
-import noInternet from "no-internet";
 
 export default class User {
   /**
@@ -118,11 +117,6 @@ function userFromResponse(response, key) {
 }
 
 async function authRequest(endpoint, data, auth = false, get = false) {
-  const offline = await noInternet({
-    url: HOST,
-  });
-  if (offline) return;
-
   var headers = {};
   if (auth) {
     const token = await this.token();
