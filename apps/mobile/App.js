@@ -7,7 +7,7 @@ import {useTracked} from './src/provider';
 import {ACTIONS} from './src/provider/actions';
 import {defaultState} from './src/provider/defaultState';
 import {eSubscribeEvent, eUnSubscribeEvent} from './src/services/eventManager';
-import {eDispatchAction, eStartSyncer} from './src/services/events';
+import {eDispatchAction, eStartSyncer, eResetApp} from './src/services/events';
 import {db, DDS, ToastEvent} from './src/utils/utils';
 import {useNetInfo} from '@react-native-community/netinfo';
 
@@ -29,16 +29,15 @@ const App = () => {
     if (!netInfo.isConnected || !netInfo.isInternetReachable) {
       db.user?.get().then(user => {
         if (user) {
-          ToastEvent.show('No internet connection','error');
+          ToastEvent.show('No internet connection', 'error');
         } else {
         }
       });
     } else {
       db.user?.get().then(user => {
         if (user) {
-          ToastEvent.show('Internet connection restored','success');
+          ToastEvent.show('Internet connection restored', 'success');
         } else {
-
         }
       });
     }
@@ -80,12 +79,20 @@ const App = () => {
     dispatch({type: ACTIONS.SYNCING, syncing: false});
   };
 
+  const resetApp = () => {
+    setInit(false);
+    Initialize().then(() => {
+      setInit(true);
+    });
+  };
+
   useEffect(() => {
     eSubscribeEvent(eStartSyncer, startSyncer);
-
+    eSubscribeEvent(eResetApp, resetApp);
     return () => {
       db.ev.unsubscribe('sync', _syncFunc);
       eUnSubscribeEvent(eStartSyncer, startSyncer);
+      eUnSubscribeEvent(eResetApp, resetApp);
     };
   }, []);
 

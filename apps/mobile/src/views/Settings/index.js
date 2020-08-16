@@ -1,40 +1,18 @@
-import React, {useState, useEffect} from 'react';
-import {
-  Platform,
-  ScrollView,
-  StatusBar,
-  Text,
-  TouchableOpacity,
-  View,
-  Modal,
-  Clipboard,
-  Linking,
-} from 'react-native';
-import MMKV from 'react-native-mmkv-storage';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import QRCode from 'react-native-qrcode-generator';
-import {
-  ACCENT,
-  COLOR_SCHEME,
-  COLOR_SCHEME_DARK,
-  COLOR_SCHEME_LIGHT,
-  opacity,
-  pv,
-  setColorScheme,
-  SIZE,
-  WEIGHT,
-  ph,
-} from '../../common/common';
-import Container from '../../components/Container';
-import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
-import {eSendEvent} from '../../services/eventManager';
-import {eOpenLoginDialog} from '../../services/events';
-import NavigationService from '../../services/NavigationService';
-import {hexToRGBA, w, DDS, setSetting, db, ToastEvent} from '../../utils/utils';
-import {Toast} from '../../components/Toast';
-import {useIsFocused} from '@react-navigation/native';
+import { useIsFocused } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
+import { Clipboard, Linking, Modal, Platform, ScrollView, StatusBar, Text, TouchableOpacity, View } from 'react-native';
 import * as Animatable from 'react-native-animatable';
+import MMKV from 'react-native-mmkv-storage';
+import QRCode from 'react-native-qrcode-generator';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { ACCENT, COLOR_SCHEME, COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT, opacity, ph, pv, setColorScheme, SIZE, WEIGHT } from '../../common/common';
+import { Toast } from '../../components/Toast';
+import { useTracked } from '../../provider';
+import { ACTIONS } from '../../provider/actions';
+import { eSendEvent } from '../../services/eventManager';
+import { eOpenLoginDialog, eResetApp } from '../../services/events';
+import NavigationService from '../../services/NavigationService';
+import { db, DDS, setSetting, ToastEvent, w } from '../../utils/utils';
 
 export const Settings = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
@@ -384,7 +362,9 @@ export const Settings = ({route, navigation}) => {
               onPress={() => {
                 DDS.isTab
                   ? eSendEvent(eOpenLoginDialog)
-                  : NavigationService.navigate('Login');
+                  : NavigationService.navigate('Login', {
+                      root: true,
+                    });
               }}
               activeOpacity={opacity / 2}
               style={{
@@ -586,6 +566,8 @@ export const Settings = ({route, navigation}) => {
               : (scale = 0.9 ? (scale = 1) : (scale = 1));
 
             await setSetting(settings, 'fontScale', scale);
+
+            eSendEvent(eResetApp);
           }}
           activeOpacity={opacity}
           style={{

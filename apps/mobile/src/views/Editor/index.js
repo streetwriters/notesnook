@@ -42,6 +42,7 @@ import {
   _onShouldStartLoadWithRequest,
   checkNote,
 } from './func';
+import {ActionIcon} from '../../components/ActionIcon';
 
 var handleBack;
 var tapCount = 0;
@@ -61,9 +62,9 @@ const Editor = ({noMenu}) => {
 
   useEffect(() => {
     if (noMenu) {
-      post('nomenu', true);
+      //post('nomenu', true);
     } else {
-      post('nomenu', false);
+      //post('nomenu', false);
     }
   }, [noMenu]);
 
@@ -172,91 +173,60 @@ const Editor = ({noMenu}) => {
         <View
           style={{
             marginTop: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight,
-          }}
-        />
-
-        {noMenu ? null : (
-          <TouchableOpacity
-            onPress={_onBackPress}
-            style={{
-              width: 60,
-              height: 50,
-              justifyContent: 'center',
-              alignItems: 'flex-start',
-              position: 'absolute',
-              left: 0,
-              top: 0,
-              marginTop: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight,
-              paddingLeft: 12,
-              zIndex: 800,
-            }}>
-            <Icon
-              style={{
-                marginLeft: -7,
-                marginTop: -1.5,
-              }}
-              name="chevron-left"
-              color={colors.icon}
-              size={SIZE.xxxl - 3}
-            />
-          </TouchableOpacity>
-        )}
-
-        <View
-          style={{
             flexDirection: 'row',
-            marginRight: 0,
-            position: 'absolute',
-            marginTop: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight,
-            zIndex: 800,
-            right: 0,
-            top: 0,
+            width: '100%',
+            height: 50,
+            justifyContent: 'space-between',
           }}>
-          {DDS.isTab && !fullscreen ? (
-            <TouchableOpacity
+          {noMenu ? null : (
+            <ActionIcon
+              name="arrow-left"
+              color={colors.icon}
+              onPress={_onBackPress}
+              customStyle={{
+                marginLeft:-5
+              }}
+            />
+          )}
+
+          <View
+            style={{
+              flexDirection: 'row',
+            }}>
+            {DDS.isTab && !fullscreen ? (
+              <ActionIcon
+                name="fullscreen"
+                color={colors.icon}
+                onPress={() => {
+                  eSendEvent(eOpenFullscreenEditor);
+                  setFullscreen(true);
+                  editing.isFullscreen = true;
+                  post(
+                    JSON.stringify({
+                      type: 'nomenu',
+                      value: false,
+                    }),
+                  );
+                }}
+              />
+            ) : null}
+
+            <ActionIcon
+              name="dots-horizontal"
+              color={colors.icon}
               onPress={() => {
-                eSendEvent(eOpenFullscreenEditor);
-                setFullscreen(true);
-                editing.isFullscreen = true;
-                post(
-                  JSON.stringify({
-                    type: 'nomenu',
-                    value: false,
-                  }),
+                ActionSheetEvent(
+                  note,
+                  true,
+                  true,
+                  ['Add to', 'Share', 'Export', 'Delete'],
+                  ['Dark Mode', 'Add to Vault', 'Pin', 'Favorite'],
                 );
               }}
-              style={{
-                width: 60,
-                height: 50,
-                justifyContent: 'center',
-                alignItems: 'flex-end',
-                paddingRight: 12,
-                zIndex: 800,
-              }}>
-              <Icon name="fullscreen" color={colors.icon} size={SIZE.xxxl} />
-            </TouchableOpacity>
-          ) : null}
-          <TouchableOpacity
-            onPress={() => {
-              ActionSheetEvent(
-                note,
-                true,
-                true,
-                ['Add to', 'Share', 'Export', 'Delete'],
-                ['Dark Mode', 'Add to Vault', 'Pin', 'Favorite'],
-              );
-            }}
-            style={{
-              width: 60,
-              height: 50,
-              justifyContent: 'center',
-              alignItems: 'flex-end',
-              paddingRight: 12,
-              zIndex: 800,
-            }}>
-            <Icon name="dots-horizontal" color={colors.icon} size={SIZE.xxxl} />
-          </TouchableOpacity>
+            />
+          </View>
         </View>
+
         <WebView
           ref={EditorWebView}
           onError={error => console.log(error)}

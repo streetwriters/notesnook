@@ -68,6 +68,7 @@ export const Initialize = () => {
             opacity: 0,
             backgroundColor: colors.bg,
           }}
+          
           keyboardDismissMode="ondrag"
           drawerWidth={300}
           drawerLockMode={locked ? 'locked-closed' : 'unlocked'}

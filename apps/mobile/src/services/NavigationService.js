@@ -2,7 +2,9 @@ import { StackActions } from '@react-navigation/native';
 import { rootNavigatorRef } from '../utils/refs';
 
 function navigate(name, params) {
+  
   rootNavigatorRef.current?.navigate(name, params);
+
 }
 function goBack() {
    rootNavigatorRef.current?.goBack();

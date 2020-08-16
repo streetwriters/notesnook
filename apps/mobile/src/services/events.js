@@ -81,3 +81,5 @@ export const eSetModalNavigator = '539'
 export const eOpenPremiumDialog = '540'
 
 export const eClosePremiumDialog = '541'
+
+export const eResetApp = '542'

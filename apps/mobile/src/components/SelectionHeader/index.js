@@ -6,14 +6,14 @@ import {SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
-import {eOpenMoveNoteDialog, eOpenSimpleDialog} from '../../services/events';
+import {eOpenMoveNoteDialog, eOpenSimpleDialog, eOpenPremiumDialog} from '../../services/events';
 import {db, selection, ToastEvent} from '../../utils/utils';
 import {TEMPLATE_DELETE} from '../DialogManager/templates';
 
 export const SelectionHeader = () => {
   // State
   const [state, dispatch] = useTracked();
-  const {colors, selectionMode, selectedItemsList, currentScreen,containerState} = state;
+  const {colors, selectionMode, selectedItemsList, currentScreen,containerState, premiumUser} = state;
   const [selectAll, setSelectAll] = useState(false);
 
 
@@ -25,10 +25,11 @@ export const SelectionHeader = () => {
       style={{
         width: '100%',
         position: 'absolute',
-        height: Platform.OS === 'android' ? 80 + StatusBar.currentHeight : 80,
+        height: Platform.OS === 'android' ? 100 + StatusBar.currentHeight : 80,
         backgroundColor: colors.bg,
         paddingTop: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight,
         justifyContent: 'flex-end',
+     
         zIndex: 999,
         paddingHorizontal: 12,
         transform: [
@@ -101,7 +102,7 @@ export const SelectionHeader = () => {
                 style={{
                   paddingLeft: 25,
                 }}
-                color={colors.accent}
+                color={colors.icon}
                 name={'plus'}
                 size={SIZE.xl}
               />
@@ -110,6 +111,10 @@ export const SelectionHeader = () => {
           {currentScreen === 'trash' || currentScreen === 'notebooks' ? null : (
             <TouchableOpacity
               onPress={async () => {
+                if (!premiumUser) {
+                  eSendEvent(eOpenPremiumDialog);
+                  return;
+                }
                 let favCount = 0;
                 let unFavCount = 0;
                 if (selectedItemsList.length > 0) {
@@ -138,7 +143,7 @@ export const SelectionHeader = () => {
                 style={{
                   paddingLeft: 25,
                 }}
-                color={colors.accent}
+                color={colors.icon}
                 name={'star'}
                 size={SIZE.xl - 3}
               />
@@ -155,7 +160,7 @@ export const SelectionHeader = () => {
                 style={{
                   paddingLeft: 25,
                 }}
-                color={colors.errorText}
+                color={colors.icon}
                 name={'delete'}
                 size={SIZE.xl - 3}
               />
@@ -183,7 +188,7 @@ export const SelectionHeader = () => {
                 style={{
                   paddingLeft: 25,
                 }}
-                color={colors.errorText}
+                color={colors.icon}
                 name="delete-restore"
                 size={SIZE.xl - 3}
               />
@@ -213,6 +218,8 @@ export const SelectionHeader = () => {
           height: 40,
           flexDirection: 'row',
           alignSelf: 'flex-start',
+          marginLeft:5,
+          marginBottom:5
         }}>
         <Icon
           style={{}}

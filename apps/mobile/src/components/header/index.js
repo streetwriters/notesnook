@@ -175,7 +175,7 @@ export const Header = ({showSearch, root}) => {
                 marginLeft: -5,
               }}
               color={colors.pri}
-              name={'chevron-left'}
+              name={'arrow-left'}
               size={SIZE.xxxl - 3}
             />
           </TouchableOpacity>

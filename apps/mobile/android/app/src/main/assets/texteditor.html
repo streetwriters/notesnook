@@ -6,7 +6,7 @@
   <style>
     .app-body {
       margin: 0px;
-      overflow: hidden;
+      overflow:auto;
 
     }
 
@@ -63,9 +63,9 @@
     .ql-editor {
       box-sizing: border-box;
       line-height: 1.42;
-      height: 100%;
+      height: auto;
       outline: none;
-      overflow-y: auto;
+      overflow-y: hidden;
       padding: 12px 12px;
       tab-size: 4;
       -moz-tab-size: 4;
@@ -735,10 +735,11 @@
     .ql-snow .ql-icon-picker .ql-picker-label svg {
       right: 4px;
     }
-    #mdi-format-textdirection-l-to-r, 
+
+    #mdi-format-textdirection-l-to-r,
     #mdi-format-textdirection-r-to-l {
-      width:20px !important;
-      height:20px !important;
+      width: 20px !important;
+      height: 20px !important;
       margin-top: 3px;
     }
 
@@ -765,12 +766,13 @@
       padding: 0px;
       width: 20px;
     }
+
     #mdi-format-align-left,
     #mdi-format-align-center,
     #mdi-format-align-justify,
     #mdi-format-align-right {
       width: 20px !important;
-      height:20px !important;
+      height: 20px !important;
       margin-top: -1px;
     }
 
@@ -993,6 +995,7 @@
       height: 50px;
       bottom: 0px;
       left: 0px;
+      z-index: 999;
     }
 
 
@@ -1026,7 +1029,7 @@
       border-color: #f0f0f0;
     }
 
-    
+
 
     .ql-toolbar.ql-snow .ql-picker.ql-expanded .ql-picker-options {
       border-color: #f0f0f0;
@@ -1079,7 +1082,6 @@
       height: 50;
       width: 100%;
       outline: none;
-      z-index: 10;
     }
 
     #titlebar {
@@ -1098,9 +1100,6 @@
     #titlebar input:focus {
       outline: none;
     }
-
-   
-
     #infowords {
       margin-right: 5px;
       margin-left: 5px;
@@ -1119,6 +1118,7 @@
 </head>
 
 <body class="app-body">
+
   <div id="titlebar">
     <input id="titleInput" placeholder="Title here" />
     <div class="info-bar">
@@ -1130,6 +1130,7 @@
     </div>
 
   </div>
+
   <div id="editor"></div>
   <div id="toolbar"></div>
 
@@ -1141,7 +1142,14 @@
 
 
 <script inline>
-  function loadAction(premium) {
+  function loadAction(premium, noMenu) {
+
+    let titleIn = document.getElementById('titlebar');
+  
+      //titleIn.style.width = width;
+      titleIn.style['padding-left'] = 12;
+      titleIn.style['padding-right'] = 60;
+    
 
 
     (function () { function r(e, n, t) { function o(i, f) { if (!n[i]) { if (!e[i]) { var c = "function" == typeof require && require; if (!f && c) return c(i, !0); if (u) return u(i, !0); var a = new Error("Cannot find module '" + i + "'"); throw a.code = "MODULE_NOT_FOUND", a } var p = n[i] = { exports: {} }; e[i][0].call(p.exports, function (r) { var n = e[i][1][r]; return o(n || r) }, p, p.exports, r, e, n, t) } return n[i].exports } for (var u = "function" == typeof require && require, i = 0; i < t.length; i++)o(t[i]); return o } return r })()({
@@ -1222,7 +1230,7 @@
         ];
         let simpleToolbar = [
           [{ header: 1 }, { header: 2 }],
-          ['bold', 'italic','underline','strike'], // toggled buttons
+          ['bold', 'italic', 'underline', 'strike'], // toggled buttons
           [{ align: [] }],
           [{ direction: 'rtl' }], // text direction
 
@@ -1298,7 +1306,7 @@
             value: document.getElementById('titleInput').value
           }
 
-         window.ReactNativeWebView.postMessage(JSON.stringify(titleMessage));
+          window.ReactNativeWebView.postMessage(JSON.stringify(titleMessage));
         }
         function onChangetitle() {
           editor.focus();
@@ -1307,7 +1315,7 @@
             type: 'title',
             value: document.getElementById('titleInput').value
           }
-         window.ReactNativeWebView.postMessage(JSON.stringify(titleMessage));
+          window.ReactNativeWebView.postMessage(JSON.stringify(titleMessage));
         }
         const setTheme = function () {
 
@@ -1546,12 +1554,13 @@
     overflow-x: auto;
     width: 100vw;
     white-space: nowrap;
-    position: absolute;
+    position: fixed;
     zIndex:999;
     bottom: 0px;
     height: 50px;
     left: 0px;
     border-top: 1px solid ${pageTheme.colors.nav};
+    background-color:${pageTheme.colors.bg};
   }
   
   .ql-editor.ql-blank::before {
@@ -16640,6 +16649,7 @@
 
 
   }
+
 
 </script>
 

@@ -13,13 +13,17 @@ import {SIZE, WEIGHT, opacity, pv} from '../../common/common';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
-import {eClearSearch, eScrollEvent, eOpenLoginDialog} from '../../services/events';
+import {
+  eClearSearch,
+  eScrollEvent,
+  eOpenLoginDialog,
+} from '../../services/events';
 import {db, ToastEvent, DDS} from '../../utils/utils';
 import * as Animatable from 'react-native-animatable';
 import {PinnedItemList} from './PinnedItemList';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import NavigationService from '../../services/NavigationService';
-import { Placeholder } from '../ListPlaceholders';
+import {Placeholder} from '../ListPlaceholders';
 const sectionListRef = createRef();
 
 const AnimatedFlatlist = Animatable.createAnimatableComponent(FlatList);
@@ -169,7 +173,7 @@ const SimpleList = ({
               ? 155 - insets.top
               : 155 - 60 - insets.top,
         }}>
-        {user || !data[0] ? null : (
+        {user || !data[0] || selectionMode ? null : (
           <TouchableOpacity
             onPress={() => {
               DDS.isTab
@@ -178,17 +182,16 @@ const SimpleList = ({
                     root: true,
                   });
             }}
-            activeOpacity={opacity }
+            activeOpacity={opacity}
             style={{
-              paddingVertical:6,
+              paddingVertical: 6,
               width: '100%',
               flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'flex-start',
               backgroundColor: colors.shade,
               paddingHorizontal: 12,
-              alignSelf:'center',
-             
+              alignSelf: 'center',
             }}>
             <View
               style={{
@@ -245,9 +248,7 @@ const SimpleList = ({
         justifyContent: 'center',
         opacity: 1,
       }}>
-      <>
-        {placeholder}
-      </>
+      <>{placeholder}</>
     </View>
   );
 

@@ -7,35 +7,34 @@ const {color, Value, timing} = Animated;
 export const EditorPosition = new Value(Dimensions.get('window').width * 1.5);
 export const EditorScale = new Value(0.99);
 export const EditorOpacity = new Value(0);
-export const EditorTranslateY = new Value(10);
+export const EditorTranslateY = new Value(150);
 
 export function openEditorAnimation() {
   EditorPosition.setValue(Dimensions.get('window').width * 1.5);
-  EditorTranslateY.setValue(10);
+  EditorTranslateY.setValue(150);
   EditorOpacity.setValue(0);
+
   editing.currentlyEditing = true;
-  let openConfigH = {
-    duration: 1,
-    toValue: 0,
-    easing: Easing.in(Easing.linear),
-  };
-  
-  timing(EditorScale, {
-    duration:300,
-    toValue:1,
-    easing: Easing.in(Easing.linear),
-  }).start();
-  timing(EditorTranslateY, {
-    duration:300,
-    toValue:0,
-    easing: Easing.in(Easing.linear),
-  }).start();
-  timing(EditorOpacity, {
-    duration:50,
-    toValue:1,
-    easing: Easing.in(Easing.linear),
-  }).start();
-  timing(EditorPosition, openConfigH).start();
+
+  EditorPosition.setValue(0);
+
+  setTimeout(() => {
+    timing(EditorScale, {
+      duration: 150,
+      toValue: 1,
+      easing: Easing.in(Easing.linear),
+    }).start();
+    timing(EditorTranslateY, {
+      duration: 150,
+      toValue: 0,
+      easing: Easing.in(Easing.linear),
+    }).start();
+    timing(EditorOpacity, {
+      duration: 150,
+      toValue: 1,
+      easing: Easing.in(Easing.linear),
+    }).start();
+  }, 10);
 }
 
 export function exitEditorAnimation() {
@@ -43,27 +42,31 @@ export function exitEditorAnimation() {
   EditorOpacity.setValue(1);
   EditorTranslateY.setValue(0);
   editing.currentlyEditing = false;
-  let openConfigH = {
-    duration: 1,
-    toValue: Dimensions.get('window').width * 1.5,
-    easing: Easing.in(Easing.linear),
-  };
-  timing(EditorOpacity, {
-    duration:150,
-    toValue:0,
-    easing: Easing.in(Easing.linear),
-  }).start();
-  timing(EditorTranslateY, {
-    duration:150,
-    toValue:40,
-    easing: Easing.in(Easing.linear),
-  }).start();
-  timing(EditorScale, {
-    duration:150,
-    toValue:0.99,
-    easing: Easing.in(Easing.linear),
-  }).start();
-  timing(EditorPosition, openConfigH).start();
+  setTimeout(() => {
+
+    setTimeout(() => {
+      EditorPosition.setValue(Dimensions.get('window').width * 1.5);
+    }, 250);
+    timing(EditorOpacity, {
+      duration: 150,
+      toValue: 0,
+      easing: Easing.in(Easing.linear),
+    }).start();
+    timing(EditorTranslateY, {
+      duration: 150,
+      toValue: 150,
+      easing: Easing.in(Easing.linear),
+    }).start();
+    timing(EditorScale, {
+      duration: 150,
+      toValue: 0.99,
+      easing: Easing.in(Easing.linear),
+    }).start();
+
+  },20)
+ 
+
+ 
 }
 
 export const slideRight = {

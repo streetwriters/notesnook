@@ -138,7 +138,7 @@ export const Login = ({route, navigation}) => {
       dispatch({
         type: ACTIONS.CONTAINER_STATE,
         state: {
-          noSelectionHeader: true,
+          noSelectionHeader: false,
         },
       });
       dispatch({

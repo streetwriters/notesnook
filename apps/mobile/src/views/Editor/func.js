@@ -1,12 +1,11 @@
-import { createRef } from 'react';
-import { Linking, Platform } from 'react-native';
-import { normalize } from '../../common/common';
-import { updateEvent } from '../../components/DialogManager/recievers';
-import { ACTIONS } from '../../provider/actions';
-import { eSendEvent } from '../../services/eventManager';
-import { refreshNotesPage } from '../../services/events';
-import { db, editing, timeConverter } from '../../utils/utils';
-
+import {createRef} from 'react';
+import {Linking, Platform} from 'react-native';
+import {normalize} from '../../common/common';
+import {updateEvent} from '../../components/DialogManager/recievers';
+import {ACTIONS} from '../../provider/actions';
+import {eSendEvent} from '../../services/eventManager';
+import {refreshNotesPage} from '../../services/events';
+import {db, editing, timeConverter} from '../../utils/utils';
 
 export const EditorWebView = createRef();
 
@@ -21,9 +20,9 @@ export const injectedJS = `if (!window.location.search) {
       }
       `;
 
-export const INJECTED_JAVASCRIPT = premium => `(function() {
+export const INJECTED_JAVASCRIPT = (premium, noMenu) => `(function() {
         setTimeout(() => {
-         loadAction(${premium});
+         loadAction(${(premium, noMenu)});
         },100)
      })();`;
 
@@ -43,21 +42,20 @@ export function post(type, value = null) {
   EditorWebView.current?.postMessage(JSON.stringify(message));
 }
 
-export const _onShouldStartLoadWithRequest = (request) => {
+export const _onShouldStartLoadWithRequest = request => {
   if (request.url.includes('https')) {
     Linking.openURL(request.url);
     return false;
   } else {
     return true;
   }
-}
+};
 
 export function checkNote() {
   return note && note.id;
 }
 
 export async function loadNote(item) {
-  //EditorWebView.current?.requestFocus();
   editing.currentlyEditing = true;
 
   updateEvent({type: ACTIONS.NOTES});
@@ -91,7 +89,6 @@ const onChange = data => {
 export const _onMessage = evt => {
   if (evt.nativeEvent.data === 'loaded') {
   } else if (evt.nativeEvent.data !== '' && evt.nativeEvent.data !== 'loaded') {
-
     clearTimeout(timer);
 
     timer = null;
@@ -239,15 +236,10 @@ export async function saveNote(lockNote = true) {
   post('saving', 'Saved');
 }
 
-export function onWebViewLoad(noMenu,premium,colors) {
-  EditorWebView.current?.injectJavaScript(INJECTED_JAVASCRIPT(premium));
-
-  if (noMenu) {
-    post('nomenu', true);
-  } else {
-    post('nomenu', false);
-  }
-
+export function onWebViewLoad(noMenu, premium, colors) {
+  EditorWebView.current?.injectJavaScript(
+    INJECTED_JAVASCRIPT(premium, false),
+  );
   if (note && note.id) {
     updateEditor();
   } else {
@@ -256,6 +248,16 @@ export function onWebViewLoad(noMenu,premium,colors) {
   let c = {...colors};
   c.factor = normalize(1);
   post('theme', c);
+
+  /*  setTimeout(() => {
+
+    if (noMenu) {
+      post('nomenu', true);
+    } else {
+      post('nomenu', false);
+    }
+
+  },1000) */
 }
 
 const updateEditor = async () => {
