@@ -60,13 +60,7 @@ const Editor = ({noMenu}) => {
     post('theme', colors);
   }, [colors.bg]);
 
-  useEffect(() => {
-    if (noMenu) {
-      //post('nomenu', true);
-    } else {
-      //post('nomenu', false);
-    }
-  }, [noMenu]);
+ 
 
   useEffect(() => {
     eSubscribeEvent(eOnLoadNote, load);
@@ -146,7 +140,9 @@ const Editor = ({noMenu}) => {
       if (checkNote()) {
         ToastEvent.show('Note Saved!', 'success');
       }
-      await clearEditor();
+      setTimeout(async () => {
+        await clearEditor();
+      }, 300);
       if (handleBack) {
         handleBack.remove();
         handleBack = null;
@@ -184,7 +180,7 @@ const Editor = ({noMenu}) => {
               color={colors.icon}
               onPress={_onBackPress}
               customStyle={{
-                marginLeft:-5
+                marginLeft: -5,
               }}
             />
           )}

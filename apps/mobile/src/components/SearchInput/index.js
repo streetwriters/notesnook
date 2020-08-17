@@ -12,6 +12,8 @@ import {TextInput, Text} from 'react-native';
 const {Value, timing, block} = Animated;
 let offsetY = 0;
 let searchResult = [];
+let timeoutAnimate = null;
+
 export const Search = props => {
   const [state, dispatch] = useTracked();
   const {colors, searchResults} = state;
@@ -25,22 +27,45 @@ export const Search = props => {
   const _opacity = new Value(1);
   const _borderAnim = new Value(1.5);
 
+  const animation = (margin, opacity, border) => {
+    timing(_marginAnim, {
+      toValue: margin,
+      duration: 230,
+      easing: Easing.inOut(Easing.ease),
+    }).start();
+    timing(_opacity, {
+      toValue: opacity,
+      duration: 250,
+      easing: Easing.inOut(Easing.ease),
+    }).start();
+    timing(_borderAnim, {
+      toValue: border,
+      duration: 270,
+      easing: Easing.inOut(Easing.ease),
+    }).start();
+  };
+
   const onScroll = y => {
     if (searchResults.results.length > 0) return;
     if (y < 30) {
-      setHideHeader(false);
+      animation(0, 1, 1.5);
       offsetY = y;
     }
-
     if (y > offsetY) {
       if (y - offsetY < 100) return;
-
-      setHideHeader(true);
+      clearTimeout(timeoutAnimate);
+      timeoutAnimate = null;
+      timeoutAnimate = setTimeout(() => {
+        animation(-65, 0, 0);
+      }, 500);
       offsetY = y;
     } else {
       if (offsetY - y < 50) return;
-
-      setHideHeader(false);
+      clearTimeout(timeoutAnimate);
+      timeoutAnimate = null;
+      timeoutAnimate = setTimeout(() => {
+        animation(0, 1, 1.5);
+      }, 500);
       offsetY = y;
     }
   };
@@ -49,38 +74,17 @@ export const Search = props => {
     selection.data = searchState.data;
     selection.type = searchState.type;
     eSubscribeEvent(eScrollEvent, onScroll);
-
     eSubscribeEvent('showSearch', () => {
-      setHideHeader(false);
+      animation(0, 1, 1.5);
     });
 
     return () => {
       eUnSubscribeEvent(eScrollEvent, onScroll);
-
       eUnSubscribeEvent('showSearch', () => {
-        setHideHeader(false);
+        animation(0, 1, 1.5);
       });
     };
-  }, []);
-
-  useEffect(() => {
-    timing(_marginAnim, {
-      toValue: hideHeader ? -65 : 0,
-      duration: 230,
-      easing: Easing.inOut(Easing.ease),
-    }).start();
-    timing(_opacity, {
-      toValue: hideHeader ? 0 : 1,
-      duration: 250,
-      easing: Easing.inOut(Easing.ease),
-    }).start();
-    timing(_borderAnim, {
-      toValue: hideHeader ? 0 : 1.5,
-      duration: 270,
-      easing: Easing.inOut(Easing.ease),
-    }).start();
-    console.log('called');
-  }, [hideHeader]);
+  }, [searchState]);
 
   const clearSearch = () => {
     if (searchResult && searchResult.length > 0) {

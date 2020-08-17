@@ -27,7 +27,7 @@ import {moveNoteHideEvent} from '../DialogManager/recievers';
 import {HeaderMenu} from './HeaderMenu';
 import {HeaderTitle} from './HeaderTitle';
 let offsetY = 0;
-
+let timeout = null
 function useForceUpdate() {
   const [, setTick] = useState(0);
   const update = useCallback(() => {
@@ -53,25 +53,36 @@ export const Header = ({showSearch, root}) => {
   const insets = useSafeArea();
   const forceUpdate = useForceUpdate();
 
+ 
   const onScroll = y => {
     if (searchResults.results.length > 0) return;
     if (y < 30) {
       setHideHeader(false);
-      offsetY = y;
+      offsetY = y
     }
-
     if (y > offsetY) {
       if (y - offsetY < 100) return;
-
-      setHideHeader(true);
-      offsetY = y;
+      clearTimeout(timeout);
+      timeout = null
+      timeout = setTimeout(() => {
+        setHideHeader(true);
+      },300); 
+      offsetY = y
     } else {
       if (offsetY - y < 50) return;
-
-      setHideHeader(false);
-      offsetY = y;
+      clearTimeout(timeout);
+      timeout = null
+      timeout = setTimeout(() => {
+        setHideHeader(false);
+      },300); 
+      offsetY = y
+    
     }
+ 
   };
+
+
+
 
   const _setModalNavigator = value => {
     if (root) return;
@@ -92,7 +103,7 @@ export const Header = ({showSearch, root}) => {
     <View
       style={{
         flexDirection: 'row',
-        zIndex: 10,
+        zIndex: 11,
         height: 50,
         marginTop:
           Platform.OS === 'ios'
@@ -107,6 +118,7 @@ export const Header = ({showSearch, root}) => {
         alignItems: 'center',
         paddingHorizontal: 12,
         width: '100%',
+        backgroundColor:colors.bg
       }}>
       <Animatable.View
         transition={['opacity']}

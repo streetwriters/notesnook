@@ -8,7 +8,7 @@ import {eSendEvent} from '../../services/eventManager';
 import {eOnLoadNote, eScrollEvent} from '../../services/events';
 import {openEditorAnimation} from '../../utils/animations';
 import {DDS} from '../../utils/utils';
-import { Placeholder } from '../../components/ListPlaceholders';
+import {Placeholder} from '../../components/ListPlaceholders';
 
 export const Home = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
@@ -97,7 +97,7 @@ export const Home = ({route, navigation}) => {
         pinned={true}
         focused={isFocused}
         RenderItem={NoteItemWrapper}
-        placeholder={<Placeholder type="notes"/>}
+        placeholder={<Placeholder type="notes" />}
         placeholderText={`Notes you write appear here`}
       />
     </>
