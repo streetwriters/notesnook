@@ -13,12 +13,7 @@ export default class User {
   async sync() {
     var user = await this.get();
     if (!user) return;
-    try {
-      user = await authRequest.call(this, "users", undefined, true, true);
-      if (!user) return await this.clear();
-    } catch (e) {
-      return await this._context.clear();
-    }
+    user = await authRequest.call(this, "users", undefined, true, true);
     await this.set(user);
   }
 
