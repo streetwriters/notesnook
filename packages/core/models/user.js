@@ -32,21 +32,6 @@ export default class User {
     return { key: user.key, salt: user.salt };
   }
 
-  async upgrade(refno) {
-    const user = await this.get();
-    if (!user || !refno) return;
-
-    await this.set({ refno, upgrading: true });
-    let response = await authRequest.call(this, "upgrade", { refno }, true);
-    if (response.duration) {
-      await this.set({
-        refno: undefined,
-        trialExpiryDate: response.duration,
-        upgrading: undefined,
-      });
-    }
-  }
-
   async set(user) {
     if (!user) return;
     user = { ...(await this.get()), ...user };
