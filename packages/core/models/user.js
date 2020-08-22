@@ -17,9 +17,8 @@ export default class User {
       user = await authRequest.call(this, "users", undefined, true, true);
       if (!user) return await this.clear();
     } catch (e) {
-      return await this.clear();
+      return await this._context.clear();
     }
-    delete user.lastSynced;
     await this.set(user);
   }
 
@@ -52,10 +51,6 @@ export default class User {
     if (!user) return;
     user = { ...(await this.get()), ...user };
     await this._context.write("user", user);
-  }
-
-  async clear() {
-    await this._context.write("user", {});
   }
 
   async login(username, password) {

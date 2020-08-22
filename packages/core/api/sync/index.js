@@ -61,7 +61,7 @@ export default class Sync {
     await this._db.conflicts.recalculate();
     await this._db.conflicts.check();
 
-    let lastSynced = user.lastSynced || 0;
+    let lastSynced = user.notesnook.lastSynced || 0;
     let serverResponse = await this._fetch(lastSynced, token);
 
     // we prepare local data before merging so we always have correct data
@@ -77,7 +77,9 @@ export default class Sync {
     lastSynced = await this._send(data, token);
 
     // update our lastSynced time
-    if (lastSynced) await this._db.user.set({ lastSynced });
+    if (lastSynced) {
+      await this._db.user.set({ notesnook: { ...user.notesnook, lastSynced } });
+    }
   }
 
   async _send(data, token) {
