@@ -124,7 +124,7 @@ async function authRequest(endpoint, data, auth = false, get = false) {
     };
   }
 
-  let response = await fetch(`${HOST}${endpoint}`, {
+  let response = await fetch(`${HOST}/${endpoint}`, {
     method: get ? "GET" : "POST",
     headers: { ...HEADERS, ...headers },
     body: get ? undefined : JSON.stringify(data),

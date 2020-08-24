@@ -46,7 +46,7 @@ export default class Sync {
   }
 
   async _fetch(lastSynced, token) {
-    let response = await fetch(`${HOST}sync?lst=${lastSynced}`, {
+    let response = await fetch(`${HOST}/sync?lst=${lastSynced}`, {
       headers: { ...HEADERS, Authorization: `Bearer ${token}` },
     });
     return await response.json();
@@ -83,7 +83,7 @@ export default class Sync {
   }
 
   async _send(data, token) {
-    let response = await fetch(`${HOST}sync`, {
+    let response = await fetch(`${HOST}/sync`, {
       method: "POST",
       headers: { ...HEADERS, Authorization: `Bearer ${token}` },
       body: JSON.stringify(data),
