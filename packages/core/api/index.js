@@ -31,6 +31,11 @@ class Database {
 
   async init() {
     this.ev = new EventManager();
+    this.ev.subscribeMulti(
+      ["user:loggedIn", "user:loggedOut", "user:tokenRefreshed", "user:synced"],
+      this._onUserStateChanged.bind(this)
+    );
+
     this.session = new Session(this.context);
     this._validate();
 
@@ -57,11 +62,6 @@ class Database {
     this.delta = await Content.new(this, "delta", false);
     /** @type {Content} */
     this.text = await Content.new(this, "text", false);
-
-    this.ev.subscribeMulti(
-      ["user:loggedIn", "user:loggedOut", "user:tokenRefreshed", "user:synced"],
-      this._onUserStateChanged.bind(this)
-    );
   }
 
   _onUserStateChanged(user) {
@@ -75,6 +75,10 @@ class Database {
       headers: { Authorization: `Bearer ${user.accessToken}` },
     });
 
+    this.evtSource.onopen = function () {
+      console.log("sse opened.");
+    };
+
     this.evtSource.onmessage = async (event) => {
       const { type, data } = JSON.parse(event.data);
       switch (type) {
@@ -82,7 +86,7 @@ class Database {
           await this.user.set({
             notesnook: { ...user.notesnook, subscription: data },
           });
-          this.ev.publish("user:upgraded");
+          this.ev.publish("user:upgraded", data);
           break;
         case "sync":
           this.ev.publish("db:sync");
