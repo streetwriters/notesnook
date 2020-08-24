@@ -13,8 +13,19 @@ export default class User {
   async sync() {
     var user = await this.get();
     if (!user) return;
-    user = await authRequest.call(this, "users", undefined, true, true);
-    await this.set(user);
+    var serverUser = await authRequest.call(
+      this,
+      "users",
+      undefined,
+      true,
+      true
+    );
+
+    await this.set({
+      ...user,
+      ...serverUser,
+      notesnook: { ...user.notesnook, ...serverUser.notesnook },
+    });
 
     // propogate event
     this._db.ev.publish("user:synced", user);
