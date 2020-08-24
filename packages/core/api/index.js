@@ -64,7 +64,7 @@ class Database {
     this.text = await Content.new(this, "text", false);
   }
 
-  _onUserStateChanged(user) {
+  async _onUserStateChanged(user) {
     if (this.evtSource) {
       this.evtSource.close();
     }
