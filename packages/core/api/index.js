@@ -11,6 +11,8 @@ import Content from "../collections/content";
 import Conflicts from "./sync/conflicts";
 import EventManager from "../utils/event-manager";
 import Session from "./session";
+import { EventSourcePolyfill } from "event-source-polyfill";
+import { HOST } from "../utils/constants";
 
 class Database {
   constructor(context) {
@@ -28,6 +30,7 @@ class Database {
   }
 
   async init() {
+    this.ev = new EventManager();
     this.session = new Session(this.context);
     this._validate();
 
@@ -38,7 +41,6 @@ class Database {
     this.vault = new Vault(this);
     this.conflicts = new Conflicts(this);
     this.lookup = new Lookup(this);
-    this.ev = new EventManager();
 
     // collections
     /** @type {Notes} */
@@ -56,10 +58,37 @@ class Database {
     /** @type {Content} */
     this.text = await Content.new(this, "text", false);
 
-    if (this._syncInterval) clearInterval(this._syncInterval);
-    this._syncInterval = setInterval(async () => {
-      this.ev.publish("sync");
-    }, 60 * 1000 * 3);
+    this.ev.subscribeMulti(
+      ["user:loggedIn", "user:loggedOut", "user:tokenRefreshed", "user:synced"],
+      this._onUserStateChanged.bind(this)
+    );
+  }
+
+  _onUserStateChanged(user) {
+    if (this.evtSource) {
+      this.evtSource.close();
+    }
+
+    if (!user) return;
+
+    this.evtSource = new EventSourcePolyfill(`${HOST}/events`, {
+      headers: { Authorization: `Bearer ${user.accessToken}` },
+    });
+
+    this.evtSource.onmessage = async (event) => {
+      const { type, data } = JSON.parse(event.data);
+      switch (type) {
+        case "upgrade":
+          await this.user.set({
+            notesnook: { ...user.notesnook, subscription: data },
+          });
+          this.ev.publish("user:upgraded");
+          break;
+        case "sync":
+          this.ev.publish("db:sync");
+          break;
+      }
+    };
   }
 
   sync() {

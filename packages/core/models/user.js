@@ -15,6 +15,9 @@ export default class User {
     if (!user) return;
     user = await authRequest.call(this, "users", undefined, true, true);
     await this.set(user);
+
+    // propogate event
+    this._db.ev.publish("user:synced", user);
   }
 
   get() {
@@ -43,6 +46,9 @@ export default class User {
     const key = await this._context.deriveKey(password, response.payload.salt);
     let user = userFromResponse(response, key);
     await this._context.write("user", user);
+
+    // propogate event
+    this._db.ev.publish("user:loggedIn", user);
   }
 
   async token() {
@@ -67,10 +73,17 @@ export default class User {
       expiry: Date.now() + response.expiry * 100,
     };
     await this._context.write("user", user);
+
+    // propogate event
+    this._db.ev.publish("user:tokenRefreshed", user);
   }
 
   logout() {
     this._db.ev.publish("clear");
+
+    // propogate event
+    this._db.ev.publish("user:loggedOut", null);
+
     return this._context.clear();
   }
 
@@ -84,6 +97,9 @@ export default class User {
     const key = await this._context.deriveKey(password, response.payload.salt);
     let user = userFromResponse(response, key);
     await this._context.write("user", user);
+
+    // propogate event
+    this._db.ev.publish("user:loggedIn", user);
   }
 }
 

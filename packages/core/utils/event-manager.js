@@ -3,6 +3,12 @@ class EventManager {
     this._registry = {};
   }
 
+  subscribeMulti(names, handler) {
+    names.forEach((name) => {
+      this.subscribe(name, handler);
+    });
+  }
+
   subscribe(name, handler) {
     if (!name || !handler) throw new Error("name and handler are required.");
     if (!this._registry[name]) this._registry[name] = [];
