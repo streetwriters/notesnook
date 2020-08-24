@@ -52,7 +52,7 @@ export default class Sync {
     return await response.json();
   }
 
-  async start() {
+  async _performChecks() {
     let user = await this._db.user.get();
     let token = await this._db.user.token();
     if (!user || !token) throw new Error("You need to login to sync.");
@@ -62,6 +62,13 @@ export default class Sync {
     await this._db.conflicts.check();
 
     let lastSynced = user.notesnook.lastSynced || 0;
+
+    return { user, lastSynced, token };
+  }
+
+  async start() {
+    let { user, lastSynced, token } = await this._performChecks();
+
     let serverResponse = await this._fetch(lastSynced, token);
 
     // we prepare local data before merging so we always have correct data
@@ -75,6 +82,20 @@ export default class Sync {
 
     // send the data back to server
     lastSynced = await this._send(data, token);
+
+    // update our lastSynced time
+    if (lastSynced) {
+      await this._db.user.set({ notesnook: { ...user.notesnook, lastSynced } });
+    }
+  }
+
+  async eventMerge(serverResponse) {
+    let { user, lastSynced } = await this._performChecks();
+    // merge the server response
+    await this._merger.merge(serverResponse, lastSynced);
+
+    // check for conflicts and throw
+    await this._db.conflicts.check();
 
     // update our lastSynced time
     if (lastSynced) {

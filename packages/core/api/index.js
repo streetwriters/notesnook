@@ -92,7 +92,8 @@ class Database {
           this.ev.publish("user:upgraded", data);
           break;
         case "sync":
-          this.ev.publish("db:sync");
+          await this.syncer.eventMerge(data);
+          this.ev.publish("db:refresh");
           break;
       }
     };
