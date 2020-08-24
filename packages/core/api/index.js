@@ -70,6 +70,9 @@ class Database {
     }
 
     if (!user) return;
+    if (!user.accessToken) {
+      user = await this.user.get();
+    }
 
     this.evtSource = new EventSourcePolyfill(`${HOST}/events`, {
       headers: { Authorization: `Bearer ${user.accessToken}` },
