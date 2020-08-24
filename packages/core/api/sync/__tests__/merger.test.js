@@ -113,6 +113,7 @@ describe.each(tests)(
 );
 
 test("local delta updated after lastSyncedTimestamp should cause merge conflict", () => {
+  StorageInterface.clear();
   return noteTest().then(async ({ db, id }) => {
     await login(db);
     const content = {
