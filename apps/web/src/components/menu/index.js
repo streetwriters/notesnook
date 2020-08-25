@@ -3,7 +3,6 @@ import { Flex, Box, Text } from "rebass";
 import { useStore as useUserStore } from "../../stores/user-store";
 
 function Menu(props) {
-  const isPremium = useUserStore((store) => store.user.isPremium);
   const isTrial = useUserStore(
     (store) => store.user?.notesnook?.subscription?.isTrial
   );
@@ -44,13 +43,7 @@ function Menu(props) {
                   if (props.closeMenu) {
                     props.closeMenu();
                   }
-
-                  const onlyPro = item.onlyPro && isTrial === undefined;
-                  if (onlyPro) {
-                    // TODO
-                  } else if (item.onClick) {
-                    item.onClick(props.data);
-                  }
+                  item.onClick(props.data);
                 }}
                 flexDirection="row"
                 alignItems="center"
@@ -72,7 +65,7 @@ function Menu(props) {
                     {item.title}
                   </Text>
                 )}
-                {item.onlyPro && !isPremium && (
+                {item.onlyPro && isTrial === undefined && (
                   <Text
                     fontSize="menu"
                     bg="primary"
