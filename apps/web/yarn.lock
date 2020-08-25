@@ -4357,6 +4357,11 @@ etag@~1.8.1:
   resolved "https://registry.yarnpkg.com/etag/-/etag-1.8.1.tgz#41ae2eeb65efa62268aebfea83ac7d79299b0887"
   integrity sha1-Qa4u62XvpiJorr/qg6x9eSmbCIc=
 
+event-source-polyfill@^1.0.16:
+  version "1.0.16"
+  resolved "https://registry.yarnpkg.com/event-source-polyfill/-/event-source-polyfill-1.0.16.tgz#24a035cf95efcc6d44e7288887da2e8de6859ca9"
+  integrity sha512-8Uw+cbuKGC8NwA2EW5zV95qmyvrxQcFlVjaZcK1NpJD/M+4aSIGhLobsY8L5QXRQ7+oVX4jA0FcyTgdlv8C0TA==
+
 eventemitter3@^2.0.3:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-2.0.3.tgz#b5e1079b59fb5e1ba2771c0a993be060a58c99ba"
@@ -7302,8 +7307,9 @@ normalize-url@^3.0.0, normalize-url@^3.0.1:
 
 "notes-core@git+ssh://git@github.com:streetwriters/notesnook-core.git":
   version "1.5.0"
-  resolved "git+ssh://git@github.com:streetwriters/notesnook-core.git#ccddf7870901639d82a1998701b1aa3a50742091"
+  resolved "git+ssh://git@github.com:streetwriters/notesnook-core.git#c9ea70d8f9c264431b49f67d77567e32c4f5b1c9"
   dependencies:
+    event-source-polyfill "^1.0.16"
     fast-sort "^2.0.1"
     fuzzysearch "^1.0.3"
     no-internet "^1.5.2"

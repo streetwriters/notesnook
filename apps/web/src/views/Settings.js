@@ -13,8 +13,9 @@ function Settings(props) {
   const toggleNightMode = useThemeStore((store) => store.toggleNightMode);
   const user = useUserStore((store) => store.user);
   const isLoggedIn = useUserStore((store) => store.isLoggedIn);
-  const isPremium = useUserStore((store) => store.user.isPremium);
-  const isTrialExpired = useUserStore((store) => store.isTrialExpired);
+  const isTrial = useUserStore(
+    (store) => store?.user?.notesnook?.subscription?.isTrial
+  );
   const logout = useUserStore((store) => store.logout);
 
   return (
@@ -79,7 +80,7 @@ function Settings(props) {
               px={1}
               py={1 / 2}
             >
-              {isPremium || isTrialExpired ? "Pro" : "Trial"}
+              {!isTrial ? "Pro" : "Trial"}
             </Text>
           )}
         </Flex>

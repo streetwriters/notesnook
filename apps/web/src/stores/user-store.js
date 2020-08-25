@@ -10,7 +10,6 @@ class UserStore extends BaseStore {
   isLoggingIn = false;
   isSigningIn = false;
   isSyncing = false;
-  isTrialExpired = false;
   user = {};
 
   init = () => {
@@ -18,11 +17,17 @@ class UserStore extends BaseStore {
       if (!user) return false;
       this.set((state) => {
         state.user = user;
-        state.isTrialExpired = user.trialExpiryDate > Date.now() * 1000;
         state.isLoggedIn = true;
       });
-      db.ev.subscribe("sync", () => {
-        this.sync();
+      db.ev.subscribe("db:refresh", () => appStore.refresh());
+      db.ev.subscribe("user:upgraded", (subscription) => {
+        console.log("user:upgraded", subscription);
+        this.set((state) => {
+          state.user = {
+            ...state.user,
+            notesnook: { ...state.user.notesnook, subscription },
+          };
+        });
       });
       this.sync();
       return true;

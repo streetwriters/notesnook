@@ -16,7 +16,9 @@ function Editor() {
   const setSession = useStore((store) => store.setSession);
   const saveSession = useStore((store) => store.saveSession);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
-  const isPremium = useUserStore((store) => store.user.isPremium);
+  const isTrial = useUserStore(
+    (store) => store.user.notesnook?.subscription?.isTrial
+  );
   const quillRef = useRef();
 
   useEffect(() => {
@@ -56,7 +58,7 @@ function Editor() {
           id="quill"
           ref={quillRef}
           refresh={sessionState === SESSION_STATES.new}
-          isSimple={!isPremium}
+          isSimple={isTrial}
           initialContent={delta}
           placeholder="Type anything here"
           container=".editor"

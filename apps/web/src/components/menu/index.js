@@ -4,7 +4,9 @@ import { useStore as useUserStore } from "../../stores/user-store";
 
 function Menu(props) {
   const isPremium = useUserStore((store) => store.user.isPremium);
-  const isTrialExpired = useUserStore((store) => store.isTrialExpired);
+  const isTrial = useUserStore(
+    (store) => store.user?.notesnook?.subscription?.isTrial
+  );
 
   return (
     <Flex
@@ -42,7 +44,8 @@ function Menu(props) {
                   if (props.closeMenu) {
                     props.closeMenu();
                   }
-                  const onlyPro = item.onlyPro && !isPremium && isTrialExpired;
+
+                  const onlyPro = item.onlyPro && isTrial === undefined;
                   if (onlyPro) {
                     // TODO
                   } else if (item.onClick) {
