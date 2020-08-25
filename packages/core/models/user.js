@@ -13,13 +13,18 @@ export default class User {
   async sync() {
     var user = await this.get();
     if (!user) return;
-    var serverUser = await authRequest.call(
-      this,
-      "users",
-      undefined,
-      true,
-      true
-    );
+    try {
+      var serverUser = await authRequest.call(
+        this,
+        "users",
+        undefined,
+        true,
+        true
+      );
+    } catch (e) {
+      if (e.message.includes("not authorized")) await this.logout();
+      else throw e;
+    }
 
     await this.set({
       ...user,
@@ -90,10 +95,8 @@ export default class User {
   }
 
   logout() {
-    this._db.ev.publish("clear");
-
     // propogate event
-    this._db.ev.publish("user:loggedOut", null);
+    this._db.ev.publish("user:loggedOut");
 
     return this._context.clear();
   }

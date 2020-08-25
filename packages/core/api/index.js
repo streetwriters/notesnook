@@ -40,8 +40,6 @@ class Database {
     this._validate();
 
     this.user = new User(this);
-    await this.user.sync();
-
     this.syncer = new Sync(this);
     this.vault = new Vault(this);
     this.conflicts = new Conflicts(this);
@@ -62,6 +60,8 @@ class Database {
     this.delta = await Content.new(this, "delta", false);
     /** @type {Content} */
     this.text = await Content.new(this, "text", false);
+
+    await this.user.sync();
   }
 
   async _onUserStateChanged(user) {
