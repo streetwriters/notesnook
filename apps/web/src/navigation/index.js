@@ -112,6 +112,7 @@ class Navigator {
     ReactDOM.render(
       <AnimatePresence exitBeforeEnter={true}>
         <Animated.Flex
+          sx={{ overflow: "hidden" }}
           key={route.key}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

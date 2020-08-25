@@ -41,6 +41,7 @@ function Editor() {
       sx={{
         position: "relative",
         alignSelf: isFocusMode ? "center" : "stretch",
+        overflow: "hidden",
       }}
       flex="1 1 auto"
     >

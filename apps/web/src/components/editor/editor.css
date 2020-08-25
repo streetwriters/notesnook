@@ -1,14 +1,11 @@
-.quill {
-  overflow-y: auto;
-  flex: 1 1 auto;
+.ql-editor {
+  height: auto !important;
+  overflow-y: hidden !important;
 }
 
 .ql-container.ql-snow {
   border: none !important;
-}
-
-.ql-container.ql-snow {
-  overflow-y: hidden;
+  overflow-y: auto !important;
 }
 
 /*Quill Toolbar*/
