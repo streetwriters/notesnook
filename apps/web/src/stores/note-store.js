@@ -69,7 +69,7 @@ class NoteStore extends BaseStore {
 
   favorite = async (note) => {
     await db.notes.note(note).favorite();
-    this.refreshContext.defer();
+    setTimeout(() => this.refreshContext(), 0);
     this._setValue(note.id, "favorite", !note.favorite);
   };
 
