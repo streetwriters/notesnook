@@ -134,12 +134,18 @@ class EditorStore extends BaseStore {
   setSession = (set, immediate = false) => {
     clearTimeout(this.get().session.timeout);
     const oldSession = { ...this.get().session };
+
+    // TODO test this
+    this.set((state) => {
+      if (state.session.state !== SESSION_STATES.stale)
+        state.session.state = SESSION_STATES.stale;
+    });
+
     this.set((state) => {
       set(state);
 
       state.session.timeout = setTimeout(
         () => {
-          this.set((state) => (state.session.state = SESSION_STATES.stale));
           this.session = this.get().session;
           this.saveSession(oldSession);
         },
