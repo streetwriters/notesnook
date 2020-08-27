@@ -17,7 +17,7 @@ function menuItems(note, context) {
   return [
     { title: "colors", component: Colors },
     {
-      title: note.notebook ? "Move" : "Add to",
+      title: note.notebook?.id ? "Move" : "Add to",
       onClick: async () => {
         if (await showMoveNoteDialog([note.id])) {
           console.log("Note moved successfully!");
@@ -48,7 +48,7 @@ function menuItems(note, context) {
       onlyPro: true,
     },
     {
-      visible: context && context.type === "topic",
+      visible: context?.type === "topic",
       title: "Remove",
       onClick: async () => {
         confirm(
