@@ -68,6 +68,7 @@ export default class ReactQuill extends Component {
     const { initialContent, refresh } = this.props;
     if (refresh) {
       this.quill.setContents(initialContent);
+      this.quill.history.clear();
       if (!initialContent.ops || !initialContent.ops.length) return;
       const text = this.quill.getText();
       this.quill.setSelection(text.length, 0);
