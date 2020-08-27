@@ -33,6 +33,7 @@ const quillModules = {
   // syntax: true,
   markdownShortcuts: {},
   magicUrl: true,
+  history: { maxStack: 1000 * 5 },
 };
 
 const simpleQuillModules = {
