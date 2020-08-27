@@ -64,7 +64,7 @@ class NoteStore extends BaseStore {
   pin = async (note) => {
     await db.notes.note(note).pin();
     this.refresh();
-    this._syncEditor(note.id, "pinned");
+    this._syncEditor(note.id, "pinned", !note.pinned);
   };
 
   favorite = async (note) => {
