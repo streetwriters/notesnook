@@ -20,11 +20,12 @@
     "test": "jest"
   },
   "dependencies": {
+    "crypto-random-string": "^3.2.0",
+    "event-source-polyfill": "^1.0.16",
     "fast-sort": "^2.0.1",
     "fuzzysearch": "^1.0.3",
     "no-internet": "^1.5.2",
     "qclone": "^1.0.4",
-    "event-source-polyfill": "^1.0.16",
     "transfun": "^1.0.2"
   }
 }
