@@ -229,5 +229,5 @@ test("export note to md", () =>
 test("export note to txt", () =>
   noteTest().then(async ({ db, id }) => {
     const txt = await db.notes.note(id).export("txt");
-    expect(txt).toBe("I am a text");
+    expect(txt.includes("I am a text")).toBeTruthy();
   }));

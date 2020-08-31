@@ -21,10 +21,13 @@ export function buildPage(
   { metadata, title, content, createdOn, editedOn }
 ) {
   let page = template;
-  page = page.replace(
-    /{{metaTags}}/g,
-    generateMetaTags(metadata, createMetaTag).join("\n")
-  );
+
+  if (createMetaTag)
+    page = page.replace(
+      /{{metaTags}}/g,
+      generateMetaTags(metadata, createMetaTag).join("\n")
+    );
+
   page = page.replace(/{{title}}/g, title);
   page = page.replace(/{{content}}/g, content);
   page = page.replace(/{{createdOn}}/g, formatDate(createdOn));

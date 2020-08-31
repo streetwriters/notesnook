@@ -1,4 +1,7 @@
 import Converter from "../utils/converter";
+import MarkdownBuilder from "../utils/templates/markdown/builder";
+import HTMLBuilder from "../utils/templates/html/builder";
+import TextBuilder from "../utils/templates/text/builder";
 
 export default class Note {
   /**
@@ -48,13 +51,22 @@ export default class Note {
    * @param {"html"|"md"|"txt"} format - Format to export into
    */
   async export(to = "html") {
+    const templateData = {
+      metadata: this.data,
+      title: this.title,
+      editedOn: this.dateEdited,
+      createdOn: this.data.dateCreated,
+    };
     switch (to) {
       case "html":
-        return Converter.deltaToHTML(this.data, await this.delta());
+        templateData.content = Converter.deltaToHTML(await this.delta());
+        return HTMLBuilder.buildHTML(templateData);
       case "txt":
-        return await this.text();
+        templateData.content = await this.text();
+        return TextBuilder.buildText(templateData);
       case "md":
-        return Converter.deltaToMD(this.data, await this.delta());
+        templateData.content = Converter.deltaToMD(await this.delta());
+        return MarkdownBuilder.buildMarkdown(templateData);
       default:
         throw new Error("Export format not supported.");
     }
