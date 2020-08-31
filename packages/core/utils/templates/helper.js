@@ -6,6 +6,10 @@ function generateMetaTags(metadata, createMetaTag) {
     let value = metadata[key];
     if (typeof value === "object" && !Array.isArray(value)) continue;
     else if (Array.isArray(value)) value = value.join(", ");
+
+    // we must have no new line characters
+    value = value.replace(/\r?\n|\r/g, "");
+
     metaTags.push(createMetaTag(key, value));
   }
   return metaTags;
