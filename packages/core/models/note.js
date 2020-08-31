@@ -50,7 +50,7 @@ export default class Note {
   async export(to = "html") {
     switch (to) {
       case "html":
-        return Converter.deltaToHTML(this.title, await this.delta());
+        return Converter.deltaToHTML(this.data, await this.delta());
       case "txt":
         return await this.text();
       case "md":

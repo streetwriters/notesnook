@@ -213,6 +213,7 @@ test("moving note to same notebook and topic should do nothing", () =>
 test("export note to html", () =>
   noteTest().then(async ({ db, id }) => {
     const html = await db.notes.note(id).export("html");
+    console.log(html);
     expect(
       html.includes(
         `<p>Hello<br/><span style="color:#f00">This is colorful</span></p>`
