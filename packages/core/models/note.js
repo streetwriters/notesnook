@@ -43,6 +43,10 @@ export default class Note {
     return this._note.dateEdited;
   }
 
+  /**
+   *
+   * @param {"html"|"md"|"txt"} format - Format to export into
+   */
   async export(to = "html") {
     switch (to) {
       case "html":
@@ -51,8 +55,8 @@ export default class Note {
         return await this.text();
       case "md":
         return Converter.deltaToMD(await this.delta());
-      case "pdf":
-        break;
+      default:
+        throw new Error("Export format not supported.");
     }
   }
 
