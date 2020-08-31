@@ -18,7 +18,7 @@ function getWeeksInMonth(month, year, _start) {
         preMonthEndDay.getMonth(),
         start
       ),
-      end: new Date(year, month, end)
+      end: new Date(year, month, end),
     });
     start = end + 1;
     end = end + 7;
@@ -26,7 +26,7 @@ function getWeeksInMonth(month, year, _start) {
   while (start <= numDays) {
     weeks.push({
       start: new Date(year, month, start),
-      end: new Date(year, month, end)
+      end: new Date(year, month, end),
     });
     start = end + 1;
     end = end + 7;
@@ -34,7 +34,7 @@ function getWeeksInMonth(month, year, _start) {
       end = end - numDays + _start;
       weeks.push({
         start: new Date(year, month, start),
-        end: new Date(year, month + 1, end)
+        end: new Date(year, month + 1, end),
       });
       break;
     }
@@ -71,7 +71,7 @@ export const months = [
   "Sep",
   "Oct",
   "Nov",
-  "Dec"
+  "Dec",
 ];
 let years = {};
 export function getWeekGroupFromTimestamp(timestamp) {
@@ -82,11 +82,23 @@ export function getWeekGroupFromTimestamp(timestamp) {
   }
   let weeks = years[date.getFullYear()];
 
-  let week = weeks.find(v => date >= v.start && date <= v.end);
+  let week = weeks.find((v) => date >= v.start && date <= v.end);
   //Format: {month} {start} - {end}, {year}
   return `${
     months[week.start.getMonth()]
   } ${week.start.getDate()}, ${week.start.getFullYear()} -  ${
     months[week.end.getMonth()]
   } ${week.end.getDate()}, ${week.end.getFullYear()}`;
+}
+
+export function formatDate(date) {
+  return new Date(date).toLocaleDateString("en", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    hour12: true,
+    minute: "2-digit",
+    second: "2-digit",
+  });
 }

@@ -54,7 +54,7 @@ export default class Note {
       case "txt":
         return await this.text();
       case "md":
-        return Converter.deltaToMD(await this.delta());
+        return Converter.deltaToMD(this.data, await this.delta());
       default:
         throw new Error("Export format not supported.");
     }
