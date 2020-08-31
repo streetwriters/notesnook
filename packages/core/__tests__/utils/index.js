@@ -27,7 +27,12 @@ const notebookTest = (notebook = TEST_NOTEBOOK) =>
 
 var TEST_NOTE = {
   content: {
-    delta: { ops: [{ type: "insert", text: "I am a delta" }] },
+    delta: {
+      ops: [
+        { insert: "Hello\n" },
+        { insert: "This is colorful", attributes: { color: "#f00" } },
+      ],
+    },
     text: "I am a text",
   },
 };

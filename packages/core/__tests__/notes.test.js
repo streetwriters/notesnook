@@ -209,3 +209,25 @@ test("moving note to same notebook and topic should do nothing", () =>
     let note = db.notes.note(id);
     expect(note.notebook.id).toBe(notebookId);
   }));
+
+test("export note to html", () =>
+  noteTest().then(async ({ db, id }) => {
+    const html = await db.notes.note(id).export("html");
+    expect(
+      html.includes(
+        `<p>Hello<br/><span style="color:#f00">This is colorful</span></p>`
+      )
+    ).toBeTruthy();
+  }));
+
+test("export note to md", () =>
+  noteTest().then(async ({ db, id }) => {
+    const md = await db.notes.note(id).export("md");
+    expect(md).toBe(`Hello\nThis is colorful\n`);
+  }));
+
+test("export note to txt", () =>
+  noteTest().then(async ({ db, id }) => {
+    const txt = await db.notes.note(id).export("txt");
+    expect(txt).toBe("I am a text");
+  }));

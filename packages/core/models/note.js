@@ -1,3 +1,5 @@
+import Converter from "../utils/converter";
+
 export default class Note {
   /**
    *
@@ -39,6 +41,19 @@ export default class Note {
 
   get dateEdited() {
     return this._note.dateEdited;
+  }
+
+  async export(to = "html") {
+    switch (to) {
+      case "html":
+        return Converter.deltaToHTML(this.title, await this.delta());
+      case "txt":
+        return await this.text();
+      case "md":
+        return Converter.deltaToMD(await this.delta());
+      case "pdf":
+        break;
+    }
   }
 
   delta() {
