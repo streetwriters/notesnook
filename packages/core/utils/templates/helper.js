@@ -3,12 +3,12 @@ import { formatDate } from "../date";
 function generateMetaTags(metadata, createMetaTag) {
   let metaTags = [];
   for (let key in metadata) {
-    let value = JSON.stringify(metadata[key]);
+    let value = metadata[key];
     if (typeof value === "object" && !Array.isArray(value)) continue;
     else if (Array.isArray(value)) value = value.join(", ");
 
     // we must have no new line characters
-    value = value.replace(/\r?\n|\r/g, "");
+    if (typeof value === "string") value = value.replace(/\r?\n|\r/g, "");
 
     metaTags.push(createMetaTag(key, value));
   }
