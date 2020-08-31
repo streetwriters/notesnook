@@ -12,6 +12,7 @@ import { db, COLORS } from "../../common";
 import { useTheme } from "emotion-theming";
 import Colors from "../menu/colors";
 import { isMobile } from "../../utils/dimensions";
+import { showExportDialog } from "../dialogs/exportdialog";
 
 function menuItems(note, context) {
   return [
@@ -32,6 +33,13 @@ function menuItems(note, context) {
     {
       title: note.favorite ? "Unfavorite" : "Favorite",
       onClick: () => store.favorite(note),
+      onlyPro: true,
+    },
+    {
+      title: "Export",
+      onClick: async () => {
+        await showExportDialog(note);
+      },
       onlyPro: true,
     },
     { title: "Edit", onClick: () => editorStore.openSession(note) },

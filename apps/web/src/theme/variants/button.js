@@ -58,6 +58,9 @@ class Tertiary {
       bg: "transparent",
       border: "2px solid",
       borderColor: "border",
+      ":hover": {
+        borderColor: "primary",
+      },
     };
   }
 }

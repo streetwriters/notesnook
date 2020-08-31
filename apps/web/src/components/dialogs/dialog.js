@@ -13,7 +13,7 @@ function Dialog(props) {
         <Modal
           isOpen={props.isOpen || false}
           shouldCloseOnOverlayClick={true}
-          onRequestClose={props.negativeButton.onClick}
+          onRequestClose={props?.negativeButton?.onClick}
           style={{
             content: {
               top: "50%",
