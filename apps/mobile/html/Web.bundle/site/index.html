@@ -1104,9 +1104,9 @@
     <input id="titleInput" placeholder="Title here" />
     <div class="info-bar">
       <p id="infowords"></p>
-      <p>•</p>
+      <p>-</p>
       <p id="infodate"></p>
-      <p>•</p>
+      <p>-</p>
       <p id="infosaved"></p>
     </div>
   <div id="editor"></div>
@@ -1119,7 +1119,38 @@
 </script>
 
 
-<script inline>(function () { function r(e, n, t) { function o(i, f) { if (!n[i]) { if (!e[i]) { var c = "function" == typeof require && require; if (!f && c) return c(i, !0); if (u) return u(i, !0); var a = new Error("Cannot find module '" + i + "'"); throw a.code = "MODULE_NOT_FOUND", a } var p = n[i] = { exports: {} }; e[i][0].call(p.exports, function (r) { var n = e[i][1][r]; return o(n || r) }, p, p.exports, r, e, n, t) } return n[i].exports } for (var u = "function" == typeof require && require, i = 0; i < t.length; i++)o(t[i]); return o } return r })()({
+<script inline>
+  function loadAction(premium, noMenu) {
+    let titleIn = document.getElementById('titlebar');
+  
+  //titleIn.style.width = width;
+  titleIn.style['padding-left'] = 12;
+  titleIn.style['padding-right'] = 60;
+
+  let proToolbar = [
+          [{ header: 1 }, { header: 2 }],
+          [{ size: ['small', false, 'large', 'huge'] }], // custom dropdown
+          ['bold', 'italic', 'image'], // toggled buttons
+          [{ list: 'ordered' }, { list: 'bullet' }, { list: 'check' }],
+          [{ header: [3, 4, 5, 6] }],
+          [{ align: [] }],
+          [{ color: [] }, { background: [] }], // dropdown with defaults from theme
+          ['underline', 'strike', 'blockquote', 'code-block'],
+          [{ script: 'sub' }, { script: 'super' }], // superscript/subscript
+          [{ indent: '-1' }, { indent: '+1' }], // outdent/indent
+          [{ direction: 'rtl' }], // text direction
+          ['clean'],
+        ];
+        let simpleToolbar = [
+          [{ header: 1 }, { header: 2 }],
+          ['bold', 'italic', 'underline', 'strike'], // toggled buttons
+          [{ align: [] }],
+          [{ direction: 'rtl' }], // text direction
+
+        ];
+        let mainToolbar = premium? proToolbar : simpleToolbar;
+
+(function () { function r(e, n, t) { function o(i, f) { if (!n[i]) { if (!e[i]) { var c = "function" == typeof require && require; if (!f && c) return c(i, !0); if (u) return u(i, !0); var a = new Error("Cannot find module '" + i + "'"); throw a.code = "MODULE_NOT_FOUND", a } var p = n[i] = { exports: {} }; e[i][0].call(p.exports, function (r) { var n = e[i][1][r]; return o(n || r) }, p, p.exports, r, e, n, t) } return n[i].exports } for (var u = "function" == typeof require && require, i = 0; i < t.length; i++)o(t[i]); return o } return r })()({
     1: [function (require, module, exports) {
       const Quill = require('quill');
 
@@ -1181,32 +1212,20 @@
       node.innerHTML = fontStyles;
       document.body.appendChild(node);
       Quill.register("modules/imageCompressor", imageCompressor);
+  
 
-      const editor = new Quill('#editor', {
-        modules: {
-          toolbar: [
-            [{ header: 1 }, { header: 2 }],
-            [{ size: ['small', false, 'large', 'huge'] }], // custom dropdown
-            ['bold', 'italic', 'image'], // toggled buttons
-            [{ list: 'ordered' }, { list: 'bullet' }, { list: 'check' }],
-            [{ header: [3, 4, 5, 6] }],
-            [{ align: [] }],
-            [{ color: [] }, { background: [] }], // dropdown with defaults from theme
-            ['underline', 'strike', 'blockquote', 'code-block'],
-            [{ script: 'sub' }, { script: 'super' }], // superscript/subscript
-            [{ indent: '-1' }, { indent: '+1' }], // outdent/indent
-            [{ direction: 'rtl' }], // text direction
-            ['clean'],
-          ],
-          imageCompressor: {
-            quality: 0.9,
-            maxWidth: 1024,
-            imageType: 'image/jpeg'
-          }
-        },
-        placeholder: 'Start writing your note',
-        theme: 'snow',
-      });
+        const editor = new Quill('#editor', {
+          modules: {
+            toolbar: mainToolbar,
+            imageCompressor: {
+              quality: 0.9,
+              maxWidth: 1024,
+              imageType: 'image/jpeg'
+            }
+          },
+          placeholder: 'Start writing your note',
+          theme: 'snow',
+        });
 
 
       var Font = Quill.import('formats/font');
@@ -16604,6 +16623,8 @@
 
     }, {}]
   }, {}, [1]);
+
+}
 </script>
 
 

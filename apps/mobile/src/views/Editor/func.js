@@ -20,11 +20,15 @@ export const injectedJS = `if (!window.location.search) {
       }
       `;
 
-export const INJECTED_JAVASCRIPT = (premium, noMenu) => `(function() {
+export const INJECTED_JAVASCRIPT = (premium, noMenu) => premium ?`(function() {
         setTimeout(() => {
-         loadAction(${(premium, noMenu)});
+         loadAction(true,false);
         },100)
-     })();`;
+     })();`:`(function() {
+      setTimeout(() => {
+       loadAction(false,false);
+      },100)
+   })();` ;
 
 var note = {};
 
