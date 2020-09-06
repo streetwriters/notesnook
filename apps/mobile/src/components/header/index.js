@@ -27,11 +27,11 @@ import {moveNoteHideEvent} from '../DialogManager/recievers';
 import {HeaderMenu} from './HeaderMenu';
 import {HeaderTitle} from './HeaderTitle';
 let offsetY = 0;
-let timeout = null
+let timeout = null;
 function useForceUpdate() {
   const [, setTick] = useState(0);
   const update = useCallback(() => {
-    setTick(tick => tick + 1);
+    setTick((tick) => tick + 1);
   }, []);
   return update;
 }
@@ -53,38 +53,32 @@ export const Header = ({showSearch, root}) => {
   const insets = useSafeArea();
   const forceUpdate = useForceUpdate();
 
- 
-  const onScroll = y => {
+  const onScroll = (y) => {
     if (searchResults.results.length > 0) return;
     if (y < 30) {
       setHideHeader(false);
-      offsetY = y
+      offsetY = y;
     }
     if (y > offsetY) {
       if (y - offsetY < 100) return;
       clearTimeout(timeout);
-      timeout = null
+      timeout = null;
       timeout = setTimeout(() => {
         setHideHeader(true);
-      },300); 
-      offsetY = y
+      }, 300);
+      offsetY = y;
     } else {
       if (offsetY - y < 50) return;
       clearTimeout(timeout);
-      timeout = null
+      timeout = null;
       timeout = setTimeout(() => {
         setHideHeader(false);
-      },300); 
-      offsetY = y
-    
+      }, 300);
+      offsetY = y;
     }
- 
   };
 
-
-
-
-  const _setModalNavigator = value => {
+  const _setModalNavigator = (value) => {
     if (root) return;
     forceUpdate();
     setIsModalNavigator(value);
@@ -118,7 +112,7 @@ export const Header = ({showSearch, root}) => {
         alignItems: 'center',
         paddingHorizontal: 12,
         width: '100%',
-        backgroundColor:colors.bg
+        backgroundColor: colors.bg,
       }}>
       <Animatable.View
         transition={['opacity']}
@@ -191,9 +185,7 @@ export const Header = ({showSearch, root}) => {
               size={SIZE.xxxl - 3}
             />
           </TouchableOpacity>
-        ) : (
-          undefined
-        )}
+        ) : undefined}
         {headerState.menu && !DDS.isTab ? (
           <TouchableOpacity
             hitSlop={{top: 20, bottom: 20, left: 50, right: 40}}
@@ -208,12 +200,11 @@ export const Header = ({showSearch, root}) => {
             }}>
             <Icon color={colors.pri} name={'menu'} size={SIZE.xxxl} />
           </TouchableOpacity>
-        ) : (
-          undefined
-        )}
+        ) : undefined}
 
         <HeaderTitle root={root} />
       </View>
+
       <View
         style={{
           flexDirection: 'row',

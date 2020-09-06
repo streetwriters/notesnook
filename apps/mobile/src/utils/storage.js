@@ -1,5 +1,7 @@
-import MMKV from 'react-native-mmkv-storage';
+import MMKVStorage from 'react-native-mmkv-storage';
 import Sodium from 'react-native-sodium';
+
+export const MMKV = new MMKVStorage.Loader().initialize();
 
 async function read(key, isArray = false) {
   let data;

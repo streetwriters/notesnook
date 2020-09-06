@@ -9,7 +9,7 @@ import {eOnLoadNote, eScrollEvent} from '../../services/events';
 import {openEditorAnimation} from '../../utils/animations';
 import {DDS} from '../../utils/utils';
 import {Placeholder} from '../../components/ListPlaceholders';
-
+import RNHTMLtoPDF from 'react-native-html-to-pdf';
 export const Home = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const {notes} = state;
@@ -54,7 +54,16 @@ export const Home = ({route, navigation}) => {
         type: ACTIONS.CONTAINER_BOTTOM_BUTTON,
         state: {
           bottomButtonText: 'Create a new note',
-          bottomButtonOnPress: () => {
+          bottomButtonOnPress: async () => {
+            let res = await RNHTMLtoPDF.convert({
+              html: '<h1>Custom converted PDF Document</h1>',
+              fileName: 'test',
+              base64: false,
+              directory:"Documents"
+              
+            });
+            console.log(res);
+            return;
             if (DDS.isTab) {
               eSendEvent(eOnLoadNote, {type: 'new'});
             } else {

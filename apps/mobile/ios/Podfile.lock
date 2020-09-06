@@ -68,7 +68,9 @@ PODS:
     - DoubleConversion
     - glog
   - glog (0.3.5)
-  - MMKV (1.0.24)
+  - MMKV (1.2.2):
+    - MMKVCore (~> 1.2.2)
+  - MMKVCore (1.2.2)
   - OpenSSL-Universal (1.0.2.19):
     - OpenSSL-Universal/Static (= 1.0.2.19)
   - OpenSSL-Universal/Static (1.0.2.19)
@@ -240,8 +242,10 @@ PODS:
   - React-jsinspector (0.63.2)
   - react-native-get-random-values (1.4.0):
     - React
-  - react-native-mmkv-storage (0.2.2):
-    - MMKV (= 1.0.24)
+  - react-native-html-to-pdf (0.8.0):
+    - React
+  - react-native-mmkv-storage (0.3.7):
+    - MMKV (= 1.2.2)
     - React
   - react-native-netinfo (5.9.6):
     - React
@@ -374,6 +378,7 @@ DEPENDENCIES:
   - React-jsiexecutor (from `../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - react-native-get-random-values (from `../node_modules/react-native-get-random-values`)
+  - react-native-html-to-pdf (from `../node_modules/react-native-html-to-pdf`)
   - react-native-mmkv-storage (from `../node_modules/react-native-mmkv-storage`)
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
   - react-native-orientation (from `../node_modules/react-native-orientation`)
@@ -415,6 +420,7 @@ SPEC REPOS:
     - Flipper-RSocket
     - FlipperKit
     - MMKV
+    - MMKVCore
     - OpenSSL-Universal
     - YogaKit
 
@@ -451,6 +457,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/jsinspector"
   react-native-get-random-values:
     :path: "../node_modules/react-native-get-random-values"
+  react-native-html-to-pdf:
+    :path: "../node_modules/react-native-html-to-pdf"
   react-native-mmkv-storage:
     :path: "../node_modules/react-native-mmkv-storage"
   react-native-netinfo:
@@ -521,7 +529,8 @@ SPEC CHECKSUMS:
   FlipperKit: bc68102cd4952a258a23c9c1b316c7bec1fecf83
   Folly: b73c3869541e86821df3c387eb0af5f65addfab4
   glog: 40a13f7840415b9a77023fbcae0f1e6f43192af3
-  MMKV: 758b2edee46b08bdd958db4169191afb9a6d4ebd
+  MMKV: b14909757d8b70e2aa89ff1c6d56a7b239e10a29
+  MMKVCore: 6225324fe5006026bc86ef8641d567e00c6582f3
   OpenSSL-Universal: 8b48cc0d10c1b2923617dfe5c178aa9ed2689355
   RCTRequired: f13f25e7b12f925f1f6a6a8c69d929a03c0129fe
   RCTTypeSafety: 44982c5c8e43ff4141eb519a8ddc88059acd1f3a
@@ -534,7 +543,8 @@ SPEC CHECKSUMS:
   React-jsiexecutor: 8ca588cc921e70590820ce72b8789b02c67cce38
   React-jsinspector: b14e62ebe7a66e9231e9581279909f2fc3db6606
   react-native-get-random-values: 2b7500cdb68066aba87cdccd97067c29e16ffe95
-  react-native-mmkv-storage: 4f85ac485ff25ad5b9f7b3c6cd4c8bb067b1028c
+  react-native-html-to-pdf: 1d1199917f56a98377d431bce84c2f275e48eb71
+  react-native-mmkv-storage: 023a9c501f7430319138a94889fc53691b93d73d
   react-native-netinfo: 38a1e0b3e89b48e4b5833ed475d8df5f049f6f90
   react-native-orientation: f1caf84d65f1a4fd4511a18f2b924e634ad7a628
   react-native-safe-area-context: eb91fe1fb3f7b87d9c30a7f0808407d8569d539d

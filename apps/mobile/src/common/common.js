@@ -1,5 +1,4 @@
 import { Dimensions, PixelRatio, StatusBar, Platform } from 'react-native';
-import MMKV from 'react-native-mmkv-storage';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -7,6 +6,7 @@ import {
 } from '../services/eventManager';
 import { eThemeUpdated } from '../services/events';
 import { DDS } from '../utils/utils';
+import { MMKV } from '../utils/storage';
 
 export const scale = {
   fontScale: 1,

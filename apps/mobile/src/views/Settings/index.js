@@ -2,7 +2,7 @@ import { useIsFocused } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import { Clipboard, Linking, Modal, Platform, ScrollView, StatusBar, Text, TouchableOpacity, View } from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import MMKV from 'react-native-mmkv-storage';
+
 import QRCode from 'react-native-qrcode-generator';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { ACCENT, COLOR_SCHEME, COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT, opacity, ph, pv, setColorScheme, SIZE, WEIGHT } from '../../common/common';
@@ -13,6 +13,7 @@ import { eSendEvent } from '../../services/eventManager';
 import { eOpenLoginDialog, eResetApp } from '../../services/events';
 import NavigationService from '../../services/NavigationService';
 import { db, DDS, setSetting, ToastEvent, w } from '../../utils/utils';
+import { MMKV } from '../../utils/storage';
 
 export const Settings = ({route, navigation}) => {
   const [state, dispatch] = useTracked();

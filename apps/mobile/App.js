@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from 'react';
-import MMKV from 'react-native-mmkv-storage';
 import Orientation from 'react-native-orientation';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {getColorScheme, scale, updateSize} from './src/common/common';
@@ -10,6 +9,8 @@ import {eSubscribeEvent, eUnSubscribeEvent} from './src/services/eventManager';
 import {eDispatchAction, eStartSyncer, eResetApp} from './src/services/events';
 import {db, DDS, ToastEvent} from './src/utils/utils';
 import {useNetInfo} from '@react-native-community/netinfo';
+import RNHTMLtoPDF from 'react-native-html-to-pdf';
+import { MMKV } from './src/utils/storage';
 
 const App = () => {
   const [state, dispatch] = useTracked();

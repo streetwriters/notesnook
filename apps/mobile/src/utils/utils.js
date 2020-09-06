@@ -6,8 +6,7 @@ import {
   eHideToast,
 } from '../services/events';
 import { DeviceDetectionService } from './deviceDetection';
-import StorageInterface from './storage';
-import MMKV from 'react-native-mmkv-storage';
+import StorageInterface, { MMKV } from './storage';
 import { updateEvent } from '../components/DialogManager/recievers';
 import { ACTIONS } from '../provider/actions';
 export const DDS = new DeviceDetectionService();

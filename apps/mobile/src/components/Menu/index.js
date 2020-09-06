@@ -8,7 +8,7 @@ import {
   View,
 } from 'react-native';
 import {createAnimatableComponent} from 'react-native-animatable';
-import MMKV from 'react-native-mmkv-storage';
+
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
   ACCENT,
@@ -28,6 +28,7 @@ import {ColorSection} from './ColorSection';
 import {MenuListItem} from './MenuListItem';
 import {TagsSection} from './TagsSection';
 import {UserSection} from './UserSection';
+import { MMKV } from '../../utils/storage';
 
 const AnimatedSafeAreaView = createAnimatableComponent(SafeAreaView);
 
@@ -85,7 +86,7 @@ export const Menu = ({
       icon: 'theme-light-dark',
       func: () => {
         if (!colors.night) {
-          MMKV.setStringAsync('theme', JSON.stringify({night: true}));
+          MMKV .setStringAsync('theme', JSON.stringify({night: true}));
           changeColorScheme(COLOR_SCHEME_DARK);
         } else {
           MMKV.setStringAsync('theme', JSON.stringify({night: false}));

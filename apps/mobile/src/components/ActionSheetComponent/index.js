@@ -8,7 +8,7 @@ import {
   View,
   KeyboardAvoidingView,
 } from 'react-native';
-import MMKV from 'react-native-mmkv-storage';
+
 import Share from 'react-native-share';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
@@ -30,6 +30,7 @@ import {timeConverter, ToastEvent, DDS, db} from '../../utils/utils';
 import {openVault, eSendEvent} from '../../services/eventManager';
 import {refreshNotesPage, eOpenPremiumDialog} from '../../services/events';
 import {PremiumTag} from '../Premium/PremiumTag';
+import { MMKV } from '../../utils/storage';
 
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
@@ -286,7 +287,7 @@ export const ActionSheetComponent = ({
       icon: 'theme-light-dark',
       func: () => {
         if (!colors.night) {
-          MMKV.setStringAsync('theme', JSON.stringify({night: true}));
+          MMKV .setStringAsync('theme', JSON.stringify({night: true}));
           changeColorScheme(COLOR_SCHEME_DARK);
         } else {
           MMKV.setStringAsync('theme', JSON.stringify({night: false}));
