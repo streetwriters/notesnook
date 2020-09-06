@@ -49,6 +49,7 @@ export const Menu = ({
     dispatch({type: ACTIONS.THEME, colors: newColors});
   }
 
+
   const listItems = [
     {
       name: 'Home',
@@ -97,7 +98,7 @@ export const Menu = ({
     },
     {
       name: 'Settings',
-      icon: 'settings-outline',
+      icon: 'cog-outline',
       func: () => NavigationService.navigate('Settings'),
       close: true,
     },

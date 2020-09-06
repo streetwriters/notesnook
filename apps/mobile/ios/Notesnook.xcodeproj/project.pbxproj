@@ -9,20 +9,17 @@
 /* Begin PBXBuildFile section */
 		00E356F31AD99517003FC87E /* NotesnookTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* NotesnookTests.m */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
-		13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB11A68108700A75B9A /* LaunchScreen.xib */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
+		2B3F87EC6B2264CD8ABA5DA8 /* libPods-Notesnook.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BD34AE0C0FD2416E48803B8 /* libPods-Notesnook.a */; };
 		2D02E4BC1E0B4A80006451C7 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		2D02E4BD1E0B4A84006451C7 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		2D02E4BF1E0B4AB3006451C7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		2DCD954D1E0B4F2C00145EB5 /* NotesnookTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* NotesnookTests.m */; };
-		4056FCF0960266EA50D2C404 /* libPods-Notesnook.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 015046610714D4E2A0814B8A /* libPods-Notesnook.a */; };
-		65378A5724584D26000A8EA0 /* DMSerifText-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 65378A5524584D25000A8EA0 /* DMSerifText-Regular.ttf */; };
-		65378A5824584D26000A8EA0 /* DMSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 65378A5624584D25000A8EA0 /* DMSans-Regular.ttf */; };
-		65378A5A24584D45000A8EA0 /* Web.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 65378A5924584D45000A8EA0 /* Web.bundle */; };
-		839B810DA8A41D64DE531228 /* libPods-Notesnook-tvOSTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C08EB006C6A48ED472BFCF7 /* libPods-Notesnook-tvOSTests.a */; };
-		8D89BE98BDF2C1D0B2043B38 /* libPods-Notesnook-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C407DC64BF56E1D5173ED836 /* libPods-Notesnook-tvOS.a */; };
-		C2D0BD0603C3B8F02C00E756 /* libPods-Notesnook-NotesnookTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 813456213EC3CA94D4301ED0 /* libPods-Notesnook-NotesnookTests.a */; };
+		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		87CE5B71DC72F3D95B7B1AA5 /* libPods-Notesnook-tvOSTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A03E3F5851D27269540E147C /* libPods-Notesnook-tvOSTests.a */; };
+		A79A93DC9D0CAE8703462151 /* libPods-Notesnook-NotesnookTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 068FA9BDFA207A50B0A9E597 /* libPods-Notesnook-NotesnookTests.a */; };
+		F50BF8BC21F8B58EB2B5A31A /* libPods-Notesnook-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 16C0296DE7A2B4102817F5C1 /* libPods-Notesnook-tvOS.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,32 +44,29 @@
 		00E356EE1AD99517003FC87E /* NotesnookTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NotesnookTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* NotesnookTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NotesnookTests.m; sourceTree = "<group>"; };
-		015046610714D4E2A0814B8A /* libPods-Notesnook.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Notesnook.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		068FA9BDFA207A50B0A9E597 /* libPods-Notesnook-NotesnookTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Notesnook-NotesnookTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		06E586B7CB8F9DC9917B1695 /* Pods-Notesnook-tvOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Notesnook-tvOS.release.xcconfig"; path = "Target Support Files/Pods-Notesnook-tvOS/Pods-Notesnook-tvOS.release.xcconfig"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* Notesnook.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Notesnook.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = Notesnook/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = Notesnook/AppDelegate.m; sourceTree = "<group>"; };
-		13B07FB21A68108700A75B9A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = Notesnook/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Notesnook/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = Notesnook/main.m; sourceTree = "<group>"; };
-		17FB309056BF057D9F328587 /* Pods-Notesnook.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Notesnook.release.xcconfig"; path = "Target Support Files/Pods-Notesnook/Pods-Notesnook.release.xcconfig"; sourceTree = "<group>"; };
-		1B3CB0027D478E3EE1B84EF7 /* Pods-Notesnook-tvOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Notesnook-tvOS.release.xcconfig"; path = "Target Support Files/Pods-Notesnook-tvOS/Pods-Notesnook-tvOS.release.xcconfig"; sourceTree = "<group>"; };
+		16C0296DE7A2B4102817F5C1 /* libPods-Notesnook-tvOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Notesnook-tvOS.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		19E7EB248446C3FE09F6E622 /* Pods-Notesnook.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Notesnook.debug.xcconfig"; path = "Target Support Files/Pods-Notesnook/Pods-Notesnook.debug.xcconfig"; sourceTree = "<group>"; };
 		2D02E47B1E0B4A5D006451C7 /* Notesnook-tvOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Notesnook-tvOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D02E4901E0B4A5D006451C7 /* Notesnook-tvOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Notesnook-tvOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		3AE9862957BB2EA459F1DC83 /* Pods-Notesnook-tvOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Notesnook-tvOS.debug.xcconfig"; path = "Target Support Files/Pods-Notesnook-tvOS/Pods-Notesnook-tvOS.debug.xcconfig"; sourceTree = "<group>"; };
-		55988C2FE31D73727735FA95 /* Pods-Notesnook.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Notesnook.debug.xcconfig"; path = "Target Support Files/Pods-Notesnook/Pods-Notesnook.debug.xcconfig"; sourceTree = "<group>"; };
-		5D3BDF1A8328A50E57816DDB /* Pods-Notesnook-NotesnookTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Notesnook-NotesnookTests.release.xcconfig"; path = "Target Support Files/Pods-Notesnook-NotesnookTests/Pods-Notesnook-NotesnookTests.release.xcconfig"; sourceTree = "<group>"; };
-		65378A5524584D25000A8EA0 /* DMSerifText-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "DMSerifText-Regular.ttf"; sourceTree = "<group>"; };
-		65378A5624584D25000A8EA0 /* DMSans-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "DMSans-Regular.ttf"; sourceTree = "<group>"; };
-		65378A5924584D45000A8EA0 /* Web.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Web.bundle; sourceTree = "<group>"; };
-		811C9B8F3085CE1782EF32B9 /* Pods-Notesnook-NotesnookTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Notesnook-NotesnookTests.debug.xcconfig"; path = "Target Support Files/Pods-Notesnook-NotesnookTests/Pods-Notesnook-NotesnookTests.debug.xcconfig"; sourceTree = "<group>"; };
-		813456213EC3CA94D4301ED0 /* libPods-Notesnook-NotesnookTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Notesnook-NotesnookTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		8C08EB006C6A48ED472BFCF7 /* libPods-Notesnook-tvOSTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Notesnook-tvOSTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		AD6B73B024994AA279B2803C /* Pods-Notesnook-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Notesnook-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-Notesnook-tvOSTests/Pods-Notesnook-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
-		C407DC64BF56E1D5173ED836 /* libPods-Notesnook-tvOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Notesnook-tvOS.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		C677120E65385B752C767AEC /* Pods-Notesnook-tvOSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Notesnook-tvOSTests.debug.xcconfig"; path = "Target Support Files/Pods-Notesnook-tvOSTests/Pods-Notesnook-tvOSTests.debug.xcconfig"; sourceTree = "<group>"; };
+		4BD34AE0C0FD2416E48803B8 /* libPods-Notesnook.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Notesnook.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		747E42E32601638E75E9A3CF /* Pods-Notesnook-tvOSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Notesnook-tvOSTests.debug.xcconfig"; path = "Target Support Files/Pods-Notesnook-tvOSTests/Pods-Notesnook-tvOSTests.debug.xcconfig"; sourceTree = "<group>"; };
+		77124A1C1FB538ED63FDEF82 /* Pods-Notesnook.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Notesnook.release.xcconfig"; path = "Target Support Files/Pods-Notesnook/Pods-Notesnook.release.xcconfig"; sourceTree = "<group>"; };
+		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = Notesnook/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		8297229C2A4840402881ECA8 /* Pods-Notesnook-tvOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Notesnook-tvOS.debug.xcconfig"; path = "Target Support Files/Pods-Notesnook-tvOS/Pods-Notesnook-tvOS.debug.xcconfig"; sourceTree = "<group>"; };
+		A03E3F5851D27269540E147C /* libPods-Notesnook-tvOSTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Notesnook-tvOSTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		B9989E5C777BB11343A62D09 /* Pods-Notesnook-NotesnookTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Notesnook-NotesnookTests.debug.xcconfig"; path = "Target Support Files/Pods-Notesnook-NotesnookTests/Pods-Notesnook-NotesnookTests.debug.xcconfig"; sourceTree = "<group>"; };
+		D1710CA05FED221CC56D2BE1 /* Pods-Notesnook-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Notesnook-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-Notesnook-tvOSTests/Pods-Notesnook-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		ED2971642150620600B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS12.0.sdk/System/Library/Frameworks/JavaScriptCore.framework; sourceTree = DEVELOPER_DIR; };
+		F284B149424757AABC0A96C2 /* Pods-Notesnook-NotesnookTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Notesnook-NotesnookTests.release.xcconfig"; path = "Target Support Files/Pods-Notesnook-NotesnookTests/Pods-Notesnook-NotesnookTests.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -80,7 +74,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C2D0BD0603C3B8F02C00E756 /* libPods-Notesnook-NotesnookTests.a in Frameworks */,
+				A79A93DC9D0CAE8703462151 /* libPods-Notesnook-NotesnookTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -88,7 +82,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4056FCF0960266EA50D2C404 /* libPods-Notesnook.a in Frameworks */,
+				2B3F87EC6B2264CD8ABA5DA8 /* libPods-Notesnook.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -96,7 +90,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8D89BE98BDF2C1D0B2043B38 /* libPods-Notesnook-tvOS.a in Frameworks */,
+				F50BF8BC21F8B58EB2B5A31A /* libPods-Notesnook-tvOS.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -104,7 +98,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				839B810DA8A41D64DE531228 /* libPods-Notesnook-tvOSTests.a in Frameworks */,
+				87CE5B71DC72F3D95B7B1AA5 /* libPods-Notesnook-tvOSTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -131,13 +125,12 @@
 		13B07FAE1A68108700A75B9A /* Notesnook */ = {
 			isa = PBXGroup;
 			children = (
-				65378A5924584D45000A8EA0 /* Web.bundle */,
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
-				13B07FB11A68108700A75B9A /* LaunchScreen.xib */,
+				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB71A68108700A75B9A /* main.m */,
 			);
 			name = Notesnook;
@@ -148,10 +141,10 @@
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				ED2971642150620600B7C4FE /* JavaScriptCore.framework */,
-				015046610714D4E2A0814B8A /* libPods-Notesnook.a */,
-				813456213EC3CA94D4301ED0 /* libPods-Notesnook-NotesnookTests.a */,
-				C407DC64BF56E1D5173ED836 /* libPods-Notesnook-tvOS.a */,
-				8C08EB006C6A48ED472BFCF7 /* libPods-Notesnook-tvOSTests.a */,
+				4BD34AE0C0FD2416E48803B8 /* libPods-Notesnook.a */,
+				068FA9BDFA207A50B0A9E597 /* libPods-Notesnook-NotesnookTests.a */,
+				16C0296DE7A2B4102817F5C1 /* libPods-Notesnook-tvOS.a */,
+				A03E3F5851D27269540E147C /* libPods-Notesnook-tvOSTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -166,14 +159,12 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
-				65378A5624584D25000A8EA0 /* DMSans-Regular.ttf */,
-				65378A5524584D25000A8EA0 /* DMSerifText-Regular.ttf */,
 				13B07FAE1A68108700A75B9A /* Notesnook */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* NotesnookTests */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
-				A62151294BA3BFE6F5B2AA48 /* Pods */,
+				DA84645424CFBF19A44D64B3 /* Pods */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -191,18 +182,19 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		A62151294BA3BFE6F5B2AA48 /* Pods */ = {
+		DA84645424CFBF19A44D64B3 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				55988C2FE31D73727735FA95 /* Pods-Notesnook.debug.xcconfig */,
-				17FB309056BF057D9F328587 /* Pods-Notesnook.release.xcconfig */,
-				811C9B8F3085CE1782EF32B9 /* Pods-Notesnook-NotesnookTests.debug.xcconfig */,
-				5D3BDF1A8328A50E57816DDB /* Pods-Notesnook-NotesnookTests.release.xcconfig */,
-				3AE9862957BB2EA459F1DC83 /* Pods-Notesnook-tvOS.debug.xcconfig */,
-				1B3CB0027D478E3EE1B84EF7 /* Pods-Notesnook-tvOS.release.xcconfig */,
-				C677120E65385B752C767AEC /* Pods-Notesnook-tvOSTests.debug.xcconfig */,
-				AD6B73B024994AA279B2803C /* Pods-Notesnook-tvOSTests.release.xcconfig */,
+				19E7EB248446C3FE09F6E622 /* Pods-Notesnook.debug.xcconfig */,
+				77124A1C1FB538ED63FDEF82 /* Pods-Notesnook.release.xcconfig */,
+				B9989E5C777BB11343A62D09 /* Pods-Notesnook-NotesnookTests.debug.xcconfig */,
+				F284B149424757AABC0A96C2 /* Pods-Notesnook-NotesnookTests.release.xcconfig */,
+				8297229C2A4840402881ECA8 /* Pods-Notesnook-tvOS.debug.xcconfig */,
+				06E586B7CB8F9DC9917B1695 /* Pods-Notesnook-tvOS.release.xcconfig */,
+				747E42E32601638E75E9A3CF /* Pods-Notesnook-tvOSTests.debug.xcconfig */,
+				D1710CA05FED221CC56D2BE1 /* Pods-Notesnook-tvOSTests.release.xcconfig */,
 			);
+			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -213,11 +205,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "NotesnookTests" */;
 			buildPhases = (
-				70A424E4DD7FD273EDD1C499 /* [CP] Check Pods Manifest.lock */,
+				52B9E42E0FD77D180139A8C7 /* [CP] Check Pods Manifest.lock */,
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
-				8F5DA31B2737328ACEC0F88F /* [CP] Copy Pods Resources */,
+				819D480147D052141ACC55A9 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -233,13 +225,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "Notesnook" */;
 			buildPhases = (
-				23E813067D91BE41C7E91382 /* [CP] Check Pods Manifest.lock */,
+				74EE9ED768E52033B174E41C /* [CP] Check Pods Manifest.lock */,
 				FD10A7F022414F080027D42C /* Start Packager */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				A40291CC06B231849899F1AB /* [CP] Copy Pods Resources */,
+				240525450DF9ABA0F332B52E /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -254,7 +246,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 2D02E4BA1E0B4A5E006451C7 /* Build configuration list for PBXNativeTarget "Notesnook-tvOS" */;
 			buildPhases = (
-				0914CA236E89194974AF1B1D /* [CP] Check Pods Manifest.lock */,
+				2A5C8EA7E28E054C7DCF2E4F /* [CP] Check Pods Manifest.lock */,
 				FD10A7F122414F3F0027D42C /* Start Packager */,
 				2D02E4771E0B4A5D006451C7 /* Sources */,
 				2D02E4781E0B4A5D006451C7 /* Frameworks */,
@@ -274,7 +266,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 2D02E4BB1E0B4A5E006451C7 /* Build configuration list for PBXNativeTarget "Notesnook-tvOSTests" */;
 			buildPhases = (
-				1A66EAACC654EDED10AACC98 /* [CP] Check Pods Manifest.lock */,
+				23B3F321642872B180473574 /* [CP] Check Pods Manifest.lock */,
 				2D02E48C1E0B4A5D006451C7 /* Sources */,
 				2D02E48D1E0B4A5D006451C7 /* Frameworks */,
 				2D02E48E1E0B4A5D006451C7 /* Resources */,
@@ -348,11 +340,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				65378A5724584D26000A8EA0 /* DMSerifText-Regular.ttf in Resources */,
+				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
-				65378A5A24584D45000A8EA0 /* Web.bundle in Resources */,
-				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
-				65378A5824584D26000A8EA0 /* DMSans-Regular.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -386,31 +375,9 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh\n";
+			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh";
 		};
-		0914CA236E89194974AF1B1D /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-Notesnook-tvOS-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		1A66EAACC654EDED10AACC98 /* [CP] Check Pods Manifest.lock */ = {
+		23B3F321642872B180473574 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -432,7 +399,25 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		23E813067D91BE41C7E91382 /* [CP] Check Pods Manifest.lock */ = {
+		240525450DF9ABA0F332B52E /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Notesnook/Pods-Notesnook-resources.sh",
+				"${PODS_CONFIGURATION_BUILD_DIR}/React-Core/AccessibilityResources.bundle",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/AccessibilityResources.bundle",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Notesnook/Pods-Notesnook-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		2A5C8EA7E28E054C7DCF2E4F /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -447,7 +432,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-Notesnook-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-Notesnook-tvOS-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -468,7 +453,7 @@
 			shellPath = /bin/sh;
 			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh";
 		};
-		70A424E4DD7FD273EDD1C499 /* [CP] Check Pods Manifest.lock */ = {
+		52B9E42E0FD77D180139A8C7 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -490,100 +475,44 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		8F5DA31B2737328ACEC0F88F /* [CP] Copy Pods Resources */ = {
+		74EE9ED768E52033B174E41C /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Notesnook-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		819D480147D052141ACC55A9 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Notesnook-NotesnookTests/Pods-Notesnook-NotesnookTests-resources.sh",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/AntDesign.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Entypo.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Feather.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/FontAwesome.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Brands.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Regular.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Solid.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Fontisto.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Foundation.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Ionicons.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Octicons.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/SimpleLineIcons.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Zocial.ttf",
+				"${PODS_CONFIGURATION_BUILD_DIR}/React-Core/AccessibilityResources.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/AntDesign.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Entypo.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/EvilIcons.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Feather.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FontAwesome.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FontAwesome5_Brands.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FontAwesome5_Regular.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FontAwesome5_Solid.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Fontisto.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Foundation.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Ionicons.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MaterialCommunityIcons.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MaterialIcons.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Octicons.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/SimpleLineIcons.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Zocial.ttf",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/AccessibilityResources.bundle",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Notesnook-NotesnookTests/Pods-Notesnook-NotesnookTests-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		A40291CC06B231849899F1AB /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Notesnook/Pods-Notesnook-resources.sh",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/AntDesign.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Entypo.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Feather.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/FontAwesome.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Brands.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Regular.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Solid.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Fontisto.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Foundation.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Ionicons.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Octicons.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/SimpleLineIcons.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Zocial.ttf",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/AntDesign.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Entypo.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/EvilIcons.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Feather.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FontAwesome.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FontAwesome5_Brands.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FontAwesome5_Regular.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FontAwesome5_Solid.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Fontisto.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Foundation.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Ionicons.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MaterialCommunityIcons.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MaterialIcons.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Octicons.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/SimpleLineIcons.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Zocial.ttf",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Notesnook/Pods-Notesnook-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		FD10A7F022414F080027D42C /* Start Packager */ = {
@@ -676,22 +605,10 @@
 		};
 /* End PBXTargetDependency section */
 
-/* Begin PBXVariantGroup section */
-		13B07FB11A68108700A75B9A /* LaunchScreen.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				13B07FB21A68108700A75B9A /* Base */,
-			);
-			name = LaunchScreen.xib;
-			path = Notesnook;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
-
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 811C9B8F3085CE1782EF32B9 /* Pods-Notesnook-NotesnookTests.debug.xcconfig */;
+			baseConfigurationReference = B9989E5C777BB11343A62D09 /* Pods-Notesnook-NotesnookTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -699,7 +616,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = NotesnookTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				OTHER_LDFLAGS = (
 					"-ObjC",
@@ -714,12 +631,12 @@
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 5D3BDF1A8328A50E57816DDB /* Pods-Notesnook-NotesnookTests.release.xcconfig */;
+			baseConfigurationReference = F284B149424757AABC0A96C2 /* Pods-Notesnook-NotesnookTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
 				INFOPLIST_FILE = NotesnookTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				OTHER_LDFLAGS = (
 					"-ObjC",
@@ -734,16 +651,12 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 55988C2FE31D73727735FA95 /* Pods-Notesnook.debug.xcconfig */;
+			baseConfigurationReference = 19E7EB248446C3FE09F6E622 /* Pods-Notesnook.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_BITCODE = NO;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"$(inherited)",
-					"FB_SONARKIT_ENABLED=1",
-				);
 				INFOPLIST_FILE = Notesnook/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = (
@@ -751,18 +664,17 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = org.streetwriters.notesnook;
+				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = Notesnook;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 17FB309056BF057D9F328587 /* Pods-Notesnook.release.xcconfig */;
+			baseConfigurationReference = 77124A1C1FB538ED63FDEF82 /* Pods-Notesnook.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -774,17 +686,16 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = org.streetwriters.notesnook;
+				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = Notesnook;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
 		};
 		2D02E4971E0B4A5E006451C7 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3AE9862957BB2EA459F1DC83 /* Pods-Notesnook-tvOS.debug.xcconfig */;
+			baseConfigurationReference = 8297229C2A4840402881ECA8 /* Pods-Notesnook-tvOS.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
@@ -806,13 +717,13 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
 				TARGETED_DEVICE_FAMILY = 3;
-				TVOS_DEPLOYMENT_TARGET = 9.2;
+				TVOS_DEPLOYMENT_TARGET = 10.0;
 			};
 			name = Debug;
 		};
 		2D02E4981E0B4A5E006451C7 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 1B3CB0027D478E3EE1B84EF7 /* Pods-Notesnook-tvOS.release.xcconfig */;
+			baseConfigurationReference = 06E586B7CB8F9DC9917B1695 /* Pods-Notesnook-tvOS.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
@@ -834,13 +745,13 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
 				TARGETED_DEVICE_FAMILY = 3;
-				TVOS_DEPLOYMENT_TARGET = 9.2;
+				TVOS_DEPLOYMENT_TARGET = 10.0;
 			};
 			name = Release;
 		};
 		2D02E4991E0B4A5E006451C7 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = C677120E65385B752C767AEC /* Pods-Notesnook-tvOSTests.debug.xcconfig */;
+			baseConfigurationReference = 747E42E32601638E75E9A3CF /* Pods-Notesnook-tvOSTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ANALYZER_NONNULL = YES;
@@ -867,7 +778,7 @@
 		};
 		2D02E49A1E0B4A5E006451C7 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = AD6B73B024994AA279B2803C /* Pods-Notesnook-tvOSTests.release.xcconfig */;
+			baseConfigurationReference = D1710CA05FED221CC56D2BE1 /* Pods-Notesnook-tvOSTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ANALYZER_NONNULL = YES;
@@ -939,7 +850,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "/usr/lib/swift $(inherited)";
 				LIBRARY_SEARCH_PATHS = (
 					"\"$(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)\"",
@@ -992,7 +903,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "/usr/lib/swift $(inherited)";
 				LIBRARY_SEARCH_PATHS = (
 					"\"$(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)\"",

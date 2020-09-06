@@ -27,6 +27,12 @@ export const INJECTED_JAVASCRIPT = (premium, noMenu) => `(function() {
      })();`;
 
 var note = {};
+
+export function getNote() {
+
+  return note;
+}
+
 var id = null;
 var content = null;
 var title = null;

@@ -6,6 +6,7 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  KeyboardAvoidingView,
 } from 'react-native';
 import MMKV from 'react-native-mmkv-storage';
 import Share from 'react-native-share';
@@ -102,7 +103,7 @@ export const ActionSheetComponent = ({
     tagToAdd = '';
   };
 
-  const _onKeyPress = async event => {
+  const _onKeyPress = async (event) => {
     if (event.nativeEvent.key === 'Backspace') {
       if (backPressCount === 0 && !tagToAdd) {
         backPressCount = 1;
@@ -295,6 +296,7 @@ export const ActionSheetComponent = ({
       switch: true,
       on: colors.night ? true : false,
       close: false,
+      nopremium: true,
     },
     {
       name: 'Pin',
@@ -362,7 +364,7 @@ export const ActionSheetComponent = ({
               dispatch({type: ACTIONS.PINNED});
               close();
             })
-            .catch(async e => {
+            .catch(async (e) => {
               switch (e.message) {
                 case db.vault.ERRORS.noVault:
                   close('novault');
@@ -383,7 +385,7 @@ export const ActionSheetComponent = ({
     },
   ];
 
-  const _renderTag = tag => (
+  const _renderTag = (tag) => (
     <TouchableOpacity
       key={tag}
       onPress={async () => {
@@ -423,7 +425,7 @@ export const ActionSheetComponent = ({
     </TouchableOpacity>
   );
 
-  const _renderColor = color => (
+  const _renderColor = (color) => (
     <TouchableOpacity
       key={color}
       onPress={async () => {
@@ -459,7 +461,7 @@ export const ActionSheetComponent = ({
     </TouchableOpacity>
   );
 
-  const _renderRowItem = rowItem =>
+  const _renderRowItem = (rowItem) =>
     rowItems.includes(rowItem.name) ? (
       <TouchableOpacity
         onPress={rowItem.func}
@@ -497,7 +499,7 @@ export const ActionSheetComponent = ({
       </TouchableOpacity>
     ) : null;
 
-  const _renderColumnItem = item =>
+  const _renderColumnItem = (item) =>
     (note.id && columnItems.includes(item.name)) ||
     (item.name === 'Dark Mode' && columnItems.includes(item.name)) ? (
       <TouchableOpacity
@@ -537,21 +539,21 @@ export const ActionSheetComponent = ({
             {item.name}
           </Text>
         </View>
-        {item.switch ? (
-          <Icon
-            size={SIZE.lg + 2}
-            color={item.on ? colors.accent : colors.icon}
-            name={item.on ? 'toggle-switch' : 'toggle-switch-off'}
-          />
-        ) : (
-          undefined
-        )}
+
         <View
           style={{
             flexDirection: 'row',
             alignItems: 'center',
           }}>
-          <PremiumTag pro={false} />
+          {item.switch ? (
+            <Icon
+              size={SIZE.lg + 2}
+              color={item.on ? colors.accent : colors.icon}
+              name={item.on ? 'toggle-switch' : 'toggle-switch-off'}
+            />
+          ) : undefined}
+
+          {item.nopremium ? null : <PremiumTag pro={premiumUser} />}
 
           {item.check ? (
             <Icon
@@ -578,7 +580,7 @@ export const ActionSheetComponent = ({
       style={{
         paddingBottom: 30,
         backgroundColor: colors.bg,
-        width: '100%',
+        width: w,
         paddingHorizontal: 0,
       }}>
       {!note.id && !note.dateCreated ? (
@@ -659,7 +661,7 @@ export const ActionSheetComponent = ({
                 flexWrap: 'wrap',
               }}>
               {note && note.topics
-                ? note.topics.slice(1, 4).map(topic => (
+                ? note.topics.slice(1, 4).map((topic) => (
                     <View
                       key={topic.dateCreated.toString() + topic.title}
                       style={{
@@ -757,14 +759,16 @@ export const ActionSheetComponent = ({
                 color: colors.accent,
               }}>
               {tags.filter(
-                o => o.count > 1 && !note.tags.find(t => t === o.title),
+                (o) => o.count > 1 && !note.tags.find((t) => t === o.title),
               ).length === 0
                 ? ''
                 : 'Suggestions '}
             </Text>
             {tags
-              .filter(o => o.count > 1 && !note.tags.find(t => t === o.title))
-              .map(tag => (
+              .filter(
+                (o) => o.count > 1 && !note.tags.find((t) => t === o.title),
+              )
+              .map((tag) => (
                 <TouchableOpacity
                   key={tag.title}
                   onPress={() => {
@@ -877,7 +881,7 @@ export const ActionSheetComponent = ({
                 setFocused(false);
               }}
               placeholder="#hashtag"
-              onChangeText={value => {
+              onChangeText={(value) => {
                 tagToAdd = value;
                 if (tagToAdd.length > 0) backPressCount = 0;
               }}

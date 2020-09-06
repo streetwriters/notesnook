@@ -41,6 +41,7 @@ import {
   _onMessage,
   _onShouldStartLoadWithRequest,
   checkNote,
+  getNote,
 } from './func';
 import {ActionIcon} from '../../components/ActionIcon';
 
@@ -59,8 +60,6 @@ const Editor = ({noMenu}) => {
     c.factor = normalize(1);
     post('theme', colors);
   }, [colors.bg]);
-
- 
 
   useEffect(() => {
     eSubscribeEvent(eOnLoadNote, load);
@@ -90,7 +89,7 @@ const Editor = ({noMenu}) => {
     };
   }, [noMenu]);
 
-  const load = item => {
+  const load = (item) => {
     loadNote(item);
     if (!DDS.isTab) {
       handleBack = BackHandler.addEventListener(
@@ -208,11 +207,22 @@ const Editor = ({noMenu}) => {
             ) : null}
 
             <ActionIcon
+              name="undo-variant"
+              color={colors.icon}
+              onPress={() => {}}
+            />
+            <ActionIcon
+              name="redo-variant"
+              color={colors.icon}
+              onPress={() => {}}
+            />
+
+            <ActionIcon
               name="dots-horizontal"
               color={colors.icon}
               onPress={() => {
                 ActionSheetEvent(
-                  note,
+                  getNote(),
                   true,
                   true,
                   ['Add to', 'Share', 'Export', 'Delete'],
@@ -225,7 +235,7 @@ const Editor = ({noMenu}) => {
 
         <WebView
           ref={EditorWebView}
-          onError={error => console.log(error)}
+          onError={(error) => console.log(error)}
           onLoad={() => onWebViewLoad(noMenu, premium, colors)}
           javaScriptEnabled={true}
           injectedJavaScript={Platform.OS === 'ios' ? injectedJS : null}

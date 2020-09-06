@@ -1,10 +1,10 @@
-import React, {useEffect, useState} from 'react';
-import {Keyboard, Text, TouchableOpacity, View} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Keyboard, Text, TouchableOpacity, View } from 'react-native';
+import { useSafeArea } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {br, opacity, pv, SIZE, WEIGHT} from '../../common/common';
-import {useTracked} from '../../provider';
-import {DDS, getElevation} from '../../utils/utils';
-import {useSafeArea} from 'react-native-safe-area-context';
+import { pv, SIZE, WEIGHT } from '../../common/common';
+import { useTracked } from '../../provider';
+import { DDS, getElevation } from '../../utils/utils';
 
 export const ContainerBottomButton = ({root}) => {
   const [state, dispatch] = useTracked();
@@ -59,28 +59,21 @@ export const ContainerBottomButton = ({root}) => {
         ],
       }}>
       <TouchableOpacity
-        activeOpacity={opacity}
-        onPress={containerBottomButton.bottomButtonOnPress}
-        style={{
-          ...getElevation(5),
-          width: '100%',
-          alignSelf: 'center',
-          borderRadius: br,
-          backgroundColor: containerBottomButton.color
-            ? containerBottomButton.color
-            : colors.accent,
-          justifyContent: 'center',
-          alignItems: 'center',
-          marginBottom: 0,
-        }}>
+        activeOpacity={0.8}
+        onPress={containerBottomButton.bottomButtonOnPress}>
         <View
           style={{
+            ...getElevation(5),
             justifyContent: 'flex-start',
             alignItems: 'center',
             flexDirection: 'row',
             width: '100%',
             padding: pv,
+            borderRadius:5,
             paddingVertical: pv + 5,
+            backgroundColor:    containerBottomButton.color
+            ? containerBottomButton.color
+            : colors.accent
           }}>
           <Icon
             name={
