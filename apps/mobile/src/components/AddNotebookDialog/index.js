@@ -258,22 +258,19 @@ export class AddNotebookDialog extends React.Component {
             style={styles.wrapper}>
             <TouchableOpacity onPress={this.close} style={styles.overlay} />
             <View
-              style={{
-                width: DDS.isTab ? '50%' : '100%',
-                height: DDS.isTab ? '80%' : '100%',
-                maxHeight: DDS.isTab ? '80%' : '100%',
-                borderRadius: DDS.isTab ? 5 : 0,
-                backgroundColor: colors.bg,
-                paddingHorizontal: ph,
-                paddingVertical: pv,
-              }}>
+              style={[
+                styles.container,
+                {
+                  backgroundColor: colors.bg,
+                },
+              ]}>
               <View style={styles.headingContainer}>
                 <Icon
                   name="book-outline"
                   color={colors.accent}
                   size={SIZE.xl}
                 />
-                <Text style={[styles.headingText,{color:colors.accent}]}>
+                <Text style={[styles.headingText, {color: colors.accent}]}>
                   {toEdit && toEdit.dateCreated
                     ? 'Edit Notebook'
                     : 'New Notebook'}
@@ -515,6 +512,14 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.3)',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  container: {
+    width: DDS.isTab ? '50%' : '100%',
+    height: DDS.isTab ? '80%' : '100%',
+    maxHeight: DDS.isTab ? '80%' : '100%',
+    borderRadius: DDS.isTab ? 5 : 0,
+    paddingHorizontal: ph,
+    paddingVertical: pv,
   },
   overlay: {
     width: '100%',

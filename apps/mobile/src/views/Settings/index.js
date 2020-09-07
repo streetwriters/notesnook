@@ -1,19 +1,41 @@
-import { useIsFocused } from '@react-navigation/native';
-import React, { useEffect, useState } from 'react';
-import { Clipboard, Linking, Modal, Platform, ScrollView, StatusBar, Text, TouchableOpacity, View } from 'react-native';
+import {useIsFocused} from '@react-navigation/native';
+import React, {useEffect, useState} from 'react';
+import {
+  Clipboard,
+  Linking,
+  Modal,
+  Platform,
+  ScrollView,
+  StatusBar,
+  Text,
+  TouchableOpacity,
+  View,
+  Appearance,
+} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 
 import QRCode from 'react-native-qrcode-generator';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { ACCENT, COLOR_SCHEME, COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT, opacity, ph, pv, setColorScheme, SIZE, WEIGHT } from '../../common/common';
-import { Toast } from '../../components/Toast';
-import { useTracked } from '../../provider';
-import { ACTIONS } from '../../provider/actions';
-import { eSendEvent } from '../../services/eventManager';
-import { eOpenLoginDialog, eResetApp } from '../../services/events';
+import {
+  ACCENT,
+  COLOR_SCHEME,
+  COLOR_SCHEME_DARK,
+  COLOR_SCHEME_LIGHT,
+  opacity,
+  ph,
+  pv,
+  setColorScheme,
+  SIZE,
+  WEIGHT,
+} from '../../common/common';
+import {Toast} from '../../components/Toast';
+import {useTracked} from '../../provider';
+import {ACTIONS} from '../../provider/actions';
+import {eSendEvent} from '../../services/eventManager';
+import {eOpenLoginDialog, eResetApp} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
-import { db, DDS, setSetting, ToastEvent, w } from '../../utils/utils';
-import { MMKV } from '../../utils/storage';
+import {db, DDS, setSetting, ToastEvent, w} from '../../utils/utils';
+import {MMKV} from '../../utils/storage';
 
 export const Settings = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
@@ -332,7 +354,7 @@ export const Settings = ({route, navigation}) => {
                   ToastEvent.show('Logged out, syncing disabled', 'success');
                 },
               },
-            ].map(item => (
+            ].map((item) => (
               <TouchableOpacity
                 key={item.name}
                 activeOpacity={opacity}
@@ -479,7 +501,7 @@ export const Settings = ({route, navigation}) => {
             '#f032e6',
             '#bcf60c',
             '#fabebe',
-          ].map(item => (
+          ].map((item) => (
             <TouchableOpacity
               key={item}
               onPress={() => {
@@ -510,6 +532,54 @@ export const Settings = ({route, navigation}) => {
             </TouchableOpacity>
           ))}
         </View>
+
+        <TouchableOpacity
+          onPress={async () => {
+            await setSetting(
+              settings,
+              'useSystemTheme',
+              !settings.useSystemTheme,
+            );
+
+            if (!settings.useSystemTheme) {
+              MMKV.setStringAsync(
+                'theme',
+                JSON.stringify({night: Appearance.getColorScheme() === 'dark'}),
+              );
+              changeColorScheme(
+                Appearance.getColorScheme() === 'dark'
+                  ? COLOR_SCHEME_DARK
+                  : COLOR_SCHEME_LIGHT,
+              );
+            }
+          }}
+          activeOpacity={opacity}
+          style={{
+            width: '100%',
+            marginHorizontal: 0,
+            paddingVertical: pv + 5,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}>
+          <Text
+            style={{
+              fontSize: SIZE.sm,
+              fontFamily: WEIGHT.regular,
+              textAlignVertical: 'center',
+              color: colors.pri,
+            }}>
+            Use System Dark Mode
+          </Text>
+          <Icon
+            size={SIZE.xl}
+            color={settings.useSystemTheme ? colors.accent : colors.icon}
+            name={
+              settings.useSystemTheme ? 'toggle-switch' : 'toggle-switch-off'
+            }
+          />
+        </TouchableOpacity>
+
         <TouchableOpacity
           onPress={() => {
             if (!colors.night) {
@@ -537,7 +607,7 @@ export const Settings = ({route, navigation}) => {
               textAlignVertical: 'center',
               color: colors.pri,
             }}>
-            Dark mode
+            Dark Mode
           </Text>
           <Icon
             size={SIZE.xl}
@@ -677,7 +747,7 @@ export const Settings = ({route, navigation}) => {
               Linking.openURL('https://www.notesnook.com');
             },
           },
-        ].map(item => (
+        ].map((item) => (
           <TouchableOpacity
             key={item.name}
             activeOpacity={opacity}

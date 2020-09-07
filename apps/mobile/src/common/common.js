@@ -1,4 +1,4 @@
-import { Dimensions, PixelRatio, StatusBar, Platform } from 'react-native';
+import { Dimensions, PixelRatio, StatusBar, Platform, Appearance } from 'react-native';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -185,7 +185,7 @@ export function setColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
   return COLOR_SCHEME;
 }
 
-export async function getColorScheme() {
+export async function getColorScheme(useSystemTheme) {
   let accentColor;
   try {
     accentColor = await MMKV.getStringAsync('accentColor');
@@ -201,13 +201,16 @@ export async function getColorScheme() {
   } else {
     setAccentColor(accentColor);
   }
-
+  if (useSystemTheme) {
+    
+    StatusBar.setBarStyle(Appearance.getColorScheme() === "dark" ? 'light-content' : 'dark-content');
+    return Appearance.getColorScheme() === "dark" ? COLOR_SCHEME_DARK : COLOR_SCHEME_LIGHT
+  }
   if (typeof t !== 'string') {
     MMKV.setStringAsync('theme', JSON.stringify({ night: false }));
     setColorScheme(COLOR_SCHEME_LIGHT);
   } else {
     let themeToSet = JSON.parse(t);
-
     themeToSet.night
       ? setColorScheme(COLOR_SCHEME_DARK)
       : setColorScheme(COLOR_SCHEME_LIGHT);

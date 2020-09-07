@@ -22,6 +22,7 @@ export const defaultState = {
     showKeyboardOnOpen: false,
     fontScale: 1,
     forcePortraitOnTablet: false,
+    useSystemTheme:true
   },
   currentScreen: 'home',
   colors: {

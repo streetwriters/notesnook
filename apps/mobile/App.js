@@ -11,11 +11,16 @@ import {db, DDS, ToastEvent} from './src/utils/utils';
 import {useNetInfo} from '@react-native-community/netinfo';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import { MMKV } from './src/utils/storage';
+import {
+  Appearance,
+  useColorScheme,
+  StatusBar} from "react-native";
 
 const App = () => {
   const [state, dispatch] = useTracked();
   const [init, setInit] = useState(false);
   const netInfo = useNetInfo();
+  const colorScheme = useColorScheme();
   const I = DDS.isTab ? require('./index.tablet') : require('./index.mobile');
   const _onOrientationChange = o => {
     // Currently orientation is locked on tablet.
@@ -25,6 +30,31 @@ const App = () => {
       forceUpdate();
     }, 1000); */
   };
+
+  useEffect(() => {
+
+    systemThemeChange();
+  
+  },[colorScheme])
+
+
+  const systemThemeChange = async () => {
+    let s;
+    try {
+      s = await MMKV.getStringAsync('settings');
+    } catch (e) {
+    }
+    console.log("HEREE");
+    console.log('heree');
+    if (!s) return;
+    s = JSON.parse(s);
+    console.log(s);
+    if (s.useSystemTheme) {
+      let newColors = await getColorScheme(s.useSystemTheme);
+      StatusBar.setBarStyle(Appearance.getColorScheme() === "dark" ? 'light-content' : 'dark-content');
+      dispatch({type: ACTIONS.THEME, colors: newColors});
+    }
+  }
 
   useEffect(() => {
     if (!netInfo.isConnected || !netInfo.isInternetReachable) {
@@ -111,7 +141,6 @@ const App = () => {
   }, []);
 
   async function Initialize(colors = colors) {
-    let newColors = await getColorScheme(colors);
 
     let s;
     try {
@@ -136,6 +165,7 @@ const App = () => {
       dispatch({type: ACTIONS.SETTINGS, settings: {...s}});
     }
 
+    let newColors = await getColorScheme(s.useSystemTheme);
     dispatch({type: ACTIONS.THEME, colors: newColors});
   }
 
