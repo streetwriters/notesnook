@@ -113,7 +113,7 @@ const RenderItem = ({item, index}) => {
         style={{
           fontFamily: WEIGHT.bold,
           fontSize: SIZE.md,
-          color: colors.pri,
+          color: colors.heading,
         }}>
         <Text
           style={{
