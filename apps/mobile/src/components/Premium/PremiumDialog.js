@@ -79,7 +79,7 @@ class PremiumDialog extends React.Component {
               style={{
                 fontSize: SIZE.lg,
                 fontFamily: WEIGHT.bold,
-                color: colors.pri,
+                color: colors.heading,
                 paddingVertical: 20,
               }}>
               Unlock Premium Features

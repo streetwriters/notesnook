@@ -28,6 +28,7 @@ import {moveNoteHideEvent} from '../DialogManager/recievers';
 import {HeaderMenu} from './HeaderMenu';
 import {HeaderTitle} from './HeaderTitle';
 import {useHideHeader, useForceUpdate} from '../../utils/hooks';
+import RNIconic from 'react-native-iconic';
 
 export const Header = ({showSearch, root}) => {
   const [state, dispatch] = useTracked();
@@ -121,12 +122,13 @@ export const Header = ({showSearch, root}) => {
       </Animatable.View>
 
       <View style={styles.leftBtnContainer}>
-        {headerState.menu && !DDS.isTab ? (
+        {!DDS.isTab ? (
           <TouchableOpacity
             hitSlop={{top: 20, bottom: 20, left: 50, right: 40}}
             onPress={onLeftButtonPress}
             style={styles.leftBtn}>
-            <Icon
+            <RNIconic
+              shape="BURGER"
               style={{
                 marginLeft: headerState.canGoBack ? -5 : 0,
               }}

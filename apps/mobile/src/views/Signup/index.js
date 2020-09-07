@@ -12,9 +12,7 @@ import {TextInput} from 'react-native-gesture-handler';
 import QRCode from 'react-native-qrcode-generator';
 import {useIsFocused} from '@react-navigation/native';
 import {opacity, pv, SIZE, WEIGHT, ph} from '../../common/common';
-import {Header} from '../../components/header';
 import {useTracked} from '../../provider';
-
 import {
   eSubscribeEvent,
   eUnSubscribeEvent,
@@ -75,7 +73,7 @@ export const Signup = ({route, navigation}) => {
     };
   }, [isFocused]);
 
-  const validateInfo  = () => {
+  const validateInfo = () => {
     if (!password || !email || !username || !passwordReEnter) {
       ToastEvent.show('All fields are required', 'error');
       return false;
@@ -88,47 +86,41 @@ export const Signup = ({route, navigation}) => {
 
     if (!invalidEmail && !invalidPassword && !invalidUsername) {
       ToastEvent.show('Signup information is invalid', 'error');
-    return false;
+      return false;
     }
-
-  }
+  };
 
   const _signUp = async () => {
     if (!validateInfo) return;
- 
-      setSigningIn(true);
-      setStatus('Creating your account...');
-      try {
-        await db.user.signup(username, email, password);
 
+    setSigningIn(true);
+    setStatus('Creating your account...');
+    try {
+      await db.user.signup(username, email, password);
+    } catch (e) {
+      setSigningIn(false);
+      setFailed(true);
+      ToastEvent.show('Signup failed, Network Error', 'error');
+      return;
+    }
 
-      } catch (e) {
-        setSigningIn(false);
-        setFailed(true);
-        ToastEvent.show('Signup failed, Network Error', 'error');
-        return;
-      }
-
-      let user;
-      try {
-
-       
-        user = await db.user.user.get();
-        setStatus('Logging you in...');
-        let k = await db.user.key();
-        setKey(k.key);
-        setStatus('Setting up crenditials...');
-        dispatch({type: ACTIONS.USER, user: user});
-        eSendEvent(eStartSyncer);
-        setTimeout(() => {
-          setModalVisible(true);
-        }, 500);
-      } catch (e) {
-        setSigningIn(false);
-        setFailed(true);
-        ToastEvent.show('Login Failed, try again', 'error');
-      }
-    
+    let user;
+    try {
+      user = await db.user.user.get();
+      setStatus('Logging you in...');
+      let k = await db.user.key();
+      setKey(k.key);
+      setStatus('Setting up crenditials...');
+      dispatch({type: ACTIONS.USER, user: user});
+      eSendEvent(eStartSyncer);
+      setTimeout(() => {
+        setModalVisible(true);
+      }, 500);
+    } catch (e) {
+      setSigningIn(false);
+      setFailed(true);
+      ToastEvent.show('Login Failed, try again', 'error');
+    }
   };
 
   useEffect(() => {
@@ -430,7 +422,7 @@ export const Signup = ({route, navigation}) => {
                   }
                 }}
                 textContentType="username"
-                onChangeText={value => {
+                onChangeText={(value) => {
                   setUsername(value);
 
                   if (invalidUsername && validateUsername(username)) {
@@ -520,7 +512,7 @@ export const Signup = ({route, navigation}) => {
                     }
                   }}
                   textContentType="emailAddress"
-                  onChangeText={value => {
+                  onChangeText={(value) => {
                     setEmail(value);
                     if (invalidEmail && validateEmail(email)) {
                       setInvalidEmail(false);
@@ -626,7 +618,7 @@ export const Signup = ({route, navigation}) => {
                         });
                       }
                     }}
-                    onChangeText={value => {
+                    onChangeText={(value) => {
                       setPassword(value);
                       if (invalidPassword && validatePass(password)) {
                         setInvalidPassword(false);
@@ -677,7 +669,7 @@ export const Signup = ({route, navigation}) => {
                 ref={_passConfirm}
                 editable={password && !invalidPassword ? true : false}
                 defaultValue={passwordReEnter}
-                onChangeText={value => {
+                onChangeText={(value) => {
                   setPasswordReEnter(value);
                   if (value !== password) {
                     setConfirmPassword(false);

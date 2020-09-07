@@ -160,7 +160,7 @@ export default class NoteItem extends React.Component {
                           justifyContent: 'center',
                           alignItems: 'center',
                         }}>
-                        {item.colors.map(item => (
+                        {item.colors.map((item) => (
                           <View
                             key={item}
                             style={{
@@ -253,32 +253,25 @@ export default class NoteItem extends React.Component {
           </>
         </TouchableOpacity>
 
-        <View
+        <TouchableOpacity
           style={{
             justifyContent: 'center',
             minHeight: 70,
             alignItems: 'center',
+          }}
+          onPress={() => {
+            ActionSheetEvent(
+              item,
+              isTrash ? false : true,
+              isTrash ? false : true,
+              isTrash
+                ? ['Remove', 'Restore']
+                : ['Add to', 'Share', 'Export', 'Delete', 'Open'],
+              isTrash ? [] : ['Pin', 'Favorite', 'Add to Vault'],
+            );
           }}>
-          <TouchableOpacity
-            style={{
-              justifyContent: 'center',
-              minHeight: 70,
-              alignItems: 'center',
-            }}
-            onPress={() => {
-              ActionSheetEvent(
-                item,
-                isTrash ? false : true,
-                isTrash ? false : true,
-                isTrash
-                  ? ['Remove', 'Restore']
-                  : ['Add to', 'Share', 'Export', 'Delete', 'Open'],
-                isTrash ? [] : ['Pin', 'Favorite', 'Add to Vault'],
-              );
-            }}>
-            <Icon name="dots-horizontal" size={SIZE.lg} color={colors.icon} />
-          </TouchableOpacity>
-        </View>
+          <Icon name="dots-horizontal" size={SIZE.lg} color={colors.heading} />
+        </TouchableOpacity>
       </View>
     );
   }

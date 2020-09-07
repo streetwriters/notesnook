@@ -28,7 +28,7 @@ import {ColorSection} from './ColorSection';
 import {MenuListItem} from './MenuListItem';
 import {TagsSection} from './TagsSection';
 import {UserSection} from './UserSection';
-import { MMKV } from '../../utils/storage';
+import {MMKV} from '../../utils/storage';
 
 const AnimatedSafeAreaView = createAnimatableComponent(SafeAreaView);
 
@@ -42,14 +42,12 @@ export const Menu = ({
   const [state, dispatch] = useTracked();
   const {colors} = state;
 
-  // todo
 
   function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
     let newColors = setColorScheme(colors, accent);
     StatusBar.setBarStyle(colors.night ? 'light-content' : 'dark-content');
     dispatch({type: ACTIONS.THEME, colors: newColors});
   }
-
 
   const listItems = [
     {
@@ -86,7 +84,7 @@ export const Menu = ({
       icon: 'theme-light-dark',
       func: () => {
         if (!colors.night) {
-          MMKV .setStringAsync('theme', JSON.stringify({night: true}));
+          MMKV.setStringAsync('theme', JSON.stringify({night: true}));
           changeColorScheme(COLOR_SCHEME_DARK);
         } else {
           MMKV.setStringAsync('theme', JSON.stringify({night: false}));
@@ -171,7 +169,7 @@ export const Menu = ({
           index={10}
           item={{
             name: 'Tags',
-            icon:'tag',
+            icon: 'tag',
             func: () => {
               close();
               NavigationService.navigate('Tags');
@@ -196,7 +194,12 @@ export const Menu = ({
             width: '100%',
           }}>
           {listItems2.map((item, index) => (
-            <MenuListItem item={item} index={index} ignore={true} noTextMode={noTextMode} />
+            <MenuListItem
+              item={item}
+              index={index}
+              ignore={true}
+              noTextMode={noTextMode}
+            />
           ))}
         </View>
 

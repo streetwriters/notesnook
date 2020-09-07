@@ -63,7 +63,7 @@ const SimpleList = ({
       }}>
       <Text
         style={{
-          color: colors.navbg,
+          color: colors.nav,
           fontSize: SIZE.sm,
           fontFamily: WEIGHT.regular,
         }}>

@@ -172,14 +172,16 @@ const Editor = ({noMenu}) => {
             width: '100%',
             height: 50,
             justifyContent: 'space-between',
+            alignItems: 'center',
           }}>
           {noMenu ? null : (
             <ActionIcon
               name="arrow-left"
-              color={colors.icon}
+              color={colors.heading}
               onPress={_onBackPress}
               customStyle={{
                 marginLeft: -5,
+                paddingLeft: 12,
               }}
             />
           )}
@@ -191,7 +193,7 @@ const Editor = ({noMenu}) => {
             {DDS.isTab && !fullscreen ? (
               <ActionIcon
                 name="fullscreen"
-                color={colors.icon}
+                color={colors.heading}
                 onPress={() => {
                   eSendEvent(eOpenFullscreenEditor);
                   setFullscreen(true);
@@ -208,18 +210,18 @@ const Editor = ({noMenu}) => {
 
             <ActionIcon
               name="undo-variant"
-              color={colors.icon}
+              color={colors.heading}
               onPress={() => {}}
             />
             <ActionIcon
               name="redo-variant"
-              color={colors.icon}
+              color={colors.heading}
               onPress={() => {}}
             />
 
             <ActionIcon
               name="dots-horizontal"
-              color={colors.icon}
+              color={colors.heading}
               onPress={() => {
                 ActionSheetEvent(
                   getNote(),

@@ -8,8 +8,8 @@ export const ActionIcon = ({onPress, name, color,customStyle}) => {
     <TouchableOpacity
       onPress={onPress}
       style={[{
-        width: 60,
-        height: 50,
+        width: 50,
+        height: 40,
         justifyContent: 'center',
         alignItems: 'flex-end',
         paddingRight: 12,

@@ -8,7 +8,7 @@ import {eSendEvent} from '../../services/eventManager';
 import {eClearSearch} from '../../services/events';
 import {sideMenuRef} from '../../utils/refs';
 
-export const MenuListItem = ({item, index, noTextMode,ignore}) => {
+export const MenuListItem = ({item, index, noTextMode, ignore}) => {
   const [state, dispatch] = useTracked();
   const {currentScreen, colors} = state;
 
@@ -68,7 +68,7 @@ export const MenuListItem = ({item, index, noTextMode,ignore}) => {
             style={{
               fontFamily: WEIGHT.regular,
               fontSize: SIZE.sm,
-              color: colors.pri,
+              color: colors.heading,
             }}>
             {item.name}
           </Text>
@@ -81,9 +81,7 @@ export const MenuListItem = ({item, index, noTextMode,ignore}) => {
           color={item.on ? colors.accent : colors.icon}
           name={item.on ? 'toggle-switch' : 'toggle-switch-off'}
         />
-      ) : (
-        undefined
-      )}
+      ) : undefined}
     </TouchableOpacity>
   );
 };

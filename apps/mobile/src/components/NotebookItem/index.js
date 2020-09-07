@@ -113,7 +113,7 @@ export const NotebookItem = ({
             style={{
               fontFamily: WEIGHT.bold,
               fontSize: SIZE.sm + 1,
-              color: colors.pri,
+              color: colors.heading,
               maxWidth: '100%',
             }}>
             {item.title}
@@ -258,7 +258,7 @@ export const NotebookItem = ({
                 notebookID: notebookID,
               });
             }}>
-            <Icon name="dots-horizontal" size={SIZE.lg} color={colors.icon} />
+            <Icon name="dots-horizontal" size={SIZE.lg} color={colors.heading} />
           </TouchableOpacity>
         )}
 

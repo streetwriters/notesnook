@@ -56,7 +56,6 @@ export function useHideHeader() {
       eUnSubscribeEvent(eScrollEvent, onScroll);
     };
   }, []);
- console.log('used',hide)
   return hide;
 
 }
