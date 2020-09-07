@@ -21,7 +21,8 @@ import {
   eOpenMoveNoteDialog,
   eOpenSimpleDialog,
   eOpenPremiumDialog,
-  eClosePremiumDialog
+  eClosePremiumDialog,
+  eOpenExportDialog
 } from '../../services/events';
 import {DDS, hexToRGBA} from '../../utils/utils';
 import ActionSheet from '../ActionSheet';
@@ -36,6 +37,7 @@ import {TEMPLATE_DELETE, TEMPLATE_PERMANANT_DELETE} from './templates';
 import MoveNoteDialog from '../MoveNoteDialog';
 import LoginDialog from '../LoginDialog';
 import PremiumDialog from '../Premium/PremiumDialog';
+import ExportDialog from '../ExportDialog';
 
 export class DialogManager extends Component {
   constructor(props) {
@@ -256,6 +258,9 @@ export class DialogManager extends Component {
         case "premium": {
           eSendEvent(eOpenPremiumDialog);
         }
+        case "export": {
+          eSendEvent(eOpenExportDialog,[this.state.item]);
+        }
       }
     }
     this.show = null;
@@ -357,6 +362,8 @@ export class DialogManager extends Component {
         <LoginDialog colors={colors} ref={ref => (this.loginDialog = ref)} />
 
         <MergeEditor />
+
+        <ExportDialog/>
       </>
     );
   }

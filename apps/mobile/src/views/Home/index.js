@@ -55,15 +55,14 @@ export const Home = ({route, navigation}) => {
         state: {
           bottomButtonText: 'Create a new note',
           bottomButtonOnPress: async () => {
-            let res = await RNHTMLtoPDF.convert({
+           /*  let res = await RNHTMLtoPDF.convert({
               html: '<h1>Custom converted PDF Document</h1>',
               fileName: 'test',
               base64: false,
               directory:"Documents"
               
             });
-            console.log(res);
-            return;
+            console.log(res); */
             if (DDS.isTab) {
               eSendEvent(eOnLoadNote, {type: 'new'});
             } else {

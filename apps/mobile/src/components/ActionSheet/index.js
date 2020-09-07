@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import React, { Component, createRef } from "react";
-import { Animated, DeviceEventEmitter, Dimensions, FlatList, Keyboard, Modal, Platform, StatusBar, TextInput, TouchableOpacity, UIManager, View, ViewPropTypes } from "react-native";
+import { Animated, DeviceEventEmitter, Dimensions, FlatList, Keyboard, Modal, Platform, StatusBar, TextInput,findNodeHandle, TouchableOpacity, UIManager, View, ViewPropTypes } from "react-native";
 import { styles } from "./styles";
 
 var deviceHeight = getDeviceHeight();
@@ -375,9 +375,10 @@ export default class ActionSheet extends Component {
       const { height: windowHeight } = Dimensions.get("window");
 
       const currentlyFocusedField = TextInput.State.currentlyFocusedInput
-        ? TextInput.State.currentlyFocusedInput()._nativeTag
+        ? findNodeHandle(TextInput?.State?.currentlyFocusedInput())?._nativeTag
         : TextInput.State.currentlyFocusedField();
 
+      if (!currentlyFocusedField) return;
       UIManager.measure(
         currentlyFocusedField,
         (originX, originY, width, height, pageX, pageY) => {

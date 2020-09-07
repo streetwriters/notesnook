@@ -1,38 +1,29 @@
 import React, {useEffect, useState} from 'react';
 import {Keyboard, Text, TouchableOpacity} from 'react-native';
-import * as Animatable from 'react-native-animatable';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {normalize, opacity, ph, pv, SIZE, WEIGHT} from '../../common/common';
-import {useTracked} from '../../provider';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
-import {eHideToast, eShowToast} from '../../services/events';
-import {DDS, w, getElevation} from '../../utils/utils';
+import Animated, {Easing, useValue} from 'react-native-reanimated';
+import {getElevation} from '../../utils/utils';
+import {eShowToast, eHideToast} from '../../services/events';
+import {eUnSubscribeEvent, eSubscribeEvent} from '../../services/eventManager';
+import { useTracked } from '../../provider';
 
-const AnimatedTouchableOpacity = Animatable.createAnimatableComponent(
+const {spring, timing} = Animated;
+const AnimatedTouchableOpacity = Animated.createAnimatedComponent(
   TouchableOpacity,
 );
 export const Toast = ({context = 'global'}) => {
   const [state, dispatch] = useTracked();
-  const {colors} = state;
-  const [toast, setToast] = useState(false);
+  const colors = state.colors;
   const [keyboard, setKeyboard] = useState(false);
-  const [message, setMessage] = useState([]);
   const [data, setData] = useState([]);
   const [toastStyle, setToastStyle] = useState({
     backgroundColor: colors.errorBg,
     color: colors.errorText,
   });
 
-  const showToastFunc = data => {
+  let toastTranslate = useValue(300);
+
+  const showToastFunc = (data) => {
     setData(data);
-
-    if (data.context === context) {
-      setToast(true);
-    }
-    if (data.message) {
-      setMessage(data.message);
-    }
-
     if (data.type === 'success') {
       setToastStyle({
         backgroundColor: colors.successBg,
@@ -46,13 +37,23 @@ export const Toast = ({context = 'global'}) => {
     }
 
     setTimeout(() => {
-      setToast(false);
+      timing(toastTranslate, {
+        toValue: 0,
+        duration: 500,
+        easing: Easing.elastic(1.1),
+      }).start();
+    }, 100);
+
+    setTimeout(() => {
+      timing(toastTranslate, {
+        toValue: 300,
+        duration: 200,
+        easing: Easing.inOut(Easing.ease),
+      }).start();
     }, data.duration);
   };
 
-  const hideToastFunc = data => {
-    setToast(false);
-  };
+  const hideToastFunc = (data) => {};
 
   const _onKeyboardShow = () => {
     setKeyboard(true);
@@ -78,11 +79,7 @@ export const Toast = ({context = 'global'}) => {
   }, []);
 
   return (
-    <Animatable.View
-      transition={['translateY', 'opacity']}
-      duration={0}
-      delay={toast? 0 :300}
-      useNativeDriver={true}
+    <Animated.View
       style={{
         width: '100%',
         alignItems: 'center',
@@ -93,26 +90,20 @@ export const Toast = ({context = 'global'}) => {
         elevation: 15,
         transform: [
           {
-            translateY: toast ? 0 : 300,
+            translateY: toastTranslate,
           },
         ],
       }}>
       <AnimatedTouchableOpacity
-        activeOpacity={1}
-        transition={['opacity']}
-        duration={300}
-        useNativeDriver={true}
-        delay={!toast? 0 : 150}
         style={{
           ...getElevation(5),
           ...toastStyle,
-          maxWidth: DDS.isTab ? normalize(350) : w - 24,
-          minWidth: DDS.isTab ? normalize(250) : w / 2,
+          maxWidth: '95%',
+          minWidth: '50%',
           alignSelf: 'center',
           borderRadius: 5,
-          paddingHorizontal: ph,
-          paddingVertical: pv,
-          opacity: toast ? 1 : 0,
+          paddingHorizontal: 15,
+          paddingVertical: 10,
           justifyContent: 'center',
           flexDirection: 'row',
           alignItems: 'center',
@@ -121,33 +112,22 @@ export const Toast = ({context = 'global'}) => {
           style={{
             ...toastStyle,
             backgroundColor: 'transparent',
-            fontFamily: WEIGHT.regular,
-            fontSize: SIZE.sm,
+            fontSize: 16,
+            textAlign: 'center',
           }}>
-          <Icon
-            name={
-              toastStyle.color === colors.errorText
-                ? 'alert-circle-outline'
-                : 'check-circle-outline'
-            }
-            color={toastStyle.color}
-            size={SIZE.sm}
-          />
-          {'  '}
-          {message}
+          {data.message}
         </Text>
 
         <TouchableOpacity activeOpacity={1}>
           <Text
             style={{
               ...toastStyle,
-              fontFamily: WEIGHT.bold,
-              fontSize: SIZE.sm,
+              fontSize: 16,
             }}>
             {data.actionText}
           </Text>
         </TouchableOpacity>
       </AnimatedTouchableOpacity>
-    </Animatable.View>
+    </Animated.View>
   );
 };

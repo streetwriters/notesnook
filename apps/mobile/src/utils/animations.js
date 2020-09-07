@@ -20,19 +20,19 @@ export function openEditorAnimation() {
 
   setTimeout(() => {
     timing(EditorScale, {
-      duration: 150,
+      duration: 300,
       toValue: 1,
-      easing: Easing.in(Easing.linear),
+      easing:  Easing.out(Easing.ease),
     }).start();
     timing(EditorTranslateY, {
-      duration: 150,
+      duration: 300,
       toValue: 0,
-      easing: Easing.in(Easing.linear),
+      easing:  Easing.out(Easing.ease),
     }).start();
     timing(EditorOpacity, {
-      duration: 150,
+      duration: 300,
       toValue: 1,
-      easing: Easing.in(Easing.linear),
+      easing: Easing.out(Easing.ease),
     }).start();
   }, 10);
 }
@@ -48,7 +48,7 @@ export function exitEditorAnimation() {
       EditorPosition.setValue(Dimensions.get('window').width * 1.5);
     }, 250);
     timing(EditorOpacity, {
-      duration: 150,
+      duration: 300,
       toValue: 0,
       easing: Easing.in(Easing.linear),
     }).start();
@@ -64,8 +64,6 @@ export function exitEditorAnimation() {
     }).start();
 
   },20)
- 
-
  
 }
 

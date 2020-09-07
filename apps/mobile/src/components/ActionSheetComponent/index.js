@@ -28,7 +28,7 @@ import {ACTIONS} from '../../provider/actions';
 import NavigationService from '../../services/NavigationService';
 import {timeConverter, ToastEvent, DDS, db} from '../../utils/utils';
 import {openVault, eSendEvent} from '../../services/eventManager';
-import {refreshNotesPage, eOpenPremiumDialog} from '../../services/events';
+import {refreshNotesPage, eOpenPremiumDialog, eOpenExportDialog} from '../../services/events';
 import {PremiumTag} from '../Premium/PremiumTag';
 import { MMKV } from '../../utils/storage';
 
@@ -226,7 +226,7 @@ export const ActionSheetComponent = ({
       name: 'Export',
       icon: 'export',
       func: () => {
-        close();
+        close('export')
       },
     },
     {
