@@ -27,9 +27,9 @@ export const HeaderMenu = () => {
             justifyContent: 'center',
             alignItems: 'flex-end',
             height: 40,
-            width: 60,
+            width: 50,
           }}>
-          <Icon name="sort" size={SIZE.xl} color={colors.icon} />
+          <Icon name="dots-vertical" size={SIZE.xl} color={colors.heading} />
         </TouchableOpacity>
       }>
       <MenuItem
