@@ -314,7 +314,7 @@ export class AddNotebookDialog extends React.Component {
                   styles.input,
                   {
                     borderColor: descFocused ? colors.accent : colors.nav,
-
+                    minHeight:90,
                     color: colors.pri,
                   },
                 ]}
