@@ -1,10 +1,10 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   ActivityIndicator,
   Platform,
+  StyleSheet,
   TouchableOpacity,
   View,
-  StyleSheet,
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import {useSafeArea} from 'react-native-safe-area-context';
@@ -16,19 +16,14 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent,
 } from '../../services/eventManager';
-import {
-  eCloseLoginDialog,
-  eScrollEvent,
-  eSetModalNavigator,
-} from '../../services/events';
+import {eCloseLoginDialog, eSetModalNavigator} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
+import {useForceUpdate, useHideHeader} from '../../utils/hooks';
 import {sideMenuRef} from '../../utils/refs';
 import {DDS, w} from '../../utils/utils';
 import {moveNoteHideEvent} from '../DialogManager/recievers';
 import {HeaderMenu} from './HeaderMenu';
 import {HeaderTitle} from './HeaderTitle';
-import {useHideHeader, useForceUpdate} from '../../utils/hooks';
-import RNIconic from 'react-native-iconic';
 
 export const Header = ({showSearch, root}) => {
   const [state, dispatch] = useTracked();
@@ -127,7 +122,7 @@ export const Header = ({showSearch, root}) => {
             hitSlop={{top: 20, bottom: 20, left: 50, right: 40}}
             onPress={onLeftButtonPress}
             style={styles.leftBtn}>
-            <RNIconic
+            <Icon
               shape="BURGER"
               style={{
                 marginLeft: headerState.canGoBack ? -5 : 0,
