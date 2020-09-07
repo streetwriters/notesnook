@@ -19,8 +19,8 @@ function configure_ssh() {
   ssh-keyscan -t rsa github.com >>"$SSH_HOME"/known_hosts # Look and make trust communications between github.com and the builder
 }
 
-if [[ "$HOME" == "/zeit" ]]; then # On Zeit
-  echo "Detected environment: Zeit"
+if [[ "$HOME" == "/vercel" ]]; then # On Vercel
+  echo "Detected environment: Vercel"
   configure_ssh /root
 
 elif [[ "$HOME" == "/home/runner" ]]; then # On Github Actions
