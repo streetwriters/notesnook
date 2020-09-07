@@ -54,12 +54,12 @@ class Database {
     this.tags = await Tags.new(this, "tags");
     /** @type {Tags} */
     this.colors = await Tags.new(this, "colors");
-    /** @type {Trash} */
-    this.trash = await Trash.new(this, "trash");
     /** @type {Content} */
     this.delta = await Content.new(this, "delta", false);
     /** @type {Content} */
     this.text = await Content.new(this, "text", false);
+    /** @type {Trash} */
+    this.trash = await Trash.new(this, "trash");
 
     await this.user.sync();
   }
