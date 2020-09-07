@@ -375,7 +375,7 @@ export default class ActionSheet extends Component {
       const { height: windowHeight } = Dimensions.get("window");
 
       const currentlyFocusedField = TextInput.State.currentlyFocusedInput
-        ? findNodeHandle(TextInput?.State?.currentlyFocusedInput())?._nativeTag
+        ? findNodeHandle(TextInput.State.currentlyFocusedInput())
         : TextInput.State.currentlyFocusedField();
 
       if (!currentlyFocusedField) return;

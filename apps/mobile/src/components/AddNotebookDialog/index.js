@@ -3,15 +3,18 @@ import {
   KeyboardAvoidingView,
   Modal,
   Platform,
+  SafeAreaView,
+  StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
 import {FlatList, TextInput} from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {opacity, ph, pv, SIZE, WEIGHT} from '../../common/common';
+import {ph, pv, SIZE, WEIGHT} from '../../common/common';
 import {ACTIONS} from '../../provider/actions';
-import {db, DDS, getElevation, ToastEvent} from '../../utils/utils';
+import {db, DDS, ToastEvent} from '../../utils/utils';
+import {Button} from '../Button';
 import {updateEvent} from '../DialogManager/recievers';
 import {Toast} from '../Toast';
 
@@ -49,7 +52,7 @@ export class AddNotebookDialog extends React.Component {
 
     if (toEdit && toEdit.type === 'notebook') {
       let topicsList = [];
-      toEdit.topics.forEach(item => {
+      toEdit.topics.forEach((item) => {
         if (item.id !== 'General') {
           topicsList.push(item.title);
         }
@@ -86,7 +89,7 @@ export class AddNotebookDialog extends React.Component {
     });
   };
 
-  onDelete = index => {
+  onDelete = (index) => {
     let {topics} = this.state;
     let prevTopics = topics;
     refs = [];
@@ -121,9 +124,8 @@ export class AddNotebookDialog extends React.Component {
 
       let toEdit;
       if (id) {
-       toEdit = db.notebooks.notebook(edit.id).data;
+        toEdit = db.notebooks.notebook(edit.id).data;
       }
-
 
       let prevTopics = [...topics];
 
@@ -250,292 +252,214 @@ export class AddNotebookDialog extends React.Component {
           this.titleRef.focus();
         }}
         onRequestClose={this.close}>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : null}
-          style={{
-            width: '100%',
-            height: '100%',
-            backgroundColor: 'rgba(0,0,0,0.3)',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}>
-          <TouchableOpacity
-            onPress={this.close}
-            style={{
-              width: '100%',
-              height: '100%',
-              position: 'absolute',
-            }}
-          />
-          <View
-            style={{
-              width: DDS.isTab ? '50%' : '100%',
-              height: DDS.isTab ? '80%' : '100%',
-              maxHeight: DDS.isTab ? '80%' : '100%',
-              borderRadius: DDS.isTab ? 5 : 0,
-              backgroundColor: colors.bg,
-              paddingHorizontal: ph,
-              paddingVertical: pv,
-            }}>
+        <SafeAreaView>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : null}
+            style={styles.wrapper}>
+            <TouchableOpacity onPress={this.close} style={styles.overlay} />
             <View
               style={{
-                flexDirection: 'row',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}>
-              <Icon name="book-outline" color={colors.accent} size={SIZE.xl} />
-              <Text
-                style={{
-                  color: colors.accent,
-                  fontFamily: WEIGHT.bold,
-                  marginLeft: 5,
-                  fontSize: SIZE.xl,
-                }}>
-                {toEdit && toEdit.dateCreated
-                  ? 'Edit Notebook'
-                  : 'New Notebook'}
-              </Text>
-            </View>
-
-            <TextInput
-              ref={ref => (this.titleRef = ref)}
-              style={{
-                padding: pv - 2,
-                borderWidth: 1.5,
-                borderColor: titleFocused ? colors.accent : colors.nav,
+                width: DDS.isTab ? '50%' : '100%',
+                height: DDS.isTab ? '80%' : '100%',
+                maxHeight: DDS.isTab ? '80%' : '100%',
+                borderRadius: DDS.isTab ? 5 : 0,
+                backgroundColor: colors.bg,
                 paddingHorizontal: ph,
-                borderRadius: 5,
-                minHeight: 45,
-                fontSize: SIZE.sm,
-                fontFamily: WEIGHT.regular,
-                color: colors.pri,
-                marginTop: 20,
-                marginBottom: 5,
-              }}
-              numberOfLines={1}
-              multiline={false}
-              onFocus={() => {
-                this.setState({
-                  titleFocused: true,
-                });
-              }}
-              onBlur={() => {
-                this.setState({
-                  titleFocused: false,
-                });
-              }}
-              defaultValue={toEdit ? toEdit.title : null}
-              onChangeText={value => {
-                this.title = value;
-              }}
-              onSubmitEditing={() => {
-                this.descriptionRef.focus();
-              }}
-              placeholder="Title of notebook"
-              placeholderTextColor={colors.icon}
-            />
-            <TextInput
-              ref={ref => (this.descriptionRef = ref)}
-              style={{
-                padding: pv - 2,
-                borderWidth: 1.5,
-                borderColor: descFocused ? colors.accent : colors.nav,
-                paddingHorizontal: ph,
-                borderRadius: 5,
-                fontSize: SIZE.sm,
-                fontFamily: WEIGHT.regular,
-                color: colors.pri,
-                marginTop: 5,
-                marginBottom: 10,
-              }}
-              textAlignVertical="top"
-              numberOfLines={2}
-              maxLength={150}
-              onFocus={() => {
-                this.setState({
-                  descFocused: true,
-                });
-              }}
-              onBlur={() => {
-                this.setState({
-                  descFocused: false,
-                });
-              }}
-              defaultValue={toEdit ? toEdit.description : null}
-              onChangeText={value => {
-                this.description = value;
-              }}
-              onSubmitEditing={() => {
-                this.topicInputRef.focus();
-              }}
-              multiline
-              placeholder="Write a short description about your notebook (optional)"
-              placeholderTextColor={colors.icon}
-            />
-
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginTop: 10,
+                paddingVertical: pv,
               }}>
+              <View style={styles.headingContainer}>
+                <Icon
+                  name="book-outline"
+                  color={colors.accent}
+                  size={SIZE.xl}
+                />
+                <Text style={[styles.headingText,{color:colors.accent}]}>
+                  {toEdit && toEdit.dateCreated
+                    ? 'Edit Notebook'
+                    : 'New Notebook'}
+                </Text>
+              </View>
+
               <TextInput
-                ref={ref => (this.topicInputRef = ref)}
-                onChangeText={value => {
-                  this.currentInputValue = value;
-                  if (this.prevItem !== null) {
-                    refs[this.prevIndex].setNativeProps({
-                      text: this.prevIndex + 1 + '. ' + value,
-                      style: {
-                        borderBottomColor: colors.accent,
-                      },
-                    });
-                  }
-                }}
-                blurOnSubmit={false}
+                ref={(ref) => (this.titleRef = ref)}
+                style={[
+                  styles.input,
+                  {
+                    borderColor: titleFocused ? colors.accent : colors.nav,
+                    color: colors.pri,
+                  },
+                ]}
+                numberOfLines={1}
+                multiline={false}
                 onFocus={() => {
                   this.setState({
-                    topicInputFoused: true,
+                    titleFocused: true,
                   });
                 }}
                 onBlur={() => {
-                  this.onSubmit(false);
                   this.setState({
-                    topicInputFoused: false,
+                    titleFocused: false,
                   });
                 }}
-                onSubmitEditing={this.onSubmit}
-                style={{
-                  padding: pv - 2,
-                  paddingHorizontal: 0,
-                  borderRadius: 5,
-                  borderWidth: 1.5,
-                  minHeight: 45,
-                  fontSize: SIZE.sm,
-                  borderColor: topicInputFoused ? colors.accent : colors.nav,
-                  fontFamily: WEIGHT.regular,
-                  color: colors.pri,
-                  paddingHorizontal: ph,
-                  width: '85%',
-                  maxWidth: '85%',
+                defaultValue={toEdit ? toEdit.title : null}
+                onChangeText={(value) => {
+                  this.title = value;
                 }}
-                placeholder="Add a new topic"
+                onSubmitEditing={() => {
+                  this.descriptionRef.focus();
+                }}
+                placeholder="Title of notebook"
                 placeholderTextColor={colors.icon}
               />
-              <TouchableOpacity
-                onPress={this.onSubmit}
-                style={{
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  borderWidth: 1.5,
-                  borderColor: topicInputFoused ? colors.accent : colors.nav,
-                  borderRadius: 5,
-                  width: '12%',
-                  minHeight: 45,
-                }}>
-                <Icon
-                  name="plus"
-                  size={SIZE.lg}
-                  color={topicInputFoused ? colors.accent : colors.icon}
-                />
-              </TouchableOpacity>
-            </View>
+              <TextInput
+                ref={(ref) => (this.descriptionRef = ref)}
+                style={[
+                  styles.input,
+                  {
+                    borderColor: descFocused ? colors.accent : colors.nav,
 
-            <FlatList
-              data={topics}
-              ref={ref => (this.listRef = ref)}
-              removeClippedSubviews={false}
-              enableEmptySections={false}
-              getItemLayout={(data, index) => ({
-                length: 50,
-                offset: 50 * index,
-                index,
-              })}
-              keyExtractor={(item, index) => item + index.toString()}
-              renderItem={({item, index}) => (
-                <TopicItem
-                  item={item}
-                  onPress={(item, index) => {
-                    this.prevIndex = index;
-                    this.prevItem = item;
-                    this.topicInputRef.setNativeProps({
-                      text: item,
-                    });
-                    this.topicInputRef.focus();
-                    this.currentInputValue = item;
+                    color: colors.pri,
+                  },
+                ]}
+                textAlignVertical="top"
+                numberOfLines={2}
+                maxLength={150}
+                onFocus={() => {
+                  this.setState({
+                    descFocused: true,
+                  });
+                }}
+                onBlur={() => {
+                  this.setState({
+                    descFocused: false,
+                  });
+                }}
+                defaultValue={toEdit ? toEdit.description : null}
+                onChangeText={(value) => {
+                  this.description = value;
+                }}
+                onSubmitEditing={() => {
+                  this.topicInputRef.focus();
+                }}
+                multiline
+                placeholder="What is this notebook about?"
+                placeholderTextColor={colors.icon}
+              />
+
+              <View style={styles.topicContainer}>
+                <TextInput
+                  ref={(ref) => (this.topicInputRef = ref)}
+                  onChangeText={(value) => {
+                    this.currentInputValue = value;
+                    if (this.prevItem !== null) {
+                      refs[this.prevIndex].setNativeProps({
+                        text: this.prevIndex + 1 + '. ' + value,
+                        style: {
+                          borderBottomColor: colors.accent,
+                        },
+                      });
+                    }
                   }}
-                  onDelete={this.onDelete}
-                  index={index}
-                  colors={colors}
+                  blurOnSubmit={false}
+                  onFocus={() => {
+                    this.setState({
+                      topicInputFoused: true,
+                    });
+                  }}
+                  onBlur={() => {
+                    this.onSubmit(false);
+                    this.setState({
+                      topicInputFoused: false,
+                    });
+                  }}
+                  onSubmitEditing={this.onSubmit}
+                  style={[
+                    styles.input,
+                    {
+                      borderColor: topicInputFoused
+                        ? colors.accent
+                        : colors.nav,
+                      color: colors.pri,
+                      width: '85%',
+                      maxWidth: '85%',
+                    },
+                  ]}
+                  placeholder="Add a new topic"
+                  placeholderTextColor={colors.icon}
                 />
-              )}
-            />
+                <TouchableOpacity
+                  onPress={this.onSubmit}
+                  style={[
+                    styles.addBtn,
+                    {
+                      borderColor: topicInputFoused
+                        ? colors.accent
+                        : colors.nav,
+                    },
+                  ]}>
+                  <Icon
+                    name="plus"
+                    size={SIZE.lg}
+                    color={topicInputFoused ? colors.accent : colors.icon}
+                  />
+                </TouchableOpacity>
+              </View>
 
-            <View
-              style={{
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                flexDirection: 'row',
-                width: '100%',
-                marginTop: 20,
-              }}>
-              <TouchableOpacity
-                activeOpacity={opacity}
-                onPress={this.addNewNotebook}
-                style={{
-                  paddingVertical: pv,
-                  paddingHorizontal: ph,
-                  borderRadius: 5,
-                  width: '48%',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  borderColor: colors.accent,
-                  backgroundColor: colors.accent,
-                  borderWidth: 1,
-                }}>
-                <Text
-                  style={{
-                    fontFamily: WEIGHT.medium,
-                    color: 'white',
-                    fontSize: SIZE.sm,
-                  }}>
-                  {toEdit && toEdit.dateCreated ? 'Save' : 'Add'}
-                </Text>
-              </TouchableOpacity>
+              <FlatList
+                data={topics}
+                ref={(ref) => (this.listRef = ref)}
+                removeClippedSubviews={false}
+                enableEmptySections={false}
+                getItemLayout={(data, index) => ({
+                  length: 50,
+                  offset: 50 * index,
+                  index,
+                })}
+                keyExtractor={(item, index) => item + index.toString()}
+                renderItem={({item, index}) => (
+                  <TopicItem
+                    item={item}
+                    onPress={(item, index) => {
+                      this.prevIndex = index;
+                      this.prevItem = item;
+                      this.topicInputRef.setNativeProps({
+                        text: item,
+                      });
+                      this.topicInputRef.focus();
+                      this.currentInputValue = item;
+                    }}
+                    onDelete={this.onDelete}
+                    index={index}
+                    colors={colors}
+                  />
+                )}
+              />
 
-              <TouchableOpacity
-                activeOpacity={opacity}
-                onPress={this.close}
-                style={{
-                  paddingVertical: pv,
-                  paddingHorizontal: ph,
-                  borderRadius: 5,
-                  width: '48%',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  backgroundColor: colors.nav,
-                }}>
-                <Text
-                  style={{
-                    fontFamily: WEIGHT.medium,
-                    color: colors.icon,
-                    fontSize: SIZE.sm,
-                  }}>
-                  Cancel
-                </Text>
-              </TouchableOpacity>
+              <View style={styles.buttonContainer}>
+                <Button
+                  title={toEdit && toEdit.dateCreated ? 'Save' : 'Add'}
+                  width="48%"
+                  onPress={this.addNewNotebook}
+                />
+
+                <Button
+                  title="Cancel"
+                  grayed
+                  width="48%"
+                  onPress={this.close}
+                />
+              </View>
             </View>
-          </View>
-        </KeyboardAvoidingView>
-        <Toast context="local" />
+          </KeyboardAvoidingView>
+          <Toast context="local" />
+        </SafeAreaView>
       </Modal>
     );
   }
 }
 
 const TopicItem = ({item, index, colors, onPress, onDelete}) => {
-  const topicRef = ref => (refs[index] = ref);
+  const topicRef = (ref) => (refs[index] = ref);
 
   return (
     <View
@@ -555,19 +479,14 @@ const TopicItem = ({item, index, colors, onPress, onDelete}) => {
         <TextInput
           ref={topicRef}
           editable={false}
-          style={{
-            padding: pv - 5,
-            paddingHorizontal: 0,
-            fontSize: SIZE.sm,
-            fontFamily: WEIGHT.regular,
-            color: colors.pri,
-            paddingHorizontal: ph,
-            borderBottomWidth: 1.5,
-            borderBottomColor: colors.nav,
-            paddingRight: 40,
-            width: '100%',
-            maxWidth: '100%',
-          }}
+          style={[
+            styles.topicInput,
+            {
+              color: colors.pri,
+
+              borderBottomColor: colors.nav,
+            },
+          ]}
           defaultValue={index + 1 + '. ' + item}
           placeholder="Add a topic"
           placeholderTextColor={colors.icon}
@@ -577,18 +496,92 @@ const TopicItem = ({item, index, colors, onPress, onDelete}) => {
         onPress={() => {
           onDelete(index);
         }}
-        style={{
-          justifyContent: 'center',
-          alignItems: 'center',
-          position: 'absolute',
-          right: 0,
-          borderColor: colors.nav,
-          borderRadius: 5,
-          width: 40,
-          height: 40,
-        }}>
+        style={[
+          styles.topicBtn,
+          {
+            borderColor: colors.nav,
+          },
+        ]}>
         <Icon name="minus" size={SIZE.lg} color={colors.icon} />
       </TouchableOpacity>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  wrapper: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  overlay: {
+    width: '100%',
+    height: '100%',
+    position: 'absolute',
+  },
+  headingContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  headingText: {
+    fontFamily: WEIGHT.bold,
+    marginLeft: 5,
+    fontSize: SIZE.xl,
+  },
+  input: {
+    paddingHorizontal: ph,
+    borderRadius: 5,
+    minHeight: 45,
+    fontSize: SIZE.sm,
+    fontFamily: WEIGHT.regular,
+    padding: pv - 2,
+    borderWidth: 1.5,
+    marginTop: 20,
+    marginBottom: 5,
+  },
+  addBtn: {
+    borderRadius: 5,
+    width: '12%',
+    minHeight: 45,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1.5,
+  },
+  buttonContainer: {
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexDirection: 'row',
+    width: '100%',
+    marginTop: 20,
+  },
+
+  topicContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  topicInput: {
+    padding: pv - 5,
+    paddingHorizontal: 0,
+    fontSize: SIZE.sm,
+    fontFamily: WEIGHT.regular,
+    paddingHorizontal: ph,
+    borderBottomWidth: 1.5,
+    paddingRight: 40,
+    width: '100%',
+    maxWidth: '100%',
+  },
+  topicBtn: {
+    borderRadius: 5,
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'absolute',
+    right: 0,
+  },
+});
