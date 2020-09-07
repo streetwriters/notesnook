@@ -108,7 +108,7 @@ export const Header = ({showSearch, root}) => {
             ? 0
             : insets.top,
         marginBottom: 10,
-        justifyContent: 'space-between',
+        justifyContent: 'center',
         alignItems: 'center',
         paddingHorizontal: 12,
         width: '100%',
@@ -147,6 +147,8 @@ export const Header = ({showSearch, root}) => {
           flexDirection: 'row',
           justifyContent: 'flex-start',
           alignItems: 'center',
+          position: 'absolute',
+          left: 12,
         }}>
         {headerState.canGoBack ? (
           <TouchableOpacity
@@ -202,13 +204,16 @@ export const Header = ({showSearch, root}) => {
           </TouchableOpacity>
         ) : undefined}
 
-        <HeaderTitle root={root} />
+        {Platform.OS === 'android' ? <HeaderTitle root={root} /> : null}
       </View>
 
+      <HeaderTitle root={root} />
       <View
         style={{
           flexDirection: 'row',
           alignItems: 'center',
+          position: 'absolute',
+          right: 12,
         }}>
         <Animatable.View
           transition="opacity"
@@ -219,6 +224,7 @@ export const Header = ({showSearch, root}) => {
           }}>
           <TouchableOpacity
             onPress={() => {
+              if (!hideHeader) return;
               setHideHeader(false);
               eSendEvent('showSearch');
             }}

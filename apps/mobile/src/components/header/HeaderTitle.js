@@ -1,5 +1,5 @@
 import React, {createRef, useEffect} from 'react';
-import {Text} from 'react-native';
+import {Text, Platform} from 'react-native';
 import {SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
 
@@ -14,6 +14,7 @@ export const HeaderTitle = ({root}) => {
         fontSize: SIZE.xl,
         color: headerTextState.color ? headerTextState.color : colors.pri,
         fontFamily: WEIGHT.bold,
+        alignSelf:'center',
       
       }}>
       <Text
