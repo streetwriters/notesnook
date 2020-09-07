@@ -10,16 +10,17 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {br, WEIGHT, SIZE} from '../../common/common';
 import {TextInput, Text} from 'react-native';
 const {Value, timing, block} = Animated;
-let offsetY = 0;
+
 let searchResult = [];
+ 
+let offsetY = 0;
 let timeoutAnimate = null;
 
-export const Search = props => {
+export const Search = (props) => {
   const [state, dispatch] = useTracked();
   const {colors, searchResults} = state;
   const [text, setText] = useState('');
   const [focus, setFocus] = useState(false);
-  const [hideHeader, setHideHeader] = useState(false);
 
   let searchState = props.root ? state.searchState : state.indSearchState;
 
@@ -45,7 +46,7 @@ export const Search = props => {
     }).start();
   };
 
-  const onScroll = y => {
+  const onScroll = (y) => {
     if (searchResults.results.length > 0) return;
     if (y < 30) {
       animation(0, 1, 1.5);
@@ -112,7 +113,7 @@ export const Search = props => {
     };
   }, []);
 
-  const onChangeText = value => {
+  const onChangeText = (value) => {
     setText(value);
   };
   const onSubmitEditing = async () => {

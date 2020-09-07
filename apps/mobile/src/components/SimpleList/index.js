@@ -48,7 +48,7 @@ const SimpleList = ({
   const searchResults = {...state.searchResults};
   const [refreshing, setRefreshing] = useState(false);
   const insets = useSafeArea();
-  const _onScroll = event => {
+  const _onScroll = (event) => {
     if (!event) return;
     let y = event.nativeEvent.contentOffset.y;
     eSendEvent(eScrollEvent, y);
