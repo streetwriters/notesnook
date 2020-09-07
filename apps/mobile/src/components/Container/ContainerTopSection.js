@@ -1,5 +1,5 @@
-import React from 'react';
-import * as Animatable from 'react-native-animatable';
+import React, {useEffect} from 'react';
+import Animated, {Easing, useValue} from 'react-native-reanimated';
 import {useTracked} from '../../provider';
 import {Header} from '../header';
 import {Search} from '../SearchInput';
@@ -7,21 +7,28 @@ import {Search} from '../SearchInput';
 export const ContainerTopSection = ({root}) => {
   const [state, dispatch] = useTracked();
   const {colors, selectionMode} = state;
+  const opacity = useValue(0);
+  useEffect(() => {
+    Animated.timing(opacity, {
+      duration: 100,
+      toValue: selectionMode ? 0 : 1,
+      easing: Easing.in(Easing.ease),
+    }).start();
+  }, [selectionMode]);
 
   return (
-    <Animatable.View
-      transition="backgroundColor"
-      duration={300}
+    <Animated.View
       style={{
-        position: selectionMode ? 'relative' : 'absolute',
+        position: 'absolute',
         backgroundColor: colors.bg,
-        zIndex: 999,
-        display: selectionMode ? 'none' : 'flex',
+        zIndex: 998,
+        display: 'flex',
         width: '100%',
+        opacity: opacity,
       }}>
-      <Header root={root}  />
+      <Header root={root} />
 
       <Search root={root} />
-    </Animatable.View>
+    </Animated.View>
   );
 };
