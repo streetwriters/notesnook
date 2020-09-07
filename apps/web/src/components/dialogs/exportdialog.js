@@ -7,7 +7,12 @@ import Dialog, { showDialog } from "./dialog";
 
 function ExportDialog(props) {
   return (
-    <Dialog isOpen={true} title={props.title} icon={props.icon}>
+    <Dialog
+      isOpen={true}
+      title={props.title}
+      icon={props.icon}
+      negativeButton={{ onClick: props.onClose, text: "Cancel" }}
+    >
       <Box>
         <Text variant="body" mb={2}>
           Please choose a format to export the note into:
@@ -47,6 +52,7 @@ export function showExportDialog(note) {
     <ExportDialog
       title={"Export Note"}
       icon={Icon.Export}
+      onClose={() => perform(false)}
       exportNote={async (format) => {
         const content = await db.notes.note(note.id).export(format);
         download(note.title, content, format);
