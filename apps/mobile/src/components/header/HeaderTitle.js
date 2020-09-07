@@ -12,7 +12,7 @@ export const HeaderTitle = ({root}) => {
     <Text
       style={{
         fontSize: SIZE.xl,
-        color: headerTextState.color ? headerTextState.color : colors.pri,
+        color: headerTextState.color ? headerTextState.color : colors.heading,
         fontFamily: WEIGHT.bold,
         alignSelf:'center',
       
