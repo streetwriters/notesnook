@@ -1,0 +1,42 @@
+{
+  // See https://go.microsoft.com/fwlink/?LinkId=733558
+  // for the documentation about the tasks.json format
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "shell",
+      "command": "yarn debug",
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "isBackground": true, //This prevents the launch.json to wait for the completion of the task
+      "problemMatcher": {
+        "owner": "custom", //This is not needed but, required by the problemMatcher Object
+        "pattern": {
+          "regexp": "^$" //This is not needed but, required by the problemMatcher Object
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "Compiling...", //Signals the begin of the Task
+          "endsPattern": "Compiled .*" //Signals that now the initialization of the task is complete
+        }
+      },
+      "label": "StartReactApp"
+    },
+    {
+      "label": "Terminate All Tasks",
+      "command": "echo ${input:terminate}",
+      "type": "shell",
+      "problemMatcher": []
+    }
+  ],
+  "inputs": [
+    {
+      "id": "terminate",
+      "type": "command",
+      "command": "workbench.action.tasks.terminate",
+      "args": "terminateAll"
+    }
+  ]
+}
