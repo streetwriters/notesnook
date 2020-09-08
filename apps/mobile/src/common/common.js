@@ -26,7 +26,7 @@ const fixedColors = {
   normal: 'black',
   icon: 'gray',
   errorBg: '#FFD2D2',
-  errorText: '#D8000C',
+  errorText: '#ff6961',
   successBg: '#DFF2BF',
   successText: '#4F8A10',
   warningBg: '#FEEFB3',
@@ -64,10 +64,12 @@ export const COLOR_SCHEME_DARK = {
   ...fixedColors,
 };
 
-const windowSize = Dimensions.get('window');
-const adjustedWidth = windowSize.width * PixelRatio.get();
-const adjustedHeight = windowSize.height * PixelRatio.get();
+let windowSize = Dimensions.get('window');
+let adjustedWidth = windowSize.width * PixelRatio.get();
+let adjustedHeight = windowSize.height * PixelRatio.get();
 const pixelDensity = PixelRatio.get();
+
+
 
 const getDeviceSize = () => {
   let dpi = getDpi(pixelDensity);
@@ -81,28 +83,11 @@ const getDeviceSize = () => {
 };
 
 const getDpi = pd => {
-  if (pd === 1 || pd < 1) {
-    return 160 * pd;
-  } else if (pd > 1 && pd <= 1.5) {
-    let multiplier = pd / 1.5;
-    return 240 * multiplier;
-  } else if (pd > 1.5 && pd <= 2) {
-    let multiplier = pd / 2;
-    return 320 * multiplier;
-  } else if (pd > 2 && pd <= 3) {
-    let multiplier = pd / 3;
-    return 480 * multiplier;
-  } else if (pd > 3 && pd <= 3.5) {
-    let multiplier = pd / 3.5;
-    return 520 * multiplier;
-  } else if (pd > 3.5) {
-    return 550;
-  }
+  return 160 * pd;
 };
 
 const correction = (size, multiplier) => {
   let dSize = getDeviceSize();
-
   if (dSize >= 4 && dSize <= 5.3 && pixelDensity <= 3) {
     return size * 0.92;
   } else if (dSize > 5.3 && dSize < 7 && pixelDensity < 3 && !DDS.isTab) {
@@ -152,6 +137,8 @@ export const SIZE = {
 };
 
 export function updateSize() {
+ 
+
   SIZE.xxs = 10 * scale.fontScale;
   SIZE.xs = 12 * scale.fontScale;
   SIZE.sm = normalize(15) * scale.fontScale;

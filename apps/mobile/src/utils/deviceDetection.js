@@ -1,5 +1,6 @@
 import {Dimensions, PixelRatio, Platform} from 'react-native';
 
+import DeviceInfo from 'react-native-device-info';
 const windowSize = Dimensions.get('window');
 
 export class DeviceDetectionService {
@@ -29,7 +30,7 @@ export class DeviceDetectionService {
   }
 
   isPhoneOrTablet() {
-    if (Platform.isPad) {
+   /*  if (Platform.isPad) {
       this.isTab = true;
       this.isPhone = false;
     }
@@ -48,6 +49,13 @@ export class DeviceDetectionService {
     } else {
       this.isTab = false;
       this.isPhone = true;
+    } */
+    if (DeviceInfo.isTablet()) {
+      this.isTab = true;
+      this.isPhone = false;
+    } else {
+      this.isTab = false;
+      this.isPhone = false;
     }
   }
 

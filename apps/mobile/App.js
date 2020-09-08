@@ -15,7 +15,6 @@ import {
   Appearance,
   useColorScheme,
   StatusBar} from "react-native";
-
 const App = () => {
   const [state, dispatch] = useTracked();
   const [init, setInit] = useState(false);
@@ -32,7 +31,6 @@ const App = () => {
   };
 
   useEffect(() => {
-
     systemThemeChange();
   
   },[colorScheme])
