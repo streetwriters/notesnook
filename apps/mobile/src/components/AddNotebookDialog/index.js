@@ -379,6 +379,7 @@ export class AddNotebookDialog extends React.Component {
                       color: colors.pri,
                       width: '85%',
                       maxWidth: '85%',
+                      marginTop:5
                     },
                   ]}
                   placeholder="Add a new topic"
