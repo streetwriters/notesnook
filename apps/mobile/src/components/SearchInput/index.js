@@ -12,10 +12,10 @@ import {TextInput, Text} from 'react-native';
 const {Value, timing, block} = Animated;
 
 let searchResult = [];
- 
+
 let offsetY = 0;
 let timeoutAnimate = null;
-
+let animating = false;
 export const Search = (props) => {
   const [state, dispatch] = useTracked();
   const {colors, searchResults} = state;
@@ -29,6 +29,9 @@ export const Search = (props) => {
   const _borderAnim = new Value(1.5);
 
   const animation = (margin, opacity, border) => {
+    if (animating) return;
+    animating = true;
+    console.log('animating');
     timing(_marginAnim, {
       toValue: margin,
       duration: 230,
@@ -44,13 +47,20 @@ export const Search = (props) => {
       duration: 270,
       easing: Easing.inOut(Easing.ease),
     }).start();
+    setTimeout(() => {
+      animating = false;
+    }, 500);
   };
 
   const onScroll = (y) => {
     if (searchResults.results.length > 0) return;
+
     if (y < 30) {
+      clearTimeout(timeoutAnimate);
+      timeoutAnimate = null;
       animation(0, 1, 1.5);
       offsetY = y;
+      return;
     }
     if (y > offsetY) {
       if (y - offsetY < 100) return;
@@ -58,6 +68,7 @@ export const Search = (props) => {
       timeoutAnimate = null;
       timeoutAnimate = setTimeout(() => {
         animation(-65, 0, 0);
+        console.log('up');
       }, 500);
       offsetY = y;
     } else {
@@ -65,6 +76,7 @@ export const Search = (props) => {
       clearTimeout(timeoutAnimate);
       timeoutAnimate = null;
       timeoutAnimate = setTimeout(() => {
+        console.log('down');
         animation(0, 1, 1.5);
       }, 500);
       offsetY = y;
