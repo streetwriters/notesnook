@@ -34,8 +34,9 @@ import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
 import {eOpenLoginDialog, eResetApp} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
-import {db, DDS, setSetting, ToastEvent, w} from '../../utils/utils';
+import {db, DDS, setSetting, ToastEvent, w, RGB_Linear_Shade, hexToRGBA} from '../../utils/utils';
 import {MMKV} from '../../utils/storage';
+import {PressableButton} from '../../components/PressableButton';
 
 export const Settings = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
@@ -381,7 +382,11 @@ export const Settings = ({route, navigation}) => {
           </>
         ) : (
           <>
-            <TouchableOpacity
+            <PressableButton
+              color={colors.shade}
+              selectedColor={colors.accent}
+              alpha={!colors.night ? -0.02 : 0.1}
+              opacity={0.12}
               onPress={() => {
                 DDS.isTab
                   ? eSendEvent(eOpenLoginDialog)
@@ -390,13 +395,13 @@ export const Settings = ({route, navigation}) => {
                     });
               }}
               activeOpacity={opacity / 2}
-              style={{
+              customStyle={{
                 paddingVertical: pv + 5,
                 marginBottom: pv + 5,
                 width: '100%',
                 flexDirection: 'row',
                 alignItems: 'center',
-                backgroundColor: colors.shade,
+                justifyContent: 'flex-start',
                 borderRadius: 5,
                 paddingHorizontal: 6,
               }}>
@@ -447,7 +452,7 @@ export const Settings = ({route, navigation}) => {
                   size={SIZE.lg}
                 />
               </View>
-            </TouchableOpacity>
+            </PressableButton>
           </>
         )}
         <Text
@@ -502,34 +507,38 @@ export const Settings = ({route, navigation}) => {
             '#bcf60c',
             '#fabebe',
           ].map((item) => (
-            <TouchableOpacity
+            <PressableButton
               key={item}
+              color={colors.accent === item? RGB_Linear_Shade(!colors.night? -0.2 : 0.2, hexToRGBA(item, 1)) : item}
+              selectedColor={item}
+              alpha={!colors.night ? -0.1 : 0.1}
+              opacity={1}
               onPress={() => {
                 changeAccentColor(item);
 
                 MMKV.setStringAsync('accentColor', item);
               }}
-              style={{
+              customStyle={{
                 flexDirection: 'row',
                 justifyContent: 'center',
                 alignItems: 'center',
                 marginHorizontal: 5,
                 marginVertical: 5,
+                width: w / 5 - 35,
+                height: w / 5 - 35,
+                borderRadius: 100,
+                justifyContent: 'center',
+                alignItems: 'center',
               }}>
               <View
                 style={{
-                  width: w / 5 - 35,
-                  height: w / 5 - 35,
-                  backgroundColor: item,
-                  borderRadius: 100,
-                  justifyContent: 'center',
-                  alignItems: 'center',
+                
                 }}>
                 {colors.accent === item ? (
                   <Icon size={SIZE.lg} color="white" name="check" />
                 ) : null}
               </View>
-            </TouchableOpacity>
+            </PressableButton>
           ))}
         </View>
 

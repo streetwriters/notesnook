@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {Platform, Pressable} from 'react-native';
 import {br, opacity} from '../../common/common';
+import { RGB_Linear_Shade, hexToRGBA } from '../../utils/utils';
 
 export const PressableButton = ({
   color,
@@ -9,21 +10,19 @@ export const PressableButton = ({
   radius,
   children,
   onPress,
-  customStyle
+  customStyle,alpha=-0.1,
+  opacity=1
 }) => {
+
+
   return (
     <Pressable
       activeOpacity={opacity}
-      android_ripple={{
-        radius: radius,
-        color: selectedColor,
-        borderless: borderless,
-      }}
       onPress={onPress}
       style={({pressed}) => [
         {
           backgroundColor:
-            pressed && Platform.OS === 'ios' ? selectedColor : color,
+            pressed && Platform.OS === 'ios' ? RGB_Linear_Shade(alpha, hexToRGBA(selectedColor, opacity)) : color,
           width: '100%',
           alignSelf: 'center',
           borderRadius: br,

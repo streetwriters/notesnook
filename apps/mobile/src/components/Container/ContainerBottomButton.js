@@ -1,10 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import { Keyboard, Text, TouchableOpacity, View } from 'react-native';
-import { useSafeArea } from 'react-native-safe-area-context';
+import React, {useEffect, useState} from 'react';
+import {Keyboard, Text, TouchableOpacity, View, Pressable} from 'react-native';
+import {useSafeArea} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { pv, SIZE, WEIGHT } from '../../common/common';
-import { useTracked } from '../../provider';
-import { DDS, getElevation } from '../../utils/utils';
+import {pv, SIZE, WEIGHT} from '../../common/common';
+import {useTracked} from '../../provider';
+import {
+  DDS,
+  getElevation,
+  hexToRGBA,
+  RGB_Linear_Shade,
+} from '../../utils/utils';
+import {PressableButton} from '../PressableButton';
 
 export const ContainerBottomButton = ({root}) => {
   const [state, dispatch] = useTracked();
@@ -58,9 +64,10 @@ export const ContainerBottomButton = ({root}) => {
           },
         ],
       }}>
-      <TouchableOpacity
-        activeOpacity={0.8}
-        onPress={containerBottomButton.bottomButtonOnPress}>
+      <PressableButton
+        color={colors.accent}
+        selectedColor={colors.accent}
+        onPress={() => {}}>
         <View
           style={{
             ...getElevation(5),
@@ -69,11 +76,8 @@ export const ContainerBottomButton = ({root}) => {
             flexDirection: 'row',
             width: '100%',
             padding: pv,
-            borderRadius:5,
+            borderRadius: 5,
             paddingVertical: pv + 5,
-            backgroundColor:    containerBottomButton.color
-            ? containerBottomButton.color
-            : colors.accent
           }}>
           <Icon
             name={
@@ -94,7 +98,7 @@ export const ContainerBottomButton = ({root}) => {
             {'  ' + containerBottomButton.bottomButtonText}
           </Text>
         </View>
-      </TouchableOpacity>
+      </PressableButton>
     </View>
   );
 };

@@ -1,19 +1,26 @@
-import React, { useEffect } from 'react';
-import { ActivityIndicator, Platform, Text, TouchableOpacity, View } from 'react-native';
+import React, {useEffect} from 'react';
+import {
+  ActivityIndicator,
+  Platform,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { opacity, pv, SIZE, WEIGHT } from '../../common/common';
-import { useTracked } from '../../provider';
-import { ACTIONS } from '../../provider/actions';
-import { eSendEvent } from '../../services/eventManager';
-import { eOpenLoginDialog } from '../../services/events';
+import {opacity, pv, SIZE, WEIGHT} from '../../common/common';
+import {useTracked} from '../../provider';
+import {ACTIONS} from '../../provider/actions';
+import {eSendEvent} from '../../services/eventManager';
+import {eOpenLoginDialog} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
-import { db, DDS, hexToRGBA, ToastEvent } from '../../utils/utils';
-import { TimeSince } from './TimeSince';
-import { sideMenuRef } from '../../utils/refs';
+import {db, DDS, hexToRGBA, ToastEvent} from '../../utils/utils';
+import {TimeSince} from './TimeSince';
+import {sideMenuRef} from '../../utils/refs';
+import {PressableButton} from '../PressableButton';
 
 export const UserSection = ({noTextMode}) => {
   const [state, dispatch] = useTracked();
-  const {colors, syncing,user} = state;
+  const {colors, syncing, user} = state;
 
   useEffect(() => {
     dispatch({type: ACTIONS.TAGS});
@@ -131,17 +138,20 @@ export const UserSection = ({noTextMode}) => {
       </TouchableOpacity>
     </View>
   ) : (
-    <TouchableOpacity
+    <PressableButton
       onPress={() => {
         DDS.isTab
           ? eSendEvent(eOpenLoginDialog)
-          : NavigationService.navigate('Login',{
-            root:true
-          });
-          sideMenuRef.current?.closeDrawer();
+          : NavigationService.navigate('Login', {
+              root: true,
+            });
+        sideMenuRef.current?.closeDrawer();
       }}
-      activeOpacity={opacity / 2}
-      style={{
+      color={colors.shade}
+      selectedColor={colors.accent}
+      alpha={!colors.night ? -0.02 : 0.1}
+      opacity={0.12}
+      customStyle={{
         paddingVertical: 12,
         marginVertical: 5,
         marginTop: pv + 5,
@@ -150,7 +160,6 @@ export const UserSection = ({noTextMode}) => {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: noTextMode ? 'center' : 'flex-start',
-        backgroundColor: noTextMode ? 'transparent' : colors.shade,
         paddingHorizontal: noTextMode ? 0 : 12,
       }}>
       <View
@@ -194,6 +203,6 @@ export const UserSection = ({noTextMode}) => {
           </Text>
         </View>
       )}
-    </TouchableOpacity>
+    </PressableButton>
   );
 };

@@ -7,6 +7,7 @@ import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
 import {eClearSearch} from '../../services/events';
 import {sideMenuRef} from '../../utils/refs';
+import {PressableButton} from '../PressableButton';
 
 export const MenuListItem = ({item, index, noTextMode, ignore}) => {
   const [state, dispatch] = useTracked();
@@ -30,19 +31,22 @@ export const MenuListItem = ({item, index, noTextMode, ignore}) => {
   };
 
   return (
-    <TouchableOpacity
+    <PressableButton
       key={item.name + index}
-      activeOpacity={opacity / 2}
       onPress={_onPress}
-      style={{
+      color={
+        currentScreen === item.name.toLowerCase() ? colors.shade : 'transparent'
+      }
+      
+      selectedColor={colors.accent}
+      alpha={!colors.night ? -0.02 : 0.02}
+      opacity={0.12}
+      customStyle={{
         width: '100%',
-        backgroundColor:
-          item.name.toLowerCase() === currentScreen
-            ? colors.shade
-            : 'transparent',
         alignSelf: 'center',
+        borderRadius: 0,
         flexDirection: 'row',
-        paddingHorizontal: noTextMode ? 0 : 12,
+        paddingHorizontal: noTextMode ? 0 : 8,
         justifyContent: noTextMode ? 'center' : 'space-between',
         alignItems: 'center',
         paddingBottom: noTextMode ? pv + 2 : normalize(15),
@@ -82,6 +86,6 @@ export const MenuListItem = ({item, index, noTextMode, ignore}) => {
           name={item.on ? 'toggle-switch' : 'toggle-switch-off'}
         />
       ) : undefined}
-    </TouchableOpacity>
+    </PressableButton>
   );
 };
