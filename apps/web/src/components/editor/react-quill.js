@@ -121,7 +121,6 @@ export default class ReactQuill extends Component {
   }
 
   textChangeHandler = (delta, oldDelta, source) => {
-    if (source !== "user") return;
     this.props.onChange(this.quill);
   };
 
