@@ -14,6 +14,7 @@ import NavigationService from '../../services/NavigationService';
 import {db, DDS, getElevation, history, ToastEvent} from '../../utils/utils';
 import {dialogActions} from '../DialogManager/dialogActions';
 import {updateEvent} from '../DialogManager/recievers';
+import { Button } from '../Button';
 
 export class Dialog extends Component {
   constructor(props) {
@@ -235,50 +236,18 @@ export class Dialog extends Component {
                   flexDirection: 'row',
                   marginTop: 20,
                 }}>
-                <TouchableOpacity
-                  activeOpacity={opacity}
+                  <Button
                   onPress={this._onClose}
-                  style={{
-                    paddingVertical: pv,
-                    paddingHorizontal: ph,
-                    borderRadius: 5,
-                    width: '48%',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    backgroundColor: colors.nav,
-                  }}>
-                  <Text
-                    style={{
-                      fontFamily: WEIGHT.medium,
-                      color: colors.icon,
-                      fontSize: SIZE.sm,
-                    }}>
-                    {negativeText}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  activeOpacity={opacity}
+                  title={negativeText}
+                  grayed
+                  />
+                    <Button
                   onPress={this._onPress}
-                  style={{
-                    paddingVertical: pv,
-                    paddingHorizontal: ph,
-                    borderRadius: 5,
-                    width: '48%',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    borderColor: colors.accent,
-                    backgroundColor: colors.accent,
-                    borderWidth: 1,
-                  }}>
-                  <Text
-                    style={{
-                      fontFamily: WEIGHT.medium,
-                      color: 'white',
-                      fontSize: SIZE.sm,
-                    }}>
-                    {positiveText}
-                  </Text>
-                </TouchableOpacity>
+                  title={positiveText}
+                 
+                  />
+                
+               
               </View>
             )}
           </View>

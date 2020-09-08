@@ -37,7 +37,6 @@ export const MenuListItem = ({item, index, noTextMode, ignore}) => {
       color={
         currentScreen === item.name.toLowerCase() ? colors.shade : 'transparent'
       }
-      
       selectedColor={colors.accent}
       alpha={!colors.night ? -0.02 : 0.02}
       opacity={0.12}

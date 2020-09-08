@@ -22,7 +22,7 @@ export const PressableButton = ({
       style={({pressed}) => [
         {
           backgroundColor:
-            pressed && Platform.OS === 'ios' ? RGB_Linear_Shade(alpha, hexToRGBA(selectedColor, opacity)) : color,
+            pressed ? RGB_Linear_Shade(alpha, hexToRGBA(selectedColor, opacity)) : color,
           width: '100%',
           alignSelf: 'center',
           borderRadius: br,

@@ -67,7 +67,7 @@ export const ContainerBottomButton = ({root}) => {
       <PressableButton
         color={colors.accent}
         selectedColor={colors.accent}
-        onPress={() => {}}>
+        onPress={containerBottomButton.bottomButtonOnPress}>
         <View
           style={{
             ...getElevation(5),
