@@ -1,15 +1,14 @@
 import React, {useEffect, useState} from 'react';
-import {Keyboard, Text, TouchableOpacity} from 'react-native';
+import {Keyboard, Text, TouchableOpacity, View} from 'react-native';
 import Animated, {Easing, useValue} from 'react-native-reanimated';
 import {getElevation} from '../../utils/utils';
 import {eShowToast, eHideToast} from '../../services/events';
 import {eUnSubscribeEvent, eSubscribeEvent} from '../../services/eventManager';
-import { useTracked } from '../../provider';
-
+import {useTracked} from '../../provider';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {SIZE} from '../../common/common';
 const {spring, timing} = Animated;
-const AnimatedTouchableOpacity = Animated.createAnimatedComponent(
-  TouchableOpacity,
-);
+
 export const Toast = ({context = 'global'}) => {
   const [state, dispatch] = useTracked();
   const colors = state.colors;
@@ -26,12 +25,10 @@ export const Toast = ({context = 'global'}) => {
     setData(data);
     if (data.type === 'success') {
       setToastStyle({
-        backgroundColor: colors.successBg,
         color: colors.successText,
       });
     } else {
       setToastStyle({
-        backgroundColor: colors.errorBg,
         color: colors.errorText,
       });
     }
@@ -44,13 +41,14 @@ export const Toast = ({context = 'global'}) => {
       }).start();
     }, 100);
 
+    
     setTimeout(() => {
       timing(toastTranslate, {
         toValue: 300,
         duration: 200,
         easing: Easing.inOut(Easing.ease),
       }).start();
-    }, data.duration);
+    }, data.duration); 
   };
 
   const hideToastFunc = (data) => {};
@@ -94,40 +92,71 @@ export const Toast = ({context = 'global'}) => {
           },
         ],
       }}>
-      <AnimatedTouchableOpacity
+      <Animated.View
+        activeOpacity={0.8}
         style={{
           ...getElevation(5),
           ...toastStyle,
           maxWidth: '95%',
-          minWidth: '50%',
+          backgroundColor: 'black',
+          minWidth: data.func ? '95%' : '50%',
           alignSelf: 'center',
           borderRadius: 5,
+          height: 50,
           paddingHorizontal: 15,
-          paddingVertical: 10,
-          justifyContent: 'center',
+          justifyContent: 'space-between',
           flexDirection: 'row',
           alignItems: 'center',
         }}>
-        <Text
+        <View
           style={{
-            ...toastStyle,
-            backgroundColor: 'transparent',
-            fontSize: 16,
-            textAlign: 'center',
+            flexDirection: 'row',
+            alignItems: 'center',
+            maxWidth: data.func ? '90%' : '75%',
           }}>
-          {data.message}
-        </Text>
-
-        <TouchableOpacity activeOpacity={1}>
+          <View
+            style={{
+              width: 25,
+              height: 25,
+              backgroundColor: colors.errorText,
+              borderRadius: 100,
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginRight: 10,
+            }}>
+            <Icon name="close" size={20} color="white" />
+          </View>
           <Text
             style={{
-              ...toastStyle,
-              fontSize: 16,
+              color: 'white',
+              backgroundColor: 'transparent',
+              fontSize: SIZE.sm,
             }}>
-            {data.actionText}
+            {data.message}
           </Text>
-        </TouchableOpacity>
-      </AnimatedTouchableOpacity>
+        </View>
+
+        {data.func ? (
+          <TouchableOpacity
+            onPress={data.func}
+            style={{
+              width: '15%',
+              height: '100%',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: 5,
+            }}
+            activeOpacity={0.5}>
+            <Text
+              style={{
+                fontSize: SIZE.sm,
+                color: colors.errorText,
+              }}>
+              {data.actionText}
+            </Text>
+          </TouchableOpacity>
+        ) : null}
+      </Animated.View>
     </Animated.View>
   );
 };
