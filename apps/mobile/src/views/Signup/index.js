@@ -1,39 +1,39 @@
+import {useIsFocused} from '@react-navigation/native';
 import React, {createRef, useEffect, useState} from 'react';
 import {
+  ActivityIndicator,
+  Clipboard,
+  Linking,
+  Modal,
   Text,
   TouchableOpacity,
   View,
-  Modal,
-  Clipboard,
-  ActivityIndicator,
-  Linking,
 } from 'react-native';
+import * as Animatable from 'react-native-animatable';
 import {TextInput} from 'react-native-gesture-handler';
 import QRCode from 'react-native-qrcode-generator';
-import {useIsFocused} from '@react-navigation/native';
-import {opacity, pv, SIZE, WEIGHT, ph} from '../../common/common';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {opacity, ph, pv, SIZE, WEIGHT} from '../../common/common';
+import {Toast} from '../../components/Toast';
 import {useTracked} from '../../provider';
+import {ACTIONS} from '../../provider/actions';
 import {
+  eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-  eSendEvent,
 } from '../../services/eventManager';
 import {
-  eLoginDialogNavigateBack,
   eCloseLoginDialog,
-  eSetModalNavigator,
+  eLoginDialogNavigateBack,
   eOpenSideMenu,
+  eSetModalNavigator,
 } from '../../services/events';
-import * as Animatable from 'react-native-animatable';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
-  validateUsername,
   validateEmail,
   validatePass,
+  validateUsername,
 } from '../../services/validation';
-import {ToastEvent, db, DDS, getElevation} from '../../utils/utils';
-import {ACTIONS} from '../../provider/actions';
-import {Toast} from '../../components/Toast';
+import {db, DDS, getElevation, ToastEvent} from '../../utils/utils';
 
 const _email = createRef();
 const _pass = createRef();
@@ -190,7 +190,7 @@ export const Signup = ({route, navigation}) => {
       <Modal
         animated={true}
         animationType="fade"
-        visible={modalVisible}
+        visible={true}
         transparent={true}>
         <View
           style={{
@@ -224,8 +224,8 @@ export const Signup = ({route, navigation}) => {
                 textAlign: 'center',
                 color: colors.pri,
               }}>
-              All your data is end-to-end encrypted. This means that we cannot
-              read your data or recover your password if you forget it.{' '}
+              All your data is encrypted. This means that we cannot read your
+              data or recover your password.{' '}
               <Text
                 style={{
                   color: colors.errorText,
@@ -274,7 +274,7 @@ export const Signup = ({route, navigation}) => {
                   width: '85%',
                   maxWidth: '85%',
                   paddingRight: 10,
-                  color: colors.icon,
+                  color: colors.pri,
                 }}>
                 {key}
               </Text>
@@ -283,7 +283,7 @@ export const Signup = ({route, navigation}) => {
 
             <Text
               style={{
-                color: colors.icon,
+                color: colors.pri,
                 fontSize: 10,
                 width: '85%',
                 maxWidth: '85%',
