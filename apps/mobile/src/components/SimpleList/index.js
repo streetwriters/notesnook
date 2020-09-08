@@ -24,6 +24,7 @@ import {PinnedItemList} from './PinnedItemList';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import NavigationService from '../../services/NavigationService';
 import {Placeholder} from '../ListPlaceholders';
+import { PressableButton } from '../PressableButton';
 const sectionListRef = createRef();
 
 const AnimatedFlatlist = Animatable.createAnimatableComponent(FlatList);
@@ -174,7 +175,7 @@ const SimpleList = ({
               : 155 - 60 - insets.top,
         }}>
         {user || !data[0] || selectionMode ? null : (
-          <TouchableOpacity
+          <PressableButton
             onPress={() => {
               DDS.isTab
                 ? eSendEvent(eOpenLoginDialog)
@@ -182,14 +183,16 @@ const SimpleList = ({
                     root: true,
                   });
             }}
-            activeOpacity={opacity}
-            style={{
+            color={colors.shade}
+            selectedColor={colors.accent}
+            alpha={!colors.night ? -0.02 : 0.1}
+            opacity={0.12}
+            customStyle={{
               paddingVertical: 6,
               width: '100%',
               flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'flex-start',
-              backgroundColor: colors.shade,
               paddingHorizontal: 12,
               alignSelf: 'center',
             }}>
@@ -232,7 +235,7 @@ const SimpleList = ({
                 Login to sync your {type}.
               </Text>
             </View>
-          </TouchableOpacity>
+          </PressableButton>
         )}
         {pinned ? <PinnedItemList type={type} /> : null}
       </View>
