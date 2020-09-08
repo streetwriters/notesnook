@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   View,
   KeyboardAvoidingView,
+  ActivityIndicator,
 } from 'react-native';
 
 import Share from 'react-native-share';
@@ -28,9 +29,13 @@ import {ACTIONS} from '../../provider/actions';
 import NavigationService from '../../services/NavigationService';
 import {timeConverter, ToastEvent, DDS, db} from '../../utils/utils';
 import {openVault, eSendEvent} from '../../services/eventManager';
-import {refreshNotesPage, eOpenPremiumDialog, eOpenExportDialog} from '../../services/events';
+import {
+  refreshNotesPage,
+  eOpenPremiumDialog,
+  eOpenExportDialog,
+} from '../../services/events';
 import {PremiumTag} from '../Premium/PremiumTag';
-import { MMKV } from '../../utils/storage';
+import {MMKV} from '../../utils/storage';
 
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
@@ -45,8 +50,9 @@ export const ActionSheetComponent = ({
   columnItems = [],
 }) => {
   const [state, dispatch] = useTracked();
-  const {colors, tags, premiumUser} = state;
+  const {colors, tags, premiumUser, user} = state;
   const [focused, setFocused] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [note, setNote] = useState(
     item
       ? item
@@ -74,6 +80,7 @@ export const ActionSheetComponent = ({
   useEffect(() => {
     if (item.dateCreated !== null) {
       setNote({...item});
+      console.log(item);
     }
   }, [item]);
 
@@ -226,7 +233,7 @@ export const ActionSheetComponent = ({
       name: 'Export',
       icon: 'export',
       func: () => {
-        close('export')
+        close('export');
       },
     },
     {
@@ -287,7 +294,7 @@ export const ActionSheetComponent = ({
       icon: 'theme-light-dark',
       func: () => {
         if (!colors.night) {
-          MMKV .setStringAsync('theme', JSON.stringify({night: true}));
+          MMKV.setStringAsync('theme', JSON.stringify({night: true}));
           changeColorScheme(COLOR_SCHEME_DARK);
         } else {
           MMKV.setStringAsync('theme', JSON.stringify({night: false}));
@@ -571,6 +578,32 @@ export const ActionSheetComponent = ({
       </TouchableOpacity>
     ) : null;
 
+  const onPressSync = async () => {
+    if (!user) {
+      NavigationService.navigate('Login', {
+        root: true,
+      });
+      close();
+      return;
+    }
+    if (user?.lastSynced < note?.dateEdited) {
+      setRefreshing(true);
+      try {
+        let user = await db.user.get();
+        dispatch({type: ACTIONS.USER, user: user});
+        await db.sync();
+        localRefresh();
+        setRefreshing(false);
+
+        ToastEvent.show('Sync Complete', 'success', 'local');
+      } catch (e) {
+        setRefreshing(false);
+        ToastEvent.show(e.message, 'error', 'local');
+      }
+      dispatch({type: ACTIONS.ALL});
+    }
+  };
+
   return (
     <View
       onLayout={() => {
@@ -605,7 +638,7 @@ export const ActionSheetComponent = ({
           <Text
             numberOfLines={1}
             style={{
-              color: colors.pri,
+              color: colors.heading,
               fontSize: SIZE.sm + 1,
               fontFamily: WEIGHT.bold,
               maxWidth: '100%',
@@ -689,23 +722,34 @@ export const ActionSheetComponent = ({
             </View>
           )}
 
-          {note.type !== 'note' ? null : (
+          {note.type !== 'note' || refreshing ? null : (
             <Text
+              onPress={onPressSync}
               style={{
                 color: colors.accent,
                 fontSize: SIZE.xs - 1,
                 textAlignVertical: 'center',
                 fontFamily: WEIGHT.regular,
-                marginTop: 2,
+                marginTop: 5,
                 borderWidth: 1,
                 textAlign: 'center',
                 borderColor: colors.accent,
                 paddingHorizontal: 5,
                 borderRadius: 2,
               }}>
-              Synced
+              {user && user.lastSynced > note.dateEdited
+                ? 'Synced'
+                : 'Sync Now'}
             </Text>
           )}
+
+          {refreshing ? (
+            <ActivityIndicator
+              style={{marginTop: 5}}
+              size={12}
+              color={colors.accent}
+            />
+          ) : null}
         </View>
       )}
 

@@ -31,7 +31,7 @@ export const MenuListItem = ({item, index, noTextMode, ignore}) => {
 
   return (
     <TouchableOpacity
-      key={item.name}
+      key={item.name + index}
       activeOpacity={opacity / 2}
       onPress={_onPress}
       style={{
