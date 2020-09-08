@@ -43,6 +43,7 @@
     "preinstall": "chmod +x ./scripts/ci.sh && ./scripts/ci.sh",
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "debug": "BROWSER=none react-scripts start",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "update": "npm i @streetwriters/editor@latest @streetwriters/notesnook-core@latest @streetwriters/theme@latest"

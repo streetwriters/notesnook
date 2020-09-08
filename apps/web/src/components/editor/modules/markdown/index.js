@@ -25,19 +25,63 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-
 import Quill from "quill";
 import HorizontalRule from "./hr";
 
+const Block = Quill.import("blots/block");
 Quill.register("formats/horizontal", HorizontalRule);
 
+function matchInline(text, pattern, lineStart, commit) {
+  if (text.match(/^([*_ \n]+)$/g)) return false;
+
+  let match = pattern.exec(text);
+
+  const annotatedText = match[0];
+  const matchedText = match[2];
+  match.index = match.index && commit ? match.index + 1 : match.index;
+  const startIndex = lineStart + match.index;
+
+  return { annotatedText, matchedText, startIndex };
+}
 class MarkdownShortcuts {
+  _makeEmphasisMatcher(name, numberOfChars, bold, italic) {
+    return {
+      name,
+      pattern: new RegExp(
+        `(?:^|\\s|\\n|[^A-z0-9_*~\`])(\\*{${numberOfChars}}|_{${numberOfChars}})((?!\\1).*?)(\\1)($|\\s|\\n|[^A-z0-9_*~\`])`,
+        "g"
+      ),
+      action: (text, _selection, pattern, lineStart, commit) => {
+        const matchInfo = matchInline(text, pattern, lineStart, commit);
+        if (!matchInfo) return;
+        const { matchedText, annotatedText, startIndex } = matchInfo;
+
+        setTimeout(() => {
+          this.quill.deleteText(startIndex, annotatedText.length);
+          this.quill.insertText(
+            startIndex,
+            commit ? matchedText + " " : annotatedText,
+            {
+              bold,
+              italic,
+            }
+          );
+          this.quill.format("bold", false);
+          this.quill.format("italic", false);
+        }, 0);
+      },
+    };
+  }
+
   constructor(quill, options) {
     this.quill = quill;
     this.options = options;
 
     this.ignoreTags = ["PRE"];
     this.matches = [
+      this._makeEmphasisMatcher("bolditalic", 3, true, true),
+      this._makeEmphasisMatcher("bold", 2, true, false),
+      this._makeEmphasisMatcher("italic", 1, false, true),
       {
         name: "header",
         pattern: /^(#){1,6}\s/g,
@@ -75,87 +119,27 @@ class MarkdownShortcuts {
         },
       },
       {
-        name: "bolditalic",
-        pattern: /(?:\*|_){3}(.+?)(?:\*|_){3}/g,
-        action: (text, selection, pattern, lineStart) => {
-          let match = pattern.exec(text);
-
-          const annotatedText = match[0];
-          const matchedText = match[1];
-          const startIndex = lineStart + match.index;
-
-          if (text.match(/^([*_ \n]+)$/g)) return;
-
-          setTimeout(() => {
-            this.quill.deleteText(startIndex, annotatedText.length);
-            this.quill.insertText(startIndex, matchedText, {
-              bold: true,
-              italic: true,
-            });
-            this.quill.format("bold", false);
-          }, 0);
-        },
-      },
-      {
-        name: "bold",
-        pattern: /(?:\*|_){2}(.+?)(?:\*|_){2}/g,
-        action: (text, selection, pattern, lineStart) => {
-          let match = pattern.exec(text);
-
-          const annotatedText = match[0];
-          const matchedText = match[1];
-          const startIndex = lineStart + match.index;
-
-          if (text.match(/^([*_ \n]+)$/g)) return;
-
-          setTimeout(() => {
-            this.quill.deleteText(startIndex, annotatedText.length);
-            this.quill.insertText(startIndex, matchedText, { bold: true });
-            this.quill.format("bold", false);
-          }, 0);
-        },
-      },
-      {
-        name: "italic",
-        pattern: /(?:\*|_){1}(.+?)(?:\*|_){1}/g,
-        action: (text, selection, pattern, lineStart) => {
-          let match = pattern.exec(text);
-
-          const annotatedText = match[0];
-          const matchedText = match[1];
-          const startIndex = lineStart + match.index;
-
-          if (text.match(/^([*_ \n]+)$/g)) return;
-
-          setTimeout(() => {
-            this.quill.deleteText(startIndex, annotatedText.length);
-            this.quill.insertText(startIndex, matchedText, { italic: true });
-            this.quill.format("italic", false);
-          }, 0);
-        },
-      },
-      {
         name: "strikethrough",
-        pattern: /(?:~~)(.+?)(?:~~)/g,
-        action: (text, selection, pattern, lineStart) => {
-          let match = pattern.exec(text);
-
-          const annotatedText = match[0];
-          const matchedText = match[1];
-          const startIndex = lineStart + match.index;
-
-          if (text.match(/^([*_ \n]+)$/g)) return;
+        pattern: /(?:^|\s|\n|[^A-z0-9_*~`])(~{2})((?!\1).*?)(\1)($|\s|\n|[^A-z0-9_*~`])/g,
+        action: (text, _selection, pattern, lineStart, commit) => {
+          const matchInfo = matchInline(text, pattern, lineStart, commit);
+          if (!matchInfo) return;
+          const { matchedText, annotatedText, startIndex } = matchInfo;
 
           setTimeout(() => {
             this.quill.deleteText(startIndex, annotatedText.length);
-            this.quill.insertText(startIndex, matchedText, { strike: true });
+            this.quill.insertText(
+              startIndex,
+              commit ? matchedText : annotatedText,
+              { strike: true }
+            );
             this.quill.format("strike", false);
           }, 0);
         },
       },
       {
-        name: "code",
-        pattern: /(?:`)(.+?)(?:`)/g,
+        name: "displayformula",
+        pattern: /(?:\$\$)(.+?)(?:\$\$)/g,
         action: (text, selection, pattern, lineStart) => {
           let match = pattern.exec(text);
 
@@ -167,43 +151,72 @@ class MarkdownShortcuts {
 
           setTimeout(() => {
             this.quill.deleteText(startIndex, annotatedText.length);
-            this.quill.insertText(startIndex, matchedText, { code: true });
+            this.quill.insertEmbed(startIndex, "formula", matchedText);
+            this.quill.insertText(startIndex + 1, "\n", "align", "center");
+          }, 0);
+        },
+      },
+      {
+        name: "formula",
+        pattern: /(?:\$)(.+?)(?:\$)/g,
+        action: (text, selection, pattern, lineStart) => {
+          let match = pattern.exec(text);
+
+          const annotatedText = match[0];
+          const matchedText = match[1];
+          const startIndex = lineStart + match.index;
+
+          if (text.match(/^([*_ \n]+)$/g)) return;
+
+          setTimeout(() => {
+            this.quill.deleteText(startIndex, annotatedText.length);
+            this.quill.insertEmbed(startIndex, "formula", matchedText);
+          }, 0);
+        },
+      },
+      {
+        name: "code",
+        pattern: /(?:^|\s|\n|[^A-z0-9_*~`])(`)((?!\1).*?)(\1)($|\s|\n|[^A-z0-9_*~`])/g,
+        action: (text, _selection, pattern, lineStart, commit) => {
+          const matchInfo = matchInline(text, pattern, lineStart, commit);
+          if (!matchInfo) return;
+          const { matchedText, annotatedText, startIndex } = matchInfo;
+
+          setTimeout(() => {
+            this.quill.deleteText(startIndex, annotatedText.length);
+            if (!commit) this.quill.insertText(startIndex, " ");
+            this.quill.insertText(
+              startIndex + (commit ? 0 : 1),
+              commit ? matchedText : annotatedText.trim(),
+              { code: true }
+            );
             this.quill.format("code", false);
-            this.quill.insertText(this.quill.getSelection(), " ");
+            if (commit) this.quill.insertText(this.quill.getSelection(), " ");
           }, 0);
         },
       },
       {
         name: "hr",
-        pattern: /^([-*]\s?){3}/g,
-        action: (text, selection) => {
-          const startIndex = selection.index - text.length;
+        pattern: /^(-\s?){3}/g,
+        action: (text, selection, pattern) => {
           setTimeout(() => {
-            this.quill.deleteText(startIndex, text.length);
+            const matchedText = text.match(pattern)[0];
+            const startIndex = selection.index - matchedText.length;
+            this.quill.deleteText(startIndex, matchedText.length);
 
-            this.quill.insertEmbed(
-              startIndex + 1,
-              "hr",
-              true,
-              Quill.sources.USER
-            );
-            this.quill.insertText(startIndex + 2, "\n", Quill.sources.SILENT);
-            this.quill.setSelection(startIndex + 2, Quill.sources.SILENT);
+            this.quill.insertEmbed(startIndex, "hr", true, Quill.sources.USER);
+            this.quill.setSelection(startIndex + 1, Quill.sources.SILENT);
           }, 0);
         },
       },
       {
-        name: "asterisk-ul",
-        pattern: /^(\*|\+)\s$/g,
+        name: "plus-ul",
+        // Quill 1.3.5 already treat * as another trigger for bullet lists
+        pattern: /^\+\s$/g,
         action: (text, selection, pattern) => {
           setTimeout(() => {
-            let index = selection.index;
-            this.quill.formatLine(index, 1, "list", "unordered");
-            if (text.trim() === "*") {
-              this.quill.deleteText(index, 1);
-            } else if (text.trim() === "+") {
-              this.quill.deleteText(index - 2, 2);
-            }
+            this.quill.formatLine(selection.index, 1, "list", "unordered");
+            this.quill.deleteText(selection.index - 2, 2);
           }, 0);
         },
       },
@@ -254,22 +267,16 @@ class MarkdownShortcuts {
 
     // Handler that looks for insert deltas that match specific characters
     this.quill.on("text-change", (delta, oldContents, source) => {
-      // remove formatting when there's no text left
-      if (
-        delta.ops[0].delete !== undefined &&
-        source === "user" &&
-        this.quill.getLength() <= 2
-      ) {
-        this.quill.removeFormat(0, 1);
-        return;
-      }
+      if (source !== "user") return;
       for (let i = 0; i < delta.ops.length; i++) {
         if (delta.ops[i].hasOwnProperty("insert")) {
           if (delta.ops[i].insert === " ") {
-            this.onSpace();
+            this.onSpace(true);
           } else if (delta.ops[i].insert === "\n") {
             this.onEnter();
-          }
+          } else this.onSpace(false);
+        } else if (delta.ops[i].hasOwnProperty("delete") && source === "user") {
+          this.onDelete();
         }
       }
     });
@@ -283,22 +290,56 @@ class MarkdownShortcuts {
     );
   }
 
-  onSpace() {
+  onSpace(commit) {
     const selection = this.quill.getSelection();
     if (!selection) return;
     const [line, offset] = this.quill.getLine(selection.index);
-    const text = line.domNode.textContent;
     const lineStart = selection.index - offset;
+    const rawText = this.quill.getText(lineStart, selection.index - lineStart);
+
+    // formulas count as a single character for insertion/deletion
+    // purposes, yet they don't show up the output of getText.
+    // So we have to compensate:
+    const delta = this.quill.getContents(lineStart, selection.index);
+    const numFormulas = delta.ops.filter((op) => op.insert && op.insert.formula)
+      .length;
+    const text = " ".repeat(numFormulas) + rawText;
     if (this.isValid(text, line.domNode.tagName)) {
       for (let match of this.matches) {
         const matchedText = text.match(match.pattern);
         if (matchedText) {
           // We need to replace only matched text not the whole line
-          match.action(text, selection, match.pattern, lineStart);
+          match.action(text, selection, match.pattern, lineStart, commit);
+          this.lastMatch = match;
+          console.log("Quill match made (" + match.name + ")");
           return;
         }
       }
     }
+  }
+
+  onDelete() {
+    const range = this.quill.getSelection();
+    const format = this.quill.getFormat(range);
+
+    if (format.blockquote || format.code || format["code-block"]) {
+      if (this.isLastBrElement(range) || this.isEmptyLine(range)) {
+        this.quill.removeFormat(range.index, range.length);
+      }
+    }
+  }
+
+  isLastBrElement(range) {
+    const [block] = this.quill.scroll.descendant(Block, range.index);
+    const isBrElement =
+      block != null && block.domNode.firstChild instanceof HTMLBRElement;
+    return isBrElement;
+  }
+
+  isEmptyLine(range) {
+    const [line] = this.quill.getLine(range.index);
+    const isEmpty = line?.children?.head?.text?.trim() === "";
+    return isEmpty;
   }
 
   onEnter() {
@@ -312,7 +353,7 @@ class MarkdownShortcuts {
       for (let match of this.matches) {
         const matchedText = text.match(match.pattern);
         if (matchedText) {
-          match.action(text, selection, match.pattern, lineStart);
+          match.action(text, selection, match.pattern, lineStart, true);
           return;
         }
       }
