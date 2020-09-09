@@ -1,50 +1,102 @@
-import React from 'react';
-import { NotebookItem } from '../../components/NotebookItem';
+import React, {useMemo} from 'react';
+import {NotebookItem} from '../../components/NotebookItem';
 import SelectionWrapper from '../../components/SelectionWrapper';
-import { useTracked } from '../../provider';
-import { ACTIONS } from '../../provider/actions';
+import {useTracked} from '../../provider';
+import {ACTIONS} from '../../provider/actions';
+import NavigationService from '../../services/NavigationService';
 
-export const NotebookItemWrapper = ({item, index,isTrash = false, pinned = false}) => {
+export const NotebookItemWrapper = ({
+  item,
+  index,
+  isTrash = false,
+  pinned = false,
+}) => {
   const [state, dispatch] = useTracked();
-  const {selectionMode,preventDefaultMargins} = state;
-  let headerState = preventDefaultMargins? state.indHeaderState : state.headerState;
-  let params = headerState.route.params? headerState.route.params : {};
-  
+  const {selectionMode, preventDefaultMargins} = state;
+  let headerState = preventDefaultMargins
+    ? state.indHeaderState
+    : state.headerState;
+  let params = headerState.route.params ? headerState.route.params : {};
+
+  const style = useMemo(() => {
+    return {width: selectionMode ? '90%' : '100%', marginHorizontal: 0};
+  }, [selectionMode]);
+
+  const onLongPress = () => {
+    if (!selectionMode) {
+      dispatch({
+        type: ACTIONS.SELECTION_MODE,
+        enabled: !selectionMode,
+      });
+    }
+
+    dispatch({
+      type: ACTIONS.SELECTED_ITEMS,
+      item: item,
+    });
+  };
+
+  const onPress = () => {
+    if (selectionMode) {
+      onLongPress();
+      return;
+    }
+    if (item.type === 'topic') {
+      NavigationService.navigate('Notes', {
+        ...item,
+      });
+    } else {
+      dispatch({
+        type: ACTIONS.HEADER_TEXT_STATE,
+        state: {
+          heading: preventDefaultMargins ? 'Move to topic' : item.title,
+        },
+      });
+      dispatch({
+        type: ACTIONS.HEADER_STATE,
+        state: {
+          canGoBack: true,
+          menu: false,
+        },
+      });
+      dispatch({
+        type: ACTIONS.CONTAINER_BOTTOM_BUTTON,
+        state: {
+          bottomButtonText: 'Add new topic',
+        },
+      });
+
+      preventDefaultMargins
+        ? navigation.navigate('Notebook', {
+            notebook: item,
+            title: preventDefaultMargins ? 'Move to topic' : item.title,
+            isMove: preventDefaultMargins,
+            hideMore: preventDefaultMargins,
+            root: preventDefaultMargins ? false : true,
+          })
+        : NavigationService.navigate('Notebook', {
+            notebook: item,
+            title: preventDefaultMargins ? 'Select a topic' : item.title,
+            isMove: preventDefaultMargins,
+            hideMore: preventDefaultMargins,
+            root: true,
+          });
+    }
+  };
 
   return (
-    <SelectionWrapper pinned={pinned} index={index} item={item}>
+    <SelectionWrapper
+      onLongPress={onLongPress}
+      pinned={pinned}
+      index={index}
+      onPress={onPress}
+      item={item}>
       <NotebookItem
         hideMore={preventDefaultMargins}
         navigation={headerState.navigation}
         route={headerState.route}
-        pinned={pinned}
-        customStyle={pinned? {
-          width: selectionMode ? '90%' : '100%',
-          marginHorizontal: 0,
-          paddingTop: 10,
-          paddingRight: 6,
-          marginBottom: 5,
-          marginTop: 15,
-          borderBottomWidth: 0,
-        } :{
-          width: selectionMode ? '90%' : '100%',
-          marginHorizontal: 0,
-        }}
-        isMove={preventDefaultMargins}
-        selectionMode={selectionMode}
-        onLongPress={() => {
-          if (!selectionMode) {
-            dispatch({
-              type: ACTIONS.SELECTION_MODE,
-              enabled: !selectionMode,
-            });
-          }
-
-          dispatch({
-            type: ACTIONS.SELECTED_ITEMS,
-            item: item,
-          });
-        }}
+        isTopic={item.type === "topic"}
+        customStyle={style}
         noteToMove={params.note}
         item={item}
         index={index}

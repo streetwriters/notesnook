@@ -1,19 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { Platform, StatusBar, Text, TouchableOpacity, View } from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {Platform, StatusBar, Text, TouchableOpacity, View} from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { SIZE, WEIGHT } from '../../common/common';
-import { useTracked } from '../../provider';
-import { ACTIONS } from '../../provider/actions';
-import { eSendEvent } from '../../services/eventManager';
+import {SIZE, WEIGHT} from '../../common/common';
+import {useTracked} from '../../provider';
+import {ACTIONS} from '../../provider/actions';
+import {eSendEvent} from '../../services/eventManager';
 import {
   eOpenMoveNoteDialog,
-
-  eOpenPremiumDialog, eOpenSimpleDialog
+  eOpenPremiumDialog,
+  eOpenSimpleDialog,
 } from '../../services/events';
-import { db, ToastEvent } from '../../utils/utils';
-import { TEMPLATE_DELETE } from '../DialogManager/templates';
+import {db, ToastEvent} from '../../utils/utils';
+import {TEMPLATE_DELETE} from '../DialogManager/templates';
 import Animated, {useValue, Easing} from 'react-native-reanimated';
 
 export const SelectionHeader = () => {
@@ -32,14 +32,13 @@ export const SelectionHeader = () => {
   const translateY = useValue(-150);
 
   useEffect(() => {
-      Animated.timing(translateY,{
-        duration:300,
-        toValue:selectionMode? 0 : -150,
-        easing:Easing.in(Easing.ease)
-      }).start();
-  },[selectionMode])
+    Animated.timing(translateY, {
+      duration: 300,
+      toValue: selectionMode ? 0 : -150,
+      easing: Easing.in(Easing.ease),
+    }).start();
+  }, [selectionMode]);
 
-  
   return containerState.noSelectionHeader ? null : (
     <Animated.View
       style={{
@@ -127,10 +126,10 @@ export const SelectionHeader = () => {
                 dispatch({type: ACTIONS.CLEAR_SELECTION});
                 eSendEvent(eOpenMoveNoteDialog);
               }}>
-              <Icon color={colors.icon} name={'plus'} size={SIZE.xl} />
+              <Icon color={colors.heading} name={'plus'} size={SIZE.xl} />
             </TouchableOpacity>
           )}
-          {currentScreen === 'trash' || currentScreen === 'notebooks' ? null : (
+        {/*   {currentScreen === 'trash' || currentScreen === 'notebooks' ? null : (
             <TouchableOpacity
               style={{
                 justifyContent: 'center',
@@ -168,9 +167,9 @@ export const SelectionHeader = () => {
                   );
                 }
               }}>
-              <Icon color={colors.icon} name={'star'} size={SIZE.xl - 3} />
+              <Icon color={colors.heading} name={'star'} size={SIZE.xl - 3} />
             </TouchableOpacity>
-          )}
+          )} */}
 
           {currentScreen === 'trash' ? null : (
             <TouchableOpacity
@@ -185,7 +184,7 @@ export const SelectionHeader = () => {
                 eSendEvent(eOpenSimpleDialog, TEMPLATE_DELETE('item'));
                 return;
               }}>
-              <Icon color={colors.icon} name={'delete'} size={SIZE.xl - 3} />
+              <Icon color={colors.heading} name={'delete'} size={SIZE.xl - 3} />
             </TouchableOpacity>
           )}
 
@@ -214,7 +213,7 @@ export const SelectionHeader = () => {
                 }
               }}>
               <Icon
-                color={colors.icon}
+                color={colors.heading}
                 name="delete-restore"
                 size={SIZE.xl - 3}
               />

@@ -1,10 +1,11 @@
-import React, {useEffect, useState} from 'react';
-import {TouchableWithoutFeedback, View} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {SIZE} from '../../common/common';
-import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
-import {getElevation} from '../../utils/utils';
+import { SIZE } from '../../common/common';
+import { useTracked } from '../../provider';
+import { ACTIONS } from '../../provider/actions';
+import { getElevation } from '../../utils/utils';
+import { PressableButton } from '../PressableButton';
 
 const SelectionWrapper = ({
   children,
@@ -13,13 +14,15 @@ const SelectionWrapper = ({
   index,
   background,
   pinned,
+  onLongPress,
+  onPress
 }) => {
   const [state, dispatch] = useTracked();
   const {colors, selectionMode, selectedItemsList} = state;
   const [selected, setSelected] = useState(false);
   useEffect(() => {
     let exists = selectedItemsList.filter(
-      o => o.dateCreated === item.dateCreated,
+      (o) => o.dateCreated === item.dateCreated,
     );
 
     if (exists[0]) {
@@ -33,9 +36,25 @@ const SelectionWrapper = ({
     }
   }, [selectedItemsList]);
 
+
+
+
+
+
   return (
-    <View
-      style={{
+    <PressableButton
+      color={currentEditingNote === item.dateCreated || pinned
+        ? colors.shade
+        : background
+        ? background
+        : 'transparent'
+      }
+      onLongPress={onLongPress}
+      onPress={onPress}
+      selectedColor={currentEditingNote === item.dateCreated || pinned? colors.accent :  colors.nav}
+      alpha={!colors.night ? -0.02 : 0.02}
+      opacity={ currentEditingNote === item.dateCreated || pinned? 0.12 : 1}
+      customStyle={{
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -47,12 +66,6 @@ const SelectionWrapper = ({
             : index === 0 && pinned && selectionMode
             ? 30
             : 0,
-        backgroundColor:
-          currentEditingNote === item.dateCreated || pinned
-            ? colors.shade
-            : background
-            ? background
-            : 'transparent',
       }}>
       {pinned ? (
         <View
@@ -63,7 +76,7 @@ const SelectionWrapper = ({
             backgroundColor: colors.accent,
             borderRadius: 100,
             position: 'absolute',
-            left: 20,
+            right: 20,
             top: -15,
             justifyContent: 'center',
             alignItems: 'center',
@@ -89,28 +102,30 @@ const SelectionWrapper = ({
           alignItems: 'center',
           paddingRight: 8,
         }}>
-        <TouchableWithoutFeedback
+        <TouchableOpacity
+          activeOpacity={1}
           onPress={() => {
             dispatch({type: ACTIONS.SELECTED_ITEMS, item: item});
           }}
           style={{
             justifyContent: 'center',
             alignItems: 'center',
+            height: 70,
           }}>
           <Icon
             size={SIZE.lg}
-            color={colors.accent}
+            color={selected ? colors.accent : colors.icon}
             name={
               selected
                 ? 'check-circle-outline'
                 : 'checkbox-blank-circle-outline'
             }
           />
-        </TouchableWithoutFeedback>
+        </TouchableOpacity>
       </View>
 
       {children}
-    </View>
+    </PressableButton>
   );
 };
 

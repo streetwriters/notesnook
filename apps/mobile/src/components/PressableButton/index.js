@@ -11,7 +11,8 @@ export const PressableButton = ({
   children,
   onPress,
   customStyle,alpha=-0.1,
-  opacity=1
+  opacity=1,
+  onLongPress
 }) => {
 
 
@@ -19,6 +20,7 @@ export const PressableButton = ({
     <Pressable
       activeOpacity={opacity}
       onPress={onPress}
+      onLongPress={onLongPress}
       style={({pressed}) => [
         {
           backgroundColor:

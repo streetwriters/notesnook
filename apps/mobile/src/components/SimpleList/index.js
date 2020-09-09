@@ -6,25 +6,23 @@ import {
   SectionList,
   Text,
   View,
-  TouchableOpacity,
 } from 'react-native';
+import * as Animatable from 'react-native-animatable';
 import {useSafeArea} from 'react-native-safe-area-context';
-import {SIZE, WEIGHT, opacity, pv} from '../../common/common';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
 import {
   eClearSearch,
-  eScrollEvent,
   eOpenLoginDialog,
+  eScrollEvent,
 } from '../../services/events';
-import {db, ToastEvent, DDS} from '../../utils/utils';
-import * as Animatable from 'react-native-animatable';
-import {PinnedItemList} from './PinnedItemList';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import NavigationService from '../../services/NavigationService';
-import {Placeholder} from '../ListPlaceholders';
-import { PressableButton } from '../PressableButton';
+import {db, DDS, ToastEvent} from '../../utils/utils';
+import {PressableButton} from '../PressableButton';
+import {PinnedItemList} from './PinnedItemList';
 const sectionListRef = createRef();
 
 const AnimatedFlatlist = Animatable.createAnimatableComponent(FlatList);

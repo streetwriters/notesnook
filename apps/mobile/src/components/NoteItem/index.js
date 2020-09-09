@@ -54,21 +54,36 @@ export default class NoteItem extends React.Component {
     }
   }
 
+  _onPress = async () => {
+    if (item.conflicted) {
+      eSendEvent(eShowMergeDialog, item);
+
+      return;
+    }
+    if (this.props.selectionMode) {
+      this.props.onLongPress();
+      return;
+    } else if (item.locked) {
+      openVault(item, true, true, false, true, false);
+
+      return;
+    }
+    if (DDS.isTab) {
+      eSendEvent(eOnLoadNote, item);
+    } else if (isTrash) {
+      simpleDialogEvent(TEMPLATE_TRASH(item.type));
+    } else {
+      eSendEvent(eOnLoadNote, item);
+      openEditorAnimation();
+    }
+  };
+
   render() {
-    let {
-      colors,
-      item,
-      customStyle,
-      onLongPress,
-      isTrash,
-      pinned,
-      index,
-    } = this.props;
+    let {colors, item, customStyle, isTrash} = this.props;
     return (
       <View
         style={[
           {
-            paddingVertical: pv,
             justifyContent: 'flex-start',
             alignItems: 'center',
             flexDirection: 'row',
@@ -76,182 +91,156 @@ export default class NoteItem extends React.Component {
             paddingRight: 6,
             alignSelf: 'center',
             borderBottomWidth: 1,
+            height: 100,
             borderBottomColor: colors.nav,
           },
           customStyle ? customStyle : {},
         ]}>
-        <TouchableOpacity
-          activeOpacity={0.8}
-          onLongPress={() => onLongPress()}
-          onPress={async () => {
-            if (item.conflicted) {
-              eSendEvent(eShowMergeDialog, item);
-
-              return;
-            }
-            if (this.props.selectionMode) {
-              this.props.onLongPress();
-              return;
-            } else if (item.locked) {
-              openVault(item, true, true, false, true, false);
-
-              return;
-            }
-            if (DDS.isTab) {
-              eSendEvent(eOnLoadNote, item);
-            } else if (isTrash) {
-              simpleDialogEvent(TEMPLATE_TRASH(item.type));
-            } else {
-              eSendEvent(eOnLoadNote, item);
-              openEditorAnimation();
-            }
-          }}
+        <View
           style={{
             paddingLeft: 0,
             width: '95%',
           }}>
-          <>
+          <Text
+            numberOfLines={1}
+            style={{
+              color: colors.heading,
+              fontSize: SIZE.sm + 1,
+              fontFamily: WEIGHT.bold,
+              maxWidth: '100%',
+            }}>
+            {item.title.replace('\n', '')}
+          </Text>
+          <View
+            style={{
+              justifyContent: 'flex-start',
+              alignItems: 'flex-start',
+              width: '100%',
+            }}>
             <Text
-              numberOfLines={1}
+              numberOfLines={2}
               style={{
-                color: colors.heading,
-                fontSize: SIZE.sm + 1,
-                fontFamily: WEIGHT.bold,
+                fontSize: SIZE.sm - 1,
+                color: colors.pri + 'B3',
+                fontFamily: WEIGHT.regular,
+                width: '100%',
                 maxWidth: '100%',
+                paddingRight: ph,
               }}>
-              {item.title.replace('\n', '')}
+              {item.headline[item.headline.length - 1] === '\n'
+                ? item.headline.slice(0, item.headline.length - 1)
+                : item.headline}
             </Text>
+
             <View
               style={{
+                flexDirection: 'row',
                 justifyContent: 'flex-start',
-                alignItems: 'flex-start',
+                alignItems: 'center',
                 width: '100%',
+                marginTop: 5,
               }}>
-              <Text
-                numberOfLines={2}
-                style={{
-                  fontSize: SIZE.sm - 1,
-                  color: colors.pri + 'B3',
-                  fontFamily: WEIGHT.regular,
-                  width: '100%',
-                  maxWidth: '100%',
-                  paddingRight: ph,
-                }}>
-                {item.headline[item.headline.length - 1] === '\n'
-                  ? item.headline.slice(0, item.headline.length - 1)
-                  : item.headline}
-              </Text>
-
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'flex-start',
-                  alignItems: 'center',
-                  width: '100%',
-                  marginTop: 5,
-                }}>
-                {!isTrash ? (
-                  <>
-                    {item.colors.length > 0 ? (
-                      <View
-                        style={{
-                          marginRight: 10,
-                          flexDirection: 'row',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                        }}>
-                        {item.colors.map((item) => (
-                          <View
-                            key={item}
-                            style={{
-                              width: SIZE.xs,
-                              height: SIZE.xs,
-                              borderRadius: 100,
-                              backgroundColor: item,
-                              marginRight: -4.5,
-                            }}
-                          />
-                        ))}
-                      </View>
-                    ) : null}
-
-                    {item.locked ? (
-                      <Icon
-                        style={{marginRight: 10}}
-                        name="lock"
-                        size={SIZE.xs}
-                        color={colors.icon}
-                      />
-                    ) : null}
-
-                    {item.favorite ? (
-                      <Icon
-                        style={{marginRight: 10}}
-                        name="star"
-                        size={SIZE.xs + 1}
-                        color="orange"
-                      />
-                    ) : null}
-                    <Text
+              {!isTrash ? (
+                <>
+                  {item.colors.length > 0 ? (
+                    <View
                       style={{
-                        color: colors.icon,
-                        fontSize: SIZE.xs - 1,
-                        textAlignVertical: 'center',
-                        fontFamily: WEIGHT.regular,
                         marginRight: 10,
+                        flexDirection: 'row',
+                        justifyContent: 'center',
+                        alignItems: 'center',
                       }}>
-                      {timeSince(item.dateCreated)}
-                    </Text>
-                  </>
-                ) : null}
+                      {item.colors.map((item) => (
+                        <View
+                          key={item}
+                          style={{
+                            width: SIZE.xs,
+                            height: SIZE.xs,
+                            borderRadius: 100,
+                            backgroundColor: item,
+                            marginRight: -4.5,
+                          }}
+                        />
+                      ))}
+                    </View>
+                  ) : null}
 
-                {isTrash ? (
-                  <>
-                    <Text
-                      style={{
-                        color: colors.icon,
-                        fontSize: SIZE.xs - 1,
-                        textAlignVertical: 'center',
-                        fontFamily: WEIGHT.regular,
-                      }}>
-                      {'Deleted on: ' + item && item.dateDeleted
-                        ? new Date(item.dateDeleted).toISOString().slice(0, 10)
-                        : null + '   '}
-                    </Text>
-                    <Text
-                      style={{
-                        color: colors.accent,
-                        fontSize: SIZE.xs - 1,
-                        textAlignVertical: 'center',
-                        fontFamily: WEIGHT.regular,
-                      }}>
-                      {item.type[0].toUpperCase() + item.type.slice(1) + '  '}
-                    </Text>
-                  </>
-                ) : null}
+                  {item.locked ? (
+                    <Icon
+                      style={{marginRight: 10}}
+                      name="lock"
+                      size={SIZE.xs}
+                      color={colors.icon}
+                    />
+                  ) : null}
 
-                {item.conflicted ? (
-                  <View
+                  {item.favorite ? (
+                    <Icon
+                      style={{marginRight: 10}}
+                      name="star"
+                      size={SIZE.xs + 1}
+                      color="orange"
+                    />
+                  ) : null}
+                  <Text
                     style={{
-                      backgroundColor: colors.errorText,
-                      borderRadius: 2.5,
-                      paddingHorizontal: 4,
-                      position: 'absolute',
-                      right: 20,
+                      color: colors.icon,
+                      fontSize: SIZE.xs - 1,
+                      textAlignVertical: 'center',
+                      fontFamily: WEIGHT.regular,
+                      marginRight: 10,
                     }}>
-                    <Text
-                      style={{
-                        fontSize: SIZE.xs - 1,
-                        color: 'white',
-                      }}>
-                      CONFLICTS
-                    </Text>
-                  </View>
-                ) : null}
-              </View>
+                    {timeSince(item.dateCreated)}
+                  </Text>
+                </>
+              ) : null}
+
+              {isTrash ? (
+                <>
+                  <Text
+                    style={{
+                      color: colors.icon,
+                      fontSize: SIZE.xs - 1,
+                      textAlignVertical: 'center',
+                      fontFamily: WEIGHT.regular,
+                    }}>
+                    {'Deleted on: ' + item && item.dateDeleted
+                      ? new Date(item.dateDeleted).toISOString().slice(0, 10)
+                      : null + '   '}
+                  </Text>
+                  <Text
+                    style={{
+                      color: colors.accent,
+                      fontSize: SIZE.xs - 1,
+                      textAlignVertical: 'center',
+                      fontFamily: WEIGHT.regular,
+                    }}>
+                    {item.type[0].toUpperCase() + item.type.slice(1) + '  '}
+                  </Text>
+                </>
+              ) : null}
+
+              {item.conflicted ? (
+                <View
+                  style={{
+                    backgroundColor: colors.errorText,
+                    borderRadius: 2.5,
+                    paddingHorizontal: 4,
+                    position: 'absolute',
+                    right: 20,
+                  }}>
+                  <Text
+                    style={{
+                      fontSize: SIZE.xs - 1,
+                      color: 'white',
+                    }}>
+                    CONFLICTS
+                  </Text>
+                </View>
+              ) : null}
             </View>
-          </>
-        </TouchableOpacity>
+          </View>
+        </View>
 
         <TouchableOpacity
           style={{
