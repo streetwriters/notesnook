@@ -41,17 +41,22 @@ export const Toast = ({context = 'global'}) => {
       }).start();
     }, 100);
 
-    
     setTimeout(() => {
       timing(toastTranslate, {
         toValue: 300,
         duration: 200,
         easing: Easing.inOut(Easing.ease),
       }).start();
-    }, data.duration); 
+    }, data.duration);
   };
 
-  const hideToastFunc = (data) => {};
+  const hideToastFunc = (data) => {
+    timing(toastTranslate, {
+      toValue: 300,
+      duration: 200,
+      easing: Easing.inOut(Easing.ease),
+    }).start();
+  };
 
   const _onKeyboardShow = () => {
     setKeyboard(true);
@@ -118,14 +123,20 @@ export const Toast = ({context = 'global'}) => {
             style={{
               width: 25,
               height: 25,
-              backgroundColor: colors.errorText,
+              backgroundColor:
+                data.type === 'error' ? colors.errorText : colors.successText,
               borderRadius: 100,
               justifyContent: 'center',
               alignItems: 'center',
               marginRight: 10,
             }}>
-            <Icon name="close" size={20} color="white" />
+            <Icon
+              name={data.type === 'success' ? 'check' : 'close'}
+              size={20}
+              color="white"
+            />
           </View>
+
           <Text
             style={{
               color: 'white',
@@ -150,7 +161,8 @@ export const Toast = ({context = 'global'}) => {
             <Text
               style={{
                 fontSize: SIZE.sm,
-                color: colors.errorText,
+                color:
+                  data.type === 'error' ? colors.errorText : colors.successText,
               }}>
               {data.actionText}
             </Text>
