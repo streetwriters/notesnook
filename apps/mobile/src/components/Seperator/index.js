@@ -5,8 +5,8 @@ const Seperator = ({half = false}) => {
   return (
     <View
       style={{
-        width: half ? 10 : 20,
-        height: half ? 10 : 20,
+        width: half ? 7.5 :15,
+        height: half ? 7.5 : 15,
       }}
     />
   );
