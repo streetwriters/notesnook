@@ -37,7 +37,10 @@ export default class Notes extends Collection {
     };
 
     if (isNoteEmpty(note)) {
-      if (oldNote) await this.remove(id);
+      if (oldNote) {
+        this._db.ev.publish("notes:removeEmptyNote", id);
+        await this.remove(id);
+      }
       return;
     }
 
