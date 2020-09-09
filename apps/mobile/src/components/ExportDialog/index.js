@@ -20,11 +20,12 @@ const {
   eOpenExportDialog,
   eCloseExportDialog,
 } = require('../../services/events');
+import {Button} from '../Button/index';
 
 const ExportDialog = () => {
   const [state, dispatch] = useTracked();
   const {colors, tags, premiumUser} = state;
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(true);
   const [notes, setNotes] = useState([]);
   const [exporting, setExporting] = useState(false);
   const [complete, setComplete] = useState(false);
@@ -44,8 +45,6 @@ const ExportDialog = () => {
   };
 
   const close = (data) => {
-
-    
     setComplete(false);
     setExporting(false);
     setNotes([]);
@@ -118,7 +117,10 @@ const ExportDialog = () => {
           ) : (
             <View style={styles.buttonContainer}>
               {actions.map((item) => (
-                <TouchableOpacity
+                <Button
+                  width="100%"
+                  title={item.title}
+                  icon={item.icon}
                   activeOpacity={opacity}
                   onPress={() => {
                     setExporting(true);
@@ -126,16 +128,7 @@ const ExportDialog = () => {
                       setComplete(true);
                     }, 1000);
                   }}
-                  style={[
-                    styles.button,
-                    {
-                      borderColor: colors.accent,
-                      backgroundColor: colors.accent,
-                    },
-                  ]}>
-                  <Icon name={item.icon} color="white" size={SIZE.lg} />
-                  <Text style={styles.buttonText}>{item.title}</Text>
-                </TouchableOpacity>
+                />
               ))}
             </View>
           )}

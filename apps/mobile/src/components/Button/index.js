@@ -1,42 +1,57 @@
 import React from 'react';
-import {
-  ActivityIndicator,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-} from 'react-native';
-import {opacity, ph, pv, SIZE, WEIGHT, COLOR_SCHEME} from '../../common/common';
+import {ActivityIndicator, StyleSheet, Text} from 'react-native';
+import {ph, pv, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
+import {PressableButton} from '../PressableButton';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export const Button = ({
-  height = 50,
+  height = 40,
   width = '48%',
   onPress = () => {},
   loading = false,
   grayed,
-  title=""
+  title = '',
+  icon,
+  color = 'accent',
 }) => {
   const [state, dispatch] = useTracked();
   const {colors, tags, premiumUser} = state;
+  const usedColor = 'accent' ? colors.accent : color;
 
   return (
-    <TouchableOpacity
-      activeOpacity={opacity}
+    <PressableButton
       onPress={onPress}
-      style={[
-        styles.button,
-        {
-          backgroundColor: grayed ? colors.nav : colors.accent,
-          height: height,
-          width: width,
-        },
-      ]}>
-      {loading ? <ActivityIndicator color={colors.accent} /> : null}
+      color={grayed ? colors.nav : usedColor}
+      selectedColor={grayed ? colors.nav : usedColor}
+      alpha={grayed ? (!colors.night ? -0.04 : 0.04) : -0.1}
+      customStyle={{
+        height: height,
+        width: width? width : null,
+        paddingVertical: pv,
+        paddingHorizontal: ph,
+        borderRadius: 5,
+        alignSelf: 'center',
+        justifyContent: 'center',
+        alignItems: 'center',
+        flexDirection: 'row',
+      }}>
+      {loading ? <ActivityIndicator color={usedColor} /> : null}
+      {icon && !loading ? (
+        <Icon
+          name={icon}
+          style={{
+            marginRight: 5,
+          }}
+          color={grayed ? colors.icon : 'white'}
+          size={SIZE.lg}
+        />
+      ) : null}
       <Text
         style={[styles.buttonText, {color: grayed ? colors.icon : 'white'}]}>
         {title}
       </Text>
-    </TouchableOpacity>
+    </PressableButton>
   );
 };
 
@@ -48,17 +63,6 @@ const styles = StyleSheet.create({
   activityContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  button: {
-    paddingVertical: pv,
-    paddingHorizontal: ph,
-    marginTop: 10,
-    borderRadius: 5,
-    alignSelf: 'center',
-    width: '48%',
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'row',
   },
   buttonText: {
     fontFamily: WEIGHT.medium,

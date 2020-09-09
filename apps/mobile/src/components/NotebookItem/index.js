@@ -7,6 +7,7 @@ import {ACTIONS} from '../../provider/actions';
 import NavigationService from '../../services/NavigationService';
 import {db, ToastEvent} from '../../utils/utils';
 import {ActionSheetEvent, moveNoteHideEvent} from '../DialogManager/recievers';
+import {Button} from '../Button';
 
 export const NotebookItem = ({
   item,
@@ -47,8 +48,8 @@ export const NotebookItem = ({
       dispatch({
         type: ACTIONS.HEADER_STATE,
         state: {
-          canGoBack:true,
-          menu:false
+          canGoBack: true,
+          menu: false,
         },
       });
       dispatch({
@@ -64,14 +65,14 @@ export const NotebookItem = ({
             title: hideMore ? 'Move to topic' : item.title,
             isMove: isMove,
             hideMore: hideMore,
-            root:false
+            root: false,
           })
         : NavigationService.navigate('Notebook', {
             notebook: item,
             title: hideMore ? 'Select a topic' : item.title,
             isMove: isMove,
             hideMore: hideMore,
-            root:true
+            root: true,
           });
     }
   };
@@ -144,7 +145,7 @@ export const NotebookItem = ({
                 flexWrap: 'wrap',
               }}>
               {item && item.topics
-                ? item.topics.slice(1, 4).map(topic => (
+                ? item.topics.slice(1, 4).map((topic) => (
                     <View
                       key={topic.dateCreated.toString() + topic.title}
                       style={{
@@ -258,16 +259,21 @@ export const NotebookItem = ({
                 notebookID: notebookID,
               });
             }}>
-            <Icon name="dots-horizontal" size={SIZE.lg} color={colors.heading} />
+            <Icon
+              name="dots-horizontal"
+              size={SIZE.lg}
+              color={colors.heading}
+            />
           </TouchableOpacity>
         )}
 
         {hideMore && isTopic ? (
-          <TouchableOpacity
-            activeOpacity={opacity}
+          <Button
+            width="20%"
+            title="Move"
             onPress={async () => {
               let noteIds = [];
-              selectedItemsList.forEach(item => noteIds.push(item.id));
+              selectedItemsList.forEach((item) => noteIds.push(item.id));
 
               await db.notes.move(
                 {
@@ -282,27 +288,7 @@ export const NotebookItem = ({
 
               ToastEvent.show(`Note moved to ${item.title}`, 'success');
             }}
-            style={{
-              borderWidth: 1,
-              borderRadius: 5,
-              width: '20%',
-              paddingHorizontal: ph - 5,
-              borderColor: colors.nav,
-              paddingVertical: pv - 5,
-              flexDirection: 'row',
-              justifyContent: 'center',
-              alignItems: 'center',
-              backgroundColor: colors.accent,
-            }}>
-            <Text
-              style={{
-                fontSize: SIZE.sm,
-                fontFamily: WEIGHT.regular,
-                color: 'white',
-              }}>
-              Move
-            </Text>
-          </TouchableOpacity>
+          />
         ) : null}
       </View>
     </View>

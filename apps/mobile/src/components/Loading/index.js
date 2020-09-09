@@ -3,11 +3,11 @@ import {
   ActivityIndicator,
   StyleSheet,
   Text,
-  View,
-  TouchableOpacity,
+  View
 } from 'react-native';
-import {SIZE, pv, ph, WEIGHT, opacity} from '../../common/common';
-import {useTracked} from '../../provider';
+import { ph, pv, SIZE, WEIGHT } from '../../common/common';
+import { useTracked } from '../../provider';
+import { Button } from '../Button';
 
 export const Loading = ({
   height = 150,
@@ -31,18 +31,10 @@ export const Loading = ({
             ]}>
             {doneText}
           </Text>
-          <TouchableOpacity
-            activeOpacity={opacity}
+          <Button
             onPress={onDone}
-            style={[
-              styles.button,
-              {
-                borderColor: colors.accent,
-                backgroundColor: colors.accent,
-              },
-            ]}>
-            <Text style={styles.buttonText}>Close</Text>
-          </TouchableOpacity>
+            title="Done"
+            />
         </>
       ) : (
         <>

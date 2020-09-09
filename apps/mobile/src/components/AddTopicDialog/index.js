@@ -7,6 +7,7 @@ import {getElevation, ToastEvent, db} from '../../utils/utils';
 import {eSendEvent} from '../../services/eventManager';
 import {eOnNewTopicAdded} from '../../services/events';
 import {Toast} from '../Toast';
+import {Button} from '../Button';
 
 export class AddTopicDialog extends React.Component {
   constructor(props) {
@@ -134,7 +135,7 @@ export class AddTopicDialog extends React.Component {
                 });
               }}
               defaultValue={toEdit ? toEdit.title : null}
-              onChangeText={value => {
+              onChangeText={(value) => {
                 this.title = value;
               }}
               placeholder="Enter title of topic"
@@ -148,51 +149,16 @@ export class AddTopicDialog extends React.Component {
                 flexDirection: 'row',
                 marginTop: 20,
               }}>
-              <TouchableOpacity
+              <Button
                 activeOpacity={opacity}
                 onPress={async () => await this.addNewTopic()}
-                style={{
-                  paddingVertical: pv,
-                  paddingHorizontal: ph,
-                  borderRadius: 5,
-                  width: '45%',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  borderColor: colors.accent,
-                  backgroundColor: colors.accent,
-                  borderWidth: 1,
-                }}>
-                <Text
-                  style={{
-                    fontFamily: WEIGHT.medium,
-                    color: 'white',
-                    fontSize: SIZE.sm,
-                  }}>
-                  {toEdit ? 'Save' : 'Add'}
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
+                title={toEdit ? 'Save' : 'Add'}
+              />
+              <Button
                 activeOpacity={opacity}
                 onPress={() => this.close()}
-                style={{
-                  paddingVertical: pv,
-                  paddingHorizontal: ph,
-                  borderRadius: 5,
-                  width: '45%',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  backgroundColor: colors.nav,
-                }}>
-                <Text
-                  style={{
-                    fontFamily: WEIGHT.medium,
-                    color: colors.icon,
-                    fontSize: SIZE.sm,
-                  }}>
-                  Cancel
-                </Text>
-              </TouchableOpacity>
+                title="Cancel"
+              />
             </View>
           </View>
         </View>
