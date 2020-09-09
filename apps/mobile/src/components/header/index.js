@@ -94,6 +94,7 @@ export const Header = ({showSearch, root}) => {
               ? 0
               : insets.top,
           backgroundColor: colors.bg,
+          overflow:"hidden"
         },
       ]}>
       <Animatable.View

@@ -6,4 +6,5 @@ export const dialogActions = {
   ACTION_TRASH: 515,
   ACTION_PERMANANT_DELETE: 516,
   ACTION_APPLY_CHANGES: 517,
+  ACTION_UPIN:518
 };

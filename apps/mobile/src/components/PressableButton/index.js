@@ -10,7 +10,8 @@ export const PressableButton = ({
   radius,
   children,
   onPress,
-  customStyle,alpha=-0.1,
+  customStyle,
+  alpha=-0.1,
   opacity=1,
   onLongPress
 }) => {

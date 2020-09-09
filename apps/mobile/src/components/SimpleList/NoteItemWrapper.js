@@ -8,6 +8,7 @@ import {eShowMergeDialog, eOnLoadNote} from '../../services/events';
 import {simpleDialogEvent} from '../DialogManager/recievers';
 import {TEMPLATE_TRASH} from '../DialogManager/templates';
 import {openEditorAnimation} from '../../utils/animations';
+import {DDS} from '../../utils/utils';
 
 export const NoteItemWrapper = ({
   item,

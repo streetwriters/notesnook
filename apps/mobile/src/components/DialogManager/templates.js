@@ -84,3 +84,12 @@ export const TEMPLATE_EMPTY_TRASH = {
   negativeText: 'Cancel',
   action: dialogActions.ACTION_EMPTY_TRASH,
 };
+
+export const TEMPLATE_UNPIN = (type) => { return {
+  title: 'Unpin' + type,
+  paragraph: 'Are you sure you want to unpin this ' + type  + '?',
+  icon: 'pin-off-outline',
+  positiveText: 'Unpin',
+  negativeText: 'Cancel',
+  action: dialogActions.ACTION_UPIN
+}};

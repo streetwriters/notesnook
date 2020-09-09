@@ -1,13 +1,9 @@
 import React from 'react';
-import {Dimensions, Text, TouchableOpacity, View} from 'react-native';
+import { Dimensions, Text, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {ph, pv, SIZE, WEIGHT} from '../../common/common';
-import {eSendEvent, openVault} from '../../services/eventManager';
-import {eOnLoadNote, eShowMergeDialog} from '../../services/events';
-import {openEditorAnimation} from '../../utils/animations';
-import {DDS, timeSince} from '../../utils/utils';
-import {ActionSheetEvent, simpleDialogEvent} from '../DialogManager/recievers';
-import {TEMPLATE_TRASH} from '../DialogManager/templates';
+import { ph, SIZE, WEIGHT } from '../../common/common';
+import { timeSince } from '../../utils/utils';
+import { ActionSheetEvent } from '../DialogManager/recievers';
 
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
@@ -54,30 +50,6 @@ export default class NoteItem extends React.Component {
     }
   }
 
-  _onPress = async () => {
-    if (item.conflicted) {
-      eSendEvent(eShowMergeDialog, item);
-
-      return;
-    }
-    if (this.props.selectionMode) {
-      this.props.onLongPress();
-      return;
-    } else if (item.locked) {
-      openVault(item, true, true, false, true, false);
-
-      return;
-    }
-    if (DDS.isTab) {
-      eSendEvent(eOnLoadNote, item);
-    } else if (isTrash) {
-      simpleDialogEvent(TEMPLATE_TRASH(item.type));
-    } else {
-      eSendEvent(eOnLoadNote, item);
-      openEditorAnimation();
-    }
-  };
-
   render() {
     let {colors, item, customStyle, isTrash} = this.props;
     return (
@@ -105,7 +77,7 @@ export default class NoteItem extends React.Component {
             numberOfLines={1}
             style={{
               color: colors.heading,
-              fontSize: SIZE.sm + 1,
+              fontSize: SIZE.md,
               fontFamily: WEIGHT.bold,
               maxWidth: '100%',
             }}>
@@ -120,7 +92,7 @@ export default class NoteItem extends React.Component {
             <Text
               numberOfLines={2}
               style={{
-                fontSize: SIZE.sm - 1,
+                fontSize: SIZE.xs + 1,
                 color: colors.pri + 'B3',
                 fontFamily: WEIGHT.regular,
                 width: '100%',

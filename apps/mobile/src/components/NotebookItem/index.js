@@ -1,12 +1,12 @@
 import React from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import {Text, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { ph, pv, SIZE, WEIGHT } from '../../common/common';
-import { useTracked } from '../../provider';
-import { ACTIONS } from '../../provider/actions';
-import { db, ToastEvent } from '../../utils/utils';
-import { Button } from '../Button';
-import { ActionSheetEvent, moveNoteHideEvent } from '../DialogManager/recievers';
+import {ph, pv, SIZE, WEIGHT} from '../../common/common';
+import {useTracked} from '../../provider';
+import {ACTIONS} from '../../provider/actions';
+import {db, ToastEvent} from '../../utils/utils';
+import {Button} from '../Button';
+import {ActionSheetEvent, moveNoteHideEvent} from '../DialogManager/recievers';
 import Seperator from '../Seperator';
 
 export const NotebookItem = ({
@@ -56,15 +56,13 @@ export const NotebookItem = ({
         </Text>
         {isTopic || !item.description ? null : (
           <Text
-            numberOfLines={numColumns === 2 ? 3 : 2}
+            numberOfLines={2}
             style={{
               fontFamily: WEIGHT.regular,
               fontSize: SIZE.xs + 1,
-              lineHeight: SIZE.sm,
               color: colors.pri,
               maxWidth: '100%',
               paddingVertical: 5,
-              height: numColumns === 2 ? SIZE.sm * 3.5 : null,
             }}>
             {item.description}
           </Text>

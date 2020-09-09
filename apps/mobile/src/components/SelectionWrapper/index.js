@@ -4,7 +4,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { SIZE } from '../../common/common';
 import { useTracked } from '../../provider';
 import { ACTIONS } from '../../provider/actions';
-import { getElevation } from '../../utils/utils';
+import { db, getElevation, ToastEvent } from '../../utils/utils';
 import { PressableButton } from '../PressableButton';
 
 const SelectionWrapper = ({
@@ -15,7 +15,7 @@ const SelectionWrapper = ({
   background,
   pinned,
   onLongPress,
-  onPress
+  onPress,
 }) => {
   const [state, dispatch] = useTracked();
   const {colors, selectionMode, selectedItemsList} = state;
@@ -36,24 +36,51 @@ const SelectionWrapper = ({
     }
   }, [selectedItemsList]);
 
-
-
-
-
+  const onPressPin = async () => {
+    let func = async () => {
+      if (!item.id) return;
+      if (item.type === 'note') {
+        await db.notes.note(note.id).pin();
+        dispatch({type: ACTIONS.PINNED});
+        dispatch({type: ACTIONS.NOTES});
+      } else {
+        await db.notebooks.notebook(note.id).pin();
+        dispatch({type: ACTIONS.PINNED});
+        dispatch({type: ACTIONS.NOTEBOOKS});
+      }
+    };
+    func();
+    ToastEvent.show(
+      item.type + ' has been unpinned.',
+      'success',
+      'global',
+      6000,
+      () => {
+        func();
+        ToastEvent.hide('unpin');
+      },
+      'Undo',
+    );
+  };
 
   return (
     <PressableButton
-      color={currentEditingNote === item.dateCreated || pinned
-        ? colors.shade
-        : background
-        ? background
-        : 'transparent'
+      color={
+        currentEditingNote === item.dateCreated || pinned
+          ? colors.shade
+          : background
+          ? background
+          : 'transparent'
       }
       onLongPress={onLongPress}
       onPress={onPress}
-      selectedColor={currentEditingNote === item.dateCreated || pinned? colors.accent :  colors.nav}
+      selectedColor={
+        currentEditingNote === item.dateCreated || pinned
+          ? colors.accent
+          : colors.nav
+      }
       alpha={!colors.night ? -0.02 : 0.02}
-      opacity={ currentEditingNote === item.dateCreated || pinned? 0.12 : 1}
+      opacity={currentEditingNote === item.dateCreated || pinned ? 0.12 : 1}
       customStyle={{
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -68,18 +95,22 @@ const SelectionWrapper = ({
             : 0,
       }}>
       {pinned ? (
-        <View
-          style={{
+        <PressableButton
+          color={colors.accent}
+          selectedColor={colors.accent}
+          alpha={!colors.night ? -0.1 : 0.1}
+          onPress={onPressPin}
+          customStyle={{
             ...getElevation(3),
             width: 30,
             height: 30,
-            backgroundColor: colors.accent,
             borderRadius: 100,
             position: 'absolute',
             right: 20,
             top: -15,
             justifyContent: 'center',
             alignItems: 'center',
+            zIndex: 10,
           }}>
           <View
             style={{
@@ -89,7 +120,7 @@ const SelectionWrapper = ({
               borderRadius: 100,
             }}
           />
-        </View>
+        </PressableButton>
       ) : null}
 
       <View

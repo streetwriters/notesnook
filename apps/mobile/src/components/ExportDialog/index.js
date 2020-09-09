@@ -21,6 +21,7 @@ const {
   eCloseExportDialog,
 } = require('../../services/events');
 import {Button} from '../Button/index';
+import Seperator from '../Seperator';
 
 const ExportDialog = () => {
   const [state, dispatch] = useTracked();
@@ -102,7 +103,10 @@ const ExportDialog = () => {
               Note
             </Text>
           </View>
-
+          <Text style={[{color: colors.pri,fontSize:SIZE.xs + 1,alignSelf:'center'}]}>
+            Export your note in any of the following formats.
+          </Text>
+                <Seperator half />
           {exporting ? (
             <Loading
               done={complete}
@@ -117,18 +121,21 @@ const ExportDialog = () => {
           ) : (
             <View style={styles.buttonContainer}>
               {actions.map((item) => (
-                <Button
-                  width="100%"
-                  title={item.title}
-                  icon={item.icon}
-                  activeOpacity={opacity}
-                  onPress={() => {
-                    setExporting(true);
-                    setTimeout(() => {
-                      setComplete(true);
-                    }, 1000);
-                  }}
-                />
+                <>
+                  <Seperator half />
+                  <Button
+                    width="100%"
+                    title={item.title}
+                    icon={item.icon}
+                    activeOpacity={opacity}
+                    onPress={() => {
+                      setExporting(true);
+                      setTimeout(() => {
+                        setComplete(true);
+                      }, 1000);
+                    }}
+                  />
+                </>
               ))}
             </View>
           )}

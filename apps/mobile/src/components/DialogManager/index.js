@@ -299,9 +299,7 @@ export class DialogManager extends Component {
                 }
               : null
           }
-          initialOffsetFromBottom={
-            DDS.isTab || item?.type !== 'note' || item.dateDeleted ? 1 : 0.5
-          }
+          initialOffsetFromBottom={1}
           bounceOnOpen={true}
           gestureEnabled={true}
           onClose={() => {
