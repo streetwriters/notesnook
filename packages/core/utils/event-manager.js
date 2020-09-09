@@ -3,6 +3,10 @@ class EventManager {
     this._registry = {};
   }
 
+  unsubscribeAll() {
+    this._registry = {};
+  }
+
   subscribeMulti(names, handler) {
     names.forEach((name) => {
       this.subscribe(name, handler);
