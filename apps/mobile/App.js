@@ -1,19 +1,20 @@
 import React, {useEffect, useState} from 'react';
 import MMKV from 'react-native-mmkv-storage';
 import Orientation from 'react-native-orientation';
-import {Loading} from './Loading';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {getColorScheme, scale, updateSize} from './src/common/common';
 import {useTracked} from './src/provider';
 import {ACTIONS} from './src/provider/actions';
 import {defaultState} from './src/provider/defaultState';
 import {eSubscribeEvent, eUnSubscribeEvent} from './src/services/eventManager';
-import {eDispatchAction, eStartSyncer} from './src/services/events';
-import {db, DDS} from './src/utils/utils';
-import {SafeAreaProvider} from 'react-native-safe-area-context';
+import {eDispatchAction, eStartSyncer, eResetApp} from './src/services/events';
+import {db, DDS, ToastEvent} from './src/utils/utils';
+import {useNetInfo} from '@react-native-community/netinfo';
 
 const App = () => {
   const [state, dispatch] = useTracked();
   const [init, setInit] = useState(false);
+  const netInfo = useNetInfo();
   const I = DDS.isTab ? require('./index.tablet') : require('./index.mobile');
   const _onOrientationChange = o => {
     // Currently orientation is locked on tablet.
@@ -23,6 +24,25 @@ const App = () => {
       forceUpdate();
     }, 1000); */
   };
+
+  useEffect(() => {
+    if (!netInfo.isConnected || !netInfo.isInternetReachable) {
+      db.user?.get().then(user => {
+        if (user) {
+          ToastEvent.show('No internet connection', 'error');
+        } else {
+        }
+      });
+    } else {
+      db.user?.get().then(user => {
+        if (user) {
+          ToastEvent.show('Internet connection restored', 'success');
+        } else {
+        }
+      });
+    }
+  }, [netInfo]);
+
   useEffect(() => {
     Orientation.addOrientationListener(_onOrientationChange);
     eSubscribeEvent(eDispatchAction, type => {
@@ -43,31 +63,47 @@ const App = () => {
   const startSyncer = async () => {
     let user = await db.user.get();
     if (user) {
-      db.ev.subscribe('sync', async () => {
-        dispatch({type: ACTIONS.SYNCING, syncing: true});
-        await db.sync();
-        let u = await db.user.get();
-        dispatch({type: ACTIONS.USER, user: u});
-        dispatch({type: ACTIONS.ALL});
-        dispatch({type: ACTIONS.SYNCING, syncing: false});
-      });
+      db.ev.subscribe('sync', _syncFunc);
     }
+  };
+
+  const _syncFunc = async () => {
+    dispatch({type: ACTIONS.SYNCING, syncing: true});
+    let u = await db.user.get();
+    try {
+      await db.sync();
+    } catch (e) {}
+    u = await db.user.get();
+    dispatch({type: ACTIONS.USER, user: u});
+    dispatch({type: ACTIONS.ALL});
+    dispatch({type: ACTIONS.SYNCING, syncing: false});
+  };
+
+  const resetApp = () => {
+    setInit(false);
+    Initialize().then(() => {
+      setInit(true);
+    });
   };
 
   useEffect(() => {
     eSubscribeEvent(eStartSyncer, startSyncer);
-
+    eSubscribeEvent(eResetApp, resetApp);
     return () => {
+      db.ev.unsubscribe('sync', _syncFunc);
       eUnSubscribeEvent(eStartSyncer, startSyncer);
+      eUnSubscribeEvent(eResetApp, resetApp);
     };
-  });
+  }, []);
 
   useEffect(() => {
     Initialize().then(() => {
       db.init().then(async () => {
         let user = await db.user.get();
-        startSyncer();
         dispatch({type: ACTIONS.USER, user: user});
+        console.log(user);
+        startSyncer();
+        dispatch({type: ACTIONS.ALL});
         setInit(true);
       });
     });
@@ -106,12 +142,13 @@ const App = () => {
     return <></>;
   }
   return (
-    <SafeAreaProvider>
-      <>
-        <I.Initialize />
-        <Loading />
-      </>
-    </SafeAreaProvider>
+    <>
+      <SafeAreaProvider>
+        <>
+          <I.Initialize />
+        </>
+      </SafeAreaProvider>
+    </>
   );
 };
 

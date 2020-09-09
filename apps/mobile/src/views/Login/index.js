@@ -1,28 +1,16 @@
-import React, {createRef, useEffect, useState} from 'react';
-import {
-  ActivityIndicator,
-  BackHandler,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { useIsFocused } from '@react-navigation/native';
+import React, { createRef, useEffect, useState } from 'react';
+import { ActivityIndicator, BackHandler, Text, TouchableOpacity, View } from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import {TextInput} from 'react-native-gesture-handler';
+import { TextInput } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {opacity, pv, SIZE, WEIGHT} from '../../common/common';
-import {Header} from '../../components/header';
-import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
-import {eSendEvent} from '../../services/eventManager';
-import {
-  eCloseSideMenu,
-  refreshNotesPage,
-  eOpenSideMenu,
-  eStartSyncer,
-} from '../../services/events';
-import {validatePass, validateUsername} from '../../services/validation';
-import {db, DDS, ToastEvent, getElevation} from '../../utils/utils';
-import {useIsFocused} from '@react-navigation/native';
+import { opacity, pv, SIZE, WEIGHT } from '../../common/common';
+import { useTracked } from '../../provider';
+import { ACTIONS } from '../../provider/actions';
+import { eSendEvent } from '../../services/eventManager';
+import { eCloseSideMenu, eOpenSideMenu, eSetModalNavigator, eStartSyncer, refreshNotesPage } from '../../services/events';
+import { validatePass, validateUsername } from '../../services/validation';
+import { db, DDS, getElevation, ToastEvent } from '../../utils/utils';
 
 export const Login = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
@@ -71,54 +59,118 @@ export const Login = ({route, navigation}) => {
   }, [isFocused]);
 
   const _logIn = async () => {
-    if (!password || password.length < 8) {
-      ToastEvent.show('Invalid username or password', 'error');
+    if (
+      !password ||
+      password.length < 8 ||
+      !username ||
+      invalidPassword ||
+      invalidUsername
+    ) {
+      ToastEvent.show('username or password invalid', 'error');
       return;
     }
-    if (!username) {
-      ToastEvent.show('Invalid username or password', 'error');
-      return;
-    }
+
     setLoggingIn(true);
     _username.current.blur();
     _pass.current.blur();
-
     setStatus('Logging in...');
 
-    if (!invalidPassword && !invalidUsername) {
-      try {
-        await db.user.login(username, password);
+
+    try {
+      let res = await db.user.login(username.toLowerCase(), password);
+      console.log(res,username,password);
+      if (res) {
+    
         setStatus('Fetching data...');
-      } catch (e) {
-        setTimeout(() => {
-          ToastEvent.show(e.message, 'error');
-          setLoggingIn(false);
-        }, 500);
-
-        return;
       }
-
-      let user;
-      try {
-        user = await db.user.get();
-        dispatch({type: ACTIONS.USER, user: user});
-        dispatch({type:ACTIONS.SYNCING,syncing:true});
-        setStatus('Syncing your notes...');
-        await db.sync();
-        eSendEvent(eStartSyncer);
-        navigation.goBack();
-        dispatch({type: ACTIONS.ALL});
-        eSendEvent(refreshNotesPage);
-        dispatch({type:ACTIONS.SYNCING,syncing:false});
-        ToastEvent.show(`Logged in as ${username}`, 'success');
-      } catch (e) {
+    } catch (e) {
+      setTimeout(() => {
         ToastEvent.show(e.message, 'error');
-      }
-    } else {
-      ToastEvent.show('Login failed, username or passoword invalid', 'error');
+        setLoggingIn(false);
+      }, 500);
+
+      return;
+    }
+
+    let user;
+
+    try {
+      user = await db.user.get();
+      if (!user) throw new Error('Username or password incorrect');
+      dispatch({type: ACTIONS.USER, user: user});
+      dispatch({type: ACTIONS.SYNCING, syncing: true});
+      setStatus('Syncing your notes...');
+      await db.sync();
+      eSendEvent(eStartSyncer);
+      navigation.goBack();
+      dispatch({type: ACTIONS.ALL});
+      eSendEvent(refreshNotesPage);
+      dispatch({type: ACTIONS.SYNCING, syncing: false});
+      ToastEvent.show(`Logged in as ${username}`, 'success');
+    } catch (e) {
+      dispatch({type: ACTIONS.SYNCING, syncing: false});
+      setLoggingIn(false);
+      ToastEvent.show(e.message, 'error');
     }
   };
 
+  useEffect(() => {
+    if (isFocused) {
+      dispatch({
+        type: ACTIONS.HEADER_STATE,
+        state: {
+          type: null,
+          menu: false,
+          canGoBack: true,
+          route: route,
+          color: null,
+          navigation: navigation,
+          ind: !route.params.root,
+        },
+      });
+      dispatch({
+        type: ACTIONS.CONTAINER_BOTTOM_BUTTON,
+        state: {
+          visible: false,
+          ind: !route.params.root,
+        },
+      });
+      dispatch({
+        type: ACTIONS.CONTAINER_STATE,
+        state: {
+          noSelectionHeader: false,
+        },
+      });
+      dispatch({
+        type: ACTIONS.HEADER_VERTICAL_MENU,
+        state: false,
+      });
+
+      dispatch({
+        type: ACTIONS.HEADER_TEXT_STATE,
+        state: {
+          heading: 'Login',
+          ind: !route.params.root,
+        },
+      });
+
+      dispatch({
+        type: ACTIONS.CURRENT_SCREEN,
+        screen: 'login',
+      });
+
+      dispatch({
+        type: ACTIONS.SEARCH_STATE,
+        state: {
+          noSearch: true,
+          ind: !route.params.root,
+        },
+      });
+      if (!route.params.root) {
+        eSendEvent(eSetModalNavigator, true);
+      }
+    }
+  }, [isFocused]);
   return (
     <View
       style={{
@@ -156,12 +208,10 @@ export const Login = ({route, navigation}) => {
 
       {loggingIn ? null : (
         <>
-          <Header
-            navigation={navigation}
-            route={route}
-            isLoginNavigator={isLoginNavigator}
-            colors={colors}
-            heading="Login"
+          <View
+            style={{
+              marginTop: Platform.OS == 'ios' ? 125 - 60 : 125 - 60,
+            }}
           />
 
           <View
@@ -479,7 +529,7 @@ export const Login = ({route, navigation}) => {
                   onPress={_logIn}
                   style={{
                     ...getElevation(5),
-                    padding: pv,
+                    padding: pv + 2,
                     backgroundColor: colors.accent,
                     borderRadius: 5,
                     marginHorizontal: 12,
@@ -505,7 +555,9 @@ export const Login = ({route, navigation}) => {
                 }}>
                 <TouchableOpacity
                   onPress={() => {
-                    navigation.navigate('Signup');
+                    navigation.navigate('Signup',{
+                      root:true
+                    });
                   }}
                   activeOpacity={opacity}
                   style={{}}>

@@ -238,7 +238,7 @@ export class VaultDialog extends Component {
       });
       return;
     } else {
-      console.log('ERROR', e.message);
+      
     }
   }
 

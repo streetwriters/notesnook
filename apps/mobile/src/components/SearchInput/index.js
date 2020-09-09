@@ -1,46 +1,158 @@
 import React, {useEffect, useState} from 'react';
-import {TextInput} from 'react-native';
+import {useTracked} from '../../provider';
+import {ACTIONS} from '../../provider/actions';
+import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
+import {eClearSearch, eScrollEvent} from '../../services/events';
+import {inputRef} from '../../utils/refs';
+import {db, DDS, selection, ToastEvent} from '../../utils/utils';
 import Animated, {Easing} from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {br, SIZE, WEIGHT} from '../../common/common';
-import {useTracked} from '../../provider';
-import {inputRef} from '../../utils/refs';
-import {DDS} from '../../utils/utils';
-
+import {br, WEIGHT, SIZE} from '../../common/common';
+import {TextInput, Text} from 'react-native';
 const {Value, timing, block} = Animated;
-
+let offsetY = 0;
+let searchResult = [];
 export const Search = props => {
   const [state, dispatch] = useTracked();
   const {colors, searchResults} = state;
-
+  const [text, setText] = useState('');
   const [focus, setFocus] = useState(false);
+  const [hideHeader, setHideHeader] = useState(false);
+
+  let searchState = props.root ? state.searchState : state.indSearchState;
 
   const _marginAnim = new Value(0);
   const _opacity = new Value(1);
   const _borderAnim = new Value(1.5);
 
+  const onScroll = y => {
+    if (searchResults.results.length > 0) return;
+    if (y < 30) {
+      setHideHeader(false);
+      offsetY = y;
+    }
+
+    if (y > offsetY) {
+      if (y - offsetY < 100) return;
+
+      setHideHeader(true);
+      offsetY = y;
+    } else {
+      if (offsetY - y < 50) return;
+
+      setHideHeader(false);
+      offsetY = y;
+    }
+  };
+
+  useEffect(() => {
+    selection.data = searchState.data;
+    selection.type = searchState.type;
+    eSubscribeEvent(eScrollEvent, onScroll);
+
+    eSubscribeEvent('showSearch', () => {
+      setHideHeader(false);
+    });
+
+    return () => {
+      eUnSubscribeEvent(eScrollEvent, onScroll);
+
+      eUnSubscribeEvent('showSearch', () => {
+        setHideHeader(false);
+      });
+    };
+  }, []);
+
   useEffect(() => {
     timing(_marginAnim, {
-      toValue: props.hide ? -65 : 0,
+      toValue: hideHeader ? -65 : 0,
       duration: 230,
       easing: Easing.inOut(Easing.ease),
     }).start();
     timing(_opacity, {
-      toValue: props.hide ? 0 : 1,
+      toValue: hideHeader ? 0 : 1,
       duration: 250,
       easing: Easing.inOut(Easing.ease),
     }).start();
     timing(_borderAnim, {
-      toValue: props.hide ? 0 : 1.5,
+      toValue: hideHeader ? 0 : 1.5,
       duration: 270,
       easing: Easing.inOut(Easing.ease),
     }).start();
-  }, [props.hide]);
+    console.log('called');
+  }, [hideHeader]);
 
-  return (
+  const clearSearch = () => {
+    if (searchResult && searchResult.length > 0) {
+      searchResult = null;
+      setText(null);
+
+      inputRef.current?.setNativeProps({
+        text: '',
+      });
+      dispatch({
+        type: ACTIONS.SEARCH_RESULTS,
+        results: {
+          results: [],
+          type: null,
+          keyword: null,
+        },
+      });
+    }
+  };
+
+  useEffect(() => {
+    eSubscribeEvent(eClearSearch, clearSearch);
+    return () => {
+      eUnSubscribeEvent(eClearSearch, clearSearch);
+    };
+  }, []);
+
+  const onChangeText = value => {
+    setText(value);
+  };
+  const onSubmitEditing = async () => {
+    if (!text || text.length < 1) {
+      ToastEvent.show('Please enter a search keyword');
+      clearSearch();
+      return;
+    }
+    let type = searchState.type;
+    if (!type) return;
+
+    let data = searchState.data;
+
+    searchResult = await db.lookup[type](
+      data[0].data ? db.notes.all : data,
+      text,
+    );
+    if (!searchResult || searchResult.length === 0) {
+      ToastEvent.show('No search results found for ' + text, 'error');
+      return;
+    } else {
+      dispatch({
+        type: ACTIONS.SEARCH_RESULTS,
+        results: {
+          type,
+          results: searchResult,
+          keyword: text,
+        },
+      });
+    }
+  };
+
+  const onBlur = () => {
+    if (searchResult && searchResult.length === 0) {
+      clearSearch();
+    }
+  };
+
+  const onFocus = () => {
+    //setSearch(false);
+  };
+
+  return searchState.data[0] && !searchState.noSearch ? (
     <Animated.View
-      transition={['marginTop', 'opacity']}
-      duration={200}
       style={{
         opacity: _opacity,
         height: 60,
@@ -49,8 +161,6 @@ export const Search = props => {
         paddingHorizontal: 12,
       }}>
       <Animated.View
-        transition={['borderWidth']}
-        duration={300}
         style={{
           flexDirection: 'row',
           justifyContent: 'space-between',
@@ -62,8 +172,8 @@ export const Search = props => {
           height: '90%',
           borderWidth: _borderAnim,
           borderColor: focus
-            ? props.headerColor
-              ? props.headerColor
+            ? searchState.color
+              ? searchState.color
               : colors.accent
             : colors.nav,
         }}>
@@ -76,36 +186,38 @@ export const Search = props => {
             width: '85%',
             fontSize: SIZE.sm,
           }}
-          onChangeText={props.onChangeText}
-          onSubmitEditing={props.onSubmitEditing}
+          onChangeText={onChangeText}
+          onSubmitEditing={onSubmitEditing}
           onFocus={() => {
             setFocus(true);
-            props.onFocus;
+            onFocus();
           }}
           onBlur={() => {
             setFocus(false);
-            props.onBlur;
+            onBlur();
           }}
           numberOfLines={1}
-          placeholder={props.placeholder}
+          placeholder={searchState.placeholder}
           placeholderTextColor={colors.icon}
         />
         <Icon
           style={{paddingRight: DDS.isTab ? 12 : 12}}
           onPress={() => {
-            props.onSubmitEditing();
+            onSubmitEditing();
           }}
           name="magnify"
           color={
             focus
-              ? props.headerColor
-                ? props.headerColor
+              ? searchState.color
+                ? searchState.color
                 : colors.accent
               : colors.icon
           }
-          size={SIZE.xl}
+          size={SIZE.xxl}
         />
       </Animated.View>
     </Animated.View>
+  ) : (
+    <></>
   );
 };

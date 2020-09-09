@@ -6,23 +6,33 @@ import {
   SectionList,
   Text,
   View,
+  TouchableOpacity,
 } from 'react-native';
 import {useSafeArea} from 'react-native-safe-area-context';
-import {SIZE, WEIGHT} from '../../common/common';
+import {SIZE, WEIGHT, opacity, pv} from '../../common/common';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
-import {eClearSearch, eScrollEvent} from '../../services/events';
-import {db, hexToRGBA, ToastEvent} from '../../utils/utils';
-import {NotebookItem} from '../NotebookItem';
-import NoteItem from '../NoteItem';
-import SelectionWrapper from '../SelectionWrapper';
+import {
+  eClearSearch,
+  eScrollEvent,
+  eOpenLoginDialog,
+} from '../../services/events';
+import {db, ToastEvent, DDS} from '../../utils/utils';
+import * as Animatable from 'react-native-animatable';
+import {PinnedItemList} from './PinnedItemList';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import NavigationService from '../../services/NavigationService';
+import {Placeholder} from '../ListPlaceholders';
 const sectionListRef = createRef();
+
+const AnimatedFlatlist = Animatable.createAnimatableComponent(FlatList);
+const AnimatedSectionList = Animatable.createAnimatableComponent(SectionList);
 const SimpleList = ({
   data,
   type,
   placeholder,
-  renderItem,
+  RenderItem,
   focused,
   placeholderText,
   pinned = null,
@@ -34,7 +44,7 @@ const SimpleList = ({
   isHome = false,
 }) => {
   const [state, dispatch] = useTracked();
-  const {colors, selectionMode, syncing} = state;
+  const {colors, selectionMode, user} = state;
   const searchResults = {...state.searchResults};
   const [refreshing, setRefreshing] = useState(false);
   const insets = useSafeArea();
@@ -163,98 +173,68 @@ const SimpleList = ({
               ? 155 - insets.top
               : 155 - 60 - insets.top,
         }}>
-        {pinned && pinned.length > 0 ? (
-          <>
-            <FlatList
-              data={pinned}
-              keyExtractor={(item, index) => item.id.toString()}
-              renderItem={({item, index}) =>
-                item.type === 'notebook' ? (
-                  <SelectionWrapper
-                    index={index}
-                    currentEditingNote={false}
-                    pinned={true}
-                    background={
-                      Platform.ios
-                        ? hexToRGBA(colors.accent + '19')
-                        : hexToRGBA(colors.shade)
-                    }
-                    item={item}>
-                    <NotebookItem
-                      hideMore={hideMore}
-                      customStyle={{
-                        width: '100%',
-                        paddingTop: 15,
-                        paddingRight: 18,
-                        marginBottom: 10,
-                        marginTop: 15,
-                        borderBottomWidth: 0,
-                        marginHorizontal: 0,
-                      }}
-                      isMove={isMove}
-                      selectionMode={selectionMode}
-                      onLongPress={() => {
-                        if (!selectionMode) {
-                          dispatch({
-                            type: ACTIONS.SELECTION_MODE,
-                            enabled: true,
-                          });
-                        }
-                        dispatch({type: ACTIONS.SELECTED_ITEMS, item: item});
-                      }}
-                      noteToMove={noteToMove}
-                      item={item}
-                      pinned={true}
-                      index={index}
-                      colors={colors}
-                    />
-                  </SelectionWrapper>
-                ) : (
-                  <SelectionWrapper
-                    index={index}
-                    currentEditingNote={false}
-                    pinned={true}
-                    background={
-                      Platform.ios
-                        ? hexToRGBA(colors.accent + '19')
-                        : hexToRGBA(colors.shade)
-                    }
-                    item={item}>
-                    <NoteItem
-                      colors={colors}
-                      customStyle={{
-                        width: selectionMode ? '90%' : '100%',
-                        marginHorizontal: 0,
-                        paddingTop: 15,
-                        paddingRight: 18,
-                        marginBottom: 10,
-                        marginTop: 15,
-                        borderBottomWidth: 0,
-                      }}
-                      currentEditingNote={false}
-                      pinned={true}
-                      selectionMode={selectionMode}
-                      onLongPress={() => {
-                        if (!selectionMode) {
-                          dispatch({
-                            type: ACTIONS.SELECTION_MODE,
-                            enabled: true,
-                          });
-                        }
-                        dispatch({type: ACTIONS.SELECTED_ITEMS, item: item});
-                      }}
-                      update={() => {
-                        dispatch({type: ACTIONS.NOTES});
-                      }}
-                      item={item}
-                      index={index}
-                    />
-                  </SelectionWrapper>
-                )
-              }
-            />
-          </>
-        ) : null}
+        {user || !data[0] || selectionMode ? null : (
+          <TouchableOpacity
+            onPress={() => {
+              DDS.isTab
+                ? eSendEvent(eOpenLoginDialog)
+                : NavigationService.navigate('Login', {
+                    root: true,
+                  });
+            }}
+            activeOpacity={opacity}
+            style={{
+              paddingVertical: 6,
+              width: '100%',
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'flex-start',
+              backgroundColor: colors.shade,
+              paddingHorizontal: 12,
+              alignSelf: 'center',
+            }}>
+            <View
+              style={{
+                width: 25,
+                backgroundColor: colors.accent,
+                height: 25,
+                borderRadius: 100,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
+              <Icon
+                style={{
+                  textAlign: 'center',
+                  textAlignVertical: 'center',
+                }}
+                name="account-outline"
+                color="white"
+                size={SIZE.xs}
+              />
+            </View>
+            <View
+              style={{
+                marginLeft: 10,
+              }}>
+              <Text
+                style={{
+                  fontFamily: WEIGHT.regular,
+                  color: colors.icon,
+                  fontSize: SIZE.xxs - 1,
+                }}>
+                You are not logged in
+              </Text>
+              <Text
+                style={{
+                  color: colors.accent,
+                  fontSize: SIZE.xxs,
+                }}>
+                Login to sync your {type}.
+              </Text>
+            </View>
+          </TouchableOpacity>
+        )}
+        {pinned ? <PinnedItemList type={type} /> : null}
       </View>
     );
 
@@ -268,18 +248,7 @@ const SimpleList = ({
         justifyContent: 'center',
         opacity: 1,
       }}>
-      <>
-        {placeholder}
-        <Text
-          style={{
-            color: colors.icon,
-            fontSize: SIZE.sm,
-            fontFamily: WEIGHT.regular,
-            marginTop: 35,
-          }}>
-          {placeholderText}
-        </Text>
-      </>
+      <>{placeholder}</>
     </View>
   );
 
@@ -287,7 +256,9 @@ const SimpleList = ({
     item.id.toString() + index.toString();
 
   return isHome && searchResults.type !== 'notes' ? (
-    <SectionList
+    <AnimatedSectionList
+      transition="backgroundColor"
+      duration={300}
       ref={sectionListRef}
       sections={data}
       refreshControl={
@@ -312,13 +283,16 @@ const SimpleList = ({
       }}
       style={{
         height: '100%',
+        backgroundColor: colors.bg,
       }}
       removeClippedSubviews={true}
       ListFooterComponent={_ListFooterComponent}
-      renderItem={renderItem}
+      renderItem={({item, index}) => <RenderItem item={item} index={index} />}
     />
   ) : (
-    <FlatList
+    <AnimatedFlatlist
+      transition="backgroundColor"
+      duration={300}
       data={
         searchResults.type === type &&
         focused &&
@@ -347,8 +321,9 @@ const SimpleList = ({
       }}
       style={{
         height: '100%',
+        backgroundColor: colors.bg,
       }}
-      renderItem={renderItem}
+      renderItem={({item, index}) => <RenderItem item={item} index={index} />}
     />
   );
 };

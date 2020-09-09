@@ -1,28 +1,18 @@
 import {useIsFocused} from '@react-navigation/native';
 import React, {useEffect} from 'react';
 import {BackHandler} from 'react-native';
-import Container from '../../components/Container';
 import {AddNotebookEvent} from '../../components/DialogManager/recievers';
-import {NotebookPlaceHolder} from '../../components/ListPlaceholders';
-import {NotebookItem} from '../../components/NotebookItem';
-import SelectionWrapper from '../../components/SelectionWrapper';
 import SimpleList from '../../components/SimpleList';
+import {NotebookItemWrapper} from '../../components/SimpleList/NotebookItemWrapper';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
 import {eScrollEvent} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
-import {slideRight} from '../../utils/animations';
-import {w} from '../../utils/utils';
+import { Placeholder } from '../../components/ListPlaceholders';
 export const Folders = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
-  const {
-    colors,
-    selectionMode,
-    pinned,
-    notebooks,
-    preventDefaultMargins,
-  } = state;
+  const {notebooks} = state;
   let isFocused = useIsFocused();
 
   const handleBackPress = () => {
@@ -35,8 +25,40 @@ export const Folders = ({route, navigation}) => {
   };
 
   useEffect(() => {
-   
     if (isFocused) {
+      dispatch({
+        type: ACTIONS.HEADER_STATE,
+        state: {
+          type: 'notebooks',
+          menu: !params.canGoBack,
+          canGoBack: params.canGoBack,
+          route: route,
+          color: null,
+          navigation: navigation,
+          ind:!params.root
+        },
+      });
+      dispatch({
+        type: ACTIONS.CONTAINER_BOTTOM_BUTTON,
+        state: {
+          bottomButtonText: 'Create a new notebook',
+          bottomButtonOnPress: () => AddNotebookEvent(),
+          color: null,
+          visible: true,
+          ind:!params.root
+        },
+      });
+      dispatch({
+        type: ACTIONS.HEADER_VERTICAL_MENU,
+        state: false,
+      });
+      dispatch({
+        type: ACTIONS.HEADER_TEXT_STATE,
+        state: {
+          heading: params.title,
+          ind:!params.root
+        },
+      });
       dispatch({type: ACTIONS.PINNED});
       dispatch({type: ACTIONS.NOTEBOOKS});
       dispatch({
@@ -44,7 +66,24 @@ export const Folders = ({route, navigation}) => {
         screen: 'notebooks',
       });
     }
+
   }, [isFocused]);
+
+  useEffect(() => {
+    if (isFocused) {
+      dispatch({
+        type: ACTIONS.SEARCH_STATE,
+        state: {
+          placeholder:params.root? 'Search all notebooks' : 'Select a notebook',
+          data: notebooks,
+          noSearch: false,
+          type: 'notebooks',
+          color: null,
+          ind:!params.root
+        },
+      });
+    }
+  }, [notebooks, isFocused]);
 
   useEffect(() => {
     eSendEvent(eScrollEvent, 0);
@@ -64,70 +103,19 @@ export const Folders = ({route, navigation}) => {
 
   const params = route.params;
 
-  const _renderItem = ({item, index}) => (
-    <SelectionWrapper item={item}>
-      <NotebookItem
-        hideMore={params.hideMore}
-        navigation={navigation}
-        route={route}
-        customStyle={{
-          width: selectionMode ? w - 74 : '100%',
-          marginHorizontal: 0,
-        }}
-        isMove={params.isMove}
-        selectionMode={selectionMode}
-        onLongPress={() => {
-          if (!selectionMode) {
-            dispatch({
-              type: ACTIONS.SELECTION_MODE,
-              enabled: !selectionMode,
-            });
-          }
-
-          dispatch({
-            type: ACTIONS.SELECTED_ITEMS,
-            item: item,
-          });
-        }}
-        noteToMove={params.note}
-        item={item}
-        index={index}
-      />
-    </SelectionWrapper>
-  );
-
   return (
-    <Container
-      bottomButtonText="Create a new notebook"
-      menu={route.params.canGoBack ? false : true}
-      preventDefaultMargins={preventDefaultMargins}
-      heading={params.title}
-      canGoBack={params.canGoBack}
-      route={route}
-      navigation={navigation}
-      placeholder="Search all notebooks"
+    <SimpleList
       data={notebooks}
       type="notebooks"
-      bottomButtonOnPress={() => {
-        AddNotebookEvent(null);
-      }}>
-      <SimpleList
-        data={notebooks}
-        type="notebooks"
-        focused={isFocused}
-        renderItem={_renderItem}
-        hideMore={params.hideMore}
-        isMove={params.isMove}
-        noteToMove={params.note}
-        placeholder={
-          <>
-            <NotebookPlaceHolder animation={slideRight} colors={colors} />
-          </>
-        }
-        pinned={pinned.notebooks}
-        placeholderText="Notebooks you add will appear here"
-      />
-    </Container>
+      focused={isFocused}
+      RenderItem={NotebookItemWrapper}
+      hideMore={params.hideMore}
+      isMove={params.isMove}
+      noteToMove={params.note}
+      placeholder={<Placeholder type="notebooks" />}
+      pinned={true}
+      placeholderText="Notebooks you add will appear here"
+    />
   );
 };
 

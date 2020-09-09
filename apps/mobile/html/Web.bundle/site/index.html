@@ -6,6 +6,7 @@
   <style>
     .app-body {
       margin: 0px;
+      overflow:hidden;
     }
 
     .floating-toolbar {
@@ -1055,7 +1056,7 @@
     #titlebar input {
       font-family: "DM Serif Text", sans-serif;
       font-weight: 400 !important;
-
+      width: 100%;
       background-color: transparent;
       border: none;
       height: 50;
@@ -1619,16 +1620,15 @@
             break;
           case "nomenu":
             let isenabled = value;
-            let width = window.innerWidth;
             let titleIn = document.getElementById('titlebar');
             if (isenabled) {
-              titleIn.style.width = width - 72;
-              titleIn.style['margin-left'] = 12;
-              titleIn.style['margin-right'] = 60;
+             
+              titleIn.style['padding-left'] = 12;
+              titleIn.style['padding-right'] = 60;
             } else {
-              titleIn.style.width = width - 120;
-              titleIn.style['margin-left'] = 60;
-              titleIn.style['margin-right'] = 60;
+             
+              titleIn.style['padding-left'] = 60;
+              titleIn.style['padding-right'] = 60;
             }
             break;
           case "title":

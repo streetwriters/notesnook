@@ -4,6 +4,7 @@ import {sideMenuRef} from '../utils/refs';
 import storage from '../utils/storage';
 import {eSendEvent} from '../services/eventManager';
 import {eCloseSideMenu, eOpenSideMenu} from '../services/events';
+import {act} from 'react-test-renderer';
 
 export const reducer = (state, action) => {
   switch (action.type) {
@@ -64,7 +65,7 @@ export const reducer = (state, action) => {
     case ACTIONS.THEME: {
       return {
         ...state,
-        colors: {...action.colors},
+        colors: action.colors,
       };
     }
     case ACTIONS.USER: {
@@ -83,7 +84,7 @@ export const reducer = (state, action) => {
     case ACTIONS.SETTINGS: {
       return {
         ...state,
-        settings: {...action.settings},
+        settings: action.settings,
       };
     }
     case ACTIONS.TRASH: {
@@ -191,10 +192,104 @@ export const reducer = (state, action) => {
     }
     case ACTIONS.SEARCH_RESULTS: {
       let results = action.results;
+
       return {
         ...state,
         searchResults: {...results},
       };
+    }
+    case ACTIONS.HEADER_STATE: {
+      let header = action.state.ind
+        ? {
+            ...state.indHeaderState,
+            ...action.state,
+          }
+        : {
+            ...state.headerState,
+            ...action.state,
+          };
+      return action.state.ind
+        ? {
+            ...state,
+            indHeaderState: {...header},
+          }
+        : {
+            ...state,
+            headerState: header,
+          };
+    }
+    case ACTIONS.SEARCH_STATE: {
+      let stat = action.state.ind
+        ? {
+            ...state.indSearchState,
+            ...action.state,
+          }
+        : {
+            ...state.searchState,
+            ...action.state,
+          };
+
+      return action.state.ind
+        ? {
+            ...state,
+            indSearchState: stat,
+          }
+        : {
+            ...state,
+            searchState: stat,
+          };
+    }
+    case ACTIONS.CONTAINER_STATE: {
+      return {
+        ...state,
+        containerState: action.state,
+      };
+    }
+    case ACTIONS.HEADER_TEXT_STATE: {
+      let stat = action.state.ind
+        ? {
+            ...state.indHeaderTextState,
+            ...action.state,
+          }
+        : {
+            ...state.headerTextState,
+            ...action.state,
+          };
+      return action.state.ind
+        ? {
+            ...state,
+            indHeaderTextState: stat,
+          }
+        : {
+            ...state,
+            headerTextState: stat,
+          };
+    }
+    case ACTIONS.HEADER_VERTICAL_MENU: {
+      return {
+        ...state,
+        headerVerticalMenu: action.state,
+      };
+    }
+    case ACTIONS.CONTAINER_BOTTOM_BUTTON: {
+      let containerBottomButton = action.state.ind
+        ? {
+            ...state.indContainerBottomButton,
+            ...action.state,
+          }
+        : {
+            ...state.containerBottomButton,
+            ...action.state,
+          };
+      return action.state.ind
+        ? {
+            ...state,
+            indContainerBottomButton: containerBottomButton,
+          }
+        : {
+            ...state,
+            containerBottomButton: containerBottomButton,
+          };
     }
     default:
       throw new Error('unknown action type');

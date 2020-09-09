@@ -21,4 +21,10 @@ export const ACTIONS = {
   ALL: 'all',
   CLEAR_ALL: 'allClear',
   SYNCING: 'syncing',
+  HEADER_STATE: 'headerState',
+  SEARCH_STATE: 'searchState',
+  CONTAINER_STATE: 'containerState',
+  CONTAINER_BOTTOM_BUTTON:'containerBottomButton',
+  HEADER_VERTICAL_MENU:'verticalMenu',
+  HEADER_TEXT_STATE:'headerTextState'
 };

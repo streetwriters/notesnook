@@ -38,18 +38,40 @@ export const NotebookItem = ({
         ...item,
       });
     } else {
+      dispatch({
+        type: ACTIONS.HEADER_TEXT_STATE,
+        state: {
+          heading: hideMore ? 'Move to topic' : item.title,
+        },
+      });
+      dispatch({
+        type: ACTIONS.HEADER_STATE,
+        state: {
+          canGoBack:true,
+          menu:false
+        },
+      });
+      dispatch({
+        type: ACTIONS.CONTAINER_BOTTOM_BUTTON,
+        state: {
+          bottomButtonText: 'Add new topic',
+        },
+      });
+
       hideMore
         ? navigation.navigate('Notebook', {
             notebook: item,
-            title: hideMore ? 'Select Topic' : item.title,
+            title: hideMore ? 'Move to topic' : item.title,
             isMove: isMove,
             hideMore: hideMore,
+            root:false
           })
         : NavigationService.navigate('Notebook', {
             notebook: item,
-            title: hideMore ? 'Select Topic' : item.title,
+            title: hideMore ? 'Select a topic' : item.title,
             isMove: isMove,
             hideMore: hideMore,
+            root:true
           });
     }
   };
@@ -129,7 +151,7 @@ export const NotebookItem = ({
                         borderRadius: 5,
                         backgroundColor: colors.accent,
                         paddingHorizontal: ph / 1.5,
-                        paddingVertical: pv / 4,
+                        paddingVertical: pv / 3,
                         marginRight: 5,
                         marginVertical: 2.5,
                       }}>

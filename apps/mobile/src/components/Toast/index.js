@@ -6,7 +6,7 @@ import {normalize, opacity, ph, pv, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
 import {eHideToast, eShowToast} from '../../services/events';
-import {DDS, w} from '../../utils/utils';
+import {DDS, w, getElevation} from '../../utils/utils';
 
 const AnimatedTouchableOpacity = Animatable.createAnimatableComponent(
   TouchableOpacity,
@@ -80,8 +80,8 @@ export const Toast = ({context = 'global'}) => {
   return (
     <Animatable.View
       transition={['translateY', 'opacity']}
-      duration={10}
-      delay={toast ? 300 : 0}
+      duration={0}
+      delay={toast? 0 :300}
       useNativeDriver={true}
       style={{
         width: '100%',
@@ -98,10 +98,13 @@ export const Toast = ({context = 'global'}) => {
         ],
       }}>
       <AnimatedTouchableOpacity
-        activeOpacity={opacity + 0.1}
+        activeOpacity={1}
         transition={['opacity']}
         duration={300}
+        useNativeDriver={true}
+        delay={!toast? 0 : 150}
         style={{
+          ...getElevation(5),
           ...toastStyle,
           maxWidth: DDS.isTab ? normalize(350) : w - 24,
           minWidth: DDS.isTab ? normalize(250) : w / 2,
@@ -111,7 +114,6 @@ export const Toast = ({context = 'global'}) => {
           paddingVertical: pv,
           opacity: toast ? 1 : 0,
           justifyContent: 'center',
-          elevation: 25,
           flexDirection: 'row',
           alignItems: 'center',
         }}>

@@ -1,45 +1,25 @@
-import React, {useState, useEffect} from 'react';
-import {
-  Platform,
-  ScrollView,
-  StatusBar,
-  Text,
-  TouchableOpacity,
-  View,
-  Modal,
-  Clipboard,
-  Linking,
-} from 'react-native';
+import { useIsFocused } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
+import { Clipboard, Linking, Modal, Platform, ScrollView, StatusBar, Text, TouchableOpacity, View } from 'react-native';
+import * as Animatable from 'react-native-animatable';
 import MMKV from 'react-native-mmkv-storage';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import QRCode from 'react-native-qrcode-generator';
-import {
-  ACCENT,
-  COLOR_SCHEME,
-  COLOR_SCHEME_DARK,
-  COLOR_SCHEME_LIGHT,
-  opacity,
-  pv,
-  setColorScheme,
-  SIZE,
-  WEIGHT,
-  ph,
-} from '../../common/common';
-import Container from '../../components/Container';
-import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
-import {eSendEvent} from '../../services/eventManager';
-import {eOpenLoginDialog} from '../../services/events';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { ACCENT, COLOR_SCHEME, COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT, opacity, ph, pv, setColorScheme, SIZE, WEIGHT } from '../../common/common';
+import { Toast } from '../../components/Toast';
+import { useTracked } from '../../provider';
+import { ACTIONS } from '../../provider/actions';
+import { eSendEvent } from '../../services/eventManager';
+import { eOpenLoginDialog, eResetApp } from '../../services/events';
 import NavigationService from '../../services/NavigationService';
-import {hexToRGBA, w, DDS, setSetting, db, ToastEvent} from '../../utils/utils';
-import {Toast} from '../../components/Toast';
+import { db, DDS, setSetting, ToastEvent, w } from '../../utils/utils';
 
-export const Settings = ({navigation}) => {
+export const Settings = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors, user, settings} = state;
   const [key, setKey] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
-
+  const isFocused = useIsFocused();
   function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
     let newColors = setColorScheme(colors, accent);
     StatusBar.setBarStyle(colors.night ? 'light-content' : 'dark-content');
@@ -54,20 +34,58 @@ export const Settings = ({navigation}) => {
   }
 
   useEffect(() => {
-    dispatch({
-      type: ACTIONS.CURRENT_SCREEN,
-      screen: 'settings',
-    });
-  },[])
+    if (isFocused) {
+      dispatch({
+        type: ACTIONS.CONTAINER_BOTTOM_BUTTON,
+        state: {
+          visible: false,
+        },
+      });
+      dispatch({
+        type: ACTIONS.HEADER_STATE,
+        state: {
+          type: null,
+          menu: true,
+          canGoBack: false,
+          route: route,
+          color: null,
+          navigation: navigation,
+        },
+      });
+      dispatch({
+        type: ACTIONS.HEADER_VERTICAL_MENU,
+        state: false,
+      });
+
+      dispatch({
+        type: ACTIONS.HEADER_TEXT_STATE,
+        state: {
+          heading: 'Settings',
+        },
+      });
+
+      dispatch({
+        type: ACTIONS.CURRENT_SCREEN,
+        screen: 'settings',
+      });
+
+      dispatch({
+        type: ACTIONS.SEARCH_STATE,
+        state: {
+          noSearch: true,
+        },
+      });
+    }
+  }, [isFocused]);
 
   return (
-    <Container
-      menu={true}
-      heading="Settings"
-      canGoBack={false}
-      noSearch={true}
-      noSelectionHeader={true}
-      noBottomButton={true}>
+    <Animatable.View
+      transition="backgroundColor"
+      duration={300}
+      style={{
+        height: '100%',
+        backgroundColor: colors.bg,
+      }}>
       <View
         style={{
           marginTop: Platform.OS == 'ios' ? 125 - 60 : 125 - 60,
@@ -146,19 +164,20 @@ export const Settings = ({navigation}) => {
                 borderWidth: 1,
                 borderRadius: 5,
                 paddingVertical: 8,
-                paddingHorizontal: 6,
+                paddingHorizontal: 10,
                 marginTop: 15,
                 alignItems: 'center',
                 borderColor: colors.nav,
               }}>
               <Text
-                numberOfLines={1}
+                numberOfLines={2}
                 style={{
                   fontFamily: WEIGHT.regular,
-                  fontSize: 16,
+                  fontSize: SIZE.sm,
                   width: '85%',
                   maxWidth: '85%',
-                  color: colors.pri,
+                  paddingRight: 10,
+                  color: colors.icon,
                 }}>
                 {key}
               </Text>
@@ -299,17 +318,10 @@ export const Settings = ({navigation}) => {
                 },
               },
               {
-                name: 'My vault',
-                func: () => {},
-              },
-              {
                 name: 'Subscription status',
                 func: () => {},
               },
-              {
-                name: 'Change password',
-                func: () => {},
-              },
+
               {
                 name: 'Logout',
                 func: async () => {
@@ -350,7 +362,9 @@ export const Settings = ({navigation}) => {
               onPress={() => {
                 DDS.isTab
                   ? eSendEvent(eOpenLoginDialog)
-                  : NavigationService.navigate('Login');
+                  : NavigationService.navigate('Login', {
+                      root: true,
+                    });
               }}
               activeOpacity={opacity / 2}
               style={{
@@ -552,6 +566,8 @@ export const Settings = ({navigation}) => {
               : (scale = 0.9 ? (scale = 1) : (scale = 1));
 
             await setSetting(settings, 'fontScale', scale);
+
+            eSendEvent(eResetApp);
           }}
           activeOpacity={opacity}
           style={{
@@ -586,7 +602,7 @@ export const Settings = ({navigation}) => {
                 textAlignVertical: 'center',
                 color: colors.pri,
               }}>
-              {settings.fontScale ? settings.fontScale + 'X' : '1X'}
+              {settings?.fontScale ? settings.fontScale + 'X' : '1X'}
             </Text>
           </View>
         </TouchableOpacity>
@@ -631,95 +647,6 @@ export const Settings = ({navigation}) => {
             />
           </TouchableOpacity>
         ) : null}
-        {/* 
-        <Text
-          style={{
-            fontSize: SIZE.xs,
-            fontFamily: WEIGHT.bold,
-            textAlignVertical: 'center',
-            color: colors.accent,
-
-            borderBottomColor: colors.nav,
-            borderBottomWidth: 0.5,
-            paddingBottom: 3,
-          }}>
-          Editor Settings
-        </Text>
-
-        <TouchableOpacity
-          activeOpacity={opacity}
-          onPress={async () => {
-            await setSetting(
-              settings,
-              'showToolbarOnTop',
-              !settings.showToolbarOnTop,
-            );
-          }}
-          style={{
-            width: '100%',
-            marginHorizontal: 0,
-            flexDirection: 'row',
-            marginTop: pv + 5,
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            paddingBottom: pv + 5,
-          }}>
-          <Text
-            style={{
-              fontSize: SIZE.sm,
-              fontFamily: WEIGHT.regular,
-              textAlignVertical: 'center',
-              color: colors.pri,
-            }}>
-            Show toolbar on top
-          </Text>
-          <Icon
-            size={SIZE.xl}
-            color={settings.showToolbarOnTop ? colors.accent : colors.icon}
-            name={
-              settings.showToolbarOnTop ? 'toggle-switch' : 'toggle-switch-off'
-            }
-          />
-        </TouchableOpacity>
-        <TouchableOpacity
-          activeOpacity={opacity}
-          onPress={async () => {
-            await setSetting(
-              settings,
-              'showKeyboardOnOpen',
-              !settings.showKeyboardOnOpen,
-            );
-          }}
-          style={{
-            width: '100%',
-            marginHorizontal: 0,
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-
-            paddingVertical: pv + 5,
-          }}>
-          <Text
-            style={{
-              fontSize: SIZE.sm,
-              fontFamily: WEIGHT.regular,
-              textAlignVertical: 'center',
-              color: colors.pri,
-            }}>
-            Show keyboard on open
-          </Text>
-          <Icon
-            size={SIZE.xl}
-            color={settings.showKeyboardOnOpen ? colors.accent : colors.icon}
-            name={
-              settings.showKeyboardOnOpen
-                ? 'toggle-switch'
-                : 'toggle-switch-off'
-            }
-          />
-        </TouchableOpacity>
-
-         */}
 
         <Text
           style={{
@@ -740,13 +667,13 @@ export const Settings = ({navigation}) => {
           {
             name: 'Privacy Policy',
             func: () => {
-              Linking.openURL('https://www.notesbook.com/privacy.html');
+              Linking.openURL('https://www.notesnook.com/privacy.html');
             },
           },
           {
             name: 'About',
             func: () => {
-              Linking.openURL('https://www.notesbook.com');
+              Linking.openURL('https://www.notesnook.com');
             },
           },
         ].map(item => (
@@ -776,9 +703,8 @@ export const Settings = ({navigation}) => {
           }}
         />
       </ScrollView>
-    </Container>
+    </Animatable.View>
   );
 };
-
 
 export default Settings;

@@ -75,3 +75,11 @@ export const eShowMergeDialog = '536';
 export const eSwitchNightMode = '537';
 
 export const eStartSyncer = '538';
+
+export const eSetModalNavigator = '539'
+
+export const eOpenPremiumDialog = '540'
+
+export const eClosePremiumDialog = '541'
+
+export const eResetApp = '542'

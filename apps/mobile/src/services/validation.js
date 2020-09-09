@@ -1,3 +1,5 @@
+import {db} from '../utils/utils';
+
 let regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
 export function validateEmail(email) {
@@ -26,4 +28,9 @@ export function validateUsername(username) {
   } else {
     return false;
   }
+}
+
+export async function checkPremiumUser() {
+  let user = await db.user.get();
+  return false;
 }

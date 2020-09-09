@@ -27,7 +27,8 @@ import {ACTIONS} from '../../provider/actions';
 import NavigationService from '../../services/NavigationService';
 import {timeConverter, ToastEvent, DDS, db} from '../../utils/utils';
 import {openVault, eSendEvent} from '../../services/eventManager';
-import {refreshNotesPage} from '../../services/events';
+import {refreshNotesPage, eOpenPremiumDialog} from '../../services/events';
+import {PremiumTag} from '../Premium/PremiumTag';
 
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
@@ -42,7 +43,7 @@ export const ActionSheetComponent = ({
   columnItems = [],
 }) => {
   const [state, dispatch] = useTracked();
-  const {colors, tags, currentEditingNote} = state;
+  const {colors, tags, premiumUser} = state;
   const [focused, setFocused] = useState(false);
   const [note, setNote] = useState(
     item
@@ -90,14 +91,14 @@ export const ActionSheetComponent = ({
     if (tag.includes(',')) {
       tag = tag.replace(',', '');
     }
-    tagsInputRef.current?.setNativeProps({
-      text: '',
-    });
 
     await db.notes.note(note.id).tag(tag);
 
     setNote({...db.notes.note(note.id).data});
     dispatch({type: ACTIONS.TAGS});
+    tagsInputRef.current?.setNativeProps({
+      text: '',
+    });
     tagToAdd = '';
   };
 
@@ -299,6 +300,11 @@ export const ActionSheetComponent = ({
       name: 'Pin',
       icon: 'tag-outline',
       func: async () => {
+        if (!premiumUser) {
+          close('premium');
+          return;
+        }
+
         if (!note.id) return;
         if (note.type === 'note') {
           await db.notes.note(note.id).pin();
@@ -316,6 +322,10 @@ export const ActionSheetComponent = ({
       name: 'Favorite',
       icon: 'star',
       func: async () => {
+        if (!premiumUser) {
+          close('premium');
+          return;
+        }
         if (!note.id) return;
         if (note.type === 'note') {
           await db.notes.note(note.id).favorite();
@@ -333,6 +343,10 @@ export const ActionSheetComponent = ({
       name: 'Add to Vault',
       icon: 'shield',
       func: () => {
+        if (!premiumUser) {
+          close('premium');
+          return;
+        }
         if (!note.id) return;
 
         if (note.locked) {
@@ -351,7 +365,6 @@ export const ActionSheetComponent = ({
             .catch(async e => {
               switch (e.message) {
                 case db.vault.ERRORS.noVault:
-                  console.log('novault', e);
                   close('novault');
                   break;
                 case db.vault.ERRORS.vaultLocked:
@@ -533,15 +546,25 @@ export const ActionSheetComponent = ({
         ) : (
           undefined
         )}
-        {item.check ? (
-          <Icon
-            name={
-              item.on ? 'check-circle-outline' : 'checkbox-blank-circle-outline'
-            }
-            color={item.on ? colors.accent : colors.icon}
-            size={SIZE.lg + 2}
-          />
-        ) : null}
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+          }}>
+          <PremiumTag pro={false} />
+
+          {item.check ? (
+            <Icon
+              name={
+                item.on
+                  ? 'check-circle-outline'
+                  : 'checkbox-blank-circle-outline'
+              }
+              color={item.on ? colors.accent : colors.icon}
+              size={SIZE.lg + 2}
+            />
+          ) : null}
+        </View>
       </TouchableOpacity>
     ) : null;
 
@@ -733,7 +756,11 @@ export const ActionSheetComponent = ({
                 fontSize: SIZE.xs,
                 color: colors.accent,
               }}>
-              Suggestions:{' '}
+              {tags.filter(
+                o => o.count > 1 && !note.tags.find(t => t === o.title),
+              ).length === 0
+                ? ''
+                : 'Suggestions '}
             </Text>
             {tags
               .filter(o => o.count > 1 && !note.tags.find(t => t === o.title))
@@ -798,17 +825,35 @@ export const ActionSheetComponent = ({
               borderWidth: 1.5,
               borderColor: focused ? colors.accent : colors.nav,
               paddingVertical: 5,
+              alignItems: 'center',
             }}>
             <TouchableOpacity
               onPress={() => {
+                if (!premiumUser) {
+                  close('premium');
+                  return;
+                }
                 tagsInputRef.current?.focus();
               }}
               style={{
                 position: 'absolute',
                 width: '100%',
                 height: '100%',
-              }}
-            />
+                justifyContent: 'flex-start',
+                alignItems: 'flex-end',
+              }}>
+              {!premiumUser ? (
+                <Text
+                  style={{
+                    color: colors.accent,
+                    fontFamily: WEIGHT.regular,
+                    fontSize: 10,
+                    marginRight: 5,
+                  }}>
+                  PRO
+                </Text>
+              ) : null}
+            </TouchableOpacity>
             {note && note.tags ? note.tags.map(_renderTag) : null}
             <TextInput
               style={{

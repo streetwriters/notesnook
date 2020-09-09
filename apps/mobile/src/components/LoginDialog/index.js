@@ -1,10 +1,10 @@
-import React, { createRef } from 'react';
+import React, {createRef} from 'react';
 import {Modal, TouchableOpacity, View} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import {normalize} from '../../common/common';
 import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
-import {eLoginDialogNavigateBack} from '../../services/events';
+import {eLoginDialogNavigateBack, eSetModalNavigator} from '../../services/events';
 import {getElevation, DDS} from '../../utils/utils';
 import ForgotPassword from '../../views/ForgotPassword';
 import Login from '../../views/Login';
@@ -12,13 +12,17 @@ import Signup from '../../views/Signup';
 import {updateEvent} from '../DialogManager/recievers';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
+import Container from '../Container';
 
 const Stack = createStackNavigator();
-
 const modalNavigatorRef2 = createRef();
+
 const ModalNavigator = ({onStateChange}) => {
   return (
-    <NavigationContainer onStateChange={onStateChange} independent={true} ref={modalNavigatorRef2}>
+    <NavigationContainer
+      onStateChange={onStateChange}
+      independent={true}
+      ref={modalNavigatorRef2}>
       <Stack.Navigator
         initialRouteName="Login"
         screenOptions={{
@@ -28,9 +32,27 @@ const ModalNavigator = ({onStateChange}) => {
           cardOverlayEnabled: false,
           cardShadowEnabled: false,
         }}>
-        <Stack.Screen name="Login" component={Login} />
-        <Stack.Screen name="Signup" component={Signup} />
-        <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
+        <Stack.Screen
+          initialParams={{
+            root: false,
+          }}
+          name="Login"
+          component={Login}
+        />
+        <Stack.Screen
+          initialParams={{
+            root: false,
+          }}
+          name="Signup"
+          component={Signup}
+        />
+        <Stack.Screen
+          initialParams={{
+            root: false,
+          }}
+          name="ForgotPassword"
+          component={ForgotPassword}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -69,6 +91,7 @@ class LoginDialog extends React.Component {
         animated={true}
         animationType="fade"
         onShow={() => {
+          eSendEvent(eSetModalNavigator, true);
           this.setState({
             animated: true,
           });
@@ -76,6 +99,7 @@ class LoginDialog extends React.Component {
         onRequestClose={() => {
           if (!this.routeIndex || this.routeIndex === 0) {
             updateEvent({type: ACTIONS.LOGIN_NAVIGATOR, enabled: false});
+            eSendEvent(eSetModalNavigator, false);
             this.close();
           } else {
             eSendEvent(eLoginDialogNavigateBack);
@@ -127,11 +151,13 @@ class LoginDialog extends React.Component {
               paddingVertical: 16,
               zIndex: 10,
             }}>
-            <ModalNavigator
-              onStateChange={event => {
+            <Container root={false}>
+              <ModalNavigator
+                onStateChange={event => {
                   this.routeIndex = event.index;
-              }}
-            />
+                }}
+              />
+            </Container>
           </View>
         </Animatable.View>
       </Modal>

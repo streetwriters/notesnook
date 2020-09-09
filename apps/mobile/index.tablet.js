@@ -18,6 +18,8 @@ import Editor from './src/views/Editor';
 import {sideMenuRef} from './src/utils/refs';
 import DrawerLayout from 'react-native-drawer-layout';
 import {getElevation} from './src/utils/utils';
+import {Toast} from './src/components/Toast';
+import {DialogManager} from './src/components/DialogManager';
 
 const editorRef = createRef();
 let outColors;
@@ -25,7 +27,6 @@ let outColors;
 export const Initialize = () => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
-
 
   const [fullscreen, setFullscreen] = useState(false);
 
@@ -82,66 +83,68 @@ export const Initialize = () => {
   }, []);
 
   return (
-    <DrawerLayout
-      ref={sideMenuRef}
-      style={{
-        opacity: 0,
-        backgroundColor: colors.bg,
-      }}
-      keyboardDismissMode="ondrag"
-      drawerWidth={300}
-      useNativeAnimations={true}
-      renderNavigationView={() => (
-        <Menu
-          hide={false}
-          colors={colors}
-          close={() => sideMenuRef.current?.closeDrawer()}
-        />
-      )}>
-      <Animatable.View
-        transition="backgroundColor"
-        duration={300}
+    <>
+      <DrawerLayout
+        ref={sideMenuRef}
         style={{
-          width: '100%',
-          height: '100%',
-          flexDirection: 'row',
+          opacity: 0,
           backgroundColor: colors.bg,
-        }}>
-      
-        <Animatable.View
-          animation="fadeIn"
-          useNativeDriver={true}
-          duration={500}
-          delay={450}
-          style={{
-            width: '4%',
-          }}>
-          <Menu 
-          
-          hide={false} noTextMode={true} colors={colors} />
-        </Animatable.View>
+        }}
+        keyboardDismissMode="ondrag"
+        drawerWidth={300}
+        useNativeAnimations={true}
+        renderNavigationView={() => (
+          <Menu
+            hide={false}
+            colors={colors}
+            close={() => sideMenuRef.current?.closeDrawer()}
+          />
+        )}>
         <Animatable.View
           transition="backgroundColor"
           duration={300}
           style={{
-            width: '28%',
+            width: '100%',
             height: '100%',
-            borderRightColor: colors.nav,
-            borderRightWidth: 2,
+            flexDirection: 'row',
+            backgroundColor: colors.bg,
           }}>
-          <NavigationStack />
-        </Animatable.View>
+          <Animatable.View
+            animation="fadeIn"
+            useNativeDriver={true}
+            duration={500}
+            delay={450}
+            style={{
+              width: '4%',
+            }}>
+            <Menu hide={false} noTextMode={true} colors={colors} />
+          </Animatable.View>
+          <Animatable.View
+            transition="backgroundColor"
+            duration={300}
+            style={{
+              width: '28%',
+              height: '100%',
+              borderRightColor: colors.nav,
+              borderRightWidth: 2,
+            }}>
+            <NavigationStack />
+          </Animatable.View>
 
-        <View
-          ref={editorRef}
-          style={{
-            width: '68%',
-            height: '100%',
-            backgroundColor: 'transparent',
-          }}>
-          <Editor noMenu={fullscreen ? false : true} />
-        </View>
-      </Animatable.View>
-    </DrawerLayout>
+          <View
+            ref={editorRef}
+            style={{
+              width: '68%',
+              height: '100%',
+              backgroundColor: 'transparent',
+            }}>
+            <Editor noMenu={fullscreen ? false : true} />
+          </View>
+        </Animatable.View>
+      </DrawerLayout>
+
+      <Toast />
+      <DialogManager colors={colors} />
+    </>
   );
 };

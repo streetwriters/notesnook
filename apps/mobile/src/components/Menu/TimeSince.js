@@ -11,12 +11,12 @@ export const TimeSince = ({time}) => {
     let interval = setInterval(() => {
       t = timeSince(time);
       setTimeAgo(t);
-    }, 60000);
+    }, 180000);
     return () => {
       clearInterval(interval);
       interval = null;
     };
-  });
+  },[]);
 
   return <Text>{timeAgo}</Text>;
 };

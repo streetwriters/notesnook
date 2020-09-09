@@ -6,6 +6,7 @@ import {
   eUnSubscribeEvent,
 } from '../services/eventManager';
 import { eThemeUpdated } from '../services/events';
+import { DDS } from '../utils/utils';
 
 export const scale = {
   fontScale: 1,
@@ -56,7 +57,7 @@ export const COLOR_SCHEME_DARK = {
   bg: '#1f1f1f',
   navbg: '#1c1c1c',
   nav: '#2b2b2b',
-  pri: '#ffffff',
+  pri: '#D3D3D3',
   sec: 'black',
   ...fixedColors,
 };
@@ -100,20 +101,20 @@ const getDpi = pd => {
 const correction = (size, multiplier) => {
   let dSize = getDeviceSize();
 
-  if (dSize > 4 && dSize <= 5.3 && pixelDensity <= 3) {
+  if (dSize >= 4 && dSize <= 5.3 && pixelDensity <= 3) {
     return size * 0.92;
-  } else if (dSize > 5.5 && dSize < 6.5 && pixelDensity <= 3) {
+  } else if (dSize > 5.3 && dSize < 7 && pixelDensity < 3 && !DDS.isTab) {
     if (Platform.OS === 'ios') {
       return size;
     }
     return size * 0.93;
-  } else if (dSize <= 5.7 && pixelDensity > 3) {
-    return size * 0.9;
-  } else if (dSize >= 6.5 && dSize <= 7.2) {
+  } else if (dSize <= 7 && pixelDensity >= 3 && !DDS.isTab) {
+    return size * 0.98;
+  } else if (dSize >= 6.5 && dSize <= 7.2 && DDS.isTab) {
     return size * multiplier;
-  } else if (dSize > 7.2 && dSize <= 8.5) {
+  } else if (dSize > 7.2 && dSize <= 8.5 && DDS.isTab) {
     return size * (multiplier + 0.05);
-  } else if (dSize > 8.5 && dSize <= 9.8) {
+  } else if (dSize > 8.5 && dSize <= 9.8 && DDS.isTab) {
     return size * (multiplier + 0.05);
   } else if (dSize > 9.8) {
     return size;

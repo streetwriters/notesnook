@@ -14,6 +14,7 @@ import {useIsFocused} from '@react-navigation/native';
 import {opacity, pv, SIZE, WEIGHT, ph} from '../../common/common';
 import {Header} from '../../components/header';
 import {useTracked} from '../../provider';
+
 import {
   eSubscribeEvent,
   eUnSubscribeEvent,
@@ -22,6 +23,8 @@ import {
 import {
   eLoginDialogNavigateBack,
   eCloseLoginDialog,
+  eSetModalNavigator,
+  eOpenSideMenu,
 } from '../../services/events';
 import * as Animatable from 'react-native-animatable';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -53,9 +56,7 @@ export const Signup = ({route, navigation}) => {
   const [failed, setFailed] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState(false);
-  const [key, setKey] = useState(
-    'xyzLLbr1tafjdfklsdfjlksafjhklfadsafsljkfsfadfljkdfassafsafaffasdfsafafs',
-  );
+  const [key, setKey] = useState('');
   const [passwordReEnter, setPasswordReEnter] = useState(null);
   const [secureEntry, setSecureEntry] = useState(true);
   let isFocused = useIsFocused();
@@ -68,23 +69,39 @@ export const Signup = ({route, navigation}) => {
     eSubscribeEvent(eLoginDialogNavigateBack, handleBackPress);
     return () => {
       eUnSubscribeEvent(eLoginDialogNavigateBack, handleBackPress);
+      if (route.params.fromHome) {
+        eSendEvent(eOpenSideMenu);
+      }
     };
   }, [isFocused]);
 
-  const _signUp = async () => {
+  const validateInfo  = () => {
     if (!password || !email || !username || !passwordReEnter) {
       ToastEvent.show('All fields are required', 'error');
-      return;
+      return false;
     }
+
     if (!confirmPassword) {
       ToastEvent.show('Passwords do not match', 'error');
-      return;
+      return false;
     }
-    setSigningIn(true);
-    setStatus('Creating your account...');
+
     if (!invalidEmail && !invalidPassword && !invalidUsername) {
+      ToastEvent.show('Signup information is invalid', 'error');
+    return false;
+    }
+
+  }
+
+  const _signUp = async () => {
+    if (!validateInfo) return;
+ 
+      setSigningIn(true);
+      setStatus('Creating your account...');
       try {
         await db.user.signup(username, email, password);
+
+
       } catch (e) {
         setSigningIn(false);
         setFailed(true);
@@ -94,6 +111,8 @@ export const Signup = ({route, navigation}) => {
 
       let user;
       try {
+
+       
         user = await db.user.user.get();
         setStatus('Logging you in...');
         let k = await db.user.key();
@@ -109,10 +128,66 @@ export const Signup = ({route, navigation}) => {
         setFailed(true);
         ToastEvent.show('Login Failed, try again', 'error');
       }
-    } else {
-      ToastEvent.show('Signup failed', 'error');
-    }
+    
   };
+
+  useEffect(() => {
+    if (isFocused) {
+      dispatch({
+        type: ACTIONS.HEADER_STATE,
+        state: {
+          type: null,
+          menu: false,
+          canGoBack: true,
+          route: route,
+          color: null,
+          navigation: navigation,
+          ind: !route.params.root,
+        },
+      });
+      dispatch({
+        type: ACTIONS.CONTAINER_BOTTOM_BUTTON,
+        state: {
+          visible: false,
+          ind: !route.params.root,
+        },
+      });
+      dispatch({
+        type: ACTIONS.CONTAINER_STATE,
+        state: {
+          noSelectionHeader: false,
+        },
+      });
+      dispatch({
+        type: ACTIONS.HEADER_VERTICAL_MENU,
+        state: false,
+      });
+
+      dispatch({
+        type: ACTIONS.HEADER_TEXT_STATE,
+        state: {
+          heading: 'Create Account',
+          ind: !route.params.root,
+        },
+      });
+
+      dispatch({
+        type: ACTIONS.CURRENT_SCREEN,
+        screen: 'signup',
+      });
+
+      dispatch({
+        type: ACTIONS.SEARCH_STATE,
+        state: {
+          noSearch: true,
+          ind: !route.params.root,
+        },
+      });
+      if (!route.params.root) {
+        eSendEvent(eSetModalNavigator, true);
+      }
+    }
+  }, [isFocused]);
 
   return (
     <View
@@ -123,7 +198,7 @@ export const Signup = ({route, navigation}) => {
       <Modal
         animated={true}
         animationType="fade"
-        visible={true}
+        visible={modalVisible}
         transparent={true}>
         <View
           style={{
@@ -289,12 +364,10 @@ export const Signup = ({route, navigation}) => {
 
       {signingIn ? null : (
         <>
-          <Header
-            isLoginNavigator={isLoginNavigator}
-            navigation={navigation}
-            colors={colors}
-            route={route}
-            heading="Create Account"
+          <View
+            style={{
+              marginTop: Platform.OS == 'ios' ? 125 - 60 : 125 - 60,
+            }}
           />
 
           <View
@@ -658,7 +731,7 @@ export const Signup = ({route, navigation}) => {
                 onPress={_signUp}
                 style={{
                   ...getElevation(5),
-                  padding: pv,
+                  padding: pv + 2,
                   backgroundColor: colors.accent,
                   borderRadius: 5,
                   marginHorizontal: 12,
@@ -684,7 +757,7 @@ export const Signup = ({route, navigation}) => {
               }}>
               <TouchableOpacity
                 onPress={() => {
-                  Linking.openURL('https://notesbook.com/privacy.html');
+                  Linking.openURL('https://notesnook.com/privacy.html');
                 }}
                 activeOpacity={opacity}
                 style={{}}>

@@ -1,42 +1,92 @@
-import React, {createRef} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
+  ActivityIndicator,
   Platform,
-  StatusBar,
-  Text,
   TouchableOpacity,
   View,
-  ActivityIndicator,
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import {SIZE, WEIGHT} from '../../common/common';
-import {useTracked} from '../../provider';
-import {eSendEvent} from '../../services/eventManager';
-import {eCloseLoginDialog} from '../../services/events';
-import NavigationService from '../../services/NavigationService';
-import {DDS, w} from '../../utils/utils';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import Menu, {MenuItem, MenuDivider} from 'react-native-material-menu';
-import {ACTIONS} from '../../provider/actions';
-import {sideMenuRef} from '../../utils/refs';
-import {moveNoteHideEvent} from '../DialogManager/recievers';
 import {useSafeArea} from 'react-native-safe-area-context';
-const menuRef = createRef();
-export const Header = ({
-  heading,
-  canGoBack = true,
-  hide,
-  showSearch,
-  menu,
-  verticalMenu = false,
-  preventDefaultMargins,
-  navigation = null,
-  isLoginNavigator,
-  headerColor,
-  route,
-}) => {
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {SIZE} from '../../common/common';
+import {useTracked} from '../../provider';
+import {
+  eSendEvent,
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+} from '../../services/eventManager';
+import {
+  eCloseLoginDialog,
+  eScrollEvent,
+  eSetModalNavigator,
+} from '../../services/events';
+import NavigationService from '../../services/NavigationService';
+import {sideMenuRef} from '../../utils/refs';
+import {DDS, w} from '../../utils/utils';
+import {moveNoteHideEvent} from '../DialogManager/recievers';
+import {HeaderMenu} from './HeaderMenu';
+import {HeaderTitle} from './HeaderTitle';
+let offsetY = 0;
+
+function useForceUpdate() {
+  const [, setTick] = useState(0);
+  const update = useCallback(() => {
+    setTick(tick => tick + 1);
+  }, []);
+  return update;
+}
+
+export const Header = ({showSearch, root}) => {
   const [state, dispatch] = useTracked();
-  const {colors, syncing} = state;
+  const {
+    colors,
+    syncing,
+    isLoginNavigator,
+    preventDefaultMargins,
+    searchResults,
+  } = state;
+  const [hideHeader, setHideHeader] = useState(false);
+
+  let headerState = root ? state.headerState : state.indHeaderState;
+
+  const [isModalNavigator, setIsModalNavigator] = useState(false);
   const insets = useSafeArea();
+  const forceUpdate = useForceUpdate();
+
+  const onScroll = y => {
+    if (searchResults.results.length > 0) return;
+    if (y < 30) {
+      setHideHeader(false);
+      offsetY = y;
+    }
+
+    if (y > offsetY) {
+      if (y - offsetY < 100) return;
+
+      setHideHeader(true);
+      offsetY = y;
+    } else {
+      if (offsetY - y < 50) return;
+
+      setHideHeader(false);
+      offsetY = y;
+    }
+  };
+
+  const _setModalNavigator = value => {
+    if (root) return;
+    forceUpdate();
+    setIsModalNavigator(value);
+  };
+
+  useEffect(() => {
+    eSubscribeEvent(eSetModalNavigator, _setModalNavigator);
+    eSubscribeEvent(eScrollEvent, onScroll);
+    return () => {
+      eUnSubscribeEvent(eSetModalNavigator, _setModalNavigator);
+      eUnSubscribeEvent(eScrollEvent, onScroll);
+    };
+  }, []);
 
   return (
     <View
@@ -46,8 +96,10 @@ export const Header = ({
         height: 50,
         marginTop:
           Platform.OS === 'ios'
-            ? preventDefaultMargins || isLoginNavigator? 0 : insets.top
-            : preventDefaultMargins || isLoginNavigator
+            ? isModalNavigator && !root
+              ? 0
+              : insets.top
+            : isModalNavigator && !root
             ? 0
             : insets.top,
         marginBottom: 10,
@@ -90,21 +142,23 @@ export const Header = ({
           justifyContent: 'flex-start',
           alignItems: 'center',
         }}>
-        {canGoBack ? (
+        {headerState.canGoBack ? (
           <TouchableOpacity
             hitSlop={{top: 20, bottom: 20, left: 50, right: 40}}
             onPress={() => {
-              if (navigation && preventDefaultMargins) {
-                if (route.name === 'Folders') {
+              headerState = root ? state.headerState : state.indHeaderState;
+
+              if (headerState.navigation && preventDefaultMargins) {
+                if (headerState.route.name === 'Folders') {
                   moveNoteHideEvent();
                 } else {
-                  navigation.goBack();
+                  headerState.navigation.goBack();
                 }
-              } else if (navigation && isLoginNavigator) {
-                if (route.name === 'Login') {
+              } else if (headerState.navigation && isModalNavigator) {
+                if (headerState.route.name === 'Login') {
                   eSendEvent(eCloseLoginDialog);
                 } else {
-                  navigation.goBack();
+                  headerState.navigation.goBack();
                 }
               } else {
                 NavigationService.goBack();
@@ -114,21 +168,21 @@ export const Header = ({
               justifyContent: 'center',
               alignItems: 'flex-start',
               height: 40,
-              width: 50,
+              width: 60,
             }}>
             <Icon
               style={{
                 marginLeft: -5,
               }}
               color={colors.pri}
-              name={'chevron-left'}
+              name={'arrow-left'}
               size={SIZE.xxxl - 3}
             />
           </TouchableOpacity>
         ) : (
           undefined
         )}
-        {menu && !DDS.isTab ? (
+        {headerState.menu && !DDS.isTab ? (
           <TouchableOpacity
             hitSlop={{top: 20, bottom: 20, left: 50, right: 40}}
             onPress={() => {
@@ -146,21 +200,7 @@ export const Header = ({
           undefined
         )}
 
-        <Text
-          style={{
-            fontSize: SIZE.xl,
-            color: headerColor ? headerColor : colors.pri,
-            fontFamily: WEIGHT.bold,
-          }}>
-          <Text
-            style={{
-              color: colors.accent,
-            }}>
-            {heading.slice(0, 1) === '#' ? '#' : null}
-          </Text>
-
-          {heading.slice(0, 1) === '#' ? heading.slice(1) : heading}
-        </Text>
+        <HeaderTitle root={root} />
       </View>
       <View
         style={{
@@ -172,10 +212,13 @@ export const Header = ({
           useNativeDriver={true}
           duration={500}
           style={{
-            opacity: hide ? 1 : 0,
+            opacity: hideHeader ? 1 : 0,
           }}>
           <TouchableOpacity
-            onPress={() => showSearch()}
+            onPress={() => {
+              setHideHeader(false);
+              eSendEvent('showSearch');
+            }}
             style={{
               justifyContent: 'center',
               alignItems: 'flex-end',
@@ -187,92 +230,7 @@ export const Header = ({
           </TouchableOpacity>
         </Animatable.View>
 
-        {verticalMenu ? (
-          <Menu
-            ref={menuRef}
-            style={{
-              borderRadius: 5,
-              backgroundColor: colors.bg,
-            }}
-            button={
-              <TouchableOpacity
-                onPress={() => {
-                  menuRef.current?.show();
-                }}
-                style={{
-                  justifyContent: 'center',
-                  alignItems: 'flex-end',
-                  height: 40,
-                  width: 60,
-                }}>
-                <Icon name="sort" size={SIZE.xl} color={colors.icon} />
-              </TouchableOpacity>
-            }>
-            <MenuItem
-              textStyle={{
-                color: colors.icon,
-                fontSize: 12,
-              }}>
-              Sort by:
-            </MenuItem>
-            <MenuDivider />
-            <MenuItem
-              textStyle={{
-                fontFamily: WEIGHT.regular,
-                color: colors.pri,
-              }}
-              onPress={() => {
-                dispatch({type: ACTIONS.NOTES, sort: null});
-                menuRef.current?.hide();
-              }}>
-              Default
-            </MenuItem>
-            <MenuItem
-              textStyle={{
-                fontFamily: WEIGHT.regular,
-                color: colors.pri,
-              }}
-              onPress={() => {
-                dispatch({type: ACTIONS.NOTES, sort: 'abc'});
-                menuRef.current?.hide();
-              }}>
-              Alphabetical
-            </MenuItem>
-            <MenuItem
-              textStyle={{
-                fontFamily: WEIGHT.regular,
-                color: colors.pri,
-              }}
-              onPress={() => {
-                dispatch({type: ACTIONS.NOTES, sort: 'year'});
-                menuRef.current?.hide();
-              }}>
-              By year
-            </MenuItem>
-            <MenuItem
-              textStyle={{
-                fontFamily: WEIGHT.regular,
-                color: colors.pri,
-              }}
-              onPress={() => {
-                dispatch({type: ACTIONS.NOTES, sort: 'month'});
-                menuRef.current?.hide();
-              }}>
-              By month
-            </MenuItem>
-            <MenuItem
-              textStyle={{
-                fontFamily: WEIGHT.regular,
-                color: colors.pri,
-              }}
-              onPress={() => {
-                dispatch({type: ACTIONS.NOTES, sort: 'week'});
-                menuRef.current?.hide();
-              }}>
-              By week
-            </MenuItem>
-          </Menu>
-        ) : null}
+        <HeaderMenu />
       </View>
     </View>
   );
