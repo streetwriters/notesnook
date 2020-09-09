@@ -22,6 +22,7 @@ function App() {
   const initUser = useUserStore((store) => store.init);
   const initNotes = useNotesStore((store) => store.init);
   const openLastSession = useEditorStore((store) => store.openLastSession);
+  const sessionId = useEditorStore((store) => store.session.id);
 
   useEffect(() => {
     refreshColors();
@@ -44,11 +45,9 @@ function App() {
 
   useEffect(() => {
     if (!isMobile()) return;
-    EditorNavigator.onNavigate = (route) => {
-      setShow(!!!route);
-    };
+    setShow(!sessionId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [sessionId]);
 
   useEffect(() => {
     return () => {

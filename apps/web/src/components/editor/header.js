@@ -25,6 +25,7 @@ function Header() {
   const isSaving = useStore((store) => store.session.isSaving);
   const sessionState = useStore((store) => store.session.state);
   const setSession = useStore((store) => store.setSession);
+  const newSession = useStore((store) => store.newSession);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
   const toggleFocusMode = useAppStore((store) => store.toggleFocusMode);
   const toggleProperties = useStore((store) => store.toggleProperties);
@@ -45,7 +46,7 @@ function Header() {
               display: ["block", "none", "none"],
             }}
             size={30}
-            onClick={() => EditorNavigator.navigate(null)}
+            onClick={() => newSession()}
           />
           <TitleBox
             shouldFocus={sessionState === SESSION_STATES.new}
