@@ -58,12 +58,15 @@
   transition: color 300ms linear;
 }
 
-.ql-snow.ql-toolbar button:hover .ql-stroke,
-.ql-snow .ql-toolbar button:hover .ql-stroke,
-.ql-snow.ql-toolbar button:focus .ql-stroke,
-.ql-snow .ql-toolbar button:focus .ql-stroke,
-.ql-snow.ql-toolbar button.ql-active .ql-stroke,
-.ql-snow .ql-toolbar button.ql-active .ql-stroke,
+.ql-snow.ql-toolbar button:hover svg,
+.ql-snow .ql-toolbar button:hover svg,
+.ql-snow.ql-toolbar button:focus svg,
+.ql-snow .ql-toolbar button:focus svg,
+.ql-snow.ql-toolbar button.ql-active svg,
+.ql-snow .ql-toolbar button.ql-active svg {
+  fill: var(--primary) !important;
+}
+
 .ql-snow.ql-toolbar .ql-picker-label:hover .ql-stroke,
 .ql-snow .ql-toolbar .ql-picker-label:hover .ql-stroke,
 .ql-snow.ql-toolbar .ql-picker-label.ql-active .ql-stroke,
