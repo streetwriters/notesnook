@@ -1,12 +1,11 @@
 import React from 'react';
-import {Modal, TouchableOpacity, View, Text, FlatList} from 'react-native';
+import {FlatList, Modal, Text, TouchableOpacity, View} from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import {DDS, getElevation} from '../../utils/utils';
-import {SIZE, WEIGHT, opacity, pv} from '../../common/common';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import NavigationService from '../../services/NavigationService';
+import {opacity, pv, SIZE, WEIGHT} from '../../common/common';
 import {eSendEvent} from '../../services/eventManager';
 import {eCloseSideMenu} from '../../services/events';
+import NavigationService from '../../services/NavigationService';
 import {Button} from '../Button';
 import Seperator from '../Seperator';
 
@@ -14,7 +13,7 @@ class PremiumDialog extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      visible: true,
+      visible: false,
       animated: false,
     };
     this.routeIndex = 0;
