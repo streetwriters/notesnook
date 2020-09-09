@@ -1,16 +1,30 @@
-import { useIsFocused } from '@react-navigation/native';
-import React, { createRef, useEffect, useState } from 'react';
-import { ActivityIndicator, BackHandler, Text, TouchableOpacity, View } from 'react-native';
+import {useIsFocused} from '@react-navigation/native';
+import React, {createRef, useEffect, useState} from 'react';
+import {
+  ActivityIndicator,
+  BackHandler,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import { TextInput } from 'react-native-gesture-handler';
+import {TextInput} from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { opacity, pv, SIZE, WEIGHT } from '../../common/common';
-import { useTracked } from '../../provider';
-import { ACTIONS } from '../../provider/actions';
-import { eSendEvent } from '../../services/eventManager';
-import { eCloseSideMenu, eOpenSideMenu, eSetModalNavigator, eStartSyncer, refreshNotesPage } from '../../services/events';
-import { validatePass, validateUsername } from '../../services/validation';
-import { db, DDS, getElevation, ToastEvent } from '../../utils/utils';
+import {opacity, pv, SIZE, WEIGHT} from '../../common/common';
+import {useTracked} from '../../provider';
+import {ACTIONS} from '../../provider/actions';
+import {eSendEvent} from '../../services/eventManager';
+import {
+  eCloseSideMenu,
+  eOpenSideMenu,
+  eSetModalNavigator,
+  eStartSyncer,
+  refreshNotesPage,
+} from '../../services/events';
+import {validatePass, validateUsername} from '../../services/validation';
+import {db, DDS, getElevation, ToastEvent} from '../../utils/utils';
+import {Button} from '../../components/Button';
+import Seperator from '../../components/Seperator';
 
 export const Login = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
@@ -75,12 +89,10 @@ export const Login = ({route, navigation}) => {
     _pass.current.blur();
     setStatus('Logging in...');
 
-
     try {
       let res = await db.user.login(username.toLowerCase(), password);
-      console.log(res,username,password);
+      console.log(res, username, password);
       if (res) {
-    
         setStatus('Fetching data...');
       }
     } catch (e) {
@@ -225,34 +237,13 @@ export const Login = ({route, navigation}) => {
                 justifyContent: DDS.isTab ? 'center' : 'space-between',
                 width: DDS.isTab ? '80%' : '100%',
                 height: DDS.isTab ? '80%' : null,
-
                 alignSelf: 'center',
               }}>
               <View
                 style={{
                   height: '70%',
+                  paddingHorizontal: 12,
                 }}>
-                <Text
-                  style={{
-                    textAlign: 'right',
-                    marginHorizontal: 12,
-                    fontFamily: WEIGHT.regular,
-
-                    textAlignVertical: 'bottom',
-
-                    position: 'absolute',
-                    right: 5,
-                    top: 2.5,
-                  }}>
-                  {invalidUsername ? (
-                    <Icon
-                      name="alert-circle-outline"
-                      size={SIZE.xs}
-                      color={colors.errorText}
-                    />
-                  ) : null}
-                </Text>
-
                 <TextInput
                   ref={_username}
                   onFocus={() => {
@@ -270,7 +261,6 @@ export const Login = ({route, navigation}) => {
                       setInvalidUsername(true);
                       _username.current.setNativeProps({
                         style: {
-                          color: colors.errorText,
                           borderColor: colors.errorText,
                         },
                       });
@@ -284,14 +274,13 @@ export const Login = ({route, navigation}) => {
                     }
                   }}
                   textContentType="username"
-                  onChangeText={value => {
+                  onChangeText={(value) => {
                     setUsername(value);
 
                     if (invalidUsername && validateUsername(username)) {
                       setInvalidUsername(false);
                       _username.current.setNativeProps({
                         style: {
-                          color: colors.pri,
                           borderColor: colors.accent,
                         },
                       });
@@ -300,18 +289,12 @@ export const Login = ({route, navigation}) => {
                   onSubmitEditing={() => {
                     if (!validateUsername(username)) {
                       setInvalidUsername(true);
-                      _username.current.setNativeProps({
-                        style: {
-                          color: colors.errorText,
-                        },
-                      });
                     }
                   }}
                   style={{
                     padding: pv,
                     borderWidth: 1.5,
                     borderColor: colors.nav,
-                    marginHorizontal: 12,
                     borderRadius: 5,
                     fontSize: SIZE.sm,
                     fontFamily: WEIGHT.regular,
@@ -400,6 +383,23 @@ export const Login = ({route, navigation}) => {
                   placeholder="Email"
                   placeholderTextColor={colors.icon}
                 /> */}
+                {invalidUsername ? (
+                  <Text
+                    style={{
+                      textAlign: 'right',
+                      fontFamily: WEIGHT.regular,
+                      textAlignVertical: 'bottom',
+                      fontSize: SIZE.xs,
+                      marginTop: 2.5,
+                    }}>
+                    <Icon
+                      name="alert-circle-outline"
+                      size={SIZE.xs}
+                      color={colors.errorText}
+                    />{' '}
+                    Username is invalid
+                  </Text>
+                ) : null}
 
                 <View
                   style={{
@@ -407,25 +407,6 @@ export const Login = ({route, navigation}) => {
                     marginTop: 15,
                     justifyContent: 'center',
                   }}>
-                  <Text
-                    style={{
-                      textAlign: 'right',
-                      marginHorizontal: 12,
-                      fontFamily: WEIGHT.regular,
-                      textAlignVertical: 'bottom',
-                      position: 'absolute',
-                      right: 5,
-                      top: 2.5,
-                    }}>
-                    {invalidPassword ? (
-                      <Icon
-                        name="alert-circle-outline"
-                        size={SIZE.xs}
-                        color={colors.errorText}
-                      />
-                    ) : null}
-                  </Text>
-
                   <View
                     ref={_passContainer}
                     style={{
@@ -436,7 +417,6 @@ export const Login = ({route, navigation}) => {
                       justifyContent: 'space-between',
                       alignItems: 'center',
                       paddingHorizontal: 10,
-                      marginHorizontal: 12,
                     }}>
                     <TextInput
                       ref={_pass}
@@ -449,15 +429,10 @@ export const Login = ({route, navigation}) => {
                           });
                         }
                       }}
-                      defaultValue={password}
                       onBlur={() => {
                         if (!validatePass(password) && password?.length > 0) {
                           setInvalidPassword(true);
-                          _pass.current.setNativeProps({
-                            style: {
-                              color: colors.errorText,
-                            },
-                          });
+
                           _passContainer.current?.setNativeProps({
                             style: {
                               borderColor: colors.errorText,
@@ -472,15 +447,12 @@ export const Login = ({route, navigation}) => {
                           });
                         }
                       }}
-                      onChangeText={value => {
+                      onChangeText={(value) => {
                         setPassword(value);
+                        console.log(value, 'VALUE');
                         if (invalidPassword && validatePass(password)) {
                           setInvalidPassword(false);
-                          _pass.current.setNativeProps({
-                            style: {
-                              color: colors.pri,
-                            },
-                          });
+
                           _passContainer.current.setNativeProps({
                             style: {
                               borderColor: colors.accent,
@@ -510,10 +482,9 @@ export const Login = ({route, navigation}) => {
                       placeholder="Password"
                       placeholderTextColor={colors.icon}
                     />
-
                     <Icon
                       name="eye"
-                      size={20}
+                      size={SIZE.md}
                       onPress={() => {
                         setSecureEntry(!secureEntry);
                       }}
@@ -523,28 +494,26 @@ export const Login = ({route, navigation}) => {
                       color={secureEntry ? colors.icon : colors.accent}
                     />
                   </View>
+
+                  {invalidPassword ? (
+                    <Text
+                      style={{
+                        textAlign: 'right',
+                        fontFamily: WEIGHT.regular,
+                        textAlignVertical: 'bottom',
+                        fontSize: SIZE.xs,
+                        marginTop: 2.5,
+                      }}>
+                      <Icon
+                        name="alert-circle-outline"
+                        size={SIZE.xs}
+                        color={colors.errorText}
+                      />{' '}
+                      Password is invalid
+                    </Text>
+                  ) : null}
                 </View>
-                <TouchableOpacity
-                  activeOpacity={opacity}
-                  onPress={_logIn}
-                  style={{
-                    ...getElevation(5),
-                    padding: pv + 2,
-                    backgroundColor: colors.accent,
-                    borderRadius: 5,
-                    marginHorizontal: 12,
-                    marginBottom: 10,
-                    alignItems: 'center',
-                  }}>
-                  <Text
-                    style={{
-                      fontSize: SIZE.md,
-                      fontFamily: WEIGHT.medium,
-                      color: 'white',
-                    }}>
-                    Login
-                  </Text>
-                </TouchableOpacity>
+                <Button title="Login" onPress={_logIn} width="100%" />
               </View>
 
               <View
@@ -555,8 +524,8 @@ export const Login = ({route, navigation}) => {
                 }}>
                 <TouchableOpacity
                   onPress={() => {
-                    navigation.navigate('Signup',{
-                      root:true
+                    navigation.navigate('Signup', {
+                      root: true,
                     });
                   }}
                   activeOpacity={opacity}

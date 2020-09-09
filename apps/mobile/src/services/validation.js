@@ -22,7 +22,7 @@ export function validatePass(password) {
 }
 
 export function validateUsername(username) {
-  let regex = /^[a-z0-9_-]{3,16}$/gim;
+  let regex = /^[a-z0-9_-]{3,200}$/gim;
   if (username && username.length > 0) {
     return regex.test(username);
   } else {

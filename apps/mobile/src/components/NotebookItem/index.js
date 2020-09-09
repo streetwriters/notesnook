@@ -1,13 +1,12 @@
 import React from 'react';
-import {Text, TouchableOpacity, View} from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {ph, pv, SIZE, WEIGHT} from '../../common/common';
-import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
-import NavigationService from '../../services/NavigationService';
-import {db, ToastEvent} from '../../utils/utils';
-import {Button} from '../Button';
-import {ActionSheetEvent, moveNoteHideEvent} from '../DialogManager/recievers';
+import { ph, pv, SIZE, WEIGHT } from '../../common/common';
+import { useTracked } from '../../provider';
+import { ACTIONS } from '../../provider/actions';
+import { db, ToastEvent } from '../../utils/utils';
+import { Button } from '../Button';
+import { ActionSheetEvent, moveNoteHideEvent } from '../DialogManager/recievers';
 import Seperator from '../Seperator';
 
 export const NotebookItem = ({
