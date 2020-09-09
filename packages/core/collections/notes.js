@@ -37,7 +37,7 @@ export default class Notes extends Collection {
     };
 
     if (isNoteEmpty(note)) {
-      if (oldNote) await this.delete(id);
+      if (oldNote) await this.remove(id);
       return;
     }
 
@@ -182,7 +182,18 @@ export default class Notes extends Collection {
     }
   }
 
-  async delete(...ids) {
+  delete(...ids) {
+    return this._delete(true, ...ids);
+  }
+
+  remove(...ids) {
+    return this._delete(false, ...ids);
+  }
+
+  /**
+   * @private
+   */
+  async _delete(moveToTrash = true, ...ids) {
     for (let id of ids) {
       let item = this.note(id);
       if (!item) continue;
@@ -201,7 +212,7 @@ export default class Notes extends Collection {
         await this._db.colors.remove(color, id);
       }
       await this._collection.removeItem(id);
-      await this._db.trash.add(item.data);
+      if (moveToTrash) await this._db.trash.add(item.data);
     }
   }
 
