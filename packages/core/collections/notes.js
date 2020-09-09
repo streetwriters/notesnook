@@ -228,8 +228,21 @@ function isNoteEmpty(note) {
 
   const isTitleEmpty = !title || !title.trim().length;
   const isTextEmpty = !isHex(text) && (!text || !text.trim().length);
-  const isDeltaEmpty = !isHex(delta) && (!delta || !delta.ops);
+  const isDeltaEmpty = !isHex(delta) && _isDeltaEmpty(delta);
   return !locked && isTitleEmpty && isTextEmpty && isDeltaEmpty;
+}
+
+function _isDeltaEmpty(delta) {
+  let obj = delta;
+  if (delta.constructor === Object) obj = delta.ops;
+
+  return (
+    !obj ||
+    obj
+      .map((o) => o.insert)
+      .join("")
+      .trim().length <= 0
+  );
 }
 
 function getNoteHeadline(note) {

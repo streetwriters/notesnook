@@ -84,10 +84,10 @@ test("updating empty note should delete it", () =>
   noteTest().then(async ({ db, id }) => {
     id = await db.notes.add({
       id,
-      title: "\n\n",
+      title: "\n",
       content: {
-        text: "",
-        delta: [],
+        text: "\n",
+        delta: [{ insert: "\n" }],
       },
     });
     expect(id).toBeUndefined();
@@ -109,7 +109,7 @@ test("note with text longer than 150 characters should have ... in the headline"
 test("get favorite notes", () =>
   noteTest({
     favorite: true,
-    content: { delta: "Hello", text: "Hello" },
+    content: { delta: [{ insert: "Hello" }], text: "Hello" },
   }).then(({ db }) => {
     expect(db.notes.favorites.length).toBeGreaterThan(0);
   }));
@@ -117,7 +117,7 @@ test("get favorite notes", () =>
 test("get pinned notes", () =>
   noteTest({
     pinned: true,
-    content: { delta: "Hello", text: "Hello" },
+    content: { delta: [{ insert: "Hello" }], text: "Hello" },
   }).then(({ db }) => {
     expect(db.notes.pinned.length).toBeGreaterThan(0);
   }));

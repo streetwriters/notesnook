@@ -7,7 +7,7 @@ import {
   TEST_NOTE,
   TEST_NOTEBOOK,
   notebookTest,
-  TEST_NOTEBOOK2
+  TEST_NOTEBOOK2,
 } from "./utils";
 
 beforeEach(async () => {
@@ -17,7 +17,7 @@ beforeEach(async () => {
 //TODO
 test("search notes", () =>
   noteTest({
-    content: { delta: "5", text: "5" }
+    content: { delta: [{ insert: "5" }], text: "5" },
   }).then(async ({ db }) => {
     await db.notes.add(TEST_NOTE);
     let filtered = await db.lookup.notes(db.notes.all, "5");
