@@ -7319,7 +7319,7 @@ normalize-url@^3.0.0, normalize-url@^3.0.1:
 
 "notes-core@git+ssh://git@github.com:streetwriters/notesnook-core.git":
   version "1.5.0"
-  resolved "git+ssh://git@github.com:streetwriters/notesnook-core.git#9e4abf6e98d98183bada040f9279989959f1bd14"
+  resolved "git+ssh://git@github.com:streetwriters/notesnook-core.git#85b016c0756aaeeab9487de9068027edd40a075d"
   dependencies:
     crypto-random-string "^3.2.0"
     event-source-polyfill "^1.0.16"

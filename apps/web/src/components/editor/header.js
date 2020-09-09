@@ -64,9 +64,8 @@ function Header() {
           sx={{
             display: "flex",
             alignItems: "center",
-            marginTop: dateEdited || text.length || id.length ? 0 : [0, 2, 2],
-            marginBottom:
-              dateEdited || text.length || id.length ? [1, 2, 2] : 0,
+            marginTop: dateEdited || text?.length || id ? 0 : [0, 2, 2],
+            marginBottom: dateEdited || text?.length || id ? [1, 2, 2] : 0,
           }}
         >
           {dateEdited > 0 ? (
@@ -81,7 +80,7 @@ function Header() {
               <TextSeperator />
             </>
           ) : null}
-          {id && id.length > 0 ? <>{isSaving ? "Saving" : "Saved"}</> : null}
+          {id ? <>{isSaving ? "Saving" : "Saved"}</> : null}
         </Text>
       </Flex>
       <Flex

@@ -286,7 +286,7 @@ class MarkdownShortcuts {
     if (!selection) return;
     const [line, offset] = this.quill.getLine(selection.index);
     const lineStart = selection.index - offset;
-    const rawText = this.quill.getText(lineStart, selection.index - lineStart);
+    //const rawText = this.quill.getText(lineStart, selection.index - lineStart);
 
     // formulas count as a single character for insertion/deletion
     // purposes, yet they don't show up the output of getText.

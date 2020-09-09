@@ -4,27 +4,30 @@ import { Flex, Box } from "rebass";
 import ThemeProvider from "./components/theme-provider";
 import { usePersistentState } from "./utils/hooks";
 import { useStore } from "./stores/app-store";
-import { useStore as useAppStore } from "./stores/app-store";
 import { useStore as useEditorStore } from "./stores/editor-store";
 import { useStore as useUserStore } from "./stores/user-store";
+import { useStore as useNotesStore } from "./stores/note-store";
 import Animated from "./components/animated";
 import NavigationMenu from "./components/navigationmenu";
 import NavigationContainer from "./navigation/container";
 import RootNavigator from "./navigation/navigators/rootnavigator";
 import EditorNavigator from "./navigation/navigators/editornavigator";
 import { isMobile } from "./utils/dimensions";
+import { db } from "./common";
 
 function App() {
   const [show, setShow] = usePersistentState("isContainerVisible", true);
   const refreshColors = useStore((store) => store.refreshColors);
-  const isFocusMode = useAppStore((store) => store.isFocusMode);
+  const isFocusMode = useStore((store) => store.isFocusMode);
   const initUser = useUserStore((store) => store.init);
+  const initNotes = useNotesStore((store) => store.init);
   const openLastSession = useEditorStore((store) => store.openLastSession);
 
   useEffect(() => {
     refreshColors();
     initUser();
-  }, [refreshColors, initUser]);
+    initNotes();
+  }, [refreshColors, initUser, initNotes]);
 
   useEffect(() => {
     if (isFocusMode) {
@@ -45,6 +48,12 @@ function App() {
       setShow(!!!route);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      db.ev.unsubscribeAll();
+    };
   }, []);
 
   return (

@@ -13,6 +13,15 @@ class NoteStore extends BaseStore {
   context = undefined;
   selectedNote = 0;
 
+  init = () => {
+    db.ev.subscribe("notes:removeEmptyNote", (id) => {
+      const { session, newSession } = editorStore.get();
+      if (session.id === id) {
+        newSession();
+      }
+    });
+  };
+
   setSelectedNote = (id) => {
     this.set((state) => (state.selectedNote = id));
   };
