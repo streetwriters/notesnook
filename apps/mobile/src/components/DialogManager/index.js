@@ -265,6 +265,7 @@ export class DialogManager extends Component {
     }
     this.show = null;
   };
+  
 
   render() {
     let {colors} = this.props;

@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { TouchableOpacity, View } from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { SIZE } from '../../common/common';
-import { useTracked } from '../../provider';
-import { ACTIONS } from '../../provider/actions';
-import { db, getElevation, ToastEvent } from '../../utils/utils';
-import { PressableButton } from '../PressableButton';
+import {SIZE} from '../../common/common';
+import {useTracked} from '../../provider';
+import {ACTIONS} from '../../provider/actions';
+import {db, getElevation, ToastEvent} from '../../utils/utils';
+import {PressableButton} from '../PressableButton';
 
 const SelectionWrapper = ({
   children,

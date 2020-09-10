@@ -1,19 +1,18 @@
 import React, {createRef, useEffect, useState} from 'react';
 import {
+  ActivityIndicator,
   Dimensions,
   StatusBar,
   Text,
   TextInput,
   TouchableOpacity,
   View,
-  KeyboardAvoidingView,
-  ActivityIndicator,
 } from 'react-native';
-
 import Share from 'react-native-share';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
   ACCENT,
+  COLORS_NOTE,
   COLOR_SCHEME,
   COLOR_SCHEME_DARK,
   COLOR_SCHEME_LIGHT,
@@ -23,27 +22,22 @@ import {
   setColorScheme,
   SIZE,
   WEIGHT,
-  COLORS_NOTE,
 } from '../../common/common';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
+import {eSendEvent, openVault} from '../../services/eventManager';
+import {refreshNotesPage} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
+import {MMKV} from '../../utils/storage';
 import {
-  timeConverter,
-  ToastEvent,
-  DDS,
   db,
+  DDS,
   hexToRGBA,
   RGB_Linear_Shade,
+  timeConverter,
+  ToastEvent,
 } from '../../utils/utils';
-import {openVault, eSendEvent} from '../../services/eventManager';
-import {
-  refreshNotesPage,
-  eOpenPremiumDialog,
-  eOpenExportDialog,
-} from '../../services/events';
 import {PremiumTag} from '../Premium/PremiumTag';
-import {MMKV} from '../../utils/storage';
 import {PressableButton} from '../PressableButton';
 
 const w = Dimensions.get('window').width;

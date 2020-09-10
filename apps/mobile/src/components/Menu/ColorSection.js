@@ -1,12 +1,12 @@
-import React, { useEffect } from 'react';
-import { Text, View } from 'react-native';
-import { COLORS_NOTE, pv, SIZE } from '../../common/common';
-import { useTracked } from '../../provider';
-import { ACTIONS } from '../../provider/actions';
-import { eSendEvent } from '../../services/eventManager';
-import { refreshNotesPage } from '../../services/events';
+import React, {useEffect} from 'react';
+import {Text, View} from 'react-native';
+import {COLORS_NOTE, pv, SIZE} from '../../common/common';
+import {useTracked} from '../../provider';
+import {ACTIONS} from '../../provider/actions';
+import {eSendEvent} from '../../services/eventManager';
+import {refreshNotesPage} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
-import { PressableButton } from '../PressableButton';
+import {PressableButton} from '../PressableButton';
 
 export const ColorSection = ({noTextMode}) => {
   const [state, dispatch] = useTracked();
