@@ -23,11 +23,19 @@ import {
   setColorScheme,
   SIZE,
   WEIGHT,
+  COLORS_NOTE,
 } from '../../common/common';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import NavigationService from '../../services/NavigationService';
-import {timeConverter, ToastEvent, DDS, db} from '../../utils/utils';
+import {
+  timeConverter,
+  ToastEvent,
+  DDS,
+  db,
+  hexToRGBA,
+  RGB_Linear_Shade,
+} from '../../utils/utils';
 import {openVault, eSendEvent} from '../../services/eventManager';
 import {
   refreshNotesPage,
@@ -36,6 +44,7 @@ import {
 } from '../../services/events';
 import {PremiumTag} from '../Premium/PremiumTag';
 import {MMKV} from '../../utils/storage';
+import {PressableButton} from '../PressableButton';
 
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
@@ -433,41 +442,47 @@ export const ActionSheetComponent = ({
     </TouchableOpacity>
   );
 
-  const _renderColor = (color) => (
-    <TouchableOpacity
-      key={color}
-      onPress={async () => {
-        let noteColors = note.colors;
+  const _renderColor = (c) => {
+    console.log(COLORS_NOTE[c]);
+    const color = {
+      name: c,
+      value: COLORS_NOTE[c],
+    };
 
-        if (noteColors.includes(color)) {
-          await db.notes.note(note.id).uncolor(color);
-        } else {
-          await db.notes.note(note.id).color(color);
-        }
-        dispatch({type: ACTIONS.COLORS});
-        localRefresh(note.type);
-      }}
-      style={{
-        flexDirection: 'row',
-        justifyContent: 'flex-start',
-        alignItems: 'center',
-        borderColor: colors.nav,
-      }}>
-      <View
-        style={{
+    return (
+      <PressableButton
+        color={RGB_Linear_Shade(
+          !colors.night ? -0.2 : 0.2,
+          hexToRGBA(color.value, 1),
+        )}
+        selectedColor={color.value}
+        alpha={!colors.night ? -0.1 : 0.1}
+        opacity={1}
+        key={color.value}
+        onPress={async () => {
+          let noteColors = note.colors;
+
+          if (noteColors.includes(color.name)) {
+            await db.notes.note(note.id).uncolor(color.name);
+          } else {
+            await db.notes.note(note.id).color(color.name);
+          }
+          dispatch({type: ACTIONS.COLORS});
+          localRefresh(note.type);
+        }}
+        customStyle={{
           width: DDS.isTab ? 400 / 10 : w / 10,
           height: DDS.isTab ? 400 / 10 : w / 10,
-          backgroundColor: color,
           borderRadius: 100,
           justifyContent: 'center',
           alignItems: 'center',
         }}>
-        {note && note.colors && note.colors.includes(color) ? (
+        {note && note.colors && note.colors.includes(color.name) ? (
           <Icon name="check" color="white" size={SIZE.lg} />
         ) : null}
-      </View>
-    </TouchableOpacity>
-  );
+      </PressableButton>
+    );
+  };
 
   const _renderRowItem = (rowItem) =>
     rowItems.includes(rowItem.name) ? (
@@ -778,9 +793,7 @@ export const ActionSheetComponent = ({
             alignItems: 'center',
             justifyContent: 'space-between',
           }}>
-          {['red', 'yellow', 'green', 'blue', 'purple', 'orange', 'gray'].map(
-            _renderColor,
-          )}
+          {Object.keys(COLORS_NOTE).map(_renderColor)}
         </View>
       ) : null}
 

@@ -72,6 +72,17 @@ let adjustedHeight = windowSize.height * PixelRatio.get();
 const pixelDensity = PixelRatio.get();
 
 
+export const COLORS_NOTE = {
+  red: "#f44336",
+  orange: "#FF9800",
+  yellow: "#FFD600",
+  green: "#4CAF50",
+  blue: "#2196F3",
+  purple: "#673AB7",
+  gray: "#9E9E9E",
+};
+
+
 
 const getDeviceSize = () => {
   let dpi = getDpi(pixelDensity);

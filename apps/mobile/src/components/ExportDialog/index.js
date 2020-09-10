@@ -26,7 +26,7 @@ import Seperator from '../Seperator';
 const ExportDialog = () => {
   const [state, dispatch] = useTracked();
   const {colors, tags, premiumUser} = state;
-  const [visible, setVisible] = useState(true);
+  const [visible, setVisible] = useState(false);
   const [notes, setNotes] = useState([]);
   const [exporting, setExporting] = useState(false);
   const [complete, setComplete] = useState(false);

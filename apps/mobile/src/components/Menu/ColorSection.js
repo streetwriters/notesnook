@@ -1,11 +1,12 @@
-import React, {useEffect} from 'react';
-import {Text, TouchableOpacity, View} from 'react-native';
-import {opacity, pv, SIZE} from '../../common/common';
-import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
-import {eSendEvent} from '../../services/eventManager';
-import {refreshNotesPage} from '../../services/events';
+import React, { useEffect } from 'react';
+import { Text, View } from 'react-native';
+import { COLORS_NOTE, pv, SIZE } from '../../common/common';
+import { useTracked } from '../../provider';
+import { ACTIONS } from '../../provider/actions';
+import { eSendEvent } from '../../services/eventManager';
+import { refreshNotesPage } from '../../services/events';
 import NavigationService from '../../services/NavigationService';
+import { PressableButton } from '../PressableButton';
 
 export const ColorSection = ({noTextMode}) => {
   const [state, dispatch] = useTracked();
@@ -21,10 +22,18 @@ export const ColorSection = ({noTextMode}) => {
         width: '100%',
         paddingHorizontal: 10,
       }}>
-      {colorNotes.map(item => (
-        <TouchableOpacity
+      {colorNotes.map((item) => (
+        <PressableButton
           key={item.id}
-          activeOpacity={opacity / 2}
+          onPress={_onPress}
+          color={
+            currentScreen === item.name.toLowerCase()
+              ? colors.shade
+              : 'transparent'
+          }
+          selectedColor={colors.accent}
+          alpha={!colors.night ? -0.02 : 0.02}
+          opacity={0.12}
           onPress={() => {
             let params = {
               type: 'color',
@@ -71,7 +80,7 @@ export const ColorSection = ({noTextMode}) => {
               style={{
                 width: SIZE.md,
                 height: SIZE.md,
-                backgroundColor: item.title,
+                backgroundColor: COLORS_NOTE[item.title],
                 borderRadius: 100,
                 justifyContent: 'center',
                 marginRight: 10,
@@ -105,7 +114,7 @@ export const ColorSection = ({noTextMode}) => {
               </Text>
             </View>
           )}
-        </TouchableOpacity>
+        </PressableButton>
       ))}
     </View>
   );

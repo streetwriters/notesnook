@@ -37,7 +37,7 @@ import NavigationService from '../../services/NavigationService';
 import {db, DDS, setSetting, ToastEvent, w, RGB_Linear_Shade, hexToRGBA} from '../../utils/utils';
 import {MMKV} from '../../utils/storage';
 import {PressableButton} from '../../components/PressableButton';
-
+  
 export const Settings = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors, user, settings} = state;
@@ -530,14 +530,11 @@ export const Settings = ({route, navigation}) => {
                 justifyContent: 'center',
                 alignItems: 'center',
               }}>
-              <View
-                style={{
-                
-                }}>
+             
                 {colors.accent === item ? (
                   <Icon size={SIZE.lg} color="white" name="check" />
                 ) : null}
-              </View>
+            
             </PressableButton>
           ))}
         </View>
