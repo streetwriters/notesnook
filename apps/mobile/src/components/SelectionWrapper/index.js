@@ -40,11 +40,11 @@ const SelectionWrapper = ({
     let func = async () => {
       if (!item.id) return;
       if (item.type === 'note') {
-        await db.notes.note(note.id).pin();
+        await db.notes.note(item.id).pin();
         dispatch({type: ACTIONS.PINNED});
         dispatch({type: ACTIONS.NOTES});
       } else {
-        await db.notebooks.notebook(note.id).pin();
+        await db.notebooks.notebook(item.id).pin();
         dispatch({type: ACTIONS.PINNED});
         dispatch({type: ACTIONS.NOTEBOOKS});
       }
