@@ -9,19 +9,24 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {SIZE} from '../../common/common';
 const {spring, timing} = Animated;
 
+const toastMessages = [];
 export const Toast = ({context = 'global'}) => {
   const [state, dispatch] = useTracked();
   const colors = state.colors;
   const [keyboard, setKeyboard] = useState(false);
-  const [data, setData] = useState([]);
+  const [data, setData] = useState({});
   const [toastStyle, setToastStyle] = useState({
     backgroundColor: colors.errorBg,
     color: colors.errorText,
   });
 
   let toastTranslate = useValue(300);
+  let toastOpacity = useValue(1);
 
   const showToastFunc = (data) => {
+    toastMessages.push(data);
+    console.log(data, toastMessages.length);
+    if (toastMessages?.length > 1) return;
     setData(data);
     if (data.type === 'success') {
       setToastStyle({
@@ -42,28 +47,60 @@ export const Toast = ({context = 'global'}) => {
     }, 100);
 
     setTimeout(() => {
+      hideToastFunc();
+    }, data.duration);
+  };
+
+  const showNext = (data) => {
+    setData(data);
+    if (data.type === 'success') {
+      setToastStyle({
+        color: colors.successText,
+      });
+    } else {
+      setToastStyle({
+        color: colors.errorText,
+      });
+    }
+    setTimeout(() => {
+      hideToastFunc();
+    }, toastMessages[0].duration);
+  };
+
+  const hideToastFunc = (data) => {
+    console.log(toastMessages.length);
+    if (toastMessages.length > 1) {
+      toastMessages.shift();
+
+      timing(toastOpacity, {
+        toValue: 0,
+        duration: 300,
+        easing: Easing.in(Easing.ease),
+      }).start(() => {
+        showNext(toastMessages[0]);
+        timing(toastOpacity, {
+          toValue: 1,
+          duration: 300,
+          easing: Easing.in(Easing.ease),
+        }).start();
+      });
+    } else {
       timing(toastTranslate, {
         toValue: 300,
         duration: 200,
         easing: Easing.inOut(Easing.ease),
-      }).start();
-    }, data.duration);
-  };
-
-  const hideToastFunc = (data) => {
-    timing(toastTranslate, {
-      toValue: 300,
-      duration: 200,
-      easing: Easing.inOut(Easing.ease),
-    }).start();
+      }).start(() => {
+        setData({});
+      });
+    }
   };
 
   const _onKeyboardShow = () => {
-    setKeyboard(true);
+    //setKeyboard(true);
   };
 
   const _onKeyboardHide = () => {
-    setKeyboard(false);
+    //setKeyboard(false);
   };
 
   useEffect(() => {
@@ -91,6 +128,7 @@ export const Toast = ({context = 'global'}) => {
         position: 'absolute',
         zIndex: 999,
         elevation: 15,
+        opacity: toastOpacity,
         transform: [
           {
             translateY: toastTranslate,
@@ -138,6 +176,9 @@ export const Toast = ({context = 'global'}) => {
           </View>
 
           <Text
+            onPress={() => {
+              hideToastFunc();
+            }}
             style={{
               color: 'white',
               backgroundColor: 'transparent',

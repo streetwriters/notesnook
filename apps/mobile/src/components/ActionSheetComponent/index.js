@@ -272,7 +272,7 @@ export const ActionSheetComponent = ({
       name: 'Restore',
       icon: 'delete-restore',
       func: async () => {
-        await db.trash.restore(note.id);
+        console.log(await db.trash.restore(note.id),"RESULT");
         dispatch({type: ACTIONS.TRASH});
         localRefresh(note.type);
         ToastEvent.show(

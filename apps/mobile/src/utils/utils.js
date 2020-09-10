@@ -80,7 +80,7 @@ export const h = Dimensions.get('window').height;
 export const ToastEvent = {
   show: (
     message,
-    type,
+    type = "error",
     context = 'global',
     duration = 6000,
     func = null,
@@ -97,7 +97,7 @@ export const ToastEvent = {
   },
   hide: (
     message,
-    type,
+    type = "error",
     context = 'global',
     duration = 6000,
     func = null,
