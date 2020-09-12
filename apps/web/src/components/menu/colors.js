@@ -28,6 +28,7 @@ function Colors(props) {
               sx={{
                 position: "absolute",
                 left: "5px",
+                top: "4px",
                 cursor: "pointer",
               }}
               color="static"
