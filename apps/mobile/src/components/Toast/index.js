@@ -68,7 +68,6 @@ export const Toast = ({context = 'global'}) => {
   };
 
   const hideToastFunc = (data) => {
-    console.log(toastMessages.length);
     if (toastMessages.length > 1) {
       toastMessages.shift();
 
@@ -90,6 +89,7 @@ export const Toast = ({context = 'global'}) => {
         duration: 200,
         easing: Easing.inOut(Easing.ease),
       }).start(() => {
+        toastMessages.shift();
         setData({});
       });
     }
