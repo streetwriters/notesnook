@@ -9,11 +9,11 @@ import { useStore as useUserStore } from "./stores/user-store";
 import { useStore as useNotesStore } from "./stores/note-store";
 import Animated from "./components/animated";
 import NavigationMenu from "./components/navigationmenu";
-import NavigationContainer from "./navigation/container";
-import RootNavigator from "./navigation/navigators/rootnavigator";
-import EditorNavigator from "./navigation/navigators/editornavigator";
 import { isMobile } from "./utils/dimensions";
 import { db } from "./common";
+import { useRoutes } from "hookrouter";
+import routes from "./navigation/routes";
+import Editor from "./components/editor";
 
 function App() {
   const [show, setShow] = usePersistentState("isContainerVisible", true);
@@ -23,6 +23,7 @@ function App() {
   const initNotes = useNotesStore((store) => store.init);
   const openLastSession = useEditorStore((store) => store.openLastSession);
   const sessionId = useEditorStore((store) => store.session.id);
+  const routeResult = useRoutes(routes);
 
   useEffect(() => {
     refreshColors();
@@ -58,7 +59,9 @@ function App() {
   return (
     <ThemeProvider>
       <Flex id="app" bg="background" height="100%">
-        <NavigationMenu toggleNavigationContainer={() => setShow(!show)} />
+        <NavigationMenu
+          toggleNavigationContainer={(state) => setShow(state || !show)}
+        />
         <Flex variant="rowFill">
           <Animated.Flex
             variant="columnFill"
@@ -75,13 +78,10 @@ function App() {
               borderColor: "border",
             }}
           >
-            <NavigationContainer
-              navigator={RootNavigator}
-              variant="columnFill"
-            />
+            {routeResult}
           </Animated.Flex>
           <Flex width={[show ? 0 : "100%", 0, "100%"]}>
-            <NavigationContainer navigator={EditorNavigator} />
+            <Editor />
           </Flex>
         </Flex>
         <Box id="dialogContainer" />

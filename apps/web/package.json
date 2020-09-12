@@ -9,6 +9,7 @@
     "emotion-theming": "^10.0.19",
     "fast-sort": "^2.1.1",
     "framer-motion": "^1.10.3",
+    "hookrouter": "^1.2.3",
     "immer": "^6.0.3",
     "libsodium-wrappers": "^0.7.6",
     "localforage": "^1.7.3",
@@ -28,6 +29,7 @@
     "zustand": "^2.2.3"
   },
   "devDependencies": {
+    "@types/hookrouter": "^2.2.3",
     "babel-eslint": "^10.1.0",
     "babel-loader": "8.1.0",
     "eslint": "^6.8.0",

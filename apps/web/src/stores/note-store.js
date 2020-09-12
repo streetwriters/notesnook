@@ -3,6 +3,7 @@ import createStore from "../common/store";
 import { store as editorStore } from "./editor-store";
 import Vault from "../common/vault";
 import BaseStore from ".";
+import { navigate } from "hookrouter";
 
 class NoteStore extends BaseStore {
   notes = {
@@ -13,13 +14,25 @@ class NoteStore extends BaseStore {
   context = undefined;
   selectedNote = 0;
 
-  init = () => {
+  init = async () => {
     db.ev.subscribe("notes:removeEmptyNote", (id) => {
       const { session, newSession } = editorStore.get();
       if (session.id === id) {
         newSession();
       }
     });
+
+    /* const note = db.notes.note("b2ce3a6053afab9cb1d8012d").data;
+    const delta = await db.delta.raw(note.content.delta);
+
+    const note2 = db.notes.note("b2f68f306c560dab97aa196a").data;
+    const delta2 = await db.delta.raw(note2.content.delta);
+
+    const delta3 = { ...delta, conflicted: delta2 };
+
+    await db.delta.add(delta3);
+    await db.notes.add({ id: note.id, conflicted: true, resolved: false });
+    console.log(delta3); */
   };
 
   setSelectedNote = (id) => {
@@ -45,11 +58,12 @@ class NoteStore extends BaseStore {
         break;
       case "color":
         notes = db.notes.colored(context.value);
+        if (!notes.length) return navigate("/");
         break;
       case "topic":
-        notes = db.notebooks
-          .notebook(context.value.id)
-          .topics.topic(context.value.topic).all;
+        const notebook = db.notebooks.notebook(context.value.id);
+        const topic = notebook.topics.topic(context.value.topic);
+        notes = topic.all;
         break;
       case "favorites":
         notes = db.notes.favorites;

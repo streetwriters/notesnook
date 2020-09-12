@@ -4,6 +4,9 @@ import ListContainer from "../components/list-container";
 import ListItem from "../components/list-item";
 import { useStore, store } from "../stores/tag-store";
 import TagsPlaceholder from "../components/placeholders/tags-placeholder";
+import Notes from "./notes";
+import { useRoutes, navigate } from "hookrouter";
+import RouteContainer from "../components/route-container";
 
 function TagNode({ title }) {
   return (
@@ -16,11 +19,28 @@ function TagNode({ title }) {
   );
 }
 
-function Tags(props) {
+const routes = {
+  "/": () => <RouteContainer title="Tags" route={<Tags />} />,
+  "/:tag": ({ tag }) => (
+    <RouteContainer
+      type="notes"
+      title={`#${tag}`}
+      route={<Notes type="notes" context={{ type: "tag", value: tag }} />}
+    />
+  ),
+};
+
+function TagsContainer() {
+  const routeResult = useRoutes(routes);
+  return routeResult;
+}
+
+function Tags() {
   const tags = useStore((store) => store.tags);
   useEffect(() => {
     store.refresh();
   }, []);
+
   return (
     <ListContainer
       type="tags"
@@ -35,10 +55,7 @@ function Tags(props) {
             title={<TagNode title={title} />}
             info={`${noteIds.length} notes`}
             onClick={() => {
-              props.navigator.navigate("notes", {
-                title: "#" + title,
-                context: { type: "tag", value: title },
-              });
+              navigate(`/tags/${title}`);
             }}
           />
         );
@@ -48,4 +65,4 @@ function Tags(props) {
   );
 }
 
-export default Tags;
+export default TagsContainer;

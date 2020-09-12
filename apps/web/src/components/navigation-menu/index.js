@@ -1,35 +1,60 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import { Flex } from "rebass";
-import RootNavigator, {
-  bottomRoutes,
-  routes,
-} from "../../navigation/navigators/rootnavigator";
-import { usePersistentState } from "../../utils/hooks";
-import { useStore } from "../../stores/app-store";
-import { COLORS } from "../../common";
-import { toTitleCase } from "../../utils/string";
-import * as Icon from "../icons";
 import { useStore as useAppStore } from "../../stores/app-store";
+import * as Icon from "../icons";
+import { useStore as useUserStore } from "../../stores/user-store";
+import { useStore as useThemeStore } from "../../stores/theme-store";
 import Animated from "../animated";
-import NavItem from "../navitem";
-import { objectMap } from "../../utils/object";
+import NavigationItem from "./navigation-item";
 import { isMobile } from "../../utils/dimensions";
+import { navigate } from "hookrouter";
+import { toTitleCase } from "../../utils/string";
+import { COLORS } from "../../common";
+import { showLogInDialog } from "../dialogs/logindialog";
+import { usePath } from "hookrouter";
+
+const routes = [
+  { title: "Home", path: "/", icon: Icon.Home },
+  {
+    title: "Notebooks",
+    path: "/notebooks",
+    icon: Icon.Notebook,
+  },
+  {
+    title: "Favorites",
+    path: "/favorites",
+    icon: Icon.StarOutline,
+  },
+  { title: "Trash", path: "/trash", icon: Icon.Trash },
+  { title: "Tags", path: "/tags", icon: Icon.Tag },
+];
+
+const bottomRoutes = [
+  {
+    title: "Settings",
+    path: "/settings",
+    icon: Icon.Settings,
+  },
+];
 
 function NavigationMenu(props) {
   const { toggleNavigationContainer } = props;
-  const [selectedRoute, setSelectedRoute] = usePersistentState("route", "home");
+  const path = usePath(false);
+  const [selectedRoute, setSelectedRoute] = useState(path);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
-  const colors = useStore((store) => store.colors);
-  const isSideMenuOpen = useStore((store) => store.isSideMenuOpen);
-  const toggleSideMenu = useStore((store) => store.toggleSideMenu);
+  const colors = useAppStore((store) => store.colors);
+  const isSideMenuOpen = useAppStore((store) => store.isSideMenuOpen);
+  const toggleSideMenu = useAppStore((store) => store.toggleSideMenu);
+  const isSyncing = useUserStore((store) => store.isSyncing);
+  const isLoggedIn = useUserStore((store) => store.isLoggedIn);
+  const logout = useUserStore((store) => store.logout);
+  const theme = useThemeStore((store) => store.theme);
+  const toggleNightMode = useThemeStore((store) => store.toggleNightMode);
 
   useEffect(() => {
-    RootNavigator.onNavigate = (route) => {
-      setSelectedRoute(route.key);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    setSelectedRoute(path);
+  }, [path]);
 
   return (
     <Animated.Flex
@@ -77,58 +102,77 @@ function NavigationMenu(props) {
           msOverflowStyle: "none",
         }}
       >
-        {objectMap(routes, (_, item) => (
-          <NavItem
-            key={item.key}
-            item={item}
-            selected={selectedRoute === item.key}
-            onSelected={() => {
-              if (selectedRoute === item.key) toggleNavigationContainer();
-              else if (RootNavigator.navigate(item.key))
-                setSelectedRoute(item.key);
+        {routes.map((item) => (
+          <NavigationItem
+            key={item.path}
+            title={item.title}
+            icon={item.icon}
+            selected={selectedRoute === item.path}
+            onClick={() => {
+              setSelectedRoute(item.path);
+              if (selectedRoute === item.path)
+                return toggleNavigationContainer();
+              toggleNavigationContainer(true);
+              navigate(item.path);
             }}
           />
         ))}
-        {colors.map((color) => {
-          return (
-            <NavItem
-              onSelected={async () => {
-                setSelectedRoute(undefined);
-                RootNavigator.navigate(
-                  "color",
-                  {
-                    title: toTitleCase(color.title),
-                    context: {
-                      type: "color",
-                      value: color.title,
-                    },
-                  },
-                  true
-                );
-              }}
-              key={color.title}
-              item={{
-                color: COLORS[color.title],
-                title: toTitleCase(color.title),
-                icon: Icon.Circle,
-                count: color.noteIds.length,
-              }}
-            />
-          );
-        })}
+        {colors.map((color) => (
+          <NavigationItem
+            key={color.title}
+            title={toTitleCase(color.title)}
+            icon={Icon.Circle}
+            color={COLORS[color.title]}
+            onClick={() => {
+              navigate(`/colors/${color.title}`);
+            }}
+          />
+        ))}
       </Flex>
       <Flex flexDirection="column">
-        {Object.values(bottomRoutes).map((item) => (
-          <NavItem
-            onSelected={async () => {
-              const shouldSelect = item.onClick
-                ? await item.onClick()
-                : item.component && RootNavigator.navigate(item.key);
-              if (shouldSelect) setSelectedRoute(item.key);
+        {theme === "light" ? (
+          <NavigationItem
+            title="Enable dark mode"
+            icon={Icon.DarkMode}
+            onClick={toggleNightMode}
+          />
+        ) : (
+          <NavigationItem
+            title="Enable light mode"
+            icon={Icon.LightMode}
+            onClick={toggleNightMode}
+          />
+        )}
+        {isLoggedIn ? (
+          <>
+            <NavigationItem
+              title="Sync"
+              isLoading={isSyncing}
+              icon={Icon.Sync}
+            />
+            <NavigationItem
+              title="Logout"
+              icon={Icon.Logout}
+              onClick={logout}
+            />
+          </>
+        ) : (
+          <NavigationItem
+            title="Login"
+            icon={Icon.Login}
+            onClick={showLogInDialog}
+          />
+        )}
+        {bottomRoutes.map((item) => (
+          <NavigationItem
+            key={item.path}
+            title={item.title}
+            icon={item.icon}
+            onClick={() => {
+              navigate(item.path);
+              setSelectedRoute(item.key);
             }}
-            key={item.key}
-            item={item}
-            selected={selectedRoute === item.key}
+            selected={selectedRoute === item.path}
           />
         ))}
       </Flex>

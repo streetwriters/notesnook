@@ -53,7 +53,8 @@ export const MoreVertical = createIcon(Icons.mdiDotsVertical);
 export const Trash = createIcon(Icons.mdiTrashCanOutline);
 export const Search = createIcon(Icons.mdiMagnify);
 export const Menu = createIcon(Icons.mdiMenu);
-export const Login = createIcon(Icons.mdiLogin);
+export const Login = createIcon(Icons.mdiLoginVariant);
+export const Logout = createIcon(Icons.mdiLogoutVariant);
 export const FocusMode = createIcon(Icons.mdiFullscreen);
 export const NormalMode = createIcon(Icons.mdiFullscreenExit);
 export const Settings = createIcon(Icons.mdiCogOutline);
@@ -66,12 +67,14 @@ export const Export = createIcon(Icons.mdiExport);
 /** Properties Icons */
 export const ChevronLeft = createIcon(Icons.mdiChevronLeft);
 export const Close = createIcon(Icons.mdiClose);
-export const Tag = createIcon(Icons.mdiTagOutline);
+export const Tag = createIcon(Icons.mdiTagTextOutline);
 export const Pin = createIcon(Icons.mdiPinOutline);
 export const PinFilled = createIcon(Icons.mdiPin);
 
 /** Settings Icons */
 export const User = createIcon(Icons.mdiAccountOutline);
+export const DarkMode = createIcon(Icons.mdiWeatherNight);
+export const LightMode = createIcon(Icons.mdiWeatherSunny);
 export const Theme = createIcon(Icons.mdiThemeLightDark);
 export const Checkmark = createIcon(Icons.mdiCheck);
 

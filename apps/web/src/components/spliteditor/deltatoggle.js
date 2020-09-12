@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { Flex, Text, Button } from "rebass";
 import { timeConverter } from "../../utils/time";
 import DeltaTransformer from "quill/core/delta";
-import { useStore } from "../../stores/mergestore";
+import { store as notestore } from "../../stores/note-store";
+import { db } from "../../common";
+import { setHashParam } from "../../utils/useHashParam";
 
 const deltaTransformer = new DeltaTransformer();
 
@@ -16,8 +18,39 @@ function DeltaToggle(props) {
     label,
     dateEdited,
     editors,
+    note,
   } = props;
-  const resolveConflict = useStore((store) => store.resolveConflict);
+
+  const resolveConflict = useCallback(
+    async (selectedContent, otherContent) => {
+      selectedContent.delta = {
+        data: { ops: selectedContent.delta },
+        resolved: true,
+      };
+      await db.notes.add({
+        id: note.id,
+        content: selectedContent,
+        conflicted: false,
+      });
+      if (otherContent) {
+        otherContent.delta = {
+          data: { ops: otherContent.delta },
+        };
+        await db.notes.add({
+          ...note,
+          content: otherContent,
+          id: undefined,
+          dateCreated: undefined,
+          dateEdited: undefined,
+          conflicted: false,
+          title: note.title + " (DUPLICATE)",
+        });
+      }
+      notestore.refresh();
+      setHashParam({ note: note.id });
+    },
+    [note]
+  );
 
   return (
     <Flex flexDirection="column" sx={sx}>

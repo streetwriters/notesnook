@@ -1,19 +1,41 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Flex, Box, Text } from "rebass";
 import SimpleEditor from "./simpleeditor";
 import DeltaTransformer from "quill/core/delta";
 import DeltaToggle from "./deltatoggle";
-import { useStore } from "../../stores/mergestore";
+import { store as notesStore } from "../../stores/note-store";
+import { db } from "../../common";
+import { setHashParam } from "../../utils/useHashParam";
 
 const deltaTransformer = new DeltaTransformer();
 
 function SplitEditor(props) {
-  const conflictedNote = useStore((store) => store.conflictedNote);
-  const remoteDelta = useStore((store) => store.remoteDelta);
-  const localDelta = useStore((store) => store.localDelta);
+  const { diffId } = props;
+
+  const [conflictedNote, setConflictedNote] = useState();
+  const [remoteDelta, setRemoteDelta] = useState();
+  const [localDelta, setLocalDelta] = useState();
+
+  useEffect(() => {
+    let note = db.notes.note(diffId);
+    if (!note) {
+      setHashParam({ note: 0 });
+      return;
+    }
+    notesStore.setSelectedNote(diffId);
+    note = note.data;
+    (async function () {
+      const delta = await db.delta.raw(note.content.delta);
+      setConflictedNote(note);
+      setLocalDelta({ ...delta, conflicted: false });
+      setRemoteDelta(delta.conflicted);
+    })();
+  }, [diffId]);
+
   const [localEditor, remoteEditor] = [useRef(), useRef()];
   const [selectedDelta, setSelectedDelta] = useState(-1);
-  if (!conflictedNote) return null;
+
+  if (!conflictedNote || !localDelta || !remoteDelta) return null;
   return (
     <Flex width="100%" flex="1 1 auto" flexDirection="column">
       <Flex
@@ -33,6 +55,7 @@ function SplitEditor(props) {
           isSelected={selectedDelta === 0}
           isOtherSelected={selectedDelta === 1}
           onToggle={() => setSelectedDelta((s) => (s === 0 ? -1 : 0))}
+          note={conflictedNote}
           editors={() => ({
             selectedEditor: remoteEditor.current.quill,
             otherEditor: localEditor.current.quill,
@@ -54,6 +77,7 @@ function SplitEditor(props) {
           sx={{ flex: "0.1 1 auto", alignItems: "flex-end" }}
           direction="row-reverse"
           label="Incoming note"
+          note={conflictedNote}
           isSelected={selectedDelta === 1}
           isOtherSelected={selectedDelta === 0}
           dateEdited={remoteDelta.dateEdited}

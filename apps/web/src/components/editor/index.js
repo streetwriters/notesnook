@@ -9,17 +9,22 @@ import { useStore as useUserStore } from "../../stores/user-store";
 import Animated from "../animated";
 import EditorMenu from "./editormenu";
 import Header from "./header";
+import { useHashParam } from "../../utils/useHashParam";
+import SplitEditor from "../spliteditor";
 
 function Editor() {
   const delta = useStore((store) => store.session.content.delta);
   const sessionState = useStore((store) => store.session.state);
   const setSession = useStore((store) => store.setSession);
   const saveSession = useStore((store) => store.saveSession);
+  const openSession = useStore((store) => store.openSession);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
   const isTrial = useUserStore(
     (store) => store.user.notesnook?.subscription?.isTrial
   );
   const quillRef = useRef();
+  const [noteId] = useHashParam("note");
+  const [diff] = useHashParam("diff");
 
   useEffect(() => {
     // move the toolbar outside (easiest way)
@@ -30,6 +35,12 @@ function Editor() {
     }
   }, []);
 
+  useEffect(() => {
+    if (!noteId) return;
+    (async () => await openSession(noteId))();
+  }, [openSession, noteId]);
+
+  if (diff) return <SplitEditor diffId={diff} />;
   return (
     <Animated.Flex
       width={["0%", "0%", "100%"]}

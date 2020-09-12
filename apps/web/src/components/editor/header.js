@@ -7,7 +7,6 @@ import TitleBox from "./title-box";
 import { useStore, SESSION_STATES } from "../../stores/editor-store";
 import { timeConverter } from "../../utils/time";
 import { countWords } from "../../utils/string";
-import EditorNavigator from "../../navigation/navigators/editornavigator";
 
 const TextSeperator = () => {
   return (

@@ -56,10 +56,10 @@ class Notebook extends React.Component {
         body={notebook.description}
         subBody={
           <Flex sx={{ marginBottom: 1, marginTop: 1 }}>
-            {notebook.topics.slice(1, 4).map((topic) => (
+            {notebook.topics.slice(1, 4).map((topic, index) => (
               <Flex
                 onClick={(e) => {
-                  onTopicClick(notebook, topic);
+                  onTopicClick(notebook, index + 1);
                   e.stopPropagation();
                 }}
                 key={topic.title}

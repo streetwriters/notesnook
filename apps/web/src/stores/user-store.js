@@ -2,7 +2,6 @@ import createStore from "../common/store";
 import { db } from "../common";
 import { store as appStore } from "./app-store";
 import BaseStore from "./index";
-import RootNavigator from "../navigation/navigators/rootnavigator";
 import config from "../utils/config";
 
 class UserStore extends BaseStore {
@@ -81,7 +80,6 @@ class UserStore extends BaseStore {
       });
       config.clear();
       await appStore.refresh();
-      RootNavigator.navigate("home");
     });
   };
 }

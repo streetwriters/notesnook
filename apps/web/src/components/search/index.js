@@ -2,19 +2,21 @@ import React from "react";
 import { Flex, Box } from "rebass";
 import { Input } from "@rebass/forms";
 import * as Icon from "../icons";
-import { useStore } from "../../stores/searchstore";
 import "./search.css";
-import RootNavigator from "../../navigation/navigators/rootnavigator";
+import { navigate } from "hookrouter";
+import { useStore } from "../../stores/searchstore";
 
-var query = "";
+var query;
 function Search(props) {
-  const search = useStore(store => store.search);
+  const search = useStore((store) => store.search);
+  const { type } = props;
+
   return (
     <Flex
       variant="rowCenter"
       px={2}
       sx={{
-        position: "relative"
+        position: "relative",
       }}
     >
       <Input
@@ -22,15 +24,14 @@ function Search(props) {
         name="search"
         autoFocus={!!query}
         defaultValue={query}
-        placeholder={`Search your ${props.type}`}
-        onChange={e => {
+        placeholder={`Search your ${type}`}
+        onChange={(e) => {
           query = e.target.value;
-          if (query.length >= 1) {
-            search(query);
-            RootNavigator.navigate("search");
-          } else {
-            RootNavigator.goBack();
+          if (query.length <= 0) return window.history.back();
+          if (query.length === 1) {
+            navigate("/search");
           }
+          search(query);
         }}
       />
       <Box
@@ -39,7 +40,7 @@ function Search(props) {
           position: "absolute",
           right: 0,
           mr: 3,
-          color: "hover"
+          color: "hover",
         }}
       >
         <Icon.Search size={28} />

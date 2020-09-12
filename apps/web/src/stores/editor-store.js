@@ -2,11 +2,10 @@ import createStore from "../common/store";
 import { store as noteStore } from "./note-store";
 import { store as appStore } from "./app-store";
 import { store as tagStore } from "./tag-store";
-import { store as mergeStore } from "./mergestore";
 import { db } from "../common";
 import BaseStore from ".";
-import EditorNavigator from "../navigation/navigators/editornavigator";
 import { isMobile } from "../utils/dimensions";
+import { setHashParam } from "../utils/useHashParam";
 
 const SESSION_STATES = { stale: "stale", new: "new" };
 const DEFAULT_SESSION = {
@@ -39,21 +38,23 @@ class EditorStore extends BaseStore {
     if (isMobile()) return;
 
     const id = localStorage.getItem("lastOpenedNote");
-    const note = db.notes.note(id);
-    if (!id || !note) {
-      return EditorNavigator.navigate("editor");
+    if (id) {
+      setHashParam({ note: id });
     }
-    await this.openSession(note.data);
   };
 
-  openSession = async (note) => {
+  openSession = async (noteId) => {
+    let note = db.notes.note(noteId);
+    if (!note) return this.newSession();
+    note = note.data;
+
     clearTimeout(this.get().session.timeout);
 
-    if (note.conflicted) {
-      return await mergeStore.openConflict(note);
-    }
-
     noteStore.setSelectedNote(note.id);
+    if (note.conflicted) {
+      setHashParam({ diff: noteId });
+      return;
+    }
     saveLastOpenedNote(note.id);
 
     let content = {};
@@ -63,11 +64,11 @@ class EditorStore extends BaseStore {
         delta: await db.notes.note(note).delta(),
       };
     } else {
-      content = await EditorNavigator.navigateWithResult("unlock", {
+      /* content = await EditorNavigator.navigateWithResult("unlock", {
         id: note.id,
       });
       console.log(content);
-      if (!content) return;
+      if (!content) return; */
     }
 
     this.set((state) => {
@@ -78,8 +79,6 @@ class EditorStore extends BaseStore {
         state: SESSION_STATES.new,
       };
     });
-
-    EditorNavigator.navigate("editor");
   };
 
   saveSession = (oldSession) => {
@@ -114,11 +113,16 @@ class EditorStore extends BaseStore {
       noteStore.refresh();
 
       saveLastOpenedNote(!this.get().session.locked && id);
+
+      if (!oldSession.index) {
+        setHashParam({ note: id }, false);
+      }
     });
   };
 
   newSession = (context = {}) => {
-    EditorNavigator.navigate("editor");
+    setHashParam({ note: 0 });
+
     clearTimeout(this.get().session.timeout);
     this.set(function (state) {
       state.session = {

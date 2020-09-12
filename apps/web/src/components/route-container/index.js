@@ -1,43 +1,53 @@
 import React from "react";
+import Animated from "../animated";
 import { Box, Flex, Heading, Text } from "rebass";
-import * as Icon from "../components/icons";
-import ThemeProvider from "../components/theme-provider";
-import { useStore } from "../stores/app-store";
-import { useStore as useSelectionStore } from "../stores/selection-store";
+import * as Icon from "../icons";
+import { useStore } from "../../stores/app-store";
+import { useStore as useSelectionStore } from "../../stores/selection-store";
+import { SELECTION_OPTIONS_MAP } from "../../common";
 
-function Route(props) {
-  const navigator = props.params.navigator || props.navigator;
-
+function RouteContainer(props) {
+  const { type, route, canGoBack, title, subtitle } = props;
   return (
-    <ThemeProvider>
-      <Flex flexDirection="column" px={2}>
-        <Header {...props} />
-      </Flex>
-      {props.route.component && (
-        <props.route.component
-          navigator={navigator}
-          onDone={props.onDone}
-          {...props.params}
-        />
-      )}
-    </ThemeProvider>
+    <Animated.Flex
+      sx={{ overflow: "hidden" }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.2, ease: "easeIn" }}
+      exit={{ opacity: 0 }}
+      flexDirection="column"
+      flex="1 1 auto"
+    >
+      <Header
+        canGoBack={canGoBack}
+        title={title}
+        subtitle={subtitle}
+        selectionOptions={SELECTION_OPTIONS_MAP[type]}
+      />
+      {route}
+    </Animated.Flex>
   );
 }
-export default Route;
+
+export default RouteContainer;
 
 function Header(props) {
-  const { route, canGoBack, backAction } = props;
-  const { title, titleColor, params, options, noHeader } = route;
+  const { title, subtitle, canGoBack, selectionOptions } = props;
 
   const toggleSideMenu = useStore((store) => store.toggleSideMenu);
 
-  if ((!title && !params.title) || noHeader) return null;
+  if (!title && !subtitle) return null;
   return (
-    <>
+    <Flex mx={2} flexDirection="column">
       <Flex alignItems="center" justifyContent="space-between">
         <Flex alignItems="center" py={2}>
           {canGoBack && (
-            <Box onClick={backAction} ml={-2} height={38} width={38}>
+            <Box
+              onClick={() => window.history.back()}
+              ml={-2}
+              height={38}
+              width={38}
+            >
               <Icon.ChevronLeft size={38} color="fontPrimary" />
             </Box>
           )}
@@ -50,13 +60,13 @@ function Header(props) {
             }}
             size={28}
           />
-          <Heading fontSize="heading" color={titleColor || "text"}>
-            {title || params.title}
+          <Heading fontSize="heading" color={"text"}>
+            {title}
           </Heading>
         </Flex>
-        <SelectionOptions options={options} />
+        <SelectionOptions options={selectionOptions} />
       </Flex>
-      {params.subtitle && (
+      {subtitle && (
         <Text
           variant="title"
           color="primary"
@@ -65,11 +75,11 @@ function Header(props) {
             cursor: "normal",
           }}
         >
-          {params.subtitle}
+          {subtitle}
         </Text>
       )}
       <SelectionBox />
-    </>
+    </Flex>
   );
 }
 

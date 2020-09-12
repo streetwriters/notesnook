@@ -9,8 +9,8 @@ function Button(props) {
     <Flex
       bg="primary"
       width={props.width}
-      py={3}
-      px={3}
+      py={2}
+      px={2}
       mx={2}
       flexDirection="row"
       alignItems="center"
@@ -22,9 +22,9 @@ function Button(props) {
         fontWeight: "body",
         ":hover": {
           cursor: "pointer",
-          bg: theme.colors.primary + "dd"
+          bg: theme.colors.primary + "dd",
         },
-        ...props.style
+        ...props.style,
       }}
       onClick={props.onClick}
     >
