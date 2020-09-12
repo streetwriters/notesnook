@@ -1,5 +1,6 @@
 import {useIsFocused} from '@react-navigation/native';
 import React, {useEffect} from 'react';
+import {Placeholder} from '../../components/ListPlaceholders';
 import SimpleList from '../../components/SimpleList';
 import {NoteItemWrapper} from '../../components/SimpleList/NoteItemWrapper';
 import {useTracked} from '../../provider';
@@ -8,8 +9,6 @@ import {eSendEvent} from '../../services/eventManager';
 import {eOnLoadNote, eScrollEvent} from '../../services/events';
 import {openEditorAnimation} from '../../utils/animations';
 import {DDS} from '../../utils/utils';
-import {Placeholder} from '../../components/ListPlaceholders';
-import RNHTMLtoPDF from 'react-native-html-to-pdf';
 export const Home = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const {notes} = state;
@@ -55,14 +54,6 @@ export const Home = ({route, navigation}) => {
         state: {
           bottomButtonText: 'Create a new note',
           bottomButtonOnPress: async () => {
-           /*  let res = await RNHTMLtoPDF.convert({
-              html: '<h1>Custom converted PDF Document</h1>',
-              fileName: 'test',
-              base64: false,
-              directory:"Documents"
-              
-            });
-            console.log(res); */
             if (DDS.isTab) {
               eSendEvent(eOnLoadNote, {type: 'new'});
             } else {
