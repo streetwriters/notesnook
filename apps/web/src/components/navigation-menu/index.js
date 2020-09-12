@@ -108,7 +108,11 @@ function NavigationMenu(props) {
             key={item.path}
             title={item.title}
             icon={item.icon}
-            selected={selectedRoute === item.path}
+            selected={
+              item.path === "/"
+                ? selectedRoute === item.path
+                : selectedRoute.startsWith(item.path)
+            }
             onClick={() => {
               setSelectedRoute(item.path);
               if (selectedRoute === item.path)
@@ -171,9 +175,9 @@ function NavigationMenu(props) {
             icon={item.icon}
             onClick={() => {
               navigate(item.path);
-              setSelectedRoute(item.key);
+              setSelectedRoute(item.path);
             }}
-            selected={selectedRoute === item.path}
+            selected={selectedRoute.startsWith(item.path)}
           />
         ))}
       </Flex>
