@@ -211,12 +211,16 @@ const Editor = ({noMenu}) => {
             <ActionIcon
               name="undo-variant"
               color={colors.heading}
-              onPress={() => {}}
+              onPress={() => {
+                post('undo');
+              }}
             />
             <ActionIcon
               name="redo-variant"
               color={colors.heading}
-              onPress={() => {}}
+              onPress={() => {
+                post('redo');
+              }}
             />
 
             <ActionIcon

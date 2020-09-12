@@ -128,8 +128,9 @@ export async function clearEditor() {
   tapCount = 0;
   saveCounter = 0;
   canSave = false;
-  //post('clearEditor');
-  //post('clearTitle');
+  post('clearEditor');
+  post('clearTitle');
+  post("clearHistory");
   post('blur');
 }
 
@@ -267,16 +268,6 @@ export function onWebViewLoad(noMenu, premium, colors) {
     Platform.OS === 'android' ? EditorWebView.current?.requestFocus() : null;
     post('blur');
   }, 3000);
-
-  /*  setTimeout(() => {
-
-    if (noMenu) {
-      post('nomenu', true);
-    } else {
-      post('nomenu', false);
-    }
-
-  },1000) */
 }
 
 const updateEditor = async () => {
@@ -310,4 +301,5 @@ const updateEditor = async () => {
   } else {
     post('text', content.text);
   }
+  post("clearHistory");
 };
