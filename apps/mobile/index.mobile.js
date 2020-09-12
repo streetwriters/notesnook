@@ -30,8 +30,9 @@ export const Initialize = () => {
     if (Platform.OS === 'android') {
       StatusBar.setBackgroundColor('transparent');
       StatusBar.setTranslucent(true);
-      StatusBar.setBarStyle(colors.night ? 'light-content' : 'dark-content');
+     
     }
+    StatusBar.setBarStyle(colors.night ? 'light-content' : 'dark-content');
   }, []);
 
   const setGestureDisabled = () => {

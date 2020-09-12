@@ -22,7 +22,9 @@ export const defaultState = {
     showKeyboardOnOpen: false,
     fontScale: 1,
     forcePortraitOnTablet: false,
-    useSystemTheme:true
+    useSystemTheme:true,
+    reminder:'weekly',
+    encryptedBackups:false
   },
   currentScreen: 'home',
   colors: {

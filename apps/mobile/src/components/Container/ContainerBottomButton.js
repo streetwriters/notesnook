@@ -1,16 +1,14 @@
-import React, {useEffect, useState} from 'react';
-import {Keyboard, Text, TouchableOpacity, View, Pressable} from 'react-native';
-import {useSafeArea} from 'react-native-safe-area-context';
+import React, { useEffect, useState } from 'react';
+import { Keyboard, Text, View } from 'react-native';
+import { useSafeArea } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {pv, SIZE, WEIGHT} from '../../common/common';
-import {useTracked} from '../../provider';
+import { pv, SIZE, WEIGHT } from '../../common/common';
+import { useTracked } from '../../provider';
 import {
   DDS,
-  getElevation,
-  hexToRGBA,
-  RGB_Linear_Shade,
+  getElevation
 } from '../../utils/utils';
-import {PressableButton} from '../PressableButton';
+import { PressableButton } from '../PressableButton';
 
 export const ContainerBottomButton = ({root}) => {
   const [state, dispatch] = useTracked();

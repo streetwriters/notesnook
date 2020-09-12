@@ -34,10 +34,19 @@ import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
 import {eOpenLoginDialog, eResetApp} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
-import {db, DDS, setSetting, ToastEvent, w, RGB_Linear_Shade, hexToRGBA} from '../../utils/utils';
+import {
+  db,
+  DDS,
+  setSetting,
+  ToastEvent,
+  w,
+  RGB_Linear_Shade,
+  hexToRGBA,
+} from '../../utils/utils';
 import {MMKV} from '../../utils/storage';
 import {PressableButton} from '../../components/PressableButton';
-  
+import Seperator from '../../components/Seperator';
+
 export const Settings = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors, user, settings} = state;
@@ -330,10 +339,6 @@ export const Settings = ({route, navigation}) => {
 
             {[
               {
-                name: 'Backup my notes',
-                func: () => {},
-              },
-              {
                 name: 'Data recovery key',
                 func: async () => {
                   let k = await db.user.key();
@@ -345,7 +350,6 @@ export const Settings = ({route, navigation}) => {
                 name: 'Subscription status',
                 func: () => {},
               },
-
               {
                 name: 'Logout',
                 func: async () => {
@@ -477,7 +481,14 @@ export const Settings = ({route, navigation}) => {
             color: colors.pri,
             marginTop: pv + 5,
           }}>
-          Accent Color
+          Accent Color{'\n'}
+          <Text
+            style={{
+              fontSize: SIZE.xs,
+              color: colors.icon,
+            }}>
+            Choose a color to use as accent color
+          </Text>
         </Text>
 
         <View
@@ -509,7 +520,14 @@ export const Settings = ({route, navigation}) => {
           ].map((item) => (
             <PressableButton
               key={item}
-              color={colors.accent === item? RGB_Linear_Shade(!colors.night? -0.2 : 0.2, hexToRGBA(item, 1)) : item}
+              color={
+                colors.accent === item
+                  ? RGB_Linear_Shade(
+                      !colors.night ? -0.2 : 0.2,
+                      hexToRGBA(item, 1),
+                    )
+                  : item
+              }
               selectedColor={item}
               alpha={!colors.night ? -0.1 : 0.1}
               opacity={1}
@@ -530,11 +548,9 @@ export const Settings = ({route, navigation}) => {
                 justifyContent: 'center',
                 alignItems: 'center',
               }}>
-             
-                {colors.accent === item ? (
-                  <Icon size={SIZE.lg} color="white" name="check" />
-                ) : null}
-            
+              {colors.accent === item ? (
+                <Icon size={SIZE.lg} color="white" name="check" />
+              ) : null}
             </PressableButton>
           ))}
         </View>
@@ -575,7 +591,16 @@ export const Settings = ({route, navigation}) => {
               textAlignVertical: 'center',
               color: colors.pri,
             }}>
-            Use System Dark Mode
+            Use System Dark Mode{'\n'}
+            <Text
+              style={{
+                fontSize: SIZE.xs,
+                color: colors.icon,
+              }}>
+              {settings.useSystemTheme
+                ? 'Switch to dark theme based on system settings'
+                : 'Keep the app theme independent from system settings'}
+            </Text>
           </Text>
           <Icon
             size={SIZE.xl}
@@ -613,7 +638,14 @@ export const Settings = ({route, navigation}) => {
               textAlignVertical: 'center',
               color: colors.pri,
             }}>
-            Dark Mode
+            Dark Mode{'\n'}
+            <Text
+              style={{
+                fontSize: SIZE.xs,
+                color: colors.icon,
+              }}>
+              {colors.night ? 'Turn off dark mode' : 'Turn on dark mode'}
+            </Text>
           </Text>
           <Icon
             size={SIZE.xl}
@@ -623,34 +655,10 @@ export const Settings = ({route, navigation}) => {
         </TouchableOpacity>
 
         <TouchableOpacity
-          onPress={async () => {
-            let scale = settings.fontScale;
-
-            scale === 1
-              ? (scale = 1.1)
-              : scale === 1.1
-              ? (scale = 1.2)
-              : scale === 1.2
-              ? (scale = 1.3)
-              : scale === 1.3
-              ? (scale = 1.4)
-              : scale === 1.4
-              ? (scale = 1.5)
-              : scale === 1.5
-              ? (scale = 0.8)
-              : scale === 0.8
-              ? (scale = 0.9)
-              : (scale = 0.9 ? (scale = 1) : (scale = 1));
-
-            await setSetting(settings, 'fontScale', scale);
-
-            eSendEvent(eResetApp);
-          }}
-          activeOpacity={opacity}
           style={{
             width: '100%',
             marginHorizontal: 0,
-            paddingVertical: pv + 5,
+            height: 50,
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -662,25 +670,70 @@ export const Settings = ({route, navigation}) => {
               textAlignVertical: 'center',
               color: colors.pri,
             }}>
-            Font Scaling
+            Font Scaling{'\n'}
+            <Text
+              style={{
+                fontSize: SIZE.xs,
+                color: colors.icon,
+              }}>
+              Scale the size of text in the app.
+            </Text>
           </Text>
 
           <View
             style={{
-              borderBottomWidth: 1,
-              borderColor: colors.nav,
-              paddingVertical: 1,
-              paddingHorizontal: 5,
+              flexDirection: 'row',
+              overflow: 'hidden',
+              borderRadius: 5,
+              justifyContent: 'center',
+              alignItems: 'center',
             }}>
-            <Text
-              style={{
-                fontSize: SIZE.xs,
-                fontFamily: WEIGHT.regular,
-                textAlignVertical: 'center',
-                color: colors.pri,
-              }}>
-              {settings?.fontScale ? settings.fontScale + 'X' : '1X'}
-            </Text>
+            {[
+              {
+                title: '0.9x',
+                value: 0.9,
+              },
+              {
+                title: '1.0x',
+                value: 1,
+              },
+              {
+                title: '1.2x',
+                value: 1.2,
+              },
+              {
+                title: '1.5x',
+                value: 1.5,
+              },
+            ].map((item) => (
+              <TouchableOpacity
+                activeOpacity={1}
+                onPress={async () => {
+                  let scale = settings.fontScale;
+                  await setSetting(settings, 'fontScale', scale);
+                  eSendEvent(eResetApp);
+                }}
+                key={item.title}
+                style={{
+                  backgroundColor:
+                    settings.fontScale === item.value
+                      ? colors.accent
+                      : colors.nav,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  height: 20,
+                  paddingHorizontal: 5,
+                }}>
+                <Text
+                  style={{
+                    color:
+                      settings.fontScale === item.value ? 'white' : colors.icon,
+                    fontSize: SIZE.xs,
+                  }}>
+                  {item.title}
+                </Text>
+              </TouchableOpacity>
+            ))}
           </View>
         </TouchableOpacity>
 
@@ -731,11 +784,197 @@ export const Settings = ({route, navigation}) => {
             fontFamily: WEIGHT.bold,
             textAlignVertical: 'center',
             color: colors.accent,
-
             borderBottomColor: colors.nav,
             borderBottomWidth: 0.5,
             paddingBottom: 3,
-            marginBottom: pv + 5,
+          }}>
+          Backup & Restore
+        </Text>
+
+        <TouchableOpacity
+          onPress={async () => {
+            await setSetting(
+              settings,
+              'useSystemTheme',
+              !settings.useSystemTheme,
+            );
+
+            if (!settings.useSystemTheme) {
+              MMKV.setStringAsync(
+                'theme',
+                JSON.stringify({night: Appearance.getColorScheme() === 'dark'}),
+              );
+              changeColorScheme(
+                Appearance.getColorScheme() === 'dark'
+                  ? COLOR_SCHEME_DARK
+                  : COLOR_SCHEME_LIGHT,
+              );
+            }
+          }}
+          activeOpacity={opacity}
+          style={{
+            width: '100%',
+            marginHorizontal: 0,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            height: 50,
+          }}>
+          <Text
+            style={{
+              fontSize: SIZE.sm,
+              fontFamily: WEIGHT.regular,
+              textAlignVertical: 'center',
+              color: colors.pri,
+            }}>
+            Backup reminder{'\n'}
+            <Text
+              style={{
+                fontSize: SIZE.xs,
+                color: colors.icon,
+              }}>
+              Remind you to backup data.
+            </Text>
+          </Text>
+
+          <View
+            style={{
+              flexDirection: 'row',
+              overflow: 'hidden',
+              borderRadius: 5,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            {[
+              {
+                title: 'Daily',
+                value: 'daily',
+              },
+              {
+                title: 'Weekly',
+                value: 'weekly',
+              },
+            ].map((item) => (
+              <TouchableOpacity
+                onPress={async () => {
+                  await setSetting(settings, 'reminder', item.value);
+                }}
+                key={item.value}
+                style={{
+                  backgroundColor:
+                    settings.reminder === 'daily' ? colors.accent : colors.nav,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  width: 60,
+                  height: 20,
+                }}>
+                <Text
+                  style={{
+                    color:
+                      settings.reminder === 'daily' ? 'white' : colors.icon,
+                    fontSize: SIZE.xs,
+                  }}>
+                  {item.title}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={async () => {
+            await setSetting(
+              settings,
+              'encryptedBackup',
+              !settings.encryptedBackup,
+            );
+          }}
+          activeOpacity={opacity}
+          style={{
+            width: '100%',
+            marginHorizontal: 0,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            height: 50,
+          }}>
+          <Text
+            style={{
+              fontSize: SIZE.sm,
+              fontFamily: WEIGHT.regular,
+              textAlignVertical: 'center',
+              color: colors.pri,
+            }}>
+            Encrypted Backups{'\n'}
+            <Text
+              style={{
+                fontSize: SIZE.xs,
+                color: colors.icon,
+              }}>
+              Encrypt your data before backup
+            </Text>
+          </Text>
+          <Icon
+            size={SIZE.xl}
+            color={settings.useSystemTheme ? colors.accent : colors.icon}
+            name={
+              settings.useSystemTheme ? 'toggle-switch' : 'toggle-switch-off'
+            }
+          />
+        </TouchableOpacity>
+
+        {[
+          {
+            name: 'Backup data',
+            func: () => {
+              Linking.openURL('https://www.notesnook.com/privacy.html');
+            },
+            desc: 'Backup all your data to phone storage',
+          },
+          {
+            name: 'Restore data',
+            func: () => {
+              Linking.openURL('https://www.notesnook.com');
+            },
+            desc: 'Restore backup from your phone.',
+          },
+        ].map((item) => (
+          <TouchableOpacity
+            key={item.name}
+            activeOpacity={opacity}
+            onPress={item.func}>
+            <Text
+              style={{
+                fontSize: SIZE.sm,
+                fontFamily: WEIGHT.regular,
+                textAlignVertical: 'center',
+                color: colors.pri,
+                height: 50,
+                justifyContent: 'center',
+              }}>
+              {item.name}
+              {'\n'}
+              <Text
+                style={{
+                  fontSize: SIZE.xs,
+                  color: colors.icon,
+                }}>
+                {item.desc}
+              </Text>
+            </Text>
+            {item.customComponent ? item.customComponent : null}
+          </TouchableOpacity>
+        ))}
+
+        <Text
+          style={{
+            fontSize: SIZE.xs,
+            fontFamily: WEIGHT.bold,
+            textAlignVertical: 'center',
+            color: colors.accent,
+            borderBottomColor: colors.nav,
+            borderBottomWidth: 0.5,
+            paddingBottom: 3,
           }}>
           Other
         </Text>
@@ -746,12 +985,14 @@ export const Settings = ({route, navigation}) => {
             func: () => {
               Linking.openURL('https://www.notesnook.com/privacy.html');
             },
+            desc: 'Read our privacy policy',
           },
           {
             name: 'About',
             func: () => {
               Linking.openURL('https://www.notesnook.com');
             },
+            desc: null,
           },
         ].map((item) => (
           <TouchableOpacity
@@ -759,8 +1000,8 @@ export const Settings = ({route, navigation}) => {
             activeOpacity={opacity}
             onPress={item.func}
             style={{
-              width: item.step ? '85%' : w - 24,
-              paddingVertical: pv + 5,
+              height: 50,
+              justifyContent: 'center',
             }}>
             <Text
               style={{
@@ -770,15 +1011,19 @@ export const Settings = ({route, navigation}) => {
                 color: colors.pri,
               }}>
               {item.name}
+              {'\n'}
+              <Text
+                style={{
+                  fontSize: SIZE.xs,
+                  color: colors.icon,
+                }}>
+                {item.desc}
+              </Text>
             </Text>
             {item.customComponent ? item.customComponent : null}
           </TouchableOpacity>
         ))}
-        <View
-          style={{
-            height: 300,
-          }}
-        />
+        <Seperator />
       </ScrollView>
     </Animatable.View>
   );

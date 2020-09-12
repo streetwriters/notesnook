@@ -1,4 +1,6 @@
+import {useNetInfo} from '@react-native-community/netinfo';
 import React, {useEffect, useState} from 'react';
+import {Appearance, StatusBar, useColorScheme} from 'react-native';
 import Orientation from 'react-native-orientation';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {getColorScheme, scale, updateSize} from './src/common/common';
@@ -6,64 +8,56 @@ import {useTracked} from './src/provider';
 import {ACTIONS} from './src/provider/actions';
 import {defaultState} from './src/provider/defaultState';
 import {eSubscribeEvent, eUnSubscribeEvent} from './src/services/eventManager';
-import {eDispatchAction, eStartSyncer, eResetApp} from './src/services/events';
+import {eDispatchAction, eResetApp, eStartSyncer} from './src/services/events';
+import {MMKV} from './src/utils/storage';
 import {db, DDS, ToastEvent} from './src/utils/utils';
-import {useNetInfo} from '@react-native-community/netinfo';
-import RNHTMLtoPDF from 'react-native-html-to-pdf';
-import { MMKV } from './src/utils/storage';
-import {
-  Appearance,
-  useColorScheme,
-  StatusBar} from "react-native";
 const App = () => {
-  const [state, dispatch] = useTracked();
+  const [, dispatch] = useTracked();
   const [init, setInit] = useState(false);
   const netInfo = useNetInfo();
   const colorScheme = useColorScheme();
   const I = DDS.isTab ? require('./index.tablet') : require('./index.mobile');
-  const _onOrientationChange = o => {
+  const _onOrientationChange = (o) => {
     // Currently orientation is locked on tablet.
     /* DDS.checkOrientation();
     setTimeout(() => {
-     
       forceUpdate();
     }, 1000); */
   };
 
   useEffect(() => {
-    systemThemeChange();
-  
-  },[colorScheme])
+    (async () => {
+      let settings;
+      try {
+        settings = await MMKV.getStringAsync('settings');
+      } catch (e) {}
+      if (!settings) {
+        return;
+      }
+      settings = JSON.parse(settings);
 
-
-  const systemThemeChange = async () => {
-    let s;
-    try {
-      s = await MMKV.getStringAsync('settings');
-    } catch (e) {
-    }
-    console.log("HEREE");
-    console.log('heree');
-    if (!s) return;
-    s = JSON.parse(s);
-    console.log(s);
-    if (s.useSystemTheme) {
-      let newColors = await getColorScheme(s.useSystemTheme);
-      StatusBar.setBarStyle(Appearance.getColorScheme() === "dark" ? 'light-content' : 'dark-content');
-      dispatch({type: ACTIONS.THEME, colors: newColors});
-    }
-  }
+      if (settings.useSystemTheme) {
+        let newColors = await getColorScheme(settings.useSystemTheme);
+        StatusBar.setBarStyle(
+          Appearance.getColorScheme() === 'dark'
+            ? 'light-content'
+            : 'dark-content',
+        );
+        dispatch({type: ACTIONS.THEME, colors: newColors});
+      }
+    })();
+  }, [colorScheme]);
 
   useEffect(() => {
     if (!netInfo.isConnected || !netInfo.isInternetReachable) {
-      db.user?.get().then(user => {
+      db.user?.get().then((user) => {
         if (user) {
           ToastEvent.show('No internet connection', 'error');
         } else {
         }
       });
     } else {
-      db.user?.get().then(user => {
+      db.user?.get().then((user) => {
         if (user) {
           ToastEvent.show('Internet connection restored', 'success');
         } else {
@@ -74,11 +68,11 @@ const App = () => {
 
   useEffect(() => {
     Orientation.addOrientationListener(_onOrientationChange);
-    eSubscribeEvent(eDispatchAction, type => {
+    eSubscribeEvent(eDispatchAction, (type) => {
       dispatch(type);
     });
     return () => {
-      eUnSubscribeEvent(eDispatchAction, type => {
+      eUnSubscribeEvent(eDispatchAction, (type) => {
         dispatch(type);
       });
       Orientation.removeOrientationListener(_onOrientationChange);
@@ -98,12 +92,12 @@ const App = () => {
 
   const _syncFunc = async () => {
     dispatch({type: ACTIONS.SYNCING, syncing: true});
-    let u = await db.user.get();
+    let user = await db.user.get();
     try {
       await db.sync();
     } catch (e) {}
-    u = await db.user.get();
-    dispatch({type: ACTIONS.USER, user: u});
+    user = await db.user.get();
+    dispatch({type: ACTIONS.USER, user: user});
     dispatch({type: ACTIONS.ALL});
     dispatch({type: ACTIONS.SYNCING, syncing: false});
   };
@@ -139,31 +133,30 @@ const App = () => {
   }, []);
 
   async function Initialize(colors = colors) {
-
-    let s;
+    let settings;
     try {
-      s = await MMKV.getStringAsync('settings');
+      settings = await MMKV.getStringAsync('settings');
     } catch (e) {}
-    if (typeof s !== 'string') {
-      s = defaultState.settings;
-      s = JSON.stringify(s);
-      s.fontScale = 1;
+    if (!settings) {
+      settings = defaultState.settings;
+      settings = JSON.stringify(s);
+      settings.fontScale = 1;
 
-      await MMKV.setStringAsync('settings', s);
+      await MMKV.setStringAsync('settings', settings);
 
-      dispatch({type: ACTIONS.SETTINGS, s});
+      dispatch({type: ACTIONS.SETTINGS, settings});
     } else {
-      s = JSON.parse(s);
-      if (s.fontScale) {
-        scale.fontScale = s.fontScale;
+      settings = JSON.parse(settings);
+      if (settings.fontScale) {
+        scale.fontScale = settings.fontScale;
       } else {
         scale.fontScale = 1;
       }
       updateSize();
-      dispatch({type: ACTIONS.SETTINGS, settings: {...s}});
+      dispatch({type: ACTIONS.SETTINGS, settings: {...settings}});
     }
 
-    let newColors = await getColorScheme(s.useSystemTheme);
+    let newColors = await getColorScheme(settings.useSystemTheme);
     dispatch({type: ACTIONS.THEME, colors: newColors});
   }
 

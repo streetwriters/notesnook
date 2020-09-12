@@ -1,7 +1,7 @@
 import React from 'react';
-import {Text} from 'react-native';
-import {SIZE, WEIGHT} from '../../common/common';
-import {useTracked} from '../../provider';
+import { Text } from 'react-native';
+import { SIZE, WEIGHT } from '../../common/common';
+import { useTracked } from '../../provider';
 
 export const HeaderTitle = ({root}) => {
   const [state, dispatch] = useTracked();
