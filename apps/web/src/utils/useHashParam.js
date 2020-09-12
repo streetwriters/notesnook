@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 
 const getHashSearchParams = () => {
   const hash = window.location.hash.slice(1);
@@ -8,7 +8,7 @@ const getHashSearchParams = () => {
 };
 
 const getHashParam = (key) => {
-  const [_, searchParams] = getHashSearchParams(window.location);
+  const [, searchParams] = getHashSearchParams(window.location);
   return searchParams.get(key);
 };
 

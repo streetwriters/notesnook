@@ -45,7 +45,7 @@ class EditorStore extends BaseStore {
 
   openSession = async (noteId) => {
     let note = db.notes.note(noteId);
-    if (!note) return this.newSession();
+    if (!note) return;
     note = note.data;
 
     clearTimeout(this.get().session.timeout);
@@ -129,6 +129,18 @@ class EditorStore extends BaseStore {
         ...DEFAULT_SESSION,
         context,
         state: SESSION_STATES.new,
+      };
+    });
+    saveLastOpenedNote();
+    noteStore.setSelectedNote(0);
+  };
+
+  clearSession = () => {
+    setHashParam({});
+    clearTimeout(this.get().session.timeout);
+    this.set(function (state) {
+      state.session = {
+        ...DEFAULT_SESSION,
       };
     });
     saveLastOpenedNote();

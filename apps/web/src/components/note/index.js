@@ -11,9 +11,8 @@ import { showPasswordDialog } from "../dialogs/passworddialog";
 import { db, COLORS } from "../../common";
 import { useTheme } from "emotion-theming";
 import Colors from "../menu/colors";
-import { isMobile } from "../../utils/dimensions";
 import { showExportDialog } from "../dialogs/exportdialog";
-import { setHashParam, useHashParam } from "../../utils/useHashParam";
+import { setHashParam } from "../../utils/useHashParam";
 
 function menuItems(note, context) {
   return [
@@ -105,10 +104,8 @@ function menuItems(note, context) {
 function Note(props) {
   const { item, index, pinnable } = props;
   const note = item;
-  //const [, setNoteId] = useHashParam("note", "");
   const selectedNote = useStore((store) => store.selectedNote);
-  // we will never be opening a note side-by-side in Mobile
-  const isOpened = isMobile() ? false : selectedNote === note.id;
+  const isOpened = selectedNote === note.id;
   const theme = useTheme();
 
   return (

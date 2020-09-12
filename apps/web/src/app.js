@@ -9,11 +9,11 @@ import { useStore as useUserStore } from "./stores/user-store";
 import { useStore as useNotesStore } from "./stores/note-store";
 import Animated from "./components/animated";
 import NavigationMenu from "./components/navigationmenu";
-import { isMobile } from "./utils/dimensions";
 import { db } from "./common";
 import { useRoutes } from "hookrouter";
 import routes from "./navigation/routes";
 import Editor from "./components/editor";
+import useMobile from "./utils/use-mobile";
 
 function App() {
   const [show, setShow] = usePersistentState("isContainerVisible", true);
@@ -22,7 +22,8 @@ function App() {
   const initUser = useUserStore((store) => store.init);
   const initNotes = useNotesStore((store) => store.init);
   const openLastSession = useEditorStore((store) => store.openLastSession);
-  const sessionId = useEditorStore((store) => store.session.id);
+  const sessionState = useEditorStore((store) => store.session.state);
+  const isMobile = useMobile();
   const routeResult = useRoutes(routes);
 
   useEffect(() => {
@@ -45,10 +46,10 @@ function App() {
   }, [openLastSession]);
 
   useEffect(() => {
-    if (!isMobile()) return;
-    setShow(!sessionId);
+    if (!isMobile) return;
+    setShow(!sessionState);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sessionId]);
+  }, [sessionState, isMobile]);
 
   useEffect(() => {
     return () => {

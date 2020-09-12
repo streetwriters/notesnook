@@ -1,5 +1,4 @@
 import React from "react";
-import Editor from "../components/editor";
 import FavoritesPlaceholder from "../components/placeholders/favorites-placeholder";
 import RouteContainer from "../components/route-container";
 import { toTitleCase } from "../utils/string";

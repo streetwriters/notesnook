@@ -7,12 +7,12 @@ import { useStore as useUserStore } from "../../stores/user-store";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 import Animated from "../animated";
 import NavigationItem from "./navigation-item";
-import { isMobile } from "../../utils/dimensions";
 import { navigate } from "hookrouter";
 import { toTitleCase } from "../../utils/string";
 import { COLORS } from "../../common";
 import { showLogInDialog } from "../dialogs/logindialog";
 import { usePath } from "hookrouter";
+import useMobile from "../../utils/use-mobile";
 
 const routes = [
   { title: "Home", path: "/", icon: Icon.Home },
@@ -51,6 +51,7 @@ function NavigationMenu(props) {
   const logout = useUserStore((store) => store.logout);
   const theme = useThemeStore((store) => store.theme);
   const toggleNightMode = useThemeStore((store) => store.toggleNightMode);
+  const isMobile = useMobile();
 
   useEffect(() => {
     setSelectedRoute(path);
@@ -60,11 +61,11 @@ function NavigationMenu(props) {
     <Animated.Flex
       flexDirection="column"
       justifyContent="space-between"
-      initial={{ opacity: 1, x: isMobile() ? -500 : 0 }}
+      initial={{ opacity: 1, x: isMobile ? -500 : 0 }}
       animate={{
         opacity: isFocusMode ? 0 : 1,
         visibility: isFocusMode ? "hidden" : "visible",
-        x: isMobile() ? (isSideMenuOpen ? 0 : -500) : 0,
+        x: isMobile ? (isSideMenuOpen ? 0 : -500) : 0,
         zIndex: isSideMenuOpen ? 999 : 1,
       }}
       transition={{ duration: 0.3, ease: "easeOut" }}
