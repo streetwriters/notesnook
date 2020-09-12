@@ -9,7 +9,6 @@ import * as serviceWorker from "./serviceWorker";
 import Modal from "react-modal";
 import { db } from "./common";
 
-ReactDOM.render(<span>Loading...</span>, document.getElementById("root"));
 db.init()
   .catch(console.error)
   .finally(() => {

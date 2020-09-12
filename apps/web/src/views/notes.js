@@ -3,6 +3,7 @@ import Note from "../components/note";
 import ListContainer from "../components/list-container";
 import { useStore } from "../stores/editor-store";
 import { useStore as useNotesStore } from "../stores/note-store";
+import NotesPlaceholder from "../components/placeholders/notesplacholder";
 
 function Notes(props) {
   const newSession = useStore((store) => store.newSession);
@@ -20,7 +21,7 @@ function Notes(props) {
     <ListContainer
       type="notes"
       items={context.notes}
-      placeholder={props.placeholder}
+      placeholder={props.placeholder || NotesPlaceholder}
       item={(index, item) => (
         <Note index={index} pinnable={false} item={item} context={context} />
       )}
