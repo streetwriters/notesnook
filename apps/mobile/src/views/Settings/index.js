@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   View,
   Appearance,
+  Pressable,
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 
@@ -259,7 +260,7 @@ export const Settings = ({route, navigation}) => {
 
       <ScrollView
         style={{
-          paddingHorizontal: 12,
+          paddingHorizontal: 0,
         }}>
         {user ? (
           <>
@@ -272,6 +273,7 @@ export const Settings = ({route, navigation}) => {
                 borderBottomColor: colors.nav,
                 borderBottomWidth: 0.5,
                 paddingBottom: 3,
+                paddingHorizontal: 12,
               }}>
               Account Settings
             </Text>
@@ -366,11 +368,11 @@ export const Settings = ({route, navigation}) => {
                 onPress={item.func}
                 style={{
                   width: '100%',
-
-                  paddingVertical: pv + 5,
+                  height: 50,
                   flexDirection: 'row',
                   justifyContent: 'space-between',
                   alignItems: 'center',
+                  paddingHorizontal: 12,
                 }}>
                 <Text
                   style={{
@@ -386,77 +388,82 @@ export const Settings = ({route, navigation}) => {
           </>
         ) : (
           <>
-            <PressableButton
-              color={colors.shade}
-              selectedColor={colors.accent}
-              alpha={!colors.night ? -0.02 : 0.1}
-              opacity={0.12}
-              onPress={() => {
-                DDS.isTab
-                  ? eSendEvent(eOpenLoginDialog)
-                  : NavigationService.navigate('Login', {
-                      root: true,
-                    });
-              }}
-              activeOpacity={opacity / 2}
-              customStyle={{
-                paddingVertical: pv + 5,
-                marginBottom: pv + 5,
-                width: '100%',
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'flex-start',
-                borderRadius: 5,
-                paddingHorizontal: 6,
+            <View
+              style={{
+                paddingHorizontal: 12,
               }}>
-              <View
-                style={{
-                  width: 40,
-                  backgroundColor: colors.accent,
-                  height: 40,
-                  borderRadius: 100,
+              <PressableButton
+                color={colors.shade}
+                selectedColor={colors.accent}
+                alpha={!colors.night ? -0.02 : 0.1}
+                opacity={0.12}
+                onPress={() => {
+                  DDS.isTab
+                    ? eSendEvent(eOpenLoginDialog)
+                    : NavigationService.navigate('Login', {
+                        root: true,
+                      });
+                }}
+                activeOpacity={opacity / 2}
+                customStyle={{
+                  paddingVertical: pv + 5,
+                  marginBottom: pv + 5,
+                  width: '100%',
+                  flexDirection: 'row',
                   alignItems: 'center',
-                  justifyContent: 'center',
+                  justifyContent: 'flex-start',
+                  borderRadius: 5,
+                  paddingHorizontal: 6,
                 }}>
-                <Icon size={SIZE.lg} color="white" name="account-outline" />
-              </View>
-
-              <View
-                style={{
-                  marginLeft: 10,
-                }}>
-                <Text
+                <View
                   style={{
-                    fontFamily: WEIGHT.regular,
-                    color: colors.icon,
-                    fontSize: SIZE.xs,
+                    width: 40,
+                    backgroundColor: colors.accent,
+                    height: 40,
+                    borderRadius: 100,
+                    alignItems: 'center',
+                    justifyContent: 'center',
                   }}>
-                  You are not logged in
-                </Text>
-                <Text
-                  style={{
-                    color: colors.accent,
-                  }}>
-                  Login to sync notes.
-                </Text>
-              </View>
+                  <Icon size={SIZE.lg} color="white" name="account-outline" />
+                </View>
 
-              <View
-                style={{
-                  width: 40,
-                  height: 40,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  position: 'absolute',
-                  right: 6,
-                }}>
-                <Icon
-                  name="chevron-right"
-                  color={colors.accent}
-                  size={SIZE.lg}
-                />
-              </View>
-            </PressableButton>
+                <View
+                  style={{
+                    marginLeft: 10,
+                  }}>
+                  <Text
+                    style={{
+                      fontFamily: WEIGHT.regular,
+                      color: colors.icon,
+                      fontSize: SIZE.xs,
+                    }}>
+                    You are not logged in
+                  </Text>
+                  <Text
+                    style={{
+                      color: colors.accent,
+                    }}>
+                    Login to sync notes.
+                  </Text>
+                </View>
+
+                <View
+                  style={{
+                    width: 40,
+                    height: 40,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    position: 'absolute',
+                    right: 6,
+                  }}>
+                  <Icon
+                    name="chevron-right"
+                    color={colors.accent}
+                    size={SIZE.lg}
+                  />
+                </View>
+              </PressableButton>
+            </View>
           </>
         )}
         <Text
@@ -465,7 +472,7 @@ export const Settings = ({route, navigation}) => {
             fontFamily: WEIGHT.bold,
             textAlignVertical: 'center',
             color: colors.accent,
-
+            paddingHorizontal: 12,
             borderBottomColor: colors.nav,
             borderBottomWidth: 0.5,
             paddingBottom: 3,
@@ -480,6 +487,7 @@ export const Settings = ({route, navigation}) => {
             textAlignVertical: 'center',
             color: colors.pri,
             marginTop: pv + 5,
+            paddingHorizontal: 12,
           }}>
           Accent Color{'\n'}
           <Text
@@ -505,6 +513,7 @@ export const Settings = ({route, navigation}) => {
             alignSelf: 'center',
             flexDirection: 'row',
             flexWrap: 'wrap',
+            paddingHorizontal: 12,
           }}>
           {[
             '#e6194b',
@@ -555,7 +564,10 @@ export const Settings = ({route, navigation}) => {
           ))}
         </View>
 
-        <TouchableOpacity
+        <PressableButton
+          color={colors.bg}
+          selectedColor={colors.nav}
+          alpha={!colors.night ? -0.02 : 0.02}
           onPress={async () => {
             await setSetting(
               settings,
@@ -575,14 +587,14 @@ export const Settings = ({route, navigation}) => {
               );
             }
           }}
-          activeOpacity={opacity}
-          style={{
+          customStyle={{
             width: '100%',
             marginHorizontal: 0,
-            paddingVertical: pv + 5,
+            height: 50,
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-between',
+            paddingHorizontal: 12,
           }}>
           <Text
             style={{
@@ -609,9 +621,12 @@ export const Settings = ({route, navigation}) => {
               settings.useSystemTheme ? 'toggle-switch' : 'toggle-switch-off'
             }
           />
-        </TouchableOpacity>
+        </PressableButton>
 
-        <TouchableOpacity
+        <PressableButton
+          color={colors.bg}
+          selectedColor={colors.nav}
+          alpha={!colors.night ? -0.02 : 0.02}
           onPress={() => {
             if (!colors.night) {
               MMKV.setStringAsync('theme', JSON.stringify({night: true}));
@@ -623,13 +638,15 @@ export const Settings = ({route, navigation}) => {
             }
           }}
           activeOpacity={opacity}
-          style={{
+          customStyle={{
             width: '100%',
             marginHorizontal: 0,
-            paddingVertical: pv + 5,
+            height: 50,
             flexDirection: 'row',
+            borderRadius: 0,
             alignItems: 'center',
             justifyContent: 'space-between',
+            paddingHorizontal: 12,
           }}>
           <Text
             style={{
@@ -652,9 +669,9 @@ export const Settings = ({route, navigation}) => {
             color={colors.night ? colors.accent : colors.icon}
             name={colors.night ? 'toggle-switch' : 'toggle-switch-off'}
           />
-        </TouchableOpacity>
+        </PressableButton>
 
-        <TouchableOpacity
+        <View
           style={{
             width: '100%',
             marginHorizontal: 0,
@@ -662,6 +679,7 @@ export const Settings = ({route, navigation}) => {
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-between',
+            paddingHorizontal: 12,
           }}>
           <Text
             style={{
@@ -735,10 +753,13 @@ export const Settings = ({route, navigation}) => {
               </TouchableOpacity>
             ))}
           </View>
-        </TouchableOpacity>
+        </View>
 
         {DDS.isTab ? (
-          <TouchableOpacity
+          <PressableButton
+            color={colors.bg}
+            selectedColor={colors.nav}
+            alpha={!colors.night ? -0.02 : 0.02}
             onPress={async () => {
               await setSetting(
                 settings,
@@ -746,7 +767,6 @@ export const Settings = ({route, navigation}) => {
                 !settings.forcePortraitOnTablet,
               );
             }}
-            activeOpacity={opacity}
             style={{
               width: '100%',
               marginHorizontal: 0,
@@ -754,6 +774,7 @@ export const Settings = ({route, navigation}) => {
               flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'space-between',
+              paddingHorizontal: 12,
             }}>
             <Text
               style={{
@@ -775,7 +796,7 @@ export const Settings = ({route, navigation}) => {
                   : 'toggle-switch-off'
               }
             />
-          </TouchableOpacity>
+          </PressableButton>
         ) : null}
 
         <Text
@@ -787,31 +808,62 @@ export const Settings = ({route, navigation}) => {
             borderBottomColor: colors.nav,
             borderBottomWidth: 0.5,
             paddingBottom: 3,
+            paddingHorizontal: 12,
           }}>
           Backup & Restore
         </Text>
 
-        <TouchableOpacity
-          onPress={async () => {
-            await setSetting(
-              settings,
-              'useSystemTheme',
-              !settings.useSystemTheme,
-            );
+        {[
+          {
+            name: 'Backup data',
+            func: () => {
+              Linking.openURL('https://www.notesnook.com/privacy.html');
+            },
+            desc: 'Backup all your data to phone storage',
+          },
+          {
+            name: 'Restore data',
+            func: () => {
+              Linking.openURL('https://www.notesnook.com');
+            },
+            desc: 'Restore backup from your phone.',
+          },
+        ].map((item) => (
+          <PressableButton
+            color={colors.bg}
+            selectedColor={colors.nav}
+            alpha={!colors.night ? -0.02 : 0.02}
+            key={item.name}
+            customStyle={{
+              height: 50,
+              justifyContent: 'center',
+              paddingHorizontal: 12,
+              width: '100%',
+            }}
+            onPress={item.func}>
+            <Text
+              style={{
+                fontSize: SIZE.sm,
+                fontFamily: WEIGHT.regular,
+                textAlignVertical: 'center',
+                color: colors.pri,
+                width: '100%',
+              }}>
+              {item.name}
+              {'\n'}
+              <Text
+                style={{
+                  fontSize: SIZE.xs,
+                  color: colors.icon,
+                }}>
+                {item.desc}
+              </Text>
+            </Text>
+            {item.customComponent ? item.customComponent : null}
+          </PressableButton>
+        ))}
 
-            if (!settings.useSystemTheme) {
-              MMKV.setStringAsync(
-                'theme',
-                JSON.stringify({night: Appearance.getColorScheme() === 'dark'}),
-              );
-              changeColorScheme(
-                Appearance.getColorScheme() === 'dark'
-                  ? COLOR_SCHEME_DARK
-                  : COLOR_SCHEME_LIGHT,
-              );
-            }
-          }}
-          activeOpacity={opacity}
+        <View
           style={{
             width: '100%',
             marginHorizontal: 0,
@@ -819,6 +871,7 @@ export const Settings = ({route, navigation}) => {
             alignItems: 'center',
             justifyContent: 'space-between',
             height: 50,
+            paddingHorizontal: 12,
           }}>
           <Text
             style={{
@@ -856,13 +909,16 @@ export const Settings = ({route, navigation}) => {
               },
             ].map((item) => (
               <TouchableOpacity
+                activeOpacity={1}
                 onPress={async () => {
                   await setSetting(settings, 'reminder', item.value);
                 }}
                 key={item.value}
                 style={{
                   backgroundColor:
-                    settings.reminder === 'daily' ? colors.accent : colors.nav,
+                    settings.reminder === item.value
+                      ? colors.accent
+                      : colors.nav,
                   justifyContent: 'center',
                   alignItems: 'center',
                   width: 60,
@@ -871,7 +927,7 @@ export const Settings = ({route, navigation}) => {
                 <Text
                   style={{
                     color:
-                      settings.reminder === 'daily' ? 'white' : colors.icon,
+                      settings.reminder === item.value ? 'white' : colors.icon,
                     fontSize: SIZE.xs,
                   }}>
                   {item.title}
@@ -879,24 +935,42 @@ export const Settings = ({route, navigation}) => {
               </TouchableOpacity>
             ))}
           </View>
-        </TouchableOpacity>
+        </View>
 
-        <TouchableOpacity
+        <PressableButton
+          color={colors.bg}
+          selectedColor={colors.nav}
+          alpha={!colors.night ? -0.02 : 0.02}
           onPress={async () => {
+            if (!user) {
+              ToastEvent.show(
+                'You must login to enable encryption',
+                'error',
+                'global',
+                6000,
+                () => {
+                  NavigationService.navigate('Login', {
+                    root: true,
+                  });
+                },
+                'Login',
+              );
+              return;
+            }
             await setSetting(
               settings,
               'encryptedBackup',
               !settings.encryptedBackup,
             );
           }}
-          activeOpacity={opacity}
-          style={{
+          customStyle={{
             width: '100%',
             marginHorizontal: 0,
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-between',
             height: 50,
+            paddingHorizontal: 12,
           }}>
           <Text
             style={{
@@ -916,55 +990,12 @@ export const Settings = ({route, navigation}) => {
           </Text>
           <Icon
             size={SIZE.xl}
-            color={settings.useSystemTheme ? colors.accent : colors.icon}
+            color={settings.encryptedBackup ? colors.accent : colors.icon}
             name={
-              settings.useSystemTheme ? 'toggle-switch' : 'toggle-switch-off'
+              settings.encryptedBackup ? 'toggle-switch' : 'toggle-switch-off'
             }
           />
-        </TouchableOpacity>
-
-        {[
-          {
-            name: 'Backup data',
-            func: () => {
-              Linking.openURL('https://www.notesnook.com/privacy.html');
-            },
-            desc: 'Backup all your data to phone storage',
-          },
-          {
-            name: 'Restore data',
-            func: () => {
-              Linking.openURL('https://www.notesnook.com');
-            },
-            desc: 'Restore backup from your phone.',
-          },
-        ].map((item) => (
-          <TouchableOpacity
-            key={item.name}
-            activeOpacity={opacity}
-            onPress={item.func}>
-            <Text
-              style={{
-                fontSize: SIZE.sm,
-                fontFamily: WEIGHT.regular,
-                textAlignVertical: 'center',
-                color: colors.pri,
-                height: 50,
-                justifyContent: 'center',
-              }}>
-              {item.name}
-              {'\n'}
-              <Text
-                style={{
-                  fontSize: SIZE.xs,
-                  color: colors.icon,
-                }}>
-                {item.desc}
-              </Text>
-            </Text>
-            {item.customComponent ? item.customComponent : null}
-          </TouchableOpacity>
-        ))}
+        </PressableButton>
 
         <Text
           style={{
@@ -975,6 +1006,7 @@ export const Settings = ({route, navigation}) => {
             borderBottomColor: colors.nav,
             borderBottomWidth: 0.5,
             paddingBottom: 3,
+            paddingHorizontal: 12,
           }}>
           Other
         </Text>
@@ -988,20 +1020,31 @@ export const Settings = ({route, navigation}) => {
             desc: 'Read our privacy policy',
           },
           {
+            name: 'Check for updates',
+            func: () => {
+              Linking.openURL('https://www.notesnook.com/privacy.html');
+            },
+            desc: 'Check for a newer version of app',
+          },
+          {
             name: 'About',
             func: () => {
               Linking.openURL('https://www.notesnook.com');
             },
-            desc: null,
+            desc: 'You are using the latest version of our app.',
           },
         ].map((item) => (
-          <TouchableOpacity
+          <PressableButton
+            color={colors.bg}
+            selectedColor={colors.nav}
+            alpha={!colors.night ? -0.02 : 0.02}
             key={item.name}
-            activeOpacity={opacity}
             onPress={item.func}
-            style={{
+            customStyle={{
               height: 50,
               justifyContent: 'center',
+              paddingHorizontal: 12,
+              width: '100%',
             }}>
             <Text
               style={{
@@ -1009,6 +1052,7 @@ export const Settings = ({route, navigation}) => {
                 fontFamily: WEIGHT.regular,
                 textAlignVertical: 'center',
                 color: colors.pri,
+                width: '100%',
               }}>
               {item.name}
               {'\n'}
@@ -1021,7 +1065,7 @@ export const Settings = ({route, navigation}) => {
               </Text>
             </Text>
             {item.customComponent ? item.customComponent : null}
-          </TouchableOpacity>
+          </PressableButton>
         ))}
         <Seperator />
       </ScrollView>
