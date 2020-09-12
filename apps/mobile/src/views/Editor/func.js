@@ -20,20 +20,25 @@ export const injectedJS = `if (!window.location.search) {
       }
       `;
 
-export const INJECTED_JAVASCRIPT = (premium, noMenu) => premium ?`(function() {
+export const INJECTED_JAVASCRIPT = (premium, noMenu) =>
+  premium
+    ? `(function() {
         setTimeout(() => {
          loadAction(true,false);
+     
         },100)
-     })();`:`(function() {
+     })();`
+    : `(function() {
       setTimeout(() => {
        loadAction(false,false);
+     
+   
       },100)
-   })();` ;
+   })();`;
 
 var note = {};
 
 export function getNote() {
-
   return note;
 }
 
@@ -52,7 +57,7 @@ export function post(type, value = null) {
   EditorWebView.current?.postMessage(JSON.stringify(message));
 }
 
-export const _onShouldStartLoadWithRequest = request => {
+export const _onShouldStartLoadWithRequest = (request) => {
   if (request.url.includes('https')) {
     Linking.openURL(request.url);
     return false;
@@ -84,7 +89,7 @@ export async function loadNote(item) {
   }
 }
 
-const onChange = data => {
+const onChange = (data) => {
   if (data !== '') {
     let rawData = JSON.parse(data);
 
@@ -96,7 +101,7 @@ const onChange = data => {
   }
 };
 
-export const _onMessage = evt => {
+export const _onMessage = (evt) => {
   if (evt.nativeEvent.data === 'loaded') {
   } else if (evt.nativeEvent.data !== '' && evt.nativeEvent.data !== 'loaded') {
     clearTimeout(timer);
@@ -123,8 +128,8 @@ export async function clearEditor() {
   tapCount = 0;
   saveCounter = 0;
   canSave = false;
-  post('clearEditor');
-  post('clearTitle');
+  //post('clearEditor');
+  //post('clearTitle');
   post('blur');
 }
 
@@ -203,6 +208,7 @@ async function addToCollection(id) {
 
 export async function saveNote(lockNote = true) {
   if (!checkIfContentIsSavable()) return;
+
   let lockedNote = id ? db.notes.note(id).data.locked : null;
   post('saving', 'Saving');
 
@@ -247,9 +253,8 @@ export async function saveNote(lockNote = true) {
 }
 
 export function onWebViewLoad(noMenu, premium, colors) {
-  EditorWebView.current?.injectJavaScript(
-    INJECTED_JAVASCRIPT(premium, false),
-  );
+  EditorWebView.current?.injectJavaScript(INJECTED_JAVASCRIPT(premium, false));
+  //
   if (note && note.id) {
     updateEditor();
   } else {
@@ -258,6 +263,10 @@ export function onWebViewLoad(noMenu, premium, colors) {
   let c = {...colors};
   c.factor = normalize(1);
   post('theme', c);
+  setTimeout(() => {
+    Platform.OS === 'android' ? EditorWebView.current?.requestFocus() : null;
+    post('blur');
+  }, 3000);
 
   /*  setTimeout(() => {
 
@@ -290,6 +299,7 @@ const updateEditor = async () => {
   }
   if (content.text === '' && note.content.delta === null) {
     post('clearEditor');
+    post('blur');
   } else if (note.content.delta) {
     if (typeof note.content.delta !== 'string') {
       content.delta = note.content.delta;
