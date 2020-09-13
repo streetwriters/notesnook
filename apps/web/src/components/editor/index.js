@@ -23,6 +23,8 @@ function Editor() {
   const isTrial = useUserStore(
     (store) => store.user.notesnook?.subscription?.isTrial
   );
+  const isLoggedin = useUserStore((store) => store.isLoggedIn);
+
   const quillRef = useRef();
   const [diff] = useHashParam("diff");
 
@@ -80,7 +82,7 @@ function Editor() {
           id="quill"
           ref={quillRef}
           refresh={sessionState === SESSION_STATES.new}
-          isSimple={isTrial}
+          isSimple={isLoggedin || !isTrial}
           initialContent={delta}
           placeholder="Type anything here"
           container=".editor"
