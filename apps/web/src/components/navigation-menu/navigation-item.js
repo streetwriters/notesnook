@@ -1,8 +1,10 @@
 import React from "react";
 import { Flex, Button, Text } from "rebass";
+import { useStore as useAppStore } from "../../stores/app-store";
 
 function NavigationItem(props) {
   const { icon: Icon, color, title, isLoading } = props;
+  const toggleSideMenu = useAppStore((store) => store.toggleSideMenu);
 
   return (
     <Button
@@ -10,7 +12,10 @@ function NavigationItem(props) {
       py={3}
       label={title}
       title={title}
-      onClick={props.onClick}
+      onClick={() => {
+        toggleSideMenu(false);
+        props.onClick();
+      }}
     >
       <Flex
         justifyContent={["flex-start", "center", "center"]}
