@@ -44,4 +44,4 @@ const useHashParam = (key, defaultValue) => {
   return [innerValue || defaultValue];
 };
 
-export { setHashParam, useHashParam };
+export { setHashParam, useHashParam, getHashParam };

@@ -60,20 +60,8 @@ export default class ReactQuill extends Component {
   shouldComponentUpdate(nextProps) {
     return (
       this.props.readOnly !== nextProps.readOnly ||
-      nextProps.refresh ||
       this.props.isSimple !== nextProps.isSimple
     );
-  }
-
-  componentDidUpdate() {
-    const { initialContent, refresh } = this.props;
-    if (refresh) {
-      this.quill.setContents(initialContent);
-      this.quill.history.clear();
-      if (!initialContent.ops || !initialContent.ops.length) return;
-      const text = this.quill.getText();
-      this.quill.setSelection(text.length, 0);
-    }
   }
 
   componentDidMount() {
@@ -121,10 +109,12 @@ export default class ReactQuill extends Component {
   }
 
   textChangeHandler = (delta, oldDelta, source) => {
+    if (source === "init") return;
     this.props.onChange(this.quill);
   };
 
   render() {
+    console.log("RERENDERING QUILL");
     return <pre id={this.props.id} />;
   }
 }

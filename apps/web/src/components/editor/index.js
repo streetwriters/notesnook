@@ -13,17 +13,18 @@ import { useHashParam } from "../../utils/useHashParam";
 import SplitEditor from "../spliteditor";
 
 function Editor() {
+  console.log("RERENDERING EDITOR");
   const delta = useStore((store) => store.session.content.delta);
   const sessionState = useStore((store) => store.session.state);
   const setSession = useStore((store) => store.setSession);
   const saveSession = useStore((store) => store.saveSession);
-  const openSession = useStore((store) => store.openSession);
+  const init = useStore((store) => store.init);
+  //const openSession = useStore((store) => store.openSession);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
   const isTrial = useUserStore(
     (store) => store.user.notesnook?.subscription?.isTrial
   );
   const quillRef = useRef();
-  const [noteId] = useHashParam("note");
   const [diff] = useHashParam("diff");
 
   useEffect(() => {
@@ -36,9 +37,19 @@ function Editor() {
   }, []);
 
   useEffect(() => {
-    if (!noteId) return;
-    (async () => await openSession(noteId))();
-  }, [openSession, noteId]);
+    init();
+  }, [init]);
+
+  useEffect(() => {
+    if (sessionState === SESSION_STATES.new) {
+      const { quill } = quillRef.current;
+      quill.setContents(delta, "init");
+      quill.history.clear();
+      if (!delta.ops || !delta.ops.length) return;
+      const text = quill.getText();
+      quill.setSelection(text.length, 0, "init");
+    }
+  }, [sessionState, delta]);
 
   if (diff) return <SplitEditor diffId={diff} />;
   return (

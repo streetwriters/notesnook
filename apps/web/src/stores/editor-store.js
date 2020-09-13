@@ -5,7 +5,7 @@ import { store as tagStore } from "./tag-store";
 import { db } from "../common";
 import BaseStore from ".";
 import { isMobile } from "../utils/dimensions";
-import { setHashParam } from "../utils/useHashParam";
+import { getHashParam, setHashParam } from "../utils/useHashParam";
 
 const SESSION_STATES = { stale: "stale", new: "new" };
 const DEFAULT_SESSION = {
@@ -32,6 +32,13 @@ const DEFAULT_SESSION = {
 class EditorStore extends BaseStore {
   session = DEFAULT_SESSION;
   arePropertiesVisible = false;
+
+  init = () => {
+    window.addEventListener("hashchange", async () => {
+      const note = getHashParam("note");
+      if (note) await this.openSession(note);
+    });
+  };
 
   openLastSession = async () => {
     // Do not reopen last session on mobile
