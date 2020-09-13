@@ -1,14 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { Keyboard, Text, View } from 'react-native';
-import { useSafeArea } from 'react-native-safe-area-context';
+import React, {useEffect, useState} from 'react';
+import {Keyboard, Text, View} from 'react-native';
+import {useSafeArea} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { pv, SIZE, WEIGHT } from '../../common/common';
-import { useTracked } from '../../provider';
-import {
-  DDS,
-  getElevation
-} from '../../utils/utils';
-import { PressableButton } from '../PressableButton';
+import {pv, SIZE, WEIGHT} from '../../common/common';
+import {useTracked} from '../../provider';
+import {DDS, getElevation} from '../../utils/utils';
+import {PressableButton} from '../PressableButton';
 
 export const ContainerBottomButton = ({root}) => {
   const [state, dispatch] = useTracked();
@@ -63,12 +60,22 @@ export const ContainerBottomButton = ({root}) => {
         ],
       }}>
       <PressableButton
-        color={containerBottomButton.color? containerBottomButton.color : colors.accent}
-        selectedColor={containerBottomButton.color? containerBottomButton.color : colors.accent}
+        color={
+          containerBottomButton.color
+            ? containerBottomButton.color
+            : colors.accent
+        }
+        selectedColor={
+          containerBottomButton.color
+            ? containerBottomButton.color
+            : colors.accent
+        }
+        customStyle={{
+          ...getElevation(5),
+        }}
         onPress={containerBottomButton.bottomButtonOnPress}>
         <View
           style={{
-            ...getElevation(5),
             justifyContent: 'flex-start',
             alignItems: 'center',
             flexDirection: 'row',
