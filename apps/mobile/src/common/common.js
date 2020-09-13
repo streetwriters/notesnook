@@ -205,7 +205,7 @@ export async function getColorScheme(useSystemTheme) {
   } else {
     setAccentColor(accentColor);
   }
-  
+
   if (useSystemTheme) {
     StatusBar.setBarStyle(
       Appearance.getColorScheme() === 'dark' ? 'light-content' : 'dark-content',
@@ -213,7 +213,7 @@ export async function getColorScheme(useSystemTheme) {
 
     Appearance.getColorScheme() === 'dark'
       ? setColorScheme(COLOR_SCHEME_DARK)
-      : setColorScheme(COLOR_SCHEME_DARK);
+      : setColorScheme(COLOR_SCHEME_LIGHT);
 
     return COLOR_SCHEME;
   }
@@ -226,7 +226,7 @@ export async function getColorScheme(useSystemTheme) {
     theme = JSON.parse(theme);
     theme.night
       ? setColorScheme(COLOR_SCHEME_DARK)
-      : setColorScheme(COLOR_SCHEME_DARK);
+      : setColorScheme(COLOR_SCHEME_LIGHT);
     StatusBar.setBarStyle(theme.night ? 'light-content' : 'dark-content');
   }
 
