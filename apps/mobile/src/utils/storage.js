@@ -1,55 +1,49 @@
 import MMKVStorage from 'react-native-mmkv-storage';
 import Sodium from 'react-native-sodium';
+import RNHTMLtoPDF from 'react-native-html-to-pdf';
+import {Platform} from 'react-native';
+import RNFetchBlob from 'rn-fetch-blob';
 
 export const MMKV = new MMKVStorage.Loader().initialize();
 
 async function read(key, isArray = false) {
   let data;
-  if (isArray) {
-    try {
-      data = await MMKV.getArrayAsync(key);
-    } catch (e) {
-      data = [];
-    }
-  } else if (key === 'hasConflicts') {
-    return await MMKV.getBoolAsync(key);
-  } else if (key === "t") {
-      try {
-        return await MMKV.getStringAsync(key);
-      } catch(e) {
-        return null
-      }
-  } else {
-    try {
-      data = await MMKV.getMapAsync(key);
-    } catch (e) {
-      data = null;
-    }
+
+  try {
+    data = await MMKV.getItem(key);
+  } catch (e) {}
+  if (!data) return null;
+  try {
+    data = JSON.parse(data);
+  } catch (e) {
+    data = data;
   }
 
-  return isArray ? data.slice() : data;
+  return data;
 }
 
 async function write(key, data) {
-  if (Array.isArray(data)) {
-    return await MMKV.setArrayAsync(key, data.slice());
-  } else if (typeof data === 'boolean') {
-    return await MMKV.setBoolAsync(key, data);
-  } else if (typeof data === "number") {
-    return await MMKV.setIntAsync(key, data);
-  } else {
-    console.log(key,data,"VALUE");
-    return await MMKV.setMapAsync(key, data);
-  }
+  return await MMKV.setItem(
+    key,
+    typeof data === 'string' ? data : JSON.stringify(data),
+  );
 }
 
 async function readMulti(keys) {
   if (keys.length <= 0) {
     return [];
   } else {
-    let data = await MMKV.getMultipleItemsAsync(keys.slice());
+    let data = await MMKV.getMultipleItemsAsync(keys);
 
-    return !data ? undefined : data;
+    return data.map(([key, value]) => {
+      let obj;
+      try {
+        obj = JSON.parse(value);
+      } catch (e) {
+        obj = value;
+      }
+      return [key, obj];
+    });
   }
 }
 
@@ -62,11 +56,11 @@ async function clear() {
 }
 
 function encrypt(password, data) {
-  return Sodium.encrypt(password, data).then(result => result);
+  return Sodium.encrypt(password, data).then((result) => result);
 }
 
 function decrypt(password, data) {
-  return Sodium.decrypt(password, data).then(result => result);
+  return Sodium.decrypt(password, data).then((result) => result);
 }
 
 async function deriveKey(password, salt) {
@@ -75,6 +69,23 @@ async function deriveKey(password, salt) {
 
     return data.key;
   } catch (e) {}
+}
+
+async function saveToPDF(html, filename) {
+  let options = {
+    html: html,
+    fileName: filename,
+    directory:
+      Platform.OS === 'ios'
+        ? 'Documents'
+        : RNFetchBlob.fs.dirs.SDCardDir + '/Call Of Writing/exported/PDF/',
+  };
+
+  return await RNHTMLtoPDF.convert(options);
+}
+
+async function getAllKeys() {
+  return await MMKV.indexer.getKeys();
 }
 
 export default {
@@ -86,4 +97,6 @@ export default {
   encrypt,
   decrypt,
   deriveKey,
+  saveToPDF,
+  getAllKeys,
 };
