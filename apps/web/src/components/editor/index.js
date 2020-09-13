@@ -13,7 +13,6 @@ import { useHashParam } from "../../utils/useHashParam";
 import SplitEditor from "../spliteditor";
 
 function Editor() {
-  console.log("RERENDERING EDITOR");
   const delta = useStore((store) => store.session.content.delta);
   const sessionState = useStore((store) => store.session.state);
   const setSession = useStore((store) => store.setSession);
