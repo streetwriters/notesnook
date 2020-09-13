@@ -23,6 +23,9 @@ function remove(key) {
 function clear() {
   storage = {};
 }
+function getAllKeys() {
+  return Object.keys(storage);
+}
 
 function encrypt(password, data) {
   return new Promise((resolve, reject) => {
@@ -39,7 +42,7 @@ function encrypt(password, data) {
 
 function decrypt(key, data) {
   return new Promise((resolve, reject) => {
-    if (key.password === data.key.password) resolve(data.cipher);
+    if (!key || key.password === data.key.password) resolve(data.cipher);
     else reject("Wrong password");
   });
 }
@@ -59,4 +62,5 @@ module.exports = {
   encrypt,
   decrypt,
   deriveKey,
+  getAllKeys,
 };

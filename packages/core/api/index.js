@@ -8,6 +8,7 @@ import Sync from "./sync";
 import Vault from "./vault";
 import Lookup from "./lookup";
 import Content from "../collections/content";
+import Backup from "../database/backup";
 import Conflicts from "./sync/conflicts";
 import EventManager from "../utils/event-manager";
 import Session from "./session";
@@ -44,6 +45,7 @@ class Database {
     this.vault = new Vault(this);
     this.conflicts = new Conflicts(this);
     this.lookup = new Lookup(this);
+    this.backup = new Backup(this);
 
     // collections
     /** @type {Notes} */

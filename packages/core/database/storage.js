@@ -17,6 +17,9 @@ export default class Storage {
   remove(key) {
     return this.storage.remove(key);
   }
+  getAllKeys() {
+    return this.storage.getAllKeys();
+  }
   encrypt(password, data) {
     return this.storage.encrypt(password, data);
   }
