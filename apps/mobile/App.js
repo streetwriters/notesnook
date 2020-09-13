@@ -1,6 +1,6 @@
 import {useNetInfo} from '@react-native-community/netinfo';
 import React, {useEffect, useState} from 'react';
-import {Appearance, StatusBar, useColorScheme} from 'react-native';
+import {Appearance, StatusBar, useColorScheme, AppState} from 'react-native';
 import Orientation from 'react-native-orientation';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {getColorScheme, scale, updateSize} from './src/common/common';
@@ -25,9 +25,24 @@ const App = () => {
     }, 1000); */
   };
 
+  const _onAppStateChange = () => {
+    //changeTheme();
+  }
+
   useEffect(() => {
-    (async () => {
-      let settings;
+      AppState.addEventListener("focus", _onAppStateChange)
+  
+     return () => {
+      AppState.removeEventListener("focus", _onAppStateChange);
+     }
+  },[])
+
+  useEffect(() => {
+      //changeTheme();
+  }, [colorScheme]);
+
+  const changeTheme = async () => {
+    let settings;
       try {
         settings = await MMKV.getStringAsync('settings');
       } catch (e) {}
@@ -43,10 +58,13 @@ const App = () => {
             ? 'light-content'
             : 'dark-content',
         );
+
         dispatch({type: ACTIONS.THEME, colors: newColors});
       }
-    })();
-  }, [colorScheme]);
+  }
+
+
+
 
   useEffect(() => {
     if (!netInfo.isConnected || !netInfo.isInternetReachable) {
@@ -156,7 +174,9 @@ const App = () => {
       dispatch({type: ACTIONS.SETTINGS, settings: {...settings}});
     }
 
+
     let newColors = await getColorScheme(settings.useSystemTheme);
+  
     dispatch({type: ACTIONS.THEME, colors: newColors});
   }
 
