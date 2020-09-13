@@ -115,6 +115,6 @@ export default class ReactQuill extends Component {
 
   render() {
     console.log("RERENDERING QUILL");
-    return <pre id={this.props.id} />;
+    return <pre onFocus={this.props.onFocus} id={this.props.id} />;
   }
 }

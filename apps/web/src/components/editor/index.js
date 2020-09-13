@@ -17,8 +17,8 @@ function Editor() {
   const sessionState = useStore((store) => store.session.state);
   const setSession = useStore((store) => store.setSession);
   const saveSession = useStore((store) => store.saveSession);
+  const toggleProperties = useStore((store) => store.toggleProperties);
   const init = useStore((store) => store.init);
-  //const openSession = useStore((store) => store.openSession);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
   const isTrial = useUserStore(
     (store) => store.user.notesnook?.subscription?.isTrial
@@ -68,13 +68,7 @@ function Editor() {
       }}
       flex="1 1 auto"
     >
-      <Flex
-        variant="columnFill"
-        className="editor"
-        onFocus={() => {
-          //hideProperties();
-        }}
-      >
+      <Flex variant="columnFill" className="editor">
         <Header />
         <Flex id="toolbar" />
         <EditorMenu quill={quillRef.current && quillRef.current.quill} />
@@ -83,6 +77,9 @@ function Editor() {
           ref={quillRef}
           refresh={sessionState === SESSION_STATES.new}
           isSimple={isLoggedin || !isTrial}
+          onFocus={() => {
+            toggleProperties(false);
+          }}
           initialContent={delta}
           placeholder="Type anything here"
           container=".editor"

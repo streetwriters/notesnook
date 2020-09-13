@@ -190,9 +190,11 @@ class EditorStore extends BaseStore {
     this._setTagOrColor("tag", tag);
   };
 
-  toggleProperties = () => {
+  toggleProperties = (toggleState) => {
     this.set(
-      (state) => (state.arePropertiesVisible = !state.arePropertiesVisible)
+      (state) =>
+        (state.arePropertiesVisible =
+          toggleState !== undefined ? toggleState : !state.arePropertiesVisible)
     );
   };
 
