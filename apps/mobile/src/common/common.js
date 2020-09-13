@@ -1,17 +1,23 @@
-import { Dimensions, PixelRatio, StatusBar, Platform, Appearance } from 'react-native';
+import {
+  Dimensions,
+  PixelRatio,
+  StatusBar,
+  Platform,
+  Appearance,
+} from 'react-native';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
 } from '../services/eventManager';
-import { eThemeUpdated } from '../services/events';
-import { DDS } from '../utils/utils';
-import { MMKV } from '../utils/storage';
+import {eThemeUpdated} from '../services/events';
+import {DDS} from '../utils/utils';
+import {MMKV} from '../utils/storage';
 
 export const scale = {
   fontScale: 1,
 };
-const { height, width } = Dimensions.get('window');
+const {height, width} = Dimensions.get('window');
 
 //COLOR SCHEME
 export const ACCENT = {
@@ -48,8 +54,8 @@ export const COLOR_SCHEME_LIGHT = {
   bg: 'white',
   navbg: '#f6fbfc',
   nav: '#e1e4e8',
-  input:"transparent",
-  heading:'#000000',
+  input: 'transparent',
+  heading: '#000000',
   pri: '#24292e',
   sec: 'white',
   ...fixedColors,
@@ -58,9 +64,9 @@ export const COLOR_SCHEME_DARK = {
   night: true,
   bg: '#1f1f1f',
   navbg: '#1c1c1c',
-  input:'#2d2d2d',
+  input: '#2d2d2d',
   nav: '#2d2d2d',
-  heading:'#ffffff',
+  heading: '#ffffff',
   pri: '#D3D3D3',
   sec: 'black',
   ...fixedColors,
@@ -71,18 +77,15 @@ let adjustedWidth = windowSize.width * PixelRatio.get();
 let adjustedHeight = windowSize.height * PixelRatio.get();
 const pixelDensity = PixelRatio.get();
 
-
 export const COLORS_NOTE = {
-  red: "#f44336",
-  orange: "#FF9800",
-  yellow: "#FFD600",
-  green: "#4CAF50",
-  blue: "#2196F3",
-  purple: "#673AB7",
-  gray: "#9E9E9E",
+  red: '#f44336',
+  orange: '#FF9800',
+  yellow: '#FFD600',
+  green: '#4CAF50',
+  blue: '#2196F3',
+  purple: '#673AB7',
+  gray: '#9E9E9E',
 };
-
-
 
 const getDeviceSize = () => {
   let dpi = getDpi(pixelDensity);
@@ -95,7 +98,7 @@ const getDeviceSize = () => {
   return diagonalSize;
 };
 
-const getDpi = pd => {
+const getDpi = (pd) => {
   return 160 * pd;
 };
 
@@ -123,7 +126,7 @@ const correction = (size, multiplier) => {
   }
 };
 
-export const normalize = size => {
+export const normalize = (size) => {
   let pd = pixelDensity;
   if (pd === 1 || pd < 1) {
     return correction(size, 0.75);
@@ -150,8 +153,6 @@ export const SIZE = {
 };
 
 export function updateSize() {
- 
-
   SIZE.xxs = 10 * scale.fontScale;
   SIZE.xs = 12 * scale.fontScale;
   SIZE.sm = normalize(15) * scale.fontScale;
@@ -180,7 +181,7 @@ export const WEIGHT = {
 };
 
 export function setColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
-  COLOR_SCHEME = { ...colors, accent: accent.color, shade: accent.shade };
+  COLOR_SCHEME = {...colors, accent: accent.color, shade: accent.shade};
 
   eSendEvent(eThemeUpdated);
 
@@ -189,13 +190,14 @@ export function setColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
 
 export async function getColorScheme(useSystemTheme) {
   let accentColor;
+  let theme;
   try {
     accentColor = await MMKV.getStringAsync('accentColor');
-  } catch (e) { }
-  let t;
+  } catch (e) {}
+
   try {
-    t = await MMKV.getStringAsync('theme');
-  } catch (e) { }
+    theme = await MMKV.getStringAsync('theme');
+  } catch (e) {}
 
   if (typeof accentColor !== 'string') {
     MMKV.setStringAsync('accentColor', '#0560FF');
@@ -203,20 +205,29 @@ export async function getColorScheme(useSystemTheme) {
   } else {
     setAccentColor(accentColor);
   }
+  
   if (useSystemTheme) {
-    
-    StatusBar.setBarStyle(Appearance.getColorScheme() === "dark" ? 'light-content' : 'dark-content');
-    return Appearance.getColorScheme() === "dark" ? COLOR_SCHEME_DARK : COLOR_SCHEME_LIGHT
+    StatusBar.setBarStyle(
+      Appearance.getColorScheme() === 'dark' ? 'light-content' : 'dark-content',
+    );
+
+    Appearance.getColorScheme() === 'dark'
+      ? setColorScheme(COLOR_SCHEME_DARK)
+      : setColorScheme(COLOR_SCHEME_DARK);
+
+    return COLOR_SCHEME;
   }
-  if (typeof t !== 'string') {
-    MMKV.setStringAsync('theme', JSON.stringify({ night: false }));
+
+  if (typeof theme !== 'string') {
+    MMKV.setStringAsync('theme', JSON.stringify({night: false}));
+
     setColorScheme(COLOR_SCHEME_LIGHT);
   } else {
-    let themeToSet = JSON.parse(t);
-    themeToSet.night
+    theme = JSON.parse(theme);
+    theme.night
       ? setColorScheme(COLOR_SCHEME_DARK)
-      : setColorScheme(COLOR_SCHEME_LIGHT);
-    StatusBar.setBarStyle(themeToSet.night ? 'light-content' : 'dark-content');
+      : setColorScheme(COLOR_SCHEME_DARK);
+    StatusBar.setBarStyle(theme.night ? 'light-content' : 'dark-content');
   }
 
   eSendEvent(eThemeUpdated);
@@ -227,12 +238,13 @@ export async function getColorScheme(useSystemTheme) {
 export function setAccentColor(color) {
   ACCENT.color = color;
   ACCENT.shade = color + '12';
+
   return ACCENT;
 }
 
-export const onThemeUpdate = (func = () => { }) => {
+export const onThemeUpdate = (func = () => {}) => {
   return eSubscribeEvent(eThemeUpdated, func);
 };
-export const clearThemeUpdateListener = (func = () => { }) => {
+export const clearThemeUpdateListener = (func = () => {}) => {
   return eUnSubscribeEvent(eThemeUpdated, func);
 };
