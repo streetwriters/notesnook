@@ -1,6 +1,7 @@
 import {useIsFocused} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {
+  Appearance,
   Clipboard,
   Linking,
   Modal,
@@ -10,11 +11,8 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Appearance,
-  Pressable,
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
-
 import QRCode from 'react-native-qrcode-generator';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
@@ -29,24 +27,24 @@ import {
   SIZE,
   WEIGHT,
 } from '../../common/common';
+import {PressableButton} from '../../components/PressableButton';
+import Seperator from '../../components/Seperator';
 import {Toast} from '../../components/Toast';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
 import {eOpenLoginDialog, eResetApp} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
+import {MMKV} from '../../utils/storage';
 import {
   db,
   DDS,
+  hexToRGBA,
+  RGB_Linear_Shade,
   setSetting,
   ToastEvent,
   w,
-  RGB_Linear_Shade,
-  hexToRGBA,
 } from '../../utils/utils';
-import {MMKV} from '../../utils/storage';
-import {PressableButton} from '../../components/PressableButton';
-import Seperator from '../../components/Seperator';
 
 export const Settings = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
@@ -111,6 +109,60 @@ export const Settings = ({route, navigation}) => {
       });
     }
   }, [isFocused]);
+
+  const SectionHeader = ({title}) => (
+    <Text
+      style={{
+        fontSize: SIZE.xs,
+        fontFamily: WEIGHT.bold,
+        textAlignVertical: 'center',
+        color: colors.accent,
+        paddingHorizontal: 12,
+        borderBottomColor: colors.nav,
+        borderBottomWidth: 0.5,
+        paddingBottom: 3,
+      }}>
+      {title}
+    </Text>
+  );
+
+  const Button = ({title, tagline, customComponent, onPress, key}) => (
+    <PressableButton
+      key={key}
+      color="transparent"
+      selectedColor={colors.nav}
+      alpha={!colors.night ? -0.02 : 0.02}
+      onPress={onPress}
+      customStyle={{
+        height: 50,
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 12,
+        width: '100%',
+        borderRadius: 0,
+        flexDirection: 'row',
+      }}>
+      <Text
+        style={{
+          fontSize: SIZE.sm,
+          fontFamily: WEIGHT.regular,
+          textAlignVertical: 'center',
+          color: colors.pri,
+        }}>
+        {title}
+        {tagline ? '\n' : null}
+
+        <Text
+          style={{
+            fontSize: SIZE.xs,
+            color: colors.icon,
+          }}>
+          {tagline}
+        </Text>
+      </Text>
+      {customComponent ? customComponent : null}
+    </PressableButton>
+  );
 
   return (
     <Animatable.View
@@ -264,19 +316,7 @@ export const Settings = ({route, navigation}) => {
         }}>
         {user ? (
           <>
-            <Text
-              style={{
-                fontSize: SIZE.xs,
-                fontFamily: WEIGHT.bold,
-                textAlignVertical: 'center',
-                color: colors.accent,
-                borderBottomColor: colors.nav,
-                borderBottomWidth: 0.5,
-                paddingBottom: 3,
-                paddingHorizontal: 12,
-              }}>
-              Account Settings
-            </Text>
+            <SectionHeader title="Account Settings" />
             <Text
               style={{
                 fontSize: SIZE.sm,
@@ -362,28 +402,7 @@ export const Settings = ({route, navigation}) => {
                 },
               },
             ].map((item) => (
-              <TouchableOpacity
-                key={item.name}
-                activeOpacity={opacity}
-                onPress={item.func}
-                style={{
-                  width: '100%',
-                  height: 50,
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  paddingHorizontal: 12,
-                }}>
-                <Text
-                  style={{
-                    fontSize: SIZE.sm,
-                    fontFamily: WEIGHT.regular,
-                    textAlignVertical: 'center',
-                    color: colors.pri,
-                  }}>
-                  {item.name}
-                </Text>
-              </TouchableOpacity>
+              <Button key={item.name} title={item.name} onPress={item.func} />
             ))}
           </>
         ) : (
@@ -466,19 +485,7 @@ export const Settings = ({route, navigation}) => {
             </View>
           </>
         )}
-        <Text
-          style={{
-            fontSize: SIZE.xs,
-            fontFamily: WEIGHT.bold,
-            textAlignVertical: 'center',
-            color: colors.accent,
-            paddingHorizontal: 12,
-            borderBottomColor: colors.nav,
-            borderBottomWidth: 0.5,
-            paddingBottom: 3,
-          }}>
-          Appearance
-        </Text>
+        <SectionHeader title="Appearance" />
 
         <Text
           style={{
@@ -564,10 +571,13 @@ export const Settings = ({route, navigation}) => {
           ))}
         </View>
 
-        <PressableButton
-          color={colors.bg}
-          selectedColor={colors.nav}
-          alpha={!colors.night ? -0.02 : 0.02}
+        <Button
+          title="Use System Dark Mode"
+          tagline={
+            settings.useSystemTheme
+              ? 'Switch to dark theme based on system settings'
+              : 'Keep the app theme independent from system settings'
+          }
           onPress={async () => {
             await setSetting(
               settings,
@@ -587,46 +597,20 @@ export const Settings = ({route, navigation}) => {
               );
             }
           }}
-          customStyle={{
-            width: '100%',
-            marginHorizontal: 0,
-            height: 50,
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            paddingHorizontal: 12,
-          }}>
-          <Text
-            style={{
-              fontSize: SIZE.sm,
-              fontFamily: WEIGHT.regular,
-              textAlignVertical: 'center',
-              color: colors.pri,
-            }}>
-            Use System Dark Mode{'\n'}
-            <Text
-              style={{
-                fontSize: SIZE.xs,
-                color: colors.icon,
-              }}>
-              {settings.useSystemTheme
-                ? 'Switch to dark theme based on system settings'
-                : 'Keep the app theme independent from system settings'}
-            </Text>
-          </Text>
-          <Icon
-            size={SIZE.xl}
-            color={settings.useSystemTheme ? colors.accent : colors.icon}
-            name={
-              settings.useSystemTheme ? 'toggle-switch' : 'toggle-switch-off'
-            }
-          />
-        </PressableButton>
+          customComponent={
+            <Icon
+              size={SIZE.xl}
+              color={settings.useSystemTheme ? colors.accent : colors.icon}
+              name={
+                settings.useSystemTheme ? 'toggle-switch' : 'toggle-switch-off'
+              }
+            />
+          }
+        />
 
-        <PressableButton
-          color={colors.bg}
-          selectedColor={colors.nav}
-          alpha={!colors.night ? -0.02 : 0.02}
+        <Button
+          title="Dark Mode"
+          tagline={colors.night ? 'Turn off dark mode' : 'Turn on dark mode'}
           onPress={() => {
             if (!colors.night) {
               MMKV.setStringAsync('theme', JSON.stringify({night: true}));
@@ -637,39 +621,14 @@ export const Settings = ({route, navigation}) => {
               changeColorScheme(COLOR_SCHEME_LIGHT);
             }
           }}
-          activeOpacity={opacity}
-          customStyle={{
-            width: '100%',
-            marginHorizontal: 0,
-            height: 50,
-            flexDirection: 'row',
-            borderRadius: 0,
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            paddingHorizontal: 12,
-          }}>
-          <Text
-            style={{
-              fontSize: SIZE.sm,
-              fontFamily: WEIGHT.regular,
-              textAlignVertical: 'center',
-              color: colors.pri,
-            }}>
-            Dark Mode{'\n'}
-            <Text
-              style={{
-                fontSize: SIZE.xs,
-                color: colors.icon,
-              }}>
-              {colors.night ? 'Turn off dark mode' : 'Turn on dark mode'}
-            </Text>
-          </Text>
-          <Icon
-            size={SIZE.xl}
-            color={colors.night ? colors.accent : colors.icon}
-            name={colors.night ? 'toggle-switch' : 'toggle-switch-off'}
-          />
-        </PressableButton>
+          customComponent={
+            <Icon
+              size={SIZE.xl}
+              color={colors.night ? colors.accent : colors.icon}
+              name={colors.night ? 'toggle-switch' : 'toggle-switch-off'}
+            />
+          }
+        />
 
         <View
           style={{
@@ -756,10 +715,8 @@ export const Settings = ({route, navigation}) => {
         </View>
 
         {DDS.isTab ? (
-          <PressableButton
-            color={colors.bg}
-            selectedColor={colors.nav}
-            alpha={!colors.night ? -0.02 : 0.02}
+          <Button
+            title="Force portrait mode"
             onPress={async () => {
               await setSetting(
                 settings,
@@ -767,51 +724,23 @@ export const Settings = ({route, navigation}) => {
                 !settings.forcePortraitOnTablet,
               );
             }}
-            style={{
-              width: '100%',
-              marginHorizontal: 0,
-              paddingVertical: pv + 5,
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              paddingHorizontal: 12,
-            }}>
-            <Text
-              style={{
-                fontSize: SIZE.sm,
-                fontFamily: WEIGHT.regular,
-                textAlignVertical: 'center',
-                color: colors.pri,
-              }}>
-              Force portrait mode
-            </Text>
-            <Icon
-              size={SIZE.xl}
-              color={
-                settings.forcePortraitOnTablet ? colors.accent : colors.icon
-              }
-              name={
-                settings.forcePortraitOnTablet
-                  ? 'toggle-switch'
-                  : 'toggle-switch-off'
-              }
-            />
-          </PressableButton>
+            customComponent={
+              <Icon
+                size={SIZE.xl}
+                color={
+                  settings.forcePortraitOnTablet ? colors.accent : colors.icon
+                }
+                name={
+                  settings.forcePortraitOnTablet
+                    ? 'toggle-switch'
+                    : 'toggle-switch-off'
+                }
+              />
+            }
+          />
         ) : null}
 
-        <Text
-          style={{
-            fontSize: SIZE.xs,
-            fontFamily: WEIGHT.bold,
-            textAlignVertical: 'center',
-            color: colors.accent,
-            borderBottomColor: colors.nav,
-            borderBottomWidth: 0.5,
-            paddingBottom: 3,
-            paddingHorizontal: 12,
-          }}>
-          Backup & Restore
-        </Text>
+        <SectionHeader title="Backup & Restore" />
 
         {[
           {
@@ -829,38 +758,7 @@ export const Settings = ({route, navigation}) => {
             desc: 'Restore backup from your phone.',
           },
         ].map((item) => (
-          <PressableButton
-            color={colors.bg}
-            selectedColor={colors.nav}
-            alpha={!colors.night ? -0.02 : 0.02}
-            key={item.name}
-            customStyle={{
-              height: 50,
-              justifyContent: 'center',
-              paddingHorizontal: 12,
-              width: '100%',
-            }}
-            onPress={item.func}>
-            <Text
-              style={{
-                fontSize: SIZE.sm,
-                fontFamily: WEIGHT.regular,
-                textAlignVertical: 'center',
-                color: colors.pri,
-                width: '100%',
-              }}>
-              {item.name}
-              {'\n'}
-              <Text
-                style={{
-                  fontSize: SIZE.xs,
-                  color: colors.icon,
-                }}>
-                {item.desc}
-              </Text>
-            </Text>
-            {item.customComponent ? item.customComponent : null}
-          </PressableButton>
+          <Button title={item.name} tagline={item.desc} onPress={item.func} />
         ))}
 
         <View
@@ -937,10 +835,9 @@ export const Settings = ({route, navigation}) => {
           </View>
         </View>
 
-        <PressableButton
-          color={colors.bg}
-          selectedColor={colors.nav}
-          alpha={!colors.night ? -0.02 : 0.02}
+        <Button
+          title="Encrypted Backups"
+          tagline="Encrypt your data before backup"
           onPress={async () => {
             if (!user) {
               ToastEvent.show(
@@ -963,53 +860,18 @@ export const Settings = ({route, navigation}) => {
               !settings.encryptedBackup,
             );
           }}
-          customStyle={{
-            width: '100%',
-            marginHorizontal: 0,
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            height: 50,
-            paddingHorizontal: 12,
-          }}>
-          <Text
-            style={{
-              fontSize: SIZE.sm,
-              fontFamily: WEIGHT.regular,
-              textAlignVertical: 'center',
-              color: colors.pri,
-            }}>
-            Encrypted Backups{'\n'}
-            <Text
-              style={{
-                fontSize: SIZE.xs,
-                color: colors.icon,
-              }}>
-              Encrypt your data before backup
-            </Text>
-          </Text>
-          <Icon
-            size={SIZE.xl}
-            color={settings.encryptedBackup ? colors.accent : colors.icon}
-            name={
-              settings.encryptedBackup ? 'toggle-switch' : 'toggle-switch-off'
-            }
-          />
-        </PressableButton>
+          customComponent={
+            <Icon
+              size={SIZE.xl}
+              color={settings.encryptedBackup ? colors.accent : colors.icon}
+              name={
+                settings.encryptedBackup ? 'toggle-switch' : 'toggle-switch-off'
+              }
+            />
+          }
+        />
 
-        <Text
-          style={{
-            fontSize: SIZE.xs,
-            fontFamily: WEIGHT.bold,
-            textAlignVertical: 'center',
-            color: colors.accent,
-            borderBottomColor: colors.nav,
-            borderBottomWidth: 0.5,
-            paddingBottom: 3,
-            paddingHorizontal: 12,
-          }}>
-          Other
-        </Text>
+        <SectionHeader title="Other" />
 
         {[
           {
@@ -1034,38 +896,7 @@ export const Settings = ({route, navigation}) => {
             desc: 'You are using the latest version of our app.',
           },
         ].map((item) => (
-          <PressableButton
-            color={colors.bg}
-            selectedColor={colors.nav}
-            alpha={!colors.night ? -0.02 : 0.02}
-            key={item.name}
-            onPress={item.func}
-            customStyle={{
-              height: 50,
-              justifyContent: 'center',
-              paddingHorizontal: 12,
-              width: '100%',
-            }}>
-            <Text
-              style={{
-                fontSize: SIZE.sm,
-                fontFamily: WEIGHT.regular,
-                textAlignVertical: 'center',
-                color: colors.pri,
-                width: '100%',
-              }}>
-              {item.name}
-              {'\n'}
-              <Text
-                style={{
-                  fontSize: SIZE.xs,
-                  color: colors.icon,
-                }}>
-                {item.desc}
-              </Text>
-            </Text>
-            {item.customComponent ? item.customComponent : null}
-          </PressableButton>
+          <Button title={item.name} tagline={item.desc} onPress={item.func} />
         ))}
         <Seperator />
       </ScrollView>
