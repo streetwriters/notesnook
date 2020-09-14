@@ -1,9 +1,10 @@
 import CheckBox from '@react-native-community/checkbox';
-import React, {createRef, useState} from 'react';
+import React, {createRef, useEffect, useState} from 'react';
 import {Clipboard, Modal, Text, TouchableOpacity, View} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import {TextInput} from 'react-native-gesture-handler';
 import QRCode from 'react-native-qrcode-generator';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {opacity, ph, pv, SIZE, WEIGHT} from '../../common/common';
 import {Button} from '../../components/Button';
@@ -11,8 +12,12 @@ import Seperator from '../../components/Seperator';
 import {Toast} from '../../components/Toast';
 import {ACTIONS} from '../../provider/actions';
 import {useTracked} from '../../provider/index';
-import {eSendEvent} from '../../services/eventManager';
-import {eCloseLoginDialog} from '../../services/events';
+import {
+  eSendEvent,
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+} from '../../services/eventManager';
+import {eCloseLoginDialog, eOpenLoginDialog} from '../../services/events';
 import {
   validateEmail,
   validatePass,
@@ -24,7 +29,7 @@ import {Loading} from '../Loading';
 const LoginDialog = () => {
   const [state, dispatch] = useTracked();
   const colors = state.colors;
-  const [visible, setVisible] = useState(true);
+  const [visible, setVisible] = useState(false);
   const [animated, setAnimated] = useState(false);
   const [status, setStatus] = useState('Logging you in');
   const [loggingIn, setLoggingIn] = useState(false);
@@ -48,6 +53,14 @@ const LoginDialog = () => {
   const _username = createRef();
   const _passConfirm = createRef();
   const _passContainer = createRef();
+  const insets = useSafeAreaInsets();
+
+  useEffect(() => {
+    eSubscribeEvent(eOpenLoginDialog, open);
+    return () => {
+      eUnSubscribeEvent(eOpenLoginDialog, open);
+    };
+  }, []);
 
   function open() {
     setVisible(true);
@@ -72,14 +85,11 @@ const LoginDialog = () => {
     setLoggingIn(true);
     _username.current.blur();
     _pass.current.blur();
-    setStatus('Logging in...');
+    setStatus('Authenticating');
 
     try {
       let res = await db.user.login(username.toLowerCase(), password);
       console.log(res, username, password);
-      if (res) {
-        setStatus('Fetching data...');
-      }
     } catch (e) {
       setTimeout(() => {
         ToastEvent.show(e.message, 'error');
@@ -94,14 +104,15 @@ const LoginDialog = () => {
     try {
       user = await db.user.get();
       if (!user) throw new Error('Username or password incorrect');
+      setStatus('Syncing your notes');
       dispatch({type: ACTIONS.USER, user: user});
       dispatch({type: ACTIONS.SYNCING, syncing: true});
-      setStatus('Syncing your notes...');
+
       await db.sync();
       eSendEvent(eStartSyncer);
-      navigation.goBack();
       dispatch({type: ACTIONS.ALL});
       eSendEvent(refreshNotesPage);
+      setVisible(false);
       dispatch({type: ACTIONS.SYNCING, syncing: false});
       ToastEvent.show(`Logged in as ${username}`, 'success');
     } catch (e) {
@@ -115,7 +126,7 @@ const LoginDialog = () => {
     if (!validateInfo) return;
 
     setSigningIn(true);
-    setStatus('Creating your account...');
+    setStatus('Creating your account');
     try {
       await db.user.signup(username, email, password);
     } catch (e) {
@@ -128,15 +139,12 @@ const LoginDialog = () => {
     let user;
     try {
       user = await db.user.user.get();
-      setStatus('Logging you in...');
       let k = await db.user.key();
       setKey(k.key);
-      setStatus('Setting up crenditials...');
+      setStatus('Setting up crenditials');
       dispatch({type: ACTIONS.USER, user: user});
       eSendEvent(eStartSyncer);
-      setTimeout(() => {
-        setModalVisible(true);
-      }, 500);
+      setModalVisible(true);
     } catch (e) {
       setSigningIn(false);
       setFailed(true);
@@ -147,35 +155,22 @@ const LoginDialog = () => {
   return (
     <Modal
       animated={true}
-      animationType="fade"
-      onShow={() => {
-        setAnimated(true);
-      }}
+      animationType="slide"
+      statusBarTranslucent={true}
       onRequestClose={close}
       visible={visible}
       transparent={true}>
-      <Animatable.View
-        transition={['opacity', 'scaleX', 'scaleY']}
-        useNativeDriver={true}
-        duration={300}
-        iterationCount={1}
+      <View
         style={{
-          opacity: animated ? 1 : 0,
+          opacity: 1,
           flex: 1,
+          paddingTop: insets.top,
           backgroundColor: DDS.isTab ? 'rgba(0,0,0,0.3)' : colors.bg,
           width: '100%',
           height: '100%',
           alignSelf: 'center',
           justifyContent: 'center',
           alignItems: 'center',
-          transform: [
-            {
-              scaleX: animated ? 1 : 0.95,
-            },
-            {
-              scaleY: animated ? 1 : 0.95,
-            },
-          ],
         }}>
         {DDS.isTab ? (
           <TouchableOpacity
@@ -765,9 +760,9 @@ const LoginDialog = () => {
                         privacy policy.
                       </Text>
                     </Text>
-                    <Seperator />
                   </View>
                 )}
+                {login ? null : <Seperator />}
 
                 <View
                   style={{
@@ -813,7 +808,7 @@ const LoginDialog = () => {
             </>
           )}
         </View>
-      </Animatable.View>
+      </View>
       <Toast context="local" />
     </Modal>
   );
