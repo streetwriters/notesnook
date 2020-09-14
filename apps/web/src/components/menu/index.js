@@ -43,7 +43,6 @@ function Menu(props) {
                   if (props.closeMenu) {
                     props.closeMenu();
                   }
-                  console.log("ITEM", item);
                   if (!item.component) {
                     item.onClick(props.data);
                   }
