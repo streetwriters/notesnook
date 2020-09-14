@@ -11,6 +11,8 @@ import {eSubscribeEvent, eUnSubscribeEvent} from './src/services/eventManager';
 import {eDispatchAction, eResetApp, eStartSyncer} from './src/services/events';
 import {MMKV} from './src/utils/storage';
 import {db, DDS, ToastEvent} from './src/utils/utils';
+
+let theme;
 const App = () => {
   const [, dispatch] = useTracked();
   const [init, setInit] = useState(false);
@@ -23,48 +25,33 @@ const App = () => {
     setTimeout(() => {
       forceUpdate();
     }, 1000); */
-  };
-
-  const _onAppStateChange = () => {
-    //changeTheme();
   }
 
   useEffect(() => {
-      AppState.addEventListener("focus", _onAppStateChange)
-  
-     return () => {
-      AppState.removeEventListener("focus", _onAppStateChange);
-     }
-  },[])
-
-  useEffect(() => {
-      //changeTheme();
+    changeTheme();
   }, [colorScheme]);
 
   const changeTheme = async () => {
     let settings;
-      try {
-        settings = await MMKV.getStringAsync('settings');
-      } catch (e) {}
-      if (!settings) {
-        return;
-      }
-      settings = JSON.parse(settings);
+    try {
+      settings = await MMKV.getStringAsync('settings');
+    } catch (e) {}
+    if (!settings) {
+      return;
+    }
+    settings = JSON.parse(settings);
+    console.log(settings.useSystemTheme)
+    if (settings.useSystemTheme) {
+      let newColors = await getColorScheme(settings.useSystemTheme);
+      StatusBar.setBarStyle(
+        Appearance.getColorScheme() === 'dark'
+          ? 'light-content'
+          : 'dark-content',
+      );
 
-      if (settings.useSystemTheme) {
-        let newColors = await getColorScheme(settings.useSystemTheme);
-        StatusBar.setBarStyle(
-          Appearance.getColorScheme() === 'dark'
-            ? 'light-content'
-            : 'dark-content',
-        );
-
-        dispatch({type: ACTIONS.THEME, colors: newColors});
-      }
-  }
-
-
-
+      dispatch({type: ACTIONS.THEME, colors: newColors});
+    }
+  };
 
   useEffect(() => {
     if (!netInfo.isConnected || !netInfo.isInternetReachable) {
@@ -157,7 +144,7 @@ const App = () => {
     } catch (e) {}
     if (!settings) {
       settings = defaultState.settings;
-      settings = JSON.stringify(s);
+      settings = JSON.stringify(settings);
       settings.fontScale = 1;
 
       await MMKV.setStringAsync('settings', settings);
@@ -174,9 +161,8 @@ const App = () => {
       dispatch({type: ACTIONS.SETTINGS, settings: {...settings}});
     }
 
-
     let newColors = await getColorScheme(settings.useSystemTheme);
-  
+
     dispatch({type: ACTIONS.THEME, colors: newColors});
   }
 
