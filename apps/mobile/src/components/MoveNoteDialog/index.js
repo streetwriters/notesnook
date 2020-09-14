@@ -1,178 +1,415 @@
-import React, {createRef} from 'react';
-import {Modal, TouchableOpacity, View, StatusBar} from 'react-native';
-import * as Animatable from 'react-native-animatable';
-import {ACTIONS} from '../../provider/actions';
-import {eSendEvent} from '../../services/eventManager';
+import React, { createRef, useEffect, useState } from 'react';
 import {
-  eMoveNoteDialogNavigateBack,
-  eSetModalNavigator,
-} from '../../services/events';
-import {getElevation, DDS} from '../../utils/utils';
-import Folders from '../../views/Folders';
-import Notebook from '../../views/Notebook';
-import Notes from '../../views/Notes';
-import {updateEvent} from '../DialogManager/recievers';
-import {NavigationContainer} from '@react-navigation/native';
-import {createStackNavigator} from '@react-navigation/stack';
-import Container from '../Container';
+  FlatList,
+  Modal,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
+} from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { pv, SIZE, WEIGHT } from '../../common/common';
+import { useTracked } from '../../provider';
+import { ACTIONS } from '../../provider/actions';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/eventManager';
+import { eOpenMoveNoteDialog } from '../../services/events';
+import { db, DDS, getElevation, ToastEvent } from '../../utils/utils';
+import { PressableButton } from '../PressableButton';
+import { Toast } from '../Toast';
+const MoveNoteDialog = () => {
+  const [state, dispatch] = useTracked();
+  const {notebooks, colors, selectedItemsList} = state;
+  const [visible, setVisible] = useState(true);
+  const [animated, setAnimated] = useState(false);
+  const [expanded, setExpanded] = useState('');
+  const [notebookInputFocused, setNotebookInputFocused] = useState(false);
+  const [topicInputFocused, setTopicInputFocused] = useState(false);
+  const insets = useSafeAreaInsets();
+  const notebookInput = createRef();
+  const topicInput = createRef();
+  let newNotebookTitle = null;
+  let newTopicTitle = null;
+  function open() {
+    setVisible(true);
+  }
 
-const Stack = createStackNavigator();
-const modalNavigatorRef = createRef();
-const ModalNavigator = ({onStateChange}) => {
-  return (
-    <NavigationContainer
-      onStateChange={onStateChange}
-      independent={true}
-      ref={modalNavigatorRef}>
-      <Stack.Navigator
-        initialRouteName="Folders"
-        screenOptions={{
-          headerShown: false,
-          animationEnabled: false,
-          gestureEnabled: false,
-          cardOverlayEnabled: false,
-          cardShadowEnabled: false,
-        }}>
-        <Stack.Screen
-          name="Folders"
-          component={Folders}
-          initialParams={{
-            title: 'Select a notebook',
-            isMove: true,
-            hideMore: true,
-            canGoBack: true,
-            root: false,
-          }}
-        />
-        <Stack.Screen
-          initialParams={{
-            root: false,
-          }}
-          name="Notebook"
-          component={Notebook}
-        />
-        <Stack.Screen
-          initialParams={{
-            root: false,
-          }}
-          name="Notes"
-          component={Notes}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
-  );
-};
+  const close = () => {
+    setVisible(false);
+    setAnimated(false);
+  };
 
-class MoveNoteDialog extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      visible: false,
-      animated: false,
+  useEffect(() => {
+    console.log(notebooks);
+    eSubscribeEvent(eOpenMoveNoteDialog, open);
+    return () => {
+      eUnSubscribeEvent(eOpenMoveNoteDialog, open);
     };
-    this.routeIndex = 0;
-    this.count = 0;
-  }
+  }, []);
 
-  open() {
-    this.setState({
-      visible: true,
+  const addNewNotebook = async () => {
+    if (!newNotebookTitle || newNotebookTitle.trim().length === 0)
+      return ToastEvent.show('Title is required', 'error', 'local');
+
+    await db.notebooks.add({
+      title: newNotebookTitle,
+      description: 'this.description',
+      topics: [],
+      id: null,
     });
-  }
+    dispatch({type: ACTIONS.NOTEBOOKS});
+    dispatch({type: ACTIONS.PINNED});
+  };
 
-  close() {
-    updateEvent({type: ACTIONS.CLEAR_SELECTION});
-    updateEvent({type: ACTIONS.MODAL_NAVIGATOR, enabled: false});
-    this.setState({
-      visible: false,
-      animated: false,
-    });
-  }
+  const addNewTopic = async () => {
+    if (!newTopicTitle || newTopicTitle.trim().length === 0)
+      return ToastEvent.show('Title is required', 'error', 'local');
+    await db.notebooks.notebook(expanded).topics.add(newTopicTitle);
+  };
 
-  render() {
-    const {visible, animated} = this.state;
-    const {colors} = this.props;
-    return (
-      <Modal
-        animated={true}
-        animationType="fade"
-        onShow={() => {
-          updateEvent({type: ACTIONS.MODAL_NAVIGATOR, enabled: true});
-          StatusBar.setBackgroundColor('white');
-          eSendEvent(eSetModalNavigator, true);
-          this.setState({
-            animated: true,
-          });
-        }}
-        onRequestClose={() => {
-          StatusBar.setBackgroundColor('transparent');
-          if (!this.routeIndex || this.routeIndex === 0) {
-            eSendEvent(eSetModalNavigator, false);
-            this.close();
-          } else {
-            eSendEvent(eMoveNoteDialogNavigateBack);
-          }
-        }}
-        visible={visible}
-        transparent={true}>
-        <Animatable.View
-          transition={['opacity', 'scaleX', 'scaleY']}
-          useNativeDriver={true}
-          duration={300}
-          iterationCount={1}
+  return (
+    <Modal
+      animated={true}
+      animationType="slide"
+      onRequestClose={close}
+      visible={visible}
+      statusBarTranslucent={true}
+      transparent={true}>
+      <View
+        style={{
+          flex: 1,
+          paddingTop: insets.top,
+          backgroundColor: DDS.isTab ? 'rgba(0,0,0,0.3)' : colors.bg,
+          width: '100%',
+          height: '100%',
+          alignSelf: 'center',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        <TouchableOpacity
+          onPress={close}
           style={{
-            opacity: animated ? 1 : 0,
-            flex: 1,
-            backgroundColor: DDS.isTab ? 'rgba(0,0,0,0.3)' : colors.bg,
             width: '100%',
             height: '100%',
-            alignSelf: 'center',
-            justifyContent: 'center',
-            alignItems: 'center',
-            transform: [
-              {
-                scaleX: animated ? 1 : 0.95,
-              },
-              {
-                scaleY: animated ? 1 : 0.95,
-              },
-            ],
-          }}>
-          <TouchableOpacity
-            onPress={() => this.close()}
-            style={{
-              width: '100%',
-              height: '100%',
-              position: 'absolute',
-              zIndex: 1,
-            }}
-          />
+            position: 'absolute',
+            zIndex: 1,
+          }}
+        />
+        <Toast context="local" />
 
+        <View
+          style={{
+            ...getElevation(DDS.isTab ? 10 : 0),
+            width: DDS.isTab ? '65%' : '100%',
+            height: DDS.isTab ? '90%' : '100%',
+            flex: 1,
+            borderRadius: DDS.isTab ? 5 : 0,
+            backgroundColor: colors.bg,
+            padding: DDS.isTab ? 8 : 0,
+            zIndex: 10,
+          }}>
           <View
             style={{
-              ...getElevation(DDS.isTab ? 10 : 0),
-              width: DDS.isTab ? '65%' : '100%',
-              height: DDS.isTab ? '90%' : '100%',
-              flex: 1,
-              borderRadius: DDS.isTab ? 5 : 0,
-              backgroundColor: colors.bg,
-              padding: DDS.isTab ? 8 : 0,
-              zIndex: 10,
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
+              height: 50,
             }}>
-            <Container
-            root={false}
-            >
-              <ModalNavigator
-                onStateChange={event => {
-                  this.routeIndex = event.index;
-                }}
-              />
-            </Container>
+            <Icon
+              name="close"
+              size={SIZE.xxl}
+              onPress={() => {
+                setVisible(false);
+              }}
+              style={{
+                width: 50,
+                height: 50,
+                marginLeft: 12,
+                position: 'absolute',
+                textAlignVertical: 'center',
+                left: 0,
+                marginBottom: 15,
+              }}
+              color={colors.heading}
+            />
+            <Text
+              style={{
+                color: colors.accent,
+                fontFamily: WEIGHT.bold,
+                fontSize: SIZE.xl,
+              }}>
+              {selectedItemsList.length > 1
+                ? 'Add notes to notebook'
+                : 'Add note to notebook'}
+            </Text>
           </View>
-        </Animatable.View>
-      </Modal>
-    );
-  }
-}
+
+          <FlatList
+            data={state.notebooks}
+            ListHeaderComponent={
+              <View
+                style={{
+                  paddingHorizontal: 12,
+                }}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    paddingHorizontal: 0,
+                    marginBottom: 10,
+                    width: '100%',
+                    borderBottomWidth: 1,
+                    borderColor: notebookInputFocused
+                      ? colors.accent
+                      : colors.nav,
+                  }}>
+                  <TextInput
+                    ref={notebookInput}
+                    onChangeText={(value) => {
+                      newNotebookTitle = value;
+                    }}
+                    blurOnSubmit={false}
+                    onFocus={() => {
+                      setNotebookInputFocused(true);
+                    }}
+                    onBlur={() => {
+                      setNotebookInputFocused(false);
+                    }}
+                    onSubmitEditing={addNewNotebook}
+                    style={[
+                      {
+                        color: colors.pri,
+                        width: '85%',
+                        maxWidth: '85%',
+                        paddingHorizontal: 0,
+                        borderRadius: 5,
+                        minHeight: 45,
+                        fontSize: SIZE.md,
+                        fontFamily: WEIGHT.regular,
+                        padding: pv - 2,
+                      },
+                    ]}
+                    placeholder="Create a new notebook"
+                    placeholderTextColor={colors.icon}
+                  />
+                  <TouchableOpacity
+                    onPress={addNewTopic}
+                    style={[
+                      {
+                        borderRadius: 5,
+                        width: '12%',
+                        minHeight: 45,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      },
+                    ]}>
+                    <Icon
+                      name="plus"
+                      size={SIZE.lg}
+                      color={notebookInputFocused ? colors.accent : colors.nav}
+                    />
+                  </TouchableOpacity>
+                </View>
+              </View>
+            }
+            renderItem={({item, index}) => (
+              <View>
+                <PressableButton
+                  onPress={() => {
+                    setExpanded(item.id === expanded ? null : item.id);
+                  }}
+                  color={expanded === item.id ? colors.shade : 'transparent'}
+                  selectedColor={
+                    expanded === item.id ? colors.accent : colors.nav
+                  }
+                  alpha={colors.night ? 0.02 : -0.02}
+                  opacity={expanded === item.id ? 0.12 : 1}
+                  customStyle={{
+                    height: 50,
+                    width: '100%',
+                    borderRadius: 0,
+                    alignItems: 'flex-start',
+                    paddingHorizontal: 12,
+                    marginBottom: 5,
+                  }}>
+                  <View
+                    style={{
+                      borderBottomWidth: 1,
+                      width: '100%',
+                      height: 50,
+                      justifyContent: 'center',
+                      borderBottomColor:
+                        expanded === item.id ? 'transparent' : colors.nav,
+                    }}>
+                    <Text
+                      style={{
+                        fontFamily: WEIGHT.bold,
+                        fontSize: SIZE.md,
+                      }}>
+                      {item.title}
+                      {'\n'}
+                      <Text
+                        style={{
+                          fontFamily: WEIGHT.regular,
+                          fontSize: SIZE.xxs,
+                        }}>
+                        {item.totalNotes +
+                          ' notes' +
+                          ' & ' +
+                          item.topics.length +
+                          ' topics'}
+                      </Text>
+                    </Text>
+                  </View>
+                </PressableButton>
+
+                {expanded === item.id ? (
+                  <FlatList
+                    data={item.topics}
+                    ListHeaderComponent={
+                      <View
+                        style={{
+                          paddingRight: 12,
+                        }}>
+                        <View
+                          style={{
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            width: '90%',
+                            alignSelf: 'flex-end',
+                            marginBottom: 5,
+                            marginTop: 5,
+                            borderBottomWidth: 1,
+                            borderColor: topicInputFocused
+                              ? colors.accent
+                              : colors.nav,
+                          }}>
+                          <TextInput
+                            ref={topicInput}
+                            onChangeText={(value) => {
+                              newTopicTitle = value;
+                            }}
+                            blurOnSubmit={false}
+                            onFocus={() => {
+                              setTopicInputFocused(true);
+                            }}
+                            onBlur={() => {
+                              setTopicInputFocused(false);
+                            }}
+                            onSubmitEditing={() => {}}
+                            style={[
+                              {
+                                color: colors.pri,
+                                width: '85%',
+                                maxWidth: '85%',
+                                paddingHorizontal: 0,
+                                borderRadius: 5,
+                                height: 40,
+                                fontSize: SIZE.sm,
+                                fontFamily: WEIGHT.regular,
+                                padding: pv - 2,
+                              },
+                            ]}
+                            placeholder="Create a new topic"
+                            placeholderTextColor={colors.icon}
+                          />
+                          <TouchableOpacity
+                            onPress={() => {}}
+                            style={[
+                              {
+                                borderRadius: 5,
+                                width: 40,
+                                minHeight: 40,
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                              },
+                            ]}>
+                            <Icon
+                              name="plus"
+                              size={SIZE.lg}
+                              color={
+                                topicInputFocused ? colors.accent : colors.nav
+                              }
+                            />
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                    }
+                    renderItem={({item, index}) => (
+                      <PressableButton
+                        onPress={async () => {
+                          let noteIds = [];
+                          selectedItemsList.forEach((item) =>
+                            noteIds.push(item.id),
+                          );
+                          await db.notes.move(
+                            {
+                              topic: item.title,
+                              id: item.notebookId,
+                            },
+                            ...noteIds,
+                          );
+                          dispatch({type: ACTIONS.CLEAR_SELECTION});
+                          close();
+                          let notebookName = db.notebooks.notebook(
+                            item.notebookId,
+                          ).title;
+                          ToastEvent.show(
+                            `Note moved to ${item.title} in ${notebookName}`,
+                            'success',
+                          );
+                        }}
+                        color="transparent"
+                        selectedColor={colors.nav}
+                        alpha={colors.night ? 0.02 : -0.02}
+                        customStyle={{
+                          height: 50,
+                          borderTopWidth: index === 0 ? 0 : 1,
+                          borderTopColor: colors.nav,
+                          width: '87%',
+                          alignSelf: 'flex-end',
+                          borderRadius: 0,
+                          alignItems: 'center',
+                          marginRight: 12,
+                          flexDirection: 'row',
+                          justifyContent: 'space-between',
+                        }}>
+                        <Text
+                          style={{
+                            fontFamily: WEIGHT.regular,
+                            fontSize: SIZE.sm,
+                          }}>
+                          {item.title}
+                          {'\n'}
+                          <Text
+                            style={{
+                              fontFamily: WEIGHT.regular,
+                              fontSize: SIZE.xxs,
+                            }}>
+                            {item.totalNotes + ' notes'}
+                          </Text>
+                        </Text>
+                        <Text
+                          style={{
+                            fontFamily: WEIGHT.regular,
+                            fontSize: SIZE.sm,
+                            color: colors.accent,
+                          }}>
+                          Move
+                        </Text>
+                      </PressableButton>
+                    )}
+                  />
+                ) : null}
+              </View>
+            )}
+          />
+        </View>
+      </View>
+    </Modal>
+  );
+};
 
 export default MoveNoteDialog;
