@@ -6,12 +6,12 @@ class TrashStore extends BaseStore {
   trash = [];
 
   refresh = () => {
-    this.set(state => (state.trash = db.trash.all));
+    this.set((state) => (state.trash = db.trash.all));
   };
 
   delete = (id, index) => {
     return db.trash.delete(id).then(() => {
-      this.set(state => {
+      this.set((state) => {
         state.trash.splice(index, 1);
       });
     });
@@ -19,13 +19,13 @@ class TrashStore extends BaseStore {
 
   restore = (id, index) => {
     return db.trash.restore(id).then(() => {
-      this.set(state => state.trash.splice(index, 1));
+      this.set((state) => state.trash.splice(index, 1));
     });
   };
 
   clear = () => {
     return db.trash.clear().then(() => {
-      this.set(state => (state.trash = []));
+      this.set((state) => (state.trash = []));
     });
   };
 }

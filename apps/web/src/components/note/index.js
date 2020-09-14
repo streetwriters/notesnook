@@ -13,6 +13,7 @@ import { useTheme } from "emotion-theming";
 import Colors from "../menu/colors";
 import { showExportDialog } from "../dialogs/exportdialog";
 import { setHashParam } from "../../utils/useHashParam";
+import { showNoteDeleted } from "../../common/toasts";
 
 function menuItems(note, context) {
   return [
@@ -91,7 +92,7 @@ function menuItems(note, context) {
           "Are you sure you want to delete this note?"
         ).then(async (res) => {
           if (res) {
-            await store.delete(note.id);
+            await store.delete(note.id).then(showNoteDeleted(note.id));
           }
         });
       },

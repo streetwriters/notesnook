@@ -26,4 +26,22 @@ function showNotesMovedToast(note, noteIds, notebook) {
   showToast("success", messageText, actions);
 }
 
-export { showNotesMovedToast };
+function showNoteDeleted(note) {
+  const undoAction = async () => {
+    await db.trash.restore(note);
+  };
+
+  let actions = [{ text: "Undo", onClick: undoAction }];
+
+  showToast("success", "Note Deleted", actions);
+}
+
+function showNoteColored(colors, label) {
+  if (colors.includes(label)) {
+    showToast("success", "Untagged as " + label);
+  } else {
+    showToast("success", "Tagged as " + label);
+  }
+}
+
+export { showNotesMovedToast, showNoteDeleted, showNoteColored };
