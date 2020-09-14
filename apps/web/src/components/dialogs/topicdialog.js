@@ -5,6 +5,7 @@ import * as Icon from "../icons";
 import { db } from "../../common";
 import Dialog, { showDialog } from "./dialog";
 import { store } from "../../stores/notebook-store";
+import { showToast } from "../../utils/toast";
 
 function TopicDialog(props) {
   const ref = useRef();
@@ -65,6 +66,7 @@ export function showEditTopicDialog(topic) {
           .notebook(topic.notebookId)
           .topics.add({ ...topic, title: t });
         store.setSelectedNotebookTopics(topic.notebookId);
+        showToast("success", "Topic edited successfully!");
         perform(true);
       }}
     />

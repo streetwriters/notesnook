@@ -5,12 +5,16 @@ import { store } from "../../stores/notebook-store";
 import * as Icon from "../icons";
 import { showEditNoteDialog } from "../dialogs/addnotebookdialog";
 import { confirm } from "../dialogs/confirm";
+import { showUnpinnedToast } from "../../common/toasts";
 
 function menuItems(notebook, index) {
   return [
     {
       title: notebook.pinned ? "Unpin" : "Pin",
-      onClick: () => store.pin(notebook, index),
+      onClick: async () => {
+        await store.pin(notebook, index);
+        if (notebook.pinned) showUnpinnedToast(notebook.id, "notebook");
+      },
     },
     {
       title: "Edit",

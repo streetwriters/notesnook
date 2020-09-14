@@ -63,17 +63,6 @@ const DeleteOption = createOption("deleteOption", Icon.Trash, async function (
   }
 });
 
-const FavoriteOption = createOption("favoriteOption", Icon.Star, function (
-  state
-) {
-  // we know only notes can be favorited
-  state.selectedItems.forEach(async (item) => {
-    if (item.favorite) return;
-    await db.notes.note(item.id).favorite();
-  });
-  notesStore.refresh();
-});
-
 const UnfavoriteOption = createOption("unfavoriteOption", Icon.Star, function (
   state
 ) {
@@ -107,7 +96,7 @@ const RestoreOption = createOption(
   }
 );
 
-const NotesOptions = createOptions([AddToNotebookOption, FavoriteOption]);
+const NotesOptions = createOptions([AddToNotebookOption]);
 const NotebooksOptions = createOptions();
 const TopicOptions = createOptions();
 const TrashOptions = createOptions([RestoreOption]);

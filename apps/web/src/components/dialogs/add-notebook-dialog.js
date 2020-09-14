@@ -5,6 +5,7 @@ import * as Icon from "../icons";
 import Dialog, { showDialog } from "./dialog";
 import { store } from "../../stores/notebook-store";
 import { qclone } from "qclone";
+import { showToast } from "../../utils/toast";
 
 class AddNotebookDialog extends React.Component {
   MAX_AVAILABLE_HEIGHT = window.innerHeight * 0.3;
@@ -185,7 +186,8 @@ export function showEditNoteDialog(notebook) {
       edit={true}
       onDone={async (nb) => {
         await store.add(nb);
-        perform(false);
+        showToast("success", "Notebook edited successfully!");
+        perform(true);
       }}
       close={() => {
         perform(false);

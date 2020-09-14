@@ -8,6 +8,7 @@ import { confirm } from "../components/dialogs/confirm";
 import { useStore, store } from "../stores/trash-store";
 import { toTitleCase } from "../utils/string";
 import TrashPlaceholder from "../components/placeholders/trash-placeholder";
+import { showToast } from "../utils/toast";
 
 function menuItems(item, index) {
   return [
@@ -69,10 +70,18 @@ function Trash() {
           confirm(
             Icon.Trash,
             "Clear",
-            `This action is irreversible. Are you sure you want to proceed?s`
+            `This action is irreversible. Are you sure you want to proceed?`
           ).then(async (res) => {
             if (res) {
-              await clearTrash();
+              try {
+                await clearTrash();
+                showToast("success", "Trash cleared successfully!");
+              } catch (e) {
+                showToast(
+                  "error",
+                  `Could not clear trash. Error: ${e.message}`
+                );
+              }
             }
           });
         },

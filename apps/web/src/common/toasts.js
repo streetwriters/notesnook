@@ -1,5 +1,6 @@
 import { db } from ".";
 import { store as notestore } from "../stores/note-store";
+import { store as nbstore } from "../stores/notebook-store";
 import { showToast } from "../utils/toast";
 
 function showNotesMovedToast(note, noteIds, notebook) {
@@ -52,11 +53,13 @@ function showNoteColored(colors, label) {
   }
 }
 
-async function showNoteUnpinnedToast(noteId) {
-  const messageText = `Note unpinned successfully!`;
+async function showUnpinnedToast(itemId, itemType) {
+  const noun = itemType === "note" ? "Note" : "Notebook";
+  const messageText = `${noun} unpinned successfully!`;
   const undoAction = async () => {
     toast.hide();
-    await notestore.pin(noteId);
+    if (itemType === "note") await notestore.pin(itemId);
+    else if (itemType === "notebook") await nbstore.pin(itemId);
   };
   let actions = [{ text: "Undo", onClick: undoAction }];
   var toast = showToast("success", messageText, actions);
@@ -66,5 +69,5 @@ export {
   showNotesMovedToast,
   showNoteDeleted,
   showNoteColored,
-  showNoteUnpinnedToast,
+  showUnpinnedToast,
 };
