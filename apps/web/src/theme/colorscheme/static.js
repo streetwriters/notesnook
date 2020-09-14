@@ -9,7 +9,8 @@ class StaticColorSchemeFactory {
       transparent: "transparent",
       static: "white",
       error: "#E53935",
-      favorite: "#ffd700"
+      success: "#4F8A10",
+      favorite: "#ffd700",
     };
   }
 }

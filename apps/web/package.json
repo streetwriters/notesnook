@@ -6,6 +6,7 @@
     "@mdi/js": "^5.0.45",
     "@mdi/react": "^1.4.0",
     "@rebass/forms": "^4.0.6",
+    "cogo-toast": "^4.2.3",
     "emotion-theming": "^10.0.19",
     "fast-sort": "^2.1.1",
     "framer-motion": "^1.10.3",

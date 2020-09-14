@@ -20,9 +20,7 @@ function menuItems(note, context) {
     {
       title: note.notebook?.id ? "Move" : "Add to",
       onClick: async () => {
-        if (await showMoveNoteDialog([note.id])) {
-          console.log("Note moved successfully!");
-        }
+        await showMoveNoteDialog([note.id]);
       },
     },
     {

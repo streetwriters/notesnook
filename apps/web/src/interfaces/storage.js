@@ -32,12 +32,17 @@ function clear() {
   return localforage.clear();
 }
 
+function getAllKeys() {
+  return localforage.keys();
+}
+
 export default {
   read,
   readMulti,
   write,
   remove,
   clear,
+  getAllKeys,
   deriveKey: crypto.deriveKey,
   encrypt: crypto.encrypt,
   decrypt: crypto.decrypt,
