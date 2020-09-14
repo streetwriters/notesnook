@@ -24,6 +24,7 @@ const routes = {
   "/:tag": ({ tag }) => (
     <RouteContainer
       type="notes"
+      canGoBack
       title={`#${tag}`}
       route={<Notes type="notes" context={{ type: "tag", value: tag }} />}
     />
