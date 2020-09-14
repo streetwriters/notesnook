@@ -1,4 +1,4 @@
-import { notebookTest, StorageInterface, TEST_NOTE } from "./utils";
+import { notebookTest, noteTest, StorageInterface, TEST_NOTE } from "./utils";
 
 beforeEach(() => StorageInterface.clear());
 
@@ -18,7 +18,7 @@ test("add topic to notebook", () =>
     let topics = db.notebooks.notebook(id).topics;
     await topics.add("Home");
     expect(topics.all.length).toBeGreaterThan(1);
-    expect(topics.all.findIndex(v => v.title === "Home")).toBeGreaterThan(-1);
+    expect(topics.all.findIndex((v) => v.title === "Home")).toBeGreaterThan(-1);
   }));
 
 test("update topic", () =>
@@ -28,7 +28,7 @@ test("update topic", () =>
     let topic = topics.topic("Home");
     let noteId = await db.notes.add(TEST_NOTE);
     await topic.add(noteId);
-    expect(topics.all.find(v => v.title === "Home").notes.length).toBe(1);
+    expect(topics.all.find((v) => v.title === "Home").notes.length).toBe(1);
   }));
 
 test("edit topic title", () =>
@@ -39,8 +39,7 @@ test("edit topic title", () =>
     expect(topics.all.length).toBeGreaterThan(1);
     await topics.add({ id: topic._topic.id, title: "Hello22" });
     expect(topics.all.length).toBeGreaterThan(1);
-    expect(topics.topic("Home")).toBeUndefined();
-    expect(topics.topic("Hello22")).toBeDefined();
+    expect(topics.topic("Hello22")._topic.title).toBe("Hello22");
   }));
 
 test("duplicate topic to notebook should not be added", () =>
@@ -68,6 +67,18 @@ test("delete a topic", () =>
   notebookTest().then(async ({ db, id }) => {
     let topics = db.notebooks.notebook(id).topics;
     await topics.add("Home");
-    await topics.delete("Home");
-    expect(topics.all.findIndex(v => v.title === "Home")).toBe(-1);
+    await topics.delete(topics.topic("Home")._topic.id);
+    expect(topics.all.findIndex((v) => v.title === "Home")).toBe(-1);
   }));
+
+test("delete note from edited topic", () =>
+  notebookTest().then(async ({ id }) =>
+    noteTest().then(async ({ db, id: noteId }) => {
+      let topics = db.notebooks.notebook(id).topics;
+      await topics.add("Home");
+      let topic = topics.topic("Home");
+      await db.notes.move({ id, topic: topic._topic.title }, noteId);
+      await topics.add({ id: topic._topic.id, title: "Hello22" });
+      await db.notes.delete(noteId);
+    })
+  ));

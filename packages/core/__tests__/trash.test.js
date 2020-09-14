@@ -26,22 +26,26 @@ test("permanently delete a note", () =>
     expect(delta.deleted).toBe(true);
   }));
 
-test("restore a deleted note", () =>
+test("restore a deleted note that was in a notebook", () =>
   noteTest().then(async ({ db, id }) => {
     let nbId = await db.notebooks.add(TEST_NOTEBOOK);
     await db.notebooks.notebook(nbId).topics.topic("General").add(id);
     await db.notes.delete(id);
     await db.trash.restore(db.trash.all[0].id);
     expect(db.trash.all.length).toBe(0);
+
     let note = db.notes.note(id);
+
     expect(note).toBeDefined();
     expect(await note.text()).toBe(TEST_NOTE.content.text);
     expect(await note.delta()).toStrictEqual(TEST_NOTE.content.delta);
-    expect(db.notebooks.notebook(nbId).topics.topic("General").has(id)).toBe(
-      true
-    );
-    expect(db.notes.note(id).notebook.id).toBe(nbId);
-    expect(db.notes.note(id).notebook.topic).toBe("General");
+
+    const notebook = db.notebooks.notebook(nbId);
+    expect(notebook.topics.topic("General").has(id)).toBe(true);
+
+    expect(note.notebook.id).toBe(nbId);
+    expect(note.notebook.topic).toBeDefined();
+    expect(notebook.topics.has("General")).toBeDefined();
   }));
 
 test("delete a locked note", () =>
@@ -100,8 +104,10 @@ test("restore a deleted notebook", () =>
     await db.trash.restore(db.trash.all[0].id);
     let notebook = db.notebooks.notebook(id);
     expect(notebook).toBeDefined();
-    expect(db.notes.note(noteId).notebook.id).toBe(id);
-    expect(db.notes.note(noteId).notebook.topic).toBe("General");
+    let note = db.notes.note(noteId);
+    expect(note.notebook.id).toBe(id);
+    expect(note.notebook.topic).toBeDefined();
+    expect(notebook.topics.topic(note.notebook.topic)).toBeDefined();
   }));
 
 test("restore a notebook that has deleted notes", () =>

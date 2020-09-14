@@ -38,7 +38,7 @@ export default class Topic {
       if (note.notebook && note.notebook.id && note.notebook.topic) {
         if (
           note.notebook.id === this._notebookId &&
-          note.notebook.topic === topic.title
+          note.notebook.topic === topic.id
         )
           return this;
         await this._db.notebooks
@@ -48,7 +48,7 @@ export default class Topic {
       }
       await this._db.notes.add({
         id: noteId,
-        notebook: { id: this._notebookId, topic: topic.title },
+        notebook: { id: this._notebookId, topic: topic.id },
       });
       topic.totalNotes++;
     }

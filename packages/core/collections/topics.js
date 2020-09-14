@@ -1,5 +1,6 @@
 import Topic from "../models/topic";
 import { qclone } from "qclone";
+import id from "../utils/id";
 
 export default class Topics {
   /**
@@ -13,7 +14,11 @@ export default class Topics {
   }
 
   has(topic) {
-    return this.all.findIndex((v) => v.title === (topic.title || topic)) > -1;
+    return (
+      this.all.findIndex(
+        (v) => v.id === topic || v.title === (topic.title || topic)
+      ) > -1
+    );
   }
 
   _dedupe(source) {
@@ -22,10 +27,9 @@ export default class Topics {
     for (let index = 0; index < length; index++) {
       let value = source[index];
       if (value.id) {
-        seen.set(value.id, {
-          ...seen.get(value.id),
+        seen.set(value.title, {
+          ...seen.get(value.title),
           ...value,
-          id: value.title,
         });
         continue;
       }
@@ -67,7 +71,7 @@ export default class Topics {
    */
   topic(topic) {
     if (typeof topic === "string") {
-      topic = this.all.find((t) => t.title === topic);
+      topic = this.all.find((t) => t.id === topic || t.title === topic);
     }
     if (!topic) return;
     return new Topic(topic, this._notebookId, this._db);
@@ -93,7 +97,7 @@ function makeTopic(topic, notebookId) {
   if (typeof topic !== "string") return { ...topic, dateEdited: Date.now() };
   return {
     type: "topic",
-    id: topic,
+    id: id(), //topic,
     notebookId,
     title: topic,
     dateCreated: Date.now(),
