@@ -1,12 +1,12 @@
-import React, {useEffect, useState} from 'react';
-import {Keyboard, Text, TouchableOpacity, View} from 'react-native';
-import Animated, {Easing, useValue} from 'react-native-reanimated';
-import {getElevation} from '../../utils/utils';
-import {eShowToast, eHideToast} from '../../services/events';
-import {eUnSubscribeEvent, eSubscribeEvent} from '../../services/eventManager';
-import {useTracked} from '../../provider';
+import React, { useEffect, useState } from 'react';
+import { Keyboard, Text, TouchableOpacity, View } from 'react-native';
+import Animated, { Easing, useValue } from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {SIZE} from '../../common/common';
+import { SIZE } from '../../common/common';
+import { useTracked } from '../../provider';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/eventManager';
+import { eHideToast, eShowToast } from '../../services/events';
+import { getElevation } from '../../utils/utils';
 const {spring, timing} = Animated;
 
 const toastMessages = [];
@@ -24,8 +24,8 @@ export const Toast = ({context = 'global'}) => {
   let toastOpacity = useValue(1);
 
   const showToastFunc = (data) => {
+    if (data.context !== context) return;
     toastMessages.push(data);
-    console.log(data, toastMessages.length);
     if (toastMessages?.length > 1) return;
     setData(data);
     if (data.type === 'success') {
