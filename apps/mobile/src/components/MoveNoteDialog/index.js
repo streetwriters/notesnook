@@ -17,6 +17,12 @@ import {eOpenMoveNoteDialog} from '../../services/events';
 import {db, DDS, getElevation, ToastEvent} from '../../utils/utils';
 import {PressableButton} from '../PressableButton';
 import {Toast} from '../Toast';
+
+let newNotebookTitle = null;
+let newTopicTitle = null;
+const notebookInput = createRef();
+const topicInput = createRef();
+
 const MoveNoteDialog = () => {
   const [state, dispatch] = useTracked();
   const {notebooks, colors, selectedItemsList} = state;
@@ -26,10 +32,7 @@ const MoveNoteDialog = () => {
   const [notebookInputFocused, setNotebookInputFocused] = useState(false);
   const [topicInputFocused, setTopicInputFocused] = useState(false);
   const insets = useSafeAreaInsets();
-  const notebookInput = createRef();
-  const topicInput = createRef();
-  let newNotebookTitle = null;
-  let newTopicTitle = null;
+
   function open() {
     setVisible(true);
   }
@@ -37,6 +40,11 @@ const MoveNoteDialog = () => {
   const close = () => {
     setVisible(false);
     setAnimated(false);
+    setExpanded(false);
+    newTopicTitle = null;
+    newNotebookTitle = null;
+    setNotebookInputFocused(false);
+    setTopicInputFocused(false);
   };
 
   useEffect(() => {
@@ -56,14 +64,24 @@ const MoveNoteDialog = () => {
       topics: [],
       id: null,
     });
+    notebookInput.current?.clear();
+    notebookInput.current?.blur();
     dispatch({type: ACTIONS.NOTEBOOKS});
     dispatch({type: ACTIONS.PINNED});
   };
 
   const addNewTopic = async () => {
-    if (!newTopicTitle || newTopicTitle.trim().length === 0)
+    if (!newTopicTitle || newTopicTitle.trim().length === 0) {
       return ToastEvent.show('Title is required', 'error', 'local');
-    await db.notebooks.notebook(expanded).topics.add(newTopicTitle);
+    }
+
+    let res = await db.notebooks.notebook(expanded).topics.add(newTopicTitle);
+    console.log(newTopicTitle, res);
+    dispatch({type: ACTIONS.NOTEBOOKS});
+    dispatch({type: ACTIONS.PINNED});
+    topicInput.current?.clear();
+    topicInput.current?.blur();
+    newTopicTitle = null;
   };
 
   return (
@@ -94,7 +112,6 @@ const MoveNoteDialog = () => {
             zIndex: 1,
           }}
         />
-        <Toast context="local" />
 
         <View
           style={{
@@ -117,9 +134,7 @@ const MoveNoteDialog = () => {
             <Icon
               name="close"
               size={SIZE.xxl}
-              onPress={() => {
-                setVisible(false);
-              }}
+              onPress={close}
               style={{
                 width: 50,
                 height: 50,
@@ -193,7 +208,7 @@ const MoveNoteDialog = () => {
                     placeholderTextColor={colors.icon}
                   />
                   <TouchableOpacity
-                    onPress={addNewTopic}
+                    onPress={addNewNotebook}
                     style={[
                       {
                         borderRadius: 5,
@@ -245,6 +260,7 @@ const MoveNoteDialog = () => {
                       style={{
                         fontFamily: WEIGHT.bold,
                         fontSize: SIZE.md,
+                        color: colors.heading,
                       }}>
                       {item.title}
                       {'\n'}
@@ -252,6 +268,7 @@ const MoveNoteDialog = () => {
                         style={{
                           fontFamily: WEIGHT.regular,
                           fontSize: SIZE.xxs,
+                          color: colors.icon,
                         }}>
                         {item.totalNotes +
                           ' notes' +
@@ -297,7 +314,7 @@ const MoveNoteDialog = () => {
                             onBlur={() => {
                               setTopicInputFocused(false);
                             }}
-                            onSubmitEditing={() => {}}
+                            onSubmitEditing={addNewTopic}
                             style={[
                               {
                                 color: colors.pri,
@@ -315,7 +332,7 @@ const MoveNoteDialog = () => {
                             placeholderTextColor={colors.icon}
                           />
                           <TouchableOpacity
-                            onPress={() => {}}
+                            onPress={addNewTopic}
                             style={[
                               {
                                 borderRadius: 5,
@@ -340,16 +357,17 @@ const MoveNoteDialog = () => {
                       <PressableButton
                         onPress={async () => {
                           let noteIds = [];
-                          selectedItemsList.forEach((item) =>
-                            noteIds.push(item.id),
-                          );
-                          await db.notes.move(
+                          selectedItemsList.forEach((i) => noteIds.push(i.id));
+                          console.log(selectedItemsList[0]);
+                          console.log(noteIds, 'NOTE IDS');
+                          let res = await db.notes.move(
                             {
                               topic: item.title,
                               id: item.notebookId,
                             },
                             ...noteIds,
                           );
+                          console.log(res);
                           dispatch({type: ACTIONS.CLEAR_SELECTION});
                           close();
                           let notebookName = db.notebooks.notebook(
@@ -379,6 +397,7 @@ const MoveNoteDialog = () => {
                           style={{
                             fontFamily: WEIGHT.regular,
                             fontSize: SIZE.sm,
+                            color: colors.heading,
                           }}>
                           {item.title}
                           {'\n'}
@@ -386,6 +405,7 @@ const MoveNoteDialog = () => {
                             style={{
                               fontFamily: WEIGHT.regular,
                               fontSize: SIZE.xxs,
+                              color: colors.icon,
                             }}>
                             {item.totalNotes + ' notes'}
                           </Text>
@@ -406,6 +426,7 @@ const MoveNoteDialog = () => {
             )}
           />
         </View>
+        <Toast context="local" />
       </View>
     </Modal>
   );
