@@ -10,6 +10,7 @@ import Animated from "../animated";
 import Toggle from "./toggle";
 import { toTitleCase } from "../../utils/string";
 import { showMoveNoteDialog } from "../dialogs/movenotedialog";
+import { navigate } from "hookrouter";
 
 const tools = [
   { key: "pinned", icons: { on: Icon.PinFilled, off: Icon.Pin }, label: "Pin" },
@@ -132,6 +133,7 @@ function Properties() {
                   color="primary"
                   sx={{ cursor: "pointer" }}
                   onClick={() => {
+                    navigate(`/notebooks/${notebookData.id}`);
                     /* RootNavigator.navigate(
                       "notebooks",
                       { params: { id: notebookData.id } },
@@ -147,11 +149,10 @@ function Properties() {
                   color="primary"
                   sx={{ cursor: "pointer" }}
                   onClick={() => {
-                    /* RootNavigator.navigate(
-                      "notebooks",
-                      { params: notebookData },
-                      true
-                    ); */
+                    const index = notebook.topics.findIndex(
+                      (t) => t.title === notebookData.topic
+                    );
+                    navigate(`/notebooks/${notebookData.id}/${index}`);
                   }}
                 >
                   {notebookData.topic}
