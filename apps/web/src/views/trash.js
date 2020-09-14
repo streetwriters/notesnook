@@ -10,8 +10,8 @@ import { toTitleCase } from "../utils/string";
 import TrashPlaceholder from "../components/placeholders/trash-placeholder";
 import { showToast } from "../utils/toast";
 import {
-  showTrashItemPermanentDelete,
   showTrashItemRestored,
+  showPermanentDeleteToast,
 } from "../common/toasts";
 
 function menuItems(item, index) {
@@ -33,9 +33,8 @@ function menuItems(item, index) {
           `Are you sure you want to permanently delete this item?`
         ).then(async (res) => {
           if (res) {
-            await store
-              .delete(item.id, index)
-              .then(showTrashItemPermanentDelete());
+            await store.delete(item.id, index);
+            showPermanentDeleteToast(item, index);
           }
         });
       },

@@ -1,6 +1,7 @@
 import { db } from ".";
 import { store as notestore } from "../stores/note-store";
 import { store as nbstore } from "../stores/notebook-store";
+import { store as trashstore } from "../stores/trash-store";
 import { showToast } from "../utils/toast";
 
 function showNotesMovedToast(note, noteIds, notebook) {
@@ -85,8 +86,21 @@ function showTrashItemRestored() {
   showToast("success", "Item restored");
 }
 
-function showTrashItemPermanentDelete() {
-  showToast("success", "Item permanently deleted");
+async function showPermanentDeleteToast(item, index) {
+  const noun = item.type === "note" ? "Note" : "Notebook";
+  const messageText = `${noun} permanently deleted!`;
+  const timeoutId = setTimeout(() => {
+    trashstore.delete(item.id, index, true);
+  }, 5000);
+  const undoAction = async () => {
+    toast.hide();
+    trashstore.set((state) => {
+      state.trash.splice(index, 0, item);
+    });
+    clearTimeout(timeoutId);
+  };
+  let actions = [{ text: "Undo", onClick: undoAction }];
+  var toast = showToast("success", messageText, actions);
 }
 
 export {
@@ -96,5 +110,5 @@ export {
   showUnpinnedToast,
   showNoteBookDeleted,
   showTrashItemRestored,
-  showTrashItemPermanentDelete,
+  showPermanentDeleteToast,
 };
