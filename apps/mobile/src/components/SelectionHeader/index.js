@@ -44,12 +44,9 @@ export const SelectionHeader = () => {
       style={{
         width: '100%',
         position: 'absolute',
-        height:
-          Platform.OS === 'android'
-            ? 100 + StatusBar.currentHeight
-            : insets.top * 2.1,
+        height:50,
         backgroundColor: colors.bg,
-        paddingTop: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight,
+        marginTop: insets.top,
         justifyContent: 'flex-end',
         zIndex: 999,
         paddingHorizontal: 12,
