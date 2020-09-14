@@ -2,6 +2,7 @@ import React from "react";
 import { Flex, Button, Text, Box } from "rebass";
 import { db } from "../../common";
 import download from "../../utils/download";
+import { showToast } from "../../utils/toast";
 import * as Icon from "../icons";
 import Dialog, { showDialog } from "./dialog";
 
@@ -47,15 +48,17 @@ function ExportDialog(props) {
   );
 }
 
-export function showExportDialog(note) {
+export function showExportDialog(noteId) {
   return showDialog((perform) => (
     <ExportDialog
       title={"Export Note"}
       icon={Icon.Export}
       onClose={() => perform(false)}
       exportNote={async (format) => {
-        const content = await db.notes.note(note.id).export(format);
+        const note = db.notes.note(noteId);
+        const content = await note.export(format);
         download(note.title, content, format);
+        showToast("success", `Note exported as ${format} successfully!`);
         perform(true);
       }}
     />
