@@ -12,11 +12,11 @@ import Trash from "../views/trash";
 
 const routes = {
   "/": () => <RouteContainer type="notes" title="Home" route={<Home />} />,
-  "/notebooks*": () => <RouteContainer route={<Notebooks />} />,
+  "/notebooks*": () => <Notebooks />,
   "/favorites": () => (
     <RouteContainer
-      key="favorites"
       title="Favorites"
+      type="favorites"
       route={
         <Notes
           placeholder={FavoritesPlaceholder}
@@ -28,7 +28,7 @@ const routes = {
   "/trash": () => (
     <RouteContainer type="trash" title="Trash" route={<Trash />} />
   ),
-  "/tags*": () => <RouteContainer route={<Tags />} />,
+  "/tags*": () => <Tags />,
   "/colors/:color": ({ color }) => (
     <RouteContainer
       type="notes"

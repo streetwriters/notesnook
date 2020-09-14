@@ -14,6 +14,8 @@ import Colors from "../menu/colors";
 import { showExportDialog } from "../dialogs/exportdialog";
 import { setHashParam } from "../../utils/useHashParam";
 import { showNoteDeleted } from "../../common/toasts";
+import { showToast } from "../../utils/toast";
+import { showNoteUnpinnedToast } from "../../common/toasts";
 
 function menuItems(note, context) {
   return [
@@ -26,7 +28,14 @@ function menuItems(note, context) {
     },
     {
       title: note.pinned ? "Unpin" : "Pin",
-      onClick: () => store.pin(note),
+      onClick: async () => {
+        try {
+          await store.pin(note.id);
+          if (note.pinned) await showNoteUnpinnedToast(note.id);
+        } catch (e) {
+          showToast("error", e.message);
+        }
+      },
       onlyPro: true,
     },
     {

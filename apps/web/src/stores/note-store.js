@@ -84,16 +84,20 @@ class NoteStore extends BaseStore {
     }
   };
 
-  pin = async (note) => {
-    await db.notes.note(note).pin();
-    this.refresh();
-    this._syncEditor(note.id, "pinned", !note.pinned);
+  pin = async (id) => {
+    const note = db.notes.note(id);
+    if (!this._syncEditor(note.id, "pinned", !note.data.pinned)) {
+      await note.pin();
+      this.refresh();
+    }
   };
 
-  favorite = async (note) => {
-    await db.notes.note(note).favorite();
-    setTimeout(() => this.refreshContext(), 0);
-    this._setValue(note.id, "favorite", !note.favorite);
+  favorite = async (id) => {
+    const note = db.notes.note(id);
+    if (!this._syncEditor(note.id, "favorite", !note.data.favorite)) {
+      await note.favorite();
+      this.refresh();
+    }
   };
 
   unlock = async (id) => {
@@ -127,7 +131,7 @@ class NoteStore extends BaseStore {
       if (index < 0) return;
 
       arr[index][prop] = value;
-      this._syncEditor(noteId, prop, value);
+      // this._syncEditor(noteId, prop, value);
     });
   };
 
@@ -136,9 +140,8 @@ class NoteStore extends BaseStore {
    */
   _syncEditor = (noteId, action, value) => {
     const { session, setSession } = editorStore.get();
-    if (session.id === noteId) {
-      setSession((state) => (state.session[action] = value));
-    }
+    if (session.id !== noteId) return false;
+    setSession((state) => (state.session[action] = value), true);
   };
 }
 
