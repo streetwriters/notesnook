@@ -4,7 +4,7 @@ import * as Icons from "@mdi/js";
 import { useTheme } from "emotion-theming";
 import Animated from "../animated";
 
-function Icon({ name, size = 24, color = "icon", stroke, rotate, hover }) {
+function Icon({ name, size = 24, color = "icon", stroke, rotate }) {
   const theme = useTheme();
   return (
     <MDIIcon
@@ -17,7 +17,7 @@ function Icon({ name, size = 24, color = "icon", stroke, rotate, hover }) {
   );
 }
 
-function createIcon(name) {
+function createIcon(name, rotate = false) {
   return function (props) {
     return (
       <Animated.Box
@@ -28,7 +28,7 @@ function createIcon(name) {
         animate={props.animation}
         onClick={props.onClick}
       >
-        <Icon name={name} {...props} />
+        <Icon name={name} rotate={rotate} {...props} />
       </Animated.Box>
     );
   };
@@ -61,7 +61,7 @@ export const Settings = createIcon(Icons.mdiCogOutline);
 export const Home = createIcon(Icons.mdiHomeOutline);
 export const Restore = createIcon(Icons.mdiRecycle);
 export const Sync = createIcon(Icons.mdiSync);
-export const Loading = createIcon(Icons.mdiLoading);
+export const Loading = createIcon(Icons.mdiLoading, true);
 export const Export = createIcon(Icons.mdiExport);
 
 /** Properties Icons */
@@ -85,3 +85,9 @@ export const Properties = createIcon(Icons.mdiDotsHorizontal);
 export const Markdown = createIcon(Icons.mdiLanguageMarkdownOutline);
 export const HTML = createIcon(Icons.mdiLanguageHtml5);
 export const Text = createIcon(Icons.mdiFormatTitle);
+
+// TOAST
+export const Success = createIcon(Icons.mdiCheckCircle);
+export const Error = createIcon(Icons.mdiAlertCircle);
+export const Warn = createIcon(Icons.mdiAlert);
+export const Info = createIcon(Icons.mdiInformation);
