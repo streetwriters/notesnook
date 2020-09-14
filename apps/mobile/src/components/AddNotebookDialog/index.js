@@ -114,10 +114,11 @@ export class AddNotebookDialog extends React.Component {
   };
 
   addNewNotebook = async () => {
-    setTimeout(async () => {
+  
       let {topics} = this.state;
       let edit = this.props.toEdit;
-      if (!this.title || this.title.trim().length === 0)
+  
+      if (!this.title || this.title?.trim().length === 0)
         return ToastEvent.show('Title is required', 'error', 'local');
 
       let id = edit && edit.id ? edit.id : null;
@@ -147,23 +148,28 @@ export class AddNotebookDialog extends React.Component {
             .topics.delete(...this.topicsToDelete);
           toEdit = db.notebooks.notebook(toEdit.id).data;
         }
-
+     
         await db.notebooks.add({
           title: this.title,
           description: this.description,
           id: id,
-        });
+        }); 
+
+
         let nextTopics = toEdit.topics.map((topic, index) => {
+          if (index === 0) return topic;
           let copy = {...topic};
-          copy.title = prevTopics[index];
+          console.log(copy,'here');
+          copy.title = prevTopics[index -1];
           return copy;
         });
 
         prevTopics.forEach((title, index) => {
-          if (!nextTopics[index]) {
+          if (!nextTopics[index + 1]) {
             nextTopics.push(title);
           }
         });
+        console.log(nextTopics,prevTopics,toEdit.topics,"HERE");
         await db.notebooks.notebook(id).topics.add(...nextTopics);
       } else {
         await db.notebooks.add({
@@ -173,12 +179,12 @@ export class AddNotebookDialog extends React.Component {
           id: id,
         });
       }
-      this.close();
+      //this.close();
       updateEvent({type: ACTIONS.NOTEBOOKS});
       updateEvent({type: ACTIONS.PINNED});
 
       ToastEvent.show('New notebook added', 'success', 'local');
-    }, 100);
+ 
   };
 
   onSubmit = (forward = true) => {
