@@ -15,6 +15,7 @@ import { showExportDialog } from "../dialogs/exportdialog";
 import { setHashParam } from "../../utils/useHashParam";
 import { showNoteDeleted } from "../../common/toasts";
 import { showUnpinnedToast } from "../../common/toasts";
+import { showToast } from "../../utils/toast";
 
 function menuItems(note, context) {
   return [
@@ -51,9 +52,11 @@ function menuItems(note, context) {
       onClick: async () => {
         const { unlock, lock } = store;
         if (!note.locked) {
-          lock(note.id);
+          await lock(note.id);
+          showToast("success", "Note locked successfully!");
         } else {
-          unlock(note.id);
+          await unlock(note.id);
+          showToast("success", "Note unlocked successfully!");
         }
       },
       onlyPro: true,
