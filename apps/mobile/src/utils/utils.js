@@ -82,7 +82,7 @@ export const ToastEvent = {
     message,
     type = "error",
     context = 'global',
-    duration = 6000,
+    duration = 3000,
     func = null,
     actionText = '',
   ) => {
@@ -99,7 +99,7 @@ export const ToastEvent = {
     message,
     type = "error",
     context = 'global',
-    duration = 6000,
+    duration = 3000,
     func = null,
     actionText = '',
   ) => {
