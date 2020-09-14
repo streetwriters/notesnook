@@ -21,8 +21,8 @@ export const Folders = ({route, navigation}) => {
         type: ACTIONS.HEADER_STATE,
         state: {
           type: 'notebooks',
-          menu: !params.canGoBack,
-          canGoBack: params.canGoBack,
+          menu: true,
+          canGoBack: false,
           route: route,
           color: null,
           navigation: navigation,
@@ -61,7 +61,7 @@ export const Folders = ({route, navigation}) => {
       dispatch({
         type: ACTIONS.SEARCH_STATE,
         state: {
-          placeholder:'Search all notebooks',
+          placeholder: 'Search all notebooks',
           data: notebooks,
           noSearch: false,
           type: 'notebooks',
