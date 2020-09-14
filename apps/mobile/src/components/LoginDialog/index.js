@@ -79,9 +79,10 @@ const LoginDialog = () => {
       invalidPassword ||
       invalidUsername
     ) {
-      ToastEvent.show('username or password is invalid', 'error');
+      ToastEvent.show('username or password is invalid', 'error', 'local');
       return;
     }
+
     setLoggingIn(true);
     _username.current.blur();
     _pass.current.blur();
@@ -92,7 +93,7 @@ const LoginDialog = () => {
       console.log(res, username, password);
     } catch (e) {
       setTimeout(() => {
-        ToastEvent.show(e.message, 'error');
+        ToastEvent.show(e.message, 'error', 'local');
         setLoggingIn(false);
       }, 500);
 
@@ -114,7 +115,7 @@ const LoginDialog = () => {
       eSendEvent(refreshNotesPage);
       setVisible(false);
       dispatch({type: ACTIONS.SYNCING, syncing: false});
-      ToastEvent.show(`Logged in as ${username}`, 'success');
+      ToastEvent.show(`Logged in as ${username}`, 'success', 'local');
     } catch (e) {
       dispatch({type: ACTIONS.SYNCING, syncing: false});
       setLoggingIn(false);
@@ -223,6 +224,7 @@ const LoginDialog = () => {
             backgroundColor: colors.bg,
             justifyContent: 'center',
           }}>
+          <Toast context="local" />
           {loggingIn || signingIn ? (
             modalVisible ? (
               <View
@@ -842,7 +844,6 @@ const LoginDialog = () => {
               </View>
             </>
           )}
-          <Toast context="local" />
         </View>
       </View>
     </Modal>
