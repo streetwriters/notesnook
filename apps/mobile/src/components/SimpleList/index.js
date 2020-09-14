@@ -1,28 +1,27 @@
-import React, {createRef, useState} from 'react';
+import React, { createRef, useState } from 'react';
 import {
   FlatList,
   Platform,
   RefreshControl,
   SectionList,
   Text,
-  View,
+  View
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import {useSafeArea} from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {SIZE, WEIGHT} from '../../common/common';
-import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
-import {eSendEvent} from '../../services/eventManager';
+import { SIZE, WEIGHT } from '../../common/common';
+import { useTracked } from '../../provider';
+import { ACTIONS } from '../../provider/actions';
+import { eSendEvent } from '../../services/eventManager';
 import {
   eClearSearch,
   eOpenLoginDialog,
-  eScrollEvent,
+  eScrollEvent
 } from '../../services/events';
-import NavigationService from '../../services/NavigationService';
-import {db, DDS, ToastEvent} from '../../utils/utils';
-import {PressableButton} from '../PressableButton';
-import {PinnedItemList} from './PinnedItemList';
+import { db, ToastEvent } from '../../utils/utils';
+import { PressableButton } from '../PressableButton';
+import { PinnedItemList } from './PinnedItemList';
 const sectionListRef = createRef();
 
 const AnimatedFlatlist = Animatable.createAnimatableComponent(FlatList);
@@ -46,7 +45,7 @@ const SimpleList = ({
   const {colors, selectionMode, user} = state;
   const searchResults = {...state.searchResults};
   const [refreshing, setRefreshing] = useState(false);
-  const insets = useSafeArea();
+  const insets = useSafeAreaInsets();
   const _onScroll = (event) => {
     if (!event) return;
     let y = event.nativeEvent.contentOffset.y;
@@ -124,9 +123,7 @@ const SimpleList = ({
         'global',
         5000,
         () => {
-          NavigationService.navigate('Login', {
-            root: true,
-          });
+          eSendEvent(eOpenLoginDialog);
         },
         'Login',
       );
@@ -186,11 +183,7 @@ const SimpleList = ({
         {user || !data[0] || selectionMode ? null : (
           <PressableButton
             onPress={() => {
-              DDS.isTab
-                ? eSendEvent(eOpenLoginDialog)
-                : NavigationService.navigate('Login', {
-                    root: true,
-                  });
+              eSendEvent(eOpenLoginDialog);
             }}
             color={colors.shade}
             selectedColor={colors.accent}
