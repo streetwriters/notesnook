@@ -81,7 +81,10 @@ function App() {
           >
             {routeResult}
           </Animated.Flex>
-          <Flex width={[show ? 0 : "100%", 0, "100%"]}>
+          <Flex
+            width={[show ? 0 : "100%", "100%", "100%"]}
+            flexDirection="column"
+          >
             <Editor />
           </Flex>
         </Flex>

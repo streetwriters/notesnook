@@ -60,7 +60,7 @@ function Editor() {
       animate={{
         width: isFocusMode ? "55%" : "100%",
       }}
-      transition={{ duration: 0.3, ease: "easeIn" }}
+      transition={{ duration: 0.5, ease: "easeIn" }}
       sx={{
         position: "relative",
         alignSelf: isFocusMode ? "center" : "stretch",
