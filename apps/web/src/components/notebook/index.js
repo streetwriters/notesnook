@@ -6,6 +6,7 @@ import * as Icon from "../icons";
 import { showEditNoteDialog } from "../dialogs/addnotebookdialog";
 import { confirm } from "../dialogs/confirm";
 import { showUnpinnedToast } from "../../common/toasts";
+import { showNoteBookDeleted } from "../../common/toasts";
 
 function menuItems(notebook, index) {
   return [
@@ -30,7 +31,9 @@ function menuItems(notebook, index) {
           "Are you sure you want to delete this notebook?"
         ).then(async (res) => {
           if (res) {
-            await store.delete(notebook.id, index);
+            await store
+              .delete(notebook.id, index)
+              .then(showNoteBookDeleted(notebook.id));
           }
         });
       },

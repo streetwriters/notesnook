@@ -32,9 +32,9 @@ function showNotesMovedToast(note, noteIds, notebook) {
 function showNoteDeleted(note) {
   const undoAction = () => {
     let deletedNotes = db.trash.all;
-    deletedNotes.forEach((element) => {
+    deletedNotes.forEach(async (element) => {
       if (element.itemId === note) {
-        db.trash.restore(element.id);
+        await db.trash.restore(element.id);
         notestore.refresh();
       }
     });
@@ -65,9 +65,26 @@ async function showUnpinnedToast(itemId, itemType) {
   var toast = showToast("success", messageText, actions);
 }
 
+function showNoteBookDeleted(notebook) {
+  const undoAction = () => {
+    let deletedNotes = db.trash.all;
+    deletedNotes.forEach(async (element) => {
+      if (element.itemId === notebook) {
+        await db.trash.restore(element.id);
+        nbstore.refresh();
+      }
+    });
+  };
+
+  let actions = [{ text: "Undo", onClick: undoAction }];
+
+  showToast("success", "Notebook Deleted", actions);
+}
+
 export {
   showNotesMovedToast,
   showNoteDeleted,
   showNoteColored,
   showUnpinnedToast,
+  showNoteBookDeleted,
 };
