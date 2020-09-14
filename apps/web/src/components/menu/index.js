@@ -43,7 +43,10 @@ function Menu(props) {
                   if (props.closeMenu) {
                     props.closeMenu();
                   }
-                  item.onClick(props.data);
+                  console.log("ITEM", item);
+                  if (!item.component) {
+                    item.onClick(props.data);
+                  }
                 }}
                 flexDirection="row"
                 alignItems="center"
