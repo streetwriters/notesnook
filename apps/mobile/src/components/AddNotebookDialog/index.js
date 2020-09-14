@@ -114,82 +114,76 @@ export class AddNotebookDialog extends React.Component {
   };
 
   addNewNotebook = async () => {
-  
-      let {topics} = this.state;
-      let edit = this.props.toEdit;
-  
-      if (!this.title || this.title?.trim().length === 0)
-        return ToastEvent.show('Title is required', 'error', 'local');
+    let {topics} = this.state;
+    let edit = this.props.toEdit;
 
-      let id = edit && edit.id ? edit.id : null;
+    if (!this.title || this.title?.trim().length === 0)
+      return ToastEvent.show('Title is required', 'error', 'local');
 
-      let toEdit;
-      if (id) {
-        toEdit = db.notebooks.notebook(edit.id).data;
-      }
+    let id = edit && edit.id ? edit.id : null;
 
-      let prevTopics = [...topics];
+    let toEdit;
+    if (id) {
+      toEdit = db.notebooks.notebook(edit.id).data;
+    }
 
-      if (
-        this.currentInputValue &&
-        this.currentInputValue.trim().length !== 0
-      ) {
-        if (this.prevItem != null) {
-          prevTopics[this.prevIndex] = this.currentInputValue;
-        } else {
-          prevTopics.push(this.currentInputValue);
-          this.currentInputValue = null;
-        }
-      }
-      if (id) {
-        if (this.topicsToDelete.length > 0) {
-          await db.notebooks
-            .notebook(toEdit.id)
-            .topics.delete(...this.topicsToDelete);
-          toEdit = db.notebooks.notebook(toEdit.id).data;
-        }
-     
-        await db.notebooks.add({
-          title: this.title,
-          description: this.description,
-          id: id,
-        }); 
+    let prevTopics = [...topics];
 
-
-        let nextTopics = toEdit.topics.map((topic, index) => {
-          if (index === 0) return topic;
-          let copy = {...topic};
-          console.log(copy,'here');
-          copy.title = prevTopics[index -1];
-          return copy;
-        });
-
-        prevTopics.forEach((title, index) => {
-          if (!nextTopics[index + 1]) {
-            nextTopics.push(title);
-          }
-        });
-        console.log(nextTopics,prevTopics,toEdit.topics,"HERE");
-        await db.notebooks.notebook(id).topics.add(...nextTopics);
+    if (this.currentInputValue && this.currentInputValue.trim().length !== 0) {
+      if (this.prevItem != null) {
+        prevTopics[this.prevIndex] = this.currentInputValue;
       } else {
-        await db.notebooks.add({
-          title: this.title,
-          description: this.description,
-          topics: prevTopics,
-          id: id,
-        });
+        prevTopics.push(this.currentInputValue);
+        this.currentInputValue = null;
       }
-      //this.close();
-      updateEvent({type: ACTIONS.NOTEBOOKS});
-      updateEvent({type: ACTIONS.PINNED});
+    }
+    if (id) {
+      if (this.topicsToDelete?.length > 0) {
+        await db.notebooks
+          .notebook(toEdit.id)
+          .topics.delete(...this.topicsToDelete);
+        toEdit = db.notebooks.notebook(toEdit.id).data;
+      }
 
-      ToastEvent.show('New notebook added', 'success', 'local');
- 
+      await db.notebooks.add({
+        title: this.title,
+        description: this.description,
+        id: id,
+      });
+
+      let nextTopics = toEdit.topics.map((topic, index) => {
+        if (index === 0) return topic;
+        let copy = {...topic};
+        console.log(copy, 'here');
+        copy.title = prevTopics[index - 1];
+        return copy;
+      });
+
+      prevTopics.forEach((title, index) => {
+        if (!nextTopics[index + 1]) {
+          nextTopics.push(title);
+        }
+      });
+      console.log(nextTopics, prevTopics, toEdit.topics, 'HERE');
+      await db.notebooks.notebook(id).topics.add(...nextTopics);
+    } else {
+      await db.notebooks.add({
+        title: this.title,
+        description: this.description,
+        topics: prevTopics,
+        id: id,
+      });
+    }
+    this.close();
+    updateEvent({type: ACTIONS.NOTEBOOKS});
+    updateEvent({type: ACTIONS.PINNED});
+
+    //ToastEvent.show('New notebook added', 'success', 'local');
   };
 
   onSubmit = (forward = true) => {
     let {topics} = this.state;
-    if (!this.currentInputValue || this.currentInputValue.trim().length === 0)
+    if (!this.currentInputValue || this.currentInputValue?.trim().length === 0)
       return;
 
     let prevTopics = [...topics];
@@ -320,7 +314,7 @@ export class AddNotebookDialog extends React.Component {
                   styles.input,
                   {
                     borderColor: descFocused ? colors.accent : colors.nav,
-                    minHeight:90,
+                    minHeight: 90,
                     color: colors.pri,
                   },
                 ]}
@@ -385,7 +379,7 @@ export class AddNotebookDialog extends React.Component {
                       color: colors.pri,
                       width: '85%',
                       maxWidth: '85%',
-                      marginTop:5
+                      marginTop: 5,
                     },
                   ]}
                   placeholder="Add a new topic"
