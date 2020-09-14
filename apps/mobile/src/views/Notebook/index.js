@@ -11,13 +11,9 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent,
 } from '../../services/eventManager';
-import {
-  eMoveNoteDialogNavigateBack,
-  eOnNewTopicAdded,
-  eScrollEvent,
-} from '../../services/events';
+import {eOnNewTopicAdded, eScrollEvent} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
-import {db, ToastEvent, w} from '../../utils/utils';
+import {db, ToastEvent} from '../../utils/utils';
 
 export const Notebook = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
@@ -61,18 +57,7 @@ export const Notebook = ({route, navigation}) => {
           navigation: navigation,
         },
       });
-      dispatch({
-        type: ACTIONS.CONTAINER_BOTTOM_BUTTON,
-        state: {
-          visible: true,
-          bottomButtonOnPress: () => {
-            let n = route.params.notebook;
-            AddTopicEvent(n);
-          },
-          color: null,
-          bottomButtonText: 'Add new topic',
-        },
-      });
+
       dispatch({
         type: ACTIONS.HEADER_VERTICAL_MENU,
         state: false,
@@ -104,6 +89,18 @@ export const Notebook = ({route, navigation}) => {
           color: null,
         },
       });
+      dispatch({
+        type: ACTIONS.CONTAINER_BOTTOM_BUTTON,
+        state: {
+          visible: true,
+          bottomButtonOnPress: () => {
+            let n = route.params.notebook;
+            AddTopicEvent(n);
+          },
+          color: null,
+          bottomButtonText: 'Add new topic',
+        },
+      });
     }
   }, [topics, isFocused]);
 
@@ -111,7 +108,6 @@ export const Notebook = ({route, navigation}) => {
     setRefreshing(true);
     try {
       await db.sync();
-
       onLoad();
       dispatch({type: ACTIONS.USER});
       setRefreshing(false);
