@@ -5,6 +5,8 @@ import * as Icon from "../icons";
 import { db } from "../../common";
 import Dialog, { showDialog } from "./dialog";
 import { toTitleCase } from "../../utils/string";
+import { showNotesMovedToast } from "../../common/toasts";
+import { showToast } from "../../utils/toast";
 
 class MoveDialog extends React.Component {
   history = [];
@@ -40,12 +42,16 @@ class MoveDialog extends React.Component {
           text: "Move",
           onClick: async () => {
             try {
-              await db.notes.move(
-                { id: this.selectedNotebook.id, topic: this.selectedTopic },
-                ...props.noteIds
-              );
+              const notebook = {
+                id: this.selectedNotebook.id,
+                topic: this.selectedTopic,
+              };
+              const note = db.notes.note(props.noteIds[0]).data;
+              await db.notes.move(notebook, ...props.noteIds);
+              showNotesMovedToast(note, props.noteIds, notebook);
               props.onMove();
             } catch (e) {
+              showToast("error", e.message);
               console.error(e);
             } finally {
               props.onClose();
