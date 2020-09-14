@@ -140,12 +140,7 @@ export const UserSection = ({noTextMode}) => {
   ) : (
     <PressableButton
       onPress={() => {
-        DDS.isTab
-          ? eSendEvent(eOpenLoginDialog)
-          : NavigationService.navigate('Login', {
-              root: true,
-            });
-        sideMenuRef.current?.closeDrawer();
+       eSendEvent(eOpenLoginDialog);
       }}
       color={colors.shade}
       selectedColor={colors.accent}

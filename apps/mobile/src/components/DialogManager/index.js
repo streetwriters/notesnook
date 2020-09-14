@@ -181,11 +181,11 @@ export class DialogManager extends Component {
   
 
   showLoginDialog = () => {
-    this.loginDialog.open();
+    //this.loginDialog.open();
   };
 
   hideLoginDialog = () => {
-    this.loginDialog.close();
+    //this.loginDialog.close();
   };
 
   showAddNotebook = data => {

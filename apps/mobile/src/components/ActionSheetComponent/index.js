@@ -7,6 +7,7 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  Clipboard,
 } from 'react-native';
 import Share from 'react-native-share';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -26,7 +27,7 @@ import {
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {eSendEvent, openVault} from '../../services/eventManager';
-import {refreshNotesPage} from '../../services/events';
+import {eOpenLoginDialog, refreshNotesPage} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
 import {MMKV} from '../../utils/storage';
 import {
@@ -39,6 +40,7 @@ import {
 } from '../../utils/utils';
 import {PremiumTag} from '../Premium/PremiumTag';
 import {PressableButton} from '../PressableButton';
+import {Toast} from '../Toast';
 
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
@@ -83,7 +85,6 @@ export const ActionSheetComponent = ({
   useEffect(() => {
     if (item.dateCreated !== null) {
       setNote({...item});
-      console.log(item);
     }
   }, [item]);
 
@@ -259,20 +260,18 @@ export const ActionSheetComponent = ({
       },
     },
     {
-      name: 'Open',
-      icon: 'open-in-app',
-      func: () => {
-        NavigationService.navigate('Editor', {
-          note: item,
-        });
-        close();
+      name: 'Copy',
+      icon: 'content-copy',
+      func: async () => {
+        let text = await db.notes.note(note.id).text();
+        Clipboard.setString(text);
+        ToastEvent.show('Note copied to clipboard', 'success', 'local');
       },
     },
     {
       name: 'Restore',
       icon: 'delete-restore',
       func: async () => {
-        console.log(await db.trash.restore(note.id),"RESULT");
         dispatch({type: ACTIONS.TRASH});
         localRefresh(note.type);
         ToastEvent.show(
@@ -437,7 +436,6 @@ export const ActionSheetComponent = ({
   );
 
   const _renderColor = (c) => {
-    console.log(COLORS_NOTE[c]);
     const color = {
       name: c,
       value: COLORS_NOTE[c],
@@ -589,10 +587,19 @@ export const ActionSheetComponent = ({
 
   const onPressSync = async () => {
     if (!user) {
-      NavigationService.navigate('Login', {
-        root: true,
-      });
-      close();
+      ToastEvent.show(
+        'You must login to sync',
+        'error',
+        'local',
+        5000,
+        () => {
+          close();
+          setTimeout(() => {
+            eSendEvent(eOpenLoginDialog);
+          }, 500);
+        },
+        'Login',
+      );
       return;
     }
     if (user?.lastSynced < note?.dateEdited) {
@@ -604,7 +611,7 @@ export const ActionSheetComponent = ({
         localRefresh();
         setRefreshing(false);
 
-        ToastEvent.show('Sync Complete', 'success', 'local');
+        ToastEvent.show('Note synced', 'success', 'local');
       } catch (e) {
         setRefreshing(false);
         ToastEvent.show(e.message, 'error', 'local');
@@ -955,6 +962,7 @@ export const ActionSheetComponent = ({
           }}
         />
       ) : null}
+      <Toast context="local" />
     </View>
   );
 };
