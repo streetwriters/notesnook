@@ -4,6 +4,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {ph, pv, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
+import NavigationService from '../../services/NavigationService';
 import {db, ToastEvent} from '../../utils/utils';
 import {Button} from '../Button';
 import {ActionSheetEvent, moveNoteHideEvent} from '../DialogManager/recievers';
@@ -80,7 +81,12 @@ export const NotebookItem = ({
             }}>
             {item && item.topics ? (
               item.topics.slice(1, 4).map((topic) => (
-                <View
+                <TouchableOpacity
+                  onPress={() => {
+                    NavigationService.navigate('Notes', {
+                      ...topic,
+                    });
+                  }}
                   key={topic.dateCreated.toString() + topic.title}
                   style={{
                     borderRadius: 2.5,
@@ -100,7 +106,7 @@ export const NotebookItem = ({
                     }}>
                     {topic.title}
                   </Text>
-                </View>
+                </TouchableOpacity>
               ))
             ) : (
               <Text

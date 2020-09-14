@@ -1,20 +1,15 @@
-import React, {useState, useEffect} from 'react';
-import {Platform, StatusBar, Text, TouchableOpacity, View} from 'react-native';
-import * as Animatable from 'react-native-animatable';
+import React, {useEffect, useState} from 'react';
+import {Text, TouchableOpacity, View} from 'react-native';
+import Animated, {Easing, useValue} from 'react-native-reanimated';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
-import {
-  eOpenMoveNoteDialog,
-  eOpenPremiumDialog,
-  eOpenSimpleDialog,
-} from '../../services/events';
+import {eOpenMoveNoteDialog, eOpenSimpleDialog} from '../../services/events';
 import {db, ToastEvent} from '../../utils/utils';
 import {TEMPLATE_DELETE} from '../DialogManager/templates';
-import Animated, {useValue, Easing} from 'react-native-reanimated';
 
 export const SelectionHeader = () => {
   // State
@@ -44,7 +39,7 @@ export const SelectionHeader = () => {
       style={{
         width: '100%',
         position: 'absolute',
-        height:50,
+        height: 50,
         backgroundColor: colors.bg,
         marginTop: insets.top,
         justifyContent: 'flex-end',
@@ -126,7 +121,7 @@ export const SelectionHeader = () => {
               <Icon color={colors.heading} name={'plus'} size={SIZE.xl} />
             </TouchableOpacity>
           )}
-        {/*   {currentScreen === 'trash' || currentScreen === 'notebooks' ? null : (
+          {/*   {currentScreen === 'trash' || currentScreen === 'notebooks' ? null : (
             <TouchableOpacity
               style={{
                 justifyContent: 'center',

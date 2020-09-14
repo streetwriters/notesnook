@@ -41,37 +41,31 @@ export const NotebookItemWrapper = ({
       onLongPress();
       return;
     }
-    if (item.type === 'topic') {
-      NavigationService.navigate('Notes', {
-        ...item,
-      });
-    } else {
-      dispatch({
-        type: ACTIONS.HEADER_TEXT_STATE,
-        state: {
-          heading: item.title,
-        },
-      });
-      dispatch({
-        type: ACTIONS.HEADER_STATE,
-        state: {
-          canGoBack: true,
-          menu: false,
-        },
-      });
-      dispatch({
-        type: ACTIONS.CONTAINER_BOTTOM_BUTTON,
-        state: {
-          bottomButtonText: 'Add new topic',
-        },
-      });
+    dispatch({
+      type: ACTIONS.HEADER_TEXT_STATE,
+      state: {
+        heading: item.title,
+      },
+    });
+    dispatch({
+      type: ACTIONS.HEADER_STATE,
+      state: {
+        canGoBack: true,
+        menu: false,
+      },
+    });
+    dispatch({
+      type: ACTIONS.CONTAINER_BOTTOM_BUTTON,
+      state: {
+        bottomButtonText: 'Add new topic',
+      },
+    });
 
-      NavigationService.navigate('Notebook', {
-        notebook: item,
-        title: item.title,
-        root: true,
-      });
-    }
+    NavigationService.navigate('Notebook', {
+      notebook: item,
+      title: item.title,
+      root: true,
+    });
   };
 
   return (

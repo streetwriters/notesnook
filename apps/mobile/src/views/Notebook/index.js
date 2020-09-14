@@ -16,6 +16,7 @@ import {
   eOnNewTopicAdded,
   eScrollEvent,
 } from '../../services/events';
+import NavigationService from '../../services/NavigationService';
 import {db, ToastEvent, w} from '../../utils/utils';
 
 export const Notebook = ({route, navigation}) => {
@@ -44,10 +45,6 @@ export const Notebook = ({route, navigation}) => {
       eUnSubscribeEvent(eOnNewTopicAdded, onLoad);
     };
   }, []);
-
-  const handleBackPress = () => {
-    navigation.goBack();
-  };
 
   useEffect(() => {
     if (isFocused) {
@@ -110,13 +107,6 @@ export const Notebook = ({route, navigation}) => {
     }
   }, [topics, isFocused]);
 
-  useEffect(() => {
-    eSubscribeEvent(eMoveNoteDialogNavigateBack, handleBackPress);
-    return () => {
-      eUnSubscribeEvent(eMoveNoteDialogNavigateBack, handleBackPress);
-    };
-  }, []);
-
   const _onRefresh = async () => {
     setRefreshing(true);
     try {
@@ -157,31 +147,36 @@ const RenderItem = ({item, index}) => {
   let params = headerState.route.params ? headerState.route.params : {};
 
   return (
-    <SelectionWrapper item={item}>
+    <SelectionWrapper
+      onPress={() => {
+        NavigationService.navigate('Notes', {
+          ...item,
+        });
+      }}
+      onLongPress={() => {
+        if (!selectionMode) {
+          dispatch({
+            type: ACTIONS.SELECTION_MODE,
+            enabled: !selectionMode,
+          });
+        }
+        dispatch({
+          type: ACTIONS.SELECTED_ITEMS,
+          item: item,
+        });
+      }}
+      item={item}>
       <NotebookItem
         hideMore={preventDefaultMargins}
         isTopic={true}
         customStyle={{
-          width: selectionMode ? w - 74 : '100%',
+          width: '100%',
           marginHorizontal: 0,
         }}
         selectionMode={selectionMode}
-        onLongPress={() => {
-          if (!selectionMode) {
-            dispatch({
-              type: ACTIONS.SELECTION_MODE,
-              enabled: !selectionMode,
-            });
-          }
-          dispatch({
-            type: ACTIONS.SELECTED_ITEMS,
-            item: item,
-          });
-        }}
         noteToMove={params.note}
         notebookID={params.notebook?.id}
         isMove={preventDefaultMargins}
-        refresh={() => {}}
         item={item}
         index={index}
         colors={colors}

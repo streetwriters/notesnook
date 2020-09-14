@@ -27,7 +27,11 @@ import {
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {eSendEvent, openVault} from '../../services/eventManager';
-import {eOpenLoginDialog, eOpenMoveNoteDialog, refreshNotesPage} from '../../services/events';
+import {
+  eOpenLoginDialog,
+  eOpenMoveNoteDialog,
+  refreshNotesPage,
+} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
 import {MMKV} from '../../utils/storage';
 import {
@@ -214,8 +218,7 @@ export const ActionSheetComponent = ({
         close();
         setTimeout(() => {
           eSendEvent(eOpenMoveNoteDialog);
-        },400)
-      
+        }, 400);
       },
     },
     {
