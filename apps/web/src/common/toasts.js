@@ -81,10 +81,20 @@ function showNoteBookDeleted(notebook) {
   showToast("success", "Notebook Deleted", actions);
 }
 
+function showTrashItemRestored() {
+  showToast("success", "Item restored");
+}
+
+function showTrashItemPermanentDelete() {
+  showToast("success", "Item permanently deleted");
+}
+
 export {
   showNotesMovedToast,
   showNoteDeleted,
   showNoteColored,
   showUnpinnedToast,
   showNoteBookDeleted,
+  showTrashItemRestored,
+  showTrashItemPermanentDelete,
 };
