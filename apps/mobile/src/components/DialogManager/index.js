@@ -189,17 +189,17 @@ export class DialogManager extends Component {
   };
 
   showAddNotebook = data => {
-    this.setState(
+    /* this.setState(
       {
         item: data.item ? data.item : {},
       },
       () => {
         this.addNotebooksDialog.open();
       },
-    );
+    ); */
   };
   hideAddNotebook = () => {
-    this.addNotebooksDialog.close();
+    //this.addNotebooksDialog.close();
   };
 
   _showSimpleDialog = data => {

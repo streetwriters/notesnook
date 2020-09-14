@@ -1,30 +1,29 @@
 import CheckBox from '@react-native-community/checkbox';
-import React, {createRef, useEffect, useState} from 'react';
-import {Clipboard, Modal, Text, TouchableOpacity, View} from 'react-native';
-import * as Animatable from 'react-native-animatable';
-import {TextInput} from 'react-native-gesture-handler';
+import React, { createRef, useEffect, useState } from 'react';
+import { Clipboard, Modal, Text, TouchableOpacity, View } from 'react-native';
+import { TextInput } from 'react-native-gesture-handler';
 import QRCode from 'react-native-qrcode-generator';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {opacity, ph, pv, SIZE, WEIGHT} from '../../common/common';
-import {Button} from '../../components/Button';
+import { opacity, ph, pv, SIZE, WEIGHT } from '../../common/common';
+import { Button } from '../../components/Button';
 import Seperator from '../../components/Seperator';
-import {Toast} from '../../components/Toast';
-import {ACTIONS} from '../../provider/actions';
-import {useTracked} from '../../provider/index';
+import { Toast } from '../../components/Toast';
+import { ACTIONS } from '../../provider/actions';
+import { useTracked } from '../../provider/index';
 import {
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent,
+  eUnSubscribeEvent
 } from '../../services/eventManager';
-import {eCloseLoginDialog, eOpenLoginDialog} from '../../services/events';
+import { eCloseLoginDialog, eOpenLoginDialog } from '../../services/events';
 import {
   validateEmail,
   validatePass,
-  validateUsername,
+  validateUsername
 } from '../../services/validation';
-import {db, DDS, getElevation, ToastEvent} from '../../utils/utils';
-import {Loading} from '../Loading';
+import { db, DDS, getElevation, ToastEvent } from '../../utils/utils';
+import { Loading } from '../Loading';
 
 const LoginDialog = () => {
   const [state, dispatch] = useTracked();

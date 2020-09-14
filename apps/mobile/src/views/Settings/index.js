@@ -417,11 +417,7 @@ export const Settings = ({route, navigation}) => {
                 alpha={!colors.night ? -0.02 : 0.1}
                 opacity={0.12}
                 onPress={() => {
-                  DDS.isTab
-                    ? eSendEvent(eOpenLoginDialog)
-                    : NavigationService.navigate('Login', {
-                        root: true,
-                      });
+                  eSendEvent(eOpenLoginDialog);
                 }}
                 activeOpacity={opacity / 2}
                 customStyle={{
@@ -439,6 +435,7 @@ export const Settings = ({route, navigation}) => {
                     width: 40,
                     backgroundColor: colors.accent,
                     height: 40,
+                    marginLeft:10,
                     borderRadius: 100,
                     alignItems: 'center',
                     justifyContent: 'center',
