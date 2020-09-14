@@ -122,6 +122,39 @@ const LoginDialog = () => {
     }
   };
 
+  const validateInfo = () => {
+    if (!password || !email || !username || !passwordReEnter) {
+      ToastEvent.show('All fields are required', 'error', 'local');
+      return false;
+    }
+
+    if (!confirmPassword) {
+      ToastEvent.show('Passwords do not match', 'error', 'local');
+      return false;
+    }
+
+    if (!invalidEmail && !invalidPassword && !invalidUsername) {
+      ToastEvent.show('Signup information is invalid', 'error', 'local');
+      return false;
+    }
+
+    if (!userConsent) {
+      ToastEvent.show(
+        'You must agree to our terms of service and privacy policy.',
+        'error',
+        'local',
+        5000,
+        () => {
+          setUserConsent(true);
+          signupUser();
+          ToastEvent.hide();
+        },
+        'I Agree',
+      );
+      return false;
+    }
+  };
+
   const signupUser = async () => {
     if (!validateInfo) return;
 
@@ -778,6 +811,8 @@ const LoginDialog = () => {
 
                 <TouchableOpacity
                   onPress={() => {
+                    ToastEvent.show('hello world', 'error', 'local');
+
                     setLogin(!login);
                   }}
                   activeOpacity={opacity}
@@ -807,9 +842,9 @@ const LoginDialog = () => {
               </View>
             </>
           )}
+          <Toast context="local" />
         </View>
       </View>
-      <Toast context="local" />
     </Modal>
   );
 };
