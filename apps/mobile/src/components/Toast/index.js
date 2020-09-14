@@ -155,7 +155,7 @@ export const Toast = ({context = 'global'}) => {
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-            maxWidth: data.func ? '90%' : '75%',
+            maxWidth: !data.func ? '90%' : '75%',
           }}>
           <View
             style={{
@@ -181,6 +181,7 @@ export const Toast = ({context = 'global'}) => {
             }}
             style={{
               color: 'white',
+              width:'100%',
               backgroundColor: 'transparent',
               fontSize: SIZE.sm,
             }}>
