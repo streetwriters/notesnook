@@ -29,8 +29,14 @@ function showNotesMovedToast(note, noteIds, notebook) {
 }
 
 function showNoteDeleted(note) {
-  const undoAction = async () => {
-    await db.trash.restore(note);
+  const undoAction = () => {
+    let deletedNotes = db.trash.all;
+    deletedNotes.forEach((element) => {
+      if (element.itemId === note) {
+        db.trash.restore(element.id);
+        notestore.refresh();
+      }
+    });
   };
 
   let actions = [{ text: "Undo", onClick: undoAction }];
