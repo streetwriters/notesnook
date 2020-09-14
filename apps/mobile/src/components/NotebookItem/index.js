@@ -25,7 +25,7 @@ export const NotebookItem = ({
     <View
       style={[
         {
-          height: isTopic ? 80 : 120,
+          height: isTopic ? 80 : 110,
           justifyContent: 'space-between',
           alignItems: 'center',
           flexDirection: 'row',
@@ -39,8 +39,8 @@ export const NotebookItem = ({
       ]}>
       <View
         style={{
-          width: hideMore ? '80%' : '90%',
-          maxWidth: hideMore ? '80%' : '90%',
+          width: '90%',
+          maxWidth: '90%',
           minHeight: 50,
           justifyContent: 'center',
         }}>
@@ -76,6 +76,7 @@ export const NotebookItem = ({
               width: '80%',
               maxWidth: '80%',
               flexWrap: 'wrap',
+              paddingVertical: item.description ? 0 : 5,
             }}>
             {item && item.topics ? (
               item.topics.slice(1, 4).map((topic) => (
@@ -180,8 +181,7 @@ export const NotebookItem = ({
           </Text>
         </View>
       </View>
-      {hideMore ||
-      (item.title === 'General' && item.type === 'topic') ? null : (
+      {item.title === 'General' && item.type === 'topic' ? null : (
         <TouchableOpacity
           style={{
             justifyContent: 'center',
@@ -205,30 +205,6 @@ export const NotebookItem = ({
           <Icon name="dots-horizontal" size={SIZE.lg} color={colors.heading} />
         </TouchableOpacity>
       )}
-
-      {hideMore && isTopic ? (
-        <Button
-          width="20%"
-          title="Move"
-          onPress={async () => {
-            let noteIds = [];
-            selectedItemsList.forEach((item) => noteIds.push(item.id));
-
-            await db.notes.move(
-              {
-                topic: item.title,
-                id: item.notebookId,
-              },
-              ...noteIds,
-            );
-            dispatch({type: ACTIONS.CLEAR_SELECTION});
-
-            moveNoteHideEvent();
-
-            ToastEvent.show(`Note moved to ${item.title}`, 'success');
-          }}
-        />
-      ) : null}
     </View>
   );
 };

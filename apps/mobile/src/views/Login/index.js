@@ -39,6 +39,7 @@ export const Login = ({route, navigation}) => {
   const [username, setUsername] = useState(null);
   const [invalidUsername, setInvalidUsername] = useState(false);
   const [secureEntry, setSecureEntry] = useState(true);
+
   const _email = createRef();
   const _pass = createRef();
   const _passContainer = createRef();

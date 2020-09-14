@@ -1,26 +1,26 @@
-import React, { createRef, useEffect, useState } from 'react';
+import React, {createRef, useEffect, useState} from 'react';
 import {
   FlatList,
   Modal,
   Text,
   TextInput,
   TouchableOpacity,
-  View
+  View,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { pv, SIZE, WEIGHT } from '../../common/common';
-import { useTracked } from '../../provider';
-import { ACTIONS } from '../../provider/actions';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/eventManager';
-import { eOpenMoveNoteDialog } from '../../services/events';
-import { db, DDS, getElevation, ToastEvent } from '../../utils/utils';
-import { PressableButton } from '../PressableButton';
-import { Toast } from '../Toast';
+import {pv, SIZE, WEIGHT} from '../../common/common';
+import {useTracked} from '../../provider';
+import {ACTIONS} from '../../provider/actions';
+import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
+import {eOpenMoveNoteDialog} from '../../services/events';
+import {db, DDS, getElevation, ToastEvent} from '../../utils/utils';
+import {PressableButton} from '../PressableButton';
+import {Toast} from '../Toast';
 const MoveNoteDialog = () => {
   const [state, dispatch] = useTracked();
   const {notebooks, colors, selectedItemsList} = state;
-  const [visible, setVisible] = useState(true);
+  const [visible, setVisible] = useState(false);
   const [animated, setAnimated] = useState(false);
   const [expanded, setExpanded] = useState('');
   const [notebookInputFocused, setNotebookInputFocused] = useState(false);
@@ -40,7 +40,6 @@ const MoveNoteDialog = () => {
   };
 
   useEffect(() => {
-    console.log(notebooks);
     eSubscribeEvent(eOpenMoveNoteDialog, open);
     return () => {
       eUnSubscribeEvent(eOpenMoveNoteDialog, open);

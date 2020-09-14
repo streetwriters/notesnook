@@ -1,12 +1,11 @@
+import {useIsFocused} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {AddTopicEvent} from '../../components/DialogManager/recievers';
-import {NotebookPlaceHolder} from '../../components/ListPlaceholders';
 import {NotebookItem} from '../../components/NotebookItem';
 import SelectionWrapper from '../../components/SelectionWrapper';
 import SimpleList from '../../components/SimpleList';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
-import {useIsFocused} from '@react-navigation/native';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -16,7 +15,6 @@ import {
   eMoveNoteDialogNavigateBack,
   eOnNewTopicAdded,
   eScrollEvent,
-  eSetModalNavigator,
 } from '../../services/events';
 import {db, ToastEvent, w} from '../../utils/utils';
 
@@ -26,23 +24,18 @@ export const Notebook = ({route, navigation}) => {
   const [refreshing, setRefreshing] = useState(false);
 
   let params = route.params;
-  let notebook;
   let isFocused = useIsFocused();
 
   const onLoad = () => {
     let allTopics;
-
     allTopics = db.notebooks.notebook(route.params.notebook.id).data.topics;
-    notebook = db.notebooks.notebook(route.params.notebook.id);
     setTopics(allTopics);
   };
 
   useEffect(() => {
     eSendEvent(eScrollEvent, 0);
     params = route.params;
-    let topic = params.notebook.topics;
-    notebook = params.notebook;
-    setTopics([...topic]);
+    setTopics([...params.notebook.topics]);
   }, []);
 
   useEffect(() => {
@@ -65,11 +58,10 @@ export const Notebook = ({route, navigation}) => {
           type: 'topics',
           menu: false,
           canGoBack: true,
-          heading:params.title,
+          heading: params.title,
           route: route,
           color: null,
           navigation: navigation,
-          ind: !params.root,
         },
       });
       dispatch({
@@ -82,7 +74,6 @@ export const Notebook = ({route, navigation}) => {
           },
           color: null,
           bottomButtonText: 'Add new topic',
-          ind: !params.root
         },
       });
       dispatch({
@@ -94,7 +85,6 @@ export const Notebook = ({route, navigation}) => {
         type: ACTIONS.HEADER_TEXT_STATE,
         state: {
           heading: params.title,
-          ind: !params.root
         },
       });
 
@@ -102,9 +92,6 @@ export const Notebook = ({route, navigation}) => {
         type: ACTIONS.CURRENT_SCREEN,
         screen: 'notebook',
       });
-      if (!params.root) {
-      eSendEvent(eSetModalNavigator,true);
-      } 
     }
   }, [isFocused]);
 
@@ -118,7 +105,6 @@ export const Notebook = ({route, navigation}) => {
           noSearch: false,
           type: 'topics',
           color: null,
-          ind: !params.root
         },
       });
     }
@@ -165,8 +151,10 @@ export default Notebook;
 const RenderItem = ({item, index}) => {
   const [state, dispatch] = useTracked();
   const {colors, selectionMode, preventDefaultMargins} = state;
-  let headerState = preventDefaultMargins? state.indHeaderState : state.headerState;
-  let params = headerState.route.params? headerState.route.params : {};
+  let headerState = preventDefaultMargins
+    ? state.indHeaderState
+    : state.headerState;
+  let params = headerState.route.params ? headerState.route.params : {};
 
   return (
     <SelectionWrapper item={item}>

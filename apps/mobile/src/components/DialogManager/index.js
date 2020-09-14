@@ -87,11 +87,13 @@ export class DialogManager extends Component {
   };
 
   _showMoveNote = () => {
-    this.moveNoteDialog.open();
+    
+    ///this.moveNoteDialog.open();
   };
 
   _hideMoveNote = () => {
-    this.moveNoteDialog.close();
+    //eSendEvent(eCloseMoveNoteDialog)
+   // this.moveNoteDialog.close();
   };
 
   loadNote = i => {
@@ -189,17 +191,17 @@ export class DialogManager extends Component {
   };
 
   showAddNotebook = data => {
-    /* this.setState(
+     this.setState(
       {
         item: data.item ? data.item : {},
       },
       () => {
         this.addNotebooksDialog.open();
       },
-    ); */
+    ); 
   };
   hideAddNotebook = () => {
-    //this.addNotebooksDialog.close();
+    this.addNotebooksDialog.close();
   };
 
   _showSimpleDialog = data => {
@@ -252,7 +254,7 @@ export class DialogManager extends Component {
           break;
         }
         case 'movenote': {
-          moveNoteEvent();
+         // this._showMoveNote();
           break;
         }
         case "premium": {

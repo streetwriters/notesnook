@@ -27,7 +27,7 @@ import {
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {eSendEvent, openVault} from '../../services/eventManager';
-import {eOpenLoginDialog, refreshNotesPage} from '../../services/events';
+import {eOpenLoginDialog, eOpenMoveNoteDialog, refreshNotesPage} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
 import {MMKV} from '../../utils/storage';
 import {
@@ -211,8 +211,11 @@ export const ActionSheetComponent = ({
       func: () => {
         dispatch({type: ACTIONS.MODAL_NAVIGATOR, enabled: true});
         dispatch({type: ACTIONS.SELECTED_ITEMS, item: note});
-
-        close('movenote');
+        close();
+        setTimeout(() => {
+          eSendEvent(eOpenMoveNoteDialog);
+        },400)
+      
       },
     },
     {

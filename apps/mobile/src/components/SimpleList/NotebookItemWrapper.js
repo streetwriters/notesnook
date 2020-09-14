@@ -49,7 +49,7 @@ export const NotebookItemWrapper = ({
       dispatch({
         type: ACTIONS.HEADER_TEXT_STATE,
         state: {
-          heading: preventDefaultMargins ? 'Move to topic' : item.title,
+          heading: item.title,
         },
       });
       dispatch({
@@ -66,21 +66,11 @@ export const NotebookItemWrapper = ({
         },
       });
 
-      preventDefaultMargins
-        ? navigation.navigate('Notebook', {
-            notebook: item,
-            title: preventDefaultMargins ? 'Move to topic' : item.title,
-            isMove: preventDefaultMargins,
-            hideMore: preventDefaultMargins,
-            root: preventDefaultMargins ? false : true,
-          })
-        : NavigationService.navigate('Notebook', {
-            notebook: item,
-            title: preventDefaultMargins ? 'Select a topic' : item.title,
-            isMove: preventDefaultMargins,
-            hideMore: preventDefaultMargins,
-            root: true,
-          });
+      NavigationService.navigate('Notebook', {
+        notebook: item,
+        title: item.title,
+        root: true,
+      });
     }
   };
 
@@ -95,7 +85,7 @@ export const NotebookItemWrapper = ({
         hideMore={preventDefaultMargins}
         navigation={headerState.navigation}
         route={headerState.route}
-        isTopic={item.type === "topic"}
+        isTopic={item.type === 'topic'}
         customStyle={style}
         noteToMove={params.note}
         item={item}
