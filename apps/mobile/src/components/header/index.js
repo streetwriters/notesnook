@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {
   ActivityIndicator,
   Platform,
@@ -7,77 +7,33 @@ import {
   View,
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import {useSafeArea} from 'react-native-safe-area-context';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {SIZE} from '../../common/common';
 import {useTracked} from '../../provider';
-import {
-  eSendEvent,
-  eSubscribeEvent,
-  eUnSubscribeEvent,
-} from '../../services/eventManager';
-import {eCloseLoginDialog, eSetModalNavigator} from '../../services/events';
+import {eSendEvent} from '../../services/eventManager';
 import NavigationService from '../../services/NavigationService';
-import {useForceUpdate, useHideHeader} from '../../utils/hooks';
+import {useHideHeader} from '../../utils/hooks';
 import {sideMenuRef} from '../../utils/refs';
 import {DDS, w} from '../../utils/utils';
-import {moveNoteHideEvent} from '../DialogManager/recievers';
 import {HeaderMenu} from './HeaderMenu';
 import {HeaderTitle} from './HeaderTitle';
 
 export const Header = ({showSearch, root}) => {
   const [state, dispatch] = useTracked();
-  const {
-    colors,
-    syncing,
-    isLoginNavigator,
-    preventDefaultMargins,
-    searchResults,
-  } = state;
+  const {colors, syncing} = state;
 
   let headerState = root ? state.headerState : state.indHeaderState;
 
-  const [isModalNavigator, setIsModalNavigator] = useState(false);
-  const insets = useSafeArea();
-  const forceUpdate = useForceUpdate();
+  const insets = useSafeAreaInsets();
   const hideHeader = useHideHeader();
-
-  const _setModalNavigator = (value) => {
-    if (root) return;
-    forceUpdate();
-    setIsModalNavigator(value);
-  };
-
-  useEffect(() => {
-    eSubscribeEvent(eSetModalNavigator, _setModalNavigator);
-
-    return () => {
-      eUnSubscribeEvent(eSetModalNavigator, _setModalNavigator);
-    };
-  }, []);
 
   const onLeftButtonPress = () => {
     if (!headerState.canGoBack) {
       sideMenuRef.current?.openDrawer();
       return;
     }
-    headerState = root ? state.headerState : state.indHeaderState;
-
-    if (headerState.navigation && preventDefaultMargins) {
-      if (headerState.route.name === 'Folders') {
-        moveNoteHideEvent();
-      } else {
-        headerState.navigation.goBack();
-      }
-    } else if (headerState.navigation && isModalNavigator) {
-      if (headerState.route.name === 'Login') {
-        eSendEvent(eCloseLoginDialog);
-      } else {
-        headerState.navigation.goBack();
-      }
-    } else {
-      NavigationService.goBack();
-    }
+    NavigationService.goBack();
   };
 
   return (
@@ -85,16 +41,9 @@ export const Header = ({showSearch, root}) => {
       style={[
         styles.container,
         {
-          marginTop:
-            Platform.OS === 'ios'
-              ? isModalNavigator && !root
-                ? 0
-                : insets.top
-              : isModalNavigator && !root
-              ? 0
-              : insets.top,
+          marginTop: insets.top,
           backgroundColor: colors.bg,
-          overflow:"hidden"
+          overflow: 'hidden',
         },
       ]}>
       <Animatable.View
@@ -124,7 +73,6 @@ export const Header = ({showSearch, root}) => {
             onPress={onLeftButtonPress}
             style={styles.leftBtn}>
             <Icon
-              shape="BURGER"
               style={{
                 marginLeft: headerState.canGoBack ? -5 : 0,
               }}
