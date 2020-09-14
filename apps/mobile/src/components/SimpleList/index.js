@@ -118,7 +118,18 @@ const SimpleList = ({
       } else {
         setRefreshing(false);
       }
-      ToastEvent.show(e.message, 'error');
+      ToastEvent.show(
+        e.message,
+        'error',
+        'global',
+        5000,
+        () => {
+          NavigationService.navigate('Login', {
+            root: true,
+          });
+        },
+        'Login',
+      );
     }
     dispatch({type: ACTIONS.ALL});
   };
