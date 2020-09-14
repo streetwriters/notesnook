@@ -27,13 +27,14 @@ export class AddTopicDialog extends React.Component {
 
     if (!this.props.toEdit) {
       await db.notebooks.notebook(this.props.notebookID).topics.add(this.title);
+      //ToastEvent.show('New topic added', 'success');
     } else {
       let topic = this.props.toEdit;
       topic.title = this.title;
-      await db.notebooks.notebook(this.props.notebookID).topics.add(topic);
+      console.log(topic);
+      await db.notebooks.notebook(topic.notebookId).topics.add(topic);
     }
     this.close();
-    ToastEvent.show('New topic added', 'success');
     eSendEvent(eOnNewTopicAdded);
   };
 
