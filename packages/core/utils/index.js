@@ -1,7 +1,7 @@
 export function groupBy(arr, key) {
-  let groups = {};
+  let groups = { Pinned: [] };
   arr.forEach((item) => {
-    let groupTitle = key(item);
+    let groupTitle = item.pinned ? "Pinned" : key(item);
     let group = groups[groupTitle]
       ? groups[groupTitle]
       : (groups[groupTitle] = []);
