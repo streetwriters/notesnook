@@ -19,12 +19,12 @@ export function openEditorAnimation() {
   EditorPosition.setValue(0);
 
     timing(EditorTranslateY, {
-      duration: 300,
+      duration: 200,
       toValue: 0,
       easing:  Easing.out(Easing.ease),
     }).start();
     timing(EditorOpacity, {
-      duration: 250,
+      duration: 150,
       toValue: 1,
       easing: Easing.out(Easing.ease),
     }).start();
