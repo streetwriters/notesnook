@@ -124,23 +124,13 @@ test("get pinned notes", () =>
 
 test("get grouped notes by abc", () => groupedTest("abc"));
 
-test("get grouped notes by abc (special)", () => groupedTest("abc", true));
-
 test("get grouped notes by month", () => groupedTest("month"));
-
-test("get grouped notes by month (special)", () => groupedTest("month", true));
 
 test("get grouped notes by year", () => groupedTest("year"));
 
-test("get grouped notes by year (special)", () => groupedTest("year", true));
-
 test("get grouped notes by weak", () => groupedTest("week"));
 
-test("get grouped notes by weak (special)", () => groupedTest("week", true));
-
 test("get grouped notes default", () => groupedTest());
-
-test("get grouped notes default (special)", () => groupedTest("", true));
 
 test("pin note", () =>
   noteTest().then(async ({ db, id }) => {

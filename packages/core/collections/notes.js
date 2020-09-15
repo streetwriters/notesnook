@@ -141,46 +141,39 @@ export default class Notes extends Collection {
       .map((id) => this._collection.getItem(id));
   }
 
-  group(by, special = false) {
-    let notes = !special
+  group(by) {
+    let notes = this.all;
+    /* !special
       ? tfun.filter(".pinned === false")(this.all)
-      : this.all;
+      :  */
     notes = sort(notes).desc((t) => t.dateCreated);
     switch (by) {
       case "abc":
-        return groupBy(notes, (note) => note.title[0].toUpperCase(), special);
+        return groupBy(notes, (note) => note.title[0].toUpperCase());
       case "month":
         return groupBy(
           notes,
-          (note) => months[new Date(note.dateCreated).getMonth()],
-          special
+          (note) => months[new Date(note.dateCreated).getMonth()]
         );
       case "week":
-        return groupBy(
-          notes,
-          (note) => getWeekGroupFromTimestamp(note.dateCreated),
-          special
+        return groupBy(notes, (note) =>
+          getWeekGroupFromTimestamp(note.dateCreated)
         );
       case "year":
-        return groupBy(
-          notes,
-          (note) => new Date(note.dateCreated).getFullYear().toString(),
-          special
+        return groupBy(notes, (note) =>
+          new Date(note.dateCreated).getFullYear().toString()
         );
       default:
         let timestamps = {
           recent: getLastWeekTimestamp(7),
           lastWeek: getLastWeekTimestamp(7) - get7DayTimestamp(), //seven day timestamp value
         };
-        return groupBy(
-          notes,
-          (note) =>
-            note.dateCreated >= timestamps.recent
-              ? "Recent"
-              : note.dateCreated >= timestamps.lastWeek
-              ? "Last week"
-              : "Older",
-          special
+        return groupBy(notes, (note) =>
+          note.dateCreated >= timestamps.recent
+            ? "Recent"
+            : note.dateCreated >= timestamps.lastWeek
+            ? "Last week"
+            : "Older"
         );
     }
   }

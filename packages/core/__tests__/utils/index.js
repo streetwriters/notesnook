@@ -60,17 +60,8 @@ const groupedTest = (type, special = false) =>
       dateCreated: getLastWeekTimestamp() - 604800000 * 2,
     });
     let grouped = db.notes.group(type, special);
-    if (special) {
-      expect(grouped.items.length).toBeGreaterThan(0);
-      expect(grouped.groups.length).toBeGreaterThan(0);
-      expect(grouped.groupCounts.length).toBeGreaterThan(0);
-      // check order
-      expect(grouped.groups[0].title).toBe("Pinned");
-      return;
-    }
     expect(grouped.length).toBeGreaterThan(0);
-    expect(grouped[0].data.length).toBeGreaterThan(0);
-    expect(grouped[0].title.length).toBeGreaterThan(0);
+    expect(grouped.some((i) => i.type === "header")).toBe(true);
   });
 
 export {
