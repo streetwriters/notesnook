@@ -683,8 +683,7 @@ export const Settings = ({route, navigation}) => {
               <TouchableOpacity
                 activeOpacity={1}
                 onPress={async () => {
-                  let scale = settings.fontScale;
-                  await setSetting(settings, 'fontScale', scale);
+                  await setSetting(settings, 'fontScale', item.value);
                   eSendEvent(eResetApp);
                 }}
                 key={item.title}
