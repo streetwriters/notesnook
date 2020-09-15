@@ -8,7 +8,7 @@ import {
   eClearEditor,
   eCloseFullscreenEditor,
   eOnNewTopicAdded,
-  eApplyChanges,
+  eApplyChanges, eOnLoadNote
 } from '../../services/events';
 import NavigationService from '../../services/NavigationService';
 import {db, DDS, getElevation, history, ToastEvent} from '../../utils/utils';
@@ -131,6 +131,11 @@ export class Dialog extends Component {
           visible: false,
         });
         NavigationService.goBack();
+        this.hide();
+        break;
+      }
+      case dialogActions.ACTION_NEW_NOTE: {
+        eSendEvent(eOnLoadNote, {type:"new"});
         this.hide();
         break;
       }

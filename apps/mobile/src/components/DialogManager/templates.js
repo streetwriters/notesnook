@@ -84,6 +84,14 @@ export const TEMPLATE_EMPTY_TRASH = {
   negativeText: 'Cancel',
   action: dialogActions.ACTION_EMPTY_TRASH,
 };
+export const TEMPLATE_NEW_NOTE = {
+  title: 'Close Note',
+  paragraph: 'Are you sure you want to close this note?',
+  icon: 'close',
+  positiveText: 'Yes',
+  negativeText: 'Cancel',
+  action: dialogActions.ACTION_NEW_NOTE,
+};
 
 export const TEMPLATE_UNPIN = (type) => { return {
   title: 'Unpin' + type,
