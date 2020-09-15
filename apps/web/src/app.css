@@ -11,3 +11,7 @@
 *::-moz-focus-inner {
   border: 0;
 }
+
+.ct-toast {
+  padding: 0px 10px !important;
+}

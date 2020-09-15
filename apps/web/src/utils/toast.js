@@ -4,6 +4,7 @@ import { Button, Flex, Text } from "rebass";
 import ThemeProvider from "../components/theme-provider";
 import * as Icon from "../components/icons";
 import { toTitleCase } from "./string";
+import { isMobile } from "./dimensions";
 
 /**
  *
@@ -15,7 +16,7 @@ function showToast(type, message, actions) {
   return CogoToast[type](
     <ToastContainer type={type} message={message} actions={actions} />,
     {
-      position: "top-right",
+      position: isMobile() ? "bottom-center" : "top-right",
       hideAfter: actions ? 5 : 3,
       bar: { size: "0px" },
       renderIcon: () => {
