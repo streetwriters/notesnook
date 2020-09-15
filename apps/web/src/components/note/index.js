@@ -13,7 +13,7 @@ import { useTheme } from "emotion-theming";
 import Colors from "../menu/colors";
 import { showExportDialog } from "../dialogs/exportdialog";
 import { setHashParam } from "../../utils/useHashParam";
-import { showNoteDeleted } from "../../common/toasts";
+import { showItemDeletedToast } from "../../common/toasts";
 import { showUnpinnedToast } from "../../common/toasts";
 import { showToast } from "../../utils/toast";
 
@@ -75,7 +75,7 @@ function menuItems(note, context) {
               .notebook(context.notebook.id)
               .topics.topic(context.value)
               .delete(note.id);
-            await store.setContext(context);
+            store.setContext(context);
           }
         });
       },
@@ -99,7 +99,7 @@ function menuItems(note, context) {
           "Are you sure you want to delete this note?"
         ).then(async (res) => {
           if (res) {
-            await store.delete(note.id).then(showNoteDeleted(note.id));
+            await store.delete(note.id).then(() => showItemDeletedToast(note));
           }
         });
       },

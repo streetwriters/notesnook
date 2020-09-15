@@ -4,7 +4,6 @@ import * as Icon from "../icons/index";
 import { objectMap } from "../../utils/object";
 import { useStore } from "../../stores/note-store";
 import { Flex } from "rebass";
-import { showNoteColored } from "../../common/toasts";
 
 function Colors(props) {
   const { id, colors } = props.data;
@@ -15,10 +14,7 @@ function Colors(props) {
       {objectMap(COLORS, (label, code) => (
         <Flex
           sx={{ position: "relative" }}
-          onClick={() => {
-            setColor(id, label);
-            showNoteColored(colors, label);
-          }}
+          onClick={() => setColor(id, label)}
           key={label}
         >
           <Icon.Circle

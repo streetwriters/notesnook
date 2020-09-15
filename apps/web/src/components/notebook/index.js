@@ -5,8 +5,7 @@ import { store } from "../../stores/notebook-store";
 import * as Icon from "../icons";
 import { showEditNoteDialog } from "../dialogs/addnotebookdialog";
 import { confirm } from "../dialogs/confirm";
-import { showUnpinnedToast } from "../../common/toasts";
-import { showNoteBookDeleted } from "../../common/toasts";
+import { showItemDeletedToast, showUnpinnedToast } from "../../common/toasts";
 
 function menuItems(notebook, index) {
   return [
@@ -33,7 +32,7 @@ function menuItems(notebook, index) {
           if (res) {
             await store
               .delete(notebook.id, index)
-              .then(showNoteBookDeleted(notebook.id));
+              .then(() => showItemDeletedToast(notebook));
           }
         });
       },

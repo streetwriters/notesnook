@@ -9,10 +9,7 @@ import { useStore, store } from "../stores/trash-store";
 import { toTitleCase } from "../utils/string";
 import TrashPlaceholder from "../components/placeholders/trash-placeholder";
 import { showToast } from "../utils/toast";
-import {
-  showTrashItemRestored,
-  showPermanentDeleteToast,
-} from "../common/toasts";
+import { showPermanentDeleteToast } from "../common/toasts";
 
 function menuItems(item, index) {
   return [
@@ -20,7 +17,9 @@ function menuItems(item, index) {
       title: "Restore",
       onClick: () => {
         store.restore(item.id, index);
-        showTrashItemRestored();
+        showToast(
+          `${item.type === "note" ? "Note" : "Notebook"} restored successfully!`
+        );
       },
     },
     {

@@ -30,30 +30,6 @@ function showNotesMovedToast(note, noteIds, notebook) {
   var toast = showToast("success", messageText, actions);
 }
 
-function showNoteDeleted(note) {
-  const undoAction = () => {
-    let deletedNotes = db.trash.all;
-    deletedNotes.forEach(async (element) => {
-      if (element.itemId === note) {
-        await db.trash.restore(element.id);
-        notestore.refresh();
-      }
-    });
-  };
-
-  let actions = [{ text: "Undo", onClick: undoAction }];
-
-  showToast("success", "Note Deleted", actions);
-}
-
-function showNoteColored(colors, label) {
-  if (colors.includes(label)) {
-    showToast("success", "Untagged as " + label);
-  } else {
-    showToast("success", "Tagged as " + label);
-  }
-}
-
 async function showUnpinnedToast(itemId, itemType) {
   const noun = itemType === "note" ? "Note" : "Notebook";
   const messageText = `${noun} unpinned successfully!`;
@@ -66,24 +42,17 @@ async function showUnpinnedToast(itemId, itemType) {
   var toast = showToast("success", messageText, actions);
 }
 
-function showNoteBookDeleted(notebook) {
-  const undoAction = () => {
-    let deletedNotes = db.trash.all;
-    deletedNotes.forEach(async (element) => {
-      if (element.itemId === notebook) {
-        await db.trash.restore(element.id);
-        nbstore.refresh();
-      }
-    });
+function showItemDeletedToast(item) {
+  const noun = item.type === "note" ? "Note" : "Notebook";
+  const messageText = `${noun} deleted successfully!`;
+  const undoAction = async () => {
+    toast.hide();
+    let trashItem = db.trash.all.find((i) => i.itemId === item.id);
+    await db.trash.restore(trashItem.id);
+    nbstore.refresh();
   };
-
   let actions = [{ text: "Undo", onClick: undoAction }];
-
-  showToast("success", "Notebook Deleted", actions);
-}
-
-function showTrashItemRestored() {
-  showToast("success", "Item restored");
+  var toast = showToast("success", messageText, actions);
 }
 
 async function showPermanentDeleteToast(item, index) {
@@ -105,10 +74,7 @@ async function showPermanentDeleteToast(item, index) {
 
 export {
   showNotesMovedToast,
-  showNoteDeleted,
-  showNoteColored,
   showUnpinnedToast,
-  showNoteBookDeleted,
-  showTrashItemRestored,
+  showItemDeletedToast,
   showPermanentDeleteToast,
 };
