@@ -128,10 +128,7 @@ export async function clearEditor() {
   tapCount = 0;
   saveCounter = 0;
   canSave = false;
-  post('clearEditor');
-  post('clearTitle');
-  post("clearHistory");
-  post('blur');
+  post('reset');
 }
 
 function checkIfContentIsSavable() {
@@ -250,6 +247,7 @@ export async function saveNote(lockNote = true) {
   }
   let n = db.notes.note(id).data.dateEdited;
   post('dateEdited', timeConverter(n));
+  
   post('saving', 'Saved');
 }
 
@@ -261,9 +259,9 @@ export function onWebViewLoad(noMenu, premium, colors) {
   } else {
     post('focusTitle');
   }
-  let c = {...colors};
-  c.factor = normalize(1);
-  post('theme', c);
+  let theme = {...colors};
+  theme.factor = normalize(1);
+  post('theme', theme);
   setTimeout(() => {
     Platform.OS === 'android' ? EditorWebView.current?.requestFocus() : null;
     post('blur');
@@ -301,5 +299,5 @@ const updateEditor = async () => {
   } else {
     post('text', content.text);
   }
-  post("clearHistory");
+  post('clearHistory');
 };

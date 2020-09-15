@@ -5,17 +5,19 @@ import {
   Platform,
   SafeAreaView,
   StatusBar,
-  TouchableOpacity,
   View,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import WebView from 'react-native-webview';
-import {normalize, SIZE} from '../../common/common';
+import {normalize} from '../../common/common';
+import {ActionIcon} from '../../components/ActionIcon';
 import {
   ActionSheetEvent,
   simpleDialogEvent,
 } from '../../components/DialogManager/recievers';
-import {TEMPLATE_EXIT_FULLSCREEN} from '../../components/DialogManager/templates';
+import {
+  TEMPLATE_EXIT_FULLSCREEN,
+  TEMPLATE_NEW_NOTE,
+} from '../../components/DialogManager/templates';
 import {useTracked} from '../../provider';
 import {
   eSendEvent,
@@ -31,8 +33,10 @@ import {
 import {exitEditorAnimation} from '../../utils/animations';
 import {DDS, editing, ToastEvent} from '../../utils/utils';
 import {
+  checkNote,
   clearEditor,
   EditorWebView,
+  getNote,
   injectedJS,
   loadNote,
   onWebViewLoad,
@@ -40,10 +44,7 @@ import {
   sourceUri,
   _onMessage,
   _onShouldStartLoadWithRequest,
-  checkNote,
-  getNote,
 } from './func';
-import {ActionIcon} from '../../components/ActionIcon';
 
 var handleBack;
 var tapCount = 0;
@@ -190,6 +191,13 @@ const Editor = ({noMenu}) => {
             style={{
               flexDirection: 'row',
             }}>
+            <ActionIcon
+              name="plus"
+              color={colors.heading}
+              onPress={() => {
+                simpleDialogEvent(TEMPLATE_NEW_NOTE);
+              }}
+            />
             {DDS.isTab && !fullscreen ? (
               <ActionIcon
                 name="fullscreen"
