@@ -369,6 +369,8 @@ const MoveNoteDialog = () => {
                           );
                           console.log(res);
                           dispatch({type: ACTIONS.CLEAR_SELECTION});
+                          dispatch({type: ACTIONS.NOTEBOOKS});
+                          dispatch({type: ACTIONS.PINNED});
                           close();
                           let notebookName = db.notebooks.notebook(
                             item.notebookId,
