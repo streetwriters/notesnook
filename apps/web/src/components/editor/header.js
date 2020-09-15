@@ -7,6 +7,7 @@ import TitleBox from "./title-box";
 import { useStore, SESSION_STATES } from "../../stores/editor-store";
 import { timeConverter } from "../../utils/time";
 import { countWords } from "../../utils/string";
+import { showToast } from "../../utils/toast";
 
 const TextSeperator = () => {
   return (
@@ -45,7 +46,10 @@ function Header() {
               display: ["block", "none", "none"],
             }}
             size={30}
-            onClick={() => clearSession()}
+            onClick={() => {
+              clearSession();
+              showToast("success", "Note saved!");
+            }}
           />
           <TitleBox
             shouldFocus={sessionState === SESSION_STATES.new}
