@@ -1632,6 +1632,17 @@
             value = message.value
           }
           switch (type) {
+            case "reset": {
+              editor.history.clear();
+              editor.setText('', 'api');
+              document.getElementById('titleInput').value = '';
+              document.getElementById('titleInput').blur();
+              editor.blur();
+              document.getElementById('infodate').innerText = "";
+              document.getElementById('infosaved').innerText = "";
+              document.getElementById("infowords").innerText = "";
+              break
+            }
             case "blur":
               document.getElementById('titleInput').blur();
               editor.blur();

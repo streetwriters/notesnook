@@ -1617,7 +1617,17 @@
             value = message.value
           }
           switch (type) {
-
+            case "reset": {
+              editor.history.clear();
+              editor.setText('', 'api');
+              document.getElementById('titleInput').value = '';
+              document.getElementById('titleInput').blur();
+              editor.blur();
+              document.getElementById('infodate').innerText = "";
+              document.getElementById('infosaved').innerText = "";
+              document.getElementById("infowords").innerText = "";
+              break
+            }
             case "blur":
               document.getElementById('titleInput').blur();
               editor.blur();
@@ -1643,7 +1653,7 @@
                 if (message.focus === "editor") {
                   //editor.focus();
                 } else {
-                  document.getElementById('titleInput').focus();
+                  //document.getElementById('titleInput').focus();
                 }
               }, 0)
               break;
@@ -1657,7 +1667,7 @@
               editor.focus();
               break;
             case "focusTitle":
-              //document.getElementById('titleInput').focus();
+              document.getElementById('titleInput').focus();
               break;
             case "nomenu":
               let isenabled = value;
