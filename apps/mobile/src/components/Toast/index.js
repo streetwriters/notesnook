@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import { Keyboard, Text, TouchableOpacity, View } from 'react-native';
-import Animated, { Easing, useValue } from 'react-native-reanimated';
+import React, {useEffect, useState} from 'react';
+import {Keyboard, Text, TouchableOpacity, View} from 'react-native';
+import Animated, {Easing, useValue} from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { SIZE } from '../../common/common';
-import { useTracked } from '../../provider';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/eventManager';
-import { eHideToast, eShowToast } from '../../services/events';
-import { getElevation } from '../../utils/utils';
+import {SIZE} from '../../common/common';
+import {useTracked} from '../../provider';
+import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
+import {eHideToast, eShowToast} from '../../services/events';
+import {getElevation} from '../../utils/utils';
 const {spring, timing} = Animated;
 
 const toastMessages = [];
@@ -27,6 +27,7 @@ export const Toast = ({context = 'global'}) => {
     if (data.context !== context) return;
     toastMessages.push(data);
     if (toastMessages?.length > 1) return;
+
     setData(data);
     if (data.type === 'success') {
       setToastStyle({
@@ -73,15 +74,17 @@ export const Toast = ({context = 'global'}) => {
 
       timing(toastOpacity, {
         toValue: 0,
-        duration: 300,
+        duration: 100,
         easing: Easing.in(Easing.ease),
       }).start(() => {
         showNext(toastMessages[0]);
-        timing(toastOpacity, {
-          toValue: 1,
-          duration: 300,
-          easing: Easing.in(Easing.ease),
-        }).start();
+        setTimeout(() => {
+          timing(toastOpacity, {
+            toValue: 1,
+            duration: 150,
+            easing: Easing.in(Easing.ease),
+          }).start();
+        }, 300);
       });
     } else {
       timing(toastTranslate, {
@@ -113,7 +116,6 @@ export const Toast = ({context = 'global'}) => {
       Keyboard.removeListener('keyboardDidShow', _onKeyboardShow);
       Keyboard.removeListener('keyboardDidHide', _onKeyboardHide);
       eUnSubscribeEvent('showToast', showToastFunc);
-
       eUnSubscribeEvent('hideToast', hideToastFunc);
     };
   }, []);
@@ -181,7 +183,7 @@ export const Toast = ({context = 'global'}) => {
             }}
             style={{
               color: 'white',
-              width:'100%',
+              width: '100%',
               backgroundColor: 'transparent',
               fontSize: SIZE.sm,
             }}>
