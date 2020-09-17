@@ -110,9 +110,7 @@ function ListItem(props) {
         <Flex
           variant="rowCenter"
           bg="primary"
-          onClick={() => {
-            //TODO unpin
-          }}
+          onClick={() => props.unpin && props.unpin()}
           sx={{
             position: "absolute",
             top: -15,

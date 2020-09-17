@@ -17,6 +17,11 @@ import { showItemDeletedToast } from "../../common/toasts";
 import { showUnpinnedToast } from "../../common/toasts";
 import { showToast } from "../../utils/toast";
 
+const pin = async (note) => {
+  await store.pin(note.id);
+  if (note.pinned) await showUnpinnedToast(note.id, "note");
+};
+
 function menuItems(note, context) {
   return [
     { title: "colors", component: Colors },
@@ -28,10 +33,7 @@ function menuItems(note, context) {
     },
     {
       title: note.pinned ? "Unpin" : "Pin",
-      onClick: async () => {
-        await store.pin(note.id);
-        if (note.pinned) await showUnpinnedToast(note.id, "note");
-      },
+      onClick: pin.bind(this, note),
       onlyPro: true,
     },
     {
@@ -123,6 +125,7 @@ function Note(props) {
       body={note.headline}
       id={note.id}
       index={index}
+      unpin={pin.bind(this, note)}
       onClick={() => {
         if (note.conflicted) {
           setHashParam({ diff: note.id });

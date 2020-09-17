@@ -6,15 +6,15 @@ import * as Icon from "../icons";
 import { showEditNoteDialog } from "../dialogs/addnotebookdialog";
 import { confirm } from "../dialogs/confirm";
 import { showItemDeletedToast, showUnpinnedToast } from "../../common/toasts";
-
+const pin = async (notebook, index) => {
+  await store.pin(notebook, index);
+  if (notebook.pinned) showUnpinnedToast(notebook.id, "notebook");
+};
 function menuItems(notebook, index) {
   return [
     {
       title: notebook.pinned ? "Unpin" : "Pin",
-      onClick: async () => {
-        await store.pin(notebook, index);
-        if (notebook.pinned) showUnpinnedToast(notebook.id, "notebook");
-      },
+      onClick: () => pin(notebook, index),
     },
     {
       title: "Edit",
@@ -58,6 +58,7 @@ class Notebook extends React.Component {
         selectable
         item={notebook}
         onClick={onClick}
+        unpin={() => pin(notebook, index)}
         title={notebook.title}
         body={notebook.description}
         subBody={
