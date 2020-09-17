@@ -1,8 +1,9 @@
 import StorageInterface from "../interfaces/storage";
 import Database from "notes-core/api/";
 import SelectionOptions from "./selectionoptions";
+import EventSource from "eventsource";
 
-export const db = new Database(StorageInterface);
+export const db = new Database(StorageInterface, EventSource);
 
 export const COLORS = {
   red: "#f44336",

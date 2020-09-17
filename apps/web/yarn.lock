@@ -3576,13 +3576,6 @@ crypto-browserify@^3.11.0:
     randombytes "^2.0.0"
     randomfill "^1.0.3"
 
-crypto-random-string@^3.2.0:
-  version "3.3.0"
-  resolved "https://registry.yarnpkg.com/crypto-random-string/-/crypto-random-string-3.3.0.tgz#c7a4682b2a87146a1f8b7378ea2606f95775e7e6"
-  integrity sha512-teWAwfMb1d6brahYyKqcBEb5Yp8PJPvPOdOonXDnvaKOTmKDFNVE8E3Y2XQuzjNV/3XMwHbrX9fHWvrhRKt4Gg==
-  dependencies:
-    type-fest "^0.8.1"
-
 css-blank-pseudo@^0.1.4:
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/css-blank-pseudo/-/css-blank-pseudo-0.1.4.tgz#dfdefd3254bf8a82027993674ccf35483bfcb3c5"
@@ -4646,10 +4639,10 @@ etag@~1.8.1:
   resolved "https://registry.yarnpkg.com/etag/-/etag-1.8.1.tgz#41ae2eeb65efa62268aebfea83ac7d79299b0887"
   integrity sha1-Qa4u62XvpiJorr/qg6x9eSmbCIc=
 
-event-source-polyfill@^1.0.16:
-  version "1.0.17"
-  resolved "https://registry.yarnpkg.com/event-source-polyfill/-/event-source-polyfill-1.0.17.tgz#850a5103c8fbc5c2c0640ca8e545224e3be9614d"
-  integrity sha512-eLZQQpKZahOH5sFaqfrbLNXJKz+JawiDQVrl6lZmQHHSamIn5PlNV3HXAY9+ZRaQC5YTIBRDd8jeTxjuEveJnQ==
+event-source-polyfill@1.0.18:
+  version "1.0.18"
+  resolved "https://registry.yarnpkg.com/event-source-polyfill/-/event-source-polyfill-1.0.18.tgz#186488ddb81b4efce3e22f59c2fa68bd0df27c56"
+  integrity sha512-4ooLMUkUYFNXjYl96twwoMkXrhwmue5aI5ayU4ORswP2b8F6bYGNsdkYqutWV77DKJLI+ZRRLvZZTSuZcUCVTA==
 
 eventemitter3@^2.0.3:
   version "2.0.3"
@@ -7231,6 +7224,11 @@ mem@^4.0.0:
     mimic-fn "^2.0.0"
     p-is-promise "^2.0.0"
 
+"memoize-one@>=3.1.1 <6":
+  version "5.1.1"
+  resolved "https://registry.yarnpkg.com/memoize-one/-/memoize-one-5.1.1.tgz#047b6e3199b508eaec03504de71229b8eb1d75c0"
+  integrity sha512-HKeeBpWvqiVJD57ZUAsJNm71eHTykffzcLZVYWiVfQeI1rJtuEaS7hQiEpWfVVk18donPwJEcFKIkCmPJNOhHA==
+
 memory-fs@^0.4.1:
   version "0.4.1"
   resolved "https://registry.yarnpkg.com/memory-fs/-/memory-fs-0.4.1.tgz#3a9a20b8462523e447cfbc7e8bb80ed667bfc552"
@@ -7645,10 +7643,8 @@ normalize-url@^3.0.0, normalize-url@^3.0.1:
 
 "notes-core@git+ssh://git@github.com:streetwriters/notesnook-core.git":
   version "1.5.0"
-  resolved "git+ssh://git@github.com:streetwriters/notesnook-core.git#244b587d695363d5ef90603b2bc2595fd15c164f"
+  resolved "git+ssh://git@github.com:streetwriters/notesnook-core.git#207f498c66896e680abeffae7efdcf83dbcf9b43"
   dependencies:
-    crypto-random-string "^3.2.0"
-    event-source-polyfill "^1.0.16"
     fast-sort "^2.0.1"
     fuzzysearch "^1.0.3"
     no-internet "^1.5.2"
@@ -9008,7 +9004,7 @@ prompts@^2.0.1:
     kleur "^3.0.3"
     sisteransi "^1.0.4"
 
-prop-types@^15.5.10, prop-types@^15.6.2, prop-types@^15.7.2:
+prop-types@^15.5.10, prop-types@^15.5.7, prop-types@^15.6.2, prop-types@^15.7.2:
   version "15.7.2"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.7.2.tgz#52c41e75b8c87e72b9d9360e0206b99dcbffa6c5"
   integrity sha512-8QQikdH7//R2vurIJSutZ1smHYTcLpRWEOlHnzcWHmBYrOGUysKwSsrC89BCiFj3CbrfJ/nXFdJepOVrY1GCHQ==
@@ -9285,6 +9281,11 @@ react-modal@^3.11.2:
     react-lifecycles-compat "^3.0.0"
     warning "^4.0.3"
 
+react-placeholder@^4.0.3:
+  version "4.0.3"
+  resolved "https://registry.yarnpkg.com/react-placeholder/-/react-placeholder-4.0.3.tgz#098f8ee00122bfd73f1ce47d7d99de00384ab141"
+  integrity sha512-yPyqFYbh/u72p0UHsKTu19KruK/aJFP0x3YENg8ZBBjf13PoTKBQckVxlpLCfn0Rm2MaMly7IxZuRsUIQV+mrw==
+
 react-scripts@3.4.1:
   version "3.4.1"
   resolved "https://registry.yarnpkg.com/react-scripts/-/react-scripts-3.4.1.tgz#f551298b5c71985cc491b9acf3c8e8c0ae3ada0a"
@@ -9345,6 +9346,18 @@ react-scripts@3.4.1:
   optionalDependencies:
     fsevents "2.1.2"
 
+react-tiny-virtual-list@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/react-tiny-virtual-list/-/react-tiny-virtual-list-2.2.0.tgz#eafb6fcf764e4ed41150ff9752cdaad8b35edf4a"
+  integrity sha512-MDiy2xyqfvkWrRiQNdHFdm36lfxmcLLKuYnUqcf9xIubML85cmYCgzBJrDsLNZ3uJQ5LEHH9BnxGKKSm8+C0Bw==
+  dependencies:
+    prop-types "^15.5.7"
+
+react-virtualized-auto-sizer@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/react-virtualized-auto-sizer/-/react-virtualized-auto-sizer-1.0.2.tgz#a61dd4f756458bbf63bd895a92379f9b70f803bd"
+  integrity sha512-MYXhTY1BZpdJFjUovvYHVBmkq79szK/k7V3MO+36gJkWGkrXKtyr4vCPtpphaTLRAdDNoYEYFZWE8LjN+PIHNg==
+
 react-virtuoso@^0.15.0:
   version "0.15.0"
   resolved "https://registry.yarnpkg.com/react-virtuoso/-/react-virtuoso-0.15.0.tgz#e429abb0179c3d0ff12860e984b4d3b5ea9ee735"
@@ -9352,6 +9365,14 @@ react-virtuoso@^0.15.0:
   dependencies:
     resize-observer-polyfill "^1.5.1"
     tslib "^1.10.0"
+
+react-window@^1.8.5:
+  version "1.8.5"
+  resolved "https://registry.yarnpkg.com/react-window/-/react-window-1.8.5.tgz#a56b39307e79979721021f5d06a67742ecca52d1"
+  integrity sha512-HeTwlNa37AFa8MDZFZOKcNEkuF2YflA0hpGPiTT9vR7OawEt+GZbfM6wqkBahD3D3pUjIabQYzsnY/BSJbgq6Q==
+  dependencies:
+    "@babel/runtime" "^7.0.0"
+    memoize-one ">=3.1.1 <6"
 
 react@^16.13.1:
   version "16.13.1"
