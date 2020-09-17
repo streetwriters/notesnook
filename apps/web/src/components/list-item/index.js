@@ -1,13 +1,10 @@
-import React, { useEffect, useState, useCallback } from "react";
-import ReactDOM from "react-dom";
+import React, { useEffect, useCallback } from "react";
 import { Flex, Box, Text } from "rebass";
 import * as Icon from "../icons";
-import Menu from "../menu";
 import {
   store as selectionStore,
   useStore as useSelectionStore,
 } from "../../stores/selection-store";
-import useContextMenu from "../../utils/useContextMenu";
 
 function selectMenuItem(isSelected, toggleSelection) {
   return {
@@ -42,14 +39,11 @@ const ItemSelector = ({ isSelected, toggleSelection }) => {
 };
 
 function ListItem(props) {
-  const menuId = `contextMenu-${props.item.id}`;
-  const [parentRef, closeMenu, openMenu] = useContextMenu(menuId);
   const isSelectionMode = useSelectionStore((store) => store.isSelectionMode);
   const selectedItems = useSelectionStore((store) => store.selectedItems);
   const isSelected =
     selectedItems.findIndex((item) => props.item.id === item.id) > -1;
   const selectItem = useSelectionStore((store) => store.selectItem);
-  const [menuItems, setMenuItems] = useState(props.menuItems);
 
   const toggleSelection = useCallback(
     function toggleSelection() {
@@ -62,24 +56,44 @@ function ListItem(props) {
     if (!isSelectionMode && isSelected) toggleSelection();
   }, [isSelectionMode, toggleSelection, isSelected]);
 
-  useEffect(() => {
-    if (props.selectable) {
-      setMenuItems([
-        selectMenuItem(isSelected, toggleSelection),
-        ...props.menuItems,
-      ]);
-    }
-  }, [props.menuItems, isSelected, props.selectable, toggleSelection]);
+  const openContextMenu = useCallback(
+    (event, withClick) => {
+      let items = props.menuItems;
+      if (props.selectable)
+        items = [selectMenuItem(isSelected, toggleSelection), ...items];
+      window.dispatchEvent(
+        new CustomEvent("globalcontextmenu", {
+          detail: {
+            items,
+            data: props.menuData,
+            internalEvent: event,
+            withClick,
+          },
+        })
+      );
+    },
+    [
+      isSelected,
+      props.menuData,
+      props.menuItems,
+      props.selectable,
+      toggleSelection,
+    ]
+  );
 
   return (
     <Flex
-      ref={parentRef}
       bg={props.pinned ? "shade" : "background"}
       alignItems="center"
+      onContextMenu={openContextMenu}
+      p={2}
+      justifyContent="space-between"
       sx={{
+        height: "inherit",
         borderBottom: "1px solid",
         borderBottomColor: "border",
         cursor: "pointer",
+        position: "relative",
         ":hover": {
           borderBottomColor: "primary",
         },
@@ -91,122 +105,99 @@ function ListItem(props) {
           toggleSelection={toggleSelection}
         />
       )}
-      <Flex
-        flex="1 1 auto"
-        alignItems="center"
-        justifyContent="space-between"
-        px={2}
-        sx={{
-          width: "full",
-          position: "relative",
-          marginTop: props.pinned ? 4 : 0,
-          paddingTop: props.pinned ? 0 : 2,
-          paddingBottom: 2,
 
-          //TODO add onpressed reaction
-        }}
-      >
-        {props.pinned && (
-          <Flex
-            variant="rowCenter"
-            bg="primary"
-            sx={{
-              position: "absolute",
-              top: -15,
-              left: 0,
-              borderRadius: 35,
-              width: 30,
-              height: 30,
-              boxShadow: "2px 1px 3px #00000066",
-            }}
-            mx={2}
-          >
-            <Box
-              bg="static"
-              sx={{
-                borderRadius: 5,
-                width: 5,
-                height: 5,
-              }}
-            />
-          </Flex>
-        )}
-        <Box
+      {props.pinned && (
+        <Flex
+          variant="rowCenter"
+          bg="primary"
           onClick={() => {
-            //e.stopPropagation();
-            if (isSelectionMode) {
-              toggleSelection();
-            } else if (props.onClick) {
-              props.onClick();
-            }
+            //TODO unpin
           }}
           sx={{
-            flex: "1 1 auto",
-            paddingTop: props.pinned ? 4 : 0,
-            width: "90%",
-            ":hover": {
-              cursor: "pointer",
-            },
+            position: "absolute",
+            top: -15,
+            right: 0,
+            borderRadius: 35,
+            width: 30,
+            height: 30,
+            boxShadow: "2px 1px 3px #00000066",
           }}
+          mx={2}
         >
-          <Text
-            color={props.focused ? "primary" : "text"}
-            fontFamily={"heading"}
-            fontSize="title"
-            fontWeight={"bold"}
-          >
-            {props.title}
-          </Text>
-          <Text
-            display={props.body ? "flex" : "none"}
-            variant="body"
+          <Box
+            bg="static"
             sx={{
-              marginBottom: 1,
-              ":hover": {
-                cursor: "pointer",
-              },
-              flexWrap: "wrap",
-            }}
-          >
-            {props.body}
-          </Text>
-          {props.subBody && props.subBody}
-          <Text
-            display={props.info ? "flex" : "none"}
-            variant="body"
-            fontSize={11}
-            color="fontTertiary"
-            sx={{ marginTop: 2 }}
-          >
-            {props.info}
-          </Text>
-        </Box>
-        {props.menuItems && (
-          <Icon.MoreVertical
-            size={22}
-            color="icon"
-            sx={{ marginRight: -1 }}
-            onClick={(e) => {
-              openMenu(e.nativeEvent, menuId, true);
+              borderRadius: 5,
+              width: 5,
+              height: 5,
             }}
           />
-        )}
+        </Flex>
+      )}
+      <Flex
+        flexDirection="column"
+        onClick={() => {
+          //e.stopPropagation();
+          if (isSelectionMode) {
+            toggleSelection();
+          } else if (props.onClick) {
+            props.onClick();
+          }
+        }}
+        sx={{
+          width: "90%",
+          ":hover": {
+            cursor: "pointer",
+          },
+        }}
+      >
+        <Text
+          as="h3"
+          color={props.focused ? "primary" : "text"}
+          fontFamily={"heading"}
+          fontSize="title"
+          fontWeight={"bold"}
+          sx={{
+            lineHeight: "1.4em",
+            maxHeight: "2.8em", // 2 lines, i hope
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
+          {props.title}
+        </Text>
+        <Text
+          as="p"
+          display={props.body ? "box" : "none"}
+          variant="body"
+          sx={{
+            cursor: "pointer",
+            lineHeight: "1.4em",
+            maxHeight: "2.8em", // 2 lines, i hope
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
+          {props.body}
+        </Text>
+        {props.subBody && props.subBody}
+        <Text
+          display={props.info ? "flex" : "none"}
+          variant="body"
+          fontSize={11}
+          color="fontTertiary"
+          sx={{ marginTop: 2 }}
+        >
+          {props.info}
+        </Text>
       </Flex>
-      {props.menuItems &&
-        ReactDOM.createPortal(
-          <Menu
-            id={menuId}
-            menuItems={menuItems}
-            data={props.menuData}
-            style={{
-              position: "absolute",
-              display: "none",
-              zIndex: 999,
-            }}
-            closeMenu={() => closeMenu()}
-          />,
-          document.body
-        )}
+      {props.menuItems && (
+        <Icon.MoreVertical
+          size={22}
+          color="icon"
+          onClick={(event) => openContextMenu(event, true)}
+        />
+      )}
     </Flex>
   );
 }

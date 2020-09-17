@@ -7,6 +7,7 @@ import TagsPlaceholder from "../components/placeholders/tags-placeholder";
 import Notes from "./notes";
 import { useRoutes, navigate } from "hookrouter";
 import RouteContainer from "../components/route-container";
+import { getItemHeight } from "../common/height-calculator";
 
 function TagNode({ title }) {
   return (
@@ -46,6 +47,8 @@ function Tags() {
     <ListContainer
       type="tags"
       items={tags}
+      itemHeight={getItemHeight}
+      estimatedItemHeight={80}
       item={(index, item) => {
         const { title, noteIds } = item;
         return (

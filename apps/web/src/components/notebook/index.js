@@ -68,7 +68,6 @@ class Notebook extends React.Component {
                   onTopicClick(notebook, index + 1);
                   e.stopPropagation();
                 }}
-                key={topic.title}
                 bg="primary"
                 px={1}
                 sx={{
@@ -80,7 +79,7 @@ class Notebook extends React.Component {
                 }}
               >
                 <Text variant="body" color="static" fontSize={11}>
-                  {topic.title}
+                  {"ghghgeh"}
                 </Text>
               </Flex>
             ))}

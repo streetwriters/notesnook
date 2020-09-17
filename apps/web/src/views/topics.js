@@ -5,6 +5,7 @@ import ListContainer from "../components/list-container";
 import { useStore as useNbStore } from "../stores/notebook-store";
 import { showTopicDialog } from "../components/dialogs/topicdialog";
 import { navigate } from "hookrouter";
+import { getItemHeight } from "../common/height-calculator";
 
 function Topics(props) {
   const { notebookId } = props;
@@ -30,22 +31,13 @@ function Topics(props) {
       <ListContainer
         type="topics"
         items={topics}
+        itemHeight={getItemHeight}
+        estimatedItemHeight={80}
         item={(index, item) => (
           <Topic
             index={index}
             item={item}
-            onClick={() => {
-              //let topic = item;
-              navigate(`/notebooks/${notebookId}/${index}`);
-              /* props.navigator.navigate("notes", {
-              title: props.notebook.title,
-              subtitle: topic.title,
-              context: {
-                type: "topic",
-                value: { id: props.notebook.id, topic: topic.title },
-              },
-            }); */
-            }}
+            onClick={() => navigate(`/notebooks/${notebookId}/${item.id}`)}
           />
         )}
         placeholder={Flex}

@@ -6,11 +6,7 @@ import BaseStore from ".";
 import { navigate } from "hookrouter";
 
 class NoteStore extends BaseStore {
-  notes = {
-    items: [],
-    groupCounts: [],
-    groups: [],
-  };
+  notes = [];
   context = undefined;
   selectedNote = 0;
 
@@ -41,7 +37,7 @@ class NoteStore extends BaseStore {
 
   refresh = () => {
     this.refreshContext();
-    this.set((state) => (state.notes = db.notes.group(undefined, true)));
+    this.set((state) => (state.notes = db.notes.group()));
   };
 
   refreshContext = () => {
@@ -126,12 +122,12 @@ class NoteStore extends BaseStore {
   _setValue = (noteId, prop, value) => {
     this.set((state) => {
       const { context, notes } = state;
-      const arr = !context ? notes.items : context.notes;
+      const arr = !context ? notes : context.notes;
       let index = arr.findIndex((note) => note.id === noteId);
       if (index < 0) return;
 
       arr[index][prop] = value;
-      // this._syncEditor(noteId, prop, value);
+      this._syncEditor(noteId, prop, value);
     });
   };
 

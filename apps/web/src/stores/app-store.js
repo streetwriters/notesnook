@@ -12,6 +12,7 @@ class AppStore extends BaseStore {
   isSideMenuOpen = false;
   isFocusMode = false;
   colors = [];
+  globalMenu = { items: [], data: {} };
 
   refresh = async () => {
     noteStore.refresh();
@@ -31,7 +32,15 @@ class AppStore extends BaseStore {
   };
 
   toggleSideMenu = (toggleState) => {
-    this.set((state) => (state.isSideMenuOpen = toggleState != null ? toggleState : !state.isSideMenuOpen));
+    this.set(
+      (state) =>
+        (state.isSideMenuOpen =
+          toggleState != null ? toggleState : !state.isSideMenuOpen)
+    );
+  };
+
+  setGlobalMenu = (items, data) => {
+    this.set((state) => (state.globalMenu = { items, data }));
   };
 }
 

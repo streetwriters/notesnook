@@ -14,6 +14,7 @@ import { useRoutes } from "hookrouter";
 import routes from "./navigation/routes";
 import Editor from "./components/editor";
 import useMobile from "./utils/use-mobile";
+import GlobalMenuWrapper from "./components/globalmenuwrapper";
 
 function App() {
   const [show, setShow] = usePersistentState("isContainerVisible", true);
@@ -89,7 +90,7 @@ function App() {
           </Flex>
         </Flex>
         <Box id="dialogContainer" />
-        <Box id="snackbarContainer" />
+        <GlobalMenuWrapper />
       </Flex>
     </ThemeProvider>
   );

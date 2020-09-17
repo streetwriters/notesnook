@@ -9,6 +9,7 @@ import Notes from "./notes.js";
 import { useRoutes, navigate } from "hookrouter";
 import RouteContainer from "../components/route-container";
 import { db } from "../common";
+import { getNotebookHeight } from "../common/height-calculator";
 
 const routes = {
   "/": () => (
@@ -51,7 +52,7 @@ function NotebooksContainer() {
   return routeResult;
 }
 
-function Notebooks(props) {
+function Notebooks() {
   const [open, setOpen] = useState(false);
   useEffect(() => store.refresh(), []);
   const notebooks = useStore((state) => state.notebooks);
@@ -62,6 +63,8 @@ function Notebooks(props) {
       <ListContainer
         type="notebooks"
         items={notebooks}
+        estimatedItemHeight={120}
+        itemHeight={getNotebookHeight}
         item={(index, item) => (
           <Notebook
             index={index}

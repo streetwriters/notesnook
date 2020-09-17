@@ -10,6 +10,7 @@ import { toTitleCase } from "../utils/string";
 import TrashPlaceholder from "../components/placeholders/trash-placeholder";
 import { showToast } from "../utils/toast";
 import { showPermanentDeleteToast } from "../common/toasts";
+import { getNotebookHeight, getNoteHeight } from "../common/height-calculator";
 
 function menuItems(item, index) {
   return [
@@ -49,13 +50,18 @@ function Trash() {
     <ListContainer
       type="trash"
       placeholder={TrashPlaceholder}
+      estimatedItemHeight={120}
+      itemHeight={(item) => {
+        if (item.type === "note") return getNoteHeight(item);
+        else if (item.type === "notebook") return getNotebookHeight(item);
+      }}
       items={items}
       item={(index, item) => (
         <ListItem
           selectable
           item={item}
           title={item.title}
-          body={item.headline}
+          body={item.headline || item.description}
           index={index}
           info={
             <Flex variant="rowCenter">

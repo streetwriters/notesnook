@@ -9,6 +9,7 @@ window.addEventListener("load", () => {
   if (path === "/search") window.location = "/";
 });
 
+// TODO this will break for now.
 function Search() {
   const results = useStore((store) => store.results);
   const item = useStore((store) => store.item);
