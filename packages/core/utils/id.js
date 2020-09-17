@@ -23,5 +23,5 @@ function cryptoRandom(size, type) {
 }
 
 export default function () {
-  return cryptoRandom(24, "hex");
+  return cryptoRandom(12, "hex");
 }
