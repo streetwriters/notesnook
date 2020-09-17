@@ -11,6 +11,7 @@ import EditorMenu from "./editormenu";
 import Header from "./header";
 import { useHashParam } from "../../utils/useHashParam";
 import SplitEditor from "../spliteditor";
+import Unlock from "../unlock";
 
 function Editor() {
   const delta = useStore((store) => store.session.content.delta);
@@ -27,6 +28,7 @@ function Editor() {
 
   const quillRef = useRef();
   const [diff] = useHashParam("diff");
+  const [unlock] = useHashParam("unlock");
 
   useEffect(() => {
     // move the toolbar outside (easiest way)
@@ -42,6 +44,7 @@ function Editor() {
   }, [init]);
 
   useEffect(() => {
+    if (!quillRef || !quillRef.current) return;
     if (sessionState === SESSION_STATES.new) {
       const { quill } = quillRef.current;
       quill.setContents(delta, "init");
@@ -50,8 +53,9 @@ function Editor() {
       const text = quill.getText();
       quill.setSelection(text.length, 0, "init");
     }
-  }, [sessionState, delta]);
+  }, [sessionState, delta, quillRef]);
 
+  if (unlock) return <Unlock noteId={unlock} />;
   if (diff) return <SplitEditor diffId={diff} />;
   return (
     <Animated.Flex

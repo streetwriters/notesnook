@@ -50,33 +50,38 @@ class EditorStore extends BaseStore {
     }
   };
 
+  openLockedSession = async (note) => {
+    setHashParam({});
+    setHashParam({ note: note.id }, false);
+    saveLastOpenedNote(note.id);
+    this.set((state) => {
+      state.session = {
+        ...DEFAULT_SESSION,
+        ...note,
+        content: note.content,
+        state: SESSION_STATES.new,
+      };
+    });
+  };
+
   openSession = async (noteId) => {
     let note = db.notes.note(noteId);
     if (!note) return;
     note = note.data;
-
     clearTimeout(this.get().session.timeout);
 
     noteStore.setSelectedNote(note.id);
-    if (note.conflicted) {
-      setHashParam({ diff: noteId });
-      return;
-    }
+
+    if (note.locked) return setHashParam({ unlock: noteId });
+    if (note.conflicted) return setHashParam({ diff: noteId });
+
     saveLastOpenedNote(note.id);
 
     let content = {};
-    if (!note.locked) {
-      content = {
-        text: await db.notes.note(note).text(),
-        delta: await db.notes.note(note).delta(),
-      };
-    } else {
-      /* content = await EditorNavigator.navigateWithResult("unlock", {
-        id: note.id,
-      });
-      console.log(content);
-      if (!content) return; */
-    }
+    content = {
+      text: await db.notes.note(note).text(),
+      delta: await db.notes.note(note).delta(),
+    };
 
     this.set((state) => {
       state.session = {

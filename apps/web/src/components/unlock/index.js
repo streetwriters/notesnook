@@ -3,22 +3,25 @@ import { Flex, Text, Button } from "rebass";
 import { Input } from "@rebass/forms";
 import * as Icon from "../icons";
 import { db } from "../../common";
+import { useStore as useEditorStore } from "../../stores/editor-store";
 
 function Unlock(props) {
-  const { id, onDone } = props;
+  const { noteId } = props;
   const passwordRef = useRef();
   const [isWrong, setIsWrong] = useState(false);
+  const openLockedSession = useEditorStore((store) => store.openLockedSession);
+
   const submit = useCallback(async () => {
     const password = passwordRef.current.value;
     try {
-      const note = await db.vault.open(id, password);
-      onDone(note.content);
+      const note = await db.vault.open(noteId, password);
+      openLockedSession(note);
     } catch (e) {
       if (e.message === db.vault.ERRORS.wrongPassword) {
         setIsWrong(true);
       }
     }
-  }, [setIsWrong, id, onDone]);
+  }, [setIsWrong, noteId, openLockedSession]);
 
   return (
     <Flex
