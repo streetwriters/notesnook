@@ -1,3 +1,4 @@
+import 'react-native-get-random-values';
 import MMKVStorage from 'react-native-mmkv-storage';
 import Sodium from 'react-native-sodium';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
