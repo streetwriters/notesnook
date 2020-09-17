@@ -12,12 +12,21 @@ import Backup from "../database/backup";
 import Conflicts from "./sync/conflicts";
 import EventManager from "../utils/event-manager";
 import Session from "./session";
-import { EventSourcePolyfill } from "event-source-polyfill";
 import { HOST } from "../utils/constants";
 
+/**
+ * @type {EventSource}
+ */
+var NNEventSource;
 class Database {
-  constructor(context) {
+  /**
+   *
+   * @param {any} context
+   * @param {EventSource} eventsource
+   */
+  constructor(context, eventsource) {
     this.context = new Storage(context);
+    NNEventSource = eventsource;
     this._syncInterval = 0;
   }
 
@@ -67,6 +76,7 @@ class Database {
   }
 
   async _onUserStateChanged(user) {
+    if (!NNEventSource) return;
     if (this.evtSource) {
       this.evtSource.close();
     }
@@ -76,7 +86,7 @@ class Database {
       user = await this.user.get();
     }
 
-    this.evtSource = new EventSourcePolyfill(`${HOST}/events`, {
+    this.evtSource = new NNEventSource(`${HOST}/events`, {
       headers: { Authorization: `Bearer ${user.accessToken}` },
     });
 

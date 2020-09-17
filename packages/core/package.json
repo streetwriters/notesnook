@@ -20,7 +20,6 @@
     "test": "jest"
   },
   "dependencies": {
-    "event-source-polyfill": "^1.0.16",
     "fast-sort": "^2.0.1",
     "fuzzysearch": "^1.0.3",
     "no-internet": "^1.5.2",
