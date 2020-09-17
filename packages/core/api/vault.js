@@ -97,7 +97,7 @@ export default class Vault {
    */
   async save(note) {
     if (!note) return;
-    await this._check();
+    //await this._check();
     let id = note.id || getId();
     return await this._lockNote(id, note);
   }
@@ -111,7 +111,7 @@ export default class Vault {
   }
 
   /** @private */
-  async _locked() {
+  _locked() {
     return !this._password || !this._password.length;
   }
 
@@ -121,40 +121,47 @@ export default class Vault {
       throw new Error(this.ERRORS.noVault);
     }
 
-    if (await this._locked()) {
+    if (this._locked()) {
       throw new Error(this.ERRORS.vaultLocked);
     }
   }
 
   /** @private */
   async _encryptContent(content, ids) {
-    let { text, delta } = { ...content };
+    let { text, delta } = content;
     let { deltaId, textId } = ids;
 
     if (!delta.ops) delta = await this._db.delta.get(deltaId);
     if (text === textId) text = await this._db.text.get(textId);
 
-    text = await this._context.encrypt({ password: this._password }, text);
-    delta = await this._context.encrypt(
-      { password: this._password },
-      JSON.stringify(delta)
-    );
-
-    await this._db.text.add({ id: textId, data: text });
-    await this._db.delta.add({ id: deltaId, data: delta });
+    [text, delta] = await Promise.all([
+      this._context.encrypt({ password: this._password }, text),
+      this._context.encrypt(
+        { password: this._password },
+        JSON.stringify(delta)
+      ),
+    ]);
+    await Promise.all([
+      this._db.text.add({ id: textId, data: text }),
+      this._db.delta.add({ id: deltaId, data: delta }),
+    ]);
   }
 
   /** @private */
   async _decryptContent(content) {
-    let { text, delta } = { ...content };
+    let { text, delta } = content;
 
-    text = await this._db.text.get(text);
-    text = await this._context.decrypt({ password: this._password }, text);
+    [text, delta] = await Promise.all([
+      this._db.text.get(text),
+      this._db.text.get(delta),
+    ]);
 
-    delta = await this._db.text.get(delta);
-    delta = await this._context.decrypt({ password: this._password }, delta);
+    [text, delta] = await Promise.all([
+      this._context.decrypt({ password: this._password }, text),
+      this._context.decrypt({ password: this._password }, delta),
+    ]);
 
-    if (typeof delta === "string") delta = JSON.parse(delta);
+    delta = JSON.parse(delta);
 
     return {
       delta,
@@ -164,7 +171,6 @@ export default class Vault {
 
   /** @private */
   async _lockNote(id, note) {
-    if (!note) return;
     let oldNote = this._db.notes.note(id);
 
     let deltaId = 0;
