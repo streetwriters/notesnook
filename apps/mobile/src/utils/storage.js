@@ -1,9 +1,10 @@
-import MMKVStorage from 'react-native-mmkv-storage';
-import Sodium from 'react-native-sodium';
+import { isArray } from 'lodash';
+import { Platform } from 'react-native';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
-import {Platform} from 'react-native';
+import MMKVStorage from 'react-native-mmkv-storage';
+import { generateSecureRandom } from 'react-native-securerandom';
+import Sodium from 'react-native-sodium';
 import RNFetchBlob from 'rn-fetch-blob';
-
 export const MMKV = new MMKVStorage.Loader().initialize();
 
 async function read(key, isArray = false) {
@@ -15,6 +16,9 @@ async function read(key, isArray = false) {
   if (!data) return null;
   try {
     data = JSON.parse(data);
+    console.log(isArray? data: null, "ARRAY");
+    
+    data = isArray? [...data] : data;
   } catch (e) {
     data = data;
   }
@@ -23,6 +27,7 @@ async function read(key, isArray = false) {
 }
 
 async function write(key, data) {
+  console.log(key,data,"DATA_WRITE");
   return await MMKV.setItem(
     key,
     typeof data === 'string' ? data : JSON.stringify(data),
@@ -30,20 +35,26 @@ async function write(key, data) {
 }
 
 async function readMulti(keys) {
+  console.log(keys,"KEYS");
   if (keys.length <= 0) {
     return [];
   } else {
-    let data = await MMKV.getMultipleItemsAsync(keys);
+    let data = await MMKV.getMultipleItemsAsync(keys.slice());
 
-    return data.map(([key, value]) => {
+    let map = data.map(([key, value]) => {
       let obj;
       try {
         obj = JSON.parse(value);
+    
       } catch (e) {
         obj = value;
       }
+      
       return [key, obj];
-    });
+    })
+    console.log(map,"DATA");
+    return map;
+
   }
 }
 
@@ -88,6 +99,10 @@ async function getAllKeys() {
   return await MMKV.indexer.getKeys();
 }
 
+async function getRandomBytes(length) {
+  return await generateSecureRandom(length);
+}
+
 export default {
   read,
   write,
@@ -99,4 +114,5 @@ export default {
   deriveKey,
   saveToPDF,
   getAllKeys,
+  getRandomBytes,
 };
