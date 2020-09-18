@@ -1,3 +1,4 @@
+import 'react-native-get-random-values';
 import { isArray } from 'lodash';
 import { Platform } from 'react-native';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
