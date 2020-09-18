@@ -5,50 +5,18 @@ class Crypto {
   }
   async _initialize() {
     if (this.isReady) return;
-    const { default: _sodium } = await import("libsodium-wrappers");
-    await _sodium.ready;
-    this.sodium = _sodium;
-    this.isReady = true;
+    return new Promise(async (resolve) => {
+      window.sodium = {
+        onload: (_sodium) => {
+          if (this.isReady) return;
+          this.isReady = true;
+          this.sodium = _sodium;
+          loadScript("crypto.worker.js").then(resolve);
+        },
+      };
+      await loadScript("sodium.js");
+    });
   }
-
-  deriveKey = async (password, salt, exportKey = false) => {
-    await this._initialize();
-
-    if (!salt)
-      salt = this.sodium.randombytes_buf(this.sodium.crypto_pwhash_SALTBYTES);
-    else {
-      salt = this.sodium.from_base64(salt);
-    }
-
-    const key = this.sodium.crypto_pwhash(
-      this.sodium.crypto_aead_xchacha20poly1305_ietf_KEYBYTES,
-      password,
-      salt,
-      3, // operations limit
-      1024 * 1024 * 8, // memory limit (8MB)
-      this.sodium.crypto_pwhash_ALG_ARGON2I13,
-      exportKey ? "base64" : "uint8array"
-    );
-    const saltHex = this.sodium.to_base64(salt);
-    this.sodium.memzero(salt);
-    if (exportKey) {
-      return key;
-    }
-    return { key, salt: saltHex };
-  };
-
-  _getKey = async (passwordOrKey) => {
-    let { salt, key, password } = passwordOrKey;
-    if (password) {
-      const result = await this.deriveKey(password, salt);
-      key = result.key;
-      salt = result.salt;
-    } else if (key && salt) {
-      salt = passwordOrKey.salt;
-      key = this.sodium.from_base64(key);
-    }
-    return { key, salt };
-  };
 
   /**
    *
@@ -57,29 +25,7 @@ class Crypto {
    */
   encrypt = async (passwordOrKey, data) => {
     await this._initialize();
-
-    const { key, salt } = await this._getKey(passwordOrKey);
-
-    const nonce = this.sodium.randombytes_buf(
-      this.sodium.crypto_aead_xchacha20poly1305_ietf_NPUBBYTES
-    );
-    const cipher = this.sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(
-      data,
-      undefined,
-      undefined,
-      nonce,
-      key,
-      "base64"
-    );
-    const iv = this.sodium.to_base64(nonce);
-    this.sodium.memzero(nonce);
-    this.sodium.memzero(key);
-    return {
-      cipher,
-      iv,
-      salt,
-      length: data.length,
-    };
+    return global.ncrypto.encrypt.call(this, passwordOrKey, data);
   };
 
   /**
@@ -87,20 +33,100 @@ class Crypto {
    * @param {{password: string}|{key:string, salt: string}} passwordOrKey - password or derived key
    * @param {{salt: string, iv: string, cipher: string}} cipher - the cipher data
    */
-  decrypt = async (passwordOrKey, { iv, cipher, salt }) => {
+  decrypt = async (passwordOrKey, cipher) => {
     await this._initialize();
-    const { key } = await this._getKey({ salt, ...passwordOrKey });
+    return global.ncrypto.decrypt.call(this, passwordOrKey, cipher);
+  };
 
-    const plainText = this.sodium.crypto_aead_xchacha20poly1305_ietf_decrypt(
-      undefined,
-      this.sodium.from_base64(cipher),
-      undefined,
-      this.sodium.from_base64(iv),
-      key,
-      "text"
-    );
-    this.sodium.memzero(key);
-    return plainText;
+  deriveKey = async (password, salt, exportKey = false) => {
+    await this._initialize();
+    return global.ncrypto.deriveKey.call(this, password, salt, exportKey);
   };
 }
-export default Crypto;
+
+class CryptoWorker {
+  constructor() {
+    this.isReady = false;
+  }
+  async _initialize() {
+    if (this.isReady) return;
+    return new Promise((resolve) => {
+      this.worker = new Worker("crypto.worker.js");
+      this.worker.onmessage = (ev) => {
+        const { type } = ev.data;
+        if (type === "loaded") {
+          this.worker.onmessage = undefined;
+          this.isReady = true;
+          resolve(true);
+        }
+      };
+    });
+  }
+
+  _communicate(type, data) {
+    return new Promise(async (resolve) => {
+      await this._initialize();
+      const messageId = Math.random().toString(36).substr(2, 9);
+      const onMessage = (e) => {
+        const { type: _type, messageId: _mId } = e.data;
+        if (_type === type && _mId === messageId) {
+          this.worker.removeEventListener("message", onMessage);
+          resolve(e.data.data);
+        }
+      };
+      this.worker.addEventListener("message", onMessage);
+      this.worker.postMessage({
+        type,
+        data,
+        messageId,
+      });
+    });
+  }
+
+  /**
+   *
+   * @param {{password: string}|{key:string, salt: string}} passwordOrKey - password or derived key
+   * @param {string|Object} data - the plaintext data
+   */
+  encrypt = (passwordOrKey, data) => {
+    return this._communicate("encrypt", {
+      passwordOrKey,
+      data,
+    });
+  };
+
+  /**
+   *
+   * @param {{password: string}|{key:string, salt: string}} passwordOrKey - password or derived key
+   * @param {{salt: string, iv: string, cipher: string}} cipher - the cipher data
+   */
+  decrypt = (passwordOrKey, cipher) => {
+    return this._communicate("decrypt", { passwordOrKey, cipher });
+  };
+
+  deriveKey = (password, salt, exportKey = false) => {
+    return this._communicate("deriveKey", { password, salt, exportKey });
+  };
+}
+
+const NCrypto =
+  "Worker" in window || "Worker" in global ? CryptoWorker : Crypto;
+export default NCrypto;
+
+function loadScript(url) {
+  return new Promise((resolve) => {
+    // adding the script tag to the head as suggested before
+    var head = document.getElementsByTagName("head")[0];
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src = url;
+
+    // then bind the event to the callback function
+    // there are several events for cross browser compatibility
+    script.onreadystatechange = resolve;
+    script.onload = resolve;
+
+    // fire the loading
+    head.appendChild(script);
+  });
+}

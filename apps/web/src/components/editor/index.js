@@ -3,7 +3,11 @@ import "./editor.css";
 import ReactQuill from "./react-quill";
 import { Flex } from "rebass";
 import Properties from "../properties";
-import { useStore, SESSION_STATES } from "../../stores/editor-store";
+import {
+  useStore,
+  SESSION_STATES,
+  store as editorstore,
+} from "../../stores/editor-store";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { useStore as useUserStore } from "../../stores/user-store";
 import Animated from "../animated";
@@ -14,7 +18,7 @@ import SplitEditor from "../spliteditor";
 import Unlock from "../unlock";
 
 function Editor() {
-  const delta = useStore((store) => store.session.content.delta);
+  console.log("rendering editor");
   const sessionState = useStore((store) => store.session.state);
   const setSession = useStore((store) => store.setSession);
   const saveSession = useStore((store) => store.saveSession);
@@ -45,15 +49,21 @@ function Editor() {
 
   useEffect(() => {
     if (!quillRef || !quillRef.current) return;
+
     if (sessionState === SESSION_STATES.new) {
+      const {
+        content: { delta },
+      } = editorstore.get().session;
+
       const { quill } = quillRef.current;
       quill.setContents(delta, "init");
       quill.history.clear();
       if (!delta.ops || !delta.ops.length) return;
       const text = quill.getText();
       quill.setSelection(text.length, 0, "init");
+      editorstore.set((state) => (state.session.state = SESSION_STATES.stale));
     }
-  }, [sessionState, delta, quillRef]);
+  }, [sessionState, quillRef]);
 
   if (unlock) return <Unlock noteId={unlock} />;
   if (diff) return <SplitEditor diffId={diff} />;
@@ -84,17 +94,20 @@ function Editor() {
           onFocus={() => {
             toggleProperties(false);
           }}
-          initialContent={delta}
           placeholder="Type anything here"
           container=".editor"
           onSave={() => {
             saveSession();
           }}
-          onChange={(editor) => {
+          changeInterval={500}
+          onChange={() => {
+            const { quill } = quillRef.current;
+            const delta = quill.getContents().ops;
+            const text = quill.getText();
             setSession((state) => {
               state.session.content = {
-                delta: { ops: editor.getContents().ops },
-                text: editor.getText(),
+                delta: { ops: delta },
+                text: text,
               };
             });
           }}

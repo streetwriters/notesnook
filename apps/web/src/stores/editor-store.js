@@ -13,7 +13,6 @@ const DEFAULT_SESSION = {
   state: undefined,
   isSaving: false,
   title: "",
-  timeout: 0,
   id: "",
   pinned: false,
   favorite: false,
@@ -68,7 +67,6 @@ class EditorStore extends BaseStore {
     let note = db.notes.note(noteId);
     if (!note) return;
     note = note.data;
-    clearTimeout(this.get().session.timeout);
 
     noteStore.setSelectedNote(note.id);
 
@@ -95,6 +93,7 @@ class EditorStore extends BaseStore {
 
   saveSession = (oldSession) => {
     this.set((state) => (state.session.isSaving = true));
+
     this._saveFn()(this.get().session).then(async (id) => {
       /* eslint-disable */
       storeSync: if (oldSession) {
@@ -135,7 +134,6 @@ class EditorStore extends BaseStore {
   newSession = (context = {}) => {
     setHashParam({ note: 0 });
 
-    clearTimeout(this.get().session.timeout);
     this.set(function (state) {
       state.session = {
         ...DEFAULT_SESSION,
@@ -149,7 +147,6 @@ class EditorStore extends BaseStore {
 
   clearSession = () => {
     setHashParam({});
-    clearTimeout(this.get().session.timeout);
     this.set(function (state) {
       state.session = {
         ...DEFAULT_SESSION,
@@ -159,27 +156,10 @@ class EditorStore extends BaseStore {
     noteStore.setSelectedNote(0);
   };
 
-  setSession = (set, immediate = false) => {
-    clearTimeout(this.get().session.timeout);
+  setSession = (set) => {
     const oldSession = { ...this.get().session };
-
-    // TODO test this
-    this.set((state) => {
-      if (state.session.state !== SESSION_STATES.stale)
-        state.session.state = SESSION_STATES.stale;
-    });
-
-    this.set((state) => {
-      set(state);
-
-      state.session.timeout = setTimeout(
-        () => {
-          this.session = this.get().session;
-          this.saveSession(oldSession);
-        },
-        immediate ? 0 : 500
-      );
-    });
+    this.set(set);
+    this.saveSession(oldSession);
   };
 
   toggleLocked = () => {
@@ -224,11 +204,11 @@ class EditorStore extends BaseStore {
     let index = arr.indexOf(value);
     if (index > -1) {
       note[`un${key}`](value).then(() => {
-        this.setSession((state) => state.session[array].splice(index, 1), true);
+        this.setSession((state) => state.session[array].splice(index, 1));
       });
     } else {
       note[key](value).then(() => {
-        this.setSession((state) => state.session[array].push(value), true);
+        this.setSession((state) => state.session[array].push(value));
       });
     }
   }

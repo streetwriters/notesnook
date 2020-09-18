@@ -53,6 +53,7 @@ const simpleQuillModules = {
 export default class ReactQuill extends Component {
   /** @private */
   quill;
+  changeTimeout;
   getEditor() {
     return this.quill.editor;
   }
@@ -108,9 +109,13 @@ export default class ReactQuill extends Component {
     this.quill.off("text-change", this.textChangeHandler);
   }
 
-  textChangeHandler = (delta, oldDelta, source) => {
+  textChangeHandler = (_delta, _oldDelta, source) => {
     if (source === "init") return;
-    this.props.onChange(this.quill);
+    clearTimeout(this.changeTimeout);
+    this.changeTimeout = setTimeout(
+      this.props.onChange,
+      this.props.changeInterval
+    );
   };
 
   render() {
