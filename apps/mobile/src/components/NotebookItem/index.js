@@ -30,7 +30,7 @@ export const NotebookItem = ({
           paddingRight: 6,
           alignSelf: 'center',
           borderBottomWidth: 1,
-          borderBottomColor: colors.nav,
+          borderBottomColor:item.pinned? 'transparent': colors.nav,
           width: '100%',
         },
         customStyle,

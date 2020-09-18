@@ -339,7 +339,7 @@ export class DialogManager extends Component {
         <VaultDialog colors={colors} />
 
         <MoveNoteDialog
-          ref={ref => (this.moveNoteDialog = ref)}
+       
           colors={colors}
         />
 
@@ -360,7 +360,7 @@ export class DialogManager extends Component {
         />
         <PremiumDialog ref={ref => this.premiumDialog = ref}  colors={colors} />
 
-        <LoginDialog colors={colors} ref={ref => (this.loginDialog = ref)} />
+        <LoginDialog colors={colors}  />
 
         <MergeEditor />
 

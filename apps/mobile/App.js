@@ -1,16 +1,16 @@
-import {useNetInfo} from '@react-native-community/netinfo';
-import React, {useEffect, useState} from 'react';
-import {Appearance, StatusBar, useColorScheme, AppState} from 'react-native';
+import { useNetInfo } from '@react-native-community/netinfo';
+import React, { useEffect, useState } from 'react';
+import { Appearance, StatusBar, useColorScheme } from 'react-native';
 import Orientation from 'react-native-orientation';
-import {SafeAreaProvider} from 'react-native-safe-area-context';
-import {getColorScheme, scale, updateSize} from './src/common/common';
-import {useTracked} from './src/provider';
-import {ACTIONS} from './src/provider/actions';
-import {defaultState} from './src/provider/defaultState';
-import {eSubscribeEvent, eUnSubscribeEvent} from './src/services/eventManager';
-import {eDispatchAction, eResetApp, eStartSyncer} from './src/services/events';
-import {MMKV} from './src/utils/storage';
-import {db, DDS, ToastEvent} from './src/utils/utils';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { getColorScheme, scale, updateSize } from './src/common/common';
+import { useTracked } from './src/provider';
+import { ACTIONS } from './src/provider/actions';
+import { defaultState } from './src/provider/defaultState';
+import { eSubscribeEvent, eUnSubscribeEvent } from './src/services/eventManager';
+import { eDispatchAction, eResetApp, eStartSyncer } from './src/services/events';
+import { MMKV } from './src/utils/storage';
+import { db, DDS, ToastEvent } from './src/utils/utils';
 
 let theme;
 const App = () => {
@@ -25,7 +25,7 @@ const App = () => {
     setTimeout(() => {
       forceUpdate();
     }, 1000); */
-  }
+  };
 
   useEffect(() => {
     changeTheme();
@@ -40,7 +40,7 @@ const App = () => {
       return;
     }
     settings = JSON.parse(settings);
-    console.log(settings.useSystemTheme)
+    console.log(settings.useSystemTheme);
     if (settings.useSystemTheme) {
       let newColors = await getColorScheme(settings.useSystemTheme);
       StatusBar.setBarStyle(
@@ -139,30 +139,28 @@ const App = () => {
 
   async function Initialize(colors = colors) {
     let settings;
+    
     try {
       settings = await MMKV.getStringAsync('settings');
     } catch (e) {}
-    if (!settings) {
+    if (!settings || typeof settings !== "string" || !settings.includes('fontScale')) {
       settings = defaultState.settings;
       settings = JSON.stringify(settings);
       settings.fontScale = 1;
-
+      console.log(settings,"SETTINGS");
       await MMKV.setStringAsync('settings', settings);
-
-      dispatch({type: ACTIONS.SETTINGS, settings});
     } else {
       settings = JSON.parse(settings);
+
       if (settings.fontScale) {
         scale.fontScale = settings.fontScale;
       } else {
         scale.fontScale = 1;
       }
       updateSize();
-      dispatch({type: ACTIONS.SETTINGS, settings: {...settings}});
     }
-
     let newColors = await getColorScheme(settings.useSystemTheme);
-
+    dispatch({type: ACTIONS.SETTINGS, settings: {...settings}});
     dispatch({type: ACTIONS.THEME, colors: newColors});
   }
 

@@ -42,7 +42,7 @@ export const Notes = ({route, navigation}) => {
       init();
       dispatch({
         type: ACTIONS.CURRENT_SCREEN,
-        screen: params.type,
+        screen: params.type === "color"? params.color.title : params.type,
       });
     } else {
       setNotes([]);
@@ -122,7 +122,7 @@ export const Notes = ({route, navigation}) => {
       init();
       dispatch({
         type: ACTIONS.CURRENT_SCREEN,
-        screen: params.type,
+        screen: params.type === "color"? params.color.title : params.type,
       });
     } else {
       setNotes([]);

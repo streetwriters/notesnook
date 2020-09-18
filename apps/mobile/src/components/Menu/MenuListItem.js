@@ -48,8 +48,7 @@ export const MenuListItem = ({item, index, noTextMode, ignore}) => {
         paddingHorizontal: noTextMode ? 0 : 8,
         justifyContent: noTextMode ? 'center' : 'space-between',
         alignItems: 'center',
-        paddingBottom: noTextMode ? pv + 2 : normalize(15),
-        paddingTop: index === 0 ? pv : noTextMode ? pv + 2 : normalize(15),
+        height:50
       }}>
       <View
         style={{

@@ -64,7 +64,7 @@ export default class NoteItem extends React.Component {
             alignSelf: 'center',
             borderBottomWidth: 1,
             height: 100,
-            borderBottomColor: colors.nav,
+            borderBottomColor:item.pinned? 'transparent': colors.nav,
           },
           customStyle ? customStyle : {},
         ]}>

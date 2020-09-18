@@ -1,18 +1,21 @@
 import React, {useEffect} from 'react';
 import {Text, View} from 'react-native';
-import {COLORS_NOTE, pv, SIZE} from '../../common/common';
+import {COLORS_NOTE, normalize, pv, SIZE} from '../../common/common';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
 import {refreshNotesPage} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
+import {sideMenuRef} from '../../utils/refs';
+import {hexToRGBA, RGB_Linear_Shade} from '../../utils/utils';
 import {PressableButton} from '../PressableButton';
 
 export const ColorSection = ({noTextMode}) => {
   const [state, dispatch] = useTracked();
-  const {colors, colorNotes} = state;
+  const {colors, colorNotes, currentScreen} = state;
 
   useEffect(() => {
+    console.log(colorNotes[0]);
     dispatch({type: ACTIONS.TAGS});
   }, []);
 
@@ -20,18 +23,16 @@ export const ColorSection = ({noTextMode}) => {
     <View
       style={{
         width: '100%',
-        paddingHorizontal: 10,
       }}>
       {colorNotes.map((item) => (
         <PressableButton
           key={item.id}
-          onPress={_onPress}
           color={
-            currentScreen === item.name.toLowerCase()
-              ? colors.shade
+            currentScreen === item.title
+              ? COLORS_NOTE[item.title]
               : 'transparent'
           }
-          selectedColor={colors.accent}
+          selectedColor={COLORS_NOTE[item.title]}
           alpha={!colors.night ? -0.02 : 0.02}
           opacity={0.12}
           onPress={() => {
@@ -62,19 +63,21 @@ export const ColorSection = ({noTextMode}) => {
             eSendEvent(refreshNotesPage, params);
             sideMenuRef.current?.closeDrawer();
           }}
-          style={{
+          customStyle={{
             flexDirection: 'row',
             justifyContent: noTextMode ? 'center' : 'flex-start',
             alignItems: 'center',
             width: '100%',
-            paddingVertical: pv,
+            borderRadius: 0,
+            paddingHorizontal: 10,
+            height: 50,
           }}>
           <View
             style={{
               width: 35,
               height: 35,
               justifyContent: 'center',
-              alignItems: 'center',
+              alignItems: 'flex-start',
             }}>
             <View
               style={{
