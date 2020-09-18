@@ -64,6 +64,7 @@ function ListItem(props) {
       window.dispatchEvent(
         new CustomEvent("globalcontextmenu", {
           detail: {
+            state: "open",
             items,
             data: props.menuData,
             internalEvent: event,

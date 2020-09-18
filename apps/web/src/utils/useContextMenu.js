@@ -7,10 +7,15 @@ function closeMenu() {
     isOpening = false;
     return;
   }
-  const menu = document.getElementById("globalContextMenu");
-  menu.style.display = "none";
+  window.dispatchEvent(
+    new CustomEvent("globalcontextmenu", { detail: { state: "close" } })
+  );
   window.removeEventListener("click", onWindowClick);
   window.removeEventListener("keydown", onKeyDown);
+}
+
+function getGlobalMenu() {
+  return document.getElementById("globalContextMenu");
 }
 
 function onKeyDown(event) {
@@ -22,18 +27,15 @@ function onWindowClick() {
 }
 
 // updated positionMenu function
-var lastTarget;
 function openMenu(e) {
   e.preventDefault();
-  const menu = document.getElementById("globalContextMenu");
+  const menu = getGlobalMenu();
+  if (menu.style.display === "block") {
+    closeMenu();
+    return;
+  }
   if (e.type === "click") {
     isOpening = true;
-    // make it work like a toggle button
-    if (menu.style.display === "block" && e.target === lastTarget) {
-      closeMenu();
-      return;
-    }
-    lastTarget = e.target;
   }
 
   const clickCoords = getPosition(e);
@@ -57,7 +59,6 @@ function openMenu(e) {
   } else {
     menu.style.top = clickCoordsY + "px";
   }
-  menu.style.display = "block";
 
   window.addEventListener("keydown", onKeyDown);
   window.addEventListener("click", onWindowClick);
@@ -91,9 +92,14 @@ function useContextMenu() {
   const [items, setItems] = useState([]);
   const [data, setData] = useState({});
   const [title, setTitle] = useState();
+  const [state, setState] = useState();
   useEffect(() => {
     const onGlobalContextMenu = (e) => {
-      const { items, data, title, internalEvent } = e.detail;
+      const { items, data, title, internalEvent, state } = e.detail;
+      setState(state);
+      if (state === "close") {
+        return;
+      }
       setItems(items);
       setData(data);
       setTitle(title);
@@ -104,7 +110,7 @@ function useContextMenu() {
       window.removeEventListener("globalcontextmenu", onGlobalContextMenu);
     };
   }, []);
-  return [items, data, title, closeMenu];
+  return [items, data, title, state, closeMenu];
 }
 
 export default useContextMenu;
