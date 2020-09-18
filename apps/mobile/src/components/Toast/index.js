@@ -1,65 +1,109 @@
 import React, {useEffect, useState} from 'react';
-import {Keyboard, Text, TouchableOpacity} from 'react-native';
-import * as Animatable from 'react-native-animatable';
+import {Keyboard, Text, TouchableOpacity, View} from 'react-native';
+import Animated, {Easing, useValue} from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {normalize, opacity, ph, pv, SIZE, WEIGHT} from '../../common/common';
+import {SIZE} from '../../common/common';
 import {useTracked} from '../../provider';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
 import {eHideToast, eShowToast} from '../../services/events';
-import {DDS, w, getElevation} from '../../utils/utils';
+import {getElevation} from '../../utils/utils';
+const {spring, timing} = Animated;
 
-const AnimatedTouchableOpacity = Animatable.createAnimatableComponent(
-  TouchableOpacity,
-);
+const toastMessages = [];
 export const Toast = ({context = 'global'}) => {
   const [state, dispatch] = useTracked();
-  const {colors} = state;
-  const [toast, setToast] = useState(false);
+  const colors = state.colors;
   const [keyboard, setKeyboard] = useState(false);
-  const [message, setMessage] = useState([]);
-  const [data, setData] = useState([]);
+  const [data, setData] = useState({});
   const [toastStyle, setToastStyle] = useState({
     backgroundColor: colors.errorBg,
     color: colors.errorText,
   });
 
-  const showToastFunc = data => {
+  let toastTranslate = useValue(300);
+  let toastOpacity = useValue(1);
+
+  const showToastFunc = (data) => {
+    if (data.context !== context) return;
+    toastMessages.push(data);
+    if (toastMessages?.length > 1) return;
+
     setData(data);
-
-    if (data.context === context) {
-      setToast(true);
-    }
-    if (data.message) {
-      setMessage(data.message);
-    }
-
     if (data.type === 'success') {
       setToastStyle({
-        backgroundColor: colors.successBg,
         color: colors.successText,
       });
     } else {
       setToastStyle({
-        backgroundColor: colors.errorBg,
         color: colors.errorText,
       });
     }
 
     setTimeout(() => {
-      setToast(false);
+      timing(toastTranslate, {
+        toValue: 0,
+        duration: 500,
+        easing: Easing.elastic(1.1),
+      }).start();
+    }, 100);
+
+    setTimeout(() => {
+      hideToastFunc();
     }, data.duration);
   };
 
-  const hideToastFunc = data => {
-    setToast(false);
+  const showNext = (data) => {
+    setData(data);
+    if (data.type === 'success') {
+      setToastStyle({
+        color: colors.successText,
+      });
+    } else {
+      setToastStyle({
+        color: colors.errorText,
+      });
+    }
+    setTimeout(() => {
+      hideToastFunc();
+    }, toastMessages[0].duration);
+  };
+
+  const hideToastFunc = (data) => {
+    if (toastMessages.length > 1) {
+      toastMessages.shift();
+
+      timing(toastOpacity, {
+        toValue: 0,
+        duration: 100,
+        easing: Easing.in(Easing.ease),
+      }).start(() => {
+        showNext(toastMessages[0]);
+        setTimeout(() => {
+          timing(toastOpacity, {
+            toValue: 1,
+            duration: 150,
+            easing: Easing.in(Easing.ease),
+          }).start();
+        }, 300);
+      });
+    } else {
+      timing(toastTranslate, {
+        toValue: 300,
+        duration: 200,
+        easing: Easing.inOut(Easing.ease),
+      }).start(() => {
+        toastMessages.shift();
+        setData({});
+      });
+    }
   };
 
   const _onKeyboardShow = () => {
-    setKeyboard(true);
+    //setKeyboard(true);
   };
 
   const _onKeyboardHide = () => {
-    setKeyboard(false);
+    //setKeyboard(false);
   };
 
   useEffect(() => {
@@ -72,17 +116,12 @@ export const Toast = ({context = 'global'}) => {
       Keyboard.removeListener('keyboardDidShow', _onKeyboardShow);
       Keyboard.removeListener('keyboardDidHide', _onKeyboardHide);
       eUnSubscribeEvent('showToast', showToastFunc);
-
       eUnSubscribeEvent('hideToast', hideToastFunc);
     };
   }, []);
 
   return (
-    <Animatable.View
-      transition={['translateY', 'opacity']}
-      duration={0}
-      delay={toast? 0 :300}
-      useNativeDriver={true}
+    <Animated.View
       style={{
         width: '100%',
         alignItems: 'center',
@@ -91,63 +130,89 @@ export const Toast = ({context = 'global'}) => {
         position: 'absolute',
         zIndex: 999,
         elevation: 15,
+        opacity: toastOpacity,
         transform: [
           {
-            translateY: toast ? 0 : 300,
+            translateY: toastTranslate,
           },
         ],
       }}>
-      <AnimatedTouchableOpacity
-        activeOpacity={1}
-        transition={['opacity']}
-        duration={300}
-        useNativeDriver={true}
-        delay={!toast? 0 : 150}
+      <Animated.View
+        activeOpacity={0.8}
         style={{
           ...getElevation(5),
           ...toastStyle,
-          maxWidth: DDS.isTab ? normalize(350) : w - 24,
-          minWidth: DDS.isTab ? normalize(250) : w / 2,
+          maxWidth: '95%',
+          backgroundColor: 'black',
+          minWidth: data.func ? '95%' : '50%',
           alignSelf: 'center',
           borderRadius: 5,
-          paddingHorizontal: ph,
-          paddingVertical: pv,
-          opacity: toast ? 1 : 0,
-          justifyContent: 'center',
+          height: 50,
+          paddingHorizontal: 15,
+          justifyContent: 'space-between',
           flexDirection: 'row',
           alignItems: 'center',
         }}>
-        <Text
+        <View
           style={{
-            ...toastStyle,
-            backgroundColor: 'transparent',
-            fontFamily: WEIGHT.regular,
-            fontSize: SIZE.sm,
+            flexDirection: 'row',
+            alignItems: 'center',
+            maxWidth: !data.func ? '90%' : '75%',
           }}>
-          <Icon
-            name={
-              toastStyle.color === colors.errorText
-                ? 'alert-circle-outline'
-                : 'check-circle-outline'
-            }
-            color={toastStyle.color}
-            size={SIZE.sm}
-          />
-          {'  '}
-          {message}
-        </Text>
-
-        <TouchableOpacity activeOpacity={1}>
-          <Text
+          <View
             style={{
-              ...toastStyle,
-              fontFamily: WEIGHT.bold,
+              width: 25,
+              height: 25,
+              backgroundColor:
+                data.type === 'error' ? colors.errorText : colors.successText,
+              borderRadius: 100,
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginRight: 10,
+            }}>
+            <Icon
+              name={data.type === 'success' ? 'check' : 'close'}
+              size={20}
+              color="white"
+            />
+          </View>
+
+          <Text
+            onPress={() => {
+              hideToastFunc();
+            }}
+            style={{
+              color: 'white',
+              width: '100%',
+              backgroundColor: 'transparent',
               fontSize: SIZE.sm,
             }}>
-            {data.actionText}
+            {data.message}
           </Text>
-        </TouchableOpacity>
-      </AnimatedTouchableOpacity>
-    </Animatable.View>
+        </View>
+
+        {data.func ? (
+          <TouchableOpacity
+            onPress={data.func}
+            style={{
+              width: '15%',
+              height: '100%',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: 5,
+            }}
+            activeOpacity={0.5}>
+            <Text
+              style={{
+                fontSize: SIZE.sm,
+                color:
+                  data.type === 'error' ? colors.errorText : colors.successText,
+              }}>
+              {data.actionText}
+            </Text>
+          </TouchableOpacity>
+        ) : null}
+      </Animated.View>
+    </Animated.View>
   );
 };

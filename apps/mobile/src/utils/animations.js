@@ -5,36 +5,30 @@ import {editing} from './utils';
 const {color, Value, timing} = Animated;
 
 export const EditorPosition = new Value(Dimensions.get('window').width * 1.5);
-export const EditorScale = new Value(0.99);
+export const EditorScale = new Value(1);
 export const EditorOpacity = new Value(0);
-export const EditorTranslateY = new Value(150);
+export const EditorTranslateY = new Value(Dimensions.get('window').height * 0.75);
 
 export function openEditorAnimation() {
   EditorPosition.setValue(Dimensions.get('window').width * 1.5);
-  EditorTranslateY.setValue(150);
+  EditorTranslateY.setValue(Dimensions.get('window').height * 0.75);
   EditorOpacity.setValue(0);
 
   editing.currentlyEditing = true;
 
   EditorPosition.setValue(0);
 
-  setTimeout(() => {
-    timing(EditorScale, {
-      duration: 150,
-      toValue: 1,
-      easing: Easing.in(Easing.linear),
-    }).start();
     timing(EditorTranslateY, {
-      duration: 150,
+      duration: 200,
       toValue: 0,
-      easing: Easing.in(Easing.linear),
+      easing:  Easing.out(Easing.ease),
     }).start();
     timing(EditorOpacity, {
       duration: 150,
       toValue: 1,
-      easing: Easing.in(Easing.linear),
+      easing: Easing.out(Easing.ease),
     }).start();
-  }, 10);
+
 }
 
 export function exitEditorAnimation() {
@@ -42,29 +36,20 @@ export function exitEditorAnimation() {
   EditorOpacity.setValue(1);
   EditorTranslateY.setValue(0);
   editing.currentlyEditing = false;
-  setTimeout(() => {
 
-    setTimeout(() => {
-      EditorPosition.setValue(Dimensions.get('window').width * 1.5);
-    }, 250);
     timing(EditorOpacity, {
       duration: 150,
       toValue: 0,
-      easing: Easing.in(Easing.linear),
-    }).start();
+      easing: Easing.inOut(Easing.ease),
+    }).start(() => {
+      EditorPosition.setValue(Dimensions.get('window').width * 1.5);
+    });
     timing(EditorTranslateY, {
-      duration: 150,
-      toValue: 150,
-      easing: Easing.in(Easing.linear),
+      duration: 200,
+      toValue: Dimensions.get('window').height * 0.75,
+      easing: Easing.inOut(Easing.ease),
     }).start();
-    timing(EditorScale, {
-      duration: 150,
-      toValue: 0.99,
-      easing: Easing.in(Easing.linear),
-    }).start();
-
-  },20)
- 
+  
 
  
 }

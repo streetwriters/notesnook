@@ -1,7 +1,7 @@
-import React, {createRef, useEffect} from 'react';
-import {Text} from 'react-native';
-import {SIZE, WEIGHT} from '../../common/common';
-import {useTracked} from '../../provider';
+import React from 'react';
+import { Text } from 'react-native';
+import { SIZE, WEIGHT } from '../../common/common';
+import { useTracked } from '../../provider';
 
 export const HeaderTitle = ({root}) => {
   const [state, dispatch] = useTracked();
@@ -9,23 +9,25 @@ export const HeaderTitle = ({root}) => {
   let headerTextState = root ? state.headerTextState : state.indHeaderTextState;
 
   return (
-    <Text
-      style={{
-        fontSize: SIZE.xl,
-        color: headerTextState.color ? headerTextState.color : colors.pri,
-        fontFamily: WEIGHT.bold,
-      
-      }}>
+    <>
       <Text
         style={{
-          color: colors.accent,
+          fontSize: SIZE.xl,
+          color: headerTextState.color ? headerTextState.color : colors.heading,
+          fontFamily: WEIGHT.bold,
+          alignSelf: 'center',
         }}>
-        {headerTextState.heading.slice(0, 1) === '#' ? '#' : null}
-      </Text>
+        <Text
+          style={{
+            color: colors.accent,
+          }}>
+          {headerTextState.heading.slice(0, 1) === '#' ? '#' : null}
+        </Text>
 
-      {headerTextState.heading.slice(0, 1) === '#'
-        ? headerTextState.heading.slice(1)
-        : headerTextState.heading}
-    </Text>
+        {headerTextState.heading.slice(0, 1) === '#'
+          ? headerTextState.heading.slice(1)
+          : headerTextState.heading}
+      </Text>
+    </>
   );
 };

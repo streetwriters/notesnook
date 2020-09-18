@@ -8,12 +8,13 @@ import {
   eClearEditor,
   eCloseFullscreenEditor,
   eOnNewTopicAdded,
-  eApplyChanges,
+  eApplyChanges, eOnLoadNote
 } from '../../services/events';
 import NavigationService from '../../services/NavigationService';
 import {db, DDS, getElevation, history, ToastEvent} from '../../utils/utils';
 import {dialogActions} from '../DialogManager/dialogActions';
 import {updateEvent} from '../DialogManager/recievers';
+import {Button} from '../Button';
 
 export class Dialog extends Component {
   constructor(props) {
@@ -34,28 +35,73 @@ export class Dialog extends Component {
           history.selectedItemsList.push(item);
         }
 
-        history.selectedItemsList.forEach(async i => {
-          if (i.type === 'note') {
-            await db.notes.delete(i.id);
-            ToastEvent.show('Notes moved to trash', 'error');
-            updateEvent({type: i.type});
-            updateEvent({type: ACTIONS.PINNED});
-
+        for (var i = 0; i < history.selectedItemsList.length; i++) {
+          let it = history.selectedItemsList[i];
+          if (it.type === 'note') {
+            await db.notes.delete(it.id);
+            updateEvent({type: it.type});
             eSendEvent(eClearEditor);
-          } else if (i.type === 'topic') {
-            await db.notebooks.notebook(i.notebookId).topics.delete(i.title);
-
+          } else if (it.type === 'topic') {
+            await db.notebooks.notebook(it.notebookId).topics.delete(it.title);
             eSendEvent(eOnNewTopicAdded);
             updateEvent({type: 'notebook'});
-
-            ToastEvent.show('Topics deleted', 'error');
-          } else if (i.type === 'notebook') {
-            await db.notebooks.delete(i.id);
-            updateEvent({type: i.type});
-            updateEvent({type: ACTIONS.PINNED});
-            ToastEvent.show('Notebooks moved to trash', 'error');
+            ToastEvent.show('Topics deleted', 'success');
+          } else if (it.type === 'notebook') {
+            await db.notebooks.delete(it.id);
+            updateEvent({type: it.type});
           }
-        });
+        }
+        updateEvent({type: ACTIONS.PINNED});
+
+        let message;
+        let notes = history.selectedItemsList.filter((o) => o.type === 'note');
+        let notebooks = history.selectedItemsList.filter(
+          (o) => o.type === 'notebook',
+        );
+        let topics = history.selectedItemsList.filter(
+          (o) => o.type === 'topic',
+        );
+        if (notes.length > 0 && notebooks.length === 0 && topics.length === 0) {
+          let msgPart = notes.length > 1 ? ' notes' : ' note';
+          message = notes.length + msgPart + ' moved to trash';
+        } else if (
+          notes.length === 0 &&
+          notebooks.length > 0 &&
+          topics.length === 0
+        ) {
+          let msgPart = notebooks.length > 1 ? ' notebooks' : ' notebook';
+          message = notebooks.length + msgPart + ' moved to trash';
+        } else if (
+          notes.length === 0 &&
+          notebooks.length === 0 &&
+          topics.length > 0
+        ) {
+          let msgPart = topics.length > 1 ? ' topics' : ' topic';
+          message = topics.length + msgPart + ' moved to trash';
+        }
+        let itemsCopy = [...history.selectedItemsList];
+        if (history.selectedItemsList[0].type !== 'topic')
+          ToastEvent.show(
+            message,
+            'success',
+            'global',
+            6000,
+            async () => {
+              console.log('COPY');
+              let trash = db.trash;
+
+              for (var i = 0; i < itemsCopy.length; i++) {
+                let it = itemsCopy[i];
+                let trashItem = trash.all.find((item) => item.itemId === it.id);
+                await db.trash.restore(trashItem.id);
+                updateEvent({type: it.type});
+              }
+              updateEvent({type: ACTIONS.TRASH});
+              updateEvent({type: ACTIONS.PINNED});
+              ToastEvent.hide();
+            },
+            'Undo',
+          );
 
         updateEvent({type: ACTIONS.CLEAR_SELECTION});
         updateEvent({type: ACTIONS.SELECTION_MODE, enabled: false});
@@ -69,7 +115,7 @@ export class Dialog extends Component {
           history.selectedItemsList.push(item);
         }
         let ids = [];
-        history.selectedItemsList.forEach(item => ids.push(item.id));
+        history.selectedItemsList.forEach((item) => ids.push(item.id));
 
         await db.trash.delete(...ids);
 
@@ -85,6 +131,11 @@ export class Dialog extends Component {
           visible: false,
         });
         NavigationService.goBack();
+        this.hide();
+        break;
+      }
+      case dialogActions.ACTION_NEW_NOTE: {
+        eSendEvent(eOnLoadNote, {type:"new"});
         this.hide();
         break;
       }
@@ -235,50 +286,8 @@ export class Dialog extends Component {
                   flexDirection: 'row',
                   marginTop: 20,
                 }}>
-                <TouchableOpacity
-                  activeOpacity={opacity}
-                  onPress={this._onClose}
-                  style={{
-                    paddingVertical: pv,
-                    paddingHorizontal: ph,
-                    borderRadius: 5,
-                    width: '48%',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    backgroundColor: colors.nav,
-                  }}>
-                  <Text
-                    style={{
-                      fontFamily: WEIGHT.medium,
-                      color: colors.icon,
-                      fontSize: SIZE.sm,
-                    }}>
-                    {negativeText}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  activeOpacity={opacity}
-                  onPress={this._onPress}
-                  style={{
-                    paddingVertical: pv,
-                    paddingHorizontal: ph,
-                    borderRadius: 5,
-                    width: '48%',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    borderColor: colors.accent,
-                    backgroundColor: colors.accent,
-                    borderWidth: 1,
-                  }}>
-                  <Text
-                    style={{
-                      fontFamily: WEIGHT.medium,
-                      color: 'white',
-                      fontSize: SIZE.sm,
-                    }}>
-                    {positiveText}
-                  </Text>
-                </TouchableOpacity>
+                <Button onPress={this._onClose} title={negativeText} grayed />
+                <Button onPress={this._onPress} title={positiveText} />
               </View>
             )}
           </View>

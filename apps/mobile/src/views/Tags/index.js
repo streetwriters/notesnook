@@ -1,12 +1,13 @@
-import { useIsFocused } from '@react-navigation/native';
-import React, { useEffect } from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
-import { pv, SIZE, WEIGHT } from '../../common/common';
-import { Placeholder } from '../../components/ListPlaceholders';
+import {useIsFocused} from '@react-navigation/native';
+import React, {useEffect} from 'react';
+import {Text, TouchableOpacity, View} from 'react-native';
+import {pv, SIZE, WEIGHT} from '../../common/common';
+import {Placeholder} from '../../components/ListPlaceholders';
 import SimpleList from '../../components/SimpleList';
-import { useTracked } from '../../provider';
-import { ACTIONS } from '../../provider/actions';
+import {useTracked} from '../../provider';
+import {ACTIONS} from '../../provider/actions';
 import NavigationService from '../../services/NavigationService';
+import {PressableButton} from '../../components/PressableButton';
 
 export const Tags = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
@@ -85,13 +86,7 @@ const RenderItem = ({item, index}) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
   return (
-    <View
-    style={{
-      paddingHorizontal:12
-    }}
-    >
-    <TouchableOpacity
-      key={item.title}
+    <PressableButton
       onPress={() => {
         NavigationService.navigate('Notes', {
           type: 'tag',
@@ -99,21 +94,27 @@ const RenderItem = ({item, index}) => {
           tag: item,
         });
       }}
-      style={{
+      selectedColor={
+        currentEditingNote === item.dateCreated || pinned
+          ? colors.accent
+          : colors.nav
+      }
+      alpha={!colors.night ? -0.02 : 0.02}
+      opacity={currentEditingNote === item.dateCreated || pinned ? 0.12 : 1}
+      customStyle={{
+        paddingHorizontal: 12,
+        height: 80,
         flexDirection: 'row',
         justifyContent: 'flex-start',
         alignItems: 'center',
-        margin: 0,
-        paddingVertical: pv + 5,
         borderBottomWidth: 1.5,
         borderBottomColor: colors.nav,
       }}>
-        
       <Text
         style={{
           fontFamily: WEIGHT.bold,
           fontSize: SIZE.md,
-          color: colors.pri,
+          color: colors.heading,
         }}>
         <Text
           style={{
@@ -136,7 +137,6 @@ const RenderItem = ({item, index}) => {
             : null}
         </Text>
       </Text>
-    </TouchableOpacity>
-    </View>
+    </PressableButton>
   );
 };

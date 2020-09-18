@@ -1,212 +1,93 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React from 'react';
 import {
   ActivityIndicator,
   Platform,
+  StyleSheet,
   TouchableOpacity,
   View,
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import {useSafeArea} from 'react-native-safe-area-context';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {SIZE} from '../../common/common';
 import {useTracked} from '../../provider';
-import {
-  eSendEvent,
-  eSubscribeEvent,
-  eUnSubscribeEvent,
-} from '../../services/eventManager';
-import {
-  eCloseLoginDialog,
-  eScrollEvent,
-  eSetModalNavigator,
-} from '../../services/events';
+import {eSendEvent} from '../../services/eventManager';
 import NavigationService from '../../services/NavigationService';
+import {useHideHeader} from '../../utils/hooks';
 import {sideMenuRef} from '../../utils/refs';
 import {DDS, w} from '../../utils/utils';
-import {moveNoteHideEvent} from '../DialogManager/recievers';
 import {HeaderMenu} from './HeaderMenu';
 import {HeaderTitle} from './HeaderTitle';
-let offsetY = 0;
-
-function useForceUpdate() {
-  const [, setTick] = useState(0);
-  const update = useCallback(() => {
-    setTick(tick => tick + 1);
-  }, []);
-  return update;
-}
 
 export const Header = ({showSearch, root}) => {
   const [state, dispatch] = useTracked();
-  const {
-    colors,
-    syncing,
-    isLoginNavigator,
-    preventDefaultMargins,
-    searchResults,
-  } = state;
-  const [hideHeader, setHideHeader] = useState(false);
+  const {colors, syncing} = state;
 
   let headerState = root ? state.headerState : state.indHeaderState;
 
-  const [isModalNavigator, setIsModalNavigator] = useState(false);
-  const insets = useSafeArea();
-  const forceUpdate = useForceUpdate();
+  const insets = useSafeAreaInsets();
+  const hideHeader = useHideHeader();
 
-  const onScroll = y => {
-    if (searchResults.results.length > 0) return;
-    if (y < 30) {
-      setHideHeader(false);
-      offsetY = y;
+  const onLeftButtonPress = () => {
+    if (!headerState.canGoBack) {
+      sideMenuRef.current?.openDrawer();
+      return;
     }
-
-    if (y > offsetY) {
-      if (y - offsetY < 100) return;
-
-      setHideHeader(true);
-      offsetY = y;
-    } else {
-      if (offsetY - y < 50) return;
-
-      setHideHeader(false);
-      offsetY = y;
-    }
+    NavigationService.goBack();
   };
-
-  const _setModalNavigator = value => {
-    if (root) return;
-    forceUpdate();
-    setIsModalNavigator(value);
-  };
-
-  useEffect(() => {
-    eSubscribeEvent(eSetModalNavigator, _setModalNavigator);
-    eSubscribeEvent(eScrollEvent, onScroll);
-    return () => {
-      eUnSubscribeEvent(eSetModalNavigator, _setModalNavigator);
-      eUnSubscribeEvent(eScrollEvent, onScroll);
-    };
-  }, []);
 
   return (
     <View
-      style={{
-        flexDirection: 'row',
-        zIndex: 10,
-        height: 50,
-        marginTop:
-          Platform.OS === 'ios'
-            ? isModalNavigator && !root
-              ? 0
-              : insets.top
-            : isModalNavigator && !root
-            ? 0
-            : insets.top,
-        marginBottom: 10,
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingHorizontal: 12,
-        width: '100%',
-      }}>
+      style={[
+        styles.container,
+        {
+          marginTop: insets.top,
+          backgroundColor: colors.bg,
+          overflow: 'hidden',
+        },
+      ]}>
       <Animatable.View
         transition={['opacity']}
         duration={300}
-        style={{
-          width: 40,
-          height: 40,
-          position: 'absolute',
-          left: w / 2 - 20,
-          top: -20,
-          opacity: syncing ? 1 : 0,
-          alignSelf: 'center',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 999,
-        }}>
+        style={[
+          styles.loadingContainer,
+          {
+            opacity: syncing ? 1 : 0,
+          },
+        ]}>
         <View
-          style={{
-            backgroundColor: colors.bg,
-            width: 40,
-            height: 20,
-            position: 'absolute',
-            zIndex: 10,
-            top: 0,
-          }}
+          style={[
+            styles.loadingInnerContainer,
+            {
+              backgroundColor: colors.bg,
+            },
+          ]}
         />
         <ActivityIndicator size={25} color={colors.accent} />
       </Animatable.View>
 
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'flex-start',
-          alignItems: 'center',
-        }}>
-        {headerState.canGoBack ? (
+      <View style={styles.leftBtnContainer}>
+        {!DDS.isTab ? (
           <TouchableOpacity
             hitSlop={{top: 20, bottom: 20, left: 50, right: 40}}
-            onPress={() => {
-              headerState = root ? state.headerState : state.indHeaderState;
-
-              if (headerState.navigation && preventDefaultMargins) {
-                if (headerState.route.name === 'Folders') {
-                  moveNoteHideEvent();
-                } else {
-                  headerState.navigation.goBack();
-                }
-              } else if (headerState.navigation && isModalNavigator) {
-                if (headerState.route.name === 'Login') {
-                  eSendEvent(eCloseLoginDialog);
-                } else {
-                  headerState.navigation.goBack();
-                }
-              } else {
-                NavigationService.goBack();
-              }
-            }}
-            style={{
-              justifyContent: 'center',
-              alignItems: 'flex-start',
-              height: 40,
-              width: 60,
-            }}>
+            onPress={onLeftButtonPress}
+            style={styles.leftBtn}>
             <Icon
               style={{
-                marginLeft: -5,
+                marginLeft: headerState.canGoBack ? -5 : 0,
               }}
-              color={colors.pri}
-              name={'arrow-left'}
-              size={SIZE.xxxl - 3}
+              color={colors.heading}
+              name={headerState.canGoBack ? 'arrow-left' : 'menu'}
+              size={SIZE.xxxl}
             />
           </TouchableOpacity>
-        ) : (
-          undefined
-        )}
-        {headerState.menu && !DDS.isTab ? (
-          <TouchableOpacity
-            hitSlop={{top: 20, bottom: 20, left: 50, right: 40}}
-            onPress={() => {
-              sideMenuRef.current?.openDrawer();
-            }}
-            style={{
-              justifyContent: 'center',
-              alignItems: 'flex-start',
-              height: 40,
-              width: 60,
-            }}>
-            <Icon color={colors.pri} name={'menu'} size={SIZE.xxxl} />
-          </TouchableOpacity>
-        ) : (
-          undefined
-        )}
+        ) : undefined}
 
-        <HeaderTitle root={root} />
+        {Platform.OS === 'android' ? <HeaderTitle root={root} /> : null}
       </View>
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-        }}>
+      {Platform.OS !== 'android' ? <HeaderTitle root={root} /> : null}
+
+      <View style={styles.rightBtnContainer}>
         <Animatable.View
           transition="opacity"
           useNativeDriver={true}
@@ -216,17 +97,12 @@ export const Header = ({showSearch, root}) => {
           }}>
           <TouchableOpacity
             onPress={() => {
+              if (!hideHeader) return;
               setHideHeader(false);
               eSendEvent('showSearch');
             }}
-            style={{
-              justifyContent: 'center',
-              alignItems: 'flex-end',
-              height: 40,
-              width: 60,
-              paddingRight: 0,
-            }}>
-            <Icon name={'magnify'} size={SIZE.xl} color={colors.icon} />
+            style={styles.rightBtn}>
+            <Icon name={'magnify'} size={SIZE.xl} color={colors.pri} />
           </TouchableOpacity>
         </Animatable.View>
 
@@ -235,3 +111,60 @@ export const Header = ({showSearch, root}) => {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flexDirection: 'row',
+    zIndex: 11,
+    height: 50,
+    marginBottom: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    width: '100%',
+  },
+  loadingContainer: {
+    alignSelf: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 999,
+    left: w / 2 - 20,
+    top: -20,
+    width: 40,
+    height: 40,
+    position: 'absolute',
+  },
+  loadingInnerContainer: {
+    width: 40,
+    height: 20,
+    position: 'absolute',
+    zIndex: 10,
+    top: 0,
+  },
+  leftBtnContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    position: 'absolute',
+    left: 12,
+  },
+  leftBtn: {
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+    height: 40,
+    width: 60,
+  },
+  rightBtnContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    position: 'absolute',
+    right: 12,
+  },
+  rightBtn: {
+    justifyContent: 'center',
+    alignItems: 'flex-end',
+    height: 40,
+    width: 50,
+    paddingRight: 0,
+  },
+});

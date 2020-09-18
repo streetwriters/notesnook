@@ -19,8 +19,12 @@ import {eSubscribeEvent, eUnSubscribeEvent} from './src/services/eventManager';
 import {eOpenSideMenu, eCloseSideMenu} from './src/services/events';
 import { Toast } from './src/components/Toast';
 import { DialogManager } from './src/components/DialogManager';
+import { Screen, ScreenContainer } from 'react-native-screens';
 
 const editorRef = createRef();
+
+const AnimatedScreenContainer = Animated.createAnimatedComponent(ScreenContainer);
+
 export const Initialize = () => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
@@ -30,8 +34,9 @@ export const Initialize = () => {
     if (Platform.OS === 'android') {
       StatusBar.setBackgroundColor('transparent');
       StatusBar.setTranslucent(true);
-      StatusBar.setBarStyle(colors.night ? 'light-content' : 'dark-content');
+     
     }
+    StatusBar.setBarStyle(colors.night ? 'light-content' : 'dark-content');
   }, []);
 
   const setGestureDisabled = () => {
@@ -90,7 +95,7 @@ export const Initialize = () => {
           </View>
         </DrawerLayout>
 
-        <Animated.View
+        <AnimatedScreenContainer
           ref={editorRef}
           onResponderTerminationRequest={true}
           onStartShouldSetResponderCapture={false}
@@ -120,8 +125,18 @@ export const Initialize = () => {
               },
             ],
           }}>
+            <Screen
+            active={1}
+          style={{
+            width:'100%',
+            height:'100%'
+          }}
+            >
+
+           
           <Editor noMenu={false} />
-        </Animated.View>
+          </Screen>
+        </AnimatedScreenContainer>
       </Animatable.View>
       <Toast />
       <DialogManager colors={colors} />

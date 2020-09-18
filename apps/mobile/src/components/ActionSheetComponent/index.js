@@ -1,17 +1,19 @@
 import React, {createRef, useEffect, useState} from 'react';
 import {
+  ActivityIndicator,
   Dimensions,
   StatusBar,
   Text,
   TextInput,
   TouchableOpacity,
   View,
+  Clipboard,
 } from 'react-native';
-import MMKV from 'react-native-mmkv-storage';
 import Share from 'react-native-share';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
   ACCENT,
+  COLORS_NOTE,
   COLOR_SCHEME,
   COLOR_SCHEME_DARK,
   COLOR_SCHEME_LIGHT,
@@ -24,11 +26,25 @@ import {
 } from '../../common/common';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
+import {eSendEvent, openVault} from '../../services/eventManager';
+import {
+  eOpenLoginDialog,
+  eOpenMoveNoteDialog,
+  refreshNotesPage,
+} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
-import {timeConverter, ToastEvent, DDS, db} from '../../utils/utils';
-import {openVault, eSendEvent} from '../../services/eventManager';
-import {refreshNotesPage, eOpenPremiumDialog} from '../../services/events';
+import {MMKV} from '../../utils/storage';
+import {
+  db,
+  DDS,
+  hexToRGBA,
+  RGB_Linear_Shade,
+  timeConverter,
+  ToastEvent,
+} from '../../utils/utils';
 import {PremiumTag} from '../Premium/PremiumTag';
+import {PressableButton} from '../PressableButton';
+import {Toast} from '../Toast';
 
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
@@ -43,8 +59,9 @@ export const ActionSheetComponent = ({
   columnItems = [],
 }) => {
   const [state, dispatch] = useTracked();
-  const {colors, tags, premiumUser} = state;
+  const {colors, tags, premiumUser, user} = state;
   const [focused, setFocused] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [note, setNote] = useState(
     item
       ? item
@@ -102,7 +119,7 @@ export const ActionSheetComponent = ({
     tagToAdd = '';
   };
 
-  const _onKeyPress = async event => {
+  const _onKeyPress = async (event) => {
     if (event.nativeEvent.key === 'Backspace') {
       if (backPressCount === 0 && !tagToAdd) {
         backPressCount = 1;
@@ -198,8 +215,10 @@ export const ActionSheetComponent = ({
       func: () => {
         dispatch({type: ACTIONS.MODAL_NAVIGATOR, enabled: true});
         dispatch({type: ACTIONS.SELECTED_ITEMS, item: note});
-
-        close('movenote');
+        close();
+        setTimeout(() => {
+          eSendEvent(eOpenMoveNoteDialog);
+        }, 400);
       },
     },
     {
@@ -224,7 +243,7 @@ export const ActionSheetComponent = ({
       name: 'Export',
       icon: 'export',
       func: () => {
-        close();
+        close('export');
       },
     },
     {
@@ -247,20 +266,18 @@ export const ActionSheetComponent = ({
       },
     },
     {
-      name: 'Open',
-      icon: 'open-in-app',
-      func: () => {
-        NavigationService.navigate('Editor', {
-          note: item,
-        });
-        close();
+      name: 'Copy',
+      icon: 'content-copy',
+      func: async () => {
+        let text = await db.notes.note(note.id).text();
+        Clipboard.setString(text);
+        ToastEvent.show('Note copied to clipboard', 'success', 'local');
       },
     },
     {
       name: 'Restore',
       icon: 'delete-restore',
       func: async () => {
-        await db.trash.restore(note.id);
         dispatch({type: ACTIONS.TRASH});
         localRefresh(note.type);
         ToastEvent.show(
@@ -295,6 +312,7 @@ export const ActionSheetComponent = ({
       switch: true,
       on: colors.night ? true : false,
       close: false,
+      nopremium: true,
     },
     {
       name: 'Pin',
@@ -362,7 +380,7 @@ export const ActionSheetComponent = ({
               dispatch({type: ACTIONS.PINNED});
               close();
             })
-            .catch(async e => {
+            .catch(async (e) => {
               switch (e.message) {
                 case db.vault.ERRORS.noVault:
                   close('novault');
@@ -383,7 +401,7 @@ export const ActionSheetComponent = ({
     },
   ];
 
-  const _renderTag = tag => (
+  const _renderTag = (tag) => (
     <TouchableOpacity
       key={tag}
       onPress={async () => {
@@ -423,43 +441,48 @@ export const ActionSheetComponent = ({
     </TouchableOpacity>
   );
 
-  const _renderColor = color => (
-    <TouchableOpacity
-      key={color}
-      onPress={async () => {
-        let noteColors = note.colors;
+  const _renderColor = (c) => {
+    const color = {
+      name: c,
+      value: COLORS_NOTE[c],
+    };
 
-        if (noteColors.includes(color)) {
-          await db.notes.note(note.id).uncolor(color);
-        } else {
-          await db.notes.note(note.id).color(color);
-        }
-        dispatch({type: ACTIONS.COLORS});
-        localRefresh(note.type);
-      }}
-      style={{
-        flexDirection: 'row',
-        justifyContent: 'flex-start',
-        alignItems: 'center',
-        borderColor: colors.nav,
-      }}>
-      <View
-        style={{
+    return (
+      <PressableButton
+        color={RGB_Linear_Shade(
+          !colors.night ? -0.2 : 0.2,
+          hexToRGBA(color.value, 1),
+        )}
+        selectedColor={color.value}
+        alpha={!colors.night ? -0.1 : 0.1}
+        opacity={1}
+        key={color.value}
+        onPress={async () => {
+          let noteColors = note.colors;
+
+          if (noteColors.includes(color.name)) {
+            await db.notes.note(note.id).uncolor(color.name);
+          } else {
+            await db.notes.note(note.id).color(color.name);
+          }
+          dispatch({type: ACTIONS.COLORS});
+          localRefresh(note.type);
+        }}
+        customStyle={{
           width: DDS.isTab ? 400 / 10 : w / 10,
           height: DDS.isTab ? 400 / 10 : w / 10,
-          backgroundColor: color,
           borderRadius: 100,
           justifyContent: 'center',
           alignItems: 'center',
         }}>
-        {note && note.colors && note.colors.includes(color) ? (
+        {note && note.colors && note.colors.includes(color.name) ? (
           <Icon name="check" color="white" size={SIZE.lg} />
         ) : null}
-      </View>
-    </TouchableOpacity>
-  );
+      </PressableButton>
+    );
+  };
 
-  const _renderRowItem = rowItem =>
+  const _renderRowItem = (rowItem) =>
     rowItems.includes(rowItem.name) ? (
       <TouchableOpacity
         onPress={rowItem.func}
@@ -497,7 +520,7 @@ export const ActionSheetComponent = ({
       </TouchableOpacity>
     ) : null;
 
-  const _renderColumnItem = item =>
+  const _renderColumnItem = (item) =>
     (note.id && columnItems.includes(item.name)) ||
     (item.name === 'Dark Mode' && columnItems.includes(item.name)) ? (
       <TouchableOpacity
@@ -537,21 +560,21 @@ export const ActionSheetComponent = ({
             {item.name}
           </Text>
         </View>
-        {item.switch ? (
-          <Icon
-            size={SIZE.lg + 2}
-            color={item.on ? colors.accent : colors.icon}
-            name={item.on ? 'toggle-switch' : 'toggle-switch-off'}
-          />
-        ) : (
-          undefined
-        )}
+
         <View
           style={{
             flexDirection: 'row',
             alignItems: 'center',
           }}>
-          <PremiumTag pro={false} />
+          {item.switch ? (
+            <Icon
+              size={SIZE.lg + 2}
+              color={item.on ? colors.accent : colors.icon}
+              name={item.on ? 'toggle-switch' : 'toggle-switch-off'}
+            />
+          ) : undefined}
+
+          {item.nopremium ? null : <PremiumTag pro={premiumUser} />}
 
           {item.check ? (
             <Icon
@@ -568,6 +591,41 @@ export const ActionSheetComponent = ({
       </TouchableOpacity>
     ) : null;
 
+  const onPressSync = async () => {
+    if (!user) {
+      ToastEvent.show(
+        'You must login to sync',
+        'error',
+        'local',
+        5000,
+        () => {
+          close();
+          setTimeout(() => {
+            eSendEvent(eOpenLoginDialog);
+          }, 500);
+        },
+        'Login',
+      );
+      return;
+    }
+    if (user?.lastSynced < note?.dateEdited) {
+      setRefreshing(true);
+      try {
+        let user = await db.user.get();
+        dispatch({type: ACTIONS.USER, user: user});
+        await db.sync();
+        localRefresh();
+        setRefreshing(false);
+
+        ToastEvent.show('Note synced', 'success', 'local');
+      } catch (e) {
+        setRefreshing(false);
+        ToastEvent.show(e.message, 'error', 'local');
+      }
+      dispatch({type: ACTIONS.ALL});
+    }
+  };
+
   return (
     <View
       onLayout={() => {
@@ -578,7 +636,7 @@ export const ActionSheetComponent = ({
       style={{
         paddingBottom: 30,
         backgroundColor: colors.bg,
-        width: '100%',
+        width: w,
         paddingHorizontal: 0,
       }}>
       {!note.id && !note.dateCreated ? (
@@ -602,7 +660,7 @@ export const ActionSheetComponent = ({
           <Text
             numberOfLines={1}
             style={{
-              color: colors.pri,
+              color: colors.heading,
               fontSize: SIZE.sm + 1,
               fontFamily: WEIGHT.bold,
               maxWidth: '100%',
@@ -659,7 +717,7 @@ export const ActionSheetComponent = ({
                 flexWrap: 'wrap',
               }}>
               {note && note.topics
-                ? note.topics.slice(1, 4).map(topic => (
+                ? note.topics.slice(1, 4).map((topic) => (
                     <View
                       key={topic.dateCreated.toString() + topic.title}
                       style={{
@@ -686,23 +744,34 @@ export const ActionSheetComponent = ({
             </View>
           )}
 
-          {note.type !== 'note' ? null : (
+          {note.type !== 'note' || refreshing ? null : (
             <Text
+              onPress={onPressSync}
               style={{
                 color: colors.accent,
                 fontSize: SIZE.xs - 1,
                 textAlignVertical: 'center',
                 fontFamily: WEIGHT.regular,
-                marginTop: 2,
+                marginTop: 5,
                 borderWidth: 1,
                 textAlign: 'center',
                 borderColor: colors.accent,
                 paddingHorizontal: 5,
                 borderRadius: 2,
               }}>
-              Synced
+              {user && user.lastSynced > note.dateEdited
+                ? 'Synced'
+                : 'Sync Now'}
             </Text>
           )}
+
+          {refreshing ? (
+            <ActivityIndicator
+              style={{marginTop: 5}}
+              size={12}
+              color={colors.accent}
+            />
+          ) : null}
         </View>
       )}
 
@@ -731,9 +800,7 @@ export const ActionSheetComponent = ({
             alignItems: 'center',
             justifyContent: 'space-between',
           }}>
-          {['red', 'yellow', 'green', 'blue', 'purple', 'orange', 'gray'].map(
-            _renderColor,
-          )}
+          {Object.keys(COLORS_NOTE).map(_renderColor)}
         </View>
       ) : null}
 
@@ -757,14 +824,16 @@ export const ActionSheetComponent = ({
                 color: colors.accent,
               }}>
               {tags.filter(
-                o => o.count > 1 && !note.tags.find(t => t === o.title),
+                (o) => o.count > 1 && !note.tags.find((t) => t === o.title),
               ).length === 0
                 ? ''
                 : 'Suggestions '}
             </Text>
             {tags
-              .filter(o => o.count > 1 && !note.tags.find(t => t === o.title))
-              .map(tag => (
+              .filter(
+                (o) => o.count > 1 && !note.tags.find((t) => t === o.title),
+              )
+              .map((tag) => (
                 <TouchableOpacity
                   key={tag.title}
                   onPress={() => {
@@ -877,7 +946,7 @@ export const ActionSheetComponent = ({
                 setFocused(false);
               }}
               placeholder="#hashtag"
-              onChangeText={value => {
+              onChangeText={(value) => {
                 tagToAdd = value;
                 if (tagToAdd.length > 0) backPressCount = 0;
               }}
@@ -899,6 +968,7 @@ export const ActionSheetComponent = ({
           }}
         />
       ) : null}
+      <Toast context="local" />
     </View>
   );
 };

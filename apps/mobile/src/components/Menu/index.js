@@ -8,7 +8,7 @@ import {
   View,
 } from 'react-native';
 import {createAnimatableComponent} from 'react-native-animatable';
-import MMKV from 'react-native-mmkv-storage';
+
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
   ACCENT,
@@ -28,6 +28,7 @@ import {ColorSection} from './ColorSection';
 import {MenuListItem} from './MenuListItem';
 import {TagsSection} from './TagsSection';
 import {UserSection} from './UserSection';
+import {MMKV} from '../../utils/storage';
 
 const AnimatedSafeAreaView = createAnimatableComponent(SafeAreaView);
 
@@ -41,7 +42,6 @@ export const Menu = ({
   const [state, dispatch] = useTracked();
   const {colors} = state;
 
-  // todo
 
   function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
     let newColors = setColorScheme(colors, accent);
@@ -97,7 +97,7 @@ export const Menu = ({
     },
     {
       name: 'Settings',
-      icon: 'settings-outline',
+      icon: 'cog-outline',
       func: () => NavigationService.navigate('Settings'),
       close: true,
     },
@@ -169,7 +169,7 @@ export const Menu = ({
           index={10}
           item={{
             name: 'Tags',
-            icon:'tag',
+            icon: 'tag',
             func: () => {
               close();
               NavigationService.navigate('Tags');
@@ -194,7 +194,12 @@ export const Menu = ({
             width: '100%',
           }}>
           {listItems2.map((item, index) => (
-            <MenuListItem item={item} index={index} ignore={true} noTextMode={noTextMode} />
+            <MenuListItem
+              item={item}
+              index={index}
+              ignore={true}
+              noTextMode={noTextMode}
+            />
           ))}
         </View>
 

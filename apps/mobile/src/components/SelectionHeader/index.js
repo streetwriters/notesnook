@@ -1,40 +1,53 @@
 import React, {useEffect, useState} from 'react';
-import {Platform, StatusBar, Text, TouchableOpacity, View} from 'react-native';
-import * as Animatable from 'react-native-animatable';
+import {Text, TouchableOpacity, View} from 'react-native';
+import Animated, {Easing, useValue} from 'react-native-reanimated';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
-import {eOpenMoveNoteDialog, eOpenSimpleDialog, eOpenPremiumDialog} from '../../services/events';
-import {db, selection, ToastEvent} from '../../utils/utils';
+import {eOpenMoveNoteDialog, eOpenSimpleDialog} from '../../services/events';
+import {db, ToastEvent} from '../../utils/utils';
 import {TEMPLATE_DELETE} from '../DialogManager/templates';
 
 export const SelectionHeader = () => {
   // State
   const [state, dispatch] = useTracked();
-  const {colors, selectionMode, selectedItemsList, currentScreen,containerState, premiumUser} = state;
+  const {
+    colors,
+    selectionMode,
+    selectedItemsList,
+    currentScreen,
+    containerState,
+    premiumUser,
+  } = state;
   const [selectAll, setSelectAll] = useState(false);
+  const insets = useSafeAreaInsets();
+  const translateY = useValue(-150);
 
+  useEffect(() => {
+    Animated.timing(translateY, {
+      duration: 300,
+      toValue: selectionMode ? 0 : -150,
+      easing: Easing.in(Easing.ease),
+    }).start();
+  }, [selectionMode]);
 
-  return (containerState.noSelectionHeader ? null :
-    <Animatable.View
-      transition={['translateY']}
-      duration={300}
-      useNativeDriver={true}
+  return containerState.noSelectionHeader ? null : (
+    <Animated.View
       style={{
         width: '100%',
         position: 'absolute',
-        height: Platform.OS === 'android' ? 100 + StatusBar.currentHeight : 80,
+        height: 50,
         backgroundColor: colors.bg,
-        paddingTop: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight,
+        marginTop: insets.top,
         justifyContent: 'flex-end',
-     
         zIndex: 999,
         paddingHorizontal: 12,
         transform: [
           {
-            translateY: selectionMode ? 0 : -150,
+            translateY: translateY,
           },
         ],
       }}>
@@ -62,7 +75,7 @@ export const SelectionHeader = () => {
               justifyContent: 'center',
               alignItems: 'flex-start',
               height: 40,
-              width: 50,
+              width: 60,
             }}>
             <Icon
               style={{
@@ -93,23 +106,30 @@ export const SelectionHeader = () => {
           }}>
           {currentScreen === 'trash' || currentScreen === 'notebooks' ? null : (
             <TouchableOpacity
+              style={{
+                justifyContent: 'center',
+                alignItems: 'flex-end',
+                height: 40,
+                width: 50,
+                paddingRight: 0,
+              }}
               onPress={() => {
                 dispatch({type: ACTIONS.SELECTION_MODE, enabled: false});
                 dispatch({type: ACTIONS.CLEAR_SELECTION});
                 eSendEvent(eOpenMoveNoteDialog);
               }}>
-              <Icon
-                style={{
-                  paddingLeft: 25,
-                }}
-                color={colors.icon}
-                name={'plus'}
-                size={SIZE.xl}
-              />
+              <Icon color={colors.heading} name={'plus'} size={SIZE.xl} />
             </TouchableOpacity>
           )}
-          {currentScreen === 'trash' || currentScreen === 'notebooks' ? null : (
+          {/*   {currentScreen === 'trash' || currentScreen === 'notebooks' ? null : (
             <TouchableOpacity
+              style={{
+                justifyContent: 'center',
+                alignItems: 'flex-end',
+                height: 40,
+                width: 50,
+                paddingRight: 0,
+              }}
               onPress={async () => {
                 if (!premiumUser) {
                   eSendEvent(eOpenPremiumDialog);
@@ -118,7 +138,7 @@ export const SelectionHeader = () => {
                 let favCount = 0;
                 let unFavCount = 0;
                 if (selectedItemsList.length > 0) {
-                  selectedItemsList.forEach(async item => {
+                  selectedItemsList.forEach(async (item) => {
                     if (!item.favorite) {
                       favCount += 1;
                     } else {
@@ -139,40 +159,40 @@ export const SelectionHeader = () => {
                   );
                 }
               }}>
-              <Icon
-                style={{
-                  paddingLeft: 25,
-                }}
-                color={colors.icon}
-                name={'star'}
-                size={SIZE.xl - 3}
-              />
+              <Icon color={colors.heading} name={'star'} size={SIZE.xl - 3} />
             </TouchableOpacity>
-          )}
+          )} */}
 
           {currentScreen === 'trash' ? null : (
             <TouchableOpacity
+              style={{
+                justifyContent: 'center',
+                alignItems: 'flex-end',
+                height: 40,
+                width: 50,
+                paddingRight: 0,
+              }}
               onPress={async () => {
                 eSendEvent(eOpenSimpleDialog, TEMPLATE_DELETE('item'));
                 return;
               }}>
-              <Icon
-                style={{
-                  paddingLeft: 25,
-                }}
-                color={colors.icon}
-                name={'delete'}
-                size={SIZE.xl - 3}
-              />
+              <Icon color={colors.heading} name={'delete'} size={SIZE.xl - 3} />
             </TouchableOpacity>
           )}
 
           {currentScreen === 'trash' ? (
             <TouchableOpacity
+              style={{
+                justifyContent: 'center',
+                alignItems: 'flex-end',
+                height: 40,
+                width: 50,
+                paddingRight: 0,
+              }}
               onPress={async () => {
                 if (selectedItemsList.length > 0) {
                   let noteIds = [];
-                  selectedItemsList.forEach(item => {
+                  selectedItemsList.forEach((item) => {
                     noteIds.push(item.id);
                   });
 
@@ -185,10 +205,7 @@ export const SelectionHeader = () => {
                 }
               }}>
               <Icon
-                style={{
-                  paddingLeft: 25,
-                }}
-                color={colors.icon}
+                color={colors.heading}
                 name="delete-restore"
                 size={SIZE.xl - 3}
               />
@@ -197,7 +214,7 @@ export const SelectionHeader = () => {
         </View>
       </View>
 
-      <TouchableOpacity
+      {/*     <TouchableOpacity
         onPress={() => {
           if (selectAll) {
             dispatch({type: ACTIONS.SELECT_ALL, selected: []});
@@ -235,8 +252,8 @@ export const SelectionHeader = () => {
           }}>
           Select All
         </Text>
-      </TouchableOpacity>
-    </Animatable.View>
+      </TouchableOpacity> */}
+    </Animated.View>
   );
 };
 

@@ -1,10 +1,11 @@
 import React, {useEffect, useState} from 'react';
-import {Keyboard, Text, TouchableOpacity, View} from 'react-native';
+import {Keyboard, Text, View} from 'react-native';
+import {useSafeArea} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {br, opacity, pv, SIZE, WEIGHT} from '../../common/common';
+import {pv, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
 import {DDS, getElevation} from '../../utils/utils';
-import {useSafeArea} from 'react-native-safe-area-context';
+import {PressableButton} from '../PressableButton';
 
 export const ContainerBottomButton = ({root}) => {
   const [state, dispatch] = useTracked();
@@ -58,21 +59,21 @@ export const ContainerBottomButton = ({root}) => {
           },
         ],
       }}>
-      <TouchableOpacity
-        activeOpacity={opacity}
-        onPress={containerBottomButton.bottomButtonOnPress}
-        style={{
-          ...getElevation(5),
-          width: '100%',
-          alignSelf: 'center',
-          borderRadius: br,
-          backgroundColor: containerBottomButton.color
+      <PressableButton
+        color={
+          containerBottomButton.color
             ? containerBottomButton.color
-            : colors.accent,
-          justifyContent: 'center',
-          alignItems: 'center',
-          marginBottom: 0,
-        }}>
+            : colors.accent
+        }
+        selectedColor={
+          containerBottomButton.color
+            ? containerBottomButton.color
+            : colors.accent
+        }
+        customStyle={{
+          ...getElevation(5),
+        }}
+        onPress={containerBottomButton.bottomButtonOnPress}>
         <View
           style={{
             justifyContent: 'flex-start',
@@ -80,6 +81,7 @@ export const ContainerBottomButton = ({root}) => {
             flexDirection: 'row',
             width: '100%',
             padding: pv,
+            borderRadius: 5,
             paddingVertical: pv + 5,
           }}>
           <Icon
@@ -101,7 +103,7 @@ export const ContainerBottomButton = ({root}) => {
             {'  ' + containerBottomButton.bottomButtonText}
           </Text>
         </View>
-      </TouchableOpacity>
+      </PressableButton>
     </View>
   );
 };

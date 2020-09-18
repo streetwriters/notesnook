@@ -1,12 +1,13 @@
 import React from 'react';
-import {Modal, TouchableOpacity, View, Text, FlatList} from 'react-native';
+import {FlatList, Modal, Text, TouchableOpacity, View} from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import {DDS, getElevation} from '../../utils/utils';
-import {SIZE, WEIGHT, opacity, pv} from '../../common/common';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import NavigationService from '../../services/NavigationService';
+import {opacity, pv, SIZE, WEIGHT} from '../../common/common';
 import {eSendEvent} from '../../services/eventManager';
 import {eCloseSideMenu} from '../../services/events';
+import NavigationService from '../../services/NavigationService';
+import {Button} from '../Button';
+import Seperator from '../Seperator';
 
 class PremiumDialog extends React.Component {
   constructor(props) {
@@ -79,7 +80,7 @@ class PremiumDialog extends React.Component {
               style={{
                 fontSize: SIZE.lg,
                 fontFamily: WEIGHT.bold,
-                color: colors.pri,
+                color: colors.heading,
                 paddingVertical: 20,
               }}>
               Unlock Premium Features
@@ -109,7 +110,7 @@ class PremiumDialog extends React.Component {
                 'Rich-text editor for all your note taking needs',
                 'Secure local vault',
               ]}
-              keyExtractor={(item,index) => item}
+              keyExtractor={(item, index) => item}
               renderItem={({item, index}) => (
                 <View
                   style={{
@@ -155,8 +156,8 @@ class PremiumDialog extends React.Component {
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              activeOpacity={opacity}
+            <Seperator />
+            <Button
               onPress={() => {
                 this.close();
                 eSendEvent(eCloseSideMenu);
@@ -165,27 +166,11 @@ class PremiumDialog extends React.Component {
                   fromHome: true,
                 });
               }}
-              style={{
-                ...getElevation(3),
-                padding: pv + 2,
-                backgroundColor: colors.accent,
-                borderRadius: 5,
-                marginTop: 10,
-                marginHorizontal: 12,
-                marginBottom: 10,
-                alignItems: 'center',
-                width: '100%',
-              }}>
-              <Text
-                style={{
-                  fontSize: SIZE.sm,
-                  fontFamily: WEIGHT.medium,
-                  color: 'white',
-                  textAlign: 'center',
-                }}>
-                Start your 14 day trial
-              </Text>
-            </TouchableOpacity>
+              title="Start your 14 day trial"
+              height={50}
+              width="100%"
+            />
+
             <Text
               style={{
                 fontSize: SIZE.xxs,

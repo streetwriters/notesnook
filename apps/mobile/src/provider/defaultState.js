@@ -16,12 +16,15 @@ export const defaultState = {
   tags: [],
   colorNotes: [],
   user: {},
-  premiumUser:false,
+  premiumUser:true,
   settings: {
     showToolbarOnTop: false,
     showKeyboardOnOpen: false,
     fontScale: 1,
     forcePortraitOnTablet: false,
+    useSystemTheme:true,
+    reminder:'weekly',
+    encryptedBackups:false
   },
   currentScreen: 'home',
   colors: {

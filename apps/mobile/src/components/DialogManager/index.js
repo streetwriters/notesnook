@@ -21,7 +21,8 @@ import {
   eOpenMoveNoteDialog,
   eOpenSimpleDialog,
   eOpenPremiumDialog,
-  eClosePremiumDialog
+  eClosePremiumDialog,
+  eOpenExportDialog
 } from '../../services/events';
 import {DDS, hexToRGBA} from '../../utils/utils';
 import ActionSheet from '../ActionSheet';
@@ -36,6 +37,7 @@ import {TEMPLATE_DELETE, TEMPLATE_PERMANANT_DELETE} from './templates';
 import MoveNoteDialog from '../MoveNoteDialog';
 import LoginDialog from '../LoginDialog';
 import PremiumDialog from '../Premium/PremiumDialog';
+import ExportDialog from '../ExportDialog';
 
 export class DialogManager extends Component {
   constructor(props) {
@@ -85,11 +87,13 @@ export class DialogManager extends Component {
   };
 
   _showMoveNote = () => {
-    this.moveNoteDialog.open();
+    
+    ///this.moveNoteDialog.open();
   };
 
   _hideMoveNote = () => {
-    this.moveNoteDialog.close();
+    //eSendEvent(eCloseMoveNoteDialog)
+   // this.moveNoteDialog.close();
   };
 
   loadNote = i => {
@@ -179,22 +183,22 @@ export class DialogManager extends Component {
   
 
   showLoginDialog = () => {
-    this.loginDialog.open();
+    //this.loginDialog.open();
   };
 
   hideLoginDialog = () => {
-    this.loginDialog.close();
+    //this.loginDialog.close();
   };
 
   showAddNotebook = data => {
-    this.setState(
+     this.setState(
       {
         item: data.item ? data.item : {},
       },
       () => {
         this.addNotebooksDialog.open();
       },
-    );
+    ); 
   };
   hideAddNotebook = () => {
     this.addNotebooksDialog.close();
@@ -250,16 +254,20 @@ export class DialogManager extends Component {
           break;
         }
         case 'movenote': {
-          moveNoteEvent();
+         // this._showMoveNote();
           break;
         }
         case "premium": {
           eSendEvent(eOpenPremiumDialog);
         }
+        case "export": {
+          eSendEvent(eOpenExportDialog,[this.state.item]);
+        }
       }
     }
     this.show = null;
   };
+  
 
   render() {
     let {colors} = this.props;
@@ -294,9 +302,7 @@ export class DialogManager extends Component {
                 }
               : null
           }
-          initialOffsetFromBottom={
-            DDS.isTab || item?.type !== 'note' || item.dateDeleted ? 1 : 0.5
-          }
+          initialOffsetFromBottom={1}
           bounceOnOpen={true}
           gestureEnabled={true}
           onClose={() => {
@@ -333,7 +339,7 @@ export class DialogManager extends Component {
         <VaultDialog colors={colors} />
 
         <MoveNoteDialog
-          ref={ref => (this.moveNoteDialog = ref)}
+       
           colors={colors}
         />
 
@@ -354,9 +360,11 @@ export class DialogManager extends Component {
         />
         <PremiumDialog ref={ref => this.premiumDialog = ref}  colors={colors} />
 
-        <LoginDialog colors={colors} ref={ref => (this.loginDialog = ref)} />
+        <LoginDialog colors={colors}  />
 
         <MergeEditor />
+
+        <ExportDialog/>
       </>
     );
   }

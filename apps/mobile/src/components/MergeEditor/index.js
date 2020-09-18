@@ -1,26 +1,27 @@
-import React, { createRef, useEffect, useState } from 'react';
-import { Modal, Text, TouchableOpacity, View } from 'react-native';
-import Animated, { Easing } from 'react-native-reanimated';
+import React, {createRef, useEffect, useState} from 'react';
+import {Modal, Text, TouchableOpacity, View, SafeAreaView} from 'react-native';
+import Animated, {Easing} from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import WebView from 'react-native-webview';
-import { normalize, SIZE, WEIGHT } from '../../common/common';
-import { useTracked } from '../../provider';
+import {normalize, SIZE} from '../../common/common';
+import {useTracked} from '../../provider';
+import {ACTIONS} from '../../provider/actions';
 import {
+  eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-  eSendEvent,
 } from '../../services/eventManager';
 import {
   eApplyChanges,
   eShowMergeDialog,
   refreshNotesPage,
 } from '../../services/events';
-import { getElevation, h, db } from '../../utils/utils';
-import { simpleDialogEvent, updateEvent } from '../DialogManager/recievers';
-import { TEMPLATE_APPLY_CHANGES } from '../DialogManager/templates';
-import { ACTIONS } from '../../provider/actions';
+import {db, h} from '../../utils/utils';
+import {Button} from '../Button';
+import {simpleDialogEvent, updateEvent} from '../DialogManager/recievers';
+import {TEMPLATE_APPLY_CHANGES} from '../DialogManager/templates';
 
-const { Value, timing } = Animated;
+const {Value, timing} = Animated;
 
 const firstWebViewHeight = new Value(h * 0.5 - 50);
 const secondWebViewHeight = new Value(h * 0.5 - 50);
@@ -78,7 +79,7 @@ let secondaryText = '';
 
 const MergeEditor = () => {
   const [state, dispatch] = useTracked();
-  const { colors } = state;
+  const {colors} = state;
   const [visible, setVisible] = useState(false);
   const [primary, setPrimary] = useState(true);
   const [secondary, setSecondary] = useState(true);
@@ -86,10 +87,10 @@ const MergeEditor = () => {
   const [copyToSave, setCopyToSave] = useState(null);
   const [disardedContent, setDiscardedContent] = useState(null);
 
-  const postMessageToPrimaryWebView = message =>
+  const postMessageToPrimaryWebView = (message) =>
     primaryWebView.current?.postMessage(JSON.stringify(message));
 
-  const postMessageToSecondaryWebView = message =>
+  const postMessageToSecondaryWebView = (message) =>
     secondaryWebView.current?.postMessage(JSON.stringify(message));
 
   const onPrimaryWebViewLoad = () => {
@@ -97,7 +98,7 @@ const MergeEditor = () => {
       type: 'delta',
       value: primaryDelta,
     });
-    let c = { ...colors };
+    let c = {...colors};
     c.factor = normalize(1);
     postMessageToPrimaryWebView({
       type: 'theme',
@@ -110,7 +111,7 @@ const MergeEditor = () => {
       type: 'delta',
       value: secondaryDelta,
     });
-    let c = { ...colors };
+    let c = {...colors};
     c.factor = normalize(1);
     postMessageToSecondaryWebView({
       type: 'theme',
@@ -118,7 +119,7 @@ const MergeEditor = () => {
     });
   };
 
-  const _onShouldStartLoadWithRequest = request => {
+  const _onShouldStartLoadWithRequest = (request) => {
     if (request.url.includes('https')) {
       Linking.openURL(request.url);
       return false;
@@ -127,8 +128,7 @@ const MergeEditor = () => {
     }
   };
 
-  const onMessageFromPrimaryWebView = evt => {
-
+  const onMessageFromPrimaryWebView = (evt) => {
     if (evt.nativeEvent.data !== '') {
       let data = JSON.parse(evt.nativeEvent.data);
       primaryDelta = data.delta;
@@ -136,8 +136,7 @@ const MergeEditor = () => {
     }
   };
 
-  const onMessageFromSecondaryWebView = evt => {
-
+  const onMessageFromSecondaryWebView = (evt) => {
     if (evt.nativeEvent.data !== '') {
       let data = JSON.parse(evt.nativeEvent.data);
       secondaryDelta = data.delta;
@@ -146,14 +145,13 @@ const MergeEditor = () => {
   };
 
   const applyChanges = async () => {
-
     if (keepContentFrom === 'primary') {
       await db.notes.add({
         content: {
           text: primaryText,
           delta: {
             data: primaryDelta,
-            resolved: true
+            resolved: true,
           },
         },
         id: note.id,
@@ -165,7 +163,7 @@ const MergeEditor = () => {
           text: secondaryText,
           delta: {
             data: primaryDelta,
-            resolved: true
+            resolved: true,
           },
         },
         id: note.id,
@@ -191,15 +189,13 @@ const MergeEditor = () => {
       });
     }
     eSendEvent(refreshNotesPage);
-    updateEvent({ type: ACTIONS.NOTES });
-    updateEvent({ type: ACTIONS.FAVORITES });
+    updateEvent({type: ACTIONS.NOTES});
+    updateEvent({type: ACTIONS.FAVORITES});
     close();
   };
 
-  const show = async item => {
+  const show = async (item) => {
     note = item;
-
-
 
     let rawDelta = await db.delta.raw(note.content.delta);
     primaryDelta = rawDelta.data;
@@ -216,7 +212,7 @@ const MergeEditor = () => {
       eUnSubscribeEvent(eApplyChanges, applyChanges);
       eUnSubscribeEvent(eShowMergeDialog, show);
     };
-  },[]);
+  }, []);
 
   const onPressKeepFromPrimaryWebView = () => {
     if (keepContentFrom == 'primary') {
@@ -279,388 +275,302 @@ const MergeEditor = () => {
     'Web.bundle/loader.html';
   const injectedJS = `if (!window.location.search) {
          var link = document.getElementById('progress-bar');
-          link.href = './site2/plaineditor.html?${params}';
+          link.href = './site/plaineditor.html?${params}';
           link.click();  
     }`;
 
+
+
+
   return (
     <Modal transparent={false} animated animationType="fade" visible={visible}>
-      <View
+      <SafeAreaView
         style={{
-          height: '100%',
-          width: '100%',
-          backgroundColor: 'rgba(0,0,0,0.3)',
+          backgroundColor: colors.nav,
         }}>
         <View
           style={{
-            backgroundColor: '#f0f0f0',
+            height: '100%',
             width: '100%',
-            height: 50,
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            paddingHorizontal: 12,
+            backgroundColor: 'rgba(0,0,0,0.3)',
           }}>
           <View
             style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}>
-            <Icon
-              style={{
-                width: 50,
-                height: 50,
-                textAlign: 'center',
-                textAlignVertical: 'center',
-                marginLeft: -8,
-              }}
-              onPress={close}
-              size={SIZE.xxl}
-              name="chevron-left"
-            />
-            <TouchableOpacity
-              onPress={() => {
-                if (keepContentFrom === 'primary') return;
-                if (!primary) {
-                  openEditorAnimation(
-                    firstWebViewHeight,
-                    secondary && keepContentFrom !== 'secondary'
-                      ? secondWebViewHeight
-                      : null,
-                    secondary && keepContentFrom !== 'secondary',
-                  );
-                  setPrimary(true);
-                } else {
-                  closeEditorAnimation(
-                    firstWebViewHeight,
-                    secondary && keepContentFrom !== 'secondary'
-                      ? secondWebViewHeight
-                      : null,
-                  );
-                  setPrimary(false);
-                }
-              }}
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-              }}>
-              <Text
-                style={{
-                  color: colors.icon,
-                  fontSize: SIZE.xxs,
-                }}>
-                Saved on 10/10/20 {'\n'}
-                12:30pm on Tablet
-              </Text>
-              <Icon
-                size={SIZE.lg}
-                name={primary ? 'chevron-up' : 'chevron-down'}
-              />
-            </TouchableOpacity>
-          </View>
-
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}>
-            {keepContentFrom === 'secondary' ? (
-              <TouchableOpacity
-                onPress={onPressSaveCopyFromPrimaryWebView}
-                style={{
-                  ...getElevation(5),
-                  height: 35,
-                  backgroundColor: colors.accent,
-                  borderRadius: 5,
-                  paddingHorizontal: 12,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginRight: 10,
-                }}>
-                <Text
-                  style={{
-                    color: 'white',
-                    textAlign: 'center',
-                    fontFamily: WEIGHT.regular,
-                    fontSize: SIZE.sm - 2,
-                  }}>
-                  Save as a copy
-                </Text>
-              </TouchableOpacity>
-            ) : null}
-
-            {keepContentFrom === 'secondary' ? (
-              <TouchableOpacity
-                onPress={onPressDiscardFromPrimaryWebView}
-                style={{
-                  ...getElevation(5),
-                  height: 35,
-                  backgroundColor: colors.errorText,
-                  borderRadius: 5,
-                  paddingHorizontal: 12,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}>
-                <Text
-                  style={{
-                    color: 'white',
-                    textAlign: 'center',
-                    fontFamily: WEIGHT.regular,
-                    fontSize: SIZE.sm - 2,
-                  }}>
-                  Discard
-                </Text>
-              </TouchableOpacity>
-            ) : null}
-
-            {keepContentFrom === 'secondary' ? null : (
-              <TouchableOpacity
-                onPress={onPressKeepFromPrimaryWebView}
-                style={{
-                  ...getElevation(5),
-                  height: 35,
-                  backgroundColor:
-                    keepContentFrom === 'primary'
-                      ? colors.errorText
-                      : colors.accent,
-                  borderRadius: 5,
-                  paddingHorizontal: 12,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}>
-                <Text
-                  style={{
-                    color: 'white',
-                    textAlign: 'center',
-                    fontFamily: WEIGHT.regular,
-                    fontSize: SIZE.sm - 2,
-                  }}>
-                  {keepContentFrom === 'primary' ? 'Undo' : 'Keep'}
-                </Text>
-              </TouchableOpacity>
-            )}
-          </View>
-        </View>
-
-        <Animated.View
-          style={{
-            height: firstWebViewHeight,
-          }}>
-          <WebView
-            onLoad={onPrimaryWebViewLoad}
-            ref={primaryWebView}
-            style={{
+              backgroundColor: colors.nav,
               width: '100%',
-              height: '100%',
-            }}
-            injectedJavaScript={Platform.OS === 'ios' ? injectedJS : null}
-            onShouldStartLoadWithRequest={_onShouldStartLoadWithRequest}
-            cacheMode="LOAD_DEFAULT"
-            domStorageEnabled={true}
-            scrollEnabled={false}
-            bounces={false}
-            allowFileAccess={true}
-            scalesPageToFit={true}
-            allowingReadAccessToURL={Platform.OS === 'android' ? true : null}
-            allowFileAccessFromFileURLs={true}
-            allowUniversalAccessFromFileURLs={true}
-            originWhitelist={['*']}
-            javaScriptEnabled={true}
-            cacheEnabled={true}
-            onMessage={onMessageFromPrimaryWebView}
-            source={
-              Platform.OS === 'ios'
-                ? { uri: sourceUri }
-                : {
-                  uri: 'file:///android_asset/plaineditor.html',
-                  baseUrl: 'file:///android_asset/',
-                }
-            }
-          />
-        </Animated.View>
-
-        <View
-          style={{
-            backgroundColor: '#f0f0f0',
-            width: '100%',
-            height: 50,
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            paddingHorizontal: 12,
-          }}>
-          <View
-            style={{
+              height: 50,
               flexDirection: 'row',
-              alignItems: 'center',
               justifyContent: 'space-between',
+              alignItems: 'center',
+              paddingHorizontal: 12,
             }}>
-            <TouchableOpacity
-              onPress={() => {
-                if (keepContentFrom === 'secondary') return;
-                if (!secondary) {
-                  openEditorAnimation(
-                    secondWebViewHeight,
-                    primary && keepContentFrom !== 'primary'
-                      ? firstWebViewHeight
-                      : null,
-                    primary && keepContentFrom !== 'primary',
-                  );
-                  setSecondary(true);
-                } else {
-                  closeEditorAnimation(
-                    secondWebViewHeight,
-                    primary && keepContentFrom !== 'primary'
-                      ? firstWebViewHeight
-                      : null,
-                  );
-                  setSecondary(false);
-                }
-              }}
+            <View
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'space-between',
               }}>
-              <Text
-                style={{
-                  color: colors.icon,
-                  fontSize: SIZE.xxs,
-                }}>
-                Saved on 10/10/20 {'\n'}
-                12:30pm on Tablet
-              </Text>
               <Icon
-                size={SIZE.lg}
-                name={secondary ? 'chevron-up' : 'chevron-down'}
+                style={{
+                  textAlign: 'center',
+                  textAlignVertical: 'center',
+                  marginLeft: -8,
+                  paddingRight: 10,
+                  paddingVertical: 10,
+                }}
+                onPress={close}
+                size={SIZE.xxl}
+                name="chevron-left"
               />
-            </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  if (keepContentFrom === 'primary') return;
+                  if (!primary) {
+                    openEditorAnimation(
+                      firstWebViewHeight,
+                      secondary && keepContentFrom !== 'secondary'
+                        ? secondWebViewHeight
+                        : null,
+                      secondary && keepContentFrom !== 'secondary',
+                    );
+                    setPrimary(true);
+                  } else {
+                    closeEditorAnimation(
+                      firstWebViewHeight,
+                      secondary && keepContentFrom !== 'secondary'
+                        ? secondWebViewHeight
+                        : null,
+                    );
+                    setPrimary(false);
+                  }
+                }}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}>
+                <Text
+                  style={{
+                    color: colors.icon,
+                    fontSize: SIZE.xxs,
+                  }}>
+                  Saved on 10/10/20 {'\n'}
+                  12:30pm on Tablet
+                </Text>
+                <Icon
+                  size={SIZE.lg}
+                  name={primary ? 'chevron-up' : 'chevron-down'}
+                />
+              </TouchableOpacity>
+            </View>
+
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'flex-end',
+              }}>
+              {keepContentFrom === 'secondary' ? (
+                <Button
+                  width={null}
+                  onPress={onPressSaveCopyFromPrimaryWebView}
+                  title="Save Copy"
+                />
+              ) : null}
+              <View style={{width: 10}} />
+              {keepContentFrom === 'secondary' ? (
+                <Button
+                  width={null}
+                  title="Discard"
+                  color={colors.errorText}
+                  onPress={onPressDiscardFromPrimaryWebView}
+                />
+              ) : null}
+              <View style={{width: 10}} />
+              {keepContentFrom === 'secondary' ? null : (
+                <Button
+                  width={null}
+                  title={keepContentFrom === 'primary' ? 'Undo' : 'Keep'}
+                  onPress={onPressKeepFromPrimaryWebView}
+                  color={
+                    keepContentFrom === 'primary' ? colors.errorText : 'accent'
+                  }
+                />
+              )}
+            </View>
           </View>
+
+          <Animated.View
+            style={{
+              height: firstWebViewHeight,
+            }}>
+            <WebView
+              onLoad={onPrimaryWebViewLoad}
+              ref={primaryWebView}
+              style={{
+                width: '100%',
+                height: '100%',
+              }}
+              injectedJavaScript={Platform.OS === 'ios' ? injectedJS : null}
+              onShouldStartLoadWithRequest={_onShouldStartLoadWithRequest}
+              cacheMode="LOAD_DEFAULT"
+              domStorageEnabled={true}
+              scrollEnabled={false}
+              bounces={false}
+              allowFileAccess={true}
+              scalesPageToFit={true}
+              allowingReadAccessToURL={Platform.OS === 'android' ? true : null}
+              allowFileAccessFromFileURLs={true}
+              allowUniversalAccessFromFileURLs={true}
+              originWhitelist={['*']}
+              javaScriptEnabled={true}
+              cacheEnabled={true}
+              onMessage={onMessageFromPrimaryWebView}
+              source={
+                Platform.OS === 'ios'
+                  ? {uri: sourceUri}
+                  : {
+                      uri: 'file:///android_asset/plaineditor.html',
+                      baseUrl: 'file:///android_asset/',
+                    }
+              }
+            />
+          </Animated.View>
 
           <View
             style={{
+              backgroundColor: colors.nav,
+              width: '100%',
+              height: 50,
               flexDirection: 'row',
-              alignItems: 'center',
               justifyContent: 'space-between',
+              alignItems: 'center',
+              paddingHorizontal: 12,
             }}>
-            {keepContentFrom === 'primary' ? (
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+              }}>
               <TouchableOpacity
-                onPress={onPressSaveCopyFromSecondaryWebView}
+                onPress={() => {
+                  if (keepContentFrom === 'secondary') return;
+                  if (!secondary) {
+                    openEditorAnimation(
+                      secondWebViewHeight,
+                      primary && keepContentFrom !== 'primary'
+                        ? firstWebViewHeight
+                        : null,
+                      primary && keepContentFrom !== 'primary',
+                    );
+                    setSecondary(true);
+                  } else {
+                    closeEditorAnimation(
+                      secondWebViewHeight,
+                      primary && keepContentFrom !== 'primary'
+                        ? firstWebViewHeight
+                        : null,
+                    );
+                    setSecondary(false);
+                  }
+                }}
                 style={{
-                  ...getElevation(5),
-                  height: 35,
-                  backgroundColor: colors.accent,
-                  borderRadius: 5,
-                  paddingHorizontal: 12,
+                  flexDirection: 'row',
                   alignItems: 'center',
-                  justifyContent: 'center',
-                  marginRight: 10,
+                  justifyContent: 'space-between',
                 }}>
                 <Text
                   style={{
-                    color: 'white',
-                    textAlign: 'center',
-                    fontFamily: WEIGHT.regular,
-                    fontSize: SIZE.sm - 2,
+                    color: colors.icon,
+                    fontSize: SIZE.xxs,
                   }}>
-                  Save as a copy
+                  Saved on 10/10/20 {'\n'}
+                  12:30pm on Tablet
                 </Text>
+                <Icon
+                  size={SIZE.lg}
+                  name={secondary ? 'chevron-up' : 'chevron-down'}
+                />
               </TouchableOpacity>
-            ) : null}
+            </View>
 
-            {keepContentFrom === 'primary' ? (
-              <TouchableOpacity
-                onPress={onPressDiscardFromSecondaryWebView}
-                style={{
-                  ...getElevation(5),
-                  height: 35,
-                  backgroundColor: colors.errorText,
-                  borderRadius: 5,
-                  paddingHorizontal: 12,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}>
-                <Text
-                  style={{
-                    color: 'white',
-                    textAlign: 'center',
-                    fontFamily: WEIGHT.regular,
-                    fontSize: SIZE.sm - 2,
-                  }}>
-                  Discard
-                </Text>
-              </TouchableOpacity>
-            ) : null}
-
-            {keepContentFrom === 'primary' ? null : (
-              <TouchableOpacity
-                onPress={onPressKeepFromSecondaryWebView}
-                style={{
-                  ...getElevation(5),
-                  height: 35,
-                  backgroundColor:
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'flex-end',
+              }}>
+              {keepContentFrom === 'primary' ? (
+                <Button
+                  width={null}
+                  onPress={onPressSaveCopyFromSecondaryWebView}
+                  title="Save Copy"
+                />
+              ) : null}
+              <View style={{width: 10}} />
+              {keepContentFrom === 'primary' ? (
+                <Button
+                  width={null}
+                  title="Discard"
+                  color={colors.errorText}
+                  onPress={onPressDiscardFromSecondaryWebView}
+                />
+              ) : null}
+              <View style={{width: 10}} />
+              {keepContentFrom === 'primary' ? null : (
+                <Button
+                  width={null}
+                  title={keepContentFrom === 'secondary' ? 'Undo' : 'Keep'}
+                  onPress={onPressKeepFromSecondaryWebView}
+                  color={
                     keepContentFrom === 'secondary'
                       ? colors.errorText
-                      : colors.accent,
-                  borderRadius: 5,
-                  paddingHorizontal: 12,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}>
-                <Text
-                  style={{
-                    color: 'white',
-                    textAlign: 'center',
-                    fontFamily: WEIGHT.regular,
-                    fontSize: SIZE.sm - 2,
-                  }}>
-                  {keepContentFrom === 'secondary' ? 'Undo' : 'Keep'}
-                </Text>
-              </TouchableOpacity>
-            )}
+                      : 'accent'
+                  }
+                />
+              )}
+            </View>
           </View>
-        </View>
 
-        <Animated.View
-          style={{
-            height: secondWebViewHeight,
-          }}>
-          <WebView
-            onLoad={onSecondaryWebViewLoad}
-            ref={secondaryWebView}
+          <Animated.View
             style={{
-              width: '100%',
-              height: '100%',
-            }}
-            injectedJavaScript={Platform.OS === 'ios' ? injectedJS : null}
-            onShouldStartLoadWithRequest={_onShouldStartLoadWithRequest}
-            cacheMode="LOAD_DEFAULT"
-            domStorageEnabled={true}
-            scrollEnabled={false}
-            bounces={false}
-            allowFileAccess={true}
-            scalesPageToFit={true}
-            allowingReadAccessToURL={Platform.OS === 'android' ? true : null}
-            allowFileAccessFromFileURLs={true}
-            allowUniversalAccessFromFileURLs={true}
-            originWhitelist={['*']}
-            javaScriptEnabled={true}
-            cacheEnabled={true}
-            onMessage={onMessageFromSecondaryWebView}
-            source={
-              Platform.OS === 'ios'
-                ? { uri: sourceUri }
-                : {
-                  uri: 'file:///android_asset/plaineditor.html',
-                  baseUrl: 'file:///android_asset/',
-                }
-            }
-          />
-        </Animated.View>
-      </View>
+              height: secondWebViewHeight,
+            }}>
+            <WebView
+              onLoad={onSecondaryWebViewLoad}
+              ref={secondaryWebView}
+              style={{
+                width: '100%',
+                height: '100%',
+              }}
+              injectedJavaScript={Platform.OS === 'ios' ? injectedJS : null}
+              onShouldStartLoadWithRequest={_onShouldStartLoadWithRequest}
+              cacheMode="LOAD_DEFAULT"
+              domStorageEnabled={true}
+              scrollEnabled={false}
+              bounces={false}
+              allowFileAccess={true}
+              scalesPageToFit={true}
+              allowingReadAccessToURL={Platform.OS === 'android' ? true : null}
+              allowFileAccessFromFileURLs={true}
+              allowUniversalAccessFromFileURLs={true}
+              originWhitelist={['*']}
+              javaScriptEnabled={true}
+              cacheEnabled={true}
+              onMessage={onMessageFromSecondaryWebView}
+              source={
+                Platform.OS === 'ios'
+                  ? {uri: sourceUri}
+                  : {
+                      uri: 'file:///android_asset/plaineditor.html',
+                      baseUrl: 'file:///android_asset/',
+                    }
+              }
+            />
+          </Animated.View>
+        </View>
+      </SafeAreaView>
     </Modal>
   );
 };

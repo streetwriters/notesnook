@@ -16,8 +16,9 @@ import {
 } from '../../services/events';
 import {openEditorAnimation} from '../../utils/animations';
 import {db, DDS, editing, ToastEvent} from '../../utils/utils';
-import { NoteItemWrapper } from '../../components/SimpleList/NoteItemWrapper';
-import { Placeholder } from '../../components/ListPlaceholders';
+import {NoteItemWrapper} from '../../components/SimpleList/NoteItemWrapper';
+import {Placeholder} from '../../components/ListPlaceholders';
+import {COLORS_NOTE} from '../../common/common';
 
 export const Notes = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
@@ -41,7 +42,7 @@ export const Notes = ({route, navigation}) => {
       init();
       dispatch({
         type: ACTIONS.CURRENT_SCREEN,
-        screen: params.type,
+        screen: params.type === "color"? params.color.title : params.type,
       });
     } else {
       setNotes([]);
@@ -61,7 +62,7 @@ export const Notes = ({route, navigation}) => {
     };
   }, []);
 
-  const init = data => {
+  const init = (data) => {
     params = route.params;
     if (data) {
       params = data;
@@ -92,7 +93,7 @@ export const Notes = ({route, navigation}) => {
           menu: params.type === 'color' ? true : false,
           canGoBack: params.type === 'color' ? false : true,
           route: route,
-          color: params.type == 'color' ? params.title : null,
+          color: params.type == 'color' ? COLORS_NOTE[params.title] : null,
           navigation: navigation,
         },
       });
@@ -100,7 +101,7 @@ export const Notes = ({route, navigation}) => {
         type: ACTIONS.CONTAINER_BOTTOM_BUTTON,
         state: {
           visible: true,
-          color: params.type == 'color' ? params.title : null,
+          color: params.type == 'color' ? COLORS_NOTE[params.title] : null,
           bottomButtonOnPress: _bottomBottomOnPress,
           bottomButtonText: 'Create a new note',
         },
@@ -121,7 +122,7 @@ export const Notes = ({route, navigation}) => {
       init();
       dispatch({
         type: ACTIONS.CURRENT_SCREEN,
-        screen: params.type,
+        screen: params.type === "color"? params.color.title : params.type,
       });
     } else {
       setNotes([]);
@@ -197,7 +198,7 @@ export const Notes = ({route, navigation}) => {
       focused={isFocused}
       customRefresh={_onRefresh}
       RenderItem={NoteItemWrapper}
-      placeholder={<Placeholder type="notes"/>}
+      placeholder={<Placeholder type="notes" />}
       placeholderText={`Add some notes to this" ${
         params.type ? params.type : 'topic.'
       }`}

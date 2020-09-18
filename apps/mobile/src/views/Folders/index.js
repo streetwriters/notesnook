@@ -9,20 +9,11 @@ import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
 import {eScrollEvent} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
-import { Placeholder } from '../../components/ListPlaceholders';
+import {Placeholder} from '../../components/ListPlaceholders';
 export const Folders = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const {notebooks} = state;
   let isFocused = useIsFocused();
-
-  const handleBackPress = () => {
-    if (route.params.isMove) {
-      return true;
-    } else {
-      NavigationService.goBack();
-      return true;
-    }
-  };
 
   useEffect(() => {
     if (isFocused) {
@@ -30,12 +21,11 @@ export const Folders = ({route, navigation}) => {
         type: ACTIONS.HEADER_STATE,
         state: {
           type: 'notebooks',
-          menu: !params.canGoBack,
-          canGoBack: params.canGoBack,
+          menu: true,
+          canGoBack: false,
           route: route,
           color: null,
           navigation: navigation,
-          ind:!params.root
         },
       });
       dispatch({
@@ -45,7 +35,6 @@ export const Folders = ({route, navigation}) => {
           bottomButtonOnPress: () => AddNotebookEvent(),
           color: null,
           visible: true,
-          ind:!params.root
         },
       });
       dispatch({
@@ -56,7 +45,6 @@ export const Folders = ({route, navigation}) => {
         type: ACTIONS.HEADER_TEXT_STATE,
         state: {
           heading: params.title,
-          ind:!params.root
         },
       });
       dispatch({type: ACTIONS.PINNED});
@@ -66,7 +54,6 @@ export const Folders = ({route, navigation}) => {
         screen: 'notebooks',
       });
     }
-
   }, [isFocused]);
 
   useEffect(() => {
@@ -74,32 +61,15 @@ export const Folders = ({route, navigation}) => {
       dispatch({
         type: ACTIONS.SEARCH_STATE,
         state: {
-          placeholder:params.root? 'Search all notebooks' : 'Select a notebook',
+          placeholder: 'Search all notebooks',
           data: notebooks,
           noSearch: false,
           type: 'notebooks',
           color: null,
-          ind:!params.root
         },
       });
     }
   }, [notebooks, isFocused]);
-
-  useEffect(() => {
-    eSendEvent(eScrollEvent, 0);
-    let backhandler;
-
-    backhandler = BackHandler.addEventListener(
-      'hardwareBackPress',
-      handleBackPress,
-    );
-
-    return () => {
-      if (!backhandler) return;
-      backhandler.remove();
-      backhandler = null;
-    };
-  }, []);
 
   const params = route.params;
 
@@ -109,9 +79,6 @@ export const Folders = ({route, navigation}) => {
       type="notebooks"
       focused={isFocused}
       RenderItem={NotebookItemWrapper}
-      hideMore={params.hideMore}
-      isMove={params.isMove}
-      noteToMove={params.note}
       placeholder={<Placeholder type="notebooks" />}
       pinned={true}
       placeholderText="Notebooks you add will appear here"

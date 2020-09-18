@@ -5,17 +5,19 @@ import {
   Platform,
   SafeAreaView,
   StatusBar,
-  TouchableOpacity,
   View,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import WebView from 'react-native-webview';
-import {normalize, SIZE} from '../../common/common';
+import {normalize} from '../../common/common';
+import {ActionIcon} from '../../components/ActionIcon';
 import {
   ActionSheetEvent,
   simpleDialogEvent,
 } from '../../components/DialogManager/recievers';
-import {TEMPLATE_EXIT_FULLSCREEN} from '../../components/DialogManager/templates';
+import {
+  TEMPLATE_EXIT_FULLSCREEN,
+  TEMPLATE_NEW_NOTE,
+} from '../../components/DialogManager/templates';
 import {useTracked} from '../../provider';
 import {
   eSendEvent,
@@ -31,8 +33,10 @@ import {
 import {exitEditorAnimation} from '../../utils/animations';
 import {DDS, editing, ToastEvent} from '../../utils/utils';
 import {
+  checkNote,
   clearEditor,
   EditorWebView,
+  getNote,
   injectedJS,
   loadNote,
   onWebViewLoad,
@@ -40,9 +44,7 @@ import {
   sourceUri,
   _onMessage,
   _onShouldStartLoadWithRequest,
-  checkNote,
 } from './func';
-import {ActionIcon} from '../../components/ActionIcon';
 
 var handleBack;
 var tapCount = 0;
@@ -59,14 +61,6 @@ const Editor = ({noMenu}) => {
     c.factor = normalize(1);
     post('theme', colors);
   }, [colors.bg]);
-
-  useEffect(() => {
-    if (noMenu) {
-      //post('nomenu', true);
-    } else {
-      //post('nomenu', false);
-    }
-  }, [noMenu]);
 
   useEffect(() => {
     eSubscribeEvent(eOnLoadNote, load);
@@ -96,7 +90,7 @@ const Editor = ({noMenu}) => {
     };
   }, [noMenu]);
 
-  const load = item => {
+  const load = (item) => {
     loadNote(item);
     if (!DDS.isTab) {
       handleBack = BackHandler.addEventListener(
@@ -146,7 +140,9 @@ const Editor = ({noMenu}) => {
       if (checkNote()) {
         ToastEvent.show('Note Saved!', 'success');
       }
-      await clearEditor();
+      setTimeout(async () => {
+        await clearEditor();
+      }, 300);
       if (handleBack) {
         handleBack.remove();
         handleBack = null;
@@ -177,14 +173,16 @@ const Editor = ({noMenu}) => {
             width: '100%',
             height: 50,
             justifyContent: 'space-between',
+            alignItems: 'center',
           }}>
           {noMenu ? null : (
             <ActionIcon
               name="arrow-left"
-              color={colors.icon}
+              color={colors.heading}
               onPress={_onBackPress}
               customStyle={{
-                marginLeft:-5
+                marginLeft: -5,
+                paddingLeft: 12,
               }}
             />
           )}
@@ -193,10 +191,17 @@ const Editor = ({noMenu}) => {
             style={{
               flexDirection: 'row',
             }}>
+            <ActionIcon
+              name="plus"
+              color={colors.heading}
+              onPress={() => {
+                simpleDialogEvent(TEMPLATE_NEW_NOTE);
+              }}
+            />
             {DDS.isTab && !fullscreen ? (
               <ActionIcon
                 name="fullscreen"
-                color={colors.icon}
+                color={colors.heading}
                 onPress={() => {
                   eSendEvent(eOpenFullscreenEditor);
                   setFullscreen(true);
@@ -212,11 +217,26 @@ const Editor = ({noMenu}) => {
             ) : null}
 
             <ActionIcon
+              name="undo-variant"
+              color={colors.heading}
+              onPress={() => {
+                post('undo');
+              }}
+            />
+            <ActionIcon
+              name="redo-variant"
+              color={colors.heading}
+              onPress={() => {
+                post('redo');
+              }}
+            />
+
+            <ActionIcon
               name="dots-horizontal"
-              color={colors.icon}
+              color={colors.heading}
               onPress={() => {
                 ActionSheetEvent(
-                  note,
+                  getNote(),
                   true,
                   true,
                   ['Add to', 'Share', 'Export', 'Delete'],
@@ -229,7 +249,7 @@ const Editor = ({noMenu}) => {
 
         <WebView
           ref={EditorWebView}
-          onError={error => console.log(error)}
+          onError={(error) => console.log(error)}
           onLoad={() => onWebViewLoad(noMenu, premium, colors)}
           javaScriptEnabled={true}
           injectedJavaScript={Platform.OS === 'ios' ? injectedJS : null}

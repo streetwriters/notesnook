@@ -1086,6 +1086,8 @@
 
     #titlebar {
       background-color: transparent;
+      padding-left:12px;
+      padding-right:12px;
     }
 
     .info-bar {
@@ -1147,8 +1149,8 @@
     let titleIn = document.getElementById('titlebar');
   
       //titleIn.style.width = width;
-      titleIn.style['padding-left'] = 12;
-      titleIn.style['padding-right'] = 60;
+      //titleIn.style['padding-left'] =0;
+      //titleIn.style['padding-right'] =0;
     
 
 
@@ -1243,6 +1245,11 @@
               quality: 0.9,
               maxWidth: 1024,
               imageType: 'image/jpeg'
+            },
+            history: {
+              delay: 2000,
+              maxStack: 500,
+              userOnly: true
             }
           },
           placeholder: 'Start writing your note',
@@ -1625,10 +1632,30 @@
             value = message.value
           }
           switch (type) {
+            case "reset": {
+              editor.history.clear();
+              editor.setText('', 'api');
+              document.getElementById('titleInput').value = '';
+              document.getElementById('titleInput').blur();
+              editor.blur();
+              document.getElementById('infodate').innerText = "";
+              document.getElementById('infosaved').innerText = "";
+              document.getElementById("infowords").innerText = "";
+              break
+            }
             case "blur":
               document.getElementById('titleInput').blur();
               editor.blur();
               break;
+              case "undo":
+              editor.history.undo();
+              break;
+            case "redo":
+              editor.history.redo();
+              break;
+            case "clearHistory":
+              editor.history.clear();
+              break;  
             case "dateEdited":
               document.getElementById('infodate').innerText = value;
               break;
@@ -1639,9 +1666,9 @@
               editor.setText(value, 'api')
               setTimeout(() => {
                 if (message.focus === "editor") {
-                  editor.focus();
+                  //editor.focus();
                 } else {
-                  document.getElementById('titleInput').focus();
+                  //document.getElementById('titleInput').focus();
                 }
               }, 0)
               break;

@@ -1,13 +1,9 @@
 import React from 'react';
-import {Dimensions, Text, TouchableOpacity, View} from 'react-native';
+import { Dimensions, Text, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {ph, pv, SIZE, WEIGHT} from '../../common/common';
-import {eSendEvent, openVault} from '../../services/eventManager';
-import {eOnLoadNote, eShowMergeDialog} from '../../services/events';
-import {openEditorAnimation} from '../../utils/animations';
-import {DDS, timeSince} from '../../utils/utils';
-import {ActionSheetEvent, simpleDialogEvent} from '../DialogManager/recievers';
-import {TEMPLATE_TRASH} from '../DialogManager/templates';
+import { ph, SIZE, WEIGHT } from '../../common/common';
+import { timeSince } from '../../utils/utils';
+import { ActionSheetEvent } from '../DialogManager/recievers';
 
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
@@ -55,20 +51,11 @@ export default class NoteItem extends React.Component {
   }
 
   render() {
-    let {
-      colors,
-      item,
-      customStyle,
-      onLongPress,
-      isTrash,
-      pinned,
-      index,
-    } = this.props;
+    let {colors, item, customStyle, isTrash} = this.props;
     return (
       <View
         style={[
           {
-            paddingVertical: pv,
             justifyContent: 'flex-start',
             alignItems: 'center',
             flexDirection: 'row',
@@ -76,209 +63,176 @@ export default class NoteItem extends React.Component {
             paddingRight: 6,
             alignSelf: 'center',
             borderBottomWidth: 1,
-            borderBottomColor: colors.nav,
+            height: 100,
+            borderBottomColor:item.pinned? 'transparent': colors.nav,
           },
           customStyle ? customStyle : {},
         ]}>
-        <TouchableOpacity
-          activeOpacity={0.8}
-          onLongPress={() => onLongPress()}
-          onPress={async () => {
-            if (item.conflicted) {
-              eSendEvent(eShowMergeDialog, item);
-
-              return;
-            }
-            if (this.props.selectionMode) {
-              this.props.onLongPress();
-              return;
-            } else if (item.locked) {
-              openVault(item, true, true, false, true, false);
-
-              return;
-            }
-            if (DDS.isTab) {
-              eSendEvent(eOnLoadNote, item);
-            } else if (isTrash) {
-              simpleDialogEvent(TEMPLATE_TRASH(item.type));
-            } else {
-              eSendEvent(eOnLoadNote, item);
-              openEditorAnimation();
-            }
-          }}
+        <View
           style={{
             paddingLeft: 0,
             width: '95%',
           }}>
-          <>
+          <Text
+            numberOfLines={1}
+            style={{
+              color: colors.heading,
+              fontSize: SIZE.md,
+              fontFamily: WEIGHT.bold,
+              maxWidth: '100%',
+            }}>
+            {item.title.replace('\n', '')}
+          </Text>
+          <View
+            style={{
+              justifyContent: 'flex-start',
+              alignItems: 'flex-start',
+              width: '100%',
+            }}>
             <Text
-              numberOfLines={1}
+              numberOfLines={2}
               style={{
-                color: colors.pri,
-                fontSize: SIZE.sm + 1,
-                fontFamily: WEIGHT.bold,
+                fontSize: SIZE.xs + 1,
+                color: colors.pri + 'B3',
+                fontFamily: WEIGHT.regular,
+                width: '100%',
                 maxWidth: '100%',
+                paddingRight: ph,
               }}>
-              {item.title.replace('\n', '')}
+              {item.headline[item.headline.length - 1] === '\n'
+                ? item.headline.slice(0, item.headline.length - 1)
+                : item.headline}
             </Text>
+
             <View
               style={{
+                flexDirection: 'row',
                 justifyContent: 'flex-start',
-                alignItems: 'flex-start',
+                alignItems: 'center',
                 width: '100%',
+                marginTop: 5,
               }}>
-              <Text
-                numberOfLines={2}
-                style={{
-                  fontSize: SIZE.sm - 1,
-                  color: colors.pri + 'B3',
-                  fontFamily: WEIGHT.regular,
-                  width: '100%',
-                  maxWidth: '100%',
-                  paddingRight: ph,
-                }}>
-                {item.headline[item.headline.length - 1] === '\n'
-                  ? item.headline.slice(0, item.headline.length - 1)
-                  : item.headline}
-              </Text>
-
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'flex-start',
-                  alignItems: 'center',
-                  width: '100%',
-                  marginTop: 5,
-                }}>
-                {!isTrash ? (
-                  <>
-                    {item.colors.length > 0 ? (
-                      <View
-                        style={{
-                          marginRight: 10,
-                          flexDirection: 'row',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                        }}>
-                        {item.colors.map(item => (
-                          <View
-                            key={item}
-                            style={{
-                              width: SIZE.xs,
-                              height: SIZE.xs,
-                              borderRadius: 100,
-                              backgroundColor: item,
-                              marginRight: -4.5,
-                            }}
-                          />
-                        ))}
-                      </View>
-                    ) : null}
-
-                    {item.locked ? (
-                      <Icon
-                        style={{marginRight: 10}}
-                        name="lock"
-                        size={SIZE.xs}
-                        color={colors.icon}
-                      />
-                    ) : null}
-
-                    {item.favorite ? (
-                      <Icon
-                        style={{marginRight: 10}}
-                        name="star"
-                        size={SIZE.xs + 1}
-                        color="orange"
-                      />
-                    ) : null}
-                    <Text
+              {!isTrash ? (
+                <>
+                  {item.colors.length > 0 ? (
+                    <View
                       style={{
-                        color: colors.icon,
-                        fontSize: SIZE.xs - 1,
-                        textAlignVertical: 'center',
-                        fontFamily: WEIGHT.regular,
                         marginRight: 10,
+                        flexDirection: 'row',
+                        justifyContent: 'center',
+                        alignItems: 'center',
                       }}>
-                      {timeSince(item.dateCreated)}
-                    </Text>
-                  </>
-                ) : null}
+                      {item.colors.map((item) => (
+                        <View
+                          key={item}
+                          style={{
+                            width: SIZE.xs,
+                            height: SIZE.xs,
+                            borderRadius: 100,
+                            backgroundColor: item,
+                            marginRight: -4.5,
+                          }}
+                        />
+                      ))}
+                    </View>
+                  ) : null}
 
-                {isTrash ? (
-                  <>
-                    <Text
-                      style={{
-                        color: colors.icon,
-                        fontSize: SIZE.xs - 1,
-                        textAlignVertical: 'center',
-                        fontFamily: WEIGHT.regular,
-                      }}>
-                      {'Deleted on: ' + item && item.dateDeleted
-                        ? new Date(item.dateDeleted).toISOString().slice(0, 10)
-                        : null + '   '}
-                    </Text>
-                    <Text
-                      style={{
-                        color: colors.accent,
-                        fontSize: SIZE.xs - 1,
-                        textAlignVertical: 'center',
-                        fontFamily: WEIGHT.regular,
-                      }}>
-                      {item.type[0].toUpperCase() + item.type.slice(1) + '  '}
-                    </Text>
-                  </>
-                ) : null}
+                  {item.locked ? (
+                    <Icon
+                      style={{marginRight: 10}}
+                      name="lock"
+                      size={SIZE.xs}
+                      color={colors.icon}
+                    />
+                  ) : null}
 
-                {item.conflicted ? (
-                  <View
+                  {item.favorite ? (
+                    <Icon
+                      style={{marginRight: 10}}
+                      name="star"
+                      size={SIZE.xs + 1}
+                      color="orange"
+                    />
+                  ) : null}
+                  <Text
                     style={{
-                      backgroundColor: colors.errorText,
-                      borderRadius: 2.5,
-                      paddingHorizontal: 4,
-                      position: 'absolute',
-                      right: 20,
+                      color: colors.icon,
+                      fontSize: SIZE.xs - 1,
+                      textAlignVertical: 'center',
+                      fontFamily: WEIGHT.regular,
+                      marginRight: 10,
                     }}>
-                    <Text
-                      style={{
-                        fontSize: SIZE.xs - 1,
-                        color: 'white',
-                      }}>
-                      CONFLICTS
-                    </Text>
-                  </View>
-                ) : null}
-              </View>
-            </View>
-          </>
-        </TouchableOpacity>
+                    {timeSince(item.dateCreated)}
+                  </Text>
+                </>
+              ) : null}
 
-        <View
+              {isTrash ? (
+                <>
+                  <Text
+                    style={{
+                      color: colors.icon,
+                      fontSize: SIZE.xs - 1,
+                      textAlignVertical: 'center',
+                      fontFamily: WEIGHT.regular,
+                    }}>
+                    {'Deleted on: ' + item && item.dateDeleted
+                      ? new Date(item.dateDeleted).toISOString().slice(0, 10)
+                      : null + '   '}
+                  </Text>
+                  <Text
+                    style={{
+                      color: colors.accent,
+                      fontSize: SIZE.xs - 1,
+                      textAlignVertical: 'center',
+                      fontFamily: WEIGHT.regular,
+                    }}>
+                    {item.type[0].toUpperCase() + item.type.slice(1) + '  '}
+                  </Text>
+                </>
+              ) : null}
+
+              {item.conflicted ? (
+                <View
+                  style={{
+                    backgroundColor: colors.errorText,
+                    borderRadius: 2.5,
+                    paddingHorizontal: 4,
+                    position: 'absolute',
+                    right: 20,
+                  }}>
+                  <Text
+                    style={{
+                      fontSize: SIZE.xs - 1,
+                      color: 'white',
+                    }}>
+                    CONFLICTS
+                  </Text>
+                </View>
+              ) : null}
+            </View>
+          </View>
+        </View>
+
+        <TouchableOpacity
           style={{
             justifyContent: 'center',
             minHeight: 70,
             alignItems: 'center',
+          }}
+          onPress={() => {
+            ActionSheetEvent(
+              item,
+              isTrash ? false : true,
+              isTrash ? false : true,
+              isTrash
+                ? ['Remove', 'Restore']
+                : ['Add to', 'Share', 'Export', 'Delete', 'Copy'],
+              isTrash ? [] : ['Pin', 'Favorite', 'Add to Vault'],
+            );
           }}>
-          <TouchableOpacity
-            style={{
-              justifyContent: 'center',
-              minHeight: 70,
-              alignItems: 'center',
-            }}
-            onPress={() => {
-              ActionSheetEvent(
-                item,
-                isTrash ? false : true,
-                isTrash ? false : true,
-                isTrash
-                  ? ['Remove', 'Restore']
-                  : ['Add to', 'Share', 'Export', 'Delete', 'Open'],
-                isTrash ? [] : ['Pin', 'Favorite', 'Add to Vault'],
-              );
-            }}>
-            <Icon name="dots-horizontal" size={SIZE.lg} color={colors.icon} />
-          </TouchableOpacity>
-        </View>
+          <Icon name="dots-horizontal" size={SIZE.lg} color={colors.heading} />
+        </TouchableOpacity>
       </View>
     );
   }

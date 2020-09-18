@@ -83,3 +83,6 @@ export const eOpenPremiumDialog = '540'
 export const eClosePremiumDialog = '541'
 
 export const eResetApp = '542'
+
+export const eOpenExportDialog = '543';
+export const eCloseExportDialog = '544';

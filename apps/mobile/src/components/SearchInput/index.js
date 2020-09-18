@@ -10,14 +10,17 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {br, WEIGHT, SIZE} from '../../common/common';
 import {TextInput, Text} from 'react-native';
 const {Value, timing, block} = Animated;
-let offsetY = 0;
+
 let searchResult = [];
-export const Search = props => {
+
+let offsetY = 0;
+let timeoutAnimate = null;
+let animating = false;
+export const Search = (props) => {
   const [state, dispatch] = useTracked();
   const {colors, searchResults} = state;
   const [text, setText] = useState('');
   const [focus, setFocus] = useState(false);
-  const [hideHeader, setHideHeader] = useState(false);
 
   let searchState = props.root ? state.searchState : state.indSearchState;
 
@@ -25,22 +28,57 @@ export const Search = props => {
   const _opacity = new Value(1);
   const _borderAnim = new Value(1.5);
 
-  const onScroll = y => {
-    if (searchResults.results.length > 0) return;
-    if (y < 30) {
-      setHideHeader(false);
-      offsetY = y;
-    }
+  const animation = (margin, opacity, border) => {
+    if (animating) return;
+    animating = true;
+    console.log('animating');
+    timing(_marginAnim, {
+      toValue: margin,
+      duration: 230,
+      easing: Easing.inOut(Easing.ease),
+    }).start();
+    timing(_opacity, {
+      toValue: opacity,
+      duration: 250,
+      easing: Easing.inOut(Easing.ease),
+    }).start();
+    timing(_borderAnim, {
+      toValue: border,
+      duration: 270,
+      easing: Easing.inOut(Easing.ease),
+    }).start();
+    setTimeout(() => {
+      animating = false;
+    }, 500);
+  };
 
+  const onScroll = (y) => {
+    if (searchResults.results.length > 0) return;
+
+    if (y < 30) {
+      clearTimeout(timeoutAnimate);
+      timeoutAnimate = null;
+      animation(0, 1, 1.5);
+      offsetY = y;
+      return;
+    }
     if (y > offsetY) {
       if (y - offsetY < 100) return;
-
-      setHideHeader(true);
+      clearTimeout(timeoutAnimate);
+      timeoutAnimate = null;
+      timeoutAnimate = setTimeout(() => {
+        animation(-65, 0, 0);
+        console.log('up');
+      }, 500);
       offsetY = y;
     } else {
       if (offsetY - y < 50) return;
-
-      setHideHeader(false);
+      clearTimeout(timeoutAnimate);
+      timeoutAnimate = null;
+      timeoutAnimate = setTimeout(() => {
+        console.log('down');
+        animation(0, 1, 1.5);
+      }, 500);
       offsetY = y;
     }
   };
@@ -49,38 +87,17 @@ export const Search = props => {
     selection.data = searchState.data;
     selection.type = searchState.type;
     eSubscribeEvent(eScrollEvent, onScroll);
-
     eSubscribeEvent('showSearch', () => {
-      setHideHeader(false);
+      animation(0, 1, 1.5);
     });
 
     return () => {
       eUnSubscribeEvent(eScrollEvent, onScroll);
-
       eUnSubscribeEvent('showSearch', () => {
-        setHideHeader(false);
+        animation(0, 1, 1.5);
       });
     };
-  }, []);
-
-  useEffect(() => {
-    timing(_marginAnim, {
-      toValue: hideHeader ? -65 : 0,
-      duration: 230,
-      easing: Easing.inOut(Easing.ease),
-    }).start();
-    timing(_opacity, {
-      toValue: hideHeader ? 0 : 1,
-      duration: 250,
-      easing: Easing.inOut(Easing.ease),
-    }).start();
-    timing(_borderAnim, {
-      toValue: hideHeader ? 0 : 1.5,
-      duration: 270,
-      easing: Easing.inOut(Easing.ease),
-    }).start();
-    console.log('called');
-  }, [hideHeader]);
+  }, [searchState]);
 
   const clearSearch = () => {
     if (searchResult && searchResult.length > 0) {
@@ -108,7 +125,7 @@ export const Search = props => {
     };
   }, []);
 
-  const onChangeText = value => {
+  const onChangeText = (value) => {
     setText(value);
   };
   const onSubmitEditing = async () => {

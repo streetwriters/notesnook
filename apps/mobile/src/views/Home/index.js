@@ -1,5 +1,6 @@
 import {useIsFocused} from '@react-navigation/native';
 import React, {useEffect} from 'react';
+import {Placeholder} from '../../components/ListPlaceholders';
 import SimpleList from '../../components/SimpleList';
 import {NoteItemWrapper} from '../../components/SimpleList/NoteItemWrapper';
 import {useTracked} from '../../provider';
@@ -8,8 +9,6 @@ import {eSendEvent} from '../../services/eventManager';
 import {eOnLoadNote, eScrollEvent} from '../../services/events';
 import {openEditorAnimation} from '../../utils/animations';
 import {DDS} from '../../utils/utils';
-import { Placeholder } from '../../components/ListPlaceholders';
-
 export const Home = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const {notes} = state;
@@ -54,7 +53,7 @@ export const Home = ({route, navigation}) => {
         type: ACTIONS.CONTAINER_BOTTOM_BUTTON,
         state: {
           bottomButtonText: 'Create a new note',
-          bottomButtonOnPress: () => {
+          bottomButtonOnPress: async () => {
             if (DDS.isTab) {
               eSendEvent(eOnLoadNote, {type: 'new'});
             } else {
@@ -97,7 +96,7 @@ export const Home = ({route, navigation}) => {
         pinned={true}
         focused={isFocused}
         RenderItem={NoteItemWrapper}
-        placeholder={<Placeholder type="notes"/>}
+        placeholder={<Placeholder type="notes" />}
         placeholderText={`Notes you write appear here`}
       />
     </>
