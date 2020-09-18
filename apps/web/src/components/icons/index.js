@@ -63,6 +63,7 @@ export const Restore = createIcon(Icons.mdiRecycle);
 export const Sync = createIcon(Icons.mdiSync);
 export const Loading = createIcon(Icons.mdiLoading, true);
 export const Export = createIcon(Icons.mdiExport);
+export const AddToNotebook = createIcon(Icons.mdiBookPlusMultipleOutline);
 
 /** Properties Icons */
 export const ChevronLeft = createIcon(Icons.mdiChevronLeft);

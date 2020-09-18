@@ -76,7 +76,7 @@ const UnfavoriteOption = createOption("unfavoriteOption", Icon.Star, function (
 
 const AddToNotebookOption = createOption(
   "atnOption",
-  Icon.Plus,
+  Icon.AddToNotebook,
   async function (state) {
     const items = state.selectedItems.map((item) => item.id);
     if (await showMoveNoteDialog(items)) {
