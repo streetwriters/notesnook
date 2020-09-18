@@ -26,14 +26,14 @@ const ItemSelector = ({ isSelected, toggleSelection }) => {
     <Box
       width={24}
       sx={{
-        marginLeft: 3,
+        marginLeft: 0,
         marginRight: 1,
         color: "primary",
         cursor: "pointer",
       }}
       onClick={() => toggleSelection()}
     >
-      {isSelected ? <Icon.Check /> : <Icon.CircleEmpty />}
+      {isSelected ? <Icon.Check color="primary" /> : <Icon.CircleEmpty />}
     </Box>
   );
 };
@@ -83,7 +83,7 @@ function ListItem(props) {
 
   return (
     <Flex
-      bg={props.pinned ? "shade" : "background"}
+      bg={props.pinned || isSelected ? "shade" : "background"}
       alignItems="center"
       onContextMenu={openContextMenu}
       p={2}
@@ -99,13 +99,6 @@ function ListItem(props) {
         },
       }}
     >
-      {isSelectionMode && (
-        <ItemSelector
-          isSelected={isSelected}
-          toggleSelection={toggleSelection}
-        />
-      )}
-
       {props.pinned && (
         <Flex
           variant="rowCenter"
@@ -149,21 +142,30 @@ function ListItem(props) {
           },
         }}
       >
-        <Text
-          as="h3"
-          color={props.focused ? "primary" : "text"}
-          fontFamily={"heading"}
-          fontSize="title"
-          fontWeight={"bold"}
-          sx={{
-            lineHeight: "1.4em",
-            maxHeight: "2.8em", // 2 lines, i hope
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}
-        >
-          {props.title}
-        </Text>
+        <Flex>
+          {isSelectionMode && (
+            <ItemSelector
+              isSelected={isSelected}
+              toggleSelection={toggleSelection}
+            />
+          )}
+          <Text
+            as="h3"
+            color={props.focused ? "primary" : "text"}
+            fontFamily={"heading"}
+            fontSize="title"
+            fontWeight={"bold"}
+            sx={{
+              lineHeight: "1.4em",
+              maxHeight: "2.8em", // 2 lines, i hope
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            {props.title}
+          </Text>
+        </Flex>
+
         <Text
           as="p"
           display={props.body ? "box" : "none"}
