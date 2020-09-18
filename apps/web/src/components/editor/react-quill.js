@@ -51,7 +51,9 @@ const simpleQuillModules = {
 };
 
 export default class ReactQuill extends Component {
-  /** @private */
+  /**
+   * @type {Quill}
+   */
   quill;
   changeTimeout;
   getEditor() {
@@ -110,6 +112,7 @@ export default class ReactQuill extends Component {
   }
 
   textChangeHandler = (_delta, _oldDelta, source) => {
+    this.props.onWordCountChanged(this.getWordCount());
     if (source === "init") return;
     clearTimeout(this.changeTimeout);
     this.changeTimeout = setTimeout(
@@ -118,8 +121,12 @@ export default class ReactQuill extends Component {
     );
   };
 
+  getWordCount() {
+    let text = this.quill.getText();
+    return (text.match(/\b\S+\b/g) || []).length;
+  }
+
   render() {
-    console.log("RERENDERING QUILL");
     return <pre onFocus={this.props.onFocus} id={this.props.id} />;
   }
 }

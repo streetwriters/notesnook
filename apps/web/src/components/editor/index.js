@@ -23,6 +23,7 @@ function Editor() {
   const setSession = useStore((store) => store.setSession);
   const saveSession = useStore((store) => store.saveSession);
   const toggleProperties = useStore((store) => store.toggleProperties);
+  const updateWordCount = useStore((store) => store.updateWordCount);
   const init = useStore((store) => store.init);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
   const isTrial = useUserStore(
@@ -51,6 +52,7 @@ function Editor() {
     if (!quillRef || !quillRef.current) return;
 
     if (sessionState === SESSION_STATES.new) {
+      editorstore.set((state) => (state.session.state = SESSION_STATES.stale));
       const {
         content: { delta },
       } = editorstore.get().session;
@@ -61,7 +63,6 @@ function Editor() {
       if (!delta.ops || !delta.ops.length) return;
       const text = quill.getText();
       quill.setSelection(text.length, 0, "init");
-      editorstore.set((state) => (state.session.state = SESSION_STATES.stale));
     }
   }, [sessionState, quillRef]);
 
@@ -100,6 +101,7 @@ function Editor() {
             saveSession();
           }}
           changeInterval={500}
+          onWordCountChanged={updateWordCount}
           onChange={() => {
             const { quill } = quillRef.current;
             const delta = quill.getContents().ops;

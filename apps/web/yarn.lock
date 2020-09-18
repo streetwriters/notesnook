@@ -1815,6 +1815,14 @@
   resolved "https://registry.yarnpkg.com/@types/q/-/q-1.5.4.tgz#15925414e0ad2cd765bfef58842f7e26a7accb24"
   integrity sha512-1HcDas8SEj4z1Wc696tH56G8OlRaH/sqZOynNNB+HF0WOeXPaxTtbYzJY2oEfiUxjSKjhCKr+MvR7dCHcEelug==
 
+"@types/quill@^2.0.3":
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/@types/quill/-/quill-2.0.3.tgz#bddb7d0951c277de6bf006faa29b39bfa3941ebb"
+  integrity sha512-bsMS+1pXXH06aP9oZOw0o7mGQnEhWo9yXoc4Hh8RO33JCgYzDZUJUUQbqzRwPoJV7T4RDwkhV/dCfXhNBUGqPQ==
+  dependencies:
+    parchment "^1.1.2"
+    quill-delta "^4.0.1"
+
 "@types/react@*":
   version "16.9.49"
   resolved "https://registry.yarnpkg.com/@types/react/-/react-16.9.49.tgz#09db021cf8089aba0cdb12a49f8021a69cce4872"
@@ -4828,6 +4836,11 @@ fast-diff@1.1.2:
   resolved "https://registry.yarnpkg.com/fast-diff/-/fast-diff-1.1.2.tgz#4b62c42b8e03de3f848460b639079920695d0154"
   integrity sha512-KaJUt+M9t1qaIteSvjc6P3RbMdXsNhK61GRftR6SNxqmhthcd9MGIi4T+o0jD8LUSpSnSKXE20nLtJ3fOHxQig==
 
+fast-diff@1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/fast-diff/-/fast-diff-1.2.0.tgz#73ee11982d86caaf7959828d519cfe927fac5f03"
+  integrity sha512-xJuoT5+L99XlZ8twedaRf6Ax2TgQVxvgZOYoPKqZufmJib0tL2tegPBOZb1pVNgIhlqDlA0eO0c3wBvQcmzx4w==
+
 fast-glob@^2.0.2:
   version "2.2.7"
   resolved "https://registry.yarnpkg.com/fast-glob/-/fast-glob-2.2.7.tgz#6953857c3afa475fff92ee6015d52da70a4cd39d"
@@ -7055,6 +7068,11 @@ lodash._reinterpolate@^3.0.0:
   resolved "https://registry.yarnpkg.com/lodash._reinterpolate/-/lodash._reinterpolate-3.0.0.tgz#0ccf2d89166af03b3663c796538b75ac6e114d9d"
   integrity sha1-DM8tiRZq8Ds2Y8eWU4t1rG4RTZ0=
 
+lodash.clonedeep@^4.5.0:
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/lodash.clonedeep/-/lodash.clonedeep-4.5.0.tgz#e23f3f9c4f8fbdde872529c1071857a086e5ccef"
+  integrity sha1-4j8/nE+Pvd6HJSnBBxhXoIblzO8=
+
 lodash.isequal@^4.5.0:
   version "4.5.0"
   resolved "https://registry.yarnpkg.com/lodash.isequal/-/lodash.isequal-4.5.0.tgz#415c4478f2bcc30120c22ce10ed3226f7d3e18e0"
@@ -7978,7 +7996,7 @@ param-case@^3.0.3:
     dot-case "^3.0.3"
     tslib "^1.10.0"
 
-parchment@^1.1.4:
+parchment@^1.1.2, parchment@^1.1.4:
   version "1.1.4"
   resolved "https://registry.yarnpkg.com/parchment/-/parchment-1.1.4.tgz#aeded7ab938fe921d4c34bc339ce1168bc2ffde5"
   integrity sha512-J5FBQt/pM2inLzg4hEWmzQx/8h8D0CiDxaG3vyp9rKrQRSDgBlhjdP5jQGgosEajXPSQouXGHOmVdgo7QmJuOg==
@@ -9128,6 +9146,15 @@ quill-delta@^3.6.2:
     deep-equal "^1.0.1"
     extend "^3.0.2"
     fast-diff "1.1.2"
+
+quill-delta@^4.0.1:
+  version "4.2.2"
+  resolved "https://registry.yarnpkg.com/quill-delta/-/quill-delta-4.2.2.tgz#015397d046e0a3bed087cd8a51f98c11a1b8f351"
+  integrity sha512-qjbn82b/yJzOjstBgkhtBjN2TNK+ZHP/BgUQO+j6bRhWQQdmj2lH6hXG7+nwwLF41Xgn//7/83lxs9n2BkTtTg==
+  dependencies:
+    fast-diff "1.2.0"
+    lodash.clonedeep "^4.5.0"
+    lodash.isequal "^4.5.0"
 
 quill-magic-url@^1.0.3:
   version "1.0.3"

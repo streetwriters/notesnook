@@ -21,6 +21,7 @@ const DEFAULT_SESSION = {
   context: undefined,
   colors: [],
   dateEdited: 0,
+  totalWords: 0,
   content: {
     text: "",
     delta: {
@@ -181,6 +182,12 @@ class EditorStore extends BaseStore {
         (state.arePropertiesVisible =
           toggleState !== undefined ? toggleState : !state.arePropertiesVisible)
     );
+  };
+
+  updateWordCount = (count) => {
+    this.set((state) => {
+      state.session.totalWords = count;
+    });
   };
 
   /**

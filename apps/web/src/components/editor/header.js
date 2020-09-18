@@ -6,7 +6,6 @@ import { useStore as useAppStore } from "../../stores/app-store";
 import TitleBox from "./title-box";
 import { useStore, SESSION_STATES } from "../../stores/editor-store";
 import { timeConverter } from "../../utils/time";
-import { countWords } from "../../utils/string";
 import { showToast } from "../../utils/toast";
 
 const TextSeperator = () => {
@@ -21,7 +20,7 @@ function Header() {
   const title = useStore((store) => store.session.title);
   const dateEdited = useStore((store) => store.session.dateEdited);
   const id = useStore((store) => store.session.id);
-  const text = useStore((store) => store.session.content.text);
+  const totalWords = useStore((store) => store.session.totalWords);
   const isSaving = useStore((store) => store.session.isSaving);
   const sessionState = useStore((store) => store.session.state);
   const setSession = useStore((store) => store.setSession);
@@ -68,23 +67,13 @@ function Header() {
           sx={{
             display: "flex",
             alignItems: "center",
-            marginTop: dateEdited || text?.length || id ? 0 : [0, 2, 2],
-            marginBottom: dateEdited || text?.length || id ? [1, 2, 2] : 0,
           }}
         >
-          {dateEdited > 0 ? (
-            <>
-              {timeConverter(dateEdited)}
-              <TextSeperator />
-            </>
-          ) : null}
-          {text.length > 0 ? (
-            <>
-              {countWords(text) + " words"}
-              <TextSeperator />
-            </>
-          ) : null}
-          {id ? <>{isSaving ? "Saving" : "Saved"}</> : null}
+          {timeConverter(dateEdited) || "-"}
+          <TextSeperator />
+          {id ? totalWords + " words" : "-"}
+          <TextSeperator />
+          {id ? (isSaving ? "Saving" : "Saved") : "-"}
         </Text>
       </Flex>
       <Flex
