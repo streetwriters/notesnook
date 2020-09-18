@@ -1,31 +1,32 @@
-import React, { createRef, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
-  FlatList,
+  Dimensions,
+  LayoutAnimation,
   Platform,
   RefreshControl,
-  SectionList,
   Text,
-  View
+  View,
 } from 'react-native';
-import * as Animatable from 'react-native-animatable';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { SIZE, WEIGHT } from '../../common/common';
-import { useTracked } from '../../provider';
-import { ACTIONS } from '../../provider/actions';
-import { eSendEvent } from '../../services/eventManager';
+import {DataProvider, LayoutProvider, RecyclerListView} from 'recyclerlistview';
+import {COLORS_NOTE, SIZE, WEIGHT} from '../../common/common';
+import {useTracked} from '../../provider';
+import {ACTIONS} from '../../provider/actions';
+import {eSendEvent} from '../../services/eventManager';
 import {
   eClearSearch,
   eOpenLoginDialog,
-  eScrollEvent
+  eScrollEvent,
 } from '../../services/events';
-import { db, ToastEvent } from '../../utils/utils';
-import { PressableButton } from '../PressableButton';
-import { PinnedItemList } from './PinnedItemList';
-const sectionListRef = createRef();
+import {db, hexToRGBA, RGB_Linear_Shade, ToastEvent} from '../../utils/utils';
+import {PressableButton} from '../PressableButton';
+let {width, height} = Dimensions.get('window');
 
-const AnimatedFlatlist = Animatable.createAnimatableComponent(FlatList);
-const AnimatedSectionList = Animatable.createAnimatableComponent(SectionList);
+const header = {
+  type: 'MAIN_HEADER',
+};
+
 const SimpleList = ({
   data,
   type,
@@ -42,15 +43,44 @@ const SimpleList = ({
   isHome = false,
 }) => {
   const [state, dispatch] = useTracked();
-  const {colors, selectionMode, user} = state;
+  const {colors, selectionMode, user, currentScreen} = state;
   const searchResults = {...state.searchResults};
   const [refreshing, setRefreshing] = useState(false);
+  const [dataProvider, setDataProvider] = useState(null);
   const insets = useSafeAreaInsets();
   const _onScroll = (event) => {
     if (!event) return;
     let y = event.nativeEvent.contentOffset.y;
     eSendEvent(eScrollEvent, y);
   };
+
+  const NOOP = () => undefined;
+
+  const layoutItemAnimator = {
+    animateDidMount: NOOP,
+    animateShift: NOOP,
+    animateWillMount: NOOP,
+    animateWillUnmount: NOOP,
+    animateWillUpdate: () =>
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut),
+  };
+
+  useEffect(() => {
+    let mainData =
+      searchResults.type === type && focused && searchResults.results.length > 0
+        ? searchResults.results
+        : data;
+
+    let d = [header, ...mainData];
+    /*  for (var i = 0; i < 10000; i++) {
+      d = [...d,...data];
+    }  */
+    setDataProvider(
+      new DataProvider((r1, r2) => {
+        return r1 !== r2;
+      }).cloneWithRows(d),
+    );
+  }, [data]);
 
   const _ListFooterComponent = data[0] ? (
     <View
@@ -70,7 +100,7 @@ const SimpleList = ({
     </View>
   ) : null;
 
-  const _renderSectionHeader = ({section: {title}}) => (
+  const RenderSectionHeader = ({item}) => (
     <Text
       style={{
         fontFamily: WEIGHT.bold,
@@ -80,9 +110,10 @@ const SimpleList = ({
         width: '100%',
         alignSelf: 'center',
         marginTop: 15,
+        height: 30,
         paddingBottom: 5,
       }}>
-      {title}
+      {item.title}
     </Text>
   );
 
@@ -131,22 +162,15 @@ const SimpleList = ({
     dispatch({type: ACTIONS.ALL});
   };
 
-  const _ListHeaderComponent_S =
-    searchResults.type === type && searchResults.results.length > 0 ? (
+  const ListHeaderComponent = () => {
+    return searchResults.type === type && searchResults.results.length > 0 ? (
       <View
         style={{
-          marginTop:
-            Platform.OS == 'ios'
-              ? data[0] && !selectionMode
-                ? 115
-                : 115 - 60
-              : data[0] && !selectionMode
-              ? 155 - insets.top
-              : 155 - insets.top - 60,
           flexDirection: 'row',
           alignItems: 'center',
           justifyContent: 'space-between',
           paddingHorizontal: 12,
+          height: 40,
         }}>
         <Text
           style={{
@@ -169,39 +193,41 @@ const SimpleList = ({
         </Text>
       </View>
     ) : (
-      <View
-        style={{
-          marginTop:
-            Platform.OS == 'ios'
-              ? data[0] && !selectionMode
-                ? 135
-                : 135 - 60
-              : data[0] && !selectionMode
-              ? 155 - insets.top
-              : 155 - 60 - insets.top,
-        }}>
+      <View>
         {user || !data[0] || selectionMode ? null : (
           <PressableButton
             onPress={() => {
               eSendEvent(eOpenLoginDialog);
             }}
-            color={colors.shade}
-            selectedColor={colors.accent}
+            color={
+              COLORS_NOTE[currentScreen]
+                ? COLORS_NOTE[currentScreen]
+                : colors.shade
+            }
+            selectedColor={
+              COLORS_NOTE[currentScreen]
+                ? COLORS_NOTE[currentScreen]
+                : colors.accent
+            }
             alpha={!colors.night ? -0.02 : 0.1}
             opacity={0.12}
             customStyle={{
-              paddingVertical: 6,
               width: '100%',
               flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'flex-start',
               paddingHorizontal: 12,
               alignSelf: 'center',
+              height: 40,
+              borderRadius: 0,
+              position: 'relative',
             }}>
             <View
               style={{
                 width: 25,
-                backgroundColor: colors.accent,
+                backgroundColor: COLORS_NOTE[currentScreen]
+                  ? COLORS_NOTE[currentScreen]
+                  : colors.accent,
                 height: 25,
                 borderRadius: 100,
                 alignItems: 'center',
@@ -231,7 +257,9 @@ const SimpleList = ({
               </Text>
               <Text
                 style={{
-                  color: colors.accent,
+                  color: COLORS_NOTE[currentScreen]
+                    ? COLORS_NOTE[currentScreen]
+                    : colors.accent,
                   fontSize: SIZE.xxs,
                 }}>
                 Login to sync your {type}.
@@ -239,96 +267,138 @@ const SimpleList = ({
             </View>
           </PressableButton>
         )}
-        {pinned ? <PinnedItemList type={type} /> : null}
       </View>
     );
+  };
 
   const _ListEmptyComponent = (
     <View
       style={{
-        height: '80%',
+        height: '100%',
         width: '100%',
         alignItems: 'center',
         alignSelf: 'center',
         justifyContent: 'center',
         opacity: 1,
+        backgroundColor: colors.bg,
       }}>
       <>{placeholder}</>
     </View>
   );
 
   const _listKeyExtractor = (item, index) =>
-    item.id.toString() + index.toString();
+    item.type === 'header' ? item.title : item.id.toString() + index.toString();
 
-  return isHome && searchResults.type !== 'notes' ? (
-    <AnimatedSectionList
-      transition="backgroundColor"
-      duration={300}
-      ref={sectionListRef}
-      sections={data}
-      refreshControl={
-        <RefreshControl
-          tintColor={colors.accent}
-          colors={[colors.accent]}
-          progressViewOffset={150}
-          onRefresh={_onRefresh}
-          refreshing={refreshing}
-        />
+  const _layoutProvider = new LayoutProvider(
+    (index) => {
+      console.log(dataProvider.getDataForIndex(index).type, 'TYPE');
+      return dataProvider.getDataForIndex(index).type;
+    },
+    (type, dim) => {
+      switch (type) {
+        case 'note':
+          dim.width = width;
+          dim.height = 100;
+          break;
+        case 'notebook':
+          dim.width = width;
+          dim.height = 110;
+          break;
+        case 'topic':
+          dim.width = width;
+          dim.height = 80;
+          break;
+        case 'tag':
+          dim.width = width;
+          dim.height = 80;
+          break;
+        case 'header':
+          dim.width = width;
+          dim.height = 40;
+          break;
+        case 'MAIN_HEADER':
+          dim.width = width;
+          dim.height = 40;
+          break;
+        default:
+          dim.width = width;
+          dim.height = 0;
       }
-      keyExtractor={_listKeyExtractor}
-      renderSectionHeader={_renderSectionHeader}
-      onScroll={_onScroll}
-      stickySectionHeadersEnabled={false}
-      ListEmptyComponent={_ListEmptyComponent}
-      ListHeaderComponent={_ListHeaderComponent_S}
-      contentContainerStyle={{
-        width: '100%',
-        alignSelf: 'center',
-        minHeight: '100%',
-      }}
-      style={{
-        height: '100%',
-        backgroundColor: colors.bg,
-      }}
-      removeClippedSubviews={true}
-      ListFooterComponent={_ListFooterComponent}
-      renderItem={({item, index}) => <RenderItem item={item} index={index} />}
-    />
+    },
+  );
+
+  const _renderRow = (type, data, index) => {
+    switch (type) {
+      case 'note':
+        return <RenderItem item={data} pinned={data.pinned} index={index} />;
+      case 'MAIN_HEADER':
+        return <ListHeaderComponent />;
+      case 'header':
+        return <RenderSectionHeader item={data} />;
+
+      default:
+        return null;
+    }
+  };
+
+  return !data || data.length === 0 ? (
+    _ListEmptyComponent
   ) : (
-    <AnimatedFlatlist
-      transition="backgroundColor"
-      duration={300}
-      data={
+    <RecyclerListView
+      layoutProvider={_layoutProvider}
+      dataProvider={dataProvider}
+      rowRenderer={_renderRow}
+      onScroll={_onScroll}
+      scrollViewProps={{
+        refreshControl: (
+          <RefreshControl
+            tintColor={colors.accent}
+            colors={[colors.accent]}
+            progressViewOffset={150}
+            onRefresh={customRefresh ? customRefresh : _onRefresh}
+            refreshing={customRefresh ? customRefreshing : refreshing}
+          />
+        ),
+        contentContainerStyle: {
+          width: '100%',
+          alignSelf: 'center',
+          minHeight: '100%',
+        },
+      }}
+      /*   data={
         searchResults.type === type &&
         focused &&
         searchResults.results.length > 0
           ? searchResults.results
           : data
       }
-      refreshControl={
-        <RefreshControl
-          tintColor={colors.accent}
-          colors={[colors.accent]}
-          progressViewOffset={150}
-          onRefresh={customRefresh ? customRefresh : _onRefresh}
-          refreshing={customRefresh ? customRefreshing : refreshing}
-        />
-      }
-      keyExtractor={_listKeyExtractor}
-      ListFooterComponent={_ListFooterComponent}
-      onScroll={_onScroll}
-      ListHeaderComponent={_ListHeaderComponent_S}
-      ListEmptyComponent={_ListEmptyComponent}
-      contentContainerStyle={{
-        width: '100%',
-        alignSelf: 'center',
-        minHeight: '100%',
-      }}
+      
+      keyExtractor={_listKeyExtractor} */
+      //
+      //onScroll={_onScroll}
+      //
+      //
+
       style={{
         height: '100%',
         backgroundColor: colors.bg,
+        width: '100%',
+        paddingTop:
+          Platform.OS == 'ios'
+            ? data[0] && !selectionMode
+              ? 115
+              : 115 - 60
+            : data[0] && !selectionMode
+            ? 155 - insets.top
+            : 155 - insets.top - 60,
       }}
-      renderItem={({item, index}) => <RenderItem item={item} index={index} />}
+      /*  renderItem={({item, index}) =>
+        item.type === 'header' ? (
+          <RenderSectionHeader item={item} />
+        ) : (
+          <RenderItem item={item} index={index} />
+        )
+      } */
     />
   );
 };
