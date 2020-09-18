@@ -87,6 +87,7 @@ const SelectionWrapper = ({
         alignItems: 'center',
         width: '100%',
         paddingHorizontal: 12,
+        borderRadius: 0,
         marginTop:
           index === 0 && pinned && !selectionMode
             ? 15
