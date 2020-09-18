@@ -1,32 +1,50 @@
 /* eslint-disable */
 
 var context;
-if (!self instanceof Window) {
-  self.sodium = {
-    onload: function (_sodium) {
-      context = { sodium: _sodium };
-      sendMessage("loaded");
-    },
-  };
-  importScripts("sodium.js");
-
+if (!self.document) {
   self.addEventListener("message", onMessage);
 }
 
 function onMessage(ev) {
   const { type, data, messageId } = ev.data;
-  if (type === "encrypt") {
-    const { passwordOrKey, data: _data } = data;
-    const cipher = encrypt.call(context, passwordOrKey, _data);
-    sendMessage("encrypt", cipher, messageId);
-  } else if (type === "decrypt") {
-    const { passwordOrKey, cipher } = data;
-    const plainText = decrypt.call(context, passwordOrKey, cipher);
-    sendMessage("decrypt", plainText, messageId);
-  } else if (type === "deriveKey") {
-    const { password, salt, exportKey } = data;
-    const derivedKey = deriveKey.call(context, password, salt, exportKey);
-    sendMessage("deriveKey", derivedKey, messageId);
+  try {
+    switch (type) {
+      case "encrypt": {
+        const { passwordOrKey, data: _data } = data;
+        const cipher = encrypt.call(context, passwordOrKey, _data);
+        sendMessage("encrypt", cipher, messageId);
+        break;
+      }
+      case "decrypt": {
+        const { passwordOrKey, cipher } = data;
+        const plainText = decrypt.call(context, passwordOrKey, cipher);
+        sendMessage("decrypt", plainText, messageId);
+        break;
+      }
+      case "deriveKey": {
+        const { password, salt, exportKey } = data;
+        const derivedKey = deriveKey.call(context, password, salt, exportKey);
+        sendMessage("deriveKey", derivedKey, messageId);
+        break;
+      }
+      case "load": {
+        const { seed } = data;
+        self.sodium = {
+          onload: function (_sodium) {
+            context = { sodium: _sodium };
+            // create the crypto polyfill if necessary
+            webCryptoPolyfill(seed, _sodium);
+            sendMessage("load", {}, messageId);
+          },
+        };
+        importScripts("sodium.js");
+        break;
+      }
+      default:
+        return;
+    }
+  } catch (error) {
+    sendMessage(type, { error }, messageId);
   }
 }
 
@@ -128,10 +146,52 @@ const decrypt = (passwordOrKey, { iv, cipher, salt }) => {
   return plainText;
 };
 
-if (self instanceof Window) {
+if (self.document) {
   self.ncrypto = {
     decrypt,
     deriveKey,
     encrypt,
   };
 }
+
+/**
+ * If not available natively, uses a separate CSPRNG to polyfill the Web Crypto API.
+ * Used in worker threads in some browsers.
+ * @param seed Securely generated 32-byte key.
+ */
+const webCryptoPolyfill = (seed, sodium) => {
+  if ("getRandomValues" in crypto) return;
+
+  const nonce = new Uint32Array(2);
+  crypto = {
+    getRandomValues: (array) => {
+      if (!array) {
+        throw new TypeError(
+          `Failed to execute 'getRandomValues' on 'Crypto': ${
+            array === null
+              ? "parameter 1 is not of type 'ArrayBufferView'"
+              : "1 argument required, but only 0 present"
+          }.`
+        );
+      }
+      /* Handle circular dependency between this polyfill and libsodium */
+      const sodiumExists = typeof sodium.crypto_stream_chacha20 === "function";
+      if (!sodiumExists) {
+        throw new Error("No CSPRNG found.");
+      }
+      ++nonce[nonce[0] === 4294967295 ? 1 : 0];
+      const newBytes = sodium().crypto_stream_chacha20(
+        array.byteLength,
+        seed,
+        new Uint8Array(nonce.buffer, nonce.byteOffset, nonce.byteLength)
+      );
+      new Uint8Array(array.buffer, array.byteOffset, array.byteLength).set(
+        newBytes
+      );
+      sodium().memzero(newBytes);
+      return array;
+    },
+    subtle: {},
+  };
+  self.crypto = crypto;
+};

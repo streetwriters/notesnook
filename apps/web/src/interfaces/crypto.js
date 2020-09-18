@@ -50,36 +50,37 @@ class CryptoWorker {
   }
   async _initialize() {
     if (this.isReady) return;
-    return new Promise((resolve) => {
-      this.worker = new Worker("crypto.worker.js");
-      this.worker.onmessage = (ev) => {
-        const { type } = ev.data;
-        if (type === "loaded") {
-          this.worker.onmessage = undefined;
-          this.isReady = true;
-          resolve(true);
-        }
-      };
-    });
+    this.worker = new Worker("crypto.worker.js");
+    const buffer = Buffer.allocUnsafe(32);
+    crypto.getRandomValues(buffer);
+    const message = { seed: buffer.buffer };
+    await this._communicate("load", message, [message.seed], false);
+    this.isReady = true;
   }
 
-  _communicate(type, data) {
-    return new Promise(async (resolve) => {
-      await this._initialize();
+  _communicate(type, data, transferables = [], init = true) {
+    return new Promise(async (resolve, reject) => {
+      if (init) await this._initialize();
       const messageId = Math.random().toString(36).substr(2, 9);
       const onMessage = (e) => {
-        const { type: _type, messageId: _mId } = e.data;
+        const { type: _type, messageId: _mId, data } = e.data;
         if (_type === type && _mId === messageId) {
           this.worker.removeEventListener("message", onMessage);
-          resolve(e.data.data);
+          if (data.error) {
+            return reject(data.error);
+          }
+          resolve(data);
         }
       };
       this.worker.addEventListener("message", onMessage);
-      this.worker.postMessage({
-        type,
-        data,
-        messageId,
-      });
+      this.worker.postMessage(
+        {
+          type,
+          data,
+          messageId,
+        },
+        transferables
+      );
     });
   }
 
