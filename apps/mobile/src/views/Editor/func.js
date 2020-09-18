@@ -265,7 +265,7 @@ export function onWebViewLoad(noMenu, premium, colors) {
   setTimeout(() => {
     Platform.OS === 'android' ? EditorWebView.current?.requestFocus() : null;
     post('blur');
-  }, 3000);
+  }, 1000);
 }
 
 const updateEditor = async () => {
