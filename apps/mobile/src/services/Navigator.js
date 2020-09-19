@@ -45,8 +45,6 @@ export const NavigationStack = () => {
           <Stack.Screen name="Notes" component={Notes} />
           <Stack.Screen name="Tags" component={Tags} />
           <Stack.Screen name="Notebook" component={Notebook} />
-          <Stack.Screen name="Login" component={Login} />
-          <Stack.Screen name="Signup" component={Signup} />
           <Stack.Screen name="Settings" component={Settings} />
         </Stack.Navigator>
       </NavigationContainer>
