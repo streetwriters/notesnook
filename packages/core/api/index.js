@@ -86,7 +86,7 @@ class Database {
       user = await this.user.get();
     }
 
-    this.evtSource = new NNEventSource(`${HOST}/events`, {
+    this.evtSource = new NNEventSource(`${Constants.HOST}/events`, {
       headers: { Authorization: `Bearer ${user.accessToken}` },
     });
 
@@ -117,7 +117,7 @@ class Database {
 
   host(host) {
     if (process.env.NODE_ENV !== "production") {
-      Constants.HOST = host || HOST;
+      Constants.HOST = host || Constants.HOST;
     }
   }
 }
