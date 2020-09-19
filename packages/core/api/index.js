@@ -12,7 +12,7 @@ import Backup from "../database/backup";
 import Conflicts from "./sync/conflicts";
 import EventManager from "../utils/event-manager";
 import Session from "./session";
-import { HOST } from "../utils/constants";
+import Constants from "../utils/constants";
 
 /**
  * @type {EventSource}
@@ -117,7 +117,7 @@ class Database {
 
   host(host) {
     if (process.env.NODE_ENV !== "production") {
-      HOST = host || HOST;
+      Constants.HOST = host || HOST;
     }
   }
 }

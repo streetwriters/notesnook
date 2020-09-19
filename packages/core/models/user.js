@@ -1,4 +1,4 @@
-import { HOST, HEADERS } from "../utils/constants";
+import Constants from "../utils/constants";
 
 export default class User {
   /**
@@ -138,9 +138,9 @@ async function authRequest(endpoint, data, auth = false, get = false) {
     };
   }
 
-  let response = await fetch(`${HOST}/${endpoint}`, {
+  let response = await fetch(`${Constants.HOST}/${endpoint}`, {
     method: get ? "GET" : "POST",
-    headers: { ...HEADERS, ...headers },
+    headers: { ...Constants.HEADERS, ...headers },
     body: get ? undefined : JSON.stringify(data),
   });
 
