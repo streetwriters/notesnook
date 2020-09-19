@@ -221,7 +221,7 @@ const SimpleList = ({
               height: 40,
               borderRadius: 0,
               position: 'relative',
-            }}>
+            }}> 
             <View
               style={{
                 width: 25,
@@ -286,12 +286,10 @@ const SimpleList = ({
     </View>
   );
 
-  const _listKeyExtractor = (item, index) =>
-    item.type === 'header' ? item.title : item.id.toString() + index.toString();
 
   const _layoutProvider = new LayoutProvider(
     (index) => {
-      console.log(dataProvider.getDataForIndex(index).type, 'TYPE');
+    
       return dataProvider.getDataForIndex(index).type;
     },
     (type, dim) => {
@@ -318,7 +316,7 @@ const SimpleList = ({
           break;
         case 'MAIN_HEADER':
           dim.width = width;
-          dim.height = 40;
+          dim.height =user || !data[0] || selectionMode ? 0: 40;
           break;
         default:
           dim.width = width;
