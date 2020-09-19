@@ -76,7 +76,7 @@ const MoveNoteDialog = () => {
     }
 
     let res = await db.notebooks.notebook(expanded).topics.add(newTopicTitle);
-    console.log(newTopicTitle, res);
+
     dispatch({type: ACTIONS.NOTEBOOKS});
     dispatch({type: ACTIONS.PINNED});
     topicInput.current?.clear();
@@ -358,8 +358,7 @@ const MoveNoteDialog = () => {
                         onPress={async () => {
                           let noteIds = [];
                           selectedItemsList.forEach((i) => noteIds.push(i.id));
-                          console.log(selectedItemsList[0]);
-                          console.log(noteIds, 'NOTE IDS');
+                       
                           let res = await db.notes.move(
                             {
                               topic: item.title,
@@ -367,7 +366,6 @@ const MoveNoteDialog = () => {
                             },
                             ...noteIds,
                           );
-                          console.log(res);
                           dispatch({type: ACTIONS.CLEAR_SELECTION});
                           dispatch({type: ACTIONS.NOTEBOOKS});
                           dispatch({type: ACTIONS.PINNED});

@@ -15,7 +15,7 @@ export const ColorSection = ({noTextMode}) => {
   const {colors, colorNotes, currentScreen} = state;
 
   useEffect(() => {
-    console.log(colorNotes[0]);
+  
     dispatch({type: ACTIONS.TAGS});
   }, []);
 

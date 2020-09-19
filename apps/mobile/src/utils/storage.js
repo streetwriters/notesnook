@@ -17,7 +17,6 @@ async function read(key, isArray = false) {
   if (!data) return null;
   try {
     data = JSON.parse(data);
-    console.log(isArray? data: null, "ARRAY");
     
     data = isArray? [...data] : data;
   } catch (e) {
@@ -28,7 +27,6 @@ async function read(key, isArray = false) {
 }
 
 async function write(key, data) {
-  console.log(key,data,"DATA_WRITE");
   return await MMKV.setItem(
     key,
     typeof data === 'string' ? data : JSON.stringify(data),
@@ -36,7 +34,6 @@ async function write(key, data) {
 }
 
 async function readMulti(keys) {
-  console.log(keys,"KEYS");
   if (keys.length <= 0) {
     return [];
   } else {
@@ -53,7 +50,7 @@ async function readMulti(keys) {
       
       return [key, obj];
     })
-    console.log(map,"DATA");
+  
     return map;
 
   }

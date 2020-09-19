@@ -35,7 +35,7 @@ import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
 import {eOpenLoginDialog, eResetApp} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
-import {MMKV} from '../../utils/storage';
+import storage, {MMKV} from '../../utils/storage';
 import {
   db,
   DDS,
@@ -316,69 +316,61 @@ export const Settings = ({route, navigation}) => {
         }}>
         {user ? (
           <>
-            <SectionHeader title="Account Settings" />
-            <Text
-              style={{
-                fontSize: SIZE.sm,
-                fontFamily: WEIGHT.regular,
-                textAlignVertical: 'center',
-                color: colors.pri,
-                marginTop: pv + 5,
-              }}>
-              Logged in as:
-            </Text>
-
             <View
               style={{
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                alignSelf: 'center',
-                flexDirection: 'row',
-                width: '100%',
-                paddingVertical: pv,
-                marginBottom: pv + 5,
-                marginTop: pv,
-                backgroundColor: colors.accent,
-                borderRadius: 5,
-                padding: 5,
                 paddingHorizontal: 12,
               }}>
               <View
                 style={{
-                  flexDirection: 'row',
-                  justifyContent: 'center',
+                  justifyContent: 'space-between',
                   alignItems: 'center',
-                }}>
-                <Icon size={SIZE.lg} color="white" name="account-outline" />
-
-                <Text
-                  style={{
-                    color: 'white',
-                    marginLeft: 5,
-                    fontFamily: WEIGHT.regular,
-                    fontSize: SIZE.sm,
-                  }}>
-                  {user.username}
-                </Text>
-              </View>
-              <View
-                style={{
+                  alignSelf: 'center',
+                  flexDirection: 'row',
+                  width: '100%',
+                  paddingVertical: pv,
+                  marginBottom: pv,
+                  marginTop: pv,
+                  backgroundColor: colors.accent,
                   borderRadius: 5,
                   padding: 5,
-                  paddingVertical: 2.5,
-                  backgroundColor: 'white',
+                  paddingHorizontal: 12,
                 }}>
-                <Text
+                <View
                   style={{
-                    color: colors.accent,
-                    fontFamily: WEIGHT.regular,
-                    fontSize: SIZE.xs,
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    alignItems: 'center',
                   }}>
-                  Pro
-                </Text>
+                  <Icon size={SIZE.lg} color="white" name="account-outline" />
+
+                  <Text
+                    style={{
+                      color: 'white',
+                      marginLeft: 5,
+                      fontFamily: WEIGHT.regular,
+                      fontSize: SIZE.sm,
+                    }}>
+                    {user.username}
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    borderRadius: 5,
+                    padding: 5,
+                    paddingVertical: 2.5,
+                    backgroundColor: 'white',
+                  }}>
+                  <Text
+                    style={{
+                      color: colors.accent,
+                      fontFamily: WEIGHT.regular,
+                      fontSize: SIZE.xs,
+                    }}>
+                    Pro
+                  </Text>
+                </View>
               </View>
             </View>
-
             {[
               {
                 name: 'Data recovery key',
@@ -387,10 +379,13 @@ export const Settings = ({route, navigation}) => {
                   setKey(k.key);
                   setModalVisible(true);
                 },
+                desc:
+                  'Generate a data recovery key to recovery your data if you lose it',
               },
               {
                 name: 'Subscription status',
                 func: () => {},
+                desc: 'Current status of your subscription',
               },
               {
                 name: 'Logout',
@@ -398,11 +393,19 @@ export const Settings = ({route, navigation}) => {
                   await db.user.logout();
                   dispatch({type: ACTIONS.USER, user: null});
                   dispatch({type: ACTIONS.CLEAR_ALL});
-                  ToastEvent.show('Logged out, syncing disabled', 'success');
+                  //ToastEvent.show('Logged out, syncing disabled', 'success');
+                  eSendEvent(eResetApp);
                 },
+                desc:
+                  'Logout of your account, this will clear everything and reset the app.',
               },
             ].map((item) => (
-              <Button key={item.name} title={item.name} onPress={item.func} />
+              <Button
+                key={item.name}
+                title={item.name}
+                onPress={item.func}
+                tagline={item.desc}
+              />
             ))}
           </>
         ) : (
@@ -435,7 +438,7 @@ export const Settings = ({route, navigation}) => {
                     width: 40,
                     backgroundColor: colors.accent,
                     height: 40,
-                    marginLeft:10,
+                    marginLeft: 10,
                     borderRadius: 100,
                     alignItems: 'center',
                     justifyContent: 'center',

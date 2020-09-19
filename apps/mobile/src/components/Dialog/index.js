@@ -87,7 +87,6 @@ export class Dialog extends Component {
             'global',
             6000,
             async () => {
-              console.log('COPY');
               let trash = db.trash;
 
               for (var i = 0; i < itemsCopy.length; i++) {

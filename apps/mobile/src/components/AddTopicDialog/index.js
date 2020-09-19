@@ -31,7 +31,7 @@ export class AddTopicDialog extends React.Component {
     } else {
       let topic = this.props.toEdit;
       topic.title = this.title;
-      console.log(topic);
+    
       await db.notebooks.notebook(topic.notebookId).topics.add(topic);
     }
     this.close();

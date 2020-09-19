@@ -305,86 +305,7 @@ export const Login = ({route, navigation}) => {
                   placeholderTextColor={colors.icon}
                 />
 
-                {/* <Text
-                  style={{
-                    textAlign: 'right',
-                    marginHorizontal: 12,
-                    fontFamily: WEIGHT.regular,
-                    textAlignVertical: 'bottom',
-        
-                    position: 'absolute',
-                    right: 5,
-                    top: 2.5,
-                  }}>
-                  {invalidEmail ? (
-                    <Icon name="alert-circle" size={SIZE.xs} color={colors.errorText} />
-                  ) : null}
-                </Text>
-        
-                <TextInput
-                  ref={_email}
-                  onFocus={() => {
-                    if (!invalidEmail) {
-                      _email.current.setNativeProps({
-                        style: {
-                          borderColor: colors.accent,
-                        },
-                      });
-                    }
-                  }}
-                  defaultValue={email}
-                  onBlur={() => {
-                    if (!validateEmail(email)) {
-                      setInvalidEmail(true);
-                      _email.current.setNativeProps({
-                        style: {
-                          color: colors.errorText,
-                          borderColor: colors.errorText,
-                        },
-                      });
-                    } else {
-                      _email.current.setNativeProps({
-                        style: {
-                          borderColor: colors.nav,
-                        },
-                      });
-                    }
-                  }}
-                  textContentType="emailAddress"
-                  onChangeText={value => {
-                    setEmail(value);
-                    if (invalidEmail && validateEmail(email)) {
-                      setInvalidEmail(false);
-                      _email.current.setNativeProps({
-                        style: {
-                          color: colors.pri,
-                          borderColor: colors.accent,
-                        },
-                      });
-                    }
-                  }}
-                  onSubmitEditing={() => {
-                    if (!validateEmail(email)) {
-                      setInvalidEmail(true);
-                      _email.current.setNativeProps({
-                        style: {
-                          color: colors.errorText,
-                        },
-                      });
-                    }
-                  }}
-                  style={{
-                    padding: pv,
-                    borderWidth: 1.5,
-                    borderColor: colors.nav,
-                    marginHorizontal: 12,
-                    borderRadius: 5,
-                    fontSize: SIZE.sm,
-                    fontFamily: WEIGHT.regular,
-                  }}
-                  placeholder="Email"
-                  placeholderTextColor={colors.icon}
-                /> */}
+                
                 {invalidUsername ? (
                   <Text
                     style={{
@@ -404,6 +325,7 @@ export const Login = ({route, navigation}) => {
                 ) : null}
 
                 <Seperator />
+                
                 <View
                   ref={_passContainer}
                   style={{
@@ -446,7 +368,6 @@ export const Login = ({route, navigation}) => {
                     }}
                     onChangeText={(value) => {
                       setPassword(value);
-                      console.log(value, 'VALUE');
                       if (invalidPassword && validatePass(password)) {
                         setInvalidPassword(false);
 
