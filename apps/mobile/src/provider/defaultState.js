@@ -16,7 +16,7 @@ export const defaultState = {
   tags: [],
   colorNotes: [],
   user: {},
-  premiumUser:true,
+  premiumUser:false,
   settings: {
     showToolbarOnTop: false,
     showKeyboardOnOpen: false,
