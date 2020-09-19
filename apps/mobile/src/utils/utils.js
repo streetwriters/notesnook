@@ -1,16 +1,22 @@
-import {Dimensions} from 'react-native';
-import Database from "notes-core/api/";
+import {Dimensions, Platform} from 'react-native';
+import Database from 'notes-core/api/';
 import {eSendEvent} from '../services/eventManager';
 import {eShowToast, eHideToast} from '../services/events';
 import {DeviceDetectionService} from './deviceDetection';
 import StorageInterface, {MMKV} from './storage';
 import {updateEvent} from '../components/DialogManager/recievers';
 import {ACTIONS} from '../provider/actions';
-import EventSource from "rn-eventsource";
-global.Buffer = require("buffer").Buffer;
+import ESource from './event-source';
+import EventSource from 'rn-eventsource';
+
+global.Buffer = require('buffer').Buffer;
 
 export const DDS = new DeviceDetectionService();
-export const db = new Database(StorageInterface, EventSource);
+export const db = new Database(
+  StorageInterface,
+  Platform.OS === 'ios' ? EventSource : ESource,
+);
+db.host('http://192.168.10.8:8000');
 
 export async function setSetting(settings, name, value) {
   let s = {...settings};
