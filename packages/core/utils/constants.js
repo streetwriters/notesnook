@@ -1,4 +1,4 @@
-export const HOST =
+export var HOST =
   process.env.NODE_ENV === "production"
     ? "https://api.notesnook.com"
     : "http://0.0.0.0:8000";

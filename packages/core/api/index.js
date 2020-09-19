@@ -114,6 +114,12 @@ class Database {
   sync() {
     return this.syncer.start();
   }
+
+  host(host) {
+    if (process.env.NODE_ENV !== "production") {
+      HOST = host || HOST;
+    }
+  }
 }
 
 export default Database;
