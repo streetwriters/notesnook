@@ -14,8 +14,9 @@ export default class CachedCollection {
     if (data.length > 0) this.map = new Map(data);
   }
 
-  clear() {
+  async clear() {
     this.map.clear();
+    await this.indexer.clear();
   }
 
   /**

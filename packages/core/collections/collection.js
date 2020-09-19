@@ -8,7 +8,10 @@ class Collection {
 
     if (collection.init) await collection.init();
     if (collection._collection.clear)
-      db.ev.subscribe("user:loggedOut", () => collection._collection.clear());
+      db.ev.subscribe(
+        "user:loggedOut",
+        async () => await collection._collection.clear()
+      );
 
     return collection;
   }

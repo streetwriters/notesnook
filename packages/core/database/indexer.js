@@ -28,4 +28,9 @@ export default class Indexer extends Storage {
     this.indices.splice(this.indices.indexOf(key), 1);
     await this.write(this.type, this.indices);
   }
+
+  async clear() {
+    this.indices = [];
+    await super.clear();
+  }
 }

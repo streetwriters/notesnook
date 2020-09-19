@@ -5,6 +5,10 @@ export default class IndexedCollection {
     this.indexer = new Indexer(context, type);
   }
 
+  clear() {
+    return this.indexer.clear();
+  }
+
   async init() {
     await this.indexer.init();
   }
@@ -34,7 +38,7 @@ export default class IndexedCollection {
       id,
       deleted: true,
       dateCreated: Date.now(),
-      dateEdited: Date.now()
+      dateEdited: Date.now(),
     });
   }
 
