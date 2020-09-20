@@ -12,6 +12,7 @@ import {opacity, ph, pv, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
 import {DDS, getElevation, db} from '../../utils/utils';
 import {Loading} from '../Loading';
+
 const {
   eSubscribeEvent,
   eUnSubscribeEvent,
@@ -22,6 +23,8 @@ const {
 } = require('../../services/events');
 import {Button} from '../Button/index';
 import Seperator from '../Seperator';
+import storage from '../../utils/storage';
+import RNFetchBlob from 'rn-fetch-blob';
 
 const ExportDialog = () => {
   const [state, dispatch] = useTracked();
@@ -30,6 +33,8 @@ const ExportDialog = () => {
   const [notes, setNotes] = useState([]);
   const [exporting, setExporting] = useState(false);
   const [complete, setComplete] = useState(false);
+  const [doneText, setDoneText] = useState(null);
+  const [result,setResult] = useState({})
   useEffect(() => {
     eSubscribeEvent(eOpenExportDialog, open);
     eSubscribeEvent(eCloseExportDialog, close);
@@ -48,15 +53,41 @@ const ExportDialog = () => {
   const close = (data) => {
     setComplete(false);
     setExporting(false);
-    setNotes([]);
     setVisible(false);
-    setNotes(data);
+    setNotes([]);
+  };
+
+  var decodeHtmlEntity = function (str) {
+    return str.replace(/&#(\d+);/g, function (match, dec) {
+      return String.fromCharCode(dec);
+    });
   };
 
   const actions = [
     {
       title: 'PDF',
-      func: () => {},
+      func: async () => {
+        setExporting(true);
+        let res;
+        for (var i = 0; i < notes.length; i++) {
+          let note = notes[i];
+          res = await storage.saveToPDF(note);
+          if (!res) {
+            setExporting(false);
+            return;
+          }
+        }
+        setDoneText(
+          `Note exported successfully! You can find the exported note in ${
+            Platform.OS === 'ios'
+              ? 'Files Manager/Notesnook'
+              : 'Storage/Notesnook/exported/PDF'
+          }.`,
+        );
+
+          setResult(res);
+        setComplete(true);
+      },
       icon: 'file-pdf-box',
     },
     {
@@ -103,41 +134,45 @@ const ExportDialog = () => {
               Note
             </Text>
           </View>
-          <Text style={[{color: colors.pri,fontSize:SIZE.xs + 1,alignSelf:'center'}]}>
-            Export your note in any of the following formats.
-          </Text>
-                <Seperator half />
+
+          <Seperator half />
           {exporting ? (
             <Loading
               done={complete}
-              doneText={`Note exported successfully! You can find exported notes in ${
-                Platform.OS === 'ios'
-                  ? 'Files Manager/Notesnook'
-                  : 'Phone Storage/Notesnook/Exported/'
-              }.`}
-              onDone={close}
+              doneText={doneText}
+              onDone={() => {
+                RNFetchBlob.android.actionViewIntent(result.filePath, 'application/pdf');
+                close();
+              }}
               tagline="Exporting notes..."
             />
           ) : (
-            <View style={styles.buttonContainer}>
-              {actions.map((item) => (
-                <>
-                  <Seperator half />
-                  <Button
-                    width="100%"
-                    title={item.title}
-                    icon={item.icon}
-                    activeOpacity={opacity}
-                    onPress={() => {
-                      setExporting(true);
-                      setTimeout(() => {
-                        setComplete(true);
-                      }, 1000);
-                    }}
-                  />
-                </>
-              ))}
-            </View>
+            <>
+              <Text
+                style={[
+                  {
+                    color: colors.pri,
+                    fontSize: SIZE.xs + 1,
+                    alignSelf: 'center',
+                  },
+                ]}>
+                Export your note in any of the following formats.
+              </Text>
+              <View style={styles.buttonContainer}>
+                {actions.map((item) => (
+                  <>
+                    <Seperator half />
+                    <Button
+                      width="100%"
+                      title={item.title}
+                      icon={item.icon}
+                      activeOpacity={opacity}
+                      onPress={item.func}
+                    />
+                  </>
+                ))}
+              </View>
+            </>
           )}
         </View>
       </View>
