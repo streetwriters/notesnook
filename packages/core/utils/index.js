@@ -1,21 +1,22 @@
 import fastsort from "fast-sort";
 
 export function groupBy(arr, key, sortSelector) {
-  if (sortSelector) fastsort(arr).desc(sortSelector);
+  if (sortSelector)
+    fastsort(arr).by([{ desc: (t) => t.pinned }, { desc: sortSelector }]);
 
-  let groups = { Pinned: [] };
+  let groups = new Map();
   arr.forEach((item) => {
-    let groupTitle = item.pinned ? "Pinned" : key(item);
-    let group = groups[groupTitle]
-      ? groups[groupTitle]
-      : (groups[groupTitle] = []);
-    group.push(item);
+    let groupTitle = item.pinned ? "" : key(item);
+    let arr = groups.get(groupTitle) || [];
+    arr.push(item);
+    groups.set(groupTitle, arr);
   });
 
   let items = [];
-  for (let group in groups) {
-    items = [...items, { title: group, type: "header" }, ...groups[group]];
-  }
+  groups.forEach((groupItems, groupTitle) => {
+    items.push({ title: groupTitle, type: "header" });
+    groupItems.forEach((item) => items.push(item));
+  });
   return items;
 }
 
