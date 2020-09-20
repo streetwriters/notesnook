@@ -49,6 +49,7 @@ function NavigationMenu(props) {
   const isSyncing = useUserStore((store) => store.isSyncing);
   const isLoggedIn = useUserStore((store) => store.isLoggedIn);
   const logout = useUserStore((store) => store.logout);
+  const sync = useUserStore((store) => store.sync);
   const theme = useThemeStore((store) => store.theme);
   const toggleNightMode = useThemeStore((store) => store.toggleNightMode);
   const isMobile = useMobile();
@@ -154,6 +155,7 @@ function NavigationMenu(props) {
               title="Sync"
               isLoading={isSyncing}
               icon={Icon.Sync}
+              onClick={sync}
             />
             <NavigationItem
               title="Logout"
