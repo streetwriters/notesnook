@@ -119,14 +119,24 @@ const App = () => {
 
   useEffect(() => {
     Initialize().then(() => {
-      db.init().then(async () => {
-        let user = await db.user.get();
-        dispatch({type: ACTIONS.USER, user: user});
- 
-        startSyncer();
-        dispatch({type: ACTIONS.ALL});
-        setInit(true);
-      });
+      let error = null;
+      db.init()
+        .catch((e) => {
+          console.log(e);
+          error = e.message;
+        })
+        .finally(async () => {
+          let user = await db.user.get();
+          dispatch({type: ACTIONS.USER, user: user});
+          startSyncer();
+          dispatch({type: ACTIONS.ALL});
+          setInit(true);
+          if (error) {
+            setTimeout(() => {
+              ToastEvent.show(error);
+            }, 500);
+          }
+        });
     });
   }, []);
 
