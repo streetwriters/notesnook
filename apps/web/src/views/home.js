@@ -4,7 +4,7 @@ import { useStore, store } from "../stores/note-store";
 import { useStore as useEditorStore } from "../stores/editor-store";
 import ListContainer from "../components/list-container";
 import NotesPlaceholder from "../components/placeholders/notesplacholder";
-import { getNoteHeight } from "../common/height-calculator";
+import { getNoteHeight, MAX_HEIGHTS } from "../common/height-calculator";
 
 function Home() {
   useEffect(() => store.refresh(), []);
@@ -15,7 +15,7 @@ function Home() {
     <ListContainer
       type="notes"
       items={notes}
-      estimatedItemHeight={100}
+      estimatedItemHeight={MAX_HEIGHTS.note}
       itemHeight={getNoteHeight}
       item={(index, item) => <Note index={index} pinnable item={item} />}
       placeholder={NotesPlaceholder}

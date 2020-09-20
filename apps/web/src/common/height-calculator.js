@@ -1,6 +1,12 @@
 const SINGLE_LINE_HEIGHT = 1.4;
 const DEFAULT_FONT_SIZE = 16;
 
+const MAX_HEIGHTS = {
+  note: SINGLE_LINE_HEIGHT * 6 * DEFAULT_FONT_SIZE,
+  notebook: SINGLE_LINE_HEIGHT * 7 * DEFAULT_FONT_SIZE,
+  generic: SINGLE_LINE_HEIGHT * 4 * DEFAULT_FONT_SIZE,
+};
+
 function getNoteHeight(item) {
   const { title, headline } = item;
   let height = SINGLE_LINE_HEIGHT * 3;
@@ -45,4 +51,4 @@ function getItemHeight(item) {
   return height * DEFAULT_FONT_SIZE;
 }
 
-export { getNoteHeight, getNotebookHeight, getItemHeight };
+export { getNoteHeight, getNotebookHeight, getItemHeight, MAX_HEIGHTS };

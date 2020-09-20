@@ -5,7 +5,7 @@ import ListContainer from "../components/list-container";
 import { useStore as useNbStore } from "../stores/notebook-store";
 import { showTopicDialog } from "../components/dialogs/topicdialog";
 import { navigate } from "hookrouter";
-import { getItemHeight } from "../common/height-calculator";
+import { getItemHeight, MAX_HEIGHTS } from "../common/height-calculator";
 
 function Topics(props) {
   const { notebookId } = props;
@@ -32,7 +32,7 @@ function Topics(props) {
         type="topics"
         items={topics}
         itemHeight={getItemHeight}
-        estimatedItemHeight={80}
+        estimatedItemHeight={MAX_HEIGHTS.generic}
         item={(index, item) => (
           <Topic
             index={index}

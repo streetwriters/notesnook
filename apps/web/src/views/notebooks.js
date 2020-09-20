@@ -9,7 +9,7 @@ import Notes from "./notes.js";
 import { useRoutes, navigate } from "hookrouter";
 import RouteContainer from "../components/route-container";
 import { db } from "../common";
-import { getNotebookHeight } from "../common/height-calculator";
+import { getNotebookHeight, MAX_HEIGHTS } from "../common/height-calculator";
 
 const routes = {
   "/": () => (
@@ -63,7 +63,7 @@ function Notebooks() {
       <ListContainer
         type="notebooks"
         items={notebooks}
-        estimatedItemHeight={120}
+        estimatedItemHeight={MAX_HEIGHTS.notebook}
         itemHeight={getNotebookHeight}
         item={(index, item) => (
           <Notebook

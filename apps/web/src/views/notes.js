@@ -4,7 +4,7 @@ import ListContainer from "../components/list-container";
 import { useStore } from "../stores/editor-store";
 import { useStore as useNotesStore } from "../stores/note-store";
 import NotesPlaceholder from "../components/placeholders/notesplacholder";
-import { getNoteHeight } from "../common/height-calculator";
+import { getNoteHeight, MAX_HEIGHTS } from "../common/height-calculator";
 
 function Notes(props) {
   const newSession = useStore((store) => store.newSession);
@@ -21,7 +21,7 @@ function Notes(props) {
   return (
     <ListContainer
       type="notes"
-      estimatedItemHeight={100}
+      estimatedItemHeight={MAX_HEIGHTS.note}
       itemHeight={getNoteHeight}
       items={context.notes}
       placeholder={props.placeholder || NotesPlaceholder}

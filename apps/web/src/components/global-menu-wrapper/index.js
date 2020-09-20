@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect } from "react";
 import Menu from "../menu";
 import useContextMenu from "../../utils/useContextMenu";
 import Animated from "../animated";

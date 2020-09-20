@@ -10,7 +10,11 @@ import { toTitleCase } from "../utils/string";
 import TrashPlaceholder from "../components/placeholders/trash-placeholder";
 import { showToast } from "../utils/toast";
 import { showPermanentDeleteToast } from "../common/toasts";
-import { getNotebookHeight, getNoteHeight } from "../common/height-calculator";
+import {
+  getNotebookHeight,
+  getNoteHeight,
+  MAX_HEIGHTS,
+} from "../common/height-calculator";
 
 function menuItems(item, index) {
   return [
@@ -50,7 +54,7 @@ function Trash() {
     <ListContainer
       type="trash"
       placeholder={TrashPlaceholder}
-      estimatedItemHeight={120}
+      estimatedItemHeight={Math.max(MAX_HEIGHTS.note, MAX_HEIGHTS.notebook)}
       itemHeight={(item) => {
         if (item.type === "note") return getNoteHeight(item);
         else if (item.type === "notebook") return getNotebookHeight(item);
