@@ -1,6 +1,5 @@
 import { groupBy, isHex } from "../utils";
 import Collection from "./collection";
-import sort from "fast-sort";
 import {
   getWeekGroupFromTimestamp,
   months,
@@ -143,37 +142,46 @@ export default class Notes extends Collection {
 
   group(by) {
     let notes = this.all;
-    /* !special
-      ? tfun.filter(".pinned === false")(this.all)
-      :  */
-    notes = sort(notes).desc((t) => t.dateCreated);
+
     switch (by) {
       case "abc":
-        return groupBy(notes, (note) => note.title[0].toUpperCase());
+        return groupBy(
+          notes,
+          (note) => note.title[0].toUpperCase(),
+          (t) => t.title
+        );
       case "month":
         return groupBy(
           notes,
-          (note) => months[new Date(note.dateCreated).getMonth()]
+          (note) => months[new Date(note.dateCreated).getMonth()],
+          (t) => t.dateCreated
         );
       case "week":
-        return groupBy(notes, (note) =>
-          getWeekGroupFromTimestamp(note.dateCreated)
+        return groupBy(
+          notes,
+          (note) => getWeekGroupFromTimestamp(note.dateCreated),
+          (t) => t.dateCreated
         );
       case "year":
-        return groupBy(notes, (note) =>
-          new Date(note.dateCreated).getFullYear().toString()
+        return groupBy(
+          notes,
+          (note) => new Date(note.dateCreated).getFullYear().toString(),
+          (t) => t.dateCreated
         );
       default:
         let timestamps = {
           recent: getLastWeekTimestamp(7),
           lastWeek: getLastWeekTimestamp(7) - get7DayTimestamp(), //seven day timestamp value
         };
-        return groupBy(notes, (note) =>
-          note.dateCreated >= timestamps.recent
-            ? "Recent"
-            : note.dateCreated >= timestamps.lastWeek
-            ? "Last week"
-            : "Older"
+        return groupBy(
+          notes,
+          (note) =>
+            note.dateCreated >= timestamps.recent
+              ? "Recent"
+              : note.dateCreated >= timestamps.lastWeek
+              ? "Last week"
+              : "Older",
+          (t) => t.dateCreated
         );
     }
   }

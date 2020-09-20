@@ -1,4 +1,8 @@
-export function groupBy(arr, key) {
+import fastsort from "fast-sort";
+
+export function groupBy(arr, key, sortSelector) {
+  if (sortSelector) fastsort(arr).desc(sortSelector);
+
   let groups = { Pinned: [] };
   arr.forEach((item) => {
     let groupTitle = item.pinned ? "Pinned" : key(item);
