@@ -8,6 +8,7 @@ import {updateEvent} from '../components/DialogManager/recievers';
 import {ACTIONS} from '../provider/actions';
 import ESource from './event-source';
 import EventSource from 'rn-eventsource';
+import {PERMISSIONS, requestMultiple, RESULTS} from 'react-native-permissions';
 
 global.Buffer = require('buffer').Buffer;
 
@@ -52,6 +53,24 @@ export const selection = {
 export const history = {
   selectedItemsList: [],
 };
+
+export async function requestStoragePermission() {
+  let granted = false;
+  try {
+    const response = await requestMultiple([
+      PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE,
+      PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
+    ]);
+    granted =
+      response['android.permission.READ_EXTERNAL_STORAGE'] ===
+        RESULTS.GRANTED &&
+      response['android.permission.WRITE_EXTERNAL_STORAGE'] === RESULTS.GRANTED;
+  } catch (err) {
+    console.log(error);
+  } finally {
+    return granted;
+  }
+}
 
 export function timeSince(date) {
   var seconds = Math.floor((new Date() - date) / 1000);
