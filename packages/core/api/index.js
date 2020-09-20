@@ -91,11 +91,21 @@ class Database {
     });
 
     this.evtSource.onopen = function () {
-      console.log("sse opened.");
+      console.log("SSE: opened channel successfully!");
+    };
+
+    this.evtSource.onerror = function (error) {
+      console.log("SSE: error:", error);
     };
 
     this.evtSource.onmessage = async (event) => {
-      const { type, data } = JSON.parse(event.data);
+      try {
+        var { type, data } = JSON.parse(event.data);
+      } catch (e) {
+        console.log("SSE: Unsupported message. Message = ", event.data);
+        return;
+      }
+
       switch (type) {
         case "upgrade":
           await this.user.set({
