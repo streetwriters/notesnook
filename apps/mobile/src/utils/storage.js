@@ -1,13 +1,14 @@
 import 'react-native-get-random-values';
-import { isArray } from 'lodash';
-import { Platform } from 'react-native';
+import {isArray} from 'lodash';
+import {Platform} from 'react-native';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import MMKVStorage from 'react-native-mmkv-storage';
-import { generateSecureRandom } from 'react-native-securerandom';
+import {generateSecureRandom} from 'react-native-securerandom';
 import Sodium from 'react-native-sodium';
 import RNFetchBlob from 'rn-fetch-blob';
+import {db, requestStoragePermission, ToastEvent} from './utils';
 export const MMKV = new MMKVStorage.Loader().initialize();
-
+import he from 'he';
 async function read(key, isArray = false) {
   let data;
 
@@ -17,8 +18,8 @@ async function read(key, isArray = false) {
   if (!data) return null;
   try {
     data = JSON.parse(data);
-    
-    data = isArray? [...data] : data;
+
+    data = isArray ? [...data] : data;
   } catch (e) {
     data = data;
   }
@@ -43,16 +44,14 @@ async function readMulti(keys) {
       let obj;
       try {
         obj = JSON.parse(value);
-    
       } catch (e) {
         obj = value;
       }
-      
-      return [key, obj];
-    })
-  
-    return map;
 
+      return [key, obj];
+    });
+
+    return map;
   }
 }
 
@@ -80,25 +79,41 @@ async function deriveKey(password, salt) {
   } catch (e) {}
 }
 
-async function saveToPDF(html, filename) {
-  let options = {
-    html: html,
-    fileName: filename,
-    directory:
-      Platform.OS === 'ios'
-        ? 'Documents'
-        : RNFetchBlob.fs.dirs.SDCardDir + '/Call Of Writing/exported/PDF/',
-  };
-
-  return await RNHTMLtoPDF.convert(options);
-}
-
 async function getAllKeys() {
   return await MMKV.indexer.getKeys();
 }
 
 async function getRandomBytes(length) {
   return await generateSecureRandom(length);
+}
+
+async function saveToPDF(note) {
+  let androidSavePath = '/Notesnook/exported/PDF';
+  if (Platform.OS === 'android') {
+    let hasPermission = await requestStoragePermission();
+    if (!hasPermission) {
+      ToastEvent.show('Failed to get storage permission');
+      return null;
+    }
+  }
+  let html = await db.notes.note(note).export('html');
+  html = he.decode(html);
+  let options = {
+    html: html,
+    fileName: note.title,
+    directory: Platform.OS === 'ios' ? 'Documents' : androidSavePath,
+  };
+  return await RNHTMLtoPDF.convert(options);
+}
+
+async function checkAndCreateDir(dir) {
+  let exists = RNFetchBlob.fs.exists(dir);
+  let isDir = RNFetchBlob.fs.isDir(dir);
+
+  if (!exists || !isDir) {
+    await RNFetchBlob.fs.mkdir(dir);
+  }
+  return dir;
 }
 
 export default {
@@ -113,4 +128,5 @@ export default {
   saveToPDF,
   getAllKeys,
   getRandomBytes,
+  checkAndCreateDir,
 };
