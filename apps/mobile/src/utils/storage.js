@@ -1,14 +1,14 @@
-import 'react-native-get-random-values';
-import {isArray} from 'lodash';
+import he from 'he';
 import {Platform} from 'react-native';
+import 'react-native-get-random-values';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import MMKVStorage from 'react-native-mmkv-storage';
+import {and} from 'react-native-reanimated';
 import {generateSecureRandom} from 'react-native-securerandom';
 import Sodium from 'react-native-sodium';
 import RNFetchBlob from 'rn-fetch-blob';
 import {db, requestStoragePermission, ToastEvent} from './utils';
 export const MMKV = new MMKVStorage.Loader().initialize();
-import he from 'he';
 async function read(key, isArray = false) {
   let data;
 
@@ -103,7 +103,62 @@ async function saveToPDF(note) {
     fileName: note.title,
     directory: Platform.OS === 'ios' ? 'Documents' : androidSavePath,
   };
-  return await RNHTMLtoPDF.convert(options);
+  let res = await RNHTMLtoPDF.convert(options);
+
+  return {
+    filePath: res.filePath,
+    type: 'application/pdf',
+    name: 'Markdown',
+  };
+}
+
+async function saveToMarkdown(note) {
+  let androidSavePath =
+    RNFetchBlob.fs.dirs.SDCardDir + '/Notesnook/exported/Markdown/';
+  await checkAndCreateDir(androidSavePath);
+  let markdown = await db.notes.note(note.id).export('md');
+  console.log(markdown);
+  let path = androidSavePath + note.title + '.md';
+  await RNFetchBlob.fs.writeFile(path, markdown, 'utf8');
+
+  return {
+    filePath: path,
+    type: 'text/markdown',
+    name: 'Markdown',
+  };
+}
+
+async function saveToText(note) {
+  let androidSavePath =
+    RNFetchBlob.fs.dirs.SDCardDir + '/Notesnook/exported/Text/';
+  await checkAndCreateDir(androidSavePath);
+  let markdown = await db.notes.note(note.id).export('txt');
+  console.log(markdown);
+
+  let path = androidSavePath + note.title + '.txt';
+  await RNFetchBlob.fs.writeFile(path, markdown, 'utf8');
+
+  return {
+    filePath: path,
+    type: 'text/plain',
+    name: 'Text',
+  };
+}
+
+async function saveToHTML(note) {
+  let androidSavePath =
+    RNFetchBlob.fs.dirs.SDCardDir + '/Notesnook/exported/Html/';
+  await checkAndCreateDir(androidSavePath);
+  let markdown = await db.notes.note(note.id).export('html');
+  console.log(markdown);
+  let path = androidSavePath + note.title + '.html';
+  await RNFetchBlob.fs.writeFile(path, markdown, 'utf8');
+
+  return {
+    filePath: path,
+    type: 'text/html',
+    name: 'Html',
+  };
 }
 
 async function checkAndCreateDir(dir) {
@@ -129,4 +184,7 @@ export default {
   getAllKeys,
   getRandomBytes,
   checkAndCreateDir,
+  saveToMarkdown,
+  saveToText,
+  saveToHTML,
 };

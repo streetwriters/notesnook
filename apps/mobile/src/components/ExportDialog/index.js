@@ -12,6 +12,7 @@ import {opacity, ph, pv, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
 import {DDS, getElevation, db, ToastEvent} from '../../utils/utils';
 import {Loading} from '../Loading';
+import FileViewer from 'react-native-file-viewer';
 
 const {
   eSubscribeEvent,
@@ -57,7 +58,7 @@ const ExportDialog = () => {
     setNotes([]);
   };
 
-  const save = async (func, mime, name) => {
+  const save = async (func, name) => {
     setExporting(true);
     let res;
     for (var i = 0; i < notes.length; i++) {
@@ -75,10 +76,8 @@ const ExportDialog = () => {
           : `Storage/Notesnook/exported/${name}`
       }.`,
     );
-    let fileData = {...res};
-    fileData.type = mime;
-    fileData.name = name;
-    setResult(fileData);
+
+    setResult(res);
     setComplete(true);
   };
 
@@ -86,28 +85,28 @@ const ExportDialog = () => {
     {
       title: 'PDF',
       func: async () => {
-        await save(storage.saveToPDF, 'application/pdf', 'PDF');
+        await save(storage.saveToPDF, 'PDF');
       },
       icon: 'file-pdf-box',
     },
     {
       title: 'Markdown',
       func: async () => {
-        await save(storage.saveToMarkdown, 'text/markdown', 'Markdown');
+        await save(storage.saveToMarkdown, 'Markdown');
       },
       icon: 'language-markdown',
     },
     {
       title: 'Plain Text',
       func: async () => {
-        await save(storage.saveToText, 'text/plain', 'Text');
+        await save(storage.saveToText, 'Text');
       },
       icon: 'card-text',
     },
     {
       title: 'HTML',
       func: async () => {
-        await save(storage.saveToHTML, 'text/html', 'Html');
+        await save(storage.saveToHTML, 'Html');
       },
       icon: 'language-html5',
     },
@@ -147,17 +146,19 @@ const ExportDialog = () => {
               done={complete}
               doneText={doneText}
               onDone={() => {
-                RNFetchBlob.android
-                  .actionViewIntent(result.filePath, result.type)
-                  .catch((e) => {
-                    console.log(e);
-                    ToastEvent.show(
-                      `No application found to open ${result.name} file`,
-                    );
-                  });
+                console.log(result.type,result.filePath);
+                FileViewer.open(result.filePath, {
+                  showOpenWithDialog: true,
+                  showAppsSuggestions: true,
+                }).catch((e) => {
+                  console.log(e);
+                  ToastEvent.show(
+                    `No application found to open ${result.name} file`,
+                  );
+                });
                 close();
               }}
-              tagline="Exporting notes..."
+              tagline="Exporting notes"
             />
           ) : (
             <>
