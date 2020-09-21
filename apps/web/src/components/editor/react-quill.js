@@ -4,6 +4,7 @@ import "quill/dist/quill.snow.css";
 import "quill/dist/quill.core.css";
 import MarkdownShortcuts from "./modules/markdown";
 import MagicUrl from "quill-magic-url";
+import { Text } from "rebass";
 
 Quill.register("modules/markdownShortcuts", MarkdownShortcuts);
 Quill.register("modules/magicUrl", MagicUrl);
@@ -127,6 +128,16 @@ export default class ReactQuill extends Component {
   }
 
   render() {
-    return <pre onFocus={this.props.onFocus} id={this.props.id} />;
+    return (
+      <Text
+        as="pre"
+        sx={{ cursor: "text" }}
+        onClick={() => {
+          this.quill.focus();
+        }}
+        onFocus={this.props.onFocus}
+        id={this.props.id}
+      />
+    );
   }
 }
