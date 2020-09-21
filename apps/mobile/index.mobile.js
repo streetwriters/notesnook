@@ -1,9 +1,10 @@
 import React, {createRef, useEffect, useState} from 'react';
 import {Platform, StatusBar, View} from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import DrawerLayout from 'react-native-drawer-layout';
 import Animated from 'react-native-reanimated';
-import {Menu} from './src/components/Menu';
+import {Screen, ScreenContainer} from 'react-native-screens';
+import {DialogManager} from './src/components/DialogManager';
+import {Toast} from './src/components/Toast';
 import {useTracked} from './src/provider';
 import {NavigationStack} from './src/services/Navigator';
 import {
@@ -12,18 +13,14 @@ import {
   EditorScale,
   EditorTranslateY,
 } from './src/utils/animations';
-import {sideMenuRef} from './src/utils/refs';
 import {DDS} from './src/utils/utils';
 import Editor from './src/views/Editor';
-import {eSubscribeEvent, eUnSubscribeEvent} from './src/services/eventManager';
-import {eOpenSideMenu, eCloseSideMenu} from './src/services/events';
-import { Toast } from './src/components/Toast';
-import { DialogManager } from './src/components/DialogManager';
-import { Screen, ScreenContainer } from 'react-native-screens';
 
 const editorRef = createRef();
 
-const AnimatedScreenContainer = Animated.createAnimatedComponent(ScreenContainer);
+const AnimatedScreenContainer = Animated.createAnimatedComponent(
+  ScreenContainer,
+);
 
 export const Initialize = () => {
   const [state, dispatch] = useTracked();
@@ -34,26 +31,8 @@ export const Initialize = () => {
     if (Platform.OS === 'android') {
       StatusBar.setBackgroundColor('transparent');
       StatusBar.setTranslucent(true);
-     
     }
     StatusBar.setBarStyle(colors.night ? 'light-content' : 'dark-content');
-  }, []);
-
-  const setGestureDisabled = () => {
-    setLocked(true);
-  };
-
-  const setGestureEnabled = () => {
-    setLocked(false);
-  };
-
-  useEffect(() => {
-    eSubscribeEvent(eOpenSideMenu, setGestureEnabled);
-    eSubscribeEvent(eCloseSideMenu, setGestureDisabled);
-    return () => {
-      eUnSubscribeEvent(eOpenSideMenu, setGestureEnabled);
-      eUnSubscribeEvent(eCloseSideMenu, setGestureDisabled);
-    };
   }, []);
 
   return (
@@ -67,33 +46,14 @@ export const Initialize = () => {
           flexDirection: 'row',
           backgroundColor: colors.bg,
         }}>
-        <DrawerLayout
-          ref={sideMenuRef}
+        <View
           style={{
-            opacity: 0,
+            width: DDS.isTab ? '70%' : '100%',
+            height: '100%',
             backgroundColor: colors.bg,
-          }}
-          
-          keyboardDismissMode="ondrag"
-          drawerWidth={300}
-          drawerLockMode={locked ? 'locked-closed' : 'unlocked'}
-          useNativeAnimations={true}
-          renderNavigationView={() => (
-            <Menu
-              hide={false}
-              colors={colors}
-              close={() => sideMenuRef.current?.closeDrawer()}
-            />
-          )}>
-          <View
-            style={{
-              width: DDS.isTab ? '70%' : '100%',
-              height: '100%',
-              backgroundColor: colors.bg,
-            }}>
-            <NavigationStack />
-          </View>
-        </DrawerLayout>
+          }}>
+          <NavigationStack />
+        </View>
 
         <AnimatedScreenContainer
           ref={editorRef}
@@ -115,7 +75,7 @@ export const Initialize = () => {
                 translateX: EditorPosition,
               },
               {
-                translateY:EditorTranslateY,
+                translateY: EditorTranslateY,
               },
               {
                 scaleX: EditorScale,
@@ -125,16 +85,13 @@ export const Initialize = () => {
               },
             ],
           }}>
-            <Screen
+          <Screen
             active={1}
-          style={{
-            width:'100%',
-            height:'100%'
-          }}
-            >
-
-           
-          <Editor noMenu={false} />
+            style={{
+              width: '100%',
+              height: '100%',
+            }}>
+            <Editor noMenu={false} />
           </Screen>
         </AnimatedScreenContainer>
       </Animatable.View>
