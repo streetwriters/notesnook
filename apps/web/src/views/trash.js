@@ -23,6 +23,7 @@ function menuItems(item, index) {
       onClick: () => {
         store.restore(item.id, index);
         showToast(
+          "success",
           `${item.type === "note" ? "Note" : "Notebook"} restored successfully!`
         );
       },
