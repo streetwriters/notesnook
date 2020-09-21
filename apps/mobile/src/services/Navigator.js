@@ -92,7 +92,7 @@ export const NavigationStack = ({component = MainComponent}) => {
           swipeEnabled: locked ? false : true,
         }}
         edgeWidth={200}
-        drawerType="back"
+        drawerType="slide"
         drawerContent={DrawerComponent}
         initialRouteName="Main">
         <Drawer.Screen name="Main" component={component} />
