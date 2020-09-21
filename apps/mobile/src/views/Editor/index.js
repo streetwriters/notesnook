@@ -174,6 +174,7 @@ const Editor = ({noMenu}) => {
             height: 50,
             justifyContent: 'space-between',
             alignItems: 'center',
+            paddingHorizontal: 12,
           }}>
           {noMenu ? null : (
             <ActionIcon
@@ -182,7 +183,6 @@ const Editor = ({noMenu}) => {
               onPress={_onBackPress}
               customStyle={{
                 marginLeft: -5,
-                paddingLeft: 12,
               }}
             />
           )}
@@ -194,6 +194,9 @@ const Editor = ({noMenu}) => {
             <ActionIcon
               name="plus"
               color={colors.heading}
+              customStyle={{
+                marginLeft: 10,
+              }}
               onPress={() => {
                 simpleDialogEvent(TEMPLATE_NEW_NOTE);
               }}
@@ -202,6 +205,9 @@ const Editor = ({noMenu}) => {
               <ActionIcon
                 name="fullscreen"
                 color={colors.heading}
+                customStyle={{
+                  marginLeft: 10,
+                }}
                 onPress={() => {
                   eSendEvent(eOpenFullscreenEditor);
                   setFullscreen(true);
@@ -219,6 +225,9 @@ const Editor = ({noMenu}) => {
             <ActionIcon
               name="undo-variant"
               color={colors.heading}
+              customStyle={{
+                marginLeft: 10,
+              }}
               onPress={() => {
                 post('undo');
               }}
@@ -226,6 +235,9 @@ const Editor = ({noMenu}) => {
             <ActionIcon
               name="redo-variant"
               color={colors.heading}
+              customStyle={{
+                marginLeft: 10,
+              }}
               onPress={() => {
                 post('redo');
               }}
@@ -234,6 +246,9 @@ const Editor = ({noMenu}) => {
             <ActionIcon
               name="dots-horizontal"
               color={colors.heading}
+              customStyle={{
+                marginLeft: 10,
+              }}
               onPress={() => {
                 ActionSheetEvent(
                   getNote(),

@@ -1,12 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {
-  Dimensions,
-  LayoutAnimation,
-  Platform,
-  RefreshControl,
-  Text,
-  View,
-} from 'react-native';
+import {Dimensions, Platform, RefreshControl, Text, View} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {DataProvider, LayoutProvider, RecyclerListView} from 'recyclerlistview';
@@ -19,7 +12,7 @@ import {
   eOpenLoginDialog,
   eScrollEvent,
 } from '../../services/events';
-import {db, hexToRGBA, RGB_Linear_Shade, ToastEvent} from '../../utils/utils';
+import {db, ToastEvent} from '../../utils/utils';
 import {PressableButton} from '../PressableButton';
 let {width, height} = Dimensions.get('window');
 

@@ -1,10 +1,10 @@
 import React from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import {Text, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { ph, pv, SIZE, WEIGHT } from '../../common/common';
-import { useTracked } from '../../provider';
+import {ph, pv, SIZE, WEIGHT} from '../../common/common';
+import {useTracked} from '../../provider';
 import NavigationService from '../../services/NavigationService';
-import { ActionSheetEvent } from '../DialogManager/recievers';
+import {ActionSheetEvent} from '../DialogManager/recievers';
 import Seperator from '../Seperator';
 
 export const NotebookItem = ({
@@ -30,7 +30,7 @@ export const NotebookItem = ({
           paddingRight: 6,
           alignSelf: 'center',
           borderBottomWidth: 1,
-          borderBottomColor:item.pinned? 'transparent': colors.nav,
+          borderBottomColor: item.pinned ? 'transparent' : colors.nav,
           width: '100%',
         },
         customStyle,
@@ -185,12 +185,10 @@ export const NotebookItem = ({
         </View>
       </View>
       {item.title === 'General' && item.type === 'topic' ? null : (
-        <TouchableOpacity
-          style={{
-            justifyContent: 'center',
-            minHeight: 70,
-            alignItems: 'center',
-          }}
+        <ActionIcon
+          color={colors.heading}
+          name="dots-horizontal"
+          size={SIZE.xl}
           onPress={() => {
             let rowItems = isTrash
               ? ['Restore', 'Remove']
@@ -204,9 +202,15 @@ export const NotebookItem = ({
             ActionSheetEvent(item, false, false, rowItems, columnItems, {
               notebookID: notebookID,
             });
-          }}>
-          <Icon name="dots-horizontal" size={SIZE.lg} color={colors.heading} />
-        </TouchableOpacity>
+          }}
+          customStyle={{
+            justifyContent: 'center',
+            height: 35,
+            width: 35,
+            borderRadius: 100,
+            alignItems: 'center',
+          }}
+        />
       )}
     </View>
   );

@@ -1,10 +1,11 @@
-import React, { createRef } from 'react';
-import { TouchableOpacity } from 'react-native';
-import Menu, { MenuDivider, MenuItem } from 'react-native-material-menu';
+import React, {createRef} from 'react';
+import {TouchableOpacity} from 'react-native';
+import Menu, {MenuDivider, MenuItem} from 'react-native-material-menu';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { SIZE, WEIGHT } from '../../common/common';
-import { useTracked } from '../../provider';
-import { ACTIONS } from '../../provider/actions';
+import {SIZE, WEIGHT} from '../../common/common';
+import {useTracked} from '../../provider';
+import {ACTIONS} from '../../provider/actions';
+import {ActionIcon} from '../ActionIcon';
 const menuRef = createRef();
 export const HeaderMenu = () => {
   const [state, dispatch] = useTracked();
@@ -19,18 +20,23 @@ export const HeaderMenu = () => {
         backgroundColor: colors.bg,
       }}
       button={
-        <TouchableOpacity
+        <ActionIcon
           onPress={() => {
             menuRef.current?.show();
           }}
-          style={{
+          name="dots-vertical"
+          size={SIZE.xl}
+          color={colors.pri}
+          customStyle={{
             justifyContent: 'center',
             alignItems: 'flex-end',
             height: 40,
-            width: 50,
-          }}>
-          <Icon name="dots-vertical" size={SIZE.xl} color={colors.heading} />
-        </TouchableOpacity>
+            width: 40,
+            marginLeft: 10,
+            borderRadius: 100,
+            backgroundColor: 'white',
+          }}
+        />
       }>
       <MenuItem
         textStyle={{

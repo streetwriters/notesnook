@@ -14,9 +14,11 @@ export const PressableButton = ({
   alpha = -0.1,
   opacity = 1,
   onLongPress,
+  hitSlop
 }) => {
   return (
     <Pressable
+      hitSlop={hitSlop}
       activeOpacity={opacity}
       onPress={onPress}
       onLongPress={onLongPress}
