@@ -62,3 +62,5 @@ buck-out/
 # Other
 react-native-mmkv-storage/
 react-native-eventsource/
+
+react-native-html-to-pdf/
