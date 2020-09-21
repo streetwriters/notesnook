@@ -10,7 +10,7 @@
     "emotion-theming": "^10.0.19",
     "eventsource": "^1.0.7",
     "fast-sort": "^2.1.1",
-    "framer-motion": "^1.10.3",
+    "framer-motion": "^2.6.15",
     "hookrouter": "^1.2.3",
     "immer": "^6.0.3",
     "localforage": "^1.7.3",

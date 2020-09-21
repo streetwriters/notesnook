@@ -16,7 +16,6 @@ import Header from "./header";
 import { useHashParam } from "../../utils/useHashParam";
 import SplitEditor from "../spliteditor";
 import Unlock from "../unlock";
-import { useAnimation } from "framer-motion";
 
 function Editor() {
   console.log("rendering editor");
@@ -27,7 +26,6 @@ function Editor() {
   const updateWordCount = useStore((store) => store.updateWordCount);
   const init = useStore((store) => store.init);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
-  const animation = useAnimation();
   const isTrial = useUserStore(
     (store) => store.user.notesnook?.subscription?.isTrial
   );
@@ -49,30 +47,6 @@ function Editor() {
   useEffect(() => {
     init();
   }, [init]);
-
-  useEffect(() => {
-    if (sessionState === SESSION_STATES.new) {
-      animation
-        .start({
-          opacity: 0,
-          transition: { duration: 0.1 },
-        })
-        .then(() =>
-          animation
-            .start({
-              x: -100,
-              transition: { duration: 0 },
-            })
-            .then(() =>
-              animation.start({
-                opacity: 1,
-                x: 0,
-                transition: { duration: 0.1 },
-              })
-            )
-        );
-    }
-  }, [sessionState, animation]);
 
   useEffect(() => {
     if (!quillRef || !quillRef.current) return;
@@ -113,35 +87,33 @@ function Editor() {
         <Header />
         <Flex id="toolbar" />
         <EditorMenu quill={quillRef.current && quillRef.current.quill} />
-        <Animated.Flex initial={{ opacity: 0 }} animate={animation}>
-          <ReactQuill
-            id="quill"
-            ref={quillRef}
-            refresh={sessionState === SESSION_STATES.new}
-            isSimple={isLoggedin || !isTrial}
-            onFocus={() => {
-              toggleProperties(false);
-            }}
-            placeholder="Type anything here"
-            container=".editor"
-            onSave={() => {
-              saveSession();
-            }}
-            changeInterval={500}
-            onWordCountChanged={updateWordCount}
-            onChange={() => {
-              const { quill } = quillRef.current;
-              const delta = quill.getContents().ops;
-              const text = quill.getText();
-              setSession((state) => {
-                state.session.content = {
-                  delta: { ops: delta },
-                  text: text,
-                };
-              });
-            }}
-          />
-        </Animated.Flex>
+        <ReactQuill
+          id="quill"
+          ref={quillRef}
+          refresh={sessionState === SESSION_STATES.new}
+          isSimple={isLoggedin || !isTrial}
+          onFocus={() => {
+            toggleProperties(false);
+          }}
+          placeholder="Type anything here"
+          container=".editor"
+          onSave={() => {
+            saveSession();
+          }}
+          changeInterval={500}
+          onWordCountChanged={updateWordCount}
+          onChange={() => {
+            const { quill } = quillRef.current;
+            const delta = quill.getContents().ops;
+            const text = quill.getText();
+            setSession((state) => {
+              state.session.content = {
+                delta: { ops: delta },
+                text: text,
+              };
+            });
+          }}
+        />
       </Flex>
       <Properties />
     </Animated.Flex>
