@@ -14,6 +14,7 @@ export const Button = ({
   title = '',
   icon,
   color = 'accent',
+  key
 }) => {
   const [state, dispatch] = useTracked();
   const {colors, tags, premiumUser} = state;
@@ -22,6 +23,7 @@ export const Button = ({
   return (
     <PressableButton
       onPress={onPress}
+      key={key}
       color={grayed ? colors.nav : usedColor}
       selectedColor={grayed ? colors.nav : usedColor}
       alpha={grayed ? (!colors.night ? -0.04 : 0.04) : -0.1}
