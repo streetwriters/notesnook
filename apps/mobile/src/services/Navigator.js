@@ -1,26 +1,29 @@
+import {createDrawerNavigator} from '@react-navigation/drawer';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import * as React from 'react';
+import Container from '../components/Container';
+import {Menu} from '../components/Menu';
+import {rootNavigatorRef, sideMenuRef} from '../utils/refs';
 import Favorites from '../views/Favorites';
 import Folders from '../views/Folders';
 import Home from '../views/Home/index';
-import Login from '../views/Login';
 import Notebook from '../views/Notebook';
 import Notes from '../views/Notes';
 import Settings from '../views/Settings';
-import Signup from '../views/Signup';
 import Tags from '../views/Tags';
 import Trash from '../views/Trash';
-import {rootNavigatorRef} from '../utils/refs';
-import Container from '../components/Container';
+import {eSubscribeEvent, eUnSubscribeEvent} from './eventManager';
+import {eCloseSideMenu, eOpenSideMenu} from './events';
+import NavigationService from './NavigationService';
 
 const Stack = createStackNavigator();
+const Drawer = createDrawerNavigator();
 
-export const NavigationStack = () => {
-
+export const MainComponent = () => {
   return (
-    <Container root={true} >
-      <NavigationContainer ref={rootNavigatorRef}>
+    <Container root={true}>
+      <NavigationContainer independent={true} ref={rootNavigatorRef}>
         <Stack.Navigator
           initialRouteName="Home"
           screenOptions={{
@@ -35,7 +38,7 @@ export const NavigationStack = () => {
             initialParams={{
               title: 'Notebooks',
               canGoBack: false,
-              root:true
+              root: true,
             }}
             name="Folders"
             component={Folders}
@@ -49,5 +52,51 @@ export const NavigationStack = () => {
         </Stack.Navigator>
       </NavigationContainer>
     </Container>
+  );
+};
+
+const DrawerComponent = (props) => {
+  return (
+    <Menu
+      menuProps={props}
+      hide={false}
+      close={() => NavigationService.closeDrawer()}
+    />
+  );
+};
+
+export const NavigationStack = ({component = MainComponent}) => {
+  const [locked, setLocked] = React.useState(false);
+
+  const setGestureDisabled = () => {
+    setLocked(true);
+  };
+
+  const setGestureEnabled = () => {
+    setLocked(false);
+  };
+
+  React.useEffect(() => {
+    eSubscribeEvent(eOpenSideMenu, setGestureEnabled);
+    eSubscribeEvent(eCloseSideMenu, setGestureDisabled);
+    return () => {
+      eUnSubscribeEvent(eOpenSideMenu, setGestureEnabled);
+      eUnSubscribeEvent(eCloseSideMenu, setGestureDisabled);
+    };
+  }, []);
+
+  return (
+    <NavigationContainer ref={sideMenuRef}>
+      <Drawer.Navigator
+        screenOptions={{
+          swipeEnabled: locked ? false : true,
+        }}
+        edgeWidth={200}
+        drawerType="back"
+        drawerContent={DrawerComponent}
+        initialRouteName="Main">
+        <Drawer.Screen name="Main" component={component} />
+      </Drawer.Navigator>
+    </NavigationContainer>
   );
 };
