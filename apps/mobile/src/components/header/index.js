@@ -30,7 +30,7 @@ export const Header = ({showSearch, root}) => {
 
   const onLeftButtonPress = () => {
     if (!headerState.canGoBack) {
-      sideMenuRef.current?.openDrawer();
+      NavigationService.openDrawer();
       return;
     }
     NavigationService.goBack();

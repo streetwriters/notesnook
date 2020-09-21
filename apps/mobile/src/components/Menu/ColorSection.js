@@ -1,14 +1,12 @@
-import React, {useEffect} from 'react';
-import {Text, View} from 'react-native';
-import {COLORS_NOTE, normalize, pv, SIZE} from '../../common/common';
-import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
-import {eSendEvent} from '../../services/eventManager';
-import {refreshNotesPage} from '../../services/events';
+import React, { useEffect } from 'react';
+import { Text, View } from 'react-native';
+import { COLORS_NOTE, SIZE } from '../../common/common';
+import { useTracked } from '../../provider';
+import { ACTIONS } from '../../provider/actions';
+import { eSendEvent } from '../../services/eventManager';
+import { refreshNotesPage } from '../../services/events';
 import NavigationService from '../../services/NavigationService';
-import {sideMenuRef} from '../../utils/refs';
-import {hexToRGBA, RGB_Linear_Shade} from '../../utils/utils';
-import {PressableButton} from '../PressableButton';
+import { PressableButton } from '../PressableButton';
 
 export const ColorSection = ({noTextMode}) => {
   const [state, dispatch] = useTracked();
@@ -61,7 +59,7 @@ export const ColorSection = ({noTextMode}) => {
 
             NavigationService.navigate('Notes', params);
             eSendEvent(refreshNotesPage, params);
-            sideMenuRef.current?.closeDrawer();
+            NavigationService.closeDrawer();
           }}
           customStyle={{
             flexDirection: 'row',

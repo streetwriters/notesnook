@@ -29,6 +29,7 @@ import {MenuListItem} from './MenuListItem';
 import {TagsSection} from './TagsSection';
 import {UserSection} from './UserSection';
 import {MMKV} from '../../utils/storage';
+import Seperator from '../Seperator';
 
 const AnimatedSafeAreaView = createAnimatableComponent(SafeAreaView);
 
@@ -202,6 +203,7 @@ export const Menu = ({
             />
           ))}
         </View>
+        <Seperator half />
 
         <UserSection noTextMode={noTextMode} />
       </View>
