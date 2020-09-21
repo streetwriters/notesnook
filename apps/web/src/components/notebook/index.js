@@ -65,6 +65,7 @@ class Notebook extends React.Component {
           <Flex sx={{ marginBottom: 1, marginTop: 1 }}>
             {notebook.topics.slice(1, 4).map((topic, index) => (
               <Flex
+                key={topic.id}
                 onClick={(e) => {
                   onTopicClick(notebook, index + 1);
                   e.stopPropagation();
@@ -80,7 +81,7 @@ class Notebook extends React.Component {
                 }}
               >
                 <Text variant="body" color="static" fontSize={11}>
-                  {"ghghgeh"}
+                  {topic.title}
                 </Text>
               </Flex>
             ))}

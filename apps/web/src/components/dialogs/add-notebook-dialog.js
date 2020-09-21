@@ -6,6 +6,7 @@ import Dialog, { showDialog } from "./dialog";
 import { store } from "../../stores/notebook-store";
 import { qclone } from "qclone";
 import { showToast } from "../../utils/toast";
+import { db } from "../../common";
 
 class AddNotebookDialog extends React.Component {
   MAX_AVAILABLE_HEIGHT = window.innerHeight * 0.3;
@@ -57,9 +58,10 @@ class AddNotebookDialog extends React.Component {
   componentDidMount() {
     if (!this.props.notebook) return;
     const { title, description, id, topics } = qclone(this.props.notebook);
+    console.log(topics);
     this.topics = topics;
     this.setState({
-      topics: topics,
+      topics,
     });
     this.title = title;
     this.description = description;
@@ -125,52 +127,59 @@ class AddNotebookDialog extends React.Component {
               marginBottom: 1,
             }}
           >
-            {this.state.topics.map((value, index) => (
-              <Flex key={value} flexDirection="row" sx={{ marginBottom: 1 }}>
-                <Input
-                  ref={(ref) => {
-                    this._inputRefs[index] = ref;
-                    if (ref) ref.value = value.title; // set default value
-                  }}
-                  placeholder="Topic name"
-                  onFocus={(e) => {
-                    this.lastLength = e.nativeEvent.target.value.length;
-                    if (this.state.focusedInputIndex === index) return;
-                    this.setState({ focusedInputIndex: index });
-                  }}
-                  onChange={(e) => {
-                    this.topics[index].title = e.target.value;
-                  }}
-                  onKeyUp={(e) => {
-                    if (e.nativeEvent.key === "Enter") {
-                      this.addTopic(index);
-                    } else if (
-                      e.nativeEvent.key === "Backspace" &&
-                      this.lastLength === 0 &&
-                      index > 0
-                    ) {
-                      this.removeTopic(index);
-                    }
-                    this.lastLength = e.nativeEvent.target.value.length;
-                  }}
-                />
-                <RebassButton
-                  variant="tertiary"
-                  sx={{ marginLeft: 1 }}
-                  px={2}
-                  py={1}
-                  onClick={() => this.performActionOnTopic(index)}
-                >
-                  <Box height={20}>
-                    {this.state.focusedInputIndex === index ? (
-                      <Icon.Plus size={22} />
-                    ) : (
-                      <Icon.Minus size={22} />
-                    )}
-                  </Box>
-                </RebassButton>
-              </Flex>
-            ))}
+            {this.state.topics.map(
+              (value, index) =>
+                value.title !== "General" && (
+                  <Flex
+                    key={value.id || value.title}
+                    flexDirection="row"
+                    sx={{ marginBottom: 1 }}
+                  >
+                    <Input
+                      ref={(ref) => {
+                        this._inputRefs[index] = ref;
+                        if (ref) ref.value = value.title; // set default value
+                      }}
+                      placeholder="Topic name"
+                      onFocus={(e) => {
+                        this.lastLength = e.nativeEvent.target.value.length;
+                        if (this.state.focusedInputIndex === index) return;
+                        this.setState({ focusedInputIndex: index });
+                      }}
+                      onChange={(e) => {
+                        this.topics[index].title = e.target.value;
+                      }}
+                      onKeyUp={(e) => {
+                        if (e.nativeEvent.key === "Enter") {
+                          this.addTopic(index);
+                        } else if (
+                          e.nativeEvent.key === "Backspace" &&
+                          this.lastLength === 0 &&
+                          index > 0
+                        ) {
+                          this.removeTopic(index);
+                        }
+                        this.lastLength = e.nativeEvent.target.value.length;
+                      }}
+                    />
+                    <RebassButton
+                      variant="tertiary"
+                      sx={{ marginLeft: 1 }}
+                      px={2}
+                      py={1}
+                      onClick={() => this.performActionOnTopic(index)}
+                    >
+                      <Box height={20}>
+                        {this.state.focusedInputIndex === index ? (
+                          <Icon.Plus size={22} />
+                        ) : (
+                          <Icon.Minus size={22} />
+                        )}
+                      </Box>
+                    </RebassButton>
+                  </Flex>
+                )
+            )}
           </Box>
         </Box>
       </Dialog>
@@ -185,7 +194,10 @@ export function showEditNoteDialog(notebook) {
       notebook={notebook}
       edit={true}
       onDone={async (nb) => {
-        await store.add(nb);
+        const topics = qclone(nb.topics);
+        delete nb.topics;
+        await store.add({ ...notebook, ...nb });
+        await db.notebooks.notebook(notebook.id).topics.add(...topics);
         showToast("success", "Notebook edited successfully!");
         perform(true);
       }}
