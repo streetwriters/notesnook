@@ -36,6 +36,11 @@ class EditorStore extends BaseStore {
   init = () => {
     window.addEventListener("hashchange", async () => {
       const note = getHashParam("note");
+
+      if (isMobile() && !note && this.get().session.id) {
+        return this.clearSession();
+      }
+
       if (note) await this.openSession(note);
     });
   };
@@ -147,7 +152,6 @@ class EditorStore extends BaseStore {
   };
 
   clearSession = () => {
-    setHashParam({});
     this.set(function (state) {
       state.session = {
         ...DEFAULT_SESSION,
@@ -155,6 +159,7 @@ class EditorStore extends BaseStore {
     });
     saveLastOpenedNote();
     noteStore.setSelectedNote(0);
+    setHashParam({});
   };
 
   setSession = (set) => {
