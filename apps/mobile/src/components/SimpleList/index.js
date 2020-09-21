@@ -33,17 +33,11 @@ const SimpleList = ({
   placeholder,
   RenderItem,
   focused,
-  placeholderText,
-  pinned = null,
   customRefresh,
   customRefreshing,
-  isMove,
-  hideMore,
-  noteToMove,
-  isHome = false,
 }) => {
   const [state, dispatch] = useTracked();
-  const {colors, selectionMode, user, currentScreen} = state;
+  const {colors, selectionMode, user} = state;
   const searchResults = {...state.searchResults};
   const [refreshing, setRefreshing] = useState(false);
   const [dataProvider, setDataProvider] = useState(null);
@@ -52,17 +46,6 @@ const SimpleList = ({
     if (!event) return;
     let y = event.nativeEvent.contentOffset.y;
     eSendEvent(eScrollEvent, y);
-  };
-
-  const NOOP = () => undefined;
-
-  const layoutItemAnimator = {
-    animateDidMount: NOOP,
-    animateShift: NOOP,
-    animateWillMount: NOOP,
-    animateWillUnmount: NOOP,
-    animateWillUpdate: () =>
-      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut),
   };
 
   useEffect(() => {
@@ -130,24 +113,8 @@ const SimpleList = ({
       let user = await db.user.get();
       dispatch({type: ACTIONS.USER, user: user});
       await db.sync();
-      if (Platform.OS === 'ios') {
-        dispatch({
-          type: ACTIONS.SYNCING,
-          syncing: false,
-        });
-      } else {
-        setRefreshing(false);
-      }
       ToastEvent.show('Sync Complete', 'success');
     } catch (e) {
-      if (Platform.OS === 'ios') {
-        dispatch({
-          type: ACTIONS.SYNCING,
-          syncing: false,
-        });
-      } else {
-        setRefreshing(false);
-      }
       ToastEvent.show(
         e.message,
         'error',
@@ -158,117 +125,17 @@ const SimpleList = ({
         },
         'Login',
       );
+    } finally {
+      if (Platform.OS === 'ios') {
+        dispatch({
+          type: ACTIONS.SYNCING,
+          syncing: false,
+        });
+      } else {
+        setRefreshing(false);
+      }
+      dispatch({type: ACTIONS.ALL});
     }
-    dispatch({type: ACTIONS.ALL});
-  };
-
-  const ListHeaderComponent = () => {
-    return searchResults.type === type && searchResults.results.length > 0 ? (
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          paddingHorizontal: 12,
-          height: 40,
-        }}>
-        <Text
-          style={{
-            fontFamily: WEIGHT.bold,
-            color: colors.accent,
-            fontSize: SIZE.xs,
-          }}>
-          Showing Results for {searchResults.keyword}
-        </Text>
-        <Text
-          onPress={() => {
-            eSendEvent(eClearSearch);
-          }}
-          style={{
-            fontFamily: WEIGHT.regular,
-            color: colors.errorText,
-            fontSize: SIZE.xs,
-          }}>
-          Clear
-        </Text>
-      </View>
-    ) : (
-      <View>
-        {user || !data[0] || selectionMode ? null : (
-          <PressableButton
-            onPress={() => {
-              eSendEvent(eOpenLoginDialog);
-            }}
-            color={
-              COLORS_NOTE[currentScreen]
-                ? COLORS_NOTE[currentScreen]
-                : colors.shade
-            }
-            selectedColor={
-              COLORS_NOTE[currentScreen]
-                ? COLORS_NOTE[currentScreen]
-                : colors.accent
-            }
-            alpha={!colors.night ? -0.02 : 0.1}
-            opacity={0.12}
-            customStyle={{
-              width: '100%',
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'flex-start',
-              paddingHorizontal: 12,
-              alignSelf: 'center',
-              height: 40,
-              borderRadius: 0,
-              position: 'relative',
-            }}> 
-            <View
-              style={{
-                width: 25,
-                backgroundColor: COLORS_NOTE[currentScreen]
-                  ? COLORS_NOTE[currentScreen]
-                  : colors.accent,
-                height: 25,
-                borderRadius: 100,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}>
-              <Icon
-                style={{
-                  textAlign: 'center',
-                  textAlignVertical: 'center',
-                }}
-                name="account-outline"
-                color="white"
-                size={SIZE.xs}
-              />
-            </View>
-            <View
-              style={{
-                marginLeft: 10,
-              }}>
-              <Text
-                style={{
-                  fontFamily: WEIGHT.regular,
-                  color: colors.icon,
-                  fontSize: SIZE.xxs - 1,
-                }}>
-                You are not logged in
-              </Text>
-              <Text
-                style={{
-                  color: COLORS_NOTE[currentScreen]
-                    ? COLORS_NOTE[currentScreen]
-                    : colors.accent,
-                  fontSize: SIZE.xxs,
-                }}>
-                Login to sync your {type}.
-              </Text>
-            </View>
-          </PressableButton>
-        )}
-      </View>
-    );
   };
 
   const _ListEmptyComponent = (
@@ -286,10 +153,8 @@ const SimpleList = ({
     </View>
   );
 
-
   const _layoutProvider = new LayoutProvider(
     (index) => {
-    
       return dataProvider.getDataForIndex(index).type;
     },
     (type, dim) => {
@@ -316,7 +181,7 @@ const SimpleList = ({
           break;
         case 'MAIN_HEADER':
           dim.width = width;
-          dim.height =user || !data[0] || selectionMode ? 0: 40;
+          dim.height = user || !data[0] || selectionMode ? 0 : 40;
           break;
         default:
           dim.width = width;
@@ -330,7 +195,7 @@ const SimpleList = ({
       case 'note':
         return <RenderItem item={data} pinned={data.pinned} index={index} />;
       case 'MAIN_HEADER':
-        return <ListHeaderComponent />;
+        return <ListHeaderComponent type={type} />;
       case 'header':
         return <RenderSectionHeader item={data} />;
 
@@ -363,20 +228,6 @@ const SimpleList = ({
           minHeight: '100%',
         },
       }}
-      /*   data={
-        searchResults.type === type &&
-        focused &&
-        searchResults.results.length > 0
-          ? searchResults.results
-          : data
-      }
-      
-      keyExtractor={_listKeyExtractor} */
-      //
-      //onScroll={_onScroll}
-      //
-      //
-
       style={{
         height: '100%',
         backgroundColor: colors.bg,
@@ -390,15 +241,139 @@ const SimpleList = ({
             ? 155 - insets.top
             : 155 - insets.top - 60,
       }}
-      /*  renderItem={({item, index}) =>
-        item.type === 'header' ? (
-          <RenderSectionHeader item={item} />
-        ) : (
-          <RenderItem item={item} index={index} />
-        )
-      } */
     />
   );
 };
 
 export default SimpleList;
+
+const SearchHeader = () => {
+  const [state, dispatch] = useTracked();
+  const {colors} = state;
+  const searchResults = {...state.searchResults};
+
+  return (
+    <View
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingHorizontal: 12,
+        height: 40,
+      }}>
+      <Text
+        style={{
+          fontFamily: WEIGHT.bold,
+          color: colors.accent,
+          fontSize: SIZE.xs,
+        }}>
+        Showing Results for {searchResults.keyword}
+      </Text>
+      <Text
+        onPress={() => {
+          eSendEvent(eClearSearch);
+        }}
+        style={{
+          fontFamily: WEIGHT.regular,
+          color: colors.errorText,
+          fontSize: SIZE.xs,
+        }}>
+        Clear
+      </Text>
+    </View>
+  );
+};
+
+const LoginCard = () => {
+  const [state, dispatch] = useTracked();
+  const {colors, selectionMode, user, currentScreen} = state;
+
+  return (
+    <View>
+      {user || !data[0] || selectionMode ? null : (
+        <PressableButton
+          onPress={() => {
+            eSendEvent(eOpenLoginDialog);
+          }}
+          color={
+            COLORS_NOTE[currentScreen]
+              ? COLORS_NOTE[currentScreen]
+              : colors.shade
+          }
+          selectedColor={
+            COLORS_NOTE[currentScreen]
+              ? COLORS_NOTE[currentScreen]
+              : colors.accent
+          }
+          alpha={!colors.night ? -0.02 : 0.1}
+          opacity={0.12}
+          customStyle={{
+            width: '100%',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'flex-start',
+            paddingHorizontal: 12,
+            alignSelf: 'center',
+            height: 40,
+            borderRadius: 0,
+            position: 'relative',
+          }}>
+          <View
+            style={{
+              width: 25,
+              backgroundColor: COLORS_NOTE[currentScreen]
+                ? COLORS_NOTE[currentScreen]
+                : colors.accent,
+              height: 25,
+              borderRadius: 100,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
+            <Icon
+              style={{
+                textAlign: 'center',
+                textAlignVertical: 'center',
+              }}
+              name="account-outline"
+              color="white"
+              size={SIZE.xs}
+            />
+          </View>
+          <View
+            style={{
+              marginLeft: 10,
+            }}>
+            <Text
+              style={{
+                fontFamily: WEIGHT.regular,
+                color: colors.icon,
+                fontSize: SIZE.xxs - 1,
+              }}>
+              You are not logged in
+            </Text>
+            <Text
+              style={{
+                color: COLORS_NOTE[currentScreen]
+                  ? COLORS_NOTE[currentScreen]
+                  : colors.accent,
+                fontSize: SIZE.xxs,
+              }}>
+              Login to sync your {type}.
+            </Text>
+          </View>
+        </PressableButton>
+      )}
+    </View>
+  );
+};
+
+const ListHeaderComponent = (type) => {
+  const [state, dispatch] = useTracked();
+  const searchResults = {...state.searchResults};
+
+  return searchResults.type === type && searchResults.results.length > 0 ? (
+    <SearchHeader />
+  ) : (
+    <LoginCard type={type} />
+  );
+};
