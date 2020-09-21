@@ -25,7 +25,7 @@ const routes = {
   ),
   "/:notebook/:topic": ({ notebook, topic }) => {
     const nb = db.notebooks.notebook(notebook);
-    const topicItem = nb.topics.all[topic];
+    const topicItem = nb.topics.topic(topic)._topic;
     if (!topicItem) return navigate(`/notebooks/${nb.id}`);
 
     return (
