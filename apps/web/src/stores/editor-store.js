@@ -109,7 +109,7 @@ class EditorStore extends BaseStore {
         if (oldSession.colors.length !== this.get().session.colors.length)
           appStore.refreshColors();
 
-        if (oldSession.state !== "new" || !oldSession.context) break storeSync;
+        if (!oldSession.context) break storeSync;
 
         const { type, value } = oldSession.context;
         if (type === "topic") await db.notes.move(value, id);
@@ -138,8 +138,6 @@ class EditorStore extends BaseStore {
   };
 
   newSession = (context = {}) => {
-    setHashParam({ note: 0 });
-
     this.set(function (state) {
       state.session = {
         ...DEFAULT_SESSION,
@@ -149,6 +147,7 @@ class EditorStore extends BaseStore {
     });
     saveLastOpenedNote();
     noteStore.setSelectedNote(0);
+    setHashParam({ note: 0 });
   };
 
   clearSession = () => {
