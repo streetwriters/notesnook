@@ -44,7 +44,7 @@ function Topics(props) {
         button={{
           content: "Add more topics",
           onClick: async () => {
-            await showTopicDialog(props.notebook.id);
+            await showTopicDialog(notebookId);
           },
         }}
       />
