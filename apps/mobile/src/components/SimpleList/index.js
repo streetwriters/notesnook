@@ -35,6 +35,7 @@ const SimpleList = ({
   const [refreshing, setRefreshing] = useState(false);
   const [dataProvider, setDataProvider] = useState(null);
   const insets = useSafeAreaInsets();
+  const listData = data;
   const _onScroll = (event) => {
     if (!event) return;
     let y = event.nativeEvent.contentOffset.y;
@@ -45,7 +46,7 @@ const SimpleList = ({
     let mainData =
       searchResults.type === type && focused && searchResults.results.length > 0
         ? searchResults.results
-        : data;
+        : listData;
 
     let d = [header, ...mainData];
     /*  for (var i = 0; i < 10000; i++) {
@@ -56,9 +57,9 @@ const SimpleList = ({
         return r1 !== r2;
       }).cloneWithRows(d),
     );
-  }, [data]);
+  }, [listData]);
 
-  const _ListFooterComponent = data[0] ? (
+  const _ListFooterComponent = listData[0] ? (
     <View
       style={{
         height: 150,
@@ -174,7 +175,7 @@ const SimpleList = ({
           break;
         case 'MAIN_HEADER':
           dim.width = width;
-          dim.height = user || !data[0] || selectionMode ? 0 : 40;
+          dim.height = user || !listData[0] || selectionMode ? 0 : 40;
           break;
         default:
           dim.width = width;
@@ -188,7 +189,7 @@ const SimpleList = ({
       case 'note':
         return <RenderItem item={data} pinned={data.pinned} index={index} />;
       case 'MAIN_HEADER':
-        return <ListHeaderComponent type={type} />;
+        return <ListHeaderComponent type={type} data={listData} />;
       case 'header':
         return <RenderSectionHeader item={data} />;
 
@@ -197,7 +198,7 @@ const SimpleList = ({
     }
   };
 
-  return !data || data.length === 0 ? (
+  return !listData || listData.length === 0 ? (
     _ListEmptyComponent
   ) : (
     <RecyclerListView
@@ -277,7 +278,7 @@ const SearchHeader = () => {
   );
 };
 
-const LoginCard = () => {
+const LoginCard = ({type,data}) => {
   const [state, dispatch] = useTracked();
   const {colors, selectionMode, user, currentScreen} = state;
 
@@ -360,13 +361,13 @@ const LoginCard = () => {
   );
 };
 
-const ListHeaderComponent = (type) => {
+const ListHeaderComponent = ({type,data}) => {
   const [state, dispatch] = useTracked();
   const searchResults = {...state.searchResults};
 
   return searchResults.type === type && searchResults.results.length > 0 ? (
     <SearchHeader />
   ) : (
-    <LoginCard type={type} />
+    <LoginCard type={type} data={data} />
   );
 };
