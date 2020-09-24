@@ -90,7 +90,7 @@ const LoginDialog = () => {
     setLoggingIn(true);
     _username.current.blur();
     _pass.current.blur();
-    setStatus('Authenticating');
+    setStatus('Logging in');
 
     try {
       let res = await db.user.login(username.toLowerCase(), password);
@@ -100,30 +100,26 @@ const LoginDialog = () => {
         ToastEvent.show(e.message, 'error', 'local');
         setLoggingIn(false);
       }, 500);
-
       return;
     }
 
-    let user;
-
     try {
-      user = await db.user.get();
+      let user = await db.user.get();
       if (!user) throw new Error('Username or password incorrect');
       setStatus('Syncing your notes');
       dispatch({type: ACTIONS.USER, user: user});
       dispatch({type: ACTIONS.SYNCING, syncing: true});
-
       await db.sync();
       eSendEvent(eStartSyncer);
       dispatch({type: ACTIONS.ALL});
       eSendEvent(refreshNotesPage);
       setVisible(false);
-      dispatch({type: ACTIONS.SYNCING, syncing: false});
       ToastEvent.show(`Logged in as ${username}`, 'success', 'local');
     } catch (e) {
+      ToastEvent.show(e.message, 'error', 'local');
+    } finally {
       dispatch({type: ACTIONS.SYNCING, syncing: false});
       setLoggingIn(false);
-      ToastEvent.show(e.message, 'error', 'local');
     }
   };
 
