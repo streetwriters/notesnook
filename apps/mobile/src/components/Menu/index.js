@@ -43,7 +43,6 @@ export const Menu = ({
   const [state, dispatch] = useTracked();
   const {colors} = state;
 
-
   function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
     let newColors = setColorScheme(colors, accent);
     StatusBar.setBarStyle(colors.night ? 'light-content' : 'dark-content');
@@ -162,10 +161,16 @@ export const Menu = ({
         contentContainerStyle={{minHeight: '50%'}}
         showsVerticalScrollIndicator={false}>
         {listItems.map((item, index) => (
-          <MenuListItem item={item} index={index} noTextMode={noTextMode} />
+          <MenuListItem
+            key={item.name}
+            item={item}
+            index={index}
+            noTextMode={noTextMode}
+          />
         ))}
 
         <MenuListItem
+          key="Tags"
           noTextMode={noTextMode}
           index={10}
           item={{
@@ -196,6 +201,7 @@ export const Menu = ({
           }}>
           {listItems2.map((item, index) => (
             <MenuListItem
+              key={item.name}
               item={item}
               index={index}
               ignore={true}
