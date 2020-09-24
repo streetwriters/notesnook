@@ -1,13 +1,13 @@
 import React, {createRef, useEffect, useState} from 'react';
 import {
   ActivityIndicator,
+  Clipboard,
   Dimensions,
   StatusBar,
   Text,
   TextInput,
   TouchableOpacity,
   View,
-  Clipboard,
 } from 'react-native';
 import Share from 'react-native-share';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -32,7 +32,6 @@ import {
   eOpenMoveNoteDialog,
   refreshNotesPage,
 } from '../../services/events';
-import NavigationService from '../../services/NavigationService';
 import {MMKV} from '../../utils/storage';
 import {
   db,
@@ -615,12 +614,11 @@ export const ActionSheetComponent = ({
         dispatch({type: ACTIONS.USER, user: user});
         await db.sync();
         localRefresh();
-        setRefreshing(false);
-
         ToastEvent.show('Note synced', 'success', 'local');
       } catch (e) {
-        setRefreshing(false);
         ToastEvent.show(e.message, 'error', 'local');
+      } finally {
+        setRefreshing(false);
       }
       dispatch({type: ACTIONS.ALL});
     }

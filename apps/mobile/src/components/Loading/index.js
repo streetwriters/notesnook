@@ -31,10 +31,14 @@ export const Loading = ({
             ]}>
             {doneText}
           </Text>
+
           <Button
             onPress={onDone}
-            title="Done"
+            title="Open File"
             />
+            
+
+
         </>
       ) : (
         <>
@@ -52,6 +56,7 @@ const styles = StyleSheet.create({
   activityText: {
     fontSize: SIZE.sm,
     textAlign: 'center',
+    marginBottom:10
   },
   activityContainer: {
     alignItems: 'center',

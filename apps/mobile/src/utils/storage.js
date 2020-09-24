@@ -1,13 +1,12 @@
 import he from 'he';
-import {Platform} from 'react-native';
+import { Platform } from 'react-native';
 import 'react-native-get-random-values';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import MMKVStorage from 'react-native-mmkv-storage';
-import {and} from 'react-native-reanimated';
-import {generateSecureRandom} from 'react-native-securerandom';
+import { generateSecureRandom } from 'react-native-securerandom';
 import Sodium from 'react-native-sodium';
 import RNFetchBlob from 'rn-fetch-blob';
-import {db, requestStoragePermission, ToastEvent} from './utils';
+import { db, requestStoragePermission, ToastEvent } from './utils';
 export const MMKV = new MMKVStorage.Loader().initialize();
 async function read(key, isArray = false) {
   let data;

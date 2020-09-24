@@ -13,6 +13,7 @@ import {
   View,
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
+import * as RNIap from 'react-native-iap';
 import QRCode from 'react-native-qrcode-generator';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
@@ -35,11 +36,12 @@ import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
 import {eOpenLoginDialog, eResetApp} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
-import storage, {MMKV} from '../../utils/storage';
+import {MMKV} from '../../utils/storage';
 import {
   db,
   DDS,
   hexToRGBA,
+  itemSkus,
   RGB_Linear_Shade,
   setSetting,
   ToastEvent,
@@ -51,7 +53,11 @@ export const Settings = ({route, navigation}) => {
   const {colors, user, settings} = state;
   const [key, setKey] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
+  const [subscriptions, setSubscriptions] = useState([]);
   const isFocused = useIsFocused();
+  let subsriptionSuccessListerner;
+  let subsriptionErrorListener;
+
   function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
     let newColors = setColorScheme(colors, accent);
     StatusBar.setBarStyle(colors.night ? 'light-content' : 'dark-content');
@@ -64,6 +70,43 @@ export const Settings = ({route, navigation}) => {
     ACCENT.shade = accentColor + '12';
     changeColorScheme();
   }
+
+  useEffect(() => {
+    RNIap.getSubscriptions(itemSkus).then((subs) => {
+      setSubscriptions(subs);
+    });
+    subsriptionSuccessListerner = RNIap.purchaseUpdatedListener(
+      onSuccessfulSubscription,
+    );
+    subsriptionErrorListener = RNIap.purchaseErrorListener(onSubscriptionError);
+
+    return () => {
+      if (subsriptionSuccessListerner) {
+        subsriptionSuccessListerner.remove();
+        subsriptionSuccessListerner = null;
+      }
+
+      if (subsriptionErrorListener) {
+        subsriptionErrorListener.remove();
+        subsriptionErrorListener = null;
+      }
+    };
+  }, []);
+
+  const onSuccessfulSubscription = (
+    subscription: RNIap.SubscriptionPurchase,
+  ) => {
+    const receipt = subscription.transactionReceipt;
+    //console.log(JSON.stringify(subscription));
+    if (receipt) {
+      console.log(JSON.stringify(subscription));
+    }
+  };
+
+  const onSubscriptionError = (error: RNIap.PurchaseError) => {
+    console.log(error.message, 'Error');
+    ToastEvent.show(error.message);
+  };
 
   useEffect(() => {
     if (isFocused) {
@@ -314,7 +357,7 @@ export const Settings = ({route, navigation}) => {
         style={{
           paddingHorizontal: 0,
         }}>
-        {user ? (
+        {user && user.Id ? (
           <>
             <View
               style={{
@@ -384,7 +427,20 @@ export const Settings = ({route, navigation}) => {
               },
               {
                 name: 'Subscription status',
-                func: () => {},
+                func: () => {
+                  RNIap.requestSubscription(
+                    subscriptions[0].productId,
+                    undefined,
+                    undefined,
+                    undefined,
+                    user.Id,
+                  )
+                    .then((r) => {
+                      console.log(r);
+                    })
+                    .catch((e) => console.log(e));
+                  return;
+                },
                 desc: 'Current status of your subscription',
               },
               {
@@ -757,7 +813,12 @@ export const Settings = ({route, navigation}) => {
             desc: 'Restore backup from your phone.',
           },
         ].map((item) => (
-          <Button title={item.name} tagline={item.desc} onPress={item.func} />
+          <Button
+            key={item.name}
+            title={item.name}
+            tagline={item.desc}
+            onPress={item.func}
+          />
         ))}
 
         <View
@@ -895,7 +956,12 @@ export const Settings = ({route, navigation}) => {
             desc: 'You are using the latest version of our app.',
           },
         ].map((item) => (
-          <Button title={item.name} tagline={item.desc} onPress={item.func} />
+          <Button
+            key={item.name}
+            title={item.name}
+            tagline={item.desc}
+            onPress={item.func}
+          />
         ))}
         <Seperator />
       </ScrollView>

@@ -1,10 +1,8 @@
-import {history, db} from '../utils/utils';
-import {ACTIONS} from './actions';
-import {sideMenuRef} from '../utils/refs';
+import { eSendEvent } from '../services/eventManager';
+import { eCloseSideMenu, eOpenSideMenu } from '../services/events';
 import storage from '../utils/storage';
-import {eSendEvent} from '../services/eventManager';
-import {eCloseSideMenu, eOpenSideMenu} from '../services/events';
-import {act} from 'react-test-renderer';
+import { db, history } from '../utils/utils';
+import { ACTIONS } from './actions';
 
 export const reducer = (state, action) => {
   switch (action.type) {

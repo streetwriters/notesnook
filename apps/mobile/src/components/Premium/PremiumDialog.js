@@ -1,28 +1,18 @@
 import React, {createRef} from 'react';
-import {
-  FlatList,
-  Modal,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {ScrollView, Text, View} from 'react-native';
+import * as RNIap from 'react-native-iap';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {opacity, pv, SIZE, WEIGHT} from '../../common/common';
+import {SIZE, WEIGHT} from '../../common/common';
 import {eSendEvent} from '../../services/eventManager';
-import {eCloseSideMenu, eOpenLoginDialog} from '../../services/events';
-import NavigationService from '../../services/NavigationService';
-import {db, getElevation, h, itemSkus, w} from '../../utils/utils';
+import {eOpenLoginDialog} from '../../services/events';
+import {db, h, itemSkus, w} from '../../utils/utils';
 import ActionSheet from '../ActionSheet';
 import {Button} from '../Button';
 import Seperator from '../Seperator';
-import * as RNIap from 'react-native-iap';
 class PremiumDialog extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      visible: true,
-      animated: false,
       user: null,
       product: null,
     };
@@ -32,7 +22,7 @@ class PremiumDialog extends React.Component {
   }
 
   open() {
-    this.actionSheetRef.current?._setModalVisible();
+    this.actionSheetRef.current?._setModalVisible(true);
   }
 
   close() {
@@ -46,14 +36,10 @@ class PremiumDialog extends React.Component {
       user: u && u.Id ? u : null,
       product: prod[0],
     });
-    this.actionSheetRef.current?._setModalVisible(true);
   }
-  componentDidUpdate() {
-    this.actionSheetRef.current?._setModalVisible(true);
-  }
+  componentDidUpdate() {}
 
   render() {
-    const {visible, animated} = this.state;
     const {colors} = this.props;
     return (
       <ActionSheet
@@ -77,11 +63,12 @@ class PremiumDialog extends React.Component {
           }}>
           <Text
             style={{
-              fontSize: SIZE.xl,
+              fontSize: SIZE.xxxl,
               fontFamily: WEIGHT.bold,
               color: colors.heading,
               paddingBottom: 20,
-              paddingTop: 20,
+              paddingTop: 10,
+              alignSelf:'center'
             }}>
             Notesnook Pro
           </Text>
@@ -95,7 +82,7 @@ class PremiumDialog extends React.Component {
             showsVerticalScrollIndicator={false}>
             {[
               {
-                title: 'Sync Across Multiple Devices',
+                title: 'Cross Platfrom Sync',
                 description:
                   'Securely sync your notes on any device, Android, iOS, Windows, MacOS, Linux and Web!',
               },
@@ -105,14 +92,14 @@ class PremiumDialog extends React.Component {
                   'No sneaking, no stealing. We give all the keys for your data to you. Privacy is not just a word to us. We use industry-grade XChaChaPoly1305 and Argon2 which is miles ahead other solutions making sure your data is secure and private even a million years from now.',
               },
               {
-                title: 'Organize Note Like Never Before',
+                title: 'Organize Notes Like Never Before',
                 description:
                   'Organize your notes using notebooks, tags and colors. Add notes to favorites for quick access. Pin most important notes and notebooks on top for quick access. You can also pin notes and notebooks to quickly access them!',
               },
               {
                 title: 'Full Rich Text Editor with Markdown',
                 description:
-                  'Unleash the power of a complete Rich Text Editor in your notes app. You can add images,links and even embed videos! We have even added full markdown support!',
+                  'Unleash the power of a complete Rich Text Editor in your notes app. You can add images, links and even embed videos! We have even added full markdown support too!',
               },
               {
                 title: 'Export Notes',
@@ -169,7 +156,6 @@ class PremiumDialog extends React.Component {
               </View>
             ))}
           </ScrollView>
-        
 
           <Seperator />
 
@@ -186,7 +172,7 @@ class PremiumDialog extends React.Component {
                 fontFamily: WEIGHT.bold,
                 color: colors.accent,
               }}>
-              {!this.state.user ? 'Try Now' : 'Upgrade Now'}
+              {!this.state.user ? 'Try it Now' : 'Upgrade Now'}
               {'\n'}
               <Text
                 style={{
@@ -221,9 +207,8 @@ class PremiumDialog extends React.Component {
                     eSendEvent(eOpenLoginDialog);
                   }, 400);
                 } else {
-                  // Request 
+                  // Request
                 }
-              
               }}
               title={this.state.user ? 'Buy Subscription' : 'Sign Up Now'}
               height={50}
