@@ -1,18 +1,21 @@
-import React, {useEffect, useState} from 'react';
+import React, {Fragment, useEffect, useState} from 'react';
 import {
   Modal,
+  Platform,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-  Platform,
 } from 'react-native';
+import FileViewer from 'react-native-file-viewer';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {opacity, ph, pv, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
-import {DDS, getElevation, db, ToastEvent} from '../../utils/utils';
+import storage from '../../utils/storage';
+import {DDS, getElevation, ToastEvent} from '../../utils/utils';
+import {Button} from '../Button/index';
 import {Loading} from '../Loading';
-import FileViewer from 'react-native-file-viewer';
+import Seperator from '../Seperator';
 
 const {
   eSubscribeEvent,
@@ -22,10 +25,6 @@ const {
   eOpenExportDialog,
   eCloseExportDialog,
 } = require('../../services/events');
-import {Button} from '../Button/index';
-import Seperator from '../Seperator';
-import storage from '../../utils/storage';
-import RNFetchBlob from 'rn-fetch-blob';
 
 const ExportDialog = () => {
   const [state, dispatch] = useTracked();
@@ -146,7 +145,7 @@ const ExportDialog = () => {
               done={complete}
               doneText={doneText}
               onDone={() => {
-                console.log(result.type,result.filePath);
+                console.log(result.type, result.filePath);
                 FileViewer.open(result.filePath, {
                   showOpenWithDialog: true,
                   showAppsSuggestions: true,
@@ -174,7 +173,7 @@ const ExportDialog = () => {
               </Text>
               <View style={styles.buttonContainer}>
                 {actions.map((item) => (
-                  <>
+                  <Fragment key={item.title}>
                     <Seperator half />
                     <Button
                       width="100%"
@@ -183,7 +182,7 @@ const ExportDialog = () => {
                       activeOpacity={opacity}
                       onPress={item.func}
                     />
-                  </>
+                  </Fragment>
                 ))}
               </View>
             </>

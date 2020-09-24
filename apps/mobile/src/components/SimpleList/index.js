@@ -33,7 +33,9 @@ const SimpleList = ({
   const {colors, selectionMode, user} = state;
   const searchResults = {...state.searchResults};
   const [refreshing, setRefreshing] = useState(false);
-  const [dataProvider, setDataProvider] = useState(null);
+  const [dataProvider, setDataProvider] = useState(new DataProvider((r1, r2) => {
+    return r1 !== r2;
+  }).cloneWithRows([]));
   const insets = useSafeAreaInsets();
   const listData = data;
   const _onScroll = (event) => {
@@ -52,6 +54,7 @@ const SimpleList = ({
     /*  for (var i = 0; i < 10000; i++) {
       d = [...d,...data];
     }  */
+    console.log(d,"D")
     setDataProvider(
       new DataProvider((r1, r2) => {
         return r1 !== r2;
@@ -228,10 +231,10 @@ const SimpleList = ({
         width: '100%',
         paddingTop:
           Platform.OS == 'ios'
-            ? data[0] && !selectionMode
+            ? listData[0] && !selectionMode
               ? 115
               : 115 - 60
-            : data[0] && !selectionMode
+            : listData[0] && !selectionMode
             ? 155 - insets.top
             : 155 - insets.top - 60,
       }}
@@ -278,7 +281,7 @@ const SearchHeader = () => {
   );
 };
 
-const LoginCard = ({type,data}) => {
+const LoginCard = ({type, data}) => {
   const [state, dispatch] = useTracked();
   const {colors, selectionMode, user, currentScreen} = state;
 
@@ -361,7 +364,7 @@ const LoginCard = ({type,data}) => {
   );
 };
 
-const ListHeaderComponent = ({type,data}) => {
+const ListHeaderComponent = ({type, data}) => {
   const [state, dispatch] = useTracked();
   const searchResults = {...state.searchResults};
 
