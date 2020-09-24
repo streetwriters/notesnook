@@ -4,12 +4,9 @@ import { Input } from "@rebass/forms";
 import * as Icon from "../icons";
 import "./search.css";
 import { navigate } from "hookrouter";
-import { useStore } from "../../stores/searchstore";
 
-var query;
 function Search(props) {
-  const search = useStore((store) => store.search);
-  const { type } = props;
+  const { query, type, context } = props;
 
   return (
     <Flex
@@ -24,14 +21,17 @@ function Search(props) {
         name="search"
         autoFocus={!!query}
         defaultValue={query}
-        placeholder={`Search your ${type}`}
-        onChange={(e) => {
-          query = e.target.value;
-          if (query.length <= 0) return window.history.back();
-          if (query.length === 1) {
-            navigate("/search");
+        placeholder={`Type your query here`}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            let query = e.target.value;
+            navigate(
+              `/search`,
+              false,
+              { q: query, type, context: btoa(JSON.stringify(context)) },
+              true
+            );
           }
-          search(query);
         }}
       />
       <Box

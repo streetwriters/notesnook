@@ -1,28 +1,61 @@
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import ListContainer from "../components/list-container";
-import SearchInput from "../components/search";
-import { useStore } from "../stores/searchstore";
 import SearchPlaceholder from "../components/placeholders/search-placeholder";
+import { useQueryParams } from "hookrouter";
+import { db, notesFromContext } from "../common";
 
-window.addEventListener("load", () => {
-  const path = window.location.pathname;
-  if (path === "/search") window.location = "/";
-});
+function typeToItems(type, context) {
+  switch (type) {
+    case "home":
+      return ["notes", db.notes.all];
+    case "notes":
+      const notes = notesFromContext(context);
+      return ["notes", notes];
+    case "notebooks":
+      return ["notebooks", db.notebooks.all];
+    case "topics":
+      const { notebookId } = context;
+      if (!notebookId) return ["topics", []];
+      const topics = db.notebooks.notebook(notebookId).topics.all;
+      return ["topics", topics];
+    case "trash":
+      return ["trash", db.trash.all];
+    default:
+      return [];
+  }
+}
 
-// TODO this will break for now.
 function Search() {
-  const results = useStore((store) => store.results);
-  const item = useStore((store) => store.item);
-  const type = useStore((store) => store.type);
+  const [results, setResults] = useState([]);
+  const [params] = useQueryParams();
+  const { q: query, type, context: ctx } = params;
+  const context = useMemo(() => {
+    try {
+      return ctx && JSON.parse(atob(ctx));
+    } catch (e) {
+      console.log(e);
+    }
+  }, [ctx]);
+
+  useEffect(() => {
+    const [lookupType, items] = typeToItems(type, context);
+    if (lookupType === "notes") {
+      db.lookup[lookupType](items, query).then((results) => {
+        setResults(results);
+      });
+    } else {
+      setResults(db.lookup[lookupType](items, query));
+    }
+  }, [context, query, type]);
 
   return (
     <>
-      <SearchInput type={type} />
       <ListContainer
-        noSearch
+        context={context}
+        type={type}
+        query={query}
         items={results}
         placeholder={SearchPlaceholder}
-        item={item}
       />
     </>
   );

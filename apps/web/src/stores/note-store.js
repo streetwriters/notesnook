@@ -1,4 +1,4 @@
-import { db } from "../common/index";
+import { db, notesFromContext } from "../common/index";
 import createStore from "../common/store";
 import { store as editorStore } from "./editor-store";
 import Vault from "../common/vault";
@@ -47,26 +47,7 @@ class NoteStore extends BaseStore {
   };
 
   setContext = (context) => {
-    let notes = [];
-    switch (context.type) {
-      case "tag":
-        notes = db.notes.tagged(context.value);
-        break;
-      case "color":
-        notes = db.notes.colored(context.value);
-        if (!notes.length) return navigate("/");
-        break;
-      case "topic":
-        const notebook = db.notebooks.notebook(context.value.id);
-        const topic = notebook.topics.topic(context.value.topic);
-        notes = topic.all;
-        break;
-      case "favorites":
-        notes = db.notes.favorites;
-        break;
-      default:
-        return;
-    }
+    let notes = notesFromContext(context);
     this.set((state) => (state.context = { ...context, notes }));
   };
 

@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from "react";
-import Topic from "../components/topic";
 import { Flex } from "rebass";
 import ListContainer from "../components/list-container";
 import { useStore as useNbStore } from "../stores/notebook-store";
 import { showTopicDialog } from "../components/dialogs/topicdialog";
-import { navigate } from "hookrouter";
-import { getItemHeight, MAX_HEIGHTS } from "../common/height-calculator";
 
 function Topics(props) {
   const { notebookId } = props;
@@ -31,15 +28,7 @@ function Topics(props) {
       <ListContainer
         type="topics"
         items={topics}
-        itemHeight={getItemHeight}
-        estimatedItemHeight={MAX_HEIGHTS.generic}
-        item={(index, item) => (
-          <Topic
-            index={index}
-            item={item}
-            onClick={() => navigate(`/notebooks/${notebookId}/${item.id}`)}
-          />
-        )}
+        context={{ notebookId }}
         placeholder={Flex}
         button={{
           content: "Add more topics",

@@ -37,7 +37,9 @@ const routes = {
     />
   ),
   "/settings": () => <RouteContainer title="Settings" route={<Settings />} />,
-  "/search": () => <RouteContainer title="Search" route={<Search />} />,
+  "/search": () => (
+    <RouteContainer canGoBack title="Search" route={<Search />} />
+  ),
 };
 
 export default routes;

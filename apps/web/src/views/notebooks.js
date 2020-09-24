@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import Notebook from "../components/notebook";
 import AddNotebookDialog from "../components/dialogs/addnotebookdialog";
 import ListContainer from "../components/list-container";
 import { useStore, store } from "../stores/notebook-store";
@@ -9,7 +8,6 @@ import Notes from "./notes.js";
 import { useRoutes, navigate } from "hookrouter";
 import RouteContainer from "../components/route-container";
 import { db } from "../common";
-import { getNotebookHeight, MAX_HEIGHTS } from "../common/height-calculator";
 
 const routes = {
   "/": () => (
@@ -63,20 +61,6 @@ function Notebooks() {
       <ListContainer
         type="notebooks"
         items={notebooks}
-        estimatedItemHeight={MAX_HEIGHTS.notebook}
-        itemHeight={getNotebookHeight}
-        item={(index, item) => (
-          <Notebook
-            index={index}
-            item={item}
-            onClick={() => {
-              navigate(`/notebooks/${item.id}`);
-            }}
-            onTopicClick={(notebook, topic) =>
-              navigate(`/notebooks/${notebook.id}/${topic}`)
-            }
-          />
-        )}
         placeholder={NotebooksPlaceholder}
         button={{
           content: "Create a notebook",

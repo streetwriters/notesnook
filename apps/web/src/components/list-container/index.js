@@ -1,17 +1,18 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { Flex } from "rebass";
 import Button from "../button";
 import Search from "../search";
 import * as Icon from "../icons";
 import { VariableSizeList as List } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
-import { useStore as useSearchStore } from "../../stores/searchstore";
 import { useStore as useSelectionStore } from "../../stores/selection-store";
 import LoginBar from "../loginbar";
 import GroupHeader from "../group-header";
+import ListProfiles from "../../common/list-profiles";
 
 function ListContainer(props) {
-  const setSearchContext = useSearchStore((store) => store.setSearchContext);
+  const { type, context } = props;
+  const profile = useMemo(() => ListProfiles[type], [type]);
   const shouldSelectAll = useSelectionStore((store) => store.shouldSelectAll);
   const setSelectedItems = useSelectionStore((store) => store.setSelectedItems);
   const listRef = useRef();
@@ -19,15 +20,6 @@ function ListContainer(props) {
   useEffect(() => {
     if (shouldSelectAll) setSelectedItems(props.items);
   }, [shouldSelectAll, setSelectedItems, props.items]);
-
-  useEffect(() => {
-    if (props.noSearch) return;
-    setSearchContext({
-      items: props.items,
-      item: props.item,
-      type: props.type,
-    });
-  }, [setSearchContext, props.item, props.items, props.type, props.noSearch]);
 
   useEffect(() => {
     if (props.static) return;
@@ -46,7 +38,7 @@ function ListContainer(props) {
         </Flex>
       ) : (
         <>
-          {!props.noSearch && <Search type={props.type} />}
+          <Search type={props.type} query={props.query} context={context} />
           <LoginBar />
           <Flex variant="columnFill" mt={2}>
             {props.children
@@ -63,14 +55,14 @@ function ListContainer(props) {
                           return item.id || item.title;
                         }}
                         overscanCount={2}
-                        estimatedItemSize={props.estimatedItemHeight}
+                        estimatedItemSize={profile.estimatedItemHeight}
                         itemSize={(index) => {
                           const item = props.items[index];
                           if (item.type === "header") {
                             if (item.title === "Pinned") return 22;
                             else return 22;
                           } else {
-                            return props.itemHeight(item);
+                            return profile.itemHeight(item);
                           }
                         }}
                         itemCount={props.items.length}
@@ -82,7 +74,7 @@ function ListContainer(props) {
                               {item.type === "header" ? (
                                 <GroupHeader title={item.title} />
                               ) : (
-                                props.item(index, item)
+                                profile.item(index, item, context)
                               )}
                             </div>
                           );

@@ -1,10 +1,8 @@
 import React, { useEffect } from "react";
-import Note from "../components/note";
 import ListContainer from "../components/list-container";
 import { useStore } from "../stores/editor-store";
 import { useStore as useNotesStore } from "../stores/note-store";
 import NotesPlaceholder from "../components/placeholders/notesplacholder";
-import { getNoteHeight, MAX_HEIGHTS } from "../common/height-calculator";
 
 function Notes(props) {
   const newSession = useStore((store) => store.newSession);
@@ -22,13 +20,9 @@ function Notes(props) {
   return (
     <ListContainer
       type="notes"
-      estimatedItemHeight={MAX_HEIGHTS.note}
-      itemHeight={getNoteHeight}
+      context={props.context}
       items={context.notes}
       placeholder={props.placeholder || NotesPlaceholder}
-      item={(index, item) => (
-        <Note index={index} pinnable={false} item={item} context={context} />
-      )}
       button={{
         content: "Make a new note",
         onClick: () => newSession(props.context),
