@@ -33,9 +33,11 @@ const SimpleList = ({
   const {colors, selectionMode, user} = state;
   const searchResults = {...state.searchResults};
   const [refreshing, setRefreshing] = useState(false);
-  const [dataProvider, setDataProvider] = useState(new DataProvider((r1, r2) => {
-    return r1 !== r2;
-  }).cloneWithRows([]));
+  const [dataProvider, setDataProvider] = useState(
+    new DataProvider((r1, r2) => {
+      return r1 !== r2;
+    }).cloneWithRows([]),
+  );
   const insets = useSafeAreaInsets();
   const listData = data;
   const _onScroll = (event) => {
@@ -54,7 +56,7 @@ const SimpleList = ({
     /*  for (var i = 0; i < 10000; i++) {
       d = [...d,...data];
     }  */
-    console.log(d,"D")
+    console.log(d, 'D');
     setDataProvider(
       new DataProvider((r1, r2) => {
         return r1 !== r2;
@@ -90,7 +92,7 @@ const SimpleList = ({
         width: '100%',
         alignSelf: 'center',
         marginTop: 15,
-        height: 30,
+        height: 18,
         paddingBottom: 5,
       }}>
       {item.title}
@@ -174,11 +176,12 @@ const SimpleList = ({
           break;
         case 'header':
           dim.width = width;
-          dim.height = 40;
+          dim.height = 18;
           break;
         case 'MAIN_HEADER':
           dim.width = width;
-          dim.height = user || !listData[0] || selectionMode ? 0 : 40;
+          dim.height =
+            (user && user.Id) || !listData[0] || selectionMode ? 0 : 40;
           break;
         default:
           dim.width = width;
@@ -287,7 +290,7 @@ const LoginCard = ({type, data}) => {
 
   return (
     <View>
-      {user || !data[0] || selectionMode ? null : (
+      {(user && user.Id) || !data[0] || selectionMode ? null : (
         <PressableButton
           onPress={() => {
             eSendEvent(eOpenLoginDialog);
