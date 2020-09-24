@@ -16,7 +16,7 @@ class RecoveryKeyDialog extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      key: '',
+      key: 'a',
     };
     this.actionSheetRef = createRef();
     this.svg = createRef();
@@ -30,6 +30,7 @@ class RecoveryKeyDialog extends React.Component {
     this.actionSheetRef.current?._setModalVisible(false);
   };
   async componentDidMount() {
+    this.actionSheetRef.current?._setModalVisible(true);
     eSubscribeEvent(eOpenRecoveryKeyDialog, this.open);
   }
 
@@ -93,24 +94,27 @@ class RecoveryKeyDialog extends React.Component {
             borderRadius: 10,
             paddingTop: 10,
           }}>
+          <Text
+            numberOfLines={2}
+            style={{
+              fontFamily: WEIGHT.bold,
+              fontSize: SIZE.xl,
+              width: '85%',
+              maxWidth: '85%',
+              paddingRight: 10,
+              marginTop: 10,
+              color: colors.heading,
+            }}>
+            Your Recovery Key
+          </Text>
+
           <View
             style={{
+              backgroundColor: colors.nav,
               borderRadius: 5,
-              marginBottom: 15,
-              paddingTop: 10,
+              padding: 10,
+              marginTop: 10,
             }}>
-            <Text
-              numberOfLines={2}
-              style={{
-                fontFamily: WEIGHT.bold,
-                fontSize: SIZE.xl,
-                width: '85%',
-                maxWidth: '85%',
-                paddingRight: 10,
-                color: colors.heading,
-              }}>
-              Your Recovery Key
-            </Text>
             <Text
               numberOfLines={2}
               style={{
@@ -123,36 +127,8 @@ class RecoveryKeyDialog extends React.Component {
               }}>
               {this.state.key}
             </Text>
-            <Seperator />
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-              }}>
-              <Button
-                onPress={() => {
-                  RNFetchBlob.fs.writeFile(
-                    RNFetchBlob.fs.dirs.SDCardDir +
-                      '/Notesnook/nn_recovery_key.txt',
-                    this.state.key,
-                    'utf8',
-                  );
-                }}
-                title="Save as Text"
-                width="48%"
-                height={50}
-              />
-              <Button
-                onPress={() => {
-                  Clipboard.setString(this.state.key);
-                  ToastEvent.show('Recovery key copied');
-                }}
-                title="Copy"
-                width="48%"
-                height={50}
-              />
-            </View>
           </View>
+          <Seperator />
 
           <View
             style={{
@@ -160,6 +136,7 @@ class RecoveryKeyDialog extends React.Component {
               marginBottom: 15,
               flexDirection: 'row',
               width: '100%',
+              justifyContent: 'space-between',
             }}>
             <QRCode
               getRef={this.svg}
@@ -169,30 +146,50 @@ class RecoveryKeyDialog extends React.Component {
               logoBorderRadius={10}
             />
 
-            <Text
+            <Seperator />
+            <View
               style={{
-                paddingHorizontal: 10,
-                fontSize: SIZE.md,
-                maxWidth: '50%',
-                fontFamily: WEIGHT.regular,
+                alignItems: 'center',
+                width: w / 2.2,
+                justifyContent: 'center',
               }}>
-              This is the QR-Code of your recovery key. You can use any QR-Code
-              Scanner to scan this image and get your key and recover your data.
-            </Text>
+              <Button
+                title="Save to Gallery"
+                onPress={this.saveQRCODE}
+                width="100%"
+                height={40}
+              />
+              <Seperator />
+              <Button
+                onPress={() => {
+                  RNFetchBlob.fs.writeFile(
+                    RNFetchBlob.fs.dirs.SDCardDir +
+                      '/Notesnook/nn_recovery_key.txt',
+                    this.state.key,
+                    'utf8',
+                  );
+                }}
+                title="Save as Text File"
+                width="100%"
+                height={40}
+              />
+              <Seperator />
+              <Button
+                onPress={() => {
+                  Clipboard.setString(this.state.key);
+                  ToastEvent.show('Recovery key copied');
+                }}
+                title="Copy Key"
+                width="100%"
+                height={40}
+              />
+            </View>
           </View>
-
-          <Button
-            title="Save QR-Code to Gallery"
-            onPress={this.saveQRCODE}
-            width="100%"
-            height={50}
-          />
 
           <Seperator />
           <View
             style={{
               flexDirection: 'row',
-              backgroundColor: colors.errorBg,
               padding: 10,
               borderRadius: 10,
             }}>
