@@ -34,7 +34,7 @@ export const HeaderMenu = () => {
             width: 40,
             marginLeft: 10,
             borderRadius: 100,
-            backgroundColor: 'white',
+            backgroundColor: colors.bg,
           }}
         />
       }>
