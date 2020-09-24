@@ -7,7 +7,7 @@ import {LOGO_BASE64} from '../../assets/images/assets';
 import {SIZE, WEIGHT} from '../../common/common';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
 import {eOpenRecoveryKeyDialog} from '../../services/events';
-import {ToastEvent, w} from '../../utils/utils';
+import {db, ToastEvent, w} from '../../utils/utils';
 import ActionSheet from '../ActionSheet';
 import {Button} from '../Button';
 import Seperator from '../Seperator';
@@ -16,7 +16,7 @@ class RecoveryKeyDialog extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      key: 'a',
+      key: null,
     };
     this.actionSheetRef = createRef();
     this.svg = createRef();
@@ -30,8 +30,13 @@ class RecoveryKeyDialog extends React.Component {
     this.actionSheetRef.current?._setModalVisible(false);
   };
   async componentDidMount() {
-    this.actionSheetRef.current?._setModalVisible(true);
     eSubscribeEvent(eOpenRecoveryKeyDialog, this.open);
+    let k = await db.user.key();
+    if (k) {
+      this.setState({
+        key: k,
+      });
+    }
   }
 
   async componentWillUnmount() {
@@ -138,13 +143,15 @@ class RecoveryKeyDialog extends React.Component {
               width: '100%',
               justifyContent: 'space-between',
             }}>
-            <QRCode
-              getRef={this.svg}
-              size={w / 2.2}
-              value={this.state.key}
-              logo={{uri: LOGO_BASE64}}
-              logoBorderRadius={10}
-            />
+            {this.state.key ? (
+              <QRCode
+                getRef={this.svg}
+                size={w / 2.2}
+                value={this.state.key}
+                logo={{uri: LOGO_BASE64}}
+                logoBorderRadius={10}
+              />
+            ) : null}
 
             <Seperator />
             <View
