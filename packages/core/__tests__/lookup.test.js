@@ -31,7 +31,19 @@ test("search notes with a locked note", () =>
     const noteId = await db.notes.add(TEST_NOTE);
     await db.vault.create("password");
     await db.vault.add(noteId);
-    let filtered = await db.lookup.notes(db.notes.all, "5");
+    let filtered = await db.lookup.notes(db.notes.all, "I am a");
+    expect(filtered.length).toBe(1);
+  }));
+
+test("search notes with an empty note", () =>
+  noteTest({
+    content: { delta: [{ insert: "5" }], text: "5" },
+  }).then(async ({ db }) => {
+    await db.notes.add({
+      title: "hello world",
+      content: { delta: [], text: "" },
+    });
+    let filtered = await db.lookup.notes(db.notes.all, "hello world");
     expect(filtered.length).toBe(1);
   }));
 
