@@ -30,6 +30,8 @@ export default class Trash extends Collection {
     }
     await this._collection.addItem({
       ...item,
+      type: "trash",
+      itemType: item.type,
       id: getId(),
       itemId: item.id,
       dateDeleted: Date.now(),
@@ -41,7 +43,7 @@ export default class Trash extends Collection {
       if (!id) continue;
       let item = this._collection.getItem(id);
       if (!item) continue;
-      if (item.type === "note") {
+      if (item.itemType === "note") {
         await this._db.delta.remove(item.content.delta);
         await this._db.text.remove(item.content.text);
       }
@@ -56,6 +58,8 @@ export default class Trash extends Collection {
       delete item.dateDeleted;
       delete item.id;
       item.id = item.itemId;
+      item.type = item.itemType;
+      delete item.itemType;
       delete item.itemId;
       if (item.type === "note") {
         let { notebook } = item;

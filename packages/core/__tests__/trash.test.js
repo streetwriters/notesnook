@@ -79,7 +79,7 @@ test("restore a deleted note that's in a deleted notebook", () =>
     await db.notes.delete(id);
     await db.notebooks.delete(nbId);
     const deletedNote = db.trash.all.find(
-      (v) => v.itemId.includes(id) && v.type === "note"
+      (v) => v.itemId.includes(id) && v.itemType === "note"
     );
     await db.trash.restore(deletedNote.id);
     let note = db.notes.note(id);
@@ -117,7 +117,7 @@ test("restore a notebook that has deleted notes", () =>
     await db.notebooks.delete(id);
     await db.notes.delete(noteId);
     const deletedNotebook = db.trash.all.find(
-      (v) => v.itemId.includes(id) && v.type === "notebook"
+      (v) => v.itemId.includes(id) && v.itemType === "notebook"
     );
     await db.trash.restore(deletedNotebook.id);
     let notebook = db.notebooks.notebook(id);
