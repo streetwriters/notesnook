@@ -3,7 +3,6 @@ import createStore from "../common/store";
 import { store as editorStore } from "./editor-store";
 import Vault from "../common/vault";
 import BaseStore from ".";
-import { navigate } from "hookrouter";
 
 class NoteStore extends BaseStore {
   notes = [];
