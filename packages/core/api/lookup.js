@@ -19,7 +19,9 @@ export default class Lookup {
       let index = 0,
         max = notes.length;
       notes.forEach(async (note) => {
-        const text = await this._db.text.get(note.content.text);
+        const text = note.locked
+          ? ""
+          : await this._db.text.get(note.content.text);
         const title = note.title;
         if (fzs(query, text + title)) results.push(note);
         if (++index >= max) return resolve(results);

@@ -24,6 +24,17 @@ test("search notes", () =>
     expect(filtered.length).toBe(1);
   }));
 
+test("search notes with a locked note", () =>
+  noteTest({
+    content: { delta: [{ insert: "5" }], text: "5" },
+  }).then(async ({ db }) => {
+    const noteId = await db.notes.add(TEST_NOTE);
+    await db.vault.create("password");
+    await db.vault.add(noteId);
+    let filtered = await db.lookup.notes(db.notes.all, "5");
+    expect(filtered.length).toBe(1);
+  }));
+
 test("search notebooks", () =>
   notebookTest().then(async ({ db }) => {
     await db.notebooks.add(TEST_NOTEBOOK2);
