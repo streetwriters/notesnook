@@ -38,6 +38,7 @@ import MoveNoteDialog from '../MoveNoteDialog';
 import LoginDialog from '../LoginDialog';
 import PremiumDialog from '../Premium/PremiumDialog';
 import ExportDialog from '../ExportDialog';
+import RecoveryKeyDialog from '../RecoveryKeyDialog';
 
 export class DialogManager extends Component {
   constructor(props) {
@@ -259,9 +260,11 @@ export class DialogManager extends Component {
         }
         case "premium": {
           eSendEvent(eOpenPremiumDialog);
+          break;
         }
         case "export": {
           eSendEvent(eOpenExportDialog,[this.state.item]);
+          break;
         }
       }
     }
@@ -365,6 +368,8 @@ export class DialogManager extends Component {
         <MergeEditor />
 
         <ExportDialog/>
+
+        <RecoveryKeyDialog colors={colors} />
       </>
     );
   }
