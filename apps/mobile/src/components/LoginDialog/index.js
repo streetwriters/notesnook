@@ -16,7 +16,12 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent,
 } from '../../services/eventManager';
-import {eCloseLoginDialog, eOpenLoginDialog, eStartSyncer, refreshNotesPage} from '../../services/events';
+import {
+  eCloseLoginDialog,
+  eOpenLoginDialog,
+  eStartSyncer,
+  refreshNotesPage,
+} from '../../services/events';
 import {
   validateEmail,
   validatePass,
@@ -171,7 +176,7 @@ const LoginDialog = () => {
 
     let user;
     try {
-      user = await db.user.user.get();
+      user = await db.user.get();
       let k = await db.user.key();
       setKey(k.key);
       setStatus('Setting up crenditials');
@@ -406,6 +411,7 @@ const LoginDialog = () => {
                         });
                       }
                     }}
+                    autoCapitalize="none"
                     defaultValue={username}
                     onBlur={() => {
                       if (!validateUsername(username) && username?.length > 0) {
@@ -495,6 +501,7 @@ const LoginDialog = () => {
                           });
                         }
                       }}
+                      autoCapitalize="none"
                       defaultValue={email}
                       onBlur={() => {
                         if (!validateEmail(email) && email?.length > 0) {
@@ -567,11 +574,9 @@ const LoginDialog = () => {
                         Email is invalid
                       </Text>
                     ) : null}
-                     <Seperator />
+                    <Seperator />
                   </>
                 )}
-
-           
 
                 <View
                   ref={_passContainer}
@@ -595,6 +600,7 @@ const LoginDialog = () => {
                         });
                       }
                     }}
+                    autoCapitalize="none"
                     defaultValue={password}
                     onBlur={() => {
                       if (!validatePass(password) && password?.length > 0) {
@@ -690,6 +696,7 @@ const LoginDialog = () => {
                       ref={_passConfirm}
                       editable={password && !invalidPassword ? true : false}
                       defaultValue={passwordReEnter}
+                      autoCapitalize="none"
                       onChangeText={(value) => {
                         setPasswordReEnter(value);
                         if (value !== password) {
