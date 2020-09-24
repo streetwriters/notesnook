@@ -104,7 +104,7 @@ const App = () => {
       dispatch(type);
     });
     return () => {
-      db.ev.unsubscribe('db:refresh', syncChanges);
+      db?.ev?.unsubscribe('db:refresh', syncChanges);
       eUnSubscribeEvent(eStartSyncer, startSyncer);
       eUnSubscribeEvent(eResetApp, resetApp);
       eUnSubscribeEvent(eDispatchAction, (type) => {
@@ -115,51 +115,50 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    (async function () {
       let error = null;
+      Initialize().finally(async () => {
+        try {
+          await db.init();
+          let user = await db.user.get();
+          if (user) {
+            dispatch({type: ACTIONS.USER, user: user});
+            startSyncer();
+          }
+        } catch (e) {
+          error = e;
+          console.log(e.message);
+        } finally {
+          dispatch({type: ACTIONS.ALL});
+          setInit(true);
+          if (error) {
+            setTimeout(() => {
+              ToastEvent.show(error.message);
+            }, 500);
+          }
+        }
+      })
 
-      try {
-        await Initialize();
-        await db.init();
-        let user = await db.user.get();
-        if (user) {
-          dispatch({type: ACTIONS.USER, user: user});
-          startSyncer();
-        }
-      } catch (e) {
-        error = e;
-        console.log(e.message);
-      } finally {
-        dispatch({type: ACTIONS.ALL});
-        setInit(true);
-        if (error) {
-          setTimeout(() => {
-            ToastEvent.show(error.message);
-          }, 500);
-        }
-      }
-    })();
   }, []);
 
   async function Initialize(colors = colors) {
     let settings;
     try {
       settings = await MMKV.getStringAsync('settings');
-      if (!settings || !settings.includes('fontScale')) {
-        settings = defaultState.settings;
-        settings.fontScale = 1;
-        console.log(settings, 'SETTINGS');
-        await MMKV.setStringAsync('settings', JSON.stringify(settings));
-      } else {
         settings = JSON.parse(settings);
         scale.fontScale = 1;
         if (settings.fontScale) {
           scale.fontScale = settings.fontScale;
         }
         updateSize();
-      }
+ 
     } catch (e) {
-      console.log(e.message);
+      if (!settings || !settings.includes('fontScale')) {
+        settings = defaultState.settings;
+        settings.fontScale = 1;
+        console.log(settings, 'SETTINGS');
+        await MMKV.setStringAsync('settings', JSON.stringify(settings));
+      }
+      console.log(e,"Initialize");
     } finally {
       let newColors = await getColorScheme(settings.useSystemTheme);
       dispatch({type: ACTIONS.SETTINGS, settings: {...settings}});
