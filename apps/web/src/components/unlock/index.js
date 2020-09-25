@@ -4,15 +4,12 @@ import { Input } from "@rebass/forms";
 import * as Icon from "../icons";
 import { db } from "../../common";
 import { useStore as useEditorStore } from "../../stores/editor-store";
-import { navigate } from "hookrouter";
-import { setHashParam } from "../../utils/useHashParam";
 
 function Unlock(props) {
   const { noteId } = props;
   const passwordRef = useRef();
   const [isWrong, setIsWrong] = useState(false);
   const openLockedSession = useEditorStore((store) => store.openLockedSession);
-  const clearSession = useEditorStore((store) => store.clearSession);
 
   const submit = useCallback(async () => {
     const password = passwordRef.current.value;
