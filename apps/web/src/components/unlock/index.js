@@ -1,4 +1,4 @@
-import React, { useRef, useState, useCallback, useEffect } from "react";
+import React, { useRef, useState, useCallback } from "react";
 import { Flex, Text, Button } from "rebass";
 import { Input } from "@rebass/forms";
 import * as Icon from "../icons";
