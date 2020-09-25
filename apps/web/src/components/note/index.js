@@ -52,7 +52,7 @@ function menuItems(note, context) {
     {
       title: note.locked ? "Unlock" : "Lock",
       onClick: async () => {
-        const { unlock, lock } = store;
+        const { unlock, lock } = store.get();
         if (!note.locked) {
           await lock(note.id);
           showToast("success", "Note locked successfully!");

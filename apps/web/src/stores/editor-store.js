@@ -48,8 +48,8 @@ class EditorStore extends BaseStore {
   openLastSession = async () => {
     // Do not reopen last session on mobile
     if (isMobile()) return;
-
     const id = localStorage.getItem("lastOpenedNote");
+
     if (id) {
       setHashParam({ note: id });
     }

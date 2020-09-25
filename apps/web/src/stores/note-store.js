@@ -77,11 +77,19 @@ class NoteStore extends BaseStore {
   };
 
   unlock = async (id) => {
-    await Vault.unlockNote(id, () => this._setValue(id, "locked", false));
+    await Vault.unlockNote(id).then(async () => {
+      if (editorStore.get().session.id === id)
+        await editorStore.openSession(id);
+      this.refresh();
+    });
   };
 
   lock = async (id) => {
-    await Vault.lockNote(id, () => this._setValue(id, "locked", true));
+    await Vault.lockNote(id).then(async () => {
+      if (editorStore.get().session.id === id)
+        await editorStore.openSession(id);
+      this.refresh();
+    });
   };
 
   setColor = async (id, color) => {
@@ -116,8 +124,10 @@ class NoteStore extends BaseStore {
    */
   _syncEditor = (noteId, action, value) => {
     const { session, setSession } = editorStore.get();
+    console.log(session.id, noteId, session.id !== noteId);
     if (session.id !== noteId) return false;
     setSession((state) => (state.session[action] = value), true);
+    return true;
   };
 }
 
