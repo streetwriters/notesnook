@@ -58,11 +58,35 @@ function NavigationMenu(props) {
     setSelectedRoute(path);
   }, [path]);
 
+  useEffect(() => {
+    if (!isMobile) return;
+    const app = document.getElementById("app");
+    let startX = 0;
+    app.ontouchstart = function (event) {
+      startX = event.touches[0].pageX;
+    };
+
+    app.ontouchmove = function (event) {
+      let currentX = event.touches[0].pageX;
+      if (currentX - startX > 50) {
+        toggleSideMenu(true);
+        startX = currentX;
+      } else if (currentX - startX < -50) {
+        toggleSideMenu(false);
+        startX = currentX;
+      }
+    };
+  }, [toggleSideMenu, isMobile]);
+
   return (
     <Animated.Flex
+      id="navigationmenu"
       flexDirection="column"
       justifyContent="space-between"
-      initial={{ opacity: 1, x: isMobile ? -500 : 0 }}
+      initial={{
+        opacity: 1,
+        x: isMobile ? -500 : 0,
+      }}
       animate={{
         opacity: isFocusMode ? 0 : 1,
         visibility: isFocusMode ? "hidden" : "visible",
