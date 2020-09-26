@@ -61,12 +61,15 @@ function NavigationMenu(props) {
   useEffect(() => {
     if (!isMobile) return;
     const app = document.getElementById("app");
+
     let startX = 0;
     app.ontouchstart = function (event) {
+      if (event.touches.length > 1) return;
       startX = event.touches[0].pageX;
     };
 
     app.ontouchmove = function (event) {
+      if (event.touches.length > 1) return;
       let currentX = event.touches[0].pageX;
       if (currentX - startX > 50) {
         toggleSideMenu(true);
