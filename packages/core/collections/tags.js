@@ -51,6 +51,7 @@ export default class Tags extends Collection {
     let notes = tag.noteIds || [];
     let deletedIds = tag.deletedIds || [];
     tag = {
+      type: "tag",
       id,
       title: tag.title,
       noteIds: [...notes, noteId],
