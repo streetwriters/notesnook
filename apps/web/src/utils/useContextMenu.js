@@ -38,6 +38,8 @@ function openMenu(e) {
     isOpening = true;
   }
 
+  menu.style.display = "block";
+
   const clickCoords = getPosition(e);
   const clickCoordsX = clickCoords.x;
   const clickCoordsY = clickCoords.y;
@@ -45,8 +47,8 @@ function openMenu(e) {
   const menuWidth = menu.offsetWidth + 4;
   const menuHeight = menu.offsetHeight + 4;
 
-  const windowWidth = window.innerWidth;
-  const windowHeight = window.innerHeight;
+  const windowWidth = window.document.body.offsetWidth;
+  const windowHeight = window.document.body.offsetHeight;
 
   if (windowWidth - clickCoordsX < menuWidth) {
     menu.style.left = windowWidth - menuWidth + "px";

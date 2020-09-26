@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { isMobile } from "./dimensions";
 
 const getHashSearchParams = () => {
   const hash = window.location.hash.slice(1);
@@ -25,7 +26,12 @@ const setHashParam = (obj, notify = true) => {
   const search = searchParams.toString();
   let hash = search ? `${prefix}?${search}` : prefix;
   if (window.history.replaceState) {
-    window.history.replaceState(null, null, `#${hash}`);
+    if (isMobile()) {
+      window.history.pushState(null, null, `#${hash}`);
+    } else {
+      window.history.replaceState(null, null, `#${hash}`);
+    }
+
     if (notify) window.dispatchEvent(new HashChangeEvent("hashchange"));
   } else {
     window.location.hash = hash;

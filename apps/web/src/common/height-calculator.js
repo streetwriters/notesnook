@@ -12,7 +12,7 @@ function getNoteHeight(item) {
   let height = SINGLE_LINE_HEIGHT * 3;
   if (title.length > 40) height += SINGLE_LINE_HEIGHT;
   if (headline.length > 0) height += SINGLE_LINE_HEIGHT;
-  if (headline.length > 60) height += SINGLE_LINE_HEIGHT;
+  if (headline.length > 40) height += SINGLE_LINE_HEIGHT;
   return height * DEFAULT_FONT_SIZE;
 }
 
