@@ -16,6 +16,8 @@ import Header from "./header";
 import { useHashParam } from "../../utils/useHashParam";
 import SplitEditor from "../spliteditor";
 import Unlock from "../unlock";
+import RouteContainer from "../route-container";
+import useMobile from "../../utils/use-mobile";
 
 function Editor() {
   console.log("rendering editor");
@@ -26,6 +28,7 @@ function Editor() {
   const updateWordCount = useStore((store) => store.updateWordCount);
   const init = useStore((store) => store.init);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
+  const isMobile = useMobile();
   const isTrial = useUserStore(
     (store) => store.user.notesnook?.subscription?.isTrial
   );
@@ -66,7 +69,13 @@ function Editor() {
     }
   }, [sessionState, quillRef]);
 
-  if (unlock) return <Unlock noteId={unlock} />;
+  if (unlock)
+    return (
+      <RouteContainer
+        onlyBackButton={isMobile}
+        route={<Unlock noteId={unlock} />}
+      />
+    );
   if (diff) return <SplitEditor diffId={diff} />;
   return (
     <Animated.Flex

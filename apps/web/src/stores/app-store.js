@@ -11,6 +11,7 @@ class AppStore extends BaseStore {
   // default state
   isSideMenuOpen = false;
   isFocusMode = false;
+  isEditorOpen = false;
   colors = [];
   globalMenu = { items: [], data: {} };
 
@@ -41,6 +42,10 @@ class AppStore extends BaseStore {
 
   setGlobalMenu = (items, data) => {
     this.set((state) => (state.globalMenu = { items, data }));
+  };
+
+  setIsEditorOpen = (toggleState) => {
+    this.set((state) => (state.isEditorOpen = toggleState));
   };
 }
 

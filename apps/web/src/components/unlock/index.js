@@ -1,15 +1,17 @@
-import React, { useRef, useState, useCallback } from "react";
+import React, { useRef, useState, useCallback, useEffect } from "react";
 import { Flex, Text, Button } from "rebass";
 import { Input } from "@rebass/forms";
 import * as Icon from "../icons";
 import { db } from "../../common";
 import { useStore as useEditorStore } from "../../stores/editor-store";
+import { useStore as useAppStore } from "../../stores/app-store";
 
 function Unlock(props) {
   const { noteId } = props;
   const passwordRef = useRef();
   const [isWrong, setIsWrong] = useState(false);
   const openLockedSession = useEditorStore((store) => store.openLockedSession);
+  const setIsEditorOpen = useAppStore((store) => store.setIsEditorOpen);
 
   const submit = useCallback(async () => {
     const password = passwordRef.current.value;
@@ -23,14 +25,22 @@ function Unlock(props) {
     }
   }, [setIsWrong, noteId, openLockedSession]);
 
+  useEffect(() => {
+    setIsEditorOpen(true);
+  }, [setIsEditorOpen]);
+
   return (
     <Flex
-      width={["0%", "0%", "100%"]}
+      width={"100%"}
       flex="1 1 auto"
       justifyContent="center"
       alignItems="center"
     >
-      <Flex flexDirection="column" width="30%" alignItems="center">
+      <Flex
+        flexDirection="column"
+        width={["95%", "95%", "30%"]}
+        alignItems="center"
+      >
         <Flex justifyContent="center" alignItems="center">
           <Icon.Unlock size={48} color="text" />
           <Text variant="heading" ml={2} fontSize={48}>

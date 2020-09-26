@@ -7,7 +7,7 @@ import BaseStore from ".";
 import { isMobile } from "../utils/dimensions";
 import { getHashParam, setHashParam } from "../utils/useHashParam";
 
-const SESSION_STATES = { stale: "stale", new: "new" };
+const SESSION_STATES = { stale: "stale", new: "new", locked: "locked" };
 const DEFAULT_SESSION = {
   notebook: undefined,
   state: undefined,
@@ -37,7 +37,7 @@ class EditorStore extends BaseStore {
     window.addEventListener("hashchange", async () => {
       const note = getHashParam("note");
 
-      if (isMobile() && !note && this.get().session.id) {
+      if (isMobile() && !note && appStore.get().isEditorOpen) {
         return this.clearSession();
       }
 
@@ -67,6 +67,7 @@ class EditorStore extends BaseStore {
         state: SESSION_STATES.new,
       };
     });
+    appStore.setIsEditorOpen(true);
   };
 
   openSession = async (noteId) => {
@@ -95,6 +96,7 @@ class EditorStore extends BaseStore {
         state: SESSION_STATES.new,
       };
     });
+    appStore.setIsEditorOpen(true);
   };
 
   saveSession = (oldSession) => {
@@ -138,6 +140,7 @@ class EditorStore extends BaseStore {
   };
 
   newSession = (context = {}) => {
+    appStore.setIsEditorOpen(true);
     this.set(function (state) {
       state.session = {
         ...DEFAULT_SESSION,
@@ -151,6 +154,7 @@ class EditorStore extends BaseStore {
   };
 
   clearSession = () => {
+    appStore.setIsEditorOpen(false);
     this.set(function (state) {
       state.session = {
         ...DEFAULT_SESSION,

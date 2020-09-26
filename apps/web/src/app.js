@@ -23,7 +23,7 @@ function App() {
   const initUser = useUserStore((store) => store.init);
   const initNotes = useNotesStore((store) => store.init);
   const openLastSession = useEditorStore((store) => store.openLastSession);
-  const sessionState = useEditorStore((store) => store.session.state);
+  const isEditorOpen = useStore((store) => store.isEditorOpen);
   const isMobile = useMobile();
   const routeResult = useRoutes(routes);
 
@@ -48,9 +48,9 @@ function App() {
 
   useEffect(() => {
     if (!isMobile) return;
-    setShow(!sessionState);
+    setShow(!isEditorOpen);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sessionState, isMobile]);
+  }, [isEditorOpen, isMobile]);
 
   useEffect(() => {
     return () => {

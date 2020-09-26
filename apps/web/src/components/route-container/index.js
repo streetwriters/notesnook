@@ -7,7 +7,7 @@ import { useStore as useSelectionStore } from "../../stores/selection-store";
 import { SELECTION_OPTIONS_MAP } from "../../common";
 
 function RouteContainer(props) {
-  const { type, route, canGoBack, title, subtitle } = props;
+  const { type, route, canGoBack, title, subtitle, onlyBackButton } = props;
   return (
     <Animated.Flex
       sx={{ overflow: "hidden" }}
@@ -22,6 +22,7 @@ function RouteContainer(props) {
         canGoBack={canGoBack}
         title={title}
         subtitle={subtitle}
+        onlyBackButton={onlyBackButton}
         selectionOptions={SELECTION_OPTIONS_MAP[type]}
       />
       {route}
@@ -32,16 +33,22 @@ function RouteContainer(props) {
 export default RouteContainer;
 
 function Header(props) {
-  const { title, subtitle, canGoBack, selectionOptions } = props;
+  const {
+    title,
+    subtitle,
+    canGoBack,
+    selectionOptions,
+    onlyBackButton,
+  } = props;
 
   const toggleSideMenu = useStore((store) => store.toggleSideMenu);
 
-  if (!title && !subtitle) return null;
+  if (!onlyBackButton && !title && !subtitle) return null;
   return (
     <Flex mx={2} flexDirection="column">
       <Flex alignItems="center" justifyContent="space-between">
         <Flex alignItems="center" py={2}>
-          {canGoBack && (
+          {(canGoBack || onlyBackButton) && (
             <Box
               onClick={() => window.history.back()}
               ml={-2}
@@ -56,7 +63,7 @@ function Header(props) {
             sx={{
               ml: 0,
               mr: 4,
-              display: ["block", "none", "none"],
+              display: [onlyBackButton ? "none" : "block", "none", "none"],
             }}
             size={28}
           />
