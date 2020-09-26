@@ -48,7 +48,7 @@ function Header(props) {
     <Flex mx={2} flexDirection="column">
       <Flex alignItems="center" justifyContent="space-between">
         <Flex alignItems="center" py={2}>
-          {(canGoBack || onlyBackButton) && (
+          {canGoBack || onlyBackButton ? (
             <Box
               onClick={() => window.history.back()}
               ml={-2}
@@ -57,16 +57,17 @@ function Header(props) {
             >
               <Icon.ChevronLeft size={38} color="fontPrimary" />
             </Box>
+          ) : (
+            <Icon.Menu
+              onClick={toggleSideMenu}
+              sx={{
+                ml: 0,
+                mr: 4,
+                display: [onlyBackButton ? "none" : "block", "none", "none"],
+              }}
+              size={28}
+            />
           )}
-          <Icon.Menu
-            onClick={toggleSideMenu}
-            sx={{
-              ml: 0,
-              mr: 4,
-              display: [onlyBackButton ? "none" : "block", "none", "none"],
-            }}
-            size={28}
-          />
           <Heading fontSize="heading" color={"text"}>
             {title}
           </Heading>
