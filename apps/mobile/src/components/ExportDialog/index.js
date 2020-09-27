@@ -123,7 +123,15 @@ const ExportDialog = () => {
           },
           styles.container,
         ]}>
-        <DialogHeader icon="export" title="Export Note" />
+        <DialogHeader
+          icon="export"
+          title="Export Note"
+          paragraph={
+            exporting
+              ? null
+              : 'Export your note in any of the following formats.'
+          }
+        />
 
         <Seperator half />
         {exporting ? (
@@ -146,16 +154,6 @@ const ExportDialog = () => {
           />
         ) : (
           <>
-            <Text
-              style={[
-                {
-                  color: colors.pri,
-                  fontSize: SIZE.xs + 1,
-                  alignSelf: 'center',
-                },
-              ]}>
-              Export your note in any of the following formats.
-            </Text>
             <View style={styles.buttonContainer}>
               {actions.map((item) => (
                 <Fragment key={item.title}>

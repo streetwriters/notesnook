@@ -284,35 +284,23 @@ export class VaultDialog extends Component {
                   : 'Unlock note'
                 : 'Lock note'
             }
+            paragraph={
+              !novault
+                ? 'Set a password to create vault'
+                : permanant
+                ? 'Enter password to remove note from vault.'
+                : note.locked
+                ? this.state.deleteNote
+                  ? 'Unlock note to delete it.'
+                  : this.state.share
+                  ? 'Unlock note to share it.'
+                  : this.state.goToEditor
+                  ? 'Unlock note to open it in editor'
+                  : 'Enter vault password to unlock note.'
+                : 'Enter vault password to lock note.'
+            }
             icon="shield"
           />
-
-          <Text
-            style={{
-              color: colors.icon,
-              fontFamily: WEIGHT.regular,
-              textAlign: 'center',
-              fontSize: SIZE.sm - 1,
-              flexWrap: 'wrap',
-              maxWidth: '90%',
-              alignSelf: 'center',
-              marginTop: 10,
-              marginBottom: 5,
-            }}>
-            {!novault
-              ? 'Set a password to create vault'
-              : permanant
-              ? 'Enter password to remove note from vault.'
-              : note.locked
-              ? this.state.deleteNote
-                ? 'Unlock note to delete it.'
-                : this.state.share
-                ? 'Unlock note to share it.'
-                : this.state.goToEditor
-                ? 'Unlock note to open it in editor'
-                : 'Enter vault password to unlock note.'
-              : 'Enter vault password to lock note.'}
-          </Text>
 
           {note.locked || locked || permanant ? (
             <TextInput

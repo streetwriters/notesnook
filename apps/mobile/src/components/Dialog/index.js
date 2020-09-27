@@ -17,6 +17,8 @@ import {Button} from '../Button';
 import {dialogActions} from '../DialogManager/dialogActions';
 import {updateEvent} from '../DialogManager/recievers';
 import BaseDialog from './base-dialog';
+import DialogButtons from './dialog-buttons';
+import DialogHeader from './dialog-header';
 
 export class Dialog extends Component {
   constructor(props) {
@@ -218,56 +220,25 @@ export class Dialog extends Component {
             paddingHorizontal: ph,
             paddingVertical: pv,
           }}>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            {icon ? (
-              <Icon name={icon} color={colors.accent} size={SIZE.lg} />
-            ) : null}
-
-            {template.noTitle ? null : (
-              <Text
-                style={{
-                  color: colors.accent,
-                  fontFamily: WEIGHT.bold,
-                  marginLeft: 5,
-                  fontSize: SIZE.md,
-                }}>
-                {title}
-              </Text>
-            )}
-          </View>
-
-          {paragraph ? (
-            <Text
-              style={{
-                color: colors.icon,
-                fontFamily: WEIGHT.regular,
-                fontSize: SIZE.xs + 1,
-                textAlign: 'center',
-              }}>
-              {this.state.selectedItemsLength > 0
+          <DialogHeader
+            title={title}
+            icon={icon}
+            paragraph={
+              this.state.selectedItemsLength > 0
                 ? 'Delete ' +
                   this.state.selectedItemsLength +
                   ' selected items?'
-                : paragraph}
-            </Text>
-          ) : null}
+                : paragraph
+            }
+          />
 
           {template.noButtons ? null : (
-            <View
-              style={{
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                flexDirection: 'row',
-                marginTop: 20,
-              }}>
-              <Button onPress={this._onClose} title={negativeText} grayed />
-              <Button onPress={this._onPress} title={positiveText} />
-            </View>
+            <DialogButtons
+              onPressNegative={this._onClose}
+              onPressPositive={this._onPress}
+              positiveTitle={positiveText}
+              negativeTitle={negativeText}
+            />
           )}
         </View>
       </BaseDialog>
