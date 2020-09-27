@@ -29,7 +29,7 @@ function Dialog(props) {
           backgroundColor: theme.colors.background,
           color: theme.colors.text,
           boxShadow: "4px 5px 18px 2px #00000038",
-          width: isMobile ? "80%" : "30%",
+          width: isMobile ? "95%" : "30%",
           padding: 0,
           overflowY: "hidden",
         },
