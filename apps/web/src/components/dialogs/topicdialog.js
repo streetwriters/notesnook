@@ -13,9 +13,10 @@ function TopicDialog(props) {
     <Dialog
       isOpen={true}
       title={props.title}
+      description="You can create as many topics as you want."
       icon={props.icon}
       positiveButton={{
-        text: "Add",
+        text: "Create topic",
         onClick: () => {
           props.onYes(ref.current.value);
         },
@@ -37,7 +38,7 @@ function TopicDialog(props) {
 export function showTopicDialog(notebook) {
   return showDialog((perform) => (
     <TopicDialog
-      title={"Topic"}
+      title={"Create a Topic"}
       icon={Icon.Topic}
       onNo={() => {
         perform(false);

@@ -6,7 +6,7 @@ import { store as editorStore } from "../stores/editor-store";
 import { store as trashStore } from "../stores/trash-store";
 import { db } from "./index";
 import { showMoveNoteDialog } from "../components/dialogs/movenotedialog";
-import { confirm } from "../components/dialogs/confirm";
+import { confirm, showDeleteConfirmation } from "../components/dialogs/confirm";
 
 function createOption(key, icon, onClick) {
   return {
@@ -26,11 +26,9 @@ function createOptions(options = []) {
 const DeleteOption = createOption("deleteOption", Icon.Trash, async function (
   state
 ) {
-  if (
-    !(await confirm(Icon.Trash, "Delete", "Are you sure you want to proceed?"))
-  )
-    return;
   const item = state.selectedItems[0];
+
+  if (!(await showDeleteConfirmation(item.type, true))) return;
 
   var isAnyNoteOpened = false;
   const items = state.selectedItems.map((item) => {

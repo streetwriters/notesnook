@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Text, Box } from "rebass";
+import { Text, Box, Button } from "rebass";
 import Input from "../inputs";
 import * as Icon from "../icons";
 import Dialog, { showDialog } from "./dialog";
@@ -8,6 +8,7 @@ import EmailInput from "../inputs/email";
 import PasswordInput from "../inputs/password";
 import Dropper from "../dropper";
 import { useStore } from "../../stores/user-store";
+import { showLogInDialog } from "./logindialog";
 
 const form = { error: true };
 function SignUpDialog(props) {
@@ -19,19 +20,35 @@ function SignUpDialog(props) {
   return (
     <Dialog
       isOpen={true}
-      title={"Sign Up"}
-      icon={Icon.User}
+      title={"Create a new Account"}
+      description={"Sign up for a 14-day free trial (no credit card)."}
+      icon={Icon.Signup}
       onCloseClick={onClose}
-      negativeButton={{ onClick: onClose }}
+      negativeButton={{ text: "I don't want to", onClick: onClose }}
+      buttonsAlignment="center"
       positiveButton={{
-        text: "Sign Up",
+        text: "Create my account",
         loading: isSigningIn,
         disabled: isSigningIn,
         onClick: () => submit(setError, form, signup, onClose),
       }}
+      footer={
+        <>
+          <Text textAlign="center" color="gray" mt={3}>
+            Already have an account?
+          </Text>
+          <Button
+            variant="anchor"
+            mt={2}
+            fontSize="body"
+            onClick={showLogInDialog}
+          >
+            Sign in here.
+          </Button>
+        </>
+      }
     >
       <Box
-        mt={1}
         onKeyDown={(e) => {
           if (e.key === "Enter") submit(setError, form, signup, onClose);
         }}

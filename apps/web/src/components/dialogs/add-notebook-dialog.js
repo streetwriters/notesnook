@@ -1,5 +1,5 @@
 import React from "react";
-import { Flex, Box, Text, Button as RebassButton } from "rebass";
+import { Flex, Box, Button as RebassButton } from "rebass";
 import { Input } from "@rebass/forms";
 import * as Icon from "../icons";
 import Dialog, { showDialog } from "./dialog";
@@ -86,10 +86,13 @@ class AddNotebookDialog extends React.Component {
     return (
       <Dialog
         isOpen={props.isOpen}
-        title="Notebook"
+        title={props.edit ? "Edit this Notebook" : "Create a Notebook"}
+        description={
+          props.edit ? "" : "Notebooks are the best way to organize your notes."
+        }
         icon={Icon.Notebook}
         positiveButton={{
-          text: props.edit ? "Edit" : "Add",
+          text: "Create notebook",
           onClick: () => {
             props.onDone({
               title: this.title,
@@ -104,7 +107,7 @@ class AddNotebookDialog extends React.Component {
         }}
         negativeButton={{ text: "Cancel", onClick: props.close }}
       >
-        <Box my={1}>
+        <Box>
           <Input
             autoFocus
             onChange={(e) => (this.title = e.target.value)}
@@ -112,19 +115,16 @@ class AddNotebookDialog extends React.Component {
             defaultValue={this.title}
           />
           <Input
-            sx={{ marginTop: 1 }}
+            sx={{ marginTop: 2 }}
             onChange={(e) => (this.description = e.target.value)}
             placeholder="Enter description (optional)"
             defaultValue={this.description}
           />
-          <Text variant="body" fontWeight="bold" my={1}>
-            Topics (optional):
-          </Text>
           <Box
+            mt={2}
             sx={{
               maxHeight: this.MAX_AVAILABLE_HEIGHT,
               overflowY: "auto",
-              marginBottom: 1,
             }}
           >
             {this.state.topics.map(
@@ -164,7 +164,7 @@ class AddNotebookDialog extends React.Component {
                     />
                     <RebassButton
                       variant="tertiary"
-                      sx={{ marginLeft: 1 }}
+                      sx={{ marginLeft: 2 }}
                       px={2}
                       py={1}
                       onClick={() => this.performActionOnTopic(index)}

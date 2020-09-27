@@ -38,7 +38,7 @@ export const Plus = createIcon(Icons.mdiPlus);
 export const Minus = createIcon(Icons.mdiMinus);
 export const Notebook = createIcon(Icons.mdiBookOutline);
 export const ArrowLeft = createIcon(Icons.mdiArrowLeft);
-export const Move = createIcon(Icons.mdiArrowAll);
+export const Move = createIcon(Icons.mdiBookPlusMultipleOutline);
 export const Topic = createIcon(Icons.mdiFormatTitle);
 export const Alert = createIcon(Icons.mdiAlert);
 export const Vault = createIcon(Icons.mdiShieldOutline);
@@ -54,6 +54,7 @@ export const Trash = createIcon(Icons.mdiTrashCanOutline);
 export const Search = createIcon(Icons.mdiMagnify);
 export const Menu = createIcon(Icons.mdiMenu);
 export const Login = createIcon(Icons.mdiLoginVariant);
+export const Signup = createIcon(Icons.mdiAccountPlusOutline);
 export const Logout = createIcon(Icons.mdiLogoutVariant);
 export const FocusMode = createIcon(Icons.mdiFullscreen);
 export const NormalMode = createIcon(Icons.mdiFullscreenExit);
@@ -62,7 +63,7 @@ export const Home = createIcon(Icons.mdiHomeOutline);
 export const Restore = createIcon(Icons.mdiRecycle);
 export const Sync = createIcon(Icons.mdiSync);
 export const Loading = createIcon(Icons.mdiLoading, true);
-export const Export = createIcon(Icons.mdiExport);
+export const Export = createIcon(Icons.mdiExportVariant);
 export const AddToNotebook = createIcon(Icons.mdiBookPlusMultipleOutline);
 
 /** Properties Icons */

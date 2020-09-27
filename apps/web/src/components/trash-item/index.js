@@ -25,11 +25,24 @@ function menuItems(item, index) {
       title: "Delete",
       color: "red",
       onClick: () => {
-        confirm(
-          Icon.Trash,
-          "Delete",
-          `Are you sure you want to permanently delete this item?`
-        ).then(async (res) => {
+        confirm(Icon.Trash, {
+          title: `Permanently Delete ${toTitleCase(item.itemType)}`,
+          subtitle: `Are you sure you want to permanently delete this ${item.itemType}?`,
+          yesText: `Delete ${item.itemType}`,
+          noText: "Cancel",
+          message: (
+            <>
+              This action is{" "}
+              <Text as="span" color="error">
+                IRREVERSIBLE
+              </Text>
+              . You will{" "}
+              <Text as="span" color="primary">
+                not be able to recover this {item.itemType}.
+              </Text>
+            </>
+          ),
+        }).then(async (res) => {
           if (res) {
             await store.delete(item.id, index);
             showPermanentDeleteToast(item, index);
@@ -54,7 +67,7 @@ function TrashItem({ item, index }) {
           <Text as="span" mx={1}>
             •
           </Text>
-          <Text color="primary">{toTitleCase(item.type)}</Text>
+          <Text color="primary">{toTitleCase(item.itemType)}</Text>
         </Flex>
       }
       menuData={item}

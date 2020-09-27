@@ -31,7 +31,7 @@ function Topics(props) {
         context={{ notebookId }}
         placeholder={Flex}
         button={{
-          content: "Add more topics",
+          content: "Create a new topic",
           onClick: async () => {
             await showTopicDialog(notebookId);
           },

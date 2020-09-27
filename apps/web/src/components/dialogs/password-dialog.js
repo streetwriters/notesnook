@@ -20,6 +20,7 @@ function PasswordDialog(props) {
     <Dialog
       isOpen={true}
       title={props.title}
+      description={props.subtitle}
       icon={props.icon}
       positiveButton={{
         text: props.positiveButtonText,
@@ -59,21 +60,24 @@ function getDialogData(type) {
   switch (type) {
     case "create_vault":
       return {
-        title: "Set Up Your Vault",
+        title: "Create Your Vault",
+        subtitle: "Your vault will encrypt everything locally.",
         icon: Icon.Vault,
-        positiveButtonText: "Done",
+        positiveButtonText: "Create my vault",
       };
     case "unlock_vault":
       return {
-        title: "Unlock Vault",
+        title: "Unlock your Vault",
+        subtitle: "Your vault will remain unlocked for 30 minutes.",
         icon: Icon.Unlock,
-        positiveButtonText: "Unlock",
+        positiveButtonText: "Unlock my vault",
       };
     case "unlock_note":
       return {
-        title: "Unlock Note",
+        title: "Unlock your Note",
+        subtitle: "Unlocking will make this note openly available.",
         icon: Icon.Unlock,
-        positiveButtonText: "Unlock",
+        positiveButtonText: "Unlock this note",
       };
     default:
       return;
@@ -81,10 +85,11 @@ function getDialogData(type) {
 }
 
 export function showPasswordDialog(type, validate) {
-  const { title, icon, positiveButtonText } = getDialogData(type);
+  const { title, subtitle, icon, positiveButtonText } = getDialogData(type);
   return showDialog((perform) => (
     <PasswordDialog
       title={title}
+      subtitle={subtitle}
       icon={icon}
       positiveButtonText={positiveButtonText}
       onCancel={() => perform(false)}

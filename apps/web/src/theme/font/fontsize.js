@@ -7,7 +7,7 @@ class FontSizeFactory {
       subtitle: 16 * scaleFactor,
       body: 16 * scaleFactor,
       menu: 14 * scaleFactor,
-      subBody: 11 * scaleFactor,
+      subBody: 12 * scaleFactor,
     };
   }
 }

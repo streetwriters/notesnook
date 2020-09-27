@@ -1,5 +1,5 @@
 import React from "react";
-import { Flex, Button, Text, Box } from "rebass";
+import { Flex, Button, Text } from "rebass";
 import { db } from "../../common";
 import download from "../../utils/download";
 import { showToast } from "../../utils/toast";
@@ -12,38 +12,33 @@ function ExportDialog(props) {
       isOpen={true}
       title={props.title}
       icon={props.icon}
-      negativeButton={{ onClick: props.onClose, text: "Cancel" }}
+      description="You can export your note to Markdown, HTML, or Text."
+      buttonsAlignment="center"
+      negativeButton={{
+        onClick: props.onClose,
+        text: "I don't want to export anymore",
+      }}
     >
-      <Box>
-        <Text variant="body" mb={2}>
-          Please choose a format to export the note into:
-        </Text>
-        <Flex my={1} justifyContent="center" alignItems="center">
-          <Button
-            variant="tertiary"
-            mr={2}
-            onClick={() => props.exportNote("html")}
-          >
-            <Icon.HTML size={100} color="dimPrimary" /> HTML
-          </Button>
-          <Button
-            variant="tertiary"
-            mr={2}
-            onClick={() => props.exportNote("md")}
-          >
-            <Icon.Markdown size={100} color="dimPrimary" />
-            Markdown
-          </Button>
-          <Button
-            variant="tertiary"
-            mr={2}
-            onClick={() => props.exportNote("txt")}
-          >
-            <Icon.Text size={100} color="dimPrimary" />
-            Text
-          </Button>
-        </Flex>
-      </Box>
+      <Flex justifyContent="center" alignItems="center">
+        <Button mr={2} onClick={() => props.exportNote("html")}>
+          <Flex variant="rowCenter">
+            <Icon.HTML color="static" />
+            <Text ml={1}>HTML</Text>
+          </Flex>
+        </Button>
+        <Button mr={2} onClick={() => props.exportNote("md")}>
+          <Flex variant="rowCenter">
+            <Icon.Markdown color="static" />
+            <Text ml={1}>Markdown</Text>
+          </Flex>
+        </Button>
+        <Button mr={2} onClick={() => props.exportNote("txt")}>
+          <Flex variant="rowCenter">
+            <Icon.Text color="static" />
+            <Text ml={1}>Text</Text>
+          </Flex>
+        </Button>
+      </Flex>
     </Dialog>
   );
 }
@@ -51,7 +46,7 @@ function ExportDialog(props) {
 export function showExportDialog(noteId) {
   return showDialog((perform) => (
     <ExportDialog
-      title={"Export Note"}
+      title={"Export your Note"}
       icon={Icon.Export}
       onClose={() => perform(false)}
       exportNote={async (format) => {

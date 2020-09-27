@@ -4,7 +4,7 @@ import ListItem from "../list-item";
 import { store } from "../../stores/notebook-store";
 import * as Icon from "../icons";
 import { showEditNoteDialog } from "../dialogs/addnotebookdialog";
-import { confirm } from "../dialogs/confirm";
+import { confirm, showDeleteConfirmation } from "../dialogs/confirm";
 import { showItemDeletedToast, showUnpinnedToast } from "../../common/toasts";
 const pin = async (notebook, index) => {
   await store.pin(notebook, index);
@@ -24,11 +24,7 @@ function menuItems(notebook, index) {
       title: "Delete",
       color: "red",
       onClick: () => {
-        confirm(
-          Icon.Trash,
-          "Delete Notebook",
-          "Are you sure you want to delete this notebook?"
-        ).then(async (res) => {
+        showDeleteConfirmation("notebook").then(async (res) => {
           if (res) {
             await store
               .delete(notebook.id, index)

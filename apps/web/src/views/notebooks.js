@@ -36,7 +36,7 @@ const routes = {
           <Notes
             context={{
               type: "topic",
-              value: { id: notebook, topic: topicItem.title },
+              value: { id: notebook, topic: topic },
             }}
           />
         }
