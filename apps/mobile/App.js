@@ -1,6 +1,6 @@
 import {useNetInfo} from '@react-native-community/netinfo';
 import React, {useEffect, useState} from 'react';
-import {Appearance, StatusBar, useColorScheme} from 'react-native';
+import {useColorScheme} from 'react-native';
 import Orientation from 'react-native-orientation';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {getColorScheme, scale, updateSize} from './src/common/common';
@@ -43,11 +43,6 @@ const App = () => {
       settings = JSON.parse(settings);
       if (settings.useSystemTheme) {
         let newColors = await getColorScheme(settings.useSystemTheme);
-        StatusBar.setBarStyle(
-          Appearance.getColorScheme() === 'dark'
-            ? 'light-content'
-            : 'dark-content',
-        );
         dispatch({type: ACTIONS.THEME, colors: newColors});
       }
     }
@@ -83,9 +78,7 @@ const App = () => {
   };
 
   const syncChanges = async () => {
-    dispatch({type: ACTIONS.SYNCING, syncing: true});
     dispatch({type: ACTIONS.ALL});
-    dispatch({type: ACTIONS.SYNCING, syncing: false});
   };
 
   const resetApp = () => {
@@ -115,46 +108,44 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-      let error = null;
-      Initialize().finally(async () => {
-        try {
-          await db.init();
-          let user = await db.user.get();
-          console.log(user,"USER");
-          if (user) {
-            dispatch({type: ACTIONS.USER, user: user});
-            startSyncer();
-          }
-        } catch (e) {
-          error = e;
-        } finally {
-          dispatch({type: ACTIONS.ALL});
-          setInit(true);
-          if (error) {
-            setTimeout(() => {
-              ToastEvent.show(error.message);
-            }, 500);
-          }
+    let error = null;
+    let user;
+    Initialize().finally(async () => {
+      try {
+        await db.init();
+        user = await db.user.get();
+      } catch (e) {
+        error = e;
+      } finally {
+        if (user) {
+          dispatch({type: ACTIONS.USER, user: user});
+          startSyncer();
         }
-      })
-
+        dispatch({type: ACTIONS.ALL});
+        setInit(true);
+        if (error) {
+          setTimeout(() => {
+            ToastEvent.show(error.message);
+          }, 500);
+        }
+      }
+    });
   }, []);
 
   async function Initialize(colors = colors) {
     let settings;
+    scale.fontScale = 1;
     try {
       settings = await MMKV.getStringAsync('settings');
-        settings = JSON.parse(settings);
-        scale.fontScale = 1;
-        if (settings.fontScale) {
-          scale.fontScale = settings.fontScale;
-        }
-        updateSize();
- 
+      settings = JSON.parse(settings);
+
+      if (settings.fontScale) {
+        scale.fontScale = settings.fontScale;
+      }
+      updateSize();
     } catch (e) {
       if (!settings || !settings.includes('fontScale')) {
         settings = defaultState.settings;
-        settings.fontScale = 1;
         await MMKV.setStringAsync('settings', JSON.stringify(settings));
       }
     } finally {
