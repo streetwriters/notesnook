@@ -19,6 +19,9 @@ import {
 import {openEditorAnimation} from '../../utils/animations';
 import {db, DDS, getElevation, ToastEvent} from '../../utils/utils';
 import {Button} from '../Button/index';
+import BaseDialog from '../Dialog/base-dialog';
+import DialogButtons from '../Dialog/dialog-buttons';
+import DialogHeader from '../Dialog/dialog-header';
 import {updateEvent} from '../DialogManager/recievers';
 import {Toast} from '../Toast';
 const passInputRef = createRef();
@@ -251,98 +254,100 @@ export class VaultDialog extends Component {
     } = this.state;
 
     return (
-      <Modal
+      <BaseDialog
         onShow={() => {
           passInputRef.current?.focus();
         }}
-        visible={visible}
-        transparent={true}
-        onRequestClose={this.close}>
+        onRequestClose={this.close}
+        visible={visible}>
         <View
           style={{
-            width: '100%',
-            height: '100%',
-            backgroundColor: colors.night
-              ? 'rgba(255,255,255,0.3)'
-              : 'rgba(0,0,0,0.3)',
-            justifyContent: 'center',
-            alignItems: 'center',
+            ...getElevation(5),
+            width: '80%',
+            maxHeight: 350,
+            borderRadius: 5,
+            backgroundColor: colors.bg,
+            paddingHorizontal: ph,
+            paddingVertical: pv,
           }}>
-          <View
-            style={{
-              ...getElevation(5),
-              width: '80%',
-              maxHeight: 350,
-              borderRadius: 5,
-              backgroundColor: colors.bg,
-              paddingHorizontal: ph,
-              paddingVertical: pv,
-            }}>
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}>
-              <Icon name="shield" color={colors.accent} size={SIZE.lg} />
-              <Text
-                style={{
-                  color: colors.accent,
-                  fontFamily: WEIGHT.bold,
-                  marginLeft: 5,
-                  fontSize: SIZE.md,
-                }}>
-                {!novault
-                  ? 'Create vault'
-                  : note.locked
-                  ? this.state.deleteNote
-                    ? 'Delete note'
-                    : this.state.share
-                    ? 'Share note'
-                    : this.state.goToEditor
-                    ? 'Unlock note'
-                    : 'Unlock note'
-                  : 'Lock note'}
-              </Text>
-            </View>
-
-            <Text
-              style={{
-                color: colors.icon,
-                fontFamily: WEIGHT.regular,
-                textAlign: 'center',
-                fontSize: SIZE.sm - 1,
-                flexWrap: 'wrap',
-                maxWidth: '90%',
-                alignSelf: 'center',
-                marginTop: 10,
-                marginBottom: 5,
-              }}>
-              {!novault
-                ? 'Set a password to create vault'
-                : permanant
-                ? 'Enter password to remove note from vault.'
+          <DialogHeader
+            title={
+              !novault
+                ? 'Create vault'
                 : note.locked
                 ? this.state.deleteNote
-                  ? 'Unlock note to delete it.'
+                  ? 'Delete note'
                   : this.state.share
-                  ? 'Unlock note to share it.'
+                  ? 'Share note'
                   : this.state.goToEditor
-                  ? 'Unlock note to open it in editor'
-                  : 'Enter vault password to unlock note.'
-                : 'Enter vault password to lock note.'}
-            </Text>
+                  ? 'Unlock note'
+                  : 'Unlock note'
+                : 'Lock note'
+            }
+            icon="shield"
+          />
 
-            {note.locked || locked || permanant ? (
+          <Text
+            style={{
+              color: colors.icon,
+              fontFamily: WEIGHT.regular,
+              textAlign: 'center',
+              fontSize: SIZE.sm - 1,
+              flexWrap: 'wrap',
+              maxWidth: '90%',
+              alignSelf: 'center',
+              marginTop: 10,
+              marginBottom: 5,
+            }}>
+            {!novault
+              ? 'Set a password to create vault'
+              : permanant
+              ? 'Enter password to remove note from vault.'
+              : note.locked
+              ? this.state.deleteNote
+                ? 'Unlock note to delete it.'
+                : this.state.share
+                ? 'Unlock note to share it.'
+                : this.state.goToEditor
+                ? 'Unlock note to open it in editor'
+                : 'Enter vault password to unlock note.'
+              : 'Enter vault password to lock note.'}
+          </Text>
+
+          {note.locked || locked || permanant ? (
+            <TextInput
+              ref={passInputRef}
+              style={{
+                padding: pv - 5,
+                borderWidth: 1.5,
+                borderColor: wrongPassword ? colors.errorText : colors.nav,
+                paddingHorizontal: ph,
+                borderRadius: 5,
+                marginTop: 10,
+                fontSize: SIZE.sm,
+                fontFamily: WEIGHT.regular,
+              }}
+              onChangeText={(value) => {
+                this.password = value;
+              }}
+              secureTextEntry
+              placeholder="Password"
+              placeholderTextColor={colors.icon}
+            />
+          ) : null}
+
+          {!novault ? (
+            <View>
               <TextInput
                 ref={passInputRef}
                 style={{
                   padding: pv - 5,
                   borderWidth: 1.5,
-                  borderColor: wrongPassword ? colors.errorText : colors.nav,
+                  borderColor: passwordsDontMatch
+                    ? colors.errorText
+                    : colors.nav,
                   paddingHorizontal: ph,
                   borderRadius: 5,
-                  marginTop: 10,
                   fontSize: SIZE.sm,
                   fontFamily: WEIGHT.regular,
                 }}
@@ -353,93 +358,58 @@ export class VaultDialog extends Component {
                 placeholder="Password"
                 placeholderTextColor={colors.icon}
               />
-            ) : null}
 
-            {!novault ? (
-              <View>
-                <TextInput
-                  ref={passInputRef}
-                  style={{
-                    padding: pv - 5,
-                    borderWidth: 1.5,
-                    borderColor: passwordsDontMatch
-                      ? colors.errorText
-                      : colors.nav,
-                    paddingHorizontal: ph,
-                    borderRadius: 5,
-                    fontSize: SIZE.sm,
-                    fontFamily: WEIGHT.regular,
-                  }}
-                  onChangeText={(value) => {
-                    this.password = value;
-                  }}
-                  secureTextEntry
-                  placeholder="Password"
-                  placeholderTextColor={colors.icon}
-                />
-
-                <TextInput
-                  ref={confirmPassRef}
-                  style={{
-                    padding: pv - 5,
-                    borderWidth: 1.5,
-                    borderColor: passwordsDontMatch
-                      ? colors.errorText
-                      : colors.nav,
-                    paddingHorizontal: ph,
-                    borderRadius: 5,
-                    fontSize: SIZE.sm,
-                    fontFamily: WEIGHT.regular,
-                    marginTop: 10,
-                  }}
-                  secureTextEntry
-                  onChangeText={(value) => {
-                    this.confirmPassword = value;
-                    if (value !== this.password) {
-                      this.setState({
-                        passwordsDontMatch: true,
-                      });
-                    } else {
-                      this.setState({
-                        passwordsDontMatch: false,
-                      });
-                    }
-                  }}
-                  placeholder="Confirm password"
-                  placeholderTextColor={colors.icon}
-                />
-              </View>
-            ) : null}
-
-            <View
-              style={{
-                justifyContent: 'space-around',
-                alignItems: 'center',
-                flexDirection: 'row',
-                marginTop: 20,
-              }}>
-              <Button onPress={this.close} title="Cancel" />
-
-              <Button
-                onPress={this.onPress}
-                title={
-                  note.locked
-                    ? this.state.deleteNote
-                      ? 'Delete'
-                      : this.state.share
-                      ? 'Share '
-                      : this.state.goToEditor
-                      ? 'Open'
-                      : 'Unlock'
-                    : 'Lock'
-                }
-                grayed
+              <TextInput
+                ref={confirmPassRef}
+                style={{
+                  padding: pv - 5,
+                  borderWidth: 1.5,
+                  borderColor: passwordsDontMatch
+                    ? colors.errorText
+                    : colors.nav,
+                  paddingHorizontal: ph,
+                  borderRadius: 5,
+                  fontSize: SIZE.sm,
+                  fontFamily: WEIGHT.regular,
+                  marginTop: 10,
+                }}
+                secureTextEntry
+                onChangeText={(value) => {
+                  this.confirmPassword = value;
+                  if (value !== this.password) {
+                    this.setState({
+                      passwordsDontMatch: true,
+                    });
+                  } else {
+                    this.setState({
+                      passwordsDontMatch: false,
+                    });
+                  }
+                }}
+                placeholder="Confirm password"
+                placeholderTextColor={colors.icon}
               />
             </View>
-          </View>
+          ) : null}
+
+          <DialogButtons
+            onPressNegative={this.close}
+            onPressPositive={this.onPress}
+            positiveTitle={
+              note.locked
+                ? this.state.deleteNote
+                  ? 'Delete'
+                  : this.state.share
+                  ? 'Share '
+                  : this.state.goToEditor
+                  ? 'Open'
+                  : 'Unlock'
+                : 'Lock'
+            }
+          />
         </View>
         <Toast context="local" />
-      </Modal>
+      </BaseDialog>
     );
   }
 }

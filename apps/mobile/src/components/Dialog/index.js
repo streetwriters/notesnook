@@ -1,20 +1,22 @@
 import React, {Component} from 'react';
 import {Modal, Text, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {opacity, ph, pv, SIZE, WEIGHT} from '../../common/common';
+import {ph, pv, SIZE, WEIGHT} from '../../common/common';
 import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
 import {
+  eApplyChanges,
   eClearEditor,
   eCloseFullscreenEditor,
+  eOnLoadNote,
   eOnNewTopicAdded,
-  eApplyChanges, eOnLoadNote
 } from '../../services/events';
 import NavigationService from '../../services/NavigationService';
 import {db, DDS, getElevation, history, ToastEvent} from '../../utils/utils';
+import {Button} from '../Button';
 import {dialogActions} from '../DialogManager/dialogActions';
 import {updateEvent} from '../DialogManager/recievers';
-import {Button} from '../Button';
+import BaseDialog from './base-dialog';
 
 export class Dialog extends Component {
   constructor(props) {
@@ -134,7 +136,7 @@ export class Dialog extends Component {
         break;
       }
       case dialogActions.ACTION_NEW_NOTE: {
-        eSendEvent(eOnLoadNote, {type:"new"});
+        eSendEvent(eOnLoadNote, {type: 'new'});
         this.hide();
         break;
       }
@@ -205,93 +207,70 @@ export class Dialog extends Component {
     const {title, paragraph, positiveText, negativeText, icon} = template;
     const {visible} = this.state;
     return (
-      <Modal
-        visible={visible}
-        transparent={true}
-        animated
-        animationType="fade"
-        onRequestClose={() => this.setState({visible: false})}>
+      <BaseDialog visible={visible} onRequestClose={this.hide}>
         <View
           style={{
-            width: '100%',
-            height: '100%',
-            backgroundColor: 'rgba(0,0,0,0.3)',
-            justifyContent: 'center',
-            alignItems: 'center',
+            ...getElevation(5),
+            width: DDS.isTab ? '40%' : '80%',
+            maxHeight: 350,
+            borderRadius: 5,
+            backgroundColor: colors.bg,
+            paddingHorizontal: ph,
+            paddingVertical: pv,
           }}>
-          <TouchableOpacity
-            onPress={this.hide}
-            style={{
-              width: '100%',
-              height: '100%',
-              position: 'absolute',
-            }}
-          />
           <View
             style={{
-              ...getElevation(5),
-              width: DDS.isTab ? '40%' : '80%',
-              maxHeight: 350,
-              borderRadius: 5,
-              backgroundColor: colors.bg,
-              paddingHorizontal: ph,
-              paddingVertical: pv,
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
             }}>
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}>
-              {icon ? (
-                <Icon name={icon} color={colors.accent} size={SIZE.lg} />
-              ) : null}
-
-              {template.noTitle ? null : (
-                <Text
-                  style={{
-                    color: colors.accent,
-                    fontFamily: WEIGHT.bold,
-                    marginLeft: 5,
-                    fontSize: SIZE.md,
-                  }}>
-                  {title}
-                </Text>
-              )}
-            </View>
-
-            {paragraph ? (
-              <Text
-                style={{
-                  color: colors.icon,
-                  fontFamily: WEIGHT.regular,
-                  fontSize: SIZE.sm - 2,
-                  textAlign: 'center',
-                  marginTop: 10,
-                }}>
-                {this.state.selectedItemsLength > 0
-                  ? 'Delete ' +
-                    this.state.selectedItemsLength +
-                    ' selected items?'
-                  : paragraph}
-              </Text>
+            {icon ? (
+              <Icon name={icon} color={colors.accent} size={SIZE.lg} />
             ) : null}
 
-            {template.noButtons ? null : (
-              <View
+            {template.noTitle ? null : (
+              <Text
                 style={{
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  flexDirection: 'row',
-                  marginTop: 20,
+                  color: colors.accent,
+                  fontFamily: WEIGHT.bold,
+                  marginLeft: 5,
+                  fontSize: SIZE.md,
                 }}>
-                <Button onPress={this._onClose} title={negativeText} grayed />
-                <Button onPress={this._onPress} title={positiveText} />
-              </View>
+                {title}
+              </Text>
             )}
           </View>
+
+          {paragraph ? (
+            <Text
+              style={{
+                color: colors.icon,
+                fontFamily: WEIGHT.regular,
+                fontSize: SIZE.xs + 1,
+                textAlign: 'center',
+              }}>
+              {this.state.selectedItemsLength > 0
+                ? 'Delete ' +
+                  this.state.selectedItemsLength +
+                  ' selected items?'
+                : paragraph}
+            </Text>
+          ) : null}
+
+          {template.noButtons ? null : (
+            <View
+              style={{
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexDirection: 'row',
+                marginTop: 20,
+              }}>
+              <Button onPress={this._onClose} title={negativeText} grayed />
+              <Button onPress={this._onPress} title={positiveText} />
+            </View>
+          )}
         </View>
-      </Modal>
+      </BaseDialog>
     );
   }
 }

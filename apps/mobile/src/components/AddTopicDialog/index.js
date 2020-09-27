@@ -8,6 +8,9 @@ import {eSendEvent} from '../../services/eventManager';
 import {eOnNewTopicAdded} from '../../services/events';
 import {Toast} from '../Toast';
 import {Button} from '../Button';
+import BaseDialog from '../Dialog/base-dialog';
+import DialogHeader from '../Dialog/dialog-header';
+import DialogButtons from '../Dialog/dialog-buttons';
 
 export class AddTopicDialog extends React.Component {
   constructor(props) {
@@ -31,7 +34,7 @@ export class AddTopicDialog extends React.Component {
     } else {
       let topic = this.props.toEdit;
       topic.title = this.title;
-    
+
       await db.notebooks.notebook(topic.notebookId).topics.add(topic);
     }
     this.close();
@@ -44,6 +47,7 @@ export class AddTopicDialog extends React.Component {
     });
   }
   close() {
+    refs = [];
     this.title = null;
     this.setState({
       visible: false,
@@ -55,116 +59,66 @@ export class AddTopicDialog extends React.Component {
     const {colors, toEdit} = this.props;
 
     return (
-      <Modal
-        visible={visible}
-        animated
-        animationType="fade"
-        transparent={true}
+      <BaseDialog
         onShow={() => {
           this.titleRef.current?.focus();
         }}
-        onRequestClose={() => {
-          refs = [];
-          this.close();
-        }}>
+        visible={visible}
+        onRequestClose={this.close}>
         <View
           style={{
-            width: '100%',
-            height: '100%',
-            backgroundColor: 'rgba(0,0,0,0.3)',
-            justifyContent: 'center',
-            alignItems: 'center',
+            ...getElevation(5),
+            width: '80%',
+            maxHeight: 350,
+            borderRadius: 5,
+            backgroundColor: colors.bg,
+            paddingHorizontal: ph,
+            paddingVertical: pv,
           }}>
-          <TouchableOpacity
-            onPress={() => this.close()}
-            style={{
-              width: '100%',
-              height: '100%',
-              position: 'absolute',
-            }}
+          <DialogHeader
+            icon="book-outline"
+            title={toEdit ? 'Edit Topic' : 'Add New Topic'}
           />
 
-          <View
+          <TextInput
+            ref={this.titleRef}
             style={{
-              ...getElevation(5),
-              width: '80%',
-              maxHeight: 350,
-              borderRadius: 5,
-              backgroundColor: colors.bg,
+              padding: pv,
+              borderWidth: 1.5,
+              borderColor: titleFocused ? colors.accent : colors.nav,
               paddingHorizontal: ph,
-              paddingVertical: pv,
-            }}>
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}>
-              <Icon name="book-outline" color={colors.accent} size={SIZE.lg} />
-              <Text
-                style={{
-                  color: colors.accent,
-                  fontFamily: WEIGHT.bold,
-                  marginLeft: 5,
-                  fontSize: SIZE.md,
-                }}>
-                {toEdit ? 'Edit Topic' : 'Add New Topic'}
-              </Text>
-            </View>
+              borderRadius: 5,
+              fontSize: SIZE.sm,
+              fontFamily: WEIGHT.regular,
+              color: colors.pri,
+              marginTop: 20,
+            }}
+            onFocus={() => {
+              this.setState({
+                titleFocused: true,
+              });
+            }}
+            onBlur={() => {
+              this.setState({
+                titleFocused: true,
+              });
+            }}
+            defaultValue={toEdit ? toEdit.title : null}
+            onChangeText={(value) => {
+              this.title = value;
+            }}
+            placeholder="Enter title of topic"
+            placeholderTextColor={colors.icon}
+          />
 
-            <TextInput
-              ref={this.titleRef}
-              style={{
-                padding: pv,
-                borderWidth: 1.5,
-                borderColor: titleFocused ? colors.accent : colors.nav,
-                paddingHorizontal: ph,
-                borderRadius: 5,
-                fontSize: SIZE.sm,
-                fontFamily: WEIGHT.regular,
-                color: colors.pri,
-                marginTop: 20,
-              }}
-              onFocus={() => {
-                this.setState({
-                  titleFocused: true,
-                });
-              }}
-              onBlur={() => {
-                this.setState({
-                  titleFocused: true,
-                });
-              }}
-              defaultValue={toEdit ? toEdit.title : null}
-              onChangeText={(value) => {
-                this.title = value;
-              }}
-              placeholder="Enter title of topic"
-              placeholderTextColor={colors.icon}
-            />
-
-            <View
-              style={{
-                justifyContent: 'space-around',
-                alignItems: 'center',
-                flexDirection: 'row',
-                marginTop: 20,
-              }}>
-              <Button
-                activeOpacity={opacity}
-                onPress={async () => await this.addNewTopic()}
-                title={toEdit ? 'Save' : 'Add'}
-              />
-              <Button
-                activeOpacity={opacity}
-                onPress={() => this.close()}
-                title="Cancel"
-              />
-            </View>
-          </View>
+          <DialogButtons
+            positiveTitle={toEdit ? 'Save' : 'Add'}
+            onPressNegative={this.close}
+            onPressPositive={this.addNewTopic}
+          />
         </View>
         <Toast context="local" />
-      </Modal>
+      </BaseDialog>
     );
   }
 }
