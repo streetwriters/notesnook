@@ -10,7 +10,9 @@ export const ActionIcon = ({
   color,
   customStyle,
   size = SIZE.xxxl,
-  iconStyle={}
+  iconStyle = {},
+  left = 10,
+  right = 10,
 }) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
@@ -18,7 +20,7 @@ export const ActionIcon = ({
   return (
     <PressableButton
       onPress={onPress}
-      hitSlop={{top: 30, left: 30, right: 30, bottom: 30}}
+      hitSlop={{top: 30, left: left, right: right, bottom: 30}}
       color="transparent"
       selectedColor={colors.nav}
       alpha={!colors.night ? -0.02 : 0.02}
@@ -28,7 +30,7 @@ export const ActionIcon = ({
         height: 40,
         justifyContent: 'center',
         alignItems: 'center',
-        borderRadius:100,
+        borderRadius: 100,
         ...customStyle,
       }}>
       <Icon name={name} style={iconStyle} color={color} size={size} />
