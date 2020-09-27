@@ -1,20 +1,12 @@
 import React from 'react';
-import {
-  ActivityIndicator,
-  Platform,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {ActivityIndicator, Platform, StyleSheet, View} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {SIZE} from '../../common/common';
 import {useTracked} from '../../provider';
 import {eSendEvent} from '../../services/eventManager';
 import NavigationService from '../../services/NavigationService';
 import {useHideHeader} from '../../utils/hooks';
-import {sideMenuRef} from '../../utils/refs';
 import {DDS, w} from '../../utils/utils';
 import {ActionIcon} from '../ActionIcon';
 import {HeaderMenu} from './HeaderMenu';
@@ -22,9 +14,7 @@ import {HeaderTitle} from './HeaderTitle';
 
 export const Header = ({showSearch, root}) => {
   const [state, dispatch] = useTracked();
-  const {colors, syncing} = state;
-
-  let headerState = root ? state.headerState : state.indHeaderState;
+  const {colors, syncing, headerState} = state;
 
   const insets = useSafeAreaInsets();
   const hideHeader = useHideHeader();

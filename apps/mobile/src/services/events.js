@@ -91,3 +91,11 @@ export const eCloseExportDialog = '544';
 export const eOpenRecoveryKeyDialog = '545';
 
 export const eCloseRecoveryKeyDialog = '546';
+
+export const eOpenPendingDialog = '547';
+
+export const eClosePendingDialog = '548';
+
+export const eOpenPremiumStatusDialog = '549';
+
+export const eClosePremiumStatusDialog = '550';

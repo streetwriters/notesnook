@@ -1,4 +1,4 @@
-import {useIsFocused} from '@react-navigation/native';
+/* import {useIsFocused} from '@react-navigation/native';
 import React, {createRef, useEffect, useState} from 'react';
 import {
   ActivityIndicator,
@@ -92,7 +92,7 @@ export const Login = ({route, navigation}) => {
 
     try {
       let res = await db.user.login(username.toLowerCase(), password);
-      console.log(res, username, password);
+      
       if (res) {
         setStatus('Fetching data...');
       }
@@ -471,3 +471,4 @@ export const Login = ({route, navigation}) => {
 };
 
 export default Login;
+ */

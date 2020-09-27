@@ -32,9 +32,10 @@ class RecoveryKeyDialog extends React.Component {
   async componentDidMount() {
     eSubscribeEvent(eOpenRecoveryKeyDialog, this.open);
     let k = await db.user.key();
+    
     if (k) {
       this.setState({
-        key: k,
+        key: k.key,
       });
     }
   }
@@ -47,7 +48,6 @@ class RecoveryKeyDialog extends React.Component {
 
   saveQRCODE = () => {
     this.svg.current?.toDataURL((data) => {
-      console.log(data);
       RNFetchBlob.fs
         .writeFile(
           RNFetchBlob.fs.dirs.SDCardDir +

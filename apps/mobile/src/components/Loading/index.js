@@ -1,13 +1,8 @@
 import React from 'react';
-import {
-  ActivityIndicator,
-  StyleSheet,
-  Text,
-  View
-} from 'react-native';
-import { ph, pv, SIZE, WEIGHT } from '../../common/common';
-import { useTracked } from '../../provider';
-import { Button } from '../Button';
+import {ActivityIndicator, StyleSheet, Text, View} from 'react-native';
+import {ph, pv, SIZE, WEIGHT} from '../../common/common';
+import {useTracked} from '../../provider';
+import {Button} from '../Button';
 
 export const Loading = ({
   height = 150,
@@ -32,13 +27,7 @@ export const Loading = ({
             {doneText}
           </Text>
 
-          <Button
-            onPress={onDone}
-            title="Open File"
-            />
-            
-
-
+          <Button onPress={onDone} title="Open File" />
         </>
       ) : (
         <>
@@ -56,7 +45,7 @@ const styles = StyleSheet.create({
   activityText: {
     fontSize: SIZE.sm,
     textAlign: 'center',
-    marginBottom:10
+    marginBottom: 10,
   },
   activityContainer: {
     alignItems: 'center',

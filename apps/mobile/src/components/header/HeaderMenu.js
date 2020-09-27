@@ -1,11 +1,9 @@
-import React, {createRef} from 'react';
-import {TouchableOpacity} from 'react-native';
-import Menu, {MenuDivider, MenuItem} from 'react-native-material-menu';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {SIZE, WEIGHT} from '../../common/common';
-import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
-import {ActionIcon} from '../ActionIcon';
+import React, { createRef } from 'react';
+import Menu, { MenuDivider, MenuItem } from 'react-native-material-menu';
+import { SIZE, WEIGHT } from '../../common/common';
+import { useTracked } from '../../provider';
+import { ACTIONS } from '../../provider/actions';
+import { ActionIcon } from '../ActionIcon';
 const menuRef = createRef();
 export const HeaderMenu = () => {
   const [state, dispatch] = useTracked();
@@ -13,6 +11,7 @@ export const HeaderMenu = () => {
 
   return headerVerticalMenu ? (
     <Menu
+      
       ref={menuRef}
       animationDuration={200}
       style={{

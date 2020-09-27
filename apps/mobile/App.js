@@ -120,13 +120,13 @@ const App = () => {
         try {
           await db.init();
           let user = await db.user.get();
+          console.log(user,"USER");
           if (user) {
             dispatch({type: ACTIONS.USER, user: user});
             startSyncer();
           }
         } catch (e) {
           error = e;
-          console.log(e.message);
         } finally {
           dispatch({type: ACTIONS.ALL});
           setInit(true);
@@ -155,10 +155,8 @@ const App = () => {
       if (!settings || !settings.includes('fontScale')) {
         settings = defaultState.settings;
         settings.fontScale = 1;
-        console.log(settings, 'SETTINGS');
         await MMKV.setStringAsync('settings', JSON.stringify(settings));
       }
-      console.log(e,"Initialize");
     } finally {
       let newColors = await getColorScheme(settings.useSystemTheme);
       dispatch({type: ACTIONS.SETTINGS, settings: {...settings}});

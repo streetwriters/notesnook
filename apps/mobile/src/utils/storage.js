@@ -1,12 +1,12 @@
 import he from 'he';
-import { Platform } from 'react-native';
+import {Platform} from 'react-native';
 import 'react-native-get-random-values';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import MMKVStorage from 'react-native-mmkv-storage';
-import { generateSecureRandom } from 'react-native-securerandom';
+import {generateSecureRandom} from 'react-native-securerandom';
 import Sodium from 'react-native-sodium';
 import RNFetchBlob from 'rn-fetch-blob';
-import { db, requestStoragePermission, ToastEvent } from './utils';
+import {db, requestStoragePermission, ToastEvent} from './utils';
 export const MMKV = new MMKVStorage.Loader().initialize();
 async function read(key, isArray = false) {
   let data;
@@ -116,7 +116,7 @@ async function saveToMarkdown(note) {
     RNFetchBlob.fs.dirs.SDCardDir + '/Notesnook/exported/Markdown/';
   await checkAndCreateDir(androidSavePath);
   let markdown = await db.notes.note(note.id).export('md');
-  console.log(markdown);
+
   let path = androidSavePath + note.title + '.md';
   await RNFetchBlob.fs.writeFile(path, markdown, 'utf8');
 
@@ -132,7 +132,6 @@ async function saveToText(note) {
     RNFetchBlob.fs.dirs.SDCardDir + '/Notesnook/exported/Text/';
   await checkAndCreateDir(androidSavePath);
   let markdown = await db.notes.note(note.id).export('txt');
-  console.log(markdown);
 
   let path = androidSavePath + note.title + '.txt';
   await RNFetchBlob.fs.writeFile(path, markdown, 'utf8');
@@ -149,7 +148,7 @@ async function saveToHTML(note) {
     RNFetchBlob.fs.dirs.SDCardDir + '/Notesnook/exported/Html/';
   await checkAndCreateDir(androidSavePath);
   let markdown = await db.notes.note(note.id).export('html');
-  console.log(markdown);
+
   let path = androidSavePath + note.title + '.html';
   await RNFetchBlob.fs.writeFile(path, markdown, 'utf8');
 

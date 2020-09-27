@@ -1,4 +1,5 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
+import {StyleSheet} from 'react-native';
 import {Dimensions, Platform, RefreshControl, Text, View} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -28,6 +29,7 @@ const SimpleList = ({
   focused,
   customRefresh,
   customRefreshing,
+  refreshCallback,
 }) => {
   const [state, dispatch] = useTracked();
   const {colors, selectionMode, user} = state;
@@ -56,7 +58,6 @@ const SimpleList = ({
     /*  for (var i = 0; i < 10000; i++) {
       d = [...d,...data];
     }  */
-    console.log(d, 'D');
     setDataProvider(
       new DataProvider((r1, r2) => {
         return r1 !== r2;
@@ -84,17 +85,12 @@ const SimpleList = ({
 
   const RenderSectionHeader = ({item}) => (
     <Text
-      style={{
-        fontFamily: WEIGHT.bold,
-        fontSize: SIZE.xs + 1,
-        color: colors.accent,
-        paddingHorizontal: 12,
-        width: '100%',
-        alignSelf: 'center',
-        marginTop: 15,
-        height: 18,
-        paddingBottom: 5,
-      }}>
+      style={[
+        {
+          color: colors.accent,
+        },
+        styles.sectionHeader,
+      ]}>
       {item.title}
     </Text>
   );
@@ -133,21 +129,21 @@ const SimpleList = ({
       } else {
         setRefreshing(false);
       }
+      if (refreshCallback) {
+        refreshCallback();
+      }
       dispatch({type: ACTIONS.ALL});
     }
   };
 
   const _ListEmptyComponent = (
     <View
-      style={{
-        height: '100%',
-        width: '100%',
-        alignItems: 'center',
-        alignSelf: 'center',
-        justifyContent: 'center',
-        opacity: 1,
-        backgroundColor: colors.bg,
-      }}>
+      style={[
+        {
+          backgroundColor: colors.bg,
+        },
+        styles.emptyList,
+      ]}>
       <>{placeholder}</>
     </View>
   );
@@ -204,6 +200,22 @@ const SimpleList = ({
     }
   };
 
+  const listStyle = useMemo(() => {
+    return {
+      height: '100%',
+      backgroundColor: colors.bg,
+      width: '100%',
+      paddingTop:
+        Platform.OS == 'ios'
+          ? listData[0] && !selectionMode
+            ? 115
+            : 115 - 60
+          : listData[0] && !selectionMode
+          ? 155 - insets.top
+          : 155 - insets.top - 60,
+    };
+  }, []);
+
   return !listData || listData.length === 0 ? (
     _ListEmptyComponent
   ) : (
@@ -228,19 +240,7 @@ const SimpleList = ({
           minHeight: '100%',
         },
       }}
-      style={{
-        height: '100%',
-        backgroundColor: colors.bg,
-        width: '100%',
-        paddingTop:
-          Platform.OS == 'ios'
-            ? listData[0] && !selectionMode
-              ? 115
-              : 115 - 60
-            : listData[0] && !selectionMode
-            ? 155 - insets.top
-            : 155 - insets.top - 60,
-      }}
+      style={listStyle}
     />
   );
 };
@@ -253,14 +253,7 @@ const SearchHeader = () => {
   const searchResults = {...state.searchResults};
 
   return (
-    <View
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingHorizontal: 12,
-        height: 40,
-      }}>
+    <View style={styles.searchHeader}>
       <Text
         style={{
           fontFamily: WEIGHT.bold,
@@ -307,17 +300,7 @@ const LoginCard = ({type, data}) => {
           }
           alpha={!colors.night ? -0.02 : 0.1}
           opacity={0.12}
-          customStyle={{
-            width: '100%',
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'flex-start',
-            paddingHorizontal: 12,
-            alignSelf: 'center',
-            height: 40,
-            borderRadius: 0,
-            position: 'relative',
-          }}>
+          customStyle={styles.loginCard}>
           <View
             style={{
               width: 25,
@@ -330,10 +313,7 @@ const LoginCard = ({type, data}) => {
               justifyContent: 'center',
             }}>
             <Icon
-              style={{
-                textAlign: 'center',
-                textAlignVertical: 'center',
-              }}
+              style={styles.loginIcon}
               name="account-outline"
               color="white"
               size={SIZE.xs}
@@ -377,3 +357,46 @@ const ListHeaderComponent = ({type, data}) => {
     <LoginCard type={type} data={data} />
   );
 };
+
+const styles = StyleSheet.create({
+  loginCard: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    paddingHorizontal: 12,
+    alignSelf: 'center',
+    height: 40,
+    borderRadius: 0,
+    position: 'relative',
+  },
+  loginIcon: {
+    textAlign: 'center',
+    textAlignVertical: 'center',
+  },
+  searchHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 12,
+    height: 40,
+  },
+  sectionHeader: {
+    fontFamily: WEIGHT.bold,
+    fontSize: SIZE.xs + 1,
+    paddingHorizontal: 12,
+    width: '100%',
+    alignSelf: 'center',
+    marginTop: 15,
+    height: 18,
+    paddingBottom: 5,
+  },
+  emptyList: {
+    height: '100%',
+    width: '100%',
+    alignItems: 'center',
+    alignSelf: 'center',
+    justifyContent: 'center',
+    opacity: 1,
+  },
+});

@@ -22,7 +22,7 @@ import {
   eOpenSimpleDialog,
   eOpenPremiumDialog,
   eClosePremiumDialog,
-  eOpenExportDialog
+  eOpenExportDialog,
 } from '../../services/events';
 import {DDS, hexToRGBA} from '../../utils/utils';
 import ActionSheet from '../ActionSheet';
@@ -39,6 +39,8 @@ import LoginDialog from '../LoginDialog';
 import PremiumDialog from '../Premium/PremiumDialog';
 import ExportDialog from '../ExportDialog';
 import RecoveryKeyDialog from '../RecoveryKeyDialog';
+import PendingDialog from '../Premium/PendingDialog';
+import PremiumStatusDialog from '../Premium/PremiumStatusDialog';
 
 export class DialogManager extends Component {
   constructor(props) {
@@ -71,7 +73,7 @@ export class DialogManager extends Component {
     );
   }
 
-  _showActionSheet = data => {
+  _showActionSheet = (data) => {
     this.setState(
       {
         actionSheetData: data,
@@ -88,16 +90,15 @@ export class DialogManager extends Component {
   };
 
   _showMoveNote = () => {
-    
     ///this.moveNoteDialog.open();
   };
 
   _hideMoveNote = () => {
     //eSendEvent(eCloseMoveNoteDialog)
-   // this.moveNoteDialog.close();
+    // this.moveNoteDialog.close();
   };
 
-  loadNote = i => {
+  loadNote = (i) => {
     if (i && i.type === 'new') {
       this.setState({
         item: {},
@@ -110,7 +111,7 @@ export class DialogManager extends Component {
     }
   };
 
-  showAddTopic = notebook => {
+  showAddTopic = (notebook) => {
     if (notebook) {
       this.setState({
         item: notebook,
@@ -144,7 +145,7 @@ export class DialogManager extends Component {
 
     eSubscribeEvent(eOpenLoginDialog, this.showLoginDialog);
     eSubscribeEvent(eCloseLoginDialog, this.hideLoginDialog);
-    
+
     eSubscribeEvent(eOpenPremiumDialog, this.showPremiumDialog);
     eSubscribeEvent(eClosePremiumDialog, this.hidePremiumDialog);
   }
@@ -181,7 +182,6 @@ export class DialogManager extends Component {
   hidePremiumDialog = () => {
     this.premiumDialog.close();
   };
-  
 
   showLoginDialog = () => {
     //this.loginDialog.open();
@@ -191,21 +191,21 @@ export class DialogManager extends Component {
     //this.loginDialog.close();
   };
 
-  showAddNotebook = data => {
-     this.setState(
+  showAddNotebook = (data) => {
+    this.setState(
       {
         item: data.item ? data.item : {},
       },
       () => {
         this.addNotebooksDialog.open();
       },
-    ); 
+    );
   };
   hideAddNotebook = () => {
     this.addNotebooksDialog.close();
   };
 
-  _showSimpleDialog = data => {
+  _showSimpleDialog = (data) => {
     this.setState(
       {
         simpleDialog: data,
@@ -215,7 +215,7 @@ export class DialogManager extends Component {
       },
     );
   };
-  _hideSimpleDialog = data => {
+  _hideSimpleDialog = (data) => {
     this.simpleDialog.hide();
   };
 
@@ -255,22 +255,21 @@ export class DialogManager extends Component {
           break;
         }
         case 'movenote': {
-         // this._showMoveNote();
+          // this._showMoveNote();
           break;
         }
-        case "premium": {
+        case 'premium': {
           eSendEvent(eOpenPremiumDialog);
           break;
         }
-        case "export": {
-          eSendEvent(eOpenExportDialog,[this.state.item]);
+        case 'export': {
+          eSendEvent(eOpenExportDialog, [this.state.item]);
           break;
         }
       }
     }
     this.show = null;
   };
-  
 
   render() {
     let {colors} = this.props;
@@ -278,7 +277,7 @@ export class DialogManager extends Component {
     return (
       <>
         <ActionSheet
-          ref={ref => (this.actionSheet = ref)}
+          ref={(ref) => (this.actionSheet = ref)}
           containerStyle={{
             backgroundColor: colors.bg,
             width: DDS.isTab ? 500 : '100%',
@@ -313,7 +312,7 @@ export class DialogManager extends Component {
           }}>
           <ActionSheetComponent
             item={item}
-            setWillRefresh={value => {
+            setWillRefresh={(value) => {
               this.willRefresh = true;
             }}
             hasColors={actionSheetData.colors}
@@ -323,7 +322,7 @@ export class DialogManager extends Component {
             }
             rowItems={actionSheetData.rowItems}
             columnItems={actionSheetData.columnItems}
-            close={value => {
+            close={(value) => {
               if (value) {
                 this.show = value;
               }
@@ -333,7 +332,7 @@ export class DialogManager extends Component {
         </ActionSheet>
 
         <Dialog
-          ref={ref => (this.simpleDialog = ref)}
+          ref={(ref) => (this.simpleDialog = ref)}
           item={item}
           colors={colors}
           template={simpleDialog}
@@ -341,13 +340,10 @@ export class DialogManager extends Component {
 
         <VaultDialog colors={colors} />
 
-        <MoveNoteDialog
-       
-          colors={colors}
-        />
+        <MoveNoteDialog colors={colors} />
 
         <AddTopicDialog
-          ref={ref => (this.addTopicsDialog = ref)}
+          ref={(ref) => (this.addTopicsDialog = ref)}
           toEdit={item.type === 'topic' ? item : null}
           notebookID={
             actionSheetData.extraData
@@ -357,19 +353,25 @@ export class DialogManager extends Component {
           colors={colors}
         />
         <AddNotebookDialog
-          ref={ref => (this.addNotebooksDialog = ref)}
+          ref={(ref) => (this.addNotebooksDialog = ref)}
           toEdit={item}
           colors={colors}
         />
-        <PremiumDialog ref={ref => this.premiumDialog = ref}  colors={colors} />
+        <PremiumDialog
+          ref={(ref) => (this.premiumDialog = ref)}
+          colors={colors}
+        />
 
-        <LoginDialog colors={colors}  />
+        <LoginDialog colors={colors} />
 
         <MergeEditor />
 
-        <ExportDialog/>
+        <ExportDialog />
 
         <RecoveryKeyDialog colors={colors} />
+        <PendingDialog colors={colors} />
+
+        <PremiumStatusDialog />
       </>
     );
   }

@@ -19,7 +19,6 @@ export const SelectionHeader = () => {
     selectionMode,
     selectedItemsList,
     currentScreen,
-    containerState,
     premiumUser,
   } = state;
   const [selectAll, setSelectAll] = useState(false);
@@ -34,7 +33,7 @@ export const SelectionHeader = () => {
     }).start();
   }, [selectionMode]);
 
-  return containerState.noSelectionHeader ? null : (
+  return (
     <Animated.View
       style={{
         width: '100%',

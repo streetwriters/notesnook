@@ -1,15 +1,11 @@
 import {useIsFocused} from '@react-navigation/native';
 import React, {useEffect} from 'react';
-import {BackHandler} from 'react-native';
 import {AddNotebookEvent} from '../../components/DialogManager/recievers';
+import {Placeholder} from '../../components/ListPlaceholders';
 import SimpleList from '../../components/SimpleList';
 import {NotebookItemWrapper} from '../../components/SimpleList/NotebookItemWrapper';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
-import {eSendEvent} from '../../services/eventManager';
-import {eScrollEvent} from '../../services/events';
-import NavigationService from '../../services/NavigationService';
-import {Placeholder} from '../../components/ListPlaceholders';
 export const Folders = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const {notebooks} = state;
@@ -23,9 +19,7 @@ export const Folders = ({route, navigation}) => {
           type: 'notebooks',
           menu: true,
           canGoBack: false,
-          route: route,
           color: null,
-          navigation: navigation,
         },
       });
       dispatch({

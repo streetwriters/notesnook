@@ -66,7 +66,6 @@ export async function requestStoragePermission() {
         RESULTS.GRANTED &&
       response['android.permission.WRITE_EXTERNAL_STORAGE'] === RESULTS.GRANTED;
   } catch (err) {
-    console.log(error);
   } finally {
     return granted;
   }

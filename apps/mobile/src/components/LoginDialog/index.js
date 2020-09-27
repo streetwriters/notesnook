@@ -34,7 +34,6 @@ const LoginDialog = () => {
   const [state, dispatch] = useTracked();
   const colors = state.colors;
   const [visible, setVisible] = useState(false);
-  const [animated, setAnimated] = useState(false);
   const [status, setStatus] = useState('Logging you in');
   const [loggingIn, setLoggingIn] = useState(false);
   const [email, setEmail] = useState(null);
@@ -71,8 +70,22 @@ const LoginDialog = () => {
   }
 
   const close = () => {
+    _email.current?.clear();
+    _pass.current?.clear();
+    _passConfirm.current?.clear();
+    _username.current?.clear();
+    
     setVisible(false);
-    setAnimated(false);
+    setUsername(null);
+    setPassword(null);
+    setConfirmPassword(null);
+    setKey(null);
+    setLogin(true);
+    setModalVisible(false);
+    setUserConsent(false);
+    setEmail(false);
+    setLoggingIn(false);
+ 
   };
 
   const loginUser = async () => {
@@ -122,6 +135,7 @@ const LoginDialog = () => {
       setLoggingIn(false);
     }
   };
+  
 
   const validateInfo = () => {
     if (!password || !email || !username || !passwordReEnter) {
@@ -312,10 +326,7 @@ const LoginDialog = () => {
                 </Text>
                 <TouchableOpacity
                   onPress={() => {
-                    DDS.isTab
-                      ? eSendEvent(eCloseLoginDialog)
-                      : navigation.navigate('Home');
-                    setModalVisible(false);
+                    close();
                   }}
                   activeOpacity={opacity}
                   style={{
@@ -348,7 +359,7 @@ const LoginDialog = () => {
                 name="arrow-left"
                 size={SIZE.xxxl}
                 onPress={() => {
-                  setVisible(false);
+                  close();
                 }}
                 style={{
                   width: 50,
@@ -459,6 +470,7 @@ const LoginDialog = () => {
                       borderRadius: 5,
                       fontSize: SIZE.sm,
                       fontFamily: WEIGHT.regular,
+                      color: colors.pri,
                     }}
                     placeholder="Username (a-z _- 0-9)"
                     placeholderTextColor={colors.icon}
@@ -548,6 +560,7 @@ const LoginDialog = () => {
                         borderRadius: 5,
                         fontSize: SIZE.sm,
                         fontFamily: WEIGHT.regular,
+                        color: colors.pri,
                       }}
                       placeholder="Email"
                       placeholderTextColor={colors.icon}
@@ -648,6 +661,7 @@ const LoginDialog = () => {
                       fontFamily: WEIGHT.regular,
                       width: '85%',
                       maxWidth: '85%',
+                      color: colors.pri,
                     }}
                     secureTextEntry={secureEntry}
                     placeholder="Password (6+ characters)"
@@ -736,6 +750,7 @@ const LoginDialog = () => {
                         borderRadius: 5,
                         fontSize: SIZE.sm,
                         fontFamily: WEIGHT.regular,
+                        color: colors.pri,
                       }}
                       secureTextEntry={secureEntry}
                       placeholder="Confirm Password"

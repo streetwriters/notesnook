@@ -115,7 +115,7 @@ export const UserSection = ({noTextMode}) => {
             }}>
             {syncing ? 'Syncing ' : 'Synced '}
             {!syncing ? (
-              user?.notesnook?.lastSynced !== 0 ? (
+              user?.notesnook?.lastSynced ? (
                 <TimeSince time={user.notesnook.lastSynced} />
               ) : (
                 'never'

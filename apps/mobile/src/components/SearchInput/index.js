@@ -18,11 +18,10 @@ let timeoutAnimate = null;
 let animating = false;
 export const Search = (props) => {
   const [state, dispatch] = useTracked();
-  const {colors, searchResults} = state;
+  const {colors, searchResults,searchState} = state;
   const [text, setText] = useState('');
   const [focus, setFocus] = useState(false);
 
-  let searchState = props.root ? state.searchState : state.indSearchState;
 
   const _marginAnim = new Value(0);
   const _opacity = new Value(1);

@@ -145,7 +145,6 @@ const ExportDialog = () => {
               done={complete}
               doneText={doneText}
               onDone={() => {
-                console.log(result.type, result.filePath);
                 FileViewer.open(result.filePath, {
                   showOpenWithDialog: true,
                   showAppsSuggestions: true,

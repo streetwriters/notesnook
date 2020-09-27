@@ -27,7 +27,6 @@ const MoveNoteDialog = () => {
   const [state, dispatch] = useTracked();
   const {notebooks, colors, selectedItemsList} = state;
   const [visible, setVisible] = useState(false);
-  const [animated, setAnimated] = useState(false);
   const [expanded, setExpanded] = useState('');
   const [notebookInputFocused, setNotebookInputFocused] = useState(false);
   const [topicInputFocused, setTopicInputFocused] = useState(false);
@@ -39,7 +38,6 @@ const MoveNoteDialog = () => {
 
   const close = () => {
     setVisible(false);
-    setAnimated(false);
     setExpanded(false);
     newTopicTitle = null;
     newNotebookTitle = null;

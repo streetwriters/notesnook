@@ -1,11 +1,10 @@
 import React from 'react';
-import {Dimensions, Text, TouchableOpacity, View} from 'react-native';
+import { Dimensions, Text, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {ph, SIZE, WEIGHT} from '../../common/common';
-import {timeSince} from '../../utils/utils';
-import {ActionIcon} from '../ActionIcon';
-import {ActionSheetEvent} from '../DialogManager/recievers';
-import {PressableButton} from '../PressableButton';
+import { ph, SIZE, WEIGHT } from '../../common/common';
+import { timeSince } from '../../utils/utils';
+import { ActionIcon } from '../ActionIcon';
+import { ActionSheetEvent } from '../DialogManager/recievers';
 
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;

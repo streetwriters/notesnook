@@ -197,42 +197,22 @@ export const reducer = (state, action) => {
       };
     }
     case ACTIONS.HEADER_STATE: {
-      let header = action.state.ind
-        ? {
-            ...state.indHeaderState,
-            ...action.state,
-          }
-        : {
+      let header = {
             ...state.headerState,
             ...action.state,
           };
-      return action.state.ind
-        ? {
-            ...state,
-            indHeaderState: {...header},
-          }
-        : {
+      return  {
             ...state,
             headerState: header,
           };
     }
     case ACTIONS.SEARCH_STATE: {
-      let stat = action.state.ind
-        ? {
-            ...state.indSearchState,
-            ...action.state,
-          }
-        : {
+      let stat = {
             ...state.searchState,
             ...action.state,
           };
 
-      return action.state.ind
-        ? {
-            ...state,
-            indSearchState: stat,
-          }
-        : {
+      return {
             ...state,
             searchState: stat,
           };
@@ -244,21 +224,11 @@ export const reducer = (state, action) => {
       };
     }
     case ACTIONS.HEADER_TEXT_STATE: {
-      let stat = action.state.ind
-        ? {
-            ...state.indHeaderTextState,
-            ...action.state,
-          }
-        : {
+      let stat ={
             ...state.headerTextState,
             ...action.state,
           };
-      return action.state.ind
-        ? {
-            ...state,
-            indHeaderTextState: stat,
-          }
-        : {
+      return {
             ...state,
             headerTextState: stat,
           };
@@ -270,21 +240,11 @@ export const reducer = (state, action) => {
       };
     }
     case ACTIONS.CONTAINER_BOTTOM_BUTTON: {
-      let containerBottomButton = action.state.ind
-        ? {
-            ...state.indContainerBottomButton,
-            ...action.state,
-          }
-        : {
+      let containerBottomButton = {
             ...state.containerBottomButton,
             ...action.state,
           };
-      return action.state.ind
-        ? {
-            ...state,
-            indContainerBottomButton: containerBottomButton,
-          }
-        : {
+      return {
             ...state,
             containerBottomButton: containerBottomButton,
           };

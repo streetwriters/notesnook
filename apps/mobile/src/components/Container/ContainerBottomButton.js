@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {Keyboard, Text, View} from 'react-native';
-import {useSafeArea} from 'react-native-safe-area-context';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {pv, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
@@ -9,12 +9,10 @@ import {PressableButton} from '../PressableButton';
 
 export const ContainerBottomButton = ({root}) => {
   const [state, dispatch] = useTracked();
-  const {colors} = state;
+  const {colors,containerBottomButton} = state;
   const [buttonHide, setButtonHide] = useState(false);
-  const insets = useSafeArea();
-  let containerBottomButton = root
-    ? state.containerBottomButton
-    : state.indContainerBottomButton;
+  const insets = useSafeAreaInsets();
+
   useEffect(() => {
     Keyboard.addListener('keyboardDidShow', () => {
       setTimeout(() => {

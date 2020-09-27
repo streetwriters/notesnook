@@ -1,17 +1,17 @@
-import { useIsFocused } from '@react-navigation/native';
-import React, { useEffect } from 'react';
-import { simpleDialogEvent } from '../../components/DialogManager/recievers';
-import { TEMPLATE_EMPTY_TRASH } from '../../components/DialogManager/templates';
-import { Placeholder } from '../../components/ListPlaceholders';
+import {useIsFocused} from '@react-navigation/native';
+import React, {useEffect} from 'react';
+import {simpleDialogEvent} from '../../components/DialogManager/recievers';
+import {TEMPLATE_EMPTY_TRASH} from '../../components/DialogManager/templates';
+import {Placeholder} from '../../components/ListPlaceholders';
 import SimpleList from '../../components/SimpleList';
-import { NotebookItemWrapper } from '../../components/SimpleList/NotebookItemWrapper';
-import { NoteItemWrapper } from '../../components/SimpleList/NoteItemWrapper';
-import { useTracked } from '../../provider';
-import { ACTIONS } from '../../provider/actions';
+import {NotebookItemWrapper} from '../../components/SimpleList/NotebookItemWrapper';
+import {NoteItemWrapper} from '../../components/SimpleList/NoteItemWrapper';
+import {useTracked} from '../../provider';
+import {ACTIONS} from '../../provider/actions';
 
 export const Trash = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
-  const {colors, selectionMode, trash} = state;
+  const {trash} = state;
 
   const isFocused = useIsFocused();
 
@@ -23,9 +23,7 @@ export const Trash = ({route, navigation}) => {
           type: 'trash',
           menu: true,
           canGoBack: false,
-          route: route,
           color: null,
-          navigation: navigation,
         },
       });
       dispatch({

@@ -4,8 +4,8 @@ import * as RNIap from 'react-native-iap';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {SIZE, WEIGHT} from '../../common/common';
 import {eSendEvent} from '../../services/eventManager';
-import {eOpenLoginDialog} from '../../services/events';
-import {db, h, itemSkus, w} from '../../utils/utils';
+import {eOpenLoginDialog, eOpenPendingDialog} from '../../services/events';
+import {db, h, itemSkus, ToastEvent, w} from '../../utils/utils';
 import ActionSheet from '../ActionSheet';
 import {Button} from '../Button';
 import Seperator from '../Seperator';
@@ -19,6 +19,12 @@ class PremiumDialog extends React.Component {
     this.routeIndex = 0;
     this.count = 0;
     this.actionSheetRef = createRef();
+    this.subsriptionSuccessListerner = RNIap.purchaseUpdatedListener(
+      this.onSuccessfulSubscription,
+    );
+    this.subsriptionErrorListener = RNIap.purchaseErrorListener(
+      this.onSubscriptionError,
+    );
   }
 
   open() {
@@ -37,7 +43,22 @@ class PremiumDialog extends React.Component {
       product: prod[0],
     });
   }
-  componentDidUpdate() {}
+
+  onSuccessfulSubscription = (subscription: RNIap.SubscriptionPurchase) => {
+    const receipt = subscription.transactionReceipt;
+
+    if (receipt) {
+      this.close();
+      setTimeout(() => {
+        eSendEvent(eOpenPendingDialog);
+      }, 500);
+    }
+  };
+
+  onSubscriptionError = (error: RNIap.PurchaseError) => {
+    console.log(error.message, 'Error');
+    ToastEvent.show(error.message);
+  };
 
   render() {
     const {colors} = this.props;
@@ -68,7 +89,7 @@ class PremiumDialog extends React.Component {
               color: colors.heading,
               paddingBottom: 20,
               paddingTop: 10,
-              alignSelf:'center'
+              alignSelf: 'center',
             }}>
             Notesnook Pro
           </Text>
@@ -180,7 +201,9 @@ class PremiumDialog extends React.Component {
                   color: colors.pri,
                   fontFamily: WEIGHT.regular,
                 }}>
-                Start your 14 Day Free Trial (no credit card needed)
+                {this.state.user
+                  ? 'Cancel anytime in Subscriptions on Google Play'
+                  : 'Start your 14 Day Trial for Free (no credit card needed)'}
               </Text>
             </Text>
             <Text
@@ -207,10 +230,16 @@ class PremiumDialog extends React.Component {
                     eSendEvent(eOpenLoginDialog);
                   }, 400);
                 } else {
-                  // Request
+                  RNIap.requestSubscription(this.state.product.productId)
+                    .then((r) => {})
+                    .catch((e) => {
+                      console.log(e);
+                    });
                 }
               }}
-              title={this.state.user ? 'Buy Subscription' : 'Sign Up Now'}
+              title={
+                this.state.user ? 'Subscribe to Notesnook Pro' : 'Sign Up Now'
+              }
               height={50}
               width="100%"
             />
