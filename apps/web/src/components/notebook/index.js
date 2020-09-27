@@ -2,9 +2,8 @@ import React from "react";
 import { Flex, Text } from "rebass";
 import ListItem from "../list-item";
 import { store } from "../../stores/notebook-store";
-import * as Icon from "../icons";
 import { showEditNoteDialog } from "../dialogs/addnotebookdialog";
-import { confirm, showDeleteConfirmation } from "../dialogs/confirm";
+import { showDeleteConfirmation } from "../dialogs/confirm";
 import { showItemDeletedToast, showUnpinnedToast } from "../../common/toasts";
 const pin = async (notebook, index) => {
   await store.pin(notebook, index);

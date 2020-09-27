@@ -6,7 +6,7 @@ import { store as editorStore } from "../stores/editor-store";
 import { store as trashStore } from "../stores/trash-store";
 import { db } from "./index";
 import { showMoveNoteDialog } from "../components/dialogs/movenotedialog";
-import { confirm, showDeleteConfirmation } from "../components/dialogs/confirm";
+import { showDeleteConfirmation } from "../components/dialogs/confirm";
 
 function createOption(key, icon, onClick) {
   return {

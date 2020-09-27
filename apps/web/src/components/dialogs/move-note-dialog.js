@@ -1,10 +1,8 @@
 import React from "react";
 import { Flex, Box, Text, Button } from "rebass";
-import { Input } from "@rebass/forms";
 import * as Icon from "../icons";
 import { db } from "../../common";
 import Dialog, { showDialog } from "./dialog";
-import { toTitleCase } from "../../utils/string";
 import { showNotesMovedToast } from "../../common/toasts";
 import { showToast } from "../../utils/toast";
 
