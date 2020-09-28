@@ -263,6 +263,7 @@ const Editor = ({noMenu}) => {
         </View>
 
         <WebView
+          testID="editor"
           ref={EditorWebView}
           onError={(error) => console.log(error)}
           onLoad={() => onWebViewLoad(noMenu, premium, colors)}

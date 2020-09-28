@@ -58,6 +58,7 @@ export const ContainerBottomButton = ({root}) => {
         ],
       }}>
       <PressableButton
+        testID={"container_bottom_btn"}
         color={
           containerBottomButton.color
             ? containerBottomButton.color
@@ -92,6 +93,7 @@ export const ContainerBottomButton = ({root}) => {
             size={SIZE.xl}
           />
           <Text
+            testID="container_bottom_btn_text"
             style={{
               fontSize: SIZE.md,
               color: 'white',

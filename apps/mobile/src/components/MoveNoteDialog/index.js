@@ -356,7 +356,7 @@ const MoveNoteDialog = () => {
                         onPress={async () => {
                           let noteIds = [];
                           selectedItemsList.forEach((i) => noteIds.push(i.id));
-                       
+
                           let res = await db.notes.move(
                             {
                               topic: item.title,
