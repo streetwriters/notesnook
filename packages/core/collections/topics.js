@@ -21,14 +21,14 @@ export default class Topics {
     );
   }
 
-  _dedupe(source) {
+  /* _dedupe(source) {
     let length = source.length,
       seen = new Map();
     for (let index = 0; index < length; index++) {
       let value = source[index];
       if (value.id) {
-        seen.set(value.title, {
-          ...seen.get(value.title),
+        seen.set(value.id, {
+          ...seen.get(value.id),
           ...value,
         });
         continue;
@@ -38,19 +38,33 @@ export default class Topics {
       seen.set(title, value);
     }
     return seen;
-  }
+  } */
 
   async add(...topics) {
     let notebook = qclone(this._db.notebooks.notebook(this._notebookId).data);
 
     let allTopics = [...notebook.topics, ...topics];
-    const unique = this._dedupe(allTopics);
 
     notebook.topics = [];
     notebook.totalNotes = 0;
-    unique.forEach((t) => {
+    allTopics.forEach((t) => {
       let topic = makeTopic(t, this._notebookId);
-      notebook.topics.push(topic);
+
+      if (notebook.topics.findIndex((_topic) => _topic.title === t) > -1)
+        return;
+
+      if (topic.title.length <= 0) return;
+
+      let index = notebook.topics.findIndex((t) => t.id === topic.id);
+      if (index > -1) {
+        notebook.topics[index] = {
+          ...notebook.topics[index],
+          ...topic,
+        };
+      } else {
+        notebook.topics.push(topic);
+      }
+
       notebook.totalNotes += topic.totalNotes;
     });
 
@@ -99,7 +113,7 @@ function makeTopic(topic, notebookId) {
     type: "topic",
     id: id(), //topic,
     notebookId,
-    title: topic,
+    title: topic.trim(),
     dateCreated: Date.now(),
     dateEdited: Date.now(),
     totalNotes: 0,

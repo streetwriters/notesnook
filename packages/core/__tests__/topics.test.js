@@ -21,7 +21,7 @@ test("add topic to notebook", () =>
     expect(topics.all.findIndex((v) => v.title === "Home")).toBeGreaterThan(-1);
   }));
 
-test("update topic", () =>
+test("add note to topic", () =>
   notebookTest().then(async ({ db, id }) => {
     let topics = db.notebooks.notebook(id).topics;
     await topics.add("Home");
@@ -31,15 +31,20 @@ test("update topic", () =>
     expect(topics.all.find((v) => v.title === "Home").notes.length).toBe(1);
   }));
 
-test("edit topic title", () =>
+test.only("edit topic title", () =>
   notebookTest().then(async ({ db, id }) => {
     let topics = db.notebooks.notebook(id).topics;
+
     await topics.add("Home");
+
     let topic = topics.topic("Home");
-    expect(topics.all.length).toBeGreaterThan(1);
+
+    expect(topics.all.length).toBe(3);
+
     await topics.add({ id: topic._topic.id, title: "Hello22" });
-    expect(topics.all.length).toBeGreaterThan(1);
-    expect(topics.topic("Hello22")._topic.title).toBe("Hello22");
+
+    expect(topics.all.length).toBe(3);
+    expect(topics.topic(topic._topic.id)._topic.title).toBe("Hello22");
   }));
 
 test("duplicate topic to notebook should not be added", () =>
