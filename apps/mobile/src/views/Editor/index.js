@@ -266,7 +266,7 @@ const Editor = ({noMenu}) => {
           testID="editor"
           ref={EditorWebView}
           onError={(error) => console.log(error)}
-          onLoad={() => onWebViewLoad(noMenu, premium, colors)}
+          onLoad={async () => await onWebViewLoad(noMenu, premium, colors)}
           javaScriptEnabled={true}
           injectedJavaScript={Platform.OS === 'ios' ? injectedJS : null}
           onShouldStartLoadWithRequest={_onShouldStartLoadWithRequest}

@@ -19,6 +19,9 @@ export const db = new Database(
 );
 db.host('http://192.168.10.8:8000');
 
+export const sleep = (duration) =>
+  new Promise((resolve) => setTimeout(() => resolve(), duration));
+
 export async function setSetting(settings, name, value) {
   let s = {...settings};
   s[name] = value;
