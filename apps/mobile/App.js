@@ -1,18 +1,17 @@
-import { useNetInfo } from '@react-native-community/netinfo';
-import React, { useEffect, useState } from 'react';
-import { Appearance, StatusBar, useColorScheme } from 'react-native';
+import {useNetInfo} from '@react-native-community/netinfo';
+import React, {useEffect, useState} from 'react';
+import {useColorScheme} from 'react-native';
 import Orientation from 'react-native-orientation';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { getColorScheme, scale, updateSize } from './src/common/common';
-import { useTracked } from './src/provider';
-import { ACTIONS } from './src/provider/actions';
-import { defaultState } from './src/provider/defaultState';
-import { eSubscribeEvent, eUnSubscribeEvent } from './src/services/eventManager';
-import { eDispatchAction, eResetApp, eStartSyncer } from './src/services/events';
-import { MMKV } from './src/utils/storage';
-import { db, DDS, ToastEvent } from './src/utils/utils';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
+import {getColorScheme, scale, updateSize} from './src/common/common';
+import {useTracked} from './src/provider';
+import {ACTIONS} from './src/provider/actions';
+import {defaultState} from './src/provider/defaultState';
+import {eSubscribeEvent, eUnSubscribeEvent} from './src/services/eventManager';
+import {eDispatchAction, eResetApp, eStartSyncer} from './src/services/events';
+import {MMKV} from './src/utils/storage';
+import {db, DDS, ToastEvent} from './src/utils/utils';
 
-let theme;
 const App = () => {
   const [, dispatch] = useTracked();
   const [init, setInit] = useState(false);
@@ -28,28 +27,24 @@ const App = () => {
   };
 
   useEffect(() => {
-    changeTheme();
+    updateTheme();
   }, [colorScheme]);
 
-  const changeTheme = async () => {
+  const updateTheme = async () => {
     let settings;
     try {
       settings = await MMKV.getStringAsync('settings');
-    } catch (e) {}
-    if (!settings) {
-      return;
-    }
-    settings = JSON.parse(settings);
-    console.log(settings.useSystemTheme);
-    if (settings.useSystemTheme) {
-      let newColors = await getColorScheme(settings.useSystemTheme);
-      StatusBar.setBarStyle(
-        Appearance.getColorScheme() === 'dark'
-          ? 'light-content'
-          : 'dark-content',
-      );
-
-      dispatch({type: ACTIONS.THEME, colors: newColors});
+    } catch (e) {
+      console.log(e.message);
+    } finally {
+      if (!settings) {
+        return;
+      }
+      settings = JSON.parse(settings);
+      if (settings.useSystemTheme) {
+        let newColors = await getColorScheme(settings.useSystemTheme);
+        dispatch({type: ACTIONS.THEME, colors: newColors});
+      }
     }
   };
 
@@ -71,40 +66,19 @@ const App = () => {
     }
   }, [netInfo]);
 
-  useEffect(() => {
-    Orientation.addOrientationListener(_onOrientationChange);
-    eSubscribeEvent(eDispatchAction, (type) => {
-      dispatch(type);
-    });
-    return () => {
-      eUnSubscribeEvent(eDispatchAction, (type) => {
-        dispatch(type);
-      });
-      Orientation.removeOrientationListener(_onOrientationChange);
-    };
-  }, []);
-
-  useEffect(() => {
-    DDS.isTab ? Orientation.lockToLandscape() : Orientation.lockToPortrait();
-  }, []);
-
   const startSyncer = async () => {
-    let user = await db.user.get();
-    if (user) {
-      db.ev.subscribe('sync', _syncFunc);
+    try {
+      let user = await db.user.get();
+      if (user) {
+        db.ev.subscribe('db:refresh', syncChanges);
+      }
+    } catch (e) {
+      console.log(e);
     }
   };
 
-  const _syncFunc = async () => {
-    dispatch({type: ACTIONS.SYNCING, syncing: true});
-    let user = await db.user.get();
-    try {
-      await db.sync();
-    } catch (e) {}
-    user = await db.user.get();
-    dispatch({type: ACTIONS.USER, user: user});
+  const syncChanges = async () => {
     dispatch({type: ACTIONS.ALL});
-    dispatch({type: ACTIONS.SYNCING, syncing: false});
   };
 
   const resetApp = () => {
@@ -115,53 +89,70 @@ const App = () => {
   };
 
   useEffect(() => {
+    DDS.isTab ? Orientation.lockToLandscape() : Orientation.lockToPortrait();
     eSubscribeEvent(eStartSyncer, startSyncer);
     eSubscribeEvent(eResetApp, resetApp);
+    Orientation.addOrientationListener(_onOrientationChange);
+    eSubscribeEvent(eDispatchAction, (type) => {
+      dispatch(type);
+    });
     return () => {
-      db.ev.unsubscribe('sync', _syncFunc);
+      db?.ev?.unsubscribe('db:refresh', syncChanges);
       eUnSubscribeEvent(eStartSyncer, startSyncer);
       eUnSubscribeEvent(eResetApp, resetApp);
+      eUnSubscribeEvent(eDispatchAction, (type) => {
+        dispatch(type);
+      });
+      Orientation.removeOrientationListener(_onOrientationChange);
     };
   }, []);
 
   useEffect(() => {
-    Initialize().then(() => {
-      db.init().then(async () => {
-        let user = await db.user.get();
-        dispatch({type: ACTIONS.USER, user: user});
-        console.log(user);
-        startSyncer();
+    let error = null;
+    let user;
+    Initialize().finally(async () => {
+      try {
+        await db.init();
+        user = await db.user.get();
+      } catch (e) {
+        error = e;
+      } finally {
+        if (user) {
+          dispatch({type: ACTIONS.USER, user: user});
+          startSyncer();
+        }
         dispatch({type: ACTIONS.ALL});
         setInit(true);
-      });
+        if (error) {
+          setTimeout(() => {
+            ToastEvent.show(error.message);
+          }, 500);
+        }
+      }
     });
   }, []);
 
   async function Initialize(colors = colors) {
     let settings;
-    
+    scale.fontScale = 1;
     try {
       settings = await MMKV.getStringAsync('settings');
-    } catch (e) {}
-    if (!settings || typeof settings !== "string" || !settings.includes('fontScale')) {
-      settings = defaultState.settings;
-      settings = JSON.stringify(settings);
-      settings.fontScale = 1;
-      console.log(settings,"SETTINGS");
-      await MMKV.setStringAsync('settings', settings);
-    } else {
       settings = JSON.parse(settings);
 
       if (settings.fontScale) {
         scale.fontScale = settings.fontScale;
-      } else {
-        scale.fontScale = 1;
       }
       updateSize();
+    } catch (e) {
+      if (!settings || !settings.includes('fontScale')) {
+        settings = defaultState.settings;
+        await MMKV.setStringAsync('settings', JSON.stringify(settings));
+      }
+    } finally {
+      let newColors = await getColorScheme(settings.useSystemTheme);
+      dispatch({type: ACTIONS.SETTINGS, settings: {...settings}});
+      dispatch({type: ACTIONS.THEME, colors: newColors});
     }
-    let newColors = await getColorScheme(settings.useSystemTheme);
-    dispatch({type: ACTIONS.SETTINGS, settings: {...settings}});
-    dispatch({type: ACTIONS.THEME, colors: newColors});
   }
 
   if (!init) {

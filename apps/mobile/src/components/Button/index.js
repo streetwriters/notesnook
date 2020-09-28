@@ -16,7 +16,7 @@ export const Button = ({
   color = 'accent',
 }) => {
   const [state, dispatch] = useTracked();
-  const {colors, tags, premiumUser} = state;
+  const {colors} = state;
   const usedColor = 'accent' ? colors.accent : color;
 
   return (

@@ -1,13 +1,13 @@
-import {useIsFocused} from '@react-navigation/native';
-import React, {useEffect} from 'react';
-import {Text, TouchableOpacity, View} from 'react-native';
-import {pv, SIZE, WEIGHT} from '../../common/common';
-import {Placeholder} from '../../components/ListPlaceholders';
+import { useIsFocused } from '@react-navigation/native';
+import React, { useEffect } from 'react';
+import { Text } from 'react-native';
+import { SIZE, WEIGHT } from '../../common/common';
+import { Placeholder } from '../../components/ListPlaceholders';
+import { PressableButton } from '../../components/PressableButton';
 import SimpleList from '../../components/SimpleList';
-import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
+import { useTracked } from '../../provider';
+import { ACTIONS } from '../../provider/actions';
 import NavigationService from '../../services/NavigationService';
-import {PressableButton} from '../../components/PressableButton';
 
 export const Tags = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
@@ -22,9 +22,7 @@ export const Tags = ({route, navigation}) => {
           type: 'trash',
           menu: true,
           canGoBack: false,
-          route: route,
           color: null,
-          navigation: navigation,
         },
       });
       dispatch({

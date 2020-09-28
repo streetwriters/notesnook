@@ -125,7 +125,7 @@ export const Toast = ({context = 'global'}) => {
       style={{
         width: '100%',
         alignItems: 'center',
-        height: 60,
+        minHeight: 30,
         bottom: keyboard ? 30 : 100,
         position: 'absolute',
         zIndex: 999,
@@ -147,7 +147,8 @@ export const Toast = ({context = 'global'}) => {
           minWidth: data.func ? '95%' : '50%',
           alignSelf: 'center',
           borderRadius: 5,
-          height: 50,
+          minHeight: 30,
+          paddingVertical: 10,
           paddingHorizontal: 15,
           justifyContent: 'space-between',
           flexDirection: 'row',
@@ -183,7 +184,7 @@ export const Toast = ({context = 'global'}) => {
             }}
             style={{
               color: 'white',
-              width: '100%',
+              width: '90%',
               backgroundColor: 'transparent',
               fontSize: SIZE.sm,
             }}>

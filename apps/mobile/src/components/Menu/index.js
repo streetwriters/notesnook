@@ -29,6 +29,7 @@ import {MenuListItem} from './MenuListItem';
 import {TagsSection} from './TagsSection';
 import {UserSection} from './UserSection';
 import {MMKV} from '../../utils/storage';
+import Seperator from '../Seperator';
 
 const AnimatedSafeAreaView = createAnimatableComponent(SafeAreaView);
 
@@ -41,7 +42,6 @@ export const Menu = ({
 }) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
-
 
   function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
     let newColors = setColorScheme(colors, accent);
@@ -161,10 +161,16 @@ export const Menu = ({
         contentContainerStyle={{minHeight: '50%'}}
         showsVerticalScrollIndicator={false}>
         {listItems.map((item, index) => (
-          <MenuListItem item={item} index={index} noTextMode={noTextMode} />
+          <MenuListItem
+            key={item.name}
+            item={item}
+            index={index}
+            noTextMode={noTextMode}
+          />
         ))}
 
         <MenuListItem
+          key="Tags"
           noTextMode={noTextMode}
           index={10}
           item={{
@@ -195,6 +201,7 @@ export const Menu = ({
           }}>
           {listItems2.map((item, index) => (
             <MenuListItem
+              key={item.name}
               item={item}
               index={index}
               ignore={true}
@@ -202,6 +209,7 @@ export const Menu = ({
             />
           ))}
         </View>
+        <Seperator half />
 
         <UserSection noTextMode={noTextMode} />
       </View>

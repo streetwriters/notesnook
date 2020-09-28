@@ -1,16 +1,23 @@
-import {Dimensions} from 'react-native';
-import Database from "notes-core/api/";
+import {Dimensions, Platform} from 'react-native';
+import Database from 'notes-core/api/';
 import {eSendEvent} from '../services/eventManager';
 import {eShowToast, eHideToast} from '../services/events';
 import {DeviceDetectionService} from './deviceDetection';
 import StorageInterface, {MMKV} from './storage';
 import {updateEvent} from '../components/DialogManager/recievers';
 import {ACTIONS} from '../provider/actions';
-import EventSource from "rn-eventsource";
-global.Buffer = require("buffer").Buffer;
+import ESource from './event-source';
+import EventSource from 'rn-eventsource';
+import {PERMISSIONS, requestMultiple, RESULTS} from 'react-native-permissions';
+
+global.Buffer = require('buffer').Buffer;
 
 export const DDS = new DeviceDetectionService();
-export const db = new Database(StorageInterface, EventSource);
+export const db = new Database(
+  StorageInterface,
+  Platform.OS === 'ios' ? EventSource : ESource,
+);
+db.host('http://192.168.10.8:8000');
 
 export async function setSetting(settings, name, value) {
   let s = {...settings};
@@ -46,6 +53,23 @@ export const selection = {
 export const history = {
   selectedItemsList: [],
 };
+
+export async function requestStoragePermission() {
+  let granted = false;
+  try {
+    const response = await requestMultiple([
+      PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE,
+      PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
+    ]);
+    granted =
+      response['android.permission.READ_EXTERNAL_STORAGE'] ===
+        RESULTS.GRANTED &&
+      response['android.permission.WRITE_EXTERNAL_STORAGE'] === RESULTS.GRANTED;
+  } catch (err) {
+  } finally {
+    return granted;
+  }
+}
 
 export function timeSince(date) {
   var seconds = Math.floor((new Date() - date) / 1000);

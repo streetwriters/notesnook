@@ -27,7 +27,6 @@ const MoveNoteDialog = () => {
   const [state, dispatch] = useTracked();
   const {notebooks, colors, selectedItemsList} = state;
   const [visible, setVisible] = useState(false);
-  const [animated, setAnimated] = useState(false);
   const [expanded, setExpanded] = useState('');
   const [notebookInputFocused, setNotebookInputFocused] = useState(false);
   const [topicInputFocused, setTopicInputFocused] = useState(false);
@@ -39,7 +38,6 @@ const MoveNoteDialog = () => {
 
   const close = () => {
     setVisible(false);
-    setAnimated(false);
     setExpanded(false);
     newTopicTitle = null;
     newNotebookTitle = null;
@@ -76,7 +74,7 @@ const MoveNoteDialog = () => {
     }
 
     let res = await db.notebooks.notebook(expanded).topics.add(newTopicTitle);
-    console.log(newTopicTitle, res);
+
     dispatch({type: ACTIONS.NOTEBOOKS});
     dispatch({type: ACTIONS.PINNED});
     topicInput.current?.clear();
@@ -358,8 +356,7 @@ const MoveNoteDialog = () => {
                         onPress={async () => {
                           let noteIds = [];
                           selectedItemsList.forEach((i) => noteIds.push(i.id));
-                          console.log(selectedItemsList[0]);
-                          console.log(noteIds, 'NOTE IDS');
+                       
                           let res = await db.notes.move(
                             {
                               topic: item.title,
@@ -367,7 +364,6 @@ const MoveNoteDialog = () => {
                             },
                             ...noteIds,
                           );
-                          console.log(res);
                           dispatch({type: ACTIONS.CLEAR_SELECTION});
                           dispatch({type: ACTIONS.NOTEBOOKS});
                           dispatch({type: ACTIONS.PINNED});

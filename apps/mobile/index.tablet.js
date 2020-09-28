@@ -1,7 +1,10 @@
 import React, {createRef, useEffect, useState} from 'react';
 import {Platform, StatusBar, View} from 'react-native';
 import * as Animatable from 'react-native-animatable';
+import {ScreenContainer} from 'react-native-screens';
+import {DialogManager} from './src/components/DialogManager';
 import {Menu} from './src/components/Menu';
+import {Toast} from './src/components/Toast';
 import {useTracked} from './src/provider';
 import {
   eSendEvent,
@@ -13,18 +16,28 @@ import {
   eOnLoadNote,
   eOpenFullscreenEditor,
 } from './src/services/events';
-import {NavigationStack} from './src/services/Navigator';
+import {MainComponent, NavigationStack} from './src/services/Navigator';
 import Editor from './src/views/Editor';
-import {sideMenuRef} from './src/utils/refs';
-import DrawerLayout from 'react-native-drawer-layout';
-import {getElevation} from './src/utils/utils';
-import {Toast} from './src/components/Toast';
-import {DialogManager} from './src/components/DialogManager';
+const AnimatedScreenContainer = Animated.createAnimatedComponent(
+  ScreenContainer,
+);
 
 const editorRef = createRef();
 let outColors;
 
 export const Initialize = () => {
+  const [state, dispatch] = useTracked();
+  const {colors} = state;
+  return (
+    <>
+      <NavigationStack component={NavWrapper} />
+      <Toast />
+      <DialogManager colors={colors} />
+    </>
+  );
+};
+
+const NavWrapper = () => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
 
@@ -77,73 +90,47 @@ export const Initialize = () => {
       StatusBar.setBackgroundColor('transparent');
       StatusBar.setTranslucent(true);
     }
-      StatusBar.setBarStyle(colors.night ? 'light-content' : 'dark-content');
-    
+    StatusBar.setBarStyle(colors.night ? 'light-content' : 'dark-content');
   }, []);
-
   return (
-    <>
-      <DrawerLayout
-        ref={sideMenuRef}
+    <View
+      style={{
+        width: '100%',
+        height: '100%',
+        flexDirection: 'row',
+        backgroundColor: colors.bg,
+      }}>
+      <Animatable.View
+        animation="fadeIn"
+        useNativeDriver={true}
+        duration={500}
+        delay={450}
         style={{
-          opacity: 0,
-          backgroundColor: colors.bg,
-        }}
-        keyboardDismissMode="ondrag"
-        drawerWidth={300}
-        useNativeAnimations={true}
-        renderNavigationView={() => (
-          <Menu
-            hide={false}
-            colors={colors}
-            close={() => sideMenuRef.current?.closeDrawer()}
-          />
-        )}>
-        <Animatable.View
-          transition="backgroundColor"
-          duration={300}
-          style={{
-            width: '100%',
-            height: '100%',
-            flexDirection: 'row',
-            backgroundColor: colors.bg,
-          }}>
-          <Animatable.View
-            animation="fadeIn"
-            useNativeDriver={true}
-            duration={500}
-            delay={450}
-            style={{
-              width: '4%',
-            }}>
-            <Menu hide={false} noTextMode={true} colors={colors} />
-          </Animatable.View>
-          <Animatable.View
-            transition="backgroundColor"
-            duration={300}
-            style={{
-              width: '28%',
-              height: '100%',
-              borderRightColor: colors.nav,
-              borderRightWidth: 2,
-            }}>
-            <NavigationStack />
-          </Animatable.View>
+          width: '4%',
+        }}>
+        <Menu hide={false} noTextMode={true} colors={colors} />
+      </Animatable.View>
+      <View
+        style={{
+          width: '28%',
+          height: '100%',
+          borderRightColor: colors.nav,
+          borderRightWidth: 2,
+        }}>
+        <MainComponent />
+      </View>
 
-          <View
-            ref={editorRef}
-            style={{
-              width: '68%',
-              height: '100%',
-              backgroundColor: 'transparent',
-            }}>
-            <Editor noMenu={fullscreen ? false : true} />
-          </View>
-        </Animatable.View>
-      </DrawerLayout>
-
-      <Toast />
-      <DialogManager colors={colors} />
-    </>
+      <AnimatedScreenContainer
+        ref={editorRef}
+        style={{
+          width: '68%',
+          height: '100%',
+          backgroundColor: 'transparent',
+        }}>
+        <Screen>
+          <Editor noMenu={fullscreen ? false : true} />
+        </Screen>
+      </AnimatedScreenContainer>
+    </View>
   );
 };

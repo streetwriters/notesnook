@@ -154,7 +154,6 @@ export class AddNotebookDialog extends React.Component {
       let nextTopics = toEdit.topics.map((topic, index) => {
         if (index === 0) return topic;
         let copy = {...topic};
-        console.log(copy, 'here');
         copy.title = prevTopics[index - 1];
         return copy;
       });
@@ -164,7 +163,6 @@ export class AddNotebookDialog extends React.Component {
           nextTopics.push(title);
         }
       });
-      console.log(nextTopics, prevTopics, toEdit.topics, 'HERE');
       await db.notebooks.notebook(id).topics.add(...nextTopics);
     } else {
       await db.notebooks.add({

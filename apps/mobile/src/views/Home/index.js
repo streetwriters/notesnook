@@ -26,21 +26,12 @@ export const Home = ({route, navigation}) => {
           type: 'notes',
           menu: true,
           canGoBack: false,
-          route: route,
           color: null,
-          navigation: navigation,
         },
       });
       dispatch({
         type: ACTIONS.HEADER_VERTICAL_MENU,
         state: true,
-      });
-
-      dispatch({
-        type: ACTIONS.CONTAINER_BOTTOM_BUTTON,
-        state: {
-          bottomButtonText: 'Create a new Note',
-        },
       });
       dispatch({
         type: ACTIONS.HEADER_TEXT_STATE,
@@ -68,8 +59,18 @@ export const Home = ({route, navigation}) => {
       eSendEvent(eScrollEvent, 0);
       dispatch({type: ACTIONS.COLORS});
       dispatch({type: ACTIONS.NOTES});
-      dispatch({type: ACTIONS.PINNED});
+    } else {
+      dispatch({
+        type: ACTIONS.HEADER_VERTICAL_MENU,
+        state: false,
+      });
     }
+    return () => {
+      dispatch({
+        type: ACTIONS.HEADER_VERTICAL_MENU,
+        state: false,
+      });
+    };
   }, [isFocused]);
 
   useEffect(() => {

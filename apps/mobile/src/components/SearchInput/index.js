@@ -18,11 +18,10 @@ let timeoutAnimate = null;
 let animating = false;
 export const Search = (props) => {
   const [state, dispatch] = useTracked();
-  const {colors, searchResults} = state;
+  const {colors, searchResults,searchState} = state;
   const [text, setText] = useState('');
   const [focus, setFocus] = useState(false);
 
-  let searchState = props.root ? state.searchState : state.indSearchState;
 
   const _marginAnim = new Value(0);
   const _opacity = new Value(1);
@@ -31,7 +30,6 @@ export const Search = (props) => {
   const animation = (margin, opacity, border) => {
     if (animating) return;
     animating = true;
-    console.log('animating');
     timing(_marginAnim, {
       toValue: margin,
       duration: 230,
@@ -68,7 +66,7 @@ export const Search = (props) => {
       timeoutAnimate = null;
       timeoutAnimate = setTimeout(() => {
         animation(-65, 0, 0);
-        console.log('up');
+       
       }, 500);
       offsetY = y;
     } else {
@@ -76,7 +74,7 @@ export const Search = (props) => {
       clearTimeout(timeoutAnimate);
       timeoutAnimate = null;
       timeoutAnimate = setTimeout(() => {
-        console.log('down');
+      
         animation(0, 1, 1.5);
       }, 500);
       offsetY = y;

@@ -1,8 +1,9 @@
 import React from 'react';
-import { Dimensions, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, Text, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { ph, SIZE, WEIGHT } from '../../common/common';
 import { timeSince } from '../../utils/utils';
+import { ActionIcon } from '../ActionIcon';
 import { ActionSheetEvent } from '../DialogManager/recievers';
 
 const w = Dimensions.get('window').width;
@@ -59,19 +60,19 @@ export default class NoteItem extends React.Component {
             justifyContent: 'flex-start',
             alignItems: 'center',
             flexDirection: 'row',
-            maxWidth: '100%',
+            width: '100%',
             paddingRight: 6,
             alignSelf: 'center',
             borderBottomWidth: 1,
             height: 100,
-            borderBottomColor:item.pinned? 'transparent': colors.nav,
+            borderBottomColor: item.pinned ? 'transparent' : colors.nav,
           },
           customStyle ? customStyle : {},
         ]}>
         <View
           style={{
             paddingLeft: 0,
-            width: '95%',
+            width: '92%',
           }}>
           <Text
             numberOfLines={1}
@@ -214,12 +215,10 @@ export default class NoteItem extends React.Component {
           </View>
         </View>
 
-        <TouchableOpacity
-          style={{
-            justifyContent: 'center',
-            minHeight: 70,
-            alignItems: 'center',
-          }}
+        <ActionIcon
+          color={colors.heading}
+          name="dots-horizontal"
+          size={SIZE.xl}
           onPress={() => {
             ActionSheetEvent(
               item,
@@ -230,9 +229,15 @@ export default class NoteItem extends React.Component {
                 : ['Add to', 'Share', 'Export', 'Delete', 'Copy'],
               isTrash ? [] : ['Pin', 'Favorite', 'Add to Vault'],
             );
-          }}>
-          <Icon name="dots-horizontal" size={SIZE.lg} color={colors.heading} />
-        </TouchableOpacity>
+          }}
+          customStyle={{
+            justifyContent: 'center',
+            height: 35,
+            width: 35,
+            borderRadius: 100,
+            alignItems: 'center',
+          }}
+        />
       </View>
     );
   }

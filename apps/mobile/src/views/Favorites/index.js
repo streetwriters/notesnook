@@ -1,31 +1,15 @@
-import {useIsFocused} from '@react-navigation/native';
-import React, {useEffect, useState} from 'react';
-import SimpleList from '../../components/SimpleList';
-import {NoteItemWrapper} from '../../components/SimpleList/NoteItemWrapper';
-import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
-import {db, ToastEvent} from '../../utils/utils';
+import { useIsFocused } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
 import { Placeholder } from '../../components/ListPlaceholders';
+import SimpleList from '../../components/SimpleList';
+import { NoteItemWrapper } from '../../components/SimpleList/NoteItemWrapper';
+import { useTracked } from '../../provider';
+import { ACTIONS } from '../../provider/actions';
 export const Favorites = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const {favorites} = state;
   const [refreshing, setRefreshing] = useState(false);
   const isFocused = useIsFocused();
-
-  const _onRefresh = async () => {
-    setRefreshing(true);
-    try {
-      await db.sync();
-
-      dispatch({type: ACTIONS.FAVORITES});
-      dispatch({type: ACTIONS.USER});
-      setRefreshing(false);
-      ToastEvent.show('Sync Complete', 'success');
-    } catch (e) {
-      setRefreshing(false);
-      ToastEvent.show('Sync failed, network error', 'error');
-    }
-  };
 
   useEffect(() => {
     if (isFocused) {
@@ -35,9 +19,7 @@ export const Favorites = ({route, navigation}) => {
           type: 'notes',
           menu: true,
           canGoBack: false,
-          route: route,
           color: null,
-          navigation: navigation,
         },
       });
       dispatch({
@@ -45,10 +27,6 @@ export const Favorites = ({route, navigation}) => {
         state: {
           visible: false,
         },
-      });
-      dispatch({
-        type: ACTIONS.HEADER_VERTICAL_MENU,
-        state: false,
       });
 
       dispatch({
@@ -85,9 +63,11 @@ export const Favorites = ({route, navigation}) => {
     <SimpleList
       data={favorites}
       type="notes"
+      refreshCallback={() => {
+        dispatch({type: ACTIONS.FAVORITES});
+      }}
       refreshing={refreshing}
       focused={isFocused}
-      onRefresh={_onRefresh}
       RenderItem={NoteItemWrapper}
       placeholder={<Placeholder type="favorites" />}
       placeholderText="Notes you favorite appear here"

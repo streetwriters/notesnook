@@ -1,13 +1,13 @@
+import he from 'he';
+import {Platform} from 'react-native';
 import 'react-native-get-random-values';
-import { isArray } from 'lodash';
-import { Platform } from 'react-native';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import MMKVStorage from 'react-native-mmkv-storage';
-import { generateSecureRandom } from 'react-native-securerandom';
+import {generateSecureRandom} from 'react-native-securerandom';
 import Sodium from 'react-native-sodium';
 import RNFetchBlob from 'rn-fetch-blob';
+import {db, requestStoragePermission, ToastEvent} from './utils';
 export const MMKV = new MMKVStorage.Loader().initialize();
-
 async function read(key, isArray = false) {
   let data;
 
@@ -17,9 +17,8 @@ async function read(key, isArray = false) {
   if (!data) return null;
   try {
     data = JSON.parse(data);
-    console.log(isArray? data: null, "ARRAY");
-    
-    data = isArray? [...data] : data;
+
+    data = isArray ? [...data] : data;
   } catch (e) {
     data = data;
   }
@@ -28,7 +27,6 @@ async function read(key, isArray = false) {
 }
 
 async function write(key, data) {
-  console.log(key,data,"DATA_WRITE");
   return await MMKV.setItem(
     key,
     typeof data === 'string' ? data : JSON.stringify(data),
@@ -36,7 +34,6 @@ async function write(key, data) {
 }
 
 async function readMulti(keys) {
-  console.log(keys,"KEYS");
   if (keys.length <= 0) {
     return [];
   } else {
@@ -46,16 +43,14 @@ async function readMulti(keys) {
       let obj;
       try {
         obj = JSON.parse(value);
-    
       } catch (e) {
         obj = value;
       }
-      
-      return [key, obj];
-    })
-    console.log(map,"DATA");
-    return map;
 
+      return [key, obj];
+    });
+
+    return map;
   }
 }
 
@@ -83,25 +78,95 @@ async function deriveKey(password, salt) {
   } catch (e) {}
 }
 
-async function saveToPDF(html, filename) {
-  let options = {
-    html: html,
-    fileName: filename,
-    directory:
-      Platform.OS === 'ios'
-        ? 'Documents'
-        : RNFetchBlob.fs.dirs.SDCardDir + '/Call Of Writing/exported/PDF/',
-  };
-
-  return await RNHTMLtoPDF.convert(options);
-}
-
 async function getAllKeys() {
   return await MMKV.indexer.getKeys();
 }
 
 async function getRandomBytes(length) {
   return await generateSecureRandom(length);
+}
+
+async function saveToPDF(note) {
+  let androidSavePath = '/Notesnook/exported/PDF';
+  if (Platform.OS === 'android') {
+    let hasPermission = await requestStoragePermission();
+    if (!hasPermission) {
+      ToastEvent.show('Failed to get storage permission');
+      return null;
+    }
+  }
+  let html = await db.notes.note(note).export('html');
+  html = he.decode(html);
+  let options = {
+    html: html,
+    fileName: note.title,
+    directory: Platform.OS === 'ios' ? 'Documents' : androidSavePath,
+  };
+  let res = await RNHTMLtoPDF.convert(options);
+
+  return {
+    filePath: res.filePath,
+    type: 'application/pdf',
+    name: 'Markdown',
+  };
+}
+
+async function saveToMarkdown(note) {
+  let androidSavePath =
+    RNFetchBlob.fs.dirs.SDCardDir + '/Notesnook/exported/Markdown/';
+  await checkAndCreateDir(androidSavePath);
+  let markdown = await db.notes.note(note.id).export('md');
+
+  let path = androidSavePath + note.title + '.md';
+  await RNFetchBlob.fs.writeFile(path, markdown, 'utf8');
+
+  return {
+    filePath: path,
+    type: 'text/markdown',
+    name: 'Markdown',
+  };
+}
+
+async function saveToText(note) {
+  let androidSavePath =
+    RNFetchBlob.fs.dirs.SDCardDir + '/Notesnook/exported/Text/';
+  await checkAndCreateDir(androidSavePath);
+  let markdown = await db.notes.note(note.id).export('txt');
+
+  let path = androidSavePath + note.title + '.txt';
+  await RNFetchBlob.fs.writeFile(path, markdown, 'utf8');
+
+  return {
+    filePath: path,
+    type: 'text/plain',
+    name: 'Text',
+  };
+}
+
+async function saveToHTML(note) {
+  let androidSavePath =
+    RNFetchBlob.fs.dirs.SDCardDir + '/Notesnook/exported/Html/';
+  await checkAndCreateDir(androidSavePath);
+  let markdown = await db.notes.note(note.id).export('html');
+
+  let path = androidSavePath + note.title + '.html';
+  await RNFetchBlob.fs.writeFile(path, markdown, 'utf8');
+
+  return {
+    filePath: path,
+    type: 'text/html',
+    name: 'Html',
+  };
+}
+
+async function checkAndCreateDir(dir) {
+  let exists = RNFetchBlob.fs.exists(dir);
+  let isDir = RNFetchBlob.fs.isDir(dir);
+
+  if (!exists || !isDir) {
+    await RNFetchBlob.fs.mkdir(dir);
+  }
+  return dir;
 }
 
 export default {
@@ -116,4 +181,8 @@ export default {
   saveToPDF,
   getAllKeys,
   getRandomBytes,
+  checkAndCreateDir,
+  saveToMarkdown,
+  saveToText,
+  saveToHTML,
 };

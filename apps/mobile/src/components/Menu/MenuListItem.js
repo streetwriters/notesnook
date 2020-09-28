@@ -1,13 +1,13 @@
 import React from 'react';
-import {Text, TouchableOpacity, View} from 'react-native';
+import { Text, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {normalize, opacity, pv, SIZE, WEIGHT} from '../../common/common';
-import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
-import {eSendEvent} from '../../services/eventManager';
-import {eClearSearch} from '../../services/events';
-import {sideMenuRef} from '../../utils/refs';
-import {PressableButton} from '../PressableButton';
+import { SIZE, WEIGHT } from '../../common/common';
+import { useTracked } from '../../provider';
+import { ACTIONS } from '../../provider/actions';
+import { eSendEvent } from '../../services/eventManager';
+import { eClearSearch } from '../../services/events';
+import NavigationService from '../../services/NavigationService';
+import { PressableButton } from '../PressableButton';
 
 export const MenuListItem = ({item, index, noTextMode, ignore}) => {
   const [state, dispatch] = useTracked();
@@ -26,7 +26,7 @@ export const MenuListItem = ({item, index, noTextMode, ignore}) => {
 
     item.func();
     if (item.close) {
-      sideMenuRef.current?.closeDrawer();
+      NavigationService.closeDrawer();
     }
   };
 

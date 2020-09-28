@@ -1,7 +1,9 @@
 import {useIsFocused} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
+import {COLORS_NOTE} from '../../common/common';
+import {Placeholder} from '../../components/ListPlaceholders';
 import SimpleList from '../../components/SimpleList';
-import {NotebookItemWrapper} from '../../components/SimpleList/NotebookItemWrapper';
+import {NoteItemWrapper} from '../../components/SimpleList/NoteItemWrapper';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {
@@ -16,9 +18,6 @@ import {
 } from '../../services/events';
 import {openEditorAnimation} from '../../utils/animations';
 import {db, DDS, editing, ToastEvent} from '../../utils/utils';
-import {NoteItemWrapper} from '../../components/SimpleList/NoteItemWrapper';
-import {Placeholder} from '../../components/ListPlaceholders';
-import {COLORS_NOTE} from '../../common/common';
 
 export const Notes = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
@@ -30,20 +29,13 @@ export const Notes = ({route, navigation}) => {
   let params = route.params ? route.params : null;
 
   useEffect(() => {
-    if (!params) {
-      params = {
-        title: 'Notes',
-      };
-    }
-  }, []);
-
-  useEffect(() => {
     if (isFocused) {
+      if (!params) {
+        params = {
+          title: 'Notes',
+        };
+      }
       init();
-      dispatch({
-        type: ACTIONS.CURRENT_SCREEN,
-        screen: params.type === "color"? params.color.title : params.type,
-      });
     } else {
       setNotes([]);
       editing.actionAfterFirstSave = {
@@ -67,20 +59,19 @@ export const Notes = ({route, navigation}) => {
     if (data) {
       params = data;
     }
+    let allNotes = [];
     eSendEvent(eScrollEvent, 0);
     if (params.type === 'tag') {
-      let notesInTag = db.notes.tagged(params.tag.title);
-      setNotes([...notesInTag]);
+      allNotes = db.notes.tagged(params.tag.title);
     } else if (params.type == 'color') {
-      let notesInColors = db.notes.colored(params.color.title);
-      setNotes([...notesInColors]);
+      allNotes = db.notes.colored(params.color.title);
     } else {
-      let allNotes = db.notebooks
+      allNotes = db.notebooks
         .notebook(params.notebookId)
         .topics.topic(params.title).all;
-      if (allNotes && allNotes.length > 0) {
-        setNotes([...allNotes]);
-      }
+    }
+    if (allNotes && allNotes.length > 0) {
+      setNotes([...allNotes]);
     }
   };
 
@@ -92,9 +83,8 @@ export const Notes = ({route, navigation}) => {
           type: 'notes',
           menu: params.type === 'color' ? true : false,
           canGoBack: params.type === 'color' ? false : true,
-          route: route,
           color: params.type == 'color' ? COLORS_NOTE[params.title] : null,
-          navigation: navigation,
+        
         },
       });
       dispatch({
@@ -122,7 +112,7 @@ export const Notes = ({route, navigation}) => {
       init();
       dispatch({
         type: ACTIONS.CURRENT_SCREEN,
-        screen: params.type === "color"? params.color.title : params.type,
+        screen: params.type === 'color' ? params.color.title : params.type,
       });
     } else {
       setNotes([]);
@@ -149,20 +139,6 @@ export const Notes = ({route, navigation}) => {
     }
   }, [notes, isFocused]);
 
-  const _onRefresh = async () => {
-    setRefreshing(true);
-    try {
-      await db.sync();
-      init();
-      dispatch({type: ACTIONS.USER});
-      setRefreshing(false);
-      ToastEvent.show('Sync Complete', 'success');
-    } catch (e) {
-      setRefreshing(false);
-      ToastEvent.show('Sync failed, network error', 'error');
-    }
-  };
-
   const _bottomBottomOnPress = () => {
     if (params.type === 'tag') {
       editing.actionAfterFirstSave = {
@@ -184,19 +160,18 @@ export const Notes = ({route, navigation}) => {
 
     if (DDS.isTab) {
       eSendEvent(eOnLoadNote, {type: 'new'});
-    } else {
-      eSendEvent(eOnLoadNote, {type: 'new'});
-      openEditorAnimation();
     }
+    openEditorAnimation();
   };
 
   return (
     <SimpleList
       data={notes}
       type="notes"
-      customRefreshing={refreshing}
+      refreshCallback={() => {
+        init();
+      }}
       focused={isFocused}
-      customRefresh={_onRefresh}
       RenderItem={NoteItemWrapper}
       placeholder={<Placeholder type="notes" />}
       placeholderText={`Add some notes to this" ${

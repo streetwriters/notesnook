@@ -1,36 +1,27 @@
 import React from 'react';
-import {
-  ActivityIndicator,
-  Platform,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {ActivityIndicator, Platform, StyleSheet, View} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {SIZE} from '../../common/common';
 import {useTracked} from '../../provider';
 import {eSendEvent} from '../../services/eventManager';
 import NavigationService from '../../services/NavigationService';
 import {useHideHeader} from '../../utils/hooks';
-import {sideMenuRef} from '../../utils/refs';
 import {DDS, w} from '../../utils/utils';
+import {ActionIcon} from '../ActionIcon';
 import {HeaderMenu} from './HeaderMenu';
 import {HeaderTitle} from './HeaderTitle';
 
 export const Header = ({showSearch, root}) => {
   const [state, dispatch] = useTracked();
-  const {colors, syncing} = state;
-
-  let headerState = root ? state.headerState : state.indHeaderState;
+  const {colors, syncing, headerState} = state;
 
   const insets = useSafeAreaInsets();
   const hideHeader = useHideHeader();
 
   const onLeftButtonPress = () => {
     if (!headerState.canGoBack) {
-      sideMenuRef.current?.openDrawer();
+      NavigationService.openDrawer();
       return;
     }
     NavigationService.goBack();
@@ -68,19 +59,16 @@ export const Header = ({showSearch, root}) => {
 
       <View style={styles.leftBtnContainer}>
         {!DDS.isTab ? (
-          <TouchableOpacity
-            hitSlop={{top: 20, bottom: 20, left: 50, right: 40}}
+          <ActionIcon
+            customStyle={styles.leftBtn}
             onPress={onLeftButtonPress}
-            style={styles.leftBtn}>
-            <Icon
-              style={{
-                marginLeft: headerState.canGoBack ? -5 : 0,
-              }}
-              color={colors.heading}
-              name={headerState.canGoBack ? 'arrow-left' : 'menu'}
-              size={SIZE.xxxl}
-            />
-          </TouchableOpacity>
+            name={headerState.canGoBack ? 'arrow-left' : 'menu'}
+            size={SIZE.xxxl}
+            color={colors.pri}
+            iconStyle={{
+              marginLeft: headerState.canGoBack ? -5 : 0,
+            }}
+          />
         ) : undefined}
 
         {Platform.OS === 'android' ? <HeaderTitle root={root} /> : null}
@@ -95,15 +83,17 @@ export const Header = ({showSearch, root}) => {
           style={{
             opacity: hideHeader ? 1 : 0,
           }}>
-          <TouchableOpacity
+          <ActionIcon
             onPress={() => {
               if (!hideHeader) return;
               setHideHeader(false);
               eSendEvent('showSearch');
             }}
-            style={styles.rightBtn}>
-            <Icon name={'magnify'} size={SIZE.xl} color={colors.pri} />
-          </TouchableOpacity>
+            name="magnify"
+            size={SIZE.xl}
+            color={colors.pri}
+            style={styles.rightBtn}
+          />
         </Animatable.View>
 
         <HeaderMenu />
@@ -150,9 +140,12 @@ const styles = StyleSheet.create({
   },
   leftBtn: {
     justifyContent: 'center',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     height: 40,
-    width: 60,
+    width: 40,
+    borderRadius: 100,
+    marginLeft: -5,
+    marginRight: 25,
   },
   rightBtnContainer: {
     flexDirection: 'row',

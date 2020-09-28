@@ -1,12 +1,6 @@
-import React, {useEffect, useState} from 'react';
-import {
-  Dimensions,
-  LayoutAnimation,
-  Platform,
-  RefreshControl,
-  Text,
-  View,
-} from 'react-native';
+import React, {useEffect, useMemo, useState} from 'react';
+import {StyleSheet} from 'react-native';
+import {Dimensions, Platform, RefreshControl, Text, View} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {DataProvider, LayoutProvider, RecyclerListView} from 'recyclerlistview';
@@ -19,7 +13,7 @@ import {
   eOpenLoginDialog,
   eScrollEvent,
 } from '../../services/events';
-import {db, hexToRGBA, RGB_Linear_Shade, ToastEvent} from '../../utils/utils';
+import {db, ToastEvent} from '../../utils/utils';
 import {PressableButton} from '../PressableButton';
 let {width, height} = Dimensions.get('window');
 
@@ -33,43 +27,32 @@ const SimpleList = ({
   placeholder,
   RenderItem,
   focused,
-  placeholderText,
-  pinned = null,
   customRefresh,
   customRefreshing,
-  isMove,
-  hideMore,
-  noteToMove,
-  isHome = false,
+  refreshCallback,
 }) => {
   const [state, dispatch] = useTracked();
-  const {colors, selectionMode, user, currentScreen} = state;
+  const {colors, selectionMode, user} = state;
   const searchResults = {...state.searchResults};
   const [refreshing, setRefreshing] = useState(false);
-  const [dataProvider, setDataProvider] = useState(null);
+  const [dataProvider, setDataProvider] = useState(
+    new DataProvider((r1, r2) => {
+      return r1 !== r2;
+    }).cloneWithRows([]),
+  );
   const insets = useSafeAreaInsets();
+  const listData = data;
   const _onScroll = (event) => {
     if (!event) return;
     let y = event.nativeEvent.contentOffset.y;
     eSendEvent(eScrollEvent, y);
   };
 
-  const NOOP = () => undefined;
-
-  const layoutItemAnimator = {
-    animateDidMount: NOOP,
-    animateShift: NOOP,
-    animateWillMount: NOOP,
-    animateWillUnmount: NOOP,
-    animateWillUpdate: () =>
-      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut),
-  };
-
   useEffect(() => {
     let mainData =
       searchResults.type === type && focused && searchResults.results.length > 0
         ? searchResults.results
-        : data;
+        : listData;
 
     let d = [header, ...mainData];
     /*  for (var i = 0; i < 10000; i++) {
@@ -80,9 +63,9 @@ const SimpleList = ({
         return r1 !== r2;
       }).cloneWithRows(d),
     );
-  }, [data]);
+  }, [listData]);
 
-  const _ListFooterComponent = data[0] ? (
+  const _ListFooterComponent = listData[0] ? (
     <View
       style={{
         height: 150,
@@ -102,17 +85,12 @@ const SimpleList = ({
 
   const RenderSectionHeader = ({item}) => (
     <Text
-      style={{
-        fontFamily: WEIGHT.bold,
-        fontSize: SIZE.xs + 1,
-        color: colors.accent,
-        paddingHorizontal: 12,
-        width: '100%',
-        alignSelf: 'center',
-        marginTop: 15,
-        height: 30,
-        paddingBottom: 5,
-      }}>
+      style={[
+        {
+          color: colors.accent,
+        },
+        styles.sectionHeader,
+      ]}>
       {item.title}
     </Text>
   );
@@ -130,24 +108,8 @@ const SimpleList = ({
       let user = await db.user.get();
       dispatch({type: ACTIONS.USER, user: user});
       await db.sync();
-      if (Platform.OS === 'ios') {
-        dispatch({
-          type: ACTIONS.SYNCING,
-          syncing: false,
-        });
-      } else {
-        setRefreshing(false);
-      }
       ToastEvent.show('Sync Complete', 'success');
     } catch (e) {
-      if (Platform.OS === 'ios') {
-        dispatch({
-          type: ACTIONS.SYNCING,
-          syncing: false,
-        });
-      } else {
-        setRefreshing(false);
-      }
       ToastEvent.show(
         e.message,
         'error',
@@ -158,140 +120,36 @@ const SimpleList = ({
         },
         'Login',
       );
+    } finally {
+      if (Platform.OS === 'ios') {
+        dispatch({
+          type: ACTIONS.SYNCING,
+          syncing: false,
+        });
+      } else {
+        setRefreshing(false);
+      }
+      if (refreshCallback) {
+        refreshCallback();
+      }
+      dispatch({type: ACTIONS.ALL});
     }
-    dispatch({type: ACTIONS.ALL});
-  };
-
-  const ListHeaderComponent = () => {
-    return searchResults.type === type && searchResults.results.length > 0 ? (
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          paddingHorizontal: 12,
-          height: 40,
-        }}>
-        <Text
-          style={{
-            fontFamily: WEIGHT.bold,
-            color: colors.accent,
-            fontSize: SIZE.xs,
-          }}>
-          Showing Results for {searchResults.keyword}
-        </Text>
-        <Text
-          onPress={() => {
-            eSendEvent(eClearSearch);
-          }}
-          style={{
-            fontFamily: WEIGHT.regular,
-            color: colors.errorText,
-            fontSize: SIZE.xs,
-          }}>
-          Clear
-        </Text>
-      </View>
-    ) : (
-      <View>
-        {user || !data[0] || selectionMode ? null : (
-          <PressableButton
-            onPress={() => {
-              eSendEvent(eOpenLoginDialog);
-            }}
-            color={
-              COLORS_NOTE[currentScreen]
-                ? COLORS_NOTE[currentScreen]
-                : colors.shade
-            }
-            selectedColor={
-              COLORS_NOTE[currentScreen]
-                ? COLORS_NOTE[currentScreen]
-                : colors.accent
-            }
-            alpha={!colors.night ? -0.02 : 0.1}
-            opacity={0.12}
-            customStyle={{
-              width: '100%',
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'flex-start',
-              paddingHorizontal: 12,
-              alignSelf: 'center',
-              height: 40,
-              borderRadius: 0,
-              position: 'relative',
-            }}>
-            <View
-              style={{
-                width: 25,
-                backgroundColor: COLORS_NOTE[currentScreen]
-                  ? COLORS_NOTE[currentScreen]
-                  : colors.accent,
-                height: 25,
-                borderRadius: 100,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}>
-              <Icon
-                style={{
-                  textAlign: 'center',
-                  textAlignVertical: 'center',
-                }}
-                name="account-outline"
-                color="white"
-                size={SIZE.xs}
-              />
-            </View>
-            <View
-              style={{
-                marginLeft: 10,
-              }}>
-              <Text
-                style={{
-                  fontFamily: WEIGHT.regular,
-                  color: colors.icon,
-                  fontSize: SIZE.xxs - 1,
-                }}>
-                You are not logged in
-              </Text>
-              <Text
-                style={{
-                  color: COLORS_NOTE[currentScreen]
-                    ? COLORS_NOTE[currentScreen]
-                    : colors.accent,
-                  fontSize: SIZE.xxs,
-                }}>
-                Login to sync your {type}.
-              </Text>
-            </View>
-          </PressableButton>
-        )}
-      </View>
-    );
   };
 
   const _ListEmptyComponent = (
     <View
-      style={{
-        height: '100%',
-        width: '100%',
-        alignItems: 'center',
-        alignSelf: 'center',
-        justifyContent: 'center',
-        opacity: 1,
-        backgroundColor: colors.bg,
-      }}>
+      style={[
+        {
+          backgroundColor: colors.bg,
+        },
+        styles.emptyList,
+      ]}>
       <>{placeholder}</>
     </View>
   );
 
-  const _listKeyExtractor = (item, index) =>
-    item.type === 'header' ? item.title : item.id.toString() + index.toString();
-
   const _layoutProvider = new LayoutProvider(
     (index) => {
-      console.log(dataProvider.getDataForIndex(index).type, 'TYPE');
       return dataProvider.getDataForIndex(index).type;
     },
     (type, dim) => {
@@ -314,11 +172,12 @@ const SimpleList = ({
           break;
         case 'header':
           dim.width = width;
-          dim.height = 40;
+          dim.height = 18;
           break;
         case 'MAIN_HEADER':
           dim.width = width;
-          dim.height = 40;
+          dim.height =
+            (user && user.Id) || !listData[0] || selectionMode ? 0 : 40;
           break;
         default:
           dim.width = width;
@@ -332,7 +191,7 @@ const SimpleList = ({
       case 'note':
         return <RenderItem item={data} pinned={data.pinned} index={index} />;
       case 'MAIN_HEADER':
-        return <ListHeaderComponent />;
+        return <ListHeaderComponent type={type} data={listData} />;
       case 'header':
         return <RenderSectionHeader item={data} />;
 
@@ -341,7 +200,23 @@ const SimpleList = ({
     }
   };
 
-  return !data || data.length === 0 ? (
+  const listStyle = useMemo(() => {
+    return {
+      height: '100%',
+      backgroundColor: colors.bg,
+      width: '100%',
+      paddingTop:
+        Platform.OS == 'ios'
+          ? listData[0] && !selectionMode
+            ? 115
+            : 115 - 60
+          : listData[0] && !selectionMode
+          ? 155 - insets.top
+          : 155 - insets.top - 60,
+    };
+  }, []);
+
+  return !listData || listData.length === 0 ? (
     _ListEmptyComponent
   ) : (
     <RecyclerListView
@@ -365,42 +240,163 @@ const SimpleList = ({
           minHeight: '100%',
         },
       }}
-      /*   data={
-        searchResults.type === type &&
-        focused &&
-        searchResults.results.length > 0
-          ? searchResults.results
-          : data
-      }
-      
-      keyExtractor={_listKeyExtractor} */
-      //
-      //onScroll={_onScroll}
-      //
-      //
-
-      style={{
-        height: '100%',
-        backgroundColor: colors.bg,
-        width: '100%',
-        paddingTop:
-          Platform.OS == 'ios'
-            ? data[0] && !selectionMode
-              ? 115
-              : 115 - 60
-            : data[0] && !selectionMode
-            ? 155 - insets.top
-            : 155 - insets.top - 60,
-      }}
-      /*  renderItem={({item, index}) =>
-        item.type === 'header' ? (
-          <RenderSectionHeader item={item} />
-        ) : (
-          <RenderItem item={item} index={index} />
-        )
-      } */
+      style={listStyle}
     />
   );
 };
 
 export default SimpleList;
+
+const SearchHeader = () => {
+  const [state, dispatch] = useTracked();
+  const {colors} = state;
+  const searchResults = {...state.searchResults};
+
+  return (
+    <View style={styles.searchHeader}>
+      <Text
+        style={{
+          fontFamily: WEIGHT.bold,
+          color: colors.accent,
+          fontSize: SIZE.xs,
+        }}>
+        Showing Results for {searchResults.keyword}
+      </Text>
+      <Text
+        onPress={() => {
+          eSendEvent(eClearSearch);
+        }}
+        style={{
+          fontFamily: WEIGHT.regular,
+          color: colors.errorText,
+          fontSize: SIZE.xs,
+        }}>
+        Clear
+      </Text>
+    </View>
+  );
+};
+
+const LoginCard = ({type, data}) => {
+  const [state, dispatch] = useTracked();
+  const {colors, selectionMode, user, currentScreen} = state;
+
+  return (
+    <View>
+      {(user && user.Id) || !data[0] || selectionMode ? null : (
+        <PressableButton
+          onPress={() => {
+            eSendEvent(eOpenLoginDialog);
+          }}
+          color={
+            COLORS_NOTE[currentScreen]
+              ? COLORS_NOTE[currentScreen]
+              : colors.shade
+          }
+          selectedColor={
+            COLORS_NOTE[currentScreen]
+              ? COLORS_NOTE[currentScreen]
+              : colors.accent
+          }
+          alpha={!colors.night ? -0.02 : 0.1}
+          opacity={0.12}
+          customStyle={styles.loginCard}>
+          <View
+            style={{
+              width: 25,
+              backgroundColor: COLORS_NOTE[currentScreen]
+                ? COLORS_NOTE[currentScreen]
+                : colors.accent,
+              height: 25,
+              borderRadius: 100,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
+            <Icon
+              style={styles.loginIcon}
+              name="account-outline"
+              color="white"
+              size={SIZE.xs}
+            />
+          </View>
+          <View
+            style={{
+              marginLeft: 10,
+            }}>
+            <Text
+              style={{
+                fontFamily: WEIGHT.regular,
+                color: colors.icon,
+                fontSize: SIZE.xxs - 1,
+              }}>
+              You are not logged in
+            </Text>
+            <Text
+              style={{
+                color: COLORS_NOTE[currentScreen]
+                  ? COLORS_NOTE[currentScreen]
+                  : colors.accent,
+                fontSize: SIZE.xxs,
+              }}>
+              Login to sync your {type}.
+            </Text>
+          </View>
+        </PressableButton>
+      )}
+    </View>
+  );
+};
+
+const ListHeaderComponent = ({type, data}) => {
+  const [state, dispatch] = useTracked();
+  const searchResults = {...state.searchResults};
+
+  return searchResults.type === type && searchResults.results.length > 0 ? (
+    <SearchHeader />
+  ) : (
+    <LoginCard type={type} data={data} />
+  );
+};
+
+const styles = StyleSheet.create({
+  loginCard: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    paddingHorizontal: 12,
+    alignSelf: 'center',
+    height: 40,
+    borderRadius: 0,
+    position: 'relative',
+  },
+  loginIcon: {
+    textAlign: 'center',
+    textAlignVertical: 'center',
+  },
+  searchHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 12,
+    height: 40,
+  },
+  sectionHeader: {
+    fontFamily: WEIGHT.bold,
+    fontSize: SIZE.xs + 1,
+    paddingHorizontal: 12,
+    width: '100%',
+    alignSelf: 'center',
+    marginTop: 15,
+    height: 18,
+    paddingBottom: 5,
+  },
+  emptyList: {
+    height: '100%',
+    width: '100%',
+    alignItems: 'center',
+    alignSelf: 'center',
+    justifyContent: 'center',
+    opacity: 1,
+  },
+});

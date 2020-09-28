@@ -1,189 +1,251 @@
-import React from 'react';
-import {FlatList, Modal, Text, TouchableOpacity, View} from 'react-native';
-import * as Animatable from 'react-native-animatable';
+import React, {createRef} from 'react';
+import {ScrollView, Text, View} from 'react-native';
+import * as RNIap from 'react-native-iap';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {opacity, pv, SIZE, WEIGHT} from '../../common/common';
+import {SIZE, WEIGHT} from '../../common/common';
 import {eSendEvent} from '../../services/eventManager';
-import {eCloseSideMenu} from '../../services/events';
-import NavigationService from '../../services/NavigationService';
+import {eOpenLoginDialog, eOpenPendingDialog} from '../../services/events';
+import {db, h, itemSkus, ToastEvent, w} from '../../utils/utils';
+import ActionSheet from '../ActionSheet';
 import {Button} from '../Button';
 import Seperator from '../Seperator';
-
 class PremiumDialog extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      visible: false,
-      animated: false,
+      user: null,
+      product: null,
     };
     this.routeIndex = 0;
     this.count = 0;
+    this.actionSheetRef = createRef();
+    this.subsriptionSuccessListerner = RNIap.purchaseUpdatedListener(
+      this.onSuccessfulSubscription,
+    );
+    this.subsriptionErrorListener = RNIap.purchaseErrorListener(
+      this.onSubscriptionError,
+    );
   }
 
   open() {
-    this.setState({
-      visible: true,
-    });
+    this.actionSheetRef.current?._setModalVisible(true);
   }
 
   close() {
+    this.actionSheetRef.current?._setModalVisible(false);
+  }
+  async componentDidMount() {
+    let u = await db.user.get();
+    let prod = await RNIap.getSubscriptions(itemSkus);
+    console.log(prod);
     this.setState({
-      visible: false,
+      user: u && u.Id ? u : null,
+      product: prod[0],
     });
   }
 
+  onSuccessfulSubscription = (subscription: RNIap.SubscriptionPurchase) => {
+    const receipt = subscription.transactionReceipt;
+
+    if (receipt) {
+      this.close();
+      setTimeout(() => {
+        eSendEvent(eOpenPendingDialog);
+      }, 500);
+    }
+  };
+
+  onSubscriptionError = (error: RNIap.PurchaseError) => {
+    console.log(error.message, 'Error');
+    ToastEvent.show(error.message);
+  };
+
   render() {
-    const {visible, animated} = this.state;
     const {colors} = this.props;
     return (
-      <Modal
-        animated={true}
-        animationType="fade"
-        visible={visible}
-        transparent={true}>
-        <Animatable.View
-          transition={['opacity', 'scaleX', 'scaleY']}
-          useNativeDriver={true}
-          duration={300}
-          iterationCount={1}
+      <ActionSheet
+        containerStyle={{
+          backgroundColor: colors.bg,
+          width: '100%',
+          alignSelf: 'center',
+          borderRadius: 10,
+        }}
+        gestureEnabled={true}
+        ref={this.actionSheetRef}
+        initialOffsetFromBottom={1}>
+        <View
           style={{
-            flex: 1,
-            backgroundColor: 'rgba(0,0,0,0.3)',
-            width: '100%',
-            height: '100%',
-            alignSelf: 'center',
-            justifyContent: 'center',
-            alignItems: 'center',
+            width: w,
+            backgroundColor: colors.bg,
+            justifyContent: 'space-between',
+            paddingHorizontal: 12,
+            borderRadius: 10,
+            paddingTop: 10,
           }}>
-          <TouchableOpacity
-            onPress={() => this.close()}
+          <Text
+            style={{
+              fontSize: SIZE.xxxl,
+              fontFamily: WEIGHT.bold,
+              color: colors.heading,
+              paddingBottom: 20,
+              paddingTop: 10,
+              alignSelf: 'center',
+            }}>
+            Notesnook Pro
+          </Text>
+
+          <ScrollView
             style={{
               width: '100%',
-              height: '100%',
-              position: 'absolute',
-              zIndex: 1,
+              maxHeight: h * 0.5,
             }}
-          />
-
-          <View
-            style={{
-              width: '90%',
-              backgroundColor: colors.bg,
-              elevation: 5,
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              padding: 12,
-              borderRadius: 5,
-              zIndex: 2,
-            }}>
-            <Text
-              style={{
-                fontSize: SIZE.lg,
-                fontFamily: WEIGHT.bold,
-                color: colors.heading,
-                paddingVertical: 20,
-              }}>
-              Unlock Premium Features
-            </Text>
-
-            <Text
-              style={{
-                fontSize: SIZE.xxxl + 10,
-                fontFamily: WEIGHT.medium,
-                color: colors.pri,
-                paddingVertical: 15,
-              }}>
-              6.99
-              <Text
+            nestedScrollEnabled={true}
+            showsVerticalScrollIndicator={false}>
+            {[
+              {
+                title: 'Cross Platfrom Sync',
+                description:
+                  'Securely sync your notes on any device, Android, iOS, Windows, MacOS, Linux and Web!',
+              },
+              {
+                title: 'Zero Knowledge',
+                description:
+                  'No sneaking, no stealing. We give all the keys for your data to you. Privacy is not just a word to us. We use industry-grade XChaChaPoly1305 and Argon2 which is miles ahead other solutions making sure your data is secure and private even a million years from now.',
+              },
+              {
+                title: 'Organize Notes Like Never Before',
+                description:
+                  'Organize your notes using notebooks, tags and colors. Add notes to favorites for quick access. Pin most important notes and notebooks on top for quick access. You can also pin notes and notebooks to quickly access them!',
+              },
+              {
+                title: 'Full Rich Text Editor with Markdown',
+                description:
+                  'Unleash the power of a complete Rich Text Editor in your notes app. You can add images, links and even embed videos! We have even added full markdown support too!',
+              },
+              {
+                title: 'Export Notes',
+                description:
+                  'You can export your notes as PDF, Markdown, Plain text or HTML file.',
+              },
+              {
+                title: 'Backup and Restore',
+                description:
+                  'Backup and restore your notes anytime into your phone storage. You can encrypt all your backups if required!',
+              },
+            ].map((item) => (
+              <View
+                key={item.title}
                 style={{
-                  color: colors.accent,
-                  fontSize: 12,
+                  paddingVertical: 5,
+                  marginBottom: 10,
                 }}>
-                /month
-              </Text>
-            </Text>
-            <FlatList
-              data={[
-                'Sync across unlimted devices on any platform',
-                'Zero-knowledge encryption',
-                'Organize your notes using notebooks, tags and colors',
-                'Rich-text editor for all your note taking needs',
-                'Secure local vault',
-              ]}
-              keyExtractor={(item, index) => item}
-              renderItem={({item, index}) => (
                 <View
                   style={{
+                    alignItems: 'flex-start',
                     flexDirection: 'row',
                     justifyContent: 'flex-start',
-                    alignItems: 'center',
-                    paddingVertical: 5,
+                    flexWrap: 'wrap',
+                    width: '100%',
                   }}>
-                  <Icon name="check" size={SIZE.lg} color={colors.accent} />
+                  <Icon
+                    name="checkbox-marked-circle"
+                    size={SIZE.lg}
+                    color={colors.accent}
+                  />
 
                   <Text
                     style={{
                       marginLeft: 10,
                       fontFamily: WEIGHT.regular,
-                      fontSize: SIZE.sm,
-                      maxWidth: '80%',
+                      fontSize: SIZE.md,
+                      maxWidth: '85%',
+                      color: colors.heading,
                     }}>
-                    {item}
+                    {item.title} {'\n'}
+                    <Text
+                      style={{
+                        marginLeft: 10,
+                        fontFamily: WEIGHT.regular,
+                        fontSize: SIZE.xs + 1,
+                        maxWidth: '85%',
+                        color: colors.icon,
+                      }}>
+                      {item.description}
+                    </Text>
                   </Text>
                 </View>
-              )}
-            />
+              </View>
+            ))}
+          </ScrollView>
 
-            <TouchableOpacity
-              activeOpacity={opacity}
+          <Seperator />
+
+          <View
+            style={{
+              padding: 5,
+              borderRadius: 10,
+              backgroundColor: colors.shade,
+              paddingHorizontal: 12,
+            }}>
+            <Text
               style={{
-                padding: pv + 2,
-                borderRadius: 5,
-                marginTop: 10,
-                marginHorizontal: 12,
-                marginBottom: 10,
-                alignItems: 'center',
-                width: '100%',
+                fontSize: SIZE.xl,
+                fontFamily: WEIGHT.bold,
+                color: colors.accent,
               }}>
+              {!this.state.user ? 'Try it Now' : 'Upgrade Now'}
+              {'\n'}
               <Text
                 style={{
-                  fontSize: SIZE.lg,
-                  fontFamily: WEIGHT.medium,
-                  color: colors.accent,
-                  textAlign: 'center',
+                  fontSize: 12,
+                  color: colors.pri,
+                  fontFamily: WEIGHT.regular,
                 }}>
-                BUY NOW
+                {this.state.user
+                  ? 'Cancel anytime in Subscriptions on Google Play'
+                  : 'Start your 14 Day Trial for Free (no credit card needed)'}
               </Text>
-            </TouchableOpacity>
-
-            <Seperator />
+            </Text>
+            <Text
+              style={{
+                fontSize: SIZE.xl,
+                fontFamily: WEIGHT.medium,
+                color: colors.pri,
+                paddingVertical: 15,
+              }}>
+              {this.state.product?.localizedPrice}
+              <Text
+                style={{
+                  color: colors.accent,
+                  fontSize: 12,
+                }}>
+                /mo
+              </Text>
+            </Text>
             <Button
               onPress={() => {
-                this.close();
-                eSendEvent(eCloseSideMenu);
-                NavigationService.navigate('Signup', {
-                  root: true,
-                  fromHome: true,
-                });
+                if (!this.state.user) {
+                  this.close();
+                  setTimeout(() => {
+                    eSendEvent(eOpenLoginDialog);
+                  }, 400);
+                } else {
+                  RNIap.requestSubscription(this.state.product.productId)
+                    .then((r) => {})
+                    .catch((e) => {
+                      console.log(e);
+                    });
+                }
               }}
-              title="Start your 14 day trial"
+              title={
+                this.state.user ? 'Subscribe to Notesnook Pro' : 'Sign Up Now'
+              }
               height={50}
               width="100%"
             />
-
-            <Text
-              style={{
-                fontSize: SIZE.xxs,
-                fontFamily: WEIGHT.medium,
-                color: colors.pri,
-                paddingBottom: 10,
-                textAlign: 'center',
-              }}>
-              No credit card required
-            </Text>
           </View>
-        </Animatable.View>
-      </Modal>
+        </View>
+      </ActionSheet>
     );
   }
 }

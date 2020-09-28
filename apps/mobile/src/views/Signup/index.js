@@ -1,4 +1,4 @@
-import {useIsFocused} from '@react-navigation/native';
+/* import {useIsFocused} from '@react-navigation/native';
 import React, {createRef, useEffect, useState} from 'react';
 import {
   ActivityIndicator,
@@ -759,3 +759,4 @@ export const Signup = ({route, navigation}) => {
 };
 
 export default Signup;
+ */

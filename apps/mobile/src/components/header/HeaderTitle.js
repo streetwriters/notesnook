@@ -1,22 +1,22 @@
 import React from 'react';
-import { Text } from 'react-native';
-import { SIZE, WEIGHT } from '../../common/common';
-import { useTracked } from '../../provider';
+import {Text} from 'react-native';
+import {SIZE, WEIGHT} from '../../common/common';
+import {useTracked} from '../../provider';
 
 export const HeaderTitle = ({root}) => {
   const [state, dispatch] = useTracked();
-  const {colors} = state;
-  let headerTextState = root ? state.headerTextState : state.indHeaderTextState;
+  const {colors, headerTextState} = state;
+
+  const style = {
+    fontSize: SIZE.xl,
+    color: headerTextState.color || colors.heading,
+    fontFamily: WEIGHT.bold,
+    alignSelf: 'center',
+  };
 
   return (
     <>
-      <Text
-        style={{
-          fontSize: SIZE.xl,
-          color: headerTextState.color ? headerTextState.color : colors.heading,
-          fontFamily: WEIGHT.bold,
-          alignSelf: 'center',
-        }}>
+      <Text style={style}>
         <Text
           style={{
             color: colors.accent,

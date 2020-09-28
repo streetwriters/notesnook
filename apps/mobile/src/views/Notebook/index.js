@@ -16,7 +16,7 @@ import NavigationService from '../../services/NavigationService';
 import {db, ToastEvent} from '../../utils/utils';
 
 export const Notebook = ({route, navigation}) => {
-  const [state, dispatch] = useTracked();
+  const [, dispatch] = useTracked();
   const [topics, setTopics] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -52,9 +52,7 @@ export const Notebook = ({route, navigation}) => {
           menu: false,
           canGoBack: true,
           heading: params.title,
-          route: route,
           color: null,
-          navigation: navigation,
         },
       });
 
@@ -104,27 +102,16 @@ export const Notebook = ({route, navigation}) => {
     }
   }, [topics, isFocused]);
 
-  const _onRefresh = async () => {
-    setRefreshing(true);
-    try {
-      await db.sync();
-      onLoad();
-      dispatch({type: ACTIONS.USER});
-      setRefreshing(false);
-      ToastEvent.show('Sync Complete', 'success');
-    } catch (e) {
-      setRefreshing(false);
-      ToastEvent.show('Sync failed, network error', 'error');
-    }
-  };
+ 
 
   return (
     <SimpleList
       data={topics}
       type="topics"
-      customRefreshing={refreshing}
+      refreshCallback={() => {
+        onLoad();
+      }}
       focused={isFocused}
-      customRefresh={_onRefresh}
       RenderItem={RenderItem}
       placeholder={<></>}
       placeholderText=""

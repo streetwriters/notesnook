@@ -23,6 +23,7 @@ export const UserSection = ({noTextMode}) => {
   const {colors, syncing, user} = state;
 
   useEffect(() => {
+    console.log(user);
     dispatch({type: ACTIONS.TAGS});
   }, []);
 
@@ -114,8 +115,8 @@ export const UserSection = ({noTextMode}) => {
             }}>
             {syncing ? 'Syncing ' : 'Synced '}
             {!syncing ? (
-              user.lastSynced && user.lastSynced !== 0 ? (
-                <TimeSince time={user.lastSynced} />
+              user?.notesnook?.lastSynced ? (
+                <TimeSince time={user.notesnook.lastSynced} />
               ) : (
                 'never'
               )
@@ -140,7 +141,7 @@ export const UserSection = ({noTextMode}) => {
   ) : (
     <PressableButton
       onPress={() => {
-       eSendEvent(eOpenLoginDialog);
+        eSendEvent(eOpenLoginDialog);
       }}
       color={colors.shade}
       selectedColor={colors.accent}

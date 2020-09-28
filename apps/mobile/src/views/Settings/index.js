@@ -1,10 +1,8 @@
 import {useIsFocused} from '@react-navigation/native';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import {
   Appearance,
-  Clipboard,
   Linking,
-  Modal,
   Platform,
   ScrollView,
   StatusBar,
@@ -13,7 +11,6 @@ import {
   View,
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import QRCode from 'react-native-qrcode-generator';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
   ACCENT,
@@ -21,19 +18,23 @@ import {
   COLOR_SCHEME_DARK,
   COLOR_SCHEME_LIGHT,
   opacity,
-  ph,
   pv,
   setColorScheme,
   SIZE,
   WEIGHT,
 } from '../../common/common';
+import {Button} from '../../components/Button';
 import {PressableButton} from '../../components/PressableButton';
 import Seperator from '../../components/Seperator';
-import {Toast} from '../../components/Toast';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
-import {eOpenLoginDialog, eResetApp} from '../../services/events';
+import {
+  eOpenLoginDialog,
+  eOpenPremiumDialog,
+  eOpenRecoveryKeyDialog,
+  eResetApp,
+} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
 import {MMKV} from '../../utils/storage';
 import {
@@ -49,13 +50,10 @@ import {
 export const Settings = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors, user, settings} = state;
-  const [key, setKey] = useState('');
-  const [modalVisible, setModalVisible] = useState(false);
   const isFocused = useIsFocused();
   function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
     let newColors = setColorScheme(colors, accent);
     StatusBar.setBarStyle(colors.night ? 'light-content' : 'dark-content');
-
     dispatch({type: ACTIONS.THEME, colors: newColors});
   }
 
@@ -66,6 +64,7 @@ export const Settings = ({route, navigation}) => {
   }
 
   useEffect(() => {
+    console.log(user);
     if (isFocused) {
       dispatch({
         type: ACTIONS.CONTAINER_BOTTOM_BUTTON,
@@ -79,9 +78,7 @@ export const Settings = ({route, navigation}) => {
           type: null,
           menu: true,
           canGoBack: false,
-          route: route,
           color: null,
-          navigation: navigation,
         },
       });
       dispatch({
@@ -110,6 +107,15 @@ export const Settings = ({route, navigation}) => {
     }
   }, [isFocused]);
 
+  const getTimeLeft = (t1, t2) => {
+    let d1 = new Date(Date.now());
+    let d2 = new Date(t2);
+    let diff = d2.getTime() - d1.getTime();
+    diff = (diff / (1000 * 3600 * 24)).toFixed(0);
+
+    return diff;
+  };
+
   const SectionHeader = ({title}) => (
     <Text
       style={{
@@ -126,15 +132,14 @@ export const Settings = ({route, navigation}) => {
     </Text>
   );
 
-  const Button = ({title, tagline, customComponent, onPress, key}) => (
+  const CustomButton = ({title, tagline, customComponent, onPress}) => (
     <PressableButton
-      key={key}
       color="transparent"
       selectedColor={colors.nav}
       alpha={!colors.night ? -0.02 : 0.02}
       onPress={onPress}
       customStyle={{
-        height: 50,
+        minHeight: 50,
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingHorizontal: 12,
@@ -177,220 +182,116 @@ export const Settings = ({route, navigation}) => {
           marginTop: Platform.OS == 'ios' ? 125 - 60 : 125 - 60,
         }}
       />
-
-      <Modal
-        animated={true}
-        animationType="fade"
-        visible={modalVisible}
-        transparent={true}>
-        <View
-          style={{
-            width: '100%',
-            height: '100%',
-            backgroundColor: 'rgba(0,0,0,0.3)',
-          }}>
-          <View
-            style={{
-              width: '100%',
-              backgroundColor: colors.bg,
-              height: '100%',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}>
-            <Text
-              style={{
-                fontFamily: WEIGHT.bold,
-                fontSize: SIZE.xl,
-                color: colors.pri,
-                marginBottom: 25,
-              }}>
-              Data Recovery Key
-            </Text>
-
-            <Text
-              style={{
-                fontFamily: WEIGHT.regular,
-                fontSize: SIZE.sm,
-                maxWidth: '85%',
-                textAlign: 'center',
-                color: colors.pri,
-              }}>
-              <Text
-                style={{
-                  color: colors.errorText,
-                }}>
-                If you lose your password, you can recover your data only using
-                your recovery key.{' '}
-              </Text>
-            </Text>
-
-            <Text
-              style={{
-                fontFamily: WEIGHT.regular,
-                fontSize: SIZE.sm,
-                maxWidth: '85%',
-                textAlign: 'center',
-                marginTop: 25,
-                marginBottom: 10,
-                color: colors.pri,
-              }}>
-              Take a Sceenshot of QR-Code
-            </Text>
-
-            <QRCode value={key} size={200} bgColor="black" fgColor="white" />
-
-            <TouchableOpacity
-              activeOpacity={0.6}
-              onPress={() => {
-                Clipboard.setString(key);
-                ToastEvent.show('Recovery key copied!', 'success', 'local');
-              }}
-              style={{
-                flexDirection: 'row',
-                borderWidth: 1,
-                borderRadius: 5,
-                paddingVertical: 8,
-                paddingHorizontal: 10,
-                marginTop: 15,
-                alignItems: 'center',
-                borderColor: colors.nav,
-              }}>
-              <Text
-                numberOfLines={2}
-                style={{
-                  fontFamily: WEIGHT.regular,
-                  fontSize: SIZE.sm,
-                  width: '85%',
-                  maxWidth: '85%',
-                  paddingRight: 10,
-                  color: colors.icon,
-                }}>
-                {key}
-              </Text>
-              <Icon color={colors.accent} size={SIZE.lg} name="clipboard" />
-            </TouchableOpacity>
-
-            <Text
-              style={{
-                color: colors.icon,
-                fontSize: 10,
-                width: '85%',
-                maxWidth: '85%',
-              }}>
-              You can also save your recovery key from app settings on any
-              device.
-            </Text>
-
-            <TouchableOpacity
-              onPress={() => {
-                setModalVisible(false);
-              }}
-              activeOpacity={opacity}
-              style={{
-                paddingVertical: pv + 5,
-                paddingHorizontal: ph,
-                borderRadius: 5,
-                width: '90%',
-                marginTop: 20,
-                justifyContent: 'center',
-                alignItems: 'center',
-                backgroundColor: colors.accent,
-              }}>
-              <Text
-                style={{
-                  fontFamily: WEIGHT.medium,
-                  color: 'white',
-                  fontSize: SIZE.sm,
-                }}>
-                I have saved the key
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-        <Toast context="local" />
-      </Modal>
-
       <ScrollView
         style={{
           paddingHorizontal: 0,
         }}>
-        {user ? (
+        {user && user.Id ? (
           <>
-            <SectionHeader title="Account Settings" />
-            <Text
-              style={{
-                fontSize: SIZE.sm,
-                fontFamily: WEIGHT.regular,
-                textAlignVertical: 'center',
-                color: colors.pri,
-                marginTop: pv + 5,
-              }}>
-              Logged in as:
-            </Text>
-
             <View
               style={{
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                alignSelf: 'center',
-                flexDirection: 'row',
-                width: '100%',
-                paddingVertical: pv,
-                marginBottom: pv + 5,
-                marginTop: pv,
-                backgroundColor: colors.accent,
-                borderRadius: 5,
-                padding: 5,
                 paddingHorizontal: 12,
               }}>
               <View
                 style={{
-                  flexDirection: 'row',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}>
-                <Icon size={SIZE.lg} color="white" name="account-outline" />
-
-                <Text
-                  style={{
-                    color: 'white',
-                    marginLeft: 5,
-                    fontFamily: WEIGHT.regular,
-                    fontSize: SIZE.sm,
-                  }}>
-                  {user.username}
-                </Text>
-              </View>
-              <View
-                style={{
+                  alignSelf: 'center',
+                  width: '100%',
+                  marginBottom: pv,
+                  marginTop: pv,
                   borderRadius: 5,
-                  padding: 5,
-                  paddingVertical: 2.5,
-                  backgroundColor: 'white',
+                  padding: 10,
+                  backgroundColor: colors.shade,
                 }}>
-                <Text
+                <View
                   style={{
-                    color: colors.accent,
-                    fontFamily: WEIGHT.regular,
-                    fontSize: SIZE.xs,
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    flexDirection: 'row',
                   }}>
-                  Pro
-                </Text>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <Icon
+                      size={SIZE.md}
+                      color={colors.accent}
+                      name="account-outline"
+                    />
+                    <Text
+                      style={{
+                        color: colors.heading,
+                        marginLeft: 5,
+                        fontFamily: WEIGHT.regular,
+                        fontSize: SIZE.sm,
+                      }}>
+                      {user.username}
+                    </Text>
+                  </View>
+                  <View
+                    style={{
+                      borderRadius: 5,
+                      padding: 5,
+                      paddingVertical: 2.5,
+                      backgroundColor: 'white',
+                    }}>
+                    <Text
+                      style={{
+                        color: colors.accent,
+                        fontFamily: WEIGHT.regular,
+                        fontSize: SIZE.xs,
+                      }}>
+                      {user.notesnook.subscription.isTrial ? 'Trial' : 'Pro'}
+                    </Text>
+                  </View>
+                </View>
+                <Seperator />
+                <View>
+                  {user.notesnook.subscription.isTrial ? (
+                    <Text
+                      style={{
+                        color:
+                          getTimeLeft(
+                            user.notesnook.subscription.start,
+                            user.notesnook.subscription.expiry,
+                          ) > 5
+                            ? colors.pri
+                            : colors.errorText,
+                        fontFamily: WEIGHT.regular,
+                        fontSize: SIZE.xxl,
+                      }}>
+                      {getTimeLeft(
+                        user.notesnook.subscription.start,
+                        user.notesnook.subscription.expiry,
+                      ) + ' Days Remaining'}
+                    </Text>
+                  ) : null}
+
+                  <Seperator />
+
+                  <Button
+                    onPress={() => {
+                      eSendEvent(eOpenPremiumDialog);
+                    }}
+                    width="100%"
+                    title="Get Notesnook Pro"
+                    height={40}
+                  />
+                </View>
+                {
+                  // Ad code here
+                }
               </View>
             </View>
-
             {[
               {
-                name: 'Data recovery key',
+                name: 'Save Data Recovery Key',
                 func: async () => {
-                  let k = await db.user.key();
-                  setKey(k.key);
-                  setModalVisible(true);
+                  eSendEvent(eOpenRecoveryKeyDialog);
                 },
-              },
-              {
-                name: 'Subscription status',
-                func: () => {},
+                desc:
+                  'We recommend you to get your data recovery key and store it safely. If you lose your password, you can recover your data using your recovery key.',
               },
               {
                 name: 'Logout',
@@ -398,11 +299,17 @@ export const Settings = ({route, navigation}) => {
                   await db.user.logout();
                   dispatch({type: ACTIONS.USER, user: null});
                   dispatch({type: ACTIONS.CLEAR_ALL});
-                  ToastEvent.show('Logged out, syncing disabled', 'success');
                 },
+                desc:
+                  'Logout of your account, this will clear everything and reset the app.',
               },
             ].map((item) => (
-              <Button key={item.name} title={item.name} onPress={item.func} />
+              <CustomButton
+                key={item.name}
+                title={item.name}
+                onPress={item.func}
+                tagline={item.desc}
+              />
             ))}
           </>
         ) : (
@@ -435,7 +342,7 @@ export const Settings = ({route, navigation}) => {
                     width: 40,
                     backgroundColor: colors.accent,
                     height: 40,
-                    marginLeft:10,
+                    marginLeft: 10,
                     borderRadius: 100,
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -568,7 +475,7 @@ export const Settings = ({route, navigation}) => {
           ))}
         </View>
 
-        <Button
+        <CustomButton
           title="Use System Dark Mode"
           tagline={
             settings.useSystemTheme
@@ -605,7 +512,7 @@ export const Settings = ({route, navigation}) => {
           }
         />
 
-        <Button
+        <CustomButton
           title="Dark Mode"
           tagline={colors.night ? 'Turn off dark mode' : 'Turn on dark mode'}
           onPress={() => {
@@ -711,7 +618,7 @@ export const Settings = ({route, navigation}) => {
         </View>
 
         {DDS.isTab ? (
-          <Button
+          <CustomButton
             title="Force portrait mode"
             onPress={async () => {
               await setSetting(
@@ -754,7 +661,12 @@ export const Settings = ({route, navigation}) => {
             desc: 'Restore backup from your phone.',
           },
         ].map((item) => (
-          <Button title={item.name} tagline={item.desc} onPress={item.func} />
+          <CustomButton
+            key={item.name}
+            title={item.name}
+            tagline={item.desc}
+            onPress={item.func}
+          />
         ))}
 
         <View
@@ -831,7 +743,7 @@ export const Settings = ({route, navigation}) => {
           </View>
         </View>
 
-        <Button
+        <CustomButton
           title="Encrypted Backups"
           tagline="Encrypt your data before backup"
           onPress={async () => {
@@ -892,7 +804,12 @@ export const Settings = ({route, navigation}) => {
             desc: 'You are using the latest version of our app.',
           },
         ].map((item) => (
-          <Button title={item.name} tagline={item.desc} onPress={item.func} />
+          <CustomButton
+            key={item.name}
+            title={item.name}
+            tagline={item.desc}
+            onPress={item.func}
+          />
         ))}
         <Seperator />
       </ScrollView>
