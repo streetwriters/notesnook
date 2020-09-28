@@ -172,7 +172,7 @@ const SimpleList = ({
           break;
         case 'header':
           dim.width = width;
-          dim.height = 18;
+          dim.height = 25;
           break;
         case 'MAIN_HEADER':
           dim.width = width;
@@ -387,9 +387,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     width: '100%',
     alignSelf: 'center',
-    marginTop: 15,
-    height: 18,
-    paddingBottom: 5,
+    marginTop: 10,
+    height: 25,
+    textAlignVertical: 'center',
   },
   emptyList: {
     height: '100%',
