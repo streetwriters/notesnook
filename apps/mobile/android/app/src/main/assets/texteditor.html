@@ -63,8 +63,8 @@
     .ql-editor {
       box-sizing: border-box;
       line-height: 1.42;
-      height: auto;
       outline: none;
+      height:100%;
       overflow-y: hidden;
       padding: 12px 12px;
       tab-size: 4;
@@ -1303,7 +1303,7 @@
             value: document.getElementById('titleInput').value
           }
 
-          window.ReactNativeWebView.postMessage(JSON.stringify(titleMessage));
+          window.ReactNativeWebView?.postMessage(JSON.stringify(titleMessage));
         }
 
         document.getElementById('titleInput').onkeyup = function (evt) {
@@ -1313,7 +1313,7 @@
             value: document.getElementById('titleInput').value
           }
 
-          window.ReactNativeWebView.postMessage(JSON.stringify(titleMessage));
+          window.ReactNativeWebView?.postMessage(JSON.stringify(titleMessage));
         }
         function onChangetitle() {
           editor.focus();
@@ -1322,7 +1322,7 @@
             type: 'title',
             value: document.getElementById('titleInput').value
           }
-          window.ReactNativeWebView.postMessage(JSON.stringify(titleMessage));
+          window.ReactNativeWebView?.postMessage(JSON.stringify(titleMessage));
         }
         const setTheme = function () {
 
@@ -1607,7 +1607,7 @@
 
         editor.once('text-change', function () {
 
-          window.ReactNativeWebView.postMessage("loaded");
+          window.ReactNativeWebView?.postMessage("loaded");
           let text = editor.getText();
           document.getElementById("infowords").innerText = text.split(' ').length + ' words';
 
@@ -1776,7 +1776,7 @@
           m.html = editor.root.innerHTML;
           m.type = 'content';
 
-          window.ReactNativeWebView.postMessage(JSON.stringify(m));
+          window.ReactNativeWebView?.postMessage(JSON.stringify(m));
         });
 
 
@@ -16675,6 +16675,8 @@
 
 
   }
+
+  loadAction(false,true)
 
 
 </script>
