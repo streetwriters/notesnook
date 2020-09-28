@@ -2,7 +2,7 @@ import React from "react";
 import ListItem from "../list-item";
 import { confirm } from "../dialogs/confirm";
 import * as Icon from "../icons";
-import { store } from "../../stores/notebook-store";
+import { store } from "../../stores/trash-store";
 import { Flex, Text } from "rebass";
 import TimeAgo from "timeago-react";
 import { toTitleCase } from "../../utils/string";

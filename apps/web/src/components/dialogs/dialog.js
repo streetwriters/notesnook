@@ -62,6 +62,7 @@ function Dialog(props) {
           {props.positiveButton && (
             <RebassButton
               variant="primary"
+              data-test-id="dialog-yes"
               sx={{ opacity: props.positiveButton.disabled ? 0.7 : 1 }}
               mx={1}
               disabled={props.positiveButton.disabled || false}
@@ -81,6 +82,7 @@ function Dialog(props) {
           {props.negativeButton && (
             <RebassButton
               variant="secondary"
+              data-test-id="dialog-no"
               onClick={props.negativeButton.onClick}
             >
               {props.negativeButton.text || "Cancel"}

@@ -34,8 +34,13 @@ function ToastContainer(props) {
   const { type, message, actions } = props;
   return (
     <ThemeProvider>
-      <Flex justifyContent="center" alignContent="center">
-        <Text variant="body" fontSize="menu" mr={2}>
+      <Flex data-test-id="toast" justifyContent="center" alignContent="center">
+        <Text
+          data-test-id="toast-message"
+          variant="body"
+          fontSize="menu"
+          mr={2}
+        >
           {message}
         </Text>
         {actions?.map((action) => (

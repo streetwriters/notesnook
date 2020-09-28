@@ -22,9 +22,11 @@ function Colors(props) {
             style={{ cursor: "pointer" }}
             color={code}
             strokeWidth={0}
+            data-test-id={`menuitem-colors-${label}`}
           />
           {colors.includes(label) && (
             <Icon.Checkmark
+              data-test-id={`menuitem-colors-${label}-check`}
               sx={{
                 position: "absolute",
                 left: "5px",

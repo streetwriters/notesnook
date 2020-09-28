@@ -1,0 +1,24 @@
+name: E2E Tests
+
+on: [pull_request, push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      GH_DEPLOY_KEY: ${{ secrets.GH_DEPLOY_KEY }}
+      CI: true
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v2 # If you're using actions/checkout@v2 you must set persist-credentials to false in most cases for the deployment to work correctly.
+        with:
+          persist-credentials: false
+
+      - name: Use Node.js 12.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+      - run: npm install
+      - uses: microsoft/playwright-github-action@v1
+      - name: Running tests
+        run: npm test

@@ -13,6 +13,7 @@ function Toggle(props) {
       mr={1}
       sx={{ borderRadius: "default", cursor: "pointer" }}
       onClick={() => onToggle(!isOn)}
+      data-test-id={props.testId}
     >
       {isOn ? <icons.on color="primary" /> : <icons.off />}
       <Text mt={1} variant="body" color={isOn ? "primary" : "text"}>

@@ -53,6 +53,7 @@ function Header() {
           <TitleBox
             shouldFocus={sessionState === SESSION_STATES.new}
             title={title}
+            changeInterval={500}
             setTitle={(title) =>
               setSession((state) => {
                 state.session.title = title;
@@ -93,7 +94,12 @@ function Header() {
         )}
       </Flex>
       {!isFocusMode && (
-        <Flex alignItems="center" onClick={() => toggleProperties()} pr={3}>
+        <Flex
+          alignItems="center"
+          onClick={() => toggleProperties()}
+          pr={3}
+          data-test-id="properties"
+        >
           <Icon.Properties size={30} />
         </Flex>
       )}

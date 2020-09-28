@@ -27,6 +27,7 @@ function createIcon(name, rotate = false) {
         transition={{ duration: 0.3, ease: "easeOut" }}
         animate={props.animation}
         onClick={props.onClick}
+        data-test-id={props["data-test-id"]}
       >
         <Icon name={name} rotate={rotate} {...props} />
       </Animated.Box>

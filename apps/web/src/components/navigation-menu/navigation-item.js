@@ -8,6 +8,7 @@ function NavigationItem(props) {
 
   return (
     <Button
+      data-test-id={`navitem-${title.toLowerCase()}`}
       variant="icon"
       py={3}
       label={title}

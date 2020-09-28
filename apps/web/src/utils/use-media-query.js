@@ -28,11 +28,15 @@ const useMediaQuery = (mediaQuery) => {
     const mediaQueryList = window.matchMedia(mediaQuery);
     const documentChangeHandler = () => setIsVerified(!!mediaQueryList.matches);
 
-    mediaQueryList.addEventListener("change", documentChangeHandler);
+    if (mediaQueryList.addEventListener)
+      mediaQueryList.addEventListener("change", documentChangeHandler);
+    else mediaQueryList.addListener(documentChangeHandler);
 
     documentChangeHandler();
     return () => {
-      mediaQueryList.removeEventListener("change", documentChangeHandler);
+      if (mediaQueryList.removeEventListener)
+        mediaQueryList.removeEventListener("change", documentChangeHandler);
+      else mediaQueryList.removeListener(documentChangeHandler);
     };
   }, [mediaQuery]);
 

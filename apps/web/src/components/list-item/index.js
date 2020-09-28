@@ -99,6 +99,7 @@ function ListItem(props) {
           borderBottomColor: "primary",
         },
       }}
+      data-test-id={`${props.item.type}-${props.index}`}
     >
       {props.pinned && (
         <Flex
@@ -162,6 +163,7 @@ function ListItem(props) {
               overflow: "hidden",
               textOverflow: "ellipsis",
             }}
+            data-test-id={`${props.item.type}-${props.index}-title`}
           >
             {props.title}
           </Text>
@@ -178,6 +180,7 @@ function ListItem(props) {
             overflow: "hidden",
             textOverflow: "ellipsis",
           }}
+          data-test-id={`${props.item.type}-${props.index}-body`}
         >
           {props.body}
         </Text>

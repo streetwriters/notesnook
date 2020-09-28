@@ -55,7 +55,11 @@ function Header(props) {
               height={38}
               width={38}
             >
-              <Icon.ChevronLeft size={38} color="fontPrimary" />
+              <Icon.ChevronLeft
+                size={38}
+                color="fontPrimary"
+                data-test-id="go-back"
+              />
             </Box>
           ) : (
             <Icon.Menu
@@ -68,7 +72,16 @@ function Header(props) {
               size={28}
             />
           )}
-          <Heading fontSize="heading" color={"text"}>
+          <Icon.Menu
+            onClick={toggleSideMenu}
+            sx={{
+              ml: 0,
+              mr: 4,
+              display: ["block", "none", "none"],
+            }}
+            size={28}
+          />
+          <Heading data-test-id="routeHeader" fontSize="heading" color={"text"}>
             {title}
           </Heading>
         </Flex>

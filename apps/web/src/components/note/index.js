@@ -146,17 +146,18 @@ function Note(props) {
       info={
         <Flex flex="1 1 auto" justifyContent="space-between">
           <Flex variant="rowCenter">
-            {note.colors.map((item, index) => (
+            {note.colors.map((item, colorIndex) => (
               <Box
                 key={item}
                 style={{
                   width: 13,
-                  marginLeft: index ? -8 : 0,
-                  marginRight: index === note.colors.length - 1 ? 5 : 0,
+                  marginLeft: colorIndex ? -8 : 0,
+                  marginRight: colorIndex === note.colors.length - 1 ? 5 : 0,
                   height: 13,
                   backgroundColor: COLORS[item],
                   borderRadius: 100,
                 }}
+                data-test-id={`note-${index}-colors-${item}`}
               />
             ))}
             <TimeAgo datetime={note.dateCreated} />
@@ -165,6 +166,7 @@ function Note(props) {
                 size={13}
                 color={theme.colors.fontTertiary}
                 sx={{ ml: 1 }}
+                data-test-id={`note-${index}-locked`}
               />
             )}
             {note.favorite && (

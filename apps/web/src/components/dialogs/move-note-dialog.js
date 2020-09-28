@@ -46,12 +46,18 @@ class MoveDialog extends React.Component {
                 setTimeout(() => {
                   this._inputRef.focus();
                 }, 0);
+              }}  sx={{
+                display: type === "notes" ? "none" : "block",
+                ":hover": { color: "primary" },
               }} */
+
+              data-test-id="add-notebook-dialog"
             >
               Create
             </Button>
           </Flex>
           {/* <Input
+            data-test-id="notebook-name-dialog"
             ref={(ref) => (this._inputRef = ref)}
             sx={{ display: mode === "write" ? "block" : "none" }}
             my={1}

@@ -71,6 +71,7 @@ function Notebooks() {
       />
       <AddNotebookDialog
         isOpen={open}
+        edit={false}
         onDone={async (nb) => {
           await add(nb);
           setOpen(false);

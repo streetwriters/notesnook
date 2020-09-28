@@ -30,6 +30,7 @@ function PasswordDialog(props) {
     >
       <Box my={1}>
         <Input
+          data-test-id="dialog-vault-pass"
           ref={passwordRef}
           autoFocus
           variant={isWrong ? "error" : "input"}

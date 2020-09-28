@@ -96,6 +96,7 @@ function Properties() {
             >
               Properties
               <Text
+                data-test-id="properties-close"
                 as="span"
                 onClick={() => toggleProperties()}
                 sx={{
@@ -114,6 +115,7 @@ function Properties() {
                   key={tool.key}
                   toggleKey={tool.key}
                   onToggle={(state) => changeState(tool.key, state)}
+                  testId={`properties-${tool.key}`}
                 />
               ))}
             </Flex>
@@ -122,6 +124,7 @@ function Properties() {
               onClick={async () => {
                 await showMoveNoteDialog([sessionId]);
               }}
+              data-test-id="properties-add-to-nb"
             >
               {notebook ? "Move to another notebook" : "Add to notebook"}
             </Button>
@@ -155,7 +158,7 @@ function Properties() {
                     navigate(`/notebooks/${notebookData.id}/${index}`);
                   }}
                 >
-                  {notebookData.topic}
+                  {notebookData?.topic}
                 </Text>
               </Text>
             )}
@@ -168,6 +171,7 @@ function Properties() {
                   onClick={() => setColor(label)}
                   sx={{ cursor: "pointer" }}
                   mt={4}
+                  data-test-id={`properties-${label}`}
                 >
                   <Flex key={label}>
                     <Icon.Circle size={24} color={code} />
@@ -176,13 +180,18 @@ function Properties() {
                     </Text>
                   </Flex>
                   {colors.includes(label) && (
-                    <Icon.Checkmark color="primary" size={20} />
+                    <Icon.Checkmark
+                      color="primary"
+                      size={20}
+                      data-test-id={`properties-${label}-check`}
+                    />
                   )}
                 </Flex>
               ))}
             </Flex>
 
             <Input
+              data-test-id="properties-tag"
               placeholder="#tag"
               mt={4}
               onKeyUp={(event) => {
@@ -210,6 +219,7 @@ function Properties() {
             >
               {tags.map((tag) => (
                 <Text
+                  data-test-id={`properties-tag-${tag}`}
                   key={tag}
                   sx={{
                     backgroundColor: "primary",

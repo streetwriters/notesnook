@@ -7,6 +7,7 @@ function Button(props) {
   const theme = useTheme();
   return (
     <Flex
+      data-test-id={props.testId}
       bg="primary"
       width={props.width}
       py={2}

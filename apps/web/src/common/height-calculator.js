@@ -29,11 +29,11 @@ function getNotebookHeight(item) {
     height += SINGLE_LINE_HEIGHT;
   }
 
-  if (description.length > 0) {
+  if (description?.length > 0) {
     height += SINGLE_LINE_HEIGHT;
   }
 
-  if (description.length > 80) {
+  if (description?.length > 80) {
     height += SINGLE_LINE_HEIGHT;
   }
   return height * DEFAULT_FONT_SIZE;

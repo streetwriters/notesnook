@@ -37,6 +37,10 @@ function Menu(props) {
           (item) =>
             item.visible !== false && (
               <Flex
+                data-test-id={`menuitem-${item.title
+                  .split(" ")
+                  .join("")
+                  .toLowerCase()}`}
                 key={item.title}
                 onClick={(e) => {
                   e.stopPropagation();

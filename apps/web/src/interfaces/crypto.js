@@ -67,6 +67,7 @@ class CryptoWorker {
         if (_type === type && _mId === messageId) {
           this.worker.removeEventListener("message", onMessage);
           if (data.error) {
+            console.error(data.error);
             return reject(data.error);
           }
           resolve(data);

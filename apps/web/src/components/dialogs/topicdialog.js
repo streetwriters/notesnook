@@ -25,6 +25,7 @@ function TopicDialog(props) {
     >
       <Box my={1}>
         <Input
+          data-test-id="edit-topic-dialog"
           autoFocus
           ref={ref}
           placeholder="Topic title"

@@ -40,7 +40,7 @@ function ListContainer(props) {
         <>
           <Search type={props.type} query={props.query} context={context} />
           <LoginBar />
-          <Flex variant="columnFill" mt={2}>
+          <Flex variant="columnFill" mt={2} data-test-id="note-list">
             {props.children
               ? props.children
               : props.items.length > 0 && (
@@ -88,6 +88,7 @@ function ListContainer(props) {
       )}
       {props.button && (
         <Button
+          testId={`${props.type}-action-button`}
           Icon={props.button.icon || Icon.Plus}
           content={props.button.content}
           onClick={props.button.onClick}

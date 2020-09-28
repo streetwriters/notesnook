@@ -14,14 +14,12 @@ jobs:
   lint:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
+    env:
+      GH_DEPLOY_KEY: ${{ secrets.GH_DEPLOY_KEY }}
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v1
-      - name: Setup SSH
-        uses: webfactory/ssh-agent@v0.2.0
-        with:
-          ssh-private-key: ${{ secrets.GH_SSH_KEY }}
       - name: Use Node.js 12.x
         uses: actions/setup-node@v1
         with:
@@ -32,4 +30,4 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           reporter: github-pr-review
-          level: 'warning'
+          level: "warning"
