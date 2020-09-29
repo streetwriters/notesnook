@@ -5,6 +5,7 @@ import { db } from "../../common";
 import Dialog, { showDialog } from "./dialog";
 import { showNotesMovedToast } from "../../common/toasts";
 import { showToast } from "../../utils/toast";
+import { Input } from "@rebass/forms";
 
 class MoveDialog extends React.Component {
   history = [];
@@ -15,6 +16,16 @@ class MoveDialog extends React.Component {
     currentOpenedIndex: -1,
     notebooks: db.notebooks.all,
   };
+
+  async addNotebook(input) {
+    if (input.value.length > 0) {
+      await db.notebooks.add({
+        title: input.value,
+      });
+      this.setState({ notebooks: db.notebooks.all });
+      input.value = "";
+    }
+  }
 
   render() {
     const { notebooks, currentOpenedIndex } = this.state;
@@ -32,95 +43,40 @@ class MoveDialog extends React.Component {
         }}
       >
         <Box>
-          <Flex alignItems="center" justifyContent="space-between" mb={2}>
-            <Text variant="title">Notebooks</Text>
+          <Text variant="title">Notebooks</Text>
+          <Flex flexDirection="row" my={2}>
+            <Input
+              ref={(ref) => (this.inputRef = ref)}
+              data-test-id="mnd-new-notebook-title"
+              placeholder={"Enter new notebook title"}
+              onKeyUp={async (e) => {
+                if (e.key === "Enter") await this.addNotebook(e.target);
+              }}
+            />
             <Button
-              variant="anchor"
-              fontSize="body"
-              /* onClick={() => {
-                if (mode === "write") {
-                  this.setState({ mode: "read" });
-                  return;
-                }
-                this.setState({ mode: "write" });
-                setTimeout(() => {
-                  this._inputRef.focus();
-                }, 0);
-              }}  sx={{
-                display: type === "notes" ? "none" : "block",
-                ":hover": { color: "primary" },
-              }} */
-
-              data-test-id="add-notebook-dialog"
+              variant="tertiary"
+              p={1}
+              px={2}
+              ml={2}
+              onClick={async () => {
+                await this.addNotebook(this.inputRef);
+              }}
+              data-test-id="mnd-new-notebook-add"
             >
-              Create
+              <Icon.Plus size={22} />
             </Button>
           </Flex>
-          {/* <Input
-            data-test-id="notebook-name-dialog"
-            ref={(ref) => (this._inputRef = ref)}
-            sx={{ display: mode === "write" ? "block" : "none" }}
-            my={1}
-            placeholder={type === "notebooks" ? "Notebook name" : "Topic name"}
-            onKeyUp={async (e) => {
-              if (e.nativeEvent.key === "Enter" && e.target.value.length > 0) {
-                if (type === "notebooks") {
-                  await db.notebooks.add({
-                    title: e.target.value,
-                  });
-                  this.setState({ items: db.notebooks.all });
-                } else {
-                  await db.notebooks
-                    .notebook(this.selectedNotebook.id)
-                    .topics.add(e.target.value);
-                  this.setState({
-                    items: db.notebooks.notebook(this.selectedNotebook.id)
-                      .topics.all,
-                  });
-                }
-                this._inputRef.value = "";
-                this.setState({ mode: "read" });
-              }
-            }}
-          /> */}
           <Box
             sx={{
               borderWidth: 1,
               borderStyle: "solid",
               borderColor: "border",
-              maxHeight: 8 * 30,
+              maxHeight: 5 * 46,
               overflowY: "auto",
             }}
           >
             {notebooks.map((notebook, index) => (
-              <Flex
-                variant="columnFill"
-                key={notebook.id}
-                /* onClick={() => {
-                      this.history.push({
-                        title,
-                        items,
-                        type,
-                      });
-                      if (type === "notebooks") {
-                        this.setState({
-                          type: "topics",
-                          items: item.topics,
-                          title: item.title,
-                        });
-                        this.selectedNotebook = item;
-                      } else if (type === "topics") {
-                        this.setState({
-                          type: "notes",
-                          title: `${this.selectedNotebook.title} - ${item.title}`,
-                          items: db.notebooks
-                            .notebook(this.selectedNotebook.id)
-                            .topics.topic(item.title).all,
-                        });
-                        this.selectedTopic = item.title;
-                      }
-                    }} */
-              >
+              <Flex variant="columnFill" key={notebook.id}>
                 <Item
                   icon={Icon.Notebook}
                   title={notebook.title}
