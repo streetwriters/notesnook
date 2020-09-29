@@ -1,14 +1,17 @@
 /* eslint-disable no-undef */
 const { getTestId, createNote, NOTE, NOTEBOOK } = require("./utils");
+const { toMatchImageSnapshot } = require("jest-image-snapshot");
+expect.extend({ toMatchImageSnapshot });
 const {
   navigateTo,
   openContextMenu,
   useContextMenu,
   clickMenuItem,
+  confirmDialog,
 } = require("./utils/actions");
 const List = require("./utils/listitemidbuilder");
 const Menu = require("./utils/menuitemidbuilder");
-const { checkNotePresence } = require("./utils/conditions");
+const { checkNotePresence, isAbsent, isPresent } = require("./utils/conditions");
 
 beforeEach(async () => {
   page = await browser.newPage();
@@ -91,6 +94,36 @@ async function createNotebookAndCheckPresence(notebook = NOTEBOOK) {
   return await checkNotebookPresence(notebook);
 }
 
+async function deleteNotebookAndCheckAbsence(notebookSelector) {
+  await openContextMenu(notebookSelector);
+
+  await page.click(Menu.new("menuitem").item("delete").build());
+
+  await confirmDialog();
+
+  await page.waitForTimeout(500);
+
+  await expect(
+    page.$(notebookSelector)
+  ).resolves.toBeFalsy();
+
+  await navigateTo("trash");
+
+  await expect(
+    isPresent(List.new("trash").atIndex(0).build())
+  ).resolves.toBeTruthy();
+
+  await expect(
+    page.textContent(List.new("trash").atIndex(0).title().build())
+  ).resolves.toBe(NOTEBOOK.title);
+
+  await expect(
+    page.textContent(List.new("trash").atIndex(0).body().build())
+  ).resolves.toBe(NOTEBOOK.description);
+
+  await navigateTo("notebooks");
+}
+
 test("create a notebook", createNotebookAndCheckPresence);
 
 test("create a note inside a notebook", async () => {
@@ -142,4 +175,48 @@ test("edit topics individually", async () => {
       page.textContent(List.new("topic").atIndex(index).title().build())
     ).resolves.toBe(editedTopicTitle);
   }
+});
+
+test("delete a notebook", async () => {
+  const notebookSelector = await createNotebookAndCheckPresence();
+
+  await deleteNotebookAndCheckAbsence(notebookSelector);
+});
+
+test("permanently delete a notebook", async () => {
+  const notebookSelector = await createNotebookAndCheckPresence();
+
+  await deleteNotebookAndCheckAbsence(notebookSelector);
+
+  await navigateTo("trash");
+
+  await openContextMenu(List.new("trash").atIndex(0).build());
+
+  await clickMenuItem("delete");
+
+  await confirmDialog();
+
+  await expect(
+    page.$(List.new("trash").atIndex(0).build())
+  ).resolves.toBeFalsy();
+});
+
+test.only("pin a notebook", async () => {
+  const notebookSelector = await createNotebookAndCheckPresence();
+
+  await useContextMenu(notebookSelector, () => clickMenuItem("pin"));
+
+  // wait for the menu to properly close
+  await page.waitForTimeout(500);
+
+  await useContextMenu(notebookSelector, () => expect(isPresent(Menu.new("menuitem").item("unpin").build())).resolves.toBeTruthy());
+
+  // wait for the menu to properly close
+  await page.waitForTimeout(500);
+
+  const notebook = await page.$(List.new("notebook").atIndex(0).build());
+  await expect(notebook.screenshot()).resolves.toMatchImageSnapshot({
+    failureThreshold: 5,
+    failureThresholdType: "percent",
+  });
 });
