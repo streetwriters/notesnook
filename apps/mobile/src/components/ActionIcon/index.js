@@ -13,12 +13,14 @@ export const ActionIcon = ({
   iconStyle = {},
   left = 10,
   right = 10,
+  testID,
 }) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
 
   return (
     <PressableButton
+      testID={testID}
       onPress={onPress}
       hitSlop={{top: 30, left: left, right: right, bottom: 30}}
       color="transparent"

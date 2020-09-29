@@ -162,6 +162,7 @@ export const Menu = ({
         showsVerticalScrollIndicator={false}>
         {listItems.map((item, index) => (
           <MenuListItem
+            testID={item.name}
             key={item.name}
             item={item}
             index={index}
@@ -171,6 +172,7 @@ export const Menu = ({
 
         <MenuListItem
           key="Tags"
+          testID="Tags"
           noTextMode={noTextMode}
           index={10}
           item={{
@@ -201,6 +203,7 @@ export const Menu = ({
           }}>
           {listItems2.map((item, index) => (
             <MenuListItem
+              testID={item.name == "Night mode" ? "night_mode" : item.name}
               key={item.name}
               item={item}
               index={index}

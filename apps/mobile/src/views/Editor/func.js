@@ -72,7 +72,6 @@ export function checkNote() {
 
 export async function loadNote(item) {
   editing.currentlyEditing = true;
-  console.log('called');
   updateEvent({type: ACTIONS.NOTES});
   if (item && item.type === 'new') {
     await clearEditor();

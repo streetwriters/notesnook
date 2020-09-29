@@ -9,7 +9,7 @@ import { eClearSearch } from '../../services/events';
 import NavigationService from '../../services/NavigationService';
 import { PressableButton } from '../PressableButton';
 
-export const MenuListItem = ({item, index, noTextMode, ignore}) => {
+export const MenuListItem = ({item, index, noTextMode, ignore,testID}) => {
   const [state, dispatch] = useTracked();
   const {currentScreen, colors} = state;
 
@@ -32,6 +32,7 @@ export const MenuListItem = ({item, index, noTextMode, ignore}) => {
 
   return (
     <PressableButton
+      testID={testID}
       key={item.name + index}
       onPress={_onPress}
       color={

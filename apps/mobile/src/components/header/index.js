@@ -60,6 +60,7 @@ export const Header = ({showSearch, root}) => {
       <View style={styles.leftBtnContainer}>
         {!DDS.isTab ? (
           <ActionIcon
+            testID="left_menu_button"
             customStyle={styles.leftBtn}
             onPress={onLeftButtonPress}
             name={headerState.canGoBack ? 'arrow-left' : 'menu'}
