@@ -31,7 +31,7 @@ test("add note to topic", () =>
     expect(topics.all.find((v) => v.title === "Home").notes.length).toBe(1);
   }));
 
-test.only("edit topic title", () =>
+test("edit topic title", () =>
   notebookTest().then(async ({ db, id }) => {
     let topics = db.notebooks.notebook(id).topics;
 
