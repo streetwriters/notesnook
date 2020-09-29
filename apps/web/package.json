@@ -55,7 +55,7 @@
   },
   "scripts": {
     "preinstall": "chmod +x ./scripts/ci.sh && ./scripts/ci.sh",
-    "start": "PORT=3001 react-scripts start",
+    "start": "react-scripts start",
     "build": "react-scripts build",
     "debug": "BROWSER=none react-scripts start",
     "test": "BROWSER= jest --runInBand -c jest.e2e.config.js",

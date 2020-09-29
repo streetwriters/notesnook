@@ -253,6 +253,8 @@ describe.each(["independent", "sequential"])("run tests %sly", (type) => {
       });
     }
 
+    await page.waitForTimeout(500);
+
     await useContextMenu(noteSelector, async () => {
       await clickMenuItem("unfavorite");
     });
