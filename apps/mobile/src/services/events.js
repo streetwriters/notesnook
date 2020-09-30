@@ -99,3 +99,11 @@ export const eClosePendingDialog = '548';
 export const eOpenPremiumStatusDialog = '549';
 
 export const eClosePremiumStatusDialog = '550';
+
+export const eOpenProgressDialog = '551';
+
+export const eCloseProgressDialog = '552';
+
+export const eOpenRestoreDialog = '553';
+
+export const eCloseRestoreDialog = '554';

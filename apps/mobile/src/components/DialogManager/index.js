@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
 import {Platform} from 'react-native';
 import {
+  eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
   openVault,
-  eSendEvent,
 } from '../../services/eventManager';
 import {
   eCloseActionSheet,
@@ -12,17 +12,17 @@ import {
   eCloseAddTopicDialog,
   eCloseLoginDialog,
   eCloseMoveNoteDialog,
+  eClosePremiumDialog,
   eCloseSimpleDialog,
   eOnLoadNote,
   eOpenActionSheet,
   eOpenAddNotebookDialog,
   eOpenAddTopicDialog,
+  eOpenExportDialog,
   eOpenLoginDialog,
   eOpenMoveNoteDialog,
-  eOpenSimpleDialog,
   eOpenPremiumDialog,
-  eClosePremiumDialog,
-  eOpenExportDialog,
+  eOpenSimpleDialog,
 } from '../../services/events';
 import {DDS, hexToRGBA} from '../../utils/utils';
 import ActionSheet from '../ActionSheet';
@@ -30,17 +30,18 @@ import {ActionSheetComponent} from '../ActionSheetComponent';
 import {AddNotebookDialog} from '../AddNotebookDialog';
 import {AddTopicDialog} from '../AddTopicDialog';
 import {Dialog} from '../Dialog';
-import MergeEditor from '../MergeEditor';
-import {VaultDialog} from '../VaultDialog';
-import {moveNoteEvent} from './recievers';
-import {TEMPLATE_DELETE, TEMPLATE_PERMANANT_DELETE} from './templates';
-import MoveNoteDialog from '../MoveNoteDialog';
-import LoginDialog from '../LoginDialog';
-import PremiumDialog from '../Premium/PremiumDialog';
 import ExportDialog from '../ExportDialog';
-import RecoveryKeyDialog from '../RecoveryKeyDialog';
+import LoginDialog from '../LoginDialog';
+import MergeEditor from '../MergeEditor';
+import MoveNoteDialog from '../MoveNoteDialog';
 import PendingDialog from '../Premium/PendingDialog';
+import PremiumDialog from '../Premium/PremiumDialog';
 import PremiumStatusDialog from '../Premium/PremiumStatusDialog';
+import ProgressDialog from '../ProgressDialog';
+import RecoveryKeyDialog from '../RecoveryKeyDialog';
+import RestoreDialog from '../RestoreDialog';
+import {VaultDialog} from '../VaultDialog';
+import {TEMPLATE_DELETE, TEMPLATE_PERMANANT_DELETE} from './templates';
 
 export class DialogManager extends Component {
   constructor(props) {
@@ -372,6 +373,9 @@ export class DialogManager extends Component {
         <PendingDialog colors={colors} />
 
         <PremiumStatusDialog />
+        <ProgressDialog />
+
+        <RestoreDialog/>
       </>
     );
   }
