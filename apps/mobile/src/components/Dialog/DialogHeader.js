@@ -1,6 +1,7 @@
 import React from 'react';
 import {Text, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { SIZE, WEIGHT } from '../../common/common';
 import {useTracked} from '../../provider';
 
 const DialogHeader = ({icon, title, paragraph}) => {
@@ -20,7 +21,7 @@ const DialogHeader = ({icon, title, paragraph}) => {
         ) : null}
         <Text
           style={{
-            color: colors.accent,
+            color: colors.heading,
             fontFamily: WEIGHT.bold,
             marginLeft: 5,
             fontSize: SIZE.md,
