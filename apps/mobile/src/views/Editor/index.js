@@ -63,6 +63,15 @@ const Editor = ({noMenu}) => {
   }, [colors.bg]);
 
   useEffect(() => {
+    if (!DDS.isTab) return;
+    if (noMenu) {
+      post('nomenu', true);
+    } else {
+      post('nomenu', false);
+    }
+  }, [noMenu]);
+
+  useEffect(() => {
     eSubscribeEvent(eOnLoadNote, load);
     eSubscribeEvent(eCloseFullscreenEditor, closeFullscreen);
     eSubscribeEvent(eClearEditor, onCallClear);
@@ -166,17 +175,46 @@ const Editor = ({noMenu}) => {
           height: '100%',
           width: '100%',
         }}>
+        {noMenu ? (
+          <View />
+        ) : (
+          <ActionIcon
+            name="arrow-left"
+            color={colors.heading}
+            onPress={_onBackPress}
+            iconStyle={{
+              textVerticalAlign: 'center',
+            }}
+            customStyle={{
+              marginLeft: -5,
+              position: 'absolute',
+              marginTop:
+                Platform.OS === 'ios' ? 0 : StatusBar.currentHeight + 5,
+              zIndex: 11,
+              left: 0,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          />
+        )}
+
         <View
           style={{
-            marginTop: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight,
             flexDirection: 'row',
-            width: '100%',
+            width: DDS.isTab ? '30%' : '100%',
             height: 50,
             justifyContent: 'space-between',
             alignItems: 'center',
             paddingHorizontal: 12,
+            position: DDS.isTab ? 'absolute' : 'relative',
+            backgroundColor: colors.bg,
+            right: 0,
+            marginTop: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight,
+            zIndex: 10,
           }}>
-          {noMenu ? null : (
+          {DDS.isTab ? (
+            <View />
+          ) : (
             <ActionIcon
               name="arrow-left"
               color={colors.heading}
@@ -303,6 +341,7 @@ const Editor = ({noMenu}) => {
             maxHeight: '100%',
             width: '100%',
             backgroundColor: 'transparent',
+            marginTop: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight,
           }}
           onMessage={_onMessage}
         />

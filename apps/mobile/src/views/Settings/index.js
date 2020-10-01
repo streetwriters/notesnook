@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import RNFetchBlob from 'rn-fetch-blob';
 import {
   ACCENT,
   COLOR_SCHEME,
@@ -30,19 +31,24 @@ import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
 import {eSendEvent} from '../../services/eventManager';
 import {
+  eCloseProgressDialog,
   eOpenLoginDialog,
   eOpenPremiumDialog,
+  eOpenProgressDialog,
   eOpenRecoveryKeyDialog,
+  eOpenRestoreDialog,
   eResetApp,
 } from '../../services/events';
 import NavigationService from '../../services/NavigationService';
-import {MMKV} from '../../utils/storage';
+import storage, {MMKV} from '../../utils/storage';
 import {
   db,
   DDS,
   hexToRGBA,
+  requestStoragePermission,
   RGB_Linear_Shade,
   setSetting,
+  sleep,
   ToastEvent,
   w,
 } from '../../utils/utils';
@@ -131,6 +137,60 @@ export const Settings = ({route, navigation}) => {
       {title}
     </Text>
   );
+
+  const backupItemsList = [
+    {
+      name: 'Backup data',
+      func: async () => {
+        let granted = requestStoragePermission();
+        if (!granted) {
+          ToastEvent.show('Backup failed! Storage access was denied.');
+          return;
+        }
+
+        eSendEvent(eOpenProgressDialog, {
+          title: 'Backing up your data',
+          paragraph:
+            "All your backups are stored in 'Phone Storage/Notesnook/backups' folder",
+        });
+        let backup = await db.backup.export();
+        let backupName =
+          'notesnook_backup_' + new Date().toString() + '.nnbackup';
+        let path = RNFetchBlob.fs.dirs.SDCardDir + '/Notesnook/backups/';
+        await storage.checkAndCreateDir(path);
+        await RNFetchBlob.fs.writeFile(path + backupName, backup, 'utf8');
+
+        await sleep(2000);
+        eSendEvent(eCloseProgressDialog);
+        ToastEvent.show('Backup complete!', 'success');
+        //Linking.openURL('https://www.notesnook.com/privacy.html');
+      },
+      desc: 'Backup all your data to phone storage',
+    },
+    {
+      name: 'Restore backup',
+      func: () => {
+        eSendEvent(eOpenRestoreDialog);
+      },
+      desc: 'Restore backup from your phone.',
+    },
+  ];
+
+  const switchTheme = async () => {
+    await setSetting(settings, 'useSystemTheme', !settings.useSystemTheme);
+
+    if (!settings.useSystemTheme) {
+      MMKV.setStringAsync(
+        'theme',
+        JSON.stringify({night: Appearance.getColorScheme() === 'dark'}),
+      );
+      changeColorScheme(
+        Appearance.getColorScheme() === 'dark'
+          ? COLOR_SCHEME_DARK
+          : COLOR_SCHEME_LIGHT,
+      );
+    }
+  };
 
   const CustomButton = ({title, tagline, customComponent, onPress}) => (
     <PressableButton
@@ -462,8 +522,8 @@ export const Settings = ({route, navigation}) => {
                 alignItems: 'center',
                 marginHorizontal: 5,
                 marginVertical: 5,
-                width: w / 5 - 35,
-                height: w / 5 - 35,
+                width: DDS.isTab ? (w * 0.28) / 5 - 35 : w / 5 - 35,
+                height: DDS.isTab ? (w * 0.28) / 5 - 35 : w / 5 - 35,
                 borderRadius: 100,
                 justifyContent: 'center',
                 alignItems: 'center',
@@ -482,25 +542,7 @@ export const Settings = ({route, navigation}) => {
               ? 'Switch to dark theme based on system settings'
               : 'Keep the app theme independent from system settings'
           }
-          onPress={async () => {
-            await setSetting(
-              settings,
-              'useSystemTheme',
-              !settings.useSystemTheme,
-            );
-
-            if (!settings.useSystemTheme) {
-              MMKV.setStringAsync(
-                'theme',
-                JSON.stringify({night: Appearance.getColorScheme() === 'dark'}),
-              );
-              changeColorScheme(
-                Appearance.getColorScheme() === 'dark'
-                  ? COLOR_SCHEME_DARK
-                  : COLOR_SCHEME_LIGHT,
-              );
-            }
-          }}
+          onPress={switchTheme}
           customComponent={
             <Icon
               size={SIZE.xl}
@@ -645,22 +687,7 @@ export const Settings = ({route, navigation}) => {
 
         <SectionHeader title="Backup & Restore" />
 
-        {[
-          {
-            name: 'Backup data',
-            func: () => {
-              Linking.openURL('https://www.notesnook.com/privacy.html');
-            },
-            desc: 'Backup all your data to phone storage',
-          },
-          {
-            name: 'Restore data',
-            func: () => {
-              Linking.openURL('https://www.notesnook.com');
-            },
-            desc: 'Restore backup from your phone.',
-          },
-        ].map((item) => (
+        {backupItemsList.map((item) => (
           <CustomButton
             key={item.name}
             title={item.name}
@@ -686,13 +713,13 @@ export const Settings = ({route, navigation}) => {
               textAlignVertical: 'center',
               color: colors.pri,
             }}>
-            Backup reminder{'\n'}
+            Auto Backup{'\n'}
             <Text
               style={{
                 fontSize: SIZE.xs,
                 color: colors.icon,
               }}>
-              Remind you to backup data.
+              Backup your data automatically.
             </Text>
           </Text>
 
@@ -747,7 +774,7 @@ export const Settings = ({route, navigation}) => {
           title="Encrypted Backups"
           tagline="Encrypt your data before backup"
           onPress={async () => {
-            if (!user) {
+            if (!user || !user.id) {
               ToastEvent.show(
                 'You must login to enable encryption',
                 'error',

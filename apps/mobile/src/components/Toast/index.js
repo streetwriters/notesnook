@@ -6,7 +6,7 @@ import {SIZE} from '../../common/common';
 import {useTracked} from '../../provider';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
 import {eHideToast, eShowToast} from '../../services/events';
-import {getElevation} from '../../utils/utils';
+import {DDS, getElevation, sleep} from '../../utils/utils';
 const {spring, timing} = Animated;
 
 const toastMessages = [];
@@ -91,7 +91,9 @@ export const Toast = ({context = 'global'}) => {
         toValue: 300,
         duration: 200,
         easing: Easing.inOut(Easing.ease),
-      }).start(() => {
+      }).start(async () => {
+        await sleep(300);
+        console.log(toastMessages);
         toastMessages.shift();
         setData({});
       });
@@ -99,11 +101,11 @@ export const Toast = ({context = 'global'}) => {
   };
 
   const _onKeyboardShow = () => {
-    //setKeyboard(true);
+    setKeyboard(true);
   };
 
   const _onKeyboardHide = () => {
-    //setKeyboard(false);
+    setKeyboard(false);
   };
 
   useEffect(() => {
@@ -115,16 +117,17 @@ export const Toast = ({context = 'global'}) => {
     return () => {
       Keyboard.removeListener('keyboardDidShow', _onKeyboardShow);
       Keyboard.removeListener('keyboardDidHide', _onKeyboardHide);
-      eUnSubscribeEvent('showToast', showToastFunc);
-      eUnSubscribeEvent('hideToast', hideToastFunc);
+      eUnSubscribeEvent(eShowToast, showToastFunc);
+      eUnSubscribeEvent(eHideToast, hideToastFunc);
     };
   }, []);
 
   return (
     <Animated.View
       style={{
-        width: '100%',
+        width: DDS.isTab ? '30%' : '100%',
         alignItems: 'center',
+        alignSelf:'center',
         minHeight: 30,
         bottom: keyboard ? 30 : 100,
         position: 'absolute',

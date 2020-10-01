@@ -5,6 +5,7 @@ import * as React from 'react';
 import Container from '../components/Container';
 import {Menu} from '../components/Menu';
 import {rootNavigatorRef, sideMenuRef} from '../utils/refs';
+import {DDS, w} from '../utils/utils';
 import Favorites from '../views/Favorites';
 import Folders from '../views/Folders';
 import Home from '../views/Home/index';
@@ -60,6 +61,7 @@ const DrawerComponent = (props) => {
     <Menu
       menuProps={props}
       hide={false}
+      noTextMode={DDS.isTab}
       close={() => NavigationService.closeDrawer()}
     />
   );
@@ -91,8 +93,12 @@ export const NavigationStack = ({component = MainComponent}) => {
         screenOptions={{
           swipeEnabled: locked ? false : true,
         }}
+        drawerStyle={{
+          width:DDS.isTab? w *0.04 : null,
+          borderRightColor:'#f0f0f0'
+        }}
         edgeWidth={200}
-        drawerType="slide"
+        drawerType={DDS.isTab ? 'permanent' : 'slide'}
         drawerContent={DrawerComponent}
         initialRouteName="Main">
         <Drawer.Screen name="Main" component={component} />

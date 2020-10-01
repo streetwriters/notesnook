@@ -5,7 +5,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {SIZE, WEIGHT} from '../../common/common';
 import {eSendEvent} from '../../services/eventManager';
 import {eOpenLoginDialog, eOpenPendingDialog} from '../../services/events';
-import {db, h, itemSkus, ToastEvent, w} from '../../utils/utils';
+import {db, DDS, h, itemSkus, ToastEvent, w} from '../../utils/utils';
 import ActionSheet from '../ActionSheet';
 import {Button} from '../Button';
 import Seperator from '../Seperator';
@@ -66,16 +66,30 @@ class PremiumDialog extends React.Component {
       <ActionSheet
         containerStyle={{
           backgroundColor: colors.bg,
-          width: '100%',
+          width: DDS.isTab ? 500 : '100%',
           alignSelf: 'center',
           borderRadius: 10,
+        
+          marginBottom: DDS.isTab ? 50 : 0,
         }}
+        extraScroll={DDS.isTab ? 50 : 0}
+        gestureEnabled={true}
+        footerAlwaysVisible={DDS.isTab}
+        footerHeight={DDS.isTab ? 20 : 10}
+        footerStyle={
+          DDS.isTab
+            ? {
+                borderRadius: 10,
+                backgroundColor: colors.bg,
+              }
+            : null
+        }
         gestureEnabled={true}
         ref={this.actionSheetRef}
         initialOffsetFromBottom={1}>
         <View
           style={{
-            width: w,
+            width: DDS.isTab ? 500 : w,
             backgroundColor: colors.bg,
             justifyContent: 'space-between',
             paddingHorizontal: 12,
@@ -97,7 +111,7 @@ class PremiumDialog extends React.Component {
           <ScrollView
             style={{
               width: '100%',
-              maxHeight: h * 0.5,
+              maxHeight:DDS.isTab? h * 0.35 : h * 0.5,
             }}
             nestedScrollEnabled={true}
             showsVerticalScrollIndicator={false}>

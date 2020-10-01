@@ -38,7 +38,7 @@ export const Initialize = () => {
   return (
     <>
       <Animatable.View
-        testID={"mobile_main_view"}
+        testID={'mobile_main_view'}
         transition="backgroundColor"
         duration={300}
         style={{

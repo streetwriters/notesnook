@@ -74,7 +74,7 @@ const LoginDialog = () => {
     _pass.current?.clear();
     _passConfirm.current?.clear();
     _username.current?.clear();
-    
+
     setVisible(false);
     setUsername(null);
     setPassword(null);
@@ -85,7 +85,6 @@ const LoginDialog = () => {
     setUserConsent(false);
     setEmail(false);
     setLoggingIn(false);
- 
   };
 
   const loginUser = async () => {
@@ -135,7 +134,6 @@ const LoginDialog = () => {
       setLoggingIn(false);
     }
   };
-  
 
   const validateInfo = () => {
     if (!password || !email || !username || !passwordReEnter) {
@@ -203,7 +201,7 @@ const LoginDialog = () => {
   return (
     <Modal
       animated={true}
-      animationType="slide"
+      animationType={DDS.isTab ? 'fade' : 'slide'}
       statusBarTranslucent={true}
       onRequestClose={close}
       visible={visible}
@@ -212,7 +210,7 @@ const LoginDialog = () => {
         style={{
           opacity: 1,
           flex: 1,
-          paddingTop: insets.top,
+          paddingTop: DDS.isTab ? 0 : insets.top,
           backgroundColor: DDS.isTab ? 'rgba(0,0,0,0.3)' : colors.bg,
           width: '100%',
           height: '100%',
@@ -233,10 +231,12 @@ const LoginDialog = () => {
         ) : null}
         <View
           style={{
-            height: '100%',
-            width: '100%',
+            height: DDS.isTab ? (login ? '70%' : '80%') : '100%',
+            width: DDS.isTab ? 500 : '100%',
             backgroundColor: colors.bg,
             justifyContent: 'center',
+            borderRadius: DDS.isTab ? 5 : 0,
+            zIndex: 10,
           }}>
           <Toast context="local" />
           {loggingIn || signingIn ? (
@@ -355,23 +355,26 @@ const LoginDialog = () => {
             )
           ) : (
             <>
-              <Icon
-                name="arrow-left"
-                size={SIZE.xxxl}
-                onPress={() => {
-                  close();
-                }}
-                style={{
-                  width: 50,
-                  height: 50,
-                  marginLeft: 12,
-                  position: 'absolute',
-                  textAlignVertical: 'center',
-                  top: 0,
-                  marginBottom: 15,
-                }}
-                color={colors.heading}
-              />
+              {DDS.isTab ? null : (
+                <Icon
+                  name="arrow-left"
+                  size={SIZE.xxxl}
+                  onPress={() => {
+                    close();
+                  }}
+                  style={{
+                    width: 50,
+                    height: 50,
+                    marginLeft: 12,
+                    position: 'absolute',
+                    textAlignVertical: 'center',
+                    top: 0,
+                    marginBottom: 15,
+                  }}
+                  color={colors.heading}
+                />
+              )}
+
               <View
                 style={{
                   justifyContent: 'center',
@@ -781,6 +784,7 @@ const LoginDialog = () => {
                     style={{
                       flexDirection: 'row',
                       width: '100%',
+                      alignItems: 'center',
                     }}>
                     <CheckBox
                       onValueChange={(value) => {
@@ -837,8 +841,8 @@ const LoginDialog = () => {
                   activeOpacity={opacity}
                   style={{
                     alignSelf: 'center',
-                    marginTop: 70,
-                    height: 50,
+                    marginTop: DDS.isTab ? 35 : 70,
+                    height: DDS.isTab ? null : 50,
                   }}>
                   <Text
                     style={{

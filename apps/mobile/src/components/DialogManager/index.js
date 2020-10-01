@@ -282,8 +282,7 @@ export class DialogManager extends Component {
           containerStyle={{
             backgroundColor: colors.bg,
             width: DDS.isTab ? 500 : '100%',
-            alignSelf: DDS.isTab ? 'flex-end' : 'center',
-            marginRight: DDS.isTab ? 12 : null,
+            alignSelf:'center',
             borderRadius: 10,
             marginBottom: DDS.isTab ? 50 : 0,
           }}

@@ -1,19 +1,20 @@
 import React from 'react';
-import { Text, View } from 'react-native';
+import {Text, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { SIZE, WEIGHT } from '../../common/common';
-import { useTracked } from '../../provider';
-import { ACTIONS } from '../../provider/actions';
-import { eSendEvent } from '../../services/eventManager';
-import { eClearSearch } from '../../services/events';
+import {SIZE, WEIGHT} from '../../common/common';
+import {useTracked} from '../../provider';
+import {ACTIONS} from '../../provider/actions';
+import {eSendEvent} from '../../services/eventManager';
+import {eClearSearch} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
-import { PressableButton } from '../PressableButton';
+import {DDS, showContext} from '../../utils/utils';
+import {PressableButton} from '../PressableButton';
 
-export const MenuListItem = ({item, index, noTextMode, ignore,testID}) => {
+export const MenuListItem = ({item, index, noTextMode, ignore, testID}) => {
   const [state, dispatch] = useTracked();
   const {currentScreen, colors} = state;
 
-  const _onPress = () => {
+  const _onPress = (event) => {
     if (!ignore) {
       dispatch({
         type: ACTIONS.HEADER_TEXT_STATE,
@@ -35,6 +36,10 @@ export const MenuListItem = ({item, index, noTextMode, ignore,testID}) => {
       testID={testID}
       key={item.name + index}
       onPress={_onPress}
+      onLongPress={(event) => {
+        console.log(event.nativeEvent);
+        showContext(event, item.name);
+      }}
       color={
         currentScreen === item.name.toLowerCase() ? colors.shade : 'transparent'
       }
@@ -49,7 +54,7 @@ export const MenuListItem = ({item, index, noTextMode, ignore,testID}) => {
         paddingHorizontal: noTextMode ? 0 : 8,
         justifyContent: noTextMode ? 'center' : 'space-between',
         alignItems: 'center',
-        height:50
+        height: 50,
       }}>
       <View
         style={{
@@ -64,7 +69,7 @@ export const MenuListItem = ({item, index, noTextMode, ignore,testID}) => {
           }}
           name={item.icon}
           color={colors.accent}
-          size={SIZE.md + 1}
+          size={DDS.isTab ? SIZE.md + 5 : SIZE.md + 1}
         />
         {noTextMode ? null : (
           <Text

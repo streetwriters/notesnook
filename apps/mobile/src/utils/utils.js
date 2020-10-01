@@ -57,6 +57,16 @@ export const history = {
   selectedItemsList: [],
 };
 
+export async function showContext(event, title) {
+  eSendEvent('showContextMenu', {
+    location: {
+      x: event.nativeEvent.pageX + 50,
+      y: event.nativeEvent.pageY - 10,
+    },
+    title: title,
+  });
+}
+
 export async function requestStoragePermission() {
   let granted = false;
   try {

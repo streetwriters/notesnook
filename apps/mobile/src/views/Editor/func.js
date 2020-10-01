@@ -262,13 +262,12 @@ export async function onWebViewLoad(noMenu, premium, colors) {
 }
 
 const loadNoteInEditor = async () => {
-  title = note.title;
-  id = note.id;
   saveCounter = 0;
   content = {};
   content.text = '';
-
-  if (note.id) {
+  if (note?.id) {
+    title = note.title;
+    id = note.id;
     content.text = await db.notes.note(id).text();
     post('dateEdited', timeConverter(note.dateEdited));
     await sleep(50);

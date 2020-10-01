@@ -24,7 +24,7 @@ const DialogHeader = ({icon, title, paragraph}) => {
             color: colors.heading,
             fontFamily: WEIGHT.bold,
             marginLeft: 5,
-            fontSize: SIZE.md,
+            fontSize: SIZE.lg,
           }}>
           {title}
         </Text>

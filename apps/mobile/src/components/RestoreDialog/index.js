@@ -1,14 +1,14 @@
 import React, {useEffect, useState} from 'react';
-import {Dimensions, Text, View, FlatList} from 'react-native';
+import {FlatList, Text, View} from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import RNFetchBlob from 'rn-fetch-blob';
 import {ph, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
+import {ACTIONS} from '../../provider/actions';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
-import {
-  eCloseProgressDialog,
-  eCloseRestoreDialog,
-  eOpenProgressDialog,
-  eOpenRestoreDialog,
-} from '../../services/events';
+import {eCloseRestoreDialog, eOpenRestoreDialog} from '../../services/events';
+import storage from '../../utils/storage';
 import {
   db,
   getElevation,
@@ -16,23 +16,18 @@ import {
   sleep,
   ToastEvent,
 } from '../../utils/utils';
-import BaseDialog from '../Dialog/base-dialog';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import RNFetchBlob from 'rn-fetch-blob';
-import storage from '../../utils/storage';
-import {PressableButton} from '../PressableButton';
 import {Button} from '../Button';
+import BaseDialog from '../Dialog/base-dialog';
 import {Loading} from '../Loading';
-import {ACTIONS} from '../../provider/actions';
 
 const RestoreDialog = () => {
   const [state, dispatch] = useTracked();
   const {colors, tags, premiumUser} = state;
-  const [visible, setVisible] = useState(true);
+  const [visible, setVisible] = useState(false);
   const [files, setFiles] = useState([]);
   const [restoring, setRestoring] = useState(false);
   const insets = useSafeAreaInsets();
+
   useEffect(() => {
     eSubscribeEvent(eOpenRestoreDialog, open);
     eSubscribeEvent(eCloseRestoreDialog, close);
@@ -55,6 +50,11 @@ const RestoreDialog = () => {
       animation="slide"
       visible={visible}
       onShow={async () => {
+        let granted = await requestStoragePermission();
+        if (!granted) {
+          ToastEvent.show('Storage permission required to check for backups.');
+          return;
+        }
         await storage.checkAndCreateDir(
           RNFetchBlob.fs.dirs.SDCardDir + '/Notesnook/backups',
         );
@@ -74,7 +74,7 @@ const RestoreDialog = () => {
           backgroundColor: colors.bg,
           paddingHorizontal: 12,
           paddingVertical: 20,
-          paddingTop: insets.top,
+          paddingTop: 0,
         }}>
         <BaseDialog visible={restoring}>
           <View
@@ -107,6 +107,7 @@ const RestoreDialog = () => {
             justifyContent: 'center',
             alignItems: 'center',
             height: 50,
+            marginTop: insets.top,
           }}>
           <Icon
             name="close"
@@ -230,8 +231,8 @@ const RestoreDialog = () => {
                   await sleep(2000);
                   setRestoring(false);
                   dispatch({type: ACTIONS.ALL});
-				  ToastEvent.show('Restore Complete!', 'success');
-				  setVisible(false);
+                  ToastEvent.show('Restore Complete!', 'success');
+                  setVisible(false);
                 }}
               />
             </View>

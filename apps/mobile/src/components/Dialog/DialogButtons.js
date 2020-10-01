@@ -13,8 +13,9 @@ const DialogButtons = ({
   return (
     <View
       style={styles.container}>
+
+      <Button onPress={onPressNegative} grayed title={negativeTitle} />
       <Button onPress={onPressPositive} title={positiveTitle} />
-      <Button onPress={onPressNegative} title={negativeTitle} />
     </View>
   );
 };

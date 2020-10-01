@@ -22,7 +22,7 @@ export const Loading = ({
             style={[
               {color: colors.icon},
               styles.activityText,
-              {fontSize: SIZE.xs},
+              {fontSize: SIZE.xs,fontFamily:WEIGHT.regular},
             ]}>
             {doneText}
           </Text>
@@ -67,5 +67,6 @@ const styles = StyleSheet.create({
     fontFamily: WEIGHT.medium,
     color: 'white',
     fontSize: SIZE.sm,
+    
   },
 });

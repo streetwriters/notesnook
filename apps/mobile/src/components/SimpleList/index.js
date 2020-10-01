@@ -42,6 +42,7 @@ const SimpleList = ({
   );
   const insets = useSafeAreaInsets();
   const listData = data;
+  const dataType = type;
   const _onScroll = (event) => {
     if (!event) return;
     let y = event.nativeEvent.contentOffset.y;
@@ -64,24 +65,6 @@ const SimpleList = ({
       }).cloneWithRows(d),
     );
   }, [listData]);
-
-  const _ListFooterComponent = listData[0] ? (
-    <View
-      style={{
-        height: 150,
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}>
-      <Text
-        style={{
-          color: colors.nav,
-          fontSize: SIZE.sm,
-          fontFamily: WEIGHT.regular,
-        }}>
-        - End -
-      </Text>
-    </View>
-  ) : null;
 
   const RenderSectionHeader = ({item}) => (
     <Text
@@ -191,7 +174,7 @@ const SimpleList = ({
       case 'note':
         return <RenderItem item={data} pinned={data.pinned} index={index} />;
       case 'MAIN_HEADER':
-        return <ListHeaderComponent type={type} data={listData} />;
+        return <ListHeaderComponent type={dataType} data={listData} />;
       case 'header':
         return <RenderSectionHeader item={data} />;
 
