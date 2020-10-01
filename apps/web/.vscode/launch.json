@@ -13,7 +13,7 @@
       "url": "http://localhost:3000",
       "webRoot": "${workspaceFolder}",
       "env": { "DISPLAY": ":0" },
-      "runtimeExecutable": "/usr/bin/brave-beta",
+      "runtimeExecutable": "/usr/bin/brave-browser",
       "runtimeArgs": ["--remote-debugging-port=9222"]
     }
   ]

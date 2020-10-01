@@ -58,7 +58,11 @@ class Body {
 
 class SubBody {
   constructor() {
-    return { variant: "text.default", fontSize: "subBody" };
+    return {
+      variant: "text.default",
+      fontSize: "subBody",
+      color: "fontTertiary",
+    };
   }
 }
 

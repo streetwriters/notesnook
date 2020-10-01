@@ -5,7 +5,7 @@ class StaticColorSchemeFactory {
     return {
       shade: hexToRGB(accent, 0.1),
       dimPrimary: hexToRGB(accent, 0.7),
-      fontTertiary: "gray",
+      fontTertiary: "#5b5b5b",
       transparent: "transparent",
       static: "white",
       error: "#E53935",

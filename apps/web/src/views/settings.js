@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Box, Button, Flex, Text } from "rebass";
 import * as Icon from "../components/icons";
 import { useStore as useUserStore } from "../stores/user-store";
@@ -7,10 +7,17 @@ import AccentItem from "../components/accent-item";
 import accents from "../theme/accents";
 import { showLogInDialog } from "../components/dialogs/logindialog";
 import { upgrade } from "../common/upgrade";
+import useSystemTheme from "../utils/use-system-theme";
 
 function Settings(props) {
   const theme = useThemeStore((store) => store.theme);
   const toggleNightMode = useThemeStore((store) => store.toggleNightMode);
+  const setTheme = useThemeStore((store) => store.setTheme);
+
+  const preferSystemTheme = useThemeStore((store) => store.preferSystemTheme);
+  const togglePreferSystemTheme = useThemeStore(
+    (store) => store.togglePreferSystemTheme
+  );
   const user = useUserStore((store) => store.user);
   const isLoggedIn = useUserStore((store) => store.isLoggedIn);
   const isTrial = useUserStore(
@@ -18,8 +25,14 @@ function Settings(props) {
   );
   const logout = useUserStore((store) => store.logout);
 
+  const isSystemThemeDark = useSystemTheme();
+  useEffect(() => {
+    if (!preferSystemTheme) return;
+    setTheme(isSystemThemeDark ? "dark" : "light");
+  }, [preferSystemTheme, isSystemThemeDark, setTheme]);
+
   return (
-    <Flex variant="columnFill" mx={2}>
+    <Flex variant="columnFill" px={2} sx={{ overflowY: "auto" }}>
       {isLoggedIn && (
         <Text mb={2} variant="subtitle" color="primary">
           Account Settings
@@ -48,12 +61,12 @@ function Settings(props) {
               variant="columnCenter"
               bg="primary"
               mr={2}
-              size={40}
+              size={35}
               sx={{
                 borderRadius: 80,
               }}
             >
-              <Icon.User color="static" />
+              <Icon.User size={20} color="static" />
             </Flex>
             <Flex variant="columnCenter" alignItems="flex-start">
               {isLoggedIn ? (
@@ -64,14 +77,14 @@ function Settings(props) {
               ) : (
                 <>
                   <Text variant="subBody">You are not logged in</Text>
-                  <Text variant="body" color="primary">
-                    Login to sync your data
+                  <Text variant="body" color="primary" fontSize={14}>
+                    Login to sync your notes
                   </Text>
                 </>
               )}
             </Flex>
           </Flex>
-          {isLoggedIn && (
+          {isLoggedIn ? (
             <Text
               bg="primary"
               sx={{ borderRadius: "default" }}
@@ -82,6 +95,8 @@ function Settings(props) {
             >
               {!isTrial ? "Pro" : "Trial"}
             </Text>
+          ) : (
+            <Icon.ChevronRight size={20} color="primary" />
           )}
         </Flex>
       </Flex>
@@ -95,47 +110,74 @@ function Settings(props) {
           Logout
         </Button>
       )}
-      <Text my={2} variant="subtitle" color="primary">
+      <Text
+        variant="subtitle"
+        color="primary"
+        py={1}
+        sx={{ borderBottom: "1px solid", borderBottomColor: "border" }}
+      >
         Appearance
       </Text>
-      <Box
+      <TextWithTip
+        text="Accent color"
+        tip="Choose a color to use as accent color"
+        sx={{ py: 2 }}
+      />
+      <Flex
+        flexWrap="wrap"
+        justifyContent="left"
         sx={{
-          borderBottom: "1px Solid",
-          borderColor: "border",
-          ":hover": { borderColor: "primary" },
+          borderRadius: "default",
         }}
       >
-        <Flex
-          flexWrap="wrap"
-          justifyContent="left"
-          mb={2}
-          p={1}
-          bg="shade"
-          sx={{
-            borderRadius: "default",
-          }}
-        >
-          {accents.map((color) => (
-            <AccentItem
-              key={color.code}
-              code={color.code}
-              label={color.label}
-            />
-          ))}
-        </Flex>
-        <Flex
-          justifyContent="space-between"
-          alignItems="center"
-          onClick={() => toggleNightMode()}
-          py={2}
-        >
-          <Text color="text" fontSize="body">
-            Dark Mode
-          </Text>
-          {theme === "dark" ? <Icon.Check /> : <Icon.CircleEmpty />}
-        </Flex>
-      </Box>
-      <Text my={2} variant="subtitle" color="primary">
+        {accents.map((color) => (
+          <AccentItem key={color.code} code={color.code} label={color.label} />
+        ))}
+      </Flex>
+      <ToggleItem
+        title="Dark mode"
+        onTip="Dark mode is on"
+        offTip="Dark mode is off"
+        onToggled={toggleNightMode}
+        isToggled={theme === "dark"}
+        onlyIf={!preferSystemTheme}
+      />
+      <ToggleItem
+        title="Follow system theme"
+        onTip="Switch app theme according to system"
+        offTip="Keep app theme independent"
+        onToggled={togglePreferSystemTheme}
+        isToggled={preferSystemTheme}
+      />
+
+      <Text
+        variant="subtitle"
+        color="primary"
+        sx={{ pb: 1, borderBottom: "1px solid", borderBottomColor: "border" }}
+      >
+        {"Backup & Restore"}
+      </Text>
+      <Button variant="list">
+        <TextWithTip text="Backup data" tip="Download all your data" />
+      </Button>
+      <Button variant="list">
+        <TextWithTip
+          text="Restore backup"
+          tip="Restore data from a backup file"
+        />
+      </Button>
+
+      <ToggleItem
+        title="Encrypt backups"
+        onTip="All backups will be encrypted"
+        offTip="Backups will not be encrypted"
+      />
+
+      <Text
+        variant="subtitle"
+        color="primary"
+        sx={{ pb: 1, borderBottom: "1px solid", borderBottomColor: "border" }}
+      >
         Other
       </Text>
       {["Terms of Service", "Privacy Policy", "About"].map((title) => (
@@ -156,3 +198,35 @@ function Settings(props) {
 }
 
 export default Settings;
+
+function TextWithTip({ text, tip, sx }) {
+  return (
+    <Text color="text" fontSize="body" sx={sx}>
+      {text}
+      <Text color="fontTertiary" fontSize="subBody">
+        {tip}
+      </Text>
+    </Text>
+  );
+}
+
+function ToggleItem(props) {
+  const { title, onTip, offTip, isToggled, onToggled, onlyIf } = props;
+
+  if (onlyIf === false) return null;
+  return (
+    <Flex
+      justifyContent="space-between"
+      alignItems="center"
+      onClick={onToggled}
+      py={2}
+    >
+      <TextWithTip text={title} tip={isToggled ? onTip : offTip} />
+      {isToggled ? (
+        <Icon.ToggleChecked size={30} color="primary" />
+      ) : (
+        <Icon.ToggleUnchecked size={30} />
+      )}
+    </Flex>
+  );
+}

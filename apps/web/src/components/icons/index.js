@@ -21,13 +21,14 @@ function createIcon(name, rotate = false) {
   return function (props) {
     return (
       <Animated.Box
-        sx={props.sx}
+        variant={props.variant}
         height={(props.size || 24) + "px"}
         whileHover={{ scale: 1.1 }}
         transition={{ duration: 0.3, ease: "easeOut" }}
         animate={props.animation}
         onClick={props.onClick}
         data-test-id={props["data-test-id"]}
+        sx={props.sx}
       >
         <Icon name={name} rotate={rotate} {...props} />
       </Animated.Box>
@@ -39,6 +40,7 @@ export const Plus = createIcon(Icons.mdiPlus);
 export const Minus = createIcon(Icons.mdiMinus);
 export const Notebook = createIcon(Icons.mdiBookOutline);
 export const ArrowLeft = createIcon(Icons.mdiArrowLeft);
+export const ArrowRight = createIcon(Icons.mdiArrowRight);
 export const Move = createIcon(Icons.mdiBookPlusMultipleOutline);
 export const Topic = createIcon(Icons.mdiFormatTitle);
 export const Alert = createIcon(Icons.mdiAlert);
@@ -69,6 +71,7 @@ export const AddToNotebook = createIcon(Icons.mdiBookPlusMultipleOutline);
 
 /** Properties Icons */
 export const ChevronLeft = createIcon(Icons.mdiChevronLeft);
+export const ChevronRight = createIcon(Icons.mdiChevronRight);
 export const Close = createIcon(Icons.mdiClose);
 export const Tag = createIcon(Icons.mdiTagTextOutline);
 export const Pin = createIcon(Icons.mdiPinOutline);
@@ -94,3 +97,6 @@ export const Success = createIcon(Icons.mdiCheckCircle);
 export const Error = createIcon(Icons.mdiAlertCircle);
 export const Warn = createIcon(Icons.mdiAlert);
 export const Info = createIcon(Icons.mdiInformation);
+
+export const ToggleUnchecked = createIcon(Icons.mdiToggleSwitchOff);
+export const ToggleChecked = createIcon(Icons.mdiToggleSwitch);
