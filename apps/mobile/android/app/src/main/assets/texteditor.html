@@ -1302,8 +1302,10 @@
             type: 'title',
             value: document.getElementById('titleInput').value
           }
-
-          window.ReactNativeWebView?.postMessage(JSON.stringify(titleMessage));
+          if (titleMessage && typeof titleMessage === 'string') {
+            window.ReactNativeWebView.postMessage(JSON.stringify(titleMessage));
+          }
+          
         }
 
         document.getElementById('titleInput').onkeyup = function (evt) {
@@ -1313,7 +1315,9 @@
             value: document.getElementById('titleInput').value
           }
 
-          window.ReactNativeWebView?.postMessage(JSON.stringify(titleMessage));
+          if (titleMessage && typeof titleMessage === 'string') {
+            window.ReactNativeWebView.postMessage(JSON.stringify(titleMessage));
+          }
         }
         function onChangetitle() {
           editor.focus();
@@ -1322,7 +1326,9 @@
             type: 'title',
             value: document.getElementById('titleInput').value
           }
-          window.ReactNativeWebView?.postMessage(JSON.stringify(titleMessage));
+          if (titleMessage && typeof titleMessage === 'string') {
+            window.ReactNativeWebView.postMessage(JSON.stringify(titleMessage));
+          }
         }
         const setTheme = function () {
 
@@ -1607,7 +1613,7 @@
 
         editor.once('text-change', function () {
 
-          window.ReactNativeWebView?.postMessage("loaded");
+          window.ReactNativeWebView.postMessage("loaded");
           let text = editor.getText();
           document.getElementById("infowords").innerText = text.split(' ').length + ' words';
 
@@ -1691,11 +1697,11 @@
               if (isenabled) {
                 //titleIn.style.width = width;
                 titleIn.style['padding-left'] = 12;
-                titleIn.style['padding-right'] = 60;
+                titleIn.style['padding-right'] = window.innerWidth * 0.40;
               } else {
                 //titleIn.style.width = width - 120;
                 titleIn.style['padding-left'] = 60;
-                titleIn.style['padding-right'] = 60;
+                titleIn.style['padding-right'] = window.innerWidth * 0.40;
               }
               break;
             case "title":
@@ -1776,7 +1782,7 @@
           m.html = editor.root.innerHTML;
           m.type = 'content';
 
-          window.ReactNativeWebView?.postMessage(JSON.stringify(m));
+          window.ReactNativeWebView.postMessage(JSON.stringify(m));
         });
 
 
@@ -16676,7 +16682,6 @@
 
   }
 
-  loadAction(false,true)
 
 
 </script>
