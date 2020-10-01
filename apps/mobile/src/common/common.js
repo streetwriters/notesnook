@@ -43,7 +43,7 @@ export var COLOR_SCHEME = {
   night: false,
   bg: 'white',
   navbg: '#f6fbfc',
-  nav: '#e1e4e8',
+  nav: '#f0f0f0',
   pri: '#000000',
   sec: 'white',
   ...fixedColors,
@@ -53,7 +53,7 @@ export const COLOR_SCHEME_LIGHT = {
   night: false,
   bg: 'white',
   navbg: '#f6fbfc',
-  nav: '#e1e4e8',
+  nav: '#f0f0f0',
   input: 'transparent',
   heading: '#000000',
   pri: '#24292e',
@@ -94,7 +94,7 @@ const getDeviceSize = () => {
   let diagonalSize = Math.sqrt(
     Math.pow(deviceWidthInInches, 2) + Math.pow(deviceHeightInInches, 2),
   );
-
+  console.log(diagonalSize);
   return diagonalSize;
 };
 
