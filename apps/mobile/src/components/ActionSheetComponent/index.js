@@ -634,7 +634,6 @@ export const ActionSheetComponent = ({
       style={{
         paddingBottom: 30,
         backgroundColor: colors.bg,
-        width: w,
         paddingHorizontal: 0,
       }}>
       {!note.id && !note.dateCreated ? (
