@@ -49,6 +49,9 @@ export default class Tags extends Collection {
     let tag = { ...oldTag, title: tagTitle };
     let id = tag.id || getId();
     let notes = tag.noteIds || [];
+
+    if (notes.find((id) => id === noteId)) return id;
+
     let deletedIds = tag.deletedIds || [];
     tag = {
       type: "tag",
