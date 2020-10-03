@@ -22,7 +22,7 @@ function LoginDialog(props) {
       description={"Signing in allows you to sync your notes across devices."}
       icon={Icon.Login}
       onCloseClick={onClose}
-      negativeButton={{ text: "I don't want to", onClick: onClose }}
+      negativeButton={{ text: "Cancel", onClick: onClose }}
       positiveButton={{
         text: "Sign me in",
         loading: isLoggingIn,

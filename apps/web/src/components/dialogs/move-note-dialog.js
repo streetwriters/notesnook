@@ -38,7 +38,7 @@ class MoveDialog extends React.Component {
         icon={Icon.Move}
         buttonsAlignment="center"
         negativeButton={{
-          text: "Get me out of here",
+          text: "Cancel",
           onClick: props.onClose,
         }}
       >

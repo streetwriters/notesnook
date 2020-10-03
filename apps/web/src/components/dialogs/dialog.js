@@ -18,18 +18,18 @@ function Dialog(props) {
       onRequestClose={props?.negativeButton?.onClick}
       style={{
         content: {
-          top: "50%",
-          left: "50%",
+          top: isMobile ? 0 : "50%",
+          left: isMobile ? 0 : "50%",
           right: "auto",
           bottom: "auto",
-          marginRight: "-50%",
-          transform: "translate(-50%, -50%)",
+          marginRight: isMobile ? 0 : "-50%",
+          transform: isMobile ? 0 : "translate(-50%, -50%)",
           borderWidth: 0,
           borderRadius: theme.radii["default"],
           backgroundColor: theme.colors.background,
           color: theme.colors.text,
           boxShadow: "4px 5px 18px 2px #00000038",
-          width: isMobile ? "95%" : "30%",
+          width: isMobile ? "100%" : "30%",
           padding: 0,
           overflowY: "hidden",
         },

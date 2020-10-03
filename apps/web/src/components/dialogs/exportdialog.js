@@ -16,7 +16,7 @@ function ExportDialog(props) {
       buttonsAlignment="center"
       negativeButton={{
         onClick: props.onClose,
-        text: "I don't want to export anymore",
+        text: "Cancel",
       }}
     >
       <Flex justifyContent="center" alignItems="center">
