@@ -8,10 +8,16 @@ export const ContainerTopSection = ({root}) => {
   const [state, dispatch] = useTracked();
   const {colors, selectionMode} = state;
   const opacity = useValue(0);
+  const translateY = useValue(0);
   useEffect(() => {
     Animated.timing(opacity, {
       duration: 100,
       toValue: selectionMode ? 0 : 1,
+      easing: Easing.in(Easing.ease),
+    }).start();
+    Animated.timing(translateY, {
+      toValue: selectionMode ? -150 : 0,
+      duration: 100,
       easing: Easing.in(Easing.ease),
     }).start();
   }, [selectionMode]);
@@ -25,6 +31,12 @@ export const ContainerTopSection = ({root}) => {
         display: 'flex',
         width: '100%',
         opacity: opacity,
+        overflow: 'hidden',
+        transform: [
+          {
+            translateY: translateY,
+          },
+        ],
       }}>
       <Header root={root} />
 

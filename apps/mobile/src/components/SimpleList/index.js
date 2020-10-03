@@ -1,7 +1,7 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {StyleSheet} from 'react-native';
 import {Dimensions, Platform, RefreshControl, Text, View} from 'react-native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {initialWindowMetrics} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {DataProvider, LayoutProvider, RecyclerListView} from 'recyclerlistview';
 import {COLORS_NOTE, SIZE, WEIGHT} from '../../common/common';
@@ -40,7 +40,6 @@ const SimpleList = ({
       return r1 !== r2;
     }).cloneWithRows([]),
   );
-  const insets = useSafeAreaInsets();
   const listData = data;
   const dataType = type;
   const _onScroll = (event) => {
@@ -50,16 +49,21 @@ const SimpleList = ({
   };
 
   useEffect(() => {
-    console.log(focused());
+    loadData();
+  }, [listData]);
+
+  const loadData = useCallback(() => {
     let mainData =
-      searchResults.type === type && focused() && searchResults.results.length > 0
+      searchResults.type === type &&
+      focused() &&
+      searchResults.results.length > 0
         ? searchResults.results
         : listData;
 
     let d = [header, ...mainData];
     /*  for (var i = 0; i < 10000; i++) {
-      d = [...d,...data];
-    }  */
+    d = [...d,...data];
+  }  */
     setDataProvider(
       new DataProvider((r1, r2) => {
         return r1 !== r2;
@@ -79,7 +83,7 @@ const SimpleList = ({
     </Text>
   );
 
-  const _onRefresh = async () => {
+  const _onRefresh = useCallback(async () => {
     if (Platform.OS === 'ios') {
       dispatch({
         type: ACTIONS.SYNCING,
@@ -118,7 +122,7 @@ const SimpleList = ({
       }
       dispatch({type: ACTIONS.ALL});
     }
-  };
+  }, []);
 
   const _ListEmptyComponent = (
     <View
@@ -156,7 +160,7 @@ const SimpleList = ({
           break;
         case 'header':
           dim.width = width;
-          dim.height = 25;
+          dim.height = 30;
           break;
         case 'MAIN_HEADER':
           dim.width = width;
@@ -195,10 +199,10 @@ const SimpleList = ({
             ? 115
             : 115 - 60
           : listData[0] && !selectionMode
-          ? 155 - insets.top
-          : 155 - insets.top - 60,
+          ? 155 - initialWindowMetrics.insets.top
+          : 155 - initialWindowMetrics.insets.top - 60,
     };
-  }, []);
+  }, [selectionMode, listData]);
 
   return !listData || listData.length === 0 ? (
     _ListEmptyComponent
