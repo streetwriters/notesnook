@@ -51,7 +51,14 @@ function Properties() {
 
   useEffect(() => {
     if (notebookData && notebookData.id) {
-      setNotebook(db.notebooks.notebook(notebookData.id).data);
+      const notebook = db.notebooks.notebook(notebookData.id).data;
+      const topic = notebook.topics?.find((t) => t.id === notebookData.topic);
+      if (!topic) return;
+      setNotebook({
+        id: notebook.id,
+        title: notebook.title,
+        topic: { title: topic.title, id: topic.id },
+      });
     }
   }, [notebookData]);
 
@@ -136,12 +143,7 @@ function Properties() {
                   color="primary"
                   sx={{ cursor: "pointer" }}
                   onClick={() => {
-                    navigate(`/notebooks/${notebookData.id}`);
-                    /* RootNavigator.navigate(
-                      "notebooks",
-                      { params: { id: notebookData.id } },
-                      true
-                    ); */
+                    navigate(`/notebooks/${notebook.id}`);
                   }}
                 >
                   {notebook.title}
@@ -152,13 +154,10 @@ function Properties() {
                   color="primary"
                   sx={{ cursor: "pointer" }}
                   onClick={() => {
-                    const index = notebook.topics.findIndex(
-                      (t) => t.title === notebookData.topic
-                    );
-                    navigate(`/notebooks/${notebookData.id}/${index}`);
+                    navigate(`/notebooks/${notebook.id}/${notebook.topic.id}`);
                   }}
                 >
-                  {notebookData?.topic}
+                  {notebook.topic.title}
                 </Text>
               </Text>
             )}
