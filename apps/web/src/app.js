@@ -15,11 +15,16 @@ import routes from "./navigation/routes";
 import Editor from "./components/editor";
 import useMobile from "./utils/use-mobile";
 import GlobalMenuWrapper from "./components/globalmenuwrapper";
+import {
+  shouldAddBackupReminder,
+  shouldAddSignupReminder,
+} from "./common/reminders";
 
 function App() {
   const [show, setShow] = usePersistentState("isContainerVisible", true);
   const refreshColors = useStore((store) => store.refreshColors);
   const isFocusMode = useStore((store) => store.isFocusMode);
+  const addReminder = useStore((store) => store.addReminder);
   const initUser = useUserStore((store) => store.init);
   const initNotes = useNotesStore((store) => store.init);
   const openLastSession = useEditorStore((store) => store.openLastSession);
@@ -27,11 +32,22 @@ function App() {
   const isMobile = useMobile();
   const routeResult = useRoutes(routes);
 
-  useEffect(() => {
-    refreshColors();
-    initUser();
-    initNotes();
-  }, [refreshColors, initUser, initNotes]);
+  useEffect(
+    function initializeApp() {
+      refreshColors();
+      initUser();
+      initNotes();
+      (async function () {
+        if (await shouldAddBackupReminder()) {
+          addReminder("backup", "high");
+        }
+        if (await shouldAddSignupReminder()) {
+          addReminder("signup", "low");
+        }
+      })();
+    },
+    [refreshColors, initUser, initNotes, addReminder]
+  );
 
   useEffect(() => {
     if (isFocusMode) {

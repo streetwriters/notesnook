@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Box, Button, Flex, Text } from "rebass";
+import React, { useEffect } from "react";
+import { Button, Flex, Text } from "rebass";
 import * as Icon from "../components/icons";
 import { useStore as useUserStore } from "../stores/user-store";
 import { useStore as useThemeStore } from "../stores/theme-store";
@@ -10,12 +10,43 @@ import { upgrade } from "../common/upgrade";
 import useSystemTheme from "../utils/use-system-theme";
 import download from "../utils/download";
 import { db } from "../common";
+import { usePersistentState } from "../utils/hooks";
+
+function importBackup() {
+  return new Promise((resolve, reject) => {
+    const importFileElem = document.getElementById("restore-backup");
+    importFileElem.click();
+    importFileElem.onchange = function () {
+      const file = importFileElem.files[0];
+      if (!file.name.endsWith(".nnbackup")) {
+        alert(
+          "Invalid backup file provided. Make sure it has an .nnbackup extension."
+        );
+        return reject(
+          "The given file does not have .nnbackup extension. Only files with .nnbackup extension are supported."
+        );
+      }
+      const reader = new FileReader();
+      reader.addEventListener("load", (event) => {
+        const text = event.target.result;
+        try {
+          resolve(JSON.parse(text));
+        } catch (e) {
+          alert(
+            "Error: Could not read the backup file provided. Either it's corrupted or invalid."
+          );
+          resolve();
+        }
+      });
+      reader.readAsText(file);
+    };
+  });
+}
 
 function Settings(props) {
   const theme = useThemeStore((store) => store.theme);
   const toggleNightMode = useThemeStore((store) => store.toggleNightMode);
   const setTheme = useThemeStore((store) => store.setTheme);
-
   const preferSystemTheme = useThemeStore((store) => store.preferSystemTheme);
   const togglePreferSystemTheme = useThemeStore(
     (store) => store.togglePreferSystemTheme
@@ -26,6 +57,10 @@ function Settings(props) {
     (store) => store?.user?.notesnook?.subscription?.isTrial
   );
   const logout = useUserStore((store) => store.logout);
+  const [backupReminderOffset, setBackupReminderOffset] = usePersistentState(
+    "backupReminderOffset",
+    0
+  );
 
   const isSystemThemeDark = useSystemTheme();
   useEffect(() => {
@@ -174,7 +209,18 @@ function Settings(props) {
           tip="Backup and download all your data"
         />
       </Button>
-      <Button variant="list">
+      <input
+        type="file"
+        id="restore-backup"
+        hidden
+        accept=".nnbackup,text/plain,application/json"
+      />
+      <Button
+        variant="list"
+        onClick={async () => {
+          await db.backup.import(JSON.stringify(await importBackup()));
+        }}
+      >
         <TextWithTip
           text="Restore backup"
           tip="Restore data from a backup file"
@@ -185,6 +231,14 @@ function Settings(props) {
         title="Encrypt backups"
         onTip="All backups will be encrypted"
         offTip="Backups will not be encrypted"
+      />
+
+      <OptionsItem
+        title="Backup reminders"
+        tip="Remind me to backup my data"
+        options={["Never", "Daily", "Weekly", "Monthly"]}
+        selectedOption={backupReminderOffset}
+        onSelectionChanged={(_option, index) => setBackupReminderOffset(index)}
       />
 
       <Text
@@ -247,6 +301,59 @@ function ToggleItem(props) {
       ) : (
         <Icon.ToggleUnchecked size={30} />
       )}
+    </Flex>
+  );
+}
+
+function OptionsItem(props) {
+  const {
+    title,
+    tip,
+    options,
+    selectedOption,
+    onSelectionChanged,
+    onlyIf,
+  } = props;
+
+  if (onlyIf === false) return null;
+  return (
+    <Flex
+      flexDirection="column"
+      justifyContent="center"
+      py={2}
+      sx={{
+        cursor: "pointer",
+        borderBottom: "1px solid",
+        borderBottomColor: "border",
+        ":hover": { borderBottomColor: "primary" },
+      }}
+    >
+      <TextWithTip text={title} tip={tip} />
+      <Flex
+        justifyContent="space-evenly"
+        mt={2}
+        bg="border"
+        sx={{ borderRadius: "default", overflow: "hidden" }}
+      >
+        {options.map((option, index) => (
+          <Text
+            key={option}
+            flex={1}
+            bg={selectedOption === index ? "primary" : "transparent"}
+            color={selectedOption === index ? "static" : "gray"}
+            textAlign="center"
+            variant="subBody"
+            p={2}
+            py={1}
+            onClick={() => onSelectionChanged(option, index)}
+            sx={{
+              ":hover": { color: selectedOption === index ? "static" : "text" },
+            }}
+          >
+            {option}
+          </Text>
+        ))}
+      </Flex>
     </Flex>
   );
 }

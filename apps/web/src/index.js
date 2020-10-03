@@ -8,14 +8,14 @@ import App from "./App";
 import * as serviceWorker from "./serviceWorker";
 import Modal from "react-modal";
 import { db } from "./common";
-import { MotionConfig, AnimationFeature } from "framer-motion";
+import { MotionConfig, AnimationFeature, GesturesFeature } from "framer-motion";
 
 db.init()
   .catch(console.error)
   .finally(() => {
     Modal.setAppElement("#root");
     ReactDOM.render(
-      <MotionConfig features={[AnimationFeature]}>
+      <MotionConfig features={[AnimationFeature, GesturesFeature]}>
         <App />
       </MotionConfig>,
       document.getElementById("root")

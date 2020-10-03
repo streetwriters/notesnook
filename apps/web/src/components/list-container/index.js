@@ -6,7 +6,7 @@ import * as Icon from "../icons";
 import { VariableSizeList as List } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { useStore as useSelectionStore } from "../../stores/selection-store";
-import LoginBar from "../loginbar";
+import ReminderBar from "../reminder-bar";
 import GroupHeader from "../group-header";
 import ListProfiles from "../../common/list-profiles";
 
@@ -39,7 +39,7 @@ function ListContainer(props) {
       ) : (
         <>
           <Search type={props.type} query={props.query} context={context} />
-          <LoginBar />
+          <ReminderBar />
           <Flex variant="columnFill" mt={2} data-test-id="note-list">
             {props.children
               ? props.children

@@ -7,6 +7,7 @@
     "@mdi/react": "^1.4.0",
     "@rebass/forms": "^4.0.6",
     "cogo-toast": "^4.2.3",
+    "dayjs": "^1.9.1",
     "emotion-theming": "^10.0.19",
     "eventsource": "^1.0.7",
     "fast-sort": "^2.1.1",

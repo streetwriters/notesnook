@@ -100,3 +100,5 @@ export const Info = createIcon(Icons.mdiInformation);
 
 export const ToggleUnchecked = createIcon(Icons.mdiToggleSwitchOff);
 export const ToggleChecked = createIcon(Icons.mdiToggleSwitch);
+
+export const Backup = createIcon(Icons.mdiBackupRestore);
