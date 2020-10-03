@@ -183,7 +183,7 @@ const Editor = ({noMenu}) => {
             color={colors.heading}
             onPress={_onBackPress}
             iconStyle={{
-              textVerticalAlign: 'center',
+              textAlignVertical: 'center',
             }}
             customStyle={{
               marginLeft: -5,
