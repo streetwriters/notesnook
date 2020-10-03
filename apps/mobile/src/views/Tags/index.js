@@ -10,9 +10,8 @@ import NavigationService from '../../services/NavigationService';
 
 export const Tags = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
-  const {colors, tags} = state;
+  const { tags} = state;
 
- 
 
   const onFocus = useCallback(() => {
     dispatch({

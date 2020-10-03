@@ -17,7 +17,7 @@ import {
   refreshNotesPage,
 } from '../../services/events';
 import {openEditorAnimation} from '../../utils/animations';
-import {db, DDS, editing, ToastEvent} from '../../utils/utils';
+import {db, DDS, editing} from '../../utils/utils';
 
 export const Notes = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
