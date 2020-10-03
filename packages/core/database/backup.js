@@ -1,7 +1,7 @@
 import Hashes from "jshashes";
 const sha256 = new Hashes.SHA256();
 
-const invalidKeys = ["user", "t"];
+const invalidKeys = ["user", "t", "lastBackup"];
 const validTypes = ["mobile", "web", "node"];
 export default class Backup {
   /**
@@ -10,6 +10,10 @@ export default class Backup {
    */
   constructor(db) {
     this._db = db;
+  }
+
+  lastBackupTime() {
+    return this._db.context.read("lastBackupTime");
   }
 
   /**
@@ -36,6 +40,9 @@ export default class Backup {
         data: await this._db.context.encrypt(key, JSON.stringify(db)),
       });
     }
+
+    // save backup time
+    await this._db.context.write("lastBackupTime", Date.now());
 
     return JSON.stringify({
       type,
