@@ -7,9 +7,9 @@ import {useTracked} from '../../provider';
 import {DDS, getElevation} from '../../utils/utils';
 import {PressableButton} from '../PressableButton';
 
-export const ContainerBottomButton = ({root}) => {
+export const ContainerBottomButton = ({title, onPress, color}) => {
   const [state, dispatch] = useTracked();
-  const {colors,containerBottomButton} = state;
+  const {colors} = state;
   const [buttonHide, setButtonHide] = useState(false);
   const insets = useSafeAreaInsets();
 
@@ -42,7 +42,7 @@ export const ContainerBottomButton = ({root}) => {
     };
   }, []);
 
-  return !containerBottomButton.visible ? null : (
+  return (
     <View
       style={{
         width: '100%',
@@ -58,21 +58,13 @@ export const ContainerBottomButton = ({root}) => {
         ],
       }}>
       <PressableButton
-        testID={"container_bottom_btn"}
-        color={
-          containerBottomButton.color
-            ? containerBottomButton.color
-            : colors.accent
-        }
-        selectedColor={
-          containerBottomButton.color
-            ? containerBottomButton.color
-            : colors.accent
-        }
+        testID={'container_bottom_btn'}
+        color={color || colors.accent}
+        selectedColor={color || colors.accent}
         customStyle={{
           ...getElevation(5),
         }}
-        onPress={containerBottomButton.bottomButtonOnPress}>
+        onPress={onPress}>
         <View
           style={{
             justifyContent: 'flex-start',
@@ -84,11 +76,7 @@ export const ContainerBottomButton = ({root}) => {
             paddingVertical: pv + 5,
           }}>
           <Icon
-            name={
-              containerBottomButton.bottomButtonText === 'Clear all trash'
-                ? 'delete'
-                : 'plus'
-            }
+            name={title === 'Clear all trash' ? 'delete' : 'plus'}
             color="white"
             size={SIZE.xl}
           />
@@ -100,7 +88,7 @@ export const ContainerBottomButton = ({root}) => {
               fontFamily: WEIGHT.regular,
               textAlignVertical: 'center',
             }}>
-            {'  ' + containerBottomButton.bottomButtonText}
+            {'  ' + title}
           </Text>
         </View>
       </PressableButton>

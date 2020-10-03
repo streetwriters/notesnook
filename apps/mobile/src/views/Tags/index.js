@@ -1,58 +1,56 @@
-import { useIsFocused } from '@react-navigation/native';
-import React, { useEffect } from 'react';
-import { Text } from 'react-native';
-import { SIZE, WEIGHT } from '../../common/common';
-import { Placeholder } from '../../components/ListPlaceholders';
-import { PressableButton } from '../../components/PressableButton';
+import React, {useEffect} from 'react';
+import {Text} from 'react-native';
+import {SIZE, WEIGHT} from '../../common/common';
+import {Placeholder} from '../../components/ListPlaceholders';
+import {PressableButton} from '../../components/PressableButton';
 import SimpleList from '../../components/SimpleList';
-import { useTracked } from '../../provider';
-import { ACTIONS } from '../../provider/actions';
+import {useTracked} from '../../provider';
+import {ACTIONS} from '../../provider/actions';
 import NavigationService from '../../services/NavigationService';
 
 export const Tags = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors, tags} = state;
-  const isFocused = useIsFocused();
+
+ 
+
+  const onFocus = useCallback(() => {
+    dispatch({
+      type: ACTIONS.HEADER_STATE,
+      state: {
+        type: 'trash',
+        menu: true,
+        canGoBack: false,
+        color: null,
+      },
+    });
+    dispatch({
+      type: ACTIONS.HEADER_VERTICAL_MENU,
+      state: false,
+    });
+    dispatch({
+      type: ACTIONS.HEADER_TEXT_STATE,
+      state: {
+        heading: 'Tags',
+      },
+    });
+
+    dispatch({type: ACTIONS.TAGS});
+    dispatch({
+      type: ACTIONS.CURRENT_SCREEN,
+      screen: 'tags',
+    });
+  }, []);
 
   useEffect(() => {
-    if (isFocused) {
-      dispatch({
-        type: ACTIONS.HEADER_STATE,
-        state: {
-          type: 'trash',
-          menu: true,
-          canGoBack: false,
-          color: null,
-        },
-      });
-      dispatch({
-        type: ACTIONS.CONTAINER_BOTTOM_BUTTON,
-        state: {
-          visible: false,
-        },
-      });
-      dispatch({
-        type: ACTIONS.HEADER_VERTICAL_MENU,
-        state: false,
-      });
-
-      dispatch({
-        type: ACTIONS.HEADER_TEXT_STATE,
-        state: {
-          heading: 'Tags',
-        },
-      });
-
-      dispatch({type: ACTIONS.TAGS});
-      dispatch({
-        type: ACTIONS.CURRENT_SCREEN,
-        screen: 'tags',
-      });
-    }
-  }, [isFocused]);
+    navigation.addListener('focus', onFocus);
+    return () => {
+      navigation.removeListener('focus', onFocus);
+    };
+  });
 
   useEffect(() => {
-    if (isFocused) {
+    if (navigation.isFocused()) {
       dispatch({
         type: ACTIONS.SEARCH_STATE,
         state: {
@@ -64,13 +62,13 @@ export const Tags = ({route, navigation}) => {
         },
       });
     }
-  }, [tags, isFocused]);
+  }, [tags]);
 
   return (
     <SimpleList
       data={tags}
       type="tags"
-      focused={isFocused}
+      focused={() => navigation.isFocused()}
       RenderItem={RenderItem}
       placeholder={<Placeholder type="tags" />}
       placeholderText="Tags added to notes appear here"

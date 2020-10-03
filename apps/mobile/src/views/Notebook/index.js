@@ -1,4 +1,3 @@
-import {useIsFocused} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {AddTopicEvent} from '../../components/DialogManager/recievers';
 import {NotebookItem} from '../../components/NotebookItem';
@@ -6,6 +5,7 @@ import SelectionWrapper from '../../components/SelectionWrapper';
 import SimpleList from '../../components/SimpleList';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
+import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -13,15 +13,12 @@ import {
 } from '../../services/eventManager';
 import {eOnNewTopicAdded, eScrollEvent} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
-import {db, ToastEvent} from '../../utils/utils';
+import {db} from '../../utils/utils';
 
 export const Notebook = ({route, navigation}) => {
   const [, dispatch] = useTracked();
   const [topics, setTopics] = useState([]);
-  const [refreshing, setRefreshing] = useState(false);
-
   let params = route.params;
-  let isFocused = useIsFocused();
 
   const onLoad = () => {
     let allTopics;
@@ -42,41 +39,46 @@ export const Notebook = ({route, navigation}) => {
     };
   }, []);
 
-  useEffect(() => {
-    if (isFocused) {
-      onLoad();
-      dispatch({
-        type: ACTIONS.HEADER_STATE,
-        state: {
-          type: 'topics',
-          menu: false,
-          canGoBack: true,
-          heading: params.title,
-          color: null,
-        },
-      });
+  const onFocus = useCallback(() => {
+    onLoad();
+    dispatch({
+      type: ACTIONS.HEADER_STATE,
+      state: {
+        type: 'topics',
+        menu: false,
+        canGoBack: true,
+        heading: params.title,
+        color: null,
+      },
+    });
 
-      dispatch({
-        type: ACTIONS.HEADER_VERTICAL_MENU,
-        state: false,
-      });
+    dispatch({
+      type: ACTIONS.HEADER_VERTICAL_MENU,
+      state: false,
+    });
 
-      dispatch({
-        type: ACTIONS.HEADER_TEXT_STATE,
-        state: {
-          heading: params.title,
-        },
-      });
+    dispatch({
+      type: ACTIONS.HEADER_TEXT_STATE,
+      state: {
+        heading: params.title,
+      },
+    });
 
-      dispatch({
-        type: ACTIONS.CURRENT_SCREEN,
-        screen: 'notebook',
-      });
-    }
-  }, [isFocused]);
+    dispatch({
+      type: ACTIONS.CURRENT_SCREEN,
+      screen: 'notebook',
+    });
+  }, []);
 
   useEffect(() => {
-    if (isFocused) {
+    navigation.addListener('focus', onFocus);
+    return () => {
+      navigation.removeListener('focus', onFocus);
+    };
+  });
+
+  useEffect(() => {
+    if (navigation.isFocused()) {
       dispatch({
         type: ACTIONS.SEARCH_STATE,
         state: {
@@ -87,35 +89,33 @@ export const Notebook = ({route, navigation}) => {
           color: null,
         },
       });
-      dispatch({
-        type: ACTIONS.CONTAINER_BOTTOM_BUTTON,
-        state: {
-          visible: true,
-          bottomButtonOnPress: () => {
-            let n = route.params.notebook;
-            AddTopicEvent(n);
-          },
-          color: null,
-          bottomButtonText: 'Add new topic',
-        },
-      });
     }
-  }, [topics, isFocused]);
+  }, [topics]);
 
- 
+  const _onPressBottomButton = () => {
+    let n = route.params.notebook;
+    AddTopicEvent(n);
+  };
 
   return (
-    <SimpleList
-      data={topics}
-      type="topics"
-      refreshCallback={() => {
-        onLoad();
-      }}
-      focused={isFocused}
-      RenderItem={RenderItem}
-      placeholder={<></>}
-      placeholderText=""
-    />
+    <>
+      <SimpleList
+        data={topics}
+        type="topics"
+        refreshCallback={() => {
+          onLoad();
+        }}
+        focused={() => navigation.isFocused()}
+        RenderItem={RenderItem}
+        placeholder={<></>}
+        placeholderText=""
+      />
+
+      <ContainerBottomButton
+        title="Add new topic"
+        onPress={_onPressBottomButton}
+      />
+    </>
   );
 };
 

@@ -50,8 +50,9 @@ const SimpleList = ({
   };
 
   useEffect(() => {
+    console.log(focused());
     let mainData =
-      searchResults.type === type && focused && searchResults.results.length > 0
+      searchResults.type === type && focused() && searchResults.results.length > 0
         ? searchResults.results
         : listData;
 

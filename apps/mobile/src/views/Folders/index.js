@@ -1,4 +1,3 @@
-import {useIsFocused} from '@react-navigation/native';
 import React, {useEffect} from 'react';
 import {AddNotebookEvent} from '../../components/DialogManager/recievers';
 import {Placeholder} from '../../components/ListPlaceholders';
@@ -6,52 +5,50 @@ import SimpleList from '../../components/SimpleList';
 import {NotebookItemWrapper} from '../../components/SimpleList/NotebookItemWrapper';
 import {useTracked} from '../../provider';
 import {ACTIONS} from '../../provider/actions';
+import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
 export const Folders = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const {notebooks} = state;
-  let isFocused = useIsFocused();
+  const params = route.params;
+
+  const onFocus = useCallback(() => {
+    dispatch({
+      type: ACTIONS.HEADER_STATE,
+      state: {
+        type: 'notebooks',
+        menu: true,
+        canGoBack: false,
+        color: null,
+      },
+    });
+
+    dispatch({
+      type: ACTIONS.HEADER_VERTICAL_MENU,
+      state: false,
+    });
+    dispatch({
+      type: ACTIONS.HEADER_TEXT_STATE,
+      state: {
+        heading: params.title,
+      },
+    });
+    dispatch({type: ACTIONS.PINNED});
+    dispatch({type: ACTIONS.NOTEBOOKS});
+    dispatch({
+      type: ACTIONS.CURRENT_SCREEN,
+      screen: 'notebooks',
+    });
+  }, []);
 
   useEffect(() => {
-    if (isFocused) {
-      dispatch({
-        type: ACTIONS.HEADER_STATE,
-        state: {
-          type: 'notebooks',
-          menu: true,
-          canGoBack: false,
-          color: null,
-        },
-      });
-      dispatch({
-        type: ACTIONS.CONTAINER_BOTTOM_BUTTON,
-        state: {
-          bottomButtonText: 'Create a new notebook',
-          bottomButtonOnPress: () => AddNotebookEvent(),
-          color: null,
-          visible: true,
-        },
-      });
-      dispatch({
-        type: ACTIONS.HEADER_VERTICAL_MENU,
-        state: false,
-      });
-      dispatch({
-        type: ACTIONS.HEADER_TEXT_STATE,
-        state: {
-          heading: params.title,
-        },
-      });
-      dispatch({type: ACTIONS.PINNED});
-      dispatch({type: ACTIONS.NOTEBOOKS});
-      dispatch({
-        type: ACTIONS.CURRENT_SCREEN,
-        screen: 'notebooks',
-      });
-    }
-  }, [isFocused]);
+    navigation.addListener('focus', onFocus);
+    return () => {
+      navigation.removeListener('focus', onFocus);
+    };
+  });
 
   useEffect(() => {
-    if (isFocused) {
+    if (navigation.isFocused()) {
       dispatch({
         type: ACTIONS.SEARCH_STATE,
         state: {
@@ -63,20 +60,26 @@ export const Folders = ({route, navigation}) => {
         },
       });
     }
-  }, [notebooks, isFocused]);
+  }, [notebooks]);
 
-  const params = route.params;
+  const _onPressBottomButton = () => AddNotebookEvent();
 
   return (
-    <SimpleList
-      data={notebooks}
-      type="notebooks"
-      focused={isFocused}
-      RenderItem={NotebookItemWrapper}
-      placeholder={<Placeholder type="notebooks" />}
-      pinned={true}
-      placeholderText="Notebooks you add will appear here"
-    />
+    <>
+      <SimpleList
+        data={notebooks}
+        type="notebooks"
+        focused={() => navigation.isFocused()}
+        RenderItem={NotebookItemWrapper}
+        placeholder={<Placeholder type="notebooks" />}
+        pinned={true}
+        placeholderText="Notebooks you add will appear here"
+      />
+      <ContainerBottomButton
+        title="Create a new notebook"
+        onPress={_onPressBottomButton}
+      />
+    </>
   );
 };
 

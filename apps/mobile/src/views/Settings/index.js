@@ -1,4 +1,3 @@
-import {useIsFocused} from '@react-navigation/native';
 import React, {useEffect} from 'react';
 import {
   Appearance,
@@ -56,7 +55,6 @@ import {
 export const Settings = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors, user, settings} = state;
-  const isFocused = useIsFocused();
   function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
     let newColors = setColorScheme(colors, accent);
     StatusBar.setBarStyle(colors.night ? 'light-content' : 'dark-content');
@@ -69,49 +67,46 @@ export const Settings = ({route, navigation}) => {
     changeColorScheme();
   }
 
+  const onFocus = useCallback(() => {
+    dispatch({
+      type: ACTIONS.HEADER_STATE,
+      state: {
+        type: null,
+        menu: true,
+        canGoBack: false,
+        color: null,
+      },
+    });
+    dispatch({
+      type: ACTIONS.HEADER_VERTICAL_MENU,
+      state: false,
+    });
+
+    dispatch({
+      type: ACTIONS.HEADER_TEXT_STATE,
+      state: {
+        heading: 'Settings',
+      },
+    });
+    dispatch({
+      type: ACTIONS.CURRENT_SCREEN,
+      screen: 'settings',
+    });
+
+    dispatch({
+      type: ACTIONS.SEARCH_STATE,
+      state: {
+        noSearch: true,
+      },
+    });
+  }, []);
+
   useEffect(() => {
-    console.log(user);
-    if (isFocused) {
-      dispatch({
-        type: ACTIONS.CONTAINER_BOTTOM_BUTTON,
-        state: {
-          visible: false,
-        },
-      });
-      dispatch({
-        type: ACTIONS.HEADER_STATE,
-        state: {
-          type: null,
-          menu: true,
-          canGoBack: false,
-          color: null,
-        },
-      });
-      dispatch({
-        type: ACTIONS.HEADER_VERTICAL_MENU,
-        state: false,
-      });
-
-      dispatch({
-        type: ACTIONS.HEADER_TEXT_STATE,
-        state: {
-          heading: 'Settings',
-        },
-      });
-
-      dispatch({
-        type: ACTIONS.CURRENT_SCREEN,
-        screen: 'settings',
-      });
-
-      dispatch({
-        type: ACTIONS.SEARCH_STATE,
-        state: {
-          noSearch: true,
-        },
-      });
-    }
-  }, [isFocused]);
+    navigation.addListener('focus', onFocus);
+    return () => {
+      navigation.removeListener('focus', onFocus);
+    };
+  });
 
   const getTimeLeft = (t1, t2) => {
     let d1 = new Date(Date.now());

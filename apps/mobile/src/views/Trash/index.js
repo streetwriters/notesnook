@@ -1,5 +1,5 @@
-import {useIsFocused} from '@react-navigation/native';
 import React, {useEffect} from 'react';
+import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
 import {simpleDialogEvent} from '../../components/DialogManager/recievers';
 import {TEMPLATE_EMPTY_TRASH} from '../../components/DialogManager/templates';
 import {Placeholder} from '../../components/ListPlaceholders';
@@ -13,53 +13,47 @@ export const Trash = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const {trash} = state;
 
-  const isFocused = useIsFocused();
+  const onFocus = useCallback(() => {
+    dispatch({
+      type: ACTIONS.HEADER_STATE,
+      state: {
+        type: 'trash',
+        menu: true,
+        canGoBack: false,
+        color: null,
+      },
+    });
+    dispatch({
+      type: ACTIONS.HEADER_VERTICAL_MENU,
+      state: false,
+    });
+
+    dispatch({
+      type: ACTIONS.HEADER_TEXT_STATE,
+      state: {
+        heading: 'Trash',
+      },
+    });
+
+    dispatch({
+      type: ACTIONS.TRASH,
+    });
+
+    dispatch({
+      type: ACTIONS.CURRENT_SCREEN,
+      screen: 'trash',
+    });
+  }, []);
 
   useEffect(() => {
-    if (isFocused) {
-      dispatch({
-        type: ACTIONS.HEADER_STATE,
-        state: {
-          type: 'trash',
-          menu: true,
-          canGoBack: false,
-          color: null,
-        },
-      });
-      dispatch({
-        type: ACTIONS.CONTAINER_BOTTOM_BUTTON,
-        state: {
-          bottomButtonText: 'Clear all trash',
-          bottomButtonOnPress: () => simpleDialogEvent(TEMPLATE_EMPTY_TRASH),
-          color: null,
-          visible: true,
-        },
-      });
-      dispatch({
-        type: ACTIONS.HEADER_VERTICAL_MENU,
-        state: false,
-      });
-
-      dispatch({
-        type: ACTIONS.HEADER_TEXT_STATE,
-        state: {
-          heading: 'Trash',
-        },
-      });
-
-      dispatch({
-        type: ACTIONS.TRASH,
-      });
-
-      dispatch({
-        type: ACTIONS.CURRENT_SCREEN,
-        screen: 'trash',
-      });
-    }
-  }, [isFocused]);
+    navigation.addListener('focus', onFocus);
+    return () => {
+      navigation.removeListener('focus', onFocus);
+    };
+  });
 
   useEffect(() => {
-    if (isFocused) {
+    if (navigation.isFocused()) {
       dispatch({
         type: ACTIONS.SEARCH_STATE,
         state: {
@@ -71,17 +65,26 @@ export const Trash = ({route, navigation}) => {
         },
       });
     }
-  }, [trash, isFocused]);
+  }, [trash]);
+
+  const _onPressBottomButton = () => simpleDialogEvent(TEMPLATE_EMPTY_TRASH);
 
   return (
-    <SimpleList
-      data={trash}
-      type="trash"
-      focused={isFocused}
-      RenderItem={RenderItem}
-      placeholder={<Placeholder type="trash" />}
-      placeholderText="Deleted notes & notebooks appear here."
-    />
+    <>
+      <SimpleList
+        data={trash}
+        type="trash"
+        focused={() => navigation.isFocused()}
+        RenderItem={RenderItem}
+        placeholder={<Placeholder type="trash" />}
+        placeholderText="Deleted notes & notebooks appear here."
+      />
+
+      <ContainerBottomButton
+        title="Clear all trash"
+        onPress={_onPressBottomButton}
+      />
+    </>
   );
 };
 
