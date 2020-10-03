@@ -76,6 +76,7 @@ class List {
       textAlign: "left",
       py: 2,
       px: 0,
+      cursor: "pointer",
       ":hover": {
         borderBottomColor: "primary",
       },

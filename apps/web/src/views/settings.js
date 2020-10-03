@@ -8,6 +8,8 @@ import accents from "../theme/accents";
 import { showLogInDialog } from "../components/dialogs/logindialog";
 import { upgrade } from "../common/upgrade";
 import useSystemTheme from "../utils/use-system-theme";
+import download from "../utils/download";
+import { db } from "../common";
 
 function Settings(props) {
   const theme = useThemeStore((store) => store.theme);
@@ -153,12 +155,24 @@ function Settings(props) {
       <Text
         variant="subtitle"
         color="primary"
-        sx={{ pb: 1, borderBottom: "1px solid", borderBottomColor: "border" }}
+        sx={{ py: 1, borderBottom: "1px solid", borderBottomColor: "border" }}
       >
         {"Backup & Restore"}
       </Text>
-      <Button variant="list">
-        <TextWithTip text="Backup data" tip="Download all your data" />
+      <Button
+        variant="list"
+        onClick={async () => {
+          download(
+            `notesnook-backup-${new Date().toLocaleString("en")}`,
+            await db.backup.export(),
+            "nnbackup"
+          );
+        }}
+      >
+        <TextWithTip
+          text="Backup data"
+          tip="Backup and download all your data"
+        />
       </Button>
       <Button variant="list">
         <TextWithTip
@@ -176,7 +190,7 @@ function Settings(props) {
       <Text
         variant="subtitle"
         color="primary"
-        sx={{ pb: 1, borderBottom: "1px solid", borderBottomColor: "border" }}
+        sx={{ py: 1, borderBottom: "1px solid", borderBottomColor: "border" }}
       >
         Other
       </Text>
@@ -220,6 +234,12 @@ function ToggleItem(props) {
       alignItems="center"
       onClick={onToggled}
       py={2}
+      sx={{
+        cursor: "pointer",
+        borderBottom: "1px solid",
+        borderBottomColor: "border",
+        ":hover": { borderBottomColor: "primary" },
+      }}
     >
       <TextWithTip text={title} tip={isToggled ? onTip : offTip} />
       {isToggled ? (
