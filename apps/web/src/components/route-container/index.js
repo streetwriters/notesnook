@@ -72,15 +72,6 @@ function Header(props) {
               size={28}
             />
           )}
-          <Icon.Menu
-            onClick={toggleSideMenu}
-            sx={{
-              ml: 0,
-              mr: 4,
-              display: ["block", "none", "none"],
-            }}
-            size={28}
-          />
           <Heading data-test-id="routeHeader" fontSize="heading" color={"text"}>
             {title}
           </Heading>
