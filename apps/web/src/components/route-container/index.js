@@ -50,10 +50,12 @@ function Header(props) {
         <Flex alignItems="center" py={2}>
           {canGoBack || onlyBackButton ? (
             <Box
+              alignSelf="flex-start"
               onClick={() => window.history.back()}
               ml={-2}
               height={38}
               width={38}
+              sx={{ flexShrink: 0 }}
             >
               <Icon.ChevronLeft
                 size={38}
