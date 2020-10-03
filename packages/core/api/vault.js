@@ -1,5 +1,6 @@
 import getId from "../utils/id";
 
+const ERASE_TIME = 1000 * 60 * 30;
 export default class Vault {
   /**
    *
@@ -34,6 +35,7 @@ export default class Vault {
       );
       await this._context.write("vaultKey", encryptedData);
       this._password = password;
+      this._startEraser();
     }
     return true;
   }
@@ -57,7 +59,14 @@ export default class Vault {
       throw new Error(this.ERRORS.wrongPassword);
     }
     this._password = password;
+    this._startEraser();
     return true;
+  }
+
+  _startEraser() {
+    setTimeout(() => {
+      this._password = "";
+    }, ERASE_TIME);
   }
 
   /**
