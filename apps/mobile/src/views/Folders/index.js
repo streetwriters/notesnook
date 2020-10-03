@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useCallback, useEffect} from 'react';
 import {AddNotebookEvent} from '../../components/DialogManager/recievers';
 import {Placeholder} from '../../components/ListPlaceholders';
 import SimpleList from '../../components/SimpleList';
@@ -61,6 +61,10 @@ export const Folders = ({route, navigation}) => {
       });
     }
   }, [notebooks]);
+
+  useEffect(() => {
+    console.log('render folders');  
+  })
 
   const _onPressBottomButton = () => AddNotebookEvent();
 

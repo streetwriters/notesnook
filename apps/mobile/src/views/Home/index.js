@@ -84,6 +84,10 @@ export const Home = ({route, navigation}) => {
     }
   };
 
+  useEffect(() => {
+    console.log('render home');  
+  })
+
   return (
     <>
       <SimpleList

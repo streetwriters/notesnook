@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useCallback, useEffect} from 'react';
 import {Text} from 'react-native';
 import {SIZE, WEIGHT} from '../../common/common';
 import {Placeholder} from '../../components/ListPlaceholders';
