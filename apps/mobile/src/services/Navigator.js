@@ -94,7 +94,7 @@ export const NavigationStack = ({component = MainComponent}) => {
           swipeEnabled: locked ? false : true,
         }}
         drawerStyle={{
-          width:DDS.isTab? w *0.04 : null,
+          width:DDS.isTab? w *0.04 : w*0.75,
           borderRightColor:'#f0f0f0'
         }}
         edgeWidth={200}
