@@ -14,7 +14,13 @@ class MoveDialog extends React.Component {
   selectedTopic;
   state = {
     currentOpenedIndex: -1,
-    notebooks: db.notebooks.all,
+    notebooks: [
+      ...db.notebooks.all,
+      ...db.notebooks.all,
+      ...db.notebooks.all,
+      ...db.notebooks.all,
+      ...db.notebooks.all,
+    ],
   };
 
   async addNotebook(input) {
@@ -37,12 +43,13 @@ class MoveDialog extends React.Component {
         description={"Organize your notes by adding them to notebooks."}
         icon={Icon.Move}
         buttonsAlignment="center"
+        onClose={props.onClose}
         negativeButton={{
           text: "Cancel",
           onClick: props.onClose,
         }}
       >
-        <Box>
+        <Flex flexDirection="column" sx={{ overflowY: "hidden" }}>
           <Text variant="title">Notebooks</Text>
           <Flex flexDirection="row" my={2}>
             <Input
@@ -71,7 +78,6 @@ class MoveDialog extends React.Component {
               borderWidth: 1,
               borderStyle: "solid",
               borderColor: "border",
-              maxHeight: 5 * 46,
               overflowY: "auto",
             }}
           >
@@ -129,7 +135,7 @@ class MoveDialog extends React.Component {
               </Flex>
             ))}
           </Box>
-        </Box>
+        </Flex>
       </Dialog>
     );
   }

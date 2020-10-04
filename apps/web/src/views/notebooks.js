@@ -76,7 +76,7 @@ function Notebooks() {
           await add(nb);
           setOpen(false);
         }}
-        close={() => {
+        onClose={() => {
           setOpen(false);
         }}
       />

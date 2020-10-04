@@ -14,6 +14,7 @@ function ExportDialog(props) {
       icon={props.icon}
       description="You can export your note to Markdown, HTML, or Text."
       buttonsAlignment="center"
+      onClose={props.onClose}
       negativeButton={{
         onClick: props.onClose,
         text: "Cancel",

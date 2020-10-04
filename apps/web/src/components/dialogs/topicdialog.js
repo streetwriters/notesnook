@@ -13,19 +13,20 @@ function TopicDialog(props) {
     <Dialog
       isOpen={true}
       title={props.title}
-      description="You can create as many topics as you want."
+      description={props.subtitle}
       icon={props.icon}
       positiveButton={{
         text: "Create topic",
         onClick: () => {
-          props.onYes(ref.current.value);
+          props.onAction(ref.current.value);
         },
       }}
-      negativeButton={{ text: "Cancel", onClick: props.onNo }}
+      onClose={props.onClose}
+      negativeButton={{ text: "Cancel", onClick: props.onClose }}
     >
       <Box my={1}>
         <Input
-          data-test-id="edit-topic-dialog"
+          data-test-id="dialog-edit-topic"
           autoFocus
           ref={ref}
           placeholder="Topic title"
@@ -40,6 +41,7 @@ export function showTopicDialog(notebook) {
   return showDialog((perform) => (
     <TopicDialog
       title={"Create a Topic"}
+      subtitle={"You can create as many topics as you want."}
       icon={Icon.Topic}
       onNo={() => {
         perform(false);
@@ -57,13 +59,12 @@ export function showTopicDialog(notebook) {
 export function showEditTopicDialog(topic) {
   return showDialog((perform) => (
     <TopicDialog
-      title={"Topic"}
+      title={"Edit Topic"}
+      subtitle={`You are editing "${topic.title}" topic.`}
       icon={Icon.Topic}
       topic={topic}
-      onNo={() => {
-        perform(false);
-      }}
-      onYes={async (t) => {
+      onClose={() => perform(false)}
+      onAction={async (t) => {
         await db.notebooks
           .notebook(topic.notebookId)
           .topics.add({ ...topic, title: t });

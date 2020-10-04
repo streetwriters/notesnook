@@ -22,6 +22,7 @@ function PasswordDialog(props) {
       title={props.title}
       description={props.subtitle}
       icon={props.icon}
+      onClose={props.onCancel}
       positiveButton={{
         text: props.positiveButtonText,
         onClick: submit,

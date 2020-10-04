@@ -20,7 +20,6 @@ import RouteContainer from "../route-container";
 import useMobile from "../../utils/use-mobile";
 
 function Editor() {
-  console.log("rendering editor");
   const sessionState = useStore((store) => store.session.state);
   const setSession = useStore((store) => store.setSession);
   const saveSession = useStore((store) => store.saveSession);
@@ -30,7 +29,7 @@ function Editor() {
   const isFocusMode = useAppStore((store) => store.isFocusMode);
   const isMobile = useMobile();
   const isTrial = useUserStore(
-    (store) => store.user.notesnook?.subscription?.isTrial
+    (store) => store.user?.notesnook?.subscription?.isTrial
   );
   const isLoggedin = useUserStore((store) => store.isLoggedIn);
 

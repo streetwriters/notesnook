@@ -9,7 +9,7 @@ class UserStore extends BaseStore {
   isLoggingIn = false;
   isSigningIn = false;
   isSyncing = false;
-  user = {};
+  user = undefined;
 
   init = () => {
     return db.user.get().then(async (user) => {

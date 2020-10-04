@@ -11,7 +11,7 @@ const {
 } = require("./utils/actions");
 const List = require("./utils/listitemidbuilder");
 const Menu = require("./utils/menuitemidbuilder");
-const { checkNotePresence, isAbsent, isPresent } = require("./utils/conditions");
+const { checkNotePresence, isPresent } = require("./utils/conditions");
 
 beforeEach(async () => {
   page = await browser.newPage();
@@ -27,11 +27,8 @@ async function fillNotebookDialog(notebook) {
 
   for (let i = 0; i < notebook.topics.length; ++i) {
     let topic = notebook.topics[i];
-
-    await page.fill(getTestId(`dialog-topic-name-${i}`), topic);
-
-    if (!(await page.$(getTestId(`dialog-topic-name-${i + 1}`))))
-      await page.click(getTestId("dialog-add-topic"));
+    await page.fill(getTestId(`dialog-nb-topic`), topic);
+    await page.click(getTestId("dialog-nb-topic-action"));
   }
 
   await page.click(getTestId("dialog-yes"));
@@ -103,9 +100,7 @@ async function deleteNotebookAndCheckAbsence(notebookSelector) {
 
   await page.waitForTimeout(500);
 
-  await expect(
-    page.$(notebookSelector)
-  ).resolves.toBeFalsy();
+  await expect(page.$(notebookSelector)).resolves.toBeFalsy();
 
   await navigateTo("trash");
 
@@ -141,17 +136,31 @@ test("edit a notebook", async () => {
 
   await useContextMenu(notebookSelector, () => clickMenuItem("edit"));
 
-  const editedNotebook = {
+  const notebook = {
     title: "An Edited Notebook",
     description: "A new edited description",
     topics: ["Topic 1", "Topic 2", "Topic 3", "Topic 4", "Topic 5"],
   };
 
-  await fillNotebookDialog(editedNotebook);
+  await page.fill(getTestId("dialog-nb-name"), notebook.title);
+
+  await page.fill(getTestId("dialog-nb-description"), notebook.description);
+
+  for (var i = 1; i <= notebook.topics.length; ++i) {
+    let id = getTestId(`dialog-nb-topic-${i}-actions-edit`);
+    let topic = notebook.topics[i - 1];
+    if ((await page.$(id)) !== null) {
+      await page.click(id);
+    }
+    await page.fill(getTestId("dialog-nb-topic"), topic);
+    await page.click(getTestId("dialog-nb-topic-action"));
+  }
+
+  await confirmDialog();
 
   await page.waitForTimeout(1000);
 
-  await checkNotebookPresence(editedNotebook);
+  await checkNotebookPresence(notebook);
 });
 
 test("edit topics individually", async () => {
@@ -165,7 +174,7 @@ test("edit topics individually", async () => {
     await page.click(Menu.new("menuitem").item("edit").build());
 
     const editedTopicTitle = "Topic " + index + " edit 1";
-    await page.fill(getTestId("edit-topic-dialog"), editedTopicTitle);
+    await page.fill(getTestId("dialog-edit-topic"), editedTopicTitle);
 
     await page.click(getTestId("dialog-yes"));
 
@@ -201,7 +210,7 @@ test("permanently delete a notebook", async () => {
   ).resolves.toBeFalsy();
 });
 
-test.only("pin a notebook", async () => {
+test("pin a notebook", async () => {
   const notebookSelector = await createNotebookAndCheckPresence();
 
   await useContextMenu(notebookSelector, () => clickMenuItem("pin"));
@@ -209,7 +218,11 @@ test.only("pin a notebook", async () => {
   // wait for the menu to properly close
   await page.waitForTimeout(500);
 
-  await useContextMenu(notebookSelector, () => expect(isPresent(Menu.new("menuitem").item("unpin").build())).resolves.toBeTruthy());
+  await useContextMenu(notebookSelector, () =>
+    expect(
+      isPresent(Menu.new("menuitem").item("unpin").build())
+    ).resolves.toBeTruthy()
+  );
 
   // wait for the menu to properly close
   await page.waitForTimeout(500);

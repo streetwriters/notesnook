@@ -10,6 +10,7 @@ function Confirm(props) {
       title={props.title}
       icon={props.icon}
       description={props.subtitle}
+      onClose={props.onNo}
       positiveButton={{
         text: props.yesText,
         onClick: props.onYes,

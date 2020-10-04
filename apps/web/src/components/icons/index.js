@@ -83,6 +83,7 @@ export const DarkMode = createIcon(Icons.mdiWeatherNight);
 export const LightMode = createIcon(Icons.mdiWeatherSunny);
 export const Theme = createIcon(Icons.mdiThemeLightDark);
 export const Checkmark = createIcon(Icons.mdiCheck);
+export const CheckCircle = createIcon(Icons.mdiCheckCircle);
 
 export const Properties = createIcon(Icons.mdiDotsHorizontal);
 
@@ -102,3 +103,6 @@ export const ToggleUnchecked = createIcon(Icons.mdiToggleSwitchOff);
 export const ToggleChecked = createIcon(Icons.mdiToggleSwitch);
 
 export const Backup = createIcon(Icons.mdiBackupRestore);
+export const Buy = createIcon(Icons.mdiCurrencyUsdCircleOutline);
+
+export const Edit = createIcon(Icons.mdiPencil);

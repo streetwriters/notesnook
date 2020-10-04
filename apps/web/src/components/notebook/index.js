@@ -17,7 +17,9 @@ function menuItems(notebook, index) {
     },
     {
       title: "Edit",
-      onClick: () => showEditNoteDialog(notebook),
+      onClick: async () => {
+        if (await showEditNoteDialog(notebook)) store.refresh();
+      },
     },
     {
       title: "Delete",

@@ -1,5 +1,5 @@
 import React from "react";
-import { Flex, Box, Button as RebassButton } from "rebass";
+import { Flex, Box, Button as RebassButton, Text } from "rebass";
 import { Input } from "@rebass/forms";
 import * as Icon from "../icons";
 import Dialog, { showDialog } from "./dialog";
@@ -9,44 +9,50 @@ import { showToast } from "../../utils/toast";
 import { db } from "../../common";
 
 class AddNotebookDialog extends React.Component {
-  MAX_AVAILABLE_HEIGHT = window.innerHeight * 0.3;
   title = "";
   description = "";
-  _inputRefs = [];
-  lastLength = 0;
-  topics = [{ title: "" }];
   id = undefined;
+  deletedTopics = [];
   state = {
-    topics: [{ title: "" }],
-    focusedInputIndex: 0,
+    topics: [],
+    isEditting: false,
+    editIndex: -1,
   };
 
-  performActionOnTopic(index) {
-    if (this.state.focusedInputIndex !== index) {
-      this.removeTopic(index);
-    } else {
-      this.addTopic(index);
-    }
-  }
-
   removeTopic(index) {
-    this._action(index, 1);
+    const topics = this.state.topics.slice();
+    if (topics[index].id) {
+      this.deletedTopics.push(topics[index].id);
+    }
+    topics.splice(index, 1);
+    this.setState({
+      topics,
+    });
   }
 
-  addTopic(index) {
-    this._action(index + 1, 0, { title: "" });
+  addTopic(topicTitle) {
+    const topics = this.state.topics.slice();
+    topics.push({ title: topicTitle });
+    this.setState({
+      topics,
+    });
+    this.resetTopicInput();
   }
 
-  _action(index, deleteCount, replaceItem) {
-    if (replaceItem !== undefined)
-      this.topics.splice(index, deleteCount, replaceItem);
-    else this.topics.splice(index, deleteCount);
+  editTopic(index) {
+    this._topicInputRef.value = this.state.topics[index].title;
+    this._topicInputRef.focus();
+    this.setState({ isEditting: true, editIndex: index });
+  }
 
-    this.setState({ topics: this.topics }, () =>
-      setTimeout(() => {
-        this._inputRefs[index].focus();
-      }, 0)
-    );
+  doneEditingTopic() {
+    this.setState({ isEditting: false, editIndex: -1 });
+    this.resetTopicInput();
+  }
+
+  resetTopicInput() {
+    this._topicInputRef.value = "";
+    this._topicInputRef.focus();
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
@@ -58,26 +64,22 @@ class AddNotebookDialog extends React.Component {
   componentDidMount() {
     if (!this.props.notebook) return;
     const { title, description, id, topics } = qclone(this.props.notebook);
-    console.log(topics);
-    this.topics = topics;
     this.setState({
       topics,
     });
     this.title = title;
+    this.notebookTitle = title;
     this.description = description;
     this.id = id;
   }
 
   _reset() {
     this.title = "";
+    this.notebookTitle = "";
     this.description = "";
-    this._inputRefs = [];
-    this.lastLength = 0;
-    this.topics = [{ title: "" }];
     this.id = undefined;
     this.setState({
-      topics: [{ title: "" }],
-      focusedInputIndex: 0,
+      topics: [],
     });
   }
 
@@ -86,28 +88,34 @@ class AddNotebookDialog extends React.Component {
     return (
       <Dialog
         isOpen={props.isOpen}
-        title={props.edit ? "Edit this Notebook" : "Create a Notebook"}
+        title={props.edit ? "Edit Notebook" : "Create a Notebook"}
         description={
-          props.edit ? "" : "Notebooks are the best way to organize your notes."
+          props.edit
+            ? `You are editing "${this.notebookTitle}".`
+            : "Notebooks are the best way to organize your notes."
         }
         icon={Icon.Notebook}
         positiveButton={{
-          text: "Create notebook",
+          text: props.edit ? "Edit notebook" : "Create notebook",
           onClick: () => {
-            props.onDone({
-              title: this.title,
-              description: this.description,
-              topics: this.topics.map((topic) => {
-                if (topic.id) return topic;
-                return topic.title;
-              }),
-              id: this.id,
-            });
+            props.onDone(
+              {
+                title: this.title,
+                description: this.description,
+                topics: this.state.topics.map((topic) => {
+                  if (topic.id) return topic;
+                  return topic.title;
+                }),
+                id: this.id,
+              },
+              this.deletedTopics
+            );
           },
         }}
-        negativeButton={{ text: "Cancel", onClick: props.close }}
+        onClose={props.onClose}
+        negativeButton={{ text: "Cancel", onClick: props.onClose }}
       >
-        <Box>
+        <Flex flexDirection="column" sx={{ overflowY: "auto" }}>
           <Input
             data-test-id="dialog-nb-name"
             autoFocus
@@ -117,79 +125,70 @@ class AddNotebookDialog extends React.Component {
           />
           <Input
             data-test-id="dialog-nb-description"
-            sx={{ marginTop: 2 }}
+            mt={2}
             onChange={(e) => (this.description = e.target.value)}
             placeholder="Enter description (optional)"
             defaultValue={this.description}
           />
-          <Box
-            mt={2}
-            sx={{
-              maxHeight: this.MAX_AVAILABLE_HEIGHT,
-              overflowY: "auto",
-            }}
-          >
-            {this.state.topics.map((value, index) => {
-              if (value.title === "General") {
-                return null;
-              }
-
-              return (
-                <Flex
-                  key={value.id || value.title}
-                  flexDirection="row"
-                  sx={{ marginBottom: 1 }}
-                >
-                  <Input
-                    data-test-id={
-                      "dialog-topic-name-" + (props.edit ? index - 1 : index)
-                    }
-                    ref={(ref) => {
-                      this._inputRefs[index] = ref;
-                      if (ref) ref.value = value.title; // set default value
-                    }}
-                    placeholder="Topic name"
-                    onFocus={(e) => {
-                      this.lastLength = e.nativeEvent.target.value.length;
-                      if (this.state.focusedInputIndex === index) return;
-                      this.setState({ focusedInputIndex: index });
-                    }}
-                    onChange={(e) => {
-                      this.topics[index].title = e.target.value;
-                    }}
-                    onKeyUp={(e) => {
-                      if (e.nativeEvent.key === "Enter") {
-                        this.addTopic(index);
-                      } else if (
-                        e.nativeEvent.key === "Backspace" &&
-                        this.lastLength === 0 &&
-                        index > 0
-                      ) {
-                        this.removeTopic(index);
-                      }
-                      this.lastLength = e.nativeEvent.target.value.length;
-                    }}
-                  />
-                  <RebassButton
-                    variant="tertiary"
-                    sx={{ marginLeft: 1 }}
-                    px={2}
-                    py={1}
-                    onClick={() => this.performActionOnTopic(index)}
-                  >
-                    <Box height={20}>
-                      {this.state.focusedInputIndex === index ? (
-                        <Icon.Plus size={22} data-test-id="dialog-add-topic" />
-                      ) : (
-                        <Icon.Minus size={22} />
-                      )}
-                    </Box>
-                  </RebassButton>
-                </Flex>
-              );
-            })}
-          </Box>
-        </Box>
+          <Flex flexDirection="row" mt={2}>
+            <Input
+              data-test-id={"dialog-nb-topic"}
+              ref={(ref) => (this._topicInputRef = ref)}
+              placeholder="Add a topic"
+              onChange={(e) => {
+                if (!this.state.isEditting) return;
+                const topics = this.state.topics.slice();
+                topics[this.state.editIndex].title = e.target.value;
+                this.setState({
+                  topics,
+                });
+              }}
+              onKeyUp={(e) => {
+                if (e.nativeEvent.key === "Enter") {
+                  if (this.state.isEditting) {
+                    this.doneEditingTopic();
+                  } else {
+                    this.addTopic(e.target.value);
+                  }
+                }
+              }}
+            />
+            <RebassButton
+              variant="tertiary"
+              sx={{ marginLeft: 1 }}
+              px={2}
+              py={1}
+              onClick={() => {
+                if (this.state.isEditting) {
+                  this.doneEditingTopic();
+                } else {
+                  this.addTopic(this._topicInputRef.value);
+                }
+              }}
+              data-test-id="dialog-nb-topic-action"
+            >
+              <Box height={20}>
+                {this.state.isEditting ? (
+                  <Icon.Checkmark size={22} />
+                ) : (
+                  <Icon.Plus size={22} />
+                )}
+              </Box>
+            </RebassButton>
+          </Flex>
+          {this.state.topics.map((topic, index) => (
+            <TopicItem
+              key={topic.id || topic.title || index}
+              hideActions={topic.title === "General"}
+              title={topic.title}
+              isEditing={this.state.editIndex === index}
+              onEdit={() => this.editTopic(index)}
+              onDoneEditing={() => this.doneEditingTopic()}
+              onDelete={() => this.removeTopic(index)}
+              index={index}
+            />
+          ))}
+        </Flex>
       </Dialog>
     );
   }
@@ -201,16 +200,24 @@ export function showEditNoteDialog(notebook) {
       isOpen={true}
       notebook={notebook}
       edit={true}
-      onDone={async (nb) => {
+      onDone={async (nb, deletedTopics) => {
+        // we remove the topics from notebook
+        // beforehand so we can add them manually, later
         const topics = qclone(nb.topics);
-        console.log(nb, topics);
         delete nb.topics;
+
+        // add the edited notebook to db
         await store.add({ ...notebook, ...nb });
-        await db.notebooks.notebook(notebook.id).topics.add(...topics);
+
+        // add or delete topics as required
+        const notebookTopics = db.notebooks.notebook(notebook.id).topics;
+        await notebookTopics.delete(...deletedTopics);
+        await notebookTopics.add(...topics);
+
         showToast("success", "Notebook edited successfully!");
         perform(true);
       }}
-      close={() => {
+      onClose={() => {
         perform(false);
       }}
     />
@@ -218,3 +225,63 @@ export function showEditNoteDialog(notebook) {
 }
 
 export default AddNotebookDialog;
+
+function TopicItem(props) {
+  const {
+    title,
+    onEdit,
+    onDoneEditing,
+    onDelete,
+    isEditing,
+    hideActions,
+    index,
+  } = props;
+  return (
+    <Flex
+      p={2}
+      pl={0}
+      justifyContent="space-between"
+      alignItems="center"
+      sx={{
+        borderWidth: 1,
+        borderBottomColor: isEditing ? "primary" : "border",
+        borderBottomStyle: "solid",
+        cursor: "pointer",
+        ":hover": { borderBottomColor: "primary" },
+      }}
+      onClick={isEditing ? onDoneEditing : onEdit}
+    >
+      <Flex alignItems="center" justifyContent="center">
+        <Icon.Topic />
+        <Text as="span" ml={1} fontSize="body">
+          {title}
+        </Text>
+      </Flex>
+      {!hideActions && (
+        <Flex justifyContent="center" alignItems="center">
+          <Text
+            variant="subBody"
+            color="primary"
+            sx={{ ":hover": { opacity: 0.8 } }}
+            onClick={isEditing ? onDoneEditing : onEdit}
+            data-test-id={`dialog-nb-topic-${index}-actions-edit`}
+          >
+            {isEditing ? "Done" : "Edit"}
+          </Text>
+          <Text
+            variant="subBody"
+            color="error"
+            ml={1}
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete();
+            }}
+            sx={{ ":hover": { opacity: 0.8 } }}
+          >
+            Delete
+          </Text>
+        </Flex>
+      )}
+    </Flex>
+  );
+}

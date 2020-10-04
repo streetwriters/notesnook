@@ -1,16 +1,27 @@
-function loadTCheckout(document, src, libName, config) {
+function loadTCheckout() {
   return new Promise((resolve) => {
+    const config = {
+      app: { merchant: "250327951921", iframeLoad: "checkout" },
+      cart: {
+        host: "https://secure.2checkout.com",
+        customization: "inline",
+      },
+    };
     var script = document.createElement("script");
-    script.src = src;
+    script.src =
+      "https://secure.avangate.com/checkout/client/twoCoInlineCart.js";
     script.async = true;
     var firstScriptElement = document.getElementsByTagName("script")[0];
     script.onload = function () {
       for (var namespace in config) {
         if (config.hasOwnProperty(namespace)) {
-          window[libName].setup.setConfig(namespace, config[namespace]);
+          window["TwoCoInlineCart"].setup.setConfig(
+            namespace,
+            config[namespace]
+          );
         }
       }
-      window[libName].register();
+      window["TwoCoInlineCart"].register();
       resolve();
     };
 
@@ -19,19 +30,8 @@ function loadTCheckout(document, src, libName, config) {
 }
 
 async function upgrade(user) {
-  if (!("TwoCoInlineCart" in window)) {
-    await loadTCheckout(
-      document,
-      "https://secure.avangate.com/checkout/client/twoCoInlineCart.js",
-      "TwoCoInlineCart",
-      {
-        app: { merchant: "250327951921", iframeLoad: "checkout" },
-        cart: {
-          host: "https://secure.2checkout.com",
-          customization: "inline",
-        },
-      }
-    );
+  if (!window.TwoCoInlineCart) {
+    await loadTCheckout();
   }
 
   const { TwoCoInlineCart: cart } = window;
