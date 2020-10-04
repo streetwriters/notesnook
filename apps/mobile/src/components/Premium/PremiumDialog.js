@@ -15,6 +15,7 @@ class PremiumDialog extends React.Component {
     this.state = {
       user: null,
       product: null,
+      scrollEnabled: false,
     };
     this.routeIndex = 0;
     this.count = 0;
@@ -25,6 +26,7 @@ class PremiumDialog extends React.Component {
     this.subsriptionErrorListener = RNIap.purchaseErrorListener(
       this.onSubscriptionError,
     );
+    this.prevScroll = 0;
   }
 
   open() {
@@ -37,7 +39,7 @@ class PremiumDialog extends React.Component {
   async componentDidMount() {
     let u = await db.user.get();
     let prod = await RNIap.getSubscriptions(itemSkus);
-    console.log(prod);
+    //console.log(prod);
     this.setState({
       user: u && u.Id ? u : null,
       product: prod[0],
@@ -69,11 +71,9 @@ class PremiumDialog extends React.Component {
           width: DDS.isTab ? 500 : '100%',
           alignSelf: 'center',
           borderRadius: 10,
-        
           marginBottom: DDS.isTab ? 50 : 0,
         }}
         extraScroll={DDS.isTab ? 50 : 0}
-        gestureEnabled={true}
         footerAlwaysVisible={DDS.isTab}
         footerHeight={DDS.isTab ? 20 : 10}
         footerStyle={
@@ -111,10 +111,8 @@ class PremiumDialog extends React.Component {
           <ScrollView
             style={{
               width: '100%',
-              maxHeight:DDS.isTab? h * 0.35 : h * 0.5,
-            }}
-            nestedScrollEnabled={true}
-            showsVerticalScrollIndicator={false}>
+              maxHeight: DDS.isTab ? h * 0.35 : h * 0.5,
+            }}>
             {[
               {
                 title: 'Cross Platfrom Sync',

@@ -4,7 +4,7 @@ import {ph, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
 import {eOpenProgressDialog, eCloseProgressDialog} from '../../services/events';
-import {getElevation} from '../../utils/utils';
+import {DDS, getElevation} from '../../utils/utils';
 import BaseDialog from '../Dialog/base-dialog';
 import {Loading} from '../Loading';
 
@@ -39,7 +39,7 @@ const ProgressDialog = () => {
       <View
         style={{
           ...getElevation(5),
-          width: '80%',
+          width: DDS.isTab? 350 : '80%',
           maxHeight: 350,
           borderRadius: 5,
           backgroundColor: colors.bg,

@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {FlatList, Text, View} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import RNFetchBlob from 'rn-fetch-blob';
 import {ph, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
@@ -11,11 +10,13 @@ import {eCloseRestoreDialog, eOpenRestoreDialog} from '../../services/events';
 import storage from '../../utils/storage';
 import {
   db,
+  DDS,
   getElevation,
   requestStoragePermission,
   sleep,
   ToastEvent,
 } from '../../utils/utils';
+import {ActionIcon} from '../ActionIcon';
 import {Button} from '../Button';
 import BaseDialog from '../Dialog/base-dialog';
 import {Loading} from '../Loading';
@@ -68,8 +69,8 @@ const RestoreDialog = () => {
       <View
         style={{
           ...getElevation(5),
-          width: '100%',
-          height: '100%',
+          width: DDS.isTab ? 500 : '100%',
+          height: DDS.isTab ? 500 : '100%',
           borderRadius: 5,
           backgroundColor: colors.bg,
           paddingHorizontal: 12,
@@ -107,19 +108,18 @@ const RestoreDialog = () => {
             justifyContent: 'center',
             alignItems: 'center',
             height: 50,
-            marginTop: insets.top,
+            marginTop: DDS.isTab ? 0 : insets.top,
           }}>
-          <Icon
+          <ActionIcon
             name="close"
             size={SIZE.xxl}
             onPress={close}
-            style={{
-              width: 50,
-              height: 50,
+            customStyle={{
+              width: 40,
+              height: 40,
               position: 'absolute',
               textAlignVertical: 'center',
               left: 0,
-              marginBottom: 15,
             }}
             color={colors.heading}
           />

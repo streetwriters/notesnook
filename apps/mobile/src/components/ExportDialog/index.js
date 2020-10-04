@@ -118,7 +118,7 @@ const ExportDialog = () => {
       <View
         style={[
           {
-            width: DDS.isTab ? '40%' : '80%',
+            width: DDS.isTab ? 350 : '80%',
             backgroundColor: colors.bg,
           },
           styles.container,

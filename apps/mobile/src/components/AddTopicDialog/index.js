@@ -3,7 +3,7 @@ import {Modal, Text, TouchableOpacity, View} from 'react-native';
 import {TextInput} from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {opacity, ph, pv, SIZE, WEIGHT} from '../../common/common';
-import {getElevation, ToastEvent, db} from '../../utils/utils';
+import {getElevation, ToastEvent, db, DDS} from '../../utils/utils';
 import {eSendEvent} from '../../services/eventManager';
 import {eOnNewTopicAdded} from '../../services/events';
 import {Toast} from '../Toast';
@@ -68,7 +68,7 @@ export class AddTopicDialog extends React.Component {
         <View
           style={{
             ...getElevation(5),
-            width: '80%',
+            width:DDS.isTab? 350 : '80%',
             maxHeight: 350,
             borderRadius: 5,
             backgroundColor: colors.bg,

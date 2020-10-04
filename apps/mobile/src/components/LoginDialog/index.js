@@ -237,6 +237,7 @@ const LoginDialog = () => {
             justifyContent: 'center',
             borderRadius: DDS.isTab ? 5 : 0,
             zIndex: 10,
+            ...getElevation(5),
           }}>
           <Toast context="local" />
           {loggingIn || signingIn ? (

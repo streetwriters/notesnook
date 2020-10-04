@@ -114,8 +114,8 @@ const MoveNoteDialog = () => {
         <View
           style={{
             ...getElevation(DDS.isTab ? 10 : 0),
-            width: DDS.isTab ? '65%' : '100%',
-            height: DDS.isTab ? '90%' : '100%',
+            width: DDS.isTab ? 500 : '100%',
+            height: DDS.isTab ? 500 : '100%',
             flex: 1,
             borderRadius: DDS.isTab ? 5 : 0,
             backgroundColor: colors.bg,

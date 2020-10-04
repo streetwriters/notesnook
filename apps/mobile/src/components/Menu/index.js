@@ -110,7 +110,9 @@ export const Menu = ({
         opacity: hide ? 0 : 1,
         width: '100%',
         backgroundColor: colors.bg,
-        paddingTop:insets.top
+        paddingTop:insets.top,
+        borderRightWidth:1,
+        borderRightColor:colors.nav
       }}>
       <ScrollView
         alwaysBounceVertical={false}
