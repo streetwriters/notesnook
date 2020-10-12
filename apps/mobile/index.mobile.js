@@ -13,7 +13,6 @@ import {
   EditorScale,
   EditorTranslateY,
 } from './src/utils/animations';
-import {DDS} from './src/utils/utils';
 import Editor from './src/views/Editor';
 
 const editorRef = createRef();
@@ -25,7 +24,6 @@ const AnimatedScreenContainer = Animated.createAnimatedComponent(
 export const Initialize = () => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
-  const [locked, setLocked] = useState(false);
 
   useEffect(() => {
     if (Platform.OS === 'android') {
@@ -49,7 +47,7 @@ export const Initialize = () => {
         }}>
         <View
           style={{
-            width: DDS.isTab ? '70%' : '100%',
+            width: '100%',
             height: '100%',
             backgroundColor: colors.bg,
           }}>
