@@ -94,27 +94,30 @@ export async function loadNote(item) {
 }
 
 const onChange = (data) => {
-  if (data !== '') {
+  if (!data || data === '') return;
     let rawData = JSON.parse(data);
-
+    console.log(rawData);
+    
     if (rawData.type === 'content') {
       if (
-        content &&
-        JSON.stringify(content.delta) !== JSON.stringify(rawData.delta)
+        !content ||
+        (content &&
+          JSON.stringify(content.delta) !== JSON.stringify(rawData.delta))
       ) {
-        content = rawData;
         noteEdited = true;
       }
+      content = rawData;
     } else {
-      if (rawData.value !== title) {
+      if (rawData.value !== '' && rawData.value !== title) {
         noteEdited = true;
-        title = rawData.value;
       }
+      title = rawData.value;
     }
-  }
+  
 };
 
 export const _onMessage = async (evt) => {
+  console.log(evt.nativeEvent.data);
   if (!evt || !evt.nativeEvent || !evt.nativeEvent.data) return;
   let message = evt.nativeEvent.data;
 
@@ -129,6 +132,7 @@ export const _onMessage = async (evt) => {
     }
     onChange(message);
     timer = setTimeout(() => {
+      console.log('noteEdited', noteEdited);
       if (noteEdited) {
         saveNote(true);
       } else {
