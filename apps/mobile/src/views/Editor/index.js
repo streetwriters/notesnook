@@ -38,6 +38,7 @@ import {
   EditorWebView,
   getNote,
   injectedJS,
+  isNotedEdited,
   loadNote,
   onWebViewLoad,
   post,
@@ -48,6 +49,8 @@ import {
 
 var handleBack;
 var tapCount = 0;
+
+
 const Editor = ({noMenu}) => {
   // Global State
   const [state, dispatch] = useTracked();
@@ -142,11 +145,11 @@ const Editor = ({noMenu}) => {
 
   const _onBackPress = async () => {
     editing.currentlyEditing = true;
-    if (DDS.isTab) {
+    if (DDS.isTab && !DDS.isSmallTab) {
       simpleDialogEvent(TEMPLATE_EXIT_FULLSCREEN());
     } else {
       exitEditorAnimation();
-      if (checkNote()) {
+      if (checkNote() && isNotedEdited()) {
         ToastEvent.show('Note Saved!', 'success');
       }
       setTimeout(async () => {
@@ -163,7 +166,8 @@ const Editor = ({noMenu}) => {
     <SafeAreaView
       style={{
         flex: 1,
-        backgroundColor: DDS.isTab ? 'transparent' : colors.bg,
+        backgroundColor:
+          DDS.isTab && !DDS.isSmallTab ? 'transparent' : colors.bg,
         height: '100%',
         width: '100%',
         flexDirection: 'row',
@@ -175,7 +179,7 @@ const Editor = ({noMenu}) => {
           height: '100%',
           width: '100%',
         }}>
-        {noMenu ? (
+        {noMenu || DDS.isPhone || DDS.isSmallTab ? (
           <View />
         ) : (
           <ActionIcon
@@ -201,18 +205,18 @@ const Editor = ({noMenu}) => {
         <View
           style={{
             flexDirection: 'row',
-            width: DDS.isTab ? '30%' : '100%',
+            width: DDS.isTab && !DDS.isSmallTab ? '30%' : '100%',
             height: 50,
             justifyContent: 'space-between',
             alignItems: 'center',
             paddingHorizontal: 12,
-            position: DDS.isTab ? 'absolute' : 'relative',
+            position: DDS.isTab && !DDS.isSmallTab ? 'absolute' : 'relative',
             backgroundColor: colors.bg,
             right: 0,
             marginTop: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight,
             zIndex: 10,
           }}>
-          {DDS.isTab ? (
+          {DDS.isTab && !DDS.isSmallTab ? (
             <View />
           ) : (
             <ActionIcon
@@ -239,7 +243,7 @@ const Editor = ({noMenu}) => {
                 simpleDialogEvent(TEMPLATE_NEW_NOTE);
               }}
             />
-            {DDS.isTab && !fullscreen ? (
+            {DDS.isTab && !DDS.isSmallTab && !fullscreen ? (
               <ActionIcon
                 name="fullscreen"
                 color={colors.heading}
@@ -341,7 +345,12 @@ const Editor = ({noMenu}) => {
             maxHeight: '100%',
             width: '100%',
             backgroundColor: 'transparent',
-            marginTop: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight,
+            marginTop:
+              DDS.isTab && !DDS.isSmallTab
+                ? Platform.OS === 'ios'
+                  ? 0
+                  : StatusBar.currentHeight
+                : 0,
           }}
           onMessage={_onMessage}
         />

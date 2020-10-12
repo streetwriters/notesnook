@@ -14,6 +14,7 @@ import {
 import {eOnNewTopicAdded, eScrollEvent} from '../../services/events';
 import NavigationService from '../../services/NavigationService';
 import {db} from '../../utils/utils';
+import { Dimensions } from 'react-native';
 
 export const Notebook = ({route, navigation}) => {
   const [, dispatch] = useTracked();
@@ -48,6 +49,16 @@ export const Notebook = ({route, navigation}) => {
         menu: false,
         canGoBack: true,
         heading: params.title,
+        color: null,
+      },
+    });
+    dispatch({
+      type: ACTIONS.SEARCH_STATE,
+      state: {
+        placeholder: `Search in "${params.title}"`,
+        data: topics,
+        noSearch: false,
+        type: 'topics',
         color: null,
       },
     });
@@ -95,6 +106,7 @@ export const Notebook = ({route, navigation}) => {
   const _onPressBottomButton = () => {
     let n = route.params.notebook;
     AddTopicEvent(n);
+  
   };
 
   return (

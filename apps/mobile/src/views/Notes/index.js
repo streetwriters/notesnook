@@ -156,10 +156,10 @@ export const Notes = ({route, navigation}) => {
       };
     }
 
-    if (DDS.isTab) {
-      eSendEvent(eOnLoadNote, {type: 'new'});
+    eSendEvent(eOnLoadNote, {type: 'new'});
+    if (DDS.isPhone || DDS.isSmallTab) {
+      openEditorAnimation();
     }
-    openEditorAnimation();
   }, [params.type]);
 
   return (

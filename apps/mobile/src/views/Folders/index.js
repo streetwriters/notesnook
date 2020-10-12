@@ -21,6 +21,16 @@ export const Folders = ({route, navigation}) => {
         color: null,
       },
     });
+    dispatch({
+      type: ACTIONS.SEARCH_STATE,
+      state: {
+        placeholder: 'Search all notebooks',
+        data: notebooks,
+        noSearch: false,
+        type: 'notebooks',
+        color: null,
+      },
+    });
 
     dispatch({
       type: ACTIONS.HEADER_VERTICAL_MENU,
@@ -38,6 +48,7 @@ export const Folders = ({route, navigation}) => {
       type: ACTIONS.CURRENT_SCREEN,
       screen: 'notebooks',
     });
+   
   }, []);
 
   useEffect(() => {

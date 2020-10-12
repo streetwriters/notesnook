@@ -34,6 +34,16 @@ export const Trash = ({route, navigation}) => {
         heading: 'Trash',
       },
     });
+    dispatch({
+      type: ACTIONS.SEARCH_STATE,
+      state: {
+        placeholder: 'Search all trash',
+        data: trash,
+        noSearch: false,
+        type: 'trash',
+        color: null,
+      },
+    });
 
     dispatch({
       type: ACTIONS.TRASH,

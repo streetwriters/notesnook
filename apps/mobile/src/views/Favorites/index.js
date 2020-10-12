@@ -26,6 +26,16 @@ export const Favorites = ({route, navigation}) => {
         heading: 'Favorites',
       },
     });
+    dispatch({
+      type: ACTIONS.SEARCH_STATE,
+      state: {
+        placeholder: 'Search all favorites',
+        data: favorites,
+        noSearch: false,
+        type: 'notes',
+        color: null,
+      },
+    });
 
     dispatch({
       type: ACTIONS.CURRENT_SCREEN,

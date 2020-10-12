@@ -19,6 +19,11 @@ export const injectedJS = `if (!window.location.search) {
         link.click();  
       }
       `;
+let noteEdited = false;
+
+export function isNotedEdited() {
+  return noteEdited;
+}
 
 export const INJECTED_JAVASCRIPT = (premium, noMenu) =>
   premium
@@ -93,16 +98,28 @@ const onChange = (data) => {
     let rawData = JSON.parse(data);
 
     if (rawData.type === 'content') {
-      content = rawData;
+      if (
+        content &&
+        JSON.stringify(content.delta) !== JSON.stringify(rawData.delta)
+      ) {
+        content = rawData;
+        noteEdited = true;
+      }
     } else {
-      title = rawData.value;
+      if (rawData.value !== title) {
+        noteEdited = true;
+        title = rawData.value;
+      }
     }
   }
 };
 
 export const _onMessage = async (evt) => {
-  if (evt.nativeEvent.data === 'loaded') {
-  } else if (evt.nativeEvent.data !== '' && evt.nativeEvent.data !== 'loaded') {
+  if (!evt || !evt.nativeEvent || !evt.nativeEvent.data) return;
+  let message = evt.nativeEvent.data;
+
+  if (message === 'loaded') {
+  } else if (message !== '' && message !== 'loaded') {
     clearTimeout(timer);
 
     timer = null;
@@ -110,9 +127,13 @@ export const _onMessage = async (evt) => {
       await sleep(2000);
       canSave = true;
     }
-    onChange(evt.nativeEvent.data);
+    onChange(message);
     timer = setTimeout(() => {
-      saveNote(true);
+      if (noteEdited) {
+        saveNote(true);
+      } else {
+        console.log('NOTHING CHANGED');
+      }
     }, 500);
   }
 };
@@ -273,7 +294,8 @@ const loadNoteInEditor = async () => {
     await sleep(50);
     post('title', title);
     content.delta = note.content.delta;
-    if (note.locked) {
+    console.log(content.delta, 'DELTA');
+    if (!note.locked) {
       content.delta = await db.notes.note(id).delta();
     }
     post('delta', content.delta);

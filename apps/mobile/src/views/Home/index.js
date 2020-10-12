@@ -1,4 +1,6 @@
 import React, {useCallback, useEffect} from 'react';
+import {Dimensions} from 'react-native';
+import Orientation from 'react-native-orientation';
 import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
 import {Placeholder} from '../../components/ListPlaceholders';
 import SimpleList from '../../components/SimpleList';
@@ -31,6 +33,16 @@ export const Home = ({route, navigation}) => {
     dispatch({
       type: ACTIONS.HEADER_VERTICAL_MENU,
       state: true,
+    });
+    dispatch({
+      type: ACTIONS.SEARCH_STATE,
+      state: {
+        placeholder: 'Search all notes',
+        data: notes,
+        noSearch: false,
+        type: 'notes',
+        color: null,
+      },
     });
     dispatch({
       type: ACTIONS.HEADER_TEXT_STATE,
@@ -76,17 +88,15 @@ export const Home = ({route, navigation}) => {
   }, [notes]);
 
   const _onPressBottomButton = async () => {
-    if (DDS.isTab) {
-      eSendEvent(eOnLoadNote, {type: 'new'});
-    } else {
-      eSendEvent(eOnLoadNote, {type: 'new'});
+    eSendEvent(eOnLoadNote, {type: 'new'});
+
+    if (DDS.isPhone || DDS.isSmallTab) {
       openEditorAnimation();
     }
   };
-
   useEffect(() => {
-    console.log('render home');  
-  })
+    console.log('render home');
+  });
 
   return (
     <>

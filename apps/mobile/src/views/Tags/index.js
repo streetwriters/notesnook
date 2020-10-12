@@ -32,6 +32,16 @@ export const Tags = ({route, navigation}) => {
       state: {
         heading: 'Tags',
       },
+    }); 
+    dispatch({
+      type: ACTIONS.SEARCH_STATE,
+      state: {
+        placeholder: 'Search all tags',
+        data: tags,
+        noSearch: false,
+        type: 'tags',
+        color: null,
+      },
     });
 
     dispatch({type: ACTIONS.TAGS});
