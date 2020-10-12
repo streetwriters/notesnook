@@ -87,14 +87,13 @@ export const COLORS_NOTE = {
   gray: '#9E9E9E',
 };
 
-const getDeviceSize = () => {
+export const getDeviceSize = () => {
   let dpi = getDpi(pixelDensity);
   let deviceWidthInInches = adjustedWidth / dpi;
   let deviceHeightInInches = adjustedHeight / dpi;
   let diagonalSize = Math.sqrt(
     Math.pow(deviceWidthInInches, 2) + Math.pow(deviceHeightInInches, 2),
   );
-  console.log(diagonalSize);
   return diagonalSize;
 };
 
@@ -116,9 +115,9 @@ const correction = (size, multiplier) => {
   } else if (dSize >= 6.5 && dSize <= 7.2 && DDS.isTab) {
     return size * multiplier;
   } else if (dSize > 7.2 && dSize <= 8.5 && DDS.isTab) {
-    return size * (multiplier + 0.05);
+    return size * (multiplier + 0.10);
   } else if (dSize > 8.5 && dSize <= 9.8 && DDS.isTab) {
-    return size * (multiplier + 0.05);
+    return size * (multiplier + 0.15);
   } else if (dSize > 9.8) {
     return size;
   } else {
@@ -129,13 +128,13 @@ const correction = (size, multiplier) => {
 export const normalize = (size) => {
   let pd = pixelDensity;
   if (pd === 1 || pd < 1) {
-    return correction(size, 0.75);
+    return correction(size, 0.82);
   } else if (pd > 1 && pd <= 1.5) {
-    return correction(size, 0.8);
+    return correction(size, 0.7);
   } else if (pd > 1.5 && pd <= 2) {
-    return correction(size, 0.84);
+    return correction(size, 0.9);
   } else if (pd > 2 && pd <= 3) {
-    return correction(size, 0.87);
+    return correction(size, 0.93);
   } else if (pd > 3) {
     return correction(size, 1);
   }
