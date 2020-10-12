@@ -1,29 +1,64 @@
 import {useNetInfo} from '@react-native-community/netinfo';
 import React, {useEffect, useState} from 'react';
-import {useColorScheme} from 'react-native';
+import {Dimensions, useColorScheme} from 'react-native';
 import Orientation from 'react-native-orientation';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
-import {getColorScheme, scale, updateSize} from './src/common/common';
+import {
+  getColorScheme,
+  getDeviceSize,
+  scale,
+  updateSize,
+} from './src/common/common';
 import {useTracked} from './src/provider';
 import {ACTIONS} from './src/provider/actions';
 import {defaultState} from './src/provider/defaultState';
-import {eSubscribeEvent, eUnSubscribeEvent} from './src/services/eventManager';
-import {eDispatchAction, eResetApp, eStartSyncer} from './src/services/events';
+import {
+  eSendEvent,
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+} from './src/services/eventManager';
+import {
+  eDispatchAction,
+  eOnLoadNote,
+  eResetApp,
+  eStartSyncer,
+} from './src/services/events';
 import {MMKV} from './src/utils/storage';
-import {db, DDS, ToastEvent} from './src/utils/utils';
+import {db, DDS, sleep, ToastEvent} from './src/utils/utils';
+import DeviceInfo from 'react-native-device-info';
+import {getNote} from './src/views/Editor/func';
+import {openEditorAnimation} from './src/utils/animations';
 
+let firstLoad = true;
+let note = null;
 const App = () => {
   const [, dispatch] = useTracked();
   const [init, setInit] = useState(false);
   const netInfo = useNetInfo();
   const colorScheme = useColorScheme();
-  const I = DDS.isTab ? require('./index.tablet') : require('./index.mobile');
+  let I =
+    DDS.isTab && !DDS.isSmallTab
+      ? require('./index.tablet')
+      : require('./index.mobile');
+
   const _onOrientationChange = (o) => {
-    // Currently orientation is locked on tablet.
-    /* DDS.checkOrientation();
+    console.log(o, 'orientation');
+    let smallTab = DDS.isSmallTab;
+    DDS.setNewValues();
+    DDS.checkSmallTab(o);
+    if (smallTab === DDS.isSmallTab) {
+      console.log('nothing changed');
+      return;
+    }
+
+    I =
+      DDS.isTab && !DDS.isSmallTab
+        ? require('./index.tablet')
+        : require('./index.mobile');
+
     setTimeout(() => {
-      forceUpdate();
-    }, 1000); */
+      resetApp();
+    }, 1000);
   };
 
   useEffect(() => {
@@ -76,20 +111,30 @@ const App = () => {
       console.log(e);
     }
   };
-
   const syncChanges = async () => {
     dispatch({type: ACTIONS.ALL});
   };
 
   const resetApp = () => {
+    note = getNote();
+    console.log(note, 'NOTE BEFORE RELOAD');
     setInit(false);
-    Initialize().then(() => {
+    Initialize().then(async () => {
       setInit(true);
+      await sleep(300);
+      console.log(note, 'NOTE ON RELOAD');
+      if (note && note.id) {
+        console.log(note);
+        eSendEvent(eOnLoadNote, note);
+        if (DDS.isPhone || DDS.isSmallTab) {
+          openEditorAnimation();
+        }
+        note = null;
+      }
     });
   };
 
   useEffect(() => {
-    DDS.isTab ? Orientation.lockToLandscape() : Orientation.lockToPortrait();
     eSubscribeEvent(eStartSyncer, startSyncer);
     eSubscribeEvent(eResetApp, resetApp);
     Orientation.addOrientationListener(_onOrientationChange);
@@ -110,19 +155,23 @@ const App = () => {
   useEffect(() => {
     let error = null;
     let user;
+
     Initialize().finally(async () => {
       try {
         await db.init();
         user = await db.user.get();
       } catch (e) {
         error = e;
+        console.log(e,"ERROR IN DB")
       } finally {
         if (user) {
           dispatch({type: ACTIONS.USER, user: user});
           startSyncer();
         }
         dispatch({type: ACTIONS.ALL});
+
         setInit(true);
+
         if (error) {
           setTimeout(() => {
             ToastEvent.show(error.message);
@@ -135,6 +184,17 @@ const App = () => {
   async function Initialize(colors = colors) {
     let settings;
     scale.fontScale = 1;
+
+    if (firstLoad) {
+      if (DeviceInfo.isTablet() && getDeviceSize() > 9) {
+        Orientation.lockToLandscape();
+        _onOrientationChange('LANDSCAPE');
+      } else {
+        Orientation.lockToPortrait();
+      }
+      firstLoad = false;
+    }
+
     try {
       settings = await MMKV.getStringAsync('settings');
       settings = JSON.parse(settings);
