@@ -37,13 +37,17 @@ class PremiumDialog extends React.Component {
     this.actionSheetRef.current?._setModalVisible(false);
   }
   async componentDidMount() {
-    let u = await db.user.get();
-    let prod = await RNIap.getSubscriptions(itemSkus);
-    //console.log(prod);
-    this.setState({
-      user: u && u.Id ? u : null,
-      product: prod[0],
-    });
+    try {
+      let u = await db.user.get();
+      let prod = await RNIap.getSubscriptions(itemSkus);
+      this.setState({
+        user: u && u.Id ? u : null,
+        product: prod[0],
+      });
+    } catch(e) {
+      console.log(e,"SKU ERROR")
+    }
+
   }
 
   onSuccessfulSubscription = (subscription: RNIap.SubscriptionPurchase) => {
@@ -109,6 +113,14 @@ class PremiumDialog extends React.Component {
           </Text>
 
           <ScrollView
+            nestedScrollEnabled={true}
+            onScrollEndDrag={this.actionSheetRef.current?.childScrollHandler}
+            onScrollAnimationEnd={
+              this.actionSheetRef.current?.childScrollHandler
+            }
+            onMomentumScrollEnd={
+              this.actionSheetRef.current?.childScrollHandler
+            }
             style={{
               width: '100%',
               maxHeight: DDS.isTab ? h * 0.35 : h * 0.5,
