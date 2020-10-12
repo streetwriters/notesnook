@@ -9,10 +9,11 @@ import {
 } from 'react-native';
 import FileViewer from 'react-native-file-viewer';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import RNFetchBlob from 'rn-fetch-blob';
 import {opacity, ph, pv, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
 import storage from '../../utils/storage';
-import {DDS, getElevation, ToastEvent} from '../../utils/utils';
+import {DDS, getElevation, sleep, ToastEvent} from '../../utils/utils';
 import {Button} from '../Button/index';
 import BaseDialog from '../Dialog/base-dialog';
 import DialogHeader from '../Dialog/dialog-header';
@@ -86,6 +87,7 @@ const ExportDialog = () => {
     {
       title: 'PDF',
       func: async () => {
+        
         await save(storage.saveToPDF, 'PDF');
       },
       icon: 'file-pdf-box',
@@ -138,7 +140,9 @@ const ExportDialog = () => {
           <Loading
             done={complete}
             doneText={doneText}
-            onDone={() => {
+            onDone={async () => {
+              close();
+              await sleep(500);
               FileViewer.open(result.filePath, {
                 showOpenWithDialog: true,
                 showAppsSuggestions: true,
@@ -148,7 +152,7 @@ const ExportDialog = () => {
                   `No application found to open ${result.name} file`,
                 );
               });
-              close();
+          
             }}
             tagline="Exporting notes"
           />
