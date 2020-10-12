@@ -2,6 +2,7 @@ import {createDrawerNavigator} from '@react-navigation/drawer';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import * as React from 'react';
+import {Dimensions} from 'react-native';
 import Container from '../components/Container';
 import {Menu} from '../components/Menu';
 import {rootNavigatorRef, sideMenuRef} from '../utils/refs';
@@ -61,7 +62,7 @@ const DrawerComponent = (props) => {
     <Menu
       menuProps={props}
       hide={false}
-      noTextMode={DDS.isTab}
+      noTextMode={DDS.isTab && !DDS.isSmallTab}
       close={() => NavigationService.closeDrawer()}
     />
   );
@@ -94,11 +95,15 @@ export const NavigationStack = ({component = MainComponent}) => {
           swipeEnabled: locked ? false : true,
         }}
         drawerStyle={{
-          width:DDS.isTab? w *0.04 : w*0.75,
-          borderRightColor:'#f0f0f0'
+          width: DDS.isTab && !DDS.isSmallTab
+            ? Dimensions.get('window').width * 0.05
+            : DDS.isSmallTab
+            ? '40%'
+            : Dimensions.get('window').width * 0.75,
+          borderRightWidth: 0,
         }}
         edgeWidth={200}
-        drawerType={DDS.isTab ? 'permanent' : 'slide'}
+        drawerType={DDS.isTab || DDS.isSmallTab ? 'permanent' : 'slide'}
         drawerContent={DrawerComponent}
         initialRouteName="Main">
         <Drawer.Screen name="Main" component={component} />

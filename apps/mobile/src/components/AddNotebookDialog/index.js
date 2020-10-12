@@ -513,9 +513,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   container: {
-    width: DDS.isTab ? '50%' : '100%',
-    height: DDS.isTab ? '80%' : '100%',
-    maxHeight: DDS.isTab ? '80%' : '100%',
+    width: DDS.isTab ? 500 : '100%',
+    height: DDS.isTab ? 600 : '100%',
+    maxHeight: DDS.isTab ? 600 : '100%',
     borderRadius: DDS.isTab ? 5 : 0,
     paddingHorizontal: ph,
     paddingVertical: pv,

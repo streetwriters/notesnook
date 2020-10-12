@@ -7,6 +7,8 @@ import {generateSecureRandom} from 'react-native-securerandom';
 import Sodium from 'react-native-sodium';
 import RNFetchBlob from 'rn-fetch-blob';
 import {db, requestStoragePermission, ToastEvent} from './utils';
+
+
 export const MMKV = new MMKVStorage.Loader().initialize();
 async function read(key, isArray = false) {
   let data;
