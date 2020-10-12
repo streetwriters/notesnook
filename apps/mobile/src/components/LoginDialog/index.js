@@ -28,6 +28,7 @@ import {
   validateUsername,
 } from '../../services/validation';
 import {db, DDS, getElevation, ToastEvent} from '../../utils/utils';
+import { ActionIcon } from '../ActionIcon';
 import {Loading} from '../Loading';
 
 const LoginDialog = () => {
@@ -245,7 +246,7 @@ const LoginDialog = () => {
             justifyContent: 'center',
             borderRadius: DDS.isTab ? 5 : 0,
             zIndex: 10,
-            ...getElevation(5),
+            ...getElevation(DDS.isTab?5  : 0),
           }}>
           <Toast context="local" />
           {loggingIn || signingIn ? (
@@ -365,20 +366,21 @@ const LoginDialog = () => {
           ) : (
             <>
               {DDS.isTab ? null : (
-                <Icon
+                <ActionIcon
                   name="arrow-left"
                   size={SIZE.xxxl}
                   onPress={() => {
                     close();
                   }}
-                  style={{
-                    width: 50,
-                    height: 50,
+                  customStyle={{
+                    width: 40,
+                    height: 40,
                     marginLeft: 12,
                     position: 'absolute',
-                    textAlignVertical: 'center',
                     top: 0,
                     marginBottom: 15,
+                    zIndex:10,
+                    left:0
                   }}
                   color={colors.heading}
                 />
