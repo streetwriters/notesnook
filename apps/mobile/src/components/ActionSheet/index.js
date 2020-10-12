@@ -15,6 +15,7 @@ import {
   UIManager,
   View,
   ViewPropTypes,
+
 } from 'react-native';
 import {w} from '../../utils/utils';
 import {styles} from './styles';
@@ -68,6 +69,8 @@ export default class ActionSheet extends Component {
     this.layoutHasCalled = false;
     this.isClosing = false;
     this.isRecoiling = false;
+    this.targetId = null;
+    this.offsetY = 0;
   }
 
   waitAsync = (ms) =>
@@ -84,6 +87,8 @@ export default class ActionSheet extends Component {
   snapToOffset = (offset) => {
     this._scrollTo(offset);
   };
+
+  
 
   /**
    * Open/Close the ActionSheet
@@ -217,7 +222,7 @@ export default class ActionSheet extends Component {
       }
 
       this._scrollTo(scrollOffset, false);
-
+      this.prevScroll = scrollOffset;
       if (Platform.OS === 'ios') {
         await this.waitAsync(delayActionSheetDrawTime / 2);
       } else {
@@ -345,10 +350,24 @@ export default class ActionSheet extends Component {
     }
   };
 
+  getTarget = () => {
+    return this.targetId;
+  };
+
+  childScrollHandler = () => {
+    if (this.prevScroll - 200 > this.offsetY) {
+      this._hideModal();
+    } else {
+      this._scrollTo(this.prevScroll);
+    }
+  };
+
   _onScroll = (event) => {
-    let offsetY = event.nativeEvent.contentOffset.y;
+    this.targetId = event.nativeEvent.target;
+    this.offsetY = event.nativeEvent.contentOffset.y;
+
     let addFactor = deviceHeight * 0.1;
-    if (this.customComponentHeight + addFactor - offsetY < 50) {
+    if (this.customComponentHeight + addFactor - this.offsetY < 50) {
       DeviceEventEmitter.emit('hasReachedTop', true);
     } else {
       DeviceEventEmitter.emit('hasReachedTop', false);
@@ -436,7 +455,7 @@ export default class ActionSheet extends Component {
       Platform.OS === 'android' ? 'keyboardDidShow' : 'keyboardWillShow',
       this._onKeyboardShow,
     );
-
+    this.offsetY = 0;
     Keyboard.removeListener(
       Platform.OS === 'android' ? 'keyboardDidHide' : 'keyboardWillHide',
       this._onKeyboardHide,
