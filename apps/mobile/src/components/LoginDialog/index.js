@@ -231,7 +231,15 @@ const LoginDialog = () => {
         ) : null}
         <View
           style={{
-            height: DDS.isTab ? (login ? '70%' : '80%') : '100%',
+            height: DDS.isTab && !DDS.isSmallTab
+              ? login
+                ? '70%'
+                : '80%'
+              : DDS.isSmallTab
+              ? login
+                ? '50%'
+                : '65%'
+              : '100%',
             width: DDS.isTab ? 500 : '100%',
             backgroundColor: colors.bg,
             justifyContent: 'center',
