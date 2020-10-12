@@ -890,8 +890,8 @@ export const ActionSheetComponent = ({
               borderRadius: 5,
               borderWidth: 1.5,
               borderColor: focused ? colors.accent : colors.nav,
-              paddingVertical: 5,
               alignItems: 'center',
+              height:40
             }}>
             <TouchableOpacity
               onPress={() => {
@@ -901,12 +901,14 @@ export const ActionSheetComponent = ({
                 }
                 tagsInputRef.current?.focus();
               }}
+              activeOpacity={1}
               style={{
                 position: 'absolute',
                 width: '100%',
                 height: '100%',
                 justifyContent: 'flex-start',
                 alignItems: 'flex-end',
+                zIndex:10
               }}>
               {!premiumUser ? (
                 <Text
@@ -914,7 +916,8 @@ export const ActionSheetComponent = ({
                     color: colors.accent,
                     fontFamily: WEIGHT.regular,
                     fontSize: 10,
-                    marginRight: 5,
+                    marginRight: 4,
+                    marginTop:2.5
                   }}>
                   PRO
                 </Text>
@@ -929,8 +932,9 @@ export const ActionSheetComponent = ({
                 fontFamily: WEIGHT.regular,
                 color: colors.pri,
                 paddingHorizontal: 5,
-                paddingVertical: 1.5,
-                margin: 1,
+                paddingVertical:0,
+                height:40,
+                textAlignVertical:"center"
               }}
               blurOnSubmit={false}
               ref={tagsInputRef}
