@@ -1,6 +1,7 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {StyleSheet} from 'react-native';
+import {StyleSheet, useWindowDimensions} from 'react-native';
 import {Dimensions, Platform, RefreshControl, Text, View} from 'react-native';
+import Orientation from 'react-native-orientation';
 import {initialWindowMetrics} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {DataProvider, LayoutProvider, RecyclerListView} from 'recyclerlistview';
@@ -15,7 +16,6 @@ import {
 } from '../../services/events';
 import {db, ToastEvent} from '../../utils/utils';
 import {PressableButton} from '../PressableButton';
-let {width, height} = Dimensions.get('window');
 
 const header = {
   type: 'MAIN_HEADER',
@@ -40,9 +40,12 @@ const SimpleList = ({
       return r1 !== r2;
     }).cloneWithRows([]),
   );
+  const {width, height, fontScale,scale} = useWindowDimensions();
+
   const listData = data;
   const dataType = type;
   const _onScroll = (event) => {
+
     if (!event) return;
     let y = event.nativeEvent.contentOffset.y;
     eSendEvent(eScrollEvent, y);
@@ -144,28 +147,28 @@ const SimpleList = ({
       switch (type) {
         case 'note':
           dim.width = width;
-          dim.height = 100;
+          dim.height = 100 * fontScale;
           break;
         case 'notebook':
           dim.width = width;
-          dim.height = 110;
+          dim.height = 110 * fontScale;
           break;
         case 'topic':
           dim.width = width;
-          dim.height = 80;
+          dim.height = 80 * fontScale;
           break;
         case 'tag':
           dim.width = width;
-          dim.height = 80;
+          dim.height = 80 * fontScale;
           break;
         case 'header':
           dim.width = width;
-          dim.height = 30;
+          dim.height = 30 * fontScale;
           break;
         case 'MAIN_HEADER':
           dim.width = width;
           dim.height =
-            (user && user.Id) || !listData[0] || selectionMode ? 0 : 40;
+            (user && user.Id) || !listData[0] || selectionMode ? 0 : 40 * fontScale;
           break;
         default:
           dim.width = width;
@@ -202,9 +205,9 @@ const SimpleList = ({
           ? 155 - initialWindowMetrics.insets.top
           : 155 - initialWindowMetrics.insets.top - 60,
     };
-  }, [selectionMode, listData]);
+  }, [selectionMode, listData, colors]);
 
-  return !listData || listData.length === 0 ? (
+  return !listData || listData.length === 0 || !dataProvider ? (
     _ListEmptyComponent
   ) : (
     <RecyclerListView
