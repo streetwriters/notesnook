@@ -8,8 +8,9 @@ import Sodium from 'react-native-sodium';
 import RNFetchBlob from 'rn-fetch-blob';
 import {db, requestStoragePermission, ToastEvent} from './utils';
 
-
 export const MMKV = new MMKVStorage.Loader().initialize();
+const dirs = RNFetchBlob.fs.dirs;
+
 async function read(key, isArray = false) {
   let data;
 
@@ -96,12 +97,17 @@ async function saveToPDF(note) {
       ToastEvent.show('Failed to get storage permission');
       return null;
     }
+  } else {
+    await checkAndCreateDir(dirs.DocumentDir + '/exported/PDF/');
   }
+
   let html = await db.notes.note(note).export('html');
+
   html = he.decode(html);
   let options = {
     html: html,
-    fileName: note.title,
+    fileName:
+      Platform.OS === 'ios' ? '/exported/PDF/' + note.title : note.title,
     directory: Platform.OS === 'ios' ? 'Documents' : androidSavePath,
   };
   let res = await RNHTMLtoPDF.convert(options);
@@ -109,17 +115,20 @@ async function saveToPDF(note) {
   return {
     filePath: res.filePath,
     type: 'application/pdf',
-    name: 'Markdown',
+    name: 'PDF',
   };
 }
 
 async function saveToMarkdown(note) {
-  let androidSavePath =
-    RNFetchBlob.fs.dirs.SDCardDir + '/Notesnook/exported/Markdown/';
-  await checkAndCreateDir(androidSavePath);
+  let savePath =
+    Platform.OS === 'ios'
+      ? dirs.DocumentDir + '/exported/Markdown/'
+      : dirs.SDCardDir + '/Notesnook/exported/Markdown/';
+
+  await checkAndCreateDir(savePath);
   let markdown = await db.notes.note(note.id).export('md');
 
-  let path = androidSavePath + note.title + '.md';
+  let path = savePath + note.title + '.md';
   await RNFetchBlob.fs.writeFile(path, markdown, 'utf8');
 
   return {
@@ -130,12 +139,14 @@ async function saveToMarkdown(note) {
 }
 
 async function saveToText(note) {
-  let androidSavePath =
-    RNFetchBlob.fs.dirs.SDCardDir + '/Notesnook/exported/Text/';
-  await checkAndCreateDir(androidSavePath);
+  let savePath =
+    Platform.OS === 'ios'
+      ? dirs.DocumentDir + '/exported/Text/'
+      : dirs.SDCardDir + '/Notesnook/exported/Text/';
+  await checkAndCreateDir(savePath);
   let markdown = await db.notes.note(note.id).export('txt');
 
-  let path = androidSavePath + note.title + '.txt';
+  let path = savePath + note.title + '.txt';
   await RNFetchBlob.fs.writeFile(path, markdown, 'utf8');
 
   return {
@@ -146,12 +157,14 @@ async function saveToText(note) {
 }
 
 async function saveToHTML(note) {
-  let androidSavePath =
-    RNFetchBlob.fs.dirs.SDCardDir + '/Notesnook/exported/Html/';
-  await checkAndCreateDir(androidSavePath);
+  let savePath =
+    Platform.OS === 'ios'
+      ? dirs.DocumentDir + '/exported/Html/'
+      : dirs.SDCardDir + '/Notesnook/exported/Html/';
+  await checkAndCreateDir(savePath);
   let markdown = await db.notes.note(note.id).export('html');
 
-  let path = androidSavePath + note.title + '.html';
+  let path = savePath + note.title + '.html';
   await RNFetchBlob.fs.writeFile(path, markdown, 'utf8');
 
   return {
@@ -162,10 +175,15 @@ async function saveToHTML(note) {
 }
 
 async function checkAndCreateDir(dir) {
-  let exists = RNFetchBlob.fs.exists(dir);
-  let isDir = RNFetchBlob.fs.isDir(dir);
-
-  if (!exists || !isDir) {
+  try {
+    let exists = await RNFetchBlob.fs.exists(dir);
+    let isDir = await RNFetchBlob.fs.isDir(dir);
+    console.log(exists, isDir);
+    if (!exists || !isDir) {
+      await RNFetchBlob.fs.mkdir(dir);
+    }
+  } catch (e) {
+    console.log(e);
     await RNFetchBlob.fs.mkdir(dir);
   }
   return dir;
