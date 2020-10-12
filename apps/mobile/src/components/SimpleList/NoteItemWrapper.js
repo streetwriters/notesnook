@@ -43,12 +43,12 @@ export const NoteItemWrapper = ({
       openVault(item, true, true, false, true, false);
       return;
     }
-    if (DDS.isTab) {
-      eSendEvent(eOnLoadNote, item);
-    } else if (isTrash) {
+    if (isTrash) {
       simpleDialogEvent(TEMPLATE_TRASH(item.type));
     } else {
       eSendEvent(eOnLoadNote, item);
+    }
+    if (DDS.isPhone || DDS.isSmallTab) {
       openEditorAnimation();
     }
   };
