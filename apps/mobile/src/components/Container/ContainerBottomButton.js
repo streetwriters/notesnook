@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Keyboard, Text, View} from 'react-native';
+import {Keyboard, Platform, Text, View} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {pv, SIZE, WEIGHT} from '../../common/common';
@@ -49,7 +49,7 @@ export const ContainerBottomButton = ({title, onPress, color}) => {
         opacity: buttonHide ? 0 : 1,
         position: 'absolute',
         paddingHorizontal: 12,
-        bottom: insets.bottom + 20,
+        bottom: Platform.OS === 'ios' ? insets.bottom - 10 : insets.bottom + 20,
         zIndex: 10,
         transform: [
           {
