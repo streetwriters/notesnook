@@ -33,7 +33,6 @@ export const Initialize = () => {
 const NavWrapper = () => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
-
   const [fullscreen, setFullscreen] = useState(false);
 
   useEffect(() => {
@@ -59,7 +58,7 @@ const NavWrapper = () => {
     editorRef.current?.setNativeProps({
       style: {
         position: 'relative',
-        width: '68%',
+        width: '69%',
         zIndex: null,
         paddingHorizontal: 0,
         backgroundColor: 'transparent',
@@ -84,7 +83,7 @@ const NavWrapper = () => {
       StatusBar.setTranslucent(true);
     }
     StatusBar.setBarStyle(colors.night ? 'light-content' : 'dark-content');
-  }, []);
+  }, []); 
   return (
     <>
       <View
@@ -99,7 +98,7 @@ const NavWrapper = () => {
             width: '30%',
             height: '100%',
             borderRightColor: colors.nav,
-            borderRightWidth:1
+            borderRightWidth: 1,
           }}>
           <MainComponent />
         </View>
@@ -107,7 +106,7 @@ const NavWrapper = () => {
         <View
           ref={editorRef}
           style={{
-            width: '70%',
+            width: '69%',
             height: '100%',
             backgroundColor: 'transparent',
             paddingRight: 12,
