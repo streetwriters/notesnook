@@ -2,11 +2,13 @@ import React, {useEffect, useState} from 'react';
 import {Keyboard, Text, TouchableOpacity, View} from 'react-native';
 import Animated, {Easing, useValue} from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {SIZE} from '../../common/common';
 import {useTracked} from '../../provider';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
-import {eHideToast, eShowToast} from '../../services/events';
-import {DDS, getElevation, sleep} from '../../utils/utils';
+import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
+import {eHideToast, eShowToast} from '../../utils/Events';
+import {getElevation} from '../../utils';
+import {sleep} from "../../utils/TimeUtils";
+import {SIZE} from "../../utils/SizeUtils";
+import {DDS} from "../../services/DeviceDetection";
 const {spring, timing} = Animated;
 
 const toastMessages = [];

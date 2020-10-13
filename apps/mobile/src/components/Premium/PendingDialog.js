@@ -1,11 +1,13 @@
 import React, {createRef} from 'react';
 import {Text, View} from 'react-native';
-import {SIZE, WEIGHT} from '../../common/common';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
-import {eClosePendingDialog, eOpenPendingDialog} from '../../services/events';
-import {db, DDS, w} from '../../utils/utils';
+import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
+import {eClosePendingDialog, eOpenPendingDialog} from '../../utils/Events';
+import {dWidth} from '../../utils';
 import ActionSheet from '../ActionSheet';
 import Seperator from '../Seperator';
+import {SIZE, WEIGHT} from "../../utils/SizeUtils";
+import {db} from "../../utils/DB";
+import {DDS} from "../../services/DeviceDetection";
 
 const actionSheet = createRef();
 class PendingDialog extends React.Component {
@@ -74,7 +76,7 @@ class PendingDialog extends React.Component {
         initialOffsetFromBottom={1}>
         <View
           style={{
-            width: DDS.isTab? 500 : w,
+            width: DDS.isTab? 500 : dWidth,
             backgroundColor: colors.bg,
             justifyContent: 'space-between',
             paddingHorizontal: 12,

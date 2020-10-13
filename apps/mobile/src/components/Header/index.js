@@ -2,15 +2,16 @@ import React from 'react';
 import {ActivityIndicator, Platform, StyleSheet, View} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {SIZE} from '../../common/common';
 import {useTracked} from '../../provider';
-import {eSendEvent} from '../../services/eventManager';
-import NavigationService from '../../services/NavigationService';
-import {useHideHeader} from '../../utils/hooks';
-import {DDS, w} from '../../utils/utils';
+import {eSendEvent} from '../../services/EventManager';
+import NavigationService from '../../services/Navigation';
+import {useHideHeader} from '../../utils/Hooks';
+import {dWidth} from '../../utils';
 import {ActionIcon} from '../ActionIcon';
 import {HeaderMenu} from './HeaderMenu';
 import {HeaderTitle} from './HeaderTitle';
+import {SIZE} from "../../utils/SizeUtils";
+import {DDS} from "../../services/DeviceDetection";
 
 export const Header = ({showSearch, root}) => {
   const [state, dispatch] = useTracked();
@@ -37,6 +38,25 @@ export const Header = ({showSearch, root}) => {
           overflow: 'hidden',
         },
       ]}>
+      <View style={styles.leftBtnContainer}>
+        {!DDS.isTab ? (
+          <ActionIcon
+            testID="left_menu_button"
+            customStyle={styles.leftBtn}
+            onPress={onLeftButtonPress}
+            name={headerState.canGoBack ? 'arrow-left' : 'menu'}
+            size={SIZE.xxxl}
+            color={colors.pri}
+            iconStyle={{
+              marginLeft: headerState.canGoBack ? -5 : 0,
+            }}
+          />
+        ) : undefined}
+
+        {Platform.OS === 'android' ? <HeaderTitle root={root} /> : null}
+      </View>
+      {Platform.OS !== 'android' ? <HeaderTitle root={root} /> : null}
+
       <Animatable.View
         transition={['opacity']}
         duration={300}
@@ -56,25 +76,6 @@ export const Header = ({showSearch, root}) => {
         />
         <ActivityIndicator size={25} color={colors.accent} />
       </Animatable.View>
-
-      <View style={styles.leftBtnContainer}>
-        {!DDS.isTab ? (
-          <ActionIcon
-            testID="left_menu_button"
-            customStyle={styles.leftBtn}
-            onPress={onLeftButtonPress}
-            name={headerState.canGoBack ? 'arrow-left' : 'menu'}
-            size={SIZE.xxxl}
-            color={colors.pri}
-            iconStyle={{
-              marginLeft: headerState.canGoBack ? -5 : 0,
-            }}
-          />
-        ) : undefined}
-
-        {Platform.OS === 'android' ? <HeaderTitle root={root} /> : null}
-      </View>
-      {Platform.OS !== 'android' ? <HeaderTitle root={root} /> : null}
 
       <View style={styles.rightBtnContainer}>
         <Animatable.View
@@ -119,7 +120,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 999,
-    left: w / 2 - 20,
+    left: dWidth / 2 - 20,
     top: -20,
     width: 40,
     height: 40,

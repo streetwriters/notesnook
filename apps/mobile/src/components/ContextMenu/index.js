@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import {Text, View} from 'react-native';
-import {SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
-import { getElevation } from '../../utils/utils';
+import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
+import { getElevation } from '../../utils';
+import {SIZE, WEIGHT} from "../../utils/SizeUtils";
 
 let contextTimeout = null;
 

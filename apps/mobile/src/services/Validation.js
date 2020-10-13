@@ -1,4 +1,4 @@
-import {db} from '../utils/utils';
+import {db} from "../utils/DB";
 
 let regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 

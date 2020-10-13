@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
 import Animated, {Easing, useValue} from 'react-native-reanimated';
 import {useTracked} from '../../provider';
-import {Header} from '../header';
+import {Header} from '../Header';
 import {Search} from '../SearchInput';
 
 export const ContainerTopSection = ({root}) => {
@@ -38,8 +38,9 @@ export const ContainerTopSection = ({root}) => {
           },
         ],
       }}>
-      <Header root={root} />
+     
 
+     <Header root={root} />
       <Search root={root} />
     </Animated.View>
   );

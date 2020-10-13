@@ -10,27 +10,21 @@ import {
 import {createAnimatableComponent} from 'react-native-animatable';
 
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {
-  ACCENT,
-  COLOR_SCHEME,
-  COLOR_SCHEME_DARK,
-  COLOR_SCHEME_LIGHT,
-  ph,
-  setColorScheme,
-  SIZE,
-} from '../../common/common';
 import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
-import NavigationService from '../../services/NavigationService';
-import {sideMenuRef} from '../../utils/refs';
-import {DDS, w} from '../../utils/utils';
+import {Actions} from '../../provider/Actions';
+import NavigationService from '../../services/Navigation';
+import {sideMenuRef} from '../../utils/Refs';
+import {dWidth} from '../../utils';
 import {ColorSection} from './ColorSection';
 import {MenuListItem} from './MenuListItem';
 import {TagsSection} from './TagsSection';
 import {UserSection} from './UserSection';
-import {MMKV} from '../../utils/storage';
 import Seperator from '../Seperator';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {ACCENT, COLOR_SCHEME, COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT, setColorScheme} from "../../utils/Colors";
+import {ph, SIZE} from "../../utils/SizeUtils";
+import {DDS} from "../../services/DeviceDetection";
+import {MMKV} from "../../utils/MMKV";
 
 export const Menu = ({
   close = () => {},
@@ -46,7 +40,7 @@ export const Menu = ({
   function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
     let newColors = setColorScheme(colors, accent);
     StatusBar.setBarStyle(colors.night ? 'light-content' : 'dark-content');
-    dispatch({type: ACTIONS.THEME, colors: newColors});
+    dispatch({type: Actions.THEME, colors: newColors});
   }
 
   const listItems = [

@@ -4,17 +4,17 @@ import {NotebookItem} from '../../components/NotebookItem';
 import SelectionWrapper from '../../components/SelectionWrapper';
 import SimpleList from '../../components/SimpleList';
 import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
+import {Actions} from '../../provider/Actions';
 import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-} from '../../services/eventManager';
-import {eOnNewTopicAdded, eScrollEvent} from '../../services/events';
-import NavigationService from '../../services/NavigationService';
-import {db} from '../../utils/utils';
+} from '../../services/EventManager';
+import {eOnNewTopicAdded, eScrollEvent} from '../../utils/Events';
+import NavigationService from '../../services/Navigation';
 import { Dimensions } from 'react-native';
+import {db} from "../../utils/DB";
 
 export const Notebook = ({route, navigation}) => {
   const [, dispatch] = useTracked();
@@ -43,7 +43,7 @@ export const Notebook = ({route, navigation}) => {
   const onFocus = useCallback(() => {
     onLoad();
     dispatch({
-      type: ACTIONS.HEADER_STATE,
+      type: Actions.HEADER_STATE,
       state: {
         type: 'topics',
         menu: false,
@@ -53,7 +53,7 @@ export const Notebook = ({route, navigation}) => {
       },
     });
     dispatch({
-      type: ACTIONS.SEARCH_STATE,
+      type: Actions.SEARCH_STATE,
       state: {
         placeholder: `Search in "${params.title}"`,
         data: topics,
@@ -64,19 +64,19 @@ export const Notebook = ({route, navigation}) => {
     });
 
     dispatch({
-      type: ACTIONS.HEADER_VERTICAL_MENU,
+      type: Actions.HEADER_VERTICAL_MENU,
       state: false,
     });
 
     dispatch({
-      type: ACTIONS.HEADER_TEXT_STATE,
+      type: Actions.HEADER_TEXT_STATE,
       state: {
         heading: params.title,
       },
     });
 
     dispatch({
-      type: ACTIONS.CURRENT_SCREEN,
+      type: Actions.CURRENT_SCREEN,
       screen: 'notebook',
     });
   }, []);
@@ -91,7 +91,7 @@ export const Notebook = ({route, navigation}) => {
   useEffect(() => {
     if (navigation.isFocused()) {
       dispatch({
-        type: ACTIONS.SEARCH_STATE,
+        type: Actions.SEARCH_STATE,
         state: {
           placeholder: `Search in "${params.title}"`,
           data: topics,
@@ -151,12 +151,12 @@ const RenderItem = ({item, index}) => {
       onLongPress={() => {
         if (!selectionMode) {
           dispatch({
-            type: ACTIONS.SELECTION_MODE,
+            type: Actions.SELECTION_MODE,
             enabled: !selectionMode,
           });
         }
         dispatch({
-          type: ACTIONS.SELECTED_ITEMS,
+          type: Actions.SELECTED_ITEMS,
           item: item,
         });
       }}

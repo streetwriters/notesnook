@@ -1,13 +1,13 @@
 import React, {useCallback, useEffect} from 'react';
 import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
 import {simpleDialogEvent} from '../../components/DialogManager/recievers';
-import {TEMPLATE_EMPTY_TRASH} from '../../components/DialogManager/templates';
+import {TEMPLATE_EMPTY_TRASH} from '../../components/DialogManager/Templates';
 import {Placeholder} from '../../components/ListPlaceholders';
 import SimpleList from '../../components/SimpleList';
 import {NotebookItemWrapper} from '../../components/SimpleList/NotebookItemWrapper';
 import {NoteItemWrapper} from '../../components/SimpleList/NoteItemWrapper';
 import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
+import {Actions} from '../../provider/Actions';
 
 export const Trash = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
@@ -15,7 +15,7 @@ export const Trash = ({route, navigation}) => {
 
   const onFocus = useCallback(() => {
     dispatch({
-      type: ACTIONS.HEADER_STATE,
+      type: Actions.HEADER_STATE,
       state: {
         type: 'trash',
         menu: true,
@@ -24,18 +24,18 @@ export const Trash = ({route, navigation}) => {
       },
     });
     dispatch({
-      type: ACTIONS.HEADER_VERTICAL_MENU,
+      type: Actions.HEADER_VERTICAL_MENU,
       state: false,
     });
 
     dispatch({
-      type: ACTIONS.HEADER_TEXT_STATE,
+      type: Actions.HEADER_TEXT_STATE,
       state: {
         heading: 'Trash',
       },
     });
     dispatch({
-      type: ACTIONS.SEARCH_STATE,
+      type: Actions.SEARCH_STATE,
       state: {
         placeholder: 'Search all trash',
         data: trash,
@@ -46,11 +46,11 @@ export const Trash = ({route, navigation}) => {
     });
 
     dispatch({
-      type: ACTIONS.TRASH,
+      type: Actions.TRASH,
     });
 
     dispatch({
-      type: ACTIONS.CURRENT_SCREEN,
+      type: Actions.CURRENT_SCREEN,
       screen: 'trash',
     });
   }, []);
@@ -65,7 +65,7 @@ export const Trash = ({route, navigation}) => {
   useEffect(() => {
     if (navigation.isFocused()) {
       dispatch({
-        type: ACTIONS.SEARCH_STATE,
+        type: Actions.SEARCH_STATE,
         state: {
           placeholder: 'Search all trash',
           data: trash,

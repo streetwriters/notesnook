@@ -1,25 +1,24 @@
 import React, {useEffect, useState} from 'react';
-import {FlatList, Text, View} from 'react-native';
+import {FlatList, Platform, Text, View} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import RNFetchBlob from 'rn-fetch-blob';
-import {ph, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
-import {eCloseRestoreDialog, eOpenRestoreDialog} from '../../services/events';
+import {Actions} from '../../provider/Actions';
+import {eSubscribeEvent, eUnSubscribeEvent, ToastEvent} from '../../services/EventManager';
+import {eCloseRestoreDialog, eOpenRestoreDialog} from '../../utils/Events';
 import storage from '../../utils/storage';
 import {
-  db,
-  DDS,
   getElevation,
-  requestStoragePermission,
-  sleep,
-  ToastEvent,
-} from '../../utils/utils';
+
+} from '../../utils';
 import {ActionIcon} from '../ActionIcon';
 import {Button} from '../Button';
 import BaseDialog from '../Dialog/base-dialog';
 import {Loading} from '../Loading';
+import {sleep} from "../../utils/TimeUtils";
+import {ph, SIZE, WEIGHT} from "../../utils/SizeUtils";
+import {db} from "../../utils/DB";
+import {DDS} from "../../services/DeviceDetection";
 
 const RestoreDialog = () => {
   const [state, dispatch] = useTracked();
@@ -51,17 +50,21 @@ const RestoreDialog = () => {
       animation="slide"
       visible={visible}
       onShow={async () => {
-        let granted = await requestStoragePermission();
-        if (!granted) {
-          ToastEvent.show('Storage permission required to check for backups.');
-          return;
+        if (Platform.OS === "android") {
+          let granted = await storage.requestPermission();
+          if (!granted) {
+            ToastEvent.show('Storage permission required to check for backups.');
+            return;
+          }
         }
-        await storage.checkAndCreateDir(
-          RNFetchBlob.fs.dirs.SDCardDir + '/Notesnook/backups',
-        );
-        let files = await RNFetchBlob.fs.lstat(
-          RNFetchBlob.fs.dirs.SDCardDir + '/Notesnook/backups',
-        );
+      
+        let path =
+          Platform.OS === 'ios'
+            ? RNFetchBlob.fs.dirs.DocumentDir + "/backups/'"
+            : RNFetchBlob.fs.dirs.SDCardDir + '/Notesnook/backups/';
+
+        await storage.checkAndCreateDir(path);
+        let files = await RNFetchBlob.fs.lstat(path);
         console.log(files);
         setFiles(files);
       }}
@@ -214,14 +217,15 @@ const RestoreDialog = () => {
                 width={80}
                 height={30}
                 onPress={async () => {
-                  let granted = await requestStoragePermission();
-                  if (!granted) {
-                    ToastEvent.show(
-                      'Restore Failed! Storage access denied',
-                      'error',
-                    );
-                    return;
+                  if (Platform.OS === 'android') {
+                    let granted = storage.requestPermission();
+                    if (!granted) {
+                      ToastEvent.show('Restore Failed! Storage access denied');
+                      return;
+                    }
                   }
+
+                 
                   setRestoring(true);
                   let backup = await RNFetchBlob.fs.readFile(
                     'file:/' + item.path,
@@ -230,7 +234,7 @@ const RestoreDialog = () => {
                   await db.backup.import(backup);
                   await sleep(2000);
                   setRestoring(false);
-                  dispatch({type: ACTIONS.ALL});
+                  dispatch({type: Actions.ALL});
                   ToastEvent.show('Restore Complete!', 'success');
                   setVisible(false);
                 }}

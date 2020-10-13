@@ -1,6 +1,6 @@
 import Animated, {Easing} from 'react-native-reanimated';
 import {Dimensions} from 'react-native';
-import {editing} from './utils';
+import {editing} from './index';
 
 const {Value, timing} = Animated;
 

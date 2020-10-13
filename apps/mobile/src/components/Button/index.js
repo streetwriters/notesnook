@@ -1,9 +1,9 @@
 import React from 'react';
 import { ActivityIndicator, StyleSheet, Text } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { ph, pv, SIZE, WEIGHT } from '../../common/common';
 import { useTracked } from '../../provider';
 import { PressableButton } from '../PressableButton';
+import {ph, pv, SIZE, WEIGHT} from "../../utils/SizeUtils";
 
 export const Button = ({
   height = 40,

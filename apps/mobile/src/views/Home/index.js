@@ -6,11 +6,11 @@ import {Placeholder} from '../../components/ListPlaceholders';
 import SimpleList from '../../components/SimpleList';
 import {NoteItemWrapper} from '../../components/SimpleList/NoteItemWrapper';
 import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
-import {eSendEvent} from '../../services/eventManager';
-import {eOnLoadNote, eScrollEvent} from '../../services/events';
-import {openEditorAnimation} from '../../utils/animations';
-import {DDS} from '../../utils/utils';
+import {Actions} from '../../provider/Actions';
+import {eSendEvent} from '../../services/EventManager';
+import {eOnLoadNote, eScrollEvent} from '../../utils/Events';
+import {openEditorAnimation} from '../../utils/Animations';
+import {DDS} from "../../services/DeviceDetection";
 
 export const Home = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
@@ -18,11 +18,11 @@ export const Home = ({route, navigation}) => {
 
   const onFocus = useCallback(() => {
     dispatch({
-      type: ACTIONS.CURRENT_SCREEN,
+      type: Actions.CURRENT_SCREEN,
       screen: 'home',
     });
     dispatch({
-      type: ACTIONS.HEADER_STATE,
+      type: Actions.HEADER_STATE,
       state: {
         type: 'notes',
         menu: true,
@@ -31,11 +31,11 @@ export const Home = ({route, navigation}) => {
       },
     });
     dispatch({
-      type: ACTIONS.HEADER_VERTICAL_MENU,
+      type: Actions.HEADER_VERTICAL_MENU,
       state: true,
     });
     dispatch({
-      type: ACTIONS.SEARCH_STATE,
+      type: Actions.SEARCH_STATE,
       state: {
         placeholder: 'Search all notes',
         data: notes,
@@ -45,20 +45,20 @@ export const Home = ({route, navigation}) => {
       },
     });
     dispatch({
-      type: ACTIONS.HEADER_TEXT_STATE,
+      type: Actions.HEADER_TEXT_STATE,
       state: {
         heading: 'Home',
       },
     });
     eSendEvent(eScrollEvent, 0);
-    dispatch({type: ACTIONS.COLORS});
-    dispatch({type: ACTIONS.NOTES});
+    dispatch({type: Actions.COLORS});
+    dispatch({type: Actions.NOTES});
   }, []);
 
   const onBlur = useCallback(() => {
     console.log(navigation.isFocused());
     dispatch({
-      type: ACTIONS.HEADER_VERTICAL_MENU,
+      type: Actions.HEADER_VERTICAL_MENU,
       state: false,
     });
   }, []);
@@ -75,7 +75,7 @@ export const Home = ({route, navigation}) => {
   useEffect(() => {
     if (navigation.isFocused()) {
       dispatch({
-        type: ACTIONS.SEARCH_STATE,
+        type: Actions.SEARCH_STATE,
         state: {
           placeholder: 'Search all notes',
           data: notes,

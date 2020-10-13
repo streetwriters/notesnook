@@ -6,14 +6,14 @@ import {Screen, ScreenContainer} from 'react-native-screens';
 import {DialogManager} from './src/components/DialogManager';
 import {Toast} from './src/components/Toast';
 import {useTracked} from './src/provider';
-import {NavigationStack} from './src/services/Navigator';
 import {
   EditorOpacity,
   EditorPosition,
   EditorScale,
   EditorTranslateY,
-} from './src/utils/animations';
+} from './src/utils/Animations';
 import Editor from './src/views/Editor';
+import {NavigationStack} from "./src/navigation/Drawer";
 
 const editorRef = createRef();
 

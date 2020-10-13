@@ -17,7 +17,7 @@ import {
   ViewPropTypes,
 
 } from 'react-native';
-import {w} from '../../utils/utils';
+import {dWidth} from '../../utils';
 import {styles} from './styles';
 
 var deviceHeight = getDeviceHeight();
@@ -514,7 +514,7 @@ export default class ActionSheet extends Component {
             onScroll={this._onScroll}
             style={styles.scrollView}
             contentContainerStyle={{
-              width: w,
+              width: dWidth,
             }}
             data={['dummy']}
             keyExtractor={(item) => item}

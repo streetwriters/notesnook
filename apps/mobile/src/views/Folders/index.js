@@ -4,7 +4,7 @@ import {Placeholder} from '../../components/ListPlaceholders';
 import SimpleList from '../../components/SimpleList';
 import {NotebookItemWrapper} from '../../components/SimpleList/NotebookItemWrapper';
 import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
+import {Actions} from '../../provider/Actions';
 import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
 export const Folders = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
@@ -13,7 +13,7 @@ export const Folders = ({route, navigation}) => {
 
   const onFocus = useCallback(() => {
     dispatch({
-      type: ACTIONS.HEADER_STATE,
+      type: Actions.HEADER_STATE,
       state: {
         type: 'notebooks',
         menu: true,
@@ -22,7 +22,7 @@ export const Folders = ({route, navigation}) => {
       },
     });
     dispatch({
-      type: ACTIONS.SEARCH_STATE,
+      type: Actions.SEARCH_STATE,
       state: {
         placeholder: 'Search all notebooks',
         data: notebooks,
@@ -33,19 +33,19 @@ export const Folders = ({route, navigation}) => {
     });
 
     dispatch({
-      type: ACTIONS.HEADER_VERTICAL_MENU,
+      type: Actions.HEADER_VERTICAL_MENU,
       state: false,
     });
     dispatch({
-      type: ACTIONS.HEADER_TEXT_STATE,
+      type: Actions.HEADER_TEXT_STATE,
       state: {
         heading: params.title,
       },
     });
-    dispatch({type: ACTIONS.PINNED});
-    dispatch({type: ACTIONS.NOTEBOOKS});
+    dispatch({type: Actions.PINNED});
+    dispatch({type: Actions.NOTEBOOKS});
     dispatch({
-      type: ACTIONS.CURRENT_SCREEN,
+      type: Actions.CURRENT_SCREEN,
       screen: 'notebooks',
     });
    
@@ -61,7 +61,7 @@ export const Folders = ({route, navigation}) => {
   useEffect(() => {
     if (navigation.isFocused()) {
       dispatch({
-        type: ACTIONS.SEARCH_STATE,
+        type: Actions.SEARCH_STATE,
         state: {
           placeholder: 'Search all notebooks',
           data: notebooks,

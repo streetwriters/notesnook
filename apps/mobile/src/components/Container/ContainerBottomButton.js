@@ -2,10 +2,11 @@ import React, {useEffect, useState} from 'react';
 import {Keyboard, Platform, Text, View} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {pv, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
-import {DDS, getElevation} from '../../utils/utils';
+import {getElevation} from '../../utils';
 import {PressableButton} from '../PressableButton';
+import {pv, SIZE, WEIGHT} from "../../utils/SizeUtils";
+import {DDS} from "../../services/DeviceDetection";
 
 export const ContainerBottomButton = ({title, onPress, color}) => {
   const [state, dispatch] = useTracked();

@@ -3,28 +3,29 @@ import {Modal, Text, TouchableOpacity, View, SafeAreaView} from 'react-native';
 import Animated, {Easing} from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import WebView from 'react-native-webview';
-import {normalize, SIZE} from '../../common/common';
 import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
+import {Actions} from '../../provider/Actions';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-} from '../../services/eventManager';
+} from '../../services/EventManager';
 import {
   eApplyChanges,
   eShowMergeDialog,
   refreshNotesPage,
-} from '../../services/events';
-import {db, h} from '../../utils/utils';
+} from '../../utils/Events';
+import {dHeight} from '../../utils';
 import {Button} from '../Button';
 import {simpleDialogEvent, updateEvent} from '../DialogManager/recievers';
-import {TEMPLATE_APPLY_CHANGES} from '../DialogManager/templates';
+import {TEMPLATE_APPLY_CHANGES} from '../DialogManager/Templates';
+import {normalize, SIZE} from "../../utils/SizeUtils";
+import {db} from "../../utils/DB";
 
 const {Value, timing} = Animated;
 
-const firstWebViewHeight = new Value(h * 0.5 - 50);
-const secondWebViewHeight = new Value(h * 0.5 - 50);
+const firstWebViewHeight = new Value(dHeight * 0.5 - 50);
+const secondWebViewHeight = new Value(dHeight * 0.5 - 50);
 const primaryWebView = createRef();
 const secondaryWebView = createRef();
 let note = null;
@@ -36,13 +37,13 @@ function openEditorAnimation(
 ) {
   let openConfig = {
     duration: 300,
-    toValue: !siblingStatus ? h - 100 : h * 0.5 - 50,
+    toValue: !siblingStatus ? dHeight - 100 : dHeight * 0.5 - 50,
     easing: Easing.inOut(Easing.ease),
   };
 
   let extendConfig = {
     duration: 300,
-    toValue: h * 0.5 - 50,
+    toValue: dHeight * 0.5 - 50,
     easing: Easing.inOut(Easing.ease),
   };
 
@@ -61,7 +62,7 @@ function closeEditorAnimation(heightToAnimate, heightToExtend = null) {
 
   let extendConfig = {
     duration: 300,
-    toValue: h - 100,
+    toValue: dHeight - 100,
     easing: Easing.inOut(Easing.ease),
   };
   if (heightToExtend) {
@@ -189,8 +190,8 @@ const MergeEditor = () => {
       });
     }
     eSendEvent(refreshNotesPage);
-    updateEvent({type: ACTIONS.NOTES});
-    updateEvent({type: ACTIONS.FAVORITES});
+    updateEvent({type: Actions.NOTES});
+    updateEvent({type: Actions.FAVORITES});
     close();
   };
 

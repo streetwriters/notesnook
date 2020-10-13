@@ -1,23 +1,25 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {COLORS_NOTE} from '../../common/common';
 import {Placeholder} from '../../components/ListPlaceholders';
 import SimpleList from '../../components/SimpleList';
 import {NoteItemWrapper} from '../../components/SimpleList/NoteItemWrapper';
 import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
+import {Actions} from '../../provider/Actions';
 import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-} from '../../services/eventManager';
+} from '../../services/EventManager';
 import {
   eOnLoadNote,
   eScrollEvent,
   refreshNotesPage,
-} from '../../services/events';
-import {openEditorAnimation} from '../../utils/animations';
-import {db, DDS, editing} from '../../utils/utils';
+} from '../../utils/Events';
+import {openEditorAnimation} from '../../utils/Animations';
+import {editing} from '../../utils';
+import {COLORS_NOTE} from "../../utils/Colors";
+import {db} from "../../utils/DB";
+import {DDS} from "../../services/DeviceDetection";
 
 export const Notes = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
@@ -76,7 +78,7 @@ export const Notes = ({route, navigation}) => {
 
   const onFocus = useCallback(() => {
     dispatch({
-      type: ACTIONS.HEADER_STATE,
+      type: Actions.HEADER_STATE,
       state: {
         type: 'notes',
         menu: params.type === 'color' ? true : false,
@@ -85,11 +87,11 @@ export const Notes = ({route, navigation}) => {
       },
     });
     dispatch({
-      type: ACTIONS.HEADER_VERTICAL_MENU,
+      type: Actions.HEADER_VERTICAL_MENU,
       state: false,
     });
     dispatch({
-      type: ACTIONS.HEADER_TEXT_STATE,
+      type: Actions.HEADER_TEXT_STATE,
       state: {
         heading:
           params.type == 'tag'
@@ -99,7 +101,7 @@ export const Notes = ({route, navigation}) => {
     });
     init();
     dispatch({
-      type: ACTIONS.CURRENT_SCREEN,
+      type: Actions.CURRENT_SCREEN,
       screen: params.type === 'color' ? params.color.title : params.type,
     });
   }, []);
@@ -123,7 +125,7 @@ export const Notes = ({route, navigation}) => {
   useEffect(() => {
     if (navigation.isFocused()) {
       dispatch({
-        type: ACTIONS.SEARCH_STATE,
+        type: Actions.SEARCH_STATE,
         state: {
           placeholder: `Search in ${
             params.type == 'tag' ? '#' + params.title : params.title

@@ -1,19 +1,11 @@
 import {Dimensions, PixelRatio, Platform} from 'react-native';
 import DeviceInfo from 'react-native-device-info';
+
 let windowSize = Dimensions.get('window');
 
 export class DeviceDetectionService {
   constructor() {
-    this.pixelDensity = PixelRatio.get();
-    this.width = windowSize.width;
-    this.height = windowSize.height;
-    this.adjustedWidth = this.width * this.pixelDensity;
-    this.adjustedHeight = this.height * this.pixelDensity;
-
-    this.isPhoneOrTablet();
-    this.isIosOrAndroid();
-    this.detectIphoneX();
-    this.checkSmallTab();
+   this.setNewValues();
   }
 
   setNewValues() {
@@ -33,24 +25,16 @@ export class DeviceDetectionService {
     let dpi = this.pixelDensity * 160;
     let deviceWidthInInches = this.adjustedWidth / dpi;
     let deviceHeightInInches = this.adjustedHeight / dpi;
-    let diagonalSize = Math.sqrt(
+    return Math.sqrt(
       Math.pow(deviceWidthInInches, 2) + Math.pow(deviceHeightInInches, 2),
     );
-    return diagonalSize;
   };
 
   checkSmallTab(orientation) {
     this.width = Dimensions.get('screen').width;
     this.height = Dimensions.get('screen').height;
     let deviceSize = this.getDeviceSize();
-    console.log(
-      'device size',
-      deviceSize,
-      this.width,
-      this.height,
-      deviceSize < 9,
-      DeviceInfo.isTablet(),
-    );
+
     if (DeviceInfo.isTablet() && (orientation === "PORTRAIT" || deviceSize < 9)) {
       console.log('small tab');
       this.isTab = true;
@@ -111,15 +95,11 @@ export class DeviceDetectionService {
   }
 
   detectIphoneX() {
-    if (
-      Platform.OS === 'ios' &&
-      !Platform.isTVOS &&
-      !Platform.isTVOS &&
-      (windowSize.height === 812 || windowSize.width === 812)
-    ) {
-      this.isIphoneX = true;
-    } else {
-      this.isIphoneX = false;
-    }
+    this.isIphoneX = Platform.OS === 'ios' &&
+        !Platform.isTVOS &&
+        !Platform.isTVOS &&
+        (windowSize.height === 812 || windowSize.width === 812);
   }
 }
+
+export const DDS = new DeviceDetectionService();

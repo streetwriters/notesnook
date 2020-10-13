@@ -3,10 +3,11 @@
   "runnerConfig": "e2e/config.json",
   "configurations": {
     "ios": {
+      "binaryPath": "ios/build/Build/Products/Debug-iphonesimulator/Notesnook.app",
+      "build": "xcodebuild -workspace ios/Notesnook.xcworkspace -scheme Notesnook -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build",
       "type": "ios.simulator",
-      "binaryPath": "SPECIFY_PATH_TO_YOUR_APP_BINARY",
       "device": {
-        "type": "iPhone 11"
+        "type": "iPhone 11 Pro"
       }
     },
     "android.emu.debug": {

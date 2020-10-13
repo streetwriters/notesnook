@@ -1,10 +1,10 @@
 import React from 'react';
 import { Dimensions, Text, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { ph, SIZE, WEIGHT } from '../../common/common';
-import { timeSince } from '../../utils/utils';
 import { ActionIcon } from '../ActionIcon';
 import { ActionSheetEvent } from '../DialogManager/recievers';
+import {timeSince} from "../../utils/TimeUtils";
+import {ph, SIZE, WEIGHT} from "../../utils/SizeUtils";
 
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;

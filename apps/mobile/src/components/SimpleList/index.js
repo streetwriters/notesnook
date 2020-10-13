@@ -3,13 +3,14 @@ import {Platform, RefreshControl, StyleSheet, Text, useWindowDimensions, View} f
 import {initialWindowMetrics} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {DataProvider, LayoutProvider, RecyclerListView} from 'recyclerlistview';
-import {COLORS_NOTE, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
-import {eSendEvent} from '../../services/eventManager';
-import {eClearSearch, eOpenLoginDialog, eScrollEvent,} from '../../services/events';
-import {db, ToastEvent} from '../../utils/utils';
+import {Actions} from '../../provider/Actions';
+import {eSendEvent, ToastEvent} from '../../services/EventManager';
+import {eClearSearch, eOpenLoginDialog, eScrollEvent,} from '../../utils/Events';
 import {PressableButton} from '../PressableButton';
+import {COLORS_NOTE} from "../../utils/Colors";
+import {SIZE, WEIGHT} from "../../utils/SizeUtils";
+import {db} from "../../utils/DB";
 
 const header = {
     type: 'MAIN_HEADER',
@@ -82,7 +83,7 @@ const SimpleList = ({
     const _onRefresh = useCallback(async () => {
         if (Platform.OS === 'ios') {
             dispatch({
-                type: ACTIONS.SYNCING,
+                type: Actions.SYNCING,
                 syncing: true,
             });
         } else {
@@ -90,7 +91,7 @@ const SimpleList = ({
         }
         try {
             let user = await db.user.get();
-            dispatch({type: ACTIONS.USER, user: user});
+            dispatch({type: Actions.USER, user: user});
             await db.sync();
             ToastEvent.show('Sync Complete', 'success');
         } catch (e) {
@@ -107,7 +108,7 @@ const SimpleList = ({
         } finally {
             if (Platform.OS === 'ios') {
                 dispatch({
-                    type: ACTIONS.SYNCING,
+                    type: Actions.SYNCING,
                     syncing: false,
                 });
             } else {
@@ -116,7 +117,7 @@ const SimpleList = ({
             if (refreshCallback) {
                 refreshCallback();
             }
-            dispatch({type: ACTIONS.ALL});
+            dispatch({type: Actions.ALL});
         }
     }, []);
 

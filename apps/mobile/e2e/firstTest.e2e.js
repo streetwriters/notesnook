@@ -8,31 +8,30 @@ it('CHECK APP LOADED', async () => {
 });
 
 it('CHECK MENU NAVIGATION', async () => {
-  menu = element(by.id('left_menu_button'));
+  await expect(element(by.id('left_menu_button'))).toBeVisible();
+
+/*   await element(by.id('Notebooks')).tap();
   menu.tap();
   await sleep(200);
-  element(by.id('Notebooks')).tap();
+  await element(by.id('Favorites')).tap();
   menu.tap();
   await sleep(200);
-  element(by.id('Favorites')).tap();
+  await element(by.id('Trash')).tap();
   menu.tap();
   await sleep(200);
-  element(by.id('Trash')).tap();
+  await element(by.text('Tags')).tap();
   menu.tap();
   await sleep(200);
-  element(by.text('Tags')).tap();
+  await element(by.id('Settings')).tap();
   menu.tap();
-  await sleep(200);
-  element(by.id('Settings')).tap();
-  menu.tap();
-  await sleep(200);
+  await sleep(200); */
 
 });
 
 it('CHECK NIGHT MODE SWITCHING', async () => {
-  element(by.id('night_mode')).tap();
+/*   await element(by.id('night_mode')).tap();
   await sleep(2000);
-  element(by.id('night_mode')).tap();
+  await element(by.id('night_mode')).tap(); */
 
 });
 

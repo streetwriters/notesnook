@@ -1,8 +1,8 @@
 import React from 'react';
 import {Text, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { SIZE, WEIGHT } from '../../common/common';
 import {useTracked} from '../../provider';
+import {SIZE, WEIGHT} from "../../utils/SizeUtils";
 
 const DialogHeader = ({icon, title, paragraph}) => {
   const [state, dispatch] = useTracked();

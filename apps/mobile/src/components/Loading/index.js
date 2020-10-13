@@ -1,8 +1,8 @@
 import React from 'react';
 import {ActivityIndicator, StyleSheet, Text, View} from 'react-native';
-import {ph, pv, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
 import {Button} from '../Button';
+import {ph, pv, SIZE, WEIGHT} from "../../utils/SizeUtils";
 
 export const Loading = ({
   height = 150,

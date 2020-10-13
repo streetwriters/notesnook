@@ -1,7 +1,7 @@
 import React from 'react';
 import {Pressable} from 'react-native';
-import {br} from '../../common/common';
-import {hexToRGBA, RGB_Linear_Shade} from '../../utils/utils';
+import {hexToRGBA, RGB_Linear_Shade} from "../../utils/ColorUtils";
+import {br} from "../../utils/SizeUtils";
 
 export const PressableButton = ({
   color,

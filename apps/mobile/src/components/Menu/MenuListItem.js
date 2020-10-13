@@ -1,14 +1,15 @@
 import React from 'react';
 import {Text, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
-import {eSendEvent} from '../../services/eventManager';
-import {eClearSearch} from '../../services/events';
-import NavigationService from '../../services/NavigationService';
-import {DDS, showContext} from '../../utils/utils';
+import {Actions} from '../../provider/Actions';
+import {eSendEvent} from '../../services/EventManager';
+import {eClearSearch} from '../../utils/Events';
+import NavigationService from '../../services/Navigation';
+import {showContext} from '../../utils';
 import {PressableButton} from '../PressableButton';
+import {SIZE, WEIGHT} from "../../utils/SizeUtils";
+import {DDS} from "../../services/DeviceDetection";
 
 export const MenuListItem = ({item, index, noTextMode, ignore, testID}) => {
   const [state, dispatch] = useTracked();
@@ -17,7 +18,7 @@ export const MenuListItem = ({item, index, noTextMode, ignore, testID}) => {
   const _onPress = (event) => {
     if (!ignore) {
       dispatch({
-        type: ACTIONS.HEADER_TEXT_STATE,
+        type: Actions.HEADER_TEXT_STATE,
         state: {
           heading: item.name,
         },

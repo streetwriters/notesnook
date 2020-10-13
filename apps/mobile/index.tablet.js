@@ -8,14 +8,15 @@ import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-} from './src/services/eventManager';
+} from './src/services/EventManager';
 import {
   eCloseFullscreenEditor,
   eOnLoadNote,
   eOpenFullscreenEditor,
-} from './src/services/events';
-import {MainComponent, NavigationStack} from './src/services/Navigator';
+} from './src/utils/Events';
+import {NavigatorStack} from './src/navigation/NavigatorStack';
 import Editor from './src/views/Editor';
+import {NavigationStack} from "./src/navigation/Drawer";
 
 const editorRef = createRef();
 let outColors;
@@ -100,7 +101,7 @@ const NavWrapper = () => {
             borderRightColor: colors.nav,
             borderRightWidth: 1,
           }}>
-          <MainComponent />
+          <NavigatorStack />
         </View>
 
         <View

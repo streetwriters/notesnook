@@ -4,14 +4,15 @@ import QRCode from 'react-native-qrcode-svg';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import RNFetchBlob from 'rn-fetch-blob';
 import {LOGO_BASE64} from '../../assets/images/assets';
-import {SIZE, WEIGHT} from '../../common/common';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
-import {eOpenRecoveryKeyDialog} from '../../services/events';
-import {db, ToastEvent, w} from '../../utils/utils';
+import {eSubscribeEvent, eUnSubscribeEvent, ToastEvent} from '../../services/EventManager';
+import {eOpenRecoveryKeyDialog} from '../../utils/Events';
+import {dWidth} from '../../utils';
 import ActionSheet from '../ActionSheet';
 import {Button} from '../Button';
 import Seperator from '../Seperator';
 import {Toast} from '../Toast';
+import {SIZE, WEIGHT} from "../../utils/SizeUtils";
+import {db} from "../../utils/DB";
 class RecoveryKeyDialog extends React.Component {
   constructor(props) {
     super(props);
@@ -92,7 +93,7 @@ class RecoveryKeyDialog extends React.Component {
         initialOffsetFromBottom={1}>
         <View
           style={{
-            width: w,
+            width: dWidth,
             backgroundColor: colors.bg,
             justifyContent: 'space-between',
             paddingHorizontal: 12,
@@ -146,7 +147,7 @@ class RecoveryKeyDialog extends React.Component {
             {this.state.key ? (
               <QRCode
                 getRef={this.svg}
-                size={w / 2.2}
+                size={dWidth / 2.2}
                 value={this.state.key}
                 logo={{uri: LOGO_BASE64}}
                 logoBorderRadius={10}
@@ -157,7 +158,7 @@ class RecoveryKeyDialog extends React.Component {
             <View
               style={{
                 alignItems: 'center',
-                width: w / 2.2,
+                width: dWidth / 2.2,
                 justifyContent: 'center',
               }}>
               <Button

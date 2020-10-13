@@ -1,12 +1,13 @@
-import { eSendEvent } from '../services/eventManager';
-import { eCloseSideMenu, eOpenSideMenu } from '../services/events';
+import { eSendEvent } from '../services/EventManager';
+import { eCloseSideMenu, eOpenSideMenu } from '../utils/Events';
 import storage from '../utils/storage';
-import { db, history } from '../utils/utils';
-import { ACTIONS } from './actions';
+import { history} from '../utils/index';
+import { Actions } from './Actions';
+import {db} from "../utils/DB";
 
 export const reducer = (state, action) => {
   switch (action.type) {
-    case ACTIONS.ALL: {
+    case Actions.ALL: {
       let notes = db.notes.pinned;
       let notebooks = db.notebooks.pinned;
 
@@ -24,13 +25,13 @@ export const reducer = (state, action) => {
         colorNotes: db.colors.all,
       };
     }
-    case ACTIONS.SYNCING: {
+    case Actions.SYNCING: {
       return {
         ...state,
         syncing: action.syncing,
       };
     }
-    case ACTIONS.CLEAR_ALL: {
+    case Actions.CLEAR_ALL: {
       storage.clear();
       return {
         ...state,
@@ -47,7 +48,7 @@ export const reducer = (state, action) => {
         user: null,
       };
     }
-    case ACTIONS.NOTES:
+    case Actions.NOTES:
       let notes;
       if (action.sort) {
         notes = db.notes.group(action.sort);
@@ -60,38 +61,38 @@ export const reducer = (state, action) => {
         notes: notes,
         loading: false,
       };
-    case ACTIONS.THEME: {
+    case Actions.THEME: {
       return {
         ...state,
         colors: action.colors,
       };
     }
-    case ACTIONS.USER: {
+    case Actions.USER: {
       let user = action.user;
       return {
         ...state,
         user: user,
       };
     }
-    case ACTIONS.NOTEBOOKS: {
+    case Actions.NOTEBOOKS: {
       return {
         ...state,
         notebooks: db.notebooks.all,
       };
     }
-    case ACTIONS.SETTINGS: {
+    case Actions.SETTINGS: {
       return {
         ...state,
         settings: action.settings,
       };
     }
-    case ACTIONS.TRASH: {
+    case Actions.TRASH: {
       return {
         ...state,
         trash: db.trash.all,
       };
     }
-    case ACTIONS.PINNED: {
+    case Actions.PINNED: {
       let notes = db.notes.pinned;
       let notebooks = db.notebooks.pinned;
 
@@ -103,31 +104,31 @@ export const reducer = (state, action) => {
         },
       };
     }
-    case ACTIONS.CURRENT_SCREEN: {
+    case Actions.CURRENT_SCREEN: {
       return {
         ...state,
         currentScreen: action.screen,
       };
     }
-    case ACTIONS.TAGS: {
+    case Actions.TAGS: {
       return {
         ...state,
         tags: db.tags.all,
       };
     }
-    case ACTIONS.FAVORITES: {
+    case Actions.FAVORITES: {
       return {
         ...state,
         favorites: db.notes.favorites,
       };
     }
-    case ACTIONS.COLORS: {
+    case Actions.COLORS: {
       return {
         ...state,
         colorNotes: db.colors.all,
       };
     }
-    case ACTIONS.SELECTION_MODE: {
+    case Actions.SELECTION_MODE: {
       if (action.enabled) {
         eSendEvent(eCloseSideMenu);
       } else {
@@ -139,13 +140,13 @@ export const reducer = (state, action) => {
         selectionMode: action.enabled,
       };
     }
-    case ACTIONS.SELECT_ALL: {
+    case Actions.SELECT_ALL: {
       return {
         ...state,
         selectedItemsList: action.selected,
       };
     }
-    case ACTIONS.SELECTED_ITEMS: {
+    case Actions.SELECTED_ITEMS: {
       let selectedItems = [...state.selectedItemsList];
       if (selectedItems.includes(action.item)) {
         selectedItems.splice(selectedItems.indexOf(action.item), 1);
@@ -162,7 +163,7 @@ export const reducer = (state, action) => {
         selectionMode: selectedItems.length > 0 ? state.selectionMode : false,
       };
     }
-    case ACTIONS.CLEAR_SELECTION: {
+    case Actions.CLEAR_SELECTION: {
       history.selectedItemsList = [];
       eSendEvent(eOpenSideMenu);
       return {
@@ -170,25 +171,25 @@ export const reducer = (state, action) => {
         selectedItemsList: [],
       };
     }
-    case ACTIONS.MODAL_NAVIGATOR: {
+    case Actions.MODAL_NAVIGATOR: {
       return {
         ...state,
         preventDefaultMargins: action.enabled,
       };
     }
-    case ACTIONS.LOGIN_NAVIGATOR: {
+    case Actions.LOGIN_NAVIGATOR: {
       return {
         ...state,
         isLoginNavigator: action.enabled,
       };
     }
-    case ACTIONS.CURRENT_EDITING_NOTE: {
+    case Actions.CURRENT_EDITING_NOTE: {
       return {
         ...state,
         currentEditingNote: action.id,
       };
     }
-    case ACTIONS.SEARCH_RESULTS: {
+    case Actions.SEARCH_RESULTS: {
       let results = action.results;
 
       return {
@@ -196,7 +197,7 @@ export const reducer = (state, action) => {
         searchResults: {...results},
       };
     }
-    case ACTIONS.HEADER_STATE: {
+    case Actions.HEADER_STATE: {
       let header = {
             ...state.headerState,
             ...action.state,
@@ -206,7 +207,7 @@ export const reducer = (state, action) => {
             headerState: header,
           };
     }
-    case ACTIONS.SEARCH_STATE: {
+    case Actions.SEARCH_STATE: {
       let stat = {
             ...state.searchState,
             ...action.state,
@@ -217,13 +218,13 @@ export const reducer = (state, action) => {
             searchState: stat,
           };
     }
-    case ACTIONS.CONTAINER_STATE: {
+    case Actions.CONTAINER_STATE: {
       return {
         ...state,
         containerState: action.state,
       };
     }
-    case ACTIONS.HEADER_TEXT_STATE: {
+    case Actions.HEADER_TEXT_STATE: {
       let stat ={
             ...state.headerTextState,
             ...action.state,
@@ -233,13 +234,13 @@ export const reducer = (state, action) => {
             headerTextState: stat,
           };
     }
-    case ACTIONS.HEADER_VERTICAL_MENU: {
+    case Actions.HEADER_VERTICAL_MENU: {
       return {
         ...state,
         headerVerticalMenu: action.state,
       };
     }
-    case ACTIONS.CONTAINER_BOTTOM_BUTTON: {
+    case Actions.CONTAINER_BOTTOM_BUTTON: {
       let containerBottomButton = {
             ...state.containerBottomButton,
             ...action.state,

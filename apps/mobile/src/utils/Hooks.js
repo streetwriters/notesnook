@@ -3,8 +3,8 @@ import { useTracked } from '../provider';
 import {
   eSubscribeEvent,
   eUnSubscribeEvent
-} from '../services/eventManager';
-import { eScrollEvent } from '../services/events';
+} from '../services/EventManager';
+import { eScrollEvent } from './Events';
 
 
 

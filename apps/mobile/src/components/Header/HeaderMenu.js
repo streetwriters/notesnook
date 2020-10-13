@@ -1,9 +1,9 @@
 import React, { createRef } from 'react';
 import Menu, { MenuDivider, MenuItem } from 'react-native-material-menu';
-import { SIZE, WEIGHT } from '../../common/common';
 import { useTracked } from '../../provider';
-import { ACTIONS } from '../../provider/actions';
+import { Actions } from '../../provider/Actions';
 import { ActionIcon } from '../ActionIcon';
+import {SIZE, WEIGHT} from "../../utils/SizeUtils";
 const menuRef = createRef();
 export const HeaderMenu = () => {
   const [state, dispatch] = useTracked();
@@ -51,7 +51,7 @@ export const HeaderMenu = () => {
           color: colors.pri,
         }}
         onPress={() => {
-          dispatch({type: ACTIONS.NOTES, sort: null});
+          dispatch({type: Actions.NOTES, sort: null});
           menuRef.current?.hide();
         }}>
         Default
@@ -62,7 +62,7 @@ export const HeaderMenu = () => {
           color: colors.pri,
         }}
         onPress={() => {
-          dispatch({type: ACTIONS.NOTES, sort: 'abc'});
+          dispatch({type: Actions.NOTES, sort: 'abc'});
           menuRef.current?.hide();
         }}>
         Alphabetical
@@ -73,7 +73,7 @@ export const HeaderMenu = () => {
           color: colors.pri,
         }}
         onPress={() => {
-          dispatch({type: ACTIONS.NOTES, sort: 'year'});
+          dispatch({type: Actions.NOTES, sort: 'year'});
           menuRef.current?.hide();
         }}>
         By year
@@ -84,7 +84,7 @@ export const HeaderMenu = () => {
           color: colors.pri,
         }}
         onPress={() => {
-          dispatch({type: ACTIONS.NOTES, sort: 'month'});
+          dispatch({type: Actions.NOTES, sort: 'month'});
           menuRef.current?.hide();
         }}>
         By month
@@ -95,7 +95,7 @@ export const HeaderMenu = () => {
           color: colors.pri,
         }}
         onPress={() => {
-          dispatch({type: ACTIONS.NOTES, sort: 'week'});
+          dispatch({type: Actions.NOTES, sort: 'week'});
           menuRef.current?.hide();
         }}>
         By week

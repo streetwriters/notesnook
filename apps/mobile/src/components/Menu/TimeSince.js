@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {Text} from 'react-native';
-import {timeSince} from '../../utils/utils';
+import {timeSince} from "../../utils/TimeUtils";
 
 export const TimeSince = ({time}) => {
   const [timeAgo, setTimeAgo] = useState(null);

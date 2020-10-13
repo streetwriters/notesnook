@@ -1,5 +1,5 @@
-import {dialogActions} from './dialogActions';
-import {timeConverter} from '../../utils/utils';
+import {dialogActions} from './DialogActions';
+import {timeConverter} from "../../utils/TimeUtils";
 
 export const TEMPLATE_DELETE = type => {
   return {

@@ -11,39 +11,31 @@ import {
 } from 'react-native';
 import Share from 'react-native-share';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {
-  ACCENT,
-  COLORS_NOTE,
-  COLOR_SCHEME,
-  COLOR_SCHEME_DARK,
-  COLOR_SCHEME_LIGHT,
-  opacity,
-  ph,
-  pv,
-  setColorScheme,
-  SIZE,
-  WEIGHT,
-} from '../../common/common';
 import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
-import {eSendEvent, openVault} from '../../services/eventManager';
+import {Actions} from '../../provider/Actions';
+import {eSendEvent, openVault, ToastEvent} from '../../services/EventManager';
 import {
   eOpenLoginDialog,
   eOpenMoveNoteDialog,
   refreshNotesPage,
-} from '../../services/events';
-import {MMKV} from '../../utils/storage';
-import {
-  db,
-  DDS,
-  hexToRGBA,
-  RGB_Linear_Shade,
-  timeConverter,
-  ToastEvent,
-} from '../../utils/utils';
+} from '../../utils/Events';
 import {PremiumTag} from '../Premium/PremiumTag';
 import {PressableButton} from '../PressableButton';
 import {Toast} from '../Toast';
+import {hexToRGBA, RGB_Linear_Shade} from "../../utils/ColorUtils";
+import {timeConverter} from "../../utils/TimeUtils";
+import {
+  ACCENT,
+  COLOR_SCHEME,
+  COLOR_SCHEME_DARK,
+  COLOR_SCHEME_LIGHT,
+  COLORS_NOTE,
+  setColorScheme
+} from "../../utils/Colors";
+import {opacity, ph, pv, SIZE, WEIGHT} from "../../utils/SizeUtils";
+import {db} from "../../utils/DB";
+import {DDS} from "../../services/DeviceDetection";
+import {MMKV} from "../../utils/MMKV";
 
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
@@ -82,7 +74,7 @@ export const ActionSheetComponent = ({
     let newColors = setColorScheme(colors, accent);
     StatusBar.setBarStyle(colors.night ? 'light-content' : 'dark-content');
 
-    dispatch({type: ACTIONS.THEME, colors: newColors});
+    dispatch({type: Actions.THEME, colors: newColors});
   }
 
   useEffect(() => {
@@ -111,7 +103,7 @@ export const ActionSheetComponent = ({
     await db.notes.note(note.id).tag(tag);
 
     setNote({...db.notes.note(note.id).data});
-    dispatch({type: ACTIONS.TAGS});
+    dispatch({type: Actions.TAGS});
     tagsInputRef.current?.setNativeProps({
       text: '',
     });
@@ -201,8 +193,8 @@ export const ActionSheetComponent = ({
 
     if (!nodispatch) {
       dispatch({type: type});
-      dispatch({type: ACTIONS.PINNED});
-      dispatch({type: ACTIONS.FAVORITES});
+      dispatch({type: Actions.PINNED});
+      dispatch({type: Actions.FAVORITES});
     }
     setNote({...toAdd});
   };
@@ -212,8 +204,8 @@ export const ActionSheetComponent = ({
       name: 'Add to',
       icon: 'book-outline',
       func: () => {
-        dispatch({type: ACTIONS.MODAL_NAVIGATOR, enabled: true});
-        dispatch({type: ACTIONS.SELECTED_ITEMS, item: note});
+        dispatch({type: Actions.MODAL_NAVIGATOR, enabled: true});
+        dispatch({type: Actions.SELECTED_ITEMS, item: note});
         close();
         setTimeout(() => {
           eSendEvent(eOpenMoveNoteDialog);
@@ -277,7 +269,7 @@ export const ActionSheetComponent = ({
       name: 'Restore',
       icon: 'delete-restore',
       func: async () => {
-        dispatch({type: ACTIONS.TRASH});
+        dispatch({type: Actions.TRASH});
         localRefresh(note.type);
         ToastEvent.show(
           item.type === 'note' ? 'Note restored' : 'Notebook restored',
@@ -328,7 +320,7 @@ export const ActionSheetComponent = ({
         } else {
           await db.notebooks.notebook(note.id).pin();
         }
-        dispatch({type: ACTIONS.PINNED});
+        dispatch({type: Actions.PINNED});
         localRefresh(item.type);
       },
       close: false,
@@ -349,7 +341,7 @@ export const ActionSheetComponent = ({
         } else {
           await db.notebooks.notebook(note.id).favorite();
         }
-        dispatch({type: ACTIONS.FAVORITES});
+        dispatch({type: Actions.FAVORITES});
         localRefresh(item.type);
       },
       close: false,
@@ -374,9 +366,9 @@ export const ActionSheetComponent = ({
           db.vault
             .add(note.id)
             .then(() => {
-              dispatch({type: ACTIONS.NOTES});
+              dispatch({type: Actions.NOTES});
               eSendEvent(refreshNotesPage);
-              dispatch({type: ACTIONS.PINNED});
+              dispatch({type: Actions.PINNED});
               close();
             })
             .catch(async (e) => {
@@ -410,7 +402,7 @@ export const ActionSheetComponent = ({
             .note(note.id)
             .untag(oldProps.tags[oldProps.tags.indexOf(tag)]);
           localRefresh(oldProps.type);
-          dispatch({type: ACTIONS.TAGS});
+          dispatch({type: Actions.TAGS});
         } catch (e) {
           localRefresh(oldProps.type);
         }
@@ -464,7 +456,7 @@ export const ActionSheetComponent = ({
           } else {
             await db.notes.note(note.id).color(color.name);
           }
-          dispatch({type: ACTIONS.COLORS});
+          dispatch({type: Actions.COLORS});
           localRefresh(note.type);
         }}
         customStyle={{
@@ -611,7 +603,7 @@ export const ActionSheetComponent = ({
       setRefreshing(true);
       try {
         let user = await db.user.get();
-        dispatch({type: ACTIONS.USER, user: user});
+        dispatch({type: Actions.USER, user: user});
         await db.sync();
         localRefresh();
         ToastEvent.show('Note synced', 'success', 'local');
@@ -620,7 +612,7 @@ export const ActionSheetComponent = ({
       } finally {
         setRefreshing(false);
       }
-      dispatch({type: ACTIONS.ALL});
+      dispatch({type: Actions.ALL});
     }
   };
 

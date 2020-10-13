@@ -1,11 +1,13 @@
 import React, {useEffect, useState} from 'react';
 import {TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {SIZE} from '../../common/common';
 import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
-import {db, getElevation, ToastEvent} from '../../utils/utils';
+import {Actions} from '../../provider/Actions';
+import {getElevation} from '../../utils';
 import {PressableButton} from '../PressableButton';
+import {ToastEvent} from "../../services/EventManager";
+import {SIZE} from "../../utils/SizeUtils";
+import {db} from "../../utils/DB";
 
 const SelectionWrapper = ({
   children,
@@ -41,12 +43,12 @@ const SelectionWrapper = ({
       if (!item.id) return;
       if (item.type === 'note') {
         await db.notes.note(item.id).pin();
-        dispatch({type: ACTIONS.PINNED});
-        dispatch({type: ACTIONS.NOTES});
+        dispatch({type: Actions.PINNED});
+        dispatch({type: Actions.NOTES});
       } else {
         await db.notebooks.notebook(item.id).pin();
-        dispatch({type: ACTIONS.PINNED});
-        dispatch({type: ACTIONS.NOTEBOOKS});
+        dispatch({type: Actions.PINNED});
+        dispatch({type: Actions.NOTEBOOKS});
       }
     };
     func();
@@ -66,7 +68,7 @@ const SelectionWrapper = ({
   return (
     <PressableButton
       color={
-        currentEditingNote === item.dateCreated || pinned
+        currentEditingNote || pinned
           ? colors.shade
           : background
           ? background
@@ -75,12 +77,12 @@ const SelectionWrapper = ({
       onLongPress={onLongPress}
       onPress={onPress}
       selectedColor={
-        currentEditingNote === item.dateCreated || pinned
+        currentEditingNote  || pinned
           ? colors.accent
           : colors.nav
       }
       alpha={!colors.night ? -0.02 : 0.02}
-      opacity={currentEditingNote === item.dateCreated || pinned ? 0.12 : 1}
+      opacity={currentEditingNote || pinned ? 0.12 : 1}
       customStyle={{
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -137,7 +139,7 @@ const SelectionWrapper = ({
         <TouchableOpacity
           activeOpacity={1}
           onPress={() => {
-            dispatch({type: ACTIONS.SELECTED_ITEMS, item: item});
+            dispatch({type: Actions.SELECTED_ITEMS, item: item});
           }}
           style={{
             justifyContent: 'center',

@@ -2,15 +2,17 @@ import React, {createRef} from 'react';
 import {Modal, Text, TouchableOpacity, View} from 'react-native';
 import {TextInput} from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {opacity, ph, pv, SIZE, WEIGHT} from '../../common/common';
-import {getElevation, ToastEvent, db, DDS} from '../../utils/utils';
-import {eSendEvent} from '../../services/eventManager';
-import {eOnNewTopicAdded} from '../../services/events';
+import {getElevation} from '../../utils';
+import {eSendEvent, ToastEvent} from '../../services/EventManager';
+import {eOnNewTopicAdded} from '../../utils/Events';
 import {Toast} from '../Toast';
 import {Button} from '../Button';
 import BaseDialog from '../Dialog/base-dialog';
 import DialogHeader from '../Dialog/dialog-header';
 import DialogButtons from '../Dialog/dialog-buttons';
+import {opacity, ph, pv, SIZE, WEIGHT} from "../../utils/SizeUtils";
+import {db} from "../../utils/DB";
+import {DDS} from "../../services/DeviceDetection";
 
 export class AddTopicDialog extends React.Component {
   constructor(props) {

@@ -5,7 +5,7 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent,
   openVault,
-} from '../../services/eventManager';
+} from '../../services/EventManager';
 import {
   eCloseActionSheet,
   eCloseAddNotebookDialog,
@@ -23,8 +23,7 @@ import {
   eOpenMoveNoteDialog,
   eOpenPremiumDialog,
   eOpenSimpleDialog,
-} from '../../services/events';
-import {DDS, hexToRGBA} from '../../utils/utils';
+} from '../../utils/Events';
 import ActionSheet from '../ActionSheet';
 import {ActionSheetComponent} from '../ActionSheetComponent';
 import {AddNotebookDialog} from '../AddNotebookDialog';
@@ -41,7 +40,9 @@ import ProgressDialog from '../ProgressDialog';
 import RecoveryKeyDialog from '../RecoveryKeyDialog';
 import RestoreDialog from '../RestoreDialog';
 import {VaultDialog} from '../VaultDialog';
-import {TEMPLATE_DELETE, TEMPLATE_PERMANANT_DELETE} from './templates';
+import {TEMPLATE_DELETE, TEMPLATE_PERMANANT_DELETE} from './Templates';
+import {hexToRGBA} from "../../utils/ColorUtils";
+import {DDS} from "../../services/DeviceDetection";
 
 export class DialogManager extends Component {
   constructor(props) {

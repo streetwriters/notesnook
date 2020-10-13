@@ -2,13 +2,15 @@ import React, {createRef} from 'react';
 import {ScrollView, Text, View} from 'react-native';
 import * as RNIap from 'react-native-iap';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {SIZE, WEIGHT} from '../../common/common';
-import {eSendEvent} from '../../services/eventManager';
-import {eOpenLoginDialog, eOpenPendingDialog} from '../../services/events';
-import {db, DDS, h, itemSkus, ToastEvent, w} from '../../utils/utils';
+import {eSendEvent, ToastEvent} from '../../services/EventManager';
+import {eOpenLoginDialog, eOpenPendingDialog} from '../../utils/Events';
+import {dHeight, itemSkus, dWidth} from '../../utils';
 import ActionSheet from '../ActionSheet';
 import {Button} from '../Button';
 import Seperator from '../Seperator';
+import {SIZE, WEIGHT} from "../../utils/SizeUtils";
+import {db} from "../../utils/DB";
+import {DDS} from "../../services/DeviceDetection";
 class PremiumDialog extends React.Component {
   constructor(props) {
     super(props);
@@ -93,7 +95,7 @@ class PremiumDialog extends React.Component {
         initialOffsetFromBottom={1}>
         <View
           style={{
-            width: DDS.isTab ? 500 : w,
+            width: DDS.isTab ? 500 : dWidth,
             backgroundColor: colors.bg,
             justifyContent: 'space-between',
             paddingHorizontal: 12,
@@ -123,7 +125,7 @@ class PremiumDialog extends React.Component {
             }
             style={{
               width: '100%',
-              maxHeight: DDS.isTab ? h * 0.35 : h * 0.5,
+              maxHeight: DDS.isTab ? dHeight * 0.35 : dHeight * 0.5,
             }}>
             {[
               {

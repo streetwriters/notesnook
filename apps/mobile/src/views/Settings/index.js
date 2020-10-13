@@ -12,23 +12,12 @@ import {
 import * as Animatable from 'react-native-animatable';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import RNFetchBlob from 'rn-fetch-blob';
-import {
-  ACCENT,
-  COLOR_SCHEME,
-  COLOR_SCHEME_DARK,
-  COLOR_SCHEME_LIGHT,
-  opacity,
-  pv,
-  setColorScheme,
-  SIZE,
-  WEIGHT,
-} from '../../common/common';
 import {Button} from '../../components/Button';
 import {PressableButton} from '../../components/PressableButton';
 import Seperator from '../../components/Seperator';
 import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
-import {eSendEvent} from '../../services/eventManager';
+import {Actions} from '../../provider/Actions';
+import {eSendEvent, ToastEvent} from '../../services/EventManager';
 import {
   eCloseProgressDialog,
   eOpenLoginDialog,
@@ -37,28 +26,28 @@ import {
   eOpenRecoveryKeyDialog,
   eOpenRestoreDialog,
   eResetApp,
-} from '../../services/events';
-import NavigationService from '../../services/NavigationService';
-import storage, {MMKV} from '../../utils/storage';
+} from '../../utils/Events';
+import NavigationService from '../../services/Navigation';
+import storage from '../../utils/storage';
 import {
-  db,
-  DDS,
-  hexToRGBA,
-  requestStoragePermission,
-  RGB_Linear_Shade,
   setSetting,
-  sleep,
-  ToastEvent,
-  w,
-} from '../../utils/utils';
+  dWidth,
+} from '../../utils';
+import {hexToRGBA, RGB_Linear_Shade} from "../../utils/ColorUtils";
+import {sleep} from "../../utils/TimeUtils";
+import {ACCENT, COLOR_SCHEME, COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT, setColorScheme} from "../../utils/Colors";
+import {opacity, pv, SIZE, WEIGHT} from "../../utils/SizeUtils";
+import {db} from "../../utils/DB";
+import {DDS} from "../../services/DeviceDetection";
+import {MMKV} from "../../utils/MMKV";
 
-export const Settings = ({route, navigation}) => {
+export const Settings = ({ navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors, user, settings} = state;
   function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
     let newColors = setColorScheme(colors, accent);
     StatusBar.setBarStyle(colors.night ? 'light-content' : 'dark-content');
-    dispatch({type: ACTIONS.THEME, colors: newColors});
+    dispatch({type: Actions.THEME, colors: newColors});
   }
 
   function changeAccentColor(accentColor) {
@@ -69,7 +58,7 @@ export const Settings = ({route, navigation}) => {
 
   const onFocus = useCallback(() => {
     dispatch({
-      type: ACTIONS.HEADER_STATE,
+      type: Actions.HEADER_STATE,
       state: {
         type: null,
         menu: true,
@@ -78,23 +67,23 @@ export const Settings = ({route, navigation}) => {
       },
     });
     dispatch({
-      type: ACTIONS.HEADER_VERTICAL_MENU,
+      type: Actions.HEADER_VERTICAL_MENU,
       state: false,
     });
 
     dispatch({
-      type: ACTIONS.HEADER_TEXT_STATE,
+      type: Actions.HEADER_TEXT_STATE,
       state: {
         heading: 'Settings',
       },
     });
     dispatch({
-      type: ACTIONS.CURRENT_SCREEN,
+      type: Actions.CURRENT_SCREEN,
       screen: 'settings',
     });
 
     dispatch({
-      type: ACTIONS.SEARCH_STATE,
+      type: Actions.SEARCH_STATE,
       state: {
         noSearch: true,
       },
@@ -137,10 +126,12 @@ export const Settings = ({route, navigation}) => {
     {
       name: 'Backup data',
       func: async () => {
-        let granted = requestStoragePermission();
-        if (!granted) {
-          ToastEvent.show('Backup failed! Storage access was denied.');
-          return;
+        if (Platform.OS === 'android') {
+          let granted = storage.requestPermission();
+          if (!granted) {
+            ToastEvent.show('Backup failed! Storage access was denied.');
+            return;
+          }
         }
 
         eSendEvent(eOpenProgressDialog, {
@@ -148,10 +139,20 @@ export const Settings = ({route, navigation}) => {
           paragraph:
             "All your backups are stored in 'Phone Storage/Notesnook/backups' folder",
         });
-        let backup = await db.backup.export();
+        let backup;
+        try {
+          backup = await db.backup.export();
+        } catch (e) {
+          console.log('error', e);
+        }
+
         let backupName =
           'notesnook_backup_' + new Date().toString() + '.nnbackup';
-        let path = RNFetchBlob.fs.dirs.SDCardDir + '/Notesnook/backups/';
+        let path =
+          Platform.OS === 'ios'
+            ? RNFetchBlob.fs.dirs.DocumentDir + "/backups/'"
+            : RNFetchBlob.fs.dirs.SDCardDir + '/Notesnook/backups/';
+        console.log('HERE');
         await storage.checkAndCreateDir(path);
         await RNFetchBlob.fs.writeFile(path + backupName, backup, 'utf8');
 
@@ -175,7 +176,7 @@ export const Settings = ({route, navigation}) => {
     await setSetting(settings, 'useSystemTheme', !settings.useSystemTheme);
 
     if (!settings.useSystemTheme) {
-      MMKV.setStringAsync(
+      await MMKV.setStringAsync(
         'theme',
         JSON.stringify({night: Appearance.getColorScheme() === 'dark'}),
       );
@@ -234,7 +235,7 @@ export const Settings = ({route, navigation}) => {
       }}>
       <View
         style={{
-          marginTop: Platform.OS == 'ios' ? 125 - 60 : 125 - 60,
+          marginTop: Platform.OS === 'ios' ? 125 - 60 : 125 - 60,
         }}
       />
       <ScrollView
@@ -352,8 +353,8 @@ export const Settings = ({route, navigation}) => {
                 name: 'Logout',
                 func: async () => {
                   await db.user.logout();
-                  dispatch({type: ACTIONS.USER, user: null});
-                  dispatch({type: ACTIONS.CLEAR_ALL});
+                  dispatch({type: Actions.USER, user: null});
+                  dispatch({type: Actions.CLEAR_ALL});
                 },
                 desc:
                   'Logout of your account, this will clear everything and reset the app.',
@@ -506,10 +507,10 @@ export const Settings = ({route, navigation}) => {
               selectedColor={item}
               alpha={!colors.night ? -0.1 : 0.1}
               opacity={1}
-              onPress={() => {
+              onPress={async () => {
                 changeAccentColor(item);
 
-                MMKV.setStringAsync('accentColor', item);
+                await MMKV.setStringAsync('accentColor', item);
               }}
               customStyle={{
                 flexDirection: 'row',
@@ -517,11 +518,9 @@ export const Settings = ({route, navigation}) => {
                 alignItems: 'center',
                 marginHorizontal: 5,
                 marginVertical: 5,
-                width: DDS.isTab ? (w * 0.28) / 5 - 35 : w / 5 - 35,
-                height: DDS.isTab ? (w * 0.28) / 5 - 35 : w / 5 - 35,
+                width: DDS.isTab ? (dWidth * 0.28) / 5 - 35 : dWidth / 5 - 35,
+                height: DDS.isTab ? (dWidth * 0.28) / 5 - 35 : dWidth / 5 - 35,
                 borderRadius: 100,
-                justifyContent: 'center',
-                alignItems: 'center',
               }}>
               {colors.accent === item ? (
                 <Icon size={SIZE.lg} color="white" name="check" />
@@ -534,8 +533,8 @@ export const Settings = ({route, navigation}) => {
           title="Use System Dark Mode"
           tagline={
             settings.useSystemTheme
-              ? 'Switch to dark theme based on system settings'
-              : 'Keep the app theme independent from system settings'
+              ? 'App will switch to dark mode based on system theme'
+              : 'App dark mode is independent from system theme'
           }
           onPress={switchTheme}
           customComponent={
@@ -551,13 +550,15 @@ export const Settings = ({route, navigation}) => {
 
         <CustomButton
           title="Dark Mode"
-          tagline={colors.night ? 'Turn off dark mode' : 'Turn on dark mode'}
-          onPress={() => {
+          tagline={
+            colors.night ? 'Dark mode is turned off' : 'Dark mode is turned on'
+          }
+          onPress={async () => {
             if (!colors.night) {
-              MMKV.setStringAsync('theme', JSON.stringify({night: true}));
+              await MMKV.setStringAsync('theme', JSON.stringify({night: true}));
               changeColorScheme(COLOR_SCHEME_DARK);
             } else {
-              MMKV.setStringAsync('theme', JSON.stringify({night: false}));
+                await MMKV.setStringAsync('theme', JSON.stringify({night: false}));
 
               changeColorScheme(COLOR_SCHEME_LIGHT);
             }
@@ -806,22 +807,22 @@ export const Settings = ({route, navigation}) => {
         {[
           {
             name: 'Privacy Policy',
-            func: () => {
-              Linking.openURL('https://www.notesnook.com/privacy.html');
+            func: async () => {
+             await Linking.openURL('https://www.notesnook.com/privacy.html');
             },
             desc: 'Read our privacy policy',
           },
           {
             name: 'Check for updates',
-            func: () => {
-              Linking.openURL('https://www.notesnook.com/privacy.html');
+            func: async () => {
+              await Linking.openURL('https://www.notesnook.com/privacy.html');
             },
             desc: 'Check for a newer version of app',
           },
           {
             name: 'About',
-            func: () => {
-              Linking.openURL('https://www.notesnook.com');
+            func: async () => {
+              await Linking.openURL('https://www.notesnook.com');
             },
             desc: 'You are using the latest version of our app.',
           },

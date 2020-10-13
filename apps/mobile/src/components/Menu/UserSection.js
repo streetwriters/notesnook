@@ -7,14 +7,16 @@ import {
   View,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {pv, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
-import {eSendEvent} from '../../services/eventManager';
-import {eOpenLoginDialog} from '../../services/events';
-import {db, hexToRGBA, showContext, ToastEvent} from '../../utils/utils';
+import {Actions} from '../../provider/Actions';
+import {eSendEvent, ToastEvent} from '../../services/EventManager';
+import {eOpenLoginDialog} from '../../utils/Events';
+import {showContext} from '../../utils';
 import {PressableButton} from '../PressableButton';
 import {TimeSince} from './TimeSince';
+import {hexToRGBA} from "../../utils/ColorUtils";
+import {pv, SIZE, WEIGHT} from "../../utils/SizeUtils";
+import {db} from "../../utils/DB";
 
 export const UserSection = ({noTextMode}) => {
   const [state, dispatch] = useTracked();
@@ -22,7 +24,7 @@ export const UserSection = ({noTextMode}) => {
 
   useEffect(() => {
     console.log(user);
-    dispatch({type: ACTIONS.TAGS});
+    dispatch({type: Actions.TAGS});
   }, []);
 
   return user && user.username ? (
@@ -66,13 +68,13 @@ export const UserSection = ({noTextMode}) => {
       <TouchableOpacity
         onPress={async () => {
           dispatch({
-            type: ACTIONS.SYNCING,
+            type: Actions.SYNCING,
             syncing: true,
           });
           try {
             if (!user) {
               let u = await db.user.get();
-              dispatch({type: ACTIONS.USER, user: u});
+              dispatch({type: Actions.USER, user: u});
             }
             await db.sync();
             ToastEvent.show('Sync Complete', 'success');
@@ -80,10 +82,10 @@ export const UserSection = ({noTextMode}) => {
             ToastEvent.show(e.message, 'error');
           }
           let u = await db.user.get();
-          dispatch({type: ACTIONS.USER, user: u});
-          dispatch({type: ACTIONS.ALL});
+          dispatch({type: Actions.USER, user: u});
+          dispatch({type: Actions.ALL});
           dispatch({
-            type: ACTIONS.SYNCING,
+            type: Actions.SYNCING,
             syncing: false,
           });
         }}

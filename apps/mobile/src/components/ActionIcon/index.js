@@ -1,8 +1,8 @@
 import React from 'react';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {SIZE} from '../../common/common';
 import {useTracked} from '../../provider';
 import {PressableButton} from '../PressableButton';
+import {SIZE} from "../../utils/SizeUtils";
 
 export const ActionIcon = ({
   onPress,
@@ -34,6 +34,7 @@ export const ActionIcon = ({
         alignItems: 'center',
         borderRadius: 100,
         ...customStyle,
+      
       }}>
       <Icon name={name} style={iconStyle} color={color} size={size} />
     </PressableButton>

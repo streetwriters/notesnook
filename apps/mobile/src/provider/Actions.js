@@ -1,4 +1,4 @@
-export const ACTIONS = {
+export const Actions = {
   NOTES: 'note',
   NOTEBOOKS: 'notebook',
   TRASH: 'trash',

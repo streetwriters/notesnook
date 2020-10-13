@@ -1,11 +1,11 @@
 import React from 'react';
 import {Text, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {ph, pv, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
-import NavigationService from '../../services/NavigationService';
+import NavigationService from '../../services/Navigation';
 import {ActionSheetEvent} from '../DialogManager/recievers';
 import Seperator from '../Seperator';
+import {ph, pv, SIZE, WEIGHT} from "../../utils/SizeUtils";
 
 export const NotebookItem = ({
   item,

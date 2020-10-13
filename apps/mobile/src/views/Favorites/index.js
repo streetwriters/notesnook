@@ -3,7 +3,7 @@ import {Placeholder} from '../../components/ListPlaceholders';
 import SimpleList from '../../components/SimpleList';
 import {NoteItemWrapper} from '../../components/SimpleList/NoteItemWrapper';
 import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
+import {Actions} from '../../provider/Actions';
 export const Favorites = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const {favorites} = state;
@@ -11,7 +11,7 @@ export const Favorites = ({route, navigation}) => {
 
   const onFocus = useCallback(() => {
     dispatch({
-      type: ACTIONS.HEADER_STATE,
+      type: Actions.HEADER_STATE,
       state: {
         type: 'notes',
         menu: true,
@@ -21,13 +21,13 @@ export const Favorites = ({route, navigation}) => {
     });
 
     dispatch({
-      type: ACTIONS.HEADER_TEXT_STATE,
+      type: Actions.HEADER_TEXT_STATE,
       state: {
         heading: 'Favorites',
       },
     });
     dispatch({
-      type: ACTIONS.SEARCH_STATE,
+      type: Actions.SEARCH_STATE,
       state: {
         placeholder: 'Search all favorites',
         data: favorites,
@@ -38,10 +38,10 @@ export const Favorites = ({route, navigation}) => {
     });
 
     dispatch({
-      type: ACTIONS.CURRENT_SCREEN,
+      type: Actions.CURRENT_SCREEN,
       screen: 'favorites',
     });
-    dispatch({type: ACTIONS.FAVORITES});
+    dispatch({type: Actions.FAVORITES});
   }, []);
 
   useEffect(() => {
@@ -54,7 +54,7 @@ export const Favorites = ({route, navigation}) => {
   useEffect(() => {
     if (navigation.isFocused()) {
       dispatch({
-        type: ACTIONS.SEARCH_STATE,
+        type: Actions.SEARCH_STATE,
         state: {
           placeholder: 'Search all favorites',
           data: favorites,
@@ -71,7 +71,7 @@ export const Favorites = ({route, navigation}) => {
       data={favorites}
       type="notes"
       refreshCallback={() => {
-        dispatch({type: ACTIONS.FAVORITES});
+        dispatch({type: Actions.FAVORITES});
       }}
       refreshing={refreshing}
       focused={() => navigation.isFocused()}

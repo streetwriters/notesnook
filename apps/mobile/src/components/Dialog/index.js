@@ -1,24 +1,26 @@
 import React, {Component} from 'react';
 import {Modal, Text, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {ph, pv, SIZE, WEIGHT} from '../../common/common';
-import {ACTIONS} from '../../provider/actions';
-import {eSendEvent} from '../../services/eventManager';
+import {Actions} from '../../provider/Actions';
+import {eSendEvent, ToastEvent} from '../../services/EventManager';
 import {
   eApplyChanges,
   eClearEditor,
   eCloseFullscreenEditor,
   eOnLoadNote,
   eOnNewTopicAdded,
-} from '../../services/events';
-import NavigationService from '../../services/NavigationService';
-import {db, DDS, getElevation, history, ToastEvent} from '../../utils/utils';
+} from '../../utils/Events';
+import NavigationService from '../../services/Navigation';
+import {getElevation, history} from '../../utils';
 import {Button} from '../Button';
-import {dialogActions} from '../DialogManager/dialogActions';
+import {dialogActions} from '../DialogManager/DialogActions';
 import {updateEvent} from '../DialogManager/recievers';
 import BaseDialog from './base-dialog';
 import DialogButtons from './dialog-buttons';
 import DialogHeader from './dialog-header';
+import {ph, pv, SIZE, WEIGHT} from "../../utils/SizeUtils";
+import {db} from "../../utils/DB";
+import {DDS} from "../../services/DeviceDetection";
 
 export class Dialog extends Component {
   constructor(props) {
@@ -55,7 +57,7 @@ export class Dialog extends Component {
             updateEvent({type: it.type});
           }
         }
-        updateEvent({type: ACTIONS.PINNED});
+        updateEvent({type: Actions.PINNED});
 
         let message;
         let notes = history.selectedItemsList.filter((o) => o.type === 'note');
@@ -99,15 +101,15 @@ export class Dialog extends Component {
                 await db.trash.restore(trashItem.id);
                 updateEvent({type: it.type});
               }
-              updateEvent({type: ACTIONS.TRASH});
-              updateEvent({type: ACTIONS.PINNED});
+              updateEvent({type: Actions.TRASH});
+              updateEvent({type: Actions.PINNED});
               ToastEvent.hide();
             },
             'Undo',
           );
 
-        updateEvent({type: ACTIONS.CLEAR_SELECTION});
-        updateEvent({type: ACTIONS.SELECTION_MODE, enabled: false});
+        updateEvent({type: Actions.CLEAR_SELECTION});
+        updateEvent({type: Actions.SELECTION_MODE, enabled: false});
 
         this.hide();
         break;
@@ -122,9 +124,9 @@ export class Dialog extends Component {
 
         await db.trash.delete(...ids);
 
-        updateEvent({type: ACTIONS.TRASH});
-        updateEvent({type: ACTIONS.CLEAR_SELECTION});
-        updateEvent({type: ACTIONS.SELECTION_MODE, enabled: false});
+        updateEvent({type: Actions.TRASH});
+        updateEvent({type: Actions.CLEAR_SELECTION});
+        updateEvent({type: Actions.SELECTION_MODE, enabled: false});
         ToastEvent.show('Item permanantly deleted');
         this.hide();
         break;
@@ -144,17 +146,17 @@ export class Dialog extends Component {
       }
       case dialogActions.ACTION_EMPTY_TRASH: {
         await db.trash.clear();
-        updateEvent({type: ACTIONS.TRASH});
+        updateEvent({type: Actions.TRASH});
 
-        updateEvent({type: ACTIONS.CLEAR_SELECTION});
-        updateEvent({type: ACTIONS.SELECTION_MODE, enabled: false});
+        updateEvent({type: Actions.CLEAR_SELECTION});
+        updateEvent({type: Actions.SELECTION_MODE, enabled: false});
         ToastEvent.show('Trash cleared', 'error');
         this.hide();
 
         break;
       }
       case dialogActions.ACTION_EXIT_FULLSCREEN: {
-        updateEvent({type: ACTIONS.NOTES});
+        updateEvent({type: Actions.NOTES});
         eSendEvent(eCloseFullscreenEditor);
         this.hide();
         break;
@@ -169,7 +171,7 @@ export class Dialog extends Component {
           'success',
         );
 
-        updateEvent({type: ACTIONS.TRASH});
+        updateEvent({type: Actions.TRASH});
         this.hide();
         break;
       }

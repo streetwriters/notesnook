@@ -2,8 +2,8 @@ import React, {useMemo} from 'react';
 import {NotebookItem} from '../../components/NotebookItem';
 import SelectionWrapper from '../../components/SelectionWrapper';
 import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
-import NavigationService from '../../services/NavigationService';
+import {Actions} from '../../provider/Actions';
+import NavigationService from '../../services/Navigation';
 
 export const NotebookItemWrapper = ({
   item,
@@ -22,13 +22,13 @@ export const NotebookItemWrapper = ({
   const onLongPress = () => {
     if (!selectionMode) {
       dispatch({
-        type: ACTIONS.SELECTION_MODE,
+        type: Actions.SELECTION_MODE,
         enabled: !selectionMode,
       });
     }
 
     dispatch({
-      type: ACTIONS.SELECTED_ITEMS,
+      type: Actions.SELECTED_ITEMS,
       item: item,
     });
   };
@@ -39,20 +39,20 @@ export const NotebookItemWrapper = ({
       return;
     }
     dispatch({
-      type: ACTIONS.HEADER_TEXT_STATE,
+      type: Actions.HEADER_TEXT_STATE,
       state: {
         heading: item.title,
       },
     });
     dispatch({
-      type: ACTIONS.HEADER_STATE,
+      type: Actions.HEADER_STATE,
       state: {
         canGoBack: true,
         menu: false,
       },
     });
     dispatch({
-      type: ACTIONS.CONTAINER_BOTTOM_BUTTON,
+      type: Actions.CONTAINER_BOTTOM_BUTTON,
       state: {
         bottomButtonText: 'Add new topic',
       },

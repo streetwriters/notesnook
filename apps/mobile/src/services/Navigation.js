@@ -1,5 +1,5 @@
 import { DrawerActions, StackActions } from '@react-navigation/native';
-import { rootNavigatorRef, sideMenuRef } from '../utils/refs';
+import { rootNavigatorRef, sideMenuRef } from '../utils/Refs';
 
 function navigate(name, params) {
   

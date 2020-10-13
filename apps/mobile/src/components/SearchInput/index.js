@@ -1,14 +1,16 @@
 import React, {useEffect, useState} from 'react';
 import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
-import {eClearSearch, eScrollEvent} from '../../services/events';
-import {inputRef} from '../../utils/refs';
-import {db, DDS, selection, ToastEvent} from '../../utils/utils';
+import {Actions} from '../../provider/Actions';
+import {eSubscribeEvent, eUnSubscribeEvent, ToastEvent} from '../../services/EventManager';
+import {eClearSearch, eScrollEvent} from '../../utils/Events';
+import {inputRef} from '../../utils/Refs';
+import {selection} from '../../utils';
 import Animated, {Easing} from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {br, WEIGHT, SIZE} from '../../common/common';
 import {TextInput, Text} from 'react-native';
+import {br, SIZE, WEIGHT} from "../../utils/SizeUtils";
+import {db} from "../../utils/DB";
+import {DDS} from "../../services/DeviceDetection";
 const {Value, timing, block} = Animated;
 
 let searchResult = [];
@@ -106,7 +108,7 @@ export const Search = (props) => {
         text: '',
       });
       dispatch({
-        type: ACTIONS.SEARCH_RESULTS,
+        type: Actions.SEARCH_RESULTS,
         results: {
           results: [],
           type: null,
@@ -146,7 +148,7 @@ export const Search = (props) => {
       return;
     } else {
       dispatch({
-        type: ACTIONS.SEARCH_RESULTS,
+        type: Actions.SEARCH_RESULTS,
         results: {
           type,
           results: searchResult,

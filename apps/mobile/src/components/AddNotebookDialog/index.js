@@ -11,12 +11,14 @@ import {
 } from 'react-native';
 import {FlatList, TextInput} from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {ph, pv, SIZE, WEIGHT} from '../../common/common';
-import {ACTIONS} from '../../provider/actions';
-import {db, DDS, ToastEvent} from '../../utils/utils';
+import {Actions} from '../../provider/Actions';
 import {Button} from '../Button';
 import {updateEvent} from '../DialogManager/recievers';
 import {Toast} from '../Toast';
+import {ToastEvent} from "../../services/EventManager";
+import {ph, pv, SIZE, WEIGHT} from "../../utils/SizeUtils";
+import {db} from "../../utils/DB";
+import {DDS} from "../../services/DeviceDetection";
 
 let refs = [];
 
@@ -173,8 +175,8 @@ export class AddNotebookDialog extends React.Component {
       });
     }
     this.close();
-    updateEvent({type: ACTIONS.NOTEBOOKS});
-    updateEvent({type: ACTIONS.PINNED});
+    updateEvent({type: Actions.NOTEBOOKS});
+    updateEvent({type: Actions.PINNED});
 
     //ToastEvent.show('New notebook added', 'success', 'local');
   };

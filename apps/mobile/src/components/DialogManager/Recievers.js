@@ -1,4 +1,4 @@
-import {eSendEvent} from '../../services/eventManager';
+import {eSendEvent} from '../../services/EventManager';
 import {
   eCloseActionSheet,
   eCloseAddNotebookDialog,
@@ -11,7 +11,7 @@ import {
   eOpenMoveNoteDialog,
   eOpenSimpleDialog,
   eDispatchAction,
-} from '../../services/events';
+} from '../../utils/Events';
 
 export const ActionSheetEvent = (
   item,

@@ -2,13 +2,14 @@ import React, {useEffect, useMemo, useState} from 'react';
 import NoteItem from '../../components/NoteItem';
 import SelectionWrapper from '../../components/SelectionWrapper';
 import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
-import {eSendEvent, eSubscribeEvent, eUnSubscribeEvent, openVault} from '../../services/eventManager';
-import {eShowMergeDialog, eOnLoadNote, eOnNoteEdited} from '../../services/events';
+import {Actions} from '../../provider/Actions';
+import {eSendEvent, eSubscribeEvent, eUnSubscribeEvent, openVault} from '../../services/EventManager';
+import {eShowMergeDialog, eOnLoadNote, eOnNoteEdited} from '../../utils/Events';
 import {simpleDialogEvent} from '../DialogManager/recievers';
-import {TEMPLATE_TRASH} from '../DialogManager/templates';
-import {openEditorAnimation} from '../../utils/animations';
-import {db, DDS} from '../../utils/utils';
+import {TEMPLATE_TRASH} from '../DialogManager/Templates';
+import {openEditorAnimation} from '../../utils/Animations';
+import {db} from "../../utils/DB";
+import {DDS} from "../../services/DeviceDetection";
 
 
 
@@ -53,9 +54,9 @@ export const NoteItemWrapper = ({
 
     const onLongPress = () => {
         if (!selectionMode) {
-            dispatch({type: ACTIONS.SELECTION_MODE, enabled: true});
+            dispatch({type: Actions.SELECTION_MODE, enabled: true});
         }
-        dispatch({type: ACTIONS.SELECTED_ITEMS, item: item});
+        dispatch({type: Actions.SELECTED_ITEMS, item: item});
     };
 
     const onPress = async () => {

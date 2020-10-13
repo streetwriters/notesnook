@@ -1,15 +1,14 @@
 import React, {useEffect, useState} from 'react';
 import {BackHandler, KeyboardAvoidingView, Platform, SafeAreaView, StatusBar, View,} from 'react-native';
 import WebView from 'react-native-webview';
-import {normalize} from '../../common/common';
 import {ActionIcon} from '../../components/ActionIcon';
 import {ActionSheetEvent, simpleDialogEvent,} from '../../components/DialogManager/recievers';
-import {TEMPLATE_EXIT_FULLSCREEN, TEMPLATE_NEW_NOTE,} from '../../components/DialogManager/templates';
+import {TEMPLATE_EXIT_FULLSCREEN, TEMPLATE_NEW_NOTE,} from '../../components/DialogManager/Templates';
 import {useTracked} from '../../provider';
-import {eSendEvent, eSubscribeEvent, eUnSubscribeEvent,} from '../../services/eventManager';
-import {eClearEditor, eCloseFullscreenEditor, eOnLoadNote, eOpenFullscreenEditor,} from '../../services/events';
-import {exitEditorAnimation} from '../../utils/animations';
-import {DDS, editing, ToastEvent} from '../../utils/utils';
+import {eSendEvent, eSubscribeEvent, eUnSubscribeEvent, ToastEvent,} from '../../services/EventManager';
+import {eClearEditor, eCloseFullscreenEditor, eOnLoadNote, eOpenFullscreenEditor,} from '../../utils/Events';
+import {exitEditorAnimation} from '../../utils/Animations';
+import {editing} from '../../utils';
 import {
     _onMessage,
     _onShouldStartLoadWithRequest,
@@ -23,7 +22,9 @@ import {
     onWebViewLoad,
     post,
     sourceUri,
-} from './func';
+} from './Functions';
+import {normalize} from "../../utils/SizeUtils";
+import {DDS} from "../../services/DeviceDetection";
 
 let handleBack;
 let tapCount = 0;

@@ -1,12 +1,12 @@
 import React, {useCallback, useEffect} from 'react';
 import {Text} from 'react-native';
-import {SIZE, WEIGHT} from '../../common/common';
 import {Placeholder} from '../../components/ListPlaceholders';
 import {PressableButton} from '../../components/PressableButton';
 import SimpleList from '../../components/SimpleList';
 import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
-import NavigationService from '../../services/NavigationService';
+import {Actions} from '../../provider/Actions';
+import NavigationService from '../../services/Navigation';
+import {SIZE, WEIGHT} from "../../utils/SizeUtils";
 
 export const Tags = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
@@ -15,7 +15,7 @@ export const Tags = ({route, navigation}) => {
 
   const onFocus = useCallback(() => {
     dispatch({
-      type: ACTIONS.HEADER_STATE,
+      type: Actions.HEADER_STATE,
       state: {
         type: 'trash',
         menu: true,
@@ -24,17 +24,17 @@ export const Tags = ({route, navigation}) => {
       },
     });
     dispatch({
-      type: ACTIONS.HEADER_VERTICAL_MENU,
+      type: Actions.HEADER_VERTICAL_MENU,
       state: false,
     });
     dispatch({
-      type: ACTIONS.HEADER_TEXT_STATE,
+      type: Actions.HEADER_TEXT_STATE,
       state: {
         heading: 'Tags',
       },
     }); 
     dispatch({
-      type: ACTIONS.SEARCH_STATE,
+      type: Actions.SEARCH_STATE,
       state: {
         placeholder: 'Search all tags',
         data: tags,
@@ -44,9 +44,9 @@ export const Tags = ({route, navigation}) => {
       },
     });
 
-    dispatch({type: ACTIONS.TAGS});
+    dispatch({type: Actions.TAGS});
     dispatch({
-      type: ACTIONS.CURRENT_SCREEN,
+      type: Actions.CURRENT_SCREEN,
       screen: 'tags',
     });
   }, []);
@@ -61,7 +61,7 @@ export const Tags = ({route, navigation}) => {
   useEffect(() => {
     if (navigation.isFocused()) {
       dispatch({
-        type: ACTIONS.SEARCH_STATE,
+        type: Actions.SEARCH_STATE,
         state: {
           placeholder: 'Search all tags',
           data: tags,

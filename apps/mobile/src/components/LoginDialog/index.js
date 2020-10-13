@@ -5,31 +5,33 @@ import {TextInput} from 'react-native-gesture-handler';
 import QRCode from 'react-native-qrcode-generator';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {opacity, ph, pv, SIZE, WEIGHT} from '../../common/common';
 import {Button} from '../../components/Button';
 import Seperator from '../../components/Seperator';
 import {Toast} from '../../components/Toast';
-import {ACTIONS} from '../../provider/actions';
+import {Actions} from '../../provider/Actions';
 import {useTracked} from '../../provider/index';
 import {
-  eSendEvent,
-  eSubscribeEvent,
-  eUnSubscribeEvent,
-} from '../../services/eventManager';
+    eSendEvent,
+    eSubscribeEvent,
+    eUnSubscribeEvent, ToastEvent,
+} from '../../services/EventManager';
 import {
   eCloseLoginDialog,
   eOpenLoginDialog,
   eStartSyncer,
   refreshNotesPage,
-} from '../../services/events';
+} from '../../utils/Events';
 import {
   validateEmail,
   validatePass,
   validateUsername,
-} from '../../services/validation';
-import {db, DDS, getElevation, ToastEvent} from '../../utils/utils';
+} from '../../services/Validation';
+import {getElevation} from '../../utils';
 import { ActionIcon } from '../ActionIcon';
 import {Loading} from '../Loading';
+import {opacity, ph, pv, SIZE, WEIGHT} from "../../utils/SizeUtils";
+import {db} from "../../utils/DB";
+import {DDS} from "../../services/DeviceDetection";
 
 const LoginDialog = () => {
   const [state, dispatch] = useTracked();
@@ -120,18 +122,18 @@ const LoginDialog = () => {
       let user = await db.user.get();
       if (!user) throw new Error('Username or password incorrect');
       setStatus('Syncing your notes');
-      dispatch({type: ACTIONS.USER, user: user});
-      dispatch({type: ACTIONS.SYNCING, syncing: true});
+      dispatch({type: Actions.USER, user: user});
+      dispatch({type: Actions.SYNCING, syncing: true});
       await db.sync();
       eSendEvent(eStartSyncer);
-      dispatch({type: ACTIONS.ALL});
+      dispatch({type: Actions.ALL});
       eSendEvent(refreshNotesPage);
       setVisible(false);
       ToastEvent.show(`Logged in as ${username}`, 'success', 'local');
     } catch (e) {
       ToastEvent.show(e.message, 'error', 'local');
     } finally {
-      dispatch({type: ACTIONS.SYNCING, syncing: false});
+      dispatch({type: Actions.SYNCING, syncing: false});
       setLoggingIn(false);
     }
   };
@@ -189,7 +191,7 @@ const LoginDialog = () => {
       let k = await db.user.key();
       setKey(k.key);
       setStatus('Setting up crenditials');
-      dispatch({type: ACTIONS.USER, user: user});
+      dispatch({type: Actions.USER, user: user});
       eSendEvent(eStartSyncer);
       setModalVisible(true);
     } catch (e) {

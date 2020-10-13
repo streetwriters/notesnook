@@ -107,3 +107,5 @@ export const eCloseProgressDialog = '552';
 export const eOpenRestoreDialog = '553';
 
 export const eCloseRestoreDialog = '554';
+
+export const eOnNoteEdited = '555';

@@ -1,12 +1,13 @@
 import React, {useEffect, useState} from 'react';
 import {Text, View} from 'react-native';
-import {ph, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
-import {eOpenProgressDialog, eCloseProgressDialog} from '../../services/events';
-import {DDS, getElevation} from '../../utils/utils';
+import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
+import {eOpenProgressDialog, eCloseProgressDialog} from '../../utils/Events';
+import {getElevation} from '../../utils';
 import BaseDialog from '../Dialog/base-dialog';
 import {Loading} from '../Loading';
+import {ph, SIZE, WEIGHT} from "../../utils/SizeUtils";
+import {DDS} from "../../services/DeviceDetection";
 
 const ProgressDialog = () => {
   const [state, dispatch] = useTracked();
