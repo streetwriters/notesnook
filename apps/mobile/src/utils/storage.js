@@ -22,9 +22,7 @@ async function read(key, isArray = false) {
     data = JSON.parse(data);
 
     data = isArray ? [...data] : data;
-  } catch (e) {
-    data = data;
-  }
+  } catch (e) {}
 
   return data;
 }
@@ -42,7 +40,7 @@ async function readMulti(keys) {
   } else {
     let data = await MMKV.getMultipleItemsAsync(keys.slice());
 
-    let map = data.map(([key, value]) => {
+    return data.map(([key, value]) => {
       let obj;
       try {
         obj = JSON.parse(value);
@@ -52,8 +50,6 @@ async function readMulti(keys) {
 
       return [key, obj];
     });
-
-    return map;
   }
 }
 
@@ -178,13 +174,13 @@ async function checkAndCreateDir(dir) {
   try {
     let exists = await RNFetchBlob.fs.exists(dir);
     let isDir = await RNFetchBlob.fs.isDir(dir);
-    console.log(exists, isDir);
     if (!exists || !isDir) {
       await RNFetchBlob.fs.mkdir(dir);
     }
   } catch (e) {
     console.log(e);
     await RNFetchBlob.fs.mkdir(dir);
+  } finally {
   }
   return dir;
 }
