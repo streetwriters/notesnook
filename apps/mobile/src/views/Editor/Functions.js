@@ -95,7 +95,6 @@ export async function loadNote(item) {
 const onChange = (data) => {
     if (!data || data === '') return;
     let rawData = JSON.parse(data);
-    console.log(content, "onChange", noteEdited);
     if (rawData.type === 'content') {
         if (
             !id && rawData.text !== "" ||
@@ -231,9 +230,7 @@ async function addToCollection(id) {
 
 export async function saveNote() {
     if (!checkIfContentIsSavable()) return;
-    console.log("saving", id);
     let lockedNote = id ? db.notes.note(id).data.locked : null;
-    post('saving', 'Saving');
 
     if (!lockedNote) {
         let rId = await db.notes.add({
@@ -244,9 +241,8 @@ export async function saveNote() {
             },
             id: id,
         });
-        console.log(rId);
         await setNoteInEditorAfterSaving(id, rId);
-        if (saveCounter < 2) {
+        if (saveCounter < 3) {
             updateEvent({
                 type: Actions.NOTES,
             });
@@ -254,6 +250,9 @@ export async function saveNote() {
         }
 
         eSendEvent(eOnNoteEdited + rId, {id: rId});
+
+
+
 
         if (id) {
             await addToCollection(id);

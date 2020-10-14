@@ -63,10 +63,15 @@ const SimpleList = ({
       }  */
         setDataProvider(
             new DataProvider((r1, r2) => {
-                return r1 !== r2;
+
+                return r1.id !== r2.id ||
+                    r1.locked !== r2.locked ||
+                    r1.pinned !== r2.pinned ||
+                    r1.favorite !== r2.favorite ||
+                    r1.title !== r2.title
             }).cloneWithRows(d),
         );
-    }, [listData]);
+    }, [listData, searchResults]);
 
     const RenderSectionHeader = ({item}) => (
         <Text
@@ -117,8 +122,9 @@ const SimpleList = ({
             if (refreshCallback) {
                 refreshCallback();
             }
-            dispatch({type: Actions.ALL});
         }
+        dispatch({type: Actions.ALL});
+
     }, []);
 
     const _ListEmptyComponent = (
@@ -212,6 +218,7 @@ const SimpleList = ({
             dataProvider={dataProvider}
             rowRenderer={_renderRow}
             onScroll={_onScroll}
+            renderFooter={() => <View style={{height:400}} />}
             scrollViewProps={{
                 refreshControl: (
                     <RefreshControl
@@ -336,7 +343,7 @@ const LoginCard = ({type, data}) => {
 };
 
 const ListHeaderComponent = ({type, data}) => {
-    const [state, ] = useTracked();
+    const [state,] = useTracked();
     const searchResults = {...state.searchResults};
 
     return searchResults.type === type && searchResults.results.length > 0 ? (

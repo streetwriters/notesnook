@@ -23,6 +23,11 @@ export const NoteItemWrapper = ({
     const {colors, selectionMode} = state;
     const [note, setNote] = useState(item);
     const [editing, setEditing] = useState(false);
+
+    useEffect(() => {
+        setNote(item);
+    },[item])
+
     const onNoteChange = (data) => {
         if (data.id !== note.id) {
             return;
@@ -34,7 +39,6 @@ export const NoteItemWrapper = ({
         if (data.closed) {
             setEditing(false);
         }
-
         setNote(db.notes.note(data.id).data)
     }
 
@@ -43,9 +47,7 @@ export const NoteItemWrapper = ({
         return () => {
             eUnSubscribeEvent(eOnNoteEdited + note.id, onNoteChange);
         }
-    }, [editing]);
-
-
+    }, [editing,item]);
 
     const style = useMemo(() => {
         return {width: selectionMode ? '90%' : '100%', marginHorizontal: 0};
@@ -62,7 +64,6 @@ export const NoteItemWrapper = ({
     const onPress = async () => {
         if (item.conflicted) {
             eSendEvent(eShowMergeDialog, item);
-
             return;
         }
         if (selectionMode) {
