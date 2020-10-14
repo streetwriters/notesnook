@@ -30,24 +30,28 @@ export const NoteItemWrapper = ({
 
     const onNoteChange = (data) => {
         if (data.id !== note.id) {
+            if (editing) {
+                setEditing(false);
+            }
             return;
         }
-        if (editing !== true) {
+        if (editing !== true && !data.noEdit) {
             setEditing(true);
         }
 
         if (data.closed) {
             setEditing(false);
         }
-        setNote(db.notes.note(data.id).data)
+        console.log(db.notes.note(data.id).data.headline.length);
+        setNote(db.notes.note(data.id).data);
     }
 
     useEffect(() => {
-        eSubscribeEvent(eOnNoteEdited + note.id, onNoteChange);
+        eSubscribeEvent(eOnNoteEdited , onNoteChange);
         return () => {
-            eUnSubscribeEvent(eOnNoteEdited + note.id, onNoteChange);
+            eUnSubscribeEvent(eOnNoteEdited , onNoteChange);
         }
-    }, [editing,item]);
+    }, [editing,note]);
 
     const style = useMemo(() => {
         return {width: selectionMode ? '90%' : '100%', marginHorizontal: 0};
@@ -58,30 +62,34 @@ export const NoteItemWrapper = ({
         if (!selectionMode) {
             dispatch({type: Actions.SELECTION_MODE, enabled: true});
         }
-        dispatch({type: Actions.SELECTED_ITEMS, item: item});
+        dispatch({type: Actions.SELECTED_ITEMS, item: note});
     };
 
     const onPress = async () => {
-        if (item.conflicted) {
-            eSendEvent(eShowMergeDialog, item);
+        if (note.conflicted) {
+            eSendEvent(eShowMergeDialog, note);
             return;
         }
         if (selectionMode) {
             onLongPress();
             return;
-        } else if (item.locked) {
+        } else if (note.locked) {
             openVault(item, true, true, false, true, false);
             return;
         }
         if (isTrash) {
-            simpleDialogEvent(TEMPLATE_TRASH(item.type));
+            simpleDialogEvent(TEMPLATE_TRASH(note.type));
         } else {
-            eSendEvent(eOnLoadNote, item);
+            eSendEvent(eOnLoadNote, note);
         }
         if (DDS.isPhone || DDS.isSmallTab) {
             openEditorAnimation();
         }
     };
+
+    useEffect(() => {
+        console.log('rerendering note');
+    })
 
 
     return (
@@ -102,4 +110,4 @@ export const NoteItemWrapper = ({
             />
         </SelectionWrapper>
     );
-};
+}

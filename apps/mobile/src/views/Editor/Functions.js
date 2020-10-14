@@ -35,6 +35,14 @@ export function isNotedEdited() {
     return noteEdited;
 }
 
+export function clearTimer() {
+    if (timer){
+        clearTimeout(timer);
+        timer = null;
+    }
+
+}
+
 export const INJECTED_JAVASCRIPT = (premium) =>
     premium
         ? `(function() {
@@ -79,15 +87,26 @@ export function checkNote() {
 
 export async function loadNote(item) {
     editing.currentlyEditing = true;
+    post('blur');
     if (item && item.type === 'new') {
         await clearEditor();
         post('focusTitle');
         canSave = true;
+        id = null;
     } else {
+        await clearEditor();
         note = item;
+        title = note.title;
+        id = note.id;
+        content = {};
+        content.text = await db.notes.note(id).text();
+        content.delta = note.content.delta;
+        if (!note.locked) {
+            content.delta = await db.notes.note(id).delta();
+        }
         canSave = false;
-        eSendEvent(eOnNoteEdited + item.id, {id: item.id});
-        await onWebViewLoad();
+        eSendEvent(eOnNoteEdited , {id: item.id});
+        await loadNoteInEditor();
     }
     noteEdited = false;
 }
@@ -101,9 +120,7 @@ const onChange = (data) => {
             (content &&
                 JSON.stringify(content.delta) !== JSON.stringify(rawData.delta))
         ) {
-
             noteEdited = true;
-
         }
         content = rawData;
     } else {
@@ -118,12 +135,10 @@ const onChange = (data) => {
 export const _onMessage = async (evt) => {
     if (!evt || !evt.nativeEvent || !evt.nativeEvent.data) return;
     let message = evt.nativeEvent.data;
-
+    clearTimeout(timer);
+    timer = null;
     if (message === 'loaded') {
     } else if (message !== '' && message !== 'loaded') {
-        clearTimeout(timer);
-
-        timer = null;
         if (!canSave) {
             await sleep(2000);
             canSave = true;
@@ -131,25 +146,25 @@ export const _onMessage = async (evt) => {
         onChange(message);
         timer = setTimeout(() => {
             if (noteEdited) {
-                saveNote(true);
-            } else {
+                saveNote("onMessage");
             }
         }, 500);
     }
 };
 
 export async function clearEditor() {
-    if (noteEdited) {
-        await saveNote(true);
+    clearTimer();
+    if (noteEdited && id) {
+        await saveNote("clearEditor");
     }
     if (note && note.id) {
-        eSendEvent(eOnNoteEdited + note.id, {id: note.id, closed: true});
+        eSendEvent(eOnNoteEdited , {id: note.id, closed: true});
     }
     noteEdited = false;
     title = null;
     content = null;
     note = null;
-    id = null;
+    //id = null;
     saveCounter = 0;
     canSave = false;
     post('reset');
@@ -228,7 +243,7 @@ async function addToCollection(id) {
     }
 }
 
-export async function saveNote() {
+export async function saveNote(caller) {
     if (!checkIfContentIsSavable()) return;
     let lockedNote = id ? db.notes.note(id).data.locked : null;
 
@@ -249,10 +264,7 @@ export async function saveNote() {
             eSendEvent(refreshNotesPage);
         }
 
-        eSendEvent(eOnNoteEdited + rId, {id: rId});
-
-
-
+        eSendEvent(eOnNoteEdited, {id: rId});
 
         if (id) {
             await addToCollection(id);
@@ -280,31 +292,25 @@ export async function saveNote() {
 export async function onWebViewLoad(noMenu, premium, colors) {
     EditorWebView.current?.injectJavaScript(INJECTED_JAVASCRIPT(premium, false));
 
+
     await loadNoteInEditor();
-    let theme = {...colors, factor: normalize(1)};
-    post('theme', theme);
-    await sleep(1000);
     if (!checkNote()) {
+        post('blur');
         Platform.OS === 'android' ? EditorWebView.current?.requestFocus() : null;
     }
     post('blur');
+
+    await sleep(1000);
+    let theme = {...colors, factor: normalize(1)};
+    post('theme', theme);
 }
 
 const loadNoteInEditor = async () => {
     saveCounter = 0;
-    content = {};
-    content.text = '';
     if (note?.id) {
-        title = note.title;
-        id = note.id;
-        content.text = await db.notes.note(id).text();
         post('dateEdited', timeConverter(note.dateEdited));
         await sleep(50);
         post('title', title);
-        content.delta = note.content.delta;
-        if (!note.locked) {
-            content.delta = await db.notes.note(id).delta();
-        }
         post('delta', content.delta);
     } else {
         post('focusTitle');

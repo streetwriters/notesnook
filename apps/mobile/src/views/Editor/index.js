@@ -13,7 +13,7 @@ import {
     _onMessage,
     _onShouldStartLoadWithRequest,
     checkNote,
-    clearEditor,
+    clearEditor, clearTimer,
     EditorWebView,
     getNote,
     injectedJS,
@@ -74,6 +74,7 @@ const Editor = ({noMenu}) => {
         }
 
         return () => {
+            clearTimer()
             if (handleBack) {
                 handleBack.remove();
                 handleBack = null;
@@ -82,6 +83,7 @@ const Editor = ({noMenu}) => {
     }, [noMenu]);
 
     const load = async (item) => {
+        console.log("loading new note");
         await loadNote(item);
         if (!DDS.isTab) {
             handleBack = BackHandler.addEventListener(
@@ -126,14 +128,12 @@ const Editor = ({noMenu}) => {
         if (DDS.isTab && !DDS.isSmallTab) {
             simpleDialogEvent(TEMPLATE_EXIT_FULLSCREEN());
         } else {
-
             exitEditorAnimation();
+
             if (checkNote() && isNotedEdited()) {
                 ToastEvent.show('Note Saved!', 'success');
             }
-            setTimeout(async () => {
-                await clearEditor();
-            }, 300);
+            await clearEditor();
             if (handleBack) {
                 handleBack.remove();
                 handleBack = null;

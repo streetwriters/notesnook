@@ -33,7 +33,7 @@ const SimpleList = ({
     const [dataProvider, setDataProvider] = useState(
         new DataProvider((r1, r2) => {
             return r1 !== r2;
-        }).cloneWithRows([]),
+        }),
     );
     const {width, fontScale} = useWindowDimensions();
 
@@ -49,7 +49,7 @@ const SimpleList = ({
         loadData();
     }, [listData]);
 
-    const loadData = useCallback(() => {
+    const loadData =() => {
         let mainData =
             searchResults.type === type &&
             focused() &&
@@ -62,16 +62,9 @@ const SimpleList = ({
         d = [...d,...data];
       }  */
         setDataProvider(
-            new DataProvider((r1, r2) => {
-
-                return r1.id !== r2.id ||
-                    r1.locked !== r2.locked ||
-                    r1.pinned !== r2.pinned ||
-                    r1.favorite !== r2.favorite ||
-                    r1.title !== r2.title
-            }).cloneWithRows(d),
+            dataProvider.cloneWithRows(d),
         );
-    }, [listData, searchResults]);
+    }
 
     const RenderSectionHeader = ({item}) => (
         <Text
@@ -101,7 +94,7 @@ const SimpleList = ({
             ToastEvent.show('Sync Complete', 'success');
         } catch (e) {
             ToastEvent.show(
-                e.message,
+                "You must login to sync.",
                 'error',
                 'global',
                 5000,

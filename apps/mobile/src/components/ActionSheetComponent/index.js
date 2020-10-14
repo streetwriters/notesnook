@@ -15,6 +15,7 @@ import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {eSendEvent, openVault, ToastEvent} from '../../services/EventManager';
 import {
+  eOnNoteEdited,
   eOpenLoginDialog,
   eOpenMoveNoteDialog,
   refreshNotesPage,
@@ -193,7 +194,6 @@ export const ActionSheetComponent = ({
 
     if (!nodispatch) {
       dispatch({type: type});
-      dispatch({type: Actions.PINNED});
       dispatch({type: Actions.FAVORITES});
     }
     setNote({...toAdd});
@@ -320,7 +320,6 @@ export const ActionSheetComponent = ({
         } else {
           await db.notebooks.notebook(note.id).pin();
         }
-        dispatch({type: Actions.PINNED});
         localRefresh(item.type);
       },
       close: false,
@@ -342,7 +341,8 @@ export const ActionSheetComponent = ({
           await db.notebooks.notebook(note.id).favorite();
         }
         dispatch({type: Actions.FAVORITES});
-        localRefresh(item.type);
+        eSendEvent(eOnNoteEdited , {id: note.id, noEdit: true});
+        localRefresh(item.type,true);
       },
       close: false,
       check: true,
@@ -361,14 +361,11 @@ export const ActionSheetComponent = ({
         if (note.locked) {
           close('unlock');
 
-          return;
         } else {
           db.vault
             .add(note.id)
             .then(() => {
-              dispatch({type: Actions.NOTES});
-              eSendEvent(refreshNotesPage);
-              dispatch({type: Actions.PINNED});
+              eSendEvent(eOnNoteEdited , {id: note.id, noEdit: true});
               close();
             })
             .catch(async (e) => {
@@ -401,10 +398,10 @@ export const ActionSheetComponent = ({
           await db.notes
             .note(note.id)
             .untag(oldProps.tags[oldProps.tags.indexOf(tag)]);
-          localRefresh(oldProps.type);
+          eSendEvent(eOnNoteEdited , {id: note.id, noEdit: true});
           dispatch({type: Actions.TAGS});
         } catch (e) {
-          localRefresh(oldProps.type);
+          eSendEvent(eOnNoteEdited , {id: note.id, noEdit: true});
         }
       }}
       style={{
@@ -457,7 +454,8 @@ export const ActionSheetComponent = ({
             await db.notes.note(note.id).color(color.name);
           }
           dispatch({type: Actions.COLORS});
-          localRefresh(note.type);
+          eSendEvent(eOnNoteEdited , {id: note.id, noEdit: true});
+          localRefresh(note.type,true);
         }}
         customStyle={{
           width: DDS.isTab ? 400 / 10 : w / 10,
@@ -583,7 +581,7 @@ export const ActionSheetComponent = ({
     ) : null;
 
   const onPressSync = async () => {
-    if (!user) {
+    if (!user || !user.Id) {
       ToastEvent.show(
         'You must login to sync',
         'error',

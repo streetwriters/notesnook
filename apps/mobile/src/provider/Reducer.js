@@ -8,18 +8,12 @@ import {db} from "../utils/DB";
 export const reducer = (state, action) => {
   switch (action.type) {
     case Actions.ALL: {
-      let notes = db.notes.pinned;
-      let notebooks = db.notebooks.pinned;
 
       return {
         ...state,
         notes: db.notes.group(),
         notebooks: db.notebooks.all,
         trash: db.trash.all,
-        pinned: {
-          notes,
-          notebooks,
-        },
         tags: db.tags.all,
         favorites: db.notes.favorites,
         colorNotes: db.colors.all,

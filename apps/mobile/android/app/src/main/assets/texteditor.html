@@ -1302,7 +1302,7 @@
             type: 'title',
             value: document.getElementById('titleInput').value
           }
-          if (titleMessage && typeof titleMessage === 'string') {
+          if (titleMessage && typeof titleMessage.value === 'string') {
             window.ReactNativeWebView.postMessage(JSON.stringify(titleMessage));
           }
           
@@ -1315,7 +1315,7 @@
             value: document.getElementById('titleInput').value
           }
 
-          if (titleMessage && typeof titleMessage === 'string') {
+          if (titleMessage && typeof titleMessage.value === 'string') {
             window.ReactNativeWebView.postMessage(JSON.stringify(titleMessage));
           }
         }
@@ -1326,7 +1326,7 @@
             type: 'title',
             value: document.getElementById('titleInput').value
           }
-          if (titleMessage && typeof titleMessage === 'string') {
+          if (titleMessage && typeof titleMessage.value === 'string') {
             window.ReactNativeWebView.postMessage(JSON.stringify(titleMessage));
           }
         }
@@ -1640,10 +1640,12 @@
           switch (type) {
             case "reset": {
               editor.history.clear();
-              editor.setText('', 'api');
+              editor.setText('', 'silent');
               document.getElementById('titleInput').value = '';
               document.getElementById('titleInput').blur();
               editor.blur();
+              document.getElementById('titleInput').blur();
+              window.blur();
               document.getElementById('infodate').innerText = "";
               document.getElementById('infosaved').innerText = "";
               document.getElementById("infowords").innerText = "";
@@ -1652,6 +1654,7 @@
             case "blur":
               document.getElementById('titleInput').blur();
               editor.blur();
+              window.blur();
               break;
               case "undo":
               editor.history.undo();
@@ -1679,7 +1682,7 @@
               }, 0)
               break;
             case "clearEditor":
-              editor.setText('', 'api');
+              editor.setText('', 'silent');
               break;
             case "clearTitle":
               document.getElementById('titleInput').value = '';
