@@ -42,7 +42,6 @@ export const NoteItemWrapper = ({
         if (data.closed) {
             setEditing(false);
         }
-        console.log(db.notes.note(data.id).data.headline.length);
         setNote(db.notes.note(data.id).data);
     }
 
@@ -86,10 +85,6 @@ export const NoteItemWrapper = ({
             openEditorAnimation();
         }
     };
-
-    useEffect(() => {
-        console.log('rerendering note');
-    })
 
 
     return (
