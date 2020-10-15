@@ -85,25 +85,40 @@ export function checkNote() {
     return note && note.id;
 }
 
+async function setNote(item) {
+    note = item;
+    saveCounter = 0;
+    noteEdited = false;
+    title = note.title;
+    id = note.id;
+    content = {};
+    content.text = await db.notes.note(id).text();
+    content.delta = note.content.delta;
+    if (!note.locked) {
+        content.delta = await db.notes.note(id).delta();
+    }
+}
+
+function clearNote() {
+    note = null;
+    noteEdited = false;
+    title = null;
+    id = null;
+    content = null;
+}
+
 export async function loadNote(item) {
     editing.currentlyEditing = true;
     post('blur');
     if (item && item.type === 'new') {
         await clearEditor();
+        clearNote();
         post('focusTitle');
         canSave = true;
         id = null;
+
     } else {
-        await clearEditor();
-        note = item;
-        title = note.title;
-        id = note.id;
-        content = {};
-        content.text = await db.notes.note(id).text();
-        content.delta = note.content.delta;
-        if (!note.locked) {
-            content.delta = await db.notes.note(id).delta();
-        }
+        await setNote(item);
         canSave = false;
         eSendEvent(eOnNoteEdited , {id: item.id});
         await loadNoteInEditor();
@@ -137,12 +152,9 @@ export const _onMessage = async (evt) => {
     let message = evt.nativeEvent.data;
     clearTimeout(timer);
     timer = null;
+    console.log('new message from editor')
     if (message === 'loaded') {
     } else if (message !== '' && message !== 'loaded') {
-        if (!canSave) {
-            await sleep(2000);
-            canSave = true;
-        }
         onChange(message);
         timer = setTimeout(() => {
             if (noteEdited) {
@@ -160,18 +172,11 @@ export async function clearEditor() {
     if (note && note.id) {
         eSendEvent(eOnNoteEdited , {id: note.id, closed: true});
     }
-    noteEdited = false;
-    title = null;
-    content = null;
-    note = null;
-    //id = null;
     saveCounter = 0;
-    canSave = false;
     post('reset');
 }
 
 function checkIfContentIsSavable() {
-    if (!canSave) return false;
     if (!title && !content) return false;
     if (content && content.text.length < 2 && title && title?.length < 2)
         return false;
