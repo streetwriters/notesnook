@@ -107,11 +107,11 @@ const RestoreDialog = () => {
 
         <View
           style={{
-            flexDirection: 'row',
-            justifyContent: 'center',
+            justifyContent: 'space-between',
             alignItems: 'center',
             height: 50,
             marginTop: DDS.isTab ? 0 : insets.top,
+            flexDirection:"row",
           }}>
           <ActionIcon
             name="close"
@@ -120,8 +120,7 @@ const RestoreDialog = () => {
             customStyle={{
               width: 40,
               height: 40,
-              position: 'absolute',
-              textAlignVertical: 'center',
+               textAlignVertical: 'center',
               left: 0,
             }}
             color={colors.heading}
@@ -134,16 +133,13 @@ const RestoreDialog = () => {
             }}>
             Choose a Backup
           </Text>
+            <View  style={ {
+                width: 40,
+                height: 40,
+            }}/>
+
         </View>
-        <Text
-          style={{
-            color: colors.icon,
-            fontFamily: WEIGHT.regular,
-            fontSize: SIZE.xs + 1,
-            textAlign: 'center',
-          }}>
-          Phone Storage/Notesnook/backups/
-        </Text>
+
 
         <FlatList
           data={files}

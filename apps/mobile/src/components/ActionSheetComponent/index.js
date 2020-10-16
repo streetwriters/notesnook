@@ -13,7 +13,7 @@ import Share from 'react-native-share';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
-import {eSendEvent, openVault, ToastEvent} from '../../services/EventManager';
+import {eSendEvent, openVault, sendNoteEditedEvent, ToastEvent} from '../../services/EventManager';
 import {
   eOnNoteEdited,
   eOpenLoginDialog,
@@ -37,6 +37,7 @@ import {opacity, ph, pv, SIZE, WEIGHT} from "../../utils/SizeUtils";
 import {db} from "../../utils/DB";
 import {DDS} from "../../services/DeviceDetection";
 import {MMKV} from "../../utils/MMKV";
+import id from "notes-core/utils/id";
 
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
@@ -115,7 +116,6 @@ export const ActionSheetComponent = ({
     if (event.nativeEvent.key === 'Backspace') {
       if (backPressCount === 0 && !tagToAdd) {
         backPressCount = 1;
-
         return;
       }
       if (backPressCount === 1 && !tagToAdd) {
@@ -136,17 +136,15 @@ export const ActionSheetComponent = ({
         });
       }
     } else if (event.nativeEvent.key === ' ') {
-      _onSubmit();
+      await _onSubmit();
       tagsInputRef.current?.setNativeProps({
         text: '',
       });
-      return;
     } else if (event.nativeEvent.key === ',') {
-      _onSubmit();
+      await _onSubmit();
       tagsInputRef.current?.setNativeProps({
         text: '',
       });
-      return;
     }
   };
 
@@ -341,7 +339,7 @@ export const ActionSheetComponent = ({
           await db.notebooks.notebook(note.id).favorite();
         }
         dispatch({type: Actions.FAVORITES});
-        eSendEvent(eOnNoteEdited , {id: note.id, noEdit: true});
+        sendNoteEditedEvent(note.id, false,true)
         localRefresh(item.type,true);
       },
       close: false,
@@ -365,7 +363,7 @@ export const ActionSheetComponent = ({
           db.vault
             .add(note.id)
             .then(() => {
-              eSendEvent(eOnNoteEdited , {id: note.id, noEdit: true});
+              sendNoteEditedEvent(note.id, false,true)
               close();
             })
             .catch(async (e) => {
@@ -398,10 +396,10 @@ export const ActionSheetComponent = ({
           await db.notes
             .note(note.id)
             .untag(oldProps.tags[oldProps.tags.indexOf(tag)]);
-          eSendEvent(eOnNoteEdited , {id: note.id, noEdit: true});
+          sendNoteEditedEvent(note.id, false,true)
           dispatch({type: Actions.TAGS});
         } catch (e) {
-          eSendEvent(eOnNoteEdited , {id: note.id, noEdit: true});
+          sendNoteEditedEvent(note.id, false,true)
         }
       }}
       style={{
@@ -454,7 +452,7 @@ export const ActionSheetComponent = ({
             await db.notes.note(note.id).color(color.name);
           }
           dispatch({type: Actions.COLORS});
-          eSendEvent(eOnNoteEdited , {id: note.id, noEdit: true});
+          sendNoteEditedEvent(note.id, false,true)
           localRefresh(note.type,true);
         }}
         customStyle={{

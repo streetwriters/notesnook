@@ -1,7 +1,5 @@
 import React from 'react';
 import * as Animatable from 'react-native-animatable';
-import {DialogManager} from './src/components/DialogManager';
-import {Toast} from './src/components/Toast';
 import {useTracked} from './src/provider';
 import {dWidth} from './src/utils';
 import {SIZE, WEIGHT} from "./src/utils/SizeUtils";

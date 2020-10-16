@@ -29,20 +29,21 @@ export const NoteItemWrapper = ({
     },[item])
 
     const onNoteChange = (data) => {
-        if (data.id !== note.id) {
+        if (data.id !== note.id || data.closed) {
             if (editing) {
                 setEditing(false);
             }
             return;
         }
-        if (editing !== true && !data.noEdit) {
+        if (!editing && !data.noEdit) {
             setEditing(true);
         }
+        let newNote = db.notes.note(data.id).data;
 
-        if (data.closed) {
-            setEditing(false);
+        if (!data.noEdit && newNote.title === note.title && newNote.headline === note.headline) {
+            return;
         }
-        setNote(db.notes.note(data.id).data);
+        setNote(newNote);
     }
 
     useEffect(() => {

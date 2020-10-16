@@ -1,6 +1,4 @@
 import React, {useCallback, useEffect} from 'react';
-import {Dimensions} from 'react-native';
-import Orientation from 'react-native-orientation';
 import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
 import {Placeholder} from '../../components/ListPlaceholders';
 import SimpleList from '../../components/SimpleList';
@@ -12,7 +10,7 @@ import {eOnLoadNote, eScrollEvent} from '../../utils/Events';
 import {openEditorAnimation} from '../../utils/Animations';
 import {DDS} from "../../services/DeviceDetection";
 
-export const Home = ({route, navigation}) => {
+export const Home = ({navigation}) => {
   const [state, dispatch] = useTracked();
   const {notes} = state;
 

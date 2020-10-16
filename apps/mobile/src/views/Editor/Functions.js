@@ -2,7 +2,7 @@ import {createRef} from 'react';
 import {Linking, Platform} from 'react-native';
 import {updateEvent} from '../../components/DialogManager/recievers';
 import {Actions} from '../../provider/Actions';
-import {eSendEvent} from '../../services/EventManager';
+import {eSendEvent, sendNoteEditedEvent} from '../../services/EventManager';
 import {eOnNoteEdited, refreshNotesPage} from '../../utils/Events';
 import {editing} from '../../utils';
 import {sleep, timeConverter} from "../../utils/TimeUtils";
@@ -120,7 +120,7 @@ export async function loadNote(item) {
     } else {
         await setNote(item);
         canSave = false;
-        eSendEvent(eOnNoteEdited , {id: item.id});
+        sendNoteEditedEvent(item.id)
         await loadNoteInEditor();
     }
     noteEdited = false;
@@ -170,7 +170,7 @@ export async function clearEditor() {
         await saveNote("clearEditor");
     }
     if (note && note.id) {
-        eSendEvent(eOnNoteEdited , {id: note.id, closed: true});
+        sendNoteEditedEvent(note.id,true)
     }
     saveCounter = 0;
     post('reset');
@@ -261,15 +261,17 @@ export async function saveNote(caller) {
             },
             id: id,
         });
-        await setNoteInEditorAfterSaving(id, rId);
-        if (saveCounter < 3) {
+        if (!id) {
             updateEvent({
                 type: Actions.NOTES,
             });
             eSendEvent(refreshNotesPage);
         }
 
-        eSendEvent(eOnNoteEdited, {id: rId});
+        sendNoteEditedEvent(rId)
+
+        await setNoteInEditorAfterSaving(id, rId);
+
 
         if (id) {
             await addToCollection(id);

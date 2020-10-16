@@ -29,12 +29,10 @@ const App = () => {
             : require('./index.mobile');
 
     const _onOrientationChange = (o) => {
-        console.log(o, 'orientation');
         let smallTab = DDS.isSmallTab;
         DDS.setNewValues();
         DDS.checkSmallTab(o);
         if (smallTab === DDS.isSmallTab) {
-            console.log('nothing changed');
             return;
         }
 
@@ -92,14 +90,11 @@ const App = () => {
         dispatch({type: Actions.ALL});
     }, resetApp = () => {
         note = getNote();
-        console.log(note, 'NOTE BEFORE RELOAD');
         setInit(false);
         Initialize().then(async () => {
             setInit(true);
             await sleep(300);
-            console.log(note, 'NOTE ON RELOAD');
             if (note && note.id) {
-                console.log(note);
                 eSendEvent(eOnLoadNote, note);
                 if (DDS.isPhone || DDS.isSmallTab) {
                     openEditorAnimation();
@@ -147,7 +142,6 @@ const App = () => {
                 user = await db.user.get();
             } catch (e) {
                 error = e;
-                console.log(e, "ERROR IN DB")
             } finally {
                 if (user) {
                     dispatch({type: Actions.USER, user: user});

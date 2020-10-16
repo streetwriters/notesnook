@@ -1,5 +1,5 @@
 import {DeviceEventEmitter} from 'react-native';
-import {eHideToast, eOpenVaultDialog, eShowToast} from '../utils/Events';
+import {eHideToast, eOnNoteEdited, eOpenVaultDialog, eShowToast} from '../utils/Events';
 
 export const eSubscribeEvent = (eventName, action) => {
   DeviceEventEmitter.addListener(eventName, action);
@@ -32,6 +32,12 @@ export const openVault = (
     deleteNote,
   });
 };
+
+export function sendNoteEditedEvent(id="",closed=false,noEdit=false) {
+    eSendEvent(eOnNoteEdited , {id,closed, noEdit});
+}
+
+
 export const ToastEvent = {
     show: (
         message,
