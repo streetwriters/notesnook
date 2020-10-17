@@ -95,15 +95,19 @@ export class AddNotebookDialog extends React.Component {
     let {topics} = this.state;
     let prevTopics = topics;
     refs = [];
+    console.log(prevTopics);
     prevTopics.splice(index, 1);
     let edit = this.props.toEdit;
+    console.log(edit);
     if (edit && edit.id) {
-      let topicToDelete = edit.topics[index + 1];
+      let topicToDelete = edit.topics[index];
+      console.log(topicToDelete)
       if (topicToDelete) {
         this.topicsToDelete.push(topicToDelete.id);
       }
     }
     let nextTopics = [...prevTopics];
+    console.log(nextTopics);
     if (this.prevIndex === index) {
       this.prevIndex = null;
       this.prevItem = null;
@@ -138,16 +142,20 @@ export class AddNotebookDialog extends React.Component {
         prevTopics[this.prevIndex] = this.currentInputValue;
       } else {
         prevTopics.push(this.currentInputValue);
-        this.currentInputValue = null;
+        this.currentInputValue =
+            null;
       }
     }
     if (id) {
+      console.log('topics to delete',this.topicsToDelete?.length)
+
       if (this.topicsToDelete?.length > 0) {
         await db.notebooks
           .notebook(toEdit.id)
           .topics.delete(...this.topicsToDelete);
         toEdit = db.notebooks.notebook(toEdit.id).data;
       }
+      console.log(toEdit.topics);
 
       await db.notebooks.add({
         title: this.title,
@@ -167,6 +175,7 @@ export class AddNotebookDialog extends React.Component {
           nextTopics.push(title);
         }
       });
+      console.log('nextTopics',nextTopics);
       await db.notebooks.notebook(id).topics.add(...nextTopics);
     } else {
       await db.notebooks.add({

@@ -181,9 +181,8 @@ const SimpleList = ({
                 return <ListHeaderComponent type={dataType} data={listData}/>;
             case 'header':
                 return <RenderSectionHeader item={data}/>;
-
             default:
-                return null;
+                return <RenderItem item={data} index={index}/>;
         }
     };
 
