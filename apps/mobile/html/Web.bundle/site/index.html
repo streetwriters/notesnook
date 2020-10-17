@@ -24,8 +24,6 @@
     <form
             id="formBox"
     >
-
-
         <input id="titleInput" placeholder="Title here"/>
         <div class="info-bar">
             <p id="infowords"></p>
@@ -33,8 +31,8 @@
             <p id="infodate"></p>
             <p>-</p>
             <p id="infosaved"></p>
+        </div>
     </form>
-</div>
 </div>
 <div id="editor"></div>
 <div id="toolbar"></div>
@@ -56,7 +54,7 @@
 
         let mainToolbar = premium ? proToolbar : simpleToolbar;
 
-        const Quill = require('quill');
+        const Quill = requiring('quill');
 
         setFonts();
 
@@ -91,6 +89,8 @@
         attachEditorListeners();
         fixDropdownMenuLocations();
     }
+
+
 </script>
 
 
