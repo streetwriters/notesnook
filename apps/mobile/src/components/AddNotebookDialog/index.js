@@ -97,10 +97,12 @@ export class AddNotebookDialog extends React.Component {
     refs = [];
     prevTopics.splice(index, 1);
     let edit = this.props.toEdit;
-    let topicToDelete = edit.topics[index + 1];
-
-    this.topicsToDelete.push(topicToDelete.id);
-
+    if (edit && edit.id) {
+      let topicToDelete = edit.topics[index + 1];
+      if (topicToDelete) {
+        this.topicsToDelete.push(topicToDelete.id);
+      }
+    }
     let nextTopics = [...prevTopics];
     if (this.prevIndex === index) {
       this.prevIndex = null;
@@ -246,7 +248,7 @@ export class AddNotebookDialog extends React.Component {
         visible={visible}
         transparent={true}
         animated
-        animationType="fade"
+        animationType={DDS.isTab ? "fade" :"slide"}
         onShow={() => {
           this.topicsToDelete = [];
           this.titleRef.focus();
@@ -305,7 +307,7 @@ export class AddNotebookDialog extends React.Component {
                 onSubmitEditing={() => {
                   this.descriptionRef.focus();
                 }}
-                placeholder="Title of notebook"
+                placeholder="Title"
                 placeholderTextColor={colors.icon}
               />
               <TextInput
@@ -314,12 +316,10 @@ export class AddNotebookDialog extends React.Component {
                   styles.input,
                   {
                     borderColor: descFocused ? colors.accent : colors.nav,
-                    minHeight: 90,
+                    minHeight: 45,
                     color: colors.pri,
                   },
                 ]}
-                textAlignVertical="top"
-                numberOfLines={2}
                 maxLength={150}
                 onFocus={() => {
                   this.setState({
@@ -338,8 +338,7 @@ export class AddNotebookDialog extends React.Component {
                 onSubmitEditing={() => {
                   this.topicInputRef.focus();
                 }}
-                multiline
-                placeholder="What is this notebook about?"
+                placeholder="Describe your notebook."
                 placeholderTextColor={colors.icon}
               />
 
@@ -382,7 +381,7 @@ export class AddNotebookDialog extends React.Component {
                       marginTop: 5,
                     },
                   ]}
-                  placeholder="Add a new topic"
+                  placeholder="Add a topic"
                   placeholderTextColor={colors.icon}
                 />
                 <TouchableOpacity
@@ -403,21 +402,21 @@ export class AddNotebookDialog extends React.Component {
                 </TouchableOpacity>
               </View>
 
+              <View
+                  style={{
+                    zIndex:10
+                  }}
+              >
+
               <FlatList
                 data={topics}
                 ref={(ref) => (this.listRef = ref)}
-                removeClippedSubviews={false}
-                enableEmptySections={false}
-                getItemLayout={(data, index) => ({
-                  length: 50,
-                  offset: 50 * index,
-                  index,
-                })}
                 keyExtractor={(item, index) => item + index.toString()}
                 renderItem={({item, index}) => (
                   <TopicItem
                     item={item}
                     onPress={(item, index) => {
+                      console.log("here")
                       this.prevIndex = index;
                       this.prevItem = item;
                       this.topicInputRef.setNativeProps({
@@ -432,6 +431,7 @@ export class AddNotebookDialog extends React.Component {
                   />
                 )}
               />
+              </View>
 
               <View style={styles.buttonContainer}>
                 <Button
@@ -465,15 +465,20 @@ const TopicItem = ({item, index, colors, onPress, onDelete}) => {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginTop: 10,
       }}>
       <TouchableOpacity
+
         style={{
-          width: '100%',
+          width: '80%',
+          backgroundColor:"transparent",
+          zIndex:10,
+          position:'absolute',
+          height:30
         }}
         onPress={() => {
-          onPress(item, index);
-        }}>
+          onPress(item, index)
+        }}
+     />
         <TextInput
           ref={topicRef}
           editable={false}
@@ -489,7 +494,7 @@ const TopicItem = ({item, index, colors, onPress, onDelete}) => {
           placeholder="Add a topic"
           placeholderTextColor={colors.icon}
         />
-      </TouchableOpacity>
+
       <TouchableOpacity
         onPress={() => {
           onDelete(index);
@@ -545,7 +550,7 @@ const styles = StyleSheet.create({
     fontFamily: WEIGHT.regular,
     padding: pv - 2,
     borderWidth: 1.5,
-    marginTop: 20,
+    marginTop: 10,
     marginBottom: 5,
   },
   addBtn: {
@@ -572,12 +577,12 @@ const styles = StyleSheet.create({
   },
   topicInput: {
     padding: pv - 5,
-    paddingHorizontal: 0,
     fontSize: SIZE.sm,
     fontFamily: WEIGHT.regular,
     paddingHorizontal: ph,
     borderBottomWidth: 1.5,
     paddingRight: 40,
+    paddingVertical:10,
     width: '100%',
     maxWidth: '100%',
   },
