@@ -1,23 +1,21 @@
 import React from 'react';
 import {Text, TouchableOpacity, View} from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
 import NavigationService from '../../services/Navigation';
 import {ActionSheetEvent} from '../DialogManager/recievers';
 import Seperator from '../Seperator';
 import {ph, pv, SIZE, WEIGHT} from "../../utils/SizeUtils";
+import {ActionIcon} from "../ActionIcon";
 
 export const NotebookItem = ({
   item,
-  hideMore = false,
   isTopic = false,
   notebookID,
-  numColumns,
   isTrash,
   customStyle,
 }) => {
-  const [state, dispatch] = useTracked();
-  const {colors, selectedItemsList} = state;
+  const [state,] = useTracked();
+  const {colors,} = state;
 
   return (
     <View

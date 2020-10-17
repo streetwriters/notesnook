@@ -58,9 +58,7 @@ const SimpleList = ({
                 : listData;
 
         let d = [header, ...mainData];
-        /*  for (var i = 0; i < 10000; i++) {
-        d = [...d,...data];
-      }  */
+        console.log(d,"D");
         setDataProvider(
             dataProvider.cloneWithRows(d),
         );
@@ -137,6 +135,7 @@ const SimpleList = ({
             return dataProvider.getDataForIndex(index).type;
         },
         (type, dim) => {
+            console.log(type);
             switch (type) {
                 case 'note':
                     dim.width = width;
@@ -176,13 +175,14 @@ const SimpleList = ({
         switch (type) {
             case 'note':
                 return <RenderItem item={data} pinned={data.pinned} index={index}/>;
+            case 'notebook':
+                return <RenderItem item={data} pinned={data.pinned} index={index}/>;
             case 'MAIN_HEADER':
                 return <ListHeaderComponent type={dataType} data={listData}/>;
             case 'header':
                 return <RenderSectionHeader item={data}/>;
 
             default:
-                s
                 return null;
         }
     };

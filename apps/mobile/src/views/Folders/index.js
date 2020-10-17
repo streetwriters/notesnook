@@ -6,6 +6,8 @@ import {NotebookItemWrapper} from '../../components/SimpleList/NotebookItemWrapp
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
+import note from "notes-core/models/note";
+import notebook from "notes-core/models/notebook";
 export const Folders = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const {notebooks} = state;
@@ -48,7 +50,7 @@ export const Folders = ({route, navigation}) => {
       type: Actions.CURRENT_SCREEN,
       screen: 'notebooks',
     });
-   
+   console.log(notebooks)
   }, []);
 
   useEffect(() => {
@@ -87,8 +89,6 @@ export const Folders = ({route, navigation}) => {
         focused={() => navigation.isFocused()}
         RenderItem={NotebookItemWrapper}
         placeholder={<Placeholder type="notebooks" />}
-        pinned={true}
-        placeholderText="Notebooks you add will appear here"
       />
       <ContainerBottomButton
         title="Create a new notebook"

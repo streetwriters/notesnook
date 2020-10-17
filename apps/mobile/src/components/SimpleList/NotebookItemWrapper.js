@@ -12,8 +12,7 @@ export const NotebookItemWrapper = ({
   pinned = false,
 }) => {
   const [state, dispatch] = useTracked();
-  const {selectionMode, preventDefaultMargins, headerState} = state;
-  let params = headerState.route.params || {};
+  const {selectionMode, preventDefaultMargins} = state;
 
   const style = useMemo(() => {
     return {width: selectionMode ? '90%' : '100%', marginHorizontal: 0};
@@ -76,7 +75,6 @@ export const NotebookItemWrapper = ({
         hideMore={preventDefaultMargins}
         isTopic={item.type === 'topic'}
         customStyle={style}
-        noteToMove={params.note}
         item={item}
         index={index}
         isTrash={isTrash}
