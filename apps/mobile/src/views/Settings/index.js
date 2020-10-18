@@ -72,11 +72,8 @@ export const Settings = ({ navigation}) => {
       screen: 'settings',
     });
       eSendEvent(eUpdateSearchState,{
-          type: Actions.SEARCH_STATE,
-          state: {
               noSearch: true,
-          },
-      })
+          })
   }, []);
 
   useEffect(() => {
