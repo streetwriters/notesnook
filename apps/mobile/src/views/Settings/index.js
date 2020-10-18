@@ -57,31 +57,20 @@ export const Settings = ({ navigation}) => {
   }
 
   const onFocus = useCallback(() => {
-    dispatch({
-      type: Actions.HEADER_STATE,
-      state: {
-        type: null,
-        menu: true,
-        canGoBack: false,
-        color: null,
-      },
-    });
-    dispatch({
-      type: Actions.HEADER_VERTICAL_MENU,
-      state: false,
-    });
-
-    dispatch({
-      type: Actions.HEADER_TEXT_STATE,
-      state: {
-        heading: 'Settings',
-      },
-    });
+      dispatch({
+          type: Actions.HEADER_STATE,
+          state: true,
+      });
+      dispatch({
+          type: Actions.HEADER_TEXT_STATE,
+          state: {
+              heading: "Settings",
+          },
+      });
     dispatch({
       type: Actions.CURRENT_SCREEN,
       screen: 'settings',
     });
-
     dispatch({
       type: Actions.SEARCH_STATE,
       state: {

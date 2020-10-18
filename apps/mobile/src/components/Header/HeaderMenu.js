@@ -11,7 +11,6 @@ export const HeaderMenu = () => {
 
   return headerVerticalMenu ? (
     <Menu
-      
       ref={menuRef}
       animationDuration={200}
       style={{

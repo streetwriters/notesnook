@@ -4,29 +4,20 @@ import * as Animatable from 'react-native-animatable';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useTracked} from '../../provider';
 import {eSendEvent} from '../../services/EventManager';
-import NavigationService from '../../services/Navigation';
 import {useHideHeader} from '../../utils/Hooks';
 import {dWidth} from '../../utils';
 import {ActionIcon} from '../ActionIcon';
 import {HeaderMenu} from './HeaderMenu';
 import {HeaderTitle} from './HeaderTitle';
 import {SIZE} from "../../utils/SizeUtils";
-import {DDS} from "../../services/DeviceDetection";
+import {HeaderLeftMenu} from "./HeaderLeftMenu";
 
 export const Header = ({showSearch, root}) => {
-  const [state, dispatch] = useTracked();
-  const {colors, syncing, headerState} = state;
+  const [state, ] = useTracked();
+  const {colors, syncing} = state;
 
   const insets = useSafeAreaInsets();
   const hideHeader = useHideHeader();
-
-  const onLeftButtonPress = () => {
-    if (!headerState.canGoBack) {
-      NavigationService.openDrawer();
-      return;
-    }
-    NavigationService.goBack();
-  };
 
   return (
     <View
@@ -39,20 +30,7 @@ export const Header = ({showSearch, root}) => {
         },
       ]}>
       <View style={styles.leftBtnContainer}>
-        {!DDS.isTab ? (
-          <ActionIcon
-            testID="left_menu_button"
-            customStyle={styles.leftBtn}
-            onPress={onLeftButtonPress}
-            name={headerState.canGoBack ? 'arrow-left' : 'menu'}
-            size={SIZE.xxxl}
-            color={colors.pri}
-            iconStyle={{
-              marginLeft: headerState.canGoBack ? -5 : 0,
-            }}
-          />
-        ) : undefined}
-
+        <HeaderLeftMenu/>
         {Platform.OS === 'android' ? <HeaderTitle root={root} /> : null}
       </View>
       {Platform.OS !== 'android' ? <HeaderTitle root={root} /> : null}

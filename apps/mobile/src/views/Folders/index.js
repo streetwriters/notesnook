@@ -6,21 +6,19 @@ import {NotebookItemWrapper} from '../../components/SimpleList/NotebookItemWrapp
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
-import note from "notes-core/models/note";
-import notebook from "notes-core/models/notebook";
 export const Folders = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const {notebooks} = state;
-  const params = route.params;
 
   const onFocus = useCallback(() => {
     dispatch({
       type: Actions.HEADER_STATE,
+      state: true,
+    });
+    dispatch({
+      type: Actions.HEADER_TEXT_STATE,
       state: {
-        type: 'notebooks',
-        menu: true,
-        canGoBack: false,
-        color: null,
+        heading: "Notebooks",
       },
     });
     dispatch({
@@ -33,25 +31,12 @@ export const Folders = ({route, navigation}) => {
         color: null,
       },
     });
-
-    dispatch({
-      type: Actions.HEADER_VERTICAL_MENU,
-      state: false,
-    });
-    dispatch({
-      type: Actions.HEADER_TEXT_STATE,
-      state: {
-        heading: params.title,
-      },
-    });
-    dispatch({type: Actions.PINNED});
     dispatch({type: Actions.NOTEBOOKS});
     dispatch({
       type: Actions.CURRENT_SCREEN,
       screen: 'notebooks',
     });
-   console.log(notebooks)
-  }, []);
+  }, [notebooks]);
 
   useEffect(() => {
     navigation.addListener('focus', onFocus);

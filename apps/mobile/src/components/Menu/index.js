@@ -1,20 +1,12 @@
 import React from 'react';
 import {
-  Platform,
-  SafeAreaView,
   ScrollView,
   StatusBar,
-  TouchableOpacity,
   View,
 } from 'react-native';
-import {createAnimatableComponent} from 'react-native-animatable';
-
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import NavigationService from '../../services/Navigation';
-import {sideMenuRef} from '../../utils/Refs';
-import {dWidth} from '../../utils';
 import {ColorSection} from './ColorSection';
 import {MenuListItem} from './MenuListItem';
 import {TagsSection} from './TagsSection';
@@ -22,16 +14,13 @@ import {UserSection} from './UserSection';
 import Seperator from '../Seperator';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ACCENT, COLOR_SCHEME, COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT, setColorScheme} from "../../utils/Colors";
-import {ph, SIZE} from "../../utils/SizeUtils";
-import {DDS} from "../../services/DeviceDetection";
+
 import {MMKV} from "../../utils/MMKV";
 
 export const Menu = ({
   close = () => {},
   hide,
-  update = () => {},
   noTextMode = false,
-  onButtonLongPress = () => {},
 }) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
@@ -86,7 +75,7 @@ export const Menu = ({
         }
       },
       switch: true,
-      on: colors.night ? true : false,
+      on: !!colors.night,
       close: false,
     },
     {

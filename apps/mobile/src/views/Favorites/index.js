@@ -7,23 +7,18 @@ import {Actions} from '../../provider/Actions';
 export const Favorites = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const {favorites} = state;
-  const [refreshing, setRefreshing] = useState(false);
 
   const onFocus = useCallback(() => {
     dispatch({
       type: Actions.HEADER_STATE,
       state: {
-        type: 'notes',
         menu: true,
-        canGoBack: false,
-        color: null,
       },
     });
-
     dispatch({
       type: Actions.HEADER_TEXT_STATE,
       state: {
-        heading: 'Favorites',
+        heading: "Favorites",
       },
     });
     dispatch({
@@ -36,7 +31,6 @@ export const Favorites = ({route, navigation}) => {
         color: null,
       },
     });
-
     dispatch({
       type: Actions.CURRENT_SCREEN,
       screen: 'favorites',
@@ -73,7 +67,6 @@ export const Favorites = ({route, navigation}) => {
       refreshCallback={() => {
         dispatch({type: Actions.FAVORITES});
       }}
-      refreshing={refreshing}
       focused={() => navigation.isFocused()}
       RenderItem={NoteItemWrapper}
       placeholder={<Placeholder type="favorites" />}

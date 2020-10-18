@@ -39,6 +39,8 @@ export const history = {
   selectedItemsList: [],
 };
 
+
+
 export async function showContext(event, title) {
   eSendEvent('showContextMenu', {
     location: {

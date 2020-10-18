@@ -16,22 +16,12 @@ export const Trash = ({route, navigation}) => {
   const onFocus = useCallback(() => {
     dispatch({
       type: Actions.HEADER_STATE,
-      state: {
-        type: 'trash',
-        menu: true,
-        canGoBack: false,
-        color: null,
-      },
+      state: true,
     });
-    dispatch({
-      type: Actions.HEADER_VERTICAL_MENU,
-      state: false,
-    });
-
     dispatch({
       type: Actions.HEADER_TEXT_STATE,
       state: {
-        heading: 'Trash',
+        heading: "Trash",
       },
     });
     dispatch({
@@ -48,7 +38,6 @@ export const Trash = ({route, navigation}) => {
     dispatch({
       type: Actions.TRASH,
     });
-
     dispatch({
       type: Actions.CURRENT_SCREEN,
       screen: 'trash',

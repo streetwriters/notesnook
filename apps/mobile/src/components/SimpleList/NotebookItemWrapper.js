@@ -45,16 +45,7 @@ export const NotebookItemWrapper = ({
     });
     dispatch({
       type: Actions.HEADER_STATE,
-      state: {
-        canGoBack: true,
-        menu: false,
-      },
-    });
-    dispatch({
-      type: Actions.CONTAINER_BOTTOM_BUTTON,
-      state: {
-        bottomButtonText: 'Add new topic',
-      },
+      state:false,
     });
 
     NavigationService.navigate('Notebook', {

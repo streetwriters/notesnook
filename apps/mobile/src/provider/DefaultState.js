@@ -16,7 +16,7 @@ export const defaultState = {
   tags: [],
   colorNotes: [],
   user: {},
-  premiumUser:false,
+  premiumUser:true,
   settings: {
     showToolbarOnTop: false,
     showKeyboardOnOpen: false,
@@ -55,15 +55,9 @@ export const defaultState = {
     type: null,
     keyword: null,
   },
-  headerState: {
-    heading: 'Home',
-    canGoBack: true,
-    menu: false,
-    verticalMenu: false,
-    headerColor: null,
-  },
+  headerMenuState: true,
   headerTextState: {
-    heading: 'Notes',
+    heading: 'Home',
     color: null,
   },
   headerVerticalMenu: true,

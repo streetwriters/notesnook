@@ -13,7 +13,6 @@ import {
 } from '../../services/EventManager';
 import {eOnNewTopicAdded, eScrollEvent} from '../../utils/Events';
 import NavigationService from '../../services/Navigation';
-import { Dimensions } from 'react-native';
 import {db} from "../../utils/DB";
 
 export const Notebook = ({route, navigation}) => {
@@ -42,14 +41,11 @@ export const Notebook = ({route, navigation}) => {
 
   const onFocus = useCallback(() => {
     onLoad();
+
     dispatch({
-      type: Actions.HEADER_STATE,
+      type: Actions.HEADER_TEXT_STATE,
       state: {
-        type: 'topics',
-        menu: false,
-        canGoBack: true,
         heading: params.title,
-        color: null,
       },
     });
     dispatch({
@@ -62,19 +58,6 @@ export const Notebook = ({route, navigation}) => {
         color: null,
       },
     });
-
-    dispatch({
-      type: Actions.HEADER_VERTICAL_MENU,
-      state: false,
-    });
-
-    dispatch({
-      type: Actions.HEADER_TEXT_STATE,
-      state: {
-        heading: params.title,
-      },
-    });
-
     dispatch({
       type: Actions.CURRENT_SCREEN,
       screen: 'notebook',
@@ -135,11 +118,7 @@ export default Notebook;
 
 const RenderItem = ({item, index}) => {
   const [state, dispatch] = useTracked();
-  const {colors, selectionMode, preventDefaultMargins} = state;
-  let headerState = preventDefaultMargins
-    ? state.indHeaderState
-    : state.headerState;
-  let params = headerState.route.params ? headerState.route.params : {};
+  const {colors,selectionMode } = state;
 
   return (
     <SelectionWrapper
@@ -162,20 +141,15 @@ const RenderItem = ({item, index}) => {
       }}
       item={item}>
       <NotebookItem
-        hideMore={preventDefaultMargins}
         isTopic={true}
         customStyle={{
           width: '100%',
           marginHorizontal: 0,
         }}
         selectionMode={selectionMode}
-        noteToMove={params.note}
-        notebookID={params.notebook?.id}
-        isMove={preventDefaultMargins}
         item={item}
         index={index}
         colors={colors}
-        data={params.notebook?.topics}
       />
     </SelectionWrapper>
   );

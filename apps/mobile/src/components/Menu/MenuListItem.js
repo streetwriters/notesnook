@@ -16,17 +16,21 @@ export const MenuListItem = ({item, index, noTextMode, ignore, testID}) => {
   const {currentScreen, colors} = state;
 
   const _onPress = (event) => {
-    if (!ignore) {
+    if (!ignore && currentScreen !== item.name.toLowerCase()) {
       dispatch({
         type: Actions.HEADER_TEXT_STATE,
         state: {
           heading: item.name,
         },
       });
+      dispatch({
+            type:  Actions.HEADER_VERTICAL_MENU,
+            state: item.name === "Home",
+      });
       eSendEvent(eClearSearch);
     }
-
     item.func();
+
     if (item.close) {
       NavigationService.closeDrawer();
     }
@@ -38,8 +42,7 @@ export const MenuListItem = ({item, index, noTextMode, ignore, testID}) => {
       key={item.name + index}
       onPress={_onPress}
       onLongPress={(event) => {
-        console.log(event.nativeEvent);
-        showContext(event, item.name);
+        showContext(event, item.name).then(r => r);
       }}
       color={
         currentScreen === item.name.toLowerCase() ? colors.shade : 'transparent'

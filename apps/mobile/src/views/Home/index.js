@@ -16,20 +16,21 @@ export const Home = ({navigation}) => {
 
   const onFocus = useCallback(() => {
     dispatch({
+      type:  Actions.HEADER_VERTICAL_MENU,
+      state: true,
+    });
+    dispatch({
+      type: Actions.HEADER_TEXT_STATE,
+      state: {
+        heading: "Home",
+      },
+    });
+    dispatch({
       type: Actions.CURRENT_SCREEN,
       screen: 'home',
     });
     dispatch({
       type: Actions.HEADER_STATE,
-      state: {
-        type: 'notes',
-        menu: true,
-        canGoBack: false,
-        color: null,
-      },
-    });
-    dispatch({
-      type: Actions.HEADER_VERTICAL_MENU,
       state: true,
     });
     dispatch({
@@ -42,23 +43,12 @@ export const Home = ({navigation}) => {
         color: null,
       },
     });
-    dispatch({
-      type: Actions.HEADER_TEXT_STATE,
-      state: {
-        heading: 'Home',
-      },
-    });
     eSendEvent(eScrollEvent, 0);
     dispatch({type: Actions.COLORS});
     dispatch({type: Actions.NOTES});
-  }, []);
+  }, [notes]);
 
   const onBlur = useCallback(() => {
-    console.log(navigation.isFocused());
-    dispatch({
-      type: Actions.HEADER_VERTICAL_MENU,
-      state: false,
-    });
   }, []);
 
   useEffect(() => {
@@ -113,6 +103,7 @@ export const Home = ({navigation}) => {
         title="Create a new note"
         onPress={_onPressBottomButton}
       />
+
     </>
   );
 };

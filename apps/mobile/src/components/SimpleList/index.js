@@ -58,7 +58,6 @@ const SimpleList = ({
                 : listData;
 
         let d = [header, ...mainData];
-        console.log(d,"D");
         setDataProvider(
             dataProvider.cloneWithRows(d),
         );
@@ -135,7 +134,7 @@ const SimpleList = ({
             return dataProvider.getDataForIndex(index).type;
         },
         (type, dim) => {
-            console.log(type);
+
             switch (type) {
                 case 'note':
                     dim.width = width;

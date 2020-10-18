@@ -49,7 +49,6 @@ export class AddTopicDialog extends React.Component {
     });
   }
   close() {
-    refs = [];
     this.title = null;
     this.setState({
       visible: false,

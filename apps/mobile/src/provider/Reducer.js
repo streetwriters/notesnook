@@ -192,13 +192,10 @@ export const reducer = (state, action) => {
       };
     }
     case Actions.HEADER_STATE: {
-      let header = {
-            ...state.headerState,
-            ...action.state,
-          };
+
       return  {
             ...state,
-            headerState: header,
+            headerMenuState:action.state
           };
     }
     case Actions.SEARCH_STATE: {

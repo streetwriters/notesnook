@@ -24,7 +24,6 @@ export const Search = (props) => {
   const [text, setText] = useState('');
   const [focus, setFocus] = useState(false);
 
-
   const _marginAnim = new Value(0);
   const _opacity = new Value(1);
   const _borderAnim = new Value(1.5);
@@ -145,7 +144,7 @@ export const Search = (props) => {
     );
     if (!searchResult || searchResult.length === 0) {
       ToastEvent.show('No search results found for ' + text, 'error');
-      return;
+
     } else {
       dispatch({
         type: Actions.SEARCH_RESULTS,
@@ -219,9 +218,7 @@ export const Search = (props) => {
         />
         <Icon
           style={{paddingRight: DDS.isTab ? 12 : 12}}
-          onPress={() => {
-            onSubmitEditing();
-          }}
+          onPress={onSubmitEditing}
           name="magnify"
           color={
             focus

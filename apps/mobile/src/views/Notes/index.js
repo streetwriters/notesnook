@@ -26,11 +26,10 @@ export const Notes = ({route, navigation}) => {
   const {colorNotes} = state;
   const allNotes = state.notes;
   const [notes, setNotes] = useState([]);
-  const [refreshing, setRefreshing] = useState(false);
   let params = route.params ? route.params : null;
 
   useEffect(() => {
-    if (isFocused) {
+    if (navigation.isFocused()) {
       if (!params) {
         params = {
           title: 'Notes',
@@ -43,7 +42,7 @@ export const Notes = ({route, navigation}) => {
         type: null,
       };
     }
-  }, [isFocused, allNotes, colorNotes]);
+  }, [allNotes, colorNotes]);
 
   useEffect(() => {
     eSubscribeEvent(refreshNotesPage, init);
@@ -64,7 +63,7 @@ export const Notes = ({route, navigation}) => {
     eSendEvent(eScrollEvent, 0);
     if (params.type === 'tag') {
       allNotes = db.notes.tagged(params.tag.title);
-    } else if (params.type == 'color') {
+    } else if (params.type === 'color') {
       allNotes = db.notes.colored(params.color.title);
     } else {
       allNotes = db.notebooks
@@ -79,22 +78,13 @@ export const Notes = ({route, navigation}) => {
   const onFocus = useCallback(() => {
     dispatch({
       type: Actions.HEADER_STATE,
-      state: {
-        type: 'notes',
-        menu: params.type === 'color' ? true : false,
-        canGoBack: params.type === 'color' ? false : true,
-        color: params.type == 'color' ? COLORS_NOTE[params.title] : null,
-      },
-    });
-    dispatch({
-      type: Actions.HEADER_VERTICAL_MENU,
-      state: false,
+      state: params.type === 'color',
     });
     dispatch({
       type: Actions.HEADER_TEXT_STATE,
       state: {
         heading:
-          params.type == 'tag'
+          params.type === 'tag'
             ? '# ' + params.title
             : params.title.slice(0, 1).toUpperCase() + params.title.slice(1),
       },
@@ -128,12 +118,12 @@ export const Notes = ({route, navigation}) => {
         type: Actions.SEARCH_STATE,
         state: {
           placeholder: `Search in ${
-            params.type == 'tag' ? '#' + params.title : params.title
+            params.type === 'tag' ? '#' + params.title : params.title
           }`,
           data: notes,
           noSearch: false,
           type: 'notes',
-          color: params.type == 'color' ? params.title : null,
+          color: params.type === 'color' ? params.title : null,
         },
       });
     }
@@ -145,7 +135,7 @@ export const Notes = ({route, navigation}) => {
         type: 'tag',
         id: params.tag.title,
       };
-    } else if (params.type == 'color') {
+    } else if (params.type === 'color') {
       editing.actionAfterFirstSave = {
         type: 'color',
         id: params.color.id,
