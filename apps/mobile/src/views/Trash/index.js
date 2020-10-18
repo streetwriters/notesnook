@@ -8,6 +8,8 @@ import {NotebookItemWrapper} from '../../components/SimpleList/NotebookItemWrapp
 import {NoteItemWrapper} from '../../components/SimpleList/NoteItemWrapper';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
+import {eSendEvent} from "../../services/EventManager";
+import {eUpdateSearchState} from "../../utils/Events";
 
 export const Trash = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
@@ -24,16 +26,14 @@ export const Trash = ({route, navigation}) => {
         heading: "Trash",
       },
     });
-    dispatch({
-      type: Actions.SEARCH_STATE,
-      state: {
-        placeholder: 'Search all trash',
-        data: trash,
-        noSearch: false,
-        type: 'trash',
-        color: null,
-      },
-    });
+
+    eSendEvent(eUpdateSearchState,{
+      placeholder: 'Search all trash',
+      data: trash,
+      noSearch: false,
+      type: 'trash',
+      color: null,
+    })
 
     dispatch({
       type: Actions.TRASH,
@@ -53,16 +53,15 @@ export const Trash = ({route, navigation}) => {
 
   useEffect(() => {
     if (navigation.isFocused()) {
-      dispatch({
-        type: Actions.SEARCH_STATE,
-        state: {
-          placeholder: 'Search all trash',
-          data: trash,
-          noSearch: false,
-          type: 'trash',
-          color: null,
-        },
-      });
+
+      eSendEvent(eUpdateSearchState,{
+        placeholder: 'Search all trash',
+        data: trash,
+        noSearch: false,
+        type: 'trash',
+        color: null,
+      })
+
     }
   }, [trash]);
 

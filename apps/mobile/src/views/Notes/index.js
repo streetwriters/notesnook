@@ -12,7 +12,7 @@ import {
 } from '../../services/EventManager';
 import {
   eOnLoadNote,
-  eScrollEvent,
+  eScrollEvent, eUpdateSearchState,
   refreshNotesPage,
 } from '../../utils/Events';
 import {openEditorAnimation} from '../../utils/Animations';
@@ -114,18 +114,15 @@ export const Notes = ({route, navigation}) => {
 
   useEffect(() => {
     if (navigation.isFocused()) {
-      dispatch({
-        type: Actions.SEARCH_STATE,
-        state: {
+      eSendEvent(eUpdateSearchState,{
           placeholder: `Search in ${
-            params.type === 'tag' ? '#' + params.title : params.title
+              params.type === 'tag' ? '#' + params.title : params.title
           }`,
           data: notes,
           noSearch: false,
           type: 'notes',
           color: params.type === 'color' ? params.title : null,
-        },
-      });
+        })
     }
   }, [notes]);
 

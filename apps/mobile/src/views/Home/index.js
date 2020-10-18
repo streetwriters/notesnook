@@ -6,7 +6,7 @@ import {NoteItemWrapper} from '../../components/SimpleList/NoteItemWrapper';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {eSendEvent} from '../../services/EventManager';
-import {eOnLoadNote, eScrollEvent} from '../../utils/Events';
+import {eOnLoadNote, eScrollEvent, eUpdateSearchState} from '../../utils/Events';
 import {openEditorAnimation} from '../../utils/Animations';
 import {DDS} from "../../services/DeviceDetection";
 
@@ -33,16 +33,13 @@ export const Home = ({navigation}) => {
       type: Actions.HEADER_STATE,
       state: true,
     });
-    dispatch({
-      type: Actions.SEARCH_STATE,
-      state: {
-        placeholder: 'Search all notes',
-        data: notes,
-        noSearch: false,
-        type: 'notes',
-        color: null,
-      },
-    });
+    eSendEvent(eUpdateSearchState,{
+      placeholder: 'Search all notes',
+      data: notes,
+      noSearch: false,
+      type: 'notes',
+      color: null,
+    })
     eSendEvent(eScrollEvent, 0);
     dispatch({type: Actions.COLORS});
     dispatch({type: Actions.NOTES});
@@ -62,16 +59,13 @@ export const Home = ({navigation}) => {
 
   useEffect(() => {
     if (navigation.isFocused()) {
-      dispatch({
-        type: Actions.SEARCH_STATE,
-        state: {
-          placeholder: 'Search all notes',
-          data: notes,
-          noSearch: false,
-          type: 'notes',
-          color: null,
-        },
-      });
+      eSendEvent(eUpdateSearchState,{
+        placeholder: 'Search all notes',
+        data: notes,
+        noSearch: false,
+        type: 'notes',
+        color: null,
+      })
     }
   }, [notes]);
 

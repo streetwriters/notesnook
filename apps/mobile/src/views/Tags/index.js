@@ -7,6 +7,8 @@ import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import NavigationService from '../../services/Navigation';
 import {SIZE, WEIGHT} from "../../utils/SizeUtils";
+import {eSendEvent} from "../../services/EventManager";
+import {eUpdateSearchState} from "../../utils/Events";
 
 export const Tags = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
@@ -24,17 +26,14 @@ export const Tags = ({route, navigation}) => {
         heading:"Tags",
       },
     });
-    dispatch({
-      type: Actions.SEARCH_STATE,
-      state: {
-        placeholder: 'Search all tags',
-        data: tags,
-        noSearch: false,
-        type: 'tags',
-        color: null,
-      },
-    });
 
+    eSendEvent(eUpdateSearchState,{
+      placeholder: 'Search all tags',
+      data: tags,
+      noSearch: false,
+      type: 'tags',
+      color: null,
+    })
     dispatch({type: Actions.TAGS});
     dispatch({
       type: Actions.CURRENT_SCREEN,
@@ -51,16 +50,13 @@ export const Tags = ({route, navigation}) => {
 
   useEffect(() => {
     if (navigation.isFocused()) {
-      dispatch({
-        type: Actions.SEARCH_STATE,
-        state: {
-          placeholder: 'Search all tags',
-          data: tags,
-          noSearch: false,
-          type: 'tags',
-          color: null,
-        },
-      });
+      eSendEvent(eUpdateSearchState,{
+        placeholder: 'Search all tags',
+        data: tags,
+        noSearch: false,
+        type: 'tags',
+        color: null,
+      })
     }
   }, [tags]);
 

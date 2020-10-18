@@ -109,3 +109,5 @@ export const eOpenRestoreDialog = '553';
 export const eCloseRestoreDialog = '554';
 
 export const eOnNoteEdited = '555';
+
+export const eUpdateSearchState = '556';

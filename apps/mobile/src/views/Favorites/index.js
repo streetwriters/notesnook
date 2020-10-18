@@ -4,6 +4,8 @@ import SimpleList from '../../components/SimpleList';
 import {NoteItemWrapper} from '../../components/SimpleList/NoteItemWrapper';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
+import {eSendEvent} from "../../services/EventManager";
+import {eUpdateSearchState} from "../../utils/Events";
 export const Favorites = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const {favorites} = state;
@@ -21,16 +23,14 @@ export const Favorites = ({route, navigation}) => {
         heading: "Favorites",
       },
     });
-    dispatch({
-      type: Actions.SEARCH_STATE,
-      state: {
-        placeholder: 'Search all favorites',
-        data: favorites,
-        noSearch: false,
-        type: 'notes',
-        color: null,
-      },
-    });
+    eSendEvent(eUpdateSearchState,{
+      placeholder: 'Search all favorites',
+      data: favorites,
+      noSearch: false,
+      type: 'notes',
+      color: null,
+    })
+
     dispatch({
       type: Actions.CURRENT_SCREEN,
       screen: 'favorites',
@@ -47,16 +47,14 @@ export const Favorites = ({route, navigation}) => {
 
   useEffect(() => {
     if (navigation.isFocused()) {
-      dispatch({
-        type: Actions.SEARCH_STATE,
-        state: {
-          placeholder: 'Search all favorites',
-          data: favorites,
-          noSearch: false,
-          type: 'notes',
-          color: null,
-        },
-      });
+
+      eSendEvent(eUpdateSearchState,{
+        placeholder: 'Search all favorites',
+        data: favorites,
+        noSearch: false,
+        type: 'notes',
+        color: null,
+      })
     }
   }, [favorites]);
 

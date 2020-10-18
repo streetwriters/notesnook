@@ -19,13 +19,13 @@ import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {eSendEvent, ToastEvent} from '../../services/EventManager';
 import {
-  eCloseProgressDialog,
-  eOpenLoginDialog,
-  eOpenPremiumDialog,
-  eOpenProgressDialog,
-  eOpenRecoveryKeyDialog,
-  eOpenRestoreDialog,
-  eResetApp,
+    eCloseProgressDialog,
+    eOpenLoginDialog,
+    eOpenPremiumDialog,
+    eOpenProgressDialog,
+    eOpenRecoveryKeyDialog,
+    eOpenRestoreDialog,
+    eResetApp, eUpdateSearchState,
 } from '../../utils/Events';
 import NavigationService from '../../services/Navigation';
 import storage from '../../utils/storage';
@@ -71,12 +71,12 @@ export const Settings = ({ navigation}) => {
       type: Actions.CURRENT_SCREEN,
       screen: 'settings',
     });
-    dispatch({
-      type: Actions.SEARCH_STATE,
-      state: {
-        noSearch: true,
-      },
-    });
+      eSendEvent(eUpdateSearchState,{
+          type: Actions.SEARCH_STATE,
+          state: {
+              noSearch: true,
+          },
+      })
   }, []);
 
   useEffect(() => {

@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {eSubscribeEvent, eUnSubscribeEvent, ToastEvent} from '../../services/EventManager';
-import {eClearSearch, eScrollEvent} from '../../utils/Events';
+import {eClearSearch, eScrollEvent, eUpdateSearchState} from '../../utils/Events';
 import {inputRef} from '../../utils/Refs';
 import {selection} from '../../utils';
 import Animated, {Easing} from 'react-native-reanimated';
@@ -20,14 +20,19 @@ let timeoutAnimate = null;
 let animating = false;
 export const Search = (props) => {
   const [state, dispatch] = useTracked();
-  const {colors, searchResults,searchState} = state;
+  const {colors, searchResults} = state;
   const [text, setText] = useState('');
   const [focus, setFocus] = useState(false);
-
+  const [searchState,setSearchState] = useState({
+    noSearch: false,
+    data: [],
+    type: 'notes',
+    color: null,
+    placeholder: 'Search all notes',
+  })
   const _marginAnim = new Value(0);
   const _opacity = new Value(1);
   const _borderAnim = new Value(1.5);
-
   const animation = (margin, opacity, border) => {
     if (animating) return;
     animating = true;
@@ -82,6 +87,10 @@ export const Search = (props) => {
     }
   };
 
+  const updateSearchState = (state => {
+    setSearchState(state);
+  })
+
   useEffect(() => {
     selection.data = searchState.data;
     selection.type = searchState.type;
@@ -89,12 +98,13 @@ export const Search = (props) => {
     eSubscribeEvent('showSearch', () => {
       animation(0, 1, 1.5);
     });
-
+    eSubscribeEvent(eUpdateSearchState,updateSearchState)
     return () => {
       eUnSubscribeEvent(eScrollEvent, onScroll);
       eUnSubscribeEvent('showSearch', () => {
         animation(0, 1, 1.5);
       });
+      eUnSubscribeEvent(eUpdateSearchState,updateSearchState)
     };
   }, [searchState]);
 

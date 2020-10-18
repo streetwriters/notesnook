@@ -36,17 +36,9 @@ export const TagsSection = () => {
               tag: item,
               type: 'tag',
             };
-
             dispatch({
               type: Actions.HEADER_VERTICAL_MENU,
               state: false,
-            });
-        
-            dispatch({
-              type: Actions.CONTAINER_BOTTOM_BUTTON,
-              state: {
-                bottomButtonText:'Create a new Note',
-              },
             });
             dispatch({
               type: Actions.HEADER_TEXT_STATE,

@@ -11,7 +11,7 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent,
 } from '../../services/EventManager';
-import {eOnNewTopicAdded, eScrollEvent} from '../../utils/Events';
+import {eOnNewTopicAdded, eScrollEvent, eUpdateSearchState} from '../../utils/Events';
 import NavigationService from '../../services/Navigation';
 import {db} from "../../utils/DB";
 
@@ -48,16 +48,15 @@ export const Notebook = ({route, navigation}) => {
         heading: params.title,
       },
     });
-    dispatch({
-      type: Actions.SEARCH_STATE,
-      state: {
-        placeholder: `Search in "${params.title}"`,
-        data: topics,
-        noSearch: false,
-        type: 'topics',
-        color: null,
-      },
-    });
+
+    eSendEvent(eUpdateSearchState,{
+      placeholder: `Search in "${params.title}"`,
+      data: topics,
+      noSearch: false,
+      type: 'topics',
+      color: null,
+    })
+
     dispatch({
       type: Actions.CURRENT_SCREEN,
       screen: 'notebook',
@@ -73,16 +72,13 @@ export const Notebook = ({route, navigation}) => {
 
   useEffect(() => {
     if (navigation.isFocused()) {
-      dispatch({
-        type: Actions.SEARCH_STATE,
-        state: {
-          placeholder: `Search in "${params.title}"`,
-          data: topics,
-          noSearch: false,
-          type: 'topics',
-          color: null,
-        },
-      });
+      eSendEvent(eUpdateSearchState,{
+        placeholder: `Search in "${params.title}"`,
+        data: topics,
+        noSearch: false,
+        type: 'topics',
+        color: null,
+      })
     }
   }, [topics]);
 

@@ -6,6 +6,8 @@ import {NotebookItemWrapper} from '../../components/SimpleList/NotebookItemWrapp
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
+import {eSendEvent} from "../../services/EventManager";
+import {eUpdateSearchState} from "../../utils/Events";
 export const Folders = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const {notebooks} = state;
@@ -21,16 +23,15 @@ export const Folders = ({route, navigation}) => {
         heading: "Notebooks",
       },
     });
-    dispatch({
-      type: Actions.SEARCH_STATE,
-      state: {
-        placeholder: 'Search all notebooks',
-        data: notebooks,
-        noSearch: false,
-        type: 'notebooks',
-        color: null,
-      },
-    });
+
+    eSendEvent(eUpdateSearchState,{
+      placeholder: 'Search all notebooks',
+      data: notebooks,
+      noSearch: false,
+      type: 'notebooks',
+      color: null,
+    },)
+
     dispatch({type: Actions.NOTEBOOKS});
     dispatch({
       type: Actions.CURRENT_SCREEN,
@@ -47,16 +48,13 @@ export const Folders = ({route, navigation}) => {
 
   useEffect(() => {
     if (navigation.isFocused()) {
-      dispatch({
-        type: Actions.SEARCH_STATE,
-        state: {
-          placeholder: 'Search all notebooks',
-          data: notebooks,
-          noSearch: false,
-          type: 'notebooks',
-          color: null,
-        },
-      });
+      eSendEvent(eUpdateSearchState,{
+        placeholder: 'Search all notebooks',
+        data: notebooks,
+        noSearch: false,
+        type: 'notebooks',
+        color: null,
+      },)
     }
   }, [notebooks]);
 
