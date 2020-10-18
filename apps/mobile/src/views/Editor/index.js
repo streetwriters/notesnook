@@ -33,7 +33,7 @@ let tapCount = 0;
 const Editor = ({noMenu}) => {
     // Global State
     const [state,] = useTracked();
-    const {colors, premium} = state;
+    const {colors, premiumUser} = state;
     const [fullscreen, setFullscreen] = useState(false);
 
     // FUNCTIONS
@@ -105,7 +105,7 @@ const Editor = ({noMenu}) => {
 
     useEffect(() => {
         EditorWebView.current?.reload();
-    }, [premium]);
+    }, [premiumUser]);
 
     const _onHardwareBackPress = async () => {
         if (editing.currentlyEditing) {
@@ -287,7 +287,7 @@ const Editor = ({noMenu}) => {
                     testID="editor"
                     ref={EditorWebView}
                     onError={(error) => console.log(error)}
-                    onLoad={async () => await onWebViewLoad(noMenu, premium, colors)}
+                    onLoad={async () => await onWebViewLoad(noMenu, premiumUser, colors)}
                     javaScriptEnabled={true}
                     injectedJavaScript={Platform.OS === 'ios' ? injectedJS : null}
                     onShouldStartLoadWithRequest={_onShouldStartLoadWithRequest}

@@ -75,7 +75,7 @@ export const NotebookItem = ({
               paddingVertical: item.description ? 0 : 5,
             }}>
             {item && item.topics ? (
-              item.topics.slice(1, 4).map((topic) => (
+              item.topics.slice(1, 3).map((topic) => (
                 <TouchableOpacity
                   onPress={() => {
                     NavigationService.navigate('Notes', {

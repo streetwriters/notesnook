@@ -1,13 +1,37 @@
-import React, { createRef } from 'react';
-import Menu, { MenuDivider, MenuItem } from 'react-native-material-menu';
-import { useTracked } from '../../provider';
-import { Actions } from '../../provider/Actions';
-import { ActionIcon } from '../ActionIcon';
+import React, {createRef} from 'react';
+import Menu, {MenuDivider, MenuItem} from 'react-native-material-menu';
+import {useTracked} from '../../provider';
+import {Actions} from '../../provider/Actions';
+import {ActionIcon} from '../ActionIcon';
 import {SIZE, WEIGHT} from "../../utils/SizeUtils";
+
 const menuRef = createRef();
 export const HeaderMenu = () => {
   const [state, dispatch] = useTracked();
   const {colors, headerVerticalMenu} = state;
+
+  const styles = {
+      text:{
+          fontFamily: WEIGHT.regular,
+          color: colors.pri,
+          fontSize: SIZE.sm,
+      },
+      title:{
+          fontFamily: WEIGHT.regular,
+          color: colors.icon,
+          fontSize: SIZE.sm ,
+      },
+      action:{
+        justifyContent: 'center',
+        alignItems: 'flex-end',
+        height: 40,
+        width: 40,
+        marginLeft: 10,
+        borderRadius: 100,
+        backgroundColor: colors.bg,
+
+      }
+    }
 
   return headerVerticalMenu ? (
     <Menu
@@ -16,6 +40,7 @@ export const HeaderMenu = () => {
       style={{
         borderRadius: 5,
         backgroundColor: colors.bg,
+        paddingBottom:10,
       }}
       button={
         <ActionIcon
@@ -25,30 +50,16 @@ export const HeaderMenu = () => {
           name="dots-vertical"
           size={SIZE.xl}
           color={colors.pri}
-          customStyle={{
-            justifyContent: 'center',
-            alignItems: 'flex-end',
-            height: 40,
-            width: 40,
-            marginLeft: 10,
-            borderRadius: 100,
-            backgroundColor: colors.bg,
-          }}
+          customStyle={styles.action}
         />
       }>
       <MenuItem
-        textStyle={{
-          color: colors.icon,
-          fontSize: 12,
-        }}>
+        textStyle={styles.title}>
         Sort by:
       </MenuItem>
-      <MenuDivider />
       <MenuItem
-        textStyle={{
-          fontFamily: WEIGHT.regular,
-          color: colors.pri,
-        }}
+
+        textStyle={styles.text}
         onPress={() => {
           dispatch({type: Actions.NOTES, sort: null});
           menuRef.current?.hide();
@@ -56,21 +67,16 @@ export const HeaderMenu = () => {
         Default
       </MenuItem>
       <MenuItem
-        textStyle={{
-          fontFamily: WEIGHT.regular,
-          color: colors.pri,
-        }}
+          textStyle={styles.text}
+
         onPress={() => {
           dispatch({type: Actions.NOTES, sort: 'abc'});
           menuRef.current?.hide();
         }}>
         Alphabetical
       </MenuItem>
-      <MenuItem
-        textStyle={{
-          fontFamily: WEIGHT.regular,
-          color: colors.pri,
-        }}
+        <MenuItem
+          textStyle={styles.text}
         onPress={() => {
           dispatch({type: Actions.NOTES, sort: 'year'});
           menuRef.current?.hide();
@@ -78,10 +84,7 @@ export const HeaderMenu = () => {
         By year
       </MenuItem>
       <MenuItem
-        textStyle={{
-          fontFamily: WEIGHT.regular,
-          color: colors.pri,
-        }}
+          textStyle={styles.text}
         onPress={() => {
           dispatch({type: Actions.NOTES, sort: 'month'});
           menuRef.current?.hide();
@@ -89,10 +92,7 @@ export const HeaderMenu = () => {
         By month
       </MenuItem>
       <MenuItem
-        textStyle={{
-          fontFamily: WEIGHT.regular,
-          color: colors.pri,
-        }}
+          textStyle={styles.text}
         onPress={() => {
           dispatch({type: Actions.NOTES, sort: 'week'});
           menuRef.current?.hide();
