@@ -72,8 +72,12 @@ export const Settings = ({ navigation}) => {
       screen: 'settings',
     });
       eSendEvent(eUpdateSearchState,{
-              noSearch: true,
-          })
+          placeholder:"",
+          data: [],
+          noSearch: true,
+          type: '',
+          color: null,
+          });
   }, []);
 
   useEffect(() => {
