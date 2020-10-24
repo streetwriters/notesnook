@@ -117,7 +117,7 @@ export const Settings = ({ navigation}) => {
       name: 'Backup data',
       func: async () => {
         if (Platform.OS === 'android') {
-          let granted = storage.requestPermission();
+          let granted = await storage.requestPermission();
           if (!granted) {
             ToastEvent.show('Backup failed! Storage access was denied.');
             return;
