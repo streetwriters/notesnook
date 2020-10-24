@@ -11,7 +11,6 @@ import {
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import RNFetchBlob from 'rn-fetch-blob';
 import {Button} from '../../components/Button';
 import {PressableButton} from '../../components/PressableButton';
 import Seperator from '../../components/Seperator';
@@ -19,29 +18,36 @@ import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {eSendEvent, ToastEvent} from '../../services/EventManager';
 import {
-    eCloseProgressDialog,
-    eOpenLoginDialog,
-    eOpenPremiumDialog,
-    eOpenProgressDialog,
-    eOpenRecoveryKeyDialog,
-    eOpenRestoreDialog,
-    eResetApp, eUpdateSearchState,
+  eCloseProgressDialog,
+  eOpenLoginDialog,
+  eOpenPremiumDialog,
+  eOpenProgressDialog,
+  eOpenRecoveryKeyDialog,
+  eOpenRestoreDialog,
+  eResetApp,
+  eUpdateSearchState,
 } from '../../utils/Events';
 import NavigationService from '../../services/Navigation';
 import storage from '../../utils/storage';
+import {setSetting, dWidth} from '../../utils';
+import {hexToRGBA, RGB_Linear_Shade} from '../../utils/ColorUtils';
+import {sleep} from '../../utils/TimeUtils';
 import {
-  setSetting,
-  dWidth,
-} from '../../utils';
-import {hexToRGBA, RGB_Linear_Shade} from "../../utils/ColorUtils";
-import {sleep} from "../../utils/TimeUtils";
-import {ACCENT, COLOR_SCHEME, COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT, setColorScheme} from "../../utils/Colors";
-import {opacity, pv, SIZE, WEIGHT} from "../../utils/SizeUtils";
-import {db} from "../../utils/DB";
-import {DDS} from "../../services/DeviceDetection";
-import {MMKV} from "../../utils/MMKV";
+  ACCENT,
+  COLOR_SCHEME,
+  COLOR_SCHEME_DARK,
+  COLOR_SCHEME_LIGHT,
+  setColorScheme,
+} from '../../utils/Colors';
+import {opacity, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
+import {db} from '../../utils/DB';
+import {DDS} from '../../services/DeviceDetection';
+import {MMKV} from '../../utils/mmkv';
+import Backup from '../../services/Backup';
 
-export const Settings = ({ navigation}) => {
+
+
+export const Settings = ({navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors, user, settings} = state;
   function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
@@ -57,27 +63,27 @@ export const Settings = ({ navigation}) => {
   }
 
   const onFocus = useCallback(() => {
-      dispatch({
-          type: Actions.HEADER_STATE,
-          state: true,
-      });
-      dispatch({
-          type: Actions.HEADER_TEXT_STATE,
-          state: {
-              heading: "Settings",
-          },
-      });
+    dispatch({
+      type: Actions.HEADER_STATE,
+      state: true,
+    });
+    dispatch({
+      type: Actions.HEADER_TEXT_STATE,
+      state: {
+        heading: 'Settings',
+      },
+    });
     dispatch({
       type: Actions.CURRENT_SCREEN,
       screen: 'settings',
     });
-      eSendEvent(eUpdateSearchState,{
-          placeholder:"",
-          data: [],
-          noSearch: true,
-          type: '',
-          color: null,
-          });
+    eSendEvent(eUpdateSearchState, {
+      placeholder: '',
+      data: [],
+      noSearch: true,
+      type: '',
+      color: null,
+    });
   }, []);
 
   useEffect(() => {
@@ -116,32 +122,14 @@ export const Settings = ({ navigation}) => {
     {
       name: 'Backup data',
       func: async () => {
-        if (Platform.OS === 'android') {
-          let granted = await storage.requestPermission();
-          if (!granted) {
-            ToastEvent.show('Backup failed! Storage access was denied.');
-            return;
-          }
-        }
         eSendEvent(eOpenProgressDialog, {
           title: 'Backing up your data',
           paragraph:
             "All your backups are stored in 'Phone Storage/Notesnook/backups/' folder",
         });
-        let backup;
-        try {
-          backup = await db.backup.export();
-        } catch (e) {
-          console.log('error', e);
-        }
-
-        let backupName =
-          'notesnook_backup_' + new Date().toString() + '.nnbackup';
-        let path = await storage.checkAndCreateDir('/backups/');
-        await RNFetchBlob.fs.writeFile(path + backupName, backup, 'utf8');
+        await Backup.run();
         await sleep(2000);
         eSendEvent(eCloseProgressDialog);
-        ToastEvent.show('Backup complete!', 'success');
       },
       desc: 'Backup all your data to phone storage',
     },
@@ -540,7 +528,10 @@ export const Settings = ({ navigation}) => {
               await MMKV.setStringAsync('theme', JSON.stringify({night: true}));
               changeColorScheme(COLOR_SCHEME_DARK);
             } else {
-                await MMKV.setStringAsync('theme', JSON.stringify({night: false}));
+              await MMKV.setStringAsync(
+                'theme',
+                JSON.stringify({night: false}),
+              );
 
               changeColorScheme(COLOR_SCHEME_LIGHT);
             }
@@ -790,7 +781,7 @@ export const Settings = ({ navigation}) => {
           {
             name: 'Privacy Policy',
             func: async () => {
-             await Linking.openURL('https://www.notesnook.com/privacy.html');
+              await Linking.openURL('https://www.notesnook.com/privacy.html');
             },
             desc: 'Read our privacy policy',
           },

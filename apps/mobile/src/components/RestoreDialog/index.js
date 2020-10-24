@@ -45,7 +45,7 @@ const RestoreDialog = () => {
     setVisible(false);
   };
 
-  const restore = async () => {
+  const restore = async (item,index) => {
     
       if (Platform.OS === 'android') {
         let granted = storage.requestPermission();
@@ -62,6 +62,7 @@ const RestoreDialog = () => {
       await db.backup.import(backup);
       await sleep(2000);
       setRestoring(false);
+      console.log(db.notes.all);
       dispatch({type: Actions.ALL});
       ToastEvent.show('Restore Complete!', 'success');
       setVisible(false);
@@ -204,9 +205,9 @@ const RestoreDialog = () => {
               </Text>
             </View>
           }
+          keyExtractor={(item,index) => item.filename}
           renderItem={({item, index}) => (
             <View
-              key={item.filename}
               style={{
                 minHeight: 50,
                 justifyContent: 'space-between',
@@ -231,7 +232,7 @@ const RestoreDialog = () => {
                 title="Restore"
                 width={80}
                 height={30}
-                onPress={restore}
+                onPress={() => restore(item,index)}
               />
             </View>
           )}
