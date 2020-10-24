@@ -18,6 +18,34 @@ let searchResult = [];
 let offsetY = 0;
 let timeoutAnimate = null;
 let animating = false;
+
+const _marginAnim = new Value(0);
+const _opacity = new Value(1);
+const _borderAnim = new Value(1.5);
+
+const animation = (margin, opacity, border) => {
+  if (animating) return;
+  animating = true;
+  timing(_marginAnim, {
+    toValue: margin,
+    duration: 230,
+    easing: Easing.inOut(Easing.ease),
+  }).start();
+  timing(_opacity, {
+    toValue: opacity,
+    duration: 250,
+    easing: Easing.inOut(Easing.ease),
+  }).start();
+  timing(_borderAnim, {
+    toValue: border,
+    duration: 270,
+    easing: Easing.inOut(Easing.ease),
+  }).start();
+  setTimeout(() => {
+    animating = false;
+  }, 500);
+};
+
 export const Search = (props) => {
   const [state, dispatch] = useTracked();
   const {colors, searchResults} = state;
@@ -30,31 +58,7 @@ export const Search = (props) => {
     color: null,
     placeholder: 'Search all notes',
   })
-  const _marginAnim = new Value(0);
-  const _opacity = new Value(1);
-  const _borderAnim = new Value(1.5);
-  const animation = (margin, opacity, border) => {
-    if (animating) return;
-    animating = true;
-    timing(_marginAnim, {
-      toValue: margin,
-      duration: 230,
-      easing: Easing.inOut(Easing.ease),
-    }).start();
-    timing(_opacity, {
-      toValue: opacity,
-      duration: 250,
-      easing: Easing.inOut(Easing.ease),
-    }).start();
-    timing(_borderAnim, {
-      toValue: border,
-      duration: 270,
-      easing: Easing.inOut(Easing.ease),
-    }).start();
-    setTimeout(() => {
-      animating = false;
-    }, 500);
-  };
+
 
   const onScroll = (y) => {
     if (searchResults.results.length > 0) return;
@@ -96,12 +100,15 @@ export const Search = (props) => {
     selection.type = searchState.type;
     eSubscribeEvent(eScrollEvent, onScroll);
     eSubscribeEvent('showSearch', () => {
+      console.log('show search');
+      animating = false;
       animation(0, 1, 1.5);
     });
     eSubscribeEvent(eUpdateSearchState,updateSearchState)
     return () => {
       eUnSubscribeEvent(eScrollEvent, onScroll);
       eUnSubscribeEvent('showSearch', () => {
+        animating = false;
         animation(0, 1, 1.5);
       });
       eUnSubscribeEvent(eUpdateSearchState,updateSearchState)

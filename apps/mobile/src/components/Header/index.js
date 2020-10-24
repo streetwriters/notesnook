@@ -1,23 +1,61 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {ActivityIndicator, Platform, StyleSheet, View} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useTracked} from '../../provider';
-import {eSendEvent} from '../../services/EventManager';
-import {useHideHeader} from '../../utils/Hooks';
+import {eSendEvent, eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
 import {dWidth} from '../../utils';
 import {ActionIcon} from '../ActionIcon';
 import {HeaderMenu} from './HeaderMenu';
 import {HeaderTitle} from './HeaderTitle';
 import {SIZE} from "../../utils/SizeUtils";
 import {HeaderLeftMenu} from "./HeaderLeftMenu";
+import { eScrollEvent } from '../../utils/Events';
 
+let timeout = null;
 export const Header = ({showSearch, root}) => {
   const [state, ] = useTracked();
   const {colors, syncing} = state;
-
   const insets = useSafeAreaInsets();
-  const hideHeader = useHideHeader();
+  const [hideHeader,setHideHeader] = useState(false);
+
+  const {
+    searchResults,
+  } = state;
+  let offsetY = 0;
+
+
+  const onScroll = (y) => {
+    if (searchResults.results.length > 0) return;
+    if (y < 30) {
+      setHideHeader(false);
+      offsetY = y;
+    }
+    if (y > offsetY) {
+      if (y - offsetY < 100) return;
+      clearTimeout(timeout);
+      timeout = null;
+      timeout = setTimeout(() => {
+        setHideHeader(true);
+      }, 300);
+      offsetY = y;
+    } else {
+      if (offsetY - y < 50) return;
+      clearTimeout(timeout);
+      timeout = null;
+      timeout = setTimeout(() => {
+        setHideHeader(false);
+      }, 300);
+      offsetY = y;
+    }
+  };
+
+  useEffect(() => {
+    eSubscribeEvent(eScrollEvent, onScroll);
+    return () => {
+      eUnSubscribeEvent(eScrollEvent, onScroll);
+    };
+  }, []);
 
   return (
     <View
