@@ -45,29 +45,48 @@ const RestoreDialog = () => {
     setVisible(false);
   };
 
+  const restore = async () => {
+    
+      if (Platform.OS === 'android') {
+        let granted = storage.requestPermission();
+        if (!granted) {
+          ToastEvent.show('Restore Failed! Storage access denied');
+          return;
+        }
+      }
+      setRestoring(true);
+      let backup = await RNFetchBlob.fs.readFile(
+        'file:/' + item.path,
+        'utf8',
+      );
+      await db.backup.import(backup);
+      await sleep(2000);
+      setRestoring(false);
+      dispatch({type: Actions.ALL});
+      ToastEvent.show('Restore Complete!', 'success');
+      setVisible(false);
+
+  }
+
+ const checkBackups = async () => {
+  if (Platform.OS === "android") {
+    let granted = await storage.requestPermission();
+    if (!granted) {
+      ToastEvent.show('Storage permission required to check for backups.');
+      return;
+    }
+  }
+  let path = await storage.checkAndCreateDir('/backups/');
+  let files = await RNFetchBlob.fs.lstat(path);
+  console.log(files);
+  setFiles(files);
+ } 
+
   return (
     <BaseDialog
       animation="slide"
       visible={visible}
-      onShow={async () => {
-        if (Platform.OS === "android") {
-          let granted = await storage.requestPermission();
-          if (!granted) {
-            ToastEvent.show('Storage permission required to check for backups.');
-            return;
-          }
-        }
-      
-        let path =
-          Platform.OS === 'ios'
-            ? RNFetchBlob.fs.dirs.DocumentDir + "/backups/'"
-            : RNFetchBlob.fs.dirs.SDCardDir + '/Notesnook/backups/';
-
-        await storage.checkAndCreateDir(path);
-        let files = await RNFetchBlob.fs.lstat(path);
-        console.log(files);
-        setFiles(files);
-      }}
+      onShow={checkBackups}
       onRequestClose={close}>
       <View
         style={{
@@ -212,28 +231,7 @@ const RestoreDialog = () => {
                 title="Restore"
                 width={80}
                 height={30}
-                onPress={async () => {
-                  if (Platform.OS === 'android') {
-                    let granted = storage.requestPermission();
-                    if (!granted) {
-                      ToastEvent.show('Restore Failed! Storage access denied');
-                      return;
-                    }
-                  }
-
-                 
-                  setRestoring(true);
-                  let backup = await RNFetchBlob.fs.readFile(
-                    'file:/' + item.path,
-                    'utf8',
-                  );
-                  await db.backup.import(backup);
-                  await sleep(2000);
-                  setRestoring(false);
-                  dispatch({type: Actions.ALL});
-                  ToastEvent.show('Restore Complete!', 'success');
-                  setVisible(false);
-                }}
+                onPress={restore}
               />
             </View>
           )}

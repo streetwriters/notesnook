@@ -6,8 +6,6 @@ import he from "he";
 import RNHTMLtoPDF from "react-native-html-to-pdf";
 import Storage from "../utils/Storage";
 
-const dirs = RNFetchBlob.fs.dirs;
-
 export async function saveToPDF(note) {
     let androidSavePath = '/Notesnook/exported/PDF';
     if (Platform.OS === 'android') {
@@ -16,10 +14,9 @@ export async function saveToPDF(note) {
             ToastEvent.show('Failed to get storage permission');
             return null;
         }
-    } else {
-        await Storage.checkAndCreateDir (dirs.DocumentDir + '/exported/PDF/');
-    }
-
+    } 
+    
+    await Storage.checkAndCreateDir ('/exported/PDF/');
     let html = await db.notes.note(note).export('html');
 
     html = he.decode(html);
@@ -39,15 +36,11 @@ export async function saveToPDF(note) {
 }
 
 export async function saveToMarkdown(note) {
-    let savePath =
-        Platform.OS === 'ios'
-            ? dirs.DocumentDir + '/exported/Markdown/'
-            : dirs.SDCardDir + '/Notesnook/exported/Markdown/';
-
-    await Storage.checkAndCreateDir(savePath);
+    
+    let path = await Storage.checkAndCreateDir('/exported/Markdown/');
     let markdown = await db.notes.note(note.id).export('md');
 
-    let path = savePath + note.title + '.md';
+    path = path + note.title + '.md';
     await RNFetchBlob.fs.writeFile(path, markdown, 'utf8');
 
     return {
@@ -58,14 +51,10 @@ export async function saveToMarkdown(note) {
 }
 
 export async function saveToText(note) {
-    let savePath =
-        Platform.OS === 'ios'
-            ? dirs.DocumentDir + '/exported/Text/'
-            : dirs.SDCardDir + '/Notesnook/exported/Text/';
-    await Storage.checkAndCreateDir(savePath);
+    
+    let path = await Storage.checkAndCreateDir('/exported/Text/');
     let markdown = await db.notes.note(note.id).export('txt');
-
-    let path = savePath + note.title + '.txt';
+    path = path + note.title + '.txt';
     await RNFetchBlob.fs.writeFile(path, markdown, 'utf8');
 
     return {
@@ -76,14 +65,10 @@ export async function saveToText(note) {
 }
 
 export async function saveToHTML(note) {
-    let savePath =
-        Platform.OS === 'ios'
-            ? dirs.DocumentDir + '/exported/Html/'
-            : dirs.SDCardDir + '/Notesnook/exported/Html/';
-    await Storage.checkAndCreateDir(savePath);
+   
+    let path = await Storage.checkAndCreateDir('/exported/Html/');
     let markdown = await db.notes.note(note.id).export('html');
-
-    let path = savePath + note.title + '.html';
+    path = path + note.title + '.html';
     await RNFetchBlob.fs.writeFile(path, markdown, 'utf8');
 
     return {

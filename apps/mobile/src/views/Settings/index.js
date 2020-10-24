@@ -123,11 +123,10 @@ export const Settings = ({ navigation}) => {
             return;
           }
         }
-
         eSendEvent(eOpenProgressDialog, {
           title: 'Backing up your data',
           paragraph:
-            "All your backups are stored in 'Phone Storage/Notesnook/backups' folder",
+            "All your backups are stored in 'Phone Storage/Notesnook/backups/' folder",
         });
         let backup;
         try {
@@ -138,18 +137,11 @@ export const Settings = ({ navigation}) => {
 
         let backupName =
           'notesnook_backup_' + new Date().toString() + '.nnbackup';
-        let path =
-          Platform.OS === 'ios'
-            ? RNFetchBlob.fs.dirs.DocumentDir + "/backups/'"
-            : RNFetchBlob.fs.dirs.SDCardDir + '/Notesnook/backups/';
-        console.log('HERE');
-        await storage.checkAndCreateDir(path);
+        let path = await storage.checkAndCreateDir('/backups/');
         await RNFetchBlob.fs.writeFile(path + backupName, backup, 'utf8');
-
         await sleep(2000);
         eSendEvent(eCloseProgressDialog);
         ToastEvent.show('Backup complete!', 'success');
-        //Linking.openURL('https://www.notesnook.com/privacy.html');
       },
       desc: 'Backup all your data to phone storage',
     },

@@ -3,6 +3,7 @@ import {eSendEvent} from '../services/EventManager';
 import {updateEvent} from '../components/DialogManager/recievers';
 import {Actions} from '../provider/Actions';
 import {MMKV} from "./MMKV";
+import RNFetchBlob from 'rn-fetch-blob';
 
 export async function setSetting(settings, name, value) {
   let s = {...settings};
@@ -11,6 +12,11 @@ export async function setSetting(settings, name, value) {
 
   updateEvent({type: Actions.SETTINGS, settings: s});
 }
+
+export const dirs = RNFetchBlob.fs.dirs;
+export const ANDROID_PATH  = dirs.SDCardDir + '/Notesnook/';
+export const IOS_PATH = dirs.DocumentDir;
+
 
 export const getElevation = (elevation) => {
   return {

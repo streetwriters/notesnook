@@ -4,6 +4,8 @@ import Sodium from 'react-native-sodium';
 import RNFetchBlob from 'rn-fetch-blob';
 import {PERMISSIONS, requestMultiple, RESULTS} from "react-native-permissions";
 import {MMKV} from "./MMKV";
+import { Platform } from "react-native";
+import { ANDROID_PATH, IOS_PATH } from ".";
 
 async function read(key, isArray = false) {
   let data;
@@ -97,7 +99,10 @@ async function requestPermission() {
   return granted;
 }
 
-async function checkAndCreateDir(dir) {
+
+
+async function checkAndCreateDir(path) {
+  let dir = Platform.OS === "ios"? IOS_PATH + path : ANDROID_PATH + path;
   try {
     let exists = await RNFetchBlob.fs.exists(dir);
     let isDir = await RNFetchBlob.fs.isDir(dir);
