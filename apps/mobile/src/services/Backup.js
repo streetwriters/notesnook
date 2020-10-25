@@ -1,6 +1,6 @@
 const {MMKV} = require('../utils/MMKV');
 import RNFetchBlob from 'rn-fetch-blob';
-import storage from '../../utils/storage';
+import storage from '../utils/storage';
 import {db} from '../utils/DB';
 
 async function run() {
