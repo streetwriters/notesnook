@@ -26,5 +26,6 @@ export const Actions = {
   CONTAINER_STATE: 'containerState',
   CONTAINER_BOTTOM_BUTTON:'containerBottomButton',
   HEADER_VERTICAL_MENU:'verticalMenu',
-  HEADER_TEXT_STATE:'headerTextState'
+  HEADER_TEXT_STATE:'headerTextState',
+  MESSAGE_BOARD_STATE:'messageBoardState'
 };

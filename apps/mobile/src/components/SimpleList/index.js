@@ -325,7 +325,7 @@ const MessageCard = ({data}) => {
                   : colors.accent,
                 fontSize: SIZE.xxs,
               }}>
-              {messageBoardState.data.actionText}
+              {messageBoardState.actionText}
             </Text>
           </View>
         </PressableButton>

@@ -241,6 +241,12 @@ export const reducer = (state, action) => {
             containerBottomButton: containerBottomButton,
           };
     }
+    case Actions.MESSAGE_BOARD_STATE: {
+      return {
+        ...state,
+        messageBoardState:action.state
+      }
+    }
     default:
       throw new Error('unknown action type');
   }

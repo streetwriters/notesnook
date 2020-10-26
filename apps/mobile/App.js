@@ -28,6 +28,7 @@ import {db} from './src/utils/DB';
 import {DDS} from './src/services/DeviceDetection';
 import {MMKV} from './src/utils/mmkv';
 import Backup from './src/services/Backup';
+import { setLoginMessage } from './src/services/Message';
 
 let firstLoad = true;
 let note = null;
@@ -160,6 +161,8 @@ const App = () => {
         if (user) {
           dispatch({type: Actions.USER, user: user});
           await startSyncer();
+        } else {
+          setLoginMessage(dispatch);
         }
         dispatch({type: Actions.ALL});
         setInit(true);
