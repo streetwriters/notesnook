@@ -27,7 +27,7 @@ function onTitleChange() {
     }
 
     if (titleMessage && typeof titleMessage.value === 'string') {
-        window.ReactNativeWebView.postMessage(JSON.stringify(titleMessage));
+        //window.ReactNativeWebView.postMessage(JSON.stringify(titleMessage));
     }
 }
 
@@ -36,7 +36,7 @@ function attachEditorListeners() {
 
     editor.once('text-change', function () {
 
-        window.ReactNativeWebView.postMessage("loaded");
+        //window.ReactNativeWebView.postMessage("loaded");
         let text = editor.getText();
         document.getElementById("infowords").innerText = text.split(' ').length + ' words';
 
@@ -161,6 +161,17 @@ function attachEditorListeners() {
         return whiteSpace;
     }
 
+    editor.on("selection-change", function(evt) {
+        console.log(evt);
+        var bounds = editor.getBounds(evt.index, evt.index);
+        console.log(bounds)
+        setTimeout(() => {
+            document.querySelector(".app-main").scrollTo({top:bounds.top,behavior:"smooth"})
+        },250)
+    
+    });
+    
+
 
     editor.on('text-change', function (delta, oldDelta, source) {
         var regex = /https?:\/\/[^\s]+$/;
@@ -201,7 +212,7 @@ function attachEditorListeners() {
         document.getElementById("infowords").innerText = m.text.split(' ').length + ' words';
         m.html = editor.root.innerHTML;
         m.type = 'content';
-        window.ReactNativeWebView.postMessage(JSON.stringify(m));
+        //window.ReactNativeWebView.postMessage(JSON.stringify(m));
 
     });
 }

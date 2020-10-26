@@ -5,6 +5,7 @@
     <link href="fonts.css" rel="stylesheet">
     <link href="styles.css" rel="stylesheet">
     <style>
+            
         .ql-toolbar {
             overflow-x: auto;
             width: 100vw;
@@ -18,24 +19,27 @@
     </style>
 </head>
 
-<body class="app-body">
+<body  class="app-body" >
+<div class="app-main">
+
 
 <div id="titlebar">
     <form id="formBox">
         <input id="titleInput" placeholder="Title here"/>
-        <div class="info-bar">
-            <p id="infowords"></p>
-            <p>•</p>
-            <p id="infodate"></p>
-            <p>•</p>
-            <p id="infosaved"></p>
-        </div>
     </form>
+    <div class="info-bar">
+        <p id="infowords"></p>
+        <p>•</p>
+        <p id="infodate"></p>
+        <p>•</p>
+        <p id="infosaved"></p>
+    </div>
 </div>
 
 <div id="editor"></div>
+</div>
 <div id="toolbar"></div>
-
+</div>
 </body>
 <script src="constants.js"></script>
 <script src="listeners.js"></script>
@@ -80,6 +84,7 @@
         fixDropdownMenuLocations();
 
     }
+    loadAction(true);
 </script>
 
 

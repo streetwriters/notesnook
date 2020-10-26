@@ -38,8 +38,8 @@
 .ql-editor {
     box-sizing: border-box;
     line-height: 1.42;
+    height: auto;
     outline: none;
-    height:100%;
     overflow-y: hidden;
     padding: 12px 12px;
     tab-size: 4;
@@ -47,7 +47,7 @@
     text-align: left;
     white-space: pre-wrap;
     word-wrap: break-word;
-}
+  }
 
 .ql-editor>* {
     cursor: text;
@@ -1061,8 +1061,8 @@
     display: flex;
     color: gray;
     font-size: 11px;
-    position: absolute;
     margin-top: -18px;
+    height:20px;
     font-family: 'DM Sans';
 }
 
@@ -1086,8 +1086,9 @@
 
 .app-body {
     margin: 0px;
-    overflow:auto;
-
+}
+.app-main {
+    overflow: auto;
 }
 
 .floating-toolbar {
@@ -1099,5 +1100,5 @@
 
 #editor {
     border: hidden !important;
-
+  
 }
