@@ -55,6 +55,7 @@ export const Notes = ({route, navigation}) => {
   }, []);
 
   const init = (data) => {
+    console.log('refreshing notes!');
     params = route.params;
     if (data) {
       params = data;

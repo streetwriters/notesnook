@@ -9,14 +9,12 @@ export async function setSetting(settings, name, value) {
   let s = {...settings};
   s[name] = value;
   await MMKV.setStringAsync('settings', JSON.stringify(s));
-
   updateEvent({type: Actions.SETTINGS, settings: s});
 }
 
 export const dirs = RNFetchBlob.fs.dirs;
 export const ANDROID_PATH  = dirs.SDCardDir + '/Notesnook/';
 export const IOS_PATH = dirs.DocumentDir;
-
 
 export const getElevation = (elevation) => {
   return {
@@ -44,8 +42,6 @@ export const selection = {
 export const history = {
   selectedItemsList: [],
 };
-
-
 
 export async function showContext(event, title) {
   eSendEvent('showContextMenu', {

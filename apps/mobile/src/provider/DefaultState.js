@@ -73,5 +73,13 @@ export const defaultState = {
     bottomButtonOnPress: () => {},
     bottomButtonText: 'Create a new note',
   },
+  messageBoardState: {
+    visible:false,
+    message:null,
+    actionText:null,
+    onPress:() => {},
+    data:{},
+    icon:'account-outline'
+  },
   keyword: [],
 };

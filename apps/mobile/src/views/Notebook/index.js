@@ -39,9 +39,8 @@ export const Notebook = ({route, navigation}) => {
     };
   }, []);
 
-  const onFocus = useCallback(() => {
+  const onFocus = () => {
     onLoad();
-
     dispatch({
       type: Actions.HEADER_TEXT_STATE,
       state: {
@@ -61,7 +60,7 @@ export const Notebook = ({route, navigation}) => {
       type: Actions.CURRENT_SCREEN,
       screen: 'notebook',
     });
-  }, []);
+  }
 
   useEffect(() => {
     navigation.addListener('focus', onFocus);

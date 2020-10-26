@@ -261,7 +261,7 @@ export async function saveNote(caller) {
             },
             id: id,
         });
-        if (!id) {
+        if (!id || saveCounter < 3) {
             updateEvent({
                 type: Actions.NOTES,
             });

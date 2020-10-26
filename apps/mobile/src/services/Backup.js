@@ -24,7 +24,7 @@ async function run() {
   await MMKV.setItem('backupDate', JSON.stringify(Date.now()));
   ToastEvent.show('Backup complete!', 'success');
   return path;
-}
+} 
 
 async function getLastBackupDate() {
   let date;
