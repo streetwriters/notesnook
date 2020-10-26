@@ -61,7 +61,6 @@
     "debug": "BROWSER=none react-scripts start",
     "test": "BROWSER= jest --runInBand -c jest.e2e.config.js",
     "eject": "react-scripts eject",
-    "sodium": "cd public && wget https://github.com/jedisct1/libsodium.js/raw/master/dist/browsers/sodium.js && cd ..",
     "update": "npm i @streetwriters/editor@latest @streetwriters/notesnook-core@latest @streetwriters/theme@latest"
   },
   "eslintConfig": {

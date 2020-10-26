@@ -37,7 +37,9 @@ function onMessage(ev) {
             sendMessage("load", {}, messageId);
           },
         };
-        importScripts("sodium.js");
+        importScripts(
+          "https://cdn.jsdelivr.net/gh/jedisct1/libsodium.js@0.7.8/dist/browsers/sodium.js"
+        );
         break;
       }
       default:
