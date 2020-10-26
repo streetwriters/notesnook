@@ -11,9 +11,10 @@ import {Toast} from '../../components/Toast';
 import {Actions} from '../../provider/Actions';
 import {useTracked} from '../../provider/index';
 import {
-    eSendEvent,
-    eSubscribeEvent,
-    eUnSubscribeEvent, ToastEvent,
+  eSendEvent,
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+  ToastEvent,
 } from '../../services/EventManager';
 import {
   eCloseLoginDialog,
@@ -27,11 +28,11 @@ import {
   validateUsername,
 } from '../../services/Validation';
 import {getElevation} from '../../utils';
-import { ActionIcon } from '../ActionIcon';
+import {ActionIcon} from '../ActionIcon';
 import {Loading} from '../Loading';
-import {opacity, ph, pv, SIZE, WEIGHT} from "../../utils/SizeUtils";
-import {db} from "../../utils/DB";
-import {DDS} from "../../services/DeviceDetection";
+import {opacity, ph, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
+import {db} from '../../utils/DB';
+import {DDS} from '../../services/DeviceDetection';
 
 const LoginDialog = () => {
   const [state, dispatch] = useTracked();
@@ -172,7 +173,7 @@ const LoginDialog = () => {
   };
 
   const signupUser = async () => {
-    if (!validateInfo) return;
+    if (!validateInfo()) return;
 
     setSigningIn(true);
     setStatus('Creating your account');
@@ -220,6 +221,7 @@ const LoginDialog = () => {
           alignSelf: 'center',
           justifyContent: 'center',
           alignItems: 'center',
+          overflow:"hidden"
         }}>
         {DDS.isTab ? (
           <TouchableOpacity
@@ -234,137 +236,156 @@ const LoginDialog = () => {
         ) : null}
         <View
           style={{
-            height: DDS.isTab && !DDS.isSmallTab
-              ? login
-                ? '70%'
-                : '80%'
-              : DDS.isSmallTab
-              ? login
-                ? '50%'
-                : '65%'
-              : '100%',
+            height:
+              DDS.isTab && !DDS.isSmallTab
+                ? login
+                  ? '70%'
+                  : '80%'
+                : DDS.isSmallTab
+                ? login
+                  ? '50%'
+                  : '65%'
+                : '100%',
             width: DDS.isTab ? 500 : '100%',
             backgroundColor: colors.bg,
             justifyContent: 'center',
             borderRadius: DDS.isTab ? 5 : 0,
             zIndex: 10,
-            ...getElevation(DDS.isTab?5  : 0),
+            ...getElevation(DDS.isTab ? 5 : 0),
           }}>
           <Toast context="local" />
           {loggingIn || signingIn ? (
-            modalVisible ? (
-              <View
+            <View
+              style={{
+                backgroundColor: !colors.night
+                  ? 'rgba(0,0,0,0.2)'
+                  : 'rgba(255,255,255,0.2)',
+                zIndex: 10,
+                position: 'absolute',
+                justifyContent: 'center',
+                alignItems: 'center',
+                width: '100%',
+                height: '100%',
+              }}>
+              <Loading
+                tagline={status}
+                customStyle={{
+                  alignSelf: 'center',
+                  backgroundColor: colors.bg,
+                  ...getElevation(5),
+                  borderRadius: 5,
+                  width: '80%',
+                  height: 100,
+                }}
+              />
+            </View>
+          ) : null}
+
+          {modalVisible ? (
+            <View
+              style={{
+                paddingHorizontal: 12,
+                width: '100%',
+                alignItems: 'center',
+              }}>
+              <Text
                 style={{
-                  paddingHorizontal: 12,
-                  width: '100%',
+                  fontFamily: WEIGHT.bold,
+                  fontSize: SIZE.xxxl,
+                  color: colors.accent,
+                }}>
+                Data Recovery Key
+              </Text>
+              <Text
+                style={{
+                  fontFamily: WEIGHT.regular,
+                  fontSize: SIZE.md,
+                  color: colors.icon,
+                  textAlign: 'center',
+                }}>
+                We cannot recover your data if you forget your password. You can
+                use this recovery key to get your data back if you lose your
+                password.
+              </Text>
+
+              <Text
+                style={{
+                  fontFamily: WEIGHT.regular,
+                  fontSize: SIZE.sm,
+                  maxWidth: '85%',
+                  marginTop: 25,
+                  marginBottom: 10,
+                  color: colors.pri,
+                }}>
+                Take a Sceenshot of this screen
+              </Text>
+              <QRCode value={key} size={200} bgColor="black" fgColor="white" />
+              <TouchableOpacity
+                activeOpacity={0.6}
+                onPress={() => {
+                  Clipboard.setString(key);
+                  ToastEvent.show('Recovery key copied!', 'success', 'local');
+                }}
+                style={{
+                  flexDirection: 'row',
+                  borderWidth: 1,
+                  borderRadius: 5,
+                  paddingVertical: 8,
+                  paddingHorizontal: 10,
+                  marginTop: 15,
                   alignItems: 'center',
+                  borderColor: colors.nav,
                 }}>
                 <Text
-                  style={{
-                    fontFamily: WEIGHT.bold,
-                    fontSize: SIZE.xxxl,
-                    color: colors.accent,
-                  }}>
-                  Data Recovery Key
-                </Text>
-                <Text
-                  style={{
-                    fontFamily: WEIGHT.regular,
-                    fontSize: SIZE.md,
-                    color: colors.icon,
-                    textAlign: 'center',
-                  }}>
-                  We cannot recover your data if you forget your password. You
-                  can use this recovery key to get your data back if you lose
-                  your password.
-                </Text>
-
-                <Text
+                  numberOfLines={2}
                   style={{
                     fontFamily: WEIGHT.regular,
                     fontSize: SIZE.sm,
-                    maxWidth: '85%',
-                    marginTop: 25,
-                    marginBottom: 10,
-                    color: colors.pri,
-                  }}>
-                  Take a Sceenshot of this screen
-                </Text>
-                <QRCode
-                  value={key}
-                  size={200}
-                  bgColor="black"
-                  fgColor="white"
-                />
-                <TouchableOpacity
-                  activeOpacity={0.6}
-                  onPress={() => {
-                    Clipboard.setString(key);
-                    ToastEvent.show('Recovery key copied!', 'success', 'local');
-                  }}
-                  style={{
-                    flexDirection: 'row',
-                    borderWidth: 1,
-                    borderRadius: 5,
-                    paddingVertical: 8,
-                    paddingHorizontal: 10,
-                    marginTop: 15,
-                    alignItems: 'center',
-                    borderColor: colors.nav,
-                  }}>
-                  <Text
-                    numberOfLines={2}
-                    style={{
-                      fontFamily: WEIGHT.regular,
-                      fontSize: SIZE.sm,
-                      width: '85%',
-                      maxWidth: '85%',
-                      paddingRight: 10,
-                      color: colors.pri,
-                    }}>
-                    {key}
-                  </Text>
-                  <Icon color={colors.accent} size={SIZE.lg} name="clipboard" />
-                </TouchableOpacity>
-                <Text
-                  style={{
-                    color: colors.pri,
-                    fontSize: SIZE.xs,
                     width: '85%',
                     maxWidth: '85%',
-                    textAlign: 'center',
+                    paddingRight: 10,
+                    color: colors.pri,
                   }}>
-                  You can get recovery key in settings on any device later.
+                  {key}
                 </Text>
-                <TouchableOpacity
-                  onPress={() => {
-                    close();
-                  }}
-                  activeOpacity={opacity}
+                <Icon color={colors.accent} size={SIZE.lg} name="clipboard" />
+              </TouchableOpacity>
+              <Text
+                style={{
+                  color: colors.pri,
+                  fontSize: SIZE.xs,
+                  width: '85%',
+                  maxWidth: '85%',
+                  textAlign: 'center',
+                }}>
+                You can get recovery key in settings on any device later.
+              </Text>
+              <TouchableOpacity
+                onPress={() => {
+                  close();
+                }}
+                activeOpacity={opacity}
+                style={{
+                  ...getElevation(5),
+                  paddingVertical: pv + 5,
+                  paddingHorizontal: ph,
+                  borderRadius: 5,
+                  width: '90%',
+                  marginTop: 20,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  backgroundColor: colors.accent,
+                }}>
+                <Text
                   style={{
-                    ...getElevation(5),
-                    paddingVertical: pv + 5,
-                    paddingHorizontal: ph,
-                    borderRadius: 5,
-                    width: '90%',
-                    marginTop: 20,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    backgroundColor: colors.accent,
+                    fontFamily: WEIGHT.medium,
+                    color: 'white',
+                    fontSize: SIZE.sm,
                   }}>
-                  <Text
-                    style={{
-                      fontFamily: WEIGHT.medium,
-                      color: 'white',
-                      fontSize: SIZE.sm,
-                    }}>
-                    I have saved the key
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            ) : (
-              <Loading tagline={status} />
-            )
+                  I have saved the key
+                </Text>
+              </TouchableOpacity>
+            </View>
           ) : (
             <>
               {DDS.isTab ? null : (
@@ -381,8 +402,8 @@ const LoginDialog = () => {
                     position: 'absolute',
                     top: 0,
                     marginBottom: 15,
-                    zIndex:10,
-                    left:0
+                    zIndex: 10,
+                    left: 0,
                   }}
                   color={colors.heading}
                 />
@@ -797,7 +818,6 @@ const LoginDialog = () => {
                     style={{
                       flexDirection: 'row',
                       width: '100%',
-                      alignItems: 'center',
                     }}>
                     <CheckBox
                       onValueChange={(value) => {
@@ -809,10 +829,11 @@ const LoginDialog = () => {
                     />
                     <Text
                       style={{
-                        fontSize: SIZE.xs + 1,
+                        fontSize: SIZE.xs,
                         fontFamily: WEIGHT.regular,
                         color: colors.pri,
                         maxWidth: '90%',
+                        marginTop: 5,
                       }}>
                       By signing up you agree to our{' '}
                       <Text
@@ -847,8 +868,6 @@ const LoginDialog = () => {
 
                 <TouchableOpacity
                   onPress={() => {
-                    ToastEvent.show('hello world', 'error', 'local');
-
                     setLogin(!login);
                   }}
                   activeOpacity={opacity}

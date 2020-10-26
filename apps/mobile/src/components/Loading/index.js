@@ -10,12 +10,13 @@ export const Loading = ({
   done = false,
   doneText = 'Action completed successfully!',
   onDone = () => {},
+  customStyle ={}
 }) => {
   const [state, dispatch] = useTracked();
   const {colors, tags, premiumUser} = state;
 
   return (
-    <View style={[{height: height}, styles.activityContainer]}>
+    <View style={[{height: height}, styles.activityContainer,  customStyle]}>
       {done ? (
         <>
           <Text

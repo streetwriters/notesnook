@@ -199,8 +199,8 @@ const SimpleList = ({
             ? 130
             : 130 - 60
           : listData[0] && !selectionMode
-          ? 150 - initialWindowMetrics.insets.top
-          : (150 - initialWindowMetrics.insets.top) - 60,
+          ? 155 - initialWindowMetrics.insets.top
+          : (155 - initialWindowMetrics.insets.top) - 60,
     };
   }, [selectionMode, listData, colors]);
 
