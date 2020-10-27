@@ -70,6 +70,7 @@ export const Home = ({navigation}) => {
   }, [notes]);
 
   const _onPressBottomButton = async () => {
+  
     eSendEvent(eOnLoadNote, {type: 'new'});
 
     if (DDS.isPhone || DDS.isSmallTab) {

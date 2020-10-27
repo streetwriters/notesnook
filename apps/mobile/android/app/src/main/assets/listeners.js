@@ -163,6 +163,7 @@ function attachEditorListeners() {
 
     editor.on("selection-change", function(evt) {
         console.log(evt);
+        if (evt.length > 0) return;
         var bounds = editor.getBounds(evt.index, evt.index);
         console.log(bounds)
         setTimeout(() => {

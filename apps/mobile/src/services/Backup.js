@@ -2,6 +2,7 @@ const {MMKV} = require('../utils/MMKV');
 import RNFetchBlob from 'rn-fetch-blob';
 import storage from '../utils/storage';
 import {db} from '../utils/DB';
+import { ToastEvent } from './EventManager';
 
 async function run() {
   if (Platform.OS === 'android') {
@@ -27,13 +28,7 @@ async function run() {
 } 
 
 async function getLastBackupDate() {
-  let date;
-  try {
-    date = await MMKV.getItem('backupDate');
-  } catch (e) {
-    date = 'never';
-  }
-  return date;
+  return await MMKV.getItem('backupDate');
 }
 const MS_DAY = 86400000;
 const MS_WEEK = MS_DAY * 7;

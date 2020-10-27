@@ -9,4 +9,4 @@ export const db = new Database(
     Storage,
     Platform.OS === 'ios' ? EventSource : AndroidEventSource,
 );
-db.host("https://192.168.10.8:5000")
+db.host("https://api.notesnook.com")

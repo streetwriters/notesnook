@@ -66,11 +66,7 @@ const App = () => {
 
   const updateTheme = async () => {
     let settings;
-    try {
       settings = await MMKV.getStringAsync('settings');
-    } catch (e) {
-      console.log(e.message);
-    } finally {
       if (settings) {
         settings = JSON.parse(settings);
         if (settings.useSystemTheme) {
@@ -78,7 +74,6 @@ const App = () => {
           dispatch({type: Actions.THEME, colors: newColors});
         }
       }
-    }
   };
 
   useEffect(() => {
@@ -155,32 +150,42 @@ const App = () => {
       try {
         await db.init();
         user = await db.user.get();
-      } catch (e) {
-        error = e;
-      } finally {
         if (user) {
           dispatch({type: Actions.USER, user: user});
           await startSyncer();
-        } else {
+        } 
+      } catch (e) {
+        error = e;
+        console.log(e)
+      } 
+        if (!user || !user.id) {
           setLoginMessage(dispatch);
         }
         dispatch({type: Actions.ALL});
         setInit(true);
-        sleep(1000).then(async () => {
-          settings = await MMKV.getStringAsync('settings');
-          settings = JSON.parse(settings);
-          if (await Backup.checkBackupRequired(settings.reminder)) {
-            await Backup.run();
-          }
-        });
+        backupData();
+
         if (error) {
           setTimeout(() => {
             ToastEvent.show(error.message);
           }, 500);
         }
-      }
+    
     });
   }, []);
+
+  async function backupData() {
+      await sleep(1000)
+      settings = await MMKV.getStringAsync('settings');
+      settings = JSON.parse(settings);
+      if (await Backup.checkBackupRequired(settings.reminder) ) {
+        try {
+          await Backup.run();
+        } catch(e) {
+          console.log(e);
+        }
+      }
+  }
 
   async function Initialize() {
     let settings;
@@ -195,25 +200,21 @@ const App = () => {
       }
       firstLoad = false;
     }
-
-    try {
       settings = await MMKV.getStringAsync('settings');
-      settings = JSON.parse(settings);
-
+      console.log('settings',settings)
+      if (!settings) {
+        settings = defaultState.settings;
+        await MMKV.setStringAsync('settings', JSON.stringify(settings));
+      } else {
+        settings = JSON.parse(settings);
+      }
       if (settings.fontScale) {
         scale.fontScale = settings.fontScale;
       }
-      updateSize();
-    } catch (e) {
-      if (!settings || !settings.includes('fontScale')) {
-        settings = defaultState.settings;
-        await MMKV.setStringAsync('settings', JSON.stringify(settings));
-      }
-    } finally {
-      let newColors = await getColorScheme(settings.useSystemTheme);
       dispatch({type: Actions.SETTINGS, settings: {...settings}});
-      dispatch({type: Actions.THEME, colors: newColors});
-    }
+      updateSize();
+      await updateTheme();
+   
   }
 
   if (!init) {

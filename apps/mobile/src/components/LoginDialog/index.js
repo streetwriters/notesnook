@@ -122,7 +122,7 @@ const LoginDialog = () => {
     try {
       let user = await db.user.get();
       if (!user) throw new Error('Username or password incorrect');
-      setStatus('Syncing your notes');
+    setStatus('Syncing your notes');
       dispatch({type: Actions.USER, user: user});
       dispatch({type: Actions.SYNCING, syncing: true});
       await db.sync();

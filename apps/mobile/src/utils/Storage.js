@@ -8,17 +8,15 @@ import { Platform } from "react-native";
 import { ANDROID_PATH, IOS_PATH } from ".";
 
 async function read(key, isArray = false) {
-  let data;
-
-  try {
-    data = await MMKV.getItem(key);
-  } catch (e) {}
+  let data = await MMKV.getItem(key);
   if (!data) return null;
   try {
     data = JSON.parse(data);
 
     data = isArray ? [...data] : data;
-  } catch (e) {}
+  } catch (e) {
+    
+  }
 
   return data;
 }
