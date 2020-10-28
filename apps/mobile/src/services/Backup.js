@@ -2,7 +2,10 @@ const {MMKV} = require('../utils/MMKV');
 import RNFetchBlob from 'rn-fetch-blob';
 import storage from '../utils/storage';
 import {db} from '../utils/DB';
-import { ToastEvent } from './EventManager';
+import {ToastEvent} from './EventManager';
+
+const MS_DAY = 86400000;
+const MS_WEEK = MS_DAY * 7;
 
 async function run() {
   if (Platform.OS === 'android') {
@@ -13,25 +16,31 @@ async function run() {
     }
   }
   let backup;
+  let error;
   try {
-    backup = await db.backup.export();
+    backup = await db.backup.export('mobile');
   } catch (e) {
     console.log('error', e);
+    error = true;
   }
-
-  let backupName = 'notesnook_backup_' + new Date().toString() + '.nnbackup';
-  let path = await storage.checkAndCreateDir('/backups/');
-  await RNFetchBlob.fs.writeFile(path + backupName, backup, 'utf8');
-  await MMKV.setItem('backupDate', JSON.stringify(Date.now()));
-  ToastEvent.show('Backup complete!', 'success');
-  return path;
-} 
+  if (!error) {
+    let backupName = 'notesnook_backup_' + new Date().toString() + '.nnbackup';
+    let path = await storage.checkAndCreateDir('/backups/');
+    await RNFetchBlob.fs.writeFile(path + backupName, backup, 'utf8');
+    await MMKV.setItem('backupDate', JSON.stringify(Date.now()));
+    setTimeout(() => {
+      ToastEvent.show('Backup complete!', 'success');
+    }, 1000);
+    return path;
+  } else {
+    ToastEvent.show('Backup failed!', 'success');
+    return null;
+  }
+}
 
 async function getLastBackupDate() {
   return await MMKV.getItem('backupDate');
 }
-const MS_DAY = 86400000;
-const MS_WEEK = MS_DAY * 7;
 
 async function checkBackupRequired(type) {
   let now = Date.now();
