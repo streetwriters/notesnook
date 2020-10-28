@@ -211,7 +211,7 @@ export const Settings = ({navigation}) => {
         style={{
           paddingHorizontal: 0,
         }}>
-        {user && user.Id ? (
+        {user ? (
           <>
             <View
               style={{
@@ -267,19 +267,19 @@ export const Settings = ({navigation}) => {
                         fontFamily: WEIGHT.regular,
                         fontSize: SIZE.xs,
                       }}>
-                      {user.notesnook.subscription.isTrial ? 'Trial' : 'Pro'}
+                      {user.subscription.isTrial ? 'Trial' : 'Pro'}
                     </Text>
                   </View>
                 </View>
                 <Seperator />
                 <View>
-                  {user.notesnook.subscription.isTrial ? (
+                  {user.subscription.isTrial ? (
                     <Text
                       style={{
                         color:
                           getTimeLeft(
-                            user.notesnook.subscription.start,
-                            user.notesnook.subscription.expiry,
+                            user.subscription.start,
+                            user.subscription.expiry,
                           ) > 5
                             ? colors.pri
                             : colors.errorText,
@@ -287,8 +287,8 @@ export const Settings = ({navigation}) => {
                         fontSize: SIZE.xxl,
                       }}>
                       {getTimeLeft(
-                        user.notesnook.subscription.start,
-                        user.notesnook.subscription.expiry,
+                        user.subscription.start,
+                        user.subscription.expiry,
                       ) + ' Days Remaining'}
                     </Text>
                   ) : null}
@@ -739,7 +739,7 @@ export const Settings = ({navigation}) => {
           title="Encrypted Backups"
           tagline="Encrypt your data before backup"
           onPress={async () => {
-            if (!user || !user.id) {
+            if (user) {
               ToastEvent.show(
                 'You must login to enable encryption',
                 'error',

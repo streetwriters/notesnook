@@ -40,7 +40,7 @@ class RecoveryKeyDialog extends React.Component {
 
   close = () => {
     this.actionSheetRef.current?._setModalVisible(false);
-    if (!this.signup) {
+    if (this.signup) {
       setTimeout(() => {
         eSendEvent(eOpenResultDialog, {
           title: 'Welcome!',

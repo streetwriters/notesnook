@@ -15,7 +15,7 @@ export const defaultState = {
   },
   tags: [],
   colorNotes: [],
-  user: {},
+  user: null,
   premiumUser:true,
   settings: {
     showToolbarOnTop: false,

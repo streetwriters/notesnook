@@ -34,7 +34,7 @@ import {Loading} from '../Loading';
 import {opacity, ph, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
 import {db} from '../../utils/DB';
 import {DDS} from '../../services/DeviceDetection';
-import { sleep } from '../../utils/TimeUtils';
+import {sleep} from '../../utils/TimeUtils';
 
 const LoginDialog = () => {
   const [state, dispatch] = useTracked();
@@ -121,10 +121,9 @@ const LoginDialog = () => {
 
     try {
       let user = await db.user.get();
-      if (!user) throw new Error('Username or password incorrect');
+      if (!user) throw new Error('Username or passoword incorrect!');
       setStatus('Syncing your notes');
       dispatch({type: Actions.USER, user: user});
-      dispatch({type: Actions.SYNCING, syncing: true});
       await db.sync();
       eSendEvent(eStartSyncer);
       dispatch({type: Actions.ALL});
@@ -134,7 +133,6 @@ const LoginDialog = () => {
     } catch (e) {
       ToastEvent.show(e.message, 'error', 'local');
     } finally {
-      dispatch({type: Actions.SYNCING, syncing: false});
       setLoggingIn(false);
     }
   };
@@ -191,14 +189,12 @@ const LoginDialog = () => {
     let user;
     try {
       user = await db.user.get();
-      let k = await db.user.key();
-      setKey(k.key);
       setStatus('Setting up crenditials');
       dispatch({type: Actions.USER, user: user});
       eSendEvent(eStartSyncer);
       close();
       await sleep(500);
-      eSendEvent(eOpenRecoveryKeyDialog);
+      eSendEvent(eOpenRecoveryKeyDialog, true);
     } catch (e) {
       setFailed(true);
       ToastEvent.show('Login Failed, try again', 'error', 'local');

@@ -579,7 +579,7 @@ export const ActionSheetComponent = ({
     ) : null;
 
   const onPressSync = async () => {
-    if (!user || !user.Id) {
+    if (!user) {
       ToastEvent.show(
         'You must login to sync',
         'error',

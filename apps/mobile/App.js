@@ -154,7 +154,7 @@ const App = () => {
         error = e;
         console.log(e);
       }
-      if (!user || !user.id) {
+      if (!user) {
         setLoginMessage(dispatch);
       }
       dispatch({type: Actions.ALL});
