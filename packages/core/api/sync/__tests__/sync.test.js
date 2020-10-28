@@ -35,7 +35,7 @@ test("sync without merge conflicts, cause merge conflicts, resolve them and then
     await db.sync();
 
     const user = await db.user.get();
-    expect(user.notesnook.lastSynced).toBeGreaterThan(0);
+    expect(user.lastSynced).toBeGreaterThan(0);
 
     /////// CAUSE MERGE CONFLICT! ///////
     // 4. edit the note's content

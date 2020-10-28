@@ -109,7 +109,7 @@ class Database {
       switch (type) {
         case "upgrade":
           await this.user.set({
-            notesnook: { ...user.notesnook, subscription: data },
+            subscription: data,
           });
           this.ev.publish("user:upgraded", data);
           break;

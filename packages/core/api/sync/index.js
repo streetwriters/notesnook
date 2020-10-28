@@ -61,7 +61,7 @@ export default class Sync {
     await this._db.conflicts.recalculate();
     await this._db.conflicts.check();
 
-    let lastSynced = user.notesnook.lastSynced || 0;
+    let lastSynced = user.lastSynced || 0;
 
     return { user, lastSynced, token };
   }
