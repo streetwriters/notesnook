@@ -50,7 +50,6 @@ import {
 } from './Functions';
 import {normalize} from '../../utils/SizeUtils';
 import {DDS} from '../../services/DeviceDetection';
-import {sleep} from '../../utils/TimeUtils';
 
 let handleBack;
 let tapCount = 0;
@@ -113,9 +112,7 @@ const Editor = ({noMenu}) => {
     console.log('loading new note');
     await loadNote(item);
     if (item.type === 'new') {
-      await sleep(500);
       textInput.current?.focus();
-      await sleep(300);
       post('focusTitle');
       Platform.OS === 'android' ? EditorWebView.current?.requestFocus() : null;
     }
@@ -186,7 +183,11 @@ const Editor = ({noMenu}) => {
         flexDirection: 'row',
         justifyContent: 'space-between',
       }}>
-      <TextInput ref={textInput} style={{height: 1,padding:0,width:1,position:"absolute"}} blurOnSubmit={false} />
+      <TextInput
+        ref={textInput}
+        style={{height: 1, padding: 0, width: 1, position: 'absolute'}}
+        blurOnSubmit={false}
+      />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : null}
         style={{
