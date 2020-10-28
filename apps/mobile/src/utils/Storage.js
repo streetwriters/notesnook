@@ -96,9 +96,6 @@ async function requestPermission() {
   }
   return granted;
 }
-
-
-
 async function checkAndCreateDir(path) {
   let dir = Platform.OS === "ios"? IOS_PATH + path : ANDROID_PATH + path;
   try {

@@ -43,6 +43,7 @@ import {VaultDialog} from '../VaultDialog';
 import {TEMPLATE_DELETE, TEMPLATE_PERMANANT_DELETE} from './Templates';
 import {hexToRGBA} from "../../utils/ColorUtils";
 import {DDS} from "../../services/DeviceDetection";
+import ResultDialog from '../ResultDialog';
 
 export class DialogManager extends Component {
   constructor(props) {
@@ -376,6 +377,8 @@ export class DialogManager extends Component {
         <ProgressDialog />
 
         <RestoreDialog/>
+
+        <ResultDialog/>
       </>
     );
   }

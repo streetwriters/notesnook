@@ -45,8 +45,6 @@ import {DDS} from '../../services/DeviceDetection';
 import {MMKV} from '../../utils/mmkv';
 import Backup from '../../services/Backup';
 
-
-
 export const Settings = ({navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors, user, settings} = state;
@@ -127,9 +125,10 @@ export const Settings = ({navigation}) => {
           paragraph:
             "All your backups are stored in 'Phone Storage/Notesnook/backups/' folder",
         });
-        await Backup.run();
-        await sleep(2000);
-        eSendEvent(eCloseProgressDialog);
+          await Backup.run();
+          await sleep(1000);
+          eSendEvent(eCloseProgressDialog);
+       
       },
       desc: 'Backup all your data to phone storage',
     },
@@ -305,9 +304,6 @@ export const Settings = ({navigation}) => {
                     height={40}
                   />
                 </View>
-                {
-                  // Ad code here
-                }
               </View>
             </View>
             {[
@@ -317,7 +313,7 @@ export const Settings = ({navigation}) => {
                   eSendEvent(eOpenRecoveryKeyDialog);
                 },
                 desc:
-                  'We recommend you to get your data recovery key and store it safely. If you lose your password, you can recover your data using your recovery key.',
+                  'Save your recovery key. If you lose your password, you can recover your data using your recovery key.',
               },
               {
                 name: 'Logout',

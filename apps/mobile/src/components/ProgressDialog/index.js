@@ -11,7 +11,7 @@ import {DDS} from "../../services/DeviceDetection";
 
 const ProgressDialog = () => {
   const [state, dispatch] = useTracked();
-  const {colors, tags, premiumUser} = state;
+  const {colors,} = state;
   const [visible, setVisible] = useState(false);
   const [dialogData, setDialogData] = useState({
     title: 'Loading',

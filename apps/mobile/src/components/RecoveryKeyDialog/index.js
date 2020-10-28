@@ -5,11 +5,12 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import RNFetchBlob from 'rn-fetch-blob';
 import {LOGO_BASE64} from '../../assets/images/assets';
 import {
+  eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
   ToastEvent,
 } from '../../services/EventManager';
-import {eOpenRecoveryKeyDialog} from '../../utils/Events';
+import {eOpenRecoveryKeyDialog, eOpenResultDialog} from '../../utils/Events';
 import {dWidth} from '../../utils';
 import ActionSheet from '../ActionSheet';
 import {Button} from '../Button';
@@ -27,14 +28,28 @@ class RecoveryKeyDialog extends React.Component {
     this.actionSheetRef = createRef();
     this.svg = createRef();
     this.user;
+    this.signup = false;
   }
 
-  open = () => {
+  open = (signup) => {
+    if (signup) {
+      this.signup = true;
+    }
     this.actionSheetRef.current?._setModalVisible(true);
   };
 
   close = () => {
     this.actionSheetRef.current?._setModalVisible(false);
+    if (!this.signup) {
+      setTimeout(() => {
+        eSendEvent(eOpenResultDialog, {
+          title: 'Welcome!',
+          paragraph: 'Your 14 day trial for Notesnook Pro is activated',
+          icon: 'checkbox-marked-circle',
+          button: 'Thank You!',
+        });
+      }, 500);
+    }
   };
   async componentDidMount() {
     eSubscribeEvent(eOpenRecoveryKeyDialog, this.open);
@@ -113,6 +128,7 @@ class RecoveryKeyDialog extends React.Component {
           alignSelf: 'center',
           borderRadius: 10,
         }}
+        closeOnTouchBackdrop={false}
         onOpen={this.onOpen}
         ref={this.actionSheetRef}
         initialOffsetFromBottom={1}>
@@ -233,7 +249,13 @@ class RecoveryKeyDialog extends React.Component {
               data or reset your password using this recovery key.
             </Text>
           </View>
-
+          <Seperator />
+          <Button
+            title="I have saved the key."
+            width="100%"
+            height={50}
+            onPress={this.close}
+          />
           <Toast context="local" />
         </View>
       </ActionSheet>
