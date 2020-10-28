@@ -9,7 +9,7 @@ import { showLogInDialog } from "../components/dialogs/logindialog";
 import { upgrade } from "../common/upgrade";
 import useSystemTheme from "../utils/use-system-theme";
 import download from "../utils/download";
-import { db } from "../common";
+import { db, SUBSCRIPTION_STATUS } from "../common";
 import { usePersistentState } from "../utils/hooks";
 
 function importBackup() {
@@ -54,7 +54,7 @@ function Settings(props) {
   const user = useUserStore((store) => store.user);
   const isLoggedIn = useUserStore((store) => store.isLoggedIn);
   const isTrial = useUserStore(
-    (store) => store?.user?.notesnook?.subscription?.isTrial
+    (store) => store?.user?.subscription?.status === SUBSCRIPTION_STATUS.TRIAL
   );
   const logout = useUserStore((store) => store.logout);
   const [backupReminderOffset, setBackupReminderOffset] = usePersistentState(

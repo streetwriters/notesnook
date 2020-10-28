@@ -18,6 +18,7 @@ import SplitEditor from "../spliteditor";
 import Unlock from "../unlock";
 import RouteContainer from "../route-container";
 import useMobile from "../../utils/use-mobile";
+import { SUBSCRIPTION_STATUS } from "../../common";
 
 function Editor() {
   const sessionState = useStore((store) => store.session.state);
@@ -29,7 +30,7 @@ function Editor() {
   const isFocusMode = useAppStore((store) => store.isFocusMode);
   const isMobile = useMobile();
   const isTrial = useUserStore(
-    (store) => store.user?.notesnook?.subscription?.isTrial
+    (store) => store.user?.subscription?.status === SUBSCRIPTION_STATUS.TRIAL
   );
   const isLoggedin = useUserStore((store) => store.isLoggedIn);
 
@@ -99,7 +100,7 @@ function Editor() {
           id="quill"
           ref={quillRef}
           refresh={sessionState === SESSION_STATES.new}
-          isSimple={isLoggedin || !isTrial}
+          isSimple={isLoggedin && !isTrial}
           onFocus={() => {
             toggleProperties(false);
           }}

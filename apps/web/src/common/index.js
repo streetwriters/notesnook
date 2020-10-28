@@ -5,6 +5,7 @@ import EventSource from "eventsource";
 import { navigate } from "hookrouter";
 
 export const db = new Database(StorageInterface, EventSource);
+db.host("http://localhost:8000");
 
 export const COLORS = {
   red: "#f44336",
@@ -14,6 +15,14 @@ export const COLORS = {
   blue: "#2196F3",
   purple: "#673AB7",
   gray: "#9E9E9E",
+};
+
+export const SUBSCRIPTION_STATUS = {
+  EXPIRED: 0,
+  TRIAL: 1,
+  ACTIVE: 2,
+  ACTIVE_RENEWING: 3,
+  CANCELLED: 4,
 };
 
 export const SELECTION_OPTIONS_MAP = {

@@ -1,10 +1,11 @@
 import React from "react";
 import { Flex, Box, Text } from "rebass";
+import { SUBSCRIPTION_STATUS } from "../../common";
 import { useStore as useUserStore } from "../../stores/user-store";
 
 function Menu(props) {
   const isTrial = useUserStore(
-    (store) => store.user?.notesnook?.subscription?.isTrial
+    (store) => store.user?.subscription?.status === SUBSCRIPTION_STATUS.TRIAL
   );
 
   return (

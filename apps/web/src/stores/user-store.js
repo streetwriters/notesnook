@@ -20,11 +20,10 @@ class UserStore extends BaseStore {
       });
       db.ev.subscribe("db:refresh", () => appStore.refresh());
       db.ev.subscribe("user:upgraded", (subscription) => {
-        console.log("user:upgraded", subscription);
         this.set((state) => {
           state.user = {
             ...state.user,
-            notesnook: { ...state.user.notesnook, subscription },
+            subscription,
           };
         });
       });
