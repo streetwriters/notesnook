@@ -1,7 +1,7 @@
 import Hashes from "jshashes";
-const sha256 = new Hashes.SHA256();
+const md5 = new Hashes.MD5();
 
-const invalidKeys = ["user", "t", "lastBackup"];
+const invalidKeys = ["user", "t", "lastBackupTime"];
 const validTypes = ["mobile", "web", "node"];
 export default class Backup {
   /**
@@ -30,7 +30,7 @@ export default class Backup {
     );
 
     const db = Object.fromEntries(await this._db.context.readMulti(keys));
-    db.h = sha256.hex(JSON.stringify(db));
+    db.h = md5.hex(JSON.stringify(db));
 
     if (encrypt) {
       const key = await this._db.user.key();
@@ -90,6 +90,6 @@ export default class Backup {
   _verify(db) {
     const hash = db.h;
     delete db.h;
-    return hash == sha256.hex(JSON.stringify(db));
+    return hash == md5.hex(JSON.stringify(db));
   }
 }

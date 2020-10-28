@@ -29,7 +29,6 @@ export default class User {
     await this.set({
       ...user,
       ...serverUser,
-      notesnook: { ...user.notesnook, ...serverUser.notesnook },
     });
 
     // propogate event
@@ -122,7 +121,6 @@ function userFromResponse(response, key) {
     ...response.payload,
     accessToken: response.access_token,
     refreshToken: response.refresh_token,
-    scopes: response.scopes,
     expiry: Date.now() + response.expiry * 100,
     key,
   };

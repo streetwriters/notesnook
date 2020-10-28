@@ -9,7 +9,6 @@ const SUCCESS_LOGIN_RESPONSE = {
     username: "thecodrr",
     email: process.env.EMAIL,
   },
-  scopes: "sync",
   expiry: 36000,
 };
 
