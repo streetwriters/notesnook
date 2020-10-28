@@ -7,9 +7,7 @@ const SUCCESS_LOGIN_RESPONSE = {
   payload: {
     username: "thecodrr",
     email: process.env.EMAIL,
-    notesnook: {
-      lastSynced: 0,
-    },
+    lastSynced: 0,
   },
   scopes: "sync",
   expiry: 36000,

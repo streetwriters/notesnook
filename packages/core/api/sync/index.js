@@ -85,7 +85,7 @@ export default class Sync {
 
     // update our lastSynced time
     if (lastSynced) {
-      await this._db.user.set({ notesnook: { ...user.notesnook, lastSynced } });
+      await this._db.user.set({ lastSynced });
     }
   }
 
@@ -103,7 +103,7 @@ export default class Sync {
 
     // update our lastSynced time
     if (lastSynced) {
-      await this._db.user.set({ notesnook: { ...user.notesnook, lastSynced } });
+      await this._db.user.set({ lastSynced });
     }
   }
 
