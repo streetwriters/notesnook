@@ -31,6 +31,7 @@ export default class Backup {
 
     const db = Object.fromEntries(await this._db.context.readMulti(keys));
     db.h = md5.hex(JSON.stringify(db));
+    db.ht = "md5";
 
     if (encrypt) {
       const key = await this._db.user.key();
@@ -89,7 +90,16 @@ export default class Backup {
 
   _verify(db) {
     const hash = db.h;
+    const hash_type = db.ht;
     delete db.h;
-    return hash == md5.hex(JSON.stringify(db));
+    delete db.ht;
+    switch (hash_type) {
+      case "md5": {
+        return hash == md5.hex(JSON.stringify(db));
+      }
+      default: {
+        return false;
+      }
+    }
   }
 }
