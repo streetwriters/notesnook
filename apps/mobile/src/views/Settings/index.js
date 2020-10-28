@@ -1,5 +1,4 @@
-import {useIsFocused} from '@react-navigation/native';
-import React, {useEffect} from 'react';
+import React, {useCallback, useEffect} from 'react';
 import {
   Appearance,
   Linking,
@@ -12,49 +11,47 @@ import {
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {Button} from '../../components/Button';
+import {PressableButton} from '../../components/PressableButton';
+import Seperator from '../../components/Seperator';
+import {useTracked} from '../../provider';
+import {Actions} from '../../provider/Actions';
+import {eSendEvent, ToastEvent} from '../../services/EventManager';
+import {
+  eCloseProgressDialog,
+  eOpenLoginDialog,
+  eOpenPremiumDialog,
+  eOpenProgressDialog,
+  eOpenRecoveryKeyDialog,
+  eOpenRestoreDialog,
+  eResetApp,
+  eUpdateSearchState,
+} from '../../utils/Events';
+import NavigationService from '../../services/Navigation';
+import storage from '../../utils/storage';
+import {setSetting, dWidth} from '../../utils';
+import {hexToRGBA, RGB_Linear_Shade} from '../../utils/ColorUtils';
+import {sleep} from '../../utils/TimeUtils';
 import {
   ACCENT,
   COLOR_SCHEME,
   COLOR_SCHEME_DARK,
   COLOR_SCHEME_LIGHT,
-  opacity,
-  pv,
   setColorScheme,
-  SIZE,
-  WEIGHT,
-} from '../../common/common';
-import {Button} from '../../components/Button';
-import {PressableButton} from '../../components/PressableButton';
-import Seperator from '../../components/Seperator';
-import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
-import {eSendEvent} from '../../services/eventManager';
-import {
-  eOpenLoginDialog,
-  eOpenPremiumDialog,
-  eOpenRecoveryKeyDialog,
-  eResetApp,
-} from '../../services/events';
-import NavigationService from '../../services/NavigationService';
-import {MMKV} from '../../utils/storage';
-import {
-  db,
-  DDS,
-  hexToRGBA,
-  RGB_Linear_Shade,
-  setSetting,
-  ToastEvent,
-  w,
-} from '../../utils/utils';
+} from '../../utils/Colors';
+import {opacity, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
+import {db} from '../../utils/DB';
+import {DDS} from '../../services/DeviceDetection';
+import {MMKV} from '../../utils/mmkv';
+import Backup from '../../services/Backup';
 
-export const Settings = ({route, navigation}) => {
+export const Settings = ({navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors, user, settings} = state;
-  const isFocused = useIsFocused();
   function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
     let newColors = setColorScheme(colors, accent);
     StatusBar.setBarStyle(colors.night ? 'light-content' : 'dark-content');
-    dispatch({type: ACTIONS.THEME, colors: newColors});
+    dispatch({type: Actions.THEME, colors: newColors});
   }
 
   function changeAccentColor(accentColor) {
@@ -63,49 +60,36 @@ export const Settings = ({route, navigation}) => {
     changeColorScheme();
   }
 
+  const onFocus = useCallback(() => {
+    dispatch({
+      type: Actions.HEADER_STATE,
+      state: true,
+    });
+    dispatch({
+      type: Actions.HEADER_TEXT_STATE,
+      state: {
+        heading: 'Settings',
+      },
+    });
+    dispatch({
+      type: Actions.CURRENT_SCREEN,
+      screen: 'settings',
+    });
+    eSendEvent(eUpdateSearchState, {
+      placeholder: '',
+      data: [],
+      noSearch: true,
+      type: '',
+      color: null,
+    });
+  }, []);
+
   useEffect(() => {
-    console.log(user);
-    if (isFocused) {
-      dispatch({
-        type: ACTIONS.CONTAINER_BOTTOM_BUTTON,
-        state: {
-          visible: false,
-        },
-      });
-      dispatch({
-        type: ACTIONS.HEADER_STATE,
-        state: {
-          type: null,
-          menu: true,
-          canGoBack: false,
-          color: null,
-        },
-      });
-      dispatch({
-        type: ACTIONS.HEADER_VERTICAL_MENU,
-        state: false,
-      });
-
-      dispatch({
-        type: ACTIONS.HEADER_TEXT_STATE,
-        state: {
-          heading: 'Settings',
-        },
-      });
-
-      dispatch({
-        type: ACTIONS.CURRENT_SCREEN,
-        screen: 'settings',
-      });
-
-      dispatch({
-        type: ACTIONS.SEARCH_STATE,
-        state: {
-          noSearch: true,
-        },
-      });
-    }
-  }, [isFocused]);
+    navigation.addListener('focus', onFocus);
+    return () => {
+      navigation.removeListener('focus', onFocus);
+    };
+  });
 
   const getTimeLeft = (t1, t2) => {
     let d1 = new Date(Date.now());
@@ -131,6 +115,47 @@ export const Settings = ({route, navigation}) => {
       {title}
     </Text>
   );
+
+  const backupItemsList = [
+    {
+      name: 'Backup data',
+      func: async () => {
+        eSendEvent(eOpenProgressDialog, {
+          title: 'Backing up your data',
+          paragraph:
+            "All your backups are stored in 'Phone Storage/Notesnook/backups/' folder",
+        });
+          await Backup.run();
+          await sleep(1000);
+          eSendEvent(eCloseProgressDialog);
+       
+      },
+      desc: 'Backup all your data to phone storage',
+    },
+    {
+      name: 'Restore backup',
+      func: () => {
+        eSendEvent(eOpenRestoreDialog);
+      },
+      desc: 'Restore backup from your phone.',
+    },
+  ];
+
+  const switchTheme = async () => {
+    await setSetting(settings, 'useSystemTheme', !settings.useSystemTheme);
+
+    if (!settings.useSystemTheme) {
+      await MMKV.setStringAsync(
+        'theme',
+        JSON.stringify({night: Appearance.getColorScheme() === 'dark'}),
+      );
+      changeColorScheme(
+        Appearance.getColorScheme() === 'dark'
+          ? COLOR_SCHEME_DARK
+          : COLOR_SCHEME_LIGHT,
+      );
+    }
+  };
 
   const CustomButton = ({title, tagline, customComponent, onPress}) => (
     <PressableButton
@@ -179,14 +204,14 @@ export const Settings = ({route, navigation}) => {
       }}>
       <View
         style={{
-          marginTop: Platform.OS == 'ios' ? 125 - 60 : 125 - 60,
+          marginTop: Platform.OS === 'ios' ? 125 - 60 : 125 - 60,
         }}
       />
       <ScrollView
         style={{
           paddingHorizontal: 0,
         }}>
-        {user && user.Id ? (
+        {user ? (
           <>
             <View
               style={{
@@ -242,19 +267,19 @@ export const Settings = ({route, navigation}) => {
                         fontFamily: WEIGHT.regular,
                         fontSize: SIZE.xs,
                       }}>
-                      {user.notesnook.subscription.isTrial ? 'Trial' : 'Pro'}
+                      {user.subscription.isTrial ? 'Trial' : 'Pro'}
                     </Text>
                   </View>
                 </View>
                 <Seperator />
                 <View>
-                  {user.notesnook.subscription.isTrial ? (
+                  {user.subscription.isTrial ? (
                     <Text
                       style={{
                         color:
                           getTimeLeft(
-                            user.notesnook.subscription.start,
-                            user.notesnook.subscription.expiry,
+                            user.subscription.start,
+                            user.subscription.expiry,
                           ) > 5
                             ? colors.pri
                             : colors.errorText,
@@ -262,8 +287,8 @@ export const Settings = ({route, navigation}) => {
                         fontSize: SIZE.xxl,
                       }}>
                       {getTimeLeft(
-                        user.notesnook.subscription.start,
-                        user.notesnook.subscription.expiry,
+                        user.subscription.start,
+                        user.subscription.expiry,
                       ) + ' Days Remaining'}
                     </Text>
                   ) : null}
@@ -279,9 +304,6 @@ export const Settings = ({route, navigation}) => {
                     height={40}
                   />
                 </View>
-                {
-                  // Ad code here
-                }
               </View>
             </View>
             {[
@@ -291,14 +313,14 @@ export const Settings = ({route, navigation}) => {
                   eSendEvent(eOpenRecoveryKeyDialog);
                 },
                 desc:
-                  'We recommend you to get your data recovery key and store it safely. If you lose your password, you can recover your data using your recovery key.',
+                  'Save your recovery key. If you lose your password, you can recover your data using your recovery key.',
               },
               {
                 name: 'Logout',
                 func: async () => {
                   await db.user.logout();
-                  dispatch({type: ACTIONS.USER, user: null});
-                  dispatch({type: ACTIONS.CLEAR_ALL});
+                  dispatch({type: Actions.USER, user: null});
+                  dispatch({type: Actions.CLEAR_ALL});
                 },
                 desc:
                   'Logout of your account, this will clear everything and reset the app.',
@@ -451,10 +473,10 @@ export const Settings = ({route, navigation}) => {
               selectedColor={item}
               alpha={!colors.night ? -0.1 : 0.1}
               opacity={1}
-              onPress={() => {
+              onPress={async () => {
                 changeAccentColor(item);
 
-                MMKV.setStringAsync('accentColor', item);
+                await MMKV.setStringAsync('accentColor', item);
               }}
               customStyle={{
                 flexDirection: 'row',
@@ -462,11 +484,9 @@ export const Settings = ({route, navigation}) => {
                 alignItems: 'center',
                 marginHorizontal: 5,
                 marginVertical: 5,
-                width: w / 5 - 35,
-                height: w / 5 - 35,
+                width: DDS.isTab ? (dWidth * 0.28) / 5 - 35 : dWidth / 5 - 35,
+                height: DDS.isTab ? (dWidth * 0.28) / 5 - 35 : dWidth / 5 - 35,
                 borderRadius: 100,
-                justifyContent: 'center',
-                alignItems: 'center',
               }}>
               {colors.accent === item ? (
                 <Icon size={SIZE.lg} color="white" name="check" />
@@ -479,28 +499,10 @@ export const Settings = ({route, navigation}) => {
           title="Use System Dark Mode"
           tagline={
             settings.useSystemTheme
-              ? 'Switch to dark theme based on system settings'
-              : 'Keep the app theme independent from system settings'
+              ? 'App will switch to dark mode based on system theme'
+              : 'App dark mode is independent from system theme'
           }
-          onPress={async () => {
-            await setSetting(
-              settings,
-              'useSystemTheme',
-              !settings.useSystemTheme,
-            );
-
-            if (!settings.useSystemTheme) {
-              MMKV.setStringAsync(
-                'theme',
-                JSON.stringify({night: Appearance.getColorScheme() === 'dark'}),
-              );
-              changeColorScheme(
-                Appearance.getColorScheme() === 'dark'
-                  ? COLOR_SCHEME_DARK
-                  : COLOR_SCHEME_LIGHT,
-              );
-            }
-          }}
+          onPress={switchTheme}
           customComponent={
             <Icon
               size={SIZE.xl}
@@ -514,13 +516,18 @@ export const Settings = ({route, navigation}) => {
 
         <CustomButton
           title="Dark Mode"
-          tagline={colors.night ? 'Turn off dark mode' : 'Turn on dark mode'}
-          onPress={() => {
+          tagline={
+            colors.night ? 'Dark mode is turned off' : 'Dark mode is turned on'
+          }
+          onPress={async () => {
             if (!colors.night) {
-              MMKV.setStringAsync('theme', JSON.stringify({night: true}));
+              await MMKV.setStringAsync('theme', JSON.stringify({night: true}));
               changeColorScheme(COLOR_SCHEME_DARK);
             } else {
-              MMKV.setStringAsync('theme', JSON.stringify({night: false}));
+              await MMKV.setStringAsync(
+                'theme',
+                JSON.stringify({night: false}),
+              );
 
               changeColorScheme(COLOR_SCHEME_LIGHT);
             }
@@ -645,22 +652,7 @@ export const Settings = ({route, navigation}) => {
 
         <SectionHeader title="Backup & Restore" />
 
-        {[
-          {
-            name: 'Backup data',
-            func: () => {
-              Linking.openURL('https://www.notesnook.com/privacy.html');
-            },
-            desc: 'Backup all your data to phone storage',
-          },
-          {
-            name: 'Restore data',
-            func: () => {
-              Linking.openURL('https://www.notesnook.com');
-            },
-            desc: 'Restore backup from your phone.',
-          },
-        ].map((item) => (
+        {backupItemsList.map((item) => (
           <CustomButton
             key={item.name}
             title={item.name}
@@ -686,13 +678,13 @@ export const Settings = ({route, navigation}) => {
               textAlignVertical: 'center',
               color: colors.pri,
             }}>
-            Backup reminder{'\n'}
+            Auto Backup{'\n'}
             <Text
               style={{
                 fontSize: SIZE.xs,
                 color: colors.icon,
               }}>
-              Remind you to backup data.
+              Backup your data automatically.
             </Text>
           </Text>
 
@@ -747,7 +739,7 @@ export const Settings = ({route, navigation}) => {
           title="Encrypted Backups"
           tagline="Encrypt your data before backup"
           onPress={async () => {
-            if (!user) {
+            if (user) {
               ToastEvent.show(
                 'You must login to enable encryption',
                 'error',
@@ -784,22 +776,22 @@ export const Settings = ({route, navigation}) => {
         {[
           {
             name: 'Privacy Policy',
-            func: () => {
-              Linking.openURL('https://www.notesnook.com/privacy.html');
+            func: async () => {
+              await Linking.openURL('https://www.notesnook.com/privacy.html');
             },
             desc: 'Read our privacy policy',
           },
           {
             name: 'Check for updates',
-            func: () => {
-              Linking.openURL('https://www.notesnook.com/privacy.html');
+            func: async () => {
+              await Linking.openURL('https://www.notesnook.com/privacy.html');
             },
             desc: 'Check for a newer version of app',
           },
           {
             name: 'About',
-            func: () => {
-              Linking.openURL('https://www.notesnook.com');
+            func: async () => {
+              await Linking.openURL('https://www.notesnook.com');
             },
             desc: 'You are using the latest version of our app.',
           },

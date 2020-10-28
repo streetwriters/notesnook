@@ -1,46 +1,49 @@
 import React, {Component} from 'react';
 import {Platform} from 'react-native';
 import {
+  eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
   openVault,
-  eSendEvent,
-} from '../../services/eventManager';
+} from '../../services/EventManager';
 import {
   eCloseActionSheet,
   eCloseAddNotebookDialog,
   eCloseAddTopicDialog,
   eCloseLoginDialog,
   eCloseMoveNoteDialog,
+  eClosePremiumDialog,
   eCloseSimpleDialog,
   eOnLoadNote,
   eOpenActionSheet,
   eOpenAddNotebookDialog,
   eOpenAddTopicDialog,
+  eOpenExportDialog,
   eOpenLoginDialog,
   eOpenMoveNoteDialog,
-  eOpenSimpleDialog,
   eOpenPremiumDialog,
-  eClosePremiumDialog,
-  eOpenExportDialog,
-} from '../../services/events';
-import {DDS, hexToRGBA} from '../../utils/utils';
+  eOpenSimpleDialog,
+} from '../../utils/Events';
 import ActionSheet from '../ActionSheet';
 import {ActionSheetComponent} from '../ActionSheetComponent';
 import {AddNotebookDialog} from '../AddNotebookDialog';
 import {AddTopicDialog} from '../AddTopicDialog';
 import {Dialog} from '../Dialog';
-import MergeEditor from '../MergeEditor';
-import {VaultDialog} from '../VaultDialog';
-import {moveNoteEvent} from './recievers';
-import {TEMPLATE_DELETE, TEMPLATE_PERMANANT_DELETE} from './templates';
-import MoveNoteDialog from '../MoveNoteDialog';
-import LoginDialog from '../LoginDialog';
-import PremiumDialog from '../Premium/PremiumDialog';
 import ExportDialog from '../ExportDialog';
-import RecoveryKeyDialog from '../RecoveryKeyDialog';
+import LoginDialog from '../LoginDialog';
+import MergeEditor from '../MergeEditor';
+import MoveNoteDialog from '../MoveNoteDialog';
 import PendingDialog from '../Premium/PendingDialog';
+import PremiumDialog from '../Premium/PremiumDialog';
 import PremiumStatusDialog from '../Premium/PremiumStatusDialog';
+import ProgressDialog from '../ProgressDialog';
+import RecoveryKeyDialog from '../RecoveryKeyDialog';
+import RestoreDialog from '../RestoreDialog';
+import {VaultDialog} from '../VaultDialog';
+import {TEMPLATE_DELETE, TEMPLATE_PERMANANT_DELETE} from './Templates';
+import {hexToRGBA} from "../../utils/ColorUtils";
+import {DDS} from "../../services/DeviceDetection";
+import ResultDialog from '../ResultDialog';
 
 export class DialogManager extends Component {
   constructor(props) {
@@ -281,8 +284,7 @@ export class DialogManager extends Component {
           containerStyle={{
             backgroundColor: colors.bg,
             width: DDS.isTab ? 500 : '100%',
-            alignSelf: DDS.isTab ? 'flex-end' : 'center',
-            marginRight: DDS.isTab ? 12 : null,
+            alignSelf:'center',
             borderRadius: 10,
             marginBottom: DDS.isTab ? 50 : 0,
           }}
@@ -372,6 +374,11 @@ export class DialogManager extends Component {
         <PendingDialog colors={colors} />
 
         <PremiumStatusDialog />
+        <ProgressDialog />
+
+        <RestoreDialog/>
+
+        <ResultDialog/>
       </>
     );
   }

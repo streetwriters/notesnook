@@ -1,8 +1,8 @@
 import React from 'react';
 import {ActivityIndicator, StyleSheet, Text, View} from 'react-native';
-import {ph, pv, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
 import {Button} from '../Button';
+import {ph, pv, SIZE, WEIGHT} from "../../utils/SizeUtils";
 
 export const Loading = ({
   height = 150,
@@ -10,19 +10,20 @@ export const Loading = ({
   done = false,
   doneText = 'Action completed successfully!',
   onDone = () => {},
+  customStyle ={}
 }) => {
   const [state, dispatch] = useTracked();
   const {colors, tags, premiumUser} = state;
 
   return (
-    <View style={[{height: height}, styles.activityContainer]}>
+    <View style={[{height: height}, styles.activityContainer,  customStyle]}>
       {done ? (
         <>
           <Text
             style={[
               {color: colors.icon},
               styles.activityText,
-              {fontSize: SIZE.xs},
+              {fontSize: SIZE.xs,fontFamily:WEIGHT.regular},
             ]}>
             {doneText}
           </Text>
@@ -67,5 +68,6 @@ const styles = StyleSheet.create({
     fontFamily: WEIGHT.medium,
     color: 'white',
     fontSize: SIZE.sm,
+    
   },
 });

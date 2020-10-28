@@ -9,24 +9,28 @@ import {
 } from 'react-native';
 import FileViewer from 'react-native-file-viewer';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {opacity, ph, pv, SIZE, WEIGHT} from '../../common/common';
+import RNFetchBlob from 'rn-fetch-blob';
 import {useTracked} from '../../provider';
 import storage from '../../utils/storage';
-import {DDS, getElevation, ToastEvent} from '../../utils/utils';
+import {getElevation} from '../../utils';
 import {Button} from '../Button/index';
 import BaseDialog from '../Dialog/base-dialog';
 import DialogHeader from '../Dialog/dialog-header';
 import {Loading} from '../Loading';
 import Seperator from '../Seperator';
+import {sleep} from "../../utils/TimeUtils";
+import {ToastEvent} from "../../services/EventManager";
+import {opacity, ph, pv, SIZE, WEIGHT} from "../../utils/SizeUtils";
+import {DDS} from "../../services/DeviceDetection";
 
 const {
   eSubscribeEvent,
   eUnSubscribeEvent,
-} = require('../../services/eventManager');
+} = require('../../services/EventManager');
 const {
   eOpenExportDialog,
   eCloseExportDialog,
-} = require('../../services/events');
+} = require('../../utils/Events');
 
 const ExportDialog = () => {
   const [state, dispatch] = useTracked();
@@ -86,6 +90,7 @@ const ExportDialog = () => {
     {
       title: 'PDF',
       func: async () => {
+        
         await save(storage.saveToPDF, 'PDF');
       },
       icon: 'file-pdf-box',
@@ -118,7 +123,7 @@ const ExportDialog = () => {
       <View
         style={[
           {
-            width: DDS.isTab ? '40%' : '80%',
+            width: DDS.isTab ? 350 : '80%',
             backgroundColor: colors.bg,
           },
           styles.container,
@@ -138,7 +143,9 @@ const ExportDialog = () => {
           <Loading
             done={complete}
             doneText={doneText}
-            onDone={() => {
+            onDone={async () => {
+              close();
+              await sleep(500);
               FileViewer.open(result.filePath, {
                 showOpenWithDialog: true,
                 showAppsSuggestions: true,
@@ -148,7 +155,7 @@ const ExportDialog = () => {
                   `No application found to open ${result.name} file`,
                 );
               });
-              close();
+          
             }}
             tagline="Exporting notes"
           />

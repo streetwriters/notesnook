@@ -4,14 +4,21 @@ import QRCode from 'react-native-qrcode-svg';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import RNFetchBlob from 'rn-fetch-blob';
 import {LOGO_BASE64} from '../../assets/images/assets';
-import {SIZE, WEIGHT} from '../../common/common';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
-import {eOpenRecoveryKeyDialog} from '../../services/events';
-import {db, ToastEvent, w} from '../../utils/utils';
+import {
+  eSendEvent,
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+  ToastEvent,
+} from '../../services/EventManager';
+import {eOpenRecoveryKeyDialog, eOpenResultDialog} from '../../utils/Events';
+import {dWidth} from '../../utils';
 import ActionSheet from '../ActionSheet';
 import {Button} from '../Button';
 import Seperator from '../Seperator';
 import {Toast} from '../Toast';
+import {SIZE, WEIGHT} from '../../utils/SizeUtils';
+import {db} from '../../utils/DB';
+import Storage from '../../utils/storage';
 class RecoveryKeyDialog extends React.Component {
   constructor(props) {
     super(props);
@@ -20,62 +27,95 @@ class RecoveryKeyDialog extends React.Component {
     };
     this.actionSheetRef = createRef();
     this.svg = createRef();
+    this.user;
+    this.signup = false;
   }
 
-  open = () => {
+  open = (signup) => {
+    if (signup) {
+      this.signup = true;
+    }
     this.actionSheetRef.current?._setModalVisible(true);
   };
 
   close = () => {
     this.actionSheetRef.current?._setModalVisible(false);
+    if (this.signup) {
+      setTimeout(() => {
+        eSendEvent(eOpenResultDialog, {
+          title: 'Welcome!',
+          paragraph: 'Your 14 day trial for Notesnook Pro is activated',
+          icon: 'checkbox-marked-circle',
+          button: 'Thank You!',
+        });
+      }, 500);
+    }
   };
   async componentDidMount() {
     eSubscribeEvent(eOpenRecoveryKeyDialog, this.open);
-    let k = await db.user.key();
-    
-    if (k) {
-      this.setState({
-        key: k.key,
-      });
-    }
   }
 
   async componentWillUnmount() {
     eUnSubscribeEvent(eOpenRecoveryKeyDialog, this.open);
   }
 
-  componentDidUpdate() {}
+  saveQRCODE = async () => {
+    if ((await Storage.requestPermission()) === false) {
+      ToastEvent.show('Storage access not granted!', 'error', 'local');
+      return;
+    }
 
-  saveQRCODE = () => {
-    this.svg.current?.toDataURL((data) => {
-      RNFetchBlob.fs
-        .writeFile(
-          RNFetchBlob.fs.dirs.SDCardDir +
-            '/Notesnook/nn_recovery_key_qrcode.png',
-          data,
-          'base64',
-        )
-        .then((res) => {
-          RNFetchBlob.fs
-            .scanFile([
-              {
-                path:
-                  RNFetchBlob.fs.dirs.SDCardDir +
-                  '/Notesnook/nn_recovery_key_qrcode.png',
-                mime: 'image/png',
-              },
-            ])
-            .then((r) => {
-              ToastEvent.show(
-                'Recovery key saved to Gallery as ' +
-                  RNFetchBlob.fs.dirs.SDCardDir +
-                  '/Notesnook/nn_recovery_key_qrcode.png',
-                'success',
-                'local',
-              );
-            });
-        });
+    this.svg.current?.toDataURL(async (data) => {
+      let path = await Storage.checkAndCreateDir('/');
+      let fileName = 'nn_' + this.user.username + '_recovery_key_qrcode.png';
+      RNFetchBlob.fs.writeFile(path + fileName, data, 'base64').then((res) => {
+        RNFetchBlob.fs
+          .scanFile([
+            {
+              path: path + fileName,
+              mime: 'image/png',
+            },
+          ])
+          .then((r) => {
+            ToastEvent.show(
+              'Recovery key saved to Gallery as ' + path + fileName,
+              'success',
+              'local',
+            );
+          });
+      });
     });
+  };
+
+  saveToTextFile = async () => {
+    if ((await Storage.requestPermission()) === false) {
+      ToastEvent.show('Storage access not granted!', 'error', 'local');
+      return;
+    }
+    let path = await Storage.checkAndCreateDir('/');
+    let fileName = 'nn_' + this.user.username + '_recovery_key.txt';
+
+    RNFetchBlob.fs
+      .writeFile(path + fileName, this.state.key, 'utf8')
+      .then((r) => {
+        ToastEvent.show(
+          'Recovery key saved as ' + path + fileName,
+          'success',
+          'local',
+        );
+      })
+      .catch((e) => {});
+  };
+
+  onOpen = async () => {
+    let k = await db.user.key();
+    this.user = await db.user.get();
+    console.log(k);
+    if (k) {
+      this.setState({
+        key: k.key,
+      });
+    }
   };
 
   render() {
@@ -88,11 +128,13 @@ class RecoveryKeyDialog extends React.Component {
           alignSelf: 'center',
           borderRadius: 10,
         }}
+        closeOnTouchBackdrop={false}
+        onOpen={this.onOpen}
         ref={this.actionSheetRef}
         initialOffsetFromBottom={1}>
         <View
           style={{
-            width: w,
+            width: dWidth,
             backgroundColor: colors.bg,
             justifyContent: 'space-between',
             paddingHorizontal: 12,
@@ -146,7 +188,7 @@ class RecoveryKeyDialog extends React.Component {
             {this.state.key ? (
               <QRCode
                 getRef={this.svg}
-                size={w / 2.2}
+                size={dWidth / 2.2}
                 value={this.state.key}
                 logo={{uri: LOGO_BASE64}}
                 logoBorderRadius={10}
@@ -157,7 +199,7 @@ class RecoveryKeyDialog extends React.Component {
             <View
               style={{
                 alignItems: 'center',
-                width: w / 2.2,
+                width: dWidth / 2.2,
                 justifyContent: 'center',
               }}>
               <Button
@@ -168,14 +210,7 @@ class RecoveryKeyDialog extends React.Component {
               />
               <Seperator />
               <Button
-                onPress={() => {
-                  RNFetchBlob.fs.writeFile(
-                    RNFetchBlob.fs.dirs.SDCardDir +
-                      '/Notesnook/nn_recovery_key.txt',
-                    this.state.key,
-                    'utf8',
-                  );
-                }}
+                onPress={this.saveToTextFile}
                 title="Save as Text File"
                 width="100%"
                 height={40}
@@ -184,7 +219,7 @@ class RecoveryKeyDialog extends React.Component {
               <Button
                 onPress={() => {
                   Clipboard.setString(this.state.key);
-                  ToastEvent.show('Recovery key copied');
+                  ToastEvent.show('Copied!', 'success', 'local');
                 }}
                 title="Copy Key"
                 width="100%"
@@ -214,7 +249,13 @@ class RecoveryKeyDialog extends React.Component {
               data or reset your password using this recovery key.
             </Text>
           </View>
-
+          <Seperator />
+          <Button
+            title="I have saved the key."
+            width="100%"
+            height={50}
+            onPress={this.close}
+          />
           <Toast context="local" />
         </View>
       </ActionSheet>

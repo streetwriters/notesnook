@@ -1,21 +1,23 @@
-import React, {useEffect, useMemo, useState} from 'react';
-import {StyleSheet} from 'react-native';
-import {Dimensions, Platform, RefreshControl, Text, View} from 'react-native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import {
+  Platform,
+  RefreshControl,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+} from 'react-native';
+import {initialWindowMetrics} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {DataProvider, LayoutProvider, RecyclerListView} from 'recyclerlistview';
-import {COLORS_NOTE, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
-import {eSendEvent} from '../../services/eventManager';
-import {
-  eClearSearch,
-  eOpenLoginDialog,
-  eScrollEvent,
-} from '../../services/events';
-import {db, ToastEvent} from '../../utils/utils';
+import {Actions} from '../../provider/Actions';
+import {eSendEvent, ToastEvent} from '../../services/EventManager';
+import {eClearSearch, eOpenLoginDialog, eScrollEvent} from '../../utils/Events';
 import {PressableButton} from '../PressableButton';
-let {width, height} = Dimensions.get('window');
+import {COLORS_NOTE} from '../../utils/Colors';
+import {SIZE, WEIGHT} from '../../utils/SizeUtils';
+import {db} from '../../utils/DB';
 
 const header = {
   type: 'MAIN_HEADER',
@@ -32,16 +34,18 @@ const SimpleList = ({
   refreshCallback,
 }) => {
   const [state, dispatch] = useTracked();
-  const {colors, selectionMode, user} = state;
+  const {colors, selectionMode, user, messageBoardState} = state;
   const searchResults = {...state.searchResults};
   const [refreshing, setRefreshing] = useState(false);
   const [dataProvider, setDataProvider] = useState(
     new DataProvider((r1, r2) => {
       return r1 !== r2;
-    }).cloneWithRows([]),
+    }),
   );
-  const insets = useSafeAreaInsets();
+  const {width, fontScale} = useWindowDimensions();
+
   const listData = data;
+  const dataType = type;
   const _onScroll = (event) => {
     if (!event) return;
     let y = event.nativeEvent.contentOffset.y;
@@ -49,39 +53,20 @@ const SimpleList = ({
   };
 
   useEffect(() => {
+    loadData();
+  }, [listData]);
+
+  const loadData = () => {
     let mainData =
-      searchResults.type === type && focused && searchResults.results.length > 0
+      searchResults.type === type &&
+      focused() &&
+      searchResults.results.length > 0
         ? searchResults.results
         : listData;
 
     let d = [header, ...mainData];
-    /*  for (var i = 0; i < 10000; i++) {
-      d = [...d,...data];
-    }  */
-    setDataProvider(
-      new DataProvider((r1, r2) => {
-        return r1 !== r2;
-      }).cloneWithRows(d),
-    );
-  }, [listData]);
-
-  const _ListFooterComponent = listData[0] ? (
-    <View
-      style={{
-        height: 150,
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}>
-      <Text
-        style={{
-          color: colors.nav,
-          fontSize: SIZE.sm,
-          fontFamily: WEIGHT.regular,
-        }}>
-        - End -
-      </Text>
-    </View>
-  ) : null;
+    setDataProvider(dataProvider.cloneWithRows(d));
+  };
 
   const RenderSectionHeader = ({item}) => (
     <Text
@@ -95,10 +80,10 @@ const SimpleList = ({
     </Text>
   );
 
-  const _onRefresh = async () => {
+  const _onRefresh = useCallback(async () => {
     if (Platform.OS === 'ios') {
       dispatch({
-        type: ACTIONS.SYNCING,
+        type: Actions.SYNCING,
         syncing: true,
       });
     } else {
@@ -106,12 +91,12 @@ const SimpleList = ({
     }
     try {
       let user = await db.user.get();
-      dispatch({type: ACTIONS.USER, user: user});
+      dispatch({type: Actions.USER, user: user});
       await db.sync();
       ToastEvent.show('Sync Complete', 'success');
     } catch (e) {
       ToastEvent.show(
-        e.message,
+        'You must login to sync.',
         'error',
         'global',
         5000,
@@ -123,7 +108,7 @@ const SimpleList = ({
     } finally {
       if (Platform.OS === 'ios') {
         dispatch({
-          type: ACTIONS.SYNCING,
+          type: Actions.SYNCING,
           syncing: false,
         });
       } else {
@@ -132,9 +117,9 @@ const SimpleList = ({
       if (refreshCallback) {
         refreshCallback();
       }
-      dispatch({type: ACTIONS.ALL});
     }
-  };
+    dispatch({type: Actions.ALL});
+  }, []);
 
   const _ListEmptyComponent = (
     <View
@@ -156,28 +141,30 @@ const SimpleList = ({
       switch (type) {
         case 'note':
           dim.width = width;
-          dim.height = 100;
+          dim.height = 100 * fontScale;
           break;
         case 'notebook':
           dim.width = width;
-          dim.height = 110;
+          dim.height = 110 * fontScale;
           break;
         case 'topic':
           dim.width = width;
-          dim.height = 80;
+          dim.height = 80 * fontScale;
           break;
         case 'tag':
           dim.width = width;
-          dim.height = 80;
+          dim.height = 80 * fontScale;
           break;
         case 'header':
           dim.width = width;
-          dim.height = 18;
+          dim.height = 30 * fontScale;
           break;
         case 'MAIN_HEADER':
           dim.width = width;
           dim.height =
-            (user && user.Id) || !listData[0] || selectionMode ? 0 : 40;
+            !messageBoardState.visible || !listData[0] || selectionMode
+              ? 0
+              : 40 * fontScale;
           break;
         default:
           dim.width = width;
@@ -190,13 +177,14 @@ const SimpleList = ({
     switch (type) {
       case 'note':
         return <RenderItem item={data} pinned={data.pinned} index={index} />;
+      case 'notebook':
+        return <RenderItem item={data} pinned={data.pinned} index={index} />;
       case 'MAIN_HEADER':
-        return <ListHeaderComponent type={type} data={listData} />;
+        return <ListHeaderComponent type={dataType} data={listData} />;
       case 'header':
         return <RenderSectionHeader item={data} />;
-
       default:
-        return null;
+        return <RenderItem item={data} index={index} />;
     }
   };
 
@@ -206,17 +194,17 @@ const SimpleList = ({
       backgroundColor: colors.bg,
       width: '100%',
       paddingTop:
-        Platform.OS == 'ios'
+        Platform.OS === 'ios'
           ? listData[0] && !selectionMode
-            ? 115
-            : 115 - 60
+            ? 130
+            : 130 - 60
           : listData[0] && !selectionMode
-          ? 155 - insets.top
-          : 155 - insets.top - 60,
+          ? 155 - initialWindowMetrics.insets.top
+          : (155 - initialWindowMetrics.insets.top) - 60,
     };
-  }, []);
+  }, [selectionMode, listData, colors]);
 
-  return !listData || listData.length === 0 ? (
+  return !listData || listData.length === 0 || !dataProvider ? (
     _ListEmptyComponent
   ) : (
     <RecyclerListView
@@ -224,6 +212,7 @@ const SimpleList = ({
       dataProvider={dataProvider}
       rowRenderer={_renderRow}
       onScroll={_onScroll}
+      renderFooter={() => <View style={{height: 400}} />}
       scrollViewProps={{
         refreshControl: (
           <RefreshControl
@@ -248,7 +237,7 @@ const SimpleList = ({
 export default SimpleList;
 
 const SearchHeader = () => {
-  const [state, dispatch] = useTracked();
+  const [state] = useTracked();
   const {colors} = state;
   const searchResults = {...state.searchResults};
 
@@ -277,17 +266,15 @@ const SearchHeader = () => {
   );
 };
 
-const LoginCard = ({type, data}) => {
-  const [state, dispatch] = useTracked();
-  const {colors, selectionMode, user, currentScreen} = state;
+const MessageCard = ({data}) => {
+  const [state] = useTracked();
+  const {colors, selectionMode, currentScreen, messageBoardState} = state;
 
   return (
     <View>
-      {(user && user.Id) || !data[0] || selectionMode ? null : (
+      {!messageBoardState.visible || !data[0] || selectionMode ? null : (
         <PressableButton
-          onPress={() => {
-            eSendEvent(eOpenLoginDialog);
-          }}
+          onPress={messageBoardState.onPress}
           color={
             COLORS_NOTE[currentScreen]
               ? COLORS_NOTE[currentScreen]
@@ -314,7 +301,7 @@ const LoginCard = ({type, data}) => {
             }}>
             <Icon
               style={styles.loginIcon}
-              name="account-outline"
+              name={messageBoardState.icon}
               color="white"
               size={SIZE.xs}
             />
@@ -329,7 +316,7 @@ const LoginCard = ({type, data}) => {
                 color: colors.icon,
                 fontSize: SIZE.xxs - 1,
               }}>
-              You are not logged in
+              {messageBoardState.message}
             </Text>
             <Text
               style={{
@@ -338,7 +325,7 @@ const LoginCard = ({type, data}) => {
                   : colors.accent,
                 fontSize: SIZE.xxs,
               }}>
-              Login to sync your {type}.
+              {messageBoardState.actionText}
             </Text>
           </View>
         </PressableButton>
@@ -348,13 +335,13 @@ const LoginCard = ({type, data}) => {
 };
 
 const ListHeaderComponent = ({type, data}) => {
-  const [state, dispatch] = useTracked();
+  const [state] = useTracked();
   const searchResults = {...state.searchResults};
 
   return searchResults.type === type && searchResults.results.length > 0 ? (
     <SearchHeader />
   ) : (
-    <LoginCard type={type} data={data} />
+    <MessageCard type={type} data={data} />
   );
 };
 
@@ -387,9 +374,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     width: '100%',
     alignSelf: 'center',
-    marginTop: 15,
-    height: 18,
-    paddingBottom: 5,
+    marginTop: 10,
+    height: 25,
+    textAlignVertical: 'center',
   },
   emptyList: {
     height: '100%',

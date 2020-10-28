@@ -1,17 +1,35 @@
 import React from 'react';
-import {Modal, StyleSheet, TouchableOpacity, View} from 'react-native';
+import {
+  Animated,
+  Modal,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import {useTracked} from '../../provider';
 
-const BaseDialog = ({visible, onRequestClose, children, onShow}) => {
+const BaseDialog = ({
+  visible,
+  onRequestClose,
+  children,
+  onShow,
+  animation = 'fade',
+}) => {
   const [state, dispatch] = useTracked();
+  const scaleValue = new Animated.Value(1);
+
   return (
     <Modal
       visible={visible}
       transparent={true}
       animated
       statusBarTranslucent
-      onShow={onShow}
-      animationType="fade"
+      onShow={() => {
+        if (onShow) {
+          onShow();
+        }
+      }}
+      animationType={animation}
       onRequestClose={onRequestClose}>
       <View
         style={[
@@ -26,6 +44,7 @@ const BaseDialog = ({visible, onRequestClose, children, onShow}) => {
           onPress={onRequestClose}
           style={styles.overlayButton}
         />
+
         {children}
       </View>
     </Modal>

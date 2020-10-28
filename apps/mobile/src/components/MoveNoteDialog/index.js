@@ -9,14 +9,16 @@ import {
 } from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {pv, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
-import {eOpenMoveNoteDialog} from '../../services/events';
-import {db, DDS, getElevation, ToastEvent} from '../../utils/utils';
+import {Actions} from '../../provider/Actions';
+import {eSubscribeEvent, eUnSubscribeEvent, ToastEvent} from '../../services/EventManager';
+import {eOpenMoveNoteDialog} from '../../utils/Events';
+import {getElevation} from '../../utils';
 import {PressableButton} from '../PressableButton';
 import {Toast} from '../Toast';
+import {pv, SIZE, WEIGHT} from "../../utils/SizeUtils";
+import {db} from "../../utils/DB";
+import {DDS} from "../../services/DeviceDetection";
 
 let newNotebookTitle = null;
 let newTopicTitle = null;
@@ -64,8 +66,8 @@ const MoveNoteDialog = () => {
     });
     notebookInput.current?.clear();
     notebookInput.current?.blur();
-    dispatch({type: ACTIONS.NOTEBOOKS});
-    dispatch({type: ACTIONS.PINNED});
+    dispatch({type: Actions.NOTEBOOKS});
+    dispatch({type: Actions.PINNED});
   };
 
   const addNewTopic = async () => {
@@ -75,8 +77,8 @@ const MoveNoteDialog = () => {
 
     let res = await db.notebooks.notebook(expanded).topics.add(newTopicTitle);
 
-    dispatch({type: ACTIONS.NOTEBOOKS});
-    dispatch({type: ACTIONS.PINNED});
+    dispatch({type: Actions.NOTEBOOKS});
+    dispatch({type: Actions.PINNED});
     topicInput.current?.clear();
     topicInput.current?.blur();
     newTopicTitle = null;
@@ -114,8 +116,8 @@ const MoveNoteDialog = () => {
         <View
           style={{
             ...getElevation(DDS.isTab ? 10 : 0),
-            width: DDS.isTab ? '65%' : '100%',
-            height: DDS.isTab ? '90%' : '100%',
+            width: DDS.isTab ? 500 : '100%',
+            height: DDS.isTab ? 500 : '100%',
             flex: 1,
             borderRadius: DDS.isTab ? 5 : 0,
             backgroundColor: colors.bg,
@@ -356,7 +358,7 @@ const MoveNoteDialog = () => {
                         onPress={async () => {
                           let noteIds = [];
                           selectedItemsList.forEach((i) => noteIds.push(i.id));
-                       
+
                           let res = await db.notes.move(
                             {
                               topic: item.title,
@@ -364,9 +366,9 @@ const MoveNoteDialog = () => {
                             },
                             ...noteIds,
                           );
-                          dispatch({type: ACTIONS.CLEAR_SELECTION});
-                          dispatch({type: ACTIONS.NOTEBOOKS});
-                          dispatch({type: ACTIONS.PINNED});
+                          dispatch({type: Actions.CLEAR_SELECTION});
+                          dispatch({type: Actions.NOTEBOOKS});
+                          dispatch({type: Actions.PINNED});
                           close();
                           let notebookName = db.notebooks.notebook(
                             item.notebookId,

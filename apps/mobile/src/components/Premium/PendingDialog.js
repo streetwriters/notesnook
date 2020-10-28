@@ -1,11 +1,13 @@
 import React, {createRef} from 'react';
 import {Text, View} from 'react-native';
-import {SIZE, WEIGHT} from '../../common/common';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
-import {eClosePendingDialog, eOpenPendingDialog} from '../../services/events';
-import {db, w} from '../../utils/utils';
+import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
+import {eClosePendingDialog, eOpenPendingDialog} from '../../utils/Events';
+import {dWidth} from '../../utils';
 import ActionSheet from '../ActionSheet';
 import Seperator from '../Seperator';
+import {SIZE, WEIGHT} from "../../utils/SizeUtils";
+import {db} from "../../utils/DB";
+import {DDS} from "../../services/DeviceDetection";
 
 const actionSheet = createRef();
 class PendingDialog extends React.Component {
@@ -54,13 +56,27 @@ class PendingDialog extends React.Component {
           width: '100%',
           alignSelf: 'center',
           borderRadius: 10,
+          width: DDS.isTab? 500 : '100%',
+          borderRadius: 10,
+          marginBottom: DDS.isTab ? 50 : 0,
         }}
+        extraScroll={DDS.isTab ? 50 : 0}
         gestureEnabled={true}
+        footerAlwaysVisible={DDS.isTab}
+        footerHeight={DDS.isTab ? 20 : 10}
+        footerStyle={
+          DDS.isTab
+            ? {
+                borderRadius: 10,
+                backgroundColor: colors.bg,
+              }
+            : null
+        }
         ref={actionSheet}
         initialOffsetFromBottom={1}>
         <View
           style={{
-            width: w,
+            width: DDS.isTab? 500 : dWidth,
             backgroundColor: colors.bg,
             justifyContent: 'space-between',
             paddingHorizontal: 12,

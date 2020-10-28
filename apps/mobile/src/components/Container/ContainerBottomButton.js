@@ -1,15 +1,16 @@
 import React, {useEffect, useState} from 'react';
-import {Keyboard, Text, View} from 'react-native';
+import {Keyboard, Platform, Text, View} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {pv, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
-import {DDS, getElevation} from '../../utils/utils';
+import {getElevation} from '../../utils';
 import {PressableButton} from '../PressableButton';
+import {pv, SIZE, WEIGHT} from "../../utils/SizeUtils";
+import {DDS} from "../../services/DeviceDetection";
 
-export const ContainerBottomButton = ({root}) => {
+export const ContainerBottomButton = ({title, onPress, color}) => {
   const [state, dispatch] = useTracked();
-  const {colors,containerBottomButton} = state;
+  const {colors} = state;
   const [buttonHide, setButtonHide] = useState(false);
   const insets = useSafeAreaInsets();
 
@@ -42,14 +43,14 @@ export const ContainerBottomButton = ({root}) => {
     };
   }, []);
 
-  return !containerBottomButton.visible ? null : (
+  return (
     <View
       style={{
         width: '100%',
         opacity: buttonHide ? 0 : 1,
         position: 'absolute',
         paddingHorizontal: 12,
-        bottom: insets.bottom + 20,
+        bottom: Platform.OS === 'ios' ? insets.bottom - 10 : insets.bottom + 20,
         zIndex: 10,
         transform: [
           {
@@ -58,20 +59,13 @@ export const ContainerBottomButton = ({root}) => {
         ],
       }}>
       <PressableButton
-        color={
-          containerBottomButton.color
-            ? containerBottomButton.color
-            : colors.accent
-        }
-        selectedColor={
-          containerBottomButton.color
-            ? containerBottomButton.color
-            : colors.accent
-        }
+        testID={'container_bottom_btn'}
+        color={color || colors.accent}
+        selectedColor={color || colors.accent}
         customStyle={{
           ...getElevation(5),
         }}
-        onPress={containerBottomButton.bottomButtonOnPress}>
+        onPress={onPress}>
         <View
           style={{
             justifyContent: 'flex-start',
@@ -83,22 +77,19 @@ export const ContainerBottomButton = ({root}) => {
             paddingVertical: pv + 5,
           }}>
           <Icon
-            name={
-              containerBottomButton.bottomButtonText === 'Clear all trash'
-                ? 'delete'
-                : 'plus'
-            }
+            name={title === 'Clear all trash' ? 'delete' : 'plus'}
             color="white"
             size={SIZE.xl}
           />
           <Text
+            testID="container_bottom_btn_text"
             style={{
               fontSize: SIZE.md,
               color: 'white',
               fontFamily: WEIGHT.regular,
               textAlignVertical: 'center',
             }}>
-            {'  ' + containerBottomButton.bottomButtonText}
+            {'  ' + title}
           </Text>
         </View>
       </PressableButton>

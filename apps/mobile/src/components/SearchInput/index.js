@@ -1,14 +1,16 @@
 import React, {useEffect, useState} from 'react';
 import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
-import {eClearSearch, eScrollEvent} from '../../services/events';
-import {inputRef} from '../../utils/refs';
-import {db, DDS, selection, ToastEvent} from '../../utils/utils';
+import {Actions} from '../../provider/Actions';
+import {eSubscribeEvent, eUnSubscribeEvent, ToastEvent} from '../../services/EventManager';
+import {eClearSearch, eScrollEvent, eUpdateSearchState} from '../../utils/Events';
+import {inputRef} from '../../utils/Refs';
+import {selection} from '../../utils';
 import Animated, {Easing} from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {br, WEIGHT, SIZE} from '../../common/common';
 import {TextInput, Text} from 'react-native';
+import {br, SIZE, WEIGHT} from "../../utils/SizeUtils";
+import {db} from "../../utils/DB";
+import {DDS} from "../../services/DeviceDetection";
 const {Value, timing, block} = Animated;
 
 let searchResult = [];
@@ -16,39 +18,47 @@ let searchResult = [];
 let offsetY = 0;
 let timeoutAnimate = null;
 let animating = false;
+
+const _marginAnim = new Value(0);
+const _opacity = new Value(1);
+const _borderAnim = new Value(1.5);
+
+const animation = (margin, opacity, border) => {
+  if (animating) return;
+  animating = true;
+  timing(_marginAnim, {
+    toValue: margin,
+    duration: 230,
+    easing: Easing.inOut(Easing.ease),
+  }).start();
+  timing(_opacity, {
+    toValue: opacity,
+    duration: 250,
+    easing: Easing.inOut(Easing.ease),
+  }).start();
+  timing(_borderAnim, {
+    toValue: border,
+    duration: 270,
+    easing: Easing.inOut(Easing.ease),
+  }).start();
+  setTimeout(() => {
+    animating = false;
+  }, 500);
+};
+
 export const Search = (props) => {
   const [state, dispatch] = useTracked();
-  const {colors, searchResults,searchState} = state;
+  const {colors, searchResults} = state;
   const [text, setText] = useState('');
   const [focus, setFocus] = useState(false);
+  const [searchState,setSearchState] = useState({
+    noSearch: false,
+    data: [],
+    type: 'notes',
+    color: null,
+    placeholder: 'Search all notes',
+  })
 
-
-  const _marginAnim = new Value(0);
-  const _opacity = new Value(1);
-  const _borderAnim = new Value(1.5);
-
-  const animation = (margin, opacity, border) => {
-    if (animating) return;
-    animating = true;
-    timing(_marginAnim, {
-      toValue: margin,
-      duration: 230,
-      easing: Easing.inOut(Easing.ease),
-    }).start();
-    timing(_opacity, {
-      toValue: opacity,
-      duration: 250,
-      easing: Easing.inOut(Easing.ease),
-    }).start();
-    timing(_borderAnim, {
-      toValue: border,
-      duration: 270,
-      easing: Easing.inOut(Easing.ease),
-    }).start();
-    setTimeout(() => {
-      animating = false;
-    }, 500);
-  };
 
   const onScroll = (y) => {
     if (searchResults.results.length > 0) return;
@@ -81,19 +91,27 @@ export const Search = (props) => {
     }
   };
 
+  const updateSearchState = (state => {
+    setSearchState(state);
+  })
+
   useEffect(() => {
     selection.data = searchState.data;
     selection.type = searchState.type;
     eSubscribeEvent(eScrollEvent, onScroll);
     eSubscribeEvent('showSearch', () => {
+      console.log('show search');
+      animating = false;
       animation(0, 1, 1.5);
     });
-
+    eSubscribeEvent(eUpdateSearchState,updateSearchState)
     return () => {
       eUnSubscribeEvent(eScrollEvent, onScroll);
       eUnSubscribeEvent('showSearch', () => {
+        animating = false;
         animation(0, 1, 1.5);
       });
+      eUnSubscribeEvent(eUpdateSearchState,updateSearchState)
     };
   }, [searchState]);
 
@@ -106,7 +124,7 @@ export const Search = (props) => {
         text: '',
       });
       dispatch({
-        type: ACTIONS.SEARCH_RESULTS,
+        type: Actions.SEARCH_RESULTS,
         results: {
           results: [],
           type: null,
@@ -143,10 +161,10 @@ export const Search = (props) => {
     );
     if (!searchResult || searchResult.length === 0) {
       ToastEvent.show('No search results found for ' + text, 'error');
-      return;
+
     } else {
       dispatch({
-        type: ACTIONS.SEARCH_RESULTS,
+        type: Actions.SEARCH_RESULTS,
         results: {
           type,
           results: searchResult,
@@ -217,9 +235,7 @@ export const Search = (props) => {
         />
         <Icon
           style={{paddingRight: DDS.isTab ? 12 : 12}}
-          onPress={() => {
-            onSubmitEditing();
-          }}
+          onPress={onSubmitEditing}
           name="magnify"
           color={
             focus

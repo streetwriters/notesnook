@@ -2,11 +2,13 @@ import React, {useEffect, useState} from 'react';
 import {Keyboard, Text, TouchableOpacity, View} from 'react-native';
 import Animated, {Easing, useValue} from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {SIZE} from '../../common/common';
 import {useTracked} from '../../provider';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/eventManager';
-import {eHideToast, eShowToast} from '../../services/events';
-import {getElevation} from '../../utils/utils';
+import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
+import {eHideToast, eShowToast} from '../../utils/Events';
+import {getElevation} from '../../utils';
+import {sleep} from "../../utils/TimeUtils";
+import {SIZE} from "../../utils/SizeUtils";
+import {DDS} from "../../services/DeviceDetection";
 const {spring, timing} = Animated;
 
 const toastMessages = [];
@@ -91,7 +93,9 @@ export const Toast = ({context = 'global'}) => {
         toValue: 300,
         duration: 200,
         easing: Easing.inOut(Easing.ease),
-      }).start(() => {
+      }).start(async () => {
+        await sleep(300);
+        console.log(toastMessages);
         toastMessages.shift();
         setData({});
       });
@@ -99,11 +103,11 @@ export const Toast = ({context = 'global'}) => {
   };
 
   const _onKeyboardShow = () => {
-    //setKeyboard(true);
+    setKeyboard(true);
   };
 
   const _onKeyboardHide = () => {
-    //setKeyboard(false);
+    setKeyboard(false);
   };
 
   useEffect(() => {
@@ -115,16 +119,17 @@ export const Toast = ({context = 'global'}) => {
     return () => {
       Keyboard.removeListener('keyboardDidShow', _onKeyboardShow);
       Keyboard.removeListener('keyboardDidHide', _onKeyboardHide);
-      eUnSubscribeEvent('showToast', showToastFunc);
-      eUnSubscribeEvent('hideToast', hideToastFunc);
+      eUnSubscribeEvent(eShowToast, showToastFunc);
+      eUnSubscribeEvent(eHideToast, hideToastFunc);
     };
   }, []);
 
   return (
     <Animated.View
       style={{
-        width: '100%',
+        width: DDS.isTab ? '30%' : '100%',
         alignItems: 'center',
+        alignSelf:'center',
         minHeight: 30,
         bottom: keyboard ? 30 : 100,
         position: 'absolute',

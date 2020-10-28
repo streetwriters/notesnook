@@ -1,13 +1,10 @@
 import React from 'react';
 import {KeyboardAvoidingView, Platform, SafeAreaView} from 'react-native';
-import { useSafeAreaInsets} from 'react-native-safe-area-context';
+import {initialWindowMetrics} from 'react-native-safe-area-context';
 import SelectionHeader from '../SelectionHeader';
-import {ContainerBottomButton} from './ContainerBottomButton';
 import {ContainerTopSection} from './ContainerTopSection';
 
-export const Container = ({children,root}) => {
-  const insets = useSafeAreaInsets();
-
+export const Container = ({children, root}) => {
   return (
     <KeyboardAvoidingView
       behavior="padding"
@@ -15,12 +12,11 @@ export const Container = ({children,root}) => {
       <SafeAreaView
         style={{
           height: '100%',
-          paddingTop: insets.top,
+          paddingTop: initialWindowMetrics.insets.top,
         }}>
         <SelectionHeader />
         <ContainerTopSection root={root} />
         {children}
-        <ContainerBottomButton root={root} />
       </SafeAreaView>
     </KeyboardAvoidingView>
   );

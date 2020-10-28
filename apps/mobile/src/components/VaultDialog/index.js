@@ -3,27 +3,29 @@ import {Modal, Text, View} from 'react-native';
 import {TextInput} from 'react-native-gesture-handler';
 import Share from 'react-native-share';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {ph, pv, SIZE, WEIGHT} from '../../common/common';
-import {ACTIONS} from '../../provider/actions';
+import {Actions} from '../../provider/Actions';
 import {
-  eSendEvent,
-  eSubscribeEvent,
-  eUnSubscribeEvent,
-} from '../../services/eventManager';
+    eSendEvent,
+    eSubscribeEvent,
+    eUnSubscribeEvent, ToastEvent,
+} from '../../services/EventManager';
 import {
   eCloseVaultDialog,
   eOnLoadNote,
   eOpenVaultDialog,
   refreshNotesPage,
-} from '../../services/events';
-import {openEditorAnimation} from '../../utils/animations';
-import {db, DDS, getElevation, ToastEvent} from '../../utils/utils';
+} from '../../utils/Events';
+import {openEditorAnimation} from '../../utils/Animations';
+import {getElevation} from '../../utils';
 import {Button} from '../Button/index';
 import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogHeader from '../Dialog/dialog-header';
 import {updateEvent} from '../DialogManager/recievers';
 import {Toast} from '../Toast';
+import {ph, pv, SIZE, WEIGHT} from "../../utils/SizeUtils";
+import {db} from "../../utils/DB";
+import {DDS} from "../../services/DeviceDetection";
 const passInputRef = createRef();
 const confirmPassRef = createRef();
 
@@ -78,7 +80,7 @@ export class VaultDialog extends Component {
   };
 
   close = () => {
-    updateEvent({type: ACTIONS.NOTES});
+    updateEvent({type: Actions.NOTES});
 
     this.password = null;
     this.confirmPassword = null;
@@ -181,8 +183,8 @@ export class VaultDialog extends Component {
   }
   async _deleteNote() {
     await db.notes.delete(this.state.note.id);
-    updateEvent({type: ACTIONS.NOTES});
-    updateEvent({type: ACTIONS.FAVORITES});
+    updateEvent({type: Actions.NOTES});
+    updateEvent({type: Actions.FAVORITES});
     eSendEvent(refreshNotesPage);
     this.close();
     ToastEvent.show('Note deleted', 'success', 'local');
@@ -263,7 +265,7 @@ export class VaultDialog extends Component {
         <View
           style={{
             ...getElevation(5),
-            width: '80%',
+            width: DDS.isTab ? 350 : '80%',
             maxHeight: 350,
             borderRadius: 5,
             backgroundColor: colors.bg,

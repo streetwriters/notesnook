@@ -1,19 +1,20 @@
 import React, {useEffect, useState} from 'react';
 import {Modal, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {ph, pv, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
-import {DDS, getElevation} from '../../utils/utils';
+import {getElevation} from '../../utils';
 import Seperator from '../Seperator';
+import {ph, pv, SIZE, WEIGHT} from "../../utils/SizeUtils";
+import {DDS} from "../../services/DeviceDetection";
 
 const {
   eSubscribeEvent,
   eUnSubscribeEvent,
-} = require('../../services/eventManager');
+} = require('../../services/EventManager');
 const {
   eOpenPremiumStatusDialog,
   eClosePremiumStatusDialog,
-} = require('../../services/events');
+} = require('../../utils/Events');
 
 const PremiumStatusDialog = () => {
   const [state, dispatch] = useTracked();

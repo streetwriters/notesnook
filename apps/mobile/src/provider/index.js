@@ -1,7 +1,7 @@
 import {useReducer} from 'react';
 import {createContainer} from 'react-tracked';
-import {reducer} from './reducer';
-import {defaultState} from './defaultState';
+import {reducer} from './Reducer';
+import {defaultState} from './DefaultState';
 
 const useValue = () => useReducer(reducer, defaultState);
 

@@ -1,8 +1,8 @@
 import React from 'react';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {SIZE} from '../../common/common';
 import {useTracked} from '../../provider';
 import {PressableButton} from '../PressableButton';
+import {SIZE} from "../../utils/SizeUtils";
 
 export const ActionIcon = ({
   onPress,
@@ -13,12 +13,14 @@ export const ActionIcon = ({
   iconStyle = {},
   left = 10,
   right = 10,
+  testID,
 }) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
 
   return (
     <PressableButton
+      testID={testID}
       onPress={onPress}
       hitSlop={{top: 30, left: left, right: right, bottom: 30}}
       color="transparent"
@@ -32,6 +34,7 @@ export const ActionIcon = ({
         alignItems: 'center',
         borderRadius: 100,
         ...customStyle,
+      
       }}>
       <Icon name={name} style={iconStyle} color={color} size={size} />
     </PressableButton>

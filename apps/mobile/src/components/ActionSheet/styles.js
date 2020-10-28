@@ -1,9 +1,10 @@
 import {StyleSheet} from 'react-native';
+import { dWidth } from '../../utils';
 
 export const styles = StyleSheet.create({
   scrollview: {
     height: '100%',
-    width: '100%',
+    width: dWidth,
     backgroundColor: 'transparent',
   },
   container: {

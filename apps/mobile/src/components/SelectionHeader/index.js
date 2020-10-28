@@ -3,13 +3,13 @@ import {Text, TouchableOpacity, View} from 'react-native';
 import Animated, {Easing, useValue} from 'react-native-reanimated';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
-import {eSendEvent} from '../../services/eventManager';
-import {eOpenMoveNoteDialog, eOpenSimpleDialog} from '../../services/events';
-import {db, ToastEvent} from '../../utils/utils';
-import {TEMPLATE_DELETE} from '../DialogManager/templates';
+import {Actions} from '../../provider/Actions';
+import {eSendEvent, ToastEvent} from '../../services/EventManager';
+import {eOpenMoveNoteDialog, eOpenSimpleDialog} from '../../utils/Events';
+import {TEMPLATE_DELETE} from '../DialogManager/Templates';
+import {SIZE, WEIGHT} from "../../utils/SizeUtils";
+import {db} from "../../utils/DB";
 
 export const SelectionHeader = () => {
   // State
@@ -66,8 +66,8 @@ export const SelectionHeader = () => {
           }}>
           <TouchableOpacity
             onPress={() => {
-              dispatch({type: ACTIONS.SELECTION_MODE, enabled: !selectionMode});
-              dispatch({type: ACTIONS.CLEAR_SELECTION});
+              dispatch({type: Actions.SELECTION_MODE, enabled: !selectionMode});
+              dispatch({type: Actions.CLEAR_SELECTION});
             }}
             hitSlop={{top: 20, bottom: 20, left: 50, right: 40}}
             style={{
@@ -113,8 +113,8 @@ export const SelectionHeader = () => {
                 paddingRight: 0,
               }}
               onPress={() => {
-                dispatch({type: ACTIONS.SELECTION_MODE, enabled: false});
-                dispatch({type: ACTIONS.CLEAR_SELECTION});
+                dispatch({type: Actions.SELECTION_MODE, enabled: false});
+                dispatch({type: Actions.CLEAR_SELECTION});
                 eSendEvent(eOpenMoveNoteDialog);
               }}>
               <Icon color={colors.heading} name={'plus'} size={SIZE.xl} />
@@ -197,9 +197,9 @@ export const SelectionHeader = () => {
 
                   await db.trash.restore(...noteIds);
 
-                  dispatch({type: ACTIONS.TRASH});
-                  dispatch({type: ACTIONS.SELECTION_MODE, enabled: false});
-                  dispatch({type: ACTIONS.CLEAR_SELECTION});
+                  dispatch({type: Actions.TRASH});
+                  dispatch({type: Actions.SELECTION_MODE, enabled: false});
+                  dispatch({type: Actions.CLEAR_SELECTION});
                   ToastEvent.show('Restore complete', 'success');
                 }
               }}>

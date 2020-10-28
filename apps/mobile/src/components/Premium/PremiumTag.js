@@ -1,7 +1,7 @@
 import React from 'react';
 import {Text, View} from 'react-native';
-import {WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
+import {WEIGHT} from "../../utils/SizeUtils";
 
 export const PremiumTag = ({pro}) => {
   const [state, dispatch] = useTracked();

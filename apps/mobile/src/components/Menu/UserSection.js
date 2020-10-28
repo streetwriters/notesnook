@@ -7,16 +7,16 @@ import {
   View,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {opacity, pv, SIZE, WEIGHT} from '../../common/common';
 import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
-import {eSendEvent} from '../../services/eventManager';
-import {eOpenLoginDialog} from '../../services/events';
-import NavigationService from '../../services/NavigationService';
-import {db, DDS, hexToRGBA, ToastEvent} from '../../utils/utils';
-import {TimeSince} from './TimeSince';
-import {sideMenuRef} from '../../utils/refs';
+import {Actions} from '../../provider/Actions';
+import {eSendEvent, ToastEvent} from '../../services/EventManager';
+import {eOpenLoginDialog} from '../../utils/Events';
+import {showContext} from '../../utils';
 import {PressableButton} from '../PressableButton';
+import {TimeSince} from './TimeSince';
+import {hexToRGBA} from "../../utils/ColorUtils";
+import {pv, SIZE, WEIGHT} from "../../utils/SizeUtils";
+import {db} from "../../utils/DB";
 
 export const UserSection = ({noTextMode}) => {
   const [state, dispatch] = useTracked();
@@ -24,7 +24,7 @@ export const UserSection = ({noTextMode}) => {
 
   useEffect(() => {
     console.log(user);
-    dispatch({type: ACTIONS.TAGS});
+    dispatch({type: Actions.TAGS});
   }, []);
 
   return user && user.username ? (
@@ -68,13 +68,13 @@ export const UserSection = ({noTextMode}) => {
       <TouchableOpacity
         onPress={async () => {
           dispatch({
-            type: ACTIONS.SYNCING,
+            type: Actions.SYNCING,
             syncing: true,
           });
           try {
             if (!user) {
               let u = await db.user.get();
-              dispatch({type: ACTIONS.USER, user: u});
+              dispatch({type: Actions.USER, user: u});
             }
             await db.sync();
             ToastEvent.show('Sync Complete', 'success');
@@ -82,10 +82,10 @@ export const UserSection = ({noTextMode}) => {
             ToastEvent.show(e.message, 'error');
           }
           let u = await db.user.get();
-          dispatch({type: ACTIONS.USER, user: u});
-          dispatch({type: ACTIONS.ALL});
+          dispatch({type: Actions.USER, user: u});
+          dispatch({type: Actions.ALL});
           dispatch({
-            type: ACTIONS.SYNCING,
+            type: Actions.SYNCING,
             syncing: false,
           });
         }}
@@ -116,7 +116,7 @@ export const UserSection = ({noTextMode}) => {
             {syncing ? 'Syncing ' : 'Synced '}
             {!syncing ? (
               user?.notesnook?.lastSynced ? (
-                <TimeSince time={user.notesnook.lastSynced} />
+                <TimeSince time={user.lastSynced} />
               ) : (
                 'never'
               )
@@ -143,7 +143,10 @@ export const UserSection = ({noTextMode}) => {
       onPress={() => {
         eSendEvent(eOpenLoginDialog);
       }}
-      color={colors.shade}
+      onLongPress={(event) => {
+        showContext(event, 'Login');
+      }}
+      color={noTextMode ? 'transparent' : colors.shade}
       selectedColor={colors.accent}
       alpha={!colors.night ? -0.02 : 0.1}
       opacity={0.12}
@@ -151,8 +154,8 @@ export const UserSection = ({noTextMode}) => {
         paddingVertical: 12,
         marginVertical: 5,
         marginTop: pv + 5,
-        borderRadius: 5,
-        width: '93%',
+        borderRadius: noTextMode ? 0 : 5,
+        width: noTextMode ? '100%' : '93%',
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: noTextMode ? 'center' : 'flex-start',
@@ -161,7 +164,7 @@ export const UserSection = ({noTextMode}) => {
       <View
         style={{
           width: 30,
-          backgroundColor: colors.accent,
+          backgroundColor: noTextMode ? 'transparent' : colors.accent,
           height: 30,
           borderRadius: 100,
           alignItems: 'center',
@@ -172,9 +175,9 @@ export const UserSection = ({noTextMode}) => {
             textAlign: 'center',
             textAlignVertical: 'center',
           }}
-          name="account-outline"
-          color="white"
-          size={SIZE.md}
+          name={noTextMode ? 'login-variant' : 'account-outline'}
+          color={noTextMode ? colors.accent : 'white'}
+          size={noTextMode ? SIZE.md + 5 : SIZE.md + 1}
         />
       </View>
       {noTextMode ? null : (

@@ -1,30 +1,36 @@
 import React from 'react';
-import { Text, View } from 'react-native';
+import {Text, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { SIZE, WEIGHT } from '../../common/common';
-import { useTracked } from '../../provider';
-import { ACTIONS } from '../../provider/actions';
-import { eSendEvent } from '../../services/eventManager';
-import { eClearSearch } from '../../services/events';
-import NavigationService from '../../services/NavigationService';
-import { PressableButton } from '../PressableButton';
+import {useTracked} from '../../provider';
+import {Actions} from '../../provider/Actions';
+import {eSendEvent} from '../../services/EventManager';
+import {eClearSearch} from '../../utils/Events';
+import NavigationService from '../../services/Navigation';
+import {showContext} from '../../utils';
+import {PressableButton} from '../PressableButton';
+import {SIZE, WEIGHT} from "../../utils/SizeUtils";
+import {DDS} from "../../services/DeviceDetection";
 
-export const MenuListItem = ({item, index, noTextMode, ignore}) => {
+export const MenuListItem = ({item, index, noTextMode, ignore, testID}) => {
   const [state, dispatch] = useTracked();
   const {currentScreen, colors} = state;
 
-  const _onPress = () => {
-    if (!ignore) {
+  const _onPress = (event) => {
+    if (!ignore && currentScreen !== item.name.toLowerCase()) {
       dispatch({
-        type: ACTIONS.HEADER_TEXT_STATE,
+        type: Actions.HEADER_TEXT_STATE,
         state: {
           heading: item.name,
         },
       });
+      dispatch({
+            type:  Actions.HEADER_VERTICAL_MENU,
+            state: item.name === "Home",
+      });
       eSendEvent(eClearSearch);
     }
-
     item.func();
+
     if (item.close) {
       NavigationService.closeDrawer();
     }
@@ -32,8 +38,12 @@ export const MenuListItem = ({item, index, noTextMode, ignore}) => {
 
   return (
     <PressableButton
+      testID={testID}
       key={item.name + index}
       onPress={_onPress}
+      onLongPress={(event) => {
+        showContext(event, item.name).then(r => r);
+      }}
       color={
         currentScreen === item.name.toLowerCase() ? colors.shade : 'transparent'
       }
@@ -48,7 +58,7 @@ export const MenuListItem = ({item, index, noTextMode, ignore}) => {
         paddingHorizontal: noTextMode ? 0 : 8,
         justifyContent: noTextMode ? 'center' : 'space-between',
         alignItems: 'center',
-        height:50
+        height: 50,
       }}>
       <View
         style={{
@@ -63,7 +73,7 @@ export const MenuListItem = ({item, index, noTextMode, ignore}) => {
           }}
           name={item.icon}
           color={colors.accent}
-          size={SIZE.md + 1}
+          size={DDS.isTab ? SIZE.md + 5 : SIZE.md + 1}
         />
         {noTextMode ? null : (
           <Text

@@ -2,6 +2,7 @@ import React from 'react';
 import {Text, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
+import {SIZE, WEIGHT} from "../../utils/SizeUtils";
 
 const DialogHeader = ({icon, title, paragraph}) => {
   const [state, dispatch] = useTracked();
@@ -20,10 +21,10 @@ const DialogHeader = ({icon, title, paragraph}) => {
         ) : null}
         <Text
           style={{
-            color: colors.accent,
+            color: colors.heading,
             fontFamily: WEIGHT.bold,
             marginLeft: 5,
-            fontSize: SIZE.md,
+            fontSize: SIZE.lg,
           }}>
           {title}
         </Text>

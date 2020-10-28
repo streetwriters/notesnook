@@ -2,8 +2,8 @@ import React, {useMemo} from 'react';
 import {NotebookItem} from '../../components/NotebookItem';
 import SelectionWrapper from '../../components/SelectionWrapper';
 import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
-import NavigationService from '../../services/NavigationService';
+import {Actions} from '../../provider/Actions';
+import NavigationService from '../../services/Navigation';
 
 export const NotebookItemWrapper = ({
   item,
@@ -12,8 +12,7 @@ export const NotebookItemWrapper = ({
   pinned = false,
 }) => {
   const [state, dispatch] = useTracked();
-  const {selectionMode, preventDefaultMargins, headerState} = state;
-  let params = headerState.route.params || {};
+  const {selectionMode, preventDefaultMargins} = state;
 
   const style = useMemo(() => {
     return {width: selectionMode ? '90%' : '100%', marginHorizontal: 0};
@@ -22,13 +21,13 @@ export const NotebookItemWrapper = ({
   const onLongPress = () => {
     if (!selectionMode) {
       dispatch({
-        type: ACTIONS.SELECTION_MODE,
+        type: Actions.SELECTION_MODE,
         enabled: !selectionMode,
       });
     }
 
     dispatch({
-      type: ACTIONS.SELECTED_ITEMS,
+      type: Actions.SELECTED_ITEMS,
       item: item,
     });
   };
@@ -39,23 +38,14 @@ export const NotebookItemWrapper = ({
       return;
     }
     dispatch({
-      type: ACTIONS.HEADER_TEXT_STATE,
+      type: Actions.HEADER_TEXT_STATE,
       state: {
         heading: item.title,
       },
     });
     dispatch({
-      type: ACTIONS.HEADER_STATE,
-      state: {
-        canGoBack: true,
-        menu: false,
-      },
-    });
-    dispatch({
-      type: ACTIONS.CONTAINER_BOTTOM_BUTTON,
-      state: {
-        bottomButtonText: 'Add new topic',
-      },
+      type: Actions.HEADER_STATE,
+      state:false,
     });
 
     NavigationService.navigate('Notebook', {
@@ -76,7 +66,6 @@ export const NotebookItemWrapper = ({
         hideMore={preventDefaultMargins}
         isTopic={item.type === 'topic'}
         customStyle={style}
-        noteToMove={params.note}
         item={item}
         index={index}
         isTrash={isTrash}

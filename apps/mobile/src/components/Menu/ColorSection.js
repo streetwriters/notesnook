@@ -1,12 +1,13 @@
 import React, { useEffect } from 'react';
 import { Text, View } from 'react-native';
-import { COLORS_NOTE, SIZE } from '../../common/common';
 import { useTracked } from '../../provider';
-import { ACTIONS } from '../../provider/actions';
-import { eSendEvent } from '../../services/eventManager';
-import { refreshNotesPage } from '../../services/events';
-import NavigationService from '../../services/NavigationService';
+import { Actions } from '../../provider/Actions';
+import { eSendEvent } from '../../services/EventManager';
+import { refreshNotesPage } from '../../utils/Events';
+import NavigationService from '../../services/Navigation';
 import { PressableButton } from '../PressableButton';
+import {COLORS_NOTE} from "../../utils/Colors";
+import {SIZE} from "../../utils/SizeUtils";
 
 export const ColorSection = ({noTextMode}) => {
   const [state, dispatch] = useTracked();
@@ -14,7 +15,7 @@ export const ColorSection = ({noTextMode}) => {
 
   useEffect(() => {
   
-    dispatch({type: ACTIONS.TAGS});
+    dispatch({type: Actions.TAGS});
   }, []);
 
   return (
@@ -40,18 +41,12 @@ export const ColorSection = ({noTextMode}) => {
               color: item,
             };
             dispatch({
-              type: ACTIONS.HEADER_VERTICAL_MENU,
+              type: Actions.HEADER_VERTICAL_MENU,
               state: false,
             });
 
             dispatch({
-              type: ACTIONS.CONTAINER_BOTTOM_BUTTON,
-              state: {
-                bottomButtonText: 'Create a new Note',
-              },
-            });
-            dispatch({
-              type: ACTIONS.HEADER_TEXT_STATE,
+              type: Actions.HEADER_TEXT_STATE,
               state: {
                 heading: item.title,
               },

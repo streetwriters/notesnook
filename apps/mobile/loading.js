@@ -1,10 +1,8 @@
 import React from 'react';
 import * as Animatable from 'react-native-animatable';
-import {SIZE, WEIGHT} from './src/common/common';
-import {DialogManager} from './src/components/DialogManager';
-import {Toast} from './src/components/Toast';
 import {useTracked} from './src/provider';
-import {w} from './src/utils/utils';
+import {dWidth} from './src/utils';
+import {SIZE, WEIGHT} from "./src/utils/SizeUtils";
 export const Loading = () => {
   const [state, dispatch] = useTracked();
   const {colors, loading} = state;
@@ -27,7 +25,7 @@ export const Loading = () => {
           zIndex: 999,
           transform: [
             {
-              translateX: loading ? 0 : -w * 2,
+              translateX: loading ? 0 : -dWidth * 2,
             },
           ],
         }}>
@@ -71,7 +69,7 @@ export const Loading = () => {
           zIndex: 999,
           transform: [
             {
-              translateX: loading ? 0 : w * 2,
+              translateX: loading ? 0 : dWidth * 2,
             },
           ],
         }}>

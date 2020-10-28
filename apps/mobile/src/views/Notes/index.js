@@ -1,35 +1,35 @@
-import {useIsFocused} from '@react-navigation/native';
-import React, {useEffect, useState} from 'react';
-import {COLORS_NOTE} from '../../common/common';
+import React, {useCallback, useEffect, useState} from 'react';
 import {Placeholder} from '../../components/ListPlaceholders';
 import SimpleList from '../../components/SimpleList';
 import {NoteItemWrapper} from '../../components/SimpleList/NoteItemWrapper';
 import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
+import {Actions} from '../../provider/Actions';
+import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-} from '../../services/eventManager';
+} from '../../services/EventManager';
 import {
   eOnLoadNote,
-  eScrollEvent,
+  eScrollEvent, eUpdateSearchState,
   refreshNotesPage,
-} from '../../services/events';
-import {openEditorAnimation} from '../../utils/animations';
-import {db, DDS, editing, ToastEvent} from '../../utils/utils';
+} from '../../utils/Events';
+import {openEditorAnimation} from '../../utils/Animations';
+import {editing} from '../../utils';
+import {COLORS_NOTE} from "../../utils/Colors";
+import {db} from "../../utils/DB";
+import {DDS} from "../../services/DeviceDetection";
 
 export const Notes = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const {colorNotes} = state;
   const allNotes = state.notes;
   const [notes, setNotes] = useState([]);
-  const [refreshing, setRefreshing] = useState(false);
-  const isFocused = useIsFocused();
   let params = route.params ? route.params : null;
 
   useEffect(() => {
-    if (isFocused) {
+    if (navigation.isFocused()) {
       if (!params) {
         params = {
           title: 'Notes',
@@ -42,7 +42,7 @@ export const Notes = ({route, navigation}) => {
         type: null,
       };
     }
-  }, [isFocused, allNotes, colorNotes]);
+  }, [allNotes, colorNotes]);
 
   useEffect(() => {
     eSubscribeEvent(refreshNotesPage, init);
@@ -55,6 +55,7 @@ export const Notes = ({route, navigation}) => {
   }, []);
 
   const init = (data) => {
+    console.log('refreshing notes!');
     params = route.params;
     if (data) {
       params = data;
@@ -63,7 +64,7 @@ export const Notes = ({route, navigation}) => {
     eSendEvent(eScrollEvent, 0);
     if (params.type === 'tag') {
       allNotes = db.notes.tagged(params.tag.title);
-    } else if (params.type == 'color') {
+    } else if (params.type === 'color') {
       allNotes = db.notes.colored(params.color.title);
     } else {
       allNotes = db.notebooks
@@ -75,77 +76,64 @@ export const Notes = ({route, navigation}) => {
     }
   };
 
-  useEffect(() => {
-    if (isFocused) {
-      dispatch({
-        type: ACTIONS.HEADER_STATE,
-        state: {
-          type: 'notes',
-          menu: params.type === 'color' ? true : false,
-          canGoBack: params.type === 'color' ? false : true,
-          color: params.type == 'color' ? COLORS_NOTE[params.title] : null,
-        
-        },
-      });
-      dispatch({
-        type: ACTIONS.CONTAINER_BOTTOM_BUTTON,
-        state: {
-          visible: true,
-          color: params.type == 'color' ? COLORS_NOTE[params.title] : null,
-          bottomButtonOnPress: _bottomBottomOnPress,
-          bottomButtonText: 'Create a new note',
-        },
-      });
-      dispatch({
-        type: ACTIONS.HEADER_VERTICAL_MENU,
-        state: false,
-      });
-      dispatch({
-        type: ACTIONS.HEADER_TEXT_STATE,
-        state: {
-          heading:
-            params.type == 'tag'
-              ? '# ' + params.title
-              : params.title.slice(0, 1).toUpperCase() + params.title.slice(1),
-        },
-      });
-      init();
-      dispatch({
-        type: ACTIONS.CURRENT_SCREEN,
-        screen: params.type === 'color' ? params.color.title : params.type,
-      });
-    } else {
-      setNotes([]);
-      editing.actionAfterFirstSave = {
-        type: null,
-      };
-    }
-  }, [isFocused, allNotes, colorNotes]);
+  const onFocus = useCallback(() => {
+    dispatch({
+      type: Actions.HEADER_STATE,
+      state: params.type === 'color',
+    });
+    dispatch({
+      type: Actions.HEADER_TEXT_STATE,
+      state: {
+        heading:
+          params.type === 'tag'
+            ? '# ' + params.title
+            : params.title.slice(0, 1).toUpperCase() + params.title.slice(1),
+      },
+    });
+    init();
+    dispatch({
+      type: Actions.CURRENT_SCREEN,
+      screen: params.type === 'color' ? params.color.title : params.type,
+    });
+  }, []);
+
+  const onBlur = useCallback(() => {
+    setNotes([]);
+    editing.actionAfterFirstSave = {
+      type: null,
+    };
+  }, []);
 
   useEffect(() => {
-    if (isFocused) {
-      dispatch({
-        type: ACTIONS.SEARCH_STATE,
-        state: {
+    navigation.addListener('focus', onFocus);
+    navigation.addListener('blur', onBlur);
+    return () => {
+      navigation.removeListener('focus', onFocus);
+      navigation.removeListener('blur', onBlur);
+    };
+  });
+
+  useEffect(() => {
+    if (navigation.isFocused()) {
+      eSendEvent(eUpdateSearchState,{
           placeholder: `Search in ${
-            params.type == 'tag' ? '#' + params.title : params.title
+              params.type === 'tag' ? '#' + params.title : params.title
           }`,
           data: notes,
           noSearch: false,
           type: 'notes',
-          color: params.type == 'color' ? params.title : null,
-        },
-      });
+          color: params.type === 'color' ? params.title : null,
+        })
     }
-  }, [notes, isFocused]);
+  }, [notes]);
 
-  const _bottomBottomOnPress = () => {
+  const _onPressBottomButton = useCallback(() => {
     if (params.type === 'tag') {
       editing.actionAfterFirstSave = {
         type: 'tag',
         id: params.tag.title,
       };
-    } else if (params.type == 'color') {
+    } else if (params.type === 'color') {
       editing.actionAfterFirstSave = {
         type: 'color',
         id: params.color.id,
@@ -158,26 +146,33 @@ export const Notes = ({route, navigation}) => {
       };
     }
 
-    if (DDS.isTab) {
-      eSendEvent(eOnLoadNote, {type: 'new'});
+    eSendEvent(eOnLoadNote, {type: 'new'});
+    if (DDS.isPhone || DDS.isSmallTab) {
+      openEditorAnimation();
     }
-    openEditorAnimation();
-  };
+  }, [params.type]);
 
   return (
-    <SimpleList
-      data={notes}
-      type="notes"
-      refreshCallback={() => {
-        init();
-      }}
-      focused={isFocused}
-      RenderItem={NoteItemWrapper}
-      placeholder={<Placeholder type="notes" />}
-      placeholderText={`Add some notes to this" ${
-        params.type ? params.type : 'topic.'
-      }`}
-    />
+    <>
+      <SimpleList
+        data={notes}
+        type="notes"
+        refreshCallback={() => {
+          init();
+        }}
+        focused={() => navigation.isFocused()}
+        RenderItem={NoteItemWrapper}
+        placeholder={<Placeholder type="notes" />}
+        placeholderText={`Add some notes to this" ${
+          params.type ? params.type : 'topic.'
+        }`}
+      />
+      <ContainerBottomButton
+        title="Create a new note"
+        onPress={_onPressBottomButton}
+        color={params.type == 'color' ? COLORS_NOTE[params.title] : null}
+      />
+    </>
   );
 };
 

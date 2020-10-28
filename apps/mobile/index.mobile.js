@@ -6,15 +6,14 @@ import {Screen, ScreenContainer} from 'react-native-screens';
 import {DialogManager} from './src/components/DialogManager';
 import {Toast} from './src/components/Toast';
 import {useTracked} from './src/provider';
-import {NavigationStack} from './src/services/Navigator';
 import {
   EditorOpacity,
   EditorPosition,
   EditorScale,
   EditorTranslateY,
-} from './src/utils/animations';
-import {DDS} from './src/utils/utils';
+} from './src/utils/Animations';
 import Editor from './src/views/Editor';
+import {NavigationStack} from "./src/navigation/Drawer";
 
 const editorRef = createRef();
 
@@ -25,7 +24,6 @@ const AnimatedScreenContainer = Animated.createAnimatedComponent(
 export const Initialize = () => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
-  const [locked, setLocked] = useState(false);
 
   useEffect(() => {
     if (Platform.OS === 'android') {
@@ -38,6 +36,7 @@ export const Initialize = () => {
   return (
     <>
       <Animatable.View
+        testID={'mobile_main_view'}
         transition="backgroundColor"
         duration={300}
         style={{
@@ -48,7 +47,7 @@ export const Initialize = () => {
         }}>
         <View
           style={{
-            width: DDS.isTab ? '70%' : '100%',
+            width: '100%',
             height: '100%',
             backgroundColor: colors.bg,
           }}>

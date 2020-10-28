@@ -1,73 +1,71 @@
-import { useIsFocused } from '@react-navigation/native';
-import React, { useEffect, useState } from 'react';
-import { Placeholder } from '../../components/ListPlaceholders';
+import React, {useCallback, useEffect, useState} from 'react';
+import {Placeholder} from '../../components/ListPlaceholders';
 import SimpleList from '../../components/SimpleList';
-import { NoteItemWrapper } from '../../components/SimpleList/NoteItemWrapper';
-import { useTracked } from '../../provider';
-import { ACTIONS } from '../../provider/actions';
+import {NoteItemWrapper} from '../../components/SimpleList/NoteItemWrapper';
+import {useTracked} from '../../provider';
+import {Actions} from '../../provider/Actions';
+import {eSendEvent} from "../../services/EventManager";
+import {eUpdateSearchState} from "../../utils/Events";
 export const Favorites = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const {favorites} = state;
-  const [refreshing, setRefreshing] = useState(false);
-  const isFocused = useIsFocused();
+
+  const onFocus = useCallback(() => {
+    dispatch({
+      type: Actions.HEADER_STATE,
+      state: {
+        menu: true,
+      },
+    });
+    dispatch({
+      type: Actions.HEADER_TEXT_STATE,
+      state: {
+        heading: "Favorites",
+      },
+    });
+    eSendEvent(eUpdateSearchState,{
+      placeholder: 'Search all favorites',
+      data: favorites,
+      noSearch: false,
+      type: 'notes',
+      color: null,
+    })
+
+    dispatch({
+      type: Actions.CURRENT_SCREEN,
+      screen: 'favorites',
+    });
+    dispatch({type: Actions.FAVORITES});
+  }, []);
 
   useEffect(() => {
-    if (isFocused) {
-      dispatch({
-        type: ACTIONS.HEADER_STATE,
-        state: {
-          type: 'notes',
-          menu: true,
-          canGoBack: false,
-          color: null,
-        },
-      });
-      dispatch({
-        type: ACTIONS.CONTAINER_BOTTOM_BUTTON,
-        state: {
-          visible: false,
-        },
-      });
-
-      dispatch({
-        type: ACTIONS.HEADER_TEXT_STATE,
-        state: {
-          heading: 'Favorites',
-        },
-      });
-
-      dispatch({
-        type: ACTIONS.CURRENT_SCREEN,
-        screen: 'favorites',
-      });
-      dispatch({type: ACTIONS.FAVORITES});
-    }
-  }, [isFocused]);
+    navigation.addListener('focus', onFocus);
+    return () => {
+      navigation.removeListener('focus', onFocus);
+    };
+  });
 
   useEffect(() => {
-    if (isFocused) {
-      dispatch({
-        type: ACTIONS.SEARCH_STATE,
-        state: {
-          placeholder: 'Search all favorites',
-          data: favorites,
-          noSearch: false,
-          type: 'notes',
-          color: null,
-        },
-      });
+    if (navigation.isFocused()) {
+
+      eSendEvent(eUpdateSearchState,{
+        placeholder: 'Search all favorites',
+        data: favorites,
+        noSearch: false,
+        type: 'notes',
+        color: null,
+      })
     }
-  }, [favorites, isFocused]);
+  }, [favorites]);
 
   return (
     <SimpleList
       data={favorites}
       type="notes"
       refreshCallback={() => {
-        dispatch({type: ACTIONS.FAVORITES});
+        dispatch({type: Actions.FAVORITES});
       }}
-      refreshing={refreshing}
-      focused={isFocused}
+      focused={() => navigation.isFocused()}
       RenderItem={NoteItemWrapper}
       placeholder={<Placeholder type="favorites" />}
       placeholderText="Notes you favorite appear here"

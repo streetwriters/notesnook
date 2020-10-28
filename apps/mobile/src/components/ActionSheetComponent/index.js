@@ -11,39 +11,33 @@ import {
 } from 'react-native';
 import Share from 'react-native-share';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {
-  ACCENT,
-  COLORS_NOTE,
-  COLOR_SCHEME,
-  COLOR_SCHEME_DARK,
-  COLOR_SCHEME_LIGHT,
-  opacity,
-  ph,
-  pv,
-  setColorScheme,
-  SIZE,
-  WEIGHT,
-} from '../../common/common';
 import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
-import {eSendEvent, openVault} from '../../services/eventManager';
+import {Actions} from '../../provider/Actions';
+import {eSendEvent, openVault, sendNoteEditedEvent, ToastEvent} from '../../services/EventManager';
 import {
+  eOnNoteEdited,
   eOpenLoginDialog,
   eOpenMoveNoteDialog,
   refreshNotesPage,
-} from '../../services/events';
-import {MMKV} from '../../utils/storage';
-import {
-  db,
-  DDS,
-  hexToRGBA,
-  RGB_Linear_Shade,
-  timeConverter,
-  ToastEvent,
-} from '../../utils/utils';
+} from '../../utils/Events';
 import {PremiumTag} from '../Premium/PremiumTag';
 import {PressableButton} from '../PressableButton';
 import {Toast} from '../Toast';
+import {hexToRGBA, RGB_Linear_Shade} from "../../utils/ColorUtils";
+import {timeConverter} from "../../utils/TimeUtils";
+import {
+  ACCENT,
+  COLOR_SCHEME,
+  COLOR_SCHEME_DARK,
+  COLOR_SCHEME_LIGHT,
+  COLORS_NOTE,
+  setColorScheme
+} from "../../utils/Colors";
+import {opacity, ph, pv, SIZE, WEIGHT} from "../../utils/SizeUtils";
+import {db} from "../../utils/DB";
+import {DDS} from "../../services/DeviceDetection";
+import {MMKV} from "../../utils/MMKV";
+import id from "notes-core/utils/id";
 
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
@@ -82,7 +76,7 @@ export const ActionSheetComponent = ({
     let newColors = setColorScheme(colors, accent);
     StatusBar.setBarStyle(colors.night ? 'light-content' : 'dark-content');
 
-    dispatch({type: ACTIONS.THEME, colors: newColors});
+    dispatch({type: Actions.THEME, colors: newColors});
   }
 
   useEffect(() => {
@@ -111,7 +105,7 @@ export const ActionSheetComponent = ({
     await db.notes.note(note.id).tag(tag);
 
     setNote({...db.notes.note(note.id).data});
-    dispatch({type: ACTIONS.TAGS});
+    dispatch({type: Actions.TAGS});
     tagsInputRef.current?.setNativeProps({
       text: '',
     });
@@ -122,7 +116,6 @@ export const ActionSheetComponent = ({
     if (event.nativeEvent.key === 'Backspace') {
       if (backPressCount === 0 && !tagToAdd) {
         backPressCount = 1;
-
         return;
       }
       if (backPressCount === 1 && !tagToAdd) {
@@ -143,17 +136,15 @@ export const ActionSheetComponent = ({
         });
       }
     } else if (event.nativeEvent.key === ' ') {
-      _onSubmit();
+      await _onSubmit();
       tagsInputRef.current?.setNativeProps({
         text: '',
       });
-      return;
     } else if (event.nativeEvent.key === ',') {
-      _onSubmit();
+      await _onSubmit();
       tagsInputRef.current?.setNativeProps({
         text: '',
       });
-      return;
     }
   };
 
@@ -201,8 +192,7 @@ export const ActionSheetComponent = ({
 
     if (!nodispatch) {
       dispatch({type: type});
-      dispatch({type: ACTIONS.PINNED});
-      dispatch({type: ACTIONS.FAVORITES});
+      dispatch({type: Actions.FAVORITES});
     }
     setNote({...toAdd});
   };
@@ -212,8 +202,8 @@ export const ActionSheetComponent = ({
       name: 'Add to',
       icon: 'book-outline',
       func: () => {
-        dispatch({type: ACTIONS.MODAL_NAVIGATOR, enabled: true});
-        dispatch({type: ACTIONS.SELECTED_ITEMS, item: note});
+        dispatch({type: Actions.MODAL_NAVIGATOR, enabled: true});
+        dispatch({type: Actions.SELECTED_ITEMS, item: note});
         close();
         setTimeout(() => {
           eSendEvent(eOpenMoveNoteDialog);
@@ -277,7 +267,7 @@ export const ActionSheetComponent = ({
       name: 'Restore',
       icon: 'delete-restore',
       func: async () => {
-        dispatch({type: ACTIONS.TRASH});
+        dispatch({type: Actions.TRASH});
         localRefresh(note.type);
         ToastEvent.show(
           item.type === 'note' ? 'Note restored' : 'Notebook restored',
@@ -328,7 +318,6 @@ export const ActionSheetComponent = ({
         } else {
           await db.notebooks.notebook(note.id).pin();
         }
-        dispatch({type: ACTIONS.PINNED});
         localRefresh(item.type);
       },
       close: false,
@@ -349,8 +338,9 @@ export const ActionSheetComponent = ({
         } else {
           await db.notebooks.notebook(note.id).favorite();
         }
-        dispatch({type: ACTIONS.FAVORITES});
-        localRefresh(item.type);
+        dispatch({type: Actions.FAVORITES});
+        sendNoteEditedEvent(note.id, false,true)
+        localRefresh(item.type,true);
       },
       close: false,
       check: true,
@@ -369,14 +359,11 @@ export const ActionSheetComponent = ({
         if (note.locked) {
           close('unlock');
 
-          return;
         } else {
           db.vault
             .add(note.id)
             .then(() => {
-              dispatch({type: ACTIONS.NOTES});
-              eSendEvent(refreshNotesPage);
-              dispatch({type: ACTIONS.PINNED});
+              sendNoteEditedEvent(note.id, false,true)
               close();
             })
             .catch(async (e) => {
@@ -409,10 +396,10 @@ export const ActionSheetComponent = ({
           await db.notes
             .note(note.id)
             .untag(oldProps.tags[oldProps.tags.indexOf(tag)]);
-          localRefresh(oldProps.type);
-          dispatch({type: ACTIONS.TAGS});
+          sendNoteEditedEvent(note.id, false,true)
+          dispatch({type: Actions.TAGS});
         } catch (e) {
-          localRefresh(oldProps.type);
+          sendNoteEditedEvent(note.id, false,true)
         }
       }}
       style={{
@@ -464,8 +451,9 @@ export const ActionSheetComponent = ({
           } else {
             await db.notes.note(note.id).color(color.name);
           }
-          dispatch({type: ACTIONS.COLORS});
-          localRefresh(note.type);
+          dispatch({type: Actions.COLORS});
+          sendNoteEditedEvent(note.id, false,true)
+          localRefresh(note.type,true);
         }}
         customStyle={{
           width: DDS.isTab ? 400 / 10 : w / 10,
@@ -611,7 +599,7 @@ export const ActionSheetComponent = ({
       setRefreshing(true);
       try {
         let user = await db.user.get();
-        dispatch({type: ACTIONS.USER, user: user});
+        dispatch({type: Actions.USER, user: user});
         await db.sync();
         localRefresh();
         ToastEvent.show('Note synced', 'success', 'local');
@@ -620,7 +608,7 @@ export const ActionSheetComponent = ({
       } finally {
         setRefreshing(false);
       }
-      dispatch({type: ACTIONS.ALL});
+      dispatch({type: Actions.ALL});
     }
   };
 
@@ -634,7 +622,6 @@ export const ActionSheetComponent = ({
       style={{
         paddingBottom: 30,
         backgroundColor: colors.bg,
-        width: w,
         paddingHorizontal: 0,
       }}>
       {!note.id && !note.dateCreated ? (
@@ -891,8 +878,8 @@ export const ActionSheetComponent = ({
               borderRadius: 5,
               borderWidth: 1.5,
               borderColor: focused ? colors.accent : colors.nav,
-              paddingVertical: 5,
               alignItems: 'center',
+              height:40
             }}>
             <TouchableOpacity
               onPress={() => {
@@ -902,12 +889,14 @@ export const ActionSheetComponent = ({
                 }
                 tagsInputRef.current?.focus();
               }}
+              activeOpacity={1}
               style={{
                 position: 'absolute',
                 width: '100%',
                 height: '100%',
                 justifyContent: 'flex-start',
                 alignItems: 'flex-end',
+                zIndex:10
               }}>
               {!premiumUser ? (
                 <Text
@@ -915,7 +904,8 @@ export const ActionSheetComponent = ({
                     color: colors.accent,
                     fontFamily: WEIGHT.regular,
                     fontSize: 10,
-                    marginRight: 5,
+                    marginRight: 4,
+                    marginTop:2.5
                   }}>
                   PRO
                 </Text>
@@ -930,8 +920,9 @@ export const ActionSheetComponent = ({
                 fontFamily: WEIGHT.regular,
                 color: colors.pri,
                 paddingHorizontal: 5,
-                paddingVertical: 1.5,
-                margin: 1,
+                paddingVertical:0,
+                height:40,
+                textAlignVertical:"center"
               }}
               blurOnSubmit={false}
               ref={tagsInputRef}

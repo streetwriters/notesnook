@@ -1,14 +1,14 @@
-import React, {useEffect, useState} from 'react';
+import React, {createRef, useEffect, useState} from 'react';
 import {
   BackHandler,
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
   StatusBar,
+  TextInput,
   View,
 } from 'react-native';
 import WebView from 'react-native-webview';
-import {normalize} from '../../common/common';
 import {ActionIcon} from '../../components/ActionIcon';
 import {
   ActionSheetEvent,
@@ -17,41 +17,49 @@ import {
 import {
   TEMPLATE_EXIT_FULLSCREEN,
   TEMPLATE_NEW_NOTE,
-} from '../../components/DialogManager/templates';
+} from '../../components/DialogManager/Templates';
 import {useTracked} from '../../provider';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-} from '../../services/eventManager';
+  ToastEvent,
+} from '../../services/EventManager';
 import {
   eClearEditor,
   eCloseFullscreenEditor,
   eOnLoadNote,
   eOpenFullscreenEditor,
-} from '../../services/events';
-import {exitEditorAnimation} from '../../utils/animations';
-import {DDS, editing, ToastEvent} from '../../utils/utils';
+} from '../../utils/Events';
+import {exitEditorAnimation} from '../../utils/Animations';
+import {editing} from '../../utils';
 import {
+  _onMessage,
+  _onShouldStartLoadWithRequest,
   checkNote,
   clearEditor,
+  clearTimer,
   EditorWebView,
   getNote,
   injectedJS,
+  isNotedEdited,
   loadNote,
   onWebViewLoad,
   post,
   sourceUri,
-  _onMessage,
-  _onShouldStartLoadWithRequest,
-} from './func';
+} from './Functions';
+import {normalize} from '../../utils/SizeUtils';
+import {DDS} from '../../services/DeviceDetection';
 
-var handleBack;
-var tapCount = 0;
+let handleBack;
+let tapCount = 0;
+
+const textInput = createRef();
+
 const Editor = ({noMenu}) => {
   // Global State
-  const [state, dispatch] = useTracked();
-  const {colors, premium} = state;
+  const [state] = useTracked();
+  const {colors, premiumUser} = state;
   const [fullscreen, setFullscreen] = useState(false);
 
   // FUNCTIONS
@@ -61,6 +69,15 @@ const Editor = ({noMenu}) => {
     c.factor = normalize(1);
     post('theme', colors);
   }, [colors.bg]);
+
+  useEffect(() => {
+    if (!DDS.isTab) return;
+    if (noMenu) {
+      post('nomenu', true);
+    } else {
+      post('nomenu', false);
+    }
+  }, [noMenu]);
 
   useEffect(() => {
     eSubscribeEvent(eOnLoadNote, load);
@@ -83,6 +100,7 @@ const Editor = ({noMenu}) => {
     }
 
     return () => {
+      clearTimer();
       if (handleBack) {
         handleBack.remove();
         handleBack = null;
@@ -90,8 +108,14 @@ const Editor = ({noMenu}) => {
     };
   }, [noMenu]);
 
-  const load = (item) => {
-    loadNote(item);
+  const load = async (item) => {
+    console.log('loading new note');
+    await loadNote(item);
+    if (item.type === 'new') {
+      textInput.current?.focus();
+      post('focusTitle');
+      Platform.OS === 'android' ? EditorWebView.current?.requestFocus() : null;
+    }
     if (!DDS.isTab) {
       handleBack = BackHandler.addEventListener(
         'hardwareBackPress',
@@ -100,12 +124,11 @@ const Editor = ({noMenu}) => {
     }
   };
 
-  const onCallClear = () => {
-    canSave = false;
+  const onCallClear = async () => {
     if (editing.currentlyEditing) {
       exitEditorAnimation();
     }
-    clearEditor();
+    await clearEditor();
   };
   const closeFullscreen = () => {
     setFullscreen(false);
@@ -113,12 +136,12 @@ const Editor = ({noMenu}) => {
 
   useEffect(() => {
     EditorWebView.current?.reload();
-  }, [premium]);
+  }, [premiumUser]);
 
   const _onHardwareBackPress = async () => {
     if (editing.currentlyEditing) {
       if (tapCount > 0) {
-        _onBackPress();
+        await _onBackPress();
         return true;
       } else {
         tapCount = 1;
@@ -133,16 +156,15 @@ const Editor = ({noMenu}) => {
 
   const _onBackPress = async () => {
     editing.currentlyEditing = true;
-    if (DDS.isTab) {
+    if (DDS.isTab && !DDS.isSmallTab) {
       simpleDialogEvent(TEMPLATE_EXIT_FULLSCREEN());
     } else {
       exitEditorAnimation();
-      if (checkNote()) {
+
+      if (checkNote() && isNotedEdited()) {
         ToastEvent.show('Note Saved!', 'success');
       }
-      setTimeout(async () => {
-        await clearEditor();
-      }, 300);
+      await clearEditor();
       if (handleBack) {
         handleBack.remove();
         handleBack = null;
@@ -154,29 +176,64 @@ const Editor = ({noMenu}) => {
     <SafeAreaView
       style={{
         flex: 1,
-        backgroundColor: DDS.isTab ? 'transparent' : colors.bg,
+        backgroundColor:
+          DDS.isTab && !DDS.isSmallTab ? 'transparent' : colors.bg,
         height: '100%',
         width: '100%',
         flexDirection: 'row',
         justifyContent: 'space-between',
       }}>
+      <TextInput
+        ref={textInput}
+        style={{height: 1, padding: 0, width: 1, position: 'absolute'}}
+        blurOnSubmit={false}
+      />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : null}
         style={{
           height: '100%',
           width: '100%',
         }}>
+        {noMenu || DDS.isPhone || DDS.isSmallTab ? (
+          <View />
+        ) : (
+          <ActionIcon
+            name="arrow-left"
+            color={colors.heading}
+            onPress={_onBackPress}
+            iconStyle={{
+              textAlignVertical: 'center',
+            }}
+            customStyle={{
+              marginLeft: -5,
+              position: 'absolute',
+              marginTop:
+                Platform.OS === 'ios' ? 0 : StatusBar.currentHeight + 5,
+              zIndex: 11,
+              left: 0,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          />
+        )}
+
         <View
           style={{
-            marginTop: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight,
             flexDirection: 'row',
-            width: '100%',
+            width: DDS.isTab && !DDS.isSmallTab ? '30%' : '100%',
             height: 50,
             justifyContent: 'space-between',
             alignItems: 'center',
             paddingHorizontal: 12,
+            position: DDS.isTab && !DDS.isSmallTab ? 'absolute' : 'relative',
+            backgroundColor: colors.bg,
+            right: 0,
+            marginTop: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight,
+            zIndex: 10,
           }}>
-          {noMenu ? null : (
+          {DDS.isTab && !DDS.isSmallTab ? (
+            <View />
+          ) : (
             <ActionIcon
               name="arrow-left"
               color={colors.heading}
@@ -201,7 +258,7 @@ const Editor = ({noMenu}) => {
                 simpleDialogEvent(TEMPLATE_NEW_NOTE);
               }}
             />
-            {DDS.isTab && !fullscreen ? (
+            {DDS.isTab && !DDS.isSmallTab && !fullscreen ? (
               <ActionIcon
                 name="fullscreen"
                 color={colors.heading}
@@ -263,9 +320,10 @@ const Editor = ({noMenu}) => {
         </View>
 
         <WebView
+          testID="editor"
           ref={EditorWebView}
           onError={(error) => console.log(error)}
-          onLoad={() => onWebViewLoad(noMenu, premium, colors)}
+          onLoad={async () => await onWebViewLoad(noMenu, premiumUser, colors)}
           javaScriptEnabled={true}
           injectedJavaScript={Platform.OS === 'ios' ? injectedJS : null}
           onShouldStartLoadWithRequest={_onShouldStartLoadWithRequest}
@@ -302,6 +360,12 @@ const Editor = ({noMenu}) => {
             maxHeight: '100%',
             width: '100%',
             backgroundColor: 'transparent',
+            marginTop:
+              DDS.isTab && !DDS.isSmallTab
+                ? Platform.OS === 'ios'
+                  ? 0
+                  : StatusBar.currentHeight
+                : 0,
           }}
           onMessage={_onMessage}
         />

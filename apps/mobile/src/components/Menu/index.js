@@ -1,52 +1,35 @@
 import React from 'react';
 import {
-  Platform,
-  SafeAreaView,
   ScrollView,
   StatusBar,
-  TouchableOpacity,
   View,
 } from 'react-native';
-import {createAnimatableComponent} from 'react-native-animatable';
-
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {
-  ACCENT,
-  COLOR_SCHEME,
-  COLOR_SCHEME_DARK,
-  COLOR_SCHEME_LIGHT,
-  ph,
-  setColorScheme,
-  SIZE,
-} from '../../common/common';
 import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
-import NavigationService from '../../services/NavigationService';
-import {sideMenuRef} from '../../utils/refs';
-import {DDS} from '../../utils/utils';
+import {Actions} from '../../provider/Actions';
+import NavigationService from '../../services/Navigation';
 import {ColorSection} from './ColorSection';
 import {MenuListItem} from './MenuListItem';
 import {TagsSection} from './TagsSection';
 import {UserSection} from './UserSection';
-import {MMKV} from '../../utils/storage';
 import Seperator from '../Seperator';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {ACCENT, COLOR_SCHEME, COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT, setColorScheme} from "../../utils/Colors";
 
-const AnimatedSafeAreaView = createAnimatableComponent(SafeAreaView);
+import {MMKV} from "../../utils/MMKV";
 
 export const Menu = ({
   close = () => {},
   hide,
-  update = () => {},
   noTextMode = false,
-  onButtonLongPress = () => {},
 }) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
+  const insets = useSafeAreaInsets();
 
   function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
     let newColors = setColorScheme(colors, accent);
     StatusBar.setBarStyle(colors.night ? 'light-content' : 'dark-content');
-    dispatch({type: ACTIONS.THEME, colors: newColors});
+    dispatch({type: Actions.THEME, colors: newColors});
   }
 
   const listItems = [
@@ -92,7 +75,7 @@ export const Menu = ({
         }
       },
       switch: true,
-      on: colors.night ? true : false,
+      on: !!colors.night,
       close: false,
     },
     {
@@ -104,64 +87,25 @@ export const Menu = ({
   ];
 
   return (
-    <AnimatedSafeAreaView
-      transition="backgroundColor"
-      duration={300}
+    <View
       style={{
         height: '100%',
         opacity: hide ? 0 : 1,
         width: '100%',
         backgroundColor: colors.bg,
-        borderRightWidth: noTextMode ? 1 : 0,
-        borderRightColor: noTextMode ? colors.nav : 'transparent',
+        paddingTop:insets.top,
+        borderRightWidth:1,
+        borderRightColor:colors.nav
       }}>
-      <View
-        style={{
-          minHeight: 2,
-          width: '100%',
-          paddingHorizontal: noTextMode ? 0 : ph,
-          height: DDS.isTab && noTextMode ? 50 : 0,
-          marginBottom: 0,
-          alignItems: 'center',
-          flexDirection: 'row',
-          justifyContent: noTextMode ? 'center' : 'space-between',
-          marginTop:
-            Platform.OS == 'ios'
-              ? 0
-              : DDS.isTab
-              ? noTextMode
-                ? StatusBar.currentHeight
-                : 0
-              : StatusBar.currentHeight,
-        }}>
-        {DDS.isTab && noTextMode ? (
-          <TouchableOpacity
-            onPress={() => {
-              sideMenuRef.current?.openDrawer();
-            }}
-            style={{
-              alignItems: 'center',
-              height: 35,
-              justifyContent: 'center',
-            }}>
-            <Icon
-              style={{
-                marginTop: noTextMode ? 0 : 7.5,
-              }}
-              name="menu"
-              size={SIZE.lg}
-              color={colors.pri}
-            />
-          </TouchableOpacity>
-        ) : null}
-      </View>
-
       <ScrollView
         alwaysBounceVertical={false}
-        contentContainerStyle={{minHeight: '50%'}}
+        contentContainerStyle={{
+          minHeight: '50%',
+        }}
         showsVerticalScrollIndicator={false}>
         {listItems.map((item, index) => (
           <MenuListItem
+            testID={item.name}
             key={item.name}
             item={item}
             index={index}
@@ -171,6 +115,7 @@ export const Menu = ({
 
         <MenuListItem
           key="Tags"
+          testID="Tags"
           noTextMode={noTextMode}
           index={10}
           item={{
@@ -201,6 +146,7 @@ export const Menu = ({
           }}>
           {listItems2.map((item, index) => (
             <MenuListItem
+              testID={item.name == 'Night mode' ? 'night_mode' : item.name}
               key={item.name}
               item={item}
               index={index}
@@ -213,6 +159,6 @@ export const Menu = ({
 
         <UserSection noTextMode={noTextMode} />
       </View>
-    </AnimatedSafeAreaView>
+    </View>
   );
 };

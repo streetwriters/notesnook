@@ -1,92 +1,94 @@
-import {useIsFocused} from '@react-navigation/native';
-import React, {useEffect} from 'react';
+import React, {useCallback, useEffect} from 'react';
+import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
 import {Placeholder} from '../../components/ListPlaceholders';
 import SimpleList from '../../components/SimpleList';
 import {NoteItemWrapper} from '../../components/SimpleList/NoteItemWrapper';
 import {useTracked} from '../../provider';
-import {ACTIONS} from '../../provider/actions';
-import {eSendEvent} from '../../services/eventManager';
-import {eOnLoadNote, eScrollEvent} from '../../services/events';
-import {openEditorAnimation} from '../../utils/animations';
-import {DDS} from '../../utils/utils';
-export const Home = ({route, navigation}) => {
+import {Actions} from '../../provider/Actions';
+import {eSendEvent} from '../../services/EventManager';
+import {
+  eOnLoadNote,
+  eScrollEvent,
+  eUpdateSearchState,
+} from '../../utils/Events';
+import {openEditorAnimation} from '../../utils/Animations';
+import {DDS} from '../../services/DeviceDetection';
+import ResultDialog from '../../components/ResultDialog';
+
+export const Home = ({navigation}) => {
   const [state, dispatch] = useTracked();
   const {notes} = state;
-  const isFocused = useIsFocused();
+
+  const onFocus = useCallback(() => {
+    dispatch({
+      type: Actions.HEADER_VERTICAL_MENU,
+      state: notes.length > 0,
+    });
+
+    dispatch({
+      type: Actions.HEADER_TEXT_STATE,
+      state: {
+        heading: 'Home',
+      },
+    });
+    dispatch({
+      type: Actions.CURRENT_SCREEN,
+      screen: 'home',
+    });
+    dispatch({
+      type: Actions.HEADER_STATE,
+      state: true,
+    });
+    eSendEvent(eUpdateSearchState, {
+      placeholder: 'Search all notes',
+      data: notes,
+      noSearch: false,
+      type: 'notes',
+      color: null,
+    });
+    eSendEvent(eScrollEvent, 0);
+    dispatch({type: Actions.COLORS});
+    dispatch({type: Actions.NOTES});
+  }, [notes]);
+
+  const onBlur = useCallback(() => {}, []);
 
   useEffect(() => {
-    if (isFocused) {
-      dispatch({
-        type: ACTIONS.CURRENT_SCREEN,
-        screen: 'home',
-      });
-      dispatch({
-        type: ACTIONS.HEADER_STATE,
-        state: {
-          type: 'notes',
-          menu: true,
-          canGoBack: false,
-          color: null,
-        },
-      });
-      dispatch({
-        type: ACTIONS.HEADER_VERTICAL_MENU,
-        state: true,
-      });
-      dispatch({
-        type: ACTIONS.HEADER_TEXT_STATE,
-        state: {
-          heading: 'Home',
-        },
-      });
-
-      dispatch({
-        type: ACTIONS.CONTAINER_BOTTOM_BUTTON,
-        state: {
-          bottomButtonText: 'Create a new note',
-          bottomButtonOnPress: async () => {
-            if (DDS.isTab) {
-              eSendEvent(eOnLoadNote, {type: 'new'});
-            } else {
-              eSendEvent(eOnLoadNote, {type: 'new'});
-              openEditorAnimation();
-            }
-          },
-          color: null,
-          visible: true,
-        },
-      });
-      eSendEvent(eScrollEvent, 0);
-      dispatch({type: ACTIONS.COLORS});
-      dispatch({type: ACTIONS.NOTES});
-    } else {
-      dispatch({
-        type: ACTIONS.HEADER_VERTICAL_MENU,
-        state: false,
-      });
-    }
+    navigation.addListener('focus', onFocus);
+    navigation.addListener('blur', onBlur);
     return () => {
-      dispatch({
-        type: ACTIONS.HEADER_VERTICAL_MENU,
-        state: false,
-      });
+      navigation.removeListener('focus', onFocus);
+      navigation.removeListener('blur', onBlur);
     };
-  }, [isFocused]);
+  });
 
   useEffect(() => {
-    if (isFocused) {
+    if (navigation.isFocused()) {
       dispatch({
-        type: ACTIONS.SEARCH_STATE,
-        state: {
-          placeholder: 'Search all notes',
-          data: notes,
-          noSearch: false,
-          type: 'notes',
-          color: null,
-        },
+        type: Actions.HEADER_VERTICAL_MENU,
+        state: notes.length > 0,
+      });
+
+      eSendEvent(eUpdateSearchState, {
+        placeholder: 'Search all notes',
+        data: notes,
+        noSearch: false,
+        type: 'notes',
+        color: null,
       });
     }
-  }, [notes, isFocused]);
+  }, [notes]);
+
+  const _onPressBottomButton = async () => {
+    eSendEvent(eOnLoadNote, {type: 'new'});
+
+    if (DDS.isPhone || DDS.isSmallTab) {
+      openEditorAnimation();
+    }
+  };
+  useEffect(() => {
+    console.log('render home');
+  });
 
   return (
     <>
@@ -95,10 +97,15 @@ export const Home = ({route, navigation}) => {
         type="notes"
         isHome={true}
         pinned={true}
-        focused={isFocused}
+        focused={() => navigation.isFocused()}
         RenderItem={NoteItemWrapper}
         placeholder={<Placeholder type="notes" />}
         placeholderText={`Notes you write appear here`}
+      />
+
+      <ContainerBottomButton
+        title="Create a new note"
+        onPress={_onPressBottomButton}
       />
     </>
   );

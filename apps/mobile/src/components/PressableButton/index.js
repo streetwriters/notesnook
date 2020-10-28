@@ -1,7 +1,7 @@
-import React, {useState} from 'react';
-import {Platform, Pressable} from 'react-native';
-import {br, opacity} from '../../common/common';
-import {RGB_Linear_Shade, hexToRGBA} from '../../utils/utils';
+import React from 'react';
+import {Pressable} from 'react-native';
+import {hexToRGBA, RGB_Linear_Shade} from "../../utils/ColorUtils";
+import {br} from "../../utils/SizeUtils";
 
 export const PressableButton = ({
   color,
@@ -14,10 +14,12 @@ export const PressableButton = ({
   alpha = -0.1,
   opacity = 1,
   onLongPress,
-  hitSlop
+  hitSlop,
+  testID,
 }) => {
   return (
     <Pressable
+      testID={testID}
       hitSlop={hitSlop}
       activeOpacity={opacity}
       onPress={onPress}

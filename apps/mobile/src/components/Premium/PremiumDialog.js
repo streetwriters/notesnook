@@ -2,19 +2,22 @@ import React, {createRef} from 'react';
 import {ScrollView, Text, View} from 'react-native';
 import * as RNIap from 'react-native-iap';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {SIZE, WEIGHT} from '../../common/common';
-import {eSendEvent} from '../../services/eventManager';
-import {eOpenLoginDialog, eOpenPendingDialog} from '../../services/events';
-import {db, h, itemSkus, ToastEvent, w} from '../../utils/utils';
+import {eSendEvent, ToastEvent} from '../../services/EventManager';
+import {eOpenLoginDialog, eOpenPendingDialog} from '../../utils/Events';
+import {dHeight, itemSkus, dWidth} from '../../utils';
 import ActionSheet from '../ActionSheet';
 import {Button} from '../Button';
 import Seperator from '../Seperator';
+import {SIZE, WEIGHT} from "../../utils/SizeUtils";
+import {db} from "../../utils/DB";
+import {DDS} from "../../services/DeviceDetection";
 class PremiumDialog extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       user: null,
       product: null,
+      scrollEnabled: false,
     };
     this.routeIndex = 0;
     this.count = 0;
@@ -25,6 +28,7 @@ class PremiumDialog extends React.Component {
     this.subsriptionErrorListener = RNIap.purchaseErrorListener(
       this.onSubscriptionError,
     );
+    this.prevScroll = 0;
   }
 
   open() {
@@ -35,13 +39,17 @@ class PremiumDialog extends React.Component {
     this.actionSheetRef.current?._setModalVisible(false);
   }
   async componentDidMount() {
-    let u = await db.user.get();
-    let prod = await RNIap.getSubscriptions(itemSkus);
-    console.log(prod);
-    this.setState({
-      user: u && u.Id ? u : null,
-      product: prod[0],
-    });
+    try {
+      let u = await db.user.get();
+      let prod = await RNIap.getSubscriptions(itemSkus);
+      this.setState({
+        user: u && u.Id ? u : null,
+        product: prod[0],
+      });
+    } catch(e) {
+      console.log(e,"SKU ERROR")
+    }
+
   }
 
   onSuccessfulSubscription = (subscription: RNIap.SubscriptionPurchase) => {
@@ -66,16 +74,28 @@ class PremiumDialog extends React.Component {
       <ActionSheet
         containerStyle={{
           backgroundColor: colors.bg,
-          width: '100%',
+          width: DDS.isTab ? 500 : '100%',
           alignSelf: 'center',
           borderRadius: 10,
+          marginBottom: DDS.isTab ? 50 : 0,
         }}
+        extraScroll={DDS.isTab ? 50 : 0}
+        footerAlwaysVisible={DDS.isTab}
+        footerHeight={DDS.isTab ? 20 : 10}
+        footerStyle={
+          DDS.isTab
+            ? {
+                borderRadius: 10,
+                backgroundColor: colors.bg,
+              }
+            : null
+        }
         gestureEnabled={true}
         ref={this.actionSheetRef}
         initialOffsetFromBottom={1}>
         <View
           style={{
-            width: w,
+            width: DDS.isTab ? 500 : dWidth,
             backgroundColor: colors.bg,
             justifyContent: 'space-between',
             paddingHorizontal: 12,
@@ -95,12 +115,18 @@ class PremiumDialog extends React.Component {
           </Text>
 
           <ScrollView
+            nestedScrollEnabled={true}
+            onScrollEndDrag={this.actionSheetRef.current?.childScrollHandler}
+            onScrollAnimationEnd={
+              this.actionSheetRef.current?.childScrollHandler
+            }
+            onMomentumScrollEnd={
+              this.actionSheetRef.current?.childScrollHandler
+            }
             style={{
               width: '100%',
-              maxHeight: h * 0.5,
-            }}
-            nestedScrollEnabled={true}
-            showsVerticalScrollIndicator={false}>
+              maxHeight: DDS.isTab ? dHeight * 0.35 : dHeight * 0.5,
+            }}>
             {[
               {
                 title: 'Cross Platfrom Sync',
