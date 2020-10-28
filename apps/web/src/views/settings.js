@@ -199,7 +199,7 @@ function Settings(props) {
         onClick={async () => {
           download(
             `notesnook-backup-${new Date().toLocaleString("en")}`,
-            await db.backup.export(),
+            await db.backup.export("web"),
             "nnbackup"
           );
         }}
