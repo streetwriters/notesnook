@@ -26,7 +26,7 @@ export default class Backup {
       throw new Error("Invalid type. It must be one of 'mobile' or 'web'.");
 
     const keys = (await this._db.context.getAllKeys()).filter(
-      (key) => !(key in invalidKeys)
+      (key) => !invalidKeys.some((t) => t === key)
     );
 
     const db = Object.fromEntries(await this._db.context.readMulti(keys));
