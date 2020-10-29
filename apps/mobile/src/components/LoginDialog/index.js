@@ -128,7 +128,7 @@ const LoginDialog = () => {
       eSendEvent(eStartSyncer);
       dispatch({type: Actions.ALL});
       eSendEvent(refreshNotesPage);
-      setVisible(false);
+      close()
       ToastEvent.show(`Logged in as ${username}`, 'success', 'local');
     } catch (e) {
       ToastEvent.show(e.message, 'error', 'local');
