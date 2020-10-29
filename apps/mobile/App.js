@@ -29,6 +29,7 @@ import {DDS} from './src/services/DeviceDetection';
 import {MMKV} from './src/utils/mmkv';
 import Backup from './src/services/Backup';
 import {setLoginMessage} from './src/services/Message';
+import SplashScreen from 'react-native-splash-screen';
 
 let firstLoad = true;
 let note = null;
@@ -161,11 +162,14 @@ const App = () => {
       setInit(true);
       backupData();
 
-      if (error) {
+    
         setTimeout(() => {
-          ToastEvent.show(error.message);
+          if (error) {
+            ToastEvent.show(error.message);
+          }
+          SplashScreen.hide();
         }, 500);
-      }
+    
     });
   }, []);
 
@@ -208,6 +212,7 @@ const App = () => {
     }
     dispatch({type: Actions.SETTINGS, settings: {...settings}});
     updateSize();
+    
     await updateTheme();
   }
 
