@@ -75,6 +75,9 @@ export default class Backup {
 
     for (let key in db) {
       let value = db[key];
+      if (value && value.dateEdited) {
+        value.dateEdited = Date.now();
+      }
       await this._db.context.write(key, value);
     }
   }
