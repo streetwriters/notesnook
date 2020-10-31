@@ -91,9 +91,9 @@ export const Settings = ({navigation}) => {
     };
   });
 
-  const getTimeLeft = (t1, t2) => {
+  const getTimeLeft = (t2) => {
     let d1 = new Date(Date.now());
-    let d2 = new Date(t2);
+    let d2 = new Date(t2 * 1000);
     let diff = d2.getTime() - d1.getTime();
     diff = (diff / (1000 * 3600 * 24)).toFixed(0);
 
@@ -125,10 +125,9 @@ export const Settings = ({navigation}) => {
           paragraph:
             "All your backups are stored in 'Phone Storage/Notesnook/backups/' folder",
         });
-          await Backup.run();
-          await sleep(1000);
-          eSendEvent(eCloseProgressDialog);
-       
+        await Backup.run();
+        await sleep(1000);
+        eSendEvent(eCloseProgressDialog);
       },
       desc: 'Backup all your data to phone storage',
     },
@@ -267,29 +266,35 @@ export const Settings = ({navigation}) => {
                         fontFamily: WEIGHT.regular,
                         fontSize: SIZE.xs,
                       }}>
-                      {user.subscription.isTrial ? 'Trial' : 'Pro'}
+                      {user.subscription.status === 1 ? 'Trial' : 'Pro'}
                     </Text>
                   </View>
                 </View>
                 <Seperator />
                 <View>
-                  {user.subscription.isTrial ? (
+                  {user.subscription.status === 1 ? (
                     <Text
                       style={{
                         color:
-                          getTimeLeft(
-                            user.subscription.start,
-                            user.subscription.expiry,
-                          ) > 5
+                          getTimeLeft(parseInt(user.subscription.expiry)) > 5
                             ? colors.pri
                             : colors.errorText,
                         fontFamily: WEIGHT.regular,
                         fontSize: SIZE.xxl,
                       }}>
-                      {getTimeLeft(
-                        user.subscription.start,
-                        user.subscription.expiry,
-                      ) + ' Days Remaining'}
+                      {getTimeLeft(parseInt(user.subscription.expiry)) +
+                        ' Days Remaining'}{' '}
+                      {'\n'}
+                      <Text
+                        style={{
+                          fontSize: 12,
+                          color: colors.icon,
+                        }}>
+                        Your trail period started on{' '}
+                        {new Date(
+                          user.subscription.start * 1000,
+                        ).toLocaleDateString()}
+                      </Text>
                     </Text>
                   ) : null}
 
