@@ -5,7 +5,7 @@ import EventSource from "eventsource";
 import { navigate } from "hookrouter";
 
 export const db = new Database(StorageInterface, EventSource);
-db.host("http://localhost:8000");
+db.host("http://localhost:4100");
 
 export const COLORS = {
   red: "#f44336",
