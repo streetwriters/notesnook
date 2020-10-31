@@ -595,20 +595,23 @@ export const ActionSheetComponent = ({
       );
       return;
     }
-    if (user?.lastSynced < note?.dateEdited) {
+    if (user?.lastSynced < note?.dateEdited || !user.lastSynced) {
       setRefreshing(true);
       try {
-        let user = await db.user.get();
-        dispatch({type: Actions.USER, user: user});
         await db.sync();
         localRefresh();
         ToastEvent.show('Note synced', 'success', 'local');
       } catch (e) {
         ToastEvent.show(e.message, 'error', 'local');
       } finally {
+        let user = await db.user.get();
+        dispatch({type: Actions.USER, user: user});
+        dispatch({type: Actions.ALL});
         setRefreshing(false);
       }
-      dispatch({type: Actions.ALL});
+    
+    } else {
+      console.log('here',user?.lastSynced,user?.lastSynced < note?.dateEdited)
     }
   };
 
