@@ -168,7 +168,7 @@ function attachEditorListeners() {
         console.log(bounds)
         setTimeout(() => {
             document.querySelector(".app-main").scrollTo({top:bounds.top,behavior:"smooth"})
-        },250)
+        },500)
     
     });
     
