@@ -38,16 +38,16 @@
 .ql-editor {
     box-sizing: border-box;
     line-height: 1.42;
-    height: 100%;
+    height: auto;
     outline: none;
-    overflow-y: auto;
+    overflow-y: hidden;
     padding: 12px 12px;
     tab-size: 4;
     -moz-tab-size: 4;
     text-align: left;
     white-space: pre-wrap;
     word-wrap: break-word;
-}
+  }
 
 .ql-editor>* {
     cursor: text;
@@ -1040,12 +1040,6 @@
 #titlebar {
     background-color: transparent;
 }
-
-.app-body {
-    margin: 0px;
-    overflow: hidden;
-}
-
 .floating-toolbar {
     position: fixed;
     bottom: 0;
@@ -1062,10 +1056,10 @@
     display: flex;
     color: gray;
     font-size: 11px;
-    position: absolute;
     margin-top: -18px;
-    font-family: 'DM Sans', serif;
-    padding-left: 6px;
+    height:20px;
+    font-family: 'DM Sans';
+    margin-left: 12px;
 }
 
 #titlebar input:focus {
@@ -1085,4 +1079,11 @@
 #infosaved {
     margin-right: 5px;
     margin-left: 5px;
+}
+
+.app-body {
+    margin: 0px;
+}
+.app-main {
+    overflow: auto;
 }
