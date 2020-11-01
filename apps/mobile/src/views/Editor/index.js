@@ -1,6 +1,7 @@
 import React, {createRef, useEffect, useState} from 'react';
 import {
   BackHandler,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
@@ -83,10 +84,17 @@ const Editor = ({noMenu}) => {
     eSubscribeEvent(eOnLoadNote, load);
     eSubscribeEvent(eCloseFullscreenEditor, closeFullscreen);
     eSubscribeEvent(eClearEditor, onCallClear);
+    Keyboard.addListener("keyboardDidShow",() => {
+      console.log('keyboard is shown')
+      post("keyboard")
+    })
     return () => {
       eUnSubscribeEvent(eClearEditor, onCallClear);
       eUnSubscribeEvent(eCloseFullscreenEditor, closeFullscreen);
       eUnSubscribeEvent(eOnLoadNote, load);
+      Keyboard.removeListener("keyboardDidShow",() => {
+        post("keyboard")
+      })
     };
   }, []);
 
@@ -201,6 +209,7 @@ const Editor = ({noMenu}) => {
             name="arrow-left"
             color={colors.heading}
             onPress={_onBackPress}
+            bottom={5}
             iconStyle={{
               textAlignVertical: 'center',
             }}
@@ -238,6 +247,7 @@ const Editor = ({noMenu}) => {
               name="arrow-left"
               color={colors.heading}
               onPress={_onBackPress}
+              bottom={5}
               customStyle={{
                 marginLeft: -5,
               }}
