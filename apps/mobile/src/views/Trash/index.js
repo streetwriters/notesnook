@@ -89,7 +89,8 @@ export const Trash = ({route, navigation}) => {
 export default Trash;
 
 const RenderItem = ({item, index}) => {
-  return item.type === 'note' ? (
+  console.log(item.itemType);
+  return item.itemType === 'note' ? (
     <NoteItemWrapper item={item} index={index} isTrash={true} />
   ) : (
     <NotebookItemWrapper item={item} index={index} isTrash={true} />
