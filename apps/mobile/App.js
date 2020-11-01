@@ -121,9 +121,7 @@ const App = () => {
       }
     };
 
-
   useEffect(() => {
- 
     eSubscribeEvent(eStartSyncer, startSyncer);
     eSubscribeEvent(eResetApp, resetApp);
     Orientation.addOrientationListener(_onOrientationChange);
@@ -166,7 +164,8 @@ const App = () => {
 
       setTimeout(() => {
         if (error) {
-          ToastEvent.show(error.message);
+          console.log(error);
+          ToastEvent.show('Error initializing database.');
         }
         SplashScreen.hide();
       }, 500);
