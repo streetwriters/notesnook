@@ -184,11 +184,6 @@ function NavigationMenu(props) {
               icon={Icon.Sync}
               onClick={sync}
             />
-            <NavigationItem
-              title="Logout"
-              icon={Icon.Logout}
-              onClick={logout}
-            />
           </>
         ) : (
           <NavigationItem
