@@ -33,6 +33,7 @@ import SplashScreen from 'react-native-splash-screen';
 
 let firstLoad = true;
 let note = null;
+let syncTimeout = null;
 const App = () => {
   const [, dispatch] = useTracked(),
     [init, setInit] = useState(false),
@@ -120,7 +121,9 @@ const App = () => {
       }
     };
 
+
   useEffect(() => {
+ 
     eSubscribeEvent(eStartSyncer, startSyncer);
     eSubscribeEvent(eResetApp, resetApp);
     Orientation.addOrientationListener(_onOrientationChange);
@@ -134,7 +137,6 @@ const App = () => {
       eUnSubscribeEvent(eDispatchAction, (type) => {
         dispatch(type);
       });
-
       Orientation.removeOrientationListener(_onOrientationChange);
     };
   }, []);
@@ -146,14 +148,14 @@ const App = () => {
     Initialize().finally(async () => {
       try {
         await db.init();
+      } catch (e) {
+        error = e;
+      } finally {
         user = await db.user.get();
         if (user) {
           dispatch({type: Actions.USER, user: user});
           await startSyncer();
         }
-      } catch (e) {
-        error = e;
-        console.log(e);
       }
       if (!user) {
         setLoginMessage(dispatch);
@@ -162,14 +164,12 @@ const App = () => {
       setInit(true);
       backupData();
 
-    
-        setTimeout(() => {
-          if (error) {
-            ToastEvent.show(error.message);
-          }
-          SplashScreen.hide();
-        }, 500);
-    
+      setTimeout(() => {
+        if (error) {
+          ToastEvent.show(error.message);
+        }
+        SplashScreen.hide();
+      }, 500);
     });
   }, []);
 
@@ -212,7 +212,7 @@ const App = () => {
     }
     dispatch({type: Actions.SETTINGS, settings: {...settings}});
     updateSize();
-    
+
     await updateTheme();
   }
 
