@@ -71,10 +71,10 @@ function NavigationMenu(props) {
     app.ontouchmove = function (event) {
       if (event.touches.length > 1) return;
       let currentX = event.touches[0].pageX;
-      if (currentX - startX > 50) {
+      if (currentX - startX > 100) {
         toggleSideMenu(true);
         startX = currentX;
-      } else if (currentX - startX < -50) {
+      } else if (currentX - startX < -100) {
         toggleSideMenu(false);
         startX = currentX;
       }
