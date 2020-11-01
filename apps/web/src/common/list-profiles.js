@@ -62,8 +62,8 @@ const TopicsProfile = createProfile(
 const TrashProfile = createProfile(
   (index, item) => <TrashItem index={index} item={item} />,
   (item) => {
-    if (item.type === "note") return getNoteHeight(item);
-    else if (item.type === "notebook") return getNotebookHeight(item);
+    if (item.itemType === "note") return getNoteHeight(item);
+    else if (item.itemType === "notebook") return getNotebookHeight(item);
   },
   Math.max(MAX_HEIGHTS.note, MAX_HEIGHTS.notebook)
 );

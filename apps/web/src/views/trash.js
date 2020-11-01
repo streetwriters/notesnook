@@ -11,6 +11,7 @@ function Trash() {
   useEffect(() => store.refresh(), []);
   const items = useStore((store) => store.trash);
   const clearTrash = useStore((store) => store.clear);
+  console.log(items);
   return (
     <ListContainer
       type="trash"
