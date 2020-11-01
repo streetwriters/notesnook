@@ -24,6 +24,7 @@
     "react-app-polyfill": "^1.0.6",
     "react-dom": "^16.13.1",
     "react-modal": "^3.11.2",
+    "react-qrcode-logo": "^2.2.1",
     "react-scripts": "3.4.1",
     "react-virtualized-auto-sizer": "^1.0.2",
     "react-window": "^1.8.5",
