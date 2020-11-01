@@ -1,10 +1,10 @@
 import React from 'react';
-import { Dimensions, Text, View } from 'react-native';
+import {Dimensions, Text, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { ActionIcon } from '../ActionIcon';
-import { ActionSheetEvent } from '../DialogManager/recievers';
-import {timeSince} from "../../utils/TimeUtils";
-import {ph, SIZE, WEIGHT} from "../../utils/SizeUtils";
+import {ActionIcon} from '../ActionIcon';
+import {ActionSheetEvent} from '../DialogManager/recievers';
+import {timeSince} from '../../utils/TimeUtils';
+import {ph, SIZE, WEIGHT} from '../../utils/SizeUtils';
 
 const w = Dimensions.get('window').width;
 const h = Dimensions.get('window').height;
@@ -172,23 +172,26 @@ export default class NoteItem extends React.Component {
                 <>
                   <Text
                     style={{
-                      color: colors.icon,
-                      fontSize: SIZE.xs - 1,
-                      textAlignVertical: 'center',
-                      fontFamily: WEIGHT.regular,
-                    }}>
-                    {'Deleted on: ' + item && item.dateDeleted
-                      ? new Date(item.dateDeleted).toISOString().slice(0, 10)
-                      : null + '   '}
-                  </Text>
-                  <Text
-                    style={{
                       color: colors.accent,
                       fontSize: SIZE.xs - 1,
                       textAlignVertical: 'center',
                       fontFamily: WEIGHT.regular,
                     }}>
-                    {item.type[0].toUpperCase() + item.type.slice(1) + '  '}
+                    {item.itemType[0].toUpperCase() +
+                      item.itemType.slice(1) +
+                      '  '}
+                  </Text>
+                  <Text
+                    style={{
+                      color: colors.icon,
+                      fontSize: SIZE.xs - 1,
+                      textAlignVertical: 'center',
+                      fontFamily: WEIGHT.regular,
+                    }}>
+                    Deleted on{' '}
+                    {item && item.dateDeleted
+                      ? new Date(item.dateDeleted).toISOString().slice(0, 10)
+                      : null + '   '}
                   </Text>
                 </>
               ) : null}

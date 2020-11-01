@@ -147,6 +147,10 @@ const SimpleList = ({
           dim.width = width;
           dim.height = 110 * fontScale;
           break;
+        case 'trash':
+          dim.width = width;
+          dim.height = 110 * fontScale;
+          break;  
         case 'topic':
           dim.width = width;
           dim.height = 80 * fontScale;
@@ -174,6 +178,7 @@ const SimpleList = ({
   );
 
   const _renderRow = (type, data, index) => {
+
     switch (type) {
       case 'note':
         return <RenderItem item={data} pinned={data.pinned} index={index} />;
