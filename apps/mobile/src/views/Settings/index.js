@@ -551,7 +551,9 @@ export const Settings = ({navigation}) => {
         <CustomButton
           title="Homepage"
           tagline={'Default screen to open on app startup '}
-          onPress={async () => {}}
+          onPress={() => {
+            menuRef.current?.show();
+          }}
           customComponent={
             <Menu
               ref={menuRef}
@@ -573,6 +575,7 @@ export const Settings = ({navigation}) => {
                     style={{
                       fontSize: SIZE.sm,
                       fontFamily: WEIGHT.regular,
+                      color:colors.pri
                     }}>
                     {settings.homepage}
                   </Text>
@@ -593,6 +596,7 @@ export const Settings = ({navigation}) => {
                   textStyle={{
                     fontFamily: WEIGHT.regular,
                     fontSize: SIZE.sm,
+                    color: settings.homepage === item.name ? colors.accent : colors.pri
                   }}>
                   {item.name}
                 </MenuItem>
