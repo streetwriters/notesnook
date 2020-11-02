@@ -4,7 +4,7 @@ import {timeConverter} from "../../utils/TimeUtils";
 export const TEMPLATE_DELETE = type => {
   return {
     title: `Delete ${type}`,
-    paragraph: `Are you sure you want to delete this ${type}`,
+    paragraph: `Are you sure you want to delete this ${type}?`,
     positiveText: 'Delete',
     negativeText: 'Cancel',
     action: dialogActions.ACTION_DELETE,

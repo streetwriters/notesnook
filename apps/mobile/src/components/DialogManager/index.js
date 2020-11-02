@@ -294,6 +294,7 @@ export class DialogManager extends Component {
               ? hexToRGBA(colors.accent + '19')
               : hexToRGBA(colors.shade)
           }
+          keyboardShouldPersistTaps="always"
           delayActionSheetDraw={true}
           delayActionSheetDrawTime={10}
           footerAlwaysVisible={DDS.isTab}
