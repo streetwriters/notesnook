@@ -1,8 +1,8 @@
-
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import * as React from 'react';
 import Container from '../components/Container';
+import { useTracked } from '../provider';
 import {rootNavigatorRef} from '../utils/Refs';
 import Favorites from '../views/Favorites';
 import Folders from '../views/Folders';
@@ -16,17 +16,22 @@ import Trash from '../views/Trash';
 const Stack = createStackNavigator();
 
 export const NavigatorStack = () => {
+  const [state, dispatch] = useTracked();
+  const {settings} = state;
+
+  console.log(settings)
   return (
     <Container root={true}>
       <NavigationContainer independent={true} ref={rootNavigatorRef}>
         <Stack.Navigator
-          initialRouteName="Home"
+          initialRouteName={settings.homepage}
           screenOptions={{
             headerShown: false,
             animationEnabled: false,
             gestureEnabled: false,
             cardOverlayEnabled: false,
             cardShadowEnabled: false,
+            
           }}>
           <Stack.Screen name="Home" component={Home} />
           <Stack.Screen
@@ -35,7 +40,7 @@ export const NavigatorStack = () => {
               canGoBack: false,
               root: true,
             }}
-            name="Folders"
+            name="Notebooks"
             component={Folders}
           />
           <Stack.Screen name="Favorites" component={Favorites} />
@@ -49,6 +54,3 @@ export const NavigatorStack = () => {
     </Container>
   );
 };
-
-
-

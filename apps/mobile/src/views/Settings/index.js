@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect} from 'react';
+import React, {createRef, useCallback, useEffect} from 'react';
 import {
   Appearance,
   Linking,
@@ -29,7 +29,7 @@ import {
 } from '../../utils/Events';
 import NavigationService from '../../services/Navigation';
 import storage from '../../utils/storage';
-import {setSetting, dWidth} from '../../utils';
+import {setSetting, dWidth, MenuItemsList} from '../../utils';
 import {hexToRGBA, RGB_Linear_Shade} from '../../utils/ColorUtils';
 import {sleep} from '../../utils/TimeUtils';
 import {
@@ -44,7 +44,9 @@ import {db} from '../../utils/DB';
 import {DDS} from '../../services/DeviceDetection';
 import {MMKV} from '../../utils/mmkv';
 import Backup from '../../services/Backup';
+import Menu, {MenuItem} from 'react-native-material-menu';
 
+let menuRef = createRef();
 export const Settings = ({navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors, user, settings} = state;
@@ -543,6 +545,59 @@ export const Settings = ({navigation}) => {
               color={colors.night ? colors.accent : colors.icon}
               name={colors.night ? 'toggle-switch' : 'toggle-switch-off'}
             />
+          }
+        />
+
+        <CustomButton
+          title="Homepage"
+          tagline={'Default screen to open on app startup '}
+          onPress={async () => {}}
+          customComponent={
+            <Menu
+              ref={menuRef}
+              animationDuration={200}
+              style={{
+                borderRadius: 5,
+                backgroundColor: colors.bg,
+              }}
+              button={
+                <TouchableOpacity
+                  onPress={() => {
+                    menuRef.current?.show();
+                  }}
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                  }}>
+                  <Text
+                    style={{
+                      fontSize: SIZE.sm,
+                      fontFamily: WEIGHT.regular,
+                    }}>
+                    {settings.homepage}
+                  </Text>
+                  <Icon color={colors.icon} name="menu-down" size={SIZE.md} />
+                </TouchableOpacity>
+              }>
+              {MenuItemsList.map((item) => (
+                <MenuItem
+                  onPress={() => {
+                    setSetting(settings,'homepage',item.name);
+                  }}
+                  style={{
+                    backgroundColor:
+                      settings.homepage === item.name
+                        ? colors.shade
+                        : 'transparent',
+                  }}
+                  textStyle={{
+                    fontFamily: WEIGHT.regular,
+                    fontSize: SIZE.sm,
+                  }}>
+                  {item.name}
+                </MenuItem>
+              ))}
+            </Menu>
           }
         />
 
