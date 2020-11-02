@@ -31,6 +31,8 @@ class AddNotebookDialog extends React.Component {
   }
 
   addTopic(topicTitle) {
+    if (topicTitle.trim().length <= 0) return;
+
     const topics = this.state.topics.slice();
     topics.push({ title: topicTitle });
     this.setState({
