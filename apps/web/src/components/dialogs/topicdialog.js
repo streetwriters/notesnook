@@ -43,7 +43,7 @@ export function showTopicDialog(notebook) {
       title={"Create a Topic"}
       subtitle={"You can create as many topics as you want."}
       icon={Icon.Topic}
-      onNo={() => {
+      onClose={() => {
         perform(false);
       }}
       onYes={async (topic) => {
