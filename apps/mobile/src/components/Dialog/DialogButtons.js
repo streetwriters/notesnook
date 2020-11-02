@@ -1,7 +1,5 @@
 import React from 'react';
-import {StyleSheet, Text, View} from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useTracked} from '../../provider';
+import {StyleSheet, View} from 'react-native';
 import {Button} from '../Button';
 
 const DialogButtons = ({
