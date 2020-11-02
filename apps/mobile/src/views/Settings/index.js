@@ -803,7 +803,7 @@ export const Settings = ({navigation}) => {
           title="Encrypted Backups"
           tagline="Encrypt your data before backup"
           onPress={async () => {
-            if (user) {
+            if (!user) {
               ToastEvent.show(
                 'You must login to enable encryption',
                 'error',
