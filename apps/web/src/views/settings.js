@@ -3,6 +3,7 @@ import { Button, Flex, Text } from "rebass";
 import * as Icon from "../components/icons";
 import { useStore as useUserStore } from "../stores/user-store";
 import { useStore as useThemeStore } from "../stores/theme-store";
+import { useStore as useSettingStore } from "../stores/setting-store";
 import AccentItem from "../components/accent-item";
 import accents from "../theme/accents";
 import { showLogInDialog } from "../components/dialogs/logindialog";
@@ -47,9 +48,13 @@ function Settings(props) {
   const theme = useThemeStore((store) => store.theme);
   const toggleNightMode = useThemeStore((store) => store.toggleNightMode);
   const setTheme = useThemeStore((store) => store.setTheme);
-  const preferSystemTheme = useThemeStore((store) => store.preferSystemTheme);
-  const togglePreferSystemTheme = useThemeStore(
-    (store) => store.togglePreferSystemTheme
+  const followSystemTheme = useThemeStore((store) => store.followSystemTheme);
+  const toggleFollowSystemTheme = useThemeStore(
+    (store) => store.toggleFollowSystemTheme
+  );
+  const encryptBackups = useSettingStore((store) => store.encryptBackups);
+  const toggleEncryptBackups = useSettingStore(
+    (store) => store.toggleEncryptBackups
   );
   const user = useUserStore((store) => store.user);
   const isLoggedIn = useUserStore((store) => store.isLoggedIn);
@@ -64,9 +69,9 @@ function Settings(props) {
 
   const isSystemThemeDark = useSystemTheme();
   useEffect(() => {
-    if (!preferSystemTheme) return;
+    if (!followSystemTheme) return;
     setTheme(isSystemThemeDark ? "dark" : "light");
-  }, [preferSystemTheme, isSystemThemeDark, setTheme]);
+  }, [followSystemTheme, isSystemThemeDark, setTheme]);
 
   return (
     <Flex variant="columnFill" px={2} sx={{ overflowY: "auto" }}>
@@ -177,14 +182,14 @@ function Settings(props) {
         offTip="Dark mode is off"
         onToggled={toggleNightMode}
         isToggled={theme === "dark"}
-        onlyIf={!preferSystemTheme}
+        onlyIf={!followSystemTheme}
       />
       <ToggleItem
         title="Follow system theme"
         onTip="Switch app theme according to system"
         offTip="Keep app theme independent"
-        onToggled={togglePreferSystemTheme}
-        isToggled={preferSystemTheme}
+        onToggled={toggleFollowSystemTheme}
+        isToggled={followSystemTheme}
       />
 
       <Text
@@ -199,7 +204,7 @@ function Settings(props) {
         onClick={async () => {
           download(
             `notesnook-backup-${new Date().toLocaleString("en")}`,
-            await db.backup.export("web"),
+            await db.backup.export("web", encryptBackups),
             "nnbackup"
           );
         }}
@@ -231,6 +236,8 @@ function Settings(props) {
         title="Encrypt backups"
         onTip="All backups will be encrypted"
         offTip="Backups will not be encrypted"
+        onToggled={toggleEncryptBackups}
+        isToggled={encryptBackups}
       />
 
       <OptionsItem

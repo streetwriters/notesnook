@@ -5,7 +5,7 @@ import Config from "../utils/config";
 class ThemeStore extends BaseStore {
   theme = Config.get("theme", "light");
   accent = Config.get("accent", "#0560ff");
-  preferSystemTheme = Config.get("preferSystemTheme", false);
+  followSystemTheme = Config.get("followSystemTheme", false);
 
   setTheme = (theme) => {
     this.set((state) => (state.theme = theme));
@@ -22,14 +22,14 @@ class ThemeStore extends BaseStore {
     Config.set("accent", accent);
   };
 
-  setPreferSystemTheme = (preferSystemTheme) => {
-    this.set((state) => (state.preferSystemTheme = preferSystemTheme));
-    Config.set("preferSystemTheme", preferSystemTheme);
+  setFollowSystemTheme = (followSystemTheme) => {
+    this.set((state) => (state.followSystemTheme = followSystemTheme));
+    Config.set("preferSystemTheme", followSystemTheme);
   };
 
-  togglePreferSystemTheme = () => {
-    const preferSystemTheme = this.get().preferSystemTheme;
-    this.setPreferSystemTheme(!preferSystemTheme);
+  toggleFollowSystemTheme = () => {
+    const followSystemTheme = this.get().followSystemTheme;
+    this.setFollowSystemTheme(!followSystemTheme);
   };
 }
 
