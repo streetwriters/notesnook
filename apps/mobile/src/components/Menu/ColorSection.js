@@ -7,7 +7,7 @@ import { refreshNotesPage } from '../../utils/Events';
 import NavigationService from '../../services/Navigation';
 import { PressableButton } from '../PressableButton';
 import {COLORS_NOTE} from "../../utils/Colors";
-import {SIZE} from "../../utils/SizeUtils";
+import {SIZE, WEIGHT} from "../../utils/SizeUtils";
 
 export const ColorSection = ({noTextMode}) => {
   const [state, dispatch] = useTracked();
@@ -17,6 +17,30 @@ export const ColorSection = ({noTextMode}) => {
   
     dispatch({type: Actions.TAGS});
   }, []);
+
+  const onPress = (item) => {
+    let params = {
+      type: 'color',
+      title: item.title,
+      color: item,
+      menu:true
+    };
+    dispatch({
+      type: Actions.HEADER_VERTICAL_MENU,
+      state: false,
+    });
+
+    dispatch({
+      type: Actions.HEADER_TEXT_STATE,
+      state: {
+        heading: item.title,
+      },
+    });
+
+    NavigationService.navigate('Notes', params);
+    eSendEvent(refreshNotesPage, params);
+    NavigationService.closeDrawer();
+  }
 
   return (
     <View
@@ -34,28 +58,7 @@ export const ColorSection = ({noTextMode}) => {
           selectedColor={COLORS_NOTE[item.title]}
           alpha={!colors.night ? -0.02 : 0.02}
           opacity={0.12}
-          onPress={() => {
-            let params = {
-              type: 'color',
-              title: item.title,
-              color: item,
-            };
-            dispatch({
-              type: Actions.HEADER_VERTICAL_MENU,
-              state: false,
-            });
-
-            dispatch({
-              type: Actions.HEADER_TEXT_STATE,
-              state: {
-                heading: item.title,
-              },
-            });
-
-            NavigationService.navigate('Notes', params);
-            eSendEvent(refreshNotesPage, params);
-            NavigationService.closeDrawer();
-          }}
+          onPress={() => onPress(item)}
           customStyle={{
             flexDirection: 'row',
             justifyContent: noTextMode ? 'center' : 'flex-start',
@@ -94,20 +97,21 @@ export const ColorSection = ({noTextMode}) => {
               }}>
               <Text
                 style={{
-                  color: colors.pri,
-                  fontSize: SIZE.sm - 1,
+                  fontFamily: WEIGHT.regular,
+                  fontSize: SIZE.sm,
+                  color: colors.heading,
                 }}>
                 {item.title.slice(0, 1).toUpperCase() + item.title.slice(1)}
               </Text>
 
-              <Text
+           {/*    <Text
                 style={{
                   color: colors.icon,
                   fontSize: SIZE.xs,
                   paddingHorizontal: 5,
                 }}>
                 {item.noteIds.length > 99 ? '99+' : item.noteIds.length}
-              </Text>
+              </Text> */}
             </View>
           )}
         </PressableButton>
