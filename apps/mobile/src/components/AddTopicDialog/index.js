@@ -10,9 +10,10 @@ import {Button} from '../Button';
 import BaseDialog from '../Dialog/base-dialog';
 import DialogHeader from '../Dialog/dialog-header';
 import DialogButtons from '../Dialog/dialog-buttons';
-import {opacity, ph, pv, SIZE, WEIGHT} from "../../utils/SizeUtils";
-import {db} from "../../utils/DB";
-import {DDS} from "../../services/DeviceDetection";
+import {opacity, ph, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
+import {db} from '../../utils/DB';
+import {DDS} from '../../services/DeviceDetection';
+import Seperator from '../Seperator';
 
 export class AddTopicDialog extends React.Component {
   constructor(props) {
@@ -69,7 +70,7 @@ export class AddTopicDialog extends React.Component {
         <View
           style={{
             ...getElevation(5),
-            width:DDS.isTab? 350 : '80%',
+            width: DDS.isTab ? 350 : '80%',
             maxHeight: 350,
             borderRadius: 5,
             backgroundColor: colors.bg,
@@ -81,11 +82,13 @@ export class AddTopicDialog extends React.Component {
             title={toEdit ? 'Edit Topic' : 'Add New Topic'}
           />
 
+          <Seperator />
+
           <TextInput
             ref={this.titleRef}
             style={{
               padding: pv,
-              borderWidth: 1.5,
+              borderBottomWidth: 1,
               borderColor: titleFocused ? colors.accent : colors.nav,
               paddingHorizontal: ph,
               borderRadius: 5,

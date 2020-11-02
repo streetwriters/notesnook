@@ -393,9 +393,10 @@ export class AddNotebookDialog extends React.Component {
                         ? colors.accent
                         : colors.nav,
                       color: colors.pri,
-                      width: '85%',
-                      maxWidth: '85%',
+                      width: '100%',
+                      maxWidth: '100%',
                       marginTop: 5,
+                      paddingRight: '15%',
                     },
                   ]}
                   placeholder="Add a topic"
@@ -478,8 +479,8 @@ const TopicItem = ({item, index, colors, onPress, onDelete}) => {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        borderBottomWidth:1,
-        borderColor:colors.nav
+        borderBottomWidth: 1,
+        borderColor: colors.nav,
       }}>
       <TouchableOpacity
         style={{
@@ -488,21 +489,19 @@ const TopicItem = ({item, index, colors, onPress, onDelete}) => {
           zIndex: 10,
           position: 'absolute',
           height: 30,
-        
         }}
         onPress={() => {
           onPress(item, index);
         }}
       />
       <Text
-      style={{
-          fontFamily:WEIGHT.regular,
+        style={{
+          fontFamily: WEIGHT.regular,
           fontSize: SIZE.sm,
-          color:colors.primary,
-          marginRight:index === 0? 2 : 0
-      }}
-      >
-          {index + 1 + "."} 
+          color: colors.primary,
+          marginRight: index === 0 ? 2 : 0,
+        }}>
+        {index + 1 + '.'}
       </Text>
       <TextInput
         ref={topicRef}
@@ -518,23 +517,22 @@ const TopicItem = ({item, index, colors, onPress, onDelete}) => {
       />
 
       <View
-      style={{
-          width:80,
-          position:"absolute",
-          right:0,
-          alignItems:"center",
-          flexDirection:"row",
-          justifyContent:'flex-end'
-      }}
-      >
-          <ActionIcon
-           onPress={() => {
+        style={{
+          width: 80,
+          position: 'absolute',
+          right: 0,
+          alignItems: 'center',
+          flexDirection: 'row',
+          justifyContent: 'flex-end',
+        }}>
+        <ActionIcon
+          onPress={() => {
             onPress(item, index);
           }}
           name="pencil"
           size={SIZE.lg - 5}
           color={colors.icon}
-        />   
+        />
         <ActionIcon
           onPress={() => {
             onDelete(index);
@@ -561,7 +559,7 @@ const styles = StyleSheet.create({
     height: DDS.isTab ? 600 : '100%',
     maxHeight: DDS.isTab ? 600 : '100%',
     borderRadius: DDS.isTab ? 5 : 0,
-    paddingHorizontal: ph,
+    paddingHorizontal: 12,
     paddingVertical: pv,
   },
   overlay: {
@@ -581,22 +579,22 @@ const styles = StyleSheet.create({
   },
   input: {
     paddingHorizontal: ph,
-    borderRadius: 5,
+    borderRadius: 0,
     minHeight: 45,
     fontSize: SIZE.sm,
     fontFamily: WEIGHT.regular,
     padding: pv - 2,
-    borderWidth: 1.5,
+    borderBottomWidth: 1,
     marginTop: 10,
     marginBottom: 5,
   },
   addBtn: {
-    borderRadius: 5,
     width: '12%',
     minHeight: 45,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1.5,
+    position: 'absolute',
+    right: 0,
   },
   buttonContainer: {
     justifyContent: 'space-between',
