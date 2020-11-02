@@ -60,3 +60,33 @@ export const itemSkus = Platform.select({
   ios: ['com.streetwriters.notesnook.sub.mo'],
   android: ['com.streetwriters.notesnook.sub.mo'],
 });
+
+
+export const MenuItemsList = [
+  {
+    name: 'Home',
+    icon: 'home-variant-outline',
+    close: true,
+  },
+  {
+    name: 'Notebooks',
+    icon: 'book-outline',
+    close: true,
+  },
+  {
+    name: 'Favorites',
+    icon: 'star-outline',
+    close: true,
+  },
+  {
+    name: 'Tags',
+    icon: 'pound',
+    close: true,
+  },
+  {
+    name: 'Trash',
+    icon: 'delete-outline',
+    close: true,
+  },
+];
+

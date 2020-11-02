@@ -1,27 +1,24 @@
 import React from 'react';
-import {
-  ScrollView,
-  StatusBar,
-  View,
-} from 'react-native';
+import {ScrollView, StatusBar, View} from 'react-native';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
-import NavigationService from '../../services/Navigation';
 import {ColorSection} from './ColorSection';
 import {MenuListItem} from './MenuListItem';
 import {TagsSection} from './TagsSection';
 import {UserSection} from './UserSection';
 import Seperator from '../Seperator';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {ACCENT, COLOR_SCHEME, COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT, setColorScheme} from "../../utils/Colors";
+import {
+  ACCENT,
+  COLOR_SCHEME,
+  COLOR_SCHEME_DARK,
+  COLOR_SCHEME_LIGHT,
+  setColorScheme,
+} from '../../utils/Colors';
+import {MenuItemsList} from "../../utils/index"
+import {MMKV} from '../../utils/mmkv';
 
-import {MMKV} from "../../utils/MMKV";
-
-export const Menu = ({
-  close = () => {},
-  hide,
-  noTextMode = false,
-}) => {
+export const Menu = ({close = () => {}, hide, noTextMode = false}) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
   const insets = useSafeAreaInsets();
@@ -32,36 +29,7 @@ export const Menu = ({
     dispatch({type: Actions.THEME, colors: newColors});
   }
 
-  const listItems = [
-    {
-      name: 'Home',
-      icon: 'home-variant-outline',
-      func: () => NavigationService.navigate('Home'),
-      close: true,
-    },
-    {
-      name: 'Notebooks',
-      icon: 'book-outline',
-      func: () => NavigationService.navigate('Folders'),
-      close: true,
-    },
-
-    {
-      name: 'Favorites',
-      icon: 'star-outline',
-      func: () => NavigationService.navigate('Favorites'),
-      close: true,
-    },
-
-    {
-      name: 'Trash',
-      icon: 'delete-outline',
-      func: () => NavigationService.navigate('Trash'),
-      close: true,
-    },
-  ];
-
-  const listItems2 = [
+  const BottomItemsList = [
     {
       name: 'Night mode',
       icon: 'theme-light-dark',
@@ -81,7 +49,6 @@ export const Menu = ({
     {
       name: 'Settings',
       icon: 'cog-outline',
-      func: () => NavigationService.navigate('Settings'),
       close: true,
     },
   ];
@@ -93,9 +60,9 @@ export const Menu = ({
         opacity: hide ? 0 : 1,
         width: '100%',
         backgroundColor: colors.bg,
-        paddingTop:insets.top,
-        borderRightWidth:1,
-        borderRightColor:colors.nav
+        paddingTop: insets.top,
+        borderRightWidth: 1,
+        borderRightColor: colors.nav,
       }}>
       <ScrollView
         alwaysBounceVertical={false}
@@ -103,30 +70,16 @@ export const Menu = ({
           minHeight: '50%',
         }}
         showsVerticalScrollIndicator={false}>
-        {listItems.map((item, index) => (
-          <MenuListItem
-            testID={item.name}
-            key={item.name}
-            item={item}
-            index={index}
-            noTextMode={noTextMode}
-          />
-        ))}
-
-        <MenuListItem
-          key="Tags"
-          testID="Tags"
-          noTextMode={noTextMode}
-          index={10}
-          item={{
-            name: 'Tags',
-            icon: 'tag',
-            func: () => {
-              close();
-              NavigationService.navigate('Tags');
-            },
-          }}
-        />
+        
+          {MenuItemsList.map((item, index) => (
+            <MenuListItem
+              testID={item.name}
+              key={item.name}
+              item={item}
+              index={index}
+              noTextMode={noTextMode}
+            />
+          ))}
 
         {noTextMode ? null : <TagsSection />}
         <ColorSection noTextMode={noTextMode} />
@@ -144,7 +97,7 @@ export const Menu = ({
           style={{
             width: '100%',
           }}>
-          {listItems2.map((item, index) => (
+          {BottomItemsList.map((item, index) => (
             <MenuListItem
               testID={item.name == 'Night mode' ? 'night_mode' : item.name}
               key={item.name}
