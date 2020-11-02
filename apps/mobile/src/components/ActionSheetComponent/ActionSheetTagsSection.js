@@ -1,4 +1,4 @@
-import React, {createRef, useState} from 'react';
+import React, {createRef, useCallback, useEffect, useState} from 'react';
 import {Text, TextInput, TouchableOpacity, View} from 'react-native';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
@@ -7,20 +7,41 @@ import {db} from '../../utils/DB';
 import {SIZE, WEIGHT} from '../../utils/SizeUtils';
 
 const tagsInputRef = createRef();
+let prevQuery = null;
+let tagToAdd = '';
+let backPressCount = 0;
 
-export const ActionSheetTagsSection = ({note, localRefresh}) => {
+export const ActionSheetTagsSection = ({item}) => {
   const [state, dispatch] = useTracked();
   const {colors, tags, premiumUser} = state;
   const [suggestions, setSuggestions] = useState([]);
   const [focused, setFocused] = useState(false);
-  let tagToAdd = null;
-  let backPressCount = 0;
+  const [note, setNote] = useState(item);
 
-  const _onSubmit = async () => {
+  const localRefresh = () => {
+    toAdd = db.notes.note(note.id);
+    if (toAdd) {
+      toAdd = toAdd.data;
+    } else {
+      setTimeout(() => {
+        toAdd = db.notes.note(note.id);
+        if (toAdd) {
+          toAdd = toAdd.data;
+        }
+      }, 500);
+    }
+    dispatch({type: Actions.NOTES});
+    dispatch({type: Actions.TAGS});
+    setNote({...toAdd});
+  };
+
+  const _onSubmit = useCallback(async () => {
     if (!tagToAdd || tagToAdd === '' || tagToAdd.trimStart().length == 0) {
-      ToastEvent.show('Empty Tag', 'success');
+      console.log('Calling submit', tagToAdd);
+      ToastEvent.show('Empty Tag', 'error', 'local');
       return;
     }
+
     let tag = tagToAdd;
     tag = tag.trim();
     if (tag.includes(' ')) {
@@ -37,9 +58,13 @@ export const ActionSheetTagsSection = ({note, localRefresh}) => {
       text: '',
     });
     tagToAdd = '';
-  };
+  });
 
-  const _onKeyPress = async (event) => {
+  useEffect(() => {
+    getSuggestions(prevQuery);
+  }, [note]);
+
+  const _onKeyPress = useCallback(async (event) => {
     if (event.nativeEvent.key === 'Backspace') {
       if (backPressCount === 0 && !tagToAdd) {
         backPressCount = 1;
@@ -73,14 +98,17 @@ export const ActionSheetTagsSection = ({note, localRefresh}) => {
         text: '',
       });
     }
-  };
+  });
 
   const getSuggestions = (query) => {
-   let _suggestions = tags.filter(t => t.title.startsWith(query))
-   if (_suggestions && _suggestions.length > 0) {
+    console.log(note.tags);
+    prevQuery = query;
+
+    let _suggestions = tags.filter(
+      (t) => t.title.startsWith(query) && !note.tags.find((n) => n === t.title),
+    );
     setSuggestions(_suggestions);
-   }
-  }
+  };
 
   const _renderTag = (tag) => (
     <TouchableOpacity
@@ -93,17 +121,16 @@ export const ActionSheetTagsSection = ({note, localRefresh}) => {
             .untag(oldProps.tags[oldProps.tags.indexOf(tag)]);
           sendNoteEditedEvent(note.id, false, true);
           dispatch({type: Actions.TAGS});
+          localRefresh(note.type);
         } catch (e) {
           sendNoteEditedEvent(note.id, false, true);
         }
       }}
       style={{
-        flexDirection: 'row',
-        justifyContent: 'flex-start',
-        alignItems: 'center',
-        margin: 1,
         paddingHorizontal: 5,
-        paddingVertical: 2.5,
+        backgroundColor: colors.shade,
+        marginLeft: 5,
+        borderRadius: 2.5,
       }}>
       <Text
         style={{
@@ -149,7 +176,7 @@ export const ActionSheetTagsSection = ({note, localRefresh}) => {
             : 'Suggested: '}
         </Text>
 
-        {[...suggestions,...suggestions,...suggestions,...suggestions].map((tag) => (
+        {suggestions.map((tag) => (
           <TouchableOpacity
             key={tag.title}
             onPress={() => {
@@ -187,45 +214,29 @@ export const ActionSheetTagsSection = ({note, localRefresh}) => {
           flexDirection: 'row',
           flexWrap: 'wrap',
           borderRadius: 5,
-          borderWidth: 1.5,
+          borderBottomWidth: 1.5,
           borderColor: focused ? colors.accent : colors.nav,
           alignItems: 'center',
-          height: 40,
         }}>
-        <TouchableOpacity
-          onPress={() => {
-            if (!premiumUser) {
-              close('premium');
-              return;
-            }
-            tagsInputRef.current?.focus();
-          }}
-          activeOpacity={1}
-          style={{
-            position: 'absolute',
-            width: '100%',
-            height: '100%',
-            justifyContent: 'flex-start',
-            alignItems: 'flex-end',
-            zIndex: 10,
-          }}>
-          {!premiumUser ? (
-            <Text
-              style={{
-                color: colors.accent,
-                fontFamily: WEIGHT.regular,
-                fontSize: 10,
-                marginRight: 4,
-                marginTop: 2.5,
-              }}>
-              PRO
-            </Text>
-          ) : null}
-        </TouchableOpacity>
+        {!premiumUser ? (
+          <Text
+            style={{
+              color: colors.accent,
+              fontFamily: WEIGHT.regular,
+              fontSize: 10,
+              marginRight: 4,
+              marginTop: 2.5,
+              position: 'absolute',
+              right: 0,
+              top: 0,
+            }}>
+            PRO
+          </Text>
+        ) : null}
+
         {note && note.tags ? note.tags.map(_renderTag) : null}
         <TextInput
           style={{
-            backgroundColor: 'transparent',
             minWidth: 100,
             zIndex: 10,
             fontFamily: WEIGHT.regular,
@@ -233,12 +244,19 @@ export const ActionSheetTagsSection = ({note, localRefresh}) => {
             paddingHorizontal: 5,
             paddingVertical: 0,
             height: 40,
+            fontSize: SIZE.sm,
             textAlignVertical: 'center',
           }}
+          autoCapitalize="none"
+          textAlignVertical="center"
           blurOnSubmit={false}
           ref={tagsInputRef}
           placeholderTextColor={colors.icon}
           onFocus={() => {
+            if (!premiumUser) {
+              close('premium');
+              return;
+            }
             setFocused(true);
           }}
           selectionColor={colors.accent}
@@ -248,7 +266,7 @@ export const ActionSheetTagsSection = ({note, localRefresh}) => {
           placeholder="#hashtag"
           onChangeText={(value) => {
             tagToAdd = value;
-            getSuggestions(value)
+            getSuggestions(value);
             if (tagToAdd.length > 0) backPressCount = 0;
           }}
           onSubmitEditing={_onSubmit}
