@@ -14,6 +14,7 @@ export const Button = ({
   title = '',
   icon,
   color = 'accent',
+  fontSize=SIZE.sm
 }) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
@@ -48,7 +49,7 @@ export const Button = ({
         />
       ) : null}
       <Text
-        style={[styles.buttonText, {color: grayed ? colors.icon : 'white'}]}>
+        style={[styles.buttonText, {color: grayed ? colors.icon : 'white',fontSize:fontSize}]}>
         {title}
       </Text>
     </PressableButton>
@@ -67,7 +68,6 @@ const styles = StyleSheet.create({
   buttonText: {
     fontFamily: WEIGHT.medium,
     color: 'white',
-    fontSize: SIZE.sm,
     marginLeft: 5,
   },
 });
