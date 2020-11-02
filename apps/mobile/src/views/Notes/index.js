@@ -74,27 +74,29 @@ export const Notes = ({route, navigation}) => {
     if (allNotes && allNotes.length > 0) {
       setNotes([...allNotes]);
     }
-  };
 
-  const onFocus = useCallback(() => {
+    dispatch({
+      type: Actions.CURRENT_SCREEN,
+      screen: params.title,
+    });
     dispatch({
       type: Actions.HEADER_STATE,
-      state: params.type === 'color',
+      state: params.menu,
     });
     dispatch({
       type: Actions.HEADER_TEXT_STATE,
       state: {
         heading:
           params.type === 'tag'
-            ? '# ' + params.title
+            ? '#' + params.title
             : params.title.slice(0, 1).toUpperCase() + params.title.slice(1),
       },
     });
+  };
+
+  const onFocus = useCallback(() => {
+  
     init();
-    dispatch({
-      type: Actions.CURRENT_SCREEN,
-      screen: params.type === 'color' ? params.color.title : params.type,
-    });
   }, []);
 
   const onBlur = useCallback(() => {
