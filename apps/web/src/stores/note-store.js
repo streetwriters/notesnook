@@ -1,6 +1,7 @@
 import { db, notesFromContext } from "../common/index";
 import createStore from "../common/store";
 import { store as editorStore } from "./editor-store";
+import { store as appStore } from "./app-store";
 import Vault from "../common/vault";
 import BaseStore from ".";
 import { EV } from "notes-core/common";
@@ -102,22 +103,10 @@ class NoteStore extends BaseStore {
     } else {
       await note.color(color);
     }
-    this._setValue(id, "colors", db.notes.note(id).data.colors);
-  };
-
-  /**
-   * @private
-   */
-  _setValue = (noteId, prop, value) => {
-    this.set((state) => {
-      const { context, notes } = state;
-      const arr = !context ? notes : context.notes;
-      let index = arr.findIndex((note) => note.id === noteId);
-      if (index < 0) return;
-
-      arr[index][prop] = value;
-      this._syncEditor(noteId, prop, value);
-    });
+    if (!this._syncEditor(note.id, "colors", db.notes.note(id).data.colors)) {
+      this.refresh();
+      appStore.refreshColors();
+    }
   };
 
   /**

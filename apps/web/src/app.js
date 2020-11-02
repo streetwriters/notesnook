@@ -9,7 +9,6 @@ import { useStore as useUserStore } from "./stores/user-store";
 import { useStore as useNotesStore } from "./stores/note-store";
 import Animated from "./components/animated";
 import NavigationMenu from "./components/navigationmenu";
-import { db } from "./common";
 import { useRoutes } from "hookrouter";
 import routes from "./navigation/routes";
 import Editor from "./components/editor";
