@@ -341,7 +341,7 @@ const LoginDialog = () => {
                 ref={_username}
                 onFocus={() => {
                   if (!invalidUsername) {
-                    _username.current.setNativeProps({
+                    _username.current?.setNativeProps({
                       style: {
                         borderColor: colors.accent,
                       },
@@ -353,7 +353,7 @@ const LoginDialog = () => {
                 onBlur={() => {
                   if (!validateUsername(username) && username?.length > 0) {
                     setInvalidUsername(true);
-                    _username.current.setNativeProps({
+                    _username.current?.setNativeProps({
                       style: {
                         color: colors.errorText,
                         borderColor: colors.errorText,
@@ -361,7 +361,7 @@ const LoginDialog = () => {
                     });
                   } else {
                     setInvalidUsername(false);
-                    _username.current.setNativePrWops({
+                    _username.current?.setNativeProps({
                       style: {
                         borderColor: colors.nav,
                       },
@@ -443,7 +443,7 @@ const LoginDialog = () => {
                   onBlur={() => {
                     if (!validateEmail(email) && email?.length > 0) {
                       setInvalidEmail(true);
-                      _email.current.setNativeProps({
+                      _email.current?.setNativeProps({
                         style: {
                           color: colors.errorText,
                           borderColor: colors.errorText,
@@ -451,7 +451,7 @@ const LoginDialog = () => {
                       });
                     } else {
                       setInvalidEmail(false);
-                      _email.current.setNativeProps({
+                      _email.current?.setNativeProps({
                         style: {
                           borderColor: colors.nav,
                         },
@@ -541,7 +541,7 @@ const LoginDialog = () => {
                 onBlur={() => {
                   if (!validatePass(password) && password?.length > 0) {
                     setInvalidPassword(true);
-                    _pass.current.setNativeProps({
+                    _pass.current?.setNativeProps({
                       style: {
                         color: colors.errorText,
                       },
