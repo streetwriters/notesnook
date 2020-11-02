@@ -1,11 +1,10 @@
-import React, {createRef, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   ActivityIndicator,
   Clipboard,
   Dimensions,
   StatusBar,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -13,6 +12,7 @@ import Share from 'react-native-share';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
+import {DDS} from '../../services/DeviceDetection';
 import {
   eSendEvent,
   openVault,
@@ -20,33 +20,24 @@ import {
   ToastEvent,
 } from '../../services/EventManager';
 import {
-  eOnNoteEdited,
-  eOpenLoginDialog,
-  eOpenMoveNoteDialog,
-  refreshNotesPage,
-} from '../../utils/Events';
-import {PremiumTag} from '../Premium/PremiumTag';
-import {PressableButton} from '../PressableButton';
-import {Toast} from '../Toast';
-import {hexToRGBA, RGB_Linear_Shade} from '../../utils/ColorUtils';
-import {timeConverter} from '../../utils/TimeUtils';
-import {
   ACCENT,
   COLOR_SCHEME,
   COLOR_SCHEME_DARK,
   COLOR_SCHEME_LIGHT,
-  COLORS_NOTE,
   setColorScheme,
 } from '../../utils/Colors';
-import {opacity, ph, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
 import {db} from '../../utils/DB';
-import {DDS} from '../../services/DeviceDetection';
+import {eOpenLoginDialog, eOpenMoveNoteDialog} from '../../utils/Events';
 import {MMKV} from '../../utils/mmkv';
-import { ActionSheetTagsSection } from './ActionSheetTagsSection';
-
+import {opacity, ph, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
+import {timeConverter} from '../../utils/TimeUtils';
+import {Button} from '../Button';
+import {PremiumTag} from '../Premium/PremiumTag';
+import {PressableButton} from '../PressableButton';
+import {Toast} from '../Toast';
+import {ActionSheetColorsSection} from './ActionSheetColorsSection';
+import {ActionSheetTagsSection} from './ActionSheetTagsSection';
 const w = Dimensions.get('window').width;
-const h = Dimensions.get('window').height;
-
 
 export const ActionSheetComponent = ({
   close = () => {},
@@ -57,8 +48,7 @@ export const ActionSheetComponent = ({
   columnItems = [],
 }) => {
   const [state, dispatch] = useTracked();
-  const {colors, tags, premiumUser, user} = state;
-
+  const {colors, premiumUser, user} = state;
   const [refreshing, setRefreshing] = useState(false);
   const [note, setNote] = useState(
     item
@@ -89,11 +79,6 @@ export const ActionSheetComponent = ({
       setNote({...item});
     }
   }, [item]);
-
-  let tagToAdd = null;
-  let backPressCount = 0;
-
-
 
   const localRefresh = (type, nodispatch = false) => {
     if (!note || !note.id) return;
@@ -293,88 +278,7 @@ export const ActionSheetComponent = ({
       check: true,
       on: note.favorite,
     },
-    {
-      name: 'Add to Vault',
-      icon: 'shield',
-      func: () => {
-        if (!premiumUser) {
-          close('premium');
-          return;
-        }
-        if (!note.id) return;
-
-        if (note.locked) {
-          close('unlock');
-        } else {
-          db.vault
-            .add(note.id)
-            .then(() => {
-              sendNoteEditedEvent(note.id, false, true);
-              close();
-            })
-            .catch(async (e) => {
-              switch (e.message) {
-                case db.vault.ERRORS.noVault:
-                  close('novault');
-                  break;
-                case db.vault.ERRORS.vaultLocked:
-                  close('locked');
-                  break;
-                case db.vault.ERRORS.wrongPassword:
-                  close();
-                  break;
-              }
-            });
-        }
-      },
-      close: true,
-      check: true,
-      on: note.locked,
-    },
   ];
-
-
-  const _renderColor = (c) => {
-    const color = {
-      name: c,
-      value: COLORS_NOTE[c],
-    };
-
-    return (
-      <PressableButton
-        color={RGB_Linear_Shade(
-          !colors.night ? -0.2 : 0.2,
-          hexToRGBA(color.value, 1),
-        )}
-        selectedColor={color.value}
-        alpha={!colors.night ? -0.1 : 0.1}
-        opacity={1}
-        key={color.value}
-        onPress={async () => {
-          let noteColors = note.colors;
-
-          if (noteColors.includes(color.name)) {
-            await db.notes.note(note.id).uncolor(color.name);
-          } else {
-            await db.notes.note(note.id).color(color.name);
-          }
-          dispatch({type: Actions.COLORS});
-          sendNoteEditedEvent(note.id, false, true);
-          localRefresh(note.type, true);
-        }}
-        customStyle={{
-          width: DDS.isTab ? 400 / 10 : w / 10,
-          height: DDS.isTab ? 400 / 10 : w / 10,
-          borderRadius: 100,
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
-        {note && note.colors && note.colors.includes(color.name) ? (
-          <Icon name="check" color="white" size={SIZE.lg} />
-        ) : null}
-      </PressableButton>
-    );
-  };
 
   const _renderRowItem = (rowItem) =>
     rowItems.includes(rowItem.name) ? (
@@ -522,6 +426,38 @@ export const ActionSheetComponent = ({
         user?.lastSynced,
         user?.lastSynced < note?.dateEdited,
       );
+    }
+  };
+
+  const onPressVaultButton = () => {
+    if (!premiumUser) {
+      close('premium');
+      return;
+    }
+    if (!note.id) return;
+
+    if (note.locked) {
+      close('unlock');
+    } else {
+      db.vault
+        .add(note.id)
+        .then(() => {
+          sendNoteEditedEvent(note.id, false, true);
+          close();
+        })
+        .catch(async (e) => {
+          switch (e.message) {
+            case db.vault.ERRORS.noVault:
+              close('novault');
+              break;
+            case db.vault.ERRORS.vaultLocked:
+              close('locked');
+              break;
+            case db.vault.ERRORS.wrongPassword:
+              close();
+              break;
+          }
+        });
     }
   };
 
@@ -687,25 +623,43 @@ export const ActionSheetComponent = ({
         </View>
       ) : null}
 
-      {hasColors && note.id ? (
-        <View
-          style={{
+      {note.type === 'note' ? (
+        <PressableButton
+          color={note.locked ? colors.errorBg : colors.shade}
+          selectedColor={note.locked ? '#FF0000' : colors.accent}
+          alpha={0.14}
+          onPress={onPressVaultButton}
+          opacity={0.15}
+          customStyle={{
+            width: '95%',
+            alignSelf: 'center',
+            height: 50,
             flexDirection: 'row',
-            flexWrap: 'wrap',
-            paddingHorizontal: 12,
-            width: '100%',
-            marginVertical: 10,
+            justifyContent: 'center',
             alignItems: 'center',
-            justifyContent: 'space-between',
           }}>
-          {Object.keys(COLORS_NOTE).map(_renderColor)}
-        </View>
+          <Icon
+            name={note.locked ? 'shield-off' : 'shield'}
+            color={note.locked ? '#FF0000' : colors.accent}
+            size={SIZE.md}
+          />
+          <Text
+            style={{
+              color: note.locked ? '#FF0000' : colors.accent,
+              fontFamily: WEIGHT.regular,
+              fontSize: SIZE.md,
+              marginLeft: 5,
+            }}>
+            {note.locked ? 'Remove from Vault' : 'Add to Vault'}
+          </Text>
+        </PressableButton>
       ) : null}
 
-          {
-            hasTags? <ActionSheetTagsSection note={note} localRefresh={localRefresh} /> : null
-          }
-     
+      {hasColors && note.id ? <ActionSheetColorsSection item={note} /> : null}
+
+      {hasTags ? (
+        <ActionSheetTagsSection item={note} localRefresh={localRefresh} />
+      ) : null}
 
       {columnItems.length > 0 ? (
         <View>{columnItemsData.map(_renderColumnItem)}</View>
