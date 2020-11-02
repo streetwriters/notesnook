@@ -1,16 +1,24 @@
 import React, {useEffect, useState} from 'react';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
-import {eSubscribeEvent, eUnSubscribeEvent, ToastEvent} from '../../services/EventManager';
-import {eClearSearch, eScrollEvent, eUpdateSearchState} from '../../utils/Events';
+import {
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+  ToastEvent,
+} from '../../services/EventManager';
+import {
+  eClearSearch,
+  eScrollEvent,
+  eUpdateSearchState,
+} from '../../utils/Events';
 import {inputRef} from '../../utils/Refs';
 import {selection} from '../../utils';
 import Animated, {Easing} from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {TextInput, Text} from 'react-native';
-import {br, SIZE, WEIGHT} from "../../utils/SizeUtils";
-import {db} from "../../utils/DB";
-import {DDS} from "../../services/DeviceDetection";
+import {br, SIZE, WEIGHT} from '../../utils/SizeUtils';
+import {db} from '../../utils/DB';
+import {DDS} from '../../services/DeviceDetection';
 const {Value, timing, block} = Animated;
 
 let searchResult = [];
@@ -51,14 +59,13 @@ export const Search = (props) => {
   const {colors, searchResults} = state;
   const [text, setText] = useState('');
   const [focus, setFocus] = useState(false);
-  const [searchState,setSearchState] = useState({
+  const [searchState, setSearchState] = useState({
     noSearch: false,
     data: [],
     type: 'notes',
     color: null,
     placeholder: 'Search all notes',
-  })
-
+  });
 
   const onScroll = (y) => {
     if (searchResults.results.length > 0) return;
@@ -76,7 +83,6 @@ export const Search = (props) => {
       timeoutAnimate = null;
       timeoutAnimate = setTimeout(() => {
         animation(-65, 0, 0);
-       
       }, 500);
       offsetY = y;
     } else {
@@ -84,16 +90,15 @@ export const Search = (props) => {
       clearTimeout(timeoutAnimate);
       timeoutAnimate = null;
       timeoutAnimate = setTimeout(() => {
-      
         animation(0, 1, 1.5);
       }, 500);
       offsetY = y;
     }
   };
 
-  const updateSearchState = (state => {
+  const updateSearchState = (state) => {
     setSearchState(state);
-  })
+  };
 
   useEffect(() => {
     selection.data = searchState.data;
@@ -104,14 +109,14 @@ export const Search = (props) => {
       animating = false;
       animation(0, 1, 1.5);
     });
-    eSubscribeEvent(eUpdateSearchState,updateSearchState)
+    eSubscribeEvent(eUpdateSearchState, updateSearchState);
     return () => {
       eUnSubscribeEvent(eScrollEvent, onScroll);
       eUnSubscribeEvent('showSearch', () => {
         animating = false;
         animation(0, 1, 1.5);
       });
-      eUnSubscribeEvent(eUpdateSearchState,updateSearchState)
+      eUnSubscribeEvent(eUpdateSearchState, updateSearchState);
     };
   }, [searchState]);
 
@@ -161,7 +166,6 @@ export const Search = (props) => {
     );
     if (!searchResult || searchResult.length === 0) {
       ToastEvent.show('No search results found for ' + text, 'error');
-
     } else {
       dispatch({
         type: Actions.SEARCH_RESULTS,
@@ -203,12 +207,11 @@ export const Search = (props) => {
           alignSelf: 'center',
           borderRadius: br,
           height: '90%',
-          borderWidth: _borderAnim,
-          borderColor: focus
+          backgroundColor: focus
+          ? searchState.color
             ? searchState.color
-              ? searchState.color
-              : colors.accent
-            : colors.nav,
+            : colors.shade
+          : colors.nav,
         }}>
         <TextInput
           ref={inputRef}
