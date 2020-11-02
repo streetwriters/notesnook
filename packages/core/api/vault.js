@@ -1,3 +1,4 @@
+import { EV } from "../common";
 import getId from "../utils/id";
 
 const ERASE_TIME = 1000 * 60 * 30;
@@ -16,7 +17,7 @@ export default class Vault {
       vaultLocked: "ERR_VAULT_LOCKED",
       wrongPassword: "ERR_WRONG_PASSWORD",
     };
-    this._db.ev.subscribe("user:loggedOut", () => {
+    EV.subscribe("user:loggedOut", () => {
       this._password = "";
     });
   }

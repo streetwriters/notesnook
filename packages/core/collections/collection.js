@@ -1,3 +1,4 @@
+import { EV } from "../common";
 import CachedCollection from "../database/cached-collection";
 import IndexedCollection from "../database/indexed-collection";
 
@@ -8,7 +9,7 @@ class Collection {
 
     if (collection.init) await collection.init();
     if (collection._collection.clear)
-      db.ev.subscribe(
+      EV.subscribe(
         "user:loggedOut",
         async () => await collection._collection.clear()
       );

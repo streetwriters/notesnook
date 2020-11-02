@@ -1,3 +1,4 @@
+import { EV } from "../common";
 import Constants from "../utils/constants";
 
 export default class User {
@@ -32,7 +33,7 @@ export default class User {
     });
 
     // propogate event
-    this._db.ev.publish("user:synced", user);
+    EV.publish("user:synced", user);
   }
 
   get() {
@@ -63,7 +64,7 @@ export default class User {
     await this._context.write("user", user);
 
     // propogate event
-    this._db.ev.publish("user:loggedIn", user);
+    EV.publish("user:loggedIn", user);
   }
 
   async token() {
@@ -90,12 +91,12 @@ export default class User {
     await this._context.write("user", user);
 
     // propogate event
-    this._db.ev.publish("user:tokenRefreshed", user);
+    EV.publish("user:tokenRefreshed", user);
   }
 
   logout() {
     // propogate event
-    this._db.ev.publish("user:loggedOut");
+    EV.publish("user:loggedOut");
 
     return this._context.clear();
   }
@@ -112,7 +113,7 @@ export default class User {
     await this._context.write("user", user);
 
     // propogate event
-    this._db.ev.publish("user:loggedIn", user);
+    EV.publish("user:loggedIn", user);
   }
 }
 

@@ -10,9 +10,9 @@ import Lookup from "./lookup";
 import Content from "../collections/content";
 import Backup from "../database/backup";
 import Conflicts from "./sync/conflicts";
-import EventManager from "../utils/event-manager";
 import Session from "./session";
 import Constants from "../utils/constants";
+import { EV } from "../common";
 
 /**
  * @type {EventSource}
@@ -27,7 +27,7 @@ class Database {
   constructor(context, eventsource) {
     this.context = new Storage(context);
     NNEventSource = eventsource;
-    this._syncInterval = 0;
+    this._syncTimeout = 0;
   }
 
   async _validate() {
@@ -40,11 +40,11 @@ class Database {
   }
 
   async init() {
-    this.ev = new EventManager();
-    this.ev.subscribeMulti(
+    EV.subscribeMulti(
       ["user:loggedIn", "user:loggedOut", "user:tokenRefreshed", "user:synced"],
       this._onUserStateChanged.bind(this)
     );
+    EV.subscribe("db:write", this._onDBWrite.bind(this));
 
     this.session = new Session(this.context);
     this._validate();
@@ -111,14 +111,21 @@ class Database {
           await this.user.set({
             subscription: data,
           });
-          this.ev.publish("user:upgraded", data);
+          EV.publish("user:upgraded", data);
           break;
         case "sync":
           await this.syncer.eventMerge(data);
-          this.ev.publish("db:refresh");
+          EV.publish("db:refresh");
           break;
       }
     };
+  }
+
+  async _onDBWrite() {
+    clearTimeout(this._syncTimeout);
+    this._syncTimeout = setTimeout(() => {
+      EV.publish("db:sync");
+    }, 60 * 1000);
   }
 
   sync() {

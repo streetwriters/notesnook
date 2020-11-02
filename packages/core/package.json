@@ -2,6 +2,7 @@
   "name": "notes-core",
   "version": "1.5.0",
   "private": true,
+  "main": "./api/index.js",
   "devDependencies": {
     "@babel/core": "^7.7.4",
     "@babel/plugin-transform-runtime": "^7.7.4",

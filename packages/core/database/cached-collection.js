@@ -1,5 +1,6 @@
 import Indexer from "./indexer";
 import sort from "fast-sort";
+import { EV } from "../common";
 
 export default class CachedCollection {
   constructor(context, type) {
@@ -51,18 +52,18 @@ export default class CachedCollection {
     delete item.remote;
     this.map.set(item.id, item);
     await this.indexer.write(item.id, item);
+
+    EV.publish("db:write", item);
   }
 
-  async removeItem(id) {
-    if (this.transactionOpen) return;
+  removeItem(id) {
     const deletedItem = {
       id,
       deleted: true,
       dateEdited: Date.now(),
       dateCreated: Date.now(),
     };
-    await this.indexer.write(id, deletedItem);
-    this.map.set(id, deletedItem);
+    return this.updateItem(deletedItem);
   }
 
   exists(id) {

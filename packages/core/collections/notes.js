@@ -8,6 +8,7 @@ import {
 } from "../utils/date";
 import Note from "../models/note";
 import getId from "../utils/id";
+import { EV } from "../common";
 var tfun = require("transfun/transfun.js").tfun;
 if (!tfun) {
   tfun = global.tfun;
@@ -37,7 +38,7 @@ export default class Notes extends Collection {
 
     if (isNoteEmpty(note)) {
       if (oldNote) {
-        this._db.ev.publish("notes:removeEmptyNote", id);
+        EV.publish("notes:removeEmptyNote", id);
         await this.remove(id);
       }
       return;
