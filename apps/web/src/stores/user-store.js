@@ -3,6 +3,7 @@ import { db } from "../common";
 import { store as appStore } from "./app-store";
 import BaseStore from "./index";
 import config from "../utils/config";
+import { EV } from "notes-core/common";
 
 class UserStore extends BaseStore {
   isLoggedIn = false;
@@ -18,8 +19,8 @@ class UserStore extends BaseStore {
         state.user = user;
         state.isLoggedIn = true;
       });
-      db.ev.subscribe("db:refresh", () => appStore.refresh());
-      db.ev.subscribe("user:upgraded", (subscription) => {
+      EV.subscribe("db:refresh", () => appStore.refresh());
+      EV.subscribe("user:upgraded", (subscription) => {
         this.set((state) => {
           state.user = {
             ...state.user,
@@ -27,6 +28,7 @@ class UserStore extends BaseStore {
           };
         });
       });
+      EV.subscribe("db:sync", this.sync);
       this.sync();
       return true;
     });
@@ -58,7 +60,8 @@ class UserStore extends BaseStore {
 
   sync = () => {
     this.set((state) => (state.isSyncing = true));
-    db.sync()
+    return db
+      .sync()
       .then(() => {
         appStore.refresh();
       })

@@ -19,7 +19,7 @@ import {
   shouldAddBackupReminder,
   shouldAddSignupReminder,
 } from "./common/reminders";
-import { showRecoveryKeyDialog } from "./components/dialogs/recoverykeydialog";
+import { EV } from "notes-core/common";
 
 function App() {
   const [show, setShow] = usePersistentState("isContainerVisible", true);
@@ -71,7 +71,7 @@ function App() {
 
   useEffect(() => {
     return () => {
-      db.ev.unsubscribeAll();
+      EV.unsubscribeAll();
     };
   }, []);
 

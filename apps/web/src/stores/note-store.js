@@ -3,6 +3,7 @@ import createStore from "../common/store";
 import { store as editorStore } from "./editor-store";
 import Vault from "../common/vault";
 import BaseStore from ".";
+import { EV } from "notes-core/common";
 
 class NoteStore extends BaseStore {
   notes = [];
@@ -10,7 +11,7 @@ class NoteStore extends BaseStore {
   selectedNote = 0;
 
   init = async () => {
-    db.ev.subscribe("notes:removeEmptyNote", (id) => {
+    EV.subscribe("notes:removeEmptyNote", (id) => {
       const { session, newSession } = editorStore.get();
       if (session.id === id) {
         newSession();
