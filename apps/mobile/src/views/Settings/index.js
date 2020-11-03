@@ -453,6 +453,7 @@ export const Settings = ({navigation}) => {
             alignSelf: 'center',
             flexDirection: 'row',
             flexWrap: 'wrap',
+            justifyContent: 'space-between',
             paddingHorizontal: 12,
           }}>
           {[
@@ -462,10 +463,6 @@ export const Settings = ({navigation}) => {
             '#0560FF',
             '#f58231',
             '#911eb4',
-            '#46f0f0',
-            '#f032e6',
-            '#bcf60c',
-            '#fabebe',
           ].map((item) => (
             <PressableButton
               key={item}
@@ -489,10 +486,10 @@ export const Settings = ({navigation}) => {
                 flexDirection: 'row',
                 justifyContent: 'center',
                 alignItems: 'center',
-                marginHorizontal: 5,
                 marginVertical: 5,
-                width: DDS.isTab ? (dWidth * 0.28) / 5 - 35 : dWidth / 5 - 35,
-                height: DDS.isTab ? (dWidth * 0.28) / 5 - 35 : dWidth / 5 - 35,
+                marginHorizontal: 0,
+                width: DDS.isTab ? (dWidth * 0.28) / 5 - 24 : dWidth / 7.5,
+                height: DDS.isTab ? (dWidth * 0.28) / 5 - 24 : dWidth / 7.5,
                 borderRadius: 100,
               }}>
               {colors.accent === item ? (
@@ -500,6 +497,49 @@ export const Settings = ({navigation}) => {
               ) : null}
             </PressableButton>
           ))}
+
+          <View
+            style={{
+              width: '100%',
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+            }}>
+            {['#46f0f0', '#f032e6', '#bcf60c', '#fabebe'].map((item,index) => (
+              <PressableButton
+                key={item}
+                color={
+                  colors.accent === item
+                    ? RGB_Linear_Shade(
+                        !colors.night ? -0.2 : 0.2,
+                        hexToRGBA(item, 1),
+                      )
+                    : item
+                }
+                selectedColor={item}
+                alpha={!colors.night ? -0.1 : 0.1}
+                opacity={1}
+                onPress={async () => {
+                  changeAccentColor(item);
+
+                  await MMKV.setStringAsync('accentColor', item);
+                }}
+                customStyle={{
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  marginTop: 5,
+                  marginRight:  ((dWidth) - ((dWidth / 7.5) * 6))/12 ,
+                  marginLeft: index === 0 ? 0 : ((dWidth - 12) - ((dWidth / 7.5) * 6))/12.1 ,
+                  width: DDS.isTab ? (dWidth * 0.28) / 5 - 24 : dWidth / 7.5,
+                  height: DDS.isTab ? (dWidth * 0.28) / 5 - 24 : dWidth / 7.5,
+                  borderRadius: 100,
+                }}>
+                {colors.accent === item ? (
+                  <Icon size={SIZE.lg} color="white" name="check" />
+                ) : null}
+              </PressableButton>
+            ))}
+          </View>
         </View>
 
         <CustomButton
@@ -575,7 +615,7 @@ export const Settings = ({navigation}) => {
                     style={{
                       fontSize: SIZE.sm,
                       fontFamily: WEIGHT.regular,
-                      color:colors.pri
+                      color: colors.pri,
                     }}>
                     {settings.homepage}
                   </Text>
@@ -585,7 +625,7 @@ export const Settings = ({navigation}) => {
               {MenuItemsList.map((item) => (
                 <MenuItem
                   onPress={() => {
-                    setSetting(settings,'homepage',item.name);
+                    setSetting(settings, 'homepage', item.name);
                   }}
                   style={{
                     backgroundColor:
@@ -596,7 +636,10 @@ export const Settings = ({navigation}) => {
                   textStyle={{
                     fontFamily: WEIGHT.regular,
                     fontSize: SIZE.sm,
-                    color: settings.homepage === item.name ? colors.accent : colors.pri
+                    color:
+                      settings.homepage === item.name
+                        ? colors.accent
+                        : colors.pri,
                   }}>
                   {item.name}
                 </MenuItem>
