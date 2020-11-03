@@ -529,7 +529,7 @@ export const Settings = ({navigation}) => {
                   alignItems: 'center',
                   marginTop: 5,
                   marginRight:  ((dWidth) - ((dWidth / 7.5) * 6))/12 ,
-                  marginLeft: index === 0 ? 0 : ((dWidth - 12) - ((dWidth / 7.5) * 6))/12.1 ,
+                  marginLeft: index === 0 ? 0.5 : ((dWidth - 12) - ((dWidth / 7.5) * 6))/12.1 ,
                   width: DDS.isTab ? (dWidth * 0.28) / 5 - 24 : dWidth / 7.5,
                   height: DDS.isTab ? (dWidth * 0.28) / 5 - 24 : dWidth / 7.5,
                   borderRadius: 100,
@@ -622,10 +622,10 @@ export const Settings = ({navigation}) => {
                   <Icon color={colors.icon} name="menu-down" size={SIZE.md} />
                 </TouchableOpacity>
               }>
-              {MenuItemsList.map((item) => (
+              {MenuItemsList.slice(0,MenuItemsList.length - 1).map((item) => (
                 <MenuItem
-                  onPress={() => {
-                    setSetting(settings, 'homepage', item.name);
+                  onPress={async () => {
+                    await setSetting(settings, 'homepage', item.name);
                   }}
                   style={{
                     backgroundColor:

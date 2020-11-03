@@ -19,7 +19,6 @@ export const NavigatorStack = () => {
   const [state, dispatch] = useTracked();
   const {settings} = state;
 
-  console.log(settings)
   return (
     <Container root={true}>
       <NavigationContainer independent={true} ref={rootNavigatorRef}>
@@ -31,7 +30,7 @@ export const NavigatorStack = () => {
             gestureEnabled: false,
             cardOverlayEnabled: false,
             cardShadowEnabled: false,
-            
+
           }}>
           <Stack.Screen name="Home" component={Home} />
           <Stack.Screen

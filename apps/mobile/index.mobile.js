@@ -71,16 +71,7 @@ export const Initialize = () => {
             opacity: EditorOpacity,
             transform: [
               {
-                translateX: EditorPosition,
-              },
-              {
                 translateY: EditorTranslateY,
-              },
-              {
-                scaleX: EditorScale,
-              },
-              {
-                scaleY: EditorScale,
               },
             ],
           }}>

@@ -33,7 +33,6 @@ import SplashScreen from 'react-native-splash-screen';
 
 let firstLoad = true;
 let note = null;
-let syncTimeout = null;
 const App = () => {
   const [, dispatch] = useTracked(),
     [init, setInit] = useState(false),
@@ -160,7 +159,7 @@ const App = () => {
       }
       dispatch({type: Actions.ALL});
       setInit(true);
-      backupData();
+      backupData().then(r=> r)
 
       setTimeout(() => {
         if (error) {
@@ -174,7 +173,7 @@ const App = () => {
 
   async function backupData() {
     await sleep(1000);
-    settings = await MMKV.getStringAsync('settings');
+    let settings = await MMKV.getStringAsync('settings');
     settings = JSON.parse(settings);
     if (await Backup.checkBackupRequired(settings.reminder)) {
       try {
@@ -199,7 +198,7 @@ const App = () => {
       firstLoad = false;
     }
     settings = await MMKV.getStringAsync('settings');
-    console.log('settings', settings);
+
     if (!settings) {
       settings = defaultState.settings;
       await MMKV.setStringAsync('settings', JSON.stringify(settings));

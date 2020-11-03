@@ -64,6 +64,9 @@ export function getNote() {
 }
 
 
+export const textInput = createRef();
+
+
 export function post(type, value = null) {
     let message = {
         type,

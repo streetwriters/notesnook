@@ -13,7 +13,6 @@ import {
 } from '../../utils/Events';
 import {openEditorAnimation} from '../../utils/Animations';
 import {DDS} from '../../services/DeviceDetection';
-import ResultDialog from '../../components/ResultDialog';
 
 export const Home = ({navigation}) => {
   const [state, dispatch] = useTracked();
@@ -79,16 +78,13 @@ export const Home = ({navigation}) => {
     }
   }, [notes]);
 
-  const _onPressBottomButton = async () => {
+  const _onPressBottomButton = async (event) => {
     eSendEvent(eOnLoadNote, {type: 'new'});
 
     if (DDS.isPhone || DDS.isSmallTab) {
       openEditorAnimation();
     }
   };
-  useEffect(() => {
-    console.log('render home');
-  });
 
   return (
     <>
