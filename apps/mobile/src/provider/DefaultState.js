@@ -25,7 +25,9 @@ export const defaultState = {
     useSystemTheme:true,
     reminder:'weekly',
     encryptedBackups:false,
-    homepage:'Home'
+    homepage:'Home',
+    sort:"default",
+    sortOrder:"des"
   },
   currentScreen: 'home',
   colors: {

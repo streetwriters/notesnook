@@ -30,6 +30,7 @@ import {MMKV} from './src/utils/mmkv';
 import Backup from './src/services/Backup';
 import {setLoginMessage} from './src/services/Message';
 import SplashScreen from 'react-native-splash-screen';
+import {SORT, sortSettings} from "./src/utils";
 
 let firstLoad = true;
 let note = null;
@@ -157,8 +158,10 @@ const App = () => {
       if (!user) {
         setLoginMessage(dispatch);
       }
+
       dispatch({type: Actions.ALL});
       setInit(true);
+
       backupData().then(r=> r)
 
       setTimeout(() => {
@@ -208,6 +211,8 @@ const App = () => {
     if (settings.fontScale) {
       scale.fontScale = settings.fontScale;
     }
+    sortSettings.sort = settings.sort;
+    sortSettings.sortOrder = settings.sortOrder;
     dispatch({type: Actions.SETTINGS, settings: {...settings}});
     updateSize();
 

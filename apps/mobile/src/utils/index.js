@@ -4,6 +4,7 @@ import {updateEvent} from '../components/DialogManager/recievers';
 import {Actions} from '../provider/Actions';
 import {MMKV} from "./MMKV";
 import RNFetchBlob from 'rn-fetch-blob';
+import {defaultState} from "../provider/DefaultState";
 
 export async function setSetting(settings, name, value) {
   let s = {...settings};
@@ -25,6 +26,19 @@ export const getElevation = (elevation) => {
     shadowRadius: 0.7 * elevation,
   };
 };
+
+export const sortSettings = {
+  sort:defaultState.settings.sort,
+  sortOrder: defaultState.settings.sortOrder
+}
+
+export const SORT = {
+  default: null,
+  alphabetical: 'abc',
+  year: 'year',
+  week: 'week',
+  month: 'month'
+}
 
 export const editing = {
   currentlyEditing: false,

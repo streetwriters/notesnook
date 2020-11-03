@@ -53,9 +53,7 @@ class PendingDialog extends React.Component {
       <ActionSheet
         containerStyle={{
           backgroundColor: colors.bg,
-          width: '100%',
           alignSelf: 'center',
-          borderRadius: 10,
           width: DDS.isTab? 500 : '100%',
           borderRadius: 10,
           marginBottom: DDS.isTab ? 50 : 0,

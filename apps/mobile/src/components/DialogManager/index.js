@@ -44,6 +44,7 @@ import {TEMPLATE_DELETE, TEMPLATE_PERMANANT_DELETE} from './Templates';
 import {hexToRGBA} from "../../utils/ColorUtils";
 import {DDS} from "../../services/DeviceDetection";
 import ResultDialog from '../ResultDialog';
+import Index from "../SortDialog";
 
 export class DialogManager extends Component {
   constructor(props) {
@@ -107,7 +108,6 @@ export class DialogManager extends Component {
         item: {},
       });
     } else {
-      note = i;
       this.setState({
         item: i,
       });
@@ -333,18 +333,12 @@ export class DialogManager extends Component {
             }}
           />
         </ActionSheet>
-
         <Dialog
           ref={(ref) => (this.simpleDialog = ref)}
           item={item}
           colors={colors}
           template={simpleDialog}
         />
-
-        <VaultDialog colors={colors} />
-
-        <MoveNoteDialog colors={colors} />
-
         <AddTopicDialog
           ref={(ref) => (this.addTopicsDialog = ref)}
           toEdit={item.type === 'topic' ? item : null}
@@ -364,22 +358,19 @@ export class DialogManager extends Component {
           ref={(ref) => (this.premiumDialog = ref)}
           colors={colors}
         />
-
         <LoginDialog colors={colors} />
-
         <MergeEditor />
-
         <ExportDialog />
-
         <RecoveryKeyDialog colors={colors} />
         <PendingDialog colors={colors} />
-
         <PremiumStatusDialog />
         <ProgressDialog />
-
         <RestoreDialog/>
-
         <ResultDialog/>
+        <VaultDialog colors={colors} />
+        <MoveNoteDialog colors={colors} />
+        <Index colors={colors} />
+
       </>
     );
   }

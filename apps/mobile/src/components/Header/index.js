@@ -114,7 +114,6 @@ export const Header = ({showSearch, root}) => {
           />
         </Animatable.View>
 
-        <HeaderMenu />
       </View>
     </View>
   );

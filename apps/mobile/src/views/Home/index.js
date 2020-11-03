@@ -13,17 +13,13 @@ import {
 } from '../../utils/Events';
 import {openEditorAnimation} from '../../utils/Animations';
 import {DDS} from '../../services/DeviceDetection';
+import {sortSettings} from "../../utils";
 
 export const Home = ({navigation}) => {
   const [state, dispatch] = useTracked();
   const {notes} = state;
 
   const onFocus = useCallback(() => {
-    dispatch({
-      type: Actions.HEADER_VERTICAL_MENU,
-      state: notes.length > 0,
-    });
-
     dispatch({
       type: Actions.HEADER_TEXT_STATE,
       state: {
@@ -46,6 +42,7 @@ export const Home = ({navigation}) => {
       color: null,
     });
     eSendEvent(eScrollEvent, 0);
+    console.log(sortSettings);
     dispatch({type: Actions.COLORS});
     dispatch({type: Actions.NOTES});
   }, [notes]);
