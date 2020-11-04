@@ -83,7 +83,7 @@ export const Search = (props) => {
       timeoutAnimate = null;
       timeoutAnimate = setTimeout(() => {
         animation(-65, 0, 0);
-      }, 500);
+      }, 300);
       offsetY = y;
     } else {
       if (offsetY - y < 50) return;
@@ -91,7 +91,7 @@ export const Search = (props) => {
       timeoutAnimate = null;
       timeoutAnimate = setTimeout(() => {
         animation(0, 1, 1.5);
-      }, 500);
+      }, 300);
       offsetY = y;
     }
   };

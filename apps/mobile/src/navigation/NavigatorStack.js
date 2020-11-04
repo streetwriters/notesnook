@@ -1,8 +1,10 @@
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import * as React from 'react';
+import {Animated} from 'react-native';
 import Container from '../components/Container';
-import { useTracked } from '../provider';
+import {useTracked} from '../provider';
+import {DDS} from '../services/DeviceDetection';
 import {rootNavigatorRef} from '../utils/Refs';
 import Favorites from '../views/Favorites';
 import Folders from '../views/Folders';
@@ -15,8 +17,52 @@ import Trash from '../views/Trash';
 
 const Stack = createStackNavigator();
 
+const forFade = ({current}) => ({
+  cardStyle: {
+    opacity: current.progress,
+  },
+});
+
+const forSlide = ({current, next, inverted, layouts: {screen}}) => {
+  const progress = Animated.add(
+    current.progress.interpolate({
+      inputRange: [0, 1],
+      outputRange: [0, 1],
+      extrapolate: 'clamp',
+    }),
+    next
+      ? next.progress.interpolate({
+          inputRange: [0, 1],
+          outputRange: [0, 1],
+          extrapolate: 'clamp',
+        })
+      : 0,
+  );
+
+  return {
+    cardStyle: {
+      transform: [
+        {
+          translateX: Animated.multiply(
+            progress.interpolate({
+              inputRange: [0, 1, 2],
+              outputRange: [
+                screen.width, // Focused, but offscreen in the beginning
+                0, // Fully focused
+                screen.width * -0.3, // Fully unfocused
+              ],
+              extrapolate: 'clamp',
+            }),
+            inverted,
+          ),
+        },
+      ],
+    },
+  };
+};
+
 export const NavigatorStack = () => {
-  const [state, dispatch] = useTracked();
+  const [state] = useTracked();
   const {settings} = state;
 
   return (
@@ -26,11 +72,8 @@ export const NavigatorStack = () => {
           initialRouteName={settings.homepage}
           screenOptions={{
             headerShown: false,
-            animationEnabled: false,
-            gestureEnabled: false,
-            cardOverlayEnabled: false,
-            cardShadowEnabled: false,
-
+            cardStyleInterpolator:
+              DDS.isTab && !DDS.isSmallTab ? forFade : forSlide,
           }}>
           <Stack.Screen name="Home" component={Home} />
           <Stack.Screen
