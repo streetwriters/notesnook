@@ -36,17 +36,17 @@ const animation = (margin, opacity, border) => {
   animating = true;
   timing(_marginAnim, {
     toValue: margin,
-    duration: 230,
+    duration: 130,
     easing: Easing.inOut(Easing.ease),
   }).start();
   timing(_opacity, {
     toValue: opacity,
-    duration: 250,
+    duration: 140,
     easing: Easing.inOut(Easing.ease),
   }).start();
   timing(_borderAnim, {
     toValue: border,
-    duration: 270,
+    duration: 150,
     easing: Easing.inOut(Easing.ease),
   }).start();
   setTimeout(() => {
@@ -105,7 +105,6 @@ export const Search = (props) => {
     selection.type = searchState.type;
     eSubscribeEvent(eScrollEvent, onScroll);
     eSubscribeEvent('showSearch', (hide) => {
-   
       if (hide) {
         animation(-65, 0, 0);
         return;
