@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {Platform, RefreshControl, StyleSheet, Text, useWindowDimensions, View,} from 'react-native';
-import {initialWindowMetrics} from 'react-native-safe-area-context';
+import {initialWindowMetrics, useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {DataProvider, LayoutProvider, RecyclerListView} from 'recyclerlistview';
 import {useTracked} from '../../provider';
@@ -26,9 +26,10 @@ const SimpleList = ({
                         customRefresh,
                         customRefreshing,
                         refreshCallback,
+    sortMenuButton
                     }) => {
     const [state, dispatch] = useTracked();
-    const {colors, selectionMode, user, messageBoardState} = state;
+    const {colors, selectionMode, messageBoardState} = state;
     const searchResults = {...state.searchResults};
     const [refreshing, setRefreshing] = useState(false);
     const [dataProvider, setDataProvider] = useState(
@@ -37,6 +38,7 @@ const SimpleList = ({
         }),
     );
     const {width, fontScale} = useWindowDimensions();
+    const insets = useSafeAreaInsets();
 
     const listData = data;
     const dataType = type;
@@ -85,7 +87,7 @@ const SimpleList = ({
                 {item.title}
             </Text>
             {
-                index === 1? <HeaderMenu/> : null
+                index === 1 && sortMenuButton? <HeaderMenu/> : null
             }
         </View>
     );
@@ -214,10 +216,10 @@ const SimpleList = ({
                     ? 130
                     : 130 - 60
                     : listData[0] && !selectionMode
-                    ? 155 - initialWindowMetrics?.insets?.top
-                    : (155 - initialWindowMetrics?.insets?.top) - 60,
+                    ? 155 - insets.top
+                    : (155 - insets.top) - 60,
         };
-    }, [selectionMode, listData, colors]);
+    }, [selectionMode, listData, colors,insets]);
 
     return !listData || listData.length === 0 || !dataProvider ? (
         _ListEmptyComponent
