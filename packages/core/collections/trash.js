@@ -21,7 +21,7 @@ export default class Trash extends Collection {
   }
 
   get all() {
-    return this._collection.getAllItems((u) => u.dateDeleted);
+    return this._collection.getItems((u) => u.dateDeleted);
   }
 
   async add(item) {

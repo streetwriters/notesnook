@@ -33,8 +33,8 @@ export default class IndexedCollection {
     await this.indexer.write(item.id, item);
   }
 
-  async removeItem(id) {
-    await this.indexer.write(id, {
+  removeItem(id) {
+    return this.updateItem({
       id,
       deleted: true,
       dateCreated: Date.now(),

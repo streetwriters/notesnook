@@ -70,7 +70,7 @@ export default class Tags extends Collection {
   }
 
   get all() {
-    return this._collection.getAllItems();
+    return this._collection.getItems();
   }
 
   async remove(tagTitle, noteId) {

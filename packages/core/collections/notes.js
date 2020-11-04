@@ -105,7 +105,7 @@ export default class Notes extends Collection {
   }
 
   get all() {
-    return this._collection.getAllItems();
+    return this._collection.getItems();
   }
 
   get pinned() {

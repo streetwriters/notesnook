@@ -56,7 +56,7 @@ export default class Notebooks extends Collection {
   }
 
   get all() {
-    return sort(this._collection.getAllItems()).desc((t) => t.pinned);
+    return sort(this._collection.getItems()).desc((t) => t.pinned);
   }
 
   get pinned() {
