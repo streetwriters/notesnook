@@ -9,6 +9,7 @@ import {
 import Note from "../models/note";
 import getId from "../utils/id";
 import { EV } from "../common";
+import { getContentFromData } from "../content-types";
 var tfun = require("transfun/transfun.js").tfun;
 if (!tfun) {
   tfun = global.tfun;
@@ -23,64 +24,52 @@ export default class Notes extends Collection {
 
     let id = noteArg.id || getId();
     let oldNote = this._collection.getItem(id);
-    let deltaId = 0;
-    let textId = 0;
-
-    if (oldNote && oldNote.content) {
-      deltaId = oldNote.content.delta;
-      textId = oldNote.content.text;
-    }
 
     let note = {
       ...oldNote,
       ...noteArg,
     };
 
-    if (isNoteEmpty(note)) {
-      if (oldNote) {
-        EV.publish("notes:removeEmptyNote", id);
-        await this.remove(id);
+    if (!oldNote && !noteArg.content) return;
+
+    if (noteArg.content && noteArg.content.data && noteArg.content.type) {
+      const { type, data, conflicted, resolved } = noteArg.content;
+
+      let content = getContentFromData(type, data);
+      if (!content) throw new Error("Invalid content type.");
+      note.title = getNoteTitle(note, content);
+      note.headline = getNoteHeadline(note, content);
+
+      if (isNoteEmpty(note, content)) {
+        if (oldNote) {
+          EV.publish("notes:removeEmptyNote", id);
+          await this.remove(id);
+        }
+        return;
       }
-      return;
-    }
 
-    const { text, delta } = note.content;
-
-    if (!textId && isHex(text)) textId = text;
-    if (!deltaId && isHex(delta)) deltaId = delta;
-
-    if (delta && typeof delta === "object") {
-      deltaId = await this._db.delta.add({
+      note.contentId = await this._db.content.add({
         noteId: id,
-        id: deltaId,
-        data: delta.data || delta,
-        conflicted: delta.conflicted,
-        resolved: delta.resolved,
+        id: note.contentId,
+        type,
+        data,
+        conflicted,
+        resolved,
       });
-    }
-
-    if (text !== textId) {
-      textId = await this._db.text.add({
-        noteId: id,
-        id: textId,
-        data: text,
-      });
-      note.title = getNoteTitle(note);
-      note.headline = getNoteHeadline(note);
     }
 
     note = {
       id,
+      contentId: note.contentId,
       type: "note",
       title: note.title,
-      content: { text: textId, delta: deltaId },
+      headline: note.headline,
       pinned: !!note.pinned,
       locked: !!note.locked,
       notebook: note.notebook || {},
       colors: note.colors || [],
       tags: note.tags || [],
       favorite: !!note.favorite,
-      headline: note.headline,
       dateCreated: note.dateCreated,
       conflicted: !!note.conflicted,
     };
@@ -233,50 +222,18 @@ export default class Notes extends Collection {
   }
 }
 
-function isNoteEmpty(note) {
-  if (!note.content) return true;
-  const {
-    title,
-    content: { delta },
-    locked,
-  } = note;
-  const text = getText(note);
-
+function isNoteEmpty(note, content) {
+  const { title, locked } = note;
   const isTitleEmpty = !title || !title.trim().length;
-  const isTextEmpty = !isHex(text) && (!text || !text.trim().length);
-  const isDeltaEmpty = !isHex(delta) && _isDeltaEmpty(delta);
-  return !locked && isTitleEmpty && isTextEmpty && isDeltaEmpty;
+  return !locked && isTitleEmpty && content.isEmpty();
 }
 
-function _isDeltaEmpty(delta) {
-  let obj = delta;
-  if (delta.constructor === Object) obj = delta.ops;
-
-  return (
-    !obj ||
-    obj
-      .map((o) => o.insert)
-      .join("")
-      .trim().length <= 0
-  );
-}
-
-function getNoteHeadline(note) {
+function getNoteHeadline(note, content) {
   if (note.locked) return "";
-  const text = getText(note);
-  return text.substring(0, 150) + (text.length > 150 ? "..." : "");
+  return content.toHeadline();
 }
 
-function getNoteTitle(note) {
-  if (note.title && note.title.length > 0) return note.title.trim();
-  const text = getText(note);
-  return text.split(" ").slice(0, 3).join(" ").trim();
-}
-
-function getText(note) {
-  if (!note.content || !note.content.text) return "";
-  const { text } = note.content;
-  if (text.data != null) return text.data;
-  else if (text != null) return text;
-  else return "";
+function getNoteTitle(note, content) {
+  if (note.title && note.title.trim().length > 0) return note.title.trim();
+  return content.toTitle();
 }

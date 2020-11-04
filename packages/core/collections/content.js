@@ -16,6 +16,7 @@ export default class Content extends Collection {
     await this._collection.addItem({
       noteId: content.noteId,
       id,
+      type: content.type,
       data: content.data || content,
       conflicted: content.conflicted || false,
       resolved: !!content.resolved,

@@ -116,21 +116,19 @@ test("local delta updated after lastSyncedTimestamp should cause merge conflict"
   StorageInterface.clear();
   return noteTest().then(async ({ db, id }) => {
     await login(db);
-    const content = {
-      text: "my name is abdullah",
-      delta: { ops: [{ insert: "my name is abdullah" }] },
-    };
-    const deltaId = db.notes.note(id).data.content.delta;
+
+    const contentId = db.notes.note(id).data.contentId;
     const merger = new Merger(db);
     const result = await merger.merge(
       {
-        delta: [
+        content: [
           {
-            id: deltaId,
+            id: contentId,
             ...(await getEncrypted({
-              id: deltaId,
+              id: contentId,
               noteId: id,
-              data: JSON.stringify(content.delta),
+              type: "delta",
+              data: [{ insert: "my name is" }],
               dateEdited: 2919,
               conflicted: false,
               resolved: false,
@@ -140,9 +138,9 @@ test("local delta updated after lastSyncedTimestamp should cause merge conflict"
       },
       200
     );
-    const localDelta = await db.delta.raw(deltaId);
-    expect(localDelta.conflicted.id).toBe(deltaId);
-    expect(localDelta.conflicted.noteId).toBe(id);
+    const localContent = await db.content.raw(contentId);
+    expect(localContent.conflicted.id).toBe(contentId);
+    expect(localContent.conflicted.noteId).toBe(id);
     expect(result).toBe(true);
     expect(await db.context.read("hasConflicts")).toBe(true);
   });

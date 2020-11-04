@@ -65,8 +65,7 @@ class Merger {
       notes,
       synced,
       notebooks,
-      delta,
-      text,
+      content,
       tags,
       colors,
       trash,
@@ -92,30 +91,24 @@ class Merger {
     );
 
     await this._mergeArrayWithConflicts(
-      delta,
-      (id) => this._db.delta.raw(id),
-      (item) => this._db.delta.add(item),
+      content,
+      (id) => this._db.content.raw(id),
+      (item) => this._db.content.add(item),
       async (local, remote) => {
         // merge conflicts resolver
         const note = this._db.notes.note(local.noteId).data;
 
         if (local.deleted || note.locked) {
-          // if note is locked or delta is deleted we keep the most recent version.
+          // if note is locked or content is deleted we keep the most recent version.
           if (remote.dateEdited > local.dateEdited)
-            await this._db.delta.add({ id: local.id, ...remote });
+            await this._db.content.add({ id: local.id, ...remote });
         } else {
           // otherwise we trigger the conflicts
-          await this._db.delta.add({ ...local, conflicted: remote });
+          await this._db.content.add({ ...local, conflicted: remote });
           await this._db.notes.add({ id: local.noteId, conflicted: true });
           await this._db.context.write("hasConflicts", true);
         }
       }
-    );
-
-    await this._mergeArray(
-      text,
-      (id) => this._db.text.raw(id),
-      (item) => this._db.text.add(item)
     );
 
     await this._mergeArray(

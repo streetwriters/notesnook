@@ -1,7 +1,7 @@
-import Converter from "../utils/converter";
 import MarkdownBuilder from "../utils/templates/markdown/builder";
 import HTMLBuilder from "../utils/templates/html/builder";
 import TextBuilder from "../utils/templates/text/builder";
+import { getContentFromData } from "../content-types";
 
 export default class Note {
   /**
@@ -57,27 +57,25 @@ export default class Note {
       editedOn: this.dateEdited,
       createdOn: this.data.dateCreated,
     };
+    const { data, type } = await this._db.content.raw(this._note.contentId);
+    let content = getContentFromData(type, data);
     switch (to) {
       case "html":
-        templateData.content = Converter.deltaToHTML(await this.delta());
+        templateData.content = content.toHTML();
         return HTMLBuilder.buildHTML(templateData);
       case "txt":
-        templateData.content = await this.text();
+        templateData.content = content._text;
         return TextBuilder.buildText(templateData);
       case "md":
-        templateData.content = Converter.deltaToMD(await this.delta());
+        templateData.content = content.toMD();
         return MarkdownBuilder.buildMarkdown(templateData);
       default:
         throw new Error("Export format not supported.");
     }
   }
 
-  delta() {
-    return this._db.delta.get(this._note.content.delta);
-  }
-
-  text() {
-    return this._db.text.get(this._note.content.text);
+  content() {
+    return this._db.content.get(this._note.contentId);
   }
 
   color(color) {

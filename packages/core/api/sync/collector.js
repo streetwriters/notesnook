@@ -19,8 +19,7 @@ class Collector {
     return {
       notes: await this._collect(this._db.notes.raw),
       notebooks: await this._collect(this._db.notebooks.raw),
-      delta: await this._collect(await this._db.delta.all()),
-      text: await this._collect(await this._db.text.all()),
+      content: await this._collect(await this._db.content.all()),
       tags: await this._collect(this._db.tags.raw),
       colors: await this._collect(this._db.colors.raw),
       trash: await this._collect(this._db.trash.raw),

@@ -44,8 +44,7 @@ export default class Trash extends Collection {
       let item = this._collection.getItem(id);
       if (!item) continue;
       if (item.itemType === "note") {
-        await this._db.delta.remove(item.content.delta);
-        await this._db.text.remove(item.content.text);
+        await this._db.content.remove(item.contentId);
       }
       await this._collection.removeItem(id);
     }

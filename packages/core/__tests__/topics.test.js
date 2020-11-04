@@ -61,10 +61,12 @@ test("get topic", () =>
     let topics = db.notebooks.notebook(id).topics;
     await topics.add("Home");
     let topic = topics.topic("Home");
-    let noteId = await db.notes.add({ content: { text: "Hello", delta: [] } });
+    let noteId = await db.notes.add({
+      content: { type: "delta", data: [{ insert: "Hello" }] },
+    });
     await topic.add(noteId);
     topic = topics.topic("Home");
-    expect(await db.text.get(topic.all[0].content.text)).toBe("Hello");
+    expect(await db.content.get(topic.all[0].contentId)).toBeDefined();
     expect(topic.totalNotes).toBe(1);
   }));
 

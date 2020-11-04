@@ -76,8 +76,7 @@ export default class Vault {
    */
   async add(noteId) {
     await this._check();
-    const note = this._db.notes.note(noteId).data;
-    await this._lockNote(noteId, note);
+    await this._lockNote(noteId);
   }
 
   /**
@@ -112,7 +111,7 @@ export default class Vault {
     if (!note) return;
     //await this._check();
     let id = note.id || getId();
-    return await this._lockNote(id, note);
+    return await this._lockNote(id);
   }
 
   // Private & internal methods
@@ -140,61 +139,32 @@ export default class Vault {
   }
 
   /** @private */
-  async _encryptContent(content, ids) {
-    let { text, delta } = content;
-    let { deltaId, textId } = ids;
+  async _encryptContent(contentId, content) {
+    let encryptedContent = await this._context.encrypt(
+      { password: this._password },
+      JSON.stringify(content)
+    );
 
-    if (!delta.ops) delta = await this._db.delta.get(deltaId);
-    if (text === textId) text = await this._db.text.get(textId);
-
-    [text, delta] = await Promise.all([
-      this._context.encrypt({ password: this._password }, text),
-      this._context.encrypt(
-        { password: this._password },
-        JSON.stringify(delta)
-      ),
-    ]);
-    await Promise.all([
-      this._db.text.add({ id: textId, data: text }),
-      this._db.delta.add({ id: deltaId, data: delta }),
-    ]);
+    await this._db.content.add({ id: contentId, data: encryptedContent });
   }
 
   /** @private */
-  async _decryptContent(content) {
-    let { text, delta } = content;
+  async _decryptContent(contentId) {
+    let encryptedContent = await this._db.content.raw(contentId);
 
-    [text, delta] = await Promise.all([
-      this._db.text.get(text),
-      this._db.text.get(delta),
-    ]);
+    let decryptedContent = await this._context.decrypt(
+      { password: this._password },
+      encryptedContent.data
+    );
 
-    [text, delta] = await Promise.all([
-      this._context.decrypt({ password: this._password }, text),
-      this._context.decrypt({ password: this._password }, delta),
-    ]);
-
-    delta = JSON.parse(delta);
-
-    return {
-      delta,
-      text,
-    };
+    return { type: encryptedContent.type, data: JSON.parse(decryptedContent) };
   }
 
   /** @private */
-  async _lockNote(id, note) {
-    let oldNote = this._db.notes.note(id);
+  async _lockNote(id) {
+    let note = this._db.notes.note(id);
 
-    let deltaId = 0;
-    let textId = 0;
-
-    if (oldNote && oldNote.data.content) {
-      deltaId = oldNote.data.content.delta;
-      textId = oldNote.data.content.text;
-    }
-
-    await this._encryptContent(note.content, { textId, deltaId });
+    await this._encryptContent(note.data.contentId, await note.content());
 
     return await this._db.notes.add({
       id,
@@ -205,25 +175,23 @@ export default class Vault {
 
   /** @private */
   async _unlockNote(note, perm = false) {
-    if (!note.locked) return;
-
-    let { delta, text } = await this._decryptContent(note.content);
+    let content = await this._decryptContent(note.contentId);
 
     if (perm) {
       await this._db.notes.add({
         id: note.id,
         locked: false,
-        content: {
-          delta,
-          text,
-        },
+        headline: note.headline,
+        contentId: note.contentId,
+        content,
       });
+      // await this._db.content.add({ id: note.contentId, data: content });
       return;
     }
 
     return {
       ...note,
-      content: { delta, text },
+      content,
     };
   }
 

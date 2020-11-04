@@ -51,8 +51,7 @@ const tests = [
     type: "note",
     title: "someTitle",
   }),
-  getMainCollectionParams("delta", { ops: [{ insert: "true" }] }),
-  getMainCollectionParams("text", "true"),
+  getMainCollectionParams("content", { ops: [{ insert: "true" }] }),
 ];
 
 describe.each(tests)("%s preparation", (collection, add, addExtra) => {

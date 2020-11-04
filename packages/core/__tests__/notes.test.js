@@ -26,13 +26,13 @@ test("add note", () =>
   noteTest().then(async ({ db, id }) => {
     let note = db.notes.note(id);
     expect(note.data).toBeDefined();
-    expect(await note.text()).toStrictEqual(TEST_NOTE.content.text);
+    expect(await note.content()).toStrictEqual(TEST_NOTE.content.data);
   }));
 
-test("get delta of note", () =>
+test("get note content", () =>
   noteTest().then(async ({ db, id }) => {
-    let delta = await db.notes.note(id).delta();
-    expect(delta).toStrictEqual(TEST_NOTE.content.delta);
+    let content = await db.notes.note(id).content();
+    expect(content).toStrictEqual(TEST_NOTE.content.data);
   }));
 
 test("delete note", () =>
@@ -56,7 +56,7 @@ test("get all notes", () =>
 test("note without a title should get title from content", () =>
   noteTest().then(async ({ db, id }) => {
     let note = db.notes.note(id);
-    expect(note.title).toBe("I am a");
+    expect(note.title).toBe("Hello This is");
   }));
 
 test("update note", () =>
@@ -65,8 +65,8 @@ test("update note", () =>
       id,
       title: "I am a new title",
       content: {
-        text: LONG_TEXT,
-        delta: [],
+        type: "delta",
+        data: [],
       },
       pinned: true,
       favorite: true,
@@ -75,7 +75,7 @@ test("update note", () =>
     id = await db.notes.add(noteData);
     let note = db.notes.note(id);
     expect(note.title).toBe(noteData.title);
-    expect(await note.text()).toStrictEqual(noteData.content.text);
+    expect(await note.content()).toStrictEqual(noteData.content.data);
     expect(note.data.pinned).toBe(true);
     expect(note.data.favorite).toBe(true);
   }));
@@ -86,8 +86,8 @@ test("updating empty note should delete it", () =>
       id,
       title: "\n",
       content: {
-        text: "\n",
-        delta: [{ insert: "\n" }],
+        type: "delta",
+        data: [{ insert: "\n" }],
       },
     });
     expect(id).toBeUndefined();
@@ -98,8 +98,8 @@ test("updating empty note should delete it", () =>
 test("note with text longer than 150 characters should have ... in the headline", () =>
   noteTest({
     content: {
-      text: LONG_TEXT,
-      delta: [],
+      type: "delta",
+      data: [{ insert: LONG_TEXT }, { insert: "\n" }],
     },
   }).then(({ db, id }) => {
     let note = db.notes.note(id);
@@ -219,5 +219,5 @@ test("export note to md", () =>
 test("export note to txt", () =>
   noteTest().then(async ({ db, id }) => {
     const txt = await db.notes.note(id).export("txt");
-    expect(txt.includes("I am a text")).toBeTruthy();
+    expect(txt.includes("Hello")).toBeTruthy();
   }));

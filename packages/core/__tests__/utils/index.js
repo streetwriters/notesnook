@@ -27,13 +27,11 @@ const notebookTest = (notebook = TEST_NOTEBOOK) =>
 
 var TEST_NOTE = {
   content: {
-    delta: {
-      ops: [
-        { insert: "Hello\n" },
-        { insert: "This is colorful", attributes: { color: "#f00" } },
-      ],
-    },
-    text: "I am a text",
+    type: "delta",
+    data: [
+      { insert: "Hello\n" },
+      { insert: "This is colorful", attributes: { color: "#f00" } },
+    ],
   },
 };
 

@@ -66,9 +66,7 @@ class Database {
     /** @type {Tags} */
     this.colors = await Tags.new(this, "colors");
     /** @type {Content} */
-    this.delta = await Content.new(this, "delta", false);
-    /** @type {Content} */
-    this.text = await Content.new(this, "text", false);
+    this.content = await Content.new(this, "content", false);
     /** @type {Trash} */
     this.trash = await Trash.new(this, "trash");
 

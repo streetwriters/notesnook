@@ -41,49 +41,51 @@ test("sync without merge conflicts, cause merge conflicts, resolve them and then
     // 4. edit the note's content
     await db.notes.add({
       id: noteId,
-      content: { text: "i am a text", delta: { ops: [{ insert: "text" }] } },
+      content: { type: "delta", data: [{ insert: "text" }] },
     });
 
     // 5. sync again and expect conflicts
-    const deltaId = db.notes.note(noteId).data.content.delta;
-    const delta = {
-      id: deltaId,
+    const contentId = db.notes.note(noteId).data.contentId;
+    const content = {
+      id: contentId,
       ...(await getEncrypted({
-        id: deltaId,
+        id: contentId,
+        type: "delta",
         dateEdited: Date.now(),
         conflicted: false,
-        data: { ops: [{ insert: "text" }] },
+        data: [{ insert: "text" }],
       })),
     };
 
     fetchMock
-      .once(JSON.stringify({ notes: [], delta: [delta], synced: false }))
+      .once(JSON.stringify({ notes: [], content: [content], synced: false }))
       .once(JSON.stringify({ lastSynced: Date.now() }), { status: 200 });
 
     await expect(db.sync()).rejects.toThrow(
       "Merge conflicts detected. Please resolve all conflicts to continue syncing."
     );
 
-    let rawDelta = await db.delta.raw(deltaId);
-    expect(rawDelta.conflicted.id).toBe(deltaId);
-    expect(rawDelta.conflicted.data).toBeTruthy();
+    let rawContent = await db.content.raw(contentId);
+    expect(rawContent.conflicted.id).toBe(contentId);
+    expect(rawContent.conflicted.data).toBeTruthy();
 
     // 6. Resolve conflicts
     await db.notes.add({
       id: noteId,
       conflicted: false,
       content: {
-        text: "i am a text",
-        delta: { data: { ops: [{ insert: "text" }] }, resolved: true },
+        type: "delta",
+        data: [{ insert: "text" }],
+        resolved: true,
       },
     });
-    rawDelta = await db.delta.raw(deltaId);
-    expect(rawDelta.conflicted).toBe(false);
+    rawContent = await db.content.raw(contentId);
+    expect(rawContent.conflicted).toBe(false);
     //expect(rawDelta.resolved).toBe(true);
 
     // 7. Resync (no conflicts should appear)
     fetchMock
-      .once(JSON.stringify({ notes: [], delta: [delta], synced: false }))
+      .once(JSON.stringify({ notes: [], content: [content], synced: false }))
       .once(JSON.stringify({ lastSynced: Date.now() }), { status: 200 });
     await expect(db.sync()).resolves.toBeUndefined();
   });

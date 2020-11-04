@@ -48,15 +48,10 @@ test("lock a note", () =>
 
     expect(note.headline).toBe("");
 
-    const delta = await db.delta.raw(note.data.content.delta);
-    expect(delta.noteId).toBeDefined();
-    expect(delta.data.iv).toBeDefined();
-    expect(delta.data.cipher).toBeDefined();
-
-    const text = await db.text.raw(note.data.content.text);
-    expect(text.noteId).toBeDefined();
-    expect(text.data.iv).toBeDefined();
-    expect(text.data.cipher).toBeDefined();
+    const content = await db.content.raw(note.data.contentId);
+    expect(content.noteId).toBeDefined();
+    expect(content.data.iv).toBeDefined();
+    expect(content.data.cipher).toBeDefined();
   }));
 
 test("unlock a note", () =>
@@ -65,7 +60,8 @@ test("unlock a note", () =>
     await db.vault.add(id);
     const note = await db.vault.open(id, "password");
     expect(note.id).toBe(id);
-    expect(note.content.delta.ops).toBeDefined();
+    expect(note.content.data).toBeDefined();
+    expect(note.content.type).toBe("delta");
   }));
 
 test("unlock a note permanently", () =>
@@ -76,7 +72,7 @@ test("unlock a note permanently", () =>
     const note = db.notes.note(id);
     expect(note.id).toBe(id);
     expect(note.headline).not.toBe("");
-    const delta = await db.delta.raw(note.data.content.delta);
-    expect(delta.data.ops).toBeDefined();
-    expect(typeof delta.data.ops).toBe("object");
+    const content = await db.content.raw(note.data.contentId);
+    expect(content.data).toBeDefined();
+    expect(typeof content.data).toBe("object");
   }));
