@@ -13,7 +13,7 @@ import {HeaderLeftMenu} from "./HeaderLeftMenu";
 import { eScrollEvent } from '../../utils/Events';
 
 let timeout = null;
-export const Header = ({showSearch, root}) => {
+export const Header = ({ root}) => {
   const [state, ] = useTracked();
   const {colors, syncing} = state;
   const insets = useSafeAreaInsets();

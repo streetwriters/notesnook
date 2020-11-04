@@ -6,14 +6,12 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import {eSendEvent} from "../../services/EventManager";
 import {eOpenSortDialog} from "../../utils/Events";
 
-
-
 export const HeaderMenu = () => {
     const [state,] = useTracked();
     const {colors,settings} = state;
 
 
-    return <TouchableOpacity
+    return  <TouchableOpacity
         onPress={() => {
             eSendEvent(eOpenSortDialog);
         }}
@@ -26,12 +24,12 @@ export const HeaderMenu = () => {
             style={{
                 fontSize: SIZE.xs + 1,
                 fontFamily: WEIGHT.regular,
-                color: colors.icon,
+                color: colors.pri,
                 marginRight: 5
             }}>
             {settings.sort.slice(0,1).toUpperCase() + settings.sort.slice(1,settings.sort.length)}
         </Text>
-        <Icon color={colors.icon}
+        <Icon color={colors.pri}
               name={settings.sortOrder === "asc" ? "sort-ascending" : "sort-descending"}
               size={SIZE.md}/>
     </TouchableOpacity>

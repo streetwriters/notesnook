@@ -90,6 +90,7 @@ export const Home = ({navigation}) => {
         type="notes"
         isHome={true}
         pinned={true}
+        sortMenuButton={true}
         focused={() => navigation.isFocused()}
         RenderItem={NoteItemWrapper}
         placeholder={<Placeholder type="notes" />}

@@ -3,8 +3,8 @@ import {Text} from 'react-native';
 import {useTracked} from '../../provider';
 import {SIZE, WEIGHT} from "../../utils/SizeUtils";
 
-export const HeaderTitle = ({root}) => {
-  const [state, dispatch] = useTracked();
+export const HeaderTitle = () => {
+  const [state,] = useTracked();
   const {colors, headerTextState} = state;
 
   const style = {
