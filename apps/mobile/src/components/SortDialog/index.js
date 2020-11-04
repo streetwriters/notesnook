@@ -121,12 +121,12 @@ class Index extends React.Component {
                                     style={{
                                         fontSize: SIZE.sm,
                                         fontFamily: WEIGHT.regular,
-                                        color: colors.icon,
+                                        color: colors.pri,
                                         marginRight: 5
                                     }}>
                                     {this.state.settings.sortOrder === "asc" ? "Ascending" : "Descending"}
                                 </Text>
-                                <Icon color={colors.icon}
+                                <Icon color={colors.pri}
                                       name={this.state.settings.sortOrder === "asc" ? "sort-ascending" : "sort-descending"}
                                       size={SIZE.md}/>
                             </TouchableOpacity>
