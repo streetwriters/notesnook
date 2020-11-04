@@ -94,7 +94,7 @@ export default class NoteItem extends React.Component {
               numberOfLines={2}
               style={{
                 fontSize: SIZE.xs + 1,
-                color: colors.pri + 'B3',
+                color: colors.pri,
                 fontFamily: WEIGHT.regular,
                 width: '100%',
                 maxWidth: '100%',
