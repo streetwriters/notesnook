@@ -192,12 +192,10 @@ export default class Notes extends Collection {
       let item = this.note(id);
       if (!item) continue;
       if (item.notebook && item.notebook.id && item.notebook.topic) {
-        await this._collection.transaction(() =>
-          this._db.notebooks
-            .notebook(item.notebook.id)
-            .topics.topic(item.notebook.topic)
-            .delete(id)
-        );
+        await this._db.notebooks
+          .notebook(item.notebook.id)
+          .topics.topic(item.notebook.topic)
+          .delete(id);
       }
       for (let tag of item.tags) {
         await this._db.tags.remove(tag, id);

@@ -23,6 +23,7 @@
   "dependencies": {
     "fast-sort": "^2.0.1",
     "fuzzysearch": "^1.0.3",
+    "hypersearch": "https://github.com/streetwriters/hypersearch",
     "jshashes": "^1.0.8",
     "no-internet": "^1.5.2",
     "qclone": "^1.0.4",

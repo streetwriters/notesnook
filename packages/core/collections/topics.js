@@ -98,7 +98,7 @@ export default class Topics {
       if (!topic) continue;
       let index = topicIds.findIndex((id) => topic.id === id);
       let t = this.topic(topic);
-      await t.transaction(() => t.delete(...topic.notes), false);
+      await t.delete(...topic.notes);
       if (index > -1) {
         allTopics.splice(i, 1);
       }

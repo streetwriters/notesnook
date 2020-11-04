@@ -9,20 +9,10 @@ export default class Topic {
     this._topic = topic;
     this._db = db;
     this._notebookId = notebookId;
-    this._transactionOpen = false;
   }
 
   get totalNotes() {
     return this._topic.totalNotes;
-  }
-
-  transaction(ops, saveAfter = true) {
-    this._transactionOpen = true;
-    ops().then(() => {
-      this._transactionOpen = false;
-    });
-    if (!saveAfter) return this;
-    return this._save();
   }
 
   has(noteId) {
@@ -71,7 +61,6 @@ export default class Topic {
   }
 
   async _save(topic) {
-    if (this._transactionOpen) return this;
     await this._db.notebooks.notebook(this._notebookId).topics.add(topic);
     return this;
   }

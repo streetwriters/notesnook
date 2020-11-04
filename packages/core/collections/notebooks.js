@@ -78,9 +78,7 @@ export default class Notebooks extends Collection {
     for (let id of ids) {
       let notebook = this.notebook(id);
       if (!notebook) continue;
-      await this._collection.transaction(() =>
-        notebook.topics.delete(...notebook.data.topics)
-      );
+      await notebook.topics.delete(...notebook.data.topics);
       await this._collection.removeItem(id);
       await this._db.trash.add(notebook.data);
     }
