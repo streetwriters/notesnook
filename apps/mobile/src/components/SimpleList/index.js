@@ -13,7 +13,12 @@ import {DataProvider, LayoutProvider, RecyclerListView} from 'recyclerlistview';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {eSendEvent, ToastEvent} from '../../services/EventManager';
-import {eClearSearch, eOpenJumpToDialog, eOpenLoginDialog, eScrollEvent} from '../../utils/Events';
+import {
+  eClearSearch,
+  eOpenJumpToDialog,
+  eOpenLoginDialog,
+  eScrollEvent,
+} from '../../utils/Events';
 import {PressableButton} from '../PressableButton';
 import {COLORS_NOTE} from '../../utils/Colors';
 import {SIZE, WEIGHT} from '../../utils/SizeUtils';
@@ -35,7 +40,7 @@ const SimpleList = ({
   refreshCallback,
   sortMenuButton,
   scrollRef,
-  jumpToDialog
+  jumpToDialog,
 }) => {
   const [state, dispatch] = useTracked();
   const {colors, selectionMode, messageBoardState} = state;
@@ -59,7 +64,7 @@ const SimpleList = ({
 
   useEffect(() => {
     loadData();
-  }, [listData]);
+  }, [listData, searchResults.results]);
 
   const loadData = () => {
     let mainData =
@@ -85,18 +90,18 @@ const SimpleList = ({
       }}>
       <Text
         onPress={() => {
-            console.log('clicekd');
-            if (jumpToDialog) {
-                eSendEvent(eOpenJumpToDialog);
-            }
+          console.log('clicekd');
+          if (jumpToDialog) {
+            eSendEvent(eOpenJumpToDialog);
+          }
         }}
         style={[
           styles.sectionHeader,
           {
             color: colors.accent,
-            height:30,
-            minWidth:60,
-            textAlignVertical:"bottom"
+            height: 30,
+            minWidth: 60,
+            textAlignVertical: 'bottom',
           },
         ]}>
         {item.title}
@@ -367,14 +372,7 @@ const MessageCard = ({data}) => {
 };
 
 const ListHeaderComponent = ({type, data}) => {
-  const [state] = useTracked();
-  const searchResults = {...state.searchResults};
-
-  return searchResults.type === type && searchResults.results.length > 0 ? (
-    <SearchHeader />
-  ) : (
-    <MessageCard type={type} data={data} />
-  );
+  return <MessageCard type={type} data={data} />;
 };
 
 const styles = StyleSheet.create({
