@@ -1,22 +1,15 @@
 import React from 'react';
 import {Text} from 'react-native';
 import {useTracked} from '../../provider';
-import {SIZE, WEIGHT} from "../../utils/SizeUtils";
+import Heading from '../Typography/Heading';
 
 export const HeaderTitle = () => {
-  const [state,] = useTracked();
+  const [state] = useTracked();
   const {colors, headerTextState} = state;
-
-  const style = {
-    fontSize: SIZE.xl,
-    color: headerTextState.color || colors.heading,
-    fontFamily: WEIGHT.bold,
-    alignSelf: 'center',
-  };
 
   return (
     <>
-      <Text style={style}>
+      <Heading color={headerTextState.color}>
         <Text
           style={{
             color: colors.accent,
@@ -27,7 +20,7 @@ export const HeaderTitle = () => {
         {headerTextState.heading.slice(0, 1) === '#'
           ? headerTextState.heading.slice(1)
           : headerTextState.heading}
-      </Text>
+      </Heading>
     </>
   );
 };
