@@ -51,7 +51,7 @@ const animation = (margin, opacity, border) => {
   }).start();
   setTimeout(() => {
     animating = false;
-  }, 500);
+  }, 200);
 };
 
 export const Search = (props) => {
