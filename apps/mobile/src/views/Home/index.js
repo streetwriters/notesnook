@@ -7,7 +7,7 @@ import { useTracked } from '../../provider';
 import { Actions } from '../../provider/Actions';
 import { DDS } from '../../services/DeviceDetection';
 import { eSendEvent } from '../../services/EventManager';
-import { sortSettings } from '../../utils';
+import { scrollRef, sortSettings } from '../../utils';
 import { openEditorAnimation } from '../../utils/Animations';
 import {
   eOnLoadNote,
@@ -15,8 +15,6 @@ import {
   eScrollEvent,
   eUpdateSearchState
 } from '../../utils/Events';
-
-const scrollRef = createRef();
 
 export const Home = ({navigation}) => {
   const [state, dispatch] = useTracked();

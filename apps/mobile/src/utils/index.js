@@ -5,6 +5,7 @@ import {Actions} from '../provider/Actions';
 import {MMKV} from "./MMKV";
 import RNFetchBlob from 'rn-fetch-blob';
 import {defaultState} from "../provider/DefaultState";
+import { createRef } from 'react';
 
 export async function setSetting(settings, name, value) {
   let s = {...settings};
@@ -12,6 +13,9 @@ export async function setSetting(settings, name, value) {
   await MMKV.setStringAsync('settings', JSON.stringify(s));
   updateEvent({type: Actions.SETTINGS, settings: s});
 }
+
+
+export const scrollRef = createRef();
 
 export const dirs = RNFetchBlob.fs.dirs;
 export const ANDROID_PATH  = dirs.SDCardDir + '/Notesnook/';
