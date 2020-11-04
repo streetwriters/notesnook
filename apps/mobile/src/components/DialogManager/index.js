@@ -44,7 +44,8 @@ import {TEMPLATE_DELETE, TEMPLATE_PERMANANT_DELETE} from './Templates';
 import {hexToRGBA} from "../../utils/ColorUtils";
 import {DDS} from "../../services/DeviceDetection";
 import ResultDialog from '../ResultDialog';
-import Index from "../SortDialog";
+import SortDialog from "../SortDialog";
+import JumpToDialog from '../JumpToDialog';
 
 export class DialogManager extends Component {
   constructor(props) {
@@ -369,7 +370,8 @@ export class DialogManager extends Component {
         <ResultDialog/>
         <VaultDialog colors={colors} />
         <MoveNoteDialog colors={colors} />
-        <Index colors={colors} />
+        <SortDialog colors={colors} />
+        <JumpToDialog/>
 
       </>
     );

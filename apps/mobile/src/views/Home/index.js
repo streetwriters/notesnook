@@ -1,19 +1,22 @@
-import React, {useCallback, useEffect} from 'react';
-import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
-import {Placeholder} from '../../components/ListPlaceholders';
+import React, { createRef, useCallback, useEffect } from 'react';
+import { ContainerBottomButton } from '../../components/Container/ContainerBottomButton';
+import { Placeholder } from '../../components/ListPlaceholders';
 import SimpleList from '../../components/SimpleList';
-import {NoteItemWrapper} from '../../components/SimpleList/NoteItemWrapper';
-import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
-import {eSendEvent} from '../../services/EventManager';
+import { NoteItemWrapper } from '../../components/SimpleList/NoteItemWrapper';
+import { useTracked } from '../../provider';
+import { Actions } from '../../provider/Actions';
+import { DDS } from '../../services/DeviceDetection';
+import { eSendEvent } from '../../services/EventManager';
+import { sortSettings } from '../../utils';
+import { openEditorAnimation } from '../../utils/Animations';
 import {
   eOnLoadNote,
+
   eScrollEvent,
-  eUpdateSearchState,
+  eUpdateSearchState
 } from '../../utils/Events';
-import {openEditorAnimation} from '../../utils/Animations';
-import {DDS} from '../../services/DeviceDetection';
-import {sortSettings} from "../../utils";
+
+const scrollRef = createRef();
 
 export const Home = ({navigation}) => {
   const [state, dispatch] = useTracked();
@@ -87,6 +90,7 @@ export const Home = ({navigation}) => {
     <>
       <SimpleList
         data={notes}
+        scrollRef={scrollRef}
         type="notes"
         isHome={true}
         pinned={true}
@@ -95,6 +99,7 @@ export const Home = ({navigation}) => {
         RenderItem={NoteItemWrapper}
         placeholder={<Placeholder type="notes" />}
         placeholderText={`Notes you write appear here`}
+        jumpToDialog={true}
       />
 
       <ContainerBottomButton
@@ -106,3 +111,5 @@ export const Home = ({navigation}) => {
 };
 
 export default Home;
+
+

@@ -18,7 +18,7 @@ import Seperator from "../Seperator";
 
 const actionSheet = createRef();
 
-class Index extends React.Component {
+class SortDialog extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -172,4 +172,4 @@ class Index extends React.Component {
     }
 }
 
-export default Index;
+export default SortDialog;
