@@ -1,19 +1,18 @@
-import React, { createRef, useCallback, useEffect } from 'react';
-import { ContainerBottomButton } from '../../components/Container/ContainerBottomButton';
-import { Placeholder } from '../../components/ListPlaceholders';
+import React, {useCallback, useEffect} from 'react';
+import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
+import {Placeholder} from '../../components/ListPlaceholders';
 import SimpleList from '../../components/SimpleList';
-import { NoteItemWrapper } from '../../components/SimpleList/NoteItemWrapper';
-import { useTracked } from '../../provider';
-import { Actions } from '../../provider/Actions';
-import { DDS } from '../../services/DeviceDetection';
-import { eSendEvent } from '../../services/EventManager';
-import { scrollRef, sortSettings } from '../../utils';
-import { openEditorAnimation } from '../../utils/Animations';
+import {NoteItemWrapper} from '../../components/SimpleList/NoteItemWrapper';
+import {useTracked} from '../../provider';
+import {Actions} from '../../provider/Actions';
+import {DDS} from '../../services/DeviceDetection';
+import {eSendEvent} from '../../services/EventManager';
+import {scrollRef} from '../../utils';
+import {openEditorAnimation} from '../../utils/Animations';
 import {
   eOnLoadNote,
-
   eScrollEvent,
-  eUpdateSearchState
+  eUpdateSearchState,
 } from '../../utils/Events';
 
 export const Home = ({navigation}) => {
@@ -35,15 +34,9 @@ export const Home = ({navigation}) => {
       type: Actions.HEADER_STATE,
       state: true,
     });
-    eSendEvent(eUpdateSearchState, {
-      placeholder: 'Search all notes',
-      data: notes,
-      noSearch: false,
-      type: 'notes',
-      color: null,
-    });
+    updateSearch();
+
     eSendEvent(eScrollEvent, 0);
-    console.log(sortSettings);
     dispatch({type: Actions.COLORS});
     dispatch({type: Actions.NOTES});
   }, [notes]);
@@ -61,11 +54,14 @@ export const Home = ({navigation}) => {
 
   useEffect(() => {
     if (navigation.isFocused()) {
-      dispatch({
-        type: Actions.HEADER_VERTICAL_MENU,
-        state: notes.length > 0,
-      });
+      updateSearch();
+    }
+  }, [notes]);
 
+  const updateSearch = () => {
+    if (notes.length === 0) {
+      eSendEvent('showSearch', true);
+    } else {
       eSendEvent(eUpdateSearchState, {
         placeholder: 'Search all notes',
         data: notes,
@@ -74,7 +70,7 @@ export const Home = ({navigation}) => {
         color: null,
       });
     }
-  }, [notes]);
+  };
 
   const _onPressBottomButton = async (event) => {
     eSendEvent(eOnLoadNote, {type: 'new'});
@@ -109,5 +105,3 @@ export const Home = ({navigation}) => {
 };
 
 export default Home;
-
-

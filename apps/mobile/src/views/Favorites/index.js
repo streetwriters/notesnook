@@ -23,13 +23,7 @@ export const Favorites = ({route, navigation}) => {
         heading: "Favorites",
       },
     });
-    eSendEvent(eUpdateSearchState,{
-      placeholder: 'Search all favorites',
-      data: favorites,
-      noSearch: false,
-      type: 'notes',
-      color: null,
-    })
+    updateSearch();
 
     dispatch({
       type: Actions.CURRENT_SCREEN,
@@ -45,9 +39,19 @@ export const Favorites = ({route, navigation}) => {
     };
   });
 
+
+
   useEffect(() => {
     if (navigation.isFocused()) {
+      updateSearch();
+    }
+  }, [favorites]);
 
+  const updateSearch = () => {
+    if (favorites.length === 0) {
+      eSendEvent('showSearch', true);
+    } else {
+      
       eSendEvent(eUpdateSearchState,{
         placeholder: 'Search all favorites',
         data: favorites,
@@ -56,7 +60,7 @@ export const Favorites = ({route, navigation}) => {
         color: null,
       })
     }
-  }, [favorites]);
+  };
 
   return (
     <SimpleList

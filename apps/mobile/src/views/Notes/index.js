@@ -83,6 +83,7 @@ export const Notes = ({route, navigation}) => {
       type: Actions.HEADER_STATE,
       state: params.menu,
     });
+    updateSearch();
     dispatch({
       type: Actions.HEADER_TEXT_STATE,
       state: {
@@ -95,7 +96,6 @@ export const Notes = ({route, navigation}) => {
   };
 
   const onFocus = useCallback(() => {
-  
     init();
   }, []);
 
@@ -117,17 +117,27 @@ export const Notes = ({route, navigation}) => {
 
   useEffect(() => {
     if (navigation.isFocused()) {
-      eSendEvent(eUpdateSearchState,{
-          placeholder: `Search in ${
-              params.type === 'tag' ? '#' + params.title : params.title
-          }`,
-          data: notes,
-          noSearch: false,
-          type: 'notes',
-          color: params.type === 'color' ? params.title : null,
-        })
+      updateSearch();
     }
   }, [notes]);
+
+  const updateSearch = () => {
+    if (notes.length === 0) {
+      eSendEvent('showSearch', true);
+    } else {
+      eSendEvent(eUpdateSearchState,{
+        placeholder: `Search in ${
+            params.type === 'tag' ? '#' + params.title : params.title
+        }`,
+        data: notes,
+        noSearch: false,
+        type: 'notes',
+        color: params.type === 'color' ? params.title : null,
+      })
+    }
+  };
+
+
 
   const _onPressBottomButton = useCallback(() => {
     if (params.type === 'tag') {

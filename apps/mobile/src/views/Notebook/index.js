@@ -48,13 +48,7 @@ export const Notebook = ({route, navigation}) => {
       },
     });
 
-    eSendEvent(eUpdateSearchState,{
-      placeholder: `Search in "${params.title}"`,
-      data: topics,
-      noSearch: false,
-      type: 'topics',
-      color: null,
-    })
+    updateSearch();
 
     dispatch({
       type: Actions.CURRENT_SCREEN,
@@ -69,8 +63,17 @@ export const Notebook = ({route, navigation}) => {
     };
   });
 
+
   useEffect(() => {
     if (navigation.isFocused()) {
+      updateSearch();
+    }
+  }, [topics]);
+
+  const updateSearch = () => {
+    if (topics.length === 0) {
+      eSendEvent('showSearch', true);
+    } else {
       eSendEvent(eUpdateSearchState,{
         placeholder: `Search in "${params.title}"`,
         data: topics,
@@ -79,7 +82,9 @@ export const Notebook = ({route, navigation}) => {
         color: null,
       })
     }
-  }, [topics]);
+  };
+
+
 
   const _onPressBottomButton = () => {
     let n = route.params.notebook;

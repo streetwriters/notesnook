@@ -104,16 +104,23 @@ export const Search = (props) => {
     selection.data = searchState.data;
     selection.type = searchState.type;
     eSubscribeEvent(eScrollEvent, onScroll);
-    eSubscribeEvent('showSearch', () => {
-      console.log('show search');
-      animating = false;
+    eSubscribeEvent('showSearch', (hide) => {
+   
+      if (hide) {
+        animation(-65, 0, 0);
+        return;
+      }
       animation(0, 1, 1.5);
     });
+
     eSubscribeEvent(eUpdateSearchState, updateSearchState);
     return () => {
       eUnSubscribeEvent(eScrollEvent, onScroll);
-      eUnSubscribeEvent('showSearch', () => {
-        animating = false;
+      eUnSubscribeEvent('showSearch', (hide) => {
+        if (hide) {
+          animation(-65, 0, 0);
+          return;
+        }
         animation(0, 1, 1.5);
       });
       eUnSubscribeEvent(eUpdateSearchState, updateSearchState);
@@ -188,7 +195,7 @@ export const Search = (props) => {
     //setSearch(false);
   };
 
-  return searchState.data[0] && !searchState.noSearch ? (
+  return (
     <Animated.View
       style={{
         opacity: _opacity,
@@ -208,10 +215,10 @@ export const Search = (props) => {
           borderRadius: br,
           height: '90%',
           backgroundColor: focus
-          ? searchState.color
             ? searchState.color
-            : colors.shade
-          : colors.nav,
+              ? searchState.color
+              : colors.shade
+            : colors.nav,
         }}>
         <TextInput
           ref={inputRef}
@@ -251,7 +258,5 @@ export const Search = (props) => {
         />
       </Animated.View>
     </Animated.View>
-  ) : (
-    <></>
   );
 };

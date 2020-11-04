@@ -26,13 +26,7 @@ export const Tags = ({route, navigation}) => {
       },
     });
 
-    eSendEvent(eUpdateSearchState, {
-      placeholder: 'Search all tags',
-      data: tags,
-      noSearch: false,
-      type: 'tags',
-      color: null,
-    });
+    updateSearch();
     dispatch({type: Actions.TAGS});
     dispatch({
       type: Actions.CURRENT_SCREEN,
@@ -47,8 +41,18 @@ export const Tags = ({route, navigation}) => {
     };
   });
 
+
+
   useEffect(() => {
     if (navigation.isFocused()) {
+      updateSearch();
+    }
+  }, [tags]);
+
+  const updateSearch = () => {
+    if (tags.length === 0) {
+      eSendEvent('showSearch', true);
+    } else {
       eSendEvent(eUpdateSearchState, {
         placeholder: 'Search all tags',
         data: tags,
@@ -57,7 +61,7 @@ export const Tags = ({route, navigation}) => {
         color: null,
       });
     }
-  }, [tags]);
+  };
 
   return (
     <SimpleList

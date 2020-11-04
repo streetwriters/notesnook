@@ -63,6 +63,7 @@ export const Settings = ({navigation}) => {
   }
 
   const onFocus = useCallback(() => {
+    eSendEvent('showSearch', true);
     dispatch({
       type: Actions.HEADER_STATE,
       state: true,
@@ -84,7 +85,10 @@ export const Settings = ({navigation}) => {
       type: '',
       color: null,
     });
+
   }, []);
+
+
 
   useEffect(() => {
     navigation.addListener('focus', onFocus);
