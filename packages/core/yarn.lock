@@ -2704,8 +2704,8 @@ http-signature@~1.2.0:
     sshpk "^1.7.0"
 
 "hypersearch@https://github.com/streetwriters/hypersearch":
-  version "0.0.1"
-  resolved "https://github.com/streetwriters/hypersearch#bbeac8ad63c3f70e94dfd05b0f00f44ecc989a19"
+  version "0.0.4"
+  resolved "https://github.com/streetwriters/hypersearch#9cad0f7c2d93f19bf06d7fa6602357b89cdba38d"
 
 iconv-lite@0.4.24:
   version "0.4.24"

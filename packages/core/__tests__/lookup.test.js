@@ -17,31 +17,31 @@ beforeEach(async () => {
 //TODO
 test("search notes", () =>
   noteTest({
-    content: { delta: [{ insert: "5" }], text: "5" },
+    content: { type: "delta", data: [{ insert: "5" }], text: "5" },
   }).then(async ({ db }) => {
     await db.notes.add(TEST_NOTE);
-    let filtered = await db.lookup.notes(db.notes.all, "5");
+    let filtered = db.lookup.notes(db.notes.all, "5");
     expect(filtered.length).toBe(1);
   }));
 
 test("search notes with a locked note", () =>
   noteTest({
-    content: { delta: [{ insert: "5" }], text: "5" },
+    content: { type: "delta", data: [{ insert: "5" }], text: "5" },
   }).then(async ({ db }) => {
     const noteId = await db.notes.add(TEST_NOTE);
     await db.vault.create("password");
     await db.vault.add(noteId);
-    let filtered = await db.lookup.notes(db.notes.all, "I am a");
+    let filtered = db.lookup.notes(db.notes.all, "Thi");
     expect(filtered.length).toBe(1);
   }));
 
 test("search notes with an empty note", () =>
   noteTest({
-    content: { delta: [{ insert: "5" }], text: "5" },
+    content: { type: "delta", data: [{ insert: "5" }], text: "5" },
   }).then(async ({ db }) => {
     await db.notes.add({
       title: "hello world",
-      content: { delta: [], text: "" },
+      content: { type: "delta", data: [{ insert: "\n" }] },
     });
     let filtered = await db.lookup.notes(db.notes.all, "hello world");
     expect(filtered.length).toBe(1);
