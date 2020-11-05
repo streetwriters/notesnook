@@ -125,6 +125,7 @@ export const Notes = ({route, navigation}) => {
     if (notes.length === 0) {
       eSendEvent('showSearch', true);
     } else {
+      eSendEvent('showSearch');
       eSendEvent(eUpdateSearchState,{
         placeholder: `Search in ${
             params.type === 'tag' ? '#' + params.title : params.title

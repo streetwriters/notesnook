@@ -53,6 +53,7 @@ export const Tags = ({route, navigation}) => {
     if (tags.length === 0) {
       eSendEvent('showSearch', true);
     } else {
+      eSendEvent('showSearch');
       eSendEvent(eUpdateSearchState, {
         placeholder: 'Search all tags',
         data: tags,

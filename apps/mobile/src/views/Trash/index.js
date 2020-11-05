@@ -54,6 +54,7 @@ export const Trash = ({route, navigation}) => {
     if (trash.length === 0) {
       eSendEvent('showSearch', true);
     } else {
+      eSendEvent('showSearch');
       eSendEvent(eUpdateSearchState, {
         placeholder: 'Search all trash',
         data: trash,

@@ -62,6 +62,7 @@ export const Home = ({navigation}) => {
     if (notes.length === 0) {
       eSendEvent('showSearch', true);
     } else {
+      eSendEvent('showSearch');
       eSendEvent(eUpdateSearchState, {
         placeholder: 'Search all notes',
         data: notes,

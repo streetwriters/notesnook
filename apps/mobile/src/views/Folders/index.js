@@ -30,13 +30,14 @@ export const Folders = ({route, navigation}) => {
       screen: 'notebooks',
     });
     updateSearch();
-    
+
   }, [notebooks]);
 
   const updateSearch = () => {
     if (notebooks.length === 0) {
       eSendEvent('showSearch', true);
     } else {
+      eSendEvent('showSearch');
       eSendEvent(eUpdateSearchState, {
         placeholder: 'Search all notebooks',
         data: notebooks,

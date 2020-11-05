@@ -74,6 +74,7 @@ export const Notebook = ({route, navigation}) => {
     if (topics.length === 0) {
       eSendEvent('showSearch', true);
     } else {
+      eSendEvent('showSearch');
       eSendEvent(eUpdateSearchState,{
         placeholder: `Search in "${params.title}"`,
         data: topics,

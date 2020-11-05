@@ -51,7 +51,7 @@ export const Favorites = ({route, navigation}) => {
     if (favorites.length === 0) {
       eSendEvent('showSearch', true);
     } else {
-      
+      eSendEvent('showSearch');
       eSendEvent(eUpdateSearchState,{
         placeholder: 'Search all favorites',
         data: favorites,
