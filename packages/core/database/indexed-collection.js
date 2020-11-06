@@ -1,77 +1,78 @@
-import Indexer from "./indexer";
+import Storage from "./storage";
 import HyperSearch from "hypersearch";
 import { getSchema } from "./schemas";
+import PersistentCachedMap from "./persistentcachedmap";
+import PersistentMap from "./persistentmap";
+import sort from "fast-sort";
 
 export default class IndexedCollection {
-  constructor(context, type) {
-    this.indexer = new Indexer(context, type);
+  /**
+   *
+   * @param {Storage} storage
+   * @param {string} type
+   */
+  constructor(storage, type) {
     this.type = type;
-    this.search = new HyperSearch({
-      schema: getSchema(type),
-      tokenizer: "forward",
-    });
+    this.storage = storage;
   }
 
   clear() {
-    return this.indexer.clear();
+    return this.search.clear();
   }
 
   async init() {
-    await this.indexer.init();
-    const index = await this.indexer.read(`${this.type}-index`);
-    if (index) this.search.import(index);
+    const index = new PersistentCachedMap(`${this.type}Index`, this.storage);
+    const store = new PersistentMap(`${this.type}Store`, this.storage);
+    await index.init();
+    await store.init();
+    this.search = new HyperSearch({
+      schema: getSchema(this.type),
+      tokenizer: "forward",
+      index,
+      store,
+    });
   }
 
   async addItem(item) {
-    const exists = await this.exists(item.id);
+    const exists = this.exists(item.id);
     if (!exists) item.dateCreated = item.dateCreated || Date.now();
-    await this.updateItem(item);
-    if (!exists) {
-      await this.indexer.index(item.id);
-    }
+    await this._upsertItem(item);
   }
 
-  async updateItem(item, index = true) {
+  /**
+   * @protected
+   */
+  async _upsertItem(item) {
     if (!item.id) throw new Error("The item must contain the id field.");
     // if item is newly synced, remote will be true.
     item.dateEdited = item.remote ? item.dateEdited : Date.now();
     // the item has become local now, so remove the flag.
     delete item.remote;
-    await this.indexer.write(item.id, item);
-
-    if (index && (this.type === "notes" || this.type === "notebooks")) {
-      this.search.addDoc(item);
-      this.indexer.write(`${this.type}-index`, this.search.export());
-    }
+    const exists = this.exists(item.id);
+    if (!exists) await this.search.addDoc(item);
+    else await this.search.updateDoc(item.id, item);
   }
 
   async removeItem(id) {
-    await this.updateItem(
-      {
-        id,
-        deleted: true,
-        dateCreated: Date.now(),
-        dateEdited: Date.now(),
-      },
-      false
-    );
-    if (this.type === "notes" || this.type === "notebooks")
-      this.search.remove(id);
+    await this.search.remove(id);
+    await this._upsertItem({
+      id,
+      deleted: true,
+      dateCreated: Date.now(),
+      dateEdited: Date.now(),
+    });
   }
 
-  exists(id) {
-    return this.indexer.exists(id);
+  async exists(id) {
+    const item = await this.getItem(id);
+    return item && !item.deleted;
   }
 
   getItem(id) {
-    return this.indexer.read(id);
+    return this.search.getById(id);
   }
 
-  async getItems(indices) {
-    const data = await this.indexer.readMulti(indices);
-    return data.reduce((total, current) => {
-      total.push(current[1]);
-      return total;
-    }, []);
+  async getItems() {
+    return await this.search.getAllDocs();
   }
 }

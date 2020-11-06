@@ -11,7 +11,7 @@ export default class Indexer extends Storage {
     this.indices = (await this.read(this.type, true)) || [];
   }
 
-  async exists(key) {
+  exists(key) {
     return this.indices.includes(key);
   }
 
@@ -30,7 +30,10 @@ export default class Indexer extends Storage {
   }
 
   async clear() {
+    for (var i = 0; i < this.indices.length; ++i) {
+      let key = this.indices[i];
+      await this.remove(key);
+    }
     this.indices = [];
-    await super.clear();
   }
 }

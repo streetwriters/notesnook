@@ -2,7 +2,7 @@ import {
   StorageInterface,
   notebookTest,
   TEST_NOTEBOOK,
-  TEST_NOTE
+  TEST_NOTE,
 } from "./utils";
 
 beforeEach(async () => {
@@ -26,7 +26,7 @@ test("search all notebooks", () =>
   notebookTest({
     ...TEST_NOTEBOOK,
     title: "I will be searched.",
-    description: "searched description"
+    description: "searched description",
   }).then(({ db }) => {
     let filtered = db.notebooks.filter("searhed");
     expect(filtered.length).toBeGreaterThan(0);
@@ -54,16 +54,10 @@ test("unpin a notebook", () =>
 test("delete a notebook", () =>
   notebookTest().then(async ({ db, id }) => {
     let noteId = await db.notes.add(TEST_NOTE);
-    await db.notebooks
-      .notebook(id)
-      .topics.topic("General")
-      .add(noteId);
-    expect(
-      db.notebooks
-        .notebook(id)
-        .topics.topic("General")
-        .has(noteId)
-    ).toBe(true);
+    await db.notebooks.notebook(id).topics.topic("General").add(noteId);
+    expect(db.notebooks.notebook(id).topics.topic("General").has(noteId)).toBe(
+      true
+    );
     let note = db.notes.note(noteId);
     expect(note.notebook.id).toBe(id);
     await db.notebooks.delete(id);

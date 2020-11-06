@@ -44,11 +44,7 @@ export default class Content extends Collection {
     return this._collection.removeItem(id);
   }
 
-  multi(ids) {
-    return this._collection.getItems(ids);
-  }
-
   all() {
-    return this._collection.getItems(this._collection.indexer.indices);
+    return this._collection.getItems();
   }
 }
