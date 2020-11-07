@@ -6354,6 +6354,10 @@ https-proxy-agent@^5.0.0:
     agent-base "6"
     debug "4"
 
+"hypersearch@https://github.com/streetwriters/hypersearch":
+  version "0.1.0"
+  resolved "https://github.com/streetwriters/hypersearch#fa5d2b8435c1b7bca4b5f8059054da848fe1631f"
+
 iconv-lite@0.4.24, iconv-lite@^0.4.24:
   version "0.4.24"
   resolved "https://registry.yarnpkg.com/iconv-lite/-/iconv-lite-0.4.24.tgz#2022b4b25fbddc21d2f524974a474aafe733908b"
@@ -8860,11 +8864,12 @@ normalize-url@^3.0.0, normalize-url@^3.0.1:
   integrity sha512-U+JJi7duF1o+u2pynbp2zXDW2/PADgC30f0GsHZtRh+HOcXHnw137TrNlyxxRvWW5fjKd3bcLHPxofWuCjaeZg==
 
 "notes-core@git+ssh://git@github.com:streetwriters/notesnook-core.git":
-  version "1.5.0"
-  resolved "git+ssh://git@github.com:streetwriters/notesnook-core.git#abeb8f7a5a4ae52cb6409d930e13238b96941e6f"
+  version "2.1.0"
+  resolved "git+ssh://git@github.com:streetwriters/notesnook-core.git#b7d94074f19261cd0efc6c60c1720e82981b49a2"
   dependencies:
     fast-sort "^2.0.1"
     fuzzysearch "^1.0.3"
+    hypersearch "https://github.com/streetwriters/hypersearch"
     jshashes "^1.0.8"
     no-internet "^1.5.2"
     qclone "^1.0.4"

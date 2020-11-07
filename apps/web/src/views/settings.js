@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { Button, Flex, Text } from "rebass";
 import * as Icon from "../components/icons";
 import { useStore as useUserStore } from "../stores/user-store";
@@ -12,6 +12,9 @@ import useSystemTheme from "../utils/use-system-theme";
 import download from "../utils/download";
 import { db, SUBSCRIPTION_STATUS } from "../common";
 import { usePersistentState } from "../utils/hooks";
+import dayjs from "dayjs";
+import { showRecoveryKeyDialog } from "../components/dialogs/recoverykeydialog";
+import { showBuyDialog } from "../components/dialogs/buy-dialog";
 
 function importBackup() {
   return new Promise((resolve, reject) => {
@@ -45,6 +48,7 @@ function importBackup() {
 }
 
 function Settings(props) {
+  const isSystemThemeDark = useSystemTheme();
   const theme = useThemeStore((store) => store.theme);
   const toggleNightMode = useThemeStore((store) => store.toggleNightMode);
   const setTheme = useThemeStore((store) => store.setTheme);
@@ -58,16 +62,21 @@ function Settings(props) {
   );
   const user = useUserStore((store) => store.user);
   const isLoggedIn = useUserStore((store) => store.isLoggedIn);
-  const isTrial = useUserStore(
-    (store) => store?.user?.subscription?.status === SUBSCRIPTION_STATUS.TRIAL
-  );
   const logout = useUserStore((store) => store.logout);
   const [backupReminderOffset, setBackupReminderOffset] = usePersistentState(
     "backupReminderOffset",
     0
   );
 
-  const isSystemThemeDark = useSystemTheme();
+  const subscriptionDaysRemaining = useMemo(
+    () => dayjs(user?.subscription?.expiry).diff(dayjs(), "day") + 1,
+    [user]
+  );
+  const isTrial = useMemo(
+    () => user?.subscription?.status === SUBSCRIPTION_STATUS.TRIAL,
+    [user]
+  );
+
   useEffect(() => {
     if (!followSystemTheme) return;
     setTheme(isSystemThemeDark ? "dark" : "light");
@@ -75,82 +84,106 @@ function Settings(props) {
 
   return (
     <Flex variant="columnFill" px={2} sx={{ overflowY: "auto" }}>
-      {isLoggedIn && (
-        <Text mb={2} variant="subtitle" color="primary">
-          Account Settings
-        </Text>
-      )}
-      <Flex
-        bg="shade"
-        p={2}
-        sx={{ borderRadius: "default", cursor: "pointer" }}
-        onClick={async () => {
-          if (!isLoggedIn) {
-            await showLogInDialog();
-          } else {
-            upgrade(user);
-          }
-          // TODO open buy premium dialog
-        }}
-      >
+      {isLoggedIn ? (
         <Flex
-          flex="1 1 auto"
-          justifyContent="space-between"
-          alignItems="center"
+          bg="shade"
+          flexDirection="column"
+          p={2}
+          sx={{ borderRadius: "default" }}
         >
-          <Flex>
-            <Flex
-              variant="columnCenter"
-              bg="primary"
-              mr={2}
-              size={35}
-              sx={{
-                borderRadius: 80,
-              }}
-            >
-              <Icon.User size={20} color="static" />
+          <Flex flex="1" justifyContent="space-between">
+            <Flex>
+              <Icon.User size={15} color="primary" />
+              <Text variant="body" color="text" ml={1}>
+                {user.username}
+              </Text>
             </Flex>
-            <Flex variant="columnCenter" alignItems="flex-start">
-              {isLoggedIn ? (
-                <>
-                  <Text variant="subtitle">{user.username}</Text>
-                  <Text variant="subBody">{user.email}</Text>
-                </>
-              ) : (
-                <>
-                  <Text variant="subBody">You are not logged in</Text>
-                  <Text variant="body" color="primary" fontSize={14}>
-                    Login to sync your notes
-                  </Text>
-                </>
-              )}
-            </Flex>
-          </Flex>
-          {isLoggedIn ? (
             <Text
-              bg="primary"
+              variant="subBody"
+              px={"2px"}
+              py={"1px"}
               sx={{ borderRadius: "default" }}
-              color="static"
-              fontSize="body"
-              px={1}
-              py={1 / 2}
+              bg="static"
+              color="primary"
             >
-              {!isTrial ? "Pro" : "Trial"}
+              {isTrial ? "Trial" : "Pro"}
             </Text>
-          ) : (
-            <Icon.ChevronRight size={20} color="primary" />
+          </Flex>
+          <Text
+            color={subscriptionDaysRemaining <= 5 ? "error" : "primary"}
+            variant="body"
+            fontSize={26}
+            mt={2}
+          >
+            {subscriptionDaysRemaining} Days Remaining
+          </Text>
+          <Text variant="subBody">
+            Your trial period started on{" "}
+            {dayjs(user.subscription.start).format("MMMM D, YYYY")}
+          </Text>
+          {isTrial && (
+            <Button mt={2} onClick={showBuyDialog}>
+              Upgrade to Notesnook Pro
+            </Button>
           )}
         </Flex>
-      </Flex>
-      {isLoggedIn && (
-        <Button
-          variant="list"
+      ) : (
+        <Flex
+          bg="shade"
+          p={2}
+          sx={{ borderRadius: "default", cursor: "pointer" }}
           onClick={async () => {
-            await logout();
+            await showLogInDialog();
           }}
         >
-          Logout
-        </Button>
+          <Flex
+            flex="1 1 auto"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Flex>
+              <Flex
+                variant="columnCenter"
+                bg="primary"
+                mr={2}
+                size={35}
+                sx={{
+                  borderRadius: 80,
+                }}
+              >
+                <Icon.User size={20} color="static" />
+              </Flex>
+              <Flex variant="columnCenter" alignItems="flex-start">
+                <Text variant="subBody">You are not logged in</Text>
+                <Text variant="body" color="primary" fontSize={14}>
+                  Login to sync your notes
+                </Text>
+              </Flex>
+            </Flex>
+            <Icon.ChevronRight size={20} color="primary" />
+          </Flex>
+        </Flex>
+      )}
+      {isLoggedIn && (
+        <>
+          <Button variant="list" onClick={showRecoveryKeyDialog}>
+            <TextWithTip
+              text="Backup data recovery key"
+              tip="In case you lose your password, you can recover your data using your recovery key."
+            />
+          </Button>
+          <Button
+            variant="list"
+            onClick={async () => {
+              await logout();
+            }}
+          >
+            <TextWithTip
+              text="Logout"
+              tip="Log out of your account and clear all data."
+            />
+          </Button>
+        </>
       )}
       <Text
         variant="subtitle"

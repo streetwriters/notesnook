@@ -23,12 +23,7 @@ function RecoveryKeyDialog(props) {
     })();
   }, []);
   return (
-    <Dialog
-      isOpen={true}
-      title="Backup Recovery Key"
-      onClose={props.onCancel}
-      showClose
-    >
+    <Dialog isOpen={true} title="Backup Recovery Key" onClose={props.onDone}>
       <Flex flexDirection="column" flex={1} sx={{ overflow: "hidden" }}>
         <Flex flexDirection="column" sx={{ overflowY: "auto" }}>
           <Text

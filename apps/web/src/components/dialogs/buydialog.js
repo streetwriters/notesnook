@@ -82,7 +82,7 @@ function BuyDialog(props) {
                 : "Start your 14 Day Trial (no credit card required)"}
             </Text>
           </Text>
-          <Text as="span" variant="body" fontSize="heading" color="text" mt={3}>
+          <Text as="span" variant="body" fontSize={30} color="text" mt={3}>
             $6.99
             <Text as="span" variant="body" color="primary" fontSize="subBody">
               /mo
