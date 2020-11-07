@@ -30,6 +30,8 @@ let title = null;
 let saveCounter = 0;
 let canSave = false;
 let timer = null;
+let webviewInit = false;
+let intent = false;
 
 export function isNotedEdited() {
   return noteEdited;
@@ -121,12 +123,14 @@ export async function loadNote(item) {
     clearNote();
     canSave = true;
     id = null;
+    intent = true;
     content = {
       delta: item.data,
       text: item.text,
     };
-    post('delta', content.delta);
-    await saveNote();
+    if (webviewInit) {
+      await loadNoteInEditor();
+    }
   } else {
     await setNote(item);
     canSave = false;
@@ -305,27 +309,29 @@ export async function saveNote() {
 
 export async function onWebViewLoad(noMenu, premium, colors) {
   EditorWebView.current?.injectJavaScript(INJECTED_JAVASCRIPT(premium, false));
-
-  await loadNoteInEditor();
   if (!checkNote()) {
     post('blur');
     Platform.OS === 'android' ? EditorWebView.current?.requestFocus() : null;
   }
   post('blur');
-
   await sleep(1000);
   let theme = {...colors, factor: normalize(1)};
   post('theme', theme);
+  await loadNoteInEditor();
+  webviewInit = true;
 }
 
 const loadNoteInEditor = async () => {
   saveCounter = 0;
-  if (note?.id) {
+  if (intent) {
+    await saveNote();
+    intent = false;
+    post('delta', content.delta);
+  } else if (note?.id) {
     post('dateEdited', timeConverter(note.dateEdited));
     await sleep(50);
     post('title', title);
     post('delta', content.delta);
-    console.log(content.delta);
   } else {
     post('focusTitle');
   }

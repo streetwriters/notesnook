@@ -35,6 +35,11 @@ import {sortSettings} from './src/utils';
 
 let firstLoad = true;
 let note = null;
+let prevIntent = {
+  text: null,
+  weblink: null,
+};
+
 const App = () => {
   const [, dispatch] = useTracked(),
     [init, setInit] = useState(false),
@@ -163,7 +168,6 @@ const App = () => {
       dispatch({type: Actions.ALL});
       setInit(true);
       backupData().then((r) => r);
-      checkForIntent();
 
       setTimeout(() => {
         if (error) {
@@ -171,14 +175,16 @@ const App = () => {
           ToastEvent.show('Error initializing database.');
         }
         SplashScreen.hide();
+        checkForIntent();
       }, 500);
     });
   }, []);
 
   const checkForIntent = () => {
+    console.log('check for intent called');
     ReceiveSharingIntent.getReceivedFiles(
       (d) => {
-        console.log(d, 'DATA');
+        console.log(d,"DATA");
         let data = d[0];
         if (data.text || data.weblink) {
           let text = data.text;
@@ -186,15 +192,19 @@ const App = () => {
           let delta = null;
 
           if (weblink && text) {
-            delta = {ops: [{insert: `${data.text + ' ' + data.weblink}`}]};
+            delta = {ops: [{insert: `${text + ' ' + weblink}`}]};
             text = data.text + ' ' + data.weblink;
           } else if (text && !weblink) {
-            delta = {ops: [{insert: `${data.text}`}]};
+            delta = {ops: [{insert: `${text}`}]};
             text = data.text;
           } else if (weblink) {
-            delta = {ops: [{insert: `${data.weblink}`}]};
-            text = data.weblink;
+            console.log('putting link')
+            delta = {ops: [{insert: `${weblink}`}]};
+            text = weblink
           }
+          console.log(text,weblink,"HERE SHOWING",delta);
+          prevIntent.text = text;
+          prevIntent.weblink = weblink;
           eSendEvent(eOnLoadNote, {
             type: 'intent',
             data: delta,
