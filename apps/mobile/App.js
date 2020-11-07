@@ -32,6 +32,7 @@ import Backup from './src/services/Backup';
 import {setLoginMessage} from './src/services/Message';
 import SplashScreen from 'react-native-splash-screen';
 import {sortSettings} from './src/utils';
+import Database from 'notes-core/api';
 
 let firstLoad = true;
 let note = null;
@@ -178,15 +179,27 @@ const App = () => {
   const checkForIntent = () => {
     ReceiveSharingIntent.getReceivedFiles(
       (d) => {
-        console.log(data, 'DATA');
+        console.log(d, 'DATA');
         let data = d[0];
-        if (data.text) {
-          let delta = {ops: [{insert: `${data.text}`}]};
+        if (data.text || data.weblink) {
+          let text = data.text;
+          let weblink = data.weblink;
+          let delta = null;
 
+          if (weblink && text) {
+            delta = {ops: [{insert: `${data.text + ' ' + data.weblink}`}]};
+            text = data.text + ' ' + data.weblink;
+          } else if (text && !weblink) {
+            delta = {ops: [{insert: `${data.text}`}]};
+            text = data.text;
+          } else if (weblink) {
+            delta = {ops: [{insert: `${data.weblink}`}]};
+            text = data.weblink;
+          }
           eSendEvent(eOnLoadNote, {
             type: 'intent',
             data: delta,
-            text: data.text,
+            text: text,
           });
           if (DDS.isPhone || DDS.isSmallTab) {
             openEditorAnimation();
