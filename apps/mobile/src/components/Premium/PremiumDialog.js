@@ -53,7 +53,7 @@ class PremiumDialog extends React.Component {
     }
   }
 
-  onSuccessfulSubscription = (subscription: RNIap.SubscriptionPurchase) => {
+  onSuccessfulSubscription = (subscription) => {
     const receipt = subscription.transactionReceipt;
 
     if (receipt) {
@@ -64,7 +64,7 @@ class PremiumDialog extends React.Component {
     }
   };
 
-  onSubscriptionError = (error: RNIap.PurchaseError) => {
+  onSubscriptionError = (error) => {
     console.log(error.message, 'Error');
     ToastEvent.show(error.message);
   };
