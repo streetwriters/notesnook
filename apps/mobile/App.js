@@ -6,6 +6,7 @@ import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {useTracked} from './src/provider';
 import {Actions} from './src/provider/Actions';
 import {defaultState} from './src/provider/DefaultState';
+import ReceiveSharingIntent from 'react-native-receive-sharing-intent';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -30,7 +31,7 @@ import {MMKV} from './src/utils/mmkv';
 import Backup from './src/services/Backup';
 import {setLoginMessage} from './src/services/Message';
 import SplashScreen from 'react-native-splash-screen';
-import {SORT, sortSettings} from "./src/utils";
+import {sortSettings} from './src/utils';
 
 let firstLoad = true;
 let note = null;
@@ -161,8 +162,8 @@ const App = () => {
 
       dispatch({type: Actions.ALL});
       setInit(true);
-
-      backupData().then(r=> r)
+      backupData().then((r) => r);
+      checkForIntent();
 
       setTimeout(() => {
         if (error) {
@@ -173,6 +174,31 @@ const App = () => {
       }, 500);
     });
   }, []);
+
+  const checkForIntent = () => {
+    ReceiveSharingIntent.getReceivedFiles(
+      (d) => {
+        console.log(data, 'DATA');
+        let data = d[0];
+        if (data.text) {
+          let delta = {ops: [{insert: `${data.text}`}]};
+
+          eSendEvent(eOnLoadNote, {
+            type: 'intent',
+            data: delta,
+            text: data.text,
+          });
+          if (DDS.isPhone || DDS.isSmallTab) {
+            openEditorAnimation();
+          }
+        }
+        ReceiveSharingIntent.clearReceivedFiles();
+      },
+      (error) => {
+        console.log(error, 'INTENT ERROR');
+      },
+    );
+  };
 
   async function backupData() {
     await sleep(1000);

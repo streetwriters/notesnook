@@ -4,6 +4,7 @@ import com.facebook.react.ReactActivity;
 import android.content.Intent; 
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.content.Intent;
 
 import org.devio.rn.splashscreen.SplashScreen;
 
@@ -20,6 +21,13 @@ public class MainActivity extends ReactActivity {
 
     super.onCreate(savedInstanceState);
   }
+
+
+@Override
+public void onNewIntent(Intent intent) {
+  super.onNewIntent(intent);
+  setIntent(intent);
+}
 
  @Override
 public void onConfigurationChanged(Configuration newConfig) {

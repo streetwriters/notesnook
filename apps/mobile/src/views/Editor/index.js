@@ -1,18 +1,25 @@
 import React, {createRef} from 'react';
-import {KeyboardAvoidingView, Platform, SafeAreaView, StatusBar, TextInput, View,} from 'react-native';
+import {
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  StatusBar,
+  TextInput,
+  View,
+} from 'react-native';
 import WebView from 'react-native-webview';
 import {useTracked} from '../../provider';
 import {
-    _onMessage,
-    _onShouldStartLoadWithRequest,
-    EditorWebView,
-    injectedJS,
-    onWebViewLoad,
-    sourceUri, textInput,
+  _onMessage,
+  _onShouldStartLoadWithRequest,
+  EditorWebView,
+  injectedJS,
+  onWebViewLoad,
+  sourceUri,
+  textInput,
 } from './Functions';
 import {DDS} from '../../services/DeviceDetection';
-import EditorHeader from "./EditorHeader";
-
+import EditorHeader from './EditorHeader';
 
 const Editor = ({noMenu}) => {
   const [state] = useTracked();
@@ -39,8 +46,7 @@ const Editor = ({noMenu}) => {
           height: '100%',
           width: '100%',
         }}>
-
-      <EditorHeader noMenu={noMenu} />
+        <EditorHeader noMenu={noMenu} />
         <WebView
           testID="editor"
           ref={EditorWebView}
