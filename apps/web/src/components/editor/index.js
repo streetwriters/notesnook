@@ -22,6 +22,7 @@ import { SUBSCRIPTION_STATUS } from "../../common";
 
 function Editor() {
   const sessionState = useStore((store) => store.session.state);
+  const contentType = useStore((store) => store.session.content?.type);
   const setSession = useStore((store) => store.setSession);
   const saveSession = useStore((store) => store.saveSession);
   const toggleProperties = useStore((store) => store.toggleProperties);
@@ -39,35 +40,36 @@ function Editor() {
   const [unlock] = useHashParam("unlock");
 
   useEffect(() => {
+    if (contentType !== "delta") return;
     // move the toolbar outside (easiest way)
     const toolbar = document.querySelector(".ql-toolbar.ql-snow");
     const toolbarContainer = document.querySelector("#toolbar");
     if (toolbar && toolbarContainer) {
       toolbarContainer.appendChild(toolbar);
     }
-  }, []);
+  }, [contentType]);
 
   useEffect(() => {
     init();
   }, [init]);
 
   useEffect(() => {
-    if (!quillRef || !quillRef.current) return;
+    if (contentType !== "delta" || !quillRef || !quillRef.current) return;
 
     if (sessionState === SESSION_STATES.new) {
       editorstore.set((state) => (state.session.state = SESSION_STATES.stale));
       const {
-        content: { delta },
+        content: { data },
       } = editorstore.get().session;
 
       const { quill } = quillRef.current;
-      quill.setContents(delta, "init");
+      quill.setContents(data, "init");
       quill.history.clear();
-      if (!delta.ops || !delta.ops.length) return;
+      if (!data || !data.length) return;
       const text = quill.getText();
       quill.setSelection(text.length, 0, "init");
     }
-  }, [sessionState, quillRef]);
+  }, [sessionState, quillRef, contentType]);
 
   if (unlock)
     return (
@@ -95,34 +97,35 @@ function Editor() {
       <Flex variant="columnFill" className="editor">
         <Header />
         <Flex id="toolbar" />
-        <EditorMenu quill={quillRef.current && quillRef.current.quill} />
-        <ReactQuill
-          id="quill"
-          ref={quillRef}
-          refresh={sessionState === SESSION_STATES.new}
-          isSimple={!isLoggedin || (isLoggedin && !isTrial)}
-          onFocus={() => {
-            toggleProperties(false);
-          }}
-          placeholder="Type anything here"
-          container=".editor"
-          onSave={() => {
-            saveSession();
-          }}
-          changeInterval={500}
-          onWordCountChanged={updateWordCount}
-          onChange={() => {
-            const { quill } = quillRef.current;
-            const delta = quill.getContents().ops;
-            const text = quill.getText();
-            setSession((state) => {
-              state.session.content = {
-                delta: { ops: delta },
-                text: text,
-              };
-            });
-          }}
-        />
+        <EditorMenu quill={quillRef.current?.quill} />
+        {contentType === "delta" && (
+          <ReactQuill
+            id="quill"
+            ref={quillRef}
+            refresh={sessionState === SESSION_STATES.new}
+            isSimple={!isLoggedin || (isLoggedin && !isTrial)}
+            onFocus={() => {
+              toggleProperties(false);
+            }}
+            placeholder="Type anything here"
+            container=".editor"
+            onSave={() => {
+              saveSession();
+            }}
+            changeInterval={500}
+            onWordCountChanged={updateWordCount}
+            onChange={() => {
+              const { quill } = quillRef.current;
+              const delta = quill.getContents().ops;
+              setSession((state) => {
+                state.session.content = {
+                  type: "delta",
+                  data: delta,
+                };
+              });
+            }}
+          />
+        )}
       </Flex>
       <Properties />
     </Animated.Flex>

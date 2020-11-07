@@ -23,10 +23,8 @@ const DEFAULT_SESSION = {
   dateEdited: 0,
   totalWords: 0,
   content: {
-    text: "",
-    delta: {
-      ops: [],
-    },
+    type: "delta",
+    data: [],
   },
 };
 class EditorStore extends BaseStore {
@@ -82,17 +80,13 @@ class EditorStore extends BaseStore {
 
     saveLastOpenedNote(note.id);
 
-    let content = {};
-    content = {
-      text: await db.notes.note(note).text(),
-      delta: await db.notes.note(note).delta(),
-    };
+    let content = await db.content.raw(note.contentId);
 
     this.set((state) => {
       state.session = {
         ...DEFAULT_SESSION,
         ...note,
-        content,
+        content: content || DEFAULT_SESSION.content,
         state: SESSION_STATES.new,
       };
     });
