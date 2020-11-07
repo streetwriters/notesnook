@@ -38,8 +38,6 @@ function ListContainer(props) {
         </Flex>
       ) : (
         <>
-          <Search type={props.type} query={props.query} context={context} />
-          <ReminderBar />
           <Flex variant="columnFill" mt={2} data-test-id="note-list">
             {props.children
               ? props.children
@@ -51,33 +49,60 @@ function ListContainer(props) {
                         height={height}
                         width={width}
                         itemKey={(index) => {
-                          const item = props.items[index];
-                          return item.id || item.title;
-                        }}
-                        overscanCount={2}
-                        estimatedItemSize={profile.estimatedItemHeight}
-                        itemSize={(index) => {
-                          const item = props.items[index];
-                          if (item.type === "header") {
-                            if (item.title === "Pinned") return 22;
-                            else return 22;
-                          } else {
-                            return profile.itemHeight(item);
+                          switch (index) {
+                            case 0:
+                              return "searchbar";
+                            case 1:
+                              return "reminderbar";
+                            default:
+                              const item = props.items[index - 2];
+                              return item.id || item.title;
                           }
                         }}
-                        itemCount={props.items.length}
+                        overscanCount={3}
+                        estimatedItemSize={profile.estimatedItemHeight}
+                        itemSize={(index) => {
+                          switch (index) {
+                            case 0:
+                              return 45;
+                            case 1:
+                              return 85;
+                            default:
+                              const item = props.items[index - 2];
+                              if (item.type === "header") {
+                                if (item.title === "Pinned") return 22;
+                                else return 22;
+                              } else {
+                                return profile.itemHeight(item);
+                              }
+                          }
+                        }}
+                        itemCount={props.items.length + 2}
                       >
                         {({ index, style }) => {
-                          const item = props.items[index];
-                          return (
-                            <div key={item.id} style={style}>
-                              {item.type === "header" ? (
-                                <GroupHeader title={item.title} />
-                              ) : (
-                                profile.item(index, item, context)
-                              )}
-                            </div>
-                          );
+                          switch (index) {
+                            case 0:
+                              return (
+                                <Search
+                                  type={props.type}
+                                  query={props.query}
+                                  context={context}
+                                />
+                              );
+                            case 1:
+                              return <ReminderBar />;
+                            default:
+                              const item = props.items[index - 2];
+                              return (
+                                <div key={item.id} style={style}>
+                                  {item.type === "header" ? (
+                                    <GroupHeader title={item.title} />
+                                  ) : (
+                                    profile.item(index, item, context)
+                                  )}
+                                </div>
+                              );
+                          }
                         }}
                       </List>
                     )}

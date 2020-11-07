@@ -13,6 +13,7 @@ function ReminderBar() {
   if (!reminder) return null;
   return (
     <Flex
+      height={65}
       p={2}
       mt={2}
       bg={"shade"}
