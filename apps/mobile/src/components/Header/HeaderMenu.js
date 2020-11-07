@@ -15,10 +15,12 @@ export const HeaderMenu = () => {
       onPress={() => {
         eSendEvent(eOpenSortDialog);
       }}
+      hitSlop={{top: 10, right: 10, left: 30, bottom: 15}}
       activeOpacity={1}
       style={{
         flexDirection: 'row',
         alignItems: 'center',
+        zIndex:10
       }}>
       <Text
         style={{
