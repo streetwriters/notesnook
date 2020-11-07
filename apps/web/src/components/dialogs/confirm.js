@@ -90,3 +90,14 @@ export function showMultiDeleteConfirmation(type) {
     noText: "Cancel",
   });
 }
+
+export function showLogoutConfirmation() {
+  return confirm(Icon.Logout, {
+    title: `Logout`,
+    subtitle: `Are you sure you want to logout?`,
+    message:
+      "Logging out will delete all local data and reset the app. Make sure you have synced all your data before logging out.",
+    yesText: `Yes`,
+    noText: "No",
+  });
+}

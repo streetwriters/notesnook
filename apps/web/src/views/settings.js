@@ -7,6 +7,7 @@ import { useStore as useSettingStore } from "../stores/setting-store";
 import AccentItem from "../components/accent-item";
 import accents from "../theme/accents";
 import { showLogInDialog } from "../components/dialogs/logindialog";
+import { showLogoutConfirmation } from "../components/dialogs/confirm";
 import { upgrade } from "../common/upgrade";
 import useSystemTheme from "../utils/use-system-theme";
 import download from "../utils/download";
@@ -175,7 +176,7 @@ function Settings(props) {
           <Button
             variant="list"
             onClick={async () => {
-              await logout();
+              if (await showLogoutConfirmation()) await logout();
             }}
           >
             <TextWithTip
