@@ -74,27 +74,29 @@ export const Notes = ({route, navigation}) => {
     if (allNotes && allNotes.length > 0) {
       setNotes([...allNotes]);
     }
-  };
 
-  const onFocus = useCallback(() => {
+    dispatch({
+      type: Actions.CURRENT_SCREEN,
+      screen: params.title,
+    });
     dispatch({
       type: Actions.HEADER_STATE,
-      state: params.type === 'color',
+      state: params.menu,
     });
+    updateSearch();
     dispatch({
       type: Actions.HEADER_TEXT_STATE,
       state: {
         heading:
           params.type === 'tag'
-            ? '# ' + params.title
+            ? '#' + params.title
             : params.title.slice(0, 1).toUpperCase() + params.title.slice(1),
       },
     });
+  };
+
+  const onFocus = useCallback(() => {
     init();
-    dispatch({
-      type: Actions.CURRENT_SCREEN,
-      screen: params.type === 'color' ? params.color.title : params.type,
-    });
   }, []);
 
   const onBlur = useCallback(() => {
@@ -115,17 +117,28 @@ export const Notes = ({route, navigation}) => {
 
   useEffect(() => {
     if (navigation.isFocused()) {
-      eSendEvent(eUpdateSearchState,{
-          placeholder: `Search in ${
-              params.type === 'tag' ? '#' + params.title : params.title
-          }`,
-          data: notes,
-          noSearch: false,
-          type: 'notes',
-          color: params.type === 'color' ? params.title : null,
-        })
+      updateSearch();
     }
   }, [notes]);
+
+  const updateSearch = () => {
+    if (notes.length === 0) {
+      eSendEvent('showSearch', true);
+    } else {
+      eSendEvent('showSearch');
+      eSendEvent(eUpdateSearchState,{
+        placeholder: `Search in ${
+            params.type === 'tag' ? '#' + params.title : params.title
+        }`,
+        data: notes,
+        noSearch: false,
+        type: 'notes',
+        color: params.type === 'color' ? params.title : null,
+      })
+    }
+  };
+
+
 
   const _onPressBottomButton = useCallback(() => {
     if (params.type === 'tag') {

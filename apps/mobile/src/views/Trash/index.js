@@ -8,8 +8,8 @@ import {NotebookItemWrapper} from '../../components/SimpleList/NotebookItemWrapp
 import {NoteItemWrapper} from '../../components/SimpleList/NoteItemWrapper';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
-import {eSendEvent} from "../../services/EventManager";
-import {eUpdateSearchState} from "../../utils/Events";
+import {eSendEvent} from '../../services/EventManager';
+import {eUpdateSearchState} from '../../utils/Events';
 
 export const Trash = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
@@ -23,18 +23,11 @@ export const Trash = ({route, navigation}) => {
     dispatch({
       type: Actions.HEADER_TEXT_STATE,
       state: {
-        heading: "Trash",
+        heading: 'Trash',
       },
     });
 
-    eSendEvent(eUpdateSearchState,{
-      placeholder: 'Search all trash',
-      data: trash,
-      noSearch: false,
-      type: 'trash',
-      color: null,
-    })
-
+    updateSearch();
     dispatch({
       type: Actions.TRASH,
     });
@@ -53,17 +46,24 @@ export const Trash = ({route, navigation}) => {
 
   useEffect(() => {
     if (navigation.isFocused()) {
+      updateSearch();
+    }
+  }, [trash]);
 
-      eSendEvent(eUpdateSearchState,{
+  const updateSearch = () => {
+    if (trash.length === 0) {
+      eSendEvent('showSearch', true);
+    } else {
+      eSendEvent('showSearch');
+      eSendEvent(eUpdateSearchState, {
         placeholder: 'Search all trash',
         data: trash,
         noSearch: false,
         type: 'trash',
         color: null,
-      })
-
+      });
     }
-  }, [trash]);
+  };
 
   const _onPressBottomButton = () => simpleDialogEvent(TEMPLATE_EMPTY_TRASH);
 
@@ -89,7 +89,8 @@ export const Trash = ({route, navigation}) => {
 export default Trash;
 
 const RenderItem = ({item, index}) => {
-  return item.type === 'note' ? (
+  console.log(item.itemType);
+  return item.itemType === 'note' ? (
     <NoteItemWrapper item={item} index={index} isTrash={true} />
   ) : (
     <NotebookItemWrapper item={item} index={index} isTrash={true} />

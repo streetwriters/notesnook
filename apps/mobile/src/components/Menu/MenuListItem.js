@@ -29,8 +29,11 @@ export const MenuListItem = ({item, index, noTextMode, ignore, testID}) => {
       });
       eSendEvent(eClearSearch);
     }
-    item.func();
-
+    if (item.func) {
+      item.func()
+    } else {
+      NavigationService.navigate(item.name)
+    }
     if (item.close) {
       NavigationService.closeDrawer();
     }

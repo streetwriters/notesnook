@@ -1,8 +1,7 @@
 import CheckBox from '@react-native-community/checkbox';
 import React, {createRef, useEffect, useState} from 'react';
-import {Clipboard, Modal, Text, TouchableOpacity, View} from 'react-native';
+import {Modal, Text, TouchableOpacity, View} from 'react-native';
 import {TextInput} from 'react-native-gesture-handler';
-import QRCode from 'react-native-qrcode-generator';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {Button} from '../../components/Button';
@@ -10,6 +9,7 @@ import Seperator from '../../components/Seperator';
 import {Toast} from '../../components/Toast';
 import {Actions} from '../../provider/Actions';
 import {useTracked} from '../../provider/index';
+import {DDS} from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -17,24 +17,22 @@ import {
   ToastEvent,
 } from '../../services/EventManager';
 import {
-  eCloseLoginDialog,
-  eOpenLoginDialog,
-  eOpenRecoveryKeyDialog,
-  eStartSyncer,
-  refreshNotesPage,
-} from '../../utils/Events';
-import {
   validateEmail,
   validatePass,
   validateUsername,
 } from '../../services/Validation';
 import {getElevation} from '../../utils';
+import {db} from '../../utils/DB';
+import {
+  eOpenLoginDialog,
+  eOpenRecoveryKeyDialog,
+  eStartSyncer,
+  refreshNotesPage,
+} from '../../utils/Events';
+import {opacity, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
+import {sleep} from '../../utils/TimeUtils';
 import {ActionIcon} from '../ActionIcon';
 import {Loading} from '../Loading';
-import {opacity, ph, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
-import {db} from '../../utils/DB';
-import {DDS} from '../../services/DeviceDetection';
-import {sleep} from '../../utils/TimeUtils';
 
 const LoginDialog = () => {
   const [state, dispatch] = useTracked();
@@ -128,7 +126,7 @@ const LoginDialog = () => {
       eSendEvent(eStartSyncer);
       dispatch({type: Actions.ALL});
       eSendEvent(refreshNotesPage);
-      setVisible(false);
+      close();
       ToastEvent.show(`Logged in as ${username}`, 'success', 'local');
     } catch (e) {
       ToastEvent.show(e.message, 'error', 'local');
@@ -292,12 +290,13 @@ const LoginDialog = () => {
               customStyle={{
                 width: 40,
                 height: 40,
-                marginLeft: 12,
                 position: 'absolute',
                 top: 0,
                 marginBottom: 15,
                 zIndex: 10,
                 left: 0,
+                marginLeft: 7,
+                marginTop: 5,
               }}
               color={colors.heading}
             />
@@ -321,7 +320,7 @@ const LoginDialog = () => {
                   fontFamily: WEIGHT.bold,
                   fontSize: SIZE.xxxl,
                 }}>
-                {login ? 'Login' : 'Sign up'}
+                {login ? 'Login' : 'Sign Up'}
                 {'\n'}
                 <Text
                   style={{
@@ -342,7 +341,7 @@ const LoginDialog = () => {
                 ref={_username}
                 onFocus={() => {
                   if (!invalidUsername) {
-                    _username.current.setNativeProps({
+                    _username.current?.setNativeProps({
                       style: {
                         borderColor: colors.accent,
                       },
@@ -354,7 +353,7 @@ const LoginDialog = () => {
                 onBlur={() => {
                   if (!validateUsername(username) && username?.length > 0) {
                     setInvalidUsername(true);
-                    _username.current.setNativeProps({
+                    _username.current?.setNativeProps({
                       style: {
                         color: colors.errorText,
                         borderColor: colors.errorText,
@@ -362,7 +361,7 @@ const LoginDialog = () => {
                     });
                   } else {
                     setInvalidUsername(false);
-                    _username.current.setNativeProps({
+                    _username.current?.setNativeProps({
                       style: {
                         borderColor: colors.nav,
                       },
@@ -396,9 +395,8 @@ const LoginDialog = () => {
                 style={{
                   paddingHorizontal: pv,
                   height: 50,
-                  borderWidth: 1.5,
+                  borderBottomWidth: 1,
                   borderColor: colors.nav,
-                  borderRadius: 5,
                   fontSize: SIZE.sm,
                   fontFamily: WEIGHT.regular,
                   color: colors.pri,
@@ -445,7 +443,7 @@ const LoginDialog = () => {
                   onBlur={() => {
                     if (!validateEmail(email) && email?.length > 0) {
                       setInvalidEmail(true);
-                      _email.current.setNativeProps({
+                      _email.current?.setNativeProps({
                         style: {
                           color: colors.errorText,
                           borderColor: colors.errorText,
@@ -453,7 +451,7 @@ const LoginDialog = () => {
                       });
                     } else {
                       setInvalidEmail(false);
-                      _email.current.setNativeProps({
+                      _email.current?.setNativeProps({
                         style: {
                           borderColor: colors.nav,
                         },
@@ -486,9 +484,8 @@ const LoginDialog = () => {
                   style={{
                     paddingHorizontal: pv,
                     height: 50,
-                    borderWidth: 1.5,
+                    borderBottomWidth: 1,
                     borderColor: colors.nav,
-                    borderRadius: 5,
                     fontSize: SIZE.sm,
                     fontFamily: WEIGHT.regular,
                     color: colors.pri,
@@ -521,10 +518,9 @@ const LoginDialog = () => {
             <View
               ref={_passContainer}
               style={{
-                borderWidth: 1.5,
+                borderBottomWidth: 1,
                 borderColor: colors.nav,
                 paddingHorizontal: 10,
-                borderRadius: 5,
                 flexDirection: 'row',
                 justifyContent: 'space-between',
                 alignItems: 'center',
@@ -545,7 +541,7 @@ const LoginDialog = () => {
                 onBlur={() => {
                   if (!validatePass(password) && password?.length > 0) {
                     setInvalidPassword(true);
-                    _pass.current.setNativeProps({
+                    _pass.current?.setNativeProps({
                       style: {
                         color: colors.errorText,
                       },
@@ -675,10 +671,9 @@ const LoginDialog = () => {
                   }}
                   style={{
                     paddingHorizontal: pv,
-                    borderWidth: 1.5,
+                    borderBottomWidth: 1,
                     height: 50,
                     borderColor: colors.nav,
-                    borderRadius: 5,
                     fontSize: SIZE.sm,
                     fontFamily: WEIGHT.regular,
                     color: colors.pri,
@@ -707,45 +702,58 @@ const LoginDialog = () => {
                 ) : null}
               </>
             )}
+
             {login ? null : (
-              <View
-                style={{
-                  flexDirection: 'row',
-                  width: '100%',
-                }}>
-                <CheckBox
-                  onValueChange={(value) => {
-                    setUserConsent(value);
+              <>
+                <Seperator />
+                <TouchableOpacity
+                  onPress={() => {
+                    setUserConsent(!userConsent);
                   }}
-                  boxType="circle"
-                  tintColors={{true: colors.accent, false: colors.icon}}
-                  value={userConsent}
-                />
-                <Text
+                  activeOpacity={0.7}
                   style={{
-                    fontSize: SIZE.xs,
-                    fontFamily: WEIGHT.regular,
-                    color: colors.pri,
-                    maxWidth: '90%',
-                    marginTop: 5,
+                    flexDirection: 'row',
+                    width: '100%',
+                    alignItems: 'center',
+                    height: 40,
                   }}>
-                  By signing up you agree to our{' '}
+                  <Icon
+                    size={SIZE.lg}
+                    color={userConsent ? colors.accent : colors.icon}
+                    name={
+                      userConsent
+                        ? 'check-circle-outline'
+                        : 'checkbox-blank-circle-outline'
+                    }
+                  />
+
                   <Text
                     style={{
-                      color: colors.accent,
+                      fontSize: SIZE.xs,
+                      fontFamily: WEIGHT.regular,
+                      color: colors.pri,
+                      maxWidth: '90%',
+                      marginLeft: 10,
                     }}>
-                    terms of service{' '}
+                    By signing up you agree to our{' '}
+                    <Text
+                      style={{
+                        color: colors.accent,
+                      }}>
+                      terms of service{' '}
+                    </Text>
+                    and{' '}
+                    <Text
+                      style={{
+                        color: colors.accent,
+                      }}>
+                      privacy policy.
+                    </Text>
                   </Text>
-                  and{' '}
-                  <Text
-                    style={{
-                      color: colors.accent,
-                    }}>
-                    privacy policy.
-                  </Text>
-                </Text>
-              </View>
+                </TouchableOpacity>
+              </>
             )}
+
             {login ? null : <Seperator />}
 
             <View
@@ -756,6 +764,7 @@ const LoginDialog = () => {
                 title={login ? 'Login' : 'Create Account'}
                 onPress={login ? loginUser : signupUser}
                 width="100%"
+                fontSize={SIZE.md}
                 height={50}
               />
             </View>

@@ -6,8 +6,8 @@ import {NotebookItemWrapper} from '../../components/SimpleList/NotebookItemWrapp
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
-import {eSendEvent} from "../../services/EventManager";
-import {eUpdateSearchState} from "../../utils/Events";
+import {eSendEvent} from '../../services/EventManager';
+import {eUpdateSearchState} from '../../utils/Events';
 export const Folders = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const {notebooks} = state;
@@ -20,24 +20,34 @@ export const Folders = ({route, navigation}) => {
     dispatch({
       type: Actions.HEADER_TEXT_STATE,
       state: {
-        heading: "Notebooks",
+        heading: 'Notebooks',
       },
     });
-
-    eSendEvent(eUpdateSearchState,{
-      placeholder: 'Search all notebooks',
-      data: notebooks,
-      noSearch: false,
-      type: 'notebooks',
-      color: null,
-    },)
 
     dispatch({type: Actions.NOTEBOOKS});
     dispatch({
       type: Actions.CURRENT_SCREEN,
       screen: 'notebooks',
     });
+    updateSearch();
+
   }, [notebooks]);
+
+  const updateSearch = () => {
+    if (notebooks.length === 0) {
+      eSendEvent('showSearch', true);
+    } else {
+      eSendEvent('showSearch');
+      eSendEvent(eUpdateSearchState, {
+        placeholder: 'Search all notebooks',
+        data: notebooks,
+        noSearch: false,
+        type: 'notebooks',
+        color: null,
+      });
+    }
+  }
+
 
   useEffect(() => {
     navigation.addListener('focus', onFocus);
@@ -48,19 +58,13 @@ export const Folders = ({route, navigation}) => {
 
   useEffect(() => {
     if (navigation.isFocused()) {
-      eSendEvent(eUpdateSearchState,{
-        placeholder: 'Search all notebooks',
-        data: notebooks,
-        noSearch: false,
-        type: 'notebooks',
-        color: null,
-      },)
+      updateSearch();
     }
   }, [notebooks]);
 
   useEffect(() => {
-    console.log('render folders');  
-  })
+    console.log('render folders');
+  });
 
   const _onPressBottomButton = () => AddNotebookEvent();
 

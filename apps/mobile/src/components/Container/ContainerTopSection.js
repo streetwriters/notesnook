@@ -5,7 +5,7 @@ import {Header} from '../Header';
 import {Search} from '../SearchInput';
 
 export const ContainerTopSection = ({root}) => {
-  const [state, dispatch] = useTracked();
+  const [state,] = useTracked();
   const {colors, selectionMode} = state;
   const opacity = useValue(0);
   const translateY = useValue(0);
@@ -38,7 +38,7 @@ export const ContainerTopSection = ({root}) => {
           },
         ],
       }}>
-     
+
 
      <Header root={root} />
       <Search root={root} />

@@ -1,26 +1,25 @@
-import React, {Component} from 'react';
-import {Modal, Text, TouchableOpacity, View} from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {Actions} from '../../provider/Actions';
-import {eSendEvent, ToastEvent} from '../../services/EventManager';
+import React, { Component } from 'react';
+import { View } from 'react-native';
+import { Actions } from '../../provider/Actions';
+import { DDS } from '../../services/DeviceDetection';
+import { eSendEvent, ToastEvent } from '../../services/EventManager';
+import NavigationService from '../../services/Navigation';
+import { getElevation, history } from '../../utils';
+import { db } from '../../utils/DB';
 import {
   eApplyChanges,
   eClearEditor,
   eCloseFullscreenEditor,
   eOnLoadNote,
-  eOnNewTopicAdded,
+  eOnNewTopicAdded
 } from '../../utils/Events';
-import NavigationService from '../../services/Navigation';
-import {getElevation, history} from '../../utils';
-import {Button} from '../Button';
-import {dialogActions} from '../DialogManager/DialogActions';
-import {updateEvent} from '../DialogManager/recievers';
+import { ph, pv } from '../../utils/SizeUtils';
+import { dialogActions } from '../DialogManager/DialogActions';
+import { updateEvent } from '../DialogManager/recievers';
+import Seperator from '../Seperator';
 import BaseDialog from './base-dialog';
 import DialogButtons from './dialog-buttons';
 import DialogHeader from './dialog-header';
-import {ph, pv, SIZE, WEIGHT} from "../../utils/SizeUtils";
-import {db} from "../../utils/DB";
-import {DDS} from "../../services/DeviceDetection";
 
 export class Dialog extends Component {
   constructor(props) {
@@ -233,6 +232,7 @@ export class Dialog extends Component {
                 : paragraph
             }
           />
+          <Seperator />
 
           {template.noButtons ? null : (
             <DialogButtons

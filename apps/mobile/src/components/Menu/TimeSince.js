@@ -11,7 +11,7 @@ export const TimeSince = ({time}) => {
     let interval = setInterval(() => {
       t = timeSince(time);
       setTimeAgo(t);
-    }, 180000);
+    }, 60000);
     return () => {
       clearInterval(interval);
       interval = null;

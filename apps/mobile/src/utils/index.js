@@ -4,6 +4,8 @@ import {updateEvent} from '../components/DialogManager/recievers';
 import {Actions} from '../provider/Actions';
 import {MMKV} from "./MMKV";
 import RNFetchBlob from 'rn-fetch-blob';
+import {defaultState} from "../provider/DefaultState";
+import { createRef } from 'react';
 
 export async function setSetting(settings, name, value) {
   let s = {...settings};
@@ -11,6 +13,9 @@ export async function setSetting(settings, name, value) {
   await MMKV.setStringAsync('settings', JSON.stringify(s));
   updateEvent({type: Actions.SETTINGS, settings: s});
 }
+
+
+export const scrollRef = createRef();
 
 export const dirs = RNFetchBlob.fs.dirs;
 export const ANDROID_PATH  = dirs.SDCardDir + '/Notesnook/';
@@ -25,6 +30,19 @@ export const getElevation = (elevation) => {
     shadowRadius: 0.7 * elevation,
   };
 };
+
+export const sortSettings = {
+  sort:defaultState.settings.sort,
+  sortOrder: defaultState.settings.sortOrder
+}
+
+export const SORT = {
+  default: null,
+  alphabetical: 'abc',
+  year: 'year',
+  week: 'week',
+  month: 'month'
+}
 
 export const editing = {
   currentlyEditing: false,
@@ -60,3 +78,33 @@ export const itemSkus = Platform.select({
   ios: ['com.streetwriters.notesnook.sub.mo'],
   android: ['com.streetwriters.notesnook.sub.mo'],
 });
+
+
+export const MenuItemsList = [
+  {
+    name: 'Home',
+    icon: 'home-variant-outline',
+    close: true,
+  },
+  {
+    name: 'Notebooks',
+    icon: 'book-outline',
+    close: true,
+  },
+  {
+    name: 'Favorites',
+    icon: 'star-outline',
+    close: true,
+  },
+  {
+    name: 'Tags',
+    icon: 'pound',
+    close: true,
+  },
+  {
+    name: 'Trash',
+    icon: 'delete-outline',
+    close: true,
+  },
+];
+

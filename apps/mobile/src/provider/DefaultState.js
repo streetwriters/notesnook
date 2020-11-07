@@ -24,7 +24,10 @@ export const defaultState = {
     forcePortraitOnTablet: false,
     useSystemTheme:true,
     reminder:'weekly',
-    encryptedBackups:false
+    encryptedBackups:false,
+    homepage:'Home',
+    sort:"default",
+    sortOrder:"des"
   },
   currentScreen: 'home',
   colors: {
@@ -60,7 +63,7 @@ export const defaultState = {
     heading: 'Home',
     color: null,
   },
-  headerVerticalMenu: true,
+  headerVerticalMenu: false,
   searchState: {
     noSearch: false,
     data: [],

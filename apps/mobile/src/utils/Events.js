@@ -114,3 +114,9 @@ export const eUpdateSearchState = '556';
 
 export const eOpenResultDialog = '557';
 export const eCloseResultDialog = '558';
+
+export const eOpenSortDialog = '559';
+export const eCloseSortDialog = '560';
+
+export const eOpenJumpToDialog = '561';
+export const eCloseJumpToDialog = '562';

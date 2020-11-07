@@ -1,31 +1,31 @@
 import React, {Component, createRef} from 'react';
-import {Modal, Text, View} from 'react-native';
+import {KeyboardAvoidingView, View} from 'react-native';
 import {TextInput} from 'react-native-gesture-handler';
 import Share from 'react-native-share';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {Actions} from '../../provider/Actions';
+import {DDS} from '../../services/DeviceDetection';
 import {
-    eSendEvent,
-    eSubscribeEvent,
-    eUnSubscribeEvent, ToastEvent,
+  eSendEvent,
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+  ToastEvent,
 } from '../../services/EventManager';
+import {getElevation} from '../../utils';
+import {openEditorAnimation} from '../../utils/Animations';
+import {db} from '../../utils/DB';
 import {
   eCloseVaultDialog,
   eOnLoadNote,
   eOpenVaultDialog,
   refreshNotesPage,
 } from '../../utils/Events';
-import {openEditorAnimation} from '../../utils/Animations';
-import {getElevation} from '../../utils';
-import {Button} from '../Button/index';
+import {ph, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
 import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogHeader from '../Dialog/dialog-header';
 import {updateEvent} from '../DialogManager/recievers';
+import Seperator from '../Seperator';
 import {Toast} from '../Toast';
-import {ph, pv, SIZE, WEIGHT} from "../../utils/SizeUtils";
-import {db} from "../../utils/DB";
-import {DDS} from "../../services/DeviceDetection";
 const passInputRef = createRef();
 const confirmPassRef = createRef();
 
@@ -43,6 +43,7 @@ export class VaultDialog extends Component {
       share: false,
       passwordsDontMatch: false,
       deleteNote: false,
+      focusIndex: null,
     };
     this.password = null;
     this.confirmPassword = null;
@@ -275,7 +276,7 @@ export class VaultDialog extends Component {
           <DialogHeader
             title={
               !novault
-                ? 'Create vault'
+                ? 'Create Vault'
                 : note.locked
                 ? this.state.deleteNote
                   ? 'Delete note'
@@ -304,13 +305,19 @@ export class VaultDialog extends Component {
             icon="shield"
           />
 
+          <Seperator />
+
           {note.locked || locked || permanant ? (
             <TextInput
               ref={passInputRef}
               style={{
                 padding: pv - 5,
-                borderWidth: 1.5,
-                borderColor: wrongPassword ? colors.errorText : colors.nav,
+                borderBottomWidth: 1.5,
+                borderColor: wrongPassword
+                  ? colors.errorText
+                  : this.state.focusIndex === 0
+                  ? colors.accent
+                  : colors.nav,
                 paddingHorizontal: ph,
                 borderRadius: 5,
                 marginTop: 10,
@@ -319,6 +326,11 @@ export class VaultDialog extends Component {
               }}
               onChangeText={(value) => {
                 this.password = value;
+              }}
+              onFocus={() => {
+                this.setState({
+                  focusIndex: 0,
+                });
               }}
               secureTextEntry
               placeholder="Password"
@@ -332,9 +344,11 @@ export class VaultDialog extends Component {
                 ref={passInputRef}
                 style={{
                   padding: pv - 5,
-                  borderWidth: 1.5,
+                  borderBottomWidth: 1.5,
                   borderColor: passwordsDontMatch
                     ? colors.errorText
+                    : this.state.focusIndex === 1
+                    ? colors.accent
                     : colors.nav,
                   paddingHorizontal: ph,
                   borderRadius: 5,
@@ -343,6 +357,11 @@ export class VaultDialog extends Component {
                 }}
                 onChangeText={(value) => {
                   this.password = value;
+                }}
+                onFocus={() => {
+                  this.setState({
+                    focusIndex: 1,
+                  });
                 }}
                 secureTextEntry
                 placeholder="Password"
@@ -353,9 +372,11 @@ export class VaultDialog extends Component {
                 ref={confirmPassRef}
                 style={{
                   padding: pv - 5,
-                  borderWidth: 1.5,
+                  borderBottomWidth: 1.5,
                   borderColor: passwordsDontMatch
                     ? colors.errorText
+                    : this.state.focusIndex === 2
+                    ? colors.accent
                     : colors.nav,
                   paddingHorizontal: ph,
                   borderRadius: 5,
@@ -364,6 +385,11 @@ export class VaultDialog extends Component {
                   marginTop: 10,
                 }}
                 secureTextEntry
+                onFocus={() => {
+                  this.setState({
+                    focusIndex: 2,
+                  });
+                }}
                 onChangeText={(value) => {
                   this.confirmPassword = value;
                   if (value !== this.password) {

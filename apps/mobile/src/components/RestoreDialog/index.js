@@ -4,21 +4,22 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import RNFetchBlob from 'rn-fetch-blob';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
-import {eSubscribeEvent, eUnSubscribeEvent, ToastEvent} from '../../services/EventManager';
+import {
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+  ToastEvent,
+} from '../../services/EventManager';
 import {eCloseRestoreDialog, eOpenRestoreDialog} from '../../utils/Events';
 import storage from '../../utils/storage';
-import {
-  getElevation,
-
-} from '../../utils';
+import {getElevation} from '../../utils';
 import {ActionIcon} from '../ActionIcon';
 import {Button} from '../Button';
 import BaseDialog from '../Dialog/base-dialog';
 import {Loading} from '../Loading';
-import {sleep} from "../../utils/TimeUtils";
-import {ph, SIZE, WEIGHT} from "../../utils/SizeUtils";
-import {db} from "../../utils/DB";
-import {DDS} from "../../services/DeviceDetection";
+import {sleep} from '../../utils/TimeUtils';
+import {ph, SIZE, WEIGHT} from '../../utils/SizeUtils';
+import {db} from '../../utils/DB';
+import {DDS} from '../../services/DeviceDetection';
 
 const RestoreDialog = () => {
   const [state, dispatch] = useTracked();
@@ -45,43 +46,38 @@ const RestoreDialog = () => {
     setVisible(false);
   };
 
-  const restore = async (item,index) => {
-    
-      if (Platform.OS === 'android') {
-        let granted = storage.requestPermission();
-        if (!granted) {
-          ToastEvent.show('Restore Failed! Storage access denied');
-          return;
-        }
+  const restore = async (item, index) => {
+    if (Platform.OS === 'android') {
+      let granted = storage.requestPermission();
+      if (!granted) {
+        ToastEvent.show('Restore Failed! Storage access denied');
+        return;
       }
-      setRestoring(true);
-      let backup = await RNFetchBlob.fs.readFile(
-        'file:/' + item.path,
-        'utf8',
-      );
-      await db.backup.import(backup);
-      await sleep(2000);
-      setRestoring(false);
-      console.log(db.notes.all);
-      dispatch({type: Actions.ALL});
-      ToastEvent.show('Restore Complete!', 'success');
-      setVisible(false);
-
-  }
-
- const checkBackups = async () => {
-  if (Platform.OS === "android") {
-    let granted = await storage.requestPermission();
-    if (!granted) {
-      ToastEvent.show('Storage permission required to check for backups.');
-      return;
     }
-  }
-  let path = await storage.checkAndCreateDir('/backups/');
-  let files = await RNFetchBlob.fs.lstat(path);
-  console.log(files);
-  setFiles(files);
- } 
+    setRestoring(true);
+    let backup = await RNFetchBlob.fs.readFile('file:/' + item.path, 'utf8');
+    await db.backup.import(backup);
+    await sleep(2000);
+    setRestoring(false);
+    console.log(db.notes.all);
+    dispatch({type: Actions.ALL});
+    ToastEvent.show('Restore Complete!', 'success');
+    setVisible(false);
+  };
+
+  const checkBackups = async () => {
+    if (Platform.OS === 'android') {
+      let granted = await storage.requestPermission();
+      if (!granted) {
+        ToastEvent.show('Storage permission required to check for backups.');
+        return;
+      }
+    }
+    let path = await storage.checkAndCreateDir('/backups/');
+    let files = await RNFetchBlob.fs.lstat(path);
+    console.log(files);
+    setFiles(files);
+  };
 
   return (
     <BaseDialog
@@ -131,17 +127,19 @@ const RestoreDialog = () => {
             alignItems: 'center',
             height: 50,
             marginTop: DDS.isTab ? 0 : insets.top,
-            flexDirection:"row",
+            flexDirection: 'row',
           }}>
           <ActionIcon
-            name="close"
+            name="arrow-left"
             size={SIZE.xxl}
             onPress={close}
             customStyle={{
               width: 40,
               height: 40,
-               textAlignVertical: 'center',
+              textAlignVertical: 'center',
               left: 0,
+              marginLeft: -5,
+              marginRight: 5,
             }}
             color={colors.heading}
           />
@@ -150,16 +148,18 @@ const RestoreDialog = () => {
               color: colors.accent,
               fontFamily: WEIGHT.bold,
               fontSize: SIZE.xl,
+              textAlign: 'center',
             }}>
             Choose a Backup
           </Text>
-            <View  style={ {
-                width: 40,
-                height: 40,
-            }}/>
 
+          <View
+            style={{
+              width: 40,
+              height: 40,
+            }}
+          />
         </View>
-
 
         <FlatList
           data={files}
@@ -205,7 +205,7 @@ const RestoreDialog = () => {
               </Text>
             </View>
           }
-          keyExtractor={(item,index) => item.filename}
+          keyExtractor={(item, index) => item.filename}
           renderItem={({item, index}) => (
             <View
               style={{
@@ -222,6 +222,7 @@ const RestoreDialog = () => {
                 style={{
                   fontFamily: WEIGHT.regular,
                   fontSize: SIZE.xs + 1,
+                  color: colors.pri,
                 }}>
                 {item.filename
                   .replace('notesnook_backup_', '')
@@ -232,7 +233,7 @@ const RestoreDialog = () => {
                 title="Restore"
                 width={80}
                 height={30}
-                onPress={() => restore(item,index)}
+                onPress={() => restore(item, index)}
               />
             </View>
           )}

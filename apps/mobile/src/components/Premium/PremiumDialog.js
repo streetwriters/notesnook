@@ -38,7 +38,9 @@ class PremiumDialog extends React.Component {
   close() {
     this.actionSheetRef.current?._setModalVisible(false);
   }
-  async componentDidMount() {
+
+
+  async getSkus() {
     try {
       let u = await db.user.get();
       let prod = await RNIap.getSubscriptions(itemSkus);
@@ -49,10 +51,9 @@ class PremiumDialog extends React.Component {
     } catch(e) {
       console.log(e,"SKU ERROR")
     }
-
   }
 
-  onSuccessfulSubscription = (subscription: RNIap.SubscriptionPurchase) => {
+  onSuccessfulSubscription = (subscription) => {
     const receipt = subscription.transactionReceipt;
 
     if (receipt) {
@@ -63,7 +64,7 @@ class PremiumDialog extends React.Component {
     }
   };
 
-  onSubscriptionError = (error: RNIap.PurchaseError) => {
+  onSubscriptionError = (error) => {
     console.log(error.message, 'Error');
     ToastEvent.show(error.message);
   };
@@ -78,6 +79,9 @@ class PremiumDialog extends React.Component {
           alignSelf: 'center',
           borderRadius: 10,
           marginBottom: DDS.isTab ? 50 : 0,
+        }}
+        onOpen={async () => {
+          await this.getSkus();
         }}
         extraScroll={DDS.isTab ? 50 : 0}
         footerAlwaysVisible={DDS.isTab}

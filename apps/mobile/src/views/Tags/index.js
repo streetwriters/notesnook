@@ -6,14 +6,13 @@ import SimpleList from '../../components/SimpleList';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import NavigationService from '../../services/Navigation';
-import {SIZE, WEIGHT} from "../../utils/SizeUtils";
-import {eSendEvent} from "../../services/EventManager";
-import {eUpdateSearchState} from "../../utils/Events";
+import {SIZE, WEIGHT} from '../../utils/SizeUtils';
+import {eSendEvent} from '../../services/EventManager';
+import {eUpdateSearchState} from '../../utils/Events';
 
 export const Tags = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
-  const { tags} = state;
-
+  const {tags} = state;
 
   const onFocus = useCallback(() => {
     dispatch({
@@ -23,17 +22,11 @@ export const Tags = ({route, navigation}) => {
     dispatch({
       type: Actions.HEADER_TEXT_STATE,
       state: {
-        heading:"Tags",
+        heading: 'Tags',
       },
     });
 
-    eSendEvent(eUpdateSearchState,{
-      placeholder: 'Search all tags',
-      data: tags,
-      noSearch: false,
-      type: 'tags',
-      color: null,
-    })
+    updateSearch();
     dispatch({type: Actions.TAGS});
     dispatch({
       type: Actions.CURRENT_SCREEN,
@@ -48,17 +41,28 @@ export const Tags = ({route, navigation}) => {
     };
   });
 
+
+
   useEffect(() => {
     if (navigation.isFocused()) {
-      eSendEvent(eUpdateSearchState,{
+      updateSearch();
+    }
+  }, [tags]);
+
+  const updateSearch = () => {
+    if (tags.length === 0) {
+      eSendEvent('showSearch', true);
+    } else {
+      eSendEvent('showSearch');
+      eSendEvent(eUpdateSearchState, {
         placeholder: 'Search all tags',
         data: tags,
         noSearch: false,
         type: 'tags',
         color: null,
-      })
+      });
     }
-  }, [tags]);
+  };
 
   return (
     <SimpleList
@@ -86,19 +90,14 @@ const RenderItem = ({item, index}) => {
           tag: item,
         });
       }}
-      selectedColor={
-        currentEditingNote === item.dateCreated || pinned
-          ? colors.accent
-          : colors.nav
-      }
+      selectedColor={colors.nav}
       alpha={!colors.night ? -0.02 : 0.02}
-      opacity={currentEditingNote === item.dateCreated || pinned ? 0.12 : 1}
+      opacity={1}
       customStyle={{
         paddingHorizontal: 12,
         height: 80,
-        flexDirection: 'row',
-        justifyContent: 'flex-start',
-        alignItems: 'center',
+        justifyContent: 'center',
+        alignItems: 'flex-start',
         borderBottomWidth: 1.5,
         borderBottomColor: colors.nav,
       }}>
@@ -112,22 +111,23 @@ const RenderItem = ({item, index}) => {
           style={{
             color: colors.accent,
           }}>
-          #{' '}
+          #
         </Text>
 
         {item.title}
-        {'\n'}
-        <Text
-          style={{
-            fontSize: SIZE.xs,
-            color: colors.icon,
-          }}>
-          {item && item.noteIds.length && item.noteIds.length > 1
-            ? item.noteIds.length + ' notes'
-            : item.noteIds.length === 1
-            ? item.noteIds.length + ' note'
-            : null}
-        </Text>
+      </Text>
+      <Text
+        style={{
+          fontSize: SIZE.xs,
+          color: colors.icon,
+          fontFamily: WEIGHT.regular,
+          marginTop: 5,
+        }}>
+        {item && item.noteIds.length && item.noteIds.length > 1
+          ? item.noteIds.length + ' notes'
+          : item.noteIds.length === 1
+          ? item.noteIds.length + ' note'
+          : null}
       </Text>
     </PressableButton>
   );

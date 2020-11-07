@@ -1,7 +1,7 @@
 import { eSendEvent } from '../services/EventManager';
 import { eCloseSideMenu, eOpenSideMenu } from '../utils/Events';
 import storage from '../utils/storage';
-import { history} from '../utils/index';
+import {history, SORT, sortSettings} from '../utils/index';
 import { Actions } from './Actions';
 import {db} from "../utils/DB";
 
@@ -9,9 +9,10 @@ export const reducer = (state, action) => {
   switch (action.type) {
     case Actions.ALL: {
 
+
       return {
         ...state,
-        notes: db.notes.group(),
+        notes:  db.notes.group(SORT[sortSettings.sort]),
         notebooks: db.notebooks.all,
         trash: db.trash.all,
         tags: db.tags.all,
@@ -43,16 +44,10 @@ export const reducer = (state, action) => {
       };
     }
     case Actions.NOTES:
-      let notes;
-      if (action.sort) {
-        notes = db.notes.group(action.sort);
-      } else {
-        notes = db.notes.group();
-      }
 
       return {
         ...state,
-        notes: notes,
+        notes: db.notes.group(SORT[sortSettings.sort]),
         loading: false,
       };
     case Actions.THEME: {

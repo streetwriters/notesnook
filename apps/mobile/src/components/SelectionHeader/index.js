@@ -1,15 +1,17 @@
-import React, {useEffect, useState} from 'react';
-import {Text, TouchableOpacity, View} from 'react-native';
+import React, {useEffect} from 'react';
+import {TouchableOpacity, View} from 'react-native';
 import Animated, {Easing, useValue} from 'react-native-reanimated';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {eSendEvent, ToastEvent} from '../../services/EventManager';
+import {db} from '../../utils/DB';
 import {eOpenMoveNoteDialog, eOpenSimpleDialog} from '../../utils/Events';
+import {SIZE} from '../../utils/SizeUtils';
+import {ActionIcon} from '../ActionIcon';
 import {TEMPLATE_DELETE} from '../DialogManager/Templates';
-import {SIZE, WEIGHT} from "../../utils/SizeUtils";
-import {db} from "../../utils/DB";
+import Heading from '../Typography/Heading';
 
 export const SelectionHeader = () => {
   // State
@@ -21,7 +23,6 @@ export const SelectionHeader = () => {
     currentScreen,
     premiumUser,
   } = state;
-  const [selectAll, setSelectAll] = useState(false);
   const insets = useSafeAreaInsets();
   const translateY = useValue(-150);
 
@@ -38,10 +39,12 @@ export const SelectionHeader = () => {
       style={{
         width: '100%',
         position: 'absolute',
-        height: 50,
+        height: 50 + insets.top,
+        paddingTop: insets.top,
         backgroundColor: colors.bg,
-        marginTop: insets.top,
-        justifyContent: 'flex-end',
+        justifyContent: 'center',
+        alignItems: 'center',
+        flexDirection: 'row',
         zIndex: 999,
         paddingHorizontal: 12,
         transform: [
@@ -52,206 +55,107 @@ export const SelectionHeader = () => {
       }}>
       <View
         style={{
-          width: '100%',
-          height: 50,
           flexDirection: 'row',
-          justifyContent: 'space-between',
+          justifyContent: 'flex-start',
           alignItems: 'center',
+          position: 'absolute',
+          left: 12,
+          paddingTop: insets.top,
         }}>
-        <View
-          style={{
-            justifyContent: 'space-between',
-            flexDirection: 'row',
+        <ActionIcon
+          customStyle={{
+            justifyContent: 'center',
             alignItems: 'center',
-          }}>
-          <TouchableOpacity
-            onPress={() => {
-              dispatch({type: Actions.SELECTION_MODE, enabled: !selectionMode});
-              dispatch({type: Actions.CLEAR_SELECTION});
-            }}
-            hitSlop={{top: 20, bottom: 20, left: 50, right: 40}}
-            style={{
-              justifyContent: 'center',
-              alignItems: 'flex-start',
-              height: 40,
-              width: 60,
-            }}>
-            <Icon
-              style={{
-                marginLeft: -5,
-              }}
-              color={colors.pri}
-              name={'chevron-left'}
-              size={SIZE.xxxl}
-            />
-          </TouchableOpacity>
+            height: 40,
+            width: 40,
+            borderRadius: 100,
+            marginLeft: -5,
+            marginRight: 25,
+          }}
+          onPress={() => {
+            dispatch({type: Actions.SELECTION_MODE, enabled: !selectionMode});
+            dispatch({type: Actions.CLEAR_SELECTION});
+          }}
+          color={colors.heading}
+          name="arrow-left"
+          size={SIZE.xxxl}
+        />
 
-          <Text
-            style={{
-              fontSize: SIZE.lg,
-              fontFamily: WEIGHT.regular,
-              color: colors.pri,
-              textAlignVertical: 'center',
-            }}>
-            {selectAll ? 'All' : selectedItemsList.length}
-          </Text>
-        </View>
-
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}>
-          {currentScreen === 'trash' || currentScreen === 'notebooks' ? null : (
-            <TouchableOpacity
-              style={{
-                justifyContent: 'center',
-                alignItems: 'flex-end',
-                height: 40,
-                width: 50,
-                paddingRight: 0,
-              }}
-              onPress={() => {
-                dispatch({type: Actions.SELECTION_MODE, enabled: false});
-                dispatch({type: Actions.CLEAR_SELECTION});
-                eSendEvent(eOpenMoveNoteDialog);
-              }}>
-              <Icon color={colors.heading} name={'plus'} size={SIZE.xl} />
-            </TouchableOpacity>
-          )}
-          {/*   {currentScreen === 'trash' || currentScreen === 'notebooks' ? null : (
-            <TouchableOpacity
-              style={{
-                justifyContent: 'center',
-                alignItems: 'flex-end',
-                height: 40,
-                width: 50,
-                paddingRight: 0,
-              }}
-              onPress={async () => {
-                if (!premiumUser) {
-                  eSendEvent(eOpenPremiumDialog);
-                  return;
-                }
-                let favCount = 0;
-                let unFavCount = 0;
-                if (selectedItemsList.length > 0) {
-                  selectedItemsList.forEach(async (item) => {
-                    if (!item.favorite) {
-                      favCount += 1;
-                    } else {
-                      return;
-                    }
-                    await db.notes.note(item.id).favorite();
-                    dispatch({type: ACTIONS.NOTES});
-                    dispatch({type: ACTIONS.FAVORITES});
-                  });
-
-                  dispatch({type: ACTIONS.SELECTION_MODE, enabled: false});
-
-                  dispatch({type: ACTIONS.CLEAR_SELECTION});
-
-                  ToastEvent.show(
-                    favCount + ' notes added to favorites',
-                    'success',
-                  );
-                }
-              }}>
-              <Icon color={colors.heading} name={'star'} size={SIZE.xl - 3} />
-            </TouchableOpacity>
-          )} */}
-
-          {currentScreen === 'trash' ? null : (
-            <TouchableOpacity
-              style={{
-                justifyContent: 'center',
-                alignItems: 'flex-end',
-                height: 40,
-                width: 50,
-                paddingRight: 0,
-              }}
-              onPress={async () => {
-                eSendEvent(eOpenSimpleDialog, TEMPLATE_DELETE('item'));
-                return;
-              }}>
-              <Icon color={colors.heading} name={'delete'} size={SIZE.xl - 3} />
-            </TouchableOpacity>
-          )}
-
-          {currentScreen === 'trash' ? (
-            <TouchableOpacity
-              style={{
-                justifyContent: 'center',
-                alignItems: 'flex-end',
-                height: 40,
-                width: 50,
-                paddingRight: 0,
-              }}
-              onPress={async () => {
-                if (selectedItemsList.length > 0) {
-                  let noteIds = [];
-                  selectedItemsList.forEach((item) => {
-                    noteIds.push(item.id);
-                  });
-
-                  await db.trash.restore(...noteIds);
-
-                  dispatch({type: Actions.TRASH});
-                  dispatch({type: Actions.SELECTION_MODE, enabled: false});
-                  dispatch({type: Actions.CLEAR_SELECTION});
-                  ToastEvent.show('Restore complete', 'success');
-                }
-              }}>
-              <Icon
-                color={colors.heading}
-                name="delete-restore"
-                size={SIZE.xl - 3}
-              />
-            </TouchableOpacity>
-          ) : null}
-        </View>
+        {Platform.OS === 'android' ? (
+          <Heading>{selectedItemsList.length + ' Selected'}</Heading>
+        ) : null}
       </View>
 
-      {/*     <TouchableOpacity
-        onPress={() => {
-          if (selectAll) {
-            dispatch({type: ACTIONS.SELECT_ALL, selected: []});
-          } else {
-            dispatch({
-              type: ACTIONS.SELECT_ALL,
-              selected:
-                selection.type === 'notes' ? db.notes.all : selection.data,
-            });
-          }
+      {Platform.OS !== 'android' ? (
+        <Heading>{selectedItemsList.length + ' Selected'}</Heading>
+      ) : null}
 
-          setSelectAll(!selectAll);
-        }}
-        hitSlop={{top: 20, bottom: 20, left: 20, right: 40}}
+      <View
         style={{
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: 40,
           flexDirection: 'row',
-          alignSelf: 'flex-start',
-          marginLeft:5,
-          marginBottom:5
+          justifyContent: 'flex-start',
+          alignItems: 'center',
+          position: 'absolute',
+          right: 12,
+          paddingTop: insets.top,
         }}>
-        <Icon
-          style={{}}
-          color={selectAll ? colors.accent : colors.icon}
-          name={
-            selectAll ? 'check-circle-outline' : 'checkbox-blank-circle-outline'
-          }
-          size={SIZE.lg}
-        />
-        <Text
-          style={{
-            marginLeft: 10,
-          }}>
-          Select All
-        </Text>
-      </TouchableOpacity> */}
+        {currentScreen === 'trash' || currentScreen === 'notebooks' ? null : (
+          <ActionIcon
+            onPress={() => {
+              dispatch({type: Actions.SELECTION_MODE, enabled: false});
+              dispatch({type: Actions.CLEAR_SELECTION});
+              eSendEvent(eOpenMoveNoteDialog);
+            }}
+            customStyle={{
+              marginLeft: 10,
+            }}
+            color={colors.heading}
+            name="plus"
+            size={SIZE.xl}
+          />
+        )}
+
+        {currentScreen === 'trash' ? null : (
+          <ActionIcon
+            customStyle={{
+              marginLeft: 10,
+            }}
+            onPress={async () => {
+              eSendEvent(eOpenSimpleDialog, TEMPLATE_DELETE('item'));
+              return;
+            }}
+            color={colors.heading}
+            name="delete"
+            size={SIZE.xl}
+          />
+        )}
+
+        {currentScreen === 'trash' ? (
+          <ActionIcon
+            customStyle={{
+              marginLeft: 10,
+            }}
+            color={colors.heading}
+            onPress={async () => {
+              if (selectedItemsList.length > 0) {
+                let noteIds = [];
+                selectedItemsList.forEach((item) => {
+                  noteIds.push(item.id);
+                });
+
+                await db.trash.restore(...noteIds);
+
+                dispatch({type: Actions.TRASH});
+                dispatch({type: Actions.SELECTION_MODE, enabled: false});
+                dispatch({type: Actions.CLEAR_SELECTION});
+                ToastEvent.show('Restore complete', 'success');
+              }
+            }}
+            name="delete-restore"
+            size={SIZE.xl - 3}
+          />
+        ) : null}
+      </View>
     </Animated.View>
   );
 };

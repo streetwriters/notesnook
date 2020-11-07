@@ -61,7 +61,7 @@ export const UserSection = ({noTextMode}) => {
             fontSize: SIZE.xs,
             color: 'white',
           }}>
-          Basic
+          {user.subscription.status === 1? "Trial" : "Pro"}
         </Text>
       </View>
 
@@ -115,7 +115,7 @@ export const UserSection = ({noTextMode}) => {
             }}>
             {syncing ? 'Syncing ' : 'Synced '}
             {!syncing ? (
-              user?.notesnook?.lastSynced ? (
+              user?.lastSynced ? (
                 <TimeSince time={user.lastSynced} />
               ) : (
                 'never'

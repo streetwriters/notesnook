@@ -1,16 +1,25 @@
 import React, {useEffect, useState} from 'react';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
-import {eSubscribeEvent, eUnSubscribeEvent, ToastEvent} from '../../services/EventManager';
-import {eClearSearch, eScrollEvent, eUpdateSearchState} from '../../utils/Events';
+import {
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+  ToastEvent,
+} from '../../services/EventManager';
+import {
+  eClearSearch,
+  eScrollEvent,
+  eUpdateSearchState,
+} from '../../utils/Events';
 import {inputRef} from '../../utils/Refs';
 import {selection} from '../../utils';
 import Animated, {Easing} from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {TextInput, Text} from 'react-native';
-import {br, SIZE, WEIGHT} from "../../utils/SizeUtils";
-import {db} from "../../utils/DB";
-import {DDS} from "../../services/DeviceDetection";
+import {br, normalize, SIZE, WEIGHT} from '../../utils/SizeUtils';
+import {db} from '../../utils/DB';
+import {DDS} from '../../services/DeviceDetection';
+import {ActionIcon} from '../ActionIcon';
 const {Value, timing, block} = Animated;
 
 let searchResult = [];
@@ -28,37 +37,38 @@ const animation = (margin, opacity, border) => {
   animating = true;
   timing(_marginAnim, {
     toValue: margin,
-    duration: 230,
+    duration: 130,
     easing: Easing.inOut(Easing.ease),
   }).start();
   timing(_opacity, {
     toValue: opacity,
-    duration: 250,
+    duration: 140,
     easing: Easing.inOut(Easing.ease),
   }).start();
   timing(_borderAnim, {
     toValue: border,
-    duration: 270,
+    duration: 150,
     easing: Easing.inOut(Easing.ease),
   }).start();
   setTimeout(() => {
     animating = false;
-  }, 500);
+  }, 200);
 };
+
+let timeout = null;
 
 export const Search = (props) => {
   const [state, dispatch] = useTracked();
   const {colors, searchResults} = state;
   const [text, setText] = useState('');
   const [focus, setFocus] = useState(false);
-  const [searchState,setSearchState] = useState({
+  const [searchState, setSearchState] = useState({
     noSearch: false,
     data: [],
     type: 'notes',
     color: null,
     placeholder: 'Search all notes',
-  })
-
+  });
 
   const onScroll = (y) => {
     if (searchResults.results.length > 0) return;
@@ -76,42 +86,46 @@ export const Search = (props) => {
       timeoutAnimate = null;
       timeoutAnimate = setTimeout(() => {
         animation(-65, 0, 0);
-       
-      }, 500);
+      }, 300);
       offsetY = y;
     } else {
       if (offsetY - y < 50) return;
       clearTimeout(timeoutAnimate);
       timeoutAnimate = null;
       timeoutAnimate = setTimeout(() => {
-      
         animation(0, 1, 1.5);
-      }, 500);
+      }, 300);
       offsetY = y;
     }
   };
 
-  const updateSearchState = (state => {
+  const updateSearchState = (state) => {
     setSearchState(state);
-  })
+  };
 
   useEffect(() => {
     selection.data = searchState.data;
     selection.type = searchState.type;
     eSubscribeEvent(eScrollEvent, onScroll);
-    eSubscribeEvent('showSearch', () => {
-      console.log('show search');
-      animating = false;
+    eSubscribeEvent('showSearch', (hide) => {
+      if (hide) {
+        animation(-65, 0, 0);
+        return;
+      }
       animation(0, 1, 1.5);
     });
-    eSubscribeEvent(eUpdateSearchState,updateSearchState)
+
+    eSubscribeEvent(eUpdateSearchState, updateSearchState);
     return () => {
       eUnSubscribeEvent(eScrollEvent, onScroll);
-      eUnSubscribeEvent('showSearch', () => {
-        animating = false;
+      eUnSubscribeEvent('showSearch', (hide) => {
+        if (hide) {
+          animation(-65, 0, 0);
+          return;
+        }
         animation(0, 1, 1.5);
       });
-      eUnSubscribeEvent(eUpdateSearchState,updateSearchState)
+      eUnSubscribeEvent(eUpdateSearchState, updateSearchState);
     };
   }, [searchState]);
 
@@ -131,6 +145,15 @@ export const Search = (props) => {
           keyword: null,
         },
       });
+    } else {
+      dispatch({
+        type: Actions.SEARCH_RESULTS,
+        results: {
+          results: [],
+          type: null,
+          keyword: null,
+        },
+      });
     }
   };
 
@@ -141,15 +164,22 @@ export const Search = (props) => {
     };
   }, []);
 
+  useEffect(() => {
+    if (!text || text.length === 0) {
+      clearSearch();
+    }
+  }, [text]);
+
   const onChangeText = (value) => {
     setText(value);
   };
+
   const onSubmitEditing = async () => {
     if (!text || text.length < 1) {
-      ToastEvent.show('Please enter a search keyword');
       clearSearch();
       return;
     }
+
     let type = searchState.type;
     if (!type) return;
 
@@ -161,7 +191,6 @@ export const Search = (props) => {
     );
     if (!searchResult || searchResult.length === 0) {
       ToastEvent.show('No search results found for ' + text, 'error');
-
     } else {
       dispatch({
         type: Actions.SEARCH_RESULTS,
@@ -184,7 +213,7 @@ export const Search = (props) => {
     //setSearch(false);
   };
 
-  return searchState.data[0] && !searchState.noSearch ? (
+  return (
     <Animated.View
       style={{
         opacity: _opacity,
@@ -198,26 +227,40 @@ export const Search = (props) => {
           flexDirection: 'row',
           justifyContent: 'space-between',
           alignItems: 'center',
-          paddingLeft: 12,
           width: '100%',
           alignSelf: 'center',
           borderRadius: br,
-          height: '90%',
-          borderWidth: _borderAnim,
-          borderColor: focus
+          height: normalize(55),
+          backgroundColor: focus
             ? searchState.color
               ? searchState.color
-              : colors.accent
+              : colors.shade
             : colors.nav,
         }}>
+        <ActionIcon
+          customStyle={{
+            width: 50,
+            height: 50,
+          }}
+          name="magnify"
+          color={
+            focus
+              ? searchState.color
+                ? searchState.color
+                : colors.accent
+              : colors.icon
+          }
+          size={SIZE.xxl}
+        />
         <TextInput
           ref={inputRef}
           style={{
             fontFamily: WEIGHT.regular,
             color: colors.pri,
-            maxWidth: '85%',
-            width: '85%',
-            fontSize: SIZE.sm,
+            fontSize: SIZE.md,
+            flexGrow: 1,
+            flex: 1,
+            flexWrap: 'wrap',
           }}
           onChangeText={onChangeText}
           onSubmitEditing={onSubmitEditing}
@@ -233,22 +276,16 @@ export const Search = (props) => {
           placeholder={searchState.placeholder}
           placeholderTextColor={colors.icon}
         />
-        <Icon
-          style={{paddingRight: DDS.isTab ? 12 : 12}}
-          onPress={onSubmitEditing}
-          name="magnify"
-          color={
-            focus
-              ? searchState.color
-                ? searchState.color
-                : colors.accent
-              : colors.icon
-          }
+        <ActionIcon
+          customStyle={{
+            width: 50,
+            height: 50,
+          }}
+          name="tune"
+          color={colors.icon}
           size={SIZE.xxl}
         />
       </Animated.View>
     </Animated.View>
-  ) : (
-    <></>
   );
 };

@@ -1,97 +1,92 @@
 <html>
-
-<head>
-    <meta content="width=device-width, initial-scale=1, user-scalable=no" name="viewport"/>
-    <link href="fonts.css" rel="stylesheet">
-    <link href="styles.css" rel="stylesheet">
+  <head>
+    <meta
+      content="width=device-width, initial-scale=1, user-scalable=no"
+      name="viewport"
+    />
+    <link href="fonts.css" rel="stylesheet" />
+    <link href="styles.css" rel="stylesheet" />
     <style>
-
-        .ql-toolbar {
-            overflow-x: auto;
-            width: 100vw;
-            white-space: nowrap;
-            position: fixed;
-            height: 50px;
-            bottom: 0px;
-            left: 0px;
-        }
+      .ql-toolbar {
+        overflow-x: auto;
+        width: 100vw;
+        white-space: nowrap;
+        position: fixed;
+        height: 50px;
+        bottom: 0px;
+        left: 0px;
+      }
     </style>
+  </head>
 
-</head>
-
-<body class="app-body">
-<div id="titlebar">
-    <form
-            id="formBox"
-    >
-        <input id="titleInput" placeholder="Title here"/>
-        <div class="info-bar">
+  <body class="app-body">
+    <div class="app-main">
+      <div id="titlebar">
+        <form id="formBox">
+          <input id="titleInput" placeholder="Title here" />
+          <div class="info-bar">
             <p id="infowords"></p>
             <p>-</p>
             <p id="infodate"></p>
             <p>-</p>
             <p id="infosaved"></p>
-        </div>
-    </form>
-</div>
-<div id="editor"></div>
-<div id="toolbar"></div>
+          </div>
+        </form>
+      </div>
+      <div id="editor"></div>
+      <div id="toolbar"></div>
+    </div>
+  </body>
 
-</body>
+  <script src="constants.js"></script>
+  <script src="listeners.js"></script>
+  <script src="module.js"></script>
+  <script src="quill.js"></script>
 
-<script src="constants.js"></script>
-<script src="listeners.js"></script>
-<script src="module.js"></script>
-<script src="quill.js"></script>
-
-<script>
+  <script>
     let editor;
 
     function loadAction(premium, noMenu) {
-        let titleIn = document.getElementById('titlebar');
-        titleIn.style['padding-left'] = 0;
-        titleIn.style['padding-right'] = 0;
+      let titleIn = document.getElementById('titlebar');
+      titleIn.style['padding-left'] = 0;
+      titleIn.style['padding-right'] = 0;
 
-        let mainToolbar = premium ? proToolbar : simpleToolbar;
+      let mainToolbar = premium ? proToolbar : simpleToolbar;
 
-        const Quill = requiring('quill');
+      const Quill = requiring('quill');
 
-        setFonts();
+      setFonts();
 
-        Quill.register("modules/imageCompressor", imageCompressor);
+      Quill.register('modules/imageCompressor', imageCompressor);
 
+      editor = new Quill('#editor', {
+        modules: {
+          toolbar: mainToolbar,
+          imageCompressor: {
+            quality: 0.9,
+            maxWidth: 1024,
+            imageType: 'image/jpeg',
+          },
+          history: {
+            delay: 2000,
+            maxStack: 500,
+            userOnly: true,
+          },
+        },
+        placeholder: 'Start writing your note',
+        theme: 'snow',
+        scrollingContainer: '.app-main',
+      });
 
-        editor = new Quill('#editor', {
-            modules: {
-                toolbar: mainToolbar,
-                imageCompressor: {
-                    quality: 0.9,
-                    maxWidth: 1024,
-                    imageType: 'image/jpeg'
-                },
-                history: {
-                    delay: 2000,
-                    maxStack: 500,
-                    userOnly: true
-                }
-            },
-            placeholder: 'Start writing your note',
-            theme: 'snow',
-        });
+      let Font = Quill.import('formats/font');
+      Font.whitelist = fontNames;
+      Quill.register(Font, true);
 
-        let Font = Quill.import('formats/font');
-        Font.whitelist = fontNames;
-        Quill.register(Font, true);
-
-        addLinkMatcher();
-        attachTitleInputListeners();
-        setTheme();
-        attachEditorListeners();
-        fixDropdownMenuLocations();
+      addLinkMatcher();
+      attachTitleInputListeners();
+      setTheme();
+      attachEditorListeners();
+      fixDropdownMenuLocations();
     }
-
-
-</script>
-
-
+  </script>
 </html>

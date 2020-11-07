@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect} from 'react';
+import React, {createRef, useCallback, useEffect} from 'react';
 import {
   Appearance,
   Linking,
@@ -29,7 +29,7 @@ import {
 } from '../../utils/Events';
 import NavigationService from '../../services/Navigation';
 import storage from '../../utils/storage';
-import {setSetting, dWidth} from '../../utils';
+import {setSetting, dWidth, MenuItemsList} from '../../utils';
 import {hexToRGBA, RGB_Linear_Shade} from '../../utils/ColorUtils';
 import {sleep} from '../../utils/TimeUtils';
 import {
@@ -44,7 +44,9 @@ import {db} from '../../utils/DB';
 import {DDS} from '../../services/DeviceDetection';
 import {MMKV} from '../../utils/mmkv';
 import Backup from '../../services/Backup';
+import Menu, {MenuItem} from 'react-native-material-menu';
 
+let menuRef = createRef();
 export const Settings = ({navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors, user, settings} = state;
@@ -61,6 +63,7 @@ export const Settings = ({navigation}) => {
   }
 
   const onFocus = useCallback(() => {
+    eSendEvent('showSearch', true);
     dispatch({
       type: Actions.HEADER_STATE,
       state: true,
@@ -82,7 +85,10 @@ export const Settings = ({navigation}) => {
       type: '',
       color: null,
     });
+
   }, []);
+
+
 
   useEffect(() => {
     navigation.addListener('focus', onFocus);
@@ -91,9 +97,9 @@ export const Settings = ({navigation}) => {
     };
   });
 
-  const getTimeLeft = (t1, t2) => {
+  const getTimeLeft = (t2) => {
     let d1 = new Date(Date.now());
-    let d2 = new Date(t2);
+    let d2 = new Date(t2 * 1000);
     let diff = d2.getTime() - d1.getTime();
     diff = (diff / (1000 * 3600 * 24)).toFixed(0);
 
@@ -125,10 +131,9 @@ export const Settings = ({navigation}) => {
           paragraph:
             "All your backups are stored in 'Phone Storage/Notesnook/backups/' folder",
         });
-          await Backup.run();
-          await sleep(1000);
-          eSendEvent(eCloseProgressDialog);
-       
+        await Backup.run();
+        await sleep(1000);
+        eSendEvent(eCloseProgressDialog);
       },
       desc: 'Backup all your data to phone storage',
     },
@@ -267,29 +272,35 @@ export const Settings = ({navigation}) => {
                         fontFamily: WEIGHT.regular,
                         fontSize: SIZE.xs,
                       }}>
-                      {user.subscription.isTrial ? 'Trial' : 'Pro'}
+                      {user.subscription.status === 1 ? 'Trial' : 'Pro'}
                     </Text>
                   </View>
                 </View>
                 <Seperator />
                 <View>
-                  {user.subscription.isTrial ? (
+                  {user.subscription.status === 1 ? (
                     <Text
                       style={{
                         color:
-                          getTimeLeft(
-                            user.subscription.start,
-                            user.subscription.expiry,
-                          ) > 5
+                          getTimeLeft(parseInt(user.subscription.expiry)) > 5
                             ? colors.pri
                             : colors.errorText,
                         fontFamily: WEIGHT.regular,
                         fontSize: SIZE.xxl,
                       }}>
-                      {getTimeLeft(
-                        user.subscription.start,
-                        user.subscription.expiry,
-                      ) + ' Days Remaining'}
+                      {getTimeLeft(parseInt(user.subscription.expiry)) +
+                        ' Days Remaining'}{' '}
+                      {'\n'}
+                      <Text
+                        style={{
+                          fontSize: 12,
+                          color: colors.icon,
+                        }}>
+                        Your trail period started on{' '}
+                        {new Date(
+                          user.subscription.start * 1000,
+                        ).toLocaleDateString()}
+                      </Text>
                     </Text>
                   ) : null}
 
@@ -446,6 +457,7 @@ export const Settings = ({navigation}) => {
             alignSelf: 'center',
             flexDirection: 'row',
             flexWrap: 'wrap',
+            justifyContent: 'space-between',
             paddingHorizontal: 12,
           }}>
           {[
@@ -455,10 +467,6 @@ export const Settings = ({navigation}) => {
             '#0560FF',
             '#f58231',
             '#911eb4',
-            '#46f0f0',
-            '#f032e6',
-            '#bcf60c',
-            '#fabebe',
           ].map((item) => (
             <PressableButton
               key={item}
@@ -482,10 +490,10 @@ export const Settings = ({navigation}) => {
                 flexDirection: 'row',
                 justifyContent: 'center',
                 alignItems: 'center',
-                marginHorizontal: 5,
                 marginVertical: 5,
-                width: DDS.isTab ? (dWidth * 0.28) / 5 - 35 : dWidth / 5 - 35,
-                height: DDS.isTab ? (dWidth * 0.28) / 5 - 35 : dWidth / 5 - 35,
+                marginHorizontal: 0,
+                width: DDS.isTab ? (dWidth * 0.28) / 5 - 24 : dWidth / 7.5,
+                height: DDS.isTab ? (dWidth * 0.28) / 5 - 24 : dWidth / 7.5,
                 borderRadius: 100,
               }}>
               {colors.accent === item ? (
@@ -493,6 +501,49 @@ export const Settings = ({navigation}) => {
               ) : null}
             </PressableButton>
           ))}
+
+          <View
+            style={{
+              width: '100%',
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+            }}>
+            {['#46f0f0', '#f032e6', '#bcf60c', '#fabebe'].map((item,index) => (
+              <PressableButton
+                key={item}
+                color={
+                  colors.accent === item
+                    ? RGB_Linear_Shade(
+                        !colors.night ? -0.2 : 0.2,
+                        hexToRGBA(item, 1),
+                      )
+                    : item
+                }
+                selectedColor={item}
+                alpha={!colors.night ? -0.1 : 0.1}
+                opacity={1}
+                onPress={async () => {
+                  changeAccentColor(item);
+
+                  await MMKV.setStringAsync('accentColor', item);
+                }}
+                customStyle={{
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  marginTop: 5,
+                  marginRight:  ((dWidth) - ((dWidth / 7.5) * 6))/12 ,
+                  marginLeft: index === 0 ? 0.5 : ((dWidth - 12) - ((dWidth / 7.5) * 6))/12.1 ,
+                  width: DDS.isTab ? (dWidth * 0.28) / 5 - 24 : dWidth / 7.5,
+                  height: DDS.isTab ? (dWidth * 0.28) / 5 - 24 : dWidth / 7.5,
+                  borderRadius: 100,
+                }}>
+                {colors.accent === item ? (
+                  <Icon size={SIZE.lg} color="white" name="check" />
+                ) : null}
+              </PressableButton>
+            ))}
+          </View>
         </View>
 
         <CustomButton
@@ -538,6 +589,66 @@ export const Settings = ({navigation}) => {
               color={colors.night ? colors.accent : colors.icon}
               name={colors.night ? 'toggle-switch' : 'toggle-switch-off'}
             />
+          }
+        />
+
+        <CustomButton
+          title="Homepage"
+          tagline={'Default screen to open on app startup '}
+          onPress={() => {
+            menuRef.current?.show();
+          }}
+          customComponent={
+            <Menu
+              ref={menuRef}
+              animationDuration={200}
+              style={{
+                borderRadius: 5,
+                backgroundColor: colors.bg,
+              }}
+              button={
+                <TouchableOpacity
+                  onPress={() => {
+                    menuRef.current?.show();
+                  }}
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                  }}>
+                  <Text
+                    style={{
+                      fontSize: SIZE.sm,
+                      fontFamily: WEIGHT.regular,
+                      color: colors.pri,
+                    }}>
+                    {settings.homepage}
+                  </Text>
+                  <Icon color={colors.icon} name="menu-down" size={SIZE.md} />
+                </TouchableOpacity>
+              }>
+              {MenuItemsList.slice(0,MenuItemsList.length - 1).map((item) => (
+                <MenuItem
+                  onPress={async () => {
+                    await setSetting(settings, 'homepage', item.name);
+                  }}
+                  style={{
+                    backgroundColor:
+                      settings.homepage === item.name
+                        ? colors.shade
+                        : 'transparent',
+                  }}
+                  textStyle={{
+                    fontFamily: WEIGHT.regular,
+                    fontSize: SIZE.sm,
+                    color:
+                      settings.homepage === item.name
+                        ? colors.accent
+                        : colors.pri,
+                  }}>
+                  {item.name}
+                </MenuItem>
+              ))}
+            </Menu>
           }
         />
 
@@ -739,7 +850,7 @@ export const Settings = ({navigation}) => {
           title="Encrypted Backups"
           tagline="Encrypt your data before backup"
           onPress={async () => {
-            if (user) {
+            if (!user) {
               ToastEvent.show(
                 'You must login to enable encryption',
                 'error',

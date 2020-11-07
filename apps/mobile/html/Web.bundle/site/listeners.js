@@ -66,6 +66,20 @@ function attachEditorListeners() {
                 document.getElementById("infowords").innerText = "";
                 break
             }
+            case 'keyboard':
+                var range = editor.getSelection();
+                if (range) {
+                  if (range.length == 0) {
+                    var bounds = editor.getBounds(range.index, range.index);
+                    
+                    setTimeout(() => {
+                      document
+                        .querySelector('.app-main')
+                        .scrollTo({top: bounds.top, behavior: 'smooth'});
+                    }, 200);
+                  } 
+                }
+                break;
             case "blur":
                 document.getElementById('titleInput').blur();
                 editor.blur();
@@ -160,6 +174,9 @@ function attachEditorListeners() {
         }
         return whiteSpace;
     }
+
+
+    
 
 
     editor.on('text-change', function (delta, oldDelta, source) {

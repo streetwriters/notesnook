@@ -7,17 +7,23 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
-import {initialWindowMetrics} from 'react-native-safe-area-context';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {DataProvider, LayoutProvider, RecyclerListView} from 'recyclerlistview';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {eSendEvent, ToastEvent} from '../../services/EventManager';
-import {eClearSearch, eOpenLoginDialog, eScrollEvent} from '../../utils/Events';
+import {
+  eClearSearch,
+  eOpenJumpToDialog,
+  eOpenLoginDialog,
+  eScrollEvent,
+} from '../../utils/Events';
 import {PressableButton} from '../PressableButton';
 import {COLORS_NOTE} from '../../utils/Colors';
 import {SIZE, WEIGHT} from '../../utils/SizeUtils';
 import {db} from '../../utils/DB';
+import {HeaderMenu} from '../Header/HeaderMenu';
 
 const header = {
   type: 'MAIN_HEADER',
@@ -32,9 +38,12 @@ const SimpleList = ({
   customRefresh,
   customRefreshing,
   refreshCallback,
+  sortMenuButton,
+  scrollRef,
+  jumpToDialog,
 }) => {
   const [state, dispatch] = useTracked();
-  const {colors, selectionMode, user, messageBoardState} = state;
+  const {colors, selectionMode, messageBoardState} = state;
   const searchResults = {...state.searchResults};
   const [refreshing, setRefreshing] = useState(false);
   const [dataProvider, setDataProvider] = useState(
@@ -43,6 +52,7 @@ const SimpleList = ({
     }),
   );
   const {width, fontScale} = useWindowDimensions();
+  const insets = useSafeAreaInsets();
 
   const listData = data;
   const dataType = type;
@@ -54,7 +64,7 @@ const SimpleList = ({
 
   useEffect(() => {
     loadData();
-  }, [listData]);
+  }, [listData, searchResults.results]);
 
   const loadData = () => {
     let mainData =
@@ -68,16 +78,36 @@ const SimpleList = ({
     setDataProvider(dataProvider.cloneWithRows(d));
   };
 
-  const RenderSectionHeader = ({item}) => (
-    <Text
-      style={[
-        {
-          color: colors.accent,
-        },
-        styles.sectionHeader,
-      ]}>
-      {item.title}
-    </Text>
+  const RenderSectionHeader = ({item, index}) => (
+    <View
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        width: '100%',
+        justifyContent: 'space-between',
+        paddingHorizontal: 12,
+        height: 30,
+      }}>
+      <Text
+        onPress={() => {
+          console.log('clicekd');
+          if (jumpToDialog) {
+            eSendEvent(eOpenJumpToDialog);
+          }
+        }}
+        style={[
+          styles.sectionHeader,
+          {
+            color: colors.accent,
+            height: 30,
+            minWidth: 60,
+            textAlignVertical: 'bottom',
+          },
+        ]}>
+        {item.title}
+      </Text>
+      {index === 1 && sortMenuButton ? <HeaderMenu /> : null}
+    </View>
   );
 
   const _onRefresh = useCallback(async () => {
@@ -147,6 +177,10 @@ const SimpleList = ({
           dim.width = width;
           dim.height = 110 * fontScale;
           break;
+        case 'trash':
+          dim.width = width;
+          dim.height = 110 * fontScale;
+          break;
         case 'topic':
           dim.width = width;
           dim.height = 80 * fontScale;
@@ -180,9 +214,11 @@ const SimpleList = ({
       case 'notebook':
         return <RenderItem item={data} pinned={data.pinned} index={index} />;
       case 'MAIN_HEADER':
-        return <ListHeaderComponent type={dataType} data={listData} />;
+        return (
+          <ListHeaderComponent type={dataType} index={index} data={listData} />
+        );
       case 'header':
-        return <RenderSectionHeader item={data} />;
+        return <RenderSectionHeader item={data} index={index} />;
       default:
         return <RenderItem item={data} index={index} />;
     }
@@ -199,15 +235,16 @@ const SimpleList = ({
             ? 130
             : 130 - 60
           : listData[0] && !selectionMode
-          ? 155 - initialWindowMetrics.insets.top
-          : (155 - initialWindowMetrics.insets.top) - 60,
+          ? 155 - insets.top
+          : 155 - insets.top - 60,
     };
-  }, [selectionMode, listData, colors]);
+  }, [selectionMode, listData, colors, insets]);
 
   return !listData || listData.length === 0 || !dataProvider ? (
     _ListEmptyComponent
   ) : (
     <RecyclerListView
+      ref={scrollRef}
       layoutProvider={_layoutProvider}
       dataProvider={dataProvider}
       rowRenderer={_renderRow}
@@ -335,14 +372,7 @@ const MessageCard = ({data}) => {
 };
 
 const ListHeaderComponent = ({type, data}) => {
-  const [state] = useTracked();
-  const searchResults = {...state.searchResults};
-
-  return searchResults.type === type && searchResults.results.length > 0 ? (
-    <SearchHeader />
-  ) : (
-    <MessageCard type={type} data={data} />
-  );
+  return <MessageCard type={type} data={data} />;
 };
 
 const styles = StyleSheet.create({
@@ -371,11 +401,7 @@ const styles = StyleSheet.create({
   sectionHeader: {
     fontFamily: WEIGHT.bold,
     fontSize: SIZE.xs + 1,
-    paddingHorizontal: 12,
-    width: '100%',
     alignSelf: 'center',
-    marginTop: 10,
-    height: 25,
     textAlignVertical: 'center',
   },
   emptyList: {

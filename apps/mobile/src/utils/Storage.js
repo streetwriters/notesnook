@@ -6,6 +6,7 @@ import {PERMISSIONS, requestMultiple, RESULTS} from "react-native-permissions";
 import {MMKV} from "./MMKV";
 import { Platform } from "react-native";
 import { ANDROID_PATH, IOS_PATH } from ".";
+import { eSendEvent } from "../services/EventManager";
 
 async function read(key, isArray = false) {
   let data = await MMKV.getItem(key);
@@ -21,11 +22,13 @@ async function read(key, isArray = false) {
   return data;
 }
 
+
 async function write(key, data) {
   return await MMKV.setItem(
     key,
     typeof data === 'string' ? data : JSON.stringify(data),
   );
+
 }
 
 async function readMulti(keys) {

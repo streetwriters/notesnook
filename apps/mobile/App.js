@@ -29,6 +29,8 @@ import {DDS} from './src/services/DeviceDetection';
 import {MMKV} from './src/utils/mmkv';
 import Backup from './src/services/Backup';
 import {setLoginMessage} from './src/services/Message';
+import SplashScreen from 'react-native-splash-screen';
+import {SORT, sortSettings} from "./src/utils";
 
 let firstLoad = true;
 let note = null;
@@ -133,7 +135,6 @@ const App = () => {
       eUnSubscribeEvent(eDispatchAction, (type) => {
         dispatch(type);
       });
-
       Orientation.removeOrientationListener(_onOrientationChange);
     };
   }, []);
@@ -145,33 +146,37 @@ const App = () => {
     Initialize().finally(async () => {
       try {
         await db.init();
+      } catch (e) {
+        error = e;
+      } finally {
         user = await db.user.get();
         if (user) {
           dispatch({type: Actions.USER, user: user});
           await startSyncer();
         }
-      } catch (e) {
-        error = e;
-        console.log(e);
       }
       if (!user) {
         setLoginMessage(dispatch);
       }
+
       dispatch({type: Actions.ALL});
       setInit(true);
-      backupData();
 
-      if (error) {
-        setTimeout(() => {
-          ToastEvent.show(error.message);
-        }, 500);
-      }
+      backupData().then(r=> r)
+
+      setTimeout(() => {
+        if (error) {
+          console.log(error);
+          ToastEvent.show('Error initializing database.');
+        }
+        SplashScreen.hide();
+      }, 500);
     });
   }, []);
 
   async function backupData() {
     await sleep(1000);
-    settings = await MMKV.getStringAsync('settings');
+    let settings = await MMKV.getStringAsync('settings');
     settings = JSON.parse(settings);
     if (await Backup.checkBackupRequired(settings.reminder)) {
       try {
@@ -196,7 +201,7 @@ const App = () => {
       firstLoad = false;
     }
     settings = await MMKV.getStringAsync('settings');
-    console.log('settings', settings);
+
     if (!settings) {
       settings = defaultState.settings;
       await MMKV.setStringAsync('settings', JSON.stringify(settings));
@@ -206,8 +211,11 @@ const App = () => {
     if (settings.fontScale) {
       scale.fontScale = settings.fontScale;
     }
+    sortSettings.sort = settings.sort;
+    sortSettings.sortOrder = settings.sortOrder;
     dispatch({type: Actions.SETTINGS, settings: {...settings}});
     updateSize();
+
     await updateTheme();
   }
 

@@ -65,7 +65,7 @@ export const NoteItemWrapper = ({
         dispatch({type: Actions.SELECTED_ITEMS, item: note});
     };
 
-    const onPress = async () => {
+    const onPress = async (event) => {
         if (note.conflicted) {
             eSendEvent(eShowMergeDialog, note);
             return;
@@ -83,7 +83,7 @@ export const NoteItemWrapper = ({
             eSendEvent(eOnLoadNote, note);
         }
         if (DDS.isPhone || DDS.isSmallTab) {
-            openEditorAnimation();
+            openEditorAnimation(event.nativeEvent);
         }
     };
 

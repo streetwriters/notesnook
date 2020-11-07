@@ -64,6 +64,9 @@ export function getNote() {
 }
 
 
+export const textInput = createRef();
+
+
 export function post(type, value = null) {
     let message = {
         type,
@@ -152,7 +155,6 @@ export const _onMessage = async (evt) => {
     let message = evt.nativeEvent.data;
     clearTimeout(timer);
     timer = null;
-    console.log('new message from editor')
     if (message === 'loaded') {
     } else if (message !== '' && message !== 'loaded') {
         onChange(message);

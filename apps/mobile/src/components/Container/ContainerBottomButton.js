@@ -5,41 +5,31 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
 import {getElevation} from '../../utils';
 import {PressableButton} from '../PressableButton';
-import {pv, SIZE, WEIGHT} from "../../utils/SizeUtils";
-import {DDS} from "../../services/DeviceDetection";
+import {normalize, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
+import {DDS} from '../../services/DeviceDetection';
 
 export const ContainerBottomButton = ({title, onPress, color}) => {
-  const [state, dispatch] = useTracked();
+  const [state] = useTracked();
   const {colors} = state;
   const [buttonHide, setButtonHide] = useState(false);
   const insets = useSafeAreaInsets();
 
+  const onKeyboardHide = () => {
+    if (DDS.isTab) return;
+    setButtonHide(false);
+  };
+
+  const onKeyboardShow = () => {
+    if (DDS.isTab) return;
+    setButtonHide(true);
+  };
+
   useEffect(() => {
-    Keyboard.addListener('keyboardDidShow', () => {
-      setTimeout(() => {
-        if (DDS.isTab) return;
-        setButtonHide(true);
-      }, 300);
-    });
-    Keyboard.addListener('keyboardDidHide', () => {
-      setTimeout(() => {
-        if (DDS.isTab) return;
-        setButtonHide(false);
-      }, 0);
-    });
+    Keyboard.addListener('keyboardDidShow', onKeyboardShow);
+    Keyboard.addListener('keyboardDidHide', onKeyboardHide);
     return () => {
-      Keyboard.removeListener('keyboardDidShow', () => {
-        setTimeout(() => {
-          if (DDS.isTab) return;
-          setButtonHide(true);
-        }, 300);
-      });
-      Keyboard.removeListener('keyboardDidHide', () => {
-        setTimeout(() => {
-          if (DDS.isTab) return;
-          setButtonHide(false);
-        }, 0);
-      });
+      Keyboard.removeListener('keyboardDidShow', onKeyboardShow);
+      Keyboard.removeListener('keyboardDidHide', onKeyboardHide);
     };
   }, []);
 
@@ -74,7 +64,7 @@ export const ContainerBottomButton = ({title, onPress, color}) => {
             width: '100%',
             padding: pv,
             borderRadius: 5,
-            paddingVertical: pv + 5,
+            height: normalize(60),
           }}>
           <Icon
             name={title === 'Clear all trash' ? 'delete' : 'plus'}
