@@ -85,11 +85,9 @@ const EditorHeader = ({noMenu}) => {
 
     const load = async (item) => {
         await loadNote(item);
-        if (item.type === 'new' && item.data) {
+        if (item.type === 'new') {
             textInput.current?.focus();
             post('focusTitle');
-           
-
             Platform.OS === 'android' ? EditorWebView.current?.requestFocus() : null;
         }
         if (!DDS.isTab) {

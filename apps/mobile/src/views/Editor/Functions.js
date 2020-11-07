@@ -175,7 +175,7 @@ export const _onMessage = async (evt) => {
 export async function clearEditor() {
   clearTimer();
   if (noteEdited && id) {
-    await saveNote('clearEditor');
+    await saveNote();
   }
   if (note && note.id) {
     sendNoteEditedEvent(note.id, true);

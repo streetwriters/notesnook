@@ -32,7 +32,6 @@ import Backup from './src/services/Backup';
 import {setLoginMessage} from './src/services/Message';
 import SplashScreen from 'react-native-splash-screen';
 import {sortSettings} from './src/utils';
-import Database from 'notes-core/api';
 
 let firstLoad = true;
 let note = null;

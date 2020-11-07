@@ -147,9 +147,7 @@ function attachEditorListeners() {
 
                 const content = value
                 editor.setContents(content, 'api');
-                setTimeout(() => {
-                    //editor.setSelection(editor.getText().length - 1, 0);
-                }, 500)
+              
 
                 break;
             case "html":
@@ -157,9 +155,6 @@ function attachEditorListeners() {
                     editor.clipboard.convert(value, 'api'),
                     'silent'
                 );
-                setTimeout(() => {
-                    //editor.setSelection(editor.getText().length - 1, 0);
-                }, 0);
                 break;
             default:
                 break;
