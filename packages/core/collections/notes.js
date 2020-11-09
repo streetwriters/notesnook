@@ -66,7 +66,7 @@ export default class Notes extends Collection {
       headline: note.headline,
       pinned: !!note.pinned,
       locked: !!note.locked,
-      notebook: note.notebook || {},
+      notebook: note.notebook || undefined,
       colors: note.colors || [],
       tags: note.tags || [],
       favorite: !!note.favorite,
