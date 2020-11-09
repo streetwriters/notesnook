@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
   Platform,
   RefreshControl,
@@ -13,7 +13,6 @@ import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {eSendEvent, ToastEvent} from '../../services/EventManager';
 import {
-  eClearSearch,
   eOpenJumpToDialog,
   eOpenLoginDialog,
   eScrollEvent,
@@ -33,7 +32,6 @@ const SimpleList = ({
   type,
   placeholder,
   RenderItem,
-  focused,
   customRefresh,
   customRefreshing,
   refreshCallback,
@@ -55,6 +53,7 @@ const SimpleList = ({
   const listData = data;
   const dataType = type;
   const _onScroll = (event) => {
+    console.log(event.nativeEvent);
     if (!event) return;
     let y = event.nativeEvent.contentOffset.y;
     eSendEvent(eScrollEvent, y);
@@ -65,15 +64,8 @@ const SimpleList = ({
   }, [listData, searchResults.results]);
 
   const loadData = () => {
-    let mainData =
-      searchResults.type === type &&
-      focused() &&
-      searchResults.results.length > 0
-        ? searchResults.results
-        : listData;
-
-    let d = [header, ...mainData];
-    setDataProvider(dataProvider.cloneWithRows(d));
+    let mainData = [header, ...listData];
+    setDataProvider(dataProvider.cloneWithRows(mainData));
   };
 
   const RenderSectionHeader = ({item, index}) => (
@@ -235,6 +227,10 @@ const SimpleList = ({
       scrollViewProps={{
         refreshControl: (
           <RefreshControl
+            style={{
+              opacity: 0,
+              elevation: 0,
+            }}
             tintColor={colors.accent}
             colors={[colors.accent]}
             progressViewOffset={150}
@@ -242,6 +238,7 @@ const SimpleList = ({
             refreshing={customRefresh ? customRefreshing : refreshing}
           />
         ),
+        overScrollMode: 'always',
         contentContainerStyle: {
           width: '100%',
           alignSelf: 'center',
@@ -252,43 +249,13 @@ const SimpleList = ({
         height: '100%',
         backgroundColor: colors.bg,
         width: '100%',
-        paddingTop:10
+        paddingTop: 10,
       }}
     />
   );
 };
 
 export default SimpleList;
-
-const SearchHeader = () => {
-  const [state] = useTracked();
-  const {colors} = state;
-  const searchResults = {...state.searchResults};
-
-  return (
-    <View style={styles.searchHeader}>
-      <Text
-        style={{
-          fontFamily: WEIGHT.bold,
-          color: colors.accent,
-          fontSize: SIZE.xs,
-        }}>
-        Showing Results for {searchResults.keyword}
-      </Text>
-      <Text
-        onPress={() => {
-          eSendEvent(eClearSearch);
-        }}
-        style={{
-          fontFamily: WEIGHT.regular,
-          color: colors.errorText,
-          fontSize: SIZE.xs,
-        }}>
-        Clear
-      </Text>
-    </View>
-  );
-};
 
 const MessageCard = ({data}) => {
   const [state] = useTracked();
