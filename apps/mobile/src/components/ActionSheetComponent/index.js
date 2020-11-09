@@ -35,6 +35,8 @@ import {Button} from '../Button';
 import {PremiumTag} from '../Premium/PremiumTag';
 import {PressableButton} from '../PressableButton';
 import {Toast} from '../Toast';
+import Heading from '../Typography/Heading';
+import Paragraph from '../Typography/Paragraph';
 import {ActionSheetColorsSection} from './ActionSheetColorsSection';
 import {ActionSheetTagsSection} from './ActionSheetTagsSection';
 const w = Dimensions.get('window').width;
@@ -306,15 +308,7 @@ export const ActionSheetComponent = ({
           size={DDS.isTab ? SIZE.xl : SIZE.lg}
           color={rowItem.name === 'Delete' ? colors.errorText : colors.accent}
         />
-
-        <Text
-          style={{
-            fontFamily: WEIGHT.regular,
-            fontSize: DDS.isTab ? SIZE.sm : SIZE.xs + 1,
-            color: colors.pri,
-          }}>
-          {rowItem.name}
-        </Text>
+        <Paragraph>{rowItem.name}</Paragraph>
       </TouchableOpacity>
     ) : null;
 
@@ -349,14 +343,7 @@ export const ActionSheetComponent = ({
             color={colors.pri}
             size={SIZE.md}
           />
-          <Text
-            style={{
-              fontFamily: WEIGHT.regular,
-              fontSize: SIZE.sm,
-              color: colors.pri,
-            }}>
-            {item.name}
-          </Text>
+          <Paragraph>{item.name}</Paragraph>
         </View>
 
         <View
@@ -474,16 +461,9 @@ export const ActionSheetComponent = ({
         paddingHorizontal: 0,
       }}>
       {!note.id && !note.dateCreated ? (
-        <Text
-          style={{
-            width: '100%',
-            textAlign: 'center',
-            marginVertical: 10,
-            color: colors.icon,
-            fontFamily: WEIGHT.regular,
-          }}>
-          Please start writing to save your note.
-        </Text>
+        <Paragraph style={{marginVertical: 10}}>
+          Start writing to save your note.
+        </Paragraph>
       ) : (
         <View
           style={{
@@ -491,21 +471,13 @@ export const ActionSheetComponent = ({
             alignItems: 'center',
             marginVertical: 10,
           }}>
-          <Text
-            numberOfLines={1}
-            style={{
-              color: colors.heading,
-              fontSize: SIZE.sm + 1,
-              fontFamily: WEIGHT.bold,
-              maxWidth: '100%',
-            }}>
-            {note.title.replace('\n', '')}
-          </Text>
+          <Heading size={SIZE.md}>{note.title.replace('\n', '')}</Heading>
+
           <Text
             numberOfLines={2}
             style={{
-              fontSize: SIZE.sm - 1,
-              color: colors.pri + 'B3',
+              fontSize: SIZE.sm,
+              color: colors.pri,
               fontFamily: WEIGHT.regular,
               width: '100%',
               textAlign: 'center',
@@ -524,7 +496,7 @@ export const ActionSheetComponent = ({
           <Text
             style={{
               color: colors.icon,
-              fontSize: SIZE.xs - 1,
+              fontSize: SIZE.xs,
               textAlignVertical: 'center',
               fontFamily: WEIGHT.regular,
               marginTop: 2.5,
@@ -567,7 +539,7 @@ export const ActionSheetComponent = ({
                         style={{
                           color: 'white',
                           fontFamily: WEIGHT.regular,
-                          fontSize: SIZE.xxs,
+                          fontSize: SIZE.xs,
                           maxWidth: '100%',
                         }}>
                         {topic.title}
@@ -583,7 +555,7 @@ export const ActionSheetComponent = ({
               onPress={onPressSync}
               style={{
                 color: colors.accent,
-                fontSize: SIZE.xs - 1,
+                fontSize: SIZE.xs,
                 textAlignVertical: 'center',
                 fontFamily: WEIGHT.regular,
                 marginTop: 5,
@@ -592,6 +564,7 @@ export const ActionSheetComponent = ({
                 borderColor: colors.accent,
                 paddingHorizontal: 5,
                 borderRadius: 2,
+                height: 20,
               }}>
               {user && user.lastSynced > note.dateEdited
                 ? 'Synced'
@@ -601,7 +574,7 @@ export const ActionSheetComponent = ({
 
           {refreshing ? (
             <ActivityIndicator
-              style={{marginTop: 5}}
+              style={{marginTop: 5, height: 20}}
               size={12}
               color={colors.accent}
             />

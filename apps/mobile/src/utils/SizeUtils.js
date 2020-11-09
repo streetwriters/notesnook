@@ -60,8 +60,8 @@ export const normalize = (size) => {
 export const SIZE = {
   xxs: 9 * scale.fontScale,
   xs: 11 * scale.fontScale,
-  sm: normalize(13) * scale.fontScale,
-  md: normalize(16) * scale.fontScale,
+  sm: normalize(12.5)  * scale.fontScale,
+  md: normalize(15) * scale.fontScale,
   lg: normalize(21) * scale.fontScale,
   xl: normalize(24) * scale.fontScale,
   xxl: normalize(28) * scale.fontScale,
@@ -71,8 +71,8 @@ export const SIZE = {
 export function updateSize() {
   SIZE.xxs = 9 * scale.fontScale;
   SIZE.xs = 10 * scale.fontScale;
-  SIZE.sm = normalize(13) * scale.fontScale;
-  SIZE.md = normalize(16) * scale.fontScale;
+  SIZE.sm = normalize(12.5) * scale.fontScale;
+  SIZE.md = normalize(15) * scale.fontScale;
   SIZE.lg = normalize(21) * scale.fontScale;
   SIZE.xl = normalize(24) * scale.fontScale;
   SIZE.xxl = normalize(28) * scale.fontScale;

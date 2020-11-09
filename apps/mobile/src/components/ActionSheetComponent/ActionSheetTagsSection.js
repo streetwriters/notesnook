@@ -162,19 +162,18 @@ export const ActionSheetTagsSection = ({item}) => {
           marginTop: 5,
           alignItems: 'center',
         }}>
-        <Text
-          style={{
-            fontFamily: WEIGHT.regular,
-            fontSize: SIZE.xs,
-            color: colors.pri,
-          }}>
-          {tags.filter(
-            (o) =>
-              o.noteIds.length >= 1 && !note.tags.find((t) => t === o.title),
-          ).length === 0
-            ? ''
-            : 'Suggested: '}
-        </Text>
+        {tags.filter(
+          (o) => o.noteIds.length >= 1 && !note.tags.find((t) => t === o.title),
+        ).length === 0 ? null : (
+          <Text
+            style={{
+              fontFamily: WEIGHT.regular,
+              fontSize: SIZE.xs,
+              color: colors.pri,
+            }}>
+            {"Suggested: "}
+          </Text>
+        )}
 
         {suggestions.map((tag) => (
           <TouchableOpacity
@@ -195,7 +194,7 @@ export const ActionSheetTagsSection = ({item}) => {
             <Text
               style={{
                 fontFamily: WEIGHT.regular,
-                fontSize: SIZE.xs,
+                fontSize: SIZE.sm,
                 color: colors.pri,
               }}>
               <Text

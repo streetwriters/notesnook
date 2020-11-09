@@ -8,8 +8,9 @@ import {eClearSearch} from '../../utils/Events';
 import NavigationService from '../../services/Navigation';
 import {showContext} from '../../utils';
 import {PressableButton} from '../PressableButton';
-import {SIZE, WEIGHT} from "../../utils/SizeUtils";
-import {DDS} from "../../services/DeviceDetection";
+import {SIZE, WEIGHT} from '../../utils/SizeUtils';
+import {DDS} from '../../services/DeviceDetection';
+import Paragraph from '../Typography/Paragraph';
 
 export const MenuListItem = ({item, index, noTextMode, ignore, testID}) => {
   const [state, dispatch] = useTracked();
@@ -24,15 +25,15 @@ export const MenuListItem = ({item, index, noTextMode, ignore, testID}) => {
         },
       });
       dispatch({
-            type:  Actions.HEADER_VERTICAL_MENU,
-            state: item.name === "Home",
+        type: Actions.HEADER_VERTICAL_MENU,
+        state: item.name === 'Home',
       });
       eSendEvent(eClearSearch);
     }
     if (item.func) {
-      item.func()
+      item.func();
     } else {
-      NavigationService.navigate(item.name)
+      NavigationService.navigate(item.name);
     }
     if (item.close) {
       NavigationService.closeDrawer();
@@ -45,7 +46,7 @@ export const MenuListItem = ({item, index, noTextMode, ignore, testID}) => {
       key={item.name + index}
       onPress={_onPress}
       onLongPress={(event) => {
-        showContext(event, item.name).then(r => r);
+        showContext(event, item.name).then((r) => r);
       }}
       color={
         currentScreen === item.name.toLowerCase() ? colors.shade : 'transparent'
@@ -78,16 +79,7 @@ export const MenuListItem = ({item, index, noTextMode, ignore, testID}) => {
           color={colors.accent}
           size={DDS.isTab ? SIZE.md + 5 : SIZE.md + 1}
         />
-        {noTextMode ? null : (
-          <Text
-            style={{
-              fontFamily: WEIGHT.regular,
-              fontSize: SIZE.sm,
-              color: colors.heading,
-            }}>
-            {item.name}
-          </Text>
-        )}
+        {noTextMode ? null : <Paragraph size={SIZE.md}>{item.name}</Paragraph>}
       </View>
 
       {item.switch && !noTextMode ? (
