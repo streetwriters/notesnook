@@ -24,7 +24,7 @@ public class MyTextView extends AppCompatTextView {
     }
 
     public void init() {
-        Typeface tf = Typeface.createFromAsset(getContext().getAssets(), "fonts/DMSerifText-Regular.ttf");
+        Typeface tf = Typeface.createFromAsset(getContext().getAssets(), "fonts/Poppins-SemiBold.ttf");
         setTypeface(tf);
 
     }

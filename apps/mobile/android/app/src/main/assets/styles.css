@@ -6,7 +6,7 @@
 */
 .ql-container {
     box-sizing: border-box;
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Poppins', sans-serif;
 
     margin: 0px;
     position: relative;
@@ -612,38 +612,38 @@
 
 .ql-snow .ql-editor h1 {
     font-size: 2em;
-    font-family: 'DM Serif Text', sans-serif;
-    font-weight: 400 !important;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600 !important;
 }
 
 .ql-snow .ql-editor h2 {
     font-size: 1.5em;
-    font-family: 'DM Serif Text', sans-serif;
-    font-weight: 400 !important;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600 !important;
 }
 
 .ql-snow .ql-editor h3 {
     font-size: 1.17em;
-    font-family: 'DM Serif Text', sans-serif;
-    font-weight: 400 !important;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600 !important;
 }
 
 .ql-snow .ql-editor h4 {
     font-size: 1em;
-    font-family: 'DM Serif Text', sans-serif;
-    font-weight: 400 !important;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600 !important;
 }
 
 .ql-snow .ql-editor h5 {
     font-size: 0.83em;
-    font-family: 'DM Serif Text', sans-serif;
-    font-weight: 400 !important;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600 !important;
 }
 
 .ql-snow .ql-editor h6 {
     font-size: 0.67em;
-    font-family: 'DM Serif Text', sans-serif;
-    font-weight: 400 !important;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600 !important;
 }
 
 .ql-snow .ql-editor a {
@@ -896,7 +896,7 @@
 
 .ql-toolbar.ql-snow {
     box-sizing: border-box;
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Poppins', sans-serif;
     padding: 8px;
 }
 
@@ -1038,8 +1038,8 @@
 }
 
 #formBox input {
-    font-family: "DM Serif Text", serif;
-    font-weight: 400;
+    font-family: "Poppins", serif;
+    font-weight: 600 !important;
     background-color: transparent;
     border: none;
     height: 50px;
@@ -1063,7 +1063,7 @@
     font-size: 11px;
     margin-top: -18px;
     height:20px;
-    font-family: 'DM Sans';
+    font-family: 'Poppins';
 }
 
 #titlebar input:focus {

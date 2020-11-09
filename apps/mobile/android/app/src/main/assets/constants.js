@@ -321,7 +321,7 @@ let simpleToolbar = [
 
 ];
 
-let fonts = ['DM Sans', 'sans-serif'];
+let fonts = ['Poppins', 'sans-serif'];
 let fontNames = fonts.map(font => getFontName(font));
 function getFontName(font) {
     return font.toLowerCase().replace(/\s/g, '-');
