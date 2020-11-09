@@ -2,8 +2,8 @@ import React, {useEffect, useState} from 'react';
 import {Text, View} from 'react-native';
 import {useTracked} from '../../provider';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
-import { getElevation } from '../../utils';
-import {SIZE, WEIGHT} from "../../utils/SizeUtils";
+import {getElevation} from '../../utils';
+import {SIZE, WEIGHT} from '../../utils/SizeUtils';
 
 let contextTimeout = null;
 
@@ -51,7 +51,7 @@ const ContextMenu = () => {
         left: contextMenu.location.x,
         top: contextMenu.location.y,
         backgroundColor: colors.night ? colors.nav : 'black',
-        paddingVertical: 5,
+        paddingVertical: 8,
         paddingHorizontal: 12,
         borderRadius: 5,
       }}>

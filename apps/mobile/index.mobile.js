@@ -14,6 +14,8 @@ import {
 } from './src/utils/Animations';
 import Editor from './src/views/Editor';
 import {NavigationStack} from "./src/navigation/Drawer";
+import ContextMenu from './src/components/ContextMenu';
+import { DummyText } from './src/components/DummyText';
 
 const editorRef = createRef();
 
@@ -86,6 +88,8 @@ export const Initialize = () => {
         </AnimatedScreenContainer>
       </Animatable.View>
       <Toast />
+      <ContextMenu />
+      <DummyText/>
       <DialogManager colors={colors} />
     </>
   );
