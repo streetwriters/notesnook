@@ -52,16 +52,12 @@ const EditorHeader = ({noMenu}) => {
         eSubscribeEvent(eOnLoadNote, load);
         eSubscribeEvent(eCloseFullscreenEditor, closeFullscreen);
         eSubscribeEvent(eClearEditor, onCallClear);
-        Keyboard.addListener("keyboardDidShow",() => {
-            post("keyboard")
-        })
+      
         return () => {
             eUnSubscribeEvent(eClearEditor, onCallClear);
             eUnSubscribeEvent(eCloseFullscreenEditor, closeFullscreen);
             eUnSubscribeEvent(eOnLoadNote, load);
-            Keyboard.removeListener("keyboardDidShow",() => {
-                post("keyboard")
-            })
+          
         };
     }, []);
 
@@ -84,6 +80,9 @@ const EditorHeader = ({noMenu}) => {
     }, [noMenu]);
 
     const load = async (item) => {
+        Keyboard.addListener("keyboardDidShow",() => {
+            post("keyboard")
+        })
         await loadNote(item);
         if (item.type === 'new') {
             textInput.current?.focus();
@@ -139,6 +138,9 @@ const EditorHeader = ({noMenu}) => {
                 ToastEvent.show('Note Saved!', 'success');
             }
             await clearEditor();
+            Keyboard.removeListener("keyboardDidShow",() => {
+                post("keyboard")
+            })
             if (handleBack) {
                 handleBack.remove();
                 handleBack = null;

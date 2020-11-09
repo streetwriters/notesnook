@@ -7,7 +7,6 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {DataProvider, LayoutProvider, RecyclerListView} from 'recyclerlistview';
 import {useTracked} from '../../provider';
@@ -52,7 +51,6 @@ const SimpleList = ({
     }),
   );
   const {width, fontScale} = useWindowDimensions();
-  const insets = useSafeAreaInsets();
 
   const listData = data;
   const dataType = type;
@@ -224,22 +222,6 @@ const SimpleList = ({
     }
   };
 
-  const listStyle = useMemo(() => {
-    return {
-      height: '100%',
-      backgroundColor: colors.bg,
-      width: '100%',
-      paddingTop:
-        Platform.OS === 'ios'
-          ? listData[0] && !selectionMode
-            ? 130
-            : 130 - 60
-          : listData[0] && !selectionMode
-          ? 155 - insets.top
-          : 155 - insets.top - 60,
-    };
-  }, [selectionMode, listData, colors, insets]);
-
   return !listData || listData.length === 0 || !dataProvider ? (
     _ListEmptyComponent
   ) : (
@@ -266,7 +248,12 @@ const SimpleList = ({
           minHeight: '100%',
         },
       }}
-      style={listStyle}
+      style={{
+        height: '100%',
+        backgroundColor: colors.bg,
+        width: '100%',
+        paddingTop:10
+      }}
     />
   );
 };

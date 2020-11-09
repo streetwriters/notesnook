@@ -22,13 +22,13 @@ function onTitleChange() {
   };
 
   if (titleMessage && typeof titleMessage.value === 'string') {
-    //window.ReactNativeWebView.postMessage(JSON.stringify(titleMessage));
+    window.ReactNativeWebView.postMessage(JSON.stringify(titleMessage));
   }
 }
 
 function attachEditorListeners() {
   editor.once('text-change', function () {
-    //window.ReactNativeWebView.postMessage('loaded');
+    window.ReactNativeWebView.postMessage('loaded');
     let text = editor.getText();
     document.getElementById('infowords').innerText =
       text.split(' ').length + ' words';
@@ -203,6 +203,6 @@ function attachEditorListeners() {
       m.text.split(' ').length + ' words';
     m.html = editor.root.innerHTML;
     m.type = 'content';
-    //window.ReactNativeWebView.postMessage(JSON.stringify(m));
+    window.ReactNativeWebView.postMessage(JSON.stringify(m));
   });
 }

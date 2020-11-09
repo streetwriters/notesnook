@@ -1,52 +1,32 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {ActivityIndicator, Platform, StyleSheet, View} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useTracked} from '../../provider';
-import {eSendEvent, eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
+import {
+  eSendEvent,
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+} from '../../services/EventManager';
 import {dWidth} from '../../utils';
 import {ActionIcon} from '../ActionIcon';
 import {HeaderMenu} from './HeaderMenu';
 import {HeaderTitle} from './HeaderTitle';
-import {SIZE} from "../../utils/SizeUtils";
-import {HeaderLeftMenu} from "./HeaderLeftMenu";
-import { eScrollEvent } from '../../utils/Events';
+import {SIZE} from '../../utils/SizeUtils';
+import {HeaderLeftMenu} from './HeaderLeftMenu';
+import {eScrollEvent} from '../../utils/Events';
 
-let timeout = null;
-export const Header = ({ root}) => {
-  const [state, ] = useTracked();
+export const Header = ({root}) => {
+  const [state] = useTracked();
   const {colors, syncing} = state;
   const insets = useSafeAreaInsets();
-  const [hideHeader,setHideHeader] = useState(false);
-
-  const {
-    searchResults,
-  } = state;
-  let offsetY = 0;
-
+  const [hide, setHide] = useState(false);
 
   const onScroll = (y) => {
-    if (searchResults.results.length > 0) return;
-    if (y < 30) {
-      setHideHeader(false);
-      offsetY = y;
-    }
-    if (y > offsetY) {
-      if (y - offsetY < 100) return;
-      clearTimeout(timeout);
-      timeout = null;
-      timeout = setTimeout(() => {
-        setHideHeader(true);
-      }, 300);
-      offsetY = y;
+    if (y > 3) {
+      setHide(false);
     } else {
-      if (offsetY - y < 50) return;
-      clearTimeout(timeout);
-      timeout = null;
-      timeout = setTimeout(() => {
-        setHideHeader(false);
-      }, 300);
-      offsetY = y;
+      setHide(true);
     }
   };
 
@@ -65,10 +45,12 @@ export const Header = ({ root}) => {
           marginTop: insets.top,
           backgroundColor: colors.bg,
           overflow: 'hidden',
+          borderBottomWidth: 1,
+          borderBottomColor: hide ? 'transparent' : colors.nav,
         },
       ]}>
       <View style={styles.leftBtnContainer}>
-        <HeaderLeftMenu/>
+        <HeaderLeftMenu />
         {Platform.OS === 'android' ? <HeaderTitle root={root} /> : null}
       </View>
       {Platform.OS !== 'android' ? <HeaderTitle root={root} /> : null}
@@ -94,26 +76,17 @@ export const Header = ({ root}) => {
       </Animatable.View>
 
       <View style={styles.rightBtnContainer}>
-        <Animatable.View
-          transition="opacity"
-          useNativeDriver={true}
-          duration={500}
-          style={{
-            opacity: hideHeader ? 1 : 0,
-          }}>
-          <ActionIcon
-            onPress={() => {
-              if (!hideHeader) return;
-              setHideHeader(false);
-              eSendEvent('showSearch');
-            }}
-            name="magnify"
-            size={SIZE.xl}
-            color={colors.pri}
-            style={styles.rightBtn}
-          />
-        </Animatable.View>
-
+        <ActionIcon
+          onPress={() => {
+            if (!hideHeader) return;
+            setHideHeader(false);
+            eSendEvent('showSearch');
+          }}
+          name="magnify"
+          size={SIZE.xxxl}
+          color={colors.pri}
+          style={styles.rightBtn}
+        />
       </View>
     </View>
   );
@@ -124,7 +97,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     zIndex: 11,
     height: 50,
-    marginBottom: 10,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 12,

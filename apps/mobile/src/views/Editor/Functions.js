@@ -332,8 +332,6 @@ const loadNoteInEditor = async () => {
     await sleep(50);
     post('title', title);
     post('delta', content.delta);
-  } else {
-    post('focusTitle');
   }
   await sleep(50);
   post('clearHistory');
