@@ -24,7 +24,7 @@ const Paragraph = ({color, size, style, ...restProps}) => {
       style={[
         {
           fontFamily: WEIGHT.regular,
-          fontSize: size || SIZE.xs + 1,
+          fontSize: size || SIZE.sm,
           color: color || colors.pri,
         },
         style,

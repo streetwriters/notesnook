@@ -1038,7 +1038,7 @@
 }
 
 #formBox input {
-    font-family: "Poppins", serif;
+    font-family: "Poppins", sans-serif;
     font-weight: 600 !important;
     background-color: transparent;
     border: none;
