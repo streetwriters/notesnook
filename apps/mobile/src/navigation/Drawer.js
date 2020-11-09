@@ -43,7 +43,7 @@ export const NavigationStack = ({component = NavigatorStack}) => {
                         ? Dimensions.get('window').width * 0.05
                         : DDS.isSmallTab
                             ? '40%'
-                            : Dimensions.get('window').width * 0.75,
+                            : Dimensions.get('window').width * 0.65,
                     borderRightWidth: 0,
                 }}
                 edgeWidth={200}

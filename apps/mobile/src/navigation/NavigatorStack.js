@@ -72,8 +72,7 @@ export const NavigatorStack = () => {
           initialRouteName={settings.homepage}
           screenOptions={{
             headerShown: false,
-            cardStyleInterpolator:
-              DDS.isTab && !DDS.isSmallTab ? forFade : forSlide,
+            cardStyleInterpolator: forFade,
           }}>
           <Stack.Screen name="Home" component={Home} />
           <Stack.Screen
