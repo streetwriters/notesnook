@@ -47,7 +47,7 @@ class Database {
     EV.subscribe("db:write", this._onDBWrite.bind(this));
 
     this.session = new Session(this.context);
-    this._validate();
+    await this._validate();
 
     this.user = new User(this);
     this.syncer = new Sync(this);
