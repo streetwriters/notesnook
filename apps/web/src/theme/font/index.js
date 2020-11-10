@@ -6,13 +6,13 @@ class FontFactory {
       fontSizes: new FontSizeFactory(scale),
       fontWeights: {
         body: 400,
-        heading: 400,
-        bold: 400
+        heading: 600,
+        bold: 600,
       },
       fonts: {
-        body: "DM Sans, sans-serif",
-        heading: `"DM Serif Text", serif`
-      }
+        body: "Poppins, sans-serif",
+        heading: `Poppins, sans-serif`,
+      },
     };
   }
 }

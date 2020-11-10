@@ -1,13 +1,13 @@
 class FontSizeFactory {
   constructor(scaleFactor) {
     return {
-      heading: 28 * scaleFactor,
-      input: 16 * scaleFactor,
-      title: 18 * scaleFactor,
-      subtitle: 16 * scaleFactor,
-      body: 14 * scaleFactor,
+      heading: 24 * scaleFactor,
+      input: 14 * scaleFactor,
+      title: 14 * scaleFactor,
+      subtitle: 12 * scaleFactor,
+      body: 13 * scaleFactor,
       menu: 14 * scaleFactor,
-      subBody: 12 * scaleFactor,
+      subBody: 10 * scaleFactor,
     };
   }
 }
