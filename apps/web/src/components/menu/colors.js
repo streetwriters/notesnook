@@ -29,8 +29,8 @@ function Colors(props) {
               data-test-id={`menuitem-colors-${label}-check`}
               sx={{
                 position: "absolute",
-                left: "5px",
-                top: "4px",
+                left: 1,
+                top: 1,
                 cursor: "pointer",
               }}
               color="static"

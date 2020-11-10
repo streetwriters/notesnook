@@ -171,7 +171,8 @@ class EditorStore extends BaseStore {
   };
 
   setColor = (color) => {
-    this._setTagOrColor("color", color);
+    //this._setTagOrColor("color", color);
+    return noteStore.setColor(this.get().session.id, color);
   };
 
   setTag = (tag) => {

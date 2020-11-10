@@ -95,17 +95,15 @@ class NoteStore extends BaseStore {
   };
 
   setColor = async (id, color) => {
-    const note = db.notes.note(id);
+    let note = db.notes.note(id);
     if (!note) return;
-    let index = note.data.colors.indexOf(color);
-    if (index > -1) {
-      await note.uncolor(color);
-    } else {
-      await note.color(color);
+    for (var c of note.data.colors) {
+      await note.uncolor(c);
     }
+    await db.notes.note(id).color(color);
+    appStore.refreshColors();
     if (!this._syncEditor(note.id, "colors", db.notes.note(id).data.colors)) {
       this.refresh();
-      appStore.refreshColors();
     }
   };
 
