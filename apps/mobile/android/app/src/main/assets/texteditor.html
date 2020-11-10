@@ -1,11 +1,10 @@
 <html>
 
 <head>
-    <meta content="width=device-width, initial-scale=1, user-scalable=no" name="viewport"/>
+    <meta content="width=device-width, initial-scale=1, user-scalable=no" name="viewport" />
     <link href="fonts.css" rel="stylesheet">
     <link href="styles.css" rel="stylesheet">
     <style>
-            
         .ql-toolbar {
             overflow-x: auto;
             width: 100vw;
@@ -19,27 +18,30 @@
     </style>
 </head>
 
-<body  class="app-body" >
-<div class="app-main">
+<body class="app-body">
+    <div class="app-main">
 
 
-<div id="titlebar">
-    <form id="formBox">
-        <input id="titleInput" placeholder="Title here"/>
-    </form>
-    <div class="info-bar">
-        <p id="infowords"></p>
-        <p>•</p>
-        <p id="infodate"></p>
-        <p>•</p>
-        <p id="infosaved"></p>
+        <div id="titlebar">
+            <form id="formBox">
+                <textarea maxlength="150" id="titleInput" placeholder="Title here"
+                   ></textarea>
+                <div id="textCopy"></div>
+            </form>
+            <div class="info-bar">
+                <p id="infowords">12 words</p>
+                <p>•</p>
+                <p id="infodate">20-20-2019</p>
+                <p>•</p>
+                <p id="infosaved">Saved</p>
+            </div>
+
+        </div>
+
+        <div id="editor"></div>
     </div>
-</div>
-
-<div id="editor"></div>
-</div>
-<div id="toolbar"></div>
-</div>
+    <div id="toolbar"></div>
+    </div>
 </body>
 <script src="constants.js"></script>
 <script src="listeners.js"></script>

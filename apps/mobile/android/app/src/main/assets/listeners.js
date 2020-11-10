@@ -1,4 +1,12 @@
 function attachTitleInputListeners() {
+  document.addEventListener(
+    'DOMContentLoaded',
+    () => {
+      autosize();
+    },
+    false,
+  );
+
   document.getElementById('formBox').onsubmit = function (evt) {
     evt.preventDefault();
     editor.focus();
@@ -7,31 +15,38 @@ function attachTitleInputListeners() {
   };
 
   document.getElementById('titleInput').onkeydown = function (evt) {
-    onTitleChange();
+    onTitleChange(evt);
+  };
+
+  document.getElementById('titleInput').onchange = function (evt) {
+    onTitleChange(evt);
   };
 
   document.getElementById('titleInput').onkeyup = function (evt) {
-    onTitleChange();
+    onTitleChange(evt);
   };
 }
 
-function onTitleChange() {
+function onTitleChange(ele) {
   let titleMessage = {
     type: 'title',
     value: document.getElementById('titleInput').value,
   };
-
+  autosize();
   if (titleMessage && typeof titleMessage.value === 'string') {
     window.ReactNativeWebView.postMessage(JSON.stringify(titleMessage));
   }
 }
 
+function autosize() {
+  document.getElementById('textCopy').innerHTML = document
+    .getElementById('titleInput')
+    .value.replace(/\n/g, '<br/>');
+}
+
 function attachEditorListeners() {
   editor.once('text-change', function () {
     window.ReactNativeWebView.postMessage('loaded');
-    let text = editor.getText();
-    document.getElementById('infowords').innerText =
-      text.split(' ').length + ' words';
   });
 
   document.addEventListener('message', (data) => {
@@ -62,13 +77,13 @@ function attachEditorListeners() {
         if (range) {
           if (range.length == 0) {
             var bounds = editor.getBounds(range.index, range.index);
-            
+
             setTimeout(() => {
               document
                 .querySelector('.app-main')
                 .scrollTo({top: bounds.top, behavior: 'smooth'});
             }, 200);
-          } 
+          }
         }
         break;
       case 'blur':
@@ -93,13 +108,13 @@ function attachEditorListeners() {
         break;
       case 'text':
         editor.setText(value, 'api');
-        setTimeout(() => {
-          if (message.focus === 'editor') {
-            //editor.focus();
-          } else {
-            //document.getElementById('titleInput').focus();
-          }
-        }, 0);
+
+          setTimeout(() => {
+            document.getElementById('infowords').innerText =
+              editor.getText().split(' ').length + ' words';
+            document.getElementById('infosaved').innerText = 'Saved';
+          }, 100);
+       
         break;
       case 'clearEditor':
         editor.setText('', 'api');
@@ -112,6 +127,7 @@ function attachEditorListeners() {
         break;
       case 'focusTitle':
         document.getElementById('titleInput').focus();
+
         break;
       case 'nomenu':
         let isenabled = value;
@@ -131,6 +147,7 @@ function attachEditorListeners() {
         document.getElementById('titleInput').value = JSON.parse(
           data.data,
         ).value;
+        autosize();
         break;
       case 'theme':
         pageTheme.colors = value;
@@ -140,9 +157,15 @@ function attachEditorListeners() {
       case 'delta':
         const content = value;
         editor.setContents(content, 'api');
-        /* setTimeout(() => {
-                  editor.setSelection(editor.getText().length - 1, 0);
-                }, 500) */
+
+        setTimeout(() => {
+          document.getElementById('infowords').innerText =
+            editor.getText().split(' ').length + ' words';
+          document.getElementById('infosaved').innerText = 'Saved';
+
+          document.body.scrollTop = 0; // For Safari
+          document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+        }, 100);
 
         break;
       case 'html':
@@ -204,5 +227,13 @@ function attachEditorListeners() {
     m.html = editor.root.innerHTML;
     m.type = 'content';
     window.ReactNativeWebView.postMessage(JSON.stringify(m));
+
+    window.ReactNativeWebView.postMessage(
+      JSON.stringify({
+        type: 'history',
+        undo: editor.history.stack.undo.length,
+        redo: editor.history.stack.redo.length,
+      }),
+    );
   });
 }

@@ -172,7 +172,7 @@ const setTheme = function () {
     color: ${pageTheme.colors.icon};
     display: inline-block;
     float: left;
-    font-size:${(pageTheme.colors.factor * 16)};
+    font-size:${(pageTheme.colors.factor * 13)};
     font-weight: 500;
     height: 24px;
     position: relative;
@@ -227,7 +227,7 @@ const setTheme = function () {
     padding: 5px 12px;
     white-space: nowrap;
     position: absolute;
-    font-size:${(pageTheme.colors.factor * 12)};
+    font-size:${(pageTheme.colors.factor * 11)};
   }
 
   .ql-snow .ql-tooltip a.ql-action::after {
@@ -272,7 +272,14 @@ const setTheme = function () {
 
   #titleInput {
     color:${pageTheme.colors.pri};
-    font-size:${27 * pageTheme.colors.factor};
+    font-size:${32 * 1.5 * pageTheme.colors.factor};
+
+  }
+
+
+  #textCopy {
+    color:${pageTheme.colors.pri};
+    font-size:${32 * 1.5 * pageTheme.colors.factor};
 
   }
   #titleInput::-webkit-input-placeholder {
