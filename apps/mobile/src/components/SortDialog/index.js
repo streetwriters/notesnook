@@ -136,7 +136,7 @@ class SortDialog extends React.Component {
                         <Seperator/>
                         {
                             Object.keys(SORT).map((item, index) => <PressableButton
-
+                                key={item}
                                 color={this.state.settings.sort === item ? colors.shade : "transparent"}
                                 onPress={async () => {
                                     await setSetting(this.state.settings, 'sort', item);

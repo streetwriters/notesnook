@@ -103,7 +103,7 @@ export const itemSkus = Platform.select({
 
 export const MenuItemsList = [
   {
-    name: 'Home',
+    name: 'Notes',
     icon: 'home-variant-outline',
     close: true,
   },

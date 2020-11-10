@@ -82,7 +82,7 @@ export const ContainerBottomButton = ({title, onPress, color}) => {
           <Icon
             name={title === 'Clear all trash' ? 'delete' : 'plus'}
             color="white"
-            size={SIZE.xl}
+            size={SIZE.xxl}
           />
         </View>
       </PressableButton>

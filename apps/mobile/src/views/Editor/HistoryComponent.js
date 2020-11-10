@@ -1,6 +1,7 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {ActionIcon} from '../../components/ActionIcon';
 import {useTracked} from '../../provider';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
 import {post,} from './Functions';
 
 
@@ -12,26 +13,42 @@ const HistoryComponent = () => {
         redo:0
     });
 
+    const onHistoryChange = (data) => {
+        setHistoryState(data);
+    }
+
+    useEffect(() => {
+        eSubscribeEvent('historyEvent',onHistoryChange);
+
+        return () => {
+            eUnSubscribeEvent('historyEvent',onHistoryChange);
+        }
+    },[])
+
     return (
         <>
 
             <ActionIcon
-                name="undo-variant"
+                name="undo"
+                disabled={historyState.undo === 0}
                 color={colors.heading}
                 customStyle={{
                     marginLeft: 10,
                 }}
                 onPress={() => {
+                    if (historyState.undo === 0) return;
                     post('undo');
                 }}
             />
             <ActionIcon
-                name="redo-variant"
+                name="redo"
+                disabled={historyState.redo=== 0}
                 color={colors.heading}
                 customStyle={{
                     marginLeft: 10,
                 }}
                 onPress={() => {
+                    if (historyState.redo === 0) return;
                     post('redo');
                 }}
             />

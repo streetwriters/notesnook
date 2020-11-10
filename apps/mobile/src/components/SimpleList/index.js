@@ -22,6 +22,11 @@ import {COLORS_NOTE} from '../../utils/Colors';
 import {SIZE, WEIGHT} from '../../utils/SizeUtils';
 import {db} from '../../utils/DB';
 import {HeaderMenu} from '../Header/HeaderMenu';
+import Heading from '../Typography/Heading';
+import {ListHeaderComponent} from './ListHeaderComponent';
+import Paragraph from '../Typography/Paragraph';
+import {Button} from '../Button';
+import Seperator from '../Seperator';
 
 const header = {
   type: 'MAIN_HEADER',
@@ -38,9 +43,10 @@ const SimpleList = ({
   sortMenuButton,
   scrollRef,
   jumpToDialog,
+  placeholderData,
 }) => {
   const [state, dispatch] = useTracked();
-  const {colors, selectionMode, messageBoardState} = state;
+  const {colors, selectionMode} = state;
   const searchResults = {...state.searchResults};
   const [refreshing, setRefreshing] = useState(false);
   const [dataProvider, setDataProvider] = useState(
@@ -53,7 +59,6 @@ const SimpleList = ({
   const listData = data;
   const dataType = type;
   const _onScroll = (event) => {
-    console.log(event.nativeEvent);
     if (!event) return;
     let y = event.nativeEvent.contentOffset.y;
     eSendEvent(eScrollEvent, y);
@@ -76,7 +81,7 @@ const SimpleList = ({
         width: '100%',
         justifyContent: 'space-between',
         paddingHorizontal: 12,
-        height: 30,
+        height: 35,
       }}>
       <Text
         onPress={() => {
@@ -89,9 +94,8 @@ const SimpleList = ({
           styles.sectionHeader,
           {
             color: colors.accent,
-            height: 30,
+            height: 35,
             minWidth: 60,
-            textAlignVertical: 'bottom',
           },
         ]}>
         {item.title}
@@ -146,10 +150,29 @@ const SimpleList = ({
       style={[
         {
           backgroundColor: colors.bg,
+          height: '100%',
         },
-        styles.emptyList,
       ]}>
-      <>{placeholder}</>
+      <ListHeaderComponent type={type} />
+
+      <View
+        style={{
+          flexGrow: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        <Heading>{placeholderData.heading}</Heading>
+        <Paragraph color={colors.icon}>{placeholderData.paragraph}</Paragraph>
+        <Seperator />
+       {placeholderData.button && <Button
+          onPress={placeholderData.action}
+          color="bg"
+          title={placeholderData.button}
+          icon="plus"
+          iconColor="accent"
+          fontSize={SIZE.md}
+        /> } 
+      </View>
     </View>
   );
 
@@ -181,14 +204,11 @@ const SimpleList = ({
           break;
         case 'header':
           dim.width = width;
-          dim.height = 30 * fontScale;
+          dim.height = 35 * fontScale;
           break;
         case 'MAIN_HEADER':
           dim.width = width;
-          dim.height =
-            !messageBoardState.visible || !listData[0] || selectionMode
-              ? 0
-              : 40 * fontScale;
+          dim.height = 200;
           break;
         default:
           dim.width = width;
@@ -223,6 +243,7 @@ const SimpleList = ({
       dataProvider={dataProvider}
       rowRenderer={_renderRow}
       onScroll={_onScroll}
+      canChangeSize={true}
       renderFooter={() => <View style={{height: 400}} />}
       scrollViewProps={{
         refreshControl: (
@@ -249,7 +270,6 @@ const SimpleList = ({
         height: '100%',
         backgroundColor: colors.bg,
         width: '100%',
-        paddingTop: 10,
       }}
     />
   );
@@ -257,77 +277,7 @@ const SimpleList = ({
 
 export default SimpleList;
 
-const MessageCard = ({data}) => {
-  const [state] = useTracked();
-  const {colors, selectionMode, currentScreen, messageBoardState} = state;
 
-  return (
-    <View>
-      {!messageBoardState.visible || !data[0] || selectionMode ? null : (
-        <PressableButton
-          onPress={messageBoardState.onPress}
-          color={
-            COLORS_NOTE[currentScreen]
-              ? COLORS_NOTE[currentScreen]
-              : colors.shade
-          }
-          selectedColor={
-            COLORS_NOTE[currentScreen]
-              ? COLORS_NOTE[currentScreen]
-              : colors.accent
-          }
-          alpha={!colors.night ? -0.02 : 0.1}
-          opacity={0.12}
-          customStyle={styles.loginCard}>
-          <View
-            style={{
-              width: 25,
-              backgroundColor: COLORS_NOTE[currentScreen]
-                ? COLORS_NOTE[currentScreen]
-                : colors.accent,
-              height: 25,
-              borderRadius: 100,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}>
-            <Icon
-              style={styles.loginIcon}
-              name={messageBoardState.icon}
-              color="white"
-              size={SIZE.xs}
-            />
-          </View>
-          <View
-            style={{
-              marginLeft: 10,
-            }}>
-            <Text
-              style={{
-                fontFamily: WEIGHT.regular,
-                color: colors.icon,
-                fontSize: SIZE.xxs - 1,
-              }}>
-              {messageBoardState.message}
-            </Text>
-            <Text
-              style={{
-                color: COLORS_NOTE[currentScreen]
-                  ? COLORS_NOTE[currentScreen]
-                  : colors.accent,
-                fontSize: SIZE.xxs,
-              }}>
-              {messageBoardState.actionText}
-            </Text>
-          </View>
-        </PressableButton>
-      )}
-    </View>
-  );
-};
-
-const ListHeaderComponent = ({type, data}) => {
-  return <MessageCard type={type} data={data} />;
-};
 
 const styles = StyleSheet.create({
   loginCard: {
@@ -354,7 +304,7 @@ const styles = StyleSheet.create({
   },
   sectionHeader: {
     fontFamily: WEIGHT.bold,
-    fontSize: SIZE.xs + 1,
+    fontSize: SIZE.sm,
     alignSelf: 'center',
     textAlignVertical: 'center',
   },

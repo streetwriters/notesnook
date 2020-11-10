@@ -24,12 +24,12 @@ export const HeaderMenu = () => {
       }}>
       <Text
         style={{
-          fontSize: SIZE.xs + 1,
+          fontSize: SIZE.sm,
           fontFamily: WEIGHT.regular,
           color: colors.pri,
           marginRight: 5,
-          height: 30,
-          textAlignVertical: 'bottom',
+          height: 35,
+          textAlignVertical:'center'
         }}>
         {settings.sort.slice(0, 1).toUpperCase() +
           settings.sort.slice(1, settings.sort.length)}
@@ -40,7 +40,7 @@ export const HeaderMenu = () => {
           settings.sortOrder === 'asc' ? 'sort-ascending' : 'sort-descending'
         }
         style={{
-          textAlignVertical: 'bottom',
+          textAlignVertical:'center',
           height: 30,
         }}
         size={SIZE.md}

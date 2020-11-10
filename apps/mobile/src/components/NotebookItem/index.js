@@ -78,7 +78,7 @@ export const NotebookItem = ({
               item.topics.slice(1, 3).map((topic) => (
                 <TouchableOpacity
                   onPress={() => {
-                    NavigationService.navigate('Notes', {
+                    NavigationService.navigate('NotesPage', {
                       ...topic,
                     });
                   }}

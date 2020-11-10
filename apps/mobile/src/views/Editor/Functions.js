@@ -166,6 +166,8 @@ export const _onMessage = async (evt) => {
   clearTimeout(timer);
   timer = null;
   if (message === 'loaded') {
+  } else if (JSON.parse(message).type === 'history') {
+    eSendEvent('historyEvent', JSON.parse(message));
   } else if (message !== '' && message !== 'loaded') {
     onChange(message);
     timer = setTimeout(() => {

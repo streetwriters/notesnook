@@ -1,11 +1,11 @@
 import React, {useEffect} from 'react';
-import {Text, TouchableOpacity, View} from 'react-native';
+import {Text, View} from 'react-native';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {eSendEvent} from '../../services/EventManager';
-import {refreshNotesPage} from '../../utils/Events';
 import NavigationService from '../../services/Navigation';
-import {opacity, SIZE, WEIGHT} from '../../utils/SizeUtils';
+import {refreshNotesPage} from '../../utils/Events';
+import {SIZE, WEIGHT} from '../../utils/SizeUtils';
 import {PressableButton} from '../PressableButton';
 
 export const TagsSection = () => {
@@ -33,7 +33,7 @@ export const TagsSection = () => {
         heading: item.title,
       },
     });
-    NavigationService.navigate('Notes', params);
+    NavigationService.navigate('NotesPage', params);
     eSendEvent(refreshNotesPage, params);
     NavigationService.closeDrawer();
   };

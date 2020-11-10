@@ -74,7 +74,7 @@ export const NavigatorStack = () => {
             headerShown: false,
             cardStyleInterpolator: forFade,
           }}>
-          <Stack.Screen name="Home" component={Home} />
+          <Stack.Screen name="Notes" component={Home} />
           <Stack.Screen
             initialParams={{
               title: 'Notebooks',
@@ -86,7 +86,7 @@ export const NavigatorStack = () => {
           />
           <Stack.Screen name="Favorites" component={Favorites} />
           <Stack.Screen name="Trash" component={Trash} />
-          <Stack.Screen name="Notes" component={Notes} />
+          <Stack.Screen name="NotesPage" component={Notes} />
           <Stack.Screen name="Tags" component={Tags} />
           <Stack.Screen name="Notebook" component={Notebook} />
           <Stack.Screen name="Settings" component={Settings} />

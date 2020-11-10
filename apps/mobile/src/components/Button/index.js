@@ -1,9 +1,9 @@
 import React from 'react';
-import { ActivityIndicator, StyleSheet, Text } from 'react-native';
+import {ActivityIndicator, StyleSheet, Text} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useTracked } from '../../provider';
-import { PressableButton } from '../PressableButton';
-import {ph, pv, SIZE, WEIGHT} from "../../utils/SizeUtils";
+import {useTracked} from '../../provider';
+import {PressableButton} from '../PressableButton';
+import {ph, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
 
 export const Button = ({
   height = 40,
@@ -14,11 +14,12 @@ export const Button = ({
   title = '',
   icon,
   color = 'accent',
-  fontSize=SIZE.sm
+  fontSize = SIZE.sm,
+  iconColor = 'white',
 }) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
-  const usedColor = 'accent' ? colors.accent : color;
+  const usedColor = color === 'accent' ? colors.accent : colors[color];
 
   return (
     <PressableButton
@@ -28,7 +29,7 @@ export const Button = ({
       alpha={grayed ? (!colors.night ? -0.04 : 0.04) : -0.1}
       customStyle={{
         height: height,
-        width: width? width : null,
+        width: width ? width : null,
         paddingVertical: pv,
         paddingHorizontal: ph,
         borderRadius: 5,
@@ -44,12 +45,15 @@ export const Button = ({
           style={{
             marginRight: 5,
           }}
-          color={grayed ? colors.icon : 'white'}
+          color={grayed ? colors.icon : colors[iconColor]}
           size={SIZE.lg}
         />
       ) : null}
       <Text
-        style={[styles.buttonText, {color: grayed ? colors.icon : 'white',fontSize:fontSize}]}>
+        style={[
+          styles.buttonText,
+          {color: grayed ? colors.icon : colors[iconColor], fontSize: fontSize},
+        ]}>
         {title}
       </Text>
     </PressableButton>

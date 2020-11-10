@@ -25,7 +25,6 @@ export const Menu = ({close = () => {}, hide, noTextMode = false}) => {
 
   function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
     let newColors = setColorScheme(colors, accent);
-    StatusBar.setBarStyle(colors.night ? 'light-content' : 'dark-content');
     dispatch({type: Actions.THEME, colors: newColors});
   }
 
@@ -70,7 +69,7 @@ export const Menu = ({close = () => {}, hide, noTextMode = false}) => {
           minHeight: '50%',
         }}
         showsVerticalScrollIndicator={false}>
-        
+
           {MenuItemsList.map((item, index) => (
             <MenuListItem
               testID={item.name}

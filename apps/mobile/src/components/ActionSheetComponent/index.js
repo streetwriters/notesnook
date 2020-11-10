@@ -71,8 +71,6 @@ export const ActionSheetComponent = ({
 
   function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
     let newColors = setColorScheme(colors, accent);
-    StatusBar.setBarStyle(colors.night ? 'light-content' : 'dark-content');
-
     dispatch({type: Actions.THEME, colors: newColors});
   }
 
