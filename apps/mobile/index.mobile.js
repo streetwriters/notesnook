@@ -1,5 +1,5 @@
-import React, {createRef, useEffect, useState} from 'react';
-import {Platform, StatusBar, View} from 'react-native';
+import React, {createRef} from 'react';
+import {View} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import Animated from 'react-native-reanimated';
 import {Screen, ScreenContainer} from 'react-native-screens';
@@ -8,8 +8,6 @@ import {Toast} from './src/components/Toast';
 import {useTracked} from './src/provider';
 import {
   EditorOpacity,
-  EditorPosition,
-  EditorScale,
   EditorTranslateY,
 } from './src/utils/Animations';
 import Editor from './src/views/Editor';
@@ -24,16 +22,8 @@ const AnimatedScreenContainer = Animated.createAnimatedComponent(
 );
 
 export const Initialize = () => {
-  const [state, dispatch] = useTracked();
+  const [state,] = useTracked();
   const {colors} = state;
-
-  useEffect(() => {
-    if (Platform.OS === 'android') {
-      StatusBar.setBackgroundColor('transparent');
-      StatusBar.setTranslucent(true);
-    }
-    StatusBar.setBarStyle(colors.night ? 'light-content' : 'dark-content');
-  }, []);
 
   return (
     <>

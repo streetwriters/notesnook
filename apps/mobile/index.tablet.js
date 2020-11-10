@@ -78,13 +78,6 @@ const NavWrapper = () => {
     };
   }, []);
 
-  useEffect(() => {
-    if (Platform.OS === 'android') {
-      StatusBar.setBackgroundColor('transparent');
-      StatusBar.setTranslucent(true);
-    }
-    StatusBar.setBarStyle(colors.night ? 'light-content' : 'dark-content');
-  }, []); 
   return (
     <>
       <View

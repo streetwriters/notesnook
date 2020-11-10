@@ -1,4 +1,4 @@
-import {Appearance, StatusBar} from "react-native";
+import {Appearance, Platform, StatusBar} from "react-native";
 import {COLOR_SCHEME, COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT, setAccentColor, setColorScheme} from "./Colors";
 import {eSendEvent, eSubscribeEvent, eUnSubscribeEvent} from "../services/EventManager";
 import {eThemeUpdated} from "./Events";
@@ -63,23 +63,19 @@ export const RGB_Linear_Shade = (p, rgba) => {
 };
 
 export async function getColorScheme(useSystemTheme) {
- 
+
     let accentColor = await MMKV.getStringAsync('accentColor');
     let theme= await MMKV.getStringAsync('theme');
- 
+
 
     if (!accentColor ) {
-        MMKV.setStringAsync('accentColor', '#0560FF');
+        await MMKV.setStringAsync('accentColor', '#0560FF');
         setAccentColor('#0560FF');
     } else {
         setAccentColor(accentColor);
     }
 
     if (useSystemTheme) {
-        StatusBar.setBarStyle(
-            Appearance.getColorScheme() === 'dark' ? 'light-content' : 'dark-content',
-        );
-
         Appearance.getColorScheme() === 'dark'
             ? setColorScheme(COLOR_SCHEME_DARK)
             : setColorScheme(COLOR_SCHEME_LIGHT);
@@ -88,17 +84,14 @@ export async function getColorScheme(useSystemTheme) {
     }
 
     if (!theme) {
-        MMKV.setStringAsync('theme', JSON.stringify({night: false}));
-
+        await MMKV.setStringAsync('theme', JSON.stringify({night: false}));
         setColorScheme(COLOR_SCHEME_LIGHT);
     } else {
         theme = JSON.parse(theme);
         theme.night
             ? setColorScheme(COLOR_SCHEME_DARK)
             : setColorScheme(COLOR_SCHEME_LIGHT);
-        StatusBar.setBarStyle(theme.night ? 'light-content' : 'dark-content');
     }
-
     eSendEvent(eThemeUpdated);
 
     return COLOR_SCHEME;

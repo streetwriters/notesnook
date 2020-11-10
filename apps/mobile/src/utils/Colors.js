@@ -1,5 +1,6 @@
 import {eSendEvent} from "../services/EventManager";
 import {eThemeUpdated} from "./Events";
+import {Platform, StatusBar} from "react-native";
 
 export const ACCENT = {
     color: '#0560FF',
@@ -17,12 +18,13 @@ const fixedColors = {
     successText: '#4F8A10',
     warningBg: '#FEEFB3',
     warningText: '#9F6000',
+    white:"#ffffff"
 };
 export var COLOR_SCHEME = {
     night: false,
     bg: 'white',
-    navbg: '#f6fbfc',
-    nav: '#f0f0f0',
+    navbg: '#f7f7f7',
+    nav: '#f7f7f7',
     pri: '#000000',
     sec: 'white',
     ...fixedColors,
@@ -31,8 +33,8 @@ export var COLOR_SCHEME = {
 export const COLOR_SCHEME_LIGHT = {
     night: false,
     bg: 'white',
-    navbg: '#f6fbfc',
-    nav: '#f0f0f0',
+    navbg: '#f7f7f7',
+    nav: '#f7f7f7',
     input: 'transparent',
     heading: '#000000',
     pri: '#24292e',
@@ -42,9 +44,9 @@ export const COLOR_SCHEME_LIGHT = {
 export const COLOR_SCHEME_DARK = {
     night: true,
     bg: '#1f1f1f',
-    navbg: '#1c1c1c',
+    navbg: '#2b2b2b',
     input: '#2d2d2d',
-    nav: '#2d2d2d',
+    nav: '#2b2b2b',
     heading: '#ffffff',
     pri: '#D3D3D3',
     sec: 'black',
@@ -63,6 +65,11 @@ export const COLORS_NOTE = {
 export function setColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
     COLOR_SCHEME = {...colors, accent: accent.color, shade: accent.shade};
 
+    StatusBar.setBarStyle(COLOR_SCHEME.night ? 'light-content' : 'dark-content');
+    if (Platform.OS === "android") {
+        StatusBar.setTranslucent(true);
+        StatusBar.setBackgroundColor(COLOR_SCHEME.bg);
+    }
     eSendEvent(eThemeUpdated);
 
     return COLOR_SCHEME;
