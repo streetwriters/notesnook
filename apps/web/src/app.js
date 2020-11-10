@@ -1,8 +1,7 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "./app.css";
 import { Flex, Box } from "rebass";
 import ThemeProvider from "./components/theme-provider";
-import { usePersistentState } from "./utils/hooks";
 import { useStore } from "./stores/app-store";
 import { useStore as useEditorStore } from "./stores/editor-store";
 import { useStore as useUserStore } from "./stores/user-store";
@@ -19,9 +18,10 @@ import {
   shouldAddSignupReminder,
 } from "./common/reminders";
 import { EV } from "notes-core/common";
+import useTablet from "./utils/use-tablet";
 
 function App() {
-  const [show, setShow] = usePersistentState("isContainerVisible", true);
+  const [show, setShow] = useState(true);
   const refreshColors = useStore((store) => store.refreshColors);
   const isFocusMode = useStore((store) => store.isFocusMode);
   const addReminder = useStore((store) => store.addReminder);
@@ -29,7 +29,9 @@ function App() {
   const initNotes = useNotesStore((store) => store.init);
   const openLastSession = useEditorStore((store) => store.openLastSession);
   const isEditorOpen = useStore((store) => store.isEditorOpen);
+  const toggleSideMenu = useStore((store) => store.toggleSideMenu);
   const isMobile = useMobile();
+  const isTablet = useTablet();
   const routeResult = useRoutes(routes);
 
   useEffect(
@@ -63,16 +65,23 @@ function App() {
   }, [openLastSession]);
 
   useEffect(() => {
-    if (!isMobile) return;
+    if (!isMobile && !isTablet) return;
     setShow(!isEditorOpen);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isEditorOpen, isMobile]);
+    // if (isTablet) toggleSideMenu(!isEditorOpen);
+    // if (!isEditorOpen && !isTablet && !isMobile) toggleSideMenu(true);
+    // // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isEditorOpen, isMobile, isTablet]);
 
   useEffect(() => {
     return () => {
       EV.unsubscribeAll();
     };
   }, []);
+
+  useEffect(() => {
+    toggleSideMenu(!isMobile);
+    if (!isMobile && !isTablet) setShow(true);
+  }, [isMobile, isTablet, toggleSideMenu]);
 
   return (
     <ThemeProvider>
@@ -99,7 +108,7 @@ function App() {
             {routeResult}
           </Animated.Flex>
           <Flex
-            width={[show ? 0 : "100%", "100%", "100%"]}
+            width={[show ? 0 : "100%", show ? 0 : "100%", "100%"]}
             flexDirection="column"
           >
             <Editor />

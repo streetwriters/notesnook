@@ -43,11 +43,12 @@ function Menu(props) {
                   .join("")
                   .toLowerCase()}`}
                 key={item.title}
-                onClick={(e) => {
+                onClick={async (e) => {
                   e.stopPropagation();
                   if (props.closeMenu) {
                     props.closeMenu();
                   }
+
                   if (!item.component) {
                     item.onClick(props.data);
                   }
@@ -72,7 +73,7 @@ function Menu(props) {
                     {item.title}
                   </Text>
                 )}
-                {item.onlyPro && isTrial === undefined && (
+                {item.onlyPro && !isTrial && (
                   <Text
                     fontSize="menu"
                     bg="primary"

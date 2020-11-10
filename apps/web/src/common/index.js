@@ -3,6 +3,10 @@ import Database from "notes-core/api/";
 import SelectionOptions from "./selectionoptions";
 import EventSource from "eventsource";
 import { navigate } from "hookrouter";
+import { store as editorStore } from "../stores/editor-store";
+import { store as noteStore } from "../stores/note-store";
+import { showAddNotebookDialog } from "../components/dialogs/addnotebookdialog";
+import { showTopicDialog } from "../components/dialogs/topicdialog";
 
 export const db = new Database(StorageInterface, EventSource);
 db.host("http://localhost:4100");
@@ -31,6 +35,15 @@ export const SELECTION_OPTIONS_MAP = {
   favorites: SelectionOptions.FavoritesOptions,
   trash: SelectionOptions.TrashOptions,
   topics: SelectionOptions.TopicOptions,
+};
+
+export const CREATE_BUTTON_MAP = {
+  notes: {
+    title: "Make a note",
+    onClick: () => editorStore.newSession(noteStore.get().context),
+  },
+  notebooks: { title: "Create a notebook", onClick: showAddNotebookDialog },
+  topics: { title: "Add a topic", onClick: showTopicDialog },
 };
 
 export const DEFAULT_CONTEXT = { colors: [], tags: [], notebook: {} };

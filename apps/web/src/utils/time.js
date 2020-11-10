@@ -1,13 +1,3 @@
-const days = [
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday"
-];
-
 const months = [
   "Jan",
   "Feb",
@@ -20,7 +10,7 @@ const months = [
   "Sep",
   "Oct",
   "Nov",
-  "Dec"
+  "Dec",
 ];
 
 export function timeConverter(timestamp, showSeconds = false) {
@@ -28,7 +18,6 @@ export function timeConverter(timestamp, showSeconds = false) {
   var d = new Date(timestamp), // Convert the passed timestamp to milliseconds
     yyyy = d.getFullYear(),
     dd = ("0" + d.getDate()).slice(-2), // Add leading 0.
-    currentDay = d.getDay(),
     hh = d.getHours(),
     h = hh,
     min = ("0" + d.getMinutes()).slice(-2), // Add leading 0.
@@ -48,8 +37,6 @@ export function timeConverter(timestamp, showSeconds = false) {
 
   // ie: 2013-02-18, 8:35 AM
   time =
-    days[currentDay] +
-    " " +
     dd +
     " " +
     months[d.getMonth()] +

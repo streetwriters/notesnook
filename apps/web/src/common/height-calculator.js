@@ -2,17 +2,19 @@ const SINGLE_LINE_HEIGHT = 1.3;
 const DEFAULT_FONT_SIZE = 16;
 
 const MAX_HEIGHTS = {
-  note: SINGLE_LINE_HEIGHT * 6 * DEFAULT_FONT_SIZE,
+  note: SINGLE_LINE_HEIGHT * 7 * DEFAULT_FONT_SIZE,
   notebook: SINGLE_LINE_HEIGHT * 7 * DEFAULT_FONT_SIZE,
   generic: SINGLE_LINE_HEIGHT * 4 * DEFAULT_FONT_SIZE,
 };
 
 function getNoteHeight(item) {
-  const { title, headline } = item;
+  const { notebook, headline } = item;
   let height = SINGLE_LINE_HEIGHT * 3;
-  if (title.length > 35) height += SINGLE_LINE_HEIGHT;
+  //if (title.length > 35) height += SINGLE_LINE_HEIGHT;
   if (headline?.length > 0) height += SINGLE_LINE_HEIGHT;
   if (headline?.length > 40) height += SINGLE_LINE_HEIGHT;
+  if (notebook) height += SINGLE_LINE_HEIGHT;
+
   return height * DEFAULT_FONT_SIZE;
 }
 

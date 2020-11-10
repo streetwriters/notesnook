@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import "./editor.css";
 import ReactQuill from "./react-quill";
-import { Flex } from "rebass";
+import { Box, Flex } from "rebass";
 import Properties from "../properties";
 import {
   useStore,
@@ -11,7 +11,6 @@ import {
 import { useStore as useAppStore } from "../../stores/app-store";
 import { useStore as useUserStore } from "../../stores/user-store";
 import Animated from "../animated";
-import EditorMenu from "./editormenu";
 import Header from "./header";
 import { useHashParam } from "../../utils/useHashParam";
 import SplitEditor from "../spliteditor";
@@ -19,6 +18,9 @@ import Unlock from "../unlock";
 import RouteContainer from "../route-container";
 import useMobile from "../../utils/use-mobile";
 import { SUBSCRIPTION_STATUS } from "../../common";
+import Toolbar from "./toolbar";
+import Footer from "./footer";
+import ObservableArray from "../../utils/observablearray";
 
 function Editor() {
   const sessionState = useStore((store) => store.session.state);
@@ -63,8 +65,20 @@ function Editor() {
       } = editorstore.get().session;
 
       const { quill } = quillRef.current;
+      console.log(quill);
       quill.setContents(data, "init");
-      quill.history.clear();
+      // quill.history.clear();
+      quill.history.stack = {
+        undo: new ObservableArray("undo"),
+        redo: new ObservableArray("redo"),
+      };
+
+      const record = quill.history.record.bind(quill.history);
+      quill.history.record = function (changeDelta, oldDelta) {
+        record(changeDelta, oldDelta);
+        quill.history.stack.redo = new ObservableArray("redo");
+      };
+
       if (!data || !data.length) return;
       const text = quill.getText();
       quill.setSelection(text.length, 0, "init");
@@ -78,15 +92,12 @@ function Editor() {
         route={<Unlock noteId={unlock} />}
       />
     );
+
   if (diff) return <SplitEditor diffId={diff} />;
   return (
-    <Animated.Flex
-      width={["0%", "0%", "100%"]}
-      initial={{ width: "100%" }}
-      animate={{
-        width: isFocusMode ? "55%" : "100%",
-      }}
-      transition={{ duration: 0.5, ease: "easeIn" }}
+    <Flex
+      flexDirection="column"
+      width={"100%"}
       sx={{
         position: "relative",
         alignSelf: isFocusMode ? "center" : "stretch",
@@ -94,41 +105,64 @@ function Editor() {
       }}
       flex="1 1 auto"
     >
-      <Flex variant="columnFill" className="editor">
-        <Header />
-        <Flex id="toolbar" />
-        <EditorMenu quill={quillRef.current?.quill} />
-        {contentType === "delta" && (
-          <ReactQuill
-            id="quill"
-            ref={quillRef}
-            refresh={sessionState === SESSION_STATES.new}
-            isSimple={!isLoggedin || (isLoggedin && !isTrial)}
-            onFocus={() => {
-              toggleProperties(false);
-            }}
-            placeholder="Type anything here"
-            container=".editor"
-            onSave={() => {
-              saveSession();
-            }}
-            changeInterval={500}
-            onWordCountChanged={updateWordCount}
-            onChange={() => {
-              const { quill } = quillRef.current;
-              const delta = quill.getContents().ops;
-              setSession((state) => {
-                state.session.content = {
-                  type: "delta",
-                  data: delta,
-                };
-              });
-            }}
-          />
-        )}
+      <Toolbar quill={quillRef.current?.quill} />
+      <Flex
+        variant="columnFill"
+        className="editorScroll"
+        flexDirection="column"
+        overflow="hidden"
+        overflowY="auto"
+      >
+        <Animated.Flex
+          variant="columnFill"
+          className="editor"
+          sx={{ mx: [0, 0, "20%"] }}
+          animate={
+            isFocusMode && {
+              marginRight: "25%",
+              marginLeft: "25%",
+            }
+          }
+          transition={{ duration: 0.3, ease: "easeOut" }}
+          mt={[0, 0, 50]}
+        >
+          <Header />
+          <Box id="toolbar" />
+          {/* <EditorMenu quill={quillRef.current?.quill} /> */}
+          {contentType === "delta" && (
+            <ReactQuill
+              id="quill"
+              ref={quillRef}
+              refresh={sessionState === SESSION_STATES.new}
+              isSimple={!isLoggedin || (isLoggedin && !isTrial)}
+              onFocus={() => {
+                toggleProperties(false);
+              }}
+              placeholder="Type anything here"
+              container=".editor"
+              scrollContainer=".editorScroll"
+              onSave={() => {
+                saveSession();
+              }}
+              changeInterval={500}
+              onWordCountChanged={updateWordCount}
+              onChange={() => {
+                const { quill } = quillRef.current;
+                const delta = quill.getContents().ops;
+                setSession((state) => {
+                  state.session.content = {
+                    type: "delta",
+                    data: delta,
+                  };
+                });
+              }}
+            />
+          )}
+        </Animated.Flex>
       </Flex>
+      <Footer />
       <Properties />
-    </Animated.Flex>
+    </Flex>
   );
 }
 export default Editor;

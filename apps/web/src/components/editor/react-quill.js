@@ -39,7 +39,6 @@ const quillModules = {
 
 const simpleQuillModules = {
   toolbar: [
-    [{ header: 1 }, { header: 2 }],
     ["bold", "italic", "underline", "strike", "blockquote"],
     [
       { list: "ordered" },
@@ -78,6 +77,7 @@ export default class ReactQuill extends Component {
     const {
       placeholder,
       container,
+      scrollContainer,
       readOnly,
       initialContent,
       onChange,
@@ -89,6 +89,7 @@ export default class ReactQuill extends Component {
     this.quill = new Quill("#" + id, {
       placeholder,
       bounds: container,
+      scrollingContainer: scrollContainer,
       modules: modules || (isSimple ? simpleQuillModules : quillModules),
       theme: "snow",
       readOnly,
@@ -130,7 +131,7 @@ export default class ReactQuill extends Component {
 
   getWordCount() {
     let text = this.quill.getText();
-    return (text.match(/\b\S+\b/g) || []).length;
+    return (text.split(/\b\S+\b/g) || []).length;
   }
 
   render() {

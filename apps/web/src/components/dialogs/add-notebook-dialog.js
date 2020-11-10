@@ -197,36 +197,6 @@ class AddNotebookDialog extends React.Component {
   }
 }
 
-export function showEditNoteDialog(notebook) {
-  return showDialog((perform) => (
-    <AddNotebookDialog
-      isOpen={true}
-      notebook={notebook}
-      edit={true}
-      onDone={async (nb, deletedTopics) => {
-        // we remove the topics from notebook
-        // beforehand so we can add them manually, later
-        const topics = qclone(nb.topics);
-        delete nb.topics;
-
-        // add the edited notebook to db
-        await store.add({ ...notebook, ...nb });
-
-        // add or delete topics as required
-        const notebookTopics = db.notebooks.notebook(notebook.id).topics;
-        await notebookTopics.delete(...deletedTopics);
-        await notebookTopics.add(...topics);
-
-        showToast("success", "Notebook edited successfully!");
-        perform(true);
-      }}
-      onClose={() => {
-        perform(false);
-      }}
-    />
-  ));
-}
-
 export default AddNotebookDialog;
 
 function TopicItem(props) {
@@ -287,4 +257,52 @@ function TopicItem(props) {
       )}
     </Flex>
   );
+}
+
+export function showEditNotebookDialog(notebook) {
+  return showDialog((perform) => (
+    <AddNotebookDialog
+      isOpen={true}
+      notebook={notebook}
+      edit={true}
+      onDone={async (nb, deletedTopics) => {
+        // we remove the topics from notebook
+        // beforehand so we can add them manually, later
+        const topics = qclone(nb.topics);
+        delete nb.topics;
+
+        // add the edited notebook to db
+        await store.add({ ...notebook, ...nb });
+
+        // add or delete topics as required
+        const notebookTopics = db.notebooks.notebook(notebook.id).topics;
+        await notebookTopics.delete(...deletedTopics);
+        await notebookTopics.add(...topics);
+
+        showToast("success", "Notebook edited successfully!");
+        perform(true);
+      }}
+      onClose={() => {
+        perform(false);
+      }}
+    />
+  ));
+}
+
+export function showAddNotebookDialog(notebook) {
+  return showDialog((perform) => (
+    <AddNotebookDialog
+      isOpen={true}
+      onDone={async (nb) => {
+        // add the notebook to db
+        await store.add({ ...notebook, ...nb });
+
+        showToast("success", "Notebook added successfully!");
+        perform(true);
+      }}
+      onClose={() => {
+        perform(false);
+      }}
+    />
+  ));
 }

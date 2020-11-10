@@ -1,10 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Text, Flex, Button } from "rebass";
 import Dialog, { showDialog } from "./dialog";
-import * as Icon from "../icons";
-import { useStore as useUserStore } from "../../stores/user-store";
-import { upgrade } from "../../common/upgrade";
-import { showSignUpDialog } from "./signupdialog";
 import { db } from "../../common";
 import { QRCode } from "react-qrcode-logo";
 import Logo from "../../assets/notesnook-small.png";

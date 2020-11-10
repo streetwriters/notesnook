@@ -84,7 +84,7 @@ function ListItem(props) {
 
   return (
     <Flex
-      bg={props.pinned || isSelected ? "shade" : "background"}
+      bg={props.focused || isSelected ? "shade" : "background"}
       alignItems="center"
       onContextMenu={openContextMenu}
       p={2}
@@ -96,37 +96,11 @@ function ListItem(props) {
         cursor: "pointer",
         position: "relative",
         ":hover": {
-          borderBottomColor: "primary",
+          backgroundColor: "shade",
         },
       }}
       data-test-id={`${props.item.type}-${props.index}`}
     >
-      {props.pinned && (
-        <Flex
-          variant="rowCenter"
-          bg="primary"
-          onClick={() => props.unpin && props.unpin()}
-          sx={{
-            position: "absolute",
-            top: -15,
-            right: 0,
-            borderRadius: 35,
-            width: 30,
-            height: 30,
-            boxShadow: "2px 1px 3px #00000066",
-          }}
-          mx={2}
-        >
-          <Box
-            bg="static"
-            sx={{
-              borderRadius: 5,
-              width: 5,
-              height: 5,
-            }}
-          />
-        </Flex>
-      )}
       <Flex
         flexDirection="column"
         onClick={() => {
@@ -144,6 +118,7 @@ function ListItem(props) {
           },
         }}
       >
+        {props.header}
         <Flex>
           {isSelectionMode && (
             <ItemSelector
@@ -153,13 +128,13 @@ function ListItem(props) {
           )}
           <Text
             as="h3"
-            color={props.focused ? "primary" : "text"}
+            color={props.bg ? props.bg : "text"}
             fontFamily={"heading"}
             fontSize="title"
             fontWeight={"bold"}
             sx={{
               lineHeight: "1.4em",
-              maxHeight: "2.8em", // 2 lines, i hope
+              maxHeight: "1.4em", // 2 lines, i hope
               overflow: "hidden",
               textOverflow: "ellipsis",
             }}
@@ -190,7 +165,7 @@ function ListItem(props) {
           variant="body"
           fontSize={11}
           color="fontTertiary"
-          sx={{ marginTop: 2 }}
+          sx={{ marginTop: 1 }}
         >
           {props.info}
         </Text>

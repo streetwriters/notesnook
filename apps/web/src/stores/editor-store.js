@@ -4,7 +4,7 @@ import { store as appStore } from "./app-store";
 import { store as tagStore } from "./tag-store";
 import { db } from "../common";
 import BaseStore from ".";
-import { isMobile } from "../utils/dimensions";
+import { isMobile, isTablet } from "../utils/dimensions";
 import { getHashParam, setHashParam } from "../utils/useHashParam";
 
 const SESSION_STATES = { stale: "stale", new: "new", locked: "locked" };
@@ -45,7 +45,7 @@ class EditorStore extends BaseStore {
 
   openLastSession = async () => {
     // Do not reopen last session on mobile
-    if (isMobile()) return;
+    if (isMobile() && isTablet()) return;
     const id = localStorage.getItem("lastOpenedNote");
 
     if (id) {

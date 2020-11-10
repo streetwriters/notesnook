@@ -17,7 +17,7 @@ function Placeholder(props) {
         alignSelf="stretch"
         sx={{ position: "relative" }}
       >
-        <Image width={"100%"} height={"200px"} />
+        <Image width={"100%"} height={"120px"} />
       </Flex>
     </>
   );

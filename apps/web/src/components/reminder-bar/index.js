@@ -29,7 +29,7 @@ function ReminderBar() {
         <Text variant="subBody" fontSize={10}>
           {reminder.action.text}
         </Text>
-        <Text variant="body" fontSize={12} color="primary">
+        <Text variant="subBody" fontSize={10} color="primary">
           {reminder.title}
         </Text>
       </Flex>

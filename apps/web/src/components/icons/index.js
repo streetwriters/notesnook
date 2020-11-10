@@ -20,23 +20,26 @@ function Icon({ name, size = 24, color = "icon", stroke, rotate }) {
 function createIcon(name, rotate = false) {
   return function (props) {
     return (
-      <Animated.Box
+      <Animated.Flex
+        title={props.title}
         variant={props.variant}
-        height={(props.size || 24) + "px"}
         whileHover={{ scale: 1.1 }}
         transition={{ duration: 0.3, ease: "easeOut" }}
         animate={props.animation}
         onClick={props.onClick}
         data-test-id={props["data-test-id"]}
         sx={props.sx}
+        justifyContent="center"
+        alignItems="center"
       >
         <Icon name={name} rotate={rotate} {...props} />
-      </Animated.Box>
+      </Animated.Flex>
     );
   };
 }
 
 export const Plus = createIcon(Icons.mdiPlus);
+export const Note = createIcon(Icons.mdiHomeOutline);
 export const Minus = createIcon(Icons.mdiMinus);
 export const Notebook = createIcon(Icons.mdiBookOutline);
 export const ArrowLeft = createIcon(Icons.mdiArrowLeft);
@@ -85,7 +88,7 @@ export const Theme = createIcon(Icons.mdiThemeLightDark);
 export const Checkmark = createIcon(Icons.mdiCheck);
 export const CheckCircle = createIcon(Icons.mdiCheckCircle);
 
-export const Properties = createIcon(Icons.mdiDotsHorizontal);
+export const Properties = createIcon(Icons.mdiDotsVertical);
 
 // FORMATS
 
@@ -106,3 +109,6 @@ export const Backup = createIcon(Icons.mdiBackupRestore);
 export const Buy = createIcon(Icons.mdiCurrencyUsdCircleOutline);
 
 export const Edit = createIcon(Icons.mdiPencil);
+
+export const Undo = createIcon(Icons.mdiUndoVariant);
+export const Redo = createIcon(Icons.mdiRedoVariant);

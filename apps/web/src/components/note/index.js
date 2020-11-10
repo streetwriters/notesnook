@@ -1,5 +1,5 @@
-import React from "react";
-import { Flex, Box, Text } from "rebass";
+import React, { useMemo } from "react";
+import { Flex, Text } from "rebass";
 import * as Icon from "../icons";
 import TimeAgo from "timeago-react";
 import ListItem from "../list-item";
@@ -125,6 +125,11 @@ function Note(props) {
   const selectedNote = useStore((store) => store.selectedNote);
   const isOpened = selectedNote === note.id;
   const theme = useTheme();
+  const color = useMemo(() => COLORS[note.colors[0]], [note.colors]);
+  const notebook = useMemo(
+    () => note.notebook && db.notebooks.notebook(note.notebook.id).data,
+    [note.notebook]
+  );
 
   return (
     <ListItem
@@ -135,7 +140,23 @@ function Note(props) {
       body={note.headline}
       id={note.id}
       index={index}
-      unpin={pin.bind(this, note)}
+      header={
+        note.notebook && (
+          <Flex
+            alignSelf="flex-start"
+            justifySelf="flex-start"
+            alignContent="center"
+            justifyContent="center"
+            mb={1}
+          >
+            <Icon.Notebook size={12} color={color ? color : "primary"} />
+            <Text variant="subBody" fontWeight="600" mt={"4px"} ml={"3px"}>
+              {notebook.title}
+            </Text>
+          </Flex>
+        )
+      }
+      bg={color}
       onClick={() => {
         if (note.conflicted) {
           setHashParam({ diff: note.id });
@@ -146,7 +167,7 @@ function Note(props) {
       info={
         <Flex flex="1 1 auto" justifyContent="space-between">
           <Flex variant="rowCenter">
-            {note.colors.map((item, colorIndex) => (
+            {/* {note.colors.map((item, colorIndex) => (
               <Box
                 key={item}
                 style={{
@@ -159,7 +180,7 @@ function Note(props) {
                 }}
                 data-test-id={`note-${index}-colors-${item}`}
               />
-            ))}
+            ))} */}
             <TimeAgo datetime={note.dateCreated} />
             {note.locked && (
               <Icon.Lock

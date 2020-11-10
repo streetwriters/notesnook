@@ -16,6 +16,7 @@ class DarkColorSchemeFactory {
       overlay: "rgba(255, 255, 255, 0.5)",
       secondary: "black",
       icon: "#dbdbdb",
+      disabled: "#5b5b5b",
       ...new StaticColorSchemeFactory(accent),
     };
   }

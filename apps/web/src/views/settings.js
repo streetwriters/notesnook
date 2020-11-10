@@ -8,7 +8,6 @@ import AccentItem from "../components/accent-item";
 import accents from "../theme/accents";
 import { showLogInDialog } from "../components/dialogs/logindialog";
 import { showLogoutConfirmation } from "../components/dialogs/confirm";
-import { upgrade } from "../common/upgrade";
 import useSystemTheme from "../utils/use-system-theme";
 import download from "../utils/download";
 import { db, SUBSCRIPTION_STATUS } from "../common";

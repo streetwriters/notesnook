@@ -7,22 +7,28 @@ import "./index.css";
 import App from "./App";
 import * as serviceWorker from "./serviceWorker";
 import Modal from "react-modal";
-import { db } from "./common";
 import { MotionConfig, AnimationFeature, GesturesFeature } from "framer-motion";
+import Splash from "./views/splash";
 
-db.init()
-  .catch(console.error)
-  .finally(() => {
-    Modal.setAppElement("#root");
-    ReactDOM.render(
-      <MotionConfig features={[AnimationFeature, GesturesFeature]}>
-        <App />
-      </MotionConfig>,
-      document.getElementById("root")
-    );
+Modal.setAppElement("#root");
+ReactDOM.render(
+  <MotionConfig features={[AnimationFeature, GesturesFeature]}>
+    <Splash
+      onLoadingFinished={() => {
+        ReactDOM.render(
+          <MotionConfig features={[AnimationFeature, GesturesFeature]}>
+            <App />
+          </MotionConfig>,
+          document.getElementById("root")
+        );
 
-    // If you want your app to work offline and load faster, you can change
-    // unregister() to register() below. Note this comes with some pitfalls.
-    // Learn more about service workers: https://bit.ly/CRA-PWA
-    serviceWorker.unregister();
-  });
+        // If you want your app to work offline and load faster, you can change
+        // unregister() to register() below. Note this comes with some pitfalls.
+        // Learn more about service workers: https://bit.ly/CRA-PWA
+        serviceWorker.unregister();
+      }}
+    />
+  </MotionConfig>,
+  document.getElementById("root"),
+  () => {}
+);

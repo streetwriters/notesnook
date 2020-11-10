@@ -6,10 +6,11 @@ import { store as trashStore } from "./trash-store";
 import { store as editorStore } from "./editor-store";
 import { store as tagStore } from "./tag-store";
 import BaseStore from "./index";
+import { isMobile } from "../utils/dimensions";
 
 class AppStore extends BaseStore {
   // default state
-  isSideMenuOpen = false;
+  isSideMenuOpen = !isMobile();
   isFocusMode = false;
   isEditorOpen = false;
   colors = [];

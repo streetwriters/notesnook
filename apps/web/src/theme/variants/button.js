@@ -7,7 +7,7 @@ class ButtonFactory {
       tertiary: new Tertiary(),
       list: new List(),
       anchor: new Anchor(),
-      menu: new Menu(),
+      tool: new Tool(),
       icon: new Icon(),
     };
   }
@@ -109,16 +109,16 @@ class Icon {
   }
 }
 
-class Menu {
+class Tool {
   constructor() {
     return {
       variant: "buttons.default",
       color: "text",
-      fontSize: 14,
-      p: 2,
-      borderRadius: "none",
+      p: 1,
+      px: 2,
+      borderRadius: "default",
       ":hover": {
-        backgroundColor: "shade",
+        backgroundColor: "bgSecondary",
       },
     };
   }

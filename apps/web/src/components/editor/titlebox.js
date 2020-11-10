@@ -1,29 +1,12 @@
 import React, { useEffect, useRef } from "react";
 import "./editor.css";
-import { Input } from "@rebass/forms";
+import TextArea from "react-textarea-autosize";
+import { useTheme } from "emotion-theming";
 
-/* class TitleBox extends React.Component {
-  inputRef;
-  changeTimeout = 0;
-  state = { text: "" };
-  shouldComponentUpdate(nextProps) {
-    return nextProps.title !== this.props.title || nextProps.shouldFocus;
-  }
-
-  componentDidUpdate() {
-    if (this.props.shouldFocus) {
-      this.inputRef.focus();
-    }
-  }
-
-  render() {
-    const { setTitle, sx, changeInterval } = this.props;
-  }
-} */
-/* export default TitleBox; */
 var changeTimeout;
 function TitleBox(props) {
-  const { sx, title, setTitle, changeInterval, shouldFocus } = props;
+  const theme = useTheme();
+  const { title, setTitle, changeInterval, shouldFocus } = props;
   const inputRef = useRef();
 
   useEffect(() => {
@@ -37,21 +20,24 @@ function TitleBox(props) {
   }, [shouldFocus]);
 
   return (
-    <Input
+    <TextArea
       ref={inputRef}
       autoFocus={shouldFocus}
+      className="editorTitle"
       data-test-id="editor-title"
-      maxLength={120}
       placeholder="Untitled"
-      fontFamily="heading"
-      fontWeight="heading"
-      fontSize="heading"
-      color="text"
-      px={2}
-      sx={{
-        borderWidth: 0,
-        ":focus": { outline: "none" },
-        ...sx,
+      maxLength={240}
+      style={{
+        backgroundColor: "transparent",
+        fontFamily: theme.fonts["heading"],
+        fontSize: 42,
+        fontWeight: theme.fontWeights["heading"],
+        resize: "none",
+        paddingRight: theme.space[2],
+        paddingLeft: theme.space[2],
+        border: "none",
+        color: theme.colors["text"],
+        width: "100%",
       }}
       onChange={(e) => {
         clearTimeout(changeTimeout);

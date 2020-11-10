@@ -2,7 +2,7 @@ import React from "react";
 import { Flex, Text } from "rebass";
 import ListItem from "../list-item";
 import { store } from "../../stores/notebook-store";
-import { showEditNoteDialog } from "../dialogs/addnotebookdialog";
+import { showEditNotebookDialog } from "../dialogs/addnotebookdialog";
 import { showDeleteConfirmation } from "../dialogs/confirm";
 import { showItemDeletedToast, showUnpinnedToast } from "../../common/toasts";
 const pin = async (notebook, index) => {
@@ -18,7 +18,7 @@ function menuItems(notebook, index) {
     {
       title: "Edit",
       onClick: async () => {
-        if (await showEditNoteDialog(notebook)) store.refresh();
+        if (await showEditNotebookDialog(notebook)) store.refresh();
       },
     },
     {

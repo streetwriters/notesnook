@@ -13,9 +13,10 @@ import { COLORS } from "../../common";
 import { showLogInDialog } from "../dialogs/logindialog";
 import { usePath } from "hookrouter";
 import useMobile from "../../utils/use-mobile";
+import useTablet from "../../utils/use-tablet";
 
 const routes = [
-  { title: "Home", path: "/", icon: Icon.Home },
+  { title: "Notes", path: "/", icon: Icon.Note },
   {
     title: "Notebooks",
     path: "/notebooks",
@@ -53,33 +54,11 @@ function NavigationMenu(props) {
   const theme = useThemeStore((store) => store.theme);
   const toggleNightMode = useThemeStore((store) => store.toggleNightMode);
   const isMobile = useMobile();
+  const isTablet = useTablet();
 
   useEffect(() => {
     setSelectedRoute(path);
   }, [path]);
-
-  useEffect(() => {
-    if (!isMobile) return;
-    const app = document.getElementById("app");
-
-    let startX = 0;
-    app.ontouchstart = function (event) {
-      if (event.touches.length > 1) return;
-      startX = event.touches[0].pageX;
-    };
-
-    app.ontouchmove = function (event) {
-      if (event.touches.length > 1) return;
-      let currentX = event.touches[0].pageX;
-      if (currentX - startX > 100) {
-        toggleSideMenu(true);
-        startX = currentX;
-      } else if (currentX - startX < -100) {
-        toggleSideMenu(false);
-        startX = currentX;
-      }
-    };
-  }, [toggleSideMenu, isMobile]);
 
   return (
     <Animated.Flex
@@ -92,23 +71,24 @@ function NavigationMenu(props) {
       }}
       animate={{
         opacity: isFocusMode ? 0 : 1,
-        visibility: isFocusMode ? "hidden" : "visible",
+        visibility: isFocusMode ? "collapse" : "visible",
         x: isMobile ? (isSideMenuOpen ? 0 : -500) : 0,
-        zIndex: isSideMenuOpen ? 999 : 1,
       }}
       transition={{ duration: 0.3, ease: "easeOut" }}
       sx={{
         borderRight: "1px solid",
         borderRightColor: "border",
-        minWidth: ["85%", 50, 50],
-        maxWidth: ["85%", 50, 50],
+        minWidth: ["85%", isSideMenuOpen ? 150 : 0, isFocusMode ? 0 : 150],
+        maxWidth: ["85%", isSideMenuOpen ? 150 : 0, isFocusMode ? 0 : 150],
+        zIndex: !isSideMenuOpen ? -1 : isMobile ? 999 : isTablet ? 1 : 1,
         height: ["100%", "auto", "auto"],
         position: ["absolute", "relative", "relative"],
       }}
-      bg={"background"}
+      bg={"bgSecondary"}
       px={0}
     >
-      {isSideMenuOpen &&
+      {isMobile &&
+        isSideMenuOpen &&
         ReactDOM.createPortal(
           <Flex
             sx={{
@@ -143,7 +123,7 @@ function NavigationMenu(props) {
             }
             onClick={() => {
               setSelectedRoute(item.path);
-              if (selectedRoute === item.path)
+              if (!isMobile && !isTablet && selectedRoute === item.path)
                 return toggleNavigationContainer();
               toggleNavigationContainer(true);
               navigate(item.path);
@@ -165,13 +145,13 @@ function NavigationMenu(props) {
       <Flex flexDirection="column">
         {theme === "light" ? (
           <NavigationItem
-            title="Enable dark mode"
+            title="Dark mode"
             icon={Icon.DarkMode}
             onClick={toggleNightMode}
           />
         ) : (
           <NavigationItem
-            title="Enable light mode"
+            title="Light mode"
             icon={Icon.LightMode}
             onClick={toggleNightMode}
           />

@@ -4,7 +4,9 @@ import { Box, Flex, Heading, Text } from "rebass";
 import * as Icon from "../icons";
 import { useStore } from "../../stores/app-store";
 import { useStore as useSelectionStore } from "../../stores/selection-store";
-import { SELECTION_OPTIONS_MAP } from "../../common";
+import { CREATE_BUTTON_MAP, SELECTION_OPTIONS_MAP } from "../../common";
+import useMobile from "../../utils/use-mobile";
+import { navigate } from "hookrouter";
 
 function RouteContainer(props) {
   const { type, route, canGoBack, title, subtitle, onlyBackButton } = props;
@@ -19,11 +21,11 @@ function RouteContainer(props) {
       flex="1 1 auto"
     >
       <Header
+        type={type}
         canGoBack={canGoBack}
         title={title}
         subtitle={subtitle}
         onlyBackButton={onlyBackButton}
-        selectionOptions={SELECTION_OPTIONS_MAP[type]}
       />
       {route}
     </Animated.Flex>
@@ -33,15 +35,11 @@ function RouteContainer(props) {
 export default RouteContainer;
 
 function Header(props) {
-  const {
-    title,
-    subtitle,
-    canGoBack,
-    selectionOptions,
-    onlyBackButton,
-  } = props;
-
+  const { title, subtitle, canGoBack, onlyBackButton, type } = props;
+  const createButtonData = CREATE_BUTTON_MAP[type];
   const toggleSideMenu = useStore((store) => store.toggleSideMenu);
+  const isMobile = useMobile();
+  const isSelectionMode = useSelectionStore((store) => store.isSelectionMode);
 
   if (!onlyBackButton && !title && !subtitle) return null;
   return (
@@ -50,12 +48,10 @@ function Header(props) {
         <Flex alignItems="center" py={2}>
           {canGoBack || onlyBackButton ? (
             <Box
-              alignSelf="flex-start"
-              onClick={() => window.history.back()}
-              ml={-2}
               height={38}
               width={38}
               sx={{ flexShrink: 0 }}
+              onClick={() => window.history.back()}
             >
               <Icon.ChevronLeft
                 size={38}
@@ -78,7 +74,41 @@ function Header(props) {
             {title}
           </Heading>
         </Flex>
-        <SelectionOptions options={selectionOptions} />
+        <SelectionOptions options={SELECTION_OPTIONS_MAP[type]} />
+        {!isSelectionMode && (
+          <Flex>
+            {type !== "search" && (
+              <Icon.Search
+                size={24}
+                sx={{ mr: 2 }}
+                onClick={() => {
+                  navigate(
+                    `/search`,
+                    false,
+                    {
+                      type,
+                    },
+                    true
+                  );
+                }}
+              />
+            )}
+
+            {!isMobile && createButtonData && (
+              <Icon.Plus
+                color="primary"
+                size={24}
+                sx={{
+                  bg: "bgSecondary",
+                  borderRadius: "default",
+                  size: 28,
+                }}
+                title={createButtonData.title}
+                onClick={createButtonData.onClick}
+              />
+            )}
+          </Flex>
+        )}
       </Flex>
       {subtitle && (
         <Text
@@ -92,7 +122,6 @@ function Header(props) {
           {subtitle}
         </Text>
       )}
-      <SelectionBox />
     </Flex>
   );
 }
@@ -112,39 +141,9 @@ function SelectionOptions(props) {
           mx={2}
           sx={{ cursor: "pointer" }}
         >
-          <option.icon />
+          <option.icon size={20} />
         </Box>
       ))}
-    </Flex>
-  );
-}
-
-function SelectionBox() {
-  const toggleSelectionMode = useSelectionStore(
-    (store) => store.toggleSelectionMode
-  );
-  const selectAll = useSelectionStore((store) => store.selectAll);
-  const shouldSelectAll = useSelectionStore((store) => store.shouldSelectAll);
-  const isSelectionMode = useSelectionStore((store) => store.isSelectionMode);
-
-  if (!isSelectionMode) return null;
-  return (
-    <Flex
-      alignItems="center"
-      mb={2}
-      sx={{ cursor: "pointer" }}
-      onClick={() => {
-        if (shouldSelectAll) {
-          toggleSelectionMode(false);
-        } else {
-          selectAll();
-        }
-      }}
-    >
-      {shouldSelectAll ? <Icon.Check /> : <Icon.CircleEmpty />}
-      <Text ml={1} variant="title" color="primary">
-        {shouldSelectAll ? "Unselect all" : "Select all"}
-      </Text>
     </Flex>
   );
 }

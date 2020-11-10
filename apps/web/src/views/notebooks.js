@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import AddNotebookDialog from "../components/dialogs/addnotebookdialog";
+import React, { useEffect } from "react";
+import { showAddNotebookDialog } from "../components/dialogs/addnotebookdialog";
 import ListContainer from "../components/list-container";
 import { useStore, store } from "../stores/notebook-store";
 import NotebooksPlaceholder from "../components/placeholders/notebooks-placeholder";
@@ -51,10 +51,8 @@ function NotebooksContainer() {
 }
 
 function Notebooks() {
-  const [open, setOpen] = useState(false);
   useEffect(() => store.refresh(), []);
   const notebooks = useStore((state) => state.notebooks);
-  const add = useStore((state) => state.add);
 
   return (
     <>
@@ -64,20 +62,7 @@ function Notebooks() {
         placeholder={NotebooksPlaceholder}
         button={{
           content: "Create a notebook",
-          onClick: async () => {
-            setOpen(true);
-          },
-        }}
-      />
-      <AddNotebookDialog
-        isOpen={open}
-        edit={false}
-        onDone={async (nb) => {
-          await add(nb);
-          setOpen(false);
-        }}
-        onClose={() => {
-          setOpen(false);
+          onClick: showAddNotebookDialog,
         }}
       />
     </>

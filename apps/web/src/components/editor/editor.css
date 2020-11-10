@@ -1,11 +1,16 @@
+.editorTitle:focus {
+  border: none;
+  outline: none;
+}
+
 .ql-editor {
   height: auto !important;
-  overflow-y: hidden !important;
+  overflow: hidden !important;
 }
 
 .ql-container.ql-snow {
   border: none !important;
-  overflow-y: auto !important;
+  overflow: hidden !important;
 }
 
 /*Quill Toolbar*/
@@ -170,17 +175,12 @@ code {
 }
 
 .ql-editor {
-  font-size: 16px;
+  font-size: 14px;
   color: var(--text) !important;
   padding: 10px !important;
 }
 
-.ql-editor h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: "DM Serif Text", serif !important;
-  font-weight: 400 !important;
+.ql-editor h1 h2 h3 h4 h5 h6 {
+  font-family: "Poppins", monospace !important;
+  font-weight: 600 !important;
 }

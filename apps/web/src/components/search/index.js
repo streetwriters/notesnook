@@ -3,15 +3,15 @@ import { Flex, Box } from "rebass";
 import { Input } from "@rebass/forms";
 import * as Icon from "../icons";
 import "./search.css";
-import { navigate } from "hookrouter";
 
-function Search(props) {
-  const { query, type, context } = props;
+function SearchBox(props) {
+  //const { query, type, context } = props;
 
   return (
     <Flex
       variant="rowCenter"
       px={2}
+      mb={2}
       sx={{
         position: "relative",
       }}
@@ -19,19 +19,10 @@ function Search(props) {
       <Input
         id="searchInput"
         name="search"
-        autoFocus={!!query}
-        defaultValue={query}
+        bg="border"
         placeholder={`Type your query here`}
         onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            let query = e.target.value;
-            navigate(
-              `/search`,
-              false,
-              { q: query, type, context: btoa(JSON.stringify(context)) },
-              true
-            );
-          }
+          if (e.key === "Enter") props.onSearch(e.target.value);
         }}
       />
       <Box
@@ -48,4 +39,4 @@ function Search(props) {
     </Flex>
   );
 }
-export default Search;
+export default SearchBox;

@@ -11,7 +11,7 @@ import Tags from "../views/tags";
 import Trash from "../views/trash";
 
 const routes = {
-  "/": () => <RouteContainer type="notes" title="Home" route={<Home />} />,
+  "/": () => <RouteContainer type="notes" title="Notes" route={<Home />} />,
   "/notebooks*": () => <Notebooks />,
   "/favorites": () => (
     <RouteContainer
@@ -38,7 +38,7 @@ const routes = {
   ),
   "/settings": () => <RouteContainer title="Settings" route={<Settings />} />,
   "/search": () => (
-    <RouteContainer canGoBack title="Search" route={<Search />} />
+    <RouteContainer type="search" canGoBack title="Search" route={<Search />} />
   ),
 };
 

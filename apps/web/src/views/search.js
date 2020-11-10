@@ -1,14 +1,15 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useState } from "react";
 import ListContainer from "../components/list-container";
 import SearchPlaceholder from "../components/placeholders/search-placeholder";
 import { useQueryParams } from "hookrouter";
 import { db, notesFromContext } from "../common";
+import SearchBox from "../components/search";
+import { useStore as useNoteStore } from "../stores/note-store";
 
 function typeToItems(type, context) {
   switch (type) {
-    case "home":
-      return ["notes", db.notes.all];
     case "notes":
+      if (!context) return ["notes", db.notes.all];
       const notes = notesFromContext(context);
       return ["notes", notes];
     case "notebooks":
@@ -28,32 +29,20 @@ function typeToItems(type, context) {
 function Search() {
   const [results, setResults] = useState([]);
   const [params] = useQueryParams();
-  const { q: query, type, context: ctx } = params;
-  const context = useMemo(() => {
-    try {
-      return ctx && JSON.parse(atob(ctx));
-    } catch (e) {
-      console.log(e);
-    }
-  }, [ctx]);
-
-  useEffect(() => {
-    const [lookupType, items] = typeToItems(type, context);
-    if (lookupType === "notes") {
-      db.lookup[lookupType](items, query).then((results) => {
-        setResults(results);
-      });
-    } else {
-      setResults(db.lookup[lookupType](items, query));
-    }
-  }, [context, query, type]);
+  const { type } = params;
+  const context = useNoteStore((store) => store.context);
 
   return (
     <>
+      <SearchBox
+        onSearch={(query) => {
+          const [lookupType, items] = typeToItems(type, context);
+          setResults(db.lookup[lookupType](items, query));
+        }}
+      />
       <ListContainer
         context={context}
         type={type}
-        query={query}
         items={results}
         placeholder={SearchPlaceholder}
       />

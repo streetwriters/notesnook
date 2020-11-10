@@ -1,12 +1,10 @@
 import React, { useEffect, useMemo, useRef } from "react";
 import { Flex } from "rebass";
 import Button from "../button";
-import Search from "../search";
 import * as Icon from "../icons";
 import { VariableSizeList as List } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { useStore as useSelectionStore } from "../../stores/selection-store";
-import ReminderBar from "../reminder-bar";
 import GroupHeader from "../group-header";
 import ListProfiles from "../../common/list-profiles";
 
@@ -38,7 +36,7 @@ function ListContainer(props) {
         </Flex>
       ) : (
         <>
-          <Flex variant="columnFill" mt={2} data-test-id="note-list">
+          <Flex variant="columnFill" data-test-id="note-list">
             {props.children
               ? props.children
               : props.items.length > 0 && (
@@ -50,12 +48,8 @@ function ListContainer(props) {
                         width={width}
                         itemKey={(index) => {
                           switch (index) {
-                            case 0:
-                              return "searchbar";
-                            case 1:
-                              return "reminderbar";
                             default:
-                              const item = props.items[index - 2];
+                              const item = props.items[index];
                               return item.id || item.title;
                           }
                         }}
@@ -63,36 +57,22 @@ function ListContainer(props) {
                         estimatedItemSize={profile.estimatedItemHeight}
                         itemSize={(index) => {
                           switch (index) {
-                            case 0:
-                              return 45;
-                            case 1:
-                              return 85;
                             default:
-                              const item = props.items[index - 2];
+                              const item = props.items[index];
                               if (item.type === "header") {
-                                if (item.title === "Pinned") return 22;
-                                else return 22;
+                                if (!item.title) return 0;
+                                return 50;
                               } else {
                                 return profile.itemHeight(item);
                               }
                           }
                         }}
-                        itemCount={props.items.length + 2}
+                        itemCount={props.items.length}
                       >
                         {({ index, style }) => {
                           switch (index) {
-                            case 0:
-                              return (
-                                <Search
-                                  type={props.type}
-                                  query={props.query}
-                                  context={context}
-                                />
-                              );
-                            case 1:
-                              return <ReminderBar />;
                             default:
-                              const item = props.items[index - 2];
+                              const item = props.items[index];
                               return (
                                 <div key={item.id} style={style}>
                                   {item.type === "header" ? (
