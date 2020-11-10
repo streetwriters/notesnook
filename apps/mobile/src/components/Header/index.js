@@ -23,7 +23,7 @@ export const Header = ({root}) => {
   const [hide, setHide] = useState(false);
 
   const onScroll = (y) => {
-    if (y > 3) {
+    if (y > 150) {
       setHide(false);
     } else {
       setHide(true);
