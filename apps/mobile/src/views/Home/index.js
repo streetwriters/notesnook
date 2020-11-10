@@ -23,7 +23,7 @@ export const Home = ({navigation}) => {
     dispatch({
       type: Actions.HEADER_TEXT_STATE,
       state: {
-        heading: 'Home',
+        heading: 'Notes',
       },
     });
     dispatch({
@@ -95,12 +95,20 @@ export const Home = ({navigation}) => {
         placeholder={<Placeholder type="notes" />}
         placeholderText={`Notes you write appear here`}
         jumpToDialog={true}
+        placeholderData={{
+          heading: 'Your Notes',
+          paragraph: 'You have not added any notes yet.',
+          button: 'Add your First Note',
+          action: _onPressBottomButton,
+        }}
       />
 
-      <ContainerBottomButton
-        title="Create a new note"
-        onPress={_onPressBottomButton}
-      />
+      {!notes || notes.length === 0 ? null : (
+        <ContainerBottomButton
+          title="Create a new note"
+          onPress={_onPressBottomButton}
+        />
+      )}
     </>
   );
 };

@@ -124,7 +124,7 @@ const RenderItem = ({item, index}) => {
   return (
     <SelectionWrapper
       onPress={() => {
-        NavigationService.navigate('Notes', {
+        NavigationService.navigate('NotesPage', {
           ...item,
         });
       }}

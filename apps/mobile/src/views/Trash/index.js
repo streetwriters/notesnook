@@ -74,14 +74,21 @@ export const Trash = ({route, navigation}) => {
         type="trash"
         focused={() => navigation.isFocused()}
         RenderItem={RenderItem}
+        placeholderData={{
+          heading: 'Your Favorites',
+          paragraph: 'You have not added any notes to favorites yet.',
+          button: null,
+        }}
         placeholder={<Placeholder type="trash" />}
         placeholderText="Deleted notes & notebooks appear here."
       />
 
-      <ContainerBottomButton
-        title="Clear all trash"
-        onPress={_onPressBottomButton}
-      />
+      {trash && trash.length !== 0 && (
+        <ContainerBottomButton
+          title="Clear all trash"
+          onPress={_onPressBottomButton}
+        />
+      )}
     </>
   );
 };

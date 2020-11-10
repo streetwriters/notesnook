@@ -25,6 +25,7 @@ import {
   eOpenRecoveryKeyDialog,
   eOpenRestoreDialog,
   eResetApp,
+  eScrollEvent,
   eUpdateSearchState,
 } from '../../utils/Events';
 import NavigationService from '../../services/Navigation';
@@ -45,6 +46,7 @@ import {DDS} from '../../services/DeviceDetection';
 import {MMKV} from '../../utils/mmkv';
 import Backup from '../../services/Backup';
 import Menu, {MenuItem} from 'react-native-material-menu';
+import {ListHeaderComponent} from '../../components/SimpleList/ListHeaderComponent';
 
 let menuRef = createRef();
 export const Settings = ({navigation}) => {
@@ -52,7 +54,6 @@ export const Settings = ({navigation}) => {
   const {colors, user, settings} = state;
   function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
     let newColors = setColorScheme(colors, accent);
-    StatusBar.setBarStyle(colors.night ? 'light-content' : 'dark-content');
     dispatch({type: Actions.THEME, colors: newColors});
   }
 
@@ -85,10 +86,7 @@ export const Settings = ({navigation}) => {
       type: '',
       color: null,
     });
-
   }, []);
-
-
 
   useEffect(() => {
     navigation.addListener('focus', onFocus);
@@ -109,14 +107,12 @@ export const Settings = ({navigation}) => {
   const SectionHeader = ({title}) => (
     <Text
       style={{
-        fontSize: SIZE.xs,
+        fontSize: SIZE.sm,
         fontFamily: WEIGHT.bold,
         textAlignVertical: 'center',
         color: colors.accent,
         paddingHorizontal: 12,
-        borderBottomColor: colors.nav,
-        borderBottomWidth: 0.5,
-        paddingBottom: 3,
+        height: 35,
       }}>
       {title}
     </Text>
@@ -179,7 +175,7 @@ export const Settings = ({navigation}) => {
       }}>
       <Text
         style={{
-          fontSize: SIZE.sm,
+          fontSize: SIZE.md,
           fontFamily: WEIGHT.regular,
           textAlignVertical: 'center',
           color: colors.pri,
@@ -189,7 +185,7 @@ export const Settings = ({navigation}) => {
 
         <Text
           style={{
-            fontSize: SIZE.xs,
+            fontSize: SIZE.sm,
             color: colors.icon,
           }}>
           {tagline}
@@ -207,15 +203,15 @@ export const Settings = ({navigation}) => {
         height: '100%',
         backgroundColor: colors.bg,
       }}>
-      <View
-        style={{
-          marginTop: Platform.OS === 'ios' ? 125 - 60 : 125 - 60,
-        }}
-      />
       <ScrollView
+        onScroll={(e) =>
+          eSendEvent(eScrollEvent, e.nativeEvent.contentOffset.y)
+        }
         style={{
           paddingHorizontal: 0,
         }}>
+        <ListHeaderComponent type="settings" messageCard={false} />
+
         {user ? (
           <>
             <View
@@ -349,25 +345,22 @@ export const Settings = ({navigation}) => {
           <>
             <View
               style={{
-                paddingHorizontal: 12,
+                paddingHorizontal: 0,
               }}>
               <PressableButton
-                color={colors.shade}
-                selectedColor={colors.accent}
+                color="transparent"
+                selectedColor={colors.nav}
                 alpha={!colors.night ? -0.02 : 0.1}
-                opacity={0.12}
                 onPress={() => {
                   eSendEvent(eOpenLoginDialog);
                 }}
                 activeOpacity={opacity / 2}
                 customStyle={{
                   paddingVertical: pv + 5,
-                  marginBottom: pv + 5,
                   width: '100%',
                   flexDirection: 'row',
                   alignItems: 'center',
                   justifyContent: 'flex-start',
-                  borderRadius: 5,
                   paddingHorizontal: 6,
                 }}>
                 <View
@@ -426,7 +419,7 @@ export const Settings = ({navigation}) => {
 
         <Text
           style={{
-            fontSize: SIZE.sm,
+            fontSize: SIZE.md,
             fontFamily: WEIGHT.regular,
             textAlignVertical: 'center',
             color: colors.pri,
@@ -436,7 +429,7 @@ export const Settings = ({navigation}) => {
           Accent Color{'\n'}
           <Text
             style={{
-              fontSize: SIZE.xs,
+              fontSize: SIZE.sm,
               color: colors.icon,
             }}>
             Choose a color to use as accent color
@@ -508,7 +501,7 @@ export const Settings = ({navigation}) => {
               flexDirection: 'row',
               flexWrap: 'wrap',
             }}>
-            {['#46f0f0', '#f032e6', '#bcf60c', '#fabebe'].map((item,index) => (
+            {['#46f0f0', '#f032e6', '#bcf60c', '#fabebe'].map((item, index) => (
               <PressableButton
                 key={item}
                 color={
@@ -532,8 +525,11 @@ export const Settings = ({navigation}) => {
                   justifyContent: 'center',
                   alignItems: 'center',
                   marginTop: 5,
-                  marginRight:  ((dWidth) - ((dWidth / 7.5) * 6))/12 ,
-                  marginLeft: index === 0 ? 0.5 : ((dWidth - 12) - ((dWidth / 7.5) * 6))/12.1 ,
+                  marginRight: (dWidth - (dWidth / 7.5) * 6) / 12,
+                  marginLeft:
+                    index === 0
+                      ? 0.5
+                      : (dWidth - 12 - (dWidth / 7.5) * 6) / 12.1,
                   width: DDS.isTab ? (dWidth * 0.28) / 5 - 24 : dWidth / 7.5,
                   height: DDS.isTab ? (dWidth * 0.28) / 5 - 24 : dWidth / 7.5,
                   borderRadius: 100,
@@ -626,7 +622,7 @@ export const Settings = ({navigation}) => {
                   <Icon color={colors.icon} name="menu-down" size={SIZE.md} />
                 </TouchableOpacity>
               }>
-              {MenuItemsList.slice(0,MenuItemsList.length - 1).map((item) => (
+              {MenuItemsList.slice(0, MenuItemsList.length - 1).map((item) => (
                 <MenuItem
                   onPress={async () => {
                     await setSetting(settings, 'homepage', item.name);
@@ -664,7 +660,7 @@ export const Settings = ({navigation}) => {
           }}>
           <Text
             style={{
-              fontSize: SIZE.sm,
+              fontSize: SIZE.md,
               fontFamily: WEIGHT.regular,
               textAlignVertical: 'center',
               color: colors.pri,
@@ -672,7 +668,7 @@ export const Settings = ({navigation}) => {
             Font Scaling{'\n'}
             <Text
               style={{
-                fontSize: SIZE.xs,
+                fontSize: SIZE.sm,
                 color: colors.icon,
               }}>
               Scale the size of text in the app.
@@ -726,7 +722,7 @@ export const Settings = ({navigation}) => {
                   style={{
                     color:
                       settings.fontScale === item.value ? 'white' : colors.icon,
-                    fontSize: SIZE.xs,
+                    fontSize: SIZE.sm,
                   }}>
                   {item.title}
                 </Text>
@@ -784,7 +780,7 @@ export const Settings = ({navigation}) => {
           }}>
           <Text
             style={{
-              fontSize: SIZE.sm,
+              fontSize: SIZE.md,
               fontFamily: WEIGHT.regular,
               textAlignVertical: 'center',
               color: colors.pri,
@@ -792,7 +788,7 @@ export const Settings = ({navigation}) => {
             Auto Backup{'\n'}
             <Text
               style={{
-                fontSize: SIZE.xs,
+                fontSize: SIZE.sm,
                 color: colors.icon,
               }}>
               Backup your data automatically.
@@ -914,7 +910,11 @@ export const Settings = ({navigation}) => {
             onPress={item.func}
           />
         ))}
-        <Seperator />
+        <View
+          style={{
+            height: 400,
+          }}
+        />
       </ScrollView>
     </Animatable.View>
   );

@@ -70,6 +70,11 @@ export const Tags = ({route, navigation}) => {
       type="tags"
       focused={() => navigation.isFocused()}
       RenderItem={RenderItem}
+      placeholderData={{
+        heading:"Your Favorites",
+        paragraph:"You have not added any notes to favorites yet.",
+        button:null,
+      }}
       placeholder={<Placeholder type="tags" />}
       placeholderText="Tags added to notes appear here"
     />
@@ -84,7 +89,7 @@ const RenderItem = ({item, index}) => {
   return (
     <PressableButton
       onPress={() => {
-        NavigationService.navigate('Notes', {
+        NavigationService.navigate('NotesPage', {
           type: 'tag',
           title: item.title,
           tag: item,

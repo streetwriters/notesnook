@@ -69,6 +69,11 @@ export const Favorites = ({route, navigation}) => {
       refreshCallback={() => {
         dispatch({type: Actions.FAVORITES});
       }}
+      placeholderData={{
+        heading:"Your Favorites",
+        paragraph:"You have not added any notes to favorites yet.",
+        button:null,
+      }}
       focused={() => navigation.isFocused()}
       RenderItem={NoteItemWrapper}
       placeholder={<Placeholder type="favorites" />}

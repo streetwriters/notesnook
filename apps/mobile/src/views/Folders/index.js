@@ -30,7 +30,6 @@ export const Folders = ({route, navigation}) => {
       screen: 'notebooks',
     });
     updateSearch();
-
   }, [notebooks]);
 
   const updateSearch = () => {
@@ -46,8 +45,7 @@ export const Folders = ({route, navigation}) => {
         color: null,
       });
     }
-  }
-
+  };
 
   useEffect(() => {
     navigation.addListener('focus', onFocus);
@@ -75,12 +73,21 @@ export const Folders = ({route, navigation}) => {
         type="notebooks"
         focused={() => navigation.isFocused()}
         RenderItem={NotebookItemWrapper}
+        placeholderData={{
+          heading:"Your Notebooks",
+          paragraph:"You have not added any notebooks yet.",
+          button:"Add a Notebook",
+          action:_onPressBottomButton
+        }}
         placeholder={<Placeholder type="notebooks" />}
       />
-      <ContainerBottomButton
-        title="Create a new notebook"
-        onPress={_onPressBottomButton}
-      />
+
+      {!notebooks || notebooks.length === 0 ? null : (
+        <ContainerBottomButton
+          title="Create a new notebook"
+          onPress={_onPressBottomButton}
+        />
+      )}
     </>
   );
 };
