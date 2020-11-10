@@ -33,6 +33,7 @@ import {opacity, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
 import {ActionIcon} from '../ActionIcon';
 import {Loading} from '../Loading';
+import {ListHeaderComponent} from '../SimpleList/ListHeaderComponent';
 
 const LoginDialog = () => {
   const [state, dispatch] = useTracked();
@@ -246,9 +247,9 @@ const LoginDialog = () => {
                   : '65%'
                 : '100%',
             width: DDS.isTab ? 500 : '100%',
-            backgroundColor: colors.bg,
-            justifyContent: 'center',
+            backgroundColor: colors.shade,
             borderRadius: DDS.isTab ? 5 : 0,
+
             zIndex: 10,
             ...getElevation(DDS.isTab ? 5 : 0),
           }}>
@@ -288,54 +289,31 @@ const LoginDialog = () => {
                 close();
               }}
               customStyle={{
-                width: 40,
-                height: 40,
-                position: 'absolute',
-                top: 0,
-                marginBottom: 15,
-                zIndex: 10,
-                left: 0,
-                marginLeft: 7,
-                marginTop: 5,
+                width: 50,
+                height: 50,
+                alignSelf: 'flex-start',
               }}
               color={colors.heading}
             />
           )}
 
+          <ListHeaderComponent
+            color="transparent"
+            type="settings"
+            title={login ? 'Login' : 'Sign Up'}
+            messageCard={false}
+            paragraph={
+              login
+                ? 'Access notes on any device.'
+                : 'Access notes on any device.'
+            }
+          />
+
           <View
             style={{
-              justifyContent: 'center',
-              width: '100%',
-              height: '100%',
-              alignSelf: 'center',
               paddingHorizontal: 12,
+              paddingTop: 12,
             }}>
-            <View
-              style={{
-                marginBottom: 25,
-              }}>
-              <Text
-                style={{
-                  color: colors.accent,
-                  fontFamily: WEIGHT.bold,
-                  fontSize: SIZE.xxxl,
-                }}>
-                {login ? 'Login' : 'Sign Up'}
-                {'\n'}
-                <Text
-                  style={{
-                    color: colors.icon,
-                    fontSize: SIZE.md,
-                    fontFamily: WEIGHT.regular,
-                  }}>
-                  {login
-                    ? 'Get all your notes from other devices'
-                    : 'Create an account to access notes anywhere.'}
-                  {}
-                </Text>
-              </Text>
-            </View>
-
             <>
               <TextInput
                 ref={_username}
