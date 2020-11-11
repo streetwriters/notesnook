@@ -34,6 +34,7 @@ function GlobalMenuWrapper() {
         id="globalContextMenu"
         menuItems={items}
         data={data}
+        state={state}
         title={title}
         style={{
           position: "absolute",

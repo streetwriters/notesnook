@@ -6,6 +6,7 @@ import { useStore as useAppStore } from "../../stores/app-store";
 import { useStore } from "../../stores/editor-store";
 import { showToast } from "../../utils/toast";
 import { EventManagers } from "../../utils/observablearray";
+import Animated from "../animated";
 
 function Toolbar(props) {
   const { quill } = props;
@@ -16,6 +17,24 @@ function Toolbar(props) {
   const toggleFocusMode = useAppStore((store) => store.toggleFocusMode);
   const toggleProperties = useStore((store) => store.toggleProperties);
   const clearSession = useStore((store) => store.clearSession);
+  const title = useStore((store) => store.session.title);
+  const [isTitleVisible, setIsTitleVisible] = useState(false);
+
+  useEffect(() => {
+    const editorScroll = document.querySelector(".editorScroll");
+    function onScroll(e) {
+      const headerOffset = document.querySelector(".editorTitle").scrollHeight;
+      const hideOffset = headerOffset + 100;
+      if (e.target.scrollTop > hideOffset && !isTitleVisible)
+        setIsTitleVisible(true);
+      else if (e.target.scrollTop <= hideOffset && isTitleVisible)
+        setIsTitleVisible(false);
+    }
+    editorScroll.addEventListener("scroll", onScroll);
+    return () => {
+      editorScroll.removeEventListener("scroll", onScroll);
+    };
+  }, [isTitleVisible]);
 
   useEffect(() => {
     if (!quill?.history) return;
@@ -65,17 +84,28 @@ function Toolbar(props) {
   );
 
   return (
-    <Flex m={2} justifyContent={["space-between", "space-between", "flex-end"]}>
-      <Icon.ChevronLeft
-        sx={{
-          display: ["block", "block", "none"],
-        }}
-        size={30}
-        onClick={() => {
-          clearSession();
-          showToast("success", "Note saved!");
-        }}
-      />
+    <Flex m={2} justifyContent={"space-between"}>
+      <Flex justifyContent="center" alignItems="center">
+        <Icon.ChevronLeft
+          sx={{
+            display: ["block", "block", "none"],
+          }}
+          size={30}
+          onClick={() => {
+            clearSession();
+            showToast("success", "Note saved!");
+          }}
+        />
+        <Animated.Text
+          ml={[2, 2, 0]}
+          initial={{ opacity: isTitleVisible ? 1 : 0 }}
+          animate={{ opacity: isTitleVisible ? 1 : 0 }}
+          transition={{ duration: 0.5 }}
+          fontWeight="heading"
+        >
+          {title}
+        </Animated.Text>
+      </Flex>
       <Flex justifyContent="flex-end">
         {tools.map((tool) => (
           <Button

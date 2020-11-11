@@ -21,7 +21,7 @@
 }
 .ql-toolbar.ql-snow span {
   padding-top: 1px;
-  font-size: 18px;
+  font-size: 1.125em;
 }
 
 .ql-formats {
@@ -166,16 +166,16 @@
 .ql-editor .ql-syntax,
 code {
   font-family: monospace !important;
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 
 .ql-editor .ql-syntax * {
   font-family: monospace !important;
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 
 .ql-editor {
-  font-size: 14px;
+  font-size: 0.875rem;
   color: var(--text) !important;
   padding: 10px !important;
 }

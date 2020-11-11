@@ -9,8 +9,8 @@ function Button(props) {
     <Flex
       data-test-id={props.testId}
       bg="primary"
-      py={2}
-      px={2}
+      py={3}
+      px={3}
       mx={2}
       alignItems="center"
       display={["flex", "none", "none"]}

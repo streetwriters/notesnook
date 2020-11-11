@@ -11,7 +11,7 @@ function Header() {
   const setSession = useStore((store) => store.setSession);
 
   return (
-    <Flex justifyContent="center">
+    <Flex mx={[2, 2, 0]} mb={[2, 2, 0]}>
       <TitleBox
         shouldFocus={sessionState === SESSION_STATES.new}
         title={title}

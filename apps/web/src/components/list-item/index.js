@@ -127,14 +127,13 @@ function ListItem(props) {
             />
           )}
           <Text
-            as="h3"
             color={props.bg ? props.bg : "text"}
             fontFamily={"heading"}
             fontSize="title"
             fontWeight={"bold"}
             sx={{
-              lineHeight: "1.4em",
-              maxHeight: "1.4em", // 2 lines, i hope
+              lineHeight: "1.4rem",
+              maxHeight: "1.4rem", // 2 lines, i hope
               overflow: "hidden",
               textOverflow: "ellipsis",
             }}

@@ -1,6 +1,6 @@
 import React from "react";
 import Animated from "../animated";
-import { Box, Flex, Heading, Text } from "rebass";
+import { Box, Flex, Text } from "rebass";
 import * as Icon from "../icons";
 import { useStore } from "../../stores/app-store";
 import { useStore as useSelectionStore } from "../../stores/selection-store";
@@ -45,34 +45,31 @@ function Header(props) {
   return (
     <Flex mx={2} flexDirection="column">
       <Flex alignItems="center" justifyContent="space-between">
-        <Flex alignItems="center" py={2}>
+        <Flex justifyContent="center" alignItems="center" py={2}>
           {canGoBack || onlyBackButton ? (
-            <Box
-              height={38}
-              width={38}
-              sx={{ flexShrink: 0 }}
+            <Icon.ChevronLeft
+              size={38}
               onClick={() => window.history.back()}
-            >
-              <Icon.ChevronLeft
-                size={38}
-                color="fontPrimary"
-                data-test-id="go-back"
-              />
-            </Box>
+              sx={{ flexShrink: 0 }}
+              color="fontPrimary"
+              data-test-id="go-back"
+            />
           ) : (
             <Icon.Menu
               onClick={toggleSideMenu}
               sx={{
+                flexShrink: 0,
                 ml: 0,
                 mr: 4,
+                mt: 1,
                 display: [onlyBackButton ? "none" : "block", "none", "none"],
               }}
-              size={28}
+              size={30}
             />
           )}
-          <Heading data-test-id="routeHeader" fontSize="heading" color={"text"}>
+          <Text variant="heading" data-test-id="routeHeader" color={"text"}>
             {title}
-          </Heading>
+          </Text>
         </Flex>
         <SelectionOptions options={SELECTION_OPTIONS_MAP[type]} />
         {!isSelectionMode && (

@@ -4,11 +4,12 @@ import * as Icon from "../icons/index";
 import { objectMap } from "../../utils/object";
 import { useStore } from "../../stores/note-store";
 import { Flex } from "rebass";
+import useMobile from "../../utils/use-mobile";
 
 function Colors(props) {
   const { id, colors } = props.data;
   const setColor = useStore((store) => store.setColor);
-
+  const isMobile = useMobile();
   return (
     <Flex flexWrap="wrap">
       {objectMap(COLORS, (label, code) => (
@@ -16,9 +17,11 @@ function Colors(props) {
           sx={{ position: "relative" }}
           onClick={() => setColor(id, label)}
           key={label}
+          justifyContent="center"
+          alignItems="center"
         >
           <Icon.Circle
-            size={25}
+            size={isMobile ? 45 : 25}
             style={{ cursor: "pointer" }}
             color={code}
             strokeWidth={0}
@@ -29,12 +32,10 @@ function Colors(props) {
               data-test-id={`menuitem-colors-${label}-check`}
               sx={{
                 position: "absolute",
-                left: 1,
-                top: 1,
                 cursor: "pointer",
               }}
               color="static"
-              size={14}
+              size={isMobile ? 24 : 14}
             />
           )}
         </Flex>

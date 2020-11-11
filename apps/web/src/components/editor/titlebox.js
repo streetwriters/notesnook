@@ -30,7 +30,7 @@ function TitleBox(props) {
       style={{
         backgroundColor: "transparent",
         fontFamily: theme.fonts["heading"],
-        fontSize: 42,
+        fontSize: "2.625em",
         fontWeight: theme.fontWeights["heading"],
         resize: "none",
         paddingRight: theme.space[2],

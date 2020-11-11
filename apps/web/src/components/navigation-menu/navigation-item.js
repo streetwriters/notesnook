@@ -33,7 +33,7 @@ function NavigationItem(props) {
         />
         <Text
           variant="body"
-          fontSize={12}
+          fontSize="subtitle"
           color={props.selected ? "primary" : "text"}
           ml={1}
         >
