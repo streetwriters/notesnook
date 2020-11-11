@@ -36,11 +36,7 @@ function Unlock(props) {
       justifyContent="center"
       alignItems="center"
     >
-      <Flex
-        flexDirection="column"
-        width={["95%", "95%", "30%"]}
-        alignItems="center"
-      >
+      <Flex flex="1" flexDirection="column" alignItems="center">
         <Flex justifyContent="center" alignItems="center">
           <Icon.Unlock size={48} color="text" />
           <Text variant="heading" ml={2} fontSize={48}>
@@ -55,6 +51,7 @@ function Unlock(props) {
           autoFocus
           variant={isWrong ? "error" : "input"}
           mt={5}
+          maxWidth={["95%", "95%", "50%"]}
           placeholder="Enter vault password"
           type="password"
           onKeyUp={async (e) => {
