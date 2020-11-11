@@ -84,6 +84,18 @@ const AddToNotebookOption = createOption(
   }
 );
 
+const ExportOption = createOption("exportOption", Icon.Export, async function (
+  state
+) {
+  alert("TODO.");
+  //const items = state.selectedItems.map((item) => item.id);
+
+  // if (await showMoveNoteDialog(items)) {
+  //   //TODO show proper snack
+  //   console.log("Notes moved successfully!");
+  // }
+});
+
 const RestoreOption = createOption(
   "restoreOption",
   Icon.Restore,
@@ -94,7 +106,7 @@ const RestoreOption = createOption(
   }
 );
 
-const NotesOptions = createOptions([AddToNotebookOption]);
+const NotesOptions = createOptions([AddToNotebookOption, ExportOption]);
 const NotebooksOptions = createOptions();
 const TopicOptions = createOptions();
 const TrashOptions = createOptions([RestoreOption]);

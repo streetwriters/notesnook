@@ -116,7 +116,7 @@ function Editor() {
         <Animated.Flex
           variant="columnFill"
           className="editor"
-          sx={{ mx: [0, 0, "20%"] }}
+          sx={{ mx: [0, 0, "15%"] }}
           animate={
             isFocusMode && {
               marginRight: "25%",

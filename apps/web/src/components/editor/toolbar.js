@@ -24,7 +24,7 @@ function Toolbar(props) {
     const editorScroll = document.querySelector(".editorScroll");
     function onScroll(e) {
       const headerOffset = document.querySelector(".editorTitle").scrollHeight;
-      const hideOffset = headerOffset + 100;
+      const hideOffset = headerOffset + 60;
       if (e.target.scrollTop > hideOffset && !isTitleVisible)
         setIsTitleVisible(true);
       else if (e.target.scrollTop <= hideOffset && isTitleVisible)
