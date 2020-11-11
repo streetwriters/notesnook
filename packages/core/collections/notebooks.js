@@ -3,6 +3,7 @@ import fuzzysearch from "fuzzysearch";
 import Notebook from "../models/notebook";
 import sort from "fast-sort";
 import getId from "../utils/id";
+import { sendCheckUserStatusEvent } from "../common";
 var tfun = require("transfun/transfun.js").tfun;
 if (!tfun) {
   tfun = global.tfun;
@@ -11,6 +12,11 @@ if (!tfun) {
 export default class Notebooks extends Collection {
   async add(notebookArg) {
     if (!notebookArg) throw new Error("Notebook cannot be undefined or null.");
+    if (
+      this.all.length === 3 &&
+      !(await sendCheckUserStatusEvent("notebook:add"))
+    )
+      return;
 
     if (notebookArg.remote) {
       return await this._collection.addItem(notebookArg);

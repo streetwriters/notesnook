@@ -2,6 +2,7 @@ import MarkdownBuilder from "../utils/templates/markdown/builder";
 import HTMLBuilder from "../utils/templates/html/builder";
 import TextBuilder from "../utils/templates/text/builder";
 import { getContentFromData } from "../content-types";
+import { EV, sendCheckUserStatusEvent } from "../common";
 
 export default class Note {
   /**
@@ -59,6 +60,10 @@ export default class Note {
     };
     const { data, type } = await this._db.content.raw(this._note.contentId);
     let content = getContentFromData(type, data);
+
+    if (to !== "txt" && !(await sendCheckUserStatusEvent("note:export")))
+      return;
+
     switch (to) {
       case "html":
         templateData.content = content.toHTML();
@@ -78,16 +83,24 @@ export default class Note {
     return this._db.content.get(this._note.contentId);
   }
 
-  color(color) {
-    return addTag.call(this, color, "colors");
+  async color(color) {
+    if (!(await sendCheckUserStatusEvent("note:colors"))) return;
+    return await addTag.call(this, color, "colors");
   }
+
   uncolor(color) {
     return removeTag.call(this, color, "colors");
   }
 
-  tag(tag) {
-    return addTag.call(this, tag, "tags");
+  async tag(tag) {
+    if (
+      this._db.tags.all.length === 5 &&
+      !(await sendCheckUserStatusEvent("note:tags"))
+    )
+      return;
+    return await addTag.call(this, tag, "tags");
   }
+
   untag(tag) {
     return removeTag.call(this, tag, "tags");
   }

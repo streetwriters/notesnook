@@ -1,4 +1,5 @@
 import SparkMD5 from "spark-md5";
+import { sendCheckUserStatusEvent } from "../common.js";
 
 const invalidKeys = ["user", "t", "lastBackupTime"];
 const validTypes = ["mobile", "web", "node"];
@@ -21,8 +22,12 @@ export default class Backup {
    * @param {boolean} encrypt
    */
   async export(type, encrypt = false) {
+    if (encrypt && !(await sendCheckUserStatusEvent("backup:encrypt"))) return;
+
     if (!validTypes.some((t) => t === type))
-      throw new Error("Invalid type. It must be one of 'mobile' or 'web'.");
+      throw new Error(
+        "Invalid type. It must be one of 'mobile' or 'web' or 'node'."
+      );
 
     const keys = (await this._db.context.getAllKeys()).filter(
       (key) => !invalidKeys.some((t) => t === key)

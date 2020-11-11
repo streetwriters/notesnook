@@ -33,5 +33,12 @@ class EventManager {
       handler(...args);
     });
   }
+
+  async publishWithResult(name, ...args) {
+    if (!this._registry[name]) return true;
+    const handlers = this._registry[name];
+    if (handlers.length <= 0) return true;
+    return await Promise.all(handlers.map((handler) => handler(...args)));
+  }
 }
 export default EventManager;
