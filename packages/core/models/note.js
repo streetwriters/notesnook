@@ -94,7 +94,7 @@ export default class Note {
 
   async tag(tag) {
     if (
-      this._db.tags.all.length === 5 &&
+      this._db.tags.all.length >= 5 &&
       !(await sendCheckUserStatusEvent("note:tags"))
     )
       return;

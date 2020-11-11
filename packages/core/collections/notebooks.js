@@ -13,7 +13,7 @@ export default class Notebooks extends Collection {
   async add(notebookArg) {
     if (!notebookArg) throw new Error("Notebook cannot be undefined or null.");
     if (
-      this.all.length === 3 &&
+      this.all.length >= 3 &&
       !(await sendCheckUserStatusEvent("notebook:add"))
     )
       return;
