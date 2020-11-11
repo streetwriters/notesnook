@@ -117,12 +117,10 @@ function Editor() {
           variant="columnFill"
           className="editor"
           sx={{ mx: [0, 0, "15%"] }}
-          animate={
-            isFocusMode && {
-              marginRight: "25%",
-              marginLeft: "25%",
-            }
-          }
+          animate={{
+            marginRight: isFocusMode ? "25%" : "15%",
+            marginLeft: isFocusMode ? "25%" : "15%",
+          }}
           transition={{ duration: 0.3, ease: "easeOut" }}
           mt={[0, 0, 50]}
         >
