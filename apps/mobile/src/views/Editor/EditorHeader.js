@@ -7,7 +7,6 @@ import {
 } from '../../components/DialogManager/recievers';
 import {
   TEMPLATE_EXIT_FULLSCREEN,
-  TEMPLATE_NEW_NOTE,
 } from '../../components/DialogManager/Templates';
 import {useTracked} from '../../provider';
 import {DDS} from '../../services/DeviceDetection';
@@ -25,6 +24,7 @@ import {
   eOnLoadNote,
   eOpenFullscreenEditor,
 } from '../../utils/Events';
+import {tabBarRef} from '../../utils/Refs';
 import {normalize} from '../../utils/SizeUtils';
 import {
   checkNote,
@@ -35,6 +35,7 @@ import {
   isNotedEdited,
   loadNote,
   post,
+  setColors,
   textInput,
 } from './Functions';
 import HistoryComponent from './HistoryComponent';
@@ -48,6 +49,7 @@ const EditorHeader = ({noMenu}) => {
   const [fullscreen, setFullscreen] = useState(false);
 
   useEffect(() => {
+    setColors(colors);
     let c = {...colors};
     c.factor = normalize(1);
     post('theme', colors);
@@ -93,15 +95,10 @@ const EditorHeader = ({noMenu}) => {
   }, [noMenu]);
 
   const load = async (item) => {
+    await loadNote(item);
     Keyboard.addListener('keyboardDidShow', () => {
       post('keyboard');
     });
-    await loadNote(item);
-    if (item.type === 'new') {
-      textInput.current?.focus();
-      post('focusTitle');
-      Platform.OS === 'android' ? EditorWebView.current?.requestFocus() : null;
-    }
     if (!DDS.isTab) {
       handleBack = BackHandler.addEventListener(
         'hardwareBackPress',
@@ -126,9 +123,11 @@ const EditorHeader = ({noMenu}) => {
 
   const _onHardwareBackPress = async () => {
     if (editing.currentlyEditing) {
+      await _onBackPress();
+      return true;
+      /* 
       if (tapCount > 0) {
-        await _onBackPress();
-        return true;
+    
       } else {
         tapCount = 1;
         setTimeout(() => {
@@ -136,16 +135,22 @@ const EditorHeader = ({noMenu}) => {
         }, 3000);
         ToastEvent.show('Press back again to exit editor', 'success');
         return true;
-      }
+      } */
     }
   };
 
   const _onBackPress = async () => {
-    editing.currentlyEditing = true;
+    editing.currentlyEditing = false;
     if (DDS.isTab && !DDS.isSmallTab) {
-      simpleDialogEvent(TEMPLATE_EXIT_FULLSCREEN());
+      if (fullscreen) {
+        eSendEvent(eCloseFullscreenEditor);
+      }
     } else {
-      exitEditorAnimation();
+      /*  exitEditorAnimation(); */
+      if (DDS.isPhone || DDS.isSmallTab) {
+        tabBarRef.current?.goToPage(0);
+      }
+
       eSendEvent('historyEvent', {
         undo: 0,
         redo: 0,
@@ -229,8 +234,8 @@ const EditorHeader = ({noMenu}) => {
               marginLeft: 10,
               borderRadius: 5,
             }}
-            onPress={() => {
-              simpleDialogEvent(TEMPLATE_NEW_NOTE);
+            onPress={async () => {
+              await loadNote({type: 'new'});
             }}
           />
 
