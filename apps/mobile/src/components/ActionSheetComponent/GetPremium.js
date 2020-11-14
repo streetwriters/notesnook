@@ -68,6 +68,7 @@ export const GetPremium = ({close, context = 'global', offset = 0}) => {
         alignSelf: 'center',
         justifyContent: 'space-between',
         top: offset,
+        maxWidth:"100%",
         transform: [
           {
             translateX: translate,
@@ -77,7 +78,7 @@ export const GetPremium = ({close, context = 'global', offset = 0}) => {
       <Heading
         size={SIZE.md}
         color="white"
-        style={{maxWidth: '75%', paddingRight: 6}}>
+        style={{maxWidth: '70%', paddingRight: 6}}>
         {msg.title}
         {'\n'}
         <Paragraph size={SIZE.sm} color="white">
@@ -95,6 +96,7 @@ export const GetPremium = ({close, context = 'global', offset = 0}) => {
         title="Get Now"
         type="inverted"
       />
+
     </Animated.View>
   );
 };

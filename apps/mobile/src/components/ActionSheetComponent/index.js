@@ -460,7 +460,7 @@ export const ActionSheetComponent = ({
       () => {
         eSendEvent(eShowGetPremium, {
           context: 'sheet',
-          title: 'Get Notesnook Pro',
+          title: 'Add Notes to Vault',
           desc:
             'With Notesnook Pro you can add notes to your vault and do so much more! Get it now.',
         });

@@ -104,8 +104,8 @@ export const Menu = React.memo(
               style={{textAlign: 'center'}}
               color={colors.icon}
               size={SIZE.xs}>
-              You have not pinned anything yet. You can pin notebook topics and
-              tags here.
+              You have not pinned anything yet. You can pin topics and tags
+              here.
             </Paragraph>
           </View>
         </ScrollView>

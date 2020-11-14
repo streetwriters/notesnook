@@ -94,9 +94,9 @@ const ExportDialog = () => {
           () => {
             eSendEvent(eShowGetPremium, {
               context: 'export',
-              title: 'Get Notesnook Pro',
+              title: 'Export in PDF, Markdown & HTML',
               desc:
-                'With Notesnook Pro you will be able to export your note in PDF, Markdown and HTML formats! Get it today.',
+                'Get Notesnook Pro to export your note in PDF, Markdown and HTML formats!',
             });
           },
         );
@@ -114,9 +114,9 @@ const ExportDialog = () => {
           () => {
             eSendEvent(eShowGetPremium, {
               context: 'export',
-              title: 'Get Notesnook Pro',
+              title: 'Export in PDF, Markdown & HTML',
               desc:
-                'With Notesnook Pro you will be able to export your note in PDF, Markdown and HTML formats! Get it today.',
+                'Get Notesnook Pro to export your note in PDF, Markdown and HTML formats!',
             });
           },
         );
@@ -142,9 +142,9 @@ const ExportDialog = () => {
           () => {
             eSendEvent(eShowGetPremium, {
               context: 'export',
-              title: 'Get Notesnook Pro',
+              title: 'Export in PDF, Markdown & HTML',
               desc:
-                'With Notesnook Pro you will be able to export your note in PDF, Markdown and HTML formats! Get it today.',
+                'Get Notesnook Pro to export your note in PDF, Markdown and HTML formats!',
             });
           },
         );
