@@ -276,6 +276,9 @@ const setTheme = function () {
 
   }
 
+  #titlebar {
+    background-color:${pageTheme.colors.shade};
+  }
 
   #textCopy {
     color:${pageTheme.colors.pri};

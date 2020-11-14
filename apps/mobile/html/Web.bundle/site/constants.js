@@ -287,6 +287,10 @@ const setTheme = function () {
     color:${pageTheme.colors.icon}
   }
 
+  #titlebar {
+    background-color:${pageTheme.colors.shade};
+  }
+
   .ql-picker-options {
     background-color: ${pageTheme.colors.nav};
     border-color:${pageTheme.colors.nav};
