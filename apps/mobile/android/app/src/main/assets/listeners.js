@@ -14,12 +14,23 @@ function attachTitleInputListeners() {
     onTitleChange();
   };
 
+
+   document.getElementById('titleInput').onkeypress = function (evt) {
+    if (evt.keyCode === 13 || evt.which === 13) {
+      evt.preventDefault();
+      editor.focus();
+      editor.setSelection(editor.getText().length - 1, 0);
+      onTitleChange();
+      return false;
+    }
+  };
+
   document.getElementById('titleInput').onkeydown = function (evt) {
     onTitleChange(evt);
   };
 
   document.getElementById('titleInput').onchange = function (evt) {
-    onTitleChange(evt);
+    autosize();
   };
 
   document.getElementById('titleInput').onkeyup = function (evt) {
@@ -45,9 +56,9 @@ function autosize() {
 }
 
 function attachEditorListeners() {
-  editor.once('text-change', function () {
+  /*  editor.once('text-change', function () {
     window.ReactNativeWebView.postMessage('loaded');
-  });
+  }); */
 
   document.addEventListener('message', (data) => {
     let message = JSON.parse(data.data);
@@ -70,6 +81,7 @@ function attachEditorListeners() {
         document.getElementById('infodate').innerText = '';
         document.getElementById('infosaved').innerText = '';
         document.getElementById('infowords').innerText = '';
+        autosize();
         break;
       }
       case 'keyboard':
@@ -109,12 +121,12 @@ function attachEditorListeners() {
       case 'text':
         editor.setText(value, 'api');
 
-          setTimeout(() => {
-            document.getElementById('infowords').innerText =
-              editor.getText().split(' ').length + ' words';
-            document.getElementById('infosaved').innerText = 'Saved';
-          }, 100);
-       
+        setTimeout(() => {
+          document.getElementById('infowords').innerText =
+            editor.getText().split(' ').length + ' words';
+          document.getElementById('infosaved').innerText = 'Saved';
+        }, 100);
+
         break;
       case 'clearEditor':
         editor.setText('', 'api');
@@ -127,7 +139,7 @@ function attachEditorListeners() {
         break;
       case 'focusTitle':
         document.getElementById('titleInput').focus();
-
+        autosize();
         break;
       case 'nomenu':
         let isenabled = value;
@@ -166,7 +178,7 @@ function attachEditorListeners() {
           document.body.scrollTop = 0; // For Safari
           document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
         }, 100);
-
+        autosize();
         break;
       case 'html':
         editor.setContents(editor.clipboard.convert(value, 'api'), 'silent');
@@ -186,6 +198,9 @@ function attachEditorListeners() {
     }
     return whiteSpace;
   }
+
+  let deltaTimeout = null;
+  let historyTimeout = null;
 
   editor.on('text-change', function (delta, oldDelta, source) {
     var regex = /https?:\/\/[^\s]+$/;
@@ -218,22 +233,34 @@ function attachEditorListeners() {
       }
     }
 
-    let m = {};
-    m.delta = {ops: editor.getContents().ops};
-
-    m.text = editor.getText();
     document.getElementById('infowords').innerText =
-      m.text.split(' ').length + ' words';
-    m.html = editor.root.innerHTML;
-    m.type = 'content';
-    window.ReactNativeWebView.postMessage(JSON.stringify(m));
+      editor.getText().split(' ').length + ' words';
 
-    window.ReactNativeWebView.postMessage(
-      JSON.stringify({
+    if (deltaTimeout) {
+      clearTimeout(deltaTimeout);
+      deltaTimeout = null;
+    }
+
+    deltaTimeout = setTimeout(() => {
+      let msg = JSON.stringify({
+        data: editor.getContents().ops,
+        type: 'delta',
+      });
+      window.ReactNativeWebView.postMessage(msg);
+    }, 50);
+
+    if (historyTimeout) {
+      clearTimeout(historyTimeout);
+      historyTimeout = null;
+    }
+
+    historyTimeout = setTimeout(() => {
+      let history = JSON.stringify({
         type: 'history',
         undo: editor.history.stack.undo.length,
         redo: editor.history.stack.redo.length,
-      }),
-    );
+      });
+      window.ReactNativeWebView.postMessage(history);
+    }, 250);
   });
 }
