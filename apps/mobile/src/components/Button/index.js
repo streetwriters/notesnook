@@ -5,28 +5,44 @@ import {useTracked} from '../../provider';
 import {PressableButton} from '../PressableButton';
 import {ph, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
 
+const BUTTON_TYPES = {
+  transparent: {
+    primary: 'transparent',
+    text: 'accent',
+    selected: 'shade',
+  },
+  gray: {
+    primary: 'transparent',
+    text: 'icon',
+    selected: 'nav',
+  },
+  accent: {
+    primary: 'accent',
+    text: 'white',
+    selected: 'accent',
+  },
+};
+
 export const Button = ({
   height = 40,
-  width = '48%',
+  width = null,
   onPress = () => {},
   loading = false,
-  grayed,
   title = '',
   icon,
-  color,
   fontSize = SIZE.sm,
-  iconColor = 'accent',
+  type = 'transparent',
 }) => {
   const [state] = useTracked();
   const {colors} = state;
-  const usedColor =  colors[color];
 
   return (
     <PressableButton
       onPress={onPress}
-      color={usedColor || "transparent"}
-      selectedColor={grayed ? colors.nav : colors.shade}
-      alpha={grayed ? (!colors.night ? -0.02 : 0.02) : -0.1}
+      disabled={loading}
+      color={colors[BUTTON_TYPES[type].primary]}
+      selectedColor={colors[BUTTON_TYPES[type].selected]}
+      alpha={!colors.night ? -0.04 : 0.04}
       customStyle={{
         height: height,
         width: width ? width : null,
@@ -38,21 +54,23 @@ export const Button = ({
         alignItems: 'center',
         flexDirection: 'row',
       }}>
-      {loading ? <ActivityIndicator color={usedColor} /> : null}
+      {loading ? (
+        <ActivityIndicator color={colors[BUTTON_TYPES[type].text]} />
+      ) : null}
       {icon && !loading ? (
         <Icon
           name={icon}
           style={{
             marginRight: 0,
           }}
-          color={grayed ? colors.icon : colors[iconColor]}
+          color={color[BUTTON_TYPES[type].text]}
           size={SIZE.md}
         />
       ) : null}
       <Text
         style={[
           styles.buttonText,
-          {color: grayed ? colors.icon : colors[iconColor], fontSize: fontSize},
+          {color: colors[BUTTON_TYPES[type].text], fontSize: fontSize},
         ]}>
         {title}
       </Text>

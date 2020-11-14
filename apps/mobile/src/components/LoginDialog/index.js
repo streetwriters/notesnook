@@ -255,32 +255,6 @@ const LoginDialog = () => {
             ...getElevation(DDS.isTab ? 5 : 0),
           }}>
           <Toast context="local" />
-          {loggingIn || signingIn ? (
-            <View
-              style={{
-                backgroundColor: !colors.night
-                  ? 'rgba(0,0,0,0.2)'
-                  : 'rgba(255,255,255,0.2)',
-                zIndex: 10,
-                position: 'absolute',
-                justifyContent: 'center',
-                alignItems: 'center',
-                width: '100%',
-                height: '100%',
-              }}>
-              <Loading
-                tagline={status}
-                customStyle={{
-                  alignSelf: 'center',
-                  backgroundColor: colors.bg,
-                  ...getElevation(5),
-                  borderRadius: 5,
-                  width: '80%',
-                  height: 100,
-                }}
-              />
-            </View>
-          ) : null}
 
           {DDS.isTab ? null : (
             <View
@@ -341,6 +315,7 @@ const LoginDialog = () => {
                     });
                   }
                 }}
+                editable={!loggingIn || !signingIn}
                 autoCapitalize="none"
                 defaultValue={username}
                 onBlur={() => {
@@ -431,6 +406,7 @@ const LoginDialog = () => {
                       });
                     }
                   }}
+                  editable={!loggingIn || !signingIn}
                   autoCapitalize="none"
                   defaultValue={email}
                   onBlur={() => {
@@ -529,6 +505,7 @@ const LoginDialog = () => {
                     });
                   }
                 }}
+                editable={!loggingIn || !signingIn}
                 autoCapitalize="none"
                 defaultValue={password}
                 onBlur={() => {
@@ -624,7 +601,11 @@ const LoginDialog = () => {
               <>
                 <TextInput
                   ref={_passConfirm}
-                  editable={password && !invalidPassword ? true : false}
+                  editable={
+                    !loggingIn || !signingIn || (password && !invalidPassword)
+                      ? true
+                      : false
+                  }
                   defaultValue={passwordReEnter}
                   autoCapitalize="none"
                   onChangeText={(value) => {
@@ -700,6 +681,7 @@ const LoginDialog = () => {
               <>
                 <Seperator />
                 <TouchableOpacity
+                  disabled={loggingIn || signingIn}
                   onPress={() => {
                     setUserConsent(!userConsent);
                   }}
@@ -754,11 +736,11 @@ const LoginDialog = () => {
                 width: '100%',
               }}>
               <Button
-                title={login ? 'Login' : 'Create Account'}
+                title={  login ? 'Login' : 'Create Account'}
                 onPress={login ? loginUser : signupUser}
                 width="100%"
-                color="accent"
-                iconColor="white"
+                type="accent"
+                loading={loggingIn || signingIn}
                 fontSize={SIZE.md}
                 height={50}
               />
