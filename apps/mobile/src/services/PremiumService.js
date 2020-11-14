@@ -4,7 +4,7 @@ import { eSendEvent } from "./EventManager";
 
 let premiumStatus = null;
 
-function setPremiumStatus(status) {
+async function setPremiumStatus(status) {
 	try {
 		let user = await db.user.get();
 		if (!user || !user.id) {
@@ -17,12 +17,17 @@ function setPremiumStatus(status) {
 	  }
 }
 
-async function verify(callback) {
+async function verify(callback,error) {
   try {
 	let user = await db.user.get();
 	
     if (!user || !user.id) {
-      eSendEvent(eOpenPremiumDialog);
+      if (error) {
+        error();
+        return;
+      }
+
+      eSendEvent( eOpenPremiumDialog);
       return;
     } else {
       if (!callback) console.warn('You must provide a callback function');

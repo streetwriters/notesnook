@@ -21,6 +21,11 @@ const BUTTON_TYPES = {
     text: 'white',
     selected: 'accent',
   },
+  inverted: {
+    primary: 'bg',
+    text: 'accent',
+    selected: 'bg',
+  },
 };
 
 export const Button = ({
@@ -61,7 +66,7 @@ export const Button = ({
           style={{
             marginRight: 0,
           }}
-          color={color[BUTTON_TYPES[type].text]}
+          color={colors[BUTTON_TYPES[type].text]}
           size={SIZE.md}
         />
       )}

@@ -19,6 +19,7 @@ import {
   sendNoteEditedEvent,
   ToastEvent,
 } from '../../services/EventManager';
+import PremiumService from '../../services/PremiumService';
 import {
   ACCENT,
   COLOR_SCHEME,
@@ -27,11 +28,15 @@ import {
   setColorScheme,
 } from '../../utils/Colors';
 import {db} from '../../utils/DB';
-import {eOpenLoginDialog, eOpenMoveNoteDialog} from '../../utils/Events';
-import { deleteItems } from '../../utils/functions';
+import {
+  eOpenLoginDialog,
+  eOpenMoveNoteDialog,
+  eShowGetPremium,
+} from '../../utils/Events';
+import {deleteItems} from '../../utils/functions';
 import {MMKV} from '../../utils/mmkv';
 import {opacity, ph, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
-import {timeConverter} from '../../utils/TimeUtils';
+import {sleep, timeConverter} from '../../utils/TimeUtils';
 import {Button} from '../Button';
 import {PremiumTag} from '../Premium/PremiumTag';
 import {PressableButton} from '../PressableButton';
@@ -40,6 +45,7 @@ import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 import {ActionSheetColorsSection} from './ActionSheetColorsSection';
 import {ActionSheetTagsSection} from './ActionSheetTagsSection';
+import {GetPremium} from './GetPremium';
 const w = Dimensions.get('window').width;
 
 export const ActionSheetComponent = ({
@@ -174,11 +180,10 @@ export const ActionSheetComponent = ({
       func: async () => {
         close();
         try {
-          await deleteItems(note)
-        } catch(e) {
+          await deleteItems(note);
+        } catch (e) {
           console.log(e);
         }
-     
       },
     },
     {
@@ -423,36 +428,44 @@ export const ActionSheetComponent = ({
     }
   };
 
-  const onPressVaultButton = () => {
-    if (!premiumUser) {
-      close('premium');
-      return;
-    }
-    if (!note.id) return;
+  const onPressVaultButton = async () => {
+    await PremiumService.verify(
+      () => {
+        if (!note.id) return;
 
-    if (note.locked) {
-      close('unlock');
-    } else {
-      db.vault
-        .add(note.id)
-        .then(() => {
-          sendNoteEditedEvent(note.id, false, true);
-          close();
-        })
-        .catch(async (e) => {
-          switch (e.message) {
-            case db.vault.ERRORS.noVault:
-              close('novault');
-              break;
-            case db.vault.ERRORS.vaultLocked:
-              close('locked');
-              break;
-            case db.vault.ERRORS.wrongPassword:
+        if (note.locked) {
+          close('unlock');
+        } else {
+          db.vault
+            .add(note.id)
+            .then(() => {
+              sendNoteEditedEvent(note.id, false, true);
               close();
-              break;
-          }
+            })
+            .catch(async (e) => {
+              switch (e.message) {
+                case db.vault.ERRORS.noVault:
+                  close('novault');
+                  break;
+                case db.vault.ERRORS.vaultLocked:
+                  close('locked');
+                  break;
+                case db.vault.ERRORS.wrongPassword:
+                  close();
+                  break;
+              }
+            });
+        }
+      },
+      () => {
+        eSendEvent(eShowGetPremium, {
+          context: 'sheet',
+          title: 'Get Notesnook Pro',
+          desc:
+            'With Notesnook Pro you can add notes to your vault and do so much more! Get it now.',
         });
-    }
+      },
+    );
   };
 
   return (
@@ -467,6 +480,7 @@ export const ActionSheetComponent = ({
         backgroundColor: colors.bg,
         paddingHorizontal: 0,
       }}>
+      <GetPremium context="sheet" close={close} offset={-110} />
       {!note.id && !note.dateCreated ? (
         <Paragraph style={{marginVertical: 10}}>
           Start writing to save your note.
@@ -635,10 +649,16 @@ export const ActionSheetComponent = ({
         </PressableButton>
       ) : null}
 
-      {hasColors && note.id ? <ActionSheetColorsSection item={note} /> : null}
+      {hasColors && note.id ? (
+        <ActionSheetColorsSection close={close} item={note} />
+      ) : null}
 
       {hasTags ? (
-        <ActionSheetTagsSection item={note} localRefresh={localRefresh} />
+        <ActionSheetTagsSection
+          close={close}
+          item={note}
+          localRefresh={localRefresh}
+        />
       ) : null}
 
       {columnItems.length > 0 ? (

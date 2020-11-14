@@ -120,3 +120,5 @@ export const eCloseSortDialog = '560';
 
 export const eOpenJumpToDialog = '561';
 export const eCloseJumpToDialog = '562';
+
+export const eShowGetPremium = '563';

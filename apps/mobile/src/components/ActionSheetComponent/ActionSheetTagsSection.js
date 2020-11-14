@@ -2,16 +2,19 @@ import React, {createRef, useCallback, useEffect, useState} from 'react';
 import {Text, TextInput, TouchableOpacity, View} from 'react-native';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
-import {sendNoteEditedEvent, ToastEvent} from '../../services/EventManager';
+import {eSendEvent, sendNoteEditedEvent, ToastEvent} from '../../services/EventManager';
+import PremiumService from '../../services/PremiumService';
 import {db} from '../../utils/DB';
+import { eShowGetPremium } from '../../utils/Events';
 import {SIZE, WEIGHT} from '../../utils/SizeUtils';
+import {sleep} from '../../utils/TimeUtils';
 
 const tagsInputRef = createRef();
 let prevQuery = null;
 let tagToAdd = '';
 let backPressCount = 0;
 
-export const ActionSheetTagsSection = ({item}) => {
+export const ActionSheetTagsSection = ({item, close}) => {
   const [state, dispatch] = useTracked();
   const {colors, tags, premiumUser} = state;
   const [suggestions, setSuggestions] = useState([]);
@@ -42,22 +45,45 @@ export const ActionSheetTagsSection = ({item}) => {
       return;
     }
 
-    let tag = tagToAdd;
-    tag = tag.trim();
-    if (tag.includes(' ')) {
-      tag = tag.replace(' ', '_');
-    }
-    if (tag.includes(',')) {
-      tag = tag.replace(',', '');
+    async function add() {
+      let tag = tagToAdd;
+      tag = tag.trim();
+      if (tag.includes(' ')) {
+        tag = tag.replace(' ', '_');
+      }
+      if (tag.includes(',')) {
+        tag = tag.replace(',', '');
+      }
+
+      try {
+        await db.notes.note(note.id).tag(tag);
+        localRefresh(note.type);
+        dispatch({type: Actions.TAGS});
+        tagsInputRef.current?.setNativeProps({
+          text: '',
+        });
+        tagToAdd = '';
+      } catch (e) {
+        ToastEvent.show(e.message, 'error', 'local');
+      }
     }
 
-    await db.notes.note(note.id).tag(tag);
-    localRefresh(note.type);
-    dispatch({type: Actions.TAGS});
-    tagsInputRef.current?.setNativeProps({
-      text: '',
-    });
-    tagToAdd = '';
+    if (
+      tags.length >= 5 &&
+      tags.findIndex((t) => t.title === tagToAdd) === -1
+    ) {
+      await PremiumService.verify(add, () => {
+        eSendEvent(eShowGetPremium, {
+          context: 'sheet',
+          title: 'Get Notesnook Pro',
+          desc: 'To create more tags for your notes become a Pro user today.',
+        });
+      });
+
+      return;
+    }
+
+    await add();
   });
 
   useEffect(() => {
@@ -171,7 +197,7 @@ export const ActionSheetTagsSection = ({item}) => {
               fontSize: SIZE.xs,
               color: colors.pri,
             }}>
-            {"Suggested: "}
+            {'Suggested: '}
           </Text>
         )}
 

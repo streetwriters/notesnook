@@ -169,6 +169,7 @@ const SimpleList = ({
             onPress={placeholderData.action}
             title={placeholderData.button}
             icon="plus"
+            type="transparent"
             fontSize={SIZE.md}
           />
         )}
