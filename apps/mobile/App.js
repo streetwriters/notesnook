@@ -20,7 +20,7 @@ import {
   eStartSyncer,
 } from './src/utils/Events';
 import DeviceInfo from 'react-native-device-info';
-import {getNote} from './src/views/Editor/Functions';
+import {getNote, setIntent} from './src/views/Editor/Functions';
 import {openEditorAnimation} from './src/utils/Animations';
 import {sleep} from './src/utils/TimeUtils';
 import {getColorScheme} from './src/utils/ColorUtils';
@@ -31,7 +31,8 @@ import {MMKV} from './src/utils/mmkv';
 import Backup from './src/services/Backup';
 import {setLoginMessage} from './src/services/Message';
 import SplashScreen from 'react-native-splash-screen';
-import {sortSettings} from './src/utils';
+import {editing, sortSettings} from './src/utils';
+import { tabBarRef } from './src/utils/Refs';
 
 let firstLoad = true;
 let note = null;
@@ -110,7 +111,7 @@ const App = () => {
         if (note && note.id) {
           eSendEvent(eOnLoadNote, note);
           if (DDS.isPhone || DDS.isSmallTab) {
-            openEditorAnimation();
+            tabBarRef.current?.goToPage(1);
           }
           note = null;
         }
@@ -192,26 +193,28 @@ const App = () => {
           let delta = null;
 
           if (weblink && text) {
-            delta = {ops: [{insert: `${text + ' ' + weblink}`}]};
+            delta = [{insert: `${text + ' ' + weblink}`}];
             text = data.text + ' ' + data.weblink;
           } else if (text && !weblink) {
-            delta = {ops: [{insert: `${text}`}]};
+            delta = [{insert: `${text}`}];
             text = data.text;
           } else if (weblink) {
             console.log('putting link')
-            delta = {ops: [{insert: `${weblink}`}]};
+            delta = [{insert: `${weblink}`}];
             text = weblink
           }
-          console.log(text,weblink,"HERE SHOWING",delta);
+     
           prevIntent.text = text;
           prevIntent.weblink = weblink;
+          setIntent();
+          console.log(text,weblink,"HERE SHOWING",delta);
           eSendEvent(eOnLoadNote, {
             type: 'intent',
             data: delta,
             text: text,
           });
           if (DDS.isPhone || DDS.isSmallTab) {
-            openEditorAnimation();
+            tabBarRef.current?.goToPage(1);
           }
         }
         ReceiveSharingIntent.clearReceivedFiles();
