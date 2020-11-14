@@ -1,31 +1,31 @@
 import React, {useEffect} from 'react';
 import {Text, View} from 'react-native';
-import {useTracked} from '../../provider';
-import {normalize, SIZE} from '../../utils/SizeUtils';
-import Heading from '../Typography/Heading';
-import {Placeholder} from '../ListPlaceholders';
-import {eScrollEvent} from '../../utils/Events';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
 import Animated from 'react-native-reanimated';
-import {dWidth} from '../../utils';
-import {MessageCard} from './MessageCard';
+import {useTracked} from '../../provider';
+import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
+import {COLORS_NOTE} from '../../utils/Colors';
+import {hexToRGBA} from '../../utils/ColorUtils';
+import {eScrollEvent} from '../../utils/Events';
+import {normalize, SIZE} from '../../utils/SizeUtils';
+import {Placeholder} from '../ListPlaceholders';
+import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
+import {MessageCard} from './MessageCard';
 
 const opacity = new Animated.Value(1);
 export const ListHeaderComponent = ({
   type,
-  data,
   messageCard = true,
   title,
   paragraph,
-  color
+  color,
 }) => {
   const [state] = useTracked();
-  const {colors, headerTextState} = state;
-
+  const {colors, headerTextState, currentScreen} = state;
+/* 
   const onScroll = async (y) => {
-    if (y > 25) {
-      let o = y / 125;
+    if (y > 100) {
+      let o = (y - 100) / 100;
       o = 1 - o;
       console.log(o);
       opacity.setValue(o);
@@ -40,14 +40,17 @@ export const ListHeaderComponent = ({
       eUnSubscribeEvent(eScrollEvent, onScroll);
     };
   }, []);
-
-  return (
-    <Animated.View
+ */
+  return type === 'search' ? null : (
+    <View
       style={{
-        minHeight: 200,
+        minHeight: 195,
+        marginBottom: 5,
         padding: 12,
-        backgroundColor:color || colors.shade,
-        opacity: opacity,
+        width: '100%',
+        backgroundColor: COLORS_NOTE[currentScreen]
+          ? hexToRGBA(COLORS_NOTE[currentScreen], 0.15)
+          : color || colors.shade,
       }}>
       {messageCard && <MessageCard />}
 
@@ -65,7 +68,12 @@ export const ListHeaderComponent = ({
           paddingHorizontal: 12,
           position: 'absolute',
         }}>
-        <Placeholder w={normalize(150)} h={normalize(150)} type={type} />
+        <Placeholder
+          color={COLORS_NOTE[currentScreen]}
+          w={normalize(150)}
+          h={normalize(150)}
+          type={type}
+        />
       </View>
       <View
         style={{
@@ -95,6 +103,6 @@ export const ListHeaderComponent = ({
           <Paragraph color={colors.icon}> {'\n' + paragraph}</Paragraph>
         )}
       </View>
-    </Animated.View>
+    </View>
   );
 };

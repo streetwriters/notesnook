@@ -7,26 +7,26 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {DataProvider, LayoutProvider, RecyclerListView} from 'recyclerlistview';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {eSendEvent, ToastEvent} from '../../services/EventManager';
+import {db} from '../../utils/DB';
 import {
   eOpenJumpToDialog,
   eOpenLoginDialog,
   eScrollEvent,
 } from '../../utils/Events';
-import {PressableButton} from '../PressableButton';
-import {COLORS_NOTE} from '../../utils/Colors';
 import {SIZE, WEIGHT} from '../../utils/SizeUtils';
-import {db} from '../../utils/DB';
-import {HeaderMenu} from '../Header/HeaderMenu';
-import Heading from '../Typography/Heading';
-import {ListHeaderComponent} from './ListHeaderComponent';
-import Paragraph from '../Typography/Paragraph';
 import {Button} from '../Button';
+import {HeaderMenu} from '../Header/HeaderMenu';
 import Seperator from '../Seperator';
+import TagItem from '../TagItem';
+import Heading from '../Typography/Heading';
+import Paragraph from '../Typography/Paragraph';
+import {ListHeaderComponent} from './ListHeaderComponent';
+import {NotebookItemWrapper} from './NotebookItemWrapper';
+import {NoteItemWrapper} from './NoteItemWrapper';
 
 const header = {
   type: 'MAIN_HEADER',
@@ -164,14 +164,16 @@ const SimpleList = ({
         <Heading>{placeholderData.heading}</Heading>
         <Paragraph color={colors.icon}>{placeholderData.paragraph}</Paragraph>
         <Seperator />
-       {placeholderData.button && <Button
-          onPress={placeholderData.action}
-          color="bg"
-          title={placeholderData.button}
-          icon="plus"
-          iconColor="accent"
-          fontSize={SIZE.md}
-        /> } 
+        {placeholderData.button && (
+          <Button
+            onPress={placeholderData.action}
+            color="bg"
+            title={placeholderData.button}
+            icon="plus"
+            iconColor="accent"
+            fontSize={SIZE.md}
+          />
+        )}
       </View>
     </View>
   );
@@ -208,7 +210,7 @@ const SimpleList = ({
           break;
         case 'MAIN_HEADER':
           dim.width = width;
-          dim.height = 200;
+          dim.height = dataType === 'search' ? 0 : 200;
           break;
         default:
           dim.width = width;
@@ -220,17 +222,36 @@ const SimpleList = ({
   const _renderRow = (type, data, index) => {
     switch (type) {
       case 'note':
-        return <RenderItem item={data} pinned={data.pinned} index={index} />;
+        return (
+          <NoteItemWrapper item={data} pinned={data.pinned} index={index} />
+        );
       case 'notebook':
-        return <RenderItem item={data} pinned={data.pinned} index={index} />;
+        return (
+          <NotebookItemWrapper item={data} pinned={data.pinned} index={index} />
+        );
+      case 'tag':
+        return <TagItem item={data} index={index} />;
+      case 'topic':
+        return (
+          <NotebookItemWrapper
+            item={data}
+            isTopic={true}
+            pinned={data.pinned}
+            index={index}
+          />
+        );
+      case 'trash':
+        return data.itemType === 'note' ? (
+          <NoteItemWrapper item={data} index={index} isTrash={true} />
+        ) : (
+          <NotebookItemWrapper item={data} index={index} isTrash={true} />
+        );
       case 'MAIN_HEADER':
         return (
           <ListHeaderComponent type={dataType} index={index} data={listData} />
         );
       case 'header':
         return <RenderSectionHeader item={data} index={index} />;
-      default:
-        return <RenderItem item={data} index={index} />;
     }
   };
 
@@ -243,8 +264,9 @@ const SimpleList = ({
       dataProvider={dataProvider}
       rowRenderer={_renderRow}
       onScroll={_onScroll}
-      canChangeSize={true}
-      renderFooter={() => <View style={{height: 400}} />}
+      canChangeSize
+      forceNonDeterministicRendering
+      renderFooter={() => <View style={{height: 300}} />}
       scrollViewProps={{
         refreshControl: (
           <RefreshControl
@@ -276,8 +298,6 @@ const SimpleList = ({
 };
 
 export default SimpleList;
-
-
 
 const styles = StyleSheet.create({
   loginCard: {
