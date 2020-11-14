@@ -1,22 +1,38 @@
-import React, {createRef, useCallback, useEffect} from 'react';
+import React, { createRef, useCallback, useEffect } from 'react';
 import {
   Appearance,
   Linking,
-  Platform,
+
   ScrollView,
-  StatusBar,
+
   Text,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
+import Menu, { MenuItem } from 'react-native-reanimated-material-menu';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {Button} from '../../components/Button';
-import {PressableButton} from '../../components/PressableButton';
+import { Button } from '../../components/Button';
+import { PressableButton } from '../../components/PressableButton';
 import Seperator from '../../components/Seperator';
-import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
-import {eSendEvent, ToastEvent} from '../../services/EventManager';
+import { ListHeaderComponent } from '../../components/SimpleList/ListHeaderComponent';
+import { useTracked } from '../../provider';
+import { Actions } from '../../provider/Actions';
+import Backup from '../../services/Backup';
+import { DDS } from '../../services/DeviceDetection';
+import { eSendEvent, ToastEvent } from '../../services/EventManager';
+import NavigationService from '../../services/Navigation';
+import PremiumService from '../../services/PremiumService';
+import { dWidth, MenuItemsList, setSetting } from '../../utils';
+import {
+  ACCENT,
+  COLOR_SCHEME,
+  COLOR_SCHEME_DARK,
+  COLOR_SCHEME_LIGHT,
+  setColorScheme
+} from '../../utils/Colors';
+import { hexToRGBA, RGB_Linear_Shade } from '../../utils/ColorUtils';
+import { db } from '../../utils/DB';
 import {
   eCloseProgressDialog,
   eOpenLoginDialog,
@@ -26,27 +42,11 @@ import {
   eOpenRestoreDialog,
   eResetApp,
   eScrollEvent,
-  eUpdateSearchState,
+  eUpdateSearchState
 } from '../../utils/Events';
-import NavigationService from '../../services/Navigation';
-import storage from '../../utils/storage';
-import {setSetting, dWidth, MenuItemsList} from '../../utils';
-import {hexToRGBA, RGB_Linear_Shade} from '../../utils/ColorUtils';
-import {sleep} from '../../utils/TimeUtils';
-import {
-  ACCENT,
-  COLOR_SCHEME,
-  COLOR_SCHEME_DARK,
-  COLOR_SCHEME_LIGHT,
-  setColorScheme,
-} from '../../utils/Colors';
-import {opacity, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
-import {db} from '../../utils/DB';
-import {DDS} from '../../services/DeviceDetection';
-import {MMKV} from '../../utils/mmkv';
-import Backup from '../../services/Backup';
-import Menu, {MenuItem} from 'react-native-material-menu';
-import {ListHeaderComponent} from '../../components/SimpleList/ListHeaderComponent';
+import { MMKV } from '../../utils/mmkv';
+import { opacity, pv, SIZE, WEIGHT } from '../../utils/SizeUtils';
+import { sleep } from '../../utils/TimeUtils';
 
 let menuRef = createRef();
 export const Settings = ({navigation}) => {
@@ -64,7 +64,7 @@ export const Settings = ({navigation}) => {
   }
 
   const onFocus = useCallback(() => {
-    eSendEvent('showSearch', true);
+    eSendEvent(eScrollEvent, {name: 'Settings', type: 'in'});
     dispatch({
       type: Actions.HEADER_STATE,
       state: true,
@@ -91,6 +91,7 @@ export const Settings = ({navigation}) => {
   useEffect(() => {
     navigation.addListener('focus', onFocus);
     return () => {
+      eSendEvent(eScrollEvent, {name: 'Settings', type: 'back'});
       navigation.removeListener('focus', onFocus);
     };
   });
@@ -143,19 +144,21 @@ export const Settings = ({navigation}) => {
   ];
 
   const switchTheme = async () => {
-    await setSetting(settings, 'useSystemTheme', !settings.useSystemTheme);
+    await PremiumService.verify(async () => {
+      await setSetting(settings, 'useSystemTheme', !settings.useSystemTheme);
 
-    if (!settings.useSystemTheme) {
-      await MMKV.setStringAsync(
-        'theme',
-        JSON.stringify({night: Appearance.getColorScheme() === 'dark'}),
-      );
-      changeColorScheme(
-        Appearance.getColorScheme() === 'dark'
-          ? COLOR_SCHEME_DARK
-          : COLOR_SCHEME_LIGHT,
-      );
-    }
+      if (!settings.useSystemTheme) {
+        await MMKV.setStringAsync(
+          'theme',
+          JSON.stringify({night: Appearance.getColorScheme() === 'dark'}),
+        );
+        changeColorScheme(
+          Appearance.getColorScheme() === 'dark'
+            ? COLOR_SCHEME_DARK
+            : COLOR_SCHEME_LIGHT,
+        );
+      }
+    });
   };
 
   const CustomButton = ({title, tagline, customComponent, onPress}) => (
@@ -204,7 +207,6 @@ export const Settings = ({navigation}) => {
         backgroundColor: colors.bg,
       }}>
       <ScrollView
-     
         onScroll={(e) =>
           eSendEvent(eScrollEvent, e.nativeEvent.contentOffset.y)
         }
@@ -476,9 +478,10 @@ export const Settings = ({navigation}) => {
               alpha={!colors.night ? -0.1 : 0.1}
               opacity={1}
               onPress={async () => {
-                changeAccentColor(item);
-
-                await MMKV.setStringAsync('accentColor', item);
+                await PremiumService.verify(async () => {
+                  changeAccentColor(item);
+                  await MMKV.setStringAsync('accentColor', item);
+                });
               }}
               customStyle={{
                 flexDirection: 'row',
@@ -517,9 +520,11 @@ export const Settings = ({navigation}) => {
                 alpha={!colors.night ? -0.1 : 0.1}
                 opacity={1}
                 onPress={async () => {
-                  changeAccentColor(item);
-
-                  await MMKV.setStringAsync('accentColor', item);
+                  console.log('called');
+                  await PremiumService.verify(async () => {
+                    changeAccentColor(item);
+                    await MMKV.setStringAsync('accentColor', item);
+                  });
                 }}
                 customStyle={{
                   flexDirection: 'row',
@@ -592,8 +597,8 @@ export const Settings = ({navigation}) => {
         <CustomButton
           title="Homepage"
           tagline={'Default screen to open on app startup '}
-          onPress={() => {
-            menuRef.current?.show();
+          onPress={async () => {
+            await PremiumService.verify(menuRef.current?.show);
           }}
           customComponent={
             <Menu
@@ -605,8 +610,8 @@ export const Settings = ({navigation}) => {
               }}
               button={
                 <TouchableOpacity
-                  onPress={() => {
-                    menuRef.current?.show();
+                  onPress={async () => {
+                    await PremiumService.verify(menuRef.current?.show);
                   }}
                   style={{
                     flexDirection: 'row',
@@ -785,6 +790,7 @@ export const Settings = ({navigation}) => {
               fontFamily: WEIGHT.regular,
               textAlignVertical: 'center',
               color: colors.pri,
+              maxWidth: '60%',
             }}>
             Auto Backup{'\n'}
             <Text
@@ -806,6 +812,10 @@ export const Settings = ({navigation}) => {
             }}>
             {[
               {
+                title: 'Off',
+                value: 'off',
+              },
+              {
                 title: 'Daily',
                 value: 'daily',
               },
@@ -817,7 +827,9 @@ export const Settings = ({navigation}) => {
               <TouchableOpacity
                 activeOpacity={1}
                 onPress={async () => {
-                  await setSetting(settings, 'reminder', item.value);
+                  await PremiumService.verify(async () => {
+                    await setSetting(settings, 'reminder', item.value);
+                  });
                 }}
                 key={item.value}
                 style={{
@@ -827,7 +839,7 @@ export const Settings = ({navigation}) => {
                       : colors.nav,
                   justifyContent: 'center',
                   alignItems: 'center',
-                  width: 60,
+                  width: 50,
                   height: 20,
                 }}>
                 <Text

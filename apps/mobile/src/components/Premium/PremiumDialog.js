@@ -79,6 +79,8 @@ class PremiumDialog extends React.Component {
           alignSelf: 'center',
           borderRadius: 10,
           marginBottom: DDS.isTab ? 50 : 0,
+          borderBottomRightRadius:0,
+          borderBottomLeftRadius:0
         }}
         onOpen={async () => {
           await this.getSkus();
@@ -115,7 +117,7 @@ class PremiumDialog extends React.Component {
               paddingTop: 10,
               alignSelf: 'center',
             }}>
-            Notesnook Pro
+            Get Notesnook Pro
           </Text>
 
           <ScrollView
@@ -198,6 +200,7 @@ class PremiumDialog extends React.Component {
                         fontFamily: WEIGHT.regular,
                         fontSize: SIZE.xs + 1,
                         maxWidth: '85%',
+                        fontWeight:'400',
                         color: colors.icon,
                       }}>
                       {item.description}
@@ -230,6 +233,7 @@ class PremiumDialog extends React.Component {
                   fontSize: 12,
                   color: colors.pri,
                   fontFamily: WEIGHT.regular,
+                  fontWeight:"400"
                 }}>
                 {this.state.user
                   ? 'Cancel anytime in Subscriptions on Google Play'
@@ -270,6 +274,7 @@ class PremiumDialog extends React.Component {
               title={
                 this.state.user ? 'Subscribe to Notesnook Pro' : 'Sign Up Now'
               }
+              type="accent"
               height={50}
               width="100%"
             />
