@@ -1,13 +1,9 @@
 import React from 'react';
-import {ScrollView, StatusBar, View} from 'react-native';
+import {ScrollView, View} from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
-import {ColorSection} from './ColorSection';
-import {MenuListItem} from './MenuListItem';
-import {TagsSection} from './TagsSection';
-import {UserSection} from './UserSection';
-import Seperator from '../Seperator';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {DDS} from '../../services/DeviceDetection';
 import {
   ACCENT,
   COLOR_SCHEME,
@@ -15,61 +11,73 @@ import {
   COLOR_SCHEME_LIGHT,
   setColorScheme,
 } from '../../utils/Colors';
-import {MenuItemsList} from "../../utils/index"
+import {MenuItemsList} from '../../utils/index';
 import {MMKV} from '../../utils/mmkv';
+import {SIZE} from '../../utils/SizeUtils';
+import Seperator from '../Seperator';
+import Heading from '../Typography/Heading';
+import Paragraph from '../Typography/Paragraph';
+import {ColorSection} from './ColorSection';
+import {MenuListItem} from './MenuListItem';
+import {TagsSection} from './TagsSection';
+import {UserSection} from './UserSection';
 
-export const Menu = ({close = () => {}, hide, noTextMode = false}) => {
-  const [state, dispatch] = useTracked();
-  const {colors} = state;
-  const insets = useSafeAreaInsets();
+export const Menu = React.memo(
+  () => {
+    const [state, dispatch] = useTracked();
+    const {colors} = state;
+    const insets = useSafeAreaInsets();
+    const noTextMode = DDS.isTab && !DDS.isSmallTab;
+    function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
+      let newColors = setColorScheme(colors, accent);
+      dispatch({type: Actions.THEME, colors: newColors});
+    }
 
-  function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
-    let newColors = setColorScheme(colors, accent);
-    dispatch({type: Actions.THEME, colors: newColors});
-  }
+    React.useEffect(() => {
+      console.log('rerendering drawer');
+    });
 
-  const BottomItemsList = [
-    {
-      name: 'Night mode',
-      icon: 'theme-light-dark',
-      func: () => {
-        if (!colors.night) {
-          MMKV.setStringAsync('theme', JSON.stringify({night: true}));
-          changeColorScheme(COLOR_SCHEME_DARK);
-        } else {
-          MMKV.setStringAsync('theme', JSON.stringify({night: false}));
-          changeColorScheme(COLOR_SCHEME_LIGHT);
-        }
+    const BottomItemsList = [
+      {
+        name: 'Night mode',
+        icon: 'theme-light-dark',
+        func: () => {
+          if (!colors.night) {
+            MMKV.setStringAsync('theme', JSON.stringify({night: true}));
+            changeColorScheme(COLOR_SCHEME_DARK);
+          } else {
+            MMKV.setStringAsync('theme', JSON.stringify({night: false}));
+            changeColorScheme(COLOR_SCHEME_LIGHT);
+          }
+        },
+        switch: true,
+        on: !!colors.night,
+        close: false,
       },
-      switch: true,
-      on: !!colors.night,
-      close: false,
-    },
-    {
-      name: 'Settings',
-      icon: 'cog-outline',
-      close: true,
-    },
-  ];
+      {
+        name: 'Settings',
+        icon: 'cog-outline',
+        close: true,
+      },
+    ];
 
-  return (
-    <View
-      style={{
-        height: '100%',
-        opacity: hide ? 0 : 1,
-        width: '100%',
-        backgroundColor: colors.bg,
-        paddingTop: insets.top,
-        borderRightWidth: 1,
-        borderRightColor: colors.nav,
-      }}>
-      <ScrollView
-        alwaysBounceVertical={false}
-        contentContainerStyle={{
-          minHeight: '50%',
-        }}
-        showsVerticalScrollIndicator={false}>
-
+    return (
+      <View
+        style={{
+          height: '100%',
+          width: '100%',
+          backgroundColor: colors.bg,
+          paddingTop: insets.top,
+          borderRightWidth: 1,
+          borderRightColor: colors.nav,
+        }}>
+        <ScrollView
+          alwaysBounceVertical={false}
+          contentContainerStyle={{
+            minHeight: '50%',
+            flexGrow: 1,
+          }}
+          showsVerticalScrollIndicator={false}>
           {MenuItemsList.map((item, index) => (
             <MenuListItem
               testID={item.name}
@@ -80,37 +88,57 @@ export const Menu = ({close = () => {}, hide, noTextMode = false}) => {
             />
           ))}
 
-        {noTextMode ? null : <TagsSection />}
-        <ColorSection noTextMode={noTextMode} />
-      </ScrollView>
+          {noTextMode ? null : <TagsSection />}
+          <ColorSection noTextMode={noTextMode} />
+          <View
+            style={{
+              justifyContent: 'center',
+              alignItems: 'center',
+              flexGrow: 1,
+              paddingHorizontal: '10%',
+            }}>
+            <Heading style={{marginBottom: 2.5}} size={SIZE.sm}>
+              Your Pins
+            </Heading>
+            <Paragraph
+              style={{textAlign: 'center'}}
+              color={colors.icon}
+              size={SIZE.xs}>
+              You have not pinned anything yet. You can pin notebook topics and
+              tags here.
+            </Paragraph>
+          </View>
+        </ScrollView>
 
-      <View
-        style={{
-          width: '100%',
-          justifyContent: noTextMode ? 'center' : 'center',
-          alignItems: 'center',
-          alignSelf: 'center',
-          marginBottom: 15,
-        }}>
         <View
           style={{
             width: '100%',
+            justifyContent: noTextMode ? 'center' : 'center',
+            alignItems: 'center',
+            alignSelf: 'center',
+            marginBottom: 15,
           }}>
-          {BottomItemsList.map((item, index) => (
-            <MenuListItem
-              testID={item.name == 'Night mode' ? 'night_mode' : item.name}
-              key={item.name}
-              item={item}
-              index={index}
-              ignore={true}
-              noTextMode={noTextMode}
-            />
-          ))}
-        </View>
-        <Seperator half />
+          <View
+            style={{
+              width: '100%',
+            }}>
+            {BottomItemsList.map((item, index) => (
+              <MenuListItem
+                testID={item.name == 'Night mode' ? 'night_mode' : item.name}
+                key={item.name}
+                item={item}
+                index={index}
+                ignore={true}
+                noTextMode={noTextMode}
+              />
+            ))}
+          </View>
+          <Seperator half />
 
-        <UserSection noTextMode={noTextMode} />
+          <UserSection noTextMode={noTextMode} />
+        </View>
       </View>
-    </View>
-  );
-};
+    );
+  },
+  () => true,
+);
