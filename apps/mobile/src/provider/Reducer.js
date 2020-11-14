@@ -179,11 +179,10 @@ export const reducer = (state, action) => {
       };
     }
     case Actions.SEARCH_RESULTS: {
-      let results = action.results;
 
       return {
         ...state,
-        searchResults: {...results},
+        searchResults:action.results,
       };
     }
     case Actions.HEADER_STATE: {

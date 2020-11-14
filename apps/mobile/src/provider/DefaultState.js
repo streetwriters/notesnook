@@ -53,11 +53,7 @@ export const defaultState = {
   isLoginNavigator: false,
   currentEditingNote: null,
   loading: true,
-  searchResults: {
-    results: [],
-    type: null,
-    keyword: null,
-  },
+  searchResults: [],
   headerMenuState: true,
   headerTextState: {
     heading: 'Home',
@@ -65,10 +61,8 @@ export const defaultState = {
   },
   headerVerticalMenu: false,
   searchState: {
-    noSearch: false,
     data: [],
     type: 'notes',
-    color: null,
     placeholder: 'Search all notes',
   },
   containerBottomButton: {
