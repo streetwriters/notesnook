@@ -62,9 +62,7 @@ buck-out/
 # Other
 react-native-mmkv-storage/
 react-native-eventsource/
-
 react-native-html-to-pdf/
-
 react-native-receive-sharing-intent/
-
+react-native-scrollable-tab-view/
 react-native-iap/
