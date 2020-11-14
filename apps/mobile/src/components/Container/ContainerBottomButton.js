@@ -65,10 +65,11 @@ export const ContainerBottomButton = ({title, onPress, color}) => {
         selectedColor={color || colors.accent}
         customStyle={{
           ...getElevation(5),
+          borderRadius: 100,
         }}
-        onLongPress={event => {
-           console.log(event)
-          showContext(event,title);
+        onLongPress={(event) => {
+          console.log(event);
+          showContext(event, title);
         }}
         onPress={onPress}>
         <View
