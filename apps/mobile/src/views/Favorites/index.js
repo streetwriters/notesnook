@@ -1,16 +1,17 @@
-import React, {useCallback, useEffect, useState} from 'react';
-import {Placeholder} from '../../components/ListPlaceholders';
+import React, { useCallback, useEffect } from 'react';
+import { Placeholder } from '../../components/ListPlaceholders';
 import SimpleList from '../../components/SimpleList';
-import {NoteItemWrapper} from '../../components/SimpleList/NoteItemWrapper';
-import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
-import {eSendEvent} from "../../services/EventManager";
-import {eUpdateSearchState} from "../../utils/Events";
+import { useTracked } from '../../provider';
+import { Actions } from '../../provider/Actions';
+import { eSendEvent } from "../../services/EventManager";
+import SearchService from '../../services/SearchService';
+import { eScrollEvent } from "../../utils/Events";
 export const Favorites = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const {favorites} = state;
 
   const onFocus = useCallback(() => {
+    eSendEvent(eScrollEvent, {name: 'Favorites', type: 'in'});
     dispatch({
       type: Actions.HEADER_STATE,
       state: {
@@ -35,6 +36,7 @@ export const Favorites = ({route, navigation}) => {
   useEffect(() => {
     navigation.addListener('focus', onFocus);
     return () => {
+      eSendEvent(eScrollEvent, {name: 'Notebooks', type: 'back'});
       navigation.removeListener('focus', onFocus);
     };
   });
@@ -47,19 +49,13 @@ export const Favorites = ({route, navigation}) => {
     }
   }, [favorites]);
 
+
   const updateSearch = () => {
-    if (favorites.length === 0) {
-      eSendEvent('showSearch', true);
-    } else {
-      eSendEvent('showSearch');
-      eSendEvent(eUpdateSearchState,{
-        placeholder: 'Search all favorites',
-        data: favorites,
-        noSearch: false,
-        type: 'notes',
-        color: null,
-      })
-    }
+    SearchService.update({
+      placeholder: 'Search in favorites',
+      data: favorites,
+      type: 'notes',
+    });
   };
 
   return (
@@ -75,7 +71,6 @@ export const Favorites = ({route, navigation}) => {
         button:null,
       }}
       focused={() => navigation.isFocused()}
-      RenderItem={NoteItemWrapper}
       placeholder={<Placeholder type="favorites" />}
       placeholderText="Notes you favorite appear here"
     />

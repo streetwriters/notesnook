@@ -204,6 +204,7 @@ export const Settings = ({navigation}) => {
         backgroundColor: colors.bg,
       }}>
       <ScrollView
+     
         onScroll={(e) =>
           eSendEvent(eScrollEvent, e.nativeEvent.contentOffset.y)
         }

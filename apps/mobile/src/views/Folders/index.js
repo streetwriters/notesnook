@@ -7,12 +7,16 @@ import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
 import {eSendEvent} from '../../services/EventManager';
-import {eUpdateSearchState} from '../../utils/Events';
+import SearchService from '../../services/SearchService';
+import { eScrollEvent } from '../../utils/Events';
+
+
 export const Folders = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const {notebooks} = state;
 
   const onFocus = useCallback(() => {
+    eSendEvent(eScrollEvent, {name: 'Notebooks', type: 'in'});
     dispatch({
       type: Actions.HEADER_STATE,
       state: true,
@@ -32,25 +36,11 @@ export const Folders = ({route, navigation}) => {
     updateSearch();
   }, [notebooks]);
 
-  const updateSearch = () => {
-    if (notebooks.length === 0) {
-      eSendEvent('showSearch', true);
-    } else {
-      eSendEvent('showSearch');
-      eSendEvent(eUpdateSearchState, {
-        placeholder: 'Search all notebooks',
-        data: notebooks,
-        noSearch: false,
-        type: 'notebooks',
-        color: null,
-      });
-    }
-  };
-
   useEffect(() => {
     navigation.addListener('focus', onFocus);
     return () => {
       navigation.removeListener('focus', onFocus);
+      eSendEvent(eScrollEvent, {name: 'Notebooks', type: 'back'});
     };
   });
 
@@ -60,9 +50,13 @@ export const Folders = ({route, navigation}) => {
     }
   }, [notebooks]);
 
-  useEffect(() => {
-    console.log('render folders');
-  });
+  const updateSearch = () => {
+    SearchService.update({
+      placeholder: 'Search in notebooks',
+      data: notebooks,
+      type: 'notebooks',
+    });
+  };
 
   const _onPressBottomButton = () => AddNotebookEvent();
 
@@ -74,10 +68,10 @@ export const Folders = ({route, navigation}) => {
         focused={() => navigation.isFocused()}
         RenderItem={NotebookItemWrapper}
         placeholderData={{
-          heading:"Your Notebooks",
-          paragraph:"You have not added any notebooks yet.",
-          button:"Add a Notebook",
-          action:_onPressBottomButton
+          heading: 'Your Notebooks',
+          paragraph: 'You have not added any notebooks yet.',
+          button: 'Add a Notebook',
+          action: _onPressBottomButton,
         }}
         placeholder={<Placeholder type="notebooks" />}
       />

@@ -1,48 +1,26 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {Placeholder} from '../../components/ListPlaceholders';
+import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
 import SimpleList from '../../components/SimpleList';
 import {NoteItemWrapper} from '../../components/SimpleList/NoteItemWrapper';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
-import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
+import {DDS} from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
 } from '../../services/EventManager';
-import {
-  eOnLoadNote,
-  eScrollEvent, eUpdateSearchState,
-  refreshNotesPage,
-} from '../../utils/Events';
-import {openEditorAnimation} from '../../utils/Animations';
+import SearchService from '../../services/SearchService';
 import {editing} from '../../utils';
-import {COLORS_NOTE} from "../../utils/Colors";
-import {db} from "../../utils/DB";
-import {DDS} from "../../services/DeviceDetection";
+import {COLORS_NOTE} from '../../utils/Colors';
+import {db} from '../../utils/DB';
+import {eOnLoadNote, eScrollEvent, refreshNotesPage} from '../../utils/Events';
+import {tabBarRef} from '../../utils/Refs';
 
 export const Notes = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
-  const {colorNotes} = state;
-  const allNotes = state.notes;
   const [notes, setNotes] = useState([]);
   let params = route.params ? route.params : null;
-
-  useEffect(() => {
-    if (navigation.isFocused()) {
-      if (!params) {
-        params = {
-          title: 'Notes',
-        };
-      }
-      init();
-    } else {
-      setNotes([]);
-      editing.actionAfterFirstSave = {
-        type: null,
-      };
-    }
-  }, [allNotes, colorNotes]);
 
   useEffect(() => {
     eSubscribeEvent(refreshNotesPage, init);
@@ -55,13 +33,12 @@ export const Notes = ({route, navigation}) => {
   }, []);
 
   const init = (data) => {
-    console.log('refreshing notes!');
+    console.log('rerendering');
     params = route.params;
     if (data) {
       params = data;
     }
     let allNotes = [];
-    eSendEvent(eScrollEvent, 0);
     if (params.type === 'tag') {
       allNotes = db.notes.tagged(params.tag.title);
     } else if (params.type === 'color') {
@@ -96,6 +73,13 @@ export const Notes = ({route, navigation}) => {
   };
 
   const onFocus = useCallback(() => {
+    eSendEvent(eScrollEvent, {
+      name:
+        params.type === 'tag'
+          ? '#' + params.title
+          : params.title.slice(0, 1).toUpperCase() + params.title.slice(1),
+      type: 'in',
+    });
     init();
   }, []);
 
@@ -110,6 +94,16 @@ export const Notes = ({route, navigation}) => {
     navigation.addListener('focus', onFocus);
     navigation.addListener('blur', onBlur);
     return () => {
+      eSendEvent(eScrollEvent, {
+        name:
+          params.type === 'tag'
+            ? '#' + params.title
+            : params.title.slice(0, 1).toUpperCase() + params.title.slice(1),
+        type: 'hide',
+      });
+      editing.actionAfterFirstSave = {
+        type: null,
+      };
       navigation.removeListener('focus', onFocus);
       navigation.removeListener('blur', onBlur);
     };
@@ -122,23 +116,16 @@ export const Notes = ({route, navigation}) => {
   }, [notes]);
 
   const updateSearch = () => {
-    if (notes.length === 0) {
-      eSendEvent('showSearch', true);
-    } else {
-      eSendEvent('showSearch');
-      eSendEvent(eUpdateSearchState,{
-        placeholder: `Search in ${
-            params.type === 'tag' ? '#' + params.title : params.title
-        }`,
-        data: notes,
-        noSearch: false,
-        type: 'notes',
-        color: params.type === 'color' ? params.title : null,
-      })
-    }
+    SearchService.update({
+      placeholder: `Search in ${
+        params.type === 'tag' ? '#' + params.title : params.title
+      }`,
+      data: notes,
+      noSearch: false,
+      type: 'notes',
+      color: params.type === 'color' ? params.title : null,
+    });
   };
-
-
 
   const _onPressBottomButton = useCallback(() => {
     if (params.type === 'tag') {
@@ -159,9 +146,10 @@ export const Notes = ({route, navigation}) => {
       };
     }
 
-    eSendEvent(eOnLoadNote, {type: 'new'});
     if (DDS.isPhone || DDS.isSmallTab) {
-      openEditorAnimation();
+      tabBarRef.current?.goToPage(1);
+    } else {
+      eSendEvent(eOnLoadNote, {type: 'new'});
     }
   }, [params.type]);
 
@@ -175,10 +163,15 @@ export const Notes = ({route, navigation}) => {
         }}
         focused={() => navigation.isFocused()}
         RenderItem={NoteItemWrapper}
-        placeholder={<Placeholder type="notes" />}
         placeholderText={`Add some notes to this" ${
           params.type ? params.type : 'topic.'
         }`}
+        placeholderData={{
+          heading: 'Your Notes',
+          paragraph: 'You have not added any notes yet.',
+          button: 'Add your First Note',
+          action: _onPressBottomButton,
+        }}
       />
       <ContainerBottomButton
         title="Create a new note"
