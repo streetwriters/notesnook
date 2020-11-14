@@ -31,13 +31,18 @@ export const ColorSection = ({noTextMode}) => {
     });
 
     dispatch({
+      type: Actions.CURRENT_SCREEN,
+      screen: item.title,
+    });
+
+    dispatch({
       type: Actions.HEADER_TEXT_STATE,
       state: {
-        heading: item.title,
+        heading: item.title.slice(0, 1).toUpperCase() + item.title.slice(1),
       },
     });
 
-    NavigationService.navigate('Notes', params);
+    NavigationService.navigate('NotesPage', params);
     eSendEvent(refreshNotesPage, params);
     NavigationService.closeDrawer();
   }
