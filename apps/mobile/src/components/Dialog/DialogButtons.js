@@ -18,13 +18,15 @@ const DialogButtons = ({
         width="30%"
         title={negativeTitle}
       />
-      <Button
-        onPress={onPressPositive}
-        fontSize={SIZE.md}
-        width="30%"
-        type="transparent"
-        title={positiveTitle}
-      />
+      {onPressPositive && (
+        <Button
+          onPress={onPressPositive}
+          fontSize={SIZE.md}
+          width="30%"
+          type="transparent"
+          title={positiveTitle}
+        />
+      )}
     </View>
   );
 };
@@ -37,6 +39,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     marginTop: 20,
-  
   },
 });
