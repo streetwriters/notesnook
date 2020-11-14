@@ -6,15 +6,13 @@ import {PERMISSIONS, requestMultiple, RESULTS} from "react-native-permissions";
 import {MMKV} from "./MMKV";
 import { Platform } from "react-native";
 import { ANDROID_PATH, IOS_PATH } from ".";
-import { eSendEvent } from "../services/EventManager";
 
 async function read(key, isArray = false) {
   let data = await MMKV.getItem(key);
   if (!data) return null;
   try {
     data = JSON.parse(data);
-
-    data = isArray ? [...data] : data;
+    //data = Array.isArray(data) ? [...data] : data;
   } catch (e) {
     
   }
