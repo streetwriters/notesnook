@@ -19,6 +19,7 @@ import {
   eOpenVaultDialog,
   refreshNotesPage,
 } from '../../utils/Events';
+import { tabBarRef } from '../../utils/Refs';
 import {ph, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
 import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';
@@ -215,7 +216,7 @@ export class VaultDialog extends Component {
     eSendEvent(eOnLoadNote, note);
 
     if (!DDS.isTab) {
-      openEditorAnimation();
+      tabBarRef.current?.goToPage(1);
     }
     ToastEvent.show('Note unlocked', 'success');
     this.close();
