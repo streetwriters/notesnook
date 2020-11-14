@@ -1,5 +1,6 @@
 import React from 'react';
 import {StyleSheet, View} from 'react-native';
+import {SIZE} from '../../utils/SizeUtils';
 import {Button} from '../Button';
 
 const DialogButtons = ({
@@ -9,11 +10,20 @@ const DialogButtons = ({
   negativeTitle = 'Cancel',
 }) => {
   return (
-    <View
-      style={styles.container}>
-
-      <Button onPress={onPressNegative} grayed title={negativeTitle} />
-      <Button onPress={onPressPositive} title={positiveTitle} />
+    <View style={styles.container}>
+      <Button
+        onPress={onPressNegative}
+        fontSize={SIZE.md}
+        grayed
+        width="30%"
+        title={negativeTitle}
+      />
+      <Button
+        onPress={onPressPositive}
+        fontSize={SIZE.md}
+        width="30%"
+        title={positiveTitle}
+      />
     </View>
   );
 };
@@ -21,10 +31,11 @@ const DialogButtons = ({
 export default DialogButtons;
 
 const styles = StyleSheet.create({
-  container:{
-    justifyContent: 'space-around',
+  container: {
+    justifyContent: 'flex-end',
     alignItems: 'center',
     flexDirection: 'row',
     marginTop: 20,
-  }
-})
+  
+  },
+});
