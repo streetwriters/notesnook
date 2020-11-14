@@ -13,18 +13,18 @@ export const Button = ({
   grayed,
   title = '',
   icon,
-  color = 'accent',
+  color,
   fontSize = SIZE.sm,
   iconColor = 'accent',
 }) => {
   const [state] = useTracked();
   const {colors} = state;
-  const usedColor = color === 'accent' ? colors.accent : colors[color];
+  const usedColor =  colors[color];
 
   return (
     <PressableButton
       onPress={onPress}
-      color="transparent"
+      color={usedColor || "transparent"}
       selectedColor={grayed ? colors.nav : colors.shade}
       alpha={grayed ? (!colors.night ? -0.02 : 0.02) : -0.1}
       customStyle={{

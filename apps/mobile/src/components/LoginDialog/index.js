@@ -34,6 +34,8 @@ import {sleep} from '../../utils/TimeUtils';
 import {ActionIcon} from '../ActionIcon';
 import {Loading} from '../Loading';
 import {ListHeaderComponent} from '../SimpleList/ListHeaderComponent';
+import Heading from '../Typography/Heading';
+import Paragraph from '../Typography/Paragraph';
 
 const LoginDialog = () => {
   const [state, dispatch] = useTracked();
@@ -247,7 +249,6 @@ const LoginDialog = () => {
                   : '65%'
                 : '100%',
             width: DDS.isTab ? 500 : '100%',
-            backgroundColor: colors.shade,
             borderRadius: DDS.isTab ? 5 : 0,
 
             zIndex: 10,
@@ -282,19 +283,34 @@ const LoginDialog = () => {
           ) : null}
 
           {DDS.isTab ? null : (
-            <ActionIcon
-              name="arrow-left"
-              size={SIZE.xxxl}
-              onPress={() => {
-                close();
-              }}
-              customStyle={{
-                width: 50,
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                paddingHorizontal: 12,
                 height: 50,
-                alignSelf: 'flex-start',
-              }}
-              color={colors.heading}
-            />
+              }}>
+              <ActionIcon
+                name="arrow-left"
+                size={SIZE.xxxl}
+                onPress={() => {
+                  close();
+                }}
+                customStyle={{
+                  width: 40,
+                  height: 40,
+                  marginLeft: -5,
+                }}
+                color={colors.heading}
+              />
+              <Paragraph
+                onPress={() => setLogin(!login)}
+                size={SIZE.md}
+                color={colors.accent}>
+                {login ? 'Sign Up' : 'Login'}
+              </Paragraph>
+            </View>
           )}
 
           <ListHeaderComponent
@@ -302,11 +318,10 @@ const LoginDialog = () => {
             type="settings"
             title={login ? 'Login' : 'Sign Up'}
             messageCard={false}
-            paragraph={
-              login
-                ? 'Access notes on any device.'
-                : 'Access notes on any device.'
-            }
+            onPress={() => {
+              setLogin(!login);
+            }}
+            paragraph={login ? 'create an account' : 'login to your account'}
           />
 
           <View
@@ -742,12 +757,14 @@ const LoginDialog = () => {
                 title={login ? 'Login' : 'Create Account'}
                 onPress={login ? loginUser : signupUser}
                 width="100%"
+                color="accent"
+                iconColor="white"
                 fontSize={SIZE.md}
                 height={50}
               />
             </View>
 
-            <TouchableOpacity
+            {/*   <TouchableOpacity
               onPress={() => {
                 setLogin(!login);
               }}
@@ -774,7 +791,7 @@ const LoginDialog = () => {
                   {!login ? 'Login' : 'Sign up now'}
                 </Text>
               </Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
         </View>
       </View>

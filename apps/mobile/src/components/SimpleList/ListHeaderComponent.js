@@ -19,10 +19,11 @@ export const ListHeaderComponent = ({
   title,
   paragraph,
   color,
+  onPress,
 }) => {
   const [state] = useTracked();
   const {colors, headerTextState, currentScreen} = state;
-/* 
+  /* 
   const onScroll = async (y) => {
     if (y > 100) {
       let o = (y - 100) / 100;
@@ -100,7 +101,12 @@ export const ListHeaderComponent = ({
             : headerTextState.heading}
         </Heading>
         {paragraph && (
-          <Paragraph color={colors.icon}> {'\n' + paragraph}</Paragraph>
+          <Paragraph color={colors.icon}>
+            {'\n'}or
+            <Paragraph onPress={onPress} color={colors.accent}>
+              {" " + paragraph}
+            </Paragraph>
+          </Paragraph>
         )}
       </View>
     </View>
