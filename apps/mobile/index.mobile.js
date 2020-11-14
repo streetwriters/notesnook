@@ -1,36 +1,35 @@
-import React, {createRef} from 'react';
+import React, {useEffect} from 'react';
 import {View} from 'react-native';
-import * as Animatable from 'react-native-animatable';
-import Animated from 'react-native-reanimated';
-import {Screen, ScreenContainer} from 'react-native-screens';
-import {DialogManager} from './src/components/DialogManager';
-import {Toast} from './src/components/Toast';
-import {useTracked} from './src/provider';
-import {
-  EditorOpacity,
-  EditorTranslateY,
-} from './src/utils/Animations';
-import Editor from './src/views/Editor';
-import {NavigationStack} from "./src/navigation/Drawer";
+import ScrollableTabView from 'react-native-scrollable-tab-view';
 import ContextMenu from './src/components/ContextMenu';
-import { DummyText } from './src/components/DummyText';
-
+import {DialogManager} from './src/components/DialogManager';
+import {DummyText} from './src/components/DummyText';
+import {Toast} from './src/components/Toast';
+import {NavigationStack} from './src/navigation/Drawer';
+import {NavigatorStack} from './src/navigation/NavigatorStack';
+import {useTracked} from './src/provider';
+import {eSendEvent} from './src/services/EventManager';
+import {editing} from './src/utils';
+import {eCloseSideMenu, eOnLoadNote, eOpenSideMenu} from './src/utils/Events';
+import {tabBarRef} from './src/utils/Refs';
+import {sleep} from './src/utils/TimeUtils';
+import {EditorWrapper} from './src/views/Editor/EditorWrapper';
+import {getIntent, getNote, post} from './src/views/Editor/Functions';
+/* 
 const editorRef = createRef();
-
+  
 const AnimatedScreenContainer = Animated.createAnimatedComponent(
   ScreenContainer,
 );
-
+ */
 export const Initialize = () => {
-  const [state,] = useTracked();
+  const [state] = useTracked();
   const {colors} = state;
 
   return (
     <>
-      <Animatable.View
+      <View
         testID={'mobile_main_view'}
-        transition="backgroundColor"
-        duration={300}
         style={{
           width: '100%',
           height: '100%',
@@ -43,9 +42,10 @@ export const Initialize = () => {
             height: '100%',
             backgroundColor: colors.bg,
           }}>
-          <NavigationStack />
+          <NavigationStack component={MobileStack} />
         </View>
 
+        {/* 
         <AnimatedScreenContainer
           ref={editorRef}
           onResponderTerminationRequest={true}
@@ -60,10 +60,10 @@ export const Initialize = () => {
             position: 'absolute',
             backgroundColor: colors.bg,
             elevation: 10,
-            opacity: EditorOpacity,
+            opacity: 0,
             transform: [
               {
-                translateY: EditorTranslateY,
+                translateY: 5000,
               },
             ],
           }}>
@@ -73,14 +73,60 @@ export const Initialize = () => {
               width: '100%',
               height: '100%',
             }}>
-            <Editor noMenu={false} />
-          </Screen>
-        </AnimatedScreenContainer>
-      </Animatable.View>
+                 <Editor noMenu={false} />
+            </Screen>
+        </AnimatedScreenContainer> */}
+      </View>
       <Toast />
       <ContextMenu />
-      <DummyText/>
+      <DummyText />
       <DialogManager colors={colors} />
     </>
   );
 };
+
+let timeout = null;
+
+const onChangeTab = async (obj) => {
+  if (obj.i === 1) {
+    if (timeout) {
+      clearTimeout(timeout);
+      timeout = null;
+    }
+    timeout = setTimeout(async () => {
+      eSendEvent(eCloseSideMenu);
+      if (getIntent()) return;
+      await sleep(150);
+      if (!editing.currentlyEditing || !getNote()) {
+        console.log('i am called before', getIntent());
+        eSendEvent(eOnLoadNote, {type: 'new'});
+      }
+    }, 150);
+  } else {
+    if (obj.from === 1) {
+      post('blur');
+      await sleep(150);
+      eSendEvent(eOpenSideMenu);
+    }
+  }
+};
+
+const MobileStack = React.memo(
+  () => {
+    useEffect(() => {
+      console.log('rerendering mobile stack');
+    });
+
+    return (
+      <ScrollableTabView
+        ref={tabBarRef}
+        prerenderingSiblingsNumber={Infinity}
+        onChangeTab={onChangeTab}
+        renderTabBar={() => <></>}>
+        <NavigatorStack />
+        <EditorWrapper />
+      </ScrollableTabView>
+    );
+  },
+  () => true,
+);
