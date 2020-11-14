@@ -8,15 +8,16 @@ import {
   FAV_SVG,
   TRASH_SVG,
   SETTINGS_SVG,
+  SEARCH_SVG
 } from '../../assets/images/assets';
 import {useTracked} from '../../provider';
-export const Placeholder = ({type, w, h}) => {
+export const Placeholder = ({type, w, h, color}) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
   const getSVG = () => {
     switch (type) {
       case 'notes':
-        return NOTE_SVG(colors.accent);
+        return NOTE_SVG(color || colors.accent);
       case 'notebooks':
         return NOTEBOOK_SVG(colors.accent);
       case 'tags':
@@ -27,6 +28,8 @@ export const Placeholder = ({type, w, h}) => {
         return TRASH_SVG(colors.accent);
       case 'settings':
         return SETTINGS_SVG(colors.accent);
+        case 'search':
+          return SEARCH_SVG(colors.accent);
     }
   };
 
