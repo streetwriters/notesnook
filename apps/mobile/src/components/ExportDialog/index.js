@@ -18,22 +18,21 @@ import BaseDialog from '../Dialog/base-dialog';
 import DialogHeader from '../Dialog/dialog-header';
 import {Loading} from '../Loading';
 import Seperator from '../Seperator';
-import {sleep} from "../../utils/TimeUtils";
-import {ToastEvent} from "../../services/EventManager";
-import {opacity, ph, pv, SIZE, WEIGHT} from "../../utils/SizeUtils";
-import {DDS} from "../../services/DeviceDetection";
+import {sleep} from '../../utils/TimeUtils';
+import {ToastEvent} from '../../services/EventManager';
+import {opacity, ph, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
+import {DDS} from '../../services/DeviceDetection';
+import Heading from '../Typography/Heading';
+import Paragraph from '../Typography/Paragraph';
 
 const {
   eSubscribeEvent,
   eUnSubscribeEvent,
 } = require('../../services/EventManager');
-const {
-  eOpenExportDialog,
-  eCloseExportDialog,
-} = require('../../utils/Events');
+const {eOpenExportDialog, eCloseExportDialog} = require('../../utils/Events');
 
 const ExportDialog = () => {
-  const [state, dispatch] = useTracked();
+  const [state] = useTracked();
   const {colors, tags, premiumUser} = state;
   const [visible, setVisible] = useState(false);
   const [notes, setNotes] = useState([]);
@@ -90,10 +89,10 @@ const ExportDialog = () => {
     {
       title: 'PDF',
       func: async () => {
-        
         await save(storage.saveToPDF, 'PDF');
       },
       icon: 'file-pdf-box',
+      desc: 'Most commonly used, opens on any device.',
     },
     {
       title: 'Markdown',
@@ -101,6 +100,7 @@ const ExportDialog = () => {
         await save(storage.saveToMarkdown, 'Markdown');
       },
       icon: 'language-markdown',
+      desc: 'Most commonly used, opens on any device.',
     },
     {
       title: 'Plain Text',
@@ -108,6 +108,7 @@ const ExportDialog = () => {
         await save(storage.saveToText, 'Text');
       },
       icon: 'card-text',
+      desc: 'A plain text file with no formatting.',
     },
     {
       title: 'HTML',
@@ -115,6 +116,7 @@ const ExportDialog = () => {
         await save(storage.saveToHTML, 'Html');
       },
       icon: 'language-html5',
+      desc: 'A file that can be opened in a browser.',
     },
   ];
 
@@ -155,7 +157,6 @@ const ExportDialog = () => {
                   `No application found to open ${result.name} file`,
                 );
               });
-          
             }}
             tagline="Exporting notes"
           />
@@ -165,15 +166,50 @@ const ExportDialog = () => {
               {actions.map((item) => (
                 <Fragment key={item.title}>
                   <Seperator half />
-                  <Button
-                    width="100%"
-                    title={item.title}
-                    icon={item.icon}
-                    activeOpacity={opacity}
+
+                  <TouchableOpacity
                     onPress={item.func}
-                  />
+                    activeOpacity={1}
+                    style={{
+                      width: '100%',
+                      alignItems: 'center',
+                      flexDirection: 'row',
+                      paddingHorizontal: 12,
+                      paddingVertical: 10,
+                    }}>
+                    <Icon
+                      name={item.icon}
+                      color={colors.accent}
+                      size={SIZE.lg}
+                    />
+                    <Heading
+                      style={{marginLeft: 5, maxWidth: '90%'}}
+                      size={SIZE.md}>
+                      {item.title}
+                      {'\n'}
+                      <Paragraph size={SIZE.sm} color={colors.icon}>
+                        {item.desc}
+                      </Paragraph>
+                    </Heading>
+                  </TouchableOpacity>
                 </Fragment>
               ))}
+              <Seperator />
+              <View
+                style={{
+                  justifyContent: 'flex-end',
+                  width: '100%',
+                  flexDirection: 'row',
+                }}>
+                <View />
+                <Button
+                  onPress={close}
+                  width="30%"
+                  grayed
+                  title="Cancel"
+                  fontSize={SIZE.md}
+                />
+              </View>
             </View>
           </>
         )}
@@ -185,7 +221,6 @@ const ExportDialog = () => {
 const styles = StyleSheet.create({
   container: {
     ...getElevation(5),
-    maxHeight: 350,
     borderRadius: 5,
     paddingHorizontal: ph,
     paddingVertical: pv,
