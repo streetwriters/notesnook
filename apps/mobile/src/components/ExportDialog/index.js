@@ -205,7 +205,7 @@ const ExportDialog = () => {
                 <Button
                   onPress={close}
                   width="30%"
-                  grayed
+                  type="gray"
                   title="Cancel"
                   fontSize={SIZE.md}
                 />

@@ -14,7 +14,7 @@ const DialogButtons = ({
       <Button
         onPress={onPressNegative}
         fontSize={SIZE.md}
-        grayed
+        type="gray"
         width="30%"
         title={negativeTitle}
       />
@@ -22,6 +22,7 @@ const DialogButtons = ({
         onPress={onPressPositive}
         fontSize={SIZE.md}
         width="30%"
+        type="transparent"
         title={positiveTitle}
       />
     </View>

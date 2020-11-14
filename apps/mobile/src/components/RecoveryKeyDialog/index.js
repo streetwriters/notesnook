@@ -254,6 +254,7 @@ class RecoveryKeyDialog extends React.Component {
             title="I have saved the key."
             width="100%"
             height={50}
+            type="accent"
             onPress={this.close}
           />
           <Toast context="local" />

@@ -167,10 +167,8 @@ const SimpleList = ({
         {placeholderData.button && (
           <Button
             onPress={placeholderData.action}
-            color="bg"
             title={placeholderData.button}
             icon="plus"
-            iconColor="accent"
             fontSize={SIZE.md}
           />
         )}
