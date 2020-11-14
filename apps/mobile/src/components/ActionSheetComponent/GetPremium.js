@@ -8,7 +8,7 @@ import {
 } from '../../services/EventManager';
 import {getElevation} from '../../utils';
 import {eOpenPremiumDialog, eShowGetPremium} from '../../utils/Events';
-import { SIZE } from '../../utils/SizeUtils';
+import {SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
 import {Button} from '../Button';
 import Heading from '../Typography/Heading';
@@ -16,7 +16,7 @@ import Paragraph from '../Typography/Paragraph';
 
 const translate = new Animated.Value(-800);
 
-export const GetPremium = ({close, context = 'global',offset=0}) => {
+export const GetPremium = ({close, context = 'global', offset = 0}) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
   const [msg, setMsg] = useState({
@@ -66,18 +66,23 @@ export const GetPremium = ({close, context = 'global',offset=0}) => {
         borderRadius: 5,
         flexDirection: 'row',
         alignSelf: 'center',
-		justifyContent: 'space-between',
-		top:offset,
+        justifyContent: 'space-between',
+        top: offset,
         transform: [
           {
             translateX: translate,
           },
         ],
       }}>
-      <Heading size={SIZE.md} color="white" style={{maxWidth: '75%', paddingRight: 6}}>
+      <Heading
+        size={SIZE.md}
+        color="white"
+        style={{maxWidth: '75%', paddingRight: 6}}>
         {msg.title}
         {'\n'}
-        <Paragraph color="white">{msg.desc}</Paragraph>
+        <Paragraph size={SIZE.sm} color="white">
+          {msg.desc}
+        </Paragraph>
       </Heading>
 
       <Button
