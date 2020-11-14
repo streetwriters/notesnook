@@ -28,6 +28,7 @@ import {
 } from '../../utils/Colors';
 import {db} from '../../utils/DB';
 import {eOpenLoginDialog, eOpenMoveNoteDialog} from '../../utils/Events';
+import { deleteItems } from '../../utils/functions';
 import {MMKV} from '../../utils/mmkv';
 import {opacity, ph, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
 import {timeConverter} from '../../utils/TimeUtils';
@@ -170,7 +171,15 @@ export const ActionSheetComponent = ({
     {
       name: 'Delete',
       icon: 'delete',
-      func: () => close('delete'),
+      func: async () => {
+        close();
+        try {
+          await deleteItems(note)
+        } catch(e) {
+          console.log(e);
+        }
+     
+      },
     },
     {
       name: 'Edit Notebook',
