@@ -45,7 +45,7 @@ export const Button = ({
       alpha={!colors.night ? -0.04 : 0.04}
       customStyle={{
         height: height,
-        width: width ? width : null,
+        width: width || null,
         paddingVertical: pv,
         paddingHorizontal: ph,
         borderRadius: 5,
@@ -54,10 +54,8 @@ export const Button = ({
         alignItems: 'center',
         flexDirection: 'row',
       }}>
-      {loading ? (
-        <ActivityIndicator color={colors[BUTTON_TYPES[type].text]} />
-      ) : null}
-      {icon && !loading ? (
+      {loading && <ActivityIndicator color={colors[BUTTON_TYPES[type].text]} />}
+      {icon && !loading && (
         <Icon
           name={icon}
           style={{
@@ -66,7 +64,7 @@ export const Button = ({
           color={color[BUTTON_TYPES[type].text]}
           size={SIZE.md}
         />
-      ) : null}
+      )}
       <Text
         style={[
           styles.buttonText,
