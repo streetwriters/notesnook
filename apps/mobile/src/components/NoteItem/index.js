@@ -137,7 +137,7 @@ export default class NoteItem extends React.Component {
               justifyContent: 'flex-start',
               alignItems: 'center',
               width: '100%',
-              marginTop: 5,
+              marginTop: 2.5,
             }}>
             {!isTrash ? (
               <>
@@ -177,7 +177,7 @@ export default class NoteItem extends React.Component {
                   <Icon
                     style={{marginRight: 10}}
                     name="star"
-                    size={SIZE.xs}
+                    size={SIZE.md}
                     color="orange"
                   />
                 ) : null}

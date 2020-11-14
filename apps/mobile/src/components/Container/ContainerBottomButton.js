@@ -1,14 +1,13 @@
-import React, {useEffect, useState} from 'react';
-import {Keyboard, Platform, Text, UIManager, View} from 'react-native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import React, { useEffect } from 'react';
+import { Keyboard, Platform, View } from 'react-native';
+import Animated, { Easing } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useTracked} from '../../provider';
-import {getElevation, showContext} from '../../utils';
-import {PressableButton} from '../PressableButton';
-import {normalize, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
-import {DDS} from '../../services/DeviceDetection';
-import {sleep} from '../../utils/TimeUtils';
-import Animated, {Easing} from 'react-native-reanimated';
+import { useTracked } from '../../provider';
+import { DDS } from '../../services/DeviceDetection';
+import { getElevation, showContext } from '../../utils';
+import { normalize, SIZE } from '../../utils/SizeUtils';
+import { PressableButton } from '../PressableButton';
 
 const translateY = new Animated.Value(0);
 export const ContainerBottomButton = ({title, onPress, color}) => {
