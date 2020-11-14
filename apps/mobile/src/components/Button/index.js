@@ -15,18 +15,18 @@ export const Button = ({
   icon,
   color = 'accent',
   fontSize = SIZE.sm,
-  iconColor = 'white',
+  iconColor = 'accent',
 }) => {
-  const [state, dispatch] = useTracked();
+  const [state] = useTracked();
   const {colors} = state;
   const usedColor = color === 'accent' ? colors.accent : colors[color];
 
   return (
     <PressableButton
       onPress={onPress}
-      color={grayed ? colors.nav : usedColor}
-      selectedColor={grayed ? colors.nav : usedColor}
-      alpha={grayed ? (!colors.night ? -0.04 : 0.04) : -0.1}
+      color="transparent"
+      selectedColor={grayed ? colors.nav : colors.shade}
+      alpha={grayed ? (!colors.night ? -0.02 : 0.02) : -0.1}
       customStyle={{
         height: height,
         width: width ? width : null,
@@ -43,10 +43,10 @@ export const Button = ({
         <Icon
           name={icon}
           style={{
-            marginRight: 5,
+            marginRight: 0,
           }}
           color={grayed ? colors.icon : colors[iconColor]}
-          size={SIZE.lg}
+          size={SIZE.md}
         />
       ) : null}
       <Text
@@ -70,8 +70,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   buttonText: {
-    fontFamily: WEIGHT.medium,
+    fontFamily: WEIGHT.bold,
     color: 'white',
+    fontSize: SIZE.md,
     marginLeft: 5,
   },
 });
