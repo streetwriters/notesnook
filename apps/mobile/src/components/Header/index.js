@@ -3,22 +3,19 @@ import {ActivityIndicator, Platform, StyleSheet, View} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useTracked} from '../../provider';
-import {
-  eSendEvent,
-  eSubscribeEvent,
-  eUnSubscribeEvent,
-} from '../../services/EventManager';
+import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
+import NavigationService from '../../services/Navigation';
 import {dWidth} from '../../utils';
-import {ActionIcon} from '../ActionIcon';
-import {HeaderMenu} from './HeaderMenu';
-import {HeaderTitle} from './HeaderTitle';
-import {SIZE} from '../../utils/SizeUtils';
-import {HeaderLeftMenu} from './HeaderLeftMenu';
 import {eScrollEvent} from '../../utils/Events';
+import {SIZE} from '../../utils/SizeUtils';
+import {ActionIcon} from '../ActionIcon';
+import {SearchInput} from '../SearchInput';
+import {HeaderLeftMenu} from './HeaderLeftMenu';
+import {HeaderTitle} from './HeaderTitle';
 
 export const Header = ({root}) => {
   const [state] = useTracked();
-  const {colors, syncing} = state;
+  const {colors, syncing, currentScreen} = state;
   const insets = useSafeAreaInsets();
   const [hide, setHide] = useState(false);
 
@@ -47,13 +44,28 @@ export const Header = ({root}) => {
           overflow: 'hidden',
           borderBottomWidth: 1,
           borderBottomColor: hide ? 'transparent' : colors.nav,
+          justifyContent: 'center',
         },
       ]}>
       <View style={styles.leftBtnContainer}>
         <HeaderLeftMenu />
-        {Platform.OS === 'android' ? <HeaderTitle root={root} /> : null}
+
+        {Platform.OS === 'android' && currentScreen !== 'search' ? (
+          <HeaderTitle root={root} />
+        ) : null}
       </View>
-      {Platform.OS !== 'android' ? <HeaderTitle root={root} /> : null}
+      {Platform.OS !== 'android' && currentScreen !== 'search' ? (
+        <HeaderTitle root={root} />
+      ) : null}
+
+      {currentScreen === 'search' ? (
+        <View
+          style={{
+            width: '80%',
+          }}>
+          <SearchInput />
+        </View>
+      ) : null}
 
       <Animatable.View
         transition={['opacity']}
@@ -75,19 +87,31 @@ export const Header = ({root}) => {
         <ActivityIndicator size={25} color={colors.accent} />
       </Animatable.View>
 
-      <View style={styles.rightBtnContainer}>
-        <ActionIcon
-          onPress={() => {
-            if (!hideHeader) return;
-            setHideHeader(false);
-            eSendEvent('showSearch');
-          }}
-          name="magnify"
-          size={SIZE.xxxl}
-          color={colors.pri}
-          style={styles.rightBtn}
-        />
-      </View>
+      {currentScreen === 'search' ? (
+        <View style={styles.rightBtnContainer}>
+          <ActionIcon
+            onPress={async () => {
+              NavigationService.navigate('Search');
+            }}
+            name="tune"
+            size={SIZE.xxxl}
+            color={colors.pri}
+            style={styles.rightBtn}
+          />
+        </View>
+      ) : (
+        <View style={styles.rightBtnContainer}>
+          <ActionIcon
+            onPress={async () => {
+              NavigationService.navigate('Search');
+            }}
+            name="magnify"
+            size={SIZE.xxxl}
+            color={colors.pri}
+            style={styles.rightBtn}
+          />
+        </View>
+      )}
     </View>
   );
 };
