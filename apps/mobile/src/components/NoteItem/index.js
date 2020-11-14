@@ -1,15 +1,16 @@
 import React from 'react';
-import {Dimensions, Text, View} from 'react-native';
+import {Dimensions, Text, View, TouchableOpacity} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {ActionIcon} from '../ActionIcon';
-import {ActionSheetEvent} from '../DialogManager/recievers';
+import {ActionSheetEvent, updateEvent} from '../DialogManager/recievers';
 import {timeSince} from '../../utils/TimeUtils';
 import {ph, SIZE, WEIGHT} from '../../utils/SizeUtils';
 import Paragraph from '../Typography/Paragraph';
 import Heading from '../Typography/Heading';
-
-const w = Dimensions.get('window').width;
-const h = Dimensions.get('window').height;
+import {db} from '../../utils/DB';
+import {Actions} from '../../provider/Actions';
+import NavigationService from '../../services/Navigation';
+import {COLORS_NOTE} from '../../utils/Colors';
 
 export default class NoteItem extends React.Component {
   constructor(props) {
@@ -55,6 +56,7 @@ export default class NoteItem extends React.Component {
 
   render() {
     let {colors, item, customStyle, isTrash} = this.props;
+
     return (
       <View
         style={[
@@ -67,7 +69,7 @@ export default class NoteItem extends React.Component {
             alignSelf: 'center',
             borderBottomWidth: 1,
             height: 100,
-            borderBottomColor: item.pinned ? 'transparent' : colors.nav,
+            borderBottomColor: colors.nav,
           },
           customStyle ? customStyle : {},
         ]}>
@@ -76,7 +78,50 @@ export default class NoteItem extends React.Component {
             width: '92%',
             paddingRight: 5,
           }}>
-          <Heading numberOfLines={1} size={SIZE.md}>
+          {item.notebook && item.notebook.id && (
+            <View
+              style={{
+                flexDirection: 'row',
+              }}>
+              <TouchableOpacity
+                activeOpacity={1}
+                onPress={() => {
+                  let notebook = db.notebooks.notebook(item.notebook.id).data;
+                  updateEvent({
+                    type: Actions.HEADER_TEXT_STATE,
+                    state: {
+                      heading: notebook.title,
+                    },
+                  });
+                  updateEvent({
+                    type: Actions.HEADER_STATE,
+                    state: false,
+                  });
+                  NavigationService.navigate('Notebook', {
+                    notebook: db.notebooks.notebook(item.notebook.id).data,
+                    title: notebook.title,
+                    root: true,
+                  });
+                }}
+                style={{
+                  paddingVertical: 1.5,
+                  marginBottom: 2.5,
+                }}>
+                <Paragraph
+                  size={SIZE.xs}
+                  color={
+                    item.colors[0] ? COLORS_NOTE[item.colors[0]] : colors.pri
+                  }>
+                  {db.notebooks.notebook(item.notebook.id).title}
+                </Paragraph>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          <Heading
+            color={COLORS_NOTE[item.colors[0]]}
+            numberOfLines={1}
+            size={SIZE.md}>
             {item.title.replace('\n', '')}
           </Heading>
 
@@ -111,7 +156,7 @@ export default class NoteItem extends React.Component {
                           width: SIZE.xs,
                           height: SIZE.xs,
                           borderRadius: 100,
-                          backgroundColor: item,
+                          backgroundColor: COLORS_NOTE[item],
                           marginRight: -4.5,
                         }}
                       />
@@ -132,14 +177,14 @@ export default class NoteItem extends React.Component {
                   <Icon
                     style={{marginRight: 10}}
                     name="star"
-                    size={SIZE.xs + 1}
+                    size={SIZE.xs}
                     color="orange"
                   />
                 ) : null}
                 <Text
                   style={{
                     color: colors.icon,
-                    fontSize: SIZE.xs - 1,
+                    fontSize: SIZE.xs,
                     textAlignVertical: 'center',
                     fontFamily: WEIGHT.regular,
                     marginRight: 10,
@@ -154,7 +199,7 @@ export default class NoteItem extends React.Component {
                 <Text
                   style={{
                     color: colors.accent,
-                    fontSize: SIZE.xs - 1,
+                    fontSize: SIZE.xs,
                     textAlignVertical: 'center',
                     fontFamily: WEIGHT.regular,
                   }}>
@@ -165,7 +210,7 @@ export default class NoteItem extends React.Component {
                 <Text
                   style={{
                     color: colors.icon,
-                    fontSize: SIZE.xs - 1,
+                    fontSize: SIZE.xs,
                     textAlignVertical: 'center',
                     fontFamily: WEIGHT.regular,
                   }}>
@@ -188,7 +233,7 @@ export default class NoteItem extends React.Component {
                 }}>
                 <Text
                   style={{
-                    fontSize: SIZE.xs - 1,
+                    fontSize: SIZE.xs,
                     color: 'white',
                   }}>
                   CONFLICTS
