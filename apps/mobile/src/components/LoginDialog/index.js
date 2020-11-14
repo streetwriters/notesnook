@@ -390,7 +390,7 @@ const LoginDialog = () => {
                   height: 50,
                   borderBottomWidth: 1,
                   borderColor: colors.nav,
-                  fontSize: SIZE.sm,
+                  fontSize: SIZE.md,
                   fontFamily: WEIGHT.regular,
                   color: colors.pri,
                 }}
@@ -479,7 +479,7 @@ const LoginDialog = () => {
                     height: 50,
                     borderBottomWidth: 1,
                     borderColor: colors.nav,
-                    fontSize: SIZE.sm,
+                    fontSize: SIZE.md,
                     fontFamily: WEIGHT.regular,
                     color: colors.pri,
                   }}
@@ -577,7 +577,7 @@ const LoginDialog = () => {
                 style={{
                   paddingHorizontal: 0,
                   height: 50,
-                  fontSize: SIZE.sm,
+                  fontSize: SIZE.md,
                   fontFamily: WEIGHT.regular,
                   width: '85%',
                   maxWidth: '85%',
@@ -667,7 +667,7 @@ const LoginDialog = () => {
                     borderBottomWidth: 1,
                     height: 50,
                     borderColor: colors.nav,
-                    fontSize: SIZE.sm,
+                    fontSize: SIZE.md,
                     fontFamily: WEIGHT.regular,
                     color: colors.pri,
                   }}
@@ -722,7 +722,7 @@ const LoginDialog = () => {
 
                   <Text
                     style={{
-                      fontSize: SIZE.xs,
+                      fontSize: SIZE.sm,
                       fontFamily: WEIGHT.regular,
                       color: colors.pri,
                       maxWidth: '90%',
