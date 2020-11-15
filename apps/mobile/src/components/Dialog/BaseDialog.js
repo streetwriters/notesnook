@@ -14,6 +14,7 @@ const BaseDialog = ({
   children,
   onShow,
   animation = 'fade',
+  premium
 }) => {
   const [state, dispatch] = useTracked();
   const scaleValue = new Animated.Value(1);
@@ -44,6 +45,7 @@ const BaseDialog = ({
           onPress={onRequestClose}
           style={styles.overlayButton}
         />
+        {premium}
 
         {children}
       </View>
