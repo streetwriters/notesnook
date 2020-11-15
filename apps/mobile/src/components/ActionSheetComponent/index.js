@@ -480,7 +480,7 @@ export const ActionSheetComponent = ({
         backgroundColor: colors.bg,
         paddingHorizontal: 0,
       }}>
-      <GetPremium context="sheet" close={close} offset={-110} />
+     
       {!note.id && !note.dateCreated ? (
         <Paragraph style={{marginVertical: 10}}>
           Start writing to save your note.

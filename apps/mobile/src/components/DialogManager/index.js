@@ -41,11 +41,12 @@ import RecoveryKeyDialog from '../RecoveryKeyDialog';
 import RestoreDialog from '../RestoreDialog';
 import {VaultDialog} from '../VaultDialog';
 import {TEMPLATE_DELETE, TEMPLATE_PERMANANT_DELETE} from './Templates';
-import {hexToRGBA} from "../../utils/ColorUtils";
-import {DDS} from "../../services/DeviceDetection";
+import {hexToRGBA} from '../../utils/ColorUtils';
+import {DDS} from '../../services/DeviceDetection';
 import ResultDialog from '../ResultDialog';
-import SortDialog from "../SortDialog";
+import SortDialog from '../SortDialog';
 import JumpToDialog from '../JumpToDialog';
+import {GetPremium,translatePrem} from '../ActionSheetComponent/GetPremium';
 
 export class DialogManager extends Component {
   constructor(props) {
@@ -285,7 +286,7 @@ export class DialogManager extends Component {
           containerStyle={{
             backgroundColor: colors.bg,
             width: DDS.isTab ? 500 : '100%',
-            alignSelf:'center',
+            alignSelf: 'center',
             borderRadius: 10,
             marginBottom: DDS.isTab ? 50 : 0,
           }}
@@ -294,6 +295,13 @@ export class DialogManager extends Component {
             Platform.ios
               ? hexToRGBA(colors.accent + '19')
               : hexToRGBA(colors.shade)
+          }
+          premium={
+            <GetPremium
+              context="sheet"
+              close={() => this.actionSheet._hideModal()}
+              offset={50}
+            />
           }
           keyboardShouldPersistTaps="always"
           delayActionSheetDraw={true}
@@ -312,6 +320,7 @@ export class DialogManager extends Component {
           bounceOnOpen={true}
           gestureEnabled={true}
           onClose={() => {
+            translatePrem.setValue(-800)
             this.onActionSheetHide();
           }}>
           <ActionSheetComponent
@@ -366,13 +375,12 @@ export class DialogManager extends Component {
         <PendingDialog colors={colors} />
         <PremiumStatusDialog />
         <ProgressDialog />
-        <RestoreDialog/>
-        <ResultDialog/>
+        <RestoreDialog />
+        <ResultDialog />
         <VaultDialog colors={colors} />
         <MoveNoteDialog colors={colors} />
         <SortDialog colors={colors} />
-        <JumpToDialog/>
-
+        <JumpToDialog />
       </>
     );
   }
