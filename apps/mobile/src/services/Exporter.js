@@ -37,6 +37,13 @@ async function saveToPDF(note) {
 
 async function saveToMarkdown(note) {
   let path = await Storage.checkAndCreateDir('/exported/Markdown/');
+  if (Platform.OS === 'android') {
+    let hasPermission = await Storage.requestPermission();
+    if (!hasPermission) {
+      ToastEvent.show('Failed to get storage permission');
+      return null;
+    }
+  }
   let markdown = await db.notes.note(note.id).export('md');
 
   path = path + note.title + '.md';
@@ -51,6 +58,13 @@ async function saveToMarkdown(note) {
 
 async function saveToText(note) {
   let path = await Storage.checkAndCreateDir('/exported/Text/');
+  if (Platform.OS === 'android') {
+    let hasPermission = await Storage.requestPermission();
+    if (!hasPermission) {
+      ToastEvent.show('Failed to get storage permission');
+      return null;
+    }
+  }
   let markdown = await db.notes.note(note.id).export('txt');
   path = path + note.title + '.txt';
   await RNFetchBlob.fs.writeFile(path, markdown, 'utf8');
@@ -64,6 +78,13 @@ async function saveToText(note) {
 
 async function saveToHTML(note) {
   let path = await Storage.checkAndCreateDir('/exported/Html/');
+  if (Platform.OS === 'android') {
+    let hasPermission = await Storage.requestPermission();
+    if (!hasPermission) {
+      ToastEvent.show('Failed to get storage permission');
+      return null;
+    }
+  }
   let markdown = await db.notes.note(note.id).export('html');
   path = path + note.title + '.html';
   await RNFetchBlob.fs.writeFile(path, markdown, 'utf8');
