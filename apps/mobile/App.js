@@ -32,7 +32,7 @@ import Backup from './src/services/Backup';
 import {setLoginMessage} from './src/services/Message';
 import SplashScreen from 'react-native-splash-screen';
 import {editing, sortSettings} from './src/utils';
-import { tabBarRef } from './src/utils/Refs';
+import {tabBarRef} from './src/utils/Refs';
 
 let firstLoad = true;
 let note = null;
@@ -78,10 +78,8 @@ const App = () => {
     settings = await MMKV.getStringAsync('settings');
     if (settings) {
       settings = JSON.parse(settings);
-      if (settings.useSystemTheme) {
-        let newColors = await getColorScheme(settings.useSystemTheme);
-        dispatch({type: Actions.THEME, colors: newColors});
-      }
+      let newColors = await getColorScheme(settings.useSystemTheme);
+      dispatch({type: Actions.THEME, colors: newColors});
     }
   };
 
@@ -185,7 +183,7 @@ const App = () => {
     console.log('check for intent called');
     ReceiveSharingIntent.getReceivedFiles(
       (d) => {
-        console.log(d,"DATA");
+        console.log(d, 'DATA');
         let data = d[0];
         if (data.text || data.weblink) {
           let text = data.text;
@@ -199,15 +197,15 @@ const App = () => {
             delta = [{insert: `${text}`}];
             text = data.text;
           } else if (weblink) {
-            console.log('putting link')
+            console.log('putting link');
             delta = [{insert: `${weblink}`}];
-            text = weblink
+            text = weblink;
           }
-     
+
           prevIntent.text = text;
           prevIntent.weblink = weblink;
           setIntent();
-          console.log(text,weblink,"HERE SHOWING",delta);
+          console.log(text, weblink, 'HERE SHOWING', delta);
           eSendEvent(eOnLoadNote, {
             type: 'intent',
             data: delta,
