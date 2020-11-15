@@ -1,44 +1,53 @@
 import {useNetInfo} from '@react-native-community/netinfo';
 import React, {useEffect, useState} from 'react';
-import {useColorScheme} from 'react-native';
+import {AppState, Platform, StatusBar, useColorScheme} from 'react-native';
+import DeviceInfo from 'react-native-device-info';
 import Orientation from 'react-native-orientation';
+import ReceiveSharingIntent from 'react-native-receive-sharing-intent';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
+import SplashScreen from 'react-native-splash-screen';
 import {useTracked} from './src/provider';
 import {Actions} from './src/provider/Actions';
 import {defaultState} from './src/provider/DefaultState';
-import ReceiveSharingIntent from 'react-native-receive-sharing-intent';
+import Backup from './src/services/Backup';
+import {DDS} from './src/services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
   ToastEvent,
 } from './src/services/EventManager';
+import {setLoginMessage} from './src/services/Message';
+import {sortSettings} from './src/utils';
+import {COLOR_SCHEME} from './src/utils/Colors';
+import {getColorScheme} from './src/utils/ColorUtils';
+import {db} from './src/utils/DB';
 import {
   eDispatchAction,
   eOnLoadNote,
   eResetApp,
   eStartSyncer,
 } from './src/utils/Events';
-import DeviceInfo from 'react-native-device-info';
-import {getNote, setIntent} from './src/views/Editor/Functions';
-import {openEditorAnimation} from './src/utils/Animations';
-import {sleep} from './src/utils/TimeUtils';
-import {getColorScheme} from './src/utils/ColorUtils';
-import {getDeviceSize, scale, updateSize} from './src/utils/SizeUtils';
-import {db} from './src/utils/DB';
-import {DDS} from './src/services/DeviceDetection';
 import {MMKV} from './src/utils/mmkv';
-import Backup from './src/services/Backup';
-import {setLoginMessage} from './src/services/Message';
-import SplashScreen from 'react-native-splash-screen';
-import {editing, sortSettings} from './src/utils';
 import {tabBarRef} from './src/utils/Refs';
+import {getDeviceSize, scale, updateSize} from './src/utils/SizeUtils';
+import {sleep} from './src/utils/TimeUtils';
+import {getNote, setIntent} from './src/views/Editor/Functions';
 
 let firstLoad = true;
 let note = null;
 let prevIntent = {
   text: null,
   weblink: null,
+};
+
+const onAppFocused = () => {
+  console.log('called');
+  StatusBar.setBarStyle(COLOR_SCHEME.night ? 'light-content' : 'dark-content');
+  if (Platform.OS === 'android') {
+    StatusBar.setTranslucent(true);
+    StatusBar.setBackgroundColor(COLOR_SCHEME.bg);
+  }
 };
 
 const App = () => {
@@ -100,20 +109,19 @@ const App = () => {
   const syncChanges = async () => {
       dispatch({type: Actions.ALL});
     },
-    resetApp = () => {
+    resetApp = async () => {
       note = getNote();
       setInit(false);
-      Initialize().then(async () => {
-        setInit(true);
-        await sleep(300);
-        if (note && note.id) {
-          eSendEvent(eOnLoadNote, note);
-          if (DDS.isPhone || DDS.isSmallTab) {
-            tabBarRef.current?.goToPage(1);
-          }
-          note = null;
+      Initialize();
+      setInit(true);
+      await sleep(300);
+      if (note && note.id) {
+        eSendEvent(eOnLoadNote, note);
+        if (DDS.isPhone || DDS.isSmallTab) {
+          tabBarRef.current?.goToPage(1);
         }
-      });
+        note = null;
+      }
     },
     startSyncer = async () => {
       try {
@@ -133,6 +141,7 @@ const App = () => {
     eSubscribeEvent(eDispatchAction, (type) => {
       dispatch(type);
     });
+    AppState.addEventListener('focus', onAppFocused);
     return () => {
       db?.ev?.unsubscribe('db:refresh', syncChanges);
       eUnSubscribeEvent(eStartSyncer, startSyncer);
@@ -141,49 +150,48 @@ const App = () => {
         dispatch(type);
       });
       Orientation.removeOrientationListener(_onOrientationChange);
+      AppState.removeEventListener('focus', onAppFocused);
     };
   }, []);
 
-  useEffect(() => {
-    let error = null;
-    let user;
+  const getUser = async () => {
+    let user = await db.user.get();
+    if (user) {
+      dispatch({type: Actions.USER, user: user});
+      await startSyncer();
+    } else {
+      setLoginMessage(dispatch);
+    }
+  };
 
-    Initialize().finally(async () => {
+  useEffect(() => {
+    Initialize();
+    let error = null;
+    (async () => {
       try {
         await db.init();
       } catch (e) {
         error = e;
       } finally {
-        user = await db.user.get();
-        if (user) {
-          dispatch({type: Actions.USER, user: user});
-          await startSyncer();
-        }
+        dispatch({type: Actions.ALL});
+        getUser().catch((e) => console.log);
+        backupData().then((r) => r);
       }
-      if (!user) {
-        setLoginMessage(dispatch);
-      }
-
-      dispatch({type: Actions.ALL});
       setInit(true);
-      backupData().then((r) => r);
-
       setTimeout(() => {
         if (error) {
           console.log(error);
           ToastEvent.show('Error initializing database.');
         }
-        SplashScreen.hide();
         checkForIntent();
-      }, 500);
-    });
+        SplashScreen.hide();
+      }, 100);
+    })();
   }, []);
 
   const checkForIntent = () => {
-    console.log('check for intent called');
     ReceiveSharingIntent.getReceivedFiles(
       (d) => {
-        console.log(d, 'DATA');
         let data = d[0];
         if (data.text || data.weblink) {
           let text = data.text;
@@ -197,7 +205,6 @@ const App = () => {
             delta = [{insert: `${text}`}];
             text = data.text;
           } else if (weblink) {
-            console.log('putting link');
             delta = [{insert: `${weblink}`}];
             text = weblink;
           }
@@ -236,10 +243,7 @@ const App = () => {
     }
   }
 
-  async function Initialize() {
-    let settings;
-    scale.fontScale = 1;
-
+  function Initialize() {
     if (firstLoad) {
       if (DeviceInfo.isTablet() && getDeviceSize() > 9) {
         Orientation.lockToLandscape();
@@ -249,8 +253,13 @@ const App = () => {
       }
       firstLoad = false;
     }
-    settings = await MMKV.getStringAsync('settings');
+    initAppSettings().catch((e) => console.log(e));
+  }
 
+  const initAppSettings = async () => {
+    let settings;
+    scale.fontScale = 1;
+    settings = await MMKV.getStringAsync('settings');
     if (!settings) {
       settings = defaultState.settings;
       await MMKV.setStringAsync('settings', JSON.stringify(settings));
@@ -264,19 +273,13 @@ const App = () => {
     sortSettings.sortOrder = settings.sortOrder;
     dispatch({type: Actions.SETTINGS, settings: {...settings}});
     updateSize();
-
     await updateTheme();
-  }
+  };
 
-  if (!init) {
-    return <></>;
-  }
   return (
     <>
       <SafeAreaProvider>
-        <>
-          <I.Initialize />
-        </>
+        <>{!init ? <></> : <I.Initialize />}</>
       </SafeAreaProvider>
     </>
   );
