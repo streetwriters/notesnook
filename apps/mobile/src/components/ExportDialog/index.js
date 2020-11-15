@@ -94,9 +94,9 @@ const ExportDialog = () => {
           () => {
             eSendEvent(eShowGetPremium, {
               context: 'export',
-              title: 'Export in PDF, Markdown & HTML',
+              title: 'Export in PDF, MD & HTML',
               desc:
-                'Get Notesnook Pro to export your note in PDF, Markdown and HTML formats!',
+                'Get Notesnook Pro to export your notes in PDF, Markdown and HTML formats!',
             });
           },
         );
@@ -114,9 +114,9 @@ const ExportDialog = () => {
           () => {
             eSendEvent(eShowGetPremium, {
               context: 'export',
-              title: 'Export in PDF, Markdown & HTML',
+              title: 'Export in PDF, MD & HTML',
               desc:
-                'Get Notesnook Pro to export your note in PDF, Markdown and HTML formats!',
+                'Get Notesnook Pro to export your notes in PDF, Markdown and HTML formats!',
             });
           },
         );
@@ -142,9 +142,9 @@ const ExportDialog = () => {
           () => {
             eSendEvent(eShowGetPremium, {
               context: 'export',
-              title: 'Export in PDF, Markdown & HTML',
+              title: 'Export in PDF, MD & HTML',
               desc:
-                'Get Notesnook Pro to export your note in PDF, Markdown and HTML formats!',
+                'Get Notesnook Pro to export your notes in PDF, Markdown and HTML formats!',
             });
           },
         );
@@ -155,7 +155,10 @@ const ExportDialog = () => {
   ];
 
   return (
-    <BaseDialog onRequestClose={close} visible={visible}>
+    <BaseDialog
+      premium={<GetPremium context="export" offset={50} close={close} />}
+      onRequestClose={close}
+      visible={visible}>
       <View
         style={[
           {
@@ -164,7 +167,6 @@ const ExportDialog = () => {
           },
           styles.container,
         ]}>
-        <GetPremium context="export" offset={-100} close={close} />
         <DialogHeader
           icon="export"
           title="Export Note"

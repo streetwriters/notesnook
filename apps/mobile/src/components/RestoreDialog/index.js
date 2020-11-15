@@ -1,27 +1,26 @@
-import React, {useEffect, useState} from 'react';
-import {FlatList, Platform, Text, View} from 'react-native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import React, { useEffect, useState } from 'react';
+import { FlatList, Platform, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import RNFetchBlob from 'rn-fetch-blob';
-import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
+import { useTracked } from '../../provider';
+import { Actions } from '../../provider/Actions';
+import { DDS } from '../../services/DeviceDetection';
 import {
   eSubscribeEvent,
   eUnSubscribeEvent,
-  ToastEvent,
+  ToastEvent
 } from '../../services/EventManager';
-import {eCloseRestoreDialog, eOpenRestoreDialog} from '../../utils/Events';
+import { getElevation } from '../../utils';
+import { db } from '../../utils/DB';
+import { eCloseRestoreDialog, eOpenRestoreDialog } from '../../utils/Events';
+import { ph, SIZE, WEIGHT } from '../../utils/SizeUtils';
 import storage from '../../utils/storage';
-import {getElevation} from '../../utils';
-import {ActionIcon} from '../ActionIcon';
-import {Button} from '../Button';
+import { sleep } from '../../utils/TimeUtils';
+import { Button } from '../Button';
 import BaseDialog from '../Dialog/base-dialog';
-import {Loading} from '../Loading';
-import {sleep} from '../../utils/TimeUtils';
-import {ph, SIZE, WEIGHT} from '../../utils/SizeUtils';
-import {db} from '../../utils/DB';
-import {DDS} from '../../services/DeviceDetection';
-import DialogHeader from '../Dialog/dialog-header';
 import DialogButtons from '../Dialog/dialog-buttons';
+import DialogHeader from '../Dialog/dialog-header';
+import { Loading } from '../Loading';
 
 const RestoreDialog = () => {
   const [state, dispatch] = useTracked();
