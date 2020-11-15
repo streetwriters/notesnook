@@ -18,7 +18,7 @@ const BUTTON_TYPES = {
   },
   accent: {
     primary: 'accent',
-    text: 'white',
+    text: 'light',
     selected: 'accent',
   },
   inverted: {
@@ -40,6 +40,7 @@ export const Button = ({
 }) => {
   const [state] = useTracked();
   const {colors} = state;
+  console.log(colors);
 
   return (
     <PressableButton
