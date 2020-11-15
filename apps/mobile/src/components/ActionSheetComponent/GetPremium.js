@@ -1,20 +1,21 @@
-import React, {useEffect, useState} from 'react';
-import Animated, {Easing} from 'react-native-reanimated';
-import {useTracked} from '../../provider';
+import React, { useEffect, useState } from 'react';
+import { Platform, Text, View } from 'react-native';
+import Animated, { Easing } from 'react-native-reanimated';
+import { useTracked } from '../../provider';
 import {
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent,
+  eUnSubscribeEvent
 } from '../../services/EventManager';
-import {getElevation} from '../../utils';
-import {eOpenPremiumDialog, eShowGetPremium} from '../../utils/Events';
-import {SIZE} from '../../utils/SizeUtils';
-import {sleep} from '../../utils/TimeUtils';
-import {Button} from '../Button';
+import { getElevation } from '../../utils';
+import { eOpenPremiumDialog, eShowGetPremium } from '../../utils/Events';
+import { SIZE } from '../../utils/SizeUtils';
+import { sleep } from '../../utils/TimeUtils';
+import { Button } from '../Button';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
-const translate = new Animated.Value(-800);
+export const translatePrem = new Animated.Value(-800);
 
 export const GetPremium = ({close, context = 'global', offset = 0}) => {
   const [state, dispatch] = useTracked();
@@ -30,20 +31,20 @@ export const GetPremium = ({close, context = 'global', offset = 0}) => {
         title: event.title,
         desc: event.desc,
       });
-      Animated.timing(translate, {
+      Animated.timing(translatePrem, {
         toValue: 0,
         duration: 300,
         easing: Easing.inOut(Easing.ease),
       }).start();
 
       setTimeout(async () => {
-        Animated.timing(translate, {
+        Animated.timing(translatePrem, {
           toValue: +800,
           duration: 150,
           easing: Easing.inOut(Easing.ease),
         }).start();
         await sleep(200);
-        translate.setValue(-800);
+        translatePrem.setValue(-800);
       }, 5000);
     }
   };
@@ -51,6 +52,7 @@ export const GetPremium = ({close, context = 'global', offset = 0}) => {
   useEffect(() => {
     eSubscribeEvent(eShowGetPremium, open);
     return () => {
+      translatePrem.setValue(-800)
       eUnSubscribeEvent(eShowGetPremium, open);
     };
   }, []);
@@ -63,40 +65,48 @@ export const GetPremium = ({close, context = 'global', offset = 0}) => {
         zIndex: 999,
         ...getElevation(10),
         padding: 12,
+        paddingVertical:20,
         borderRadius: 5,
         flexDirection: 'row',
         alignSelf: 'center',
         justifyContent: 'space-between',
         top: offset,
-        maxWidth:"100%",
+        maxWidth: '100%',
         transform: [
           {
-            translateX: translate,
+            translateX: translatePrem,
           },
         ],
       }}>
-      <Heading
-        size={SIZE.md}
-        color="white"
-        style={{maxWidth: '70%', paddingRight: 6}}>
-        {msg.title}
-        {'\n'}
-        <Paragraph size={SIZE.sm} color="white">
-          {msg.desc}
-        </Paragraph>
-      </Heading>
+      <View
+        style={{
+          width: '75%',
+          maxWidth: '75%',
+          paddingRight: 6,
+          justifyContent: 'center',
+        }}>
+        <Heading color="white" size={SIZE.md}>
+          {msg.title}
+        </Heading>
+
+        <Text>
+          <Paragraph style={{margin: 0}} size={SIZE.sm} color="white">
+            {msg.desc}
+          </Paragraph>
+        </Text>
+      </View>
 
       <Button
         onPress={async () => {
           close();
-          await sleep(300);
+          translatePrem.setValue(-800);
+          await sleep(Platform.OS === 'ios' ? 300 : 50);
           eSendEvent(eOpenPremiumDialog);
         }}
         width={80}
         title="Get Now"
         type="inverted"
       />
-
     </Animated.View>
   );
 };
