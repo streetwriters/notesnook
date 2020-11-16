@@ -1,4 +1,5 @@
 import {useNetInfo} from '@react-native-community/netinfo';
+import {EV} from 'notes-core/common';
 import React, {useEffect, useState} from 'react';
 import {AppState, Platform, StatusBar, useColorScheme} from 'react-native';
 import DeviceInfo from 'react-native-device-info';
@@ -127,7 +128,7 @@ const App = () => {
       try {
         let user = await db.user.get();
         if (user) {
-          db.ev.subscribe('db:refresh', syncChanges);
+          EV.subscribe('db:refresh', syncChanges);
         }
       } catch (e) {
         console.log(e);
@@ -143,7 +144,7 @@ const App = () => {
     });
     AppState.addEventListener('focus', onAppFocused);
     return () => {
-      db?.ev?.unsubscribe('db:refresh', syncChanges);
+      EV.unsubscribe('db:refresh', syncChanges);
       eUnSubscribeEvent(eStartSyncer, startSyncer);
       eUnSubscribeEvent(eResetApp, resetApp);
       eUnSubscribeEvent(eDispatchAction, (type) => {
@@ -158,6 +159,10 @@ const App = () => {
     let user = await db.user.get();
     if (user) {
       dispatch({type: Actions.USER, user: user});
+      dispatch({type: Actions.SYNCING, syncing: true});
+      await db.sync();
+      dispatch({type: Actions.SYNCING, syncing: false});
+      dispatch({type: Actions.ALL});
       await startSyncer();
     } else {
       setLoginMessage(dispatch);
