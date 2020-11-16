@@ -1,5 +1,4 @@
 import fuzzysearch from "fuzzysearch";
-import sm from "../utils/set";
 var tfun = require("transfun/transfun.js").tfun;
 if (!tfun) {
   tfun = global.tfun;
@@ -15,22 +14,23 @@ export default class Lookup {
   }
 
   notes(notes, query) {
-    return sm.union(
-      this._db.content._collection.search.search(query, {
-        map: (elem) => {
-          return notes.find((note) => note.contentId === elem);
-        },
-      }),
-      this._db.notes._collection.search.search(query)
-    );
+    let contentIds = this._db.content._collection.search.searchDocs(query);
+    let noteIds = this._db.notes._collection.search.searchDocs(query);
+    return notes.filter((note) => {
+      return (
+        contentIds.findIndex((content) => note.id === content.noteId) > -1 ||
+        noteIds.findIndex((n) => n.id === note.id) > -1
+      );
+    });
   }
 
   notebooks(array, query) {
-    return this._db.notebooks._collection.search.search(query, {
-      map: (elem) => {
-        return array.find((nb) => nb.id === elem);
-      },
-    });
+    const notebooksIds = this._db.notebooks._collection.search.searchDocs(
+      query
+    );
+    return tfun.filter(
+      (nb) => notebooksIds.findIndex((notebook) => notebook.id === nb.id) > -1
+    )(array);
   }
 
   topics(array, query) {

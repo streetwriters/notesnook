@@ -41,6 +41,7 @@ export default class Notebooks extends Collection {
       description: notebook.description,
       dateCreated: notebook.dateCreated,
       pinned: !!notebook.pinned,
+      favorite: !!notebook.favorite,
       topics: notebook.topics || [],
       totalNotes: 0,
     };

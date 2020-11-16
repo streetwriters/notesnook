@@ -79,12 +79,13 @@ test("delete a topic", () =>
   }));
 
 test("delete note from edited topic", () =>
-  notebookTest().then(async ({ db, id }) => {
-    const noteId = await db.notes.add(TEST_NOTE);
-    let topics = db.notebooks.notebook(id).topics;
-    await topics.add("Home");
-    let topic = topics.topic("Home");
-    await db.notes.move({ id, topic: topic._topic.title }, noteId);
-    await topics.add({ id: topic._topic.id, title: "Hello22" });
-    await db.notes.delete(noteId);
-  }));
+  notebookTest().then(async ({ id }) =>
+    noteTest().then(async ({ db, id: noteId }) => {
+      let topics = db.notebooks.notebook(id).topics;
+      await topics.add("Home");
+      let topic = topics.topic("Home");
+      await db.notes.move({ id, topic: topic._topic.title }, noteId);
+      await topics.add({ id: topic._topic.id, title: "Hello22" });
+      await db.notes.delete(noteId);
+    })
+  ));

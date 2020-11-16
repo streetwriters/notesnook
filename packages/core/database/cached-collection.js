@@ -1,36 +1,45 @@
-import Storage from "./storage";
-import HyperSearch from "hypersearch";
-import { getSchema } from "./schemas";
-import PersistentCachedMap from "./persistentcachedmap";
+import Indexer from "./indexer";
 import sort from "fast-sort";
+import { EV } from "../common";
 import IndexedCollection from "./indexed-collection";
 
 export default class CachedCollection extends IndexedCollection {
+  constructor(context, type) {
+    super(context, type);
+  }
+
   async init() {
-    const index = new PersistentCachedMap(`${this.type}Index`, this.storage);
-    const store = new PersistentCachedMap(`${this.type}Store`, this.storage);
-    await index.init();
-    await store.init();
-    this.search = new HyperSearch({
-      schema: getSchema(this.type),
-      tokenizer: "forward",
-      index,
-      store,
-    });
+    await super.init();
+    const data = await this.indexer.readMulti(this.indexer.indices);
+    this.map = new Map(data);
+  }
+
+  async clear() {
+    await super.clear();
+    this.map.clear();
+  }
+
+  async updateItem(item, index = true) {
+    await super.updateItem(item, index);
+    this.map.set(item.id, item);
+    EV.publish("db:write", item);
   }
 
   exists(id) {
-    const item = this.getItem(id);
-    return item && !item.deleted;
+    return this.map.has(id) && !this.map.get(id).deleted;
+  }
+
+  getItem(id) {
+    return this.map.get(id);
   }
 
   getRaw() {
-    return Array.from(this.search.getAllDocs());
+    return Array.from(this.map.values());
   }
 
   getItems(sortFn = (u) => u.dateCreated) {
     let items = [];
-    this.search.options.store.forEach((value) => {
+    this.map.forEach((value) => {
       if (!value || value.deleted) return;
       items[items.length] = value;
     });

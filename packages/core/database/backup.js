@@ -34,23 +34,26 @@ export default class Backup {
       (key) => !invalidKeys.some((t) => t === key)
     );
 
-    let data = Object.fromEntries(await this._db.context.readMulti(keys));
+    const db = Object.fromEntries(await this._db.context.readMulti(keys));
+    db.h = md5.hex(JSON.stringify(db));
+    db.ht = "md5";
 
     if (encrypt) {
       const key = await this._db.user.key();
-      data = await this._db.context.encrypt(key, JSON.stringify(data));
+      return JSON.stringify({
+        type,
+        date: Date.now(),
+        data: await this._db.context.encrypt(key, JSON.stringify(db)),
+      });
     }
 
     // save backup time
     await this._db.context.write("lastBackupTime", Date.now());
 
     return JSON.stringify({
-      version: 2,
       type,
       date: Date.now(),
-      data,
-      hash: md5.hex(JSON.stringify(data)),
-      hash_type: "md5",
+      data: db,
     });
   }
 
@@ -72,26 +75,16 @@ export default class Backup {
       db = JSON.parse(await this._db.context.decrypt(key, db));
     }
 
-    if (!this._verify(backup))
+    if (!this._verify(db))
       throw new Error("Backup file has been tempered, aborting...");
-    // TODO add a proper restoration system.
-    // for (let key in db) {
-    //   let value = db[key];
-    //   if (value && value.dateEdited) {
-    //     value.dateEdited = Date.now();
-    //   }
 
-    //   const oldValue = await this._db.context.read(oldValue);
-
-    //   let finalValue = oldValue || value;
-    //   if (typeof value === "object") {
-    //     finalValue = Array.isArray(value)
-    //       ? [...value, ...oldValue]
-    //       : { ...value, ...oldValue };
-    //   }
-
-    //   await this._db.context.write(key, finalValue);
-    // }
+    for (let key in db) {
+      let value = db[key];
+      if (value && value.dateEdited) {
+        value.dateEdited = Date.now();
+      }
+      await this._db.context.write(key, value);
+    }
   }
 
   _validate(backup) {
@@ -103,11 +96,14 @@ export default class Backup {
     );
   }
 
-  _verify(backup) {
-    const { hash, hash_type, data: db } = backup;
+  _verify(db) {
+    const hash = db.h;
+    const hash_type = db.ht;
+    delete db.h;
+    delete db.ht;
     switch (hash_type) {
       case "md5": {
-        return hash === md5.hex(JSON.stringify(db));
+        return hash == md5.hex(JSON.stringify(db));
       }
       default: {
         return false;
