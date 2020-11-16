@@ -1,6 +1,5 @@
 import Storage from "./storage";
 import Indexer from "./indexer";
-import SparkMD5 from "spark-md5";
 
 export default class PersistentCachedMap {
   /**
@@ -20,7 +19,6 @@ export default class PersistentCachedMap {
   }
 
   async set(key, value) {
-    key = SparkMD5.hash(key);
     this.map.set(key, value);
     await this.indexer.write(key, value);
     await this.indexer.index(key);
@@ -33,12 +31,10 @@ export default class PersistentCachedMap {
   }
 
   get(key) {
-    key = SparkMD5.hash(key);
     return this.map.get(key);
   }
 
   has(key) {
-    key = SparkMD5.hash(key);
     return this.map.has(key);
   }
 
