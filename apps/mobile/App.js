@@ -1,40 +1,44 @@
-import {useNetInfo} from '@react-native-community/netinfo';
-import {EV} from 'notes-core/common';
-import React, {useEffect, useState} from 'react';
-import {AppState, Platform, StatusBar, useColorScheme} from 'react-native';
+import * as NetInfo from '@react-native-community/netinfo';
+import { EV } from 'notes-core/common';
+import React, { useEffect, useState } from 'react';
+import {
+  Appearance, AppState,
+  Platform,
+  StatusBar
+} from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 import Orientation from 'react-native-orientation';
+import { enabled } from 'react-native-privacy-snapshot';
 import ReceiveSharingIntent from 'react-native-receive-sharing-intent';
-import {SafeAreaProvider} from 'react-native-safe-area-context';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import SplashScreen from 'react-native-splash-screen';
-import {useTracked} from './src/provider';
-import {Actions} from './src/provider/Actions';
-import {defaultState} from './src/provider/DefaultState';
+import { useTracked } from './src/provider';
+import { Actions } from './src/provider/Actions';
+import { defaultState } from './src/provider/DefaultState';
 import Backup from './src/services/Backup';
-import {DDS} from './src/services/DeviceDetection';
+import { DDS } from './src/services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-  ToastEvent,
+  ToastEvent
 } from './src/services/EventManager';
-import {setLoginMessage} from './src/services/Message';
-import {AndroidModule, sortSettings} from './src/utils';
-import {COLOR_SCHEME} from './src/utils/Colors';
-import {getColorScheme} from './src/utils/ColorUtils';
-import {db} from './src/utils/DB';
+import { setLoginMessage } from './src/services/Message';
+import { AndroidModule, sortSettings } from './src/utils';
+import { COLOR_SCHEME } from './src/utils/Colors';
+import { getColorScheme } from './src/utils/ColorUtils';
+import { db } from './src/utils/DB';
 import {
   eDispatchAction,
   eOnLoadNote,
   eResetApp,
-  eStartSyncer,
+  eStartSyncer
 } from './src/utils/Events';
-import {MMKV} from './src/utils/mmkv';
-import {tabBarRef} from './src/utils/Refs';
-import {getDeviceSize, scale, updateSize} from './src/utils/SizeUtils';
-import {sleep} from './src/utils/TimeUtils';
-import {getNote, setIntent} from './src/views/Editor/Functions';
-import {enabled} from 'react-native-privacy-snapshot';
+import { MMKV } from './src/utils/mmkv';
+import { tabBarRef } from './src/utils/Refs';
+import { getDeviceSize, scale, updateSize } from './src/utils/SizeUtils';
+import { sleep } from './src/utils/TimeUtils';
+import { getNote, setIntent } from './src/views/Editor/Functions';
 let firstLoad = true;
 let note = null;
 let prevIntent = {
@@ -67,11 +71,24 @@ const onAppBlur = async () => {
   }
 };
 
+const onNetworkStateChanged = (netInfo) => {
+  let message = 'Internet connection restored';
+  let type = 'success';
+  if (!netInfo.isConnected || !netInfo.isInternetReachable) {
+    message = 'No internet connection';
+    type = 'error';
+  }
+  db.user?.get().then((user) => {
+    if (user) {
+      ToastEvent.show(message, type);
+    }
+  });
+};
+
 const App = () => {
   const [, dispatch] = useTracked(),
-    [init, setInit] = useState(false),
-    netInfo = useNetInfo(),
-    colorScheme = useColorScheme();
+    [init, setInit] = useState(false);
+
   let I =
     DDS.isTab && !DDS.isSmallTab
       ? require('./index.tablet')
@@ -94,10 +111,6 @@ const App = () => {
     }, 1000);
   };
 
-  useEffect(() => {
-    updateTheme().then((r) => r);
-  }, [colorScheme]);
-
   const updateTheme = async () => {
     let settings;
     settings = await MMKV.getStringAsync('settings');
@@ -107,20 +120,6 @@ const App = () => {
       dispatch({type: Actions.THEME, colors: newColors});
     }
   };
-
-  useEffect(() => {
-    let message = 'Internet connection restored';
-    let type = 'success';
-    if (!netInfo.isConnected || !netInfo.isInternetReachable) {
-      message = 'No internet connection';
-      type = 'error';
-    }
-    db.user?.get().then((user) => {
-      if (user) {
-        ToastEvent.show(message, type);
-      }
-    });
-  }, [netInfo]);
 
   const syncChanges = async () => {
       dispatch({type: Actions.ALL});
@@ -150,6 +149,10 @@ const App = () => {
       }
     };
 
+  const onSystemThemeChanged = async () => {
+    updateTheme().then((r) => r);
+  };
+
   useEffect(() => {
     eSubscribeEvent(eStartSyncer, startSyncer);
     eSubscribeEvent(eResetApp, resetApp);
@@ -159,6 +162,8 @@ const App = () => {
     });
     AppState.addEventListener('focus', onAppFocused);
     AppState.addEventListener('blur', onAppBlur);
+    Appearance.addChangeListener(onSystemThemeChanged);
+    let unsub = NetInfo.addEventListener(onNetworkStateChanged);
     return () => {
       EV.unsubscribe('db:refresh', syncChanges);
       eUnSubscribeEvent(eStartSyncer, startSyncer);
@@ -169,6 +174,8 @@ const App = () => {
       Orientation.removeOrientationListener(_onOrientationChange);
       AppState.removeEventListener('focus', onAppFocused);
       AppState.removeEventListener('blur', onAppBlur);
+      Appearance.removeChangeListener(onSystemThemeChanged);
+      unsub();
     };
   }, []);
 
@@ -234,7 +241,6 @@ const App = () => {
           prevIntent.text = text;
           prevIntent.weblink = weblink;
           setIntent();
-          console.log(text, weblink, 'HERE SHOWING', delta);
           eSendEvent(eOnLoadNote, {
             type: 'intent',
             data: delta,
@@ -302,7 +308,6 @@ const App = () => {
     updateSize();
     await updateTheme();
   };
-
   return (
     <>
       <SafeAreaProvider>
