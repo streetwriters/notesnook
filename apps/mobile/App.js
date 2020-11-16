@@ -19,7 +19,7 @@ import {
   ToastEvent,
 } from './src/services/EventManager';
 import {setLoginMessage} from './src/services/Message';
-import {sortSettings} from './src/utils';
+import {AndroidModule, sortSettings} from './src/utils';
 import {COLOR_SCHEME} from './src/utils/Colors';
 import {getColorScheme} from './src/utils/ColorUtils';
 import {db} from './src/utils/DB';
@@ -42,13 +42,17 @@ let prevIntent = {
   weblink: null,
 };
 
-const onAppFocused = () => {
-  console.log('called');
+const onAppFocused = async () => {
   StatusBar.setBarStyle(COLOR_SCHEME.night ? 'light-content' : 'dark-content');
   if (Platform.OS === 'android') {
     StatusBar.setTranslucent(true);
     StatusBar.setBackgroundColor(COLOR_SCHEME.bg);
   }
+};
+
+const onAppBlur = async () => {
+  //AndroidModule.setSecureMode(false);
+
 };
 
 const App = () => {
@@ -68,7 +72,6 @@ const App = () => {
     if (smallTab === DDS.isSmallTab) {
       return;
     }
-
     I =
       DDS.isTab && !DDS.isSmallTab
         ? require('./index.tablet')
@@ -143,6 +146,7 @@ const App = () => {
       dispatch(type);
     });
     AppState.addEventListener('focus', onAppFocused);
+    AppState.addEventListener('blur', onAppBlur);
     return () => {
       EV.unsubscribe('db:refresh', syncChanges);
       eUnSubscribeEvent(eStartSyncer, startSyncer);
@@ -152,6 +156,7 @@ const App = () => {
       });
       Orientation.removeOrientationListener(_onOrientationChange);
       AppState.removeEventListener('focus', onAppFocused);
+      AppState.removeEventListener('blur', onAppBlur);
     };
   }, []);
 
@@ -273,6 +278,11 @@ const App = () => {
     }
     if (settings.fontScale) {
       scale.fontScale = settings.fontScale;
+    }
+    if (settings.privacyScreen ) {
+      AndroidModule.setSecureMode(true);
+    } else {
+      AndroidModule.setSecureMode(false);
     }
     sortSettings.sort = settings.sort;
     sortSettings.sortOrder = settings.sortOrder;

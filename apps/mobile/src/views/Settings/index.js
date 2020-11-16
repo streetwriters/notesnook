@@ -22,6 +22,7 @@ import {eSendEvent, ToastEvent} from '../../services/EventManager';
 import NavigationService from '../../services/Navigation';
 import PremiumService from '../../services/PremiumService';
 import {
+  AndroidModule,
   dWidth,
   MenuItemsList,
   setSetting,
@@ -166,7 +167,13 @@ export const Settings = ({navigation}) => {
     });
   };
 
-  const CustomButton = ({title, tagline, customComponent, onPress}) => (
+  const CustomButton = ({
+    title,
+    tagline,
+    customComponent,
+    onPress,
+    maxWidth = '100%',
+  }) => (
     <PressableButton
       color="transparent"
       selectedColor={colors.nav}
@@ -188,6 +195,7 @@ export const Settings = ({navigation}) => {
           fontFamily: WEIGHT.regular,
           textAlignVertical: 'center',
           color: colors.pri,
+          maxWidth: maxWidth,
         }}>
         {title}
         {tagline ? '\n' : null}
@@ -646,29 +654,31 @@ export const Settings = ({navigation}) => {
                   <Icon color={colors.icon} name="menu-down" size={SIZE.md} />
                 </TouchableOpacity>
               }>
-              {MenuItemsList.slice(0, MenuItemsList.length - 1).map((item) => (
-                <MenuItem
-                  key={item.title}
-                  onPress={async () => {
-                    await setSetting(settings, 'homepage', item.name);
-                  }}
-                  style={{
-                    backgroundColor:
-                      settings.homepage === item.name
-                        ? colors.shade
-                        : 'transparent',
-                  }}
-                  textStyle={{
-                    fontFamily: WEIGHT.regular,
-                    fontSize: SIZE.sm,
-                    color:
-                      settings.homepage === item.name
-                        ? colors.accent
-                        : colors.pri,
-                  }}>
-                  {item.name}
-                </MenuItem>
-              ))}
+              {MenuItemsList.slice(0, MenuItemsList.length - 1).map(
+                (item, index) => (
+                  <MenuItem
+                    key={item.name}
+                    onPress={async () => {
+                      await setSetting(settings, 'homepage', item.name);
+                    }}
+                    style={{
+                      backgroundColor:
+                        settings.homepage === item.name
+                          ? colors.shade
+                          : 'transparent',
+                    }}
+                    textStyle={{
+                      fontFamily: WEIGHT.regular,
+                      fontSize: SIZE.sm,
+                      color:
+                        settings.homepage === item.name
+                          ? colors.accent
+                          : colors.pri,
+                    }}>
+                    {item.name}
+                  </MenuItem>
+                ),
+              )}
             </Menu>
           }
         />
@@ -781,6 +791,71 @@ export const Settings = ({navigation}) => {
             }
           />
         ) : null}
+
+        <SectionHeader title="Privacy & Security" />
+
+        <CustomButton
+          key="privacyMode"
+          title={
+            settings.privacyScreen
+              ? 'Privacy Mode Enabled'
+              : 'Privacy Mode Disabled'
+          }
+          tagline={
+            settings.privacyScreen
+              ? 'Hide app content when it goes in background.'
+              : 'App contents can be seen when app goes in background.'
+          }
+          onPress={() => {
+            //setSetting(settings, 'screenshotMode', true);
+            AndroidModule.setSecureMode(!settings.privacyScreen);
+            setSetting(settings, 'privacyScreen', !settings.privacyScreen);
+          }}
+          maxWidth="90%"
+          customComponent={
+            <Icon
+              size={SIZE.xl}
+              color={settings.privacyScreen ? colors.accent : colors.icon}
+              name={
+                settings.privacyScreen ? 'toggle-switch' : 'toggle-switch-off'
+              }
+            />
+          }
+        />
+
+        {/*   <CustomButton
+          key="screenshotMode"
+          title={
+            settings.screenshotMode
+              ? 'Screenshots Enabled'
+              : 'Screenshots Disabled'
+          }
+          tagline={
+            settings.screenshotMode
+              ? 'Screenshots can be taken in the app.'
+              : 'You cannot take screenshots in the app.'
+          }
+          onPress={() => {
+            if (!settings.privacyScreen) {
+              ToastEvent.show(
+                'You must enable Privacy Mode to disable taking screenshots',
+                'error',
+              );
+              return;
+            }
+            setSetting(settings, 'screenshotMode', !settings.screenshotMode);
+          }}
+          maxWidth="90%"
+          customComponent={
+            <Icon
+              size={SIZE.xl}
+              color={settings.screenshotMode ? colors.accent : colors.icon}
+              name={
+                settings.screenshotMode ? 'toggle-switch' : 'toggle-switch-off'
+              }
+            />
+          }
+        /> */}
 
         <SectionHeader title="Backup & Restore" />
 

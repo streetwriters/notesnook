@@ -1,4 +1,4 @@
-import {Dimensions, Platform} from 'react-native';
+import {Dimensions, NativeModules, Platform} from 'react-native';
 import {eSendEvent} from '../services/EventManager';
 import {updateEvent} from '../components/DialogManager/recievers';
 import {Actions} from '../provider/Actions';
@@ -17,6 +17,7 @@ export async function setSetting(settings, name, value) {
 }
 
 export const scrollRef = createRef();
+export const AndroidModule = NativeModules.NNativeModule;
 
 export const dirs = RNFetchBlob.fs.dirs;
 export const ANDROID_PATH = dirs.SDCardDir + '/Notesnook/';
