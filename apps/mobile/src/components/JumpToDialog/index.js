@@ -17,7 +17,7 @@ const JumpToDialog = () => {
   const [state] = useTracked();
   const {notes, colors, settings} = state;
   const [visible, setVisible] = useState(false);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(null);
 
   const onPress = (item, index) => {
     let offset = 35 * index;
