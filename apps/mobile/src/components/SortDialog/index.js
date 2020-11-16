@@ -1,7 +1,7 @@
 import React, {createRef} from 'react';
 import {Text, TouchableOpacity, View} from 'react-native';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
-import {dWidth, setSetting, SORT, sortSettings} from '../../utils';
+import {dWidth, SORT, sortSettings} from '../../utils';
 import ActionSheet from '../ActionSheet';
 import {DDS} from "../../services/DeviceDetection";
 import {eCloseSortDialog, eOpenSortDialog} from "../../utils/Events";
@@ -13,6 +13,7 @@ import {updateEvent} from "../DialogManager/Recievers";
 import {Actions} from "../../provider/Actions";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import Seperator from "../Seperator";
+import SettingsService from '../../services/SettingsService';
 
 
 
@@ -108,7 +109,7 @@ class SortDialog extends React.Component {
                             <TouchableOpacity
                                 onPress={async () => {
                                     let value = this.state.settings.sortOrder === "asc" ? "des" : "asc";
-                                    await setSetting(this.state.settings, 'sortOrder', value);
+                                    await SettingsService.set('sortOrder', value)
                                     sortSettings.sortOrder = value;
                                     await this.getSettings();
                                 }}
@@ -139,7 +140,7 @@ class SortDialog extends React.Component {
                                 key={item}
                                 color={this.state.settings.sort === item ? colors.shade : "transparent"}
                                 onPress={async () => {
-                                    await setSetting(this.state.settings, 'sort', item);
+                                    await SettingsService.set('sort', item);
                                     await this.getSettings();
                                     sortSettings.sort = item;
                                     updateEvent({type: Actions.NOTES})

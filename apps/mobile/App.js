@@ -1,44 +1,42 @@
 import * as NetInfo from '@react-native-community/netinfo';
-import { EV } from 'notes-core/common';
-import React, { useEffect, useState } from 'react';
-import {
-  Appearance, AppState,
-  Platform,
-  StatusBar
-} from 'react-native';
+import {EV} from 'notes-core/common';
+import React, {useEffect, useState} from 'react';
+import {Appearance, AppState, Platform, StatusBar} from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 import Orientation from 'react-native-orientation';
-import { enabled } from 'react-native-privacy-snapshot';
+import {enabled} from 'react-native-privacy-snapshot';
 import ReceiveSharingIntent from 'react-native-receive-sharing-intent';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
 import SplashScreen from 'react-native-splash-screen';
-import { useTracked } from './src/provider';
-import { Actions } from './src/provider/Actions';
-import { defaultState } from './src/provider/DefaultState';
+import {useTracked} from './src/provider';
+import {Actions} from './src/provider/Actions';
+import {defaultState} from './src/provider/DefaultState';
 import Backup from './src/services/Backup';
-import { DDS } from './src/services/DeviceDetection';
+import {DDS} from './src/services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-  ToastEvent
+  ToastEvent,
 } from './src/services/EventManager';
-import { setLoginMessage } from './src/services/Message';
-import { AndroidModule, sortSettings } from './src/utils';
-import { COLOR_SCHEME } from './src/utils/Colors';
-import { getColorScheme } from './src/utils/ColorUtils';
-import { db } from './src/utils/DB';
+import IntentService from './src/services/IntentService';
+import {setLoginMessage} from './src/services/Message';
+import SettingsService from './src/services/SettingsService';
+import {AndroidModule, sortSettings} from './src/utils';
+import {COLOR_SCHEME} from './src/utils/Colors';
+import {getColorScheme} from './src/utils/ColorUtils';
+import {db} from './src/utils/DB';
 import {
   eDispatchAction,
   eOnLoadNote,
   eResetApp,
-  eStartSyncer
+  eStartSyncer,
 } from './src/utils/Events';
-import { MMKV } from './src/utils/mmkv';
-import { tabBarRef } from './src/utils/Refs';
-import { getDeviceSize, scale, updateSize } from './src/utils/SizeUtils';
-import { sleep } from './src/utils/TimeUtils';
-import { getNote, setIntent } from './src/views/Editor/Functions';
+import {MMKV} from './src/utils/mmkv';
+import {tabBarRef} from './src/utils/Refs';
+import {getDeviceSize, scale, updateSize} from './src/utils/SizeUtils';
+import {sleep} from './src/utils/TimeUtils';
+import {getNote, setIntent} from './src/views/Editor/Functions';
 let firstLoad = true;
 let note = null;
 let prevIntent = {
@@ -52,21 +50,13 @@ const onAppFocused = async () => {
     StatusBar.setTranslucent(true);
     StatusBar.setBackgroundColor(COLOR_SCHEME.bg);
   }
-  let settings = await MMKV.getStringAsync('settings');
-  if (settings) {
-    settings = JSON.parse(settings);
-  }
-  if (settings.privacyScreen) {
+  if (SettingsService.get().privacyScreen) {
     enabled(false);
   }
 };
 
 const onAppBlur = async () => {
-  let settings = await MMKV.getStringAsync('settings');
-  if (settings) {
-    settings = JSON.parse(settings);
-  }
-  if (settings.privacyScreen) {
+  if (SettingsService.get().privacyScreen) {
     enabled(true);
   }
 };
@@ -110,17 +100,6 @@ const App = () => {
       resetApp();
     }, 1000);
   };
-
-  const updateTheme = async () => {
-    let settings;
-    settings = await MMKV.getStringAsync('settings');
-    if (settings) {
-      settings = JSON.parse(settings);
-      let newColors = await getColorScheme(settings.useSystemTheme);
-      dispatch({type: Actions.THEME, colors: newColors});
-    }
-  };
-
   const syncChanges = async () => {
       dispatch({type: Actions.ALL});
     },
@@ -150,7 +129,7 @@ const App = () => {
     };
 
   const onSystemThemeChanged = async () => {
-    updateTheme().then((r) => r);
+    await SettingsService.setTheme();
   };
 
   useEffect(() => {
@@ -212,51 +191,11 @@ const App = () => {
           console.log(error);
           ToastEvent.show('Error initializing database.');
         }
-        checkForIntent();
+        IntentService.check();
         SplashScreen.hide();
       }, 100);
     })();
   }, []);
-
-  const checkForIntent = () => {
-    ReceiveSharingIntent.getReceivedFiles(
-      (d) => {
-        let data = d[0];
-        if (data.text || data.weblink) {
-          let text = data.text;
-          let weblink = data.weblink;
-          let delta = null;
-
-          if (weblink && text) {
-            delta = [{insert: `${text + ' ' + weblink}`}];
-            text = data.text + ' ' + data.weblink;
-          } else if (text && !weblink) {
-            delta = [{insert: `${text}`}];
-            text = data.text;
-          } else if (weblink) {
-            delta = [{insert: `${weblink}`}];
-            text = weblink;
-          }
-
-          prevIntent.text = text;
-          prevIntent.weblink = weblink;
-          setIntent();
-          eSendEvent(eOnLoadNote, {
-            type: 'intent',
-            data: delta,
-            text: text,
-          });
-          if (DDS.isPhone || DDS.isSmallTab) {
-            tabBarRef.current?.goToPage(1);
-          }
-        }
-        ReceiveSharingIntent.clearReceivedFiles();
-      },
-      (error) => {
-        console.log(error, 'INTENT ERROR');
-      },
-    );
-  };
 
   async function backupData() {
     await sleep(1000);
@@ -281,33 +220,9 @@ const App = () => {
       }
       firstLoad = false;
     }
-    initAppSettings().catch((e) => console.log(e));
+    SettingsService.init().then((r) => r);
   }
 
-  const initAppSettings = async () => {
-    let settings;
-    scale.fontScale = 1;
-    settings = await MMKV.getStringAsync('settings');
-    if (!settings) {
-      settings = defaultState.settings;
-      await MMKV.setStringAsync('settings', JSON.stringify(settings));
-    } else {
-      settings = JSON.parse(settings);
-    }
-    if (settings.fontScale) {
-      scale.fontScale = settings.fontScale;
-    }
-    if (settings.privacyScreen) {
-      AndroidModule.setSecureMode(true);
-    } else {
-      AndroidModule.setSecureMode(false);
-    }
-    sortSettings.sort = settings.sort;
-    sortSettings.sortOrder = settings.sortOrder;
-    dispatch({type: Actions.SETTINGS, settings: {...settings}});
-    updateSize();
-    await updateTheme();
-  };
   return (
     <>
       <SafeAreaProvider>

@@ -21,12 +21,12 @@ import {DDS} from '../../services/DeviceDetection';
 import {eSendEvent, ToastEvent} from '../../services/EventManager';
 import NavigationService from '../../services/Navigation';
 import PremiumService from '../../services/PremiumService';
+import SettingsService from '../../services/SettingsService';
 import {
   AndroidModule,
   dWidth,
   MenuItemsList,
   setSetting,
-  SUBSCRIPTION_STATUS,
   SUBSCRIPTION_STATUS_STRINGS,
 } from '../../utils';
 import {
@@ -151,7 +151,7 @@ export const Settings = ({navigation}) => {
 
   const switchTheme = async () => {
     await PremiumService.verify(async () => {
-      await setSetting(settings, 'useSystemTheme', !settings.useSystemTheme);
+      await SettingsService.set('useSystemTheme', !settings.useSystemTheme);
 
       if (!settings.useSystemTheme) {
         await MMKV.setStringAsync(
@@ -659,7 +659,7 @@ export const Settings = ({navigation}) => {
                   <MenuItem
                     key={item.name}
                     onPress={async () => {
-                      await setSetting(settings, 'homepage', item.name);
+                      await SettingsService.set('homepage', item.name);
                     }}
                     style={{
                       backgroundColor:
@@ -739,7 +739,7 @@ export const Settings = ({navigation}) => {
               <TouchableOpacity
                 activeOpacity={1}
                 onPress={async () => {
-                  await setSetting(settings, 'fontScale', item.value);
+                  await SettingsService.set('fontScale', item.value);
                   eSendEvent(eResetApp);
                 }}
                 key={item.title}
@@ -770,8 +770,7 @@ export const Settings = ({navigation}) => {
           <CustomButton
             title="Force portrait mode"
             onPress={async () => {
-              await setSetting(
-                settings,
+              await SettingsService.set(
                 'forcePortraitOnTablet',
                 !settings.forcePortraitOnTablet,
               );
@@ -922,7 +921,7 @@ export const Settings = ({navigation}) => {
                 activeOpacity={1}
                 onPress={async () => {
                   await PremiumService.verify(async () => {
-                    await setSetting(settings, 'reminder', item.value);
+                    await SettingsService.set('reminder', item.value);
                   });
                 }}
                 key={item.value}
@@ -968,8 +967,7 @@ export const Settings = ({navigation}) => {
               );
               return;
             }
-            await setSetting(
-              settings,
+            await SettingsService.set(
               'encryptedBackup',
               !settings.encryptedBackup,
             );

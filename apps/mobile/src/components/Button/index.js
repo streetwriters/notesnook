@@ -40,7 +40,6 @@ export const Button = ({
 }) => {
   const [state] = useTracked();
   const {colors} = state;
-  console.log(colors);
 
   return (
     <PressableButton

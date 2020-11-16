@@ -44,38 +44,6 @@ export const Initialize = () => {
           }}>
           <NavigationStack component={MobileStack} />
         </View>
-
-        {/* 
-        <AnimatedScreenContainer
-          ref={editorRef}
-          onResponderTerminationRequest={true}
-          onStartShouldSetResponderCapture={false}
-          onStartShouldSetResponder={false}
-          onMoveShouldSetResponder={false}
-          onMoveShouldSetResponderCapture={false}
-          style={{
-            width: '100%',
-            height: '100%',
-            alignSelf: 'flex-end',
-            position: 'absolute',
-            backgroundColor: colors.bg,
-            elevation: 10,
-            opacity: 0,
-            transform: [
-              {
-                translateY: 5000,
-              },
-            ],
-          }}>
-          <Screen
-            active={1}
-            style={{
-              width: '100%',
-              height: '100%',
-            }}>
-                 <Editor noMenu={false} />
-            </Screen>
-        </AnimatedScreenContainer> */}
       </View>
       <Toast />
       <ContextMenu />
