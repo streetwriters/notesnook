@@ -34,7 +34,7 @@ import {tabBarRef} from './src/utils/Refs';
 import {getDeviceSize, scale, updateSize} from './src/utils/SizeUtils';
 import {sleep} from './src/utils/TimeUtils';
 import {getNote, setIntent} from './src/views/Editor/Functions';
-
+import {enabled} from 'react-native-privacy-snapshot';
 let firstLoad = true;
 let note = null;
 let prevIntent = {
@@ -48,11 +48,23 @@ const onAppFocused = async () => {
     StatusBar.setTranslucent(true);
     StatusBar.setBackgroundColor(COLOR_SCHEME.bg);
   }
+  let settings = await MMKV.getStringAsync('settings');
+  if (settings) {
+    settings = JSON.parse(settings);
+  }
+  if (settings.privacyScreen) {
+    enabled(false);
+  }
 };
 
 const onAppBlur = async () => {
-  //AndroidModule.setSecureMode(false);
-
+  let settings = await MMKV.getStringAsync('settings');
+  if (settings) {
+    settings = JSON.parse(settings);
+  }
+  if (settings.privacyScreen) {
+    enabled(true);
+  }
 };
 
 const App = () => {
@@ -279,7 +291,7 @@ const App = () => {
     if (settings.fontScale) {
       scale.fontScale = settings.fontScale;
     }
-    if (settings.privacyScreen ) {
+    if (settings.privacyScreen) {
       AndroidModule.setSecureMode(true);
     } else {
       AndroidModule.setSecureMode(false);
