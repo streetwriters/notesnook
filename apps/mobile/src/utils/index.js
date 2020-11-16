@@ -128,3 +128,20 @@ export const MenuItemsList = [
     close: true,
   },
 ];
+
+export const SUBSCRIPTION_STATUS = {
+  EXPIRED: 0,
+  TRIAL: 1,
+  ACTIVE: 2,
+  ACTIVE_RENEWING: 3,
+  CANCELLED: 4,
+};
+
+export const SUBSCRIPTION_STATUS_STRINGS = {
+  0: "Expired",
+  1: "Trial",
+  2: "Pro",
+  3: "Pro",
+  4: "Cancelled",
+};
+
