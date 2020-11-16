@@ -1,40 +1,25 @@
-import React, {useEffect} from 'react';
-import {
-  ActivityIndicator,
-  Platform,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import React from 'react';
+import {ActivityIndicator, Text, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {eSendEvent, ToastEvent} from '../../services/EventManager';
+import {showContext, SUBSCRIPTION_STATUS_STRINGS} from '../../utils';
+import {db} from '../../utils/DB';
 import {eOpenLoginDialog} from '../../utils/Events';
-import {showContext} from '../../utils';
+import {pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
 import {PressableButton} from '../PressableButton';
 import {TimeSince} from './TimeSince';
-import {hexToRGBA} from "../../utils/ColorUtils";
-import {pv, SIZE, WEIGHT} from "../../utils/SizeUtils";
-import {db} from "../../utils/DB";
 
 export const UserSection = ({noTextMode}) => {
   const [state, dispatch] = useTracked();
   const {colors, syncing, user} = state;
 
-  useEffect(() => {
-    console.log(user);
-    dispatch({type: Actions.TAGS});
-  }, []);
-
   return user && user.username ? (
     <View
       style={{
-        width: '93%',
-        borderRadius: 5,
-        backgroundColor: Platform.ios
-          ? hexToRGBA(colors.accent + '19')
-          : hexToRGBA(colors.shade),
+        width: '100%',
+        borderRadius: 0,
       }}>
       <View
         style={{
@@ -42,10 +27,8 @@ export const UserSection = ({noTextMode}) => {
           justifyContent: 'space-between',
           alignItems: 'center',
           backgroundColor: colors.accent,
-          borderRadius: 5,
-          paddingHorizontal: 5,
+          paddingHorizontal: 6,
           paddingVertical: 8,
-          elevation: 2,
         }}>
         <Text
           style={{
@@ -61,7 +44,7 @@ export const UserSection = ({noTextMode}) => {
             fontSize: SIZE.xs,
             color: 'white',
           }}>
-          {user.subscription.status === 1? "Trial" : "Pro"}
+          {SUBSCRIPTION_STATUS_STRINGS[user.subscription.status]}
         </Text>
       </View>
 
@@ -94,23 +77,18 @@ export const UserSection = ({noTextMode}) => {
           justifyContent: 'space-between',
           alignItems: 'center',
           paddingHorizontal: 5,
-          paddingVertical: pv + 5,
+          paddingVertical: 12,
         }}>
         <View
           style={{
             flexDirection: 'row',
             alignItems: 'center',
           }}>
-          {syncing ? (
-            <ActivityIndicator size={SIZE.xs} color={colors.accent} />
-          ) : (
-            <Icon color={colors.accent} name="sync" size={SIZE.sm} />
-          )}
           <Text
             style={{
               fontFamily: WEIGHT.regular,
               color: colors.pri,
-              fontSize: SIZE.xs,
+              fontSize: SIZE.sm,
               marginLeft: 5,
             }}>
             {syncing ? 'Syncing ' : 'Synced '}
@@ -124,18 +102,18 @@ export const UserSection = ({noTextMode}) => {
             {'\n'}
             <Text
               style={{
-                fontSize: 8,
+                fontSize: SIZE.xs,
                 color: colors.icon,
               }}>
-              Tap to sync
+              {syncing ? 'Fetching your notes ' : 'Tap to sync '}
             </Text>
           </Text>
         </View>
-        <Icon
-          size={SIZE.md}
-          color={colors.accent}
-          name="check-circle-outline"
-        />
+        {syncing ? (
+          <ActivityIndicator size={SIZE.lg} color={colors.accent} />
+        ) : (
+          <Icon color={colors.accent} name="sync" size={SIZE.lg} />
+        )}
       </TouchableOpacity>
     </View>
   ) : (
