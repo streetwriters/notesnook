@@ -1,10 +1,10 @@
 import { QuillDeltaToHtmlConverter } from "quill-delta-to-html";
 import { deltaToMarkdown } from "quill-delta-to-markdown";
 
+const splitter = /\W+/gm;
 class Delta {
   constructor(data) {
     this.data = data;
-    this._text = this.toTXT();
   }
 
   toHTML() {
@@ -28,15 +28,39 @@ class Delta {
   }
 
   toTitle() {
-    return this._text.split(/\W+/).slice(0, 3).join(" ").trim();
+    return getSubstringFromDelta(this.data, 30);
   }
 
   toHeadline() {
-    return this._text.split(" ").slice(0, 20).join(" ") + "...";
+    return getSubstringFromDelta(this.data, 60);
   }
 
   isEmpty() {
-    return this._text.trim().length <= 0;
+    return this.toTXT().trim().length <= 0;
+  }
+
+  /**
+   * @returns {Boolean}
+   */
+  search(query) {
+    const tokens = query.split(splitter);
+    return this.data.some((item) => {
+      if (item.insert && item.insert.indexOf) {
+        return tokens.some((token) => item.insert.indexOf(token) > -1);
+      }
+      return false;
+    });
   }
 }
 export default Delta;
+
+function getSubstringFromDelta(data, limit) {
+  let substr = "";
+  for (var i = 0; i < data.length; ++i) {
+    const item = data[i];
+    if (item.insert && typeof item.insert === "string")
+      substr += item.insert.trim() + " ";
+    if (substr.length >= limit) return substr.substring(0, limit).trim();
+  }
+  return substr.trim();
+}

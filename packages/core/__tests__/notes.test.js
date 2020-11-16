@@ -56,7 +56,7 @@ test("get all notes", () =>
 test("note without a title should get title from content", () =>
   noteTest().then(async ({ db, id }) => {
     let note = db.notes.note(id);
-    expect(note.title).toBe("Hello This is");
+    expect(note.title).toBe("Hello This is colorful");
   }));
 
 test("update note", () =>
@@ -93,17 +93,6 @@ test("updating empty note should delete it", () =>
     expect(id).toBeUndefined();
     let note = db.notes.note(id);
     expect(note).toBeUndefined();
-  }));
-
-test("note with text longer than 150 characters should have ... in the headline", () =>
-  noteTest({
-    content: {
-      type: "delta",
-      data: [{ insert: LONG_TEXT }, { insert: "\n" }],
-    },
-  }).then(({ db, id }) => {
-    let note = db.notes.note(id);
-    expect(note.headline.includes("...")).toBe(true);
   }));
 
 test("get favorite notes", () =>

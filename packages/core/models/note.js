@@ -69,7 +69,7 @@ export default class Note {
         templateData.content = content.toHTML();
         return HTMLBuilder.buildHTML(templateData);
       case "txt":
-        templateData.content = content._text;
+        templateData.content = content.toTXT();
         return TextBuilder.buildText(templateData);
       case "md":
         templateData.content = content.toMD();
