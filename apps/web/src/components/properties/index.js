@@ -193,7 +193,7 @@ function Properties() {
               data-test-id="properties-tag"
               placeholder="#tag"
               mt={4}
-              onKeyUp={(event) => {
+              onKeyUp={async (event) => {
                 if (
                   event.key === "Enter" ||
                   event.key === " " ||
@@ -204,8 +204,8 @@ function Properties() {
                     event.target.value = "";
                     return;
                   }
-                  setTag(value.trim().replace(",", ""));
                   event.target.value = "";
+                  await setTag(value.trim().replace(",", ""));
                 }
               }}
             />
@@ -230,8 +230,8 @@ function Properties() {
                     cursor: "pointer",
                   }}
                   fontSize={"subBody"}
-                  onClick={() => {
-                    setTag(tag);
+                  onClick={async () => {
+                    await setTag(tag);
                   }}
                 >
                   #{tag}

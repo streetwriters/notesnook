@@ -4,7 +4,10 @@ import { Flex, Box } from "rebass";
 import ThemeProvider from "./components/theme-provider";
 import { useStore } from "./stores/app-store";
 import { useStore as useEditorStore } from "./stores/editor-store";
-import { useStore as useUserStore } from "./stores/user-store";
+import {
+  store as userstore,
+  useStore as useUserStore,
+} from "./stores/user-store";
 import { useStore as useNotesStore } from "./stores/note-store";
 import Animated from "./components/animated";
 import NavigationMenu from "./components/navigationmenu";
@@ -19,6 +22,7 @@ import {
 } from "./common/reminders";
 import { EV } from "notes-core/common";
 import useTablet from "./utils/use-tablet";
+import { showBuyDialog } from "./components/dialogs/buy-dialog";
 
 function App() {
   const [show, setShow] = useState(true);
@@ -50,6 +54,18 @@ function App() {
     },
     [refreshColors, initUser, initNotes, addReminder]
   );
+
+  useEffect(() => {
+    EV.subscribe("user:checkStatus", async (type) => {
+      const subStatus = userstore.get().user?.subscription?.status;
+      if (subStatus && subStatus >= 1 && subStatus <= 3) {
+        return { type, result: true };
+      } else {
+        await showBuyDialog();
+        return { type, result: false };
+      }
+    });
+  }, []);
 
   useEffect(() => {
     if (isFocusMode) {

@@ -53,8 +53,8 @@ export function showExportDialog(noteId) {
       exportNote={async (format) => {
         const note = db.notes.note(noteId);
         const content = await note.export(format);
+        if (!content) return perform(false);
         download(note.title, content, format);
-        showToast("success", `Note exported as ${format} successfully!`);
         perform(true);
       }}
     />

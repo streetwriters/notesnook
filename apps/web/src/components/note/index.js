@@ -44,7 +44,8 @@ function menuItems(note, context) {
     {
       title: "Export",
       onClick: async () => {
-        await showExportDialog(note);
+        if (await showExportDialog(note))
+          showToast("success", `Note exported successfully!`);
       },
       onlyPro: true,
     },
@@ -54,11 +55,11 @@ function menuItems(note, context) {
       onClick: async () => {
         const { unlock, lock } = store.get();
         if (!note.locked) {
-          await lock(note.id);
-          showToast("success", "Note locked successfully!");
+          if (await lock(note.id))
+            showToast("success", "Note locked successfully!");
         } else {
-          await unlock(note.id);
-          showToast("success", "Note unlocked successfully!");
+          if (await unlock(note.id))
+            showToast("success", "Note unlocked successfully!");
         }
       },
       onlyPro: true,

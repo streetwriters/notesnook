@@ -176,7 +176,7 @@ class EditorStore extends BaseStore {
   };
 
   setTag = (tag) => {
-    this._setTagOrColor("tag", tag);
+    return this._setTag(tag);
   };
 
   toggleProperties = (toggleState) => {
@@ -204,23 +204,22 @@ class EditorStore extends BaseStore {
       : db.notes.add.bind(db.notes);
   };
 
-  _setTagOrColor(key, value) {
-    const array = key === "tag" ? "tags" : "colors";
-    const { [array]: arr, id } = this.get().session;
+  async _setTag(value) {
+    const { tags, id } = this.get().session;
 
     let note = db.notes.note(id);
     if (!note) return;
 
-    let index = arr.indexOf(value);
+    let index = tags.indexOf(value);
     if (index > -1) {
-      note[`un${key}`](value).then(() => {
-        this.setSession((state) => state.session[array].splice(index, 1));
-      });
+      await note.untag(value);
     } else {
-      note[key](value).then(() => {
-        this.setSession((state) => state.session[array].push(value));
-      });
+      await note.tag(value);
     }
+
+    this.setSession(
+      (state) => (state.session.tags = db.notes.note(id).data.tags)
+    );
   }
 }
 
