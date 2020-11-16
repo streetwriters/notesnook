@@ -14,6 +14,8 @@ export default class IndexedCollection {
   constructor(storage, type) {
     this.type = type;
     this.storage = storage;
+    this.indexKey = `${this.type}Index`;
+    this.storeKey = `${this.type}Store`;
   }
 
   clear() {
@@ -21,16 +23,18 @@ export default class IndexedCollection {
   }
 
   async init() {
-    const index = new PersistentCachedMap(`${this.type}Index`, this.storage);
     const store = new PersistentMap(`${this.type}Store`, this.storage);
-    await index.init();
     await store.init();
     this.search = new HyperSearch({
       schema: getSchema(this.type),
       tokenizer: "forward",
-      index,
       store,
+      onIndexUpdated: async () => {
+        await this.storage.write(this.indexKey, this.search.indexer.export());
+      },
     });
+    const index = await this.storage.read(this.indexKey);
+    this.search.indexer.import(index);
   }
 
   async addItem(item) {

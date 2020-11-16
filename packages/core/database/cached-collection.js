@@ -7,16 +7,18 @@ import IndexedCollection from "./indexed-collection";
 
 export default class CachedCollection extends IndexedCollection {
   async init() {
-    const index = new PersistentCachedMap(`${this.type}Index`, this.storage);
-    const store = new PersistentCachedMap(`${this.type}Store`, this.storage);
-    await index.init();
+    const store = new PersistentCachedMap(this.storeKey, this.storage);
     await store.init();
     this.search = new HyperSearch({
       schema: getSchema(this.type),
       tokenizer: "forward",
-      index,
       store,
+      onIndexUpdated: async () => {
+        await this.storage.write(this.indexKey, this.search.indexer.export());
+      },
     });
+    const index = await this.storage.read(this.indexKey);
+    this.search.indexer.import(index);
   }
 
   exists(id) {
