@@ -17,18 +17,16 @@ export default class Lookup {
   notes(notes, query) {
     return sm.union(
       this._db.content._collection.search.search(query, {
-        shouldMap: true,
         map: (elem) => {
           return notes.find((note) => note.contentId === elem);
         },
       }),
-      this._db.notes._collection.search.search(query, { shouldMap: true })
+      this._db.notes._collection.search.search(query)
     );
   }
 
   notebooks(array, query) {
     return this._db.notebooks._collection.search.search(query, {
-      shouldMap: true,
       map: (elem) => {
         return array.find((nb) => nb.id === elem);
       },
