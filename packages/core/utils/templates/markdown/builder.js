@@ -2,7 +2,7 @@ import { buildPage } from "../helper";
 import MDTemplate from "./template";
 
 function createMetaTag(name, content) {
-  if (content.length <= 0) return "";
+  if (!content || content.length <= 0) return "";
   return `[nn-${name}]:- "${content}"`;
 }
 
