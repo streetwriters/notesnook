@@ -1,38 +1,42 @@
-import React, { createRef, useCallback, useEffect } from 'react';
+import React, {createRef, useCallback, useEffect} from 'react';
 import {
   Appearance,
   Linking,
-
   ScrollView,
-
   Text,
   TouchableOpacity,
-  View
+  View,
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import Menu, { MenuItem } from 'react-native-reanimated-material-menu';
+import Menu, {MenuItem} from 'react-native-reanimated-material-menu';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { Button } from '../../components/Button';
-import { PressableButton } from '../../components/PressableButton';
+import {Button} from '../../components/Button';
+import {PressableButton} from '../../components/PressableButton';
 import Seperator from '../../components/Seperator';
-import { ListHeaderComponent } from '../../components/SimpleList/ListHeaderComponent';
-import { useTracked } from '../../provider';
-import { Actions } from '../../provider/Actions';
+import {ListHeaderComponent} from '../../components/SimpleList/ListHeaderComponent';
+import {useTracked} from '../../provider';
+import {Actions} from '../../provider/Actions';
 import Backup from '../../services/Backup';
-import { DDS } from '../../services/DeviceDetection';
-import { eSendEvent, ToastEvent } from '../../services/EventManager';
+import {DDS} from '../../services/DeviceDetection';
+import {eSendEvent, ToastEvent} from '../../services/EventManager';
 import NavigationService from '../../services/Navigation';
 import PremiumService from '../../services/PremiumService';
-import { dWidth, MenuItemsList, setSetting } from '../../utils';
+import {
+  dWidth,
+  MenuItemsList,
+  setSetting,
+  SUBSCRIPTION_STATUS,
+  SUBSCRIPTION_STATUS_STRINGS,
+} from '../../utils';
 import {
   ACCENT,
   COLOR_SCHEME,
   COLOR_SCHEME_DARK,
   COLOR_SCHEME_LIGHT,
-  setColorScheme
+  setColorScheme,
 } from '../../utils/Colors';
-import { hexToRGBA, RGB_Linear_Shade } from '../../utils/ColorUtils';
-import { db } from '../../utils/DB';
+import {hexToRGBA, RGB_Linear_Shade} from '../../utils/ColorUtils';
+import {db} from '../../utils/DB';
 import {
   eCloseProgressDialog,
   eOpenLoginDialog,
@@ -42,11 +46,11 @@ import {
   eOpenRestoreDialog,
   eResetApp,
   eScrollEvent,
-  eUpdateSearchState
+  eUpdateSearchState,
 } from '../../utils/Events';
-import { MMKV } from '../../utils/mmkv';
-import { opacity, pv, SIZE, WEIGHT } from '../../utils/SizeUtils';
-import { sleep } from '../../utils/TimeUtils';
+import {MMKV} from '../../utils/mmkv';
+import {opacity, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
+import {sleep} from '../../utils/TimeUtils';
 
 let menuRef = createRef();
 export const Settings = ({navigation}) => {
@@ -89,6 +93,7 @@ export const Settings = ({navigation}) => {
   }, []);
 
   useEffect(() => {
+    console.log(user);
     navigation.addListener('focus', onFocus);
     return () => {
       eSendEvent(eScrollEvent, {name: 'Settings', type: 'back'});
@@ -102,7 +107,7 @@ export const Settings = ({navigation}) => {
     let diff = d2.getTime() - d1.getTime();
     diff = (diff / (1000 * 3600 * 24)).toFixed(0);
 
-    return diff;
+    return diff < 0 ? 0 : diff;
   };
 
   const SectionHeader = ({title}) => (
@@ -172,13 +177,14 @@ export const Settings = ({navigation}) => {
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingHorizontal: 12,
+        paddingVertical: 6,
         width: '100%',
         borderRadius: 0,
         flexDirection: 'row',
       }}>
       <Text
         style={{
-          fontSize: SIZE.md,
+          fontSize: SIZE.sm,
           fontFamily: WEIGHT.regular,
           textAlignVertical: 'center',
           color: colors.pri,
@@ -225,11 +231,8 @@ export const Settings = ({navigation}) => {
                 style={{
                   alignSelf: 'center',
                   width: '100%',
-                  marginBottom: pv,
-                  marginTop: pv,
                   borderRadius: 5,
-                  padding: 10,
-                  backgroundColor: colors.shade,
+                  paddingVertical: 12,
                 }}>
                 <View
                   style={{
@@ -243,11 +246,23 @@ export const Settings = ({navigation}) => {
                       justifyContent: 'center',
                       alignItems: 'center',
                     }}>
-                    <Icon
-                      size={SIZE.md}
-                      color={colors.accent}
-                      name="account-outline"
-                    />
+                    <View
+                      style={{
+                        borderWidth: 1,
+                        borderRadius: 100,
+                        borderColor: colors.accent,
+                        width: 20,
+                        height: 20,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}>
+                      <Icon
+                        size={SIZE.md}
+                        color={colors.accent}
+                        name="account-outline"
+                      />
+                    </View>
+
                     <Text
                       style={{
                         color: colors.heading,
@@ -268,10 +283,10 @@ export const Settings = ({navigation}) => {
                     <Text
                       style={{
                         color: colors.accent,
-                        fontFamily: WEIGHT.regular,
-                        fontSize: SIZE.xs,
+                        fontFamily: WEIGHT.bold,
+                        fontSize: SIZE.sm,
                       }}>
-                      {user.subscription.status === 1 ? 'Trial' : 'Pro'}
+                      {SUBSCRIPTION_STATUS_STRINGS[user.subscription.status]}
                     </Text>
                   </View>
                 </View>
@@ -285,7 +300,7 @@ export const Settings = ({navigation}) => {
                             ? colors.pri
                             : colors.errorText,
                         fontFamily: WEIGHT.regular,
-                        fontSize: SIZE.xxl,
+                        fontSize: SIZE.lg,
                       }}>
                       {getTimeLeft(parseInt(user.subscription.expiry)) +
                         ' Days Remaining'}{' '}
@@ -310,8 +325,10 @@ export const Settings = ({navigation}) => {
                       eSendEvent(eOpenPremiumDialog);
                     }}
                     width="100%"
+                    fontSize={SIZE.md}
                     title="Get Notesnook Pro"
-                    height={40}
+                    height={50}
+                    type="accent"
                   />
                 </View>
               </View>
@@ -323,7 +340,7 @@ export const Settings = ({navigation}) => {
                   eSendEvent(eOpenRecoveryKeyDialog);
                 },
                 desc:
-                  'Save your recovery key. If you lose your password, you can recover your data using your recovery key.',
+                  'If you lose your password, you can recover your data using your recovery key.',
               },
               {
                 name: 'Logout',
@@ -359,7 +376,7 @@ export const Settings = ({navigation}) => {
                 }}
                 activeOpacity={opacity / 2}
                 customStyle={{
-                  paddingVertical: pv + 5,
+                  paddingVertical: 12,
                   width: '100%',
                   flexDirection: 'row',
                   alignItems: 'center',
@@ -394,6 +411,8 @@ export const Settings = ({navigation}) => {
                   <Text
                     style={{
                       color: colors.accent,
+                      fontFamily: WEIGHT.regular,
+                      fontSize: SIZE.sm,
                     }}>
                     Login to sync notes.
                   </Text>
@@ -422,11 +441,10 @@ export const Settings = ({navigation}) => {
 
         <Text
           style={{
-            fontSize: SIZE.md,
+            fontSize: SIZE.sm,
             fontFamily: WEIGHT.regular,
             textAlignVertical: 'center',
             color: colors.pri,
-            marginTop: pv + 5,
             paddingHorizontal: 12,
           }}>
           Accent Color{'\n'}
@@ -630,6 +648,7 @@ export const Settings = ({navigation}) => {
               }>
               {MenuItemsList.slice(0, MenuItemsList.length - 1).map((item) => (
                 <MenuItem
+                  key={item.title}
                   onPress={async () => {
                     await setSetting(settings, 'homepage', item.name);
                   }}
@@ -666,7 +685,7 @@ export const Settings = ({navigation}) => {
           }}>
           <Text
             style={{
-              fontSize: SIZE.md,
+              fontSize: SIZE.sm,
               fontFamily: WEIGHT.regular,
               textAlignVertical: 'center',
               color: colors.pri,
@@ -786,7 +805,7 @@ export const Settings = ({navigation}) => {
           }}>
           <Text
             style={{
-              fontSize: SIZE.md,
+              fontSize: SIZE.sm,
               fontFamily: WEIGHT.regular,
               textAlignVertical: 'center',
               color: colors.pri,
