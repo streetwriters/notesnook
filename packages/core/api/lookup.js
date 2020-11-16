@@ -14,22 +14,27 @@ export default class Lookup {
   }
 
   notes(notes, query) {
-    let contentIds = this._db.content._collection.search.searchDocs(query);
-    let noteIds = this._db.notes._collection.search.searchDocs(query);
-    return notes.filter((note) => {
-      return (
-        contentIds.findIndex((content) => note.id === content.noteId) > -1 ||
-        noteIds.findIndex((n) => n.id === note.id) > -1
-      );
+    return new Promise((resolve) => {
+      const results = [];
+      let index = 0,
+        max = notes.length;
+      notes.forEach(async (note) => {
+        const text =
+          note.locked || !note.content
+            ? ""
+            : await this._db.text.get(note.content.text);
+        const title = note.title;
+        if (fzs(query, text + title)) results.push(note);
+        if (++index >= max) return resolve(results);
+      });
     });
   }
 
   notebooks(array, query) {
-    const notebooksIds = this._db.notebooks._collection.search.searchDocs(
-      query
-    );
     return tfun.filter(
-      (nb) => notebooksIds.findIndex((notebook) => notebook.id === nb.id) > -1
+      (nb) =>
+        fzs(query, nb.title + " " + nb.description) ||
+        nb.topics.some((topic) => fuzzysearch(query, topic.title))
     )(array);
   }
 

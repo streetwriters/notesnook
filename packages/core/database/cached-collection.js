@@ -19,8 +19,8 @@ export default class CachedCollection extends IndexedCollection {
     this.map.clear();
   }
 
-  async updateItem(item, index = true) {
-    await super.updateItem(item, index);
+  async updateItem(item) {
+    await super.updateItem(item);
     this.map.set(item.id, item);
     EV.publish("db:write", item);
   }
