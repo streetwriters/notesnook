@@ -37,6 +37,13 @@ import {tabBarRef} from './src/utils/Refs';
 import {getDeviceSize, scale, updateSize} from './src/utils/SizeUtils';
 import {sleep} from './src/utils/TimeUtils';
 import {getNote, setIntent} from './src/views/Editor/Functions';
+
+import * as Sentry from '@sentry/react-native';
+
+Sentry.init({ 
+  dsn: 'https://317a5c31caf64d1e9b27abf15eb1a554@o477952.ingest.sentry.io/5519681', 
+});
+
 let firstLoad = true;
 let note = null;
 let prevIntent = {
@@ -178,8 +185,11 @@ const App = () => {
     (async () => {
       try {
         await db.init();
+
+        console.log("db is initialized");
       } catch (e) {
         error = e;
+        console.log(e,"ERROR DB")
       } finally {
         dispatch({type: Actions.ALL});
         getUser().catch((e) => console.log);

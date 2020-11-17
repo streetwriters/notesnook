@@ -16,12 +16,12 @@ PODS:
     - Flipper-Folly (~> 2.2)
     - Flipper-RSocket (~> 1.1)
   - Flipper-DoubleConversion (1.1.7)
-  - Flipper-Folly (2.2.0):
+  - Flipper-Folly (2.3.0):
     - boost-for-react-native
     - CocoaLibEvent (~> 1.0)
     - Flipper-DoubleConversion
     - Flipper-Glog
-    - OpenSSL-Universal (= 1.0.2.19)
+    - OpenSSL-Universal (= 1.0.2.20)
   - Flipper-Glog (0.3.6)
   - Flipper-PeerTalk (0.0.4)
   - Flipper-RSocket (1.1.0):
@@ -68,12 +68,12 @@ PODS:
     - DoubleConversion
     - glog
   - glog (0.3.5)
-  - MMKV (1.2.2):
-    - MMKVCore (~> 1.2.2)
-  - MMKVCore (1.2.2)
-  - OpenSSL-Universal (1.0.2.19):
-    - OpenSSL-Universal/Static (= 1.0.2.19)
-  - OpenSSL-Universal/Static (1.0.2.19)
+  - MMKV (1.2.5):
+    - MMKVCore (~> 1.2.5)
+  - MMKVCore (1.2.5)
+  - OpenSSL-Universal (1.0.2.20):
+    - OpenSSL-Universal/Static (= 1.0.2.20)
+  - OpenSSL-Universal/Static (1.0.2.20)
   - Permission-PhotoLibrary (2.2.0):
     - RNPermissions
   - RCTRequired (0.63.3)
@@ -249,7 +249,7 @@ PODS:
   - react-native-html-to-pdf (0.8.0):
     - React
   - react-native-mmkv-storage (0.3.7):
-    - MMKV (= 1.2.2)
+    - MMKV (= 1.2.5)
     - React
   - react-native-netinfo (5.9.6):
     - React
@@ -263,6 +263,8 @@ PODS:
     - React
   - react-native-splash-screen (3.2.0):
     - React
+  - react-native-viewpager (4.2.0):
+    - React-Core
   - react-native-webview (10.7.0):
     - React
   - React-RCTActionSheet (0.63.3):
@@ -339,14 +341,21 @@ PODS:
     - React
   - RNIap (4.6.1):
     - React-Core
+  - RNKeychain (6.2.0):
+    - React-Core
   - RNPermissions (2.2.0):
     - React
+  - RNPrivacySnapshot (1.0.0):
+    - React-Core
   - RNReanimated (1.13.0):
     - React
   - RNScreens (2.10.1):
     - React
   - RNSecureRandom (1.0.0):
     - React
+  - RNSentry (2.0.0):
+    - React-Core
+    - Sentry (~> 6.0.3)
   - RNShare (3.7.0):
     - React
   - RNStoreReview (0.1.5):
@@ -355,6 +364,9 @@ PODS:
     - React
   - RNVectorIcons (7.0.0):
     - React
+  - Sentry (6.0.9):
+    - Sentry/Core (= 6.0.9)
+  - Sentry/Core (6.0.9)
   - toolbar-android (0.1.0-rc.2):
     - React
   - Yoga (1.14.0)
@@ -410,6 +422,7 @@ DEPENDENCIES:
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-sodium (from `../node_modules/react-native-sodium`)
   - react-native-splash-screen (from `../node_modules/react-native-splash-screen`)
+  - "react-native-viewpager (from `../node_modules/@react-native-community/viewpager`)"
   - react-native-webview (from `../node_modules/react-native-webview`)
   - React-RCTActionSheet (from `../node_modules/react-native/Libraries/ActionSheetIOS`)
   - React-RCTAnimation (from `../node_modules/react-native/Libraries/NativeAnimation`)
@@ -428,10 +441,13 @@ DEPENDENCIES:
   - RNFileViewer (from `../node_modules/react-native-file-viewer`)
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - RNIap (from `../node_modules/react-native-iap`)
+  - RNKeychain (from `../node_modules/react-native-keychain`)
   - RNPermissions (from `../node_modules/react-native-permissions`)
+  - RNPrivacySnapshot (from `../node_modules/react-native-privacy-snapshot`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNSecureRandom (from `../node_modules/react-native-securerandom`)
+  - "RNSentry (from `../node_modules/@sentry/react-native`)"
   - RNShare (from `../node_modules/react-native-share`)
   - RNStoreReview (from `../node_modules/react-native-store-review/ios`)
   - RNSVG (from `../node_modules/react-native-svg`)
@@ -455,6 +471,7 @@ SPEC REPOS:
     - MMKV
     - MMKVCore
     - OpenSSL-Universal
+    - Sentry
     - YogaKit
 
 EXTERNAL SOURCES:
@@ -510,6 +527,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-sodium"
   react-native-splash-screen:
     :path: "../node_modules/react-native-splash-screen"
+  react-native-viewpager:
+    :path: "../node_modules/@react-native-community/viewpager"
   react-native-webview:
     :path: "../node_modules/react-native-webview"
   React-RCTActionSheet:
@@ -546,14 +565,20 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-gesture-handler"
   RNIap:
     :path: "../node_modules/react-native-iap"
+  RNKeychain:
+    :path: "../node_modules/react-native-keychain"
   RNPermissions:
     :path: "../node_modules/react-native-permissions"
+  RNPrivacySnapshot:
+    :path: "../node_modules/react-native-privacy-snapshot"
   RNReanimated:
     :path: "../node_modules/react-native-reanimated"
   RNScreens:
     :path: "../node_modules/react-native-screens"
   RNSecureRandom:
     :path: "../node_modules/react-native-securerandom"
+  RNSentry:
+    :path: "../node_modules/@sentry/react-native"
   RNShare:
     :path: "../node_modules/react-native-share"
   RNStoreReview:
@@ -577,16 +602,16 @@ SPEC CHECKSUMS:
   FBReactNativeSpec: 7da9338acfb98d4ef9e5536805a0704572d33c2f
   Flipper: be611d4b742d8c87fbae2ca5f44603a02539e365
   Flipper-DoubleConversion: 38631e41ef4f9b12861c67d17cb5518d06badc41
-  Flipper-Folly: c12092ea368353b58e992843a990a3225d4533c3
+  Flipper-Folly: e4493b013c02d9347d5e0cb4d128680239f6c78a
   Flipper-Glog: 1dfd6abf1e922806c52ceb8701a3599a79a200a6
   Flipper-PeerTalk: 116d8f857dc6ef55c7a5a75ea3ceaafe878aadc9
   Flipper-RSocket: 64e7431a55835eb953b0bf984ef3b90ae9fdddd7
   FlipperKit: ab353d41aea8aae2ea6daaf813e67496642f3d7d
   Folly: b73c3869541e86821df3c387eb0af5f65addfab4
   glog: 40a13f7840415b9a77023fbcae0f1e6f43192af3
-  MMKV: b14909757d8b70e2aa89ff1c6d56a7b239e10a29
-  MMKVCore: 6225324fe5006026bc86ef8641d567e00c6582f3
-  OpenSSL-Universal: 8b48cc0d10c1b2923617dfe5c178aa9ed2689355
+  MMKV: 6c208ddcb4c197e564f72f3f73ef3b0c792e091c
+  MMKVCore: d9aa23fc6fb698c671c403ec593cdfe7d184e310
+  OpenSSL-Universal: ff34003318d5e1163e9529b08470708e389ffcdd
   Permission-PhotoLibrary: e3ff899f87a3eda29427c142ca93837e8802d228
   RCTRequired: 48884c74035a0b5b76dbb7a998bd93bcfc5f2047
   RCTTypeSafety: edf4b618033c2f1c5b7bc3d90d8e085ed95ba2ab
@@ -601,13 +626,14 @@ SPEC CHECKSUMS:
   react-native-eventsource: 63f9edb311e11bb3a95873c2b77acec8f580c234
   react-native-get-random-values: 2b7500cdb68066aba87cdccd97067c29e16ffe95
   react-native-html-to-pdf: 1d1199917f56a98377d431bce84c2f275e48eb71
-  react-native-mmkv-storage: 023a9c501f7430319138a94889fc53691b93d73d
+  react-native-mmkv-storage: 2404a7da3ff9fa1aef07019a2d70f1c22feac554
   react-native-netinfo: 38a1e0b3e89b48e4b5833ed475d8df5f049f6f90
   react-native-orientation: f1caf84d65f1a4fd4511a18f2b924e634ad7a628
   react-native-receive-sharing-intent: feba0a332a07977549a85aa58b496eb44368366a
   react-native-safe-area-context: eb91fe1fb3f7b87d9c30a7f0808407d8569d539d
   react-native-sodium: c7587732667e1cdb7d0d77c2aa2e98420aad2036
   react-native-splash-screen: 200d11d188e2e78cea3ad319964f6142b6384865
+  react-native-viewpager: c1a686e7b5e164a52387f1522358623c4f52070f
   react-native-webview: 6edf4d6f71b9161fc3e96083726a538ee395304d
   React-RCTActionSheet: 53ea72699698b0b47a6421cb1c8b4ab215a774aa
   React-RCTAnimation: 1befece0b5183c22ae01b966f5583f42e69a83c2
@@ -626,14 +652,18 @@ SPEC CHECKSUMS:
   RNFileViewer: db62d60dd19007c54b2c959b5e675a46d59f8a43
   RNGestureHandler: b6b359bb800ae399a9c8b27032bdbf7c18f08a08
   RNIap: f7595967b8467dacb95f94a9eb4bbdb59f3afc67
+  RNKeychain: 612de9918c1170d51094404616fd49b2818176f9
   RNPermissions: 477d88d0be7ecb0a7b344e4d5fbb0352de104626
+  RNPrivacySnapshot: 8eaf571478a353f2e5184f5c803164f22428b023
   RNReanimated: 89f5e0a04d1dd52fbf27e7e7030d8f80a646a3fc
   RNScreens: b748efec66e095134c7166ca333b628cd7e6f3e2
   RNSecureRandom: 0dcee021fdb3d50cd5cee5db0ebf583c42f5af0e
+  RNSentry: cb4ef23400fb6690f6ac8f6acef0c023a8a4f37d
   RNShare: a1d5064df7a0ebe778d001869b3f0a124bf0a491
   RNStoreReview: 62d6afd7c37db711a594bbffca6b0ea3a812b7a8
   RNSVG: ce9d996113475209013317e48b05c21ee988d42e
   RNVectorIcons: da6fe858f5a65d7bbc3379540a889b0b12aa5976
+  Sentry: 388c9dc093b2fd3a264466a5c5b21e25959610a9
   toolbar-android: 85f3ef4d691469f2d304e7dee4bca013aa1ba1ff
   Yoga: 7d13633d129fd179e01b8953d38d47be90db185a
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
