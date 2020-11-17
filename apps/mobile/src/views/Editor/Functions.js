@@ -66,6 +66,10 @@ export function clearTimer() {
     clearTimeout(timer);
     timer = null;
   }
+  if (currentEditingTimer) {
+    clearTimeout(currentEditingTimer);
+    currentEditingTimer = null;
+  }
 }
 
 export const INJECTED_JAVASCRIPT = (premium) =>
@@ -138,6 +142,8 @@ function clearNote() {
   };
 }
 
+let currentEditingTimer = null;
+
 export async function loadNote(item) {
   editing.currentlyEditing = true;
   post('blur');
@@ -163,9 +169,13 @@ export async function loadNote(item) {
       await loadNoteInEditor();
     }
   } else {
+    clearTimer();
     await setNote(item);
     sendNoteEditedEvent(item.id);
     await loadNoteInEditor();
+    currentEditingTimer = setTimeout(() => {
+      updateEvent({type: Actions.CURRENT_EDITING_NOTE, id: item.id});
+    }, 500);
   }
 }
 
@@ -209,17 +219,17 @@ function onNoteChange() {
 
 export async function clearEditor() {
   clearTimer();
-  await sleep(500);
+  post('reset');
   if (noteEdited && id) {
     await saveNote(false);
   }
+  updateEvent({type: Actions.CURRENT_EDITING_NOTE, id: null});
   sendNoteEditedEvent(null, true);
   eSendEvent('historyEvent', {
     undo: 0,
     redo: 0,
   });
   saveCounter = 0;
-  post('reset');
 }
 
 function checkIfContentIsSavable() {
@@ -236,12 +246,11 @@ async function setNoteInEditorAfterSaving(oldId, currentId) {
     if (note) {
       note = note.data;
     } else {
-      setTimeout(() => {
-        note = db.notes.note(id);
-        if (note) {
-          note = note.data;
-        }
-      }, 500);
+      await sleep(500);
+      note = db.notes.note(id);
+      if (note) {
+        note = note.data;
+      }
     }
   }
 }
@@ -306,6 +315,7 @@ export async function saveNote(canPost = true) {
       updateEvent({
         type: Actions.NOTES,
       });
+      updateEvent({type: Actions.CURRENT_EDITING_NOTE, id: id});
       eSendEvent(refreshNotesPage);
     }
     sendNoteEditedEvent(rId);
