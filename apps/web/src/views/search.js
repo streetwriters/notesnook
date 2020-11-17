@@ -35,9 +35,9 @@ function Search() {
   return (
     <>
       <SearchBox
-        onSearch={(query) => {
+        onSearch={async (query) => {
           const [lookupType, items] = typeToItems(type, context);
-          setResults(db.lookup[lookupType](items, query));
+          setResults(await db.lookup[lookupType](items, query));
         }}
       />
       <ListContainer

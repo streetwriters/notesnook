@@ -2,7 +2,6 @@ import React from "react";
 import { Flex, Button, Text } from "rebass";
 import { db } from "../../common";
 import download from "../../utils/download";
-import { showToast } from "../../utils/toast";
 import * as Icon from "../icons";
 import Dialog, { showDialog } from "./dialog";
 
