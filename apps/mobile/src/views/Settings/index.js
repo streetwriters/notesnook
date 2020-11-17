@@ -51,6 +51,7 @@ import {
 } from '../../utils/Events';
 import {MMKV} from '../../utils/mmkv';
 import {opacity, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
+import Storage from '../../utils/storage';
 import {sleep} from '../../utils/TimeUtils';
 
 let menuRef = createRef();
@@ -802,11 +803,10 @@ export const Settings = ({navigation}) => {
           }
           tagline={
             settings.privacyScreen
-              ? 'Hide app content when it goes in background.'
-              : 'App contents can be seen when app goes in background.'
+              ? 'App contents will be hidden when app goes in background and screenshots will be disabled'
+              : 'App contents can be seen when app goes in background and screenshots will be disabled'
           }
           onPress={() => {
-            //setSetting(settings, 'screenshotMode', true);
             AndroidModule.setSecureMode(!settings.privacyScreen);
             setSetting(settings, 'privacyScreen', !settings.privacyScreen);
           }}
@@ -921,6 +921,15 @@ export const Settings = ({navigation}) => {
                 activeOpacity={1}
                 onPress={async () => {
                   await PremiumService.verify(async () => {
+                    if (Platform.OS === 'android') {
+                      let granted = await Storage.requestPermission();
+                      if (!granted) {
+                        ToastEvent.show(
+                          'You must give storage access to enable auto backups.',
+                        );
+                        return;
+                      }
+                    }
                     await SettingsService.set('reminder', item.value);
                   });
                 }}
