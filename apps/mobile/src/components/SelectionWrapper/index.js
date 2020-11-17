@@ -4,7 +4,6 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {ToastEvent} from '../../services/EventManager';
-import {getElevation} from '../../utils';
 import {COLORS_NOTE} from '../../utils/Colors';
 import {db} from '../../utils/DB';
 import {SIZE} from '../../utils/SizeUtils';
@@ -13,15 +12,13 @@ import {PressableButton} from '../PressableButton';
 const SelectionWrapper = ({
   children,
   item,
-  currentEditingNote,
   index,
   background,
   onLongPress,
-
   onPress,
 }) => {
   const [state, dispatch] = useTracked();
-  const {colors, selectionMode, selectedItemsList} = state;
+  const {colors, selectionMode, selectedItemsList, currentEditingNote} = state;
   const [selected, setSelected] = useState(false);
   useEffect(() => {
     let exists = selectedItemsList.filter(
@@ -69,7 +66,7 @@ const SelectionWrapper = ({
   return (
     <PressableButton
       color={
-        currentEditingNote
+        currentEditingNote === item.id
           ? item.type === 'note' && item.colors[0]
             ? COLORS_NOTE[item.colors[0]]
             : colors.shade
@@ -81,7 +78,7 @@ const SelectionWrapper = ({
       onPress={onPress}
       selectedColor={currentEditingNote ? colors.accent : colors.nav}
       alpha={!colors.night ? -0.02 : 0.02}
-      opacity={ currentEditingNote ? 0.15 : 1}
+      opacity={currentEditingNote ? 0.15 : 1}
       customStyle={{
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -96,7 +93,7 @@ const SelectionWrapper = ({
             ? 30
             : 0,
       }}>
-     {/*  {item.pinned ? (
+      {/*  {item.pinned ? (
         <PressableButton
           color={item.colors[0] ? COLORS_NOTE[item.colors[0]] : colors.accent}
           selectedColor={

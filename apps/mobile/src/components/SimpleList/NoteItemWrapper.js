@@ -14,34 +14,22 @@ import {simpleDialogEvent} from '../DialogManager/recievers';
 import {TEMPLATE_TRASH} from '../DialogManager/Templates';
 import {db} from '../../utils/DB';
 import {DDS} from '../../services/DeviceDetection';
-import { tabBarRef } from '../../utils/Refs';
+import {tabBarRef} from '../../utils/Refs';
 
-export const NoteItemWrapper = ({
-  item,
-  index,
-  isTrash = false,
-}) => {
+export const NoteItemWrapper = ({item, index, isTrash = false}) => {
   const [state, dispatch] = useTracked();
   const {colors, selectionMode} = state;
   const [note, setNote] = useState(item);
-  const [editing, setEditing] = useState(false);
 
   useEffect(() => {
     setNote(item);
   }, [item]);
 
   const onNoteChange = (data) => {
-    if (data.id !== note.id || data.closed) {
-      if (editing) {
-        setEditing(false);
-      }
+    if (!data || data.id !== note.id || data.closed) {
       return;
     }
-    if (!editing && !data.noEdit) {
-      setEditing(true);
-    }
     let newNote = db.notes.note(data.id).data;
-
     if (
       !data.noEdit &&
       newNote.title === note.title &&
@@ -57,7 +45,7 @@ export const NoteItemWrapper = ({
     return () => {
       eUnSubscribeEvent(eOnNoteEdited, onNoteChange);
     };
-  }, [editing, note]);
+  }, [note]);
 
   const style = useMemo(() => {
     return {width: selectionMode ? '90%' : '100%', marginHorizontal: 0};
@@ -98,12 +86,10 @@ export const NoteItemWrapper = ({
       index={index}
       onLongPress={onLongPress}
       onPress={onPress}
-      currentEditingNote={editing}
       item={note}>
       <NoteItem
         colors={colors}
         customStyle={style}
-        currentEditingNote={editing}
         selectionMode={selectionMode}
         item={note}
         isTrash={isTrash}
