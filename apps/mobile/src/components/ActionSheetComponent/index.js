@@ -154,7 +154,12 @@ export const ActionSheetComponent = ({
       icon: 'share-variant',
       func: () => {
         if (note.locked) {
-          openVault(item, false, true, false, false, true);
+          openVault({
+            item:item,
+            novault:true,
+            locked:true,
+            share:true,
+          })
         } else {
           close();
           let m = `${note.title}\n \n ${note.content.text}`;

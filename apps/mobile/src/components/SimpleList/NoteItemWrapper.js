@@ -67,7 +67,12 @@ export const NoteItemWrapper = ({item, index, isTrash = false}) => {
       onLongPress();
       return;
     } else if (note.locked) {
-      openVault(item, true, true, false, true, false);
+      openVault({
+        item:item,
+        novault:true,
+        locked:true,
+        goToEditor:true,
+      })
       return;
     }
     if (isTrash) {

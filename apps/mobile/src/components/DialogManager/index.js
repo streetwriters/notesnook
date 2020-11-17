@@ -229,7 +229,12 @@ export class DialogManager extends Component {
       switch (this.show) {
         case 'delete': {
           if (this.state.item.locked) {
-            openVault(this.state.item, true, true, false, false, false, true);
+            openVault({
+              item:this.state.item,
+              novault:true,
+              locked:true,
+              deleteNote:true,
+            })
           } else {
             this._showSimpleDialog(TEMPLATE_DELETE(this.state.item.type));
           }
@@ -240,15 +245,29 @@ export class DialogManager extends Component {
           break;
         }
         case 'novault': {
-          openVault(this.state.item, false);
+          openVault({
+            item:this.state.item,
+            novault:false,
+            locked:true,
+            deleteNote:true,
+          })
           break;
         }
         case 'locked': {
-          openVault(this.state.item, true, true);
+          openVault({
+            item:this.state.item,
+            novault:true,
+            locked:true,
+          })
           break;
         }
         case 'unlock': {
-          openVault(this.state.item, true, true, true, false, false);
+          openVault({
+            item:this.state.item,
+            novault:true,
+            locked:true,
+            permanant:true
+          })
           break;
         }
         case 'notebook': {
