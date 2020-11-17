@@ -64,12 +64,14 @@ async function checkBackupRequired(type) {
     } else {
       return false;
     }
-  } else {
+  } else if (type === "weekly") {
     if (lastBackupDate + MS_WEEK < now) {
       return true;
     } else {
       false;
     }
+  } else {
+    console.log("Backups are disabled");
   }
 }
 
