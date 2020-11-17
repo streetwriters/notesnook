@@ -61,7 +61,7 @@ export const Notebook = ({route, navigation}) => {
       eSendEvent(eScrollEvent, {name: params.title, type: 'back'});
       navigation.removeListener('focus', onFocus);
     };
-  });
+  },[]);
 
 
 

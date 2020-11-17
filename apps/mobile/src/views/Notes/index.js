@@ -107,7 +107,7 @@ export const Notes = ({route, navigation}) => {
       navigation.removeListener('focus', onFocus);
       navigation.removeListener('blur', onBlur);
     };
-  });
+  },[]);
 
   useEffect(() => {
     if (navigation.isFocused()) {

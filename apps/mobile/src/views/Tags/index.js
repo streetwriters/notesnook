@@ -38,7 +38,7 @@ export const Tags = ({route, navigation}) => {
       eSendEvent(eScrollEvent, {name:'Tags', type: 'back'});
       navigation.removeListener('focus', onFocus);
     };
-  });
+  },[]);
 
 
   useEffect(() => {

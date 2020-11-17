@@ -18,10 +18,17 @@ import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import Backup from '../../services/Backup';
 import {DDS} from '../../services/DeviceDetection';
-import {eSendEvent, ToastEvent} from '../../services/EventManager';
+import {
+  eSendEvent,
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+  openVault,
+  ToastEvent,
+} from '../../services/EventManager';
 import NavigationService from '../../services/Navigation';
 import PremiumService from '../../services/PremiumService';
 import SettingsService from '../../services/SettingsService';
+import * as Keychain from 'react-native-keychain';
 import {
   AndroidModule,
   dWidth,
@@ -58,6 +65,11 @@ let menuRef = createRef();
 export const Settings = ({navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors, user, settings} = state;
+  const [vaultStatus, setVaultStatus] = React.useState({
+    exists: false,
+    biometryEnrolled: false,
+    isBiometryAvailable: false,
+  });
   function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
     let newColors = setColorScheme(colors, accent);
     dispatch({type: Actions.THEME, colors: newColors});
@@ -94,14 +106,45 @@ export const Settings = ({navigation}) => {
     });
   }, []);
 
+  const checkVaultStatus = useCallback(() => {
+    db.vault.add('check_no_vault').catch(async (e) => {
+      console.log(e);
+      let biometry = await Keychain.getSupportedBiometryType();
+      let fingerprint = await Keychain.hasInternetCredentials('nn_vault');
+      console.log(biometry, fingerprint);
+      let available = false;
+      if (
+        biometry === Keychain.BIOMETRY_TYPE.FINGERPRINT ||
+        biometry === Keychain.BIOMETRY_TYPE.TOUCH_ID
+      ) {
+        available = true;
+      }
+      if (e.message === db.vault.ERRORS.noVault) {
+        setVaultStatus({
+          exists: false,
+          biometryEnrolled: fingerprint,
+          isBiometryAvailable: available,
+        });
+      } else {
+        setVaultStatus({
+          exists: true,
+          biometryEnrolled: fingerprint,
+          isBiometryAvailable: available,
+        });
+      }
+    });
+  });
+
   useEffect(() => {
-    console.log(user);
+    checkVaultStatus();
+    eSubscribeEvent('vaultUpdated', () => checkVaultStatus());
     navigation.addListener('focus', onFocus);
     return () => {
       eSendEvent(eScrollEvent, {name: 'Settings', type: 'back'});
+      eUnSubscribeEvent('vaultUpdated', () => checkVaultStatus());
       navigation.removeListener('focus', onFocus);
     };
-  });
+  }, []);
 
   const getTimeLeft = (t2) => {
     let d1 = new Date(Date.now());
@@ -796,15 +839,11 @@ export const Settings = ({navigation}) => {
 
         <CustomButton
           key="privacyMode"
-          title={
-            settings.privacyScreen
-              ? 'Privacy Mode Enabled'
-              : 'Privacy Mode Disabled'
-          }
+          title="Privacy Mode"
           tagline={
             settings.privacyScreen
-              ? 'App contents will be hidden when app goes in background and screenshots will be disabled'
-              : 'App contents can be seen when app goes in background and screenshots will be disabled'
+              ? 'App contents will be hidden when app goes in background and screenshots are disabled'
+              : 'App contents can be seen when app goes in background and screenshots are enabled'
           }
           onPress={() => {
             AndroidModule.setSecureMode(!settings.privacyScreen);
@@ -821,6 +860,50 @@ export const Settings = ({navigation}) => {
             />
           }
         />
+
+        {vaultStatus.exists ? (
+          vaultStatus.isBiometryAvailable ? (
+            <CustomButton
+              key="fingerprintVaultUnlock"
+              title="Unlock vault with Fingerprint"
+              tagline={
+                !vaultStatus.biometryEnrolled
+                  ? 'Enable access to the vault with fingerprint.'
+                  : 'You can access the vault with fingerprint.'
+              }
+              onPress={() => {
+                openVault({
+                  item:{},
+                  fingerprintAccess:true,
+                  novault:true
+                })
+              }}
+              maxWidth="90%"
+              customComponent={
+                <Icon
+                  size={SIZE.xl}
+                  color={
+                    vaultStatus.biometryEnrolled ? colors.accent : colors.icon
+                  }
+                  name={
+                    vaultStatus.biometryEnrolled
+                      ? 'toggle-switch'
+                      : 'toggle-switch-off'
+                  }
+                />
+              }
+            />
+          ) : null
+        ) : (
+          <CustomButton
+            key="createVault"
+            title="Create Vault"
+            tagline="Adds an extra layer of security for most important notes."
+            onPress={() => {
+              openVault({}, false);
+            }}
+          />
+        )}
 
         {/*   <CustomButton
           key="screenshotMode"

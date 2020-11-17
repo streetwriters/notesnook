@@ -29,7 +29,7 @@ export const Search = ({route, navigation}) => {
     return () => {
       navigation.removeListener('focus', onFocus);
     };
-  });
+  },[]);
 
   return (
     <>

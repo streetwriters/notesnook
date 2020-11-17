@@ -1,4 +1,5 @@
 import React, {useCallback, useEffect} from 'react';
+import * as Keychain from 'react-native-keychain';
 import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
 import SimpleList from '../../components/SimpleList';
 import {useTracked} from '../../provider';
@@ -7,12 +8,10 @@ import {DDS} from '../../services/DeviceDetection';
 import {eSendEvent} from '../../services/EventManager';
 import SearchService from '../../services/SearchService';
 import {scrollRef} from '../../utils';
-import {
-  eOnLoadNote,
-  eScrollEvent,
-  eUpdateSearchState,
-} from '../../utils/Events';
+import {eOnLoadNote, eScrollEvent} from '../../utils/Events';
 import {tabBarRef} from '../../utils/Refs';
+import Storage from '../../utils/storage';
+import * as Sentry from '@sentry/react-native';
 
 export const Home = ({navigation}) => {
   const [state, dispatch] = useTracked();
@@ -50,7 +49,7 @@ export const Home = ({navigation}) => {
       navigation.removeListener('focus', onFocus);
       navigation.removeListener('blur', onBlur);
     };
-  });
+  },[]);
 
   useEffect(() => {
     if (navigation.isFocused()) {

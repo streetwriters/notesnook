@@ -43,7 +43,7 @@ export const Trash = ({route, navigation}) => {
       eSendEvent(eScrollEvent, {name:'Trash', type: 'back'});
       navigation.removeListener('focus', onFocus);
     };
-  });
+  },[]);
 
   useEffect(() => {
     if (navigation.isFocused()) {
