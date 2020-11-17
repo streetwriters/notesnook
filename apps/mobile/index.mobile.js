@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import {View} from 'react-native';
 import ScrollableTabView from 'react-native-scrollable-tab-view';
 import ContextMenu from './src/components/ContextMenu';
@@ -12,16 +12,8 @@ import {eSendEvent} from './src/services/EventManager';
 import {editing} from './src/utils';
 import {eCloseSideMenu, eOnLoadNote, eOpenSideMenu} from './src/utils/Events';
 import {tabBarRef} from './src/utils/Refs';
-import {sleep} from './src/utils/TimeUtils';
 import {EditorWrapper} from './src/views/Editor/EditorWrapper';
 import {getIntent, getNote, post} from './src/views/Editor/Functions';
-/* 
-const editorRef = createRef();
-  
-const AnimatedScreenContainer = Animated.createAnimatedComponent(
-  ScreenContainer,
-);
- */
 export const Initialize = () => {
   const [state] = useTracked();
   const {colors} = state;
@@ -53,8 +45,6 @@ export const Initialize = () => {
   );
 };
 
-let timeout = null;
-
 const onChangeTab = async (obj) => {
   if (obj.i === 1) {
     eSendEvent(eCloseSideMenu);
@@ -72,10 +62,6 @@ const onChangeTab = async (obj) => {
 
 const MobileStack = React.memo(
   () => {
-    useEffect(() => {
-      console.log('rerendering mobile stack');
-    });
-
     return (
       <ScrollableTabView
         ref={tabBarRef}
