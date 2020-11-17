@@ -76,3 +76,38 @@ test("unlock a note permanently", () =>
     expect(content.data).toBeDefined();
     expect(typeof content.data).toBe("object");
   }));
+
+test("save a locked note", () =>
+  noteTest().then(async ({ db, id }) => {
+    await db.vault.create("password");
+    await db.vault.add(id);
+
+    const note = db.notes.note(id).data;
+    await db.vault.save(note);
+
+    const content = await db.content.raw(note.contentId);
+    const contentData = JSON.parse(content.data.cipher);
+
+    expect(contentData.iv).not.toBeDefined();
+    expect(contentData.cipher).not.toBeDefined();
+    expect(contentData.key).not.toBeDefined();
+  }));
+
+test("save an edited locked note", () =>
+  noteTest().then(async ({ db, id }) => {
+    await db.vault.create("password");
+    await db.vault.add(id);
+
+    const note = db.notes.note(id).data;
+    await db.vault.save({
+      note,
+      data: { type: "delta", data: [{ insert: "hello world\n" }] },
+    });
+
+    const content = await db.content.raw(note.contentId);
+    const contentData = JSON.parse(content.data.cipher);
+
+    expect(contentData.iv).not.toBeDefined();
+    expect(contentData.cipher).not.toBeDefined();
+    expect(contentData.key).not.toBeDefined();
+  }));

@@ -45,7 +45,7 @@ export default class Vault {
    * Unlocks the vault with the given password
    * @param {string} password The password
    * @throws ERR_NO_VAULT | ERR_WRONG_PASSWORD
-   * @returns {Boolean}
+   * @returns {Promise<Boolean>}
    */
   async unlock(password) {
     const vaultKey = await this._context.read("vaultKey");
@@ -78,7 +78,7 @@ export default class Vault {
     if (!(await sendCheckUserStatusEvent("vault:check"))) return;
 
     await this._check();
-    await this._lockNote(noteId);
+    await this._lockNote({ id: noteId });
   }
 
   /**
@@ -112,8 +112,8 @@ export default class Vault {
   async save(note) {
     if (!note) return;
     //await this._check();
-    let id = note.id || getId();
-    return await this._lockNote(id);
+    //let id = note.id || getId();
+    return await this._lockNote(note);
   }
 
   // Private & internal methods
@@ -163,10 +163,17 @@ export default class Vault {
   }
 
   /** @private */
-  async _lockNote(id) {
-    let note = this._db.notes.note(id);
+  async _lockNote(note) {
+    let { id, data: content, contentId } = note;
 
-    await this._encryptContent(note.data.contentId, await note.content());
+    if (!content) {
+      note = this._db.notes.note(id);
+      if (note.data.locked) return;
+      content = await note.content();
+      contentId = note.data.contentId;
+    }
+
+    await this._encryptContent(contentId, content);
 
     return await this._db.notes.add({
       id,
