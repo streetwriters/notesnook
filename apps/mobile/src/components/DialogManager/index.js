@@ -317,7 +317,7 @@ export class DialogManager extends Component {
               : null
           }
           initialOffsetFromBottom={1}
-          bounceOnOpen={true}
+          bounceOnOpen={false}
           gestureEnabled={true}
           onClose={() => {
             translatePrem.setValue(-800)
