@@ -67,7 +67,7 @@ async function deriveCryptoKey(name, data) {
       authenticationType:
         Keychain.AUTHENTICATION_TYPE.DEVICE_PASSCODE_OR_BIOMETRICS,
       accessControl: Keychain.ACCESS_CONTROL.DEVICE_PASSCODE,
-      rules:Keychain.SECURITY_RULES.AUTOMATIC_UPGRADE
+      rules: Keychain.SECURITY_RULES.AUTOMATIC_UPGRADE,
     });
 
     return credentials.key;
@@ -83,7 +83,7 @@ async function getCryptoKey(name) {
         authenticationType:
           Keychain.AUTHENTICATION_TYPE.DEVICE_PASSCODE_OR_BIOMETRICS,
         accessControl: Keychain.ACCESS_CONTROL.DEVICE_PASSCODE,
-        authenticationPrompt:{cancel:null}
+        authenticationPrompt: {cancel: null},
       });
       return credentials.password;
     } else {

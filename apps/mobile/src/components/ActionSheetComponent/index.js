@@ -429,34 +429,35 @@ export const ActionSheetComponent = ({
   };
 
   const onPressVaultButton = async () => {
-    await PremiumService.verify(
-      () => {
-        if (!note.id) return;
+    if (!note.id) return;
 
-        if (note.locked) {
-          close('unlock');
-        } else {
-          db.vault
-            .add(note.id)
-            .then(() => {
-              sendNoteEditedEvent(note.id, false, true);
+    if (note.locked) {
+      close('unlock');
+    } else {
+      db.vault
+        .add(note.id)
+        .then(() => {
+          sendNoteEditedEvent(note.id, false, true);
+          close();
+        })
+        .catch(async (e) => {
+          switch (e.message) {
+            case db.vault.ERRORS.noVault:
+              close('novault');
+              break;
+            case db.vault.ERRORS.vaultLocked:
+              close('locked');
+              break;
+            case db.vault.ERRORS.wrongPassword:
               close();
-            })
-            .catch(async (e) => {
-              switch (e.message) {
-                case db.vault.ERRORS.noVault:
-                  close('novault');
-                  break;
-                case db.vault.ERRORS.vaultLocked:
-                  close('locked');
-                  break;
-                case db.vault.ERRORS.wrongPassword:
-                  close();
-                  break;
-              }
-            });
-        }
-      },
+              break;
+          }
+        });
+    }
+
+    return;
+    await PremiumService.verify(
+      () => {},
       () => {
         eSendEvent(eShowGetPremium, {
           context: 'sheet',
@@ -480,7 +481,6 @@ export const ActionSheetComponent = ({
         backgroundColor: colors.bg,
         paddingHorizontal: 0,
       }}>
-     
       {!note.id && !note.dateCreated ? (
         <Paragraph style={{marginVertical: 10}}>
           Start writing to save your note.

@@ -11,26 +11,26 @@ export const eUnSubscribeEvent = (eventName, action) => {
 
 export const eSendEvent = (eventName, data) => {
   DeviceEventEmitter.emit(eventName, data);
+
+
 };
 
-export const openVault = (
-  item,
-  novault = false,
-  locked = false,
-  permanant = false,
-  editor = false,
-  share = false,
-  deleteNote = false,
-) => {
-  eSendEvent(eOpenVaultDialog, {
-    item,
-    novault,
-    locked,
-    permanant,
-    goToEditor: editor,
-    share,
-    deleteNote,
-  });
+/**
+ * @typedef {Object} vaultType
+ * @property {Object} item
+ * @property {boolean} novault
+ * @property {Object} locked
+ * @property {Object} permanant
+ * @property {Object} goToEditor
+ * @property {Object} share
+ * @property {Object} deleteNote
+ * @property {Object} fingerprintAccess
+ * @property {Object} copyNote
+ * @param {vaultType} data 
+ */
+
+export const openVault = (data) => {
+  eSendEvent(eOpenVaultDialog, data);
 };
 
 export function sendNoteEditedEvent(id="",closed=false,noEdit=false) {

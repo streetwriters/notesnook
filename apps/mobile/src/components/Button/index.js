@@ -26,6 +26,12 @@ const BUTTON_TYPES = {
     text: 'accent',
     selected: 'bg',
   },
+
+  shade: {
+    primary: 'shade',
+    text: 'accent',
+    selected: 'shade',
+  },
 };
 
 export const Button = ({
