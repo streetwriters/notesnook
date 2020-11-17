@@ -67,6 +67,7 @@ async function deriveCryptoKey(name, data) {
       authenticationType:
         Keychain.AUTHENTICATION_TYPE.DEVICE_PASSCODE_OR_BIOMETRICS,
       accessControl: Keychain.ACCESS_CONTROL.DEVICE_PASSCODE,
+      rules:Keychain.SECURITY_RULES.AUTOMATIC_UPGRADE
     });
 
     return credentials.key;
@@ -78,7 +79,12 @@ async function deriveCryptoKey(name, data) {
 async function getCryptoKey(name) {
   try {
     if (await Keychain.hasInternetCredentials('notesnook')) {
-      let credentials = await Keychain.getInternetCredentials('notesnook');
+      let credentials = await Keychain.getInternetCredentials('notesnook', {
+        authenticationType:
+          Keychain.AUTHENTICATION_TYPE.DEVICE_PASSCODE_OR_BIOMETRICS,
+        accessControl: Keychain.ACCESS_CONTROL.DEVICE_PASSCODE,
+        authenticationPrompt:{cancel:null}
+      });
       return credentials.password;
     } else {
       return null;
@@ -143,7 +149,6 @@ export default {
   clear,
   encrypt,
   decrypt,
-  deriveKey,
   getAllKeys,
   getRandomBytes,
   checkAndCreateDir,
