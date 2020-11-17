@@ -57,23 +57,14 @@ let timeout = null;
 
 const onChangeTab = async (obj) => {
   if (obj.i === 1) {
-    if (timeout) {
-      clearTimeout(timeout);
-      timeout = null;
+    eSendEvent(eCloseSideMenu);
+    if (getIntent()) return;
+    if (!editing.currentlyEditing || !getNote()) {
+      eSendEvent(eOnLoadNote, {type: 'new'});
     }
-    timeout = setTimeout(async () => {
-      eSendEvent(eCloseSideMenu);
-      if (getIntent()) return;
-      await sleep(150);
-      if (!editing.currentlyEditing || !getNote()) {
-        console.log('i am called before', getIntent());
-        eSendEvent(eOnLoadNote, {type: 'new'});
-      }
-    }, 150);
   } else {
     if (obj.from === 1) {
       post('blur');
-      await sleep(150);
       eSendEvent(eOpenSideMenu);
     }
   }
