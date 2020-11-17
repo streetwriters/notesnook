@@ -7,11 +7,9 @@
 .ql-container {
   box-sizing: border-box;
   font-family: 'Poppins', sans-serif;
-
   margin: 0px;
   position: relative;
-
-  height: calc(100% - 105px) !important;
+  height: calc(100% - 260px) !important;
 }
 
 .ql-container.ql-disabled .ql-tooltip {
