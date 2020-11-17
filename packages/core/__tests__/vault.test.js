@@ -100,8 +100,8 @@ test("save an edited locked note", () =>
 
     const note = db.notes.note(id).data;
     await db.vault.save({
-      note,
-      data: { type: "delta", data: [{ insert: "hello world\n" }] },
+      ...note,
+      content: { type: "delta", data: [{ insert: "hello world\n" }] },
     });
 
     const content = await db.content.raw(note.contentId);
