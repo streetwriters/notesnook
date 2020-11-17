@@ -52,7 +52,7 @@ async function deriveCryptoKey(name, data) {
 }
 
 async function getCryptoKey(name) {
-  return storage[name];
+  return storage[name].key;
 }
 
 module.exports = {

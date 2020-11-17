@@ -43,7 +43,8 @@ export default class User {
   async key() {
     const user = await this.get();
     if (!user) return;
-    return this._context.getCryptoKey(`_uk_@${user.username}`);
+    const key = await this._context.getCryptoKey(`_uk_@${user.username}`);
+    return { key, salt: user.salt };
   }
 
   async set(user) {
