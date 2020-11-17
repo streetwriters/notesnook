@@ -39,7 +39,7 @@ export const Favorites = ({route, navigation}) => {
       eSendEvent(eScrollEvent, {name: 'Notebooks', type: 'back'});
       navigation.removeListener('focus', onFocus);
     };
-  });
+  },[]);
 
 
 

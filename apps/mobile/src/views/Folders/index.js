@@ -42,7 +42,7 @@ export const Folders = ({route, navigation}) => {
       navigation.removeListener('focus', onFocus);
       eSendEvent(eScrollEvent, {name: 'Notebooks', type: 'back'});
     };
-  });
+  },[]);
 
   useEffect(() => {
     if (navigation.isFocused()) {
