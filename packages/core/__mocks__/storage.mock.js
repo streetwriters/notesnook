@@ -47,10 +47,12 @@ function decrypt(key, data) {
   });
 }
 
-function deriveKey(password, salt) {
-  return new Promise((resolve, reject) =>
-    resolve({ key: password, salt: "salt" })
-  );
+async function deriveCryptoKey(name, data) {
+  storage[name] = { key: data.password, salt: "salt" };
+}
+
+async function getCryptoKey(name) {
+  return storage[name];
 }
 
 module.exports = {
@@ -61,6 +63,7 @@ module.exports = {
   clear,
   encrypt,
   decrypt,
-  deriveKey,
+  deriveCryptoKey,
+  getCryptoKey,
   getAllKeys,
 };

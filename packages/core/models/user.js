@@ -43,13 +43,13 @@ export default class User {
   async key() {
     const user = await this.get();
     if (!user) return;
-    return { key: user.key, salt: user.salt };
+    return this._context.getCryptoKey(`_uk_@${user.username}`);
   }
 
   async set(user) {
     if (!user) return;
     user = { ...(await this.get()), ...user };
-    await this._context.write("user", user);
+    await this._context.write(`user`, user);
   }
 
   async login(username, password) {
@@ -59,12 +59,7 @@ export default class User {
       grant_type: "password",
     });
     if (!response) return;
-    const key = await this._context.deriveKey(password, response.payload.salt);
-    let user = userFromResponse(response, key);
-    await this._context.write("user", user);
-
-    // propogate event
-    EV.publish("user:loggedIn", user);
+    await this._postLogin(password, response);
   }
 
   async token() {
@@ -108,8 +103,15 @@ export default class User {
       email,
     });
     if (!response) return;
-    const key = await this._context.deriveKey(password, response.payload.salt);
-    let user = userFromResponse(response, key);
+    await this._postLogin(password, response);
+  }
+
+  async _postLogin(password, response) {
+    await this._context.deriveCryptoKey(`_uk_@${response.payload.username}`, {
+      password,
+      salt: response.payload.salt,
+    });
+    let user = userFromResponse(response);
     await this._context.write("user", user);
 
     // propogate event
@@ -117,13 +119,12 @@ export default class User {
   }
 }
 
-function userFromResponse(response, key) {
+function userFromResponse(response) {
   let user = {
     ...response.payload,
     accessToken: response.access_token,
     refreshToken: response.refresh_token,
     expiry: Date.now() + response.expiry * 100,
-    key,
   };
   return user;
 }

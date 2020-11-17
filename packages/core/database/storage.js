@@ -26,7 +26,11 @@ export default class Storage {
   decrypt(password, cipher) {
     return this.storage.decrypt(password, cipher);
   }
-  deriveKey(password, salt) {
-    return this.storage.deriveKey(password, salt, true);
+
+  deriveCryptoKey(name, data) {
+    return this.storage.deriveCryptoKey(name, data);
+  }
+  getCryptoKey(name) {
+    return this.storage.getCryptoKey(name);
   }
 }
