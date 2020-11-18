@@ -1,16 +1,15 @@
 import * as NetInfo from '@react-native-community/netinfo';
+import * as Sentry from '@sentry/react-native';
 import {EV} from 'notes-core/common';
 import React, {useEffect, useState} from 'react';
 import {Appearance, AppState, Platform, StatusBar} from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 import Orientation from 'react-native-orientation';
 import {enabled} from 'react-native-privacy-snapshot';
-import ReceiveSharingIntent from 'react-native-receive-sharing-intent';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import SplashScreen from 'react-native-splash-screen';
 import {useTracked} from './src/provider';
 import {Actions} from './src/provider/Actions';
-import {defaultState} from './src/provider/DefaultState';
 import Backup from './src/services/Backup';
 import {DDS} from './src/services/DeviceDetection';
 import {
@@ -22,9 +21,7 @@ import {
 import IntentService from './src/services/IntentService';
 import {setLoginMessage} from './src/services/Message';
 import SettingsService from './src/services/SettingsService';
-import {AndroidModule, sortSettings} from './src/utils';
 import {COLOR_SCHEME} from './src/utils/Colors';
-import {getColorScheme} from './src/utils/ColorUtils';
 import {db} from './src/utils/DB';
 import {
   eDispatchAction,
@@ -34,22 +31,17 @@ import {
 } from './src/utils/Events';
 import {MMKV} from './src/utils/mmkv';
 import {tabBarRef} from './src/utils/Refs';
-import {getDeviceSize, scale, updateSize} from './src/utils/SizeUtils';
+import {getDeviceSize} from './src/utils/SizeUtils';
 import {sleep} from './src/utils/TimeUtils';
-import {getNote, setIntent} from './src/views/Editor/Functions';
+import {getNote} from './src/views/Editor/Functions';
 
-import * as Sentry from '@sentry/react-native';
-
-Sentry.init({ 
-  dsn: 'https://317a5c31caf64d1e9b27abf15eb1a554@o477952.ingest.sentry.io/5519681', 
+Sentry.init({
+  dsn:
+    'https://317a5c31caf64d1e9b27abf15eb1a554@o477952.ingest.sentry.io/5519681',
 });
 
 let firstLoad = true;
 let note = null;
-let prevIntent = {
-  text: null,
-  weblink: null,
-};
 
 const onAppFocused = async () => {
   StatusBar.setBarStyle(COLOR_SCHEME.night ? 'light-content' : 'dark-content');
@@ -186,10 +178,10 @@ const App = () => {
       try {
         await db.init();
 
-        console.log("db is initialized");
+        console.log('db is initialized');
       } catch (e) {
         error = e;
-        console.log(e,"ERROR DB")
+        console.log(e, 'ERROR DB');
       } finally {
         dispatch({type: Actions.ALL});
         getUser().catch((e) => console.log);
