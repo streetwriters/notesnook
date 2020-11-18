@@ -53,6 +53,8 @@ const Editor = ({noMenu}) => {
           onError={(error) => console.log(error)}
           onLoad={async () => await onWebViewLoad(noMenu, premiumUser, colors)}
           javaScriptEnabled={true}
+          focusable={true}
+          keyboardDisplayRequiresUserAction={false}
           injectedJavaScript={Platform.OS === 'ios' ? injectedJS : null}
           onShouldStartLoadWithRequest={_onShouldStartLoadWithRequest}
           renderLoading={() => (

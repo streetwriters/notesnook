@@ -153,9 +153,13 @@ export async function loadNote(item) {
     intent = false;
     noteEdited = false;
     id = null;
-    textInput.current?.focus();
-    post('focusTitle');
-    Platform.OS === 'android' ? EditorWebView.current?.requestFocus() : null;
+    if (Platform.OS === "android") {
+      textInput.current?.focus();
+      post('focusTitle');
+      EditorWebView.current?.requestFocus() 
+    } else { 
+      post('focusTitle');
+    }
   } else if (item && item.type === 'intent') {
     await clearEditor();
     clearNote();
