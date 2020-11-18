@@ -31,60 +31,59 @@ function Unlock(props) {
 
   return (
     <Flex
-      width={"100%"}
-      flex="1 1 auto"
+      flex="1"
+      flexDirection="column"
       justifyContent="center"
       alignItems="center"
+      mx={2}
     >
-      <Flex flex="1" flexDirection="column" alignItems="center">
-        <Flex justifyContent="center" alignItems="center">
-          <Icon.Unlock size={48} color="text" />
-          <Text variant="heading" ml={2} fontSize={48}>
-            Unlock Note
+      <Flex justifyContent="center" alignItems="center">
+        <Icon.Unlock size={"heading"} color="text" />
+        <Text variant="heading" ml={2} fontSize={48}>
+          Unlock Note
+        </Text>
+      </Flex>
+      <Text variant="body" color="gray" textAlign="center">
+        Please unlock this note using your vault password.
+      </Text>
+      <Input
+        ref={passwordRef}
+        autoFocus
+        variant={isWrong ? "error" : "input"}
+        mt={5}
+        maxWidth={["95%", "95%", "50%"]}
+        placeholder="Enter vault password"
+        type="password"
+        onKeyUp={async (e) => {
+          if (e.key === "Enter") {
+            await submit();
+          } else {
+            setIsWrong(false);
+          }
+        }}
+      />
+      {isWrong && (
+        <Flex
+          alignItems="center"
+          justifyContent="center"
+          alignSelf="flex-start"
+          color="error"
+          mt={2}
+        >
+          <Icon.Alert color="error" />
+          <Text ml={1} fontSize={"body"}>
+            Wrong password
           </Text>
         </Flex>
-        <Text variant="body" color="gray">
-          Please unlock this note using your vault password.
-        </Text>
-        <Input
-          ref={passwordRef}
-          autoFocus
-          variant={isWrong ? "error" : "input"}
-          mt={5}
-          maxWidth={["95%", "95%", "50%"]}
-          placeholder="Enter vault password"
-          type="password"
-          onKeyUp={async (e) => {
-            if (e.key === "Enter") {
-              await submit();
-            } else {
-              setIsWrong(false);
-            }
-          }}
-        />
-        {isWrong && (
-          <Flex
-            alignItems="center"
-            justifyContent="center"
-            alignSelf="flex-start"
-            color="error"
-            mt={2}
-          >
-            <Icon.Alert color="error" />
-            <Text ml={1} fontSize={"body"}>
-              Wrong password
-            </Text>
-          </Flex>
-        )}
-        <Button
-          mt={3}
-          onClick={async () => {
-            await submit();
-          }}
-        >
-          Unlock
-        </Button>
-      </Flex>
+      )}
+      <Button
+        mt={3}
+        onClick={async () => {
+          await submit();
+        }}
+      >
+        Unlock
+      </Button>
     </Flex>
   );
 }

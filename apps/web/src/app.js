@@ -108,10 +108,10 @@ function App() {
         <Flex variant="rowFill">
           <Animated.Flex
             variant="columnFill"
-            initial={{ width: "30%", opacity: 1, scaleY: 1 }}
+            initial={{ width: "30%", opacity: 1, x: 0 }}
             animate={{
               width: show ? "30%" : "0%",
-              scaleY: show ? 1 : 0.8,
+              x: show ? 0 : "-30%",
               opacity: show ? 1 : 0,
               zIndex: show ? 0 : -1,
             }}

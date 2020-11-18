@@ -155,7 +155,7 @@ function Settings(props) {
               </Flex>
               <Flex variant="columnCenter" alignItems="flex-start">
                 <Text variant="subBody">You are not logged in</Text>
-                <Text variant="body" color="primary" fontSize={14}>
+                <Text variant="body" color="primary" fontSize={"body"}>
                   Login to sync your notes
                 </Text>
               </Flex>

@@ -11,6 +11,7 @@ import Animated from "../animated";
 function Toolbar(props) {
   const { quill } = props;
   const sessionState = useStore((store) => store.session.state);
+  const sessionId = useStore((store) => store.session.sessionId);
   const [undoable, setUndoable] = useState(false);
   const [redoable, setRedoable] = useState(false);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
@@ -92,8 +93,8 @@ function Toolbar(props) {
           }}
           size={30}
           onClick={() => {
+            if (sessionId) showToast("success", "Note saved!");
             clearSession();
-            showToast("success", "Note saved!");
           }}
         />
         <Animated.Text

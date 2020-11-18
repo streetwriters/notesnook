@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import "./editor.css";
 import ReactQuill from "./react-quill";
 import { Box, Flex } from "rebass";
@@ -17,6 +17,7 @@ import SplitEditor from "../spliteditor";
 import Unlock from "../unlock";
 import RouteContainer from "../route-container";
 import useMobile from "../../utils/use-mobile";
+import useTablet from "../../utils/use-tablet";
 import { SUBSCRIPTION_STATUS } from "../../common";
 import Toolbar from "./toolbar";
 import Footer from "./footer";
@@ -32,10 +33,16 @@ function Editor() {
   const init = useStore((store) => store.init);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
   const isMobile = useMobile();
+  const isTablet = useTablet();
+
   const isTrial = useUserStore(
     (store) => store.user?.subscription?.status === SUBSCRIPTION_STATUS.TRIAL
   );
   const isLoggedin = useUserStore((store) => store.isLoggedIn);
+  const editorMargins = useMemo(() => {
+    if (isMobile || isTablet) return "0%";
+    else return "15%";
+  }, [isTablet, isMobile]);
 
   const quillRef = useRef();
   const [diff] = useHashParam("diff");
@@ -116,10 +123,10 @@ function Editor() {
         <Animated.Flex
           variant="columnFill"
           className="editor"
-          sx={{ mx: [0, 0, "15%"] }}
+          sx={{ mx: [0, 0, editorMargins] }}
           animate={{
-            marginRight: isFocusMode ? "25%" : "15%",
-            marginLeft: isFocusMode ? "25%" : "15%",
+            marginRight: isFocusMode ? "25%" : editorMargins,
+            marginLeft: isFocusMode ? "25%" : editorMargins,
           }}
           transition={{ duration: 0.3, ease: "easeOut" }}
           mt={[0, 0, 50]}

@@ -14,7 +14,7 @@ function TitleBox(props) {
     const textarea = document.querySelector(".editorTitle");
     const dummy = document.querySelector(".dummyEditorTitle");
     dummy.innerHTML = textarea.value;
-    setHeight(dummy.scrollHeight);
+    setHeight(dummy.scrollHeight || 60);
   }, []);
 
   useEffect(() => {
