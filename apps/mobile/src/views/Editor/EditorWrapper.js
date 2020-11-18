@@ -1,12 +1,12 @@
 import React from 'react';
-import { View } from 'react-native';
-import { PanGestureHandler, State } from 'react-native-gesture-handler';
-import Animated, { Easing } from 'react-native-reanimated';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import {View} from 'react-native';
+import {PanGestureHandler, State} from 'react-native-gesture-handler';
+import Animated, {Easing} from 'react-native-reanimated';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Paragraph from '../../components/Typography/Paragraph';
-import { useTracked } from '../../provider';
-import { eSendEvent } from '../../services/EventManager';
-import { eOnLoadNote } from '../../utils/Events';
+import {useTracked} from '../../provider';
+import {eSendEvent} from '../../services/EventManager';
+import {eOnLoadNote} from '../../utils/Events';
 import Editor from './index';
 
 let prevVal = 0;
@@ -37,7 +37,7 @@ const onHandlerStateChange = (evt) => {
 
 const onGestureEvent = (event) => {
   if (event.nativeEvent.translationY < 0) return;
-  let v =  event.nativeEvent.translationY;
+  let v = event.nativeEvent.translationY;
   if (v >= 80 && prevVal !== 80) {
     prevVal = 80;
     animation(80);
@@ -87,6 +87,16 @@ export const EditorWrapper = () => {
         width: '100%',
         height: '100%',
       }}>
+      <View
+        style={{
+          position: 'absolute',
+          zIndex: 20,
+          height: insets.top,
+          top: 0,
+          width: '100%',
+          backgroundColor: colors.bg,
+        }}
+      />
       <PanGestureHandler
         minPointers={2}
         onHandlerStateChange={onHandlerStateChange}
@@ -100,12 +110,11 @@ export const EditorWrapper = () => {
             ],
             height: '100%',
             width: '100%',
-     
           }}>
           <View
             style={{
               height: 80,
-              position:'absolute',
+              position: 'absolute',
               backgroundColor: colors.accent,
               width: '100%',
               justifyContent: 'center',
@@ -113,7 +122,7 @@ export const EditorWrapper = () => {
               zIndex: 10,
               transform: [
                 {
-                  translateY: - 80 + insets.top,
+                  translateY: -80 + insets.top,
                 },
               ],
             }}>
