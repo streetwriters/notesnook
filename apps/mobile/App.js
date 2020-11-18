@@ -43,20 +43,22 @@ Sentry.init({
 let firstLoad = true;
 let note = null;
 
-const onAppFocused = async () => {
-  StatusBar.setBarStyle(COLOR_SCHEME.night ? 'light-content' : 'dark-content');
-  if (Platform.OS === 'android') {
-    StatusBar.setTranslucent(true);
-    StatusBar.setBackgroundColor(COLOR_SCHEME.bg);
-  }
-  if (SettingsService.get().privacyScreen) {
-    enabled(false);
-  }
-};
-
-const onAppBlur = async () => {
-  if (SettingsService.get().privacyScreen) {
-    enabled(true);
+const onAppStateChanged = async (state) => {
+  if (state === 'active') {
+    StatusBar.setBarStyle(
+      COLOR_SCHEME.night ? 'light-content' : 'dark-content',
+    );
+    if (Platform.OS === 'android') {
+      StatusBar.setTranslucent(true);
+      StatusBar.setBackgroundColor(COLOR_SCHEME.bg);
+    }
+    if (SettingsService.get().privacyScreen) {
+      enabled(false);
+    }
+  } else {
+    if (SettingsService.get().privacyScreen) {
+      enabled(true);
+    }
   }
 };
 
@@ -138,8 +140,7 @@ const App = () => {
     eSubscribeEvent(eDispatchAction, (type) => {
       dispatch(type);
     });
-    AppState.addEventListener('focus', onAppFocused);
-    AppState.addEventListener('blur', onAppBlur);
+    AppState.addEventListener('change', onAppStateChanged);
     Appearance.addChangeListener(onSystemThemeChanged);
     let unsub = NetInfo.addEventListener(onNetworkStateChanged);
     return () => {
@@ -150,8 +151,7 @@ const App = () => {
         dispatch(type);
       });
       Orientation.removeOrientationListener(_onOrientationChange);
-      AppState.removeEventListener('focus', onAppFocused);
-      AppState.removeEventListener('blur', onAppBlur);
+      AppState.removeEventListener('change', onAppStateChanged);
       Appearance.removeChangeListener(onSystemThemeChanged);
       unsub();
     };

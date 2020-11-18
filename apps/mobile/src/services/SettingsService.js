@@ -5,7 +5,8 @@ import {AndroidModule, sortSettings} from '../utils';
 import {getColorScheme} from '../utils/ColorUtils';
 import {MMKV} from '../utils/mmkv';
 import {scale, updateSize} from '../utils/SizeUtils';
-
+import {enabled} from 'react-native-privacy-snapshot';
+import {Platform} from 'react-native';
 let settings = defaultState.settings;
 
 async function init() {
@@ -21,9 +22,17 @@ async function init() {
     scale.fontScale = settings.fontScale;
   }
   if (settings.privacyScreen) {
-    AndroidModule.setSecureMode(true);
+    if (Platform.OS === 'android') {
+      AndroidModule.setSecureMode(true);
+    } else {
+      enabled(true);
+    }
   } else {
-    AndroidModule.setSecureMode(false);
+    if (Platform.OS === 'android') {
+      AndroidModule.setSecureMode(false);
+    } else {
+      enabled(false);
+    }
   }
   sortSettings.sort = settings.sort;
   sortSettings.sortOrder = settings.sortOrder;
