@@ -16,15 +16,49 @@
 }
 .ql-toolbar.ql-snow span {
   padding-top: 1px;
-  font-size: 1.125em;
+  font-size: 0.975em;
 }
 
 .ql-formats {
   margin-bottom: 5px;
 }
 
-.ql-formats > * {
-  margin-left: 5px !important;
+.ql-formats > span.ql-color-picker {
+  padding: 0px !important;
+  height: auto !important;
+  width: auto !important;
+}
+
+.ql-formats > span.ql-color-picker > .ql-picker-label {
+  padding: 5px !important;
+  padding-bottom: 0px !important;
+  height: auto !important;
+  width: auto !important;
+  border-radius: 5px;
+  margin-left: 2px;
+  margin-right: 2px;
+}
+
+.ql-formats > span.ql-header {
+  padding: 0px !important;
+  height: auto !important;
+}
+
+.ql-formats > span.ql-header > .ql-picker-label {
+  padding: 5px !important;
+  height: auto !important;
+  border-radius: 5px;
+  margin-left: 2px;
+  margin-right: 2px;
+}
+
+.ql-formats > button {
+  width: auto !important;
+  height: auto !important;
+  padding: 5px !important;
+  border-radius: 5px;
+  margin-left: 2px;
+  margin-right: 2px;
 }
 
 .ql-header.ql-picker {
@@ -55,6 +89,7 @@
 .ql-snow .ql-toolbar .ql-picker-label.ql-active {
   color: var(--primary) !important;
   fill: var(--primary) !important;
+  background-color: var(--shade) !important;
   transition: color 300ms linear;
 }
 
@@ -161,16 +196,16 @@
 .ql-editor .ql-syntax,
 code {
   font-family: monospace !important;
-  font-size: 0.875rem;
+  font-size: 16px;
 }
 
 .ql-editor .ql-syntax * {
   font-family: monospace !important;
-  font-size: 0.875rem;
+  font-size: 16px;
 }
 
 .ql-editor {
-  font-size: 0.875rem;
+  font-size: 16px;
   color: var(--text) !important;
   padding: 10px 0px 10px 0px !important;
 }
@@ -182,4 +217,17 @@ code {
 .ql-editor h1 h2 h3 h4 h5 h6 {
   font-family: "Poppins", monospace !important;
   font-weight: 600 !important;
+}
+
+.ql-editor ul[data-checked="false"] > li::before,
+.ql-editor ul[data-checked="true"] > li::before {
+  font-size: 20px;
+}
+.ql-editor ul[data-checked="true"] > li::before {
+  color: var(--primary) !important;
+}
+
+.ql-editor ul[data-checked="true"] > li {
+  text-decoration: line-through;
+  text-decoration-color: var(--primary);
 }

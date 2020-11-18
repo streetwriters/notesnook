@@ -7,26 +7,27 @@ var changeTimeout;
 function TitleBox(props) {
   const { title, setTitle, changeInterval, shouldFocus } = props;
 
-  const [height, setHeight] = useState("auto");
+  const [height, setHeight] = useState(60);
   const inputRef = useRef();
 
   const resize = useCallback(() => {
     const textarea = document.querySelector(".editorTitle");
     const dummy = document.querySelector(".dummyEditorTitle");
     dummy.innerHTML = textarea.value;
-    setHeight(dummy.scrollHeight || 60);
+    setHeight(dummy.scrollHeight > 60 ? dummy.scrollHeight : 60);
   }, []);
 
   useEffect(() => {
     if (!window.ResizeObserver) return;
     const myObserver = new ResizeObserver((entries) => {
       const newHeight = entries[0].contentRect.height;
-      setHeight(newHeight);
+      setHeight(newHeight > 60 ? newHeight : 60);
     });
     myObserver.observe(document.querySelector(".dummyEditorTitle"));
   }, []);
 
   useEffect(() => {
+    console.log("title changged", title);
     if (!inputRef.current) return;
     clearTimeout(changeTimeout);
     inputRef.current.value = title;

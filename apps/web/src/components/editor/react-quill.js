@@ -9,10 +9,29 @@ import { Text } from "rebass";
 Quill.register("modules/markdownShortcuts", MarkdownShortcuts);
 Quill.register("modules/magicUrl", MagicUrl);
 
-const quillModules = {
+const List = Quill.import("formats/list");
+
+class BetterList extends List {
+  constructor(el) {
+    super(el);
+
+    const isCheckList = el.hasAttribute("data-checked");
+    el.addEventListener("touchstart", (e) => {
+      if (!isCheckList) {
+        return;
+      }
+      e.preventDefault();
+    });
+  }
+}
+
+Quill.register("formats/lists", BetterList);
+
+const quillModules = (isSimple) => ({
   toolbar: [
-    [{ header: [false, 1, 2, 3, 4, 5, 6] }],
+    //
     ["bold", "italic", "underline", "strike", "blockquote"],
+    [{ header: "2" }, { header: "3" }, { header: [false, 4, 5, 6] }],
     [
       { align: "" },
       { align: "center" },
@@ -22,6 +41,7 @@ const quillModules = {
     [
       { list: "ordered" },
       { list: "bullet" },
+      { list: "check" },
       { indent: "-1" },
       { indent: "+1" },
     ],
@@ -35,26 +55,7 @@ const quillModules = {
   markdownShortcuts: {},
   magicUrl: true,
   history: { maxStack: 1000 * 5 },
-};
-
-const simpleQuillModules = {
-  toolbar: [
-    ["bold", "italic", "underline", "strike", "blockquote"],
-    [
-      { list: "ordered" },
-      { list: "bullet" },
-      { indent: "-1" },
-      { indent: "+1" },
-    ],
-    [
-      { align: "" },
-      { align: "center" },
-      { align: "right" },
-      { align: "justify" },
-    ],
-    [{ direction: "rtl" }, "clean"],
-  ],
-};
+});
 
 export default class ReactQuill extends Component {
   /**
@@ -90,7 +91,7 @@ export default class ReactQuill extends Component {
       placeholder,
       bounds: container,
       scrollingContainer: scrollContainer,
-      modules: modules || (isSimple ? simpleQuillModules : quillModules),
+      modules: modules || quillModules(isSimple),
       theme: "snow",
       readOnly,
     });
@@ -137,6 +138,7 @@ export default class ReactQuill extends Component {
   render() {
     return (
       <Text
+        mx={[2, 2, 0]}
         as="pre"
         sx={{ cursor: "text" }}
         onClick={() => {

@@ -120,6 +120,7 @@ class EditorStore extends BaseStore {
 
       this.set((state) => {
         state.session.id = id;
+        state.session.title = db.notes.note(id).title;
         state.session.isSaving = false;
       });
 
