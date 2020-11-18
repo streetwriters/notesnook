@@ -1,6 +1,7 @@
 <html>
+
 <head>
-    <meta content="width=device-width, initial-scale=1, user-scalable=no" name="viewport"/>
+    <meta content="width=device-width, initial-scale=1, user-scalable=no" name="viewport" />
     <link href="fonts.css" rel="stylesheet">
     <link href="styles.css" rel="stylesheet">
     <style>
@@ -18,21 +19,20 @@
 </head>
 
 <body class="app-body">
-<div id="editor"></div>
-<div id="toolbar"></div>
+    <div id="editor"></div>
+    <div id="toolbar"></div>
 </body>
 
 <script src="constants.js"></script>
 <script src="listeners.js"></script>
 <script src="module.js"></script>
 <script src="quill.js"></script>
-
+<script src="image-resize.min.js"></script>
 <script>
     let editor;
 
     function loadAction() {
 
-        const Quill = require('quill');
         setFonts();
         Quill.register("modules/imageCompressor", imageCompressor);
 
@@ -45,6 +45,14 @@
                     maxWidth: 1024,
                     imageType: 'image/jpeg'
                 },
+                history: {
+                    delay: 2000,
+                    maxStack: 500,
+                    userOnly: true,
+                },
+                imageResize: {
+                    displaySize: true,
+                }
             },
             placeholder: ' ',
         });

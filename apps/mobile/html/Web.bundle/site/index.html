@@ -44,6 +44,7 @@
   <script src="listeners.js"></script>
   <script src="module.js"></script>
   <script src="quill.js"></script>
+  <script src="image-resize.min.js"></script>
 
   <script>
     let editor;
@@ -55,7 +56,6 @@
 
       let mainToolbar = premium ? proToolbar : simpleToolbar;
 
-      const Quill = requiring('quill');
 
       setFonts();
 
@@ -74,6 +74,9 @@
             maxStack: 500,
             userOnly: true,
           },
+          imageResize: {
+                    displaySize: true,
+          }
         },
         placeholder: 'Start writing your note',
         theme: 'snow',

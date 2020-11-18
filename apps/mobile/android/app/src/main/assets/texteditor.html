@@ -24,9 +24,8 @@
 
         <div id="titlebar">
             <form id="formBox">
-                
-                <textarea maxlength="150" id="titleInput" placeholder="Title here"
-                   ></textarea>
+
+                <textarea maxlength="150" id="titleInput" placeholder="Title here"></textarea>
                 <div id="textCopy"></div>
             </form>
             <div class="info-bar">
@@ -44,25 +43,24 @@
     <div id="toolbar"></div>
     </div>
 </body>
+<script src="module.js"></script>
 <script src="constants.js"></script>
 <script src="listeners.js"></script>
-<script src="module.js"></script>
 <script src="quill.js"></script>
-
+<script src="image-resize.min.js"></script>
 
 <script>
     let editor;
 
     function loadAction(premium, noMenu) {
-
-        const Quill = requiring('quill');
+        Image
         setFonts();
         Quill.register("modules/imageCompressor", imageCompressor);
         editor = new Quill('#editor', {
             modules: {
                 toolbar: premium ? proToolbar : simpleToolbar,
                 imageCompressor: {
-                    quality: 0.9,
+                    quality: 1,
                     maxWidth: 1024,
                     imageType: 'image/jpeg'
                 },
@@ -70,6 +68,9 @@
                     delay: 2000,
                     maxStack: 500,
                     userOnly: true
+                },
+                imageResize: {
+                    displaySize: true,
                 }
             },
             placeholder: 'Start writing your note',
