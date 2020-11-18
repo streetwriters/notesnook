@@ -6,7 +6,7 @@
 */
 .ql-container {
   box-sizing: border-box;
-  font-family: 'Noto Sans', sans-serif;
+  font-family: 'Poppins', sans-serif;
   margin: 0px;
   position: relative;
   height: calc(100% - 260px) !important;
@@ -90,14 +90,21 @@
 .ql-editor ul[data-checked='false'] > li * {
   pointer-events: all;
 }
+.ql-editor ul[data-checked='true'] > li {
+  text-decoration: line-through;
+}
 
-.ql-editor ul[data-checked='true'] > li::before {
+ .ql-editor ul[data-checked='true'] > li::before {
   content: '\2611';
+  font-size: 25px;
+  margin-right: 0px;
+  
 }
 
 .ql-editor ul[data-checked='false'] > li::before {
   content: '\2610';
-}
+  font-size: 25px;
+} 
 
 .ql-editor li::before {
   display: inline-block;
@@ -511,16 +518,17 @@
   cursor: pointer;
   display: inline-block;
   float: left;
-  height: 32px;
-  padding: 5px 15px;
-  width: 36px;
+  height: 40px !important;
+  width: 40px !important;
 }
 
 .ql-snow.ql-toolbar button svg,
 .ql-snow .ql-toolbar button svg {
-  float: left;
-  height: 100%;
+  height: 25px;
+  width: 25px;
+
 }
+
 
 .ql-snow.ql-toolbar button:active:hover,
 .ql-snow .ql-toolbar button:active:hover {
@@ -604,42 +612,42 @@
 .ql-snow .ql-direction.ql-active svg:first-child {
   display: none;
 }
-
 .ql-snow .ql-editor h1 {
   font-size: 2em;
-  font-family: 'DM Serif Text', sans-serif;
-  font-weight: 400 !important;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600 !important;
 }
 
 .ql-snow .ql-editor h2 {
   font-size: 1.5em;
-  font-family: 'DM Serif Text', sans-serif;
-  font-weight: 400 !important;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600 !important;
 }
 
 .ql-snow .ql-editor h3 {
   font-size: 1.17em;
-  font-family: 'DM Serif Text', sans-serif;
-  font-weight: 400 !important;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600 !important;
 }
 
 .ql-snow .ql-editor h4 {
   font-size: 1em;
-  font-family: 'DM Serif Text', sans-serif;
-  font-weight: 400 !important;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600 !important;
 }
 
 .ql-snow .ql-editor h5 {
   font-size: 0.83em;
-  font-family: 'DM Serif Text', sans-serif;
-  font-weight: 400 !important;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600 !important;
 }
 
 .ql-snow .ql-editor h6 {
   font-size: 0.67em;
-  font-family: 'DM Serif Text', sans-serif;
-  font-weight: 400 !important;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600 !important;
 }
+
 
 .ql-snow .ql-editor a {
   text-decoration: underline;
@@ -664,13 +672,13 @@
 .ql-snow .ql-picker-label {
   cursor: pointer;
   display: inline-block;
-  height: 100%;
   padding-left: 8px;
   padding-right: 2px;
-
   position: relative;
-  width: 110%;
+  padding-top:3px;
+  padding-bottom:3px;
 }
+
 
 .ql-snow .ql-picker-label::before {
   display: inline-block;
@@ -682,6 +690,8 @@
   display: block;
   padding-bottom: 5px;
   padding-top: 5px;
+  padding-right:5px;
+  padding-left:5px;
 }
 
 .ql-snow .ql-picker.ql-expanded .ql-picker-options {
@@ -706,18 +716,24 @@
   right: 4px;
 }
 
+#mdi-format-textdirection-l-to-r,
+#mdi-format-textdirection-r-to-l {
+  width: 20px !important;
+  height: 20px !important;
+  margin-top: 3px;
+}
 .ql-snow .ql-icon-picker .ql-picker-options {
-  padding: 4px 0px;
+  padding: 0px 0px;
 }
 
 .ql-snow .ql-icon-picker .ql-picker-item {
   height: 30px;
   width: 30px;
-  padding: 2px 4px;
+  padding: 5px 8px;
 }
 
 .ql-snow .ql-color-picker .ql-picker-options {
-  padding: 3px 5px;
+  padding: 0px !important;
   width: 194px;
 }
 
@@ -729,13 +745,20 @@
   padding: 0px;
   width: 20px;
 }
-
+#mdi-format-align-left,
+#mdi-format-align-center,
+#mdi-format-align-justify,
+#mdi-format-align-right {
+  width: 20px !important;
+  height: 20px !important;
+  margin-top: -1px;
+}
 .ql-snow .ql-picker:not(.ql-color-picker):not(.ql-icon-picker) svg {
   position: absolute;
-  margin-top: -9px;
   right: 0;
-  top: 50%;
+  top: calc(50% - 10px);
   width: 20px;
+  height: 20px;
 }
 
 .ql-snow
@@ -760,8 +783,9 @@
 }
 
 .ql-snow .ql-picker.ql-header {
-  width: 98px;
+  min-width: 98px;
 }
+
 
 .ql-snow .ql-picker.ql-header .ql-picker-label::before,
 .ql-snow .ql-picker.ql-header .ql-picker-item::before {
@@ -850,7 +874,7 @@
 }
 
 .ql-snow .ql-picker.ql-size {
-  width: 98px;
+  min-width: 98px;
 }
 
 .ql-snow .ql-picker.ql-size .ql-picker-label::before,
@@ -887,12 +911,21 @@
 
 .ql-toolbar.ql-snow {
   box-sizing: border-box;
-  font-family: 'Noto Sans', sans-serif;
-  padding: 8px;
+  font-family: 'Poppins', sans-serif;
+  padding-left: 12px;
+  padding-right:12px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  height:50px;
 }
 
 .ql-toolbar.ql-snow .ql-formats {
   margin-right: 15px;
+}
+
+.ql-toolbar.ql-snow .ql-formats button {
+  margin-left: 2.5px;
+  margin-right:2.5px;
 }
 
 .ql-toolbar.ql-snow .ql-picker-label {
@@ -907,6 +940,17 @@
   content: 'Visit URL:';
   line-height: 26px;
   margin-right: 8px;
+}
+.ql-snow .ql-picker {
+  vertical-align: middle;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.ql-snow .ql-picker .ql-picker-label {
+  font-size:14px;
+  width: 120px ;
 }
 
 .ql-snow .ql-tooltip a.ql-preview {
@@ -975,7 +1019,6 @@
 }
 
 .ql-toolbar.ql-snow .ql-picker-options {
-  border: 1px solid transparent;
   box-shadow: rgba(0, 0, 0, 0.2) 0 2px 8px;
 }
 
@@ -1064,8 +1107,9 @@
 #formBox > textarea {
   word-wrap: break-word; /* make sure the div and the textarea wrap words in the same way */
   box-sizing: border-box;
-  padding: 2px;
   width: 100%;
+  padding-left: 12px;
+  padding-right: 12px;
 }
 
 #formBox > textarea {
@@ -1093,7 +1137,9 @@
   margin-top: -8px;
   margin-bottom: 12px;
 }
-
+#titlebar textarea:focus {
+  outline: none;
+}
 #infowords {
   margin-right: 5px;
   margin-left: 5px;
@@ -1114,5 +1160,4 @@
 }
 .app-main {
   overflow: auto;
-  height: calc(100% - 65px);
 }

@@ -41,7 +41,6 @@
         <div id="editor"></div>
     </div>
     <div id="toolbar"></div>
-    </div>
 </body>
 <script src="module.js"></script>
 <script src="constants.js"></script>
@@ -52,10 +51,27 @@
 <script>
     let editor;
 
+    const List = Quill.import("formats/list");
+
+    class BetterList extends List {
+        constructor(el) {
+            super(el);
+            const isCheckList = el.hasAttribute("data-checked");
+            el.addEventListener("touchstart", e => {
+                if (!isCheckList) {
+                    return;
+                }
+                e.preventDefault();
+            });
+        }
+    }
+
     function loadAction(premium, noMenu) {
         Image
         setFonts();
         Quill.register("modules/imageCompressor", imageCompressor);
+
+        Quill.register("formats/lists", BetterList);
         editor = new Quill('#editor', {
             modules: {
                 toolbar: premium ? proToolbar : simpleToolbar,

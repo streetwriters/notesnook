@@ -1,97 +1,100 @@
 <html>
-  <head>
-    <meta
-      content="width=device-width, initial-scale=1, user-scalable=no"
-      name="viewport"
-    />
-    <link href="fonts.css" rel="stylesheet" />
-    <link href="styles.css" rel="stylesheet" />
-    <style>
-      .ql-toolbar {
-        overflow-x: auto;
-        width: 100vw;
-        white-space: nowrap;
-        position: fixed;
-        height: 50px;
-        bottom: 0px;
-        left: 0px;
-      }
-    </style>
-  </head>
 
-  <body class="app-body">
-    <div class="app-main">
-      <div id="titlebar">
-        <form id="formBox">
-           <textarea maxlength="150" id="titleInput" placeholder="Title here"
-                   ></textarea>
-            <div id="textCopy"></div>
-        </form>
-         <div class="info-bar">
-            <p id="infowords"></p>
-            <p>-</p>
-            <p id="infodate"></p>
-            <p>-</p>
-            <p id="infosaved"></p>
-          </div>
+<head>
+  <meta content="width=device-width, initial-scale=1, user-scalable=no" name="viewport" />
+  <link href="fonts.css" rel="stylesheet" />
+  <link href="styles.css" rel="stylesheet" />
+
+  <style>
+     .ql-toolbar {
+    background-color:transparent;
+    overflow-x: auto;
+    width: 100vw;
+    white-space: nowrap;
+    position: absolute;
+    bottom: 0px;
+    height: 50px;
+    left: 0px;
+  }
+  .ql-toolbar::-webkit-scrollbar {
+    display: none;
+  }
+  </style>
+
+</head>
+
+<body class="app-body">
+  <div class="app-main">
+    <div id="titlebar">
+      <form id="formBox">
+        <textarea maxlength="150" id="titleInput" placeholder="Title here"></textarea>
+        <div id="textCopy"></div>
+      </form>
+      <div class="info-bar">
+        <p id="infowords"></p>
+        <p>-</p>
+        <p id="infodate"></p>
+        <p>-</p>
+        <p id="infosaved"></p>
       </div>
-      <div id="editor"></div>
-      <div id="toolbar"></div>
     </div>
-  </body>
+    <div id="editor"></div>
+  </div>
+  <div id="toolbar"></div>
+</body>
 
-  <script src="constants.js"></script>
-  <script src="listeners.js"></script>
-  <script src="module.js"></script>
-  <script src="quill.js"></script>
-  <script src="image-resize.min.js"></script>
+<script src="constants.js"></script>
+<script src="listeners.js"></script>
+<script src="module.js"></script>
+<script src="quill.js"></script>
+<script src="image-resize.min.js"></script>
 
-  <script>
-    let editor;
+<script>
+  let editor;
 
-    function loadAction(premium, noMenu) {
-      let titleIn = document.getElementById('titlebar');
-      titleIn.style['padding-left'] = 0;
-      titleIn.style['padding-right'] = 0;
+  function loadAction(premium, noMenu) {
+    let titleIn = document.getElementById('titlebar');
+    titleIn.style['padding-left'] = 0;
+    titleIn.style['padding-right'] = 0;
 
-      let mainToolbar = premium ? proToolbar : simpleToolbar;
+    let mainToolbar = premium ? proToolbar : simpleToolbar;
+    setFonts();
 
+    Quill.register('modules/imageCompressor', imageCompressor);
 
-      setFonts();
-
-      Quill.register('modules/imageCompressor', imageCompressor);
-
-      editor = new Quill('#editor', {
-        modules: {
-          toolbar: mainToolbar,
-          imageCompressor: {
-            quality: 0.9,
-            maxWidth: 1024,
-            imageType: 'image/jpeg',
-          },
-          history: {
-            delay: 2000,
-            maxStack: 500,
-            userOnly: true,
-          },
-          imageResize: {
-                    displaySize: true,
-          }
+    editor = new Quill('#editor', {
+      modules: {
+        toolbar: mainToolbar,
+        imageCompressor: {
+          quality: 0.9,
+          maxWidth: 1024,
+          imageType: 'image/jpeg',
         },
-        placeholder: 'Start writing your note',
-        theme: 'snow',
-        scrollingContainer: '.app-main',
-      });
+        history: {
+          delay: 2000,
+          maxStack: 500,
+          userOnly: true,
+        },
+        imageResize: {
+          displaySize: true,
+        }
+      },
+      placeholder: 'Start writing your note',
+      theme: 'snow',
+      scrollingContainer: '.app-main',
+    });
 
-      let Font = Quill.import('formats/font');
-      Font.whitelist = fontNames;
-      Quill.register(Font, true);
+    let Font = Quill.import('formats/font');
+    Font.whitelist = fontNames;
+    Quill.register(Font, true);
 
-      addLinkMatcher();
-      attachTitleInputListeners();
-      setTheme();
-      attachEditorListeners();
-      fixDropdownMenuLocations();
-    }
-  </script>
+    addLinkMatcher();
+    attachTitleInputListeners();
+    setTheme();
+    attachEditorListeners();
+    fixDropdownMenuLocations();
+  }
+  loadAction(true);
+</script>
+
 </html>
