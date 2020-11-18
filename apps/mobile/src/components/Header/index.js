@@ -39,7 +39,7 @@ export const Header = ({root}) => {
       style={[
         styles.container,
         {
-          marginTop: insets.top,
+          marginTop:Platform.OS === "android"? insets.top : null,
           backgroundColor: colors.bg,
           overflow: 'hidden',
           borderBottomWidth: 1,
