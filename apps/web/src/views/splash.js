@@ -4,6 +4,7 @@ import ThemeProvider from "../components/theme-provider";
 import Animated from "../components/animated";
 import { db } from "../common";
 import { getRandom } from "../utils/random";
+import * as Sentry from "@sentry/react";
 
 const loadingLines = [
   "Ejecting bumfuzzled notes",
@@ -22,6 +23,10 @@ function Splash(props) {
         await db.init();
         setLoading(false);
       } catch (e) {
+        Sentry.captureException(e, (scope) => {
+          scope.setExtra("where", "db.init");
+          return scope;
+        });
         console.error(e);
       }
     })();

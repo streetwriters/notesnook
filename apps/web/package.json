@@ -6,6 +6,8 @@
     "@mdi/js": "^5.0.45",
     "@mdi/react": "^1.4.0",
     "@rebass/forms": "^4.0.6",
+    "@sentry/react": "^5.27.4",
+    "@sentry/tracing": "^5.27.4",
     "cogo-toast": "^4.2.3",
     "dayjs": "^1.9.1",
     "emotion-theming": "^10.0.19",
@@ -33,6 +35,7 @@
     "zustand": "^2.2.3"
   },
   "devDependencies": {
+    "@sentry/types": "^5.27.4",
     "@types/hookrouter": "^2.2.3",
     "@types/jest": "^26.0.14",
     "@types/jest-image-snapshot": "^4.1.0",

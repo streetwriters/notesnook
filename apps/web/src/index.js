@@ -3,12 +3,29 @@ import "react-app-polyfill/ie9";
 import "./utils/dimensions";
 import React from "react";
 import ReactDOM from "react-dom";
+import * as Sentry from "@sentry/react";
+import { Integrations } from "@sentry/tracing";
 import "./index.css";
 import App from "./App";
 import * as serviceWorker from "./serviceWorker";
 import Modal from "react-modal";
 import { MotionConfig, AnimationFeature, GesturesFeature } from "framer-motion";
 import Splash from "./views/splash";
+
+Sentry.init({
+  dsn:
+    "https://647084abf3de441c83c17d2b603633b8@o477952.ingest.sentry.io/5520885",
+  integrations: [new Integrations.BrowserTracing()],
+  beforeSend: (event) => {
+    if (event.exception || event.extra.report === true) {
+      Sentry.showReportDialog();
+    }
+    return event;
+  },
+  // We recommend adjusting this value in production, or using tracesSampler
+  // for finer control
+  tracesSampleRate: 1.0,
+});
 
 Modal.setAppElement("#root");
 ReactDOM.render(
