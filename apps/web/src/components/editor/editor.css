@@ -206,9 +206,15 @@ code {
 
 .ql-editor {
   font-size: 16px;
+  line-height: 1.6 !important;
   color: var(--text) !important;
   padding: 10px 0px 10px 0px !important;
 }
+
+.ql-editor > p {
+  margin-bottom: 20px !important;
+}
+
 .ql-editor.ql-blank::before {
   left: 0px !important;
   right: 0px !important;
@@ -223,6 +229,7 @@ code {
 .ql-editor ul[data-checked="true"] > li::before {
   font-size: 20px;
 }
+
 .ql-editor ul[data-checked="true"] > li::before {
   color: var(--primary) !important;
 }

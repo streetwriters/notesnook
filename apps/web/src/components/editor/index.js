@@ -140,6 +140,7 @@ function Editor() {
               ref={quillRef}
               refresh={sessionState === SESSION_STATES.new}
               isSimple={!isLoggedin || (isLoggedin && !isTrial)}
+              isFocusMode={isFocusMode}
               onFocus={() => {
                 toggleProperties(false);
               }}

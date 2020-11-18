@@ -2,34 +2,18 @@ import React, { Component } from "react";
 import Quill from "quill";
 import "quill/dist/quill.snow.css";
 import "quill/dist/quill.core.css";
+import "./modules/betterlist";
 import MarkdownShortcuts from "./modules/markdown";
 import MagicUrl from "quill-magic-url";
 import { Text } from "rebass";
+import QuillFocus from "./modules/focus";
 
 Quill.register("modules/markdownShortcuts", MarkdownShortcuts);
 Quill.register("modules/magicUrl", MagicUrl);
+Quill.register("modules/focus", QuillFocus);
 
-const List = Quill.import("formats/list");
-
-class BetterList extends List {
-  constructor(el) {
-    super(el);
-
-    const isCheckList = el.hasAttribute("data-checked");
-    el.addEventListener("touchstart", (e) => {
-      if (!isCheckList) {
-        return;
-      }
-      e.preventDefault();
-    });
-  }
-}
-
-Quill.register("formats/lists", BetterList);
-
-const quillModules = (isSimple) => ({
+const quillModules = (_isSimple, isFocusMode) => ({
   toolbar: [
-    //
     ["bold", "italic", "underline", "strike", "blockquote"],
     [{ header: "2" }, { header: "3" }, { header: [false, 4, 5, 6] }],
     [
@@ -38,13 +22,8 @@ const quillModules = (isSimple) => ({
       { align: "right" },
       { align: "justify" },
     ],
-    [
-      { list: "ordered" },
-      { list: "bullet" },
-      { list: "check" },
-      { indent: "-1" },
-      { indent: "+1" },
-    ],
+    [{ list: "ordered" }, { list: "bullet" }, { list: "check" }],
+    [{ indent: "-1" }, { indent: "+1" }],
     [{ size: ["small", false, "large", "huge"] }],
     ["code-block", { script: "sub" }, { script: "super" }],
     [{ color: [] }, { background: [] }],
@@ -55,6 +34,10 @@ const quillModules = (isSimple) => ({
   markdownShortcuts: {},
   magicUrl: true,
   history: { maxStack: 1000 * 5 },
+  focus: {
+    enabled: isFocusMode,
+    focusClass: "focused-blot", // Defaults to .focused-blot.
+  },
 });
 
 export default class ReactQuill extends Component {
@@ -68,13 +51,26 @@ export default class ReactQuill extends Component {
   }
 
   shouldComponentUpdate(nextProps) {
+    console.log("should", nextProps.isFocusMode, this.props.isFocusMode);
     return (
       this.props.readOnly !== nextProps.readOnly ||
-      this.props.isSimple !== nextProps.isSimple
+      this.props.isSimple !== nextProps.isSimple ||
+      this.props.isFocusMode !== nextProps.isFocusMode
     );
   }
 
+  componentDidUpdate() {
+    const { isFocusMode } = this.props;
+
+    const focus = this.quill.getModule("focus");
+    focus.toggle(isFocusMode);
+  }
+
   componentDidMount() {
+    this._initializeQuill();
+  }
+
+  _initializeQuill() {
     const {
       placeholder,
       container,
@@ -86,12 +82,14 @@ export default class ReactQuill extends Component {
       modules,
       id,
       isSimple,
+      isFocusMode,
     } = this.props;
+
     this.quill = new Quill("#" + id, {
       placeholder,
       bounds: container,
       scrollingContainer: scrollContainer,
-      modules: modules || quillModules(isSimple),
+      modules: modules || quillModules(isSimple, isFocusMode),
       theme: "snow",
       readOnly,
     });
