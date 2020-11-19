@@ -1,19 +1,17 @@
-import React, {useCallback, useEffect, useState} from 'react';
-import {AddTopicEvent} from '../../components/DialogManager/recievers';
-import {NotebookItem} from '../../components/NotebookItem';
-import SelectionWrapper from '../../components/SelectionWrapper';
+import React, { useEffect, useState } from 'react';
+import { ContainerBottomButton } from '../../components/Container/ContainerBottomButton';
+import { AddTopicEvent } from '../../components/DialogManager/recievers';
 import SimpleList from '../../components/SimpleList';
-import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
-import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
+import { useTracked } from '../../provider';
+import { Actions } from '../../provider/Actions';
 import {
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent,
+  eUnSubscribeEvent
 } from '../../services/EventManager';
-import {eOnNewTopicAdded, eScrollEvent, eUpdateSearchState} from '../../utils/Events';
-import NavigationService from '../../services/Navigation';
-import {db} from "../../utils/DB";
+import SearchService from '../../services/SearchService';
+import { db } from "../../utils/DB";
+import { eOnNewTopicAdded, eScrollEvent } from '../../utils/Events';
 
 export const Notebook = ({route, navigation}) => {
   const [, dispatch] = useTracked();
@@ -40,6 +38,7 @@ export const Notebook = ({route, navigation}) => {
   }, []);
 
   const onFocus = () => {
+    eSendEvent(eScrollEvent, {name: params.title, type: 'in'});
     onLoad();
     dispatch({
       type: Actions.HEADER_TEXT_STATE,
@@ -49,6 +48,12 @@ export const Notebook = ({route, navigation}) => {
     });
 
     updateSearch();
+    dispatch({
+      type: Actions.CONTAINER_BOTTOM_BUTTON,
+      state: {
+        onPress:_onPressBottomButton
+      },
+    });
 
     dispatch({
       type: Actions.CURRENT_SCREEN,
@@ -59,9 +64,13 @@ export const Notebook = ({route, navigation}) => {
   useEffect(() => {
     navigation.addListener('focus', onFocus);
     return () => {
+      eSendEvent(eScrollEvent, {name: params.title, type: 'back'});
       navigation.removeListener('focus', onFocus);
     };
-  });
+  },[]);
+
+
+
 
 
   useEffect(() => {
@@ -71,18 +80,11 @@ export const Notebook = ({route, navigation}) => {
   }, [topics]);
 
   const updateSearch = () => {
-    if (topics.length === 0) {
-      eSendEvent('showSearch', true);
-    } else {
-      eSendEvent('showSearch');
-      eSendEvent(eUpdateSearchState,{
-        placeholder: `Search in "${params.title}"`,
-        data: topics,
-        noSearch: false,
-        type: 'topics',
-        color: null,
-      })
-    }
+    SearchService.update({
+      placeholder: `Search in "${params.title}"`,
+      data: topics,
+      type: 'topics',
+    });
   };
 
 
@@ -102,7 +104,6 @@ export const Notebook = ({route, navigation}) => {
           onLoad();
         }}
         focused={() => navigation.isFocused()}
-        RenderItem={RenderItem}
         placeholder={<></>}
         placeholderText=""
       />
@@ -116,7 +117,7 @@ export const Notebook = ({route, navigation}) => {
 };
 
 export default Notebook;
-
+/* 
 const RenderItem = ({item, index}) => {
   const [state, dispatch] = useTracked();
   const {colors,selectionMode } = state;
@@ -124,7 +125,7 @@ const RenderItem = ({item, index}) => {
   return (
     <SelectionWrapper
       onPress={() => {
-        NavigationService.navigate('Notes', {
+        NavigationService.navigate('NotesPage', {
           ...item,
         });
       }}
@@ -155,3 +156,4 @@ const RenderItem = ({item, index}) => {
     </SelectionWrapper>
   );
 };
+ */

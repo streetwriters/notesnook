@@ -8,9 +8,11 @@ import {dHeight, itemSkus, dWidth} from '../../utils';
 import ActionSheet from '../ActionSheet';
 import {Button} from '../Button';
 import Seperator from '../Seperator';
-import {SIZE, WEIGHT} from "../../utils/SizeUtils";
-import {db} from "../../utils/DB";
-import {DDS} from "../../services/DeviceDetection";
+import {SIZE, WEIGHT} from '../../utils/SizeUtils';
+import {db} from '../../utils/DB';
+import {DDS} from '../../services/DeviceDetection';
+import Heading from '../Typography/Heading';
+import Paragraph from '../Typography/Paragraph';
 class PremiumDialog extends React.Component {
   constructor(props) {
     super(props);
@@ -39,7 +41,6 @@ class PremiumDialog extends React.Component {
     this.actionSheetRef.current?._setModalVisible(false);
   }
 
-
   async getSkus() {
     try {
       let u = await db.user.get();
@@ -48,8 +49,8 @@ class PremiumDialog extends React.Component {
         user: u && u.Id ? u : null,
         product: prod[0],
       });
-    } catch(e) {
-      console.log(e,"SKU ERROR")
+    } catch (e) {
+      console.log(e, 'SKU ERROR');
     }
   }
 
@@ -79,6 +80,8 @@ class PremiumDialog extends React.Component {
           alignSelf: 'center',
           borderRadius: 10,
           marginBottom: DDS.isTab ? 50 : 0,
+          borderBottomRightRadius: 0,
+          borderBottomLeftRadius: 0,
         }}
         onOpen={async () => {
           await this.getSkus();
@@ -106,17 +109,15 @@ class PremiumDialog extends React.Component {
             borderRadius: 10,
             paddingTop: 10,
           }}>
-          <Text
+          <Heading
+            size={SIZE.xxxl}
             style={{
-              fontSize: SIZE.xxxl,
-              fontFamily: WEIGHT.bold,
-              color: colors.heading,
               paddingBottom: 20,
               paddingTop: 10,
               alignSelf: 'center',
             }}>
-            Notesnook Pro
-          </Text>
+            Get Notesnook Pro
+          </Heading>
 
           <ScrollView
             nestedScrollEnabled={true}
@@ -183,26 +184,24 @@ class PremiumDialog extends React.Component {
                     color={colors.accent}
                   />
 
-                  <Text
+                  <Heading
+                    SIZE={SIZE.md}
                     style={{
                       marginLeft: 10,
-                      fontFamily: WEIGHT.regular,
-                      fontSize: SIZE.md,
                       maxWidth: '85%',
-                      color: colors.heading,
                     }}>
                     {item.title} {'\n'}
-                    <Text
+                    <Paragraph
+                      SIZE={SIZE.xs}
+                      color={colors.icon}
                       style={{
                         marginLeft: 10,
-                        fontFamily: WEIGHT.regular,
-                        fontSize: SIZE.xs + 1,
                         maxWidth: '85%',
-                        color: colors.icon,
+                        fontWeight: '400',
                       }}>
                       {item.description}
-                    </Text>
-                  </Text>
+                    </Paragraph>
+                  </Heading>
                 </View>
               </View>
             ))}
@@ -217,41 +216,30 @@ class PremiumDialog extends React.Component {
               backgroundColor: colors.shade,
               paddingHorizontal: 12,
             }}>
-            <Text
-              style={{
-                fontSize: SIZE.xl,
-                fontFamily: WEIGHT.bold,
-                color: colors.accent,
-              }}>
+            <Heading size={SIZE.xl} color={colors.accent}>
               {!this.state.user ? 'Try it Now' : 'Upgrade Now'}
               {'\n'}
-              <Text
+              <Paragraph
+                size={SIZE.sm}
                 style={{
-                  fontSize: 12,
-                  color: colors.pri,
-                  fontFamily: WEIGHT.regular,
+                  fontWeight: '400',
                 }}>
                 {this.state.user
                   ? 'Cancel anytime in Subscriptions on Google Play'
                   : 'Start your 14 Day Trial for Free (no credit card needed)'}
-              </Text>
-            </Text>
-            <Text
+              </Paragraph>
+            </Heading>
+            <Paragraph
+              size={SIZE.xl}
               style={{
                 fontSize: SIZE.xl,
-                fontFamily: WEIGHT.medium,
-                color: colors.pri,
                 paddingVertical: 15,
               }}>
               {this.state.product?.localizedPrice}
-              <Text
-                style={{
-                  color: colors.accent,
-                  fontSize: 12,
-                }}>
+              <Paragraph color={colors.accent} size={SIZE.sm}>
                 /mo
-              </Text>
-            </Text>
+              </Paragraph>
+            </Paragraph>
             <Button
               onPress={() => {
                 if (!this.state.user) {
@@ -270,6 +258,7 @@ class PremiumDialog extends React.Component {
               title={
                 this.state.user ? 'Subscribe to Notesnook Pro' : 'Sign Up Now'
               }
+              type="accent"
               height={50}
               width="100%"
             />

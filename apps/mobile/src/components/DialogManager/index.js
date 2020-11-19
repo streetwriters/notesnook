@@ -41,11 +41,12 @@ import RecoveryKeyDialog from '../RecoveryKeyDialog';
 import RestoreDialog from '../RestoreDialog';
 import {VaultDialog} from '../VaultDialog';
 import {TEMPLATE_DELETE, TEMPLATE_PERMANANT_DELETE} from './Templates';
-import {hexToRGBA} from "../../utils/ColorUtils";
-import {DDS} from "../../services/DeviceDetection";
+import {hexToRGBA} from '../../utils/ColorUtils';
+import {DDS} from '../../services/DeviceDetection';
 import ResultDialog from '../ResultDialog';
-import SortDialog from "../SortDialog";
+import SortDialog from '../SortDialog';
 import JumpToDialog from '../JumpToDialog';
+import {GetPremium,translatePrem} from '../ActionSheetComponent/GetPremium';
 
 export class DialogManager extends Component {
   constructor(props) {
@@ -228,7 +229,12 @@ export class DialogManager extends Component {
       switch (this.show) {
         case 'delete': {
           if (this.state.item.locked) {
-            openVault(this.state.item, true, true, false, false, false, true);
+            openVault({
+              item:this.state.item,
+              novault:true,
+              locked:true,
+              deleteNote:true,
+            })
           } else {
             this._showSimpleDialog(TEMPLATE_DELETE(this.state.item.type));
           }
@@ -239,15 +245,29 @@ export class DialogManager extends Component {
           break;
         }
         case 'novault': {
-          openVault(this.state.item, false);
+          openVault({
+            item:this.state.item,
+            novault:false,
+            locked:true,
+            deleteNote:true,
+          })
           break;
         }
         case 'locked': {
-          openVault(this.state.item, true, true);
+          openVault({
+            item:this.state.item,
+            novault:true,
+            locked:true,
+          })
           break;
         }
         case 'unlock': {
-          openVault(this.state.item, true, true, true, false, false);
+          openVault({
+            item:this.state.item,
+            novault:true,
+            locked:true,
+            permanant:true
+          })
           break;
         }
         case 'notebook': {
@@ -285,7 +305,7 @@ export class DialogManager extends Component {
           containerStyle={{
             backgroundColor: colors.bg,
             width: DDS.isTab ? 500 : '100%',
-            alignSelf:'center',
+            alignSelf: 'center',
             borderRadius: 10,
             marginBottom: DDS.isTab ? 50 : 0,
           }}
@@ -294,6 +314,13 @@ export class DialogManager extends Component {
             Platform.ios
               ? hexToRGBA(colors.accent + '19')
               : hexToRGBA(colors.shade)
+          }
+          premium={
+            <GetPremium
+              context="sheet"
+              close={() => this.actionSheet._hideModal()}
+              offset={50}
+            />
           }
           keyboardShouldPersistTaps="always"
           delayActionSheetDraw={true}
@@ -309,9 +336,10 @@ export class DialogManager extends Component {
               : null
           }
           initialOffsetFromBottom={1}
-          bounceOnOpen={true}
+          bounceOnOpen={false}
           gestureEnabled={true}
           onClose={() => {
+            translatePrem.setValue(-800)
             this.onActionSheetHide();
           }}>
           <ActionSheetComponent
@@ -366,13 +394,12 @@ export class DialogManager extends Component {
         <PendingDialog colors={colors} />
         <PremiumStatusDialog />
         <ProgressDialog />
-        <RestoreDialog/>
-        <ResultDialog/>
+        <RestoreDialog />
+        <ResultDialog />
         <VaultDialog colors={colors} />
         <MoveNoteDialog colors={colors} />
         <SortDialog colors={colors} />
-        <JumpToDialog/>
-
+        <JumpToDialog />
       </>
     );
   }

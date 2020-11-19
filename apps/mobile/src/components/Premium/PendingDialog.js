@@ -5,9 +5,11 @@ import {eClosePendingDialog, eOpenPendingDialog} from '../../utils/Events';
 import {dWidth} from '../../utils';
 import ActionSheet from '../ActionSheet';
 import Seperator from '../Seperator';
-import {SIZE, WEIGHT} from "../../utils/SizeUtils";
-import {db} from "../../utils/DB";
-import {DDS} from "../../services/DeviceDetection";
+import {SIZE, WEIGHT} from '../../utils/SizeUtils';
+import {db} from '../../utils/DB';
+import {DDS} from '../../services/DeviceDetection';
+import Paragraph from '../Typography/Paragraph';
+import Heading from '../Typography/Heading';
 
 const actionSheet = createRef();
 class PendingDialog extends React.Component {
@@ -54,7 +56,7 @@ class PendingDialog extends React.Component {
         containerStyle={{
           backgroundColor: colors.bg,
           alignSelf: 'center',
-          width: DDS.isTab? 500 : '100%',
+          width: DDS.isTab ? 500 : '100%',
           borderRadius: 10,
           marginBottom: DDS.isTab ? 50 : 0,
         }}
@@ -74,39 +76,37 @@ class PendingDialog extends React.Component {
         initialOffsetFromBottom={1}>
         <View
           style={{
-            width: DDS.isTab? 500 : dWidth,
+            width: DDS.isTab ? 500 : dWidth,
             backgroundColor: colors.bg,
             justifyContent: 'space-between',
             paddingHorizontal: 12,
             borderRadius: 10,
             paddingTop: 10,
           }}>
-          <Text
+          <Heading
+            size={SIZE.xxxl}
+            color={colors.accent}
             style={{
-              fontSize: SIZE.xxxl,
-              fontFamily: WEIGHT.bold,
-              color: colors.accent,
               paddingBottom: 20,
               paddingTop: 10,
               alignSelf: 'center',
             }}>
             Thank you!
-          </Text>
+          </Heading>
 
           <Seperator />
 
-          <Text
+          <Paragraph
+            size={SIZE.md}
             style={{
               fontSize: SIZE.md,
-              fontFamily: WEIGHT.regular,
-              color: colors.pri,
               width: '80%',
               alignSelf: 'center',
               textAlign: 'center',
             }}>
             We are processing your subscription. You account will be upgraded to
             Notesnook Pro very soon.
-          </Text>
+          </Paragraph>
           <Seperator />
         </View>
       </ActionSheet>

@@ -499,6 +499,7 @@ export default class ActionSheet extends Component {
               width: '100%',
             },
           ]}>
+            {this.props.premium}
           <FlatList
             bounces={false}
             keyboardShouldPersistTaps={keyboardShouldPersistTaps}

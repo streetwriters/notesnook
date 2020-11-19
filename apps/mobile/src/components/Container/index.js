@@ -1,20 +1,18 @@
 import React from 'react';
 import {KeyboardAvoidingView, Platform, SafeAreaView} from 'react-native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import { useTracked } from '../../provider';
 import SelectionHeader from '../SelectionHeader';
 import {ContainerTopSection} from './ContainerTopSection';
 
 export const Container = ({children, root}) => {
-  const  insets = useSafeAreaInsets()
-
+  const [state] = useTracked();
+  const {colors, } = state;
   return (
-    <KeyboardAvoidingView
-      behavior="padding"
-      enabled={Platform.OS === 'ios'}>
+    <KeyboardAvoidingView behavior="padding" enabled={Platform.OS === 'ios'}>
       <SafeAreaView
         style={{
           height: '100%',
-          paddingTop: insets.top,
+          backgroundColor:colors.bg
         }}>
         <SelectionHeader />
         <ContainerTopSection root={root} />

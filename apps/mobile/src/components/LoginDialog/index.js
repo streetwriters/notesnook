@@ -1,4 +1,3 @@
-import CheckBox from '@react-native-community/checkbox';
 import React, {createRef, useEffect, useState} from 'react';
 import {Modal, Text, TouchableOpacity, View} from 'react-native';
 import {TextInput} from 'react-native-gesture-handler';
@@ -29,10 +28,11 @@ import {
   eStartSyncer,
   refreshNotesPage,
 } from '../../utils/Events';
-import {opacity, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
+import {pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
 import {ActionIcon} from '../ActionIcon';
-import {Loading} from '../Loading';
+import {ListHeaderComponent} from '../SimpleList/ListHeaderComponent';
+import Paragraph from '../Typography/Paragraph';
 
 const LoginDialog = () => {
   const [state, dispatch] = useTracked();
@@ -73,6 +73,7 @@ const LoginDialog = () => {
   }
 
   const close = () => {
+    if (loggingIn || signingIn) return;
     _email.current?.clear();
     _pass.current?.clear();
     _passConfirm.current?.clear();
@@ -235,107 +236,69 @@ const LoginDialog = () => {
         ) : null}
         <View
           style={{
-            height:
-              DDS.isTab && !DDS.isSmallTab
-                ? login
-                  ? '70%'
-                  : '80%'
-                : DDS.isSmallTab
-                ? login
-                  ? '50%'
-                  : '65%'
-                : '100%',
+            maxHeight: DDS.isLargeTablet() ? '90%' : '100%',
+            minHeight: '50%',
+            height: DDS.isLargeTablet() ? null : '100%',
             width: DDS.isTab ? 500 : '100%',
-            backgroundColor: colors.bg,
-            justifyContent: 'center',
             borderRadius: DDS.isTab ? 5 : 0,
+            backgroundColor: colors.bg,
             zIndex: 10,
             ...getElevation(DDS.isTab ? 5 : 0),
+            paddingBottom: DDS.isLargeTablet() ? 20 : 0,
           }}>
           <Toast context="local" />
-          {loggingIn || signingIn ? (
-            <View
-              style={{
-                backgroundColor: !colors.night
-                  ? 'rgba(0,0,0,0.2)'
-                  : 'rgba(255,255,255,0.2)',
-                zIndex: 10,
-                position: 'absolute',
-                justifyContent: 'center',
-                alignItems: 'center',
-                width: '100%',
-                height: '100%',
-              }}>
-              <Loading
-                tagline={status}
-                customStyle={{
-                  alignSelf: 'center',
-                  backgroundColor: colors.bg,
-                  ...getElevation(5),
-                  borderRadius: 5,
-                  width: '80%',
-                  height: 100,
-                }}
-              />
-            </View>
-          ) : null}
-
-          {DDS.isTab ? null : (
-            <ActionIcon
-              name="arrow-left"
-              size={SIZE.xxxl}
-              onPress={() => {
-                close();
-              }}
-              customStyle={{
-                width: 40,
-                height: 40,
-                position: 'absolute',
-                top: 0,
-                marginBottom: 15,
-                zIndex: 10,
-                left: 0,
-                marginLeft: 7,
-                marginTop: 5,
-              }}
-              color={colors.heading}
-            />
-          )}
 
           <View
             style={{
-              justifyContent: 'center',
-              width: '100%',
-              height: '100%',
-              alignSelf: 'center',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
               paddingHorizontal: 12,
+              height: 50,
             }}>
-            <View
-              style={{
-                marginBottom: 25,
-              }}>
-              <Text
-                style={{
-                  color: colors.accent,
-                  fontFamily: WEIGHT.bold,
-                  fontSize: SIZE.xxxl,
-                }}>
-                {login ? 'Login' : 'Sign Up'}
-                {'\n'}
-                <Text
-                  style={{
-                    color: colors.icon,
-                    fontSize: SIZE.md,
-                    fontFamily: WEIGHT.regular,
-                  }}>
-                  {login
-                    ? 'Get all your notes from other devices'
-                    : 'Create an account to access notes anywhere.'}
-                  {}
-                </Text>
-              </Text>
-            </View>
+            {DDS.isLargeTablet() ? (
+              <View />
+            ) : (
+              <ActionIcon
+                name="arrow-left"
+                size={SIZE.xxxl}
+                onPress={() => {
+                  close();
+                }}
+                customStyle={{
+                  width: 40,
+                  height: 40,
+                  marginLeft: -5,
+                }}
+                color={colors.heading}
+              />
+            )}
 
+            <Paragraph
+              onPress={() => setLogin(!login)}
+              size={SIZE.md}
+              color={colors.accent}>
+              {login ? 'Sign Up' : 'Login'}
+            </Paragraph>
+          </View>
+
+          <ListHeaderComponent
+            color="transparent"
+            type="settings"
+            shouldShow
+            title={login ? 'Login' : 'Sign Up'}
+            messageCard={false}
+            onPress={() => {
+              setLogin(!login);
+            }}
+            paragraph={login ? 'create an account' : 'login to your account'}
+          />
+
+          <View
+            style={{
+              paddingHorizontal: 12,
+              paddingTop: 12,
+            }}>
             <>
               <TextInput
                 ref={_username}
@@ -348,6 +311,7 @@ const LoginDialog = () => {
                     });
                   }
                 }}
+                editable={!loggingIn || !signingIn}
                 autoCapitalize="none"
                 defaultValue={username}
                 onBlur={() => {
@@ -397,7 +361,7 @@ const LoginDialog = () => {
                   height: 50,
                   borderBottomWidth: 1,
                   borderColor: colors.nav,
-                  fontSize: SIZE.sm,
+                  fontSize: SIZE.md,
                   fontFamily: WEIGHT.regular,
                   color: colors.pri,
                 }}
@@ -405,12 +369,11 @@ const LoginDialog = () => {
                 placeholderTextColor={colors.icon}
               />
               {invalidUsername ? (
-                <Text
+                <Paragraph
+                  size={SIZE.xs}
                   style={{
                     textAlign: 'right',
-                    fontFamily: WEIGHT.regular,
                     textAlignVertical: 'bottom',
-                    fontSize: SIZE.xs,
                     marginTop: 2.5,
                   }}>
                   <Icon
@@ -419,7 +382,7 @@ const LoginDialog = () => {
                     color={colors.errorText}
                   />{' '}
                   Username is invalid
-                </Text>
+                </Paragraph>
               ) : null}
             </>
 
@@ -438,6 +401,7 @@ const LoginDialog = () => {
                       });
                     }
                   }}
+                  editable={!loggingIn || !signingIn}
                   autoCapitalize="none"
                   defaultValue={email}
                   onBlur={() => {
@@ -486,7 +450,7 @@ const LoginDialog = () => {
                     height: 50,
                     borderBottomWidth: 1,
                     borderColor: colors.nav,
-                    fontSize: SIZE.sm,
+                    fontSize: SIZE.md,
                     fontFamily: WEIGHT.regular,
                     color: colors.pri,
                   }}
@@ -495,12 +459,11 @@ const LoginDialog = () => {
                 />
 
                 {invalidEmail ? (
-                  <Text
+                  <Paragraph
+                    size={SIZE.xs}
                     style={{
                       textAlign: 'right',
-                      fontFamily: WEIGHT.regular,
                       textAlignVertical: 'bottom',
-                      fontSize: SIZE.xs,
                       marginTop: 2.5,
                     }}>
                     <Icon
@@ -509,7 +472,7 @@ const LoginDialog = () => {
                       color={colors.errorText}
                     />{' '}
                     Email is invalid
-                  </Text>
+                  </Paragraph>
                 ) : null}
                 <Seperator />
               </>
@@ -536,6 +499,7 @@ const LoginDialog = () => {
                     });
                   }
                 }}
+                editable={!loggingIn || !signingIn}
                 autoCapitalize="none"
                 defaultValue={password}
                 onBlur={() => {
@@ -584,7 +548,7 @@ const LoginDialog = () => {
                 style={{
                   paddingHorizontal: 0,
                   height: 50,
-                  fontSize: SIZE.sm,
+                  fontSize: SIZE.md,
                   fontFamily: WEIGHT.regular,
                   width: '85%',
                   maxWidth: '85%',
@@ -608,12 +572,11 @@ const LoginDialog = () => {
               />
             </View>
             {invalidPassword ? (
-              <Text
+              <Paragraph
+                size={SIZE.xs}
                 style={{
                   textAlign: 'right',
-                  fontFamily: WEIGHT.regular,
                   textAlignVertical: 'bottom',
-                  fontSize: SIZE.xs,
                   marginTop: 2.5,
                 }}>
                 <Icon
@@ -622,7 +585,7 @@ const LoginDialog = () => {
                   color={colors.errorText}
                 />{' '}
                 Password is invalid
-              </Text>
+              </Paragraph>
             ) : null}
 
             <Seperator />
@@ -631,7 +594,11 @@ const LoginDialog = () => {
               <>
                 <TextInput
                   ref={_passConfirm}
-                  editable={password && !invalidPassword ? true : false}
+                  editable={
+                    !loggingIn || !signingIn || (password && !invalidPassword)
+                      ? true
+                      : false
+                  }
                   defaultValue={passwordReEnter}
                   autoCapitalize="none"
                   onChangeText={(value) => {
@@ -674,7 +641,7 @@ const LoginDialog = () => {
                     borderBottomWidth: 1,
                     height: 50,
                     borderColor: colors.nav,
-                    fontSize: SIZE.sm,
+                    fontSize: SIZE.md,
                     fontFamily: WEIGHT.regular,
                     color: colors.pri,
                   }}
@@ -684,12 +651,11 @@ const LoginDialog = () => {
                 />
 
                 {password && !invalidPassword && !confirmPassword ? (
-                  <Text
+                  <Paragraph
+                    size={SIZE.xs}
                     style={{
                       textAlign: 'right',
-                      fontFamily: WEIGHT.regular,
                       textAlignVertical: 'bottom',
-                      fontSize: SIZE.xs,
                       marginTop: 2.5,
                     }}>
                     <Icon
@@ -698,7 +664,7 @@ const LoginDialog = () => {
                       color={colors.errorText}
                     />{' '}
                     Passwords do not match
-                  </Text>
+                  </Paragraph>
                 ) : null}
               </>
             )}
@@ -707,6 +673,7 @@ const LoginDialog = () => {
               <>
                 <Seperator />
                 <TouchableOpacity
+                  disabled={loggingIn || signingIn}
                   onPress={() => {
                     setUserConsent(!userConsent);
                   }}
@@ -727,76 +694,33 @@ const LoginDialog = () => {
                     }
                   />
 
-                  <Text
+                  <Paragraph
                     style={{
-                      fontSize: SIZE.xs,
-                      fontFamily: WEIGHT.regular,
-                      color: colors.pri,
                       maxWidth: '90%',
                       marginLeft: 10,
                     }}>
                     By signing up you agree to our{' '}
-                    <Text
-                      style={{
-                        color: colors.accent,
-                      }}>
+                    <Paragraph color={colors.accent}>
                       terms of service{' '}
-                    </Text>
+                    </Paragraph>
                     and{' '}
-                    <Text
-                      style={{
-                        color: colors.accent,
-                      }}>
-                      privacy policy.
-                    </Text>
-                  </Text>
+                    <Paragraph color={colors.accent}>privacy policy.</Paragraph>
+                  </Paragraph>
                 </TouchableOpacity>
               </>
             )}
 
             {login ? null : <Seperator />}
 
-            <View
-              style={{
-                width: '100%',
-              }}>
-              <Button
-                title={login ? 'Login' : 'Create Account'}
-                onPress={login ? loginUser : signupUser}
-                width="100%"
-                fontSize={SIZE.md}
-                height={50}
-              />
-            </View>
-
-            <TouchableOpacity
-              onPress={() => {
-                setLogin(!login);
-              }}
-              activeOpacity={opacity}
-              style={{
-                alignSelf: 'center',
-                marginTop: DDS.isTab ? 35 : 70,
-                height: DDS.isTab ? null : 50,
-              }}>
-              <Text
-                style={{
-                  fontSize: SIZE.xs + 1,
-                  fontFamily: WEIGHT.regular,
-                  color: colors.pri,
-                  height: 25,
-                }}>
-                {!login
-                  ? 'Already have an account? '
-                  : "Don't have an account? "}
-                <Text
-                  style={{
-                    color: colors.accent,
-                  }}>
-                  {!login ? 'Login' : 'Sign up now'}
-                </Text>
-              </Text>
-            </TouchableOpacity>
+            <Button
+              title={login ? 'Login' : 'Create Account'}
+              onPress={login ? loginUser : signupUser}
+              width="100%"
+              type="accent"
+              loading={loggingIn || signingIn}
+              fontSize={SIZE.md}
+              height={50}
+            />
           </View>
         </View>
       </View>

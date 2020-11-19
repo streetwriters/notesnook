@@ -16,10 +16,12 @@ export const PressableButton = ({
   onLongPress,
   hitSlop,
   testID,
+  disabled
 }) => {
   return (
     <Pressable
       testID={testID}
+      disabled={disabled}
       hitSlop={hitSlop}
       activeOpacity={opacity}
       onPress={onPress}

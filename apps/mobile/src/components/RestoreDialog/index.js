@@ -4,22 +4,24 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import RNFetchBlob from 'rn-fetch-blob';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
+import {DDS} from '../../services/DeviceDetection';
 import {
   eSubscribeEvent,
   eUnSubscribeEvent,
   ToastEvent,
 } from '../../services/EventManager';
-import {eCloseRestoreDialog, eOpenRestoreDialog} from '../../utils/Events';
-import storage from '../../utils/storage';
 import {getElevation} from '../../utils';
-import {ActionIcon} from '../ActionIcon';
+import {db} from '../../utils/DB';
+import {eCloseRestoreDialog, eOpenRestoreDialog} from '../../utils/Events';
+import {ph, SIZE, WEIGHT} from '../../utils/SizeUtils';
+import storage from '../../utils/storage';
+import {sleep} from '../../utils/TimeUtils';
 import {Button} from '../Button';
 import BaseDialog from '../Dialog/base-dialog';
+import DialogButtons from '../Dialog/dialog-buttons';
+import DialogHeader from '../Dialog/dialog-header';
 import {Loading} from '../Loading';
-import {sleep} from '../../utils/TimeUtils';
-import {ph, SIZE, WEIGHT} from '../../utils/SizeUtils';
-import {db} from '../../utils/DB';
-import {DDS} from '../../services/DeviceDetection';
+import Paragraph from '../Typography/Paragraph';
 
 const RestoreDialog = () => {
   const [state, dispatch] = useTracked();
@@ -88,13 +90,12 @@ const RestoreDialog = () => {
       <View
         style={{
           ...getElevation(5),
-          width: DDS.isTab ? 500 : '100%',
-          height: DDS.isTab ? 500 : '100%',
+          width: DDS.isTab ? 500 : '80%',
+          height: DDS.isTab ? 500 : null,
+          maxHeight: '90%',
           borderRadius: 5,
           backgroundColor: colors.bg,
-          paddingHorizontal: 12,
-          paddingVertical: 20,
-          paddingTop: 0,
+          padding: 12,
         }}>
         <BaseDialog visible={restoring}>
           <View
@@ -108,136 +109,60 @@ const RestoreDialog = () => {
               paddingVertical: 20,
             }}>
             <Loading height={40} tagline="Resoring your data" />
-            <Text
+            <Paragraph
+              size={SIZE.xs}
+              color={colors.icon}
               style={{
-                fontFamily: WEIGHT.regular,
                 alignSelf: 'center',
                 textAlign: 'center',
-                color: colors.icon,
-                fontSize: SIZE.xs,
               }}>
               Your data is being restored
-            </Text>
+            </Paragraph>
           </View>
         </BaseDialog>
 
+        <DialogHeader
+          title="Choose a Backup"
+          paragraph="All backups are stored in 'Phone Storage/Notesnook/backups'
+        folder."
+        />
+
         <View
           style={{
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            height: 50,
-            marginTop: DDS.isTab ? 0 : insets.top,
-            flexDirection: 'row',
+            maxHeight: '85%',
           }}>
-          <ActionIcon
-            name="arrow-left"
-            size={SIZE.xxl}
-            onPress={close}
-            customStyle={{
-              width: 40,
-              height: 40,
-              textAlignVertical: 'center',
-              left: 0,
-              marginLeft: -5,
-              marginRight: 5,
-            }}
-            color={colors.heading}
-          />
-          <Text
-            style={{
-              color: colors.accent,
-              fontFamily: WEIGHT.bold,
-              fontSize: SIZE.xl,
-              textAlign: 'center',
-            }}>
-            Choose a Backup
-          </Text>
+          <FlatList
+            data={files}
+            keyExtractor={(item, index) => item.filename}
+            renderItem={({item, index}) => (
+              <View
+                style={{
+                  minHeight: 50,
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  width: '100%',
+                  borderRadius: 0,
+                  flexDirection: 'row',
+                  borderBottomWidth: 0.5,
+                  borderBottomColor: colors.nav,
+                }}>
+                <Paragraph size={SIZE.xs}>
+                  {item.filename
+                    .replace('notesnook_backup_', '')
+                    .replace('.nnbackup', '')}
+                </Paragraph>
 
-          <View
-            style={{
-              width: 40,
-              height: 40,
-            }}
+                <Button
+                  title="Restore"
+                  width={80}
+                  height={30}
+                  onPress={() => restore(item, index)}
+                />
+              </View>
+            )}
           />
         </View>
-
-        <FlatList
-          data={files}
-          style={{
-            height: '100%',
-          }}
-          contentContainerStyle={{
-            height: '100%',
-          }}
-          ListEmptyComponent={
-            <View
-              style={{
-                width: '90%',
-                height: '100%',
-                justifyContent: 'center',
-                alignItems: 'center',
-                alignSelf: 'center',
-              }}>
-              <Text
-                style={{
-                  color: colors.pri,
-                  fontFamily: WEIGHT.regular,
-                  fontSize: SIZE.sm,
-                  textAlign: 'center',
-                  marginBottom: 10,
-                }}>
-                No Backups Found
-              </Text>
-              <Text
-                style={{
-                  color: colors.icon,
-                  fontFamily: WEIGHT.regular,
-                  fontSize: SIZE.xs + 1,
-                  textAlign: 'center',
-                }}>
-                All backups are stored in 'Phone Storage/Notesnook/backups'
-                folder. If you have migrated to a new device, move your backups
-                to{' '}
-                <Text style={{color: colors.accent}}>
-                  'Phone Storage/Notesnook/backups'
-                </Text>{' '}
-                so they can be restored.
-              </Text>
-            </View>
-          }
-          keyExtractor={(item, index) => item.filename}
-          renderItem={({item, index}) => (
-            <View
-              style={{
-                minHeight: 50,
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                width: '100%',
-                borderRadius: 0,
-                flexDirection: 'row',
-                borderBottomWidth: 0.5,
-                borderBottomColor: colors.nav,
-              }}>
-              <Text
-                style={{
-                  fontFamily: WEIGHT.regular,
-                  fontSize: SIZE.xs + 1,
-                  color: colors.pri,
-                }}>
-                {item.filename
-                  .replace('notesnook_backup_', '')
-                  .replace('.nnbackup', '')}
-              </Text>
-
-              <Button
-                title="Restore"
-                width={80}
-                height={30}
-                onPress={() => restore(item, index)}
-              />
-            </View>
-          )}
-        />
+        <DialogButtons onPressNegative={close} />
       </View>
     </BaseDialog>
   );

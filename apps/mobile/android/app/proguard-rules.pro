@@ -11,3 +11,6 @@
 
 -keep class com.facebook.jni.** { *; }
 -keep public class com.horcrux.svg.** {*;}
+-keep class com.facebook.crypto.** {
+   *;
+}

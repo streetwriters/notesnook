@@ -1,13 +1,16 @@
 import React from 'react';
-import {Dimensions, Text, View} from 'react-native';
+import {Dimensions, Text, View, TouchableOpacity} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {ActionIcon} from '../ActionIcon';
-import {ActionSheetEvent} from '../DialogManager/recievers';
+import {ActionSheetEvent, updateEvent} from '../DialogManager/recievers';
 import {timeSince} from '../../utils/TimeUtils';
 import {ph, SIZE, WEIGHT} from '../../utils/SizeUtils';
-
-const w = Dimensions.get('window').width;
-const h = Dimensions.get('window').height;
+import Paragraph from '../Typography/Paragraph';
+import Heading from '../Typography/Heading';
+import {db} from '../../utils/DB';
+import {Actions} from '../../provider/Actions';
+import NavigationService from '../../services/Navigation';
+import {COLORS_NOTE} from '../../utils/Colors';
 
 export default class NoteItem extends React.Component {
   constructor(props) {
@@ -53,6 +56,7 @@ export default class NoteItem extends React.Component {
 
   render() {
     let {colors, item, customStyle, isTrash} = this.props;
+
     return (
       <View
         style={[
@@ -65,156 +69,174 @@ export default class NoteItem extends React.Component {
             alignSelf: 'center',
             borderBottomWidth: 1,
             height: 100,
-            borderBottomColor: item.pinned ? 'transparent' : colors.nav,
+            borderBottomColor: colors.nav,
           },
           customStyle ? customStyle : {},
         ]}>
         <View
           style={{
-            paddingLeft: 0,
             width: '92%',
+            paddingRight: 5,
           }}>
-          <Text
-            numberOfLines={1}
-            style={{
-              color: colors.heading,
-              fontSize: SIZE.md,
-              fontFamily: WEIGHT.bold,
-              maxWidth: '100%',
-            }}>
-            {item.title.replace('\n', '')}
-          </Text>
-          <View
-            style={{
-              justifyContent: 'flex-start',
-              alignItems: 'flex-start',
-              width: '100%',
-            }}>
-            <Text
-              numberOfLines={2}
-              style={{
-                fontSize: SIZE.xs + 1,
-                color: colors.pri,
-                fontFamily: WEIGHT.regular,
-                width: '100%',
-                maxWidth: '100%',
-                paddingRight: ph,
-              }}>
-              {item.headline[item.headline.length - 1] === '\n'
-                ? item.headline.slice(0, item.headline.length - 1)
-                : item.headline}
-            </Text>
-
+          {item.notebook && item.notebook.id && (
             <View
               style={{
                 flexDirection: 'row',
-                justifyContent: 'flex-start',
-                alignItems: 'center',
-                width: '100%',
-                marginTop: 5,
               }}>
-              {!isTrash ? (
-                <>
-                  {item.colors.length > 0 ? (
-                    <View
-                      style={{
-                        marginRight: 10,
-                        flexDirection: 'row',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                      }}>
-                      {item.colors.map((item) => (
-                        <View
-                          key={item}
-                          style={{
-                            width: SIZE.xs,
-                            height: SIZE.xs,
-                            borderRadius: 100,
-                            backgroundColor: item,
-                            marginRight: -4.5,
-                          }}
-                        />
-                      ))}
-                    </View>
-                  ) : null}
-
-                  {item.locked ? (
-                    <Icon
-                      style={{marginRight: 10}}
-                      name="lock"
-                      size={SIZE.xs}
-                      color={colors.icon}
-                    />
-                  ) : null}
-
-                  {item.favorite ? (
-                    <Icon
-                      style={{marginRight: 10}}
-                      name="star"
-                      size={SIZE.xs + 1}
-                      color="orange"
-                    />
-                  ) : null}
-                  <Text
-                    style={{
-                      color: colors.icon,
-                      fontSize: SIZE.xs - 1,
-                      textAlignVertical: 'center',
-                      fontFamily: WEIGHT.regular,
-                      marginRight: 10,
-                    }}>
-                    {timeSince(item.dateCreated)}
-                  </Text>
-                </>
-              ) : null}
-
-              {isTrash ? (
-                <>
-                  <Text
-                    style={{
-                      color: colors.accent,
-                      fontSize: SIZE.xs - 1,
-                      textAlignVertical: 'center',
-                      fontFamily: WEIGHT.regular,
-                    }}>
-                    {item.itemType[0].toUpperCase() +
-                      item.itemType.slice(1) +
-                      '  '}
-                  </Text>
-                  <Text
-                    style={{
-                      color: colors.icon,
-                      fontSize: SIZE.xs - 1,
-                      textAlignVertical: 'center',
-                      fontFamily: WEIGHT.regular,
-                    }}>
-                    Deleted on{' '}
-                    {item && item.dateDeleted
-                      ? new Date(item.dateDeleted).toISOString().slice(0, 10)
-                      : null + '   '}
-                  </Text>
-                </>
-              ) : null}
-
-              {item.conflicted ? (
-                <View
-                  style={{
-                    backgroundColor: colors.errorText,
-                    borderRadius: 2.5,
-                    paddingHorizontal: 4,
-                    position: 'absolute',
-                    right: 20,
-                  }}>
-                  <Text
-                    style={{
-                      fontSize: SIZE.xs - 1,
-                      color: 'white',
-                    }}>
-                    CONFLICTS
-                  </Text>
-                </View>
-              ) : null}
+              <TouchableOpacity
+                activeOpacity={1}
+                onPress={() => {
+                  let notebook = db.notebooks.notebook(item.notebook.id).data;
+                  updateEvent({
+                    type: Actions.HEADER_TEXT_STATE,
+                    state: {
+                      heading: notebook.title,
+                    },
+                  });
+                  updateEvent({
+                    type: Actions.HEADER_STATE,
+                    state: false,
+                  });
+                  NavigationService.navigate('Notebook', {
+                    notebook: db.notebooks.notebook(item.notebook.id).data,
+                    title: notebook.title,
+                    root: true,
+                  });
+                }}
+                style={{
+                  paddingVertical: 1.5,
+                  marginBottom: 2.5,
+                }}>
+                <Paragraph
+                  size={SIZE.xs}
+                  color={
+                    item.colors[0] ? COLORS_NOTE[item.colors[0]] : colors.pri
+                  }>
+                  {db.notebooks.notebook(item.notebook.id).title}
+                </Paragraph>
+              </TouchableOpacity>
             </View>
+          )}
+
+          <Heading
+            color={COLORS_NOTE[item.colors[0]]}
+            numberOfLines={1}
+            size={SIZE.md}>
+            {item.title.replace('\n', '')}
+          </Heading>
+
+          <Paragraph numberOfLines={2}>
+            {item.headline[item.headline.length - 1] === '\n'
+              ? item.headline.slice(0, item.headline.length - 1)
+              : item.headline}
+          </Paragraph>
+
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'flex-start',
+              alignItems: 'center',
+              width: '100%',
+              marginTop: 2.5,
+            }}>
+            {!isTrash ? (
+              <>
+                {item.colors.length > 0 ? (
+                  <View
+                    style={{
+                      marginRight: 10,
+                      flexDirection: 'row',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    {item.colors.map((item) => (
+                      <View
+                        key={item}
+                        style={{
+                          width: SIZE.xs,
+                          height: SIZE.xs,
+                          borderRadius: 100,
+                          backgroundColor: COLORS_NOTE[item],
+                          marginRight: -4.5,
+                        }}
+                      />
+                    ))}
+                  </View>
+                ) : null}
+
+                {item.locked ? (
+                  <Icon
+                    style={{marginRight: 10}}
+                    name="lock"
+                    size={SIZE.xs}
+                    color={colors.icon}
+                  />
+                ) : null}
+
+                {item.favorite ? (
+                  <Icon
+                    style={{marginRight: 10}}
+                    name="star"
+                    size={SIZE.md}
+                    color="orange"
+                  />
+                ) : null}
+                <Paragraph
+                  color={colors.icon}
+                  size={SIZE.xs}
+                  style={{
+                    textAlignVertical: 'center',
+                    marginRight: 10,
+                  }}>
+                  {timeSince(item.dateCreated)}
+                </Paragraph>
+              </>
+            ) : null}
+
+            {isTrash ? (
+              <>
+                <Paragraph
+                  color={colors.icon}
+                  size={SIZE.xs}
+                  style={{
+                    textAlignVertical: 'center',
+                  }}>
+                  {item.itemType[0].toUpperCase() +
+                    item.itemType.slice(1) +
+                    '  '}
+                </Paragraph>
+                <Paragraph
+                  color={colors.icon}
+                  size={SIZE.xs}
+                  style={{
+                    textAlignVertical: 'center',
+                  }}>
+                  Deleted on{' '}
+                  {item && item.dateDeleted
+                    ? new Date(item.dateDeleted).toISOString().slice(0, 10)
+                    : null + '   '}
+                </Paragraph>
+              </>
+            ) : null}
+
+            {item.conflicted ? (
+              <View
+                style={{
+                  backgroundColor: colors.errorText,
+                  borderRadius: 2.5,
+                  paddingHorizontal: 4,
+                  position: 'absolute',
+                  right: 20,
+                }}>
+                <Paragraph
+                  size={SIZE.xs}
+                  style={{
+                    color: 'white',
+                  }}>
+                  CONFLICTS
+                </Paragraph>
+              </View>
+            ) : null}
           </View>
         </View>
 

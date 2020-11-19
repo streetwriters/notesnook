@@ -1,5 +1,5 @@
 import React from 'react';
-import {Text} from 'react-native';
+import {Platform, Text} from 'react-native';
 import {useTracked} from '../../provider';
 import {SIZE, WEIGHT} from '../../utils/SizeUtils';
 
@@ -20,12 +20,15 @@ const Paragraph = ({color, size, style, ...restProps}) => {
 
   return (
     <Text
+      onLayout={e => console.log(e.nativeEvent.layout.height,"HEIGHT")}
       {...restProps}
       style={[
         {
           fontFamily: WEIGHT.regular,
-          fontSize: size || SIZE.xs + 1,
+          fontSize: size || SIZE.sm,
           color: color || colors.pri,
+          fontWeight:'400',
+          paddingBottom:Platform.OS === "ios" && size? size/3.5:3.5
         },
         style,
       ]}></Text>

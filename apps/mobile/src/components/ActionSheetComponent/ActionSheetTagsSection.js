@@ -2,16 +2,24 @@ import React, {createRef, useCallback, useEffect, useState} from 'react';
 import {Text, TextInput, TouchableOpacity, View} from 'react-native';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
-import {sendNoteEditedEvent, ToastEvent} from '../../services/EventManager';
+import {
+  eSendEvent,
+  sendNoteEditedEvent,
+  ToastEvent,
+} from '../../services/EventManager';
+import PremiumService from '../../services/PremiumService';
 import {db} from '../../utils/DB';
+import {eShowGetPremium} from '../../utils/Events';
 import {SIZE, WEIGHT} from '../../utils/SizeUtils';
+import {sleep} from '../../utils/TimeUtils';
+import Paragraph from '../Typography/Paragraph';
 
 const tagsInputRef = createRef();
 let prevQuery = null;
 let tagToAdd = '';
 let backPressCount = 0;
 
-export const ActionSheetTagsSection = ({item}) => {
+export const ActionSheetTagsSection = ({item, close}) => {
   const [state, dispatch] = useTracked();
   const {colors, tags, premiumUser} = state;
   const [suggestions, setSuggestions] = useState([]);
@@ -42,22 +50,45 @@ export const ActionSheetTagsSection = ({item}) => {
       return;
     }
 
-    let tag = tagToAdd;
-    tag = tag.trim();
-    if (tag.includes(' ')) {
-      tag = tag.replace(' ', '_');
-    }
-    if (tag.includes(',')) {
-      tag = tag.replace(',', '');
+    async function add() {
+      let tag = tagToAdd;
+      tag = tag.trim();
+      if (tag.includes(' ')) {
+        tag = tag.replace(' ', '_');
+      }
+      if (tag.includes(',')) {
+        tag = tag.replace(',', '');
+      }
+
+      try {
+        await db.notes.note(note.id).tag(tag);
+        localRefresh(note.type);
+        dispatch({type: Actions.TAGS});
+        tagsInputRef.current?.setNativeProps({
+          text: '',
+        });
+        tagToAdd = '';
+      } catch (e) {
+        ToastEvent.show(e.message, 'error', 'local');
+      }
     }
 
-    await db.notes.note(note.id).tag(tag);
-    localRefresh(note.type);
-    dispatch({type: Actions.TAGS});
-    tagsInputRef.current?.setNativeProps({
-      text: '',
-    });
-    tagToAdd = '';
+    if (
+      tags.length >= 5 &&
+      tags.findIndex((t) => t.title === tagToAdd) === -1
+    ) {
+      await PremiumService.verify(add, () => {
+        eSendEvent(eShowGetPremium, {
+          context: 'sheet',
+          title: 'Get Notesnook Pro',
+          desc: 'To create more tags for your notes become a Pro user today.',
+        });
+      });
+
+      return;
+    }
+
+    await add();
   });
 
   useEffect(() => {
@@ -132,20 +163,10 @@ export const ActionSheetTagsSection = ({item}) => {
         marginLeft: 5,
         borderRadius: 2.5,
       }}>
-      <Text
-        style={{
-          fontFamily: WEIGHT.regular,
-          fontSize: SIZE.sm,
-          color: colors.pri,
-        }}>
-        <Text
-          style={{
-            color: colors.accent,
-          }}>
-          #
-        </Text>
+      <Paragraph>
+        <Paragraph color={colors.accent}>#</Paragraph>
         {tag}
-      </Text>
+      </Paragraph>
     </TouchableOpacity>
   );
 
@@ -162,19 +183,11 @@ export const ActionSheetTagsSection = ({item}) => {
           marginTop: 5,
           alignItems: 'center',
         }}>
-        <Text
-          style={{
-            fontFamily: WEIGHT.regular,
-            fontSize: SIZE.xs,
-            color: colors.pri,
-          }}>
-          {tags.filter(
-            (o) =>
-              o.noteIds.length >= 1 && !note.tags.find((t) => t === o.title),
-          ).length === 0
-            ? ''
-            : 'Suggested: '}
-        </Text>
+        {tags.filter(
+          (o) => o.noteIds.length >= 1 && !note.tags.find((t) => t === o.title),
+        ).length === 0 ? null : (
+          <Paragraph size={SIZE.xs}>{'Suggested: '}</Paragraph>
+        )}
 
         {suggestions.map((tag) => (
           <TouchableOpacity
@@ -192,20 +205,10 @@ export const ActionSheetTagsSection = ({item}) => {
               paddingHorizontal: 0,
               paddingVertical: 2.5,
             }}>
-            <Text
-              style={{
-                fontFamily: WEIGHT.regular,
-                fontSize: SIZE.xs,
-                color: colors.pri,
-              }}>
-              <Text
-                style={{
-                  color: colors.accent,
-                }}>
-                #
-              </Text>
+            <Paragraph>
+              <Paragraph color={colors.accent}>#</Paragraph>
               {tag.title}
-            </Text>
+            </Paragraph>
           </TouchableOpacity>
         ))}
       </View>
@@ -219,11 +222,10 @@ export const ActionSheetTagsSection = ({item}) => {
           alignItems: 'center',
         }}>
         {!premiumUser ? (
-          <Text
+          <Paragraph
+            color={colors.accent}
+            size={SIZE.xs}
             style={{
-              color: colors.accent,
-              fontFamily: WEIGHT.regular,
-              fontSize: 10,
               marginRight: 4,
               marginTop: 2.5,
               position: 'absolute',
@@ -231,7 +233,7 @@ export const ActionSheetTagsSection = ({item}) => {
               top: 0,
             }}>
             PRO
-          </Text>
+          </Paragraph>
         ) : null}
 
         {note && note.tags ? note.tags.map(_renderTag) : null}

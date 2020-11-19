@@ -1,40 +1,27 @@
-import React, {useEffect} from 'react';
-import {
-  ActivityIndicator,
-  Platform,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import React from 'react';
+import {ActivityIndicator, Text, TouchableOpacity, View} from 'react-native';
+import {color} from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {eSendEvent, ToastEvent} from '../../services/EventManager';
+import {showContext, SUBSCRIPTION_STATUS_STRINGS} from '../../utils';
+import {db} from '../../utils/DB';
 import {eOpenLoginDialog} from '../../utils/Events';
-import {showContext} from '../../utils';
+import {pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
 import {PressableButton} from '../PressableButton';
+import Paragraph from '../Typography/Paragraph';
 import {TimeSince} from './TimeSince';
-import {hexToRGBA} from "../../utils/ColorUtils";
-import {pv, SIZE, WEIGHT} from "../../utils/SizeUtils";
-import {db} from "../../utils/DB";
 
 export const UserSection = ({noTextMode}) => {
   const [state, dispatch] = useTracked();
   const {colors, syncing, user} = state;
 
-  useEffect(() => {
-    console.log(user);
-    dispatch({type: Actions.TAGS});
-  }, []);
-
   return user && user.username ? (
     <View
       style={{
-        width: '93%',
-        borderRadius: 5,
-        backgroundColor: Platform.ios
-          ? hexToRGBA(colors.accent + '19')
-          : hexToRGBA(colors.shade),
+        width: '100%',
+        borderRadius: 0,
       }}>
       <View
         style={{
@@ -42,27 +29,15 @@ export const UserSection = ({noTextMode}) => {
           justifyContent: 'space-between',
           alignItems: 'center',
           backgroundColor: colors.accent,
-          borderRadius: 5,
-          paddingHorizontal: 5,
+          paddingHorizontal: 6,
           paddingVertical: 8,
-          elevation: 2,
         }}>
-        <Text
-          style={{
-            fontFamily: WEIGHT.regular,
-            color: 'white',
-            fontSize: SIZE.xs,
-          }}>
+        <Paragraph color="white">
           <Icon name="account-outline" /> {user.username}
-        </Text>
-        <Text
-          style={{
-            fontFamily: WEIGHT.regular,
-            fontSize: SIZE.xs,
-            color: 'white',
-          }}>
-          {user.subscription.status === 1? "Trial" : "Pro"}
-        </Text>
+        </Paragraph>
+        <Paragraph color="white" size={SIZE.xs}>
+          {SUBSCRIPTION_STATUS_STRINGS[user.subscription.status]}
+        </Paragraph>
       </View>
 
       <TouchableOpacity
@@ -94,23 +69,15 @@ export const UserSection = ({noTextMode}) => {
           justifyContent: 'space-between',
           alignItems: 'center',
           paddingHorizontal: 5,
-          paddingVertical: pv + 5,
+          paddingVertical: 12,
         }}>
         <View
           style={{
             flexDirection: 'row',
             alignItems: 'center',
           }}>
-          {syncing ? (
-            <ActivityIndicator size={SIZE.xs} color={colors.accent} />
-          ) : (
-            <Icon color={colors.accent} name="sync" size={SIZE.sm} />
-          )}
-          <Text
+          <Paragraph
             style={{
-              fontFamily: WEIGHT.regular,
-              color: colors.pri,
-              fontSize: SIZE.xs,
               marginLeft: 5,
             }}>
             {syncing ? 'Syncing ' : 'Synced '}
@@ -122,20 +89,22 @@ export const UserSection = ({noTextMode}) => {
               )
             ) : null}
             {'\n'}
-            <Text
+            <Paragraph
+              size={SIZE.xs}
+              color={colors.icon}
               style={{
-                fontSize: 8,
+                fontSize: SIZE.xs,
                 color: colors.icon,
               }}>
-              Tap to sync
-            </Text>
-          </Text>
+              {syncing ? 'Fetching your notes ' : 'Tap to sync '}
+            </Paragraph>
+          </Paragraph>
         </View>
-        <Icon
-          size={SIZE.md}
-          color={colors.accent}
-          name="check-circle-outline"
-        />
+        {syncing ? (
+          <ActivityIndicator size={SIZE.lg} color={colors.accent} />
+        ) : (
+          <Icon color={colors.accent} name="sync" size={SIZE.lg} />
+        )}
       </TouchableOpacity>
     </View>
   ) : (
@@ -146,7 +115,7 @@ export const UserSection = ({noTextMode}) => {
       onLongPress={(event) => {
         showContext(event, 'Login');
       }}
-      color={noTextMode ? 'transparent' : colors.shade}
+      color="transparent"
       selectedColor={colors.accent}
       alpha={!colors.night ? -0.02 : 0.1}
       opacity={0.12}
@@ -154,12 +123,12 @@ export const UserSection = ({noTextMode}) => {
         paddingVertical: 12,
         marginVertical: 5,
         marginTop: pv + 5,
-        borderRadius: noTextMode ? 0 : 5,
-        width: noTextMode ? '100%' : '93%',
+        borderRadius: 0,
+        width: '100%',
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: noTextMode ? 'center' : 'flex-start',
-        paddingHorizontal: noTextMode ? 0 : 12,
+        justifyContent: 'flex-start',
+        paddingHorizontal: 8,
       }}>
       <View
         style={{
@@ -185,21 +154,10 @@ export const UserSection = ({noTextMode}) => {
           style={{
             marginLeft: 10,
           }}>
-          <Text
-            style={{
-              fontFamily: WEIGHT.regular,
-              color: colors.icon,
-              fontSize: SIZE.xs,
-            }}>
+          <Paragraph size={SIZE.xs} color={colors.icon}>
             You are not logged in
-          </Text>
-          <Text
-            style={{
-              color: colors.accent,
-              fontSize: SIZE.sm - 2,
-            }}>
-            Login to sync notes.
-          </Text>
+          </Paragraph>
+          <Paragraph color={colors.accent}>Login to sync notes.</Paragraph>
         </View>
       )}
     </PressableButton>

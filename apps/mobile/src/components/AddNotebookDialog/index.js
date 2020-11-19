@@ -21,6 +21,9 @@ import {ph, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
 import {db} from '../../utils/DB';
 import {DDS} from '../../services/DeviceDetection';
 import {ActionIcon} from '../ActionIcon';
+import DialogButtons from '../Dialog/dialog-buttons';
+import DialogHeader from '../Dialog/dialog-header';
+import Paragraph from '../Typography/Paragraph';
 
 let refs = [];
 
@@ -282,18 +285,18 @@ export class AddNotebookDialog extends React.Component {
                   backgroundColor: colors.bg,
                 },
               ]}>
-              <View style={styles.headingContainer}>
-                <Icon
-                  name="book-outline"
-                  color={colors.accent}
-                  size={SIZE.xl}
-                />
-                <Text style={[styles.headingText, {color: colors.heading}]}>
-                  {toEdit && toEdit.dateCreated
+              <DialogHeader
+                title={
+                  toEdit && toEdit.dateCreated
                     ? 'Edit Notebook'
-                    : 'New Notebook'}
-                </Text>
-              </View>
+                    : 'New Notebook'
+                }
+                paragraph={
+                  toEdit && toEdit.dateCreated
+                    ? 'Edit your notebook'
+                    : 'Add a new notebook to your notebooks.'
+                }
+              />
 
               <TextInput
                 ref={(ref) => (this.titleRef = ref)}
@@ -302,6 +305,7 @@ export class AddNotebookDialog extends React.Component {
                   {
                     borderColor: titleFocused ? colors.accent : colors.nav,
                     color: colors.pri,
+                    fontSize: SIZE.md,
                   },
                 ]}
                 numberOfLines={1}
@@ -447,20 +451,12 @@ export class AddNotebookDialog extends React.Component {
                 )}
               />
 
-              <View style={styles.buttonContainer}>
-                <Button
-                  title={toEdit && toEdit.dateCreated ? 'Save' : 'Add'}
-                  width="48%"
-                  onPress={this.addNewNotebook}
-                />
-
-                <Button
-                  title="Cancel"
-                  grayed
-                  width="48%"
-                  onPress={this.close}
-                />
-              </View>
+              <DialogButtons
+                negativeTitle="Cancel"
+                positiveTitle={toEdit && toEdit.dateCreated ? 'Save' : 'Add'}
+                onPressPositive={this.addNewNotebook}
+                onPressNegative={this.close}
+              />
             </View>
           </KeyboardAvoidingView>
           <Toast context="local" />
@@ -494,15 +490,12 @@ const TopicItem = ({item, index, colors, onPress, onDelete}) => {
           onPress(item, index);
         }}
       />
-      <Text
+      <Paragraph
         style={{
-          fontFamily: WEIGHT.regular,
-          fontSize: SIZE.sm,
-          color: colors.primary,
           marginRight: index === 0 ? 2 : 0,
         }}>
         {index + 1 + '.'}
-      </Text>
+      </Paragraph>
       <TextInput
         ref={topicRef}
         editable={false}
@@ -555,10 +548,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   container: {
-    width: DDS.isTab ? 500 : '100%',
-    height: DDS.isTab ? 600 : '100%',
-    maxHeight: DDS.isTab ? 600 : '100%',
-    borderRadius: DDS.isTab ? 5 : 0,
+    width: DDS.isTab ? 500 : '80%',
+    height: DDS.isTab ? 600 : null,
+    maxHeight: DDS.isTab ? 600 :"90%",
+    borderRadius: 5,
     paddingHorizontal: 12,
     paddingVertical: pv,
   },
@@ -578,10 +571,11 @@ const styles = StyleSheet.create({
     fontSize: SIZE.xl,
   },
   input: {
-    paddingHorizontal: ph,
+    paddingRight: 12,
+    paddingHorizontal: 0,
     borderRadius: 0,
     minHeight: 45,
-    fontSize: SIZE.sm,
+    fontSize: SIZE.md,
     fontFamily: WEIGHT.regular,
     padding: pv - 2,
     borderBottomWidth: 1,

@@ -2,7 +2,8 @@ import React from 'react';
 import {ActivityIndicator, StyleSheet, Text, View} from 'react-native';
 import {useTracked} from '../../provider';
 import {Button} from '../Button';
-import {ph, pv, SIZE, WEIGHT} from "../../utils/SizeUtils";
+import {ph, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
+import Paragraph from '../Typography/Paragraph';
 
 export const Loading = ({
   height = 150,
@@ -10,32 +11,30 @@ export const Loading = ({
   done = false,
   doneText = 'Action completed successfully!',
   onDone = () => {},
-  customStyle ={}
+  customStyle = {},
 }) => {
   const [state, dispatch] = useTracked();
-  const {colors, tags, premiumUser} = state;
+  const {colors} = state;
 
   return (
-    <View style={[{height: height}, styles.activityContainer,  customStyle]}>
+    <View style={[{height: height}, styles.activityContainer, customStyle]}>
       {done ? (
         <>
-          <Text
-            style={[
-              {color: colors.icon},
-              styles.activityText,
-              {fontSize: SIZE.xs,fontFamily:WEIGHT.regular},
-            ]}>
+          <Paragraph
+            color={colors.icon}
+            size={SIZE.xs}
+            style={styles.activityText}>
             {doneText}
-          </Text>
+          </Paragraph>
 
           <Button onPress={onDone} title="Open File" />
         </>
       ) : (
         <>
           <ActivityIndicator color={colors.accent} />
-          <Text style={[{color: colors.pri}, styles.activityText]}>
+          <Paragraph color={colors.pri} style={styles.activityText}>
             {tagline}
-          </Text>
+          </Paragraph>
         </>
       )}
     </View>
@@ -68,6 +67,5 @@ const styles = StyleSheet.create({
     fontFamily: WEIGHT.medium,
     color: 'white',
     fontSize: SIZE.sm,
-    
   },
 });

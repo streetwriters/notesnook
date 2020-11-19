@@ -2,7 +2,9 @@ import React from 'react';
 import {Text, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
-import {SIZE, WEIGHT} from "../../utils/SizeUtils";
+import {SIZE, WEIGHT} from '../../utils/SizeUtils';
+import Heading from '../Typography/Heading';
+import Paragraph from '../Typography/Paragraph';
 
 const DialogHeader = ({icon, title, paragraph}) => {
   const [state, dispatch] = useTracked();
@@ -13,32 +15,16 @@ const DialogHeader = ({icon, title, paragraph}) => {
       <View
         style={{
           flexDirection: 'row',
-          justifyContent: 'center',
           alignItems: 'center',
         }}>
-        {icon ? (
+        {/*   {icon ? (
           <Icon name={icon} color={colors.accent} size={SIZE.lg} />
-        ) : null}
-        <Text
-          style={{
-            color: colors.heading,
-            fontFamily: WEIGHT.bold,
-            marginLeft: 5,
-            fontSize: SIZE.lg,
-          }}>
-          {title}
-        </Text>
+        ) : null} */}
+        <Heading size={SIZE.xl}>{title}</Heading>
       </View>
+
       {paragraph ? (
-        <Text
-          style={{
-            color: colors.icon,
-            fontFamily: WEIGHT.regular,
-            fontSize: SIZE.xs + 1,
-            textAlign: 'center',
-          }}>
-          {paragraph}
-        </Text>
+        <Paragraph color={colors.icon}>{paragraph}</Paragraph>
       ) : null}
     </>
   );

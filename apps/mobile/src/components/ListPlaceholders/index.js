@@ -7,15 +7,17 @@ import {
   TAG_SVG,
   FAV_SVG,
   TRASH_SVG,
+  SETTINGS_SVG,
+  SEARCH_SVG
 } from '../../assets/images/assets';
-import { useTracked } from '../../provider';
-export const Placeholder = ({type}) => {
+import {useTracked} from '../../provider';
+export const Placeholder = ({type, w, h, color}) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
   const getSVG = () => {
     switch (type) {
       case 'notes':
-        return NOTE_SVG(colors.accent);
+        return NOTE_SVG(color || colors.accent);
       case 'notebooks':
         return NOTEBOOK_SVG(colors.accent);
       case 'tags':
@@ -24,14 +26,18 @@ export const Placeholder = ({type}) => {
         return FAV_SVG(colors.accent);
       case 'trash':
         return TRASH_SVG(colors.accent);
+      case 'settings':
+        return SETTINGS_SVG(colors.accent);
+        case 'search':
+          return SEARCH_SVG(colors.accent);
     }
   };
 
   return (
     <View
       style={{
-        height: 250,
-        width: 250,
+        height: w || 250,
+        width: h || 250,
       }}>
       <SvgXml xml={getSVG()} width="100%" height="100%" />
     </View>

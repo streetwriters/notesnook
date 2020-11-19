@@ -1,52 +1,31 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {ActivityIndicator, Platform, StyleSheet, View} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useTracked} from '../../provider';
-import {eSendEvent, eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
-import {dWidth} from '../../utils';
+import {DDS} from '../../services/DeviceDetection';
+import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
+import NavigationService from '../../services/Navigation';
+import {dWidth, getElevation} from '../../utils';
+import {eScrollEvent} from '../../utils/Events';
+import {SIZE} from '../../utils/SizeUtils';
 import {ActionIcon} from '../ActionIcon';
-import {HeaderMenu} from './HeaderMenu';
+import {SearchInput} from '../SearchInput';
+import {HeaderLeftMenu} from './HeaderLeftMenu';
+import { HeaderRightMenu } from './HeaderRightMenu';
 import {HeaderTitle} from './HeaderTitle';
-import {SIZE} from "../../utils/SizeUtils";
-import {HeaderLeftMenu} from "./HeaderLeftMenu";
-import { eScrollEvent } from '../../utils/Events';
 
-let timeout = null;
-export const Header = ({ root}) => {
-  const [state, ] = useTracked();
-  const {colors, syncing} = state;
+export const Header = ({root}) => {
+  const [state] = useTracked();
+  const {colors, syncing, currentScreen} = state;
   const insets = useSafeAreaInsets();
-  const [hideHeader,setHideHeader] = useState(false);
-
-  const {
-    searchResults,
-  } = state;
-  let offsetY = 0;
-
+  const [hide, setHide] = useState(true);
 
   const onScroll = (y) => {
-    if (searchResults.results.length > 0) return;
-    if (y < 30) {
-      setHideHeader(false);
-      offsetY = y;
-    }
-    if (y > offsetY) {
-      if (y - offsetY < 100) return;
-      clearTimeout(timeout);
-      timeout = null;
-      timeout = setTimeout(() => {
-        setHideHeader(true);
-      }, 300);
-      offsetY = y;
+    if (y > 150) {
+      setHide(false);
     } else {
-      if (offsetY - y < 50) return;
-      clearTimeout(timeout);
-      timeout = null;
-      timeout = setTimeout(() => {
-        setHideHeader(false);
-      }, 300);
-      offsetY = y;
+      setHide(true);
     }
   };
 
@@ -62,16 +41,33 @@ export const Header = ({ root}) => {
       style={[
         styles.container,
         {
-          marginTop: insets.top,
+          marginTop: Platform.OS === 'android' ? insets.top : null,
           backgroundColor: colors.bg,
           overflow: 'hidden',
+          borderBottomWidth: 1,
+          borderBottomColor: hide ? 'transparent' : colors.nav,
+          justifyContent: 'center',
         },
       ]}>
       <View style={styles.leftBtnContainer}>
-        <HeaderLeftMenu/>
-        {Platform.OS === 'android' ? <HeaderTitle root={root} /> : null}
+        <HeaderLeftMenu />
+
+        {Platform.OS === 'android' && currentScreen !== 'search' || Platform.isPad ? (
+          <HeaderTitle root={root} />
+        ) : null}
       </View>
-      {Platform.OS !== 'android' ? <HeaderTitle root={root} /> : null}
+      {Platform.OS !== 'android' && !Platform.isPad && currentScreen !== 'search' ? (
+        <HeaderTitle root={root} />
+      ) : null}
+
+      {currentScreen === 'search' ? (
+        <View
+          style={{
+            width: '80%',
+          }}>
+          <SearchInput />
+        </View>
+      ) : null}
 
       <Animatable.View
         transition={['opacity']}
@@ -93,28 +89,21 @@ export const Header = ({ root}) => {
         <ActivityIndicator size={25} color={colors.accent} />
       </Animatable.View>
 
-      <View style={styles.rightBtnContainer}>
-        <Animatable.View
-          transition="opacity"
-          useNativeDriver={true}
-          duration={500}
-          style={{
-            opacity: hideHeader ? 1 : 0,
-          }}>
+      {currentScreen === 'search' ? (
+        <View style={styles.rightBtnContainer}>
           <ActionIcon
-            onPress={() => {
-              if (!hideHeader) return;
-              setHideHeader(false);
-              eSendEvent('showSearch');
+            onPress={async () => {
+              NavigationService.navigate('Search');
             }}
-            name="magnify"
-            size={SIZE.xl}
+            name="tune"
+            size={SIZE.xxxl}
             color={colors.pri}
             style={styles.rightBtn}
           />
-        </Animatable.View>
-
-      </View>
+        </View>
+      ) : (
+       <HeaderRightMenu/>
+      )}
     </View>
   );
 };
@@ -124,7 +113,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     zIndex: 11,
     height: 50,
-    marginBottom: 10,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 12,

@@ -1,7 +1,10 @@
 import React from 'react';
 import {
   Animated,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
+  SafeAreaView,
   StyleSheet,
   TouchableOpacity,
   View,
@@ -14,6 +17,7 @@ const BaseDialog = ({
   children,
   onShow,
   animation = 'fade',
+  premium,
 }) => {
   const [state, dispatch] = useTracked();
   const scaleValue = new Animated.Value(1);
@@ -31,22 +35,26 @@ const BaseDialog = ({
       }}
       animationType={animation}
       onRequestClose={onRequestClose}>
-      <View
-        style={[
-          {
-            backgroundColor: state.colors.night
-              ? 'rgba(255,255,255,0.15)'
-              : 'rgba(0,0,0,0.3)',
-          },
-          styles.backdrop,
-        ]}>
-        <TouchableOpacity
-          onPress={onRequestClose}
-          style={styles.overlayButton}
-        />
+      <SafeAreaView>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : null}
+          style={[
+            {
+              backgroundColor: state.colors.night
+                ? 'rgba(255,255,255,0.15)'
+                : 'rgba(0,0,0,0.3)',
+            },
+            styles.backdrop,
+          ]}>
+          <TouchableOpacity
+            onPress={onRequestClose}
+            style={styles.overlayButton}
+          />
+          {premium}
 
-        {children}
-      </View>
+          {children}
+        </KeyboardAvoidingView>
+      </SafeAreaView>
     </Modal>
   );
 };

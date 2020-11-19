@@ -1,34 +1,28 @@
-import "react-native-get-random-values";
+import 'react-native-get-random-values';
 import {generateSecureRandom} from 'react-native-securerandom';
 import Sodium from 'react-native-sodium';
 import RNFetchBlob from 'rn-fetch-blob';
-import {PERMISSIONS, requestMultiple, RESULTS} from "react-native-permissions";
-import {MMKV} from "./MMKV";
-import { Platform } from "react-native";
-import { ANDROID_PATH, IOS_PATH } from ".";
-import { eSendEvent } from "../services/EventManager";
+import {PERMISSIONS, requestMultiple, RESULTS} from 'react-native-permissions';
+import {MMKV} from './mmkv';
+import {Platform} from 'react-native';
+import {ANDROID_PATH, IOS_PATH} from '.';
+import * as Keychain from 'react-native-keychain';
 
 async function read(key, isArray = false) {
   let data = await MMKV.getItem(key);
   if (!data) return null;
   try {
     data = JSON.parse(data);
-
-    data = isArray ? [...data] : data;
-  } catch (e) {
-    
-  }
+  } catch (e) {}
 
   return data;
 }
-
 
 async function write(key, data) {
   return await MMKV.setItem(
     key,
     typeof data === 'string' ? data : JSON.stringify(data),
   );
-
 }
 
 async function readMulti(keys) {
@@ -66,15 +60,48 @@ function decrypt(password, data) {
   return Sodium.decrypt(password, data).then((result) => result);
 }
 
-async function deriveKey(password, salt) {
+async function deriveCryptoKey(name, data) {
   try {
-    let data = await Sodium.deriveKey(password, salt);
+    let credentials = await Sodium.deriveKey(data.password, data.salt);
+    await Keychain.setInternetCredentials('notesnook', name, credentials.key, {
+      authenticationType:
+        Keychain.AUTHENTICATION_TYPE.DEVICE_PASSCODE_OR_BIOMETRICS,
+      accessControl: Keychain.ACCESS_CONTROL.DEVICE_PASSCODE,
+      rules: Keychain.SECURITY_RULES.AUTOMATIC_UPGRADE,
+    });
 
-    return data.key;
-  } catch (e) {}
+    return credentials.key;
+  } catch (e) {
+    console.log(e);
+  }
 }
 
+async function getCryptoKey(name) {
+  try {
+    if (await Keychain.hasInternetCredentials('notesnook')) {
+      let credentials = await Keychain.getInternetCredentials('notesnook', {
+        authenticationType:
+          Keychain.AUTHENTICATION_TYPE.DEVICE_PASSCODE_OR_BIOMETRICS,
+        accessControl: Keychain.ACCESS_CONTROL.DEVICE_PASSCODE,
+        authenticationPrompt: {cancel: null},
+      });
+      return credentials.password;
+    } else {
+      return null;
+    }
+  } catch (e) {
+    console.log(e);
+  }
+}
 
+async function removeCryptoKey(name) {
+  try {
+    let result = await Keychain.resetInternetCredentials('notesnook');
+    return result;
+  } catch (e) {
+    console.log(e);
+  }
+}
 
 async function getAllKeys() {
   return await MMKV.indexer.getKeys();
@@ -92,15 +119,14 @@ async function requestPermission() {
       PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
     ]);
     granted =
-        response['android.permission.READ_EXTERNAL_STORAGE'] ===
+      response['android.permission.READ_EXTERNAL_STORAGE'] ===
         RESULTS.GRANTED &&
-        response['android.permission.WRITE_EXTERNAL_STORAGE'] === RESULTS.GRANTED;
-  } catch (err) {
-  }
+      response['android.permission.WRITE_EXTERNAL_STORAGE'] === RESULTS.GRANTED;
+  } catch (err) {}
   return granted;
 }
 async function checkAndCreateDir(path) {
-  let dir = Platform.OS === "ios"? IOS_PATH + path : ANDROID_PATH + path;
+  let dir = Platform.OS === 'ios' ? IOS_PATH + path : ANDROID_PATH + path;
   try {
     let exists = await RNFetchBlob.fs.exists(dir);
     let isDir = await RNFetchBlob.fs.isDir(dir);
@@ -123,9 +149,11 @@ export default {
   clear,
   encrypt,
   decrypt,
-  deriveKey,
   getAllKeys,
   getRandomBytes,
   checkAndCreateDir,
-  requestPermission
+  requestPermission,
+  deriveCryptoKey,
+  getCryptoKey,
+  removeCryptoKey,
 };

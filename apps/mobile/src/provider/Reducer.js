@@ -1,18 +1,17 @@
-import { eSendEvent } from '../services/EventManager';
-import { eCloseSideMenu, eOpenSideMenu } from '../utils/Events';
+import {eSendEvent} from '../services/EventManager';
+import {eCloseSideMenu, eOpenSideMenu} from '../utils/Events';
 import storage from '../utils/storage';
 import {history, SORT, sortSettings} from '../utils/index';
-import { Actions } from './Actions';
-import {db} from "../utils/DB";
+import {Actions} from './Actions';
+import {db} from '../utils/DB';
+import {defaultState} from './DefaultState';
 
 export const reducer = (state, action) => {
   switch (action.type) {
     case Actions.ALL: {
-
-
       return {
         ...state,
-        notes:  db.notes.group(SORT[sortSettings.sort]),
+        notes: db.notes.group(SORT[sortSettings.sort]),
         notebooks: db.notebooks.all,
         trash: db.trash.all,
         tags: db.tags.all,
@@ -24,6 +23,12 @@ export const reducer = (state, action) => {
       return {
         ...state,
         syncing: action.syncing,
+      };
+    }
+    case Actions.LOADING: {
+      return {
+        ...state,
+        syncing: action.loading,
       };
     }
     case Actions.CLEAR_ALL: {
@@ -44,11 +49,9 @@ export const reducer = (state, action) => {
       };
     }
     case Actions.NOTES:
-
       return {
         ...state,
         notes: db.notes.group(SORT[sortSettings.sort]),
-        loading: false,
       };
     case Actions.THEME: {
       return {
@@ -179,30 +182,27 @@ export const reducer = (state, action) => {
       };
     }
     case Actions.SEARCH_RESULTS: {
-      let results = action.results;
-
       return {
         ...state,
-        searchResults: {...results},
+        searchResults: action.results,
       };
     }
     case Actions.HEADER_STATE: {
-
-      return  {
-            ...state,
-            headerMenuState:action.state
-          };
+      return {
+        ...state,
+        headerMenuState: action.state,
+      };
     }
     case Actions.SEARCH_STATE: {
       let stat = {
-            ...state.searchState,
-            ...action.state,
-          };
+        ...state.searchState,
+        ...action.state,
+      };
 
       return {
-            ...state,
-            searchState: stat,
-          };
+        ...state,
+        searchState: stat,
+      };
     }
     case Actions.CONTAINER_STATE: {
       return {
@@ -211,14 +211,14 @@ export const reducer = (state, action) => {
       };
     }
     case Actions.HEADER_TEXT_STATE: {
-      let stat ={
-            ...state.headerTextState,
-            ...action.state,
-          };
+      let stat = {
+        ...state.headerTextState,
+        ...action.state,
+      };
       return {
-            ...state,
-            headerTextState: stat,
-          };
+        ...state,
+        headerTextState: stat,
+      };
     }
     case Actions.HEADER_VERTICAL_MENU: {
       return {
@@ -227,20 +227,26 @@ export const reducer = (state, action) => {
       };
     }
     case Actions.CONTAINER_BOTTOM_BUTTON: {
-      let containerBottomButton = {
-            ...state.containerBottomButton,
-            ...action.state,
-          };
+      let _state = {
+        ...defaultState.containerBottomButton,
+        ...action.state,
+      };
       return {
-            ...state,
-            containerBottomButton: containerBottomButton,
-          };
+        ...state,
+        containerBottomButton: _state,
+      };
     }
     case Actions.MESSAGE_BOARD_STATE: {
       return {
         ...state,
-        messageBoardState:action.state
-      }
+        messageBoardState: action.state,
+      };
+    }
+    case Actions.FULLSCREEN: {
+      return {
+        ...state,
+        fullscreen: action.state,
+      };
     }
     default:
       throw new Error('unknown action type');

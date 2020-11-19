@@ -19,6 +19,7 @@ import {
   sendNoteEditedEvent,
   ToastEvent,
 } from '../../services/EventManager';
+import PremiumService from '../../services/PremiumService';
 import {
   ACCENT,
   COLOR_SCHEME,
@@ -27,16 +28,24 @@ import {
   setColorScheme,
 } from '../../utils/Colors';
 import {db} from '../../utils/DB';
-import {eOpenLoginDialog, eOpenMoveNoteDialog} from '../../utils/Events';
+import {
+  eOpenLoginDialog,
+  eOpenMoveNoteDialog,
+  eShowGetPremium,
+} from '../../utils/Events';
+import {deleteItems} from '../../utils/functions';
 import {MMKV} from '../../utils/mmkv';
 import {opacity, ph, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
-import {timeConverter} from '../../utils/TimeUtils';
+import {sleep, timeConverter} from '../../utils/TimeUtils';
 import {Button} from '../Button';
 import {PremiumTag} from '../Premium/PremiumTag';
 import {PressableButton} from '../PressableButton';
 import {Toast} from '../Toast';
+import Heading from '../Typography/Heading';
+import Paragraph from '../Typography/Paragraph';
 import {ActionSheetColorsSection} from './ActionSheetColorsSection';
 import {ActionSheetTagsSection} from './ActionSheetTagsSection';
+import {GetPremium} from './GetPremium';
 const w = Dimensions.get('window').width;
 
 export const ActionSheetComponent = ({
@@ -69,8 +78,6 @@ export const ActionSheetComponent = ({
 
   function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
     let newColors = setColorScheme(colors, accent);
-    StatusBar.setBarStyle(colors.night ? 'light-content' : 'dark-content');
-
     dispatch({type: Actions.THEME, colors: newColors});
   }
 
@@ -147,7 +154,12 @@ export const ActionSheetComponent = ({
       icon: 'share-variant',
       func: () => {
         if (note.locked) {
-          openVault(item, false, true, false, false, true);
+          openVault({
+            item: item,
+            novault: true,
+            locked: true,
+            share: true,
+          });
         } else {
           close();
           let m = `${note.title}\n \n ${note.content.text}`;
@@ -170,7 +182,14 @@ export const ActionSheetComponent = ({
     {
       name: 'Delete',
       icon: 'delete',
-      func: () => close('delete'),
+      func: async () => {
+        close();
+        try {
+          await deleteItems(note);
+        } catch (e) {
+          console.log(e);
+        }
+      },
     },
     {
       name: 'Edit Notebook',
@@ -306,15 +325,7 @@ export const ActionSheetComponent = ({
           size={DDS.isTab ? SIZE.xl : SIZE.lg}
           color={rowItem.name === 'Delete' ? colors.errorText : colors.accent}
         />
-
-        <Text
-          style={{
-            fontFamily: WEIGHT.regular,
-            fontSize: DDS.isTab ? SIZE.sm : SIZE.xs + 1,
-            color: colors.pri,
-          }}>
-          {rowItem.name}
-        </Text>
+        <Paragraph>{rowItem.name}</Paragraph>
       </TouchableOpacity>
     ) : null;
 
@@ -349,14 +360,7 @@ export const ActionSheetComponent = ({
             color={colors.pri}
             size={SIZE.md}
           />
-          <Text
-            style={{
-              fontFamily: WEIGHT.regular,
-              fontSize: SIZE.sm,
-              color: colors.pri,
-            }}>
-            {item.name}
-          </Text>
+          <Paragraph>{item.name}</Paragraph>
         </View>
 
         <View
@@ -429,11 +433,7 @@ export const ActionSheetComponent = ({
     }
   };
 
-  const onPressVaultButton = () => {
-    if (!premiumUser) {
-      close('premium');
-      return;
-    }
+  const onPressVaultButton = async () => {
     if (!note.id) return;
 
     if (note.locked) {
@@ -459,6 +459,19 @@ export const ActionSheetComponent = ({
           }
         });
     }
+
+    return;
+    await PremiumService.verify(
+      () => {},
+      () => {
+        eSendEvent(eShowGetPremium, {
+          context: 'sheet',
+          title: 'Add Notes to Vault',
+          desc:
+            'With Notesnook Pro you can add notes to your vault and do so much more! Get it now.',
+        });
+      },
+    );
   };
 
   return (
@@ -474,16 +487,9 @@ export const ActionSheetComponent = ({
         paddingHorizontal: 0,
       }}>
       {!note.id && !note.dateCreated ? (
-        <Text
-          style={{
-            width: '100%',
-            textAlign: 'center',
-            marginVertical: 10,
-            color: colors.icon,
-            fontFamily: WEIGHT.regular,
-          }}>
-          Please start writing to save your note.
-        </Text>
+        <Paragraph style={{marginVertical: 10}}>
+          Start writing to save your note.
+        </Paragraph>
       ) : (
         <View
           style={{
@@ -491,22 +497,11 @@ export const ActionSheetComponent = ({
             alignItems: 'center',
             marginVertical: 10,
           }}>
-          <Text
-            numberOfLines={1}
-            style={{
-              color: colors.heading,
-              fontSize: SIZE.sm + 1,
-              fontFamily: WEIGHT.bold,
-              maxWidth: '100%',
-            }}>
-            {note.title.replace('\n', '')}
-          </Text>
-          <Text
+          <Heading size={SIZE.md}>{note.title.replace('\n', '')}</Heading>
+
+          <Paragraph
             numberOfLines={2}
             style={{
-              fontSize: SIZE.sm - 1,
-              color: colors.pri + 'B3',
-              fontFamily: WEIGHT.regular,
               width: '100%',
               textAlign: 'center',
               maxWidth: '100%',
@@ -519,14 +514,13 @@ export const ActionSheetComponent = ({
                 ? note.headline.slice(0, note.headline.length - 1)
                 : note.headline
               : null}
-          </Text>
+          </Paragraph>
 
-          <Text
+          <Paragraph
+            color={colors.icon}
+            size={SIZE.xs}
             style={{
-              color: colors.icon,
-              fontSize: SIZE.xs - 1,
               textAlignVertical: 'center',
-              fontFamily: WEIGHT.regular,
               marginTop: 2.5,
             }}>
             {note.type === 'note'
@@ -538,7 +532,7 @@ export const ActionSheetComponent = ({
             {note.dateDeleted
               ? 'Deleted on ' + timeConverter(note.dateDeleted)
               : null}
-          </Text>
+          </Paragraph>
 
           {note.type !== 'notebook' ? null : (
             <View
@@ -562,16 +556,15 @@ export const ActionSheetComponent = ({
                         marginRight: 5,
                         marginVertical: 2.5,
                       }}>
-                      <Text
+                      <Paragraph
+                        size={SIZE.xs}
                         numberOfLines={1}
+                        color="white"
                         style={{
-                          color: 'white',
-                          fontFamily: WEIGHT.regular,
-                          fontSize: SIZE.xxs,
                           maxWidth: '100%',
                         }}>
                         {topic.title}
-                      </Text>
+                      </Paragraph>
                     </View>
                   ))
                 : null}
@@ -579,29 +572,29 @@ export const ActionSheetComponent = ({
           )}
 
           {note.type !== 'note' || refreshing ? null : (
-            <Text
+            <Paragraph
+              color={colors.accent}
+              size={SIZE.xs}
               onPress={onPressSync}
               style={{
-                color: colors.accent,
-                fontSize: SIZE.xs - 1,
                 textAlignVertical: 'center',
-                fontFamily: WEIGHT.regular,
                 marginTop: 5,
                 borderWidth: 1,
                 textAlign: 'center',
                 borderColor: colors.accent,
                 paddingHorizontal: 5,
                 borderRadius: 2,
+                height: 20,
               }}>
               {user && user.lastSynced > note.dateEdited
                 ? 'Synced'
                 : 'Sync Now'}
-            </Text>
+            </Paragraph>
           )}
 
           {refreshing ? (
             <ActivityIndicator
-              style={{marginTop: 5}}
+              style={{marginTop: 5, height: 20}}
               size={12}
               color={colors.accent}
             />
@@ -643,22 +636,27 @@ export const ActionSheetComponent = ({
             color={note.locked ? '#FF0000' : colors.accent}
             size={SIZE.md}
           />
-          <Text
+          <Paragraph
+            color={note.locked ? '#FF0000' : colors.accent}
+            size={SIZE.md}
             style={{
-              color: note.locked ? '#FF0000' : colors.accent,
-              fontFamily: WEIGHT.regular,
-              fontSize: SIZE.md,
               marginLeft: 5,
             }}>
             {note.locked ? 'Remove from Vault' : 'Add to Vault'}
-          </Text>
+          </Paragraph>
         </PressableButton>
       ) : null}
 
-      {hasColors && note.id ? <ActionSheetColorsSection item={note} /> : null}
+      {hasColors && note.id ? (
+        <ActionSheetColorsSection close={close} item={note} />
+      ) : null}
 
       {hasTags ? (
-        <ActionSheetTagsSection item={note} localRefresh={localRefresh} />
+        <ActionSheetTagsSection
+          close={close}
+          item={note}
+          localRefresh={localRefresh}
+        />
       ) : null}
 
       {columnItems.length > 0 ? (

@@ -2,7 +2,6 @@ import React, {useEffect} from 'react';
 import Animated, {Easing, useValue} from 'react-native-reanimated';
 import {useTracked} from '../../provider';
 import {Header} from '../Header';
-import {Search} from '../SearchInput';
 
 export const ContainerTopSection = ({root}) => {
   const [state,] = useTracked();
@@ -25,10 +24,7 @@ export const ContainerTopSection = ({root}) => {
   return (
     <Animated.View
       style={{
-        position: 'absolute',
         backgroundColor: colors.bg,
-        zIndex: 998,
-        display: 'flex',
         width: '100%',
         opacity: opacity,
         overflow: 'hidden',
@@ -38,10 +34,7 @@ export const ContainerTopSection = ({root}) => {
           },
         ],
       }}>
-
-
      <Header root={root} />
-      <Search root={root} />
     </Animated.View>
   );
 };

@@ -1,34 +1,68 @@
 import React from 'react';
-import { ActivityIndicator, StyleSheet, Text } from 'react-native';
+import {ActivityIndicator, StyleSheet, Text} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useTracked } from '../../provider';
-import { PressableButton } from '../PressableButton';
-import {ph, pv, SIZE, WEIGHT} from "../../utils/SizeUtils";
+import {useTracked} from '../../provider';
+import {PressableButton} from '../PressableButton';
+import {ph, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
+import Paragraph from '../Typography/Paragraph';
+import Heading from '../Typography/Heading';
+
+const BUTTON_TYPES = {
+  transparent: {
+    primary: 'transparent',
+    text: 'accent',
+    selected: 'shade',
+  },
+  gray: {
+    primary: 'transparent',
+    text: 'icon',
+    selected: 'nav',
+  },
+  accent: {
+    primary: 'accent',
+    text: 'light',
+    selected: 'accent',
+  },
+  inverted: {
+    primary: 'bg',
+    text: 'accent',
+    selected: 'bg',
+  },
+
+  shade: {
+    primary: 'shade',
+    text: 'accent',
+    selected: 'accent',
+    opacity: 0.12,
+  },
+};
 
 export const Button = ({
   height = 40,
-  width = '48%',
+  width = null,
   onPress = () => {},
   loading = false,
-  grayed,
   title = '',
   icon,
-  color = 'accent',
-  fontSize=SIZE.sm
+  fontSize = SIZE.sm,
+  type = 'transparent',
+  iconSize = SIZE.md,
+  style = {},
 }) => {
-  const [state, dispatch] = useTracked();
+  const [state] = useTracked();
   const {colors} = state;
-  const usedColor = 'accent' ? colors.accent : color;
 
   return (
     <PressableButton
       onPress={onPress}
-      color={grayed ? colors.nav : usedColor}
-      selectedColor={grayed ? colors.nav : usedColor}
-      alpha={grayed ? (!colors.night ? -0.04 : 0.04) : -0.1}
+      disabled={loading}
+      color={colors[BUTTON_TYPES[type].primary]}
+      selectedColor={colors[BUTTON_TYPES[type].selected]}
+      alpha={!colors.night ? -0.04 : 0.04}
+      opacity={BUTTON_TYPES[type].opacity || 1}
       customStyle={{
         height: height,
-        width: width? width : null,
+        width: width || null,
         paddingVertical: pv,
         paddingHorizontal: ph,
         borderRadius: 5,
@@ -36,22 +70,27 @@ export const Button = ({
         justifyContent: 'center',
         alignItems: 'center',
         flexDirection: 'row',
+        ...style,
       }}>
-      {loading ? <ActivityIndicator color={usedColor} /> : null}
-      {icon && !loading ? (
+      {loading && <ActivityIndicator color={colors[BUTTON_TYPES[type].text]} />}
+      {icon && !loading && (
         <Icon
           name={icon}
           style={{
-            marginRight: 5,
+            marginRight: 0,
           }}
-          color={grayed ? colors.icon : 'white'}
-          size={SIZE.lg}
+          color={colors[BUTTON_TYPES[type].text]}
+          size={iconSize}
         />
-      ) : null}
-      <Text
-        style={[styles.buttonText, {color: grayed ? colors.icon : 'white',fontSize:fontSize}]}>
-        {title}
-      </Text>
+      )}
+      {!title ? null : (
+        <Heading
+          color={colors[BUTTON_TYPES[type].text]}
+          size={fontSize}
+          style={styles.buttonText}>
+          {title}
+        </Heading>
+      )}
     </PressableButton>
   );
 };
@@ -66,8 +105,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   buttonText: {
-    fontFamily: WEIGHT.medium,
-    color: 'white',
     marginLeft: 5,
   },
 });

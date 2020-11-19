@@ -1,10 +1,11 @@
 import React from 'react';
-import {useTracked} from '../../provider';
-import {SIZE, WEIGHT} from '../../utils/SizeUtils';
-import {Text, TouchableOpacity} from 'react-native';
+import { TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {eSendEvent} from '../../services/EventManager';
-import {eOpenSortDialog} from '../../utils/Events';
+import { useTracked } from '../../provider';
+import { eSendEvent } from '../../services/EventManager';
+import { eOpenSortDialog } from '../../utils/Events';
+import { SIZE } from '../../utils/SizeUtils';
+import Paragraph from '../Typography/Paragraph';
 
 export const HeaderMenu = () => {
   const [state] = useTracked();
@@ -15,30 +16,29 @@ export const HeaderMenu = () => {
       onPress={() => {
         eSendEvent(eOpenSortDialog);
       }}
+      hitSlop={{top: 10, right: 10, left: 30, bottom: 15}}
       activeOpacity={1}
       style={{
         flexDirection: 'row',
         alignItems: 'center',
+        zIndex:10
       }}>
-      <Text
+      <Paragraph
         style={{
-          fontSize: SIZE.xs + 1,
-          fontFamily: WEIGHT.regular,
-          color: colors.pri,
           marginRight: 5,
-          height: 30,
-          textAlignVertical: 'bottom',
+          height: 35,
+          textAlignVertical:'center'
         }}>
         {settings.sort.slice(0, 1).toUpperCase() +
           settings.sort.slice(1, settings.sort.length)}
-      </Text>
+      </Paragraph>
       <Icon
         color={colors.pri}
         name={
           settings.sortOrder === 'asc' ? 'sort-ascending' : 'sort-descending'
         }
         style={{
-          textAlignVertical: 'bottom',
+          textAlignVertical:'center',
           height: 30,
         }}
         size={SIZE.md}

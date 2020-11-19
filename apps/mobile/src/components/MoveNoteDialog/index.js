@@ -11,14 +11,20 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
-import {eSubscribeEvent, eUnSubscribeEvent, ToastEvent} from '../../services/EventManager';
+import {
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+  ToastEvent,
+} from '../../services/EventManager';
 import {eOpenMoveNoteDialog} from '../../utils/Events';
 import {getElevation} from '../../utils';
 import {PressableButton} from '../PressableButton';
 import {Toast} from '../Toast';
-import {pv, SIZE, WEIGHT} from "../../utils/SizeUtils";
-import {db} from "../../utils/DB";
-import {DDS} from "../../services/DeviceDetection";
+import {pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
+import {db} from '../../utils/DB';
+import {DDS} from '../../services/DeviceDetection';
+import Heading from '../Typography/Heading';
+import Paragraph from '../Typography/Paragraph';
 
 let newNotebookTitle = null;
 let newTopicTitle = null;
@@ -146,16 +152,11 @@ const MoveNoteDialog = () => {
               }}
               color={colors.heading}
             />
-            <Text
-              style={{
-                color: colors.accent,
-                fontFamily: WEIGHT.bold,
-                fontSize: SIZE.xl,
-              }}>
+            <Heading color={colors.accent}>
               {selectedItemsList.length > 1
                 ? 'Add notes to notebook'
                 : 'Add note to notebook'}
-            </Text>
+            </Heading>
           </View>
 
           <FlatList
@@ -256,27 +257,17 @@ const MoveNoteDialog = () => {
                       borderBottomColor:
                         expanded === item.id ? 'transparent' : colors.nav,
                     }}>
-                    <Text
-                      style={{
-                        fontFamily: WEIGHT.bold,
-                        fontSize: SIZE.md,
-                        color: colors.heading,
-                      }}>
+                    <Heading size={SIZE.md}>
                       {item.title}
                       {'\n'}
-                      <Text
-                        style={{
-                          fontFamily: WEIGHT.regular,
-                          fontSize: SIZE.xxs,
-                          color: colors.icon,
-                        }}>
+                      <Paragraph size={SIZE.xs} color={colors.icon}>
                         {item.totalNotes +
                           ' notes' +
                           ' & ' +
                           item.topics.length +
                           ' topics'}
-                      </Text>
-                    </Text>
+                      </Paragraph>
+                    </Heading>
                   </View>
                 </PressableButton>
 
@@ -393,31 +384,14 @@ const MoveNoteDialog = () => {
                           flexDirection: 'row',
                           justifyContent: 'space-between',
                         }}>
-                        <Text
-                          style={{
-                            fontFamily: WEIGHT.regular,
-                            fontSize: SIZE.sm,
-                            color: colors.heading,
-                          }}>
+                        <Paragraph color={colors.heading}>
                           {item.title}
                           {'\n'}
-                          <Text
-                            style={{
-                              fontFamily: WEIGHT.regular,
-                              fontSize: SIZE.xxs,
-                              color: colors.icon,
-                            }}>
+                          <Paragraph color={colors.icon} size={SIZE.xs}>
                             {item.totalNotes + ' notes'}
-                          </Text>
-                        </Text>
-                        <Text
-                          style={{
-                            fontFamily: WEIGHT.regular,
-                            fontSize: SIZE.sm,
-                            color: colors.accent,
-                          }}>
-                          Move
-                        </Text>
+                          </Paragraph>
+                        </Paragraph>
+                        <Paragraph color={colors.accent}>Move</Paragraph>
                       </PressableButton>
                     )}
                   />

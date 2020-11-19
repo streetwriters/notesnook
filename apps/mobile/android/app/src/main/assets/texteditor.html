@@ -1,11 +1,10 @@
 <html>
 
 <head>
-    <meta content="width=device-width, initial-scale=1, user-scalable=no" name="viewport"/>
+    <meta content="width=device-width, initial-scale=1, user-scalable=no" name="viewport" />
     <link href="fonts.css" rel="stylesheet">
     <link href="styles.css" rel="stylesheet">
     <style>
-            
         .ql-toolbar {
             overflow-x: auto;
             width: 100vw;
@@ -19,47 +18,65 @@
     </style>
 </head>
 
-<body  class="app-body" >
-<div class="app-main">
+<body class="app-body">
+    <div class="app-main">
 
 
-<div id="titlebar">
-    <form id="formBox">
-        <input id="titleInput" placeholder="Title here"/>
-    </form>
-    <div class="info-bar">
-        <p id="infowords"></p>
-        <p>•</p>
-        <p id="infodate"></p>
-        <p>•</p>
-        <p id="infosaved"></p>
+        <div id="titlebar">
+            <form id="formBox">
+
+                <textarea maxlength="150" id="titleInput" placeholder="Title here"></textarea>
+                <div id="textCopy"></div>
+            </form>
+            <div class="info-bar">
+                <p id="infowords"></p>
+                <p>•</p>
+                <p id="infodate"></p>
+                <p>•</p>
+                <p id="infosaved"></p>
+            </div>
+
+        </div>
+
+        <div id="editor"></div>
     </div>
-</div>
-
-<div id="editor"></div>
-</div>
-<div id="toolbar"></div>
-</div>
+    <div id="toolbar"></div>
 </body>
+<script src="module.js"></script>
 <script src="constants.js"></script>
 <script src="listeners.js"></script>
-<script src="module.js"></script>
 <script src="quill.js"></script>
-
+<script src="image-resize.min.js"></script>
 
 <script>
     let editor;
 
-    function loadAction(premium, noMenu) {
+    const List = Quill.import("formats/list");
 
-        const Quill = requiring('quill');
+    class BetterList extends List {
+        constructor(el) {
+            super(el);
+            const isCheckList = el.hasAttribute("data-checked");
+            el.addEventListener("touchstart", e => {
+                if (!isCheckList) {
+                    return;
+                }
+                e.preventDefault();
+            });
+        }
+    }
+
+    function loadAction(premium, noMenu) {
+        Image
         setFonts();
         Quill.register("modules/imageCompressor", imageCompressor);
+
+        Quill.register("formats/lists", BetterList);
         editor = new Quill('#editor', {
             modules: {
                 toolbar: premium ? proToolbar : simpleToolbar,
                 imageCompressor: {
-                    quality: 0.9,
+                    quality: 1,
                     maxWidth: 1024,
                     imageType: 'image/jpeg'
                 },
@@ -67,6 +84,9 @@
                     delay: 2000,
                     maxStack: 500,
                     userOnly: true
+                },
+                imageResize: {
+                    displaySize: true,
                 }
             },
             placeholder: 'Start writing your note',
@@ -83,6 +103,8 @@
         setTheme();
         attachEditorListeners();
         fixDropdownMenuLocations();
+
+      
 
     }
     loadAction(true);

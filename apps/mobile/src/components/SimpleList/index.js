@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
   Platform,
   RefreshControl,
@@ -7,23 +7,27 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {DataProvider, LayoutProvider, RecyclerListView} from 'recyclerlistview';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
+import {DDS} from '../../services/DeviceDetection';
 import {eSendEvent, ToastEvent} from '../../services/EventManager';
+import {db} from '../../utils/DB';
 import {
-  eClearSearch,
   eOpenJumpToDialog,
   eOpenLoginDialog,
   eScrollEvent,
 } from '../../utils/Events';
-import {PressableButton} from '../PressableButton';
-import {COLORS_NOTE} from '../../utils/Colors';
 import {SIZE, WEIGHT} from '../../utils/SizeUtils';
-import {db} from '../../utils/DB';
+import {Button} from '../Button';
 import {HeaderMenu} from '../Header/HeaderMenu';
+import Seperator from '../Seperator';
+import TagItem from '../TagItem';
+import Heading from '../Typography/Heading';
+import Paragraph from '../Typography/Paragraph';
+import {ListHeaderComponent} from './ListHeaderComponent';
+import {NotebookItemWrapper} from './NotebookItemWrapper';
+import {NoteItemWrapper} from './NoteItemWrapper';
 
 const header = {
   type: 'MAIN_HEADER',
@@ -34,16 +38,16 @@ const SimpleList = ({
   type,
   placeholder,
   RenderItem,
-  focused,
   customRefresh,
   customRefreshing,
   refreshCallback,
   sortMenuButton,
   scrollRef,
   jumpToDialog,
+  placeholderData,
 }) => {
   const [state, dispatch] = useTracked();
-  const {colors, selectionMode, messageBoardState} = state;
+  const {colors, selectionMode} = state;
   const searchResults = {...state.searchResults};
   const [refreshing, setRefreshing] = useState(false);
   const [dataProvider, setDataProvider] = useState(
@@ -52,7 +56,6 @@ const SimpleList = ({
     }),
   );
   const {width, fontScale} = useWindowDimensions();
-  const insets = useSafeAreaInsets();
 
   const listData = data;
   const dataType = type;
@@ -67,15 +70,8 @@ const SimpleList = ({
   }, [listData, searchResults.results]);
 
   const loadData = () => {
-    let mainData =
-      searchResults.type === type &&
-      focused() &&
-      searchResults.results.length > 0
-        ? searchResults.results
-        : listData;
-
-    let d = [header, ...mainData];
-    setDataProvider(dataProvider.cloneWithRows(d));
+    let mainData = [header, ...listData];
+    setDataProvider(dataProvider.cloneWithRows(mainData));
   };
 
   const RenderSectionHeader = ({item, index}) => (
@@ -86,26 +82,24 @@ const SimpleList = ({
         width: '100%',
         justifyContent: 'space-between',
         paddingHorizontal: 12,
-        height: 30,
+        height: 35,
       }}>
-      <Text
+      <Paragraph
         onPress={() => {
           console.log('clicekd');
           if (jumpToDialog) {
             eSendEvent(eOpenJumpToDialog);
           }
         }}
-        style={[
-          styles.sectionHeader,
-          {
-            color: colors.accent,
-            height: 30,
-            minWidth: 60,
-            textAlignVertical: 'bottom',
-          },
-        ]}>
+        color={colors.accent}
+        style={{
+          height: 35,
+          minWidth: 60,
+          alignSelf: 'center',
+          textAlignVertical: 'center',
+        }}>
         {item.title}
-      </Text>
+      </Paragraph>
       {index === 1 && sortMenuButton ? <HeaderMenu /> : null}
     </View>
   );
@@ -156,10 +150,30 @@ const SimpleList = ({
       style={[
         {
           backgroundColor: colors.bg,
+          height: '100%',
         },
-        styles.emptyList,
       ]}>
-      <>{placeholder}</>
+      <ListHeaderComponent type={type} />
+
+      <View
+        style={{
+          flexGrow: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        <Heading>{placeholderData.heading}</Heading>
+        <Paragraph color={colors.icon}>{placeholderData.paragraph}</Paragraph>
+        <Seperator />
+        {placeholderData.button && (
+          <Button
+            onPress={placeholderData.action}
+            title={placeholderData.button}
+            icon="plus"
+            type="transparent"
+            fontSize={SIZE.md}
+          />
+        )}
+      </View>
     </View>
   );
 
@@ -191,14 +205,12 @@ const SimpleList = ({
           break;
         case 'header':
           dim.width = width;
-          dim.height = 30 * fontScale;
+          dim.height = 35 * fontScale;
           break;
         case 'MAIN_HEADER':
           dim.width = width;
           dim.height =
-            !messageBoardState.visible || !listData[0] || selectionMode
-              ? 0
-              : 40 * fontScale;
+            dataType === 'search' ? 0 : DDS.isLargeTablet() ? 50 : 200;
           break;
         default:
           dim.width = width;
@@ -210,35 +222,38 @@ const SimpleList = ({
   const _renderRow = (type, data, index) => {
     switch (type) {
       case 'note':
-        return <RenderItem item={data} pinned={data.pinned} index={index} />;
+        return (
+          <NoteItemWrapper item={data} pinned={data.pinned} index={index} />
+        );
       case 'notebook':
-        return <RenderItem item={data} pinned={data.pinned} index={index} />;
+        return (
+          <NotebookItemWrapper item={data} pinned={data.pinned} index={index} />
+        );
+      case 'tag':
+        return <TagItem item={data} index={index} />;
+      case 'topic':
+        return (
+          <NotebookItemWrapper
+            item={data}
+            isTopic={true}
+            pinned={data.pinned}
+            index={index}
+          />
+        );
+      case 'trash':
+        return data.itemType === 'note' ? (
+          <NoteItemWrapper item={data} index={index} isTrash={true} />
+        ) : (
+          <NotebookItemWrapper item={data} index={index} isTrash={true} />
+        );
       case 'MAIN_HEADER':
         return (
           <ListHeaderComponent type={dataType} index={index} data={listData} />
         );
       case 'header':
         return <RenderSectionHeader item={data} index={index} />;
-      default:
-        return <RenderItem item={data} index={index} />;
     }
   };
-
-  const listStyle = useMemo(() => {
-    return {
-      height: '100%',
-      backgroundColor: colors.bg,
-      width: '100%',
-      paddingTop:
-        Platform.OS === 'ios'
-          ? listData[0] && !selectionMode
-            ? 130
-            : 130 - 60
-          : listData[0] && !selectionMode
-          ? 155 - insets.top
-          : 155 - insets.top - 60,
-    };
-  }, [selectionMode, listData, colors, insets]);
 
   return !listData || listData.length === 0 || !dataProvider ? (
     _ListEmptyComponent
@@ -249,10 +264,16 @@ const SimpleList = ({
       dataProvider={dataProvider}
       rowRenderer={_renderRow}
       onScroll={_onScroll}
-      renderFooter={() => <View style={{height: 400}} />}
+      canChangeSize
+      forceNonDeterministicRendering
+      renderFooter={() => <View style={{height: 300}} />}
       scrollViewProps={{
         refreshControl: (
           <RefreshControl
+            style={{
+              opacity: 0,
+              elevation: 0,
+            }}
             tintColor={colors.accent}
             colors={[colors.accent]}
             progressViewOffset={150}
@@ -260,120 +281,23 @@ const SimpleList = ({
             refreshing={customRefresh ? customRefreshing : refreshing}
           />
         ),
+        overScrollMode: 'always',
         contentContainerStyle: {
           width: '100%',
           alignSelf: 'center',
           minHeight: '100%',
         },
       }}
-      style={listStyle}
+      style={{
+        height: '100%',
+        backgroundColor: colors.bg,
+        width: '100%',
+      }}
     />
   );
 };
 
 export default SimpleList;
-
-const SearchHeader = () => {
-  const [state] = useTracked();
-  const {colors} = state;
-  const searchResults = {...state.searchResults};
-
-  return (
-    <View style={styles.searchHeader}>
-      <Text
-        style={{
-          fontFamily: WEIGHT.bold,
-          color: colors.accent,
-          fontSize: SIZE.xs,
-        }}>
-        Showing Results for {searchResults.keyword}
-      </Text>
-      <Text
-        onPress={() => {
-          eSendEvent(eClearSearch);
-        }}
-        style={{
-          fontFamily: WEIGHT.regular,
-          color: colors.errorText,
-          fontSize: SIZE.xs,
-        }}>
-        Clear
-      </Text>
-    </View>
-  );
-};
-
-const MessageCard = ({data}) => {
-  const [state] = useTracked();
-  const {colors, selectionMode, currentScreen, messageBoardState} = state;
-
-  return (
-    <View>
-      {!messageBoardState.visible || !data[0] || selectionMode ? null : (
-        <PressableButton
-          onPress={messageBoardState.onPress}
-          color={
-            COLORS_NOTE[currentScreen]
-              ? COLORS_NOTE[currentScreen]
-              : colors.shade
-          }
-          selectedColor={
-            COLORS_NOTE[currentScreen]
-              ? COLORS_NOTE[currentScreen]
-              : colors.accent
-          }
-          alpha={!colors.night ? -0.02 : 0.1}
-          opacity={0.12}
-          customStyle={styles.loginCard}>
-          <View
-            style={{
-              width: 25,
-              backgroundColor: COLORS_NOTE[currentScreen]
-                ? COLORS_NOTE[currentScreen]
-                : colors.accent,
-              height: 25,
-              borderRadius: 100,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}>
-            <Icon
-              style={styles.loginIcon}
-              name={messageBoardState.icon}
-              color="white"
-              size={SIZE.xs}
-            />
-          </View>
-          <View
-            style={{
-              marginLeft: 10,
-            }}>
-            <Text
-              style={{
-                fontFamily: WEIGHT.regular,
-                color: colors.icon,
-                fontSize: SIZE.xxs - 1,
-              }}>
-              {messageBoardState.message}
-            </Text>
-            <Text
-              style={{
-                color: COLORS_NOTE[currentScreen]
-                  ? COLORS_NOTE[currentScreen]
-                  : colors.accent,
-                fontSize: SIZE.xxs,
-              }}>
-              {messageBoardState.actionText}
-            </Text>
-          </View>
-        </PressableButton>
-      )}
-    </View>
-  );
-};
-
-const ListHeaderComponent = ({type, data}) => {
-  return <MessageCard type={type} data={data} />;
-};
 
 const styles = StyleSheet.create({
   loginCard: {
@@ -397,12 +321,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 12,
     height: 40,
-  },
-  sectionHeader: {
-    fontFamily: WEIGHT.bold,
-    fontSize: SIZE.xs + 1,
-    alignSelf: 'center',
-    textAlignVertical: 'center',
   },
   emptyList: {
     height: '100%',

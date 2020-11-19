@@ -3,24 +3,22 @@ import {TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
-import {getElevation} from '../../utils';
+import {ToastEvent} from '../../services/EventManager';
+import {COLORS_NOTE} from '../../utils/Colors';
+import {db} from '../../utils/DB';
+import {SIZE} from '../../utils/SizeUtils';
 import {PressableButton} from '../PressableButton';
-import {ToastEvent} from "../../services/EventManager";
-import {SIZE} from "../../utils/SizeUtils";
-import {db} from "../../utils/DB";
 
 const SelectionWrapper = ({
   children,
   item,
-  currentEditingNote,
   index,
   background,
-  pinned,
   onLongPress,
   onPress,
 }) => {
   const [state, dispatch] = useTracked();
-  const {colors, selectionMode, selectedItemsList} = state;
+  const {colors, selectionMode, selectedItemsList, currentEditingNote} = state;
   const [selected, setSelected] = useState(false);
   useEffect(() => {
     let exists = selectedItemsList.filter(
@@ -68,21 +66,19 @@ const SelectionWrapper = ({
   return (
     <PressableButton
       color={
-        currentEditingNote || pinned
-          ? colors.shade
+        currentEditingNote === item.id
+          ? item.type === 'note' && item.colors[0]
+            ? COLORS_NOTE[item.colors[0]]
+            : colors.shade
           : background
           ? background
           : 'transparent'
       }
       onLongPress={onLongPress}
       onPress={onPress}
-      selectedColor={
-        currentEditingNote  || pinned
-          ? colors.accent
-          : colors.nav
-      }
+      selectedColor={currentEditingNote ? colors.accent : colors.nav}
       alpha={!colors.night ? -0.02 : 0.02}
-      opacity={currentEditingNote || pinned ? 0.12 : 1}
+      opacity={currentEditingNote ? 0.15 : 1}
       customStyle={{
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -91,16 +87,18 @@ const SelectionWrapper = ({
         paddingHorizontal: 12,
         borderRadius: 0,
         marginTop:
-          index === 0 && pinned && !selectionMode
+          index === 0 && !selectionMode
             ? 15
-            : index === 0 && pinned && selectionMode
+            : index === 0 && selectionMode
             ? 30
             : 0,
       }}>
-      {pinned ? (
+      {/*  {item.pinned ? (
         <PressableButton
-          color={colors.accent}
-          selectedColor={colors.accent}
+          color={item.colors[0] ? COLORS_NOTE[item.colors[0]] : colors.accent}
+          selectedColor={
+            item.colors[0] ? COLORS_NOTE[item.colors[0]] : colors.accent
+          }
           alpha={!colors.night ? -0.1 : 0.1}
           onPress={onPressPin}
           customStyle={{
@@ -124,7 +122,7 @@ const SelectionWrapper = ({
             }}
           />
         </PressableButton>
-      ) : null}
+      ) : null} */}
 
       <View
         style={{

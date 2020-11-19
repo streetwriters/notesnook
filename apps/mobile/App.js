@@ -1,125 +1,140 @@
-import {useNetInfo} from '@react-native-community/netinfo';
+import * as NetInfo from '@react-native-community/netinfo';
+import * as Sentry from '@sentry/react-native';
+import {EV} from 'notes-core/common';
 import React, {useEffect, useState} from 'react';
-import {useColorScheme} from 'react-native';
+import {
+  Appearance,
+  AppState,
+  Dimensions,
+  Platform,
+  StatusBar,
+  View,
+} from 'react-native';
 import Orientation from 'react-native-orientation';
+import {enabled} from 'react-native-privacy-snapshot';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
+import SplashScreen from 'react-native-splash-screen';
+import {RootView} from './RootView';
 import {useTracked} from './src/provider';
 import {Actions} from './src/provider/Actions';
-import {defaultState} from './src/provider/DefaultState';
+import Backup from './src/services/Backup';
+import {DDS} from './src/services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
   ToastEvent,
 } from './src/services/EventManager';
+import IntentService from './src/services/IntentService';
+import {setLoginMessage} from './src/services/Message';
+import SettingsService from './src/services/SettingsService';
+import {setWidthHeight} from './src/utils';
+import {COLOR_SCHEME} from './src/utils/Colors';
+import {db} from './src/utils/DB';
 import {
   eDispatchAction,
   eOnLoadNote,
   eResetApp,
   eStartSyncer,
 } from './src/utils/Events';
-import DeviceInfo from 'react-native-device-info';
-import {getNote} from './src/views/Editor/Functions';
-import {openEditorAnimation} from './src/utils/Animations';
-import {sleep} from './src/utils/TimeUtils';
-import {getColorScheme} from './src/utils/ColorUtils';
-import {getDeviceSize, scale, updateSize} from './src/utils/SizeUtils';
-import {db} from './src/utils/DB';
-import {DDS} from './src/services/DeviceDetection';
 import {MMKV} from './src/utils/mmkv';
-import Backup from './src/services/Backup';
-import {setLoginMessage} from './src/services/Message';
-import SplashScreen from 'react-native-splash-screen';
-import {SORT, sortSettings} from "./src/utils";
+import {tabBarRef} from './src/utils/Refs';
+import {sleep} from './src/utils/TimeUtils';
+import {getNote} from './src/views/Editor/Functions';
+
+Sentry.init({
+  dsn:
+    'https://317a5c31caf64d1e9b27abf15eb1a554@o477952.ingest.sentry.io/5519681',
+});
 
 let firstLoad = true;
 let note = null;
+let {width, height} = Dimensions.get('window');
+
+const onAppStateChanged = async (state) => {
+  if (state === 'active') {
+    console.log('active state');
+    StatusBar.setBarStyle(
+      COLOR_SCHEME.night ? 'light-content' : 'dark-content',
+      true,
+    );
+    if (Platform.OS === 'android') {
+      StatusBar.setBackgroundColor('transparent', true);
+      StatusBar.setTranslucent(true, true);
+    }
+    if (SettingsService.get().privacyScreen) {
+      enabled(false);
+    }
+  } else {
+    if (SettingsService.get().privacyScreen) {
+      enabled(true);
+    }
+  }
+};
+
+const onNetworkStateChanged = (netInfo) => {
+  let message = 'Internet connection restored';
+  let type = 'success';
+  if (!netInfo.isConnected || !netInfo.isInternetReachable) {
+    message = 'No internet connection';
+    type = 'error';
+  }
+  db.user?.get().then((user) => {
+    if (user) {
+      ToastEvent.show(message, type);
+    }
+  });
+};
+
 const App = () => {
   const [, dispatch] = useTracked(),
-    [init, setInit] = useState(false),
-    netInfo = useNetInfo(),
-    colorScheme = useColorScheme();
-  let I =
-    DDS.isTab && !DDS.isSmallTab
-      ? require('./index.tablet')
-      : require('./index.mobile');
+    [init, setInit] = useState(false);
 
   const _onOrientationChange = (o) => {
+    return;
     let smallTab = DDS.isSmallTab;
     DDS.setNewValues();
     DDS.checkSmallTab(o);
     if (smallTab === DDS.isSmallTab) {
       return;
     }
-
-    I =
-      DDS.isTab && !DDS.isSmallTab
-        ? require('./index.tablet')
-        : require('./index.mobile');
+    I = DDS.isLargeTablet() ? require('./index.tablet') : require('./RootView');
 
     setTimeout(() => {
       resetApp();
     }, 1000);
   };
-
-  useEffect(() => {
-    updateTheme().then((r) => r);
-  }, [colorScheme]);
-
-  const updateTheme = async () => {
-    let settings;
-    settings = await MMKV.getStringAsync('settings');
-    if (settings) {
-      settings = JSON.parse(settings);
-      if (settings.useSystemTheme) {
-        let newColors = await getColorScheme(settings.useSystemTheme);
-        dispatch({type: Actions.THEME, colors: newColors});
-      }
-    }
-  };
-
-  useEffect(() => {
-    let message = 'Internet connection restored';
-    let type = 'success';
-    if (!netInfo.isConnected || !netInfo.isInternetReachable) {
-      message = 'No internet connection';
-      type = 'error';
-    }
-    db.user?.get().then((user) => {
-      if (user) {
-        ToastEvent.show(message, type);
-      }
-    });
-  }, [netInfo]);
-
   const syncChanges = async () => {
       dispatch({type: Actions.ALL});
     },
-    resetApp = () => {
+    resetApp = async () => {
       note = getNote();
       setInit(false);
-      Initialize().then(async () => {
-        setInit(true);
-        await sleep(300);
-        if (note && note.id) {
-          eSendEvent(eOnLoadNote, note);
-          if (DDS.isPhone || DDS.isSmallTab) {
-            openEditorAnimation();
-          }
-          note = null;
+      Initialize();
+      setInit(true);
+      await sleep(300);
+      if (note && note.id) {
+        eSendEvent(eOnLoadNote, note);
+        if (DDS.isPhone || DDS.isSmallTab) {
+          tabBarRef.current?.goToPage(1);
         }
-      });
+        note = null;
+      }
     },
     startSyncer = async () => {
       try {
         let user = await db.user.get();
         if (user) {
-          db.ev.subscribe('db:refresh', syncChanges);
+          EV.subscribe('db:refresh', syncChanges);
         }
       } catch (e) {
         console.log(e);
       }
     };
+
+  const onSystemThemeChanged = async () => {
+    await SettingsService.setTheme();
+  };
 
   useEffect(() => {
     eSubscribeEvent(eStartSyncer, startSyncer);
@@ -128,50 +143,62 @@ const App = () => {
     eSubscribeEvent(eDispatchAction, (type) => {
       dispatch(type);
     });
+    AppState.addEventListener('change', onAppStateChanged);
+    Appearance.addChangeListener(onSystemThemeChanged);
+    let unsub = NetInfo.addEventListener(onNetworkStateChanged);
     return () => {
-      db?.ev?.unsubscribe('db:refresh', syncChanges);
+      EV.unsubscribe('db:refresh', syncChanges);
       eUnSubscribeEvent(eStartSyncer, startSyncer);
       eUnSubscribeEvent(eResetApp, resetApp);
       eUnSubscribeEvent(eDispatchAction, (type) => {
         dispatch(type);
       });
       Orientation.removeOrientationListener(_onOrientationChange);
+      AppState.removeEventListener('change', onAppStateChanged);
+      Appearance.removeChangeListener(onSystemThemeChanged);
+      unsub();
     };
   }, []);
 
-  useEffect(() => {
-    let error = null;
-    let user;
+  const getUser = async () => {
+    let user = await db.user.get();
+    if (user) {
+      dispatch({type: Actions.USER, user: user});
+      dispatch({type: Actions.SYNCING, syncing: true});
+      await db.sync();
+      dispatch({type: Actions.SYNCING, syncing: false});
+      dispatch({type: Actions.ALL});
+      await startSyncer();
+    } else {
+      setLoginMessage(dispatch);
+    }
+  };
 
-    Initialize().finally(async () => {
+  useEffect(() => {
+    Initialize();
+    let error = null;
+    (async () => {
       try {
         await db.init();
+        console.log('db is initialized');
       } catch (e) {
         error = e;
+        console.log(e, 'ERROR DB');
       } finally {
-        user = await db.user.get();
-        if (user) {
-          dispatch({type: Actions.USER, user: user});
-          await startSyncer();
-        }
+        dispatch({type: Actions.ALL});
+        getUser().catch((e) => console.log);
+        backupData().then((r) => r);
       }
-      if (!user) {
-        setLoginMessage(dispatch);
-      }
-
-      dispatch({type: Actions.ALL});
       setInit(true);
-
-      backupData().then(r=> r)
-
       setTimeout(() => {
         if (error) {
           console.log(error);
           ToastEvent.show('Error initializing database.');
         }
+        IntentService.check();
         SplashScreen.hide();
-      }, 500);
-    });
+      }, 100);
+    })();
   }, []);
 
   async function backupData() {
@@ -187,47 +214,23 @@ const App = () => {
     }
   }
 
-  async function Initialize() {
-    let settings;
-    scale.fontScale = 1;
-
+  function Initialize() {
+    Orientation.lockToLandscape();
     if (firstLoad) {
-      if (DeviceInfo.isTablet() && getDeviceSize() > 9) {
-        Orientation.lockToLandscape();
-        _onOrientationChange('LANDSCAPE');
+      console.log(DDS.isTab);
+      if (DDS.isTab) {
       } else {
         Orientation.lockToPortrait();
       }
       firstLoad = false;
     }
-    settings = await MMKV.getStringAsync('settings');
-
-    if (!settings) {
-      settings = defaultState.settings;
-      await MMKV.setStringAsync('settings', JSON.stringify(settings));
-    } else {
-      settings = JSON.parse(settings);
-    }
-    if (settings.fontScale) {
-      scale.fontScale = settings.fontScale;
-    }
-    sortSettings.sort = settings.sort;
-    sortSettings.sortOrder = settings.sortOrder;
-    dispatch({type: Actions.SETTINGS, settings: {...settings}});
-    updateSize();
-
-    await updateTheme();
+    SettingsService.init().then((r) => r);
   }
 
-  if (!init) {
-    return <></>;
-  }
   return (
     <>
       <SafeAreaProvider>
-        <>
-          <I.Initialize />
-        </>
+        <>{!init ? <></> : <RootView />}</>
       </SafeAreaProvider>
     </>
   );

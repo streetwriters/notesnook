@@ -10,6 +10,7 @@ export const NotebookItemWrapper = ({
   index,
   isTrash = false,
   pinned = false,
+  isTopic,
 }) => {
   const [state, dispatch] = useTracked();
   const {selectionMode, preventDefaultMargins} = state;
@@ -37,6 +38,14 @@ export const NotebookItemWrapper = ({
       onLongPress();
       return;
     }
+
+    if (isTopic) {
+      NavigationService.navigate('NotesPage', {
+        ...item,
+      });
+      return;
+    }
+
     dispatch({
       type: Actions.HEADER_TEXT_STATE,
       state: {
@@ -45,7 +54,7 @@ export const NotebookItemWrapper = ({
     });
     dispatch({
       type: Actions.HEADER_STATE,
-      state:false,
+      state: false,
     });
 
     NavigationService.navigate('Notebook', {
@@ -64,7 +73,7 @@ export const NotebookItemWrapper = ({
       item={item}>
       <NotebookItem
         hideMore={preventDefaultMargins}
-        isTopic={item.type === 'topic'}
+        isTopic={isTopic}
         customStyle={style}
         item={item}
         index={index}

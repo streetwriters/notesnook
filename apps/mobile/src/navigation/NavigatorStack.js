@@ -11,6 +11,7 @@ import Folders from '../views/Folders';
 import Home from '../views/Home';
 import Notebook from '../views/Notebook';
 import Notes from '../views/Notes';
+import {Search} from '../views/Search';
 import Settings from '../views/Settings';
 import Tags from '../views/Tags';
 import Trash from '../views/Trash';
@@ -61,38 +62,45 @@ const forSlide = ({current, next, inverted, layouts: {screen}}) => {
   };
 };
 
-export const NavigatorStack = () => {
-  const [state] = useTracked();
-  const {settings} = state;
+export const NavigatorStack = React.memo(
+  () => {
+    const [state] = useTracked();
+    const {settings} = state;
 
-  return (
-    <Container root={true}>
-      <NavigationContainer independent={true} ref={rootNavigatorRef}>
-        <Stack.Navigator
-          initialRouteName={settings.homepage}
-          screenOptions={{
-            headerShown: false,
-            cardStyleInterpolator:
-              DDS.isTab && !DDS.isSmallTab ? forFade : forSlide,
-          }}>
-          <Stack.Screen name="Home" component={Home} />
-          <Stack.Screen
-            initialParams={{
-              title: 'Notebooks',
-              canGoBack: false,
-              root: true,
-            }}
-            name="Notebooks"
-            component={Folders}
-          />
-          <Stack.Screen name="Favorites" component={Favorites} />
-          <Stack.Screen name="Trash" component={Trash} />
-          <Stack.Screen name="Notes" component={Notes} />
-          <Stack.Screen name="Tags" component={Tags} />
-          <Stack.Screen name="Notebook" component={Notebook} />
-          <Stack.Screen name="Settings" component={Settings} />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </Container>
-  );
-};
+    React.useEffect(() => {
+      console.log("rerendering navigator stack");
+    })
+
+    return (
+      <Container root={true}>
+        <NavigationContainer independent={true} ref={rootNavigatorRef}>
+          <Stack.Navigator
+            initialRouteName={settings.homepage}
+            screenOptions={{
+              headerShown: false,
+              cardStyleInterpolator: forFade,
+            }}>
+            <Stack.Screen name="Notes" component={Home} />
+            <Stack.Screen
+              initialParams={{
+                title: 'Notebooks',
+                canGoBack: false,
+                root: true,
+              }}
+              name="Notebooks"
+              component={Folders}
+            />
+            <Stack.Screen name="Favorites" component={Favorites} />
+            <Stack.Screen name="Trash" component={Trash} />
+            <Stack.Screen name="NotesPage" component={Notes} />
+            <Stack.Screen name="Tags" component={Tags} />
+            <Stack.Screen name="Notebook" component={Notebook} />
+            <Stack.Screen name="Settings" component={Settings} />
+            <Stack.Screen name="Search" component={Search} />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </Container>
+    );
+  },
+  () => true,
+);

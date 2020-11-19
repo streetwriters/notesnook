@@ -1,18 +1,15 @@
-import React, {useEffect, useState} from 'react';
-import {ScrollView, Text, View} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { ScrollView, View } from 'react-native';
 import BaseDialog from '../../components/Dialog/base-dialog';
-import {PressableButton} from '../../components/PressableButton';
+import { PressableButton } from '../../components/PressableButton';
 import Seperator from '../../components/Seperator';
-import {useTracked} from '../../provider';
-import {DDS} from '../../services/DeviceDetection';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
-import {getElevation, scrollRef} from '../../utils';
-import {
-  eCloseJumpToDialog,
-  eOpenJumpToDialog,
-  eScrollEvent,
-} from '../../utils/Events';
-import {SIZE, WEIGHT} from '../../utils/SizeUtils';
+import { useTracked } from '../../provider';
+import { DDS } from '../../services/DeviceDetection';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
+import { getElevation, scrollRef } from '../../utils';
+import { eCloseJumpToDialog, eOpenJumpToDialog } from '../../utils/Events';
+import { SIZE } from '../../utils/SizeUtils';
+import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
 const offsets = [];
@@ -21,29 +18,29 @@ const JumpToDialog = () => {
   const [state] = useTracked();
   const {notes, colors, settings} = state;
   const [visible, setVisible] = useState(false);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(null);
 
   const onPress = (item, index) => {
-    let offset = 30 * index;
+    let offset = 35 * index;
     let ind = notes.findIndex(
       (i) => i.title === item.title && i.type === 'header',
     );
     ind = ind + 1;
     ind = ind - (index + 1);
-    offset = offset + ind * 100;
-    scrollRef.current?.scrollToOffset(0, index === 0 ? 0 : offset + 50, true);
+    offset = offset + ind * 100 + 200;
+    scrollRef.current?.scrollToOffset(0, index === 0 ? 0 : offset, true);
     close();
   };
 
   useEffect(() => {
     eSubscribeEvent(eOpenJumpToDialog, open);
     eSubscribeEvent(eCloseJumpToDialog, close);
-    eSubscribeEvent(eScrollEvent, onScroll);
+    //eSubscribeEvent(eScrollEvent, onScroll);
 
     return () => {
       eUnSubscribeEvent(eOpenJumpToDialog, open);
       eUnSubscribeEvent(eCloseJumpToDialog, close);
-      eUnSubscribeEvent(eScrollEvent, onScroll);
+      //eUnSubscribeEvent(eScrollEvent, onScroll);
     };
   }, []);
 
@@ -54,8 +51,8 @@ const JumpToDialog = () => {
     }
     timeout = setTimeout(() => {
       let index = offsets.findIndex((o, i) => o <= y && offsets[i + 1] > y);
-      setCurrentIndex(index);
-    }, 30);
+      //setCurrentIndex(index);
+    }, 100);
   };
 
   const open = () => {
@@ -74,13 +71,14 @@ const JumpToDialog = () => {
     notes
       .filter((i) => i.type === 'header')
       .map((item, index) => {
-        let offset = 30 * index;
+        let offset = 35 * index;
         let ind = notes.findIndex(
           (i) => i.title === item.title && i.type === 'header',
         );
         ind = ind + 1;
         ind = ind - (index + 1);
-        offset = offset + ind * 100;
+        offset = offset + ind * 100 + 200;
+
         offsets.push(offset);
       });
   };
@@ -104,16 +102,14 @@ const JumpToDialog = () => {
           alignSelf: 'center',
           padding: 10,
         }}>
-        <Text
+        <Heading
+          size={SIZE.xl}
           style={{
-            fontSize: SIZE.xl,
-            fontFamily: WEIGHT.bold,
-            color: colors.heading,
             alignSelf: 'center',
           }}>
           {settings.sort.slice(0, 1).toUpperCase() +
             settings.sort.slice(1, settings.sort.length)}
-        </Text>
+        </Heading>
         <Seperator />
         <ScrollView
           style={{
@@ -130,6 +126,7 @@ const JumpToDialog = () => {
               .filter((i) => i.type === 'header')
               .map((item, index) => (
                 <PressableButton
+                  key={item.title}
                   onPress={() => onPress(item, index)}
                   color={currentIndex === index ? colors.shade : 'transparent'}
                   selectedColor={

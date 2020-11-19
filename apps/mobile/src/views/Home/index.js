@@ -1,42 +1,47 @@
 import React, {useCallback, useEffect} from 'react';
+import * as Keychain from 'react-native-keychain';
 import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
-import {Placeholder} from '../../components/ListPlaceholders';
 import SimpleList from '../../components/SimpleList';
-import {NoteItemWrapper} from '../../components/SimpleList/NoteItemWrapper';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {DDS} from '../../services/DeviceDetection';
 import {eSendEvent} from '../../services/EventManager';
+import SearchService from '../../services/SearchService';
 import {scrollRef} from '../../utils';
-import {openEditorAnimation} from '../../utils/Animations';
-import {
-  eOnLoadNote,
-  eScrollEvent,
-  eUpdateSearchState,
-} from '../../utils/Events';
+import {eOnLoadNote, eScrollEvent} from '../../utils/Events';
+import {tabBarRef} from '../../utils/Refs';
+import Storage from '../../utils/storage';
+import * as Sentry from '@sentry/react-native';
 
 export const Home = ({navigation}) => {
   const [state, dispatch] = useTracked();
   const {notes} = state;
 
   const onFocus = useCallback(() => {
+    eSendEvent(eScrollEvent, {name: 'Notes', type: 'in'});
     dispatch({
       type: Actions.HEADER_TEXT_STATE,
       state: {
-        heading: 'Home',
+        heading: 'Notes',
       },
     });
     dispatch({
       type: Actions.CURRENT_SCREEN,
-      screen: 'home',
+      screen: 'notes',
     });
+    dispatch({
+      type: Actions.CONTAINER_BOTTOM_BUTTON,
+      state: {
+        onPress:_onPressBottomButton
+      },
+    });
+
     dispatch({
       type: Actions.HEADER_STATE,
       state: true,
     });
     updateSearch();
 
-    eSendEvent(eScrollEvent, 0);
     dispatch({type: Actions.COLORS});
     dispatch({type: Actions.NOTES});
   }, [notes]);
@@ -47,10 +52,11 @@ export const Home = ({navigation}) => {
     navigation.addListener('focus', onFocus);
     navigation.addListener('blur', onBlur);
     return () => {
+      eSendEvent(eScrollEvent, {name: 'Notes', type: 'back'});
       navigation.removeListener('focus', onFocus);
       navigation.removeListener('blur', onBlur);
     };
-  });
+  },[]);
 
   useEffect(() => {
     if (navigation.isFocused()) {
@@ -59,25 +65,20 @@ export const Home = ({navigation}) => {
   }, [notes]);
 
   const updateSearch = () => {
-    if (notes.length === 0) {
-      eSendEvent('showSearch', true);
-    } else {
-      eSendEvent('showSearch');
-      eSendEvent(eUpdateSearchState, {
-        placeholder: 'Search all notes',
-        data: notes,
-        noSearch: false,
-        type: 'notes',
-        color: null,
-      });
-    }
+    SearchService.update({
+      placeholder: 'Search in notes',
+      data: notes,
+      type: 'notes',
+    });
   };
 
-  const _onPressBottomButton = async (event) => {
-    eSendEvent(eOnLoadNote, {type: 'new'});
-
-    if (DDS.isPhone || DDS.isSmallTab) {
-      openEditorAnimation();
+  const _onPressBottomButton = (event) => {
+  
+    if (!DDS.isLargeTablet()) {
+      tabBarRef.current?.goToPage(1);
+    } else {
+      console.log('called');
+      eSendEvent(eOnLoadNote, {type: 'new'});
     }
   };
 
@@ -90,17 +91,22 @@ export const Home = ({navigation}) => {
         isHome={true}
         pinned={true}
         sortMenuButton={true}
-        focused={() => navigation.isFocused()}
-        RenderItem={NoteItemWrapper}
-        placeholder={<Placeholder type="notes" />}
         placeholderText={`Notes you write appear here`}
         jumpToDialog={true}
+        placeholderData={{
+          heading: 'Your Notes',
+          paragraph: 'You have not added any notes yet.',
+          button: 'Add your First Note',
+          action: _onPressBottomButton,
+        }}
       />
 
-      <ContainerBottomButton
-        title="Create a new note"
-        onPress={_onPressBottomButton}
-      />
+      {!notes || notes.length === 0 ? null : (
+        <ContainerBottomButton
+          title="Create a new note"
+          onPress={_onPressBottomButton}
+        />
+      )}
     </>
   );
 };

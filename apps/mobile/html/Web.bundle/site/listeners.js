@@ -1,224 +1,282 @@
-
 function attachTitleInputListeners() {
-    document.getElementById('formBox').onsubmit = function (evt) {
-        evt.preventDefault()
-        editor.focus();
-        editor.setSelection(editor.getText().length - 1, 0);
-        onTitleChange();
+  document.addEventListener(
+    'DOMContentLoaded',
+    () => {
+      autosize();
+      document
+      .querySelector('.app-main')
+      .addEventListener('scroll', (event) => {
+        if (scrollTimer) {
+          clearTimeout(scrollTimer);
+          scrollTimer = null;
+        }
+        scrollTimer = setTimeout(() => {
+          window.ReactNativeWebView.postMessage(
+            JSON.stringify({
+              visible: document.querySelector('.app-main').scrollTop,
+              title: document.getElementById('titleInput').value,
+              type: 'scroll',
+            }),
+          );
+        }, 100);
+      });
+    },
+    false,
+  );
+
+  document.getElementById('formBox').onsubmit = function (evt) {
+    evt.preventDefault();
+    editor.focus();
+    editor.setSelection(editor.getText().length - 1, 0);
+    onTitleChange();
+  };
+
+  document.getElementById('titleInput').onkeypress = function (evt) {
+    if (evt.keyCode === 13 || evt.which === 13) {
+      evt.preventDefault();
+      editor.focus();
+      editor.setSelection(editor.getText().length - 1, 0);
+      onTitleChange();
+      return false;
     }
+  };
 
-    document.getElementById('titleInput').onkeydown = function (evt) {
-        onTitleChange();
-    }
+  document.getElementById('titleInput').onkeydown = function (evt) {
+    onTitleChange(evt);
+  };
 
-    document.getElementById('titleInput').onkeyup = function (evt) {
+  document.getElementById('titleInput').onchange = function (evt) {
+    autosize();
+  };
 
-        onTitleChange()
-    }
-
-
-
+  document.getElementById('titleInput').onkeyup = function (evt) {
+    onTitleChange(evt);
+  };
 }
 
-function onTitleChange() {
-    let titleMessage = {
-        type: 'title',
-        value: document.getElementById('titleInput').value
-    }
+function onTitleChange(ele) {
+  let titleMessage = {
+    type: 'title',
+    value: document.getElementById('titleInput').value,
+  };
+  autosize();
+  if (titleMessage && typeof titleMessage.value === 'string') {
+    window.ReactNativeWebView.postMessage(JSON.stringify(titleMessage));
+  }
+}
 
-    if (titleMessage && typeof titleMessage.value === 'string') {
-        window.ReactNativeWebView.postMessage(JSON.stringify(titleMessage));
-    }
+function autosize() {
+  document.getElementById('textCopy').innerHTML = document
+    .getElementById('titleInput')
+    .value.replace(/\n/g, '<br/>');
 }
 
 function attachEditorListeners() {
+  /*  editor.once('text-change', function () {
+    window.ReactNativeWebView.postMessage('loaded');
+  }); */
 
+  window.addEventListener('message', (data) => {
+    let message = JSON.parse(data.data);
+    let type = message.type;
+    let value;
+    if (message.value && message.type !== 'nomenu') {
+      value = message.value;
+    } else {
+      value = message.value;
+    }
+    switch (type) {
+      case 'reset': {
+        editor.history.clear();
+        editor.setText('', 'api');
+        document.getElementById('titleInput').value = '';
+        document.getElementById('titleInput').blur();
+        editor.blur();
+        document.getElementById('titleInput').blur();
+        window.blur();
+        document.getElementById('infodate').innerText = '';
+        document.getElementById('infosaved').innerText = '';
+        document.getElementById('infowords').innerText = '';
+        autosize();
+        break;
+      }
+      case 'keyboard':
+        var range = editor.getSelection();
+        if (range) {
+          if (range.length == 0) {
+            var bounds = editor.getBounds(range.index, range.index);
 
-    editor.once('text-change', function () {
+            setTimeout(() => {
+              document
+                .querySelector('.app-main')
+                .scrollTo({top: bounds.top, behavior: 'smooth'});
+            }, 200);
+          }
+        }
+        break;
+      case 'blur':
+        document.getElementById('titleInput').blur();
+        editor.blur();
+        window.blur();
+        break;
+      case 'undo':
+        editor.history.undo();
+        break;
+      case 'redo':
+        editor.history.redo();
+        break;
+      case 'clearHistory':
+        editor.history.clear();
+        break;
+      case 'dateEdited':
+        document.getElementById('infodate').innerText = value;
+        break;
+      case 'saving':
+        document.getElementById('infosaved').innerText = value;
+        break;
+      case 'text':
+        editor.setText(value, 'api');
 
-        window.ReactNativeWebView.postMessage("loaded");
-        let text = editor.getText();
-        document.getElementById("infowords").innerText = text.split(' ').length + ' words';
+        setTimeout(() => {
+          document.getElementById('infowords').innerText =
+            editor.getText().split(' ').length + ' words';
+          document.getElementById('infosaved').innerText = 'Saved';
+        }, 100);
 
-
-    });
-
-    window.addEventListener('message', data => {
-
-        let message = JSON.parse(data.data);
-        let type = message.type;
-        let value;
-        if (message.value && message.type !== 'nomenu') {
-            value = message.value;
+        break;
+      case 'clearEditor':
+        editor.setText('', 'api');
+        break;
+      case 'clearTitle':
+        document.getElementById('titleInput').value = '';
+        break;
+      case 'focusEditor':
+        editor.focus();
+        break;
+      case 'focusTitle':
+        document.getElementById('titleInput').focus();
+        autosize();
+        break;
+      case 'nomenu':
+        let isenabled = value;
+        //let width = window.innerWidth;
+        let titleIn = document.getElementById('titlebar');
+        if (isenabled) {
+          //titleIn.style.width = width;
+          titleIn.style['padding-left'] = 12;
+          titleIn.style['padding-right'] = window.innerWidth * 0.4;
         } else {
-            value = message.value
+          //titleIn.style.width = width - 120;
+          titleIn.style['padding-left'] = 60;
+          titleIn.style['padding-right'] = window.innerWidth * 0.4;
         }
-        switch (type) {
-            case "reset": {
-                editor.history.clear();
-                editor.setText('', 'api');
-                document.getElementById('titleInput').value = '';
-                document.getElementById('titleInput').blur();
-                editor.blur();
-                window.blur();
-                document.getElementById('infodate').innerText = "";
-                document.getElementById('infosaved').innerText = "";
-                document.getElementById("infowords").innerText = "";
-                break
-            }
-            case 'keyboard':
-                var range = editor.getSelection();
-                if (range) {
-                  if (range.length == 0) {
-                    var bounds = editor.getBounds(range.index, range.index);
-                    
-                    setTimeout(() => {
-                      document
-                        .querySelector('.app-main')
-                        .scrollTo({top: bounds.top, behavior: 'smooth'});
-                    }, 200);
-                  } 
-                }
-                break;
-            case "blur":
-                document.getElementById('titleInput').blur();
-                editor.blur();
-                window.blur();
-                break;
-            case "undo":
-                editor.history.undo();
-                break;
-            case "redo":
-                editor.history.redo();
-                break;
-            case "clearHistory":
-                editor.history.clear();
-                break;
-            case "dateEdited":
-                document.getElementById('infodate').innerText = value;
-                break;
-            case "saving":
-                document.getElementById('infosaved').innerText = value;
-                break;
-            case "text":
-                editor.setText(value, 'api')
-                setTimeout(() => {
-                    if (message.focus === "editor") {
-                        //editor.focus();
-                    } else {
-                        //document.getElementById('titleInput').focus();
-                    }
-                }, 0)
-                break;
-            case "clearEditor":
-                editor.setText('', 'api');
-                break;
-            case "clearTitle":
-                document.getElementById('titleInput').value = '';
-                break;
-            case "focusEditor":
-                editor.focus();
-                break;
-            case "focusTitle":
-                document.getElementById('titleInput').focus();
-                break;
-            case "nomenu":
-                let isenabled = value;
-                let titleIn = document.getElementById('titlebar');
-                if (isenabled) {
+        break;
+      case 'title':
+        document.getElementById('titleInput').value = JSON.parse(
+          data.data,
+        ).value;
+        autosize();
+        break;
+      case 'theme':
+        pageTheme.colors = value;
+        setTheme();
+        break;
 
-                    titleIn.style['padding-left'] = 12;
-                    titleIn.style['padding-right'] = 60;
-                } else {
+      case 'delta':
+        const content = value;
+        editor.setContents(content, 'api');
 
-                    titleIn.style['padding-left'] = 60;
-                    titleIn.style['padding-right'] = 60;
-                }
-                break;
-            case "title":
-                document.getElementById('titleInput').value = JSON.parse(data.data).value
-                break;
-            case "theme":
-                pageTheme.colors = value;
-                setTheme();
-                break;
+        setTimeout(() => {
+          document.getElementById('infowords').innerText =
+            editor.getText().split(' ').length + ' words';
+          document.getElementById('infosaved').innerText = 'Saved';
 
-            case "delta":
+          document.body.scrollTop = 0; // For Safari
+          document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+        }, 100);
+        autosize();
+        break;
+      case 'html':
+        editor.setContents(editor.clipboard.convert(value, 'api'), 'silent');
+        /*  setTimeout(() => {
+                   editor.setSelection(editor.getText().length - 1, 0);
+                 }, 0); */
+        break;
+      default:
+        break;
+    }
+  });
 
-                const content = value
-                editor.setContents(content, 'api');
-                setTimeout(() => {
-                    //editor.setSelection(editor.getText().length - 1, 0);
-                }, 500)
+  function isWhitespace(ch) {
+    let whiteSpace = false;
+    if (ch === ' ' || ch === '\t' || ch === '\n') {
+      whiteSpace = true;
+    }
+    return whiteSpace;
+  }
 
-                break;
-            case "html":
-                editor.setContents(
-                    editor.clipboard.convert(value, 'api'),
-                    'silent'
-                );
-                setTimeout(() => {
-                    //editor.setSelection(editor.getText().length - 1, 0);
-                }, 0);
-                break;
-            default:
-                break;
+  let deltaTimeout = null;
+  let historyTimeout = null;
+
+  editor.on('text-change', function (delta, oldDelta, source) {
+    var regex = /https?:\/\/[^\s]+$/;
+    if (source === 'api') return;
+    if (
+      delta.ops.length === 2 &&
+      delta.ops[0].retain &&
+      isWhitespace(delta.ops[1].insert)
+    ) {
+      var endRetain = delta.ops[0].retain;
+      var text = editor.getText().substr(0, endRetain);
+      var match = text.toLowerCase().match(regex);
+
+      if (match !== null) {
+        var url = match[0];
+
+        var ops = [];
+        if (endRetain > url.length) {
+          ops.push({retain: endRetain - url.length});
         }
 
-    });
+        ops = ops.concat([
+          {delete: url.length},
+          {insert: url, attributes: {link: url}},
+        ]);
 
-    function isWhitespace(ch) {
-        let whiteSpace = false;
-        if (ch === ' ' || ch === '\t' || ch === '\n') {
-            whiteSpace = true;
-        }
-        return whiteSpace;
+        editor.updateContents({
+          ops: ops,
+        });
+      }
     }
 
+    document.getElementById('infowords').innerText =
+      editor.getText().split(' ').length + ' words';
 
-    
+    if (deltaTimeout) {
+      clearTimeout(deltaTimeout);
+      deltaTimeout = null;
+    }
 
+    deltaTimeout = setTimeout(() => {
+      let msg = JSON.stringify({
+        data: editor.getContents().ops,
+        type: 'delta',
+      });
+      window.ReactNativeWebView.postMessage(msg);
+    }, 50);
 
-    editor.on('text-change', function (delta, oldDelta, source) {
-        var regex = /https?:\/\/[^\s]+$/;
-        if (source === "api") return;
-        if (
-            delta.ops.length === 2 &&
-            delta.ops[0].retain &&
-            isWhitespace(delta.ops[1].insert)
-        ) {
-            var endRetain = delta.ops[0].retain;
-            var text = editor.getText().substr(0, endRetain);
-            var match = text.toLowerCase().match(regex);
+    if (historyTimeout) {
+      clearTimeout(historyTimeout);
+      historyTimeout = null;
+    }
 
-            if (match !== null) {
-                var url = match[0];
-
-                var ops = [];
-                if (endRetain > url.length) {
-                    ops.push({retain: endRetain - url.length});
-                }
-
-                ops = ops.concat([
-                    {delete: url.length},
-                    {insert: url, attributes: {link: url}},
-                ]);
-
-                editor.updateContents({
-                    ops: ops,
-                });
-            }
-        }
-
-
-        let m = {};
-        m.delta = {ops: editor.getContents().ops}
-
-        m.text = editor.getText();
-        document.getElementById("infowords").innerText = m.text.split(' ').length + ' words';
-        m.html = editor.root.innerHTML;
-        m.type = 'content';
-        window.ReactNativeWebView.postMessage(JSON.stringify(m));
-
-    });
+    historyTimeout = setTimeout(() => {
+      let history = JSON.stringify({
+        type: 'history',
+        undo: editor.history.stack.undo.length,
+        redo: editor.history.stack.redo.length,
+      });
+      window.ReactNativeWebView.postMessage(history);
+    }, 1000);
+  });
 }

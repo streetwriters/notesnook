@@ -1,15 +1,15 @@
 import React from 'react';
-import {Text, View} from 'react-native';
+import {View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
+import {DDS} from '../../services/DeviceDetection';
 import {eSendEvent} from '../../services/EventManager';
-import {eClearSearch} from '../../utils/Events';
 import NavigationService from '../../services/Navigation';
-import {showContext} from '../../utils';
+import {eClearSearch} from '../../utils/Events';
+import {SIZE} from '../../utils/SizeUtils';
 import {PressableButton} from '../PressableButton';
-import {SIZE, WEIGHT} from "../../utils/SizeUtils";
-import {DDS} from "../../services/DeviceDetection";
+import Paragraph from '../Typography/Paragraph';
 
 export const MenuListItem = ({item, index, noTextMode, ignore, testID}) => {
   const [state, dispatch] = useTracked();
@@ -23,16 +23,15 @@ export const MenuListItem = ({item, index, noTextMode, ignore, testID}) => {
           heading: item.name,
         },
       });
-      dispatch({
-            type:  Actions.HEADER_VERTICAL_MENU,
-            state: item.name === "Home",
-      });
       eSendEvent(eClearSearch);
     }
+    if (item.name.toLowerCase() === currentScreen) {
+      console.log('already here');
+    }
     if (item.func) {
-      item.func()
+      item.func();
     } else {
-      NavigationService.navigate(item.name)
+      NavigationService.navigate(item.name);
     }
     if (item.close) {
       NavigationService.closeDrawer();
@@ -44,9 +43,6 @@ export const MenuListItem = ({item, index, noTextMode, ignore, testID}) => {
       testID={testID}
       key={item.name + index}
       onPress={_onPress}
-      onLongPress={(event) => {
-        showContext(event, item.name).then(r => r);
-      }}
       color={
         currentScreen === item.name.toLowerCase() ? colors.shade : 'transparent'
       }
@@ -78,16 +74,7 @@ export const MenuListItem = ({item, index, noTextMode, ignore, testID}) => {
           color={colors.accent}
           size={DDS.isTab ? SIZE.md + 5 : SIZE.md + 1}
         />
-        {noTextMode ? null : (
-          <Text
-            style={{
-              fontFamily: WEIGHT.regular,
-              fontSize: SIZE.sm,
-              color: colors.heading,
-            }}>
-            {item.name}
-          </Text>
-        )}
+        {noTextMode ? null : <Paragraph size={SIZE.md}>{item.name}</Paragraph>}
       </View>
 
       {item.switch && !noTextMode ? (

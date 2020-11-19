@@ -1,27 +1,36 @@
-import React, {useEffect, useState} from 'react';
-import {Keyboard, Platform, Text, View} from 'react-native';
+import React, {useEffect} from 'react';
+import {Keyboard, Platform, View} from 'react-native';
+import Animated, {Easing} from 'react-native-reanimated';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
-import {getElevation} from '../../utils';
-import {PressableButton} from '../PressableButton';
-import {normalize, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
 import {DDS} from '../../services/DeviceDetection';
+import {getElevation, showContext} from '../../utils';
+import {normalize, SIZE} from '../../utils/SizeUtils';
+import {PressableButton} from '../PressableButton';
 
-export const ContainerBottomButton = ({title, onPress, color}) => {
+const translateY = new Animated.Value(0);
+export const ContainerBottomButton = ({title, onPress, color,shouldShow =false}) => {
   const [state] = useTracked();
   const {colors} = state;
-  const [buttonHide, setButtonHide] = useState(false);
   const insets = useSafeAreaInsets();
 
-  const onKeyboardHide = () => {
+  function animate(translate) {
+    Animated.timing(translateY, {
+      toValue: translate,
+      duration: 250,
+      easing: Easing.elastic(1),
+    }).start();
+  }
+
+  const onKeyboardHide = async () => {
     if (DDS.isTab) return;
-    setButtonHide(false);
+    animate(0);
   };
 
-  const onKeyboardShow = () => {
+  const onKeyboardShow = async () => {
     if (DDS.isTab) return;
-    setButtonHide(true);
+    animate(150);
   };
 
   useEffect(() => {
@@ -33,18 +42,19 @@ export const ContainerBottomButton = ({title, onPress, color}) => {
     };
   }, []);
 
-  return (
-    <View
+  return DDS.isLargeTablet() && !shouldShow ? null : (
+    <Animated.View
       style={{
-        width: '100%',
-        opacity: buttonHide ? 0 : 1,
         position: 'absolute',
-        paddingHorizontal: 12,
-        bottom: Platform.OS === 'ios' ? insets.bottom - 10 : insets.bottom + 20,
+        right: 12,
+        bottom: Platform.OS === 'ios' ? insets.bottom - 10 : insets.bottom + 12,
         zIndex: 10,
         transform: [
           {
-            translateY: buttonHide ? 200 : 0,
+            translateY: translateY,
+          },
+          {
+            translateX: translateY,
           },
         ],
       }}>
@@ -54,35 +64,28 @@ export const ContainerBottomButton = ({title, onPress, color}) => {
         selectedColor={color || colors.accent}
         customStyle={{
           ...getElevation(5),
+          borderRadius: 100,
+        }}
+        onLongPress={(event) => {
+          console.log(event);
+          showContext(event, title);
         }}
         onPress={onPress}>
         <View
           style={{
-            justifyContent: 'flex-start',
             alignItems: 'center',
-            flexDirection: 'row',
+            justifyContent: 'center',
             width: '100%',
-            padding: pv,
-            borderRadius: 5,
             height: normalize(60),
+            width: normalize(60),
           }}>
           <Icon
             name={title === 'Clear all trash' ? 'delete' : 'plus'}
             color="white"
-            size={SIZE.xl}
+            size={SIZE.xxl}
           />
-          <Text
-            testID="container_bottom_btn_text"
-            style={{
-              fontSize: SIZE.md,
-              color: 'white',
-              fontFamily: WEIGHT.regular,
-              textAlignVertical: 'center',
-            }}>
-            {'  ' + title}
-          </Text>
         </View>
       </PressableButton>
-    </View>
+    </Animated.View>
   );
 };
