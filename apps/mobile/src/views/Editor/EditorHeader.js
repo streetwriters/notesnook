@@ -1,13 +1,15 @@
 import React, {useEffect, useState} from 'react';
 import {BackHandler, Keyboard, Platform, StatusBar, View} from 'react-native';
+import {TextInput} from 'react-native-gesture-handler';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ActionIcon} from '../../components/ActionIcon';
+import {Button} from '../../components/Button';
 import {
   ActionSheetEvent,
   simpleDialogEvent,
 } from '../../components/DialogManager/recievers';
-import {
-  TEMPLATE_EXIT_FULLSCREEN,
-} from '../../components/DialogManager/Templates';
+import {TEMPLATE_EXIT_FULLSCREEN} from '../../components/DialogManager/Templates';
+import Heading from '../../components/Typography/Heading';
 import {useTracked} from '../../provider';
 import {DDS} from '../../services/DeviceDetection';
 import {
@@ -25,7 +27,8 @@ import {
   eOpenFullscreenEditor,
 } from '../../utils/Events';
 import {tabBarRef} from '../../utils/Refs';
-import {normalize} from '../../utils/SizeUtils';
+import {normalize, SIZE, WEIGHT} from '../../utils/SizeUtils';
+import {EditorTitle} from './EditorTitle';
 import {
   checkNote,
   clearEditor,
@@ -43,41 +46,28 @@ import HistoryComponent from './HistoryComponent';
 let handleBack;
 let tapCount = 0;
 
-const EditorHeader = ({noMenu}) => {
+const EditorHeader = () => {
   const [state] = useTracked();
-  const {colors, premiumUser} = state;
-  const [fullscreen, setFullscreen] = useState(false);
-
+  const {colors, premiumUser, fullscreen} = state;
+  const insets = useSafeAreaInsets();
   useEffect(() => {
     setColors(colors);
-    let c = {...colors};
-    c.factor = normalize(1);
-    post('theme', colors);
   }, [colors.bg]);
 
-  useEffect(() => {
-    if (!DDS.isTab) return;
-    if (noMenu) {
-      post('nomenu', true);
-    } else {
-      post('nomenu', false);
-    }
-  }, [noMenu]);
+  
 
   useEffect(() => {
     eSubscribeEvent(eOnLoadNote, load);
-    eSubscribeEvent(eCloseFullscreenEditor, closeFullscreen);
     eSubscribeEvent(eClearEditor, onCallClear);
 
     return () => {
       eUnSubscribeEvent(eClearEditor, onCallClear);
-      eUnSubscribeEvent(eCloseFullscreenEditor, closeFullscreen);
       eUnSubscribeEvent(eOnLoadNote, load);
     };
   }, []);
 
   useEffect(() => {
-    if (!noMenu && DDS.isTab) {
+    if (fullscreen && DDS.isTab) {
       handleBack = BackHandler.addEventListener('hardwareBackPress', () => {
         simpleDialogEvent(TEMPLATE_EXIT_FULLSCREEN());
         editing.isFullscreen = false;
@@ -92,9 +82,10 @@ const EditorHeader = ({noMenu}) => {
         handleBack = null;
       }
     };
-  }, [noMenu]);
+  }, [fullscreen]);
 
   const load = async (item) => {
+    console.log(item);
     await loadNote(item);
     Keyboard.addListener('keyboardDidShow', () => {
       post('keyboard');
@@ -112,9 +103,6 @@ const EditorHeader = ({noMenu}) => {
       exitEditorAnimation();
     }
     await clearEditor();
-  };
-  const closeFullscreen = () => {
-    setFullscreen(false);
   };
 
   useEffect(() => {
@@ -141,7 +129,7 @@ const EditorHeader = ({noMenu}) => {
 
   const _onBackPress = async () => {
     editing.currentlyEditing = false;
-    if (DDS.isTab && !DDS.isSmallTab) {
+    if (DDS.isLargeTablet()) {
       if (fullscreen) {
         eSendEvent(eCloseFullscreenEditor);
       }
@@ -172,45 +160,45 @@ const EditorHeader = ({noMenu}) => {
 
   return (
     <>
-      {noMenu || DDS.isPhone || DDS.isSmallTab ? (
-        <View />
-      ) : (
-        <ActionIcon
-          name="arrow-left"
-          color={colors.heading}
-          onPress={_onBackPress}
-          bottom={5}
-          iconStyle={{
-            textAlignVertical: 'center',
-          }}
-          customStyle={{
-            marginLeft: -5,
-            position: 'absolute',
-            marginTop: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight + 5,
-            zIndex: 11,
-            left: 0,
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        />
-      )}
-
       <View
         style={{
           flexDirection: 'row',
-          width: DDS.isTab && !DDS.isSmallTab ? '30%' : '100%',
+          width: '100%',
           height: 50,
           justifyContent: 'space-between',
           alignItems: 'center',
           paddingHorizontal: 12,
-          position: DDS.isTab && !DDS.isSmallTab ? 'absolute' : 'relative',
+          position: 'relative',
           backgroundColor: colors.bg,
           right: 0,
-          marginTop: Platform.OS === 'ios' ? 0 : StatusBar.currentHeight,
+          marginTop: Platform.OS === 'ios' ? 0 : insets.top,
           zIndex: 10,
         }}>
-        {DDS.isTab && !DDS.isSmallTab ? (
+        {!fullscreen ? (
           <View />
+        ) : (
+          <ActionIcon
+            name="arrow-left"
+            color={colors.heading}
+            onPress={_onBackPress}
+            bottom={5}
+            iconStyle={{
+              textAlignVertical: 'center',
+            }}
+            customStyle={{
+              marginLeft: -5,
+              position: 'absolute',
+              marginTop: Platform.OS === 'ios' ? 0 : insets.top + 5,
+              zIndex: 11,
+              left: 0,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          />
+        )}
+
+        {DDS.isLargeTablet() ? (
+          <EditorTitle />
         ) : (
           <ActionIcon
             name="arrow-left"
@@ -239,7 +227,7 @@ const EditorHeader = ({noMenu}) => {
             }}
           />
 
-          {DDS.isTab && !DDS.isSmallTab && !fullscreen ? (
+          {DDS.isLargeTablet() && !fullscreen ? (
             <ActionIcon
               name="fullscreen"
               color={colors.heading}
@@ -248,14 +236,8 @@ const EditorHeader = ({noMenu}) => {
               }}
               onPress={() => {
                 eSendEvent(eOpenFullscreenEditor);
-                setFullscreen(true);
                 editing.isFullscreen = true;
-                post(
-                  JSON.stringify({
-                    type: 'nomenu',
-                    value: false,
-                  }),
-                );
+                
               }}
             />
           ) : null}
