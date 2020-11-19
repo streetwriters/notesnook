@@ -1,8 +1,28 @@
+let scrollTimer = null;
+
 function attachTitleInputListeners() {
   document.addEventListener(
     'DOMContentLoaded',
     () => {
       autosize();
+
+      document
+        .querySelector('.app-main')
+        .addEventListener('scroll', (event) => {
+          if (scrollTimer) {
+            clearTimeout(scrollTimer);
+            scrollTimer = null;
+          }
+          scrollTimer = setTimeout(() => {
+            window.ReactNativeWebView.postMessage(
+              JSON.stringify({
+                visible: document.querySelector('.app-main').scrollTop,
+                title: document.getElementById('titleInput').value,
+                type: 'scroll',
+              }),
+            );
+          }, 100);
+        });
     },
     false,
   );
@@ -14,8 +34,7 @@ function attachTitleInputListeners() {
     onTitleChange();
   };
 
-
-   document.getElementById('titleInput').onkeypress = function (evt) {
+  document.getElementById('titleInput').onkeypress = function (evt) {
     if (evt.keyCode === 13 || evt.which === 13) {
       evt.preventDefault();
       editor.focus();
@@ -261,6 +280,6 @@ function attachEditorListeners() {
         redo: editor.history.stack.redo.length,
       });
       window.ReactNativeWebView.postMessage(history);
-    }, 250);
+    }, 1000);
   });
 }
