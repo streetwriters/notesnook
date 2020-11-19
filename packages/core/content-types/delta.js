@@ -43,10 +43,12 @@ class Delta {
    * @returns {Boolean}
    */
   search(query) {
-    const tokens = query.split(splitter);
+    const tokens = query.toLowerCase().split(splitter);
     return this.data.some((item) => {
       if (item.insert && item.insert.indexOf) {
-        return tokens.some((token) => item.insert.indexOf(token) > -1);
+        return tokens.some(
+          (token) => item.insert.toLowerCase().indexOf(token) > -1
+        );
       }
       return false;
     });

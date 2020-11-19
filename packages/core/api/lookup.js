@@ -14,23 +14,22 @@ export default class Lookup {
     this._db = db;
   }
 
-  notes(notes, query) {
-    return new Promise((resolve) => {
-      const results = [];
-      let index = 0,
-        max = notes.length;
-      notes.forEach(async (note) => {
-        const title = note.title;
-        if (!note.locked) {
-          let content = await this._db.content.raw(note.contentId);
-          content = getContentFromData(content.type, content.data);
-          if (content.search(query) || fzs(query, title)) results.push(note);
-        } else {
-          if (fzs(query, title)) results.push(note);
-        }
-        if (++index >= max) return resolve(results);
-      });
+  async notes(notes, query) {
+    const deltas = await this._db.content.multi(
+      notes.map((note) => note.contentId)
+    );
+    const results = [];
+    notes.forEach((note) => {
+      const title = note.title;
+      if (!note.locked) {
+        let content = deltas.find((delta) => delta.id === note.contentId);
+        content = getContentFromData(content.type, content.data);
+        if (fzs(query, title) || content.search(query)) results.push(note);
+      } else {
+        if (fzs(query, title)) results.push(note);
+      }
     });
+    return results;
   }
 
   notebooks(array, query) {
