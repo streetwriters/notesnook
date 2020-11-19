@@ -24,6 +24,13 @@ export const Tags = ({route, navigation}) => {
       },
     });
 
+    dispatch({
+      type: Actions.CONTAINER_BOTTOM_BUTTON,
+      state: {
+        onPress:null
+      },
+    });
+
     updateSearch();
     dispatch({type: Actions.TAGS});
     dispatch({
