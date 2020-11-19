@@ -27,6 +27,13 @@ export const Favorites = ({route, navigation}) => {
     updateSearch();
 
     dispatch({
+      type: Actions.CONTAINER_BOTTOM_BUTTON,
+      state: {
+        onPress:null
+      },
+    });
+
+    dispatch({
       type: Actions.CURRENT_SCREEN,
       screen: 'favorites',
     });

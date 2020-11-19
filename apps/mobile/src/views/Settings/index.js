@@ -60,6 +60,8 @@ import {MMKV} from '../../utils/mmkv';
 import {opacity, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
 import Storage from '../../utils/storage';
 import {sleep} from '../../utils/TimeUtils';
+import Paragraph from '../../components/Typography/Paragraph';
+import Heading from '../../components/Typography/Heading';
 
 let menuRef = createRef();
 export const Settings = ({navigation}) => {
@@ -88,6 +90,13 @@ export const Settings = ({navigation}) => {
       state: true,
     });
     dispatch({
+      type: Actions.CONTAINER_BOTTOM_BUTTON,
+      state: {
+        onPress: null,
+      },
+    });
+
+    dispatch({
       type: Actions.HEADER_TEXT_STATE,
       state: {
         heading: 'Settings',
@@ -111,7 +120,8 @@ export const Settings = ({navigation}) => {
       console.log(e);
       let biometry = await Keychain.getSupportedBiometryType();
       let fingerprint = await Keychain.hasInternetCredentials('nn_vault');
-      console.log(biometry, fingerprint);
+
+      console.log(biometry, fingerprint, 'val');
       let available = false;
       if (
         biometry === Keychain.BIOMETRY_TYPE.FINGERPRINT ||
@@ -156,17 +166,16 @@ export const Settings = ({navigation}) => {
   };
 
   const SectionHeader = ({title}) => (
-    <Text
+    <Heading
+      size={SIZE.sm}
+      color={colors.accent}
       style={{
-        fontSize: SIZE.sm,
-        fontFamily: WEIGHT.bold,
         textAlignVertical: 'center',
-        color: colors.accent,
         paddingHorizontal: 12,
         height: 35,
       }}>
       {title}
-    </Text>
+    </Heading>
   );
 
   const backupItemsList = [
@@ -233,25 +242,18 @@ export const Settings = ({navigation}) => {
         borderRadius: 0,
         flexDirection: 'row',
       }}>
-      <Text
+      <Paragraph
         style={{
-          fontSize: SIZE.sm,
-          fontFamily: WEIGHT.regular,
           textAlignVertical: 'center',
-          color: colors.pri,
           maxWidth: maxWidth,
         }}>
         {title}
         {tagline ? '\n' : null}
 
-        <Text
-          style={{
-            fontSize: SIZE.sm,
-            color: colors.icon,
-          }}>
+        <Paragraph size={SIZE.xs} color={colors.icon}>
           {tagline}
-        </Text>
-      </Text>
+        </Paragraph>
+      </Paragraph>
       {customComponent ? customComponent : null}
     </PressableButton>
   );
@@ -271,7 +273,9 @@ export const Settings = ({navigation}) => {
         style={{
           paddingHorizontal: 0,
         }}>
-        <ListHeaderComponent type="settings" messageCard={false} />
+        {!DDS.isLargeTablet() && (
+          <ListHeaderComponent type="settings" messageCard={false} />
+        )}
 
         {user ? (
           <>
@@ -315,15 +319,13 @@ export const Settings = ({navigation}) => {
                       />
                     </View>
 
-                    <Text
+                    <Paragraph
+                      color={colors.heading}
                       style={{
-                        color: colors.heading,
                         marginLeft: 5,
-                        fontFamily: WEIGHT.regular,
-                        fontSize: SIZE.sm,
                       }}>
                       {user.username}
-                    </Text>
+                    </Paragraph>
                   </View>
                   <View
                     style={{
@@ -332,42 +334,31 @@ export const Settings = ({navigation}) => {
                       paddingVertical: 2.5,
                       backgroundColor: 'white',
                     }}>
-                    <Text
-                      style={{
-                        color: colors.accent,
-                        fontFamily: WEIGHT.bold,
-                        fontSize: SIZE.sm,
-                      }}>
+                    <Heading color={colors.accent} size={SIZE.sm}>
                       {SUBSCRIPTION_STATUS_STRINGS[user.subscription.status]}
-                    </Text>
+                    </Heading>
                   </View>
                 </View>
                 <Seperator />
                 <View>
                   {user.subscription.status === 1 ? (
-                    <Text
-                      style={{
-                        color:
-                          getTimeLeft(parseInt(user.subscription.expiry)) > 5
-                            ? colors.pri
-                            : colors.errorText,
-                        fontFamily: WEIGHT.regular,
-                        fontSize: SIZE.lg,
-                      }}>
+                    <Paragraph
+                      size={SIZE.lg}
+                      color={
+                        getTimeLeft(parseInt(user.subscription.expiry)) > 5
+                          ? colors.pri
+                          : colors.errorText
+                      }>
                       {getTimeLeft(parseInt(user.subscription.expiry)) +
                         ' Days Remaining'}{' '}
                       {'\n'}
-                      <Text
-                        style={{
-                          fontSize: 12,
-                          color: colors.icon,
-                        }}>
+                      <Paragraph color={colors.icon} size={SIZE.sm}>
                         Your trail period started on{' '}
                         {new Date(
                           user.subscription.start * 1000,
                         ).toLocaleDateString()}
-                      </Text>
-                    </Text>
+                      </Paragraph>
+                    </Paragraph>
                   ) : null}
 
                   <Seperator />
@@ -452,22 +443,12 @@ export const Settings = ({navigation}) => {
                   style={{
                     marginLeft: 10,
                   }}>
-                  <Text
-                    style={{
-                      fontFamily: WEIGHT.regular,
-                      color: colors.icon,
-                      fontSize: SIZE.xs,
-                    }}>
+                  <Paragraph color={colors.icon} size={SIZE.xs}>
                     You are not logged in
-                  </Text>
-                  <Text
-                    style={{
-                      color: colors.accent,
-                      fontFamily: WEIGHT.regular,
-                      fontSize: SIZE.sm,
-                    }}>
+                  </Paragraph>
+                  <Paragraph color={colors.accent}>
                     Login to sync notes.
-                  </Text>
+                  </Paragraph>
                 </View>
 
                 <View
@@ -491,23 +472,16 @@ export const Settings = ({navigation}) => {
         )}
         <SectionHeader title="Appearance" />
 
-        <Text
+        <Paragraph
           style={{
-            fontSize: SIZE.sm,
-            fontFamily: WEIGHT.regular,
             textAlignVertical: 'center',
-            color: colors.pri,
             paddingHorizontal: 12,
           }}>
           Accent Color{'\n'}
-          <Text
-            style={{
-              fontSize: SIZE.sm,
-              color: colors.icon,
-            }}>
+          <Paragraph size={SIZE.xs} color={colors.icon}>
             Choose a color to use as accent color
-          </Text>
-        </Text>
+          </Paragraph>
+        </Paragraph>
 
         <View
           contentContainerStyle={{
@@ -523,7 +497,6 @@ export const Settings = ({navigation}) => {
             alignSelf: 'center',
             flexDirection: 'row',
             flexWrap: 'wrap',
-            justifyContent: 'space-between',
             paddingHorizontal: 12,
           }}>
           {[
@@ -533,6 +506,10 @@ export const Settings = ({navigation}) => {
             '#0560FF',
             '#f58231',
             '#911eb4',
+            '#46f0f0',
+            '#f032e6',
+            '#bcf60c',
+            '#fabebe',
           ].map((item) => (
             <PressableButton
               key={item}
@@ -558,9 +535,13 @@ export const Settings = ({navigation}) => {
                 justifyContent: 'center',
                 alignItems: 'center',
                 marginVertical: 5,
-                marginHorizontal: 0,
-                width: DDS.isTab ? (dWidth * 0.28) / 5 - 24 : dWidth / 7.5,
-                height: DDS.isTab ? (dWidth * 0.28) / 5 - 24 : dWidth / 7.5,
+                marginHorizontal: 5,
+                width: DDS.isTab
+                  ? (dWidth * 0.85 * 0.28) / 5 - 24
+                  : dWidth / 7.5,
+                height: DDS.isTab
+                  ? (dWidth * 0.85 * 0.28) / 5 - 24
+                  : dWidth / 7.5,
                 borderRadius: 100,
               }}>
               {colors.accent === item ? (
@@ -568,54 +549,6 @@ export const Settings = ({navigation}) => {
               ) : null}
             </PressableButton>
           ))}
-
-          <View
-            style={{
-              width: '100%',
-              flexDirection: 'row',
-              flexWrap: 'wrap',
-            }}>
-            {['#46f0f0', '#f032e6', '#bcf60c', '#fabebe'].map((item, index) => (
-              <PressableButton
-                key={item}
-                color={
-                  colors.accent === item
-                    ? RGB_Linear_Shade(
-                        !colors.night ? -0.2 : 0.2,
-                        hexToRGBA(item, 1),
-                      )
-                    : item
-                }
-                selectedColor={item}
-                alpha={!colors.night ? -0.1 : 0.1}
-                opacity={1}
-                onPress={async () => {
-                  console.log('called');
-                  await PremiumService.verify(async () => {
-                    changeAccentColor(item);
-                    await MMKV.setStringAsync('accentColor', item);
-                  });
-                }}
-                customStyle={{
-                  flexDirection: 'row',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  marginTop: 5,
-                  marginRight: (dWidth - (dWidth / 7.5) * 6) / 12,
-                  marginLeft:
-                    index === 0
-                      ? 0.5
-                      : (dWidth - 12 - (dWidth / 7.5) * 6) / 12.1,
-                  width: DDS.isTab ? (dWidth * 0.28) / 5 - 24 : dWidth / 7.5,
-                  height: DDS.isTab ? (dWidth * 0.28) / 5 - 24 : dWidth / 7.5,
-                  borderRadius: 100,
-                }}>
-                {colors.accent === item ? (
-                  <Icon size={SIZE.lg} color="white" name="check" />
-                ) : null}
-              </PressableButton>
-            ))}
-          </View>
         </View>
 
         <CustomButton
@@ -687,14 +620,7 @@ export const Settings = ({navigation}) => {
                     flexDirection: 'row',
                     alignItems: 'center',
                   }}>
-                  <Text
-                    style={{
-                      fontSize: SIZE.sm,
-                      fontFamily: WEIGHT.regular,
-                      color: colors.pri,
-                    }}>
-                    {settings.homepage}
-                  </Text>
+                  <Paragraph>{settings.homepage}</Paragraph>
                   <Icon color={colors.icon} name="menu-down" size={SIZE.md} />
                 </TouchableOpacity>
               }>
@@ -737,22 +663,19 @@ export const Settings = ({navigation}) => {
             justifyContent: 'space-between',
             paddingHorizontal: 12,
           }}>
-          <Text
+          <Paragraph
             style={{
-              fontSize: SIZE.sm,
-              fontFamily: WEIGHT.regular,
               textAlignVertical: 'center',
-              color: colors.pri,
             }}>
             Font Scaling{'\n'}
-            <Text
+            <Paragraph
+              color={colors.icon}
               style={{
-                fontSize: SIZE.sm,
-                color: colors.icon,
+                fontSize: SIZE.xs,
               }}>
               Scale the size of text in the app.
-            </Text>
-          </Text>
+            </Paragraph>
+          </Paragraph>
 
           <View
             style={{
@@ -797,14 +720,12 @@ export const Settings = ({navigation}) => {
                   height: 20,
                   paddingHorizontal: 5,
                 }}>
-                <Text
-                  style={{
-                    color:
-                      settings.fontScale === item.value ? 'white' : colors.icon,
-                    fontSize: SIZE.sm,
-                  }}>
+                <Paragraph
+                  color={
+                    settings.fontScale === item.value ? 'white' : colors.icon
+                  }>
                   {item.title}
-                </Text>
+                </Paragraph>
               </TouchableOpacity>
             ))}
           </View>
@@ -873,10 +794,10 @@ export const Settings = ({navigation}) => {
               }
               onPress={() => {
                 openVault({
-                  item:{},
-                  fingerprintAccess:true,
-                  novault:true
-                })
+                  item: {},
+                  fingerprintAccess: true,
+                  novault: true,
+                });
               }}
               maxWidth="90%"
               customComponent={
@@ -900,7 +821,10 @@ export const Settings = ({navigation}) => {
             title="Create Vault"
             tagline="Adds an extra layer of security for most important notes."
             onPress={() => {
-              openVault({}, false);
+              openVault({
+                item: {},
+                novault: false,
+              });
             }}
           />
         )}
@@ -960,23 +884,16 @@ export const Settings = ({navigation}) => {
             height: 50,
             paddingHorizontal: 12,
           }}>
-          <Text
+          <Paragraph
             style={{
-              fontSize: SIZE.sm,
-              fontFamily: WEIGHT.regular,
               textAlignVertical: 'center',
-              color: colors.pri,
               maxWidth: '60%',
             }}>
             Auto Backup{'\n'}
-            <Text
-              style={{
-                fontSize: SIZE.sm,
-                color: colors.icon,
-              }}>
+            <Paragraph color={colors.icon} size={SIZE.xs}>
               Backup your data automatically.
-            </Text>
-          </Text>
+            </Paragraph>
+          </Paragraph>
 
           <View
             style={{
@@ -1027,14 +944,13 @@ export const Settings = ({navigation}) => {
                   width: 50,
                   height: 20,
                 }}>
-                <Text
-                  style={{
-                    color:
-                      settings.reminder === item.value ? 'white' : colors.icon,
-                    fontSize: SIZE.xs,
-                  }}>
+                <Paragraph
+                  color={
+                    settings.reminder === item.value ? 'white' : colors.icon
+                  }
+                  size={SIZE.xs}>
                   {item.title}
-                </Text>
+                </Paragraph>
               </TouchableOpacity>
             ))}
           </View>

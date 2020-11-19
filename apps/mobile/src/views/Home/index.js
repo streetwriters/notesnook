@@ -27,8 +27,15 @@ export const Home = ({navigation}) => {
     });
     dispatch({
       type: Actions.CURRENT_SCREEN,
-      screen: 'home',
+      screen: 'notes',
     });
+    dispatch({
+      type: Actions.CONTAINER_BOTTOM_BUTTON,
+      state: {
+        onPress:_onPressBottomButton
+      },
+    });
+
     dispatch({
       type: Actions.HEADER_STATE,
       state: true,
@@ -65,10 +72,12 @@ export const Home = ({navigation}) => {
     });
   };
 
-  const _onPressBottomButton = async (event) => {
-    if (DDS.isPhone || DDS.isSmallTab) {
+  const _onPressBottomButton = (event) => {
+  
+    if (!DDS.isLargeTablet()) {
       tabBarRef.current?.goToPage(1);
     } else {
+      console.log('called');
       eSendEvent(eOnLoadNote, {type: 'new'});
     }
   };

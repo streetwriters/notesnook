@@ -48,6 +48,12 @@ export const Notebook = ({route, navigation}) => {
     });
 
     updateSearch();
+    dispatch({
+      type: Actions.CONTAINER_BOTTOM_BUTTON,
+      state: {
+        onPress:_onPressBottomButton
+      },
+    });
 
     dispatch({
       type: Actions.CURRENT_SCREEN,

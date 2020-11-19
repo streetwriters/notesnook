@@ -6,16 +6,16 @@ import {Placeholder} from '../../components/ListPlaceholders';
 import SimpleList from '../../components/SimpleList';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
-import { eSendEvent } from '../../services/EventManager';
+import {eSendEvent} from '../../services/EventManager';
 import SearchService from '../../services/SearchService';
-import { eScrollEvent } from '../../utils/Events';
+import {eScrollEvent} from '../../utils/Events';
 
 export const Trash = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const {trash} = state;
 
   const onFocus = useCallback(() => {
-    eSendEvent(eScrollEvent, {name:'Trash', type: 'in'});
+    eSendEvent(eScrollEvent, {name: 'Trash', type: 'in'});
     dispatch({
       type: Actions.HEADER_STATE,
       state: true,
@@ -24,6 +24,13 @@ export const Trash = ({route, navigation}) => {
       type: Actions.HEADER_TEXT_STATE,
       state: {
         heading: 'Trash',
+      },
+    });
+
+    dispatch({
+      type: Actions.CONTAINER_BOTTOM_BUTTON,
+      state: {
+        onPress: null,
       },
     });
 
@@ -40,10 +47,10 @@ export const Trash = ({route, navigation}) => {
   useEffect(() => {
     navigation.addListener('focus', onFocus);
     return () => {
-      eSendEvent(eScrollEvent, {name:'Trash', type: 'back'});
+      eSendEvent(eScrollEvent, {name: 'Trash', type: 'back'});
       navigation.removeListener('focus', onFocus);
     };
-  },[]);
+  }, []);
 
   useEffect(() => {
     if (navigation.isFocused()) {
@@ -68,8 +75,9 @@ export const Trash = ({route, navigation}) => {
         type="trash"
         focused={() => navigation.isFocused()}
         placeholderData={{
-          heading: 'Your Favorites',
-          paragraph: 'You have not added any notes to favorites yet.',
+          heading: 'Your Trash',
+          paragraph:
+            'Items in the trash will be permanently deleted after 7 days.',
           button: null,
         }}
         placeholder={<Placeholder type="trash" />}
@@ -80,6 +88,7 @@ export const Trash = ({route, navigation}) => {
         <ContainerBottomButton
           title="Clear all trash"
           onPress={_onPressBottomButton}
+          shouldShow={true}
         />
       )}
     </>

@@ -33,6 +33,14 @@ export const Folders = ({route, navigation}) => {
       type: Actions.CURRENT_SCREEN,
       screen: 'notebooks',
     });
+
+    dispatch({
+      type: Actions.CONTAINER_BOTTOM_BUTTON,
+      state: {
+        onPress:_onPressBottomButton
+      },
+    });
+
     updateSearch();
   }, [notebooks]);
 

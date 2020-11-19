@@ -60,6 +60,14 @@ export const Notes = ({route, navigation}) => {
       type: Actions.HEADER_STATE,
       state: params.menu,
     });
+    dispatch({
+      type: Actions.CONTAINER_BOTTOM_BUTTON,
+      state: {
+        onPress:_onPressBottomButton,
+        color:params.type == 'color' ? COLORS_NOTE[params.title] : null
+      },
+    });
+    
     updateSearch();
     dispatch({
       type: Actions.HEADER_TEXT_STATE,
