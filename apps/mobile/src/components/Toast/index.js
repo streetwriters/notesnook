@@ -3,13 +3,14 @@ import {Keyboard, Text, TouchableOpacity, View} from 'react-native';
 import Animated, {Easing, useValue} from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
+import {DDS} from '../../services/DeviceDetection';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
+import {dHeight, getElevation} from '../../utils';
 import {eHideToast, eShowToast} from '../../utils/Events';
-import {getElevation} from '../../utils';
-import {sleep} from "../../utils/TimeUtils";
-import {SIZE} from "../../utils/SizeUtils";
-import {DDS} from "../../services/DeviceDetection";
-const {spring, timing} = Animated;
+import {SIZE} from '../../utils/SizeUtils';
+import {sleep} from '../../utils/TimeUtils';
+import Paragraph from '../Typography/Paragraph';
+const {timing} = Animated;
 
 const toastMessages = [];
 export const Toast = ({context = 'global'}) => {
@@ -22,7 +23,7 @@ export const Toast = ({context = 'global'}) => {
     color: colors.errorText,
   });
 
-  let toastTranslate = useValue(300);
+  let toastTranslate = useValue(dHeight);
   let toastOpacity = useValue(1);
 
   const showToastFunc = (data) => {
@@ -129,7 +130,7 @@ export const Toast = ({context = 'global'}) => {
       style={{
         width: DDS.isTab ? '30%' : '100%',
         alignItems: 'center',
-        alignSelf:'center',
+        alignSelf: 'center',
         minHeight: 30,
         bottom: keyboard ? 30 : 100,
         position: 'absolute',
@@ -183,18 +184,16 @@ export const Toast = ({context = 'global'}) => {
             />
           </View>
 
-          <Text
+          <Paragraph
+            color="white"
             onPress={() => {
               hideToastFunc();
             }}
             style={{
-              color: 'white',
               width: '90%',
-              backgroundColor: 'transparent',
-              fontSize: SIZE.sm,
             }}>
             {data.message}
-          </Text>
+          </Paragraph>
         </View>
 
         {data.func ? (
@@ -208,14 +207,12 @@ export const Toast = ({context = 'global'}) => {
               borderRadius: 5,
             }}
             activeOpacity={0.5}>
-            <Text
-              style={{
-                fontSize: SIZE.sm,
-                color:
-                  data.type === 'error' ? colors.errorText : colors.successText,
-              }}>
+            <Paragraph
+              color={
+                data.type === 'error' ? colors.errorText : colors.successText
+              }>
               {data.actionText}
-            </Text>
+            </Paragraph>
           </TouchableOpacity>
         ) : null}
       </Animated.View>
