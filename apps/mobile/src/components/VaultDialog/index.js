@@ -497,8 +497,8 @@ export class VaultDialog extends Component {
             </View>
           ) : null}
 
-          {!this.state.fingerprintAccess &&
-          (!this.state.biometricUnlock || !novault) ? (
+          {this.state.isBiometryAvailable && !this.state.fingerprintAccess &&
+          (!this.state.biometricUnlock || !novault)  ? (
             <TouchableOpacity
               onPress={() => {
                 this.setState({
