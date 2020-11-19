@@ -38,9 +38,7 @@ export const TagsSection = () => {
     eSendEvent(refreshNotesPage, params);
     NavigationService.closeDrawer();
   };
-  useEffect(() => {
-    console.log(currentScreen);
-  }, [currentScreen]);
+
   return (
     <View
       style={{

@@ -96,7 +96,7 @@ export const Toast = ({context = 'global'}) => {
         easing: Easing.inOut(Easing.ease),
       }).start(async () => {
         await sleep(300);
-        console.log(toastMessages);
+      
         toastMessages.shift();
         setData({});
       });

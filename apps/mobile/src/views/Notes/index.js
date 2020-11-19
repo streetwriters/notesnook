@@ -33,7 +33,6 @@ export const Notes = ({route, navigation}) => {
   }, []);
 
   const init = (data) => {
-    console.log('rerendering');
     params = route.params;
     if (data) {
       params = data;

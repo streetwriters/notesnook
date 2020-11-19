@@ -445,7 +445,7 @@ function fixDropdownMenuLocations() {
             if (!evt.target.offsetParent) {
               
                 let _myLocalElement = evt.target.parentElement;
-                console.log(_myLocalElement)
+                
                 var rect = _myLocalElement.getBoundingClientRect();
                 evtItemWidth = _myLocalElement.offsetParent.offsetWidth;
                 evtItemHeight = _myLocalElement.offsetParent.offsetHeight;
@@ -479,7 +479,6 @@ function fixDropdownMenuLocations() {
                 left = left - (wDiff / 2);
             }
 
-            console.log('position changing')
 
             dropDownFixPosition(
                 '.ql-picker-label',

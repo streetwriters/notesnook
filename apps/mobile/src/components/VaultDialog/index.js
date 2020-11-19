@@ -249,7 +249,6 @@ export class VaultDialog extends Component {
   }
 
   _permanantUnlock() {
-    console.log('permanant unlock');
     db.vault
       .remove(this.state.note.id, this.password)
       .then((r) => {
@@ -301,7 +300,6 @@ export class VaultDialog extends Component {
           cancel: null,
         },
       });
-      console.log(credentials.password);
       if (credentials?.password) {
         this.password = credentials.password;
         this.onPress();

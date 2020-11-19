@@ -25,25 +25,7 @@ export const ListHeaderComponent = ({
 }) => {
   const [state] = useTracked();
   const {colors, headerTextState, currentScreen} = state;
-  /* 
-  const onScroll = async (y) => {
-    if (y > 100) {
-      let o = (y - 100) / 100;
-      o = 1 - o;
-      console.log(o);
-      opacity.setValue(o);
-    } else {
-      opacity.setValue(1);
-    }
-  };
-
-  useEffect(() => {
-    eSubscribeEvent(eScrollEvent, onScroll);
-    return () => {
-      eUnSubscribeEvent(eScrollEvent, onScroll);
-    };
-  }, []);
- */
+  
   return type === 'search' ? null : DDS.isLargeTablet() && !shouldShow ? (
     <View
       style={{

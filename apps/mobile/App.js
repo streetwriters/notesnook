@@ -53,7 +53,6 @@ let {width, height} = Dimensions.get('window');
 
 const onAppStateChanged = async (state) => {
   if (state === 'active') {
-    console.log('active state');
     StatusBar.setBarStyle(
       COLOR_SCHEME.night ? 'light-content' : 'dark-content',
       true,
@@ -164,7 +163,6 @@ const App = () => {
     (async () => {
       try {
         await db.init();
-        console.log('db is initialized');
       } catch (e) {
         error = e;
         console.log(e, 'ERROR DB');

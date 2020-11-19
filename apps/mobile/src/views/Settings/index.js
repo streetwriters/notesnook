@@ -119,11 +119,10 @@ export const Settings = ({navigation}) => {
 
   const checkVaultStatus = useCallback(() => {
     db.vault.add('check_no_vault').catch(async (e) => {
-      console.log(e);
+   
       let biometry = await Keychain.getSupportedBiometryType();
       let fingerprint = await Keychain.hasInternetCredentials('nn_vault');
 
-      console.log(biometry, fingerprint, 'val');
       let available = false;
       if (
         biometry === Keychain.BIOMETRY_TYPE.FINGERPRINT ||

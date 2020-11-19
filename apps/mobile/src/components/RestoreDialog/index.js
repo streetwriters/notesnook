@@ -61,7 +61,6 @@ const RestoreDialog = () => {
     await db.backup.import(backup);
     await sleep(2000);
     setRestoring(false);
-    console.log(db.notes.all);
     dispatch({type: Actions.ALL});
     ToastEvent.show('Restore Complete!', 'success');
     setVisible(false);
@@ -77,7 +76,7 @@ const RestoreDialog = () => {
     }
     let path = await storage.checkAndCreateDir('/backups/');
     let files = await RNFetchBlob.fs.lstat(path);
-    console.log(files);
+
     setFiles(files);
   };
 

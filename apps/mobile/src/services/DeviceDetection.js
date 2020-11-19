@@ -46,12 +46,10 @@ export class DeviceDetectionService {
     this.width = Dimensions.get('screen').width;
     this.height = Dimensions.get('screen').height;
     let deviceSize = this.getDeviceSize();
-    console.log(orientation, 'orientation');
     if (
       (!DeviceInfo.isTablet() && orientation === 'LANDSCAPE') ||
       (DeviceInfo.isTablet() && (orientation === 'PORTRAIT' || deviceSize < 9))
     ) {
-      console.log('small tab');
       this.isTab = true;
       this.isPhone = false;
       this.isSmallTab = true;

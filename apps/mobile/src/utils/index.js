@@ -64,7 +64,7 @@ export const history = {
 };
 
 export async function showContext(event, title) {
-  console.log(event.nativeEvent);
+
   event._targetInst.ref.current?.measureInWindow((x, y, w, h) => {
     dummyRef.current.setNativeProps({
       style: {

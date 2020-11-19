@@ -20,7 +20,7 @@ const Paragraph = ({color, size, style, ...restProps}) => {
 
   return (
     <Text
-      onLayout={e => console.log(e.nativeEvent.layout.height,"HEIGHT")}
+
       {...restProps}
       style={[
         {

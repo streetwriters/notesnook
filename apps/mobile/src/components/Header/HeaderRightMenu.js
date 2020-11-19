@@ -26,7 +26,7 @@ export const HeaderRightMenu = () => {
       {DDS.isLargeTablet() && containerBottomButton.onPress ? (
         <Button
           onPress={ () => {
-            console.log('hello');
+        
             containerBottomButton.onPress()
 
           }}

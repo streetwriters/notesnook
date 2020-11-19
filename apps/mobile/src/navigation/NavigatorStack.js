@@ -67,10 +67,7 @@ export const NavigatorStack = React.memo(
     const [state] = useTracked();
     const {settings} = state;
 
-    React.useEffect(() => {
-      console.log("rerendering navigator stack");
-    })
-
+   
     return (
       <Container root={true}>
         <NavigationContainer independent={true} ref={rootNavigatorRef}>

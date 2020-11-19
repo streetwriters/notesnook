@@ -424,13 +424,7 @@ export const ActionSheetComponent = ({
         dispatch({type: Actions.ALL});
         setRefreshing(false);
       }
-    } else {
-      console.log(
-        'here',
-        user?.lastSynced,
-        user?.lastSynced < note?.dateEdited,
-      );
-    }
+    } 
   };
 
   const onPressVaultButton = async () => {

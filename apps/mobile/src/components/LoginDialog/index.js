@@ -109,7 +109,7 @@ const LoginDialog = () => {
 
     try {
       let res = await db.user.login(username.toLowerCase(), password);
-      console.log(res, username, password);
+   
     } catch (e) {
       setTimeout(() => {
         ToastEvent.show(e.message, 'error', 'local');
@@ -146,7 +146,7 @@ const LoginDialog = () => {
       ToastEvent.show('Passwords do not match', 'error', 'local');
       return false;
     }
-    console.log(invalidEmail, invalidPassword, invalidUsername);
+   
     if (invalidEmail && invalidPassword && invalidUsername) {
       ToastEvent.show('Signup information is invalid', 'error', 'local');
       return false;

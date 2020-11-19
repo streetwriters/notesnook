@@ -78,7 +78,7 @@ const EditorHeader = () => {
   }, [fullscreen]);
 
   const load = async (item) => {
-    console.log(item);
+
     await loadNote(item);
     Keyboard.addListener('keyboardDidShow', () => {
       post('keyboard');

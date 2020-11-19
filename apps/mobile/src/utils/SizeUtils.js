@@ -19,7 +19,7 @@ export const getDeviceSize = () => {
 };
 
 const getDpi = (pd) => {
-  console.log(pd);
+
   return 160 * pd;
 };
 const correction = (size, multiplier) => {
@@ -38,10 +38,9 @@ const correction = (size, multiplier) => {
   } else if (dSize > 7.2 && dSize <= 8.5 && DDS.isTab) {
     return size * 0.9;
   } else if (dSize > 8.5 && dSize <= 9.8 && DDS.isTab) {
-    console.log(dSize)
+    
     return size * 0.8;
   } else if (dSize > 9.8) {
-    console.log("HERE CALC",dSize)
     return size * 0.85;
   } else {
     return size;

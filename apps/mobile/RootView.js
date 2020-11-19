@@ -29,7 +29,6 @@ import {getIntent, getNote, post} from './src/views/Editor/Functions';
 
 let {width, height} = Dimensions.get('window');
 const onChangeTab = async (obj) => {
-  console.log('tab changed');
   if (obj.i === 1) {
     eSendEvent(eCloseSideMenu);
     if (getIntent()) return;

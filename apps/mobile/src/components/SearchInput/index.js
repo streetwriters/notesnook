@@ -12,7 +12,6 @@ export const SearchInput = (props) => {
 
   const updateSearchState = () => {
     setSearchState(SearchService.getSearchInformation().placeholder);
-    console.log(SearchService.getSearchInformation().placeholder);
   };
 
   useEffect(() => {

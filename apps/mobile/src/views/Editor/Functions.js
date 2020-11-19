@@ -138,7 +138,6 @@ async function setNote(item) {
 }
 
 function clearNote() {
-  console.log('note cleared');
   note = null;
   title = '';
   noteEdited = false;
@@ -152,7 +151,7 @@ function clearNote() {
 let currentEditingTimer = null;
 
 export async function loadNote(item) {
-  console.log(item);
+ 
   editing.currentlyEditing = true;
   post('blur');
   if (item && item.type === 'new') {

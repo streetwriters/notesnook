@@ -513,7 +513,7 @@ function fixDropdownMenuLocations() {
 
       document.getElementById(dropdown).style.top = downTop + 20;
       document.getElementById(dropdown).style.left = left;
-      //console.log('called',downTop + 20,left);
+ 
     });
   }
 }

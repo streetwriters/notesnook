@@ -66,10 +66,6 @@ export const ContainerBottomButton = ({title, onPress, color,shouldShow =false})
           ...getElevation(5),
           borderRadius: 100,
         }}
-        onLongPress={(event) => {
-          console.log(event);
-          showContext(event, title);
-        }}
         onPress={onPress}>
         <View
           style={{

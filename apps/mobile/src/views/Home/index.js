@@ -77,7 +77,6 @@ export const Home = ({navigation}) => {
     if (!DDS.isLargeTablet()) {
       tabBarRef.current?.goToPage(1);
     } else {
-      console.log('called');
       eSendEvent(eOnLoadNote, {type: 'new'});
     }
   };

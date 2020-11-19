@@ -33,10 +33,6 @@ export const Menu = React.memo(
       dispatch({type: Actions.THEME, colors: newColors});
     }
 
-    React.useEffect(() => {
-      console.log('rerendering drawer');
-    });
-
     const BottomItemsList = [
       {
         name: 'Night mode',

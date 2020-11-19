@@ -46,7 +46,7 @@ export async function deleteItems(item) {
           let it = itemsCopy[i];
           let trashItem = trash.all.find((item) => item.itemId === it.id);
           await db.trash.restore(trashItem.id);
-          console.log(it.type, 'type');
+         s
           updateEvent({type: it.type});
         }
         updateEvent({type: Actions.TRASH});

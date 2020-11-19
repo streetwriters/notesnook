@@ -86,7 +86,6 @@ const SimpleList = ({
       }}>
       <Paragraph
         onPress={() => {
-          console.log('clicekd');
           if (jumpToDialog) {
             eSendEvent(eOpenJumpToDialog);
           }

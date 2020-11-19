@@ -45,7 +45,7 @@ export const ActionSheetTagsSection = ({item, close}) => {
 
   const _onSubmit = useCallback(async () => {
     if (!tagToAdd || tagToAdd === '' || tagToAdd.trimStart().length == 0) {
-      console.log('Calling submit', tagToAdd);
+  
       ToastEvent.show('Empty Tag', 'error', 'local');
       return;
     }

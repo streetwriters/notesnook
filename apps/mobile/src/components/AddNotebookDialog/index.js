@@ -64,7 +64,6 @@ export class AddNotebookDialog extends React.Component {
         if (index === 0) return;
         topicsList.push(item.title);
       });
-      console.log(topicsList);
       this.id = toEdit.id;
       this.title = toEdit.title;
       this.description = toEdit.description;
@@ -105,7 +104,7 @@ export class AddNotebookDialog extends React.Component {
     let edit = this.props.toEdit;
     if (edit && edit.id) {
       let topicToDelete = edit.topics[index + 1];
-      console.log(topicToDelete);
+   
       if (topicToDelete) {
         this.topicsToDelete.push(topicToDelete.id);
       }
@@ -432,7 +431,7 @@ export class AddNotebookDialog extends React.Component {
                   <TopicItem
                     item={item}
                     onPress={(item, index) => {
-                      console.log('here');
+                     
                       this.prevIndex = index;
                       this.prevItem = item;
                       this.topicInputRef.setNativeProps({

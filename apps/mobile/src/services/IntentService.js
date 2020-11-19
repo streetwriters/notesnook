@@ -13,7 +13,6 @@ let previousIntent = {
 function check() {
   ReceiveSharingIntent.getReceivedFiles(
     (d) => {
-      console.log('INTENT SERVICE', d);
       let data = d[0];
       if (data.text || data.weblink) {
         let text = data.text;
