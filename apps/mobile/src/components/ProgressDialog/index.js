@@ -6,12 +6,13 @@ import {eOpenProgressDialog, eCloseProgressDialog} from '../../utils/Events';
 import {getElevation} from '../../utils';
 import BaseDialog from '../Dialog/base-dialog';
 import {Loading} from '../Loading';
-import {ph, SIZE, WEIGHT} from "../../utils/SizeUtils";
-import {DDS} from "../../services/DeviceDetection";
+import {ph, SIZE, WEIGHT} from '../../utils/SizeUtils';
+import {DDS} from '../../services/DeviceDetection';
+import Paragraph from '../Typography/Paragraph';
 
 const ProgressDialog = () => {
   const [state, dispatch] = useTracked();
-  const {colors,} = state;
+  const {colors} = state;
   const [visible, setVisible] = useState(false);
   const [dialogData, setDialogData] = useState({
     title: 'Loading',
@@ -40,7 +41,7 @@ const ProgressDialog = () => {
       <View
         style={{
           ...getElevation(5),
-          width: DDS.isTab? 350 : '80%',
+          width: DDS.isTab ? 350 : '80%',
           maxHeight: 350,
           borderRadius: 5,
           backgroundColor: colors.bg,
@@ -48,16 +49,14 @@ const ProgressDialog = () => {
           paddingVertical: 20,
         }}>
         <Loading height={40} tagline={dialogData.title} />
-        <Text
+        <Paragraph
+          color={colors.icon}
           style={{
-            fontFamily: WEIGHT.regular,
             alignSelf: 'center',
             textAlign: 'center',
-            color: colors.icon,
-            fontSize: SIZE.xs,
           }}>
           {dialogData.paragraph}
-        </Text>
+        </Paragraph>
       </View>
     </BaseDialog>
   );

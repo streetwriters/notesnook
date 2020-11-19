@@ -3,6 +3,8 @@ import {Text, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
 import {SIZE, WEIGHT} from '../../utils/SizeUtils';
+import Heading from '../Typography/Heading';
+import Paragraph from '../Typography/Paragraph';
 
 const DialogHeader = ({icon, title, paragraph}) => {
   const [state, dispatch] = useTracked();
@@ -18,25 +20,11 @@ const DialogHeader = ({icon, title, paragraph}) => {
         {/*   {icon ? (
           <Icon name={icon} color={colors.accent} size={SIZE.lg} />
         ) : null} */}
-        <Text
-          style={{
-            color: colors.heading,
-            fontFamily: WEIGHT.bold,
-            fontSize: SIZE.xl,
-          }}>
-          {title}
-        </Text>
+        <Heading size={SIZE.xl}>{title}</Heading>
       </View>
 
       {paragraph ? (
-        <Text
-          style={{
-            color: colors.icon,
-            fontFamily: WEIGHT.regular,
-            fontSize: SIZE.sm,
-          }}>
-          {paragraph}
-        </Text>
+        <Paragraph color={colors.icon}>{paragraph}</Paragraph>
       ) : null}
     </>
   );

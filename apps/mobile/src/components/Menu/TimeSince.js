@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {Text} from 'react-native';
 import {timeSince} from "../../utils/TimeUtils";
+import Paragraph from '../Typography/Paragraph';
 
 export const TimeSince = ({time}) => {
   const [timeAgo, setTimeAgo] = useState(null);
@@ -18,5 +19,5 @@ export const TimeSince = ({time}) => {
     };
   },[]);
 
-  return <Text>{timeAgo}</Text>;
+  return <Paragraph>{timeAgo}</Paragraph>;
 };

@@ -4,9 +4,11 @@ import {PressableButton} from '../../components/PressableButton';
 import {useTracked} from '../../provider';
 import NavigationService from '../../services/Navigation';
 import {SIZE, WEIGHT} from '../../utils/SizeUtils';
+import Heading from '../Typography/Heading';
+import Paragraph from '../Typography/Paragraph';
 
 const TagItem = ({item, index}) => {
-  const [state, ] = useTracked();
+  const [state] = useTracked();
   const {colors} = state;
   return (
     <PressableButton
@@ -28,26 +30,19 @@ const TagItem = ({item, index}) => {
         borderBottomWidth: 1.5,
         borderBottomColor: colors.nav,
       }}>
-      <Text
-        style={{
-          fontFamily: WEIGHT.bold,
-          fontSize: SIZE.md,
-          color: colors.heading,
-        }}>
-        <Text
+      <Heading size={SIZE.md}>
+        <Heading
           style={{
             color: colors.accent,
           }}>
           #
-        </Text>
-
+        </Heading>
         {item.title}
-      </Text>
-      <Text
+      </Heading>
+      <Paragraph
+        color={colors.icon}
+        size={SIZE.xs}
         style={{
-          fontSize: SIZE.xs,
-          color: colors.icon,
-          fontFamily: WEIGHT.regular,
           marginTop: 5,
         }}>
         {item && item.noteIds.length && item.noteIds.length > 1
@@ -55,7 +50,7 @@ const TagItem = ({item, index}) => {
           : item.noteIds.length === 1
           ? item.noteIds.length + ' note'
           : null}
-      </Text>
+      </Paragraph>
     </PressableButton>
   );
 };

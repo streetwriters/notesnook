@@ -7,7 +7,7 @@ import { ActionIcon } from '../ActionIcon';
 
 export const HeaderLeftMenu = () => {
   const [state] = useTracked();
-  const {colors, headerMenuState, searchResults} = state;
+  const {colors, headerMenuState, currentScreen} = state;
 
   const onLeftButtonPress = () => {
     if (headerMenuState) {
@@ -19,7 +19,7 @@ export const HeaderLeftMenu = () => {
 
   return (
     <>
-      {!DDS.isTab ? (
+      {!DDS.isTab || currentScreen === 'search' ? (
         <ActionIcon
           testID="left_menu_button"
           customStyle={{

@@ -6,6 +6,8 @@ import {getElevation} from '../../utils';
 import Seperator from '../Seperator';
 import {ph, pv, SIZE, WEIGHT} from "../../utils/SizeUtils";
 import {DDS} from "../../services/DeviceDetection";
+import Paragraph from '../Typography/Paragraph';
+import Heading from '../Typography/Heading';
 
 const {
   eSubscribeEvent,
@@ -57,23 +59,20 @@ const PremiumStatusDialog = () => {
             styles.container,
           ]}>
           <View style={styles.headingContainer}>
-            <Text style={[{color: colors.accent}, styles.heading]}>
+            <Heading color={colors.accent} style={styles.heading}>
               Notesnook Pro
-            </Text>
+            </Heading>
           </View>
           <Seperator />
-          <Text
+          <Paragraph
             style={{
-              color: colors.pri,
-              fontFamily: WEIGHT.regular,
-              fontSize: SIZE.sm,
               textAlign: 'center',
               width: '90%',
               alignSelf: 'center',
             }}>
             Your account has been upgraded to Notesnook Pro successfully. Now
             you can enjoy all premium features!
-          </Text>
+          </Paragraph>
           <Seperator />
         </View>
       </View>

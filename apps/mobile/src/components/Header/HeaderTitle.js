@@ -2,11 +2,12 @@ import React, {useEffect} from 'react';
 import {Text} from 'react-native';
 import Animated from 'react-native-reanimated';
 import {useTracked} from '../../provider';
+import {DDS} from '../../services/DeviceDetection';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
 import {eScrollEvent} from '../../utils/Events';
 import Heading from '../Typography/Heading';
 
-const opacity = new Animated.Value(0);
+const opacity = new Animated.Value(DDS.isLargeTablet() ? 1 : 0);
 
 let scrollPostions = {};
 
@@ -15,6 +16,7 @@ export const HeaderTitle = () => {
   const {colors, headerTextState} = state;
 
   const onScroll = async (y) => {
+    if (DDS.isLargeTablet()) return;
     if (typeof y !== 'number') {
       if (y.type === 'back') {
         scrollPostions[y.name] = null;
@@ -42,7 +44,6 @@ export const HeaderTitle = () => {
       opacity.setValue(0);
     }
     scrollPostions[headerTextState.heading] = y;
-
   };
 
   useEffect(() => {
@@ -58,12 +59,9 @@ export const HeaderTitle = () => {
         opacity: opacity,
       }}>
       <Heading color={headerTextState.color}>
-        <Text
-          style={{
-            color: colors.accent,
-          }}>
+        <Heading color={colors.accent}>
           {headerTextState.heading.slice(0, 1) === '#' ? '#' : null}
-        </Text>
+        </Heading>
 
         {headerTextState.heading.slice(0, 1) === '#'
           ? headerTextState.heading.slice(1)

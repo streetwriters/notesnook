@@ -1,26 +1,27 @@
-import React, { useEffect, useState } from 'react';
-import { FlatList, Platform, Text, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import React, {useEffect, useState} from 'react';
+import {FlatList, Platform, Text, View} from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import RNFetchBlob from 'rn-fetch-blob';
-import { useTracked } from '../../provider';
-import { Actions } from '../../provider/Actions';
-import { DDS } from '../../services/DeviceDetection';
+import {useTracked} from '../../provider';
+import {Actions} from '../../provider/Actions';
+import {DDS} from '../../services/DeviceDetection';
 import {
   eSubscribeEvent,
   eUnSubscribeEvent,
-  ToastEvent
+  ToastEvent,
 } from '../../services/EventManager';
-import { getElevation } from '../../utils';
-import { db } from '../../utils/DB';
-import { eCloseRestoreDialog, eOpenRestoreDialog } from '../../utils/Events';
-import { ph, SIZE, WEIGHT } from '../../utils/SizeUtils';
+import {getElevation} from '../../utils';
+import {db} from '../../utils/DB';
+import {eCloseRestoreDialog, eOpenRestoreDialog} from '../../utils/Events';
+import {ph, SIZE, WEIGHT} from '../../utils/SizeUtils';
 import storage from '../../utils/storage';
-import { sleep } from '../../utils/TimeUtils';
-import { Button } from '../Button';
+import {sleep} from '../../utils/TimeUtils';
+import {Button} from '../Button';
 import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogHeader from '../Dialog/dialog-header';
-import { Loading } from '../Loading';
+import {Loading} from '../Loading';
+import Paragraph from '../Typography/Paragraph';
 
 const RestoreDialog = () => {
   const [state, dispatch] = useTracked();
@@ -108,16 +109,15 @@ const RestoreDialog = () => {
               paddingVertical: 20,
             }}>
             <Loading height={40} tagline="Resoring your data" />
-            <Text
+            <Paragraph
+              size={SIZE.xs}
+              color={colors.icon}
               style={{
-                fontFamily: WEIGHT.regular,
                 alignSelf: 'center',
                 textAlign: 'center',
-                color: colors.icon,
-                fontSize: SIZE.xs,
               }}>
               Your data is being restored
-            </Text>
+            </Paragraph>
           </View>
         </BaseDialog>
 
@@ -146,16 +146,11 @@ const RestoreDialog = () => {
                   borderBottomWidth: 0.5,
                   borderBottomColor: colors.nav,
                 }}>
-                <Text
-                  style={{
-                    fontFamily: WEIGHT.regular,
-                    fontSize: SIZE.xs + 1,
-                    color: colors.pri,
-                  }}>
+                <Paragraph size={SIZE.xs}>
                   {item.filename
                     .replace('notesnook_backup_', '')
                     .replace('.nnbackup', '')}
-                </Text>
+                </Paragraph>
 
                 <Button
                   title="Restore"

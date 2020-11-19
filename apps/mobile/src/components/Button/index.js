@@ -4,6 +4,8 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
 import {PressableButton} from '../PressableButton';
 import {ph, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
+import Paragraph from '../Typography/Paragraph';
+import Heading from '../Typography/Heading';
 
 const BUTTON_TYPES = {
   transparent: {
@@ -30,7 +32,8 @@ const BUTTON_TYPES = {
   shade: {
     primary: 'shade',
     text: 'accent',
-    selected: 'shade',
+    selected: 'accent',
+    opacity: 0.12,
   },
 };
 
@@ -43,6 +46,8 @@ export const Button = ({
   icon,
   fontSize = SIZE.sm,
   type = 'transparent',
+  iconSize = SIZE.md,
+  style = {},
 }) => {
   const [state] = useTracked();
   const {colors} = state;
@@ -54,6 +59,7 @@ export const Button = ({
       color={colors[BUTTON_TYPES[type].primary]}
       selectedColor={colors[BUTTON_TYPES[type].selected]}
       alpha={!colors.night ? -0.04 : 0.04}
+      opacity={BUTTON_TYPES[type].opacity || 1}
       customStyle={{
         height: height,
         width: width || null,
@@ -64,6 +70,7 @@ export const Button = ({
         justifyContent: 'center',
         alignItems: 'center',
         flexDirection: 'row',
+        ...style,
       }}>
       {loading && <ActivityIndicator color={colors[BUTTON_TYPES[type].text]} />}
       {icon && !loading && (
@@ -73,16 +80,17 @@ export const Button = ({
             marginRight: 0,
           }}
           color={colors[BUTTON_TYPES[type].text]}
-          size={SIZE.md}
+          size={iconSize}
         />
       )}
-      <Text
-        style={[
-          styles.buttonText,
-          {color: colors[BUTTON_TYPES[type].text], fontSize: fontSize},
-        ]}>
-        {title}
-      </Text>
+      {!title ? null : (
+        <Heading
+          color={colors[BUTTON_TYPES[type].text]}
+          size={fontSize}
+          style={styles.buttonText}>
+          {title}
+        </Heading>
+      )}
     </PressableButton>
   );
 };
@@ -97,9 +105,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   buttonText: {
-    fontFamily: WEIGHT.bold,
-    color: 'white',
-    fontSize: SIZE.md,
     marginLeft: 5,
   },
 });

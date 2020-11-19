@@ -1,15 +1,14 @@
 import React from 'react';
-import {Text, View} from 'react-native';
+import {View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
-import {eSendEvent} from '../../services/EventManager';
-import {eClearSearch} from '../../utils/Events';
-import NavigationService from '../../services/Navigation';
-import {showContext} from '../../utils';
-import {PressableButton} from '../PressableButton';
-import {SIZE, WEIGHT} from '../../utils/SizeUtils';
 import {DDS} from '../../services/DeviceDetection';
+import {eSendEvent} from '../../services/EventManager';
+import NavigationService from '../../services/Navigation';
+import {eClearSearch} from '../../utils/Events';
+import {SIZE} from '../../utils/SizeUtils';
+import {PressableButton} from '../PressableButton';
 import Paragraph from '../Typography/Paragraph';
 
 export const MenuListItem = ({item, index, noTextMode, ignore, testID}) => {
@@ -24,11 +23,10 @@ export const MenuListItem = ({item, index, noTextMode, ignore, testID}) => {
           heading: item.name,
         },
       });
-      dispatch({
-        type: Actions.HEADER_VERTICAL_MENU,
-        state: item.name === 'Home',
-      });
       eSendEvent(eClearSearch);
+    }
+    if (item.name.toLowerCase() === currentScreen) {
+      console.log('already here');
     }
     if (item.func) {
       item.func();
@@ -45,9 +43,6 @@ export const MenuListItem = ({item, index, noTextMode, ignore, testID}) => {
       testID={testID}
       key={item.name + index}
       onPress={_onPress}
-      onLongPress={(event) => {
-        showContext(event, item.name).then((r) => r);
-      }}
       color={
         currentScreen === item.name.toLowerCase() ? colors.shade : 'transparent'
       }

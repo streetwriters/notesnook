@@ -181,44 +181,41 @@ export default class NoteItem extends React.Component {
                     color="orange"
                   />
                 ) : null}
-                <Text
+                <Paragraph
+                  color={colors.icon}
+                  size={SIZE.xs}
                   style={{
-                    color: colors.icon,
-                    fontSize: SIZE.xs,
                     textAlignVertical: 'center',
-                    fontFamily: WEIGHT.regular,
                     marginRight: 10,
                   }}>
                   {timeSince(item.dateCreated)}
-                </Text>
+                </Paragraph>
               </>
             ) : null}
 
             {isTrash ? (
               <>
-                <Text
+                <Paragraph
+                  color={colors.icon}
+                  size={SIZE.xs}
                   style={{
-                    color: colors.accent,
-                    fontSize: SIZE.xs,
                     textAlignVertical: 'center',
-                    fontFamily: WEIGHT.regular,
                   }}>
                   {item.itemType[0].toUpperCase() +
                     item.itemType.slice(1) +
                     '  '}
-                </Text>
-                <Text
+                </Paragraph>
+                <Paragraph
+                  color={colors.icon}
+                  size={SIZE.xs}
                   style={{
-                    color: colors.icon,
-                    fontSize: SIZE.xs,
                     textAlignVertical: 'center',
-                    fontFamily: WEIGHT.regular,
                   }}>
                   Deleted on{' '}
                   {item && item.dateDeleted
                     ? new Date(item.dateDeleted).toISOString().slice(0, 10)
                     : null + '   '}
-                </Text>
+                </Paragraph>
               </>
             ) : null}
 
@@ -231,13 +228,13 @@ export default class NoteItem extends React.Component {
                   position: 'absolute',
                   right: 20,
                 }}>
-                <Text
+                <Paragraph
+                  size={SIZE.xs}
                   style={{
-                    fontSize: SIZE.xs,
                     color: 'white',
                   }}>
                   CONFLICTS
-                </Text>
+                </Paragraph>
               </View>
             ) : null}
           </View>

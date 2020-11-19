@@ -155,11 +155,11 @@ export const ActionSheetComponent = ({
       func: () => {
         if (note.locked) {
           openVault({
-            item:item,
-            novault:true,
-            locked:true,
-            share:true,
-          })
+            item: item,
+            novault: true,
+            locked: true,
+            share: true,
+          });
         } else {
           close();
           let m = `${note.title}\n \n ${note.content.text}`;
@@ -499,12 +499,9 @@ export const ActionSheetComponent = ({
           }}>
           <Heading size={SIZE.md}>{note.title.replace('\n', '')}</Heading>
 
-          <Text
+          <Paragraph
             numberOfLines={2}
             style={{
-              fontSize: SIZE.sm,
-              color: colors.pri,
-              fontFamily: WEIGHT.regular,
               width: '100%',
               textAlign: 'center',
               maxWidth: '100%',
@@ -517,14 +514,13 @@ export const ActionSheetComponent = ({
                 ? note.headline.slice(0, note.headline.length - 1)
                 : note.headline
               : null}
-          </Text>
+          </Paragraph>
 
-          <Text
+          <Paragraph
+            color={colors.icon}
+            size={SIZE.xs}
             style={{
-              color: colors.icon,
-              fontSize: SIZE.xs,
               textAlignVertical: 'center',
-              fontFamily: WEIGHT.regular,
               marginTop: 2.5,
             }}>
             {note.type === 'note'
@@ -536,7 +532,7 @@ export const ActionSheetComponent = ({
             {note.dateDeleted
               ? 'Deleted on ' + timeConverter(note.dateDeleted)
               : null}
-          </Text>
+          </Paragraph>
 
           {note.type !== 'notebook' ? null : (
             <View
@@ -560,16 +556,15 @@ export const ActionSheetComponent = ({
                         marginRight: 5,
                         marginVertical: 2.5,
                       }}>
-                      <Text
+                      <Paragraph
+                        size={SIZE.xs}
                         numberOfLines={1}
+                        color="white"
                         style={{
-                          color: 'white',
-                          fontFamily: WEIGHT.regular,
-                          fontSize: SIZE.xs,
                           maxWidth: '100%',
                         }}>
                         {topic.title}
-                      </Text>
+                      </Paragraph>
                     </View>
                   ))
                 : null}
@@ -577,13 +572,12 @@ export const ActionSheetComponent = ({
           )}
 
           {note.type !== 'note' || refreshing ? null : (
-            <Text
+            <Paragraph
+              color={colors.accent}
+              size={SIZE.xs}
               onPress={onPressSync}
               style={{
-                color: colors.accent,
-                fontSize: SIZE.xs,
                 textAlignVertical: 'center',
-                fontFamily: WEIGHT.regular,
                 marginTop: 5,
                 borderWidth: 1,
                 textAlign: 'center',
@@ -595,7 +589,7 @@ export const ActionSheetComponent = ({
               {user && user.lastSynced > note.dateEdited
                 ? 'Synced'
                 : 'Sync Now'}
-            </Text>
+            </Paragraph>
           )}
 
           {refreshing ? (
@@ -642,15 +636,14 @@ export const ActionSheetComponent = ({
             color={note.locked ? '#FF0000' : colors.accent}
             size={SIZE.md}
           />
-          <Text
+          <Paragraph
+            color={note.locked ? '#FF0000' : colors.accent}
+            size={SIZE.md}
             style={{
-              color: note.locked ? '#FF0000' : colors.accent,
-              fontFamily: WEIGHT.regular,
-              fontSize: SIZE.md,
               marginLeft: 5,
             }}>
             {note.locked ? 'Remove from Vault' : 'Add to Vault'}
-          </Text>
+          </Paragraph>
         </PressableButton>
       ) : null}
 

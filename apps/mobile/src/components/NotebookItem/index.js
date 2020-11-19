@@ -4,8 +4,10 @@ import {useTracked} from '../../provider';
 import NavigationService from '../../services/Navigation';
 import {ActionSheetEvent} from '../DialogManager/recievers';
 import Seperator from '../Seperator';
-import {ph, pv, SIZE, WEIGHT} from "../../utils/SizeUtils";
-import {ActionIcon} from "../ActionIcon";
+import {ph, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
+import {ActionIcon} from '../ActionIcon';
+import Heading from '../Typography/Heading';
+import Paragraph from '../Typography/Paragraph';
 
 export const NotebookItem = ({
   item,
@@ -14,8 +16,8 @@ export const NotebookItem = ({
   isTrash,
   customStyle,
 }) => {
-  const [state,] = useTracked();
-  const {colors,} = state;
+  const [state] = useTracked();
+  const {colors} = state;
 
   return (
     <View
@@ -40,28 +42,24 @@ export const NotebookItem = ({
           minHeight: 50,
           justifyContent: 'center',
         }}>
-        <Text
+        <Heading
+          size={SIZE.md}
           numberOfLines={1}
           style={{
-            fontFamily: WEIGHT.bold,
-            fontSize: SIZE.md,
-            color: colors.heading,
             maxWidth: '100%',
           }}>
           {item.title}
-        </Text>
+        </Heading>
         {isTopic || !item.description ? null : (
-          <Text
+          <Paragraph
+            size={SIZE.sm}
             numberOfLines={2}
             style={{
-              fontFamily: WEIGHT.regular,
-              fontSize: SIZE.xs + 1,
-              color: colors.pri,
               maxWidth: '100%',
               paddingVertical: 5,
             }}>
             {item.description}
-          </Text>
+          </Paragraph>
         )}
 
         {isTopic ? null : (
@@ -91,29 +89,27 @@ export const NotebookItem = ({
                     marginRight: 5,
                     marginVertical: 2.5,
                   }}>
-                  <Text
+                  <Paragraph
+                    size={SIZE.xs}
                     numberOfLines={1}
                     style={{
                       color: 'white',
-                      fontFamily: WEIGHT.regular,
-                      fontSize: SIZE.xxs,
                       maxWidth: '100%',
                     }}>
                     {topic.title}
-                  </Text>
+                  </Paragraph>
                 </TouchableOpacity>
               ))
             ) : (
-              <Text
+              <Paragraph
+                color={colors.icon}
+                size={SIZE.xs}
                 style={{
-                  color: colors.icon,
-                  fontFamily: WEIGHT.regular,
-                  fontSize: SIZE.xxs,
                   paddingVertical: pv / 3,
                   maxWidth: '100%',
                 }}>
                 This notebook has no topics.
-              </Text>
+              </Paragraph>
             )}
           </View>
         )}
@@ -125,26 +121,24 @@ export const NotebookItem = ({
               alignItems: 'center',
               marginTop: 5,
             }}>
-            <Text
+            <Paragraph
+              color={colors.icon}
+              size={SIZE.xs}
               style={{
-                color: colors.icon,
-                fontSize: SIZE.xs - 1,
                 textAlignVertical: 'center',
-                fontFamily: WEIGHT.regular,
               }}>
               {'Deleted on: ' + item && item.dateDeleted
                 ? new Date(item.dateDeleted).toISOString().slice(0, 10)
                 : null + '   '}
-            </Text>
-            <Text
+            </Paragraph>
+            <Paragraph
+              color={colors.accent}
+              size={SIZE.xs}
               style={{
-                color: colors.accent,
-                fontSize: SIZE.xs - 1,
                 textAlignVertical: 'center',
-                fontFamily: WEIGHT.regular,
               }}>
               {item.type[0].toUpperCase() + item.type.slice(1) + '  '}
-            </Text>
+            </Paragraph>
           </View>
         ) : null}
 
@@ -156,21 +150,20 @@ export const NotebookItem = ({
             marginTop: 5,
           }}>
           {isTrash ? null : (
-            <Text
+            <Paragraph
+              color={colors.icon}
+              size={SIZE.xs}
               style={{
-                color: colors.icon,
-                fontSize: SIZE.xxs,
                 textAlignVertical: 'center',
-                fontFamily: WEIGHT.regular,
               }}>
               {new Date(item.dateCreated).toDateString().substring(4)}
-            </Text>
+            </Paragraph>
           )}
           <Seperator half />
-          <Text
+          <Paragraph
+            color={colors.icon}
+            size={SIZE.xs}
             style={{
-              color: colors.icon,
-              fontSize: SIZE.xxs,
               textAlignVertical: 'center',
               fontFamily: WEIGHT.regular,
             }}>
@@ -179,7 +172,7 @@ export const NotebookItem = ({
               : item.totalNotes === 1
               ? item.totalNotes + ' Note'
               : '0 Notes'}
-          </Text>
+          </Paragraph>
         </View>
       </View>
       {item.title === 'General' && item.type === 'topic' ? null : (

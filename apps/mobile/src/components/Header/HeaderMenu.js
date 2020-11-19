@@ -1,10 +1,11 @@
 import React from 'react';
-import {useTracked} from '../../provider';
-import {SIZE, WEIGHT} from '../../utils/SizeUtils';
-import {Text, TouchableOpacity} from 'react-native';
+import { TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {eSendEvent} from '../../services/EventManager';
-import {eOpenSortDialog} from '../../utils/Events';
+import { useTracked } from '../../provider';
+import { eSendEvent } from '../../services/EventManager';
+import { eOpenSortDialog } from '../../utils/Events';
+import { SIZE } from '../../utils/SizeUtils';
+import Paragraph from '../Typography/Paragraph';
 
 export const HeaderMenu = () => {
   const [state] = useTracked();
@@ -22,18 +23,15 @@ export const HeaderMenu = () => {
         alignItems: 'center',
         zIndex:10
       }}>
-      <Text
+      <Paragraph
         style={{
-          fontSize: SIZE.sm,
-          fontFamily: WEIGHT.regular,
-          color: colors.pri,
           marginRight: 5,
           height: 35,
           textAlignVertical:'center'
         }}>
         {settings.sort.slice(0, 1).toUpperCase() +
           settings.sort.slice(1, settings.sort.length)}
-      </Text>
+      </Paragraph>
       <Icon
         color={colors.pri}
         name={

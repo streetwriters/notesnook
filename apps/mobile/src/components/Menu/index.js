@@ -27,7 +27,7 @@ export const Menu = React.memo(
     const [state, dispatch] = useTracked();
     const {colors} = state;
     const insets = useSafeAreaInsets();
-    const noTextMode = DDS.isTab && !DDS.isSmallTab;
+    const noTextMode = false;
     function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
       let newColors = setColorScheme(colors, accent);
       dispatch({type: Actions.THEME, colors: newColors});
@@ -66,7 +66,7 @@ export const Menu = React.memo(
         style={{
           height: '100%',
           width: '100%',
-          backgroundColor: colors.bg,
+          backgroundColor:DDS.isLargeTablet()? colors.nav : colors.bg,
           paddingTop: insets.top,
           borderRightWidth: 1,
           borderRightColor: colors.nav,

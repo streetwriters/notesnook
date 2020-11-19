@@ -19,8 +19,9 @@ import {dHeight} from '../../utils';
 import {Button} from '../Button';
 import {simpleDialogEvent, updateEvent} from '../DialogManager/recievers';
 import {TEMPLATE_APPLY_CHANGES} from '../DialogManager/Templates';
-import {normalize, SIZE} from "../../utils/SizeUtils";
-import {db} from "../../utils/DB";
+import {normalize, SIZE} from '../../utils/SizeUtils';
+import {db} from '../../utils/DB';
+import Paragraph from '../Typography/Paragraph';
 
 const {Value, timing} = Animated;
 
@@ -280,9 +281,6 @@ const MergeEditor = () => {
           link.click();  
     }`;
 
-
-
-
   return (
     <Modal transparent={false} animated animationType="fade" visible={visible}>
       <SafeAreaView
@@ -350,14 +348,10 @@ const MergeEditor = () => {
                   alignItems: 'center',
                   justifyContent: 'space-between',
                 }}>
-                <Text
-                  style={{
-                    color: colors.icon,
-                    fontSize: SIZE.xxs,
-                  }}>
+                <Paragraph color={colors.icon} size={SIZE.xxs}>
                   Saved on 10/10/20 {'\n'}
                   12:30pm on Tablet
-                </Text>
+                </Paragraph>
                 <Icon
                   size={SIZE.lg}
                   name={primary ? 'chevron-up' : 'chevron-down'}
@@ -481,14 +475,10 @@ const MergeEditor = () => {
                   alignItems: 'center',
                   justifyContent: 'space-between',
                 }}>
-                <Text
-                  style={{
-                    color: colors.icon,
-                    fontSize: SIZE.xxs,
-                  }}>
+                <Paragraph color={colors.icon} size={SIZE.xs}>
                   Saved on 10/10/20 {'\n'}
                   12:30pm on Tablet
-                </Text>
+                </Paragraph>
                 <Icon
                   size={SIZE.lg}
                   name={secondary ? 'chevron-up' : 'chevron-down'}

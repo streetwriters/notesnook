@@ -10,6 +10,7 @@ import {
 import {DataProvider, LayoutProvider, RecyclerListView} from 'recyclerlistview';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
+import {DDS} from '../../services/DeviceDetection';
 import {eSendEvent, ToastEvent} from '../../services/EventManager';
 import {db} from '../../utils/DB';
 import {
@@ -83,23 +84,22 @@ const SimpleList = ({
         paddingHorizontal: 12,
         height: 35,
       }}>
-      <Text
+      <Paragraph
         onPress={() => {
           console.log('clicekd');
           if (jumpToDialog) {
             eSendEvent(eOpenJumpToDialog);
           }
         }}
-        style={[
-          styles.sectionHeader,
-          {
-            color: colors.accent,
-            height: 35,
-            minWidth: 60,
-          },
-        ]}>
+        color={colors.accent}
+        style={{
+          height: 35,
+          minWidth: 60,
+          alignSelf: 'center',
+          textAlignVertical: 'center',
+        }}>
         {item.title}
-      </Text>
+      </Paragraph>
       {index === 1 && sortMenuButton ? <HeaderMenu /> : null}
     </View>
   );
@@ -209,7 +209,8 @@ const SimpleList = ({
           break;
         case 'MAIN_HEADER':
           dim.width = width;
-          dim.height = dataType === 'search' ? 0 : 200;
+          dim.height =
+            dataType === 'search' ? 0 : DDS.isLargeTablet() ? 50 : 200;
           break;
         default:
           dim.width = width;
@@ -320,12 +321,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 12,
     height: 40,
-  },
-  sectionHeader: {
-    fontFamily: WEIGHT.bold,
-    fontSize: SIZE.sm,
-    alignSelf: 'center',
-    textAlignVertical: 'center',
   },
   emptyList: {
     height: '100%',

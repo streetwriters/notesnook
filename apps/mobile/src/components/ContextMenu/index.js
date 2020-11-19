@@ -4,6 +4,7 @@ import {useTracked} from '../../provider';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
 import {getElevation} from '../../utils';
 import {SIZE, WEIGHT} from '../../utils/SizeUtils';
+import Paragraph from '../Typography/Paragraph';
 
 let contextTimeout = null;
 
@@ -55,14 +56,7 @@ const ContextMenu = () => {
         paddingHorizontal: 12,
         borderRadius: 5,
       }}>
-      <Text
-        style={{
-          color: 'white',
-          fontFamily: WEIGHT.regular,
-          fontSize: SIZE.sm,
-        }}>
-        {contextMenu.title}
-      </Text>
+      <Paragraph color="white">{contextMenu.title}</Paragraph>
     </View>
   );
 };

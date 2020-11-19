@@ -3,21 +3,23 @@ import {ActivityIndicator, Platform, StyleSheet, View} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useTracked} from '../../provider';
+import {DDS} from '../../services/DeviceDetection';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
 import NavigationService from '../../services/Navigation';
-import {dWidth} from '../../utils';
+import {dWidth, getElevation} from '../../utils';
 import {eScrollEvent} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
 import {ActionIcon} from '../ActionIcon';
 import {SearchInput} from '../SearchInput';
 import {HeaderLeftMenu} from './HeaderLeftMenu';
+import { HeaderRightMenu } from './HeaderRightMenu';
 import {HeaderTitle} from './HeaderTitle';
 
 export const Header = ({root}) => {
   const [state] = useTracked();
   const {colors, syncing, currentScreen} = state;
   const insets = useSafeAreaInsets();
-  const [hide, setHide] = useState(false);
+  const [hide, setHide] = useState(true);
 
   const onScroll = (y) => {
     if (y > 150) {
@@ -39,7 +41,7 @@ export const Header = ({root}) => {
       style={[
         styles.container,
         {
-          marginTop:Platform.OS === "android"? insets.top : null,
+          marginTop: Platform.OS === 'android' ? insets.top : null,
           backgroundColor: colors.bg,
           overflow: 'hidden',
           borderBottomWidth: 1,
@@ -50,11 +52,11 @@ export const Header = ({root}) => {
       <View style={styles.leftBtnContainer}>
         <HeaderLeftMenu />
 
-        {Platform.OS === 'android' && currentScreen !== 'search' ? (
+        {Platform.OS === 'android' && currentScreen !== 'search' || Platform.isPad ? (
           <HeaderTitle root={root} />
         ) : null}
       </View>
-      {Platform.OS !== 'android' && currentScreen !== 'search' ? (
+      {Platform.OS !== 'android' && !Platform.isPad && currentScreen !== 'search' ? (
         <HeaderTitle root={root} />
       ) : null}
 
@@ -100,17 +102,7 @@ export const Header = ({root}) => {
           />
         </View>
       ) : (
-        <View style={styles.rightBtnContainer}>
-          <ActionIcon
-            onPress={async () => {
-              NavigationService.navigate('Search');
-            }}
-            name="magnify"
-            size={SIZE.xxxl}
-            color={colors.pri}
-            style={styles.rightBtn}
-          />
-        </View>
+       <HeaderRightMenu/>
       )}
     </View>
   );

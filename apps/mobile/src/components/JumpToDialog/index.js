@@ -1,14 +1,15 @@
-import React, {useEffect, useState} from 'react';
-import {ScrollView, Text, View} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { ScrollView, View } from 'react-native';
 import BaseDialog from '../../components/Dialog/base-dialog';
-import {PressableButton} from '../../components/PressableButton';
+import { PressableButton } from '../../components/PressableButton';
 import Seperator from '../../components/Seperator';
-import {useTracked} from '../../provider';
-import {DDS} from '../../services/DeviceDetection';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
-import {getElevation, scrollRef} from '../../utils';
-import {eCloseJumpToDialog, eOpenJumpToDialog} from '../../utils/Events';
-import {SIZE, WEIGHT} from '../../utils/SizeUtils';
+import { useTracked } from '../../provider';
+import { DDS } from '../../services/DeviceDetection';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
+import { getElevation, scrollRef } from '../../utils';
+import { eCloseJumpToDialog, eOpenJumpToDialog } from '../../utils/Events';
+import { SIZE } from '../../utils/SizeUtils';
+import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
 const offsets = [];
@@ -101,16 +102,14 @@ const JumpToDialog = () => {
           alignSelf: 'center',
           padding: 10,
         }}>
-        <Text
+        <Heading
+          size={SIZE.xl}
           style={{
-            fontSize: SIZE.xl,
-            fontFamily: WEIGHT.bold,
-            color: colors.heading,
             alignSelf: 'center',
           }}>
           {settings.sort.slice(0, 1).toUpperCase() +
             settings.sort.slice(1, settings.sort.length)}
-        </Text>
+        </Heading>
         <Seperator />
         <ScrollView
           style={{

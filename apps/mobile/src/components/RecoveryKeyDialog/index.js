@@ -19,6 +19,8 @@ import {Toast} from '../Toast';
 import {SIZE, WEIGHT} from '../../utils/SizeUtils';
 import {db} from '../../utils/DB';
 import Storage from '../../utils/storage';
+import Heading from '../Typography/Heading';
+import Paragraph from '../Typography/Paragraph';
 class RecoveryKeyDialog extends React.Component {
   constructor(props) {
     super(props);
@@ -141,19 +143,16 @@ class RecoveryKeyDialog extends React.Component {
             borderRadius: 10,
             paddingTop: 10,
           }}>
-          <Text
+          <Heading
             numberOfLines={2}
             style={{
-              fontFamily: WEIGHT.bold,
-              fontSize: SIZE.xl,
               width: '85%',
               maxWidth: '85%',
               paddingRight: 10,
               marginTop: 10,
-              color: colors.heading,
             }}>
-            Your Recovery Key
-          </Text>
+            Recovery Key
+          </Heading>
 
           <View
             style={{
@@ -162,18 +161,17 @@ class RecoveryKeyDialog extends React.Component {
               padding: 10,
               marginTop: 10,
             }}>
-            <Text
+            <Paragraph
+              color={colors.icon}
+              size={SIZE.md}
               numberOfLines={2}
               style={{
-                fontFamily: WEIGHT.regular,
-                fontSize: SIZE.md,
                 width: '100%',
                 maxWidth: '100%',
                 paddingRight: 10,
-                color: colors.icon,
               }}>
               {this.state.key}
-            </Text>
+            </Paragraph>
           </View>
           <Seperator />
 
@@ -236,18 +234,16 @@ class RecoveryKeyDialog extends React.Component {
               borderRadius: 10,
             }}>
             <Icon color={colors.errorText} size={SIZE.lg} name="alert-circle" />
-            <Text
+            <Paragraph
+              color={colors.errorText}
               style={{
-                color: colors.errorText,
-                fontFamily: WEIGHT.regular,
                 marginLeft: 10,
-                fontSize: SIZE.sm,
                 width: '90%',
               }}>
               We request you to save your recovery key and keep it in multiple
               places. If you forget your password, you can only recover your
               data or reset your password using this recovery key.
-            </Text>
+            </Paragraph>
           </View>
           <Seperator />
           <Button

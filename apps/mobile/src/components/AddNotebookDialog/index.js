@@ -23,6 +23,7 @@ import {DDS} from '../../services/DeviceDetection';
 import {ActionIcon} from '../ActionIcon';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogHeader from '../Dialog/dialog-header';
+import Paragraph from '../Typography/Paragraph';
 
 let refs = [];
 
@@ -489,15 +490,12 @@ const TopicItem = ({item, index, colors, onPress, onDelete}) => {
           onPress(item, index);
         }}
       />
-      <Text
+      <Paragraph
         style={{
-          fontFamily: WEIGHT.regular,
-          fontSize: SIZE.sm,
-          color: colors.primary,
           marginRight: index === 0 ? 2 : 0,
         }}>
         {index + 1 + '.'}
-      </Text>
+      </Paragraph>
       <TextInput
         ref={topicRef}
         editable={false}

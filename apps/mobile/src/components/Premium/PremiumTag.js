@@ -1,7 +1,8 @@
 import React from 'react';
-import {Text, View} from 'react-native';
-import {useTracked} from '../../provider';
-import {WEIGHT} from "../../utils/SizeUtils";
+import { View } from 'react-native';
+import { useTracked } from '../../provider';
+import { SIZE } from '../../utils/SizeUtils';
+import Paragraph from '../Typography/Paragraph';
 
 export const PremiumTag = ({pro}) => {
   const [state, dispatch] = useTracked();
@@ -17,15 +18,14 @@ export const PremiumTag = ({pro}) => {
         marginRight: 20,
         elevation: 1,
       }}>
-      <Text
+      <Paragraph
+        size={SIZE.xs}
         style={{
           color: 'white',
           paddingHorizontal: 4,
-          fontSize: 10,
-          fontFamily: WEIGHT.regular,
         }}>
         PRO
-      </Text>
+      </Paragraph>
     </View>
   ) : null;
 };

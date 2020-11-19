@@ -10,6 +10,8 @@ import {ph, SIZE, WEIGHT} from '../../utils/SizeUtils';
 import {Button} from '../Button';
 import BaseDialog from '../Dialog/base-dialog';
 import Seperator from '../Seperator';
+import Heading from '../Typography/Heading';
+import Paragraph from '../Typography/Paragraph';
 
 const ResultDialog = () => {
   const [state, dispatch] = useTracked();
@@ -54,27 +56,23 @@ const ResultDialog = () => {
           alignItems: 'center',
         }}>
         <Icon name={dialogData.icon} color={colors.accent} size={80} />
-        <Text
+        <Heading
+          size={SIZE.lg}
           style={{
-            fontFamily: WEIGHT.bold,
             alignSelf: 'center',
             textAlign: 'center',
-            color: colors.heading,
-            fontSize: SIZE.lg,
             marginTop: 10,
           }}>
           {dialogData.title}
-        </Text>
-        <Text
+        </Heading>
+        <Paragraph
+          color={colors.icon}
           style={{
-            fontFamily: WEIGHT.regular,
             alignSelf: 'center',
             textAlign: 'center',
-            color: colors.icon,
-            fontSize: SIZE.sm,
           }}>
           {dialogData.paragraph}
-        </Text>
+        </Paragraph>
         <Seperator />
         <Button title={dialogData.button} width="100%" onPress={close} />
       </View>

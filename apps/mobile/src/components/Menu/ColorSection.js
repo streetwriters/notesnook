@@ -8,6 +8,7 @@ import NavigationService from '../../services/Navigation';
 import { PressableButton } from '../PressableButton';
 import {COLORS_NOTE} from "../../utils/Colors";
 import {SIZE, WEIGHT} from "../../utils/SizeUtils";
+import Paragraph from '../Typography/Paragraph';
 
 export const ColorSection = ({noTextMode}) => {
   const [state, dispatch] = useTracked();
@@ -100,23 +101,17 @@ export const ColorSection = ({noTextMode}) => {
                 alignItems: 'center',
                 width: '85%',
               }}>
-              <Text
+              <Paragraph
+              color={colors.heading}
                 style={{
                   fontFamily: WEIGHT.regular,
                   fontSize: SIZE.sm,
                   color: colors.heading,
                 }}>
                 {item.title.slice(0, 1).toUpperCase() + item.title.slice(1)}
-              </Text>
+              </Paragraph>
 
-           {/*    <Text
-                style={{
-                  color: colors.icon,
-                  fontSize: SIZE.xs,
-                  paddingHorizontal: 5,
-                }}>
-                {item.noteIds.length > 99 ? '99+' : item.noteIds.length}
-              </Text> */}
+        
             </View>
           )}
         </PressableButton>

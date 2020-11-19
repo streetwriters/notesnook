@@ -7,6 +7,7 @@ import NavigationService from '../../services/Navigation';
 import {refreshNotesPage} from '../../utils/Events';
 import {SIZE, WEIGHT} from '../../utils/SizeUtils';
 import {PressableButton} from '../PressableButton';
+import Paragraph from '../Typography/Paragraph';
 
 export const TagsSection = () => {
   const [state, dispatch] = useTracked();
@@ -76,14 +77,9 @@ export const TagsSection = () => {
                 justifyContent: 'center',
                 alignItems: 'flex-start',
               }}>
-              <Text
-                style={{
-                  color: colors.accent,
-                  fontSize: SIZE.md,
-                  fontFamily: WEIGHT.regular,
-                }}>
+              <Paragraph color={colors.accent} size={SIZE.md}>
                 #
-              </Text>
+              </Paragraph>
             </View>
             <View
               style={{
@@ -92,25 +88,8 @@ export const TagsSection = () => {
                 alignItems: 'center',
                 width: '85%',
               }}>
-              <Text
-                style={{
-                  fontFamily: WEIGHT.regular,
-                  fontSize: SIZE.sm,
-                  color: colors.heading,
-                }}>
-                {item.title}
-              </Text>
+              <Paragraph color={colors.heading}>{item.title}</Paragraph>
 
-              {/*   {item.noteIds.length > 1 ? (
-                <Text
-                  style={{
-                    color: colors.icon,
-                    fontSize: SIZE.xs,
-                    paddingHorizontal: 5,
-                  }}>
-                  {item.noteIds.length > 99 ? '99+' : item.noteIds.length}
-                </Text>
-              ) : null} */}
             </View>
           </PressableButton>
         ))}
