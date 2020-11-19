@@ -1,5 +1,5 @@
 import React from 'react';
-import {View} from 'react-native';
+import {KeyboardAvoidingView, Platform, SafeAreaView, View} from 'react-native';
 import {PanGestureHandler, State} from 'react-native-gesture-handler';
 import Animated, {Easing} from 'react-native-reanimated';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
@@ -8,7 +8,7 @@ import {useTracked} from '../../provider';
 import {eSendEvent} from '../../services/EventManager';
 import {eOnLoadNote} from '../../utils/Events';
 import Editor from './index';
-
+import {editorRef} from "../../utils/Refs"
 let prevVal = 0;
 let finalValue = 80;
 let anim2 = new Animated.Value(0);
@@ -76,16 +76,20 @@ function opacityAnim(a, b, c) {
   }).start();
 }
 
-export const EditorWrapper = () => {
+const AnimatedKeyboardView = Animated.createAnimatedComponent(KeyboardAvoidingView)
+
+export const EditorWrapper = ({dimensions}) => {
   const [state] = useTracked();
   const {colors} = state;
   const insets = useSafeAreaInsets();
 
   return (
-    <View
+    <SafeAreaView
+      ref={editorRef}
       style={{
-        width: '100%',
+        width: dimensions.width * 0.55,
         height: '100%',
+        backgroundColor: colors.bg,
       }}>
       <View
         style={{
@@ -93,7 +97,7 @@ export const EditorWrapper = () => {
           zIndex: 20,
           height: insets.top,
           top: 0,
-          width: '100%',
+          width: dimensions.width,
           backgroundColor: colors.bg,
         }}
       />
@@ -101,7 +105,8 @@ export const EditorWrapper = () => {
         minPointers={2}
         onHandlerStateChange={onHandlerStateChange}
         onGestureEvent={onGestureEvent}>
-        <Animated.View
+        <AnimatedKeyboardView
+        behavior={Platform.OS === 'ios' ? 'padding' : null}
           style={{
             transform: [
               {
@@ -154,15 +159,9 @@ export const EditorWrapper = () => {
             </Animated.Text>
           </View>
 
-          <View
-            style={{
-              height: '100%',
-              width: '100%',
-            }}>
-            <Editor noMenu={false} />
-          </View>
-        </Animated.View>
+            <Editor/>
+        </AnimatedKeyboardView>
       </PanGestureHandler>
-    </View>
+    </SafeAreaView>
   );
 };
