@@ -9,6 +9,7 @@ import {Menu} from '../components/Menu';
 import NavigationService from '../services/Navigation';
 import {createDrawerNavigator} from '@react-navigation/drawer';
 import {DDS} from '../services/DeviceDetection';
+import { dWidth } from '../utils';
 
 const Drawer = createDrawerNavigator();
 
@@ -40,11 +41,11 @@ export const NavigationStack = ({component = NavigatorStack}) => {
         }}
         drawerStyle={{
           width:
-            DDS.isTab && !DDS.isSmallTab
-              ? Dimensions.get('window').width * 0.05
+           DDS.isLargeTablet()
+              ? DDS.width * 0.15
               : DDS.isSmallTab
-              ? '40%'
-              : Dimensions.get('window').width * 0.65,
+              ? "30%"
+              : "65%",
           borderRightWidth: 0,
         }}
         edgeWidth={200}
@@ -61,6 +62,6 @@ export const NavigationStack = ({component = NavigatorStack}) => {
 
 const DrawerComponent = () => {
   return (
-    <Menu/>
+    <Menu  />
   );
 };
