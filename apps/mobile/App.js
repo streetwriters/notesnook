@@ -2,12 +2,19 @@ import * as NetInfo from '@react-native-community/netinfo';
 import * as Sentry from '@sentry/react-native';
 import {EV} from 'notes-core/common';
 import React, {useEffect, useState} from 'react';
-import {Appearance, AppState, Platform, StatusBar} from 'react-native';
-import DeviceInfo from 'react-native-device-info';
+import {
+  Appearance,
+  AppState,
+  Dimensions,
+  Platform,
+  StatusBar,
+  View,
+} from 'react-native';
 import Orientation from 'react-native-orientation';
 import {enabled} from 'react-native-privacy-snapshot';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import SplashScreen from 'react-native-splash-screen';
+import {RootView} from './RootView';
 import {useTracked} from './src/provider';
 import {Actions} from './src/provider/Actions';
 import Backup from './src/services/Backup';
@@ -21,6 +28,7 @@ import {
 import IntentService from './src/services/IntentService';
 import {setLoginMessage} from './src/services/Message';
 import SettingsService from './src/services/SettingsService';
+import {setWidthHeight} from './src/utils';
 import {COLOR_SCHEME} from './src/utils/Colors';
 import {db} from './src/utils/DB';
 import {
@@ -31,7 +39,6 @@ import {
 } from './src/utils/Events';
 import {MMKV} from './src/utils/mmkv';
 import {tabBarRef} from './src/utils/Refs';
-import {getDeviceSize} from './src/utils/SizeUtils';
 import {sleep} from './src/utils/TimeUtils';
 import {getNote} from './src/views/Editor/Functions';
 
@@ -42,16 +49,18 @@ Sentry.init({
 
 let firstLoad = true;
 let note = null;
+let {width, height} = Dimensions.get('window');
 
 const onAppStateChanged = async (state) => {
   if (state === 'active') {
-    console.log("active state");
+    console.log('active state');
     StatusBar.setBarStyle(
-      COLOR_SCHEME.night ? 'light-content' : 'dark-content',true
+      COLOR_SCHEME.night ? 'light-content' : 'dark-content',
+      true,
     );
     if (Platform.OS === 'android') {
-      StatusBar.setBackgroundColor("transparent",true)
-      StatusBar.setTranslucent(true,true);
+      StatusBar.setBackgroundColor('transparent', true);
+      StatusBar.setTranslucent(true, true);
     }
     if (SettingsService.get().privacyScreen) {
       enabled(false);
@@ -81,22 +90,15 @@ const App = () => {
   const [, dispatch] = useTracked(),
     [init, setInit] = useState(false);
 
-  let I =
-    DDS.isLargeTablet()
-      ? require('./index.tablet')
-      : require('./index.mobile');
-
   const _onOrientationChange = (o) => {
+    return;
     let smallTab = DDS.isSmallTab;
     DDS.setNewValues();
     DDS.checkSmallTab(o);
     if (smallTab === DDS.isSmallTab) {
       return;
     }
-    I =
-     DDS.isLargeTablet()
-        ? require('./index.tablet')
-        : require('./index.mobile');
+    I = DDS.isLargeTablet() ? require('./index.tablet') : require('./RootView');
 
     setTimeout(() => {
       resetApp();
@@ -178,7 +180,6 @@ const App = () => {
     (async () => {
       try {
         await db.init();
-
         console.log('db is initialized');
       } catch (e) {
         error = e;
@@ -214,10 +215,10 @@ const App = () => {
   }
 
   function Initialize() {
+    Orientation.lockToLandscape();
     if (firstLoad) {
-      if (DDS.isLargeTablet()) {
-        Orientation.lockToLandscape();
-        _onOrientationChange('LANDSCAPE');
+      console.log(DDS.isTab);
+      if (DDS.isTab) {
       } else {
         Orientation.lockToPortrait();
       }
@@ -229,7 +230,7 @@ const App = () => {
   return (
     <>
       <SafeAreaProvider>
-        <>{!init ? <></> : <I.Initialize />}</>
+        <>{!init ? <></> : <RootView />}</>
       </SafeAreaProvider>
     </>
   );
