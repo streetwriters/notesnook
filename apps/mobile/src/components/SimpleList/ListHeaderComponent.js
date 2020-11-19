@@ -2,6 +2,7 @@ import React, {useEffect} from 'react';
 import {Text, View} from 'react-native';
 import Animated from 'react-native-reanimated';
 import {useTracked} from '../../provider';
+import {DDS} from '../../services/DeviceDetection';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
 import {COLORS_NOTE} from '../../utils/Colors';
 import {hexToRGBA} from '../../utils/ColorUtils';
@@ -20,6 +21,7 @@ export const ListHeaderComponent = ({
   paragraph,
   color,
   onPress,
+  shouldShow = false,
 }) => {
   const [state] = useTracked();
   const {colors, headerTextState, currentScreen} = state;
@@ -42,7 +44,19 @@ export const ListHeaderComponent = ({
     };
   }, []);
  */
-  return type === 'search' ? null : (
+  return type === 'search' ? null : DDS.isLargeTablet() && !shouldShow ? (
+    <View
+      style={{
+        minHeight: 50,
+        marginBottom: 5,
+        padding: 12,
+        width: '100%',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}>
+      {messageCard && <MessageCard />}
+    </View>
+  ) : (
     <View
       style={{
         minHeight: 195,
@@ -54,11 +68,6 @@ export const ListHeaderComponent = ({
           : color || colors.shade,
       }}>
       {messageCard && <MessageCard />}
-
-      {/*     <Icon style={{
-        position:'absolute',
-        right:0,
-      }} name="home" color={colors.bg} size={SIZE.xxxl * 4} />  */}
 
       <View
         style={{
@@ -87,12 +96,9 @@ export const ListHeaderComponent = ({
           style={{marginBottom: paragraph ? -10 : 0}}
           size={SIZE.xxxl * 1.5}
           color={headerTextState.color}>
-          <Text
-            style={{
-              color: colors.accent,
-            }}>
+          <Heading size={SIZE.xxxl * 1.5} color={colors.accent}>
             {headerTextState.heading.slice(0, 1) === '#' ? '#' : null}
-          </Text>
+          </Heading>
 
           {title
             ? title
@@ -104,7 +110,7 @@ export const ListHeaderComponent = ({
           <Paragraph color={colors.icon}>
             {'\n'}or
             <Paragraph onPress={onPress} color={colors.accent}>
-              {" " + paragraph}
+              {' ' + paragraph}
             </Paragraph>
           </Paragraph>
         )}
