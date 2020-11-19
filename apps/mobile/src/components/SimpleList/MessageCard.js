@@ -1,9 +1,11 @@
 import React from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import {Text, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useTracked } from '../../provider';
-import { COLORS_NOTE } from '../../utils/Colors';
-import { SIZE } from '../../utils/SizeUtils';
+import {useTracked} from '../../provider';
+import {DDS} from '../../services/DeviceDetection';
+import {COLORS_NOTE} from '../../utils/Colors';
+import {SIZE} from '../../utils/SizeUtils';
+import Paragraph from '../Typography/Paragraph';
 
 export const MessageCard = ({data}) => {
   const [state] = useTracked();
@@ -19,7 +21,7 @@ export const MessageCard = ({data}) => {
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'flex-start',
-            position: 'absolute',
+            position: DDS.isLargeTablet() ? 'relative' : 'absolute',
             right: 0,
             top: 0,
           }}>
@@ -28,16 +30,17 @@ export const MessageCard = ({data}) => {
               flexDirection: 'row',
               alignItems: 'center',
             }}>
-            <Text
-              style={{
-                color: COLORS_NOTE[currentScreen]
+            <Paragraph
+              color={
+                COLORS_NOTE[currentScreen]
                   ? COLORS_NOTE[currentScreen]
-                  : colors.accent,
-                fontSize: SIZE.sm,
+                  : colors.accent
+              }
+              style={{
                 marginRight: 10,
               }}>
               {messageBoardState.actionText}
-            </Text>
+            </Paragraph>
 
             <Icon
               name="arrow-right"
