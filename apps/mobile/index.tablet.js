@@ -59,7 +59,7 @@ const NavWrapper = () => {
     editorRef.current?.setNativeProps({
       style: {
         position: 'relative',
-        width: '69%',
+        width: '71%',
         zIndex: null,
         paddingHorizontal: 0,
         backgroundColor: 'transparent',
@@ -100,7 +100,7 @@ const NavWrapper = () => {
         <View
           ref={editorRef}
           style={{
-            width: '69%',
+            width: '71%',
             height: '100%',
             backgroundColor: 'transparent',
             paddingRight: 12,
