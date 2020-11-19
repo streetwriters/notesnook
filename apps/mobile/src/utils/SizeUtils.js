@@ -15,9 +15,11 @@ export const getDeviceSize = () => {
   let diagonalSize = Math.sqrt(
     Math.pow(deviceWidthInInches, 2) + Math.pow(deviceHeightInInches, 2),
   );
-  return diagonalSize;
+  return Platform.isPad? diagonalSize + 2 : diagonalSize;
 };
+
 const getDpi = (pd) => {
+  console.log(pd);
   return 160 * pd;
 };
 const correction = (size, multiplier) => {
@@ -34,11 +36,13 @@ const correction = (size, multiplier) => {
   } else if (dSize >= 6.5 && dSize <= 7.2 && DDS.isTab) {
     return size * multiplier;
   } else if (dSize > 7.2 && dSize <= 8.5 && DDS.isTab) {
-    return size * (multiplier + 0.1);
+    return size * 0.9;
   } else if (dSize > 8.5 && dSize <= 9.8 && DDS.isTab) {
-    return size * (multiplier + 0.15);
+    console.log(dSize)
+    return size * 0.8;
   } else if (dSize > 9.8) {
-    return size;
+    console.log("HERE CALC",dSize)
+    return size * 0.85;
   } else {
     return size;
   }
