@@ -94,8 +94,13 @@ export async function showContext(event, title) {
   });
 }
 
-export const dWidth = Dimensions.get('window').width;
-export const dHeight = Dimensions.get('window').height;
+export let dWidth = Dimensions.get('window').width;
+export let dHeight = Dimensions.get('window').height;
+
+export function setWidthHeight(size) {
+  dWidth = size.width;
+  dHeight = size.height
+}
 
 export const itemSkus = Platform.select({
   ios: ['com.streetwriters.notesnook.sub.mo'],
