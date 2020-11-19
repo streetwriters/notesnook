@@ -45,12 +45,13 @@ let note = null;
 
 const onAppStateChanged = async (state) => {
   if (state === 'active') {
+    console.log("active state");
     StatusBar.setBarStyle(
-      COLOR_SCHEME.night ? 'light-content' : 'dark-content',
+      COLOR_SCHEME.night ? 'light-content' : 'dark-content',true
     );
     if (Platform.OS === 'android') {
-      StatusBar.setTranslucent(true);
-      StatusBar.setBackgroundColor(COLOR_SCHEME.bg);
+      StatusBar.setBackgroundColor("transparent",true)
+      StatusBar.setTranslucent(true,true);
     }
     if (SettingsService.get().privacyScreen) {
       enabled(false);
@@ -81,7 +82,7 @@ const App = () => {
     [init, setInit] = useState(false);
 
   let I =
-    DDS.isTab && !DDS.isSmallTab
+    DDS.isLargeTablet()
       ? require('./index.tablet')
       : require('./index.mobile');
 
@@ -93,7 +94,7 @@ const App = () => {
       return;
     }
     I =
-      DDS.isTab && !DDS.isSmallTab
+     DDS.isLargeTablet()
         ? require('./index.tablet')
         : require('./index.mobile');
 
@@ -214,7 +215,7 @@ const App = () => {
 
   function Initialize() {
     if (firstLoad) {
-      if (DeviceInfo.isTablet() && getDeviceSize() > 9) {
+      if (DDS.isLargeTablet()) {
         Orientation.lockToLandscape();
         _onOrientationChange('LANDSCAPE');
       } else {
