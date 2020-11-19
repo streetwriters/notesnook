@@ -156,12 +156,36 @@ const AppStack = React.memo(
     };
 
     return (
-      <ScrollableTabView
-        ref={tabBarRef}
-        prerenderingSiblingsNumber={Infinity}
-        onChangeTab={onChangeTab}
-        renderTabBar={() => <></>}>
-        {!mode && (
+      <>
+        <View
+          style={{
+            position: 'absolute',
+            width: '400%',
+            height: '400%',
+            backgroundColor: colors.bg,
+          }}
+        />
+        <ScrollableTabView
+          ref={tabBarRef}
+          style={{
+            zIndex:2
+          }}
+          prerenderingSiblingsNumber={Infinity}
+          onChangeTab={onChangeTab}
+          renderTabBar={() => <></>}>
+          {!mode && (
+            <View
+              style={{
+                width: '100%',
+                height: '100%',
+                flexDirection: 'row',
+                backgroundColor: colors.bg,
+              }}
+            />
+          )}
+          {mode && mode !== 'tablet' && (
+            <NavigationStack component={NavigatorStack} />
+          )}
           <View
             style={{
               width: '100%',
@@ -169,34 +193,23 @@ const AppStack = React.memo(
               flexDirection: 'row',
               backgroundColor: colors.bg,
             }}
-          />
-        )}
-        {mode && mode !== 'tablet' && (
-          <NavigationStack component={NavigatorStack} />
-        )}
-        <View
-          style={{
-            width: '100%',
-            height: '100%',
-            flexDirection: 'row',
-            backgroundColor: colors.bg,
-          }}
-          onLayout={_onLayout}>
-          {mode && mode === 'tablet' && (
-            <View
-              style={{
-                width: dimensions.width * 0.45,
-                height: '100%',
-                borderRightColor: colors.nav,
-                borderRightWidth: 1,
-              }}>
-              <NavigationStack component={NavigatorStack} />
-            </View>
-          )}
+            onLayout={_onLayout}>
+            {mode && mode === 'tablet' && (
+              <View
+                style={{
+                  width: dimensions.width * 0.45,
+                  height: '100%',
+                  borderRightColor: colors.nav,
+                  borderRightWidth: 1,
+                }}>
+                <NavigationStack component={NavigatorStack} />
+              </View>
+            )}
 
-          <EditorWrapper dimensions={dimensions} passRef={editorRef} />
-        </View>
-      </ScrollableTabView>
+            <EditorWrapper dimensions={dimensions} passRef={editorRef} />
+          </View>
+        </ScrollableTabView>
+      </>
     );
   },
   () => true,
