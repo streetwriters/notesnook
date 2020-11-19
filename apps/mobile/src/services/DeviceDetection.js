@@ -21,6 +21,18 @@ export class DeviceDetectionService {
     this.checkSmallTab();
   }
 
+  setSize(size) {
+    windowSize = size;
+    this.width = windowSize.width;
+    this.height = windowSize.height;
+    this.adjustedWidth = this.width * this.pixelDensity;
+    this.adjustedHeight = this.height * this.pixelDensity;
+    this.isPhoneOrTablet();
+    this.isIosOrAndroid();
+    this.detectIphoneX();
+    this.checkSmallTab();
+  }
+
   getDeviceSize = () => {
     let dpi = this.pixelDensity * 160;
     let deviceWidthInInches = this.adjustedWidth / dpi;
@@ -34,7 +46,7 @@ export class DeviceDetectionService {
     this.width = Dimensions.get('screen').width;
     this.height = Dimensions.get('screen').height;
     let deviceSize = this.getDeviceSize();
-
+    console.log(orientation,"orientation")
     if (DeviceInfo.isTablet() && (orientation === "PORTRAIT" || deviceSize < 9)) {
       console.log('small tab');
       this.isTab = true;
@@ -99,6 +111,10 @@ export class DeviceDetectionService {
         !Platform.isTVOS &&
         !Platform.isTVOS &&
         (windowSize.height === 812 || windowSize.width === 812);
+  }
+
+ isLargeTablet() {
+    return this.isTab && !this.isSmallTab
   }
 }
 
