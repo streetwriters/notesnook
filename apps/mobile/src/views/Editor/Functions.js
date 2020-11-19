@@ -10,6 +10,7 @@ import {normalize} from '../../utils/SizeUtils';
 import {db} from '../../utils/DB';
 import {COLORS_NOTE, COLOR_SCHEME} from '../../utils/Colors';
 import {hexToRGBA} from '../../utils/ColorUtils';
+import {DDS} from '../../services/DeviceDetection';
 
 export const EditorWebView = createRef();
 
@@ -17,12 +18,18 @@ export const params = 'platform=' + Platform.OS;
 export const sourceUri =
   (Platform.OS === 'android' ? 'file:///android_asset/' : '') +
   'Web.bundle/loader.html';
-export const injectedJS = `if (!window.location.search) {
-       var link = document.getElementById('progress-bar');
-        link.href = './site/index.html?${params}';
-        link.click();  
-      }
+export const injectedJS = ` setTimeout(() => {
+  if (!window.location.search) {
+    var link = document.getElementById('progress-bar');
+     link.href = './site/index.html?${params}';
+     link.click();  
+   }
+},1000);   
+true;
       `;
+
+  
+  
 
 let noteEdited = false;
 let note = null;
@@ -51,7 +58,8 @@ export function setColors(colors) {
     appColors = colors;
   }
   let theme = {...appColors, factor: normalize(1)};
-  if (note && note.colors[0]) {
+
+  if (note && note.colors[0] && !DDS.isLargeTablet()) {
     theme.shade = hexToRGBA(COLORS_NOTE[note.colors[0]], 0.15);
   }
   post('theme', theme);
@@ -72,6 +80,7 @@ export function clearTimer() {
   }
 }
 
+
 export const INJECTED_JAVASCRIPT = (premium) =>
   premium
     ? `(function() {
@@ -83,8 +92,6 @@ export const INJECTED_JAVASCRIPT = (premium) =>
     : `(function() {
       setTimeout(() => {
        loadAction(false,false);
-     
-   
       },100)
    })();`;
 
@@ -132,6 +139,7 @@ async function setNote(item) {
 }
 
 function clearNote() {
+  console.log('note cleared');
   note = null;
   title = '';
   noteEdited = false;
@@ -145,6 +153,7 @@ function clearNote() {
 let currentEditingTimer = null;
 
 export async function loadNote(item) {
+  console.log(item);
   editing.currentlyEditing = true;
   post('blur');
   if (item && item.type === 'new') {
@@ -153,11 +162,11 @@ export async function loadNote(item) {
     intent = false;
     noteEdited = false;
     id = null;
-    if (Platform.OS === "android") {
+    if (Platform.OS === 'android') {
       textInput.current?.focus();
       post('focusTitle');
-      EditorWebView.current?.requestFocus() 
-    } else { 
+      EditorWebView.current?.requestFocus();
+    } else {
       post('focusTitle');
     }
   } else if (item && item.type === 'intent') {
@@ -203,7 +212,13 @@ export const _onMessage = async (evt) => {
     case 'title':
       noteEdited = true;
       title = message.value;
+      eSendEvent('editorScroll', {
+        title: message.value,
+      });
       onNoteChange();
+      break;
+    case 'scroll':
+      eSendEvent('editorScroll', message);
       break;
     default:
       break;
@@ -234,6 +249,7 @@ export async function clearEditor() {
     redo: 0,
   });
   saveCounter = 0;
+  clearNote();
 }
 
 function checkIfContentIsSavable() {
@@ -349,7 +365,7 @@ export async function saveNote(canPost = true) {
   }
 }
 
-export async function onWebViewLoad(noMenu, premium, colors) {
+export async function onWebViewLoad( premium, colors) {
   EditorWebView.current?.injectJavaScript(INJECTED_JAVASCRIPT(premium, false));
   if (!checkNote()) {
     post('blur');
@@ -357,9 +373,7 @@ export async function onWebViewLoad(noMenu, premium, colors) {
   }
   post('blur');
   await sleep(1000);
-  let theme = {...colors, factor: normalize(1)};
-  appColors = colors;
-  post('theme', theme);
+  setColors(colors);
   await loadNoteInEditor();
   webviewInit = true;
 }
