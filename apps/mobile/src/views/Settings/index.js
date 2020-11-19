@@ -2,6 +2,7 @@ import React, {createRef, useCallback, useEffect} from 'react';
 import {
   Appearance,
   Linking,
+  Platform,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -62,6 +63,7 @@ import Storage from '../../utils/storage';
 import {sleep} from '../../utils/TimeUtils';
 import Paragraph from '../../components/Typography/Paragraph';
 import Heading from '../../components/Typography/Heading';
+import {enabled} from 'react-native-privacy-snapshot';
 
 let menuRef = createRef();
 export const Settings = ({navigation}) => {
@@ -767,7 +769,9 @@ export const Settings = ({navigation}) => {
               : 'App contents can be seen when app goes in background and screenshots are enabled'
           }
           onPress={() => {
-            AndroidModule.setSecureMode(!settings.privacyScreen);
+            Platform.OS === 'android'
+              ? AndroidModule.setSecureMode(!settings.privacyScreen)
+              : enabled(true);
             setSetting(settings, 'privacyScreen', !settings.privacyScreen);
           }}
           maxWidth="90%"
