@@ -1,7 +1,7 @@
 class FontSizeFactory {
   constructor() {
     return {
-      heading: "1.5rem",
+      heading: "1.2rem",
       input: "0.875rem",
       title: "0.875rem",
       subtitle: "0.750rem",

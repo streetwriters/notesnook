@@ -10,16 +10,19 @@ function SearchBox(props) {
   return (
     <Flex
       variant="rowCenter"
-      px={2}
+      mx={2}
       mb={2}
+      px={2}
+      bg="bgSecondary"
       sx={{
         position: "relative",
+        borderRadius: "default",
       }}
     >
       <Input
         id="searchInput"
         name="search"
-        bg="border"
+        sx={{ borderWidth: 0, px: 0 }}
         placeholder={`Type your query here`}
         onKeyDown={(e) => {
           if (e.key === "Enter") props.onSearch(e.target.value);
@@ -28,13 +31,10 @@ function SearchBox(props) {
       <Box
         id="searchIcon"
         sx={{
-          position: "absolute",
-          right: 0,
-          mr: 3,
           color: "hover",
         }}
       >
-        <Icon.Search size={28} />
+        <Icon.Search size={24} />
       </Box>
     </Flex>
   );

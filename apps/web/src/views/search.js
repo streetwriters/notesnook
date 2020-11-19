@@ -4,7 +4,9 @@ import SearchPlaceholder from "../components/placeholders/search-placeholder";
 import { useQueryParams } from "hookrouter";
 import { db, notesFromContext } from "../common";
 import SearchBox from "../components/search";
+import ProgressBar from "../components/progress-bar";
 import { useStore as useNoteStore } from "../stores/note-store";
+import { Flex, Text } from "rebass";
 
 function typeToItems(type, context) {
   switch (type) {
@@ -27,6 +29,10 @@ function typeToItems(type, context) {
 }
 
 function Search() {
+  const [searchState, setSearchState] = useState({
+    isSearching: false,
+    totalItems: 0,
+  });
   const [results, setResults] = useState([]);
   const [params] = useQueryParams();
   const { type } = params;
@@ -37,15 +43,44 @@ function Search() {
       <SearchBox
         onSearch={async (query) => {
           const [lookupType, items] = typeToItems(type, context);
+
+          setResults([]);
+
+          if (items.length <= 0) return;
+
+          setSearchState({ isSearching: true, totalItems: items.length });
+
           setResults(await db.lookup[lookupType](items, query));
+
+          setSearchState({ isSearching: false, totalItems: 0 });
         }}
       />
-      <ListContainer
-        context={context}
-        type={type}
-        items={results}
-        placeholder={SearchPlaceholder}
-      />
+      {searchState.isSearching ? (
+        <Flex
+          flex="1"
+          justifyContent="center"
+          alignItems="center"
+          flexDirection="column"
+        >
+          <SearchPlaceholder />
+          <Text mt={2}>
+            Searching in {searchState.totalItems} {type}...
+          </Text>
+          <ProgressBar
+            progress={100}
+            width={"60%"}
+            duration={3}
+            sx={{ mt: 2 }}
+          />
+        </Flex>
+      ) : (
+        <ListContainer
+          context={context}
+          type={type}
+          items={results}
+          placeholder={SearchPlaceholder}
+        />
+      )}
     </>
   );
 }

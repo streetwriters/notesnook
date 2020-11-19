@@ -15,7 +15,7 @@ function RouteContainer(props) {
       sx={{ overflow: "hidden" }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.2, ease: "easeIn" }}
+      transition={{ duration: 0.3, ease: "easeIn" }}
       exit={{ opacity: 0 }}
       flexDirection="column"
       flex="1 1 auto"
@@ -47,10 +47,10 @@ function Header(props) {
       <Flex alignItems="center" justifyContent="space-between">
         <Flex justifyContent="center" alignItems="center" py={2}>
           {canGoBack || onlyBackButton ? (
-            <Icon.ChevronLeft
-              size={38}
+            <Icon.ArrowLeft
+              size={24}
               onClick={() => window.history.back()}
-              sx={{ flexShrink: 0 }}
+              sx={{ flexShrink: 0, mr: 2 }}
               color="fontPrimary"
               data-test-id="go-back"
             />

@@ -116,3 +116,5 @@ export const Edit = createIcon(Icons.mdiPencil);
 
 export const Undo = createIcon(Icons.mdiUndoVariant);
 export const Redo = createIcon(Icons.mdiRedoVariant);
+
+export const Filter = createIcon(Icons.mdiTune);

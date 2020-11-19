@@ -3,6 +3,7 @@ import { Flex, Text } from "rebass";
 import ThemeProvider from "../components/theme-provider";
 import Animated from "../components/animated";
 import { db } from "../common";
+import ProgressBar from "../components/progress-bar";
 import { getRandom } from "../utils/random";
 import * as Sentry from "@sentry/react";
 
@@ -67,17 +68,11 @@ function Splash(props) {
             </Animated.Text>
           </Animated.Flex>
         </Flex>
-        <Flex overflow="hidden" width={300}>
-          <Animated.Box
-            height={5}
-            initial={{ width: "0%" }}
-            animate={{ width: "100%" }}
-            transition={{ duration: 1 }}
-            bg="primary"
-            sx={{ borderRadius: "default" }}
-            onAnimationComplete={() => setAnimationEnded(true)}
-          />
-        </Flex>
+        <ProgressBar
+          progress={100}
+          width={300}
+          onLoadingEnd={() => setAnimationEnded(true)}
+        />
         <Text color="text" mt={2}>
           {loadingLines[getRandom(0, loadingLines.length)]}
         </Text>
