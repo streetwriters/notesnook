@@ -1,16 +1,16 @@
-import React, { useEffect } from 'react';
-import { Keyboard, Platform, View } from 'react-native';
-import Animated, { Easing } from 'react-native-reanimated';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import React, {useEffect} from 'react';
+import {Keyboard, Platform, View} from 'react-native';
+import Animated, {Easing} from 'react-native-reanimated';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useTracked } from '../../provider';
-import { DDS } from '../../services/DeviceDetection';
-import { getElevation, showContext } from '../../utils';
-import { normalize, SIZE } from '../../utils/SizeUtils';
-import { PressableButton } from '../PressableButton';
+import {useTracked} from '../../provider';
+import {DDS} from '../../services/DeviceDetection';
+import {getElevation, showContext} from '../../utils';
+import {normalize, SIZE} from '../../utils/SizeUtils';
+import {PressableButton} from '../PressableButton';
 
 const translateY = new Animated.Value(0);
-export const ContainerBottomButton = ({title, onPress, color}) => {
+export const ContainerBottomButton = ({title, onPress, color,shouldShow =false}) => {
   const [state] = useTracked();
   const {colors} = state;
   const insets = useSafeAreaInsets();
@@ -42,7 +42,7 @@ export const ContainerBottomButton = ({title, onPress, color}) => {
     };
   }, []);
 
-  return (
+  return DDS.isLargeTablet() && !shouldShow ? null : (
     <Animated.View
       style={{
         position: 'absolute',
