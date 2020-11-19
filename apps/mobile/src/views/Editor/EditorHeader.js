@@ -1,34 +1,30 @@
-import React, {useEffect, useState} from 'react';
-import {BackHandler, Keyboard, Platform, StatusBar, View} from 'react-native';
-import {TextInput} from 'react-native-gesture-handler';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {ActionIcon} from '../../components/ActionIcon';
-import {Button} from '../../components/Button';
+import React, { useEffect } from 'react';
+import { BackHandler, Keyboard, Platform, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ActionIcon } from '../../components/ActionIcon';
 import {
   ActionSheetEvent,
-  simpleDialogEvent,
+  simpleDialogEvent
 } from '../../components/DialogManager/recievers';
-import {TEMPLATE_EXIT_FULLSCREEN} from '../../components/DialogManager/Templates';
-import Heading from '../../components/Typography/Heading';
-import {useTracked} from '../../provider';
-import {DDS} from '../../services/DeviceDetection';
+import { TEMPLATE_EXIT_FULLSCREEN } from '../../components/DialogManager/Templates';
+import { useTracked } from '../../provider';
+import { DDS } from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-  ToastEvent,
+  ToastEvent
 } from '../../services/EventManager';
-import {editing} from '../../utils';
-import {exitEditorAnimation} from '../../utils/Animations';
+import { editing } from '../../utils';
+import { exitEditorAnimation } from '../../utils/Animations';
 import {
   eClearEditor,
   eCloseFullscreenEditor,
   eOnLoadNote,
-  eOpenFullscreenEditor,
+  eOpenFullscreenEditor
 } from '../../utils/Events';
-import {tabBarRef} from '../../utils/Refs';
-import {normalize, SIZE, WEIGHT} from '../../utils/SizeUtils';
-import {EditorTitle} from './EditorTitle';
+import { tabBarRef } from '../../utils/Refs';
+import { EditorTitle } from './EditorTitle';
 import {
   checkNote,
   clearEditor,
@@ -38,8 +34,7 @@ import {
   isNotedEdited,
   loadNote,
   post,
-  setColors,
-  textInput,
+  setColors
 } from './Functions';
 import HistoryComponent from './HistoryComponent';
 
@@ -53,8 +48,6 @@ const EditorHeader = () => {
   useEffect(() => {
     setColors(colors);
   }, [colors.bg]);
-
-  
 
   useEffect(() => {
     eSubscribeEvent(eOnLoadNote, load);
@@ -175,7 +168,9 @@ const EditorHeader = () => {
           zIndex: 10,
         }}>
         {!fullscreen ? (
-          <View />
+          DDS.isLargeTablet() ? (
+            <View />
+          ) : null
         ) : (
           <ActionIcon
             name="arrow-left"
@@ -237,7 +232,6 @@ const EditorHeader = () => {
               onPress={() => {
                 eSendEvent(eOpenFullscreenEditor);
                 editing.isFullscreen = true;
-                
               }}
             />
           ) : null}
