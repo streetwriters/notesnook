@@ -29,6 +29,7 @@ import {getIntent, getNote, post} from './src/views/Editor/Functions';
 
 let {width, height} = Dimensions.get('window');
 const onChangeTab = async (obj) => {
+  console.log(obj.i,obj.from,'tab changed')
   if (obj.i === 1) {
     eSendEvent(eCloseSideMenu);
     if (getIntent()) return;
@@ -102,6 +103,8 @@ const AppStack = React.memo(
     }, []);
 
     const _onLayout = async (event) => {
+      console.log(editing.currentlyEditing);
+      if (editing.currentlyEditing) return;
       let size = event?.nativeEvent?.layout;
       if (!size) return;
       setDimensions({
@@ -133,7 +136,7 @@ const AppStack = React.memo(
             paddingHorizontal: 0,
           },
         });
-
+    
         if (editing.currentlyEditing) {
           tabBarRef.current?.goToPage(1);
         }
@@ -169,20 +172,12 @@ const AppStack = React.memo(
           style={{
             zIndex:2
           }}
+          initialPage={0}
           prerenderingSiblingsNumber={Infinity}
           onChangeTab={onChangeTab}
           renderTabBar={() => <></>}>
-          {!mode && (
-            <View
-              style={{
-                width: '100%',
-                height: '100%',
-                flexDirection: 'row',
-                backgroundColor: colors.bg,
-              }}
-            />
-          )}
-          {mode && mode !== 'tablet' && (
+         
+          { mode !== 'tablet' && (
             <NavigationStack component={NavigatorStack} />
           )}
           <View
@@ -205,7 +200,7 @@ const AppStack = React.memo(
               </View>
             )}
 
-            <EditorWrapper dimensions={dimensions} passRef={editorRef} />
+            <EditorWrapper dimensions={dimensions} />
           </View>
         </ScrollableTabView>
       </>
