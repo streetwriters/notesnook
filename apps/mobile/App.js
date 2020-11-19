@@ -92,7 +92,7 @@ const App = () => {
 
   const _onOrientationChange = (o) => {
     return;
-    let smallTab = DDS.isSmallTab;
+    /*  let smallTab = DDS.isSmallTab;
     DDS.setNewValues();
     DDS.checkSmallTab(o);
     if (smallTab === DDS.isSmallTab) {
@@ -102,7 +102,7 @@ const App = () => {
 
     setTimeout(() => {
       resetApp();
-    }, 1000);
+    }, 1000); */
   };
   const syncChanges = async () => {
       dispatch({type: Actions.ALL});
@@ -110,12 +110,12 @@ const App = () => {
     resetApp = async () => {
       note = getNote();
       setInit(false);
-      Initialize();
+      await SettingsService.init();
       setInit(true);
       await sleep(300);
       if (note && note.id) {
         eSendEvent(eOnLoadNote, note);
-        if (DDS.isPhone || DDS.isSmallTab) {
+        if (!DDS.isLargeTablet()) {
           tabBarRef.current?.goToPage(1);
         }
         note = null;
@@ -175,7 +175,7 @@ const App = () => {
   };
 
   useEffect(() => {
-    Initialize();
+    SettingsService.init().then((r) => r);
     let error = null;
     (async () => {
       try {
@@ -212,19 +212,6 @@ const App = () => {
         console.log(e);
       }
     }
-  }
-
-  function Initialize() {
-    Orientation.lockToLandscape();
-    if (firstLoad) {
-      console.log(DDS.isTab);
-      if (DDS.isTab) {
-      } else {
-        Orientation.lockToPortrait();
-      }
-      firstLoad = false;
-    }
-    SettingsService.init().then((r) => r);
   }
 
   return (

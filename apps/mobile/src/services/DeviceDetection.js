@@ -5,7 +5,7 @@ let windowSize = Dimensions.get('window');
 
 export class DeviceDetectionService {
   constructor() {
-   this.setNewValues();
+    this.setNewValues();
   }
 
   setNewValues() {
@@ -46,14 +46,17 @@ export class DeviceDetectionService {
     this.width = Dimensions.get('screen').width;
     this.height = Dimensions.get('screen').height;
     let deviceSize = this.getDeviceSize();
-    console.log(orientation,"orientation")
-    if (DeviceInfo.isTablet() && (orientation === "PORTRAIT" || deviceSize < 9)) {
+    console.log(orientation, 'orientation');
+    if (
+      (!DeviceInfo.isTablet() && orientation === 'LANDSCAPE') ||
+      (DeviceInfo.isTablet() && (orientation === 'PORTRAIT' || deviceSize < 9))
+    ) {
       console.log('small tab');
       this.isTab = true;
       this.isPhone = false;
       this.isSmallTab = true;
     } else {
-      if (!DeviceInfo.isTablet() ) {
+      if (!DeviceInfo.isTablet()) {
         this.isTab = false;
         this.isPhone = true;
         this.isSmallTab = false;
@@ -62,7 +65,6 @@ export class DeviceDetectionService {
         this.isSmallTab = false;
         this.isPhone = true;
       }
-    
     }
   }
 
@@ -107,14 +109,15 @@ export class DeviceDetectionService {
   }
 
   detectIphoneX() {
-    this.isIphoneX = Platform.OS === 'ios' &&
-        !Platform.isTVOS &&
-        !Platform.isTVOS &&
-        (windowSize.height === 812 || windowSize.width === 812);
+    this.isIphoneX =
+      Platform.OS === 'ios' &&
+      !Platform.isTVOS &&
+      !Platform.isTVOS &&
+      (windowSize.height === 812 || windowSize.width === 812);
   }
 
- isLargeTablet() {
-    return this.isTab && !this.isSmallTab
+  isLargeTablet() {
+    return this.isTab && !this.isSmallTab;
   }
 }
 
