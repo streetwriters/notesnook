@@ -9,6 +9,7 @@ import {eSendEvent} from '../../services/EventManager';
 import {eOnLoadNote} from '../../utils/Events';
 import Editor from './index';
 import {editorRef} from "../../utils/Refs"
+import { DDS } from '../../services/DeviceDetection';
 let prevVal = 0;
 let finalValue = 80;
 let anim2 = new Animated.Value(0);
@@ -87,7 +88,7 @@ export const EditorWrapper = ({dimensions}) => {
     <SafeAreaView
       ref={editorRef}
       style={{
-        width: dimensions.width * 0.55,
+        width:DDS.isLargeTablet()? dimensions.width * 0.55 : dimensions.width,
         height: '100%',
         backgroundColor: colors.bg,
       }}>

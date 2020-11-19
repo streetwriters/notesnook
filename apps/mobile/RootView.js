@@ -118,7 +118,7 @@ const AppStack = React.memo(
         editorRef.current?.setNativeProps({
           style: {
             position: 'relative',
-            width: dimensions.width * 0.55,
+            width: size.width * 0.55,
             zIndex: null,
             paddingHorizontal: 0,
           },
@@ -129,7 +129,7 @@ const AppStack = React.memo(
         editorRef.current?.setNativeProps({
           style: {
             position: 'relative',
-            width: '100%',
+            width: size.width,
             zIndex: null,
             paddingHorizontal: 0,
           },
@@ -144,7 +144,7 @@ const AppStack = React.memo(
         editorRef.current?.setNativeProps({
           style: {
             position: 'relative',
-            width: '100%',
+            width: size.width,
             zIndex: null,
             paddingHorizontal: 0,
           },
@@ -161,10 +161,19 @@ const AppStack = React.memo(
         prerenderingSiblingsNumber={Infinity}
         onChangeTab={onChangeTab}
         renderTabBar={() => <></>}>
+        {!mode && (
+          <View
+            style={{
+              width: '100%',
+              height: '100%',
+              flexDirection: 'row',
+              backgroundColor: colors.bg,
+            }}
+          />
+        )}
         {mode && mode !== 'tablet' && (
           <NavigationStack component={NavigatorStack} />
         )}
-
         <View
           style={{
             width: '100%',
