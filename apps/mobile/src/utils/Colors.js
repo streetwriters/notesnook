@@ -67,10 +67,13 @@ export const COLORS_NOTE = {
 export function setColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
   COLOR_SCHEME = {...colors, accent: accent.color, shade: accent.shade};
 
-  StatusBar.setBarStyle(COLOR_SCHEME.night ? 'light-content' : 'dark-content');
+  StatusBar.setBarStyle(
+    COLOR_SCHEME.night ? 'light-content' : 'dark-content',
+    true,
+  );
   if (Platform.OS === 'android') {
-    StatusBar.setTranslucent(true);
-    StatusBar.setBackgroundColor(COLOR_SCHEME.bg);
+    StatusBar.setBackgroundColor('transparent', true);
+    StatusBar.setTranslucent(true,true);
   }
   eSendEvent(eThemeUpdated);
 
