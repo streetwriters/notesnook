@@ -4,6 +4,7 @@ import storage from '../utils/storage';
 import {history, SORT, sortSettings} from '../utils/index';
 import {Actions} from './Actions';
 import {db} from '../utils/DB';
+import {defaultState} from './DefaultState';
 
 export const reducer = (state, action) => {
   switch (action.type) {
@@ -226,19 +227,25 @@ export const reducer = (state, action) => {
       };
     }
     case Actions.CONTAINER_BOTTOM_BUTTON: {
-      let containerBottomButton = {
-        ...state.containerBottomButton,
+      let _state = {
+        ...defaultState.containerBottomButton,
         ...action.state,
       };
       return {
         ...state,
-        containerBottomButton: containerBottomButton,
+        containerBottomButton: _state,
       };
     }
     case Actions.MESSAGE_BOARD_STATE: {
       return {
         ...state,
         messageBoardState: action.state,
+      };
+    }
+    case Actions.FULLSCREEN: {
+      return {
+        ...state,
+        fullscreen: action.state,
       };
     }
     default:

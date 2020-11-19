@@ -16,6 +16,7 @@ export const defaultState = {
   tags: [],
   colorNotes: [],
   user: null,
+  fullscreen:false,
   premiumUser: true,
   settings: {
     showToolbarOnTop: false,
@@ -68,9 +69,7 @@ export const defaultState = {
     placeholder: 'Search all notes',
   },
   containerBottomButton: {
-    visible: true,
-    bottomButtonOnPress: () => {},
-    bottomButtonText: 'Create a new note',
+    onPress: () => {},
   },
   messageBoardState: {
     visible: false,

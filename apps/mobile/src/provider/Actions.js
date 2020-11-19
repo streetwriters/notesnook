@@ -28,5 +28,6 @@ export const Actions = {
   HEADER_VERTICAL_MENU:'verticalMenu',
   HEADER_TEXT_STATE:'headerTextState',
   MESSAGE_BOARD_STATE:'messageBoardState',
-  LOADING:"loading"
+  LOADING:"loading",
+  FULLSCREEN:"fullscreen"
 };
