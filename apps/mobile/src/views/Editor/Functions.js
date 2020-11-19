@@ -24,8 +24,7 @@ export const injectedJS = ` setTimeout(() => {
      link.href = './site/index.html?${params}';
      link.click();  
    }
-},1000);   
-true;
+},100);   
       `;
 
   

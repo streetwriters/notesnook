@@ -1,26 +1,26 @@
-import React, {useEffect, useState} from 'react';
-import {FlatList, Platform, Text, View} from 'react-native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import React, { useEffect, useState } from 'react';
+import { FlatList, Platform, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import RNFetchBlob from 'rn-fetch-blob';
-import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
-import {DDS} from '../../services/DeviceDetection';
+import { useTracked } from '../../provider';
+import { Actions } from '../../provider/Actions';
+import { DDS } from '../../services/DeviceDetection';
 import {
   eSubscribeEvent,
   eUnSubscribeEvent,
-  ToastEvent,
+  ToastEvent
 } from '../../services/EventManager';
-import {getElevation} from '../../utils';
-import {db} from '../../utils/DB';
-import {eCloseRestoreDialog, eOpenRestoreDialog} from '../../utils/Events';
-import {ph, SIZE, WEIGHT} from '../../utils/SizeUtils';
+import { getElevation } from '../../utils';
+import { db } from '../../utils/DB';
+import { eCloseRestoreDialog, eOpenRestoreDialog } from '../../utils/Events';
+import { ph, SIZE } from '../../utils/SizeUtils';
 import storage from '../../utils/storage';
-import {sleep} from '../../utils/TimeUtils';
-import {Button} from '../Button';
+import { sleep } from '../../utils/TimeUtils';
+import { Button } from '../Button';
 import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogHeader from '../Dialog/dialog-header';
-import {Loading} from '../Loading';
+import { Loading } from '../Loading';
 import Paragraph from '../Typography/Paragraph';
 
 const RestoreDialog = () => {
@@ -132,6 +132,7 @@ const RestoreDialog = () => {
             maxHeight: '85%',
           }}>
           <FlatList
+            
             data={files}
             keyExtractor={(item, index) => item.filename}
             renderItem={({item, index}) => (

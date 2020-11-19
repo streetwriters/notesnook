@@ -90,20 +90,6 @@ const App = () => {
   const [, dispatch] = useTracked(),
     [init, setInit] = useState(false);
 
-  const _onOrientationChange = (o) => {
-    return;
-    /*  let smallTab = DDS.isSmallTab;
-    DDS.setNewValues();
-    DDS.checkSmallTab(o);
-    if (smallTab === DDS.isSmallTab) {
-      return;
-    }
-    I = DDS.isLargeTablet() ? require('./index.tablet') : require('./RootView');
-
-    setTimeout(() => {
-      resetApp();
-    }, 1000); */
-  };
   const syncChanges = async () => {
       dispatch({type: Actions.ALL});
     },
@@ -139,7 +125,6 @@ const App = () => {
   useEffect(() => {
     eSubscribeEvent(eStartSyncer, startSyncer);
     eSubscribeEvent(eResetApp, resetApp);
-    Orientation.addOrientationListener(_onOrientationChange);
     eSubscribeEvent(eDispatchAction, (type) => {
       dispatch(type);
     });
@@ -153,7 +138,6 @@ const App = () => {
       eUnSubscribeEvent(eDispatchAction, (type) => {
         dispatch(type);
       });
-      Orientation.removeOrientationListener(_onOrientationChange);
       AppState.removeEventListener('change', onAppStateChanged);
       Appearance.removeChangeListener(onSystemThemeChanged);
       unsub();

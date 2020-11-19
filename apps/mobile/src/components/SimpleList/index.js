@@ -1,33 +1,33 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   Platform,
   RefreshControl,
   StyleSheet,
-  Text,
+
   useWindowDimensions,
-  View,
+  View
 } from 'react-native';
-import {DataProvider, LayoutProvider, RecyclerListView} from 'recyclerlistview';
-import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
-import {DDS} from '../../services/DeviceDetection';
-import {eSendEvent, ToastEvent} from '../../services/EventManager';
-import {db} from '../../utils/DB';
+import { DataProvider, LayoutProvider, RecyclerListView } from 'recyclerlistview';
+import { useTracked } from '../../provider';
+import { Actions } from '../../provider/Actions';
+import { DDS } from '../../services/DeviceDetection';
+import { eSendEvent, ToastEvent } from '../../services/EventManager';
+import { db } from '../../utils/DB';
 import {
   eOpenJumpToDialog,
   eOpenLoginDialog,
-  eScrollEvent,
+  eScrollEvent
 } from '../../utils/Events';
-import {SIZE, WEIGHT} from '../../utils/SizeUtils';
-import {Button} from '../Button';
-import {HeaderMenu} from '../Header/HeaderMenu';
+import { SIZE } from '../../utils/SizeUtils';
+import { Button } from '../Button';
+import { HeaderMenu } from '../Header/HeaderMenu';
 import Seperator from '../Seperator';
 import TagItem from '../TagItem';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
-import {ListHeaderComponent} from './ListHeaderComponent';
-import {NotebookItemWrapper} from './NotebookItemWrapper';
-import {NoteItemWrapper} from './NoteItemWrapper';
+import { ListHeaderComponent } from './ListHeaderComponent';
+import { NotebookItemWrapper } from './NotebookItemWrapper';
+import { NoteItemWrapper } from './NoteItemWrapper';
 
 const header = {
   type: 'MAIN_HEADER',
