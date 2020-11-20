@@ -1,5 +1,3 @@
-// @flow
-
 import PropTypes from 'prop-types';
 import React from 'react';
 import {
@@ -9,7 +7,6 @@ import {
   View,
 } from 'react-native';
 import Animated, {Easing} from 'react-native-reanimated';
-
 import styles from './styles';
 
 const deviceScreen = Dimensions.get('window');
@@ -19,6 +16,14 @@ function shouldOpenMenu(dx) {
   return dx > barrierForward;
 }
 
+/**
+ * @typedef {SideMenu.propTypes} propTypes
+ */
+
+/**
+ * @param {propTypes} props
+ * @extends {React.Component<propTypes, {}>}}
+ */
 export default class SideMenu extends React.Component {
   constructor(props) {
     super(props);
@@ -60,11 +65,7 @@ export default class SideMenu extends React.Component {
       hiddenMenuOffset: deviceScreen.width * hiddenMenuOffsetPercentage,
       left,
     };
-
-
   }
-
-
 
   onLayoutChange(e) {
     const {width, height} = e.nativeEvent.layout;
@@ -85,8 +86,8 @@ export default class SideMenu extends React.Component {
     const style = [
       styles.frontView,
       {width, height},
-	  this.props.animationStyle(this.state.left),
-	  this.props.containerStyle
+      this.props.animationStyle(this.state.left),
+      this.props.containerStyle,
     ];
 
     return (
@@ -238,13 +239,6 @@ export default class SideMenu extends React.Component {
       onPanResponderRelease: this.onPanResponderRelease,
       onPanResponderTerminate: this.onPanResponderTerminate,
     });
-  }
-
-  componentDidMount() {
-    //eSubscribeEvent(eSendSideMenuOverlayRef, this._getOverlayViewRef);
-  }
-  componentWillUnmount() {
-    //eUnSubscribeEvent(eSendSideMenuOverlayRef, this._getOverlayViewRef);
   }
 
   _getOverlayViewRef = (data) => {
