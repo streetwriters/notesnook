@@ -18,12 +18,18 @@ function TitleBox(props) {
   }, []);
 
   useEffect(() => {
+    console.log("hello");
     if (!window.ResizeObserver) return;
     const myObserver = new ResizeObserver((entries) => {
-      const newHeight = entries[0].contentRect.height;
-      setHeight(newHeight > 60 ? newHeight : 60);
+      window.requestAnimationFrame(() => {
+        const newHeight = entries[0].contentRect.height;
+        setHeight(newHeight > 60 ? newHeight : 60);
+      });
     });
     myObserver.observe(document.querySelector(".dummyEditorTitle"));
+    return () => {
+      myObserver.disconnect();
+    };
   }, []);
 
   useEffect(() => {
