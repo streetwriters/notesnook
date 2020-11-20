@@ -27,7 +27,6 @@ function TitleBox(props) {
   }, []);
 
   useEffect(() => {
-    console.log("title changged", title);
     if (!inputRef.current) return;
     clearTimeout(changeTimeout);
     inputRef.current.value = title;
