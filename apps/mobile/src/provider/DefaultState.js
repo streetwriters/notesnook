@@ -33,6 +33,7 @@ export const defaultState = {
     privacyScreen: false,
   },
   currentScreen: 'home',
+  deviceMode:null,
   colors: {
     night: false,
     bg: 'white',

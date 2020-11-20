@@ -1,17 +1,16 @@
-import {NavigationContainer} from '@react-navigation/native';
-import {createStackNavigator} from '@react-navigation/stack';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 import * as React from 'react';
-import {Animated} from 'react-native';
+import { Animated } from 'react-native';
 import Container from '../components/Container';
-import {useTracked} from '../provider';
-import {DDS} from '../services/DeviceDetection';
-import {rootNavigatorRef} from '../utils/Refs';
+import { useTracked } from '../provider';
+import { rootNavigatorRef } from '../utils/Refs';
 import Favorites from '../views/Favorites';
 import Folders from '../views/Folders';
 import Home from '../views/Home';
 import Notebook from '../views/Notebook';
 import Notes from '../views/Notes';
-import {Search} from '../views/Search';
+import { Search } from '../views/Search';
 import Settings from '../views/Settings';
 import Tags from '../views/Tags';
 import Trash from '../views/Trash';
@@ -66,7 +65,6 @@ export const NavigatorStack = React.memo(
   () => {
     const [state] = useTracked();
     const {settings} = state;
-
    
     return (
       <Container root={true}>

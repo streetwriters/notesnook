@@ -1,17 +1,18 @@
 import React from 'react';
-import { useTracked } from '../../provider';
-import { DDS } from '../../services/DeviceDetection';
+import {useTracked} from '../../provider';
+import {DDS} from '../../services/DeviceDetection';
 import NavigationService from '../../services/Navigation';
-import { SIZE } from '../../utils/SizeUtils';
-import { ActionIcon } from '../ActionIcon';
+import {sideMenuRef} from '../../utils/Refs';
+import {SIZE} from '../../utils/SizeUtils';
+import {ActionIcon} from '../ActionIcon';
 
 export const HeaderLeftMenu = () => {
   const [state] = useTracked();
-  const {colors, headerMenuState, currentScreen} = state;
+  const {colors, headerMenuState, currentScreen, deviceMode} = state;
 
   const onLeftButtonPress = () => {
     if (headerMenuState) {
-      NavigationService.openDrawer();
+      sideMenuRef.current?.openMenu(true);
       return;
     }
     NavigationService.goBack();
@@ -19,7 +20,7 @@ export const HeaderLeftMenu = () => {
 
   return (
     <>
-      {!DDS.isTab || currentScreen === 'search' ? (
+      {deviceMode === 'mobile' || currentScreen === 'search' ? (
         <ActionIcon
           testID="left_menu_button"
           customStyle={{

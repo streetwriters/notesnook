@@ -7,6 +7,7 @@ import {DDS} from '../../services/DeviceDetection';
 import {eSendEvent} from '../../services/EventManager';
 import NavigationService from '../../services/Navigation';
 import {eClearSearch} from '../../utils/Events';
+import { sideMenuRef } from '../../utils/Refs';
 import {SIZE} from '../../utils/SizeUtils';
 import {PressableButton} from '../PressableButton';
 import Paragraph from '../Typography/Paragraph';
@@ -34,7 +35,7 @@ export const MenuListItem = ({item, index, noTextMode, ignore, testID}) => {
       NavigationService.navigate(item.name);
     }
     if (item.close) {
-      NavigationService.closeDrawer();
+     sideMenuRef.current?.openMenu(false)
     }
   };
 

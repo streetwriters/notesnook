@@ -248,6 +248,12 @@ export const reducer = (state, action) => {
         fullscreen: action.state,
       };
     }
+    case Actions.DEVICE_MODE: {
+      return {
+        ...state,
+        deviceMode: action.state,
+      };
+    }
     default:
       throw new Error('unknown action type');
   }

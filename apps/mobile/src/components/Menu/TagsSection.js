@@ -5,6 +5,7 @@ import {Actions} from '../../provider/Actions';
 import {eSendEvent} from '../../services/EventManager';
 import NavigationService from '../../services/Navigation';
 import {refreshNotesPage} from '../../utils/Events';
+import { sideMenuRef } from '../../utils/Refs';
 import {SIZE, WEIGHT} from '../../utils/SizeUtils';
 import {PressableButton} from '../PressableButton';
 import Paragraph from '../Typography/Paragraph';
@@ -36,7 +37,7 @@ export const TagsSection = () => {
     });
     NavigationService.navigate('NotesPage', params);
     eSendEvent(refreshNotesPage, params);
-    NavigationService.closeDrawer();
+    sideMenuRef.current?.openMenu(false)
   };
 
   return (

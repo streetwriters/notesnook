@@ -4,8 +4,9 @@ import ScrollableTabView from 'react-native-scrollable-tab-view';
 import ContextMenu from './src/components/ContextMenu';
 import {DialogManager} from './src/components/DialogManager';
 import {DummyText} from './src/components/DummyText';
+import {Menu} from './src/components/Menu';
+import SideMenu from './src/components/SideMenu';
 import {Toast} from './src/components/Toast';
-import {NavigationStack} from './src/navigation/Drawer';
 import {NavigatorStack} from './src/navigation/NavigatorStack';
 import {useTracked} from './src/provider';
 import {Actions} from './src/provider/Actions';
@@ -23,24 +24,30 @@ import {
   eOpenFullscreenEditor,
   eOpenSideMenu,
 } from './src/utils/Events';
-import {editorRef, tabBarRef} from './src/utils/Refs';
+import {editorRef, sideMenuRef, tabBarRef} from './src/utils/Refs';
 import {EditorWrapper} from './src/views/Editor/EditorWrapper';
 import {getIntent, getNote, post} from './src/views/Editor/Functions';
 
 let {width, height} = Dimensions.get('window');
+let movedAway = true;
+let layoutTimer = null;
+
 const onChangeTab = async (obj) => {
-  console.log(obj.i,obj.from,'tab changed')
   if (obj.i === 1) {
-    eSendEvent(eCloseSideMenu);
+    sideMenuRef.current?.setGestureEnabled(false);
     if (getIntent()) return;
+    movedAway = false;
     if (!editing.currentlyEditing || !getNote()) {
       eSendEvent(eOnLoadNote, {type: 'new'});
+      editing.currentlyEditing = true;
     }
   } else {
     if (obj.from === 1) {
+      movedAway = true;
+      editing.currentlyEditing = false;
       post('blur');
-      eSendEvent(eOpenSideMenu);
     }
+    sideMenuRef.current?.setGestureEnabled(true);
   }
 };
 
@@ -103,83 +110,127 @@ const AppStack = React.memo(
     }, []);
 
     const _onLayout = async (event) => {
-      console.log(editing.currentlyEditing);
-      if (editing.currentlyEditing) return;
-      let size = event?.nativeEvent?.layout;
-      if (!size) return;
-      setDimensions({
-        width: size.width,
-        height: size.height,
-      });
-      setWidthHeight(size);
-      DDS.setSize(size);
-      DDS.checkSmallTab(size.width > size.height ? 'LANDSCAPE' : 'PORTRAIT');
-      if (DDS.isLargeTablet()) {
-        setMode('tablet');
-        dispatch({type: Actions.FULLSCREEN, state: false});
-        editorRef.current?.setNativeProps({
-          style: {
-            position: 'relative',
-            width: size.width * 0.55,
-            zIndex: null,
-            paddingHorizontal: 0,
-          },
-        });
-      } else if (DDS.isSmallTab) {
-        setMode('smallTablet');
-        dispatch({type: Actions.FULLSCREEN, state: false});
-        editorRef.current?.setNativeProps({
-          style: {
-            position: 'relative',
-            width: size.width,
-            zIndex: null,
-            paddingHorizontal: 0,
-          },
-        });
-    
-        if (editing.currentlyEditing) {
-          tabBarRef.current?.goToPage(1);
-        }
-      } else {
-        setMode('mobile');
-        dispatch({type: Actions.FULLSCREEN, state: false});
-        editorRef.current?.setNativeProps({
-          style: {
-            position: 'relative',
-            width: size.width,
-            zIndex: null,
-            paddingHorizontal: 0,
-          },
-        });
-        if (editing.currentlyEditing) {
-          tabBarRef.current?.goToPage(1);
-        }
+      if (layoutTimer) {
+        clearTimeout(layoutTimer);
+        layoutTimer = null;
       }
+      let size = event?.nativeEvent?.layout;
+      if (!size || (size.width === dimensions.width && mode !== null)) {
+        return;
+      } 
+      layoutTimer = setTimeout(async () => {
+        eSendEvent(eCloseSideMenu);
+        setDimensions({
+          width: size.width,
+          height: size.height,
+        });
+        setWidthHeight(size);
+        DDS.setSize(size);
+        console.log(size.width, size.height);
+        DDS.checkSmallTab(size.width > size.height ? 'LANDSCAPE' : 'PORTRAIT');
+
+        if (DDS.isLargeTablet()) {
+          setMode('tablet');
+          sideMenuRef.current?.setGestureEnabled(false);
+          dispatch({type: Actions.DEVICE_MODE, state: 'tablet'});
+          dispatch({type: Actions.FULLSCREEN, state: false});
+          editorRef.current?.setNativeProps({
+            style: {
+              position: 'relative',
+              width: size.width * 0.55,
+              zIndex: null,
+              paddingHorizontal: 0,
+            },
+          });
+        } else if (DDS.isSmallTab) {
+          setMode('smallTablet');
+          dispatch({type: Actions.DEVICE_MODE, state: 'smallTablet'});
+          dispatch({type: Actions.FULLSCREEN, state: false});
+          sideMenuRef.current?.setGestureEnabled(false);
+          editorRef.current?.setNativeProps({
+            style: {
+              position: 'relative',
+              width: size.width,
+              zIndex: null,
+              paddingHorizontal: 0,
+            },
+          });
+
+          if (editing.currentlyEditing && !movedAway) {
+            tabBarRef.current?.goToPage(1);
+          }
+        } else {
+          sideMenuRef.current?.setGestureEnabled(true);
+          setMode('mobile');
+          dispatch({type: Actions.DEVICE_MODE, state: 'mobile'});
+          dispatch({type: Actions.FULLSCREEN, state: false});
+          editorRef.current?.setNativeProps({
+            style: {
+              position: 'relative',
+              width: size.width,
+              zIndex: null,
+              paddingHorizontal: 0,
+            },
+          });
+          if (editing.currentlyEditing && !movedAway) {
+            tabBarRef.current?.goToPage(1);
+          }
+        }
+
+        eSendEvent(eOpenSideMenu);
+      }, 500);
     };
 
     return (
-      <>
-        <View
-          style={{
-            position: 'absolute',
-            width: '400%',
-            height: '400%',
-            backgroundColor: colors.bg,
-          }}
-        />
+      <SideMenu
+        ref={sideMenuRef}
+        containerStyle={{
+          backgroundColor: colors.bg,
+        }}
+        menu={mode === 'mobile' ? <Menu /> : null}>
         <ScrollableTabView
           ref={tabBarRef}
           style={{
-            zIndex:2
+            zIndex: 1,
           }}
           initialPage={0}
           prerenderingSiblingsNumber={Infinity}
           onChangeTab={onChangeTab}
           renderTabBar={() => <></>}>
-         
-          { mode !== 'tablet' && (
-            <NavigationStack component={NavigatorStack} />
+          {mode && mode !== 'tablet' && (
+            <View
+              style={{
+                width: dimensions.width,
+                height: '100%',
+                borderRightColor: colors.nav,
+                borderRightWidth: 1,
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'flex-start',
+              }}>
+              {mode && mode === 'smallTablet' && (
+                <View
+                  style={{
+                    height: '100%',
+                    width: dimensions.width * 0.35,
+                  }}>
+                  <Menu />
+                </View>
+              )}
+
+              <View
+                style={{
+                  height: '100%',
+                  width:
+                    mode === 'mobile'
+                      ? dimensions.width
+                      : dimensions.width * 0.65,
+                }}>
+                <NavigatorStack />
+              </View>
+            </View>
           )}
+
           <View
             style={{
               width: '100%',
@@ -195,16 +246,35 @@ const AppStack = React.memo(
                   height: '100%',
                   borderRightColor: colors.nav,
                   borderRightWidth: 1,
+                  flexDirection: 'row',
+                  alignItems: 'center',
                 }}>
-                <NavigationStack component={NavigatorStack} />
+                <View
+                  style={{
+                    height: '100%',
+                    width: dimensions.width * 0.15,
+                  }}>
+                  <Menu />
+                </View>
+
+                <View
+                  style={{
+                    height: '100%',
+                    width: dimensions.width * 0.3,
+                  }}>
+                  <NavigatorStack />
+                </View>
               </View>
             )}
-
-            <EditorWrapper dimensions={dimensions} />
+            {mode && <EditorWrapper dimensions={dimensions} />}
           </View>
         </ScrollableTabView>
-      </>
+      </SideMenu>
     );
   },
   () => true,
 );
+
+/**
+ *
+ */

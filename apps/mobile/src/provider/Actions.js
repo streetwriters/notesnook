@@ -29,5 +29,6 @@ export const Actions = {
   HEADER_TEXT_STATE:'headerTextState',
   MESSAGE_BOARD_STATE:'messageBoardState',
   LOADING:"loading",
-  FULLSCREEN:"fullscreen"
+  FULLSCREEN:"fullscreen",
+  DEVICE_MODE:"deviceMode"
 };

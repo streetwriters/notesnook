@@ -9,6 +9,7 @@ import { PressableButton } from '../PressableButton';
 import {COLORS_NOTE} from "../../utils/Colors";
 import {SIZE, WEIGHT} from "../../utils/SizeUtils";
 import Paragraph from '../Typography/Paragraph';
+import { sideMenuRef } from '../../utils/Refs';
 
 export const ColorSection = ({noTextMode}) => {
   const [state, dispatch] = useTracked();
@@ -45,7 +46,7 @@ export const ColorSection = ({noTextMode}) => {
 
     NavigationService.navigate('NotesPage', params);
     eSendEvent(refreshNotesPage, params);
-    NavigationService.closeDrawer();
+    sideMenuRef.current?.openMenu(false);
   }
 
   return (

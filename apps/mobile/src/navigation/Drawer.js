@@ -1,15 +1,12 @@
+import {createDrawerNavigator} from '@react-navigation/drawer';
+import {NavigationContainer} from '@react-navigation/native';
 import * as React from 'react';
+import {Menu} from '../components/Menu';
+import {DDS} from '../services/DeviceDetection';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../services/EventManager';
 import {eCloseSideMenu, eOpenSideMenu} from '../utils/Events';
-import {NavigationContainer} from '@react-navigation/native';
 import {sideMenuRef} from '../utils/Refs';
-import {Dimensions} from 'react-native';
 import {NavigatorStack} from './NavigatorStack';
-import {Menu} from '../components/Menu';
-import NavigationService from '../services/Navigation';
-import {createDrawerNavigator} from '@react-navigation/drawer';
-import {DDS} from '../services/DeviceDetection';
-import { dWidth } from '../utils';
 
 const Drawer = createDrawerNavigator();
 
@@ -38,16 +35,17 @@ export const NavigationStack = ({component = NavigatorStack}) => {
       <Drawer.Navigator
         screenOptions={{
           swipeEnabled: locked ? false : true,
+          
         }}
         drawerStyle={{
-          width:
-           DDS.isLargeTablet()
-              ? DDS.width * 0.15
-              : DDS.isSmallTab
-              ? "30%"
-              : "65%",
+          width: DDS.isLargeTablet()
+            ? DDS.width * 0.15
+            : DDS.isSmallTab
+            ? '30%'
+            : '65%',
           borderRightWidth: 0,
         }}
+        
         edgeWidth={200}
         drawerType={DDS.isTab || DDS.isSmallTab ? 'permanent' : 'slide'}
         drawerContent={DrawerComponent}
@@ -58,10 +56,6 @@ export const NavigationStack = ({component = NavigatorStack}) => {
   );
 };
 
-
-
 const DrawerComponent = () => {
-  return (
-    <Menu  />
-  );
+  return <Menu />;
 };
