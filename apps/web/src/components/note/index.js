@@ -33,7 +33,9 @@ function menuItems(note, context) {
     },
     {
       title: note.pinned ? "Unpin" : "Pin",
-      onClick: pin.bind(this, note),
+      onClick: async () => {
+        await pin(note);
+      },
       onlyPro: true,
     },
     {

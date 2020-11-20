@@ -2,6 +2,7 @@ import { db } from "../common/index";
 import createStore from "../common/store";
 import { store as trashStore } from "./trash-store";
 import BaseStore from "./index";
+import { showToast } from "../utils/toast";
 
 class NotebookStore extends BaseStore {
   notebooks = [];
@@ -27,6 +28,10 @@ class NotebookStore extends BaseStore {
   };
 
   pin = async (notebookId) => {
+    // TODO (hack) We probably shouldn't do this here.
+    if (db.notebooks.pinned.length >= 3) {
+      return await showToast("error", "You cannot pin more than 3 notebooks.");
+    }
     await db.notebooks.notebook(notebookId).pin();
     this.refresh();
   };
