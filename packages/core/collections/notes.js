@@ -232,6 +232,7 @@ function getNoteHeadline(note, content) {
 }
 
 function getNoteTitle(note, content) {
-  if (note.title && note.title.trim().length > 0) return note.title.trim();
+  if (note.title && note.title.trim().length > 0)
+    return note.title.replace(/\r?\n/g, " ");
   return content.toTitle();
 }

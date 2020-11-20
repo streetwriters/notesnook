@@ -61,8 +61,8 @@ function getSubstringFromDelta(data, limit) {
   for (var i = 0; i < data.length; ++i) {
     const item = data[i];
     if (item.insert && typeof item.insert === "string")
-      substr += item.insert.trim() + " ";
-    if (substr.length >= limit) return substr.substring(0, limit).trim();
+      substr += item.insert.replace(/\r?\n/g, " ");
+    if (substr.length > limit) return substr.substring(0, limit);
   }
-  return substr.trim();
+  return substr;
 }
