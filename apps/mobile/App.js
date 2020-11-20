@@ -2,15 +2,7 @@ import * as NetInfo from '@react-native-community/netinfo';
 import * as Sentry from '@sentry/react-native';
 import {EV} from 'notes-core/common';
 import React, {useEffect, useState} from 'react';
-import {
-  Appearance,
-  AppState,
-  Dimensions,
-  Platform,
-  StatusBar,
-  View,
-} from 'react-native';
-import Orientation from 'react-native-orientation';
+import {Appearance, AppState, Platform, StatusBar} from 'react-native';
 import {enabled} from 'react-native-privacy-snapshot';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import SplashScreen from 'react-native-splash-screen';
@@ -28,7 +20,6 @@ import {
 import IntentService from './src/services/IntentService';
 import {setLoginMessage} from './src/services/Message';
 import SettingsService from './src/services/SettingsService';
-import {setWidthHeight} from './src/utils';
 import {COLOR_SCHEME} from './src/utils/Colors';
 import {db} from './src/utils/DB';
 import {
@@ -46,10 +37,7 @@ Sentry.init({
   dsn:
     'https://317a5c31caf64d1e9b27abf15eb1a554@o477952.ingest.sentry.io/5519681',
 });
-
-let firstLoad = true;
 let note = null;
-let {width, height} = Dimensions.get('window');
 
 const onAppStateChanged = async (state) => {
   if (state === 'active') {

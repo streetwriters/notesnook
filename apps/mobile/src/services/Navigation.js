@@ -1,13 +1,11 @@
-import { DrawerActions, StackActions } from '@react-navigation/native';
-import { rootNavigatorRef, sideMenuRef } from '../utils/Refs';
+import {StackActions} from '@react-navigation/native';
+import {rootNavigatorRef} from '../utils/Refs';
 
 function navigate(name, params) {
-  
   rootNavigatorRef.current?.navigate(name, params);
-
 }
 function goBack() {
-   rootNavigatorRef.current?.goBack();
+  rootNavigatorRef.current?.goBack();
 }
 
 function push(...args) {
@@ -15,17 +13,16 @@ function push(...args) {
 }
 
 function openDrawer() {
-  sideMenuRef.current?.dispatch(DrawerActions.openDrawer());
+  //sideMenuRef.current?.dispatch(DrawerActions.openDrawer());
 }
 function closeDrawer() {
-  sideMenuRef.current?.dispatch(DrawerActions.closeDrawer());
+  // sideMenuRef.current?.dispatch(DrawerActions.closeDrawer());
 }
-
 
 export default {
   navigate,
   goBack,
   push,
   openDrawer,
-  closeDrawer
+  closeDrawer,
 };

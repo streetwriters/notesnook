@@ -5,7 +5,7 @@ import ContextMenu from './src/components/ContextMenu';
 import {DialogManager} from './src/components/DialogManager';
 import {DummyText} from './src/components/DummyText';
 import {Menu} from './src/components/Menu';
-import SideMenu from './src/components/SideMenu';
+import SideMenu from './src/components/SideMenu/SideMenu';
 import {Toast} from './src/components/Toast';
 import {NavigatorStack} from './src/navigation/NavigatorStack';
 import {useTracked} from './src/provider';
