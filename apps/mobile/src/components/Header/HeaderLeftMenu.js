@@ -1,10 +1,8 @@
 import React from 'react';
-import {useTracked} from '../../provider';
-import {DDS} from '../../services/DeviceDetection';
+import { useTracked } from '../../provider';
 import NavigationService from '../../services/Navigation';
-import {sideMenuRef} from '../../utils/Refs';
-import {SIZE} from '../../utils/SizeUtils';
-import {ActionIcon} from '../ActionIcon';
+import { SIZE } from '../../utils/SizeUtils';
+import { ActionIcon } from '../ActionIcon';
 
 export const HeaderLeftMenu = () => {
   const [state] = useTracked();
@@ -12,7 +10,7 @@ export const HeaderLeftMenu = () => {
 
   const onLeftButtonPress = () => {
     if (headerMenuState) {
-      sideMenuRef.current?.openMenu(true);
+      NavigationService.openDrawer()
       return;
     }
     NavigationService.goBack();

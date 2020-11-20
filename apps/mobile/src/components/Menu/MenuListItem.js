@@ -35,7 +35,7 @@ export const MenuListItem = ({item, index, noTextMode, ignore, testID}) => {
       NavigationService.navigate(item.name);
     }
     if (item.close) {
-     sideMenuRef.current?.openMenu(false)
+      NavigationService.closeDrawer()
     }
   };
 

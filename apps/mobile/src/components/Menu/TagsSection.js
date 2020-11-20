@@ -37,7 +37,7 @@ export const TagsSection = () => {
     });
     NavigationService.navigate('NotesPage', params);
     eSendEvent(refreshNotesPage, params);
-    sideMenuRef.current?.openMenu(false)
+    NavigationService.closeDrawer()
   };
 
   return (

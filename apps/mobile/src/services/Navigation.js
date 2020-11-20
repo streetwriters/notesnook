@@ -13,10 +13,10 @@ function push(...args) {
 }
 
 function openDrawer() {
-  //sideMenuRef.current?.dispatch(DrawerActions.openDrawer());
+ sideMenuRef.current?.dispatch(DrawerActions.openDrawer());
 }
 function closeDrawer() {
-  // sideMenuRef.current?.dispatch(DrawerActions.closeDrawer());
+   sideMenuRef.current?.dispatch(DrawerActions.closeDrawer());
 }
 
 export default {

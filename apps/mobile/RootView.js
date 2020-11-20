@@ -1,12 +1,13 @@
 import React, {useEffect, useState} from 'react';
 import {Dimensions, View} from 'react-native';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import ScrollableTabView from 'react-native-scrollable-tab-view';
 import ContextMenu from './src/components/ContextMenu';
 import {DialogManager} from './src/components/DialogManager';
 import {DummyText} from './src/components/DummyText';
 import {Menu} from './src/components/Menu';
-import SideMenu from './src/components/SideMenu/SideMenu';
 import {Toast} from './src/components/Toast';
+import {NavigationStack} from './src/navigation/Drawer';
 import {NavigatorStack} from './src/navigation/NavigatorStack';
 import {useTracked} from './src/provider';
 import {Actions} from './src/provider/Actions';
@@ -24,7 +25,7 @@ import {
   eOpenFullscreenEditor,
   eOpenSideMenu,
 } from './src/utils/Events';
-import {editorRef, sideMenuRef, tabBarRef} from './src/utils/Refs';
+import {editorRef, tabBarRef} from './src/utils/Refs';
 import {EditorWrapper} from './src/views/Editor/EditorWrapper';
 import {getIntent, getNote, post} from './src/views/Editor/Functions';
 
@@ -34,7 +35,7 @@ let layoutTimer = null;
 
 const onChangeTab = async (obj) => {
   if (obj.i === 1) {
-    sideMenuRef.current?.setGestureEnabled(false);
+    eSendEvent(eCloseSideMenu);
     if (getIntent()) return;
     movedAway = false;
     if (!editing.currentlyEditing || !getNote()) {
@@ -47,7 +48,7 @@ const onChangeTab = async (obj) => {
       editing.currentlyEditing = false;
       post('blur');
     }
-    sideMenuRef.current?.setGestureEnabled(true);
+    eSendEvent(eOpenSideMenu);
   }
 };
 
@@ -57,7 +58,7 @@ export const RootView = () => {
 
   return (
     <>
-      <AppStack />
+      <NavigationStack component={AppStack} />
       <Toast />
       <ContextMenu />
       <DummyText />
@@ -65,6 +66,18 @@ export const RootView = () => {
     </>
   );
 };
+
+const getDefaultDrawerWidth = ({height, width}) => {
+  const smallerAxisSize = Math.min(height, width);
+  const isLandscape = width > height;
+  const isTablet = smallerAxisSize >= 600;
+  const appBarHeight = Platform.OS === 'ios' ? (isLandscape ? 32 : 44) : 56;
+  const maxWidth = isTablet ? 320 : 280;
+
+  return Math.min(smallerAxisSize - appBarHeight, maxWidth);
+};
+
+const GestureHandlerWrapper = GestureHandlerRootView ?? View;
 
 const AppStack = React.memo(
   () => {
@@ -117,9 +130,8 @@ const AppStack = React.memo(
       let size = event?.nativeEvent?.layout;
       if (!size || (size.width === dimensions.width && mode !== null)) {
         return;
-      } 
+      }
       layoutTimer = setTimeout(async () => {
-        eSendEvent(eCloseSideMenu);
         setDimensions({
           width: size.width,
           height: size.height,
@@ -131,7 +143,6 @@ const AppStack = React.memo(
 
         if (DDS.isLargeTablet()) {
           setMode('tablet');
-          sideMenuRef.current?.setGestureEnabled(false);
           dispatch({type: Actions.DEVICE_MODE, state: 'tablet'});
           dispatch({type: Actions.FULLSCREEN, state: false});
           editorRef.current?.setNativeProps({
@@ -146,7 +157,7 @@ const AppStack = React.memo(
           setMode('smallTablet');
           dispatch({type: Actions.DEVICE_MODE, state: 'smallTablet'});
           dispatch({type: Actions.FULLSCREEN, state: false});
-          sideMenuRef.current?.setGestureEnabled(false);
+
           editorRef.current?.setNativeProps({
             style: {
               position: 'relative',
@@ -160,7 +171,7 @@ const AppStack = React.memo(
             tabBarRef.current?.goToPage(1);
           }
         } else {
-          sideMenuRef.current?.setGestureEnabled(true);
+          eSendEvent(eOpenSideMenu);
           setMode('mobile');
           dispatch({type: Actions.DEVICE_MODE, state: 'mobile'});
           dispatch({type: Actions.FULLSCREEN, state: false});
@@ -182,99 +193,88 @@ const AppStack = React.memo(
     };
 
     return (
-      <SideMenu
-        ref={sideMenuRef}
-        containerStyle={{
-          backgroundColor: colors.bg,
+      <ScrollableTabView
+        ref={tabBarRef}
+        style={{
+          zIndex: 1,
         }}
-        menu={mode === 'mobile' ? <Menu /> : null}>
-        <ScrollableTabView
-          ref={tabBarRef}
-          style={{
-            zIndex: 1,
-          }}
-          initialPage={0}
-          prerenderingSiblingsNumber={Infinity}
-          onChangeTab={onChangeTab}
-          renderTabBar={() => <></>}>
-          {mode && mode !== 'tablet' && (
+        initialPage={0}
+        prerenderingSiblingsNumber={Infinity}
+        onChangeTab={onChangeTab}
+        renderTabBar={() => <></>}>
+        {mode && mode !== 'tablet' && (
+          <View
+            style={{
+              width: dimensions.width,
+              height: '100%',
+              borderRightColor: colors.nav,
+              borderRightWidth: 1,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'flex-start',
+            }}>
+            {mode && mode === 'smallTablet' && (
+              <View
+                style={{
+                  height: '100%',
+                  width: dimensions.width * 0.35,
+                }}>
+                <Menu />
+              </View>
+            )}
+
             <View
               style={{
-                width: dimensions.width,
+                height: '100%',
+                width:
+                  mode === 'mobile'
+                    ? dimensions.width
+                    : dimensions.width * 0.65,
+              }}>
+              <NavigatorStack />
+            </View>
+          </View>
+        )}
+
+        <View
+          style={{
+            width: '100%',
+            height: '100%',
+            flexDirection: 'row',
+            backgroundColor: colors.bg,
+          }}
+          onLayout={_onLayout}>
+          {mode && mode === 'tablet' && (
+            <View
+              style={{
+                width: dimensions.width * 0.45,
                 height: '100%',
                 borderRightColor: colors.nav,
                 borderRightWidth: 1,
                 flexDirection: 'row',
                 alignItems: 'center',
-                justifyContent: 'flex-start',
               }}>
-              {mode && mode === 'smallTablet' && (
-                <View
-                  style={{
-                    height: '100%',
-                    width: dimensions.width * 0.35,
-                  }}>
-                  <Menu />
-                </View>
-              )}
+              <View
+                style={{
+                  height: '100%',
+                  width: dimensions.width * 0.15,
+                }}>
+                <Menu />
+              </View>
 
               <View
                 style={{
                   height: '100%',
-                  width:
-                    mode === 'mobile'
-                      ? dimensions.width
-                      : dimensions.width * 0.65,
+                  width: dimensions.width * 0.3,
                 }}>
                 <NavigatorStack />
               </View>
             </View>
           )}
-
-          <View
-            style={{
-              width: '100%',
-              height: '100%',
-              flexDirection: 'row',
-              backgroundColor: colors.bg,
-            }}
-            onLayout={_onLayout}>
-            {mode && mode === 'tablet' && (
-              <View
-                style={{
-                  width: dimensions.width * 0.45,
-                  height: '100%',
-                  borderRightColor: colors.nav,
-                  borderRightWidth: 1,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                }}>
-                <View
-                  style={{
-                    height: '100%',
-                    width: dimensions.width * 0.15,
-                  }}>
-                  <Menu />
-                </View>
-
-                <View
-                  style={{
-                    height: '100%',
-                    width: dimensions.width * 0.3,
-                  }}>
-                  <NavigatorStack />
-                </View>
-              </View>
-            )}
-            {mode && <EditorWrapper dimensions={dimensions} />}
-          </View>
-        </ScrollableTabView>
-      </SideMenu>
+          {mode && <EditorWrapper dimensions={dimensions} />}
+        </View>
+      </ScrollableTabView>
     );
   },
   () => true,
 );
-
-/**
- *
- */

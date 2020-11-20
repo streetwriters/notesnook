@@ -46,7 +46,7 @@ export const ColorSection = ({noTextMode}) => {
 
     NavigationService.navigate('NotesPage', params);
     eSendEvent(refreshNotesPage, params);
-    sideMenuRef.current?.openMenu(false);
+    NavigationService.closeDrawer()
   }
 
   return (
