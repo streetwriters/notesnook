@@ -5,6 +5,7 @@ import { store as appStore } from "./app-store";
 import Vault from "../common/vault";
 import BaseStore from ".";
 import { EV } from "notes-core/common";
+import Config from "../utils/config";
 
 class NoteStore extends BaseStore {
   notes = [];
@@ -38,7 +39,9 @@ class NoteStore extends BaseStore {
 
   refresh = () => {
     this.refreshContext();
-    this.set((state) => (state.notes = db.notes.group()));
+    this.set(
+      (state) => (state.notes = db.notes.group(Config.get("selectedGroup")))
+    );
   };
 
   refreshContext = () => {

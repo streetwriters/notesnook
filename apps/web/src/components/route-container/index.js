@@ -43,7 +43,7 @@ function Header(props) {
 
   if (!onlyBackButton && !title && !subtitle) return null;
   return (
-    <Flex mx={2} flexDirection="column">
+    <Flex mx={2} flexDirection="column" justifyContent="center">
       <Flex alignItems="center" justifyContent="space-between">
         <Flex justifyContent="center" alignItems="center" py={2}>
           {canGoBack || onlyBackButton ? (

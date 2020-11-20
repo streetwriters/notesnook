@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Flex } from "rebass";
 import Button from "../button";
 import * as Icon from "../icons";
@@ -13,6 +13,7 @@ function ListContainer(props) {
   const profile = useMemo(() => ListProfiles[type], [type]);
   const shouldSelectAll = useSelectionStore((store) => store.shouldSelectAll);
   const setSelectedItems = useSelectionStore((store) => store.setSelectedItems);
+  const [expandedGroup, setExpandedGroup] = useState(-1);
   const listRef = useRef();
 
   useEffect(() => {
@@ -56,33 +57,39 @@ function ListContainer(props) {
                         overscanCount={3}
                         estimatedItemSize={profile.estimatedItemHeight}
                         itemSize={(index) => {
-                          switch (index) {
-                            default:
-                              const item = props.items[index];
-                              if (item.type === "header") {
-                                if (!item.title) return 0;
-                                return 50;
-                              } else {
-                                return profile.itemHeight(item);
-                              }
+                          const item = props.items[index];
+                          if (item.type === "header") {
+                            if (!item.title) return 0;
+                            return index === expandedGroup ? 203 : 29;
+                          } else {
+                            return profile.itemHeight(item);
                           }
                         }}
                         itemCount={props.items.length}
                       >
                         {({ index, style }) => {
-                          switch (index) {
-                            default:
-                              const item = props.items[index];
-                              return (
-                                <div key={item.id} style={style}>
-                                  {item.type === "header" ? (
-                                    <GroupHeader title={item.title} />
-                                  ) : (
-                                    profile.item(index, item, context)
-                                  )}
-                                </div>
-                              );
-                          }
+                          const item = props.items[index];
+                          return (
+                            <div key={item.id} style={style}>
+                              {item.type === "header" ? (
+                                <GroupHeader
+                                  title={item.title}
+                                  isExpanded={expandedGroup === index}
+                                  onExpand={() => {
+                                    setExpandedGroup((s) =>
+                                      s === -1 ? index : -1
+                                    );
+                                    listRef.current.resetAfterIndex(
+                                      index - 1,
+                                      true
+                                    );
+                                  }}
+                                />
+                              ) : (
+                                profile.item(index, item, context)
+                              )}
+                            </div>
+                          );
                         }}
                       </List>
                     )}

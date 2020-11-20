@@ -118,3 +118,6 @@ export const Undo = createIcon(Icons.mdiUndoVariant);
 export const Redo = createIcon(Icons.mdiRedoVariant);
 
 export const Filter = createIcon(Icons.mdiTune);
+
+export const ChevronDown = createIcon(Icons.mdiChevronDown);
+export const ChevronUp = createIcon(Icons.mdiChevronUp);
