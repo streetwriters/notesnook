@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { Flex } from "rebass";
 import Button from "../button";
 import * as Icon from "../icons";
@@ -13,7 +13,6 @@ function ListContainer(props) {
   const profile = useMemo(() => ListProfiles[type], [type]);
   const shouldSelectAll = useSelectionStore((store) => store.shouldSelectAll);
   const setSelectedItems = useSelectionStore((store) => store.setSelectedItems);
-  const [expandedGroup, setExpandedGroup] = useState(-1);
   const listRef = useRef();
 
   useEffect(() => {
@@ -60,7 +59,7 @@ function ListContainer(props) {
                           const item = props.items[index];
                           if (item.type === "header") {
                             if (!item.title) return 0;
-                            return index === expandedGroup ? 208 : 29;
+                            return 29;
                           } else {
                             return profile.itemHeight(item);
                           }
@@ -70,18 +69,23 @@ function ListContainer(props) {
                         {({ index, style }) => {
                           const item = props.items[index];
                           return (
-                            <div key={item.id} style={style}>
+                            <div key={item.id || item.title} style={style}>
                               {item.type === "header" ? (
                                 <GroupHeader
                                   title={item.title}
-                                  isExpanded={expandedGroup === index}
-                                  onExpand={() => {
-                                    setExpandedGroup((s) =>
-                                      s === -1 ? index : -1
+                                  groups={props.items.filter(
+                                    (v) =>
+                                      v.type === "header" &&
+                                      v.title !== item.title
+                                  )}
+                                  onJump={(title) => {
+                                    const index = props.items.findIndex(
+                                      (v) => v.title === title
                                     );
-                                    listRef.current.resetAfterIndex(
+                                    if (index < 0) return;
+                                    listRef.current.scrollToItem(
                                       index,
-                                      true
+                                      "smart"
                                     );
                                   }}
                                 />

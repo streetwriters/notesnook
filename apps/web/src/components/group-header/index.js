@@ -1,5 +1,5 @@
 import * as Icon from "../icons";
-import React from "react";
+import React, { useState } from "react";
 import { Flex, Text } from "rebass";
 import { usePersistentState } from "../../utils/hooks";
 import { useStore as useNoteStore } from "../../stores/note-store";
@@ -17,26 +17,21 @@ function getGroupTitleByType(type) {
 }
 
 function GroupHeader(props) {
-  const { title, onExpand, isExpanded } = props;
-  const [selectedGroup, setSelectedGroup] = usePersistentState(
-    "selectedGroup",
-    undefined
-  );
-  const [sortDirection, setSortDirection] = usePersistentState(
-    "sortDirection",
-    "desc"
-  );
-  const refresh = useNoteStore((store) => store.refresh);
+  const { title, groups, onJump } = props;
+  const [selectedGroup] = usePersistentState("selectedGroup", undefined);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [menuType, setMenuType] = useState();
   if (!title) return null;
 
   return (
     <Flex
       bg="bgSecondary"
       flexDirection="column"
-      sx={{
-        borderBottom: "1px solid",
-        borderBottomColor: "border",
-        borderBottomWidth: isExpanded ? 1 : 0,
+      sx={{ cursor: "pointer" }}
+      onClick={() => {
+        if (groups.length <= 0) return;
+        setMenuType("jumpto");
+        setIsExpanded((s) => !s);
       }}
     >
       <Flex
@@ -59,64 +54,46 @@ function GroupHeader(props) {
               <Icon.ChevronDown size={18} />
             )
           }
-          onClick={onExpand}
+          onClick={(e) => {
+            e.stopPropagation();
+            setMenuType("groupby");
+            setIsExpanded((s) => !s);
+          }}
         />
       </Flex>
-      {isExpanded && (
-        <Flex flexDirection="column" py={2}>
-          <Flex
-            pl={2}
-            pr={1}
-            mb={1}
-            justifyContent="space-between"
-            alignItems="center"
-          >
-            <Text color="primary" variant="title">
-              Group by
-            </Text>
-            <IconButton
-              text={sortDirection === "desc" ? "Ascending" : "Descending"}
-              icon={
-                sortDirection === "desc" ? (
-                  <Icon.SortDesc size={14} />
-                ) : (
-                  <Icon.SortAsc size={14} />
-                )
-              }
-              textStyle={{ mr: 1 }}
-              onClick={() => {
-                setSortDirection(sortDirection === "desc" ? "asc" : "desc");
-                refresh();
-              }}
-            />
-          </Flex>
-          {groups.map((item) => (
-            <Flex
-              key={item.title}
-              justifyContent="space-between"
-              p={1}
-              px={2}
-              sx={{ cursor: "pointer", ":hover": { bg: "shade" } }}
-              onClick={() => {
-                setSelectedGroup(item.type);
-                refresh();
-              }}
-            >
-              <Text variant="body">{item.title}</Text>
-              {selectedGroup === item.type && (
-                <Icon.Checkmark size={16} color="primary" />
-              )}
-            </Flex>
-          ))}
-        </Flex>
-      )}
+      <Flex
+        flexDirection="column"
+        p={menuType === "jumpto" ? 2 : 0}
+        pt={2}
+        style={{
+          display: isExpanded ? "flex" : "none",
+        }}
+        sx={{
+          position: "absolute",
+          zIndex: 1,
+          bg: "bgSecondary",
+          width: "100%",
+          top: "29px",
+          borderBottom: "1px solid",
+          borderBottomColor: "border",
+          borderBottomWidth: 1,
+          boxShadow: "0px 3px 6px 0px #0000005e",
+        }}
+      >
+        <JumpToGroupMenu
+          onJump={onJump}
+          isVisible={menuType === "jumpto"}
+          groups={groups}
+        />
+        <GroupByMenu isVisible={menuType === "groupby"} />
+      </Flex>
     </Flex>
   );
 }
 export default GroupHeader;
 
 function IconButton(props) {
-  const { text, icon, onClick, textStyle } = props;
+  const { text, icon, onClick, textStyle, sx } = props;
   return (
     <Flex
       onClick={onClick}
@@ -125,6 +102,7 @@ function IconButton(props) {
         borderRadius: "default",
         cursor: "pointer",
         ":hover": { bg: "hover" },
+        ...sx,
       }}
     >
       <Text variant="subtitle" fontWeight="normal" sx={textStyle}>
@@ -132,5 +110,91 @@ function IconButton(props) {
       </Text>
       {icon}
     </Flex>
+  );
+}
+
+function JumpToGroupMenu(props) {
+  const { groups, isVisible, onJump } = props;
+  if (!isVisible) return null;
+  return (
+    <>
+      <Text color="primary" variant="title" mb={1}>
+        Jump to
+      </Text>
+      <Flex flexWrap="wrap">
+        {groups.map((group) => (
+          <IconButton
+            text={group.title}
+            textStyle={{ fontSize: "body" }}
+            onClick={() => onJump(group.title)}
+            sx={{ bg: "shade", mr: 1, mt: 1 }}
+          ></IconButton>
+        ))}
+      </Flex>
+    </>
+  );
+}
+
+function GroupByMenu(props) {
+  const { isVisible } = props;
+
+  const [sortDirection, setSortDirection] = usePersistentState(
+    "sortDirection",
+    "desc"
+  );
+  const [selectedGroup, setSelectedGroup] = usePersistentState(
+    "selectedGroup",
+    undefined
+  );
+  const refresh = useNoteStore((store) => store.refresh);
+
+  if (!isVisible) return null;
+  return (
+    <>
+      <Flex
+        pl={2}
+        pr={1}
+        mb={1}
+        justifyContent="space-between"
+        alignItems="center"
+      >
+        <Text color="primary" variant="title">
+          Group by
+        </Text>
+        <IconButton
+          text={sortDirection === "desc" ? "Ascending" : "Descending"}
+          icon={
+            sortDirection === "desc" ? (
+              <Icon.SortDesc size={14} />
+            ) : (
+              <Icon.SortAsc size={14} />
+            )
+          }
+          textStyle={{ mr: 1 }}
+          onClick={() => {
+            setSortDirection(sortDirection === "desc" ? "asc" : "desc");
+            refresh();
+          }}
+        />
+      </Flex>
+      {groups.map((item) => (
+        <Flex
+          key={item.title}
+          justifyContent="space-between"
+          p={1}
+          px={2}
+          sx={{ cursor: "pointer", ":hover": { bg: "shade" } }}
+          onClick={() => {
+            setSelectedGroup(item.type);
+            refresh();
+          }}
+        >
+          <Text variant="body">{item.title}</Text>
+          {selectedGroup === item.type && (
+            <Icon.Checkmark size={16} color="primary" />
+          )}
+        </Flex>
+      ))}
+    </>
   );
 }
