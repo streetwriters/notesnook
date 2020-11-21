@@ -111,3 +111,16 @@ test("save an edited locked note", () =>
     expect(contentData.cipher).not.toBeDefined();
     expect(contentData.key).not.toBeDefined();
   }));
+
+test("change vault password", () =>
+  noteTest().then(async ({ db, id }) => {
+    await db.vault.create("password");
+    await db.vault.add(id);
+
+    await expect(db.vault.open(id, "password")).resolves.toBeDefined();
+
+    await db.vault.changePassword("password", "newPassword");
+
+    await expect(db.vault.open(id, "password")).rejects.toThrow();
+    await expect(db.vault.open(id, "newPassword")).resolves.toBeDefined();
+  }));

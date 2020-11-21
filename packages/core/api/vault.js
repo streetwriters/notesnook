@@ -25,7 +25,7 @@ export default class Vault {
   /**
    * Creates a new vault (replacing if any older exists)
    * @param {string} password The password
-   * @returns {Boolean}
+   * @returns {Promise<Boolean>}
    */
   async create(password) {
     const vaultKey = await this._context.read("vaultKey");
@@ -44,7 +44,7 @@ export default class Vault {
   /**
    * Unlocks the vault with the given password
    * @param {string} password The password
-   * @throws ERR_NO_VAULT | ERR_WRONG_PASSWORD
+   * @throws  ERR_NO_VAULT | ERR_WRONG_PASSWORD
    * @returns {Promise<Boolean>}
    */
   async unlock(password) {
@@ -62,6 +62,20 @@ export default class Vault {
     this._password = password;
     this._startEraser();
     return true;
+  }
+
+  async changePassword(oldPassword, newPassword) {
+    if (await this.unlock(oldPassword)) {
+      const lockedNotes = this._db.notes.all.filter((v) => v.locked);
+      for (var note of lockedNotes) {
+        await this._unlockNote(note, true);
+      }
+      await this._context.remove("vaultKey");
+      await this.create(newPassword);
+      for (var note of lockedNotes) {
+        await this._lockNote(note);
+      }
+    }
   }
 
   _startEraser() {
@@ -92,6 +106,8 @@ export default class Vault {
       await this._unlockNote(note, true);
     }
   }
+
+  async clear(password) {}
 
   /**
    * Temporarily unlock (open) a note
