@@ -62,7 +62,7 @@ export default class Trash extends Collection {
       delete item.itemId;
       if (item.type === "note") {
         let { notebook } = item;
-        item.notebook = {};
+        item.notebook = undefined;
         await this._db.notes.add(item);
 
         if (notebook && notebook.id && notebook.topic) {
