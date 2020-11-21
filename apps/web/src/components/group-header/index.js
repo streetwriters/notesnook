@@ -78,9 +78,9 @@ function GroupHeader(props) {
               text={sortDirection === "desc" ? "Ascending" : "Descending"}
               icon={
                 sortDirection === "desc" ? (
-                  <Icon.SortDesc size={18} />
+                  <Icon.SortDesc size={14} />
                 ) : (
-                  <Icon.SortAsc size={18} />
+                  <Icon.SortAsc size={14} />
                 )
               }
               textStyle={{ mr: 1 }}
