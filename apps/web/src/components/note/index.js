@@ -36,12 +36,10 @@ function menuItems(note, context) {
       onClick: async () => {
         await pin(note);
       },
-      onlyPro: true,
     },
     {
       title: note.favorite ? "Unfavorite" : "Favorite",
       onClick: () => store.favorite(note),
-      onlyPro: true,
     },
     {
       title: "Export",
@@ -51,7 +49,6 @@ function menuItems(note, context) {
       },
       onlyPro: true,
     },
-    { title: "Edit", onClick: () => editorStore.openSession(note) },
     {
       title: note.locked ? "Unlock" : "Lock",
       onClick: async () => {
