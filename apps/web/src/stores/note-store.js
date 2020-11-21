@@ -41,7 +41,11 @@ class NoteStore extends BaseStore {
   refresh = () => {
     this.refreshContext();
     this.set(
-      (state) => (state.notes = db.notes.group(Config.get("selectedGroup")))
+      (state) =>
+        (state.notes = db.notes.group(
+          Config.get("selectedGroup"),
+          Config.get("sortDirection", "desc")
+        ))
     );
   };
 

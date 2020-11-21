@@ -121,3 +121,6 @@ export const Filter = createIcon(Icons.mdiTune);
 
 export const ChevronDown = createIcon(Icons.mdiChevronDown);
 export const ChevronUp = createIcon(Icons.mdiChevronUp);
+
+export const SortAsc = createIcon(Icons.mdiSortAscending);
+export const SortDesc = createIcon(Icons.mdiSortDescending);
