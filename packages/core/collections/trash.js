@@ -73,7 +73,7 @@ export default class Trash extends Collection {
             !this._db.notebooks._collection.exists(id) ||
             !this._db.notebooks.notebook(id).topics.has(topic)
           ) {
-            notebook = {};
+            notebook = undefined;
           }
 
           // restore the note to the topic it was in before deletion
