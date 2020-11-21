@@ -83,10 +83,19 @@ export function getWeekGroupFromTimestamp(timestamp) {
   let weeks = years[date.getFullYear()];
 
   let week = weeks.find((v) => date >= v.start && date <= v.end);
+
   //Format: {month} {start} - {end}, {year}
-  return `${
-    months[week.start.getMonth()]
-  } ${week.start.getDate()}, ${week.start.getFullYear()} -  ${
+
+  const startMonth =
+    week.start.getMonth() === week.end.getMonth()
+      ? ""
+      : months[week.start.getMonth()];
+  const startYear =
+    week.start.getFullYear() === week.end.getFullYear()
+      ? ""
+      : `, ${week.start.getFullYear()}`;
+
+  return `${startMonth} ${week.start.getDate()}${startYear} -  ${
     months[week.end.getMonth()]
   } ${week.end.getDate()}, ${week.end.getFullYear()}`;
 }
