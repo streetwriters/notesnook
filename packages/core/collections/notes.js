@@ -74,7 +74,7 @@ export default class Notes extends Collection {
       conflicted: !!note.conflicted,
     };
 
-    if (!oldNote) {
+    if (!oldNote || oldNote.deleted) {
       for (let color of note.colors) {
         await this._db.colors.add(color, id);
       }
