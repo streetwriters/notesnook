@@ -1,6 +1,7 @@
 import { db } from "../common/index";
 import createStore from "../common/store";
 import BaseStore from "./index";
+import { store as appStore } from "./app-store";
 
 class TrashStore extends BaseStore {
   trash = [];
@@ -21,6 +22,7 @@ class TrashStore extends BaseStore {
   restore = (id, index) => {
     return db.trash.restore(id).then(() => {
       this.set((state) => state.trash.splice(index, 1));
+      appStore.refreshColors();
     });
   };
 
