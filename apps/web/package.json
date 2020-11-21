@@ -29,7 +29,7 @@
     "react-qrcode-logo": "^2.2.1",
     "react-scripts": "3.4.1",
     "react-virtualized-auto-sizer": "^1.0.2",
-    "react-window": "^1.8.5",
+    "react-window": "^1.8.6",
     "rebass": "^4.0.7",
     "timeago-react": "^3.0.0",
     "zustand": "^2.2.3"

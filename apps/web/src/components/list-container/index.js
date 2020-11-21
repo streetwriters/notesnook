@@ -60,7 +60,7 @@ function ListContainer(props) {
                           const item = props.items[index];
                           if (item.type === "header") {
                             if (!item.title) return 0;
-                            return index === expandedGroup ? 203 : 29;
+                            return index === expandedGroup ? 208 : 29;
                           } else {
                             return profile.itemHeight(item);
                           }
@@ -80,7 +80,7 @@ function ListContainer(props) {
                                       s === -1 ? index : -1
                                     );
                                     listRef.current.resetAfterIndex(
-                                      index - 1,
+                                      index,
                                       true
                                     );
                                   }}
