@@ -1,8 +1,11 @@
 import fastsort from "fast-sort";
 
-export function groupBy(arr, key, sortSelector) {
+export function groupBy(arr, key, sortSelector, sortDirection) {
   if (sortSelector)
-    fastsort(arr).by([{ desc: (t) => t.pinned }, { desc: sortSelector }]);
+    fastsort(arr).by([
+      { desc: (t) => t.pinned },
+      { [sortDirection]: sortSelector },
+    ]);
 
   let groups = new Map();
   arr.forEach((item) => {

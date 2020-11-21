@@ -130,7 +130,12 @@ export default class Notes extends Collection {
       .map((id) => this._collection.getItem(id));
   }
 
-  group(by) {
+  /**
+   *
+   * @param {"abc"|"month"|"year"|"week"|undefined} by
+   * @param {"asc"|"desc"} sort
+   */
+  group(by, sort = "desc") {
     let notes = this.all;
 
     switch (by) {
@@ -138,25 +143,29 @@ export default class Notes extends Collection {
         return groupBy(
           notes,
           (note) => note.title[0].toUpperCase(),
-          (t) => t.title
+          (t) => t.title[0],
+          sort
         );
       case "month":
         return groupBy(
           notes,
           (note) => months[new Date(note.dateCreated).getMonth()],
-          (t) => t.dateCreated
+          (t) => t.dateCreated,
+          sort
         );
       case "week":
         return groupBy(
           notes,
           (note) => getWeekGroupFromTimestamp(note.dateCreated),
-          (t) => t.dateCreated
+          (t) => t.dateCreated,
+          sort
         );
       case "year":
         return groupBy(
           notes,
           (note) => new Date(note.dateCreated).getFullYear().toString(),
-          (t) => t.dateCreated
+          (t) => t.dateCreated,
+          sort
         );
       default:
         let timestamps = {
@@ -171,7 +180,8 @@ export default class Notes extends Collection {
               : note.dateCreated >= timestamps.lastWeek
               ? "Last week"
               : "Older",
-          (t) => t.dateCreated
+          (t) => t.dateCreated,
+          sort
         );
     }
   }

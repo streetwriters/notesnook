@@ -7,3 +7,19 @@ test("groupBy should work", () => {
   expect(ret.some((i) => i.title === "2")).toBeTruthy();
   expect(ret.some((i) => i.title === "3")).toBeTruthy();
 });
+
+test("group alphabetically", () => {
+  const sortedAlphabet = "abcdefghijlmnopqrstuvwxyz".split("");
+  const alphabet = "nopqrstuvwxyzabcdefghijlm".split("");
+  let ret = groupBy(
+    alphabet,
+    (x) => x[0],
+    (x) => x[0],
+    "asc"
+  ).filter((v) => v.title);
+  expect(
+    sortedAlphabet.every((alpha, index) => {
+      return ret[index].title === alpha;
+    })
+  ).toBeTruthy();
+});

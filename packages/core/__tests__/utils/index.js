@@ -44,7 +44,7 @@ const noteTest = (note = TEST_NOTE) =>
     return { db, id };
   });
 
-const groupedTest = (type, special = false) =>
+const groupedTest = (type) =>
   noteTest().then(async ({ db }) => {
     await db.notes.add({ ...TEST_NOTE, title: "HELLO WHAT!" });
     await db.notes.add({
@@ -57,7 +57,7 @@ const groupedTest = (type, special = false) =>
       title: "Some title and title title",
       dateCreated: getLastWeekTimestamp() - 604800000 * 2,
     });
-    let grouped = db.notes.group(type, special);
+    let grouped = db.notes.group(type);
     expect(grouped.length).toBeGreaterThan(0);
     expect(grouped.some((i) => i.type === "header")).toBe(true);
   });
