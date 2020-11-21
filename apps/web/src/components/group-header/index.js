@@ -1,8 +1,10 @@
 import * as Icon from "../icons";
 import React, { useState } from "react";
 import { Flex, Text } from "rebass";
+import Animated from "../animated";
 import { usePersistentState } from "../../utils/hooks";
 import { useStore as useNoteStore } from "../../stores/note-store";
+import { useTheme } from "emotion-theming";
 
 const groups = [
   { type: undefined, title: "Default" },
@@ -17,17 +19,24 @@ function getGroupTitleByType(type) {
 }
 
 function GroupHeader(props) {
-  const { title, groups, onJump } = props;
+  const { title, groups, onJump, wasJumpedTo, index } = props;
   const [selectedGroup] = usePersistentState("selectedGroup", undefined);
   const [isExpanded, setIsExpanded] = useState(false);
   const [menuType, setMenuType] = useState();
+  const theme = useTheme();
   if (!title) return null;
 
   return (
-    <Flex
-      bg="bgSecondary"
+    <Animated.Flex
+      bg={"bgSecondary"}
       flexDirection="column"
       sx={{ cursor: "pointer" }}
+      animate={{
+        backgroundColor: wasJumpedTo
+          ? theme.colors["dimPrimary"]
+          : "bgSecondary",
+      }}
+      transition={{ duration: 0.3, repeatType: "reverse", repeat: 3 }}
       onClick={() => {
         if (groups.length <= 0) return;
         setMenuType("jumpto");
@@ -45,21 +54,22 @@ function GroupHeader(props) {
         <Text variant="subtitle" color="primary">
           {title}
         </Text>
-        <IconButton
-          text={getGroupTitleByType(selectedGroup)}
-          icon={
-            isExpanded ? (
-              <Icon.ChevronUp size={18} />
-            ) : (
-              <Icon.ChevronDown size={18} />
-            )
-          }
-          onClick={(e) => {
-            e.stopPropagation();
-            setMenuType("groupby");
-            setIsExpanded((s) => !s);
-          }}
-        />
+        {index === 0 && (
+          <IconButton
+            text={getGroupTitleByType(selectedGroup)}
+            icon={
+              isExpanded ? (
+                <Icon.ChevronUp size={18} />
+              ) : (
+                <Icon.ChevronDown size={18} />
+              )
+            }
+            onClick={() => {
+              setMenuType("groupby");
+              setIsExpanded((s) => !s);
+            }}
+          />
+        )}
       </Flex>
       <Flex
         flexDirection="column"
@@ -81,13 +91,16 @@ function GroupHeader(props) {
         }}
       >
         <JumpToGroupMenu
-          onJump={onJump}
+          onJump={(title) => {
+            setIsExpanded(false);
+            onJump(title);
+          }}
           isVisible={menuType === "jumpto"}
           groups={groups}
         />
         <GroupByMenu isVisible={menuType === "groupby"} />
       </Flex>
-    </Flex>
+    </Animated.Flex>
   );
 }
 export default GroupHeader;
@@ -96,7 +109,10 @@ function IconButton(props) {
   const { text, icon, onClick, textStyle, sx } = props;
   return (
     <Flex
-      onClick={onClick}
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick(e);
+      }}
       px={1}
       sx={{
         borderRadius: "default",

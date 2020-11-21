@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Flex } from "rebass";
 import Button from "../button";
 import * as Icon from "../icons";
@@ -13,6 +13,7 @@ function ListContainer(props) {
   const profile = useMemo(() => ListProfiles[type], [type]);
   const shouldSelectAll = useSelectionStore((store) => store.shouldSelectAll);
   const setSelectedItems = useSelectionStore((store) => store.setSelectedItems);
+  const [jumpToIndex, setJumpToIndex] = useState(-1);
   const listRef = useRef();
 
   useEffect(() => {
@@ -73,20 +74,26 @@ function ListContainer(props) {
                               {item.type === "header" ? (
                                 <GroupHeader
                                   title={item.title}
+                                  index={index}
                                   groups={props.items.filter(
                                     (v) =>
                                       v.type === "header" &&
                                       v.title !== item.title
                                   )}
+                                  wasJumpedTo={index === jumpToIndex}
                                   onJump={(title) => {
                                     const index = props.items.findIndex(
                                       (v) => v.title === title
                                     );
                                     if (index < 0) return;
+                                    setJumpToIndex(index);
                                     listRef.current.scrollToItem(
                                       index,
-                                      "smart"
+                                      "center"
                                     );
+                                    setTimeout(() => {
+                                      setJumpToIndex(-1);
+                                    }, 1900);
                                   }}
                                 />
                               ) : (
