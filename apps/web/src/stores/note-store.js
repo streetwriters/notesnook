@@ -64,6 +64,7 @@ class NoteStore extends BaseStore {
     await db.notes.delete(id);
     this.refreshContext();
     this.refresh();
+    appStore.refreshColors();
     const { session, newSession } = editorStore.get();
     if (session.id === id) {
       newSession();
