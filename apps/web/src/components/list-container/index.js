@@ -104,6 +104,7 @@ function ListContainer(props) {
           Icon={props.button.icon || Icon.Plus}
           content={props.button.content}
           onClick={props.button.onClick}
+          show={props.button.show}
         />
       )}
     </Flex>
