@@ -84,8 +84,6 @@ export function getWeekGroupFromTimestamp(timestamp) {
 
   let week = weeks.find((v) => date >= v.start && date <= v.end);
 
-  //Format: {month} {start} - {end}, {year}
-
   const startMonth =
     week.start.getMonth() === week.end.getMonth()
       ? ""
@@ -95,9 +93,10 @@ export function getWeekGroupFromTimestamp(timestamp) {
       ? ""
       : `, ${week.start.getFullYear()}`;
 
-  return `${startMonth} ${week.start.getDate()}${startYear} -  ${
+  //Format: {start} {month}, {year} - {end} {month}, {year}
+  return `${week.start.getDate()} ${startMonth}${startYear} - ${week.end.getDate()} ${
     months[week.end.getMonth()]
-  } ${week.end.getDate()}, ${week.end.getFullYear()}`;
+  }, ${week.end.getFullYear()}`;
 }
 
 export function formatDate(date) {
