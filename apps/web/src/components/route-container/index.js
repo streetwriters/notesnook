@@ -77,7 +77,6 @@ function Header(props) {
             {type !== "search" && (
               <Icon.Search
                 size={24}
-                sx={{ mr: 2 }}
                 onClick={() => {
                   navigate(
                     `/search`,
@@ -96,6 +95,7 @@ function Header(props) {
                 color="primary"
                 size={24}
                 sx={{
+                  ml: 2,
                   bg: "bgSecondary",
                   borderRadius: "default",
                   size: 28,
