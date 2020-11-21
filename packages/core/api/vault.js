@@ -49,7 +49,7 @@ export default class Vault {
    */
   async unlock(password) {
     const vaultKey = await this._context.read("vaultKey");
-    if (!(await this._exists(vaultKey))) throw new Error(this.ERRORS.noVault);
+    if (!(await this.exists(vaultKey))) throw new Error(this.ERRORS.noVault);
     var data;
     try {
       data = await this._context.decrypt({ password }, vaultKey);
@@ -116,13 +116,12 @@ export default class Vault {
     return await this._lockNote(note);
   }
 
-  // Private & internal methods
-
-  /** @private */
-  async _exists(vaultKey) {
+  async exists(vaultKey) {
     if (!vaultKey) vaultKey = await this._context.read("vaultKey");
     return vaultKey && vaultKey.cipher && vaultKey.iv;
   }
+
+  // Private & internal methods
 
   /** @private */
   _locked() {
@@ -131,7 +130,7 @@ export default class Vault {
 
   /** @private */
   async _check() {
-    if (!(await this._exists())) {
+    if (!(await this.exists())) {
       throw new Error(this.ERRORS.noVault);
     }
 
@@ -208,7 +207,7 @@ export default class Vault {
 
   /** @inner */
   async _getKey() {
-    if (await this._exists()) return await this._context.read("vaultKey");
+    if (await this.exists()) return await this._context.read("vaultKey");
   }
 
   /** @inner */
