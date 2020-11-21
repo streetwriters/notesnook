@@ -12,6 +12,10 @@ const groups = [
   { type: "month", title: "Month" },
 ];
 
+function getGroupTitleByType(type) {
+  return groups.find((v) => v.type === type).title;
+}
+
 function GroupHeader(props) {
   const { title, onExpand, isExpanded } = props;
   const [selectedGroup, setSelectedGroup] = usePersistentState(
@@ -47,7 +51,7 @@ function GroupHeader(props) {
           {title}
         </Text>
         <IconButton
-          text="Default"
+          text={getGroupTitleByType(selectedGroup)}
           icon={
             isExpanded ? (
               <Icon.ChevronUp size={18} />
