@@ -6,7 +6,6 @@ import ListItem from "../list-item";
 import { confirm, showDeleteConfirmation } from "../dialogs/confirm";
 import { showMoveNoteDialog } from "../dialogs/movenotedialog";
 import { store, useStore } from "../../stores/note-store";
-import { store as editorStore } from "../../stores/editor-store";
 import { showPasswordDialog } from "../dialogs/passworddialog";
 import { db, COLORS } from "../../common";
 import { useTheme } from "emotion-theming";
