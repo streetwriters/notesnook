@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Flex, Box } from "rebass";
+import { Flex } from "rebass";
 import { Input, Label } from "@rebass/forms";
 import * as Icon from "../icons";
 
