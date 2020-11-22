@@ -1,15 +1,18 @@
 import { db } from "../common";
 import { showPasswordDialog } from "../components/dialogs/passworddialog";
+import { showToast } from "../utils/toast";
 
 class Vault {
   static createVault() {
-    return showPasswordDialog("create_vault", (password) =>
-      db.vault.create(password)
-    );
+    return showPasswordDialog("create_vault", async ({ password }) => {
+      await db.vault.create(password);
+      await showToast("success", "Vault created.");
+      return true;
+    });
   }
 
   static unlockVault() {
-    return showPasswordDialog("unlock_vault", (password) => {
+    return showPasswordDialog("unlock_vault", ({ password }) => {
       return db.vault
         .unlock(password)
         .then(() => true)
@@ -17,9 +20,20 @@ class Vault {
     });
   }
 
+  static changeVaultPassword() {
+    return showPasswordDialog(
+      "change_password",
+      async ({ oldPassword, newPassword }) => {
+        await db.vault.changePassword(oldPassword, newPassword);
+        showToast("success", "Vault password changed.");
+        return true;
+      }
+    );
+  }
+
   static unlockNote(id) {
     return new Promise((resolve) => {
-      return showPasswordDialog("unlock_note", (password) => {
+      return showPasswordDialog("unlock_note", ({ password }) => {
         return db.vault
           .remove(id, password)
           .then(() => true)

@@ -5,6 +5,7 @@ import ThemeProvider from "../theme-provider";
 import * as Icon from "../icons";
 import Modal from "react-modal";
 import { useTheme } from "emotion-theming";
+import { getHashParam, setHashParam } from "../../utils/useHashParam";
 
 function Dialog(props) {
   const theme = useTheme();
@@ -76,9 +77,9 @@ function Dialog(props) {
           mb={3}
           sx={{ borderBottom: "1px solid", borderColor: "border" }}
         >
-          {props.icon && (
+          {/* {props.icon && (
             <props.icon size={props.iconSize || 38} color="primary" />
-          )}
+          )} */}
           <Text
             variant="heading"
             textAlign="center"
@@ -103,6 +104,7 @@ function Dialog(props) {
           >
             {props.positiveButton && (
               <RebassButton
+                {...props.positiveButton.props}
                 variant="primary"
                 data-test-id="dialog-yes"
                 sx={{ opacity: props.positiveButton.disabled ? 0.7 : 1 }}
@@ -142,13 +144,23 @@ export default Dialog;
 
 export function showDialog(dialog) {
   const root = document.getElementById("dialogContainer");
-  const perform = (resolve, result) => {
-    ReactDOM.unmountComponentAtNode(root);
-    resolve(result);
-  };
+
   if (root) {
     return new Promise((resolve) => {
-      const PropDialog = dialog(perform.bind(this, resolve));
+      const perform = (result) => {
+        window.removeEventListener("hashchange", onHashChange);
+        ReactDOM.unmountComponentAtNode(root);
+        resolve(result);
+      };
+      window.addEventListener("hashchange", onHashChange);
+
+      function onHashChange() {
+        if (!getHashParam("type")) perform(false);
+      }
+
+      setHashParam({ type: "dialog" });
+
+      const PropDialog = dialog(perform);
       ReactDOM.render(<ThemeProvider>{PropDialog}</ThemeProvider>, root);
     });
   }

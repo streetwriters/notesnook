@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Button, Flex, Text } from "rebass";
 import * as Icon from "../components/icons";
 import { useStore as useUserStore } from "../stores/user-store";
@@ -15,6 +15,8 @@ import { usePersistentState } from "../utils/hooks";
 import dayjs from "dayjs";
 import { showRecoveryKeyDialog } from "../components/dialogs/recoverykeydialog";
 import { showBuyDialog } from "../components/dialogs/buy-dialog";
+import Vault from "../common/vault";
+import { showToast } from "../utils/toast";
 
 function importBackup() {
   return new Promise((resolve, reject) => {
@@ -67,6 +69,7 @@ function Settings(props) {
     "backupReminderOffset",
     0
   );
+  const [isVaultCreated, setIsVaultCreated] = useState(false);
 
   const subscriptionDaysRemaining = useMemo(
     () => dayjs(user?.subscription?.expiry).diff(dayjs(), "day") + 1,
@@ -81,6 +84,12 @@ function Settings(props) {
     if (!followSystemTheme) return;
     setTheme(isSystemThemeDark ? "dark" : "light");
   }, [followSystemTheme, isSystemThemeDark, setTheme]);
+
+  useEffect(() => {
+    (async function () {
+      setIsVaultCreated(await db.vault.exists());
+    })();
+  }, [isVaultCreated]);
 
   return (
     <Flex variant="columnFill" px={2} sx={{ overflowY: "auto" }}>
@@ -280,6 +289,31 @@ function Settings(props) {
         selectedOption={backupReminderOffset}
         onSelectionChanged={(_option, index) => setBackupReminderOffset(index)}
       />
+
+      <Text
+        variant="subtitle"
+        color="primary"
+        sx={{ py: 1, borderBottom: "1px solid", borderBottomColor: "border" }}
+      >
+        Vault
+      </Text>
+
+      {!isVaultCreated && (
+        <Button variant="list" onClick={Vault.createVault}>
+          <TextWithTip
+            text="Create vault"
+            tip="Create a password-encrypted vault for your notes"
+          />
+        </Button>
+      )}
+
+      {isVaultCreated && (
+        <>
+          <Button variant="list" onClick={Vault.changeVaultPassword}>
+            <TextWithTip text="Change vault password" />
+          </Button>
+        </>
+      )}
 
       <Text
         variant="subtitle"

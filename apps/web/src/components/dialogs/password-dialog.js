@@ -1,21 +1,37 @@
-import React, { useState, useRef, useCallback } from "react";
-import { Box, Text, Flex } from "rebass";
-import { Input } from "@rebass/forms";
+import React, { useState, useCallback, useMemo } from "react";
+import { Box, Text } from "rebass";
 import Dialog, { showDialog } from "./dialog";
 import * as Icon from "../icons";
+import Field from "../field";
 
+const requiredValues = ["password", "newPassword", "oldPassword"];
 function PasswordDialog(props) {
-  const [isWrong, setIsWrong] = useState(false);
-  const passwordRef = useRef();
-  const submit = useCallback(async () => {
-    const password = passwordRef.current.value;
-    if (await props.validate(password)) {
-      props.onDone();
-    } else {
-      setIsWrong(true);
-      passwordRef.current.focus();
-    }
-  }, [setIsWrong, props]);
+  const { type } = props;
+  const [error, setError] = useState();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const isChangePasswordDialog = useMemo(() => type === "change_password", [
+    type,
+  ]);
+
+  const submit = useCallback(
+    async (data) => {
+      setIsLoading(true);
+      setError(false);
+      try {
+        if (await props.validate(data)) {
+          props.onDone();
+        } else {
+          setError("Wrong password.");
+        }
+      } catch (e) {
+        setError("Wrong password.");
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [props]
+  );
   return (
     <Dialog
       isOpen={true}
@@ -24,34 +40,59 @@ function PasswordDialog(props) {
       icon={props.icon}
       onClose={props.onCancel}
       positiveButton={{
+        props: {
+          form: "passwordForm",
+          type: "submit",
+        },
         text: props.positiveButtonText,
-        onClick: submit,
+        loading: isLoading,
+        disabled: isLoading,
       }}
       negativeButton={{ text: "Cancel", onClick: props.onCancel }}
     >
-      <Box my={1}>
-        <Input
-          data-test-id="dialog-vault-pass"
-          ref={passwordRef}
+      <Box
+        id="passwordForm"
+        as="form"
+        onSubmit={async (e) => {
+          e.preventDefault();
+          const data = requiredValues.reduce((prev, curr) => {
+            if (!e.target[curr]) return prev;
+            prev[curr] = e.target[curr].value;
+            return prev;
+          }, {});
+
+          setError();
+
+          await submit(data);
+        }}
+      >
+        <Field
           autoFocus
-          variant={isWrong ? "error" : "input"}
+          required
+          label={isChangePasswordDialog ? "Old password" : "Password"}
           type="password"
-          placeholder="Enter vault password"
-          onKeyUp={async (e) => {
-            if (e.key === "Enter") {
-              await submit();
-            } else {
-              setIsWrong(false);
-            }
-          }}
+          autoComplete={
+            type === "create_vault" ? "new-password" : "current-password"
+          }
+          id={isChangePasswordDialog ? "oldPassword" : "password"}
+          name={isChangePasswordDialog ? "oldPassword" : "password"}
         />
-        {isWrong && (
-          <Flex alignItems="center" color="error" mt={2}>
-            <Icon.Alert size={16} color="error" />
-            <Text ml={1} fontSize={"subBody"}>
-              Wrong password
-            </Text>
-          </Flex>
+
+        {isChangePasswordDialog ? (
+          <Field
+            required
+            label="New password"
+            type="password"
+            autoComplete="new-password"
+            id="newPassword"
+            name="newPassword"
+          />
+        ) : null}
+
+        {error && (
+          <Text mt={1} variant={"error"}>
+            {error}
+          </Text>
         )}
       </Box>
     </Dialog>
@@ -63,23 +104,31 @@ function getDialogData(type) {
     case "create_vault":
       return {
         title: "Create Your Vault",
-        subtitle: "Your vault will encrypt everything locally.",
+        subtitle: "A vault stores your notes in a password-encrypted storage.",
         icon: Icon.Vault,
-        positiveButtonText: "Create my vault",
+        positiveButtonText: "Create vault",
       };
     case "unlock_vault":
       return {
         title: "Unlock your Vault",
         subtitle: "Your vault will remain unlocked for 30 minutes.",
         icon: Icon.Unlock,
-        positiveButtonText: "Unlock my vault",
+        positiveButtonText: "Unlock vault",
       };
     case "unlock_note":
       return {
-        title: "Unlock your Note",
+        title: "Unlock Note",
         subtitle: "Unlocking will make this note openly available.",
         icon: Icon.Unlock,
-        positiveButtonText: "Unlock this note",
+        positiveButtonText: "Unlock note",
+      };
+    case "change_password":
+      return {
+        title: "Change Vault Password",
+        subtitle:
+          "All locked notes will be re-encrypted with the new password.",
+        icon: Icon.Password,
+        positiveButtonText: "Change password",
       };
     default:
       return;
@@ -90,6 +139,7 @@ export function showPasswordDialog(type, validate) {
   const { title, subtitle, icon, positiveButtonText } = getDialogData(type);
   return showDialog((perform) => (
     <PasswordDialog
+      type={type}
       title={title}
       subtitle={subtitle}
       icon={icon}
