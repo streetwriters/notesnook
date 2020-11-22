@@ -11,13 +11,9 @@ export default InputFactory;
 class Default {
   constructor() {
     return {
-      border: "none",
-      borderRadius: 0,
-      p: 0,
-      py: 1,
-
-      borderBottom: "1px solid",
-      borderBottomColor: "border",
+      borderRadius: "default",
+      border: "1px solid",
+      borderColor: "border",
       fontFamily: "body",
       fontWeight: "body",
       fontSize: "input",
@@ -25,6 +21,7 @@ class Default {
       ":focus": {
         outline: "none",
         borderColor: "primary",
+        borderWidth: "2px",
       },
       ":hover": {
         borderColor: "dimPrimary",
