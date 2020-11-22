@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./app.css";
-import { Flex, Box } from "rebass";
+import { Flex, Box, Text } from "rebass";
 import ThemeProvider from "./components/theme-provider";
 import { useStore } from "./stores/app-store";
 import { useStore as useEditorStore } from "./stores/editor-store";
@@ -101,37 +101,53 @@ function App() {
 
   return (
     <ThemeProvider>
-      <Flex id="app" bg="background" height="100%">
-        <NavigationMenu
-          toggleNavigationContainer={(state) => setShow(state || !show)}
-        />
-        <Flex variant="rowFill">
-          <Animated.Flex
-            variant="columnFill"
-            initial={{ width: "30%", opacity: 1, x: 0 }}
-            animate={{
-              width: show ? "30%" : "0%",
-              x: show ? 0 : "-30%",
-              opacity: show ? 1 : 0,
-              zIndex: show ? 0 : -1,
-            }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-            sx={{
-              borderRight: "1px solid",
-              borderColor: "border",
-            }}
-          >
-            {routeResult}
-          </Animated.Flex>
+      <Flex flexDirection="column" height="100%">
+        {isMobile && (
           <Flex
-            width={[show ? 0 : "100%", show ? 0 : "100%", "100%"]}
-            flexDirection="column"
+            alignItems="center"
+            justifyContent="center"
+            bg="primary"
+            width="100%"
+            py={1}
           >
-            <Editor />
+            <Text color="static" textAlign="center" fontSize="title">
+              Use our <a href="https://notesnook.com/mobile">mobile app</a> for
+              a better experience.
+            </Text>
           </Flex>
+        )}
+        <Flex flex="1" id="app" bg="background">
+          <NavigationMenu
+            toggleNavigationContainer={(state) => setShow(state || !show)}
+          />
+          <Flex variant="rowFill">
+            <Animated.Flex
+              variant="columnFill"
+              initial={{ width: "30%", opacity: 1, x: 0 }}
+              animate={{
+                width: show ? "30%" : "0%",
+                x: show ? 0 : "-30%",
+                opacity: show ? 1 : 0,
+                zIndex: show ? 0 : -1,
+              }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              sx={{
+                borderRight: "1px solid",
+                borderColor: "border",
+              }}
+            >
+              {routeResult}
+            </Animated.Flex>
+            <Flex
+              width={[show ? 0 : "100%", show ? 0 : "100%", "100%"]}
+              flexDirection="column"
+            >
+              <Editor />
+            </Flex>
+          </Flex>
+          <Box id="dialogContainer" />
+          <GlobalMenuWrapper />
         </Flex>
-        <Box id="dialogContainer" />
-        <GlobalMenuWrapper />
       </Flex>
     </ThemeProvider>
   );
