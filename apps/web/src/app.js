@@ -101,53 +101,51 @@ function App() {
 
   return (
     <ThemeProvider>
-      <Flex flexDirection="column" height="100%">
-        {isMobile && (
-          <Flex
-            alignItems="center"
-            justifyContent="center"
-            bg="primary"
-            width="100%"
-            py={1}
+      <Flex id="app" bg="background" height="100%">
+        <NavigationMenu
+          toggleNavigationContainer={(state) => setShow(state || !show)}
+        />
+        <Flex variant="rowFill">
+          <Animated.Flex
+            variant="columnFill"
+            initial={{ width: "30%", opacity: 1, x: 0 }}
+            animate={{
+              width: show ? "30%" : "0%",
+              x: show ? 0 : "-30%",
+              opacity: show ? 1 : 0,
+              zIndex: show ? 0 : -1,
+            }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+            sx={{
+              borderRight: "1px solid",
+              borderColor: "border",
+            }}
           >
-            <Text color="static" textAlign="center" fontSize="title">
-              Use our <a href="https://notesnook.com/mobile">mobile app</a> for
-              a better experience.
-            </Text>
+            {isMobile && (
+              <Flex
+                alignItems="center"
+                justifyContent="center"
+                bg="primary"
+                width="100%"
+                py={1}
+              >
+                <Text color="static" textAlign="center" fontSize="title">
+                  Use our <a href="https://notesnook.com/mobile">mobile app</a>{" "}
+                  for a better experience.
+                </Text>
+              </Flex>
+            )}
+            {routeResult}
+          </Animated.Flex>
+          <Flex
+            width={[show ? 0 : "100%", show ? 0 : "100%", "100%"]}
+            flexDirection="column"
+          >
+            <Editor />
           </Flex>
-        )}
-        <Flex flex="1" id="app" bg="background">
-          <NavigationMenu
-            toggleNavigationContainer={(state) => setShow(state || !show)}
-          />
-          <Flex variant="rowFill">
-            <Animated.Flex
-              variant="columnFill"
-              initial={{ width: "30%", opacity: 1, x: 0 }}
-              animate={{
-                width: show ? "30%" : "0%",
-                x: show ? 0 : "-30%",
-                opacity: show ? 1 : 0,
-                zIndex: show ? 0 : -1,
-              }}
-              transition={{ duration: 0.3, ease: "easeOut" }}
-              sx={{
-                borderRight: "1px solid",
-                borderColor: "border",
-              }}
-            >
-              {routeResult}
-            </Animated.Flex>
-            <Flex
-              width={[show ? 0 : "100%", show ? 0 : "100%", "100%"]}
-              flexDirection="column"
-            >
-              <Editor />
-            </Flex>
-          </Flex>
-          <Box id="dialogContainer" />
-          <GlobalMenuWrapper />
         </Flex>
+        <Box id="dialogContainer" />
+        <GlobalMenuWrapper />
       </Flex>
     </ThemeProvider>
   );
