@@ -1,14 +1,12 @@
 import React, { useState } from "react";
 import { Flex, Button, Text } from "rebass";
-import Input from "../inputs";
 import * as Icon from "../icons";
 import Dialog, { showDialog } from "./dialog";
 import { showSignUpDialog } from "./signupdialog";
 import { useStore } from "../../stores/user-store";
-import PasswordInput from "../inputs/password";
-import Dropper from "../dropper";
+import Field from "../field";
 
-const form = { error: true };
+const requiredValues = ["username", "password"];
 function LoginDialog(props) {
   const { onClose } = props;
   const [error, setError] = useState();
@@ -24,15 +22,21 @@ function LoginDialog(props) {
       onClose={onClose}
       negativeButton={{ text: "Cancel", onClick: onClose }}
       positiveButton={{
-        text: "Sign me in",
+        props: {
+          form: "loginForm",
+          type: "submit",
+        },
+        text: "Sign in",
         loading: isLoggingIn,
         disabled: isLoggingIn,
-        onClick: () => submit(setError, form, login, onClose),
+        // onClick: () => {
+        //   console.log(document.getElementById("loginForm"));
+        // }, //submit(setError, form, login, onClose),
       }}
       buttonsAlignment="center"
       footer={
         <>
-          <Text textAlign="center" color="gray" mt={3}>
+          <Text fontSize="title" textAlign="center" color="gray" mt={3}>
             Don't have an account?
           </Text>
           <Button
@@ -49,31 +53,44 @@ function LoginDialog(props) {
       }
     >
       <Flex
-        variant="columnFill"
-        onKeyDown={(e) => {
-          if (e.key === "Enter") submit(setError, form, login, onClose);
+        id="loginForm"
+        as="form"
+        onSubmit={(e) => {
+          e.preventDefault();
+          const data = requiredValues.reduce((prev, curr) => {
+            prev[curr] = e.target[curr].value;
+            return prev;
+          }, {});
+
+          setError();
+
+          login(data)
+            .then(onClose)
+            .catch((e) => setError(e.message));
         }}
+        variant="columnFill"
       >
-        <Dropper mt={2} form={form}>
-          <Input autoFocus name="username" title="Username" />
-          <PasswordInput />
-        </Dropper>
+        <Field
+          autoFocus
+          required
+          id="username"
+          label="Username"
+          name="username"
+          autoComplete="username"
+        />
+        <Field
+          required
+          id="password"
+          label="Password"
+          name="password"
+          type="password"
+          autoComplete="current-password"
+          sx={{ mt: 1 }}
+        />
         {error && <Text variant="error">{error}</Text>}
-        {/* <Button variant="anchor" onClick={showSignUpDialog}>
-          I don't have an account
-        </Button> */}
       </Flex>
     </Dialog>
   );
-}
-
-function submit(setError, form, login, onClose) {
-  setError();
-  if (form.error) return;
-
-  login(form)
-    .then(onClose)
-    .catch((e) => setError(e.message));
 }
 
 export const showLogInDialog = () => {

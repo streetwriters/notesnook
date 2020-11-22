@@ -1,16 +1,12 @@
 import React, { useState } from "react";
 import { Text, Box, Button } from "rebass";
-import Input from "../inputs";
 import * as Icon from "../icons";
 import Dialog, { showDialog } from "./dialog";
-//import { db } from "../../common";
-import EmailInput from "../inputs/email";
-import PasswordInput from "../inputs/password";
-import Dropper from "../dropper";
 import { useStore } from "../../stores/user-store";
 import { showLogInDialog } from "./logindialog";
+import Field from "../field";
 
-const form = { error: true };
+const requiredValues = ["email", "username", "password"];
 function SignUpDialog(props) {
   const { onClose } = props;
   const [error, setError] = useState();
@@ -27,14 +23,17 @@ function SignUpDialog(props) {
       negativeButton={{ text: "Cancel", onClick: onClose }}
       buttonsAlignment="center"
       positiveButton={{
-        text: "Create my account",
+        props: {
+          form: "signupForm",
+          type: "submit",
+        },
+        text: "Create account",
         loading: isSigningIn,
         disabled: isSigningIn,
-        onClick: () => submit(setError, form, signup, onClose),
       }}
       footer={
         <>
-          <Text textAlign="center" color="gray" mt={3}>
+          <Text fontSize="title" textAlign="center" color="gray" mt={3}>
             Already have an account?
           </Text>
           <Button
@@ -49,37 +48,52 @@ function SignUpDialog(props) {
       }
     >
       <Box
-        onKeyDown={(e) => {
-          if (e.key === "Enter") submit(setError, form, signup, onClose);
+        id="signupForm"
+        as="form"
+        onSubmit={(e) => {
+          e.preventDefault();
+          const data = requiredValues.reduce((prev, curr) => {
+            prev[curr] = e.target[curr].value;
+            return prev;
+          }, {});
+
+          setError();
+
+          signup(data)
+            .then(onClose)
+            .catch((e) => setError(e.message));
         }}
       >
-        <Dropper mt={2} form={form}>
-          <Input autoFocus title="Username" name="username" />
-          <EmailInput />
-          <PasswordInput confirm />
-        </Dropper>
+        <Field
+          autoFocus
+          required
+          id="email"
+          type="email"
+          label="Email"
+          name="email"
+        />
+        <Field
+          required
+          id="username"
+          label="Username"
+          name="username"
+          sx={{ mt: 1 }}
+        />
+        <Field
+          required
+          id="password"
+          label="Password"
+          name="password"
+          type="password"
+          autoComplete="new-password"
+          sx={{ mt: 1 }}
+        />
         {error && <Text variant="error">{error}</Text>}
       </Box>
     </Dialog>
   );
 }
 
-function submit(setError, form, signup, onClose) {
-  setError();
-  if (form.password !== form.confirm) {
-    form.error = true;
-    setError("Passwords do not match.");
-  }
-  if (form.error) return;
-  signup(form)
-    .then(onClose)
-    .catch((e) => setError(e.message));
-}
-
 export function showSignUpDialog() {
   return showDialog((perform) => <SignUpDialog onClose={() => perform()} />);
 }
-
-/**
-
- */

@@ -124,3 +124,5 @@ export const ChevronUp = createIcon(Icons.mdiChevronUp);
 
 export const SortAsc = createIcon(Icons.mdiSortAscending);
 export const SortDesc = createIcon(Icons.mdiSortDescending);
+
+export const Password = createIcon(Icons.mdiFormTextboxPassword);

@@ -46,7 +46,7 @@ class Primary {
 
 class Secondary {
   constructor() {
-    return { variant: "buttons.default", color: "text", bg: "bgSecondary" };
+    return { variant: "buttons.default", color: "text", bg: "border" };
   }
 }
 
