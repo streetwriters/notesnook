@@ -16,7 +16,6 @@ import dayjs from "dayjs";
 import { showRecoveryKeyDialog } from "../components/dialogs/recoverykeydialog";
 import { showBuyDialog } from "../components/dialogs/buy-dialog";
 import Vault from "../common/vault";
-import { showToast } from "../utils/toast";
 
 function importBackup() {
   return new Promise((resolve, reject) => {

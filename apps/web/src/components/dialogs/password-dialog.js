@@ -127,7 +127,7 @@ function getDialogData(type) {
         title: "Change Vault Password",
         subtitle:
           "All locked notes will be re-encrypted with the new password.",
-        icon: Icon.Password,
+        icon: Icon.Unlock,
         positiveButtonText: "Change password",
       };
     default:

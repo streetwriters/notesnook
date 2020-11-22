@@ -11,9 +11,13 @@ export default InputFactory;
 class Default {
   constructor() {
     return {
-      borderRadius: "default",
-      border: "2px solid",
-      borderColor: "border",
+      border: "none",
+      borderRadius: 0,
+      p: 0,
+      py: 1,
+
+      borderBottom: "1px solid",
+      borderBottomColor: "border",
       fontFamily: "body",
       fontWeight: "body",
       fontSize: "input",
