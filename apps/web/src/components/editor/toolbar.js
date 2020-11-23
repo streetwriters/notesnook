@@ -87,11 +87,11 @@ function Toolbar(props) {
   return (
     <Flex m={2} justifyContent={"space-between"}>
       <Flex justifyContent="center" alignItems="center">
-        <Icon.ChevronLeft
+        <Icon.ArrowLeft
           sx={{
             display: ["block", "block", "none"],
           }}
-          size={30}
+          size={18}
           onClick={() => {
             if (sessionId) showToast("success", "Note saved!");
             clearSession();
