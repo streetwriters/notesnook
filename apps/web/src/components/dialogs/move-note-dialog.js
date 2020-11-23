@@ -1,11 +1,11 @@
 import React from "react";
-import { Flex, Box, Text, Button } from "rebass";
+import { Flex, Box, Text } from "rebass";
 import * as Icon from "../icons";
 import { db } from "../../common";
 import Dialog, { showDialog } from "./dialog";
 import { showNotesMovedToast } from "../../common/toasts";
 import { showToast } from "../../utils/toast";
-import { Input } from "@rebass/forms";
+import Field from "../field";
 
 class MoveDialog extends React.Component {
   history = [];
@@ -36,7 +36,6 @@ class MoveDialog extends React.Component {
         title={"Add Note to Notebook"}
         description={"Organize your notes by adding them to notebooks."}
         icon={Icon.Move}
-        buttonsAlignment="center"
         onClose={props.onClose}
         negativeButton={{
           text: "Cancel",
@@ -44,31 +43,27 @@ class MoveDialog extends React.Component {
         }}
       >
         <Flex flexDirection="column" sx={{ overflowY: "hidden" }}>
-          <Text variant="title">Notebooks</Text>
-          <Flex flexDirection="row" my={2}>
-            <Input
-              ref={(ref) => (this.inputRef = ref)}
-              data-test-id="mnd-new-notebook-title"
-              placeholder={"Enter new notebook title"}
-              onKeyUp={async (e) => {
-                if (e.key === "Enter") await this.addNotebook(e.target);
-              }}
-            />
-            <Button
-              variant="tertiary"
-              p={1}
-              px={2}
-              ml={2}
-              onClick={async () => {
+          <Field
+            inputRef={(ref) => (this.inputRef = ref)}
+            data-test-id="mnd-new-notebook-title"
+            label="Notebooks"
+            id="notebook-title"
+            name="notebook-title"
+            helpText="Press enter to add a new notebook"
+            action={{
+              onClick: async () => {
                 await this.addNotebook(this.inputRef);
-              }}
-              data-test-id="mnd-new-notebook-add"
-            >
-              <Icon.Plus size={22} />
-            </Button>
-          </Flex>
+              },
+              icon: Icon.Plus,
+            }}
+            onKeyUp={async (e) => {
+              if (e.key === "Enter") await this.addNotebook(e.target);
+            }}
+          />
           <Box
+            mt={1}
             sx={{
+              borderRadius: "default",
               borderWidth: 1,
               borderStyle: "solid",
               borderColor: "border",

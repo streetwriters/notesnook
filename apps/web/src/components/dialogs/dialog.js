@@ -73,25 +73,18 @@ function Dialog(props) {
           />
         )}
         <Flex
-          variant="columnCenter"
+          flexDirection="column"
           pb={2}
-          mb={3}
-          sx={{ borderBottom: "1px solid", borderColor: "border" }}
+          //sx={{ borderBottom: "1px solid", borderColor: "border" }}
         >
           {/* {props.icon && (
             <props.icon size={props.iconSize || 38} color="primary" />
           )} */}
-          <Text
-            variant="heading"
-            textAlign="center"
-            color="text"
-            mx={1}
-            mt={props.icon && 1}
-          >
+          <Text variant="heading" textAlign="left" color="text">
             {props.title}
           </Text>
           {props.description && (
-            <Text variant="body" textAlign="center" color="gray" mx={1} mt={1}>
+            <Text variant="body" textAlign="left" color="gray" mt={1}>
               {props.description}
             </Text>
           )}

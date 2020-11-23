@@ -1,5 +1,5 @@
 import React, { useEffect, useCallback } from "react";
-import { Flex, Box, Text } from "rebass";
+import { Flex, Text } from "rebass";
 import * as Icon from "../icons";
 import {
   store as selectionStore,
@@ -22,9 +22,10 @@ function selectMenuItem(isSelected, toggleSelection) {
 }
 
 const ItemSelector = ({ isSelected, toggleSelection }) => {
-  return (
-    <Box
-      width={24}
+  return isSelected ? (
+    <Icon.Check
+      color="primary"
+      size={16}
       sx={{
         marginLeft: 0,
         marginRight: 1,
@@ -32,9 +33,9 @@ const ItemSelector = ({ isSelected, toggleSelection }) => {
         cursor: "pointer",
       }}
       onClick={() => toggleSelection()}
-    >
-      {isSelected ? <Icon.Check color="primary" /> : <Icon.CircleEmpty />}
-    </Box>
+    />
+  ) : (
+    <Icon.CircleEmpty />
   );
 };
 

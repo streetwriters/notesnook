@@ -5,6 +5,26 @@ import download from "../../utils/download";
 import * as Icon from "../icons";
 import Dialog, { showDialog } from "./dialog";
 
+const formats = [
+  {
+    type: "md",
+    title: "Markdown",
+    icon: Icon.Markdown,
+    subtitle: "Can be opened in any plain-text or markdown editor.",
+  },
+  {
+    type: "html",
+    title: "HTML",
+    icon: Icon.HTML,
+    subtitle: "Can be opened in any browser.",
+  },
+  {
+    type: "txt",
+    title: "Text",
+    icon: Icon.Text,
+    subtitle: "Can be opened in any plain-text editor.",
+  },
+];
 function ExportDialog(props) {
   return (
     <Dialog
@@ -12,32 +32,40 @@ function ExportDialog(props) {
       title={props.title}
       icon={props.icon}
       description="You can export your note to Markdown, HTML, or Text."
-      buttonsAlignment="center"
       onClose={props.onClose}
+      scrollable
       negativeButton={{
         onClick: props.onClose,
         text: "Cancel",
       }}
     >
-      <Flex justifyContent="center" alignItems="center">
-        <Button mr={2} onClick={() => props.exportNote("html")}>
-          <Flex variant="rowCenter">
-            <Icon.HTML color="static" />
-            <Text ml={1}>HTML</Text>
-          </Flex>
-        </Button>
-        <Button mr={2} onClick={() => props.exportNote("md")}>
-          <Flex variant="rowCenter">
-            <Icon.Markdown color="static" />
-            <Text ml={1}>Markdown</Text>
-          </Flex>
-        </Button>
-        <Button mr={2} onClick={() => props.exportNote("txt")}>
-          <Flex variant="rowCenter">
-            <Icon.Text color="static" />
-            <Text ml={1}>Text</Text>
-          </Flex>
-        </Button>
+      <Flex flexDirection="column">
+        {formats.map((format) => (
+          <Button
+            variant="tertiary"
+            sx={{ display: "flex" }}
+            mb={1}
+            onClick={() => props.exportNote(format.type)}
+          >
+            <format.icon
+              color="primary"
+              sx={{ p: 1, bg: "shade", borderRadius: "default" }}
+            />
+            <Flex flexDirection="column" alignItems="flex-start" ml={2}>
+              <Text variant="title" textAlign="left">
+                {format.title}
+              </Text>
+              <Text
+                variant="subtitle"
+                textAlign="left"
+                fontWeight="normal"
+                color="gray"
+              >
+                {format.subtitle}
+              </Text>
+            </Flex>
+          </Button>
+        ))}
       </Flex>
     </Dialog>
   );

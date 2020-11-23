@@ -1,12 +1,12 @@
 import React from "react";
-import { Flex, Box, Button as RebassButton, Text } from "rebass";
-import { Input } from "@rebass/forms";
+import { Flex, Text } from "rebass";
 import * as Icon from "../icons";
 import Dialog, { showDialog } from "./dialog";
 import { store } from "../../stores/notebook-store";
 import { qclone } from "qclone";
 import { showToast } from "../../utils/toast";
 import { db } from "../../common";
+import Field from "../field";
 
 class AddNotebookDialog extends React.Component {
   title = "";
@@ -119,66 +119,49 @@ class AddNotebookDialog extends React.Component {
         negativeButton={{ text: "Cancel", onClick: props.onClose }}
       >
         <Flex flexDirection="column" sx={{ overflowY: "auto" }}>
-          <Input
-            data-test-id="dialog-nb-name"
-            autoFocus
-            onChange={(e) => (this.title = e.target.value)}
-            placeholder="Enter name"
-            defaultValue={this.title}
+          <Field autoFocus required label="Title" name="title" id="title" />
+          <Field
+            label="Description"
+            name="description"
+            id="description"
+            helpText="Optional"
+            sx={{ mt: 1 }}
           />
-          <Input
-            data-test-id="dialog-nb-description"
-            mt={2}
-            onChange={(e) => (this.description = e.target.value)}
-            placeholder="Enter description (optional)"
-            defaultValue={this.description}
-          />
-          <Flex flexDirection="row" mt={2}>
-            <Input
-              data-test-id={"dialog-nb-topic"}
-              ref={(ref) => (this._topicInputRef = ref)}
-              placeholder="Add a topic"
-              onChange={(e) => {
-                if (!this.state.isEditting) return;
-                const topics = this.state.topics.slice();
-                topics[this.state.editIndex].title = e.target.value;
-                this.setState({
-                  topics,
-                });
-              }}
-              onKeyUp={(e) => {
-                if (e.nativeEvent.key === "Enter") {
-                  if (this.state.isEditting) {
-                    this.doneEditingTopic();
-                  } else {
-                    this.addTopic(e.target.value);
-                  }
-                }
-              }}
-            />
-            <RebassButton
-              variant="tertiary"
-              sx={{ marginLeft: 1 }}
-              px={2}
-              py={1}
-              onClick={() => {
+          <Field
+            inputRef={(ref) => (this._topicInputRef = ref)}
+            label="Topics"
+            name="topic"
+            id="topic"
+            action={{
+              onClick: () => {
                 if (this.state.isEditting) {
                   this.doneEditingTopic();
                 } else {
                   this.addTopic(this._topicInputRef.value);
                 }
-              }}
-              data-test-id="dialog-nb-topic-action"
-            >
-              <Box height={20}>
-                {this.state.isEditting ? (
-                  <Icon.Checkmark size={22} />
-                ) : (
-                  <Icon.Plus size={22} />
-                )}
-              </Box>
-            </RebassButton>
-          </Flex>
+              },
+              icon: this.state.isEditting ? Icon.Checkmark : Icon.Plus,
+            }}
+            onChange={(e) => {
+              if (!this.state.isEditting) return;
+              const topics = this.state.topics.slice();
+              topics[this.state.editIndex].title = e.target.value;
+              this.setState({
+                topics,
+              });
+            }}
+            onKeyUp={(e) => {
+              if (e.nativeEvent.key === "Enter") {
+                if (this.state.isEditting) {
+                  this.doneEditingTopic();
+                } else {
+                  this.addTopic(e.target.value);
+                }
+              }
+            }}
+            helpText="Press enter to add a topic (optional)"
+            sx={{ mt: 1 }}
+          />
           {this.state.topics.map((topic, index) => (
             <TopicItem
               key={topic.id || topic.title || index}

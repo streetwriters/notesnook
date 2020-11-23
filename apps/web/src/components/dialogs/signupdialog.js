@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Text, Box, Button } from "rebass";
+import { Text, Box, Button, Flex } from "rebass";
 import * as Icon from "../icons";
 import Dialog, { showDialog } from "./dialog";
 import { useStore } from "../../stores/user-store";
@@ -17,12 +17,20 @@ function SignUpDialog(props) {
     <Dialog
       isOpen={true}
       title={"Create a new Account"}
-      description={"Sign up for a 14-day free trial (no credit card)."}
+      description={
+        <Flex alignItems="center">
+          <Text fontSize="body" textAlign="center" color="gray" mr="3px">
+            Already have an account?
+          </Text>
+          <Button variant="anchor" fontSize="body" onClick={showLogInDialog}>
+            Sign in here.
+          </Button>
+        </Flex>
+      }
       icon={Icon.Signup}
       onClose={onClose}
       scrollable
       negativeButton={{ text: "Cancel", onClick: onClose }}
-      buttonsAlignment="center"
       positiveButton={{
         props: {
           form: "signupForm",
@@ -32,21 +40,6 @@ function SignUpDialog(props) {
         loading: isSigningIn,
         disabled: isSigningIn,
       }}
-      footer={
-        <>
-          <Text fontSize="title" textAlign="center" color="gray" mt={3}>
-            Already have an account?
-          </Text>
-          <Button
-            variant="anchor"
-            mt={2}
-            fontSize="body"
-            onClick={showLogInDialog}
-          >
-            Sign in here.
-          </Button>
-        </>
-      }
     >
       <Box
         id="signupForm"

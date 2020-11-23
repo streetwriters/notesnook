@@ -17,7 +17,21 @@ function LoginDialog(props) {
     <Dialog
       isOpen={true}
       title={"Sign in to Your Account"}
-      description={"Signing in allows you to sync your notes across devices."}
+      description={
+        <Flex alignItems="center">
+          <Text as="span" fontSize="body" color="gray">
+            Don't have an account?{" "}
+            <Button
+              variant="anchor"
+              sx={{ textAlign: "left" }}
+              fontSize="body"
+              onClick={showSignUpDialog}
+            >
+              Create an account here.
+            </Button>
+          </Text>
+        </Flex>
+      }
       icon={Icon.Login}
       onClose={onClose}
       scrollable
@@ -30,28 +44,7 @@ function LoginDialog(props) {
         text: "Sign in",
         loading: isLoggingIn,
         disabled: isLoggingIn,
-        // onClick: () => {
-        //   console.log(document.getElementById("loginForm"));
-        // }, //submit(setError, form, login, onClose),
       }}
-      buttonsAlignment="center"
-      footer={
-        <>
-          <Text fontSize="title" textAlign="center" color="gray" mt={3}>
-            Don't have an account?
-          </Text>
-          <Button
-            mt={3}
-            variant="anchor"
-            justifySelf="center"
-            alignSelf="center"
-            fontSize="body"
-            onClick={showSignUpDialog}
-          >
-            Sign up here
-          </Button>
-        </>
-      }
     >
       <Flex
         id="loginForm"
@@ -69,7 +62,7 @@ function LoginDialog(props) {
             .then(onClose)
             .catch((e) => setError(e.message));
         }}
-        variant="columnFill"
+        flexDirection="column"
       >
         <Field
           autoFocus

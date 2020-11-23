@@ -13,6 +13,11 @@ function Field(props) {
     required,
     autoFocus,
     autoComplete,
+    helpText,
+    action,
+    onKeyUp,
+    onChange,
+    inputRef,
   } = props;
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
@@ -28,17 +33,22 @@ function Field(props) {
       >
         {label}
       </Label>
-      {/* <Label htmlFor={id} sx={{ fontSize: "body", color: "gray" }} mb={1}>
-        Hello I am secondary
-      </Label> */}
+      {helpText && (
+        <Label htmlFor={id} sx={{ fontSize: "subBody", color: "gray" }}>
+          {helpText}
+        </Label>
+      )}
       <Flex mt={1} sx={{ position: "relative" }}>
         <Input
+          ref={inputRef}
           autoFocus={autoFocus}
           required={required}
           name={name}
           id={id}
           autoComplete={autoComplete}
           type={type || "text"}
+          onChange={onChange}
+          onKeyUp={onKeyUp}
         />
         {type === "password" && (
           <Flex
@@ -63,6 +73,23 @@ function Field(props) {
             ) : (
               <Icon.PasswordInvisible />
             )}
+          </Flex>
+        )}
+        {action && (
+          <Flex
+            onClick={action.onClick}
+            variant="rowCenter"
+            sx={{
+              position: "absolute",
+              right: 0,
+              top: 0,
+              bottom: 0,
+              px: 1,
+              borderRadius: "default",
+              ":hover": { bg: "border" },
+            }}
+          >
+            <action.icon />
           </Flex>
         )}
       </Flex>

@@ -17,8 +17,8 @@ function Confirm(props) {
       }}
       negativeButton={{ text: props.noText, onClick: props.onNo }}
     >
-      <Box my={2}>
-        <Text as="span" variant="body" fontSize={18}>
+      <Box>
+        <Text as="span" variant="body">
           {props.message}
         </Text>
       </Box>
@@ -50,15 +50,12 @@ export function showDeleteConfirmation(type, multi = false) {
   if (multi) noun += "s";
   let lowerCaseNoun = noun.toLowerCase();
 
-  let [firstPronoun, secondPronoun] = multi
-    ? ["these", "they"]
-    : ["this", "it"];
+  let secondPronoun = multi ? "they" : "it";
 
   return confirm(Icon.Trash, {
-    title: `Delete ${noun}`,
-    subtitle: `Are you sure you want to delete ${firstPronoun} ${lowerCaseNoun}?`,
+    title: `Delete ${noun}?`,
     message: (
-      <Text as="span">
+      <Text as="span" fontSize="body">
         The {lowerCaseNoun} will be{" "}
         <Text as="span" color="primary">
           kept in your Trash for 7 days
