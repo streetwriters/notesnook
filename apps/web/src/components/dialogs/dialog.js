@@ -57,7 +57,7 @@ function Dialog(props) {
         bg="background"
         alignSelf={"center"}
         m={[0, 2, 2]}
-        overflowY={props.scrollable ? "scroll" : "hidden"}
+        overflowY={props.scrollable ? "auto" : "hidden"}
         sx={{
           position: "relative",
           overflow: "hidden",
