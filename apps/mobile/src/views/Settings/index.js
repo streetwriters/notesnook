@@ -240,7 +240,7 @@ export const Settings = ({navigation}) => {
         borderRadius: 0,
         flexDirection: 'row',
       }}>
-      <Heading
+      <Paragraph
         size={SIZE.md}
         style={{
           textAlignVertical: 'center',
@@ -252,7 +252,7 @@ export const Settings = ({navigation}) => {
         <Paragraph size={SIZE.sm} color={colors.icon}>
           {tagline}
         </Paragraph>
-      </Heading>
+      </Paragraph>
       {customComponent ? customComponent : null}
     </PressableButton>
   );
@@ -469,7 +469,7 @@ export const Settings = ({navigation}) => {
         )}
         <SectionHeader title="Appearance" />
 
-        <Heading
+        <Paragraph
           size={SIZE.md}
           style={{
             textAlignVertical: 'center',
@@ -479,7 +479,7 @@ export const Settings = ({navigation}) => {
           <Paragraph size={SIZE.sm} color={colors.icon}>
             Choose a color to use as accent color
           </Paragraph>
-        </Heading>
+        </Paragraph>
 
         <View
           contentContainerStyle={{
@@ -884,7 +884,7 @@ export const Settings = ({navigation}) => {
             height: 50,
             paddingHorizontal: 12,
           }}>
-          <Heading
+          <Paragraph
             size={SIZE.md}
             style={{
               textAlignVertical: 'center',
@@ -894,7 +894,7 @@ export const Settings = ({navigation}) => {
             <Paragraph color={colors.icon} size={SIZE.sm}>
               Backup your data automatically.
             </Paragraph>
-          </Heading>
+          </Paragraph>
 
           <View
             style={{
