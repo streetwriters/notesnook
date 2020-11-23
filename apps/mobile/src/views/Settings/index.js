@@ -4,11 +4,9 @@ import {
   Linking,
   Platform,
   ScrollView,
-  Text,
   TouchableOpacity,
   View,
 } from 'react-native';
-import * as Animatable from 'react-native-animatable';
 import Menu, {MenuItem} from 'react-native-reanimated-material-menu';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {Button} from '../../components/Button';
@@ -119,7 +117,6 @@ export const Settings = ({navigation}) => {
 
   const checkVaultStatus = useCallback(() => {
     db.vault.add('check_no_vault').catch(async (e) => {
-   
       let biometry = await Keychain.getSupportedBiometryType();
       let fingerprint = await Keychain.hasInternetCredentials('nn_vault');
 
@@ -167,7 +164,7 @@ export const Settings = ({navigation}) => {
   };
 
   const SectionHeader = ({title}) => (
-    <Heading
+    <Paragraph
       size={SIZE.sm}
       color={colors.accent}
       style={{
@@ -176,7 +173,7 @@ export const Settings = ({navigation}) => {
         height: 35,
       }}>
       {title}
-    </Heading>
+    </Paragraph>
   );
 
   const backupItemsList = [
@@ -243,7 +240,8 @@ export const Settings = ({navigation}) => {
         borderRadius: 0,
         flexDirection: 'row',
       }}>
-      <Paragraph
+      <Heading
+        size={SIZE.md}
         style={{
           textAlignVertical: 'center',
           maxWidth: maxWidth,
@@ -251,18 +249,16 @@ export const Settings = ({navigation}) => {
         {title}
         {tagline ? '\n' : null}
 
-        <Paragraph size={SIZE.xs} color={colors.icon}>
+        <Paragraph size={SIZE.sm} color={colors.icon}>
           {tagline}
         </Paragraph>
-      </Paragraph>
+      </Heading>
       {customComponent ? customComponent : null}
     </PressableButton>
   );
 
   return (
-    <Animatable.View
-      transition="backgroundColor"
-      duration={300}
+    <View
       style={{
         height: '100%',
         backgroundColor: colors.bg,
@@ -473,16 +469,17 @@ export const Settings = ({navigation}) => {
         )}
         <SectionHeader title="Appearance" />
 
-        <Paragraph
+        <Heading
+          size={SIZE.md}
           style={{
             textAlignVertical: 'center',
             paddingHorizontal: 12,
           }}>
           Accent Color{'\n'}
-          <Paragraph size={SIZE.xs} color={colors.icon}>
+          <Paragraph size={SIZE.sm} color={colors.icon}>
             Choose a color to use as accent color
           </Paragraph>
-        </Paragraph>
+        </Heading>
 
         <View
           contentContainerStyle={{
@@ -654,7 +651,7 @@ export const Settings = ({navigation}) => {
           }
         />
 
-        <View
+        {/*     <View
           style={{
             width: '100%',
             marginHorizontal: 0,
@@ -731,7 +728,7 @@ export const Settings = ({navigation}) => {
             ))}
           </View>
         </View>
-
+ */}
         {DDS.isTab ? (
           <CustomButton
             title="Force portrait mode"
@@ -887,16 +884,17 @@ export const Settings = ({navigation}) => {
             height: 50,
             paddingHorizontal: 12,
           }}>
-          <Paragraph
+          <Heading
+            size={SIZE.md}
             style={{
               textAlignVertical: 'center',
               maxWidth: '60%',
             }}>
             Auto Backup{'\n'}
-            <Paragraph color={colors.icon} size={SIZE.xs}>
+            <Paragraph color={colors.icon} size={SIZE.sm}>
               Backup your data automatically.
             </Paragraph>
-          </Paragraph>
+          </Heading>
 
           <View
             style={{
@@ -1032,7 +1030,7 @@ export const Settings = ({navigation}) => {
           }}
         />
       </ScrollView>
-    </Animatable.View>
+    </View>
   );
 };
 
