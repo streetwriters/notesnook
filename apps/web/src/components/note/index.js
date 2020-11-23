@@ -146,10 +146,9 @@ function Note(props) {
             justifySelf="flex-start"
             alignContent="center"
             justifyContent="center"
-            mb={1}
           >
             <Icon.Notebook size={12} color={color ? color : "primary"} />
-            <Text variant="subBody" fontWeight="600" mt={"4px"} ml={"3px"}>
+            <Text variant="subBody" fontWeight="600" ml={"3px"}>
               {notebook.title}
             </Text>
           </Flex>
