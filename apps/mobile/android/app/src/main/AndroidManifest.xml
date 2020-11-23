@@ -18,27 +18,25 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
+
         <activity
             android:name=".MainActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|uiMode"
             android:label="@string/app_name"
             android:launchMode="singleTask"
             android:windowSoftInputMode="adjustResize">
-           
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".IntentActivity"
-            android:label="Make to Note"
-            android:noHistory="true"
-            android:launchMode="singleTask">
-             
-              <intent-filter>
+            android:label="Make Note"
+            android:launchMode="singleTask"
+            android:noHistory="true">
+            <intent-filter>
                 <action android:name="android.intent.action.SEND" />
 
                 <category android:name="android.intent.category.DEFAULT" />
@@ -53,10 +51,8 @@
                 <data android:mimeType="text/*" />
             </intent-filter>
         </activity>
-
-
         <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
-
+        <service android:name="com.streetwriters.notesnook.OnClearFromRecentService" android:stopWithTask="false" android:enabled="true" android:exported="true" />
         <provider
             android:name="com.vinzscam.reactnativefileviewer.FileProvider"
             android:authorities="${applicationId}.provider"
