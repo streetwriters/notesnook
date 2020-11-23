@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Platform, StyleSheet, View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTracked } from '../../provider';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
@@ -15,7 +15,7 @@ import { HeaderTitle } from './HeaderTitle';
 
 export const Header = ({root}) => {
   const [state] = useTracked();
-  const {colors, syncing, currentScreen} = state;
+  const {colors, currentScreen} = state;
   const insets = useSafeAreaInsets();
   const [hide, setHide] = useState(true);
 
@@ -66,24 +66,6 @@ export const Header = ({root}) => {
           <SearchInput />
         </View>
       ) : null}
-
-      <View
-        style={[
-          styles.loadingContainer,
-          {
-            opacity: syncing ? 1 : 0,
-          },
-        ]}>
-        <View
-          style={[
-            styles.loadingInnerContainer,
-            {
-              backgroundColor: colors.bg,
-            },
-          ]}
-        />
-        <ActivityIndicator size={25} color={colors.accent} />
-      </View>
 
       {currentScreen === 'search' ? (
         <View style={styles.rightBtnContainer}>

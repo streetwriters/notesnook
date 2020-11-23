@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {Text} from 'react-native';
+import {ActivityIndicator, Text} from 'react-native';
 import Animated from 'react-native-reanimated';
 import {useTracked} from '../../provider';
 import {DDS} from '../../services/DeviceDetection';

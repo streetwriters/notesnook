@@ -1,19 +1,21 @@
 import React from 'react';
-import {StyleSheet, View} from 'react-native';
+import {ActivityIndicator, StyleSheet, View} from 'react-native';
 import {useTracked} from '../../provider';
 import {DDS} from '../../services/DeviceDetection';
 import NavigationService from '../../services/Navigation';
 import {dWidth} from '../../utils';
 import {SIZE} from '../../utils/SizeUtils';
 import {ActionIcon} from '../ActionIcon';
-import { Button } from '../Button';
+import {Button} from '../Button';
 
 export const HeaderRightMenu = () => {
-  const [state,] = useTracked();
-  const {colors, containerBottomButton,currentScreen} = state;
+  const [state] = useTracked();
+  const {colors, containerBottomButton, currentScreen, syncing} = state;
 
   return (
     <View style={styles.rightBtnContainer}>
+      {syncing && <ActivityIndicator size={SIZE.xl} color={colors.accent} />}
+
       <ActionIcon
         onPress={async () => {
           NavigationService.navigate('Search');
@@ -23,20 +25,19 @@ export const HeaderRightMenu = () => {
         color={colors.pri}
         customStyle={styles.rightBtn}
       />
+
       {DDS.isLargeTablet() && containerBottomButton.onPress ? (
         <Button
-          onPress={ () => {
-        
-            containerBottomButton.onPress()
-
+          onPress={() => {
+            containerBottomButton.onPress();
           }}
-          icon={currentScreen === "trash" ? "delete" : 'plus'}
+          icon={currentScreen === 'trash' ? 'delete' : 'plus'}
           iconSize={SIZE.xl}
           type="shade"
           style={{
             marginLeft: 20,
-            width:60,
-            height:35
+            width: 60,
+            height: 35,
           }}
         />
       ) : null}
