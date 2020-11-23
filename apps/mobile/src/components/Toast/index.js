@@ -7,7 +7,6 @@ import {DDS} from '../../services/DeviceDetection';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
 import {dHeight, getElevation} from '../../utils';
 import {eHideToast, eShowToast} from '../../utils/Events';
-import {SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
 import Paragraph from '../Typography/Paragraph';
 const {timing} = Animated;
@@ -26,7 +25,7 @@ export const Toast = ({context = 'global'}) => {
   let toastTranslate = useValue(dHeight);
   let toastOpacity = useValue(1);
 
-  const showToastFunc = (data) => {
+  const showToastFunc = async (data) => {
     if (data.context !== context) return;
     toastMessages.push(data);
     if (toastMessages?.length > 1) return;
@@ -41,14 +40,15 @@ export const Toast = ({context = 'global'}) => {
         color: colors.errorText,
       });
     }
-
-    setTimeout(() => {
-      timing(toastTranslate, {
-        toValue: 0,
-        duration: 500,
-        easing: Easing.elastic(1.1),
+   
+      toastTranslate.setValue(0);
+      await sleep(50)
+      timing(toastOpacity, {
+        toValue: 1,
+        duration: 150,
+        easing: Easing.ease,
       }).start();
-    }, 100);
+
 
     setTimeout(() => {
       hideToastFunc();
@@ -90,16 +90,19 @@ export const Toast = ({context = 'global'}) => {
         }, 300);
       });
     } else {
-      timing(toastTranslate, {
-        toValue: 300,
-        duration: 200,
+      
+      timing(toastOpacity, {
+        toValue: 0,
+        duration: 150,
         easing: Easing.inOut(Easing.ease),
       }).start(async () => {
-        await sleep(300);
-      
+        await sleep(100);
+        toastTranslate.setValue(dHeight)
         toastMessages.shift();
         setData({});
       });
+
+
     }
   };
 
@@ -128,7 +131,7 @@ export const Toast = ({context = 'global'}) => {
   return (
     <Animated.View
       style={{
-        width: DDS.isTab ? '30%' : '100%',
+        width: DDS.isTab ? 300 : '100%',
         alignItems: 'center',
         alignSelf: 'center',
         minHeight: 30,
