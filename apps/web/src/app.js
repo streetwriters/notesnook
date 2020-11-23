@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./app.css";
-import { Flex, Box, Text } from "rebass";
+import { Flex, Box } from "rebass";
 import ThemeProvider from "./components/theme-provider";
 import { useStore } from "./stores/app-store";
 import { useStore as useEditorStore } from "./stores/editor-store";
@@ -23,6 +23,7 @@ import {
 import { EV } from "notes-core/common";
 import useTablet from "./utils/use-tablet";
 import { showBuyDialog } from "./components/dialogs/buy-dialog";
+import Banner from "./components/banner";
 
 function App() {
   const [show, setShow] = useState(true);
@@ -57,14 +58,14 @@ function App() {
 
   useEffect(() => {
     EV.subscribe("user:checkStatus", async (type) => {
-      // const subStatus = userstore.get().user?.subscription?.status;
-      // if (subStatus && subStatus >= 1 && subStatus <= 3) {
-      //   return { type, result: true };
-      // } else {
-      //   await showBuyDialog();
-      //   return { type, result: false };
-      // }
-      return { type, result: true };
+      //return { type, result: true };
+      const subStatus = userstore.get().user?.subscription?.status;
+      if (subStatus && subStatus >= 1 && subStatus <= 3) {
+        return { type, result: true };
+      } else {
+        await showBuyDialog();
+        return { type, result: false };
+      }
     });
   }, []);
 
@@ -114,28 +115,15 @@ function App() {
               width: show ? "30%" : "0%",
               x: show ? 0 : "-30%",
               opacity: show ? 1 : 0,
-              zIndex: show ? 0 : -1,
             }}
             transition={{ duration: 0.3, ease: "easeOut" }}
             sx={{
               borderRight: "1px solid",
+              zIndex: show ? 0 : -1,
               borderColor: "border",
             }}
           >
-            {isMobile && (
-              <Flex
-                alignItems="center"
-                justifyContent="center"
-                bg="primary"
-                width="100%"
-                py={1}
-              >
-                <Text color="static" textAlign="center" fontSize="title">
-                  Use our <a href="https://notesnook.com/mobile">mobile app</a>{" "}
-                  for a better experience.
-                </Text>
-              </Flex>
-            )}
+            {isMobile && <Banner />}
             {routeResult}
           </Animated.Flex>
           <Flex
