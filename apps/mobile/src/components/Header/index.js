@@ -1,19 +1,17 @@
-import React, {useEffect, useState} from 'react';
-import {ActivityIndicator, Platform, StyleSheet, View} from 'react-native';
-import * as Animatable from 'react-native-animatable';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {useTracked} from '../../provider';
-import {DDS} from '../../services/DeviceDetection';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, Platform, StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTracked } from '../../provider';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
 import NavigationService from '../../services/Navigation';
-import {dWidth, getElevation} from '../../utils';
-import {eScrollEvent} from '../../utils/Events';
-import {SIZE} from '../../utils/SizeUtils';
-import {ActionIcon} from '../ActionIcon';
-import {SearchInput} from '../SearchInput';
-import {HeaderLeftMenu} from './HeaderLeftMenu';
+import { dWidth } from '../../utils';
+import { eScrollEvent } from '../../utils/Events';
+import { SIZE } from '../../utils/SizeUtils';
+import { ActionIcon } from '../ActionIcon';
+import { SearchInput } from '../SearchInput';
+import { HeaderLeftMenu } from './HeaderLeftMenu';
 import { HeaderRightMenu } from './HeaderRightMenu';
-import {HeaderTitle} from './HeaderTitle';
+import { HeaderTitle } from './HeaderTitle';
 
 export const Header = ({root}) => {
   const [state] = useTracked();
@@ -69,9 +67,7 @@ export const Header = ({root}) => {
         </View>
       ) : null}
 
-      <Animatable.View
-        transition={['opacity']}
-        duration={300}
+      <View
         style={[
           styles.loadingContainer,
           {
@@ -87,7 +83,7 @@ export const Header = ({root}) => {
           ]}
         />
         <ActivityIndicator size={25} color={colors.accent} />
-      </Animatable.View>
+      </View>
 
       {currentScreen === 'search' ? (
         <View style={styles.rightBtnContainer}>
