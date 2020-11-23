@@ -388,15 +388,13 @@ export async function onWebViewLoad(premium, colors, event) {
 }
 async function loadEditorState() {
   if (sideMenuRef.current !== null) {
-
     if (intent) {
       console.log('clearing here');
       MMKV.removeItem('appState');
       return;
     }
-
     let appState = await MMKV.getItem('appState');
-    console.log('checking for app state',appState);
+    console.log('checking for app state', appState);
     if (appState) {
       appState = JSON.parse(appState);
       if (appState.editing && appState.note.id !== null) {
@@ -415,7 +413,10 @@ async function loadEditorState() {
         tabBarRef.current?.goToPage(1);
         SplashScreen.hide();
       } else {
+        console.log('loading main app',intent);
+        if (intent) return;
         eSendEvent('nointent');
+        console.log('sent no intent');
       }
     });
   }
