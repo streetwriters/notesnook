@@ -41,6 +41,7 @@ export const NavigationStack = ({component = NavigatorStack}) => {
         }}
         drawerStyle={{
           width: deviceMode !== 'mobile' ? 0 : '65%',
+          borderRightWidth:0,
         }}
         edgeWidth={200}
         drawerType="slide"

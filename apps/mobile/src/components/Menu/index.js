@@ -64,8 +64,6 @@ export const Menu = React.memo(
           width: '100%',
           backgroundColor:DDS.isLargeTablet()? colors.nav : colors.bg,
           paddingTop: insets.top,
-          borderRightWidth: 1,
-          borderRightColor: colors.nav,
         }}>
         <ScrollView
           alwaysBounceVertical={false}
