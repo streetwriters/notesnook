@@ -185,6 +185,7 @@ function Note(props) {
               />
             ))} */}
             <TimeAgo
+              live={false}
               style={{ fontSize: theme.fontSizes["subBody"] }}
               datetime={note.dateCreated}
             />
