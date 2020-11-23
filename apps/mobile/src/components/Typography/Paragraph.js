@@ -20,19 +20,19 @@ const Paragraph = ({color, size, style, ...restProps}) => {
 
   return (
     <Text
-
       {...restProps}
       style={[
         {
           fontFamily: WEIGHT.regular,
           fontSize: size || SIZE.sm,
           color: color || colors.pri,
-          fontWeight:'400',
-          paddingBottom:Platform.OS === "ios" && size? size/3.5:3.5
+          fontWeight: '400',
+          lineHeight:
+            Platform.OS === 'ios' ? (size ? size + 2 : SIZE.sm + 2) : null,
         },
         style,
       ]}></Text>
   );
 };
 
-export default Paragraph
+export default Paragraph;

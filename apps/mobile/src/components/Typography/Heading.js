@@ -26,7 +26,8 @@ const Heading = ({color, size, style, ...restProps}) => {
           fontFamily: WEIGHT.bold,
           fontSize: size || SIZE.xl,
           color: color || colors.heading,
-          paddingBottom:Platform.OS === "ios" && size? size/3.5:3.5
+          lineHeight:
+            Platform.OS === 'ios' ? (size ? size + 2 : SIZE.xl + 2) : null,
         },
         style,
       ]}></Text>
