@@ -1,15 +1,15 @@
-import React, {createRef} from 'react';
-import {Text, View} from 'react-native';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
-import {eClosePendingDialog, eOpenPendingDialog} from '../../utils/Events';
-import {dWidth} from '../../utils';
+import React, { createRef } from 'react';
+import { View } from 'react-native';
+import { DDS } from '../../services/DeviceDetection';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
+import { dWidth } from '../../utils';
+import { db } from '../../utils/DB';
+import { eClosePendingDialog, eOpenPendingDialog } from '../../utils/Events';
+import { SIZE } from '../../utils/SizeUtils';
 import ActionSheet from '../ActionSheet';
 import Seperator from '../Seperator';
-import {SIZE, WEIGHT} from '../../utils/SizeUtils';
-import {db} from '../../utils/DB';
-import {DDS} from '../../services/DeviceDetection';
-import Paragraph from '../Typography/Paragraph';
 import Heading from '../Typography/Heading';
+import Paragraph from '../Typography/Paragraph';
 
 const actionSheet = createRef();
 class PendingDialog extends React.Component {
@@ -36,12 +36,8 @@ class PendingDialog extends React.Component {
     });
   }
   async componentDidMount() {
-    eSubscribeEvent(eOpenPendingDialog, this.open.bind(this));
-    eSubscribeEvent(eClosePendingDialog, this.close.bind(this));
-    let u = await db.user.get();
-    this.setState({
-      user: u && u.Id ? u : null,
-    });
+      eSubscribeEvent(eOpenPendingDialog, this.open.bind(this));
+      eSubscribeEvent(eClosePendingDialog, this.close.bind(this));  
   }
 
   componentWillUnmount() {
