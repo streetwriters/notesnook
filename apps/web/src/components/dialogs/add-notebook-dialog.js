@@ -14,7 +14,7 @@ class AddNotebookDialog extends React.Component {
   id = undefined;
   deletedTopics = [];
   state = {
-    topics: [],
+    topics: [{ title: "General" }],
     isEditting: false,
     editIndex: -1,
   };
@@ -119,11 +119,23 @@ class AddNotebookDialog extends React.Component {
         negativeButton={{ text: "Cancel", onClick: props.onClose }}
       >
         <Flex flexDirection="column" sx={{ overflowY: "auto" }}>
-          <Field autoFocus required label="Title" name="title" id="title" />
           <Field
+            defaultValue={this.title}
+            data-test-id="dialog-nb-name"
+            autoFocus
+            required
+            label="Title"
+            name="title"
+            id="title"
+            onChange={(e) => (this.title = e.target.value)}
+          />
+          <Field
+            data-test-id="dialog-nb-description"
             label="Description"
             name="description"
             id="description"
+            onChange={(e) => (this.description = e.target.value)}
+            defaultValue={this.description}
             helpText="Optional"
             sx={{ mt: 1 }}
           />

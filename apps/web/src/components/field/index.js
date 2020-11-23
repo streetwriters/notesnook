@@ -18,6 +18,7 @@ function Field(props) {
     onKeyUp,
     onChange,
     inputRef,
+    defaultValue,
   } = props;
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
@@ -40,6 +41,8 @@ function Field(props) {
       )}
       <Flex mt={1} sx={{ position: "relative" }}>
         <Input
+          data-test-id={props["data-test-id"]}
+          defaultValue={defaultValue}
           ref={inputRef}
           autoFocus={autoFocus}
           required={required}
