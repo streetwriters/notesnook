@@ -184,7 +184,10 @@ function Note(props) {
                 data-test-id={`note-${index}-colors-${item}`}
               />
             ))} */}
-            <TimeAgo datetime={note.dateCreated} />
+            <TimeAgo
+              style={{ fontSize: theme.fontSizes["subBody"] }}
+              datetime={note.dateCreated}
+            />
             {note.locked && (
               <Icon.Lock
                 size={13}
