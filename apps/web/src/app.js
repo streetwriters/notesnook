@@ -57,13 +57,14 @@ function App() {
 
   useEffect(() => {
     EV.subscribe("user:checkStatus", async (type) => {
-      const subStatus = userstore.get().user?.subscription?.status;
-      if (subStatus && subStatus >= 1 && subStatus <= 3) {
-        return { type, result: true };
-      } else {
-        await showBuyDialog();
-        return { type, result: false };
-      }
+      // const subStatus = userstore.get().user?.subscription?.status;
+      // if (subStatus && subStatus >= 1 && subStatus <= 3) {
+      //   return { type, result: true };
+      // } else {
+      //   await showBuyDialog();
+      //   return { type, result: false };
+      // }
+      return { type, result: true };
     });
   }, []);
 

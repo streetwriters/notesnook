@@ -14,11 +14,13 @@ function Dialog(props) {
       isOpen={props.isOpen || false}
       onRequestClose={props.onClose}
       shouldCloseOnEsc
-      shouldCloseOnOverlayClick
+      shouldReturnFocusAfterClose
+      shouldFocusAfterRender
       onAfterOpen={(e) => {
         // we need this work around because ReactModal content spreads over the overlay
         const child = e.contentEl.firstElementChild;
         e.contentEl.onclick = function (e) {
+          if (!e.screenX && !e.screenY) return;
           if (
             e.x < child.offsetLeft ||
             e.x > child.offsetLeft + child.clientWidth ||
