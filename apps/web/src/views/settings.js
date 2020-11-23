@@ -297,21 +297,24 @@ function Settings(props) {
         Vault
       </Text>
 
-      {!isVaultCreated && (
-        <Button variant="list" onClick={Vault.createVault}>
-          <TextWithTip
-            text="Create vault"
-            tip="Create a password-encrypted vault for your notes"
-          />
-        </Button>
-      )}
-
-      {isVaultCreated && (
+      {isVaultCreated ? (
         <>
           <Button variant="list" onClick={Vault.changeVaultPassword}>
             <TextWithTip text="Change vault password" />
           </Button>
         </>
+      ) : (
+        <Button
+          variant="list"
+          onClick={async () => {
+            setIsVaultCreated(await Vault.createVault());
+          }}
+        >
+          <TextWithTip
+            text="Create vault"
+            tip="Create a password-encrypted vault for your notes"
+          />
+        </Button>
       )}
 
       <Text

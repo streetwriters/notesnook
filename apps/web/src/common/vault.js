@@ -6,7 +6,7 @@ class Vault {
   static createVault() {
     return showPasswordDialog("create_vault", async ({ password }) => {
       await db.vault.create(password);
-      await showToast("success", "Vault created.");
+      showToast("success", "Vault created.");
       return true;
     });
   }
