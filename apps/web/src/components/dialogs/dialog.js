@@ -152,7 +152,7 @@ export function showDialog(dialog) {
         if (!getHashParam("type")) perform(false);
       }
 
-      setHashParam({ type: "dialog" });
+      setHashParam({ type: "dialog" }, true, true, true);
 
       const PropDialog = dialog(perform);
       ReactDOM.render(<ThemeProvider>{PropDialog}</ThemeProvider>, root);

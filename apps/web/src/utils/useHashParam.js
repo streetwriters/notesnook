@@ -13,10 +13,15 @@ const getHashParam = (key) => {
   return searchParams.get(key);
 };
 
-const setHashParam = (obj, notify = true) => {
-  //const [prefix, searchParams] = getHashSearchParams();
-  const searchParams = new URLSearchParams();
-  const prefix = "";
+const setHashParam = (
+  obj,
+  notify = true,
+  append = false,
+  forcePush = false
+) => {
+  const [prefix, searchParams] = append
+    ? getHashSearchParams()
+    : ["", new URLSearchParams()];
 
   for (let key in obj) {
     let value = obj[key];
@@ -26,7 +31,7 @@ const setHashParam = (obj, notify = true) => {
   const search = searchParams.toString();
   let hash = search ? `${prefix}?${search}` : prefix;
   if (window.history.replaceState) {
-    if (isMobile()) {
+    if (isMobile() || forcePush) {
       window.history.pushState(null, null, `#${hash}`);
     } else {
       window.history.replaceState(null, null, `#${hash}`);
