@@ -1,22 +1,21 @@
-import React, { useEffect } from 'react';
-import { Text, View } from 'react-native';
-import { useTracked } from '../../provider';
-import { Actions } from '../../provider/Actions';
-import { eSendEvent } from '../../services/EventManager';
-import { refreshNotesPage } from '../../utils/Events';
+import React, {useEffect} from 'react';
+import {Text, View} from 'react-native';
+import {useTracked} from '../../provider';
+import {Actions} from '../../provider/Actions';
+import {eSendEvent} from '../../services/EventManager';
+import {refreshNotesPage} from '../../utils/Events';
 import NavigationService from '../../services/Navigation';
-import { PressableButton } from '../PressableButton';
-import {COLORS_NOTE} from "../../utils/Colors";
-import {SIZE, WEIGHT} from "../../utils/SizeUtils";
+import {PressableButton} from '../PressableButton';
+import {COLORS_NOTE} from '../../utils/Colors';
+import {SIZE, WEIGHT} from '../../utils/SizeUtils';
 import Paragraph from '../Typography/Paragraph';
-import { sideMenuRef } from '../../utils/Refs';
+import {sideMenuRef} from '../../utils/Refs';
 
 export const ColorSection = ({noTextMode}) => {
   const [state, dispatch] = useTracked();
   const {colors, colorNotes, currentScreen} = state;
 
   useEffect(() => {
-  
     dispatch({type: Actions.TAGS});
   }, []);
 
@@ -25,7 +24,7 @@ export const ColorSection = ({noTextMode}) => {
       type: 'color',
       title: item.title,
       color: item,
-      menu:true
+      menu: true,
     };
     dispatch({
       type: Actions.HEADER_VERTICAL_MENU,
@@ -46,8 +45,8 @@ export const ColorSection = ({noTextMode}) => {
 
     NavigationService.navigate('NotesPage', params);
     eSendEvent(refreshNotesPage, params);
-    NavigationService.closeDrawer()
-  }
+    NavigationService.closeDrawer();
+  };
 
   return (
     <View
@@ -102,17 +101,9 @@ export const ColorSection = ({noTextMode}) => {
                 alignItems: 'center',
                 width: '85%',
               }}>
-              <Paragraph
-              color={colors.heading}
-                style={{
-                  fontFamily: WEIGHT.regular,
-                  fontSize: SIZE.sm,
-                  color: colors.heading,
-                }}>
+              <Paragraph color={colors.heading} size={SIZE.md}>
                 {item.title.slice(0, 1).toUpperCase() + item.title.slice(1)}
               </Paragraph>
-
-        
             </View>
           )}
         </PressableButton>
