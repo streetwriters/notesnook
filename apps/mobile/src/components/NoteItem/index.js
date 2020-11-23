@@ -106,14 +106,24 @@ export default class NoteItem extends React.Component {
                 style={{
                   paddingVertical: 1.5,
                   marginBottom: 2.5,
+                  flexDirection: 'row',
+                  alignItems: 'center',
                 }}>
-                <Paragraph
+                <Icon
+                  name="book-outline"
+                  color={colors.accent}
+                  size={SIZE.xs}
+                  style={{
+                    marginRight: 2.5,
+                  }}
+                />
+                <Heading
                   size={SIZE.xs}
                   color={
-                    item.colors[0] ? COLORS_NOTE[item.colors[0]] : colors.pri
+                    item.colors[0] ? COLORS_NOTE[item.colors[0]] : colors.accent
                   }>
                   {db.notebooks.notebook(item.notebook.id).title}
-                </Paragraph>
+                </Heading>
               </TouchableOpacity>
             </View>
           )}
