@@ -148,7 +148,12 @@ function Note(props) {
             justifyContent="center"
           >
             <Icon.Notebook size={12} color={color ? color : "primary"} />
-            <Text variant="subBody" fontWeight="600" ml={"3px"}>
+            <Text
+              variant="subBody"
+              color={color ? color : "primary"}
+              fontWeight="600"
+              ml={"3px"}
+            >
               {notebook.title}
             </Text>
           </Flex>

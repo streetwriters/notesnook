@@ -3,12 +3,12 @@ import MDIIcon from "@mdi/react";
 import * as Icons from "@mdi/js";
 import { useTheme } from "emotion-theming";
 import Animated from "../animated";
-import useMobile from "../../utils/use-mobile";
+//import useMobile from "../../utils/use-mobile";
 
 function Icon({ name, size = 24, color = "icon", stroke, rotate }) {
   const theme = useTheme();
-  const isMobile = useMobile();
-  size += isMobile ? 4 : 0;
+  // const isMobile = useMobile();
+  //size += isMobile ? 4 : 0;
 
   return (
     <MDIIcon
