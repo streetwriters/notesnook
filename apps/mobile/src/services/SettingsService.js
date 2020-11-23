@@ -51,8 +51,8 @@ const setTheme = async () => {
 
 async function set(name, value) {
   settings[name] = value;
-  await MMKV.setStringAsync('settings', JSON.stringify(s));
-  updateEvent({type: Actions.SETTINGS, settings: s});
+  await MMKV.setStringAsync('settings', JSON.stringify(settings));
+  updateEvent({type: Actions.SETTINGS, settings: settings});
 }
 
 function get() {
