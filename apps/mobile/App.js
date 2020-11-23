@@ -7,22 +7,18 @@ import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {useTracked} from './src/provider';
 import {Actions} from './src/provider/Actions';
 import {
-  eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
   ToastEvent,
 } from './src/services/EventManager';
-import IntentService from './src/services/IntentService';
 import {setLoginMessage} from './src/services/Message';
-import Navigation from './src/services/Navigation';
 import {editing} from './src/utils';
 import {COLOR_SCHEME} from './src/utils/Colors';
 import {db} from './src/utils/DB';
-import {eDispatchAction, eOnLoadNote, eStartSyncer} from './src/utils/Events';
+import {eDispatchAction, eStartSyncer} from './src/utils/Events';
 import {MMKV} from './src/utils/mmkv';
-import {tabBarRef} from './src/utils/Refs';
-import { sleep } from './src/utils/TimeUtils';
-import {getNote, setIntentNote} from './src/views/Editor/Functions';
+import {sleep} from './src/utils/TimeUtils';
+import {getNote} from './src/views/Editor/Functions';
 
 let AppRootView = require('./initializer.intent').IntentView;
 let SettingsService = null;
@@ -48,7 +44,7 @@ const onAppStateChanged = async (state) => {
       await MMKV.removeItem('appState');
     }
   } else {
-    if (editing.currentlyEditing) {
+    if (editing.currentlyEditing && appInit) {
       let state = JSON.stringify({
         editing: editing.currentlyEditing,
         note: getNote(),
@@ -128,11 +124,11 @@ const App = () => {
     setInit(true);
     backupData().then((r) => r);
     sleep(300).then(() => (appInit = true));
-    Sentry = require('@sentry/react-native');
-    Sentry.init({
-      dsn:
-        'https://317a5c31caf64d1e9b27abf15eb1a554@o477952.ingest.sentry.io/5519681',
-    });
+    //Sentry = require('@sentry/react-native');
+   // Sentry.init({
+   //   dsn:
+   //     'https://317a5c31caf64d1e9b27abf15eb1a554@o477952.ingest.sentry.io/5519681',
+   // });
   };
 
   const getUser = async () => {
@@ -155,15 +151,14 @@ const App = () => {
 
   useEffect(() => {
     SettingsService = require('./src/services/SettingsService').default;
-    SettingsService.init().finally(() => {
-      db.init().finally(runAfterInit);
-    });
+    SettingsService.init();
+    db.init().finally(runAfterInit);
   }, []);
 
   const runAfterInit = () => {
     setIntent(true);
     dispatch({type: Actions.ALL});
-    getUser().catch((e) => console.log);
+    getUser().catch((e) => e);
   };
 
   async function backupData() {
@@ -180,8 +175,8 @@ const App = () => {
 
   return (
     <SafeAreaProvider>
-      {intent && <AppRootView />}
-      {init && !intent && <AppRootView />}
+      {intent ? <AppRootView /> : null}
+      {init && !intent ? <AppRootView /> : null}
     </SafeAreaProvider>
   );
 };
