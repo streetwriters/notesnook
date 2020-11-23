@@ -18,6 +18,11 @@ const BUTTON_TYPES = {
     text: 'icon',
     selected: 'nav',
   },
+  grayBg: {
+    primary: 'nav',
+    text: 'icon',
+    selected: 'nav',
+  },
   accent: {
     primary: 'accent',
     text: 'light',
@@ -87,7 +92,9 @@ export const Button = ({
         <Heading
           color={colors[BUTTON_TYPES[type].text]}
           size={fontSize}
-          style={styles.buttonText}>
+          style={{
+            marginLeft: icon || loading ? 5 : 0,
+          }}>
           {title}
         </Heading>
       )}
@@ -103,8 +110,5 @@ const styles = StyleSheet.create({
   activityContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  buttonText: {
-    marginLeft: 5,
   },
 });

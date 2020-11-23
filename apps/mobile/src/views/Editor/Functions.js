@@ -388,12 +388,15 @@ export async function onWebViewLoad(premium, colors, event) {
 }
 async function loadEditorState() {
   if (sideMenuRef.current !== null) {
+
     if (intent) {
+      console.log('clearing here');
       MMKV.removeItem('appState');
       return;
     }
-    console.log('checking for app state');
+
     let appState = await MMKV.getItem('appState');
+    console.log('checking for app state',appState);
     if (appState) {
       appState = JSON.parse(appState);
       if (appState.editing && appState.note.id !== null) {

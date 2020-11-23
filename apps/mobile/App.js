@@ -21,11 +21,13 @@ import {db} from './src/utils/DB';
 import {eDispatchAction, eOnLoadNote, eStartSyncer} from './src/utils/Events';
 import {MMKV} from './src/utils/mmkv';
 import {tabBarRef} from './src/utils/Refs';
+import { sleep } from './src/utils/TimeUtils';
 import {getNote, setIntentNote} from './src/views/Editor/Functions';
 
 let AppRootView = require('./initializer.intent').IntentView;
 let SettingsService = null;
 let Sentry = null;
+let appInit = false;
 
 const onAppStateChanged = async (state) => {
   console.log('app state', state);
@@ -41,16 +43,18 @@ const onAppStateChanged = async (state) => {
     if (SettingsService.get().privacyScreen) {
       enabled(false);
     }
-    MMKV.removeItem('appState');
+    console.log('clearing state', await MMKV.getItem('appState'));
+    if (appInit) {
+      await MMKV.removeItem('appState');
+    }
   } else {
     if (editing.currentlyEditing) {
-      MMKV.setItem(
-        'appState',
-        JSON.stringify({
-          editing: editing.currentlyEditing,
-          note: getNote(),
-        }),
-      );
+      let state = JSON.stringify({
+        editing: editing.currentlyEditing,
+        note: getNote(),
+      });
+      console.log('putting items in state', state);
+      await MMKV.setItem('appState', state);
     }
 
     if (SettingsService.get().privacyScreen) {
@@ -123,6 +127,7 @@ const App = () => {
     AppRootView = require('./initializer.root').RootView;
     setInit(true);
     backupData().then((r) => r);
+    sleep(300).then(() => (appInit = true));
     Sentry = require('@sentry/react-native');
     Sentry.init({
       dsn:

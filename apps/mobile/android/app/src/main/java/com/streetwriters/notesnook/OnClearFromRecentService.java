@@ -1,11 +1,9 @@
 package com.streetwriters.notesnook;
-
-        import android.app.Service;
-        import android.content.Intent;
-        import android.os.IBinder;
-        import android.util.Log;
-
-        import com.tencent.mmkv.MMKV;
+import android.app.Service;
+import android.content.Intent;
+import android.os.IBinder;
+import android.util.Log;
+import com.tencent.mmkv.MMKV;
 
 public class OnClearFromRecentService extends Service {
 

@@ -15,14 +15,17 @@ const DialogButtons = ({
         onPress={onPressNegative}
         fontSize={SIZE.md}
         type="gray"
-        width="30%"
+        width="25%"
         title={negativeTitle}
       />
       {onPressPositive && (
         <Button
           onPress={onPressPositive}
           fontSize={SIZE.md}
-          width="30%"
+          style={{
+            marginLeft:10 
+          }}
+          width="25%"
           type="transparent"
           title={positiveTitle}
         />

@@ -6,23 +6,21 @@ import {
   Platform,
   SafeAreaView,
   StyleSheet,
-  Text,
   TouchableOpacity,
   View,
 } from 'react-native';
 import {FlatList, TextInput} from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {Actions} from '../../provider/Actions';
-import {Button} from '../Button';
-import {updateEvent} from '../DialogManager/recievers';
-import {Toast} from '../Toast';
-import {ToastEvent} from '../../services/EventManager';
-import {ph, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
-import {db} from '../../utils/DB';
 import {DDS} from '../../services/DeviceDetection';
+import {ToastEvent} from '../../services/EventManager';
+import {db} from '../../utils/DB';
+import {ph, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
 import {ActionIcon} from '../ActionIcon';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogHeader from '../Dialog/dialog-header';
+import {updateEvent} from '../DialogManager/recievers';
+import {Toast} from '../Toast';
 import Paragraph from '../Typography/Paragraph';
 
 let refs = [];
@@ -104,7 +102,7 @@ export class AddNotebookDialog extends React.Component {
     let edit = this.props.toEdit;
     if (edit && edit.id) {
       let topicToDelete = edit.topics[index + 1];
-   
+
       if (topicToDelete) {
         this.topicsToDelete.push(topicToDelete.id);
       }
@@ -279,7 +277,7 @@ export class AddNotebookDialog extends React.Component {
                 paragraph={
                   toEdit && toEdit.dateCreated
                     ? 'Edit your notebook'
-                    : 'Add a new notebook to your notebooks.'
+                    : 'Add a new notebook'
                 }
               />
 
@@ -417,7 +415,6 @@ export class AddNotebookDialog extends React.Component {
                   <TopicItem
                     item={item}
                     onPress={(item, index) => {
-                     
                       this.prevIndex = index;
                       this.prevItem = item;
                       this.topicInputRef.setNativeProps({
@@ -533,9 +530,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   container: {
-    width: DDS.isTab ? 500 : '80%',
-    height: DDS.isTab ? 600 : null,
-    maxHeight: DDS.isTab ? 600 :"90%",
+    width: DDS.isTab ? 500 : '100%',
+    height: DDS.isTab ? 600 : '100%',
+    maxHeight: DDS.isTab ? 600 : '100%',
     borderRadius: 5,
     paddingHorizontal: 12,
     paddingVertical: pv,

@@ -185,7 +185,7 @@ class PremiumDialog extends React.Component {
                   />
 
                   <Heading
-                    SIZE={SIZE.md}
+                    size={SIZE.md}
                     style={{
                       marginLeft: 10,
                       maxWidth: '85%',
