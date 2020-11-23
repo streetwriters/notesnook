@@ -12,11 +12,6 @@ if (!tfun) {
 export default class Notebooks extends Collection {
   async add(notebookArg) {
     if (!notebookArg) throw new Error("Notebook cannot be undefined or null.");
-    if (
-      this.all.length >= 3 &&
-      !(await sendCheckUserStatusEvent("notebook:add"))
-    )
-      return;
 
     if (notebookArg.remote) {
       return await this._collection.addItem(notebookArg);
@@ -25,6 +20,13 @@ export default class Notebooks extends Collection {
     //TODO reliably and efficiently check for duplicates.
     const id = notebookArg.id || getId();
     let oldNotebook = this._collection.getItem(id);
+
+    if (
+      !oldNotebook &&
+      this.all.length >= 3 &&
+      !(await sendCheckUserStatusEvent("notebook:add"))
+    )
+      return;
 
     if (!oldNotebook && !notebookArg.title)
       throw new Error("Notebook must contain at least a title.");
