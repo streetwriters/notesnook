@@ -3,7 +3,7 @@ import {Linking, Platform} from 'react-native';
 import {updateEvent} from '../../components/DialogManager/recievers';
 import {Actions} from '../../provider/Actions';
 import {eSendEvent, sendNoteEditedEvent} from '../../services/EventManager';
-import {refreshNotesPage} from '../../utils/Events';
+import {eOnLoadNote, refreshNotesPage} from '../../utils/Events';
 import {editing} from '../../utils';
 import {sleep, timeConverter} from '../../utils/TimeUtils';
 import {normalize} from '../../utils/SizeUtils';
@@ -11,6 +11,11 @@ import {db} from '../../utils/DB';
 import {COLORS_NOTE, COLOR_SCHEME} from '../../utils/Colors';
 import {hexToRGBA} from '../../utils/ColorUtils';
 import {DDS} from '../../services/DeviceDetection';
+import {sideMenuRef, tabBarRef} from '../../utils/Refs';
+import {MMKV} from '../../utils/mmkv';
+import IntentService from '../../services/IntentService';
+import Navigation from '../../services/Navigation';
+import SplashScreen from 'react-native-splash-screen';
 
 export const EditorWebView = createRef();
 
@@ -26,9 +31,6 @@ export const injectedJS = ` setTimeout(() => {
    }
 },100);   
       `;
-
-  
-  
 
 let noteEdited = false;
 let note = null;
@@ -78,7 +80,6 @@ export function clearTimer() {
     currentEditingTimer = null;
   }
 }
-
 
 export const INJECTED_JAVASCRIPT = (premium) =>
   premium
@@ -151,13 +152,12 @@ function clearNote() {
 let currentEditingTimer = null;
 
 export async function loadNote(item) {
- 
   editing.currentlyEditing = true;
   post('blur');
   if (item && item.type === 'new') {
+    intent = false;
     await clearEditor();
     clearNote();
-    intent = false;
     noteEdited = false;
     id = null;
     if (Platform.OS === 'android') {
@@ -188,6 +188,15 @@ export async function loadNote(item) {
       updateEvent({type: Actions.CURRENT_EDITING_NOTE, id: item.id});
     }, 500);
   }
+}
+
+export function setIntentNote(item) {
+  id = null;
+  intent = true;
+  content = {
+    data: item.data,
+    type: 'delta',
+  };
 }
 
 export const _onMessage = async (evt) => {
@@ -226,6 +235,7 @@ export const _onMessage = async (evt) => {
 function onNoteChange() {
   clearTimeout(timer);
   timer = null;
+
   noteEdited = true;
   timer = setTimeout(() => {
     if (noteEdited) {
@@ -248,6 +258,7 @@ export async function clearEditor() {
   });
   saveCounter = 0;
   clearNote();
+  intent = false;
 }
 
 function checkIfContentIsSavable() {
@@ -363,27 +374,61 @@ export async function saveNote(canPost = true) {
   }
 }
 
-export async function onWebViewLoad( premium, colors) {
+export async function onWebViewLoad(premium, colors, event) {
   EditorWebView.current?.injectJavaScript(INJECTED_JAVASCRIPT(premium, false));
   if (!checkNote()) {
     post('blur');
     Platform.OS === 'android' ? EditorWebView.current?.requestFocus() : null;
   }
   post('blur');
-  await sleep(1000);
   setColors(colors);
+  await loadEditorState();
   await loadNoteInEditor();
   webviewInit = true;
 }
+async function loadEditorState() {
+  if (sideMenuRef.current !== null) {
+    if (intent) {
+      MMKV.removeItem('appState');
+      return;
+    }
+    console.log('checking for app state');
+    let appState = await MMKV.getItem('appState');
+    if (appState) {
+      appState = JSON.parse(appState);
+      if (appState.editing && appState.note.id !== null) {
+        console.log('loading in editor');
+        eSendEvent(eOnLoadNote, appState.note);
+        tabBarRef.current?.goToPage(1);
+        MMKV.removeItem('appState');
+      }
+    }
+  } else {
+    IntentService.check((event) => {
+      if (event) {
+        intent = true;
+        eSendEvent(eOnLoadNote, event);
+        Navigation.closeDrawer();
+        tabBarRef.current?.goToPage(1);
+        SplashScreen.hide();
+      } else {
+        eSendEvent('nointent');
+      }
+    });
+  }
+}
+
+export let isFromIntent = false;
 
 const loadNoteInEditor = async () => {
   saveCounter = 0;
   if (intent) {
     post('delta', content.data);
+    intent = true;
     await saveNote();
-    intent = false;
   } else if (note?.id) {
     post('title', title);
+    intent = false;
     post('dateEdited', timeConverter(note.dateEdited));
     setColors();
     post('delta', content.data);

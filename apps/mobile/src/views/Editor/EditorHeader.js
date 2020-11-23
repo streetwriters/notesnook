@@ -1,40 +1,44 @@
-import React, { useEffect } from 'react';
-import { BackHandler, Keyboard, Platform, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ActionIcon } from '../../components/ActionIcon';
+import React, {useEffect} from 'react';
+import {BackHandler, Keyboard, Platform, View} from 'react-native';
+import RNExitApp from 'react-native-exit-app';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {ActionIcon} from '../../components/ActionIcon';
 import {
   ActionSheetEvent,
-  simpleDialogEvent
+  simpleDialogEvent,
 } from '../../components/DialogManager/recievers';
-import { TEMPLATE_EXIT_FULLSCREEN } from '../../components/DialogManager/Templates';
-import { useTracked } from '../../provider';
-import { DDS } from '../../services/DeviceDetection';
+import {TEMPLATE_EXIT_FULLSCREEN} from '../../components/DialogManager/Templates';
+import {useTracked} from '../../provider';
+import {DDS} from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-  ToastEvent
+  ToastEvent,
 } from '../../services/EventManager';
-import { editing } from '../../utils';
-import { exitEditorAnimation } from '../../utils/Animations';
+import {editing} from '../../utils';
+import {exitEditorAnimation} from '../../utils/Animations';
 import {
   eClearEditor,
   eCloseFullscreenEditor,
   eOnLoadNote,
-  eOpenFullscreenEditor
+  eOpenFullscreenEditor,
 } from '../../utils/Events';
-import { tabBarRef } from '../../utils/Refs';
-import { EditorTitle } from './EditorTitle';
+import {sideMenuRef, tabBarRef} from '../../utils/Refs';
+import {EditorTitle} from './EditorTitle';
 import {
   checkNote,
   clearEditor,
   clearTimer,
   EditorWebView,
+  getIntent,
   getNote,
+  isFromIntent,
   isNotedEdited,
   loadNote,
   post,
-  setColors
+  saveNote,
+  setColors,
 } from './Functions';
 import HistoryComponent from './HistoryComponent';
 
@@ -78,7 +82,6 @@ const EditorHeader = () => {
   }, [fullscreen]);
 
   const load = async (item) => {
-
     await loadNote(item);
     Keyboard.addListener('keyboardDidShow', () => {
       post('keyboard');
@@ -106,32 +109,35 @@ const EditorHeader = () => {
     if (editing.currentlyEditing) {
       await _onBackPress();
       return true;
-      /* 
-      if (tapCount > 0) {
-    
-      } else {
-        tapCount = 1;
-        setTimeout(() => {
-          tapCount = 0;
-        }, 3000);
-        ToastEvent.show('Press back again to exit editor', 'success');
-        return true;
-      } */
     }
   };
 
   const _onBackPress = async () => {
+    if (getIntent() && sideMenuRef.current === null) {
+      if (tapCount > 0) {
+        console.log('called here');
+        tapCount = 0;
+        RNExitApp.exitApp();
+      } else {
+        await saveNote();
+        tapCount = 1;
+        console.log('tapped once');
+        setTimeout(() => {
+          tapCount = 0;
+        }, 3000);
+        ToastEvent.show('Note saved, press back again to exit app.', 'success');
+      }
+      return true;
+    }
     editing.currentlyEditing = false;
     if (DDS.isLargeTablet()) {
       if (fullscreen) {
         eSendEvent(eCloseFullscreenEditor);
       }
     } else {
-      /*  exitEditorAnimation(); */
       if (DDS.isPhone || DDS.isSmallTab) {
         tabBarRef.current?.goToPage(0);
       }
-
       eSendEvent('historyEvent', {
         undo: 0,
         redo: 0,
@@ -167,44 +173,19 @@ const EditorHeader = () => {
           marginTop: Platform.OS === 'ios' ? 0 : insets.top,
           zIndex: 10,
         }}>
-        {!fullscreen ? (
-          DDS.isLargeTablet() ? (
-            <View />
-          ) : null
-        ) : (
+        {DDS.isLargeTablet() && !fullscreen ? null : (
           <ActionIcon
             name="arrow-left"
             color={colors.heading}
             onPress={_onBackPress}
             bottom={5}
-            iconStyle={{
-              textAlignVertical: 'center',
-            }}
             customStyle={{
               marginLeft: -5,
-              position: 'absolute',
-              marginTop: Platform.OS === 'ios' ? 0 : insets.top + 5,
-              zIndex: 11,
-              left: 0,
-              justifyContent: 'center',
-              alignItems: 'center',
             }}
           />
         )}
 
-        {DDS.isLargeTablet() ? (
-          <EditorTitle />
-        ) : (
-          <ActionIcon
-            name="arrow-left"
-            color={colors.heading}
-            onPress={_onBackPress}
-            bottom={5}
-            customStyle={{
-              marginLeft: -5,
-            }}
-          />
-        )}
+        {DDS.isLargeTablet() && <EditorTitle />}
 
         <View
           style={{
