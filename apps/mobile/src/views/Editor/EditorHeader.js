@@ -39,6 +39,7 @@ import {
   post,
   saveNote,
   setColors,
+  setIntent,
 } from './Functions';
 import HistoryComponent from './HistoryComponent';
 
@@ -112,16 +113,19 @@ const EditorHeader = () => {
     }
   };
 
+  
+
   const _onBackPress = async () => {
     if (getIntent() && sideMenuRef.current === null) {
       if (tapCount > 0) {
-        console.log('called here');
         tapCount = 0;
+        setIntent(false);
+        editing.currentlyEditing = false;
+        await clearEditor();
         RNExitApp.exitApp();
       } else {
         await saveNote();
         tapCount = 1;
-        console.log('tapped once');
         setTimeout(() => {
           tapCount = 0;
         }, 3000);
