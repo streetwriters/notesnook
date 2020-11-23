@@ -22,6 +22,7 @@ import { SUBSCRIPTION_STATUS } from "../../common";
 import Toolbar from "./toolbar";
 import Footer from "./footer";
 import ObservableArray from "../../utils/observablearray";
+import Banner from "../banner";
 
 function Editor() {
   const sessionState = useStore((store) => store.session.state);
@@ -104,7 +105,6 @@ function Editor() {
   return (
     <Flex
       flexDirection="column"
-      width={"100%"}
       sx={{
         position: "relative",
         alignSelf: isFocusMode ? "center" : "stretch",
@@ -112,6 +112,7 @@ function Editor() {
       }}
       flex="1 1 auto"
     >
+      {isMobile && <Banner />}
       <Toolbar quill={quillRef.current?.quill} />
       <Flex
         variant="columnFill"

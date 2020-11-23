@@ -7,29 +7,32 @@ import MarkdownShortcuts from "./modules/markdown";
 import MagicUrl from "quill-magic-url";
 import { Text } from "rebass";
 import QuillFocus from "./modules/focus";
+import { isMobile } from "../../utils/dimensions";
 
 Quill.register("modules/markdownShortcuts", MarkdownShortcuts);
 Quill.register("modules/magicUrl", MagicUrl);
 Quill.register("modules/focus", QuillFocus);
 
-const quillModules = (_isSimple, isFocusMode) => ({
-  toolbar: [
-    ["bold", "italic", "underline", "strike", "blockquote"],
-    [{ header: "2" }, { header: "3" }, { header: [false, 4, 5, 6] }],
-    [
-      { align: "" },
-      { align: "center" },
-      { align: "right" },
-      { align: "justify" },
-    ],
-    [{ list: "ordered" }, { list: "bullet" }, { list: "check" }],
-    [{ indent: "-1" }, { indent: "+1" }],
-    [{ size: ["small", false, "large", "huge"] }],
-    ["code-block", { script: "sub" }, { script: "super" }],
-    [{ color: [] }, { background: [] }],
-    ["link", "image", "video"],
-    [{ direction: "rtl" }, "clean"],
-  ],
+const quillModules = (isSimple, isFocusMode, isMobile) => ({
+  toolbar: isMobile
+    ? ["bold", "italic", "underline"]
+    : [
+        ["bold", "italic", "underline", "strike", "blockquote"],
+        [{ header: "2" }, { header: "3" }, { header: [false, 4, 5, 6] }],
+        [
+          { align: "" },
+          { align: "center" },
+          { align: "right" },
+          { align: "justify" },
+        ],
+        [{ list: "ordered" }, { list: "bullet" }, { list: "check" }],
+        [{ indent: "-1" }, { indent: "+1" }],
+        [{ size: ["small", false, "large", "huge"] }],
+        ["code-block", { script: "sub" }, { script: "super" }],
+        [{ color: [] }, { background: [] }],
+        ["link", "image", "video"],
+        [{ direction: "rtl" }, "clean"],
+      ],
   // syntax: true,
   markdownShortcuts: {},
   magicUrl: true,
@@ -89,7 +92,7 @@ export default class ReactQuill extends Component {
       placeholder,
       bounds: container,
       scrollingContainer: scrollContainer,
-      modules: modules || quillModules(isSimple, isFocusMode),
+      modules: modules || quillModules(isSimple, isFocusMode, isMobile()),
       theme: "snow",
       readOnly,
     });
