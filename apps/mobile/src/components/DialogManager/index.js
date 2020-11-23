@@ -46,7 +46,8 @@ import {DDS} from '../../services/DeviceDetection';
 import ResultDialog from '../ResultDialog';
 import SortDialog from '../SortDialog';
 import JumpToDialog from '../JumpToDialog';
-import {GetPremium,translatePrem} from '../ActionSheetComponent/GetPremium';
+import {GetPremium, translatePrem} from '../ActionSheetComponent/GetPremium';
+import {sleep} from '../../utils/TimeUtils';
 
 export class DialogManager extends Component {
   constructor(props) {
@@ -55,6 +56,7 @@ export class DialogManager extends Component {
     this.opened = false;
     this.state = {
       item: {},
+      actionSheetVisible: false,
       actionSheetData: {
         colors: false,
         tags: false,
@@ -84,6 +86,7 @@ export class DialogManager extends Component {
       {
         actionSheetData: data,
         item: data.item ? data.item : {},
+        actionSheetVisible: true,
       },
       () => {
         this.actionSheet._setModalVisible();
@@ -93,6 +96,11 @@ export class DialogManager extends Component {
 
   _hideActionSheet = () => {
     this.actionSheet._setModalVisible();
+    sleep(200).then(() => {
+      this.setState({
+        actionSheetVisible: false,
+      });
+    });
   };
 
   _showMoveNote = () => {
@@ -230,11 +238,11 @@ export class DialogManager extends Component {
         case 'delete': {
           if (this.state.item.locked) {
             openVault({
-              item:this.state.item,
-              novault:true,
-              locked:true,
-              deleteNote:true,
-            })
+              item: this.state.item,
+              novault: true,
+              locked: true,
+              deleteNote: true,
+            });
           } else {
             this._showSimpleDialog(TEMPLATE_DELETE(this.state.item.type));
           }
@@ -246,28 +254,28 @@ export class DialogManager extends Component {
         }
         case 'novault': {
           openVault({
-            item:this.state.item,
-            novault:false,
-            locked:true,
-            deleteNote:true,
-          })
+            item: this.state.item,
+            novault: false,
+            locked: true,
+            deleteNote: true,
+          });
           break;
         }
         case 'locked': {
           openVault({
-            item:this.state.item,
-            novault:true,
-            locked:true,
-          })
+            item: this.state.item,
+            novault: true,
+            locked: true,
+          });
           break;
         }
         case 'unlock': {
           openVault({
-            item:this.state.item,
-            novault:true,
-            locked:true,
-            permanant:true
-          })
+            item: this.state.item,
+            novault: true,
+            locked: true,
+            permanant: true,
+          });
           break;
         }
         case 'notebook': {
@@ -300,68 +308,71 @@ export class DialogManager extends Component {
     let {actionSheetData, item, simpleDialog} = this.state;
     return (
       <>
-        <ActionSheet
-          ref={(ref) => (this.actionSheet = ref)}
-          containerStyle={{
-            backgroundColor: colors.bg,
-            width: DDS.isTab ? 500 : '100%',
-            alignSelf: 'center',
-            borderRadius: 10,
-            marginBottom: DDS.isTab ? 50 : 0,
-          }}
-          extraScroll={DDS.isTab ? 50 : 0}
-          indicatorColor={
-            Platform.ios
-              ? hexToRGBA(colors.accent + '19')
-              : hexToRGBA(colors.shade)
-          }
-          premium={
-            <GetPremium
-              context="sheet"
-              close={() => this.actionSheet._hideModal()}
-              offset={50}
-            />
-          }
-          keyboardShouldPersistTaps="always"
-          delayActionSheetDraw={true}
-          delayActionSheetDrawTime={10}
-          footerAlwaysVisible={DDS.isTab}
-          footerHeight={DDS.isTab ? 20 : 10}
-          footerStyle={
-            DDS.isTab
-              ? {
-                  borderRadius: 10,
-                  backgroundColor: colors.bg,
-                }
-              : null
-          }
-          initialOffsetFromBottom={1}
-          bounceOnOpen={false}
-          gestureEnabled={true}
-          onClose={() => {
-            translatePrem.setValue(-800)
-            this.onActionSheetHide();
-          }}>
-          <ActionSheetComponent
-            item={item}
-            setWillRefresh={(value) => {
-              this.willRefresh = true;
+        {!this.state.actionSheetVisible ? null : (
+          <ActionSheet
+            ref={(ref) => (this.actionSheet = ref)}
+            containerStyle={{
+              backgroundColor: colors.bg,
+              width: DDS.isTab ? 500 : '100%',
+              alignSelf: 'center',
+              borderRadius: 10,
+              marginBottom: DDS.isTab ? 50 : 0,
             }}
-            hasColors={actionSheetData.colors}
-            hasTags={actionSheetData.colors}
-            overlayColor={
-              colors.night ? 'rgba(225,225,225,0.1)' : 'rgba(0,0,0,0.3)'
+            extraScroll={DDS.isTab ? 50 : 0}
+            indicatorColor={
+              Platform.ios
+                ? hexToRGBA(colors.accent + '19')
+                : hexToRGBA(colors.shade)
             }
-            rowItems={actionSheetData.rowItems}
-            columnItems={actionSheetData.columnItems}
-            close={(value) => {
-              if (value) {
-                this.show = value;
+            premium={
+              <GetPremium
+                context="sheet"
+                close={() => this.actionSheet._hideModal()}
+                offset={50}
+              />
+            }
+            keyboardShouldPersistTaps="always"
+            delayActionSheetDraw={true}
+            delayActionSheetDrawTime={10}
+            footerAlwaysVisible={DDS.isTab}
+            footerHeight={DDS.isTab ? 20 : 10}
+            footerStyle={
+              DDS.isTab
+                ? {
+                    borderRadius: 10,
+                    backgroundColor: colors.bg,
+                  }
+                : null
+            }
+            initialOffsetFromBottom={1}
+            bounceOnOpen={false}
+            gestureEnabled={true}
+            onClose={() => {
+              translatePrem.setValue(-800);
+              this.onActionSheetHide();
+            }}>
+            <ActionSheetComponent
+              item={item}
+              setWillRefresh={(value) => {
+                this.willRefresh = true;
+              }}
+              hasColors={actionSheetData.colors}
+              hasTags={actionSheetData.colors}
+              overlayColor={
+                colors.night ? 'rgba(225,225,225,0.1)' : 'rgba(0,0,0,0.3)'
               }
-              this.actionSheet._setModalVisible();
-            }}
-          />
-        </ActionSheet>
+              rowItems={actionSheetData.rowItems}
+              columnItems={actionSheetData.columnItems}
+              close={(value) => {
+                if (value) {
+                  this.show = value;
+                }
+                this.actionSheet._setModalVisible();
+              }}
+            />
+          </ActionSheet>
+        )}
+
         <Dialog
           ref={(ref) => (this.simpleDialog = ref)}
           item={item}

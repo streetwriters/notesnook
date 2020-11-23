@@ -1,28 +1,21 @@
 import React, {createRef, useEffect, useState} from 'react';
-import {
-  FlatList,
-  Modal,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {FlatList, Modal, TextInput, TouchableOpacity, View} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
+import {DDS} from '../../services/DeviceDetection';
 import {
   eSubscribeEvent,
   eUnSubscribeEvent,
   ToastEvent,
 } from '../../services/EventManager';
-import {eOpenMoveNoteDialog} from '../../utils/Events';
 import {getElevation} from '../../utils';
+import {db} from '../../utils/DB';
+import {eOpenMoveNoteDialog} from '../../utils/Events';
+import {pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
 import {PressableButton} from '../PressableButton';
 import {Toast} from '../Toast';
-import {pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
-import {db} from '../../utils/DB';
-import {DDS} from '../../services/DeviceDetection';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
@@ -80,9 +73,7 @@ const MoveNoteDialog = () => {
     if (!newTopicTitle || newTopicTitle.trim().length === 0) {
       return ToastEvent.show('Title is required', 'error', 'local');
     }
-
     let res = await db.notebooks.notebook(expanded).topics.add(newTopicTitle);
-
     dispatch({type: Actions.NOTEBOOKS});
     dispatch({type: Actions.PINNED});
     topicInput.current?.clear();
@@ -90,12 +81,12 @@ const MoveNoteDialog = () => {
     newTopicTitle = null;
   };
 
-  return (
+  return !visible ? null : (
     <Modal
       animated={true}
       animationType="slide"
       onRequestClose={close}
-      visible={visible}
+      visible={true}
       statusBarTranslucent={true}
       transparent={true}>
       <View

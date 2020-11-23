@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { ScrollView, View } from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {ScrollView, View} from 'react-native';
 import BaseDialog from '../../components/Dialog/base-dialog';
-import { PressableButton } from '../../components/PressableButton';
+import {PressableButton} from '../../components/PressableButton';
 import Seperator from '../../components/Seperator';
-import { useTracked } from '../../provider';
-import { DDS } from '../../services/DeviceDetection';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
-import { getElevation, scrollRef } from '../../utils';
-import { eCloseJumpToDialog, eOpenJumpToDialog } from '../../utils/Events';
-import { SIZE } from '../../utils/SizeUtils';
+import {useTracked} from '../../provider';
+import {DDS} from '../../services/DeviceDetection';
+import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
+import {getElevation, scrollRef} from '../../utils';
+import {eCloseJumpToDialog, eOpenJumpToDialog} from '../../utils/Events';
+import {SIZE} from '../../utils/SizeUtils';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
@@ -83,13 +83,13 @@ const JumpToDialog = () => {
       });
   };
 
-  return (
+  return !visible ? null : (
     <BaseDialog
       onShow={() => {
         loadOffsets();
       }}
       onRequestClose={close}
-      visible={visible}>
+      visible={true}>
       <View
         style={{
           ...getElevation(5),

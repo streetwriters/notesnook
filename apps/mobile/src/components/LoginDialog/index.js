@@ -1,5 +1,5 @@
 import React, {createRef, useEffect, useState} from 'react';
-import {Modal, Text, TouchableOpacity, View} from 'react-native';
+import {Modal, TouchableOpacity, View} from 'react-native';
 import {TextInput} from 'react-native-gesture-handler';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -109,7 +109,6 @@ const LoginDialog = () => {
 
     try {
       let res = await db.user.login(username.toLowerCase(), password);
-   
     } catch (e) {
       setTimeout(() => {
         ToastEvent.show(e.message, 'error', 'local');
@@ -146,7 +145,7 @@ const LoginDialog = () => {
       ToastEvent.show('Passwords do not match', 'error', 'local');
       return false;
     }
-   
+
     if (invalidEmail && invalidPassword && invalidUsername) {
       ToastEvent.show('Signup information is invalid', 'error', 'local');
       return false;
@@ -202,13 +201,13 @@ const LoginDialog = () => {
     }
   };
 
-  return (
+  return !visible ? null : (
     <Modal
       animated={true}
       animationType={DDS.isTab ? 'fade' : 'slide'}
       statusBarTranslucent={true}
       onRequestClose={close}
-      visible={visible}
+      visible={true}
       transparent={true}>
       <View
         style={{

@@ -80,10 +80,10 @@ const RestoreDialog = () => {
     setFiles(files);
   };
 
-  return (
+  return !visible? null : (
     <BaseDialog
       animation="slide"
-      visible={visible}
+      visible={true}
       onShow={checkBackups}
       onRequestClose={close}>
       <View

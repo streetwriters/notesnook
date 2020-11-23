@@ -59,13 +59,13 @@ export class AddTopicDialog extends React.Component {
   render() {
     const {visible, titleFocused} = this.state;
     const {colors, toEdit} = this.props;
-
+    if (!visible) return null;
     return (
       <BaseDialog
         onShow={() => {
           this.titleRef.current?.focus();
         }}
-        visible={visible}
+        visible={true}
         onRequestClose={this.close}>
         <View
           style={{

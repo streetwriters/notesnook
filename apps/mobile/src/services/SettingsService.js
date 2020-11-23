@@ -38,7 +38,8 @@ async function init() {
   sortSettings.sortOrder = settings.sortOrder;
   updateSize();
   updateEvent({type: Actions.SETTINGS, settings: {...settings}});
-  await setTheme();
+  setTheme();
+  return;
 }
 
 const setTheme = async () => {

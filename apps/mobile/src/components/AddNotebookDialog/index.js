@@ -215,21 +215,6 @@ export class AddNotebookDialog extends React.Component {
         topics: prevTopics,
       });
       this.currentInputValue = null;
-      /*   if (prevTopics[this.prevIndex + 1] && forward) {
-                this.prevIndex = this.prevIndex + 1;
-                this.prevItem = prevTopics[this.prevIndex];
-                this.currentInputValue = this.prevItem;
-                this.topicInputRef.setNativeProps({
-                    text: null,
-                });
-                this.topicInputRef.setNativeProps({
-                    text: prevTopics[this.prevIndex],
-                });
-                this.setState({
-                    editTopic:true
-                })
-            } else {} */
-
       if (this.state.editTopic) {
         this.topicInputRef.blur();
         Keyboard.dismiss();
@@ -261,9 +246,10 @@ export class AddNotebookDialog extends React.Component {
       visible,
       topicInputFocused,
     } = this.state;
+    if (!visible) return null;
     return (
       <Modal
-        visible={visible}
+        visible={true}
         transparent={true}
         animated
         animationType={DDS.isTab ? 'fade' : 'slide'}

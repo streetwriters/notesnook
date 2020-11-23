@@ -322,13 +322,14 @@ export class VaultDialog extends Component {
       biometricUnlock,
     } = this.state;
 
+    if (!visible) return null;
     return (
       <BaseDialog
         onShow={() => {
           passInputRef.current?.focus();
         }}
         onRequestClose={this.close}
-        visible={visible}>
+        visible={true}>
         <View
           style={{
             ...getElevation(5),
@@ -495,8 +496,9 @@ export class VaultDialog extends Component {
             </View>
           ) : null}
 
-          {this.state.isBiometryAvailable && !this.state.fingerprintAccess &&
-          (!this.state.biometricUnlock || !novault)  ? (
+          {this.state.isBiometryAvailable &&
+          !this.state.fingerprintAccess &&
+          (!this.state.biometricUnlock || !novault) ? (
             <TouchableOpacity
               onPress={() => {
                 this.setState({

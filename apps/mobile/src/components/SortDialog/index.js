@@ -1,21 +1,22 @@
 import React, {createRef} from 'react';
-import {Text, TouchableOpacity, View} from 'react-native';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
-import {dWidth, SORT, sortSettings} from '../../utils';
-import ActionSheet from '../ActionSheet';
-import {DDS} from '../../services/DeviceDetection';
-import {eCloseSortDialog, eOpenSortDialog} from '../../utils/Events';
-import {PressableButton} from '../PressableButton';
-import {SIZE, WEIGHT} from '../../utils/SizeUtils';
-import {defaultState} from '../../provider/DefaultState';
-import {MMKV} from '../../utils/mmkv';
-import {updateEvent} from '../DialogManager/recievers';
-import {Actions} from '../../provider/Actions';
+import {TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import Seperator from '../Seperator';
+import {Actions} from '../../provider/Actions';
+import {defaultState} from '../../provider/DefaultState';
+import {DDS} from '../../services/DeviceDetection';
+import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
 import SettingsService from '../../services/SettingsService';
-import Paragraph from '../Typography/Paragraph';
+import {dWidth, SORT, sortSettings} from '../../utils';
+import {eCloseSortDialog, eOpenSortDialog} from '../../utils/Events';
+import {MMKV} from '../../utils/mmkv';
+import {SIZE} from '../../utils/SizeUtils';
+import {sleep} from '../../utils/TimeUtils';
+import ActionSheet from '../ActionSheet';
+import {updateEvent} from '../DialogManager/recievers';
+import {PressableButton} from '../PressableButton';
+import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
+import Paragraph from '../Typography/Paragraph';
 
 const actionSheet = createRef();
 
@@ -24,12 +25,20 @@ class SortDialog extends React.Component {
     super(props);
     this.state = {
       settings: defaultState.settings,
+      visible: false,
     };
   }
 
   async open() {
-    actionSheet.current?._setModalVisible(true);
-    await this.getSettings();
+    this.setState(
+      {
+        visible: true,
+      },
+      async () => {
+        actionSheet.current?._setModalVisible(true);
+        await this.getSettings();
+      },
+    );
   }
 
   async getSettings() {
@@ -41,6 +50,11 @@ class SortDialog extends React.Component {
 
   close() {
     actionSheet.current?._setModalVisible(false);
+    sleep(200).then(() => {
+      this.setState({
+        visible: false,
+      });
+    });
   }
 
   async componentDidMount() {
@@ -55,6 +69,9 @@ class SortDialog extends React.Component {
 
   render() {
     const {colors} = this.props;
+
+    if (!this.state.visible) return null;
+
     return (
       <ActionSheet
         containerStyle={{

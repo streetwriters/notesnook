@@ -36,8 +36,8 @@ const ProgressDialog = () => {
     setVisible(false);
   };
 
-  return (
-    <BaseDialog visible={visible} onRequestClose={close}>
+  return !visible ? null : (
+    <BaseDialog visible={true} onRequestClose={close}>
       <View
         style={{
           ...getElevation(5),

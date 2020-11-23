@@ -281,8 +281,8 @@ const MergeEditor = () => {
           link.click();  
     }`;
 
-  return (
-    <Modal transparent={false} animated animationType="fade" visible={visible}>
+  return !visible ? null : (
+    <Modal transparent={false} animated animationType="fade" visible={true}>
       <SafeAreaView
         style={{
           backgroundColor: colors.nav,

@@ -2,17 +2,9 @@ import React, {Component} from 'react';
 import {View} from 'react-native';
 import {Actions} from '../../provider/Actions';
 import {DDS} from '../../services/DeviceDetection';
-import {eSendEvent, ToastEvent} from '../../services/EventManager';
-import NavigationService from '../../services/Navigation';
+import {ToastEvent} from '../../services/EventManager';
 import {getElevation, history} from '../../utils';
 import {db} from '../../utils/DB';
-import {
-  eApplyChanges,
-  eClearEditor,
-  eCloseFullscreenEditor,
-  eOnLoadNote,
-  eOnNewTopicAdded,
-} from '../../utils/Events';
 import {ph, pv} from '../../utils/SizeUtils';
 import {dialogActions} from '../DialogManager/DialogActions';
 import {updateEvent} from '../DialogManager/recievers';
@@ -87,8 +79,10 @@ export class Dialog extends Component {
     const {template, colors} = this.props;
     const {title, paragraph, positiveText, negativeText, icon} = template;
     const {visible} = this.state;
+
+    if (!visible) return null;
     return (
-      <BaseDialog visible={visible} onRequestClose={this.hide}>
+      <BaseDialog visible={true} onRequestClose={this.hide}>
         <View
           style={{
             ...getElevation(5),

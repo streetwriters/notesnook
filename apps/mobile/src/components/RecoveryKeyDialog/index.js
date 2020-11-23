@@ -1,24 +1,25 @@
-import React, {createRef} from 'react';
-import {Clipboard, Text, View} from 'react-native';
+import React, { createRef } from 'react';
+import { Clipboard, View } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import RNFetchBlob from 'rn-fetch-blob';
-import {LOGO_BASE64} from '../../assets/images/assets';
+import { LOGO_BASE64 } from '../../assets/images/assets';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-  ToastEvent,
+  ToastEvent
 } from '../../services/EventManager';
-import {eOpenRecoveryKeyDialog, eOpenResultDialog} from '../../utils/Events';
-import {dWidth} from '../../utils';
-import ActionSheet from '../ActionSheet';
-import {Button} from '../Button';
-import Seperator from '../Seperator';
-import {Toast} from '../Toast';
-import {SIZE, WEIGHT} from '../../utils/SizeUtils';
-import {db} from '../../utils/DB';
+import { dWidth } from '../../utils';
+import { db } from '../../utils/DB';
+import { eOpenRecoveryKeyDialog, eOpenResultDialog } from '../../utils/Events';
+import { SIZE } from '../../utils/SizeUtils';
 import Storage from '../../utils/storage';
+import { sleep } from '../../utils/TimeUtils';
+import ActionSheet from '../ActionSheet';
+import { Button } from '../Button';
+import Seperator from '../Seperator';
+import { Toast } from '../Toast';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 class RecoveryKeyDialog extends React.Component {
@@ -26,6 +27,7 @@ class RecoveryKeyDialog extends React.Component {
     super(props);
     this.state = {
       key: null,
+      visible: false,
     };
     this.actionSheetRef = createRef();
     this.svg = createRef();
@@ -37,11 +39,23 @@ class RecoveryKeyDialog extends React.Component {
     if (signup) {
       this.signup = true;
     }
-    this.actionSheetRef.current?._setModalVisible(true);
+    this.setState(
+      {
+        visible: true,
+      },
+      () => {
+        this.actionSheetRef.current?._setModalVisible(true);
+      },
+    );
   };
 
   close = () => {
     this.actionSheetRef.current?._setModalVisible(false);
+    sleep(200).then(() => {
+      this.setState({
+        visible: false,
+      });
+    });
     if (this.signup) {
       setTimeout(() => {
         eSendEvent(eOpenResultDialog, {
@@ -122,6 +136,7 @@ class RecoveryKeyDialog extends React.Component {
 
   render() {
     const {colors} = this.props;
+    if (!this.state.visible) return null;
     return (
       <ActionSheet
         containerStyle={{

@@ -154,11 +154,11 @@ const ExportDialog = () => {
     },
   ];
 
-  return (
+  return !visible ? null : (
     <BaseDialog
       premium={<GetPremium context="export" offset={50} close={close} />}
       onRequestClose={close}
-      visible={visible}>
+      visible={true}>
       <View
         style={[
           {
