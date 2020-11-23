@@ -20,6 +20,7 @@ function SignUpDialog(props) {
       description={"Sign up for a 14-day free trial (no credit card)."}
       icon={Icon.Signup}
       onClose={onClose}
+      scrollable
       negativeButton={{ text: "Cancel", onClick: onClose }}
       buttonsAlignment="center"
       positiveButton={{

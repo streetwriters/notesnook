@@ -14,13 +14,7 @@ class MoveDialog extends React.Component {
   selectedTopic;
   state = {
     currentOpenedIndex: -1,
-    notebooks: [
-      ...db.notebooks.all,
-      ...db.notebooks.all,
-      ...db.notebooks.all,
-      ...db.notebooks.all,
-      ...db.notebooks.all,
-    ],
+    notebooks: db.notebooks.all,
   };
 
   async addNotebook(input) {

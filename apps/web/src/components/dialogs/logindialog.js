@@ -20,6 +20,7 @@ function LoginDialog(props) {
       description={"Signing in allows you to sync your notes across devices."}
       icon={Icon.Login}
       onClose={onClose}
+      scrollable
       negativeButton={{ text: "Cancel", onClick: onClose }}
       positiveButton={{
         props: {
