@@ -6,7 +6,7 @@
 #import "RNSplashScreen.h"
 #import <React/RCTLinkingManager.h>
 #import "ReceiveSharingIntent-Bridging-Header.h"
-
+#import <MMKV.h>
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
@@ -30,6 +30,15 @@
   return YES;
 }
 
+- (void)applicationWillTerminate:(UIApplication *)application {
+  NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
+  NSString *libraryPath = (NSString *) [paths firstObject];
+  NSString *rootDir = [libraryPath stringByAppendingPathComponent:@"mmkv"];
+  [MMKV initializeMMKV:rootDir];
+  MMKV *kv = [MMKV mmkvWithID:@"default" mode:MMKVSingleProcess];
+  [kv removeValueForKey:@"appState"];
+  return YES;
+}
 
 
 - (NSURL *)sourceURLForBridge:(RCTBridge *)bridge
