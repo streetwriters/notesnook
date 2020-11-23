@@ -1,16 +1,12 @@
 import ReceiveSharingIntent from 'react-native-receive-sharing-intent';
-import { eOnLoadNote } from '../utils/Events';
-import { tabBarRef } from '../utils/Refs';
-import { setIntent } from '../views/Editor/Functions';
-import { DDS } from './DeviceDetection';
-import { eSendEvent } from './EventManager';
+import {setIntent} from '../views/Editor/Functions';
 
 let previousIntent = {
   text: null,
   weblink: null,
 };
 
-function check() {
+async function check(callback) {
   ReceiveSharingIntent.getReceivedFiles(
     (d) => {
       let data = d[0];
@@ -33,19 +29,17 @@ function check() {
         previousIntent.text = text;
         previousIntent.weblink = weblink;
         setIntent();
-        eSendEvent(eOnLoadNote, {
+        callback({
           type: 'intent',
           data: delta,
-          text: text,
         });
-        if (DDS.isPhone || DDS.isSmallTab) {
-          tabBarRef.current?.goToPage(1);
-        }
+      } else {
+        callback(null);
       }
       ReceiveSharingIntent.clearReceivedFiles();
     },
     (error) => {
-      console.log(error, 'INTENT ERROR');
+      callback(null);
     },
   );
 }
