@@ -4,6 +4,7 @@ import { get7DayTimestamp } from "../utils/date";
 
 export default class Trash extends Collection {
   async init() {
+    await super.init();
     await this.cleanup();
   }
 
@@ -77,7 +78,7 @@ export default class Trash extends Collection {
           }
 
           // restore the note to the topic it was in before deletion
-          if (notebook.id && notebook.topic) {
+          if (notebook && notebook.id && notebook.topic) {
             await this._db.notebooks
               .notebook(id)
               .topics.topic(topic)

@@ -83,7 +83,7 @@ test("restore a deleted note that's in a deleted notebook", () =>
     await db.trash.restore(deletedNote.id);
     let note = db.notes.note(id);
     expect(note).toBeDefined();
-    expect(db.notes.note(id).notebook).toStrictEqual({});
+    expect(db.notes.note(id).notebook).toBeUndefined();
   }));
 
 test("delete a notebook", () =>

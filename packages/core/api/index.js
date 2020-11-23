@@ -58,7 +58,7 @@ class Database {
 
     // collections
     /** @type {Notes} */
-    this.notes = await Notes.new(this, "notes");
+    this.notes = await Notes.new(this, "notes", true, true);
     /** @type {Notebooks} */
     this.notebooks = await Notebooks.new(this, "notebooks");
     /** @type {Tags} */

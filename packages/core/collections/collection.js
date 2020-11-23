@@ -3,11 +3,10 @@ import CachedCollection from "../database/cached-collection";
 import IndexedCollection from "../database/indexed-collection";
 
 class Collection {
-  static async new(db, name, cached = true) {
+  static async new(db, name, cached = true, deferred = false) {
     const collection = new this(db, name, cached);
-    await collection._collection.init();
 
-    if (collection.init) await collection.init();
+    if (!deferred && collection.init) await collection.init();
     if (collection._collection.clear)
       EV.subscribe(
         "user:loggedOut",
@@ -15,6 +14,10 @@ class Collection {
       );
 
     return collection;
+  }
+
+  async init() {
+    await this._collection.init();
   }
 
   /**

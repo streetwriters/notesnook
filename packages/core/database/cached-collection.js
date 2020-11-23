@@ -6,6 +6,7 @@ import IndexedCollection from "./indexed-collection";
 export default class CachedCollection extends IndexedCollection {
   constructor(context, type) {
     super(context, type);
+    this.map = new Map();
   }
 
   async init() {
