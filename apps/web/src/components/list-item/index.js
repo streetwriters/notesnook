@@ -35,7 +35,14 @@ const ItemSelector = ({ isSelected, toggleSelection }) => {
       onClick={() => toggleSelection()}
     />
   ) : (
-    <Icon.CircleEmpty />
+    <Icon.CircleEmpty
+      size={16}
+      sx={{
+        marginLeft: 0,
+        marginRight: 1,
+        cursor: "pointer",
+      }}
+    />
   );
 };
 
