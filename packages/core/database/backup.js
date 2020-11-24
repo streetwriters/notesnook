@@ -1,4 +1,3 @@
-import { sendCheckUserStatusEvent } from "../common.js";
 import Hashes from "jshashes";
 const md5 = new Hashes.MD5();
 
@@ -26,34 +25,29 @@ export default class Backup {
     if (encrypt && !(await sendCheckUserStatusEvent("backup:encrypt"))) return;
 
     if (!validTypes.some((t) => t === type))
-      throw new Error(
-        "Invalid type. It must be one of 'mobile' or 'web' or 'node'."
-      );
+      throw new Error("Invalid type. It must be one of 'mobile' or 'web'.");
 
     const keys = (await this._db.context.getAllKeys()).filter(
       (key) => !invalidKeys.some((t) => t === key)
     );
 
-    const db = Object.fromEntries(await this._db.context.readMulti(keys));
-    db.h = md5.hex(JSON.stringify(db));
-    db.ht = "md5";
+    let data = Object.fromEntries(await this._db.context.readMulti(keys));
 
     if (encrypt) {
       const key = await this._db.user.key();
-      return JSON.stringify({
-        type,
-        date: Date.now(),
-        data: await this._db.context.encrypt(key, JSON.stringify(db)),
-      });
+      data = await this._db.context.encrypt(key, JSON.stringify(data));
     }
 
     // save backup time
     await this._db.context.write("lastBackupTime", Date.now());
 
     return JSON.stringify({
+      version: 2,
       type,
       date: Date.now(),
-      data: db,
+      data,
+      hash: md5.hex(JSON.stringify(data)),
+      hash_type: "md5",
     });
   }
 
@@ -75,16 +69,26 @@ export default class Backup {
       db = JSON.parse(await this._db.context.decrypt(key, db));
     }
 
-    if (!this._verify(db))
+    if (!this._verify(backup))
       throw new Error("Backup file has been tempered, aborting...");
+    // TODO add a proper restoration system.
+    // for (let key in db) {
+    //   let value = db[key];
+    //   if (value && value.dateEdited) {
+    //     value.dateEdited = Date.now();
+    //   }
 
-    for (let key in db) {
-      let value = db[key];
-      if (value && value.dateEdited) {
-        value.dateEdited = Date.now();
-      }
-      await this._db.context.write(key, value);
-    }
+    //   const oldValue = await this._db.context.read(oldValue);
+
+    //   let finalValue = oldValue || value;
+    //   if (typeof value === "object") {
+    //     finalValue = Array.isArray(value)
+    //       ? [...value, ...oldValue]
+    //       : { ...value, ...oldValue };
+    //   }
+
+    //   await this._db.context.write(key, finalValue);
+    // }
   }
 
   _validate(backup) {
@@ -96,14 +100,11 @@ export default class Backup {
     );
   }
 
-  _verify(db) {
-    const hash = db.h;
-    const hash_type = db.ht;
-    delete db.h;
-    delete db.ht;
+  _verify(backup) {
+    const { hash, hash_type, data: db } = backup;
     switch (hash_type) {
       case "md5": {
-        return hash == md5.hex(JSON.stringify(db));
+        return hash === md5.hex(JSON.stringify(db));
       }
       default: {
         return false;
