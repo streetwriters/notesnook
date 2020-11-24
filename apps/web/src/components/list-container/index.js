@@ -7,6 +7,11 @@ import AutoSizer from "react-virtualized-auto-sizer";
 import { useStore as useSelectionStore } from "../../stores/selection-store";
 import GroupHeader from "../group-header";
 import ListProfiles from "../../common/list-profiles";
+import ScrollContainer from "../scroll-container";
+
+const CustomScrollbarsVirtualList = React.forwardRef((props, ref) => (
+  <ScrollContainer {...props} forwardedRef={ref} />
+));
 
 function ListContainer(props) {
   const { type, context } = props;
@@ -54,6 +59,7 @@ function ListContainer(props) {
                               return item.id || item.title;
                           }
                         }}
+                        outerElementType={CustomScrollbarsVirtualList}
                         overscanCount={3}
                         estimatedItemSize={profile.estimatedItemHeight}
                         itemSize={(index) => {

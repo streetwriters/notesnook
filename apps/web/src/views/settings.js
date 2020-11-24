@@ -16,6 +16,7 @@ import dayjs from "dayjs";
 import { showRecoveryKeyDialog } from "../components/dialogs/recoverykeydialog";
 import { showBuyDialog } from "../components/dialogs/buy-dialog";
 import Vault from "../common/vault";
+import ScrollContainer from "../components/scroll-container";
 
 function importBackup() {
   return new Promise((resolve, reject) => {
@@ -91,253 +92,261 @@ function Settings(props) {
   }, [isVaultCreated]);
 
   return (
-    <Flex variant="columnFill" px={2} sx={{ overflowY: "auto" }}>
-      {isLoggedIn ? (
-        <Flex
-          bg="shade"
-          flexDirection="column"
-          p={2}
-          sx={{ borderRadius: "default" }}
-        >
-          <Flex flex="1" justifyContent="space-between">
-            <Flex>
-              <Icon.User size={15} color="primary" />
-              <Text variant="body" color="text" ml={1}>
-                {user.username}
+    <ScrollContainer>
+      <Flex variant="columnFill" px={2}>
+        {isLoggedIn ? (
+          <Flex
+            bg="shade"
+            flexDirection="column"
+            p={2}
+            sx={{ borderRadius: "default" }}
+          >
+            <Flex flex="1" justifyContent="space-between">
+              <Flex>
+                <Icon.User size={15} color="primary" />
+                <Text variant="body" color="text" ml={1}>
+                  {user.username}
+                </Text>
+              </Flex>
+              <Text
+                variant="subBody"
+                px={"2px"}
+                py={"1px"}
+                sx={{ borderRadius: "default" }}
+                bg="static"
+                color="primary"
+              >
+                {isTrial ? "Trial" : "Pro"}
               </Text>
             </Flex>
             <Text
-              variant="subBody"
-              px={"2px"}
-              py={"1px"}
-              sx={{ borderRadius: "default" }}
-              bg="static"
-              color="primary"
+              color={subscriptionDaysRemaining <= 5 ? "error" : "primary"}
+              variant="body"
+              fontSize={26}
+              mt={2}
             >
-              {isTrial ? "Trial" : "Pro"}
+              {subscriptionDaysRemaining} Days Remaining
             </Text>
+            <Text variant="subBody">
+              Your trial period started on{" "}
+              {dayjs(user.subscription.start).format("MMMM D, YYYY")}
+            </Text>
+            {isTrial && (
+              <Button mt={2} onClick={showBuyDialog}>
+                Upgrade to Notesnook Pro
+              </Button>
+            )}
           </Flex>
-          <Text
-            color={subscriptionDaysRemaining <= 5 ? "error" : "primary"}
-            variant="body"
-            fontSize={26}
-            mt={2}
-          >
-            {subscriptionDaysRemaining} Days Remaining
-          </Text>
-          <Text variant="subBody">
-            Your trial period started on{" "}
-            {dayjs(user.subscription.start).format("MMMM D, YYYY")}
-          </Text>
-          {isTrial && (
-            <Button mt={2} onClick={showBuyDialog}>
-              Upgrade to Notesnook Pro
-            </Button>
-          )}
-        </Flex>
-      ) : (
-        <Flex
-          bg="shade"
-          p={2}
-          sx={{ borderRadius: "default", cursor: "pointer" }}
-          onClick={async () => {
-            await showLogInDialog();
-          }}
-        >
+        ) : (
           <Flex
-            flex="1 1 auto"
-            justifyContent="space-between"
-            alignItems="center"
-          >
-            <Flex>
-              <Flex
-                variant="columnCenter"
-                bg="primary"
-                mr={2}
-                size={35}
-                sx={{
-                  borderRadius: 80,
-                }}
-              >
-                <Icon.User size={20} color="static" />
-              </Flex>
-              <Flex variant="columnCenter" alignItems="flex-start">
-                <Text variant="subBody">You are not logged in</Text>
-                <Text variant="body" color="primary" fontSize={"body"}>
-                  Login to sync your notes
-                </Text>
-              </Flex>
-            </Flex>
-            <Icon.ChevronRight size={20} color="primary" />
-          </Flex>
-        </Flex>
-      )}
-      {isLoggedIn && (
-        <>
-          <Button variant="list" onClick={showRecoveryKeyDialog}>
-            <TextWithTip
-              text="Backup data recovery key"
-              tip="In case you lose your password, you can recover your data using your recovery key."
-            />
-          </Button>
-          <Button
-            variant="list"
+            bg="shade"
+            p={2}
+            sx={{ borderRadius: "default", cursor: "pointer" }}
             onClick={async () => {
-              if (await showLogoutConfirmation()) await logout();
+              await showLogInDialog();
             }}
           >
-            <TextWithTip
-              text="Logout"
-              tip="Log out of your account and clear all data."
+            <Flex
+              flex="1 1 auto"
+              justifyContent="space-between"
+              alignItems="center"
+            >
+              <Flex>
+                <Flex
+                  variant="columnCenter"
+                  bg="primary"
+                  mr={2}
+                  size={35}
+                  sx={{
+                    borderRadius: 80,
+                  }}
+                >
+                  <Icon.User size={20} color="static" />
+                </Flex>
+                <Flex variant="columnCenter" alignItems="flex-start">
+                  <Text variant="subBody">You are not logged in</Text>
+                  <Text variant="body" color="primary" fontSize={"body"}>
+                    Login to sync your notes
+                  </Text>
+                </Flex>
+              </Flex>
+              <Icon.ChevronRight size={20} color="primary" />
+            </Flex>
+          </Flex>
+        )}
+        {isLoggedIn && (
+          <>
+            <Button variant="list" onClick={showRecoveryKeyDialog}>
+              <TextWithTip
+                text="Backup data recovery key"
+                tip="In case you lose your password, you can recover your data using your recovery key."
+              />
+            </Button>
+            <Button
+              variant="list"
+              onClick={async () => {
+                if (await showLogoutConfirmation()) await logout();
+              }}
+            >
+              <TextWithTip
+                text="Logout"
+                tip="Log out of your account and clear all data."
+              />
+            </Button>
+          </>
+        )}
+        <Text
+          variant="subtitle"
+          color="primary"
+          py={1}
+          sx={{ borderBottom: "1px solid", borderBottomColor: "border" }}
+        >
+          Appearance
+        </Text>
+        <TextWithTip
+          text="Accent color"
+          tip="Choose a color to use as accent color"
+          sx={{ py: 2 }}
+        />
+        <Flex
+          flexWrap="wrap"
+          justifyContent="left"
+          sx={{
+            borderRadius: "default",
+          }}
+        >
+          {accents.map((color) => (
+            <AccentItem
+              key={color.code}
+              code={color.code}
+              label={color.label}
             />
-          </Button>
-        </>
-      )}
-      <Text
-        variant="subtitle"
-        color="primary"
-        py={1}
-        sx={{ borderBottom: "1px solid", borderBottomColor: "border" }}
-      >
-        Appearance
-      </Text>
-      <TextWithTip
-        text="Accent color"
-        tip="Choose a color to use as accent color"
-        sx={{ py: 2 }}
-      />
-      <Flex
-        flexWrap="wrap"
-        justifyContent="left"
-        sx={{
-          borderRadius: "default",
-        }}
-      >
-        {accents.map((color) => (
-          <AccentItem key={color.code} code={color.code} label={color.label} />
-        ))}
-      </Flex>
-      <ToggleItem
-        title="Dark mode"
-        onTip="Dark mode is on"
-        offTip="Dark mode is off"
-        onToggled={toggleNightMode}
-        isToggled={theme === "dark"}
-        onlyIf={!followSystemTheme}
-      />
-      <ToggleItem
-        title="Follow system theme"
-        onTip="Switch app theme according to system"
-        offTip="Keep app theme independent"
-        onToggled={toggleFollowSystemTheme}
-        isToggled={followSystemTheme}
-      />
-
-      <Text
-        variant="subtitle"
-        color="primary"
-        sx={{ py: 1, borderBottom: "1px solid", borderBottomColor: "border" }}
-      >
-        {"Backup & Restore"}
-      </Text>
-      <Button
-        variant="list"
-        onClick={async () => {
-          download(
-            `notesnook-backup-${new Date().toLocaleString("en")}`,
-            await db.backup.export("web", encryptBackups),
-            "nnbackup"
-          );
-        }}
-      >
-        <TextWithTip
-          text="Backup data"
-          tip="Backup and download all your data"
+          ))}
+        </Flex>
+        <ToggleItem
+          title="Dark mode"
+          onTip="Dark mode is on"
+          offTip="Dark mode is off"
+          onToggled={toggleNightMode}
+          isToggled={theme === "dark"}
+          onlyIf={!followSystemTheme}
         />
-      </Button>
-      <input
-        type="file"
-        id="restore-backup"
-        hidden
-        accept=".nnbackup,text/plain,application/json"
-      />
-      <Button
-        variant="list"
-        onClick={async () => {
-          await db.backup.import(JSON.stringify(await importBackup()));
-        }}
-      >
-        <TextWithTip
-          text="Restore backup"
-          tip="Restore data from a backup file"
+        <ToggleItem
+          title="Follow system theme"
+          onTip="Switch app theme according to system"
+          offTip="Keep app theme independent"
+          onToggled={toggleFollowSystemTheme}
+          isToggled={followSystemTheme}
         />
-      </Button>
 
-      <ToggleItem
-        title="Encrypt backups"
-        onTip="All backups will be encrypted"
-        offTip="Backups will not be encrypted"
-        onToggled={toggleEncryptBackups}
-        isToggled={encryptBackups}
-      />
-
-      <OptionsItem
-        title="Backup reminders"
-        tip="Remind me to backup my data"
-        options={["Never", "Daily", "Weekly", "Monthly"]}
-        selectedOption={backupReminderOffset}
-        onSelectionChanged={(_option, index) => setBackupReminderOffset(index)}
-      />
-
-      <Text
-        variant="subtitle"
-        color="primary"
-        sx={{ py: 1, borderBottom: "1px solid", borderBottomColor: "border" }}
-      >
-        Vault
-      </Text>
-
-      {isVaultCreated ? (
-        <>
-          <Button variant="list" onClick={Vault.changeVaultPassword}>
-            <TextWithTip text="Change vault password" />
-          </Button>
-        </>
-      ) : (
+        <Text
+          variant="subtitle"
+          color="primary"
+          sx={{ py: 1, borderBottom: "1px solid", borderBottomColor: "border" }}
+        >
+          {"Backup & Restore"}
+        </Text>
         <Button
           variant="list"
           onClick={async () => {
-            setIsVaultCreated(await Vault.createVault());
+            download(
+              `notesnook-backup-${new Date().toLocaleString("en")}`,
+              await db.backup.export("web", encryptBackups),
+              "nnbackup"
+            );
           }}
         >
           <TextWithTip
-            text="Create vault"
-            tip="Create a password-encrypted vault for your notes"
+            text="Backup data"
+            tip="Backup and download all your data"
           />
         </Button>
-      )}
-
-      <Text
-        variant="subtitle"
-        color="primary"
-        sx={{ py: 1, borderBottom: "1px solid", borderBottomColor: "border" }}
-      >
-        Other
-      </Text>
-      {["Terms of Service", "Privacy Policy", "About"].map((title) => (
+        <input
+          type="file"
+          id="restore-backup"
+          hidden
+          accept=".nnbackup,text/plain,application/json"
+        />
         <Button
-          key={title}
           variant="list"
-          onClick={() =>
-            props.navigator.navigate("TOS", {
-              title,
-            })
-          }
+          onClick={async () => {
+            await db.backup.import(JSON.stringify(await importBackup()));
+          }}
         >
-          {title}
+          <TextWithTip
+            text="Restore backup"
+            tip="Restore data from a backup file"
+          />
         </Button>
-      ))}
-    </Flex>
+
+        <ToggleItem
+          title="Encrypt backups"
+          onTip="All backups will be encrypted"
+          offTip="Backups will not be encrypted"
+          onToggled={toggleEncryptBackups}
+          isToggled={encryptBackups}
+        />
+
+        <OptionsItem
+          title="Backup reminders"
+          tip="Remind me to backup my data"
+          options={["Never", "Daily", "Weekly", "Monthly"]}
+          selectedOption={backupReminderOffset}
+          onSelectionChanged={(_option, index) =>
+            setBackupReminderOffset(index)
+          }
+        />
+
+        <Text
+          variant="subtitle"
+          color="primary"
+          sx={{ py: 1, borderBottom: "1px solid", borderBottomColor: "border" }}
+        >
+          Vault
+        </Text>
+
+        {isVaultCreated ? (
+          <>
+            <Button variant="list" onClick={Vault.changeVaultPassword}>
+              <TextWithTip text="Change vault password" />
+            </Button>
+          </>
+        ) : (
+          <Button
+            variant="list"
+            onClick={async () => {
+              setIsVaultCreated(await Vault.createVault());
+            }}
+          >
+            <TextWithTip
+              text="Create vault"
+              tip="Create a password-encrypted vault for your notes"
+            />
+          </Button>
+        )}
+
+        <Text
+          variant="subtitle"
+          color="primary"
+          sx={{ py: 1, borderBottom: "1px solid", borderBottomColor: "border" }}
+        >
+          Other
+        </Text>
+        {["Terms of Service", "Privacy Policy", "About"].map((title) => (
+          <Button
+            key={title}
+            variant="list"
+            onClick={() =>
+              props.navigator.navigate("TOS", {
+                title,
+              })
+            }
+          >
+            {title}
+          </Button>
+        ))}
+      </Flex>
+    </ScrollContainer>
   );
 }
 
