@@ -33,7 +33,7 @@ function ListContainer(props) {
     <Flex variant="columnFill">
       {!props.items.length && props.placeholder ? (
         <Flex variant="columnCenterFill">
-          <props.placeholder />
+          {props.isLoading ? <Icon.Loading rotate /> : <props.placeholder />}
         </Flex>
       ) : (
         <>
