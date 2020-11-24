@@ -2,13 +2,9 @@ import {
   StorageInterface,
   databaseTest,
   noteTest,
-  groupedTest,
-  LONG_TEXT,
-  TEST_NOTE,
-  TEST_NOTEBOOK,
   notebookTest,
-  TEST_NOTEBOOK2,
 } from "./utils";
+import v0Backup from "./__fixtures__/backup.v0.json";
 
 beforeEach(async () => {
   StorageInterface.clear();
@@ -67,3 +63,35 @@ test("import tempered backup", () =>
       ).rejects.toThrowError(/tempered/);
     })
   ));
+
+test.only("import unversioned (v0) backup", () => {
+  return databaseTest().then(async (db) => {
+    await db.backup.import(JSON.stringify(v0Backup));
+
+    expect(
+      db.notes.all.every(
+        (v) => v.contentId && !v.content && (!v.notebook || !v.notebook.id)
+      )
+    ).toBeTruthy();
+
+    expect(
+      db.notebooks.all.every((v) => v.title != null && v.description != null)
+    ).toBeTruthy();
+
+    function verifyIndex(db, backupCollection, collection) {
+      if (!v0Backup.data[backupCollection]) return;
+      expect(
+        v0Backup.data[backupCollection].every(
+          (v) => db[collection]._collection.indexer.indices.indexOf(v) > -1
+        )
+      ).toBeTruthy();
+    }
+
+    verifyIndex(db, "notes", "notes");
+    verifyIndex(db, "notebooks", "notebooks");
+    verifyIndex(db, "delta", "content");
+    verifyIndex(db, "tags", "tags");
+    verifyIndex(db, "colors", "colors");
+    verifyIndex(db, "trash", "trash");
+  });
+});

@@ -4,6 +4,7 @@ const md5 = new Hashes.MD5();
 
 const invalidKeys = ["user", "t", "lastBackupTime"];
 const validTypes = ["mobile", "web", "node"];
+const CURRENT_BACKUP_VERSION = 2;
 export default class Backup {
   /**
    *
@@ -43,7 +44,7 @@ export default class Backup {
     await this._db.context.write("lastBackupTime", Date.now());
 
     return JSON.stringify({
-      version: 2,
+      version: CURRENT_BACKUP_VERSION,
       type,
       date: Date.now(),
       data,
@@ -63,6 +64,8 @@ export default class Backup {
 
     if (!this._validate(backup)) throw new Error("Invalid backup.");
 
+    backup = this._migrateBackup(backup);
+
     let db = backup.data;
     //check if we have encrypted data
     if (db.salt && db.iv) {
@@ -72,24 +75,71 @@ export default class Backup {
 
     if (!this._verify(backup))
       throw new Error("Backup file has been tempered, aborting...");
-    // TODO add a proper restoration system.
-    // for (let key in db) {
-    //   let value = db[key];
-    //   if (value && value.dateEdited) {
-    //     value.dateEdited = Date.now();
-    //   }
 
-    //   const oldValue = await this._db.context.read(oldValue);
+    await this._migrateData(backup);
+  }
 
-    //   let finalValue = oldValue || value;
-    //   if (typeof value === "object") {
-    //     finalValue = Array.isArray(value)
-    //       ? [...value, ...oldValue]
-    //       : { ...value, ...oldValue };
-    //   }
+  _migrateBackup(backup) {
+    const { version = 0 } = backup;
+    if (version > CURRENT_BACKUP_VERSION)
+      throw new Error(
+        "This backup was made from a newer version of Notesnook. Cannot migrate."
+      );
 
-    //   await this._db.context.write(key, finalValue);
-    // }
+    switch (version) {
+      case CURRENT_BACKUP_VERSION: {
+        return backup;
+      }
+      case 0: {
+        const hash = backup.data.h;
+        const hash_type = backup.data.ht;
+        delete backup.data.h;
+        delete backup.data.ht;
+        return {
+          version: 0,
+          type: backup.type,
+          date: backup.date || Date.now(),
+          data: backup.data,
+          hash,
+          hash_type,
+        };
+      }
+      default:
+        throw new Error("Unknown backup version.");
+    }
+  }
+
+  async _migrateData(backup) {
+    const { data, version = 0 } = backup;
+    if (version > CURRENT_BACKUP_VERSION)
+      throw new Error(
+        "This backup was made from a newer version of Notesnook. Cannot migrate."
+      );
+
+    const collections = [
+      "notes",
+      "notebooks",
+      "tags",
+      "colors",
+      "trash",
+      "delta",
+      "text",
+      "content",
+    ];
+
+    await Promise.all(
+      collections.map(async (collection) => {
+        const collectionIndex = data[collection];
+        if (!collectionIndex) return;
+        await Promise.all(
+          collectionIndex.map(async (id) => {
+            const item = data[id];
+            if (!item) return;
+            await migrations[version][collection](this._db, item);
+          })
+        );
+      })
+    );
   }
 
   _validate(backup) {
@@ -113,3 +163,82 @@ export default class Backup {
     }
   }
 }
+
+const migrations = {
+  handleDeleted: async function (db, collection, item) {
+    if (item.deleted) {
+      await db[collection]._collection.addItem(item);
+      return true;
+    }
+    return false;
+  },
+  0: {
+    notes: async function (db, item) {
+      if (await migrations.handleDeleted(db, "notes", item)) return;
+
+      const contentId = item.content.delta;
+      delete item.content;
+      item.contentId = contentId;
+      item.remote = true;
+      if (!item.notebook.id) item.notebook = undefined;
+      await db.notes.add(item);
+    },
+    delta: async function (db, item) {
+      if (await migrations.handleDeleted(db, "content", item)) return;
+
+      item.data = item.data.ops;
+      item.type = "delta";
+      await db.content.add(item);
+    },
+    trash: async function (db, item) {
+      if (await migrations.handleDeleted(db, "trash", item)) return;
+
+      item.itemType = item.type;
+      item.type = "trash";
+      if (item.itemType === "note") {
+        item.contentId = item.content.delta;
+        delete item.content;
+      }
+      await db.trash.add(item);
+    },
+    notebooks: async function (db, item) {
+      if (await migrations.handleDeleted(db, "notebooks", item)) return;
+      await db.notebooks.add(item);
+    },
+    tags: async function (db, item) {
+      if (await migrations.handleDeleted(db, "tags", item)) return;
+      await db.tags.add(item);
+    },
+    colors: async function (db, item) {
+      if (await migrations.handleDeleted(db, "colors", item)) return;
+      await db.tags.add(item);
+    },
+    text: function () {},
+  },
+  2: {
+    notes: async function (db, item) {
+      if (await migrations.handleDeleted(db, "notes", item)) return;
+      await db.notes.add({ ...item, remote: true });
+    },
+    notebooks: async function (db, item) {
+      if (await migrations.handleDeleted(db, "notebooks", item)) return;
+      await db.notebooks.add(item);
+    },
+    tags: async function (db, item) {
+      if (await migrations.handleDeleted(db, "tags", item)) return;
+      await db.tags.add(item);
+    },
+    colors: async function (db, item) {
+      if (await migrations.handleDeleted(db, "colors", item)) return;
+      await db.tags.add(item);
+    },
+    trash: async function (db, item) {
+      if (await migrations.handleDeleted(db, "trash", item)) return;
+      await db.trash.add(item);
+    },
+    content: async function (db, item) {
+      if (await migrations.handleDeleted(db, "content", item)) return;
+      await db.content.add(item);
+    },
+  },
+};
