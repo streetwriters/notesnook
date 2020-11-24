@@ -138,6 +138,7 @@ const AppStack = React.memo(
       } else {
         setDeviceMode('mobile', size);
       }
+      SplashScreen.hide();
     }
 
     function setDeviceMode(current, size) {
@@ -156,7 +157,6 @@ const AppStack = React.memo(
       if (!movedAway && current !== 'tablet') {
         tabBarRef.current?.goToPage(1);
       }
-      sleep(50).then(() => SplashScreen.hide());
     }
 
     const _responder = (e) => {

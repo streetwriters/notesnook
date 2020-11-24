@@ -13,15 +13,9 @@ public class IntentActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         Intent intent = this.getIntent();
-
         intent.setClass(getBaseContext(), MainActivity.class);
+        finishAffinity();
         startActivity(intent);
-        
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            finishAndRemoveTask();
-        } else {
-            finish();
-        }
 
     }
 }

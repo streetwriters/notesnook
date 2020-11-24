@@ -1,33 +1,35 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
+  ActivityIndicator,
   Platform,
   RefreshControl,
   StyleSheet,
-
   useWindowDimensions,
-  View
+  View,
 } from 'react-native';
-import { DataProvider, LayoutProvider, RecyclerListView } from 'recyclerlistview';
-import { useTracked } from '../../provider';
-import { Actions } from '../../provider/Actions';
-import { DDS } from '../../services/DeviceDetection';
-import { eSendEvent, ToastEvent } from '../../services/EventManager';
-import { db } from '../../utils/DB';
+import {initialWindowMetrics} from 'react-native-safe-area-context';
+import {DataProvider, LayoutProvider, RecyclerListView} from 'recyclerlistview';
+import {useTracked} from '../../provider';
+import {Actions} from '../../provider/Actions';
+import {DDS} from '../../services/DeviceDetection';
+import {eSendEvent, ToastEvent} from '../../services/EventManager';
+import {dHeight} from '../../utils';
+import {db} from '../../utils/DB';
 import {
   eOpenJumpToDialog,
   eOpenLoginDialog,
-  eScrollEvent
+  eScrollEvent,
 } from '../../utils/Events';
-import { SIZE } from '../../utils/SizeUtils';
-import { Button } from '../Button';
-import { HeaderMenu } from '../Header/HeaderMenu';
+import {SIZE} from '../../utils/SizeUtils';
+import {Button} from '../Button';
+import {HeaderMenu} from '../Header/HeaderMenu';
 import Seperator from '../Seperator';
 import TagItem from '../TagItem';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
-import { ListHeaderComponent } from './ListHeaderComponent';
-import { NotebookItemWrapper } from './NotebookItemWrapper';
-import { NoteItemWrapper } from './NoteItemWrapper';
+import {ListHeaderComponent} from './ListHeaderComponent';
+import {NotebookItemWrapper} from './NotebookItemWrapper';
+import {NoteItemWrapper} from './NoteItemWrapper';
 
 const header = {
   type: 'MAIN_HEADER',
@@ -36,8 +38,6 @@ const header = {
 const SimpleList = ({
   data,
   type,
-  placeholder,
-  RenderItem,
   customRefresh,
   customRefreshing,
   refreshCallback,
@@ -45,15 +45,16 @@ const SimpleList = ({
   scrollRef,
   jumpToDialog,
   placeholderData,
+  loading,
 }) => {
   const [state, dispatch] = useTracked();
-  const {colors, selectionMode} = state;
+  const {colors} = state;
   const searchResults = {...state.searchResults};
   const [refreshing, setRefreshing] = useState(false);
   const [dataProvider, setDataProvider] = useState(
     new DataProvider((r1, r2) => {
       return r1 !== r2;
-    }),
+    }).cloneWithRows([header, {type: 'empty'}]),
   );
   const {width, fontScale} = useWindowDimensions();
 
@@ -70,7 +71,13 @@ const SimpleList = ({
   }, [listData, searchResults.results]);
 
   const loadData = () => {
-    let mainData = [header, ...listData];
+    let mainData = [header, {type: 'empty'}];
+    console.log(mainData);
+    mainData =
+      !listData || listData.length === 0
+        ? mainData
+        : [header, ...listData];
+    console.log(mainData,'main data');
     setDataProvider(dataProvider.cloneWithRows(mainData));
   };
 
@@ -149,11 +156,10 @@ const SimpleList = ({
       style={[
         {
           backgroundColor: colors.bg,
-          height: '100%',
+          height: dHeight - 250 - initialWindowMetrics.insets.top,
+          width: '100%',
         },
       ]}>
-      <ListHeaderComponent type={type} />
-
       <View
         style={{
           flexGrow: 1,
@@ -161,9 +167,11 @@ const SimpleList = ({
           alignItems: 'center',
         }}>
         <Heading>{placeholderData.heading}</Heading>
-        <Paragraph color={colors.icon}>{placeholderData.paragraph}</Paragraph>
+        <Paragraph color={colors.icon}>
+          {loading ? placeholderData.loading : placeholderData.paragraph}
+        </Paragraph>
         <Seperator />
-        {placeholderData.button && (
+        {placeholderData.button && !loading ? (
           <Button
             onPress={placeholderData.action}
             title={placeholderData.button}
@@ -171,6 +179,8 @@ const SimpleList = ({
             type="transparent"
             fontSize={SIZE.md}
           />
+        ) : (
+          <ActivityIndicator color={colors.accent} />
         )}
       </View>
     </View>
@@ -193,6 +203,10 @@ const SimpleList = ({
         case 'trash':
           dim.width = width;
           dim.height = 110 * fontScale;
+          break;
+        case 'empty':
+          dim.width = width;
+          dim.height = 600;
           break;
         case 'topic':
           dim.width = width;
@@ -251,12 +265,12 @@ const SimpleList = ({
         );
       case 'header':
         return <RenderSectionHeader item={data} index={index} />;
+      case 'empty':
+        return _ListEmptyComponent;
     }
   };
 
-  return !listData || listData.length === 0 || !dataProvider ? (
-    _ListEmptyComponent
-  ) : (
+  return (
     <RecyclerListView
       ref={scrollRef}
       layoutProvider={_layoutProvider}
@@ -297,36 +311,3 @@ const SimpleList = ({
 };
 
 export default SimpleList;
-
-const styles = StyleSheet.create({
-  loginCard: {
-    width: '100%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    paddingHorizontal: 12,
-    alignSelf: 'center',
-    height: 40,
-    borderRadius: 0,
-    position: 'relative',
-  },
-  loginIcon: {
-    textAlign: 'center',
-    textAlignVertical: 'center',
-  },
-  searchHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 12,
-    height: 40,
-  },
-  emptyList: {
-    height: '100%',
-    width: '100%',
-    alignItems: 'center',
-    alignSelf: 'center',
-    justifyContent: 'center',
-    opacity: 1,
-  },
-});

@@ -1,26 +1,39 @@
 import * as NetInfo from '@react-native-community/netinfo';
 import {EV} from 'notes-core/common';
 import React, {useEffect, useState} from 'react';
-import {Appearance, AppState, Platform, StatusBar} from 'react-native';
+import {
+  Appearance,
+  AppState,
+  Linking,
+  NativeModules,
+  Platform,
+  StatusBar,
+} from 'react-native';
 import {enabled} from 'react-native-privacy-snapshot';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {useTracked} from './src/provider';
 import {Actions} from './src/provider/Actions';
 import {
+  eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
   ToastEvent,
 } from './src/services/EventManager';
 import {setLoginMessage} from './src/services/Message';
 import {editing} from './src/utils';
-import {COLOR_SCHEME} from './src/utils/Colors';
+import {ACCENT, COLOR_SCHEME} from './src/utils/Colors';
 import {db} from './src/utils/DB';
-import {eDispatchAction, eStartSyncer} from './src/utils/Events';
+import {eDispatchAction, eOnLoadNote, eStartSyncer} from './src/utils/Events';
 import {MMKV} from './src/utils/mmkv';
 import {sleep} from './src/utils/TimeUtils';
 import {getNote} from './src/views/Editor/Functions';
+import IntentService from './src/services/IntentService';
+import {tabBarRef} from './src/utils/Refs';
+import Navigation from './src/services/Navigation';
+import SplashScreen from 'react-native-splash-screen';
+const {ReceiveSharingIntent} = NativeModules;
 
-let AppRootView = require('./initializer.intent').IntentView;
+let AppRootView = require('./initializer.root').RootView;
 let SettingsService = null;
 let Sentry = null;
 let appInit = false;
@@ -42,6 +55,26 @@ const onAppStateChanged = async (state) => {
     console.log('clearing state', await MMKV.getItem('appState'));
     if (appInit) {
       await MMKV.removeItem('appState');
+      try {
+        console.log('I am running too from here');
+        _data = await ReceiveSharingIntent.getFileNames();
+        if (_data) {
+          IntentService.setIntent(_data);
+          IntentService.check((event) => {
+            console.log(event);
+            if (event) {
+              eSendEvent(eOnLoadNote, event);
+              tabBarRef.current?.goToPage(1);
+              Navigation.closeDrawer();
+            } else {
+              eSendEvent('nointent');
+              SplashScreen.hide();
+            }
+          });
+        }
+      } catch (e) {
+        console.log(e);
+      }
     }
   } else {
     if (editing.currentlyEditing && appInit) {
@@ -75,7 +108,7 @@ const onNetworkStateChanged = (netInfo) => {
 
 const App = () => {
   const [, dispatch] = useTracked(),
-    [init, setInit] = useState(false),
+    [init, setInit] = useState(true),
     [intent, setIntent] = useState(false);
 
   const syncChanges = async () => {
@@ -96,6 +129,23 @@ const App = () => {
     await SettingsService.setTheme();
   };
 
+  const _handleIntent = async (res) => {
+    let url = res ? res.url : '';
+    try {
+      if (res && res.startsWith('ShareMedia://dataUrl')) {
+        _data = await ReceiveSharingIntent.getFileNames(url);
+      }
+      if (_data) {
+        IntentService.setIntent(_data);
+        IntentService.check((event) => {
+          eSendEvent(eOnLoadNote, event);
+          tabBarRef.current?.goToPage(1);
+          Navigation.closeDrawer();
+        });
+      }
+    } catch (e) {}
+  };
+
   useEffect(() => {
     eSubscribeEvent(eStartSyncer, startSyncer);
     eSubscribeEvent(eDispatchAction, (type) => {
@@ -105,6 +155,9 @@ const App = () => {
     eSubscribeEvent('nointent', loadMainApp);
     Appearance.addChangeListener(onSystemThemeChanged);
     let unsub = NetInfo.addEventListener(onNetworkStateChanged);
+    if (Platform.OS === 'ios') {
+      Linking.addEventListener('url', _handleIntent);
+    }
     return () => {
       EV.unsubscribe('db:refresh', syncChanges);
       eUnSubscribeEvent(eStartSyncer, startSyncer);
@@ -114,21 +167,31 @@ const App = () => {
       eUnSubscribeEvent('nointent', loadMainApp);
       AppState.removeEventListener('change', onAppStateChanged);
       Appearance.removeChangeListener(onSystemThemeChanged);
+      if (Platform.OS === 'ios') {
+        Linking.removeEventListener('url', _handleIntent);
+      }
       unsub();
     };
   }, []);
 
   const loadMainApp = () => {
-    setIntent(false);
+    dispatch({type: Actions.ALL});
     AppRootView = require('./initializer.root').RootView;
-    setInit(true);
+    getUser().then(console.log).catch(console.log);
     backupData().then((r) => r);
     sleep(300).then(() => (appInit = true));
+    db.notes.init().then(() => {
+      dispatch({type: Actions.NOTES});
+      console.log('setting loading to false')
+      dispatch({type: Actions.LOADING, loading: false});
+    });
+  
+
     //Sentry = require('@sentry/react-native');
-   // Sentry.init({
-   //   dsn:
-   //     'https://317a5c31caf64d1e9b27abf15eb1a554@o477952.ingest.sentry.io/5519681',
-   // });
+    // Sentry.init({
+    //   dsn:
+    //     'https://317a5c31caf64d1e9b27abf15eb1a554@o477952.ingest.sentry.io/5519681',
+    // });
   };
 
   const getUser = async () => {
@@ -156,9 +219,20 @@ const App = () => {
   }, []);
 
   const runAfterInit = () => {
-    setIntent(true);
-    dispatch({type: Actions.ALL});
-    getUser().catch((e) => e);
+    IntentService.getIntent()
+      .then(() => {
+        AppRootView = require('./initializer.intent').IntentView;
+        console.log('found intent');
+        setInit(false);
+        dispatch({type: Actions.ALL});
+        setIntent(true);
+        ReceiveSharingIntent.clearFileNames();
+      })
+      .catch((e) => {
+        console.log(e, 'no intent recieved');
+        ReceiveSharingIntent.clearFileNames();
+        loadMainApp();
+      });
   };
 
   async function backupData() {

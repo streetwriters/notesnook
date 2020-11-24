@@ -28,7 +28,7 @@ export const reducer = (state, action) => {
     case Actions.LOADING: {
       return {
         ...state,
-        syncing: action.loading,
+        loading: action.loading,
       };
     }
     case Actions.CLEAR_ALL: {

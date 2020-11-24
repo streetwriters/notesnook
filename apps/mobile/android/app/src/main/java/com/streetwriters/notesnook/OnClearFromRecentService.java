@@ -30,5 +30,6 @@ public class OnClearFromRecentService extends Service {
         MMKV mmkv = MMKV.mmkvWithID("default",MMKV.SINGLE_PROCESS_MODE);
         mmkv.removeValueForKey("appState");
         stopSelf();
+        System.exit(0);
     }
 }

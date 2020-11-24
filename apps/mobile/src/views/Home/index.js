@@ -1,5 +1,4 @@
 import React, {useCallback, useEffect} from 'react';
-import * as Keychain from 'react-native-keychain';
 import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
 import SimpleList from '../../components/SimpleList';
 import {useTracked} from '../../provider';
@@ -10,12 +9,10 @@ import SearchService from '../../services/SearchService';
 import {scrollRef} from '../../utils';
 import {eOnLoadNote, eScrollEvent} from '../../utils/Events';
 import {tabBarRef} from '../../utils/Refs';
-import Storage from '../../utils/storage';
-import * as Sentry from '@sentry/react-native';
 
 export const Home = ({navigation}) => {
   const [state, dispatch] = useTracked();
-  const {notes} = state;
+  const {notes, loading} = state;
 
   const onFocus = useCallback(() => {
     eSendEvent(eScrollEvent, {name: 'Notes', type: 'in'});
@@ -32,7 +29,7 @@ export const Home = ({navigation}) => {
     dispatch({
       type: Actions.CONTAINER_BOTTOM_BUTTON,
       state: {
-        onPress:_onPressBottomButton
+        onPress: _onPressBottomButton,
       },
     });
 
@@ -56,7 +53,7 @@ export const Home = ({navigation}) => {
       navigation.removeListener('focus', onFocus);
       navigation.removeListener('blur', onBlur);
     };
-  },[]);
+  }, []);
 
   useEffect(() => {
     if (navigation.isFocused()) {
@@ -73,7 +70,6 @@ export const Home = ({navigation}) => {
   };
 
   const _onPressBottomButton = (event) => {
-  
     if (!DDS.isLargeTablet()) {
       tabBarRef.current?.goToPage(1);
     } else {
@@ -89,6 +85,7 @@ export const Home = ({navigation}) => {
         type="notes"
         isHome={true}
         pinned={true}
+        loading={loading}
         sortMenuButton={true}
         placeholderText={`Notes you write appear here`}
         jumpToDialog={true}
@@ -97,6 +94,7 @@ export const Home = ({navigation}) => {
           paragraph: 'You have not added any notes yet.',
           button: 'Add your First Note',
           action: _onPressBottomButton,
+          loading: 'We are loading your notes.',
         }}
       />
 

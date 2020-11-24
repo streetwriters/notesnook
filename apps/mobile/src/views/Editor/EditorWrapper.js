@@ -8,8 +8,8 @@ import {useTracked} from '../../provider';
 import {eSendEvent} from '../../services/EventManager';
 import {eOnLoadNote} from '../../utils/Events';
 import Editor from './index';
-import {editorRef} from "../../utils/Refs"
-import { DDS } from '../../services/DeviceDetection';
+import {editorRef} from '../../utils/Refs';
+import {DDS} from '../../services/DeviceDetection';
 let prevVal = 0;
 let finalValue = 80;
 let anim2 = new Animated.Value(0);
@@ -77,7 +77,9 @@ function opacityAnim(a, b, c) {
   }).start();
 }
 
-const AnimatedKeyboardView = Animated.createAnimatedComponent(KeyboardAvoidingView)
+const AnimatedKeyboardView = Animated.createAnimatedComponent(
+  KeyboardAvoidingView,
+);
 
 export const EditorWrapper = ({dimensions}) => {
   const [state] = useTracked();
@@ -88,7 +90,7 @@ export const EditorWrapper = ({dimensions}) => {
     <SafeAreaView
       ref={editorRef}
       style={{
-        width:DDS.isLargeTablet()? dimensions.width * 0.55 : dimensions.width,
+        width: DDS.isLargeTablet() ? dimensions.width * 0.55 : dimensions.width,
         height: '100%',
         backgroundColor: colors.bg,
       }}>
@@ -107,7 +109,7 @@ export const EditorWrapper = ({dimensions}) => {
         onHandlerStateChange={onHandlerStateChange}
         onGestureEvent={onGestureEvent}>
         <AnimatedKeyboardView
-        behavior={Platform.OS === 'ios' ? 'padding' : null}
+          behavior={Platform.OS === 'ios' ? 'padding' : null}
           style={{
             transform: [
               {
@@ -160,7 +162,7 @@ export const EditorWrapper = ({dimensions}) => {
             </Animated.Text>
           </View>
 
-            <Editor/>
+          <Editor />
         </AnimatedKeyboardView>
       </PanGestureHandler>
     </SafeAreaView>

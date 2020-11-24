@@ -6,6 +6,7 @@ import {useTracked} from '../provider';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../services/EventManager';
 import {eCloseSideMenu, eOpenSideMenu} from '../utils/Events';
 import {sideMenuRef} from '../utils/Refs';
+import { sleep } from '../utils/TimeUtils';
 import {NavigatorStack} from './NavigatorStack';
 
 const Drawer = createDrawerNavigator();
@@ -14,6 +15,15 @@ export const NavigationStack = ({component = NavigatorStack}) => {
   const [state] = useTracked();
   const {deviceMode} = state;
   const [locked, setLocked] = React.useState(false);
+  const [initRender, setInitRender] = React.useState(true);
+
+  React.useEffect(() => {
+    console.log("rendering drawer");
+    sleep(1000).then(() => {
+      setInitRender(false);
+    })
+
+  }, []);
 
   const setGestureDisabled = () => {
     setLocked(true);
@@ -40,8 +50,9 @@ export const NavigationStack = ({component = NavigatorStack}) => {
           gestureEnabled: locked || deviceMode !== 'mobile' ? false : true,
         }}
         drawerStyle={{
-          width: deviceMode !== 'mobile' ? 0 : '65%',
-          borderRightWidth:0,
+          width: initRender ? 0 : deviceMode !== 'mobile' ? 0 : '65%',
+          height:initRender? 0 : null,
+          borderRightWidth: 0,
         }}
         edgeWidth={200}
         drawerType="slide"
