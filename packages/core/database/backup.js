@@ -1,4 +1,5 @@
 import Hashes from "jshashes";
+import { sendCheckUserStatusEvent } from "../common.js";
 const md5 = new Hashes.MD5();
 
 const invalidKeys = ["user", "t", "lastBackupTime"];

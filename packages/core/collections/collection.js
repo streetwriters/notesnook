@@ -7,6 +7,8 @@ class Collection {
     const collection = new this(db, name, cached);
 
     if (!deferred && collection.init) await collection.init();
+    else await collection._collection.indexer.init();
+
     if (collection._collection.clear)
       EV.subscribe(
         "user:loggedOut",
