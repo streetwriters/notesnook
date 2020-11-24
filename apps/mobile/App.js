@@ -37,6 +37,7 @@ let AppRootView = require('./initializer.root').RootView;
 let SettingsService = null;
 let Sentry = null;
 let appInit = false;
+let intentInit = false;
 
 const onAppStateChanged = async (state) => {
   console.log('app state', state);
@@ -55,6 +56,8 @@ const onAppStateChanged = async (state) => {
     console.log('clearing state', await MMKV.getItem('appState'));
     if (appInit) {
       await MMKV.removeItem('appState');
+    }
+    if (intentInit) {
       try {
         console.log('I am running too from here');
         _data = await ReceiveSharingIntent.getFileNames();
@@ -179,13 +182,12 @@ const App = () => {
     AppRootView = require('./initializer.root').RootView;
     getUser().then(console.log).catch(console.log);
     backupData().then((r) => r);
-    sleep(300).then(() => (appInit = true));
+    sleep(500).then(() => (appInit = true));
     db.notes.init().then(() => {
       dispatch({type: Actions.NOTES});
-      console.log('setting loading to false')
+      console.log('setting loading to false');
       dispatch({type: Actions.LOADING, loading: false});
     });
-  
 
     //Sentry = require('@sentry/react-native');
     // Sentry.init({
@@ -224,6 +226,7 @@ const App = () => {
         AppRootView = require('./initializer.intent').IntentView;
         console.log('found intent');
         setInit(false);
+        intentInit = true;
         dispatch({type: Actions.ALL});
         setIntent(true);
         ReceiveSharingIntent.clearFileNames();
@@ -231,6 +234,7 @@ const App = () => {
       .catch((e) => {
         console.log(e, 'no intent recieved');
         ReceiveSharingIntent.clearFileNames();
+        intentInit = true;
         loadMainApp();
       });
   };
