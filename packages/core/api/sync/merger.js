@@ -1,10 +1,9 @@
-import Database from "../index";
 import { areAllEmpty } from "./utils";
 
 class Merger {
   /**
    *
-   * @param {Database} db
+   * @param {import("../index").default} db
    */
   constructor(db) {
     this._db = db;
