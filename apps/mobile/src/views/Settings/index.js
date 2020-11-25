@@ -783,38 +783,52 @@ export const Settings = ({navigation}) => {
         />
 
         {vaultStatus.exists ? (
-          vaultStatus.isBiometryAvailable ? (
+          <>
+            {vaultStatus.isBiometryAvailable ? (
+              <CustomButton
+                key="fingerprintVaultUnlock"
+                title="Unlock vault with Fingerprint"
+                tagline={
+                  !vaultStatus.biometryEnrolled
+                    ? 'Enable access to the vault with fingerprint.'
+                    : 'You can access the vault with fingerprint.'
+                }
+                onPress={() => {
+                  openVault({
+                    item: {},
+                    fingerprintAccess: true,
+                    novault: true,
+                  });
+                }}
+                maxWidth="90%"
+                customComponent={
+                  <Icon
+                    size={SIZE.xl}
+                    color={
+                      vaultStatus.biometryEnrolled ? colors.accent : colors.icon
+                    }
+                    name={
+                      vaultStatus.biometryEnrolled
+                        ? 'toggle-switch'
+                        : 'toggle-switch-off'
+                    }
+                  />
+                }
+              />
+            ) : null}
             <CustomButton
-              key="fingerprintVaultUnlock"
-              title="Unlock vault with Fingerprint"
-              tagline={
-                !vaultStatus.biometryEnrolled
-                  ? 'Enable access to the vault with fingerprint.'
-                  : 'You can access the vault with fingerprint.'
-              }
+              key="changeVaultPassword"
+              title="Change Vault Password"
+              tagline="Setup a new password for the vault"
               onPress={() => {
                 openVault({
                   item: {},
-                  fingerprintAccess: true,
+                  changePassword: true,
                   novault: true,
                 });
               }}
-              maxWidth="90%"
-              customComponent={
-                <Icon
-                  size={SIZE.xl}
-                  color={
-                    vaultStatus.biometryEnrolled ? colors.accent : colors.icon
-                  }
-                  name={
-                    vaultStatus.biometryEnrolled
-                      ? 'toggle-switch'
-                      : 'toggle-switch-off'
-                  }
-                />
-              }
             />
-          ) : null
+          </>
         ) : (
           <CustomButton
             key="createVault"
