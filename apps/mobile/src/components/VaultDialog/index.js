@@ -178,7 +178,7 @@ export class VaultDialog extends Component {
           this.setState({
             loading: false,
           });
-          if (e === db.vault.ERRORS.wrongPassword) {
+          if (e.message === db.vault.ERRORS.wrongPassword) {
             ToastEvent.show('Current password incorrect.', 'error', 'local');
           }
         });
