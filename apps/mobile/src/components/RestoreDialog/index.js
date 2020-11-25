@@ -15,7 +15,7 @@ import {db} from '../../utils/DB';
 import {eCloseRestoreDialog, eOpenRestoreDialog} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
 import storage from '../../utils/storage';
-import {sleep} from '../../utils/TimeUtils';
+import {sleep, timeConverter, timeSince} from '../../utils/TimeUtils';
 import {Button} from '../Button';
 import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';
@@ -91,6 +91,13 @@ const RestoreDialog = () => {
     }
     let path = await storage.checkAndCreateDir('/backups/');
     let files = await RNFetchBlob.fs.lstat(path);
+    console.log(
+      files.sort(function (a, b) {
+        timeA = a.lastModified;
+        timeB = b.lastModified;
+        return timeB - timeA;
+      }),
+    );
 
     setFiles(files);
   };
@@ -147,7 +154,9 @@ const RestoreDialog = () => {
                 borderBottomColor: colors.nav,
               }}>
               <Paragraph size={SIZE.sm} style={{width: '70%'}}>
-                {item.filename}
+                {timeConverter(item?.lastModified * 1)}
+                {'\n'}
+                <Paragraph size={SIZE.xs}>{item.filename}</Paragraph>
               </Paragraph>
 
               <Button
