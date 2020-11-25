@@ -7,6 +7,8 @@ import { store as editorStore } from "./editor-store";
 import { store as tagStore } from "./tag-store";
 import BaseStore from "./index";
 import { isMobile } from "../utils/dimensions";
+import { showToast } from "../utils/toast";
+import { toTitleCase } from "../utils/string";
 
 class AppStore extends BaseStore {
   // default state
@@ -16,6 +18,7 @@ class AppStore extends BaseStore {
   colors = [];
   globalMenu = { items: [], data: {} };
   reminders = [];
+  menuPins = [];
 
   refresh = async () => {
     noteStore.refresh();
@@ -24,10 +27,15 @@ class AppStore extends BaseStore {
     tagStore.refresh();
     await editorStore.openLastSession();
     this.refreshColors();
+    this.refreshMenuPins();
   };
 
   refreshColors = () => {
     this.set((state) => (state.colors = db.colors.all));
+  };
+
+  refreshMenuPins = () => {
+    this.set((state) => (state.menuPins = db.settings.pins));
   };
 
   toggleFocusMode = () => {
@@ -64,6 +72,41 @@ class AppStore extends BaseStore {
         priority: priority === "high" ? 1 : priority === "medium" ? 2 : 1,
       })
     );
+  };
+
+  pinItemToMenu = async (item) => {
+    if (db.settings.isPinned(item.id)) {
+      await db.settings.unpin(item.id);
+      await showToast(
+        "success",
+        `${toTitleCase(item.type)} unpinned from menu!`
+      );
+    } else {
+      await db.settings.pin(item.type, {
+        id: item.id,
+        notebookId: item.notebookId,
+      });
+      await showToast("success", `${toTitleCase(item.type)} pinned to menu!`);
+    }
+    this.refreshMenuPins();
+
+    // refresh the respective list
+    switch (item.type) {
+      case "notebook": {
+        notebookStore.refresh();
+        break;
+      }
+      case "topic": {
+        notebookStore.setSelectedNotebookTopics(item.notebookId);
+        break;
+      }
+      case "tag": {
+        tagStore.refresh();
+        break;
+      }
+      default:
+        return;
+    }
   };
 }
 

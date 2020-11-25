@@ -219,7 +219,6 @@ function Note(props) {
         </Flex>
       }
       pinned={pinnable && note.pinned}
-      menuData={note}
       menuItems={menuItems(note, props.context)}
     />
   );

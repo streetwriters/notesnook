@@ -70,7 +70,6 @@ function TrashItem({ item, index }) {
           <Text color="primary">{toTitleCase(item.itemType)}</Text>
         </Flex>
       }
-      menuData={item}
       menuItems={menuItems(item, index)}
     />
   );

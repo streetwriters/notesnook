@@ -28,6 +28,7 @@ import Banner from "./components/banner";
 function App() {
   const [show, setShow] = useState(true);
   const refreshColors = useStore((store) => store.refreshColors);
+  const refreshMenuPins = useStore((store) => store.refreshMenuPins);
   const isFocusMode = useStore((store) => store.isFocusMode);
   const addReminder = useStore((store) => store.addReminder);
   const initUser = useUserStore((store) => store.init);
@@ -42,6 +43,7 @@ function App() {
   useEffect(
     function initializeApp() {
       refreshColors();
+      refreshMenuPins();
       initUser();
       initNotes();
       (async function () {
@@ -53,7 +55,7 @@ function App() {
         }
       })();
     },
-    [refreshColors, initUser, initNotes, addReminder]
+    [refreshColors, refreshMenuPins, initUser, initNotes, addReminder]
   );
 
   useEffect(() => {

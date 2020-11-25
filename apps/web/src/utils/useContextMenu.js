@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 var isOpening = false;
 
@@ -92,18 +92,16 @@ function getPosition(e) {
 
 function useContextMenu() {
   const [items, setItems] = useState([]);
-  const [data, setData] = useState({});
   const [title, setTitle] = useState();
   const [state, setState] = useState();
   useEffect(() => {
     const onGlobalContextMenu = (e) => {
-      const { items, data, title, internalEvent, state } = e.detail;
+      const { items, title, internalEvent, state } = e.detail;
       setState(state);
       if (state === "close") {
         return;
       }
       setItems(items);
-      setData(data);
       setTitle(title);
       openMenu(internalEvent);
     };
@@ -112,7 +110,23 @@ function useContextMenu() {
       window.removeEventListener("globalcontextmenu", onGlobalContextMenu);
     };
   }, []);
-  return [items, data, title, state, closeMenu];
+  return [items, title, state, closeMenu];
+}
+
+export function useOpenContextMenu() {
+  return useCallback((event, items, data, withClick) => {
+    window.dispatchEvent(
+      new CustomEvent("globalcontextmenu", {
+        detail: {
+          state: "open",
+          items,
+          data,
+          internalEvent: event,
+          withClick,
+        },
+      })
+    );
+  }, []);
 }
 
 export default useContextMenu;

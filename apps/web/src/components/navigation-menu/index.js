@@ -45,6 +45,7 @@ function NavigationMenu(props) {
   const [selectedRoute, setSelectedRoute] = useState(path);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
   const colors = useAppStore((store) => store.colors);
+  const pins = useAppStore((store) => store.menuPins);
   const isSideMenuOpen = useAppStore((store) => store.isSideMenuOpen);
   const toggleSideMenu = useAppStore((store) => store.toggleSideMenu);
   const isSyncing = useUserStore((store) => store.isSyncing);
@@ -141,6 +142,31 @@ function NavigationMenu(props) {
             }}
           />
         ))}
+        <Flex
+          flexDirection="column"
+          sx={{ borderTop: "1px solid", borderTopColor: "border" }}
+        >
+          {pins.map((pin) => (
+            <NavigationItem
+              key={pin.id}
+              title={pin.title}
+              menu={{
+                items: [{ title: "Unpin", onClick: () => {} }],
+                data: pin,
+              }}
+              icon={
+                pin.type === "notebook"
+                  ? Icon.Notebook2
+                  : pin.type === "tag"
+                  ? Icon.Tag2
+                  : Icon.Topic
+              }
+              onClick={() => {
+                navigate(``);
+              }}
+            />
+          ))}
+        </Flex>
       </Flex>
       <Flex flexDirection="column">
         {theme === "light" ? (

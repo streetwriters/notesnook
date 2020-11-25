@@ -1,10 +1,11 @@
-import React, { useEffect, useCallback } from "react";
+import React, { useEffect, useCallback, useMemo } from "react";
 import { Flex, Text } from "rebass";
 import * as Icon from "../icons";
 import {
   store as selectionStore,
   useStore as useSelectionStore,
 } from "../../stores/selection-store";
+import { useOpenContextMenu } from "../../utils/useContextMenu";
 
 function selectMenuItem(isSelected, toggleSelection) {
   return {
@@ -53,6 +54,8 @@ function ListItem(props) {
     selectedItems.findIndex((item) => props.item.id === item.id) > -1;
   const selectItem = useSelectionStore((store) => store.selectItem);
 
+  const openContextMenu = useOpenContextMenu();
+
   const toggleSelection = useCallback(
     function toggleSelection() {
       selectItem(props.item);
@@ -60,41 +63,22 @@ function ListItem(props) {
     [selectItem, props.item]
   );
 
+  const menuItems = useMemo(() => {
+    let items = props.menuItems;
+    if (props.selectable)
+      items = [selectMenuItem(isSelected, toggleSelection), ...items];
+    return items;
+  }, [props.menuItems, isSelected, toggleSelection, props.selectable]);
+
   useEffect(() => {
     if (!isSelectionMode && isSelected) toggleSelection();
   }, [isSelectionMode, toggleSelection, isSelected]);
-
-  const openContextMenu = useCallback(
-    (event, withClick) => {
-      let items = props.menuItems;
-      if (props.selectable)
-        items = [selectMenuItem(isSelected, toggleSelection), ...items];
-      window.dispatchEvent(
-        new CustomEvent("globalcontextmenu", {
-          detail: {
-            state: "open",
-            items,
-            data: props.menuData,
-            internalEvent: event,
-            withClick,
-          },
-        })
-      );
-    },
-    [
-      isSelected,
-      props.menuData,
-      props.menuItems,
-      props.selectable,
-      toggleSelection,
-    ]
-  );
 
   return (
     <Flex
       bg={props.focused || isSelected ? "shade" : "background"}
       alignItems="center"
-      onContextMenu={openContextMenu}
+      onContextMenu={(e) => openContextMenu(e, menuItems, false)}
       p={2}
       justifyContent="space-between"
       sx={{
@@ -181,7 +165,7 @@ function ListItem(props) {
         <Icon.MoreVertical
           size={22}
           color="icon"
-          onClick={(event) => openContextMenu(event, true)}
+          onClick={(event) => openContextMenu(event, menuItems, true)}
         />
       )}
     </Flex>

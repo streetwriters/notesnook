@@ -2,6 +2,15 @@ import React from "react";
 import ListItem from "../list-item";
 import { navigate } from "hookrouter";
 import { Text } from "rebass";
+import { store as appStore } from "../../stores/app-store";
+import { db } from "../../common";
+
+const menuItems = (item) => [
+  {
+    title: db.settings.isPinned(item.id) ? "Unpin from Menu" : "Pin to Menu",
+    onClick: () => appStore.pinItemToMenu(item),
+  },
+];
 
 function Tag({ item, index }) {
   const { title, noteIds } = item;
@@ -12,6 +21,7 @@ function Tag({ item, index }) {
       index={index}
       title={<TagNode title={title} />}
       info={`${noteIds.length} notes`}
+      menuItems={menuItems(item)}
       onClick={() => {
         navigate(`/tags/${title}`);
       }}

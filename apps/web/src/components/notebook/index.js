@@ -2,18 +2,28 @@ import React from "react";
 import { Flex, Text } from "rebass";
 import ListItem from "../list-item";
 import { store } from "../../stores/notebook-store";
+import { store as appStore } from "../../stores/app-store";
 import { showEditNotebookDialog } from "../dialogs/addnotebookdialog";
 import { showDeleteConfirmation } from "../dialogs/confirm";
 import { showItemDeletedToast, showUnpinnedToast } from "../../common/toasts";
+import { db } from "../../common";
+
 const pin = async (notebook, index) => {
   await store.pin(notebook, index);
   if (notebook.pinned) showUnpinnedToast(notebook.id, "notebook");
 };
+
 function menuItems(notebook, index) {
   return [
     {
       title: notebook.pinned ? "Unpin" : "Pin",
       onClick: () => pin(notebook, index),
+    },
+    {
+      title: db.settings.isPinned(notebook.id)
+        ? "Unpin from Menu"
+        : "Pin to Menu",
+      onClick: () => appStore.pinItemToMenu(notebook),
     },
     {
       title: "Edit",
@@ -95,7 +105,6 @@ class Notebook extends React.Component {
         }
         pinned={notebook.pinned}
         index={index}
-        menuData={notebook}
         menuItems={menuItems(notebook, index)}
       />
     );

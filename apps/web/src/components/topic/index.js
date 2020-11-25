@@ -5,9 +5,14 @@ import { confirm } from "../dialogs/confirm";
 import * as Icon from "../icons";
 import { db } from "../../common";
 import { store } from "../../stores/notebook-store";
+import { store as appStore } from "../../stores/app-store";
 import { Text } from "rebass";
 
 const menuItems = (item) => [
+  {
+    title: db.settings.isPinned(item.id) ? "Unpin from Menu" : "Pin to Menu",
+    onClick: () => appStore.pinItemToMenu(item),
+  },
   {
     title: "Edit",
     onClick: () => {
@@ -57,7 +62,6 @@ function Topic({ item, index, onClick }) {
       title={topic.title}
       info={`${topic.totalNotes} Notes`}
       index={index}
-      menuData={topic}
       menuItems={menuItems(topic)}
     />
   );

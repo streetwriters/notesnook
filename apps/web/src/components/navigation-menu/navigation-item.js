@@ -1,12 +1,14 @@
 import React from "react";
 import { Flex, Button, Text } from "rebass";
 import { useStore as useAppStore } from "../../stores/app-store";
+import { useOpenContextMenu } from "../../utils/useContextMenu";
 import useMobile from "../../utils/use-mobile";
 
 function NavigationItem(props) {
   const { icon: Icon, color, title, isLoading } = props;
   const toggleSideMenu = useAppStore((store) => store.toggleSideMenu);
   const isMobile = useMobile();
+  const openContextMenu = useOpenContextMenu();
 
   return (
     <Button
@@ -15,6 +17,10 @@ function NavigationItem(props) {
       py={2}
       label={title}
       title={title}
+      onContextMenu={(event) => {
+        if (!props.menu) return;
+        openContextMenu(event, props.menu.items, props.menu.data, false);
+      }}
       onClick={() => {
         if (isMobile) toggleSideMenu(false);
         props.onClick();
@@ -34,6 +40,11 @@ function NavigationItem(props) {
         <Text
           variant="body"
           fontSize="subtitle"
+          sx={{
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
           color={props.selected ? "primary" : "text"}
           ml={1}
         >
