@@ -72,12 +72,10 @@ const SimpleList = ({
 
   const loadData = () => {
     let mainData = [header, {type: 'empty'}];
-    console.log(mainData);
     mainData =
       !listData || listData.length === 0
         ? mainData
         : [header, ...listData];
-    console.log(mainData,'main data');
     setDataProvider(dataProvider.cloneWithRows(mainData));
   };
 
