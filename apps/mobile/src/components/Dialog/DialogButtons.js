@@ -3,6 +3,8 @@ import {ActivityIndicator, StyleSheet, View} from 'react-native';
 import {useTracked} from '../../provider';
 import {SIZE} from '../../utils/SizeUtils';
 import {Button} from '../Button';
+import Paragraph from '../Typography/Paragraph';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const DialogButtons = ({
   onPressPositive,
@@ -10,6 +12,7 @@ const DialogButtons = ({
   positiveTitle,
   negativeTitle = 'Cancel',
   loading,
+  doneText,
 }) => {
   const [state] = useTracked();
   const {colors} = state;
@@ -18,7 +21,22 @@ const DialogButtons = ({
     <View style={styles.container}>
       {loading ? (
         <ActivityIndicator color={colors.accent} size={SIZE.lg} />
-      ) : <View/>}
+      ) : doneText ? (
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+          }}>
+          <Icon
+            color={colors.accent}
+            name="check-circle-outline"
+            size={SIZE.md}
+          />
+          <Paragraph color={colors.accent}>{' ' + doneText}</Paragraph>
+        </View>
+      ) : (
+        <View />
+      )}
 
       <View
         style={{

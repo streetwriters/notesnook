@@ -20,8 +20,7 @@ import {Button} from '../Button';
 import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogHeader from '../Dialog/dialog-header';
-import {Loading} from '../Loading';
-import { Toast } from '../Toast';
+import {Toast} from '../Toast';
 import Paragraph from '../Typography/Paragraph';
 
 const RestoreDialog = () => {
@@ -46,7 +45,11 @@ const RestoreDialog = () => {
 
   const close = () => {
     if (restoring) {
-      ToastEvent.show('Please wait, we are restoring your data.','error','local');
+      ToastEvent.show(
+        'Please wait, we are restoring your data.',
+        'error',
+        'local',
+      );
       return;
     }
 
@@ -57,7 +60,11 @@ const RestoreDialog = () => {
     if (Platform.OS === 'android') {
       let granted = storage.requestPermission();
       if (!granted) {
-        ToastEvent.show('Restore Failed! Storage access denied',"error","local");
+        ToastEvent.show(
+          'Restore Failed! Storage access denied',
+          'error',
+          'local',
+        );
         return;
       }
     }
@@ -67,7 +74,7 @@ const RestoreDialog = () => {
     await sleep(2000);
     setRestoring(false);
     dispatch({type: Actions.ALL});
-    ToastEvent.show('Restore Complete!', 'success',"local");
+    ToastEvent.show('Restore Complete!', 'success', 'local');
     setVisible(false);
   };
 
@@ -154,7 +161,6 @@ const RestoreDialog = () => {
         />
 
         <DialogButtons loading={restoring} onPressNegative={close} />
-      
       </View>
       <Toast context="local" />
     </BaseDialog>

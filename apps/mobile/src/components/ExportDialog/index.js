@@ -1,6 +1,7 @@
 import React, {Fragment, useEffect, useState} from 'react';
 import {Platform, StyleSheet, TouchableOpacity, View} from 'react-native';
 import FileViewer from 'react-native-file-viewer';
+import {exp} from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
 import {DDS} from '../../services/DeviceDetection';
@@ -13,6 +14,7 @@ import {sleep} from '../../utils/TimeUtils';
 import {GetPremium} from '../ActionSheetComponent/GetPremium';
 import {Button} from '../Button/index';
 import BaseDialog from '../Dialog/base-dialog';
+import DialogButtons from '../Dialog/dialog-buttons';
 import DialogHeader from '../Dialog/dialog-header';
 import {Loading} from '../Loading';
 import Seperator from '../Seperator';
@@ -61,6 +63,7 @@ const ExportDialog = () => {
   };
 
   const save = async (func, name) => {
+    if (exporting) return;
     setExporting(true);
     let res;
     for (var i = 0; i < notes.length; i++) {
@@ -178,88 +181,79 @@ const ExportDialog = () => {
         />
 
         <Seperator half />
-        {exporting ? (
-          <Loading
-            done={complete}
-            doneText={doneText}
-            onDone={async () => {
-              close();
-              await sleep(500);
-              FileViewer.open(result.filePath, {
-                showOpenWithDialog: true,
-                showAppsSuggestions: true,
-              }).catch((e) => {
-                console.log(e);
-                ToastEvent.show(
-                  `No application found to open ${result.name} file`,
-                );
-              });
-            }}
-            tagline="Exporting notes"
-          />
-        ) : (
-          <>
-            <View style={styles.buttonContainer}>
-              {actions.map((item) => (
-                <Fragment key={item.title}>
-                  <Seperator half />
-
-                  <TouchableOpacity
-                    onPress={item.func}
-                    activeOpacity={1}
-                    style={{
-                      width: '100%',
-                      alignItems: 'center',
-                      flexDirection: 'row',
-                      paddingRight: 12,
-                      paddingVertical: 10,
-                    }}>
-                    <View
-                      style={{
-                        backgroundColor: colors.shade,
-                        borderRadius: 5,
-                        height: 40,
-                        width: 40,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                      }}>
-                      <Icon
-                        name={item.icon}
-                        color={colors.accent}
-                        size={SIZE.xxxl}
-                      />
-                    </View>
-                    <Heading
-                      style={{marginLeft: 5, maxWidth: '90%'}}
-                      size={SIZE.md}>
-                      {item.title}
-                      {'\n'}
-                      <Paragraph size={SIZE.sm} color={colors.icon}>
-                        {item.desc}
-                      </Paragraph>
-                    </Heading>
-                  </TouchableOpacity>
-                </Fragment>
-              ))}
-              <Seperator />
-              <View
+        <View style={styles.buttonContainer}>
+          {actions.map((item) => (
+            <Fragment key={item.title}>
+              <Seperator half />
+              <TouchableOpacity
+                onPress={item.func}
+                activeOpacity={1}
                 style={{
-                  justifyContent: 'flex-end',
                   width: '100%',
+                  alignItems: 'center',
                   flexDirection: 'row',
+                  paddingRight: 12,
+                  paddingVertical: 10,
                 }}>
-                <View />
-                <Button
-                  onPress={close}
-                  width="30%"
-                  type="gray"
-                  title="Cancel"
-                  fontSize={SIZE.md}
-                />
-              </View>
-            </View>
-          </>
-        )}
+                <View
+                  style={{
+                    backgroundColor: colors.shade,
+                    borderRadius: 5,
+                    height: 40,
+                    width: 40,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}>
+                  <Icon
+                    name={item.icon}
+                    color={colors.accent}
+                    size={SIZE.xxxl}
+                  />
+                </View>
+                <Heading
+                  style={{marginLeft: 5, maxWidth: '90%'}}
+                  size={SIZE.md}>
+                  {item.title}
+                  {'\n'}
+                  <Paragraph size={SIZE.sm} color={colors.icon}>
+                    {item.desc}
+                  </Paragraph>
+                </Heading>
+              </TouchableOpacity>
+            </Fragment>
+          ))}
+          <Seperator />
+
+          <View
+            style={{
+              width: '100%',
+            }}>
+            <DialogButtons
+              onPressNegative={close}
+              negativeTitle="Cancel"
+              positiveTitle={complete && 'Open File'}
+              onPressPositive={
+                complete
+                  ? async () => {
+                      close();
+                      await sleep(500);
+                      FileViewer.open(result.filePath, {
+                        showOpenWithDialog: true,
+                        showAppsSuggestions: true,
+                      }).catch((e) => {
+                        console.log(e);
+                        ToastEvent.show(
+                          `No application found to open ${result.name} file`,
+                        );
+                      });
+                    }
+                  : null
+              }
+              loading={exporting && !complete}
+              doneText={complete && 'Note Exported!'}
+            />
+          </View>
+        </View>
       </View>
     </BaseDialog>
   );
