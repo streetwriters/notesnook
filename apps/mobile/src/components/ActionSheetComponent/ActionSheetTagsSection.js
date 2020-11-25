@@ -255,10 +255,6 @@ export const ActionSheetTagsSection = ({item, close}) => {
           ref={tagsInputRef}
           placeholderTextColor={colors.icon}
           onFocus={() => {
-            if (!premiumUser) {
-              close('premium');
-              return;
-            }
             setFocused(true);
           }}
           selectionColor={colors.accent}

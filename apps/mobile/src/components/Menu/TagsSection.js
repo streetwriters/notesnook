@@ -150,7 +150,10 @@ const PinItem = ({item, index, onPress}) => {
           ) : item.type === 'tag' ? (
             <Icon color={colors.accent} size={SIZE.md} name="pound" />
           ) : (
-            <Paragraph color={colors.accent} size={SIZE.md}>
+            <Paragraph
+              style={{textAlign: 'center', width: 12}}
+              color={colors.accent}
+              size={SIZE.md}>
               T
             </Paragraph>
           )}

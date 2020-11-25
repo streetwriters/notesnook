@@ -1,23 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   ActivityIndicator,
   Clipboard,
   Dimensions,
-
-
   TouchableOpacity,
-  View
+  View,
 } from 'react-native';
 import Share from 'react-native-share';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useTracked } from '../../provider';
-import { Actions } from '../../provider/Actions';
-import { DDS } from '../../services/DeviceDetection';
+import {useTracked} from '../../provider';
+import {Actions} from '../../provider/Actions';
+import {DDS} from '../../services/DeviceDetection';
 import {
   eSendEvent,
   openVault,
   sendNoteEditedEvent,
-  ToastEvent
+  ToastEvent,
 } from '../../services/EventManager';
 import PremiumService from '../../services/PremiumService';
 import {
@@ -25,25 +23,25 @@ import {
   COLOR_SCHEME,
   COLOR_SCHEME_DARK,
   COLOR_SCHEME_LIGHT,
-  setColorScheme
+  setColorScheme,
 } from '../../utils/Colors';
-import { db } from '../../utils/DB';
+import {db} from '../../utils/DB';
 import {
   eOpenLoginDialog,
   eOpenMoveNoteDialog,
-  eShowGetPremium
+  eShowGetPremium,
 } from '../../utils/Events';
-import { deleteItems } from '../../utils/functions';
-import { MMKV } from '../../utils/mmkv';
-import { opacity, ph, pv, SIZE } from '../../utils/SizeUtils';
-import { timeConverter } from '../../utils/TimeUtils';
-import { PremiumTag } from '../Premium/PremiumTag';
-import { PressableButton } from '../PressableButton';
-import { Toast } from '../Toast';
+import {deleteItems} from '../../utils/functions';
+import {MMKV} from '../../utils/mmkv';
+import {opacity, ph, pv, SIZE} from '../../utils/SizeUtils';
+import {timeConverter} from '../../utils/TimeUtils';
+import {PremiumTag} from '../Premium/PremiumTag';
+import {PressableButton} from '../PressableButton';
+import {Toast} from '../Toast';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
-import { ActionSheetColorsSection } from './ActionSheetColorsSection';
-import { ActionSheetTagsSection } from './ActionSheetTagsSection';
+import {ActionSheetColorsSection} from './ActionSheetColorsSection';
+import {ActionSheetTagsSection} from './ActionSheetTagsSection';
 const w = Dimensions.get('window').width;
 
 export const ActionSheetComponent = ({
@@ -326,20 +324,20 @@ export const ActionSheetComponent = ({
           if (isPinnedToMenu) {
             await db.settings.unpin(note.id);
           } else {
-            if (item.type === 'notebook') {
-              await db.settings.pin(note.type, {id: note.id});
-            } else if (item.type === 'topic') {
+            if (item.type === 'topic') {
               await db.settings.pin(note.type, {
                 id: note.notebookId,
                 topic: note.id,
               });
+            } else {
+              await db.settings.pin(note.type, {id: note.id});
             }
           }
-       
+
           setIsPinnedToMenu(
             db.settings.pins.findIndex((i) => i.id === item.id) > -1,
           );
-          dispatch({type:Actions.MENU_PINS})
+          dispatch({type: Actions.MENU_PINS});
         } catch (e) {}
       },
       close: false,

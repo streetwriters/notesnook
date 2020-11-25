@@ -1,9 +1,11 @@
 import React from 'react';
-import {Text} from 'react-native';
+import {Text, View} from 'react-native';
 import {PressableButton} from '../../components/PressableButton';
 import {useTracked} from '../../provider';
 import NavigationService from '../../services/Navigation';
 import {SIZE, WEIGHT} from '../../utils/SizeUtils';
+import {ActionIcon} from '../ActionIcon';
+import { ActionSheetEvent } from '../DialogManager/recievers';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
@@ -25,32 +27,55 @@ const TagItem = ({item, index}) => {
       customStyle={{
         paddingHorizontal: 12,
         height: 80,
-        justifyContent: 'center',
-        alignItems: 'flex-start',
+        flexDirection: 'row',
+        alignItems: 'center',
         borderBottomWidth: 1.5,
         borderBottomColor: colors.nav,
+        width:"100%",
+        justifyContent:"space-between"
       }}>
-      <Heading size={SIZE.md}>
-        <Heading
-          style={{
-            color: colors.accent,
-          }}>
-          #
+      <View>
+        <Heading size={SIZE.md}>
+          <Heading
+            size={SIZE.md}
+            style={{
+              color: colors.accent,
+            }}>
+            #
+          </Heading>
+          {item.title}
         </Heading>
-        {item.title}
-      </Heading>
-      <Paragraph
-        color={colors.icon}
-        size={SIZE.xs}
-        style={{
-          marginTop: 5,
-        }}>
-        {item && item.noteIds.length && item.noteIds.length > 1
-          ? item.noteIds.length + ' notes'
-          : item.noteIds.length === 1
-          ? item.noteIds.length + ' note'
-          : null}
-      </Paragraph>
+        <Paragraph
+          color={colors.icon}
+          size={SIZE.xs}
+          style={{
+            marginTop: 5,
+          }}>
+          {item && item.noteIds.length && item.noteIds.length > 1
+            ? item.noteIds.length + ' notes'
+            : item.noteIds.length === 1
+            ? item.noteIds.length + ' note'
+            : null}
+        </Paragraph>
+      </View>
+
+      <ActionIcon
+        color={colors.heading}
+        name="dots-horizontal"
+        size={SIZE.xl}
+        onPress={() => {
+          let rowItems = [];
+          let columnItems = ['Pin to Menu', 'Unpin from Menu'];
+          ActionSheetEvent(item, false, false, rowItems, columnItems);
+        }}
+        customStyle={{
+          justifyContent: 'center',
+          height: 35,
+          width: 35,
+          borderRadius: 100,
+          alignItems: 'center',
+        }}
+      />
     </PressableButton>
   );
 };
