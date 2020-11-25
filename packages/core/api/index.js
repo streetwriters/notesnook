@@ -13,6 +13,7 @@ import Conflicts from "./sync/conflicts";
 import Session from "./session";
 import Constants from "../utils/constants";
 import { EV } from "../common";
+import Settings from "./settings";
 
 /**
  * @type {EventSource}
