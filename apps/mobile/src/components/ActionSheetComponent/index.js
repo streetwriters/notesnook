@@ -258,18 +258,38 @@ export const ActionSheetComponent = ({
       name: 'Pin',
       icon: 'tag-outline',
       func: async () => {
-        if (!premiumUser) {
-          close('premium');
-          return;
-        }
-
-        if (!note.id) return;
-        if (note.type === 'note') {
-          await db.notes.note(note.id).pin();
-        } else {
-          await db.notebooks.notebook(note.id).pin();
-        }
-        localRefresh(item.type);
+        await PremiumService.verify(
+          async () => {
+            if (!note.id) return;
+            if (note.type === 'note') {
+              if (db.notes.pinned.length === 3) {
+                ToastEvent.show(
+                  'You cannot pin more than 3 notes',
+                  'error',
+                  'local',
+                );
+                return;
+              }
+              await db.notes.note(note.id).pin();
+            } else {
+              if (db.notebooks.pinned.length === 3) {
+                ToastEvent.show(
+                  'You cannot pin more than 3 notes',
+                  'error',
+                  'local',
+                );
+                return;
+              }
+              await db.notebooks.notebook(note.id).pin();
+            }
+            localRefresh(item.type);
+          },
+          {
+            context: 'sheet',
+            title: 'Get Notesnook Pro',
+            desc: 'To pin notes and notebooks become a Pro user today.',
+          },
+        );
       },
       close: false,
       check: true,
@@ -279,10 +299,6 @@ export const ActionSheetComponent = ({
       name: 'Favorite',
       icon: 'star',
       func: async () => {
-        if (!premiumUser) {
-          close('premium');
-          return;
-        }
         if (!note.id) return;
         if (note.type === 'note') {
           await db.notes.note(note.id).favorite();
@@ -424,7 +440,7 @@ export const ActionSheetComponent = ({
         dispatch({type: Actions.ALL});
         setRefreshing(false);
       }
-    } 
+    }
   };
 
   const onPressVaultButton = async () => {
