@@ -381,11 +381,11 @@ export class DialogManager extends Component {
         />
         <AddTopicDialog
           ref={(ref) => (this.addTopicsDialog = ref)}
-          toEdit={item.type === 'topic' ? item : null}
+          toEdit={item?.type === 'topic' ? item : null}
           notebookID={
             actionSheetData.extraData
               ? actionSheetData.extraData.notebookID
-              : item.id
+              : item?.id
           }
           colors={colors}
         />
