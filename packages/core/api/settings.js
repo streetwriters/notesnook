@@ -29,7 +29,7 @@ class Settings {
   }
 
   isPinned(id) {
-    return this.Settings.pins.findIndex((v) => v.data.id === id) > -1;
+    return this.settings.pins.findIndex((v) => v.data.id === id) > -1;
   }
 
   get pins() {
