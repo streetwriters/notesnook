@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import "./editor.css";
 import { Text, Flex } from "rebass";
 import { Input } from "@rebass/forms";
 

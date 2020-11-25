@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useState } from "react";
-import "./editor.css";
 import { Button, Flex, Text } from "rebass";
 import * as Icon from "../icons";
 import { useStore as useAppStore } from "../../stores/app-store";

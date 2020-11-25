@@ -11,6 +11,7 @@ import { Text } from "rebass";
 import QuillFocus from "./modules/focus";
 import { isMobile } from "../../utils/dimensions";
 import { showBuyDialog } from "../dialogs/buy-dialog";
+import "./editor.css";
 
 Quill.register("modules/markdownShortcuts", MarkdownShortcuts);
 Quill.register("modules/magicUrl", MagicUrl);
@@ -193,9 +194,6 @@ export default class ReactQuill extends Component {
         mx={[2, 2, 0]}
         as="pre"
         sx={{ cursor: "text" }}
-        onClick={() => {
-          this.quill.focus();
-        }}
         onFocus={this.props.onFocus}
         id={this.props.id}
       />

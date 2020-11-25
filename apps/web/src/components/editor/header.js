@@ -1,5 +1,4 @@
 import React from "react";
-import "./editor.css";
 import { Flex } from "rebass";
 import TitleBox from "./title-box";
 import { useStore, SESSION_STATES } from "../../stores/editor-store";

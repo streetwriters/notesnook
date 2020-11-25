@@ -1,5 +1,4 @@
 import React from "react";
-import "./editor.css";
 import { Flex, Text } from "rebass";
 import { useStore } from "../../stores/editor-store";
 import { timeConverter } from "../../utils/time";

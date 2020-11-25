@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useRef } from "react";
-import "./editor.css";
 import ReactQuill from "./react-quill";
 import { Box, Flex } from "rebass";
 import Properties from "../properties";
