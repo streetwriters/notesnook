@@ -161,11 +161,13 @@ const AppStack = React.memo(
 
     const _responder = (e) => {
       const swiperLeftAreaLocation = 60;
-      const swiperRightAreaLocation = dimensions.width - 100;
+      const swiperRightAreaLocation = movedAway? dimensions.width - 150 : dimensions.width - 1;
       let pageX = e.nativeEvent.pageX;
       if (pageX <= swiperLeftAreaLocation || pageX >= swiperRightAreaLocation) {
+        console.log('true')
         tabBarRef.current?.setScrollEnabled(true);
       } else {
+        console.log('false')
         tabBarRef.current?.setScrollEnabled(false);
       }
       return false;
