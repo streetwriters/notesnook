@@ -1,34 +1,30 @@
-import React, { useEffect, useState } from 'react';
-import { ContainerBottomButton } from '../../components/Container/ContainerBottomButton';
-import { AddTopicEvent } from '../../components/DialogManager/recievers';
+import React, {useEffect, useState} from 'react';
+import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
+import {AddTopicEvent} from '../../components/DialogManager/recievers';
 import SimpleList from '../../components/SimpleList';
-import { useTracked } from '../../provider';
-import { Actions } from '../../provider/Actions';
+import {useTracked} from '../../provider';
+import {Actions} from '../../provider/Actions';
 import {
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent
+  eUnSubscribeEvent,
 } from '../../services/EventManager';
 import SearchService from '../../services/SearchService';
-import { db } from "../../utils/DB";
-import { eOnNewTopicAdded, eScrollEvent } from '../../utils/Events';
+import {db} from '../../utils/DB';
+import {eOnNewTopicAdded, eScrollEvent} from '../../utils/Events';
 
 export const Notebook = ({route, navigation}) => {
   const [, dispatch] = useTracked();
-  const [topics, setTopics] = useState([]);
+  const [topics, setTopics] = useState(route.params.notebook.topics);
   let params = route.params;
 
   const onLoad = () => {
-    let allTopics;
-    allTopics = db.notebooks.notebook(route.params.notebook.id).data.topics;
-    setTopics(allTopics);
+    setTopics(db.notebooks.notebook(route.params.notebook.id).data.topics);
   };
 
   useEffect(() => {
-    eSendEvent(eScrollEvent, 0);
-    params = route.params;
-    setTopics([...params.notebook.topics]);
-  }, []);
+    onFocus();
+  }, [route.params]);
 
   useEffect(() => {
     eSubscribeEvent(eOnNewTopicAdded, onLoad);
@@ -44,6 +40,7 @@ export const Notebook = ({route, navigation}) => {
       type: Actions.HEADER_TEXT_STATE,
       state: {
         heading: params.title,
+        id:params.notebook.id
       },
     });
 
@@ -51,7 +48,7 @@ export const Notebook = ({route, navigation}) => {
     dispatch({
       type: Actions.CONTAINER_BOTTOM_BUTTON,
       state: {
-        onPress:_onPressBottomButton
+        onPress: _onPressBottomButton,
       },
     });
 
@@ -59,20 +56,16 @@ export const Notebook = ({route, navigation}) => {
       type: Actions.CURRENT_SCREEN,
       screen: 'notebook',
     });
-  }
+  };
 
   useEffect(() => {
     navigation.addListener('focus', onFocus);
+
     return () => {
       eSendEvent(eScrollEvent, {name: params.title, type: 'back'});
       navigation.removeListener('focus', onFocus);
     };
-  },[]);
-
-
-
-
-
+  }, []);
   useEffect(() => {
     if (navigation.isFocused()) {
       updateSearch();
@@ -87,12 +80,9 @@ export const Notebook = ({route, navigation}) => {
     });
   };
 
-
-
   const _onPressBottomButton = () => {
     let n = route.params.notebook;
     AddTopicEvent(n);
-  
   };
 
   return (
@@ -108,7 +98,7 @@ export const Notebook = ({route, navigation}) => {
           heading: route.params.notebook.title,
           paragraph: 'You have not added any topics yet.',
           button: 'Add a Topic',
-          action:_onPressBottomButton
+          action: _onPressBottomButton,
         }}
       />
 

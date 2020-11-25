@@ -62,11 +62,11 @@ export const Notes = ({route, navigation}) => {
     dispatch({
       type: Actions.CONTAINER_BOTTOM_BUTTON,
       state: {
-        onPress:_onPressBottomButton,
-        color:params.type == 'color' ? COLORS_NOTE[params.title] : null
+        onPress: _onPressBottomButton,
+        color: params.type == 'color' ? COLORS_NOTE[params.title] : null,
       },
     });
-    
+
     updateSearch();
     dispatch({
       type: Actions.HEADER_TEXT_STATE,
@@ -75,6 +75,14 @@ export const Notes = ({route, navigation}) => {
           params.type === 'tag'
             ? '#' + params.title
             : params.title.slice(0, 1).toUpperCase() + params.title.slice(1),
+        id:
+          params.type === 'tag'
+            ? params.tag.id
+            : params.type === 'topic'
+            ? params.id
+            : params.type === 'color'
+            ? params.color.title
+            : null,
       },
     });
   };
@@ -114,7 +122,7 @@ export const Notes = ({route, navigation}) => {
       navigation.removeListener('focus', onFocus);
       navigation.removeListener('blur', onBlur);
     };
-  },[]);
+  }, []);
 
   useEffect(() => {
     if (navigation.isFocused()) {

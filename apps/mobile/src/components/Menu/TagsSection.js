@@ -1,50 +1,76 @@
 import React, {useEffect, useState} from 'react';
 import {FlatList, View} from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
+import {DDS} from '../../services/DeviceDetection';
 import {eSendEvent} from '../../services/EventManager';
 import NavigationService from '../../services/Navigation';
+import {getElevation} from '../../utils';
 import {db} from '../../utils/DB';
 import {refreshNotesPage} from '../../utils/Events';
+import {rootNavigatorRef} from '../../utils/Refs';
 import {ph, pv, SIZE} from '../../utils/SizeUtils';
-import {NotebookItem} from '../NotebookItem';
+import BaseDialog from '../Dialog/base-dialog';
+import DialogButtons from '../Dialog/dialog-buttons';
+import DialogHeader from '../Dialog/dialog-header';
 import {PressableButton} from '../PressableButton';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import BaseDialog from '../Dialog/base-dialog';
-import DialogHeader from '../Dialog/dialog-header';
-import DialogButtons from '../Dialog/dialog-buttons';
-import {getElevation} from '../../utils';
-import {DDS} from '../../services/DeviceDetection';
 
 export const TagsSection = () => {
   const [state, dispatch] = useTracked();
-  const {colors, menuPins} = state;
+  const {colors, menuPins, currentScreen} = state;
 
   useEffect(() => {
     dispatch({type: Actions.MENU_PINS});
   }, []);
 
   const onPress = (item) => {
-    let params = {
-      title: item.title,
-      tag: item,
-      type: 'tag',
-      menu: true,
-    };
-    dispatch({
-      type: Actions.HEADER_VERTICAL_MENU,
-      state: false,
-    });
+    let params;
+
     dispatch({
       type: Actions.HEADER_TEXT_STATE,
       state: {
         heading: item.title,
+        id: item.id,
       },
     });
-    NavigationService.navigate('NotesPage', params);
-    eSendEvent(refreshNotesPage, params);
+    if (item.type === 'notebook') {
+      params = {
+        notebook: item,
+        title: item.title,
+        root: true,
+        menu: true,
+      };
+      if (currentScreen === 'notebook') {
+        rootNavigatorRef.current?.setParams(params);
+      } else {
+        NavigationService.navigate('Notebook', {
+          notebook: item,
+          title: item.title,
+          root: true,
+        });
+      }
+    } else if (item.type === 'tag') {
+      params = params = {
+        title: item.title,
+        tag: item,
+        type: 'tag',
+        menu: true,
+      };
+
+      NavigationService.navigate('NotesPage', params);
+
+      eSendEvent(refreshNotesPage, params);
+    } else {
+      params = {...item, menu: true};
+
+      NavigationService.navigate('NotesPage', params);
+
+      eSendEvent(refreshNotesPage, params);
+    }
+
     NavigationService.closeDrawer();
   };
 
@@ -82,7 +108,7 @@ export const TagsSection = () => {
             style={{
               paddingHorizontal: 8,
               textAlignVertical: 'center',
-              height:35
+              height: 35,
             }}
             size={SIZE.sm}>
             Your Pins{'\n'}
@@ -104,7 +130,7 @@ export const TagsSection = () => {
 
 const PinItem = ({item, index, onPress}) => {
   const [state, dispatch] = useTracked();
-  const {colors, currentScreen} = state;
+  const {colors, headerTextState} = state;
   const [visible, setVisible] = useState(false);
 
   return (
@@ -135,11 +161,7 @@ const PinItem = ({item, index, onPress}) => {
         </BaseDialog>
       )}
       <PressableButton
-        color={
-          currentScreen === item.title.toLowerCase()
-            ? colors.shade
-            : 'transparent'
-        }
+        color={headerTextState.id === item.id ? colors.shade : 'transparent'}
         selectedColor={colors.accent}
         alpha={!colors.night ? -0.02 : 0.02}
         opacity={0.12}
