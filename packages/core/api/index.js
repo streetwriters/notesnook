@@ -55,6 +55,7 @@ class Database {
     this.conflicts = new Conflicts(this);
     this.lookup = new Lookup(this);
     this.backup = new Backup(this);
+    this.settings = new Settings(this);
 
     // collections
     /** @type {Notes} */
@@ -70,6 +71,7 @@ class Database {
     /** @type {Trash} */
     this.trash = await Trash.new(this, "trash");
 
+    await this.settings.init();
     await this.user.sync();
   }
 
