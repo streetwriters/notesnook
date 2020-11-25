@@ -196,7 +196,7 @@ export const Settings = ({navigation}) => {
       func: () => {
         eSendEvent(eOpenRestoreDialog);
       },
-      desc: 'Restore backup from your phone.',
+      desc: 'Restore a backup from your phone.',
     },
   ];
 
@@ -477,7 +477,7 @@ export const Settings = ({navigation}) => {
           }}>
           Accent Color{'\n'}
           <Paragraph size={SIZE.sm} color={colors.icon}>
-            Choose a color to use as accent color
+            Change the accent color of the app.
           </Paragraph>
         </Paragraph>
 
@@ -550,13 +550,10 @@ export const Settings = ({navigation}) => {
         </View>
 
         <CustomButton
-          title="Use System Dark Mode"
-          tagline={
-            settings.useSystemTheme
-              ? 'App will switch to dark mode based on system theme'
-              : 'App dark mode is independent from system theme'
-          }
+          title="System Theme"
+          tagline="Automatically switch to dark mode when the system theme changes."
           onPress={switchTheme}
+          maxWidth="90%"
           customComponent={
             <Icon
               size={SIZE.xl}
@@ -570,9 +567,7 @@ export const Settings = ({navigation}) => {
 
         <CustomButton
           title="Dark Mode"
-          tagline={
-            colors.night ? 'Dark mode is turned off' : 'Dark mode is turned on'
-          }
+          tagline="Switch on dark mode at night to protect your eyes."
           onPress={async () => {
             if (!colors.night) {
               await MMKV.setStringAsync('theme', JSON.stringify({night: true}));
@@ -586,6 +581,7 @@ export const Settings = ({navigation}) => {
               changeColorScheme(COLOR_SCHEME_LIGHT);
             }
           }}
+          maxWidth="90%"
           customComponent={
             <Icon
               size={SIZE.xl}
@@ -759,11 +755,7 @@ export const Settings = ({navigation}) => {
         <CustomButton
           key="privacyMode"
           title="Privacy Mode"
-          tagline={
-            settings.privacyScreen
-              ? 'App contents will be hidden when app goes in background and screenshots are disabled'
-              : 'App contents can be seen when app goes in background and screenshots are enabled'
-          }
+          tagline="Hide app contents when you switch to other apps. This will also disable screenshot taking in the app."
           onPress={() => {
             Platform.OS === 'android'
               ? AndroidModule.setSecureMode(!settings.privacyScreen)
@@ -788,11 +780,7 @@ export const Settings = ({navigation}) => {
               <CustomButton
                 key="fingerprintVaultUnlock"
                 title="Unlock vault with Fingerprint"
-                tagline={
-                  !vaultStatus.biometryEnrolled
-                    ? 'Enable access to the vault with fingerprint.'
-                    : 'You can access the vault with fingerprint.'
-                }
+                tagline="Access vault with fingerprint."
                 onPress={() => {
                   openVault({
                     item: {},
@@ -833,7 +821,7 @@ export const Settings = ({navigation}) => {
           <CustomButton
             key="createVault"
             title="Create Vault"
-            tagline="Adds an extra layer of security for most important notes."
+            tagline="Secure your notes by adding the to the vault."
             onPress={() => {
               openVault({
                 item: {},
@@ -972,8 +960,8 @@ export const Settings = ({navigation}) => {
         </View>
 
         <CustomButton
-          title="Encrypted Backups"
-          tagline="Encrypt your data before backup"
+          title="Backup Encryption"
+          tagline="Backups will be encrypted."
           onPress={async () => {
             if (!user) {
               ToastEvent.show(

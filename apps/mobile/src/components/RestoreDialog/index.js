@@ -21,6 +21,7 @@ import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogHeader from '../Dialog/dialog-header';
 import {Loading} from '../Loading';
+import { Toast } from '../Toast';
 import Paragraph from '../Typography/Paragraph';
 
 const RestoreDialog = () => {
@@ -44,6 +45,11 @@ const RestoreDialog = () => {
   };
 
   const close = () => {
+    if (restoring) {
+      ToastEvent.show('Please wait, we are restoring your data.','error','local');
+      return;
+    }
+
     setVisible(false);
   };
 
@@ -51,7 +57,7 @@ const RestoreDialog = () => {
     if (Platform.OS === 'android') {
       let granted = storage.requestPermission();
       if (!granted) {
-        ToastEvent.show('Restore Failed! Storage access denied');
+        ToastEvent.show('Restore Failed! Storage access denied',"error","local");
         return;
       }
     }
@@ -61,7 +67,7 @@ const RestoreDialog = () => {
     await sleep(2000);
     setRestoring(false);
     dispatch({type: Actions.ALL});
-    ToastEvent.show('Restore Complete!', 'success');
+    ToastEvent.show('Restore Complete!', 'success',"local");
     setVisible(false);
   };
 
@@ -99,28 +105,6 @@ const RestoreDialog = () => {
           backgroundColor: colors.bg,
           padding: 12,
         }}>
-        <BaseDialog visible={restoring}>
-          <View
-            style={{
-              ...getElevation(5),
-              width: '80%',
-              maxHeight: 350,
-              borderRadius: 5,
-              backgroundColor: colors.bg,
-            }}>
-            <Loading height={40} tagline="Resoring your data" />
-            <Paragraph
-              size={SIZE.xs}
-              color={colors.icon}
-              style={{
-                alignSelf: 'center',
-                textAlign: 'center',
-              }}>
-              Your data is being restored
-            </Paragraph>
-          </View>
-        </BaseDialog>
-
         <DialogHeader
           title="Your Backups"
           paragraph="All backups stored in 'Phone Storage/Notesnook/backups'"
@@ -155,10 +139,8 @@ const RestoreDialog = () => {
                 borderBottomWidth: 0.5,
                 borderBottomColor: colors.nav,
               }}>
-              <Paragraph size={SIZE.sm}>
-                {item.filename
-                  .replace('notesnook_backup_', '')
-                  .replace('.nnbackup', '')}
+              <Paragraph size={SIZE.sm} style={{width: '70%'}}>
+                {item.filename}
               </Paragraph>
 
               <Button
@@ -171,8 +153,10 @@ const RestoreDialog = () => {
           )}
         />
 
-        <DialogButtons onPressNegative={close} />
+        <DialogButtons loading={restoring} onPressNegative={close} />
+      
       </View>
+      <Toast context="local" />
     </BaseDialog>
   );
 };
