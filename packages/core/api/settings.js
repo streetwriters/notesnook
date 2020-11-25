@@ -39,7 +39,7 @@ class Settings {
       } else if (pin.type === "topic") {
         return this._db.notebooks
           .notebook(pin.data.notebookId)
-          .topics.topic(pin.data.topic)._topic;
+          .topics.topic(pin.data.id)._topic;
       } else if (pin.type === "tag") {
         return this._db.tags.tag(pin.data.id);
       }
