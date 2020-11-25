@@ -106,7 +106,11 @@ export class VaultDialog extends Component {
 
   close = () => {
     if (this.state.loading) {
-      ToastEvent.show('Please wait and do not close the app.', 'success');
+      ToastEvent.show(
+        'Please wait and do not close the app.',
+        'success',
+        'local',
+      );
       return;
     }
     updateEvent({type: Actions.NOTES});
@@ -128,6 +132,9 @@ export class VaultDialog extends Component {
 
   onPress = async () => {
     if (this.state.loading) return;
+    if (!this.password) {
+      ToastEvent.show('You must fill all the fields.', 'error', 'local');
+    }
     if (!this.state.novault) {
       if (this.password && this.password.length < 3) {
         ToastEvent.show('Password too short', 'error', 'local');
@@ -144,6 +151,9 @@ export class VaultDialog extends Component {
 
       this._createVault();
     } else if (this.state.changePassword) {
+      if (!this.newPassword) {
+        ToastEvent.show('You must fill all the fields.', 'error', 'local');
+      }
       if (this.newPassword && this.newPassword.length < 3) {
         ToastEvent.show('New password too short', 'error', 'local');
         return;
