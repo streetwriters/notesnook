@@ -25,7 +25,6 @@ export const GetPremium = ({close, context = 'global', offset = 0}) => {
     title: '',
     desc: '',
   });
-
   const open = (event) => {
     if (event.context === context) {
       setMsg({

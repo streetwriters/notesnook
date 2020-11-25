@@ -390,6 +390,45 @@
   }
 
 
+  function moduleHandlerWrapper(type, premium) {
+    return async function (value) {
+      if (!premium) {
+        await window.ReactNativeWebView.postMessage(JSON.stringify({
+          type: "premium"
+        }));
+        return;
+      }
+      handlers[type].call(this, value);
+    };
+  }
+
+  const SnowTheme = Quill.import("themes/snow");
+  const Toolbar = Quill.import("modules/toolbar");
+
+  const handlers = {
+    ...Toolbar.DEFAULTS.handlers,
+    ...SnowTheme.DEFAULTS.modules.toolbar.handlers,
+    color: function (color) {
+      this.quill.format("color", color, "user");
+    },
+    background: function (color) {
+      this.quill.format("background", color, "user");
+    },
+    align: function (position) {
+      this.quill.format("align", position, "user");
+    },
+    "code-block": function (value) {
+      this.quill.format("code-block", value, "user");
+    },
+    size: function (value) {
+      this.quill.format("size", value, "user");
+    },
+    script: function (value) {
+      this.quill.format("script", value, "user");
+    },
+  };
+
+
   function loadAction(premium, noMenu) {
     let titleIn = document.getElementById('titlebar');
     titleIn.style['padding-left'] = 0;
@@ -404,7 +443,39 @@
 
     editor = new Quill('#editor', {
       modules: {
-        toolbar: mainToolbar,
+        toolbar: {
+          container: [
+            ["bold", "italic", "underline", "strike", "blockquote"],
+            [{ header: "2" }, { header: "3" }, { header: [false, 4, 5, 6] }],
+            [
+              { align: "" },
+              { align: "center" },
+              { align: "right" },
+              { align: "justify" },
+            ],
+            [{ list: "ordered" }, { list: "bullet" }, { list: "check" }],
+            [{ indent: "-1" }, { indent: "+1" }],
+            [{ size: ["small", false, "large", "huge"] }],
+            ["code-block", { script: "sub" }, { script: "super" }],
+            [{ color: [] }, { background: [] }],
+            ["link", "image", "video"],
+            [{ direction: "rtl" }, "clean"],
+          ],
+          handlers: {
+            list: moduleHandlerWrapper("list", premium),
+            indent: moduleHandlerWrapper("indent", premium),
+            direction: moduleHandlerWrapper("direction", premium),
+            image: moduleHandlerWrapper("image", premium),
+            video: moduleHandlerWrapper("video", premium),
+            formula: moduleHandlerWrapper("formula", premium),
+            color: moduleHandlerWrapper("formula", premium),
+            background: moduleHandlerWrapper("background", premium),
+            align: moduleHandlerWrapper("align", premium),
+            "code-block": moduleHandlerWrapper("code-block", premium),
+            size: moduleHandlerWrapper("size", premium),
+            script: moduleHandlerWrapper("script", premium),
+          },
+        },
         imageCompressor: {
           quality: 0.9,
           maxWidth: 1024,
@@ -418,7 +489,7 @@
         imageResize: {
           displaySize: false,
         },
-        markdownShortcuts: premium? true : false,
+        markdownShortcuts: premium,
         magicUrl: true
       },
       placeholder: 'Start writing your note',
