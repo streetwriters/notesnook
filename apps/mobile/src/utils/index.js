@@ -12,7 +12,7 @@ import {SIZE} from './SizeUtils';
 export async function setSetting(settings, name, value) {
   let s = {...settings};
   s[name] = value;
-  await MMKV.setStringAsync('settings', JSON.stringify(s));
+  await MMKV.setStringAsync('appSettings', JSON.stringify(s));
   updateEvent({type: Actions.SETTINGS, settings: s});
 }
 

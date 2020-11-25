@@ -42,7 +42,7 @@ class SortDialog extends React.Component {
   }
 
   async getSettings() {
-    let settings = await MMKV.getItem('settings');
+    let settings = await MMKV.getItem('appSettings');
     this.setState({
       settings: JSON.parse(settings),
     });

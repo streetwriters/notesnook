@@ -188,7 +188,10 @@ export const NotebookItem = ({
                   'Delete',
                 ];
 
-            let columnItems = item.type === 'topic' ? [] : ['Pin'];
+            let columnItems =
+              item.type === 'topic'
+                ? ['Pin to Menu', 'Unpin from Menu']
+                : ['Pin', 'Pin to Menu', 'Unpin from Menu'];
 
             ActionSheetEvent(item, false, false, rowItems, columnItems, {
               notebookID: notebookID,

@@ -11,10 +11,10 @@ let settings = defaultState.settings;
 
 async function init() {
   scale.fontScale = 1;
-  settings = await MMKV.getStringAsync('settings');
+  settings = await MMKV.getStringAsync('appSettings');
   if (!settings) {
     settings = defaultState.settings;
-    await MMKV.setStringAsync('settings', JSON.stringify(settings));
+    await MMKV.setStringAsync('appSettings', JSON.stringify(settings));
   } else {
     settings = JSON.parse(settings);
   }
@@ -51,7 +51,7 @@ const setTheme = async () => {
 
 async function set(name, value) {
   settings[name] = value;
-  await MMKV.setStringAsync('settings', JSON.stringify(settings));
+  await MMKV.setStringAsync('appSettings', JSON.stringify(settings));
   updateEvent({type: Actions.SETTINGS, settings: settings});
 }
 

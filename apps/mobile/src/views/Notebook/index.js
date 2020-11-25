@@ -104,8 +104,12 @@ export const Notebook = ({route, navigation}) => {
           onLoad();
         }}
         focused={() => navigation.isFocused()}
-        placeholder={<></>}
-        placeholderText=""
+        placeholderData={{
+          heading: route.params.notebook.title,
+          paragraph: 'You have not added any topics yet.',
+          button: 'Add a Topic',
+          action:_onPressBottomButton
+        }}
       />
 
       <ContainerBottomButton

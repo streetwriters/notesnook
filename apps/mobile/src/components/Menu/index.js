@@ -62,7 +62,7 @@ export const Menu = React.memo(
         style={{
           height: '100%',
           width: '100%',
-          backgroundColor:DDS.isLargeTablet()? colors.nav : colors.bg,
+          backgroundColor: DDS.isLargeTablet() ? colors.nav : colors.bg,
           paddingTop: insets.top,
         }}>
         <ScrollView
@@ -81,27 +81,8 @@ export const Menu = React.memo(
               noTextMode={noTextMode}
             />
           ))}
-
-          {noTextMode ? null : <TagsSection />}
           <ColorSection noTextMode={noTextMode} />
-          <View
-            style={{
-              justifyContent: 'center',
-              alignItems: 'center',
-              flexGrow: 1,
-              paddingHorizontal: '10%',
-            }}>
-            <Heading style={{marginBottom: 2.5}} size={SIZE.sm}>
-              Your Pins
-            </Heading>
-            <Paragraph
-              style={{textAlign: 'center'}}
-              color={colors.icon}
-              size={SIZE.xs}>
-              You have not pinned anything yet. You can pin topics and tags
-              here.
-            </Paragraph>
-          </View>
+          <TagsSection />
         </ScrollView>
 
         <View

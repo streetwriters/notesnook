@@ -7,7 +7,7 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
-import {initialWindowMetrics} from 'react-native-safe-area-context';
+import {initialWindowMetrics, useSafeAreaInsets} from 'react-native-safe-area-context';
 import {DataProvider, LayoutProvider, RecyclerListView} from 'recyclerlistview';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
@@ -51,6 +51,7 @@ const SimpleList = ({
   const {colors} = state;
   const searchResults = {...state.searchResults};
   const [refreshing, setRefreshing] = useState(false);
+  const insets = useSafeAreaInsets();
   const [dataProvider, setDataProvider] = useState(
     new DataProvider((r1, r2) => {
       return r1 !== r2;
@@ -154,7 +155,7 @@ const SimpleList = ({
       style={[
         {
           backgroundColor: colors.bg,
-          height: dHeight - 250 - initialWindowMetrics.insets.top,
+          height: dHeight - 250 - insets.top,
           width: '100%',
         },
       ]}>

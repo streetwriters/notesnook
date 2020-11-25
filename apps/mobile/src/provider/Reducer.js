@@ -17,6 +17,7 @@ export const reducer = (state, action) => {
         tags: db.tags.all,
         favorites: db.notes.favorites,
         colorNotes: db.colors.all,
+        menuPins:db.settings.pins
       };
     }
     case Actions.SYNCING: {
@@ -252,6 +253,13 @@ export const reducer = (state, action) => {
       return {
         ...state,
         deviceMode: action.state,
+      };
+    }
+    case Actions.MENU_PINS: {
+
+      return {
+        ...state,
+        menuPins: db.settings.pins,
       };
     }
     default:

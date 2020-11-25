@@ -30,5 +30,6 @@ export const Actions = {
   MESSAGE_BOARD_STATE:'messageBoardState',
   LOADING:"loading",
   FULLSCREEN:"fullscreen",
-  DEVICE_MODE:"deviceMode"
+  DEVICE_MODE:"deviceMode",
+  MENU_PINS:"menuPins"
 };
