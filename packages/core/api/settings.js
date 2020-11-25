@@ -16,6 +16,7 @@ class Settings {
   async pin(type, data) {
     if (type !== "notebook" && type !== "topic" && type !== "tag")
       throw new Error("This item cannot be pinned.");
+    if (this.isPinned(data.id)) return;
     this._settings.pins.push({ type, data });
     await this._db.context.write("settings", this._settings);
   }
@@ -25,6 +26,10 @@ class Settings {
     if (index <= -1) return;
     this._settings.pins.splice(index, 1);
     await this._db.context.write("settings", this._settings);
+  }
+
+  isPinned(id) {
+    return this.Settings.pins.findIndex((v) => v.data.id === id) > -1;
   }
 
   get pins() {
