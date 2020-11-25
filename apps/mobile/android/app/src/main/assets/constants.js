@@ -1,3 +1,5 @@
+
+
 let requiring = null;
 const pageTheme = {
   colors: {
@@ -348,6 +350,7 @@ let proToolbar = [
   [{header: 1}, {header: 2}],
   [{size: ['small', false, 'large', 'huge']}], // custom dropdown
   ['bold', 'italic', 'image'], // toggled buttons
+  ['link'],
   [{list: 'ordered'}, {list: 'bullet'}, {list: 'check'}],
   [{header: [3, 4, 5, 6]}],
   [{align: []}],
@@ -513,7 +516,6 @@ function fixDropdownMenuLocations() {
 
       document.getElementById(dropdown).style.top = downTop + 20;
       document.getElementById(dropdown).style.left = left;
- 
     });
   }
 }

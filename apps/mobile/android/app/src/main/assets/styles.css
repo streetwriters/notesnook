@@ -977,6 +977,10 @@
   display: none;
 }
 
+.ql-snow .ql-tooltip input[type='text'] {
+  display: none;
+}
+
 .ql-snow .ql-tooltip.ql-editing input[type='text'] {
   display: inline-block;
 }
