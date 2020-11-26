@@ -12798,6 +12798,11 @@ uuid@^8.3.1:
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-8.3.1.tgz#2ba2e6ca000da60fce5a196954ab241131e05a31"
   integrity sha512-FOmRr+FmWEIG8uhZv6C2bTgEVXsHk08kE7mPlrBbEe+c3r9pjceVPgupIfNIhc4yx55H69OXANrUaSuu9eInKg==
 
+uzip@^0.20201126.0:
+  version "0.20201126.0"
+  resolved "https://registry.yarnpkg.com/uzip/-/uzip-0.20201126.0.tgz#88dac2fa972cdccd4eef00b40b21c71467556744"
+  integrity sha512-qru89GgrQ0wX8ZoHGx1uOVGAA4jNRi8Vneuf7UESfLv22HX4vIQGS3e5KnENXdY8+t1aLcHHMcUHikaKFn79sQ==
+
 v8-compile-cache@^2.0.3:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/v8-compile-cache/-/v8-compile-cache-2.2.0.tgz#9471efa3ef9128d2f7c6a7ca39c4dd6b5055b132"

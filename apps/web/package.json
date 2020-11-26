@@ -33,6 +33,7 @@
     "react-window": "^1.8.6",
     "rebass": "^4.0.7",
     "timeago-react": "^3.0.0",
+    "uzip": "^0.20201126.0",
     "zustand": "^2.2.3"
   },
   "devDependencies": {

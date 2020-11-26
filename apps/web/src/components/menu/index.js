@@ -48,7 +48,7 @@ function Menu(props) {
               }}
             >
               {item.component ? (
-                <item.component data={props.data} />
+                item.component
               ) : (
                 <Text as="span" fontFamily="body" fontSize="menu">
                   {item.title}

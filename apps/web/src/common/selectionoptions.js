@@ -7,6 +7,8 @@ import { store as trashStore } from "../stores/trash-store";
 import { db } from "./index";
 import { showMoveNoteDialog } from "../components/dialogs/movenotedialog";
 import { showDeleteConfirmation } from "../components/dialogs/confirm";
+import { showExportDialog } from "../components/dialogs/exportdialog";
+import { showToast } from "../utils/toast";
 
 function createOption(key, icon, onClick) {
   return {
@@ -23,54 +25,58 @@ function createOptions(options = []) {
   return [...options, DeleteOption];
 }
 
-const DeleteOption = createOption("deleteOption", Icon.Trash, async function (
-  state
-) {
-  const item = state.selectedItems[0];
+const DeleteOption = createOption(
+  "deleteOption",
+  Icon.Trash,
+  async function (state) {
+    const item = state.selectedItems[0];
 
-  if (!(await showDeleteConfirmation(item.type, true))) return;
+    if (!(await showDeleteConfirmation(item.type, true))) return;
 
-  var isAnyNoteOpened = false;
-  const items = state.selectedItems.map((item) => {
-    if (item.id === editorStore.get().session.id) isAnyNoteOpened = true;
-    if (item.locked) return 0;
-    return item.id;
-  });
+    var isAnyNoteOpened = false;
+    const items = state.selectedItems.map((item) => {
+      if (item.id === editorStore.get().session.id) isAnyNoteOpened = true;
+      if (item.locked) return 0;
+      return item.id;
+    });
 
-  if (item.dateDeleted) {
-    // we are in trash
-    await db.trash.delete(...items);
-    trashStore.refresh();
-    return;
+    if (item.dateDeleted) {
+      // we are in trash
+      await db.trash.delete(...items);
+      trashStore.refresh();
+      return;
+    }
+
+    if (isAnyNoteOpened) {
+      editorStore.newSession();
+    }
+
+    if (item.type === "note") {
+      await db.notes.delete(...items);
+      notesStore.refresh();
+    } else if (item.type === "notebook") {
+      await db.notebooks.delete(...items);
+      nbStore.refresh();
+    } else if (item.notebookId) {
+      // its a topic
+      await db.notebooks.notebook(item.notebookId).topics.delete(...items);
+      // TODO refresh topics
+    }
   }
+);
 
-  if (isAnyNoteOpened) {
-    editorStore.newSession();
+const UnfavoriteOption = createOption(
+  "unfavoriteOption",
+  Icon.Star,
+  function (state) {
+    // we know only notes can be favorited
+    state.selectedItems.forEach(async (item) => {
+      if (!item.favorite) return;
+      await db.notes.note(item.id).favorite();
+    });
+    notesStore.setContext({ type: "favorites" });
   }
-
-  if (item.type === "note") {
-    await db.notes.delete(...items);
-    notesStore.refresh();
-  } else if (item.type === "notebook") {
-    await db.notebooks.delete(...items);
-    nbStore.refresh();
-  } else if (item.notebookId) {
-    // its a topic
-    await db.notebooks.notebook(item.notebookId).topics.delete(...items);
-    // TODO refresh topics
-  }
-});
-
-const UnfavoriteOption = createOption("unfavoriteOption", Icon.Star, function (
-  state
-) {
-  // we know only notes can be favorited
-  state.selectedItems.forEach(async (item) => {
-    if (!item.favorite) return;
-    await db.notes.note(item.id).favorite();
-  });
-  notesStore.setContext({ type: "favorites" });
-});
+);
 
 const AddToNotebookOption = createOption(
   "atnOption",
@@ -84,17 +90,16 @@ const AddToNotebookOption = createOption(
   }
 );
 
-const ExportOption = createOption("exportOption", Icon.Export, async function (
-  state
-) {
-  alert("TODO.");
-  //const items = state.selectedItems.map((item) => item.id);
-
-  // if (await showMoveNoteDialog(items)) {
-  //   //TODO show proper snack
-  //   console.log("Notes moved successfully!");
-  // }
-});
+const ExportOption = createOption(
+  "exportOption",
+  Icon.Export,
+  async function (state) {
+    const items = state.selectedItems.map((item) => item.id);
+    if (await showExportDialog(items)) {
+      await showToast("success", `${items.length} notes exported!`);
+    }
+  }
+);
 
 const RestoreOption = createOption(
   "restoreOption",

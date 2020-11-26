@@ -2,6 +2,7 @@ import React from "react";
 import { Flex, Button, Text } from "rebass";
 import { db } from "../../common";
 import download from "../../utils/download";
+import { zip } from "../../utils/zip";
 import * as Icon from "../icons";
 import Dialog, { showDialog } from "./dialog";
 
@@ -71,17 +72,29 @@ function ExportDialog(props) {
   );
 }
 
-export function showExportDialog(noteId) {
+export function showExportDialog(noteIds) {
   return showDialog((perform) => (
     <ExportDialog
-      title={"Export your Note"}
+      title={
+        noteIds.length > 1 ? `Export ${noteIds.length} notes` : "Export note"
+      }
       icon={Icon.Export}
       onClose={() => perform(false)}
       exportNote={async (format) => {
-        const note = db.notes.note(noteId);
-        const content = await note.export(format);
-        if (!content) return perform(false);
-        download(note.title, content, format);
+        var files = [];
+        for (var noteId of noteIds) {
+          const note = db.notes.note(noteId);
+          const content = await note.export(format);
+          if (!content) continue;
+          files.push({ filename: note.title, content });
+        }
+        if (!files.length) return perform(false);
+        if (files.length === 1) {
+          download(files[0].filename, files[0].content, format);
+        } else {
+          const zipped = zip(files, format);
+          download("notes", zipped, "zip");
+        }
         perform(true);
       }}
     />

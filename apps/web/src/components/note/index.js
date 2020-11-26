@@ -23,7 +23,7 @@ const pin = async (note) => {
 
 function menuItems(note, context) {
   return [
-    { title: "colors", component: Colors },
+    { title: "colors", component: <Colors data={note} /> },
     {
       title: note.notebook?.id ? "Move" : "Add to",
       onClick: async () => {
@@ -43,7 +43,7 @@ function menuItems(note, context) {
     {
       title: "Export",
       onClick: async () => {
-        if (await showExportDialog(note))
+        if (await showExportDialog([note.id]))
           showToast("success", `Note exported successfully!`);
       },
       onlyPro: true,
