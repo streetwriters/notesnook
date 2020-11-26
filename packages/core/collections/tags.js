@@ -4,12 +4,6 @@ import { qclone } from "qclone";
 import set from "../utils/set";
 
 export default class Tags extends Collection {
-  notes(tag) {
-    const tagItem = this.all.find((t) => t.title === tag);
-    if (!tagItem) return [];
-    return tagItem.noteIds;
-  }
-
   tag(id) {
     const tagItem = this.all.find((t) => t.id === id);
     if (!tagItem) return;

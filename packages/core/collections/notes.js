@@ -120,8 +120,10 @@ export default class Notes extends Collection {
     return tfun.filter(".favorite === true")(this.all);
   }
 
-  tagged(tag) {
-    return this._db.tags.notes(tag).map((id) => this._collection.getItem(id));
+  tagged(tagId) {
+    const tag = this._db.tags.tag(tagId);
+    if (!tag || tag.noteIds.length <= 0) return [];
+    return tag.noteIds.map((id) => this._collection.getItem(id));
   }
 
   colored(color) {
