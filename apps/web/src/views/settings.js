@@ -18,6 +18,7 @@ import { showBuyDialog } from "../components/dialogs/buy-dialog";
 import Vault from "../common/vault";
 import ScrollContainer from "../components/scroll-container";
 import { showLoadingDialog } from "../components/dialogs/loadingdialog";
+import { showToast } from "../utils/toast";
 
 function importBackup() {
   return new Promise((resolve, reject) => {
@@ -26,9 +27,6 @@ function importBackup() {
     importFileElem.onchange = function () {
       const file = importFileElem.files[0];
       if (!file.name.endsWith(".nnbackup")) {
-        alert(
-          "Invalid backup file provided. Make sure it has an .nnbackup extension."
-        );
         return reject(
           "The given file does not have .nnbackup extension. Only files with .nnbackup extension are supported."
         );
@@ -250,11 +248,24 @@ function Settings(props) {
         <Button
           variant="list"
           onClick={async () => {
+            const data = await showLoadingDialog({
+              title: "Creating backup",
+              subtitle: "We are creating a backup of your data. Please wait...",
+              action: async () => {
+                return await db.backup.export("web", encryptBackups);
+              },
+              message: (
+                <Text color="error">
+                  Please do NOT close your browser or shut down your PC.
+                </Text>
+              ),
+            });
             download(
               `notesnook-backup-${new Date().toLocaleString("en")}`,
-              await db.backup.export("web", encryptBackups),
+              data,
               "nnbackup"
             );
+            await showToast("success", "Backup created!");
           }}
         >
           <TextWithTip
@@ -271,19 +282,31 @@ function Settings(props) {
         <Button
           variant="list"
           onClick={async () => {
-            const backupData = JSON.stringify(await importBackup());
-            showLoadingDialog({
-              title: "Restoring backup",
-              subtitle: "We are restoring your backup. Please wait...",
-              action: async () => {
-                await db.backup.import(backupData);
-              },
-              message: (
-                <Text color="error">
-                  Please do NOT close your browser or shut down your PC.
-                </Text>
-              ),
-            });
+            try {
+              const backupData = JSON.stringify(await importBackup());
+              const error = await showLoadingDialog({
+                title: "Restoring backup",
+                subtitle: "We are restoring your backup. Please wait...",
+                action: async () => {
+                  await db.backup.import(backupData);
+                },
+                message: (
+                  <Text color="error">
+                    Please do NOT close your browser or shut down your PC.
+                  </Text>
+                ),
+              });
+              if (!error) {
+                await showToast("success", "Backup restored!");
+              } else {
+                throw new Error(error);
+              }
+            } catch (e) {
+              await showToast(
+                "error",
+                `Could not restore the backup. Error message: ${e.message || e}`
+              );
+            }
           }}
         >
           <TextWithTip

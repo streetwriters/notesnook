@@ -17,7 +17,7 @@ function showToast(type, message, actions) {
     <ToastContainer type={type} message={message} actions={actions} />,
     {
       position: isMobile() ? "bottom-center" : "top-right",
-      hideAfter: actions ? 5 : 3,
+      hideAfter: actions ? 5 : type === "error" ? 5 : 3,
       bar: { size: "0px" },
       renderIcon: () => {
         return (
@@ -34,7 +34,12 @@ function ToastContainer(props) {
   const { type, message, actions } = props;
   return (
     <ThemeProvider>
-      <Flex data-test-id="toast" justifyContent="center" alignContent="center">
+      <Flex
+        data-test-id="toast"
+        justifyContent="center"
+        alignContent="center"
+        my={1}
+      >
         <Text
           data-test-id="toast-message"
           variant="body"

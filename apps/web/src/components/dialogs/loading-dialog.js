@@ -6,8 +6,11 @@ import * as Icon from "../icons";
 function LoadingDialog(props) {
   useEffect(() => {
     (async function () {
-      await props.action();
-      props.onDone();
+      try {
+        props.onDone(await props.action());
+      } catch (e) {
+        props.onDone(e);
+      }
     })();
   }, [props]);
 
