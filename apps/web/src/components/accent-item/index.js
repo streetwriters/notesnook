@@ -2,17 +2,24 @@ import React from "react";
 import { Flex } from "rebass";
 import * as Icon from "../icons";
 import { useStore as useThemeStore } from "../../stores/theme-store";
+import { isUserPremium } from "../../common";
+import { showBuyDialog } from "../dialogs/buy-dialog";
 
 function AccentItem(props) {
   const { code, label } = props;
-  const setAccent = useThemeStore(store => store.setAccent);
-  const accent = useThemeStore(store => store.accent);
+  const setAccent = useThemeStore((store) => store.setAccent);
+  const accent = useThemeStore((store) => store.accent);
 
   return (
     <Flex
       variant="rowCenter"
       sx={{ position: "relative" }}
-      onClick={() => setAccent(code)}
+      onClick={async () => {
+        if (isUserPremium()) setAccent(code);
+        else {
+          await showBuyDialog();
+        }
+      }}
       key={label}
     >
       {code === accent && (
@@ -20,7 +27,7 @@ function AccentItem(props) {
           sx={{
             position: "absolute",
             zIndex: 1,
-            cursor: "pointer"
+            cursor: "pointer",
           }}
           color="static"
           size={20}

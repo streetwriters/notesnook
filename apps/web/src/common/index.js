@@ -13,6 +13,7 @@ import download from "../utils/download";
 import { Text } from "rebass";
 import { showLoadingDialog } from "../components/dialogs/loadingdialog";
 import Config from "../utils/config";
+import { store as userstore } from "../stores/user-store";
 
 export const db = new Database(StorageInterface, EventSource);
 db.host("http://localhost:4100");
@@ -98,4 +99,9 @@ export async function createBackup() {
     "nnbackup"
   );
   await showToast("success", "Backup created!");
+}
+
+export function isUserPremium() {
+  const subStatus = userstore.get().user?.subscription?.status;
+  return subStatus && subStatus >= 1 && subStatus <= 3;
 }

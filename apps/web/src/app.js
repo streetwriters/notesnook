@@ -4,10 +4,7 @@ import { Flex, Box } from "rebass";
 import ThemeProvider from "./components/theme-provider";
 import { useStore } from "./stores/app-store";
 import { useStore as useEditorStore } from "./stores/editor-store";
-import {
-  store as userstore,
-  useStore as useUserStore,
-} from "./stores/user-store";
+import { useStore as useUserStore } from "./stores/user-store";
 import { useStore as useNotesStore } from "./stores/note-store";
 import Animated from "./components/animated";
 import NavigationMenu from "./components/navigationmenu";
@@ -20,6 +17,7 @@ import {
   shouldAddBackupReminder,
   shouldAddSignupReminder,
 } from "./common/reminders";
+import { isUserPremium } from "./common";
 import { EV } from "notes-core/common";
 import useTablet from "./utils/use-tablet";
 import { showBuyDialog } from "./components/dialogs/buy-dialog";
@@ -61,8 +59,7 @@ function App() {
   useEffect(() => {
     EV.subscribe("user:checkStatus", async (type) => {
       //return { type, result: true };
-      const subStatus = userstore.get().user?.subscription?.status;
-      if (subStatus && subStatus >= 1 && subStatus <= 3) {
+      if (isUserPremium()) {
         return { type, result: true };
       } else {
         await showBuyDialog();

@@ -9,7 +9,12 @@ import accents from "../theme/accents";
 import { showLogInDialog } from "../components/dialogs/logindialog";
 import { showLogoutConfirmation } from "../components/dialogs/confirm";
 import useSystemTheme from "../utils/use-system-theme";
-import { createBackup, db, SUBSCRIPTION_STATUS } from "../common";
+import {
+  createBackup,
+  db,
+  isUserPremium,
+  SUBSCRIPTION_STATUS,
+} from "../common";
 import { usePersistentState } from "../utils/hooks";
 import dayjs from "dayjs";
 import { showRecoveryKeyDialog } from "../components/dialogs/recoverykeydialog";
@@ -233,6 +238,7 @@ function Settings(props) {
           title="Follow system theme"
           onTip="Switch app theme according to system"
           offTip="Keep app theme independent"
+          premium
           onToggled={toggleFollowSystemTheme}
           isToggled={followSystemTheme}
         />
@@ -297,6 +303,7 @@ function Settings(props) {
           onTip="All backups will be encrypted"
           offTip="Backups will not be encrypted"
           onToggled={toggleEncryptBackups}
+          premium
           isToggled={encryptBackups}
         />
 
@@ -377,14 +384,19 @@ function TextWithTip({ text, tip, sx }) {
 }
 
 function ToggleItem(props) {
-  const { title, onTip, offTip, isToggled, onToggled, onlyIf } = props;
+  const { title, onTip, offTip, isToggled, onToggled, onlyIf, premium } = props;
 
   if (onlyIf === false) return null;
   return (
     <Flex
       justifyContent="space-between"
       alignItems="center"
-      onClick={onToggled}
+      onClick={async () => {
+        if (isUserPremium() || !premium) onToggled();
+        else {
+          await showBuyDialog();
+        }
+      }}
       py={2}
       sx={{
         cursor: "pointer",
