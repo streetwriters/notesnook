@@ -64,7 +64,7 @@ export const Trash = ({route, navigation}) => {
     SearchService.update({
       placeholder: 'Search in trash',
       data: trash,
-      type: 'notes',
+      type: 'trash',
     });
   };
 
