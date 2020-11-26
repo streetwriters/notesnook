@@ -1,5 +1,5 @@
 import React from 'react';
-import {ScrollView, View} from 'react-native';
+import {FlatList, ScrollView, View} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
@@ -13,10 +13,7 @@ import {
 } from '../../utils/Colors';
 import {MenuItemsList} from '../../utils/index';
 import {MMKV} from '../../utils/mmkv';
-import {SIZE} from '../../utils/SizeUtils';
 import Seperator from '../Seperator';
-import Heading from '../Typography/Heading';
-import Paragraph from '../Typography/Paragraph';
 import {ColorSection} from './ColorSection';
 import {MenuListItem} from './MenuListItem';
 import {TagsSection} from './TagsSection';
@@ -65,52 +62,49 @@ export const Menu = React.memo(
           backgroundColor: DDS.isLargeTablet() ? colors.nav : colors.bg,
           paddingTop: insets.top,
         }}>
-        <ScrollView
+        <FlatList
           alwaysBounceVertical={false}
           contentContainerStyle={{
-            minHeight: '50%',
             flexGrow: 1,
           }}
-          showsVerticalScrollIndicator={false}>
-          {MenuItemsList.map((item, index) => (
-            <MenuListItem
-              testID={item.name}
-              key={item.name}
-              item={item}
-              index={index}
-              noTextMode={noTextMode}
-            />
-          ))}
-          <ColorSection noTextMode={noTextMode} />
-          <TagsSection />
-        </ScrollView>
+          showsVerticalScrollIndicator={false}
+          data={[0]}
+          keyExtractor={() => 'mainMenuView'}
+          renderItem={() => (
+            <>
+              {MenuItemsList.map((item, index) => (
+                <MenuListItem
+                  testID={item.name}
+                  key={item.name}
+                  item={item}
+                  index={index}
+                  noTextMode={noTextMode}
+                />
+              ))}
+              <ColorSection noTextMode={noTextMode} />
+              <TagsSection />
+            </>
+          )}
+        />
 
+        {BottomItemsList.map((item, index) => (
+          <MenuListItem
+            testID={item.name == 'Night mode' ? 'night_mode' : item.name}
+            key={item.name}
+            item={item}
+            index={index}
+            ignore={true}
+            noTextMode={false}
+          />
+        ))}
         <View
           style={{
             width: '100%',
-            justifyContent: noTextMode ? 'center' : 'center',
-            alignItems: 'center',
-            alignSelf: 'center',
-            marginBottom: 15,
+            padding: 8,
           }}>
-          <View
-            style={{
-              width: '100%',
-            }}>
-            {BottomItemsList.map((item, index) => (
-              <MenuListItem
-                testID={item.name == 'Night mode' ? 'night_mode' : item.name}
-                key={item.name}
-                item={item}
-                index={index}
-                ignore={true}
-                noTextMode={noTextMode}
-              />
-            ))}
-          </View>
           <Seperator half />
-
           <UserSection noTextMode={noTextMode} />
+          <Seperator />
         </View>
       </View>
     );

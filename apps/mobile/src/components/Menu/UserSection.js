@@ -1,6 +1,5 @@
 import React from 'react';
-import {ActivityIndicator, Text, TouchableOpacity, View} from 'react-native';
-import {color} from 'react-native-reanimated';
+import {ActivityIndicator, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
@@ -8,7 +7,7 @@ import {eSendEvent, ToastEvent} from '../../services/EventManager';
 import {showContext, SUBSCRIPTION_STATUS_STRINGS} from '../../utils';
 import {db} from '../../utils/DB';
 import {eOpenLoginDialog} from '../../utils/Events';
-import {pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
+import {pv, SIZE} from '../../utils/SizeUtils';
 import {PressableButton} from '../PressableButton';
 import Paragraph from '../Typography/Paragraph';
 import {TimeSince} from './TimeSince';
@@ -21,7 +20,9 @@ export const UserSection = ({noTextMode}) => {
     <View
       style={{
         width: '100%',
-        borderRadius: 0,
+        borderRadius: 5,
+        alignSelf: 'center',
+        backgroundColor: colors.shade,
       }}>
       <View
         style={{
@@ -30,7 +31,9 @@ export const UserSection = ({noTextMode}) => {
           alignItems: 'center',
           backgroundColor: colors.accent,
           paddingHorizontal: 6,
-          paddingVertical: 8,
+          paddingVertical: 6,
+          borderTopRightRadius: 5,
+          borderTopLeftRadius: 5,
         }}>
         <Paragraph color="white">
           <Icon name="account-outline" /> {user.username}
@@ -41,6 +44,7 @@ export const UserSection = ({noTextMode}) => {
       </View>
 
       <TouchableOpacity
+        activeOpacity={0.8}
         onPress={async () => {
           dispatch({
             type: Actions.SYNCING,
@@ -68,7 +72,7 @@ export const UserSection = ({noTextMode}) => {
           flexDirection: 'row',
           justifyContent: 'space-between',
           alignItems: 'center',
-          paddingHorizontal: 5,
+          paddingRight: 5,
           paddingVertical: 12,
         }}>
         <View
@@ -80,7 +84,7 @@ export const UserSection = ({noTextMode}) => {
             style={{
               marginLeft: 5,
             }}>
-            {syncing ? 'Syncing ' : 'Synced '}
+            {syncing ? 'Syncing ' : 'Last synced: '}
             {!syncing ? (
               user?.lastSynced ? (
                 <TimeSince time={user.lastSynced} />
@@ -112,10 +116,7 @@ export const UserSection = ({noTextMode}) => {
       onPress={() => {
         eSendEvent(eOpenLoginDialog);
       }}
-      onLongPress={(event) => {
-        showContext(event, 'Login');
-      }}
-      color="transparent"
+      color={colors.accent}
       selectedColor={colors.accent}
       alpha={!colors.night ? -0.02 : 0.1}
       opacity={0.12}
@@ -123,7 +124,7 @@ export const UserSection = ({noTextMode}) => {
         paddingVertical: 12,
         marginVertical: 5,
         marginTop: pv + 5,
-        borderRadius: 0,
+        borderRadius: 5,
         width: '100%',
         flexDirection: 'row',
         alignItems: 'center',

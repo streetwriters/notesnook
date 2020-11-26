@@ -1,16 +1,15 @@
 import React from 'react';
-import {View} from 'react-native';
+import { View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useTracked} from '../../provider';
-import {DDS} from '../../services/DeviceDetection';
+import { useTracked } from '../../provider';
 import Navigation from '../../services/Navigation';
-import {SIZE} from '../../utils/SizeUtils';
-import {PressableButton} from '../PressableButton';
+import { SIZE } from '../../utils/SizeUtils';
+import { PressableButton } from '../PressableButton';
 import Paragraph from '../Typography/Paragraph';
 
 export const MenuListItem = ({item, index, noTextMode, ignore, testID}) => {
   const [state, dispatch] = useTracked();
-  const {currentScreen, colors} = state;
+  const {headerTextState, colors} = state;
 
   const _onPress = (event) => {
     if (item.func) {
@@ -38,13 +37,13 @@ export const MenuListItem = ({item, index, noTextMode, ignore, testID}) => {
       key={item.name + index}
       onPress={_onPress}
       color={
-        currentScreen === item.name.toLowerCase() ? colors.shade : 'transparent'
+        headerTextState.id === item.name.toLowerCase() + "_navigation" ? colors.shade : 'transparent'
       }
       selectedColor={colors.accent}
       alpha={!colors.night ? -0.02 : 0.02}
       opacity={0.12}
       customStyle={{
-        width: '100%',
+        width: noTextMode ? 50 : '100%',
         alignSelf: 'center',
         borderRadius: 0,
         flexDirection: 'row',
@@ -60,13 +59,13 @@ export const MenuListItem = ({item, index, noTextMode, ignore, testID}) => {
         }}>
         <Icon
           style={{
-            minWidth: noTextMode ? 5 : 35,
+            minWidth: noTextMode ? null : 35,
             textAlignVertical: 'center',
-            textAlign: 'left',
+            textAlign: noTextMode ? 'center' : 'left',
           }}
           name={item.icon}
           color={colors.accent}
-          size={DDS.isTab ? SIZE.md + 5 : SIZE.md + 1}
+          size={SIZE.md}
         />
         {noTextMode ? null : <Paragraph size={SIZE.md}>{item.name}</Paragraph>}
       </View>
