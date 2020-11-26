@@ -43,13 +43,15 @@ class EditorStore extends BaseStore {
     });
   };
 
-  openLastSession = async () => {
+  openLastSession = () => {
     // Do not reopen last session on mobile
     if (isMobile() && isTablet()) return;
     const id = localStorage.getItem("lastOpenedNote");
 
     if (id) {
-      setHashParam({ note: id });
+      db.notes.init().then(() => {
+        setHashParam({ note: id });
+      });
     }
   };
 
