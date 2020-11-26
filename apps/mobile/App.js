@@ -187,6 +187,7 @@ const App = () => {
       dispatch({type: Actions.NOTES});
       console.log('setting loading to false');
       dispatch({type: Actions.LOADING, loading: false});
+      SettingsService.setAppLoaded();
     });
 
     //Sentry = require('@sentry/react-native');

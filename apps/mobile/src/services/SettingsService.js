@@ -8,6 +8,15 @@ import {scale, updateSize} from '../utils/SizeUtils';
 import {enabled} from 'react-native-privacy-snapshot';
 import {Platform} from 'react-native';
 let settings = defaultState.settings;
+let appLoaded = false;
+
+function setAppLoaded() {
+  appLoaded = true;
+}
+
+function getApploaded() {
+  return appLoaded;
+}
 
 async function init() {
   scale.fontScale = 1;
@@ -64,4 +73,6 @@ export default {
   setTheme,
   set,
   get,
+  setAppLoaded,
+  getApploaded,
 };

@@ -17,6 +17,7 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent,
 } from './src/services/EventManager';
+import SettingsService from './src/services/SettingsService';
 import {editing, setWidthHeight} from './src/utils';
 import {
   eCloseFullscreenEditor,
@@ -26,7 +27,6 @@ import {
   eOpenSideMenu,
 } from './src/utils/Events';
 import {editorRef, tabBarRef} from './src/utils/Refs';
-import {sleep} from './src/utils/TimeUtils';
 import {EditorWrapper} from './src/views/Editor/EditorWrapper';
 import {getIntent, getNote, post} from './src/views/Editor/Functions';
 
@@ -138,7 +138,12 @@ const AppStack = React.memo(
       } else {
         setDeviceMode('mobile', size);
       }
+      if (!SettingsService.getApploaded()) {
+        eSendEvent('nointent');
+      }
       SplashScreen.hide();
+  
+
     }
 
     function setDeviceMode(current, size) {
