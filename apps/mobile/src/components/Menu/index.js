@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {FlatList, ScrollView, View} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useTracked} from '../../provider';
@@ -53,13 +53,14 @@ export const Menu = React.memo(
         close: true,
       },
     ];
-
+    
+  
     return (
       <View
         style={{
           height: '100%',
           width: '100%',
-          backgroundColor: DDS.isLargeTablet() ? colors.nav : colors.bg,
+          backgroundColor: "white",
           paddingTop: insets.top,
         }}>
         <FlatList
@@ -74,11 +75,8 @@ export const Menu = React.memo(
             <>
               {MenuItemsList.map((item, index) => (
                 <MenuListItem
-                  testID={item.name}
-                  key={item.name}
                   item={item}
                   index={index}
-                  noTextMode={noTextMode}
                 />
               ))}
               <ColorSection noTextMode={noTextMode} />

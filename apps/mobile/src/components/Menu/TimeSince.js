@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from 'react';
-import {Text} from 'react-native';
 import {timeSince} from "../../utils/TimeUtils";
 import Paragraph from '../Typography/Paragraph';
 

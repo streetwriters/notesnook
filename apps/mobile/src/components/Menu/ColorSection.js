@@ -1,8 +1,12 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {View} from 'react-native';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
-import {eSendEvent} from '../../services/EventManager';
+import {
+  eSendEvent,
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import {COLORS_NOTE} from '../../utils/Colors';
 import {refreshNotesPage} from '../../utils/Events';
@@ -12,10 +16,42 @@ import Paragraph from '../Typography/Paragraph';
 
 export const ColorSection = ({noTextMode}) => {
   const [state, dispatch] = useTracked();
-  const {colors, colorNotes, headerTextState} = state;
+  const {colorNotes} = state;
 
   useEffect(() => {
     dispatch({type: Actions.COLORS});
+  }, []);
+
+  return (
+    <View
+      style={{
+        width: '100%',
+      }}>
+      {colorNotes.map((item, index) => (
+        <ColorItem item={item} index={index} />
+      ))}
+    </View>
+  );
+};
+
+const ColorItem = ({item, index}) => {
+  const [state, dispatch] = useTracked();
+  const {colors} = state;
+  const [headerTextState, setHeaderTextState] = useState(null);
+
+  const onHeaderStateChange = (event) => {
+    if (event.id === item.name) {
+      setHeaderTextState(event);
+    } else {
+      setHeaderTextState(null);
+    }
+  };
+
+  useEffect(() => {
+    eSubscribeEvent('onHeaderStateChange', onHeaderStateChange);
+    return () => {
+      eUnSubscribeEvent('onHeaderStateChange', onHeaderStateChange);
+    };
   }, []);
 
   const onPress = (item) => {
@@ -35,65 +71,58 @@ export const ColorSection = ({noTextMode}) => {
   };
 
   return (
-    <View
-      style={{
+    <PressableButton
+      key={item.id}
+      color={
+        headerTextState?.id === item.id && item.type === headerTextState?.type
+          ? COLORS_NOTE[item.title]
+          : 'transparent'
+      }
+      selectedColor={COLORS_NOTE[item.title]}
+      alpha={!colors.night ? -0.02 : 0.02}
+      opacity={0.12}
+      onPress={() => onPress(item)}
+      customStyle={{
+        flexDirection: 'row',
+        justifyContent: noTextMode ? 'center' : 'flex-start',
+        alignItems: 'center',
         width: '100%',
+        borderRadius: 0,
+        paddingHorizontal: 10,
+        height: 50,
       }}>
-      {colorNotes.map((item) => (
-        <PressableButton
-          key={item.id}
-          color={
-            headerTextState.id === item.id && item.type === headerTextState.type
-              ? COLORS_NOTE[item.title]
-              : 'transparent'
-          }
-          selectedColor={COLORS_NOTE[item.title]}
-          alpha={!colors.night ? -0.02 : 0.02}
-          opacity={0.12}
-          onPress={() => onPress(item)}
-          customStyle={{
-            flexDirection: 'row',
-            justifyContent: noTextMode ? 'center' : 'flex-start',
-            alignItems: 'center',
-            width: '100%',
-            borderRadius: 0,
-            paddingHorizontal: 10,
-            height: 50,
-          }}>
-          <View
-            style={{
-              width: 35,
-              height: 35,
-              justifyContent: 'center',
-              alignItems: 'flex-start',
-            }}>
-            <View
-              style={{
-                width: SIZE.md,
-                height: SIZE.md,
-                backgroundColor: COLORS_NOTE[item.title],
-                borderRadius: 100,
-                justifyContent: 'center',
-                marginRight: 10,
-              }}
-            />
-          </View>
+      <View
+        style={{
+          width: 35,
+          height: 35,
+          justifyContent: 'center',
+          alignItems: 'flex-start',
+        }}>
+        <View
+          style={{
+            width: SIZE.md,
+            height: SIZE.md,
+            backgroundColor: COLORS_NOTE[item.title],
+            borderRadius: 100,
+            justifyContent: 'center',
+            marginRight: 10,
+          }}
+        />
+      </View>
 
-          {noTextMode ? null : (
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                width: '85%',
-              }}>
-              <Paragraph color={colors.heading} size={SIZE.md}>
-                {item.title.slice(0, 1).toUpperCase() + item.title.slice(1)}
-              </Paragraph>
-            </View>
-          )}
-        </PressableButton>
-      ))}
-    </View>
+      {noTextMode ? null : (
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            width: '85%',
+          }}>
+          <Paragraph color={colors.heading} size={SIZE.md}>
+            {item.title.slice(0, 1).toUpperCase() + item.title.slice(1)}
+          </Paragraph>
+        </View>
+      )}
+    </PressableButton>
   );
 };

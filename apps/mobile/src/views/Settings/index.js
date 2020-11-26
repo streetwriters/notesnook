@@ -94,7 +94,6 @@ export const Settings = ({navigation}) => {
 
   const onFocus = useCallback(() => {
     eSendEvent(eScrollEvent, {name: 'Settings', type: 'in'});
-
     if (DDS.isLargeTablet()) {
       dispatch({
         type: Actions.CONTAINER_BOTTOM_BUTTON,

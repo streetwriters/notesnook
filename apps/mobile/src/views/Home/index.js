@@ -19,6 +19,7 @@ export const Home = ({route, navigation}) => {
   const onFocus = useCallback(() => {
     updateSearch();
     eSendEvent(eScrollEvent, {name: 'Notes', type: 'in'});
+    
     if (DDS.isLargeTablet()) {
       dispatch({
         type: Actions.CONTAINER_BOTTOM_BUTTON,

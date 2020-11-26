@@ -1,15 +1,17 @@
-import React from 'react';
-import { View } from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useTracked } from '../../provider';
+import {useTracked} from '../../provider';
+import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import { SIZE } from '../../utils/SizeUtils';
-import { PressableButton } from '../PressableButton';
+import {SIZE} from '../../utils/SizeUtils';
+import {PressableButton} from '../PressableButton';
 import Paragraph from '../Typography/Paragraph';
 
-export const MenuListItem = ({item, index, noTextMode, ignore, testID}) => {
+export const MenuListItem = ({item, index, noTextMode, testID}) => {
   const [state, dispatch] = useTracked();
-  const {headerTextState, colors} = state;
+  const {colors} = state;
+  const [headerTextState, setHeaderTextState] = useState(null);
 
   const _onPress = (event) => {
     if (item.func) {
@@ -31,13 +33,30 @@ export const MenuListItem = ({item, index, noTextMode, ignore, testID}) => {
     }
   };
 
+  const onHeaderStateChange = (event) => {
+    if (event.id === item.name.toLowerCase() + '_navigation') {
+      setHeaderTextState(event);
+    } else {
+      setHeaderTextState(null);
+    }
+  };
+
+  useEffect(() => {
+    eSubscribeEvent('onHeaderStateChange', onHeaderStateChange);
+    return () => {
+      eUnSubscribeEvent('onHeaderStateChange', onHeaderStateChange);
+    };
+  }, []);
+
   return (
     <PressableButton
       testID={testID}
       key={item.name + index}
       onPress={_onPress}
       color={
-        headerTextState.id === item.name.toLowerCase() + "_navigation" ? colors.shade : 'transparent'
+        headerTextState?.id === item.name.toLowerCase() + '_navigation'
+          ? colors.shade
+          : 'transparent'
       }
       selectedColor={colors.accent}
       alpha={!colors.night ? -0.02 : 0.02}

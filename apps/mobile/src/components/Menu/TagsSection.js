@@ -4,7 +4,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {DDS} from '../../services/DeviceDetection';
-import {eSendEvent} from '../../services/EventManager';
+import {eSendEvent, eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import {getElevation} from '../../utils';
 import {db} from '../../utils/DB';
@@ -20,11 +20,12 @@ import Paragraph from '../Typography/Paragraph';
 
 export const TagsSection = () => {
   const [state, dispatch] = useTracked();
-  const {colors, menuPins, currentScreen} = state;
+  const {colors, menuPins} = state;
 
   useEffect(() => {
     dispatch({type: Actions.MENU_PINS});
   }, []);
+
 
   const onPress = (item) => {
     let params;
@@ -35,15 +36,13 @@ export const TagsSection = () => {
         menu: true,
       };
 
-      if (currentScreen === 'notebook') {
-        rootNavigatorRef.current?.setParams(params);
-      } else {
-        Navigation.navigate('Notebook', params, {
-          heading: item.title,
-          id: item.id,
-          type: item.type,
-        });
-      }
+      Navigation.navigate('Notebook', params, {
+        heading: item.title,
+        id: item.id,
+        type: item.type,
+      });
+      rootNavigatorRef.current?.setParams(params);
+
     } else if (item.type === 'tag') {
       params = params = {
         title: item.title,
@@ -115,9 +114,26 @@ export const TagsSection = () => {
 
 const PinItem = ({item, index, onPress}) => {
   const [state, dispatch] = useTracked();
-  const {colors, headerTextState, currentScreen} = state;
+  const {colors} = state;
   const [visible, setVisible] = useState(false);
+  const [headerTextState, setHeaderTextState] = useState(null);
 
+
+
+  const onHeaderStateChange = (event) => {
+    if (event?.id === item.name) {
+      setHeaderTextState(event);
+    } else {
+      setHeaderTextState(null);
+    }
+  };
+
+  useEffect(() => {
+    eSubscribeEvent('onHeaderStateChange', onHeaderStateChange);
+    return () => {
+      eUnSubscribeEvent('onHeaderStateChange', onHeaderStateChange);
+    };
+  }, []);
   return (
     <>
       {visible && (
@@ -147,7 +163,7 @@ const PinItem = ({item, index, onPress}) => {
       )}
       <PressableButton
         color={
-          headerTextState.id === item.id && headerTextState.type === item.type
+          headerTextState?.id === item.id && headerTextState?.type === item.type
             ? colors.shade
             : 'transparent'
         }

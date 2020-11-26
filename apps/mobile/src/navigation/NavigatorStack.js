@@ -1,16 +1,20 @@
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import {NavigationContainer} from '@react-navigation/native';
+import {createStackNavigator} from '@react-navigation/stack';
 import * as React from 'react';
-import { Animated } from 'react-native';
+import {Animated} from 'react-native';
 import Container from '../components/Container';
-import { useTracked } from '../provider';
-import { rootNavigatorRef } from '../utils/Refs';
+import {updateEvent} from '../components/DialogManager/recievers';
+import {Actions} from '../provider/Actions';
+import {eSendEvent} from '../services/EventManager';
+import SettingsService from '../services/SettingsService';
+import {rootNavigatorRef} from '../utils/Refs';
+import {sleep} from '../utils/TimeUtils';
 import Favorites from '../views/Favorites';
 import Folders from '../views/Folders';
 import Home from '../views/Home';
 import Notebook from '../views/Notebook';
 import Notes from '../views/Notes';
-import { Search } from '../views/Search';
+import {Search} from '../views/Search';
 import Settings from '../views/Settings';
 import Tags from '../views/Tags';
 import Trash from '../views/Trash';
@@ -63,14 +67,23 @@ const forSlide = ({current, next, inverted, layouts: {screen}}) => {
 
 export const NavigatorStack = React.memo(
   () => {
-    const [state] = useTracked();
-    const {settings} = state;
-   
+    React.useEffect(() => {
+      sleep(1000).then(() => {
+        console.log(SettingsService.get().homepage)
+        let headerState = {
+          heading: SettingsService.get().homepage,
+          id: SettingsService.get().homepage.toLowerCase() + '_navigation',
+        };
+        updateEvent({type: Actions.HEADER_TEXT_STATE, state: headerState});
+        eSendEvent('onHeaderStateChange', headerState);
+      });
+    }, []);
+
     return (
       <Container root={true}>
         <NavigationContainer independent={true} ref={rootNavigatorRef}>
           <Stack.Navigator
-            initialRouteName={settings.homepage}
+            initialRouteName={SettingsService.get().homepage}
             screenOptions={{
               headerShown: false,
               cardStyleInterpolator: forFade,
