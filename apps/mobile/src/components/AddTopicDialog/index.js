@@ -65,6 +65,7 @@ export class AddTopicDialog extends React.Component {
         onShow={() => {
           this.titleRef.current?.focus();
         }}
+        statusBarTranslucent={false}
         visible={true}
         onRequestClose={this.close}>
         <View
@@ -117,7 +118,12 @@ export class AddTopicDialog extends React.Component {
 
           <DialogButtons
             positiveTitle={toEdit ? 'Save' : 'Add'}
-            onPressNegative={this.close}
+            onPressNegative={() => {
+              this.title = null;
+              this.setState({
+                visible: false,
+              });
+            }}
             onPressPositive={this.addNewTopic}
           />
         </View>
