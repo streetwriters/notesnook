@@ -11,7 +11,8 @@ export async function shouldAddBackupReminder() {
   const lastBackupTime = await db.backup.lastBackupTime();
   const offsetToDays =
     backupReminderOffset === 1 ? 1 : backupReminderOffset === 2 ? 7 : 30;
-  return dayjs(lastBackupTime).add(offsetToDays, "d").isAfter(dayjs());
+
+  return dayjs(lastBackupTime).add(offsetToDays, "d").isBefore(dayjs());
 }
 
 export async function shouldAddSignupReminder() {
