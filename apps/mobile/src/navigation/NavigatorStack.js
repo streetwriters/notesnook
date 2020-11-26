@@ -65,11 +65,16 @@ const forSlide = ({current, next, inverted, layouts: {screen}}) => {
   };
 };
 
+const screenOptionsForAnimation = {
+  animationEnabled: true,
+  cardStyleInterpolator: forSlide,
+};
+
 export const NavigatorStack = React.memo(
   () => {
     React.useEffect(() => {
       sleep(1000).then(() => {
-        console.log(SettingsService.get().homepage)
+        console.log(SettingsService.get().homepage);
         let headerState = {
           heading: SettingsService.get().homepage,
           id: SettingsService.get().homepage.toLowerCase() + '_navigation',
@@ -86,25 +91,29 @@ export const NavigatorStack = React.memo(
             initialRouteName={SettingsService.get().homepage}
             screenOptions={{
               headerShown: false,
-              cardStyleInterpolator: forFade,
+              animationEnabled: false,
             }}>
             <Stack.Screen name="Notes" component={Home} />
-            <Stack.Screen
-              initialParams={{
-                title: 'Notebooks',
-                canGoBack: false,
-                root: true,
-              }}
-              name="Notebooks"
-              component={Folders}
-            />
+            <Stack.Screen name="Notebooks" component={Folders} />
             <Stack.Screen name="Favorites" component={Favorites} />
             <Stack.Screen name="Trash" component={Trash} />
-            <Stack.Screen name="NotesPage" component={Notes} />
+            <Stack.Screen
+              options={screenOptionsForAnimation}
+              name="NotesPage"
+              component={Notes}
+            />
             <Stack.Screen name="Tags" component={Tags} />
-            <Stack.Screen name="Notebook" component={Notebook} />
+            <Stack.Screen
+              options={screenOptionsForAnimation}
+              name="Notebook"
+              component={Notebook}
+            />
             <Stack.Screen name="Settings" component={Settings} />
-            <Stack.Screen name="Search" component={Search} />
+            <Stack.Screen
+              options={screenOptionsForAnimation}
+              name="Search"
+              component={Search}
+            />
           </Stack.Navigator>
         </NavigationContainer>
       </Container>

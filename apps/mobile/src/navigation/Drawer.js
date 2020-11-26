@@ -43,7 +43,7 @@ export const NavigationStack = ({component = NavigatorStack}) => {
   }, []);
 
   return (
-    <NavigationContainer ref={sideMenuRef}>
+    <NavigationContainer  ref={sideMenuRef}>
       <Drawer.Navigator
         screenOptions={{
           swipeEnabled: locked || deviceMode !== 'mobile' ? false : true,

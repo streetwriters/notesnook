@@ -1,4 +1,4 @@
-import React, {createRef, useCallback, useEffect} from 'react';
+import React, {createRef, useCallback, useEffect, useState} from 'react';
 import {
   Appearance,
   Linking,
@@ -207,6 +207,7 @@ const CustomButton = ({
 }) => {
   const [state] = useTracked();
   const {colors} = state;
+  const [visible, setVisible] = useState(false);
   return (
     <PressableButton
       color="transparent"
@@ -244,7 +245,7 @@ const CustomButton = ({
 const SettingsUserSection = () => {
   const [state, dispatch] = useTracked();
   const {colors, user} = state;
-
+  const [visible, setVisible] = useState(false);
   const getTimeLeft = (t2) => {
     let d1 = new Date(Date.now());
     let d2 = new Date(t2 * 1000);
@@ -256,6 +257,36 @@ const SettingsUserSection = () => {
 
   return user ? (
     <>
+      {visible && (
+        <BaseDialog visible={true}>
+          <View
+            style={{
+              ...getElevation(5),
+              width: DDS.isTab ? 350 : '80%',
+              maxHeight: 350,
+              borderRadius: 5,
+              backgroundColor: colors.bg,
+              paddingHorizontal: ph,
+              paddingVertical: pv,
+            }}>
+            <DialogHeader
+              title="Logout"
+              paragraph="Clear all your data and reset the app."
+            />
+            <DialogButtons
+              positiveTitle="Logout"
+              negativeTitle="Cancel"
+              onPressNegative={() => setVisible(false)}
+              onPressPositive={async () => {
+                await db.user.logout();
+                dispatch({type: Actions.USER, user: null});
+                dispatch({type: Actions.CLEAR_ALL});
+                dispatch({type: Actions.SYNCING, syncing: false});
+              }}
+            />
+          </View>
+        </BaseDialog>
+      )}
       <View
         style={{
           paddingHorizontal: 12,
@@ -360,18 +391,14 @@ const SettingsUserSection = () => {
             eSendEvent(eOpenRecoveryKeyDialog);
           },
           desc:
-            'If you lose your password, you can recover your data using your recovery key.',
+            'Recover your data using the recovery key if your password is lost.',
         },
         {
           name: 'Logout',
           func: async () => {
-            await db.user.logout();
-            dispatch({type: Actions.USER, user: null});
-            dispatch({type: Actions.CLEAR_ALL});
-            dispatch({type: Actions.SYNCING, syncing: false});
+            setVisible(true);
           },
-          desc:
-            'Logout of your account, this will clear everything and reset the app.',
+          desc: 'This will clear all data and reset the app.',
         },
       ].map((item) => (
         <CustomButton
