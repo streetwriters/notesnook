@@ -13,14 +13,18 @@ const routes = {
   "/": () => (
     <RouteContainer type="notebooks" title="Notebooks" route={<Notebooks />} />
   ),
-  "/:notebook": ({ notebook }) => (
-    <RouteContainer
-      type="topics"
-      title={db.notebooks.notebook(notebook).title}
-      canGoBack
-      route={<Topics notebookId={notebook} />}
-    />
-  ),
+  "/:notebook": ({ notebook }) => {
+    const nbItem = db.notebooks.notebook(notebook);
+    if (!nbItem) return;
+    return (
+      <RouteContainer
+        type="topics"
+        title={nbItem.title}
+        canGoBack
+        route={<Topics notebookId={notebook} />}
+      />
+    );
+  },
   "/:notebook/:topic": ({ notebook, topic }) => {
     const nb = db.notebooks.notebook(notebook);
     const topicItem = nb.topics.topic(topic)._topic;

@@ -13,7 +13,7 @@ const menuItems = (item) => [
 ];
 
 function Tag({ item, index }) {
-  const { title, noteIds } = item;
+  const { id, title, noteIds } = item;
   return (
     <ListItem
       item={item}
@@ -23,7 +23,7 @@ function Tag({ item, index }) {
       info={`${noteIds.length} notes`}
       menuItems={menuItems(item)}
       onClick={() => {
-        navigate(`/tags/${title}`);
+        navigate(`/tags/${id}`);
       }}
     />
   );

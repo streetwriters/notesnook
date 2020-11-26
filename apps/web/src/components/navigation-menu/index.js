@@ -15,6 +15,16 @@ import { usePath } from "hookrouter";
 import useMobile from "../../utils/use-mobile";
 import useTablet from "../../utils/use-tablet";
 
+function shouldSelectNavItem(route, pin) {
+  if (pin.type === "notebook") {
+    return route === `/notebooks/${pin.id}`;
+  } else if (pin.type === "topic") {
+    return route === `/notebooks/${pin.notebookId}/${pin.id}`;
+  } else if (pin.type === "tag") {
+    return route === `/tags/${pin.id}`;
+  }
+}
+
 const routes = [
   { title: "Notes", path: "/", icon: Icon.Note },
   {
@@ -161,8 +171,15 @@ function NavigationMenu(props) {
                   ? Icon.Tag2
                   : Icon.Topic
               }
+              selected={shouldSelectNavItem(selectedRoute, pin)}
               onClick={() => {
-                navigate(``);
+                if (pin.type === "notebook") {
+                  navigate(`/notebooks/${pin.id}`);
+                } else if (pin.type === "topic") {
+                  navigate(`/notebooks/${pin.notebookId}/${pin.id}`);
+                } else if (pin.type === "tag") {
+                  navigate(`/tags/${pin.id}`);
+                }
               }}
             />
           ))}
