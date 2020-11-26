@@ -1,17 +1,16 @@
-import React, {useCallback, useEffect} from 'react';
-import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
+import React, { useCallback, useEffect } from 'react';
+import { ContainerBottomButton } from '../../components/Container/ContainerBottomButton';
 import SimpleList from '../../components/SimpleList';
-import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
-import {DDS} from '../../services/DeviceDetection';
-import {eSendEvent} from '../../services/EventManager';
-import Navigation from '../../services/Navigation';
+import { useTracked } from '../../provider';
+import { Actions } from '../../provider/Actions';
+import { DDS } from '../../services/DeviceDetection';
+import { eSendEvent } from '../../services/EventManager';
 import SearchService from '../../services/SearchService';
-import {scrollRef} from '../../utils';
-import {eOnLoadNote, eScrollEvent} from '../../utils/Events';
-import {rootNavigatorRef, tabBarRef} from '../../utils/Refs';
+import { scrollRef } from '../../utils';
+import { eOnLoadNote, eScrollEvent } from '../../utils/Events';
+import { tabBarRef } from '../../utils/Refs';
 
-export const Home = ({route,navigation}) => {
+export const Home = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const {notes, loading} = state;
 
@@ -57,11 +56,11 @@ export const Home = ({route,navigation}) => {
   }, []);
 
   useEffect(() => {
-    console.log('rerender')
+    console.log('rerender');
     if (navigation.isFocused()) {
       updateSearch();
     }
-  }, [notes,route.params]);
+  }, [notes, route.params]);
 
   const updateSearch = () => {
     SearchService.update({
@@ -72,7 +71,6 @@ export const Home = ({route,navigation}) => {
   };
 
   const _onPressBottomButton = (event) => {
-  
     if (!DDS.isLargeTablet()) {
       tabBarRef.current?.goToPage(1);
     } else {

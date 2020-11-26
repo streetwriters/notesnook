@@ -83,9 +83,7 @@ export const ActionSheetComponent = ({
     if (item.dateCreated !== null) {
       setNote({...item});
       if (item.type !== note) {
-        setIsPinnedToMenu(
-          db.settings.pins.findIndex((i) => i.id === item.id) > -1,
-        );
+        setIsPinnedToMenu(db.settings.isPinned(note.id));
       }
     }
   }, [item]);
@@ -326,17 +324,14 @@ export const ActionSheetComponent = ({
           } else {
             if (item.type === 'topic') {
               await db.settings.pin(note.type, {
-                id: note.notebookId,
-                topic: note.id,
+                id: note.id,
+                notebookId: note.notebookId,
               });
             } else {
               await db.settings.pin(note.type, {id: note.id});
             }
           }
-
-          setIsPinnedToMenu(
-            db.settings.pins.findIndex((i) => i.id === item.id) > -1,
-          );
+          setIsPinnedToMenu(db.settings.isPinned(note.id));
           dispatch({type: Actions.MENU_PINS});
         } catch (e) {}
       },

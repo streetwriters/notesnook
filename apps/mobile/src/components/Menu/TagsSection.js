@@ -102,24 +102,6 @@ export const TagsSection = () => {
             </Paragraph>
           </View>
         }
-        ListHeaderComponent={
-          <Heading
-            color={colors.accent}
-            style={{
-              paddingHorizontal: 8,
-              textAlignVertical: 'center',
-              height: 35,
-            }}
-            size={SIZE.sm}>
-            Your Pins{'\n'}
-            <Paragraph
-              style={{textAlign: 'center'}}
-              color={colors.icon}
-              size={SIZE.xs}>
-              Tap and hold to unpin.
-            </Paragraph>
-          </Heading>
-        }
         renderItem={({item, index}) => (
           <PinItem key={item.id} item={item} index={index} onPress={onPress} />
         )}
@@ -175,8 +157,6 @@ const PinItem = ({item, index, onPress}) => {
           borderRadius: 0,
           paddingHorizontal: 10,
           minHeight: 50,
-          borderBottomWidth: 1,
-          borderBottomColor: colors.nav,
         }}>
         <View
           style={{
