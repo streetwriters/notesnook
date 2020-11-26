@@ -72,8 +72,7 @@ export function showMultiDeleteConfirmation(type) {
   let noun = type === "note" ? "Notes" : "Notebooks";
 
   return confirm(Icon.Trash, {
-    title: `Delete these ${noun}`,
-    subtitle: `Are you sure you want to delete these ${type}s?`,
+    title: `Delete these ${noun}?`,
     message: (
       <Text as="span">
         These {type}s will be{" "}
@@ -90,10 +89,9 @@ export function showMultiDeleteConfirmation(type) {
 
 export function showLogoutConfirmation() {
   return confirm(Icon.Logout, {
-    title: `Logout`,
-    subtitle: `Are you sure you want to logout?`,
+    title: `Logout?`,
     message:
-      "Logging out will delete all local data and reset the app. Make sure you have synced all your data before logging out.",
+      "Logging out will delete all local data and reset the app. Make sure you have synced your data before logging out.",
     yesText: `Yes`,
     noText: "No",
   });

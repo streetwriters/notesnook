@@ -17,6 +17,7 @@ import { showRecoveryKeyDialog } from "../components/dialogs/recoverykeydialog";
 import { showBuyDialog } from "../components/dialogs/buy-dialog";
 import Vault from "../common/vault";
 import ScrollContainer from "../components/scroll-container";
+import { showLoadingDialog } from "../components/dialogs/loadingdialog";
 
 function importBackup() {
   return new Promise((resolve, reject) => {
@@ -270,7 +271,19 @@ function Settings(props) {
         <Button
           variant="list"
           onClick={async () => {
-            await db.backup.import(JSON.stringify(await importBackup()));
+            const backupData = JSON.stringify(await importBackup());
+            showLoadingDialog({
+              title: "Restoring backup",
+              subtitle: "We are restoring your backup. Please wait...",
+              action: async () => {
+                await db.backup.import(backupData);
+              },
+              message: (
+                <Text color="error">
+                  Please do NOT close your browser or shut down your PC.
+                </Text>
+              ),
+            });
           }}
         >
           <TextWithTip
