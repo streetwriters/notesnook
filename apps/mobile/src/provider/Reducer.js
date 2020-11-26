@@ -212,13 +212,10 @@ export const reducer = (state, action) => {
       };
     }
     case Actions.HEADER_TEXT_STATE: {
-      let stat = {
-        ...state.headerTextState,
-        ...action.state,
-      };
+    
       return {
         ...state,
-        headerTextState: stat,
+        headerTextState: action.state,
       };
     }
     case Actions.HEADER_VERTICAL_MENU: {

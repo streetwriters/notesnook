@@ -1,61 +1,59 @@
-import React, { useCallback, useEffect } from 'react';
-import { Placeholder } from '../../components/ListPlaceholders';
+import React, {useCallback, useEffect} from 'react';
+import {Placeholder} from '../../components/ListPlaceholders';
 import SimpleList from '../../components/SimpleList';
-import { useTracked } from '../../provider';
-import { Actions } from '../../provider/Actions';
-import { eSendEvent } from "../../services/EventManager";
+import {useTracked} from '../../provider';
+import {Actions} from '../../provider/Actions';
+import {DDS} from '../../services/DeviceDetection';
+import {eSendEvent} from '../../services/EventManager';
+import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
-import { eScrollEvent } from "../../utils/Events";
+import {eScrollEvent} from '../../utils/Events';
 export const Favorites = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const {favorites} = state;
+  let pageIsLoaded = false;
 
   const onFocus = useCallback(() => {
     eSendEvent(eScrollEvent, {name: 'Favorites', type: 'in'});
-    dispatch({
-      type: Actions.HEADER_STATE,
-      state: {
+    updateSearch();
+    if (DDS.isLargeTablet()) {
+      dispatch({
+        type: Actions.CONTAINER_BOTTOM_BUTTON,
+        state: {
+          onPress: null,
+        },
+      });
+    }
+    if (!pageIsLoaded) {
+      pageIsLoaded = true;
+      return;
+    }
+    Navigation.setHeaderState(
+      'favorites',
+      {
         menu: true,
       },
-    });
-    dispatch({
-      type: Actions.HEADER_TEXT_STATE,
-      state: {
-        heading: "Favorites",
+      {
+        heading: 'Favorites',
+        id: 'favorites_navigation',
       },
-    });
-    updateSearch();
-
-    dispatch({
-      type: Actions.CONTAINER_BOTTOM_BUTTON,
-      state: {
-        onPress:null
-      },
-    });
-
-    dispatch({
-      type: Actions.CURRENT_SCREEN,
-      screen: 'favorites',
-    });
-    dispatch({type: Actions.FAVORITES});
+    );
   }, []);
 
   useEffect(() => {
     navigation.addListener('focus', onFocus);
     return () => {
+      pageIsLoaded = false;
       eSendEvent(eScrollEvent, {name: 'Notebooks', type: 'back'});
       navigation.removeListener('focus', onFocus);
     };
-  },[]);
-
-
+  }, []);
 
   useEffect(() => {
     if (navigation.isFocused()) {
       updateSearch();
     }
   }, [favorites]);
-
 
   const updateSearch = () => {
     SearchService.update({
@@ -73,9 +71,9 @@ export const Favorites = ({route, navigation}) => {
         dispatch({type: Actions.FAVORITES});
       }}
       placeholderData={{
-        heading:"Your Favorites",
-        paragraph:"You have not added any notes to favorites yet.",
-        button:null,
+        heading: 'Your Favorites',
+        paragraph: 'You have not added any notes to favorites yet.',
+        button: null,
       }}
       focused={() => navigation.isFocused()}
       placeholder={<Placeholder type="favorites" />}

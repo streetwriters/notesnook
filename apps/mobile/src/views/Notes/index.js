@@ -10,6 +10,7 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent,
 } from '../../services/EventManager';
+import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
 import {editing} from '../../utils';
 import {COLORS_NOTE} from '../../utils/Colors';
@@ -18,9 +19,10 @@ import {eOnLoadNote, eScrollEvent, refreshNotesPage} from '../../utils/Events';
 import {tabBarRef} from '../../utils/Refs';
 
 export const Notes = ({route, navigation}) => {
-  const [state, dispatch] = useTracked();
+  const [, dispatch] = useTracked();
   const [notes, setNotes] = useState([]);
   let params = route.params ? route.params : null;
+  let pageIsLoaded = false;
 
   useEffect(() => {
     eSubscribeEvent(refreshNotesPage, init);
@@ -50,15 +52,7 @@ export const Notes = ({route, navigation}) => {
     if (allNotes && allNotes.length > 0) {
       setNotes([...allNotes]);
     }
-
-    dispatch({
-      type: Actions.CURRENT_SCREEN,
-      screen: params.title,
-    });
-    dispatch({
-      type: Actions.HEADER_STATE,
-      state: params.menu,
-    });
+    updateSearch();
     dispatch({
       type: Actions.CONTAINER_BOTTOM_BUTTON,
       state: {
@@ -67,23 +61,25 @@ export const Notes = ({route, navigation}) => {
       },
     });
 
-    updateSearch();
-    dispatch({
-      type: Actions.HEADER_TEXT_STATE,
-      state: {
-        heading:
-          params.type === 'tag'
-            ? '#' + params.title
-            : params.title.slice(0, 1).toUpperCase() + params.title.slice(1),
-        id:
-          params.type === 'tag'
-            ? params.tag.id
-            : params.type === 'topic'
-            ? params.id
-            : params.type === 'color'
-            ? params.color.title
-            : null,
-      },
+    if (!pageIsLoaded) {
+      pageIsLoaded = true;
+      return;
+    }
+
+    Navigation.setHeaderState('Notes', params, {
+      heading:
+        params.type === 'tag'
+          ? '#' + params.title
+          : params.title.slice(0, 1).toUpperCase() + params.title.slice(1),
+      id:
+        params.type === 'tag'
+          ? params.tag.id
+          : params.type === 'topic'
+          ? params.id
+          : params.type === 'color'
+          ? params.color.id
+          : null,
+      type: params.type,
     });
   };
 

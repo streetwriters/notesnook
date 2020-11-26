@@ -3,7 +3,8 @@ import { Platform, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTracked } from '../../provider';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
-import NavigationService from '../../services/Navigation';
+import Navigation from '../../services/Navigation';
+
 import { dWidth } from '../../utils';
 import { eScrollEvent } from '../../utils/Events';
 import { SIZE } from '../../utils/SizeUtils';
@@ -71,7 +72,9 @@ export const Header = ({root}) => {
         <View style={styles.rightBtnContainer}>
           <ActionIcon
             onPress={async () => {
-              NavigationService.navigate('Search');
+              Navigation.navigate('Search',{
+                menu:false
+              });
             }}
             name="tune"
             size={SIZE.xxxl}

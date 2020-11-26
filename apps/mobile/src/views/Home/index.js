@@ -1,46 +1,49 @@
-import React, { useCallback, useEffect } from 'react';
-import { ContainerBottomButton } from '../../components/Container/ContainerBottomButton';
+import React, {useCallback, useEffect} from 'react';
+import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
 import SimpleList from '../../components/SimpleList';
-import { useTracked } from '../../provider';
-import { Actions } from '../../provider/Actions';
-import { DDS } from '../../services/DeviceDetection';
-import { eSendEvent } from '../../services/EventManager';
+import {useTracked} from '../../provider';
+import {Actions} from '../../provider/Actions';
+import {DDS} from '../../services/DeviceDetection';
+import {eSendEvent} from '../../services/EventManager';
+import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
-import { scrollRef } from '../../utils';
-import { eOnLoadNote, eScrollEvent } from '../../utils/Events';
-import { tabBarRef } from '../../utils/Refs';
+import {scrollRef} from '../../utils';
+import {eOnLoadNote, eScrollEvent} from '../../utils/Events';
+import {tabBarRef} from '../../utils/Refs';
 
 export const Home = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const {notes, loading} = state;
+  let pageIsLoaded = false;
 
   const onFocus = useCallback(() => {
-    eSendEvent(eScrollEvent, {name: 'Notes', type: 'in'});
-    dispatch({
-      type: Actions.HEADER_TEXT_STATE,
-      state: {
-        heading: 'Notes',
-      },
-    });
-    dispatch({
-      type: Actions.CURRENT_SCREEN,
-      screen: 'notes',
-    });
-    dispatch({
-      type: Actions.CONTAINER_BOTTOM_BUTTON,
-      state: {
-        onPress: _onPressBottomButton,
-      },
-    });
-
-    dispatch({
-      type: Actions.HEADER_STATE,
-      state: true,
-    });
     updateSearch();
+    eSendEvent(eScrollEvent, {name: 'Notes', type: 'in'});
+    if (DDS.isLargeTablet()) {
+      dispatch({
+        type: Actions.CONTAINER_BOTTOM_BUTTON,
+        state: {
+          onPress: _onPressBottomButton,
+        },
+      });
+    }
 
-    dispatch({type: Actions.COLORS});
-    dispatch({type: Actions.NOTES});
+    if (!pageIsLoaded) {
+      pageIsLoaded = true;
+      return;
+    }
+
+    Navigation.setHeaderState(
+      'notes',
+      {
+        menu: true,
+      },
+      {
+        heading: 'Notes',
+        id: 'notes_navigation',
+      },
+    );
+    //dispatch({type: Actions.NOTES});
   }, [notes]);
 
   const onBlur = useCallback(() => {}, []);
@@ -49,6 +52,7 @@ export const Home = ({route, navigation}) => {
     navigation.addListener('focus', onFocus);
     navigation.addListener('blur', onBlur);
     return () => {
+      pageIsLoaded = false;
       eSendEvent(eScrollEvent, {name: 'Notes', type: 'back'});
       navigation.removeListener('focus', onFocus);
       navigation.removeListener('blur', onBlur);

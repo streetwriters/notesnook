@@ -1,26 +1,37 @@
 import React from 'react';
-import {Text, View} from 'react-native';
+import {View} from 'react-native';
 import {PressableButton} from '../../components/PressableButton';
 import {useTracked} from '../../provider';
-import NavigationService from '../../services/Navigation';
-import {SIZE, WEIGHT} from '../../utils/SizeUtils';
+import Navigation from '../../services/Navigation';
+import {SIZE} from '../../utils/SizeUtils';
 import {ActionIcon} from '../ActionIcon';
-import { ActionSheetEvent } from '../DialogManager/recievers';
+import {ActionSheetEvent} from '../DialogManager/recievers';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
 const TagItem = ({item, index}) => {
   const [state] = useTracked();
   const {colors} = state;
+
+  const onPress = () => {
+    Navigation.navigate(
+      'NotesPage',
+      {
+        type: 'tag',
+        title: item.title,
+        tag: item,
+      },
+      {
+        heading: '#' + item.title,
+        id: item.id,
+        type: item.type,
+      },
+    );
+  };
+
   return (
     <PressableButton
-      onPress={() => {
-        NavigationService.navigate('NotesPage', {
-          type: 'tag',
-          title: item.title,
-          tag: item,
-        });
-      }}
+      onPress={onPress}
       selectedColor={colors.nav}
       alpha={!colors.night ? -0.02 : 0.02}
       opacity={1}
@@ -31,8 +42,8 @@ const TagItem = ({item, index}) => {
         alignItems: 'center',
         borderBottomWidth: 1.5,
         borderBottomColor: colors.nav,
-        width:"100%",
-        justifyContent:"space-between"
+        width: '100%',
+        justifyContent: 'space-between',
       }}>
       <View>
         <Heading size={SIZE.md}>

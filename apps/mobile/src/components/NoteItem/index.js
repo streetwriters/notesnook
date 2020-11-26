@@ -1,16 +1,16 @@
 import React from 'react';
-import {Dimensions, Text, View, TouchableOpacity} from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {ActionIcon} from '../ActionIcon';
-import {ActionSheetEvent, updateEvent} from '../DialogManager/recievers';
-import {timeSince} from '../../utils/TimeUtils';
-import {ph, SIZE, WEIGHT} from '../../utils/SizeUtils';
-import Paragraph from '../Typography/Paragraph';
+import { Actions } from '../../provider/Actions';
+import Navigation from '../../services/Navigation';
+import { COLORS_NOTE } from '../../utils/Colors';
+import { db } from '../../utils/DB';
+import { SIZE } from '../../utils/SizeUtils';
+import { timeSince } from '../../utils/TimeUtils';
+import { ActionIcon } from '../ActionIcon';
+import { ActionSheetEvent, updateEvent } from '../DialogManager/recievers';
 import Heading from '../Typography/Heading';
-import {db} from '../../utils/DB';
-import {Actions} from '../../provider/Actions';
-import NavigationService from '../../services/Navigation';
-import {COLORS_NOTE} from '../../utils/Colors';
+import Paragraph from '../Typography/Paragraph';
 
 export default class NoteItem extends React.Component {
   constructor(props) {
@@ -97,7 +97,7 @@ export default class NoteItem extends React.Component {
                     type: Actions.HEADER_STATE,
                     state: false,
                   });
-                  NavigationService.navigate('Notebook', {
+                  Navigation.navigate('Notebook', {
                     notebook: db.notebooks.notebook(item.notebook.id).data,
                     title: notebook.title,
                     root: true,

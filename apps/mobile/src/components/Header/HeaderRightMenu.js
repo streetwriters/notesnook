@@ -2,7 +2,7 @@ import React from 'react';
 import {ActivityIndicator, StyleSheet, View} from 'react-native';
 import {useTracked} from '../../provider';
 import {DDS} from '../../services/DeviceDetection';
-import NavigationService from '../../services/Navigation';
+import Navigation from '../../services/Navigation';
 import {dWidth} from '../../utils';
 import {SIZE} from '../../utils/SizeUtils';
 import {ActionIcon} from '../ActionIcon';
@@ -18,7 +18,9 @@ export const HeaderRightMenu = () => {
 
       <ActionIcon
         onPress={async () => {
-          NavigationService.navigate('Search');
+          Navigation.navigate('Search',{
+            menu:false
+          });
         }}
         name="magnify"
         size={SIZE.xxxl}

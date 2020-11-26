@@ -5,7 +5,7 @@ import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {DDS} from '../../services/DeviceDetection';
 import {eSendEvent} from '../../services/EventManager';
-import NavigationService from '../../services/Navigation';
+import Navigation from '../../services/Navigation';
 import {getElevation} from '../../utils';
 import {db} from '../../utils/DB';
 import {refreshNotesPage} from '../../utils/Events';
@@ -28,28 +28,20 @@ export const TagsSection = () => {
 
   const onPress = (item) => {
     let params;
-
-    dispatch({
-      type: Actions.HEADER_TEXT_STATE,
-      state: {
-        heading: item.title,
-        id: item.id,
-      },
-    });
     if (item.type === 'notebook') {
       params = {
         notebook: item,
         title: item.title,
-        root: true,
         menu: true,
       };
+
       if (currentScreen === 'notebook') {
         rootNavigatorRef.current?.setParams(params);
       } else {
-        NavigationService.navigate('Notebook', {
-          notebook: item,
-          title: item.title,
-          root: true,
+        Navigation.navigate('Notebook', params, {
+          heading: item.title,
+          id: item.id,
+          type: item.type,
         });
       }
     } else if (item.type === 'tag') {
@@ -59,19 +51,23 @@ export const TagsSection = () => {
         type: 'tag',
         menu: true,
       };
-
-      NavigationService.navigate('NotesPage', params);
-
+      Navigation.navigate('NotesPage', params, {
+        heading: '#' + item.title,
+        id: item.id,
+        type: item.type,
+      });
       eSendEvent(refreshNotesPage, params);
     } else {
       params = {...item, menu: true};
-
-      NavigationService.navigate('NotesPage', params);
-
+      Navigation.navigate('NotesPage', params, {
+        heading: item.title,
+        id: item.id,
+        type: item.type,
+      });
       eSendEvent(refreshNotesPage, params);
     }
 
-    NavigationService.closeDrawer();
+    Navigation.closeDrawer();
   };
 
   return (
@@ -81,6 +77,12 @@ export const TagsSection = () => {
       }}>
       <FlatList
         data={menuPins}
+        style={{
+          flexGrow: 1,
+        }}
+        contentContainerStyle={{
+          flexGrow: 1,
+        }}
         ListEmptyComponent={
           <View
             style={{
@@ -102,8 +104,9 @@ export const TagsSection = () => {
             </Paragraph>
           </View>
         }
+        keyExtractor={(item, index) => item.id}
         renderItem={({item, index}) => (
-          <PinItem key={item.id} item={item} index={index} onPress={onPress} />
+          <PinItem item={item} index={index} onPress={onPress} />
         )}
       />
     </View>
@@ -112,7 +115,7 @@ export const TagsSection = () => {
 
 const PinItem = ({item, index, onPress}) => {
   const [state, dispatch] = useTracked();
-  const {colors, headerTextState} = state;
+  const {colors, headerTextState, currentScreen} = state;
   const [visible, setVisible] = useState(false);
 
   return (
@@ -143,7 +146,11 @@ const PinItem = ({item, index, onPress}) => {
         </BaseDialog>
       )}
       <PressableButton
-        color={headerTextState.id === item.id ? colors.shade : 'transparent'}
+        color={
+          headerTextState.id === item.id && headerTextState.type === item.type
+            ? colors.shade
+            : 'transparent'
+        }
         selectedColor={colors.accent}
         alpha={!colors.night ? -0.02 : 0.02}
         opacity={0.12}

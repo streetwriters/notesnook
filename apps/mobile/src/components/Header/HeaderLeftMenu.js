@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTracked } from '../../provider';
-import NavigationService from '../../services/Navigation';
+import Navigation from '../../services/Navigation';
 import { SIZE } from '../../utils/SizeUtils';
 import { ActionIcon } from '../ActionIcon';
 
@@ -10,10 +10,10 @@ export const HeaderLeftMenu = () => {
 
   const onLeftButtonPress = () => {
     if (headerMenuState) {
-      NavigationService.openDrawer()
+      Navigation.openDrawer()
       return;
     }
-    NavigationService.goBack();
+    Navigation.goBack();
   };
 
   return (

@@ -2,12 +2,8 @@ import React from 'react';
 import {View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
 import {DDS} from '../../services/DeviceDetection';
-import {eSendEvent} from '../../services/EventManager';
-import NavigationService from '../../services/Navigation';
-import {eClearSearch} from '../../utils/Events';
-import { sideMenuRef } from '../../utils/Refs';
+import Navigation from '../../services/Navigation';
 import {SIZE} from '../../utils/SizeUtils';
 import {PressableButton} from '../PressableButton';
 import Paragraph from '../Typography/Paragraph';
@@ -17,25 +13,22 @@ export const MenuListItem = ({item, index, noTextMode, ignore, testID}) => {
   const {currentScreen, colors} = state;
 
   const _onPress = (event) => {
-    if (!ignore && currentScreen !== item.name.toLowerCase()) {
-      dispatch({
-        type: Actions.HEADER_TEXT_STATE,
-        state: {
-          heading: item.name,
-        },
-      });
-      eSendEvent(eClearSearch);
-    }
-    if (item.name.toLowerCase() === currentScreen) {
-      console.log('already here');
-    }
     if (item.func) {
       item.func();
     } else {
-      NavigationService.navigate(item.name);
+      Navigation.navigate(
+        item.name,
+        {
+          menu: true,
+        },
+        {
+          heading: item.name,
+          id: item.name.toLowerCase() + '_navigation',
+        },
+      );
     }
     if (item.close) {
-      NavigationService.closeDrawer()
+      Navigation.closeDrawer();
     }
   };
 

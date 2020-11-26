@@ -62,6 +62,7 @@ import {sleep} from '../../utils/TimeUtils';
 import Paragraph from '../../components/Typography/Paragraph';
 import Heading from '../../components/Typography/Heading';
 import {enabled} from 'react-native-privacy-snapshot';
+import Navigation from '../../services/Navigation';
 
 let menuRef = createRef();
 export const Settings = ({navigation}) => {
@@ -72,6 +73,7 @@ export const Settings = ({navigation}) => {
     biometryEnrolled: false,
     isBiometryAvailable: false,
   });
+  let pageIsLoaded = false;
   function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
     let newColors = setColorScheme(colors, accent);
     dispatch({type: Actions.THEME, colors: newColors});
@@ -85,27 +87,16 @@ export const Settings = ({navigation}) => {
 
   const onFocus = useCallback(() => {
     eSendEvent(eScrollEvent, {name: 'Settings', type: 'in'});
-    dispatch({
-      type: Actions.HEADER_STATE,
-      state: true,
-    });
-    dispatch({
-      type: Actions.CONTAINER_BOTTOM_BUTTON,
-      state: {
-        onPress: null,
-      },
-    });
 
-    dispatch({
-      type: Actions.HEADER_TEXT_STATE,
-      state: {
-        heading: 'Settings',
-      },
-    });
-    dispatch({
-      type: Actions.CURRENT_SCREEN,
-      screen: 'settings',
-    });
+    if (DDS.isLargeTablet()) {
+      dispatch({
+        type: Actions.CONTAINER_BOTTOM_BUTTON,
+        state: {
+          onPress: null,
+        },
+      });
+    }
+
     eSendEvent(eUpdateSearchState, {
       placeholder: '',
       data: [],
@@ -113,6 +104,21 @@ export const Settings = ({navigation}) => {
       type: '',
       color: null,
     });
+
+    if (!pageIsLoaded) {
+      pageIsLoaded = true;
+      return;
+    }
+    Navigation.setHeaderState(
+      'settings',
+      {
+        menu: true,
+      },
+      {
+        heading: 'Settings',
+        id: 'settings_navigation',
+      },
+    );
   }, []);
 
   const checkVaultStatus = useCallback(() => {
@@ -148,6 +154,7 @@ export const Settings = ({navigation}) => {
     eSubscribeEvent('vaultUpdated', () => checkVaultStatus());
     navigation.addListener('focus', onFocus);
     return () => {
+      pageIsLoaded = false;
       eSendEvent(eScrollEvent, {name: 'Settings', type: 'back'});
       eUnSubscribeEvent('vaultUpdated', () => checkVaultStatus());
       navigation.removeListener('focus', onFocus);
@@ -970,9 +977,7 @@ export const Settings = ({navigation}) => {
                 'global',
                 6000,
                 () => {
-                  NavigationService.navigate('Login', {
-                    root: true,
-                  });
+                  eSendEvent(eOpenLoginDialog);
                 },
                 'Login',
               );

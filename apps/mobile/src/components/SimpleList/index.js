@@ -7,7 +7,10 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
-import {initialWindowMetrics, useSafeAreaInsets} from 'react-native-safe-area-context';
+import {
+  initialWindowMetrics,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 import {DataProvider, LayoutProvider, RecyclerListView} from 'recyclerlistview';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
@@ -74,9 +77,7 @@ const SimpleList = ({
   const loadData = () => {
     let mainData = [header, {type: 'empty'}];
     mainData =
-      !listData || listData.length === 0
-        ? mainData
-        : [header, ...listData];
+      !listData || listData.length === 0 ? mainData : [header, ...listData];
     setDataProvider(dataProvider.cloneWithRows(mainData));
   };
 
@@ -178,9 +179,9 @@ const SimpleList = ({
             type="transparent"
             fontSize={SIZE.md}
           />
-        ) : (
+        ) : loading ? (
           <ActivityIndicator color={colors.accent} />
-        )}
+        ) : null}
       </View>
     </View>
   );

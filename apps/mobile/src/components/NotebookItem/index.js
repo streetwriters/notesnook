@@ -1,11 +1,11 @@
 import React from 'react';
-import {Text, TouchableOpacity, View} from 'react-native';
-import {useTracked} from '../../provider';
-import NavigationService from '../../services/Navigation';
-import {ActionSheetEvent} from '../DialogManager/recievers';
+import { TouchableOpacity, View } from 'react-native';
+import { useTracked } from '../../provider';
+import Navigation from '../../services/Navigation';
+import { ph, pv, SIZE, WEIGHT } from '../../utils/SizeUtils';
+import { ActionIcon } from '../ActionIcon';
+import { ActionSheetEvent } from '../DialogManager/recievers';
 import Seperator from '../Seperator';
-import {ph, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
-import {ActionIcon} from '../ActionIcon';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
@@ -76,7 +76,7 @@ export const NotebookItem = ({
               item.topics.slice(1, 3).map((topic) => (
                 <TouchableOpacity
                   onPress={() => {
-                    NavigationService.navigate('NotesPage', {
+                    Navigation.navigate('NotesPage', {
                       ...topic,
                     });
                   }}

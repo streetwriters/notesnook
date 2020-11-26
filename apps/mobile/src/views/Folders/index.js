@@ -8,49 +8,50 @@ import {Actions} from '../../provider/Actions';
 import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
 import {eSendEvent} from '../../services/EventManager';
 import SearchService from '../../services/SearchService';
-import { eScrollEvent } from '../../utils/Events';
-
+import {eScrollEvent} from '../../utils/Events';
+import Navigation from '../../services/Navigation';
+import {DDS} from '../../services/DeviceDetection';
 
 export const Folders = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const {notebooks} = state;
+  let pageIsLoaded = false;
 
   const onFocus = useCallback(() => {
     eSendEvent(eScrollEvent, {name: 'Notebooks', type: 'in'});
-    dispatch({
-      type: Actions.HEADER_STATE,
-      state: true,
-    });
-    dispatch({
-      type: Actions.HEADER_TEXT_STATE,
-      state: {
-        heading: 'Notebooks',
-      },
-    });
-
-    dispatch({type: Actions.NOTEBOOKS});
-    dispatch({
-      type: Actions.CURRENT_SCREEN,
-      screen: 'notebooks',
-    });
-
-    dispatch({
-      type: Actions.CONTAINER_BOTTOM_BUTTON,
-      state: {
-        onPress:_onPressBottomButton
-      },
-    });
-
     updateSearch();
-  }, [notebooks]);
+    if (DDS.isLargeTablet()) {
+      dispatch({
+        type: Actions.CONTAINER_BOTTOM_BUTTON,
+        state: {
+          onPress: _onPressBottomButton,
+        },
+      });
+    }
+    if (!pageIsLoaded) {
+      pageIsLoaded = true;
+      return;
+    }
+    Navigation.setHeaderState(
+      'notebooks',
+      {
+        menu: true,
+      },
+      {
+        heading: 'Notebooks',
+        id: 'notebooks_navigation',
+      },
+    );
+  }, []);
 
   useEffect(() => {
     navigation.addListener('focus', onFocus);
     return () => {
+      pageIsLoaded = false;
       navigation.removeListener('focus', onFocus);
       eSendEvent(eScrollEvent, {name: 'Notebooks', type: 'back'});
     };
-  },[]);
+  }, []);
 
   useEffect(() => {
     if (navigation.isFocused()) {
@@ -60,7 +61,7 @@ export const Folders = ({route, navigation}) => {
 
   const updateSearch = () => {
     SearchService.update({
-      placeholder: 'Search in notebooks',
+      placeholder: 'Type a keyword to search in notebooks',
       data: notebooks,
       type: 'notebooks',
     });

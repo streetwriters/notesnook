@@ -1,29 +1,30 @@
-import React, {useEffect, useState} from 'react';
-import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
-import {AddTopicEvent} from '../../components/DialogManager/recievers';
+import React, { useEffect, useState } from 'react';
+import { ContainerBottomButton } from '../../components/Container/ContainerBottomButton';
+import { AddTopicEvent } from '../../components/DialogManager/recievers';
 import SimpleList from '../../components/SimpleList';
-import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
+import { useTracked } from '../../provider';
 import {
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent,
+  eUnSubscribeEvent
 } from '../../services/EventManager';
+import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
-import {db} from '../../utils/DB';
-import {eOnNewTopicAdded, eScrollEvent} from '../../utils/Events';
+import { db } from '../../utils/DB';
+import { eOnNewTopicAdded, eScrollEvent } from '../../utils/Events';
 
 export const Notebook = ({route, navigation}) => {
   const [, dispatch] = useTracked();
   const [topics, setTopics] = useState(route.params.notebook.topics);
   let params = route.params;
+  let pageIsLoaded = false;
 
   const onLoad = () => {
     setTopics(db.notebooks.notebook(route.params.notebook.id).data.topics);
   };
 
   useEffect(() => {
-    onFocus();
+    onLoad();
   }, [route.params]);
 
   useEffect(() => {
@@ -33,39 +34,29 @@ export const Notebook = ({route, navigation}) => {
     };
   }, []);
 
-  const onFocus = () => {
+  const onFocus = async () => {
     eSendEvent(eScrollEvent, {name: params.title, type: 'in'});
-    onLoad();
-    dispatch({
-      type: Actions.HEADER_TEXT_STATE,
-      state: {
-        heading: params.title,
-        id:params.notebook.id
-      },
-    });
-
     updateSearch();
-    dispatch({
-      type: Actions.CONTAINER_BOTTOM_BUTTON,
-      state: {
-        onPress: _onPressBottomButton,
-      },
-    });
-
-    dispatch({
-      type: Actions.CURRENT_SCREEN,
-      screen: 'notebook',
+    if (!pageIsLoaded) {
+      console.log('returning since page is not loaded');
+      pageIsLoaded = true;
+      return;
+    }
+    Navigation.setHeaderState('notebooks', params, {
+      heading: params.title,
+      id: params.notebook.id,
+      type: 'notebook',
     });
   };
 
   useEffect(() => {
     navigation.addListener('focus', onFocus);
-
     return () => {
       eSendEvent(eScrollEvent, {name: params.title, type: 'back'});
       navigation.removeListener('focus', onFocus);
     };
   }, []);
+
   useEffect(() => {
     if (navigation.isFocused()) {
       updateSearch();
@@ -111,43 +102,3 @@ export const Notebook = ({route, navigation}) => {
 };
 
 export default Notebook;
-/* 
-const RenderItem = ({item, index}) => {
-  const [state, dispatch] = useTracked();
-  const {colors,selectionMode } = state;
-
-  return (
-    <SelectionWrapper
-      onPress={() => {
-        NavigationService.navigate('NotesPage', {
-          ...item,
-        });
-      }}
-      onLongPress={() => {
-        if (!selectionMode) {
-          dispatch({
-            type: Actions.SELECTION_MODE,
-            enabled: !selectionMode,
-          });
-        }
-        dispatch({
-          type: Actions.SELECTED_ITEMS,
-          item: item,
-        });
-      }}
-      item={item}>
-      <NotebookItem
-        isTopic={true}
-        customStyle={{
-          width: '100%',
-          marginHorizontal: 0,
-        }}
-        selectionMode={selectionMode}
-        item={item}
-        index={index}
-        colors={colors}
-      />
-    </SelectionWrapper>
-  );
-};
- */

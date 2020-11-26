@@ -6,47 +6,49 @@ import {Placeholder} from '../../components/ListPlaceholders';
 import SimpleList from '../../components/SimpleList';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
+import {DDS} from '../../services/DeviceDetection';
 import {eSendEvent} from '../../services/EventManager';
+import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
 import {eScrollEvent} from '../../utils/Events';
 
 export const Trash = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const {trash} = state;
+  let pageIsLoaded = false;
 
   const onFocus = useCallback(() => {
     eSendEvent(eScrollEvent, {name: 'Trash', type: 'in'});
-    dispatch({
-      type: Actions.HEADER_STATE,
-      state: true,
-    });
-    dispatch({
-      type: Actions.HEADER_TEXT_STATE,
-      state: {
-        heading: 'Trash',
-      },
-    });
-
-    dispatch({
-      type: Actions.CONTAINER_BOTTOM_BUTTON,
-      state: {
-        onPress: null,
-      },
-    });
-
+    if (DDS.isLargeTablet()) {
+      dispatch({
+        type: Actions.CONTAINER_BOTTOM_BUTTON,
+        state: {
+          onPress: null,
+        },
+      });
+    }
     updateSearch();
-    dispatch({
-      type: Actions.TRASH,
-    });
-    dispatch({
-      type: Actions.CURRENT_SCREEN,
-      screen: 'trash',
-    });
+    if (!pageIsLoaded) {
+      pageIsLoaded = true;
+      return;
+    }
+    Navigation.setHeaderState(
+      'trash',
+      {
+        menu: true,
+      },
+      {
+        heading: 'Trash',
+        id: 'trash_navigation',
+      },
+    );
   }, []);
 
   useEffect(() => {
     navigation.addListener('focus', onFocus);
     return () => {
+      pageIsLoaded = false;
+
       eSendEvent(eScrollEvent, {name: 'Trash', type: 'back'});
       navigation.removeListener('focus', onFocus);
     };

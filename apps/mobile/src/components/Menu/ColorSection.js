@@ -1,22 +1,21 @@
 import React, {useEffect} from 'react';
-import {Text, View} from 'react-native';
+import {View} from 'react-native';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {eSendEvent} from '../../services/EventManager';
-import {refreshNotesPage} from '../../utils/Events';
-import NavigationService from '../../services/Navigation';
-import {PressableButton} from '../PressableButton';
+import Navigation from '../../services/Navigation';
 import {COLORS_NOTE} from '../../utils/Colors';
-import {SIZE, WEIGHT} from '../../utils/SizeUtils';
+import {refreshNotesPage} from '../../utils/Events';
+import {SIZE} from '../../utils/SizeUtils';
+import {PressableButton} from '../PressableButton';
 import Paragraph from '../Typography/Paragraph';
-import {sideMenuRef} from '../../utils/Refs';
 
 export const ColorSection = ({noTextMode}) => {
   const [state, dispatch] = useTracked();
-  const {colors, colorNotes, currentScreen} = state;
+  const {colors, colorNotes, headerTextState} = state;
 
   useEffect(() => {
-    dispatch({type: Actions.TAGS});
+    dispatch({type: Actions.COLORS});
   }, []);
 
   const onPress = (item) => {
@@ -26,26 +25,13 @@ export const ColorSection = ({noTextMode}) => {
       color: item,
       menu: true,
     };
-    dispatch({
-      type: Actions.HEADER_VERTICAL_MENU,
-      state: false,
+    Navigation.navigate('NotesPage', params, {
+      heading: item.title.slice(0, 1).toUpperCase() + item.title.slice(1),
+      id: item.id,
+      type: 'color',
     });
-
-    dispatch({
-      type: Actions.CURRENT_SCREEN,
-      screen: item.title,
-    });
-
-    dispatch({
-      type: Actions.HEADER_TEXT_STATE,
-      state: {
-        heading: item.title.slice(0, 1).toUpperCase() + item.title.slice(1),
-      },
-    });
-
-    NavigationService.navigate('NotesPage', params);
     eSendEvent(refreshNotesPage, params);
-    NavigationService.closeDrawer();
+    Navigation.closeDrawer();
   };
 
   return (
@@ -57,7 +43,7 @@ export const ColorSection = ({noTextMode}) => {
         <PressableButton
           key={item.id}
           color={
-            currentScreen === item.title
+            headerTextState.id === item.id && item.type === headerTextState.type
               ? COLORS_NOTE[item.title]
               : 'transparent'
           }
