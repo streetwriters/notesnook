@@ -9,8 +9,7 @@ import accents from "../theme/accents";
 import { showLogInDialog } from "../components/dialogs/logindialog";
 import { showLogoutConfirmation } from "../components/dialogs/confirm";
 import useSystemTheme from "../utils/use-system-theme";
-import download from "../utils/download";
-import { db, SUBSCRIPTION_STATUS } from "../common";
+import { createBackup, db, SUBSCRIPTION_STATUS } from "../common";
 import { usePersistentState } from "../utils/hooks";
 import dayjs from "dayjs";
 import { showRecoveryKeyDialog } from "../components/dialogs/recoverykeydialog";
@@ -245,29 +244,7 @@ function Settings(props) {
         >
           {"Backup & Restore"}
         </Text>
-        <Button
-          variant="list"
-          onClick={async () => {
-            const data = await showLoadingDialog({
-              title: "Creating backup",
-              subtitle: "We are creating a backup of your data. Please wait...",
-              action: async () => {
-                return await db.backup.export("web", encryptBackups);
-              },
-              message: (
-                <Text color="error">
-                  Please do NOT close your browser or shut down your PC.
-                </Text>
-              ),
-            });
-            download(
-              `notesnook-backup-${new Date().toLocaleString("en")}`,
-              data,
-              "nnbackup"
-            );
-            await showToast("success", "Backup created!");
-          }}
-        >
+        <Button variant="list" onClick={createBackup}>
           <TextWithTip
             text="Backup data"
             tip="Backup and download all your data"

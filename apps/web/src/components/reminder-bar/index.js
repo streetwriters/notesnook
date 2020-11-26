@@ -1,38 +1,36 @@
 import React, { useMemo } from "react";
-import { Flex, Text, Box } from "rebass";
+import { Flex, Text } from "rebass";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { Reminders } from "../../common/reminders";
+import * as Icon from "../icons";
 
 function ReminderBar() {
   const reminders = useAppStore((store) => store.reminders);
   const reminder = useMemo(() => {
-    const reminder = reminders.sort((a, b) => a.priority - b.priority)[0];
+    const copy = reminders.slice();
+    const reminder = copy.sort((a, b) => a.priority - b.priority)[0];
     if (!reminder) return;
     return Reminders[reminder.type];
   }, [reminders]);
   if (!reminder) return null;
   return (
     <Flex
-      height={65}
-      p={2}
-      mt={2}
+      p={1}
       bg={"shade"}
       alignItems="center"
       mx={2}
+      mb={1}
       sx={{ cursor: "pointer", borderRadius: "default" }}
-      onClick={reminder?.action?.onClick}
+      onClick={reminder?.action}
+      justifyContent="space-between"
     >
-      <Box sx={{ bg: "primary", borderRadius: 80 }} width={40} p={2} mr={2}>
-        <reminder.icon size={18} color="static" />
-      </Box>
-      <Flex flexDirection="column">
-        <Text variant="subBody" fontSize={10}>
-          {reminder.action.text}
-        </Text>
+      <Flex>
+        <reminder.icon size={14} color="primary" sx={{ mr: 1 }} />
         <Text variant="subBody" fontSize={10} color="primary">
           {reminder.title}
         </Text>
       </Flex>
+      <Icon.ArrowRight size={14} color="primary" />
     </Flex>
   );
 }

@@ -8,6 +8,7 @@ import { useStore as useSelectionStore } from "../../stores/selection-store";
 import GroupHeader from "../group-header";
 import ListProfiles from "../../common/list-profiles";
 import ScrollContainer from "../scroll-container";
+import ReminderBar from "../reminder-bar";
 
 const CustomScrollbarsVirtualList = React.forwardRef((props, ref) => (
   <ScrollContainer {...props} forwardedRef={ref} />
@@ -42,6 +43,7 @@ function ListContainer(props) {
         </Flex>
       ) : (
         <>
+          <ReminderBar />
           <Flex variant="columnFill" data-test-id="note-list">
             {props.children
               ? props.children

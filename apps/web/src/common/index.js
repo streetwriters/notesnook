@@ -1,3 +1,4 @@
+import React from "react";
 import StorageInterface from "../interfaces/storage";
 import Database from "notes-core/api/";
 import SelectionOptions from "./selectionoptions";
@@ -7,6 +8,11 @@ import { store as editorStore } from "../stores/editor-store";
 import { store as noteStore } from "../stores/note-store";
 import { showAddNotebookDialog } from "../components/dialogs/addnotebookdialog";
 import { showTopicDialog } from "../components/dialogs/topicdialog";
+import { showToast } from "../utils/toast";
+import download from "../utils/download";
+import { Text } from "rebass";
+import { showLoadingDialog } from "../components/dialogs/loadingdialog";
+import Config from "../utils/config";
 
 export const db = new Database(StorageInterface, EventSource);
 db.host("http://localhost:4100");
@@ -70,4 +76,26 @@ export function notesFromContext(context) {
       return [];
   }
   return notes;
+}
+
+export async function createBackup() {
+  const encryptBackups = Config.get("encryptBackups", false);
+  const data = await showLoadingDialog({
+    title: "Creating backup",
+    subtitle: "We are creating a backup of your data. Please wait...",
+    action: async () => {
+      return await db.backup.export("web", encryptBackups);
+    },
+    message: (
+      <Text color="error">
+        Please do NOT close your browser or shut down your PC.
+      </Text>
+    ),
+  });
+  download(
+    `notesnook-backup-${new Date().toLocaleString("en")}`,
+    data,
+    "nnbackup"
+  );
+  await showToast("success", "Backup created!");
 }
