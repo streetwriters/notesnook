@@ -265,7 +265,7 @@ function attachEditorListeners() {
         data: editor.getContents().ops,
         type: 'delta',
       });
-     // window.ReactNativeWebView.postMessage(msg);
+      window.ReactNativeWebView.postMessage(msg);
     }, 50);
 
     if (historyTimeout) {
@@ -279,7 +279,7 @@ function attachEditorListeners() {
         undo: editor.history.stack.undo.length,
         redo: editor.history.stack.redo.length,
       });
-     // window.ReactNativeWebView.postMessage(history);
+      window.ReactNativeWebView.postMessage(history);
     }, 1000);
   });
 }
