@@ -430,11 +430,7 @@ export class VaultDialog extends Component {
 
           <Seperator />
 
-          {note.locked ||
-          locked ||
-          permanant ||
-          fingerprintAccess ||
-          changePassword ? (
+          {changePassword ? (
             <>
               <TextInput
                 ref={passInputRef}
