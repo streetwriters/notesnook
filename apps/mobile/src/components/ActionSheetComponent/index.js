@@ -470,35 +470,34 @@ export const ActionSheetComponent = ({
   };
 
   const onPressVaultButton = async () => {
-    if (!note.id) return;
-
-    if (note.locked) {
-      close('unlock');
-    } else {
-      db.vault
-        .add(note.id)
-        .then(() => {
-          sendNoteEditedEvent(note.id, false, true);
-          close();
-        })
-        .catch(async (e) => {
-          switch (e.message) {
-            case db.vault.ERRORS.noVault:
-              close('novault');
-              break;
-            case db.vault.ERRORS.vaultLocked:
-              close('locked');
-              break;
-            case db.vault.ERRORS.wrongPassword:
-              close();
-              break;
-          }
-        });
-    }
-
-    return;
     await PremiumService.verify(
-      () => {},
+      () => {
+        if (!note.id) return;
+
+        if (note.locked) {
+          close('unlock');
+        } else {
+          db.vault
+            .add(note.id)
+            .then(() => {
+              sendNoteEditedEvent(note.id, false, true);
+              close();
+            })
+            .catch(async (e) => {
+              switch (e.message) {
+                case db.vault.ERRORS.noVault:
+                  close('novault');
+                  break;
+                case db.vault.ERRORS.vaultLocked:
+                  close('locked');
+                  break;
+                case db.vault.ERRORS.wrongPassword:
+                  close();
+                  break;
+              }
+            });
+        }
+      },
       () => {
         eSendEvent(eShowGetPremium, {
           context: 'sheet',
