@@ -32,7 +32,7 @@ class Delta {
   }
 
   toHeadline() {
-    return getSubstringFromDelta(this.data, 60);
+    return getSubstringFromDelta(this.data, 80);
   }
 
   isEmpty() {
