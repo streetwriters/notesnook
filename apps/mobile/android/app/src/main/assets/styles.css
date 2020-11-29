@@ -783,7 +783,8 @@
 }
 
 .ql-snow .ql-picker.ql-header {
-  min-width: 98px;
+  min-width: 20px;
+  margin-top:5px
 }
 
 .ql-snow .ql-picker.ql-header .ql-picker-label::before,
@@ -879,7 +880,7 @@
 }
 
 .ql-snow .ql-picker.ql-size {
-  min-width: 98px;
+  min-width: 20px;
 }
 
 .ql-snow .ql-picker.ql-size .ql-picker-label::before,
@@ -950,9 +951,16 @@
   align-items: center;
 }
 
-.ql-snow .ql-picker .ql-picker-label {
+.ql-snow .ql-picker {
   font-size:14px;
-  width: 120px ;
+  min-width: 50px ;
+}
+
+.ql-header .ql-picker-label,
+.ql-size .ql-picker-label
+ {
+  font-size:14px;
+  min-width: 120px !important;
 }
 
 .ql-snow .ql-tooltip a.ql-preview {
