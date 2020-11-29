@@ -1,26 +1,28 @@
 import React, {createRef, useEffect, useState} from 'react';
-import {Modal, Text, TouchableOpacity, View, SafeAreaView} from 'react-native';
+import {Modal, SafeAreaView, TouchableOpacity, View} from 'react-native';
 import Animated, {Easing} from 'react-native-reanimated';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import WebView from 'react-native-webview';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
+import {DDS} from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
 } from '../../services/EventManager';
+import {dHeight} from '../../utils';
+import {db} from '../../utils/DB';
 import {
   eApplyChanges,
   eShowMergeDialog,
   refreshNotesPage,
 } from '../../utils/Events';
-import {dHeight} from '../../utils';
+import {normalize, SIZE} from '../../utils/SizeUtils';
 import {Button} from '../Button';
 import {simpleDialogEvent, updateEvent} from '../DialogManager/recievers';
 import {TEMPLATE_APPLY_CHANGES} from '../DialogManager/Templates';
-import {normalize, SIZE} from '../../utils/SizeUtils';
-import {db} from '../../utils/DB';
 import Paragraph from '../Typography/Paragraph';
 
 const {Value, timing} = Animated;
@@ -38,13 +40,15 @@ function openEditorAnimation(
 ) {
   let openConfig = {
     duration: 300,
-    toValue: !siblingStatus ? dHeight - 100 : dHeight * 0.5 - 50,
+    toValue: !siblingStatus
+      ? dHeight - (100 + windowInsets)
+      : dHeight * 0.5 - (50 + windowInsets / 2),
     easing: Easing.inOut(Easing.ease),
   };
 
   let extendConfig = {
     duration: 300,
-    toValue: dHeight * 0.5 - 50,
+    toValue: dHeight * 0.5 - (50 + windowInsets / 2),
     easing: Easing.inOut(Easing.ease),
   };
 
@@ -63,22 +67,21 @@ function closeEditorAnimation(heightToAnimate, heightToExtend = null) {
 
   let extendConfig = {
     duration: 300,
-    toValue: dHeight - 100,
+    toValue: dHeight - (100 + windowInsets),
     easing: Easing.inOut(Easing.ease),
   };
   if (heightToExtend) {
+    extendConfig.toValue = dHeight - (100 + windowInsets);
     timing(heightToExtend, extendConfig).start();
   }
 
   timing(heightToAnimate, closeConfig).start();
 }
 
-let primaryDelta = null;
-let primaryText = '';
+let primaryData = null;
 
-let secondaryDelta = null;
-let secondaryText = '';
-
+let secondaryData = null;
+let windowInsets = 0;
 const MergeEditor = () => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
@@ -89,6 +92,7 @@ const MergeEditor = () => {
   const [copyToSave, setCopyToSave] = useState(null);
   const [disardedContent, setDiscardedContent] = useState(null);
 
+  const insets = useSafeAreaInsets();
   const postMessageToPrimaryWebView = (message) =>
     primaryWebView.current?.postMessage(JSON.stringify(message));
 
@@ -98,7 +102,7 @@ const MergeEditor = () => {
   const onPrimaryWebViewLoad = () => {
     postMessageToPrimaryWebView({
       type: 'delta',
-      value: primaryDelta,
+      value: primaryData.data,
     });
     let c = {...colors};
     c.factor = normalize(1);
@@ -111,7 +115,7 @@ const MergeEditor = () => {
   const onSecondaryWebViewLoad = () => {
     postMessageToSecondaryWebView({
       type: 'delta',
-      value: secondaryDelta,
+      value: secondaryData.data,
     });
     let c = {...colors};
     c.factor = normalize(1);
@@ -133,16 +137,20 @@ const MergeEditor = () => {
   const onMessageFromPrimaryWebView = (evt) => {
     if (evt.nativeEvent.data !== '') {
       let data = JSON.parse(evt.nativeEvent.data);
-      primaryDelta = data.delta;
-      primaryText = data.text;
+      if (data.type === 'delta') {
+        console.log(data.data);
+        primaryData = data.data;
+      }
     }
   };
 
   const onMessageFromSecondaryWebView = (evt) => {
-    if (evt.nativeEvent.data !== '') {
+    if (evt.nativeEvent.data === '') {
       let data = JSON.parse(evt.nativeEvent.data);
-      secondaryDelta = data.delta;
-      secondaryText = data.text;
+      if (data.type === 'delta') {
+        console.log(data.data);
+        secondaryData = data.data;
+      }
     }
   };
 
@@ -150,11 +158,9 @@ const MergeEditor = () => {
     if (keepContentFrom === 'primary') {
       await db.notes.add({
         content: {
-          text: primaryText,
-          delta: {
-            data: primaryDelta,
-            resolved: true,
-          },
+          data: primaryData.data,
+          resolved: true,
+          type: primaryData.type,
         },
         id: note.id,
         conflicted: false,
@@ -162,11 +168,9 @@ const MergeEditor = () => {
     } else if (keepContentFrom === 'secondary') {
       await db.notes.add({
         content: {
-          text: secondaryText,
-          delta: {
-            data: primaryDelta,
-            resolved: true,
-          },
+          data: primaryData.data,
+          type: primaryData.type,
+          resolved: true,
         },
         id: note.id,
         conflicted: false,
@@ -176,16 +180,16 @@ const MergeEditor = () => {
     if (copyToSave === 'primary') {
       await db.notes.add({
         content: {
-          text: primaryText,
-          delta: primaryDelta,
+          data: primaryData.data,
+          type: primaryData.type,
         },
         id: null,
       });
     } else if (copyToSave === 'secondary') {
       await db.notes.add({
         content: {
-          text: secondaryText,
-          delta: secondaryDelta,
+          data: secondaryData.data,
+          type: secondaryData.type,
         },
         id: null,
       });
@@ -198,16 +202,22 @@ const MergeEditor = () => {
 
   const show = async (item) => {
     note = item;
-
-    let rawDelta = await db.delta.raw(note.content.delta);
-    primaryDelta = rawDelta.data;
-    secondaryDelta = rawDelta.conflicted.data;
-
+    db.content;
+    let note = await db.content.raw(note.contentId);
+    windowInsets = insets.top;
+    switch (note.type) {
+      case 'delta':
+        primaryData = note;
+        secondaryData = note;
+    }
     setVisible(true);
+    firstWebViewHeight.setValue(dHeight / 2 - (50 + insets.top / 2));
+    secondWebViewHeight.setValue(dHeight / 2 - (50 + insets.top / 2));
     openEditorAnimation(firstWebViewHeight, secondWebViewHeight, true);
   };
 
   useEffect(() => {
+    windowInsets = insets.top;
     eSubscribeEvent(eApplyChanges, applyChanges);
     eSubscribeEvent(eShowMergeDialog, show);
     return () => {
@@ -263,8 +273,8 @@ const MergeEditor = () => {
     setCopyToSave(null);
     setDiscardedContent(null);
     setKeepContentFrom(null);
-    primaryDelta = null;
-    secondaryDelta = null;
+    primaryData = null;
+    secondaryData = null;
     primaryText = null;
     secondaryText = null;
     note = null;
@@ -282,16 +292,21 @@ const MergeEditor = () => {
     }`;
 
   return !visible ? null : (
-    <Modal transparent={false} animated animationType="fade" visible={true}>
+    <Modal
+      statusBarTranslucent
+      transparent={false}
+      animationType="slide"
+      visible={true}>
       <SafeAreaView
         style={{
           backgroundColor: colors.nav,
+          paddingTop: insets.top,
         }}>
         <View
           style={{
             height: '100%',
             width: '100%',
-            backgroundColor: 'rgba(0,0,0,0.3)',
+            backgroundColor: DDS.isLargeTablet() ? 'rgba(0,0,0,0.3)' : null,
           }}>
           <View
             style={{
@@ -319,7 +334,7 @@ const MergeEditor = () => {
                 }}
                 onPress={close}
                 size={SIZE.xxl}
-                name="chevron-left"
+                name="arrow-left"
               />
               <TouchableOpacity
                 onPress={() => {
