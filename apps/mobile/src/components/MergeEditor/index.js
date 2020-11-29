@@ -12,17 +12,20 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent,
 } from '../../services/EventManager';
-import {dHeight} from '../../utils';
+import {dHeight, getElevation} from '../../utils';
 import {db} from '../../utils/DB';
 import {
   eApplyChanges,
   eShowMergeDialog,
   refreshNotesPage,
 } from '../../utils/Events';
-import {normalize, SIZE} from '../../utils/SizeUtils';
+import {normalize, ph, pv, SIZE} from '../../utils/SizeUtils';
 import {Button} from '../Button';
-import {simpleDialogEvent, updateEvent} from '../DialogManager/recievers';
-import {TEMPLATE_APPLY_CHANGES} from '../DialogManager/Templates';
+import BaseDialog from '../Dialog/base-dialog';
+import DialogButtons from '../Dialog/dialog-buttons';
+import DialogContainer from '../Dialog/dialog-container';
+import DialogHeader from '../Dialog/dialog-header';
+import {updateEvent} from '../DialogManager/recievers';
 import Paragraph from '../Typography/Paragraph';
 
 const {Value, timing} = Animated;
@@ -90,6 +93,7 @@ const MergeEditor = () => {
   const [keepContentFrom, setKeepContentFrom] = useState(null);
   const [copyToSave, setCopyToSave] = useState(null);
   const [disardedContent, setDiscardedContent] = useState(null);
+  const [dialogVisible, setDialogVisible] = useState(false);
 
   const insets = useSafeAreaInsets();
   const postMessageToPrimaryWebView = (message) =>
@@ -157,6 +161,7 @@ const MergeEditor = () => {
   };
 
   const applyChanges = async () => {
+    console.log(keepContentFrom, copyToSave);
     if (keepContentFrom === 'primary') {
       await db.notes.add({
         content: {
@@ -205,15 +210,15 @@ const MergeEditor = () => {
   const show = async (item) => {
     note = item;
     db.content;
-    let note = await db.content.raw(note.contentId);
-    switch (note.type) {
+    let noteData = await db.content.raw(note.contentId);
+    switch (noteData.type) {
       case 'delta':
-        primaryData = note;
-        secondaryData = note;
+        primaryData = noteData;
+        secondaryData = noteData;
     }
     setVisible(true);
-    firstWebViewHeight.setValue((dHeight / 2) - (50 + insets.top / 2));
-    secondWebViewHeight.setValue((dHeight / 2) - (50 + insets.top / 2));
+    firstWebViewHeight.setValue(dHeight / 2 - (50 + insets.top / 2));
+    secondWebViewHeight.setValue(dHeight / 2 - (50 + insets.top / 2));
     openEditorAnimation(firstWebViewHeight, secondWebViewHeight, true, insets);
   };
 
@@ -243,7 +248,7 @@ const MergeEditor = () => {
 
   const onPressSaveCopyFromPrimaryWebView = () => {
     setCopyToSave('primary');
-    simpleDialogEvent(TEMPLATE_APPLY_CHANGES);
+    setDialogVisible(true);
   };
 
   const onPressKeepFromSecondaryWebView = () => {
@@ -263,17 +268,17 @@ const MergeEditor = () => {
 
   const onPressSaveCopyFromSecondaryWebView = () => {
     setCopyToSave('secondary');
-    simpleDialogEvent(TEMPLATE_APPLY_CHANGES);
+    setDialogVisible(true);
   };
 
   const onPressDiscardFromPrimaryWebView = () => {
     setDiscardedContent('primary');
-    simpleDialogEvent(TEMPLATE_APPLY_CHANGES);
+    setDialogVisible(true);
   };
 
   const onPressDiscardFromSecondaryWebView = () => {
     setDiscardedContent('secondary');
-    simpleDialogEvent(TEMPLATE_APPLY_CHANGES);
+    setDialogVisible(true);
   };
 
   const close = () => {
@@ -312,6 +317,23 @@ const MergeEditor = () => {
           backgroundColor: colors.nav,
           paddingTop: insets.top,
         }}>
+        {dialogVisible && (
+          <BaseDialog visible={true}>
+            <DialogContainer>
+              <DialogHeader
+                title="Apply Changes"
+                paragraph="Apply selected changes to note?"
+              />
+              <DialogButtons
+                positiveTitle="Apply"
+                negativeTitle="Cancel"
+                onPressNegative={() => setDialogVisible(false)}
+                onPressPositive={applyChanges}
+              />
+            </DialogContainer>
+          </BaseDialog>
+        )}
+
         <View
           style={{
             height: '100%',
