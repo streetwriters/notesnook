@@ -249,8 +249,12 @@ function attachEditorListeners() {
       }
     }
 
-    document.getElementById('infowords').innerText =
+    let infowords = document.getElementById('infowords');
+    if (infowords) {
+      document.getElementById('infowords').innerText =
       editor.getText().split(' ').length + ' words';
+    }
+    
 
     if (deltaTimeout) {
       clearTimeout(deltaTimeout);

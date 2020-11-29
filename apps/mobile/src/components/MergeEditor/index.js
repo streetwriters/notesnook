@@ -37,18 +37,19 @@ function openEditorAnimation(
   heightToAnimate,
   extendedHeight = null,
   siblingStatus,
+  insets,
 ) {
   let openConfig = {
     duration: 300,
     toValue: !siblingStatus
-      ? dHeight - (100 + windowInsets)
-      : dHeight * 0.5 - (50 + windowInsets / 2),
+      ? dHeight - (100 + insets.top)
+      : dHeight * 0.5 - (50 + insets.top / 2),
     easing: Easing.inOut(Easing.ease),
   };
 
   let extendConfig = {
     duration: 300,
-    toValue: dHeight * 0.5 - (50 + windowInsets / 2),
+    toValue: dHeight * 0.5 - (50 + insets.top / 2),
     easing: Easing.inOut(Easing.ease),
   };
 
@@ -58,7 +59,7 @@ function openEditorAnimation(
   timing(heightToAnimate, openConfig).start();
 }
 
-function closeEditorAnimation(heightToAnimate, heightToExtend = null) {
+function closeEditorAnimation(heightToAnimate, heightToExtend = null, insets) {
   let closeConfig = {
     duration: 300,
     toValue: 0,
@@ -67,11 +68,10 @@ function closeEditorAnimation(heightToAnimate, heightToExtend = null) {
 
   let extendConfig = {
     duration: 300,
-    toValue: dHeight - (100 + windowInsets),
+    toValue: dHeight - (100 + insets.top),
     easing: Easing.inOut(Easing.ease),
   };
   if (heightToExtend) {
-    extendConfig.toValue = dHeight - (100 + windowInsets);
     timing(heightToExtend, extendConfig).start();
   }
 
@@ -81,7 +81,6 @@ function closeEditorAnimation(heightToAnimate, heightToExtend = null) {
 let primaryData = null;
 
 let secondaryData = null;
-let windowInsets = 0;
 const MergeEditor = () => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
@@ -135,8 +134,10 @@ const MergeEditor = () => {
   };
 
   const onMessageFromPrimaryWebView = (evt) => {
+    console.log(evt.nativeEvent.data);
     if (evt.nativeEvent.data !== '') {
       let data = JSON.parse(evt.nativeEvent.data);
+      console.log(data);
       if (data.type === 'delta') {
         console.log(data.data);
         primaryData = data.data;
@@ -145,6 +146,7 @@ const MergeEditor = () => {
   };
 
   const onMessageFromSecondaryWebView = (evt) => {
+    console.log(data.data);
     if (evt.nativeEvent.data === '') {
       let data = JSON.parse(evt.nativeEvent.data);
       if (data.type === 'delta') {
@@ -204,20 +206,18 @@ const MergeEditor = () => {
     note = item;
     db.content;
     let note = await db.content.raw(note.contentId);
-    windowInsets = insets.top;
     switch (note.type) {
       case 'delta':
         primaryData = note;
         secondaryData = note;
     }
     setVisible(true);
-    firstWebViewHeight.setValue(dHeight / 2 - (50 + insets.top / 2));
-    secondWebViewHeight.setValue(dHeight / 2 - (50 + insets.top / 2));
-    openEditorAnimation(firstWebViewHeight, secondWebViewHeight, true);
+    firstWebViewHeight.setValue((dHeight / 2) - (50 + insets.top / 2));
+    secondWebViewHeight.setValue((dHeight / 2) - (50 + insets.top / 2));
+    openEditorAnimation(firstWebViewHeight, secondWebViewHeight, true, insets);
   };
 
   useEffect(() => {
-    windowInsets = insets.top;
     eSubscribeEvent(eApplyChanges, applyChanges);
     eSubscribeEvent(eShowMergeDialog, show);
     return () => {
@@ -229,10 +229,15 @@ const MergeEditor = () => {
   const onPressKeepFromPrimaryWebView = () => {
     if (keepContentFrom == 'primary') {
       setKeepContentFrom(null);
-      openEditorAnimation(firstWebViewHeight, secondWebViewHeight);
+      openEditorAnimation(
+        firstWebViewHeight,
+        secondWebViewHeight,
+        false,
+        insets,
+      );
     } else {
       setKeepContentFrom('primary');
-      closeEditorAnimation(firstWebViewHeight, secondWebViewHeight);
+      closeEditorAnimation(firstWebViewHeight, secondWebViewHeight, insets);
     }
   };
 
@@ -244,10 +249,15 @@ const MergeEditor = () => {
   const onPressKeepFromSecondaryWebView = () => {
     if (keepContentFrom == 'secondary') {
       setKeepContentFrom(null);
-      openEditorAnimation(secondWebViewHeight, firstWebViewHeight);
+      openEditorAnimation(
+        secondWebViewHeight,
+        firstWebViewHeight,
+        false,
+        insets,
+      );
     } else {
       setKeepContentFrom('secondary');
-      closeEditorAnimation(secondWebViewHeight, firstWebViewHeight);
+      closeEditorAnimation(secondWebViewHeight, firstWebViewHeight, insets);
     }
   };
 
@@ -278,7 +288,7 @@ const MergeEditor = () => {
     primaryText = null;
     secondaryText = null;
     note = null;
-    openEditorAnimation(firstWebViewHeight, secondWebViewHeight, true);
+    openEditorAnimation(firstWebViewHeight, secondWebViewHeight, true, insets);
   };
 
   const params = 'platform=' + Platform.OS;
@@ -346,6 +356,7 @@ const MergeEditor = () => {
                         ? secondWebViewHeight
                         : null,
                       secondary && keepContentFrom !== 'secondary',
+                      insets,
                     );
                     setPrimary(true);
                   } else {
@@ -354,6 +365,7 @@ const MergeEditor = () => {
                       secondary && keepContentFrom !== 'secondary'
                         ? secondWebViewHeight
                         : null,
+                      insets,
                     );
                     setPrimary(false);
                   }
@@ -473,6 +485,7 @@ const MergeEditor = () => {
                         ? firstWebViewHeight
                         : null,
                       primary && keepContentFrom !== 'primary',
+                      insets,
                     );
                     setSecondary(true);
                   } else {
@@ -481,6 +494,7 @@ const MergeEditor = () => {
                       primary && keepContentFrom !== 'primary'
                         ? firstWebViewHeight
                         : null,
+                      insets,
                     );
                     setSecondary(false);
                   }
