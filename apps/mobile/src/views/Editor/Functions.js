@@ -232,7 +232,6 @@ export const _onMessage = async (evt) => {
       eSendEvent('editorScroll', message);
       break;
     case 'premium':
-      post('blur');
       eSendEvent(eShowGetPremium, {
         context: 'editor',
         title: 'Get Notesnook Pro',
