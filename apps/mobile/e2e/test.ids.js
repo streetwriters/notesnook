@@ -1,34 +1,35 @@
 export const notesnook = {
   ids: {
     default: {
-      root: '1',
-      menu: '2',
+      root: 'root_1',
+      menu: 'menu_2',
       dialog: {
-        yes: '3',
-        no: '4',
+        yes: 'yes_3',
+        no: 'no_4',
       },
-      editor: '5',
+      editor: 'editor_5',
       header: {
         buttons: {
-          left: '6',
-          right: '7',
+          left: 'left_6',
+          right: 'right_7',
+          back:'back_13'
         },
       },
     },
     dialogs: {
       notebook: {
         inputs: {
-          title: '8',
-          description: '9',
-          topic: '10',
+          title: 'title_8',
+          description: 'description_9',
+          topic: 'topic_10',
         },
         buttons: {
-          add: '11',
+          add: 'add_11',
         },
       },
     },
     menu: {
-      nightmode:"12"
+      nightmode:"night_12"
     }
   },
 };

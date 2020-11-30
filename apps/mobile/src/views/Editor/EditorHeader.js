@@ -2,6 +2,7 @@ import React, {useEffect} from 'react';
 import {BackHandler, Keyboard, Platform, View} from 'react-native';
 import RNExitApp from 'react-native-exit-app';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import { notesnook } from '../../../e2e/test.ids';
 import {ActionIcon} from '../../components/ActionIcon';
 import {
   ActionSheetEvent,
@@ -179,7 +180,7 @@ const EditorHeader = () => {
         }}>
         {DDS.isLargeTablet() && !fullscreen ? null : (
           <ActionIcon
-            testID="editor_back_key"
+            testID={notesnook.ids.default.header.buttons.back}
             name="arrow-left"
             color={colors.heading}
             onPress={_onBackPress}
