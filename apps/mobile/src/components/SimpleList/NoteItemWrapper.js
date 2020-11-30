@@ -35,7 +35,7 @@ export const NoteItemWrapper = ({item, index, isTrash = false}) => {
       newNote.title === note.title &&
       newNote.headline === note.headline
     ) {
-      console.log('returning from here',newNote.headline,note.headline);
+      console.log('returning from here', newNote.headline, note.headline);
       return;
     }
     setNote(newNote);
@@ -60,9 +60,6 @@ export const NoteItemWrapper = ({item, index, isTrash = false}) => {
   };
 
   const onPress = async (event) => {
-
-    eSendEvent(eShowMergeDialog, note);
-    return;
     if (note.conflicted) {
       eSendEvent(eShowMergeDialog, note);
       return;
@@ -72,11 +69,11 @@ export const NoteItemWrapper = ({item, index, isTrash = false}) => {
       return;
     } else if (note.locked) {
       openVault({
-        item:item,
-        novault:true,
-        locked:true,
-        goToEditor:true,
-      })
+        item: item,
+        novault: true,
+        locked: true,
+        goToEditor: true,
+      });
       return;
     }
     if (isTrash) {
@@ -86,7 +83,6 @@ export const NoteItemWrapper = ({item, index, isTrash = false}) => {
     }
     if (DDS.isPhone || DDS.isSmallTab) {
       tabBarRef.current?.goToPage(1);
-      //openEditorAnimation(event.nativeEvent);
     }
   };
 

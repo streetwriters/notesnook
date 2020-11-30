@@ -179,6 +179,7 @@ const EditorHeader = () => {
         }}>
         {DDS.isLargeTablet() && !fullscreen ? null : (
           <ActionIcon
+            testID="editor_back_key"
             name="arrow-left"
             color={colors.heading}
             onPress={_onBackPress}

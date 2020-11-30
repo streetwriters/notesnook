@@ -17,7 +17,7 @@ export const defaultState = {
   colorNotes: [],
   user: null,
   fullscreen:false,
-  premiumUser: false,
+  premiumUser: true,
   settings: {
     showToolbarOnTop: false,
     showKeyboardOnOpen: false,

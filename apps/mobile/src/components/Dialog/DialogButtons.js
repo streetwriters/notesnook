@@ -5,6 +5,7 @@ import {SIZE} from '../../utils/SizeUtils';
 import {Button} from '../Button';
 import Paragraph from '../Typography/Paragraph';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {notesnook} from '../../../e2e/test.ids';
 
 const DialogButtons = ({
   onPressPositive,
@@ -46,6 +47,7 @@ const DialogButtons = ({
         <Button
           onPress={onPressNegative}
           fontSize={SIZE.md}
+          testID={notesnook.ids.default.dialog.no}
           type="gray"
           title={negativeTitle}
         />
@@ -53,6 +55,7 @@ const DialogButtons = ({
           <Button
             onPress={onPressPositive}
             fontSize={SIZE.md}
+            testID={notesnook.ids.default.dialog.yes}
             style={{
               marginLeft: 10,
             }}

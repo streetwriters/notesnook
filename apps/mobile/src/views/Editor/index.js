@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import {Platform, TextInput, View} from 'react-native';
 import WebView from 'react-native-webview';
+import { notesnook } from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
 import EditorHeader from './EditorHeader';
 import {
@@ -29,7 +30,7 @@ const Editor = () => {
       />
       <EditorHeader />
       <WebView
-        testID="editor"
+        testID={notesnook.ids.default.editor}
         ref={EditorWebView}
         onError={(error) => console.log(error)}
         onLoad={async (event) =>

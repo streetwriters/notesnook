@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import {FlatList, ScrollView, View} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import { notesnook } from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {DDS} from '../../services/DeviceDetection';
@@ -60,7 +61,7 @@ export const Menu = React.memo(
         style={{
           height: '100%',
           width: '100%',
-          backgroundColor: "white",
+          backgroundColor: colors.bg,
           paddingTop: insets.top,
         }}>
         <FlatList
@@ -76,6 +77,7 @@ export const Menu = React.memo(
               {MenuItemsList.map((item, index) => (
                 <MenuListItem
                   item={item}
+                  testID={item.name}
                   index={index}
                 />
               ))}
@@ -87,7 +89,7 @@ export const Menu = React.memo(
 
         {BottomItemsList.map((item, index) => (
           <MenuListItem
-            testID={item.name == 'Night mode' ? 'night_mode' : item.name}
+            testID={item.name == 'Night mode' ? notesnook.ids.menu.nightmode : item.name}
             key={item.name}
             item={item}
             index={index}

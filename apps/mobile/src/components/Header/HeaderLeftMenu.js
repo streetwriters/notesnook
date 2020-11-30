@@ -1,4 +1,5 @@
 import React from 'react';
+import { notesnook } from '../../../e2e/test.ids';
 import { useTracked } from '../../provider';
 import Navigation from '../../services/Navigation';
 import { SIZE } from '../../utils/SizeUtils';
@@ -20,7 +21,7 @@ export const HeaderLeftMenu = () => {
     <>
       {deviceMode === 'mobile' || currentScreen === 'search' ? (
         <ActionIcon
-          testID="left_menu_button"
+          testID={notesnook.ids.default.header.buttons.left}
           customStyle={{
             justifyContent: 'center',
             alignItems: 'center',

@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {Dimensions, View} from 'react-native';
 import ScrollableTabView from 'react-native-scrollable-tab-view';
 import SplashScreen from 'react-native-splash-screen';
+import { notesnook } from './e2e/test.ids';
 import ContextMenu from './src/components/ContextMenu';
 import {DialogManager} from './src/components/DialogManager';
 import {DummyText} from './src/components/DummyText';
@@ -181,6 +182,7 @@ const AppStack = React.memo(
     return (
       <View
         onLayout={_onLayout}
+        testID={notesnook.ids.default.root}
         style={{
           width: '100%',
           height: '100%',

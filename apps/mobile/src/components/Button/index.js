@@ -53,6 +53,7 @@ export const Button = ({
   type = 'transparent',
   iconSize = SIZE.md,
   style = {},
+  testID
 }) => {
   const [state] = useTracked();
   const {colors} = state;
@@ -61,6 +62,7 @@ export const Button = ({
     <PressableButton
       onPress={onPress}
       disabled={loading}
+      testID={testID}
       color={colors[BUTTON_TYPES[type].primary]}
       selectedColor={colors[BUTTON_TYPES[type].selected]}
       alpha={!colors.night ? -0.04 : 0.04}

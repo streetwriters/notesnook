@@ -12,14 +12,14 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent,
 } from '../../services/EventManager';
-import {dHeight, getElevation} from '../../utils';
+import {dHeight} from '../../utils';
 import {db} from '../../utils/DB';
 import {
   eApplyChanges,
   eShowMergeDialog,
   refreshNotesPage,
 } from '../../utils/Events';
-import {normalize, ph, pv, SIZE} from '../../utils/SizeUtils';
+import {normalize, SIZE} from '../../utils/SizeUtils';
 import {Button} from '../Button';
 import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';

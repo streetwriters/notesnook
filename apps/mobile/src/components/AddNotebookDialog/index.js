@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import {FlatList, TextInput} from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { notesnook } from '../../../e2e/test.ids';
 import {Actions} from '../../provider/Actions';
 import {DDS} from '../../services/DeviceDetection';
 import {ToastEvent} from '../../services/EventManager';
@@ -283,6 +284,7 @@ export class AddNotebookDialog extends React.Component {
 
               <TextInput
                 ref={(ref) => (this.titleRef = ref)}
+                testID={notesnook.ids.dialogs.notebook.inputs.title}
                 style={[
                   styles.input,
                   {
@@ -315,6 +317,7 @@ export class AddNotebookDialog extends React.Component {
               />
               <TextInput
                 ref={(ref) => (this.descriptionRef = ref)}
+                testID={notesnook.ids.dialogs.notebook.inputs.description}
                 style={[
                   styles.input,
                   {
@@ -348,6 +351,7 @@ export class AddNotebookDialog extends React.Component {
               <View style={styles.topicContainer}>
                 <TextInput
                   ref={(ref) => (this.topicInputRef = ref)}
+                  testID={notesnook.ids.dialogs.notebook.inputs.topic}
                   onChangeText={(value) => {
                     this.currentInputValue = value;
                     if (this.prevItem !== null) {
@@ -391,6 +395,7 @@ export class AddNotebookDialog extends React.Component {
                 />
                 <TouchableOpacity
                   onPress={this.onSubmit}
+                  testID={notesnook.ids.dialogs.notebook.buttons.add}
                   style={[
                     styles.addBtn,
                     {
@@ -436,6 +441,7 @@ export class AddNotebookDialog extends React.Component {
               <DialogButtons
                 negativeTitle="Cancel"
                 positiveTitle={toEdit && toEdit.dateCreated ? 'Save' : 'Add'}
+                
                 onPressPositive={this.addNewNotebook}
                 onPressNegative={this.close}
               />
