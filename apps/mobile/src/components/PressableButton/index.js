@@ -1,47 +1,75 @@
-import React from 'react';
-import {Pressable} from 'react-native';
-import {hexToRGBA, RGB_Linear_Shade} from "../../utils/ColorUtils";
-import {br} from "../../utils/SizeUtils";
+import React, { useCallback } from 'react';
+import { Pressable } from 'react-native';
+import { useTracked } from '../../provider';
+import { BUTTON_TYPES } from '../../utils';
+import { hexToRGBA, RGB_Linear_Shade } from '../../utils/ColorUtils';
+import { br } from '../../utils/SizeUtils';
+
+/**
+ *
+ * @typedef {Object} buttonTypes
+ * @property {"transparent" | "gray" | "grayBg" | "accent" | "inverted" | "shade"} type type of button
+ *
+ *@param {buttonTypes} type
+ *
+ */
 
 export const PressableButton = ({
-  color,
-  selectedColor,
-  borderless,
-  radius,
   children,
   onPress,
   customStyle,
-  alpha = -0.1,
-  opacity = 1,
   onLongPress,
   hitSlop,
   testID,
-  disabled
+  disabled,
+  type = 'gray',
+  noborder,
+  accentColor = 'accent',
+  accentText = 'light',
 }) => {
+  const [state] = useTracked();
+  const {colors} = state;
+  const selectedColor =
+    colors[
+      type === 'accent'
+        ? BUTTON_TYPES[type](accentColor, accentText).selected
+        : BUTTON_TYPES[type].selected
+    ];
+  const primaryColor =
+    colors[
+      type === 'accent'
+        ? BUTTON_TYPES[type](accentColor, accentText).primary
+        : BUTTON_TYPES[type].primary
+    ];
+  const opacity = type === 'accent' ? 1 : BUTTON_TYPES[type].opacity;
+  const alpha = colors.night ? 0.04 : -0.04;
+
+  const getStyle = useCallback(
+    ({pressed}) => [
+      {
+        backgroundColor: pressed
+          ? RGB_Linear_Shade(alpha, hexToRGBA(selectedColor, opacity || 1))
+          : hexToRGBA(primaryColor, opacity || 1 - 0.02),
+        width: '100%',
+        alignSelf: 'center',
+        borderRadius: noborder ? 0 : br,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 0,
+      },
+      customStyle,
+    ],
+    [customStyle, noborder, type],
+  );
+
   return (
     <Pressable
       testID={testID}
       disabled={disabled}
       hitSlop={hitSlop}
-      activeOpacity={opacity}
       onPress={onPress}
       onLongPress={onLongPress}
-      style={({pressed}) => [
-        {
-          backgroundColor: pressed
-            ? RGB_Linear_Shade(alpha, hexToRGBA(selectedColor, opacity))
-            : color !== 'transparent'
-            ? hexToRGBA(color, opacity - 0.02)
-            : color,
-          width: '100%',
-          alignSelf: 'center',
-          borderRadius: br,
-          justifyContent: 'center',
-          alignItems: 'center',
-          marginBottom: 0,
-        },
-        customStyle,
-      ]}>
+      style={getStyle}>
       {children}
     </Pressable>
   );
