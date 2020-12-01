@@ -6,7 +6,7 @@ beforeEach(async () => {
 
 describe.each([
   ["tag", "untag", "tags", "tagged", ["hello", "tag"]],
-  ["color", "uncolor", "colors", "colored", ["red", "blue"]]
+  ["color", "uncolor", "colors", "colored", ["red", "blue"]],
 ])("%s", (action, unaction, collection, filter, values) => {
   test(`${action} a note`, () =>
     noteTest().then(async ({ db, id }) => {
@@ -45,7 +45,7 @@ describe.each([
   test(`get ${collection}`, () =>
     noteTest({
       ...TEST_NOTE,
-      [collection]: values
+      [collection]: values,
     }).then(async ({ db }) => {
       expect(db[collection].all.length).toBeGreaterThan(0);
     }));
@@ -53,8 +53,9 @@ describe.each([
   test(`get notes in ${action}`, () =>
     noteTest({
       ...TEST_NOTE,
-      [collection]: values
+      [collection]: values,
     }).then(async ({ db }) => {
-      expect(db.notes[filter](values[0])[0][collection]).toStrictEqual(values);
+      const tag = db[collection].all.find((v) => v.title === values[0]);
+      expect(db.notes[filter](tag.id)[0][collection]).toStrictEqual(values);
     }));
 });

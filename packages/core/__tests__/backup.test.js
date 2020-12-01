@@ -64,7 +64,7 @@ test("import tempered backup", () =>
     })
   ));
 
-test.only("import unversioned (v0) backup", () => {
+test("import unversioned (v0) backup", () => {
   return databaseTest().then(async (db) => {
     await db.backup.import(JSON.stringify(v0Backup));
 
