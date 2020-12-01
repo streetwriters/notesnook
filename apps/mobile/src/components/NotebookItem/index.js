@@ -1,10 +1,11 @@
 import React from 'react';
-import { TouchableOpacity, View } from 'react-native';
-import { useTracked } from '../../provider';
+import {TouchableOpacity, View} from 'react-native';
+import {notesnook} from '../../../e2e/test.ids';
+import {useTracked} from '../../provider';
 import Navigation from '../../services/Navigation';
-import { ph, pv, SIZE, WEIGHT } from '../../utils/SizeUtils';
-import { ActionIcon } from '../ActionIcon';
-import { ActionSheetEvent } from '../DialogManager/recievers';
+import {ph, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
+import {ActionIcon} from '../ActionIcon';
+import {ActionSheetEvent} from '../DialogManager/recievers';
 import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
@@ -18,6 +19,21 @@ export const NotebookItem = ({
 }) => {
   const [state] = useTracked();
   const {colors} = state;
+
+  const showActionSheet = () => {
+    let rowItems = isTrash
+      ? ['Restore', 'Remove']
+      : [item.type == 'topic' ? 'Edit Topic' : 'Edit Notebook', 'Delete'];
+
+    let columnItems =
+      item.type === 'topic'
+        ? ['Pin to Menu', 'Unpin from Menu']
+        : ['Pin', 'Pin to Menu', 'Unpin from Menu'];
+
+    ActionSheetEvent(item, false, false, rowItems, columnItems, {
+      notebookID: notebookID,
+    });
+  };
 
   return (
     <View
@@ -179,24 +195,9 @@ export const NotebookItem = ({
         <ActionIcon
           color={colors.heading}
           name="dots-horizontal"
+          testID={notesnook.ids.notebook.menu}
           size={SIZE.xl}
-          onPress={() => {
-            let rowItems = isTrash
-              ? ['Restore', 'Remove']
-              : [
-                  item.type == 'topic' ? 'Edit Topic' : 'Edit Notebook',
-                  'Delete',
-                ];
-
-            let columnItems =
-              item.type === 'topic'
-                ? ['Pin to Menu', 'Unpin from Menu']
-                : ['Pin', 'Pin to Menu', 'Unpin from Menu'];
-
-            ActionSheetEvent(item, false, false, rowItems, columnItems, {
-              notebookID: notebookID,
-            });
-          }}
+          onPress={showActionSheet}
           customStyle={{
             justifyContent: 'center',
             height: 35,

@@ -1,6 +1,7 @@
 import React from 'react';
 import {Text, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { notesnook } from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
 import {DDS} from '../../services/DeviceDetection';
 import {COLORS_NOTE} from '../../utils/Colors';
@@ -17,6 +18,7 @@ export const MessageCard = ({data}) => {
         <TouchableOpacity
           activeOpacity={0.7}
           onPress={messageBoardState.onPress}
+          testID={notesnook.ids.default.loginToSync}
           style={{
             flexDirection: 'row',
             alignItems: 'center',

@@ -1,10 +1,9 @@
-import React, {useEffect} from 'react';
-import {ActivityIndicator, Text} from 'react-native';
+import React, { useEffect } from 'react';
 import Animated from 'react-native-reanimated';
-import {useTracked} from '../../provider';
-import {DDS} from '../../services/DeviceDetection';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
-import {eScrollEvent} from '../../utils/Events';
+import { useTracked } from '../../provider';
+import { DDS } from '../../services/DeviceDetection';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
+import { eScrollEvent } from '../../utils/Events';
 import Heading from '../Typography/Heading';
 
 const opacity = new Animated.Value(DDS.isLargeTablet() ? 1 : 0);

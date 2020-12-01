@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import Share from 'react-native-share';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { notesnook } from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {DDS} from '../../services/DeviceDetection';
@@ -253,6 +254,7 @@ export const ActionSheetComponent = ({
       on: colors.night ? true : false,
       close: false,
       nopremium: true,
+      id:notesnook.ids.dialogs.actionsheet.night
     },
     {
       name: 'Pin',
@@ -294,6 +296,7 @@ export const ActionSheetComponent = ({
       close: false,
       check: true,
       on: note.pinned,
+      id:notesnook.ids.dialogs.actionsheet.pin
     },
     {
       name: 'Favorite',
@@ -312,6 +315,7 @@ export const ActionSheetComponent = ({
       close: false,
       check: true,
       on: note.favorite,
+      id:notesnook.ids.dialogs.actionsheet.favorite
     },
     {
       name: isPinnedToMenu ? 'Unpin from Menu' : 'Pin to Menu',
@@ -337,6 +341,7 @@ export const ActionSheetComponent = ({
       close: false,
       check: true,
       on: isPinnedToMenu,
+      id:notesnook.ids.dialogs.actionsheet.pinMenu
     },
   ];
 
@@ -377,6 +382,7 @@ export const ActionSheetComponent = ({
       <TouchableOpacity
         key={item.name}
         activeOpacity={opacity}
+        testID={item.id}
         onPress={() => {
           item.func();
         }}
@@ -610,6 +616,7 @@ export const ActionSheetComponent = ({
             <Paragraph
               color={colors.accent}
               size={SIZE.xs}
+              testID={notesnook.ids.dialogs.actionsheet.sync}
               onPress={onPressSync}
               style={{
                 textAlignVertical: 'center',
@@ -656,6 +663,7 @@ export const ActionSheetComponent = ({
           accentColor="errorBg"
           type={note.locked ? 'accent' : 'shade'}
           onPress={onPressVaultButton}
+          testID={notesnook.ids.dialogs.actionsheet.vault}
           customStyle={{
             width: '95%',
             alignSelf: 'center',

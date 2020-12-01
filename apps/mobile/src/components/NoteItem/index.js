@@ -7,7 +7,6 @@ import Navigation from '../../services/Navigation';
 import {COLORS_NOTE} from '../../utils/Colors';
 import {db} from '../../utils/DB';
 import {SIZE} from '../../utils/SizeUtils';
-import {timeSince} from '../../utils/TimeUtils';
 import {ActionIcon} from '../ActionIcon';
 import {ActionSheetEvent, updateEvent} from '../DialogManager/recievers';
 import {TimeSince} from '../Menu/TimeSince';
@@ -55,6 +54,18 @@ export default class NoteItem extends React.Component {
       this.cipher.value = true;
     }
   }
+
+  showActionSheet = () => {
+    ActionSheetEvent(
+      item,
+      isTrash ? false : true,
+      isTrash ? false : true,
+      isTrash
+        ? ['Remove', 'Restore']
+        : ['Add to', 'Share', 'Export', 'Delete', 'Copy'],
+      isTrash ? [] : ['Pin', 'Favorite', 'Add to Vault'],
+    );
+  };
 
   render() {
     let {colors, item, customStyle, isTrash} = this.props;
@@ -256,17 +267,7 @@ export default class NoteItem extends React.Component {
           name="dots-horizontal"
           testID={notesnook.ids.note.menu}
           size={SIZE.xl}
-          onPress={() => {
-            ActionSheetEvent(
-              item,
-              isTrash ? false : true,
-              isTrash ? false : true,
-              isTrash
-                ? ['Remove', 'Restore']
-                : ['Add to', 'Share', 'Export', 'Delete', 'Copy'],
-              isTrash ? [] : ['Pin', 'Favorite', 'Add to Vault'],
-            );
-          }}
+          onPress={this.showActionSheet}
           customStyle={{
             justifyContent: 'center',
             height: 35,

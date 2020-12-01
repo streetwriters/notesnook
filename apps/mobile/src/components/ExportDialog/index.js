@@ -3,6 +3,7 @@ import {Platform, StyleSheet, TouchableOpacity, View} from 'react-native';
 import FileViewer from 'react-native-file-viewer';
 import {exp} from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { notesnook } from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
 import {DDS} from '../../services/DeviceDetection';
 import {eSendEvent, ToastEvent} from '../../services/EventManager';
@@ -106,6 +107,7 @@ const ExportDialog = () => {
       },
       icon: 'file-pdf-box',
       desc: 'Most commonly used, opens on any device.',
+      id:notesnook.ids.dialogs.export.pdf
     },
     {
       title: 'Markdown',
@@ -126,6 +128,7 @@ const ExportDialog = () => {
       },
       icon: 'language-markdown',
       desc: 'Most commonly used, opens on any device.',
+      id:notesnook.ids.dialogs.export.md
     },
     {
       title: 'Plain Text',
@@ -134,6 +137,7 @@ const ExportDialog = () => {
       },
       icon: 'card-text',
       desc: 'A plain text file with no formatting.',
+      id:notesnook.ids.dialogs.export.text
     },
     {
       title: 'HTML',
@@ -154,6 +158,7 @@ const ExportDialog = () => {
       },
       icon: 'language-html5',
       desc: 'A file that can be opened in a browser.',
+      id:notesnook.ids.dialogs.export.html
     },
   ];
 
@@ -186,6 +191,7 @@ const ExportDialog = () => {
             <Fragment key={item.title}>
               <Seperator half />
               <TouchableOpacity
+                testID={item.id}
                 onPress={item.func}
                 activeOpacity={1}
                 style={{

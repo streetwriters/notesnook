@@ -1,4 +1,5 @@
 import React, {useMemo} from 'react';
+import { notesnook } from '../../../e2e/test.ids';
 import {NotebookItem} from '../../components/NotebookItem';
 import SelectionWrapper from '../../components/SelectionWrapper';
 import {useTracked} from '../../provider';
@@ -58,6 +59,7 @@ export const NotebookItemWrapper = ({
     <SelectionWrapper
       onLongPress={onLongPress}
       pinned={pinned}
+      testID={isTopic? notesnook.ids.topic.get(index) : notesnook.ids.notebook.get(index)}
       index={index}
       onPress={onPress}
       item={item}>

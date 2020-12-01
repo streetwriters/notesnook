@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { notesnook } from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {DDS} from '../../services/DeviceDetection';
@@ -172,6 +173,7 @@ const MoveNoteDialog = () => {
                       onChangeText={(value) => {
                         newNotebookTitle = value;
                       }}
+                      testID={notesnook.ids.dialogs.addTo.addNotebook}
                       blurOnSubmit={false}
                       onFocus={() => {
                         setNotebookInputFocused(true);
@@ -198,6 +200,7 @@ const MoveNoteDialog = () => {
                     />
                     <TouchableOpacity
                       onPress={addNewNotebook}
+                      testID={notesnook.ids.dialogs.addTo.addNotebook}
                       style={[
                         {
                           borderRadius: 5,
@@ -285,6 +288,7 @@ const MoveNoteDialog = () => {
                               onChangeText={(value) => {
                                 newTopicTitle = value;
                               }}
+                              testID={notesnook.ids.dialogs.addTo.addTopic}
                               blurOnSubmit={false}
                               onFocus={() => {
                                 setTopicInputFocused(true);
@@ -311,6 +315,7 @@ const MoveNoteDialog = () => {
                             />
                             <TouchableOpacity
                               onPress={addNewTopic}
+                              testID={notesnook.ids.dialogs.addTo.btnTopic}
                               style={[
                                 {
                                   borderRadius: 5,

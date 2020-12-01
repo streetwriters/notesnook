@@ -1,6 +1,7 @@
 import React, {createRef} from 'react';
 import {TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { notesnook } from '../../../e2e/test.ids';
 import {Actions} from '../../provider/Actions';
 import {defaultState} from '../../provider/DefaultState';
 import {DDS} from '../../services/DeviceDetection';
@@ -120,6 +121,7 @@ class SortDialog extends React.Component {
               </Heading>
 
               <TouchableOpacity
+                testID={notesnook.ids.dialogs.sortBy.order}
                 onPress={async () => {
                   let value =
                     this.state.settings.sortOrder === 'asc' ? 'des' : 'asc';

@@ -68,6 +68,8 @@ export const notesnook = {
         vault: 'vault_btn',
         copy: 'icon-Copy',
         sync: 'btn-sync-now',
+        night: 'nightswitch',
+        color: (color) => 'icon-color-' + color,
       },
     },
     menu: {
@@ -75,6 +77,22 @@ export const notesnook = {
     },
     note: {
       menu: 'note_menu',
+      get:(index) => 'note-item-' + index
+    },
+    notebook: {
+      menu: 'notebook_menu',
+      get:(index) => 'notebook-item-' + index
+    },
+    topic: {
+      menu: 'topic_menu',
+      get:(index) => 'topic-item-' + index
+    },
+    tag: {                       
+      menu: 'tag_menu',
+      get:(index) => 'tag-item-' + index
+    },
+    list: {
+      getByType: (type) => 'list-' + type,
     },
   },
 };

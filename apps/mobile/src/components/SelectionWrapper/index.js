@@ -16,6 +16,7 @@ const SelectionWrapper = ({
   background,
   onLongPress,
   onPress,
+  testID
 }) => {
   const [state, dispatch] = useTracked();
   const {colors, selectionMode, selectedItemsList, currentEditingNote} = state;
@@ -74,6 +75,7 @@ const SelectionWrapper = ({
           ? background
           : 'transparent'
       }
+      testID={testID}
       onLongPress={onLongPress}
       onPress={onPress}
       customSelectedColor={currentEditingNote ? colors.accent : colors.nav}

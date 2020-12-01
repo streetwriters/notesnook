@@ -1,5 +1,6 @@
 import React, {createRef, useCallback, useEffect, useState} from 'react';
 import {Text, TextInput, TouchableOpacity, View} from 'react-native';
+import { notesnook } from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {
@@ -249,6 +250,7 @@ export const ActionSheetTagsSection = ({item, close}) => {
             fontSize: SIZE.sm,
             textAlignVertical: 'center',
           }}
+          testID={notesnook.ids.dialogs.actionsheet.hashtagInput}
           autoCapitalize="none"
           textAlignVertical="center"
           blurOnSubmit={false}

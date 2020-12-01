@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import {View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { notesnook } from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {DDS} from '../../services/DeviceDetection';
@@ -45,7 +46,7 @@ export const ActionSheetColorsSection = ({item,close}) => {
       <PressableButton
         type="accent"
         accentColor={color.name.toLowerCase()}
-        testID={'icon-color-' + c}
+        testID={notesnook.ids.dialogs.actionsheet.color(c)}
         key={color.value}
         onPress={async () => {
           await PremiumService.verify(async () => {

@@ -1,5 +1,6 @@
 import React from 'react';
 import {ActivityIndicator, StyleSheet, View} from 'react-native';
+import { notesnook } from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
 import {DDS} from '../../services/DeviceDetection';
 import Navigation from '../../services/Navigation';
@@ -22,6 +23,7 @@ export const HeaderRightMenu = () => {
             menu: false,
           });
         }}
+        testID={notesnook.ids.default.header.buttons.left}
         name="magnify"
         size={SIZE.xxxl}
         color={colors.pri}
@@ -33,6 +35,7 @@ export const HeaderRightMenu = () => {
           onPress={() => {
             containerBottomButton.onPress();
           }}
+          testID={notesnook.ids.default.addBtn}
           icon={currentScreen === 'trash' ? 'delete' : 'plus'}
           iconSize={SIZE.xl}
           type="shade"

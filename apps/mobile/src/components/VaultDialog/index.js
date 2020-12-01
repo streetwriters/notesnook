@@ -4,6 +4,7 @@ import {TextInput} from 'react-native-gesture-handler';
 import * as Keychain from 'react-native-keychain';
 import Share from 'react-native-share';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {notesnook} from '../../../e2e/test.ids';
 import {Actions} from '../../provider/Actions';
 import {DDS} from '../../services/DeviceDetection';
 import {
@@ -313,13 +314,13 @@ export class VaultDialog extends Component {
   toTXT(data) {
     return data.reduce(function (text, op) {
       if (!op.insert) return text;
-      if (typeof op.insert !== "string") return text + " ";
+      if (typeof op.insert !== 'string') return text + ' ';
       return text + op.insert;
-    }, "");
+    }, '');
   }
 
   _shareNote(note) {
-    let text = this.toTXT(note.content.data)
+    let text = this.toTXT(note.content.data);
     let m = `${note.title}\n \n ${text}`;
     Share.open({
       title: 'Share note to',
@@ -439,12 +440,13 @@ export class VaultDialog extends Component {
 
           <Seperator />
 
-          {changePassword ? (
+          {novault || changePassword ? (
             <>
               <TextInput
                 ref={passInputRef}
                 editable={!loading}
                 autoCapitalize="none"
+                testID={notesnook.ids.dialogs.vault.pwd}
                 style={{
                   padding: pv - 5,
                   borderBottomWidth: 1.5,
@@ -494,6 +496,7 @@ export class VaultDialog extends Component {
               <TextInput
                 ref={changePassInputRef}
                 editable={!loading}
+                testID={notesnook.ids.dialogs.vault.changePwd}
                 autoCapitalize="none"
                 style={{
                   padding: pv - 5,
@@ -529,6 +532,7 @@ export class VaultDialog extends Component {
               <TextInput
                 ref={passInputRef}
                 autoCapitalize="none"
+                testID={notesnook.ids.dialogs.vault.pwd}
                 style={{
                   padding: pv - 5,
                   borderBottomWidth: 1.5,
@@ -557,6 +561,7 @@ export class VaultDialog extends Component {
               <TextInput
                 ref={confirmPassRef}
                 autoCapitalize="none"
+                testID={notesnook.ids.dialogs.vault.pwdAlt}
                 style={{
                   padding: pv - 5,
                   borderBottomWidth: 1.5,
@@ -603,6 +608,7 @@ export class VaultDialog extends Component {
                   biometricUnlock: !biometricUnlock,
                 });
               }}
+              testID={notesnook.ids.dialogs.vault.fingerprint}
               activeOpacity={0.7}
               style={{
                 flexDirection: 'row',
@@ -628,9 +634,7 @@ export class VaultDialog extends Component {
                   maxWidth: '90%',
                   marginLeft: 10,
                 }}>
-                {!biometricUnlock
-                  ? 'Fingerprint Unlock Disabled'
-                  : 'Fingerprint Unlock Enabled'}
+                Fingerprint Unlock
               </Paragraph>
             </TouchableOpacity>
           ) : null}

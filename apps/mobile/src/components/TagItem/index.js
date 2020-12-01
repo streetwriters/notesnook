@@ -1,5 +1,6 @@
 import React from 'react';
 import {View} from 'react-native';
+import { notesnook } from '../../../e2e/test.ids';
 import {PressableButton} from '../../components/PressableButton';
 import {useTracked} from '../../provider';
 import Navigation from '../../services/Navigation';
@@ -33,6 +34,7 @@ const TagItem = ({item, index}) => {
     <PressableButton
       onPress={onPress}
       selectedColor={colors.nav}
+      testID={notesnook.ids.tag.get(index)}
       alpha={!colors.night ? -0.02 : 0.02}
       opacity={1}
       customStyle={{
@@ -79,6 +81,7 @@ const TagItem = ({item, index}) => {
           let columnItems = ['Pin to Menu', 'Unpin from Menu'];
           ActionSheetEvent(item, false, false, rowItems, columnItems);
         }}
+        testID={notesnook.ids.tag.menu}
         customStyle={{
           justifyContent: 'center',
           height: 35,

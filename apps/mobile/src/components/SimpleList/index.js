@@ -3,14 +3,10 @@ import {
   ActivityIndicator,
   Platform,
   RefreshControl,
-  StyleSheet,
   useWindowDimensions,
   View,
 } from 'react-native';
-import {
-  initialWindowMetrics,
-  useSafeAreaInsets,
-} from 'react-native-safe-area-context';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {DataProvider, LayoutProvider, RecyclerListView} from 'recyclerlistview';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
@@ -300,6 +296,7 @@ const SimpleList = ({
           alignSelf: 'center',
           minHeight: '100%',
         },
+        testID: 'list-' + type,
       }}
       style={{
         height: '100%',
