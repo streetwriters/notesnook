@@ -395,7 +395,13 @@ const MoveNoteDialog = () => {
               )}
             />
 
-            <DialogButtons negativeTitle="Cancel" onPressNegative={close} />
+            <View
+              style={{
+                paddingHorizontal: 12,
+                width:"100%"
+              }}>
+              <DialogButtons negativeTitle="Cancel" onPressNegative={close} />
+            </View>
           </View>
           <Toast context="local" />
         </KeyboardAvoidingView>
