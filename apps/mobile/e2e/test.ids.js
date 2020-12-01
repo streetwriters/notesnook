@@ -1,35 +1,80 @@
 export const notesnook = {
   ids: {
     default: {
-      root: 'root_1',
-      menu: 'menu_2',
+      root: 'root',
+      menu: 'menu',
       dialog: {
-        yes: 'yes_3',
-        no: 'no_4',
+        yes: 'yes',
+        no: 'no',
       },
-      editor: 'editor_5',
+      editor: 'editor',
       header: {
         buttons: {
-          left: 'left_6',
-          right: 'right_7',
-          back:'back_13'
+          left: 'left',
+          right: 'right',
+          back: 'back',
         },
       },
+      actionsheetBackdrop: 'backdrop',
+      loginToSync: 'login_to_sync',
+      addBtn: 'btn-add-item',
     },
     dialogs: {
       notebook: {
         inputs: {
-          title: 'title_8',
-          description: 'description_9',
-          topic: 'topic_10',
+          title: 'title',
+          description: 'description',
+          topic: 'topic',
         },
         buttons: {
-          add: 'add_11',
+          add: 'add',
         },
+      },
+      export: {
+        pdf: 'pdf',
+        text: 'text',
+        md: 'md',
+        html: 'html',
+      },
+      vault: {
+        changePwd: 'change_pwd',
+        pwd: 'pwd',
+        confirmPwd: 'pwd',
+        pwdAlt: 'pwd_alt',
+        fingerprint: 'fingerprint',
+      },
+      sortBy: {
+        order: 'orderby',
+        default: 'btn-default',
+        alphabetical: 'btn-alphabetical',
+        year: 'btn-year',
+        week: 'btn-week',
+        month: 'btn-month',
+      },
+      addTo: {
+        addNotebook: 'input-addNotebook',
+        addTopic: 'input-addTopic',
+        btnNotebook: 'btn-addNotebook',
+        btnTopic: 'btn-addTopic',
+      },
+      actionsheet: {
+        delete: 'icon-Delete',
+        hashtagInput: 'hashtag_input',
+        export: 'icon-Export',
+        addTo: 'icon-Add to',
+        pin: 'item_pin',
+        pinMenu: 'item_pin_menu',
+        favorite: 'note_favorite',
+        vault: 'vault_btn',
+        copy: 'icon-Copy',
+        sync: 'btn-sync-now',
       },
     },
     menu: {
-      nightmode:"night_12"
-    }
+      nightmode: 'night',
+    },
+    note: {
+      menu: 'note_menu',
+    },
   },
 };
