@@ -69,6 +69,7 @@ function PasswordDialog(props) {
         <Field
           autoFocus
           required
+          data-test-id="dialog-password"
           label={isChangePasswordDialog ? "Old password" : "Password"}
           type="password"
           autoComplete={

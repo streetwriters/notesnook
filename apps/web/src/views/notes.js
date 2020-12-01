@@ -1,18 +1,24 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import ListContainer from "../components/list-container";
 import { useStore } from "../stores/editor-store";
 import { useStore as useNotesStore } from "../stores/note-store";
 import NotesPlaceholder from "../components/placeholders/notesplacholder";
+import { db } from "../common";
 
 function Notes(props) {
+  const [isLoading, setIsLoading] = useState(true);
   const newSession = useStore((store) => store.newSession);
   const context = useNotesStore((store) => store.context);
   const setContext = useNotesStore((store) => store.setContext);
 
   useEffect(() => {
-    if (props.context) {
-      setContext(props.context);
-    }
+    (async function () {
+      await db.notes.init();
+      if (props.context) {
+        setContext(props.context);
+      }
+      setIsLoading(false);
+    })();
   }, [props.context, setContext]);
 
   if (!context) return null;
@@ -20,6 +26,7 @@ function Notes(props) {
   return (
     <ListContainer
       type="notes"
+      isLoading={isLoading}
       context={props.context}
       items={context.notes}
       placeholder={props.placeholder || NotesPlaceholder}

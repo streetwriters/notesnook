@@ -30,7 +30,7 @@ const testCISkip = process.env.CI ? test.skip : test;
 var createNoteAndCheckPresence = async function createNoteAndCheckPresence(
   note = NOTE
 ) {
-  await createNote(note, "home");
+  await createNote(note, "notes");
 
   // make sure the note has saved.
   await page.waitForTimeout(1000);
@@ -71,7 +71,7 @@ async function lockUnlockNote(noteSelector, type) {
 
   await clickMenuItem(type);
 
-  await page.fill(getTestId("dialog-vault-pass"), "123abc123abc");
+  await page.fill(getTestId("dialog-password"), "123abc123abc");
 
   await confirmDialog();
 
@@ -119,29 +119,34 @@ async function checkNoteColored(noteSelector) {
     isPresent(Menu.new("menuitem").colorCheck("red").build())
   ).resolves.toBeTruthy();
 
-  await expect(
-    isPresent(List.new("note").atIndex(0).grouped().color("red").build())
-  ).resolves.toBeTruthy();
+  await closeContextMenu(noteSelector);
 
-  await page.click(getTestId("navitem-red"));
+  // wait for the menu to properly close
+  await page.waitForTimeout(500);
 
-  await expect(
-    isPresent(List.new("note").atIndex(0).color("red").build())
-  ).resolves.toBeTruthy();
+  const note = await page.$(List.new("note").grouped().atIndex(0).build());
+  await expect(note.screenshot()).resolves.toMatchImageSnapshot({
+    failureThreshold: 5,
+    failureThresholdType: "percent",
+  });
+
+  await navigateTo("red");
+
+  const coloredNote = await page.$(List.new("note").atIndex(0).build());
+  await expect(coloredNote.screenshot()).resolves.toMatchImageSnapshot({
+    failureThreshold: 5,
+    failureThresholdType: "percent",
+  });
 }
 
 async function addNoteToNotebook() {
-  await page.click(getTestId("add-notebook-dialog"));
+  await page.type(getTestId("mnd-new-notebook-title"), "Test Notebook");
 
-  await page.fill(getTestId("notebook-name-dialog"), "test notebook");
+  await page.press(getTestId("mnd-new-notebook-title"), "Enter");
 
-  await page.press(getTestId("notebook-name-dialog"), "Enter");
+  await page.click(List.new("notebook").atIndex(0).build());
 
-  await page.click(getTestId("test-notebook-dialog"));
-
-  await page.click(getTestId("general-dialog"));
-
-  await confirmDialog();
+  await page.click(List.new("notebook").atIndex(0).topic(0).build());
 
   await expect(isToastPresent()).resolves.toBeTruthy();
 
@@ -154,7 +159,12 @@ async function addNoteToNotebook() {
   await checkNotePresence(0, false);
 }
 
-describe.each(["independent", "sequential"])("run tests %sly", (type) => {
+describe.each(["independent"])("run tests %sly", (type) => {
+  beforeAll(async () => {
+    if (type === "sequential") {
+      await page.goto("http://localhost:3000/");
+    }
+  });
   // clear all browser data after running all tests for a single case
   // so this will clear all data after running test independently & sequentially.
   afterAll(async () => {
@@ -173,8 +183,8 @@ describe.each(["independent", "sequential"])("run tests %sly", (type) => {
       await page.goto("http://localhost:3000/");
     } else {
       // only navigate to Home if we are not at home
-      if ((await page.textContent(getTestId("routeHeader"))) !== "Home")
-        await navigateTo("home");
+      if ((await page.textContent(getTestId("routeHeader"))) !== "Notes")
+        await navigateTo("notes");
     }
   }, 600000);
 
@@ -209,12 +219,12 @@ describe.each(["independent", "sequential"])("run tests %sly", (type) => {
 
     await expect(isToastPresent()).resolves.toBeTruthy();
 
-    await navigateTo("home");
+    await navigateTo("notes");
 
     await checkNotePresence();
   });
 
-  test.skip("add a note to notebook", async () => {
+  test("add a note to notebook", async () => {
     const noteSelector = await createNoteAndCheckPresence();
 
     await openContextMenu(noteSelector);
@@ -241,7 +251,7 @@ describe.each(["independent", "sequential"])("run tests %sly", (type) => {
 
     await checkNotePresence(0, false);
 
-    await navigateTo("home");
+    await navigateTo("notes");
   });
 
   test("unfavorite a note", async () => {
@@ -285,7 +295,7 @@ describe.each(["independent", "sequential"])("run tests %sly", (type) => {
       ).resolves.toBeTruthy();
     });
 
-    await navigateTo("home");
+    await navigateTo("notes");
   });
 
   test("assign a color to a note", async () => {
@@ -357,7 +367,7 @@ describe.each(["independent", "sequential"])("run tests %sly", (type) => {
   });
 });
 
-describe.skip("run tests only independently", () => {
+describe("run tests only independently", () => {
   beforeAll(() => {
     createNoteAndCheckPresence = staticCreateNoteAndCheckPresence;
   });
@@ -383,6 +393,8 @@ describe.skip("run tests only independently", () => {
     const noteSelector = await createNoteAndCheckPresence();
 
     await lockUnlockNote(noteSelector, "lock");
+
+    await page.waitForTimeout(500);
 
     await lockUnlockNote(noteSelector, "unlock");
 
@@ -410,7 +422,7 @@ describe.skip("run tests only independently", () => {
 
     await page.click(getTestId("properties-locked"));
 
-    await page.fill(getTestId("dialog-vault-pass"), "123abc123abc");
+    await page.fill(getTestId("dialog-password"), "123abc123abc");
 
     await confirmDialog();
 
@@ -420,7 +432,7 @@ describe.skip("run tests only independently", () => {
     await checkNoteLocked(noteSelector);
   });
 
-  test.skip("add a note to notebook from properties", async () => {
+  test("add a note to notebook from properties", async () => {
     await createNoteAndCheckPresence();
 
     await page.click(getTestId("properties"));

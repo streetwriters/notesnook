@@ -73,6 +73,7 @@ class MoveDialog extends React.Component {
             {notebooks.map((notebook, index) => (
               <Flex variant="columnFill" key={notebook.id}>
                 <Item
+                  data-test-id={`notebook-${index}`}
                   icon={Icon.Notebook}
                   title={notebook.title}
                   totalNotes={notebook.totalNotes}
@@ -89,8 +90,9 @@ class MoveDialog extends React.Component {
                     display: currentOpenedIndex === index ? "flex" : "none",
                   }}
                 >
-                  {notebook.topics.map((topic) => (
+                  {notebook.topics.map((topic, topicIndex) => (
                     <Item
+                      data-test-id={`notebook-${index}-topic-${topicIndex}`}
                       key={topic.id}
                       onClick={async () => {
                         try {
@@ -144,6 +146,7 @@ function Item(props) {
   const { icon: Icon, indent = 0, title, totalNotes, onClick, action } = props;
   return (
     <Flex
+      data-test-id={props["data-test-id"]}
       p={2}
       justifyContent="space-between"
       alignItems="center"

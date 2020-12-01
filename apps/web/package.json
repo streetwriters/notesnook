@@ -65,7 +65,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "debug": "BROWSER=none react-scripts start",
-    "test": "BROWSER= jest --runInBand -c jest.e2e.config.js",
+    "test": "REACT_APP_CI=true BROWSER= jest --runInBand -c jest.e2e.config.js",
     "eject": "react-scripts eject",
     "update": "npm i @streetwriters/editor@latest @streetwriters/notesnook-core@latest @streetwriters/theme@latest"
   },

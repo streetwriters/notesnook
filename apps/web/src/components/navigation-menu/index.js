@@ -146,9 +146,10 @@ function NavigationMenu(props) {
             key={color.title}
             title={toTitleCase(color.title)}
             icon={Icon.Circle}
+            selected={selectedRoute === `/colors/${color.id}`}
             color={COLORS[color.title]}
             onClick={() => {
-              navigate(`/colors/${color.title}`);
+              navigate(`/colors/${color.id}`);
             }}
           />
         ))}

@@ -33,6 +33,11 @@ class ListItemIDBuilder {
     return this;
   }
 
+  topic(index) {
+    this.suffix = `topic-${index}`;
+    return this;
+  }
+
   grouped() {
     this.isGrouped = true;
     return this;

@@ -109,6 +109,7 @@ function Toolbar(props) {
       <Flex justifyContent="flex-end">
         {tools.map((tool) => (
           <Button
+            data-test-id={tool.title.toLowerCase().replace(/ /g, "-")}
             disabled={!tool.enabled}
             variant="tool"
             title={tool.title}

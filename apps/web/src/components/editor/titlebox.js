@@ -17,7 +17,6 @@ function TitleBox(props) {
   }, []);
 
   useEffect(() => {
-    console.log("hello");
     if (!window.ResizeObserver) return;
     const myObserver = new ResizeObserver((entries) => {
       window.requestAnimationFrame(() => {
@@ -53,6 +52,7 @@ function TitleBox(props) {
       ></Text>
       <Input
         ref={inputRef}
+        data-test-id="editor-title"
         className="editorTitle"
         autoFocus={shouldFocus}
         placeholder="Untitled"

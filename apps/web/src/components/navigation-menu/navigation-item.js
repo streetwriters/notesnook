@@ -34,7 +34,7 @@ function NavigationItem(props) {
         <Icon
           size={18}
           sx={{ mr: 1 }}
-          color={props.selected ? "primary" : color || "icon"}
+          color={props.selected && !color ? "primary" : color || "icon"}
           rotate={isLoading}
         />
         <Text

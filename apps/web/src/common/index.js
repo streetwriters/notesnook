@@ -3,7 +3,6 @@ import StorageInterface from "../interfaces/storage";
 import Database from "notes-core/api/";
 import SelectionOptions from "./selectionoptions";
 import EventSource from "eventsource";
-import { navigate } from "hookrouter";
 import { store as editorStore } from "../stores/editor-store";
 import { store as noteStore } from "../stores/note-store";
 import { showAddNotebookDialog } from "../components/dialogs/addnotebookdialog";
@@ -63,7 +62,6 @@ export function notesFromContext(context) {
       break;
     case "color":
       notes = db.notes.colored(context.value);
-      if (!notes.length) return navigate("/");
       break;
     case "topic":
       const notebook = db.notebooks.notebook(context.value.id);

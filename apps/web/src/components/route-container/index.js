@@ -92,6 +92,7 @@ function Header(props) {
 
             {!isMobile && createButtonData && (
               <Icon.Plus
+                data-test-id={`${type}-action-button`}
                 color="primary"
                 size={24}
                 sx={{
