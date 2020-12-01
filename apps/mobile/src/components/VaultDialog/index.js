@@ -310,8 +310,17 @@ export class VaultDialog extends Component {
     this.close();
   }
 
+  toTXT(data) {
+    return data.reduce(function (text, op) {
+      if (!op.insert) return text;
+      if (typeof op.insert !== "string") return text + " ";
+      return text + op.insert;
+    }, "");
+  }
+
   _shareNote(note) {
-    let m = `${note.title}\n \n ${note.content.text}`;
+    let text = this.toTXT(note.content.data)
+    let m = `${note.title}\n \n ${text}`;
     Share.open({
       title: 'Share note to',
       failOnCancel: false,

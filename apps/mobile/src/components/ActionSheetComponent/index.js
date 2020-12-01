@@ -153,7 +153,7 @@ export const ActionSheetComponent = ({
     {
       name: 'Share',
       icon: 'share-variant',
-      func: () => {
+      func: async () => {
         if (note.locked) {
           openVault({
             item: item,
@@ -162,9 +162,8 @@ export const ActionSheetComponent = ({
             share: true,
           });
         } else {
-          close();
-          let m = `${note.title}\n \n ${note.content.text}`;
-
+          let text = await db.notes.note(note.id).export('txt');
+          let m = `${note.title}\n \n ${text}`;
           Share.open({
             title: 'Share note to',
             failOnCancel: false,
@@ -346,6 +345,7 @@ export const ActionSheetComponent = ({
       <TouchableOpacity
         onPress={rowItem.func}
         key={rowItem.name}
+        testID={'icon-' + rowItem.name}
         style={{
           alignItems: 'center',
           width: DDS.isTab
@@ -653,11 +653,9 @@ export const ActionSheetComponent = ({
 
       {note.type === 'note' ? (
         <PressableButton
-          color={note.locked ? colors.errorBg : colors.shade}
-          selectedColor={note.locked ? '#FF0000' : colors.accent}
-          alpha={0.14}
+          accentColor="errorBg"
+          type={note.locked ? 'accent' : 'shade'}
           onPress={onPressVaultButton}
-          opacity={0.15}
           customStyle={{
             width: '95%',
             alignSelf: 'center',
