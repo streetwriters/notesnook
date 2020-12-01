@@ -19,7 +19,9 @@ class Collection {
   }
 
   async init() {
+    if (this.initialized) return;
     await this._collection.init();
+    this.initialized = true;
   }
 
   /**
