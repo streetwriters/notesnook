@@ -224,12 +224,7 @@ const MoveNoteDialog = () => {
                     onPress={() => {
                       setExpanded(item.id === expanded ? null : item.id);
                     }}
-                    color={expanded === item.id ? colors.shade : 'transparent'}
-                    selectedColor={
-                      expanded === item.id ? colors.accent : colors.nav
-                    }
-                    alpha={colors.night ? 0.02 : -0.02}
-                    opacity={expanded === item.id ? 0.12 : 1}
+                    type={expanded === item.id ? 'shade' : 'transparent'}
                     customStyle={{
                       height: 50,
                       width: '100%',
@@ -365,9 +360,7 @@ const MoveNoteDialog = () => {
                               'success',
                             );
                           }}
-                          color="transparent"
-                          selectedColor={colors.nav}
-                          alpha={colors.night ? 0.02 : -0.02}
+                          type="gray"
                           customStyle={{
                             height: 50,
                             borderTopWidth: index === 0 ? 0 : 1,
@@ -398,7 +391,7 @@ const MoveNoteDialog = () => {
             <View
               style={{
                 paddingHorizontal: 12,
-                width:"100%"
+                width: '100%',
               }}>
               <DialogButtons negativeTitle="Cancel" onPressNegative={close} />
             </View>

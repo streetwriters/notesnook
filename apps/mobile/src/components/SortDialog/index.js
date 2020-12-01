@@ -155,6 +155,7 @@ class SortDialog extends React.Component {
             {Object.keys(SORT).map((item, index) => (
               <PressableButton
                 key={item}
+                testID={'btn-' + item}
                 color={
                   this.state.settings.sort === item
                     ? colors.shade

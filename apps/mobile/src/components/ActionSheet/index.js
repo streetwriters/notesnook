@@ -72,6 +72,7 @@ export default class ActionSheet extends Component {
     this.isRecoiling = false;
     this.targetId = null;
     this.offsetY = 0;
+    this.borderRadius = new Animated.Value(10);
   }
 
   waitAsync = (ms) =>
@@ -574,6 +575,8 @@ export default class ActionSheet extends Component {
                           translateY: this.transformValue,
                         },
                       ],
+                      borderTopRightRadius:this.borderRadius,
+                      borderTopLeftRadius:this.borderRadius
                     },
                   ]}>
                   {gestureEnabled || headerAlwaysVisible ? (

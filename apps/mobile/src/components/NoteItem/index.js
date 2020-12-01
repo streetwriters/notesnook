@@ -1,14 +1,16 @@
 import React from 'react';
-import { TouchableOpacity, View } from 'react-native';
+import {TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { Actions } from '../../provider/Actions';
+import {notesnook} from '../../../e2e/test.ids';
+import {Actions} from '../../provider/Actions';
 import Navigation from '../../services/Navigation';
-import { COLORS_NOTE } from '../../utils/Colors';
-import { db } from '../../utils/DB';
-import { SIZE } from '../../utils/SizeUtils';
-import { timeSince } from '../../utils/TimeUtils';
-import { ActionIcon } from '../ActionIcon';
-import { ActionSheetEvent, updateEvent } from '../DialogManager/recievers';
+import {COLORS_NOTE} from '../../utils/Colors';
+import {db} from '../../utils/DB';
+import {SIZE} from '../../utils/SizeUtils';
+import {timeSince} from '../../utils/TimeUtils';
+import {ActionIcon} from '../ActionIcon';
+import {ActionSheetEvent, updateEvent} from '../DialogManager/recievers';
+import {TimeSince} from '../Menu/TimeSince';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
@@ -191,15 +193,14 @@ export default class NoteItem extends React.Component {
                     color="orange"
                   />
                 ) : null}
-                <Paragraph
-                  color={colors.icon}
-                  size={SIZE.xs}
-                  style={{
-                    textAlignVertical: 'center',
-                    marginRight: 10,
-                  }}>
-                  {timeSince(item.dateCreated)}
-                </Paragraph>
+
+                <TimeSince
+                  style={{fontSize: SIZE.xs, color: colors.icon}}
+                  time={item.dateCreated}
+                  updateFrequency={
+                    Date.now() - item.dateCreated < 60000 ? 2000 : 60000
+                  }
+                />
               </>
             ) : null}
 
@@ -253,6 +254,7 @@ export default class NoteItem extends React.Component {
         <ActionIcon
           color={colors.heading}
           name="dots-horizontal"
+          testID={notesnook.ids.note.menu}
           size={SIZE.xl}
           onPress={() => {
             ActionSheetEvent(

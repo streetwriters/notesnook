@@ -43,13 +43,9 @@ export const ActionSheetColorsSection = ({item,close}) => {
 
     return (
       <PressableButton
-        color={RGB_Linear_Shade(
-          !colors.night ? -0.2 : 0.2,
-          hexToRGBA(color.value, 1),
-        )}
-        selectedColor={color.value}
-        alpha={!colors.night ? -0.1 : 0.1}
-        opacity={1}
+        type="accent"
+        accentColor={color.name.toLowerCase()}
+        testID={'icon-color-' + c}
         key={color.value}
         onPress={async () => {
           await PremiumService.verify(async () => {

@@ -26,16 +26,18 @@ export const PressableButton = ({
   noborder,
   accentColor = 'accent',
   accentText = 'light',
+  customColor,
+  customSelectedColor
 }) => {
   const [state] = useTracked();
   const {colors} = state;
-  const selectedColor =
+  const selectedColor = customSelectedColor ||
     colors[
       type === 'accent'
         ? BUTTON_TYPES[type](accentColor, accentText).selected
         : BUTTON_TYPES[type].selected
     ];
-  const primaryColor =
+  const primaryColor = customColor ||
     colors[
       type === 'accent'
         ? BUTTON_TYPES[type](accentColor, accentText).primary

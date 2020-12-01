@@ -169,7 +169,7 @@ export const BUTTON_TYPES = {
   accent: (themeColor, text) => ({
     primary: themeColor,
     text: text,
-    selected: 'accent',
+    selected: themeColor,
   }),
   inverted: {
     primary: 'bg',

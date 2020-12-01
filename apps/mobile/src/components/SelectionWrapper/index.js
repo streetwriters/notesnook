@@ -36,7 +36,7 @@ const SelectionWrapper = ({
     }
   }, [selectedItemsList]);
 
-  const onPressPin = async () => {
+/*   const onPressPin = async () => {
     let func = async () => {
       if (!item.id) return;
       if (item.type === 'note') {
@@ -61,11 +61,11 @@ const SelectionWrapper = ({
       },
       'Undo',
     );
-  };
+  }; */
 
   return (
     <PressableButton
-      color={
+      customColor={
         currentEditingNote === item.id
           ? item.type === 'note' && item.colors[0]
             ? COLORS_NOTE[item.colors[0]]
@@ -76,7 +76,7 @@ const SelectionWrapper = ({
       }
       onLongPress={onLongPress}
       onPress={onPress}
-      selectedColor={currentEditingNote ? colors.accent : colors.nav}
+      customSelectedColor={currentEditingNote ? colors.accent : colors.nav}
       alpha={!colors.night ? -0.02 : 0.02}
       opacity={currentEditingNote ? 0.15 : 1}
       customStyle={{

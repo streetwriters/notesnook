@@ -73,12 +73,12 @@ const ColorItem = ({item, index}) => {
   return (
     <PressableButton
       key={item.id}
-      color={
+      customColor={
         headerTextState?.id === item.id && item.type === headerTextState?.type
           ? COLORS_NOTE[item.title]
           : 'transparent'
       }
-      selectedColor={COLORS_NOTE[item.title]}
+      customSelectedColor={COLORS_NOTE[item.title]}
       alpha={!colors.night ? -0.02 : 0.02}
       opacity={0.12}
       onPress={() => onPress(item)}

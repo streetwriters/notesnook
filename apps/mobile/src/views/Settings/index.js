@@ -207,12 +207,8 @@ const CustomButton = ({
 }) => {
   const [state] = useTracked();
   const {colors} = state;
-  const [visible, setVisible] = useState(false);
   return (
     <PressableButton
-      color="transparent"
-      selectedColor={colors.nav}
-      alpha={!colors.night ? -0.02 : 0.02}
       onPress={onPress}
       customStyle={{
         minHeight: 50,
@@ -416,13 +412,9 @@ const SettingsUserSection = () => {
           paddingHorizontal: 0,
         }}>
         <PressableButton
-          color="transparent"
-          selectedColor={colors.nav}
-          alpha={!colors.night ? -0.02 : 0.1}
           onPress={() => {
             eSendEvent(eOpenLoginDialog);
           }}
-          activeOpacity={opacity / 2}
           customStyle={{
             paddingVertical: 12,
             width: '100%',
@@ -550,7 +542,7 @@ const SettingsAppearanceSection = () => {
         ].map((item) => (
           <PressableButton
             key={item}
-            color={
+            customColor={
               colors.accent === item
                 ? RGB_Linear_Shade(
                     !colors.night ? -0.2 : 0.2,
@@ -558,7 +550,7 @@ const SettingsAppearanceSection = () => {
                   )
                 : item
             }
-            selectedColor={item}
+            customSelectedColor={item}
             alpha={!colors.night ? -0.1 : 0.1}
             opacity={1}
             onPress={async () => {

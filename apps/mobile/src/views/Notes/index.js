@@ -187,7 +187,7 @@ export const Notes = ({route, navigation}) => {
       <ContainerBottomButton
         title="Create a new note"
         onPress={_onPressBottomButton}
-        color={params.type == 'color' ? COLORS_NOTE[params.title] : null}
+        color={params.type == 'color' ? params.title : null}
       />
     </>
   );

@@ -128,12 +128,7 @@ const JumpToDialog = () => {
                 <PressableButton
                   key={item.title}
                   onPress={() => onPress(item, index)}
-                  color={currentIndex === index ? colors.shade : 'transparent'}
-                  selectedColor={
-                    currentIndex === index ? colors.accent : colors.nav
-                  }
-                  alpha={!colors.night ? -0.02 : 0.02}
-                  opacity={currentIndex === index ? 0.12 : 1}
+                  type={currentIndex === index? 'shade' : 'gray'}
                   customStyle={{
                     minWidth: '20%',
                     maxWidth: '46%',

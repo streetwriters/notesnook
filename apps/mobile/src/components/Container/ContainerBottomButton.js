@@ -3,6 +3,7 @@ import {Keyboard, Platform, View} from 'react-native';
 import Animated, {Easing} from 'react-native-reanimated';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {notesnook} from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
 import {DDS} from '../../services/DeviceDetection';
 import {getElevation, showContext} from '../../utils';
@@ -10,7 +11,12 @@ import {normalize, SIZE} from '../../utils/SizeUtils';
 import {PressableButton} from '../PressableButton';
 
 const translateY = new Animated.Value(0);
-export const ContainerBottomButton = ({title, onPress, color,shouldShow =false}) => {
+export const ContainerBottomButton = ({
+  title,
+  onPress,
+  color = 'accent',
+  shouldShow = false,
+}) => {
   const [state] = useTracked();
   const {colors} = state;
   const insets = useSafeAreaInsets();
@@ -59,9 +65,10 @@ export const ContainerBottomButton = ({title, onPress, color,shouldShow =false})
         ],
       }}>
       <PressableButton
-        testID={'container_bottom_btn'}
-        color={color || colors.accent}
-        selectedColor={color || colors.accent}
+        testID={notesnook.ids.default.addBtn}
+        type="accent"
+        accentColor={color || 'accent'}
+        accentText="light"
         customStyle={{
           ...getElevation(5),
           borderRadius: 100,

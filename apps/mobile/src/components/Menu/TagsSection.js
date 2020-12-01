@@ -4,7 +4,11 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {DDS} from '../../services/DeviceDetection';
-import {eSendEvent, eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
+import {
+  eSendEvent,
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import {getElevation} from '../../utils';
 import {db} from '../../utils/DB';
@@ -26,7 +30,6 @@ export const TagsSection = () => {
     dispatch({type: Actions.MENU_PINS});
   }, []);
 
-
   const onPress = (item) => {
     let params;
     if (item.type === 'notebook') {
@@ -42,7 +45,6 @@ export const TagsSection = () => {
         type: item.type,
       });
       rootNavigatorRef.current?.setParams(params);
-
     } else if (item.type === 'tag') {
       params = params = {
         title: item.title,
@@ -118,8 +120,6 @@ const PinItem = ({item, index, onPress}) => {
   const [visible, setVisible] = useState(false);
   const [headerTextState, setHeaderTextState] = useState(null);
 
-
-
   const onHeaderStateChange = (event) => {
     if (event?.id === item.name) {
       setHeaderTextState(event);
@@ -162,14 +162,11 @@ const PinItem = ({item, index, onPress}) => {
         </BaseDialog>
       )}
       <PressableButton
-        color={
+        type={
           headerTextState?.id === item.id && headerTextState?.type === item.type
-            ? colors.shade
+            ? 'shade'
             : 'transparent'
         }
-        selectedColor={colors.accent}
-        alpha={!colors.night ? -0.02 : 0.02}
-        opacity={0.12}
         onLongPress={() => setVisible(true)}
         onPress={() => onPress(item)}
         customStyle={{
@@ -226,53 +223,4 @@ const PinItem = ({item, index, onPress}) => {
   );
 };
 
-/* 
 
-  {tags
-        .filter((o) => o.noteIds.length > 1)
-        .slice(0, tags.length > 10 ? 10 : tags.length)
-        .map((item) => (
-          <PressableButton
-            key={item.id}
-            color={
-              currentScreen === item.title.toLowerCase()
-                ? colors.shade
-                : 'transparent'
-            }
-            selectedColor={colors.accent}
-            alpha={!colors.night ? -0.02 : 0.02}
-            opacity={0.12}
-            onPress={() => onPress(item)}
-            customStyle={{
-              flexDirection: 'row',
-              justifyContent: 'flex-start',
-              alignItems: 'center',
-              width: '100%',
-              borderRadius: 0,
-              paddingHorizontal: 10,
-              height: 50,
-            }}>
-            <View
-              style={{
-                width: 35,
-                height: 35,
-                justifyContent: 'center',
-                alignItems: 'flex-start',
-              }}>
-              <Paragraph color={colors.accent} size={SIZE.md}>
-                #
-              </Paragraph>
-            </View>
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                width: '85%',
-              }}>
-              <Paragraph color={colors.heading}>{item.title}</Paragraph>
-
-            </View>
-          </PressableButton>
-        ))}
-*/

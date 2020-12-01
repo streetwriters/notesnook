@@ -53,14 +53,11 @@ export const MenuListItem = ({item, index, noTextMode, testID}) => {
       testID={testID}
       key={item.name + index}
       onPress={_onPress}
-      color={
+      type={
         headerTextState?.id === item.name.toLowerCase() + '_navigation'
-          ? colors.shade
+          ? 'shade'
           : 'transparent'
       }
-      selectedColor={colors.accent}
-      alpha={!colors.night ? -0.02 : 0.02}
-      opacity={0.12}
       customStyle={{
         width: noTextMode ? 50 : '100%',
         alignSelf: 'center',

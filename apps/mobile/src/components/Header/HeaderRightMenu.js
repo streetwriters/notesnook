@@ -18,8 +18,8 @@ export const HeaderRightMenu = () => {
 
       <ActionIcon
         onPress={async () => {
-          Navigation.navigate('Search',{
-            menu:false
+          Navigation.navigate('Search', {
+            menu: false,
           });
         }}
         name="magnify"
@@ -99,9 +99,10 @@ const styles = StyleSheet.create({
   },
   rightBtn: {
     justifyContent: 'center',
-    alignItems: 'flex-end',
+    alignItems: 'center',
     height: 40,
-    width: 50,
+    width: 40,
+    marginLeft: 10,
     paddingRight: 0,
   },
 });

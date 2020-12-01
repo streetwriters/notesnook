@@ -6,6 +6,17 @@ export const ACCENT = {
   color: '#0560FF',
   shade: '#0560FF12',
 };
+
+export const COLORS_NOTE = {
+  red: '#f44336',
+  orange: '#FF9800',
+  yellow: '#FFD600',
+  green: '#4CAF50',
+  blue: '#2196F3',
+  purple: '#673AB7',
+  gray: '#9E9E9E',
+};
+
 const fixedColors = {
   accent: ACCENT.color,
   shade: ACCENT.shade,
@@ -18,6 +29,13 @@ const fixedColors = {
   successText: '#4F8A10',
   warningBg: '#FEEFB3',
   warningText: '#9F6000',
+  red: '#f44336',
+  orange: '#FF9800',
+  yellow: '#FFD600',
+  green: '#4CAF50',
+  blue: '#2196F3',
+  purple: '#673AB7',
+  gray: '#9E9E9E',
 };
 export var COLOR_SCHEME = {
   ...fixedColors,
@@ -54,15 +72,7 @@ export const COLOR_SCHEME_DARK = {
   sec: 'black',
   light: '#ffffff',
 };
-export const COLORS_NOTE = {
-  red: '#f44336',
-  orange: '#FF9800',
-  yellow: '#FFD600',
-  green: '#4CAF50',
-  blue: '#2196F3',
-  purple: '#673AB7',
-  gray: '#9E9E9E',
-};
+
 
 export function setColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
   COLOR_SCHEME = {...colors, accent: accent.color, shade: accent.shade};

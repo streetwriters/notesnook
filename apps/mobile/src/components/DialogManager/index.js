@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Platform} from 'react-native';
+import {Dimensions, Platform} from 'react-native';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -48,6 +48,7 @@ import SortDialog from '../SortDialog';
 import JumpToDialog from '../JumpToDialog';
 import {GetPremium, translatePrem} from '../ActionSheetComponent/GetPremium';
 import {sleep} from '../../utils/TimeUtils';
+import { dHeight } from '../../utils';
 
 export class DialogManager extends Component {
   constructor(props) {
@@ -95,12 +96,7 @@ export class DialogManager extends Component {
   };
 
   _hideActionSheet = () => {
-    this.actionSheet._setModalVisible();
-    sleep(200).then(() => {
-      this.setState({
-        actionSheetVisible: false,
-      });
-    });
+    this.actionSheet._setModalVisible(false);
   };
 
   _showMoveNote = () => {
@@ -313,10 +309,12 @@ export class DialogManager extends Component {
             ref={(ref) => (this.actionSheet = ref)}
             containerStyle={{
               backgroundColor: colors.bg,
-              width: DDS.isTab ? 500 : '100%',
+              width: DDS.isLargeTablet() ? 500 : '100%',
               alignSelf: 'center',
               borderRadius: 10,
-              marginBottom: DDS.isTab ? 50 : 0,
+              marginBottom: DDS.isLargeTablet() ? 50 : 0,
+              borderBottomRightRadius: DDS.isLargeTablet() ? 10 : 1,
+              borderBottomLeftRadius: DDS.isLargeTablet() ? 10 : 1,
             }}
             extraScroll={DDS.isTab ? 50 : 0}
             indicatorColor={
@@ -350,6 +348,9 @@ export class DialogManager extends Component {
             onClose={() => {
               translatePrem.setValue(-800);
               this.onActionSheetHide();
+              this.setState({
+                actionSheetVisible: false,
+              });
             }}>
             <ActionSheetComponent
               item={item}

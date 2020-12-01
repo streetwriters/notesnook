@@ -1,25 +1,25 @@
-import {createRef} from 'react';
-import {Linking, Platform} from 'react-native';
+import { createRef } from 'react';
+import { Linking, Platform } from 'react-native';
 import SplashScreen from 'react-native-splash-screen';
-import {updateEvent} from '../../components/DialogManager/recievers';
-import {Actions} from '../../provider/Actions';
-import {DDS} from '../../services/DeviceDetection';
-import {eSendEvent, sendNoteEditedEvent} from '../../services/EventManager';
+import { updateEvent } from '../../components/DialogManager/recievers';
+import { Actions } from '../../provider/Actions';
+import { DDS } from '../../services/DeviceDetection';
+import { eSendEvent, sendNoteEditedEvent } from '../../services/EventManager';
 import IntentService from '../../services/IntentService';
-import {editing} from '../../utils';
-import {COLORS_NOTE, COLOR_SCHEME} from '../../utils/Colors';
-import {hexToRGBA} from '../../utils/ColorUtils';
-import {db} from '../../utils/DB';
+import { editing } from '../../utils';
+import { COLORS_NOTE, COLOR_SCHEME } from '../../utils/Colors';
+import { hexToRGBA } from '../../utils/ColorUtils';
+import { db } from '../../utils/DB';
 import {
   eOnLoadNote,
-  eOpenPremiumDialog,
+
   eShowGetPremium,
-  refreshNotesPage,
+  refreshNotesPage
 } from '../../utils/Events';
-import {MMKV} from '../../utils/mmkv';
-import {sideMenuRef, tabBarRef} from '../../utils/Refs';
-import {normalize} from '../../utils/SizeUtils';
-import {sleep, timeConverter} from '../../utils/TimeUtils';
+import { MMKV } from '../../utils/mmkv';
+import { sideMenuRef, tabBarRef } from '../../utils/Refs';
+import { normalize } from '../../utils/SizeUtils';
+import { sleep, timeConverter } from '../../utils/TimeUtils';
 
 export const EditorWebView = createRef();
 
