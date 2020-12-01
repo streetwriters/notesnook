@@ -14,10 +14,9 @@ jobs:
   lint:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
-    env:
-      GH_DEPLOY_KEY: ${{ secrets.GH_DEPLOY_KEY }}
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+      - run: echo "GH_DEPLOY_KEY=${{ secrets.GH_DEPLOY_KEY }}" >> $GITHUB_ENV
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v1
       - name: Use Node.js 12.x

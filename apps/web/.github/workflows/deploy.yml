@@ -9,9 +9,8 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    env:
-      GH_DEPLOY_KEY: ${{ secrets.GH_DEPLOY_KEY }}
     steps:
+      - run: echo "GH_DEPLOY_KEY=${{ secrets.GH_DEPLOY_KEY }}" >> $GITHUB_ENV
       - name: Checkout 🛎️
         uses: actions/checkout@v2 # If you're using actions/checkout@v2 you must set persist-credentials to false in most cases for the deployment to work correctly.
         with:
