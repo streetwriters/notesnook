@@ -1,8 +1,9 @@
+import {isNull} from 'lodash';
 import React, {useEffect, useState} from 'react';
 import {Dimensions, View} from 'react-native';
 import ScrollableTabView from 'react-native-scrollable-tab-view';
 import SplashScreen from 'react-native-splash-screen';
-import { notesnook } from './e2e/test.ids';
+import {notesnook} from './e2e/test.ids';
 import ContextMenu from './src/components/ContextMenu';
 import {DialogManager} from './src/components/DialogManager';
 import {DummyText} from './src/components/DummyText';
@@ -34,12 +35,13 @@ import {getIntent, getNote, post} from './src/views/Editor/Functions';
 let {width, height} = Dimensions.get('window');
 let movedAway = true;
 let layoutTimer = null;
-
+let currentTab = 0;
 const onChangeTab = async (obj) => {
   if (obj.i === 1) {
     eSendEvent(eCloseSideMenu);
     if (getIntent()) return;
     movedAway = false;
+    currentTab = 1;
     if (!editing.currentlyEditing || !getNote()) {
       eSendEvent(eOnLoadNote, {type: 'new'});
       editing.currentlyEditing = true;
@@ -49,6 +51,7 @@ const onChangeTab = async (obj) => {
       movedAway = true;
       post('blur');
     }
+    currentTab = 0;
     eSendEvent(eOpenSideMenu);
   }
 };
@@ -66,6 +69,11 @@ export const RootView = () => {
       <DialogManager colors={colors} />
     </>
   );
+};
+
+let updatedDimensions = {
+  width: width,
+  height: height,
 };
 
 const AppStack = React.memo(
@@ -115,10 +123,14 @@ const AppStack = React.memo(
         clearTimeout(layoutTimer);
         layoutTimer = null;
       }
+
       let size = event?.nativeEvent?.layout;
+      updatedDimensions = size;
       if (!size || (size.width === dimensions.width && mode !== null)) {
         return;
       }
+
+      updatedDimensions = size;
       layoutTimer = setTimeout(async () => {
         checkDeviceType(size);
       }, 500);
@@ -129,6 +141,7 @@ const AppStack = React.memo(
         width: size.width,
         height: size.height,
       });
+
       setWidthHeight(size);
       DDS.setSize(size);
       DDS.checkSmallTab(size.width > size.height ? 'LANDSCAPE' : 'PORTRAIT');
@@ -143,8 +156,6 @@ const AppStack = React.memo(
         eSendEvent('nointent');
       }
       SplashScreen.hide();
-  
-
     }
 
     function setDeviceMode(current, size) {
@@ -165,18 +176,14 @@ const AppStack = React.memo(
       }
     }
 
+
     const _responder = (e) => {
-      const swiperLeftAreaLocation = 60;
-      const swiperRightAreaLocation = movedAway? dimensions.width - 150 : dimensions.width - 1;
-      let pageX = e.nativeEvent.pageX;
-      if (pageX <= swiperLeftAreaLocation || pageX >= swiperRightAreaLocation) {
-        console.log('true')
-        tabBarRef.current?.setScrollEnabled(true);
+      let pageY = e.nativeEvent.pageY;
+      if (currentTab === 1 && pageY > updatedDimensions.height - 70) {
+        return true;
       } else {
-        console.log('false')
-        tabBarRef.current?.setScrollEnabled(false);
+        return false;
       }
-      return false;
     };
 
     return (
