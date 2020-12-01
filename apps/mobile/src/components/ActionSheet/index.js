@@ -17,6 +17,7 @@ import {
   ViewPropTypes,
 
 } from 'react-native';
+import { notesnook } from '../../../e2e/test.ids';
 import {dWidth} from '../../utils';
 import {styles} from './styles';
 
@@ -440,9 +441,11 @@ export default class ActionSheet extends Component {
   };
 
   _onKeyboardHide = () => {
+
     this.setState({
       keyboard: false,
     });
+    this.opacityValue.setValue(1);
     Animated.timing(this.transformValue, {
       toValue: 0,
       duration: 100,
@@ -528,6 +531,7 @@ export default class ActionSheet extends Component {
                   onTouchStart={this._onTouchBackdrop}
                   onTouchMove={this._onTouchBackdrop}
                   onTouchEnd={this._onTouchBackdrop}
+                  testID={notesnook.ids.default.actionsheetBackdrop}
                   style={{
                     height: '100%',
                     width: '100%',
