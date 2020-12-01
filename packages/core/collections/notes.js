@@ -127,9 +127,9 @@ export default class Notes extends Collection {
   }
 
   colored(color) {
-    return this._db.colors
-      .notes(color)
-      .map((id) => this._collection.getItem(id));
+    const color = this._db.colors.tag(tagId);
+    if (!color || color.noteIds.length <= 0) return [];
+    return color.noteIds.map((id) => this._collection.getItem(id));
   }
 
   /**
