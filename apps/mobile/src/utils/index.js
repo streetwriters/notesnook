@@ -64,7 +64,6 @@ export const history = {
 };
 
 export async function showContext(event, title) {
-
   event._targetInst.ref.current?.measureInWindow((x, y, w, h) => {
     dummyRef.current.setNativeProps({
       style: {
@@ -99,7 +98,7 @@ export let dHeight = Dimensions.get('window').height;
 
 export function setWidthHeight(size) {
   dWidth = size.width;
-  dHeight = size.height
+  dHeight = size.height;
 }
 
 export const itemSkus = Platform.select({
@@ -144,10 +143,43 @@ export const SUBSCRIPTION_STATUS = {
 };
 
 export const SUBSCRIPTION_STATUS_STRINGS = {
-  0: "Expired",
-  1: "Trial",
-  2: "Pro",
-  3: "Pro",
-  4: "Cancelled",
+  0: 'Expired',
+  1: 'Trial',
+  2: 'Pro',
+  3: 'Pro',
+  4: 'Cancelled',
 };
 
+export const BUTTON_TYPES = {
+  transparent: {
+    primary: 'transparent',
+    text: 'accent',
+    selected: 'shade',
+  },
+  gray: {
+    primary: 'transparent',
+    text: 'icon',
+    selected: 'nav',
+  },
+  grayBg: {
+    primary: 'nav',
+    text: 'icon',
+    selected: 'nav',
+  },
+  accent: (themeColor, text) => ({
+    primary: themeColor,
+    text: text,
+    selected: 'accent',
+  }),
+  inverted: {
+    primary: 'bg',
+    text: 'accent',
+    selected: 'bg',
+  },
+  shade: {
+    primary: 'shade',
+    text: 'accent',
+    selected: 'accent',
+    opacity: 0.12,
+  },
+};
