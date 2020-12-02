@@ -13,7 +13,7 @@ function createRoute(key, header) {
   return { buttonId: `navitem-${key}`, header };
 }
 const routes = [
-  createRoute("home", "Home"),
+  createRoute("notes", "Notes"),
   createRoute("notebooks", "Notebooks"),
   createRoute("favorites", "Favorites"),
   createRoute("tags", "Tags"),
