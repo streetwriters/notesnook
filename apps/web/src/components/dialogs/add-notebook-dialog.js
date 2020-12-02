@@ -121,7 +121,7 @@ class AddNotebookDialog extends React.Component {
         <Flex flexDirection="column" sx={{ overflowY: "auto" }}>
           <Field
             defaultValue={this.title}
-            data-test-id="dialog-nb-name"
+            data-test-id="and-name"
             autoFocus
             required
             label="Title"
@@ -130,7 +130,7 @@ class AddNotebookDialog extends React.Component {
             onChange={(e) => (this.title = e.target.value)}
           />
           <Field
-            data-test-id="dialog-nb-description"
+            data-test-id="and-description"
             label="Description"
             name="description"
             id="description"
@@ -141,10 +141,12 @@ class AddNotebookDialog extends React.Component {
           />
           <Field
             inputRef={(ref) => (this._topicInputRef = ref)}
+            data-test-id="and-topic"
             label="Topics"
             name="topic"
             id="topic"
             action={{
+              testId: "and-topic-action",
               onClick: () => {
                 if (this.state.isEditting) {
                   this.doneEditingTopic();
@@ -232,7 +234,7 @@ function TopicItem(props) {
             color="primary"
             sx={{ ":hover": { opacity: 0.8 } }}
             onClick={isEditing ? onDoneEditing : onEdit}
-            data-test-id={`dialog-nb-topic-${index}-actions-edit`}
+            data-test-id={`and-topic-${index}-actions-edit`}
           >
             {isEditing ? "Done" : "Edit"}
           </Text>

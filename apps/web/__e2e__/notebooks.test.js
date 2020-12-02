@@ -21,14 +21,14 @@ beforeEach(async () => {
 afterEach(async () => page.close());
 
 async function fillNotebookDialog(notebook) {
-  await page.fill(getTestId("dialog-nb-name"), notebook.title);
+  await page.fill(getTestId("and-name"), notebook.title);
 
-  await page.fill(getTestId("dialog-nb-description"), notebook.description);
+  await page.fill(getTestId("and-description"), notebook.description);
 
   for (let i = 0; i < notebook.topics.length; ++i) {
     let topic = notebook.topics[i];
-    await page.fill(getTestId(`dialog-nb-topic`), topic);
-    await page.click(getTestId("dialog-nb-topic-action"));
+    await page.fill(getTestId(`and-topic`), topic);
+    await page.click(getTestId("and-topic-action"));
   }
 
   await page.click(getTestId("dialog-yes"));
@@ -142,18 +142,18 @@ test("edit a notebook", async () => {
     topics: ["Topic 1", "Topic 2", "Topic 3", "Topic 4", "Topic 5"],
   };
 
-  await page.fill(getTestId("dialog-nb-name"), notebook.title);
+  await page.fill(getTestId("and-name"), notebook.title);
 
-  await page.fill(getTestId("dialog-nb-description"), notebook.description);
+  await page.fill(getTestId("and-description"), notebook.description);
 
   for (var i = 1; i <= notebook.topics.length; ++i) {
-    let id = getTestId(`dialog-nb-topic-${i}-actions-edit`);
+    let id = getTestId(`and-topic-${i}-actions-edit`);
     let topic = notebook.topics[i - 1];
     if ((await page.$(id)) !== null) {
       await page.click(id);
     }
-    await page.fill(getTestId("dialog-nb-topic"), topic);
-    await page.click(getTestId("dialog-nb-topic-action"));
+    await page.fill(getTestId("and-topic"), topic);
+    await page.click(getTestId("and-topic-action"));
   }
 
   await confirmDialog();

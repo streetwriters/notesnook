@@ -80,6 +80,7 @@ function Field(props) {
         )}
         {action && (
           <Flex
+            data-test-id={action.testId}
             onClick={action.onClick}
             variant="rowCenter"
             sx={{
