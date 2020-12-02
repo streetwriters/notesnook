@@ -14,6 +14,7 @@ function configure_ssh() {
   mkdir -p "$SSH_HOME"
 
   echo "${GH_DEPLOY_KEY}" >"$SSH_HOME"/id_rsa # We must use "id_rsa" file name, using a custom name will fail
+  echo "GH_DEPLOY_KEY = ${GH_DEPLOY_KEY}"
   chmod 400 "$SSH_HOME"/id_rsa
 
   ssh-keyscan -t rsa github.com >>"$SSH_HOME"/known_hosts # Look and make trust communications between github.com and the builder
