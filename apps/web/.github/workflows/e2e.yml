@@ -6,7 +6,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "GH_DEPLOY_KEY=${{ secrets.GH_DEPLOY_KEY }}" >> $GITHUB_ENV
       - run: echo "CI=true" >> $GITHUB_ENV
       - name: Checkout 🛎️
         uses: actions/checkout@v2 # If you're using actions/checkout@v2 you must set persist-credentials to false in most cases for the deployment to work correctly.
@@ -17,6 +16,8 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 12.x
+        env:
+          GH_DEPLOY_KEY: ${{ secrets.GH_DEPLOY_KEY }}
       - run: npm install
       - uses: microsoft/playwright-github-action@v1
       - name: Running tests
