@@ -92,6 +92,7 @@ async function checkNotePinned(noteSelector) {
   const note = await page.$(List.new("note").grouped().atIndex(0).build());
   await expect(note.screenshot()).resolves.toMatchImageSnapshot({
     failureThreshold: 5,
+    allowSizeMismatch: true,
     failureThresholdType: "percent",
   });
 }
@@ -127,6 +128,7 @@ async function checkNoteColored(noteSelector) {
   const note = await page.$(List.new("note").grouped().atIndex(0).build());
   await expect(note.screenshot()).resolves.toMatchImageSnapshot({
     failureThreshold: 5,
+    allowSizeMismatch: true,
     failureThresholdType: "percent",
   });
 
@@ -134,6 +136,7 @@ async function checkNoteColored(noteSelector) {
 
   const coloredNote = await page.$(List.new("note").atIndex(0).build());
   await expect(coloredNote.screenshot()).resolves.toMatchImageSnapshot({
+    allowSizeMismatch: true,
     failureThreshold: 5,
     failureThresholdType: "percent",
   });

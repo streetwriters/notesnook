@@ -231,5 +231,6 @@ test("pin a notebook", async () => {
   await expect(notebook.screenshot()).resolves.toMatchImageSnapshot({
     failureThreshold: 5,
     failureThresholdType: "percent",
+    allowSizeMismatch: true,
   });
 });
