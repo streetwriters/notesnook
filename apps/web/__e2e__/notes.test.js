@@ -166,7 +166,7 @@ async function addNoteToNotebook() {
   await checkNotePresence(0, false);
 }
 
-describe.each(["independent"])("run tests %sly", (type) => {
+describe.each(["independent", "sequential"])("run tests %sly", (type) => {
   beforeAll(async () => {
     if (type === "sequential") {
       await page.goto("http://localhost:3000/");
