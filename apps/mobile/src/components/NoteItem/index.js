@@ -57,13 +57,13 @@ export default class NoteItem extends React.Component {
 
   showActionSheet = () => {
     ActionSheetEvent(
-      item,
-      isTrash ? false : true,
-      isTrash ? false : true,
-      isTrash
+      this.props.item,
+      this.props.isTrash ? false : true,
+      this.props.isTrash ? false : true,
+      this.props.isTrash
         ? ['Remove', 'Restore']
         : ['Add to', 'Share', 'Export', 'Delete', 'Copy'],
-      isTrash ? [] : ['Pin', 'Favorite', 'Add to Vault'],
+      this.props.isTrash ? [] : ['Pin', 'Favorite', 'Add to Vault'],
     );
   };
 
