@@ -33,5 +33,6 @@ test.each(routes)("navigating to %s", async (_header, route) => {
   await expect(navItem.screenshot()).resolves.toMatchImageSnapshot({
     failureThreshold: 5,
     failureThresholdType: "percent",
+    allowSizeMismatch: true,
   });
 });
