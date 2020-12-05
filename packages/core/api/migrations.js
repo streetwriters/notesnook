@@ -19,7 +19,7 @@ class Migrations {
   }
 
   _migrationFunction(collectionId) {
-    let migrationFunction = migrations[version][collectionId];
+    let migrationFunction = migrations[this.dbVersion][collectionId];
     if (!migrationFunction)
       migrationFunction = migrations[CURRENT_DATABASE_VERSION][collectionId];
     return migrationFunction;
