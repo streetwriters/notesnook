@@ -14,6 +14,7 @@ import Session from "./session";
 import Constants from "../utils/constants";
 import { EV } from "../common";
 import Settings from "./settings";
+import Migrations from "./migrations";
 
 /**
  * @type {EventSource}
@@ -57,6 +58,7 @@ class Database {
     this.lookup = new Lookup(this);
     this.backup = new Backup(this);
     this.settings = new Settings(this);
+    this.migrations = new Migrations(this);
 
     // collections
     /** @type {Notes} */
@@ -74,6 +76,7 @@ class Database {
 
     await this.settings.init();
     await this.user.sync();
+    await this.migrations.migrate();
   }
 
   async _onUserStateChanged(user) {
