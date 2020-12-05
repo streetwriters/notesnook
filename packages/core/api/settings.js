@@ -20,7 +20,11 @@ class Settings {
   }
 
   merge(item) {
-    this._settings = { ...this._settings, ...item };
+    this._settings = {
+      ...this._settings,
+      ...item,
+      pins: [...this.settings.pins, ...item.pins],
+    };
   }
 
   async init() {
