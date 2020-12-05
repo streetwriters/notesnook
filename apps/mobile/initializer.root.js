@@ -76,6 +76,8 @@ let updatedDimensions = {
   height: height,
 };
 
+let currentScroll = 0;
+let startLocation = 0;
 const AppStack = React.memo(
   () => {
     const [state, dispatch] = useTracked();
@@ -159,6 +161,7 @@ const AppStack = React.memo(
     }
 
     function setDeviceMode(current, size) {
+
       eSendEvent(current !== 'mobile' ? eCloseSideMenu : eOpenSideMenu);
       setMode(current);
       dispatch({type: Actions.DEVICE_MODE, state: current});
@@ -176,14 +179,23 @@ const AppStack = React.memo(
       }
     }
 
-
     const _responder = (e) => {
-      let pageY = e.nativeEvent.pageY;
-      if (currentTab === 1 && pageY > updatedDimensions.height - 70) {
-        return true;
+      startLocation = e.nativeEvent.pageX;
+      const swiperLeftAreaLocation = 70;
+      const swiperRightAreaLocation = movedAway
+        ? dimensions.width - 150
+        : dimensions.width - 1;
+      let pageX = e.nativeEvent.pageX;
+      startLocation = e.nativeEvent.pageX;
+      if (pageX <= swiperLeftAreaLocation || pageX >= swiperRightAreaLocation) {
+        tabBarRef.current?.setScrollEnabled(true);
       } else {
-        return false;
+        if (currentScroll === 0 || currentScroll === 1) {
+          console.log(currentScroll);
+          tabBarRef.current?.setScrollEnabled(false);
+        }
       }
+      return false;
     };
 
     return (
@@ -195,6 +207,21 @@ const AppStack = React.memo(
           height: '100%',
           backgroundColor: colors.bg,
         }}
+        onMoveShouldSetResponder={e => {
+          const swiperLeftAreaLocation = 70;
+          const swiperRightAreaLocation = movedAway
+            ? dimensions.width - 150
+            : dimensions.width - 1;
+          if (startLocation <= swiperLeftAreaLocation || startLocation >= swiperRightAreaLocation) {
+            tabBarRef.current?.setScrollEnabled(true);
+          } else {
+            if (currentScroll === 0 || currentScroll === 1) {
+              console.log(currentScroll);
+              tabBarRef.current?.setScrollEnabled(false);
+            }
+          }
+          return false;
+        }}
         onStartShouldSetResponder={_responder}>
         {mode && (
           <ScrollableTabView
@@ -202,6 +229,7 @@ const AppStack = React.memo(
             style={{
               zIndex: 1,
             }}
+            onScroll={(event) => (currentScroll = event)}
             initialPage={0}
             prerenderingSiblingsNumber={Infinity}
             onChangeTab={onChangeTab}
