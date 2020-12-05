@@ -1,4 +1,5 @@
 import { CURRENT_DATABASE_VERSION } from "../common";
+import { migrations } from "../migrations";
 
 class Migrations {
   /**
