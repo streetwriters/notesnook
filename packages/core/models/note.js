@@ -39,8 +39,8 @@ export default class Note {
     return this._note.id;
   }
 
-  get notebook() {
-    return this._note.notebook;
+  get notebooks() {
+    return this._note.notebooks;
   }
 
   get dateEdited() {

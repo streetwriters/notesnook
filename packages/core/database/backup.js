@@ -177,10 +177,12 @@ const migrations = {
       if (await migrations.handleDeleted(db, "notes", item)) return;
 
       const contentId = item.content.delta;
+      const notebook = item.notebook;
       delete item.content;
+      delete item.notebook;
       item.contentId = contentId;
       item.remote = true;
-      if (!item.notebook.id) item.notebook = undefined;
+      if (notebook) item.notebooks = [notebook];
       await db.notes.add(item);
     },
     delta: async function (db, item) {

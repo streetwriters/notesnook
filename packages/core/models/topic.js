@@ -25,20 +25,19 @@ export default class Topic {
       let note = this._db.notes.note(noteId);
       if (this.has(noteId) || !note || note.data.deleted) continue;
       topic.notes.push(noteId);
-      if (note.notebook && note.notebook.id && note.notebook.topic) {
-        if (
-          note.notebook.id === this._notebookId &&
-          note.notebook.topic === topic.id
+
+      const array = note.notebooks || [];
+      if (
+        array.some(
+          (item) => item.id === this._notebookId && item.topic === topic.id
         )
-          return this;
-        await this._db.notebooks
-          .notebook(note.notebook.id)
-          .topics.topic(note.notebook.topic)
-          .delete(note.id);
-      }
+      )
+        return this;
+      array.push({ id: this._notebookId, topic: topic.id });
+
       await this._db.notes.add({
         id: noteId,
-        notebook: { id: this._notebookId, topic: topic.id },
+        notebooks: array,
       });
       topic.totalNotes++;
     }
@@ -48,12 +47,20 @@ export default class Topic {
   async delete(...noteIds) {
     const topic = qclone(this._topic);
     for (let noteId of noteIds) {
-      if (!this.has(noteId)) return this;
+      let note = this._db.notes.note(noteId);
+      if (!this.has(noteId) || !note || note.data.deleted) return this;
       let index = topic.notes.findIndex((n) => n === noteId);
       topic.notes.splice(index, 1);
+
+      const array = note.notebooks || [];
+      index = array.findIndex(
+        (n) => n.id === this._notebookId && n.topic === topic.id
+      );
+      array.splice(index, 1);
+
       await this._db.notes.add({
         id: noteId,
-        notebook: {},
+        notebooks: array,
       });
       topic.totalNotes--;
     }

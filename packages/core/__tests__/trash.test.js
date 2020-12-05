@@ -42,8 +42,8 @@ test("restore a deleted note that was in a notebook", () =>
     const notebook = db.notebooks.notebook(nbId);
     expect(notebook.topics.topic("General").has(id)).toBe(true);
 
-    expect(note.notebook.id).toBe(nbId);
-    expect(note.notebook.topic).toBeDefined();
+    expect(note.notebooks.some((n) => n.id === nbId)).toBe(true);
+
     expect(notebook.topics.has("General")).toBeDefined();
   }));
 
@@ -92,7 +92,7 @@ test("delete a notebook", () =>
     await db.notebooks.notebook(id).topics.topic("General").add(noteId);
     await db.notebooks.delete(id);
     expect(db.notebooks.notebook(id).data.deleted).toBe(true);
-    expect(db.notes.note(noteId).notebook).toStrictEqual({});
+    expect(db.notes.note(noteId).notebook).toBeUndefined();
   }));
 
 test("restore a deleted notebook", () =>
@@ -104,9 +104,9 @@ test("restore a deleted notebook", () =>
     let notebook = db.notebooks.notebook(id);
     expect(notebook).toBeDefined();
     let note = db.notes.note(noteId);
-    expect(note.notebook.id).toBe(id);
-    expect(note.notebook.topic).toBeDefined();
-    expect(notebook.topics.topic(note.notebook.topic)).toBeDefined();
+    const index = note.notebooks.findIndex((n) => n.id === id);
+    expect(note.notebooks[index]).toBeDefined();
+    expect(notebook.topics.topic(note.notebooks[index].topic)).toBeDefined();
   }));
 
 test("restore a notebook that has deleted notes", () =>

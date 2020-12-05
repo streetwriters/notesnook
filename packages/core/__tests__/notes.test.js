@@ -165,7 +165,7 @@ test("add note to topic", () =>
     expect(topic.totalNotes).toBe(1);
     expect(db.notebooks.notebook(notebookId).data.totalNotes).toBe(1);
     let note = db.notes.note(id);
-    expect(note.notebook.id).toBe(notebookId);
+    expect(note.notebooks.some((n) => n.id === notebookId)).toBe(true);
   }));
 
 test("duplicate note to topic should not be added", () =>
@@ -190,7 +190,7 @@ test("move note", () =>
     await db.notebooks.notebook(notebookId2).topics.add("Home2");
     await db.notes.move({ id: notebookId2, topic: "Home2" }, id);
     let note = db.notes.note(id);
-    expect(note.notebook.id).toBe(notebookId2);
+    expect(note.notebooks.some((n) => n.id === notebookId2)).toBe(true);
   }));
 
 test("moving note to same notebook and topic should do nothing", () =>
@@ -202,7 +202,7 @@ test("moving note to same notebook and topic should do nothing", () =>
     await topic.add(id);
     await db.notes.move({ id: notebookId, topic: "Home" }, id);
     let note = db.notes.note(id);
-    expect(note.notebook.id).toBe(notebookId);
+    expect(note.notebooks.some((n) => n.id === notebookId)).toBe(true);
   }));
 
 test("export note to html", () =>
