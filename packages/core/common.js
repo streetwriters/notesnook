@@ -7,3 +7,12 @@ export async function sendCheckUserStatusEvent(type) {
   if (typeof results === "boolean") return results;
   return results.some((r) => r.type === type && r.result === true);
 }
+
+export const CHECK_IDS = {
+  noteColor: "note:color",
+  noteTag: "note:tag",
+  noteExport: "note:export",
+  vaultAdd: "vault:add",
+  notebookAdd: "notebook:add",
+  backupEncrypt: "backup:encrypt",
+};

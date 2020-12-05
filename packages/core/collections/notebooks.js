@@ -3,7 +3,7 @@ import fuzzysearch from "fuzzysearch";
 import Notebook from "../models/notebook";
 import sort from "fast-sort";
 import getId from "../utils/id";
-import { sendCheckUserStatusEvent } from "../common";
+import { CHECK_IDS, sendCheckUserStatusEvent } from "../common";
 var tfun = require("transfun/transfun.js").tfun;
 if (!tfun) {
   tfun = global.tfun;
@@ -24,7 +24,7 @@ export default class Notebooks extends Collection {
     if (
       !oldNotebook &&
       this.all.length >= 3 &&
-      !(await sendCheckUserStatusEvent("notebook:add"))
+      !(await sendCheckUserStatusEvent(CHECK_IDS.notebookAdd))
     )
       return;
 

@@ -1,4 +1,4 @@
-import { EV, sendCheckUserStatusEvent } from "../common";
+import { CHECK_IDS, EV, sendCheckUserStatusEvent } from "../common";
 import getId from "../utils/id";
 
 const ERASE_TIME = 1000 * 60 * 30;
@@ -89,7 +89,7 @@ export default class Vault {
    * @param {string} noteId The id of the note to lock
    */
   async add(noteId) {
-    if (!(await sendCheckUserStatusEvent("vault:check"))) return;
+    if (!(await sendCheckUserStatusEvent(CHECK_IDS.vaultAdd))) return;
 
     await this._check();
     await this._lockNote({ id: noteId });
