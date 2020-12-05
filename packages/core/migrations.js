@@ -59,7 +59,7 @@ export const migrations = {
     },
     notebooks: async function (db, item) {
       if (await migrations.handleDeleted(db, "notebooks", item)) return;
-      delete item.favorite;
+      if (item.favorite !== undefined) delete item.favorite;
       await db.notebooks.add(item);
     },
     tags: async function (db, item) {
