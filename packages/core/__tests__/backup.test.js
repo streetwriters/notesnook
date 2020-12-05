@@ -5,6 +5,7 @@ import {
   notebookTest,
 } from "./utils";
 import v0Backup from "./__fixtures__/backup.v0.json";
+import v2Backup from "./__fixtures__/backup.v2.json";
 
 beforeEach(async () => {
   StorageInterface.clear();
@@ -70,7 +71,11 @@ test("import unversioned (v0) backup", () => {
 
     expect(
       db.notes.all.every(
-        (v) => v.contentId && !v.content && (!v.notebook || !v.notebook.id)
+        (v) =>
+          v.contentId &&
+          !v.content &&
+          !v.notebook &&
+          (!v.notebooks || Array.isArray(v.notebooks))
       )
     ).toBeTruthy();
 
@@ -78,20 +83,43 @@ test("import unversioned (v0) backup", () => {
       db.notebooks.all.every((v) => v.title != null && v.description != null)
     ).toBeTruthy();
 
-    function verifyIndex(db, backupCollection, collection) {
-      if (!v0Backup.data[backupCollection]) return;
-      expect(
-        v0Backup.data[backupCollection].every(
-          (v) => db[collection]._collection.indexer.indices.indexOf(v) > -1
-        )
-      ).toBeTruthy();
-    }
-
-    verifyIndex(db, "notes", "notes");
-    verifyIndex(db, "notebooks", "notebooks");
-    verifyIndex(db, "delta", "content");
-    verifyIndex(db, "tags", "tags");
-    verifyIndex(db, "colors", "colors");
-    verifyIndex(db, "trash", "trash");
+    verifyIndex(v0Backup, db, "notes", "notes");
+    verifyIndex(v0Backup, db, "notebooks", "notebooks");
+    verifyIndex(v0Backup, db, "delta", "content");
+    verifyIndex(v0Backup, db, "tags", "tags");
+    verifyIndex(v0Backup, db, "colors", "colors");
+    verifyIndex(v0Backup, db, "trash", "trash");
   });
 });
+
+test("import v2 backup", () => {
+  return databaseTest().then(async (db) => {
+    await db.backup.import(JSON.stringify(v2Backup));
+
+    expect(db.settings.raw.id).toBeDefined();
+    expect(db.settings.raw.pins.length).toBeGreaterThan(0);
+
+    expect(
+      db.notes.all.every(
+        (v) => !v.notebook && (!v.notebooks || Array.isArray(v.notebooks))
+      )
+    ).toBeTruthy();
+
+    verifyIndex(v2Backup, db, "notes", "notes");
+    verifyIndex(v2Backup, db, "notebooks", "notebooks");
+    verifyIndex(v2Backup, db, "content", "content");
+    verifyIndex(v2Backup, db, "tags", "tags");
+    verifyIndex(v2Backup, db, "colors", "colors");
+    verifyIndex(v2Backup, db, "trash", "trash");
+  });
+});
+
+function verifyIndex(backup, db, backupCollection, collection) {
+  if (!backup.data[backupCollection]) return;
+
+  expect(
+    backup.data[backupCollection].every(
+      (v) => db[collection]._collection.indexer.indices.indexOf(v) > -1
+    )
+  ).toBeTruthy();
+}

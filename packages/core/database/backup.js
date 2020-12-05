@@ -1,10 +1,10 @@
 import Hashes from "jshashes";
-import { sendCheckUserStatusEvent } from "../common.js";
+import { CHECK_IDS, sendCheckUserStatusEvent } from "../common.js";
 const md5 = new Hashes.MD5();
 
 const invalidKeys = ["user", "t", "lastBackupTime"];
 const validTypes = ["mobile", "web", "node"];
-const CURRENT_BACKUP_VERSION = 2;
+const CURRENT_BACKUP_VERSION = 3;
 export default class Backup {
   /**
    *
@@ -24,7 +24,8 @@ export default class Backup {
    * @param {boolean} encrypt
    */
   async export(type, encrypt = false) {
-    if (encrypt && !(await sendCheckUserStatusEvent("backup:encrypt"))) return;
+    if (encrypt && !(await sendCheckUserStatusEvent(CHECK_IDS.backupEncrypt)))
+      return;
 
     if (!validTypes.some((t) => t === type))
       throw new Error("Invalid type. It must be one of 'mobile' or 'web'.");
@@ -87,7 +88,8 @@ export default class Backup {
       );
 
     switch (version) {
-      case CURRENT_BACKUP_VERSION: {
+      case CURRENT_BACKUP_VERSION:
+      case 2: {
         return backup;
       }
       case 0: {
@@ -125,17 +127,31 @@ export default class Backup {
       "delta",
       "text",
       "content",
+      "settings",
     ];
 
     await Promise.all(
       collections.map(async (collection) => {
         const collectionIndex = data[collection];
         if (!collectionIndex) return;
+
+        if (!Array.isArray(collectionIndex)) {
+          let migrationFunction = migrations[version][collection];
+          if (!migrationFunction)
+            migrationFunction = migrations[CURRENT_BACKUP_VERSION][collection];
+          await migrationFunction(this._db, collectionIndex);
+          return;
+        }
+
         await Promise.all(
           collectionIndex.map(async (id) => {
             const item = data[id];
             if (!item) return;
-            await migrations[version][collection](this._db, item);
+            let migrationFunction = migrations[version][collection];
+            if (!migrationFunction)
+              migrationFunction =
+                migrations[CURRENT_BACKUP_VERSION][collection];
+            await migrationFunction(this._db, item);
           })
         );
       })
@@ -203,21 +219,22 @@ const migrations = {
       }
       await db.trash.add(item);
     },
-    notebooks: async function (db, item) {
-      if (await migrations.handleDeleted(db, "notebooks", item)) return;
-      await db.notebooks.add(item);
-    },
-    tags: async function (db, item) {
-      if (await migrations.handleDeleted(db, "tags", item)) return;
-      await db.tags.add(item);
-    },
-    colors: async function (db, item) {
-      if (await migrations.handleDeleted(db, "colors", item)) return;
-      await db.tags.add(item);
-    },
     text: function () {},
   },
   2: {
+    notes: async function (db, item) {
+      if (await migrations.handleDeleted(db, "notes", item)) return;
+
+      // notebook -> notebooks
+      const notebook = item.notebook;
+      delete item.notebook;
+      item.remote = true;
+      if (notebook) item.notebooks = [notebook];
+
+      await db.notes.add({ ...item, remote: true });
+    },
+  },
+  3: {
     notes: async function (db, item) {
       if (await migrations.handleDeleted(db, "notes", item)) return;
       await db.notes.add({ ...item, remote: true });
@@ -228,11 +245,11 @@ const migrations = {
     },
     tags: async function (db, item) {
       if (await migrations.handleDeleted(db, "tags", item)) return;
-      await db.tags.add(item);
+      await db.tags.merge(item);
     },
     colors: async function (db, item) {
       if (await migrations.handleDeleted(db, "colors", item)) return;
-      await db.tags.add(item);
+      await db.colors.merge(item);
     },
     trash: async function (db, item) {
       if (await migrations.handleDeleted(db, "trash", item)) return;
@@ -241,6 +258,9 @@ const migrations = {
     content: async function (db, item) {
       if (await migrations.handleDeleted(db, "content", item)) return;
       await db.content.add(item);
+    },
+    settings: async function (db, item) {
+      db.settings.merge(item);
     },
   },
 };
