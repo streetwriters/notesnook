@@ -39,7 +39,7 @@ export function showLoadingDialog(dialogData) {
       subtitle={subtitle}
       message={message}
       action={action}
-      onDone={() => perform(true)}
+      onDone={(e) => perform(e)}
     />
   ));
 }
