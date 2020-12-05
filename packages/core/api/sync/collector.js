@@ -23,6 +23,7 @@ class Collector {
       tags: await this._collect(this._db.tags.raw),
       colors: await this._collect(this._db.colors.raw),
       trash: await this._collect(this._db.trash.raw),
+      settings: await this._collect([this._db.settings.raw]),
       vaultKey: await this._serialize(await this._db.vault._getKey()),
     };
   }

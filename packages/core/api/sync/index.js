@@ -28,7 +28,6 @@
 import Constants from "../../utils/constants";
 import Collector from "./collector";
 import Merger from "./merger";
-import { areAllEmpty } from "./utils";
 var tfun = require("transfun/transfun.js").tfun;
 if (!tfun) {
   tfun = global.tfun;
@@ -67,7 +66,7 @@ export default class Sync {
   }
 
   async start() {
-    let { user, lastSynced, token } = await this._performChecks();
+    let { lastSynced, token } = await this._performChecks();
 
     let serverResponse = await this._fetch(lastSynced, token);
 
@@ -90,7 +89,7 @@ export default class Sync {
   }
 
   async eventMerge(serverResponse) {
-    let { user, lastSynced } = await this._performChecks();
+    let { lastSynced } = await this._performChecks();
 
     // we update the last synced time before merging so there are no conflicts
     lastSynced = serverResponse.lastSynced;

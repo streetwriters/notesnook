@@ -69,6 +69,7 @@ class Merger {
       colors,
       trash,
       vaultKey,
+      settings,
     } = serverResponse;
 
     if (synced || areAllEmpty(serverResponse)) return false;
@@ -79,10 +80,17 @@ class Merger {
     }
 
     await this._mergeArray(
+      settings,
+      () => this._db.settings.raw,
+      this._db.settings.merge
+    );
+
+    await this._mergeArray(
       notes,
       (id) => this._db.notes.note(id),
       (item) => this._db.notes.add(item)
     );
+
     await this._mergeArray(
       notebooks,
       (id) => this._db.notebooks.notebook(id),

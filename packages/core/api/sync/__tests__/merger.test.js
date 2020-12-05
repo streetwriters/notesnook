@@ -18,6 +18,7 @@ const emptyServerResponse = {
   tags: [],
   colors: [],
   trash: [],
+  settings: [],
 };
 
 const testItem = { id: "someId", dateEdited: 2 };

@@ -1,3 +1,5 @@
+import id from "../utils/id";
+
 class Settings {
   /**
    *
@@ -5,12 +7,26 @@ class Settings {
    */
   constructor(db) {
     this._db = db;
-    this._settings = { pins: [] };
+    this._settings = {
+      id: id(),
+      pins: [],
+      dateEdited: 0,
+      dateCreated: Date.now(),
+    };
+  }
+
+  get raw() {
+    return this._settings;
+  }
+
+  merge(item) {
+    this._settings = { ...this._settings, ...item };
   }
 
   async init() {
-    this._settings =
-      (await this._db.context.read("settings")) || this._settings;
+    var settings = await this._db.context.read("settings");
+    if (!settings) await this._db.context.write("settings", this._settings);
+    else this._settings = settings;
   }
 
   async pin(type, data) {
@@ -18,6 +34,7 @@ class Settings {
       throw new Error("This item cannot be pinned.");
     if (this.isPinned(data.id)) return;
     this._settings.pins.push({ type, data });
+    this._settings.dateEdited = Date.now();
     await this._db.context.write("settings", this._settings);
   }
 
@@ -25,6 +42,7 @@ class Settings {
     const index = this._settings.pins.findIndex((i) => i.data.id === id);
     if (index <= -1) return;
     this._settings.pins.splice(index, 1);
+    this._settings.dateEdited = Date.now();
     await this._db.context.write("settings", this._settings);
   }
 
