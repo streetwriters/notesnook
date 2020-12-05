@@ -59,7 +59,7 @@ class Migrations {
         );
       })
     );
-    await this._db.context.write("v", CURRENT_VERSION);
+    await this._db.context.write("v", CURRENT_DATABASE_VERSION);
   }
 }
 export default Migrations;
