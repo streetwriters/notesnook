@@ -1,16 +1,16 @@
 import React, {createRef} from 'react';
-import {ScrollView, Text, View} from 'react-native';
+import {ScrollView, View} from 'react-native';
 import * as RNIap from 'react-native-iap';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {DDS} from '../../services/DeviceDetection';
 import {eSendEvent, ToastEvent} from '../../services/EventManager';
+import {dHeight, dWidth, itemSkus} from '../../utils';
+import {db} from '../../utils/DB';
 import {eOpenLoginDialog, eOpenPendingDialog} from '../../utils/Events';
-import {dHeight, itemSkus, dWidth} from '../../utils';
+import {SIZE} from '../../utils/SizeUtils';
 import ActionSheet from '../ActionSheet';
 import {Button} from '../Button';
 import Seperator from '../Seperator';
-import {SIZE, WEIGHT} from '../../utils/SizeUtils';
-import {db} from '../../utils/DB';
-import {DDS} from '../../services/DeviceDetection';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 class PremiumDialog extends React.Component {
@@ -20,21 +20,25 @@ class PremiumDialog extends React.Component {
       user: null,
       product: null,
       scrollEnabled: false,
+      visible: false,
     };
     this.routeIndex = 0;
     this.count = 0;
     this.actionSheetRef = createRef();
-    this.subsriptionSuccessListerner = RNIap.purchaseUpdatedListener(
-      this.onSuccessfulSubscription,
-    );
-    this.subsriptionErrorListener = RNIap.purchaseErrorListener(
-      this.onSubscriptionError,
-    );
+    this.subsriptionSuccessListerner;
+    this.subsriptionErrorListener;
     this.prevScroll = 0;
   }
 
   open() {
-    this.actionSheetRef.current?._setModalVisible(true);
+    this.setState(
+      {
+        visible: true,
+      },
+      () => {
+        this.actionSheetRef.current?._setModalVisible(true);
+      },
+    );
   }
 
   close() {
@@ -42,16 +46,24 @@ class PremiumDialog extends React.Component {
   }
 
   async getSkus() {
-    try {
-      let u = await db.user.get();
-      let prod = await RNIap.getSubscriptions(itemSkus);
-      this.setState({
-        user: u && u.Id ? u : null,
-        product: prod[0],
-      });
-    } catch (e) {
-      console.log(e, 'SKU ERROR');
-    }
+        try {
+          await  RNIap.initConnection();
+          let u = await db.user.get();
+          let prod = await RNIap.getSubscriptions(itemSkus);
+          this.setState({
+            user: u && u.Id ? u : null,
+            product: prod[0],
+          });
+          this.subsriptionSuccessListerner = RNIap.purchaseUpdatedListener(
+            this.onSuccessfulSubscription,
+          );
+          this.subsriptionErrorListener = RNIap.purchaseErrorListener(
+            this.onSubscriptionError,
+          );
+        } catch (e) {
+          console.log(e, 'SKU ERROR');
+        }
+    
   }
 
   onSuccessfulSubscription = (subscription) => {
@@ -72,7 +84,7 @@ class PremiumDialog extends React.Component {
 
   render() {
     const {colors} = this.props;
-    return (
+    return !this.state.visible ? null : (
       <ActionSheet
         containerStyle={{
           backgroundColor: colors.bg,
@@ -84,7 +96,11 @@ class PremiumDialog extends React.Component {
           borderBottomLeftRadius: 0,
         }}
         onOpen={async () => {
-          await this.getSkus();
+          try {
+            await this.getSkus();
+          } catch (e) {
+            console.log(e);
+          }
         }}
         extraScroll={DDS.isTab ? 50 : 0}
         footerAlwaysVisible={DDS.isTab}
@@ -97,6 +113,11 @@ class PremiumDialog extends React.Component {
               }
             : null
         }
+        onClose={() => {
+          this.setState({
+            visible: false,
+          });
+        }}
         gestureEnabled={true}
         ref={this.actionSheetRef}
         initialOffsetFromBottom={1}>
