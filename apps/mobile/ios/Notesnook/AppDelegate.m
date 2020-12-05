@@ -37,7 +37,6 @@
   [MMKV initializeMMKV:rootDir];
   MMKV *kv = [MMKV mmkvWithID:@"default" mode:MMKVSingleProcess];
   [kv removeValueForKey:@"appState"];
-  return YES;
 }
 
 
