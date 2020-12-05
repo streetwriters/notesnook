@@ -1,4 +1,5 @@
-const CURRENT_VERSION = 3;
+import { CURRENT_DATABASE_VERSION } from "../common";
+
 class Migrations {
   /**
    *
@@ -6,7 +7,7 @@ class Migrations {
    */
   constructor(db) {
     this._db = db;
-    this.dbVersion = CURRENT_VERSION;
+    this.dbVersion = CURRENT_DATABASE_VERSION;
   }
 
   async init() {
@@ -14,13 +15,13 @@ class Migrations {
   }
 
   get _shouldMigrate() {
-    return this.dbVersion < CURRENT_VERSION;
+    return this.dbVersion < CURRENT_DATABASE_VERSION;
   }
 
   _migrationFunction(collectionId) {
     let migrationFunction = migrations[version][collectionId];
     if (!migrationFunction)
-      migrationFunction = migrations[CURRENT_VERSION][collectionId];
+      migrationFunction = migrations[CURRENT_DATABASE_VERSION][collectionId];
     return migrationFunction;
   }
 

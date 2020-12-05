@@ -1,11 +1,14 @@
 import Hashes from "jshashes";
-import { CHECK_IDS, sendCheckUserStatusEvent } from "../common.js";
+import {
+  CHECK_IDS,
+  sendCheckUserStatusEvent,
+  CURRENT_DATABASE_VERSION,
+} from "../common.js";
 import { migrations } from "../migrations.js";
 const md5 = new Hashes.MD5();
 
 const invalidKeys = ["user", "t", "lastBackupTime"];
 const validTypes = ["mobile", "web", "node"];
-const CURRENT_BACKUP_VERSION = 3;
 export default class Backup {
   /**
    *
@@ -46,7 +49,7 @@ export default class Backup {
     await this._db.context.write("lastBackupTime", Date.now());
 
     return JSON.stringify({
-      version: CURRENT_BACKUP_VERSION,
+      version: CURRENT_DATABASE_VERSION,
       type,
       date: Date.now(),
       data,
@@ -83,13 +86,13 @@ export default class Backup {
 
   _migrateBackup(backup) {
     const { version = 0 } = backup;
-    if (version > CURRENT_BACKUP_VERSION)
+    if (version > CURRENT_DATABASE_VERSION)
       throw new Error(
         "This backup was made from a newer version of Notesnook. Cannot migrate."
       );
 
     switch (version) {
-      case CURRENT_BACKUP_VERSION:
+      case CURRENT_DATABASE_VERSION:
       case 2: {
         return backup;
       }
@@ -114,7 +117,7 @@ export default class Backup {
 
   async _migrateData(backup) {
     const { data, version = 0 } = backup;
-    if (version > CURRENT_BACKUP_VERSION)
+    if (version > CURRENT_DATABASE_VERSION)
       throw new Error(
         "This backup was made from a newer version of Notesnook. Cannot migrate."
       );
@@ -147,7 +150,7 @@ export default class Backup {
             let migrationFunction = migrations[version][collectionId];
             if (!migrationFunction)
               migrationFunction =
-                migrations[CURRENT_BACKUP_VERSION][collectionId];
+                migrations[CURRENT_DATABASE_VERSION][collectionId];
             await migrationFunction(this._db, item);
           })
         );

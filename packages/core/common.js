@@ -16,3 +16,5 @@ export const CHECK_IDS = {
   notebookAdd: "notebook:add",
   backupEncrypt: "backup:encrypt",
 };
+
+export const CURRENT_DATABASE_VERSION = 3;
