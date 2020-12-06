@@ -49,11 +49,16 @@ let tapCount = 0;
 
 const EditorHeader = () => {
   const [state] = useTracked();
-  const {colors, premiumUser, fullscreen} = state;
+  const {colors, premiumUser, fullscreen,deviceMode} = state;
   const insets = useSafeAreaInsets();
+
   useEffect(() => {
     setColors(colors);
   }, [colors.bg]);
+
+  useEffect(() => {
+    post("tablet",DDS.isLargeTablet())
+  }, [deviceMode]);
 
   useEffect(() => {
     eSubscribeEvent(eOnLoadNote, load);
@@ -64,6 +69,8 @@ const EditorHeader = () => {
       eUnSubscribeEvent(eOnLoadNote, load);
     };
   }, []);
+
+
 
   useEffect(() => {
     if (fullscreen && DDS.isTab) {
