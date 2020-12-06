@@ -27,7 +27,9 @@ export const PressableButton = ({
   accentColor = 'accent',
   accentText = 'light',
   customColor,
-  customSelectedColor
+  customSelectedColor,
+  customAlpha,
+  customOpacity
 }) => {
   const [state] = useTracked();
   const {colors} = state;
@@ -43,8 +45,8 @@ export const PressableButton = ({
         ? BUTTON_TYPES[type](accentColor, accentText).primary
         : BUTTON_TYPES[type].primary
     ];
-  const opacity = type === 'accent' ? 1 : BUTTON_TYPES[type].opacity;
-  const alpha = colors.night ? 0.04 : -0.04;
+  const opacity = customOpacity ? customOpacity : type === 'accent' ? 1 : BUTTON_TYPES[type].opacity;
+  const alpha = customAlpha? customAlpha : colors.night ? 0.04 : -0.04;
 
   const getStyle = useCallback(
     ({pressed}) => [

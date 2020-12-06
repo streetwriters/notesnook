@@ -78,9 +78,9 @@ const SelectionWrapper = ({
       testID={testID}
       onLongPress={onLongPress}
       onPress={onPress}
-      customSelectedColor={currentEditingNote ? colors.accent : colors.nav}
-      alpha={!colors.night ? -0.02 : 0.02}
-      opacity={currentEditingNote ? 0.15 : 1}
+      customSelectedColor={currentEditingNote === item.id ? colors.accent : colors.nav}
+      customAlpha={!colors.night ? -0.02 : 0.02}
+      customOpacity={currentEditingNote ? 0.15 : 1}
       customStyle={{
         flexDirection: 'row',
         justifyContent: 'space-between',
