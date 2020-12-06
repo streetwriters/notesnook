@@ -78,9 +78,10 @@ let updatedDimensions = {
 
 let currentScroll = 0;
 let startLocation = 0;
-
+let startLocationX = 0;
 const _responder = (e) => {
   startLocation = e.nativeEvent.pageY;
+  startLocationX = e.nativeEvent.pageX
   _handleTouch();
   return false;
 };
@@ -95,13 +96,21 @@ const _handleTouch = () => {
       if (currentScroll === 0 || currentScroll === 1) {
         tabBarRef.current?.setScrollEnabled(false);
       }
+    }else 
+    if (currentTab === 0 && startLocationX < (updatedDimensions.width*0.75)) {
+      console.log("here it is here");
+      if (currentScroll === 0 || currentScroll === 1) {
+        tabBarRef.current?.setScrollEnabled(false);
+      }
     } else {
+      console.log("blocking");
       tabBarRef.current?.setScrollEnabled(true);
     }
   }
 };
 
 const _onTouchEnd = (e) => {
+  console.log("touch ended");
   startLocation = 0;
   tabBarRef.current?.setScrollEnabled(true);
 };
@@ -215,7 +224,7 @@ const AppStack = React.memo(
           height: '100%',
           backgroundColor: colors.bg,
         }}
-        onMoveShouldSetResponder={_moveResponder}
+        onMoveShouldSetResponderCapture={_moveResponder}
         onTouchEnd={_onTouchEnd}
         onStartShouldSetResponder={_responder}>
         {mode && (
