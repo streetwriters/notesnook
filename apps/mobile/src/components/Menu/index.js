@@ -100,9 +100,8 @@ export const Menu = React.memo(
         <View
           style={{
             width: '100%',
-            padding: 8,
+            paddingHorizontal: 8,
           }}>
-          <Seperator half />
           <UserSection noTextMode={noTextMode} />
           <Seperator />
         </View>
