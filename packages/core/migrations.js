@@ -12,13 +12,11 @@ export const migrations = {
       }
       delete item.notebook;
       item.remote = true;
-      item.migrated = true;
       return item;
     },
     delta: function (item) {
       item.data = item.data.ops;
       item.type = "delta";
-      item.migrated = true;
       return item;
     },
     trash: function (item) {
@@ -28,7 +26,6 @@ export const migrations = {
         item.contentId = item.content.delta;
         delete item.content;
       }
-      item.migrated = true;
       return item;
     },
   },
@@ -39,7 +36,6 @@ export const migrations = {
       delete item.notebook;
       item.remote = true;
       if (notebook) item.notebooks = [notebook];
-      item.migrated = true;
       return item;
     },
   },
