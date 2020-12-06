@@ -67,7 +67,7 @@ export default class Notes extends Collection {
       pinned: !!note.pinned,
       locked: !!note.locked,
       notebooks: note.notebooks || undefined,
-      colors: note.colors || [],
+      color: note.color,
       tags: note.tags || [],
       favorite: !!note.favorite,
       dateCreated: note.dateCreated,
@@ -75,9 +75,7 @@ export default class Notes extends Collection {
     };
 
     if (!oldNote || oldNote.deleted) {
-      for (let color of note.colors) {
-        await this._db.colors.add(color, id);
-      }
+      if (note.color) await this._db.colors.add(note.color, id);
 
       for (let tag of note.tags) {
         await this._db.tags.add(tag, id);
@@ -212,8 +210,8 @@ export default class Notes extends Collection {
       for (let tag of item.tags) {
         await this._db.tags.remove(tag, id);
       }
-      for (let color of item.colors) {
-        await this._db.colors.remove(color, id);
+      if (item.color) {
+        await this._db.colors.remove(item.color, id);
       }
       await this._collection.removeItem(id);
       if (moveToTrash) await this._db.trash.add(item.data);

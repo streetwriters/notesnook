@@ -4,17 +4,29 @@ beforeEach(async () => {
   StorageInterface.clear();
 });
 
+function checkColorValue(note, value) {
+  expect(note.data.color).toBe(value);
+}
+
+function checkTagValue(note, value) {
+  expect(note.data.tags[0]).toBe(value);
+}
+
 describe.each([
-  ["tag", "untag", "tags", "tagged", ["hello", "tag"]],
-  ["color", "uncolor", "colors", "colored", ["red", "blue"]],
-])("%s", (action, unaction, collection, filter, values) => {
+  ["tag", "untag", "tagged", "hello"],
+  ["color", "uncolor", "colored", "red"],
+])("%s", (action, unaction, filter, value) => {
+  let check = action === "tag" ? checkTagValue : checkColorValue;
+  let collection = action === "tag" ? "tags" : "colors";
+  let key = action === "tag" ? "tags" : "color";
+
   test(`${action} a note`, () =>
     noteTest().then(async ({ db, id }) => {
       let note = db.notes.note(id);
-      await note[action](values[0]);
+      await note[action](value);
       note = db.notes.note(id);
-      expect(note[collection][0]).toBe(values[0]);
-      expect(db[collection].all[0].title).toBe(values[0]);
+      check(note, value);
+      expect(db[collection].all[0].title).toBe(value);
       expect(db[collection].all[0].noteIds.length).toBe(1);
     }));
 
@@ -22,40 +34,38 @@ describe.each([
     noteTest().then(async ({ db, id }) => {
       const id2 = await db.notes.add(TEST_NOTE);
       let note = db.notes.note(id);
-      await note[action](values[0]);
+      await note[action](value);
       note = db.notes.note(id2);
-      await note[action](values[0]);
-      expect(db[collection].all[0].title).toBe(values[0]);
+      await note[action](value);
+      expect(db[collection].all[0].title).toBe(value);
       expect(db[collection].all[0].noteIds.length).toBe(2);
     }));
 
   test(`${unaction} from note`, () =>
     noteTest().then(async ({ db, id }) => {
       let note = db.notes.note(id);
-      await note[action](values[0]);
+      await note[action](value);
       note = db.notes.note(id);
-      expect(note[collection][0]).toBe(values[0]);
-      expect(db[collection].all[0].title).toBe(values[0]);
-      await note[unaction](values[0]);
+      check(note, value);
+      await note[unaction](value);
       note = db.notes.note(id);
-      expect(note[collection].length).toBe(0);
+      check(note, undefined);
       expect(db[collection].all.length).toBe(0);
     }));
 
   test(`get ${collection}`, () =>
-    noteTest({
-      ...TEST_NOTE,
-      [collection]: values,
-    }).then(async ({ db }) => {
+    noteTest().then(async ({ db, id }) => {
+      let note = db.notes.note(id);
+      await note[action](value);
       expect(db[collection].all.length).toBeGreaterThan(0);
     }));
 
   test(`get notes in ${action}`, () =>
-    noteTest({
-      ...TEST_NOTE,
-      [collection]: values,
-    }).then(async ({ db }) => {
-      const tag = db[collection].all.find((v) => v.title === values[0]);
-      expect(db.notes[filter](tag.id)[0][collection]).toStrictEqual(values);
+    noteTest().then(async ({ db, id }) => {
+      let note = db.notes.note(id);
+      await note[action](value);
+      const tag = db[collection].all.find((v) => v.title === value);
+      const filteredNotes = db.notes[filter](tag.id);
+      check(db.notes.note(filteredNotes[0]), value);
     }));
 });

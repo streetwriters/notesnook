@@ -87,7 +87,13 @@ describe.each(tests)(
         item.title = "Google";
         const result = await merger.merge(
           {
-            [collection]: [{ id: item.id, ...(await getEncrypted(item)) }],
+            [collection]: [
+              {
+                v: CURRENT_DATABASE_VERSION,
+                id: item.id,
+                ...(await getEncrypted(item)),
+              },
+            ],
             synced: false,
           },
           0

@@ -85,11 +85,16 @@ export default class Note {
 
   async color(color) {
     if (!(await sendCheckUserStatusEvent(CHECK_IDS.noteColor))) return;
-    return await addTag.call(this, color, "colors");
+    await this._db.colors.add(color, this._note.id);
+    await this._db.notes._collection.addItem({ ...this._note, color });
   }
 
-  uncolor(color) {
-    return removeTag.call(this, color, "colors");
+  async uncolor() {
+    await this._db.colors.remove(this._note.color, this._note.id);
+    await this._db.notes._collection.addItem({
+      ...this._note,
+      color: undefined,
+    });
   }
 
   async tag(tag) {
