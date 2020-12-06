@@ -38,10 +38,27 @@
 
         </div>
 
+
+    <div id="titlebarAlt">
+    
+        <input maxlength="150" id="simpleTitleInput" placeholder="Title here"></input>
+        <div class="info-bar info-bar-alt">
+          <p id="infowords"></p>
+          <p>-</p>
+          <p id="infodate"></p>
+          <p>-</p>
+          <p id="infosaved"></p>
+        </div>
+   </div>
+
         <div id="editor"></div>
     </div>
     <div id="toolbar"></div>
 </body>
+<script>
+    let editor;
+    let isTablet = false;
+    </script>
 <script src="quill.js"></script>
 <script src="module.js"></script>
 <script src="magic-url.js"></script>
@@ -51,8 +68,6 @@
 <script src="image-resize.min.js"></script>
 
 <script>
-    let editor;
-
     const List = Quill.import("formats/list");
     let BlockEmbed = Quill.import("blots/block/embed");
     class HorizontalRule extends BlockEmbed { }
@@ -432,7 +447,8 @@
         },
     };
 
-    function loadAction(premium, noMenu) {
+    function loadAction(premium, tab) {
+        isTablet = tab;
         setFonts();
         Quill.register("modules/imageCompressor", imageCompressor);
         Quill.register("formats/lists", BetterList);

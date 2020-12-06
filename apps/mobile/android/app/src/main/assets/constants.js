@@ -314,7 +314,7 @@ const setTheme = function () {
     border-color:${pageTheme.colors.nav};
   }
   .ql-container {
-    font-size:${pageTheme.colors.factor * 18};
+    font-size:${pageTheme.colors.factor * 15};
     color:${pageTheme.colors.pri};
   }
   .info-bar {
@@ -339,6 +339,44 @@ const setTheme = function () {
       font-size: 25px;
     
     }   
+
+    #simpleTitleInput {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600 !important;
+      background-color: transparent;
+      border: none;
+      width: 100%;
+      outline: none;
+      font-size: 24px;
+      padding-right: 12px;
+      padding-left:12px;
+      height:50px;
+    }
+    .info-bar {
+      margin-bottom:${isTablet ? '12px !important' : '0px !important'};
+      padding-left:12px;
+    }
+
+    #titlebarAlt {
+      height:50px;
+      display:${isTablet ? 'none !important' : 'flex !important'};
+      justify-content: center;
+      flex-direction: column;
+    }
+    #titlebar {
+      display:${!isTablet ? 'none !important' : 'flex !important'};
+    }
+    .ql-container {
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+      margin: 0px;
+      position: relative;
+      height:${
+        isTablet
+          ? 'calc(100% - 260px) !important'
+          : 'calc(100% - 110px) !important'
+      };
+    }
     
 
                 `;

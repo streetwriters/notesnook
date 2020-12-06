@@ -1,11 +1,13 @@
-let scrollTimer = null;
-
+let titleInput = isTablet ? 'titleInput' : 'simpleTitleInput';
+let infoBar = isTablet ? '.info-bar' : '.info-bar-alt';
+let info = null;
 function attachTitleInputListeners() {
+  titleInput = isTablet ? 'titleInput' : 'simpleTitleInput';
+  infoBar = isTablet ? '.info-bar' : '.info-bar-alt';
   document.addEventListener(
     'DOMContentLoaded',
     () => {
       autosize();
-
       document
         .querySelector('.app-main')
         .addEventListener('scroll', (event) => {
@@ -17,7 +19,7 @@ function attachTitleInputListeners() {
             window.ReactNativeWebView.postMessage(
               JSON.stringify({
                 visible: document.querySelector('.app-main').scrollTop,
-                title: document.getElementById('titleInput').value,
+                title: document.getElementById(titleInput).value,
                 type: 'scroll',
               }),
             );
@@ -34,7 +36,7 @@ function attachTitleInputListeners() {
     onTitleChange();
   };
 
-  document.getElementById('titleInput').onkeypress = function (evt) {
+  document.getElementById(titleInput).onkeypress = function (evt) {
     if (evt.keyCode === 13 || evt.which === 13) {
       evt.preventDefault();
       editor.focus();
@@ -44,15 +46,15 @@ function attachTitleInputListeners() {
     }
   };
 
-  document.getElementById('titleInput').onkeydown = function (evt) {
+  document.getElementById(titleInput).onkeydown = function (evt) {
     onTitleChange(evt);
   };
 
-  document.getElementById('titleInput').onchange = function (evt) {
+  document.getElementById(titleInput).onchange = function (evt) {
     autosize();
   };
 
-  document.getElementById('titleInput').onkeyup = function (evt) {
+  document.getElementById(titleInput).onkeyup = function (evt) {
     onTitleChange(evt);
   };
 }
@@ -60,7 +62,7 @@ function attachTitleInputListeners() {
 function onTitleChange(ele) {
   let titleMessage = {
     type: 'title',
-    value: document.getElementById('titleInput').value,
+    value: document.getElementById(titleInput).value,
   };
   autosize();
   if (titleMessage && typeof titleMessage.value === 'string') {
@@ -69,15 +71,19 @@ function onTitleChange(ele) {
 }
 
 function autosize() {
-  document.getElementById('textCopy').innerHTML = document
-    .getElementById('titleInput')
-    .value.replace(/\n/g, '<br/>');
+  if (isTablet) {
+    document.getElementById('textCopy').innerHTML = document
+      .getElementById(titleInput)
+      .value.replace(/\n/g, '<br/>');
+  }
 }
 
 function attachEditorListeners() {
   /*  editor.once('text-change', function () {
     window.ReactNativeWebView.postMessage('loaded');
   }); */
+  titleInput = isTablet ? 'titleInput' : 'simpleTitleInput';
+  infoBar = isTablet ? '.info-bar' : '.info-bar-alt';
 
   document.addEventListener('message', (data) => {
     let message = JSON.parse(data.data);
@@ -92,14 +98,16 @@ function attachEditorListeners() {
       case 'reset': {
         editor.history.clear();
         editor.setText('', 'api');
-        document.getElementById('titleInput').value = '';
-        document.getElementById('titleInput').blur();
+        document.getElementById(titleInput).value = '';
+        document.getElementById(titleInput).blur();
         editor.blur();
-        document.getElementById('titleInput').blur();
+        document.getElementById(titleInput).blur();
         window.blur();
-        document.getElementById('infodate').innerText = '';
-        document.getElementById('infosaved').innerText = '';
-        document.getElementById('infowords').innerText = '';
+
+        info = document.querySelector(infoBar);
+        info.querySelector('#infodate').innerText = '';
+        info.querySelector('#infosaved').innerText = '';
+        info.querySelector('#infowords').innerText = '';
         autosize();
         break;
       }
@@ -118,7 +126,7 @@ function attachEditorListeners() {
         }
         break;
       case 'blur':
-        document.getElementById('titleInput').blur();
+        document.getElementById(titleInput).blur();
         editor.blur();
         window.blur();
         break;
@@ -132,18 +140,21 @@ function attachEditorListeners() {
         editor.history.clear();
         break;
       case 'dateEdited':
-        document.getElementById('infodate').innerText = value;
+        linfo = document.querySelector(infoBar);
+        info.querySelector('#infodate').innerText = value;
         break;
       case 'saving':
-        document.getElementById('infosaved').innerText = value;
+        info = document.querySelector(infoBar);
+        info.querySelector('#infosaved').innerText = value;
         break;
       case 'text':
         editor.setText(value, 'api');
 
         setTimeout(() => {
-          document.getElementById('infowords').innerText =
+          info = document.querySelector(infoBar);
+          info.querySelector('#infowords').innerText =
             editor.getText().split(' ').length + ' words';
-          document.getElementById('infosaved').innerText = 'Saved';
+            info.querySelector('#infosaved').innerText = 'Saved';
         }, 100);
 
         break;
@@ -151,13 +162,13 @@ function attachEditorListeners() {
         editor.setText('', 'api');
         break;
       case 'clearTitle':
-        document.getElementById('titleInput').value = '';
+        document.getElementById(titleInput).value = '';
         break;
       case 'focusEditor':
         editor.focus();
         break;
       case 'focusTitle':
-        document.getElementById('titleInput').focus();
+        document.getElementById(titleInput).focus();
         autosize();
         break;
       case 'nomenu':
@@ -175,9 +186,7 @@ function attachEditorListeners() {
         }
         break;
       case 'title':
-        document.getElementById('titleInput').value = JSON.parse(
-          data.data,
-        ).value;
+        document.getElementById(titleInput).value = JSON.parse(data.data).value;
         autosize();
         break;
       case 'theme':
@@ -190,9 +199,10 @@ function attachEditorListeners() {
         editor.setContents(content, 'api');
 
         setTimeout(() => {
-          document.getElementById('infowords').innerText =
+          info = document.querySelector(infoBar);
+          info.querySelector('#infowords').innerText =
             editor.getText().split(' ').length + ' words';
-          document.getElementById('infosaved').innerText = 'Saved';
+            info.querySelector('#infosaved').innerText = 'Saved';
 
           document.body.scrollTop = 0; // For Safari
           document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
@@ -251,12 +261,13 @@ function attachEditorListeners() {
         });
       }
     }
-    let infowords = document.getElementById('infowords');
+    info = document.querySelector(infoBar);
+    let infowords = info.querySelector('#infowords');
     if (infowords) {
-      document.getElementById('infowords').innerText =
-      editor.getText().split(' ').length + ' words';
+      infowords.innerText =
+        editor.getText().split(' ').length + ' words';
     }
-    
+
     if (deltaTimeout) {
       clearTimeout(deltaTimeout);
       deltaTimeout = null;
