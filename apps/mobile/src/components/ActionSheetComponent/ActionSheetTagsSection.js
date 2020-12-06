@@ -73,22 +73,7 @@ export const ActionSheetTagsSection = ({item, close}) => {
         ToastEvent.show(e.message, 'error', 'local');
       }
     }
-
-    if (
-      tags.length >= 5 &&
-      tags.findIndex((t) => t.title === tagToAdd) === -1
-    ) {
-      await PremiumService.verify(add, () => {
-        eSendEvent(eShowGetPremium, {
-          context: 'sheet',
-          title: 'Get Notesnook Pro',
-          desc: 'To create more tags for your notes become a Pro user today.',
-        });
-      });
-
-      return;
-    }
-
+    
     await add();
   });
 

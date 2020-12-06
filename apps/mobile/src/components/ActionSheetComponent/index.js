@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import Share from 'react-native-share';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { notesnook } from '../../../e2e/test.ids';
+import {notesnook} from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {DDS} from '../../services/DeviceDetection';
@@ -254,7 +254,7 @@ export const ActionSheetComponent = ({
       on: colors.night ? true : false,
       close: false,
       nopremium: true,
-      id:notesnook.ids.dialogs.actionsheet.night
+      id: notesnook.ids.dialogs.actionsheet.night,
     },
     {
       name: 'Pin',
@@ -296,7 +296,7 @@ export const ActionSheetComponent = ({
       close: false,
       check: true,
       on: note.pinned,
-      id:notesnook.ids.dialogs.actionsheet.pin
+      id: notesnook.ids.dialogs.actionsheet.pin,
     },
     {
       name: 'Favorite',
@@ -315,7 +315,7 @@ export const ActionSheetComponent = ({
       close: false,
       check: true,
       on: note.favorite,
-      id:notesnook.ids.dialogs.actionsheet.favorite
+      id: notesnook.ids.dialogs.actionsheet.favorite,
     },
     {
       name: isPinnedToMenu ? 'Unpin from Menu' : 'Pin to Menu',
@@ -341,7 +341,7 @@ export const ActionSheetComponent = ({
       close: false,
       check: true,
       on: isPinnedToMenu,
-      id:notesnook.ids.dialogs.actionsheet.pinMenu
+      id: notesnook.ids.dialogs.actionsheet.pinMenu,
     },
   ];
 
@@ -476,43 +476,32 @@ export const ActionSheetComponent = ({
   };
 
   const onPressVaultButton = async () => {
-    await PremiumService.verify(
-      () => {
-        if (!note.id) return;
-
-        if (note.locked) {
-          close('unlock');
-        } else {
-          db.vault
-            .add(note.id)
-            .then(() => {
-              sendNoteEditedEvent(note.id, false, true);
+    if (!note.id) return;
+    if (note.locked) {
+      close('unlock');
+    } else {
+      db.vault
+        .add(note.id)
+        .then(() => {
+          sendNoteEditedEvent(note.id, false, true);
+          if (note.locked && PremiumService.get()) {
+            close();
+          }
+        })
+        .catch(async (e) => {
+          switch (e.message) {
+            case db.vault.ERRORS.noVault:
+              close('novault');
+              break;
+            case db.vault.ERRORS.vaultLocked:
+              close('locked');
+              break;
+            case db.vault.ERRORS.wrongPassword:
               close();
-            })
-            .catch(async (e) => {
-              switch (e.message) {
-                case db.vault.ERRORS.noVault:
-                  close('novault');
-                  break;
-                case db.vault.ERRORS.vaultLocked:
-                  close('locked');
-                  break;
-                case db.vault.ERRORS.wrongPassword:
-                  close();
-                  break;
-              }
-            });
-        }
-      },
-      () => {
-        eSendEvent(eShowGetPremium, {
-          context: 'sheet',
-          title: 'Add Notes to Vault',
-          desc:
-            'With Notesnook Pro you can add notes to your vault and do so much more! Get it now.',
+              break;
+          }
         });
-      },
-    );
+    }
   };
 
   return (

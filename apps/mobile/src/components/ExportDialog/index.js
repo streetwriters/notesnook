@@ -3,7 +3,7 @@ import {Platform, StyleSheet, TouchableOpacity, View} from 'react-native';
 import FileViewer from 'react-native-file-viewer';
 import {exp} from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { notesnook } from '../../../e2e/test.ids';
+import {notesnook} from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
 import {DDS} from '../../services/DeviceDetection';
 import {eSendEvent, ToastEvent} from '../../services/EventManager';
@@ -91,44 +91,20 @@ const ExportDialog = () => {
     {
       title: 'PDF',
       func: async () => {
-        await PremiumService.verify(
-          async () => {
-            await save(Exporter.saveToPDF, 'PDF');
-          },
-          () => {
-            eSendEvent(eShowGetPremium, {
-              context: 'export',
-              title: 'Export in PDF, MD & HTML',
-              desc:
-                'Get Notesnook Pro to export your notes in PDF, Markdown and HTML formats!',
-            });
-          },
-        );
+        await save(Exporter.saveToPDF, 'PDF');
       },
       icon: 'file-pdf-box',
       desc: 'Most commonly used, opens on any device.',
-      id:notesnook.ids.dialogs.export.pdf
+      id: notesnook.ids.dialogs.export.pdf,
     },
     {
       title: 'Markdown',
       func: async () => {
-        await PremiumService.verify(
-          async () => {
-            await save(Exporter.saveToMarkdown, 'Markdown');
-          },
-          () => {
-            eSendEvent(eShowGetPremium, {
-              context: 'export',
-              title: 'Export in PDF, MD & HTML',
-              desc:
-                'Get Notesnook Pro to export your notes in PDF, Markdown and HTML formats!',
-            });
-          },
-        );
+        await save(Exporter.saveToMarkdown, 'Markdown');
       },
       icon: 'language-markdown',
       desc: 'Most commonly used, opens on any device.',
-      id:notesnook.ids.dialogs.export.md
+      id: notesnook.ids.dialogs.export.md,
     },
     {
       title: 'Plain Text',
@@ -137,28 +113,16 @@ const ExportDialog = () => {
       },
       icon: 'card-text',
       desc: 'A plain text file with no formatting.',
-      id:notesnook.ids.dialogs.export.text
+      id: notesnook.ids.dialogs.export.text,
     },
     {
       title: 'HTML',
       func: async () => {
-        await PremiumService.verify(
-          async () => {
-            await save(Exporter.saveToHTML, 'Html');
-          },
-          () => {
-            eSendEvent(eShowGetPremium, {
-              context: 'export',
-              title: 'Export in PDF, MD & HTML',
-              desc:
-                'Get Notesnook Pro to export your notes in PDF, Markdown and HTML formats!',
-            });
-          },
-        );
+        await save(Exporter.saveToHTML, 'Html');
       },
       icon: 'language-html5',
       desc: 'A file that can be opened in a browser.',
-      id:notesnook.ids.dialogs.export.html
+      id: notesnook.ids.dialogs.export.html,
     },
   ];
 

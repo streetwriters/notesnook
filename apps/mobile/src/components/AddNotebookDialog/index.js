@@ -11,13 +11,15 @@ import {
 } from 'react-native';
 import {FlatList, TextInput} from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { notesnook } from '../../../e2e/test.ids';
+import {notesnook} from '../../../e2e/test.ids';
 import {Actions} from '../../provider/Actions';
 import {DDS} from '../../services/DeviceDetection';
-import {ToastEvent} from '../../services/EventManager';
+import {eSendEvent, ToastEvent} from '../../services/EventManager';
 import {db} from '../../utils/DB';
+import {eShowGetPremium} from '../../utils/Events';
 import {ph, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
 import {ActionIcon} from '../ActionIcon';
+import {GetPremium} from '../ActionSheetComponent/GetPremium';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogHeader from '../Dialog/dialog-header';
 import {updateEvent} from '../DialogManager/recievers';
@@ -185,8 +187,6 @@ export class AddNotebookDialog extends React.Component {
     this.close();
     updateEvent({type: Actions.NOTEBOOKS});
     updateEvent({type: Actions.PINNED});
-
-    //ToastEvent.show('New notebook added', 'success', 'local');
   };
 
   onSubmit = (forward = true) => {
@@ -441,7 +441,6 @@ export class AddNotebookDialog extends React.Component {
               <DialogButtons
                 negativeTitle="Cancel"
                 positiveTitle={toEdit && toEdit.dateCreated ? 'Save' : 'Add'}
-                
                 onPressPositive={this.addNewNotebook}
                 onPressNegative={this.close}
               />

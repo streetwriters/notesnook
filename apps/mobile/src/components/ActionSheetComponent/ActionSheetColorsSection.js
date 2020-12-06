@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { notesnook } from '../../../e2e/test.ids';
+import {notesnook} from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {DDS} from '../../services/DeviceDetection';
@@ -11,12 +11,12 @@ import {dWidth} from '../../utils';
 import {COLORS_NOTE} from '../../utils/Colors';
 import {hexToRGBA, RGB_Linear_Shade} from '../../utils/ColorUtils';
 import {db} from '../../utils/DB';
-import { eShowGetPremium } from '../../utils/Events';
+import {eShowGetPremium} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
-import { sleep } from '../../utils/TimeUtils';
+import {sleep} from '../../utils/TimeUtils';
 import {PressableButton} from '../PressableButton';
 
-export const ActionSheetColorsSection = ({item,close}) => {
+export const ActionSheetColorsSection = ({item, close}) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
   const [note, setNote] = useState(item);
@@ -49,23 +49,15 @@ export const ActionSheetColorsSection = ({item,close}) => {
         testID={notesnook.ids.dialogs.actionsheet.color(c)}
         key={color.value}
         onPress={async () => {
-          await PremiumService.verify(async () => {
-            let noteColors = note.colors;
-            if (noteColors.includes(color.name)) {
-              await db.notes.note(note.id).uncolor(color.name);
-            } else {
-              await db.notes.note(note.id).color(color.name);
-            }
-            dispatch({type: Actions.COLORS});
-            sendNoteEditedEvent(note.id, false, true);
-            localRefresh();
-          },() => {
-            eSendEvent(eShowGetPremium,{
-              context:'sheet',
-              title:'Get Notesnook Pro',
-              desc:'To assign color to a note get Notesnook Pro today.'
-            })
-          });
+          let noteColors = note.colors;
+          if (noteColors.includes(color.name)) {
+            await db.notes.note(note.id).uncolor(color.name);
+          } else {
+            await db.notes.note(note.id).color(color.name);
+          }
+          dispatch({type: Actions.COLORS});
+          sendNoteEditedEvent(note.id, false, true);
+          localRefresh();
         }}
         customStyle={{
           width: DDS.isTab ? 400 / 10 : dWidth / 10,

@@ -17,6 +17,10 @@ async function setPremiumStatus(status) {
 	  }
 }
 
+function get() {
+  return premiumStatus && premiumStatus !== 0 && premiumStatus !== 4
+}
+
 async function verify(callback,error) {
   try {
 	let user = await db.user.get();
@@ -40,5 +44,6 @@ async function verify(callback,error) {
 
 export default {
   verify,
-  setPremiumStatus
+  setPremiumStatus,
+  get
 };

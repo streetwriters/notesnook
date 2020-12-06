@@ -10,7 +10,7 @@ function getIntent() {
     try {
       if (isIos) {
         initialUrlIOS = await Linking.getInitialURL();
-        if (res && res.startsWith('ShareMedia://dataUrl')) {
+        if (initialUrlIOS && initialUrlIOS.startsWith('ShareMedia://dataUrl')) {
           _data = await ReceiveSharingIntent.getFileNames(initialUrlIOS.url);
         } else {
           reject('unsupported url');

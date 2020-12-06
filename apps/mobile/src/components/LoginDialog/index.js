@@ -204,7 +204,7 @@ const LoginDialog = () => {
   return !visible ? null : (
     <Modal
       animated={true}
-      animationType={DDS.isTab ? 'fade' : 'slide'}
+      animationType={DDS.isLargeTablet() ? 'fade' : 'slide'}
       statusBarTranslucent={true}
       onRequestClose={close}
       visible={true}
