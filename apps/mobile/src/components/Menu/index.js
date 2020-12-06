@@ -76,6 +76,7 @@ export const Menu = React.memo(
             <>
               {MenuItemsList.map((item, index) => (
                 <MenuListItem
+                  key={item.name}
                   item={item}
                   testID={item.name}
                   index={index}
