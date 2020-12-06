@@ -12,11 +12,13 @@ export const migrations = {
         item.notebooks = [notebook];
       }
       item.remote = true;
+      item.dateEdited = Date.now();
       return item;
     },
     delta: function (item) {
       item.data = item.data.ops;
       item.type = "delta";
+      item.dateEdited = Date.now();
       return item;
     },
     trash: function (item) {
@@ -26,6 +28,7 @@ export const migrations = {
         item.contentId = item.content.delta;
         delete item.content;
       }
+      item.dateEdited = Date.now();
       return item;
     },
   },
@@ -36,6 +39,7 @@ export const migrations = {
       delete item.notebook;
       item.remote = true;
       if (notebook) item.notebooks = [notebook];
+      item.dateEdited = Date.now();
       return item;
     },
   },

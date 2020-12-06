@@ -4,6 +4,7 @@ import getId from "../utils/id";
 export default class Content extends Collection {
   async add(content) {
     if (!content) return;
+    if (content.deleted) return await this._collection.addItem(content);
 
     if (content.id && (await this._collection.exists(content.id))) {
       content = {

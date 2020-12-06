@@ -12,7 +12,9 @@ class Merger {
 
   _migrate(item, deserialized) {
     const version = item.v || 0;
-    const migrate = migrations[version][item.type];
+    let type = deserialized.type;
+    if (deserialized.data) type = "delta";
+    const migrate = migrations[version][type];
     if (migrate) return migrate(deserialized);
     return deserialized;
   }
