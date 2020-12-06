@@ -1,34 +1,32 @@
 let requiring = null;
 const pageTheme = {
-    colors: {
-        accent: '#0560FF',
-        shade: '#0560FF12',
-        fg: '#0560FF',
-        normal: 'black',
-        icon: 'gray',
-        errorBg: '#FFD2D2',
-        errorText: '#D8000C',
-        successBg: '#DFF2BF',
-        successText: '#4F8A10',
-        warningBg: '#FEEFB3',
-        warningText: '#9F6000',
-        night: false,
-        bg: 'white',
-        navbg: '#f6fbfc',
-        nav: '#f0f0f0',
-        pri: 'black',
-        sec: 'white',
-        factor: 1
-    }
-}
+  colors: {
+    accent: '#0560FF',
+    shade: '#0560FF12',
+    fg: '#0560FF',
+    normal: 'black',
+    icon: 'gray',
+    errorBg: '#FFD2D2',
+    errorText: '#D8000C',
+    successBg: '#DFF2BF',
+    successText: '#4F8A10',
+    warningBg: '#FEEFB3',
+    warningText: '#9F6000',
+    night: false,
+    bg: 'white',
+    navbg: '#f6fbfc',
+    nav: '#f0f0f0',
+    pri: 'black',
+    sec: 'white',
+    factor: 1,
+  },
+};
 
 const setTheme = function () {
+  let css = document.createElement('style');
+  css.type = 'text/css';
 
-
-    let css = document.createElement('style');
-    css.type = 'text/css';
-
-    let node = `
+  let node = `
     .ql-snow.ql-toolbar button.ql-active,
     .ql-snow .ql-toolbar button.ql-active,
     .ql-snow.ql-toolbar .ql-picker-label:hover,
@@ -187,7 +185,7 @@ const setTheme = function () {
     color: ${pageTheme.colors.icon};
     display: inline-block;
     float: left;
-    font-size:${(pageTheme.colors.factor * 13)};
+    font-size:${pageTheme.colors.factor * 13};
     font-weight: 500;
     position: relative;
     vertical-align: middle;
@@ -243,7 +241,7 @@ const setTheme = function () {
     padding: 5px 12px;
     white-space: nowrap;
     position: absolute;
-    font-size:${(pageTheme.colors.factor * 11)};
+    font-size:${pageTheme.colors.factor * 11};
   }
   
   .ql-snow .ql-tooltip a.ql-action::after {
@@ -262,8 +260,8 @@ const setTheme = function () {
   .ql-snow.ql-toolbar button,
     .ql-snow .ql-toolbar button {
       
-      height: ${(pageTheme.colors.factor * 32)};
-      width: ${(pageTheme.colors.factor * 36)};
+      height: ${pageTheme.colors.factor * 32};
+      width: ${pageTheme.colors.factor * 36};
     }
   
 
@@ -308,7 +306,7 @@ const setTheme = function () {
     border-color:${pageTheme.colors.nav};
   }
   .ql-container {
-    font-size:${(pageTheme.colors.factor * 18)};
+    font-size:${pageTheme.colors.factor * 15};
     color:${pageTheme.colors.pri};
   }
 
@@ -335,196 +333,216 @@ const setTheme = function () {
       font-size: 25px;
     
     }  
+
+    #simpleTitleInput {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600 !important;
+      background-color: transparent;
+      border: none;
+      width: 100%;
+      outline: none;
+      font-size: 24px;
+      padding-right: 12px;
+      padding-left:12px;
+      height:50px;
+    }
+    .info-bar {
+      margin-bottom:${isTablet ? '12px !important' : '0px !important'};
+      padding-left:12px;
+    }
+
+    #titlebarAlt {
+      height:50px;
+      display:${isTablet ? 'none !important' : 'flex !important'};
+      justify-content: center;
+      flex-direction: column;
+    }
+    #titlebar {
+      display:${!isTablet ? 'none !important' : 'flex !important'};
+    }
+    .ql-container {
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+      margin: 0px;
+      position: relative;
+      height:${
+        isTablet
+          ? 'calc(100% - 260px) !important'
+          : 'calc(100% - 110px) !important'
+      };
+    }
  
-                `
-    css.appendChild(document.createTextNode(node));
-    document.getElementsByTagName("head")[0].appendChild(css);
-}
+                `;
+  css.appendChild(document.createTextNode(node));
+  document.getElementsByTagName('head')[0].appendChild(css);
+};
 
 let proToolbar = [
-    [{header: 1}, {header: 2}],
-    [{size: ['small', false, 'large', 'huge']}], // custom dropdown
-    ['bold', 'italic', 'image'], // toggled buttons
-    [{list: 'ordered'}, {list: 'bullet'}, {list: 'check'}],
-    [{header: [3, 4, 5, 6]}],
-    [{align: []}],
-    [{color: []}, {background: []}], // dropdown with defaults from theme
-    ['underline', 'strike', 'blockquote', 'code-block'],
-    [{script: 'sub'}, {script: 'super'}], // superscript/subscript
-    [{indent: '-1'}, {indent: '+1'}], // outdent/indent
-    [{direction: 'rtl'}], // text direction
-    ['clean'],
+  [{header: 1}, {header: 2}],
+  [{size: ['small', false, 'large', 'huge']}], // custom dropdown
+  ['bold', 'italic', 'image'], // toggled buttons
+  [{list: 'ordered'}, {list: 'bullet'}, {list: 'check'}],
+  [{header: [3, 4, 5, 6]}],
+  [{align: []}],
+  [{color: []}, {background: []}], // dropdown with defaults from theme
+  ['underline', 'strike', 'blockquote', 'code-block'],
+  [{script: 'sub'}, {script: 'super'}], // superscript/subscript
+  [{indent: '-1'}, {indent: '+1'}], // outdent/indent
+  [{direction: 'rtl'}], // text direction
+  ['clean'],
 ];
 let simpleToolbar = [
-    [{header: 1}, {header: 2}],
-    ['bold', 'italic', 'underline', 'strike'], // toggled buttons
-    [{align: []}],
-    [{direction: 'rtl'}], // text direction
-
+  [{header: 1}, {header: 2}],
+  ['bold', 'italic', 'underline', 'strike'], // toggled buttons
+  [{align: []}],
+  [{direction: 'rtl'}], // text direction
 ];
 
 let fonts = ['DM Sans', 'sans-serif'];
-let fontNames = fonts.map(font => getFontName(font));
+let fontNames = fonts.map((font) => getFontName(font));
 function getFontName(font) {
-    return font.toLowerCase().replace(/\s/g, '-');
+  return font.toLowerCase().replace(/\s/g, '-');
 }
 
 function addLinkMatcher() {
-    editor.clipboard.addMatcher(Node.TEXT_NODE, function (node, delta) {
-        let regex = /https?:\/\/[^\s]+/g;
-        if (typeof node.data !== 'string') return;
+  editor.clipboard.addMatcher(Node.TEXT_NODE, function (node, delta) {
+    let regex = /https?:\/\/[^\s]+/g;
+    if (typeof node.data !== 'string') return;
 
-        let matches = node.data.toLowerCase().match(regex);
+    let matches = node.data.toLowerCase().match(regex);
 
-        if (matches && matches.length > 0) {
-            let ops = [];
-            let str = node.data;
-            matches.forEach(function (match) {
-                let split = str.split(match);
-                let beforeLink = split.shift();
-                ops.push({insert: beforeLink});
-                ops.push({insert: match, attributes: {link: match}});
-                str = split.join(match);
-            });
-            ops.push({insert: str});
-            delta.ops = ops;
-        }
+    if (matches && matches.length > 0) {
+      let ops = [];
+      let str = node.data;
+      matches.forEach(function (match) {
+        let split = str.split(match);
+        let beforeLink = split.shift();
+        ops.push({insert: beforeLink});
+        ops.push({insert: match, attributes: {link: match}});
+        str = split.join(match);
+      });
+      ops.push({insert: str});
+      delta.ops = ops;
+    }
 
-        return delta;
-    });
+    return delta;
+  });
 }
 
 function setFonts() {
-    // specify the fonts you would
-    let fontStyles = '';
-    fonts.forEach(function (font) {
-        let fontName = getFontName(font);
-        fontStyles +=
-            '.ql-snow .ql-picker.ql-font .ql-picker-label[data-value=' +
-            fontName +
-            ']::before, .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=' +
-            fontName +
-            ']::before {' +
-            "content: '" +
-            font +
-            "';" +
-            "font-family: '" +
-            font +
-            "';" +
-            '}' +
-            '.ql-font-' +
-            fontName +
-            '{' +
-            " font-family: '" +
-            font +
-            "';" +
-            '}';
-    });
-    let node = document.createElement('style');
-    node.innerHTML = fontStyles;
-    document.body.appendChild(node);
+  // specify the fonts you would
+  let fontStyles = '';
+  fonts.forEach(function (font) {
+    let fontName = getFontName(font);
+    fontStyles +=
+      '.ql-snow .ql-picker.ql-font .ql-picker-label[data-value=' +
+      fontName +
+      ']::before, .ql-snow .ql-picker.ql-font .ql-picker-item[data-value=' +
+      fontName +
+      ']::before {' +
+      "content: '" +
+      font +
+      "';" +
+      "font-family: '" +
+      font +
+      "';" +
+      '}' +
+      '.ql-font-' +
+      fontName +
+      '{' +
+      " font-family: '" +
+      font +
+      "';" +
+      '}';
+  });
+  let node = document.createElement('style');
+  node.innerHTML = fontStyles;
+  document.body.appendChild(node);
 }
 
 function fixDropdownMenuLocations() {
-    document.querySelectorAll('.ql-picker').forEach(e => {
-        e.addEventListener('mousedown', function (e) {
-            e.preventDefault();
+  document.querySelectorAll('.ql-picker').forEach((e) => {
+    e.addEventListener('mousedown', function (e) {
+      e.preventDefault();
+    });
+  });
 
-        })
-    })
+  document.querySelectorAll('.ql-picker-label').forEach((e) => {
+    e.addEventListener('click', function (evt) {
+      let top;
+      let left;
+      let menu;
+      let evtItemWidth;
+      let evtItemHeight;
 
-    document.querySelectorAll('.ql-picker-label').forEach(e => {
-        e.addEventListener('click', function (evt) {
+      if (!evt.target.offsetParent) {
+        let _myLocalElement = evt.target.parentElement;
 
-            let top;
-            let left;
-            let menu;
-            let evtItemWidth;
-            let evtItemHeight;
+        var rect = _myLocalElement.getBoundingClientRect();
+        evtItemWidth = _myLocalElement.offsetParent.offsetWidth;
+        evtItemHeight = _myLocalElement.offsetParent.offsetHeight;
 
-            if (!evt.target.offsetParent) {
-              
-                let _myLocalElement = evt.target.parentElement;
-                
-                var rect = _myLocalElement.getBoundingClientRect();
-                evtItemWidth = _myLocalElement.offsetParent.offsetWidth;
-                evtItemHeight = _myLocalElement.offsetParent.offsetHeight;
+        top = rect.top;
+        left = rect.left;
 
-                top = rect.top;
-                left = rect.left;
+        menu = _myLocalElement.attributes.getNamedItem('aria-controls').value;
+      } else {
+        //left = evt.target.offsetParent.offsetLeft;
+        evtItemWidth = evt.target.offsetParent.offsetWidth;
+        evtItemHeight = evt.target.offsetParent.offsetHeight;
 
-                menu = _myLocalElement.attributes.getNamedItem('aria-controls').value;
-                
-            } else {
-                //left = evt.target.offsetParent.offsetLeft;
-                evtItemWidth = evt.target.offsetParent.offsetWidth;
-                evtItemHeight = evt.target.offsetParent.offsetHeight;
+        var rect = evt.target.offsetParent.getBoundingClientRect();
+        top = rect.top;
+        left = rect.left;
+        menu = evt.target.attributes.getNamedItem('aria-controls').value;
+      }
 
+      let menuHeight = document.getElementById(menu).offsetHeight;
+      let menuWidth = document.getElementById(menu).offsetWidth;
+      let wDiff;
+      if (menuWidth < evtItemWidth) {
+        wDiff = evtItemWidth - menuWidth;
+        left = left + wDiff / 2;
+      } else {
+        wDiff = menuWidth - evtItemWidth;
+        left = left - wDiff / 2;
+      }
 
-                var rect = evt.target.offsetParent.getBoundingClientRect();
-                top = rect.top;
-                left = rect.left;
-                menu = evt.target.attributes.getNamedItem('aria-controls').value;
-            }
+      dropDownFixPosition(
+        '.ql-picker-label',
+        menu,
+        top,
+        left,
+        menuHeight,
+        menuWidth,
+      );
+    });
+  });
 
+  function dropDownFixPosition(button, dropdown, top, left, height, width) {
+    let b = document.querySelector(button);
 
-            let menuHeight = document.getElementById(menu).offsetHeight;
-            let menuWidth = document.getElementById(menu).offsetWidth;
-            let wDiff;
-            if (menuWidth < evtItemWidth) {
-                wDiff = evtItemWidth - menuWidth;
-                left = left + (wDiff / 2);
-            } else {
-                wDiff = menuWidth - evtItemWidth;
-                left = left - (wDiff / 2);
-            }
+    var dropDownTop = top - b.offsetHeight / 2 - height;
 
+    let screenWidth = window.outerWidth;
 
-            dropDownFixPosition(
-                '.ql-picker-label',
-                menu,
-                top,
-                left,
-                menuHeight,
-                menuWidth
-            )
-
-        })
-    })
-
-
-    function dropDownFixPosition(button, dropdown, top, left, height, width) {
-
-        let b = document.querySelector(button);
-
-        var dropDownTop = top - (b.offsetHeight / 2) - height;
-
-        let screenWidth = window.outerWidth;
-
-        if (left + width > screenWidth) {
-            left = left - (left + width - screenWidth);
-            left -= 10;
-
-        }
-        document.getElementById(dropdown).style.top = dropDownTop;
-        document.getElementById(dropdown).style.left = left;
-
-        //dropdown.css('top', dropDownTop + 'px');
-        //dropdown.css('left', left + 'px');
-
-        window.addEventListener('resize', function () {
-
-
-            let currentTop = document.querySelector('#toolbar').offsetTop;
-
-            let downTop =
-                currentTop - b.offsetHeight - height;
-
-
-            document.getElementById(dropdown).style.top = downTop + 20;
-            document.getElementById(dropdown).style.left = left;
-
-
-        })
+    if (left + width > screenWidth) {
+      left = left - (left + width - screenWidth);
+      left -= 10;
     }
+    document.getElementById(dropdown).style.top = dropDownTop;
+    document.getElementById(dropdown).style.left = left;
+
+    //dropdown.css('top', dropDownTop + 'px');
+    //dropdown.css('left', left + 'px');
+
+    window.addEventListener('resize', function () {
+      let currentTop = document.querySelector('#toolbar').offsetTop;
+
+      let downTop = currentTop - b.offsetHeight - height;
+
+      document.getElementById(dropdown).style.top = downTop + 20;
+      document.getElementById(dropdown).style.left = left;
+    });
+  }
 }

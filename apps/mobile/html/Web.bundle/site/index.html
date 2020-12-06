@@ -20,17 +20,48 @@
     .ql-toolbar::-webkit-scrollbar {
       display: none;
     }
+
+
+    #simpleTitleInput {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600 !important;
+      background-color: transparent;
+      border: none;
+      width: 100%;
+      outline: none;
+      font-size: 24px;
+      padding-right: 12px;
+      padding-left:12px;
+      height:50px;
+    }
+    .info-bar {
+      margin-bottom: 0px !important;
+    }
+
+    #titlebarAlt {
+      height:50px;
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+    }
+    #titlebar {
+      display: none !important;
+    }
+
+
+
   </style>
 
 </head>
 
 <body class="app-body">
   <div class="app-main">
-    <div id="titlebar">
-      <form id="formBox">
+     <div id="titlebar">
+    <form id="formBox">
         <textarea maxlength="150" id="titleInput" placeholder="Title here"></textarea>
+
         <div id="textCopy"></div>
-      </form>
+      </form> 
       <div class="info-bar">
         <p id="infowords"></p>
         <p>-</p>
@@ -38,20 +69,37 @@
         <p>-</p>
         <p id="infosaved"></p>
       </div>
+    </div> 
+
+    <div id="titlebarAlt">
+    
+         <input maxlength="150" id="simpleTitleInput" placeholder="Title here"></input>
+         <div class="info-bar info-bar-alt">
+           <p id="infowords"></p>
+           <p>-</p>
+           <p id="infodate"></p>
+           <p>-</p>
+           <p id="infosaved"></p>
+         </div>
     </div>
+
+
     <div id="editor"></div>
   </div>
   <div id="toolbar"></div>
 </body>
+<script>
+  let editor;
+  let isTablet = false;
+  </script>
 <script src="quill.js"></script>
 <script src="constants.js"></script>
-<script src="listeners.js"></script>
 <script src="module.js"></script>
 <script src="image-resize.min.js"></script>
 <script src="magic-url.js"></script>
+<script src="listeners.js"></script>
 
 <script>
-  let editor;
   const List = Quill.import("formats/list");
   let BlockEmbed = Quill.import("blots/block/embed");
   class HorizontalRule extends BlockEmbed { }
@@ -404,7 +452,7 @@
   }
 
   const SnowTheme = Quill.import("themes/snow");
- const Toolbar = Quill.import("modules/toolbar");
+  const Toolbar = Quill.import("modules/toolbar");
 
   const handlers = {
     ...Toolbar.DEFAULTS.handlers,
@@ -430,11 +478,12 @@
   };
 
 
-  function loadAction(premium, noMenu) {
+  function loadAction(premium, tab) {
+    isTablet = tab;
     let titleIn = document.getElementById('titlebar');
     titleIn.style['padding-left'] = 0;
     titleIn.style['padding-right'] = 0;
-
+ 
     let mainToolbar = premium ? proToolbar : simpleToolbar;
     setFonts();
     Quill.register('modules/imageCompressor', imageCompressor);
@@ -508,7 +557,6 @@
     fixDropdownMenuLocations();
   }
 
-  loadAction();
 </script>
 
 </html>

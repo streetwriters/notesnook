@@ -4,13 +4,7 @@
 * Copyright (c) 2014, Jason Chen
 * Copyright (c) 2013, salesforce.com
 */
-.ql-container {
-  box-sizing: border-box;
-  font-family: 'Poppins', sans-serif;
-  margin: 0px;
-  position: relative;
-  height: calc(100% - 260px) !important;
-}
+
 
 .ql-container.ql-disabled .ql-tooltip {
   visibility: hidden;
@@ -1147,7 +1141,6 @@
   font-family: 'Poppins';
   margin-top: -8px;
   margin-bottom: 12px;
-  padding-left: 12px;
 }
 #titlebar textarea:focus {
   outline: none;
