@@ -6,6 +6,7 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
+import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {DataProvider, LayoutProvider, RecyclerListView} from 'recyclerlistview';
 import {useTracked} from '../../provider';
@@ -87,21 +88,27 @@ const SimpleList = ({
         paddingHorizontal: 12,
         height: 35,
       }}>
-      <Paragraph
+      <TouchableWithoutFeedback
         onPress={() => {
           if (jumpToDialog) {
             eSendEvent(eOpenJumpToDialog);
           }
         }}
-        color={colors.accent}
+        hitSlop={{top: 10, left: 10, right: 30, bottom: 15}}
         style={{
-          height: 35,
-          minWidth: 60,
-          alignSelf: 'center',
-          textAlignVertical: 'center',
+          height: '100%',
+          justifyContent: 'center',
         }}>
-        {item.title}
-      </Paragraph>
+        <Paragraph
+          color={colors.accent}
+          style={{
+            minWidth: 60,
+            alignSelf: 'center',
+            textAlignVertical: 'center',
+          }}>
+          {item.title}
+        </Paragraph>
+      </TouchableWithoutFeedback>
       {index === 1 && sortMenuButton ? <HeaderMenu /> : null}
     </View>
   );

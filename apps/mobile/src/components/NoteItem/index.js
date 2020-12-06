@@ -91,7 +91,7 @@ export default class NoteItem extends React.Component {
             width: '92%',
             paddingRight: 5,
           }}>
-          {item.notebook && item.notebook.id && (
+          {item.notebooks && item.notebooks.length > 0 && (
             <View
               style={{
                 flexDirection: 'row',
@@ -135,7 +135,7 @@ export default class NoteItem extends React.Component {
                   color={
                     item.colors[0] ? COLORS_NOTE[item.colors[0]] : colors.accent
                   }>
-                  {db.notebooks.notebook(item.notebook.id).title}
+                  {db.notebooks.notebook(item.notebooks[0].id).title} 
                 </Heading>
               </TouchableOpacity>
             </View>

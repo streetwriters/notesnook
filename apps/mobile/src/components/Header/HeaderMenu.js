@@ -21,12 +21,12 @@ export const HeaderMenu = () => {
       style={{
         flexDirection: 'row',
         alignItems: 'center',
-        zIndex:10
+        zIndex:10,
+        height: 35,
       }}>
       <Paragraph
         style={{
           marginRight: 5,
-          height: 35,
           textAlignVertical:'center'
         }}>
         {settings.sort.slice(0, 1).toUpperCase() +
@@ -39,7 +39,6 @@ export const HeaderMenu = () => {
         }
         style={{
           textAlignVertical:'center',
-          height: 30,
         }}
         size={SIZE.md}
       />
