@@ -14,7 +14,7 @@ import {SIZE, WEIGHT} from '../../utils/SizeUtils';
  *
  * @param {TextType | restTypes} props all props
  */
-const Paragraph = ({color, size, style, ...restProps}) => {
+const Paragraph = ({color, size = SIZE.sm, style, ...restProps}) => {
   const [state] = useTracked();
   const {colors} = state;
 
@@ -27,8 +27,8 @@ const Paragraph = ({color, size, style, ...restProps}) => {
           fontSize: size || SIZE.sm,
           color: color || colors.pri,
           fontWeight: '400',
-          lineHeight:
-            Platform.OS === 'ios' ? (size ? size + 2 : SIZE.sm + 2) : null,
+          paddingBottom:
+            Platform.OS === 'ios' ? size*0.25: null,
         },
         style,
       ]}></Text>

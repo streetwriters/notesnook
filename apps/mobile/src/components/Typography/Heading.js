@@ -14,7 +14,7 @@ import {SIZE, WEIGHT} from '../../utils/SizeUtils';
  *
  * @param {TextType | restTypes} props all props
  */
-const Heading = ({color, size, style, ...restProps}) => {
+const Heading = ({color, size= SIZE.xl, style, ...restProps}) => {
   const [state] = useTracked();
   const {colors} = state;
 
@@ -26,8 +26,8 @@ const Heading = ({color, size, style, ...restProps}) => {
           fontFamily: WEIGHT.bold,
           fontSize: size || SIZE.xl,
           color: color || colors.heading,
-          lineHeight:
-            Platform.OS === 'ios' ? (size ? size + 2 : SIZE.xl + 2) : null,
+          paddingBottom:
+            Platform.OS === 'ios' ? size*0.25: null,
         },
         style,
       ]}></Text>
