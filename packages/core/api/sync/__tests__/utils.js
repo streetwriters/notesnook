@@ -32,10 +32,10 @@ function mainCollectionParams(collection, itemKey, item) {
     return db[collection][itemKey](item.id).data;
   }
 
-  return [collection, addItem, editItem, getItem];
+  return [collection, addItem, editItem, getItem, itemKey];
 }
 
-function tagsCollectionParams(collection, item) {
+function tagsCollectionParams(collection, item, type) {
   async function addItem(db) {
     const id = await db[collection].add(item, 20);
     return db[collection].tag(id);
@@ -49,7 +49,7 @@ function tagsCollectionParams(collection, item) {
     return db[collection].tag(item.id);
   }
 
-  return [collection, addItem, editItem, getItem];
+  return [collection, addItem, editItem, getItem, type];
 }
 
 function getEncrypted(item) {

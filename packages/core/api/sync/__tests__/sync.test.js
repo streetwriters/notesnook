@@ -1,5 +1,6 @@
 //import User from "../../models/user";
 import { enableFetchMocks, disableFetchMocks } from "jest-fetch-mock";
+import { CURRENT_DATABASE_VERSION } from "../../../common";
 import StorageInterface from "../../../__mocks__/storage.mock";
 //import Sync from "../sync";
 //import Collector from "../prepare";
@@ -48,6 +49,7 @@ test("sync without merge conflicts, cause merge conflicts, resolve them and then
     const contentId = db.notes.note(noteId).data.contentId;
     const content = {
       id: contentId,
+      v: CURRENT_DATABASE_VERSION,
       ...(await getEncrypted({
         id: contentId,
         type: "delta",

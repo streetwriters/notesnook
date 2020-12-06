@@ -1,3 +1,4 @@
+import { migrations } from "../../migrations";
 import { areAllEmpty } from "./utils";
 
 class Merger {
@@ -9,12 +10,19 @@ class Merger {
     this._db = db;
   }
 
+  _migrate(item, deserialized) {
+    const version = item.v || 0;
+    const migrate = migrations[version][item.type];
+    if (migrate) return migrate(deserialized);
+    return deserialized;
+  }
+
   async _deserialize(item) {
     const deserialized = JSON.parse(
       await this._db.context.decrypt(this.key, item)
     );
     deserialized.remote = true;
-    return deserialized;
+    return this._migrate(item, deserialized);
   }
 
   async _mergeItem(remoteItem, get, add) {

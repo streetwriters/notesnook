@@ -9,6 +9,7 @@ import {
 import { enableFetchMocks, disableFetchMocks } from "jest-fetch-mock";
 import { tagsCollectionParams, mainCollectionParams } from "./utils";
 import { login, getEncrypted } from "./utils";
+import { CURRENT_DATABASE_VERSION } from "../../../common";
 
 const emptyServerResponse = {
   notes: [],
@@ -38,13 +39,13 @@ test("null server response should return false", async () => {
 const tests = [
   mainCollectionParams("notes", "note", TEST_NOTE),
   mainCollectionParams("notebooks", "notebook", TEST_NOTEBOOK),
-  tagsCollectionParams("tags", "someTag"),
-  tagsCollectionParams("colors", "red"),
+  tagsCollectionParams("tags", "someTag", "tag"),
+  tagsCollectionParams("colors", "red", "tag"),
 ];
 
 describe.each(tests)(
   "general %s syncing tests",
-  (collection, add, edit, get) => {
+  (collection, add, edit, get, itemType) => {
     beforeAll(() => {
       enableFetchMocks();
     });
@@ -61,7 +62,11 @@ describe.each(tests)(
         const result = await merger.merge(
           {
             [collection]: [
-              { id: testItem.id, ...(await getEncrypted(testItem)) },
+              {
+                id: testItem.id,
+                v: CURRENT_DATABASE_VERSION,
+                ...(await getEncrypted({ ...testItem, type: itemType })),
+              },
             ],
             synced: false,
           },
@@ -125,6 +130,7 @@ test("local delta updated after lastSyncedTimestamp should cause merge conflict"
         content: [
           {
             id: contentId,
+            v: CURRENT_DATABASE_VERSION,
             ...(await getEncrypted({
               id: contentId,
               noteId: id,

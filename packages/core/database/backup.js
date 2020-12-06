@@ -126,42 +126,34 @@ export default class Backup {
 
     const collections = [
       {
-        id: "notes",
         index: data["notes"],
         dbCollection: this._db.notes,
       },
       {
-        id: "notebooks",
         index: data["notebooks"],
         dbCollection: this._db.notebooks,
       },
       {
-        id: "tags",
         index: data["tags"],
         dbCollection: this._db.tags,
       },
       {
-        id: "colors",
         index: data["colors"],
         dbCollection: this._db.colors,
       },
       {
-        id: "trash",
         index: data["trash"],
         dbCollection: this._db.trash,
       },
       {
-        id: "delta",
         index: data["delta"],
         dbCollection: this._db.content,
       },
       {
-        id: "content",
         index: data["content"],
         dbCollection: this._db.content,
       },
       {
-        id: "settings",
         index: ["settings"],
         dbCollection: this._db.settings,
       },

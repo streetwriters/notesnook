@@ -23,37 +23,30 @@ class Migrations {
 
     const collections = [
       {
-        id: "notes",
         index: this._db.notes.raw,
         dbCollection: this._db.notes,
       },
       {
-        id: "notebooks",
         index: this._db.notebooks.raw,
         dbCollection: this._db.notebooks,
       },
       {
-        id: "tags",
         index: this._db.tags.raw,
         dbCollection: this._db.tags,
       },
       {
-        id: "colors",
         index: this._db.colors.raw,
         dbCollection: this._db.colors,
       },
       {
-        id: "trash",
         index: this._db.trash.raw,
         dbCollection: this._db.trash,
       },
       {
-        id: "content",
         index: content,
         dbCollection: this._db.content,
       },
       {
-        id: "settings",
         index: [this._db.settings.raw],
         dbCollection: this._db.settings,
       },
