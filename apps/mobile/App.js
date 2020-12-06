@@ -1,5 +1,5 @@
 import * as NetInfo from '@react-native-community/netinfo';
-import {EV} from 'notes-core/common';
+import {CHECK_IDS, EV} from 'notes-core/common';
 import React, {useEffect, useState} from 'react';
 import {
   Appearance,
@@ -23,7 +23,13 @@ import {setLoginMessage} from './src/services/Message';
 import {editing} from './src/utils';
 import {ACCENT, COLOR_SCHEME} from './src/utils/Colors';
 import {db} from './src/utils/DB';
-import {eDispatchAction, eOnLoadNote, eStartSyncer} from './src/utils/Events';
+import {
+  eDispatchAction,
+  eOnLoadNote,
+  eOpenPremiumDialog,
+  eShowGetPremium,
+  eStartSyncer,
+} from './src/utils/Events';
 import {MMKV} from './src/utils/mmkv';
 import {sleep} from './src/utils/TimeUtils';
 import {getNote} from './src/views/Editor/Functions';
@@ -31,6 +37,7 @@ import IntentService from './src/services/IntentService';
 import {tabBarRef} from './src/utils/Refs';
 import Navigation from './src/services/Navigation';
 import SplashScreen from 'react-native-splash-screen';
+import PremiumService from './src/services/PremiumService';
 const {ReceiveSharingIntent} = NativeModules;
 
 let AppRootView = require('./initializer.root').RootView;
@@ -57,27 +64,28 @@ const onAppStateChanged = async (state) => {
     if (appInit) {
       await MMKV.removeItem('appState');
     }
-    if (intentInit) {
-      try {
-        console.log('I am running too from here');
-        _data = await ReceiveSharingIntent.getFileNames();
-        if (_data) {
-          IntentService.setIntent(_data);
-          IntentService.check((event) => {
-            console.log(event);
-            if (event) {
-              eSendEvent(eOnLoadNote, event);
-              tabBarRef.current?.goToPage(1);
-              Navigation.closeDrawer();
-            } else {
-              eSendEvent('nointent');
-              SplashScreen.hide();
-            }
-          });
+    try {
+      if (intentInit) {
+        if (Platform.OS === 'android') {
+          _data = await ReceiveSharingIntent.getFileNames();
+          if (_data) {
+            IntentService.setIntent(_data);
+            IntentService.check((event) => {
+              console.log(event);
+              if (event) {
+                eSendEvent(eOnLoadNote, event);
+                tabBarRef.current?.goToPage(1);
+                Navigation.closeDrawer();
+              } else {
+                eSendEvent('nointent');
+                SplashScreen.hide();
+              }
+            });
+          }
         }
-      } catch (e) {
-        console.log(e);
       }
+    } catch (e) {
+      console.log(e);
     }
   } else {
     if (editing.currentlyEditing && appInit) {
@@ -133,20 +141,69 @@ const App = () => {
   };
 
   const _handleIntent = async (res) => {
-    let url = res ? res.url : '';
-    try {
-      if (res && res.startsWith('ShareMedia://dataUrl')) {
-        _data = await ReceiveSharingIntent.getFileNames(url);
+    if (intentInit) {
+      let url = res ? res.url : '';
+      try {
+        if (res && res.startsWith('ShareMedia://dataUrl')) {
+          _data = await ReceiveSharingIntent.getFileNames(url);
+        }
+        if (_data) {
+          IntentService.setIntent(_data);
+          IntentService.check((event) => {
+            eSendEvent(eOnLoadNote, event);
+            tabBarRef.current?.goToPage(1);
+            Navigation.closeDrawer();
+          });
+        }
+      } catch (e) {}
+    }
+  };
+
+  const handlePremiumAccess = async (type) => {
+    let status = PremiumService.get();
+    let message = null;
+    if (!status) {
+      switch (type) {
+        case CHECK_IDS.noteColor:
+          message = {
+            context: 'sheet',
+            title: 'Get Notesnook Pro',
+            desc: 'To assign colors to a note get Notesnook Pro today.',
+          };
+          break;
+        case CHECK_IDS.noteExport:
+          message = {
+            context: 'export',
+            title: 'Export in PDF, MD & HTML',
+            desc:
+              'Get Notesnook Pro to export your notes in PDF, Markdown and HTML formats!',
+          };
+          break;
+        case CHECK_IDS.noteTag:
+          message = {
+            context: 'sheet',
+            title: 'Get Notesnook Pro',
+            desc: 'To create more tags for your notes become a Pro user today.',
+          };
+          break;
+        case CHECK_IDS.notebookAdd:
+          eSendEvent(eOpenPremiumDialog);
+          break;
+        case CHECK_IDS.vaultAdd:
+          message = {
+            context: 'sheet',
+            title: 'Add Notes to Vault',
+            desc:
+              'With Notesnook Pro you can add notes to your vault and do so much more! Get it now.',
+          };
+          break;
       }
-      if (_data) {
-        IntentService.setIntent(_data);
-        IntentService.check((event) => {
-          eSendEvent(eOnLoadNote, event);
-          tabBarRef.current?.goToPage(1);
-          Navigation.closeDrawer();
-        });
+      if (message) {
+        eSendEvent(eShowGetPremium, message);
       }
-    } catch (e) {}
+    }
+
+    return {type, result: status};
   };
 
   useEffect(() => {
@@ -161,6 +218,7 @@ const App = () => {
     if (Platform.OS === 'ios') {
       Linking.addEventListener('url', _handleIntent);
     }
+    EV.subscribe('user:checkStatus', handlePremiumAccess);
     return () => {
       EV.unsubscribe('db:refresh', syncChanges);
       eUnSubscribeEvent(eStartSyncer, startSyncer);
