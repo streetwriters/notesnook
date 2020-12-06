@@ -48,10 +48,11 @@
 <script src="listeners.js"></script>
 <script src="module.js"></script>
 <script src="image-resize.min.js"></script>
+<script src="magic-url.js"></script>
 
 <script>
   let editor;
-
+  const List = Quill.import("formats/list");
   let BlockEmbed = Quill.import("blots/block/embed");
   class HorizontalRule extends BlockEmbed { }
   HorizontalRule.blotName = "hr";
@@ -403,7 +404,7 @@
   }
 
   const SnowTheme = Quill.import("themes/snow");
-  const Toolbar = Quill.import("modules/toolbar");
+ const Toolbar = Quill.import("modules/toolbar");
 
   const handlers = {
     ...Toolbar.DEFAULTS.handlers,
@@ -436,7 +437,6 @@
 
     let mainToolbar = premium ? proToolbar : simpleToolbar;
     setFonts();
-    console.log(BaseTheme)
     Quill.register('modules/imageCompressor', imageCompressor);
     Quill.register("formats/lists", BetterList);
     Quill.register("modules/markdownShortcuts", MarkdownShortcuts);
@@ -507,6 +507,8 @@
     attachEditorListeners();
     fixDropdownMenuLocations();
   }
+
+  loadAction();
 </script>
 
 </html>
