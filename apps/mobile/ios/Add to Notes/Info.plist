@@ -25,14 +25,12 @@
 		<key>NSExtensionAttributes</key>
 		<dict>
 			<key>NSExtensionActivationRule</key>
-            <dict>
-                <!--TODO: Add this flag, if you want to support sharing text into your app-->
-                <key>NSExtensionActivationSupportsText</key>
-                <true/>
-                <!--TODO: Add this tag, if you want to support sharing urls into your app-->
-              <key>NSExtensionActivationSupportsWebURLWithMaxCount</key>
-              <integer>1</integer> 
-            </dict>
+			<dict>
+				<key>NSExtensionActivationSupportsText</key>
+				<true/>
+				<key>NSExtensionActivationSupportsWebURLWithMaxCount</key>
+				<integer>1</integer>
+			</dict>
 		</dict>
 		<key>NSExtensionMainStoryboard</key>
 		<string>MainInterface</string>
