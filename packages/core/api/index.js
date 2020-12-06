@@ -76,8 +76,8 @@ class Database {
 
     await this.settings.init();
     await this.user.sync();
-    await this.migrations.init();
 
+    await this.migrations.init();
     await this.migrations.migrate();
   }
 

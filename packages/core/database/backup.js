@@ -1,10 +1,10 @@
 import Hashes from "jshashes";
+import Migrator from "./migrator.js";
 import {
   CHECK_IDS,
   sendCheckUserStatusEvent,
   CURRENT_DATABASE_VERSION,
 } from "../common.js";
-import { migrations } from "../migrations.js";
 const md5 = new Hashes.MD5();
 
 const invalidKeys = ["user", "t", "lastBackupTime"];
@@ -16,6 +16,7 @@ export default class Backup {
    */
   constructor(db) {
     this._db = db;
+    this._migrator = new Migrator();
   }
 
   lastBackupTime() {
@@ -117,45 +118,56 @@ export default class Backup {
 
   async _migrateData(backup) {
     const { data, version = 0 } = backup;
+
     if (version > CURRENT_DATABASE_VERSION)
       throw new Error(
         "This backup was made from a newer version of Notesnook. Cannot migrate."
       );
 
     const collections = [
-      "notes",
-      "notebooks",
-      "tags",
-      "colors",
-      "trash",
-      "delta",
-      "text",
-      "content",
-      "settings",
+      {
+        id: "notes",
+        index: data["notes"],
+        dbCollection: this._db.notes,
+      },
+      {
+        id: "notebooks",
+        index: data["notebooks"],
+        dbCollection: this._db.notebooks,
+      },
+      {
+        id: "tags",
+        index: data["tags"],
+        dbCollection: this._db.tags,
+      },
+      {
+        id: "colors",
+        index: data["colors"],
+        dbCollection: this._db.colors,
+      },
+      {
+        id: "trash",
+        index: data["trash"],
+        dbCollection: this._db.trash,
+      },
+      {
+        id: "delta",
+        index: data["delta"],
+        dbCollection: this._db.content,
+      },
+      {
+        id: "content",
+        index: data["content"],
+        dbCollection: this._db.content,
+      },
+      {
+        id: "settings",
+        index: ["settings"],
+        dbCollection: this._db.settings,
+      },
     ];
 
-    await Promise.all(
-      collections.map(async (collectionId) => {
-        let collection = data[collectionId];
-        if (!collection) return;
-
-        if (!Array.isArray(collection)) {
-          collection = [collectionId];
-        }
-
-        await Promise.all(
-          collection.map(async (id) => {
-            const item = data[id];
-            if (!item) return;
-            let migrationFunction = migrations[version][collectionId];
-            if (!migrationFunction)
-              migrationFunction =
-                migrations[CURRENT_DATABASE_VERSION][collectionId];
-            await migrationFunction(this._db, item);
-          })
-        );
-      })
-    );
+    await this._migrator.migrate(collections, (id) => data[id], version);
   }
 
   _validate(backup) {

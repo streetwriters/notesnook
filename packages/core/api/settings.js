@@ -8,6 +8,7 @@ class Settings {
   constructor(db) {
     this._db = db;
     this._settings = {
+      type: "settings",
       id: id(),
       pins: [],
       dateEdited: 0,

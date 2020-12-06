@@ -1,3 +1,4 @@
+import { CURRENT_DATABASE_VERSION } from "../../common";
 import Database from "../index";
 var tfun = require("transfun/transfun.js").tfun;
 if (!tfun) {
@@ -43,6 +44,7 @@ class Collector {
 
           return {
             id: item.id,
+            v: CURRENT_DATABASE_VERSION,
             ...(await this._serialize(item)),
           };
         })(array)

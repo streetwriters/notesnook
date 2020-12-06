@@ -1,15 +1,6 @@
 export const migrations = {
-  handleDeleted: async function (db, collection, item) {
-    if (item.deleted) {
-      await db[collection]._collection.addItem(item);
-      return true;
-    }
-    return false;
-  },
   0: {
-    notes: async function (db, item) {
-      if (await migrations.handleDeleted(db, "notes", item)) return;
-
+    note: function (item) {
       const contentId = item.content.delta;
       const notebook = item.notebook;
       delete item.content;
@@ -17,69 +8,43 @@ export const migrations = {
       item.contentId = contentId;
       item.remote = true;
       if (notebook) item.notebooks = [notebook];
-      await db.notes.add(item);
+      return item;
     },
-    delta: async function (db, item) {
-      if (await migrations.handleDeleted(db, "content", item)) return;
-
+    delta: function (item) {
       item.data = item.data.ops;
       item.type = "delta";
-      await db.content.add(item);
+      return item;
     },
-    trash: async function (db, item) {
-      if (await migrations.handleDeleted(db, "trash", item)) return;
-
+    trash: function (item) {
       item.itemType = item.type;
       item.type = "trash";
       if (item.itemType === "note") {
         item.contentId = item.content.delta;
         delete item.content;
       }
-      await db.trash.add(item);
+      return item;
     },
     text: function () {},
   },
   2: {
-    notes: async function (db, item) {
-      if (await migrations.handleDeleted(db, "notes", item)) return;
-
+    note: function (item) {
       // notebook -> notebooks
       const notebook = item.notebook;
       delete item.notebook;
       item.remote = true;
       if (notebook) item.notebooks = [notebook];
-
-      await db.notes.add({ ...item, remote: true });
+      return item;
     },
   },
   3: {
-    notes: async function (db, item) {
-      if (await migrations.handleDeleted(db, "notes", item)) return;
-      await db.notes.add({ ...item, remote: true });
-    },
-    notebooks: async function (db, item) {
-      if (await migrations.handleDeleted(db, "notebooks", item)) return;
+    note: false,
+    notebooks: function (item) {
       if (item.favorite !== undefined) delete item.favorite;
-      await db.notebooks.add(item);
+      return item;
     },
-    tags: async function (db, item) {
-      if (await migrations.handleDeleted(db, "tags", item)) return;
-      await db.tags.merge(item);
-    },
-    colors: async function (db, item) {
-      if (await migrations.handleDeleted(db, "colors", item)) return;
-      await db.colors.merge(item);
-    },
-    trash: async function (db, item) {
-      if (await migrations.handleDeleted(db, "trash", item)) return;
-      await db.trash.add(item);
-    },
-    content: async function (db, item) {
-      if (await migrations.handleDeleted(db, "content", item)) return;
-      await db.content.add(item);
-    },
-    settings: async function (db, item) {
-      db.settings.merge(item);
-    },
+    tag: false,
+    trash: false,
+    content: false,
+    settings: false,
   },
 };
