@@ -41,9 +41,7 @@ export const SearchInput = (props) => {
           justifyContent: 'space-between',
           alignItems: 'center',
           alignSelf: 'center',
-          height: normalize(50),
-          borderRadius: 5,
-          width: '100%',
+          height: 50,
           paddingHorizontal: 12,
         },
         props.customStyle,
@@ -57,8 +55,9 @@ export const SearchInput = (props) => {
           flexGrow: 1,
           flex: 1,
           flexWrap: 'wrap',
-          paddingVertical:0,
-          padding:0
+          padding:0,
+          margin:0,
+          marginBottom:5,
         }}
         onChangeText={onChangeText}
         numberOfLines={1}

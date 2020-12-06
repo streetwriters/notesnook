@@ -69,7 +69,7 @@ export const Header = ({root}) => {
       ) : null}
 
       {currentScreen === 'search' ? (
-        <View style={styles.rightBtnContainer}>
+        <View style={[styles.rightBtnContainer,{right:6}]}>
           <ActionIcon
             onPress={async () => {
               Navigation.navigate('Search',{
