@@ -78,6 +78,34 @@ let updatedDimensions = {
 
 let currentScroll = 0;
 let startLocation = 0;
+
+const _responder = (e) => {
+  startLocation = e.nativeEvent.pageY;
+  _handleTouch();
+  return false;
+};
+const _moveResponder = (e) => {
+  _handleTouch();
+  return false;
+};
+
+const _handleTouch = () => {
+  {
+    if (currentTab === 1 && startLocation > updatedDimensions.height - 70) {
+      if (currentScroll === 0 || currentScroll === 1) {
+        tabBarRef.current?.setScrollEnabled(false);
+      }
+    } else {
+      tabBarRef.current?.setScrollEnabled(true);
+    }
+  }
+};
+
+const _onTouchEnd = (e) => {
+  startLocation = 0;
+  tabBarRef.current?.setScrollEnabled(true);
+};
+
 const AppStack = React.memo(
   () => {
     const [state, dispatch] = useTracked();
@@ -161,7 +189,6 @@ const AppStack = React.memo(
     }
 
     function setDeviceMode(current, size) {
-
       eSendEvent(current !== 'mobile' ? eCloseSideMenu : eOpenSideMenu);
       setMode(current);
       dispatch({type: Actions.DEVICE_MODE, state: current});
@@ -179,25 +206,6 @@ const AppStack = React.memo(
       }
     }
 
-    const _responder = (e) => {
-      startLocation = e.nativeEvent.pageX;
-      const swiperLeftAreaLocation = 70;
-      const swiperRightAreaLocation = movedAway
-        ? dimensions.width - 150
-        : dimensions.width - 1;
-      let pageX = e.nativeEvent.pageX;
-      startLocation = e.nativeEvent.pageX;
-      if (pageX <= swiperLeftAreaLocation || pageX >= swiperRightAreaLocation) {
-        tabBarRef.current?.setScrollEnabled(true);
-      } else {
-        if (currentScroll === 0 || currentScroll === 1) {
-          console.log(currentScroll);
-          tabBarRef.current?.setScrollEnabled(false);
-        }
-      }
-      return false;
-    };
-
     return (
       <View
         onLayout={_onLayout}
@@ -207,21 +215,8 @@ const AppStack = React.memo(
           height: '100%',
           backgroundColor: colors.bg,
         }}
-        onMoveShouldSetResponder={e => {
-          const swiperLeftAreaLocation = 70;
-          const swiperRightAreaLocation = movedAway
-            ? dimensions.width - 150
-            : dimensions.width - 1;
-          if (startLocation <= swiperLeftAreaLocation || startLocation >= swiperRightAreaLocation) {
-            tabBarRef.current?.setScrollEnabled(true);
-          } else {
-            if (currentScroll === 0 || currentScroll === 1) {
-              console.log(currentScroll);
-              tabBarRef.current?.setScrollEnabled(false);
-            }
-          }
-          return false;
-        }}
+        onMoveShouldSetResponder={_moveResponder}
+        onTouchEnd={_onTouchEnd}
         onStartShouldSetResponder={_responder}>
         {mode && (
           <ScrollableTabView
