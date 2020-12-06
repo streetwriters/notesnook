@@ -13,12 +13,14 @@ export const migrations = {
       }
       item.remote = true;
       item.dateEdited = Date.now();
+      item.migrated = true;
       return item;
     },
     delta: function (item) {
       item.data = item.data.ops;
       item.type = "delta";
       item.dateEdited = Date.now();
+      item.migrated = true;
       return item;
     },
     trash: function (item) {
@@ -29,6 +31,7 @@ export const migrations = {
         delete item.content;
       }
       item.dateEdited = Date.now();
+      item.migrated = true;
       return item;
     },
   },
@@ -40,6 +43,7 @@ export const migrations = {
       item.remote = true;
       if (notebook) item.notebooks = [notebook];
       item.dateEdited = Date.now();
+      item.migrated = true;
       return item;
     },
   },
