@@ -26,6 +26,7 @@ export const Notes = ({route, navigation}) => {
 
   useEffect(() => {
     eSubscribeEvent(refreshNotesPage, init);
+
     return () => {
       eUnSubscribeEvent(refreshNotesPage, init);
       editing.actionAfterFirstSave = {
@@ -33,6 +34,26 @@ export const Notes = ({route, navigation}) => {
       };
     };
   }, []);
+  
+  const setActionAfterFirstSave = ()  => {
+    if (params.type === 'tag') {
+      editing.actionAfterFirstSave = {
+        type: 'tag',
+        id: params.tag.id,
+      };
+    } else if (params.type === 'color') {
+      editing.actionAfterFirstSave = {
+        type: 'color',
+        id: params.color.id,
+      };
+    } else {
+      editing.actionAfterFirstSave = {
+        type: 'topic',
+        id: params.title,
+        notebook: params.notebookId,
+      };
+    }
+  }
 
   const init = (data) => {
     params = route.params;
@@ -52,6 +73,7 @@ export const Notes = ({route, navigation}) => {
     if (allNotes && allNotes.length > 0) {
       setNotes([...allNotes]);
     }
+    setActionAfterFirstSave();
     updateSearch();
     dispatch({
       type: Actions.CONTAINER_BOTTOM_BUTTON,
@@ -139,23 +161,8 @@ export const Notes = ({route, navigation}) => {
   };
 
   const _onPressBottomButton = useCallback(() => {
-    if (params.type === 'tag') {
-      editing.actionAfterFirstSave = {
-        type: 'tag',
-        id: params.tag.title,
-      };
-    } else if (params.type === 'color') {
-      editing.actionAfterFirstSave = {
-        type: 'color',
-        id: params.color.id,
-      };
-    } else {
-      editing.actionAfterFirstSave = {
-        type: 'topic',
-        id: params.title,
-        notebook: params.notebookId,
-      };
-    }
+    
+    setActionAfterFirstSave();
 
     if (DDS.isPhone || DDS.isSmallTab) {
       tabBarRef.current?.goToPage(1);
