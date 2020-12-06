@@ -6,17 +6,20 @@ export const migrations = {
         delete item.content;
         item.contentId = contentId;
       }
-      if (item.notebook.id) {
+      if (item.notebook) {
         const notebook = item.notebook;
+        delete item.notebook;
         item.notebooks = [notebook];
       }
-      delete item.notebook;
-      item.remote = true;
+      item.dateEdited = Date.now();
+      item.migrated = true;
       return item;
     },
     delta: function (item) {
       item.data = item.data.ops;
       item.type = "delta";
+      item.dateEdited = Date.now();
+      item.migrated = true;
       return item;
     },
     trash: function (item) {
@@ -26,6 +29,8 @@ export const migrations = {
         item.contentId = item.content.delta;
         delete item.content;
       }
+      item.dateEdited = Date.now();
+      item.migrated = true;
       return item;
     },
   },
@@ -34,8 +39,9 @@ export const migrations = {
       // notebook -> notebooks
       const notebook = item.notebook;
       delete item.notebook;
-      item.remote = true;
       if (notebook) item.notebooks = [notebook];
+      item.dateEdited = Date.now();
+      item.migrated = true;
       return item;
     },
   },

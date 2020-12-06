@@ -18,7 +18,7 @@ if (!tfun) {
 export default class Notes extends Collection {
   async add(noteArg) {
     if (!noteArg) return;
-    if (noteArg.remote) {
+    if (noteArg.remote || noteArg.migrated) {
       return await this._collection.addItem(noteArg);
     }
 

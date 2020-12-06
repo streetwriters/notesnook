@@ -26,7 +26,7 @@ export default class Trash extends Collection {
   }
 
   async add(item) {
-    if (item.dateDeleted || item.deleted) {
+    if (item.dateDeleted || item.deleted || item.migrated) {
       return await this._collection.addItem(item);
     }
     await this._collection.addItem({

@@ -37,10 +37,14 @@ class Collector {
   _collect(array) {
     return Promise.all(
       tfun
-        .filter((item) => item.dateEdited > this._lastSyncedTimestamp)
+        .filter(
+          (item) => item.dateEdited > this._lastSyncedTimestamp || item.migrated
+        )
         .map(async (item) => {
-          // in case of resolved delta, we do not want to send this key to the server
-          if (item.resolved) delete item.resolved;
+          // in case of resolved delta
+          item.resolved = false;
+          // turn the migrated flag off so we don't keep syncing this item repeated
+          item.migrated = false;
 
           return {
             id: item.id,
