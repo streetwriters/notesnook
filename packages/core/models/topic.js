@@ -27,13 +27,17 @@ export default class Topic {
       topic.notes.push(noteId);
 
       const array = note.notebooks || [];
-      if (
-        array.some(
-          (item) => item.id === this._notebookId && item.topic === topic.id
-        )
-      )
-        return this;
-      array.push({ id: this._notebookId, topic: topic.id });
+      const notebookIndex = array.findIndex((nb) => nb.id === this._notebookId);
+      if (notebookIndex === -1) {
+        let notebook = {};
+        notebook.id = this._notebookId;
+        notebook.topics = [topic.id];
+        array.push(notebook);
+      } else {
+        const topicIndex = array[notebookIndex].topics.indexOf(topic.id);
+        if (topicIndex > -1) return;
+        array[notebookIndex].topics.push(topic.id);
+      }
 
       await this._db.notes.add({
         id: noteId,
@@ -49,14 +53,19 @@ export default class Topic {
     for (let noteId of noteIds) {
       let note = this._db.notes.note(noteId);
       if (!this.has(noteId) || !note || note.data.deleted) return this;
-      let index = topic.notes.findIndex((n) => n === noteId);
+      let index = topic.notes.indexOf(noteId);
       topic.notes.splice(index, 1);
 
       const array = note.notebooks || [];
-      index = array.findIndex(
-        (n) => n.id === this._notebookId && n.topic === topic.id
-      );
-      array.splice(index, 1);
+      const notebookIndex = array.findIndex((nb) => nb.id === this._notebookId);
+      if (notebookIndex === -1) return;
+
+      const topicIndex = array[notebookIndex].topics.indexOf(topic.id);
+      if (topicIndex === -1) return;
+
+      array[notebookIndex].topics.splice(topicIndex, 1);
+      if (array[notebookIndex].topics.length <= 0)
+        array.splice(notebookIndex, 1);
 
       await this._db.notes.add({
         id: noteId,

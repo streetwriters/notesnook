@@ -106,7 +106,9 @@ test("restore a deleted notebook", () =>
     let note = db.notes.note(noteId);
     const index = note.notebooks.findIndex((n) => n.id === id);
     expect(note.notebooks[index]).toBeDefined();
-    expect(notebook.topics.topic(note.notebooks[index].topic)).toBeDefined();
+    expect(
+      notebook.topics.topic(note.notebooks[index].topics[0])
+    ).toBeDefined();
   }));
 
 test("restore a notebook that has deleted notes", () =>
