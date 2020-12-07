@@ -51,7 +51,8 @@ class CryptoWorker {
     this.promiseQueue = [];
   }
   async _initialize() {
-    if (this.isReady || this.initializing)
+    if (this.isReady) return;
+    if (this.initializing)
       return await new Promise((resolve, reject) => {
         this.promiseQueue.push({ resolve, reject });
       });
