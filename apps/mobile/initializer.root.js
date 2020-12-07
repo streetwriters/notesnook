@@ -81,7 +81,7 @@ let startLocation = 0;
 let startLocationX = 0;
 const _responder = (e) => {
   startLocation = e.nativeEvent.pageY;
-  startLocationX = e.nativeEvent.pageX
+  startLocationX = e.nativeEvent.pageX;
   _handleTouch();
   return false;
 };
@@ -91,26 +91,30 @@ const _moveResponder = (e) => {
 };
 
 const _handleTouch = () => {
+  if (currentTab === 0) return;
   {
     if (currentTab === 1 && startLocation > updatedDimensions.height - 70) {
       if (currentScroll === 0 || currentScroll === 1) {
         tabBarRef.current?.setScrollEnabled(false);
       }
-    }else 
-    if (currentTab === 0 && startLocationX < (updatedDimensions.width*0.75)) {
-      console.log("here it is here");
+    } /* else if (
+      currentTab === 0 &&
+      startLocationX < updatedDimensions.width * 0.75
+    ) {
+      console.log('here it is here');
       if (currentScroll === 0 || currentScroll === 1) {
         tabBarRef.current?.setScrollEnabled(false);
       }
-    } else {
-      console.log("blocking");
+    } */ else {
+      console.log('blocking');
       tabBarRef.current?.setScrollEnabled(true);
     }
   }
 };
 
 const _onTouchEnd = (e) => {
-  console.log("touch ended");
+  if (currentTab === 0) return;
+  console.log('touch ended');
   startLocation = 0;
   tabBarRef.current?.setScrollEnabled(true);
 };
