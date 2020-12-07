@@ -61,21 +61,29 @@ function decrypt(password, data) {
 }
 
 let CRYPT_CONFIG = Platform.select({
-  ios:{
-    accessible:Keychain.ACCESSIBLE.AFTER_FIRST_UNLOCK
+  ios: {
+    accessible: Keychain.ACCESSIBLE.AFTER_FIRST_UNLOCK,
   },
-  android:{
+  android: {
     authenticationType:
-    Keychain.AUTHENTICATION_TYPE.DEVICE_PASSCODE_OR_BIOMETRICS,
-  accessControl: Keychain.ACCESS_CONTROL.DEVICE_PASSCODE,
-  rules: Keychain.SECURITY_RULES.AUTOMATIC_UPGRADE,
-  }
-})
+      Keychain.AUTHENTICATION_TYPE.DEVICE_PASSCODE_OR_BIOMETRICS,
+    accessControl: Keychain.ACCESS_CONTROL.DEVICE_PASSCODE,
+    rules: Keychain.SECURITY_RULES.AUTOMATIC_UPGRADE,
+    authenticationPrompt: {
+      cancel: null,
+    },
+  },
+});
 
 async function deriveCryptoKey(name, data) {
   try {
     let credentials = await Sodium.deriveKey(data.password, data.salt);
-    await Keychain.setInternetCredentials('notesnook', name, credentials.key, CRYPT_CONFIG);
+    await Keychain.setInternetCredentials(
+      'notesnook',
+      name,
+      credentials.key,
+      CRYPT_CONFIG,
+    );
 
     return credentials.key;
   } catch (e) {
@@ -86,7 +94,10 @@ async function deriveCryptoKey(name, data) {
 async function getCryptoKey(name) {
   try {
     if (await Keychain.hasInternetCredentials('notesnook')) {
-      let credentials = await Keychain.getInternetCredentials('notesnook', CRYPT_CONFIG);
+      let credentials = await Keychain.getInternetCredentials(
+        'notesnook',
+        CRYPT_CONFIG,
+      );
       return credentials.password;
     } else {
       return null;
