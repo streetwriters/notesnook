@@ -1,5 +1,3 @@
-
-
 let requiring = null;
 const pageTheme = {
   colors: {
@@ -351,6 +349,7 @@ const setTheme = function () {
       padding-right: 12px;
       padding-left:12px;
       height:50px;
+      color:${pageTheme.colors.icon}
     }
     .info-bar {
       margin-bottom:${isTablet ? '12px !important' : '0px !important'};
