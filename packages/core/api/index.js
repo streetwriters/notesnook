@@ -134,8 +134,8 @@ class Database {
     }, 15 * 1000);
   }
 
-  sync() {
-    return this.syncer.start();
+  sync(full) {
+    return this.syncer.start(full);
   }
 
   host(host) {
