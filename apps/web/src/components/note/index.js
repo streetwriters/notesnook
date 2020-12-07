@@ -124,7 +124,7 @@ function Note(props) {
   const selectedNote = useStore((store) => store.selectedNote);
   const isOpened = selectedNote === note.id;
   const theme = useTheme();
-  const color = useMemo(() => COLORS[note.colors[0]], [note.colors]);
+  const color = useMemo(() => COLORS[note.color], [note.color]);
   const notebook = useMemo(
     () => note.notebook && db.notebooks.notebook(note.notebook.id).data,
     [note.notebook]
@@ -170,20 +170,6 @@ function Note(props) {
       info={
         <Flex flex="1 1 auto" justifyContent="space-between">
           <Flex variant="rowCenter">
-            {/* {note.colors.map((item, colorIndex) => (
-              <Box
-                key={item}
-                style={{
-                  width: 13,
-                  marginLeft: colorIndex ? -8 : 0,
-                  marginRight: colorIndex === note.colors.length - 1 ? 5 : 0,
-                  height: 13,
-                  backgroundColor: COLORS[item],
-                  borderRadius: 100,
-                }}
-                data-test-id={`note-${index}-colors-${item}`}
-              />
-            ))} */}
             <TimeAgo
               live={false}
               style={{ fontSize: theme.fontSizes["subBody"] }}
