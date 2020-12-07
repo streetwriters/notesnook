@@ -24,7 +24,6 @@ class Settings {
     this._settings = {
       ...this._settings,
       ...item,
-      pins: [...this._settings.pins, ...item.pins],
     };
   }
 
