@@ -132,7 +132,7 @@ const App = () => {
         EV.subscribe('db:refresh', syncChanges);
       }
     } catch (e) {
-      console.log(e);
+      console.log(e, 'SYNC ERROR');
     }
   };
 
@@ -141,16 +141,15 @@ const App = () => {
   };
 
   const _handleIntent = async (res) => {
-
     if (intentInit) {
       let url = res ? res.url : '';
 
       try {
         if (url.startsWith('ShareMedia://dataUrl')) {
-        console.log(url);
+          console.log(url);
           _data = await ReceiveSharingIntent.getFileNames(url);
-          _data = IntentService.iosSortedData(_data)
-          console.log("DONE","DATA GETTING");
+          _data = IntentService.iosSortedData(_data);
+          console.log('DONE', 'DATA GETTING');
         }
         if (_data) {
           IntentService.setIntent(_data);
@@ -161,7 +160,7 @@ const App = () => {
           });
         }
       } catch (e) {
-        console.log(e,"ERROR HERE")
+        console.log(e, 'ERROR HERE');
       }
     }
   };
@@ -266,18 +265,18 @@ const App = () => {
     try {
       let user = await db.user.get();
       if (user) {
-        dispatch({type: Actions.USER, user: user});
         dispatch({type: Actions.SYNCING, syncing: true});
+        dispatch({type: Actions.USER, user: user});
         await db.sync();
-        dispatch({type: Actions.SYNCING, syncing: false});
         dispatch({type: Actions.ALL});
         await startSyncer();
       } else {
         setLoginMessage(dispatch);
       }
     } catch (e) {
-      console.log(e);
+      console.log(e, 'SYNC ERROR');
     }
+    dispatch({type: Actions.SYNCING, syncing: false});
   };
 
   useEffect(() => {
