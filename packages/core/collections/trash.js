@@ -62,27 +62,29 @@ export default class Trash extends Collection {
       delete item.itemType;
       delete item.itemId;
       if (item.type === "note") {
-        let { notebook } = item;
-        item.notebook = undefined;
+        let { notebooks } = item;
+        item.notebooks = undefined;
         await this._db.notes.add(item);
 
-        if (notebook && notebook.id && notebook.topic) {
-          const { id, topic } = notebook;
+        if (notebooks) {
+          for (let nb of notebooks) {
+            const { id, topics } = nb;
+            for (let topic of topics) {
+              // if the notebook or topic has been deleted
+              if (
+                !this._db.notebooks._collection.exists(id) ||
+                !this._db.notebooks.notebook(id).topics.has(topic)
+              ) {
+                notebooks = undefined;
+                continue;
+              }
 
-          // if the notebook or topic has been deleted
-          if (
-            !this._db.notebooks._collection.exists(id) ||
-            !this._db.notebooks.notebook(id).topics.has(topic)
-          ) {
-            notebook = undefined;
-          }
-
-          // restore the note to the topic it was in before deletion
-          if (notebook && notebook.id && notebook.topic) {
-            await this._db.notebooks
-              .notebook(id)
-              .topics.topic(topic)
-              .add(item.id);
+              // restore the note to the topic it was in before deletion
+              await this._db.notebooks
+                .notebook(id)
+                .topics.topic(topic)
+                .add(item.id);
+            }
           }
         }
       } else if (item.type === "notebook") {

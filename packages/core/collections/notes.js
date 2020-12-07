@@ -10,6 +10,7 @@ import Note from "../models/note";
 import getId from "../utils/id";
 import { EV } from "../common";
 import { getContentFromData } from "../content-types";
+import qclone from "qclone/src/qclone";
 var tfun = require("transfun/transfun.js").tfun;
 if (!tfun) {
   tfun = global.tfun;
@@ -200,12 +201,17 @@ export default class Notes extends Collection {
   async _delete(moveToTrash = true, ...ids) {
     for (let id of ids) {
       let item = this.note(id);
+      const itemData = qclone(item.data);
       if (!item) continue;
-      if (item.notebook && item.notebook.id && item.notebook.topic) {
-        await this._db.notebooks
-          .notebook(item.notebook.id)
-          .topics.topic(item.notebook.topic)
-          .delete(id);
+      if (item.notebooks) {
+        for (let notebook of item.notebooks) {
+          for (let topic of notebook.topics) {
+            await this._db.notebooks
+              .notebook(notebook.id)
+              .topics.topic(topic)
+              .delete(id);
+          }
+        }
       }
       for (let tag of item.tags) {
         await this._db.tags.remove(tag, id);
@@ -214,7 +220,7 @@ export default class Notes extends Collection {
         await this._db.colors.remove(item.color, id);
       }
       await this._collection.removeItem(id);
-      if (moveToTrash) await this._db.trash.add(item.data);
+      if (moveToTrash) await this._db.trash.add(itemData);
     }
   }
 
