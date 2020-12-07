@@ -49,7 +49,7 @@ export class AddTopicDialog extends React.Component {
       visible: true,
     });
   }
-  close() {
+  close = () => {
     this.title = null;
     this.setState({
       visible: false,
