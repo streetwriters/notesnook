@@ -21,9 +21,9 @@ export default class CachedCollection extends IndexedCollection {
   }
 
   async updateItem(item) {
+    EV.publish("db:write", item);
     await super.updateItem(item);
     this.map.set(item.id, item);
-    EV.publish("db:write", item);
   }
 
   exists(id) {

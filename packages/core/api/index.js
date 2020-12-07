@@ -127,7 +127,10 @@ class Database {
     };
   }
 
-  async _onDBWrite() {
+  _onDBWrite(item) {
+    if (item.remote) {
+      return;
+    }
     clearTimeout(this._syncTimeout);
     this._syncTimeout = setTimeout(() => {
       EV.publish("db:sync");
