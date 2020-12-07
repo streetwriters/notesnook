@@ -45,7 +45,7 @@ export const Home = ({route, navigation}) => {
       },
     );
     //dispatch({type: Actions.NOTES});
-  }, [notes]);
+  }, []);
 
   const onBlur = useCallback(() => {}, []);
 

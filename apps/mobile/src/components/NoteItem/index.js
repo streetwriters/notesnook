@@ -69,7 +69,6 @@ export default class NoteItem extends React.Component {
 
   render() {
     let {colors, item, customStyle, isTrash} = this.props;
-    console.log(item, 'ITE<');
     return (
       <View
         style={[
