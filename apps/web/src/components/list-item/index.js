@@ -164,6 +164,7 @@ function ListItem(props) {
       {props.menuItems && (
         <Icon.MoreVertical
           size={22}
+          sx={{ marginRight: [3, 2, 0] }}
           color="icon"
           onClick={(event) => openContextMenu(event, menuItems, true)}
         />
