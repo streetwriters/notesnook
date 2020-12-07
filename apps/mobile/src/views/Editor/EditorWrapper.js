@@ -39,6 +39,7 @@ const onHandlerStateChange = (evt) => {
 
 const onGestureEvent = (event) => {
   if (event.nativeEvent.translationY < 0) return;
+
   let v = event.nativeEvent.translationY;
   if (v >= 80 && prevVal !== 80) {
     prevVal = 80;
@@ -86,7 +87,6 @@ export const EditorWrapper = ({dimensions}) => {
   const [state] = useTracked();
   const {colors} = state;
   const insets = useSafeAreaInsets();
-
   return (
     <SafeAreaView
       ref={editorRef}
@@ -132,7 +132,7 @@ export const EditorWrapper = ({dimensions}) => {
               zIndex: 10,
               transform: [
                 {
-                  translateY: -80 + insets.top,
+                  translateY: -80
                 },
               ],
             }}>
