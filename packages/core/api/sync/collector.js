@@ -41,15 +41,14 @@ class Collector {
           (item) => item.dateEdited > this._lastSyncedTimestamp || item.migrated
         )
         .map(async (item) => {
-          // in case of resolved delta
-          if (item.resolved) item.resolved = false;
-          // turn the migrated flag off so we don't keep syncing this item repeated
-          if (item.migrated) item.migrated = false;
-
           return {
             id: item.id,
             v: CURRENT_DATABASE_VERSION,
-            ...(await this._serialize(item)),
+            ...(await this._serialize({
+              ...item,
+              migrated: false,
+              resolved: false,
+            })),
           };
         })(array)
     );
