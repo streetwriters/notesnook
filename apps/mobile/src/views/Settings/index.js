@@ -795,9 +795,11 @@ const SettingsPrivacyAndSecurity = () => {
           title="Create Vault"
           tagline="Secure your notes by adding the to the vault."
           onPress={() => {
-            openVault({
-              item: {},
-              novault: false,
+            PremiumService.verify(() => {
+              openVault({
+                item: {},
+                novault: false,
+              });
             });
           }}
         />
