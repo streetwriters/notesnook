@@ -309,6 +309,7 @@ async function addToCollection(id) {
         type: null,
       };
       updateEvent({type: Actions.NOTEBOOKS});
+      eSendEvent(refreshNotesPage);
       break;
     }
     case 'tag': {
@@ -318,6 +319,7 @@ async function addToCollection(id) {
       };
 
       updateEvent({type: Actions.TAGS});
+      eSendEvent(refreshNotesPage);
       break;
     }
     case 'color': {
@@ -326,6 +328,7 @@ async function addToCollection(id) {
       editing.actionAfterFirstSave = {
         type: null,
       };
+      eSendEvent(refreshNotesPage);
       updateEvent({type: Actions.COLORS});
       break;
     }
@@ -359,6 +362,7 @@ export async function saveNote(canPost = true) {
       updateEvent({type: Actions.CURRENT_EDITING_NOTE, id: id});
       eSendEvent(refreshNotesPage);
     }
+
     sendNoteEditedEvent(rId);
     await setNoteInEditorAfterSaving(id, rId);
     if (id) {
