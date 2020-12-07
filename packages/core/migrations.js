@@ -34,7 +34,7 @@ export const migrations = {
       // note.notebook -> note.notebooks
       const notebook = item.notebook;
       delete item.notebook;
-      if (notebook) {
+      if (notebook && notebook.id && notebook.topic) {
         notebook.topics = [notebook.topics];
         delete notebook.topic;
         item.notebooks = [notebook];
