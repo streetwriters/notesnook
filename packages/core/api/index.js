@@ -131,7 +131,7 @@ class Database {
     clearTimeout(this._syncTimeout);
     this._syncTimeout = setTimeout(() => {
       EV.publish("db:sync");
-    }, 60 * 1000);
+    }, 15 * 1000);
   }
 
   sync() {
