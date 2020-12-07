@@ -13,7 +13,7 @@ import {
   eUnSubscribeEvent,
   ToastEvent,
 } from '../../services/EventManager';
-import {getElevation} from '../../utils';
+import {getElevation, toTXT} from '../../utils';
 import {db} from '../../utils/DB';
 import {
   eCloseVaultDialog,
@@ -55,6 +55,7 @@ export class VaultDialog extends Component {
       isBiometryAvailable: false,
       fingerprintAccess: false,
       changePassword: false,
+      copyNote:false
     };
     this.password = null;
     this.confirmPassword = null;
@@ -248,6 +249,8 @@ export class VaultDialog extends Component {
           this._shareNote(note);
         } else if (this.state.deleteNote) {
           await this._deleteNote();
+        } else if (this.state.copyNote) {
+          this._copyNote(note);
         }
       })
       .catch((e) => {
@@ -311,16 +314,18 @@ export class VaultDialog extends Component {
     this.close();
   }
 
-  toTXT(data) {
-    return data.reduce(function (text, op) {
-      if (!op.insert) return text;
-      if (typeof op.insert !== 'string') return text + ' ';
-      return text + op.insert;
-    }, '');
+
+  _copyNote(note) {
+    let text = toTXT(note.content.data);
+    let m = `${note.title}\n \n ${text}`;
+    Clipboard.setString(text);
+    ToastEvent.show('Note copied to clipboard', 'success', 'local');
+    this.close();
   }
+ 
 
   _shareNote(note) {
-    let text = this.toTXT(note.content.data);
+    let text = toTXT(note.content.data);
     let m = `${note.title}\n \n ${text}`;
     Share.open({
       title: 'Share note to',

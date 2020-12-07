@@ -19,6 +19,7 @@ import {
   ToastEvent,
 } from '../../services/EventManager';
 import PremiumService from '../../services/PremiumService';
+import { toTXT } from '../../utils';
 import {
   ACCENT,
   COLOR_SCHEME,
@@ -210,9 +211,21 @@ export const ActionSheetComponent = ({
       name: 'Copy',
       icon: 'content-copy',
       func: async () => {
-        let text = await db.notes.note(note.id).text();
+        if (note.locked) {
+         openVault({
+           copyNote:true,
+           novault:true,
+           locked:true,
+           item:note
+         });
+        } else {
+        let text = await db.notes.note(note.id).content();
+        text = toTXT(text);
+        text = `${note.title}\n \n ${text}`;
         Clipboard.setString(text);
-        ToastEvent.show('Note copied to clipboard', 'success', 'local');
+        ToastEvent.show('Note copied to clipboard', 'success', 'local');  
+        }
+
       },
     },
     {
