@@ -1,19 +1,14 @@
 export const migrations = {
   0: {
     note: function (item) {
+      // note.content -> note.contentId
       if (item.content) {
         const contentId = item.content.delta;
         delete item.content;
         item.contentId = contentId;
       }
-      if (item.notebook) {
-        const notebook = item.notebook;
-        delete item.notebook;
-        item.notebooks = [notebook];
-      }
-      item.dateEdited = Date.now();
-      item.migrated = true;
-      return item;
+
+      return migrations[2].note(item);
     },
     delta: function (item) {
       item.data = item.data.ops;
@@ -36,16 +31,30 @@ export const migrations = {
   },
   2: {
     note: function (item) {
-      // notebook -> notebooks
+      // note.notebook -> note.notebooks
       const notebook = item.notebook;
       delete item.notebook;
-      if (notebook) item.notebooks = [notebook];
+      if (notebook) {
+        notebook.topics = [notebook.topics];
+        delete notebook.topic;
+        item.notebooks = [notebook];
+      }
+
+      return migrations[3].note(item);
+    },
+  },
+  3: {
+    note: function (item) {
+      // note.colors -> note.color
+      if (item.colors && item.colors.length > 0) item.color = item.colors.pop();
+      delete item.colors;
+
       item.dateEdited = Date.now();
       item.migrated = true;
       return item;
     },
   },
-  3: {
+  4: {
     note: false,
     notebooks: false,
     tag: false,

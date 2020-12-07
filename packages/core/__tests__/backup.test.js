@@ -6,8 +6,9 @@ import {
 } from "./utils";
 import v0Backup from "./__fixtures__/backup.v0.json";
 import v2Backup from "./__fixtures__/backup.v2.json";
+import v3Backup from "./__fixtures__/backup.v3.json";
 
-beforeEach(async () => {
+beforeEach(() => {
   StorageInterface.clear();
 });
 
@@ -65,52 +66,46 @@ test("import tempered backup", () =>
     })
   ));
 
-test("import unversioned (v0) backup", () => {
-  return databaseTest().then(async (db) => {
-    await db.backup.import(JSON.stringify(v0Backup));
+describe.each([
+  ["v0", v0Backup],
+  ["v2", v2Backup],
+  ["v3", v3Backup],
+])("testing backup version: %s", (version, data) => {
+  test(`import ${version} backup`, () => {
+    return databaseTest().then(async (db) => {
+      await db.backup.import(JSON.stringify(data));
 
-    expect(
-      db.notes.all.every(
-        (v) =>
-          v.contentId &&
-          !v.content &&
-          !v.notebook &&
-          (!v.notebooks || Array.isArray(v.notebooks))
-      )
-    ).toBeTruthy();
+      expect(db.settings.raw.id).toBeDefined();
 
-    expect(
-      db.notebooks.all.every((v) => v.title != null && v.description != null)
-    ).toBeTruthy();
+      expect(
+        db.notes.all.every(
+          (v) =>
+            v.contentId &&
+            !v.content &&
+            !v.notebook &&
+            (!v.notebooks || Array.isArray(v.notebooks)) &&
+            !v.colors
+        )
+      ).toBeTruthy();
 
-    verifyIndex(v0Backup, db, "notes", "notes");
-    verifyIndex(v0Backup, db, "notebooks", "notebooks");
-    verifyIndex(v0Backup, db, "delta", "content");
-    verifyIndex(v0Backup, db, "tags", "tags");
-    verifyIndex(v0Backup, db, "colors", "colors");
-    verifyIndex(v0Backup, db, "trash", "trash");
+      expect(
+        db.notebooks.all.every((v) => v.title != null && v.description != null)
+      ).toBeTruthy();
+    });
   });
-});
 
-test("import v2 backup", () => {
-  return databaseTest().then(async (db) => {
-    await db.backup.import(JSON.stringify(v2Backup));
+  test(`verify indices of ${version} backup`, () => {
+    return databaseTest().then(async (db) => {
+      await db.backup.import(JSON.stringify(data));
 
-    expect(db.settings.raw.id).toBeDefined();
-    expect(db.settings.raw.pins.length).toBeGreaterThan(0);
-
-    expect(
-      db.notes.all.every(
-        (v) => !v.notebook && (!v.notebooks || Array.isArray(v.notebooks))
-      )
-    ).toBeTruthy();
-
-    verifyIndex(v2Backup, db, "notes", "notes");
-    verifyIndex(v2Backup, db, "notebooks", "notebooks");
-    verifyIndex(v2Backup, db, "content", "content");
-    verifyIndex(v2Backup, db, "tags", "tags");
-    verifyIndex(v2Backup, db, "colors", "colors");
-    verifyIndex(v2Backup, db, "trash", "trash");
+      verifyIndex(data, db, "notes", "notes");
+      verifyIndex(data, db, "notebooks", "notebooks");
+      verifyIndex(data, db, "delta", "content");
+      verifyIndex(data, db, "content", "content");
+      verifyIndex(data, db, "tags", "tags");
+      verifyIndex(data, db, "colors", "colors");
+      verifyIndex(data, db, "trash", "trash");
+    });
   });
 });
 
