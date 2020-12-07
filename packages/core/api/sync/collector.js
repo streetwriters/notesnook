@@ -40,15 +40,17 @@ class Collector {
         .filter(
           (item) => item.dateEdited > this._lastSyncedTimestamp || item.migrated
         )
-        .map(async (item) => {
+        .map(async (i) => {
+          const item = { ...i };
+          // in case of resolved delta
+          delete item.resolved;
+          // turn the migrated flag off so we don't keep syncing this item repeated
+          delete item.migrated;
+
           return {
             id: item.id,
             v: CURRENT_DATABASE_VERSION,
-            ...(await this._serialize({
-              ...item,
-              migrated: false,
-              resolved: false,
-            })),
+            ...(await this._serialize(item)),
           };
         })(array)
     );
