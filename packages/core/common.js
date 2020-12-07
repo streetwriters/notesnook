@@ -17,4 +17,4 @@ export const CHECK_IDS = {
   backupEncrypt: "backup:encrypt",
 };
 
-export const CURRENT_DATABASE_VERSION = 4;
+export const CURRENT_DATABASE_VERSION = 4.1;

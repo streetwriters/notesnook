@@ -7,6 +7,7 @@ import {
 import v0Backup from "./__fixtures__/backup.v0.json";
 import v2Backup from "./__fixtures__/backup.v2.json";
 import v3Backup from "./__fixtures__/backup.v3.json";
+import v4Backup from "./__fixtures__/backup.v4.json";
 
 beforeEach(() => {
   StorageInterface.clear();
@@ -70,6 +71,7 @@ describe.each([
   ["v0", v0Backup],
   ["v2", v2Backup],
   ["v3", v3Backup],
+  ["v4", v4Backup],
 ])("testing backup version: %s", (version, data) => {
   test(`import ${version} backup`, () => {
     return databaseTest().then(async (db) => {
@@ -78,14 +80,17 @@ describe.each([
       expect(db.settings.raw.id).toBeDefined();
 
       expect(
-        db.notes.all.every(
-          (v) =>
+        db.notes.all.every((v) => {
+          return (
             v.contentId &&
             !v.content &&
             !v.notebook &&
-            (!v.notebooks || Array.isArray(v.notebooks)) &&
+            (!v.notebooks ||
+              (Array.isArray(v.notebooks) &&
+                v.notebooks.every((nb) => !!nb.id))) &&
             !v.colors
-        )
+          );
+        })
       ).toBeTruthy();
 
       expect(

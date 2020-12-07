@@ -49,14 +49,22 @@ export const migrations = {
       if (item.colors && item.colors.length > 0) item.color = item.colors.pop();
       delete item.colors;
 
+      return migrations[4].note(item);
+    },
+  },
+  4: {
+    note: function (item) {
+      if (item.notebooks && item.notebooks.every((n) => !n.id)) {
+        item.notebooks = undefined;
+      }
       item.dateEdited = Date.now();
       item.migrated = true;
       return item;
     },
   },
-  4: {
+  4.1: {
     note: false,
-    notebooks: false,
+    notebook: false,
     tag: false,
     trash: false,
     delta: false,
