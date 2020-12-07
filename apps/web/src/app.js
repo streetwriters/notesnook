@@ -13,10 +13,7 @@ import routes from "./navigation/routes";
 import Editor from "./components/editor";
 import useMobile from "./utils/use-mobile";
 import GlobalMenuWrapper from "./components/globalmenuwrapper";
-import {
-  shouldAddBackupReminder,
-  shouldAddSignupReminder,
-} from "./common/reminders";
+import { resetReminders } from "./common/reminders";
 import { isUserPremium } from "./common";
 import { EV } from "notes-core/common";
 import useTablet from "./utils/use-tablet";
@@ -45,12 +42,7 @@ function App() {
       initUser();
       initNotes();
       (async function () {
-        if (await shouldAddBackupReminder()) {
-          addReminder("backup", "high");
-        }
-        if (await shouldAddSignupReminder()) {
-          addReminder("signup", "low");
-        }
+        await resetReminders();
       })();
     },
     [refreshColors, refreshMenuPins, initUser, initNotes, addReminder]

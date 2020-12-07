@@ -1,5 +1,6 @@
 import Config from "../utils/config";
 import { createBackup, db } from "./index";
+import { store as appStore } from "../stores/app-store";
 import * as Icon from "../components/icons";
 import dayjs from "dayjs";
 import { showSignUpDialog } from "../components/dialogs/signupdialog";
@@ -32,3 +33,13 @@ export const Reminders = {
     icon: Icon.Login,
   },
 };
+
+export async function resetReminders() {
+  appStore.set((state) => (state.reminders = []));
+  if (await shouldAddBackupReminder()) {
+    appStore.addReminder("backup", "high");
+  }
+  if (await shouldAddSignupReminder()) {
+    appStore.addReminder("signup", "low");
+  }
+}

@@ -9,6 +9,7 @@ import BaseStore from "./index";
 import { isMobile } from "../utils/dimensions";
 import { showToast } from "../utils/toast";
 import { toTitleCase } from "../utils/string";
+import { resetReminders } from "../common/reminders";
 
 class AppStore extends BaseStore {
   // default state
@@ -25,9 +26,10 @@ class AppStore extends BaseStore {
     notebookStore.refresh();
     trashStore.refresh();
     tagStore.refresh();
-    await editorStore.openLastSession();
+    editorStore.openLastSession();
     this.refreshColors();
     this.refreshMenuPins();
+    await resetReminders();
   };
 
   refreshColors = () => {
