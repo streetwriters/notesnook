@@ -308,7 +308,7 @@ async function addToCollection(id) {
       editing.actionAfterFirstSave = {
         type: null,
       };
-
+      updateEvent({type: Actions.NOTEBOOKS});
       break;
     }
     case 'tag': {
@@ -317,6 +317,7 @@ async function addToCollection(id) {
         type: null,
       };
 
+      updateEvent({type: Actions.TAGS});
       break;
     }
     case 'color': {
@@ -325,7 +326,7 @@ async function addToCollection(id) {
       editing.actionAfterFirstSave = {
         type: null,
       };
-
+      updateEvent({type: Actions.COLORS});
       break;
     }
     default: {

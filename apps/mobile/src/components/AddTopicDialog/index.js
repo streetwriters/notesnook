@@ -14,6 +14,8 @@ import {opacity, ph, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
 import {db} from '../../utils/DB';
 import {DDS} from '../../services/DeviceDetection';
 import Seperator from '../Seperator';
+import { updateEvent } from '../DialogManager/recievers';
+import { Actions } from '../../provider/Actions';
 
 export class AddTopicDialog extends React.Component {
   constructor(props) {
@@ -41,6 +43,7 @@ export class AddTopicDialog extends React.Component {
       await db.notebooks.notebook(topic.notebookId).topics.add(topic);
     }
     this.close();
+    updateEvent({type:Actions.NOTEBOOKS})
     eSendEvent(eOnNewTopicAdded);
   };
 
