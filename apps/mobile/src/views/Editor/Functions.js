@@ -440,6 +440,8 @@ export let isFromIntent = false;
 const loadNoteInEditor = async () => {
   saveCounter = 0;
   if (intent) {
+    console.log("POSTING DELTA")
+    await sleep(1500);
     post('delta', content.data);
     intent = true;
     await saveNote();

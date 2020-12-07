@@ -141,11 +141,16 @@ const App = () => {
   };
 
   const _handleIntent = async (res) => {
+
     if (intentInit) {
       let url = res ? res.url : '';
+
       try {
-        if (res && res.startsWith('ShareMedia://dataUrl')) {
+        if (url.startsWith('ShareMedia://dataUrl')) {
+        console.log(url);
           _data = await ReceiveSharingIntent.getFileNames(url);
+          _data = IntentService.iosSortedData(_data)
+          console.log("DONE","DATA GETTING");
         }
         if (_data) {
           IntentService.setIntent(_data);
@@ -155,7 +160,9 @@ const App = () => {
             Navigation.closeDrawer();
           });
         }
-      } catch (e) {}
+      } catch (e) {
+        console.log(e,"ERROR HERE")
+      }
     }
   };
 
