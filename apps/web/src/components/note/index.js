@@ -221,6 +221,6 @@ export default React.memo(Note, function (prevProps, nextProps) {
     prevItem.title === nextItem.title &&
     prevItem.locked === nextItem.locked &&
     prevItem.conflicted === nextItem.conflicted &&
-    JSON.stringify(prevItem.colors) === JSON.stringify(nextItem.colors)
+    prevItem.color === nextItem.color
   );
 });

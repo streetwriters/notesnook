@@ -7,7 +7,7 @@ import { Flex } from "rebass";
 import useMobile from "../../utils/use-mobile";
 
 function Colors(props) {
-  const { id, colors } = props.data;
+  const { id, color } = props.data;
   const setColor = useStore((store) => store.setColor);
   const isMobile = useMobile();
   return (
@@ -27,7 +27,7 @@ function Colors(props) {
             strokeWidth={0}
             data-test-id={`menuitem-colors-${label}`}
           />
-          {colors.includes(label) && (
+          {color === label && (
             <Icon.Checkmark
               data-test-id={`menuitem-colors-${label}-check`}
               sx={{

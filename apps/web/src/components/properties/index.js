@@ -24,7 +24,7 @@ const tools = [
 
 function Properties() {
   const [notebook, setNotebook] = useState();
-  const colors = useStore((store) => store.session.colors);
+  const color = useStore((store) => store.session.color);
   const toggleLocked = useStore((store) => store.toggleLocked);
   const tags = useStore((store) => store.session.tags);
   const sessionId = useStore((store) => store.session.id);
@@ -178,7 +178,7 @@ function Properties() {
                       {toTitleCase(label)}
                     </Text>
                   </Flex>
-                  {colors.includes(label) && (
+                  {color === label && (
                     <Icon.Checkmark
                       color="primary"
                       size={20}

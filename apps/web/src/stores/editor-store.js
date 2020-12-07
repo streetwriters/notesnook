@@ -19,7 +19,7 @@ const DEFAULT_SESSION = {
   locked: false,
   tags: [],
   context: undefined,
-  colors: [],
+  color: undefined,
   dateEdited: 0,
   totalWords: 0,
   content: {
@@ -104,7 +104,7 @@ class EditorStore extends BaseStore {
         if (oldSession.tags.length !== this.get().session.tags.length)
           tagStore.refresh();
 
-        if (oldSession.colors.length !== this.get().session.colors.length)
+        if (oldSession.color !== this.get().session.color)
           appStore.refreshColors();
 
         if (!oldSession.context) break storeSync;
