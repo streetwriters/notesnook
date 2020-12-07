@@ -29,6 +29,7 @@ import {
   eOpenSideMenu,
 } from './src/utils/Events';
 import {editorRef, tabBarRef} from './src/utils/Refs';
+import { sleep } from './src/utils/TimeUtils';
 import {EditorWrapper} from './src/views/Editor/EditorWrapper';
 import {getIntent, getNote, post} from './src/views/Editor/Functions';
 
@@ -198,7 +199,7 @@ const AppStack = React.memo(
       if (!SettingsService.getApploaded()) {
         eSendEvent('nointent');
       }
-      SplashScreen.hide();
+      sleep(100).then(() =>   SplashScreen.hide() )
     }
 
     function setDeviceMode(current, size) {
