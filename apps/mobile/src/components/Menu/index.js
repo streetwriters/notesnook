@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
+import React, {useEffect} from 'react';
 import {FlatList, ScrollView, View} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import { notesnook } from '../../../e2e/test.ids';
+import {notesnook} from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {DDS} from '../../services/DeviceDetection';
@@ -54,8 +54,7 @@ export const Menu = React.memo(
         close: true,
       },
     ];
-    
-  
+
     return (
       <View
         style={{
@@ -75,12 +74,7 @@ export const Menu = React.memo(
           renderItem={() => (
             <>
               {MenuItemsList.map((item, index) => (
-                <MenuListItem
-                  key={item.name}
-                  item={item}
-                  testID={item.name}
-                  index={index}
-                />
+                <MenuListItem key={item.name} item={item} testID={item.name} index={index} />
               ))}
               <ColorSection noTextMode={noTextMode} />
               <TagsSection />
@@ -90,7 +84,11 @@ export const Menu = React.memo(
 
         {BottomItemsList.map((item, index) => (
           <MenuListItem
-            testID={item.name == 'Night mode' ? notesnook.ids.menu.nightmode : item.name}
+            testID={
+              item.name == 'Night mode'
+                ? notesnook.ids.menu.nightmode
+                : item.name
+            }
             key={item.name}
             item={item}
             index={index}

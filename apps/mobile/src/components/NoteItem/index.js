@@ -132,17 +132,15 @@ export default class NoteItem extends React.Component {
                 />
                 <Heading
                   size={SIZE.xs}
-                  color={
-                    item.colors[0] ? COLORS_NOTE[item.colors[0]] : colors.accent
-                  }>
-                  {db.notebooks.notebook(item.notebooks[0].id).title} 
+                  color={item.color ? COLORS_NOTE[item.color] : colors.accent}>
+                  {db.notebooks.notebook(item.notebooks[0].id).title}
                 </Heading>
               </TouchableOpacity>
             </View>
           )}
 
           <Heading
-            color={COLORS_NOTE[item.colors[0]]}
+            color={COLORS_NOTE[item.color]}
             numberOfLines={1}
             size={SIZE.md}>
             {item.title.replace('\n', '')}
@@ -164,28 +162,18 @@ export default class NoteItem extends React.Component {
             }}>
             {!isTrash ? (
               <>
-                {item.colors.length > 0 ? (
+                {item.color &&
                   <View
+                    key={item}
                     style={{
+                      width: SIZE.xs,
+                      height: SIZE.xs,
+                      borderRadius: 100,
+                      backgroundColor: COLORS_NOTE[item.color],
+                      marginRight: -4.5,
                       marginRight: 10,
-                      flexDirection: 'row',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                    }}>
-                    {item.colors.map((item) => (
-                      <View
-                        key={item}
-                        style={{
-                          width: SIZE.xs,
-                          height: SIZE.xs,
-                          borderRadius: 100,
-                          backgroundColor: COLORS_NOTE[item],
-                          marginRight: -4.5,
-                        }}
-                      />
-                    ))}
-                  </View>
-                ) : null}
+                    }}
+                  />}
 
                 {item.locked ? (
                   <Icon

@@ -17,8 +17,7 @@ import {sleep} from '../../utils/TimeUtils';
 import {PressableButton} from '../PressableButton';
 
 export const ActionSheetColorsSection = ({item, close}) => {
-  const [state, dispatch] = useTracked();
-  const {colors} = state;
+  const [, dispatch] = useTracked();
   const [note, setNote] = useState(item);
 
   const localRefresh = () => {
@@ -49,8 +48,8 @@ export const ActionSheetColorsSection = ({item, close}) => {
         testID={notesnook.ids.dialogs.actionsheet.color(c)}
         key={color.value}
         onPress={async () => {
-          let noteColors = note.colors;
-          if (noteColors.includes(color.name)) {
+          let noteColor = note.color;
+          if (noteColor === color.name) {
             await db.notes.note(note.id).uncolor(color.name);
           } else {
             await db.notes.note(note.id).color(color.name);
@@ -66,7 +65,7 @@ export const ActionSheetColorsSection = ({item, close}) => {
           justifyContent: 'center',
           alignItems: 'center',
         }}>
-        {note && note.colors && note.colors.includes(color.name) ? (
+        {note.color === color.name ? (
           <Icon name="check" color="white" size={SIZE.lg} />
         ) : null}
       </PressableButton>

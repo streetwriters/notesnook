@@ -68,8 +68,8 @@ const SelectionWrapper = ({
     <PressableButton
       customColor={
         currentEditingNote === item.id
-          ? item.type === 'note' && item.colors[0]
-            ? COLORS_NOTE[item.colors[0]]
+          ? item.type === 'note' && item.color
+            ? COLORS_NOTE[item.color]
             : colors.shade
           : background
           ? background

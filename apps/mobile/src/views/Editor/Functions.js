@@ -63,8 +63,8 @@ export function setColors(colors) {
   }
   let theme = {...appColors, factor: normalize(1)};
 
-  if (note && note.colors[0] && !DDS.isLargeTablet()) {
-    theme.shade = hexToRGBA(COLORS_NOTE[note.colors[0]], 0.15);
+  if (note && note.color && !DDS.isLargeTablet()) {
+    theme.shade = hexToRGBA(COLORS_NOTE[note.color], 0.15);
   }
   post('theme', theme);
 }
