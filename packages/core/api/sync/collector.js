@@ -42,9 +42,9 @@ class Collector {
         )
         .map(async (item) => {
           // in case of resolved delta
-          item.resolved = false;
+          if (item.resolved) item.resolved = false;
           // turn the migrated flag off so we don't keep syncing this item repeated
-          item.migrated = false;
+          if (item.migrated) item.migrated = false;
 
           return {
             id: item.id,
