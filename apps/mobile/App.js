@@ -242,8 +242,10 @@ const App = () => {
   }, []);
 
   const loadMainApp = () => {
+    console.log('main app loadinggggg');
     dispatch({type: Actions.ALL});
     AppRootView = require('./initializer.root').RootView;
+    sleep(100).then(() => SplashScreen.hide());
     getUser().then(console.log).catch(console.log);
     backupData().then((r) => r);
     sleep(500).then(() => (appInit = true));
@@ -286,6 +288,7 @@ const App = () => {
   }, []);
 
   const runAfterInit = () => {
+    let isIntent = false;
     IntentService.getIntent()
       .then(() => {
         AppRootView = require('./initializer.intent').IntentView;
@@ -294,13 +297,17 @@ const App = () => {
         intentInit = true;
         dispatch({type: Actions.ALL});
         setIntent(true);
+        isIntent = true;
         ReceiveSharingIntent.clearFileNames();
       })
-      .catch((e) => {
-        console.log(e, 'no intent recieved');
-        ReceiveSharingIntent.clearFileNames();
-        intentInit = true;
-        loadMainApp();
+      .catch((e) => console.log)
+      .finally(() => {
+        if (!isIntent) {
+          console.log('no intent recieved');
+          ReceiveSharingIntent.clearFileNames();
+          intentInit = true;
+          loadMainApp();
+        }
       });
   };
 

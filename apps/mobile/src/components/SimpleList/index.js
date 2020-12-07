@@ -21,7 +21,7 @@ import {
   eScrollEvent,
 } from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
-import { sleep } from '../../utils/TimeUtils';
+import {sleep} from '../../utils/TimeUtils';
 import {Button} from '../Button';
 import {HeaderMenu} from '../Header/HeaderMenu';
 import Seperator from '../Seperator';
@@ -49,7 +49,7 @@ const SimpleList = ({
   loading,
 }) => {
   const [state, dispatch] = useTracked();
-  const {colors,searchResults} = state;
+  const {colors, searchResults} = state;
   const [refreshing, setRefreshing] = useState(false);
   const [dataProvider, setDataProvider] = useState(
     new DataProvider((r1, r2) => {
@@ -73,12 +73,9 @@ const SimpleList = ({
   }, [listData, searchResults.results]);
 
   const loadData = () => {
-    sleep(500).then(()=> {
-      let mainData = [header, {type: 'empty'}];
-      mainData =
-        !listData || listData.length === 0 ? mainData : [header, ...listData];
-      setDataProvider(dataProvider.cloneWithRows(mainData));
-    })
+    if (listData || listData.length === 0) {
+      setDataProvider(dataProvider.cloneWithRows([header, ...listData]));
+    }
   };
 
   const RenderSectionHeader = ({item, index}) => (

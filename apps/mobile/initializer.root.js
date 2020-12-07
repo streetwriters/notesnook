@@ -19,6 +19,7 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent,
 } from './src/services/EventManager';
+import IntentService from './src/services/IntentService';
 import SettingsService from './src/services/SettingsService';
 import {editing, setWidthHeight} from './src/utils';
 import {
@@ -196,10 +197,6 @@ const AppStack = React.memo(
       } else {
         setDeviceMode('mobile', size);
       }
-      if (!SettingsService.getApploaded()) {
-        eSendEvent('nointent');
-      }
-      sleep(100).then(() =>   SplashScreen.hide() )
     }
 
     function setDeviceMode(current, size) {
