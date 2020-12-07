@@ -31,7 +31,7 @@ class UserStore extends BaseStore {
           };
         });
       });
-      EV.subscribe("db:sync", this.sync);
+      EV.subscribe("db:sync", () => this.sync(false));
       await this.sync();
       return true;
     });
@@ -73,10 +73,10 @@ class UserStore extends BaseStore {
       });
   };
 
-  sync = () => {
+  sync = (full = true) => {
     this.set((state) => (state.isSyncing = true));
     return db
-      .sync()
+      .sync(full)
       .then(() => {
         return appStore.refresh();
       })
