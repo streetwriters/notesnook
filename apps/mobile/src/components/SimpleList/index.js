@@ -21,6 +21,7 @@ import {
   eScrollEvent,
 } from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
+import { sleep } from '../../utils/TimeUtils';
 import {Button} from '../Button';
 import {HeaderMenu} from '../Header/HeaderMenu';
 import Seperator from '../Seperator';
@@ -48,15 +49,15 @@ const SimpleList = ({
   loading,
 }) => {
   const [state, dispatch] = useTracked();
-  const {colors} = state;
-  const searchResults = {...state.searchResults};
+  const {colors,searchResults} = state;
   const [refreshing, setRefreshing] = useState(false);
-  const insets = useSafeAreaInsets();
   const [dataProvider, setDataProvider] = useState(
     new DataProvider((r1, r2) => {
       return r1 !== r2;
     }).cloneWithRows([header, {type: 'empty'}]),
   );
+  const insets = useSafeAreaInsets();
+
   const {width, fontScale} = useWindowDimensions();
 
   const listData = data;
@@ -72,10 +73,12 @@ const SimpleList = ({
   }, [listData, searchResults.results]);
 
   const loadData = () => {
-    let mainData = [header, {type: 'empty'}];
-    mainData =
-      !listData || listData.length === 0 ? mainData : [header, ...listData];
-    setDataProvider(dataProvider.cloneWithRows(mainData));
+    sleep(500).then(()=> {
+      let mainData = [header, {type: 'empty'}];
+      mainData =
+        !listData || listData.length === 0 ? mainData : [header, ...listData];
+      setDataProvider(dataProvider.cloneWithRows(mainData));
+    })
   };
 
   const RenderSectionHeader = ({item, index}) => (
@@ -209,7 +212,7 @@ const SimpleList = ({
           break;
         case 'empty':
           dim.width = width;
-          dim.height = 600;
+          dim.height = dHeight - 250 - insets.top;
           break;
         case 'topic':
           dim.width = width;
@@ -280,7 +283,7 @@ const SimpleList = ({
       dataProvider={dataProvider}
       rowRenderer={_renderRow}
       onScroll={_onScroll}
-      canChangeSize
+      canChangeSize={true}
       forceNonDeterministicRendering
       renderFooter={() => <View style={{height: 300}} />}
       scrollViewProps={{

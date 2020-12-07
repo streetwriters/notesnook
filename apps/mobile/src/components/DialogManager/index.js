@@ -7,6 +7,7 @@ import {
   eUnSubscribeEvent,
   openVault
 } from '../../services/EventManager';
+import { dWidth } from '../../utils';
 import { hexToRGBA } from '../../utils/ColorUtils';
 import {
   eCloseActionSheet,
@@ -344,7 +345,7 @@ export class DialogManager extends Component {
             bounceOnOpen={false}
             gestureEnabled={true}
             onClose={() => {
-              translatePrem.setValue(-800);
+              translatePrem.setValue(-dWidth * 5);
               this.onActionSheetHide();
               this.setState({
                 actionSheetVisible: false,
