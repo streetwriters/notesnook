@@ -85,6 +85,7 @@ export default class Note {
 
   async color(color) {
     if (!(await sendCheckUserStatusEvent(CHECK_IDS.noteColor))) return;
+    await this.uncolor();
     await this._db.colors.add(color, this._note.id);
     await this._db.notes._collection.addItem({ ...this._note, color });
   }
