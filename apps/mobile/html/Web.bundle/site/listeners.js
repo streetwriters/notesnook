@@ -85,6 +85,88 @@ function attachEditorListeners() {
   titleInput = isTablet ? 'titleInput' : 'simpleTitleInput';
   infoBar = isTablet ? '.info-bar' : '.info-bar-alt';
 
+ 
+
+  function isWhitespace(ch) {
+    let whiteSpace = false;
+    if (ch === ' ' || ch === '\t' || ch === '\n') {
+      whiteSpace = true;
+    }
+    return whiteSpace;
+  }
+
+  let deltaTimeout = null;
+  let historyTimeout = null;
+
+  editor.on('text-change', function (delta, oldDelta, source) {
+    var regex = /https?:\/\/[^\s]+$/;
+    if (source === 'api') return;
+    if (
+      delta.ops.length === 2 &&
+      delta.ops[0].retain &&
+      isWhitespace(delta.ops[1].insert)
+    ) {
+      var endRetain = delta.ops[0].retain;
+      var text = editor.getText().substr(0, endRetain);
+      var match = text.toLowerCase().match(regex);
+
+      if (match !== null) {
+        var url = match[0];
+
+        var ops = [];
+        if (endRetain > url.length) {
+          ops.push({retain: endRetain - url.length});
+        }
+
+        ops = ops.concat([
+          {delete: url.length},
+          {insert: url, attributes: {link: url}},
+        ]);
+
+        editor.updateContents({
+          ops: ops,
+        });
+      }
+    }
+    info = document.querySelector(infoBar);
+    let infowords = info.querySelector('#infowords');
+    if (infowords) {
+      infowords.innerText =
+        editor.getText().split(' ').length + ' words';
+    }
+
+    if (deltaTimeout) {
+      clearTimeout(deltaTimeout);
+      deltaTimeout = null;
+    }
+
+    deltaTimeout = setTimeout(() => {
+      let msg = JSON.stringify({
+        data: editor.getContents().ops,
+        type: 'delta',
+      });
+      window.ReactNativeWebView.postMessage(msg);
+    }, 50);
+
+    if (historyTimeout) {
+      clearTimeout(historyTimeout);
+      historyTimeout = null;
+    }
+
+    historyTimeout = setTimeout(() => {
+      let history = JSON.stringify({
+        type: 'history',
+        undo: editor.history.stack.undo.length,
+        redo: editor.history.stack.redo.length,
+      });
+      window.ReactNativeWebView.postMessage(history);
+    }, 1000);
+  });
+}
+
+function attachMessageListener() {
+  titleInput = isTablet ? 'titleInput' : 'simpleTitleInput';
+  infoBar = isTablet ? '.info-bar' : '.info-bar-alt';  
   window.addEventListener('message', (data) => {
     let message = JSON.parse(data.data);
     let type = message.type;
@@ -218,81 +300,5 @@ function attachEditorListeners() {
       default:
         break;
     }
-  });
-
-  function isWhitespace(ch) {
-    let whiteSpace = false;
-    if (ch === ' ' || ch === '\t' || ch === '\n') {
-      whiteSpace = true;
-    }
-    return whiteSpace;
-  }
-
-  let deltaTimeout = null;
-  let historyTimeout = null;
-
-  editor.on('text-change', function (delta, oldDelta, source) {
-    var regex = /https?:\/\/[^\s]+$/;
-    if (source === 'api') return;
-    if (
-      delta.ops.length === 2 &&
-      delta.ops[0].retain &&
-      isWhitespace(delta.ops[1].insert)
-    ) {
-      var endRetain = delta.ops[0].retain;
-      var text = editor.getText().substr(0, endRetain);
-      var match = text.toLowerCase().match(regex);
-
-      if (match !== null) {
-        var url = match[0];
-
-        var ops = [];
-        if (endRetain > url.length) {
-          ops.push({retain: endRetain - url.length});
-        }
-
-        ops = ops.concat([
-          {delete: url.length},
-          {insert: url, attributes: {link: url}},
-        ]);
-
-        editor.updateContents({
-          ops: ops,
-        });
-      }
-    }
-    info = document.querySelector(infoBar);
-    let infowords = info.querySelector('#infowords');
-    if (infowords) {
-      infowords.innerText =
-        editor.getText().split(' ').length + ' words';
-    }
-
-    if (deltaTimeout) {
-      clearTimeout(deltaTimeout);
-      deltaTimeout = null;
-    }
-
-    deltaTimeout = setTimeout(() => {
-      let msg = JSON.stringify({
-        data: editor.getContents().ops,
-        type: 'delta',
-      });
-      window.ReactNativeWebView.postMessage(msg);
-    }, 50);
-
-    if (historyTimeout) {
-      clearTimeout(historyTimeout);
-      historyTimeout = null;
-    }
-
-    historyTimeout = setTimeout(() => {
-      let history = JSON.stringify({
-        type: 'history',
-        undo: editor.history.stack.undo.length,
-        redo: editor.history.stack.redo.length,
-      });
-      window.ReactNativeWebView.postMessage(history);
-    }, 1000);
   });
 }

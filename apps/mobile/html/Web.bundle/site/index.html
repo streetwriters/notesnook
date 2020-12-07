@@ -475,7 +475,7 @@
     },
   };
 
-
+  attachMessageListener();
   function loadAction(premium, tab) {
     isTablet = tab;
     let titleIn = document.getElementById('titlebar');
@@ -550,9 +550,9 @@
 
     addLinkMatcher();
     attachTitleInputListeners();
-    setTheme();
     attachEditorListeners();
     fixDropdownMenuLocations();
+    setTheme();
   }
 
 </script>
