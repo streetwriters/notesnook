@@ -1,10 +1,11 @@
 import React, {createRef} from 'react';
-import {ScrollView, View} from 'react-native';
+import {Platform, ScrollView, View} from 'react-native';
 import * as RNIap from 'react-native-iap';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {DDS} from '../../services/DeviceDetection';
 import {eSendEvent, ToastEvent} from '../../services/EventManager';
 import {dHeight, dWidth, itemSkus} from '../../utils';
+import { hexToRGBA } from '../../utils/ColorUtils';
 import {db} from '../../utils/DB';
 import {eOpenLoginDialog, eOpenPendingDialog} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
@@ -95,6 +96,11 @@ class PremiumDialog extends React.Component {
           borderBottomRightRadius: 0,
           borderBottomLeftRadius: 0,
         }}
+        indicatorColor={
+          Platform.ios
+            ? hexToRGBA(colors.accent + '19')
+            : hexToRGBA(colors.shade)
+        }
         onOpen={async () => {
           try {
             await this.getSkus();

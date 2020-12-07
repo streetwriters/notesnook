@@ -1,8 +1,9 @@
 import React, { createRef } from 'react';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 import { DDS } from '../../services/DeviceDetection';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
 import { dWidth } from '../../utils';
+import { hexToRGBA } from '../../utils/ColorUtils';
 import { db } from '../../utils/DB';
 import { eClosePendingDialog, eOpenPendingDialog } from '../../utils/Events';
 import { SIZE } from '../../utils/SizeUtils';
@@ -56,6 +57,11 @@ class PendingDialog extends React.Component {
           borderRadius: 10,
           marginBottom: DDS.isTab ? 50 : 0,
         }}
+        indicatorColor={
+          Platform.ios
+            ? hexToRGBA(colors.accent + '19')
+            : hexToRGBA(colors.shade)
+        }
         extraScroll={DDS.isTab ? 50 : 0}
         gestureEnabled={true}
         footerAlwaysVisible={DDS.isTab}

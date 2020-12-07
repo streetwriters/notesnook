@@ -1,5 +1,5 @@
 import React, { createRef } from 'react';
-import { Clipboard, View } from 'react-native';
+import { Clipboard, Platform, View } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import RNFetchBlob from 'rn-fetch-blob';
@@ -11,6 +11,7 @@ import {
   ToastEvent
 } from '../../services/EventManager';
 import { dWidth } from '../../utils';
+import { hexToRGBA } from '../../utils/ColorUtils';
 import { db } from '../../utils/DB';
 import { eOpenRecoveryKeyDialog, eOpenResultDialog } from '../../utils/Events';
 import { SIZE } from '../../utils/SizeUtils';
@@ -145,6 +146,11 @@ class RecoveryKeyDialog extends React.Component {
           alignSelf: 'center',
           borderRadius: 10,
         }}
+        indicatorColor={
+          Platform.ios
+            ? hexToRGBA(colors.accent + '19')
+            : hexToRGBA(colors.shade)
+        }
         closeOnTouchBackdrop={false}
         onOpen={this.onOpen}
         ref={this.actionSheetRef}

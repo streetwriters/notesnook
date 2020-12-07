@@ -1,11 +1,13 @@
-import React, {Component} from 'react';
-import {Dimensions, Platform} from 'react-native';
+import React, { Component } from 'react';
+import { Platform } from 'react-native';
+import { DDS } from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-  openVault,
+  openVault
 } from '../../services/EventManager';
+import { hexToRGBA } from '../../utils/ColorUtils';
 import {
   eCloseActionSheet,
   eCloseAddNotebookDialog,
@@ -22,14 +24,16 @@ import {
   eOpenLoginDialog,
   eOpenMoveNoteDialog,
   eOpenPremiumDialog,
-  eOpenSimpleDialog,
+  eOpenSimpleDialog
 } from '../../utils/Events';
 import ActionSheet from '../ActionSheet';
-import {ActionSheetComponent} from '../ActionSheetComponent';
-import {AddNotebookDialog} from '../AddNotebookDialog';
-import {AddTopicDialog} from '../AddTopicDialog';
-import {Dialog} from '../Dialog';
+import { ActionSheetComponent } from '../ActionSheetComponent';
+import { GetPremium, translatePrem } from '../ActionSheetComponent/GetPremium';
+import { AddNotebookDialog } from '../AddNotebookDialog';
+import { AddTopicDialog } from '../AddTopicDialog';
+import { Dialog } from '../Dialog';
 import ExportDialog from '../ExportDialog';
+import JumpToDialog from '../JumpToDialog';
 import LoginDialog from '../LoginDialog';
 import MergeEditor from '../MergeEditor';
 import MoveNoteDialog from '../MoveNoteDialog';
@@ -39,16 +43,10 @@ import PremiumStatusDialog from '../Premium/PremiumStatusDialog';
 import ProgressDialog from '../ProgressDialog';
 import RecoveryKeyDialog from '../RecoveryKeyDialog';
 import RestoreDialog from '../RestoreDialog';
-import {VaultDialog} from '../VaultDialog';
-import {TEMPLATE_DELETE, TEMPLATE_PERMANANT_DELETE} from './Templates';
-import {hexToRGBA} from '../../utils/ColorUtils';
-import {DDS} from '../../services/DeviceDetection';
 import ResultDialog from '../ResultDialog';
 import SortDialog from '../SortDialog';
-import JumpToDialog from '../JumpToDialog';
-import {GetPremium, translatePrem} from '../ActionSheetComponent/GetPremium';
-import {sleep} from '../../utils/TimeUtils';
-import { dHeight } from '../../utils';
+import { VaultDialog } from '../VaultDialog';
+import { TEMPLATE_DELETE, TEMPLATE_PERMANANT_DELETE } from './Templates';
 
 export class DialogManager extends Component {
   constructor(props) {

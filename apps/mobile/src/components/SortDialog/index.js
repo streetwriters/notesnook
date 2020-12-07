@@ -1,5 +1,5 @@
 import React, {createRef} from 'react';
-import {TouchableOpacity, View} from 'react-native';
+import {Platform, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {notesnook} from '../../../e2e/test.ids';
 import {Actions} from '../../provider/Actions';
@@ -8,6 +8,7 @@ import {DDS} from '../../services/DeviceDetection';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
 import SettingsService from '../../services/SettingsService';
 import {dWidth, SORT, sortSettings} from '../../utils';
+import { hexToRGBA } from '../../utils/ColorUtils';
 import {eCloseSortDialog, eOpenSortDialog} from '../../utils/Events';
 import {MMKV} from '../../utils/mmkv';
 import {SIZE} from '../../utils/SizeUtils';
@@ -82,6 +83,11 @@ class SortDialog extends React.Component {
           borderRadius: 10,
           marginBottom: DDS.isTab ? 50 : 0,
         }}
+        indicatorColor={
+          Platform.ios
+            ? hexToRGBA(colors.accent + '19')
+            : hexToRGBA(colors.shade)
+        }
         extraScroll={DDS.isTab ? 50 : 0}
         gestureEnabled={true}
         footerAlwaysVisible={DDS.isTab}
