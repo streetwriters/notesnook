@@ -1,21 +1,19 @@
-import React, {createRef} from 'react';
-import {Modal, Text, TouchableOpacity, View} from 'react-native';
-import {TextInput} from 'react-native-gesture-handler';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {getElevation} from '../../utils';
-import {eSendEvent, ToastEvent} from '../../services/EventManager';
-import {eOnNewTopicAdded} from '../../utils/Events';
-import {Toast} from '../Toast';
-import {Button} from '../Button';
-import BaseDialog from '../Dialog/base-dialog';
-import DialogHeader from '../Dialog/dialog-header';
-import DialogButtons from '../Dialog/dialog-buttons';
-import {opacity, ph, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
-import {db} from '../../utils/DB';
-import {DDS} from '../../services/DeviceDetection';
-import Seperator from '../Seperator';
-import { updateEvent } from '../DialogManager/recievers';
+import React, { createRef } from 'react';
+import { View } from 'react-native';
+import { TextInput } from 'react-native-gesture-handler';
 import { Actions } from '../../provider/Actions';
+import { DDS } from '../../services/DeviceDetection';
+import { eSendEvent, ToastEvent } from '../../services/EventManager';
+import { getElevation } from '../../utils';
+import { db } from '../../utils/DB';
+import { eOnNewTopicAdded } from '../../utils/Events';
+import { ph, pv, SIZE, WEIGHT } from '../../utils/SizeUtils';
+import BaseDialog from '../Dialog/base-dialog';
+import DialogButtons from '../Dialog/dialog-buttons';
+import DialogHeader from '../Dialog/dialog-header';
+import { updateEvent } from '../DialogManager/recievers';
+import Seperator from '../Seperator';
+import { Toast } from '../Toast';
 
 export class AddTopicDialog extends React.Component {
   constructor(props) {
@@ -27,6 +25,7 @@ export class AddTopicDialog extends React.Component {
 
     this.title;
     this.titleRef = createRef();
+    this.notebook = null;
   }
 
   addNewTopic = async () => {
@@ -35,7 +34,6 @@ export class AddTopicDialog extends React.Component {
 
     if (!this.props.toEdit) {
       await db.notebooks.notebook(this.props.notebookID).topics.add(this.title);
-      //ToastEvent.show('New topic added', 'success');
     } else {
       let topic = this.props.toEdit;
       topic.title = this.title;
@@ -43,11 +41,12 @@ export class AddTopicDialog extends React.Component {
       await db.notebooks.notebook(topic.notebookId).topics.add(topic);
     }
     this.close();
-    updateEvent({type:Actions.NOTEBOOKS})
+    updateEvent({type: Actions.NOTEBOOKS});
     eSendEvent(eOnNewTopicAdded);
   };
 
-  open() {
+  async open() {
+    this.notebook = await db.notebooks.notebook(this.props.notebookID);
     this.setState({
       visible: true,
     });
@@ -57,7 +56,7 @@ export class AddTopicDialog extends React.Component {
     this.setState({
       visible: false,
     });
-  }
+  };
 
   render() {
     const {visible, titleFocused} = this.state;
@@ -83,7 +82,8 @@ export class AddTopicDialog extends React.Component {
           }}>
           <DialogHeader
             icon="book-outline"
-            title={toEdit ? 'Edit Topic' : 'Add New Topic'}
+            title={toEdit ? 'Edit Topic' : 'New Topic'}
+            paragraph={'Add a new topic to ' + this.notebook.title}
           />
 
           <Seperator />
