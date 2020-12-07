@@ -84,7 +84,7 @@ const ColorItem = ({item, index}) => {
       onPress={() => onPress(item)}
       customStyle={{
         flexDirection: 'row',
-        justifyContent: noTextMode ? 'center' : 'flex-start',
+        justifyContent: 'flex-start',
         alignItems: 'center',
         width: '100%',
         borderRadius: 0,
@@ -110,19 +110,17 @@ const ColorItem = ({item, index}) => {
         />
       </View>
 
-      {noTextMode ? null : (
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            width: '85%',
-          }}>
-          <Paragraph color={colors.heading} size={SIZE.md}>
-            {item.title.slice(0, 1).toUpperCase() + item.title.slice(1)}
-          </Paragraph>
-        </View>
-      )}
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          width: '85%',
+        }}>
+        <Paragraph color={colors.heading} size={SIZE.md}>
+          {item.title.slice(0, 1).toUpperCase() + item.title.slice(1)}
+        </Paragraph>
+      </View>
     </PressableButton>
   );
 };
