@@ -1,9 +1,12 @@
+import React from "react";
 import createStore from "../common/store";
 import { db } from "../common";
 import { store as appStore } from "./app-store";
 import BaseStore from "./index";
 import config from "../utils/config";
 import { EV } from "notes-core/common";
+import { showLoadingDialog } from "../components/dialogs/loadingdialog";
+import { Text } from "rebass";
 
 class UserStore extends BaseStore {
   isLoggedIn = false;
@@ -29,7 +32,7 @@ class UserStore extends BaseStore {
         });
       });
       EV.subscribe("db:sync", this.sync);
-      this.sync();
+      await this.sync();
       return true;
     });
   };
@@ -39,7 +42,19 @@ class UserStore extends BaseStore {
     return db.user
       .login(form.username, form.password)
       .then(() => {
-        return this.init();
+        return showLoadingDialog({
+          title: "Importing your data...",
+          subtitle:
+            "We are importing your data from the server. Please wait...",
+          action: async () => {
+            return await this.init();
+          },
+          message: (
+            <Text color="error">
+              Please do NOT close your browser or power off your device.
+            </Text>
+          ),
+        });
       })
       .finally(() => {
         this.set((state) => (state.isLoggingIn = false));
@@ -63,7 +78,7 @@ class UserStore extends BaseStore {
     return db
       .sync()
       .then(() => {
-        appStore.refresh();
+        return appStore.refresh();
       })
       .catch(async (err) => {
         if (err.code === "MERGE_CONFLICT") await appStore.refresh();
