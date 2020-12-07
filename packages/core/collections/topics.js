@@ -47,16 +47,17 @@ export default class Topics {
 
     notebook.topics = [];
     notebook.totalNotes = 0;
-    allTopics.forEach((t) => {
+    for (let t of allTopics) {
       let topic = makeTopic(t, this._notebookId);
 
       if (notebook.topics.findIndex((_topic) => _topic.title === t) > -1)
-        return;
+        continue;
 
-      if (topic.title.length <= 0) return;
+      if (topic.title.length <= 0) continue;
 
       let index = notebook.topics.findIndex((t) => t.id === topic.id);
       if (index > -1) {
+        notebook.totalNotes -= notebook.topics[index].totalNotes;
         notebook.topics[index] = {
           ...notebook.topics[index],
           ...topic,
@@ -66,8 +67,7 @@ export default class Topics {
       }
 
       notebook.totalNotes += topic.totalNotes;
-    });
-
+    }
     return this._db.notebooks._collection.addItem(notebook);
   }
 

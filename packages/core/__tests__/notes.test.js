@@ -42,10 +42,14 @@ test("delete note", () =>
     let topic = topics.topic("General");
     await topic.add(id);
     topic = topics.topic("General");
+
     expect(topic.all.findIndex((v) => v.id === id)).toBeGreaterThan(-1);
     await db.notes.delete(id);
     expect(db.notes.note(id)).toBeUndefined();
     expect(topic.all.findIndex((v) => v.id === id)).toBe(-1);
+
+    expect(db.notebooks.notebook(notebookId).data.totalNotes).toBe(0);
+    expect(topics.topic("General")._topic.totalNotes).toBe(0);
   }));
 
 test("get all notes", () =>
@@ -179,18 +183,25 @@ test("duplicate note to topic should not be added", () =>
     expect(topic.all.length).toBe(1);
   }));
 
-test("move note", () =>
+test("add the same note to 2 notebooks", () =>
   noteTest().then(async ({ db, id }) => {
     let notebookId = await db.notebooks.add({ title: "Hello" });
     let topics = db.notebooks.notebook(notebookId).topics;
     await topics.add("Home");
-    let topic = topics.topic("Home");
-    await topic.add(id);
+    let topic = topics.topic("Home")._topic;
+    await db.notes.move({ id: notebookId, topic: topic.id }, id);
+
+    expect(topics.topic(topic.id).has(id)).toBe(true);
+
     let notebookId2 = await db.notebooks.add({ title: "Hello2" });
-    await db.notebooks.notebook(notebookId2).topics.add("Home2");
-    await db.notes.move({ id: notebookId2, topic: "Home2" }, id);
+    let topics2 = db.notebooks.notebook(notebookId2).topics;
+    await topics2.add("Home2");
+    let topic2 = topics2.topic("Home2")._topic;
+    await db.notes.move({ id: notebookId2, topic: topic2.id }, id);
+
     let note = db.notes.note(id);
-    expect(note.notebooks.some((n) => n.id === notebookId2)).toBe(true);
+    expect(note.notebooks.length).toBe(2);
+    expect(topics2.topic(topic2.id).has(id)).toBe(true);
   }));
 
 test("moving note to same notebook and topic should do nothing", () =>
