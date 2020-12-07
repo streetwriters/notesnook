@@ -128,7 +128,9 @@ function Settings(props) {
               fontSize={26}
               mt={2}
             >
-              {subscriptionDaysRemaining} Days Remaining
+              {subscriptionDaysRemaining > 0
+                ? `${subscriptionDaysRemaining} Days Remaining`
+                : "Your trial has ended."}
             </Text>
             <Text variant="subBody">
               Your trial period started on{" "}
