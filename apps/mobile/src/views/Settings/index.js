@@ -242,9 +242,10 @@ const SettingsUserSection = () => {
   const [state, dispatch] = useTracked();
   const {colors, user} = state;
   const [visible, setVisible] = useState(false);
+
   const getTimeLeft = (t2) => {
     let d1 = new Date(Date.now());
-    let d2 = new Date(t2 * 1000);
+    let d2 = new Date(t2);
     let diff = d2.getTime() - d1.getTime();
     diff = (diff / (1000 * 3600 * 24)).toFixed(0);
 

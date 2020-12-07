@@ -19,7 +19,7 @@ export default class NoteItem extends React.Component {
     this.cipher = {
       value: false,
     };
-    this.colors = [];
+    this.color;
     this.actionSheet;
     this.show = null;
     this.setMenuRef = {};
@@ -29,7 +29,7 @@ export default class NoteItem extends React.Component {
   shouldComponentUpdate(nextProps, nextState) {
     if (
       nextProps.item.locked !== this.cipher.value ||
-      nextProps.item.colors.length !== this.colors.length ||
+      nextProps.item.color !== this.color ||
       nextProps.selectionMode !== this.props.selectionMode
     ) {
       return true;
@@ -41,15 +41,15 @@ export default class NoteItem extends React.Component {
     }
   }
   componentDidUpdate() {
-    this.colors = [...this.props.item.colors];
+    this.color = this.props.item.color;
     this.cipher.value = this.props.item.locked ? true : false;
   }
   componentWillUnmount() {
-    this.colors = [];
+    this.color = null;
     this.cipher.value = false;
   }
   componentDidMount() {
-    this.colors = [];
+    this.color = null;
     if (this.props.item.locked) {
       this.cipher.value = true;
     }
@@ -69,7 +69,7 @@ export default class NoteItem extends React.Component {
 
   render() {
     let {colors, item, customStyle, isTrash} = this.props;
-    console.log(item,"ITE<")
+    console.log(item, 'ITE<');
     return (
       <View
         style={[
@@ -162,7 +162,7 @@ export default class NoteItem extends React.Component {
             }}>
             {!isTrash ? (
               <>
-                {item.color &&
+                {item.color && (
                   <View
                     key={item}
                     style={{
@@ -173,7 +173,8 @@ export default class NoteItem extends React.Component {
                       marginRight: -4.5,
                       marginRight: 10,
                     }}
-                  />}
+                  />
+                )}
 
                 {item.locked ? (
                   <Icon
