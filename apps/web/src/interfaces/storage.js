@@ -41,12 +41,10 @@ async function deriveCryptoKey(name, data) {
   if (!password) throw new Error("Invalid data provided to deriveCryptoKey.");
 
   const keyData = await crypto.deriveKey(password, salt, true);
-  console.log("keyData", keyData);
   if (window.indexedDB) {
     const pbkdfKey = await derivePBKDF2Key(password);
     await write(name, pbkdfKey);
     const cipheredKey = await aesEncrypt(pbkdfKey, keyData);
-    console.log("cipheredKey", cipheredKey);
     await write(`${name}@_k`, cipheredKey);
   } else {
     await write(`${name}@_k`, keyData);

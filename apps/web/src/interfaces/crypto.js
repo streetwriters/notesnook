@@ -47,15 +47,34 @@ class Crypto {
 class CryptoWorker {
   constructor() {
     this.isReady = false;
+    this.initializing = false;
+    this.promiseQueue = [];
   }
   async _initialize() {
-    if (this.isReady) return;
+    if (this.isReady || this.initializing)
+      return await new Promise((resolve, reject) => {
+        this.promiseQueue.push({ resolve, reject });
+      });
+
+    this.initializing = true;
     this.worker = new Worker("crypto.worker.js");
     const buffer = Buffer.allocUnsafe(32);
     crypto.getRandomValues(buffer);
     const message = { seed: buffer.buffer };
-    await this._communicate("load", message, [message.seed], false);
-    this.isReady = true;
+
+    try {
+      await this._communicate("load", message, [message.seed], false);
+      this.isReady = true;
+
+      this.promiseQueue.forEach(({ resolve }) => resolve());
+    } catch (e) {
+      this.isReady = false;
+
+      this.promiseQueue.forEach(({ reject }) => reject(e));
+    } finally {
+      this.initializing = false;
+      this.promiseQueue = [];
+    }
   }
 
   _communicate(type, data, transferables = [], init = true) {
