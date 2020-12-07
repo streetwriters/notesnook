@@ -111,7 +111,7 @@ const onNetworkStateChanged = (netInfo) => {
     type = 'error';
   }
   db.user?.get().then((user) => {
-    if (user) {
+    if (user && intentInit) {
       ToastEvent.show(message, type);
     }
   });
