@@ -28,13 +28,13 @@ export const ColorSection = ({noTextMode}) => {
         width: '100%',
       }}>
       {colorNotes.map((item, index) => (
-        <ColorItem item={item} index={index} />
+        <ColorItem key={item.id} item={item} index={index} />
       ))}
     </View>
   );
 };
 
-const ColorItem = ({item, index}) => {
+const ColorItem = ({item, index,}) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
   const [headerTextState, setHeaderTextState] = useState(null);
@@ -72,7 +72,6 @@ const ColorItem = ({item, index}) => {
 
   return (
     <PressableButton
-      key={item.id}
       customColor={
         headerTextState?.id === item.id && item.type === headerTextState?.type
           ? COLORS_NOTE[item.title]
