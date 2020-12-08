@@ -6,14 +6,14 @@ var changeTimeout;
 function TitleBox(props) {
   const { title, setTitle, changeInterval, shouldFocus } = props;
 
-  const [height, setHeight] = useState(60);
+  const [height, setHeight] = useState(0);
   const inputRef = useRef();
 
   const resize = useCallback(() => {
     const textarea = document.querySelector(".editorTitle");
     const dummy = document.querySelector(".dummyEditorTitle");
     dummy.innerHTML = textarea.value;
-    setHeight(dummy.scrollHeight > 60 ? dummy.scrollHeight : 60);
+    setHeight(dummy.scrollHeight);
   }, []);
 
   useEffect(() => {
@@ -21,7 +21,7 @@ function TitleBox(props) {
     const myObserver = new ResizeObserver((entries) => {
       window.requestAnimationFrame(() => {
         const newHeight = entries[0].contentRect.height;
-        setHeight(newHeight > 60 ? newHeight : 60);
+        setHeight(newHeight);
       });
     });
     myObserver.observe(document.querySelector(".dummyEditorTitle"));
@@ -47,7 +47,8 @@ function TitleBox(props) {
         as="pre"
         className="dummyEditorTitle"
         variant="heading"
-        fontSize="2.625em"
+        minHeight={[30, 30, 60]}
+        fontSize={["1.625em", "1.625em", "2.625em"]}
         sx={{ whiteSpace: "pre-wrap", position: "absolute", zIndex: -1 }}
       ></Text>
       <Input
@@ -58,12 +59,13 @@ function TitleBox(props) {
         placeholder="Untitled"
         as="textarea"
         width="100%"
+        minHeight={[30, 30, 60]}
         p={0}
         sx={{
           height,
           overflowY: "hidden",
           fontFamily: "heading",
-          fontSize: "2.625em",
+          fontSize: ["1.625em", "1.625em", "2.625em"],
           fontWeight: "heading",
           border: "none",
           resize: "none",
@@ -82,27 +84,6 @@ function TitleBox(props) {
         }}
       />
     </Flex>
-    // <TextArea
-    //   ref={inputRef}
-    //   autoFocus={shouldFocus}
-    //   className="editorTitle"
-    //   data-test-id="editor-title"
-    //   placeholder="Untitled"
-    //   maxLength={240}
-    //   style={{
-    //     backgroundColor: "transparent",
-    //     fontFamily: theme.fonts["heading"],
-    //     fontSize: "2.625em",
-    //     fontWeight: theme.fontWeights["heading"],
-    //     resize: "none",
-    //     paddingRight: theme.space[2],
-    //     paddingLeft: theme.space[2],
-    //     border: "none",
-    //     color: theme.colors["text"],
-    //     width: "100%",
-    //   }}
-
-    // />
   );
 }
 

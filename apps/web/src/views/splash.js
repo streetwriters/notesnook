@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Flex, Text } from "rebass";
+import { Box, Flex, Text } from "rebass";
 import ThemeProvider from "../components/theme-provider";
 import Animated from "../components/animated";
 import { db } from "../common";
@@ -47,33 +47,39 @@ function Splash(props) {
         alignItems="center"
         overflow="hidden"
       >
-        <Flex
-          sx={{
-            fontSize: 62,
-            color: "primary",
-            fontWeight: "bold",
-            fontFamily: "body",
-          }}
-        >
-          <Animated.Text backgroundColor="bgPrimary" overflow={"hidden"} x={0}>
-            Notes
-          </Animated.Text>
-          <Animated.Flex backgroundColor="" overflow={"hidden"}>
+        <Box>
+          <Flex
+            sx={{
+              fontSize: [42, 42, 52],
+              color: "primary",
+              fontWeight: "bold",
+              fontFamily: "body",
+            }}
+          >
             <Animated.Text
-              initial={{ x: -100 * 1.2 }}
-              animate={{ x: 0 }}
-              transition={{ ease: "easeOut", duration: 1 }}
+              backgroundColor="bgPrimary"
+              overflow={"hidden"}
+              x={0}
             >
-              nook
+              Notes
             </Animated.Text>
-          </Animated.Flex>
-        </Flex>
-        <ProgressBar
-          progress={100}
-          width={300}
-          onLoadingEnd={() => setAnimationEnded(true)}
-        />
-        <Text color="text" mt={2}>
+            <Animated.Flex backgroundColor="" overflow={"hidden"}>
+              <Animated.Text
+                initial={{ x: -100 * 1.2 }}
+                animate={{ x: 0 }}
+                transition={{ ease: "easeOut", duration: 1 }}
+              >
+                nook
+              </Animated.Text>
+            </Animated.Flex>
+          </Flex>
+          <ProgressBar
+            progress={100}
+            width={"100%"}
+            onLoadingEnd={() => setAnimationEnded(true)}
+          />
+        </Box>
+        <Text color="text" fontSize="title" mt={2}>
           {loadingLines[getRandom(0, loadingLines.length)]}
         </Text>
       </Flex>
