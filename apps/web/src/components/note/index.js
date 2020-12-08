@@ -126,7 +126,7 @@ function Note(props) {
   const theme = useTheme();
   const color = useMemo(() => COLORS[note.color], [note.color]);
   const notebook = useMemo(
-    () => note.notebooks && db.notebooks.notebook(note.notebooks[0].id).data,
+    () => note.notebooks && db.notebooks.notebook(note.notebooks[0].id)?.data,
     [note.notebooks]
   );
 
@@ -140,7 +140,7 @@ function Note(props) {
       id={note.id}
       index={index}
       header={
-        note.notebooks && (
+        notebook && (
           <Flex
             alignSelf="flex-start"
             justifySelf="flex-start"

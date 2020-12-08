@@ -11,8 +11,7 @@ function getNoteHeight(item) {
   const { notebook, headline } = item;
   let height = SINGLE_LINE_HEIGHT * 3;
   //if (title.length > 35) height += SINGLE_LINE_HEIGHT;
-  if (headline?.length > 0) height += SINGLE_LINE_HEIGHT;
-  if (headline?.length > 50) height += SINGLE_LINE_HEIGHT;
+  if (headline?.length > 0) height += SINGLE_LINE_HEIGHT * 2;
   if (notebook) height += SINGLE_LINE_HEIGHT / 2;
 
   return height * DEFAULT_FONT_SIZE;
@@ -33,11 +32,9 @@ function getNotebookHeight(item) {
 
   if (description?.length > 0) {
     height += SINGLE_LINE_HEIGHT;
-  }
-
-  if (description?.length > 50) {
     height += SINGLE_LINE_HEIGHT;
   }
+
   return height * DEFAULT_FONT_SIZE;
 }
 
