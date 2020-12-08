@@ -18,7 +18,9 @@ const routes = {
         type="notes"
         canGoBack
         title={`#${title}`}
-        route={<Notes type="notes" context={{ type: "tag", value: title }} />}
+        route={
+          <Notes type="notes" context={{ type: "tag", value: tagItem.id }} />
+        }
       />
     );
   },
