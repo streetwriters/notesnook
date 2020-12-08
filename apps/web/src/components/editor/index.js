@@ -72,7 +72,6 @@ function Editor() {
       } = editorstore.get().session;
 
       const { quill } = quillRef.current;
-      console.log(quill);
       quill.setContents(data, "init");
       // quill.history.clear();
       quill.history.stack = {
