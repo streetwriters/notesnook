@@ -78,8 +78,8 @@ const ColorItem = ({item, index,}) => {
           : 'transparent'
       }
       customSelectedColor={COLORS_NOTE[item.title]}
-      alpha={!colors.night ? -0.02 : 0.02}
-      opacity={0.12}
+      customAlpha={!colors.night ? -0.02 : 0.02}
+      customOpacity={0.12}
       onPress={() => onPress(item)}
       customStyle={{
         flexDirection: 'row',
