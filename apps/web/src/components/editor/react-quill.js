@@ -174,7 +174,8 @@ export default class ReactQuill extends Component {
   }
 
   textChangeHandler = (_delta, _oldDelta, source) => {
-    this.props.onWordCountChanged(this.getWordCount());
+    if (this.props.onWordCountChanged)
+      this.props.onWordCountChanged(this.getWordCount());
     if (source === "init") return;
     clearTimeout(this.changeTimeout);
     this.changeTimeout = setTimeout(

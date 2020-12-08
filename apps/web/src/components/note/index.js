@@ -27,7 +27,9 @@ function menuItems(note, context) {
     {
       title: "Add to notebook",
       onClick: async () => {
-        await showMoveNoteDialog([note.id]);
+        if (await showMoveNoteDialog([note.id])) {
+          store.refresh();
+        }
       },
     },
     {
@@ -197,8 +199,9 @@ function Note(props) {
           {note.conflicted && (
             <Text
               ml={1}
-              p={1}
+              px={"3px"}
               bg="error"
+              fontSize="subBody"
               color="static"
               sx={{ borderRadius: "default" }}
             >

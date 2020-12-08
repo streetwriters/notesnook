@@ -23,18 +23,21 @@ function DeltaToggle(props) {
 
   const resolveConflict = useCallback(
     async (selectedContent, otherContent) => {
-      selectedContent.delta = {
-        data: { ops: selectedContent.delta },
+      selectedContent = {
+        data: selectedContent,
+        type: "delta",
         resolved: true,
       };
+
       await db.notes.add({
         id: note.id,
         content: selectedContent,
         conflicted: false,
       });
       if (otherContent) {
-        otherContent.delta = {
-          data: { ops: otherContent.delta },
+        otherContent = {
+          data: otherContent,
+          type: "delta",
         };
         await db.notes.add({
           ...note,
@@ -62,20 +65,12 @@ function DeltaToggle(props) {
             onClick={async () => {
               const { selectedEditor, otherEditor } = editors();
               await resolveConflict(
-                {
-                  delta: deltaTransformer.cleanDifference(
-                    selectedEditor.getContents()
-                  ),
-                  text: selectedEditor.getText(),
-                },
-                {
-                  delta: deltaTransformer.cleanDifference(
-                    otherEditor.getContents()
-                  ),
-                  text: otherEditor.getText(),
-                }
+                deltaTransformer.cleanDifference(selectedEditor.getContents()),
+                deltaTransformer.cleanDifference(otherEditor.getContents())
               );
             }}
+            p={1}
+            px={2}
           >
             Save copy
           </Button>
@@ -85,16 +80,15 @@ function DeltaToggle(props) {
           onClick={async () => {
             if (isOtherSelected) {
               const { selectedEditor } = editors();
-              await resolveConflict({
-                delta: deltaTransformer.cleanDifference(
-                  selectedEditor.getContents()
-                ),
-                text: selectedEditor.getText(),
-              });
+              await resolveConflict(
+                deltaTransformer.cleanDifference(selectedEditor.getContents())
+              );
             } else {
               onToggle();
             }
           }}
+          p={1}
+          px={2}
           bg={isOtherSelected ? "error" : "primary"}
         >
           {isSelected ? "Undo" : isOtherSelected ? "Discard" : "Keep"}

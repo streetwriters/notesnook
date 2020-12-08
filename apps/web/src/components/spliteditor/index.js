@@ -25,7 +25,7 @@ function SplitEditor(props) {
     notesStore.setSelectedNote(diffId);
     note = note.data;
     (async function () {
-      const delta = await db.delta.raw(note.content.delta);
+      const delta = await db.content.raw(note.contentId);
       setConflictedNote(note);
       setLocalDelta({ ...delta, conflicted: false });
       setRemoteDelta(delta.conflicted);
@@ -94,6 +94,7 @@ function SplitEditor(props) {
           width="50%"
           flex="1 1 auto"
           sx={{ borderRight: "1px solid", borderColor: "border" }}
+          px={2}
         >
           <SimpleEditor
             pref={localEditor}
@@ -106,7 +107,7 @@ function SplitEditor(props) {
             )}
           />
         </Box>
-        <Box className="secondEditor" flex="1 1 auto" width="50%">
+        <Box className="secondEditor" flex="1 1 auto" width="50%" px={2}>
           <SimpleEditor
             pref={remoteEditor}
             container=".secondEditor"
