@@ -141,7 +141,7 @@ function attachEditorListeners() {
         break;
       case 'dateEdited':
         linfo = document.querySelector(infoBar);
-        info.querySelector('#infodate').innerText = value;
+        info.querySelector('#infodate').innerText = value + ' - ';
         break;
       case 'saving':
         info = document.querySelector(infoBar);
@@ -153,8 +153,8 @@ function attachEditorListeners() {
         setTimeout(() => {
           info = document.querySelector(infoBar);
           info.querySelector('#infowords').innerText =
-            editor.getText().split(' ').length + ' words';
-            info.querySelector('#infosaved').innerText = 'Saved';
+            editor.getText().split(' ').length + ' words - ';
+          info.querySelector('#infosaved').innerText = 'Saved';
         }, 100);
 
         break;
@@ -201,8 +201,8 @@ function attachEditorListeners() {
         setTimeout(() => {
           info = document.querySelector(infoBar);
           info.querySelector('#infowords').innerText =
-            editor.getText().split(' ').length + ' words';
-            info.querySelector('#infosaved').innerText = 'Saved';
+            editor.getText().split(' ').length + ' words - ';
+          info.querySelector('#infosaved').innerText = 'Saved';
 
           document.body.scrollTop = 0; // For Safari
           document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
@@ -264,8 +264,7 @@ function attachEditorListeners() {
     info = document.querySelector(infoBar);
     let infowords = info.querySelector('#infowords');
     if (infowords) {
-      infowords.innerText =
-        editor.getText().split(' ').length + ' words';
+      infowords.innerText = editor.getText().split(' ').length + ' words - ';
     }
 
     if (deltaTimeout) {
@@ -369,8 +368,8 @@ function attachMessageListener() {
         setTimeout(() => {
           info = document.querySelector(infoBar);
           info.querySelector('#infowords').innerText =
-            editor.getText().split(' ').length + ' words';
-            info.querySelector('#infosaved').innerText = 'Saved';
+            editor.getText().split(' ').length + ' words  - ';
+          info.querySelector('#infosaved').innerText = 'Saved';
         }, 100);
 
         break;
@@ -417,8 +416,8 @@ function attachMessageListener() {
         setTimeout(() => {
           info = document.querySelector(infoBar);
           info.querySelector('#infowords').innerText =
-            editor.getText().split(' ').length + ' words';
-            info.querySelector('#infosaved').innerText = 'Saved';
+            editor.getText().split(' ').length + ' words - ';
+          info.querySelector('#infosaved').innerText = 'Saved';
 
           document.body.scrollTop = 0; // For Safari
           document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
@@ -435,5 +434,4 @@ function attachMessageListener() {
         break;
     }
   });
-
 }
