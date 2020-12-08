@@ -34,8 +34,8 @@ export const Notes = ({route, navigation}) => {
       };
     };
   }, []);
-  
-  const setActionAfterFirstSave = ()  => {
+
+  const setActionAfterFirstSave = () => {
     if (params.type === 'tag') {
       editing.actionAfterFirstSave = {
         type: 'tag',
@@ -53,7 +53,7 @@ export const Notes = ({route, navigation}) => {
         notebook: params.notebookId,
       };
     }
-  }
+  };
 
   const init = (data) => {
     params = route.params;
@@ -62,9 +62,9 @@ export const Notes = ({route, navigation}) => {
     }
     let allNotes = [];
     if (params.type === 'tag') {
-      allNotes = db.notes.tagged(params.tag.title);
+      allNotes = db.notes.tagged(params.tag.id);
     } else if (params.type === 'color') {
-      allNotes = db.notes.colored(params.color.title);
+      allNotes = db.notes.colored(params.color.id);
     } else {
       allNotes = db.notebooks
         .notebook(params.notebookId)
@@ -161,7 +161,6 @@ export const Notes = ({route, navigation}) => {
   };
 
   const _onPressBottomButton = useCallback(() => {
-    
     setActionAfterFirstSave();
 
     if (DDS.isPhone || DDS.isSmallTab) {
@@ -179,6 +178,7 @@ export const Notes = ({route, navigation}) => {
         refreshCallback={() => {
           init();
         }}
+        
         focused={() => navigation.isFocused()}
         RenderItem={NoteItemWrapper}
         placeholderText={`Add some notes to this" ${
