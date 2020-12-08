@@ -41,7 +41,7 @@ async function deriveCryptoKey(name, data) {
   if (!password) throw new Error("Invalid data provided to deriveCryptoKey.");
 
   const keyData = await crypto.deriveKey(password, salt, true);
-  if (window.indexedDB) {
+  if (window.indexedDB && window?.subtle?.crypto) {
     const pbkdfKey = await derivePBKDF2Key(password);
     await write(name, pbkdfKey);
     const cipheredKey = await aesEncrypt(pbkdfKey, keyData);
@@ -52,7 +52,7 @@ async function deriveCryptoKey(name, data) {
 }
 
 async function getCryptoKey(name) {
-  if (window.indexedDB) {
+  if (window.indexedDB && window?.subtle?.crypto) {
     const pbkdfKey = await read(name);
     const cipheredKey = await read(`${name}@_k`);
     if (!pbkdfKey || !cipheredKey) return;
