@@ -26,6 +26,7 @@ export const ListHeaderComponent = ({
   const [state] = useTracked();
   const {colors, headerTextState, currentScreen} = state;
   
+  console.log(headerTextState)
   return type === 'search' ? null : DDS.isLargeTablet() && !shouldShow ? (
     <View
       style={{
@@ -45,8 +46,8 @@ export const ListHeaderComponent = ({
         marginBottom: 5,
         padding: 12,
         width: '100%',
-        backgroundColor: COLORS_NOTE[currentScreen]
-          ? hexToRGBA(COLORS_NOTE[currentScreen], 0.15)
+        backgroundColor:  COLORS_NOTE[headerTextState.heading.toLowerCase()]
+          ? hexToRGBA(COLORS_NOTE[headerTextState.heading.toLowerCase()], 0.15)
           : color || colors.shade,
       }}>
       {messageCard && <MessageCard />}
@@ -61,7 +62,7 @@ export const ListHeaderComponent = ({
           position: 'absolute',
         }}>
         <Placeholder
-          color={COLORS_NOTE[currentScreen]}
+          color={COLORS_NOTE[headerTextState.heading.toLowerCase()]}
           w={normalize(150)}
           h={normalize(150)}
           type={type}

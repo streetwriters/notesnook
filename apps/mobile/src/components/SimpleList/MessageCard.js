@@ -10,7 +10,7 @@ import Paragraph from '../Typography/Paragraph';
 
 export const MessageCard = ({data}) => {
   const [state] = useTracked();
-  const {colors, selectionMode, currentScreen, messageBoardState} = state;
+  const {colors, selectionMode, currentScreen, messageBoardState,headerTextState} = state;
 
   return (
     <View>
@@ -34,8 +34,8 @@ export const MessageCard = ({data}) => {
             }}>
             <Paragraph
               color={
-                COLORS_NOTE[currentScreen]
-                  ? COLORS_NOTE[currentScreen]
+                COLORS_NOTE[headerTextState.heading.toLowerCase()]
+                  ? COLORS_NOTE[headerTextState.heading.toLowerCase()]
                   : colors.accent
               }
               style={{
@@ -48,8 +48,8 @@ export const MessageCard = ({data}) => {
               name="arrow-right"
               size={SIZE.sm}
               color={
-                COLORS_NOTE[currentScreen]
-                  ? COLORS_NOTE[currentScreen]
+                COLORS_NOTE[headerTextState.heading.toLowerCase()]
+                  ? COLORS_NOTE[headerTextState.heading.toLowerCase()]
                   : colors.accent
               }
             />

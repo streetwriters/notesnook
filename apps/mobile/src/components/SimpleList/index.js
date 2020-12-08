@@ -49,7 +49,7 @@ const SimpleList = ({
   loading,
 }) => {
   const [state, dispatch] = useTracked();
-  const {colors, searchResults} = state;
+  const {colors, searchResults,headerTextState} = state;
   const [refreshing, setRefreshing] = useState(false);
   const [dataProvider, setDataProvider] = useState(
     new DataProvider((r1, r2) => {
@@ -73,9 +73,10 @@ const SimpleList = ({
   }, [listData, searchResults.results]);
 
   const loadData = () => {
-    if (listData || listData.length === 0) {
-      setDataProvider(dataProvider.cloneWithRows([header, ...listData]));
-    }
+    let mainData = [header, {type: 'empty'}];
+    mainData =
+      !listData || listData.length === 0 ? mainData : [header, ...listData];
+    setDataProvider(dataProvider.cloneWithRows(mainData));
   };
 
   const RenderSectionHeader = ({item, index}) => (
@@ -179,8 +180,10 @@ const SimpleList = ({
             onPress={placeholderData.action}
             title={placeholderData.button}
             icon="plus"
-            type="transparent"
+            type="accent"
             fontSize={SIZE.md}
+            accentColor="bg"
+            accentText={headerTextState.heading.toLowerCase() || "accent"}
           />
         ) : loading ? (
           <ActivityIndicator color={colors.accent} />
