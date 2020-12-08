@@ -8976,7 +8976,7 @@ notes-core@../notes-core/:
 
 "notes-core@git+ssh://git@github.com:streetwriters/notesnook-core.git":
   version "4.2.0"
-  resolved "git+ssh://git@github.com:streetwriters/notesnook-core.git#f41deba51e2bb0c1209ce6b5883624eab026e13f"
+  resolved "git+ssh://git@github.com:streetwriters/notesnook-core.git#80dc84afe8780e591b8ec9b30a538567d34f1957"
   dependencies:
     fast-sort "^2.0.1"
     fuzzysearch "^1.0.3"
