@@ -33,7 +33,7 @@ class MoveDialog extends React.Component {
     return (
       <Dialog
         isOpen={true}
-        title={"Add Note to Notebook"}
+        title={"Add to Notebook"}
         description={"Organize your notes by adding them to notebooks."}
         icon={Icon.Move}
         onClose={props.onClose}

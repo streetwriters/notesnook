@@ -25,7 +25,7 @@ function menuItems(note, context) {
   return [
     { title: "colors", component: <Colors data={note} /> },
     {
-      title: note.notebook?.id ? "Move" : "Add to",
+      title: "Add to notebook",
       onClick: async () => {
         await showMoveNoteDialog([note.id]);
       },
@@ -126,8 +126,8 @@ function Note(props) {
   const theme = useTheme();
   const color = useMemo(() => COLORS[note.color], [note.color]);
   const notebook = useMemo(
-    () => note.notebook && db.notebooks.notebook(note.notebook.id).data,
-    [note.notebook]
+    () => note.notebooks && db.notebooks.notebook(note.notebooks[0].id).data,
+    [note.notebooks]
   );
 
   return (
@@ -140,7 +140,7 @@ function Note(props) {
       id={note.id}
       index={index}
       header={
-        note.notebook && (
+        note.notebooks && (
           <Flex
             alignSelf="flex-start"
             justifySelf="flex-start"
