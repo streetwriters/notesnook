@@ -8,6 +8,7 @@ import v0Backup from "./__fixtures__/backup.v0.json";
 import v2Backup from "./__fixtures__/backup.v2.json";
 import v3Backup from "./__fixtures__/backup.v3.json";
 import v4Backup from "./__fixtures__/backup.v4.json";
+import v42Backup from "./__fixtures__/backup.v4.2.json";
 
 beforeEach(() => {
   StorageInterface.clear();
@@ -72,6 +73,7 @@ describe.each([
   ["v2", v2Backup],
   ["v3", v3Backup],
   ["v4", v4Backup],
+  ["v4.2", v42Backup],
 ])("testing backup version: %s", (version, data) => {
   test(`import ${version} backup`, () => {
     return databaseTest().then(async (db) => {
@@ -81,21 +83,21 @@ describe.each([
 
       expect(
         db.notes.all.every((v) => {
+          const doesNotHaveContent = v.contentId && !v.content;
+          const doesNotHaveColors = !v.colors && (!v.color || v.color.length);
+          const hasTopicsInAllNotebooks =
+            !v.notebooks ||
+            v.notebooks.every((nb) => !!nb.id && !!nb.topics && !nb.topic);
           return (
-            v.contentId &&
-            !v.content &&
+            doesNotHaveContent &&
             !v.notebook &&
-            (!v.notebooks ||
-              (Array.isArray(v.notebooks) &&
-                v.notebooks.every((nb) => !!nb.id))) &&
-            !v.colors
+            hasTopicsInAllNotebooks &&
+            doesNotHaveColors
           );
         })
       ).toBeTruthy();
 
-      expect(
-        db.notebooks.all.every((v) => v.title != null && v.description != null)
-      ).toBeTruthy();
+      expect(db.notebooks.all.every((v) => v.title != null)).toBeTruthy();
     });
   });
 

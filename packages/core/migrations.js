@@ -13,7 +13,6 @@ export const migrations = {
     delta: function (item) {
       item.data = item.data.ops;
       item.type = "delta";
-      item.dateEdited = Date.now();
       item.migrated = true;
       return item;
     },
@@ -24,7 +23,6 @@ export const migrations = {
         item.contentId = item.content.delta;
         delete item.content;
       }
-      item.dateEdited = Date.now();
       item.migrated = true;
       return item;
     },
@@ -57,13 +55,26 @@ export const migrations = {
       if (item.notebooks && item.notebooks.every((n) => !n.id)) {
         item.notebooks = undefined;
       }
-      item.dateEdited = Date.now();
+      return migrations["4.1"].note(item);
+    },
+  },
+  4.1: {
+    note: function (item) {
+      return migrations["4.2"].note(item);
+    },
+  },
+  4.2: {
+    note: function (item) {
+      if (item.notebooks) {
+        item.notebooks = item.notebooks.map((nb) => {
+          return { id: nb.id, topics: nb.topics || [nb.topic] };
+        });
+      }
       item.migrated = true;
       return item;
     },
   },
-  4.1: {},
-  4.2: {
+  4.3: {
     note: false,
     notebook: false,
     tag: false,
