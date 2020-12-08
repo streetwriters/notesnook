@@ -60,6 +60,15 @@ export const Notes = ({route, navigation}) => {
     if (data) {
       params = data;
     }
+    if (route.params.menu) {
+      navigation.setOptions({
+        animationEnabled:false
+      })
+    } else {
+      navigation.setOptions({
+        animationEnabled:true
+      })
+    }
     let allNotes = [];
     if (params.type === 'tag') {
       allNotes = db.notes.tagged(params.tag.id);
