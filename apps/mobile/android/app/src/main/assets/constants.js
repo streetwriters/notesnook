@@ -289,7 +289,7 @@ const setTheme = function () {
   }
 
   #titleInput {
-    color:${pageTheme.colors.pri};
+    color:${pageTheme.colors.heading};
     font-size:${32 * 1.5 * pageTheme.colors.factor};
 
   }
@@ -338,6 +338,9 @@ const setTheme = function () {
     
     }   
 
+    #simpleTitleInput::-webkit-input-placeholder {
+      color:${pageTheme.colors.icon}
+    }
     #simpleTitleInput {
       font-family: 'Poppins', sans-serif;
       font-weight: 600 !important;
@@ -349,7 +352,7 @@ const setTheme = function () {
       padding-right: 12px;
       padding-left:12px;
       height:50px;
-      color:${pageTheme.colors.icon}
+      color:${pageTheme.colors.heading}
     }
     .info-bar {
       margin-bottom:${isTablet ? '12px !important' : '0px !important'};

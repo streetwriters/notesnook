@@ -333,7 +333,9 @@ const setTheme = function () {
       font-size: 25px;
     
     }  
-
+    #simpleTitleInput::-webkit-input-placeholder {
+      color:${pageTheme.colors.icon}
+    }
     #simpleTitleInput {
       font-family: 'Poppins', sans-serif;
       font-weight: 600 !important;
@@ -345,7 +347,7 @@ const setTheme = function () {
       padding-right: 12px;
       padding-left:12px;
       height:50px;
-      color:${pageTheme.colors.icon}
+      color:${pageTheme.colors.heading}
     }
     .info-bar {
       margin-bottom:${isTablet ? '12px !important' : '0px !important'};
