@@ -80,7 +80,7 @@ const SelectionWrapper = ({
       onPress={onPress}
       customSelectedColor={currentEditingNote === item.id ? colors.accent : colors.nav}
       customAlpha={!colors.night ? -0.02 : 0.02}
-      customOpacity={currentEditingNote ? 0.15 : 1}
+      customOpacity={currentEditingNote === item.id ? 0.15 : 1}
       customStyle={{
         flexDirection: 'row',
         justifyContent: 'space-between',

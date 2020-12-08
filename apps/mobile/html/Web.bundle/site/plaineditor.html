@@ -25,15 +25,14 @@
 <script>
     let editor;
     let isTablet = false;
-    </script>
+</script>
 <script src="quill.js"></script>
 <script src="constants.js"></script>
 <script src="module.js"></script>
 <script src="magic-url.js"></script>
 <script src="listeners.js"></script>
-<script src="image-resize.min.js"></script>   
+<script src="image-resize.min.js"></script>
 <script>
-    let editor;
     attachMessageListener();
     function loadAction() {
 
@@ -56,9 +55,10 @@
                 },
                 imageResize: {
                     displaySize: true,
-                }
+                },
+                magicUrl: true
             },
-            placeholder: ' ',
+            placeholder: 'Type something here',
         });
 
         let Font = Quill.import('formats/font');
@@ -66,10 +66,10 @@
         Quill.register(Font, true);
 
         addLinkMatcher();
-        attachTitleInputListeners();
         setTheme();
         attachEditorListeners();
     }
+    loadAction();
 </script>
 
 

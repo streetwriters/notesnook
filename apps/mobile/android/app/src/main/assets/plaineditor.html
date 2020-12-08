@@ -35,7 +35,7 @@
 <script src="image-resize.min.js"></script>  
 
 <script>
-    let editor;
+    attachMessageListener()
     function loadAction() {
         setFonts();
         Quill.register("modules/imageCompressor", imageCompressor);
@@ -55,20 +55,21 @@
                 },
                 imageResize: {
                     displaySize: true,
-                }
+                },
+                magicUrl: true
             },
-            placeholder: ' ',
+            placeholder: 'Type something here',
         });
         let Font = Quill.import('formats/font');
         Font.whitelist = fontNames;
         Quill.register(Font, true);
         
-        addLinkMatcher();
         setTheme();
         attachEditorListeners();
     }
 
     loadAction();
+
 </script>
 
 

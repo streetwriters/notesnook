@@ -132,7 +132,7 @@ function attachEditorListeners() {
     let infowords = info.querySelector('#infowords');
     if (infowords) {
       infowords.innerText =
-        editor.getText().split(' ').length + ' words - ';
+        editor.getText().split(' ').length + ' words';
     }
 
     if (deltaTimeout) {
@@ -223,7 +223,7 @@ function attachMessageListener() {
         break;
       case 'dateEdited':
         linfo = document.querySelector(infoBar);
-        info.querySelector('#infodate').innerText = value + " - ";
+        info.querySelector('#infodate').innerText = value;
         break;
       case 'saving':
         info = document.querySelector(infoBar);
@@ -235,7 +235,7 @@ function attachMessageListener() {
         setTimeout(() => {
           info = document.querySelector(infoBar);
           info.querySelector('#infowords').innerText =
-            editor.getText().split(' ').length + ' words - ';
+            editor.getText().split(' ').length + ' words';
             info.querySelector('#infosaved').innerText = 'Saved';
         }, 100);
 
@@ -283,7 +283,7 @@ function attachMessageListener() {
         setTimeout(() => {
           info = document.querySelector(infoBar);
           info.querySelector('#infowords').innerText =
-            editor.getText().split(' ').length + ' words - ';
+            editor.getText().split(' ').length + ' words';
             info.querySelector('#infosaved').innerText = 'Saved';
 
           document.body.scrollTop = 0; // For Safari

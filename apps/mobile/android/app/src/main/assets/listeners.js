@@ -141,7 +141,7 @@ function attachEditorListeners() {
         break;
       case 'dateEdited':
         linfo = document.querySelector(infoBar);
-        info.querySelector('#infodate').innerText = value + ' - ';
+        info.querySelector('#infodate').innerText = value;
         break;
       case 'saving':
         info = document.querySelector(infoBar);
@@ -153,7 +153,7 @@ function attachEditorListeners() {
         setTimeout(() => {
           info = document.querySelector(infoBar);
           info.querySelector('#infowords').innerText =
-            editor.getText().split(' ').length + ' words - ';
+            editor.getText().split(' ').length + ' words';
           info.querySelector('#infosaved').innerText = 'Saved';
         }, 100);
 
@@ -201,7 +201,7 @@ function attachEditorListeners() {
         setTimeout(() => {
           info = document.querySelector(infoBar);
           info.querySelector('#infowords').innerText =
-            editor.getText().split(' ').length + ' words - ';
+            editor.getText().split(' ').length + ' words';
           info.querySelector('#infosaved').innerText = 'Saved';
 
           document.body.scrollTop = 0; // For Safari
@@ -264,7 +264,7 @@ function attachEditorListeners() {
     info = document.querySelector(infoBar);
     let infowords = info.querySelector('#infowords');
     if (infowords) {
-      infowords.innerText = editor.getText().split(' ').length + ' words - ';
+      infowords.innerText = editor.getText().split(' ').length + ' words';
     }
 
     if (deltaTimeout) {
@@ -368,7 +368,7 @@ function attachMessageListener() {
         setTimeout(() => {
           info = document.querySelector(infoBar);
           info.querySelector('#infowords').innerText =
-            editor.getText().split(' ').length + ' words  - ';
+            editor.getText().split(' ').length + ' words';
           info.querySelector('#infosaved').innerText = 'Saved';
         }, 100);
 
@@ -416,10 +416,10 @@ function attachMessageListener() {
         setTimeout(() => {
           info = document.querySelector(infoBar);
           info.querySelector('#infowords').innerText =
-            editor.getText().split(' ').length + ' words - ';
+            editor.getText().split(' ').length + ' words';
           info.querySelector('#infosaved').innerText = 'Saved';
 
-          document.body.scrollTop = 0; // For Safari
+          document.body.scrollTop = 0; // For Safari 
           document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
         }, 100);
         autosize();

@@ -440,7 +440,6 @@ export let isFromIntent = false;
 const loadNoteInEditor = async () => {
   saveCounter = 0;
   if (intent) {
-    console.log("POSTING DELTA")
     await sleep(1500);
     post('delta', content.data);
     intent = true;
@@ -448,9 +447,10 @@ const loadNoteInEditor = async () => {
   } else if (note?.id) {
     post('title', title);
     intent = false;
-    post('dateEdited', timeConverter(note.dateEdited));
     setColors();
     post('delta', content.data);
+    await sleep(100);
+    post('dateEdited', timeConverter(note.dateEdited));
   }
   await sleep(50);
   post('clearHistory');

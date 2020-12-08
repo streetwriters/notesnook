@@ -209,12 +209,12 @@ const MergeEditor = () => {
 
   const show = async (item) => {
     note = item;
-    db.content;
     let noteData = await db.content.raw(note.contentId);
+
     switch (noteData.type) {
       case 'delta':
         primaryData = noteData;
-        secondaryData = noteData;
+        secondaryData = noteData.conflicted;
     }
     setVisible(true);
     firstWebViewHeight.setValue(dHeight / 2 - (50 + insets.top / 2));

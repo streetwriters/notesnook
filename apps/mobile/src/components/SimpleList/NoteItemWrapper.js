@@ -60,11 +60,13 @@ export const NoteItemWrapper = ({item, index, isTrash = false}) => {
     dispatch({type: Actions.SELECTED_ITEMS, item: note});
   };
 
-  const onPress = async (event) => {
+  const onPress = async () => {
+
     if (note.conflicted) {
       eSendEvent(eShowMergeDialog, note);
       return;
     }
+
     if (selectionMode) {
       onLongPress();
       return;
