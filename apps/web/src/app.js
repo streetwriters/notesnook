@@ -100,6 +100,7 @@ function App() {
         />
         <Flex variant="rowFill">
           <Animated.Flex
+            className="listMenu"
             variant="columnFill"
             initial={{ width: "30%", opacity: 1, x: 0 }}
             animate={{
@@ -107,10 +108,15 @@ function App() {
               x: show ? 0 : "-30%",
               opacity: show ? 1 : 0,
             }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
+            onAnimationComplete={() => {
+              const element = document.querySelector(".listMenu");
+              if (!element) return;
+              element.style.display =
+                element.style.display === "none" ? "flex" : "none";
+            }}
+            transition={{ duration: 0.2, ease: "easeIn" }}
             sx={{
               borderRight: "1px solid",
-              zIndex: show ? 0 : -1,
               borderColor: "border",
             }}
           >
