@@ -168,6 +168,9 @@ const App = () => {
   const handlePremiumAccess = async (type) => {
     let status = PremiumService.get();
     let message = null;
+
+    return {type:type, result:true};
+    
     if (!status) {
       switch (type) {
         case CHECK_IDS.noteColor:
