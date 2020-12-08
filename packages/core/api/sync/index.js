@@ -93,9 +93,6 @@ export default class Sync {
   async eventMerge(serverResponse) {
     let { lastSynced } = await this._performChecks();
 
-    // we update the last synced time before merging so there are no conflicts
-    lastSynced = serverResponse.lastSynced;
-
     // merge the server response
     await this._merger.merge(serverResponse, lastSynced);
 
@@ -103,8 +100,8 @@ export default class Sync {
     await this._db.conflicts.check();
 
     // update our lastSynced time
-    if (lastSynced) {
-      await this._db.user.set({ lastSynced });
+    if (serverResponse.lastSynced) {
+      await this._db.user.set({ lastSynced: serverResponse.lastSynced });
     }
   }
 
