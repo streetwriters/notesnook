@@ -1,36 +1,36 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Platform,
   RefreshControl,
   useWindowDimensions,
-  View,
+  View
 } from 'react-native';
-import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {DataProvider, LayoutProvider, RecyclerListView} from 'recyclerlistview';
-import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
-import {DDS} from '../../services/DeviceDetection';
-import {eSendEvent, ToastEvent} from '../../services/EventManager';
-import {dHeight} from '../../utils';
-import {db} from '../../utils/DB';
+import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { DataProvider, LayoutProvider, RecyclerListView } from 'recyclerlistview';
+import { useTracked } from '../../provider';
+import { Actions } from '../../provider/Actions';
+import { DDS } from '../../services/DeviceDetection';
+import { eSendEvent, ToastEvent } from '../../services/EventManager';
+import { dHeight } from '../../utils';
+import { COLORS_NOTE } from '../../utils/Colors';
+import { db } from '../../utils/DB';
 import {
   eOpenJumpToDialog,
   eOpenLoginDialog,
-  eScrollEvent,
+  eScrollEvent
 } from '../../utils/Events';
-import {SIZE} from '../../utils/SizeUtils';
-import {sleep} from '../../utils/TimeUtils';
-import {Button} from '../Button';
-import {HeaderMenu} from '../Header/HeaderMenu';
+import { SIZE } from '../../utils/SizeUtils';
+import { Button } from '../Button';
+import { HeaderMenu } from '../Header/HeaderMenu';
 import Seperator from '../Seperator';
 import TagItem from '../TagItem';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
-import {ListHeaderComponent} from './ListHeaderComponent';
-import {NotebookItemWrapper} from './NotebookItemWrapper';
-import {NoteItemWrapper} from './NoteItemWrapper';
+import { ListHeaderComponent } from './ListHeaderComponent';
+import { NotebookItemWrapper } from './NotebookItemWrapper';
+import { NoteItemWrapper } from './NoteItemWrapper';
 
 const header = {
   type: 'MAIN_HEADER',
@@ -47,12 +47,12 @@ const SimpleList = ({
   jumpToDialog,
   placeholderData,
   loading,
-  headerProps={
-    heading:"Home"
-  }
+  headerProps = {
+    heading: 'Home',
+  },
 }) => {
   const [state, dispatch] = useTracked();
-  const {colors, searchResults,headerTextState} = state;
+  const {colors, searchResults, headerTextState} = state;
   const [refreshing, setRefreshing] = useState(false);
   const [dataProvider, setDataProvider] = useState(
     new DataProvider((r1, r2) => {
@@ -186,7 +186,11 @@ const SimpleList = ({
             type="accent"
             fontSize={SIZE.md}
             accentColor="bg"
-            accentText={headerTextState.heading.toLowerCase() || "accent"}
+            accentText={
+              COLORS_NOTE[headerTextState.heading.toLowerCase()]
+                ? headerTextState.heading.toLowerCase()
+                : 'accent'
+            }
           />
         ) : loading ? (
           <ActivityIndicator color={colors.accent} />
@@ -270,7 +274,12 @@ const SimpleList = ({
         );
       case 'MAIN_HEADER':
         return (
-          <ListHeaderComponent title={headerProps.heading} type={dataType} index={index} data={listData} />
+          <ListHeaderComponent
+            title={headerProps.heading}
+            type={dataType}
+            index={index}
+            data={listData}
+          />
         );
       case 'header':
         return <RenderSectionHeader item={data} index={index} />;

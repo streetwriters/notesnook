@@ -85,6 +85,7 @@ export const Home = ({route, navigation}) => {
 
   return (
     <>
+      
       <SimpleList
         data={notes}
         scrollRef={scrollRef}

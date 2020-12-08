@@ -62,11 +62,13 @@ export const Notes = ({route, navigation}) => {
     }
     if (route.params.menu) {
       navigation.setOptions({
-        animationEnabled:false
+        animationEnabled:false,
+        gestureEnabled:false
       })
     } else {
       navigation.setOptions({
-        animationEnabled:true
+        animationEnabled:true,
+        gestureEnabled:true
       })
     }
     let allNotes = [];

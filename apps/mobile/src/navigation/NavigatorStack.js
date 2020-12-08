@@ -68,12 +68,15 @@ const forSlide = ({current, next, inverted, layouts: {screen}}) => {
 const screenOptionsForAnimation = {
   animationEnabled: true,
   cardStyleInterpolator: forSlide,
+  gestureEnabled:true
 };
+
 
 export const NavigatorStack = React.memo(
   () => {
+    
     React.useEffect(() => {
-      sleep(1000).then(() => {
+      sleep(2000).then(() => {
         console.log(SettingsService.get().homepage);
         let headerState = {
           heading: SettingsService.get().homepage,
@@ -84,14 +87,18 @@ export const NavigatorStack = React.memo(
       });
     }, []);
 
+  
     return (
       <Container root={true}>
-        <NavigationContainer independent={true} ref={rootNavigatorRef}>
+        <NavigationContainer 
+        independent={true} ref={rootNavigatorRef}>
           <Stack.Navigator
+          
             initialRouteName={SettingsService.get().homepage}
             screenOptions={{
               headerShown: false,
               animationEnabled: false,
+              gestureEnabled:false
             }}>
             <Stack.Screen name="Notes" component={Home} />
             <Stack.Screen name="Notebooks" component={Folders} />
