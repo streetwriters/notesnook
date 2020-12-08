@@ -26,7 +26,8 @@ export default class Topic {
       if (this.has(noteId) || !note || note.data.deleted) continue;
       topic.notes.push(noteId);
 
-      const array = note.notebooks || [];
+      let array = note.notebooks || [];
+      array = array.slice();
       const notebookIndex = array.findIndex((nb) => nb.id === this._notebookId);
       if (notebookIndex === -1) {
         let notebook = {};
@@ -52,11 +53,12 @@ export default class Topic {
     const topic = qclone(this._topic);
     for (let noteId of noteIds) {
       let note = this._db.notes.note(noteId);
-      if (!this.has(noteId) || !note || note.data.deleted) return this;
+      if (!this.has(noteId) || !note || note.data.deleted || !note.notebooks)
+        return this;
       let index = topic.notes.indexOf(noteId);
       topic.notes.splice(index, 1);
 
-      const array = note.notebooks || [];
+      let array = note.notebooks.slice();
       const notebookIndex = array.findIndex((nb) => nb.id === this._notebookId);
       if (notebookIndex === -1) return;
 
