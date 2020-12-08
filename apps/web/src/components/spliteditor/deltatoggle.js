@@ -13,7 +13,6 @@ function DeltaToggle(props) {
     isSelected,
     isOtherSelected,
     onToggle,
-    direction,
     sx,
     label,
     dateEdited,
@@ -95,7 +94,6 @@ function DeltaToggle(props) {
         </Button>
       </Flex>
       <Flex
-        flexDirection={direction}
         alignItems="center"
         mt={1}
         sx={{ fontSize: "subBody", color: "fontTertiary" }}
