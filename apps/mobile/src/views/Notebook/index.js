@@ -84,6 +84,9 @@ export const Notebook = ({route, navigation}) => {
         refreshCallback={() => {
           onLoad();
         }}
+        headerProps={{
+          heading: params.title,
+        }}
         focused={() => navigation.isFocused()}
         placeholderData={{
           heading: route.params.notebook.title,

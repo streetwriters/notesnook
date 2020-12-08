@@ -178,7 +178,11 @@ export const Notes = ({route, navigation}) => {
         refreshCallback={() => {
           init();
         }}
-        
+        headerProps={{
+          heading: params.type === 'tag'
+          ? '#' + params.title
+          : params.title.slice(0, 1).toUpperCase() + params.title.slice(1),
+        }}
         focused={() => navigation.isFocused()}
         RenderItem={NoteItemWrapper}
         placeholderText={`Add some notes to this" ${

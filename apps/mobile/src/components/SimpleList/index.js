@@ -47,6 +47,9 @@ const SimpleList = ({
   jumpToDialog,
   placeholderData,
   loading,
+  headerProps={
+    heading:"Home"
+  }
 }) => {
   const [state, dispatch] = useTracked();
   const {colors, searchResults,headerTextState} = state;
@@ -267,7 +270,7 @@ const SimpleList = ({
         );
       case 'MAIN_HEADER':
         return (
-          <ListHeaderComponent type={dataType} index={index} data={listData} />
+          <ListHeaderComponent title={headerProps.heading} type={dataType} index={index} data={listData} />
         );
       case 'header':
         return <RenderSectionHeader item={data} index={index} />;

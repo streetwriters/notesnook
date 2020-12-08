@@ -82,6 +82,9 @@ export const Trash = ({route, navigation}) => {
             'Items in the trash will be permanently deleted after 7 days.',
           button: null,
         }}
+        headerProps={{
+          heading: 'Trash',
+        }}
         placeholder={<Placeholder type="trash" />}
         placeholderText="Deleted notes & notebooks appear here."
       />

@@ -82,6 +82,9 @@ export const Folders = ({route, navigation}) => {
           button: 'Add a Notebook',
           action: _onPressBottomButton,
         }}
+        headerProps={{
+          heading: "Notebooks",
+        }}
         placeholder={<Placeholder type="notebooks" />}
       />
 

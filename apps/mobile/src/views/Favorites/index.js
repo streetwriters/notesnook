@@ -75,6 +75,9 @@ export const Favorites = ({route, navigation}) => {
         paragraph: 'You have not added any notes to favorites yet.',
         button: null,
       }}
+      headerProps={{
+        heading: "Favorites",
+      }}
       focused={() => navigation.isFocused()}
       placeholder={<Placeholder type="favorites" />}
       placeholderText="Notes you favorite appear here"

@@ -8,9 +8,9 @@ import {COLORS_NOTE} from '../../utils/Colors';
 import {SIZE} from '../../utils/SizeUtils';
 import Paragraph from '../Typography/Paragraph';
 
-export const MessageCard = ({data}) => {
+export const MessageCard = ({data,color}) => {
   const [state] = useTracked();
-  const {colors, selectionMode, currentScreen, messageBoardState,headerTextState} = state;
+  const {colors, selectionMode,  messageBoardState,headerTextState} = state;
 
   return (
     <View>
@@ -33,11 +33,7 @@ export const MessageCard = ({data}) => {
               alignItems: 'center',
             }}>
             <Paragraph
-              color={
-                COLORS_NOTE[headerTextState.heading.toLowerCase()]
-                  ? COLORS_NOTE[headerTextState.heading.toLowerCase()]
-                  : colors.accent
-              }
+              color={color}
               style={{
                 marginRight: 10,
               }}>
@@ -47,11 +43,7 @@ export const MessageCard = ({data}) => {
             <Icon
               name="arrow-right"
               size={SIZE.sm}
-              color={
-                COLORS_NOTE[headerTextState.heading.toLowerCase()]
-                  ? COLORS_NOTE[headerTextState.heading.toLowerCase()]
-                  : colors.accent
-              }
+              color={color}
             />
           </View>
         </TouchableOpacity>

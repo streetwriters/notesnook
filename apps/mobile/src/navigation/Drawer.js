@@ -1,6 +1,7 @@
 import {createDrawerNavigator} from '@react-navigation/drawer';
 import {NavigationContainer} from '@react-navigation/native';
 import * as React from 'react';
+import {Platform} from 'react-native';
 import {State} from 'react-native-gesture-handler';
 import {Menu} from '../components/Menu';
 import {useTracked} from '../provider';
@@ -27,11 +28,11 @@ export const NavigationStack = ({component = NavigatorStack}) => {
   }, []);
 
   const setGestureDisabled = () => {
-    //setLocked(true);
+    setLocked(true);
   };
 
   const setGestureEnabled = () => {
-    //setLocked(false);
+    setLocked(false);
   };
 
   React.useEffect(() => {
@@ -44,14 +45,15 @@ export const NavigationStack = ({component = NavigatorStack}) => {
   }, []);
 
   const onStateChange = (state) => {
-      let s = state[0];
-      if (s && s !== State.ACTIVE && s !== State.BEGAN) {
-        let state = sideMenuRef.current.getRootState();
-        if (state.history.findIndex((o) => o.type === 'drawer') === -1) {
-          tabBarRef.current?.setScrollEnabled(true);
-        }
+    if (Platform.OS === 'android') return;
+    let s = state[0];
+    if (s && s !== State.ACTIVE && s !== State.BEGAN) {
+      let state = sideMenuRef.current.getRootState();
+      if (state.history.findIndex((o) => o.type === 'drawer') === -1) {
+        tabBarRef.current?.setScrollEnabled(true);
       }
-  }
+    }
+  };
 
   return (
     <NavigationContainer ref={sideMenuRef}>

@@ -150,7 +150,7 @@ export const Settings = ({navigation}) => {
           paddingHorizontal: 0,
         }}>
         {!DDS.isLargeTablet() && (
-          <ListHeaderComponent type="settings" messageCard={false} />
+          <ListHeaderComponent title="Settings" type="settings" messageCard={false} />
         )}
 
         <SettingsUserSection />

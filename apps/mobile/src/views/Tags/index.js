@@ -68,6 +68,9 @@ export const Tags = ({route, navigation}) => {
     <SimpleList
       data={tags}
       type="tags"
+      headerProps={{
+        heading: "Tags",
+      }}
       focused={() => navigation.isFocused()}
       placeholderData={{
         heading: 'Your Tags',
