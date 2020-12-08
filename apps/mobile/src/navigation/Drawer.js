@@ -10,7 +10,7 @@ import {sideMenuRef, tabBarRef} from '../utils/Refs';
 import {sleep} from '../utils/TimeUtils';
 import {NavigatorStack} from './NavigatorStack';
 
-const menuRef =React.createRef();
+const menuRef = React.createRef();
 const Drawer = createDrawerNavigator();
 
 export const NavigationStack = ({component = NavigatorStack}) => {
@@ -27,11 +27,11 @@ export const NavigationStack = ({component = NavigatorStack}) => {
   }, []);
 
   const setGestureDisabled = () => {
-    setLocked(true);
+    //setLocked(true);
   };
 
   const setGestureEnabled = () => {
-    setLocked(false);
+    //setLocked(false);
   };
 
   React.useEffect(() => {
@@ -43,6 +43,16 @@ export const NavigationStack = ({component = NavigatorStack}) => {
     };
   }, []);
 
+  const onStateChange = (state) => {
+      let s = state[0];
+      if (s && s !== State.ACTIVE && s !== State.BEGAN) {
+        let state = sideMenuRef.current.getRootState();
+        if (state.history.findIndex((o) => o.type === 'drawer') === -1) {
+          tabBarRef.current?.setScrollEnabled(true);
+        }
+      }
+  }
+
   return (
     <NavigationContainer ref={sideMenuRef}>
       <Drawer.Navigator
@@ -50,14 +60,13 @@ export const NavigationStack = ({component = NavigatorStack}) => {
           swipeEnabled: locked || deviceMode !== 'mobile' ? false : true,
           gestureEnabled: locked || deviceMode !== 'mobile' ? false : true,
         }}
+        onStateChange={onStateChange}
         drawerStyle={{
           width: initRender ? 0 : deviceMode !== 'mobile' ? 0 : '65%',
           height: initRender ? 0 : null,
           borderRightWidth: 0,
         }}
-        drawerContentOptions={{
-          
-        }}
+        drawerContentOptions={{}}
         edgeWidth={200}
         drawerType="slide"
         drawerContent={deviceMode !== 'mobile' ? () => <></> : DrawerComponent}

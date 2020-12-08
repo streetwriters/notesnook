@@ -1,6 +1,6 @@
 import {isNull} from 'lodash';
 import React, {useEffect, useState} from 'react';
-import {Dimensions, View} from 'react-native';
+import {Dimensions, Platform, View} from 'react-native';
 import ScrollableTabView from 'react-native-scrollable-tab-view';
 import SplashScreen from 'react-native-splash-screen';
 import {notesnook} from './e2e/test.ids';
@@ -21,7 +21,7 @@ import {
 } from './src/services/EventManager';
 import IntentService from './src/services/IntentService';
 import SettingsService from './src/services/SettingsService';
-import {editing, setWidthHeight} from './src/utils';
+import {dWidth, editing, setWidthHeight} from './src/utils';
 import {
   eCloseFullscreenEditor,
   eCloseSideMenu,
@@ -30,7 +30,7 @@ import {
   eOpenSideMenu,
 } from './src/utils/Events';
 import {editorRef, tabBarRef} from './src/utils/Refs';
-import { sleep } from './src/utils/TimeUtils';
+import {sleep} from './src/utils/TimeUtils';
 import {EditorWrapper} from './src/views/Editor/EditorWrapper';
 import {getIntent, getNote, post} from './src/views/Editor/Functions';
 
@@ -93,21 +93,18 @@ const _moveResponder = (e) => {
 };
 
 const _handleTouch = () => {
-  if (currentTab === 0) return;
   {
     if (currentTab === 1 && startLocation > updatedDimensions.height - 70) {
       if (currentScroll === 0 || currentScroll === 1) {
         tabBarRef.current?.setScrollEnabled(false);
       }
-    } /* else if (
-      currentTab === 0 &&
-      startLocationX < updatedDimensions.width * 0.75
-    ) {
-      console.log('here it is here');
-      if (currentScroll === 0 || currentScroll === 1) {
+    } else if (currentTab === 0 && Platform.OS === 'ios') {
+      if (currentScroll === 0 && startLocationX < 150) {
         tabBarRef.current?.setScrollEnabled(false);
+      } else {
+        tabBarRef.current?.setScrollEnabled(true);
       }
-    } */ else {
+    } else {
       console.log('blocking');
       tabBarRef.current?.setScrollEnabled(true);
     }
@@ -115,7 +112,6 @@ const _handleTouch = () => {
 };
 
 const _onTouchEnd = (e) => {
-  if (currentTab === 0) return;
   console.log('touch ended');
   startLocation = 0;
   tabBarRef.current?.setScrollEnabled(true);
@@ -228,7 +224,7 @@ const AppStack = React.memo(
         }}
         onMoveShouldSetResponderCapture={_moveResponder}
         onTouchEnd={_onTouchEnd}
-        onStartShouldSetResponder={_responder}>
+        onStartShouldSetResponderCapture={_responder}>
         {mode && (
           <ScrollableTabView
             ref={tabBarRef}
