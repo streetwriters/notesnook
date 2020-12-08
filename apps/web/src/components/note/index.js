@@ -171,6 +171,19 @@ function Note(props) {
       }}
       info={
         <>
+          {note.conflicted && (
+            <Text
+              mr={1}
+              px={1}
+              py="1px"
+              bg="error"
+              fontSize="subBody"
+              color="static"
+              sx={{ borderRadius: "default" }}
+            >
+              CONFLICT
+            </Text>
+          )}
           <Flex variant="rowCenter">
             {note.pinned && (
               <Icon.PinFilled color="primary" size={10} sx={{ mr: 1 }} />
@@ -196,18 +209,6 @@ function Note(props) {
               />
             )}
           </Flex>
-          {note.conflicted && (
-            <Text
-              ml={1}
-              px={"3px"}
-              bg="error"
-              fontSize="subBody"
-              color="static"
-              sx={{ borderRadius: "default" }}
-            >
-              CONFLICT
-            </Text>
-          )}
         </>
       }
       pinned={pinnable && note.pinned}
