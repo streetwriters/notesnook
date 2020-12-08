@@ -168,8 +168,11 @@ function Note(props) {
         }
       }}
       info={
-        <Flex flex="1 1 auto" justifyContent="space-between">
+        <>
           <Flex variant="rowCenter">
+            {note.pinned && (
+              <Icon.PinFilled color="primary" size={10} sx={{ mr: 1 }} />
+            )}
             <TimeAgo
               live={false}
               style={{ fontSize: theme.fontSizes["subBody"] }}
@@ -202,7 +205,7 @@ function Note(props) {
               CONFLICT
             </Text>
           )}
-        </Flex>
+        </>
       }
       pinned={pinnable && note.pinned}
       menuItems={menuItems(note, props.context)}

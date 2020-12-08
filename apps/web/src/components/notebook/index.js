@@ -7,6 +7,7 @@ import { showEditNotebookDialog } from "../dialogs/addnotebookdialog";
 import { showDeleteConfirmation } from "../dialogs/confirm";
 import { showItemDeletedToast, showUnpinnedToast } from "../../common/toasts";
 import { db } from "../../common";
+import * as Icon from "../icons";
 
 const pin = async (notebook, index) => {
   await store.pin(notebook, index);
@@ -65,7 +66,6 @@ class Notebook extends React.Component {
         selectable
         item={notebook}
         onClick={onClick}
-        unpin={() => pin(notebook, index)}
         title={notebook.title}
         body={notebook.description}
         subBody={
@@ -96,6 +96,9 @@ class Notebook extends React.Component {
         }
         info={
           <Flex variant="rowCenter">
+            {notebook.pinned && (
+              <Icon.PinFilled color="primary" size={10} sx={{ mr: 1 }} />
+            )}
             {new Date(notebook.dateCreated).toDateString().substring(4)}
             <Text as="span" mx={1}>
               •
