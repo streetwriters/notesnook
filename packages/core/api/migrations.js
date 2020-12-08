@@ -16,7 +16,7 @@ class Migrations {
   }
 
   async migrate() {
-    if (this.dbVersion > CURRENT_DATABASE_VERSION) return;
+    if (this.dbVersion >= CURRENT_DATABASE_VERSION) return;
 
     await this._db.notes.init();
     const content = await this._db.content.all();
