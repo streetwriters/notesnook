@@ -15,7 +15,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Build and Deploy 🚀
+      - name: Deploy 🚀
         uses: amondnet/vercel-action@v20.0.0
         with:
           vercel-token: ${{ secrets.ZEIT_TOKEN }}
