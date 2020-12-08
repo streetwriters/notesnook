@@ -137,7 +137,7 @@ class Database {
     }, 15 * 1000);
   }
 
-  sync(full) {
+  sync(full = true) {
     return this.syncer.start(full);
   }
 
