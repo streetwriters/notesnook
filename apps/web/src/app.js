@@ -108,16 +108,11 @@ function App() {
               x: show ? 0 : "-30%",
               opacity: show ? 1 : 0,
             }}
-            onAnimationComplete={() => {
-              const element = document.querySelector(".listMenu");
-              if (!element) return;
-              element.style.display =
-                element.style.display === "none" ? "flex" : "none";
-            }}
-            transition={{ duration: 0.2, ease: "easeIn" }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
             sx={{
               borderRight: "1px solid",
               borderColor: "border",
+              borderRightWidth: show ? 1 : 0,
             }}
           >
             {isMobile && <Banner />}
