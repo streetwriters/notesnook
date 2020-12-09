@@ -1,5 +1,5 @@
 import React, {createRef} from 'react';
-import {Platform, ScrollView, View} from 'react-native';
+import {Platform, ScrollView, TouchableOpacity, View} from 'react-native';
 import * as RNIap from 'react-native-iap';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import RNFetchBlob from 'rn-fetch-blob';
@@ -20,8 +20,9 @@ class PremiumDialog extends React.Component {
     super(props);
     this.state = {
       user: null,
-      product: null,
+      products: null,
       scrollEnabled: false,
+      product: null,
       visible: false,
     };
     this.routeIndex = 0;
@@ -47,14 +48,17 @@ class PremiumDialog extends React.Component {
 
   async getSkus() {
     try {
-      await RNIap.initConnection();
       let u = await db.user.get();
-      let prod = await RNIap.getSubscriptions(itemSkus);
       this.setState({
         user: u,
+      });
+      await RNIap.initConnection();
+      let prod = await RNIap.getSubscriptions(itemSkus);
+      console.log(prod);
+      this.setState({
+        products: prod,
         product: prod[0],
       });
-   
     } catch (e) {
       console.log(e, 'SKU ERROR');
     }
@@ -85,9 +89,9 @@ class PremiumDialog extends React.Component {
             console.log(e);
           }
         }}
-        extraScroll={DDS.isLargeTablet() ? 50 : 20}
+        extraScroll={DDS.isLargeTablet() ? 50 : 10}
         footerAlwaysVisible={DDS.isLargeTablet()}
-        footerHeight={DDS.isLargeTablet() ? 20 : 20}
+        footerHeight={DDS.isLargeTablet() ? 20 : 10}
         footerStyle={
           DDS.isLargeTablet()
             ? {
@@ -100,7 +104,6 @@ class PremiumDialog extends React.Component {
           this.setState({
             visible: false,
           });
-
         }}
         gestureEnabled={true}
         ref={this.actionSheetRef}
@@ -121,7 +124,7 @@ class PremiumDialog extends React.Component {
               paddingTop: 10,
               alignSelf: 'center',
             }}>
-            Get Notesnook Pro
+            Notesnook Pro
           </Heading>
 
           <ScrollView
@@ -135,8 +138,8 @@ class PremiumDialog extends React.Component {
             }
             style={{
               width: '100%',
-              maxHeight: DDS.isLargeTablet() ? dHeight * 0.35 : dHeight * 0.5,
-            }}>
+              maxHeight: DDS.isLargeTablet() ? dHeight * 0.35 : dHeight * 0.45,
+            }}>                  
             {[
               {
                 title: 'Cross Platfrom Sync',
@@ -228,24 +231,51 @@ class PremiumDialog extends React.Component {
                 size={SIZE.sm}
                 style={{
                   fontWeight: '400',
-                  lineHeight: 16,
+                  lineHeight: 17,
                 }}>
                 {this.state.user
-                  ? 'Cancel anytime in Subscriptions on Google Play'
+                  ? `You can cancel anytime from subscriptions on${
+                      Platform.OS === 'android' ? ' Google Play' : ' App Store'
+                    }`
                   : 'Start your 14 Day Trial Today (no credit card required.)'}
               </Paragraph>
             </Heading>
-            <Paragraph
-              size={SIZE.xl}
+
+            <View
               style={{
-                fontSize: SIZE.xl,
-                paddingVertical: 15,
+                flexDirection: 'row',
+                paddingVertical: 5,
+                marginTop: 10,
               }}>
-              {this.state.product?.localizedPrice}
-              <Paragraph color={colors.accent} size={SIZE.sm}>
-                /mo
-              </Paragraph>
-            </Paragraph>
+              {this.state.products?.map((item) => (
+                <TouchableOpacity
+                  onPress={() => {
+                    this.setState({
+                      product: item,
+                    });
+                  }}
+                  style={{
+                    borderWidth: 1,
+                    borderColor: this.state.product?.productId
+                      ? colors.accent
+                      : 'transparent',
+                    borderRadius: 5,
+                    padding: 5,
+                    paddingVertical: 10,
+                    marginRight: 10,
+                  }}>
+                  <Paragraph
+                    size={SIZE.lg}
+                   >
+                    {item.localizedPrice}
+                    <Paragraph color={colors.accent} size={SIZE.sm}>
+                      /mo
+                    </Paragraph>
+                  </Paragraph>
+                </TouchableOpacity>
+              ))}
+            </View>
+
             <Seperator half />
             <Button
               onPress={async () => {
@@ -255,7 +285,7 @@ class PremiumDialog extends React.Component {
                     eSendEvent(eOpenLoginDialog);
                   }, 400);
                 } else {
-                  RNIap.requestSubscription(this.state.product.productId)
+                  RNIap.requestSubscription(this.state.product?.productId)
                     .then((r) => {})
                     .catch((e) => {
                       console.log(e);
@@ -263,9 +293,7 @@ class PremiumDialog extends React.Component {
                   this.close();
                 }
               }}
-              title={
-                this.state.user ? 'Subscribe to Notesnook Pro' : 'Sign Up Now'
-              }
+              title={this.state.user ? 'Subscribe' : 'Sign Up'}
               type="accent"
               height={50}
               width="100%"
