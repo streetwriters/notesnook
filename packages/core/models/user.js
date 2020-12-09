@@ -14,6 +14,11 @@ export default class User {
   async sync() {
     var user = await this.get();
     if (!user) return;
+
+    if (!user.remember) {
+      return this.logout();
+    }
+
     try {
       var serverUser = await authRequest.call(
         this,
@@ -53,14 +58,14 @@ export default class User {
     await this._context.write(`user`, user);
   }
 
-  async login(username, password) {
+  async login(username, password, remember) {
     let response = await authRequest("oauth/token", {
       username,
       password,
       grant_type: "password",
     });
     if (!response) return;
-    await this._postLogin(password, response);
+    await this._postLogin(password, remember, response);
   }
 
   async token() {
@@ -104,15 +109,16 @@ export default class User {
       email,
     });
     if (!response) return;
-    await this._postLogin(password, response);
+    await this._postLogin(password, true, response);
   }
 
-  async _postLogin(password, response) {
+  async _postLogin(password, remember, response) {
     await this._context.deriveCryptoKey(`_uk_@${response.payload.username}`, {
       password,
       salt: response.payload.salt,
     });
     let user = userFromResponse(response);
+    user.remember = remember;
     await this._context.write("user", user);
 
     // propogate event
