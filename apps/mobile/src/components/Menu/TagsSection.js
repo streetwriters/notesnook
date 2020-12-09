@@ -24,11 +24,13 @@ import Paragraph from '../Typography/Paragraph';
 
 export const TagsSection = () => {
   const [state, dispatch] = useTracked();
-  const {colors, menuPins} = state;
+  const {colors, menuPins, loading} = state;
 
   useEffect(() => {
-    dispatch({type: Actions.MENU_PINS});
-  }, []);
+    if (!loading) {
+      dispatch({type: Actions.MENU_PINS});
+    }
+  }, [loading]);
 
   const onPress = (item) => {
     let params;
@@ -222,5 +224,3 @@ const PinItem = ({item, index, onPress}) => {
     </>
   );
 };
-
-
