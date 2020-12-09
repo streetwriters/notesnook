@@ -80,7 +80,7 @@ class PremiumDialog extends React.Component {
 
   onSubscriptionError = (error) => {
     console.log(error.message, 'Error');
-    ToastEvent.show(error.message);
+    //ToastEvent.show(error.message);
   };
 
   render() {
@@ -89,10 +89,10 @@ class PremiumDialog extends React.Component {
       <ActionSheet
         containerStyle={{
           backgroundColor: colors.bg,
-          width: DDS.isTab ? 500 : '100%',
+          width: DDS.isLargeTablet() ? 500 : '100%',
           alignSelf: 'center',
           borderRadius: 10,
-          marginBottom: DDS.isTab ? 50 : 0,
+          marginBottom: DDS.isLargeTablet() ? 50 : 0,
           borderBottomRightRadius: 0,
           borderBottomLeftRadius: 0,
         }}
@@ -108,11 +108,11 @@ class PremiumDialog extends React.Component {
             console.log(e);
           }
         }}
-        extraScroll={DDS.isTab ? 50 : 0}
-        footerAlwaysVisible={DDS.isTab}
-        footerHeight={DDS.isTab ? 20 : 10}
+        extraScroll={DDS.isLargeTablet() ? 50 : 20}
+        footerAlwaysVisible={DDS.isLargeTablet()}
+        footerHeight={DDS.isLargeTablet() ? 20 : 20}
         footerStyle={
-          DDS.isTab
+          DDS.isLargeTablet()
             ? {
                 borderRadius: 10,
                 backgroundColor: colors.bg,
@@ -129,7 +129,7 @@ class PremiumDialog extends React.Component {
         initialOffsetFromBottom={1}>
         <View
           style={{
-            width: DDS.isTab ? 500 : dWidth,
+            width: DDS.isLargeTablet() ? 500 : dWidth,
             backgroundColor: colors.bg,
             justifyContent: 'space-between',
             paddingHorizontal: 12,
@@ -157,7 +157,7 @@ class PremiumDialog extends React.Component {
             }
             style={{
               width: '100%',
-              maxHeight: DDS.isTab ? dHeight * 0.35 : dHeight * 0.5,
+              maxHeight:DDS.isLargeTablet() ? dHeight * 0.35 : dHeight * 0.5,
             }}>
             {[
               {
