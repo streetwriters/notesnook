@@ -4,7 +4,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {eSendEvent, ToastEvent} from '../../services/EventManager';
-import {SUBSCRIPTION_STATUS_STRINGS} from '../../utils';
+import {getElevation, SUBSCRIPTION_STATUS_STRINGS} from '../../utils';
 import {db} from '../../utils/DB';
 import {eOpenLoginDialog} from '../../utils/Events';
 import {pv, SIZE} from '../../utils/SizeUtils';
@@ -23,6 +23,7 @@ export const UserSection = ({noTextMode}) => {
         borderRadius: 5,
         alignSelf: 'center',
         backgroundColor: colors.shade,
+        marginTop:10,
       }}>
       <View
         style={{

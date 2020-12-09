@@ -16,7 +16,6 @@ export const HeaderLeftMenu = () => {
     }
     Navigation.goBack();
   };
-
   return (
     <>
       {deviceMode === 'mobile' || currentScreen === 'search' ? (

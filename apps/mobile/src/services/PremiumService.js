@@ -2,9 +2,10 @@ import { db } from "../utils/DB";
 import { eOpenPremiumDialog } from "../utils/Events";
 import { eSendEvent } from "./EventManager";
 
-let premiumStatus = null;
+let premiumStatus = true;
 
-async function setPremiumStatus(status) {
+async function setPremiumStatus() {
+
 	try {
 		let user = await db.user.get();
 		if (!user || !user.id) {
@@ -18,14 +19,20 @@ async function setPremiumStatus(status) {
 }
 
 function get() {
+  //return true;
   return premiumStatus && premiumStatus !== 0 && premiumStatus !== 4
 }
 
 async function verify(callback,error) {
+
+ /*  if (!callback) console.warn('You must provide a callback function');
+  await callback();
+
+  return; */
   try {
 	let user = await db.user.get();
 	
-    if (!user || !user.id) {
+    if (!user || !user.id || premiumStatus) {
       if (error) {
         error();
         return;

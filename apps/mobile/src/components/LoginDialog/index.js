@@ -1,5 +1,5 @@
 import React, {createRef, useEffect, useState} from 'react';
-import {Modal, TouchableOpacity, View} from 'react-native';
+import {ActivityIndicator, Modal, TouchableOpacity, View} from 'react-native';
 import {TextInput} from 'react-native-gesture-handler';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -31,14 +31,18 @@ import {
 import {pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
 import {ActionIcon} from '../ActionIcon';
+import BaseDialog from '../Dialog/base-dialog';
+import DialogContainer from '../Dialog/dialog-container';
+import DialogHeader from '../Dialog/dialog-header';
 import {ListHeaderComponent} from '../SimpleList/ListHeaderComponent';
+import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
 const LoginDialog = () => {
   const [state, dispatch] = useTracked();
   const colors = state.colors;
   const [visible, setVisible] = useState(false);
-  const [status, setStatus] = useState('Logging you in');
+  const [status, setStatus] = useState(null);
   const [loggingIn, setLoggingIn] = useState(false);
   const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
@@ -108,19 +112,17 @@ const LoginDialog = () => {
     setStatus('Logging in');
 
     try {
-      let res = await db.user.login(username.toLowerCase(), password);
+      await db.user.login(username.toLowerCase(), password);
     } catch (e) {
-      setTimeout(() => {
-        ToastEvent.show(e.message, 'error', 'local');
-        setLoggingIn(false);
-      }, 500);
+      ToastEvent.show(e.message, 'error', 'local');
+      setLoggingIn(false);
       return;
     }
 
     try {
       let user = await db.user.get();
       if (!user) throw new Error('Username or passoword incorrect!');
-      setStatus('Syncing your notes');
+      setStatus('Syncing Data');
       dispatch({type: Actions.USER, user: user});
       await db.sync();
       eSendEvent(eStartSyncer);
@@ -174,7 +176,7 @@ const LoginDialog = () => {
     if (!validateInfo()) return;
 
     setSigningIn(true);
-    setStatus('Creating your account');
+    setStatus('Creating User');
     try {
       await db.user.signup(username, email, password);
     } catch (e) {
@@ -209,6 +211,32 @@ const LoginDialog = () => {
       onRequestClose={close}
       visible={true}
       transparent={true}>
+      {status && (loggingIn || signingIn) ? (
+        <BaseDialog visible={true}>
+          <DialogContainer>
+            <View
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginBottom: 10,
+              }}>
+              <Heading>{status}</Heading>
+              <Paragraph style={{textAlign: 'center'}}>
+                {loggingIn
+                  ? 'Please wait while we log in and sync your data.'
+                  : 'Please wait while we are setting up your account.'}
+
+                <Paragraph color={colors.errorText}>
+                  {' '}
+                  Do not close the app.
+                </Paragraph>
+              </Paragraph>
+            </View>
+
+            <ActivityIndicator color={colors.accent} />
+          </DialogContainer>
+        </BaseDialog>
+      ) : null}
       <View
         style={{
           opacity: 1,

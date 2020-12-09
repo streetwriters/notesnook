@@ -201,7 +201,6 @@ const AppStack = React.memo(
     function setDeviceMode(current, size) {
       eSendEvent(current !== 'mobile' ? eCloseSideMenu : eOpenSideMenu);
       setMode(current);
-      console.log(current, 'DEVICE MODE');
       dispatch({type: Actions.DEVICE_MODE, state: current});
       dispatch({type: Actions.FULLSCREEN, state: false});
       editorRef.current?.setNativeProps({

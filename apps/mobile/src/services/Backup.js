@@ -8,6 +8,8 @@ const MS_DAY = 86400000;
 const MS_WEEK = MS_DAY * 7;
 
 async function run() {
+
+  console.log('exporting backup data');
   if (Platform.OS === 'android') {
     let granted = await storage.requestPermission();
     if (!granted) {
@@ -18,7 +20,9 @@ async function run() {
   let backup;
   let error;
   try {
-    backup = await db.backup.export('mobile');
+    console.log('exporting backup data');
+    backup = await db.backup.export('mobile',false);
+    console.log('backup data gotten');
   } catch (e) {
     console.log('error', e);
     error = true;

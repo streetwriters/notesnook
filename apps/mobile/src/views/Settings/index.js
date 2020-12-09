@@ -12,6 +12,10 @@ import {enabled} from 'react-native-privacy-snapshot';
 import Menu, {MenuItem} from 'react-native-reanimated-material-menu';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {Button} from '../../components/Button';
+import BaseDialog from '../../components/Dialog/base-dialog';
+import DialogButtons from '../../components/Dialog/dialog-buttons';
+import DialogContainer from '../../components/Dialog/dialog-container';
+import DialogHeader from '../../components/Dialog/dialog-header';
 import {PressableButton} from '../../components/PressableButton';
 import Seperator from '../../components/Seperator';
 import {ListHeaderComponent} from '../../components/SimpleList/ListHeaderComponent';
@@ -34,6 +38,7 @@ import SettingsService from '../../services/SettingsService';
 import {
   AndroidModule,
   dWidth,
+  getElevation,
   MenuItemsList,
   setSetting,
   SUBSCRIPTION_STATUS_STRINGS,
@@ -58,7 +63,7 @@ import {
   eUpdateSearchState,
 } from '../../utils/Events';
 import {MMKV} from '../../utils/mmkv';
-import {opacity, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
+import {opacity, ph, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
 import Storage from '../../utils/storage';
 import {sleep} from '../../utils/TimeUtils';
 
@@ -256,16 +261,7 @@ const SettingsUserSection = () => {
     <>
       {visible && (
         <BaseDialog visible={true}>
-          <View
-            style={{
-              ...getElevation(5),
-              width: DDS.isTab ? 350 : '80%',
-              maxHeight: 350,
-              borderRadius: 5,
-              backgroundColor: colors.bg,
-              paddingHorizontal: ph,
-              paddingVertical: pv,
-            }}>
+          <DialogContainer>
             <DialogHeader
               title="Logout"
               paragraph="Clear all your data and reset the app."
@@ -281,7 +277,7 @@ const SettingsUserSection = () => {
                 dispatch({type: Actions.SYNCING, syncing: false});
               }}
             />
-          </View>
+          </DialogContainer>
         </BaseDialog>
       )}
       <View
@@ -822,6 +818,7 @@ const SettingsBackupAndRestore = () => {
           paragraph:
             "All your backups are stored in 'Phone Storage/Notesnook/backups/' folder",
         });
+        console.log("running backup now")
         await Backup.run();
         await sleep(1000);
         eSendEvent(eCloseProgressDialog);
