@@ -13,6 +13,7 @@ import {enabled} from 'react-native-privacy-snapshot';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {useTracked} from './src/provider';
 import {Actions} from './src/provider/Actions';
+import * as RNIap from 'react-native-iap';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -24,8 +25,10 @@ import {editing} from './src/utils';
 import {ACCENT, COLOR_SCHEME} from './src/utils/Colors';
 import {db} from './src/utils/DB';
 import {
+  eClosePremiumDialog,
   eDispatchAction,
   eOnLoadNote,
+  eOpenPendingDialog,
   eOpenPremiumDialog,
   eShowGetPremium,
   eStartSyncer,
@@ -45,7 +48,7 @@ let SettingsService = null;
 let Sentry = null;
 let appInit = false;
 let intentInit = false;
-
+let hasPurchased = false;
 const onAppStateChanged = async (state) => {
   console.log('app state', state);
   if (state === 'active') {
@@ -169,8 +172,6 @@ const App = () => {
     let status = PremiumService.get();
     let message = null;
 
-    return {type:type, result:true};
-    
     if (!status) {
       switch (type) {
         case CHECK_IDS.noteColor:
@@ -215,11 +216,44 @@ const App = () => {
     return {type, result: status};
   };
 
+  let subsriptionSuccessListerner;
+  let subsriptionErrorListener;
+
+  const attachIAPListeners = () => {
+    if (Platform.OS === 'ios') {
+      RNIap.getReceiptIOS()
+        .then((r) => {
+          console.log(r);
+          hasPurchased = true;
+          processReceipt(r);
+        })
+        .catch(console.log)
+        .finally(() => {
+          subsriptionSuccessListerner = RNIap.purchaseUpdatedListener(
+            onSuccessfulSubscription,
+          );
+          subsriptionErrorListener = RNIap.purchaseErrorListener(
+            onSubscriptionError,
+          );
+        });
+    } else {
+      subsriptionSuccessListerner = RNIap.purchaseUpdatedListener(
+        onSuccessfulSubscription,
+      );
+      subsriptionErrorListener = RNIap.purchaseErrorListener(
+        onSubscriptionError,
+      );
+    }
+  };
+
   useEffect(() => {
     eSubscribeEvent(eStartSyncer, startSyncer);
     eSubscribeEvent(eDispatchAction, (type) => {
       dispatch(type);
     });
+
+    attachIAPListeners();
+
     AppState.addEventListener('change', onAppStateChanged);
     eSubscribeEvent('nointent', loadMainApp);
     Appearance.addChangeListener(onSystemThemeChanged);
@@ -241,11 +275,22 @@ const App = () => {
         Linking.removeEventListener('url', _handleIntent);
       }
       unsub();
+      unsubIAP();
     };
   }, []);
 
-  const loadMainApp = () => {
+  unsubIAP = () => {
+    if (subsriptionSuccessListerner) {
+      subsriptionSuccessListerner?.remove();
+      subsriptionSuccessListerner = null;
+    }
+    if (subsriptionErrorListener) {
+      subsriptionErrorListener?.remove();
+      subsriptionErrorListener = null;
+    }
+  };
 
+  const loadMainApp = () => {
     dispatch({type: Actions.ALL});
     AppRootView = require('./initializer.root').RootView;
     getUser().then(console.log).catch(console.log);
@@ -256,7 +301,7 @@ const App = () => {
       dispatch({type: Actions.LOADING, loading: false});
       SettingsService.setAppLoaded();
     });
-    SplashScreen.hide()
+    SplashScreen.hide();
     //Sentry = require('@sentry/react-native');
     // Sentry.init({
     //   dsn:
@@ -324,10 +369,52 @@ const App = () => {
     }
   }
 
+  const onSuccessfulSubscription = (subscription) => {
+    if (hasPurchased) {
+      console.log('already processing');
+      return;
+    }
+    console.log('PROCESSING SUBS', subscription.transactionId);
+    const receipt = subscription.transactionReceipt;
+    processReceipt(receipt);
+
+    setTimeout(() => {
+      eSendEvent(eClosePremiumDialog);
+      eSendEvent(eOpenPendingDialog);
+    }, 500);
+  };
+
+const onSubscriptionError = (error) => {
+  console.log(error.message, 'Error');
+  //ToastEvent.show(error.message);
+};
+
+const processReceipt = (receipt) => {
+  if (receipt) {
+    if (Platform.OS === 'ios') {
+      fetch('http://192.168.10.5:8100/webhooks/assn', {
+        method: 'POST',
+        body: JSON.stringify({
+          receipt_data: subscription.transactionReceipt,
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then((r) => {
+          console.log(r.status, 'STATUS');
+        })
+        .catch((e) => {
+          console.log(e, 'ERROR');
+        });
+    }
+  }
+}
+
   return (
     <SafeAreaProvider>
       {intent ? <AppRootView /> : null}
-      {init && !intent ? <AppRootView  /> : null}
+      {init && !intent ? <AppRootView /> : null}
     </SafeAreaProvider>
   );
 };
