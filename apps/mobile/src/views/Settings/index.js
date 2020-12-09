@@ -151,11 +151,16 @@ export const Settings = ({navigation}) => {
         onScroll={(e) =>
           eSendEvent(eScrollEvent, e.nativeEvent.contentOffset.y)
         }
+        scrollEventThrottle={1}
         style={{
           paddingHorizontal: 0,
         }}>
         {!DDS.isLargeTablet() && (
-          <ListHeaderComponent title="Settings" type="settings" messageCard={false} />
+          <ListHeaderComponent
+            title="Settings"
+            type="settings"
+            messageCard={false}
+          />
         )}
 
         <SettingsUserSection />
@@ -225,19 +230,22 @@ const CustomButton = ({
         borderRadius: 0,
         flexDirection: 'row',
       }}>
-      <Paragraph
-        size={SIZE.md}
+      <View
         style={{
-          textAlignVertical: 'center',
           maxWidth: maxWidth,
         }}>
-        {title}
-        {tagline ? '\n' : null}
-
+        <Paragraph
+          size={SIZE.md}
+          style={{
+            textAlignVertical: 'center',
+            maxWidth: maxWidth,
+          }}>
+          {title}
+        </Paragraph>
         <Paragraph size={SIZE.sm} color={colors.icon}>
           {tagline}
         </Paragraph>
-      </Paragraph>
+      </View>
       {customComponent ? customComponent : null}
     </PressableButton>
   );
@@ -333,7 +341,6 @@ const SettingsUserSection = () => {
                 borderRadius: 5,
                 padding: 5,
                 paddingVertical: 2.5,
-                backgroundColor: 'white',
               }}>
               <Heading color={colors.accent} size={SIZE.sm}>
                 {SUBSCRIPTION_STATUS_STRINGS[user.subscription.status]}
@@ -343,23 +350,24 @@ const SettingsUserSection = () => {
           <Seperator />
           <View>
             {user.subscription.status === 1 ? (
-              <Paragraph
-                size={SIZE.lg}
-                color={
-                  getTimeLeft(parseInt(user.subscription.expiry)) > 5
-                    ? colors.pri
-                    : colors.errorText
-                }>
-                {getTimeLeft(parseInt(user.subscription.expiry)) +
-                  ' Days Remaining'}{' '}
-                {'\n'}
+              <View>
+                <Paragraph
+                  size={SIZE.lg}
+                  color={
+                    getTimeLeft(parseInt(user.subscription.expiry)) > 5
+                      ? colors.pri
+                      : colors.errorText
+                  }>
+                  {getTimeLeft(parseInt(user.subscription.expiry)) +
+                    ' Days Remaining'}{' '}
+                </Paragraph>
                 <Paragraph color={colors.icon} size={SIZE.sm}>
                   Your trail period started on{' '}
                   {new Date(
                     user.subscription.start * 1000,
                   ).toLocaleDateString()}
                 </Paragraph>
-              </Paragraph>
+              </View>
             ) : null}
 
             <Seperator />
@@ -370,7 +378,7 @@ const SettingsUserSection = () => {
               }}
               width="100%"
               fontSize={SIZE.md}
-              title="Get Notesnook Pro"
+              title="Subscribe to Notesnook Pro"
               height={50}
               type="accent"
             />
@@ -497,18 +505,21 @@ const SettingsAppearanceSection = () => {
     <>
       <SectionHeader title="Appearance" />
 
-      <Paragraph
-        size={SIZE.md}
+      <View
         style={{
-          textAlignVertical: 'center',
           paddingHorizontal: 12,
         }}>
-        Accent Color{'\n'}
+        <Paragraph
+          size={SIZE.md}
+          style={{
+            textAlignVertical: 'center',
+          }}>
+          Accent Color
+        </Paragraph>
         <Paragraph size={SIZE.sm} color={colors.icon}>
           Change the accent color of the app.
         </Paragraph>
-      </Paragraph>
-
+      </View>
       <View
         contentContainerStyle={{
           flexDirection: 'row',
@@ -818,19 +829,18 @@ const SettingsBackupAndRestore = () => {
           paragraph:
             "All your backups are stored in 'Phone Storage/Notesnook/backups/' folder",
         });
-        console.log("running backup now")
+        console.log('running backup now');
         await Backup.run();
-        await sleep(1000);
         eSendEvent(eCloseProgressDialog);
       },
-      desc: 'Backup all your data to phone storage',
+      desc: 'Backup your data to phone storage',
     },
     {
       name: 'Restore backup',
       func: () => {
         eSendEvent(eOpenRestoreDialog);
       },
-      desc: 'Restore a backup from your phone.',
+      desc: 'Restore backup from phone storage.',
     },
   ];
 
@@ -857,17 +867,22 @@ const SettingsBackupAndRestore = () => {
           height: 50,
           paddingHorizontal: 12,
         }}>
-        <Paragraph
-          size={SIZE.md}
+        <View
           style={{
-            textAlignVertical: 'center',
             maxWidth: '60%',
           }}>
-          Auto Backup{'\n'}
+          <Paragraph
+            size={SIZE.md}
+            style={{
+              textAlignVertical: 'center',
+              maxWidth: '100%',
+            }}>
+            Auto Backup
+          </Paragraph>
           <Paragraph color={colors.icon} size={SIZE.sm}>
             Backup your data automatically.
           </Paragraph>
-        </Paragraph>
+        </View>
 
         <View
           style={{
@@ -879,7 +894,7 @@ const SettingsBackupAndRestore = () => {
           }}>
           {[
             {
-              title: 'Off',
+              title: 'Never',
               value: 'off',
             },
             {
@@ -928,7 +943,7 @@ const SettingsBackupAndRestore = () => {
 
       <CustomButton
         title="Backup Encryption"
-        tagline="Backups will be encrypted."
+        tagline="Encrypt all your backups."
         onPress={async () => {
           if (!user) {
             ToastEvent.show(
