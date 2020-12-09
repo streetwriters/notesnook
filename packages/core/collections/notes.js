@@ -137,7 +137,7 @@ export default class Notes extends Collection {
    * @param {"asc"|"desc"} sort
    */
   group(by, sort = "desc") {
-    let notes = this.all;
+    let notes = qclone(this.all);
 
     switch (by) {
       case "abc":
