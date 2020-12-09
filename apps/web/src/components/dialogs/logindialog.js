@@ -15,16 +15,20 @@ function LoginDialog(props) {
   useEffect(() => {
     if (!window.PasswordCredential) return;
     (async function () {
-      navigator.credentials
-        .get({ mediation: "silent", password: true })
-        .then(async (credential) => {
-          if (credential) {
-            await login({
-              username: credential.id,
-              password: credential.password,
-            });
-          }
+      console.log("Trying to automatically login...");
+      const credential = await navigator.credentials.get({
+        mediation: "silent",
+        password: true,
+      });
+      if (credential) {
+        console.log("Got credentials...");
+        await login({
+          username: credential.id,
+          password: credential.password,
         });
+      } else {
+        console.log("Did not get credentials...");
+      }
     })();
   }, [login]);
   return (
@@ -83,6 +87,7 @@ function LoginDialog(props) {
                   password: data.password,
                 });
                 await navigator.credentials.store(c);
+                console.log("Credentails stored...");
                 onClose();
               } else {
                 onClose();

@@ -190,7 +190,11 @@ function Settings(props) {
             <Button
               variant="list"
               onClick={async () => {
-                if (await showLogoutConfirmation()) await logout();
+                if (await showLogoutConfirmation()) {
+                  if (window.PasswordCredential)
+                    await navigator.credentials.preventSilentAccess();
+                  await logout();
+                }
               }}
             >
               <TextWithTip
