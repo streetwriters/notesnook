@@ -15,9 +15,8 @@ import {
   UIManager,
   View,
   ViewPropTypes,
-
 } from 'react-native';
-import { notesnook } from '../../../e2e/test.ids';
+import {notesnook} from '../../../e2e/test.ids';
 import {dWidth} from '../../utils';
 import {styles} from './styles';
 
@@ -89,8 +88,6 @@ export default class ActionSheet extends Component {
   snapToOffset = (offset) => {
     this._scrollTo(offset);
   };
-
-  
 
   /**
    * Open/Close the ActionSheet
@@ -168,7 +165,6 @@ export default class ActionSheet extends Component {
     this.isClosing = true;
     this._hideAnimation();
   };
-
   _showModal = async (event) => {
     let {
       gestureEnabled,
@@ -179,15 +175,17 @@ export default class ActionSheet extends Component {
       delayActionSheetDraw,
       delayActionSheetDrawTime,
     } = this.props;
-
+    console.log('LAYOUT CALLED');
+    deviceHeight = getDeviceHeight(this.props.statusBarTranslucent);
     let addFactor = deviceHeight * 0.1;
     let height = event.nativeEvent.layout.height;
+
+    console.log(height, 'HEIGHT', deviceHeight);
     if (this.layoutHasCalled) {
       let diff;
       if (height > this.customComponentHeight) {
         diff = height - this.customComponentHeight;
         this._scrollTo(this.prevScroll + diff);
-
         this.customComponentHeight = height;
       } else {
         diff = this.customComponentHeight - height;
@@ -223,6 +221,7 @@ export default class ActionSheet extends Component {
         }
       }
 
+      console.log(scrollOffset, 'OFFSET');
       this._scrollTo(scrollOffset, false);
       this.prevScroll = scrollOffset;
       if (Platform.OS === 'ios') {
@@ -232,7 +231,7 @@ export default class ActionSheet extends Component {
           await this.waitAsync(delayActionSheetDrawTime / 2);
         }
       }
-
+      console.log(scrollOffset, 'END_OFFSET');
       this._openAnimation(scrollOffset);
 
       if (!gestureEnabled) {
@@ -248,6 +247,7 @@ export default class ActionSheet extends Component {
 
     if (animated) {
       this.transformValue.setValue(scrollOffset);
+      console.log(scrollOffset, 'OFFSET_ANIM');
       Animated.parallel([
         Animated.spring(this.transformValue, {
           toValue: 0,
@@ -295,7 +295,11 @@ export default class ActionSheet extends Component {
 
         DeviceEventEmitter.emit('hasReachedTop', true);
       } else {
-        this._scrollTo(this.prevScroll);
+        let offset =
+          this.customComponentHeight * this.props.initialOffsetFromBottom +
+          deviceHeight * 0.1 +
+          this.props.extraScroll;
+        this._scrollTo(offset);
       }
     } else {
       if (this.prevScroll - verticalOffset > springOffset) {
@@ -308,7 +312,11 @@ export default class ActionSheet extends Component {
         if (this.isRecoiling) {
           return;
         }
-        this._scrollTo(this.prevScroll);
+        let offset =
+          this.customComponentHeight * this.props.initialOffsetFromBottom +
+          deviceHeight * 0.1 +
+          this.props.extraScroll;
+        this._scrollTo(offset);
         this.isRecoiling = true;
         await this.waitAsync(300);
         this.isRecoiling = false;
@@ -442,7 +450,6 @@ export default class ActionSheet extends Component {
   };
 
   _onKeyboardHide = () => {
-
     this.setState({
       keyboard: false,
     });
@@ -503,7 +510,7 @@ export default class ActionSheet extends Component {
               width: '100%',
             },
           ]}>
-            {this.props.premium}
+          {this.props.premium}
           <FlatList
             bounces={false}
             keyboardShouldPersistTaps={keyboardShouldPersistTaps}
@@ -575,8 +582,8 @@ export default class ActionSheet extends Component {
                           translateY: this.transformValue,
                         },
                       ],
-                      borderTopRightRadius:this.borderRadius,
-                      borderTopLeftRadius:this.borderRadius
+                      borderTopRightRadius: this.borderRadius,
+                      borderTopLeftRadius: this.borderRadius,
                     },
                   ]}>
                   {gestureEnabled || headerAlwaysVisible ? (
