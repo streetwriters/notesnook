@@ -245,20 +245,18 @@ const App = () => {
   }, []);
 
   const loadMainApp = () => {
-    console.log('main app loadinggggg');
+
     dispatch({type: Actions.ALL});
     AppRootView = require('./initializer.root').RootView;
-    sleep(100).then(() => SplashScreen.hide());
     getUser().then(console.log).catch(console.log);
     backupData().then((r) => r);
     sleep(500).then(() => (appInit = true));
     db.notes.init().then(() => {
       dispatch({type: Actions.NOTES});
-      console.log('setting loading to false');
       dispatch({type: Actions.LOADING, loading: false});
       SettingsService.setAppLoaded();
     });
-
+    SplashScreen.hide()
     //Sentry = require('@sentry/react-native');
     // Sentry.init({
     //   dsn:
@@ -329,7 +327,7 @@ const App = () => {
   return (
     <SafeAreaProvider>
       {intent ? <AppRootView /> : null}
-      {init && !intent ? <AppRootView /> : null}
+      {init && !intent ? <AppRootView  /> : null}
     </SafeAreaProvider>
   );
 };
