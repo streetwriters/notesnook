@@ -85,8 +85,6 @@ function attachEditorListeners() {
   titleInput = isTablet ? 'titleInput' : 'simpleTitleInput';
   infoBar = isTablet ? '.info-bar' : '.info-bar-alt';
 
- 
-
   function isWhitespace(ch) {
     let whiteSpace = false;
     if (ch === ' ' || ch === '\t' || ch === '\n') {
@@ -131,8 +129,7 @@ function attachEditorListeners() {
     info = document.querySelector(infoBar);
     let infowords = info.querySelector('#infowords');
     if (infowords) {
-      infowords.innerText =
-        editor.getText().split(' ').length + ' words';
+      infowords.innerText = editor.getText().split(' ').length + ' words';
     }
 
     if (deltaTimeout) {
@@ -166,7 +163,7 @@ function attachEditorListeners() {
 
 function attachMessageListener() {
   titleInput = isTablet ? 'titleInput' : 'simpleTitleInput';
-  infoBar = isTablet ? '.info-bar' : '.info-bar-alt';  
+  infoBar = isTablet ? '.info-bar' : '.info-bar-alt';
   window.addEventListener('message', (data) => {
     let message = JSON.parse(data.data);
     let type = message.type;
@@ -197,12 +194,16 @@ function attachMessageListener() {
         var range = editor.getSelection();
         if (range) {
           if (range.length == 0) {
-            var bounds = editor.getBounds(range.index, range.index);
-
+            let correction = isTablet ? 265 : 110;
             setTimeout(() => {
               document
                 .querySelector('.app-main')
-                .scrollTo({top: bounds.top, behavior: 'smooth'});
+                .scrollTo({
+                  top:
+                    editor.getBounds(editor.getSelection().index).bottom -
+                    (window.innerHeight - correction),
+                  behavior: 'smooth',
+                });
             }, 200);
           }
         }
@@ -236,7 +237,7 @@ function attachMessageListener() {
           info = document.querySelector(infoBar);
           info.querySelector('#infowords').innerText =
             editor.getText().split(' ').length + ' words';
-            info.querySelector('#infosaved').innerText = 'Saved';
+          info.querySelector('#infosaved').innerText = 'Saved';
         }, 100);
 
         break;
@@ -284,7 +285,7 @@ function attachMessageListener() {
           info = document.querySelector(infoBar);
           info.querySelector('#infowords').innerText =
             editor.getText().split(' ').length + ' words';
-            info.querySelector('#infosaved').innerText = 'Saved';
+          info.querySelector('#infosaved').innerText = 'Saved';
 
           document.body.scrollTop = 0; // For Safari
           document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
