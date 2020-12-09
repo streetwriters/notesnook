@@ -151,6 +151,7 @@ class RecoveryKeyDialog extends React.Component {
             ? hexToRGBA(colors.accent + '19')
             : hexToRGBA(colors.shade)
         }
+        extraScroll={20}
         closeOnTouchBackdrop={false}
         onOpen={this.onOpen}
         ref={this.actionSheetRef}
