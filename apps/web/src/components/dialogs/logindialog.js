@@ -12,6 +12,7 @@ function LoginDialog(props) {
   const { onClose } = props;
   const [error, setError] = useState();
   const [credential, setCredential] = useState();
+  const [username, setUsername] = useState();
   const isLoggingIn = useStore((store) => store.isLoggingIn);
   const login = useStore((store) => store.login);
 
@@ -24,32 +25,56 @@ function LoginDialog(props) {
       });
       if (credential) {
         setCredential(credential);
+        if (!credential.password) {
+          setUsername(credential.id);
+        } else {
+          await login({
+            password: credential.password,
+            username: credential.id,
+            remember: true,
+          });
+          onClose();
+        }
       }
     })();
-  }, [login]);
+  }, [login, onClose]);
   return (
     <Dialog
       isOpen={true}
-      title={"Sign in to Your Account"}
+      title={
+        credential?.password
+          ? `Signing in as ${credential.id}...`
+          : "Sign in to Your Account"
+      }
       description={
         <Flex alignItems="center">
-          <Text as="span" fontSize="body" color="gray">
-            Don't have an account?{" "}
-            <Button
-              variant="anchor"
-              sx={{ textAlign: "left" }}
-              fontSize="body"
-              onClick={showSignUpDialog}
-            >
-              Create an account here.
-            </Button>
-          </Text>
+          {credential?.password ? (
+            <Text as="span" fontSize="body" color="gray">
+              Please wait...
+            </Text>
+          ) : (
+            <Text as="span" fontSize="body" color="gray">
+              Don't have an account?{" "}
+              <Button
+                variant="anchor"
+                sx={{ textAlign: "left" }}
+                fontSize="body"
+                onClick={showSignUpDialog}
+              >
+                Create an account here.
+              </Button>
+            </Text>
+          )}
         </Flex>
       }
       icon={Icon.Login}
       onClose={onClose}
       scrollable
-      negativeButton={{ text: "Cancel", onClick: onClose }}
+      negativeButton={{
+        text: "Cancel",
+        disabled: isLoggingIn,
+        onClick: onClose,
+      }}
       positiveButton={{
         props: {
           form: "loginForm",
@@ -60,7 +85,7 @@ function LoginDialog(props) {
         disabled: isLoggingIn,
       }}
     >
-      <Flex flexDirection="column">
+      {!credential?.password && (
         <Flex
           id="loginForm"
           as="form"
@@ -79,7 +104,7 @@ function LoginDialog(props) {
                 // Instantiate PasswordCredential with the form
                 if (window.PasswordCredential) {
                   var c = new window.PasswordCredential({
-                    id: data.email,
+                    id: data.username,
                     name: data.username,
                     type: "password",
                     password: data.password,
@@ -95,14 +120,16 @@ function LoginDialog(props) {
           flexDirection="column"
         >
           <Field
-            autoFocus
+            autoFocus={!username}
             required
             id="username"
             label="Username"
             name="username"
             autoComplete="username"
+            defaultValue={username}
           />
           <Field
+            autoFocus={!!username}
             required
             id="password"
             label="Password"
@@ -117,39 +144,7 @@ function LoginDialog(props) {
             Keep me logged in
           </Label>
         </Flex>
-        {credential && (
-          <Button
-            variant="tertiary"
-            mt={2}
-            sx={{ textAlign: "left" }}
-            onClick={async () => {
-              if (!credential.password) {
-                const element = document.querySelector("#loginForm #username");
-                if (!element) {
-                  return setCredential();
-                }
-                element.value = credential.name;
-              } else {
-                let remember = false;
-                const element = document.querySelector("#loginForm #remember");
-                if (!element) remember = element.checked;
-
-                await login({
-                  password: credential.password,
-                  username: credential.name,
-                  remember: remember,
-                });
-                onClose();
-              }
-            }}
-          >
-            <Text as="span">
-              Login as <b>{credential.name}</b>
-              {credential.id && <Text variant="subBody">{credential.id}</Text>}
-            </Text>
-          </Button>
-        )}
-      </Flex>
+      )}
     </Dialog>
   );
 }
