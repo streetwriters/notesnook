@@ -5,8 +5,9 @@ import Dialog, { showDialog } from "./dialog";
 import { showSignUpDialog } from "./signupdialog";
 import { useStore } from "../../stores/user-store";
 import Field from "../field";
+import { Checkbox, Label } from "@rebass/forms";
 
-const requiredValues = ["username", "password"];
+const requiredValues = ["username", "password", "remember"];
 function LoginDialog(props) {
   const { onClose } = props;
   const [error, setError] = useState();
@@ -65,8 +66,9 @@ function LoginDialog(props) {
           as="form"
           onSubmit={(e) => {
             e.preventDefault();
+            const form = new FormData(e.target);
             const data = requiredValues.reduce((prev, curr) => {
-              prev[curr] = e.target[curr].value;
+              prev[curr] = form.get(curr);
               return prev;
             }, {});
 
@@ -110,6 +112,10 @@ function LoginDialog(props) {
             sx={{ mt: 1 }}
           />
           {error && <Text variant="error">{error}</Text>}
+          <Label mt={1} fontSize="body" alignItems="center">
+            <Checkbox id="remember" name="remember" defaultChecked />
+            Keep me logged in
+          </Label>
         </Flex>
         {credential && (
           <Button
@@ -127,6 +133,7 @@ function LoginDialog(props) {
                 await login({
                   password: credential.password,
                   username: credential.name,
+                  remember: true,
                 });
                 onClose();
               }

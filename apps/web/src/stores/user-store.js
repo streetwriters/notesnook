@@ -40,7 +40,7 @@ class UserStore extends BaseStore {
   login = (form) => {
     this.set((state) => (state.isLoggingIn = true));
     return db.user
-      .login(form.username, form.password)
+      .login(form.username, form.password, form.remember)
       .then(() => {
         return showLoadingDialog({
           title: "Importing your data...",
