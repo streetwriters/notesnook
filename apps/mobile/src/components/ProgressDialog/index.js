@@ -1,17 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { View } from 'react-native';
+import { ActivityIndicator, View } from 'react-native';
 import { useTracked } from '../../provider';
-import { DDS } from '../../services/DeviceDetection';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
-import { getElevation } from '../../utils';
 import { eCloseProgressDialog, eOpenProgressDialog } from '../../utils/Events';
-import { ph } from '../../utils/SizeUtils';
 import BaseDialog from '../Dialog/base-dialog';
-import { Loading } from '../Loading';
+import DialogContainer from '../Dialog/dialog-container';
+import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
 const ProgressDialog = () => {
-  const [state, dispatch] = useTracked();
+  const [state, ] = useTracked();
   const {colors} = state;
   const [visible, setVisible] = useState(false);
   const [dialogData, setDialogData] = useState({
@@ -37,27 +35,25 @@ const ProgressDialog = () => {
   };
 
   return !visible ? null : (
-    <BaseDialog visible={true} onRequestClose={close}>
-      <View
-        style={{
-          ...getElevation(5),
-          width: DDS.isTab ? 350 : '80%',
-          maxHeight: 350,
-          borderRadius: 5,
-          backgroundColor: colors.bg,
-          paddingHorizontal: ph,
-          paddingVertical: 20,
-        }}>
-        <Loading height={40} tagline={dialogData.title} />
-        <Paragraph
-          color={colors.icon}
+    <BaseDialog visible={true}>
+      <DialogContainer>
+        <View
           style={{
-            alignSelf: 'center',
-            textAlign: 'center',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginBottom: 10,
           }}>
-          {dialogData.paragraph}
-        </Paragraph>
-      </View>
+          <Heading>   {dialogData.title}</Heading>
+          <Paragraph style={{textAlign: 'center'}}>
+         
+            <Paragraph color={colors.errorText}>
+              {' '}
+              Do not close the app.
+            </Paragraph>
+          </Paragraph>
+        </View>
+        <ActivityIndicator color={colors.accent} />
+      </DialogContainer>
     </BaseDialog>
   );
 };
