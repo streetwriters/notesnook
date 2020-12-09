@@ -6,10 +6,11 @@ import { db } from "../common";
 import BaseStore from ".";
 import { isMobile, isTablet } from "../utils/dimensions";
 import { getHashParam, setHashParam } from "../utils/useHashParam";
+import { qclone } from "qclone";
 
 const SESSION_STATES = { stale: "stale", new: "new", locked: "locked" };
 const DEFAULT_SESSION = {
-  notebook: undefined,
+  notebooks: undefined,
   state: undefined,
   isSaving: false,
   title: "",
@@ -34,6 +35,8 @@ class EditorStore extends BaseStore {
   init = () => {
     window.addEventListener("hashchange", async () => {
       const note = getHashParam("note");
+
+      if (this.get().session.id === note) return;
 
       if (isMobile() && !note && appStore.get().isEditorOpen) {
         return this.clearSession();
@@ -73,7 +76,7 @@ class EditorStore extends BaseStore {
   openSession = async (noteId) => {
     let note = db.notes.note(noteId);
     if (!note) return;
-    note = note.data;
+    note = qclone(note.data);
 
     noteStore.setSelectedNote(note.id);
 

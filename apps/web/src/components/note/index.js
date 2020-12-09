@@ -128,7 +128,9 @@ function Note(props) {
   const theme = useTheme();
   const color = useMemo(() => COLORS[note.color], [note.color]);
   const notebook = useMemo(
-    () => note.notebooks && db.notebooks.notebook(note.notebooks[0].id)?.data,
+    () =>
+      !!note.notebooks?.length &&
+      db.notebooks.notebook(note.notebooks[0].id)?.data,
     [note.notebooks]
   );
 
@@ -228,6 +230,7 @@ export default React.memo(Note, function (prevProps, nextProps) {
     prevItem.title === nextItem.title &&
     prevItem.locked === nextItem.locked &&
     prevItem.conflicted === nextItem.conflicted &&
-    prevItem.color === nextItem.color
+    prevItem.color === nextItem.color &&
+    prevItem.notebooks?.length === nextItem.notebooks?.length
   );
 });

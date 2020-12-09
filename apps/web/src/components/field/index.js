@@ -19,6 +19,7 @@ function Field(props) {
     onChange,
     inputRef,
     defaultValue,
+    placeholder,
   } = props;
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
@@ -48,6 +49,7 @@ function Field(props) {
           required={required}
           name={name}
           id={id}
+          placeholder={placeholder}
           autoComplete={autoComplete}
           type={type || "text"}
           onChange={onChange}
@@ -85,15 +87,15 @@ function Field(props) {
             variant="rowCenter"
             sx={{
               position: "absolute",
-              right: 0,
-              top: 0,
-              bottom: 0,
+              right: "2px",
+              top: "2px",
+              bottom: "2px",
               px: 1,
               borderRadius: "default",
               ":hover": { bg: "border" },
             }}
           >
-            <action.icon />
+            <action.icon size={20} />
           </Flex>
         )}
       </Flex>
