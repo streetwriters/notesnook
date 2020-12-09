@@ -17,7 +17,7 @@ function LoginDialog(props) {
     (async function () {
       console.log("Trying to automatically login...");
       const credential = await navigator.credentials.get({
-        mediation: "silent",
+        mediation: "optional",
         password: true,
       });
       if (credential) {
@@ -27,7 +27,7 @@ function LoginDialog(props) {
           password: credential.password,
         });
       } else {
-        console.log("Did not get credentials...");
+        console.log("Did not get credentials...", credential);
       }
     })();
   }, [login]);
