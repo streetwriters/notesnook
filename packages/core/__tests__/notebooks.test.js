@@ -50,21 +50,3 @@ test("unpin a notebook", () =>
     notebook = db.notebooks.notebook(id);
     expect(notebook.data.pinned).toBe(false);
   }));
-
-test("delete a notebook", () =>
-  notebookTest().then(async ({ db, id }) => {
-    let noteId = await db.notes.add(TEST_NOTE);
-    await db.notebooks.notebook(id).topics.topic("General").add(noteId);
-    expect(db.notebooks.notebook(id).topics.topic("General").has(noteId)).toBe(
-      true
-    );
-    let note = db.notes.note(noteId);
-
-    expect(note.notebooks.some((n) => n.id === id)).toBe(true);
-
-    await db.notebooks.delete(id);
-    expect(db.notebooks.notebook(id).data.deleted).toBe(true);
-    note = db.notes.note(noteId);
-
-    expect(note.notebooks.length).toBe(0);
-  }));

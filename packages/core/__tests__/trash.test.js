@@ -91,7 +91,7 @@ test("delete a notebook", () =>
     let noteId = await db.notes.add(TEST_NOTE);
     await db.notebooks.notebook(id).topics.topic("General").add(noteId);
     await db.notebooks.delete(id);
-    expect(db.notebooks.notebook(id).data.deleted).toBe(true);
+    expect(db.notebooks.notebook(id)).toBeUndefined();
     expect(db.notes.note(noteId).notebook).toBeUndefined();
   }));
 
