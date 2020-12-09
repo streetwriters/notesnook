@@ -130,10 +130,14 @@ function LoginDialog(props) {
                 }
                 element.value = credential.name;
               } else {
+                let remember = false;
+                const element = document.querySelector("#loginForm #remember");
+                if (!element) remember = element.checked;
+
                 await login({
                   password: credential.password,
                   username: credential.name,
-                  remember: true,
+                  remember: remember,
                 });
                 onClose();
               }
