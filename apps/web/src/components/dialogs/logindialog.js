@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Flex, Button, Text } from "rebass";
 import * as Icon from "../icons";
 import Dialog, { showDialog } from "./dialog";
@@ -12,7 +12,21 @@ function LoginDialog(props) {
   const [error, setError] = useState();
   const isLoggingIn = useStore((store) => store.isLoggingIn);
   const login = useStore((store) => store.login);
-
+  useEffect(() => {
+    if (!window.PasswordCredential) return;
+    (async function () {
+      navigator.credentials
+        .get({ mediation: "silent", password: true })
+        .then(async (credential) => {
+          if (credential) {
+            await login({
+              username: credential.id,
+              password: credential.password,
+            });
+          }
+        });
+    })();
+  }, [login]);
   return (
     <Dialog
       isOpen={true}
@@ -59,7 +73,21 @@ function LoginDialog(props) {
           setError();
 
           login(data)
-            .then(onClose)
+            .then(async () => {
+              // Instantiate PasswordCredential with the form
+              if (window.PasswordCredential) {
+                var c = new window.PasswordCredential({
+                  id: data.username,
+                  name: data.username,
+                  type: "password",
+                  password: data.password,
+                });
+                await navigator.credentials.store(c);
+                onClose();
+              } else {
+                onClose();
+              }
+            })
             .catch((e) => setError(e.message));
         }}
         flexDirection="column"

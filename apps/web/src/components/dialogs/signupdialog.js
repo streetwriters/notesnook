@@ -54,7 +54,21 @@ function SignUpDialog(props) {
           setError();
 
           signup(data)
-            .then(onClose)
+            .then(async () => {
+              // Instantiate PasswordCredential with the form
+              if (window.PasswordCredential) {
+                var c = new window.PasswordCredential({
+                  id: data.username,
+                  name: data.username,
+                  type: "password",
+                  password: data.password,
+                });
+                await navigator.credentials.store(c);
+                onClose();
+              } else {
+                onClose();
+              }
+            })
             .catch((e) => setError(e.message));
         }}
       >
@@ -65,12 +79,14 @@ function SignUpDialog(props) {
           type="email"
           label="Email"
           name="email"
+          autoComplete="email"
         />
         <Field
           required
           id="username"
           label="Username"
           name="username"
+          autoComplete="username"
           sx={{ mt: 1 }}
         />
         <Field
