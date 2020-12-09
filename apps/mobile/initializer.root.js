@@ -1,8 +1,6 @@
-import {isNull} from 'lodash';
 import React, {useEffect, useState} from 'react';
 import {Dimensions, Platform, View} from 'react-native';
 import ScrollableTabView from 'react-native-scrollable-tab-view';
-import SplashScreen from 'react-native-splash-screen';
 import {notesnook} from './e2e/test.ids';
 import ContextMenu from './src/components/ContextMenu';
 import {DialogManager} from './src/components/DialogManager';
@@ -19,9 +17,7 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent,
 } from './src/services/EventManager';
-import IntentService from './src/services/IntentService';
-import SettingsService from './src/services/SettingsService';
-import {dWidth, editing, setWidthHeight} from './src/utils';
+import {editing, setWidthHeight} from './src/utils';
 import {
   eCloseFullscreenEditor,
   eCloseSideMenu,
@@ -30,7 +26,6 @@ import {
   eOpenSideMenu,
 } from './src/utils/Events';
 import {editorRef, tabBarRef} from './src/utils/Refs';
-import {sleep} from './src/utils/TimeUtils';
 import {EditorWrapper} from './src/views/Editor/EditorWrapper';
 import {getIntent, getNote, post} from './src/views/Editor/Functions';
 
@@ -121,7 +116,13 @@ const AppStack = React.memo(
   () => {
     const [state, dispatch] = useTracked();
     const {colors} = state;
-    const [mode, setMode] = useState(null);
+    const [mode, setMode] = useState(
+      DDS.isLargeTablet()
+        ? 'tablet'
+        : DDS.isSmallTab
+        ? 'smallTablet'
+        : 'mobile',
+    );
     const [dimensions, setDimensions] = useState({width, height});
 
     const showFullScreenEditor = () => {
@@ -168,6 +169,7 @@ const AppStack = React.memo(
       let size = event?.nativeEvent?.layout;
       updatedDimensions = size;
       if (!size || (size.width === dimensions.width && mode !== null)) {
+        dispatch({type: Actions.DEVICE_MODE, state: mode});
         return;
       }
 
@@ -186,6 +188,7 @@ const AppStack = React.memo(
       setWidthHeight(size);
       DDS.setSize(size);
       DDS.checkSmallTab(size.width > size.height ? 'LANDSCAPE' : 'PORTRAIT');
+
       if (DDS.isLargeTablet()) {
         setDeviceMode('tablet', size);
       } else if (DDS.isSmallTab) {
@@ -198,6 +201,7 @@ const AppStack = React.memo(
     function setDeviceMode(current, size) {
       eSendEvent(current !== 'mobile' ? eCloseSideMenu : eOpenSideMenu);
       setMode(current);
+      console.log(current, 'DEVICE MODE');
       dispatch({type: Actions.DEVICE_MODE, state: current});
       dispatch({type: Actions.FULLSCREEN, state: false});
       editorRef.current?.setNativeProps({
