@@ -68,14 +68,19 @@ const RestoreDialog = () => {
         return;
       }
     }
-    setRestoring(true);
-    let backup = await RNFetchBlob.fs.readFile('file:/' + item.path, 'utf8');
-    await db.backup.import(backup);
-    await sleep(2000);
-    setRestoring(false);
-    dispatch({type: Actions.ALL});
-    ToastEvent.show('Restore Complete!', 'success', 'local');
-    setVisible(false);
+    try {
+      setRestoring(true);
+      let backup = await RNFetchBlob.fs.readFile('file:/' + item.path, 'utf8');
+      await db.backup.import(backup);
+      setRestoring(false);
+      dispatch({type: Actions.ALL});
+      ToastEvent.show('Restore Complete!', 'success', 'local');
+      setVisible(false);
+    } catch (e) {
+      setRestoring(false);
+      ToastEvent.show(e.message, 'error', 'local');
+      console.log(e)
+    } 
   };
 
   const checkBackups = async () => {
@@ -89,17 +94,14 @@ const RestoreDialog = () => {
         return;
       }
     }
-    let path = await storage.checkAndCreateDir('/backups/');
-    let files = await RNFetchBlob.fs.lstat(path);
-    console.log(
-      files.sort(function (a, b) {
-        timeA = a.lastModified;
-        timeB = b.lastModified;
-        return timeB - timeA;
-      }),
-    );
+    try {
+      let path = await storage.checkAndCreateDir('/backups/');
+      let files = await RNFetchBlob.fs.lstat(path);
+      setFiles(files);
+    } catch(e) {
+      console.log(e)
+    }
 
-    setFiles(files);
   };
 
   return !visible ? null : (
@@ -112,9 +114,9 @@ const RestoreDialog = () => {
         style={{
           ...getElevation(5),
           paddingTop: insets.top + 10,
-          width: DDS.isTab ? 500 : '100%',
-          height: DDS.isTab ? 500 : '100%',
-          maxHeight: DDS.isTab ? '90%' : '100%',
+          width: DDS.isLargeTablet() ? 500 : '100%',
+          height: DDS.isLargeTablet()  ? 500 : '100%',
+          maxHeight: DDS.isLargeTablet()  ? '90%' : '100%',
           borderRadius: 5,
           backgroundColor: colors.bg,
           padding: 12,
