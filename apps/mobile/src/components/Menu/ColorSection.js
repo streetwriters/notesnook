@@ -9,6 +9,7 @@ import {
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import {COLORS_NOTE} from '../../utils/Colors';
+import {db} from '../../utils/DB';
 import {refreshNotesPage} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
 import {PressableButton} from '../PressableButton';
@@ -16,11 +17,13 @@ import Paragraph from '../Typography/Paragraph';
 
 export const ColorSection = ({noTextMode}) => {
   const [state, dispatch] = useTracked();
-  const {colorNotes} = state;
+  const {colorNotes,loading} = state;
 
   useEffect(() => {
-    dispatch({type: Actions.COLORS});
-  }, []);
+    if (!loading) {
+      dispatch({type: Actions.COLORS});
+    }
+  }, [loading]);
 
   return (
     <View
@@ -34,7 +37,7 @@ export const ColorSection = ({noTextMode}) => {
   );
 };
 
-const ColorItem = ({item, index,}) => {
+const ColorItem = ({item, index}) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
   const [headerTextState, setHeaderTextState] = useState(null);
