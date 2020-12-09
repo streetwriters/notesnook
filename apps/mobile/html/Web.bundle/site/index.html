@@ -549,6 +549,20 @@
     attachEditorListeners();
     fixDropdownMenuLocations();
     setTheme();
+    function loaded() {
+            let msg = JSON.stringify({
+                data: true,
+                type: 'status',
+            });
+            window.ReactNativeWebView.postMessage(msg);
+        }
+        if (editor) {
+            loaded();
+        } else {
+            setTimeout(() => {
+                loaded();
+            }, 500)
+        }
   }
 
 </script>

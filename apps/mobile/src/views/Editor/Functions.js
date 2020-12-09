@@ -186,7 +186,9 @@ export async function loadNote(item) {
     clearTimer();
     await setNote(item);
     sendNoteEditedEvent(item.id);
-    await loadNoteInEditor();
+    if (webviewInit) {
+      await loadNoteInEditor();
+    }
     currentEditingTimer = setTimeout(() => {
       updateEvent({type: Actions.CURRENT_EDITING_NOTE, id: item.id});
     }, 500);
@@ -238,6 +240,10 @@ export const _onMessage = async (evt) => {
       });
 
       break;
+    case 'status':
+        webviewInit = true;
+        loadNoteInEditor();
+        break;  
     default:
       break;
   }
@@ -399,8 +405,7 @@ export async function onWebViewLoad(premium, colors, event) {
   post('blur');
   setColors(colors);
   await loadEditorState();
-  await loadNoteInEditor();
-  webviewInit = true;
+  //await loadNoteInEditor();
 }
 async function loadEditorState() {
   if (sideMenuRef.current !== null) {
@@ -438,6 +443,7 @@ async function loadEditorState() {
 export let isFromIntent = false;
 
 const loadNoteInEditor = async () => {
+  if (!webviewInit) return;
   saveCounter = 0;
   if (intent) {
     await sleep(1500);
