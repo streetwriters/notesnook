@@ -2,10 +2,11 @@ import React, {createRef} from 'react';
 import {Platform, ScrollView, View} from 'react-native';
 import * as RNIap from 'react-native-iap';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import RNFetchBlob from 'rn-fetch-blob';
 import {DDS} from '../../services/DeviceDetection';
 import {eSendEvent, ToastEvent} from '../../services/EventManager';
 import {dHeight, dWidth, itemSkus} from '../../utils';
-import { hexToRGBA } from '../../utils/ColorUtils';
+import {hexToRGBA} from '../../utils/ColorUtils';
 import {db} from '../../utils/DB';
 import {eOpenLoginDialog, eOpenPendingDialog} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
@@ -26,8 +27,6 @@ class PremiumDialog extends React.Component {
     this.routeIndex = 0;
     this.count = 0;
     this.actionSheetRef = createRef();
-    this.subsriptionSuccessListerner;
-    this.subsriptionErrorListener;
     this.prevScroll = 0;
   }
 
@@ -47,41 +46,19 @@ class PremiumDialog extends React.Component {
   }
 
   async getSkus() {
-        try {
-          await  RNIap.initConnection();
-          let u = await db.user.get();
-          let prod = await RNIap.getSubscriptions(itemSkus);
-          this.setState({
-            user: u && u.Id ? u : null,
-            product: prod[0],
-          });
-          this.subsriptionSuccessListerner = RNIap.purchaseUpdatedListener(
-            this.onSuccessfulSubscription,
-          );
-          this.subsriptionErrorListener = RNIap.purchaseErrorListener(
-            this.onSubscriptionError,
-          );
-        } catch (e) {
-          console.log(e, 'SKU ERROR');
-        }
-    
-  }
-
-  onSuccessfulSubscription = (subscription) => {
-    const receipt = subscription.transactionReceipt;
-
-    if (receipt) {
-      this.close();
-      setTimeout(() => {
-        eSendEvent(eOpenPendingDialog);
-      }, 500);
+    try {
+      await RNIap.initConnection();
+      let u = await db.user.get();
+      let prod = await RNIap.getSubscriptions(itemSkus);
+      this.setState({
+        user: u,
+        product: prod[0],
+      });
+   
+    } catch (e) {
+      console.log(e, 'SKU ERROR');
     }
-  };
-
-  onSubscriptionError = (error) => {
-    console.log(error.message, 'Error');
-    //ToastEvent.show(error.message);
-  };
+  }
 
   render() {
     const {colors} = this.props;
@@ -123,6 +100,7 @@ class PremiumDialog extends React.Component {
           this.setState({
             visible: false,
           });
+
         }}
         gestureEnabled={true}
         ref={this.actionSheetRef}
@@ -157,7 +135,7 @@ class PremiumDialog extends React.Component {
             }
             style={{
               width: '100%',
-              maxHeight:DDS.isLargeTablet() ? dHeight * 0.35 : dHeight * 0.5,
+              maxHeight: DDS.isLargeTablet() ? dHeight * 0.35 : dHeight * 0.5,
             }}>
             {[
               {
@@ -250,10 +228,11 @@ class PremiumDialog extends React.Component {
                 size={SIZE.sm}
                 style={{
                   fontWeight: '400',
+                  lineHeight: 16,
                 }}>
                 {this.state.user
                   ? 'Cancel anytime in Subscriptions on Google Play'
-                  : 'Start your 14 Day Trial for Free (no credit card needed)'}
+                  : 'Start your 14 Day Trial Today (no credit card required.)'}
               </Paragraph>
             </Heading>
             <Paragraph
@@ -267,8 +246,9 @@ class PremiumDialog extends React.Component {
                 /mo
               </Paragraph>
             </Paragraph>
+            <Seperator half />
             <Button
-              onPress={() => {
+              onPress={async () => {
                 if (!this.state.user) {
                   this.close();
                   setTimeout(() => {
@@ -280,6 +260,7 @@ class PremiumDialog extends React.Component {
                     .catch((e) => {
                       console.log(e);
                     });
+                  this.close();
                 }
               }}
               title={
