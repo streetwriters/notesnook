@@ -3,12 +3,12 @@ import RNFetchBlob from 'rn-fetch-blob';
 import storage from '../utils/storage';
 import {db} from '../utils/DB';
 import {ToastEvent} from './EventManager';
+import SettingsService from './SettingsService';
 
 const MS_DAY = 86400000;
 const MS_WEEK = MS_DAY * 7;
 
 async function run() {
-
   console.log('exporting backup data');
   if (Platform.OS === 'android') {
     let granted = await storage.requestPermission();
@@ -21,7 +21,10 @@ async function run() {
   let error;
   try {
     console.log('exporting backup data');
-    backup = await db.backup.export('mobile',false);
+    backup = await db.backup.export(
+      'mobile',
+      SettingsService.get().encryptedBackups,
+    );
     console.log('backup data gotten');
   } catch (e) {
     console.log('error', e);
