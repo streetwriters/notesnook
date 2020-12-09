@@ -27,7 +27,6 @@ export default class Topic {
       topic.notes.push(noteId);
 
       let array = note.notebooks || [];
-      array = array.slice();
       const notebookIndex = array.findIndex((nb) => nb.id === this._notebookId);
       if (notebookIndex === -1) {
         let notebook = {};
@@ -58,7 +57,7 @@ export default class Topic {
       let index = topic.notes.indexOf(noteId);
       topic.notes.splice(index, 1);
 
-      let array = note.notebooks.slice();
+      let array = note.notebooks;
       const notebookIndex = array.findIndex((nb) => nb.id === this._notebookId);
       if (notebookIndex === -1) return;
 
