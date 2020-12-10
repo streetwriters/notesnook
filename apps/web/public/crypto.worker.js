@@ -1,6 +1,7 @@
 /* eslint-disable */
 
 var context;
+const enc = new TextEncoder();
 if (!self.document) {
   self.addEventListener("message", onMessage);
 }
@@ -107,8 +108,9 @@ const encrypt = (passwordOrKey, data) => {
   const nonce = sodium.randombytes_buf(
     sodium.crypto_aead_xchacha20poly1305_ietf_NPUBBYTES
   );
+  const dataArray = enc.encode(data);
   const cipher = sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(
-    data,
+    dataArray,
     undefined,
     undefined,
     nonce,
@@ -122,7 +124,7 @@ const encrypt = (passwordOrKey, data) => {
     cipher,
     iv,
     salt,
-    length: data.length,
+    length: dataArray.length,
   };
 };
 
