@@ -13,8 +13,9 @@ function RecoveryKeyDialog(props) {
   const [copyText, setCopyText] = useState("Copy to clipboard");
   useEffect(() => {
     (async () => {
-      const { username, key, salt } = await db.user.get();
-      setKey(key + "@" + salt);
+      const { username } = await db.user.get();
+      const { key, salt } = await db.user.key();
+      setKey(`${key}\0${salt}`);
       setUsername(username);
     })();
   }, []);
