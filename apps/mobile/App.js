@@ -1,29 +1,33 @@
 import * as NetInfo from '@react-native-community/netinfo';
-import {CHECK_IDS, EV} from 'notes-core/common';
-import React, {useEffect, useState} from 'react';
+import { CHECK_IDS, EV } from 'notes-core/common';
+import React, { useEffect, useState } from 'react';
 import {
   Appearance,
   AppState,
   Linking,
   NativeModules,
   Platform,
-  StatusBar,
+  StatusBar
 } from 'react-native';
-import {enabled} from 'react-native-privacy-snapshot';
-import {SafeAreaProvider} from 'react-native-safe-area-context';
-import {useTracked} from './src/provider';
-import {Actions} from './src/provider/Actions';
 import * as RNIap from 'react-native-iap';
+import { enabled } from 'react-native-privacy-snapshot';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import SplashScreen from 'react-native-splash-screen';
+import { useTracked } from './src/provider';
+import { Actions } from './src/provider/Actions';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-  ToastEvent,
+  ToastEvent
 } from './src/services/EventManager';
-import {setLoginMessage} from './src/services/Message';
-import {editing} from './src/utils';
-import {ACCENT, COLOR_SCHEME} from './src/utils/Colors';
-import {db} from './src/utils/DB';
+import IntentService from './src/services/IntentService';
+import { setLoginMessage } from './src/services/Message';
+import Navigation from './src/services/Navigation';
+import PremiumService from './src/services/PremiumService';
+import { editing } from './src/utils';
+import { COLOR_SCHEME } from './src/utils/Colors';
+import { db } from './src/utils/DB';
 import {
   eClosePremiumDialog,
   eDispatchAction,
@@ -31,16 +35,12 @@ import {
   eOpenPendingDialog,
   eOpenPremiumDialog,
   eShowGetPremium,
-  eStartSyncer,
+  eStartSyncer
 } from './src/utils/Events';
-import {MMKV} from './src/utils/mmkv';
-import {sleep} from './src/utils/TimeUtils';
-import {getNote} from './src/views/Editor/Functions';
-import IntentService from './src/services/IntentService';
-import {tabBarRef} from './src/utils/Refs';
-import Navigation from './src/services/Navigation';
-import SplashScreen from 'react-native-splash-screen';
-import PremiumService from './src/services/PremiumService';
+import { MMKV } from './src/utils/mmkv';
+import { tabBarRef } from './src/utils/Refs';
+import { sleep } from './src/utils/TimeUtils';
+import { getNote } from './src/views/Editor/Functions';
 const {ReceiveSharingIntent} = NativeModules;
 
 let AppRootView = require('./initializer.root').RootView;
