@@ -1,3 +1,4 @@
+import { EV } from "../common";
 import id from "../utils/id";
 
 class Settings {
