@@ -8,7 +8,7 @@ import { useStore as useUserStore } from "./stores/user-store";
 import { useStore as useNotesStore } from "./stores/note-store";
 import Animated from "./components/animated";
 import NavigationMenu from "./components/navigationmenu";
-import { useRoutes } from "hookrouter";
+import { useRoutes } from "raviger";
 import routes from "./navigation/routes";
 import Editor from "./components/editor";
 import useMobile from "./utils/use-mobile";

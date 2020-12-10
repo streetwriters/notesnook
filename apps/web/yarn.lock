@@ -6263,11 +6263,6 @@ homedir-polyfill@^1.0.0:
   dependencies:
     parse-passwd "^1.0.0"
 
-hookrouter@^1.2.3:
-  version "1.2.3"
-  resolved "https://registry.yarnpkg.com/hookrouter/-/hookrouter-1.2.3.tgz#a65599a1be376b51734caf7c4f7f8aba59bb2c77"
-  integrity sha512-n0mqEBGgXIxYRNMHlwCzoyTOk0OB5Es3jwUyA3+2l5nte/52n0CMMj1bmoCabC8K43YTUEr0zzexTBfo//tq2Q==
-
 hoopy@^0.1.4:
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/hoopy/-/hoopy-0.1.4.tgz#609207d661100033a9a9402ad3dea677381c1b1d"
@@ -10691,6 +10686,11 @@ range-parser@^1.2.1, range-parser@~1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/range-parser/-/range-parser-1.2.1.tgz#3cf37023d199e1c24d1a55b84800c2f3e6468031"
   integrity sha512-Hrgsx+orqoygnmhFbKaHE6c296J+HTAQXoxEF6gNupROmmGJRoyzfG3ccAveqCBrwr/2yxQ5BVd/GTl5agOwSg==
+
+raviger@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/raviger/-/raviger-2.0.0.tgz#f7a2db58dc86b89ba191806f64c86ac6154d3641"
+  integrity sha512-LdjNxTs8wtGFrK0tuyX+shkMa0VEk7L1qyjmquoMmRXEEgJXgWpZ5MoiPIsuGs5eQZOrAh22Y5h1+pzoLRgLUg==
 
 raw-body@2.4.0:
   version "2.4.0"

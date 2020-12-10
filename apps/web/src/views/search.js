@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import ListContainer from "../components/list-container";
 import SearchPlaceholder from "../components/placeholders/search-placeholder";
-import { useQueryParams } from "hookrouter";
+import { useQueryParams } from "raviger";
 import { db, notesFromContext } from "../common";
 import SearchBox from "../components/search";
 import ProgressBar from "../components/progress-bar";
@@ -34,8 +34,7 @@ function Search() {
     totalItems: 0,
   });
   const [results, setResults] = useState([]);
-  const [params] = useQueryParams();
-  const { type } = params;
+  const [{ type }] = useQueryParams();
   const context = useNoteStore((store) => store.context);
 
   return (

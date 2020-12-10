@@ -1,25 +1,16 @@
 import React from "react";
-import Animated from "../animated";
 import { Box, Flex, Text } from "rebass";
 import * as Icon from "../icons";
 import { useStore } from "../../stores/app-store";
 import { useStore as useSelectionStore } from "../../stores/selection-store";
 import { CREATE_BUTTON_MAP, SELECTION_OPTIONS_MAP } from "../../common";
 import useMobile from "../../utils/use-mobile";
-import { navigate } from "hookrouter";
+import { navigate } from "raviger";
 
 function RouteContainer(props) {
   const { type, route, canGoBack, title, subtitle, onlyBackButton } = props;
   return (
-    <Animated.Flex
-      sx={{ overflow: "hidden" }}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.3, ease: "easeIn" }}
-      exit={{ opacity: 0 }}
-      flexDirection="column"
-      flex="1 1 auto"
-    >
+    <>
       <Header
         type={type}
         canGoBack={canGoBack}
@@ -28,7 +19,7 @@ function RouteContainer(props) {
         onlyBackButton={onlyBackButton}
       />
       {route}
-    </Animated.Flex>
+    </>
   );
 }
 

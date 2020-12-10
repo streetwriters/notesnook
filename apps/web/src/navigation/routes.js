@@ -9,11 +9,49 @@ import Notes from "../views/notes.js";
 import Search from "../views/search";
 import Settings from "../views/settings";
 import Tags from "../views/tags";
+import Topics from "../views/topics";
+import { navigate } from "raviger";
 import Trash from "../views/trash";
 
 const routes = {
   "/": () => <RouteContainer type="notes" title="Notes" route={<Home />} />,
-  "/notebooks*": () => <Notebooks />,
+  "/notebooks": () => (
+    <RouteContainer type="notebooks" title="Notebooks" route={<Notebooks />} />
+  ),
+  "/notebooks/:notebook": ({ notebook }) => {
+    const nbItem = db.notebooks.notebook(notebook);
+    if (!nbItem) return;
+    return (
+      <RouteContainer
+        type="topics"
+        title={nbItem.title}
+        canGoBack
+        route={<Topics notebookId={notebook} />}
+      />
+    );
+  },
+  "/notebooks/:notebook/:topic": ({ notebook, topic }) => {
+    const nb = db.notebooks.notebook(notebook);
+    const topicItem = nb.topics.topic(topic)._topic;
+    if (!topicItem) return navigate(`/notebooks/${nb.id}`);
+
+    return (
+      <RouteContainer
+        type="notes"
+        title={nb.title}
+        canGoBack
+        subtitle={topicItem.title}
+        route={
+          <Notes
+            context={{
+              type: "topic",
+              value: { id: notebook, topic: topic },
+            }}
+          />
+        }
+      />
+    );
+  },
   "/favorites": () => (
     <RouteContainer
       title="Favorites"
@@ -29,7 +67,22 @@ const routes = {
   "/trash": () => (
     <RouteContainer type="trash" title="Trash" route={<Trash />} />
   ),
-  "/tags*": () => <Tags />,
+  "/tags": () => <RouteContainer title="Tags" route={<Tags />} />,
+  "/tags/:tag": ({ tag }) => {
+    const tagItem = db.tags.tag(tag);
+    if (!tagItem) return navigate("/");
+    const { title } = tagItem;
+    return (
+      <RouteContainer
+        type="notes"
+        canGoBack
+        title={`#${title}`}
+        route={
+          <Notes type="notes" context={{ type: "tag", value: tagItem.id }} />
+        }
+      />
+    );
+  },
   "/colors/:color": ({ color }) => (
     <RouteContainer
       type="notes"

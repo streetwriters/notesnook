@@ -7,11 +7,11 @@ import { useStore as useUserStore } from "../../stores/user-store";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 import Animated from "../animated";
 import NavigationItem from "./navigation-item";
-import { navigate } from "hookrouter";
+import { navigate } from "raviger";
 import { toTitleCase } from "../../utils/string";
 import { COLORS } from "../../common";
 import { showLogInDialog } from "../dialogs/logindialog";
-import { usePath } from "hookrouter";
+import { usePath } from "raviger";
 import useMobile from "../../utils/use-mobile";
 import useTablet from "../../utils/use-tablet";
 
