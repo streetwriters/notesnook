@@ -25,7 +25,7 @@ export default class User {
         "users",
         undefined,
         true,
-        true
+        "GET"
       );
     } catch (e) {
       if (e.message.includes("not authorized")) await this.logout();
@@ -112,6 +112,20 @@ export default class User {
     await this._postLogin(password, true, response);
   }
 
+  async delete() {
+    let response = await authRequest.call(
+      this,
+      "users",
+      undefined,
+      true,
+      "DELETE"
+    );
+    if (response.success) {
+      this.logout();
+      return true;
+    }
+  }
+
   async _postLogin(password, remember, response) {
     await this._context.deriveCryptoKey(`_uk_@${response.payload.username}`, {
       password,
@@ -136,7 +150,7 @@ function userFromResponse(response) {
   return user;
 }
 
-async function authRequest(endpoint, data, auth = false, get = false) {
+async function authRequest(endpoint, data, auth = false, method = "POST") {
   var headers = {};
   if (auth) {
     const token = await this.token();
@@ -146,9 +160,9 @@ async function authRequest(endpoint, data, auth = false, get = false) {
   }
 
   let response = await fetch(`${Constants.HOST}/${endpoint}`, {
-    method: get ? "GET" : "POST",
+    method,
     headers: { ...Constants.HEADERS, ...headers },
-    body: get ? undefined : JSON.stringify(data),
+    body: data ? JSON.stringify(data) : undefined,
   });
 
   if (response.ok) {

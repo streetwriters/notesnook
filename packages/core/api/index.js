@@ -119,6 +119,10 @@ class Database {
           });
           EV.publish("user:upgraded", data);
           break;
+        case "logout":
+          if (data.reason === "accountDeleted") EV.publish("user:deleted");
+          await this.user.logout();
+          break;
         case "sync":
           await this.syncer.eventMerge(data);
           EV.publish("db:refresh");
