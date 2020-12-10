@@ -28,12 +28,18 @@ function LoginDialog(props) {
         if (!credential.password) {
           setUsername(credential.id);
         } else {
-          await login({
-            password: credential.password,
-            username: credential.id,
-            remember: true,
-          });
-          onClose();
+          try {
+            await login({
+              password: credential.password,
+              username: credential.id,
+              remember: true,
+            });
+            onClose();
+          } catch (e) {
+            setUsername(credential.id);
+            setCredential();
+            setError(e.message);
+          }
         }
       }
     })();
