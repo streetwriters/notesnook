@@ -92,7 +92,7 @@ class Merger {
     await this._mergeArray(
       settings,
       () => this._db.settings.raw,
-      this._db.settings.merge
+      (item) => this._db.settings.merge(item)
     );
 
     await this._mergeArray(
