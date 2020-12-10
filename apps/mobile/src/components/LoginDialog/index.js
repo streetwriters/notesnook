@@ -15,6 +15,7 @@ import {
   eUnSubscribeEvent,
   ToastEvent,
 } from '../../services/EventManager';
+import {clearMessage} from '../../services/Message';
 import {
   validateEmail,
   validatePass,
@@ -112,7 +113,7 @@ const LoginDialog = () => {
     setStatus('Logging in');
 
     try {
-      await db.user.login(username.toLowerCase(), password);
+      await db.user.login(username.toLowerCase(), password, true);
     } catch (e) {
       ToastEvent.show(e.message, 'error', 'local');
       setLoggingIn(false);
@@ -128,9 +129,11 @@ const LoginDialog = () => {
       eSendEvent(eStartSyncer);
       dispatch({type: Actions.ALL});
       eSendEvent(refreshNotesPage);
+      clearMessage(dispatch);
       close();
       ToastEvent.show(`Logged in as ${username}`, 'success', 'local');
     } catch (e) {
+      console.warn(e);
       ToastEvent.show(e.message, 'error', 'local');
     } finally {
       setLoggingIn(false);
@@ -192,6 +195,7 @@ const LoginDialog = () => {
       setStatus('Setting up crenditials');
       dispatch({type: Actions.USER, user: user});
       eSendEvent(eStartSyncer);
+      clearMessage(dispatch);
       close();
       await sleep(500);
       eSendEvent(eOpenRecoveryKeyDialog, true);

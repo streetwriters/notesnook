@@ -14,3 +14,14 @@ export function setLoginMessage(dispatch) {
 		icon:'account-outline'
 	}});
 }
+
+export function clearMessage(dispatch) {
+	dispatch({type:Actions.MESSAGE_BOARD_STATE,state:{
+		visible:false,
+		message:'',
+		actionText:"",
+		onPress: null,
+		data:{},
+		icon:'account-outline'
+	}});
+}

@@ -1,33 +1,34 @@
 import * as NetInfo from '@react-native-community/netinfo';
-import { CHECK_IDS, EV } from 'notes-core/common';
-import React, { useEffect, useState } from 'react';
+import {CHECK_IDS, EV} from 'notes-core/common';
+import React, {useEffect, useState} from 'react';
 import {
   Appearance,
   AppState,
   Linking,
   NativeModules,
   Platform,
-  StatusBar
+  StatusBar,
 } from 'react-native';
 import * as RNIap from 'react-native-iap';
-import { enabled } from 'react-native-privacy-snapshot';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import {enabled} from 'react-native-privacy-snapshot';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
 import SplashScreen from 'react-native-splash-screen';
-import { useTracked } from './src/provider';
-import { Actions } from './src/provider/Actions';
+import {useTracked} from './src/provider';
+import {Actions} from './src/provider/Actions';
+import { DDS } from './src/services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-  ToastEvent
+  ToastEvent,
 } from './src/services/EventManager';
 import IntentService from './src/services/IntentService';
-import { setLoginMessage } from './src/services/Message';
+import {clearMessage, setLoginMessage} from './src/services/Message';
 import Navigation from './src/services/Navigation';
 import PremiumService from './src/services/PremiumService';
-import { editing } from './src/utils';
-import { COLOR_SCHEME } from './src/utils/Colors';
-import { db } from './src/utils/DB';
+import {editing} from './src/utils';
+import {COLOR_SCHEME} from './src/utils/Colors';
+import {db} from './src/utils/DB';
 import {
   eClosePremiumDialog,
   eDispatchAction,
@@ -35,12 +36,12 @@ import {
   eOpenPendingDialog,
   eOpenPremiumDialog,
   eShowGetPremium,
-  eStartSyncer
+  eStartSyncer,
 } from './src/utils/Events';
-import { MMKV } from './src/utils/mmkv';
-import { tabBarRef } from './src/utils/Refs';
-import { sleep } from './src/utils/TimeUtils';
-import { getNote } from './src/views/Editor/Functions';
+import {MMKV} from './src/utils/mmkv';
+import {tabBarRef} from './src/utils/Refs';
+import {sleep} from './src/utils/TimeUtils';
+import {getNote} from './src/views/Editor/Functions';
 const {ReceiveSharingIntent} = NativeModules;
 
 let AppRootView = require('./initializer.root').RootView;
@@ -298,6 +299,7 @@ const App = () => {
     sleep(500).then(() => (appInit = true));
     db.notes.init().then(() => {
       dispatch({type: Actions.NOTES});
+      console.log(db.notes.all);
       dispatch({type: Actions.LOADING, loading: false});
       SettingsService.setAppLoaded();
     });
@@ -318,6 +320,7 @@ const App = () => {
         await db.sync();
         dispatch({type: Actions.ALL});
         await startSyncer();
+        clearMessage(dispatch);
       } else {
         setLoginMessage(dispatch);
       }
@@ -330,6 +333,14 @@ const App = () => {
   useEffect(() => {
     SettingsService = require('./src/services/SettingsService').default;
     SettingsService.init();
+    dispatch({
+      type: Actions.DEVICE_MODE,
+      state: DDS.isLargeTablet()
+        ? 'tablet'
+        : DDS.isSmallTab
+        ? 'smallTablet'
+        : 'mobile',
+    });
     db.init().finally(runAfterInit);
   }, []);
 
@@ -384,32 +395,32 @@ const App = () => {
     }, 500);
   };
 
-const onSubscriptionError = (error) => {
-  console.log(error.message, 'Error');
-  //ToastEvent.show(error.message);
-};
+  const onSubscriptionError = (error) => {
+    console.log(error.message, 'Error');
+    //ToastEvent.show(error.message);
+  };
 
-const processReceipt = (receipt) => {
-  if (receipt) {
-    if (Platform.OS === 'ios') {
-      fetch('http://192.168.10.5:8100/webhooks/assn', {
-        method: 'POST',
-        body: JSON.stringify({
-          receipt_data: subscription.transactionReceipt,
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-        .then((r) => {
-          console.log(r.status, 'STATUS');
+  const processReceipt = (receipt) => {
+    if (receipt) {
+      if (Platform.OS === 'ios') {
+        fetch('http://192.168.10.5:8100/webhooks/assn', {
+          method: 'POST',
+          body: JSON.stringify({
+            receipt_data: subscription.transactionReceipt,
+          }),
+          headers: {
+            'Content-Type': 'application/json',
+          },
         })
-        .catch((e) => {
-          console.log(e, 'ERROR');
-        });
+          .then((r) => {
+            console.log(r.status, 'STATUS');
+          })
+          .catch((e) => {
+            console.log(e, 'ERROR');
+          });
+      }
     }
-  }
-}
+  };
 
   return (
     <SafeAreaProvider>

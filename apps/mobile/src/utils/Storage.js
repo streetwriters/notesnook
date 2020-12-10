@@ -56,8 +56,12 @@ function encrypt(password, data) {
   return Sodium.encrypt(password, data).then((result) => result);
 }
 
+
 function decrypt(password, data) {
-  return Sodium.decrypt(password, data).then((result) => result);
+  return Sodium.decrypt(password,data).then((result) => {
+    console.log(result);
+    return result;
+  });
 }
 
 let CRYPT_CONFIG = Platform.select({
@@ -84,7 +88,7 @@ async function deriveCryptoKey(name, data) {
       credentials.key,
       CRYPT_CONFIG,
     );
-
+    console.log(credentials.key)
     return credentials.key;
   } catch (e) {
     console.log(e);

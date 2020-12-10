@@ -90,7 +90,7 @@ export default class NoteItem extends React.Component {
             width: '92%',
             paddingRight: 5,
           }}>
-          {item.notebooks && item.notebooks.length > 0 && (
+          {item.notebooks && item.notebooks.length === 0 && (
             <View
               style={{
                 flexDirection: 'row',

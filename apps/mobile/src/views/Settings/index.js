@@ -32,6 +32,7 @@ import {
   openVault,
   ToastEvent,
 } from '../../services/EventManager';
+import { setLoginMessage } from '../../services/Message';
 import Navigation from '../../services/Navigation';
 import PremiumService from '../../services/PremiumService';
 import SettingsService from '../../services/SettingsService';
@@ -283,6 +284,7 @@ const SettingsUserSection = () => {
                 dispatch({type: Actions.USER, user: null});
                 dispatch({type: Actions.CLEAR_ALL});
                 dispatch({type: Actions.SYNCING, syncing: false});
+                setLoginMessage(dispatch)
               }}
             />
           </DialogContainer>

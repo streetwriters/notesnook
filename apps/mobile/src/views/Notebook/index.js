@@ -25,6 +25,7 @@ export const Notebook = ({route, navigation}) => {
 
   useEffect(() => {
     onLoad();
+
   }, [route.params]);
 
   useEffect(() => {
