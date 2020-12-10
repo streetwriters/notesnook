@@ -11,7 +11,8 @@ import {eScrollEvent} from '../../utils/Events';
 
 export const Tags = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
-  const {tags} = state;
+  state.tags.indexOf();
+  const tags = state.tags;
   let pageIsLoaded = false;
 
   const onFocus = useCallback(() => {

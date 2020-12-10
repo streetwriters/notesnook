@@ -128,9 +128,7 @@ const App = () => {
 
   const syncChanges = async () => {
     console.log('dispatching sync changes')
-    dispatch({type: Actions.LOADING,loading:true});
     dispatch({type: Actions.ALL});
-    dispatch({type: Actions.LOADING,loading:false});
   };
   const startSyncer = async () => {
     try {

@@ -1,24 +1,23 @@
-import React, {useEffect} from 'react';
-import {FlatList, ScrollView, View} from 'react-native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {notesnook} from '../../../e2e/test.ids';
-import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
-import {DDS} from '../../services/DeviceDetection';
+import React from 'react';
+import { FlatList, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { notesnook } from '../../../e2e/test.ids';
+import { useTracked } from '../../provider';
+import { Actions } from '../../provider/Actions';
 import {
   ACCENT,
   COLOR_SCHEME,
   COLOR_SCHEME_DARK,
   COLOR_SCHEME_LIGHT,
-  setColorScheme,
+  setColorScheme
 } from '../../utils/Colors';
-import {MenuItemsList} from '../../utils/index';
-import {MMKV} from '../../utils/mmkv';
+import { MenuItemsList } from '../../utils/index';
+import { MMKV } from '../../utils/mmkv';
 import Seperator from '../Seperator';
-import {ColorSection} from './ColorSection';
-import {MenuListItem} from './MenuListItem';
-import {TagsSection} from './TagsSection';
-import {UserSection} from './UserSection';
+import { ColorSection } from './ColorSection';
+import { MenuListItem } from './MenuListItem';
+import { TagsSection } from './TagsSection';
+import { UserSection } from './UserSection';
 
 export const Menu = React.memo(
   () => {

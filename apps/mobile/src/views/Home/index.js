@@ -13,13 +13,15 @@ import {tabBarRef} from '../../utils/Refs';
 
 export const Home = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
-  const {notes, loading} = state;
+  const {loading} = state;
+  state.notes.indexOf();
+  const notes = state.notes
   let pageIsLoaded = false;
 
   const onFocus = useCallback(() => {
     updateSearch();
     eSendEvent(eScrollEvent, {name: 'Notes', type: 'in'});
-    
+
     if (DDS.isLargeTablet()) {
       dispatch({
         type: Actions.CONTAINER_BOTTOM_BUTTON,
@@ -85,7 +87,6 @@ export const Home = ({route, navigation}) => {
 
   return (
     <>
-      
       <SimpleList
         data={notes}
         scrollRef={scrollRef}
@@ -95,7 +96,7 @@ export const Home = ({route, navigation}) => {
         loading={loading}
         sortMenuButton={true}
         headerProps={{
-          heading: "Home",
+          heading: 'Home',
         }}
         placeholderText={`Notes you write appear here`}
         jumpToDialog={true}

@@ -10,7 +10,9 @@ import SearchService from '../../services/SearchService';
 import {eScrollEvent} from '../../utils/Events';
 export const Favorites = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
-  const {favorites} = state;
+  state.favorites.indexOf();
+  const favorites = state.favorites;
+
   let pageIsLoaded = false;
 
   const onFocus = useCallback(() => {
