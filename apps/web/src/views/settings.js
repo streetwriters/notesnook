@@ -7,7 +7,10 @@ import { useStore as useSettingStore } from "../stores/setting-store";
 import AccentItem from "../components/accent-item";
 import accents from "../theme/accents";
 import { showLogInDialog } from "../components/dialogs/logindialog";
-import { showLogoutConfirmation } from "../components/dialogs/confirm";
+import {
+  showAccountDeleteConfirmation,
+  showLogoutConfirmation,
+} from "../components/dialogs/confirm";
 import useSystemTheme from "../utils/use-system-theme";
 import {
   createBackup,
@@ -67,7 +70,6 @@ function Settings(props) {
   );
   const user = useUserStore((store) => store.user);
   const isLoggedIn = useUserStore((store) => store.isLoggedIn);
-  const logout = useUserStore((store) => store.logout);
   const [backupReminderOffset, setBackupReminderOffset] = usePersistentState(
     "backupReminderOffset",
     0
@@ -191,13 +193,28 @@ function Settings(props) {
               variant="list"
               onClick={async () => {
                 if (await showLogoutConfirmation()) {
-                  await logout();
+                  await db.user.logout();
                 }
               }}
             >
               <TextWithTip
                 text="Logout"
                 tip="Log out of your account and clear all data."
+              />
+            </Button>
+            <Button
+              sx={{ borderColor: "error" }}
+              variant="list"
+              onClick={async () => {
+                if (await showAccountDeleteConfirmation(user.username)) {
+                  await db.user.delete();
+                }
+              }}
+            >
+              <TextWithTip
+                color="error"
+                text="Delete account"
+                tip="Permanently delete account and logout from all devices."
               />
             </Button>
           </>
@@ -376,11 +393,11 @@ function Settings(props) {
 
 export default Settings;
 
-function TextWithTip({ text, tip, sx }) {
+function TextWithTip({ text, tip, sx, color }) {
   return (
-    <Text color="text" fontSize="body" sx={sx}>
+    <Text color={color || "text"} fontSize="body" sx={sx}>
       {text}
-      <Text color="fontTertiary" fontSize="subBody">
+      <Text color={color || "fontTertiary"} fontSize="subBody">
         {tip}
       </Text>
     </Text>

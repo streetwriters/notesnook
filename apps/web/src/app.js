@@ -19,6 +19,7 @@ import { EV } from "notes-core/common";
 import useTablet from "./utils/use-tablet";
 import { showBuyDialog } from "./components/dialogs/buy-dialog";
 import Banner from "./components/banner";
+import { showAccountDeletedNotice } from "./components/dialogs/confirm";
 
 function App() {
   const [show, setShow] = useState(true);
@@ -57,6 +58,9 @@ function App() {
         await showBuyDialog();
         return { type, result: false };
       }
+    });
+    EV.subscribe("user:deleted", async () => {
+      await showAccountDeletedNotice();
     });
   }, []);
 

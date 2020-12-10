@@ -33,6 +33,13 @@ class UserStore extends BaseStore {
       });
       EV.subscribe("db:sync", () => this.sync(false));
       EV.subscribe("user:loggedOut", async () => {
+        this.set((state) => {
+          state.user = {};
+          state.isLoggedIn = false;
+        });
+        config.clear();
+        await appStore.refresh();
+
         if (window.PasswordCredential) {
           await navigator.credentials.preventSilentAccess();
           if (navigator.credentials.requireUserMediation)
@@ -94,17 +101,6 @@ class UserStore extends BaseStore {
       .finally(() => {
         this.set((state) => (state.isSyncing = false));
       });
-  };
-
-  logout = () => {
-    return db.user.logout().then(async () => {
-      this.set((state) => {
-        state.user = {};
-        state.isLoggedIn = false;
-      });
-      config.clear();
-      await appStore.refresh();
-    });
   };
 }
 

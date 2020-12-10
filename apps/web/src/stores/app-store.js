@@ -22,6 +22,7 @@ class AppStore extends BaseStore {
   menuPins = [];
 
   refresh = async () => {
+    await resetReminders();
     noteStore.refresh();
     notebookStore.refresh();
     trashStore.refresh();
@@ -29,7 +30,6 @@ class AppStore extends BaseStore {
     editorStore.openLastSession();
     this.refreshColors();
     this.refreshMenuPins();
-    await resetReminders();
   };
 
   refreshColors = () => {
