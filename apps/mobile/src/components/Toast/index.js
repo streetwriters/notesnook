@@ -27,6 +27,9 @@ export const Toast = ({context = 'global'}) => {
 
   const showToastFunc = async (data) => {
     if (data.context !== context) return;
+    if (toastMessages.findIndex((m) => m.message === data.message) >= 0) {
+      return;
+    }
     toastMessages.push(data);
     if (toastMessages?.length > 1) return;
 
@@ -40,15 +43,14 @@ export const Toast = ({context = 'global'}) => {
         color: colors.errorText,
       });
     }
-   
-      toastTranslate.setValue(0);
-      await sleep(50)
-      timing(toastOpacity, {
-        toValue: 1,
-        duration: 150,
-        easing: Easing.ease,
-      }).start();
 
+    toastTranslate.setValue(0);
+    await sleep(50);
+    timing(toastOpacity, {
+      toValue: 1,
+      duration: 150,
+      easing: Easing.ease,
+    }).start();
 
     setTimeout(() => {
       hideToastFunc();
@@ -90,19 +92,16 @@ export const Toast = ({context = 'global'}) => {
         }, 300);
       });
     } else {
-      
       timing(toastOpacity, {
         toValue: 0,
         duration: 150,
         easing: Easing.inOut(Easing.ease),
       }).start(async () => {
         await sleep(100);
-        toastTranslate.setValue(dHeight)
+        toastTranslate.setValue(dHeight);
         toastMessages.shift();
         setData({});
       });
-
-
     }
   };
 
