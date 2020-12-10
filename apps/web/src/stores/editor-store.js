@@ -7,6 +7,7 @@ import BaseStore from ".";
 import { isMobile, isTablet } from "../utils/dimensions";
 import { getHashParam, setHashParam } from "../utils/useHashParam";
 import { qclone } from "qclone";
+import { EV } from "notes-core/common";
 
 const SESSION_STATES = { stale: "stale", new: "new", locked: "locked" };
 const DEFAULT_SESSION = {
@@ -44,6 +45,8 @@ class EditorStore extends BaseStore {
 
       if (note) await this.openSession(note);
     });
+
+    EV.subscribe("user:loggedOut", () => this.clearSession());
   };
 
   openLastSession = () => {

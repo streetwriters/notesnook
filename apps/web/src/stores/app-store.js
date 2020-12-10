@@ -78,19 +78,22 @@ class AppStore extends BaseStore {
 
   pinItemToMenu = async (item) => {
     if (db.settings.isPinned(item.id)) {
+      this.set((state) => {
+        const index = state.menuPins.findIndex((i) => i.id === item.id);
+        if (index >= -1) {
+          state.menuPins.splice(index, 1);
+        }
+      });
       await db.settings.unpin(item.id);
-      await showToast(
-        "success",
-        `${toTitleCase(item.type)} unpinned from menu!`
-      );
+      showToast("success", `${toTitleCase(item.type)} unpinned from menu!`);
     } else {
+      this.set((state) => state.menuPins.push(item));
       await db.settings.pin(item.type, {
         id: item.id,
         notebookId: item.notebookId,
       });
-      await showToast("success", `${toTitleCase(item.type)} pinned to menu!`);
+      showToast("success", `${toTitleCase(item.type)} pinned to menu!`);
     }
-    this.refreshMenuPins();
 
     // refresh the respective list
     switch (item.type) {
