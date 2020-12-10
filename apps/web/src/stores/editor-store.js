@@ -46,7 +46,7 @@ class EditorStore extends BaseStore {
       if (note) await this.openSession(note);
     });
 
-    EV.subscribe("user:loggedOut", () => this.clearSession());
+    EV.subscribe("user:loggedOut", () => this.get().newSession());
   };
 
   openLastSession = () => {
@@ -158,9 +158,10 @@ class EditorStore extends BaseStore {
 
   clearSession = () => {
     appStore.setIsEditorOpen(false);
-    this.set(function (state) {
+    this.set((state) => {
       state.session = {
         ...DEFAULT_SESSION,
+        state: SESSION_STATES.new,
       };
     });
     saveLastOpenedNote();
