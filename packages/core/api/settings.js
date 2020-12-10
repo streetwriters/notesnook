@@ -31,6 +31,15 @@ class Settings {
     var settings = await this._db.context.read("settings");
     if (!settings) await this._db.context.write("settings", this._settings);
     else this._settings = settings;
+    EV.subscribe("user:loggedOut", () => {
+      this._settings = {
+        type: "settings",
+        id: id(),
+        pins: [],
+        dateEdited: 0,
+        dateCreated: Date.now(),
+      };
+    });
   }
 
   async pin(type, data) {
