@@ -95,11 +95,11 @@ export default class User {
     EV.publish("user:tokenRefreshed", user);
   }
 
-  logout() {
+  async logout() {
+    await this._context.clear();
+
     // propogate event
     EV.publish("user:loggedOut");
-
-    return this._context.clear();
   }
 
   async signup(username, email, password) {
@@ -121,7 +121,7 @@ export default class User {
       "DELETE"
     );
     if (response.success) {
-      this.logout();
+      await this.logout();
       return true;
     }
   }
