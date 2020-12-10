@@ -21,11 +21,12 @@ class Settings {
     return this._settings;
   }
 
-  merge(item) {
+  async merge(item) {
     this._settings = {
       ...this._settings,
       ...item,
     };
+    await this._db.context.write("settings", this._settings);
   }
 
   async init() {
