@@ -170,6 +170,7 @@ const AppStack = React.memo(
       updatedDimensions = size;
       if (!size || (size.width === dimensions.width && mode !== null)) {
         dispatch({type: Actions.DEVICE_MODE, state: mode});
+      
         return;
       }
 
