@@ -15,7 +15,7 @@ import {SafeAreaProvider} from 'react-native-safe-area-context';
 import SplashScreen from 'react-native-splash-screen';
 import {useTracked} from './src/provider';
 import {Actions} from './src/provider/Actions';
-import { DDS } from './src/services/DeviceDetection';
+import {DDS} from './src/services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -127,7 +127,10 @@ const App = () => {
     [intent, setIntent] = useState(false);
 
   const syncChanges = async () => {
+    console.log('dispatching sync changes')
+    dispatch({type: Actions.LOADING,loading:true});
     dispatch({type: Actions.ALL});
+    dispatch({type: Actions.LOADING,loading:false});
   };
   const startSyncer = async () => {
     try {
@@ -153,7 +156,6 @@ const App = () => {
           console.log(url);
           _data = await ReceiveSharingIntent.getFileNames(url);
           _data = IntentService.iosSortedData(_data);
-          console.log('DONE', 'DATA GETTING');
         }
         if (_data) {
           IntentService.setIntent(_data);
@@ -224,7 +226,6 @@ const App = () => {
     if (Platform.OS === 'ios') {
       RNIap.getReceiptIOS()
         .then((r) => {
-          console.log(r);
           hasPurchased = true;
           processReceipt(r);
         })
@@ -247,6 +248,16 @@ const App = () => {
     }
   };
 
+  const dbSync = async () => {
+    try {
+      dispatch({type: Actions.SYNCING, syncing: true});
+      await db.sync(false);
+    } catch (e) {
+    } finally {
+      dispatch({type: Actions.SYNCING, syncing: false});
+    }
+  };
+
   useEffect(() => {
     eSubscribeEvent(eStartSyncer, startSyncer);
     eSubscribeEvent(eDispatchAction, (type) => {
@@ -262,9 +273,12 @@ const App = () => {
     if (Platform.OS === 'ios') {
       Linking.addEventListener('url', _handleIntent);
     }
+    EV.subscribe('db:sync', dbSync);
     EV.subscribe('user:checkStatus', handlePremiumAccess);
     return () => {
+
       EV.unsubscribe('db:refresh', syncChanges);
+      EV.unsubscribe('db:sync', dbSync);
       eUnSubscribeEvent(eStartSyncer, startSyncer);
       eUnSubscribeEvent(eDispatchAction, (type) => {
         dispatch(type);
@@ -299,7 +313,6 @@ const App = () => {
     sleep(500).then(() => (appInit = true));
     db.notes.init().then(() => {
       dispatch({type: Actions.NOTES});
-      console.log(db.notes.all);
       dispatch({type: Actions.LOADING, loading: false});
       SettingsService.setAppLoaded();
     });
@@ -349,7 +362,6 @@ const App = () => {
     IntentService.getIntent()
       .then(() => {
         AppRootView = require('./initializer.intent').IntentView;
-        console.log('found intent');
         setInit(false);
         intentInit = true;
         dispatch({type: Actions.ALL});
@@ -360,7 +372,6 @@ const App = () => {
       .catch((e) => console.log)
       .finally(() => {
         if (!isIntent) {
-          console.log('no intent recieved');
           ReceiveSharingIntent.clearFileNames();
           intentInit = true;
           loadMainApp();
@@ -382,10 +393,8 @@ const App = () => {
 
   const onSuccessfulSubscription = (subscription) => {
     if (hasPurchased) {
-      console.log('already processing');
       return;
     }
-    console.log('PROCESSING SUBS', subscription.transactionId);
     const receipt = subscription.transactionReceipt;
     processReceipt(receipt);
 
@@ -401,12 +410,13 @@ const App = () => {
   };
 
   const processReceipt = (receipt) => {
+    return;
     if (receipt) {
       if (Platform.OS === 'ios') {
         fetch('http://192.168.10.5:8100/webhooks/assn', {
           method: 'POST',
           body: JSON.stringify({
-            receipt_data: subscription.transactionReceipt,
+            receipt_data: receipt,
           }),
           headers: {
             'Content-Type': 'application/json',

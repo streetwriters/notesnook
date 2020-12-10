@@ -131,6 +131,7 @@ const SimpleList = ({
       user = await db.user.get();
       dispatch({type: Actions.USER, user: user});
       await db.sync();
+
       ToastEvent.show('Sync Complete', 'success');
     } catch (e) {
       if (!user) {

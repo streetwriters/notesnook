@@ -77,7 +77,6 @@ export const NavigatorStack = React.memo(
     
     React.useEffect(() => {
       sleep(2000).then(() => {
-        console.log(SettingsService.get().homepage);
         let headerState = {
           heading: SettingsService.get().homepage,
           id: SettingsService.get().homepage.toLowerCase() + '_navigation',

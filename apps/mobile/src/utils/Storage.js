@@ -58,10 +58,7 @@ function encrypt(password, data) {
 
 
 function decrypt(password, data) {
-  return Sodium.decrypt(password,data).then((result) => {
-    console.log(result);
-    return result;
-  });
+  return Sodium.decrypt(password,data).then((result) => result);
 }
 
 let CRYPT_CONFIG = Platform.select({

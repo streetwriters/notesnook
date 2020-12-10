@@ -19,7 +19,7 @@ import {
   ToastEvent,
 } from '../../services/EventManager';
 import PremiumService from '../../services/PremiumService';
-import { toTXT } from '../../utils';
+import {toTXT} from '../../utils';
 import {
   ACCENT,
   COLOR_SCHEME,
@@ -212,20 +212,19 @@ export const ActionSheetComponent = ({
       icon: 'content-copy',
       func: async () => {
         if (note.locked) {
-         openVault({
-           copyNote:true,
-           novault:true,
-           locked:true,
-           item:note
-         });
+          openVault({
+            copyNote: true,
+            novault: true,
+            locked: true,
+            item: note,
+          });
         } else {
-        let text = await db.notes.note(note.id).content();
-        text = toTXT(text);
-        text = `${note.title}\n \n ${text}`;
-        Clipboard.setString(text);
-        ToastEvent.show('Note copied to clipboard', 'success', 'local');  
+          let text = await db.notes.note(note.id).content();
+          text = toTXT(text);
+          text = `${note.title}\n \n ${text}`;
+          Clipboard.setString(text);
+          ToastEvent.show('Note copied to clipboard', 'success', 'local');
         }
-
       },
     },
     {
@@ -615,25 +614,32 @@ export const ActionSheetComponent = ({
           )}
 
           {note.type !== 'note' || refreshing ? null : (
-            <Paragraph
-              color={colors.accent}
-              size={SIZE.xs}
+            <TouchableOpacity
+              activeOpacity={0.9}
               testID={notesnook.ids.dialogs.actionsheet.sync}
               onPress={onPressSync}
               style={{
-                textAlignVertical: 'center',
-                marginTop: 5,
-                borderWidth: 1,
-                textAlign: 'center',
                 borderColor: colors.accent,
                 paddingHorizontal: 5,
                 borderRadius: 2,
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginTop: 5,
+                borderWidth: 1,
                 height: 20,
               }}>
-              {user && user.lastSynced > note.dateEdited
-                ? 'Synced'
-                : 'Sync Now'}
-            </Paragraph>
+              <Paragraph
+                color={colors.accent}
+                size={SIZE.xs}
+                style={{
+                  textAlignVertical: 'center',
+                  textAlign: 'center',
+                }}>
+                {user && user.lastSynced > note.dateEdited
+                  ? 'Synced'
+                  : 'Sync Now'}
+              </Paragraph>
+            </TouchableOpacity>
           )}
 
           {refreshing ? (

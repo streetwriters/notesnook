@@ -21,7 +21,6 @@ export const NavigationStack = ({component = NavigatorStack}) => {
   const [initRender, setInitRender] = React.useState(true);
 
   React.useEffect(() => {
-    console.log('rendering drawer');
     sleep(1000).then(() => {
       setInitRender(false);
     });
@@ -68,7 +67,6 @@ export const NavigationStack = ({component = NavigatorStack}) => {
           height: initRender ? 0 : null,
           borderRightWidth: 0,
         }}
-        drawerContentOptions={{}}
         edgeWidth={200}
         drawerType="slide"
         drawerContent={deviceMode !== 'mobile' ? () => <></> : DrawerComponent}

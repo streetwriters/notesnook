@@ -36,7 +36,6 @@ export const NoteItemWrapper = ({item, index, isTrash = false}) => {
       newNote.title === note.title &&
       newNote.headline === note.headline
     ) {
-      console.log('returning from here', newNote.headline, note.headline);
       return;
     }
     setNote(newNote);
