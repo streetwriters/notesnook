@@ -191,8 +191,6 @@ function Settings(props) {
               variant="list"
               onClick={async () => {
                 if (await showLogoutConfirmation()) {
-                  if (window.PasswordCredential)
-                    await navigator.credentials.preventSilentAccess();
                   await logout();
                 }
               }}

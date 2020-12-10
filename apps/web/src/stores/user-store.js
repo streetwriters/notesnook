@@ -32,6 +32,13 @@ class UserStore extends BaseStore {
         });
       });
       EV.subscribe("db:sync", () => this.sync(false));
+      EV.subscribe("user:loggedOut", async () => {
+        if (window.PasswordCredential) {
+          await navigator.credentials.preventSilentAccess();
+          if (navigator.credentials.requireUserMediation)
+            await navigator.credentials.requireUserMediation();
+        }
+      });
       await this.sync();
       return true;
     });
