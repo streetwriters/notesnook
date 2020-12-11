@@ -1,7 +1,6 @@
 import React, { useState, useCallback, useMemo } from "react";
 import { Box, Text } from "rebass";
 import Dialog, { showDialog } from "./dialog";
-import * as Icon from "../icons";
 import Field from "../field";
 
 const requiredValues = ["password", "newPassword", "oldPassword"];
@@ -10,9 +9,10 @@ function PasswordDialog(props) {
   const [error, setError] = useState();
   const [isLoading, setIsLoading] = useState(false);
 
-  const isChangePasswordDialog = useMemo(() => type === "change_password", [
-    type,
-  ]);
+  const isChangePasswordDialog = useMemo(
+    () => type === "change_password" || "change_account_password",
+    [type]
+  );
 
   const submit = useCallback(
     async (data) => {
@@ -25,7 +25,7 @@ function PasswordDialog(props) {
           setError("Wrong password.");
         }
       } catch (e) {
-        setError("Wrong password.");
+        setError(e.message);
       } finally {
         setIsLoading(false);
       }
@@ -38,7 +38,7 @@ function PasswordDialog(props) {
       title={props.title}
       description={props.subtitle}
       icon={props.icon}
-      onClose={props.onCancel}
+      onClose={props.onClose}
       positiveButton={{
         props: {
           form: "passwordForm",
@@ -48,7 +48,7 @@ function PasswordDialog(props) {
         loading: isLoading,
         disabled: isLoading,
       }}
-      negativeButton={{ text: "Cancel", onClick: props.onCancel }}
+      negativeButton={{ text: "Cancel", onClick: props.onClose }}
     >
       <Box
         id="passwordForm"
@@ -106,21 +106,18 @@ function getDialogData(type) {
       return {
         title: "Create Your Vault",
         subtitle: "A vault stores your notes in a password-encrypted storage.",
-        icon: Icon.Vault,
         positiveButtonText: "Create vault",
       };
     case "unlock_vault":
       return {
         title: "Unlock your Vault",
         subtitle: "Your vault will remain unlocked for 30 minutes.",
-        icon: Icon.Unlock,
         positiveButtonText: "Unlock vault",
       };
     case "unlock_note":
       return {
         title: "Unlock Note",
         subtitle: "Unlocking will make this note openly available.",
-        icon: Icon.Unlock,
         positiveButtonText: "Unlock note",
       };
     case "change_password":
@@ -128,7 +125,13 @@ function getDialogData(type) {
         title: "Change Vault Password",
         subtitle:
           "All locked notes will be re-encrypted with the new password.",
-        icon: Icon.Unlock,
+        positiveButtonText: "Change password",
+      };
+    case "change_account_password":
+      return {
+        title: "Change Account Password",
+        subtitle:
+          "All your data will be re-encrypted and synced with the new password.",
         positiveButtonText: "Change password",
       };
     default:
@@ -137,16 +140,15 @@ function getDialogData(type) {
 }
 
 export function showPasswordDialog(type, validate) {
-  const { title, subtitle, icon, positiveButtonText } = getDialogData(type);
+  const { title, subtitle, positiveButtonText } = getDialogData(type);
   return showDialog((perform) => (
     <PasswordDialog
       type={type}
       title={title}
       subtitle={subtitle}
-      icon={icon}
       positiveButtonText={positiveButtonText}
-      onCancel={() => perform(false)}
       validate={validate}
+      onClose={() => perform(false)}
       onDone={() => perform(true)}
     />
   ));

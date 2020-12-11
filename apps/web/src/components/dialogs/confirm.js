@@ -19,7 +19,9 @@ function Confirm(props) {
         onClick: props.onYes,
         disabled: !isButtonEnabled,
       }}
-      negativeButton={{ text: props.noText, onClick: props.onNo }}
+      negativeButton={
+        props.noText && { text: props.noText, onClick: props.onNo }
+      }
     >
       <Box>
         <Text as="span" variant="body">
@@ -144,9 +146,26 @@ export function showAccountDeleteConfirmation(username) {
 
 export function showAccountDeletedNotice() {
   return confirm(Icon.Logout, {
-    title: `Your account was deleted.`,
+    title: `Account deleted`,
     message:
       "You deleted your account from another device. You have been logged out.",
+    yesText: `Okay`,
+  });
+}
+
+export function showPasswordChangedNotice() {
+  return confirm(Icon.Logout, {
+    title: `Account password changed`,
+    message:
+      "Your account password was changed, please login again using the new password.",
+    yesText: `Okay`,
+  });
+}
+
+export function showAccountLoggedOutNotice(reason) {
+  return confirm(Icon.Logout, {
+    title: `You were logged out`,
+    message: reason,
     yesText: `Okay`,
   });
 }

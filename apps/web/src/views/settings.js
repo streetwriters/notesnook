@@ -26,6 +26,7 @@ import Vault from "../common/vault";
 import ScrollContainer from "../components/scroll-container";
 import { showLoadingDialog } from "../components/dialogs/loadingdialog";
 import { showToast } from "../utils/toast";
+import { showPasswordDialog } from "../components/dialogs/passworddialog";
 
 function importBackup() {
   return new Promise((resolve, reject) => {
@@ -188,6 +189,25 @@ function Settings(props) {
                 text="Backup data recovery key"
                 tip="In case you lose your password, you can recover your data using your recovery key."
               />
+            </Button>
+            <Button
+              variant="list"
+              onClick={async () => {
+                const result = await showPasswordDialog(
+                  "change_account_password",
+                  (data) => {
+                    return db.user.changePassword(
+                      data.oldPassword,
+                      data.newPassword
+                    );
+                  }
+                );
+                if (result) {
+                  await showToast("success", "Account password changed!");
+                }
+              }}
+            >
+              <TextWithTip text="Change account password" />
             </Button>
             <Button
               variant="list"
