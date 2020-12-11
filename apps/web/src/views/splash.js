@@ -6,6 +6,7 @@ import { db } from "../common";
 import ProgressBar from "../components/progress-bar";
 import { getRandom } from "../utils/random";
 import { EV } from "notes-core/common";
+import { showToast } from "../utils/toast";
 //import * as Sentry from "@sentry/react";
 
 const loadingLines = [
@@ -24,18 +25,19 @@ function Splash(props) {
       try {
         EV.subscribe("user:loggedOut", (reason) => {
           if (reason) {
-            // TODO find a way to show this properly.
-            alert(reason);
+            showToast("error", reason);
           }
         });
         await db.init();
-        setLoading(false);
       } catch (e) {
         // Sentry.captureException(e, (scope) => {
         //   scope.setExtra("where", "db.init");
         //   return scope;
         // });
         console.error(e);
+        showToast("error", `Error initializing database: ${e.message}`);
+      } finally {
+        setLoading(false);
       }
     })();
   }, []);
