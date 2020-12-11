@@ -65,13 +65,13 @@ export default class Sync {
     return { user, lastSynced, token };
   }
 
-  async start(full) {
+  async start(full, force) {
     let { lastSynced, token } = await this._performChecks();
 
     if (full) var serverResponse = await this._fetch(lastSynced, token);
 
     // we prepare local data before merging so we always have correct data
-    const data = await this._collector.collect(lastSynced);
+    const data = await this._collector.collect(lastSynced, force);
 
     if (full) {
       // merge the server response

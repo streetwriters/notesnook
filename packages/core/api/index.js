@@ -15,6 +15,7 @@ import Constants from "../utils/constants";
 import { EV } from "../common";
 import Settings from "./settings";
 import Migrations from "./migrations";
+import Outbox from "./outbox";
 
 /**
  * @type {EventSource}
@@ -59,6 +60,7 @@ class Database {
     this.backup = new Backup(this);
     this.settings = new Settings(this);
     this.migrations = new Migrations(this);
+    this.outbox = new Outbox(this);
 
     // collections
     /** @type {Notes} */
@@ -76,6 +78,7 @@ class Database {
 
     await this.settings.init();
     await this.user.sync();
+    await this.outbox.init();
 
     await this.migrations.init();
     await this.migrations.migrate();
@@ -87,10 +90,10 @@ class Database {
       this.evtSource.close();
     }
 
-    if (!user) return;
-    if (!user.accessToken) {
+    if (!user || !user.accessToken) {
       user = await this.user.get();
     }
+    if (!user) return;
 
     this.evtSource = new NNEventSource(`${Constants.HOST}/events`, {
       headers: { Authorization: `Bearer ${user.accessToken}` },
@@ -123,6 +126,10 @@ class Database {
           await this.user.logout();
           EV.publish("user:deleted");
           break;
+        case "userPasswordChanged":
+          await this.user.logout();
+          EV.publish("user:passwordChanged");
+          break;
         case "sync":
           await this.syncer.eventMerge(data);
           EV.publish("db:refresh");
@@ -141,8 +148,8 @@ class Database {
     }, 15 * 1000);
   }
 
-  sync(full = true) {
-    return this.syncer.start(full);
+  sync(full = true, force = false) {
+    return this.syncer.start(full, force);
   }
 
   host(host) {

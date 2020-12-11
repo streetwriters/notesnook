@@ -12,11 +12,26 @@ class Collector {
    */
   constructor(db) {
     this._db = db;
+
+    this._map = async (i) => {
+      const item = { ...i };
+      // in case of resolved delta
+      delete item.resolved;
+      // turn the migrated flag off so we don't keep syncing this item repeated
+      delete item.migrated;
+
+      return {
+        id: item.id,
+        v: CURRENT_DATABASE_VERSION,
+        ...(await this._serialize(item)),
+      };
+    };
   }
 
-  async collect(lastSyncedTimestamp) {
+  async collect(lastSyncedTimestamp, force) {
     this._lastSyncedTimestamp = lastSyncedTimestamp;
     this.key = await this._db.user.key();
+    this.force = force;
     return {
       notes: await this._collect(this._db.notes.raw),
       notebooks: await this._collect(this._db.notebooks.raw),
@@ -35,24 +50,15 @@ class Collector {
   }
 
   _collect(array) {
+    if (this.force) {
+      return Promise.all(tfun.map(this._map)(array));
+    }
     return Promise.all(
       tfun
         .filter(
           (item) => item.dateEdited > this._lastSyncedTimestamp || item.migrated
         )
-        .map(async (i) => {
-          const item = { ...i };
-          // in case of resolved delta
-          delete item.resolved;
-          // turn the migrated flag off so we don't keep syncing this item repeated
-          delete item.migrated;
-
-          return {
-            id: item.id,
-            v: CURRENT_DATABASE_VERSION,
-            ...(await this._serialize(item)),
-          };
-        })(array)
+        .map(this._map)(array)
     );
   }
 }

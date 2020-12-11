@@ -28,8 +28,11 @@ export default class User {
         "GET"
       );
     } catch (e) {
-      if (e.message.includes("not authorized")) await this.logout();
-      else throw e;
+      if (e.message.includes("not authorized")) {
+        return await this.logout(
+          "You were logged out. Either your session expired or your account was deleted. Please try logging in again."
+        );
+      } else throw e;
     }
 
     await this.set({
@@ -95,11 +98,11 @@ export default class User {
     EV.publish("user:tokenRefreshed", user);
   }
 
-  async logout() {
+  async logout(reason) {
     await this._context.clear();
 
     // propogate event
-    EV.publish("user:loggedOut");
+    EV.publish("user:loggedOut", reason);
   }
 
   async signup(username, email, password) {
@@ -122,6 +125,28 @@ export default class User {
     );
     if (response.success) {
       await this.logout();
+      return true;
+    }
+  }
+
+  async changePassword(oldPassword, newPassword) {
+    let response = await authRequest.call(
+      this,
+      "users/password",
+      { old_password: oldPassword, new_password: newPassword },
+      true,
+      "PATCH"
+    );
+    if (response.success) {
+      await this._db.outbox.add("changePassword", { newPassword }, async () => {
+        const key = await this.key();
+        const { username } = await this.get();
+        await this._context.deriveCryptoKey(`_uk_@${username}`, {
+          password: newPassword,
+          salt: key.salt,
+        });
+        await this._db.sync(false, true);
+      });
       return true;
     }
   }
@@ -173,9 +198,8 @@ async function authRequest(endpoint, data, auth = false, method = "POST") {
     return result;
   }
 
-  let json = await response.json();
   let error =
-    json.error ||
+    (await response.text()) ||
     `Request failed with status code: ${response.status} ${response.statusText}.`;
   throw new Error(error);
 }
