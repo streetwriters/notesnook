@@ -5,7 +5,8 @@ import Animated from "../components/animated";
 import { db } from "../common";
 import ProgressBar from "../components/progress-bar";
 import { getRandom } from "../utils/random";
-import * as Sentry from "@sentry/react";
+import { EV } from "notes-core/common";
+//import * as Sentry from "@sentry/react";
 
 const loadingLines = [
   "Ejecting bumfuzzled notes",
@@ -21,13 +22,19 @@ function Splash(props) {
   useEffect(() => {
     (async function () {
       try {
+        EV.subscribe("user:loggedOut", (reason) => {
+          if (reason) {
+            // TODO find a way to show this properly.
+            alert(reason);
+          }
+        });
         await db.init();
         setLoading(false);
       } catch (e) {
-        Sentry.captureException(e, (scope) => {
-          scope.setExtra("where", "db.init");
-          return scope;
-        });
+        // Sentry.captureException(e, (scope) => {
+        //   scope.setExtra("where", "db.init");
+        //   return scope;
+        // });
         console.error(e);
       }
     })();
