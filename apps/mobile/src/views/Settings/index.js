@@ -39,7 +39,6 @@ import SettingsService from '../../services/SettingsService';
 import {
   AndroidModule,
   dWidth,
-  getElevation,
   MenuItemsList,
   setSetting,
   SUBSCRIPTION_STATUS_STRINGS,
@@ -64,9 +63,8 @@ import {
   eUpdateSearchState,
 } from '../../utils/Events';
 import {MMKV} from '../../utils/mmkv';
-import {opacity, ph, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
+import {pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
 import Storage from '../../utils/storage';
-import {sleep} from '../../utils/TimeUtils';
 
 const otherItems = [
   {
@@ -217,66 +215,68 @@ const AccoutLogoutSection = () => {
   const {colors, user} = state;
   const [visible, setVisible] = useState(false);
 
-  return user && (
-    <>
-      {visible && (
-        <BaseDialog visible={true}>
-          <DialogContainer>
-            <DialogHeader
-              title="Logout"
-              paragraph="Clear all your data and reset the app."
-            />
-            <DialogButtons
-              positiveTitle="Logout"
-              negativeTitle="Cancel"
-              onPressNegative={() => setVisible(false)}
-              onPressPositive={async () => {
-                await db.user.logout();
-                dispatch({type: Actions.USER, user: null});
-                dispatch({type: Actions.CLEAR_ALL});
-                dispatch({type: Actions.SYNCING, syncing: false});
-                setLoginMessage(dispatch);
-              }}
-            />
-          </DialogContainer>
-        </BaseDialog>
-      )}
-      {[
-        {
-          name: 'Logout',
-          func: async () => {
-            setVisible(true);
+  return (
+    user && (
+      <>
+        {visible && (
+          <BaseDialog visible={true}>
+            <DialogContainer>
+              <DialogHeader
+                title="Logout"
+                paragraph="Clear all your data and reset the app."
+              />
+              <DialogButtons
+                positiveTitle="Logout"
+                negativeTitle="Cancel"
+                onPressNegative={() => setVisible(false)}
+                onPressPositive={async () => {
+                  await db.user.logout();
+                  dispatch({type: Actions.USER, user: null});
+                  dispatch({type: Actions.CLEAR_ALL});
+                  dispatch({type: Actions.SYNCING, syncing: false});
+                  setLoginMessage(dispatch);
+                }}
+              />
+            </DialogContainer>
+          </BaseDialog>
+        )}
+        {[
+          {
+            name: 'Logout',
+            func: async () => {
+              setVisible(true);
+            },
           },
-        },
-        {
-          name: 'Delete My Account',
-        },
-      ].map((item, index) => (
-        <PressableButton
-          onPress={item.func}
-          key={item.name}
-          type="accent"
-          accentColor="light"
-          customStyle={{
-            height: 50,
-            borderTopWidth: index === 0 ? 1 : 0,
-            borderTopColor: colors.nav,
-            width: '100%',
-            alignItems: 'flex-start',
-            paddingHorizontal: 12,
-            marginTop: index === 0 ? 25 : 0,
-            borderRadius: 0,
-          }}>
-          <Heading
-            color={colors.red}
-            style={{
-              fontSize: SIZE.md,
+          {
+            name: 'Delete My Account',
+          },
+        ].map((item, index) => (
+          <PressableButton
+            onPress={item.func}
+            key={item.name}
+            type="accent"
+            accentColor="light"
+            customStyle={{
+              height: 50,
+              borderTopWidth: index === 0 ? 1 : 0,
+              borderTopColor: colors.nav,
+              width: '100%',
+              alignItems: 'flex-start',
+              paddingHorizontal: 12,
+              marginTop: index === 0 ? 25 : 0,
+              borderRadius: 0,
             }}>
-            {item.name}
-          </Heading>
-        </PressableButton>
-      ))}
-    </>
+            <Heading
+              color={colors.red}
+              style={{
+                fontSize: SIZE.md,
+              }}>
+              {item.name}
+            </Heading>
+          </PressableButton>
+        ))}
+      </>
+    )
   );
 };
 
@@ -326,9 +326,8 @@ const CustomButton = ({
 };
 
 const SettingsUserSection = () => {
-  const [state, dispatch] = useTracked();
+  const [state] = useTracked();
   const {colors, user} = state;
-  const [visible, setVisible] = useState(false);
 
   const getTimeLeft = (t2) => {
     let d1 = new Date(Date.now());
