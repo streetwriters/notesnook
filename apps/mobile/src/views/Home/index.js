@@ -8,6 +8,7 @@ import {eSendEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
 import {scrollRef} from '../../utils';
+import { db } from '../../utils/DB';
 import {eOnLoadNote, eScrollEvent} from '../../utils/Events';
 import {tabBarRef} from '../../utils/Refs';
 
@@ -72,7 +73,7 @@ export const Home = ({route, navigation}) => {
   const updateSearch = () => {
     SearchService.update({
       placeholder: 'Search in notes',
-      data: notes,
+      data: db.notes.all,
       type: 'notes',
     });
   };
