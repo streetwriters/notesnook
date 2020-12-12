@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {FlatList, Platform, View} from 'react-native';
+import DocumentPicker from 'react-native-document-picker';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import RNFetchBlob from 'rn-fetch-blob';
 import {useTracked} from '../../provider';
@@ -15,11 +16,12 @@ import {db} from '../../utils/DB';
 import {eCloseRestoreDialog, eOpenRestoreDialog} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
 import storage from '../../utils/storage';
-import {sleep, timeConverter, timeSince} from '../../utils/TimeUtils';
+import {timeConverter} from '../../utils/TimeUtils';
 import {Button} from '../Button';
 import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogHeader from '../Dialog/dialog-header';
+import Seperator from '../Seperator';
 import {Toast} from '../Toast';
 import Paragraph from '../Typography/Paragraph';
 
@@ -39,17 +41,21 @@ const RestoreDialog = () => {
     };
   }, []);
 
-  const open = (data) => {
+  const open = () => {
     setVisible(true);
+  };
+
+  const showIsWorking = () => {
+    ToastEvent.show(
+      'Please wait, we are restoring your data.',
+      'error',
+      'local',
+    );
   };
 
   const close = () => {
     if (restoring) {
-      ToastEvent.show(
-        'Please wait, we are restoring your data.',
-        'error',
-        'local',
-      );
+      showIsWorking();
       return;
     }
 
@@ -57,6 +63,10 @@ const RestoreDialog = () => {
   };
 
   const restore = async (item, index) => {
+    if (restoring) {
+      showIsWorking();
+      return;
+    }
     if (Platform.OS === 'android') {
       let granted = storage.requestPermission();
       if (!granted) {
@@ -79,8 +89,8 @@ const RestoreDialog = () => {
     } catch (e) {
       setRestoring(false);
       ToastEvent.show(e.message, 'error', 'local');
-      console.log(e)
-    } 
+      console.log(e);
+    }
   };
 
   const checkBackups = async () => {
@@ -97,11 +107,16 @@ const RestoreDialog = () => {
     try {
       let path = await storage.checkAndCreateDir('/backups/');
       let files = await RNFetchBlob.fs.lstat(path);
-      setFiles(files);
-    } catch(e) {
-      console.log(e)
-    }
+      files = files.sort(function (a, b) {
+        timeA = a.lastModified;
+        timeB = b.lastModified;
+        return timeB - timeA;
+      });
 
+      setFiles(files);
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   return !visible ? null : (
@@ -112,12 +127,12 @@ const RestoreDialog = () => {
       onRequestClose={close}>
       <View
         style={{
-          ...getElevation(5),
-          paddingTop: insets.top + 10,
+          ...getElevation(DDS.isLargeTablet() ? 5 : 0),
+          paddingTop: Platform.OS === 'ios' ? 10 : insets.top + 10,
           width: DDS.isLargeTablet() ? 500 : '100%',
-          height: DDS.isLargeTablet()  ? 500 : '100%',
-          maxHeight: DDS.isLargeTablet()  ? '90%' : '100%',
-          borderRadius: 5,
+          height: DDS.isLargeTablet() ? 500 : '100%',
+          maxHeight: DDS.isLargeTablet() ? '90%' : '100%',
+          borderRadius: DDS.isLargeTablet() ? 5 : 0,
           backgroundColor: colors.bg,
           padding: 12,
         }}>
@@ -125,7 +140,36 @@ const RestoreDialog = () => {
           title="Your Backups"
           paragraph="All backups stored in 'Phone Storage/Notesnook/backups'"
         />
-
+        <Seperator half />
+        <Button
+          onPress={() => {
+            if (restoring) {
+              showIsWorking();
+              return;
+            }
+            DocumentPicker.pick()
+              .then((r) => {
+                fetch(r.uri).then(async (r) => {
+                  try {
+                    let backup = await r.json();
+                    setRestoring(true);
+                    await db.backup.import(JSON.stringify(backup));
+                    setRestoring(false);
+                    dispatch({type: Actions.ALL});
+                    ToastEvent.show('Restore Complete!', 'success', 'global');
+                    setVisible(false);
+                  } catch (e) {
+                    setRestoring(false);
+                    ToastEvent.show('Invalid backup data', 'error', 'local');
+                  }
+                });
+              })
+              .catch(console.log);
+          }}
+          title="Open File Manager"
+          type="accent"
+          width="100%"
+        />
         <FlatList
           data={files}
           style={{
@@ -155,12 +199,19 @@ const RestoreDialog = () => {
                 borderBottomWidth: 0.5,
                 borderBottomColor: colors.nav,
               }}>
-              <Paragraph size={SIZE.sm} style={{width: '70%'}}>
-                {timeConverter(item?.lastModified * 1)}
-                {'\n'}
-                <Paragraph size={SIZE.xs}>{item.filename}</Paragraph>
-              </Paragraph>
-
+              <View
+                style={{
+                  maxWidth: '75%',
+                }}>
+                <Paragraph
+                  size={SIZE.sm}
+                  style={{width: '100%', maxWidth: '100%'}}>
+                  {timeConverter(item?.lastModified * 1)}
+                </Paragraph>
+                <Paragraph size={SIZE.xs}>
+                  {item.filename.replace('.nnbackup', '')}
+                </Paragraph>
+              </View>
               <Button
                 title="Restore"
                 width={80}
