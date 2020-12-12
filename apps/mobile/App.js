@@ -108,7 +108,7 @@ const onAppStateChanged = async (state) => {
 };
 
 const onNetworkStateChanged = (netInfo) => {
-  let message = 'Internet connection restored';
+ /*  let message = 'Internet connection restored';
   let type = 'success';
   if (!netInfo.isConnected || !netInfo.isInternetReachable) {
     message = 'No internet connection';
@@ -118,7 +118,7 @@ const onNetworkStateChanged = (netInfo) => {
     if (user && intentInit) {
       ToastEvent.show(message, type);
     }
-  });
+  }); */
 };
 
 const App = () => {
