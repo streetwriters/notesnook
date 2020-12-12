@@ -454,37 +454,31 @@ export const ActionSheetComponent = ({
     ) : null;
 
   const onPressSync = async () => {
-    let user = await db.user.get();
-    if (!user) {
-      ToastEvent.show(
-        'You must login to sync',
-        'error',
-        'local',
-        5000,
-        () => {
-          close();
-          setTimeout(() => {
+    setRefreshing(true);
+    try {
+      await db.sync();
+      localRefresh();
+      ToastEvent.show('Sync Complete!', 'success', 'local');
+    } catch (e) {
+      if (e.message === 'You need to login to sync.') {
+        ToastEvent.show(
+          e.message,
+          'error',
+          'local',
+          5000,
+          () => {
             eSendEvent(eOpenLoginDialog);
-          }, 500);
-        },
-        'Login',
-      );
-      return;
-    }
-    if (user?.lastSynced < note?.dateEdited || !user.lastSynced) {
-      setRefreshing(true);
-      try {
-        await db.sync();
-        localRefresh();
-        ToastEvent.show('Note synced', 'success', 'local');
-      } catch (e) {
-        ToastEvent.show(e.message, 'error', 'local');
-      } finally {
-        let user = await db.user.get();
-        dispatch({type: Actions.USER, user: user});
-        dispatch({type: Actions.ALL});
-        setRefreshing(false);
+          },
+          'Login',
+        );
+      } else {
+        ToastEvent.show(e.message, 'error', 'local', 5000);
       }
+    } finally {
+      let user = await db.user.get();
+      dispatch({type: Actions.USER, user: user});
+      dispatch({type: Actions.ALL});
+      setRefreshing(false);
     }
   };
 

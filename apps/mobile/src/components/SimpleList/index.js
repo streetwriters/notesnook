@@ -126,17 +126,13 @@ const SimpleList = ({
     } else {
       setRefreshing(true);
     }
-    let user;
     try {
-      user = await db.user.get();
-      dispatch({type: Actions.USER, user: user});
       await db.sync();
-
       ToastEvent.show('Sync Complete', 'success');
     } catch (e) {
-      if (!user) {
+      if (e.message === 'You need to login to sync.') {
         ToastEvent.show(
-          'You must login to sync.',
+          e.message,
           'error',
           'global',
           5000,
@@ -146,7 +142,7 @@ const SimpleList = ({
           'Login',
         );
       } else {
-        ToastEvent.show(e.message, 'error', 'global', 3000);
+        ToastEvent.show(e.message, 'error', 'global', 5000);
       }
     } finally {
       if (Platform.OS === 'ios') {
@@ -160,8 +156,10 @@ const SimpleList = ({
       if (refreshCallback) {
         refreshCallback();
       }
+      let user = await db.user.get();
+      dispatch({type: Actions.USER, user: user});
+      dispatch({type: Actions.ALL});
     }
-    dispatch({type: Actions.ALL});
   }, []);
 
   const _ListEmptyComponent = (

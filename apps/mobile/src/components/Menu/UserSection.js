@@ -23,7 +23,7 @@ export const UserSection = ({noTextMode}) => {
         borderRadius: 5,
         alignSelf: 'center',
         backgroundColor: colors.shade,
-        marginTop:10,
+        marginTop: 10,
       }}>
       <View
         style={{
@@ -52,22 +52,19 @@ export const UserSection = ({noTextMode}) => {
             syncing: true,
           });
           try {
-            if (!user) {
-              let u = await db.user.get();
-              dispatch({type: Actions.USER, user: u});
-            }
             await db.sync();
             ToastEvent.show('Sync Complete', 'success');
           } catch (e) {
             ToastEvent.show(e.message, 'error');
+          } finally {
+            let user = await db.user.get();
+            dispatch({type: Actions.USER, user: user});
+            dispatch({type: Actions.ALL});
+            dispatch({
+              type: Actions.SYNCING,
+              syncing: false,
+            });
           }
-          let u = await db.user.get();
-          dispatch({type: Actions.USER, user: u});
-          dispatch({type: Actions.ALL});
-          dispatch({
-            type: Actions.SYNCING,
-            syncing: false,
-          });
         }}
         style={{
           flexDirection: 'row',
