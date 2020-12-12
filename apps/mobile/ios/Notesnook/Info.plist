@@ -6,6 +6,19 @@
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
 	<string>Notesnook</string>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>Notesnook Backup File</string>
+			<key>LSHandlerRank</key>
+			<string>Owner</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>org.streetwriters.notesnook.nnbackup</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -87,5 +100,31 @@
 	<true/>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>UTExportedTypeDeclarations</key>
+	<array>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.text</string>
+			</array>
+			<key>UTTypeDescription</key>
+			<string>Notesnook Backup File</string>
+			<key>UTTypeIconFiles</key>
+			<array/>
+			<key>UTTypeIdentifier</key>
+			<string>org.streetwriters.notesnook.nnbackup</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>nnbackup</string>
+				</array>
+				<key>public.mime-type</key>
+				<array>
+					<string>application/json</string>
+				</array>
+			</dict>
+		</dict>
+	</array>
 </dict>
 </plist>

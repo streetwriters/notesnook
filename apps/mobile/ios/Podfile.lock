@@ -191,6 +191,8 @@ PODS:
     - React-cxxreact (= 0.63.4)
     - React-jsi (= 0.63.4)
   - React-jsinspector (0.63.4)
+  - react-native-document-picker (4.1.0):
+    - React-Core
   - react-native-eventsource (0.0.3):
     - React
   - react-native-get-random-values (1.4.0):
@@ -343,6 +345,7 @@ DEPENDENCIES:
   - React-jsi (from `../node_modules/react-native/ReactCommon/jsi`)
   - React-jsiexecutor (from `../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
+  - react-native-document-picker (from `../node_modules/react-native-document-picker`)
   - react-native-eventsource (from `../node_modules/react-native-eventsource`)
   - react-native-get-random-values (from `../node_modules/react-native-get-random-values`)
   - react-native-html-to-pdf (from `../node_modules/react-native-html-to-pdf`)
@@ -428,6 +431,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/jsiexecutor"
   React-jsinspector:
     :path: "../node_modules/react-native/ReactCommon/jsinspector"
+  react-native-document-picker:
+    :path: "../node_modules/react-native-document-picker"
   react-native-eventsource:
     :path: "../node_modules/react-native-eventsource"
   react-native-get-random-values:
@@ -536,6 +541,7 @@ SPEC CHECKSUMS:
   React-jsi: a0418934cf48f25b485631deb27c64dc40fb4c31
   React-jsiexecutor: 93bd528844ad21dc07aab1c67cb10abae6df6949
   React-jsinspector: 58aef7155bc9a9683f5b60b35eccea8722a4f53a
+  react-native-document-picker: d870e0a41510b241d5b764e7a2b5ccf129af7967
   react-native-eventsource: 63f9edb311e11bb3a95873c2b77acec8f580c234
   react-native-get-random-values: 2b7500cdb68066aba87cdccd97067c29e16ffe95
   react-native-html-to-pdf: 1d1199917f56a98377d431bce84c2f275e48eb71
