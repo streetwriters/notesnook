@@ -44,7 +44,7 @@ export const NavigationStack = ({component = NavigatorStack}) => {
   }, []);
 
   const onStateChange = (state) => {
-    if (Platform.OS === 'android') return;
+    //if (Platform.OS === 'android') return;
     let s = state[0];
     if (s && s !== State.ACTIVE && s !== State.BEGAN) {
       let state = sideMenuRef.current.getRootState();

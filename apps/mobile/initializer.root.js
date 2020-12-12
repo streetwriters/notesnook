@@ -87,29 +87,30 @@ const _moveResponder = (e) => {
   return false;
 };
 
+let touchEndTimer = null;
+
 const _handleTouch = () => {
   {
-    if (currentTab === 1 && startLocation > updatedDimensions.height - 70) {
+    if (
+      (currentTab === 1 && startLocation > updatedDimensions.height - 70) ||
+      (currentTab === 0 && startLocationX < 150)
+    ) {
       if (currentScroll === 0 || currentScroll === 1) {
         tabBarRef.current?.setScrollEnabled(false);
       }
-    } else if (currentTab === 0 && Platform.OS === 'ios') {
-      if (currentScroll === 0 && startLocationX < 150) {
-        tabBarRef.current?.setScrollEnabled(false);
-      } else {
-        tabBarRef.current?.setScrollEnabled(true);
-      }
     } else {
-      console.log('blocking');
       tabBarRef.current?.setScrollEnabled(true);
     }
   }
 };
 
 const _onTouchEnd = (e) => {
-  console.log('touch ended');
   startLocation = 0;
-  tabBarRef.current?.setScrollEnabled(true);
+  clearTimeout(touchEndTimer);
+  touchEndTimer = null;
+  touchEndTimer = setTimeout(() => {
+    tabBarRef.current?.setScrollEnabled(true);
+  }, 200);
 };
 
 const AppStack = React.memo(
@@ -170,7 +171,7 @@ const AppStack = React.memo(
       updatedDimensions = size;
       if (!size || (size.width === dimensions.width && mode !== null)) {
         dispatch({type: Actions.DEVICE_MODE, state: mode});
-      
+
         return;
       }
 
