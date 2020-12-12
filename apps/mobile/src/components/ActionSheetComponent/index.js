@@ -454,6 +454,7 @@ export const ActionSheetComponent = ({
     ) : null;
 
   const onPressSync = async () => {
+    let user = await db.user.get();
     if (!user) {
       ToastEvent.show(
         'You must login to sync',
