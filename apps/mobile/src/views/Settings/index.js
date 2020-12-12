@@ -32,7 +32,7 @@ import {
   openVault,
   ToastEvent,
 } from '../../services/EventManager';
-import { setLoginMessage } from '../../services/Message';
+import {setLoginMessage} from '../../services/Message';
 import Navigation from '../../services/Navigation';
 import PremiumService from '../../services/PremiumService';
 import SettingsService from '../../services/SettingsService';
@@ -179,6 +179,9 @@ export const Settings = ({navigation}) => {
             onPress={item.func}
           />
         ))}
+
+        <AccoutLogoutSection />
+
         <View
           style={{
             height: 400,
@@ -209,12 +212,81 @@ const SectionHeader = ({title}) => {
   );
 };
 
+const AccoutLogoutSection = () => {
+  const [state, dispatch] = useTracked();
+  const {colors, user} = state;
+  const [visible, setVisible] = useState(false);
+
+  return user && (
+    <>
+      {visible && (
+        <BaseDialog visible={true}>
+          <DialogContainer>
+            <DialogHeader
+              title="Logout"
+              paragraph="Clear all your data and reset the app."
+            />
+            <DialogButtons
+              positiveTitle="Logout"
+              negativeTitle="Cancel"
+              onPressNegative={() => setVisible(false)}
+              onPressPositive={async () => {
+                await db.user.logout();
+                dispatch({type: Actions.USER, user: null});
+                dispatch({type: Actions.CLEAR_ALL});
+                dispatch({type: Actions.SYNCING, syncing: false});
+                setLoginMessage(dispatch);
+              }}
+            />
+          </DialogContainer>
+        </BaseDialog>
+      )}
+      {[
+        {
+          name: 'Logout',
+          func: async () => {
+            setVisible(true);
+          },
+        },
+        {
+          name: 'Delete My Account',
+        },
+      ].map((item, index) => (
+        <PressableButton
+          onPress={item.func}
+          key={item.name}
+          type="accent"
+          accentColor="light"
+          customStyle={{
+            height: 50,
+            borderTopWidth: index === 0 ? 1 : 0,
+            borderTopColor: colors.nav,
+            width: '100%',
+            alignItems: 'flex-start',
+            paddingHorizontal: 12,
+            marginTop: index === 0 ? 25 : 0,
+            borderRadius: 0,
+          }}>
+          <Heading
+            color={colors.red}
+            style={{
+              fontSize: SIZE.md,
+            }}>
+            {item.name}
+          </Heading>
+        </PressableButton>
+      ))}
+    </>
+  );
+};
+
 const CustomButton = ({
   title,
   tagline,
   customComponent,
   onPress,
   maxWidth = '100%',
+  color = null,
 }) => {
   const [state] = useTracked();
   const {colors} = state;
@@ -237,6 +309,7 @@ const CustomButton = ({
         }}>
         <Paragraph
           size={SIZE.md}
+          color={color || colors.pri}
           style={{
             textAlignVertical: 'center',
             maxWidth: maxWidth,
@@ -268,28 +341,6 @@ const SettingsUserSection = () => {
 
   return user ? (
     <>
-      {visible && (
-        <BaseDialog visible={true}>
-          <DialogContainer>
-            <DialogHeader
-              title="Logout"
-              paragraph="Clear all your data and reset the app."
-            />
-            <DialogButtons
-              positiveTitle="Logout"
-              negativeTitle="Cancel"
-              onPressNegative={() => setVisible(false)}
-              onPressPositive={async () => {
-                await db.user.logout();
-                dispatch({type: Actions.USER, user: null});
-                dispatch({type: Actions.CLEAR_ALL});
-                dispatch({type: Actions.SYNCING, syncing: false});
-                setLoginMessage(dispatch)
-              }}
-            />
-          </DialogContainer>
-        </BaseDialog>
-      )}
       <View
         style={{
           paddingHorizontal: 12,
@@ -335,7 +386,7 @@ const SettingsUserSection = () => {
                 style={{
                   marginLeft: 5,
                 }}>
-                {user.username}
+                {user?.username}
               </Paragraph>
             </View>
             <View
@@ -396,19 +447,13 @@ const SettingsUserSection = () => {
           desc:
             'Recover your data using the recovery key if your password is lost.',
         },
-        {
-          name: 'Logout',
-          func: async () => {
-            setVisible(true);
-          },
-          desc: 'This will clear all data and reset the app.',
-        },
       ].map((item) => (
         <CustomButton
           key={item.name}
           title={item.name}
           onPress={item.func}
           tagline={item.desc}
+          color={item.name === 'Logout' ? colors.errorText : colors.pri}
         />
       ))}
     </>
@@ -523,10 +568,6 @@ const SettingsAppearanceSection = () => {
         </Paragraph>
       </View>
       <View
-        contentContainerStyle={{
-          flexDirection: 'row',
-          flexWrap: 'wrap',
-        }}
         style={{
           borderRadius: 5,
           padding: 5,
@@ -575,10 +616,12 @@ const SettingsAppearanceSection = () => {
               alignItems: 'center',
               marginVertical: 5,
               marginHorizontal: 5,
-              width: DDS.isTab ? (dWidth * 0.85 * 0.28) / 5 - 24 : dWidth / 7.5,
-              height: DDS.isTab
-                ? (dWidth * 0.85 * 0.28) / 5 - 24
-                : dWidth / 7.5,
+              width: DDS.isLargeTablet()
+                ? ((dWidth - 24 - 6 * 12) * 0.85 * 0.28) / 6
+                : (dWidth - 24 - 6 * 12) / 6,
+              height: DDS.isLargeTablet()
+                ? ((dWidth - 24 - 6 * 12) * 0.85 * 0.28) / 6
+                : (dWidth - 24 - 6 * 12) / 6,
               borderRadius: 100,
             }}>
             {colors.accent === item ? (
