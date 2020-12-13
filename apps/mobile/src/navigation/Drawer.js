@@ -1,7 +1,6 @@
 import {createDrawerNavigator} from '@react-navigation/drawer';
 import {NavigationContainer} from '@react-navigation/native';
 import * as React from 'react';
-import {Platform} from 'react-native';
 import {State} from 'react-native-gesture-handler';
 import {Menu} from '../components/Menu';
 import {useTracked} from '../provider';
@@ -11,8 +10,18 @@ import {sideMenuRef, tabBarRef} from '../utils/Refs';
 import {sleep} from '../utils/TimeUtils';
 import {NavigatorStack} from './NavigatorStack';
 
-const menuRef = React.createRef();
 const Drawer = createDrawerNavigator();
+ 
+
+const onStateChange = (state) => {
+  let s = state[0];
+  if (s && s !== State.ACTIVE && s !== State.BEGAN) {
+    let state = sideMenuRef.current.getRootState();
+    if (state.history.findIndex((o) => o.type === 'drawer') === -1) {
+      tabBarRef.current?.setScrollEnabled(true);
+    }
+  }
+};
 
 export const NavigationStack = ({component = NavigatorStack}) => {
   const [state] = useTracked();
@@ -20,18 +29,13 @@ export const NavigationStack = ({component = NavigatorStack}) => {
   const [locked, setLocked] = React.useState(false);
   const [initRender, setInitRender] = React.useState(true);
 
-  React.useEffect(() => {
-    sleep(1000).then(() => {
-      setInitRender(false);
-    });
-  }, []);
-
   const setGestureDisabled = () => {
     setLocked(true);
   };
 
   const setGestureEnabled = () => {
     setLocked(false);
+    setInitRender(false);
   };
 
   React.useEffect(() => {
@@ -43,16 +47,7 @@ export const NavigationStack = ({component = NavigatorStack}) => {
     };
   }, []);
 
-  const onStateChange = (state) => {
-    //if (Platform.OS === 'android') return;
-    let s = state[0];
-    if (s && s !== State.ACTIVE && s !== State.BEGAN) {
-      let state = sideMenuRef.current.getRootState();
-      if (state.history.findIndex((o) => o.type === 'drawer') === -1) {
-        tabBarRef.current?.setScrollEnabled(true);
-      }
-    }
-  };
+
 
   return (
     <NavigationContainer ref={sideMenuRef}>
@@ -63,8 +58,8 @@ export const NavigationStack = ({component = NavigatorStack}) => {
         }}
         onStateChange={onStateChange}
         drawerStyle={{
-          width: initRender ? 0 : deviceMode !== 'mobile' ? 0 : '65%',
-          height: initRender ? 0 : null,
+          width: deviceMode !== 'mobile' ? 0 : '65%',
+          opacity: initRender ? 0 : 1,
           borderRightWidth: 0,
         }}
         edgeWidth={200}
