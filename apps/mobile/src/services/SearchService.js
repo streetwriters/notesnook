@@ -14,7 +14,6 @@ function update(data) {
 }
 
 async function search(term) {
-  console.log(term, term.length);
   if (!term || term.length === 0) {
     updateEvent({
       type: Actions.SEARCH_RESULTS,
@@ -28,7 +27,6 @@ async function search(term) {
     searchInformation.data,
     term,
   );
-  console.log(results.length);
   if (!results || results.length === 0) {
     ToastEvent.show('No search results found for ' + term, 'error');
     return;
