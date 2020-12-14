@@ -12,6 +12,7 @@ import {hexToRGBA} from '../../utils/ColorUtils';
 import {db} from '../../utils/DB';
 import {
   eOnLoadNote,
+  eOpenSideMenu,
   eShowGetPremium,
   refreshNotesPage,
 } from '../../utils/Events';
@@ -241,9 +242,9 @@ export const _onMessage = async (evt) => {
 
       break;
     case 'status':
-        webviewInit = true;
-        loadNoteInEditor();
-        break;  
+      webviewInit = true;
+      loadNoteInEditor();
+      break;
     default:
       break;
   }
@@ -405,7 +406,6 @@ export async function onWebViewLoad(premium, colors, event) {
   post('blur');
   setColors(colors);
   await loadEditorState();
-  //await loadNoteInEditor();
 }
 async function loadEditorState() {
   if (sideMenuRef.current !== null) {
@@ -414,25 +414,21 @@ async function loadEditorState() {
       return;
     }
     let appState = await MMKV.getItem('appState');
-    console.log('checking for app state', appState);
     if (appState) {
       appState = JSON.parse(appState);
       if (appState.editing && appState.note && appState.note.id) {
-        console.log('loading note in editor');
         eSendEvent(eOnLoadNote, appState.note);
         tabBarRef.current?.goToPage(1);
         MMKV.removeItem('appState');
       }
     }
   } else {
-    // Checks intent only when app is loading
-    console.log('here checking for intent and waiting');
     IntentService.check((event) => {
       if (event) {
-        console.log('I am handling the intent');
         intent = true;
         eSendEvent(eOnLoadNote, event);
         SplashScreen.hide();
+        sleep(300).then(() => eSendEvent(eOpenSideMenu));
       } else {
         eSendEvent('nointent');
       }
