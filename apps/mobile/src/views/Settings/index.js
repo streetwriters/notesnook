@@ -446,6 +446,13 @@ const SettingsUserSection = () => {
           desc:
             'Recover your data using the recovery key if your password is lost.',
         },
+        {
+          name: 'Change Password',
+          func: async () => {
+            eSendEvent(eOpenLoginDialog, 3);
+          },
+          desc: 'Setup a new password for your account.',
+        },
       ].map((item) => (
         <CustomButton
           key={item.name}
