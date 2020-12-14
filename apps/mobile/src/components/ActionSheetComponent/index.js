@@ -146,7 +146,7 @@ export const ActionSheetComponent = ({
       name: 'Add to',
       icon: 'book-outline',
       func: () => {
-        dispatch({type: Actions.MODAL_NAVIGATOR, enabled: true});
+        dispatch({type: Actions.CLEAR_SELECTION});
         dispatch({type: Actions.SELECTED_ITEMS, item: note});
         close();
         setTimeout(() => {
@@ -485,8 +485,6 @@ export const ActionSheetComponent = ({
   };
 
   const onPressVaultButton = async () => {
-    console.log(editing.actionAfterFirstSave);
-    return;
     if (!note.id) return;
     if (note.locked) {
       close('unlock');

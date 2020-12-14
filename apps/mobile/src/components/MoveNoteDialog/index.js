@@ -15,13 +15,18 @@ import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {DDS} from '../../services/DeviceDetection';
 import {
+  eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
   ToastEvent,
 } from '../../services/EventManager';
 import {getElevation} from '../../utils';
 import {db} from '../../utils/DB';
-import {eOpenMoveNoteDialog} from '../../utils/Events';
+import {
+  eOnNewTopicAdded,
+  eOpenMoveNoteDialog,
+  refreshNotesPage,
+} from '../../utils/Events';
 import {pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogHeader from '../Dialog/dialog-header';
@@ -37,16 +42,20 @@ const topicInput = createRef();
 
 const MoveNoteDialog = () => {
   const [state, dispatch] = useTracked();
-  const {notebooks, colors, selectedItemsList} = state;
+  const {colors, selectedItemsList} = state;
   const [visible, setVisible] = useState(false);
   const [expanded, setExpanded] = useState('');
   const [notebookInputFocused, setNotebookInputFocused] = useState(false);
   const [topicInputFocused, setTopicInputFocused] = useState(false);
+  const [note, setNote] = useState(null);
 
   function open() {
+    if (selectedItemsList.length === 1) {
+      console.log('setting note');
+      setNote(selectedItemsList[0]);
+    }
     setVisible(true);
   }
-
   const close = () => {
     setVisible(false);
     setExpanded(false);
@@ -54,9 +63,19 @@ const MoveNoteDialog = () => {
     newNotebookTitle = null;
     setNotebookInputFocused(false);
     setTopicInputFocused(false);
+    setNote(null);
+    eSendEvent(refreshNotesPage);
+    eSendEvent(eOnNewTopicAdded);
+    dispatch({type: Actions.CLEAR_SELECTION});
+    dispatch({type: Actions.NOTEBOOKS});
+    dispatch({type: Actions.NOTES});
   };
 
   useEffect(() => {
+    if (selectedItemsList.length === 1) {
+      console.log('setting note effect');
+      setNote(selectedItemsList[0]);
+    }
     eSubscribeEvent(eOpenMoveNoteDialog, open);
     return () => {
       eUnSubscribeEvent(eOpenMoveNoteDialog, open);
@@ -140,7 +159,7 @@ const MoveNoteDialog = () => {
               }}>
               <DialogHeader
                 title="Add to notebook"
-                paragraph={`Organize your notes to find them easily.`}
+                paragraph={`Add your notes in notebooks to find them easily.`}
               />
             </View>
 
@@ -339,29 +358,45 @@ const MoveNoteDialog = () => {
                       renderItem={({item, index}) => (
                         <PressableButton
                           onPress={async () => {
+                            
+                            if (
+                              note &&
+                              note.notebooks &&
+                              note.notebooks.findIndex((o) =>
+                                o.topics.findIndex((e) => e === item.id),
+                              )
+                            ) {
+                              await db.notebooks
+                                .notebook(item.notebookId)
+                                .topics.topic(item.id)
+                                .delete(note.id);
+
+                               if (note && note.id) {
+                                  console.log('updating note');
+                                  setNote({...db.notes.note(note.id).data});
+                                }
+                              
+                            dispatch({type: Actions.NOTEBOOKS});  
+                              return;
+                            }
+
                             let noteIds = [];
                             selectedItemsList.forEach((i) =>
                               noteIds.push(i.id),
                             );
-
                             await db.notes.move(
                               {
-                                topic: item.title,
+                                topic: item.id,
                                 id: item.notebookId,
                               },
                               ...noteIds,
                             );
-                            dispatch({type: Actions.CLEAR_SELECTION});
+                              console.log(item.id,item.notebookId);
+                            if (note && note.id) {
+                              console.log('updating note');
+                              setNote({...db.notes.note(note.id).data});
+                            }
                             dispatch({type: Actions.NOTEBOOKS});
-                            dispatch({type: Actions.NOTES});
-                            close();
-                            let notebookName = db.notebooks.notebook(
-                              item.notebookId,
-                            ).title;
-                            ToastEvent.show(
-                              `Note moved to ${item.title} in ${notebookName}`,
-                              'success',
-                            );
                           }}
                           type="gray"
                           customStyle={{
@@ -376,13 +411,22 @@ const MoveNoteDialog = () => {
                             flexDirection: 'row',
                             justifyContent: 'space-between',
                           }}>
-                          <Paragraph color={colors.heading}>
-                            {item.title}
-                            {'\n'}
-                            <Paragraph color={colors.icon} size={SIZE.xs}>
-                              {item.totalNotes + ' notes'}
+                          <View>
+                            <Paragraph color={colors.heading}>
+                              {item.title}
+                              {'\n'}
+                              <Paragraph color={colors.icon} size={SIZE.xs}>
+                                {item.totalNotes + ' notes'}
+                              </Paragraph>
                             </Paragraph>
-                          </Paragraph>
+                          </View>
+                          {note?.notebooks?.findIndex(
+                            (o) => o.topics.indexOf(item.id) > -1,
+                          ) > -1 ? (
+                            <Paragraph size={SIZE.sm} color={colors.errorText}>
+                              Remove
+                            </Paragraph>
+                          ) : null}
                         </PressableButton>
                       )}
                     />
@@ -396,7 +440,10 @@ const MoveNoteDialog = () => {
                 paddingHorizontal: 12,
                 width: '100%',
               }}>
-              <DialogButtons negativeTitle="Cancel" onPressNegative={close} />
+              <DialogButtons
+                negativeTitle="Close"
+                onPressNegative={close}
+              />
             </View>
           </View>
           <Toast context="local" />
