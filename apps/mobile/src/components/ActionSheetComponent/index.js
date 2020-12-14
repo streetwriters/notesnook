@@ -19,7 +19,7 @@ import {
   ToastEvent,
 } from '../../services/EventManager';
 import PremiumService from '../../services/PremiumService';
-import {toTXT} from '../../utils';
+import {editing, toTXT} from '../../utils';
 import {
   ACCENT,
   COLOR_SCHEME,
@@ -29,9 +29,11 @@ import {
 } from '../../utils/Colors';
 import {db} from '../../utils/DB';
 import {
+  eOnNewTopicAdded,
   eOpenLoginDialog,
   eOpenMoveNoteDialog,
   eShowGetPremium,
+  refreshNotesPage,
 } from '../../utils/Events';
 import {deleteItems} from '../../utils/functions';
 import {MMKV} from '../../utils/mmkv';
@@ -483,6 +485,8 @@ export const ActionSheetComponent = ({
   };
 
   const onPressVaultButton = async () => {
+    console.log(editing.actionAfterFirstSave);
+    return;
     if (!note.id) return;
     if (note.locked) {
       close('unlock');
@@ -687,6 +691,44 @@ export const ActionSheetComponent = ({
               marginLeft: 5,
             }}>
             {note.locked ? 'Remove from Vault' : 'Add to Vault'}
+          </Paragraph>
+        </PressableButton>
+      ) : null}
+
+      {editing.actionAfterFirstSave.type === 'topic' &&
+      note.notebooks &&
+      note.notebooks.findIndex(
+        (o) => o.id === editing.actionAfterFirstSave.id,
+      ) ? (
+        <PressableButton
+          accentColor="errorBg"
+          type="accent"
+          customOpacity={0.6}
+          onPress={async () => {
+            await db.notebooks
+              .notebook(editing.actionAfterFirstSave.notebook)
+              .topics.topic(editing.actionAfterFirstSave.id)
+              .delete(note.id);
+
+            eSendEvent(refreshNotesPage);
+            eSendEvent(eOnNewTopicAdded);
+            dispatch({type: Actions.NOTEBOOKS});
+            dispatch({type: Actions.NOTES});
+            setNote(db.notes.note(note.id).data);
+            close();
+          }}
+          testID={notesnook.ids.dialogs.actionsheet.vault}
+          customStyle={{
+            width: '95%',
+            alignSelf: 'center',
+            height: 50,
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginTop: 10,
+          }}>
+          <Paragraph color="#FF0000" size={SIZE.md}>
+            Remove from Topic
           </Paragraph>
         </PressableButton>
       ) : null}

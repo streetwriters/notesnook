@@ -90,7 +90,7 @@ export default class NoteItem extends React.Component {
             width: '92%',
             paddingRight: 5,
           }}>
-          {item.notebooks && item.notebooks.length === 0 && (
+          {item.notebooks && item.notebooks.length > 0 && (
             <View
               style={{
                 flexDirection: 'row',
@@ -98,7 +98,7 @@ export default class NoteItem extends React.Component {
               <TouchableOpacity
                 activeOpacity={1}
                 onPress={() => {
-                  let notebook = db.notebooks.notebook(item.notebook.id).data;
+                  let notebook = db.notebooks.notebook(item.notebooks[0].id).data;
                   updateEvent({
                     type: Actions.HEADER_TEXT_STATE,
                     state: {
@@ -110,7 +110,7 @@ export default class NoteItem extends React.Component {
                     state: false,
                   });
                   Navigation.navigate('Notebook', {
-                    notebook: db.notebooks.notebook(item.notebook.id).data,
+                    notebook: db.notebooks.notebook(item.notebooks[0].id).data,
                     title: notebook.title,
                     root: true,
                   });
@@ -132,7 +132,7 @@ export default class NoteItem extends React.Component {
                 <Heading
                   size={SIZE.xs}
                   color={item.color ? COLORS_NOTE[item.color] : colors.accent}>
-                  {db.notebooks.notebook(item.notebooks[0].id).title}
+                  {db.notebooks.notebook(item.notebooks[0].id).title + " "} {item.notebooks.length > 1? "& " + (item.notebooks.length - 1) + " others" : ""}
                 </Heading>
               </TouchableOpacity>
             </View>

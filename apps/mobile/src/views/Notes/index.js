@@ -49,7 +49,7 @@ export const Notes = ({route, navigation}) => {
     } else {
       editing.actionAfterFirstSave = {
         type: 'topic',
-        id: params.title,
+        id: params.id,
         notebook: params.notebookId,
       };
     }
@@ -62,16 +62,17 @@ export const Notes = ({route, navigation}) => {
     }
     if (route.params.menu) {
       navigation.setOptions({
-        animationEnabled:false,
-        gestureEnabled:false
-      })
+        animationEnabled: false,
+        gestureEnabled: false,
+      });
     } else {
       navigation.setOptions({
-        animationEnabled:true,
-        gestureEnabled:true
-      })
+        animationEnabled: true,
+        gestureEnabled: true,
+      });
     }
     let allNotes = [];
+    console.log(params.type);
     if (params.type === 'tag') {
       allNotes = db.notes.tagged(params.tag.id);
     } else if (params.type === 'color') {
@@ -81,7 +82,8 @@ export const Notes = ({route, navigation}) => {
         .notebook(params.notebookId)
         .topics.topic(params.title).all;
     }
-    if (allNotes && allNotes.length > 0) {
+
+    if (allNotes) {
       setNotes([...allNotes]);
     }
     setActionAfterFirstSave();
@@ -190,9 +192,10 @@ export const Notes = ({route, navigation}) => {
           init();
         }}
         headerProps={{
-          heading: params.type === 'tag'
-          ? '#' + params.title
-          : params.title.slice(0, 1).toUpperCase() + params.title.slice(1),
+          heading:
+            params.type === 'tag'
+              ? '#' + params.title
+              : params.title.slice(0, 1).toUpperCase() + params.title.slice(1),
         }}
         focused={() => navigation.isFocused()}
         RenderItem={NoteItemWrapper}

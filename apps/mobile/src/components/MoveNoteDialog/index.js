@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { notesnook } from '../../../e2e/test.ids';
+import {notesnook} from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {DDS} from '../../services/DeviceDetection';
@@ -76,7 +76,6 @@ const MoveNoteDialog = () => {
     notebookInput.current?.clear();
     notebookInput.current?.blur();
     dispatch({type: Actions.NOTEBOOKS});
-    dispatch({type: Actions.PINNED});
   };
 
   const addNewTopic = async () => {
@@ -85,7 +84,6 @@ const MoveNoteDialog = () => {
     }
     let res = await db.notebooks.notebook(expanded).topics.add(newTopicTitle);
     dispatch({type: Actions.NOTEBOOKS});
-    dispatch({type: Actions.PINNED});
     topicInput.current?.clear();
     topicInput.current?.blur();
     newTopicTitle = null;
@@ -346,7 +344,7 @@ const MoveNoteDialog = () => {
                               noteIds.push(i.id),
                             );
 
-                            let res = await db.notes.move(
+                            await db.notes.move(
                               {
                                 topic: item.title,
                                 id: item.notebookId,
@@ -355,7 +353,7 @@ const MoveNoteDialog = () => {
                             );
                             dispatch({type: Actions.CLEAR_SELECTION});
                             dispatch({type: Actions.NOTEBOOKS});
-                            dispatch({type: Actions.PINNED});
+                            dispatch({type: Actions.NOTES});
                             close();
                             let notebookName = db.notebooks.notebook(
                               item.notebookId,
