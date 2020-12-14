@@ -8,7 +8,7 @@ import {eSendEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
 import {scrollRef} from '../../utils';
-import { db } from '../../utils/DB';
+import {db} from '../../utils/DB';
 import {eOnLoadNote, eScrollEvent} from '../../utils/Events';
 import {tabBarRef} from '../../utils/Refs';
 
@@ -16,7 +16,7 @@ export const Home = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const {loading} = state;
   state.notes.indexOf();
-  const notes = state.notes
+  const notes = state.notes;
   let pageIsLoaded = false;
 
   const onFocus = useCallback(() => {
@@ -47,7 +47,6 @@ export const Home = ({route, navigation}) => {
         id: 'notes_navigation',
       },
     );
-    //dispatch({type: Actions.NOTES});
   }, []);
 
   const onBlur = useCallback(() => {}, []);
@@ -64,7 +63,6 @@ export const Home = ({route, navigation}) => {
   }, []);
 
   useEffect(() => {
-    console.log('rerender');
     if (navigation.isFocused()) {
       updateSearch();
     }
@@ -73,7 +71,7 @@ export const Home = ({route, navigation}) => {
   const updateSearch = () => {
     SearchService.update({
       placeholder: 'Search in notes',
-      data: db.notes.all,
+      data: db?.notes?.all,
       type: 'notes',
     });
   };
