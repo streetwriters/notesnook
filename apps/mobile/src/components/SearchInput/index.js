@@ -1,10 +1,11 @@
 import React, {useEffect, useState} from 'react';
-import {TextInput, View} from 'react-native';
+import {Platform, TextInput, View} from 'react-native';
 import {useTracked} from '../../provider';
 import SearchService from '../../services/SearchService';
 import {inputRef} from '../../utils/Refs';
-import {normalize, SIZE, WEIGHT} from '../../utils/SizeUtils';
+import {SIZE, WEIGHT} from '../../utils/SizeUtils';
 
+let searchTerm;
 export const SearchInput = (props) => {
   const [state] = useTracked();
   const {colors} = state;
@@ -18,19 +19,8 @@ export const SearchInput = (props) => {
     updateSearchState();
   }, []);
 
-  /*  const clearSearch = () => {
-    searchResult = null;
-    inputRef.current?.setNativeProps({
-      text: '',
-    });
-    dispatch({
-      type: Actions.SEARCH_RESULTS,
-      results: [],
-    });
-  }; */
-
   const onChangeText = async (value) => {
-    await SearchService.search(value);
+    searchTerm = value;
   };
 
   return (
@@ -55,12 +45,17 @@ export const SearchInput = (props) => {
           flexGrow: 1,
           flex: 1,
           flexWrap: 'wrap',
-          padding:0,
-          margin:0,
-          marginBottom:5,
+          padding: 0,
+          margin: 0,
+          marginBottom: Platform.OS === 'ios' ? 5 : 0,
         }}
+        textAlignVertical="center"
         onChangeText={onChangeText}
         numberOfLines={1}
+        onSubmitEditing={async () => {
+          await SearchService.search(searchTerm);
+        }}
+        enablesReturnKeyAutomatically
         placeholder={searchState}
         placeholderTextColor={colors.icon}
       />
