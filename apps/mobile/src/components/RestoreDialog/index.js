@@ -175,6 +175,10 @@ const RestoreDialog = () => {
           style={{
             flexGrow: 1,
           }}
+          contentContainerStyle={{
+            width: '100%',
+            height: '100%',
+          }}
           keyExtractor={(item, index) => item.filename}
           ListEmptyComponent={
             <View
