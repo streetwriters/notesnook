@@ -1,47 +1,47 @@
 import * as NetInfo from '@react-native-community/netinfo';
-import {CHECK_IDS, EV} from 'notes-core/common';
-import React, {useEffect, useState} from 'react';
+import { CHECK_IDS, EV } from 'notes-core/common';
+import React, { useEffect, useState } from 'react';
 import {
   Appearance,
   AppState,
   Linking,
   NativeModules,
   Platform,
-  StatusBar,
+  StatusBar
 } from 'react-native';
 import * as RNIap from 'react-native-iap';
-import {enabled} from 'react-native-privacy-snapshot';
-import {SafeAreaProvider} from 'react-native-safe-area-context';
+import { enabled } from 'react-native-privacy-snapshot';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import SplashScreen from 'react-native-splash-screen';
-import {useTracked} from './src/provider';
-import {Actions} from './src/provider/Actions';
-import {DDS} from './src/services/DeviceDetection';
+import { useTracked } from './src/provider';
+import { Actions } from './src/provider/Actions';
+import { DDS } from './src/services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent,
-  ToastEvent,
+  eUnSubscribeEvent
 } from './src/services/EventManager';
 import IntentService from './src/services/IntentService';
-import {clearMessage, setLoginMessage} from './src/services/Message';
+import { clearMessage, setLoginMessage } from './src/services/Message';
 import Navigation from './src/services/Navigation';
 import PremiumService from './src/services/PremiumService';
-import {editing} from './src/utils';
-import {COLOR_SCHEME} from './src/utils/Colors';
-import {db} from './src/utils/DB';
+import { editing } from './src/utils';
+import { COLOR_SCHEME } from './src/utils/Colors';
+import { db } from './src/utils/DB';
 import {
   eClosePremiumDialog,
   eDispatchAction,
   eOnLoadNote,
   eOpenPendingDialog,
   eOpenPremiumDialog,
+  eOpenSideMenu,
   eShowGetPremium,
-  eStartSyncer,
+  eStartSyncer
 } from './src/utils/Events';
-import {MMKV} from './src/utils/mmkv';
-import {tabBarRef} from './src/utils/Refs';
-import {sleep} from './src/utils/TimeUtils';
-import {getNote} from './src/views/Editor/Functions';
+import { MMKV } from './src/utils/mmkv';
+import { tabBarRef } from './src/utils/Refs';
+import { sleep } from './src/utils/TimeUtils';
+import { getNote } from './src/views/Editor/Functions';
 const {ReceiveSharingIntent} = NativeModules;
 
 let AppRootView = require('./initializer.root').RootView;
@@ -83,6 +83,8 @@ const onAppStateChanged = async (state) => {
               } else {
                 eSendEvent('nointent');
                 SplashScreen.hide();
+
+                sleep(300).then(() => eSendEvent(eOpenSideMenu));
               }
             });
           }
@@ -108,7 +110,7 @@ const onAppStateChanged = async (state) => {
 };
 
 const onNetworkStateChanged = (netInfo) => {
- /*  let message = 'Internet connection restored';
+  /*  let message = 'Internet connection restored';
   let type = 'success';
   if (!netInfo.isConnected || !netInfo.isInternetReachable) {
     message = 'No internet connection';
@@ -127,7 +129,7 @@ const App = () => {
     [intent, setIntent] = useState(false);
 
   const syncChanges = async () => {
-    console.log('dispatching sync changes')
+    console.log('dispatching sync changes');
     dispatch({type: Actions.ALL});
   };
   const startSyncer = async () => {
@@ -274,7 +276,6 @@ const App = () => {
     EV.subscribe('db:sync', dbSync);
     EV.subscribe('user:checkStatus', handlePremiumAccess);
     return () => {
-
       EV.unsubscribe('db:refresh', syncChanges);
       EV.unsubscribe('db:sync', dbSync);
       eUnSubscribeEvent(eStartSyncer, startSyncer);
@@ -315,6 +316,7 @@ const App = () => {
       SettingsService.setAppLoaded();
     });
     SplashScreen.hide();
+    sleep(300).then(() => eSendEvent(eOpenSideMenu));
     //Sentry = require('@sentry/react-native');
     // Sentry.init({
     //   dsn:
@@ -352,7 +354,7 @@ const App = () => {
         ? 'smallTablet'
         : 'mobile',
     });
-    db.init().finally(runAfterInit);
+    db.init().catch(console.log).finally(runAfterInit);
   }, []);
 
   const runAfterInit = () => {
