@@ -120,6 +120,7 @@ export class DialogManager extends Component {
   };
 
   showAddTopic = (notebook) => {
+    console.log(this.state.item);
     if (notebook) {
       this.setState({
         item: notebook,
@@ -329,8 +330,8 @@ export class DialogManager extends Component {
               />
             }
             keyboardShouldPersistTaps="always"
-            delayActionSheetDraw={true}
-            delayActionSheetDrawTime={10}
+            //delayActionSheetDraw={true}
+            //delayActionSheetDrawTime={10}
             footerAlwaysVisible={DDS.isTab}
             footerHeight={DDS.isTab ? 20 : 10}
             footerStyle={
@@ -382,11 +383,7 @@ export class DialogManager extends Component {
         <AddTopicDialog
           ref={(ref) => (this.addTopicsDialog = ref)}
           toEdit={item?.type === 'topic' ? item : null}
-          notebookID={
-            actionSheetData.extraData
-              ? actionSheetData.extraData.notebookID
-              : item?.id
-          }
+          notebookID={item?.notebookId}
           colors={colors}
         />
         <AddNotebookDialog
