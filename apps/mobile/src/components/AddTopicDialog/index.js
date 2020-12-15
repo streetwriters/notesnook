@@ -1,19 +1,20 @@
-import React, { createRef } from 'react';
-import { View } from 'react-native';
-import { TextInput } from 'react-native-gesture-handler';
-import { Actions } from '../../provider/Actions';
-import { DDS } from '../../services/DeviceDetection';
-import { eSendEvent, ToastEvent } from '../../services/EventManager';
-import { getElevation } from '../../utils';
-import { db } from '../../utils/DB';
-import { eOnNewTopicAdded } from '../../utils/Events';
-import { ph, pv, SIZE, WEIGHT } from '../../utils/SizeUtils';
+import React, {createRef} from 'react';
+import {View} from 'react-native';
+import {TextInput} from 'react-native-gesture-handler';
+import {Actions} from '../../provider/Actions';
+import {DDS} from '../../services/DeviceDetection';
+import {eSendEvent, ToastEvent} from '../../services/EventManager';
+import {getElevation} from '../../utils';
+import {db} from '../../utils/DB';
+import {eOnNewTopicAdded} from '../../utils/Events';
+import {ph, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
 import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';
+import DialogContainer from '../Dialog/dialog-container';
 import DialogHeader from '../Dialog/dialog-header';
-import { updateEvent } from '../DialogManager/recievers';
+import {updateEvent} from '../DialogManager/recievers';
 import Seperator from '../Seperator';
-import { Toast } from '../Toast';
+import {Toast} from '../Toast';
 
 export class AddTopicDialog extends React.Component {
   constructor(props) {
@@ -46,6 +47,7 @@ export class AddTopicDialog extends React.Component {
   };
 
   async open() {
+    console.log(this.props.notebookID);
     this.notebook = await db.notebooks.notebook(this.props.notebookID);
     this.setState({
       visible: true,
@@ -70,36 +72,24 @@ export class AddTopicDialog extends React.Component {
         statusBarTranslucent={false}
         visible={true}
         onRequestClose={this.close}>
-        <View
-          style={{
-            ...getElevation(5),
-            width: DDS.isTab ? 350 : '80%',
-            maxHeight: 350,
-            borderRadius: 5,
-            backgroundColor: colors.bg,
-            paddingHorizontal: ph,
-            paddingVertical: pv,
-          }}>
+        <DialogContainer>
           <DialogHeader
             icon="book-outline"
             title={toEdit ? 'Edit Topic' : 'New Topic'}
             paragraph={'Add a new topic to ' + this.notebook.title}
           />
 
-          <Seperator />
-
           <TextInput
             ref={this.titleRef}
             style={{
-              padding: pv,
+              paddingTop: 10,
+              paddingBottom: 5,
               borderBottomWidth: 1,
               borderColor: titleFocused ? colors.accent : colors.nav,
-              paddingHorizontal: ph,
-              borderRadius: 5,
+              paddingHorizontal: 0,
               fontSize: SIZE.sm,
               fontFamily: WEIGHT.regular,
               color: colors.pri,
-              marginTop: 20,
             }}
             onFocus={() => {
               this.setState({
@@ -129,7 +119,7 @@ export class AddTopicDialog extends React.Component {
             }}
             onPressPositive={this.addNewTopic}
           />
-        </View>
+        </DialogContainer>
         <Toast context="local" />
       </BaseDialog>
     );
