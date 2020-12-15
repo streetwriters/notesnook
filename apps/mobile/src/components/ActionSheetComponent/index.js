@@ -275,38 +275,29 @@ export const ActionSheetComponent = ({
       name: 'Pin',
       icon: 'tag-outline',
       func: async () => {
-        await PremiumService.verify(
-          async () => {
-            if (!note.id) return;
-            if (note.type === 'note') {
-              if (db.notes.pinned.length === 3) {
-                ToastEvent.show(
-                  'You cannot pin more than 3 notes',
-                  'error',
-                  'local',
-                );
-                return;
-              }
-              await db.notes.note(note.id).pin();
-            } else {
-              if (db.notebooks.pinned.length === 3) {
-                ToastEvent.show(
-                  'You cannot pin more than 3 notes',
-                  'error',
-                  'local',
-                );
-                return;
-              }
-              await db.notebooks.notebook(note.id).pin();
-            }
-            localRefresh(item.type);
-          },
-          {
-            context: 'sheet',
-            title: 'Get Notesnook Pro',
-            desc: 'To pin notes and notebooks become a Pro user today.',
-          },
-        );
+        if (!note.id) return;
+        if (note.type === 'note') {
+          if (db.notes.pinned.length === 3) {
+            ToastEvent.show(
+              'You cannot pin more than 3 notes',
+              'error',
+              'local',
+            );
+            return;
+          }
+          await db.notes.note(note.id).pin();
+        } else {
+          if (db.notebooks.pinned.length === 3) {
+            ToastEvent.show(
+              'You cannot pin more than 3 notes',
+              'error',
+              'local',
+            );
+            return;
+          }
+          await db.notebooks.notebook(note.id).pin();
+        }
+        localRefresh(item.type);
       },
       close: false,
       check: true,
