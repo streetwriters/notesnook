@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react';
+import {Keyboard} from 'react-native';
 import {
   ActivityIndicator,
   Clipboard,
@@ -150,7 +151,7 @@ export const ActionSheetComponent = ({
         dispatch({type: Actions.SELECTED_ITEMS, item: note});
         close();
         setTimeout(() => {
-          eSendEvent(eOpenMoveNoteDialog);
+          eSendEvent(eOpenMoveNoteDialog, note);
         }, 400);
       },
     },
@@ -525,6 +526,16 @@ export const ActionSheetComponent = ({
         backgroundColor: colors.bg,
         paddingHorizontal: 0,
       }}>
+      <TouchableOpacity
+        style={{
+          width: '100%',
+          height: '100%',
+          position: 'absolute',
+        }}
+        onPress={() => {
+          Keyboard.dismiss();
+        }}
+      />
       {!note.id && !note.dateCreated ? (
         <Paragraph style={{marginVertical: 10}}>
           Start writing to save your note.
@@ -700,8 +711,9 @@ export const ActionSheetComponent = ({
       ) ? (
         <PressableButton
           accentColor="errorBg"
-          type="accent"
-          customOpacity={0.6}
+          customColor="#ff0000"
+          customSelectedColor="#ff0000"
+          customOpacity={0.12}
           onPress={async () => {
             await db.notebooks
               .notebook(editing.actionAfterFirstSave.notebook)
