@@ -64,7 +64,7 @@ const LoginDialog = () => {
   const [failed, setFailed] = useState(false);
   const [signingIn, setSigningIn] = useState(false);
   const [userConsent, setUserConsent] = useState(false);
-  const [mode, setMode] = useState(MODES.changePassword);
+  const [mode, setMode] = useState(MODES.login);
 
   const _email = useRef();
   const _pass = useRef();
@@ -140,9 +140,9 @@ const LoginDialog = () => {
   }, []);
 
   function open(mode) {
-    if (mode) {
-      setMode(mode);
-    }
+
+    setMode(mode? mode : MODES.login);
+  
     setVisible(true);
   }
 
