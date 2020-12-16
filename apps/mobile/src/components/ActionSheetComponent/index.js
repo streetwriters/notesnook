@@ -590,7 +590,7 @@ export const ActionSheetComponent = ({
                     <View
                       key={topic.dateCreated.toString() + topic.title}
                       style={{
-                        borderRadius: 5,
+                        borderRadius: 2.5,
                         backgroundColor: colors.accent,
                         paddingHorizontal: ph / 1.5,
                         paddingVertical: pv / 4,
