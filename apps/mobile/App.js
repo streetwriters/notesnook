@@ -41,6 +41,7 @@ import {
   eOpenSideMenu,
   eShowGetPremium,
   eStartSyncer,
+  refreshNotesPage,
 } from './src/utils/Events';
 import {MMKV} from './src/utils/mmkv';
 import {tabBarRef} from './src/utils/Refs';
@@ -319,6 +320,8 @@ const App = () => {
     sleep(500).then(() => (appInit = true));
     db.notes.init().then(() => {
       dispatch({type: Actions.NOTES});
+      dispatch({type: Actions.FAVORITES});
+      eSendEvent(refreshNotesPage)
       dispatch({type: Actions.LOADING, loading: false});
       SettingsService.setAppLoaded();
     });
@@ -345,7 +348,6 @@ const App = () => {
         dispatch({type: Actions.LAST_SYNC, lastSync: await db.lastSynced()});
         dispatch({type: Actions.ALL});
         await startSyncer();
-     
       } else {
         setLoginMessage(dispatch);
       }

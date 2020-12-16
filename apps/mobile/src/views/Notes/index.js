@@ -19,7 +19,8 @@ import {eOnLoadNote, eScrollEvent, refreshNotesPage} from '../../utils/Events';
 import {tabBarRef} from '../../utils/Refs';
 
 export const Notes = ({route, navigation}) => {
-  const [, dispatch] = useTracked();
+  const [state, dispatch] = useTracked();
+  const {loading} = state;
   const [notes, setNotes] = useState([]);
   let params = route.params ? route.params : null;
   let pageIsLoaded = false;
@@ -72,7 +73,6 @@ export const Notes = ({route, navigation}) => {
       });
     }
     let allNotes = [];
-    console.log(params.type);
     if (params.type === 'tag') {
       allNotes = db.notes.tagged(params.tag.id);
     } else if (params.type === 'color') {
@@ -197,6 +197,7 @@ export const Notes = ({route, navigation}) => {
               ? '#' + params.title
               : params.title.slice(0, 1).toUpperCase() + params.title.slice(1),
         }}
+        loading={loading}
         focused={() => navigation.isFocused()}
         RenderItem={NoteItemWrapper}
         placeholderText={`Add some notes to this" ${

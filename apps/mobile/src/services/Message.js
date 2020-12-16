@@ -1,5 +1,9 @@
 import {Actions} from '../provider/Actions';
-import {eOpenLoginDialog} from '../utils/Events';
+import {
+  eCloseProgressDialog,
+  eOpenLoginDialog,
+  eOpenProgressDialog,
+} from '../utils/Events';
 import {eSendEvent} from './EventManager';
 
 export function setLoginMessage(dispatch) {
@@ -8,12 +12,13 @@ export function setLoginMessage(dispatch) {
     state: {
       visible: true,
       message: 'You are not logged in',
-      actionText: 'Login to sync your notes',
+      actionText: 'Login to sync your data.',
       onPress: () => {
         eSendEvent(eOpenLoginDialog);
       },
       data: {},
       icon: 'account-outline',
+      type:"normal"
     },
   });
 }
@@ -23,16 +28,25 @@ export function setEmailVerifyMessage(dispatch) {
     type: Actions.MESSAGE_BOARD_STATE,
     state: {
       visible: true,
-      message: 'Email not verified',
-      actionText: 'Please verify your email to sync notes',
+      message: 'Account not verified',
+      actionText: 'Please verify account to sync your data',
       onPress: () => {
-        // Handle this
-        //eSendEvent(eOpen)
+        eSendEvent(eOpenProgressDialog, {
+          title: 'Account not verified',
+          paragraph:
+            'We have sent you an account confirmation link. Please check your email to verify your account.',
+          action: () => {
+            eSendEvent(eCloseProgressDialog);
+          },
+          noProgress: true,
+        });
       },
       data: {},
-      icon: 'account-outline',
+      icon: 'alert',
+      type:"error"
     },
   });
+
 }
 
 export function clearMessage(dispatch) {

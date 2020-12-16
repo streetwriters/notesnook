@@ -12,6 +12,7 @@ export const Favorites = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   state.favorites.indexOf();
   const favorites = state.favorites;
+  const {loading} = state;
 
   let pageIsLoaded = false;
 
@@ -72,6 +73,7 @@ export const Favorites = ({route, navigation}) => {
       refreshCallback={() => {
         dispatch({type: Actions.FAVORITES});
       }}
+      loading={loading}
       placeholderData={{
         heading: 'Your Favorites',
         paragraph: 'You have not added any notes to favorites yet.',

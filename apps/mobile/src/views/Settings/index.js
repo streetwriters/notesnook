@@ -327,7 +327,7 @@ const CustomButton = ({
 
 const SettingsUserSection = () => {
   const [state] = useTracked();
-  const {colors, user} = state;
+  const {colors, user,messageBoardState} = state;
 
   const getTimeLeft = (t2) => {
     let d1 = new Date(Date.now());
@@ -338,185 +338,180 @@ const SettingsUserSection = () => {
     return diff < 0 ? 0 : diff;
   };
 
-  return user ? (
+  return (
     <>
-      <View
-        style={{
-          paddingHorizontal: 12,
+    {messageBoardState &&  <PressableButton
+        onPress={messageBoardState.onPress}
+        customStyle={{
+          paddingVertical: 12,
+          width: '100%',
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'flex-start',
+          paddingHorizontal: 6,
         }}>
         <View
           style={{
-            alignSelf: 'center',
-            width: '100%',
-            borderRadius: 5,
-            paddingVertical: 12,
+            width: 40,
+            backgroundColor:messageBoardState.type === "error"? colors.red: colors.accent,
+            height: 40,
+            marginLeft: 10,
+            borderRadius: 100,
+            alignItems: 'center',
+            justifyContent: 'center',
           }}>
+          <Icon size={SIZE.lg} color="white" name={messageBoardState.icon} />
+        </View>
+
+        <View
+          style={{
+            marginLeft: 10,
+          }}>
+          <Paragraph color={colors.icon} size={SIZE.xs}>
+           {messageBoardState.message}
+          </Paragraph>
+          <Paragraph color={messageBoardState.type === "error"? colors.red: colors.accent}>{messageBoardState.actionText}</Paragraph>
+        </View>
+
+        <View
+          style={{
+            width: 40,
+            height: 40,
+            justifyContent: 'center',
+            alignItems: 'center',
+            position: 'absolute',
+            right: 6,
+          }}>
+          <Icon name="chevron-right" color={messageBoardState.type === "error"? colors.red: colors.accent} size={SIZE.lg} />
+        </View>
+      </PressableButton>}
+
+      {user ? (
+        <>
           <View
             style={{
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              flexDirection: 'row',
+              paddingHorizontal: 12,
             }}>
             <View
               style={{
-                flexDirection: 'row',
-                justifyContent: 'center',
-                alignItems: 'center',
+                alignSelf: 'center',
+                width: '100%',
+                borderRadius: 5,
+                paddingVertical: 12,
               }}>
               <View
                 style={{
-                  borderWidth: 1,
-                  borderRadius: 100,
-                  borderColor: colors.accent,
-                  width: 20,
-                  height: 20,
+                  justifyContent: 'space-between',
                   alignItems: 'center',
-                  justifyContent: 'center',
+                  flexDirection: 'row',
                 }}>
-                <Icon
-                  size={SIZE.md}
-                  color={colors.accent}
-                  name="account-outline"
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}>
+                  <View
+                    style={{
+                      borderWidth: 1,
+                      borderRadius: 100,
+                      borderColor: colors.accent,
+                      width: 20,
+                      height: 20,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}>
+                    <Icon
+                      size={SIZE.md}
+                      color={colors.accent}
+                      name="account-outline"
+                    />
+                  </View>
+
+                  <Paragraph
+                    color={colors.heading}
+                    style={{
+                      marginLeft: 5,
+                    }}>
+                    {user?.email}
+                  </Paragraph>
+                </View>
+                <View
+                  style={{
+                    borderRadius: 5,
+                    padding: 5,
+                    paddingVertical: 2.5,
+                  }}>
+                  <Heading color={colors.accent} size={SIZE.sm}>
+                    {SUBSCRIPTION_STATUS_STRINGS[user.subscription.status]}
+                  </Heading>
+                </View>
+              </View>
+              <Seperator />
+              <View>
+                {user.subscription.status === 1 ? (
+                  <View>
+                    <Paragraph
+                      size={SIZE.lg}
+                      color={
+                        getTimeLeft(parseInt(user.subscription.expiry)) > 5
+                          ? colors.pri
+                          : colors.errorText
+                      }>
+                      {getTimeLeft(parseInt(user.subscription.expiry)) +
+                        ' Days Remaining'}{' '}
+                    </Paragraph>
+                    <Paragraph color={colors.icon} size={SIZE.sm}>
+                      Your trail period started on{' '}
+                      {new Date(
+                        user.subscription.start * 1000,
+                      ).toLocaleDateString()}
+                    </Paragraph>
+                  </View>
+                ) : null}
+
+                <Seperator />
+
+                <Button
+                  onPress={() => {
+                    eSendEvent(eOpenPremiumDialog);
+                  }}
+                  width="100%"
+                  fontSize={SIZE.md}
+                  title="Subscribe to Notesnook Pro"
+                  height={50}
+                  type="accent"
                 />
               </View>
-
-              <Paragraph
-                color={colors.heading}
-                style={{
-                  marginLeft: 5,
-                }}>
-                {user?.email}
-              </Paragraph>
-            </View>
-            <View
-              style={{
-                borderRadius: 5,
-                padding: 5,
-                paddingVertical: 2.5,
-              }}>
-              <Heading color={colors.accent} size={SIZE.sm}>
-                {SUBSCRIPTION_STATUS_STRINGS[user.subscription.status]}
-              </Heading>
             </View>
           </View>
-          <Seperator />
-          <View>
-            {user.subscription.status === 1 ? (
-              <View>
-                <Paragraph
-                  size={SIZE.lg}
-                  color={
-                    getTimeLeft(parseInt(user.subscription.expiry)) > 5
-                      ? colors.pri
-                      : colors.errorText
-                  }>
-                  {getTimeLeft(parseInt(user.subscription.expiry)) +
-                    ' Days Remaining'}{' '}
-                </Paragraph>
-                <Paragraph color={colors.icon} size={SIZE.sm}>
-                  Your trail period started on{' '}
-                  {new Date(
-                    user.subscription.start * 1000,
-                  ).toLocaleDateString()}
-                </Paragraph>
-              </View>
-            ) : null}
-
-            <Seperator />
-
-            <Button
-              onPress={() => {
-                eSendEvent(eOpenPremiumDialog);
-              }}
-              width="100%"
-              fontSize={SIZE.md}
-              title="Subscribe to Notesnook Pro"
-              height={50}
-              type="accent"
+          {[
+            {
+              name: 'Save Data Recovery Key',
+              func: async () => {
+                eSendEvent(eOpenRecoveryKeyDialog);
+              },
+              desc:
+                'Recover your data using the recovery key if your password is lost.',
+            },
+            {
+              name: 'Change Password',
+              func: async () => {
+                eSendEvent(eOpenLoginDialog, 3);
+              },
+              desc: 'Setup a new password for your account.',
+            },
+          ].map((item) => (
+            <CustomButton
+              key={item.name}
+              title={item.name}
+              onPress={item.func}
+              tagline={item.desc}
+              color={item.name === 'Logout' ? colors.errorText : colors.pri}
             />
-          </View>
-        </View>
-      </View>
-      {[
-        {
-          name: 'Save Data Recovery Key',
-          func: async () => {
-            eSendEvent(eOpenRecoveryKeyDialog);
-          },
-          desc:
-            'Recover your data using the recovery key if your password is lost.',
-        },
-        {
-          name: 'Change Password',
-          func: async () => {
-            eSendEvent(eOpenLoginDialog, 3);
-          },
-          desc: 'Setup a new password for your account.',
-        },
-      ].map((item) => (
-        <CustomButton
-          key={item.name}
-          title={item.name}
-          onPress={item.func}
-          tagline={item.desc}
-          color={item.name === 'Logout' ? colors.errorText : colors.pri}
-        />
-      ))}
-    </>
-  ) : (
-    <>
-      <View
-        style={{
-          paddingHorizontal: 0,
-        }}>
-        <PressableButton
-          onPress={() => {
-            eSendEvent(eOpenLoginDialog);
-          }}
-          customStyle={{
-            paddingVertical: 12,
-            width: '100%',
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'flex-start',
-            paddingHorizontal: 6,
-          }}>
-          <View
-            style={{
-              width: 40,
-              backgroundColor: colors.accent,
-              height: 40,
-              marginLeft: 10,
-              borderRadius: 100,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}>
-            <Icon size={SIZE.lg} color="white" name="account-outline" />
-          </View>
-
-          <View
-            style={{
-              marginLeft: 10,
-            }}>
-            <Paragraph color={colors.icon} size={SIZE.xs}>
-              You are not logged in
-            </Paragraph>
-            <Paragraph color={colors.accent}>Login to sync notes.</Paragraph>
-          </View>
-
-          <View
-            style={{
-              width: 40,
-              height: 40,
-              justifyContent: 'center',
-              alignItems: 'center',
-              position: 'absolute',
-              right: 6,
-            }}>
-            <Icon name="chevron-right" color={colors.accent} size={SIZE.lg} />
-          </View>
-        </PressableButton>
-      </View>
+          ))}
+        </>
+      ) : null}
     </>
   );
 };
