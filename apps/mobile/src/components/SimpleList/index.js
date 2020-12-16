@@ -91,7 +91,12 @@ const SimpleList = ({
         justifyContent: 'space-between',
         paddingHorizontal: 12,
         height: 35,
-        backgroundColor: index === 1 ? colors.shade : colors.nav,
+        backgroundColor:
+          index === 1
+            ? headerProps.color
+              ? colors[headerProps.color]
+              : colors.shade
+            : colors.nav,
         marginTop: index === 1 ? 0 : 5,
       }}>
       <TouchableWithoutFeedback
