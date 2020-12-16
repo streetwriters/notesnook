@@ -137,8 +137,8 @@ export const ActionSheetComponent = ({
 
     if (!nodispatch) {
       dispatch({type: type});
-      if (type === "note") {
-        eSendEvent(refreshNotesPage)
+      if (type === 'note') {
+        eSendEvent(refreshNotesPage);
       }
       dispatch({type: Actions.FAVORITES});
     }
@@ -241,7 +241,7 @@ export const ActionSheetComponent = ({
         dispatch({type: Actions.TRASH});
         dispatch({type: note.itemType});
         dispatch({type: Actions.FAVORITES});
-        eSendEvent(refreshNotesPage)
+        eSendEvent(refreshNotesPage);
         ToastEvent.show(
           item.type === 'note' ? 'Note restored' : 'Notebook restored',
           'success',
@@ -475,7 +475,7 @@ export const ActionSheetComponent = ({
         ToastEvent.show(e.message, 'error', 'local', 5000);
       }
     } finally {
-      dispatch({type: Actions.LAST_SYNC,lastSync: await db.lastSynced()});
+      dispatch({type: Actions.LAST_SYNC, lastSync: await db.lastSynced()});
       dispatch({type: Actions.ALL});
       setRefreshing(false);
     }
@@ -597,8 +597,8 @@ export const ActionSheetComponent = ({
                       style={{
                         borderRadius: 2.5,
                         backgroundColor: colors.accent,
-                        paddingHorizontal: ph / 1.5,
-                        paddingVertical: pv / 4,
+                        paddingHorizontal: 5,
+                        paddingVertical: 2,
                         marginRight: 5,
                         marginVertical: 2.5,
                       }}>
@@ -625,12 +625,12 @@ export const ActionSheetComponent = ({
               style={{
                 borderColor: colors.accent,
                 paddingHorizontal: 5,
-                borderRadius: 2,
+                borderRadius: 2.5,
                 justifyContent: 'center',
                 alignItems: 'center',
                 marginTop: 5,
                 borderWidth: 1,
-                height: 20,
+                height: 18,
               }}>
               <Paragraph
                 color={colors.accent}
