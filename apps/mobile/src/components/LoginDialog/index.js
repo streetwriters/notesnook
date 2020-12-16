@@ -1,40 +1,39 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {ActivityIndicator, Modal, TouchableOpacity, View} from 'react-native';
-import {TextInput} from 'react-native-gesture-handler';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import React, { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, Modal, TouchableOpacity, View } from 'react-native';
+import { TextInput } from 'react-native-gesture-handler';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {Button} from '../../components/Button';
+import { Button } from '../../components/Button';
 import Seperator from '../../components/Seperator';
-import {Toast} from '../../components/Toast';
-import {Actions} from '../../provider/Actions';
-import {useTracked} from '../../provider/index';
-import {DDS} from '../../services/DeviceDetection';
+import { Toast } from '../../components/Toast';
+import { Actions } from '../../provider/Actions';
+import { useTracked } from '../../provider/index';
+import { DDS } from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-  ToastEvent,
+  ToastEvent
 } from '../../services/EventManager';
-import {clearMessage} from '../../services/Message';
+import { clearMessage } from '../../services/Message';
 import {
   validateEmail,
-  validatePass,
-  validateUsername,
+  validatePass
 } from '../../services/Validation';
-import {getElevation} from '../../utils';
-import {db} from '../../utils/DB';
+import { getElevation } from '../../utils';
+import { db } from '../../utils/DB';
 import {
   eOpenLoginDialog,
   eOpenRecoveryKeyDialog,
   eStartSyncer,
-  refreshNotesPage,
+  refreshNotesPage
 } from '../../utils/Events';
-import {SIZE, WEIGHT} from '../../utils/SizeUtils';
-import {sleep} from '../../utils/TimeUtils';
-import {ActionIcon} from '../ActionIcon';
+import { SIZE, WEIGHT } from '../../utils/SizeUtils';
+import { sleep } from '../../utils/TimeUtils';
+import { ActionIcon } from '../ActionIcon';
 import BaseDialog from '../Dialog/base-dialog';
 import DialogContainer from '../Dialog/dialog-container';
-import {ListHeaderComponent} from '../SimpleList/ListHeaderComponent';
+import { ListHeaderComponent } from '../SimpleList/ListHeaderComponent';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
@@ -103,7 +102,7 @@ const LoginDialog = () => {
     {
       headerButton: 'Forgot Password',
       headerButtonFunc: () => {
-        setMode(MODES.signup);
+        setMode(MODES.login);
       },
       button: 'Send Recovery Email',
       buttonFunc: sendEmail,
@@ -188,12 +187,12 @@ const LoginDialog = () => {
     }
 
     try {
-      let user = await db.user.getUser()
+      let user = await db.user.getUser();
       if (!user) throw new Error('Email or passoword incorrect!');
       setStatus('Syncing Data');
       dispatch({type: Actions.USER, user: user});
       await db.sync();
-      dispatch({type: Actions.LAST_SYNC,lastSync: await db.lastSynced()});
+      dispatch({type: Actions.LAST_SYNC, lastSync: await db.lastSynced()});
       eSendEvent(eStartSyncer);
       dispatch({type: Actions.ALL});
       eSendEvent(refreshNotesPage);
@@ -258,10 +257,10 @@ const LoginDialog = () => {
 
     let user;
     try {
-      user = await db.user.getUser()
+      user = await db.user.getUser();
       setStatus('Setting up crenditials');
       dispatch({type: Actions.USER, user: user});
-      dispatch({type: Actions.LAST_SYNC,lastSync: await db.lastSynced()});
+      dispatch({type: Actions.LAST_SYNC, lastSync: await db.lastSynced()});
       eSendEvent(eStartSyncer);
       clearMessage(dispatch);
       close();
@@ -495,81 +494,91 @@ const LoginDialog = () => {
                 ) : null}
               </>
             )} */}
-            <Seperator />
 
-            {mode !== MODES.signup && mode !== MODES.login ? null : (
+            {mode === MODES.changePassword ? null : (
               <>
-                <TextInput
-                  ref={_email}
-                  onFocus={() => {
-                    if (!invalidEmail) {
-                      _email.current.setNativeProps({
-                        style: {
-                          borderColor: colors.accent,
-                        },
-                      });
-                    }
-                  }}
-                  editable={!loggingIn || !signingIn}
-                  autoCapitalize="none"
-                  defaultValue={email}
-                  onBlur={() => {
-                    if (!validateEmail(email) && email?.length > 0) {
-                      setInvalidEmail(true);
-                      _email.current?.setNativeProps({
-                        style: {
-                          color: colors.errorText,
-                          borderColor: colors.errorText,
-                        },
-                      });
-                    } else {
-                      setInvalidEmail(false);
-                      _email.current?.setNativeProps({
-                        style: {
-                          borderColor: colors.nav,
-                        },
-                      });
-                    }
-                  }}
-                  textContentType="emailAddress"
-                  onChangeText={(value) => {
-                    setEmail(value);
-                    if (invalidEmail && validateEmail(email)) {
-                      setInvalidEmail(false);
-                      _email.current.setNativeProps({
-                        style: {
-                          color: colors.pri,
-                          borderColor: colors.accent,
-                        },
-                      });
-                    }
-                  }}
-                  blurOnSubmit={false}
-                  onSubmitEditing={() => {
-                    if (!validateEmail(email)) {
-                      setInvalidEmail(true);
-                      _email.current.setNativeProps({
-                        style: {
-                          color: colors.errorText,
-                        },
-                      });
-                    }
-                    if (mode === MODES.signup) {
-                      _pass.current?.focus();
-                    }
-                  }}
+                <View
                   style={{
-                    paddingHorizontal: 0,
-                    height: 50,
                     borderBottomWidth: 1,
                     borderColor: colors.nav,
-                    fontSize: SIZE.md,
-                    fontFamily: WEIGHT.regular,
-                    color: colors.pri,
-                  }}
-                  placeholder="Email"
-                  placeholderTextColor={colors.icon}
-                />
+                    paddingHorizontal: 0,
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'flex-end',
+                    height: 50,
+                  }}>
+                  <TextInput
+                    ref={_email}
+                    onFocus={() => {
+                      if (!invalidEmail) {
+                        _email.current.setNativeProps({
+                          style: {
+                            borderColor: colors.accent,
+                          },
+                        });
+                      }
+                    }}
+                    editable={!loggingIn || !signingIn}
+                    autoCapitalize="none"
+                    defaultValue={email}
+                    onBlur={() => {
+                      if (!validateEmail(email) && email?.length > 0) {
+                        setInvalidEmail(true);
+                        _email.current?.setNativeProps({
+                          style: {
+                            color: colors.errorText,
+                            borderColor: colors.errorText,
+                          },
+                        });
+                      } else {
+                        setInvalidEmail(false);
+                        _email.current?.setNativeProps({
+                          style: {
+                            borderColor: colors.nav,
+                          },
+                        });
+                      }
+                    }}
+                    textContentType="emailAddress"
+                    onChangeText={(value) => {
+                      setEmail(value);
+                      if (invalidEmail && validateEmail(email)) {
+                        setInvalidEmail(false);
+                        _email.current.setNativeProps({
+                          style: {
+                            color: colors.pri,
+                            borderColor: colors.accent,
+                          },
+                        });
+                      }
+                    }}
+                    blurOnSubmit={false}
+                    onSubmitEditing={() => {
+                      if (!validateEmail(email)) {
+                        setInvalidEmail(true);
+                        _email.current.setNativeProps({
+                          style: {
+                            color: colors.errorText,
+                          },
+                        });
+                      }
+                      if (mode === MODES.signup) {
+                        _pass.current?.focus();
+                      }
+                    }}
+                    style={{
+                      paddingHorizontal: 0,
+                      fontSize: SIZE.md,
+                      fontFamily: WEIGHT.regular,
+                      color: colors.pri,
+                      width: '100%',
+                      paddingVertical: 0,
+                      paddingBottom: 2.5,
+                    }}
+                    placeholder="Email"
+                    placeholderTextColor={colors.icon}
+                  />
+                </View>
 
                 {invalidEmail ? (
                   <Paragraph
@@ -578,6 +587,8 @@ const LoginDialog = () => {
                       textAlign: 'right',
                       textAlignVertical: 'bottom',
                       marginTop: 2.5,
+                      paddingVertical: 0,
+                      paddingBottom: 2.5,
                     }}>
                     <Icon
                       name="alert-circle-outline"
@@ -602,6 +613,7 @@ const LoginDialog = () => {
                     flexDirection: 'row',
                     justifyContent: 'space-between',
                     alignItems: 'center',
+                    height: 50,
                   }}>
                   <TextInput
                     ref={_oPass}
@@ -618,12 +630,13 @@ const LoginDialog = () => {
                     }}
                     style={{
                       paddingHorizontal: 0,
-                      height: 50,
                       fontSize: SIZE.md,
                       fontFamily: WEIGHT.regular,
                       width: '85%',
                       maxWidth: '85%',
                       color: colors.pri,
+                      paddingVertical: 0,
+                      paddingBottom: 2.5,
                     }}
                     secureTextEntry={secureEntry}
                     placeholder="Current Password"
@@ -638,6 +651,7 @@ const LoginDialog = () => {
                     }}
                     style={{
                       width: 25,
+                      paddingBottom: 2.5,
                     }}
                     color={secureEntry ? colors.icon : colors.accent}
                   />
@@ -674,7 +688,8 @@ const LoginDialog = () => {
                     paddingHorizontal: 0,
                     flexDirection: 'row',
                     justifyContent: 'space-between',
-                    alignItems: 'center',
+                    alignItems: 'flex-end',
+                    height: 50,
                   }}>
                   <TextInput
                     ref={_pass}
@@ -744,12 +759,13 @@ const LoginDialog = () => {
                     blurOnSubmit={false}
                     style={{
                       paddingHorizontal: 0,
-                      height: 50,
                       fontSize: SIZE.md,
                       fontFamily: WEIGHT.regular,
                       width: '85%',
                       maxWidth: '85%',
                       color: colors.pri,
+                      paddingVertical: 0,
+                      paddingBottom: 2.5,
                     }}
                     secureTextEntry={secureEntry}
                     placeholder="Password (6+ characters)"
@@ -764,6 +780,7 @@ const LoginDialog = () => {
                     }}
                     style={{
                       width: 25,
+                      paddingBottom: 2.5,
                     }}
                     color={secureEntry ? colors.icon : colors.accent}
                   />
@@ -805,68 +822,77 @@ const LoginDialog = () => {
 
             {mode !== MODES.signup && mode !== MODES.changePassword ? null : (
               <>
-                <TextInput
-                  ref={_passConfirm}
-                  editable={
-                    !loggingIn || !signingIn || (password && !invalidPassword)
-                      ? true
-                      : false
-                  }
-                  defaultValue={passwordReEnter}
-                  autoCapitalize="none"
-                  onChangeText={(value) => {
-                    setPasswordReEnter(value);
-                    if (value !== password) {
-                      setConfirmPassword(false);
-                      _passConfirm.current.setNativeProps({
-                        style: {
-                          borderColor: colors.errorText,
-                        },
-                      });
-                      _pass.current.setNativeProps({
-                        style: {
-                          borderColor: colors.errorText,
-                        },
-                      });
-                    } else {
-                      setConfirmPassword(true);
-                      _passConfirm.current.setNativeProps({
-                        style: {
-                          borderColor: colors.accent,
-                        },
-                      });
-                      _pass.current.setNativeProps({
-                        style: {
-                          borderColor: colors.accent,
-                        },
-                      });
-                    }
-                  }}
-                  onFocus={() => {
-                    _passConfirm.current.setNativeProps({
-                      style: {
-                        borderColor: colors.accent,
-                      },
-                    });
-                  }}
-                  onSubmitEditing={() => {
-                    current.buttonFunc();
-                  }}
-                  blurOnSubmit
+                <View
                   style={{
-                    paddingHorizontal: 0,
                     borderBottomWidth: 1,
-                    height: 50,
                     borderColor: colors.nav,
-                    fontSize: SIZE.md,
-                    fontFamily: WEIGHT.regular,
-                    color: colors.pri,
-                  }}
-                  secureTextEntry={secureEntry}
-                  placeholder="Confirm Password"
-                  placeholderTextColor={colors.icon}
-                />
-
+                    paddingHorizontal: 0,
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'flex-end',
+                    height: 50,
+                  }}>
+                  <TextInput
+                    ref={_passConfirm}
+                    editable={
+                      !loggingIn || !signingIn || (password && !invalidPassword)
+                        ? true
+                        : false
+                    }
+                    defaultValue={passwordReEnter}
+                    autoCapitalize="none"
+                    onChangeText={(value) => {
+                      setPasswordReEnter(value);
+                      if (value !== password) {
+                        setConfirmPassword(false);
+                        _passConfirm.current.setNativeProps({
+                          style: {
+                            borderColor: colors.errorText,
+                          },
+                        });
+                        _pass.current.setNativeProps({
+                          style: {
+                            borderColor: colors.errorText,
+                          },
+                        });
+                      } else {
+                        setConfirmPassword(true);
+                        _passConfirm.current.setNativeProps({
+                          style: {
+                            borderColor: colors.accent,
+                          },
+                        });
+                        _pass.current.setNativeProps({
+                          style: {
+                            borderColor: colors.accent,
+                          },
+                        });
+                      }
+                    }}
+                    onFocus={() => {
+                      _passConfirm.current.setNativeProps({
+                        style: {
+                          borderColor: colors.accent,
+                        },
+                      });
+                    }}
+                    onSubmitEditing={() => {
+                      current.buttonFunc();
+                    }}
+                    blurOnSubmit
+                    style={{
+                      paddingHorizontal: 0,
+                      fontSize: SIZE.md,
+                      fontFamily: WEIGHT.regular,
+                      color: colors.pri,
+                      paddingVertical: 0,
+                      paddingBottom: 2.5,
+                    }}
+                    secureTextEntry={secureEntry}
+                    placeholder="Confirm Password"
+                    placeholderTextColor={colors.icon}
+                  />
+                </View>
                 {password && !invalidPassword && !confirmPassword ? (
                   <Paragraph
                     size={SIZE.xs}
