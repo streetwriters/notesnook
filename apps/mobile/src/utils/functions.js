@@ -5,7 +5,6 @@ import {eSendEvent, ToastEvent} from '../services/EventManager';
 import {db} from './DB';
 import {eClearEditor, eOnNewTopicAdded, eOpenPremiumDialog} from './Events';
 
-
 export async function deleteItems(item) {
   if (item && item.dateCreated && history.selectedItemsList.length === 0) {
     history.selectedItemsList = [];
@@ -46,7 +45,6 @@ export async function deleteItems(item) {
           let it = itemsCopy[i];
           let trashItem = trash.all.find((item) => item.itemId === it.id);
           await db.trash.restore(trashItem.id);
-         s
           updateEvent({type: it.type});
         }
         updateEvent({type: Actions.TRASH});
