@@ -92,7 +92,7 @@ class Database {
     }
 
     if (!user || !user.accessToken) {
-      user = await this.user.get();
+      user = await this.user.getUser();
     }
     if (!user) return;
 

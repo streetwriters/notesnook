@@ -37,7 +37,6 @@ async function handleResponse(response) {
     if (response.ok) {
       return json;
     }
-
     let error = json.error || json.errors.join("\n");
     throw new Error(error);
   } else {
@@ -53,7 +52,7 @@ async function request(url, token, method) {
   return handleResponse(
     await fetch(url, {
       method,
-      headers: { Authorization: token ? "Bearer " + token : undefined },
+      headers: getAuthorizationHeader(token),
     })
   );
 }
@@ -64,13 +63,17 @@ async function bodyRequest(url, data, json = true, token, method) {
       method,
       body: transformer(data, json),
       headers: {
-        Authorization: token ? "Bearer " + token : undefined,
+        ...getAuthorizationHeader(token),
         "Content-Type": json
           ? "application/json"
           : "application/x-www-form-urlencoded",
       },
     })
   );
+}
+
+function getAuthorizationHeader(token) {
+  return token ? { Authorization: "Bearer " + token } : {};
 }
 
 export default {

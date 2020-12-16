@@ -49,7 +49,7 @@ export default class Sync {
 
   async _fetch(lastSynced, token) {
     return await http.get(
-      `${Constants.AUTH_HOST}/sync?lst=${lastSynced}`,
+      `${Constants.API_HOST}/sync?lst=${lastSynced}`,
       token
     );
   }
