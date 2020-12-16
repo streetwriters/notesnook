@@ -9,6 +9,7 @@ import {eSendEvent, ToastEvent} from '../../services/EventManager';
 import {db} from '../../utils/DB';
 import {eOpenMoveNoteDialog, eOpenSimpleDialog} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
+import {sleep} from '../../utils/TimeUtils';
 import {ActionIcon} from '../ActionIcon';
 import {TEMPLATE_DELETE} from '../DialogManager/Templates';
 import Heading from '../Typography/Heading';
@@ -101,9 +102,9 @@ export const SelectionHeader = () => {
         }}>
         {currentScreen === 'trash' || currentScreen === 'notebooks' ? null : (
           <ActionIcon
-            onPress={() => {
+            onPress={async () => {
               dispatch({type: Actions.SELECTION_MODE, enabled: false});
-              dispatch({type: Actions.CLEAR_SELECTION});
+              await sleep(100);
               eSendEvent(eOpenMoveNoteDialog);
             }}
             customStyle={{

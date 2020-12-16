@@ -137,6 +137,43 @@ const IntComponent = ({close, note, setNote}) => {
     newTopicTitle = null;
   };
 
+  const handlePress = async () => {
+    if (
+      note?.notebooks?.findIndex(
+        (o) =>
+          o.topics.findIndex((i) => {
+            return i === item.id;
+          }) > -1,
+      ) > -1
+    ) {
+      await db.notebooks
+        .notebook(item.notebookId)
+        .topics.topic(item.id)
+        .delete(note.id);
+
+      if (note && note.id) {
+        setNote({...db.notes.note(note.id).data});
+      }
+      dispatch({type: Actions.NOTEBOOKS});
+      return;
+    }
+
+    let noteIds = [];
+    selectedItemsList.forEach((i) => noteIds.push(i.id));
+    console.log(noteIds, 'NOTE IDS');
+    await db.notes.move(
+      {
+        topic: item.id,
+        id: item.notebookId,
+      },
+      ...noteIds,
+    );
+    if (note && note.id) {
+      setNote({...db.notes.note(note.id).data});
+    }
+    dispatch({type: Actions.NOTEBOOKS});
+  };
+
   return (
     <>
       <View>
@@ -361,42 +398,7 @@ const IntComponent = ({close, note, setNote}) => {
                   }
                   renderItem={({item, index}) => (
                     <PressableButton
-                      onPress={async () => {
-                        if (
-                          note?.notebooks?.findIndex(
-                            (o) =>
-                              o.topics.findIndex((i) => {
-                                return i === item.id;
-                              }) > -1,
-                          ) > -1
-                        ) {
-                          await db.notebooks
-                            .notebook(item.notebookId)
-                            .topics.topic(item.id)
-                            .delete(note.id);
-
-                          if (note && note.id) {
-                            setNote({...db.notes.note(note.id).data});
-                          }
-                          dispatch({type: Actions.NOTEBOOKS});
-                          return;
-                        }
-
-                        let noteIds = [];
-                        selectedItemsList.forEach((i) => noteIds.push(i.id));
-                        await db.notes.move(
-                          {
-                            topic: item.id,
-                            id: item.notebookId,
-                          },
-                          ...noteIds,
-                        );
-                        console.log(item.id, item.notebookId);
-                        if (note && note.id) {
-                          setNote({...db.notes.note(note.id).data});
-                        }
-                        dispatch({type: Actions.NOTEBOOKS});
-                      }}
+                      onPress={handlePress}
                       type="gray"
                       customStyle={{
                         height: 50,
