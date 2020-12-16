@@ -1,11 +1,11 @@
 import React from 'react';
-import { TouchableOpacity, View } from 'react-native';
-import { notesnook } from '../../../e2e/test.ids';
-import { useTracked } from '../../provider';
+import {TouchableOpacity, View} from 'react-native';
+import {notesnook} from '../../../e2e/test.ids';
+import {useTracked} from '../../provider';
 import Navigation from '../../services/Navigation';
-import { ph, pv, SIZE, WEIGHT } from '../../utils/SizeUtils';
-import { ActionIcon } from '../ActionIcon';
-import { ActionSheetEvent } from '../DialogManager/recievers';
+import {ph, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
+import {ActionIcon} from '../ActionIcon';
+import {ActionSheetEvent} from '../DialogManager/recievers';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
@@ -106,8 +106,8 @@ export const NotebookItem = ({
                   style={{
                     borderRadius: 2.5,
                     backgroundColor: colors.accent,
-                    paddingHorizontal: ph / 1.5,
-                    paddingVertical: pv / 3,
+                    paddingHorizontal: 5,
+                    paddingVertical: 2,
                     marginRight: 5,
                     marginVertical: 2.5,
                   }}>
@@ -141,7 +141,7 @@ export const NotebookItem = ({
             flexDirection: 'row',
             justifyContent: 'flex-start',
             alignItems: 'center',
-            marginTop: 5,
+            marginTop: 2.5,
           }}>
           {isTrash ? (
             <>
@@ -150,19 +150,19 @@ export const NotebookItem = ({
                 size={SIZE.xs}
                 style={{
                   textAlignVertical: 'center',
+                  marginRight: 10,
                 }}>
                 {'Deleted on ' +
                   new Date(item.dateDeleted).toISOString().slice(0, 10)}
-                {'   '}
               </Paragraph>
               <Paragraph
                 color={colors.accent}
                 size={SIZE.xs}
                 style={{
                   textAlignVertical: 'center',
+                  marginRight: 10,
                 }}>
                 {item.itemType[0].toUpperCase() + item.itemType.slice(1)}
-                {'   '}
               </Paragraph>
             </>
           ) : null}
@@ -171,17 +171,16 @@ export const NotebookItem = ({
               color={colors.icon}
               size={SIZE.xs}
               style={{
-                textAlignVertical: 'center',
+                marginRight: 10,
               }}>
               {new Date(item.dateCreated).toDateString().substring(4)}
-              {'   '}
             </Paragraph>
           )}
           <Paragraph
             color={colors.icon}
             size={SIZE.xs}
             style={{
-              textAlignVertical: 'center',
+              marginRight: 10,
               fontFamily: WEIGHT.regular,
             }}>
             {item && item.totalNotes && item.totalNotes > 1

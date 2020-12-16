@@ -1,13 +1,13 @@
 import React from 'react';
-import { TouchableOpacity, View } from 'react-native';
+import {TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { notesnook } from '../../../e2e/test.ids';
-import { COLORS_NOTE } from '../../utils/Colors';
-import { db } from '../../utils/DB';
-import { SIZE } from '../../utils/SizeUtils';
-import { ActionIcon } from '../ActionIcon';
-import { ActionSheetEvent } from '../DialogManager/recievers';
-import { TimeSince } from '../Menu/TimeSince';
+import {notesnook} from '../../../e2e/test.ids';
+import {COLORS_NOTE} from '../../utils/Colors';
+import {db} from '../../utils/DB';
+import {SIZE} from '../../utils/SizeUtils';
+import {ActionIcon} from '../ActionIcon';
+import {ActionSheetEvent} from '../DialogManager/recievers';
+import {TimeSince} from '../Menu/TimeSince';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
@@ -78,8 +78,8 @@ export default class NoteItem extends React.Component {
             paddingRight: 6,
             alignSelf: 'center',
             borderBottomWidth: 1,
-            height: 100,
             borderBottomColor: colors.nav,
+            height: 100,
           },
           customStyle ? customStyle : {},
         ]}>
@@ -95,7 +95,7 @@ export default class NoteItem extends React.Component {
               }}>
               <TouchableOpacity
                 activeOpacity={1}
-              /*   onPress={() => {
+                /*   onPress={() => {
                   let notebook = db.notebooks.notebook(item.notebooks[0].id).data;
                   updateEvent({
                     type: Actions.HEADER_TEXT_STATE,
@@ -130,7 +130,10 @@ export default class NoteItem extends React.Component {
                 <Heading
                   size={SIZE.xs}
                   color={item.color ? COLORS_NOTE[item.color] : colors.accent}>
-                  {db.notebooks.notebook(item.notebooks[0].id).title + " "} {item.notebooks.length > 1? "& " + (item.notebooks.length - 1) + " others" : ""}
+                  {db.notebooks.notebook(item.notebooks[0].id).title + ' '}{' '}
+                  {item.notebooks.length > 1
+                    ? '& ' + (item.notebooks.length - 1) + ' others'
+                    : ''}
                 </Heading>
               </TouchableOpacity>
             </View>
@@ -159,6 +162,14 @@ export default class NoteItem extends React.Component {
             }}>
             {!isTrash ? (
               <>
+                <TimeSince
+                  style={{fontSize: SIZE.xs, color: colors.icon,marginRight:10}}
+                  time={item.dateCreated}
+                  updateFrequency={
+                    Date.now() - item.dateCreated < 60000 ? 2000 : 60000
+                  }
+                />
+
                 {item.color && (
                   <View
                     key={item}
@@ -177,7 +188,10 @@ export default class NoteItem extends React.Component {
                   <Icon
                     style={{marginRight: 10}}
                     name="lock"
-                    size={SIZE.xs}
+                    size={SIZE.sm}
+                    style={{
+                      marginRight: 10,
+                    }}
                     color={colors.icon}
                   />
                 ) : null}
@@ -187,17 +201,13 @@ export default class NoteItem extends React.Component {
                     style={{marginRight: 10}}
                     name="star"
                     size={SIZE.md}
+                    style={{
+                      marginBottom: 2,
+                      marginRight: 10,
+                    }}
                     color="orange"
                   />
                 ) : null}
-
-                <TimeSince
-                  style={{fontSize: SIZE.xs, color: colors.icon}}
-                  time={item.dateCreated}
-                  updateFrequency={
-                    Date.now() - item.dateCreated < 60000 ? 2000 : 60000
-                  }
-                />
               </>
             ) : null}
 
@@ -207,43 +217,22 @@ export default class NoteItem extends React.Component {
                   color={colors.icon}
                   size={SIZE.xs}
                   style={{
-                    textAlignVertical: 'center',
+                    marginRight: 10,
                   }}>
-                  {item.itemType[0].toUpperCase() +
-                    item.itemType.slice(1) +
-                    '  '}
+                  {item.itemType[0].toUpperCase() + item.itemType.slice(1)}
                 </Paragraph>
                 <Paragraph
                   color={colors.icon}
                   size={SIZE.xs}
                   style={{
-                    textAlignVertical: 'center',
+                    marginRight: 10,
                   }}>
                   Deleted on{' '}
                   {item && item.dateDeleted
                     ? new Date(item.dateDeleted).toISOString().slice(0, 10)
-                    : null + '   '}
+                    : null}
                 </Paragraph>
               </>
-            ) : null}
-
-            {item.conflicted ? (
-              <View
-                style={{
-                  backgroundColor: colors.errorText,
-                  borderRadius: 2.5,
-                  paddingHorizontal: 4,
-                  position: 'absolute',
-                  right: 20,
-                }}>
-                <Paragraph
-                  size={SIZE.xs}
-                  style={{
-                    color: 'white',
-                  }}>
-                  CONFLICTS
-                </Paragraph>
-              </View>
             ) : null}
           </View>
         </View>
