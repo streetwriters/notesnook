@@ -1,14 +1,14 @@
-import React, { Component } from 'react';
-import { Platform } from 'react-native';
-import { DDS } from '../../services/DeviceDetection';
+import React, {Component} from 'react';
+import {Platform} from 'react-native';
+import {DDS} from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-  openVault
+  openVault,
 } from '../../services/EventManager';
-import { dWidth } from '../../utils';
-import { hexToRGBA } from '../../utils/ColorUtils';
+import {dWidth} from '../../utils';
+import {hexToRGBA} from '../../utils/ColorUtils';
 import {
   eCloseActionSheet,
   eCloseAddNotebookDialog,
@@ -25,14 +25,14 @@ import {
   eOpenLoginDialog,
   eOpenMoveNoteDialog,
   eOpenPremiumDialog,
-  eOpenSimpleDialog
+  eOpenSimpleDialog,
 } from '../../utils/Events';
 import ActionSheet from '../ActionSheet';
-import { ActionSheetComponent } from '../ActionSheetComponent';
-import { GetPremium, translatePrem } from '../ActionSheetComponent/GetPremium';
-import { AddNotebookDialog } from '../AddNotebookDialog';
-import { AddTopicDialog } from '../AddTopicDialog';
-import { Dialog } from '../Dialog';
+import {ActionSheetComponent} from '../ActionSheetComponent';
+import {GetPremium, translatePrem} from '../ActionSheetComponent/GetPremium';
+import {AddNotebookDialog} from '../AddNotebookDialog';
+import {AddTopicDialog} from '../AddTopicDialog';
+import {Dialog} from '../Dialog';
 import ExportDialog from '../ExportDialog';
 import JumpToDialog from '../JumpToDialog';
 import LoginDialog from '../LoginDialog';
@@ -46,8 +46,8 @@ import RecoveryKeyDialog from '../RecoveryKeyDialog';
 import RestoreDialog from '../RestoreDialog';
 import ResultDialog from '../ResultDialog';
 import SortDialog from '../SortDialog';
-import { VaultDialog } from '../VaultDialog';
-import { TEMPLATE_DELETE, TEMPLATE_PERMANANT_DELETE } from './Templates';
+import {VaultDialog} from '../VaultDialog';
+import {TEMPLATE_DELETE, TEMPLATE_PERMANANT_DELETE} from './Templates';
 
 export class DialogManager extends Component {
   constructor(props) {
@@ -120,13 +120,11 @@ export class DialogManager extends Component {
   };
 
   showAddTopic = (notebook) => {
-    console.log(this.state.item);
     if (notebook) {
       this.setState({
         item: notebook,
       });
     }
-
     this.addTopicsDialog.open();
   };
 
@@ -383,7 +381,7 @@ export class DialogManager extends Component {
         <AddTopicDialog
           ref={(ref) => (this.addTopicsDialog = ref)}
           toEdit={item?.type === 'topic' ? item : null}
-          notebookID={item?.notebookId}
+          notebookID={item?.type !== 'topic' ? item.id : item.notebookId}
           colors={colors}
         />
         <AddNotebookDialog
