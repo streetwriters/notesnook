@@ -85,19 +85,15 @@ class Database {
     await this.user.fetchUser();
   }
 
-  async _onUserStateChanged(user) {
+  async _onUserStateChanged() {
     if (!NNEventSource) return;
     if (this.evtSource) {
       this.evtSource.close();
     }
 
-    if (!user || !user.accessToken) {
-      user = await this.user.getUser();
-    }
-    if (!user) return;
-
+    let token = await this.user.tokenManager.getAccessToken();
     this.evtSource = new NNEventSource(`${Constants.SSE_HOST}/sse`, {
-      headers: { Authorization: `Bearer ${user.accessToken}` },
+      headers: { Authorization: `Bearer ${token}` },
     });
 
     this.evtSource.onopen = function () {
