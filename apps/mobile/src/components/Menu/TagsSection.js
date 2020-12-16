@@ -69,7 +69,6 @@ export const TagsSection = () => {
       });
       eSendEvent(refreshNotesPage, params);
     }
-
     Navigation.closeDrawer();
   };
 
@@ -89,8 +88,8 @@ export const TagsSection = () => {
         ListEmptyComponent={
           <View
             style={{
-              width: '100%',
-              height: '100%',
+              flexGrow: 1,
+              minHeight:"40%",
               justifyContent: 'center',
               alignItems: 'center',
               paddingHorizontal: '10%',
@@ -102,7 +101,7 @@ export const TagsSection = () => {
               style={{textAlign: 'center'}}
               color={colors.icon}
               size={SIZE.xs}>
-              You have not pinned anything yet. You can pin topics and tags
+              You have not pinned anything yet. You can pin notebooks, topics and tags
               here.
             </Paragraph>
           </View>
@@ -156,7 +155,7 @@ const PinItem = ({item, index, onPress}) => {
               negativeTitle="Cancel"
               onPressNegative={() => setVisible(false)}
               onPressPositive={async () => {
-                await db.settings.unpin(note.id);
+                await db.settings.unpin(item.id);
                 dispatch({type: Actions.MENU_PINS});
               }}
             />
