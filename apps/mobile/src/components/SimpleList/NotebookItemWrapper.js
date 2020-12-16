@@ -1,5 +1,5 @@
 import React, {useMemo} from 'react';
-import { notesnook } from '../../../e2e/test.ids';
+import {notesnook} from '../../../e2e/test.ids';
 import {NotebookItem} from '../../components/NotebookItem';
 import SelectionWrapper from '../../components/SelectionWrapper';
 import {useTracked} from '../../provider';
@@ -21,6 +21,7 @@ export const NotebookItemWrapper = ({
   }, [selectionMode]);
 
   const onLongPress = () => {
+    if (item.title === 'General') return;
     if (!selectionMode) {
       dispatch({
         type: Actions.SELECTION_MODE,
@@ -36,7 +37,8 @@ export const NotebookItemWrapper = ({
 
   const onPress = () => {
     if (selectionMode) {
-      onLongPress();
+      console.log(item.title);
+        onLongPress();
       return;
     }
     let routeName = isTopic ? 'NotesPage' : 'Notebook';
@@ -58,7 +60,11 @@ export const NotebookItemWrapper = ({
     <SelectionWrapper
       onLongPress={onLongPress}
       pinned={pinned}
-      testID={isTopic? notesnook.ids.topic.get(index) : notesnook.ids.notebook.get(index)}
+      testID={
+        isTopic
+          ? notesnook.ids.topic.get(index)
+          : notesnook.ids.notebook.get(index)
+      }
       index={index}
       onPress={onPress}
       item={item}>
