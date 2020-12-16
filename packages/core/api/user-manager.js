@@ -9,6 +9,7 @@ const ENDPOINTS = {
   user: "/users",
   deleteUser: "/users/delete",
   patchUser: "/account",
+  verifyUser: "/account/verify",
   revoke: "/connect/revocation",
 };
 
@@ -138,6 +139,16 @@ class UserManager {
       await this._db.sync(false, true);
     });
     return true;
+  }
+
+  async sendVerificationEmail() {
+    let token = await this.tokenManager.getAccessToken();
+    if (!token) return;
+    await http.post(
+      `${constants.AUTH_HOST}${ENDPOINTS.verifyUser}`,
+      null,
+      token
+    );
   }
 }
 
