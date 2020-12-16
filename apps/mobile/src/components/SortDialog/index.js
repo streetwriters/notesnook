@@ -7,8 +7,8 @@ import {defaultState} from '../../provider/DefaultState';
 import {DDS} from '../../services/DeviceDetection';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
 import SettingsService from '../../services/SettingsService';
-import {dWidth, SORT, sortSettings} from '../../utils';
-import { hexToRGBA } from '../../utils/ColorUtils';
+import {dWidth, getElevation, SORT, sortSettings} from '../../utils';
+import {hexToRGBA} from '../../utils/ColorUtils';
 import {eCloseSortDialog, eOpenSortDialog} from '../../utils/Events';
 import {MMKV} from '../../utils/mmkv';
 import {SIZE} from '../../utils/SizeUtils';
@@ -18,7 +18,6 @@ import {updateEvent} from '../DialogManager/recievers';
 import {PressableButton} from '../PressableButton';
 import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
-import Paragraph from '../Typography/Paragraph';
 
 const actionSheet = createRef();
 
@@ -139,17 +138,24 @@ class SortDialog extends React.Component {
                 style={{
                   flexDirection: 'row',
                   alignItems: 'center',
+                  backgroundColor: colors.accent,
+                  borderRadius: 100,
+                  paddingHorizontal: 8,
+                  height: 22,
+                  ...getElevation(2),
                 }}>
-                <Paragraph
+                <Heading
+                  size={SIZE.sm}
                   style={{
                     marginRight: 5,
+                    color: 'white',
                   }}>
                   {this.state.settings.sortOrder === 'asc'
                     ? 'Ascending'
                     : 'Descending'}
-                </Paragraph>
+                </Heading>
                 <Icon
-                  color={colors.pri}
+                  color="white"
                   name={
                     this.state.settings.sortOrder === 'asc'
                       ? 'sort-ascending'
@@ -171,26 +177,36 @@ class SortDialog extends React.Component {
                   sortSettings.sort = item;
                   updateEvent({type: Actions.NOTES});
                 }}
-                selectedColor={
-                  this.state.settings.sort === item ? colors.accent : colors.nav
-                }
-                alpha={!colors.night ? -0.02 : 0.02}
-                opacity={this.state.settings.sort === item ? 0.12 : 1}
+                type="transparent"
                 customStyle={{
                   width: '100%',
                   height: 50,
+                  justifyContent: 'space-between',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  paddingHorizontal: 12,
                 }}>
-                <Paragraph
+                <Heading
+                  size={SIZE.sm}
                   color={
                     this.state.settings.sort === item
                       ? colors.accent
                       : colors.pri
                   }>
                   {item.slice(0, 1).toUpperCase() + item.slice(1, item.length)}
-                </Paragraph>
+                </Heading>
+                {this.state.settings.sort === item ? (
+                  <Icon color={colors.accent} name="check" size={SIZE.lg} />
+                ) : null}
               </PressableButton>
             ))}
           </View>
+
+          <View
+            style={{
+              height: 25,
+            }}
+          />
         </View>
       </ActionSheet>
     );
