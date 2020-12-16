@@ -106,7 +106,7 @@ class SortDialog extends React.Component {
             width: DDS.isTab ? 500 : dWidth,
             backgroundColor: colors.bg,
             justifyContent: 'space-between',
-            paddingHorizontal: 12,
+          
             borderRadius: 10,
             paddingTop: 10,
           }}>
@@ -116,6 +116,7 @@ class SortDialog extends React.Component {
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'space-between',
+                paddingHorizontal: 12,
               }}>
               <Heading
                 size={SIZE.xl}
@@ -166,6 +167,7 @@ class SortDialog extends React.Component {
               </TouchableOpacity>
             </View>
             <Seperator />
+
             {Object.keys(SORT).map((item, index) => (
               <PressableButton
                 key={item}
@@ -184,7 +186,8 @@ class SortDialog extends React.Component {
                   justifyContent: 'space-between',
                   flexDirection: 'row',
                   alignItems: 'center',
-                  paddingHorizontal: 12,
+                  borderRadius:0,
+                  paddingHorizontal:12
                 }}>
                 <Heading
                   size={SIZE.sm}
