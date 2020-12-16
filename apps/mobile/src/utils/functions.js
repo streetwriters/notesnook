@@ -3,7 +3,7 @@ import {updateEvent} from '../components/DialogManager/recievers';
 import {Actions} from '../provider/Actions';
 import {eSendEvent, ToastEvent} from '../services/EventManager';
 import {db} from './DB';
-import {eClearEditor, eOnNewTopicAdded, eOpenPremiumDialog} from './Events';
+import {eClearEditor, eOnNewTopicAdded, refreshNotesPage} from './Events';
 
 export async function deleteItems(item) {
   if (item && item.dateCreated && history.selectedItemsList.length === 0) {
@@ -11,21 +11,35 @@ export async function deleteItems(item) {
     history.selectedItemsList.push(item);
   }
 
-  for (var i = 0; i < history.selectedItemsList.length; i++) {
-    let it = history.selectedItemsList[i];
-    if (it.type === 'note') {
-      await db.notes.delete(it.id);
-      updateEvent({type: it.type});
-      eSendEvent(eClearEditor);
-    } else if (it.type === 'topic') {
-      await db.notebooks.notebook(it.notebookId).topics.delete(it.title);
-      eSendEvent(eOnNewTopicAdded);
-      updateEveny({type: 'notebook'});
-      ToastEvent.show('Topics deleted', 'success');
-    } else if (it.type === 'notebook') {
-      await db.notebooks.delete(it.id);
-      updateEvent({type: it.type});
+  let notes = history.selectedItemsList.filter((i) => i.type === 'note');
+  let notebooks = history.selectedItemsList.filter(
+    (i) => i.type === 'notebook',
+  );
+  let topics = history.selectedItemsList.filter((i) => i.type === 'topic');
+
+  if (notes?.length > 0) {
+    let ids = notes.map((i) => i.id);
+    await db.notes.delete(ids);
+    updateEvent({type: Actions.NOTES});
+    eSendEvent(eClearEditor);
+    eSendEvent(refreshNotesPage);
+  }
+  if (topics?.length > 0) {
+    for (var i = 0; i < topics.length; i++) {
+      let it = topics[i];
+      await db.notebooks.notebook(it.notebookId).topics.delete(it.id);
     }
+
+    updateEvent({type: Actions.NOTEBOOKS});
+    eSendEvent(eOnNewTopicAdded);
+    ToastEvent.show('Topics deleted', 'success');
+  }
+
+  if (notebooks?.length > 0) {
+    let ids = notebooks.map((i) => i.id);
+    await db.notebooks.delete(ids);
+    updateEvent({type: Actions.NOTEBOOKS});
+    updateEvent({type: Actions.NOTES});
   }
 
   let msgPart = history.selectedItemsList.length === 1 ? ' item' : ' items';
@@ -40,19 +54,22 @@ export async function deleteItems(item) {
       6000,
       async () => {
         let trash = db.trash;
-
+        let ids = [];
         for (var i = 0; i < itemsCopy.length; i++) {
           let it = itemsCopy[i];
           let trashItem = trash.all.find((item) => item.itemId === it.id);
-          await db.trash.restore(trashItem.id);
-          updateEvent({type: it.type});
+          ids.push(trashItem.id);
         }
+        await db.trash.restore(ids);
+        updateEvent({type: Actions.NOTEBOOKS});
+        updateEvent({type: Actions.NOTES});
         updateEvent({type: Actions.TRASH});
         ToastEvent.hide();
       },
       'Undo',
     );
   }
+
   updateEvent({type: Actions.TRASH});
   updateEvent({type: Actions.CLEAR_SELECTION});
   updateEvent({type: Actions.SELECTION_MODE, enabled: false});
