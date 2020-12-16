@@ -97,7 +97,7 @@ export default class NoteItem extends React.Component {
               }}>
               <TouchableOpacity
                 activeOpacity={1}
-                onPress={() => {
+              /*   onPress={() => {
                   let notebook = db.notebooks.notebook(item.notebooks[0].id).data;
                   updateEvent({
                     type: Actions.HEADER_TEXT_STATE,
@@ -114,7 +114,7 @@ export default class NoteItem extends React.Component {
                     title: notebook.title,
                     root: true,
                   });
-                }}
+                }} */
                 style={{
                   paddingVertical: 1.5,
                   marginBottom: 2.5,
