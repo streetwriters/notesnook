@@ -143,9 +143,9 @@ export const SelectionHeader = () => {
                 selectedItemsList.forEach((item) => {
                   noteIds.push(item.id);
                 });
-
                 await db.trash.restore(...noteIds);
-
+                dispatch({type: Actions.NOTEBOOKS});
+                dispatch({type: Actions.NOTES});
                 dispatch({type: Actions.TRASH});
                 dispatch({type: Actions.SELECTION_MODE, enabled: false});
                 dispatch({type: Actions.CLEAR_SELECTION});
