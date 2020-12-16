@@ -16,7 +16,7 @@ export const UserSection = ({noTextMode}) => {
   const [state, dispatch] = useTracked();
   const {colors, syncing, user} = state;
 
-  return user && user.username ? (
+  return user && user.email ? (
     <View
       style={{
         width: '100%',
@@ -37,7 +37,7 @@ export const UserSection = ({noTextMode}) => {
           borderTopLeftRadius: 5,
         }}>
         <Paragraph color="white">
-          <Icon name="account-outline" /> {user.username}
+          <Icon name="account-outline" /> {user.email}
         </Paragraph>
         <Paragraph color="white" size={SIZE.xs}>
           {SUBSCRIPTION_STATUS_STRINGS[user.subscription.status]}

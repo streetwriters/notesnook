@@ -385,7 +385,7 @@ const SettingsUserSection = () => {
                 style={{
                   marginLeft: 5,
                 }}>
-                {user?.username}
+                {user?.email}
               </Paragraph>
             </View>
             <View

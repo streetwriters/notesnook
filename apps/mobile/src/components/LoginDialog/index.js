@@ -1,40 +1,40 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Modal, TouchableOpacity, View } from 'react-native';
-import { TextInput } from 'react-native-gesture-handler';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import React, {useEffect, useRef, useState} from 'react';
+import {ActivityIndicator, Modal, TouchableOpacity, View} from 'react-native';
+import {TextInput} from 'react-native-gesture-handler';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { Button } from '../../components/Button';
+import {Button} from '../../components/Button';
 import Seperator from '../../components/Seperator';
-import { Toast } from '../../components/Toast';
-import { Actions } from '../../provider/Actions';
-import { useTracked } from '../../provider/index';
-import { DDS } from '../../services/DeviceDetection';
+import {Toast} from '../../components/Toast';
+import {Actions} from '../../provider/Actions';
+import {useTracked} from '../../provider/index';
+import {DDS} from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-  ToastEvent
+  ToastEvent,
 } from '../../services/EventManager';
-import { clearMessage } from '../../services/Message';
+import {clearMessage} from '../../services/Message';
 import {
   validateEmail,
   validatePass,
-  validateUsername
+  validateUsername,
 } from '../../services/Validation';
-import { getElevation } from '../../utils';
-import { db } from '../../utils/DB';
+import {getElevation} from '../../utils';
+import {db} from '../../utils/DB';
 import {
   eOpenLoginDialog,
   eOpenRecoveryKeyDialog,
   eStartSyncer,
-  refreshNotesPage
+  refreshNotesPage,
 } from '../../utils/Events';
-import { SIZE, WEIGHT } from '../../utils/SizeUtils';
-import { sleep } from '../../utils/TimeUtils';
-import { ActionIcon } from '../ActionIcon';
+import {SIZE, WEIGHT} from '../../utils/SizeUtils';
+import {sleep} from '../../utils/TimeUtils';
+import {ActionIcon} from '../ActionIcon';
 import BaseDialog from '../Dialog/base-dialog';
 import DialogContainer from '../Dialog/dialog-container';
-import { ListHeaderComponent } from '../SimpleList/ListHeaderComponent';
+import {ListHeaderComponent} from '../SimpleList/ListHeaderComponent';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
@@ -55,8 +55,8 @@ const LoginDialog = () => {
   const [password, setPassword] = useState(null);
   const [invalidEmail, setInvalidEmail] = useState(false);
   const [invalidPassword, setInvalidPassword] = useState(false);
-  const [username, setUsername] = useState(null);
-  const [invalidUsername, setInvalidUsername] = useState(false);
+  //const [username, setUsername] = useState(null);
+  //const [invalidUsername, setInvalidUsername] = useState(false);
   const [secureEntry, setSecureEntry] = useState(true);
   const [confirmPassword, setConfirmPassword] = useState(false);
   const [oldPassword, setOldPassword] = useState(null);
@@ -140,9 +140,8 @@ const LoginDialog = () => {
   }, []);
 
   function open(mode) {
+    setMode(mode ? mode : MODES.login);
 
-    setMode(mode? mode : MODES.login);
-  
     setVisible(true);
   }
 
@@ -154,7 +153,7 @@ const LoginDialog = () => {
     _username.current?.clear();
 
     setVisible(false);
-    setUsername(null);
+    //setUsername(null);
     setPassword(null);
     setConfirmPassword(null);
     setUserConsent(false);
@@ -167,21 +166,21 @@ const LoginDialog = () => {
     if (
       !password ||
       password.length < 8 ||
-      !username ||
+      !email ||
       invalidPassword ||
-      invalidUsername
+      invalidEmail
     ) {
-      ToastEvent.show('username or password is invalid', 'error', 'local');
+      ToastEvent.show('email or password is invalid', 'error', 'local');
       return;
     }
 
     setLoggingIn(true);
-    _username.current.blur();
+    _email.current.blur();
     _pass.current.blur();
     setStatus('Logging in');
 
     try {
-      await db.user.login(username.toLowerCase(), password, true);
+      await db.user.login(email.toLowerCase(), password, true);
     } catch (e) {
       ToastEvent.show(e.message, 'error', 'local');
       setLoggingIn(false);
@@ -190,7 +189,7 @@ const LoginDialog = () => {
 
     try {
       let user = await db.user.get();
-      if (!user) throw new Error('Username or passoword incorrect!');
+      if (!user) throw new Error('Email or passoword incorrect!');
       setStatus('Syncing Data');
       dispatch({type: Actions.USER, user: user});
       await db.sync();
@@ -199,7 +198,7 @@ const LoginDialog = () => {
       eSendEvent(refreshNotesPage);
       clearMessage(dispatch);
       close();
-      ToastEvent.show(`Logged in as ${username}`, 'success', 'local');
+      ToastEvent.show(`Logged in as ${email}`, 'success', 'local');
     } catch (e) {
       console.warn(e);
       ToastEvent.show(e.message, 'error', 'local');
@@ -209,7 +208,7 @@ const LoginDialog = () => {
   };
 
   const validateInfo = () => {
-    if (!password || !email || !username || !passwordReEnter) {
+    if (!password || !email || !passwordReEnter) {
       ToastEvent.show('All fields are required', 'error', 'local');
       return false;
     }
@@ -219,7 +218,7 @@ const LoginDialog = () => {
       return false;
     }
 
-    if (invalidEmail && invalidPassword && invalidUsername) {
+    if (invalidEmail && invalidPassword) {
       ToastEvent.show('Signup information is invalid', 'error', 'local');
       return false;
     }
@@ -248,7 +247,7 @@ const LoginDialog = () => {
     setSigningIn(true);
     setStatus('Creating User');
     try {
-      await db.user.signup(username, email, password);
+      await db.user.signup(email, password);
     } catch (e) {
       setSigningIn(false);
       setFailed(true);
@@ -276,7 +275,6 @@ const LoginDialog = () => {
 
   const sendEmail = () => {
     setStatus('Recovery Email Sent!');
-    // handle recovery email sending
   };
 
   const changePassword = () => {};
@@ -404,7 +402,7 @@ const LoginDialog = () => {
               paddingHorizontal: 12,
               paddingTop: 12,
             }}>
-            {mode === MODES.forgotPassword ||
+            {/*    {mode === MODES.forgotPassword ||
             mode === MODES.changePassword ? null : (
               <>
                 <TextInput
@@ -494,10 +492,10 @@ const LoginDialog = () => {
                   </Paragraph>
                 ) : null}
               </>
-            )}
+            )} */}
             <Seperator />
 
-            {mode !== MODES.signup ? null : (
+            {mode !== MODES.signup && mode !== MODES.login ? null : (
               <>
                 <TextInput
                   ref={_email}
@@ -567,7 +565,7 @@ const LoginDialog = () => {
                     fontFamily: WEIGHT.regular,
                     color: colors.pri,
                   }}
-                  placeholder="youremail@gmail.com"
+                  placeholder="Email"
                   placeholderTextColor={colors.icon}
                 />
 
