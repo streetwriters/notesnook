@@ -16,7 +16,7 @@ const SelectionWrapper = ({
   background,
   onLongPress,
   onPress,
-  testID
+  testID,
 }) => {
   const [state, dispatch] = useTracked();
   const {colors, selectionMode, selectedItemsList, currentEditingNote} = state;
@@ -37,7 +37,7 @@ const SelectionWrapper = ({
     }
   }, [selectedItemsList]);
 
-/*   const onPressPin = async () => {
+  /*   const onPressPin = async () => {
     let func = async () => {
       if (!item.id) return;
       if (item.type === 'note') {
@@ -78,7 +78,9 @@ const SelectionWrapper = ({
       testID={testID}
       onLongPress={onLongPress}
       onPress={onPress}
-      customSelectedColor={currentEditingNote === item.id ? colors.accent : colors.nav}
+      customSelectedColor={
+        currentEditingNote === item.id ? colors.accent : colors.nav
+      }
       customAlpha={!colors.night ? -0.02 : 0.02}
       customOpacity={currentEditingNote === item.id ? 0.15 : 1}
       customStyle={{
@@ -136,26 +138,26 @@ const SelectionWrapper = ({
           alignItems: 'center',
           paddingRight: 8,
         }}>
-        <TouchableOpacity
-          activeOpacity={1}
-          onPress={() => {
-            dispatch({type: Actions.SELECTED_ITEMS, item: item});
-          }}
-          style={{
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: 70,
-          }}>
-          <Icon
-            size={SIZE.lg}
-            color={selected ? colors.accent : colors.icon}
-            name={
-              selected
-                ? 'check-circle-outline'
-                : 'checkbox-blank-circle-outline'
-            }
-          />
-        </TouchableOpacity>
+        {item.title !== 'General' && (
+          <TouchableOpacity
+            activeOpacity={1}
+            onPress={onLongPress}
+            style={{
+              justifyContent: 'center',
+              alignItems: 'center',
+              height: 70,
+            }}>
+            <Icon
+              size={SIZE.lg}
+              color={selected ? colors.accent : colors.icon}
+              name={
+                selected
+                  ? 'check-circle-outline'
+                  : 'checkbox-blank-circle-outline'
+              }
+            />
+          </TouchableOpacity>
+        )}
       </View>
 
       {children}
