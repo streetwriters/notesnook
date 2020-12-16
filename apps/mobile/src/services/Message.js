@@ -18,7 +18,7 @@ export function setLoginMessage(dispatch) {
       },
       data: {},
       icon: 'account-outline',
-      type:"normal"
+      type: 'normal',
     },
   });
 }
@@ -38,15 +38,15 @@ export function setEmailVerifyMessage(dispatch) {
           action: () => {
             eSendEvent(eCloseProgressDialog);
           },
+          actionText: 'Resend Confirmation Link',
           noProgress: true,
         });
       },
       data: {},
       icon: 'alert',
-      type:"error"
+      type: 'error',
     },
   });
-
 }
 
 export function clearMessage(dispatch) {

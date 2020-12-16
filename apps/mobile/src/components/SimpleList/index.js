@@ -91,6 +91,8 @@ const SimpleList = ({
         justifyContent: 'space-between',
         paddingHorizontal: 12,
         height: 35,
+        backgroundColor: index === 1 ? colors.shade : colors.nav,
+        marginTop: index === 1 ? 0 : 5,
       }}>
       <TouchableWithoutFeedback
         onPress={() => {
@@ -103,15 +105,16 @@ const SimpleList = ({
           height: '100%',
           justifyContent: 'center',
         }}>
-        <Paragraph
+        <Heading
           color={colors.accent}
+          size={SIZE.sm}
           style={{
             minWidth: 60,
             alignSelf: 'center',
             textAlignVertical: 'center',
           }}>
           {item.title}
-        </Paragraph>
+        </Heading>
       </TouchableWithoutFeedback>
       {index === 1 && sortMenuButton ? <HeaderMenu /> : null}
     </View>
@@ -156,7 +159,7 @@ const SimpleList = ({
       if (refreshCallback) {
         refreshCallback();
       }
-      dispatch({type: Actions.LAST_SYNC,lastSync: await db.lastSynced()});
+      dispatch({type: Actions.LAST_SYNC, lastSync: await db.lastSynced()});
       dispatch({type: Actions.ALL});
     }
   }, []);
@@ -234,12 +237,12 @@ const SimpleList = ({
           break;
         case 'header':
           dim.width = width;
-          dim.height = 35 * fontScale;
+          dim.height = 40 * fontScale;
           break;
         case 'MAIN_HEADER':
           dim.width = width;
           dim.height =
-            dataType === 'search' ? 0 : DDS.isLargeTablet() ? 50 : 200;
+            dataType === 'search' ? 0 : DDS.isLargeTablet() ? 50 : 195;
           break;
         default:
           dim.width = width;

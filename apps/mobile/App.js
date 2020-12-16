@@ -36,8 +36,10 @@ import {
   eClosePremiumDialog,
   eDispatchAction,
   eOnLoadNote,
+  eOpenLoginDialog,
   eOpenPendingDialog,
   eOpenPremiumDialog,
+  eOpenProgressDialog,
   eOpenSideMenu,
   eShowGetPremium,
   eStartSyncer,
@@ -270,6 +272,18 @@ const App = () => {
     }
   };
 
+  const onLogout = (reason) => {
+    eSendEvent(eOpenProgressDialog, {
+      title: 'User Logged Out',
+      paragraph: reason,
+      action: () => {
+        eSendEvent(eOpenLoginDialog);
+      },
+      actionText: 'Login Again',
+      noProgress: true,
+    });
+  };
+
   useEffect(() => {
     eSubscribeEvent(eStartSyncer, startSyncer);
     eSubscribeEvent(eDispatchAction, (type) => {
@@ -284,9 +298,11 @@ const App = () => {
     let unsub = NetInfo.addEventListener(onNetworkStateChanged);
     Linking.addEventListener('url', _handleIntent);
     EV.subscribe('db:sync', dbSync);
+    EV.subscribe('user:loggedOut', onLogout);
     EV.subscribe('user:checkStatus', handlePremiumAccess);
     return () => {
       EV.unsubscribe('db:refresh', syncChanges);
+      EV.unsubscribe('user:loggedOut', onLogout);
       EV.unsubscribe('db:sync', dbSync);
       eUnSubscribeEvent(eStartSyncer, startSyncer);
       eUnSubscribeEvent(eDispatchAction, (type) => {
@@ -321,7 +337,7 @@ const App = () => {
     db.notes.init().then(() => {
       dispatch({type: Actions.NOTES});
       dispatch({type: Actions.FAVORITES});
-      eSendEvent(refreshNotesPage)
+      eSendEvent(refreshNotesPage);
       dispatch({type: Actions.LOADING, loading: false});
       SettingsService.setAppLoaded();
     });

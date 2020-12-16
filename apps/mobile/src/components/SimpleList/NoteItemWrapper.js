@@ -15,7 +15,7 @@ import {TEMPLATE_TRASH} from '../DialogManager/Templates';
 import {db} from '../../utils/DB';
 import {DDS} from '../../services/DeviceDetection';
 import {tabBarRef} from '../../utils/Refs';
-import { notesnook } from '../../../e2e/test.ids';
+import {notesnook} from '../../../e2e/test.ids';
 
 export const NoteItemWrapper = ({item, index, isTrash = false}) => {
   const [state, dispatch] = useTracked();
@@ -60,7 +60,6 @@ export const NoteItemWrapper = ({item, index, isTrash = false}) => {
   };
 
   const onPress = async () => {
-
     if (note.conflicted) {
       eSendEvent(eShowMergeDialog, note);
       return;
