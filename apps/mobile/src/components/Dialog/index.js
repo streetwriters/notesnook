@@ -5,6 +5,7 @@ import {DDS} from '../../services/DeviceDetection';
 import {ToastEvent} from '../../services/EventManager';
 import {getElevation, history} from '../../utils';
 import {db} from '../../utils/DB';
+import { deleteItems } from '../../utils/functions';
 import {ph, pv} from '../../utils/SizeUtils';
 import {dialogActions} from '../DialogManager/DialogActions';
 import {updateEvent} from '../DialogManager/recievers';
@@ -25,6 +26,10 @@ export class Dialog extends Component {
   _onPress = async () => {
     let {template, item} = this.props;
     switch (template.action) {
+      case dialogActions.ACTION_DELETE:
+        deleteItems();
+        this.hide();  
+        break;
       case dialogActions.ACTION_PERMANANT_DELETE: {
         if (item.dateCreated && history.selectedItemsList.length === 0) {
           history.selectedItemsList = [];
