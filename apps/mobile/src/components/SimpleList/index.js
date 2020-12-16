@@ -118,7 +118,7 @@ const SimpleList = ({
             alignSelf: 'center',
             textAlignVertical: 'center',
           }}>
-          {item.title}
+          {!item.title || item.title === "" ? "Pinned" : item.title}
         </Heading>
       </TouchableWithoutFeedback>
       {index === 1 && sortMenuButton ? <HeaderMenu /> : null}
