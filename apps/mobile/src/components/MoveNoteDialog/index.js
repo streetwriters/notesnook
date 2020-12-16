@@ -137,7 +137,7 @@ const IntComponent = ({close, note, setNote}) => {
     newTopicTitle = null;
   };
 
-  const handlePress = async () => {
+  const handlePress = async (item,index) => {
     if (
       note?.notebooks?.findIndex(
         (o) =>
@@ -398,7 +398,7 @@ const IntComponent = ({close, note, setNote}) => {
                   }
                   renderItem={({item, index}) => (
                     <PressableButton
-                      onPress={handlePress}
+                      onPress={() => handlePress(item,index)}
                       type="gray"
                       customStyle={{
                         height: 50,
