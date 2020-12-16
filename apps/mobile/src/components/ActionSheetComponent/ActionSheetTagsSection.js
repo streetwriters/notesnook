@@ -202,7 +202,6 @@ export const ActionSheetTagsSection = ({item, close}) => {
         style={{
           flexDirection: 'row',
           flexWrap: 'wrap',
-          borderRadius: 5,
           borderBottomWidth: 1.5,
           borderColor: focused ? colors.accent : colors.nav,
           alignItems: 'center',
@@ -258,6 +257,7 @@ export const ActionSheetTagsSection = ({item, close}) => {
           onKeyPress={_onKeyPress}
         />
       </View>
+
     </View>
   ) : null;
 };
