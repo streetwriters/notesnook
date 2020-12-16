@@ -2,12 +2,92 @@ import React, {useEffect, useState} from 'react';
 import {TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
-import {ToastEvent} from '../../services/EventManager';
+import {DDS} from '../../services/DeviceDetection';
 import {COLORS_NOTE} from '../../utils/Colors';
-import {db} from '../../utils/DB';
+import {hexToRGBA, RGB_Linear_Shade} from '../../utils/ColorUtils';
 import {SIZE} from '../../utils/SizeUtils';
 import {PressableButton} from '../PressableButton';
+import Heading from '../Typography/Heading';
+import Paragraph from '../Typography/Paragraph';
+
+const Filler = ({item, background}) => {
+  const [state] = useTracked();
+  const {colors, currentEditingNote} = state;
+  const color = item.color || 'accent';
+
+  return (
+    <View
+      style={{
+        /*   backgroundColor: DDS.isLargeTablet()
+          ? currentEditingNote === item.id
+            ? item.type === 'note' && item.color
+              ? COLORS_NOTE[item.color]
+              : colors.shade
+            : background
+            ? background
+            : 'transparent'
+          : 'transparent', */
+        position: 'absolute',
+        width: '110%',
+        height: '110%',
+        paddingVertical: '3.5%',
+        paddingHorizontal: '5%',
+        alignItems: 'flex-end',
+        justifyContent: 'flex-end',
+      }}>
+      <View
+        style={{
+          flexDirection: 'row',
+        }}>
+        {item.conflicted ? (
+          <View
+            style={{
+              backgroundColor: hexToRGBA(colors.red, 0.12),
+              paddingHorizontal: 3,
+              paddingVertical: 2,
+              borderRadius: 3,
+              marginRight: 10,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}>
+            <Icon name="alert-circle" size={SIZE.xxs} color={colors.red} />
+            <Heading
+              size={SIZE.xxs}
+              style={{
+                color: colors.red,
+                marginLeft: 5,
+              }}>
+              CONFLICTS
+            </Heading>
+          </View>
+        ) : null}
+
+        {currentEditingNote === item.id ? (
+          <View
+            style={{
+              backgroundColor: hexToRGBA(colors[color], 0.12),
+              paddingHorizontal: 3,
+              paddingVertical: 2,
+              borderRadius: 3,
+              marginRight: 10,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}>
+            <Icon name="pencil-outline" size={SIZE.xxs} color={colors[color]} />
+            <Heading
+              size={SIZE.xxs}
+              style={{marginLeft: 5}}
+              color={colors[color]}>
+              EDITING NOW
+            </Heading>
+          </View>
+        ) : null}
+      </View>
+    </View>
+  );
+};
 
 const SelectionWrapper = ({
   children,
@@ -19,7 +99,7 @@ const SelectionWrapper = ({
   testID,
 }) => {
   const [state, dispatch] = useTracked();
-  const {colors, selectionMode, selectedItemsList, currentEditingNote} = state;
+  const {colors, selectionMode, selectedItemsList} = state;
   const [selected, setSelected] = useState(false);
   useEffect(() => {
     let exists = selectedItemsList.filter(
@@ -37,52 +117,15 @@ const SelectionWrapper = ({
     }
   }, [selectedItemsList]);
 
-  /*   const onPressPin = async () => {
-    let func = async () => {
-      if (!item.id) return;
-      if (item.type === 'note') {
-        await db.notes.note(item.id).pin();
-        dispatch({type: Actions.PINNED});
-        dispatch({type: Actions.NOTES});
-      } else {
-        await db.notebooks.notebook(item.id).pin();
-        dispatch({type: Actions.PINNED});
-        dispatch({type: Actions.NOTEBOOKS});
-      }
-    };
-    func();
-    ToastEvent.show(
-      item.type + ' has been unpinned.',
-      'success',
-      'global',
-      6000,
-      () => {
-        func();
-        ToastEvent.hide('unpin');
-      },
-      'Undo',
-    );
-  }; */
-
   return (
     <PressableButton
-      customColor={
-        currentEditingNote === item.id
-          ? item.type === 'note' && item.color
-            ? COLORS_NOTE[item.color]
-            : colors.shade
-          : background
-          ? background
-          : 'transparent'
-      }
+      customColor="transparent"
       testID={testID}
       onLongPress={onLongPress}
       onPress={onPress}
-      customSelectedColor={
-        currentEditingNote === item.id ? colors.accent : colors.nav
-      }
+      customSelectedColor={colors.nav}
       customAlpha={!colors.night ? -0.02 : 0.02}
-      customOpacity={currentEditingNote === item.id ? 0.15 : 1}
+      customOpacity={1}
       customStyle={{
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -90,6 +133,7 @@ const SelectionWrapper = ({
         width: '100%',
         paddingHorizontal: 12,
         borderRadius: 0,
+        overflow: 'hidden',
         marginTop:
           index === 0 && !selectionMode
             ? 15
@@ -97,36 +141,9 @@ const SelectionWrapper = ({
             ? 30
             : 0,
       }}>
-      {/*  {item.pinned ? (
-        <PressableButton
-          color={item.colors[0] ? COLORS_NOTE[item.colors[0]] : colors.accent}
-          selectedColor={
-            item.colors[0] ? COLORS_NOTE[item.colors[0]] : colors.accent
-          }
-          alpha={!colors.night ? -0.1 : 0.1}
-          onPress={onPressPin}
-          customStyle={{
-            ...getElevation(3),
-            width: 30,
-            height: 30,
-            borderRadius: 100,
-            position: 'absolute',
-            right: 20,
-            top: -15,
-            justifyContent: 'center',
-            alignItems: 'center',
-            zIndex: 10,
-          }}>
-          <View
-            style={{
-              width: 5,
-              height: 5,
-              backgroundColor: 'white',
-              borderRadius: 100,
-            }}
-          />
-        </PressableButton>
-      ) : null} */}
+      {item.type === 'note' ? (
+        <Filler background={background} item={item} />
+      ) : null}
 
       <View
         style={{
