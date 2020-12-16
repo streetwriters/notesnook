@@ -54,7 +54,6 @@ export const NotebookItemWrapper = ({
     };
     Navigation.navigate(routeName, params, headerState);
   };
-
   return (
     <SelectionWrapper
       onLongPress={onLongPress}

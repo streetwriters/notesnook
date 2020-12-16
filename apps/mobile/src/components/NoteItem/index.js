@@ -1,15 +1,13 @@
 import React from 'react';
-import {TouchableOpacity, View} from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {notesnook} from '../../../e2e/test.ids';
-import {Actions} from '../../provider/Actions';
-import Navigation from '../../services/Navigation';
-import {COLORS_NOTE} from '../../utils/Colors';
-import {db} from '../../utils/DB';
-import {SIZE} from '../../utils/SizeUtils';
-import {ActionIcon} from '../ActionIcon';
-import {ActionSheetEvent, updateEvent} from '../DialogManager/recievers';
-import {TimeSince} from '../Menu/TimeSince';
+import { notesnook } from '../../../e2e/test.ids';
+import { COLORS_NOTE } from '../../utils/Colors';
+import { db } from '../../utils/DB';
+import { SIZE } from '../../utils/SizeUtils';
+import { ActionIcon } from '../ActionIcon';
+import { ActionSheetEvent } from '../DialogManager/recievers';
+import { TimeSince } from '../Menu/TimeSince';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
