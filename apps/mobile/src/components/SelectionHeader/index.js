@@ -100,7 +100,9 @@ export const SelectionHeader = () => {
           right: 12,
           paddingTop: insets.top,
         }}>
-        {currentScreen === 'trash' || currentScreen === 'notebooks' ? null : (
+        {currentScreen === 'trash' ||
+        currentScreen === 'notebooks' ||
+        currentScreen === 'notebook' ? null : (
           <ActionIcon
             onPress={async () => {
               dispatch({type: Actions.SELECTION_MODE, enabled: false});
