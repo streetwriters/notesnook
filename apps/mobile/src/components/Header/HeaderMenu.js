@@ -1,13 +1,12 @@
 import React from 'react';
-import {TouchableOpacity} from 'react-native';
+import { TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useTracked} from '../../provider';
-import {eSendEvent} from '../../services/EventManager';
-import {getElevation} from '../../utils';
-import {eOpenSortDialog} from '../../utils/Events';
-import {SIZE} from '../../utils/SizeUtils';
+import { useTracked } from '../../provider';
+import { eSendEvent } from '../../services/EventManager';
+import { getElevation } from '../../utils';
+import { eOpenSortDialog } from '../../utils/Events';
+import { SIZE } from '../../utils/SizeUtils';
 import Heading from '../Typography/Heading';
-import Paragraph from '../Typography/Paragraph';
 
 export const HeaderMenu = () => {
   const [state] = useTracked();
@@ -28,7 +27,7 @@ export const HeaderMenu = () => {
         backgroundColor: colors.accent,
         paddingHorizontal: 8,
         borderRadius: 100,
-        ...getElevation(5)
+        ...getElevation(2)
       }}>
       <Heading
         color={colors.light}

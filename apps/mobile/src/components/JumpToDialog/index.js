@@ -124,28 +124,30 @@ const JumpToDialog = () => {
             }}>
             {notes
               .filter((i) => i.type === 'header')
-              .map((item, index) => (
-                <PressableButton
-                  key={item.title}
-                  onPress={() => onPress(item, index)}
-                  type={currentIndex === index? 'shade' : 'gray'}
-                  customStyle={{
-                    minWidth: '20%',
-                    maxWidth: '46%',
-                    width: null,
-                    padding: 15,
-                    margin: 5,
-                  }}>
-                  <Paragraph
-                    size={SIZE.xs}
-                    color={currentIndex === index ? colors.accent : null}
-                    style={{
-                      textAlign: 'center',
+              .map((item, index) => {
+                return item.title ? (
+                  <PressableButton
+                    key={item.title}
+                    onPress={() => onPress(item, index)}
+                    type={currentIndex === index ? 'shade' : 'gray'}
+                    customStyle={{
+                      minWidth: '20%',
+                      maxWidth: '46%',
+                      width: null,
+                      padding: 15,
+                      margin: 5,
                     }}>
-                    {item.title}
-                  </Paragraph>
-                </PressableButton>
-              ))}
+                    <Paragraph
+                      size={SIZE.sm}
+                      color={currentIndex === index ? colors.accent : null}
+                      style={{
+                        textAlign: 'center',
+                      }}>
+                      {item.title}
+                    </Paragraph>
+                  </PressableButton>
+                ) : null;
+              })}
           </View>
         </ScrollView>
       </View>
