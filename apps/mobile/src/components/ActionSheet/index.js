@@ -20,7 +20,7 @@ import {notesnook} from '../../../e2e/test.ids';
 import {dWidth} from '../../utils';
 import {styles} from './styles';
 
-var deviceHeight = getDeviceHeight();
+var devHeight = getDeviceHeight();
 
 function getDeviceHeight(statusBarTranslucent) {
   var height = Dimensions.get('window').height;
@@ -58,6 +58,7 @@ export default class ActionSheet extends Component {
       scrollable: false,
       layoutHasCalled: false,
       keyboard: false,
+      deviceHeight: getDeviceHeight(this.props.statusBarTranslucent),
     };
     this.transformValue = new Animated.Value(0);
     this.opacityValue = new Animated.Value(0);
@@ -72,6 +73,7 @@ export default class ActionSheet extends Component {
     this.targetId = null;
     this.offsetY = 0;
     this.borderRadius = new Animated.Value(10);
+    this.currentOffsetFromBottom = this.props.initialOffsetFromBottom;
   }
 
   waitAsync = (ms) =>
@@ -93,7 +95,6 @@ export default class ActionSheet extends Component {
    * Open/Close the ActionSheet
    */
   _setModalVisible = (visible) => {
-    deviceHeight = getDeviceHeight(this.props.statusBarTranslucent);
     let modalVisible = this.state.modalVisible;
     if (visible !== undefined) {
       if (modalVisible === visible) {
@@ -138,7 +139,7 @@ export default class ActionSheet extends Component {
       let scrollOffset = closable
         ? 0
         : this.customComponentHeight * initialOffsetFromBottom +
-          deviceHeight * 0.1 +
+          this.state.deviceHeight * 0.1 +
           extraScroll -
           bottomOffset;
 
@@ -169,49 +170,27 @@ export default class ActionSheet extends Component {
     let {
       gestureEnabled,
       initialOffsetFromBottom,
-      footerHeight,
-      footerAlwaysVisible,
       extraScroll,
       delayActionSheetDraw,
       delayActionSheetDrawTime,
     } = this.props;
-    console.log('LAYOUT CALLED');
-    deviceHeight = getDeviceHeight(this.props.statusBarTranslucent);
-    let addFactor = deviceHeight * 0.1;
-    let height = event.nativeEvent.layout.height;
 
-    console.log(height, 'HEIGHT', deviceHeight);
+    let height = event.nativeEvent.layout.height;
     if (this.layoutHasCalled) {
-      let diff;
-      if (height > this.customComponentHeight) {
-        diff = height - this.customComponentHeight;
-        this._scrollTo(this.prevScroll + diff);
-        this.customComponentHeight = height;
-      } else {
-        diff = this.customComponentHeight - height;
-        this._scrollTo(this.prevScroll - diff);
-        this.customComponentHeight = height;
-      }
+      this._returnToPrevScrollPosition(height);
+      this.customComponentHeight = height;
+
       return;
     } else {
-      if (footerAlwaysVisible) {
-        this.customComponentHeight = height;
-      } else {
-        this.customComponentHeight = height - footerHeight;
-      }
-
-      if (this.customComponentHeight > deviceHeight) {
-        this.customComponentHeight =
-          (this.customComponentHeight -
-            (this.customComponentHeight - deviceHeight)) *
-          0.9;
-      }
+      this.customComponentHeight = height;
+      this._applyHeightLimiter();
+      let correction = this.state.deviceHeight * 0.1;
 
       let scrollOffset = gestureEnabled
         ? this.customComponentHeight * initialOffsetFromBottom +
-          addFactor +
+          correction +
           extraScroll
-        : this.customComponentHeight + addFactor + extraScroll;
+        : this.customComponentHeight + correction + extraScroll;
 
       if (Platform.OS === 'ios') {
         await this.waitAsync(delayActionSheetDrawTime);
@@ -220,8 +199,6 @@ export default class ActionSheet extends Component {
           await this.waitAsync(delayActionSheetDrawTime);
         }
       }
-
-      console.log(scrollOffset, 'OFFSET');
       this._scrollTo(scrollOffset, false);
       this.prevScroll = scrollOffset;
       if (Platform.OS === 'ios') {
@@ -231,13 +208,10 @@ export default class ActionSheet extends Component {
           await this.waitAsync(delayActionSheetDrawTime / 2);
         }
       }
-      console.log(scrollOffset, 'END_OFFSET');
       this._openAnimation(scrollOffset);
-
       if (!gestureEnabled) {
         DeviceEventEmitter.emit('hasReachedTop');
       }
-
       this.layoutHasCalled = true;
     }
   };
@@ -267,66 +241,66 @@ export default class ActionSheet extends Component {
   };
 
   _onScrollBegin = async (event) => {};
-  _onScrollBeginDrag = async (event) => {
+  _onScrollBeginDrag = (event) => {
     let verticalOffset = event.nativeEvent.contentOffset.y;
     this.prevScroll = verticalOffset;
   };
 
+  _applyHeightLimiter() {
+    if (this.customComponentHeight > this.state.deviceHeight) {
+      this.customComponentHeight =
+        (this.customComponentHeight -
+          (this.customComponentHeight - this.state.deviceHeight)) *
+        1;
+    }
+  }
+
   _onScrollEnd = async (event) => {
     let {springOffset, extraScroll} = this.props;
-
     let verticalOffset = event.nativeEvent.contentOffset.y;
+    if (this.isRecoiling) return;
 
     if (this.prevScroll < verticalOffset) {
-      if (this.isRecoiling) return;
       if (verticalOffset - this.prevScroll > springOffset * 0.75) {
         this.isRecoiling = true;
-        let addFactor = deviceHeight * 0.1;
 
-        let scrollValue = this.customComponentHeight + addFactor + extraScroll;
-
-        if (scrollValue > deviceHeight) {
-          scrollValue = (scrollValue - (scrollValue - deviceHeight)) * 1;
-        }
+        this._applyHeightLimiter();
+        let correction = this.state.deviceHeight * 0.1;
+        let scrollValue = this.customComponentHeight + correction + extraScroll;
 
         this._scrollTo(scrollValue);
         await this.waitAsync(300);
         this.isRecoiling = false;
-
+        this.currentOffsetFromBottom = 1;
         DeviceEventEmitter.emit('hasReachedTop', true);
       } else {
-        let offset =
-          this.customComponentHeight * this.props.initialOffsetFromBottom +
-          deviceHeight * 0.1 +
-          this.props.extraScroll;
-        this._scrollTo(offset);
+        this._returnToPrevScrollPosition(this.customComponentHeight);
       }
     } else {
       if (this.prevScroll - verticalOffset > springOffset) {
-        if (this.isRecoiling) {
-          return;
-        }
-
         this._hideModal();
       } else {
         if (this.isRecoiling) {
           return;
         }
-        let offset =
-          this.customComponentHeight * this.props.initialOffsetFromBottom +
-          deviceHeight * 0.1 +
-          this.props.extraScroll;
-        this._scrollTo(offset);
         this.isRecoiling = true;
+        this._returnToPrevScrollPosition(this.customComponentHeight);
         await this.waitAsync(300);
         this.isRecoiling = false;
       }
     }
   };
 
+  _returnToPrevScrollPosition(height) {
+    let offset =
+      height * this.currentOffsetFromBottom +
+      this.state.deviceHeight * 0.1 +
+      this.props.extraScroll;
+    this._scrollTo(offset);
+  }
+
   _scrollTo = (y, animated = true) => {
     this.scrollAnimationEndValue = y;
-
     this.scrollViewRef.current?._listRef._scrollRef.scrollTo({
       x: 0,
       y: this.scrollAnimationEndValue,
@@ -376,8 +350,8 @@ export default class ActionSheet extends Component {
     this.targetId = event.nativeEvent.target;
     this.offsetY = event.nativeEvent.contentOffset.y;
 
-    let addFactor = deviceHeight * 0.1;
-    if (this.customComponentHeight + addFactor - this.offsetY < 50) {
+    let correction = this.state.deviceHeight * 0.1;
+    if (this.customComponentHeight + correction - this.offsetY < 50) {
       DeviceEventEmitter.emit('hasReachedTop', true);
     } else {
       DeviceEventEmitter.emit('hasReachedTop', false);
@@ -473,8 +447,18 @@ export default class ActionSheet extends Component {
     );
   }
 
+  _onDeviceLayout = (event) => {
+    let height = event.nativeEvent.layout.height;
+    if (this.props.statusBarTranslucent && Platform.OS === 'android') {
+      height = event.nativeEvent.layout.height - StatusBar.currentHeight;
+    }
+    this.setState({
+      deviceHeight: height,
+    });
+  };
+
   render() {
-    let {scrollable, modalVisible, keyboard} = this.state;
+    let {scrollable, modalVisible, keyboard, deviceHeight} = this.state;
     let {
       onOpen,
       overlayColor,
@@ -484,10 +468,7 @@ export default class ActionSheet extends Component {
       defaultOverlayOpacity,
       children,
       containerStyle,
-      footerStyle,
-      footerHeight,
       CustomHeaderComponent,
-      CustomFooterComponent,
       headerAlwaysVisible,
       keyboardShouldPersistTaps,
       statusBarTranslucent,
@@ -503,6 +484,7 @@ export default class ActionSheet extends Component {
         transparent={true}
         statusBarTranslucent={statusBarTranslucent}>
         <Animated.View
+          onLayout={this._onDeviceLayout}
           style={[
             styles.parentContainer,
             {
@@ -584,6 +566,7 @@ export default class ActionSheet extends Component {
                       ],
                       borderTopRightRadius: this.borderRadius,
                       borderTopLeftRadius: this.borderRadius,
+                      maxHeight: deviceHeight,
                     },
                   ]}>
                   {gestureEnabled || headerAlwaysVisible ? (
@@ -600,19 +583,6 @@ export default class ActionSheet extends Component {
                   ) : null}
 
                   {children}
-                  <View
-                    style={[
-                      {
-                        width: '100%',
-                        backgroundColor: 'transparent',
-                      },
-                      footerStyle,
-                      {
-                        height: footerHeight,
-                      },
-                    ]}>
-                    {CustomFooterComponent}
-                  </View>
                 </Animated.View>
               </View>
             )}
