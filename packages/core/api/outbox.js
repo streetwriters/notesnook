@@ -15,9 +15,9 @@ class Outbox {
       const data = this.outbox[id];
       switch (id) {
         case "changePassword":
-          const key = await this._db.user.key();
-          const { username } = await this._db.user.get();
-          await this._db.context.deriveCryptoKey(`_uk_@${username}`, {
+          const key = await this._db.user.getEncryptionKey();
+          const { email } = await this._db.user.getUser();
+          await this._db.context.deriveCryptoKey(`_uk_@${email}`, {
             password: data.newPassword,
             salt: key.salt,
           });

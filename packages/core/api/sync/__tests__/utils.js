@@ -4,18 +4,26 @@ import Storage from "../../../__mocks__/storage.mock";
 const SUCCESS_LOGIN_RESPONSE = {
   access_token: "access_token",
   refresh_token: "refresh_token",
-  payload: {
-    username: "thecodrr",
-    email: process.env.EMAIL,
-    lastSynced: 0,
-  },
-  scopes: "sync",
-  expiry: 36000,
+  scope: "sync",
+  expires_in: 3600,
+};
+
+const SUCCESS_USER_RESPONSE = {
+  userId: "0",
+  email: process.env.EMAIL,
+  salt: "",
+  vaultKey: null,
 };
 
 async function login(db) {
-  fetchMock.mockResponseOnce(JSON.stringify(SUCCESS_LOGIN_RESPONSE));
-  await db.user.login("username", "password");
+  fetchMock
+    .mockResponseOnce(JSON.stringify(SUCCESS_LOGIN_RESPONSE), {
+      headers: { "Content-Type": "application/json" },
+    })
+    .mockResponseOnce(JSON.stringify(SUCCESS_USER_RESPONSE), {
+      headers: { "Content-Type": "application/json" },
+    });
+  await db.user.login(SUCCESS_USER_RESPONSE.email, "password");
 }
 
 function mainCollectionParams(collection, itemKey, item) {

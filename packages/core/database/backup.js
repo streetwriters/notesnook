@@ -42,7 +42,7 @@ export default class Backup {
     let data = Object.fromEntries(await this._db.context.readMulti(keys));
 
     if (encrypt) {
-      const key = await this._db.user.key();
+      const key = await this._db.user.getEncryptionKey();
       data = await this._db.context.encrypt(key, JSON.stringify(data));
     }
 
@@ -75,7 +75,7 @@ export default class Backup {
     let db = backup.data;
     //check if we have encrypted data
     if (db.salt && db.iv) {
-      const key = await this._db.user.key();
+      const key = await this._db.user.getEncryptionKey();
       db = JSON.parse(await this._db.context.decrypt(key, db));
     }
 

@@ -1,14 +1,12 @@
 const module = {
-  HOST:
+  API_HOST:
     process.env.NODE_ENV === "production"
       ? "https://api.notesnook.com"
-      : "http://0.0.0.0:8000",
-  HEADERS: {
-    agent: "nn/1.0.0",
-    origin: "notesnook.com",
-    "Content-Type": "application/json",
-    Accept: "application/json",
-  },
+      : "http://localhost:5264",
+  AUTH_HOST:
+    process.env.NODE_ENV === "production"
+      ? "https://auth.streetwriters.co"
+      : "http://localhost:8264",
 };
 
 export default module;

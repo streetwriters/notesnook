@@ -83,7 +83,7 @@ class Merger {
     } = serverResponse;
 
     if (synced || areAllEmpty(serverResponse)) return false;
-    this.key = await this._db.user.key();
+    this.key = await this._db.user.getEncryptionKey();
 
     if (vaultKey) {
       await this._db.vault._setKey(await this._deserialize(vaultKey));

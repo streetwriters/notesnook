@@ -7,6 +7,10 @@ import StorageInterface from "../../../__mocks__/storage.mock";
 import { databaseTest, TEST_NOTE } from "../../../__tests__/utils";
 import { login, getEncrypted } from "./utils";
 
+const RESPONSE_PARAMS = {
+  headers: { "Content-Type": "application/json" },
+};
+
 beforeAll(() => {
   enableFetchMocks();
 });
@@ -31,12 +35,13 @@ test("sync without merge conflicts, cause merge conflicts, resolve them and then
 
     // 3. start sync
     fetchMock
-      .once(JSON.stringify({ notes: [], synced: false }))
-      .once(JSON.stringify({ lastSynced: Date.now() }), { status: 200 });
+      .once(JSON.stringify({ notes: [], synced: false }), RESPONSE_PARAMS)
+      .once(
+        JSON.stringify({ lastSynced: Date.now() }),
+        { status: 200 },
+        RESPONSE_PARAMS
+      );
     await db.sync();
-
-    const user = await db.user.get();
-    expect(user.lastSynced).toBeGreaterThan(0);
 
     /////// CAUSE MERGE CONFLICT! ///////
     // 4. edit the note's content
@@ -60,8 +65,15 @@ test("sync without merge conflicts, cause merge conflicts, resolve them and then
     };
 
     fetchMock
-      .once(JSON.stringify({ notes: [], content: [content], synced: false }))
-      .once(JSON.stringify({ lastSynced: Date.now() }), { status: 200 });
+      .once(
+        JSON.stringify({ notes: [], content: [content], synced: false }),
+        RESPONSE_PARAMS
+      )
+      .once(
+        JSON.stringify({ lastSynced: Date.now() }),
+        { status: 200 },
+        RESPONSE_PARAMS
+      );
 
     await expect(db.sync()).rejects.toThrow(
       "Merge conflicts detected. Please resolve all conflicts to continue syncing."
@@ -87,8 +99,15 @@ test("sync without merge conflicts, cause merge conflicts, resolve them and then
 
     // 7. Resync (no conflicts should appear)
     fetchMock
-      .once(JSON.stringify({ notes: [], content: [content], synced: false }))
-      .once(JSON.stringify({ lastSynced: Date.now() }), { status: 200 });
+      .once(
+        JSON.stringify({ notes: [], content: [content], synced: false }),
+        RESPONSE_PARAMS
+      )
+      .once(
+        JSON.stringify({ lastSynced: Date.now() }),
+        { status: 200 },
+        RESPONSE_PARAMS
+      );
     await expect(db.sync()).resolves.toBeUndefined();
   });
 });

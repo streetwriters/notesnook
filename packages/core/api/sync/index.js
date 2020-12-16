@@ -26,6 +26,8 @@
  * And then it should continue.
  */
 import Constants from "../../utils/constants";
+import http from "../../utils/http";
+import TokenManager from "../token-manager";
 import Collector from "./collector";
 import Merger from "./merger";
 var tfun = require("transfun/transfun.js").tfun;
@@ -42,27 +44,26 @@ export default class Sync {
     this._db = db;
     this._collector = new Collector(this._db);
     this._merger = new Merger(this._db);
+    this._tokenManager = new TokenManager(this._db);
   }
 
   async _fetch(lastSynced, token) {
-    let response = await fetch(`${Constants.HOST}/sync?lst=${lastSynced}`, {
-      headers: { ...Constants.HEADERS, Authorization: `Bearer ${token}` },
-    });
-    return await response.json();
+    return await http.get(
+      `${Constants.AUTH_HOST}/sync?lst=${lastSynced}`,
+      token
+    );
   }
 
   async _performChecks() {
-    let user = await this._db.user.get();
-    let token = await this._db.user.token();
-    if (!user || !token) throw new Error("You need to login to sync.");
+    let lastSynced = (await this._db.context.read("lastSynced")) || 0;
+    let token = await this._tokenManager.getAccessToken();
+    if (!token) throw new Error("You need to login to sync.");
 
     // update the conflicts status and if find any, throw
     await this._db.conflicts.recalculate();
     await this._db.conflicts.check();
 
-    let lastSynced = user.lastSynced || 0;
-
-    return { user, lastSynced, token };
+    return { lastSynced, token };
   }
 
   async start(full, force) {
@@ -86,7 +87,7 @@ export default class Sync {
 
     // update our lastSynced time
     if (lastSynced) {
-      await this._db.user.set({ lastSynced });
+      await this._db.context.write("lastSynced", lastSynced);
     }
   }
 
@@ -101,20 +102,17 @@ export default class Sync {
 
     // update our lastSynced time
     if (serverResponse.lastSynced) {
-      await this._db.user.set({ lastSynced: serverResponse.lastSynced });
+      await this._db.context.write("lastSynced", serverResponse.lastSynced);
     }
   }
 
   async _send(data, token) {
-    let response = await fetch(`${Constants.HOST}/sync`, {
-      method: "POST",
-      headers: { ...Constants.HEADERS, Authorization: `Bearer ${token}` },
-      body: JSON.stringify(data),
-    });
-    if (response.ok) {
-      const json = await response.json();
-      return json.lastSynced;
-    }
-    throw new Error("Failed to sync with the server.");
+    let response = await http.post.json(
+      `${Constants.API_HOST}/sync`,
+      data,
+      token
+    );
+
+    return response.lastSynced;
   }
 }

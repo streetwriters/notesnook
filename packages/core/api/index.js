@@ -3,7 +3,6 @@ import Storage from "../database/storage";
 import Notebooks from "../collections/notebooks";
 import Trash from "../collections/trash";
 import Tags from "../collections/tags";
-import User from "../models/user";
 import Sync from "./sync";
 import Vault from "./vault";
 import Lookup from "./lookup";
@@ -16,6 +15,7 @@ import { EV } from "../common";
 import Settings from "./settings";
 import Migrations from "./migrations";
 import Outbox from "./outbox";
+import UserManager from "./user-manager";
 
 /**
  * @type {EventSource}
@@ -44,7 +44,7 @@ class Database {
 
   async init() {
     EV.subscribeMulti(
-      ["user:loggedIn", "user:loggedOut", "user:tokenRefreshed", "user:synced"],
+      ["user:loggedIn", "user:loggedOut", "user:fetched"],
       this._onUserStateChanged.bind(this)
     );
     EV.subscribe("db:write", this._onDBWrite.bind(this));
@@ -52,7 +52,7 @@ class Database {
     this.session = new Session(this.context);
     await this._validate();
 
-    this.user = new User(this);
+    this.user = new UserManager(this);
     this.syncer = new Sync(this);
     this.vault = new Vault(this);
     this.conflicts = new Conflicts(this);
@@ -77,11 +77,12 @@ class Database {
     this.trash = await Trash.new(this, "trash");
 
     await this.settings.init();
-    await this.user.sync();
     await this.outbox.init();
 
     await this.migrations.init();
     await this.migrations.migrate();
+
+    await this.user.fetchUser();
   }
 
   async _onUserStateChanged(user) {

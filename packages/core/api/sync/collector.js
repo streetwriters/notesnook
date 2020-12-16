@@ -30,7 +30,7 @@ class Collector {
 
   async collect(lastSyncedTimestamp, force) {
     this._lastSyncedTimestamp = lastSyncedTimestamp;
-    this.key = await this._db.user.key();
+    this.key = await this._db.user.getEncryptionKey();
     this.force = force;
     return {
       notes: await this._collect(this._db.notes.raw),
