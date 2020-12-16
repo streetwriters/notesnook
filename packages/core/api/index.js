@@ -96,7 +96,7 @@ class Database {
     }
     if (!user) return;
 
-    this.evtSource = new NNEventSource(`${Constants.HOST}/events`, {
+    this.evtSource = new NNEventSource(`${Constants.SSE_HOST}/sse`, {
       headers: { Authorization: `Bearer ${user.accessToken}` },
     });
 
@@ -153,9 +153,15 @@ class Database {
     return this.syncer.start(full, force);
   }
 
-  host(host) {
+  /**
+   *
+   * @param {{AUTH_HOST: string, API_HOST: string, SSE_HOST: string}} hosts
+   */
+  host(hosts) {
     if (process.env.NODE_ENV !== "production") {
-      Constants.HOST = host || Constants.HOST;
+      Constants.AUTH_HOST = hosts.AUTH_HOST || Constants.AUTH_HOST;
+      Constants.API_HOST = hosts.API_HOST || Constants.API_HOST;
+      Constants.SSE_HOST = hosts.SSE_HOST || Constants.SSE_HOST;
     }
   }
 }
