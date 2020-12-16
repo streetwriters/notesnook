@@ -137,6 +137,9 @@ export const ActionSheetComponent = ({
 
     if (!nodispatch) {
       dispatch({type: type});
+      if (type === "note") {
+        eSendEvent(refreshNotesPage)
+      }
       dispatch({type: Actions.FAVORITES});
     }
     setNote({...toAdd});
@@ -234,8 +237,11 @@ export const ActionSheetComponent = ({
       name: 'Restore',
       icon: 'delete-restore',
       func: async () => {
+        await db.trash.restore(note.id);
         dispatch({type: Actions.TRASH});
-        localRefresh(note.type);
+        dispatch({type: note.itemType});
+        dispatch({type: Actions.FAVORITES});
+        eSendEvent(refreshNotesPage)
         ToastEvent.show(
           item.type === 'note' ? 'Note restored' : 'Notebook restored',
           'success',

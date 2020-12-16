@@ -35,7 +35,7 @@ export async function deleteItems(item) {
   if (history.selectedItemsList[0].type !== 'topic') {
     ToastEvent.show(
       message,
-      'success',
+      'error',
       'global',
       6000,
       async () => {
@@ -53,6 +53,7 @@ export async function deleteItems(item) {
       'Undo',
     );
   }
+  updateEvent({type: Actions.TRASH});
   updateEvent({type: Actions.CLEAR_SELECTION});
   updateEvent({type: Actions.SELECTION_MODE, enabled: false});
 }
