@@ -25,7 +25,7 @@ export const NotebookItem = ({
       ? ['Restore', 'Remove']
       : [item.type == 'topic' ? 'Edit Topic' : 'Edit Notebook', 'Delete'];
 
-    let columnItems =
+    let columnItems = isTrash? []:
       item.type === 'topic'
         ? ['Pin to Menu', 'Unpin from Menu']
         : ['Pin', 'Pin to Menu', 'Unpin from Menu'];
@@ -93,8 +93,8 @@ export const NotebookItem = ({
                 <TouchableOpacity
                   activeOpacity={0.8}
                   onPress={() => {
-                    let routeName = 'NotesPage' ;
-                    let params = {...topic, menu: false}
+                    let routeName = 'NotesPage';
+                    let params = {...topic, menu: false};
                     let headerState = {
                       heading: topic.title,
                       id: topic.id,
