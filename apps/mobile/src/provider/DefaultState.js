@@ -81,5 +81,6 @@ export const defaultState = {
     icon: 'account-outline',
   },
   keyword: [],
-  menuPins:[]
+  menuPins:[],
+  lastSynced:"Never"
 };

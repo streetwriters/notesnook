@@ -48,7 +48,7 @@ class PremiumDialog extends React.Component {
 
   async getSkus() {
     try {
-      let u = await db.user.get();
+      let u = await db.user.getUser()
       this.setState({
         user: u,
       });

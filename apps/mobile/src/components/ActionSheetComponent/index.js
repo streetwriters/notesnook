@@ -475,8 +475,7 @@ export const ActionSheetComponent = ({
         ToastEvent.show(e.message, 'error', 'local', 5000);
       }
     } finally {
-      let user = await db.user.get();
-      dispatch({type: Actions.USER, user: user});
+      dispatch({type: Actions.LAST_SYNC,lastSync: await db.lastSynced()});
       dispatch({type: Actions.ALL});
       setRefreshing(false);
     }

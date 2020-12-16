@@ -31,5 +31,6 @@ export const Actions = {
   LOADING:"loading",
   FULLSCREEN:"fullscreen",
   DEVICE_MODE:"deviceMode",
-  MENU_PINS:"menuPins"
+  MENU_PINS:"menuPins",
+  LAST_SYNC:"lastSynced"
 };

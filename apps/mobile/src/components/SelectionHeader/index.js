@@ -1,21 +1,20 @@
-import React, {useEffect} from 'react';
-import {TouchableOpacity, View} from 'react-native';
-import Animated, {Easing, useValue} from 'react-native-reanimated';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
-import {eSendEvent, ToastEvent} from '../../services/EventManager';
-import {db} from '../../utils/DB';
+import React, { useEffect } from 'react';
+import { View } from 'react-native';
+import Animated, { Easing, useValue } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTracked } from '../../provider';
+import { Actions } from '../../provider/Actions';
+import { eSendEvent, ToastEvent } from '../../services/EventManager';
+import { db } from '../../utils/DB';
 import {
   eOpenMoveNoteDialog,
   eOpenSimpleDialog,
-  refreshNotesPage,
+  refreshNotesPage
 } from '../../utils/Events';
-import {SIZE} from '../../utils/SizeUtils';
-import {sleep} from '../../utils/TimeUtils';
-import {ActionIcon} from '../ActionIcon';
-import {TEMPLATE_DELETE} from '../DialogManager/Templates';
+import { SIZE } from '../../utils/SizeUtils';
+import { sleep } from '../../utils/TimeUtils';
+import { ActionIcon } from '../ActionIcon';
+import { TEMPLATE_DELETE } from '../DialogManager/Templates';
 import Heading from '../Typography/Heading';
 
 export const SelectionHeader = () => {

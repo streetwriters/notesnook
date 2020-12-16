@@ -259,6 +259,13 @@ export const reducer = (state, action) => {
         menuPins: db.settings.pins,
       };
     }
+    case Actions.LAST_SYNC: {
+
+      return {
+        ...state,
+        menuPins: action.lastSync,
+      };
+    }
     default:
       throw new Error('unknown action type');
   }

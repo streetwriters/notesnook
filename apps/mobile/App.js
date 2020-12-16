@@ -1,33 +1,37 @@
 import * as NetInfo from '@react-native-community/netinfo';
-import { CHECK_IDS, EV } from 'notes-core/common';
-import React, { useEffect, useState } from 'react';
+import {CHECK_IDS, EV} from 'notes-core/common';
+import React, {useEffect, useState} from 'react';
 import {
   Appearance,
   AppState,
   Linking,
   NativeModules,
   Platform,
-  StatusBar
+  StatusBar,
 } from 'react-native';
 import * as RNIap from 'react-native-iap';
-import { enabled } from 'react-native-privacy-snapshot';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import {enabled} from 'react-native-privacy-snapshot';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
 import SplashScreen from 'react-native-splash-screen';
-import { useTracked } from './src/provider';
-import { Actions } from './src/provider/Actions';
-import { DDS } from './src/services/DeviceDetection';
+import {useTracked} from './src/provider';
+import {Actions} from './src/provider/Actions';
+import {DDS} from './src/services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent
+  eUnSubscribeEvent,
 } from './src/services/EventManager';
 import IntentService from './src/services/IntentService';
-import { clearMessage, setLoginMessage } from './src/services/Message';
+import {
+  clearMessage,
+  setEmailVerifyMessage,
+  setLoginMessage,
+} from './src/services/Message';
 import Navigation from './src/services/Navigation';
 import PremiumService from './src/services/PremiumService';
-import { editing } from './src/utils';
-import { COLOR_SCHEME } from './src/utils/Colors';
-import { db } from './src/utils/DB';
+import {editing} from './src/utils';
+import {COLOR_SCHEME} from './src/utils/Colors';
+import {db} from './src/utils/DB';
 import {
   eClosePremiumDialog,
   eDispatchAction,
@@ -36,12 +40,12 @@ import {
   eOpenPremiumDialog,
   eOpenSideMenu,
   eShowGetPremium,
-  eStartSyncer
+  eStartSyncer,
 } from './src/utils/Events';
-import { MMKV } from './src/utils/mmkv';
-import { tabBarRef } from './src/utils/Refs';
-import { sleep } from './src/utils/TimeUtils';
-import { getNote } from './src/views/Editor/Functions';
+import {MMKV} from './src/utils/mmkv';
+import {tabBarRef} from './src/utils/Refs';
+import {sleep} from './src/utils/TimeUtils';
+import {getNote} from './src/views/Editor/Functions';
 const {ReceiveSharingIntent} = NativeModules;
 
 let AppRootView = require('./initializer.root').RootView;
@@ -134,7 +138,7 @@ const App = () => {
   };
   const startSyncer = async () => {
     try {
-      let user = await db.user.get();
+      let user = await db.user.getUser();
       if (user) {
         EV.subscribe('db:refresh', syncChanges);
       }
@@ -152,18 +156,24 @@ const App = () => {
       let url = res ? res.url : '';
 
       try {
-        if (url.startsWith('ShareMedia://dataUrl')) {
-          console.log(url);
+        if (Platform.OS === 'ios' && url.startsWith('ShareMedia://dataUrl')) {
           _data = await ReceiveSharingIntent.getFileNames(url);
           _data = IntentService.iosSortedData(_data);
-        }
-        if (_data) {
-          IntentService.setIntent(_data);
-          IntentService.check((event) => {
-            eSendEvent(eOnLoadNote, event);
-            tabBarRef.current?.goToPage(1);
-            Navigation.closeDrawer();
-          });
+
+          if (_data) {
+            IntentService.setIntent(_data);
+            IntentService.check((event) => {
+              eSendEvent(eOnLoadNote, event);
+              tabBarRef.current?.goToPage(1);
+              Navigation.closeDrawer();
+            });
+          }
+        } else if (url.startsWith('https://notesnook.com/verify')) {
+          let user = await db.user.fetchUser();
+          dispatch({type: Actions.USER, user: user});
+          if (user.isEmailConfirmed) {
+            clearMessage(dispatch);
+          }
         }
       } catch (e) {
         console.log(e, 'ERROR HERE');
@@ -252,6 +262,7 @@ const App = () => {
     try {
       dispatch({type: Actions.SYNCING, syncing: true});
       await db.sync(false);
+      dispatch({type: Actions.LAST_SYNC, lastSync: await db.lastSynced()});
     } catch (e) {
     } finally {
       dispatch({type: Actions.SYNCING, syncing: false});
@@ -270,9 +281,7 @@ const App = () => {
     eSubscribeEvent('nointent', loadMainApp);
     Appearance.addChangeListener(onSystemThemeChanged);
     let unsub = NetInfo.addEventListener(onNetworkStateChanged);
-    if (Platform.OS === 'ios') {
-      Linking.addEventListener('url', _handleIntent);
-    }
+    Linking.addEventListener('url', _handleIntent);
     EV.subscribe('db:sync', dbSync);
     EV.subscribe('user:checkStatus', handlePremiumAccess);
     return () => {
@@ -285,9 +294,7 @@ const App = () => {
       eUnSubscribeEvent('nointent', loadMainApp);
       AppState.removeEventListener('change', onAppStateChanged);
       Appearance.removeChangeListener(onSystemThemeChanged);
-      if (Platform.OS === 'ios') {
-        Linking.removeEventListener('url', _handleIntent);
-      }
+      Linking.removeEventListener('url', _handleIntent);
       unsub();
       unsubIAP();
     };
@@ -326,14 +333,19 @@ const App = () => {
 
   const getUser = async () => {
     try {
-      let user = await db.user.get();
+      let user = await db.user.fetchUser();
       if (user) {
+        clearMessage(dispatch);
+        if (!user.isEmailConfirmed) {
+          setEmailVerifyMessage(dispatch);
+        }
         dispatch({type: Actions.SYNCING, syncing: true});
         dispatch({type: Actions.USER, user: user});
         await db.sync();
+        dispatch({type: Actions.LAST_SYNC, lastSync: await db.lastSynced()});
         dispatch({type: Actions.ALL});
         await startSyncer();
-        clearMessage(dispatch);
+     
       } else {
         setLoginMessage(dispatch);
       }

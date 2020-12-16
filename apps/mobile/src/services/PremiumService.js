@@ -7,7 +7,7 @@ let premiumStatus = true;
 async function setPremiumStatus() {
 
 	try {
-		let user = await db.user.get();
+		let user = await db.user.getUser();
 		if (!user || !user.id) {
 		  premiumStatus = null;
 		} else {
@@ -30,7 +30,7 @@ async function verify(callback,error) {
 
   return; */
   try {
-	let user = await db.user.get();
+	let user = await db.user.getUser();
 	
     if (!user || !user.id || premiumStatus) {
       if (error) {

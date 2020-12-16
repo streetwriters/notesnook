@@ -31,6 +31,6 @@ export function validateUsername(username) {
 }
 
 export async function checkPremiumUser() {
-  let user = await db.user.get();
+  //let user = await db.user.get();
   return false;
 }

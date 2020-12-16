@@ -188,11 +188,12 @@ const LoginDialog = () => {
     }
 
     try {
-      let user = await db.user.get();
+      let user = await db.user.getUser()
       if (!user) throw new Error('Email or passoword incorrect!');
       setStatus('Syncing Data');
       dispatch({type: Actions.USER, user: user});
       await db.sync();
+      dispatch({type: Actions.LAST_SYNC,lastSync: await db.lastSynced()});
       eSendEvent(eStartSyncer);
       dispatch({type: Actions.ALL});
       eSendEvent(refreshNotesPage);
@@ -257,9 +258,10 @@ const LoginDialog = () => {
 
     let user;
     try {
-      user = await db.user.get();
+      user = await db.user.getUser()
       setStatus('Setting up crenditials');
       dispatch({type: Actions.USER, user: user});
+      dispatch({type: Actions.LAST_SYNC,lastSync: await db.lastSynced()});
       eSendEvent(eStartSyncer);
       clearMessage(dispatch);
       close();

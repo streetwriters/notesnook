@@ -1,19 +1,18 @@
-import React, {useEffect, useState} from 'react';
-import {Platform, StyleSheet, View} from 'react-native';
-import Animated from 'react-native-reanimated';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {useTracked} from '../../provider';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
+import React, { useEffect, useState } from 'react';
+import { Platform, StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTracked } from '../../provider';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
+import { dWidth } from '../../utils';
+import { eScrollEvent } from '../../utils/Events';
+import { SIZE } from '../../utils/SizeUtils';
+import { ActionIcon } from '../ActionIcon';
+import { SearchInput } from '../SearchInput';
+import { HeaderLeftMenu } from './HeaderLeftMenu';
+import { HeaderRightMenu } from './HeaderRightMenu';
+import { HeaderTitle } from './HeaderTitle';
 
-import {dWidth} from '../../utils';
-import {eScrollEvent} from '../../utils/Events';
-import {SIZE} from '../../utils/SizeUtils';
-import {ActionIcon} from '../ActionIcon';
-import {SearchInput} from '../SearchInput';
-import {HeaderLeftMenu} from './HeaderLeftMenu';
-import {HeaderRightMenu} from './HeaderRightMenu';
-import {HeaderTitle} from './HeaderTitle';
 
 export const Header = ({root}) => {
   const [state] = useTracked();

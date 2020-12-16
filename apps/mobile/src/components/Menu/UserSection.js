@@ -57,8 +57,7 @@ export const UserSection = ({noTextMode}) => {
           } catch (e) {
             ToastEvent.show(e.message, 'error');
           } finally {
-            let user = await db.user.get();
-            dispatch({type: Actions.USER, user: user});
+            dispatch({type: Actions.LAST_SYNC,lastSync: await db.lastSynced()});
             dispatch({type: Actions.ALL});
             dispatch({
               type: Actions.SYNCING,
