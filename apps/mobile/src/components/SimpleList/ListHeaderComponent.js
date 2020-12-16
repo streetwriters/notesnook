@@ -41,14 +41,17 @@ export const ListHeaderComponent = ({
     <View
       style={{
         minHeight: 195,
-        marginBottom: 5,
         padding: 12,
         width: '100%',
         backgroundColor: COLORS_NOTE[title.toLowerCase()]
           ? hexToRGBA(COLORS_NOTE[title.toLowerCase()], 0.15)
           : color || colors.shade,
       }}>
-      {messageCard && <MessageCard color={COLORS_NOTE[title.toLowerCase()] || colors.accent} />}
+      {messageCard && (
+        <MessageCard
+          color={COLORS_NOTE[title.toLowerCase()] || colors.accent}
+        />
+      )}
 
       <View
         style={{
