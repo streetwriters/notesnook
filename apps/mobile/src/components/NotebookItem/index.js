@@ -25,10 +25,11 @@ export const NotebookItem = ({
       ? ['Restore', 'Remove']
       : [item.type == 'topic' ? 'Edit Topic' : 'Edit Notebook', 'Delete'];
 
-    let columnItems = isTrash? []:
-      item.type === 'topic'
-        ? ['Pin to Menu', 'Unpin from Menu']
-        : ['Pin', 'Pin to Menu', 'Unpin from Menu'];
+    let columnItems = isTrash
+      ? []
+      : item.type === 'topic'
+      ? ['Pin to Menu', 'Unpin from Menu']
+      : ['Pin', 'Pin to Menu', 'Unpin from Menu'];
 
     ActionSheetEvent(item, false, false, rowItems, columnItems, {
       notebookID: notebookID,
@@ -136,34 +137,6 @@ export const NotebookItem = ({
           </View>
         )}
 
-        {isTrash ? (
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginTop: 5,
-            }}>
-            <Paragraph
-              color={colors.icon}
-              size={SIZE.xs}
-              style={{
-                textAlignVertical: 'center',
-              }}>
-              {'Deleted on: ' + item && item.dateDeleted
-                ? new Date(item.dateDeleted).toISOString().slice(0, 10)
-                : null + '   '}
-            </Paragraph>
-            <Paragraph
-              color={colors.accent}
-              size={SIZE.xs}
-              style={{
-                textAlignVertical: 'center',
-              }}>
-              {item.type[0].toUpperCase() + item.type.slice(1) + '  '}
-            </Paragraph>
-          </View>
-        ) : null}
-
         <View
           style={{
             flexDirection: 'row',
@@ -171,6 +144,29 @@ export const NotebookItem = ({
             alignItems: 'center',
             marginTop: 5,
           }}>
+          {isTrash ? (
+            <>
+              <Paragraph
+                color={colors.icon}
+                size={SIZE.xs}
+                style={{
+                  textAlignVertical: 'center',
+                }}>
+                {'Deleted on ' +
+                  new Date(item.dateDeleted).toISOString().slice(0, 10)}
+                {'   '}
+              </Paragraph>
+              <Paragraph
+                color={colors.accent}
+                size={SIZE.xs}
+                style={{
+                  textAlignVertical: 'center',
+                }}>
+                {item.itemType[0].toUpperCase() + item.itemType.slice(1)}
+                {'   '}
+              </Paragraph>
+            </>
+          ) : null}
           {isTrash ? null : (
             <Paragraph
               color={colors.icon}
@@ -179,9 +175,9 @@ export const NotebookItem = ({
                 textAlignVertical: 'center',
               }}>
               {new Date(item.dateCreated).toDateString().substring(4)}
+              {'   '}
             </Paragraph>
           )}
-          <Seperator half />
           <Paragraph
             color={colors.icon}
             size={SIZE.xs}
