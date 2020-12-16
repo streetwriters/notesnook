@@ -158,6 +158,8 @@ let currentEditingTimer = null;
 export async function loadNote(item) {
   editing.currentlyEditing = true;
   post('blur');
+
+  
   if (item && item.type === 'new') {
     intent = false;
     await clearEditor();
@@ -190,9 +192,8 @@ export async function loadNote(item) {
     if (webviewInit) {
       await loadNoteInEditor();
     }
-    currentEditingTimer = setTimeout(() => {
-      updateEvent({type: Actions.CURRENT_EDITING_NOTE, id: item.id});
-    }, 500);
+    updateEvent({type: Actions.CURRENT_EDITING_NOTE, id: item.id});
+   
   }
 }
 
