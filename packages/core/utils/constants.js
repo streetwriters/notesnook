@@ -10,7 +10,7 @@ const module = {
   SSE_HOST:
     process.env.NODE_ENV === "production"
       ? "https://events.streetwriters.co"
-      : "http://localhost:8264",
+      : "http://localhost:7264",
 };
 
 export default module;
