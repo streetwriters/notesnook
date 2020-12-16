@@ -104,7 +104,7 @@ class UserManager {
           "You were logged out. Either your session expired or your account was deleted. Please try logging in again."
         );
       } else {
-        throw e;
+        return await this.getUser();
       }
     }
   }
