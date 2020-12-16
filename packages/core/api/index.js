@@ -135,6 +135,10 @@ class Database {
     };
   }
 
+  async lastSynced() {
+    return this.context.read("lastSynced");
+  }
+
   _onDBWrite(item) {
     if (item.remote) {
       return;
