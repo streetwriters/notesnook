@@ -66,7 +66,7 @@ const ProgressDialog = () => {
           <ActivityIndicator color={colors.accent} />
         ) : null}
         {dialogData?.action ? (
-          <Button type="transparent" title="Resend Confirmation Link" />
+          <Button type="transparent" title={dialogData.actionText} />
         ) : null}
       </DialogContainer>
     </BaseDialog>
