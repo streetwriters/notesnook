@@ -1,7 +1,12 @@
-import React, {createRef, useEffect, useRef, useState} from 'react';
-import {Keyboard} from 'react-native';
-import {ScrollView} from 'react-native';
-import {FlatList, TextInput, TouchableOpacity, View} from 'react-native';
+import React, {createRef, useEffect, useState} from 'react';
+import {
+  FlatList,
+  Keyboard,
+  ScrollView,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {notesnook} from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
@@ -13,7 +18,6 @@ import {
   eUnSubscribeEvent,
   ToastEvent,
 } from '../../services/EventManager';
-import {dHeight} from '../../utils';
 import {db} from '../../utils/DB';
 import {
   eOnNewTopicAdded,
@@ -21,7 +25,6 @@ import {
   refreshNotesPage,
 } from '../../utils/Events';
 import {pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
-import {ActionIcon} from '../ActionIcon';
 import ActionSheet from '../ActionSheet';
 import DialogHeader from '../Dialog/dialog-header';
 import {PressableButton} from '../PressableButton';
@@ -33,13 +36,12 @@ let newNotebookTitle = null;
 let newTopicTitle = null;
 const notebookInput = createRef();
 const topicInput = createRef();
-
+const actionSheetRef = createRef();
 const MoveNoteDialog = () => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
   const [visible, setVisible] = useState(false);
   const [note, setNote] = useState(null);
-  const actionSheetRef = useRef();
   function open(note) {
     setNote(note);
     setVisible(true);
@@ -68,6 +70,11 @@ const MoveNoteDialog = () => {
     dispatch({type: Actions.NOTES});
   };
 
+  const update = (note) => {
+    console.log(note.notebooks.length);
+    setNote(note);
+  };
+
   const style = React.useMemo(() => {
     return {
       width: DDS.isLargeTablet() ? 500 : '100%',
@@ -90,14 +97,14 @@ const MoveNoteDialog = () => {
       gestureEnabled
       initialOffsetFromBottom={1}
       onClose={_onClose}>
-      <IntComponent close={close} note={note} />
+      <IntComponent close={close} note={note} setNote={update} />
     </ActionSheet>
   );
 };
 
 export default MoveNoteDialog;
 
-const IntComponent = ({close, note}) => {
+const IntComponent = ({close, note, setNote}) => {
   const [state, dispatch] = useTracked();
   const {colors, selectedItemsList} = state;
   const [expanded, setExpanded] = useState('');
@@ -155,7 +162,17 @@ const IntComponent = ({close, note}) => {
           />
         </View>
 
-        <ScrollView nestedScrollEnabled>
+        <ScrollView
+          onScrollEndDrag={() => {
+            actionSheetRef.current?.childScrollHandler();
+          }}
+          onMomentumScrollEnd={() => {
+            actionSheetRef.current?.childScrollHandler();
+          }}
+          onScrollAnimationEnd={() => {
+            actionSheetRef.current?.childScrollHandler();
+          }}
+          nestedScrollEnabled>
           <View>
             <View
               style={{
@@ -346,11 +363,12 @@ const IntComponent = ({close, note}) => {
                     <PressableButton
                       onPress={async () => {
                         if (
-                          note &&
-                          note.notebooks &&
-                          note.notebooks.findIndex((o) =>
-                            o.topics.findIndex((e) => e === item.id),
-                          )
+                          note?.notebooks?.findIndex(
+                            (o) =>
+                              o.topics.findIndex((i) => {
+                                return i === item.id;
+                              }) > -1,
+                          ) > -1
                         ) {
                           await db.notebooks
                             .notebook(item.notebookId)
@@ -358,10 +376,8 @@ const IntComponent = ({close, note}) => {
                             .delete(note.id);
 
                           if (note && note.id) {
-                            console.log('updating note');
                             setNote({...db.notes.note(note.id).data});
                           }
-
                           dispatch({type: Actions.NOTEBOOKS});
                           return;
                         }
@@ -377,7 +393,6 @@ const IntComponent = ({close, note}) => {
                         );
                         console.log(item.id, item.notebookId);
                         if (note && note.id) {
-                          console.log('updating note');
                           setNote({...db.notes.note(note.id).data});
                         }
                         dispatch({type: Actions.NOTEBOOKS});
