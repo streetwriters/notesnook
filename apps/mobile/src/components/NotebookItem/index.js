@@ -91,10 +91,16 @@ export const NotebookItem = ({
             {item && item.topics ? (
               item.topics.slice(1, 3).map((topic) => (
                 <TouchableOpacity
+                  activeOpacity={0.8}
                   onPress={() => {
-                    Navigation.navigate('NotesPage', {
-                      ...topic,
-                    });
+                    let routeName = 'NotesPage' ;
+                    let params = {...topic, menu: false}
+                    let headerState = {
+                      heading: topic.title,
+                      id: topic.id,
+                      type: topic.type,
+                    };
+                    Navigation.navigate(routeName, params, headerState);
                   }}
                   key={topic.dateCreated.toString() + topic.title}
                   style={{
