@@ -11,7 +11,7 @@ import {
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
 import { db } from '../../utils/DB';
-import { eOnNewTopicAdded, eScrollEvent } from '../../utils/Events';
+import { eOnNewTopicAdded, eOpenAddTopicDialog, eScrollEvent } from '../../utils/Events';
 
 export const Notebook = ({route, navigation}) => {
   const [, dispatch] = useTracked();
@@ -74,7 +74,7 @@ export const Notebook = ({route, navigation}) => {
 
   const _onPressBottomButton = () => {
     let n = route.params.notebook;
-    AddTopicEvent(n);
+    eSendEvent(eOpenAddTopicDialog,n.id)
   };
 
   return (
