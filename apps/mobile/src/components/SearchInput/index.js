@@ -43,20 +43,21 @@ export const SearchInput = (props) => {
           color: colors.pri,
           fontSize: SIZE.xl,
           flexGrow: 1,
-          flex: 1,
           flexWrap: 'wrap',
           padding: 0,
+          paddingVertical: 0,
+          paddingHorizontal: 0,
           margin: 0,
           marginBottom: Platform.OS === 'ios' ? 5 : 0,
         }}
         textAlignVertical="center"
         onChangeText={onChangeText}
-        numberOfLines={1}
+        multiline={false}
         onSubmitEditing={async () => {
           await SearchService.search(searchTerm);
         }}
         enablesReturnKeyAutomatically
-        placeholder={searchState}
+        placeholder="Type a keyword"
         placeholderTextColor={colors.icon}
       />
     </View>
