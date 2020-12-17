@@ -1,19 +1,24 @@
 import React, {createRef} from 'react';
-import {View} from 'react-native';
 import {TextInput} from 'react-native-gesture-handler';
 import {Actions} from '../../provider/Actions';
-import {DDS} from '../../services/DeviceDetection';
-import {eSendEvent, ToastEvent} from '../../services/EventManager';
-import {getElevation} from '../../utils';
+import {
+  eSendEvent,
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+  ToastEvent,
+} from '../../services/EventManager';
 import {db} from '../../utils/DB';
-import {eOnNewTopicAdded} from '../../utils/Events';
-import {ph, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
+import {
+  eCloseAddTopicDialog,
+  eOnNewTopicAdded,
+  eOpenAddTopicDialog,
+} from '../../utils/Events';
+import {SIZE, WEIGHT} from '../../utils/SizeUtils';
 import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogContainer from '../Dialog/dialog-container';
 import DialogHeader from '../Dialog/dialog-header';
 import {updateEvent} from '../DialogManager/recievers';
-import Seperator from '../Seperator';
 import {Toast} from '../Toast';
 
 export class AddTopicDialog extends React.Component {
@@ -46,13 +51,22 @@ export class AddTopicDialog extends React.Component {
     eSendEvent(eOnNewTopicAdded);
   };
 
-  async open() {
-    console.log(this.props.notebookID);
-    this.notebook = await db.notebooks.notebook(this.props.notebookID);
+  componentDidMount() {
+    eSubscribeEvent(eOpenAddTopicDialog, this.open);
+    eSubscribeEvent(eCloseAddTopicDialog, this.close);
+  }
+  componentWillUnmount() {
+    eUnSubscribeEvent(eOpenAddTopicDialog, this.open);
+    eUnSubscribeEvent(eCloseAddTopicDialog, this.close);
+  }
+
+  open = async (notebookId) => {
+    let id = notebookId || this.props.notebookID;
+    this.notebook = await db.notebooks.notebook(id);
     this.setState({
       visible: true,
     });
-  }
+  };
   close = () => {
     this.title = null;
     this.setState({
