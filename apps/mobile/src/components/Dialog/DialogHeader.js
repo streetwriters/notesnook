@@ -20,20 +20,31 @@ const DialogHeader = ({icon, title, paragraph, button}) => {
           height: 50,
         }}>
         <View>
-          <Heading size={SIZE.xl}>{title}</Heading>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}>
+            <Heading size={SIZE.xl}>{title}</Heading>
+
+            {button && (
+              <Button
+                onPress={button.onPress}
+                style={{
+                  borderRadius: 100,
+                }}
+                title={button.title}
+                type="accent"
+                height={22}
+              />
+            )}
+          </View>
+
           {paragraph ? (
             <Paragraph color={colors.icon}>{paragraph}</Paragraph>
           ) : null}
         </View>
-
-        {button && (
-          <Button
-            onPress={button.onPress}
-            title={button.title}
-            type="grayBg"
-            fontSize={SIZE.md}
-          />
-        )}
       </View>
     </>
   );
