@@ -7,10 +7,13 @@ import {useTracked} from '../../provider';
 import {DDS} from '../../services/DeviceDetection';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
 import {getElevation, scrollRef} from '../../utils';
-import {eCloseJumpToDialog, eOpenJumpToDialog} from '../../utils/Events';
+import {
+  eCloseJumpToDialog,
+  eOpenJumpToDialog,
+  eScrollEvent,
+} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
 import Heading from '../Typography/Heading';
-import Paragraph from '../Typography/Paragraph';
 
 const offsets = [];
 let timeout = null;
@@ -35,12 +38,12 @@ const JumpToDialog = () => {
   useEffect(() => {
     eSubscribeEvent(eOpenJumpToDialog, open);
     eSubscribeEvent(eCloseJumpToDialog, close);
-    //eSubscribeEvent(eScrollEvent, onScroll);
+    eSubscribeEvent(eScrollEvent, onScroll);
 
     return () => {
       eUnSubscribeEvent(eOpenJumpToDialog, open);
       eUnSubscribeEvent(eCloseJumpToDialog, close);
-      //eUnSubscribeEvent(eScrollEvent, onScroll);
+      eUnSubscribeEvent(eScrollEvent, onScroll);
     };
   }, []);
 
@@ -51,8 +54,8 @@ const JumpToDialog = () => {
     }
     timeout = setTimeout(() => {
       let index = offsets.findIndex((o, i) => o <= y && offsets[i + 1] > y);
-      //setCurrentIndex(index);
-    }, 100);
+      setCurrentIndex(index);
+    }, 200);
   };
 
   const open = () => {
@@ -77,8 +80,7 @@ const JumpToDialog = () => {
         );
         ind = ind + 1;
         ind = ind - (index + 1);
-        offset = offset + ind * 100 + 200;
-
+        offset = offset + ind * 100 + 190;
         offsets.push(offset);
       });
   };
@@ -121,7 +123,33 @@ const JumpToDialog = () => {
               flexWrap: 'wrap',
               alignSelf: 'center',
               justifyContent: 'center',
+              paddingBottom: 20,
             }}>
+            <PressableButton
+              key="go to top"
+              onPress={() => {
+                scrollRef.current?.scrollToOffset(0, 0, true);
+                close()
+              }}
+              type='shade'
+              customStyle={{
+                minWidth: '20%',
+                maxWidth: '46%',
+                width: null,
+                paddingHorizontal: 10,
+                margin: 5,
+                borderRadius: 100,
+                height: 22,
+              }}>
+              <Heading
+                size={SIZE.sm}
+                color={colors.accent}
+                style={{
+                  textAlign: 'center',
+                }}>
+                Top
+              </Heading>
+            </PressableButton>
             {notes
               .filter((i) => i.type === 'header')
               .map((item, index) => {
@@ -129,22 +157,26 @@ const JumpToDialog = () => {
                   <PressableButton
                     key={item.title}
                     onPress={() => onPress(item, index)}
-                    type={currentIndex === index ? 'shade' : 'gray'}
+                    type={currentIndex === index ? 'accent' : 'shade'}
                     customStyle={{
                       minWidth: '20%',
                       maxWidth: '46%',
                       width: null,
-                      padding: 15,
+                      paddingHorizontal: 0,
                       margin: 5,
+                      borderRadius: 100,
+                      height: 22,
                     }}>
-                    <Paragraph
+                    <Heading
                       size={SIZE.sm}
-                      color={currentIndex === index ? colors.accent : null}
+                      color={
+                        currentIndex === index ? colors.light : colors.accent
+                      }
                       style={{
                         textAlign: 'center',
                       }}>
                       {item.title}
-                    </Paragraph>
+                    </Heading>
                   </PressableButton>
                 ) : null;
               })}
