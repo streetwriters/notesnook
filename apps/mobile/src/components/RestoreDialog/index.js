@@ -1,5 +1,6 @@
 import React, {createRef, useEffect, useState} from 'react';
 import {ScrollView} from 'react-native';
+import {ActivityIndicator} from 'react-native';
 import {FlatList, Platform, View} from 'react-native';
 import DocumentPicker from 'react-native-document-picker';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
@@ -35,7 +36,7 @@ const RestoreDialog = () => {
   const {colors} = state;
   const [visible, setVisible] = useState(false);
   const [files, setFiles] = useState([]);
-  const [restoring, setRestoring] = useState(false);
+  const [restoring, setRestoring] = useState(true);
   const insets = useSafeAreaInsets();
   useEffect(() => {
     eSubscribeEvent(eOpenRestoreDialog, open);
@@ -144,7 +145,8 @@ const RestoreDialog = () => {
     <ActionSheet
       ref={actionSheetRef}
       containerStyle={style}
-      gestureEnabled
+      gestureEnabled={!restoring}
+      closeOnTouchBackdrop={!restoring}
       initialOffsetFromBottom={1}
       onClose={close}
       onOpen={() => checkBackups()}>
@@ -155,6 +157,7 @@ const RestoreDialog = () => {
             justifyContent: 'space-between',
             paddingHorizontal: 12,
             alignItems: 'center',
+            paddingTop: restoring ? 25 : 0,
           }}>
           <DialogHeader
             title="Backups"
@@ -212,6 +215,31 @@ const RestoreDialog = () => {
                 height: 100,
               }}>
               <Paragraph color={colors.icon}>No backups found.</Paragraph>
+            </View>
+          )}
+
+          {!restoring ? null : (
+            <View
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <ActivityIndicator color={colors.accent} />
+              <Paragraph color={colors.icon}>
+                Restoring backup. Please wait.
+              </Paragraph>
+
+              <Button
+                title="Cancel"
+                type="accent"
+                onPress={() => {
+                  setRestoring(false);
+                }}
+                height={25}
+                style={{
+                  marginTop: 5,
+                }}
+              />
             </View>
           )}
 
