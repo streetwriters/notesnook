@@ -1,4 +1,5 @@
-import React, {useEffect, useState} from 'react';
+import React, {createRef, useEffect, useState} from 'react';
+import {ScrollView} from 'react-native';
 import {FlatList, Platform, View} from 'react-native';
 import DocumentPicker from 'react-native-document-picker';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
@@ -16,14 +17,18 @@ import {db} from '../../utils/DB';
 import {eCloseRestoreDialog, eOpenRestoreDialog} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
 import storage from '../../utils/storage';
-import {timeConverter} from '../../utils/TimeUtils';
+import {sleep, timeConverter} from '../../utils/TimeUtils';
+import ActionSheet from '../ActionSheet';
 import {Button} from '../Button';
 import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogHeader from '../Dialog/dialog-header';
 import Seperator from '../Seperator';
 import {Toast} from '../Toast';
+import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
+
+const actionSheetRef = createRef();
 
 const RestoreDialog = () => {
   const [state, dispatch] = useTracked();
@@ -41,8 +46,10 @@ const RestoreDialog = () => {
     };
   }, []);
 
-  const open = () => {
+  const open = async () => {
     setVisible(true);
+    await sleep(30);
+    actionSheetRef.current?._setModalVisible(true);
   };
 
   const showIsWorking = () => {
@@ -119,79 +126,96 @@ const RestoreDialog = () => {
     }
   };
 
+  const style = React.useMemo(() => {
+    return {
+      width: DDS.isLargeTablet() ? 500 : '100%',
+      height: DDS.isLargeTablet() ? 500 : null,
+      maxHeight: DDS.isLargeTablet() ? 500 : '90%',
+      borderTopRightRadius: DDS.isLargeTablet() ? 5 : 10,
+      borderTopLeftRadius: DDS.isLargeTablet() ? 5 : 10,
+      backgroundColor: colors.bg,
+      padding: DDS.isLargeTablet() ? 8 : 0,
+      zIndex: 10,
+      paddingVertical: 12,
+    };
+  }, [colors.bg]);
+
   return !visible ? null : (
-    <BaseDialog
-      animation="slide"
-      visible={true}
-      onShow={checkBackups}
-      onRequestClose={close}>
-      <View
-        style={{
-          ...getElevation(DDS.isLargeTablet() ? 5 : 0),
-          paddingTop: Platform.OS === 'ios' ? 10 : insets.top + 10,
-          width: DDS.isLargeTablet() ? 500 : '100%',
-          height: DDS.isLargeTablet() ? 500 : '100%',
-          maxHeight: DDS.isLargeTablet() ? '90%' : '100%',
-          borderRadius: DDS.isLargeTablet() ? 5 : 0,
-          backgroundColor: colors.bg,
-          padding: 12,
-        }}>
-        <DialogHeader
-          title="Your Backups"
-          paragraph="All backups stored in 'Phone Storage/Notesnook/backups'"
-        />
-        <Seperator half />
-        <Button
-          onPress={() => {
-            if (restoring) {
-              showIsWorking();
-              return;
-            }
-            DocumentPicker.pick()
-              .then((r) => {
-                fetch(r.uri).then(async (r) => {
-                  try {
-                    let backup = await r.json();
-                    setRestoring(true);
-                    await db.backup.import(JSON.stringify(backup));
-                    setRestoring(false);
-                    dispatch({type: Actions.ALL});
-                    ToastEvent.show('Restore Complete!', 'success', 'global');
-                    setVisible(false);
-                  } catch (e) {
-                    setRestoring(false);
-                    ToastEvent.show('Invalid backup data', 'error', 'local');
-                  }
-                });
-              })
-              .catch(console.log);
-          }}
-          title="Open File Manager"
-          type="accent"
-          width="100%"
-        />
-        <FlatList
-          data={files}
+    <ActionSheet
+      ref={actionSheetRef}
+      containerStyle={style}
+      gestureEnabled
+      initialOffsetFromBottom={1}
+      onClose={close}
+      onOpen={() => checkBackups()}>
+      <View>
+        <View
           style={{
-            flexGrow: 1,
-          }}
-          contentContainerStyle={{
-            width: '100%',
-            height: '100%',
-          }}
-          keyExtractor={(item, index) => item.filename}
-          ListEmptyComponent={
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            paddingHorizontal: 12,
+            alignItems: 'center',
+          }}>
+          <DialogHeader
+            title="Backups"
+            paragraph="All the backups are stored in 'Phone Storage/Notesnook/Backups'."
+            button={{
+              title: 'Open File Manager',
+              onPress: () => {
+                if (restoring) {
+                  showIsWorking();
+                  return;
+                }
+                DocumentPicker.pick()
+                  .then((r) => {
+                    fetch(r.uri).then(async (r) => {
+                      try {
+                        let backup = await r.json();
+                        setRestoring(true);
+                        await db.backup.import(JSON.stringify(backup));
+                        setRestoring(false);
+                        dispatch({type: Actions.ALL});
+                        ToastEvent.show(
+                          'Restore Complete!',
+                          'success',
+                          'global',
+                        );
+                        setVisible(false);
+                      } catch (e) {
+                        setRestoring(false);
+                        ToastEvent.show(
+                          'Invalid backup data',
+                          'error',
+                          'local',
+                        );
+                      }
+                    });
+                  })
+                  .catch(console.log);
+              },
+            }}
+          />
+        </View>
+
+        <Seperator half />
+
+        <ScrollView
+          nestedScrollEnabled
+          style={{
+            paddingHorizontal: 12,
+          }}>
+          {files && files.length > 0 ? null : (
             <View
               style={{
-                height: '100%',
-                width: '100%',
                 justifyContent: 'center',
                 alignItems: 'center',
+                height: 100,
               }}>
               <Paragraph color={colors.icon}>No backups found.</Paragraph>
             </View>
-          }
-          renderItem={({item, index}) => (
+          )}
+
+          {files.map((item, index) => (
             <View
               style={{
                 minHeight: 50,
@@ -223,13 +247,16 @@ const RestoreDialog = () => {
                 onPress={() => restore(item, index)}
               />
             </View>
-          )}
-        />
-
-        <DialogButtons loading={restoring} onPressNegative={close} />
+          ))}
+          <View
+            style={{
+              height: 25,
+            }}
+          />
+        </ScrollView>
       </View>
       <Toast context="local" />
-    </BaseDialog>
+    </ActionSheet>
   );
 };
 
