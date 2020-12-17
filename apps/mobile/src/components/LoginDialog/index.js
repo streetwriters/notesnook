@@ -1,39 +1,35 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Modal, TouchableOpacity, View } from 'react-native';
-import { TextInput } from 'react-native-gesture-handler';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import React, {useEffect, useRef, useState} from 'react';
+import {ActivityIndicator, Modal, TouchableOpacity, View} from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { Button } from '../../components/Button';
+import {Button} from '../../components/Button';
 import Seperator from '../../components/Seperator';
-import { Toast } from '../../components/Toast';
-import { Actions } from '../../provider/Actions';
-import { useTracked } from '../../provider/index';
-import { DDS } from '../../services/DeviceDetection';
+import {Toast} from '../../components/Toast';
+import {Actions} from '../../provider/Actions';
+import {useTracked} from '../../provider/index';
+import {DDS} from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-  ToastEvent
+  ToastEvent,
 } from '../../services/EventManager';
-import { clearMessage } from '../../services/Message';
-import {
-  validateEmail,
-  validatePass
-} from '../../services/Validation';
-import { getElevation } from '../../utils';
-import { db } from '../../utils/DB';
+import {clearMessage} from '../../services/Message';
+import {getElevation} from '../../utils';
+import {db} from '../../utils/DB';
 import {
   eOpenLoginDialog,
   eOpenRecoveryKeyDialog,
   eStartSyncer,
-  refreshNotesPage
+  refreshNotesPage,
 } from '../../utils/Events';
-import { SIZE, WEIGHT } from '../../utils/SizeUtils';
-import { sleep } from '../../utils/TimeUtils';
-import { ActionIcon } from '../ActionIcon';
+import {SIZE} from '../../utils/SizeUtils';
+import {sleep} from '../../utils/TimeUtils';
+import {ActionIcon} from '../ActionIcon';
 import BaseDialog from '../Dialog/base-dialog';
 import DialogContainer from '../Dialog/dialog-container';
-import { ListHeaderComponent } from '../SimpleList/ListHeaderComponent';
+import Input from '../Input';
+import {ListHeaderComponent} from '../SimpleList/ListHeaderComponent';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
@@ -44,35 +40,28 @@ const MODES = {
   changePassword: 3,
 };
 
+let email;
+let username;
+let password;
+let confirmPassword;
+let oldPassword;
+
 const LoginDialog = () => {
   const [state, dispatch] = useTracked();
   const colors = state.colors;
   const [visible, setVisible] = useState(false);
   const [status, setStatus] = useState(null);
-  const [loggingIn, setLoggingIn] = useState(false);
-  const [email, setEmail] = useState(null);
-  const [password, setPassword] = useState(null);
-  const [invalidEmail, setInvalidEmail] = useState(false);
-  const [invalidPassword, setInvalidPassword] = useState(false);
-  //const [username, setUsername] = useState(null);
-  //const [invalidUsername, setInvalidUsername] = useState(false);
-  const [secureEntry, setSecureEntry] = useState(true);
-  const [confirmPassword, setConfirmPassword] = useState(false);
-  const [oldPassword, setOldPassword] = useState(null);
-  const [passwordReEnter, setPasswordReEnter] = useState(null);
-  const [failed, setFailed] = useState(false);
-  const [signingIn, setSigningIn] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [userConsent, setUserConsent] = useState(false);
   const [mode, setMode] = useState(MODES.login);
+  const [error, setError] = useState(false);
+  const insets = useSafeAreaInsets();
 
   const _email = useRef();
   const _pass = useRef();
   const _username = useRef();
-  const _oldPass = useRef();
   const _oPass = useRef();
   const _passConfirm = useRef();
-  const _passContainer = useRef();
-  const insets = useSafeAreaInsets();
 
   const MODE_DATA = [
     {
@@ -81,11 +70,15 @@ const LoginDialog = () => {
         setMode(MODES.signup);
       },
       button: 'Login',
-      buttonFunc: loginUser,
+      buttonFunc: () => loginUser(),
       headerParagraph: 'create a new account',
       showForgotButton: true,
       loading: 'Please wait while we log in and sync your data.',
       showLoader: true,
+      buttonAlt: 'Sign Up',
+      buttonAltFunc: () => {
+        setMode(MODES.signup);
+      },
     },
     {
       headerButton: 'Sign Up',
@@ -93,11 +86,15 @@ const LoginDialog = () => {
         setMode(MODES.login);
       },
       button: 'Create Account',
-      buttonFunc: signupUser,
+      buttonFunc: () => signupUser(),
       headerParagraph: 'login to your account',
       showForgotButton: false,
       loading: 'Please wait while we are setting up your account.',
       showLoader: true,
+      buttonAlt: 'Login',
+      buttonAltFunc: () => {
+        setMode(MODES.login);
+      },
     },
     {
       headerButton: 'Forgot Password',
@@ -105,7 +102,7 @@ const LoginDialog = () => {
         setMode(MODES.login);
       },
       button: 'Send Recovery Email',
-      buttonFunc: sendEmail,
+      buttonFunc: () => sendEmail(),
       headerParagraph: 'login to your account',
       showForgotButton: false,
       loading:
@@ -113,6 +110,10 @@ const LoginDialog = () => {
         email +
         '. Follow the link in the email to set a new password',
       showLoader: false,
+      buttonAlt: 'Login',
+      buttonAltFunc: () => {
+        setMode(MODES.login);
+      },
     },
     {
       headerButton: 'Change Password',
@@ -120,12 +121,13 @@ const LoginDialog = () => {
         setMode(MODES.signup);
       },
       button: 'Change Password',
-      buttonFunc: changePassword,
+      buttonFunc: () => changePassword(),
       headerParagraph: 'login to your account',
       showForgotButton: false,
       loading:
         'Please wait while we change your password and encrypt your data.',
       showLoader: true,
+      buttonAlt: null,
     },
   ];
 
@@ -145,35 +147,29 @@ const LoginDialog = () => {
   }
 
   const close = () => {
-    if (loggingIn || signingIn) return;
+    if (loading) return;
     _email.current?.clear();
     _pass.current?.clear();
     _passConfirm.current?.clear();
     _username.current?.clear();
 
+    email = null;
+    password = null;
+    confirmPassword = null;
+    oldPassword = null;
     setVisible(false);
-    //setUsername(null);
-    setPassword(null);
-    setConfirmPassword(null);
     setUserConsent(false);
-    setEmail(null);
-    setLoggingIn(false);
+    setError(false);
+    setLoading(false);
     setMode(MODES.login);
   };
 
   const loginUser = async () => {
-    if (
-      !password ||
-      password.length < 8 ||
-      !email ||
-      invalidPassword ||
-      invalidEmail
-    ) {
-      ToastEvent.show('email or password is invalid', 'error', 'local');
+    if (!password || !email || error) {
+      ToastEvent.show('Email or password is invalid', 'error', 'local');
       return;
     }
-
-    setLoggingIn(true);
+    setLoading(true);
     _email.current.blur();
     _pass.current.blur();
     setStatus('Logging in');
@@ -182,7 +178,7 @@ const LoginDialog = () => {
       await db.user.login(email.toLowerCase(), password, true);
     } catch (e) {
       ToastEvent.show(e.message, 'error', 'local');
-      setLoggingIn(false);
+      setLoading(false);
       return;
     }
 
@@ -203,22 +199,17 @@ const LoginDialog = () => {
       console.warn(e);
       ToastEvent.show(e.message, 'error', 'local');
     } finally {
-      setLoggingIn(false);
+      setLoading(false);
     }
   };
 
   const validateInfo = () => {
-    if (!password || !email || !passwordReEnter) {
+    if (!password || !email || !confirmPassword) {
       ToastEvent.show('All fields are required', 'error', 'local');
       return false;
     }
 
-    if (!confirmPassword) {
-      ToastEvent.show('Passwords do not match', 'error', 'local');
-      return false;
-    }
-
-    if (invalidEmail && invalidPassword) {
+    if (error) {
       ToastEvent.show('Signup information is invalid', 'error', 'local');
       return false;
     }
@@ -244,13 +235,12 @@ const LoginDialog = () => {
 
   const signupUser = async () => {
     if (!validateInfo()) return;
-    setSigningIn(true);
+    setLoading(true);
     setStatus('Creating User');
     try {
       await db.user.signup(email, password);
     } catch (e) {
-      setSigningIn(false);
-      setFailed(true);
+      setLoading(false);
       ToastEvent.show('Signup failed, Network Error', 'error', 'local');
       return;
     }
@@ -267,10 +257,9 @@ const LoginDialog = () => {
       await sleep(500);
       eSendEvent(eOpenRecoveryKeyDialog, true);
     } catch (e) {
-      setFailed(true);
       ToastEvent.show('Login Failed, try again', 'error', 'local');
     } finally {
-      setSigningIn(false);
+      setLoading(false);
     }
   };
 
@@ -357,8 +346,6 @@ const LoginDialog = () => {
             ...getElevation(DDS.isLargeTablet() ? 5 : 0),
             paddingBottom: DDS.isLargeTablet() ? 20 : 0,
           }}>
-          <Toast context="local" />
-
           <View
             style={{
               flexDirection: 'row',
@@ -403,521 +390,109 @@ const LoginDialog = () => {
               paddingHorizontal: 12,
               paddingTop: 12,
             }}>
-            {/*    {mode === MODES.forgotPassword ||
-            mode === MODES.changePassword ? null : (
-              <>
-                <TextInput
-                  ref={_username}
-                  onFocus={() => {
-                    if (!invalidUsername) {
-                      _username.current?.setNativeProps({
-                        style: {
-                          borderColor: colors.accent,
-                        },
-                      });
-                    }
-                  }}
-                  editable={!loggingIn || !signingIn}
-                  autoCapitalize="none"
-                  defaultValue={username}
-                  onBlur={() => {
-                    if (!validateUsername(username) && username?.length > 0) {
-                      setInvalidUsername(true);
-                      _username.current?.setNativeProps({
-                        style: {
-                          color: colors.errorText,
-                          borderColor: colors.errorText,
-                        },
-                      });
-                    } else {
-                      setInvalidUsername(false);
-                      _username.current?.setNativeProps({
-                        style: {
-                          borderColor: colors.nav,
-                        },
-                      });
-                    }
-                  }}
-                  textContentType="username"
-                  onChangeText={(value) => {
-                    setUsername(value);
-
-                    if (invalidUsername && validateUsername(username)) {
-                      setInvalidUsername(false);
-                      _username.current.setNativeProps({
-                        style: {
-                          color: colors.pri,
-                          borderColor: colors.accent,
-                        },
-                      });
-                    }
-                  }}
-                  onSubmitEditing={() => {
-                    if (!validateUsername(username)) {
-                      setInvalidUsername(true);
-                      _username.current.setNativeProps({
-                        style: {
-                          color: colors.errorText,
-                        },
-                      });
-                    }
-                    _pass.current?.focus();
-                  }}
-                  blurOnSubmit={false}
-                  style={{
-                    paddingHorizontal: 0,
-                    height: 50,
-                    borderBottomWidth: 1,
-                    borderColor: colors.nav,
-                    fontSize: SIZE.md,
-                    fontFamily: WEIGHT.regular,
-                    color: colors.pri,
-                  }}
-                  placeholder="Username (a-z _- 0-9)"
-                  placeholderTextColor={colors.icon}
-                />
-                {invalidUsername ? (
-                  <Paragraph
-                    size={SIZE.xs}
-                    style={{
-                      textAlign: 'right',
-                      textAlignVertical: 'bottom',
-                      marginTop: 2.5,
-                    }}>
-                    <Icon
-                      name="alert-circle-outline"
-                      size={SIZE.xs}
-                      color={colors.errorText}
-                    />{' '}
-                    Username is invalid
-                  </Paragraph>
-                ) : null}
-              </>
-            )} */}
-
             {mode === MODES.changePassword ? null : (
-              <>
-                <View
-                  style={{
-                    borderBottomWidth: 1,
-                    borderColor: colors.nav,
-                    paddingHorizontal: 0,
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'flex-end',
-                    height: 50,
-                  }}>
-                  <TextInput
-                    ref={_email}
-                    onFocus={() => {
-                      if (!invalidEmail) {
-                        _email.current.setNativeProps({
-                          style: {
-                            borderColor: colors.accent,
-                          },
-                        });
-                      }
-                    }}
-                    editable={!loggingIn || !signingIn}
-                    autoCapitalize="none"
-                    defaultValue={email}
-                    onBlur={() => {
-                      if (!validateEmail(email) && email?.length > 0) {
-                        setInvalidEmail(true);
-                        _email.current?.setNativeProps({
-                          style: {
-                            color: colors.errorText,
-                            borderColor: colors.errorText,
-                          },
-                        });
-                      } else {
-                        setInvalidEmail(false);
-                        _email.current?.setNativeProps({
-                          style: {
-                            borderColor: colors.nav,
-                          },
-                        });
-                      }
-                    }}
-                    textContentType="emailAddress"
-                    onChangeText={(value) => {
-                      setEmail(value);
-                      if (invalidEmail && validateEmail(email)) {
-                        setInvalidEmail(false);
-                        _email.current.setNativeProps({
-                          style: {
-                            color: colors.pri,
-                            borderColor: colors.accent,
-                          },
-                        });
-                      }
-                    }}
-                    blurOnSubmit={false}
-                    onSubmitEditing={() => {
-                      if (!validateEmail(email)) {
-                        setInvalidEmail(true);
-                        _email.current.setNativeProps({
-                          style: {
-                            color: colors.errorText,
-                          },
-                        });
-                      }
-                      if (mode === MODES.signup) {
-                        _pass.current?.focus();
-                      }
-                    }}
-                    style={{
-                      paddingHorizontal: 0,
-                      fontSize: SIZE.md,
-                      fontFamily: WEIGHT.regular,
-                      color: colors.pri,
-                      width: '100%',
-                      paddingVertical: 0,
-                      paddingBottom: 2.5,
-                    }}
-                    placeholder="Email"
-                    placeholderTextColor={colors.icon}
-                  />
-                </View>
-
-                {invalidEmail ? (
-                  <Paragraph
-                    size={SIZE.xs}
-                    style={{
-                      textAlign: 'right',
-                      textAlignVertical: 'bottom',
-                      marginTop: 2.5,
-                      paddingVertical: 0,
-                      paddingBottom: 2.5,
-                    }}>
-                    <Icon
-                      name="alert-circle-outline"
-                      size={SIZE.xs}
-                      color={colors.errorText}
-                    />{' '}
-                    Email is invalid
-                  </Paragraph>
-                ) : null}
-                <Seperator />
-              </>
+              <Input
+                fwdRef={_email}
+                onChangeText={(value) => {
+                  email = value;
+                }}
+                onErrorCheck={(r) => {
+                  setError(r);
+                }}
+                validationType="email"
+                errorMessage="Email is invalid"
+                placeholder="Email"
+                onSubmit={() => {
+                  if (mode === MODES.signup) {
+                    _pass.current?.focus();
+                  }
+                }}
+              />
             )}
 
             {mode !== MODES.changePassword ? null : (
-              <>
-                <View
-                  ref={_oldPass}
-                  style={{
-                    borderBottomWidth: 1,
-                    borderColor: colors.nav,
-                    paddingHorizontal: 0,
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    height: 50,
-                  }}>
-                  <TextInput
-                    ref={_oPass}
-                    editable={!loggingIn || !signingIn}
-                    autoCapitalize="none"
-                    defaultValue={oldPassword}
-                    onChangeText={(value) => {
-                      setOldPassword(value);
-                    }}
-                    onSubmitEditing={() => {
-                      if (mode === MODES.changePassword) {
-                        _pass.current?.focus();
-                      }
-                    }}
-                    style={{
-                      paddingHorizontal: 0,
-                      fontSize: SIZE.md,
-                      fontFamily: WEIGHT.regular,
-                      width: '85%',
-                      maxWidth: '85%',
-                      color: colors.pri,
-                      paddingVertical: 0,
-                      paddingBottom: 2.5,
-                    }}
-                    secureTextEntry={secureEntry}
-                    placeholder="Current Password"
-                    placeholderTextColor={colors.icon}
-                  />
-
-                  <Icon
-                    name="eye"
-                    size={20}
-                    onPress={() => {
-                      setSecureEntry(!secureEntry);
-                    }}
-                    style={{
-                      width: 25,
-                      paddingBottom: 2.5,
-                    }}
-                    color={secureEntry ? colors.icon : colors.accent}
-                  />
-                </View>
-
-                {invalidPassword ? (
-                  <Paragraph
-                    size={SIZE.xs}
-                    style={{
-                      textAlign: 'right',
-                      textAlignVertical: 'bottom',
-                      marginTop: 2.5,
-                    }}>
-                    <Icon
-                      name="alert-circle-outline"
-                      size={SIZE.xs}
-                      color={colors.errorText}
-                    />{' '}
-                    Password is invalid
-                  </Paragraph>
-                ) : null}
-
-                <Seperator />
-              </>
+              <Input
+                fwdRef={_oPass}
+                onChangeText={(value) => {
+                  oldPassword = value;
+                }}
+                onErrorCheck={(r) => {
+                  setError(r);
+                }}
+                secureTextEntry
+                placeholder="Current Password"
+                onSubmit={() => {
+                  if (mode === MODES.signup) {
+                    _pass.current?.focus();
+                  }
+                }}
+              />
             )}
 
             {mode === MODES.forgotPassword ? null : (
-              <>
-                <View
-                  ref={_passContainer}
-                  style={{
-                    borderBottomWidth: 1,
-                    borderColor: colors.nav,
-                    paddingHorizontal: 0,
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'flex-end',
-                    height: 50,
-                  }}>
-                  <TextInput
-                    ref={_pass}
-                    onFocus={() => {
-                      if (!invalidPassword) {
-                        _passContainer.current?.setNativeProps({
-                          style: {
-                            borderColor: colors.accent,
-                          },
-                        });
-                      }
-                    }}
-                    editable={!loggingIn || !signingIn}
-                    autoCapitalize="none"
-                    defaultValue={password}
-                    onBlur={() => {
-                      if (!validatePass(password) && password?.length > 0) {
-                        setInvalidPassword(true);
-                        _pass.current?.setNativeProps({
-                          style: {
-                            color: colors.errorText,
-                          },
-                        });
-                        _passContainer.current?.setNativeProps({
-                          style: {
-                            borderColor: colors.errorText,
-                          },
-                        });
-                      } else {
-                        setInvalidPassword(false);
-                        _passContainer.current?.setNativeProps({
-                          style: {
-                            borderColor: colors.nav,
-                          },
-                        });
-                      }
-                    }}
-                    onChangeText={(value) => {
-                      setPassword(value);
-                      if (invalidPassword && validatePass(password)) {
-                        setInvalidPassword(false);
-                        _pass.current.setNativeProps({
-                          style: {
-                            color: colors.pri,
-                          },
-                        });
-                      }
-                    }}
-                    onSubmitEditing={() => {
-                      if (!validatePass(password)) {
-                        setInvalidPassword(true);
-                        _pass.current.setNativeProps({
-                          style: {
-                            color: colors.errorText,
-                          },
-                        });
-                      }
-                      if (
-                        mode === MODES.signup ||
-                        mode === MODES.changePassword
-                      ) {
-                        _passConfirm.current?.focus();
-                      } else {
-                        current.buttonFunc();
-                      }
-                    }}
-                    blurOnSubmit={false}
-                    style={{
-                      paddingHorizontal: 0,
-                      fontSize: SIZE.md,
-                      fontFamily: WEIGHT.regular,
-                      width: '85%',
-                      maxWidth: '85%',
-                      color: colors.pri,
-                      paddingVertical: 0,
-                      paddingBottom: 2.5,
-                    }}
-                    secureTextEntry={secureEntry}
-                    placeholder="Password (6+ characters)"
-                    placeholderTextColor={colors.icon}
-                  />
-
-                  <Icon
-                    name="eye"
-                    size={20}
-                    onPress={() => {
-                      setSecureEntry(!secureEntry);
-                    }}
-                    style={{
-                      width: 25,
-                      paddingBottom: 2.5,
-                    }}
-                    color={secureEntry ? colors.icon : colors.accent}
-                  />
-                </View>
-                {mode === MODES.login ? (
-                  <TouchableOpacity
-                    onPress={() => {
-                      setMode(MODES.forgotPassword);
-                    }}
-                    style={{
-                      alignSelf: 'flex-end',
-                      marginTop: 2.5,
-                    }}>
-                    <Paragraph color={colors.accent}>
-                      Forgot password?
-                    </Paragraph>
-                  </TouchableOpacity>
-                ) : null}
-                {invalidPassword ? (
-                  <Paragraph
-                    size={SIZE.xs}
-                    style={{
-                      textAlign: 'right',
-                      textAlignVertical: 'bottom',
-                      marginTop: 2.5,
-                    }}>
-                    <Icon
-                      name="alert-circle-outline"
-                      size={SIZE.xs}
-                      color={colors.errorText}
-                    />{' '}
-                    Password is invalid
-                  </Paragraph>
-                ) : null}
-
-                <Seperator />
-              </>
+              <Input
+                fwdRef={_pass}
+                onChangeText={(value) => {
+                  password = value;
+                }}
+                onErrorCheck={(r) => {
+                  setError(r);
+                }}
+                marginBottom={0}
+                validationType="password"
+                secureTextEntry
+                placeholder="Password"
+                errorMessage="Password is invalid"
+                onSubmit={() => {
+                  if (mode === MODES.signup || mode === MODES.changePassword) {
+                    _passConfirm.current?.focus();
+                  } else {
+                    current.buttonFunc();
+                  }
+                }}
+              />
             )}
 
+            {mode === MODES.login && (
+              <TouchableOpacity
+                onPress={() => {
+                  setMode(MODES.forgotPassword);
+                }}
+                style={{
+                  alignSelf: 'flex-end',
+                  marginTop: 2.5,
+                }}>
+                <Paragraph color={colors.accent}>Forgot password?</Paragraph>
+              </TouchableOpacity>
+            )}
+            <Seperator />
             {mode !== MODES.signup && mode !== MODES.changePassword ? null : (
               <>
-                <View
-                  style={{
-                    borderBottomWidth: 1,
-                    borderColor: colors.nav,
-                    paddingHorizontal: 0,
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'flex-end',
-                    height: 50,
-                  }}>
-                  <TextInput
-                    ref={_passConfirm}
-                    editable={
-                      !loggingIn || !signingIn || (password && !invalidPassword)
-                        ? true
-                        : false
-                    }
-                    defaultValue={passwordReEnter}
-                    autoCapitalize="none"
-                    onChangeText={(value) => {
-                      setPasswordReEnter(value);
-                      if (value !== password) {
-                        setConfirmPassword(false);
-                        _passConfirm.current.setNativeProps({
-                          style: {
-                            borderColor: colors.errorText,
-                          },
-                        });
-                        _pass.current.setNativeProps({
-                          style: {
-                            borderColor: colors.errorText,
-                          },
-                        });
-                      } else {
-                        setConfirmPassword(true);
-                        _passConfirm.current.setNativeProps({
-                          style: {
-                            borderColor: colors.accent,
-                          },
-                        });
-                        _pass.current.setNativeProps({
-                          style: {
-                            borderColor: colors.accent,
-                          },
-                        });
-                      }
-                    }}
-                    onFocus={() => {
-                      _passConfirm.current.setNativeProps({
-                        style: {
-                          borderColor: colors.accent,
-                        },
-                      });
-                    }}
-                    onSubmitEditing={() => {
-                      current.buttonFunc();
-                    }}
-                    blurOnSubmit
-                    style={{
-                      paddingHorizontal: 0,
-                      fontSize: SIZE.md,
-                      fontFamily: WEIGHT.regular,
-                      color: colors.pri,
-                      paddingVertical: 0,
-                      paddingBottom: 2.5,
-                    }}
-                    secureTextEntry={secureEntry}
-                    placeholder="Confirm Password"
-                    placeholderTextColor={colors.icon}
-                  />
-                </View>
-                {password && !invalidPassword && !confirmPassword ? (
-                  <Paragraph
-                    size={SIZE.xs}
-                    style={{
-                      textAlign: 'right',
-                      textAlignVertical: 'bottom',
-                      marginTop: 2.5,
-                    }}>
-                    <Icon
-                      name="alert-circle-outline"
-                      size={SIZE.xs}
-                      color={colors.errorText}
-                    />{' '}
-                    Passwords do not match
-                  </Paragraph>
-                ) : null}
-
-                <Seperator />
+                <Input
+                  fwdRef={_passConfirm}
+                  onChangeText={(value) => {
+                    confirmPassword = value;
+                  }}
+                  onErrorCheck={(r) => {
+                    setError(r);
+                  }}
+                  loading={loading}
+                  validationType="confirmPassword"
+                  customValidator={() => password}
+                  secureTextEntry
+                  placeholder="Confirm Password"
+                  errorMessage="Passwords do not match"
+                  onSubmit={() => {
+                    current.buttonFunc();
+                  }}
+                />
               </>
             )}
 
             {mode !== MODES.signup ? null : (
               <>
                 <TouchableOpacity
-                  disabled={loggingIn || signingIn}
+                  disabled={loading}
                   onPress={() => {
                     setUserConsent(!userConsent);
                   }}
@@ -961,12 +536,28 @@ const LoginDialog = () => {
               onPress={current.buttonFunc}
               width="100%"
               type="accent"
-              loading={loggingIn || signingIn}
+              loading={loading}
               fontSize={SIZE.md}
               height={50}
             />
+
+            {current.buttonAlt && (
+              <Button
+                title={current.buttonAlt}
+                onPress={current.buttonAltFunc}
+                width="100%"
+                type="shade"
+                loading={loading}
+                fontSize={SIZE.md}
+                style={{
+                  marginTop: 10,
+                }}
+                height={50}
+              />
+            )}
           </View>
         </View>
+        <Toast context="local" />
       </View>
     </Modal>
   );
