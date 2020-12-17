@@ -23,6 +23,7 @@ import {GetPremium} from '../ActionSheetComponent/GetPremium';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogHeader from '../Dialog/dialog-header';
 import {updateEvent} from '../DialogManager/recievers';
+import Input from '../Input';
 import {Toast} from '../Toast';
 import Paragraph from '../Typography/Paragraph';
 
@@ -129,7 +130,7 @@ export class AddNotebookDialog extends React.Component {
     let edit = this.props.toEdit;
 
     if (!this.title || this.title?.trim().length === 0)
-      return ToastEvent.show('Title is required', 'error', 'local');
+      return ToastEvent.show('Notebook title is required', 'error', 'local');
 
     let id = edit && edit.id ? edit.id : null;
 
@@ -282,135 +283,59 @@ export class AddNotebookDialog extends React.Component {
                 }
               />
 
-              <TextInput
-                ref={(ref) => (this.titleRef = ref)}
+              <Input
+                fwdRef={(ref) => (this.titleRef = ref)}
                 testID={notesnook.ids.dialogs.notebook.inputs.title}
-                style={[
-                  styles.input,
-                  {
-                    borderColor: titleFocused ? colors.accent : colors.nav,
-                    color: colors.pri,
-                    fontSize: SIZE.md,
-                  },
-                ]}
-                numberOfLines={1}
-                multiline={false}
-                onFocus={() => {
-                  this.setState({
-                    titleFocused: true,
-                  });
-                }}
-                onBlur={() => {
-                  this.setState({
-                    titleFocused: false,
-                  });
-                }}
-                defaultValue={toEdit ? toEdit.title : null}
                 onChangeText={(value) => {
                   this.title = value;
                 }}
-                onSubmitEditing={() => {
+                placeholder="Title"
+                onSubmit={() => {
                   this.descriptionRef.focus();
                 }}
-                placeholder="Title"
-                placeholderTextColor={colors.icon}
+                defaultValue={toEdit ? toEdit.title : null}
               />
-              <TextInput
-                ref={(ref) => (this.descriptionRef = ref)}
-                testID={notesnook.ids.dialogs.notebook.inputs.description}
-                style={[
-                  styles.input,
-                  {
-                    borderColor: descFocused ? colors.accent : colors.nav,
-                    minHeight: 45,
-                    color: colors.pri,
-                  },
-                ]}
-                maxLength={150}
-                onFocus={() => {
-                  this.setState({
-                    descFocused: true,
-                  });
+
+              <Input
+                fwdRef={(ref) => (this.descriptionRef = ref)}
+                testID={notesnook.ids.dialogs.notebook.inputs.title}
+                onChangeText={(value) => {
+                  this.description = value;
+                  this.currentInputValue = value;
+                  if (this.prevItem !== null) {
+                    refs[this.prevIndex].setNativeProps({
+                      text: this.prevIndex + 1 + '. ' + value,
+                      style: {
+                        borderBottomColor: colors.accent,
+                      },
+                    });
+                  }
                 }}
-                onBlur={() => {
-                  this.setState({
-                    descFocused: false,
-                  });
+                placeholder="Describe your notebook."
+                onSubmit={() => {
+                  this.topicInputRef.focus();
                 }}
-                defaultValue={toEdit ? toEdit.description : null}
+                defaultValue={toEdit ? toEdit.title : null}
+              />
+
+              <Input
+                fwdRef={(ref) => (this.topicInputRef = ref)}
+                testID={notesnook.ids.dialogs.notebook.inputs.title}
                 onChangeText={(value) => {
                   this.description = value;
                 }}
-                onSubmitEditing={() => {
-                  this.topicInputRef.focus();
-                }}
                 placeholder="Describe your notebook."
-                placeholderTextColor={colors.icon}
+                onSubmit={() => {
+                  this.onSubmit();
+                }}
+                button={{
+                  icon: this.state.editTopic ? 'check' : 'plus',
+                  onPress: this.onSubmit,
+                  color: topicInputFocused ? colors.accent : colors.icon,
+                }}
+                placeholder="Add a topic"
+                defaultValue={toEdit ? toEdit.title : null}
               />
-
-              <View style={styles.topicContainer}>
-                <TextInput
-                  ref={(ref) => (this.topicInputRef = ref)}
-                  testID={notesnook.ids.dialogs.notebook.inputs.topic}
-                  onChangeText={(value) => {
-                    this.currentInputValue = value;
-                    if (this.prevItem !== null) {
-                      refs[this.prevIndex].setNativeProps({
-                        text: this.prevIndex + 1 + '. ' + value,
-                        style: {
-                          borderBottomColor: colors.accent,
-                        },
-                      });
-                    }
-                  }}
-                  blurOnSubmit={false}
-                  onFocus={() => {
-                    this.setState({
-                      topicInputFocused: true,
-                    });
-                  }}
-                  onBlur={() => {
-                    this.onSubmit(false);
-                    this.setState({
-                      topicInputFocused: false,
-                      editTopic: false,
-                    });
-                  }}
-                  onSubmitEditing={this.onSubmit}
-                  style={[
-                    styles.input,
-                    {
-                      borderColor: topicInputFocused
-                        ? colors.accent
-                        : colors.nav,
-                      color: colors.pri,
-                      width: '100%',
-                      maxWidth: '100%',
-                      marginTop: 5,
-                      paddingRight: '15%',
-                    },
-                  ]}
-                  placeholder="Add a topic"
-                  placeholderTextColor={colors.icon}
-                />
-                <TouchableOpacity
-                  onPress={this.onSubmit}
-                  testID={notesnook.ids.dialogs.notebook.buttons.add}
-                  style={[
-                    styles.addBtn,
-                    {
-                      borderColor: topicInputFocused
-                        ? colors.accent
-                        : colors.nav,
-                    },
-                  ]}>
-                  <Icon
-                    name={this.state.editTopic ? 'check' : 'plus'}
-                    size={SIZE.lg}
-                    color={topicInputFocused ? colors.accent : colors.icon}
-                  />
-                </TouchableOpacity>
-              </View>
 
               <FlatList
                 data={topics}

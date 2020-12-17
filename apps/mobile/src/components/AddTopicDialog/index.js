@@ -1,5 +1,4 @@
 import React, {createRef} from 'react';
-import {TextInput} from 'react-native-gesture-handler';
 import {Actions} from '../../provider/Actions';
 import {
   eSendEvent,
@@ -13,12 +12,12 @@ import {
   eOnNewTopicAdded,
   eOpenAddTopicDialog,
 } from '../../utils/Events';
-import {SIZE, WEIGHT} from '../../utils/SizeUtils';
 import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogContainer from '../Dialog/dialog-container';
 import DialogHeader from '../Dialog/dialog-header';
 import {updateEvent} from '../DialogManager/recievers';
+import Input from '../Input';
 import {Toast} from '../Toast';
 
 export class AddTopicDialog extends React.Component {
@@ -75,7 +74,7 @@ export class AddTopicDialog extends React.Component {
   };
 
   render() {
-    const {visible, titleFocused} = this.state;
+    const {visible} = this.state;
     const {colors, toEdit} = this.props;
     if (!visible) return null;
     return (
@@ -93,34 +92,15 @@ export class AddTopicDialog extends React.Component {
             paragraph={'Add a new topic to ' + this.notebook.title}
           />
 
-          <TextInput
-            ref={this.titleRef}
-            style={{
-              paddingTop: 10,
-              paddingBottom: 5,
-              borderBottomWidth: 1,
-              borderColor: titleFocused ? colors.accent : colors.nav,
-              paddingHorizontal: 0,
-              fontSize: SIZE.sm,
-              fontFamily: WEIGHT.regular,
-              color: colors.pri,
-            }}
-            onFocus={() => {
-              this.setState({
-                titleFocused: true,
-              });
-            }}
-            onBlur={() => {
-              this.setState({
-                titleFocused: true,
-              });
-            }}
-            defaultValue={toEdit ? toEdit.title : null}
+          <Input
+            fwdRef={this.titleRef}
             onChangeText={(value) => {
               this.title = value;
             }}
+            blurOnSubmit={false}
+            defaultValue={toEdit ? toEdit.title : null}
             placeholder="Enter title of topic"
-            placeholderTextColor={colors.icon}
+            onSubmit={this.addNewTopic}
           />
 
           <DialogButtons
