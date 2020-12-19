@@ -5,6 +5,7 @@ import SelectionWrapper from '../../components/SelectionWrapper';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import Navigation from '../../services/Navigation';
+import {rootNavigatorRef} from '../../utils/Refs';
 
 export const NotebookItemWrapper = ({
   item,
@@ -38,7 +39,7 @@ export const NotebookItemWrapper = ({
   const onPress = () => {
     if (selectionMode) {
       console.log(item.title);
-        onLongPress();
+      onLongPress();
       return;
     }
     let routeName = isTopic ? 'NotesPage' : 'Notebook';
@@ -54,7 +55,7 @@ export const NotebookItemWrapper = ({
       id: item.id,
       type: item.type,
     };
-    Navigation.navigate(routeName, params, headerState);
+    Navigation.push(routeName, params, headerState);
   };
   return (
     <SelectionWrapper

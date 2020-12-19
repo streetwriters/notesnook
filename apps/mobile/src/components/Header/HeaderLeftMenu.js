@@ -1,9 +1,10 @@
 import React from 'react';
-import { notesnook } from '../../../e2e/test.ids';
-import { useTracked } from '../../provider';
+import {notesnook} from '../../../e2e/test.ids';
+import {useTracked} from '../../provider';
 import Navigation from '../../services/Navigation';
-import { SIZE } from '../../utils/SizeUtils';
-import { ActionIcon } from '../ActionIcon';
+import SettingsService from '../../services/SettingsService';
+import {SIZE} from '../../utils/SizeUtils';
+import {ActionIcon} from '../ActionIcon';
 
 export const HeaderLeftMenu = () => {
   const [state] = useTracked();
@@ -11,7 +12,7 @@ export const HeaderLeftMenu = () => {
 
   const onLeftButtonPress = () => {
     if (headerMenuState) {
-      Navigation.openDrawer()
+      Navigation.openDrawer();
       return;
     }
     Navigation.goBack();
@@ -31,6 +32,10 @@ export const HeaderLeftMenu = () => {
             marginRight: 25,
           }}
           onPress={onLeftButtonPress}
+          onLongPress={() => {
+            Navigation.popToTop();
+            
+          }}
           name={!headerMenuState ? 'arrow-left' : 'menu'}
           size={SIZE.xxxl}
           color={colors.pri}

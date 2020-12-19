@@ -3,6 +3,7 @@ import {updateEvent} from '../components/DialogManager/recievers';
 import {Actions} from '../provider/Actions';
 import {rootNavigatorRef, sideMenuRef} from '../utils/Refs';
 import {eSendEvent} from './EventManager';
+import SettingsService from './SettingsService';
 
 let currentScreen = null;
 
@@ -65,8 +66,29 @@ function goBack() {
   rootNavigatorRef.current?.goBack();
 }
 
-function push(...args) {
-  rootNavigatorRef.current?.dispatch(StackActions.push(...args));
+function push(name, params, item) {
+  currentScreen = name;
+  setHeaderState(name, params, item);
+  rootNavigatorRef.current?.dispatch(StackActions.push(name, params));
+}
+
+function replace(...args) {
+  rootNavigatorRef.current?.dispatch(StackActions.replace(...args));
+}
+
+function popToTop() {
+  rootNavigatorRef.current?.dispatch(StackActions.popToTop());
+  SettingsService.get().homepage;
+  setHeaderState(
+    SettingsService.get().homepage.toLowerCase(),
+    {
+      menu: true,
+    },
+    {
+      heading: SettingsService.get().homepage,
+      id: SettingsService.get().homepage.toLocaleLowerCase() + '_navigation',
+    },
+  );
 }
 
 function openDrawer() {
@@ -84,4 +106,6 @@ export default {
   closeDrawer,
   getCurrentScreen,
   setHeaderState,
+  replace,
+  popToTop,
 };

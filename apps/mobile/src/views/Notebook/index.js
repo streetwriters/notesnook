@@ -1,17 +1,21 @@
-import React, { useEffect, useState } from 'react';
-import { ContainerBottomButton } from '../../components/Container/ContainerBottomButton';
-import { AddTopicEvent } from '../../components/DialogManager/recievers';
+import React, {useEffect, useState} from 'react';
+import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
+import {AddTopicEvent} from '../../components/DialogManager/recievers';
 import SimpleList from '../../components/SimpleList';
-import { useTracked } from '../../provider';
+import {useTracked} from '../../provider';
 import {
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent
+  eUnSubscribeEvent,
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
-import { db } from '../../utils/DB';
-import { eOnNewTopicAdded, eOpenAddTopicDialog, eScrollEvent } from '../../utils/Events';
+import {db} from '../../utils/DB';
+import {
+  eOnNewTopicAdded,
+  eOpenAddTopicDialog,
+  eScrollEvent,
+} from '../../utils/Events';
 
 export const Notebook = ({route, navigation}) => {
   const [, dispatch] = useTracked();
@@ -25,7 +29,6 @@ export const Notebook = ({route, navigation}) => {
 
   useEffect(() => {
     onLoad();
-
   }, [route.params]);
 
   useEffect(() => {
@@ -37,6 +40,17 @@ export const Notebook = ({route, navigation}) => {
 
   const onFocus = async () => {
     eSendEvent(eScrollEvent, {name: params.title, type: 'in'});
+    if (route.params.menu) {
+      navigation.setOptions({
+        animationEnabled: false,
+        gestureEnabled: false,
+      });
+    } else {
+      navigation.setOptions({
+        animationEnabled: true,
+        gestureEnabled: Platform.OS === 'ios',
+      });
+    }
     updateSearch();
     if (!pageIsLoaded) {
       console.log('returning since page is not loaded');
@@ -74,7 +88,7 @@ export const Notebook = ({route, navigation}) => {
 
   const _onPressBottomButton = () => {
     let n = route.params.notebook;
-    eSendEvent(eOpenAddTopicDialog,n.id)
+    eSendEvent(eOpenAddTopicDialog, n.id);
   };
 
   return (

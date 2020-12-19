@@ -29,7 +29,7 @@ const Input = ({
   marginBottom = 10,
   button,
   testID,
-  defaultValue
+  defaultValue,
 }) => {
   const [state] = useTracked();
   const colors = state.colors;
@@ -114,8 +114,8 @@ const Input = ({
     <>
       <View style={style}>
         <TextInput
-		  ref={fwdRef}
-		  testID={testID}
+          ref={fwdRef}
+          testID={testID}
           editable={!loading}
           defaultValue={defaultValue}
           autoCapitalize={autoCapitalize}

@@ -18,6 +18,7 @@ export const ActionIcon = ({
   bottom = 30,
   testID,
   disabled,
+  onLongPress
 }) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
@@ -27,6 +28,7 @@ export const ActionIcon = ({
       testID={testID}
       onPress={onPress}
       hitSlop={{top: top, left: left, right: right, bottom: bottom}}
+      onLongPress={onLongPress}
       disabled={disabled}
       type="gray"
       customStyle={{

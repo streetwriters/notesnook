@@ -17,6 +17,7 @@ import {
   eUnSubscribeEvent,
   ToastEvent,
 } from '../../services/EventManager';
+import Navigation from '../../services/Navigation';
 import {editing} from '../../utils';
 import {exitEditorAnimation} from '../../utils/Animations';
 import {
@@ -187,6 +188,10 @@ const EditorHeader = () => {
         }}>
         {DDS.isLargeTablet() && !fullscreen ? null : (
           <ActionIcon
+            onLongPress={async () => {
+              await _onBackPress();
+              Navigation.popToTop();
+            }}
             testID={notesnook.ids.default.header.buttons.back}
             name="arrow-left"
             color={colors.heading}

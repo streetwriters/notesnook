@@ -1,4 +1,5 @@
 import React, {useCallback, useEffect, useState} from 'react';
+import { Platform } from 'react-native';
 import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
 import SimpleList from '../../components/SimpleList';
 import {NoteItemWrapper} from '../../components/SimpleList/NoteItemWrapper';
@@ -69,7 +70,7 @@ export const Notes = ({route, navigation}) => {
     } else {
       navigation.setOptions({
         animationEnabled: true,
-        gestureEnabled: true,
+        gestureEnabled: Platform.OS === "ios",
       });
     }
     let allNotes = [];
