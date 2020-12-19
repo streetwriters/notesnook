@@ -88,85 +88,91 @@ export const EditorWrapper = ({dimensions}) => {
   const {colors} = state;
   const insets = useSafeAreaInsets();
   return (
-    <SafeAreaView
+    <View
       ref={editorRef}
       style={{
         width: DDS.isLargeTablet() ? dimensions.width * 0.55 : dimensions.width,
         height: '100%',
         backgroundColor: colors.bg,
       }}>
-      <GetPremium context="editor" offset={50 + insets.top} />
-      <View
+      <SafeAreaView
         style={{
-          position: 'absolute',
-          zIndex: 20,
-          height: insets.top,
-          top: 0,
-          width: dimensions.width,
-          backgroundColor: colors.bg,
-        }}
-      />
-      <PanGestureHandler
-        minPointers={2}
-        onHandlerStateChange={onHandlerStateChange}
-        onGestureEvent={onGestureEvent}>
-        <AnimatedKeyboardView
-          behavior={Platform.OS === 'ios' ? 'padding' : null}
+          width: '100%',
+          height: '100%',
+        }}>
+        <GetPremium context="editor" offset={50 + insets.top} />
+        <View
           style={{
-            transform: [
-              {
-                translateY: anim2,
-              },
-            ],
-            height: '100%',
-            width: '100%',
-          }}>
-          <View
+            position: 'absolute',
+            zIndex: 20,
+            height: insets.top,
+            top: 0,
+            width: dimensions.width,
+            backgroundColor: colors.bg,
+          }}
+        />
+        <PanGestureHandler
+          minPointers={2}
+          onHandlerStateChange={onHandlerStateChange}
+          onGestureEvent={onGestureEvent}>
+          <AnimatedKeyboardView
+            behavior={Platform.OS === 'ios' ? 'padding' : null}
             style={{
-              height: 80,
-              position: 'absolute',
-              backgroundColor: colors.accent,
-              width: '100%',
-              justifyContent: 'center',
-              alignItems: 'center',
-              zIndex: 10,
               transform: [
                 {
-                  translateY: -80
+                  translateY: anim2,
                 },
               ],
+              height: '100%',
+              width: '100%',
             }}>
-            <Animated.Text
+            <View
               style={{
+                height: 80,
                 position: 'absolute',
-                opacity: op1,
-                bottom: 10,
+                backgroundColor: colors.accent,
+                width: '100%',
+                justifyContent: 'center',
+                alignItems: 'center',
+                zIndex: 10,
+                transform: [
+                  {
+                    translateY: -80,
+                  },
+                ],
               }}>
-              <Paragraph color="white">
-                Keep swiping down to start a new note.
-              </Paragraph>
-            </Animated.Text>
+              <Animated.Text
+                style={{
+                  position: 'absolute',
+                  opacity: op1,
+                  bottom: 10,
+                }}>
+                <Paragraph color="white">
+                  Keep swiping down to start a new note.
+                </Paragraph>
+              </Animated.Text>
 
-            <Animated.Text
-              style={{
-                position: 'absolute',
-                opacity: op3,
-              }}>
-              <Paragraph color="white">Release to load new note</Paragraph>
-            </Animated.Text>
+              <Animated.Text
+                style={{
+                  position: 'absolute',
+                  opacity: op3,
+                }}>
+                <Paragraph color="white">Release to load new note</Paragraph>
+              </Animated.Text>
 
-            <Animated.Text
-              style={{
-                position: 'absolute',
-                opacity: op2,
-              }}>
-              <Paragraph color="white">Loading a new note</Paragraph>
-            </Animated.Text>
-          </View>
+              <Animated.Text
+                style={{
+                  position: 'absolute',
+                  opacity: op2,
+                }}>
+                <Paragraph color="white">Loading a new note</Paragraph>
+              </Animated.Text>
+            </View>
 
-          <Editor />
-        </AnimatedKeyboardView>
-      </PanGestureHandler>
-    </SafeAreaView>
+            <Editor />
+          </AnimatedKeyboardView>
+        </PanGestureHandler>
+      </SafeAreaView>
+    </View>
   );
 };
