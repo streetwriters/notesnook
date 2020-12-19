@@ -1,19 +1,18 @@
 import React from 'react';
-import {Platform} from 'react-native';
-import {ScrollView} from 'react-native';
-import {useTracked} from '../../provider';
-import {DDS} from '../../services/DeviceDetection';
+import { Platform } from 'react-native';
+import { useTracked } from '../../provider';
+import { DDS } from '../../services/DeviceDetection';
 import { hexToRGBA } from '../../utils/ColorUtils';
 import ActionSheet from '../ActionSheet';
-import {GetPremium} from './GetPremium';
+import { GetPremium } from './GetPremium';
 
 const ActionSheetWrapper = ({
   children,
   fwdRef,
-  gestureEnabled=true,
+  gestureEnabled = true,
   onClose,
   onOpen,
-  closeOnTouchBackdrop=true
+  closeOnTouchBackdrop = true,
 }) => {
   const [state] = useTracked();
   const {colors} = state;
@@ -43,8 +42,8 @@ const ActionSheetWrapper = ({
       containerStyle={style}
       gestureEnabled={gestureEnabled}
       extraScroll={largeTablet ? 50 : 0}
-	  initialOffsetFromBottom={1}
-	  closeOnTouchBackdrop={closeOnTouchBackdrop}
+      initialOffsetFromBottom={1}
+      closeOnTouchBackdrop={closeOnTouchBackdrop}
       indicatorColor={
         Platform.OS === 'ios'
           ? hexToRGBA(colors.accent + '19')

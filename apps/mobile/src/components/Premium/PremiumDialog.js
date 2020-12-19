@@ -1,18 +1,15 @@
-import React, {createRef} from 'react';
-import {Platform, ScrollView, TouchableOpacity, View} from 'react-native';
+import React, { createRef } from 'react';
+import { Platform, ScrollView, TouchableOpacity, View } from 'react-native';
 import * as RNIap from 'react-native-iap';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import RNFetchBlob from 'rn-fetch-blob';
-import {DDS} from '../../services/DeviceDetection';
-import {eSendEvent, ToastEvent} from '../../services/EventManager';
-import {dHeight, dWidth, itemSkus} from '../../utils';
-import {hexToRGBA} from '../../utils/ColorUtils';
-import {db} from '../../utils/DB';
-import {eOpenLoginDialog, eOpenPendingDialog} from '../../utils/Events';
-import {SIZE} from '../../utils/SizeUtils';
-import ActionSheet from '../ActionSheet';
+import { DDS } from '../../services/DeviceDetection';
+import { eSendEvent } from '../../services/EventManager';
+import { dHeight, itemSkus } from '../../utils';
+import { db } from '../../utils/DB';
+import { eOpenLoginDialog } from '../../utils/Events';
+import { SIZE } from '../../utils/SizeUtils';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
-import {Button} from '../Button';
+import { Button } from '../Button';
 import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
@@ -24,7 +21,7 @@ class PremiumDialog extends React.Component {
       products: null,
       scrollEnabled: false,
       product: null,
-      visible: true,
+      visible: false,
     };
     this.routeIndex = 0;
     this.count = 0;
@@ -47,9 +44,7 @@ class PremiumDialog extends React.Component {
     this.actionSheetRef.current?._setModalVisible(false);
   }
 
-  componentDidMount() {
-    this.actionSheetRef.current?._setModalVisible(true);
-  }
+  
 
   async getSkus() {
     try {
