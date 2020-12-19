@@ -37,11 +37,11 @@ const correction = (size, multiplier) => {
     return size * multiplier;
   } else if (dSize > 7.2 && dSize <= 8.5 && DDS.isTab) {
     return size * 0.9;
-  } else if (dSize > 8.5 && dSize <= 9.8 && DDS.isTab) {
+  } else if (dSize > 8.5 && dSize <= 9.2 && DDS.isTab) {
     
+    return size * 0.78;
+  } else if (dSize > 9.2) {
     return size * 0.8;
-  } else if (dSize > 9.8) {
-    return size * 0.85;
   } else {
     return size;
   }
@@ -61,8 +61,8 @@ export const normalize = (size) => {
   }
 };
 export const SIZE = {
-  xxs: 9 * scale.fontScale,
-  xs: 11 * scale.fontScale,
+  xxs: normalize(9) * scale.fontScale,
+  xs: normalize(10.5) * scale.fontScale,
   sm: normalize(12.5)  * scale.fontScale,
   md: normalize(15) * scale.fontScale,
   lg: normalize(21) * scale.fontScale,
@@ -72,8 +72,8 @@ export const SIZE = {
 };
 
 export function updateSize() {
-  SIZE.xxs = 9 * scale.fontScale;
-  SIZE.xs = 10 * scale.fontScale;
+  SIZE.xxs = normalize(9) * scale.fontScale;
+  SIZE.xs = normalize(10.5) * scale.fontScale;
   SIZE.sm = normalize(12.5) * scale.fontScale;
   SIZE.md = normalize(15) * scale.fontScale;
   SIZE.lg = normalize(21) * scale.fontScale;

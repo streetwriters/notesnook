@@ -1,23 +1,22 @@
 import React from 'react';
-import {ActivityIndicator, TouchableOpacity, View} from 'react-native';
+import { ActivityIndicator, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
-import {DDS} from '../../services/DeviceDetection';
-import {eSendEvent, ToastEvent} from '../../services/EventManager';
-import {getElevation, SUBSCRIPTION_STATUS_STRINGS} from '../../utils';
-import {db} from '../../utils/DB';
-import {eOpenLoginDialog} from '../../utils/Events';
-import {pv, SIZE} from '../../utils/SizeUtils';
-import {PressableButton} from '../PressableButton';
+import { useTracked } from '../../provider';
+import { Actions } from '../../provider/Actions';
+import { DDS } from '../../services/DeviceDetection';
+import { eSendEvent, ToastEvent } from '../../services/EventManager';
+import { db } from '../../utils/DB';
+import { eOpenLoginDialog } from '../../utils/Events';
+import { pv, SIZE } from '../../utils/SizeUtils';
+import { PressableButton } from '../PressableButton';
 import Paragraph from '../Typography/Paragraph';
-import {TimeSince} from './TimeSince';
+import { TimeSince } from './TimeSince';
 
 export const UserSection = ({noTextMode}) => {
   const [state, dispatch] = useTracked();
   const {colors, syncing, user} = state;
 
-  return !user && !user?.email ? (
+  return user && user?.email ? (
     <View
       style={{
         width: '100%',

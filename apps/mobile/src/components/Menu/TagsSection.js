@@ -173,17 +173,17 @@ const PinItem = ({item, index, onPress}) => {
           width: '100%',
           borderRadius: 0,
           paddingHorizontal: 10,
-          minHeight: 40,
+          minHeight: 50,
         }}>
         <View
           style={{
             flexDirection: 'row',
             alignItems: 'center',
+            flexGrow: 1,
           }}>
           <View
             style={{
               width: 30,
-              height: 30,
               justifyContent: 'center',
               alignItems: 'flex-start',
             }}>
@@ -203,13 +203,25 @@ const PinItem = ({item, index, onPress}) => {
           <View
             style={{
               alignItems: 'flex-start',
+              width: '75%',
             }}>
             {headerTextState?.id === item.id ? (
-              <Heading color={colors.heading} size={SIZE.md}>
+              <Heading
+                style={{
+                  flexWrap: 'wrap',
+                
+                }}
+                color={colors.heading}
+                size={SIZE.md}>
                 {item.title}
               </Heading>
             ) : (
-              <Paragraph color={colors.heading} size={SIZE.md}>
+              <Paragraph
+                style={{
+                  flexWrap: 'wrap',
+                }}
+                color={colors.heading}
+                size={SIZE.md}>
                 {item.title}
               </Paragraph>
             )}

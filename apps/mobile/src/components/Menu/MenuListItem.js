@@ -4,7 +4,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import {getElevation} from '../../utils';
+import { getElevation } from '../../utils';
 import {SIZE} from '../../utils/SizeUtils';
 import {PressableButton} from '../PressableButton';
 import Heading from '../Typography/Heading';
@@ -64,7 +64,7 @@ export const MenuListItem = ({item, index, noTextMode, testID}) => {
         paddingHorizontal: 8,
         justifyContent: 'space-between',
         alignItems: 'center',
-        height: 40,
+        height: 45,
       }}>
       <View
         style={{
@@ -73,7 +73,7 @@ export const MenuListItem = ({item, index, noTextMode, testID}) => {
         }}>
         <Icon
           style={{
-            minWidth: 30,
+            width:  30,
             textAlignVertical: 'center',
             textAlign: 'left',
           }}
@@ -106,7 +106,7 @@ export const MenuListItem = ({item, index, noTextMode, testID}) => {
             width: 7,
             height: 7,
             borderRadius: 100,
-            ...getElevation(5),
+            ...getElevation(5)
           }}
         />
       )}

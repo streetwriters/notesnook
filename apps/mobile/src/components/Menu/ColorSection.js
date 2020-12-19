@@ -95,7 +95,6 @@ const ColorItem = ({item, index}) => {
         <View
           style={{
             width: 30,
-            height: 30,
             justifyContent: 'center',
             alignItems: 'flex-start',
           }}>

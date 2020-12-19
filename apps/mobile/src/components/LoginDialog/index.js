@@ -355,7 +355,19 @@ const LoginDialog = () => {
               height: 50,
             }}>
             {DDS.isLargeTablet() ? (
-              <View />
+              <ActionIcon
+                name="close"
+                size={SIZE.xxxl}
+                onPress={() => {
+                  close();
+                }}
+                customStyle={{
+                  width: 40,
+                  height: 40,
+                  marginLeft: -5,
+                }}
+                color={colors.heading}
+              />
             ) : (
               <ActionIcon
                 name="arrow-left"
@@ -387,7 +399,7 @@ const LoginDialog = () => {
 
           <View
             style={{
-              paddingHorizontal: 12,
+              paddingHorizontal:12,
               paddingTop: 12,
             }}>
             {mode === MODES.changePassword ? null : (
