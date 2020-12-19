@@ -84,7 +84,7 @@
 </body>
 <script>
   let editor;
-  let isTablet = false;
+  let isTablet = true;
   </script>
 <script src="quill.js"></script>
 <script src="constants.js"></script>
@@ -472,8 +472,8 @@
   };
 
   attachMessageListener();
-  function loadAction(premium, tab) {
-    isTablet = tab;
+  function loadAction(premium) {
+    isTablet = true;
     let titleIn = document.getElementById('titlebar');
     titleIn.style['padding-left'] = 0;
     titleIn.style['padding-right'] = 0;
@@ -565,6 +565,7 @@
         }
   }
 
+  loadAction(true)
 </script>
 
 </html>

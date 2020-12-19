@@ -22,7 +22,7 @@ import { UserSection } from './UserSection';
 export const Menu = React.memo(
   () => {
     const [state, dispatch] = useTracked();
-    const {colors} = state;
+    const {colors,deviceMode} = state;
     const insets = useSafeAreaInsets();
     const noTextMode = false;
     function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
@@ -59,7 +59,7 @@ export const Menu = React.memo(
         style={{
           height: '100%',
           width: '100%',
-          backgroundColor: colors.bg,
+          backgroundColor:deviceMode !== "mobile"? colors.nav : colors.bg,
           paddingTop: insets.top,
         }}>
         <FlatList

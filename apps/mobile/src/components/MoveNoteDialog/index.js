@@ -26,6 +26,7 @@ import {
 } from '../../utils/Events';
 import {pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
 import ActionSheet from '../ActionSheet';
+import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
 import DialogHeader from '../Dialog/dialog-header';
 import {PressableButton} from '../PressableButton';
 import {Toast} from '../Toast';
@@ -38,8 +39,7 @@ const notebookInput = createRef();
 const topicInput = createRef();
 const actionSheetRef = createRef();
 const MoveNoteDialog = () => {
-  const [state, dispatch] = useTracked();
-  const {colors} = state;
+  const [, dispatch] = useTracked();
   const [visible, setVisible] = useState(false);
   const [note, setNote] = useState(null);
   function open(note) {
@@ -75,36 +75,16 @@ const MoveNoteDialog = () => {
     setNote(note);
   };
 
-  const style = React.useMemo(() => {
-    return {
-      width: DDS.isLargeTablet() ? 500 : '100%',
-      height: DDS.isLargeTablet() ? 500 : null,
-      maxHeight: DDS.isLargeTablet() ? 500 : '90%',
-      borderTopRightRadius: DDS.isLargeTablet() ? 5 : 10,
-      borderTopLeftRadius: DDS.isLargeTablet() ? 5 : 10,
-      backgroundColor: colors.bg,
-      padding: DDS.isLargeTablet() ? 8 : 0,
-      zIndex: 10,
-      paddingVertical: 12,
-    };
-  }, [colors.bg]);
-
   return !visible ? null : (
-    <ActionSheet
-      ref={actionSheetRef}
-      animationType="slide"
-      containerStyle={style}
-      gestureEnabled
-      initialOffsetFromBottom={1}
-      onClose={_onClose}>
-      <IntComponent close={close} note={note} setNote={update} />
-    </ActionSheet>
+    <ActionSheetWrapper fwdRef={actionSheetRef} onClose={_onClose}>
+      <MoveNoteComponent close={close} note={note} setNote={update} />
+    </ActionSheetWrapper>
   );
 };
 
 export default MoveNoteDialog;
 
-const IntComponent = ({close, note, setNote}) => {
+const MoveNoteComponent = ({close, note, setNote}) => {
   const [state, dispatch] = useTracked();
   const {colors, selectedItemsList} = state;
   const [expanded, setExpanded] = useState('');
@@ -137,7 +117,7 @@ const IntComponent = ({close, note, setNote}) => {
     newTopicTitle = null;
   };
 
-  const handlePress = async (item,index) => {
+  const handlePress = async (item, index) => {
     if (
       note?.notebooks?.findIndex(
         (o) =>
@@ -398,7 +378,7 @@ const IntComponent = ({close, note, setNote}) => {
                   }
                   renderItem={({item, index}) => (
                     <PressableButton
-                      onPress={() => handlePress(item,index)}
+                      onPress={() => handlePress(item, index)}
                       type="gray"
                       customStyle={{
                         height: 50,

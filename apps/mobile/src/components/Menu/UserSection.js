@@ -3,6 +3,7 @@ import {ActivityIndicator, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
+import {DDS} from '../../services/DeviceDetection';
 import {eSendEvent, ToastEvent} from '../../services/EventManager';
 import {getElevation, SUBSCRIPTION_STATUS_STRINGS} from '../../utils';
 import {db} from '../../utils/DB';
@@ -16,7 +17,7 @@ export const UserSection = ({noTextMode}) => {
   const [state, dispatch] = useTracked();
   const {colors, syncing, user} = state;
 
-  return user && user.email ? (
+  return !user && !user?.email ? (
     <View
       style={{
         width: '100%',
@@ -25,7 +26,7 @@ export const UserSection = ({noTextMode}) => {
         backgroundColor: colors.shade,
         marginTop: 10,
       }}>
-      <View
+      {/*   <View
         style={{
           flexDirection: 'row',
           justifyContent: 'space-between',
@@ -42,7 +43,7 @@ export const UserSection = ({noTextMode}) => {
         <Paragraph color="white" size={SIZE.xs}>
           {SUBSCRIPTION_STATUS_STRINGS[user.subscription.status]}
         </Paragraph>
-      </View>
+      </View> */}
 
       <TouchableOpacity
         activeOpacity={0.8}
@@ -57,7 +58,10 @@ export const UserSection = ({noTextMode}) => {
           } catch (e) {
             ToastEvent.show(e.message, 'error');
           } finally {
-            dispatch({type: Actions.LAST_SYNC,lastSync: await db.lastSynced()});
+            dispatch({
+              type: Actions.LAST_SYNC,
+              lastSync: await db.lastSynced(),
+            });
             dispatch({type: Actions.ALL});
             dispatch({
               type: Actions.SYNCING,
@@ -84,17 +88,16 @@ export const UserSection = ({noTextMode}) => {
             {syncing ? 'Syncing ' : 'Last synced: '}
             {!syncing ? (
               user?.lastSynced ? (
-                <TimeSince time={user.lastSynced} />
+                <TimeSince time={user?.lastSynced} />
               ) : (
                 'never'
               )
             ) : null}
             {'\n'}
             <Paragraph
-              size={SIZE.xs}
+              size={DDS.isLargeTablet() ? SIZE.xxs : SIZE.xs}
               color={colors.icon}
               style={{
-                fontSize: SIZE.xs,
                 color: colors.icon,
               }}>
               {syncing ? 'Fetching your notes ' : 'Tap to sync '}
@@ -147,12 +150,21 @@ export const UserSection = ({noTextMode}) => {
       {noTextMode ? null : (
         <View
           style={{
-            marginLeft: 10,
+            marginLeft: DDS.isLargeTablet() ? 5 : 10,
+            flex: 1,
           }}>
-          <Paragraph size={SIZE.xs} color={colors.icon}>
-            You are not logged in
+          {DDS.isLargeTablet() ? null : (
+            <Paragraph size={SIZE.xs} color={colors.icon}>
+              You are not logged in
+            </Paragraph>
+          )}
+          <Paragraph
+            style={{
+              flexWrap: 'wrap',
+            }}
+            color={colors.accent}>
+            Login to sync notes.
           </Paragraph>
-          <Paragraph color={colors.accent}>Login to sync notes.</Paragraph>
         </View>
       )}
     </PressableButton>

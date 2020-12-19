@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {Keyboard} from 'react-native';
+import {ScrollView} from 'react-native';
 import {
   ActivityIndicator,
   Clipboard,
@@ -511,7 +512,7 @@ export const ActionSheetComponent = ({
   };
 
   return (
-    <View
+    <ScrollView
       onLayout={() => {
         if (!item.dateDeleted) {
           localRefresh(item.type, true);
@@ -521,6 +522,8 @@ export const ActionSheetComponent = ({
         paddingBottom: 30,
         backgroundColor: colors.bg,
         paddingHorizontal: 0,
+        borderBottomRightRadius:DDS.isLargeTablet()? 10 : 1,
+        borderBottomLeftRadius:DDS.isLargeTablet()? 10 : 1
       }}>
       <TouchableOpacity
         style={{
@@ -763,6 +766,6 @@ export const ActionSheetComponent = ({
         />
       ) : null}
       <Toast context="local" />
-    </View>
+    </ScrollView>
   );
 };

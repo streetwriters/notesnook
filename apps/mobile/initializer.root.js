@@ -170,8 +170,10 @@ const AppStack = React.memo(
       let size = event?.nativeEvent?.layout;
       updatedDimensions = size;
       if (!size || (size.width === dimensions.width && mode !== null)) {
+        console.log(mode);
+        DDS.setSize(size);
         dispatch({type: Actions.DEVICE_MODE, state: mode});
-
+     
         return;
       }
 
@@ -188,9 +190,8 @@ const AppStack = React.memo(
       });
 
       setWidthHeight(size);
+      console.log(size,"SIZES")
       DDS.setSize(size);
-      DDS.checkSmallTab(size.width > size.height ? 'LANDSCAPE' : 'PORTRAIT');
-
       if (DDS.isLargeTablet()) {
         setDeviceMode('tablet', size);
       } else if (DDS.isSmallTab) {

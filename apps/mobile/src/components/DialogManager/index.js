@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component, createRef} from 'react';
 import {Platform} from 'react-native';
 import {DDS} from '../../services/DeviceDetection';
 import {
@@ -29,6 +29,7 @@ import {
 } from '../../utils/Events';
 import ActionSheet from '../ActionSheet';
 import {ActionSheetComponent} from '../ActionSheetComponent';
+import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
 import {GetPremium, translatePrem} from '../ActionSheetComponent/GetPremium';
 import {AddNotebookDialog} from '../AddNotebookDialog';
 import {AddTopicDialog} from '../AddTopicDialog';
@@ -52,7 +53,7 @@ import {TEMPLATE_DELETE, TEMPLATE_PERMANANT_DELETE} from './Templates';
 export class DialogManager extends Component {
   constructor(props) {
     super(props);
-    this.actionSheet;
+    this.actionSheet = createRef();
     this.opened = false;
     this.state = {
       item: {},
@@ -89,13 +90,13 @@ export class DialogManager extends Component {
         actionSheetVisible: true,
       },
       () => {
-        this.actionSheet._setModalVisible();
+        this.actionSheet.current?._setModalVisible();
       },
     );
   };
 
   _hideActionSheet = () => {
-    this.actionSheet._setModalVisible(false);
+    this.actionSheet.current?._setModalVisible(false);
   };
 
   _showMoveNote = () => {
@@ -300,49 +301,12 @@ export class DialogManager extends Component {
   render() {
     let {colors} = this.props;
     let {actionSheetData, item, simpleDialog} = this.state;
+    console.log(DDS.isLargeTablet())
     return (
       <>
         {!this.state.actionSheetVisible ? null : (
-          <ActionSheet
-            ref={(ref) => (this.actionSheet = ref)}
-            containerStyle={{
-              backgroundColor: colors.bg,
-              width: DDS.isLargeTablet() ? 500 : '100%',
-              alignSelf: 'center',
-              borderRadius: 10,
-              marginBottom: DDS.isLargeTablet() ? 50 : 0,
-              borderBottomRightRadius: DDS.isLargeTablet() ? 10 : 1,
-              borderBottomLeftRadius: DDS.isLargeTablet() ? 10 : 1,
-            }}
-            extraScroll={DDS.isTab ? 50 : 0}
-            indicatorColor={
-              Platform.ios
-                ? hexToRGBA(colors.accent + '19')
-                : hexToRGBA(colors.shade)
-            }
-            premium={
-              <GetPremium
-                context="sheet"
-                close={() => this.actionSheet._hideModal()}
-                offset={50}
-              />
-            }
-            keyboardShouldPersistTaps="always"
-            //delayActionSheetDraw={true}
-            //delayActionSheetDrawTime={10}
-            footerAlwaysVisible={DDS.isTab}
-            footerHeight={DDS.isTab ? 20 : 10}
-            footerStyle={
-              DDS.isTab
-                ? {
-                    borderRadius: 10,
-                    backgroundColor: colors.bg,
-                  }
-                : null
-            }
-            initialOffsetFromBottom={1}
-            bounceOnOpen={false}
-            gestureEnabled={true}
+          <ActionSheetWrapper
+            fwdRef={this.actionSheet}
             onClose={() => {
               translatePrem.setValue(-dWidth * 5);
               this.onActionSheetHide();
@@ -369,7 +333,7 @@ export class DialogManager extends Component {
                 this.actionSheet._setModalVisible();
               }}
             />
-          </ActionSheet>
+          </ActionSheetWrapper>
         )}
 
         <Dialog

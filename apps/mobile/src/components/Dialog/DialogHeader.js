@@ -19,7 +19,10 @@ const DialogHeader = ({icon, title, paragraph, button}) => {
           justifyContent: 'space-between',
           height: 50,
         }}>
-        <View>
+        <View
+          style={{
+            width: '100%',
+          }}>
           <View
             style={{
               flexDirection: 'row',

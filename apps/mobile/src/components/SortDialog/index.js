@@ -14,6 +14,7 @@ import {MMKV} from '../../utils/mmkv';
 import {SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
 import ActionSheet from '../ActionSheet';
+import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
 import {updateEvent} from '../DialogManager/recievers';
 import {PressableButton} from '../PressableButton';
 import Seperator from '../Seperator';
@@ -74,39 +75,12 @@ class SortDialog extends React.Component {
     if (!this.state.visible) return null;
 
     return (
-      <ActionSheet
-        containerStyle={{
-          backgroundColor: colors.bg,
-          alignSelf: 'center',
-          width: DDS.isTab ? 500 : '100%',
-          borderRadius: 10,
-          marginBottom: DDS.isTab ? 50 : 0,
-        }}
-        indicatorColor={
-          Platform.ios
-            ? hexToRGBA(colors.accent + '19')
-            : hexToRGBA(colors.shade)
-        }
-        extraScroll={DDS.isTab ? 50 : 0}
-        gestureEnabled={true}
-        footerAlwaysVisible={DDS.isTab}
-        footerHeight={DDS.isTab ? 20 : 10}
-        footerStyle={
-          DDS.isTab
-            ? {
-                borderRadius: 10,
-                backgroundColor: colors.bg,
-              }
-            : null
-        }
-        ref={actionSheet}
-        initialOffsetFromBottom={1}>
+      <ActionSheetWrapper fwdRef={actionSheet}>
         <View
           style={{
-            width: DDS.isTab ? 500 : dWidth,
+            width: '100%',
             backgroundColor: colors.bg,
             justifyContent: 'space-between',
-          
             borderRadius: 10,
             paddingTop: 10,
           }}>
@@ -186,8 +160,8 @@ class SortDialog extends React.Component {
                   justifyContent: 'space-between',
                   flexDirection: 'row',
                   alignItems: 'center',
-                  borderRadius:0,
-                  paddingHorizontal:12
+                  borderRadius: 0,
+                  paddingHorizontal: 12,
                 }}>
                 <Heading
                   size={SIZE.sm}
@@ -211,7 +185,7 @@ class SortDialog extends React.Component {
             }}
           />
         </View>
-      </ActionSheet>
+      </ActionSheetWrapper>
     );
   }
 }

@@ -11,6 +11,7 @@ import {db} from '../../utils/DB';
 import {eOpenLoginDialog, eOpenPendingDialog} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
 import ActionSheet from '../ActionSheet';
+import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
 import {Button} from '../Button';
 import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
@@ -23,7 +24,7 @@ class PremiumDialog extends React.Component {
       products: null,
       scrollEnabled: false,
       product: null,
-      visible: false,
+      visible: true,
     };
     this.routeIndex = 0;
     this.count = 0;
@@ -46,9 +47,13 @@ class PremiumDialog extends React.Component {
     this.actionSheetRef.current?._setModalVisible(false);
   }
 
+  componentDidMount() {
+    this.actionSheetRef.current?._setModalVisible(true);
+  }
+
   async getSkus() {
     try {
-      let u = await db.user.getUser()
+      let u = await db.user.getUser();
       this.setState({
         user: u,
       });
@@ -67,21 +72,7 @@ class PremiumDialog extends React.Component {
   render() {
     const {colors} = this.props;
     return !this.state.visible ? null : (
-      <ActionSheet
-        containerStyle={{
-          backgroundColor: colors.bg,
-          width: DDS.isLargeTablet() ? 500 : '100%',
-          alignSelf: 'center',
-          borderRadius: 10,
-          marginBottom: DDS.isLargeTablet() ? 50 : 0,
-          borderBottomRightRadius: 0,
-          borderBottomLeftRadius: 0,
-        }}
-        indicatorColor={
-          Platform.ios
-            ? hexToRGBA(colors.accent + '19')
-            : hexToRGBA(colors.shade)
-        }
+      <ActionSheetWrapper
         onOpen={async () => {
           try {
             await this.getSkus();
@@ -89,28 +80,15 @@ class PremiumDialog extends React.Component {
             console.log(e);
           }
         }}
-        extraScroll={DDS.isLargeTablet() ? 50 : 10}
-        footerAlwaysVisible={DDS.isLargeTablet()}
-        footerHeight={DDS.isLargeTablet() ? 20 : 10}
-        footerStyle={
-          DDS.isLargeTablet()
-            ? {
-                borderRadius: 10,
-                backgroundColor: colors.bg,
-              }
-            : null
-        }
         onClose={() => {
           this.setState({
             visible: false,
           });
         }}
-        gestureEnabled={true}
-        ref={this.actionSheetRef}
-        initialOffsetFromBottom={1}>
+        fwdRef={this.actionSheetRef}>
         <View
           style={{
-            width: DDS.isLargeTablet() ? 500 : dWidth,
+            width: "100%",
             backgroundColor: colors.bg,
             justifyContent: 'space-between',
             paddingHorizontal: 12,
@@ -139,7 +117,7 @@ class PremiumDialog extends React.Component {
             style={{
               width: '100%',
               maxHeight: DDS.isLargeTablet() ? dHeight * 0.35 : dHeight * 0.45,
-            }}>                  
+            }}>
             {[
               {
                 title: 'Cross Platfrom Sync',
@@ -264,9 +242,7 @@ class PremiumDialog extends React.Component {
                     paddingVertical: 10,
                     marginRight: 10,
                   }}>
-                  <Paragraph
-                    size={SIZE.lg}
-                   >
+                  <Paragraph size={SIZE.lg}>
                     {item.localizedPrice}
                     <Paragraph color={colors.accent} size={SIZE.sm}>
                       /mo
@@ -300,7 +276,7 @@ class PremiumDialog extends React.Component {
             />
           </View>
         </View>
-      </ActionSheet>
+      </ActionSheetWrapper>
     );
   }
 }

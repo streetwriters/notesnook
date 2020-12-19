@@ -2,7 +2,7 @@ import React, {useEffect} from 'react';
 import {BackHandler, Keyboard, Platform, View} from 'react-native';
 import RNExitApp from 'react-native-exit-app';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import { notesnook } from '../../../e2e/test.ids';
+import {notesnook} from '../../../e2e/test.ids';
 import {ActionIcon} from '../../components/ActionIcon';
 import {
   ActionSheetEvent,
@@ -50,7 +50,7 @@ let tapCount = 0;
 
 const EditorHeader = () => {
   const [state] = useTracked();
-  const {colors, premiumUser, fullscreen,deviceMode} = state;
+  const {colors, premiumUser, fullscreen, deviceMode} = state;
   const insets = useSafeAreaInsets();
 
   useEffect(() => {
@@ -58,7 +58,7 @@ const EditorHeader = () => {
   }, [colors.bg]);
 
   useEffect(() => {
-    post("tablet",DDS.isLargeTablet())
+    post('tablet', DDS.isLargeTablet());
   }, [deviceMode]);
 
   useEffect(() => {
@@ -70,8 +70,6 @@ const EditorHeader = () => {
       eUnSubscribeEvent(eOnLoadNote, load);
     };
   }, []);
-
-
 
   useEffect(() => {
     if (fullscreen && DDS.isTab) {
@@ -121,8 +119,6 @@ const EditorHeader = () => {
       return true;
     }
   };
-
-  
 
   const _onBackPress = async () => {
     if (getIntent() && sideMenuRef.current === null) {

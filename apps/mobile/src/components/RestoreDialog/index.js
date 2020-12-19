@@ -20,6 +20,7 @@ import {SIZE} from '../../utils/SizeUtils';
 import storage from '../../utils/storage';
 import {sleep, timeConverter} from '../../utils/TimeUtils';
 import ActionSheet from '../ActionSheet';
+import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
 import {Button} from '../Button';
 import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';
@@ -32,12 +33,8 @@ import Paragraph from '../Typography/Paragraph';
 const actionSheetRef = createRef();
 
 const RestoreDialog = () => {
-  const [state, dispatch] = useTracked();
-  const {colors} = state;
   const [visible, setVisible] = useState(false);
-  const [files, setFiles] = useState([]);
-  const [restoring, setRestoring] = useState(true);
-  const insets = useSafeAreaInsets();
+  const [restoring, setRestoring] = useState(false);
   useEffect(() => {
     eSubscribeEvent(eOpenRestoreDialog, open);
     eSubscribeEvent(eCloseRestoreDialog, close);
@@ -53,6 +50,14 @@ const RestoreDialog = () => {
     actionSheetRef.current?._setModalVisible(true);
   };
 
+  const close = () => {
+    if (restoring) {
+      showIsWorking();
+      return;
+    }
+    setVisible(false);
+  };
+
   const showIsWorking = () => {
     ToastEvent.show(
       'Please wait, we are restoring your data.',
@@ -61,14 +66,31 @@ const RestoreDialog = () => {
     );
   };
 
-  const close = () => {
-    if (restoring) {
-      showIsWorking();
-      return;
-    }
+  return !visible ? null : (
+    <ActionSheetWrapper
+      fwdRef={actionSheetRef}
+      gestureEnabled={!restoring}
+      closeOnTouchBackdrop={!restoring}
+      onClose={close}>
+      <RestoreDataComponent
+        close={close}
+        restoring={restoring}
+        setRestoring={setRestoring}
+      />
+    </ActionSheetWrapper>
+  );
+};
 
-    setVisible(false);
-  };
+export default RestoreDialog;
+
+const RestoreDataComponent = ({close, setRestoring, restoring}) => {
+  const [state, dispatch] = useTracked();
+  const {colors} = state;
+  const [files, setFiles] = useState([]);
+
+  useEffect(() => {
+    checkBackups();
+  }, []);
 
   const restore = async (item, index) => {
     if (restoring) {
@@ -93,7 +115,7 @@ const RestoreDialog = () => {
       setRestoring(false);
       dispatch({type: Actions.ALL});
       ToastEvent.show('Restore Complete!', 'success', 'local');
-      setVisible(false);
+      close();
     } catch (e) {
       setRestoring(false);
       ToastEvent.show(e.message, 'error', 'local');
@@ -127,35 +149,15 @@ const RestoreDialog = () => {
     }
   };
 
-  const style = React.useMemo(() => {
-    return {
-      width: DDS.isLargeTablet() ? 500 : '100%',
-      height: DDS.isLargeTablet() ? 500 : null,
-      maxHeight: DDS.isLargeTablet() ? 500 : '90%',
-      borderTopRightRadius: DDS.isLargeTablet() ? 5 : 10,
-      borderTopLeftRadius: DDS.isLargeTablet() ? 5 : 10,
-      backgroundColor: colors.bg,
-      padding: DDS.isLargeTablet() ? 8 : 0,
-      zIndex: 10,
-      paddingVertical: 12,
-    };
-  }, [colors.bg]);
-
-  return !visible ? null : (
-    <ActionSheet
-      ref={actionSheetRef}
-      containerStyle={style}
-      gestureEnabled={!restoring}
-      closeOnTouchBackdrop={!restoring}
-      initialOffsetFromBottom={1}
-      onClose={close}
-      onOpen={() => checkBackups()}>
+  return (
+    <>
       <View>
         <View
           style={{
             flexDirection: 'row',
             justifyContent: 'space-between',
-            paddingHorizontal: 12,
+            paddingHorizontal: 8,
+            paddingRight: 8,
             alignItems: 'center',
             paddingTop: restoring ? 25 : 0,
           }}>
@@ -284,8 +286,6 @@ const RestoreDialog = () => {
         </ScrollView>
       </View>
       <Toast context="local" />
-    </ActionSheet>
+    </>
   );
 };
-
-export default RestoreDialog;

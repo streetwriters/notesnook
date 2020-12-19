@@ -283,23 +283,22 @@ const setTheme = function () {
   
   #titleInput {
     color:${pageTheme.colors.pri};
-    font-size:${32 * 1.5 * pageTheme.colors.factor};
+    font-size:${32 * 1 * pageTheme.colors.factor};
 
   }
 
   #textCopy {
     color:${pageTheme.colors.pri};
-    font-size:${32 * 1.5 * pageTheme.colors.factor};
-
+    font-size:${32 * pageTheme.colors.factor};
+    min-height: ${32 * pageTheme.colors.factor + 6};
   }
+
+ 
 
   #titleInput::-webkit-input-placeholder {
     color:${pageTheme.colors.icon}
   }
 
-  #titlebar {
-    background-color:${pageTheme.colors.shade};
-  }
 
   .ql-picker-options {
     background-color: ${pageTheme.colors.nav};
@@ -368,11 +367,7 @@ const setTheme = function () {
       font-family: 'Poppins', sans-serif;
       margin: 0px;
       position: relative;
-      height:${
-        isTablet
-          ? 'calc(100% - 260px) !important'
-          : 'calc(100% - 110px) !important'
-      };
+      height:calc(100% - 115px) !important
     }
  
                 `;
