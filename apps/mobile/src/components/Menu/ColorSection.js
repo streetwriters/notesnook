@@ -8,16 +8,18 @@ import {
   eUnSubscribeEvent,
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
+import {getElevation} from '../../utils';
 import {COLORS_NOTE} from '../../utils/Colors';
 import {db} from '../../utils/DB';
 import {refreshNotesPage} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
 import {PressableButton} from '../PressableButton';
+import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
-export const ColorSection = ({noTextMode}) => {
+export const ColorSection = () => {
   const [state, dispatch] = useTracked();
-  const {colorNotes,loading} = state;
+  const {colorNotes, loading} = state;
 
   useEffect(() => {
     if (!loading) {
@@ -25,16 +27,9 @@ export const ColorSection = ({noTextMode}) => {
     }
   }, [loading]);
 
-  return (
-    <View
-      style={{
-        width: '100%',
-      }}>
-      {colorNotes.map((item, index) => (
-        <ColorItem key={item.id} item={item} index={index} />
-      ))}
-    </View>
-  );
+  return colorNotes.map((item, index) => (
+    <ColorItem key={item.id} item={item} index={index} />
+  ));
 };
 
 const ColorItem = ({item, index}) => {
@@ -43,7 +38,9 @@ const ColorItem = ({item, index}) => {
   const [headerTextState, setHeaderTextState] = useState(null);
 
   const onHeaderStateChange = (event) => {
-    if (event.id === item.name) {
+    console.log(event);
+    if (event.id === item.id) {
+      console.log('here');
       setHeaderTextState(event);
     } else {
       setHeaderTextState(null);
@@ -75,54 +72,67 @@ const ColorItem = ({item, index}) => {
 
   return (
     <PressableButton
-      customColor={
-        headerTextState?.id === item.id && item.type === headerTextState?.type
-          ? COLORS_NOTE[item.title]
-          : 'transparent'
-      }
+      customColor="transparent"
       customSelectedColor={COLORS_NOTE[item.title]}
       customAlpha={!colors.night ? -0.02 : 0.02}
       customOpacity={0.12}
       onPress={() => onPress(item)}
       customStyle={{
-        flexDirection: 'row',
-        justifyContent: 'flex-start',
-        alignItems: 'center',
         width: '100%',
+        alignSelf: 'center',
         borderRadius: 0,
-        paddingHorizontal: 10,
-        height: 50,
+        flexDirection: 'row',
+        paddingHorizontal: 8,
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        height: 40,
       }}>
       <View
         style={{
-          width: 35,
-          height: 35,
-          justifyContent: 'center',
-          alignItems: 'flex-start',
+          flexDirection: 'row',
+          alignItems: 'center',
         }}>
         <View
           style={{
-            width: SIZE.md,
-            height: SIZE.md,
-            backgroundColor: COLORS_NOTE[item.title],
-            borderRadius: 100,
+            width: 30,
+            height: 30,
             justifyContent: 'center',
-            marginRight: 10,
-          }}
-        />
+            alignItems: 'flex-start',
+          }}>
+          <View
+            style={{
+              width: SIZE.md,
+              height: SIZE.md,
+              backgroundColor: COLORS_NOTE[item.title],
+              borderRadius: 100,
+              justifyContent: 'center',
+              marginRight: 10,
+            }}
+          />
+        </View>
+        {headerTextState?.id === item.id ? (
+          <Heading color={COLORS_NOTE[item.title.toLowerCase()]} size={SIZE.md}>
+            {item.title.slice(0, 1).toUpperCase() + item.title.slice(1)}
+          </Heading>
+        ) : (
+          <Paragraph color={colors.heading} size={SIZE.md}>
+            {item.title.slice(0, 1).toUpperCase() + item.title.slice(1)}
+          </Paragraph>
+        )}
       </View>
 
       <View
         style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          width: '85%',
-        }}>
-        <Paragraph color={colors.heading} size={SIZE.md}>
-          {item.title.slice(0, 1).toUpperCase() + item.title.slice(1)}
-        </Paragraph>
-      </View>
+          backgroundColor:
+            headerTextState?.id === item.id
+              ? COLORS_NOTE[item.title.toLowerCase()]
+              : 'transparent',
+          width: 7,
+          height: 7,
+          borderRadius: 100,
+          ...getElevation(5),
+        }}
+      />
     </PressableButton>
   );
 };

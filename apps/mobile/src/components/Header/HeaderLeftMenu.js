@@ -1,6 +1,7 @@
 import React from 'react';
 import {notesnook} from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
+import { DDS } from '../../services/DeviceDetection';
 import Navigation from '../../services/Navigation';
 import SettingsService from '../../services/SettingsService';
 import {SIZE} from '../../utils/SizeUtils';
@@ -19,7 +20,9 @@ export const HeaderLeftMenu = () => {
   };
   return (
     <>
-      {deviceMode === 'mobile' || currentScreen === 'search' ? (
+      {deviceMode === 'mobile' ||
+      currentScreen === 'search' ||
+      !headerMenuState ? (
         <ActionIcon
           testID={notesnook.ids.default.header.buttons.left}
           customStyle={{
@@ -29,12 +32,11 @@ export const HeaderLeftMenu = () => {
             width: 40,
             borderRadius: 100,
             marginLeft: -5,
-            marginRight: 25,
+            marginRight:DDS.isLargeTablet()? 10 : 25,
           }}
           onPress={onLeftButtonPress}
           onLongPress={() => {
             Navigation.popToTop();
-            
           }}
           name={!headerMenuState ? 'arrow-left' : 'menu'}
           size={SIZE.xxxl}

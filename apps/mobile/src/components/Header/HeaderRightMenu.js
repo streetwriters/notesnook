@@ -41,7 +41,7 @@ export const HeaderRightMenu = () => {
           type="shade"
           style={{
             marginLeft: 20,
-            width: 60,
+            width: 50,
             height: 35,
           }}
         />

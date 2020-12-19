@@ -185,7 +185,10 @@ const SimpleList = ({
           alignItems: 'center',
         }}>
         <Heading>{placeholderData.heading}</Heading>
-        <Paragraph color={colors.icon}>
+        <Paragraph style={{
+          textAlign:'center',
+          width:"80%"
+        }} color={colors.icon}>
           {loading ? placeholderData.loading : placeholderData.paragraph}
         </Paragraph>
         <Seperator />

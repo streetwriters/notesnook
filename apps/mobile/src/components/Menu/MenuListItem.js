@@ -4,8 +4,10 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
+import {getElevation} from '../../utils';
 import {SIZE} from '../../utils/SizeUtils';
 import {PressableButton} from '../PressableButton';
+import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
 export const MenuListItem = ({item, index, noTextMode, testID}) => {
@@ -53,20 +55,16 @@ export const MenuListItem = ({item, index, noTextMode, testID}) => {
       testID={testID}
       key={item.name + index}
       onPress={_onPress}
-      type={
-        headerTextState?.id === item.name.toLowerCase() + '_navigation'
-          ? 'shade'
-          : 'transparent'
-      }
+      type="transparent"
       customStyle={{
-        width: noTextMode ? 50 : '100%',
+        width: '100%',
         alignSelf: 'center',
         borderRadius: 0,
         flexDirection: 'row',
-        paddingHorizontal: noTextMode ? 0 : 8,
-        justifyContent: noTextMode ? 'center' : 'space-between',
+        paddingHorizontal: 8,
+        justifyContent: 'space-between',
         alignItems: 'center',
-        height: 50,
+        height: 40,
       }}>
       <View
         style={{
@@ -75,24 +73,43 @@ export const MenuListItem = ({item, index, noTextMode, testID}) => {
         }}>
         <Icon
           style={{
-            minWidth: noTextMode ? null : 35,
+            minWidth: 30,
             textAlignVertical: 'center',
-            textAlign: noTextMode ? 'center' : 'left',
+            textAlign: 'left',
           }}
           name={item.icon}
           color={colors.accent}
           size={SIZE.md}
         />
-        {noTextMode ? null : <Paragraph size={SIZE.md}>{item.name}</Paragraph>}
+        {headerTextState?.id === item.name.toLowerCase() + '_navigation' ? (
+          <Heading color={colors.accent} size={SIZE.md}>
+            {item.name}
+          </Heading>
+        ) : (
+          <Paragraph size={SIZE.md}>{item.name}</Paragraph>
+        )}
       </View>
 
-      {item.switch && !noTextMode ? (
+      {item.switch ? (
         <Icon
           size={SIZE.lg}
           color={item.on ? colors.accent : colors.icon}
           name={item.on ? 'toggle-switch' : 'toggle-switch-off'}
         />
-      ) : undefined}
+      ) : (
+        <View
+          style={{
+            backgroundColor:
+              headerTextState?.id === item.name.toLowerCase() + '_navigation'
+                ? colors.accent
+                : 'transparent',
+            width: 7,
+            height: 7,
+            borderRadius: 100,
+            ...getElevation(5),
+          }}
+        />
+      )}
     </PressableButton>
   );
 };

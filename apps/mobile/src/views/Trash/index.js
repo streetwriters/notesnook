@@ -78,7 +78,7 @@ export const Trash = ({route, navigation}) => {
         type="trash"
         focused={() => navigation.isFocused()}
         placeholderData={{
-          heading: 'Your Trash',
+          heading: 'Trash',
           paragraph:
             'Items in the trash will be permanently deleted after 7 days.',
           button: null,

@@ -89,7 +89,7 @@ export const TagsSection = () => {
           <View
             style={{
               flexGrow: 1,
-              minHeight:"40%",
+              minHeight: '40%',
               justifyContent: 'center',
               alignItems: 'center',
               paddingHorizontal: '10%',
@@ -101,8 +101,8 @@ export const TagsSection = () => {
               style={{textAlign: 'center'}}
               color={colors.icon}
               size={SIZE.xs}>
-              You have not pinned anything yet. You can pin notebooks, topics and tags
-              here.
+              You have not pinned anything yet. You can pin notebooks, topics
+              and tags here.
             </Paragraph>
           </View>
         }
@@ -122,7 +122,7 @@ const PinItem = ({item, index, onPress}) => {
   const [headerTextState, setHeaderTextState] = useState(null);
 
   const onHeaderStateChange = (event) => {
-    if (event?.id === item.name) {
+    if (event?.id === item.id) {
       setHeaderTextState(event);
     } else {
       setHeaderTextState(null);
@@ -163,62 +163,79 @@ const PinItem = ({item, index, onPress}) => {
         </BaseDialog>
       )}
       <PressableButton
-        type={
-          headerTextState?.id === item.id && headerTextState?.type === item.type
-            ? 'shade'
-            : 'transparent'
-        }
+        type="transparent"
         onLongPress={() => setVisible(true)}
         onPress={() => onPress(item)}
         customStyle={{
           flexDirection: 'row',
-          justifyContent: 'flex-start',
+          justifyContent: 'space-between',
           alignItems: 'center',
           width: '100%',
           borderRadius: 0,
           paddingHorizontal: 10,
-          minHeight: 50,
+          minHeight: 40,
         }}>
         <View
           style={{
-            width: 35,
-            height: 35,
-            justifyContent: 'center',
-            alignItems: 'flex-start',
+            flexDirection: 'row',
+            alignItems: 'center',
           }}>
-          {item.type === 'notebook' ? (
-            <Icon color={colors.accent} size={SIZE.md} name="book-outline" />
-          ) : item.type === 'tag' ? (
-            <Icon color={colors.accent} size={SIZE.md} name="pound" />
-          ) : (
+          <View
+            style={{
+              width: 30,
+              height: 30,
+              justifyContent: 'center',
+              alignItems: 'flex-start',
+            }}>
+            {item.type === 'notebook' ? (
+              <Icon color={colors.accent} size={SIZE.md} name="book-outline" />
+            ) : item.type === 'tag' ? (
+              <Icon color={colors.accent} size={SIZE.md} name="pound" />
+            ) : (
+              <Paragraph
+                style={{textAlign: 'center', width: 12}}
+                color={colors.accent}
+                size={SIZE.md}>
+                T
+              </Paragraph>
+            )}
+          </View>
+          <View
+            style={{
+              alignItems: 'flex-start',
+            }}>
+            {headerTextState?.id === item.id ? (
+              <Heading color={colors.heading} size={SIZE.md}>
+                {item.title}
+              </Heading>
+            ) : (
+              <Paragraph color={colors.heading} size={SIZE.md}>
+                {item.title}
+              </Paragraph>
+            )}
             <Paragraph
-              style={{textAlign: 'center', width: 12}}
-              color={colors.accent}
-              size={SIZE.md}>
-              T
+              style={{marginTop: 2.5}}
+              size={SIZE.xs}
+              color={colors.icon}>
+              {item.type.slice(0, 1).toUpperCase() +
+                item.type.slice(1, item.type.length)}{' '}
+              {item.type === 'topic'
+                ? 'in ' + db.notebooks.notebook(item.notebookId).data.title
+                : null}
             </Paragraph>
-          )}
+          </View>
         </View>
+
         <View
           style={{
-            alignItems: 'flex-start',
-            width: '85%',
-          }}>
-          <Paragraph size={SIZE.md} color={colors.heading}>
-            {item.title}
-          </Paragraph>
-
-          <Paragraph
-            style={{marginTop: 2.5}}
-            size={SIZE.xs}
-            color={colors.icon}>
-            {item.type.slice(0, 1).toUpperCase() +
-              item.type.slice(1, item.type.length)}{' '}
-            {item.type === 'topic'
-              ? 'in ' + db.notebooks.notebook(item.notebookId).data.title
-              : null}
-          </Paragraph>
-        </View>
+            backgroundColor:
+              headerTextState?.id === item.id ? colors.accent : 'transparent',
+            width: 7,
+            height: 7,
+            borderRadius: 100,
+            ...getElevation(5),
+          }}
+        />
       </PressableButton>
     </>
   );
