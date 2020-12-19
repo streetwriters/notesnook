@@ -301,7 +301,6 @@ export class DialogManager extends Component {
   render() {
     let {colors} = this.props;
     let {actionSheetData, item, simpleDialog} = this.state;
-    console.log(DDS.isLargeTablet())
     return (
       <>
         {!this.state.actionSheetVisible ? null : (
@@ -319,6 +318,7 @@ export class DialogManager extends Component {
               setWillRefresh={(value) => {
                 this.willRefresh = true;
               }}
+              getRef={() => this.actionSheet}
               hasColors={actionSheetData.colors}
               hasTags={actionSheetData.colors}
               overlayColor={

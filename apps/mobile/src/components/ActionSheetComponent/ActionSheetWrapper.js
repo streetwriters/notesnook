@@ -17,12 +17,12 @@ const ActionSheetWrapper = ({
   const [state] = useTracked();
   const {colors} = state;
   const largeTablet = DDS.isLargeTablet();
+  const smallTablet = DDS.isTab;
 
   const style = React.useMemo(() => {
     return {
-      width: largeTablet ? 500 : '100%',
-      minHeight: largeTablet ? 100 : null,
-      maxHeight: largeTablet ? 500 : '90%',
+      width: largeTablet || smallTablet ? 500 : '100%',
+      maxHeight: largeTablet ? 500 : '100%',
       borderTopRightRadius: 10,
       borderTopLeftRadius: 10,
       backgroundColor: colors.bg,

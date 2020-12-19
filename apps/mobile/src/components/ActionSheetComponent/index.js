@@ -57,6 +57,7 @@ export const ActionSheetComponent = ({
   hasTags = false,
   rowItems = [],
   columnItems = [],
+  getRef,
 }) => {
   const [state, dispatch] = useTracked();
   const {colors, premiumUser, user} = state;
@@ -511,8 +512,16 @@ export const ActionSheetComponent = ({
     }
   };
 
+  const onScrollEnd = () => {
+    getRef().current?.childScrollHandler();
+  };
+
   return (
     <ScrollView
+      nestedScrollEnabled
+      onScrollEndDrag={onScrollEnd}
+      onScrollAnimationEnd={onScrollEnd}
+      onMomentumScrollEnd={onScrollEnd}
       onLayout={() => {
         if (!item.dateDeleted) {
           localRefresh(item.type, true);
@@ -522,8 +531,8 @@ export const ActionSheetComponent = ({
         paddingBottom: 30,
         backgroundColor: colors.bg,
         paddingHorizontal: 0,
-        borderBottomRightRadius:DDS.isLargeTablet()? 10 : 1,
-        borderBottomLeftRadius:DDS.isLargeTablet()? 10 : 1
+        borderBottomRightRadius: DDS.isLargeTablet() ? 10 : 1,
+        borderBottomLeftRadius: DDS.isLargeTablet() ? 10 : 1,
       }}>
       <TouchableOpacity
         style={{

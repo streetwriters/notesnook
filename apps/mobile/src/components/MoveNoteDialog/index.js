@@ -1,35 +1,33 @@
-import React, {createRef, useEffect, useState} from 'react';
+import React, { createRef, useEffect, useState } from 'react';
 import {
   FlatList,
   Keyboard,
   ScrollView,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {notesnook} from '../../../e2e/test.ids';
-import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
-import {DDS} from '../../services/DeviceDetection';
+import { notesnook } from '../../../e2e/test.ids';
+import { useTracked } from '../../provider';
+import { Actions } from '../../provider/Actions';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-  ToastEvent,
+  ToastEvent
 } from '../../services/EventManager';
-import {db} from '../../utils/DB';
+import { db } from '../../utils/DB';
 import {
   eOnNewTopicAdded,
   eOpenMoveNoteDialog,
-  refreshNotesPage,
+  refreshNotesPage
 } from '../../utils/Events';
-import {pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
-import ActionSheet from '../ActionSheet';
+import { pv, SIZE, WEIGHT } from '../../utils/SizeUtils';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
 import DialogHeader from '../Dialog/dialog-header';
-import {PressableButton} from '../PressableButton';
-import {Toast} from '../Toast';
+import { PressableButton } from '../PressableButton';
+import { Toast } from '../Toast';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
