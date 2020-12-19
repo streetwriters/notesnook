@@ -330,7 +330,7 @@ export class DialogManager extends Component {
                 if (value) {
                   this.show = value;
                 }
-                this.actionSheet._setModalVisible();
+                this.actionSheet.current?._setModalVisible();
               }}
             />
           </ActionSheetWrapper>
