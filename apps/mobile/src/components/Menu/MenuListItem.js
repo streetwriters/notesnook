@@ -5,7 +5,7 @@ import {useTracked} from '../../provider';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import { getElevation } from '../../utils';
-import {SIZE} from '../../utils/SizeUtils';
+import {normalize, SIZE} from '../../utils/SizeUtils';
 import {PressableButton} from '../PressableButton';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
@@ -64,7 +64,7 @@ export const MenuListItem = ({item, index, noTextMode, testID}) => {
         paddingHorizontal: 8,
         justifyContent: 'space-between',
         alignItems: 'center',
-        height: 45,
+        height:normalize(50),
       }}>
       <View
         style={{
@@ -106,7 +106,7 @@ export const MenuListItem = ({item, index, noTextMode, testID}) => {
             width: 7,
             height: 7,
             borderRadius: 100,
-            ...getElevation(5)
+            ...getElevation(headerTextState?.id === item.name.toLowerCase() + '_navigation'? 5 : 0)
           }}
         />
       )}

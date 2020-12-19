@@ -14,7 +14,7 @@ import {getElevation} from '../../utils';
 import {db} from '../../utils/DB';
 import {refreshNotesPage} from '../../utils/Events';
 import {rootNavigatorRef} from '../../utils/Refs';
-import {ph, pv, SIZE} from '../../utils/SizeUtils';
+import {normalize, ph, pv, SIZE} from '../../utils/SizeUtils';
 import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogHeader from '../Dialog/dialog-header';
@@ -173,7 +173,7 @@ const PinItem = ({item, index, onPress}) => {
           width: '100%',
           borderRadius: 0,
           paddingHorizontal: 10,
-          minHeight: 50,
+          minHeight: normalize(50),
         }}>
         <View
           style={{
@@ -245,7 +245,7 @@ const PinItem = ({item, index, onPress}) => {
             width: 7,
             height: 7,
             borderRadius: 100,
-            ...getElevation(5),
+            ...getElevation(headerTextState?.id === item.id + '_navigation'? 5 : 0)
           }}
         />
       </PressableButton>

@@ -12,7 +12,7 @@ import {getElevation} from '../../utils';
 import {COLORS_NOTE} from '../../utils/Colors';
 import {db} from '../../utils/DB';
 import {refreshNotesPage} from '../../utils/Events';
-import {SIZE} from '../../utils/SizeUtils';
+import {normalize, SIZE} from '../../utils/SizeUtils';
 import {PressableButton} from '../PressableButton';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
@@ -85,7 +85,7 @@ const ColorItem = ({item, index}) => {
         paddingHorizontal: 8,
         justifyContent: 'space-between',
         alignItems: 'center',
-        height: 40,
+        height: normalize(50),
       }}>
       <View
         style={{
@@ -129,7 +129,7 @@ const ColorItem = ({item, index}) => {
           width: 7,
           height: 7,
           borderRadius: 100,
-          ...getElevation(5),
+          ...getElevation(headerTextState?.id === item.id + '_navigation'? 5 : 0)
         }}
       />
     </PressableButton>
