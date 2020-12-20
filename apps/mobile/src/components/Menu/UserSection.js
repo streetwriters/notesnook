@@ -1,16 +1,16 @@
 import React from 'react';
-import { ActivityIndicator, TouchableOpacity, View } from 'react-native';
+import {ActivityIndicator, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useTracked } from '../../provider';
-import { Actions } from '../../provider/Actions';
-import { DDS } from '../../services/DeviceDetection';
-import { eSendEvent, ToastEvent } from '../../services/EventManager';
-import { db } from '../../utils/DB';
-import { eOpenLoginDialog } from '../../utils/Events';
-import { pv, SIZE } from '../../utils/SizeUtils';
-import { PressableButton } from '../PressableButton';
+import {useTracked} from '../../provider';
+import {Actions} from '../../provider/Actions';
+import {DDS} from '../../services/DeviceDetection';
+import {eSendEvent, ToastEvent} from '../../services/EventManager';
+import {db} from '../../utils/DB';
+import {eOpenLoginDialog} from '../../utils/Events';
+import {pv, SIZE} from '../../utils/SizeUtils';
+import {PressableButton} from '../PressableButton';
 import Paragraph from '../Typography/Paragraph';
-import { TimeSince } from './TimeSince';
+import {TimeSince} from './TimeSince';
 
 export const UserSection = ({noTextMode}) => {
   const [state, dispatch] = useTracked();
@@ -24,6 +24,8 @@ export const UserSection = ({noTextMode}) => {
         alignSelf: 'center',
         backgroundColor: colors.shade,
         marginTop: 10,
+        borderWidth: 1,
+        borderColor: colors.accent,
       }}>
       {/*   <View
         style={{
@@ -72,17 +74,16 @@ export const UserSection = ({noTextMode}) => {
           flexDirection: 'row',
           justifyContent: 'space-between',
           alignItems: 'center',
-          paddingRight: 5,
+          paddingRight: 12,
+          paddingLeft: 6,
           paddingVertical: 12,
         }}>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-          }}>
+        <View>
           <Paragraph
+            size={DDS.isLargeTablet() ? SIZE.xxs : SIZE.xs}
+            color={colors.icon}
             style={{
-              marginLeft: 5,
+              color: colors.icon,
             }}>
             {syncing ? 'Syncing ' : 'Last synced: '}
             {!syncing ? (
@@ -92,15 +93,9 @@ export const UserSection = ({noTextMode}) => {
                 'never'
               )
             ) : null}
-            {'\n'}
-            <Paragraph
-              size={DDS.isLargeTablet() ? SIZE.xxs : SIZE.xs}
-              color={colors.icon}
-              style={{
-                color: colors.icon,
-              }}>
-              {syncing ? 'Fetching your notes ' : 'Tap to sync '}
-            </Paragraph>
+          </Paragraph>
+          <Paragraph color={colors.accent} >
+            {syncing ? 'Fetching your notes ' : 'Tap to sync '}
           </Paragraph>
         </View>
         {syncing ? (

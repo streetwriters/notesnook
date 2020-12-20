@@ -106,7 +106,7 @@ export const MenuListItem = ({item, index, noTextMode, testID}) => {
             width: 7,
             height: 7,
             borderRadius: 100,
-            ...getElevation(headerTextState?.id === item.name.toLowerCase() + '_navigation'? 5 : 0)
+            ...getElevation(headerTextState?.id === item.name.toLowerCase() + '_navigation'? 1 : 0)
           }}
         />
       )}

@@ -129,7 +129,7 @@ const ColorItem = ({item, index}) => {
           width: 7,
           height: 7,
           borderRadius: 100,
-          ...getElevation(headerTextState?.id === item.id + '_navigation'? 5 : 0)
+          ...getElevation(headerTextState?.id === item.id + '_navigation'? 1 : 0)
         }}
       />
     </PressableButton>
