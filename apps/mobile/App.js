@@ -30,6 +30,7 @@ import {
 } from './src/services/Message';
 import Navigation from './src/services/Navigation';
 import PremiumService from './src/services/PremiumService';
+import SettingsService from './src/services/SettingsService';
 import Sync from './src/services/Sync';
 import {editing} from './src/utils';
 import {COLOR_SCHEME} from './src/utils/Colors';
@@ -52,7 +53,6 @@ import {getNote} from './src/views/Editor/Functions';
 const {ReceiveSharingIntent} = NativeModules;
 
 let AppRootView = require('./initializer.root').RootView;
-let SettingsService = null;
 let Sentry = null;
 let appIsInitialized = false;
 let intentOnAppLoadProcessed = false;
@@ -171,7 +171,6 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    SettingsService = require('./src/services/SettingsService').default;
     SettingsService.init();
     dispatch({
       type: Actions.DEVICE_MODE,
