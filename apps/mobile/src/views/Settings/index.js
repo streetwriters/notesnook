@@ -197,7 +197,7 @@ const SectionHeader = ({title}) => {
   const {colors} = state;
 
   return (
-    <Paragraph
+    <Heading
       size={SIZE.sm}
       color={colors.accent}
       style={{
@@ -206,7 +206,7 @@ const SectionHeader = ({title}) => {
         height: 35,
       }}>
       {title}
-    </Paragraph>
+    </Heading>
   );
 };
 

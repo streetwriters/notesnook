@@ -331,6 +331,7 @@ export const ActionSheetComponent = ({
       check: true,
       on: note.favorite,
       id: notesnook.ids.dialogs.actionsheet.favorite,
+      color:'orange'
     },
     {
       name: isPinnedToMenu ? 'Unpin from Menu' : 'Pin to Menu',
@@ -420,7 +421,7 @@ export const ActionSheetComponent = ({
               width: 30,
             }}
             name={item.icon}
-            color={colors.pri}
+            color={item.color || colors.accent}
             size={SIZE.md}
           />
           <Paragraph>{item.name}</Paragraph>
