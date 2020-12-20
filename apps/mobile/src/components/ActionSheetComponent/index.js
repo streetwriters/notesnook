@@ -281,7 +281,7 @@ export const ActionSheetComponent = ({
     },
     {
       name: 'Pin',
-      icon: 'tag-outline',
+      icon: 'pin',
       func: async () => {
         if (!note.id) return;
         if (note.type === 'note') {

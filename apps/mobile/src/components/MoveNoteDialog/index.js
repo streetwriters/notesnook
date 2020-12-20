@@ -307,6 +307,10 @@ const MoveNoteComponent = ({close, note, setNote}) => {
                   data={item.topics}
                   keyboardShouldPersistTaps="always"
                   keyboardDismissMode="none"
+                  style={{
+                    width:"90%",
+                    alignSelf:"flex-end"
+                  }}
                   ListHeaderComponent={
                     <View>
                       <View
