@@ -1,23 +1,19 @@
 import React, {Fragment, useEffect, useState} from 'react';
 import {Platform, StyleSheet, TouchableOpacity, View} from 'react-native';
 import FileViewer from 'react-native-file-viewer';
-import {exp} from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {notesnook} from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
 import {DDS} from '../../services/DeviceDetection';
-import {eSendEvent, ToastEvent} from '../../services/EventManager';
+import {ToastEvent} from '../../services/EventManager';
 import Exporter from '../../services/Exporter';
-import PremiumService from '../../services/PremiumService';
 import {getElevation} from '../../utils';
 import {ph, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
 import {GetPremium} from '../ActionSheetComponent/GetPremium';
-import {Button} from '../Button/index';
 import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogHeader from '../Dialog/dialog-header';
-import {Loading} from '../Loading';
 import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
@@ -192,7 +188,6 @@ const ExportDialog = () => {
               </TouchableOpacity>
             </Fragment>
           ))}
-          <Seperator />
 
           <View
             style={{
