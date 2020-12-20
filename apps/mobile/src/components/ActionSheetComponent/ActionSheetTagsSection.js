@@ -1,6 +1,7 @@
 import React, {createRef, useCallback, useEffect, useState} from 'react';
 import {Text, TextInput, TouchableOpacity, View} from 'react-native';
-import { notesnook } from '../../../e2e/test.ids';
+import {ScrollView} from 'react-native-gesture-handler';
+import {notesnook} from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {
@@ -13,6 +14,9 @@ import {db} from '../../utils/DB';
 import {eShowGetPremium} from '../../utils/Events';
 import {SIZE, WEIGHT} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
+import {Button} from '../Button';
+import {PressableButton} from '../PressableButton';
+import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
 const tagsInputRef = createRef();
@@ -46,7 +50,6 @@ export const ActionSheetTagsSection = ({item, close}) => {
 
   const _onSubmit = useCallback(async () => {
     if (!tagToAdd || tagToAdd === '' || tagToAdd.trimStart().length == 0) {
-  
       ToastEvent.show('Empty Tag', 'error', 'local');
       return;
     }
@@ -73,12 +76,20 @@ export const ActionSheetTagsSection = ({item, close}) => {
         ToastEvent.show(e.message, 'error', 'local');
       }
     }
-    
+
     await add();
   });
 
   useEffect(() => {
-    getSuggestions(prevQuery);
+    if (prevQuery) {
+      getSuggestions(prevQuery);
+    } else {
+      getSuggestions();
+    }
+
+    return () => {
+      prevQuery = null;
+    };
   }, [note]);
 
   const _onKeyPress = useCallback(async (event) => {
@@ -118,12 +129,25 @@ export const ActionSheetTagsSection = ({item, close}) => {
   });
 
   const getSuggestions = (query) => {
-    console.log(note.tags);
     prevQuery = query;
+    let _suggestions;
+    if (query) {
+      _suggestions = tags.filter(
+        (t) =>
+          t.title.startsWith(query) && !note.tags.find((n) => n === t.title),
+      );
+    } else {
+      console.log(note.tags);
+      _suggestions = tags
+        .sort(function (x, y) {
+          return x.dateEdited - y.dateEdited;
+        })
+        .filter(
+          (o) => o.noteIds.length >= 1 && !note.tags.find((t) => t === o.title),
+        )
+        .slice(0, 10);
+    }
 
-    let _suggestions = tags.filter(
-      (t) => t.title.startsWith(query) && !note.tags.find((n) => n === t.title),
-    );
     setSuggestions(_suggestions);
   };
 
@@ -161,43 +185,51 @@ export const ActionSheetTagsSection = ({item, close}) => {
       style={{
         marginHorizontal: 12,
       }}>
-      <View
-        style={{
+      <ScrollView
+        horizontal
+        contentContainerStyle={{
           flexDirection: 'row',
-          flexWrap: 'wrap',
-          marginBottom: 5,
-          marginTop: 5,
           alignItems: 'center',
+          paddingVertical: 5,
         }}>
-        {tags.filter(
-          (o) => o.noteIds.length >= 1 && !note.tags.find((t) => t === o.title),
-        ).length === 0 ? null : (
-          <Paragraph size={SIZE.xs}>{'Suggested: '}</Paragraph>
-        )}
-
-        {suggestions.map((tag) => (
-          <TouchableOpacity
-            key={tag.title}
-            onPress={() => {
-              tagToAdd = tag.title;
-              _onSubmit();
-            }}
+        {suggestions.length === 0 ? null : (
+          <View
+            key="suggestions"
             style={{
-              flexDirection: 'row',
-              justifyContent: 'flex-start',
+              justifyContent: 'center',
               alignItems: 'center',
               margin: 1,
               marginRight: 5,
               paddingHorizontal: 0,
               paddingVertical: 2.5,
             }}>
-            <Paragraph>
-              <Paragraph color={colors.accent}>#</Paragraph>
-              {tag.title}
-            </Paragraph>
-          </TouchableOpacity>
+            <Heading size={SIZE.sm} color={colors.accent}>
+              Suggestions:
+            </Heading>
+          </View>
+        )}
+
+        {suggestions.map((tag) => (
+          <Button
+            key={tag.title}
+            onPress={() => {
+              tagToAdd = tag.title;
+              _onSubmit();
+            }}
+            title={'#' + tag.title}
+            type="shade"
+            height={22}
+            style={{
+              margin: 1,
+              marginRight: 5,
+              paddingHorizontal: 0,
+              paddingVertical: 2.5,
+              borderRadius: 100,
+              paddingHorizontal: 12,
+            }}
+          />
         ))}
-      </View>
+      </ScrollView>
       <View
         style={{
           flexDirection: 'row',
@@ -257,7 +289,6 @@ export const ActionSheetTagsSection = ({item, close}) => {
           onKeyPress={_onKeyPress}
         />
       </View>
-
     </View>
   ) : null;
 };
