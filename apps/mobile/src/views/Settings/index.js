@@ -327,7 +327,7 @@ const CustomButton = ({
 
 const SettingsUserSection = () => {
   const [state] = useTracked();
-  const {colors, user,messageBoardState} = state;
+  const {colors, user, messageBoardState} = state;
 
   const getTimeLeft = (t2) => {
     let d1 = new Date(Date.now());
@@ -340,51 +340,65 @@ const SettingsUserSection = () => {
 
   return (
     <>
-    {messageBoardState &&  <PressableButton
-        onPress={messageBoardState.onPress}
-        customStyle={{
-          paddingVertical: 12,
-          width: '100%',
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'flex-start',
-          paddingHorizontal: 6,
-        }}>
-        <View
-          style={{
-            width: 40,
-            backgroundColor:messageBoardState.type === "error"? colors.red: colors.accent,
-            height: 40,
-            marginLeft: 10,
-            borderRadius: 100,
+      {messageBoardState && messageBoardState?.visible && (
+        <PressableButton
+          onPress={messageBoardState.onPress}
+          customStyle={{
+            paddingVertical: 12,
+            width: '100%',
+            flexDirection: 'row',
             alignItems: 'center',
-            justifyContent: 'center',
+            justifyContent: 'flex-start',
+            paddingHorizontal: 0,
           }}>
-          <Icon size={SIZE.lg} color="white" name={messageBoardState.icon} />
-        </View>
+          <View
+            style={{
+              width: 40,
+              backgroundColor:
+                messageBoardState.type === 'error' ? colors.red : colors.accent,
+              height: 40,
+              marginLeft: 10,
+              borderRadius: 100,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
+            <Icon size={SIZE.lg} color="white" name={messageBoardState.icon} />
+          </View>
 
-        <View
-          style={{
-            marginLeft: 10,
-          }}>
-          <Paragraph color={colors.icon} size={SIZE.xs}>
-           {messageBoardState.message}
-          </Paragraph>
-          <Paragraph color={messageBoardState.type === "error"? colors.red: colors.accent}>{messageBoardState.actionText}</Paragraph>
-        </View>
+          <View
+            style={{
+              marginLeft: 10,
+            }}>
+            <Paragraph color={colors.icon} size={SIZE.xs}>
+              {messageBoardState.message}
+            </Paragraph>
+            <Paragraph
+              color={
+                messageBoardState.type === 'error' ? colors.red : colors.accent
+              }>
+              {messageBoardState.actionText}
+            </Paragraph>
+          </View>
 
-        <View
-          style={{
-            width: 40,
-            height: 40,
-            justifyContent: 'center',
-            alignItems: 'center',
-            position: 'absolute',
-            right: 6,
-          }}>
-          <Icon name="chevron-right" color={messageBoardState.type === "error"? colors.red: colors.accent} size={SIZE.lg} />
-        </View>
-      </PressableButton>}
+          <View
+            style={{
+              width: 40,
+              height: 40,
+              justifyContent: 'center',
+              alignItems: 'center',
+              position: 'absolute',
+              right: 6,
+            }}>
+            <Icon
+              name="chevron-right"
+              color={
+                messageBoardState.type === 'error' ? colors.red : colors.accent
+              }
+              size={SIZE.lg}
+            />
+          </View>
+        </PressableButton>
+      )}
 
       {user ? (
         <>
@@ -396,7 +410,6 @@ const SettingsUserSection = () => {
               style={{
                 alignSelf: 'center',
                 width: '100%',
-                borderRadius: 5,
                 paddingVertical: 12,
               }}>
               <View
@@ -404,6 +417,9 @@ const SettingsUserSection = () => {
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   flexDirection: 'row',
+                  borderBottomWidth:1,
+                  paddingBottom:2.5,
+                  borderBottomColor:colors.nav
                 }}>
                 <View
                   style={{
@@ -443,14 +459,15 @@ const SettingsUserSection = () => {
                     paddingVertical: 2.5,
                   }}>
                   <Heading color={colors.accent} size={SIZE.sm}>
-                    {SUBSCRIPTION_STATUS_STRINGS[user.subscription.status]}
+                    {SUBSCRIPTION_STATUS_STRINGS[user.subscription.type]}
                   </Heading>
                 </View>
               </View>
-              <Seperator />
               <View>
-                {user.subscription.status === 1 ? (
+                {user.subscription.type === 1 ||
+                user.subscription.type === 2 ? (
                   <View>
+                    <Seperator />
                     <Paragraph
                       size={SIZE.lg}
                       color={
@@ -470,18 +487,21 @@ const SettingsUserSection = () => {
                   </View>
                 ) : null}
 
-                <Seperator />
-
-                <Button
-                  onPress={() => {
-                    eSendEvent(eOpenPremiumDialog);
-                  }}
-                  width="100%"
-                  fontSize={SIZE.md}
-                  title="Subscribe to Notesnook Pro"
-                  height={50}
-                  type="accent"
-                />
+                {user.isEmailConfirmed && (
+                  <>
+                    <Seperator />
+                    <Button
+                      onPress={() => {
+                        eSendEvent(eOpenPremiumDialog);
+                      }}
+                      width="100%"
+                      fontSize={SIZE.md}
+                      title="Subscribe to Notesnook Pro"
+                      height={50}
+                      type="accent"
+                    />
+                  </>
+                )}
               </View>
             </View>
           </View>

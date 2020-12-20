@@ -143,11 +143,11 @@ export const SUBSCRIPTION_STATUS = {
 };
 
 export const SUBSCRIPTION_STATUS_STRINGS = {
-  0: 'Expired',
+  0: 'Basic',
   1: 'Trial',
-  2: 'Pro',
-  3: 'Pro',
-  4: 'Cancelled',
+  2: 'Beta',
+  3: 'Trial Expired',
+  4: 'Beta Expired',
 };
 
 export const BUTTON_TYPES = {

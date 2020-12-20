@@ -83,7 +83,7 @@ export const MenuListItem = ({item, index, noTextMode, testID}) => {
         />
         {headerTextState?.id === item.name.toLowerCase() + '_navigation' ? (
           <Heading color={colors.accent} size={SIZE.md}>
-            {item.name}
+            {item.name} 
           </Heading>
         ) : (
           <Paragraph size={SIZE.md}>{item.name}</Paragraph>

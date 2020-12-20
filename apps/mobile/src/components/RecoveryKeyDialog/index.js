@@ -125,7 +125,7 @@ class RecoveryKeyDialog extends React.Component {
   };
 
   onOpen = async () => {
-    let k = await db.user.key();
+    let k = await db.user.getEncryptionKey();
     this.user = await db.user.getUser();
 
     if (k) {

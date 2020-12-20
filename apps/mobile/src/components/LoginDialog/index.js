@@ -14,7 +14,7 @@ import {
   eUnSubscribeEvent,
   ToastEvent,
 } from '../../services/EventManager';
-import {clearMessage} from '../../services/Message';
+import {clearMessage, setEmailVerifyMessage} from '../../services/Message';
 import {getElevation} from '../../utils';
 import {db} from '../../utils/DB';
 import {
@@ -177,8 +177,10 @@ const LoginDialog = () => {
     try {
       await db.user.login(email.toLowerCase(), password, true);
     } catch (e) {
+      console.log(e);
       ToastEvent.show(e.message, 'error', 'local');
       setLoading(false);
+      setStatus(null)
       return;
     }
 
@@ -197,6 +199,7 @@ const LoginDialog = () => {
       ToastEvent.show(`Logged in as ${email}`, 'success', 'local');
     } catch (e) {
       console.warn(e);
+      setStatus(null);
       ToastEvent.show(e.message, 'error', 'local');
     } finally {
       setLoading(false);
@@ -241,6 +244,8 @@ const LoginDialog = () => {
       await db.user.signup(email, password);
     } catch (e) {
       setLoading(false);
+      setStatus(null);
+      console.log(e);
       ToastEvent.show('Signup failed, Network Error', 'error', 'local');
       return;
     }
@@ -253,10 +258,12 @@ const LoginDialog = () => {
       dispatch({type: Actions.LAST_SYNC, lastSync: await db.lastSynced()});
       eSendEvent(eStartSyncer);
       clearMessage(dispatch);
+      setEmailVerifyMessage(dispatch)
       close();
       await sleep(500);
       eSendEvent(eOpenRecoveryKeyDialog, true);
     } catch (e) {
+      setStatus(null);
       ToastEvent.show('Login Failed, try again', 'error', 'local');
     } finally {
       setLoading(false);
@@ -559,7 +566,6 @@ const LoginDialog = () => {
                 onPress={current.buttonAltFunc}
                 width="100%"
                 type="shade"
-                loading={loading}
                 fontSize={SIZE.md}
                 style={{
                   marginTop: 10,
