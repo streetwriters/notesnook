@@ -53,7 +53,7 @@
 </body>
 <script>
     let editor;
-    let isTablet = false;
+    let isTablet = true;
 </script>
 <script src="quill.js"></script>
 <script src="constants.js"></script>
@@ -442,8 +442,8 @@
         },
     };
     attachMessageListener();
-    function loadAction(premium, tab) {
-        isTablet = tab;
+    function loadAction(premium) {
+        isTablet = true;
         setFonts();
         Quill.register("modules/imageCompressor", imageCompressor);
         Quill.register("formats/lists", BetterList);
@@ -530,6 +530,7 @@
         }
 
     }
+    loadAction(true)
 </script>
 
 

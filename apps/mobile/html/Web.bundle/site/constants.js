@@ -290,7 +290,6 @@ const setTheme = function () {
   #textCopy {
     color:${pageTheme.colors.pri};
     font-size:${32 * pageTheme.colors.factor};
-    min-height: ${32 * pageTheme.colors.factor + 6};
   }
 
  
@@ -349,7 +348,6 @@ const setTheme = function () {
       color:${pageTheme.colors.heading}
     }
     .info-bar {
-      margin-bottom:${isTablet ? '12px !important' : '0px !important'};
       padding-left:12px;
     }
 

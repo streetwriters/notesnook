@@ -72,20 +72,31 @@ function onTitleChange(ele) {
 
 function autosize() {
   if (isTablet) {
-    document.getElementById('textCopy').innerHTML = document
+    let ele = document.getElementById('textCopy');
+    ele.innerHTML = document
       .getElementById(titleInput)
       .value.replace(/\n/g, '<br/>');
+    console.log(document.getElementById('titlebar').scrollHeight);
+    let newHeight = document.getElementById('titlebar').scrollHeight;
+    let css = document.createElement('style');
+    css.type = 'text/css';
+    let node = `
+      .ql-container {
+        box-sizing: border-box;
+        font-family: 'Poppins', sans-serif;
+        margin: 0px;
+        position: relative;
+        height:calc(100% - ${newHeight + 65}px) !important
+        };
+   `;
+    css.appendChild(document.createTextNode(node));
+    document.getElementsByTagName('head')[0].appendChild(css);
   }
 }
 
 function attachEditorListeners() {
-  /*  editor.once('text-change', function () {
-    window.ReactNativeWebView.postMessage('loaded');
-  }); */
   titleInput = isTablet ? 'titleInput' : 'simpleTitleInput';
   infoBar = isTablet ? '.info-bar' : '.info-bar-alt';
-
-
 
   function isWhitespace(ch) {
     let whiteSpace = false;
