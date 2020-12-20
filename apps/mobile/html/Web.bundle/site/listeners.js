@@ -64,6 +64,9 @@ function onTitleChange(ele) {
     type: 'title',
     value: document.getElementById(titleInput).value,
   };
+  info = document.querySelector(infoBar);
+  info.querySelector('#infowords').innerText =
+    editor.getText().split(' ').length + ' words';
   autosize();
   if (titleMessage && typeof titleMessage.value === 'string') {
     window.ReactNativeWebView.postMessage(JSON.stringify(titleMessage));
@@ -284,6 +287,8 @@ function attachMessageListener() {
         break;
       case 'title':
         document.getElementById(titleInput).value = JSON.parse(data.data).value;
+        info.querySelector('#infowords').innerText =
+        editor.getText().split(' ').length + ' words';
         autosize();
         break;
       case 'theme':
