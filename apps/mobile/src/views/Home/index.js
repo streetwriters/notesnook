@@ -95,7 +95,7 @@ export const Home = ({route, navigation}) => {
         loading={loading}
         sortMenuButton={true}
         headerProps={{
-          heading: 'Home',
+          heading: 'Notes',
         }}
         placeholderText={`Notes you write appear here`}
         jumpToDialog={true}
