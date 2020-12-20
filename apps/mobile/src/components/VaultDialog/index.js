@@ -1,36 +1,34 @@
-import React, {Component, createRef} from 'react';
-import {TouchableOpacity, View} from 'react-native';
-import {TextInput} from 'react-native-gesture-handler';
+import React, { Component, createRef } from 'react';
+import { TouchableOpacity, View } from 'react-native';
 import * as Keychain from 'react-native-keychain';
 import Share from 'react-native-share';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {notesnook} from '../../../e2e/test.ids';
-import {Actions} from '../../provider/Actions';
-import {DDS} from '../../services/DeviceDetection';
+import { notesnook } from '../../../e2e/test.ids';
+import { Actions } from '../../provider/Actions';
+import { DDS } from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-  ToastEvent,
+  ToastEvent
 } from '../../services/EventManager';
-import {getElevation, toTXT} from '../../utils';
-import {db} from '../../utils/DB';
+import { getElevation, toTXT } from '../../utils';
+import { db } from '../../utils/DB';
 import {
   eCloseVaultDialog,
   eOnLoadNote,
   eOpenVaultDialog,
-  refreshNotesPage,
+  refreshNotesPage
 } from '../../utils/Events';
-import {tabBarRef} from '../../utils/Refs';
-import {ph, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
-import {Button} from '../Button';
+import { tabBarRef } from '../../utils/Refs';
+import { ph, pv, SIZE, WEIGHT } from '../../utils/SizeUtils';
+import { Button } from '../Button';
 import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogHeader from '../Dialog/dialog-header';
-import {updateEvent} from '../DialogManager/recievers';
+import { updateEvent } from '../DialogManager/recievers';
 import Input from '../Input';
-import Seperator from '../Seperator';
-import {Toast} from '../Toast';
+import { Toast } from '../Toast';
 import Paragraph from '../Typography/Paragraph';
 
 const passInputRef = createRef();
