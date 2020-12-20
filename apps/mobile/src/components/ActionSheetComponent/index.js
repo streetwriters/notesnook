@@ -21,6 +21,7 @@ import {
   ToastEvent,
 } from '../../services/EventManager';
 import PremiumService from '../../services/PremiumService';
+import Sync from '../../services/Sync';
 import {editing, toTXT} from '../../utils';
 import {
   ACCENT,
@@ -455,33 +456,7 @@ export const ActionSheetComponent = ({
       </TouchableOpacity>
     ) : null;
 
-  const onPressSync = async () => {
-    setRefreshing(true);
-    try {
-      await db.sync();
-      localRefresh();
-      ToastEvent.show('Sync Complete!', 'success', 'local');
-    } catch (e) {
-      if (e.message === 'You need to login to sync.') {
-        ToastEvent.show(
-          e.message,
-          'error',
-          'local',
-          5000,
-          () => {
-            eSendEvent(eOpenLoginDialog);
-          },
-          'Login',
-        );
-      } else {
-        ToastEvent.show(e.message, 'error', 'local', 5000);
-      }
-    } finally {
-      dispatch({type: Actions.LAST_SYNC, lastSync: await db.lastSynced()});
-      dispatch({type: Actions.ALL});
-      setRefreshing(false);
-    }
-  };
+
 
   const onPressVaultButton = async () => {
     if (!note.id) return;
@@ -633,7 +608,7 @@ export const ActionSheetComponent = ({
             <TouchableOpacity
               activeOpacity={0.9}
               testID={notesnook.ids.dialogs.actionsheet.sync}
-              onPress={onPressSync}
+              onPress={async () => await Sync.run('local')}
               style={{
                 borderColor: colors.accent,
                 paddingHorizontal: 5,

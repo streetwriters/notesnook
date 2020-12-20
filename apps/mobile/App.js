@@ -1,5 +1,5 @@
 import * as NetInfo from '@react-native-community/netinfo';
-import {CHECK_IDS, EV} from 'notes-core/common';
+import {EV} from 'notes-core/common';
 import React, {useEffect, useState} from 'react';
 import {
   Appearance,
@@ -15,6 +15,7 @@ import {SafeAreaProvider} from 'react-native-safe-area-context';
 import SplashScreen from 'react-native-splash-screen';
 import {useTracked} from './src/provider';
 import {Actions} from './src/provider/Actions';
+import Backup from './src/services/Backup';
 import {DDS} from './src/services/DeviceDetection';
 import {
   eSendEvent,
@@ -29,6 +30,7 @@ import {
 } from './src/services/Message';
 import Navigation from './src/services/Navigation';
 import PremiumService from './src/services/PremiumService';
+import Sync from './src/services/Sync';
 import {editing} from './src/utils';
 import {COLOR_SCHEME} from './src/utils/Colors';
 import {db} from './src/utils/DB';
@@ -38,10 +40,8 @@ import {
   eOnLoadNote,
   eOpenLoginDialog,
   eOpenPendingDialog,
-  eOpenPremiumDialog,
   eOpenProgressDialog,
   eOpenSideMenu,
-  eShowGetPremium,
   eStartSyncer,
   refreshNotesPage,
 } from './src/utils/Events';
@@ -54,59 +54,47 @@ const {ReceiveSharingIntent} = NativeModules;
 let AppRootView = require('./initializer.root').RootView;
 let SettingsService = null;
 let Sentry = null;
-let appInit = false;
-let intentInit = false;
+let appIsInitialized = false;
+let intentOnAppLoadProcessed = false;
 let hasPurchased = false;
+
+function updateStatusBarColor() {
+  StatusBar.setBarStyle(
+    COLOR_SCHEME.night ? 'light-content' : 'dark-content',
+    true,
+  );
+  if (Platform.OS === 'android') {
+    StatusBar.setBackgroundColor('transparent', true);
+    StatusBar.setTranslucent(true, true);
+  }
+}
+
 const onAppStateChanged = async (state) => {
-  console.log('app state', state);
   if (state === 'active') {
-    StatusBar.setBarStyle(
-      COLOR_SCHEME.night ? 'light-content' : 'dark-content',
-      true,
-    );
-    if (Platform.OS === 'android') {
-      StatusBar.setBackgroundColor('transparent', true);
-      StatusBar.setTranslucent(true, true);
-    }
+    updateStatusBarColor();
     if (SettingsService.get().privacyScreen) {
       enabled(false);
     }
-    console.log('clearing state', await MMKV.getItem('appState'));
-    if (appInit) {
+    if (appIsInitialized) {
       await MMKV.removeItem('appState');
     }
     try {
-      if (intentInit) {
+      if (intentOnAppLoadProcessed) {
         if (Platform.OS === 'android') {
-          _data = await ReceiveSharingIntent.getFileNames();
-          if (_data) {
-            IntentService.setIntent(_data);
-            IntentService.check((event) => {
-              console.log(event);
-              if (event) {
-                eSendEvent(eOnLoadNote, event);
-                tabBarRef.current?.goToPage(1);
-                Navigation.closeDrawer();
-              } else {
-                eSendEvent('nointent');
-                SplashScreen.hide();
-
-                sleep(300).then(() => eSendEvent(eOpenSideMenu));
-              }
-            });
+          let intent = await ReceiveSharingIntent.getFileNames();
+          if (intent) {
+            IntentService.setIntent(intent);
+            IntentService.check(loadIntent);
           }
         }
       }
-    } catch (e) {
-      console.log(e);
-    }
+    } catch (e) {}
   } else {
-    if (editing.currentlyEditing && appInit) {
+    if (editing.currentlyEditing && appIsInitialized) {
       let state = JSON.stringify({
         editing: editing.currentlyEditing,
         note: getNote(),
       });
-      console.log('putting items in state', state);
       await MMKV.setItem('appState', state);
     }
 
@@ -116,6 +104,18 @@ const onAppStateChanged = async (state) => {
   }
 };
 
+function loadIntent(event) {
+  if (event) {
+    eSendEvent(eOnLoadNote, event);
+    tabBarRef.current?.goToPage(1);
+    Navigation.closeDrawer();
+  } else {
+    eSendEvent('nointent');
+    SplashScreen.hide();
+    sleep(300).then(() => eSendEvent(eOpenSideMenu));
+  }
+}
+
 const onNetworkStateChanged = (netInfo) => {
   /*  let message = 'Internet connection restored';
   let type = 'success';
@@ -124,7 +124,7 @@ const onNetworkStateChanged = (netInfo) => {
     type = 'error';
   }
   db.user?.get().then((user) => {
-    if (user && intentInit) {
+    if (user && intentOnAppLoadProcessed) {
       ToastEvent.show(message, type);
     }
   }); */
@@ -135,41 +135,71 @@ const App = () => {
     [init, setInit] = useState(true),
     [intent, setIntent] = useState(false);
 
-  const syncChanges = async () => {
-    console.log('dispatching sync changes');
+  let subsriptionSuccessListerner;
+  let subsriptionErrorListener;
+
+  useEffect(() => {
+    eSubscribeEvent(eDispatchAction, (type) => {
+      dispatch(type);
+    });
+    attachIAPListeners();
+    AppState.addEventListener('change', onAppStateChanged);
+    eSubscribeEvent('nointent', loadMainApp);
+    Appearance.addChangeListener(SettingsService.setTheme);
+    let unsub = NetInfo.addEventListener(onNetworkStateChanged);
+    Linking.addEventListener('url', onUrlRecieved);
+    EV.subscribe('db:refresh', onSyncComplete);
+    EV.subscribe('db:sync', partialSync);
+    EV.subscribe('user:loggedOut', onLogout);
+    EV.subscribe('user:checkStatus', PremiumService.onUserStatusCheck);
+    return () => {
+      EV.subscribe('db:refresh', onSyncComplete);
+      EV.unsubscribe('user:loggedOut', onLogout);
+      EV.unsubscribe('db:sync', partialSync);
+      EV.unsubscribe('user:checkStatus', PremiumService.onUserStatusCheck);
+      eUnSubscribeEvent(eStartSyncer, startSyncer);
+      eUnSubscribeEvent(eDispatchAction, (type) => {
+        dispatch(type);
+      });
+      eUnSubscribeEvent('nointent', loadMainApp);
+      AppState.removeEventListener('change', onAppStateChanged);
+      Appearance.removeChangeListener(SettingsService.setTheme);
+      Linking.removeEventListener('url', onUrlRecieved);
+      unsub();
+      unsubIAP();
+    };
+  }, []);
+
+  useEffect(() => {
+    SettingsService = require('./src/services/SettingsService').default;
+    SettingsService.init();
+    dispatch({
+      type: Actions.DEVICE_MODE,
+      state: DDS.isLargeTablet()
+        ? 'tablet'
+        : DDS.isSmallTab
+        ? 'smallTablet'
+        : 'mobile',
+    });
+    db.init().catch(console.log).finally(runAfterInit);
+  }, []);
+
+  const onSyncComplete = async () => {
     dispatch({type: Actions.ALL});
   };
-  const startSyncer = async () => {
-    try {
-      let user = await db.user.getUser();
-      if (user) {
-        EV.subscribe('db:refresh', syncChanges);
-      }
-    } catch (e) {
-      console.log(e, 'SYNC ERROR');
-    }
-  };
 
-  const onSystemThemeChanged = async () => {
-    await SettingsService.setTheme();
-  };
-
-  const _handleIntent = async (res) => {
-    if (intentInit) {
+  const onUrlRecieved = async (res) => {
+    if (intentOnAppLoadProcessed) {
       let url = res ? res.url : '';
 
       try {
         if (Platform.OS === 'ios' && url.startsWith('ShareMedia://dataUrl')) {
-          _data = await ReceiveSharingIntent.getFileNames(url);
-          _data = IntentService.iosSortedData(_data);
+          let intent = await ReceiveSharingIntent.getFileNames(url);
+          intent = IntentService.iosSortedData(intent);
 
-          if (_data) {
-            IntentService.setIntent(_data);
-            IntentService.check((event) => {
-              eSendEvent(eOnLoadNote, event);
-              tabBarRef.current?.goToPage(1);
-              Navigation.closeDrawer();
-            });
+          if (intent) {
+            IntentService.setIntent(intent);
+            IntentService.check(loadIntent);
           }
         } else if (url.startsWith('https://notesnook.com/verify')) {
           let user = await db.user.fetchUser();
@@ -178,62 +208,9 @@ const App = () => {
             clearMessage(dispatch);
           }
         }
-      } catch (e) {
-        console.log(e, 'ERROR HERE');
-      }
+      } catch (e) {}
     }
   };
-
-  const handlePremiumAccess = async (type) => {
-    let status = PremiumService.get();
-    let message = null;
-
-    if (!status) {
-      switch (type) {
-        case CHECK_IDS.noteColor:
-          message = {
-            context: 'sheet',
-            title: 'Get Notesnook Pro',
-            desc: 'To assign colors to a note get Notesnook Pro today.',
-          };
-          break;
-        case CHECK_IDS.noteExport:
-          message = {
-            context: 'export',
-            title: 'Export in PDF, MD & HTML',
-            desc:
-              'Get Notesnook Pro to export your notes in PDF, Markdown and HTML formats!',
-          };
-          break;
-        case CHECK_IDS.noteTag:
-          message = {
-            context: 'sheet',
-            title: 'Get Notesnook Pro',
-            desc: 'To create more tags for your notes become a Pro user today.',
-          };
-          break;
-        case CHECK_IDS.notebookAdd:
-          eSendEvent(eOpenPremiumDialog);
-          break;
-        case CHECK_IDS.vaultAdd:
-          message = {
-            context: 'sheet',
-            title: 'Add Notes to Vault',
-            desc:
-              'With Notesnook Pro you can add notes to your vault and do so much more! Get it now.',
-          };
-          break;
-      }
-      if (message) {
-        eSendEvent(eShowGetPremium, message);
-      }
-    }
-
-    return {type, result: status};
-  };
-
-  let subsriptionSuccessListerner;
-  let subsriptionErrorListener;
 
   const attachIAPListeners = () => {
     if (Platform.OS === 'ios') {
@@ -261,7 +238,7 @@ const App = () => {
     }
   };
 
-  const dbSync = async () => {
+  const partialSync = async () => {
     try {
       dispatch({type: Actions.SYNCING, syncing: true});
       await db.sync(false);
@@ -284,39 +261,6 @@ const App = () => {
     });
   };
 
-  useEffect(() => {
-    eSubscribeEvent(eStartSyncer, startSyncer);
-    eSubscribeEvent(eDispatchAction, (type) => {
-      dispatch(type);
-    });
-
-    attachIAPListeners();
-
-    AppState.addEventListener('change', onAppStateChanged);
-    eSubscribeEvent('nointent', loadMainApp);
-    Appearance.addChangeListener(onSystemThemeChanged);
-    let unsub = NetInfo.addEventListener(onNetworkStateChanged);
-    Linking.addEventListener('url', _handleIntent);
-    EV.subscribe('db:sync', dbSync);
-    EV.subscribe('user:loggedOut', onLogout);
-    EV.subscribe('user:checkStatus', handlePremiumAccess);
-    return () => {
-      EV.unsubscribe('db:refresh', syncChanges);
-      EV.unsubscribe('user:loggedOut', onLogout);
-      EV.unsubscribe('db:sync', dbSync);
-      eUnSubscribeEvent(eStartSyncer, startSyncer);
-      eUnSubscribeEvent(eDispatchAction, (type) => {
-        dispatch(type);
-      });
-      eUnSubscribeEvent('nointent', loadMainApp);
-      AppState.removeEventListener('change', onAppStateChanged);
-      Appearance.removeChangeListener(onSystemThemeChanged);
-      Linking.removeEventListener('url', _handleIntent);
-      unsub();
-      unsubIAP();
-    };
-  }, []);
-
   unsubIAP = () => {
     if (subsriptionSuccessListerner) {
       subsriptionSuccessListerner?.remove();
@@ -331,9 +275,9 @@ const App = () => {
   const loadMainApp = () => {
     dispatch({type: Actions.ALL});
     AppRootView = require('./initializer.root').RootView;
-    getUser().then(console.log).catch(console.log);
-    backupData().then((r) => r);
-    sleep(500).then(() => (appInit = true));
+    setCurrentUser().then(console.log).catch(console.log);
+    Backup.checkAndRun().then((r) => r);
+    sleep(500).then(() => (appIsInitialized = true));
     db.notes.init().then(() => {
       dispatch({type: Actions.NOTES});
       dispatch({type: Actions.FAVORITES});
@@ -350,7 +294,7 @@ const App = () => {
     // });
   };
 
-  const getUser = async () => {
+  const setCurrentUser = async () => {
     try {
       let user = await db.user.fetchUser();
       if (user) {
@@ -358,34 +302,14 @@ const App = () => {
         if (!user.isEmailConfirmed) {
           setEmailVerifyMessage(dispatch);
         }
-        dispatch({type: Actions.SYNCING, syncing: true});
         dispatch({type: Actions.USER, user: user});
-        await db.sync();
-        dispatch({type: Actions.LAST_SYNC, lastSync: await db.lastSynced()});
-        dispatch({type: Actions.ALL});
+        await Sync.run();
         await startSyncer();
       } else {
         setLoginMessage(dispatch);
       }
-    } catch (e) {
-      console.log(e, 'SYNC ERROR');
-    }
-    dispatch({type: Actions.SYNCING, syncing: false});
+    } catch (e) {}
   };
-
-  useEffect(() => {
-    SettingsService = require('./src/services/SettingsService').default;
-    SettingsService.init();
-    dispatch({
-      type: Actions.DEVICE_MODE,
-      state: DDS.isLargeTablet()
-        ? 'tablet'
-        : DDS.isSmallTab
-        ? 'smallTablet'
-        : 'mobile',
-    });
-    db.init().catch(console.log).finally(runAfterInit);
-  }, []);
 
   const runAfterInit = () => {
     let isIntent = false;
@@ -393,7 +317,7 @@ const App = () => {
       .then(() => {
         AppRootView = require('./initializer.intent').IntentView;
         setInit(false);
-        intentInit = true;
+        intentOnAppLoadProcessed = true;
         dispatch({type: Actions.ALL});
         setIntent(true);
         isIntent = true;
@@ -403,23 +327,11 @@ const App = () => {
       .finally(() => {
         if (!isIntent) {
           ReceiveSharingIntent.clearFileNames();
-          intentInit = true;
+          intentOnAppLoadProcessed = true;
           loadMainApp();
         }
       });
   };
-
-  async function backupData() {
-    let settings = SettingsService.get();
-    let Backup = require('./src/services/Backup').default;
-    if (await Backup.checkBackupRequired(settings.reminder)) {
-      try {
-        await Backup.run();
-      } catch (e) {
-        console.log(e);
-      }
-    }
-  }
 
   const onSuccessfulSubscription = (subscription) => {
     if (hasPurchased) {
@@ -434,10 +346,7 @@ const App = () => {
     }, 500);
   };
 
-  const onSubscriptionError = (error) => {
-    console.log(error.message, 'Error');
-    //ToastEvent.show(error.message);
-  };
+  const onSubscriptionError = (error) => {};
 
   const processReceipt = (receipt) => {
     return;

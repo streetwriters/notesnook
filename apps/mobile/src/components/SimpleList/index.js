@@ -1,7 +1,6 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   ActivityIndicator,
-  Platform,
   RefreshControl,
   useWindowDimensions,
   View,
@@ -10,17 +9,12 @@ import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {DataProvider, LayoutProvider, RecyclerListView} from 'recyclerlistview';
 import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
 import {DDS} from '../../services/DeviceDetection';
-import {eSendEvent, ToastEvent} from '../../services/EventManager';
+import {eSendEvent} from '../../services/EventManager';
+import Sync from '../../services/Sync';
 import {dHeight} from '../../utils';
 import {COLORS_NOTE} from '../../utils/Colors';
-import {db} from '../../utils/DB';
-import {
-  eOpenJumpToDialog,
-  eOpenLoginDialog,
-  eScrollEvent,
-} from '../../utils/Events';
+import {eOpenJumpToDialog, eScrollEvent} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
 import {Button} from '../Button';
 import {HeaderMenu} from '../Header/HeaderMenu';
@@ -118,56 +112,19 @@ const SimpleList = ({
             alignSelf: 'center',
             textAlignVertical: 'center',
           }}>
-          {!item.title || item.title === "" ? "Pinned" : item.title}
+          {!item.title || item.title === '' ? 'Pinned' : item.title}
         </Heading>
       </TouchableWithoutFeedback>
       {index === 1 && sortMenuButton ? <HeaderMenu /> : null}
     </View>
   );
 
-  const _onRefresh = useCallback(async () => {
-    if (Platform.OS === 'ios') {
-      dispatch({
-        type: Actions.SYNCING,
-        syncing: true,
-      });
-    } else {
-      setRefreshing(true);
+  const _onRefresh = async () => {
+    await Sync.run();
+    if (refreshCallback) {
+      refreshCallback();
     }
-    try {
-      await db.sync();
-      ToastEvent.show('Sync Complete', 'success');
-    } catch (e) {
-      if (e.message === 'You need to login to sync.') {
-        ToastEvent.show(
-          e.message,
-          'error',
-          'global',
-          5000,
-          () => {
-            eSendEvent(eOpenLoginDialog);
-          },
-          'Login',
-        );
-      } else {
-        ToastEvent.show(e.message, 'error', 'global', 5000);
-      }
-    } finally {
-      if (Platform.OS === 'ios') {
-        dispatch({
-          type: Actions.SYNCING,
-          syncing: false,
-        });
-      } else {
-        setRefreshing(false);
-      }
-      if (refreshCallback) {
-        refreshCallback();
-      }
-      dispatch({type: Actions.LAST_SYNC, lastSync: await db.lastSynced()});
-      dispatch({type: Actions.ALL});
-    }
-  }, []);
+  };
 
   const _ListEmptyComponent = (
     <View
@@ -185,10 +142,12 @@ const SimpleList = ({
           alignItems: 'center',
         }}>
         <Heading>{placeholderData.heading}</Heading>
-        <Paragraph style={{
-          textAlign:'center',
-          width:"80%"
-        }} color={colors.icon}>
+        <Paragraph
+          style={{
+            textAlign: 'center',
+            width: '80%',
+          }}
+          color={colors.icon}>
           {loading ? placeholderData.loading : placeholderData.paragraph}
         </Paragraph>
         <Seperator />

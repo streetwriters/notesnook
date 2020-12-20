@@ -82,7 +82,19 @@ async function checkBackupRequired(type) {
   }
 }
 
+const checkAndRun = async () => {
+  let settings = SettingsService.get();
+  if (await checkBackupRequired(settings.reminder)) {
+    try {
+      await run();
+    } catch (e) {
+      console.log(e);
+    }
+  }
+};
+
 export default {
   checkBackupRequired,
   run,
+  checkAndRun,
 };

@@ -1,16 +1,15 @@
 import React from 'react';
-import {ActivityIndicator, TouchableOpacity, View} from 'react-native';
+import { ActivityIndicator, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
-import {DDS} from '../../services/DeviceDetection';
-import {eSendEvent, ToastEvent} from '../../services/EventManager';
-import {db} from '../../utils/DB';
-import {eOpenLoginDialog} from '../../utils/Events';
-import {pv, SIZE} from '../../utils/SizeUtils';
-import {PressableButton} from '../PressableButton';
+import { useTracked } from '../../provider';
+import { DDS } from '../../services/DeviceDetection';
+import { eSendEvent } from '../../services/EventManager';
+import Sync from '../../services/Sync';
+import { eOpenLoginDialog } from '../../utils/Events';
+import { pv, SIZE } from '../../utils/SizeUtils';
+import { PressableButton } from '../PressableButton';
 import Paragraph from '../Typography/Paragraph';
-import {TimeSince} from './TimeSince';
+import { TimeSince } from './TimeSince';
 
 export const UserSection = ({noTextMode}) => {
   const [state, dispatch] = useTracked();
@@ -24,52 +23,10 @@ export const UserSection = ({noTextMode}) => {
         alignSelf: 'center',
         backgroundColor: colors.shade,
         marginTop: 10,
-        borderWidth: 1,
-        borderColor: colors.accent,
       }}>
-      {/*   <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          backgroundColor: colors.accent,
-          paddingHorizontal: 6,
-          paddingVertical: 6,
-          borderTopRightRadius: 5,
-          borderTopLeftRadius: 5,
-        }}>
-        <Paragraph color="white">
-          <Icon name="account-outline" /> {user.email}
-        </Paragraph>
-        <Paragraph color="white" size={SIZE.xs}>
-          {SUBSCRIPTION_STATUS_STRINGS[user.subscription.status]}
-        </Paragraph>
-      </View> */}
-
       <TouchableOpacity
         activeOpacity={0.8}
-        onPress={async () => {
-          dispatch({
-            type: Actions.SYNCING,
-            syncing: true,
-          });
-          try {
-            await db.sync();
-            ToastEvent.show('Sync Complete', 'success');
-          } catch (e) {
-            ToastEvent.show(e.message, 'error');
-          } finally {
-            dispatch({
-              type: Actions.LAST_SYNC,
-              lastSync: await db.lastSynced(),
-            });
-            dispatch({type: Actions.ALL});
-            dispatch({
-              type: Actions.SYNCING,
-              syncing: false,
-            });
-          }
-        }}
+        onPress={Sync.run}
         style={{
           flexDirection: 'row',
           justifyContent: 'space-between',
@@ -94,7 +51,7 @@ export const UserSection = ({noTextMode}) => {
               )
             ) : null}
           </Paragraph>
-          <Paragraph color={colors.accent} >
+          <Paragraph color={colors.accent}>
             {syncing ? 'Fetching your notes ' : 'Tap to sync '}
           </Paragraph>
         </View>

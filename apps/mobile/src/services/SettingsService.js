@@ -54,6 +54,7 @@ async function init() {
 const setTheme = async () => {
   if (settings) {
     let newColors = await getColorScheme(settings.useSystemTheme);
+    
     updateEvent({type: Actions.THEME, colors: newColors});
   }
 };
@@ -67,6 +68,8 @@ async function set(name, value) {
 function get() {
   return settings;
 }
+
+
 
 export default {
   init,
