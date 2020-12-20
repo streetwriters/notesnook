@@ -28,6 +28,7 @@ import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogHeader from '../Dialog/dialog-header';
 import {updateEvent} from '../DialogManager/recievers';
+import Input from '../Input';
 import Seperator from '../Seperator';
 import {Toast} from '../Toast';
 import Paragraph from '../Typography/Paragraph';
@@ -55,7 +56,7 @@ export class VaultDialog extends Component {
       isBiometryAvailable: false,
       fingerprintAccess: false,
       changePassword: false,
-      copyNote:false
+      copyNote: false,
     };
     this.password = null;
     this.confirmPassword = null;
@@ -134,15 +135,18 @@ export class VaultDialog extends Component {
 
   onPress = async () => {
     if (this.state.loading) return;
+
     if (!this.password) {
       ToastEvent.show('You must fill all the fields.', 'error', 'local');
+      return;
     }
-    if (!this.state.novault) {
-      if (this.password && this.password.length < 3) {
-        ToastEvent.show('Password too short', 'error', 'local');
+    if (this.password && this.password.length < 3) {
+      ToastEvent.show('Password too short', 'error', 'local');
 
-        return;
-      }
+      return;
+    }
+
+    if (!this.state.novault) {
       if (this.password !== this.confirmPassword) {
         ToastEvent.show('Passwords do not match', 'error', 'local');
         this.setState({
@@ -153,13 +157,6 @@ export class VaultDialog extends Component {
 
       this._createVault();
     } else if (this.state.changePassword) {
-      if (!this.newPassword) {
-        ToastEvent.show('You must fill all the fields.', 'error', 'local');
-      }
-      if (this.newPassword && this.newPassword.length < 3) {
-        ToastEvent.show('New password too short', 'error', 'local');
-        return;
-      }
       this.setState({
         loading: true,
       });
@@ -191,23 +188,22 @@ export class VaultDialog extends Component {
           wrongPassword: true,
         });
         return;
-      } else {
-        db.vault
-          .unlock(this.password)
-          .then(async () => {
-            this.setState({
-              wrongPassword: false,
-            });
-            if (this.state.note.locked) {
-              await this._unlockNote();
-            } else {
-              await this._lockNote();
-            }
-          })
-          .catch((e) => {
-            this._takeErrorAction(e);
-          });
       }
+      db.vault
+        .unlock(this.password)
+        .then(async () => {
+          this.setState({
+            wrongPassword: false,
+          });
+          if (this.state.note.locked) {
+            await this._unlockNote();
+          } else {
+            await this._lockNote();
+          }
+        })
+        .catch((e) => {
+          this._takeErrorAction(e);
+        });
     } else if (this.state.fingerprintEnroll) {
       this._enrollFingerprint(this.password);
     }
@@ -314,7 +310,6 @@ export class VaultDialog extends Component {
     this.close();
   }
 
-
   _copyNote(note) {
     let text = toTXT(note.content.data);
     let m = `${note.title}\n \n ${text}`;
@@ -322,7 +317,6 @@ export class VaultDialog extends Component {
     ToastEvent.show('Note copied to clipboard', 'success', 'local');
     this.close();
   }
- 
 
   _shareNote(note) {
     let text = toTXT(note.content.data);
@@ -443,42 +437,20 @@ export class VaultDialog extends Component {
             icon="shield"
           />
 
-          <Seperator />
-
           {novault || changePassword ? (
             <>
-              <TextInput
-                ref={passInputRef}
+              <Input
+                fwdRef={passInputRef}
                 editable={!loading}
                 autoCapitalize="none"
                 testID={notesnook.ids.dialogs.vault.pwd}
-                style={{
-                  padding: pv - 5,
-                  borderBottomWidth: 1.5,
-                  borderColor: wrongPassword
-                    ? colors.errorText
-                    : this.state.focusIndex === 0
-                    ? colors.accent
-                    : colors.nav,
-                  paddingHorizontal: ph,
-                  marginTop: 10,
-                  fontSize: SIZE.sm,
-                  fontFamily: WEIGHT.regular,
-                }}
                 onChangeText={(value) => {
                   this.password = value;
                 }}
-                onFocus={() => {
-                  this.setState({
-                    focusIndex: 0,
-                  });
-                }}
                 secureTextEntry
                 placeholder={changePassword ? 'Current Password' : 'Password'}
-                placeholderTextColor={colors.icon}
               />
 
-              <Seperator />
               {!this.state.biometricUnlock ||
               !novault ||
               changePassword ? null : (
@@ -498,94 +470,38 @@ export class VaultDialog extends Component {
 
           {changePassword ? (
             <>
-              <TextInput
+              <Input
                 ref={changePassInputRef}
                 editable={!loading}
                 testID={notesnook.ids.dialogs.vault.changePwd}
                 autoCapitalize="none"
-                style={{
-                  padding: pv - 5,
-                  borderBottomWidth: 1.5,
-                  borderColor: wrongPassword
-                    ? colors.errorText
-                    : this.state.focusIndex === 0
-                    ? colors.accent
-                    : colors.nav,
-                  paddingHorizontal: ph,
-                  marginTop: 10,
-                  fontSize: SIZE.sm,
-                  fontFamily: WEIGHT.regular,
-                }}
                 onChangeText={(value) => {
                   this.newPassword = value;
                 }}
-                onFocus={() => {
-                  this.setState({
-                    focusIndex: 0,
-                  });
-                }}
                 secureTextEntry
                 placeholder={'New Password'}
-                placeholderTextColor={colors.icon}
               />
-              <Seperator />
             </>
           ) : null}
 
           {!novault ? (
             <View>
-              <TextInput
-                ref={passInputRef}
+              <Input
+                fwdRef={passInputRef}
                 autoCapitalize="none"
                 testID={notesnook.ids.dialogs.vault.pwd}
-                style={{
-                  padding: pv - 5,
-                  borderBottomWidth: 1.5,
-                  borderColor: passwordsDontMatch
-                    ? colors.errorText
-                    : this.state.focusIndex === 1
-                    ? colors.accent
-                    : colors.nav,
-                  paddingHorizontal: ph,
-                  fontSize: SIZE.sm,
-                  fontFamily: WEIGHT.regular,
-                }}
                 onChangeText={(value) => {
                   this.password = value;
                 }}
-                onFocus={() => {
-                  this.setState({
-                    focusIndex: 1,
-                  });
-                }}
                 secureTextEntry
                 placeholder="Password"
-                placeholderTextColor={colors.icon}
               />
 
-              <TextInput
-                ref={confirmPassRef}
+              <Input
+                fwdRef={confirmPassRef}
                 autoCapitalize="none"
                 testID={notesnook.ids.dialogs.vault.pwdAlt}
-                style={{
-                  padding: pv - 5,
-                  borderBottomWidth: 1.5,
-                  borderColor: passwordsDontMatch
-                    ? colors.errorText
-                    : this.state.focusIndex === 2
-                    ? colors.accent
-                    : colors.nav,
-                  paddingHorizontal: ph,
-                  fontSize: SIZE.sm,
-                  fontFamily: WEIGHT.regular,
-                  marginTop: 10,
-                }}
                 secureTextEntry
-                onFocus={() => {
-                  this.setState({
-                    focusIndex: 2,
-                  });
-                }}
                 onChangeText={(value) => {
                   this.confirmPassword = value;
                   if (value !== this.password) {
@@ -599,7 +515,6 @@ export class VaultDialog extends Component {
                   }
                 }}
                 placeholder="Confirm password"
-                placeholderTextColor={colors.icon}
               />
             </View>
           ) : null}
