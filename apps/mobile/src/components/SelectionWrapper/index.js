@@ -2,10 +2,17 @@ import React, {useEffect, useState} from 'react';
 import {TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
-import {DDS} from '../../services/DeviceDetection';
-import {COLORS_NOTE} from '../../utils/Colors';
-import {hexToRGBA, RGB_Linear_Shade} from '../../utils/ColorUtils';
+import {Actions} from '../../provider/Actions';
+import {eSendEvent, openVault} from '../../services/EventManager';
+import {getElevation} from '../../utils';
+import {hexToRGBA} from '../../utils/ColorUtils';
+import {db} from '../../utils/DB';
+import {refreshNotesPage} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
+import {ActionIcon} from '../ActionIcon';
+import {Button} from '../Button';
+import {simpleDialogEvent} from '../DialogManager/recievers';
+import {TEMPLATE_PERMANANT_DELETE} from '../DialogManager/Templates';
 import {PressableButton} from '../PressableButton';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
@@ -18,15 +25,6 @@ const Filler = ({item, background}) => {
   return (
     <View
       style={{
-        /*   backgroundColor: DDS.isLargeTablet()
-          ? currentEditingNote === item.id
-            ? item.type === 'note' && item.color
-              ? COLORS_NOTE[item.color]
-              : colors.shade
-            : background
-            ? background
-            : 'transparent'
-          : 'transparent', */
         position: 'absolute',
         width: '110%',
         height: '110%',
@@ -89,6 +87,212 @@ const Filler = ({item, background}) => {
   );
 };
 
+const ActionStrip = ({note, setActionStrip}) => {
+  const [state, dispatch] = useTracked();
+  const {colors, selectionMode} = state;
+  const [isPinnedToMenu, setIsPinnedToMenu] = useState(false);
+
+  useEffect(() => {
+    if (note.type === 'note') return;
+    setIsPinnedToMenu(db.settings.isPinned(note.id));
+  }, []);
+
+  const updateNotes = () => {
+    dispatch({type: Actions.NOTES});
+    dispatch({type: Actions.FAVORITES});
+    eSendEvent(refreshNotesPage);
+  };
+
+  const actions = [
+    {
+      icon: note.pinned ? 'pin-off' : 'pin',
+      visible: true,
+      onPress: async () => {
+        if (!note.id) return;
+
+        if (note.type === 'note') {
+          if (db.notes.pinned.length === 3) {
+            ToastEvent.show('You cannot pin more than 3 notes', 'error');
+            return;
+          }
+          await db.notes.note(note.id).pin();
+        } else {
+          if (db.notebooks.pinned.length === 3) {
+            ToastEvent.show('You cannot pin more than 3 notebooks', 'error');
+            return;
+          }
+          await db.notebooks.notebook(note.id).pin();
+          dispatch({type: Actions.NOTEBOOKS});
+        }
+        updateNotes();
+        setActionStrip(false);
+      },
+    },
+    {
+      icon: note.favorite ? 'star-off' : 'star',
+      onPress: async () => {
+        if (!note.id) return;
+        if (note.type === 'note') {
+          await db.notes.note(note.id).favorite();
+        } else {
+          await db.notebooks.notebook(note.id).favorite();
+        }
+        updateNotes();
+        setActionStrip(false);
+      },
+      visible: note.type === 'note',
+      color: !note.favorite ? 'orange' : null,
+    },
+
+    {
+      name: isPinnedToMenu ? 'Unpin from Menu' : 'Pin to Menu',
+      icon: 'tag-outline',
+      func: async () => {
+        try {
+          if (isPinnedToMenu) {
+            await db.settings.unpin(note.id);
+            ToastEvent.show('Unpinned from menu', 'success');
+          } else {
+            if (item.type === 'topic') {
+              await db.settings.pin(note.type, {
+                id: note.id,
+                notebookId: note.notebookId,
+              });
+            } else {
+              await db.settings.pin(note.type, {id: note.id});
+            }
+
+            ToastEvent.show('Pinned to menu', 'success');
+          }
+          setIsPinnedToMenu(db.settings.isPinned(note.id));
+          dispatch({type: Actions.MENU_PINS});
+        } catch (e) {}
+      },
+      visible: note.type !== 'note',
+    },
+    {
+      icon: 'content-copy',
+      visible: note.type === 'note',
+      onPress: async () => {
+        if (note.locked) {
+          openVault({
+            copyNote: true,
+            novault: true,
+            locked: true,
+            item: note,
+          });
+        } else {
+          let text = await db.notes.note(note.id).content();
+          text = toTXT(text);
+          text = `${note.title}\n \n ${text}`;
+          Clipboard.setString(text);
+          ToastEvent.show('Note copied to clipboard', 'success');
+        }
+        setActionStrip(false);
+      },
+    },
+    {
+      icon: 'delete-restore',
+      onPress: async () => {
+        await db.trash.restore(note.id);
+        dispatch({type: Actions.TRASH});
+        dispatch({type: note.itemType});
+        dispatch({type: Actions.FAVORITES});
+        eSendEvent(refreshNotesPage);
+        ToastEvent.show(
+          item.type === 'note' ? 'Note restored' : 'Notebook restored',
+          'success',
+        );
+        setActionStrip(false);
+      },
+      visible: note.type === 'trash',
+    },
+    {
+      icon: 'delete',
+      visible: note.type === 'trash',
+      onPress: () => {
+        simpleDialogEvent(TEMPLATE_PERMANANT_DELETE);
+        setActionStrip(false);
+      },
+    },
+    {
+      icon: 'delete',
+      visible: note.type !== 'trash',
+      onPress: async () => {
+        try {
+          await deleteItems(note);
+        } catch (e) {
+          console.log(e);
+        }
+        setActionStrip(false);
+      },
+    },
+    {
+      icon: 'close',
+      onPress: () => setActionStrip(false),
+      color: colors.light,
+      bg: colors.red,
+      visible: true,
+    },
+  ];
+
+  return (
+    <View
+      style={{
+        position: 'absolute',
+        zIndex: 10,
+        width: '102%',
+        height: '100%',
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
+        alignItems: 'center',
+      }}>
+      <Button
+        type="accent"
+        title="Select"
+        icon="check"
+        onPress={() => {
+          if (!selectionMode) {
+            dispatch({type: Actions.SELECTION_MODE, enabled: true});
+          }
+          dispatch({type: Actions.SELECTED_ITEMS, item: note});
+          setActionStrip(false);
+        }}
+        style={{
+          borderRadius: 100,
+          paddingHorizontal: 12,
+          ...getElevation(5),
+        }}
+        height={30}
+      />
+      {actions.map(
+        (item) =>
+          item.visible && (
+            <View
+              key={item.icon}
+              style={{
+                width: 40,
+                height: 40,
+                backgroundColor: item.bg || colors.bg,
+                borderRadius: 100,
+                justifyContent: 'center',
+                alignItems: 'center',
+                ...getElevation(5),
+                marginLeft: 15,
+              }}>
+              <ActionIcon
+                color={item.color || colors.heading}
+                onPress={item.onPress}
+                name={item.icon}
+                size={SIZE.lg}
+              />
+            </View>
+          ),
+      )}
+    </View>
+  );
+};
+
 const SelectionWrapper = ({
   children,
   item,
@@ -101,18 +305,22 @@ const SelectionWrapper = ({
   const [state, dispatch] = useTracked();
   const {colors, selectionMode, selectedItemsList} = state;
   const [selected, setSelected] = useState(false);
+  const [actionStrip, setActionStrip] = useState(false);
   useEffect(() => {
-    let exists = selectedItemsList.filter(
-      (o) => o.dateCreated === item.dateCreated,
-    );
+    if (selectionMode) {
+      setActionStrip(false);
+      let exists = selectedItemsList.filter(
+        (o) => o.dateCreated === item.dateCreated,
+      );
 
-    if (exists[0]) {
-      if (!selected) {
-        setSelected(true);
-      }
-    } else {
-      if (selected) {
-        setSelected(false);
+      if (exists[0]) {
+        if (!selected) {
+          setSelected(true);
+        }
+      } else {
+        if (selected) {
+          setSelected(false);
+        }
       }
     }
   }, [selectedItemsList]);
@@ -121,7 +329,10 @@ const SelectionWrapper = ({
     <PressableButton
       customColor="transparent"
       testID={testID}
-      onLongPress={onLongPress}
+      onLongPress={() => {
+        if (selectionMode) return;
+        setActionStrip(!actionStrip);
+      }}
       onPress={onPress}
       customSelectedColor={colors.nav}
       customAlpha={!colors.night ? -0.02 : 0.02}
@@ -131,9 +342,9 @@ const SelectionWrapper = ({
         justifyContent: 'space-between',
         alignItems: 'center',
         width: '100%',
-        paddingHorizontal: 12,
         borderRadius: 0,
         overflow: 'hidden',
+        paddingHorizontal: 12,
         marginTop:
           index === 0 && !selectionMode
             ? 15
@@ -141,9 +352,11 @@ const SelectionWrapper = ({
             ? 30
             : 0,
       }}>
-      {item.type === 'note' ? (
-        <Filler background={background} item={item} />
-      ) : null}
+      {actionStrip && (
+        <ActionStrip note={item} setActionStrip={setActionStrip} />
+      )}
+
+      {item.type === 'note' && <Filler background={background} item={item} />}
 
       <View
         style={{
