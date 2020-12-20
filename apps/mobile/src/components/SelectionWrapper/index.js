@@ -1,21 +1,20 @@
-import React, {useEffect, useState} from 'react';
-import {TouchableOpacity, View} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
-import {eSendEvent, openVault} from '../../services/EventManager';
-import {getElevation} from '../../utils';
-import {hexToRGBA} from '../../utils/ColorUtils';
-import {db} from '../../utils/DB';
-import {refreshNotesPage} from '../../utils/Events';
-import {SIZE} from '../../utils/SizeUtils';
-import {ActionIcon} from '../ActionIcon';
-import {Button} from '../Button';
-import {simpleDialogEvent} from '../DialogManager/recievers';
-import {TEMPLATE_PERMANANT_DELETE} from '../DialogManager/Templates';
-import {PressableButton} from '../PressableButton';
+import { useTracked } from '../../provider';
+import { Actions } from '../../provider/Actions';
+import { eSendEvent, openVault } from '../../services/EventManager';
+import { getElevation } from '../../utils';
+import { hexToRGBA } from '../../utils/ColorUtils';
+import { db } from '../../utils/DB';
+import { refreshNotesPage } from '../../utils/Events';
+import { SIZE } from '../../utils/SizeUtils';
+import { ActionIcon } from '../ActionIcon';
+import { Button } from '../Button';
+import { simpleDialogEvent } from '../DialogManager/recievers';
+import { TEMPLATE_PERMANANT_DELETE } from '../DialogManager/Templates';
+import { PressableButton } from '../PressableButton';
 import Heading from '../Typography/Heading';
-import Paragraph from '../Typography/Paragraph';
 
 const Filler = ({item, background}) => {
   const [state] = useTracked();
@@ -273,7 +272,7 @@ const ActionStrip = ({note, setActionStrip}) => {
               style={{
                 width: 40,
                 height: 40,
-                backgroundColor: item.bg || colors.bg,
+                backgroundColor: item.bg || colors.nav,
                 borderRadius: 100,
                 justifyContent: 'center',
                 alignItems: 'center',

@@ -151,35 +151,6 @@ export const ActionSheetTagsSection = ({item, close}) => {
     setSuggestions(_suggestions);
   };
 
-  const _renderTag = (tag) => (
-    <TouchableOpacity
-      key={tag}
-      onPress={async () => {
-        let oldProps = {...note};
-        try {
-          await db.notes
-            .note(note.id)
-            .untag(oldProps.tags[oldProps.tags.indexOf(tag)]);
-          sendNoteEditedEvent(note.id, false, true);
-          dispatch({type: Actions.TAGS});
-          localRefresh(note.type);
-        } catch (e) {
-          sendNoteEditedEvent(note.id, false, true);
-        }
-      }}
-      style={{
-        paddingHorizontal: 5,
-        backgroundColor: colors.shade,
-        marginLeft: 5,
-        borderRadius: 2.5,
-      }}>
-      <Paragraph>
-        <Paragraph color={colors.accent}>#</Paragraph>
-        {tag}
-      </Paragraph>
-    </TouchableOpacity>
-  );
-
   return note.id || note.dateCreated ? (
     <View
       style={{
@@ -253,7 +224,9 @@ export const ActionSheetTagsSection = ({item, close}) => {
           </Paragraph>
         ) : null}
 
-        {note && note.tags ? note.tags.map(_renderTag) : null}
+        {note && note.tags
+          ? note.tags.map((item) => <TagItem tag={item} note={note} />)
+          : null}
         <TextInput
           style={{
             minWidth: 100,
@@ -263,7 +236,7 @@ export const ActionSheetTagsSection = ({item, close}) => {
             paddingHorizontal: 5,
             paddingVertical: 0,
             height: 40,
-            fontSize: SIZE.sm,
+            fontSize: SIZE.md,
             textAlignVertical: 'center',
           }}
           testID={notesnook.ids.dialogs.actionsheet.hashtagInput}
@@ -291,4 +264,40 @@ export const ActionSheetTagsSection = ({item, close}) => {
       </View>
     </View>
   ) : null;
+};
+
+const TagItem = ({tag, note}) => {
+  const [state, dispatch] = useTracked();
+  const {colors} = state;
+
+  const onPress = async () => {
+    let prevNote = {...note};
+    try {
+      await db.notes
+        .note(note.id)
+        .untag(prevNote.tags[prevNote.tags.indexOf(tag)]);
+      sendNoteEditedEvent(note.id, false, true);
+      dispatch({type: Actions.TAGS});
+      localRefresh(note.type);
+    } catch (e) {
+      sendNoteEditedEvent(note.id, false, true);
+    }
+  };
+
+  return (
+    <TouchableOpacity
+      key={tag}
+      onPress={onPress}
+      style={{
+        paddingHorizontal: 8,
+        backgroundColor: colors.shade,
+        marginLeft: 5,
+        borderRadius: 100,
+        paddingVertical:2
+      }}>
+      <Paragraph size={SIZE.md} color={colors.accent}>
+        #{tag}
+      </Paragraph>
+    </TouchableOpacity>
+  );
 };
