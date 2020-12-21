@@ -7,6 +7,7 @@ import config from "../utils/config";
 import { EV } from "notes-core/common";
 import { showLoadingDialog } from "../components/dialogs/loadingdialog";
 import { Text } from "rebass";
+import { showToast } from "../utils/toast";
 
 class UserStore extends BaseStore {
   isLoggedIn = false;
@@ -16,7 +17,7 @@ class UserStore extends BaseStore {
   user = undefined;
 
   init = () => {
-    return db.user.get().then(async (user) => {
+    return db.user.getUser().then(async (user) => {
       if (!user) return false;
       this.set((state) => {
         state.user = user;
@@ -54,7 +55,7 @@ class UserStore extends BaseStore {
   login = (form) => {
     this.set((state) => (state.isLoggingIn = true));
     return db.user
-      .login(form.username, form.password, form.remember)
+      .login(form.email, form.password, form.remember)
       .then(() => {
         return showLoadingDialog({
           title: "Importing your data...",
@@ -78,7 +79,7 @@ class UserStore extends BaseStore {
   signup = (form) => {
     this.set((state) => (state.isSigningIn = true));
     return db.user
-      .signup(form.username, form.email, form.password)
+      .signup(form.email, form.password)
       .then(() => {
         return this.init();
       })
@@ -96,7 +97,10 @@ class UserStore extends BaseStore {
       })
       .catch(async (err) => {
         if (err.code === "MERGE_CONFLICT") await appStore.refresh();
-        else console.error(err);
+        else {
+          showToast("error", err.message);
+          console.error(err);
+        }
       })
       .finally(() => {
         this.set((state) => (state.isSyncing = false));

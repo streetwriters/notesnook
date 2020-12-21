@@ -17,7 +17,7 @@ export async function shouldAddBackupReminder() {
 }
 
 export async function shouldAddSignupReminder() {
-  const user = await db.user.get();
+  const user = await db.user.getUser();
   if (!user) return true;
 }
 

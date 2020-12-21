@@ -9,14 +9,14 @@ import copyToClipboard from "../../utils/clipboard";
 
 function RecoveryKeyDialog(props) {
   const [key, setKey] = useState();
-  const [username, setUsername] = useState();
+  const [email, setEmail] = useState();
   const [copyText, setCopyText] = useState("Copy to clipboard");
   useEffect(() => {
     (async () => {
-      const { username } = await db.user.get();
-      const { key, salt } = await db.user.key();
+      const { email } = await db.user.getUser();
+      const { key, salt } = await db.user.getEncryptionKey();
       setKey(`${key}\0${salt}`);
-      setUsername(username);
+      setEmail(email);
     })();
   }, []);
   return (
@@ -71,7 +71,7 @@ function RecoveryKeyDialog(props) {
                 onClick={async () => {
                   const qrcode = document.getElementById("react-qrcode-logo");
                   qrcode.toBlob((blob) => {
-                    download(`${username}-notesnook-recoverykey`, blob, "png");
+                    download(`${email}-notesnook-recoverykey`, blob, "png");
                   });
                 }}
               >
@@ -81,7 +81,7 @@ function RecoveryKeyDialog(props) {
                 mt={1}
                 fontSize="body"
                 onClick={() => {
-                  download(`${username}-notesnook-recoverykey`, key, "txt");
+                  download(`${email}-notesnook-recoverykey`, key, "txt");
                 }}
               >
                 Download file

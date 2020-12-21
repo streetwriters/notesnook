@@ -6,13 +6,14 @@ import { showSignUpDialog } from "./signupdialog";
 import { useStore } from "../../stores/user-store";
 import Field from "../field";
 import { Checkbox, Label } from "@rebass/forms";
+import { showForgotPasswordDialog } from "./forgotpassworddialog";
 
-const requiredValues = ["username", "password", "remember"];
+const requiredValues = ["email", "password", "remember"];
 function LoginDialog(props) {
   const { onClose } = props;
   const [error, setError] = useState();
   const [credential, setCredential] = useState();
-  const [username, setUsername] = useState();
+  const [email, setEmail] = useState();
   const isLoggingIn = useStore((store) => store.isLoggingIn);
   const login = useStore((store) => store.login);
 
@@ -26,17 +27,17 @@ function LoginDialog(props) {
       if (credential) {
         setCredential(credential);
         if (!credential.password) {
-          setUsername(credential.id);
+          setEmail(credential.id);
         } else {
           try {
             await login({
               password: credential.password,
-              username: credential.id,
+              email: credential.id,
               remember: true,
             });
             onClose();
           } catch (e) {
-            setUsername(credential.id);
+            setEmail(credential.id);
             setCredential();
             setError(e.message);
           }
@@ -110,8 +111,8 @@ function LoginDialog(props) {
                 // Instantiate PasswordCredential with the form
                 if (window.PasswordCredential) {
                   var c = new window.PasswordCredential({
-                    id: data.username,
-                    name: data.username,
+                    id: data.email,
+                    name: data.email,
                     type: "password",
                     password: data.password,
                   });
@@ -126,16 +127,16 @@ function LoginDialog(props) {
           flexDirection="column"
         >
           <Field
-            autoFocus={!username}
+            autoFocus={!email}
             required
-            id="username"
-            label="Username"
-            name="username"
-            autoComplete="username"
-            defaultValue={username}
+            id="email"
+            label="Email"
+            name="email"
+            autoComplete="email"
+            defaultValue={email}
           />
           <Field
-            autoFocus={!!username}
+            autoFocus={!!email}
             required
             id="password"
             label="Password"
@@ -144,6 +145,13 @@ function LoginDialog(props) {
             autoComplete="current-password"
             sx={{ mt: 1 }}
           />
+          <Button
+            variant="anchor"
+            sx={{ alignSelf: "flex-start" }}
+            onClick={showForgotPasswordDialog}
+          >
+            Forgot password?
+          </Button>
           {error && <Text variant="error">{error}</Text>}
           <Label mt={1} fontSize="body" alignItems="center">
             <Checkbox id="remember" name="remember" defaultChecked />

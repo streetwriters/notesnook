@@ -196,7 +196,7 @@ function Settings(props) {
                 const result = await showPasswordDialog(
                   "change_account_password",
                   (data) => {
-                    return db.user.changePassword(
+                    return db.user.resetPassword(
                       data.oldPassword,
                       data.newPassword
                     );
@@ -213,7 +213,7 @@ function Settings(props) {
               variant="list"
               onClick={async () => {
                 if (await showLogoutConfirmation()) {
-                  await db.user.logout();
+                  await db.user.logout(true, "User's request.");
                 }
               }}
             >
@@ -226,9 +226,9 @@ function Settings(props) {
               sx={{ borderColor: "error" }}
               variant="list"
               onClick={async () => {
-                if (await showAccountDeleteConfirmation(user.username)) {
-                  await db.user.delete();
-                }
+                // if (await showAccountDeleteConfirmation(user.username)) {
+                //   await db.user.deleteUser();
+                // }
               }}
             >
               <TextWithTip

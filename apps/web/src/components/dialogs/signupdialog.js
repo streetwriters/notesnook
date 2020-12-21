@@ -6,7 +6,7 @@ import { useStore } from "../../stores/user-store";
 import { showLogInDialog } from "./logindialog";
 import Field from "../field";
 
-const requiredValues = ["email", "username", "password"];
+const requiredValues = ["email", "password"];
 function SignUpDialog(props) {
   const { onClose } = props;
   const [error, setError] = useState();
@@ -58,8 +58,8 @@ function SignUpDialog(props) {
               // Instantiate PasswordCredential with the form
               if (window.PasswordCredential) {
                 var c = new window.PasswordCredential({
-                  id: data.username,
-                  name: data.username,
+                  id: data.email,
+                  name: data.email,
                   type: "password",
                   password: data.password,
                 });
@@ -80,14 +80,6 @@ function SignUpDialog(props) {
           label="Email"
           name="email"
           autoComplete="email"
-        />
-        <Field
-          required
-          id="username"
-          label="Username"
-          name="username"
-          autoComplete="username"
-          sx={{ mt: 1 }}
         />
         <Field
           required
