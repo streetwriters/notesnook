@@ -225,7 +225,9 @@ export const ActionSheetTagsSection = ({item, close}) => {
         ) : null}
 
         {note && note.tags
-          ? note.tags.map((item) => <TagItem tag={item} note={note} />)
+          ? note.tags.map((item) => (
+              <TagItem key={item.title} tag={item} note={note} />
+            ))
           : null}
         <TextInput
           style={{
@@ -286,14 +288,13 @@ const TagItem = ({tag, note}) => {
 
   return (
     <TouchableOpacity
-      key={tag}
       onPress={onPress}
       style={{
         paddingHorizontal: 8,
         backgroundColor: colors.shade,
         marginLeft: 5,
         borderRadius: 100,
-        paddingVertical:2
+        paddingVertical: 2,
       }}>
       <Paragraph size={SIZE.md} color={colors.accent}>
         #{tag}
