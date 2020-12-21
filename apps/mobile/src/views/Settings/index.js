@@ -417,9 +417,9 @@ const SettingsUserSection = () => {
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   flexDirection: 'row',
-                  borderBottomWidth:1,
-                  paddingBottom:2.5,
-                  borderBottomColor:colors.nav
+                  borderBottomWidth: 1,
+                  paddingBottom: 2.5,
+                  borderBottomColor: colors.nav,
                 }}>
                 <View
                   style={{
@@ -825,12 +825,13 @@ const SettingsPrivacyAndSecurity = () => {
           {vaultStatus.isBiometryAvailable ? (
             <CustomButton
               key="fingerprintVaultUnlock"
-              title="Unlock vault with Fingerprint"
+              title="Fingerprint Unlock"
               tagline="Access vault with fingerprint."
               onPress={() => {
                 openVault({
                   item: {},
-                  fingerprintAccess: true,
+                  fingerprintAccess: !vaultStatus.biometryEnrolled,
+                  revokeFingerprintAccess: vaultStatus.biometryEnrolled,
                   novault: true,
                 });
               }}

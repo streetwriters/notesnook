@@ -25,6 +25,7 @@ export const eSendEvent = (eventName, data) => {
  * @property {boolean} share
  * @property {boolean} deleteNote
  * @property {boolean} fingerprintAccess
+ * @property {boolean} revokeFingerprintAccess
  * @property {boolean} changePassword
  * @property {boolean} copyNote
  * @param {vaultType} data 
