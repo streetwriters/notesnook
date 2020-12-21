@@ -500,6 +500,11 @@ export class VaultDialog extends Component {
                 autoCapitalize="none"
                 testID={notesnook.ids.dialogs.vault.pwdAlt}
                 secureTextEntry
+                validationType="confirmPassword"
+                customValidator={() => this.password}
+                errorMessage="Passwords do not match."
+                onErrorCheck={(e) => null}
+                marginBottom={0}
                 onChangeText={(value) => {
                   this.confirmPassword = value;
                   if (value !== this.password) {
