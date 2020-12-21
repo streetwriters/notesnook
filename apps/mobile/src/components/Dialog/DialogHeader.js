@@ -17,7 +17,7 @@ const DialogHeader = ({icon, title, paragraph, button}) => {
           flexDirection: 'row',
           alignItems: 'center',
           justifyContent: 'space-between',
-          height: 50,
+          minHeight: 50,
         }}>
         <View
           style={{
