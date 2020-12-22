@@ -267,7 +267,7 @@ const AccoutLogoutSection = () => {
               borderRadius: 0,
             }}>
             <Heading
-              color={colors.red}
+              color={item.name === "Logout" ? colors.pri : colors.red}
               style={{
                 fontSize: SIZE.md,
               }}>
@@ -312,7 +312,6 @@ const CustomButton = ({
           color={color || colors.pri}
           style={{
             textAlignVertical: 'center',
-            maxWidth: maxWidth,
           }}>
           {title}
         </Paragraph>
@@ -825,7 +824,7 @@ const SettingsPrivacyAndSecurity = () => {
           {vaultStatus.isBiometryAvailable ? (
             <CustomButton
               key="fingerprintVaultUnlock"
-              title="Fingerprint Unlock"
+              title="Vault Fingerprint Unlock"
               tagline="Access vault with fingerprint."
               onPress={() => {
                 openVault({
