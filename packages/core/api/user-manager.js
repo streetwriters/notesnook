@@ -112,35 +112,24 @@ class UserManager {
     }
   }
 
+  changePassword(oldPassword, newPassword) {
+    return this._updatePassword("change_password", {
+      old_password: oldPassword,
+      new_password: newPassword,
+    });
+  }
+
+  resetPassword(newPassword) {
+    return this._updatePassword("reset_password", {
+      new_password: newPassword,
+    });
+  }
+
   async getEncryptionKey() {
     const user = await this.getUser();
     if (!user) return;
     const key = await this._db.context.getCryptoKey(`_uk_@${user.email}`);
     return { key, salt: user.salt };
-  }
-
-  async resetPassword(oldPassword, newPassword) {
-    let token = await this.tokenManager.getAccessToken();
-    if (!token) return;
-    await http.patch(
-      `${constants.AUTH_HOST}/${ENDPOINTS.patchUser}`,
-      {
-        type: "reset_password",
-        old_password: oldPassword,
-        new_password: newPassword,
-      },
-      token
-    );
-    await this._db.outbox.add("reset_password", { newPassword }, async () => {
-      const key = await this.getEncryptionKey();
-      const { email } = await this.getUser();
-      await this._db.context.deriveCryptoKey(`_uk_@${email}`, {
-        password: newPassword,
-        salt: key.salt,
-      });
-      await this._db.sync(false, true);
-    });
-    return true;
   }
 
   async sendVerificationEmail() {
@@ -158,6 +147,29 @@ class UserManager {
       email,
       client_id: "notesnook",
     });
+  }
+
+  async _updatePassword(type, data) {
+    let token = await this.tokenManager.getAccessToken();
+    if (!token) return;
+    await http.patch(
+      `${constants.AUTH_HOST}/${ENDPOINTS.patchUser}`,
+      {
+        type,
+        ...data,
+      },
+      token
+    );
+    await this._db.outbox.add(type, { newPassword }, async () => {
+      const key = await this.getEncryptionKey();
+      const { email } = await this.getUser();
+      await this._db.context.deriveCryptoKey(`_uk_@${email}`, {
+        password: newPassword,
+        salt: key.salt,
+      });
+      await this._db.sync(false, true);
+    });
+    return true;
   }
 }
 
