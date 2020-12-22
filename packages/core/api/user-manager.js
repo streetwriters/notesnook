@@ -24,6 +24,12 @@ class UserManager {
     this.tokenManager = new TokenManager(db);
   }
 
+  async init() {
+    const user = await this.getUser();
+    if (!user) return;
+    if (!user.remember) await this.logout(true, "Session expired.");
+  }
+
   async signup(email, password) {
     await http.post(`${constants.API_HOST}${ENDPOINTS.signup}`, {
       email,
@@ -60,10 +66,14 @@ class UserManager {
   }
 
   async logout(revoke = true, reason) {
-    if (revoke) await this.tokenManager.revokeToken();
-    await this._db.context.clear();
-
-    EV.publish("user:loggedOut", reason);
+    try {
+      if (revoke) await this.tokenManager.revokeToken();
+    } catch (e) {
+      console.error(e);
+    } finally {
+      await this._db.context.clear();
+      EV.publish("user:loggedOut", reason);
+    }
   }
 
   setUser(user) {
@@ -87,7 +97,7 @@ class UserManager {
     return true;
   }
 
-  async fetchUser(remember) {
+  async fetchUser(remember = false) {
     try {
       let token = await this.tokenManager.getAccessToken();
       if (!token) return;
@@ -170,7 +180,7 @@ class UserManager {
           password: data.new_password,
           salt: key.salt,
         });
-        await this._db.sync(false, true);
+        await this._db.sync(true, true);
       }
     );
     return true;
