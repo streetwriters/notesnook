@@ -147,7 +147,6 @@ export class VaultDialog extends Component {
   };
 
   onPress = async () => {
-
     if (this.state.revokeFingerprintAccess) {
       await this._revokeFingerprintAccess();
       close();
@@ -371,7 +370,7 @@ export class VaultDialog extends Component {
         },
       });
       eSendEvent('vaultUpdated');
-      ToastEvent.show("Fingerprint access revoked!", 'success');
+      ToastEvent.show('Fingerprint access revoked!', 'success');
     } catch (e) {
       ToastEvent.show(e.message, 'error', 'local');
     }
@@ -431,7 +430,7 @@ export class VaultDialog extends Component {
         <View
           style={{
             ...getElevation(5),
-            width: DDS.isTab ? 350 : '80%',
+            width: DDS.isTab ? 350 : '85%',
             borderRadius: 5,
             backgroundColor: colors.bg,
             paddingHorizontal: ph,
@@ -442,9 +441,9 @@ export class VaultDialog extends Component {
               !novault
                 ? 'Create Vault'
                 : fingerprintAccess
-                ? 'Fingerprint Unlock'
+                ? 'Vault Fingerprint Unlock'
                 : this.state.revokeFingerprintAccess
-                ? 'Revoke Fingerprint Unlock'
+                ? 'Revoke Vault Fingerprint Unlock'
                 : changePassword
                 ? 'Change Vault Password'
                 : note.locked
@@ -461,9 +460,9 @@ export class VaultDialog extends Component {
               !novault
                 ? 'Set a password to create vault'
                 : fingerprintAccess
-                ? 'Enter vault password to enable access to the vault with fingerprint'
+                ? 'Enter vault password to enable fingerprint unlocking'
                 : this.state.revokeFingerprintAccess
-                ? 'Disable vault unlocking with fingerprint'
+                ? 'Disable vault fingerprint unlock '
                 : changePassword
                 ? 'Setup a new password for the vault.'
                 : permanant
@@ -492,6 +491,14 @@ export class VaultDialog extends Component {
                 onChangeText={(value) => {
                   this.password = value;
                 }}
+                marginBottom={
+                  !this.state.biometricUnlock ||
+                  !this.state.isBiometryEnrolled ||
+                  !novault ||
+                  changePassword
+                    ? 0
+                    : 10
+                }
                 secureTextEntry
                 placeholder={changePassword ? 'Current Password' : 'Password'}
               />

@@ -46,7 +46,7 @@ const ResultDialog = () => {
       <View
         style={{
           ...getElevation(5),
-          width: DDS.isTab ? 350 : '80%',
+          width: DDS.isTab ? 350 : '85%',
           maxHeight: 350,
           borderRadius: 5,
           backgroundColor: colors.bg,

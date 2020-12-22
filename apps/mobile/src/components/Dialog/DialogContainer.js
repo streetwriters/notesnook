@@ -13,7 +13,7 @@ const DialogContainer = ({width, height, ...restProps}) => {
       {...restProps}
       style={{
         ...getElevation(5),
-        width: width || DDS.isLargeTablet() ? 350 : '80%',
+        width: width || DDS.isLargeTablet() ? 350 : '85%',
         maxHeight: height || 350,
         borderRadius: 5,
         backgroundColor: colors.bg,

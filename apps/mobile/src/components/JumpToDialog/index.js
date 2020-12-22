@@ -95,7 +95,7 @@ const JumpToDialog = () => {
       <View
         style={{
           ...getElevation(5),
-          width: DDS.isTab ? 500 : '80%',
+          width: DDS.isTab ? 500 : '85%',
           backgroundColor: colors.bg,
           zIndex: 100,
           bottom: 20,
