@@ -153,22 +153,26 @@ class UserManager {
     let token = await this.tokenManager.getAccessToken();
     if (!token) return;
     await http.patch(
-      `${constants.AUTH_HOST}/${ENDPOINTS.patchUser}`,
+      `${constants.AUTH_HOST}${ENDPOINTS.patchUser}`,
       {
         type,
         ...data,
       },
       token
     );
-    await this._db.outbox.add(type, { newPassword }, async () => {
-      const key = await this.getEncryptionKey();
-      const { email } = await this.getUser();
-      await this._db.context.deriveCryptoKey(`_uk_@${email}`, {
-        password: newPassword,
-        salt: key.salt,
-      });
-      await this._db.sync(false, true);
-    });
+    await this._db.outbox.add(
+      type,
+      { newPassword: data.newPassword },
+      async () => {
+        const key = await this.getEncryptionKey();
+        const { email } = await this.getUser();
+        await this._db.context.deriveCryptoKey(`_uk_@${email}`, {
+          password: data.newPassword,
+          salt: key.salt,
+        });
+        await this._db.sync(false, true);
+      }
+    );
     return true;
   }
 }
