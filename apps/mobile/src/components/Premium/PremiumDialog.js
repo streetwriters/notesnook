@@ -254,7 +254,14 @@ class PremiumDialog extends React.Component {
                     eSendEvent(eOpenLoginDialog);
                   }, 400);
                 } else {
-                  RNIap.requestSubscription(this.state.product?.productId)
+                  RNIap.requestSubscription(
+                    this.state.product?.productId,
+                    false,
+                    null,
+                    null,
+                    null,
+                    this.state.user.id,
+                  )
                     .then((r) => {})
                     .catch((e) => {
                       console.log(e);
