@@ -55,11 +55,20 @@ const onChangeTab = async (obj) => {
 
 export const RootView = () => {
   const [state] = useTracked();
-  const {colors} = state;
+  const {colors, intentMode} = state;
 
   return (
     <>
-      <NavigationStack component={AppStack} />
+      {intentMode ? (
+        <EditorWrapper
+          dimensions={{
+            width: '100%',
+            height: '100%',
+          }}
+        />
+      ) : (
+        <NavigationStack component={AppStack} />
+      )}
       <Toast />
       <ContextMenu />
       <DummyText />

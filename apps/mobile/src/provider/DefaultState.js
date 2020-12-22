@@ -82,5 +82,6 @@ export const defaultState = {
   },
   keyword: [],
   menuPins:[],
-  lastSynced:"Never"
+  lastSynced:"Never",
+  intentMode:true
 };

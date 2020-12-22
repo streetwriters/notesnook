@@ -13,6 +13,7 @@ import * as RNIap from 'react-native-iap';
 import {enabled} from 'react-native-privacy-snapshot';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import SplashScreen from 'react-native-splash-screen';
+import {RootView} from './initializer.root';
 import {useTracked} from './src/provider';
 import {Actions} from './src/provider/Actions';
 import Backup from './src/services/Backup';
@@ -43,16 +44,14 @@ import {
   eOpenPendingDialog,
   eOpenProgressDialog,
   eOpenSideMenu,
-  eStartSyncer,
   refreshNotesPage,
 } from './src/utils/Events';
 import {MMKV} from './src/utils/mmkv';
 import {tabBarRef} from './src/utils/Refs';
 import {sleep} from './src/utils/TimeUtils';
-import {getNote} from './src/views/Editor/Functions';
+import {getIntent, getNote, setIntent} from './src/views/Editor/Functions';
 const {ReceiveSharingIntent} = NativeModules;
 
-let AppRootView = require('./initializer.root').RootView;
 let Sentry = null;
 let appIsInitialized = false;
 let intentOnAppLoadProcessed = false;
@@ -106,6 +105,8 @@ const onAppStateChanged = async (state) => {
 
 function loadIntent(event) {
   if (event) {
+    setIntent();
+    console.log(event, getIntent());
     eSendEvent(eOnLoadNote, event);
     tabBarRef.current?.goToPage(1);
     Navigation.closeDrawer();
@@ -131,9 +132,7 @@ const onNetworkStateChanged = (netInfo) => {
 };
 
 const App = () => {
-  const [, dispatch] = useTracked(),
-    [init, setInit] = useState(true),
-    [intent, setIntent] = useState(false);
+  const [, dispatch] = useTracked();
 
   let subsriptionSuccessListerner;
   let subsriptionErrorListener;
@@ -157,7 +156,6 @@ const App = () => {
       EV.unsubscribe('user:loggedOut', onLogout);
       EV.unsubscribe('db:sync', partialSync);
       EV.unsubscribe('user:checkStatus', PremiumService.onUserStatusCheck);
-      eUnSubscribeEvent(eStartSyncer, startSyncer);
       eUnSubscribeEvent(eDispatchAction, (type) => {
         dispatch(type);
       });
@@ -272,8 +270,8 @@ const App = () => {
   };
 
   const loadMainApp = () => {
+    dispatch({type: Actions.INTENT_MODE, state: false});
     dispatch({type: Actions.ALL});
-    AppRootView = require('./initializer.root').RootView;
     setCurrentUser().then(console.log).catch(console.log);
     Backup.checkAndRun().then((r) => r);
     sleep(500).then(() => (appIsInitialized = true));
@@ -314,17 +312,20 @@ const App = () => {
     let isIntent = false;
     IntentService.getIntent()
       .then(() => {
-        AppRootView = require('./initializer.intent').IntentView;
-        setInit(false);
-        intentOnAppLoadProcessed = true;
-        dispatch({type: Actions.ALL});
-        setIntent(true);
-        isIntent = true;
-        ReceiveSharingIntent.clearFileNames();
+        IntentService.check((event) => {
+          SplashScreen.hide();
+          loadIntent(event);
+          intentOnAppLoadProcessed = true;
+          dispatch({type: Actions.ALL});
+          isIntent = true;
+          dispatch({type: Actions.INTENT_MODE, state: true});
+          ReceiveSharingIntent.clearFileNames();
+        });
       })
       .catch((e) => console.log)
       .finally(() => {
         if (!isIntent) {
+          dispatch({type: Actions.INTENT_MODE, state: false});
           ReceiveSharingIntent.clearFileNames();
           intentOnAppLoadProcessed = true;
           loadMainApp();
@@ -372,8 +373,7 @@ const App = () => {
 
   return (
     <SafeAreaProvider>
-      {intent ? <AppRootView /> : null}
-      {init && !intent ? <AppRootView /> : null}
+      <RootView />
     </SafeAreaProvider>
   );
 };

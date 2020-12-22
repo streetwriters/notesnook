@@ -266,6 +266,13 @@ export const reducer = (state, action) => {
         menuPins: action.lastSync,
       };
     }
+    case Actions.INTENT_MODE: {
+
+      return {
+        ...state,
+        intentMode: action.state,
+      };
+    }
     default:
       throw new Error('unknown action type');
   }

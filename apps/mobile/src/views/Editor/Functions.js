@@ -155,13 +155,12 @@ function clearNote() {
 
 let currentEditingTimer = null;
 
-export async function loadNote(item) {
+export const loadNote = async (item) => {
   editing.currentlyEditing = true;
   post('blur');
 
-  
   if (item && item.type === 'new') {
-    intent = false;
+    if (intent) return;
     await clearEditor();
     clearNote();
     noteEdited = false;
@@ -177,11 +176,11 @@ export async function loadNote(item) {
     await clearEditor();
     clearNote();
     id = null;
-    intent = true;
     content = {
       data: item.data,
       type: 'delta',
     };
+    intent = true;
     if (webviewInit) {
       await loadNoteInEditor();
     }
@@ -193,9 +192,8 @@ export async function loadNote(item) {
       await loadNoteInEditor();
     }
     updateEvent({type: Actions.CURRENT_EDITING_NOTE, id: item.id});
-   
   }
-}
+};
 
 export function setIntentNote(item) {
   id = null;
@@ -277,7 +275,7 @@ export async function clearEditor() {
   });
   saveCounter = 0;
   clearNote();
-  intent = false;
+  //intent = false;
 }
 
 function checkIfContentIsSavable() {
@@ -382,7 +380,7 @@ export async function saveNote(canPost = true) {
     }
     saveCounter++;
   } else {
-    await db.vault.save({
+    let note = await db.vault.save({
       title,
       content: {
         type: content.type,
@@ -424,7 +422,7 @@ async function loadEditorState() {
       }
     }
   } else {
-    IntentService.check((event) => {
+   /*  IntentService.check((event) => {
       if (event) {
         intent = true;
         eSendEvent(eOnLoadNote, event);
@@ -433,7 +431,7 @@ async function loadEditorState() {
       } else {
         eSendEvent('nointent');
       }
-    });
+    }); */
   }
 }
 
@@ -443,18 +441,17 @@ const loadNoteInEditor = async () => {
   if (!webviewInit) return;
   saveCounter = 0;
   if (intent) {
-    await sleep(1500);
     post('delta', content.data);
-    intent = true;
+    intent = false;
     await saveNote();
   } else if (note?.id) {
     post('title', title);
     intent = false;
     setColors();
     post('delta', content.data);
-    await sleep(100);
+    await sleep(10);
     post('dateEdited', timeConverter(note.dateEdited));
   }
-  await sleep(50);
+  await sleep(10);
   post('clearHistory');
 };

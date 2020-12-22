@@ -121,7 +121,7 @@ const EditorHeader = () => {
   };
 
   const _onBackPress = async () => {
-    if (getIntent() && sideMenuRef.current === null) {
+    if (sideMenuRef.current === null) {
       if (tapCount > 0) {
         tapCount = 0;
         setIntent(false);
