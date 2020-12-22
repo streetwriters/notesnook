@@ -162,12 +162,12 @@ class UserManager {
     );
     await this._db.outbox.add(
       type,
-      { newPassword: data.newPassword },
+      { newPassword: data.new_password },
       async () => {
         const key = await this.getEncryptionKey();
         const { email } = await this.getUser();
         await this._db.context.deriveCryptoKey(`_uk_@${email}`, {
-          password: data.newPassword,
+          password: data.new_password,
           salt: key.salt,
         });
         await this._db.sync(false, true);
