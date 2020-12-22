@@ -33,8 +33,9 @@ const ActionSheetWrapper = ({
       borderBottomLeftRadius: largeTablet ? 10 : 1,
       marginBottom: largeTablet ? 50 : 0,
       alignSelf: 'center',
+      paddingTop:gestureEnabled ? 8 : 18
     };
-  }, [colors.bg]);
+  }, [colors.bg,gestureEnabled]);
 
   return (
     <ActionSheet
