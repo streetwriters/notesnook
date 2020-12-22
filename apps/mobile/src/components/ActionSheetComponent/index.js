@@ -331,7 +331,7 @@ export const ActionSheetComponent = ({
       check: true,
       on: note.favorite,
       id: notesnook.ids.dialogs.actionsheet.favorite,
-      color:'orange'
+      color: 'orange',
     },
     {
       name: isPinnedToMenu ? 'Unpin from Menu' : 'Pin to Menu',
@@ -457,8 +457,6 @@ export const ActionSheetComponent = ({
       </TouchableOpacity>
     ) : null;
 
-
-
   const onPressVaultButton = async () => {
     if (!note.id) return;
     if (note.locked) {
@@ -466,13 +464,15 @@ export const ActionSheetComponent = ({
     } else {
       db.vault
         .add(note.id)
-        .then(() => {
+        .then((r) => {
+          console.log(r);
           sendNoteEditedEvent(note.id, false, true);
           if (note.locked && PremiumService.get()) {
             close();
           }
         })
         .catch(async (e) => {
+          console.log(e);
           switch (e.message) {
             case db.vault.ERRORS.noVault:
               close('novault');
@@ -660,8 +660,10 @@ export const ActionSheetComponent = ({
 
       {note.type === 'note' ? (
         <PressableButton
-          accentColor="errorBg"
           type={note.locked ? 'accent' : 'shade'}
+          accentColor="red"
+          customSelectedColor={note.locked && '#ff0000'}
+          customOpacity={note.locked && 0.12}
           onPress={onPressVaultButton}
           testID={notesnook.ids.dialogs.actionsheet.vault}
           customStyle={{
@@ -694,8 +696,8 @@ export const ActionSheetComponent = ({
         (o) => o.id === editing.actionAfterFirstSave.id,
       ) ? (
         <PressableButton
-          accentColor="errorBg"
-          customColor="#ff0000"
+          type="accent"
+          accentColor="red"
           customSelectedColor="#ff0000"
           customOpacity={0.12}
           onPress={async () => {
