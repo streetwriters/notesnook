@@ -28,6 +28,7 @@ class UserManager {
     await http.post(`${constants.API_HOST}${ENDPOINTS.signup}`, {
       email,
       password,
+      client_id: "notesnook",
     });
     return await this.login(email, password);
   }
