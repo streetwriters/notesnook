@@ -11,6 +11,7 @@ const ENDPOINTS = {
   patchUser: "/account",
   verifyUser: "/account/verify",
   revoke: "/connect/revocation",
+  recoverAccount: "/account/recover",
 };
 
 class UserManager {
@@ -123,7 +124,7 @@ class UserManager {
     await http.patch(
       `${constants.AUTH_HOST}/${ENDPOINTS.patchUser}`,
       {
-        type: "resetPassword",
+        type: "reset_password",
         old_password: oldPassword,
         new_password: newPassword,
       },
@@ -149,6 +150,13 @@ class UserManager {
       null,
       token
     );
+  }
+
+  recoverAccount(email) {
+    return http.post(`${constants.AUTH_HOST}${ENDPOINTS.recoverAccount}`, {
+      email,
+      client_id: "notesnook",
+    });
   }
 }
 
