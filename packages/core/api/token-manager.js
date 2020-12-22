@@ -4,6 +4,7 @@ import constants from "../utils/constants";
 const ENDPOINTS = {
   token: "/connect/token",
   revoke: "/connect/revocation",
+  temporaryToken: "/account/token",
 };
 
 class TokenManager {
@@ -70,6 +71,16 @@ class TokenManager {
 
   saveToken(tokenResponse) {
     return this._db.context.write("token", { ...tokenResponse, t: Date.now() });
+  }
+
+  async getAccessTokenFromAuthorizationCode(userId, authCode) {
+    return await this.saveToken(
+      await http.post(`${constants.AUTH_HOST}${ENDPOINTS.temporaryToken}`, {
+        authorization_code: authCode,
+        user_id: userId,
+        client_id: "notesnook",
+      })
+    );
   }
 }
 export default TokenManager;
