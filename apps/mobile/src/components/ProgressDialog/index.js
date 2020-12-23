@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useTracked } from '../../provider';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
 import { eCloseProgressDialog, eOpenProgressDialog } from '../../utils/Events';
-import { SIZE } from '../../utils/SizeUtils';
 import { sleep } from '../../utils/TimeUtils';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
 import { Button } from '../Button';
@@ -57,6 +57,16 @@ const ProgressDialog = () => {
           marginBottom: 10,
           paddingHorizontal: 12,
         }}>
+        {!dialogData?.noProgress ? (
+          <ActivityIndicator size={50} color={colors.accent} />
+        ) : (
+          <Icon
+            color={colors.accent}
+            name={dialogData.icon || 'check'}
+            size={50}
+          />
+        )}
+
         <Heading> {dialogData?.title}</Heading>
         <Paragraph style={{textAlign: 'center'}}>
           {dialogData?.paragraph}
@@ -68,9 +78,6 @@ const ProgressDialog = () => {
           ) : null}
         </Paragraph>
       </View>
-      {!dialogData?.noProgress ? (
-        <ActivityIndicator size={SIZE.xxxl} color={colors.accent} />
-      ) : null}
 
       {dialogData?.action ? (
         <Button
