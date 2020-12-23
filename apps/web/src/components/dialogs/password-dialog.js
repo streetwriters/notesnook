@@ -8,11 +8,9 @@ function PasswordDialog(props) {
   const { type } = props;
   const [error, setError] = useState();
   const [isLoading, setIsLoading] = useState(false);
-
-  const isChangePasswordDialog = useMemo(
-    () => type === "change_password" || "change_account_password",
-    [type]
-  );
+  const isChangePasswordDialog = useMemo(() => {
+    return type === "change_password" || type === "change_account_password";
+  }, [type]);
 
   const submit = useCallback(
     async (data) => {
