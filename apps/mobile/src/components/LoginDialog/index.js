@@ -191,7 +191,6 @@ const LoginDialog = () => {
       dispatch({type: Actions.USER, user: user});
       await db.sync();
       dispatch({type: Actions.LAST_SYNC, lastSync: await db.lastSynced()});
-      eSendEvent(eStartSyncer);
       dispatch({type: Actions.ALL});
       eSendEvent(refreshNotesPage);
       clearMessage(dispatch);
@@ -256,7 +255,6 @@ const LoginDialog = () => {
       setStatus('Setting up crenditials');
       dispatch({type: Actions.USER, user: user});
       dispatch({type: Actions.LAST_SYNC, lastSync: await db.lastSynced()});
-      eSendEvent(eStartSyncer);
       clearMessage(dispatch);
       setEmailVerifyMessage(dispatch);
       close();
