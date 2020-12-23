@@ -19,6 +19,7 @@ import {
 } from './src/services/EventManager';
 import {editing, setWidthHeight} from './src/utils';
 import {
+  eClearEditor,
   eCloseFullscreenEditor,
   eCloseSideMenu,
   eOnLoadNote,
@@ -27,7 +28,7 @@ import {
 } from './src/utils/Events';
 import {editorRef, tabBarRef} from './src/utils/Refs';
 import {EditorWrapper} from './src/views/Editor/EditorWrapper';
-import {getIntent, getNote, post} from './src/views/Editor/Functions';
+import {clearEditor, getIntent, getNote, post} from './src/views/Editor/Functions';
 
 let {width, height} = Dimensions.get('window');
 let movedAway = true;
@@ -39,12 +40,16 @@ const onChangeTab = async (obj) => {
     if (getIntent()) return;
     movedAway = false;
     currentTab = 1;
+  
     if (!editing.currentlyEditing || !getNote()) {
       eSendEvent(eOnLoadNote, {type: 'new'});
       editing.currentlyEditing = true;
     }
   } else {
     if (obj.from === 1) {
+      if (getNote()?.locked) {
+        eSendEvent(eClearEditor);
+      }
       movedAway = true;
       post('blur');
     }

@@ -1,18 +1,15 @@
 import {createRef} from 'react';
 import {Linking, Platform} from 'react-native';
-import SplashScreen from 'react-native-splash-screen';
 import {updateEvent} from '../../components/DialogManager/recievers';
 import {Actions} from '../../provider/Actions';
 import {DDS} from '../../services/DeviceDetection';
 import {eSendEvent, sendNoteEditedEvent} from '../../services/EventManager';
-import IntentService from '../../services/IntentService';
 import {editing} from '../../utils';
 import {COLORS_NOTE, COLOR_SCHEME} from '../../utils/Colors';
 import {hexToRGBA} from '../../utils/ColorUtils';
 import {db} from '../../utils/DB';
 import {
   eOnLoadNote,
-  eOpenSideMenu,
   eShowGetPremium,
   refreshNotesPage,
 } from '../../utils/Events';

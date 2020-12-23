@@ -104,9 +104,8 @@ const EditorHeader = () => {
 
   const onCallClear = async () => {
     if (editing.currentlyEditing) {
-      exitEditorAnimation();
+      await _onBackPress()
     }
-    await clearEditor();
   };
 
   useEffect(() => {
