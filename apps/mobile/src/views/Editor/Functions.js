@@ -344,14 +344,14 @@ async function addToCollection(id) {
   }
 }
 
-export async function saveNote(canPost = true) {
+export async function saveNote() {
   if (!checkIfContentIsSavable()) return;
 
   if (id && !db.notes.note(id)) {
     clearNote();
     return;
   }
-  let lockedNote = id ? db.notes.note(id).data.locked : null;
+  let locked = id ? db.notes.note(id).data.locked : null;
 
   let noteData = {
     title,
@@ -360,42 +360,31 @@ export async function saveNote(canPost = true) {
       type: content.type,
     },
     id: id,
-  }
+  };
 
-  if (!lockedNote) {
-    let rId = await db.notes.add(noteData);
+  if (!locked) {
+    let noteId = await db.notes.add(noteData);
     if (!id || saveCounter < 3) {
       updateEvent({
         type: Actions.NOTES,
       });
-      updateEvent({type: Actions.CURRENT_EDITING_NOTE, id: id});
+      updateEvent({type: Actions.CURRENT_EDITING_NOTE, id: noteId});
       eSendEvent(refreshNotesPage);
     }
 
-    sendNoteEditedEvent(rId);
-    await setNoteInEditorAfterSaving(id, rId);
+    await setNoteInEditorAfterSaving(id, noteId);
     if (id) {
       await addToCollection(id);
-      updateEvent({
-        type: Actions.CURRENT_EDITING_NOTE,
-        id: id,
-      });
     }
     saveCounter++;
   } else {
-    console.log('saving data in vault')
     noteData.contentId = note.contentId;
     await db.vault.save(noteData);
-    sendNoteEditedEvent(id);
   }
+  sendNoteEditedEvent(id);
   let n = db.notes.note(id).data.dateEdited;
-  console.log(db.notes.note(id).data);
-  if (canPost) {
-    console.log(noteData);
-    post('dateEdited', timeConverter(n));
-    post('saving', 'Saved');
-  }
-
+  post('dateEdited', timeConverter(n));
+  post('saving', 'Saved');
 }
 
 export async function onWebViewLoad(premium, colors, event) {
@@ -424,7 +413,7 @@ async function loadEditorState() {
       }
     }
   } else {
-   /*  IntentService.check((event) => {
+    /*  IntentService.check((event) => {
       if (event) {
         intent = true;
         eSendEvent(eOnLoadNote, event);
