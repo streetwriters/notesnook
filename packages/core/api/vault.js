@@ -196,6 +196,7 @@ export default class Vault {
       id,
       locked: true,
       headline: "",
+      title: note.title,
     });
   }
 
