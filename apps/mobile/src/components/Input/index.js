@@ -10,6 +10,7 @@ import {
 } from '../../services/Validation';
 import {getElevation} from '../../utils';
 import {SIZE, WEIGHT} from '../../utils/SizeUtils';
+import {ActionIcon} from '../ActionIcon';
 import Paragraph from '../Typography/Paragraph';
 
 const Input = ({
@@ -138,9 +139,11 @@ const Input = ({
             alignItems: 'center',
           }}>
           {secureTextEntry && (
-            <Icon
+            <ActionIcon
               name="eye"
               size={20}
+              top={10}
+              bottom={10}
               onPress={() => {
                 setSecureEntry(!secureEntry);
               }}
@@ -153,9 +156,11 @@ const Input = ({
           )}
 
           {button && (
-            <Icon
+            <ActionIcon
               name={button.icon}
               size={20}
+              top={10}
+              bottom={10}
               onPress={button.onPress}
               style={{
                 width: 25,
@@ -166,8 +171,10 @@ const Input = ({
           )}
 
           {error && (
-            <Icon
+            <ActionIcon
               name="alert-circle-outline"
+              top={10}
+              bottom={10}
               onPress={() => {
                 setShowError(!showError);
               }}

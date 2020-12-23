@@ -23,7 +23,7 @@ PODS:
   - MMKV (1.2.6):
     - MMKVCore (~> 1.2.6)
   - MMKVCore (1.2.6)
-  - Permission-PhotoLibrary (2.2.0):
+  - Permission-PhotoLibrary (2.2.2):
     - RNPermissions
   - RCTRequired (0.63.4)
   - RCTTypeSafety (0.63.4):
@@ -191,19 +191,17 @@ PODS:
     - React-cxxreact (= 0.63.4)
     - React-jsi (= 0.63.4)
   - React-jsinspector (0.63.4)
-  - react-native-document-picker (4.1.0):
+  - react-native-document-picker (4.1.1):
     - React-Core
-  - react-native-eventsource (0.0.3):
-    - React
-  - react-native-get-random-values (1.4.0):
+  - react-native-get-random-values (1.5.0):
     - React
   - react-native-html-to-pdf (0.8.0):
     - React
   - react-native-mmkv-storage (0.3.7):
     - MMKV (= 1.2.6)
     - React
-  - react-native-netinfo (5.9.6):
-    - React
+  - react-native-netinfo (5.9.9):
+    - React-Core
   - react-native-orientation (3.1.3):
     - React
   - react-native-receive-sharing-intent (1.0.4):
@@ -214,9 +212,9 @@ PODS:
     - React
   - react-native-splash-screen (3.2.0):
     - React
-  - react-native-viewpager (4.2.0):
+  - react-native-viewpager (4.2.2):
     - React-Core
-  - react-native-webview (11.0.1):
+  - react-native-webview (11.0.2):
     - React-Core
   - React-RCTActionSheet (0.63.4):
     - React-Core/RCTActionSheetHeaders (= 0.63.4)
@@ -280,42 +278,42 @@ PODS:
     - React-jsi (= 0.63.4)
   - rn-fetch-blob (0.12.0):
     - React-Core
-  - RNCCheckbox (0.5.3):
-    - React
+  - RNCCheckbox (0.5.6):
+    - React-Core
   - RNCMaskedView (0.1.10):
     - React
-  - RNDeviceInfo (6.0.2):
-    - React
+  - RNDeviceInfo (6.2.1):
+    - React-Core
   - RNExitApp (1.1.0):
     - React
-  - RNFileViewer (2.1.1):
-    - React
+  - RNFileViewer (2.1.4):
+    - React-Core
   - RNGestureHandler (1.9.0):
     - React-Core
-  - RNIap (4.6.1):
+  - RNIap (5.2.0):
     - React-Core
   - RNKeychain (6.2.0):
     - React-Core
-  - RNPermissions (2.2.0):
-    - React
+  - RNPermissions (2.2.2):
+    - React-Core
   - RNPrivacySnapshot (1.0.0):
     - React-Core
   - RNReanimated (1.13.2):
     - React-Core
-  - RNScreens (2.15.0):
+  - RNScreens (2.16.1):
     - React-Core
   - RNSecureRandom (1.0.0):
     - React
   - RNSentry (2.1.0):
     - React-Core
     - Sentry (= 6.0.9)
-  - RNShare (3.7.0):
-    - React
+  - RNShare (3.8.5):
+    - React-Core
   - RNStoreReview (0.1.5):
     - React
   - RNSVG (12.1.0):
     - React
-  - RNVectorIcons (7.0.0):
+  - RNVectorIcons (7.1.0):
     - React
   - Sentry (6.0.9):
     - Sentry/Core (= 6.0.9)
@@ -346,7 +344,6 @@ DEPENDENCIES:
   - React-jsiexecutor (from `../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - react-native-document-picker (from `../node_modules/react-native-document-picker`)
-  - react-native-eventsource (from `../node_modules/react-native-eventsource`)
   - react-native-get-random-values (from `../node_modules/react-native-get-random-values`)
   - react-native-html-to-pdf (from `../node_modules/react-native-html-to-pdf`)
   - react-native-mmkv-storage (from `../node_modules/react-native-mmkv-storage`)
@@ -433,8 +430,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/jsinspector"
   react-native-document-picker:
     :path: "../node_modules/react-native-document-picker"
-  react-native-eventsource:
-    :path: "../node_modules/react-native-eventsource"
   react-native-get-random-values:
     :path: "../node_modules/react-native-get-random-values"
   react-native-html-to-pdf:
@@ -530,7 +525,7 @@ SPEC CHECKSUMS:
   glog: 40a13f7840415b9a77023fbcae0f1e6f43192af3
   MMKV: 27f6b9e34849e77e78c5a1cc8f7f513e37f5fa15
   MMKVCore: c301b04fd2ab9957e6e4d4465b9b60e443b0bb6b
-  Permission-PhotoLibrary: e3ff899f87a3eda29427c142ca93837e8802d228
+  Permission-PhotoLibrary: 8227a6ed9f6a971537afe63742d54f5f23a38fe2
   RCTRequired: 082f10cd3f905d6c124597fd1c14f6f2655ff65e
   RCTTypeSafety: 8c9c544ecbf20337d069e4ae7fd9a377aadf504b
   React: b0a957a2c44da4113b0c4c9853d8387f8e64e615
@@ -541,19 +536,18 @@ SPEC CHECKSUMS:
   React-jsi: a0418934cf48f25b485631deb27c64dc40fb4c31
   React-jsiexecutor: 93bd528844ad21dc07aab1c67cb10abae6df6949
   React-jsinspector: 58aef7155bc9a9683f5b60b35eccea8722a4f53a
-  react-native-document-picker: d870e0a41510b241d5b764e7a2b5ccf129af7967
-  react-native-eventsource: 63f9edb311e11bb3a95873c2b77acec8f580c234
-  react-native-get-random-values: 2b7500cdb68066aba87cdccd97067c29e16ffe95
+  react-native-document-picker: c9cbeb5445188a805ab19fa4061115d38fe1ea63
+  react-native-get-random-values: 1404bd5cc0ab0e287f75ee1c489555688fc65f89
   react-native-html-to-pdf: 1d1199917f56a98377d431bce84c2f275e48eb71
   react-native-mmkv-storage: 1af147d3491d82e9b8c9706d8c03f82a30d8f1b4
-  react-native-netinfo: 38a1e0b3e89b48e4b5833ed475d8df5f049f6f90
+  react-native-netinfo: 0212ce8604e88edf686f1481b925b17a42a52449
   react-native-orientation: f1caf84d65f1a4fd4511a18f2b924e634ad7a628
   react-native-receive-sharing-intent: feba0a332a07977549a85aa58b496eb44368366a
   react-native-safe-area-context: b6e0e284002381d2ff29fa4fff42b4d8282e3c94
   react-native-sodium: c7587732667e1cdb7d0d77c2aa2e98420aad2036
   react-native-splash-screen: 200d11d188e2e78cea3ad319964f6142b6384865
-  react-native-viewpager: c1a686e7b5e164a52387f1522358623c4f52070f
-  react-native-webview: 86a23feaf8918f38f62fa695c137fa8463565372
+  react-native-viewpager: ea945e2881ce9a4a8bcdc84de4ec65ff23c90f6e
+  react-native-webview: dfd7202ff115c44d3ea401c2f36122fb3ac79f07
   React-RCTActionSheet: 89a0ca9f4a06c1f93c26067af074ccdce0f40336
   React-RCTAnimation: 1bde3ecc0c104c55df246eda516e0deb03c4e49b
   React-RCTBlob: a97d378b527740cc667e03ebfa183a75231ab0f0
@@ -565,28 +559,28 @@ SPEC CHECKSUMS:
   React-RCTVibration: ae4f914cfe8de7d4de95ae1ea6cc8f6315d73d9d
   ReactCommon: 73d79c7039f473b76db6ff7c6b159c478acbbb3b
   rn-fetch-blob: f065bb7ab7fb48dd002629f8bdcb0336602d3cba
-  RNCCheckbox: 47d045535fbb16796df628022a7cd631c78a4d9b
+  RNCCheckbox: 80ee60cd2e67b46986e8e244db520655372deab4
   RNCMaskedView: 5a8ec07677aa885546a0d98da336457e2bea557f
-  RNDeviceInfo: bdd61e8b070d13a1dd9d022091981075ed4cde16
+  RNDeviceInfo: 9b6aba9ffaed69ecb72bd13c7bcb0debf277bc9f
   RNExitApp: c4e052df2568b43bec8a37c7cd61194d4cfee2c3
-  RNFileViewer: db62d60dd19007c54b2c959b5e675a46d59f8a43
+  RNFileViewer: 83cc066ad795b1f986791d03b56fe0ee14b6a69f
   RNGestureHandler: 9b7e605a741412e20e13c512738a31bd1611759b
-  RNIap: f7595967b8467dacb95f94a9eb4bbdb59f3afc67
+  RNIap: 64d7d32ba6edde36921858399433c9ca0a5245e6
   RNKeychain: 612de9918c1170d51094404616fd49b2818176f9
-  RNPermissions: 477d88d0be7ecb0a7b344e4d5fbb0352de104626
+  RNPermissions: 5df468064df661a4c8c017e2791ce90d7695eea5
   RNPrivacySnapshot: 8eaf571478a353f2e5184f5c803164f22428b023
   RNReanimated: e03f7425cb7a38dcf1b644d680d1bfc91c3337ad
-  RNScreens: 2ad555d4d9fa10b91bb765ca07fe9b29d59573f0
+  RNScreens: 45c457af3d2ee9e08fc01e70da87e653d46b1198
   RNSecureRandom: 0dcee021fdb3d50cd5cee5db0ebf583c42f5af0e
   RNSentry: 51972e3fe50e2fb38ae459af8c87d61f63f364db
-  RNShare: a1d5064df7a0ebe778d001869b3f0a124bf0a491
+  RNShare: 7e22ba3bf66294ff7c122a1f2da8a8ec642091a0
   RNStoreReview: 62d6afd7c37db711a594bbffca6b0ea3a812b7a8
   RNSVG: ce9d996113475209013317e48b05c21ee988d42e
-  RNVectorIcons: da6fe858f5a65d7bbc3379540a889b0b12aa5976
+  RNVectorIcons: bc69e6a278b14842063605de32bec61f0b251a59
   Sentry: 388c9dc093b2fd3a264466a5c5b21e25959610a9
   toolbar-android: 85f3ef4d691469f2d304e7dee4bca013aa1ba1ff
   Yoga: 4bd86afe9883422a7c4028c00e34790f560923d6
 
 PODFILE CHECKSUM: 75e5fdf731f5fbebed2725159f7ea172ed1c0356
 
-COCOAPODS: 1.9.3
+COCOAPODS: 1.10.0
