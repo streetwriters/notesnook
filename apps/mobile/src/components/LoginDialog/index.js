@@ -274,6 +274,14 @@ const LoginDialog = () => {
       return;
     }
     try {
+      let lastRecoveryEmailTime = await MMKV.getItem('lastRecoveryEmailTime');
+      if (
+        lastRecoveryEmailTime &&
+        Date.now() - JSON.parse(lastRecoveryEmailTime) < 60000 * 10
+      ) {
+        throw new Error('Please wait before requesting another email');
+      }
+      await MMKV.setItem('lastRecoveryEmailTime', JSON.stringify(Date.now()));
       await db.user.recoverAccount(email);
     } catch (e) {
       ToastEvent.show(e.message, 'error', 'local');
