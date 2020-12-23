@@ -32,6 +32,11 @@ class UserStore extends BaseStore {
           };
         });
       });
+      EV.subscribe("user:emailConfirmed", async () => {
+        showToast("success", "Email confirmed successfully!");
+        await this.sync(true);
+      });
+
       EV.subscribe("db:sync", () => this.sync(false));
       EV.subscribe("user:loggedOut", async () => {
         this.set((state) => {

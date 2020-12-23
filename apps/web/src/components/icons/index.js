@@ -65,6 +65,7 @@ export const Trash = createIcon(Icons.mdiTrashCanOutline);
 export const Search = createIcon(Icons.mdiMagnify);
 export const Menu = createIcon(Icons.mdiMenu);
 export const Login = createIcon(Icons.mdiLoginVariant);
+export const Email = createIcon(Icons.mdiEmailAlertOutline);
 export const Signup = createIcon(Icons.mdiAccountPlusOutline);
 export const Logout = createIcon(Icons.mdiLogoutVariant);
 export const FocusMode = createIcon(Icons.mdiFullscreen);

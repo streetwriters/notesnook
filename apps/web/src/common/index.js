@@ -15,9 +15,15 @@ import Config from "../utils/config";
 import { store as userstore } from "../stores/user-store";
 
 export const db = new Database(StorageInterface, EventSource);
+db.host({
+  API_HOST: "http://192.168.10.5:5264",
+  AUTH_HOST: "http://192.168.10.5:8264",
+  SSE_HOST: "http://192.168.10.5:7264",
+});
 //db.host("http://192.168.10.5:8100");
 // db.host();
 //db.host("https://api.notesnook.com");
+
 export const COLORS = {
   red: "#f44336",
   orange: "#FF9800",

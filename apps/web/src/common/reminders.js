@@ -4,6 +4,8 @@ import { store as appStore } from "../stores/app-store";
 import * as Icon from "../components/icons";
 import dayjs from "dayjs";
 import { showSignUpDialog } from "../components/dialogs/signupdialog";
+import { showDialog } from "../components/dialogs/dialog";
+import { showToast } from "../utils/toast";
 
 export async function shouldAddBackupReminder() {
   const backupReminderOffset = Config.get("backupReminderOffset", 0);
@@ -21,6 +23,11 @@ export async function shouldAddSignupReminder() {
   if (!user) return true;
 }
 
+export async function shouldAddConfirmEmailReminder() {
+  const user = await db.user.getUser();
+  return !user?.isEmailConfirmed;
+}
+
 export const Reminders = {
   backup: {
     title: "Back up your data now!",
@@ -29,8 +36,16 @@ export const Reminders = {
   },
   signup: {
     title: "Sign up for cross-device syncing!",
-    action: async () => showSignUpDialog(),
+    action: () => showSignUpDialog(),
     icon: Icon.Login,
+  },
+  email: {
+    title: "Please confirm your email",
+    action: async () => {
+      await db.user.sendVerificationEmail();
+      showToast("success", "Confirmation email sent. Please check your inbox!");
+    },
+    icon: Icon.Email,
   },
 };
 
@@ -41,5 +56,8 @@ export async function resetReminders() {
   }
   if (await shouldAddSignupReminder()) {
     appStore.addReminder("signup", "low");
+  }
+  if (await shouldAddConfirmEmailReminder()) {
+    appStore.addReminder("email", "high");
   }
 }

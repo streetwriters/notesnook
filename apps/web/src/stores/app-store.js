@@ -62,7 +62,7 @@ class AppStore extends BaseStore {
 
   /**
    *
-   * @param {"backup"|"signup"} type
+   * @param {"backup"|"signup"|"email"} type
    * @param {string} title
    * @param {string} detail
    * @param {"high"|"medium"|"low"} priority

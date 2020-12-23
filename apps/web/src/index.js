@@ -6,11 +6,10 @@ import ReactDOM from "react-dom";
 //import * as Sentry from "@sentry/react";
 //import { Integrations } from "@sentry/tracing";
 import "./index.css";
-import App from "./App";
 import * as serviceWorker from "./serviceWorker";
 import Modal from "react-modal";
-import { MotionConfig, AnimationFeature, GesturesFeature } from "framer-motion";
-import Splash from "./views/splash";
+import rootroutes from "./navigation/rootRoutes";
+import { useRoutes } from "raviger";
 
 // Sentry.init({
 //   dsn:
@@ -28,24 +27,14 @@ import Splash from "./views/splash";
 // });
 
 Modal.setAppElement("#root");
-ReactDOM.render(
-  <MotionConfig features={[AnimationFeature, GesturesFeature]}>
-    <Splash
-      onLoadingFinished={() => {
-        ReactDOM.render(
-          <MotionConfig features={[AnimationFeature, GesturesFeature]}>
-            <App />
-          </MotionConfig>,
-          document.getElementById("root")
-        );
-      }}
-    />
-  </MotionConfig>,
-  document.getElementById("root"),
-  () => {}
-);
+ReactDOM.render(<Root />, document.getElementById("root"), () => {});
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
 // Learn more about service workers: https://bit.ly/CRA-PWA
 serviceWorker.register();
+
+function Root() {
+  const routeResult = useRoutes(rootroutes, { fallbackRoute: "/" });
+  return routeResult;
+}
