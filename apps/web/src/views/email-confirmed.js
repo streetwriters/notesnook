@@ -1,13 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Button, Flex, Text } from "rebass";
-import { navigate, useQueryParams } from "raviger";
 import ThemeProvider from "../components/theme-provider";
-import Field from "../components/field";
 import * as Icon from "../components/icons";
-import { db } from "../common";
-import TokenManager from "notes-core/api/tokenmanager";
-import { showToast } from "../utils/toast";
-import { useCallback } from "react";
 
 function EmailConfirmed(props) {
   return (

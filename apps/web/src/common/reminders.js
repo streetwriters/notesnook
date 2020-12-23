@@ -4,7 +4,6 @@ import { store as appStore } from "../stores/app-store";
 import * as Icon from "../components/icons";
 import dayjs from "dayjs";
 import { showSignUpDialog } from "../components/dialogs/signupdialog";
-import { showDialog } from "../components/dialogs/dialog";
 import { showToast } from "../utils/toast";
 
 export async function shouldAddBackupReminder() {

@@ -7,10 +7,7 @@ import { useStore as useSettingStore } from "../stores/setting-store";
 import AccentItem from "../components/accent-item";
 import accents from "../theme/accents";
 import { showLogInDialog } from "../components/dialogs/logindialog";
-import {
-  showAccountDeleteConfirmation,
-  showLogoutConfirmation,
-} from "../components/dialogs/confirm";
+import { showLogoutConfirmation } from "../components/dialogs/confirm";
 import useSystemTheme from "../utils/use-system-theme";
 import {
   createBackup,

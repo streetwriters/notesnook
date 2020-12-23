@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Text, Box } from "rebass";
 import Dialog, { showDialog } from "./dialog";
-import { useStore } from "../../stores/user-store";
 import Field from "../field";
 import { db } from "../../common";
 import { showToast } from "../../utils/toast";

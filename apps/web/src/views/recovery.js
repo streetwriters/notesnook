@@ -5,7 +5,6 @@ import ThemeProvider from "../components/theme-provider";
 import Field from "../components/field";
 import * as Icon from "../components/icons";
 import { db } from "../common";
-import TokenManager from "notes-core/api/tokenmanager";
 import { showToast } from "../utils/toast";
 import { useCallback } from "react";
 
