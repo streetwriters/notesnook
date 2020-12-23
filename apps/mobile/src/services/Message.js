@@ -30,13 +30,14 @@ export function setEmailVerifyMessage(dispatch) {
     type: Actions.MESSAGE_BOARD_STATE,
     state: {
       visible: true,
-      message: 'Account not verified',
-      actionText: 'Please verify account to sync your data',
+      message: 'Email not verified',
+      actionText: 'Please verify your email to sync.',
       onPress: () => {
         eSendEvent(eOpenProgressDialog, {
-          title: 'Account not verified',
+          title: 'Email not verified',
+          icon: 'email',
           paragraph:
-            'We have sent you an account confirmation link. Please check your email to verify your account.',
+            'We have sent you an email confirmation link. Please check your email to verify your account.',
           action: async () => {
             let lastEmailTime = await MMKV.getItem('lastEmailTime');
             if (
@@ -44,15 +45,15 @@ export function setEmailVerifyMessage(dispatch) {
               Date.now() - JSON.parse(lastEmailTime) < 60000 * 10
             ) {
               ToastEvent.show(
-                'Please wait before sending another email.',
+                'Please wait before requesting another email',
                 'error',
                 'local',
               );
-              console.log("error")
+              console.log('error');
               return;
             }
             await db.user.sendVerificationEmail();
-            console.log("passed",lastEmailTime)
+            console.log('passed', lastEmailTime);
             await MMKV.setItem('lastEmailTime', JSON.stringify(Date.now()));
             ToastEvent.show('Verification email sent!', 'success', 'local');
           },
