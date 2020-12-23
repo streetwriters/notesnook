@@ -38,6 +38,7 @@ import {COLOR_SCHEME} from './src/utils/Colors';
 import {db} from './src/utils/DB';
 import {
   eClosePremiumDialog,
+  eCloseProgressDialog,
   eDispatchAction,
   eOnLoadNote,
   eOpenLoginDialog,
@@ -198,14 +199,28 @@ const App = () => {
             IntentService.setIntent(intent);
             IntentService.check(loadIntent);
           }
-        } else if (url.startsWith('https://notesnook.com/verify')) {
-          let user = await db.user.fetchUser();
-          dispatch({type: Actions.USER, user: user});
-          if (user.isEmailConfirmed) {
-            clearMessage(dispatch);
-          }
+        } else if (url.startsWith('https://notesnook.com')) {
+          await onEmailVerified();
         }
       } catch (e) {}
+    }
+  };
+
+  const onEmailVerified = async () => {
+    let user = await db.user.fetchUser();
+    dispatch({type: Actions.USER, user: user});
+    let message =
+      user?.subscription?.type === 2
+        ? 'Thank you for signing up for Notesnook Beta Program. Enjoy all premium features for free for the next 3 months.'
+        : 'Your Notesnook Pro Trial has been activated. Enjoy all premium features for free for the next 14 days!';
+    eSendEvent(eOpenProgressDialog, {
+      title: 'Email Confirmed!',
+      paragraph: message,
+      noProgress: true,
+    });
+
+    if (user?.isEmailConfirmed) {
+      clearMessage(dispatch);
     }
   };
 
@@ -249,10 +264,11 @@ const App = () => {
   const onLogout = (reason) => {
     eSendEvent(eOpenProgressDialog, {
       title: 'User Logged Out',
-      paragraph: reason,
+      paragraph: 'You have been logged out of your account.',
       action: () => {
         eSendEvent(eOpenLoginDialog);
       },
+      icon: 'logout',
       actionText: 'Login Again',
       noProgress: true,
     });
@@ -283,6 +299,11 @@ const App = () => {
       SettingsService.setAppLoaded();
     });
     SplashScreen.hide();
+    Linking.getInitialURL().then(async (url) => {
+      if (url && url.startsWith('https://notesnook.com')) {
+        await onEmailVerified();
+      }
+    });
     sleep(300).then(() => eSendEvent(eOpenSideMenu));
     //Sentry = require('@sentry/react-native');
     // Sentry.init({
