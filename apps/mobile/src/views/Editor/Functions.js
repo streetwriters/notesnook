@@ -352,15 +352,18 @@ export async function saveNote(canPost = true) {
     return;
   }
   let lockedNote = id ? db.notes.note(id).data.locked : null;
+
+  let noteData = {
+    title,
+    content: {
+      data: content.data,
+      type: content.type,
+    },
+    id: id,
+  }
+
   if (!lockedNote) {
-    let rId = await db.notes.add({
-      title,
-      content: {
-        data: content.data,
-        type: content.type,
-      },
-      id: id,
-    });
+    let rId = await db.notes.add(noteData);
     if (!id || saveCounter < 3) {
       updateEvent({
         type: Actions.NOTES,
@@ -380,20 +383,19 @@ export async function saveNote(canPost = true) {
     }
     saveCounter++;
   } else {
-    let note = await db.vault.save({
-      title,
-      content: {
-        type: content.type,
-        data: content.data,
-      },
-      id: id,
-    });
+    console.log('saving data in vault')
+    noteData.contentId = note.contentId;
+    await db.vault.save(noteData);
+    sendNoteEditedEvent(id);
   }
   let n = db.notes.note(id).data.dateEdited;
+  console.log(db.notes.note(id).data);
   if (canPost) {
+    console.log(noteData);
     post('dateEdited', timeConverter(n));
     post('saving', 'Saved');
   }
+
 }
 
 export async function onWebViewLoad(premium, colors, event) {
