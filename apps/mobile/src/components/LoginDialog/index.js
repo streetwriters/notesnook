@@ -125,7 +125,7 @@ const LoginDialog = () => {
       headerParagraph: 'login to your account',
       showForgotButton: false,
       loading:
-        'Please wait while we change your password and encrypt your data.',
+        'Please wait while we change your password and reencrypt your data.',
       showLoader: true,
       buttonAlt: null,
     },
@@ -180,7 +180,7 @@ const LoginDialog = () => {
       console.log(e);
       ToastEvent.show(e.message, 'error', 'local');
       setLoading(false);
-      setStatus(null)
+      setStatus(null);
       return;
     }
 
@@ -258,7 +258,7 @@ const LoginDialog = () => {
       dispatch({type: Actions.LAST_SYNC, lastSync: await db.lastSynced()});
       eSendEvent(eStartSyncer);
       clearMessage(dispatch);
-      setEmailVerifyMessage(dispatch)
+      setEmailVerifyMessage(dispatch);
       close();
       await sleep(500);
       eSendEvent(eOpenRecoveryKeyDialog, true);
@@ -270,11 +270,34 @@ const LoginDialog = () => {
     }
   };
 
-  const sendEmail = () => {
-    setStatus('Recovery Email Sent!');
+  const sendEmail = async () => {
+    if (!email || error) {
+      ToastEvent.show('Account email required.', 'error', 'local');
+      return;
+    }
+    try {
+      await db.user.recoverAccount(email);
+    } catch (e) {
+      ToastEvent.show(e.message, 'error', 'local');
+    }
+    setStatus('Account Recovery Email Sent!');
   };
 
-  const changePassword = () => {};
+  const changePassword = async () => {
+    if (error || !oldPassword || !password) {
+      ToastEvent.show('All fields are required', 'error', 'local');
+      return;
+    }
+    setLoading(true);
+    setStatus('Setting new Password');
+    try {
+      await db.user.changePassword(oldPassword, password);
+    } catch (e) {
+      ToastEvent.show(e.message, 'error', 'local');
+    }
+    setStatus(null);
+    setLoading(false);
+  };
 
   return !visible ? null : (
     <Modal
@@ -406,7 +429,7 @@ const LoginDialog = () => {
 
           <View
             style={{
-              paddingHorizontal:12,
+              paddingHorizontal: 12,
               paddingTop: 12,
             }}>
             {mode === MODES.changePassword ? null : (
