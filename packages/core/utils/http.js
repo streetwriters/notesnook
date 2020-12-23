@@ -19,6 +19,7 @@ post.json = function (url, data, token) {
 };
 
 function transformer(data, json) {
+  if (!data) return;
   if (json) return JSON.stringify(data);
   else {
     return Object.entries(data)

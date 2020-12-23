@@ -78,6 +78,7 @@ class Database {
 
     await this.settings.init();
     await this.outbox.init();
+    await this.user.init();
 
     await this.migrations.init();
     await this.migrations.migrate();
@@ -107,6 +108,7 @@ class Database {
     this.evtSource.onmessage = async (event) => {
       try {
         var { type, data } = JSON.parse(event.data);
+        console.log(type, data);
       } catch (e) {
         console.log("SSE: Unsupported message. Message = ", event.data);
         return;
@@ -126,6 +128,11 @@ class Database {
         case "userPasswordChanged":
           await this.user.logout();
           EV.publish("user:passwordChanged");
+          break;
+        case "emailConfirmed":
+          const token = await this.context.read("token");
+          await this.user.tokenManager._refreshToken(token);
+          EV.publish("user:emailConfirmed");
           break;
         case "sync":
           await this.syncer.eventMerge(data);
