@@ -9,6 +9,7 @@ import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
 import {Button} from '../Button';
 import BaseDialog from '../Dialog/base-dialog';
 import DialogContainer from '../Dialog/dialog-container';
+import { Toast } from '../Toast';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
@@ -76,9 +77,12 @@ const ProgressDialog = () => {
       {dialogData?.action ? (
         <Button
           type="transparent"
+          onPress={dialogData.action}
           title={dialogData.actionText}
         />
       ) : null}
+
+      <Toast context="local" />
     </ActionSheetWrapper>
   );
 };

@@ -1,10 +1,12 @@
 import {Actions} from '../provider/Actions';
+import {db} from '../utils/DB';
 import {
   eCloseProgressDialog,
   eOpenLoginDialog,
   eOpenProgressDialog,
 } from '../utils/Events';
-import {eSendEvent} from './EventManager';
+import {MMKV} from '../utils/mmkv';
+import {eSendEvent, ToastEvent} from './EventManager';
 
 export function setLoginMessage(dispatch) {
   dispatch({
@@ -35,8 +37,24 @@ export function setEmailVerifyMessage(dispatch) {
           title: 'Account not verified',
           paragraph:
             'We have sent you an account confirmation link. Please check your email to verify your account.',
-          action: () => {
-            eSendEvent(eCloseProgressDialog);
+          action: async () => {
+            let lastEmailTime = await MMKV.getItem('lastEmailTime');
+            if (
+              lastEmailTime &&
+              Date.now() - JSON.parse(lastEmailTime) < 60000 * 10
+            ) {
+              ToastEvent.show(
+                'Please wait before sending another email.',
+                'error',
+                'local',
+              );
+              console.log("error")
+              return;
+            }
+            await db.user.sendVerificationEmail();
+            console.log("passed",lastEmailTime)
+            await MMKV.setItem('lastEmailTime', JSON.stringify(Date.now()));
+            ToastEvent.show('Verification email sent!', 'success', 'local');
           },
           actionText: 'Resend Confirmation Link',
           noProgress: true,
