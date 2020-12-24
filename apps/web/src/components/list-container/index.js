@@ -52,7 +52,7 @@ function ListContainer(props) {
                     {({ height, width }) => (
                       <List
                         ref={listRef}
-                        height={height}
+                        height={height - 1} // TODO: we have to subtract 1 from total height so scrollbar doesn't appear (not tested widely)
                         width={width}
                         itemKey={(index) => {
                           switch (index) {
