@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useRef } from "react";
-import ReactQuill from "./react-quill";
+import React, { useEffect, useMemo, useRef, Suspense } from "react";
+//import ReactQuill from "./react-quill";
 import { Box, Flex } from "rebass";
 import Properties from "../properties";
 import {
@@ -22,6 +22,9 @@ import Toolbar from "./toolbar";
 import Footer from "./footer";
 import ObservableArray from "../../utils/observablearray";
 import Banner from "../banner";
+import EditorLoading from "./loading";
+
+const ReactQuill = React.lazy(() => import("./react-quill"));
 
 function Editor() {
   const sessionState = useStore((store) => store.session.state);
@@ -134,34 +137,36 @@ function Editor() {
           <Box id="toolbar" />
           {/* <EditorMenu quill={quillRef.current?.quill} /> */}
           {contentType === "delta" && (
-            <ReactQuill
-              id="quill"
-              ref={quillRef}
-              refresh={sessionState === SESSION_STATES.new}
-              isSimple={!isLoggedin || (isLoggedin && !isTrial)}
-              isFocusMode={isFocusMode}
-              onFocus={() => {
-                toggleProperties(false);
-              }}
-              placeholder="Type anything here"
-              container=".editor"
-              scrollContainer=".editorScroll"
-              onSave={() => {
-                saveSession();
-              }}
-              changeInterval={500}
-              onWordCountChanged={updateWordCount}
-              onChange={() => {
-                const { quill } = quillRef.current;
-                const delta = quill.getContents().ops;
-                setSession((state) => {
-                  state.session.content = {
-                    type: "delta",
-                    data: delta,
-                  };
-                });
-              }}
-            />
+            <Suspense fallback={<EditorLoading />}>
+              <ReactQuill
+                id="quill"
+                ref={quillRef}
+                refresh={sessionState === SESSION_STATES.new}
+                isSimple={!isLoggedin || (isLoggedin && !isTrial)}
+                isFocusMode={isFocusMode}
+                onFocus={() => {
+                  toggleProperties(false);
+                }}
+                placeholder="Type anything here"
+                container=".editor"
+                scrollContainer=".editorScroll"
+                onSave={() => {
+                  saveSession();
+                }}
+                changeInterval={500}
+                onWordCountChanged={updateWordCount}
+                onChange={() => {
+                  const { quill } = quillRef.current;
+                  const delta = quill.getContents().ops;
+                  setSession((state) => {
+                    state.session.content = {
+                      type: "delta",
+                      data: delta,
+                    };
+                  });
+                }}
+              />
+            </Suspense>
           )}
         </Animated.Flex>
       </Flex>

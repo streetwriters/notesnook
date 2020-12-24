@@ -92,7 +92,7 @@ export function showExportDialog(noteIds) {
         if (files.length === 1) {
           download(files[0].filename, files[0].content, format);
         } else {
-          const zipped = zip(files, format);
+          const zipped = await zip(files, format);
           download("notes", zipped, "zip");
         }
         perform(true);
