@@ -32,7 +32,7 @@ const ScrollContainer = ({
         if (scrollTrackY) scrollTrackY.style.opacity = 0;
       }}
       wrapperProps={{
-        style: { right: 0, inset: "0px 0px 0px 0px" },
+        style: { right: 0, inset: "0px 1px 0px 0px" },
       }}
       trackYProps={{
         className: "scrollTrackY",
