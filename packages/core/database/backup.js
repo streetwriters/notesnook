@@ -1,11 +1,11 @@
-import Hashes from "jshashes";
+import { MD5 } from "jshashes";
 import Migrator from "./migrator.js";
 import {
   CHECK_IDS,
   sendCheckUserStatusEvent,
   CURRENT_DATABASE_VERSION,
 } from "../common.js";
-const md5 = new Hashes.MD5();
+const md5 = new MD5();
 
 const invalidKeys = ["user", "t", "lastBackupTime"];
 const validTypes = ["mobile", "web", "node"];
