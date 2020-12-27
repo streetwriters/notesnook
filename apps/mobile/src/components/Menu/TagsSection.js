@@ -120,6 +120,7 @@ const PinItem = ({item, index, onPress}) => {
   const {colors} = state;
   const [visible, setVisible] = useState(false);
   const [headerTextState, setHeaderTextState] = useState(null);
+  const color = headerTextState?.id === item.id ? colors.pri : colors.accent;
 
   const onHeaderStateChange = (event) => {
     if (event?.id === item.id) {
@@ -188,13 +189,13 @@ const PinItem = ({item, index, onPress}) => {
               alignItems: 'flex-start',
             }}>
             {item.type === 'notebook' ? (
-              <Icon color={colors.accent} size={SIZE.md} name="book-outline" />
+              <Icon color={color} size={SIZE.md} name="book-outline" />
             ) : item.type === 'tag' ? (
-              <Icon color={colors.accent} size={SIZE.md} name="pound" />
+              <Icon color={color} size={SIZE.md} name="pound" />
             ) : (
               <Paragraph
                 style={{textAlign: 'center', width: 12}}
-                color={colors.accent}
+                color={color}
                 size={SIZE.md}>
                 T
               </Paragraph>
@@ -209,7 +210,6 @@ const PinItem = ({item, index, onPress}) => {
               <Heading
                 style={{
                   flexWrap: 'wrap',
-                
                 }}
                 color={colors.heading}
                 size={SIZE.md}>
@@ -245,7 +245,9 @@ const PinItem = ({item, index, onPress}) => {
             width: 7,
             height: 7,
             borderRadius: 100,
-            ...getElevation(headerTextState?.id === item.id + '_navigation'? 1 : 0)
+            ...getElevation(
+              headerTextState?.id === item.id + '_navigation' ? 1 : 0,
+            ),
           }}
         />
       </PressableButton>

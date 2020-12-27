@@ -78,7 +78,7 @@ export const MenuListItem = ({item, index, noTextMode, testID}) => {
             textAlign: 'left',
           }}
           name={item.icon}
-          color={colors.accent}
+          color={headerTextState?.id === item.name.toLowerCase() + '_navigation'? colors.accent : colors.pri}
           size={SIZE.md}
         />
         {headerTextState?.id === item.name.toLowerCase() + '_navigation' ? (
