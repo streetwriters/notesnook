@@ -11,6 +11,7 @@ import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
+  sendNoteEditedEvent,
 } from '../../services/EventManager';
 import {dHeight} from '../../utils';
 import {db} from '../../utils/DB';
@@ -161,7 +162,6 @@ const MergeEditor = () => {
   };
 
   const applyChanges = async () => {
-    console.log(keepContentFrom, copyToSave);
     if (keepContentFrom === 'primary') {
       await db.notes.add({
         content: {
@@ -202,6 +202,7 @@ const MergeEditor = () => {
       });
     }
     eSendEvent(refreshNotesPage);
+    sendNoteEditedEvent(note.id);
     updateEvent({type: Actions.NOTES});
     updateEvent({type: Actions.FAVORITES});
     close();
@@ -399,8 +400,7 @@ const MergeEditor = () => {
                   justifyContent: 'space-between',
                 }}>
                 <Paragraph color={colors.icon} size={SIZE.xxs}>
-                  Saved on 10/10/20 {'\n'}
-                  12:30pm on Tablet
+                  Saved on {timeConverter(primaryData.dateEdited)}
                 </Paragraph>
                 <Icon
                   size={SIZE.lg}
@@ -528,8 +528,7 @@ const MergeEditor = () => {
                   justifyContent: 'space-between',
                 }}>
                 <Paragraph color={colors.icon} size={SIZE.xs}>
-                  Saved on 10/10/20 {'\n'}
-                  12:30pm on Tablet
+                  Saved on {timeConverter(secondaryData.dateEdited)}
                 </Paragraph>
                 <Icon
                   size={SIZE.lg}
