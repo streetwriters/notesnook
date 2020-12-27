@@ -288,6 +288,7 @@ const MergeEditor = () => {
     setCopyToSave(null);
     setDiscardedContent(null);
     setKeepContentFrom(null);
+    setDialogVisible(false);
     primaryData = null;
     secondaryData = null;
     primaryText = null;
