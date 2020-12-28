@@ -142,7 +142,7 @@ const LoginDialog = () => {
 
   function open(mode) {
     setMode(mode ? mode : MODES.login);
-
+    setStatus(null);
     setVisible(true);
   }
 
@@ -161,6 +161,7 @@ const LoginDialog = () => {
     setUserConsent(false);
     setError(false);
     setLoading(false);
+    setStatus(null);
     setMode(MODES.login);
   };
 
@@ -195,7 +196,7 @@ const LoginDialog = () => {
       eSendEvent(refreshNotesPage);
       clearMessage(dispatch);
       close();
-      ToastEvent.show(`Logged in as ${email}`, 'success', 'local');
+      ToastEvent.show(`Logged in as ${user.email}`, 'success', 'global');
     } catch (e) {
       console.warn(e);
       setStatus(null);
@@ -284,6 +285,8 @@ const LoginDialog = () => {
       await MMKV.setItem('lastRecoveryEmailTime', JSON.stringify(Date.now()));
       await db.user.recoverAccount(email);
     } catch (e) {
+      setStatus(null);
+      
       ToastEvent.show(e.message, 'error', 'local');
     }
     setStatus('Account Recovery Email Sent!');
@@ -299,6 +302,8 @@ const LoginDialog = () => {
     try {
       await db.user.changePassword(oldPassword, password);
     } catch (e) {
+
+    setStatus(null);
       ToastEvent.show(e.message, 'error', 'local');
     }
     setStatus(null);

@@ -237,6 +237,7 @@ const AccoutLogoutSection = () => {
                   dispatch({type: Actions.CLEAR_ALL});
                   dispatch({type: Actions.SYNCING, syncing: false});
                   setLoginMessage(dispatch);
+                  setVisible(false);
                 }}
               />
             </DialogContainer>
