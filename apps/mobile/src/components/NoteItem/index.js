@@ -66,6 +66,7 @@ export default class NoteItem extends React.Component {
   };
 
   render() {
+ 
     let {colors, item, customStyle, isTrash} = this.props;
     return (
       <View
@@ -113,7 +114,7 @@ export default class NoteItem extends React.Component {
                 <Heading
                   size={SIZE.xs}
                   color={item.color ? COLORS_NOTE[item.color] : colors.accent}>
-                  {db.notebooks.notebook(item.notebooks[0].id).title + ' '}{' '}
+                  {db.notebooks.notebook(item.notebooks[0]?.id)?.title + ' '}{' '}
                   {item.notebooks.length > 1
                     ? '& ' + (item.notebooks.length - 1) + ' others'
                     : ''}
