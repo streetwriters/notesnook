@@ -102,7 +102,7 @@ export const NotebookItem = ({
                     };
                     Navigation.navigate(routeName, params, headerState);
                   }}
-                  key={topic.dateCreated.toString() + topic.title}
+                  key={topic.id}
                   style={{
                     borderRadius: 2.5,
                     backgroundColor: colors.accent,
