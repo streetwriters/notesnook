@@ -1,20 +1,21 @@
 import React from 'react';
-import { ActivityIndicator, TouchableOpacity, View } from 'react-native';
+import {ActivityIndicator, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useTracked } from '../../provider';
-import { DDS } from '../../services/DeviceDetection';
-import { eSendEvent } from '../../services/EventManager';
+import {useTracked} from '../../provider';
+import {DDS} from '../../services/DeviceDetection';
+import {eSendEvent} from '../../services/EventManager';
 import Sync from '../../services/Sync';
-import { eOpenLoginDialog } from '../../utils/Events';
-import { pv, SIZE } from '../../utils/SizeUtils';
-import { PressableButton } from '../PressableButton';
+import {eOpenLoginDialog} from '../../utils/Events';
+import {pv, SIZE} from '../../utils/SizeUtils';
+import {PressableButton} from '../PressableButton';
 import Paragraph from '../Typography/Paragraph';
-import { TimeSince } from './TimeSince';
+import {TimeSince} from './TimeSince';
 
 export const UserSection = ({noTextMode}) => {
   const [state, dispatch] = useTracked();
-  const {colors, syncing, user} = state;
+  const {colors, syncing, user, lastSynced} = state;
 
+  console.log(lastSynced);
   return user && user?.email ? (
     <View
       style={{
@@ -44,8 +45,8 @@ export const UserSection = ({noTextMode}) => {
             }}>
             {syncing ? 'Syncing ' : 'Last synced: '}
             {!syncing ? (
-              user?.lastSynced ? (
-                <TimeSince time={user?.lastSynced} />
+              lastSynced !== 'Never' ? (
+                <TimeSince time={lastSynced} />
               ) : (
                 'never'
               )
