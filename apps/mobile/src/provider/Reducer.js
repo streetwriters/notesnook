@@ -263,7 +263,7 @@ export const reducer = (state, action) => {
 
       return {
         ...state,
-        menuPins: action.lastSync,
+        lastSynced: action.lastSync,
       };
     }
     case Actions.INTENT_MODE: {
