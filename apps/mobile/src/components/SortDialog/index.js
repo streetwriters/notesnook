@@ -101,7 +101,7 @@ class SortDialog extends React.Component {
                 testID={notesnook.ids.dialogs.sortBy.order}
                 onPress={async () => {
                   let value =
-                    this.state.settings.sortOrder === 'asc' ? 'des' : 'asc';
+                    this.state.settings?.sortOrder === 'asc' ? 'des' : 'asc';
                   await SettingsService.set('sortOrder', value);
                   sortSettings.sortOrder = value;
                   await this.getSettings();
@@ -122,14 +122,14 @@ class SortDialog extends React.Component {
                     marginRight: 5,
                     color: 'white',
                   }}>
-                  {this.state.settings.sortOrder === 'asc'
+                  {this.state.settings?.sortOrder === 'asc'
                     ? 'Ascending'
                     : 'Descending'}
                 </Heading>
                 <Icon
                   color="white"
                   name={
-                    this.state.settings.sortOrder === 'asc'
+                    this.state.settings?.sortOrder === 'asc'
                       ? 'sort-ascending'
                       : 'sort-descending'
                   }
@@ -143,7 +143,7 @@ class SortDialog extends React.Component {
               <PressableButton
                 key={item}
                 testID={'btn-' + item}
-                type={this.state.settings.sort === item ? 'shade' : 'gray'}
+                type={this.state.settings?.sort === item ? 'shade' : 'gray'}
                 onPress={async () => {
                   await SettingsService.set('sort', item);
                   await this.getSettings();
@@ -163,13 +163,13 @@ class SortDialog extends React.Component {
                 <Heading
                   size={SIZE.sm}
                   color={
-                    this.state.settings.sort === item
+                    this.state.settings?.sort === item
                       ? colors.accent
                       : colors.pri
                   }>
                   {item.slice(0, 1).toUpperCase() + item.slice(1, item.length)}
                 </Heading>
-                {this.state.settings.sort === item ? (
+                {this.state.settings?.sort === item ? (
                   <Icon color={colors.accent} name="check" size={SIZE.lg} />
                 ) : null}
               </PressableButton>
