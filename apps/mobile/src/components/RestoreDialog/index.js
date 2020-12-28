@@ -1,33 +1,24 @@
-import React, {createRef, useEffect, useState} from 'react';
-import {ScrollView} from 'react-native';
-import {ActivityIndicator} from 'react-native';
-import {FlatList, Platform, View} from 'react-native';
+import React, { createRef, useEffect, useState } from 'react';
+import { ActivityIndicator, Platform, ScrollView, View } from 'react-native';
 import DocumentPicker from 'react-native-document-picker';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import RNFetchBlob from 'rn-fetch-blob';
-import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
-import {DDS} from '../../services/DeviceDetection';
+import { useTracked } from '../../provider';
+import { Actions } from '../../provider/Actions';
 import {
   eSubscribeEvent,
   eUnSubscribeEvent,
-  ToastEvent,
+  ToastEvent
 } from '../../services/EventManager';
-import {getElevation} from '../../utils';
-import {db} from '../../utils/DB';
-import {eCloseRestoreDialog, eOpenRestoreDialog} from '../../utils/Events';
-import {SIZE} from '../../utils/SizeUtils';
+import { db } from '../../utils/DB';
+import { eCloseRestoreDialog, eOpenRestoreDialog } from '../../utils/Events';
+import { SIZE } from '../../utils/SizeUtils';
 import storage from '../../utils/storage';
-import {sleep, timeConverter} from '../../utils/TimeUtils';
-import ActionSheet from '../ActionSheet';
+import { sleep, timeConverter } from '../../utils/TimeUtils';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
-import {Button} from '../Button';
-import BaseDialog from '../Dialog/base-dialog';
-import DialogButtons from '../Dialog/dialog-buttons';
+import { Button } from '../Button';
 import DialogHeader from '../Dialog/dialog-header';
 import Seperator from '../Seperator';
-import {Toast} from '../Toast';
-import Heading from '../Typography/Heading';
+import { Toast } from '../Toast';
 import Paragraph from '../Typography/Paragraph';
 
 const actionSheetRef = createRef();
