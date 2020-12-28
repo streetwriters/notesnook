@@ -39,6 +39,7 @@ import SettingsService from '../../services/SettingsService';
 import {
   AndroidModule,
   dWidth,
+  getElevation,
   MenuItemsList,
   setSetting,
   SUBSCRIPTION_STATUS_STRINGS,
@@ -65,6 +66,7 @@ import {
 import {MMKV} from '../../utils/mmkv';
 import {pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
 import Storage from '../../utils/storage';
+import {timeConverter} from '../../utils/TimeUtils';
 
 const otherItems = [
   {
@@ -267,7 +269,7 @@ const AccoutLogoutSection = () => {
               borderRadius: 0,
             }}>
             <Heading
-              color={item.name === "Logout" ? colors.pri : colors.red}
+              color={item.name === 'Logout' ? colors.pri : colors.red}
               style={{
                 fontSize: SIZE.md,
               }}>
@@ -404,21 +406,26 @@ const SettingsUserSection = () => {
           <View
             style={{
               paddingHorizontal: 12,
+              marginTop: 15,
+              marginBottom: 15,
             }}>
             <View
               style={{
                 alignSelf: 'center',
                 width: '100%',
                 paddingVertical: 12,
+                backgroundColor: colors.bg,
+                borderRadius: 5,
+                paddingHorizontal: 12,
+                borderWidth: 1,
+                borderColor: colors.accent,
               }}>
               <View
                 style={{
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   flexDirection: 'row',
-                  borderBottomWidth: 1,
                   paddingBottom: 2.5,
-                  borderBottomColor: colors.nav,
                 }}>
                 <View
                   style={{
@@ -445,6 +452,7 @@ const SettingsUserSection = () => {
 
                   <Paragraph
                     color={colors.heading}
+                    size={SIZE.sm}
                     style={{
                       marginLeft: 5,
                     }}>
@@ -471,22 +479,25 @@ const SettingsUserSection = () => {
                       size={SIZE.lg}
                       color={
                         getTimeLeft(parseInt(user.subscription.expiry)) > 5
-                          ? colors.pri
-                          : colors.errorText
+                          ? colors.accent
+                          : colors.red
                       }>
                       {getTimeLeft(parseInt(user.subscription.expiry)) +
                         ' Days Remaining'}{' '}
                     </Paragraph>
-                    <Paragraph color={colors.icon} size={SIZE.sm}>
-                      Your trail period started on{' '}
-                      {new Date(
-                        user.subscription.start * 1000,
-                      ).toLocaleDateString()}
+                    <Paragraph color={colors.pri}>
+                      {user.subscription.type === 2
+                        ? 'You signed up for our Beta Program on ' +
+                          timeConverter(user.subscription.start)
+                        : user.subscription.type === 1
+                        ? 'Your trial period started on ' +
+                          timeConverter(user.subscription.start)
+                        : null}
                     </Paragraph>
                   </View>
                 ) : null}
 
-                {user.isEmailConfirmed && (
+                {user.isEmailConfirmed && user.subscription.type !== 2 && (
                   <>
                     <Seperator />
                     <Button
@@ -497,7 +508,7 @@ const SettingsUserSection = () => {
                       fontSize={SIZE.md}
                       title="Subscribe to Notesnook Pro"
                       height={50}
-                      type="accent"
+                      type="transparent"
                     />
                   </>
                 )}
