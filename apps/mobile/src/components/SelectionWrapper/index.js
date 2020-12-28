@@ -105,7 +105,7 @@ const ActionStrip = ({note, setActionStrip}) => {
   const actions = [
     {
       icon: note.pinned ? 'pin-off' : 'pin',
-      visible: true,
+      visible:note.type === "note" || note.type === "notebook",
       onPress: async () => {
         if (!note.id) return;
 
