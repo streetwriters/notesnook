@@ -108,6 +108,7 @@ class Database {
     this.evtSource.onmessage = async (event) => {
       try {
         var { type, data } = JSON.parse(event.data);
+        data = JSON.parse(data);
         console.log(type, data);
       } catch (e) {
         console.log("SSE: Unsupported message. Message = ", event.data);
