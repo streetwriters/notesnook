@@ -1,26 +1,27 @@
-import React, { createRef } from 'react';
-import { Clipboard, Platform, View } from 'react-native';
+import React, {createRef} from 'react';
+import {Clipboard, Platform, View} from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import RNFetchBlob from 'rn-fetch-blob';
-import { LOGO_BASE64 } from '../../assets/images/assets';
+import {LOGO_BASE64} from '../../assets/images/assets';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-  ToastEvent
+  ToastEvent,
 } from '../../services/EventManager';
-import { dWidth } from '../../utils';
-import { hexToRGBA } from '../../utils/ColorUtils';
-import { db } from '../../utils/DB';
-import { eOpenRecoveryKeyDialog, eOpenResultDialog } from '../../utils/Events';
-import { SIZE } from '../../utils/SizeUtils';
+import {dWidth} from '../../utils';
+import {hexToRGBA} from '../../utils/ColorUtils';
+import {db} from '../../utils/DB';
+import {eOpenRecoveryKeyDialog, eOpenResultDialog} from '../../utils/Events';
+import {SIZE} from '../../utils/SizeUtils';
 import Storage from '../../utils/storage';
-import { sleep } from '../../utils/TimeUtils';
+import {sleep} from '../../utils/TimeUtils';
 import ActionSheet from '../ActionSheet';
-import { Button } from '../Button';
+import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
+import {Button} from '../Button';
 import Seperator from '../Seperator';
-import { Toast } from '../Toast';
+import {Toast} from '../Toast';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 class RecoveryKeyDialog extends React.Component {
@@ -61,8 +62,8 @@ class RecoveryKeyDialog extends React.Component {
       setTimeout(() => {
         eSendEvent(eOpenResultDialog, {
           title: 'Welcome!',
-          paragraph: 'Your 14 day trial for Notesnook Pro is activated',
-          icon: 'checkbox-marked-circle',
+          paragraph: 'Please verify your email to activate syncing.',
+          icon: 'check',
           button: 'Thank You!',
         });
       }, 500);
@@ -139,23 +140,11 @@ class RecoveryKeyDialog extends React.Component {
     const {colors} = this.props;
     if (!this.state.visible) return null;
     return (
-      <ActionSheet
-        containerStyle={{
-          backgroundColor: colors.bg,
-          width: '100%',
-          alignSelf: 'center',
-          borderRadius: 10,
-        }}
-        indicatorColor={
-          Platform.ios
-            ? hexToRGBA(colors.accent + '19')
-            : hexToRGBA(colors.shade)
-        }
-        extraScroll={20}
+      <ActionSheetWrapper
         closeOnTouchBackdrop={false}
+        gestureEnabled={false}
         onOpen={this.onOpen}
-        ref={this.actionSheetRef}
-        initialOffsetFromBottom={1}>
+        fwdRef={this.actionSheetRef}>
         <View
           style={{
             width: dWidth,
@@ -277,7 +266,7 @@ class RecoveryKeyDialog extends React.Component {
           />
           <Toast context="local" />
         </View>
-      </ActionSheet>
+      </ActionSheetWrapper>
     );
   }
 }
