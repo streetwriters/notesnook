@@ -1,5 +1,5 @@
 import React from 'react';
-import {KeyboardAvoidingView, Platform, SafeAreaView, View} from 'react-native';
+import {KeyboardAvoidingView, Platform, SafeAreaView, StatusBar, View} from 'react-native';
 import {PanGestureHandler, State} from 'react-native-gesture-handler';
 import Animated, {Easing} from 'react-native-reanimated';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
@@ -87,6 +87,8 @@ export const EditorWrapper = ({dimensions}) => {
   const [state] = useTracked();
   const {colors} = state;
   const insets = useSafeAreaInsets();
+
+  console.log(insets.top)
   return (
     <View
       ref={editorRef}
@@ -137,7 +139,7 @@ export const EditorWrapper = ({dimensions}) => {
                 zIndex: 10,
                 transform: [
                   {
-                    translateY: -80,
+                    translateY:Platform.OS === "ios" ? -80 : -80 + insets.top,
                   },
                 ],
               }}>
