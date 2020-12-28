@@ -271,6 +271,8 @@ export async function clearEditor() {
     redo: 0,
   });
   saveCounter = 0;
+  post('dateEdited', "");
+  post('saving', '');
   clearNote();
   //intent = false;
 }
