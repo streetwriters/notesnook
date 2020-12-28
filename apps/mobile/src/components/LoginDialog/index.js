@@ -245,7 +245,7 @@ const LoginDialog = () => {
       setLoading(false);
       setStatus(null);
       console.log(e);
-      ToastEvent.show('Signup failed, Network Error', 'error', 'local');
+      ToastEvent.show(e.message, 'error', 'local');
       return;
     }
 
@@ -262,7 +262,7 @@ const LoginDialog = () => {
       eSendEvent(eOpenRecoveryKeyDialog, true);
     } catch (e) {
       setStatus(null);
-      ToastEvent.show('Login Failed, try again', 'error', 'local');
+      ToastEvent.show(e.message, 'error', 'local');
     } finally {
       setLoading(false);
     }
