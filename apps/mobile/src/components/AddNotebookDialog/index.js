@@ -89,12 +89,14 @@ export class AddNotebookDialog extends React.Component {
     this.currentSelectedInput = null;
     this.title = null;
     this.description = null;
+    this.currentInputValue = null;
     this.id = null;
     this.setState({
       visible: false,
       topics: [],
       descFocused: false,
       titleFocused: false,
+      editTopic: false,
     });
   };
 
@@ -191,6 +193,9 @@ export class AddNotebookDialog extends React.Component {
   };
 
   onSubmit = (forward = true) => {
+    this.topicInputRef.setNativeProps({
+      text: null,
+    });
     let {topics} = this.state;
     if (!this.currentInputValue || this.currentInputValue?.trim().length === 0)
       return;
@@ -200,9 +205,6 @@ export class AddNotebookDialog extends React.Component {
       prevTopics.push(this.currentInputValue);
       this.setState({
         topics: prevTopics,
-      });
-      this.topicInputRef.setNativeProps({
-        text: null,
       });
 
       setTimeout(() => {
@@ -215,6 +217,7 @@ export class AddNotebookDialog extends React.Component {
         topics: prevTopics,
       });
       this.currentInputValue = null;
+      console.log('edit topic is', this.state.editTopic);
       if (this.state.editTopic) {
         this.topicInputRef.blur();
         Keyboard.dismiss();
@@ -225,9 +228,6 @@ export class AddNotebookDialog extends React.Component {
       this.prevItem = null;
       this.prevIndex = null;
       this.currentInputValue = null;
-      this.topicInputRef.setNativeProps({
-        text: null,
-      });
 
       if (forward) {
         setTimeout(() => {
@@ -289,7 +289,7 @@ export class AddNotebookDialog extends React.Component {
                 onChangeText={(value) => {
                   this.title = value;
                 }}
-                placeholder="Title"
+                placeholder="Enter a Title"
                 onSubmit={() => {
                   this.descriptionRef.focus();
                 }}
@@ -298,43 +298,41 @@ export class AddNotebookDialog extends React.Component {
 
               <Input
                 fwdRef={(ref) => (this.descriptionRef = ref)}
-                testID={notesnook.ids.dialogs.notebook.inputs.title}
+                testID={notesnook.ids.dialogs.notebook.inputs.description}
                 onChangeText={(value) => {
                   this.description = value;
+                }}
+                placeholder="Describe your notebook."
+                onSubmit={() => {
+                  this.topicInputRef.focus();
+                }}
+                defaultValue={toEdit ? toEdit.description : null}
+              />
+
+              <Input
+                fwdRef={(ref) => (this.topicInputRef = ref)}
+                testID={notesnook.ids.dialogs.notebook.inputs.topic}
+                onChangeText={(value) => {
                   this.currentInputValue = value;
                   if (this.prevItem !== null) {
                     refs[this.prevIndex].setNativeProps({
-                      text: this.prevIndex + 1 + '. ' + value,
+                      text: value,
                       style: {
                         borderBottomColor: colors.accent,
                       },
                     });
                   }
                 }}
-                placeholder="Describe your notebook."
-                onSubmit={() => {
-                  this.topicInputRef.focus();
-                }}
-                defaultValue={toEdit ? toEdit.title : null}
-              />
-
-              <Input
-                fwdRef={(ref) => (this.topicInputRef = ref)}
-                testID={notesnook.ids.dialogs.notebook.inputs.title}
-                onChangeText={(value) => {
-                  this.description = value;
-                }}
-                placeholder="Describe your notebook."
                 onSubmit={() => {
                   this.onSubmit();
                 }}
+                blurOnSubmit={false}
                 button={{
                   icon: this.state.editTopic ? 'check' : 'plus',
                   onPress: this.onSubmit,
                   color: topicInputFocused ? colors.accent : colors.icon,
                 }}
                 placeholder="Add a topic"
-                defaultValue={toEdit ? toEdit.title : null}
               />
 
               <FlatList
