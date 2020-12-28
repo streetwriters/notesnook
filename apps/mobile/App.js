@@ -170,7 +170,7 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    SettingsService.init();
+    SettingsService.init().then(r => console.log)
     dispatch({
       type: Actions.DEVICE_MODE,
       state: DDS.isLargeTablet()
@@ -183,7 +183,9 @@ const App = () => {
   }, []);
 
   const onSyncComplete = async () => {
+    console.log("user synced data");
     dispatch({type: Actions.ALL});
+    dispatch({type: Actions.LAST_SYNC, lastSync: await db.lastSynced()});
   };
 
   const onUrlRecieved = async (res) => {
@@ -262,10 +264,13 @@ const App = () => {
   };
 
   const onLogout = (reason) => {
+    console.log(reason,"REASON")
     eSendEvent(eOpenProgressDialog, {
       title: 'User Logged Out',
       paragraph: 'You have been logged out of your account.',
-      action: () => {
+      action: async () => {
+        eSendEvent(eCloseProgressDialog);
+        await sleep(50)
         eSendEvent(eOpenLoginDialog);
       },
       icon: 'logout',
