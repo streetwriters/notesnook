@@ -11,13 +11,16 @@ export const reducer = (state, action) => {
     case Actions.ALL: {
       return {
         ...state,
-        notes: db.notes.group(SORT[sortSettings.sort],sortSettings.sortOrder),
+        notes: db.notes.group(
+          SORT[sortSettings.sort],
+          sortSettings.sortOrder,
+        ),
         notebooks: db.notebooks.all,
         trash: db.trash.all,
         tags: db.tags.all,
         favorites: db.notes.favorites,
         colorNotes: db.colors.all,
-        menuPins:db.settings.pins
+        menuPins: db.settings.pins,
       };
     }
     case Actions.SYNCING: {
@@ -52,7 +55,10 @@ export const reducer = (state, action) => {
     case Actions.NOTES:
       return {
         ...state,
-        notes: db.notes.group(SORT[sortSettings.sort],sortSettings.sortOrder),
+        notes: db.notes.group(
+          SORT[sortSettings.sort],
+          sortSettings.sortOrder,
+        ),
       };
     case Actions.THEME: {
       return {
@@ -212,7 +218,6 @@ export const reducer = (state, action) => {
       };
     }
     case Actions.HEADER_TEXT_STATE: {
-    
       return {
         ...state,
         headerTextState: action.state,
@@ -253,21 +258,18 @@ export const reducer = (state, action) => {
       };
     }
     case Actions.MENU_PINS: {
-
       return {
         ...state,
         menuPins: db.settings.pins,
       };
     }
     case Actions.LAST_SYNC: {
-
       return {
         ...state,
         lastSynced: action.lastSync,
       };
     }
     case Actions.INTENT_MODE: {
-
       return {
         ...state,
         intentMode: action.state,
