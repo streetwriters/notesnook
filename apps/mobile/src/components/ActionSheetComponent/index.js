@@ -568,39 +568,45 @@ export const ActionSheetComponent = ({
               : null}
           </Paragraph>
 
-          {note.type !== 'notebook' ? null : (
+          {note.type === 'notebook' && (
             <View
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'center',
-                width: '100%',
-                maxWidth: '100%',
+                width: '90%',
+                maxWidth: '90%',
                 flexWrap: 'wrap',
               }}>
-              {note && note.topics
-                ? note.topics.slice(1, 4).map((topic) => (
-                    <View
-                      key={topic.dateCreated.toString() + topic.title}
-                      style={{
-                        borderRadius: 2.5,
-                        backgroundColor: colors.accent,
-                        paddingHorizontal: 5,
-                        paddingVertical: 2,
-                        marginRight: 5,
-                        marginVertical: 2.5,
-                      }}>
-                      <Paragraph
-                        size={SIZE.xs}
-                        numberOfLines={1}
-                        color="white"
+              {note && note.topics && note.topics.length > 0
+                ? note.topics
+                    .slice()
+                    .sort((a, b) => a.dateEdited - b.dateEdited)
+                    .slice(0, 6)
+                    .map((topic) => (
+                      <View
+                        key={topic.id}
                         style={{
-                          maxWidth: '100%',
+                          borderRadius: 2.5,
+                          backgroundColor: colors.accent,
+                          paddingHorizontal: 5,
+                          paddingVertical: 2,
+                          marginRight: 5,
+                          marginVertical: 2.5,
                         }}>
-                        {topic.title}
-                      </Paragraph>
-                    </View>
-                  ))
+                        <Paragraph
+                          size={SIZE.xs}
+                          numberOfLines={1}
+                          color="white"
+                          style={{
+                            maxWidth: '100%',
+                          }}>
+                          {topic.title.length > 16
+                            ? topic.title.slice(0, 16) + '...'
+                            : topic.title}
+                        </Paragraph>
+                      </View>
+                    ))
                 : null}
             </View>
           )}
