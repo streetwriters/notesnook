@@ -8,6 +8,8 @@ import {defaultState} from '../provider/DefaultState';
 import {createRef} from 'react';
 import {dummyRef} from '../components/DummyText';
 import {SIZE} from './SizeUtils';
+import RNTooltips from 'react-native-tooltips';
+import { tabBarRef } from './Refs';
 
 export async function setSetting(settings, name, value) {
   let s = {...settings};
@@ -190,4 +192,14 @@ export function toTXT(data) {
     if (typeof op.insert !== 'string') return text + ' ';
     return text + op.insert;
   }, '');
+}
+
+export function showTooltip(event, text) {
+  if (!event._targetInst?.ref?.current) return;
+  RNTooltips.Show(event._targetInst.ref.current, tabBarRef.current, {
+    text: text,
+    tintColor: 'black',
+    corner: 40,
+    textSize: 10,
+  });
 }
