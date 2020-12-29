@@ -1,33 +1,27 @@
-import React, { createRef, useEffect, useState } from 'react';
-import {
-  FlatList,
-  Keyboard,
-  ScrollView,
-  TextInput,
-  TouchableOpacity,
-  View
-} from 'react-native';
+import React, {createRef, useEffect, useState} from 'react';
+import {Keyboard, TextInput, TouchableOpacity, View} from 'react-native';
+import {FlatList} from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { notesnook } from '../../../e2e/test.ids';
-import { useTracked } from '../../provider';
-import { Actions } from '../../provider/Actions';
+import {notesnook} from '../../../e2e/test.ids';
+import {useTracked} from '../../provider';
+import {Actions} from '../../provider/Actions';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-  ToastEvent
+  ToastEvent,
 } from '../../services/EventManager';
-import { db } from '../../utils/DB';
+import {db} from '../../utils/DB';
 import {
   eOnNewTopicAdded,
   eOpenMoveNoteDialog,
-  refreshNotesPage
+  refreshNotesPage,
 } from '../../utils/Events';
-import { pv, SIZE, WEIGHT } from '../../utils/SizeUtils';
+import {pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
 import DialogHeader from '../Dialog/dialog-header';
-import { PressableButton } from '../PressableButton';
-import { Toast } from '../Toast';
+import {PressableButton} from '../PressableButton';
+import {Toast} from '../Toast';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
@@ -43,10 +37,10 @@ const MoveNoteDialog = () => {
   function open(note) {
     setNote(note);
     setVisible(true);
-    actionSheetRef.current?._setModalVisible(true);
+    actionSheetRef.current?.setModalVisible(true);
   }
   const close = () => {
-    actionSheetRef.current?._setModalVisible(false);
+    actionSheetRef.current?.setModalVisible(false);
   };
 
   useEffect(() => {
@@ -177,7 +171,8 @@ const MoveNoteComponent = ({close, note, setNote}) => {
           />
         </View>
 
-        <ScrollView
+        <FlatList
+          nestedScrollEnabled={true}
           onScrollEndDrag={() => {
             actionSheetRef.current?.childScrollHandler();
           }}
@@ -187,8 +182,17 @@ const MoveNoteComponent = ({close, note, setNote}) => {
           onScrollAnimationEnd={() => {
             actionSheetRef.current?.childScrollHandler();
           }}
-          nestedScrollEnabled>
-          <View>
+          keyboardShouldPersistTaps="always"
+          keyboardDismissMode="none"
+          data={state.notebooks}
+          ListFooterComponent={
+            <View
+              style={{
+                height: 100,
+              }}
+            />
+          }
+          ListHeaderComponent={
             <View
               style={{
                 flexDirection: 'row',
@@ -248,10 +252,12 @@ const MoveNoteComponent = ({close, note, setNote}) => {
                 />
               </TouchableOpacity>
             </View>
-          </View>
-
-          {state.notebooks.map((item) => (
-            <View>
+          }
+          renderItem={({item, index}) => (
+            <View
+              style={{
+                height: expanded === item.id ? null : 60,
+              }}>
               <PressableButton
                 onPress={() => {
                   setExpanded(item.id === expanded ? null : item.id);
@@ -304,12 +310,23 @@ const MoveNoteComponent = ({close, note, setNote}) => {
 
               {expanded === item.id ? (
                 <FlatList
+                  nestedScrollEnabled
                   data={item.topics}
                   keyboardShouldPersistTaps="always"
                   keyboardDismissMode="none"
+                  onScrollEndDrag={() => {
+                    actionSheetRef.current?.childScrollHandler();
+                  }}
+                  onMomentumScrollEnd={() => {
+                    actionSheetRef.current?.childScrollHandler();
+                  }}
+                  onScrollAnimationEnd={() => {
+                    actionSheetRef.current?.childScrollHandler();
+                  }}
                   style={{
-                    width:"90%",
-                    alignSelf:"flex-end"
+                    width: '90%',
+                    alignSelf: 'flex-end',
+                    maxHeight: 500,
                   }}
                   ListHeaderComponent={
                     <View>
@@ -414,13 +431,8 @@ const MoveNoteComponent = ({close, note, setNote}) => {
                 />
               ) : null}
             </View>
-          ))}
-          <View
-            style={{
-              height: 100,
-            }}
-          />
-        </ScrollView>
+          )}
+        />
       </View>
       <Toast context="local" />
     </>
