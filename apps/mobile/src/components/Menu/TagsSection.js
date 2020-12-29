@@ -120,7 +120,7 @@ const PinItem = ({item, index, onPress}) => {
   const {colors} = state;
   const [visible, setVisible] = useState(false);
   const [headerTextState, setHeaderTextState] = useState(null);
-  const color = headerTextState?.id === item.id ? colors.pri : colors.accent;
+  const color = headerTextState?.id === item.id ? colors.accent : colors.pri;
 
   const onHeaderStateChange = (event) => {
     if (event?.id === item.id) {
@@ -193,12 +193,12 @@ const PinItem = ({item, index, onPress}) => {
             ) : item.type === 'tag' ? (
               <Icon color={color} size={SIZE.md} name="pound" />
             ) : (
-              <Paragraph
+              <Heading
                 style={{textAlign: 'center', width: 12}}
                 color={color}
                 size={SIZE.md}>
                 T
-              </Paragraph>
+              </Heading>
             )}
           </View>
           <View
