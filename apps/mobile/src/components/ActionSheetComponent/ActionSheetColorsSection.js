@@ -11,7 +11,7 @@ import {dWidth} from '../../utils';
 import {COLORS_NOTE} from '../../utils/Colors';
 import {hexToRGBA, RGB_Linear_Shade} from '../../utils/ColorUtils';
 import {db} from '../../utils/DB';
-import {eShowGetPremium} from '../../utils/Events';
+import {eShowGetPremium, refreshNotesPage} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
 import {PressableButton} from '../PressableButton';
@@ -54,9 +54,10 @@ export const ActionSheetColorsSection = ({item, close}) => {
           } else {
             await db.notes.note(note.id).color(color.name);
           }
+          localRefresh();
           dispatch({type: Actions.COLORS});
           sendNoteEditedEvent(note.id, false, true);
-          localRefresh();
+          eSendEvent(refreshNotesPage);
         }}
         customStyle={{
           width: DDS.isTab ? 400 / 10 : dWidth / 10,
