@@ -198,13 +198,13 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
         <ScrollView
           nestedScrollEnabled
           onScrollEndDrag={() => {
-            actionSheetRef.current?.childScrollHandler();
+            actionSheetRef.current?.handleChildScrollEnd();
           }}
           onMomentumScrollEnd={() => {
-            actionSheetRef.current?.childScrollHandler();
+            actionSheetRef.current?.handleChildScrollEnd();
           }}
           onScrollAnimationEnd={() => {
-            actionSheetRef.current?.childScrollHandler();
+            actionSheetRef.current?.handleChildScrollEnd();
           }}
           style={{
             paddingHorizontal: 12,

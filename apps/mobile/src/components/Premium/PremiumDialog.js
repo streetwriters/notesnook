@@ -100,12 +100,12 @@ class PremiumDialog extends React.Component {
 
           <ScrollView
             nestedScrollEnabled={true}
-            onScrollEndDrag={this.actionSheetRef.current?.childScrollHandler}
+            onScrollEndDrag={this.actionSheetRef.current?.handleChildScrollEnd}
             onScrollAnimationEnd={
-              this.actionSheetRef.current?.childScrollHandler
+              this.actionSheetRef.current?.handleChildScrollEnd
             }
             onMomentumScrollEnd={
-              this.actionSheetRef.current?.childScrollHandler
+              this.actionSheetRef.current?.handleChildScrollEnd
             }
             style={{
               width: '100%',

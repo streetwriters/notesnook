@@ -9,6 +9,7 @@ import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
+  sendNoteEditedEvent,
   ToastEvent,
 } from '../../services/EventManager';
 import {db} from '../../utils/DB';
@@ -125,8 +126,10 @@ const MoveNoteComponent = ({close, note, setNote}) => {
 
       if (note && note.id) {
         setNote({...db.notes.note(note.id).data});
+        sendNoteEditedEvent(note.id);
       }
       dispatch({type: Actions.NOTEBOOKS});
+
       return;
     }
 
@@ -142,6 +145,8 @@ const MoveNoteComponent = ({close, note, setNote}) => {
     );
     if (note && note.id) {
       setNote({...db.notes.note(note.id).data});
+
+      sendNoteEditedEvent(note.id);
     }
     dispatch({type: Actions.NOTEBOOKS});
   };
@@ -174,13 +179,13 @@ const MoveNoteComponent = ({close, note, setNote}) => {
         <FlatList
           nestedScrollEnabled={true}
           onScrollEndDrag={() => {
-            actionSheetRef.current?.childScrollHandler();
+            actionSheetRef.current?.handleChildScrollEnd();
           }}
           onMomentumScrollEnd={() => {
-            actionSheetRef.current?.childScrollHandler();
+            actionSheetRef.current?.handleChildScrollEnd();
           }}
           onScrollAnimationEnd={() => {
-            actionSheetRef.current?.childScrollHandler();
+            actionSheetRef.current?.handleChildScrollEnd();
           }}
           keyboardShouldPersistTaps="always"
           keyboardDismissMode="none"
@@ -315,13 +320,13 @@ const MoveNoteComponent = ({close, note, setNote}) => {
                   keyboardShouldPersistTaps="always"
                   keyboardDismissMode="none"
                   onScrollEndDrag={() => {
-                    actionSheetRef.current?.childScrollHandler();
+                    actionSheetRef.current?.handleChildScrollEnd();
                   }}
                   onMomentumScrollEnd={() => {
-                    actionSheetRef.current?.childScrollHandler();
+                    actionSheetRef.current?.handleChildScrollEnd();
                   }}
                   onScrollAnimationEnd={() => {
-                    actionSheetRef.current?.childScrollHandler();
+                    actionSheetRef.current?.handleChildScrollEnd();
                   }}
                   style={{
                     width: '90%',

@@ -1,54 +1,51 @@
-import React, {useEffect, useState} from 'react';
-import {Keyboard} from 'react-native';
-import {ScrollView} from 'react-native';
+import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Clipboard,
-  Dimensions,
-  TouchableOpacity,
-  View,
+  Dimensions, Keyboard, ScrollView, TouchableOpacity,
+  View
 } from 'react-native';
 import Share from 'react-native-share';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {notesnook} from '../../../e2e/test.ids';
-import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
-import {DDS} from '../../services/DeviceDetection';
+import { notesnook } from '../../../e2e/test.ids';
+import { useTracked } from '../../provider';
+import { Actions } from '../../provider/Actions';
+import { DDS } from '../../services/DeviceDetection';
 import {
   eSendEvent,
   openVault,
   sendNoteEditedEvent,
-  ToastEvent,
+  ToastEvent
 } from '../../services/EventManager';
 import PremiumService from '../../services/PremiumService';
 import Sync from '../../services/Sync';
-import {editing, toTXT} from '../../utils';
+import { editing, toTXT } from '../../utils';
 import {
   ACCENT,
   COLOR_SCHEME,
   COLOR_SCHEME_DARK,
   COLOR_SCHEME_LIGHT,
-  setColorScheme,
+  setColorScheme
 } from '../../utils/Colors';
-import {db} from '../../utils/DB';
+import { db } from '../../utils/DB';
 import {
   eOnNewTopicAdded,
-  eOpenLoginDialog,
+
   eOpenMoveNoteDialog,
-  eShowGetPremium,
-  refreshNotesPage,
+
+  refreshNotesPage
 } from '../../utils/Events';
-import {deleteItems} from '../../utils/functions';
-import {MMKV} from '../../utils/mmkv';
-import {opacity, ph, pv, SIZE} from '../../utils/SizeUtils';
-import {timeConverter} from '../../utils/TimeUtils';
-import {PremiumTag} from '../Premium/PremiumTag';
-import {PressableButton} from '../PressableButton';
-import {Toast} from '../Toast';
+import { deleteItems } from '../../utils/functions';
+import { MMKV } from '../../utils/mmkv';
+import { opacity, pv, SIZE } from '../../utils/SizeUtils';
+import { timeConverter } from '../../utils/TimeUtils';
+import { PremiumTag } from '../Premium/PremiumTag';
+import { PressableButton } from '../PressableButton';
+import { Toast } from '../Toast';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
-import {ActionSheetColorsSection} from './ActionSheetColorsSection';
-import {ActionSheetTagsSection} from './ActionSheetTagsSection';
+import { ActionSheetColorsSection } from './ActionSheetColorsSection';
+import { ActionSheetTagsSection } from './ActionSheetTagsSection';
 const w = Dimensions.get('window').width;
 
 export const ActionSheetComponent = ({
@@ -489,7 +486,8 @@ export const ActionSheetComponent = ({
   };
 
   const onScrollEnd = () => {
-    getRef().current?.childScrollHandler();
+    
+    getRef().current?.handleChildScrollEnd();
   };
 
   return (
@@ -697,10 +695,10 @@ export const ActionSheetComponent = ({
       ) : null}
 
       {editing.actionAfterFirstSave.type === 'topic' &&
-      note.notebooks &&
-      note.notebooks.findIndex(
-        (o) => o.id === editing.actionAfterFirstSave.id,
-      ) ? (
+      note.notebooks?.length > 0 &&
+      note?.notebooks?.findIndex(
+        (o) => o.topics.indexOf(editing.actionAfterFirstSave.id) > -1,
+      ) > -1  ? (
         <PressableButton
           type="accent"
           accentColor="red"
