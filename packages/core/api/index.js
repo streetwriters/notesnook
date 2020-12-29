@@ -137,7 +137,6 @@ class Database {
           break;
         case "sync":
           await this.syncer.eventMerge(data);
-          EV.publish("db:refresh");
           break;
       }
     };
