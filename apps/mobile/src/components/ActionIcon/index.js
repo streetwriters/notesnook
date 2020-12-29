@@ -4,6 +4,7 @@ import {useTracked} from '../../provider';
 import {PressableButton} from '../PressableButton';
 import {SIZE} from '../../utils/SizeUtils';
 import {hexToRGBA, RGB_Linear_Shade} from '../../utils/ColorUtils';
+import { showTooltip } from '../../utils';
 
 export const ActionIcon = ({
   onPress,
@@ -18,7 +19,8 @@ export const ActionIcon = ({
   bottom = 30,
   testID,
   disabled,
-  onLongPress
+  onLongPress,
+  tooltipText
 }) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
@@ -28,7 +30,15 @@ export const ActionIcon = ({
       testID={testID}
       onPress={onPress}
       hitSlop={{top: top, left: left, right: right, bottom: bottom}}
-      onLongPress={onLongPress}
+      onLongPress={(event) => {
+        if (onLongPress) {
+          onLongPress();
+          return;
+        }
+        if (tooltipText) {
+          showTooltip(event, tooltipText);
+        }
+      }}
       disabled={disabled}
       type="gray"
       customStyle={{

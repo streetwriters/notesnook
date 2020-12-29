@@ -1,10 +1,10 @@
 import React from 'react';
-import { ActivityIndicator } from 'react-native';
+import {ActivityIndicator} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useTracked } from '../../provider';
-import { BUTTON_TYPES } from '../../utils';
-import { ph, pv, SIZE } from '../../utils/SizeUtils';
-import { PressableButton } from '../PressableButton';
+import {useTracked} from '../../provider';
+import {BUTTON_TYPES, showTooltip} from '../../utils';
+import {ph, pv, SIZE} from '../../utils/SizeUtils';
+import {PressableButton} from '../PressableButton';
 import Heading from '../Typography/Heading';
 
 /**
@@ -25,6 +25,8 @@ export const Button = ({
   testID,
   accentColor = 'accent',
   accentText = 'light',
+  onLongPress,
+  tooltipText,
 }) => {
   const [state] = useTracked();
   const {colors} = state;
@@ -38,6 +40,15 @@ export const Button = ({
   return (
     <PressableButton
       onPress={onPress}
+      onLongPress={(event) => {
+        if (onLongPress) {
+          onLongPress();
+          return;
+        }
+        if (tooltipText) {
+          showTooltip(event, tooltipText);
+        }
+      }}
       disabled={loading}
       testID={testID}
       type={type}

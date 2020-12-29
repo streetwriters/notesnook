@@ -1,21 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import { TouchableOpacity, View } from 'react-native';
+import React, {useEffect, useRef, useState} from 'react';
+import {TouchableOpacity, View, UIManager} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useTracked } from '../../provider';
-import { Actions } from '../../provider/Actions';
-import { eSendEvent, openVault } from '../../services/EventManager';
-import { getElevation } from '../../utils';
-import { hexToRGBA } from '../../utils/ColorUtils';
-import { db } from '../../utils/DB';
-import { refreshNotesPage } from '../../utils/Events';
-import { SIZE } from '../../utils/SizeUtils';
-import { ActionIcon } from '../ActionIcon';
-import { Button } from '../Button';
-import { simpleDialogEvent } from '../DialogManager/recievers';
-import { TEMPLATE_PERMANANT_DELETE } from '../DialogManager/Templates';
-import { PressableButton } from '../PressableButton';
+import {useTracked} from '../../provider';
+import {Actions} from '../../provider/Actions';
+import {eSendEvent, openVault, ToastEvent} from '../../services/EventManager';
+import {getElevation, showTooltip} from '../../utils';
+import {hexToRGBA} from '../../utils/ColorUtils';
+import {db} from '../../utils/DB';
+import {refreshNotesPage} from '../../utils/Events';
+import {SIZE} from '../../utils/SizeUtils';
+import {ActionIcon} from '../ActionIcon';
+import {Button} from '../Button';
+import {simpleDialogEvent} from '../DialogManager/recievers';
+import {TEMPLATE_PERMANANT_DELETE} from '../DialogManager/Templates';
+import {PressableButton} from '../PressableButton';
 import Heading from '../Typography/Heading';
-
 const Filler = ({item, background}) => {
   const [state] = useTracked();
   const {colors, currentEditingNote} = state;
@@ -90,7 +89,8 @@ const ActionStrip = ({note, setActionStrip}) => {
   const [state, dispatch] = useTracked();
   const {colors, selectionMode} = state;
   const [isPinnedToMenu, setIsPinnedToMenu] = useState(false);
-
+  const toolTipTarget = useRef();
+  const toolTipParent = useRef();
   useEffect(() => {
     if (note.type === 'note') return;
     setIsPinnedToMenu(db.settings.isPinned(note.id));
@@ -104,8 +104,9 @@ const ActionStrip = ({note, setActionStrip}) => {
 
   const actions = [
     {
+      title: 'Pin ' + note.type,
       icon: note.pinned ? 'pin-off' : 'pin',
-      visible:note.type === "note" || note.type === "notebook",
+      visible: note.type === 'note' || note.type === 'notebook',
       onPress: async () => {
         if (!note.id) return;
 
@@ -128,6 +129,7 @@ const ActionStrip = ({note, setActionStrip}) => {
       },
     },
     {
+      title: 'Add to favorites',
       icon: note.favorite ? 'star-off' : 'star',
       onPress: async () => {
         if (!note.id) return;
@@ -144,15 +146,15 @@ const ActionStrip = ({note, setActionStrip}) => {
     },
 
     {
-      name: isPinnedToMenu ? 'Unpin from Menu' : 'Pin to Menu',
-      icon: 'tag-outline',
-      func: async () => {
+      title: isPinnedToMenu ? 'Unpin from Menu' : 'Pin to Menu',
+      icon: isPinnedToMenu ? 'tag-off-outline' : 'tag-outline',
+      onPress: async () => {
         try {
           if (isPinnedToMenu) {
             await db.settings.unpin(note.id);
             ToastEvent.show('Unpinned from menu', 'success');
           } else {
-            if (item.type === 'topic') {
+            if (note.type === 'topic') {
               await db.settings.pin(note.type, {
                 id: note.id,
                 notebookId: note.notebookId,
@@ -165,11 +167,16 @@ const ActionStrip = ({note, setActionStrip}) => {
           }
           setIsPinnedToMenu(db.settings.isPinned(note.id));
           dispatch({type: Actions.MENU_PINS});
-        } catch (e) {}
+
+          setActionStrip(false);
+        } catch (e) {
+          console.log(e);
+        }
       },
       visible: note.type !== 'note',
     },
     {
+      title: 'Copy Note',
       icon: 'content-copy',
       visible: note.type === 'note',
       onPress: async () => {
@@ -191,6 +198,7 @@ const ActionStrip = ({note, setActionStrip}) => {
       },
     },
     {
+      title: 'Restore ' + note.itemType,
       icon: 'delete-restore',
       onPress: async () => {
         await db.trash.restore(note.id);
@@ -207,6 +215,7 @@ const ActionStrip = ({note, setActionStrip}) => {
       visible: note.type === 'trash',
     },
     {
+      title: 'Delete' + note.itemType,
       icon: 'delete',
       visible: note.type === 'trash',
       onPress: () => {
@@ -215,6 +224,7 @@ const ActionStrip = ({note, setActionStrip}) => {
       },
     },
     {
+      title: 'Delete' + note.type,
       icon: 'delete',
       visible: note.type !== 'trash',
       onPress: async () => {
@@ -227,6 +237,7 @@ const ActionStrip = ({note, setActionStrip}) => {
       },
     },
     {
+      title: 'Close',
       icon: 'close',
       onPress: () => setActionStrip(false),
       color: colors.light,
@@ -237,6 +248,7 @@ const ActionStrip = ({note, setActionStrip}) => {
 
   return (
     <View
+      ref={toolTipParent}
       style={{
         position: 'absolute',
         zIndex: 10,
@@ -250,7 +262,8 @@ const ActionStrip = ({note, setActionStrip}) => {
         type="accent"
         title="Select"
         icon="check"
-        onPress={() => {
+        tooltipText="Select Item"
+        onPress={(event) => {
           if (!selectionMode) {
             dispatch({type: Actions.SELECTION_MODE, enabled: true});
           }
@@ -268,6 +281,7 @@ const ActionStrip = ({note, setActionStrip}) => {
         (item) =>
           item.visible && (
             <View
+              ref={toolTipTarget}
               key={item.icon}
               style={{
                 width: 40,
@@ -282,6 +296,7 @@ const ActionStrip = ({note, setActionStrip}) => {
               <ActionIcon
                 color={item.color || colors.heading}
                 onPress={item.onPress}
+                tooltipText={item.title}
                 name={item.icon}
                 size={SIZE.lg}
               />
