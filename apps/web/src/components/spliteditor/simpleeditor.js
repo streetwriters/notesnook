@@ -6,7 +6,7 @@ function SimpleEditor(props) {
   const { delta, container, id, pref } = props;
   useEffect(() => {
     const toolbar = document.querySelector(`${container} .ql-toolbar.ql-snow`);
-    toolbar.remove();
+    if (toolbar) toolbar.remove();
   }, [container]);
   return (
     <Suspense fallback={<EditorLoading />}>

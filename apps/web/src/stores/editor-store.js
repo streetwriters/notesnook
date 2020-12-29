@@ -136,7 +136,7 @@ class EditorStore extends BaseStore {
 
       saveLastOpenedNote(!this.get().session.locked && id);
 
-      if (!oldSession.index) {
+      if (!oldSession?.index) {
         setHashParam({ note: id }, false);
       }
     });

@@ -223,9 +223,13 @@ function Settings(props) {
               sx={{ borderColor: "error" }}
               variant="list"
               onClick={async () => {
-                // if (await showAccountDeleteConfirmation(user.username)) {
-                //   await db.user.deleteUser();
-                // }
+                return showPasswordDialog(
+                  "delete_account",
+                  async ({ password }) => {
+                    await db.user.deleteUser(password);
+                    return true;
+                  }
+                );
               }}
             >
               <TextWithTip
