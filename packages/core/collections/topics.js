@@ -55,6 +55,9 @@ export default class Topics {
 
       if (topic.title.length <= 0) continue;
 
+      if (topics.findIndex((t) => topic.id === t.id) > -1)
+        topic.dateEdited = Date.now();
+
       let index = notebook.topics.findIndex((t) => t.id === topic.id);
       if (index > -1) {
         notebook.totalNotes -= notebook.topics[index].totalNotes;
@@ -108,7 +111,7 @@ export default class Topics {
 }
 
 function makeTopic(topic, notebookId) {
-  if (typeof topic !== "string") return { ...topic, dateEdited: Date.now() };
+  if (typeof topic !== "string") return topic;
   return {
     type: "topic",
     id: id(), //topic,

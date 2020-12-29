@@ -41,10 +41,17 @@ test("edit topic title", () =>
 
     expect(topics.all.length).toBe(3);
 
+    const oldDateEdited = topic._topic.dateEdited;
+
+    await delay(30);
+
     await topics.add({ id: topic._topic.id, title: "Hello22" });
 
     expect(topics.all.length).toBe(3);
     expect(topics.topic(topic._topic.id)._topic.title).toBe("Hello22");
+    expect(topics.topic(topic._topic.id)._topic.dateEdited).toBeGreaterThan(
+      oldDateEdited
+    );
   }));
 
 test("duplicate topic to notebook should not be added", () =>
@@ -89,3 +96,38 @@ test("delete note from edited topic", () =>
       await db.notes.delete(noteId);
     })
   ));
+
+test.only("editing one topic should not update dateEdited of all", () =>
+  notebookTest().then(async ({ db, id }) => {
+    let topics = db.notebooks.notebook(id).topics;
+
+    await topics.add("Home");
+    await topics.add("Home2");
+    await topics.add("Home3");
+
+    let topic = topics.topic("Home");
+
+    const oldTopics = topics.all.filter((t) => t.title !== "Home");
+
+    await delay(100);
+
+    await topics.add({ id: topic._topic.id, title: "Hello22" });
+
+    const newTopics = topics.all.filter((t) => t.title !== "Hello22");
+
+    //console.log(newTopics, oldTopics);
+    expect(
+      newTopics.every(
+        (t) =>
+          oldTopics.findIndex(
+            (topic) => topic.id === t.id && topic.dateEdited === t.dateEdited
+          ) > -1
+      )
+    ).toBe(true);
+  }));
+
+function delay(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
