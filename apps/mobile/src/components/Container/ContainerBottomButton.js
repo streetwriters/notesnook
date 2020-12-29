@@ -6,9 +6,10 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {notesnook} from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
 import {DDS} from '../../services/DeviceDetection';
-import {getElevation, showContext} from '../../utils';
+import {getElevation, showContext, showTooltip, TOOLTIP_POSITIONS} from '../../utils';
 import {normalize, SIZE} from '../../utils/SizeUtils';
 import {PressableButton} from '../PressableButton';
+import RNTooltips from 'react-native-tooltips';
 
 const translateY = new Animated.Value(0);
 export const ContainerBottomButton = ({
@@ -75,6 +76,9 @@ export const ContainerBottomButton = ({
         customStyle={{
           ...getElevation(5),
           borderRadius: 100,
+        }}
+        onLongPress={(event) => {
+          showTooltip(event,title,TOOLTIP_POSITIONS.LEFT)
         }}
         onPress={onPress}>
         <View

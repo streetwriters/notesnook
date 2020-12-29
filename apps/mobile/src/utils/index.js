@@ -194,12 +194,21 @@ export function toTXT(data) {
   }, '');
 }
 
-export function showTooltip(event, text) {
+export const TOOLTIP_POSITIONS = {
+  LEFT:1,
+  RIGHT:2,
+  TOP:3,
+  BOTTOM:4
+}
+
+
+export function showTooltip(event, text,position) {
   if (!event._targetInst?.ref?.current) return;
   RNTooltips.Show(event._targetInst.ref.current, tabBarRef.current, {
     text: text,
     tintColor: 'black',
     corner: 40,
-    textSize: 10,
+    textSize: 12,
+    position:position
   });
 }
