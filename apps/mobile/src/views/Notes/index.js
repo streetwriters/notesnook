@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import { Platform } from 'react-native';
+import {Platform} from 'react-native';
 import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
 import SimpleList from '../../components/SimpleList';
 import {NoteItemWrapper} from '../../components/SimpleList/NoteItemWrapper';
@@ -70,7 +70,7 @@ export const Notes = ({route, navigation}) => {
     } else {
       navigation.setOptions({
         animationEnabled: true,
-        gestureEnabled: Platform.OS === "ios",
+        gestureEnabled: Platform.OS === 'ios',
       });
     }
     let allNotes = [];
@@ -78,15 +78,18 @@ export const Notes = ({route, navigation}) => {
       allNotes = db.notes.tagged(params.tag.id);
     } else if (params.type === 'color') {
       allNotes = db.notes.colored(params.color.id);
+      console.log('allNotes', allNotes);
     } else {
       allNotes = db.notebooks
         .notebook(params.notebookId)
         .topics.topic(params.title).all;
     }
 
-    if (allNotes) {
-      setNotes([...allNotes]);
+    if (!allNotes || allNotes.length === 0) {
+      Navigation.goBack();
     }
+
+    setNotes([...allNotes]);
     setActionAfterFirstSave();
     updateSearch();
     dispatch({
@@ -197,7 +200,7 @@ export const Notes = ({route, navigation}) => {
             params.type === 'tag'
               ? '#' + params.title
               : params.title.slice(0, 1).toUpperCase() + params.title.slice(1),
-          color: params.type === 'color' ? params.title.toLowerCase() : null,    
+          color: params.type === 'color' ? params.title.toLowerCase() : null,
         }}
         loading={loading}
         focused={() => navigation.isFocused()}
