@@ -23,6 +23,7 @@ import {
   eStartSyncer,
   refreshNotesPage,
 } from '../../utils/Events';
+import {MMKV} from '../../utils/mmkv';
 import {SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
 import {ActionIcon} from '../ActionIcon';
@@ -282,11 +283,11 @@ const LoginDialog = () => {
       ) {
         throw new Error('Please wait before requesting another email');
       }
-      await MMKV.setItem('lastRecoveryEmailTime', JSON.stringify(Date.now()));
       await db.user.recoverAccount(email);
+      await MMKV.setItem('lastRecoveryEmailTime', JSON.stringify(Date.now()));
     } catch (e) {
+      await MMKV.removeItem('lastRecoveryEmailTime');
       setStatus(null);
-      
       ToastEvent.show(e.message, 'error', 'local');
     }
     setStatus('Account Recovery Email Sent!');
@@ -302,8 +303,7 @@ const LoginDialog = () => {
     try {
       await db.user.changePassword(oldPassword, password);
     } catch (e) {
-
-    setStatus(null);
+      setStatus(null);
       ToastEvent.show(e.message, 'error', 'local');
     }
     setStatus(null);
