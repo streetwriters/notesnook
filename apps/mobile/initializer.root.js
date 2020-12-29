@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {Dimensions, View} from 'react-native';
 import ScrollableTabView from 'react-native-scrollable-tab-view';
+import SplashScreen from 'react-native-splash-screen';
 import {notesnook} from './e2e/test.ids';
 import ContextMenu from './src/components/ContextMenu';
 import {DialogManager} from './src/components/DialogManager';
@@ -17,7 +18,7 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent,
 } from './src/services/EventManager';
-import {editing, setWidthHeight} from './src/utils';
+import {editing, getAppIsIntialized, setWidthHeight} from './src/utils';
 import {
   eClearEditor,
   eCloseFullscreenEditor,
@@ -28,7 +29,12 @@ import {
 } from './src/utils/Events';
 import {editorRef, tabBarRef} from './src/utils/Refs';
 import {EditorWrapper} from './src/views/Editor/EditorWrapper';
-import {clearEditor, getIntent, getNote, post} from './src/views/Editor/Functions';
+import {
+  clearEditor,
+  getIntent,
+  getNote,
+  post,
+} from './src/views/Editor/Functions';
 
 let {width, height} = Dimensions.get('window');
 let movedAway = true;
@@ -40,7 +46,7 @@ const onChangeTab = async (obj) => {
     if (getIntent()) return;
     movedAway = false;
     currentTab = 1;
-  
+
     if (!editing.currentlyEditing || !getNote()) {
       eSendEvent(eOnLoadNote, {type: 'new'});
       editing.currentlyEditing = true;
@@ -130,7 +136,7 @@ const _onTouchEnd = (e) => {
 const AppStack = React.memo(
   () => {
     const [state, dispatch] = useTracked();
-    const {colors} = state;
+    const {colors, intentMode} = state;
     const [mode, setMode] = useState(
       DDS.isLargeTablet()
         ? 'tablet'
@@ -184,13 +190,11 @@ const AppStack = React.memo(
       let size = event?.nativeEvent?.layout;
       updatedDimensions = size;
       if (!size || (size.width === dimensions.width && mode !== null)) {
-        console.log(mode);
         DDS.setSize(size);
         dispatch({type: Actions.DEVICE_MODE, state: mode});
 
         return;
       }
-
       updatedDimensions = size;
       layoutTimer = setTimeout(async () => {
         checkDeviceType(size);
@@ -204,7 +208,6 @@ const AppStack = React.memo(
       });
 
       setWidthHeight(size);
-      console.log(size, 'SIZES');
       DDS.setSize(size);
       if (DDS.isLargeTablet()) {
         setDeviceMode('tablet', size);
@@ -220,6 +223,7 @@ const AppStack = React.memo(
       setMode(current);
       dispatch({type: Actions.DEVICE_MODE, state: current});
       dispatch({type: Actions.FULLSCREEN, state: false});
+
       editorRef.current?.setNativeProps({
         style: {
           position: 'relative',
