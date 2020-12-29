@@ -11,7 +11,6 @@ import {sleep} from '../utils/TimeUtils';
 import {NavigatorStack} from './NavigatorStack';
 
 const Drawer = createDrawerNavigator();
- 
 
 const onStateChange = (state) => {
   let s = state[0];
@@ -47,8 +46,6 @@ export const NavigationStack = ({component = NavigatorStack}) => {
     };
   }, []);
 
-
-
   return (
     <NavigationContainer ref={sideMenuRef}>
       <Drawer.Navigator
@@ -58,7 +55,7 @@ export const NavigationStack = ({component = NavigatorStack}) => {
         }}
         onStateChange={onStateChange}
         drawerStyle={{
-          width: deviceMode !== 'mobile' ? 0 : '65%',
+          width: deviceMode !== 'mobile' ? 0 : '75%',
           opacity: initRender ? 0 : 1,
           borderRightWidth: 0,
         }}
