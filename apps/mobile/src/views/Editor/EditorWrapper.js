@@ -1,16 +1,16 @@
 import React from 'react';
-import {KeyboardAvoidingView, Platform, SafeAreaView, StatusBar, View} from 'react-native';
-import {PanGestureHandler, State} from 'react-native-gesture-handler';
-import Animated, {Easing} from 'react-native-reanimated';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import { KeyboardAvoidingView, Platform, SafeAreaView, View } from 'react-native';
+import { PanGestureHandler, State } from 'react-native-gesture-handler';
+import Animated, { Easing } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { GetPremium } from '../../components/ActionSheetComponent/GetPremium';
 import Paragraph from '../../components/Typography/Paragraph';
-import {useTracked} from '../../provider';
-import {eSendEvent} from '../../services/EventManager';
-import {eOnLoadNote} from '../../utils/Events';
+import { useTracked } from '../../provider';
+import { DDS } from '../../services/DeviceDetection';
+import { eSendEvent } from '../../services/EventManager';
+import { eOnLoadNote } from '../../utils/Events';
+import { editorRef } from '../../utils/Refs';
 import Editor from './index';
-import {editorRef} from '../../utils/Refs';
-import {DDS} from '../../services/DeviceDetection';
-import {GetPremium} from '../../components/ActionSheetComponent/GetPremium';
 let prevVal = 0;
 let finalValue = 80;
 let anim2 = new Animated.Value(0);
@@ -88,7 +88,6 @@ export const EditorWrapper = ({dimensions}) => {
   const {colors} = state;
   const insets = useSafeAreaInsets();
 
-  console.log(insets.top)
   return (
     <View
       ref={editorRef}
