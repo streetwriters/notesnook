@@ -27,17 +27,12 @@ export const NoteItemWrapper = ({item, index, isTrash = false}) => {
   }, [item]);
 
   const onNoteChange = (data) => {
+
     if (!data || data.id !== note.id || data.closed) {
       return;
     }
     let newNote = db.notes.note(data.id).data;
-    if (
-      !data.noEdit &&
-      newNote.title === note.title &&
-      newNote.headline === note.headline
-    ) {
-      return;
-    }
+    console.log('updating note',newNote.notebooks)
     setNote(newNote);
   };
 
@@ -46,7 +41,7 @@ export const NoteItemWrapper = ({item, index, isTrash = false}) => {
     return () => {
       eUnSubscribeEvent(eOnNoteEdited, onNoteChange);
     };
-  }, [note]);
+  }, []);
 
   const style = useMemo(() => {
     return {width: selectionMode ? '90%' : '100%', marginHorizontal: 0};
