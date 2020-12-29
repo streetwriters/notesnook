@@ -55,7 +55,7 @@ const SimpleList = ({
   );
   const insets = useSafeAreaInsets();
 
-  const {width, fontScale} = useWindowDimensions();
+  const {width, fontScale,height} = useWindowDimensions();
 
   const listData = data;
   const dataType = type;
@@ -131,7 +131,7 @@ const SimpleList = ({
       style={[
         {
           backgroundColor: colors.bg,
-          height: dHeight - 250 - insets.top,
+          height: height - 250 - insets.top,
           width: '100%',
         },
       ]}>

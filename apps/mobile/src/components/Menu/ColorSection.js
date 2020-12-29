@@ -38,9 +38,8 @@ const ColorItem = ({item, index}) => {
   const [headerTextState, setHeaderTextState] = useState(null);
 
   const onHeaderStateChange = (event) => {
-    console.log(event);
+   
     if (event.id === item.id) {
-      console.log('here');
       setHeaderTextState(event);
     } else {
       setHeaderTextState(null);

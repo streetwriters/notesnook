@@ -15,7 +15,6 @@ export const UserSection = ({noTextMode}) => {
   const [state, dispatch] = useTracked();
   const {colors, syncing, user, lastSynced} = state;
 
-  console.log(lastSynced);
   return user && user?.email ? (
     <View
       style={{

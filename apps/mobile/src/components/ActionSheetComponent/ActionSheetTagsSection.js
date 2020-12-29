@@ -137,7 +137,6 @@ export const ActionSheetTagsSection = ({item, close}) => {
           t.title.startsWith(query) && !note.tags.find((n) => n === t.title),
       );
     } else {
-      console.log(note.tags);
       _suggestions = tags
         .sort(function (x, y) {
           return x.dateEdited - y.dateEdited;
