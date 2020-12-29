@@ -194,6 +194,7 @@ function attachMessageListener() {
     }
     switch (type) {
       case 'reset': {
+        editor.setSelection(0,0,'user');
         editor.history.clear();
         editor.setText('', 'api');
         document.getElementById(titleInput).value = '';
@@ -259,6 +260,7 @@ function attachMessageListener() {
 
         break;
       case 'clearEditor':
+        editor.setSelection(0,0,'user');
         editor.setText('', 'api');
         break;
       case 'clearTitle':
