@@ -28,7 +28,7 @@ export const defaultState = {
     encryptedBackups: false,
     homepage: 'Notes',
     sort: 'default',
-    sortOrder: 'des',
+    sortOrder: 'desc',
     screenshotMode: true,
     privacyScreen: false,
   },

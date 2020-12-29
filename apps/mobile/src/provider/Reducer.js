@@ -11,7 +11,7 @@ export const reducer = (state, action) => {
     case Actions.ALL: {
       return {
         ...state,
-        notes: db.notes.group(SORT[sortSettings.sort]),
+        notes: db.notes.group(SORT[sortSettings.sort],sortSettings.sortOrder),
         notebooks: db.notebooks.all,
         trash: db.trash.all,
         tags: db.tags.all,
@@ -52,7 +52,7 @@ export const reducer = (state, action) => {
     case Actions.NOTES:
       return {
         ...state,
-        notes: db.notes.group(SORT[sortSettings.sort]),
+        notes: db.notes.group(SORT[sortSettings.sort],sortSettings.sortOrder),
       };
     case Actions.THEME: {
       return {

@@ -101,7 +101,7 @@ class SortDialog extends React.Component {
                 testID={notesnook.ids.dialogs.sortBy.order}
                 onPress={async () => {
                   let value =
-                    this.state.settings?.sortOrder === 'asc' ? 'des' : 'asc';
+                    this.state.settings?.sortOrder === 'asc' ? 'desc' : 'asc';
                   await SettingsService.set('sortOrder', value);
                   sortSettings.sortOrder = value;
                   await this.getSettings();
