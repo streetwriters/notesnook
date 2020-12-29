@@ -150,18 +150,18 @@ function clearNote() {
   };
 }
 
-let currentEditingTimer = null;
+let currentEditingTimer = null; 
 
 export const loadNote = async (item) => {
   editing.currentlyEditing = true;
   post('blur');
 
   if (item && item.type === 'new') {
-    if (intent) return;
-    await clearEditor();
+       await clearEditor();
     clearNote();
     noteEdited = false;
     id = null;
+    await sleep(10);
     if (Platform.OS === 'android') {
       textInput.current?.focus();
       post('focusTitle');
