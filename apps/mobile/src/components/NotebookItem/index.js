@@ -89,39 +89,45 @@ export const NotebookItem = ({
               paddingVertical: item.description ? 0 : 5,
             }}>
             {item && item.topics ? (
-              item.topics.slice(1, 3).map((topic) => (
-                <TouchableOpacity
-                  activeOpacity={0.8}
-                  onPress={() => {
-                    let routeName = 'NotesPage';
-                    let params = {...topic, menu: false};
-                    let headerState = {
-                      heading: topic.title,
-                      id: topic.id,
-                      type: topic.type,
-                    };
-                    Navigation.navigate(routeName, params, headerState);
-                  }}
-                  key={topic.id}
-                  style={{
-                    borderRadius: 2.5,
-                    backgroundColor: colors.accent,
-                    paddingHorizontal: 5,
-                    paddingVertical: 2,
-                    marginRight: 5,
-                    marginVertical: 2.5,
-                  }}>
-                  <Paragraph
-                    size={SIZE.xs}
-                    numberOfLines={1}
+              item.topics
+                .slice(1)
+                .sort((a, b) => b.dateEdited - a.dateEdited)
+                .slice(0, 2) 
+                .map((topic) => (
+                  <TouchableOpacity
+                    activeOpacity={0.8}
+                    onPress={() => {
+                      let routeName = 'NotesPage';
+                      let params = {...topic, menu: false};
+                      let headerState = {
+                        heading: topic.title,
+                        id: topic.id,
+                        type: topic.type,
+                      };
+                      Navigation.navigate(routeName, params, headerState);
+                    }}
+                    key={topic.id}
                     style={{
-                      color: 'white',
-                      maxWidth: '100%',
+                      borderRadius: 2.5,
+                      backgroundColor: colors.accent,
+                      paddingHorizontal: 5,
+                      paddingVertical: 2,
+                      marginRight: 5,
+                      marginVertical: 2.5,
                     }}>
-                    {topic.title}
-                  </Paragraph>
-                </TouchableOpacity>
-              ))
+                    <Paragraph
+                      size={SIZE.xs}
+                      numberOfLines={1}
+                      style={{
+                        color: 'white',
+                        maxWidth: '100%',
+                      }}>
+                      {topic.title.length > 16
+                        ? topic.title.slice(0, 16) + '...'
+                        : topic.title}
+                    </Paragraph>
+                  </TouchableOpacity>
+                ))
             ) : (
               <Paragraph
                 color={colors.icon}
