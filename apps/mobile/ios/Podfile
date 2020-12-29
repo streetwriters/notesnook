@@ -8,6 +8,9 @@ permissions_path = '../node_modules/react-native-permissions/ios'
 pod 'Base64'
 pod 'Permission-PhotoLibrary', :path => "#{permissions_path}/PhotoLibrary.podspec"
 pod 'MMKV'
+pod 'SexyTooltip',:git => 'https://github.com/prscX/SexyTooltip.git'
+pod 'RNTooltips', :path => '../node_modules/react-native-tooltips/ios'
+
 target 'Notesnook' do
   config = use_native_modules!
 

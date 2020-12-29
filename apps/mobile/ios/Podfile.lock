@@ -25,6 +25,7 @@ PODS:
   - MMKVCore (1.2.6)
   - Permission-PhotoLibrary (2.2.2):
     - RNPermissions
+  - pop (1.0.12)
   - RCTRequired (0.63.4)
   - RCTTypeSafety (0.63.4):
     - FBLazyVector (= 0.63.4)
@@ -313,11 +314,17 @@ PODS:
     - React
   - RNSVG (12.1.0):
     - React
+  - RNTooltips (1.0.2):
+    - pop (~> 1.0)
+    - React
+    - SexyTooltip
   - RNVectorIcons (7.1.0):
     - React
   - Sentry (6.0.9):
     - Sentry/Core (= 6.0.9)
   - Sentry/Core (6.0.9)
+  - SexyTooltip (1.2.5):
+    - pop (~> 1.0)
   - toolbar-android (0.1.0-rc.2):
     - React
   - Yoga (1.14.0)
@@ -383,7 +390,9 @@ DEPENDENCIES:
   - RNShare (from `../node_modules/react-native-share`)
   - RNStoreReview (from `../node_modules/react-native-store-review/ios`)
   - RNSVG (from `../node_modules/react-native-svg`)
+  - RNTooltips (from `../node_modules/react-native-tooltips/ios`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
+  - SexyTooltip (from `https://github.com/prscX/SexyTooltip.git`)
   - "toolbar-android (from `../node_modules/@react-native-community/toolbar-android`)"
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
@@ -393,6 +402,7 @@ SPEC REPOS:
     - boost-for-react-native
     - MMKV
     - MMKVCore
+    - pop
     - Sentry
 
 EXTERNAL SOURCES:
@@ -508,12 +518,21 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-store-review/ios"
   RNSVG:
     :path: "../node_modules/react-native-svg"
+  RNTooltips:
+    :path: "../node_modules/react-native-tooltips/ios"
   RNVectorIcons:
     :path: "../node_modules/react-native-vector-icons"
+  SexyTooltip:
+    :git: https://github.com/prscX/SexyTooltip.git
   toolbar-android:
     :path: "../node_modules/@react-native-community/toolbar-android"
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
+
+CHECKOUT OPTIONS:
+  SexyTooltip:
+    :commit: 2fbe10260fb1b0f7dcd9822681a6970ce88112af
+    :git: https://github.com/prscX/SexyTooltip.git
 
 SPEC CHECKSUMS:
   Base64: cecfb41a004124895a7bcee567a89bae5a89d49b
@@ -526,6 +545,7 @@ SPEC CHECKSUMS:
   MMKV: 27f6b9e34849e77e78c5a1cc8f7f513e37f5fa15
   MMKVCore: c301b04fd2ab9957e6e4d4465b9b60e443b0bb6b
   Permission-PhotoLibrary: 8227a6ed9f6a971537afe63742d54f5f23a38fe2
+  pop: d582054913807fd11fd50bfe6a539d91c7e1a55a
   RCTRequired: 082f10cd3f905d6c124597fd1c14f6f2655ff65e
   RCTTypeSafety: 8c9c544ecbf20337d069e4ae7fd9a377aadf504b
   React: b0a957a2c44da4113b0c4c9853d8387f8e64e615
@@ -576,11 +596,13 @@ SPEC CHECKSUMS:
   RNShare: 7e22ba3bf66294ff7c122a1f2da8a8ec642091a0
   RNStoreReview: 62d6afd7c37db711a594bbffca6b0ea3a812b7a8
   RNSVG: ce9d996113475209013317e48b05c21ee988d42e
+  RNTooltips: e13180e4339e2a85daabd09507f62a5a32d3dc8a
   RNVectorIcons: bc69e6a278b14842063605de32bec61f0b251a59
   Sentry: 388c9dc093b2fd3a264466a5c5b21e25959610a9
+  SexyTooltip: 5c9b4dec52bfb317938cb0488efd9da3717bb6fd
   toolbar-android: 85f3ef4d691469f2d304e7dee4bca013aa1ba1ff
   Yoga: 4bd86afe9883422a7c4028c00e34790f560923d6
 
-PODFILE CHECKSUM: 75e5fdf731f5fbebed2725159f7ea172ed1c0356
+PODFILE CHECKSUM: 1cb02af42eb11bb808c12bcec382e64156ced4a8
 
 COCOAPODS: 1.10.0
