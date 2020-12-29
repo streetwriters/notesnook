@@ -1,8 +1,8 @@
-import React, { useEffect } from 'react';
-import {Platform, TextInput, View} from 'react-native';
+import React from 'react';
+import { Platform, TextInput, View } from 'react-native';
 import WebView from 'react-native-webview';
 import { notesnook } from '../../../e2e/test.ids';
-import {useTracked} from '../../provider';
+import { useTracked } from '../../provider';
 import EditorHeader from './EditorHeader';
 import {
   EditorWebView,
@@ -11,16 +11,13 @@ import {
   sourceUri,
   textInput,
   _onMessage,
-  _onShouldStartLoadWithRequest,
+  _onShouldStartLoadWithRequest
 } from './Functions';
 
 const Editor = () => {
   const [state] = useTracked();
   const {colors, premiumUser} = state;
 
- useEffect(() => {
-  console.log('rendering editor');
- })
   return (
     <>
       <TextInput
