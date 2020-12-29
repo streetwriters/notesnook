@@ -1,10 +1,10 @@
 import React from 'react';
-import { Platform } from 'react-native';
-import { useTracked } from '../../provider';
-import { DDS } from '../../services/DeviceDetection';
-import { hexToRGBA } from '../../utils/ColorUtils';
-import ActionSheet from '../ActionSheet';
-import { GetPremium } from './GetPremium';
+import {Platform} from 'react-native';
+import {useTracked} from '../../provider';
+import {DDS} from '../../services/DeviceDetection';
+import {hexToRGBA} from '../../utils/ColorUtils';
+import ActionSheet from 'react-native-actions-sheet';
+import {GetPremium} from './GetPremium';
 
 const ActionSheetWrapper = ({
   children,
@@ -33,9 +33,9 @@ const ActionSheetWrapper = ({
       borderBottomLeftRadius: largeTablet ? 10 : 1,
       marginBottom: largeTablet ? 50 : 0,
       alignSelf: 'center',
-      paddingTop:gestureEnabled ? 8 : 18
+      paddingTop: gestureEnabled ? 8 : 18,
     };
-  }, [colors.bg,gestureEnabled]);
+  }, [colors.bg, gestureEnabled]);
 
   return (
     <ActionSheet
@@ -55,7 +55,7 @@ const ActionSheetWrapper = ({
       premium={
         <GetPremium
           context="sheet"
-          close={() => fwdRef?.current?._hideModal()}
+          close={() => fwdRef?.current?.hide()}
           offset={50}
         />
       }
