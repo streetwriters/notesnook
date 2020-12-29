@@ -1,27 +1,25 @@
-import React, {createRef} from 'react';
-import {Clipboard, Platform, View} from 'react-native';
+import React, { createRef } from 'react';
+import { Clipboard, View } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import RNFetchBlob from 'rn-fetch-blob';
-import {LOGO_BASE64} from '../../assets/images/assets';
+import { LOGO_BASE64 } from '../../assets/images/assets';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-  ToastEvent,
+  ToastEvent
 } from '../../services/EventManager';
-import {dWidth} from '../../utils';
-import {hexToRGBA} from '../../utils/ColorUtils';
-import {db} from '../../utils/DB';
-import {eOpenRecoveryKeyDialog, eOpenResultDialog} from '../../utils/Events';
-import {SIZE} from '../../utils/SizeUtils';
+import { dWidth } from '../../utils';
+import { db } from '../../utils/DB';
+import { eOpenRecoveryKeyDialog, eOpenResultDialog } from '../../utils/Events';
+import { SIZE } from '../../utils/SizeUtils';
 import Storage from '../../utils/storage';
-import {sleep} from '../../utils/TimeUtils';
-import ActionSheet from '../ActionSheet';
+import { sleep } from '../../utils/TimeUtils';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
-import {Button} from '../Button';
+import { Button } from '../Button';
 import Seperator from '../Seperator';
-import {Toast} from '../Toast';
+import { Toast } from '../Toast';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 class RecoveryKeyDialog extends React.Component {
