@@ -19,12 +19,34 @@ if (!tfun) {
 export default class Notes extends Collection {
   async add(noteArg) {
     if (!noteArg) return;
-    if (noteArg.remote || noteArg.migrated) {
-      return await this._collection.addItem(noteArg);
-    }
 
     let id = noteArg.id || getId();
     let oldNote = this._collection.getItem(id);
+
+    if (noteArg.remote || noteArg.migrated) {
+      if (oldNote) {
+        if (oldNote.color !== noteArg.color) {
+          await this._db.colors.remove(oldNote.color, id);
+        }
+        if (oldNote.tags) {
+          for (let tag of oldNote.tags) {
+            await this._db.tags.remove(tag, id);
+          }
+        }
+      }
+
+      if (noteArg.color) {
+        await this._db.colors.add(noteArg.color, id);
+      }
+
+      if (noteArg.tags.length) {
+        for (let tag of noteArg.tags) {
+          await this._db.tags.add(tag, id);
+        }
+      }
+
+      return await this._collection.addItem(noteArg);
+    }
 
     let note = {
       ...oldNote,

@@ -75,8 +75,6 @@ class Merger {
       synced,
       notebooks,
       content,
-      tags,
-      colors,
       trash,
       vaultKey,
       settings,
@@ -128,17 +126,17 @@ class Merger {
       }
     );
 
-    await this._mergeArray(
-      tags,
-      (id) => this._db.tags.tag(id),
-      (item) => this._db.tags.merge(item)
-    );
+    // await this._mergeArray(
+    //   tags,
+    //   (id) => this._db.tags.tag(id),
+    //   (item) => this._db.tags.merge(item)
+    // );
 
-    await this._mergeArray(
-      colors,
-      (id) => this._db.colors.tag(id),
-      (item) => this._db.colors.merge(item)
-    );
+    // await this._mergeArray(
+    //   colors,
+    //   (id) => this._db.colors.tag(id),
+    //   (item) => this._db.colors.merge(item)
+    // );
 
     await this._mergeArray(
       trash,

@@ -36,8 +36,6 @@ class Collector {
       notes: await this._collect(this._db.notes.raw),
       notebooks: await this._collect(this._db.notebooks.raw),
       content: await this._collect(await this._db.content.all()),
-      tags: await this._collect(this._db.tags.raw),
-      colors: await this._collect(this._db.colors.raw),
       trash: await this._collect(this._db.trash.raw),
       settings: await this._collect([this._db.settings.raw]),
       vaultKey: await this._serialize(await this._db.vault._getKey()),

@@ -19,6 +19,7 @@ export default class Tags extends Collection {
     const oldTag = this.all.find(
       (t) => t.id === tag.id || t.title === tag.title
     );
+
     if (!oldTag) return await this._collection.addItem(tag);
 
     const deletedIds = set.union(oldTag.deletedIds, tag.deletedIds);
