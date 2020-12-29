@@ -55,6 +55,7 @@ export const Folders = ({route, navigation}) => {
   }, []);
 
   useEffect(() => {
+    console.log('rerendering notebooks yeah')
     if (navigation.isFocused()) {
       updateSearch();
     }

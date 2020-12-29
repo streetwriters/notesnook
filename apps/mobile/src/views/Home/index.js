@@ -66,7 +66,7 @@ export const Home = ({route, navigation}) => {
     if (navigation.isFocused()) {
       updateSearch();
     }
-  }, [notes, route.params]);
+  }, [notes]);
 
   const updateSearch = () => {
     SearchService.update({
