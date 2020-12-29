@@ -20,6 +20,7 @@ import {
 import Navigation from '../../services/Navigation';
 import {editing} from '../../utils';
 import {exitEditorAnimation} from '../../utils/Animations';
+import { db } from '../../utils/DB';
 import {
   eClearEditor,
   eCloseFullscreenEditor,
@@ -239,8 +240,9 @@ const EditorHeader = () => {
               marginLeft: 10,
             }}
             onPress={() => {
+              let note = getNote() && db.notes.note(getNote().id).data
               ActionSheetEvent(
-                getNote(),
+                note,
                 true,
                 true,
                 ['Add to', 'Share', 'Export', 'Delete'],
