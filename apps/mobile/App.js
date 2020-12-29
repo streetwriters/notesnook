@@ -216,6 +216,7 @@ const App = () => {
   const onEmailVerified = async () => {
     let user = await db.user.fetchUser();
     dispatch({type: Actions.USER, user: user});
+    if (!user) return;
     let message =
       user?.subscription?.type === 2
         ? 'Thank you for signing up for Notesnook Beta Program. Enjoy all premium features for free for the next 3 months.'
