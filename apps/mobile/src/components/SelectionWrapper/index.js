@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {TouchableOpacity, View, UIManager} from 'react-native';
+import {TouchableOpacity, View, UIManager, ViewBase} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
@@ -89,8 +89,6 @@ const ActionStrip = ({note, setActionStrip}) => {
   const [state, dispatch] = useTracked();
   const {colors, selectionMode} = state;
   const [isPinnedToMenu, setIsPinnedToMenu] = useState(false);
-  const toolTipTarget = useRef();
-  const toolTipParent = useRef();
   useEffect(() => {
     if (note.type === 'note') return;
     setIsPinnedToMenu(db.settings.isPinned(note.id));
@@ -248,7 +246,6 @@ const ActionStrip = ({note, setActionStrip}) => {
 
   return (
     <View
-      ref={toolTipParent}
       style={{
         position: 'absolute',
         zIndex: 10,
@@ -281,7 +278,6 @@ const ActionStrip = ({note, setActionStrip}) => {
         (item) =>
           item.visible && (
             <View
-              ref={toolTipTarget}
               key={item.icon}
               style={{
                 width: 40,
@@ -320,6 +316,7 @@ const SelectionWrapper = ({
   const {colors, selectionMode, selectedItemsList} = state;
   const [selected, setSelected] = useState(false);
   const [actionStrip, setActionStrip] = useState(false);
+
   useEffect(() => {
     if (selectionMode) {
       setActionStrip(false);
@@ -339,14 +336,16 @@ const SelectionWrapper = ({
     }
   }, [selectedItemsList]);
 
+  onLong = () => {
+    if (selectionMode) return;
+    setActionStrip(!actionStrip);
+  };
+
   return (
     <PressableButton
       customColor="transparent"
       testID={testID}
-      onLongPress={() => {
-        if (selectionMode) return;
-        setActionStrip(!actionStrip);
-      }}
+      onLongPress={onLong}
       onPress={onPress}
       customSelectedColor={colors.nav}
       customAlpha={!colors.night ? -0.02 : 0.02}
@@ -372,37 +371,40 @@ const SelectionWrapper = ({
 
       {item.type === 'note' && <Filler background={background} item={item} />}
 
-      <View
-        style={{
-          display: selectionMode ? 'flex' : 'none',
-          opacity: selectionMode ? 1 : 0,
-          width: '10%',
-          height: 70,
-          justifyContent: 'center',
-          alignItems: 'center',
-          paddingRight: 8,
-        }}>
-        {item.title !== 'General' && (
-          <TouchableOpacity
-            activeOpacity={1}
-            onPress={onLongPress}
-            style={{
-              justifyContent: 'center',
-              alignItems: 'center',
-              height: 70,
-            }}>
-            <Icon
-              size={SIZE.lg}
-              color={selected ? colors.accent : colors.icon}
-              name={
-                selected
-                  ? 'check-circle-outline'
-                  : 'checkbox-blank-circle-outline'
-              }
-            />
-          </TouchableOpacity>
-        )}
-      </View>
+      {selectionMode && (
+        <View
+          style={{
+            display: 'flex',
+            opacity: 1,
+            width: '10%',
+            height: 70,
+            justifyContent: 'center',
+            alignItems: 'center',
+            paddingRight: 8,
+          }}>
+          {item.type !== 'topic' ||
+          (item.type === 'topic' && item.title !== 'General') ? (
+            <TouchableOpacity
+              activeOpacity={1}
+              onPress={onLongPress}
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: 70,
+              }}>
+              <Icon
+                size={SIZE.lg}
+                color={selected ? colors.accent : colors.icon}
+                name={
+                  selected
+                    ? 'check-circle-outline'
+                    : 'checkbox-blank-circle-outline'
+                }
+              />
+            </TouchableOpacity>
+          ) : null}
+        </View>
+      )}
 
       {children}
     </PressableButton>
