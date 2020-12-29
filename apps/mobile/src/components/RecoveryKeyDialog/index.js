@@ -46,13 +46,13 @@ class RecoveryKeyDialog extends React.Component {
         visible: true,
       },
       () => {
-        this.actionSheetRef.current?._setModalVisible(true);
+        this.actionSheetRef.current?.setModalVisible(true);
       },
     );
   };
 
   close = () => {
-    this.actionSheetRef.current?._setModalVisible(false);
+    this.actionSheetRef.current?.setModalVisible(false);
     sleep(200).then(() => {
       this.setState({
         visible: false,

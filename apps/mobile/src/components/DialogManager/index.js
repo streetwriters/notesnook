@@ -1,6 +1,4 @@
 import React, {Component, createRef} from 'react';
-import {Platform} from 'react-native';
-import {DDS} from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -8,11 +6,9 @@ import {
   openVault,
 } from '../../services/EventManager';
 import {dWidth} from '../../utils';
-import {hexToRGBA} from '../../utils/ColorUtils';
 import {
   eCloseActionSheet,
   eCloseAddNotebookDialog,
-  eCloseAddTopicDialog,
   eCloseLoginDialog,
   eCloseMoveNoteDialog,
   eClosePremiumDialog,
@@ -20,17 +16,15 @@ import {
   eOnLoadNote,
   eOpenActionSheet,
   eOpenAddNotebookDialog,
-  eOpenAddTopicDialog,
   eOpenExportDialog,
   eOpenLoginDialog,
   eOpenMoveNoteDialog,
   eOpenPremiumDialog,
   eOpenSimpleDialog,
 } from '../../utils/Events';
-import ActionSheet from '../ActionSheet';
 import {ActionSheetComponent} from '../ActionSheetComponent';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
-import {GetPremium, translatePrem} from '../ActionSheetComponent/GetPremium';
+import {translatePrem} from '../ActionSheetComponent/GetPremium';
 import {AddNotebookDialog} from '../AddNotebookDialog';
 import {AddTopicDialog} from '../AddTopicDialog';
 import {Dialog} from '../Dialog';
@@ -90,13 +84,13 @@ export class DialogManager extends Component {
         actionSheetVisible: true,
       },
       () => {
-        this.actionSheet.current?._setModalVisible();
+        this.actionSheet.current?.setModalVisible();
       },
     );
   };
 
   _hideActionSheet = () => {
-    this.actionSheet.current?._setModalVisible(false);
+    this.actionSheet.current?.setModalVisible(false);
   };
 
   _showMoveNote = () => {
@@ -330,7 +324,7 @@ export class DialogManager extends Component {
                 if (value) {
                   this.show = value;
                 }
-                this.actionSheet.current?._setModalVisible();
+                this.actionSheet.current?.setModalVisible();
               }}
             />
           </ActionSheetWrapper>

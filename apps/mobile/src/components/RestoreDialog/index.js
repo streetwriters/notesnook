@@ -38,7 +38,7 @@ const RestoreDialog = () => {
   const open = async () => {
     setVisible(true);
     await sleep(30);
-    actionSheetRef.current?._setModalVisible(true);
+    actionSheetRef.current?.setModalVisible(true);
   };
 
   const close = () => {

@@ -33,7 +33,7 @@ const ProgressDialog = () => {
     setDialogData(data);
     setVisible(true);
     await sleep(1);
-    actionSheetRef.current?._setModalVisible(true);
+    actionSheetRef.current?.setModalVisible(true);
   };
 
   const close = () => {

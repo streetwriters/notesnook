@@ -35,13 +35,13 @@ class PremiumDialog extends React.Component {
         visible: true,
       },
       () => {
-        this.actionSheetRef.current?._setModalVisible(true);
+        this.actionSheetRef.current?.setModalVisible(true);
       },
     );
   }
 
   close() {
-    this.actionSheetRef.current?._setModalVisible(false);
+    this.actionSheetRef.current?.setModalVisible(false);
   }
 
   async getSkus() {

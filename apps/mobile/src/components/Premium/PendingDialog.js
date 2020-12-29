@@ -20,7 +20,7 @@ class PendingDialog extends React.Component {
   }
 
   async open() {
-    actionSheet.current?._setModalVisible(true);
+    actionSheet.current?.setModalVisible(true);
     let u = await db.user.fetchUser();
     this.setState({
       user: u && u.Id ? u : null,
@@ -28,7 +28,7 @@ class PendingDialog extends React.Component {
   }
 
   close() {
-    actionSheet.current?._setModalVisible(false);
+    actionSheet.current?.setModalVisible(false);
     this.setState({
       user: null,
     });

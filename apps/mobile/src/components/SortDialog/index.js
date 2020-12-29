@@ -34,7 +34,7 @@ class SortDialog extends React.Component {
         visible: true,
       },
       async () => {
-        actionSheet.current?._setModalVisible(true);
+        actionSheet.current?.setModalVisible(true);
         await this.getSettings();
       },
     );
@@ -48,7 +48,7 @@ class SortDialog extends React.Component {
   }
 
   close() {
-    actionSheet.current?._setModalVisible(false);
+    actionSheet.current?.setModalVisible(false);
     sleep(200).then(() => {
       this.setState({
         visible: false,
