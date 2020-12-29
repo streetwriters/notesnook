@@ -39,7 +39,7 @@ export default class Notes extends Collection {
         await this._db.colors.add(noteArg.color, id);
       }
 
-      if (noteArg.tags.length) {
+      if (noteArg.tags && noteArg.tags.length) {
         for (let tag of noteArg.tags) {
           await this._db.tags.add(tag, id);
         }
@@ -53,7 +53,7 @@ export default class Notes extends Collection {
       ...noteArg,
     };
 
-    if (!oldNote && !noteArg.content) return;
+    if (!oldNote && !noteArg.content && !noteArg.contentId) return;
 
     if (noteArg.content && noteArg.content.data && noteArg.content.type) {
       const { type, data, conflicted, resolved } = noteArg.content;

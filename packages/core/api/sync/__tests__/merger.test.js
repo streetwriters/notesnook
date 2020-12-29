@@ -39,8 +39,6 @@ test("null server response should return false", async () => {
 const tests = [
   mainCollectionParams("notes", "note", TEST_NOTE),
   mainCollectionParams("notebooks", "notebook", TEST_NOTEBOOK),
-  tagsCollectionParams("tags", "someTag", "tag"),
-  tagsCollectionParams("colors", "red", "tag"),
 ];
 
 describe.each(tests)(

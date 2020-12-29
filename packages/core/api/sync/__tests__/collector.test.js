@@ -44,8 +44,6 @@ const MAX_ITEMS = 5;
 const tests = [
   getMainCollectionParams("notes", TEST_NOTE),
   getMainCollectionParams("notebooks", TEST_NOTEBOOK),
-  getTagsCollectionParams("tags", "someTag"),
-  getTagsCollectionParams("colors", "red"),
   getMainCollectionParams("trash", {
     id: 2141,
     type: "note",

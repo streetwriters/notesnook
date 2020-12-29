@@ -97,7 +97,7 @@ test("delete note from edited topic", () =>
     })
   ));
 
-test.only("editing one topic should not update dateEdited of all", () =>
+test("editing one topic should not update dateEdited of all", () =>
   notebookTest().then(async ({ db, id }) => {
     let topics = db.notebooks.notebook(id).topics;
 

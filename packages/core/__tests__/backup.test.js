@@ -9,6 +9,7 @@ import v2Backup from "./__fixtures__/backup.v2.json";
 import v3Backup from "./__fixtures__/backup.v3.json";
 import v4Backup from "./__fixtures__/backup.v4.json";
 import v42Backup from "./__fixtures__/backup.v4.2.json";
+import v43Backup from "./__fixtures__/backup.v4.3.json";
 
 beforeEach(() => {
   StorageInterface.clear();
@@ -74,6 +75,7 @@ describe.each([
   ["v3", v3Backup],
   ["v4", v4Backup],
   ["v4.2", v42Backup],
+  ["v4.3", v43Backup],
 ])("testing backup version: %s", (version, data) => {
   test(`import ${version} backup`, () => {
     return databaseTest().then(async (db) => {

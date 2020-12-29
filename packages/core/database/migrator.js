@@ -11,11 +11,13 @@ class Migrator {
           collection.index.map(async (id) => {
             let item = get(id);
             if (!item) return;
+
             if (item.deleted)
               return await collection.dbCollection._collection.addItem(item);
 
             const migrate = migrations[version][item.type || id];
             if (migrate) item = migrate(item);
+
             if (!!collection.dbCollection.merge) {
               await collection.dbCollection.merge(item);
             } else {
