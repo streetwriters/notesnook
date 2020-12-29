@@ -87,6 +87,13 @@ const onAppStateChanged = async (state) => {
             IntentService.check(loadIntent);
           }
         }
+      } else {
+        if (!db || !db.notes) return;
+        if (!getNote()) {
+          eSendEvent('nointent');
+        } else {
+          SplashScreen.hide();
+        }
       }
     } catch (e) {}
   } else {
@@ -107,7 +114,6 @@ const onAppStateChanged = async (state) => {
 function loadIntent(event) {
   if (event) {
     setIntent();
-    console.log(event, getIntent());
     eSendEvent(eOnLoadNote, event);
     tabBarRef.current?.goToPage(1);
     Navigation.closeDrawer();
@@ -170,7 +176,7 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    SettingsService.init().then(r => console.log)
+    SettingsService.init().then((r) => console.log);
     dispatch({
       type: Actions.DEVICE_MODE,
       state: DDS.isLargeTablet()
@@ -183,7 +189,6 @@ const App = () => {
   }, []);
 
   const onSyncComplete = async () => {
-    console.log("user synced data");
     dispatch({type: Actions.ALL});
     dispatch({type: Actions.LAST_SYNC, lastSync: await db.lastSynced()});
   };
@@ -264,13 +269,13 @@ const App = () => {
   };
 
   const onLogout = (reason) => {
-    console.log(reason,"REASON")
+    console.log(reason, 'REASON');
     eSendEvent(eOpenProgressDialog, {
       title: 'User Logged Out',
       paragraph: 'You have been logged out of your account.',
       action: async () => {
         eSendEvent(eCloseProgressDialog);
-        await sleep(50)
+        await sleep(50);
         eSendEvent(eOpenLoginDialog);
       },
       icon: 'logout',
@@ -309,6 +314,7 @@ const App = () => {
         await onEmailVerified();
       }
     });
+    intentOnAppLoadProcessed = true;
     sleep(300).then(() => eSendEvent(eOpenSideMenu));
     //Sentry = require('@sentry/react-native');
     // Sentry.init({
