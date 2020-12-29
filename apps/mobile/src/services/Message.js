@@ -39,23 +39,27 @@ export function setEmailVerifyMessage(dispatch) {
           paragraph:
             'We have sent you an email confirmation link. Please check your email to verify your account.',
           action: async () => {
-            let lastEmailTime = await MMKV.getItem('lastEmailTime');
-            if (
-              lastEmailTime &&
-              Date.now() - JSON.parse(lastEmailTime) < 60000 * 10
-            ) {
-              ToastEvent.show(
-                'Please wait before requesting another email',
-                'error',
-                'local',
-              );
-              console.log('error');
-              return;
+            try {
+              let lastEmailTime = await MMKV.getItem('lastEmailTime');
+              if (
+                lastEmailTime &&
+                Date.now() - JSON.parse(lastEmailTime) < 60000 * 10
+              ) {
+                ToastEvent.show(
+                  'Please wait before requesting another email',
+                  'error',
+                  'local',
+                );
+                console.log('error');
+                return;
+              }
+              await db.user.sendVerificationEmail();
+              await MMKV.setItem('lastEmailTime', JSON.stringify(Date.now()));
+              ToastEvent.show('Verification email sent!', 'success', 'local');
+            } catch (e) {
+              ToastEvent.show(e.message, 'error', 'local');
+              await MMKV.removeItem('lastEmailTime');
             }
-            await db.user.sendVerificationEmail();
-            console.log('passed', lastEmailTime);
-            await MMKV.setItem('lastEmailTime', JSON.stringify(Date.now()));
-            ToastEvent.show('Verification email sent!', 'success', 'local');
           },
           actionText: 'Resend Confirmation Link',
           noProgress: true,
