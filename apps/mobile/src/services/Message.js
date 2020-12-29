@@ -1,12 +1,11 @@
-import {Actions} from '../provider/Actions';
-import {db} from '../utils/DB';
+import { Actions } from '../provider/Actions';
+import { db } from '../utils/DB';
 import {
-  eCloseProgressDialog,
   eOpenLoginDialog,
-  eOpenProgressDialog,
+  eOpenProgressDialog
 } from '../utils/Events';
-import {MMKV} from '../utils/mmkv';
-import {eSendEvent, ToastEvent} from './EventManager';
+import { MMKV } from '../utils/mmkv';
+import { eSendEvent, ToastEvent } from './EventManager';
 
 export function setLoginMessage(dispatch) {
   dispatch({
