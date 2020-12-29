@@ -9,7 +9,7 @@ import {createRef} from 'react';
 import {dummyRef} from '../components/DummyText';
 import {SIZE} from './SizeUtils';
 import RNTooltips from 'react-native-tooltips';
-import { tabBarRef } from './Refs';
+import {tabBarRef} from './Refs';
 
 export async function setSetting(settings, name, value) {
   let s = {...settings};
@@ -195,20 +195,39 @@ export function toTXT(data) {
 }
 
 export const TOOLTIP_POSITIONS = {
-  LEFT:1,
-  RIGHT:2,
-  TOP:3,
-  BOTTOM:4
-}
+  LEFT: 1,
+  RIGHT: 2,
+  TOP: 3,
+  BOTTOM: 4,
+};
 
-
-export function showTooltip(event, text,position) {
+export function showTooltip(event, text, position) {
   if (!event._targetInst?.ref?.current) return;
   RNTooltips.Show(event._targetInst.ref.current, tabBarRef.current, {
     text: text,
     tintColor: 'black',
     corner: 40,
     textSize: 12,
-    position:position
+    position: position,
   });
+}
+
+let appIsInitialized = false;
+
+export function setAppIsInitialized(value) {
+  appIsInitialized = value;
+}
+
+export function getAppIsIntialized() {
+  return appIsInitialized;
+}
+
+let intentOnAppLoadProcessed = false;
+
+export function setIntentOnAppLoadProcessed(value) {
+  intentOnAppLoadProcessed = value;
+}
+
+export function getIntentOnAppLoadProcessed() {
+  return intentOnAppLoadProcessed;
 }
