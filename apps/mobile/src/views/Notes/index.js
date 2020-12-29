@@ -85,7 +85,10 @@ export const Notes = ({route, navigation}) => {
         .topics.topic(params.title).all;
     }
 
-    if (!allNotes || allNotes.length === 0) {
+    if (
+      (params.type === 'tag' || params.type === 'color') &&
+      (!allNotes || allNotes.length === 0)
+    ) {
       Navigation.goBack();
     }
 
