@@ -1,28 +1,29 @@
 import React from 'react';
-import { FlatList, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { notesnook } from '../../../e2e/test.ids';
-import { useTracked } from '../../provider';
-import { Actions } from '../../provider/Actions';
+import {FlatList, View} from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {notesnook} from '../../../e2e/test.ids';
+import {useTracked} from '../../provider';
+import {Actions} from '../../provider/Actions';
 import {
   ACCENT,
   COLOR_SCHEME,
   COLOR_SCHEME_DARK,
   COLOR_SCHEME_LIGHT,
-  setColorScheme
+  setColorScheme,
 } from '../../utils/Colors';
-import { MenuItemsList } from '../../utils/index';
-import { MMKV } from '../../utils/mmkv';
+import {MenuItemsList} from '../../utils/index';
+import {MMKV} from '../../utils/mmkv';
+import {ActionIcon} from '../ActionIcon';
 import Seperator from '../Seperator';
-import { ColorSection } from './ColorSection';
-import { MenuListItem } from './MenuListItem';
-import { TagsSection } from './TagsSection';
-import { UserSection } from './UserSection';
+import {ColorSection} from './ColorSection';
+import {MenuListItem} from './MenuListItem';
+import {TagsSection} from './TagsSection';
+import {UserSection} from './UserSection';
 
 export const Menu = React.memo(
   () => {
     const [state, dispatch] = useTracked();
-    const {colors,deviceMode} = state;
+    const {colors, deviceMode} = state;
     const insets = useSafeAreaInsets();
     const noTextMode = false;
     function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
@@ -32,7 +33,7 @@ export const Menu = React.memo(
 
     const BottomItemsList = [
       {
-        name: 'Night mode',
+        name: colors.night ? 'Day' : 'Night',
         icon: 'theme-light-dark',
         func: () => {
           if (!colors.night) {
@@ -59,7 +60,7 @@ export const Menu = React.memo(
         style={{
           height: '100%',
           width: '100%',
-          backgroundColor:deviceMode !== "mobile"? colors.nav : colors.bg,
+          backgroundColor: deviceMode !== 'mobile' ? colors.nav : colors.bg,
           paddingTop: insets.top,
         }}>
         <FlatList
@@ -77,7 +78,12 @@ export const Menu = React.memo(
           renderItem={() => (
             <>
               {MenuItemsList.map((item, index) => (
-                <MenuListItem key={item.name} item={item} testID={item.name} index={index} />
+                <MenuListItem
+                  key={item.name}
+                  item={item}
+                  testID={item.name}
+                  index={index}
+                />
               ))}
               <ColorSection noTextMode={noTextMode} />
               <TagsSection />
@@ -85,7 +91,7 @@ export const Menu = React.memo(
           )}
         />
 
-        {BottomItemsList.map((item, index) => (
+        {BottomItemsList.slice(1, 2).map((item, index) => (
           <MenuListItem
             testID={
               item.name == 'Night mode'
@@ -96,16 +102,16 @@ export const Menu = React.memo(
             item={item}
             index={index}
             ignore={true}
-            noTextMode={false}
+            rightBtn={BottomItemsList[0]}
           />
         ))}
+
         <View
           style={{
             width: '100%',
-            paddingHorizontal: 8,
+            paddingHorizontal: 0,
           }}>
           <UserSection noTextMode={noTextMode} />
-          <Seperator />
         </View>
       </View>
     );
