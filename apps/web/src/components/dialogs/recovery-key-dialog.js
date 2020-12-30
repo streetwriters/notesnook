@@ -6,6 +6,7 @@ import { QRCode } from "react-qrcode-logo";
 import Logo from "../../assets/notesnook-small.png";
 import download from "../../utils/download";
 import copyToClipboard from "../../utils/clipboard";
+import Config from "../../utils/config";
 
 function RecoveryKeyDialog(props) {
   const [key, setKey] = useState();
@@ -101,6 +102,11 @@ function RecoveryKeyDialog(props) {
 
 export function showRecoveryKeyDialog() {
   return showDialog((perform) => (
-    <RecoveryKeyDialog onDone={() => perform(true)} />
+    <RecoveryKeyDialog
+      onDone={() => {
+        Config.set("recoveryKeyBackupDate", Date.now());
+        perform(true);
+      }}
+    />
   ));
 }

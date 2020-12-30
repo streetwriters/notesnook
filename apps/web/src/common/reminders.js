@@ -5,6 +5,7 @@ import * as Icon from "../components/icons";
 import dayjs from "dayjs";
 import { showSignUpDialog } from "../components/dialogs/signupdialog";
 import { showToast } from "../utils/toast";
+import { showRecoveryKeyDialog } from "../components/dialogs/recoverykeydialog";
 
 export async function shouldAddBackupReminder() {
   const backupReminderOffset = Config.get("backupReminderOffset", 0);
@@ -15,6 +16,12 @@ export async function shouldAddBackupReminder() {
     backupReminderOffset === 1 ? 1 : backupReminderOffset === 2 ? 7 : 30;
 
   return dayjs(lastBackupTime).add(offsetToDays, "d").isBefore(dayjs());
+}
+
+export async function shouldAddRecoveryKeyBackupReminder() {
+  const recoveryKeyBackupDate = Config.get("recoveryKeyBackupDate", 0);
+  if (!recoveryKeyBackupDate) return false;
+  return dayjs(recoveryKeyBackupDate).add(7, "d").isBefore(dayjs());
 }
 
 export async function shouldAddSignupReminder() {
@@ -46,6 +53,11 @@ export const Reminders = {
     },
     icon: Icon.Email,
   },
+  recoverykey: {
+    title: "Did you backup your recovery key?",
+    action: showRecoveryKeyDialog,
+    icon: Icon.Warn,
+  },
 };
 
 export async function resetReminders() {
@@ -58,5 +70,8 @@ export async function resetReminders() {
   }
   if (await shouldAddConfirmEmailReminder()) {
     appStore.addReminder("email", "high");
+  }
+  if (await shouldAddRecoveryKeyBackupReminder()) {
+    appStore.addReminder("recoverykey", "high");
   }
 }

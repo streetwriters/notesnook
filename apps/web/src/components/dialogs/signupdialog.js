@@ -5,6 +5,7 @@ import Dialog, { showDialog } from "./dialog";
 import { useStore } from "../../stores/user-store";
 import { showLogInDialog } from "./logindialog";
 import Field from "../field";
+import { showRecoveryKeyDialog } from "./recoverykeydialog";
 
 const requiredValues = ["email", "password"];
 function SignUpDialog(props) {
@@ -97,5 +98,12 @@ function SignUpDialog(props) {
 }
 
 export function showSignUpDialog() {
-  return showDialog((perform) => <SignUpDialog onClose={() => perform()} />);
+  return showDialog((perform) => (
+    <SignUpDialog
+      onClose={async () => {
+        perform(true);
+        await showRecoveryKeyDialog();
+      }}
+    />
+  ));
 }
