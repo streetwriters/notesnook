@@ -14,20 +14,21 @@ import {SIZE, WEIGHT} from '../../utils/SizeUtils';
  *
  * @param {TextType | restTypes} props all props
  */
-const Heading = ({color, size= SIZE.xl, style, ...restProps}) => {
+const Heading = ({color, size = SIZE.xl, style, ...restProps}) => {
   const [state] = useTracked();
   const {colors} = state;
 
   return (
     <Text
+      allowFontScaling={true}
+      maxFontSizeMultiplier={1}
       {...restProps}
       style={[
         {
           fontFamily: WEIGHT.bold,
           fontSize: size || SIZE.xl,
           color: color || colors.heading,
-          paddingBottom:
-            Platform.OS === 'ios' ? size*0.25: null,
+          paddingBottom: Platform.OS === 'ios' ? size * 0.25 : null,
         },
         style,
       ]}></Text>

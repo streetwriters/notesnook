@@ -20,6 +20,8 @@ const Paragraph = ({color, size = SIZE.sm, style, ...restProps}) => {
 
   return (
     <Text
+      allowFontScaling
+      maxFontSizeMultiplier={1}
       {...restProps}
       style={[
         {
@@ -27,8 +29,7 @@ const Paragraph = ({color, size = SIZE.sm, style, ...restProps}) => {
           fontSize: size || SIZE.sm,
           color: color || colors.pri,
           fontWeight: '400',
-          paddingBottom:
-            Platform.OS === 'ios' ? size*0.25: null,
+          paddingBottom: Platform.OS === 'ios' ? size * 0.25 : null,
         },
         style,
       ]}></Text>
