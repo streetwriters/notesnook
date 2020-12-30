@@ -4,13 +4,15 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import { getElevation } from '../../utils';
+import {getElevation} from '../../utils';
 import {normalize, SIZE} from '../../utils/SizeUtils';
+import {ActionIcon} from '../ActionIcon';
+import { Button } from '../Button';
 import {PressableButton} from '../PressableButton';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
-export const MenuListItem = ({item, index, noTextMode, testID}) => {
+export const MenuListItem = ({item, index, noTextMode, testID, rightBtn}) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
   const [headerTextState, setHeaderTextState] = useState(null);
@@ -64,7 +66,7 @@ export const MenuListItem = ({item, index, noTextMode, testID}) => {
         paddingHorizontal: 8,
         justifyContent: 'space-between',
         alignItems: 'center',
-        height:normalize(50),
+        height: normalize(50),
       }}>
       <View
         style={{
@@ -73,17 +75,21 @@ export const MenuListItem = ({item, index, noTextMode, testID}) => {
         }}>
         <Icon
           style={{
-            width:  30,
+            width: 30,
             textAlignVertical: 'center',
             textAlign: 'left',
           }}
           name={item.icon}
-          color={headerTextState?.id === item.name.toLowerCase() + '_navigation'? colors.accent : colors.pri}
+          color={
+            headerTextState?.id === item.name.toLowerCase() + '_navigation'
+              ? colors.accent
+              : colors.pri
+          }
           size={SIZE.md}
         />
         {headerTextState?.id === item.name.toLowerCase() + '_navigation' ? (
           <Heading color={colors.accent} size={SIZE.md}>
-            {item.name} 
+            {item.name}
           </Heading>
         ) : (
           <Paragraph size={SIZE.md}>{item.name}</Paragraph>
@@ -96,6 +102,19 @@ export const MenuListItem = ({item, index, noTextMode, testID}) => {
           color={item.on ? colors.accent : colors.icon}
           name={item.on ? 'toggle-switch' : 'toggle-switch-off'}
         />
+      ) : rightBtn ? (
+        <Button 
+        title={rightBtn.name}
+        type="shade"
+        height={25}
+        fontSize={SIZE.xs}
+        iconSize={SIZE.xs}
+        icon={rightBtn.icon}
+        style={{
+          borderRadius:100
+        }}
+        onPress={rightBtn.func}
+        />
       ) : (
         <View
           style={{
@@ -106,7 +125,11 @@ export const MenuListItem = ({item, index, noTextMode, testID}) => {
             width: 7,
             height: 7,
             borderRadius: 100,
-            ...getElevation(headerTextState?.id === item.name.toLowerCase() + '_navigation'? 1 : 0)
+            ...getElevation(
+              headerTextState?.id === item.name.toLowerCase() + '_navigation'
+                ? 1
+                : 0,
+            ),
           }}
         />
       )}
