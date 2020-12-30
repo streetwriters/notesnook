@@ -40,59 +40,62 @@ export const ListHeaderComponent = ({
   ) : (
     <View
       style={{
-        minHeight: 195,
-        padding: 12,
         width: '100%',
-        backgroundColor: COLORS_NOTE[title.toLowerCase()]
-          ? hexToRGBA(COLORS_NOTE[title.toLowerCase()], 0.15)
-          : color || colors.shade,
       }}>
       {messageCard && (
         <MessageCard
           color={COLORS_NOTE[title.toLowerCase()] || colors.accent}
         />
       )}
+      <View
+        style={{
+          minHeight: 195,
+          padding: 12,
+          width: '100%',
+          zIndex: 10,
+          justifyContent: 'flex-end',
+          backgroundColor: COLORS_NOTE[title.toLowerCase()]
+            ? hexToRGBA(COLORS_NOTE[title.toLowerCase()], 0.15)
+            : color || colors.shade,
+        }}>
+        <View
+          style={{
+            right: 0,
+            paddingRight: 12,
+            opacity: 0.5,
+            bottom: 0,
+            paddingHorizontal: 12,
+            position: 'absolute',
+          }}>
+          <Placeholder
+            color={COLORS_NOTE[title.toLowerCase()] || colors.accent}
+            w={normalize(150)}
+            h={normalize(150)}
+            type={type}
+          />
+        </View>
+        <View
+          style={{
+            marginTop: 15,
+          }}>
+          <Heading
+            style={{marginBottom: paragraph ? -10 : 0}}
+            size={SIZE.xxxl * 1.5}>
+            <Heading size={SIZE.xxxl * 1.5} color={colors.accent}>
+              {title.slice(0, 1) === '#' ? '#' : null}
+            </Heading>
 
-      <View
-        style={{
-          right: 0,
-          paddingRight: 12,
-          opacity: 0.5,
-          bottom: 0,
-          paddingHorizontal: 12,
-          position: 'absolute',
-        }}>
-        <Placeholder
-          color={COLORS_NOTE[title.toLowerCase()] || colors.accent}
-          w={normalize(150)}
-          h={normalize(150)}
-          type={type}
-        />
-      </View>
-      <View
-        style={{
-          position: 'absolute',
-          bottom: 0,
-          paddingHorizontal: 12,
-          paddingBottom: 12,
-        }}>
-        <Heading
-          style={{marginBottom: paragraph ? -10 : 0}}
-          size={SIZE.xxxl * 1.5}>
-          <Heading size={SIZE.xxxl * 1.5} color={colors.accent}>
-            {title.slice(0, 1) === '#' ? '#' : null}
+            {title.slice(0, 1) === '#' ? title.slice(1) : title}
           </Heading>
-
-          {title.slice(0, 1) === '#' ? title.slice(1) : title}
-        </Heading>
-        {paragraph && (
-          <Paragraph color={colors.icon}>
-            {'\n'}or
-            <Paragraph onPress={onPress} color={colors.accent}>
-              {' ' + paragraph}
+          {paragraph && (
+            <Paragraph color={colors.icon}>
+              {'\n'}or
+              <Paragraph onPress={onPress} color={colors.accent}>
+                {' ' + paragraph}
+              </Paragraph>
             </Paragraph>
-          </Paragraph>
-        )}
+          )}
+        </View>
       </View>
     </View>
   );
