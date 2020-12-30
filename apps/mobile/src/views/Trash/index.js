@@ -1,4 +1,5 @@
 import React, {useCallback, useEffect, useState} from 'react';
+import { InteractionManager } from 'react-native';
 import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
 import {simpleDialogEvent} from '../../components/DialogManager/recievers';
 import {TEMPLATE_EMPTY_TRASH} from '../../components/DialogManager/Templates';
