@@ -10,7 +10,6 @@ import SearchService from '../../services/SearchService';
 import {eScrollEvent} from '../../utils/Events';
 export const Favorites = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
-  state.favorites.indexOf();
   const favorites = state.favorites;
   const {loading} = state;
 

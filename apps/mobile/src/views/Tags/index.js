@@ -11,7 +11,6 @@ import {eScrollEvent} from '../../utils/Events';
 
 export const Tags = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
-  state.tags.indexOf();
   const tags = state.tags;
   let pageIsLoaded = false;
 

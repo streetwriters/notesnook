@@ -14,7 +14,6 @@ import {eScrollEvent} from '../../utils/Events';
 
 export const Trash = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
-  state.trash.indexOf();
   const trash = state.trash;
   let pageIsLoaded = false;
 

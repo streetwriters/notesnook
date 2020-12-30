@@ -15,7 +15,6 @@ import {tabBarRef} from '../../utils/Refs';
 export const Home = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const {loading} = state;
-  state.notes.indexOf();
   const notes = state.notes;
   let pageIsLoaded = false;
 

@@ -14,7 +14,6 @@ import {DDS} from '../../services/DeviceDetection';
 
 export const Folders = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
-  state.notebooks.indexOf();
   const notebooks = state.notebooks;
   let pageIsLoaded = false;
 
