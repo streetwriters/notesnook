@@ -123,13 +123,13 @@ const PinItem = ({item, index, onPress}) => {
   const color = headerTextState?.id === item.id ? colors.accent : colors.pri;
 
   const onHeaderStateChange = (event) => {
-    InteractionManager.runAfterInteractions(() => {
+  
       if (event?.id === item.id) {
         setHeaderTextState(event);
       } else {
         setHeaderTextState(null);
       }
-    })
+   
   
   };
 

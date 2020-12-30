@@ -7,7 +7,7 @@ import Navigation from '../../services/Navigation';
 import {getElevation} from '../../utils';
 import {normalize, SIZE} from '../../utils/SizeUtils';
 import {ActionIcon} from '../ActionIcon';
-import { Button } from '../Button';
+import {Button} from '../Button';
 import {PressableButton} from '../PressableButton';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
@@ -38,14 +38,11 @@ export const MenuListItem = ({item, index, noTextMode, testID, rightBtn}) => {
   };
 
   const onHeaderStateChange = (event) => {
-    InteractionManager.runAfterInteractions(() => {
-      if (event.id === item.name.toLowerCase() + '_navigation') {
-        setHeaderTextState(event);
-      } else {
-        setHeaderTextState(null);
-      }
-    })
-   
+    if (event.id === item.name.toLowerCase() + '_navigation') {
+      setHeaderTextState(event);
+    } else {
+      setHeaderTextState(null);
+    }
   };
 
   useEffect(() => {
@@ -106,17 +103,17 @@ export const MenuListItem = ({item, index, noTextMode, testID, rightBtn}) => {
           name={item.on ? 'toggle-switch' : 'toggle-switch-off'}
         />
       ) : rightBtn ? (
-        <Button 
-        title={rightBtn.name}
-        type="shade"
-        height={25}
-        fontSize={SIZE.xs}
-        iconSize={SIZE.xs}
-        icon={rightBtn.icon}
-        style={{
-          borderRadius:100
-        }}
-        onPress={rightBtn.func}
+        <Button
+          title={rightBtn.name}
+          type="shade"
+          height={25}
+          fontSize={SIZE.xs}
+          iconSize={SIZE.xs}
+          icon={rightBtn.icon}
+          style={{
+            borderRadius: 100,
+          }}
+          onPress={rightBtn.func}
         />
       ) : (
         <View

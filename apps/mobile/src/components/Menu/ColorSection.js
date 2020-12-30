@@ -38,13 +38,12 @@ const ColorItem = ({item, index}) => {
   const [headerTextState, setHeaderTextState] = useState(null);
 
   const onHeaderStateChange = (event) => {
-    InteractionManager.runAfterInteractions(() => {
       if (event?.id === item.id) {
         setHeaderTextState(event);
       } else {
         setHeaderTextState(null);
       }
-    });
+
   };
 
   useEffect(() => {

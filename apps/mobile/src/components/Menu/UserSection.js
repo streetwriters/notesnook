@@ -1,14 +1,14 @@
 import React from 'react';
-import { ActivityIndicator, TouchableOpacity, View } from 'react-native';
+import {ActivityIndicator, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useTracked } from '../../provider';
-import { eSendEvent, ToastEvent } from '../../services/EventManager';
+import {useTracked} from '../../provider';
+import {eSendEvent, ToastEvent} from '../../services/EventManager';
 import Sync from '../../services/Sync';
-import { eOpenLoginDialog } from '../../utils/Events';
-import { SIZE } from '../../utils/SizeUtils';
+import {eOpenLoginDialog} from '../../utils/Events';
+import {SIZE} from '../../utils/SizeUtils';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
-import { TimeSince } from './TimeSince';
+import {TimeSince} from './TimeSince';
 
 export const UserSection = ({noTextMode}) => {
   const [state, dispatch] = useTracked();
