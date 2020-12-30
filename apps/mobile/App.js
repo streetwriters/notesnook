@@ -33,7 +33,7 @@ import Navigation from './src/services/Navigation';
 import PremiumService from './src/services/PremiumService';
 import SettingsService from './src/services/SettingsService';
 import Sync from './src/services/Sync';
-import { editing, getAppIsIntialized, getIntentOnAppLoadProcessed, setAppIsInitialized, setIntentOnAppLoadProcessed } from './src/utils';
+import { editing, getAppIsIntialized,appIsInitialized, getIntentOnAppLoadProcessed, setAppIsInitialized, setIntentOnAppLoadProcessed } from './src/utils';
 import { COLOR_SCHEME } from './src/utils/Colors';
 import { db } from './src/utils/DB';
 import {
@@ -72,7 +72,7 @@ const onAppStateChanged = async (state) => {
     updateStatusBarColor();
     if (SettingsService.get().privacyScreen) {
       enabled(false);
-    }
+    } 
     if (getAppIsIntialized()) {
       await MMKV.removeItem('appState');
     }
@@ -95,7 +95,7 @@ const onAppStateChanged = async (state) => {
       }
     } catch (e) {}
   } else {
-    if (editing.currentlyEditing && getAppIsInitialized()) {
+    if (editing.currentlyEditing && getAppIsIntialized()) {
       let state = JSON.stringify({
         editing: editing.currentlyEditing,
         note: getNote(),
