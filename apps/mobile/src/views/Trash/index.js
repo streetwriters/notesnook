@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
 import {simpleDialogEvent} from '../../components/DialogManager/recievers';
 import {TEMPLATE_EMPTY_TRASH} from '../../components/DialogManager/Templates';
@@ -15,19 +15,26 @@ import {eScrollEvent} from '../../utils/Events';
 export const Trash = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const trash = state.trash;
+  const [loading, setLoading] = useState(true);
   let pageIsLoaded = false;
 
   const onFocus = useCallback(() => {
-    eSendEvent(eScrollEvent, {name: 'Trash', type: 'in'});
-    if (DDS.isLargeTablet()) {
-      dispatch({
-        type: Actions.CONTAINER_BOTTOM_BUTTON,
-        state: {
-          onPress: null,
-        },
-      });
-    }
-    updateSearch();
+    InteractionManager.runAfterInteractions(() => {
+      if (loading) {
+        setLoading(false);
+      }
+      eSendEvent(eScrollEvent, {name: 'Trash', type: 'in'});
+      if (DDS.isLargeTablet()) {
+        dispatch({
+          type: Actions.CONTAINER_BOTTOM_BUTTON,
+          state: {
+            onPress: null,
+          },
+        });
+      }
+      updateSearch();
+    });
+
     if (!pageIsLoaded) {
       pageIsLoaded = true;
       return;
@@ -48,7 +55,6 @@ export const Trash = ({route, navigation}) => {
     navigation.addListener('focus', onFocus);
     return () => {
       pageIsLoaded = false;
-
       eSendEvent(eScrollEvent, {name: 'Trash', type: 'back'});
       navigation.removeListener('focus', onFocus);
     };
@@ -76,11 +82,13 @@ export const Trash = ({route, navigation}) => {
         data={trash}
         type="trash"
         focused={() => navigation.isFocused()}
+        loading={loading}
         placeholderData={{
           heading: 'Trash',
           paragraph:
             'Items in the trash will be permanently deleted after 7 days.',
           button: null,
+          loading: 'Loading trash items',
         }}
         headerProps={{
           heading: 'Trash',

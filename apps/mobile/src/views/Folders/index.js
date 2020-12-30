@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {AddNotebookEvent} from '../../components/DialogManager/recievers';
 import {Placeholder} from '../../components/ListPlaceholders';
 import SimpleList from '../../components/SimpleList';
@@ -11,23 +11,31 @@ import SearchService from '../../services/SearchService';
 import {eScrollEvent} from '../../utils/Events';
 import Navigation from '../../services/Navigation';
 import {DDS} from '../../services/DeviceDetection';
+import {InteractionManager} from 'react-native';
 
 export const Folders = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const notebooks = state.notebooks;
+  const [loading, setLoading] = useState(true);
   let pageIsLoaded = false;
 
   const onFocus = useCallback(() => {
-    eSendEvent(eScrollEvent, {name: 'Notebooks', type: 'in'});
-    updateSearch();
-    if (DDS.isLargeTablet()) {
-      dispatch({
-        type: Actions.CONTAINER_BOTTOM_BUTTON,
-        state: {
-          onPress: _onPressBottomButton,
-        },
-      });
-    }
+    InteractionManager.runAfterInteractions(() => {
+      if (loading) {
+        setLoading(false);
+      }
+      eSendEvent(eScrollEvent, {name: 'Notebooks', type: 'in'});
+      updateSearch();
+      if (DDS.isLargeTablet()) {
+        dispatch({
+          type: Actions.CONTAINER_BOTTOM_BUTTON,
+          state: {
+            onPress: _onPressBottomButton,
+          },
+        });
+      }
+    });
+
     if (!pageIsLoaded) {
       pageIsLoaded = true;
       return;
@@ -54,7 +62,6 @@ export const Folders = ({route, navigation}) => {
   }, []);
 
   useEffect(() => {
-    console.log('rerendering notebooks yeah')
     if (navigation.isFocused()) {
       updateSearch();
     }
@@ -77,14 +84,16 @@ export const Folders = ({route, navigation}) => {
         type="notebooks"
         focused={() => navigation.isFocused()}
         RenderItem={NotebookItemWrapper}
+        loading={loading}
         placeholderData={{
           heading: 'Your Notebooks',
           paragraph: 'You have not added any notebooks yet.',
           button: 'Add a Notebook',
           action: _onPressBottomButton,
+          loading: 'Loading your notebooks',
         }}
         headerProps={{
-          heading: "Notebooks",
+          heading: 'Notebooks',
         }}
         placeholder={<Placeholder type="notebooks" />}
       />

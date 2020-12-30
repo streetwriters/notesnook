@@ -1,8 +1,7 @@
 import React, {useEffect, useState} from 'react';
+import {InteractionManager} from 'react-native';
 import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
-import {AddTopicEvent} from '../../components/DialogManager/recievers';
 import SimpleList from '../../components/SimpleList';
-import {useTracked} from '../../provider';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -18,13 +17,15 @@ import {
 } from '../../utils/Events';
 
 export const Notebook = ({route, navigation}) => {
-  const [, dispatch] = useTracked();
   const [topics, setTopics] = useState(route.params.notebook.topics);
+  const [loading, setLoading] = useState(true);
   let params = route.params;
   let pageIsLoaded = false;
 
   const onLoad = () => {
-    setTopics(db.notebooks.notebook(route.params.notebook.id).data.topics);
+    InteractionManager.runAfterInteractions(() => {
+      setTopics(db.notebooks.notebook(route.params.notebook.id).data.topics);
+    });
   };
 
   useEffect(() => {
@@ -39,19 +40,26 @@ export const Notebook = ({route, navigation}) => {
   }, []);
 
   const onFocus = async () => {
-    eSendEvent(eScrollEvent, {name: params.title, type: 'in'});
-    if (route.params.menu) {
-      navigation.setOptions({
-        animationEnabled: false,
-        gestureEnabled: false,
-      });
-    } else {
-      navigation.setOptions({
-        animationEnabled: true,
-        gestureEnabled: Platform.OS === 'ios',
-      });
-    }
-    updateSearch();
+    InteractionManager.runAfterInteractions(() => {
+      if (loading) {
+        setLoading(false);
+      }
+      eSendEvent(eScrollEvent, {name: params.title, type: 'in'});
+      if (route.params.menu) {
+        navigation.setOptions({
+          animationEnabled: false,
+          gestureEnabled: false,
+        });
+      } else {
+        navigation.setOptions({
+          animationEnabled: true,
+          gestureEnabled: Platform.OS === 'ios',
+        });
+      }
+      updateSearch();
+     
+    });
+    
     if (!pageIsLoaded) {
       console.log('returning since page is not loaded');
       pageIsLoaded = true;
@@ -102,12 +110,14 @@ export const Notebook = ({route, navigation}) => {
         headerProps={{
           heading: params.title,
         }}
+        loading={loading}
         focused={() => navigation.isFocused()}
         placeholderData={{
           heading: route.params.notebook.title,
           paragraph: 'You have not added any topics yet.',
           button: 'Add a Topic',
           action: _onPressBottomButton,
+          loading: 'Loading notebook topics',
         }}
       />
 

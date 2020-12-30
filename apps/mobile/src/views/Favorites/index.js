@@ -1,4 +1,5 @@
 import React, {useCallback, useEffect} from 'react';
+import {InteractionManager} from 'react-native';
 import {Placeholder} from '../../components/ListPlaceholders';
 import SimpleList from '../../components/SimpleList';
 import {useTracked} from '../../provider';
@@ -11,21 +12,28 @@ import {eScrollEvent} from '../../utils/Events';
 export const Favorites = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const favorites = state.favorites;
+  const [localLoad, setLocalLoad] = React.useState(true);
   const {loading} = state;
 
   let pageIsLoaded = false;
 
   const onFocus = useCallback(() => {
-    eSendEvent(eScrollEvent, {name: 'Favorites', type: 'in'});
-    updateSearch();
-    if (DDS.isLargeTablet()) {
-      dispatch({
-        type: Actions.CONTAINER_BOTTOM_BUTTON,
-        state: {
-          onPress: null,
-        },
-      });
-    }
+    InteractionManager.runAfterInteractions(() => {
+      if (localLoad) {
+        setLocalLoad(false);
+      }
+      eSendEvent(eScrollEvent, {name: 'Favorites', type: 'in'});
+      updateSearch();
+      if (DDS.isLargeTablet()) {
+        dispatch({
+          type: Actions.CONTAINER_BOTTOM_BUTTON,
+          state: {
+            onPress: null,
+          },
+        });
+      }
+    });
+
     if (!pageIsLoaded) {
       pageIsLoaded = true;
       return;
@@ -72,14 +80,15 @@ export const Favorites = ({route, navigation}) => {
       refreshCallback={() => {
         dispatch({type: Actions.FAVORITES});
       }}
-      loading={loading}
+      loading={loading || localLoad}
       placeholderData={{
         heading: 'Your Favorites',
         paragraph: 'You have not added any notes to favorites yet.',
         button: null,
+        loading: 'Loading your favorites',
       }}
       headerProps={{
-        heading: "Favorites",
+        heading: 'Favorites',
       }}
       focused={() => navigation.isFocused()}
       placeholder={<Placeholder type="favorites" />}

@@ -1,4 +1,5 @@
-import React, {useCallback, useEffect} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
+import {InteractionManager} from 'react-native';
 import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
 import SimpleList from '../../components/SimpleList';
 import {useTracked} from '../../provider';
@@ -15,21 +16,28 @@ import {tabBarRef} from '../../utils/Refs';
 export const Home = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const {loading} = state;
+  const [localLoad, setLocalLoad] = useState(true);
   const notes = state.notes;
   let pageIsLoaded = false;
 
   const onFocus = useCallback(() => {
-    updateSearch();
-    eSendEvent(eScrollEvent, {name: 'Notes', type: 'in'});
+    InteractionManager.runAfterInteractions(() => {
+      if (localLoad) {
+        setLocalLoad(false);
+      }
 
-    if (DDS.isLargeTablet()) {
-      dispatch({
-        type: Actions.CONTAINER_BOTTOM_BUTTON,
-        state: {
-          onPress: _onPressBottomButton,
-        },
-      });
-    }
+      updateSearch();
+      eSendEvent(eScrollEvent, {name: 'Notes', type: 'in'});
+
+      if (DDS.isLargeTablet()) {
+        dispatch({
+          type: Actions.CONTAINER_BOTTOM_BUTTON,
+          state: {
+            onPress: _onPressBottomButton,
+          },
+        });
+      }
+    });
 
     if (!pageIsLoaded) {
       pageIsLoaded = true;
@@ -91,7 +99,7 @@ export const Home = ({route, navigation}) => {
         type="notes"
         isHome={true}
         pinned={true}
-        loading={loading}
+        loading={loading || localLoad}
         sortMenuButton={true}
         headerProps={{
           heading: 'Notes',
@@ -103,7 +111,7 @@ export const Home = ({route, navigation}) => {
           paragraph: 'You have not added any notes yet.',
           button: 'Add your First Note',
           action: _onPressBottomButton,
-          loading: 'We are loading your notes.',
+          loading: 'Loading your notes.',
         }}
       />
 

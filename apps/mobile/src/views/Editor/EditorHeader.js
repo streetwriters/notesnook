@@ -1,48 +1,53 @@
-import React, {useEffect} from 'react';
-import {BackHandler, Keyboard, Platform, View} from 'react-native';
+import React, { useEffect } from 'react';
+import {
+  BackHandler,
+  InteractionManager,
+  Keyboard,
+  Platform,
+  View
+} from 'react-native';
 import RNExitApp from 'react-native-exit-app';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {notesnook} from '../../../e2e/test.ids';
-import {ActionIcon} from '../../components/ActionIcon';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { notesnook } from '../../../e2e/test.ids';
+import { ActionIcon } from '../../components/ActionIcon';
 import {
   ActionSheetEvent,
-  simpleDialogEvent,
+  simpleDialogEvent
 } from '../../components/DialogManager/recievers';
-import {TEMPLATE_EXIT_FULLSCREEN} from '../../components/DialogManager/Templates';
-import {useTracked} from '../../provider';
-import {DDS} from '../../services/DeviceDetection';
+import { TEMPLATE_EXIT_FULLSCREEN } from '../../components/DialogManager/Templates';
+import { useTracked } from '../../provider';
+import { DDS } from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-  ToastEvent,
+  ToastEvent
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import {editing} from '../../utils';
-import {exitEditorAnimation} from '../../utils/Animations';
+import { editing } from '../../utils';
 import { db } from '../../utils/DB';
 import {
   eClearEditor,
   eCloseFullscreenEditor,
   eOnLoadNote,
-  eOpenFullscreenEditor,
+  eOpenFullscreenEditor
 } from '../../utils/Events';
-import {sideMenuRef, tabBarRef} from '../../utils/Refs';
-import {EditorTitle} from './EditorTitle';
+import { sideMenuRef, tabBarRef } from '../../utils/Refs';
+import { EditorTitle } from './EditorTitle';
 import {
   checkNote,
   clearEditor,
   clearTimer,
   EditorWebView,
-  getIntent,
+
   getNote,
-  isFromIntent,
+
   isNotedEdited,
   loadNote,
   post,
   saveNote,
   setColors,
-  setIntent,
+  setIntent
 } from './Functions';
 import HistoryComponent from './HistoryComponent';
 
@@ -92,20 +97,22 @@ const EditorHeader = () => {
 
   const load = async (item) => {
     await loadNote(item);
-    Keyboard.addListener('keyboardDidShow', () => {
-      post('keyboard');
+    InteractionManager.runAfterInteractions(() => {
+      Keyboard.addListener('keyboardDidShow', () => {
+        post('keyboard');
+      });
+      if (!DDS.isTab) {
+        handleBack = BackHandler.addEventListener(
+          'hardwareBackPress',
+          _onHardwareBackPress,
+        );
+      }
     });
-    if (!DDS.isTab) {
-      handleBack = BackHandler.addEventListener(
-        'hardwareBackPress',
-        _onHardwareBackPress,
-      );
-    }
   };
 
   const onCallClear = async () => {
     if (editing.currentlyEditing) {
-      await _onBackPress()
+      await _onBackPress();
     }
   };
 
@@ -240,7 +247,7 @@ const EditorHeader = () => {
               marginLeft: 10,
             }}
             onPress={() => {
-              let note = getNote() && db.notes.note(getNote().id).data
+              let note = getNote() && db.notes.note(getNote().id).data;
               ActionSheetEvent(
                 note,
                 true,

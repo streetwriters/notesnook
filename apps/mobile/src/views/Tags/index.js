@@ -1,4 +1,5 @@
-import React, {useCallback, useEffect} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
+import {InteractionManager} from 'react-native';
 import {Placeholder} from '../../components/ListPlaceholders';
 import SimpleList from '../../components/SimpleList';
 import {useTracked} from '../../provider';
@@ -12,19 +13,26 @@ import {eScrollEvent} from '../../utils/Events';
 export const Tags = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const tags = state.tags;
+  const [loading, setLoading] = useState(true);
   let pageIsLoaded = false;
 
   const onFocus = useCallback(() => {
-    eSendEvent(eScrollEvent, {name: 'Tags', type: 'in'});
-    if (DDS.isLargeTablet()) {
-      dispatch({
-        type: Actions.CONTAINER_BOTTOM_BUTTON,
-        state: {
-          onPress: null,
-        },
-      });
-    }
-    updateSearch();
+    InteractionManager.runAfterInteractions(() => {
+      if (loading) {
+        setLoading(false);
+      }
+      eSendEvent(eScrollEvent, {name: 'Tags', type: 'in'});
+      if (DDS.isLargeTablet()) {
+        dispatch({
+          type: Actions.CONTAINER_BOTTOM_BUTTON,
+          state: {
+            onPress: null,
+          },
+        });
+      }
+      updateSearch();
+    });
+
     if (!pageIsLoaded) {
       pageIsLoaded = true;
       return;
@@ -69,13 +77,15 @@ export const Tags = ({route, navigation}) => {
       data={tags}
       type="tags"
       headerProps={{
-        heading: "Tags",
+        heading: 'Tags',
       }}
+      loading={loading}
       focused={() => navigation.isFocused()}
       placeholderData={{
         heading: 'Your Tags',
         paragraph: 'You have not created any tags for your notes yet.',
         button: null,
+        loading: 'Loading your tags.',
       }}
       placeholder={<Placeholder type="tags" />}
       placeholderText="Tags added to notes appear here"

@@ -1,6 +1,7 @@
 import React, {createRef, useCallback, useEffect, useState} from 'react';
 import {
   Appearance,
+  InteractionManager,
   Linking,
   Platform,
   ScrollView,
@@ -771,30 +772,32 @@ const SettingsPrivacyAndSecurity = () => {
   });
 
   const checkVaultStatus = useCallback(() => {
-    db.vault.add('check_no_vault').catch(async (e) => {
-      let biometry = await Keychain.getSupportedBiometryType();
-      let fingerprint = await Keychain.hasInternetCredentials('nn_vault');
+    InteractionManager.runAfterInteractions(() => {
+      db.vault.add('check_no_vault').catch(async (e) => {
+        let biometry = await Keychain.getSupportedBiometryType();
+        let fingerprint = await Keychain.hasInternetCredentials('nn_vault');
 
-      let available = false;
-      if (
-        biometry === Keychain.BIOMETRY_TYPE.FINGERPRINT ||
-        biometry === Keychain.BIOMETRY_TYPE.TOUCH_ID
-      ) {
-        available = true;
-      }
-      if (e.message === db.vault.ERRORS.noVault) {
-        setVaultStatus({
-          exists: false,
-          biometryEnrolled: fingerprint,
-          isBiometryAvailable: available,
-        });
-      } else {
-        setVaultStatus({
-          exists: true,
-          biometryEnrolled: fingerprint,
-          isBiometryAvailable: available,
-        });
-      }
+        let available = false;
+        if (
+          biometry === Keychain.BIOMETRY_TYPE.FINGERPRINT ||
+          biometry === Keychain.BIOMETRY_TYPE.TOUCH_ID
+        ) {
+          available = true;
+        }
+        if (e.message === db.vault.ERRORS.noVault) {
+          setVaultStatus({
+            exists: false,
+            biometryEnrolled: fingerprint,
+            isBiometryAvailable: available,
+          });
+        } else {
+          setVaultStatus({
+            exists: true,
+            biometryEnrolled: fingerprint,
+            isBiometryAvailable: available,
+          });
+        }
+      });
     });
   });
 
