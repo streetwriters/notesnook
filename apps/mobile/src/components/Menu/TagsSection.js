@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {FlatList, View} from 'react-native';
+import {FlatList, InteractionManager, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
@@ -123,11 +123,14 @@ const PinItem = ({item, index, onPress}) => {
   const color = headerTextState?.id === item.id ? colors.accent : colors.pri;
 
   const onHeaderStateChange = (event) => {
-    if (event?.id === item.id) {
-      setHeaderTextState(event);
-    } else {
-      setHeaderTextState(null);
-    }
+    InteractionManager.runAfterInteractions(() => {
+      if (event?.id === item.id) {
+        setHeaderTextState(event);
+      } else {
+        setHeaderTextState(null);
+      }
+    })
+  
   };
 
   useEffect(() => {

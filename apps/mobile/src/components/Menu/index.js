@@ -13,8 +13,6 @@ import {
 } from '../../utils/Colors';
 import {MenuItemsList} from '../../utils/index';
 import {MMKV} from '../../utils/mmkv';
-import {ActionIcon} from '../ActionIcon';
-import Seperator from '../Seperator';
 import {ColorSection} from './ColorSection';
 import {MenuListItem} from './MenuListItem';
 import {TagsSection} from './TagsSection';

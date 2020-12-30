@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {View} from 'react-native';
+import {InteractionManager, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
@@ -38,11 +38,14 @@ export const MenuListItem = ({item, index, noTextMode, testID, rightBtn}) => {
   };
 
   const onHeaderStateChange = (event) => {
-    if (event.id === item.name.toLowerCase() + '_navigation') {
-      setHeaderTextState(event);
-    } else {
-      setHeaderTextState(null);
-    }
+    InteractionManager.runAfterInteractions(() => {
+      if (event.id === item.name.toLowerCase() + '_navigation') {
+        setHeaderTextState(event);
+      } else {
+        setHeaderTextState(null);
+      }
+    })
+   
   };
 
   useEffect(() => {

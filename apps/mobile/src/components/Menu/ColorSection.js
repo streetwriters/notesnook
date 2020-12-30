@@ -38,12 +38,13 @@ const ColorItem = ({item, index}) => {
   const [headerTextState, setHeaderTextState] = useState(null);
 
   const onHeaderStateChange = (event) => {
-   
-    if (event.id === item.id) {
-      setHeaderTextState(event);
-    } else {
-      setHeaderTextState(null);
-    }
+    InteractionManager.runAfterInteractions(() => {
+      if (event?.id === item.id) {
+        setHeaderTextState(event);
+      } else {
+        setHeaderTextState(null);
+      }
+    });
   };
 
   useEffect(() => {
@@ -128,7 +129,9 @@ const ColorItem = ({item, index}) => {
           width: 7,
           height: 7,
           borderRadius: 100,
-          ...getElevation(headerTextState?.id === item.id + '_navigation'? 1 : 0)
+          ...getElevation(
+            headerTextState?.id === item.id + '_navigation' ? 1 : 0,
+          ),
         }}
       />
     </PressableButton>
