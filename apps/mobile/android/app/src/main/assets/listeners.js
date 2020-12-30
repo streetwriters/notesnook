@@ -114,7 +114,11 @@ function attachEditorListeners() {
 
   editor.on('text-change', function (delta, oldDelta, source) {
     var regex = /https?:\/\/[^\s]+$/;
-    if (source === 'api') return;
+
+   if (source === "custom") {
+     return;
+   }
+
     if (
       delta.ops.length === 2 &&
       delta.ops[0].retain &&
@@ -192,9 +196,9 @@ function attachMessageListener() {
     }
     switch (type) {
       case 'reset': {
-        editor.setSelection(0,0,'user');
+
         editor.history.clear();
-        editor.setText('', 'api');
+        editor.setText('', 'custom');
         document.getElementById(titleInput).value = '';
         document.getElementById(titleInput).blur();
         editor.blur();
@@ -206,22 +210,25 @@ function attachMessageListener() {
         info.querySelector('#infosaved').innerText = '';
         info.querySelector('#infowords').innerText = '';
         autosize();
+        editor.getModule("imageResize").hideOverlay();
         break;
       }
       case 'keyboard':
         var range = editor.getSelection();
-        
+
         if (range) {
           if (range.length === 0) {
-
             let correction = isTablet ? 265 : 110;
             setTimeout(() => {
-              document
-              .querySelector('.app-main')
-             .scrollTo({top: editor.getBounds(editor.getSelection().index).bottom - (window.innerHeight - correction), behavior: "smooth"});
-            }, 200); 
+              document.querySelector('.app-main').scrollTo({
+                top:
+                  editor.getBounds(editor.getSelection().index).bottom -
+                  (window.innerHeight - correction),
+                behavior: 'smooth',
+              });
+            }, 200);
           }
-        } 
+        }
         break;
       case 'blur':
         document.getElementById(titleInput).blur();
@@ -246,7 +253,7 @@ function attachMessageListener() {
         info.querySelector('#infosaved').innerText = value;
         break;
       case 'text':
-        editor.setText(value, 'api');
+        editor.setText(value, 'custom');
 
         setTimeout(() => {
           info = document.querySelector(infoBar);
@@ -257,8 +264,8 @@ function attachMessageListener() {
 
         break;
       case 'clearEditor':
-        editor.setSelection(0,0,'user');
-        editor.setText('', 'api');
+        editor.setSelection(0, 0, 'user');
+        editor.setText('', 'custom');
         break;
       case 'clearTitle':
         document.getElementById(titleInput).value = '';
@@ -298,7 +305,7 @@ function attachMessageListener() {
 
       case 'delta':
         const content = value;
-        editor.setContents(content, 'api');
+        editor.setContents(content, 'custom');
 
         setTimeout(() => {
           info = document.querySelector(infoBar);
@@ -306,13 +313,13 @@ function attachMessageListener() {
             editor.getText().split(' ').length + ' words';
           info.querySelector('#infosaved').innerText = 'Saved';
 
-          document.body.scrollTop = 0; // For Safari 
+          document.body.scrollTop = 0; // For Safari
           document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
         }, 100);
         autosize();
         break;
       case 'html':
-        editor.setContents(editor.clipboard.convert(value, 'api'), 'silent');
+        editor.setContents(editor.clipboard.convert(value, 'custom'), 'silent');
         /*  setTimeout(() => {
                    editor.setSelection(editor.getText().length - 1, 0);
                  }, 0); */
