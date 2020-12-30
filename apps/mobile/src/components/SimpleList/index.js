@@ -48,6 +48,7 @@ const SimpleList = ({
   const [state, dispatch] = useTracked();
   const {colors, searchResults, headerTextState} = state;
   const [refreshing, setRefreshing] = useState(false);
+
   const [dataProvider, setDataProvider] = useState(
     new DataProvider((r1, r2) => {
       return r1 !== r2;
@@ -55,7 +56,7 @@ const SimpleList = ({
   );
   const insets = useSafeAreaInsets();
 
-  const {width, fontScale,height} = useWindowDimensions();
+  const {width, fontScale, height} = useWindowDimensions();
 
   const listData = data;
   const dataType = type;
@@ -67,9 +68,10 @@ const SimpleList = ({
 
   useEffect(() => {
     loadData();
-  }, [listData, searchResults.results]);
+  }, [data, searchResults.results,loading]);
 
   const loadData = () => {
+    if (loading) return;
     let mainData = [header, {type: 'empty'}];
     mainData =
       !listData || listData.length === 0 ? mainData : [header, ...listData];
@@ -269,6 +271,7 @@ const SimpleList = ({
       rowRenderer={_renderRow}
       onScroll={_onScroll}
       canChangeSize={true}
+      optimizeForInsertDeleteAnimations
       forceNonDeterministicRendering
       renderFooter={() => <View style={{height: 300}} />}
       scrollViewProps={{
