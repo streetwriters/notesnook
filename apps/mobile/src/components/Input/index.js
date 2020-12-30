@@ -4,11 +4,13 @@ import {TextInput} from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider/index';
 import {
+  ERRORS_LIST,
   validateEmail,
   validatePass,
   validateUsername,
 } from '../../services/Validation';
 import {getElevation} from '../../utils';
+import {hexToRGBA, RGB_Linear_Shade} from '../../utils/ColorUtils';
 import {SIZE, WEIGHT} from '../../utils/SizeUtils';
 import {ActionIcon} from '../ActionIcon';
 import Paragraph from '../Typography/Paragraph';
@@ -39,17 +41,31 @@ const Input = ({
   const [focus, setFocus] = useState(false);
   const [secureEntry, setSecureEntry] = useState(true);
   const [showError, setShowError] = useState(false);
+  const [errorList, setErrorList] = useState({
+    SHORT_PASS: true,
+    NO_ABC: true,
+    NO_CAPS_ABC: true,
+    NO_NUM: true,
+    SPECIAL: true,
+  });
   const color = error
     ? colors.red
     : focus
     ? customColor || colors.accent
     : colors.nav;
 
-  const validate = () => {
+  const validate = (value) => {
     if (!validationType) return;
     if (!value || value?.length === 0) {
       setError(false);
       onErrorCheck(false);
+      setErrorList({
+        SHORT_PASS: true,
+        NO_ABC: true,
+        NO_CAPS_ABC: true,
+        NO_NUM: true,
+        SPECIAL: true,
+      });
       return;
     }
     let isError = false;
@@ -68,16 +84,28 @@ const Input = ({
         break;
     }
     console.log('isError', isError, error);
-    setError(!isError);
-    onErrorCheck(!isError);
+
+    if (validationType === 'password') {
+      let hasError = false;
+
+      Object.keys(isError).forEach((e) => {
+        if (isError[e] === true) {
+          hasError = true;
+        }
+      });
+      setError(hasError);
+      onErrorCheck(hasError);
+      setErrorList(isError);
+    } else {
+      setError(!isError);
+      onErrorCheck(!isError);
+    }
   };
 
   const onChange = (value) => {
     onChangeText(value);
     setValue(value);
-    if (error) {
-      validate();
-    }
+    validate(value);
   };
 
   const onBlur = () => {
@@ -215,6 +243,37 @@ const Input = ({
           </View>
         ) : null}
       </View>
+
+      {validationType === 'password' && focus && (
+        <View
+          style={{
+            paddingTop: 5,
+          }}>
+          {Object.keys(errorList).filter((k) => errorList[k] === true)
+            .length !== 0 ? (
+            Object.keys(ERRORS_LIST).map((error) => (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                }}>
+                <Icon
+                  name={errorList[error] ? 'close' : 'check'}
+                  color={errorList[error] ? 'red' : 'green'}
+                />
+
+                <Paragraph style={{marginLeft: 5}} size={SIZE.xs}>
+                  {ERRORS_LIST[error]}
+                </Paragraph>
+              </View>
+            ))
+          ) : (
+            <Paragraph color={colors.green} size={SIZE.xs}>
+              Password is strong.
+            </Paragraph>
+          )}
+        </View>
+      )}
     </>
   );
 };
