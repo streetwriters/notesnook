@@ -1,123 +1,94 @@
 import React from 'react';
-import {ActivityIndicator, TouchableOpacity, View} from 'react-native';
+import { ActivityIndicator, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useTracked} from '../../provider';
-import {DDS} from '../../services/DeviceDetection';
-import {eSendEvent} from '../../services/EventManager';
+import { useTracked } from '../../provider';
+import { eSendEvent, ToastEvent } from '../../services/EventManager';
 import Sync from '../../services/Sync';
-import {eOpenLoginDialog} from '../../utils/Events';
-import {pv, SIZE} from '../../utils/SizeUtils';
-import {PressableButton} from '../PressableButton';
+import { eOpenLoginDialog } from '../../utils/Events';
+import { SIZE } from '../../utils/SizeUtils';
+import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
-import {TimeSince} from './TimeSince';
+import { TimeSince } from './TimeSince';
 
 export const UserSection = ({noTextMode}) => {
   const [state, dispatch] = useTracked();
   const {colors, syncing, user, lastSynced} = state;
 
-  return user && user?.email ? (
+  return (
     <View
       style={{
         width: '100%',
-        borderRadius: 5,
         alignSelf: 'center',
-        backgroundColor: colors.shade,
-        marginTop: 10,
+        backgroundColor: colors.nav,
       }}>
-      <TouchableOpacity
-        activeOpacity={0.8}
-        onPress={Sync.run}
+      <View
         style={{
           flexDirection: 'row',
           justifyContent: 'space-between',
           alignItems: 'center',
-          paddingRight: 12,
-          paddingLeft: 6,
-          paddingVertical: 12,
+          paddingRight: 8,
+          paddingLeft: 8,
+          paddingVertical: 5,
         }}>
-        <View>
-          <Paragraph
-            size={DDS.isLargeTablet() ? SIZE.xxs : SIZE.xs}
-            color={colors.icon}
-            style={{
-              color: colors.icon,
-            }}>
-            {syncing ? 'Syncing ' : 'Last synced: '}
-            {!syncing ? (
-              lastSynced !== 'Never' ? (
-                <TimeSince time={lastSynced} />
-              ) : (
-                'never'
-              )
-            ) : null}
-          </Paragraph>
-          <Paragraph color={colors.accent}>
-            {syncing ? 'Fetching your notes ' : 'Tap to sync '}
-          </Paragraph>
-        </View>
-        {syncing ? (
-          <ActivityIndicator size={SIZE.lg} color={colors.accent} />
-        ) : (
-          <Icon color={colors.accent} name="sync" size={SIZE.lg} />
-        )}
-      </TouchableOpacity>
-    </View>
-  ) : (
-    <PressableButton
-      onPress={() => {
-        eSendEvent(eOpenLoginDialog);
-      }}
-      type="shade"
-      customStyle={{
-        paddingVertical: 12,
-        marginVertical: 5,
-        marginTop: pv + 5,
-        borderRadius: 5,
-        width: '100%',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'flex-start',
-        paddingHorizontal: 8,
-      }}>
-      <View
-        style={{
-          width: 30,
-          backgroundColor: noTextMode ? 'transparent' : colors.accent,
-          height: 30,
-          borderRadius: 100,
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}>
-        <Icon
-          style={{
-            textAlign: 'center',
-            textAlignVertical: 'center',
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={() => {
+            if (user) {
+              ToastEvent.show('Logged in as ' + user?.email, 'success');
+            } else {
+              eSendEvent(eOpenLoginDialog);
+            }
           }}
-          name={noTextMode ? 'login-variant' : 'account-outline'}
-          color={noTextMode ? colors.accent : 'white'}
-          size={noTextMode ? SIZE.md + 5 : SIZE.md + 1}
-        />
-      </View>
-      {noTextMode ? null : (
-        <View
           style={{
-            marginLeft: DDS.isLargeTablet() ? 5 : 10,
-            flex: 1,
+            flexDirection: 'row',
+            alignItems: 'center',
           }}>
-          {DDS.isLargeTablet() ? null : (
-            <Paragraph size={SIZE.xs} color={colors.icon}>
-              You are not logged in
-            </Paragraph>
-          )}
-          <Paragraph
+          <View
             style={{
-              flexWrap: 'wrap',
+              height: 8,
+              width: 8,
+              backgroundColor: !user ? colors.red : colors.green,
+              borderRadius: 100,
+              marginRight: 5,
             }}
-            color={colors.accent}>
-            Login to sync notes.
-          </Paragraph>
-        </View>
-      )}
-    </PressableButton>
+          />
+          <Heading size={SIZE.sm} color={colors.heading}>
+            {!user ? 'Not Logged in' : 'Logged in'}
+          </Heading>
+        </TouchableOpacity>
+
+        {user && (
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={Sync.run}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+            }}>
+            <Paragraph
+              style={{
+                marginRight: 5,
+              }}
+              size={SIZE.xs}
+              color={syncing ? colors.accent : colors.icon}>
+              {syncing ? 'Syncing' : 'Synced '}
+
+              {!syncing ? (
+                lastSynced && lastSynced !== 'Never' ? (
+                  <TimeSince style={{fontSize: SIZE.xs}} time={lastSynced} />
+                ) : (
+                  'never'
+                )
+              ) : null}
+            </Paragraph>
+            {syncing ? (
+              <ActivityIndicator size={SIZE.md} color={colors.accent} />
+            ) : (
+              <Icon color={colors.accent} name="sync" size={SIZE.md} />
+            )}
+          </TouchableOpacity>
+        )}
+      </View>
+    </View>
   );
 };
