@@ -1,10 +1,10 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {TouchableOpacity, View, UIManager, ViewBase} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {eSendEvent, openVault, ToastEvent} from '../../services/EventManager';
-import {getElevation, showTooltip} from '../../utils';
+import {dWidth, getElevation} from '../../utils';
 import {hexToRGBA} from '../../utils/ColorUtils';
 import {db} from '../../utils/DB';
 import {refreshNotesPage} from '../../utils/Events';
@@ -89,6 +89,7 @@ const ActionStrip = ({note, setActionStrip}) => {
   const [state, dispatch] = useTracked();
   const {colors, selectionMode} = state;
   const [isPinnedToMenu, setIsPinnedToMenu] = useState(false);
+  const [width, setWidth] = useState(dWidth);
   useEffect(() => {
     if (note.type === 'note') return;
     setIsPinnedToMenu(db.settings.isPinned(note.id));
@@ -246,6 +247,7 @@ const ActionStrip = ({note, setActionStrip}) => {
 
   return (
     <View
+      onLayout={(event) => setWidth(event.nativeEvent.layout.width)}
       style={{
         position: 'absolute',
         zIndex: 10,
@@ -280,8 +282,8 @@ const ActionStrip = ({note, setActionStrip}) => {
             <View
               key={item.icon}
               style={{
-                width: 40,
-                height: 40,
+                width: width / 1.4 / actions.length,
+                height: width / 1.4 / actions.length,
                 backgroundColor: item.bg || colors.nav,
                 borderRadius: 100,
                 justifyContent: 'center',
@@ -293,8 +295,10 @@ const ActionStrip = ({note, setActionStrip}) => {
                 color={item.color || colors.heading}
                 onPress={item.onPress}
                 tooltipText={item.title}
+                top={60}
+                bottom={60}
                 name={item.icon}
-                size={SIZE.lg}
+                size={width / 2.8 / actions.length}
               />
             </View>
           ),
