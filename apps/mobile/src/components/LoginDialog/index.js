@@ -20,7 +20,6 @@ import {db} from '../../utils/DB';
 import {
   eOpenLoginDialog,
   eOpenRecoveryKeyDialog,
-  eStartSyncer,
   refreshNotesPage,
 } from '../../utils/Events';
 import {MMKV} from '../../utils/mmkv';
@@ -483,27 +482,32 @@ const LoginDialog = () => {
             )}
 
             {mode === MODES.forgotPassword ? null : (
-              <Input
-                fwdRef={_pass}
-                onChangeText={(value) => {
-                  password = value;
-                }}
-                onErrorCheck={(r) => {
-                  setError(r);
-                }}
-                marginBottom={0}
-                validationType="password"
-                secureTextEntry
-                placeholder="Password"
-                errorMessage="Password is invalid"
-                onSubmit={() => {
-                  if (mode === MODES.signup || mode === MODES.changePassword) {
-                    _passConfirm.current?.focus();
-                  } else {
-                    current.buttonFunc();
-                  }
-                }}
-              />
+              <>
+                <Input
+                  fwdRef={_pass}
+                  onChangeText={(value) => {
+                    password = value;
+                  }}
+                  onErrorCheck={(r) => {
+                    setError(r);
+                  }}
+                  marginBottom={0}
+                  validationType={mode === MODES.signup ? 'password' : 'null'}
+                  secureTextEntry
+                  placeholder="Password"
+                  errorMessage="Password is invalid"
+                  onSubmit={() => {
+                    if (
+                      mode === MODES.signup ||
+                      mode === MODES.changePassword
+                    ) {
+                      _passConfirm.current?.focus();
+                    } else {
+                      current.buttonFunc();
+                    }
+                  }}
+                />
+              </>
             )}
 
             {mode === MODES.login && (
