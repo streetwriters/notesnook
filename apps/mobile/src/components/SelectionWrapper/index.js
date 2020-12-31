@@ -1,14 +1,20 @@
 import React, {useEffect, useState} from 'react';
-import {TouchableOpacity, View,Clipboard} from 'react-native';
+import {TouchableOpacity, View, Clipboard} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
-import {eSendEvent, openVault, ToastEvent} from '../../services/EventManager';
+import {
+  eSendEvent,
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+  openVault,
+  ToastEvent,
+} from '../../services/EventManager';
 import {dWidth, getElevation, toTXT} from '../../utils';
 import {hexToRGBA} from '../../utils/ColorUtils';
 import {db} from '../../utils/DB';
 import {refreshNotesPage} from '../../utils/Events';
-import { deleteItems } from '../../utils/functions';
+import {deleteItems} from '../../utils/functions';
 import {SIZE} from '../../utils/SizeUtils';
 import {ActionIcon} from '../ActionIcon';
 import {Button} from '../Button';
@@ -341,10 +347,22 @@ const SelectionWrapper = ({
     }
   }, [selectedItemsList]);
 
-  onLong = () => {
+  const onLong = () => {
     if (selectionMode) return;
     setActionStrip(!actionStrip);
   };
+
+  const closeStrip = () => {
+    setActionStrip(false);
+  };
+
+  useEffect(() => {
+    eSubscribeEvent('navigate', closeStrip);
+
+    return () => {
+      eUnSubscribeEvent('navigate', closeStrip);
+    };
+  }, []);
 
   return (
     <PressableButton
