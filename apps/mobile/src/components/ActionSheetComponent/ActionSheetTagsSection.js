@@ -138,6 +138,7 @@ export const ActionSheetTagsSection = ({item, close}) => {
       );
     } else {
       _suggestions = tags
+        .slice()
         .sort(function (x, y) {
           return x.dateEdited - y.dateEdited;
         })
