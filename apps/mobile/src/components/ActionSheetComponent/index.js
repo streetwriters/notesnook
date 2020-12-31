@@ -449,6 +449,7 @@ export const ActionSheetComponent = ({
         .then((r) => {
           console.log(r);
           sendNoteEditedEvent(note.id, false, true);
+          localRefresh(note.type);
           if (note.locked && PremiumService.get()) {
             close();
           }
