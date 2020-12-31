@@ -6,7 +6,7 @@ import {db} from './DB';
 import {eClearEditor, eOnNewTopicAdded, refreshNotesPage} from './Events';
 
 export const deleteItems = async (item) => {
-  if (item && item.dateCreated && history.selectedItemsList.length === 0) {
+  if (item && item.id && history.selectedItemsList.length === 0) {
     history.selectedItemsList = [];
     history.selectedItemsList.push(item);
   }
