@@ -129,6 +129,8 @@ export const ActionSheetTagsSection = ({item, close}) => {
   });
 
   const getSuggestions = (query) => {
+    if (!note || !note?.id) return;
+
     prevQuery = query;
     let _suggestions;
     if (query) {
