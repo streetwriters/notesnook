@@ -38,7 +38,8 @@ export class AddTopicDialog extends React.Component {
       return ToastEvent.show('Title is required', 'error', 'local');
 
     if (!this.props.toEdit) {
-      await db.notebooks.notebook(this.props.notebookID).topics.add(this.title);
+      await db.notebooks.notebook(this.notebook.id).topics.add(this.title);
+
     } else {
       let topic = this.props.toEdit;
       topic.title = this.title;
@@ -61,7 +62,8 @@ export class AddTopicDialog extends React.Component {
 
   open = async (notebookId) => {
     let id = notebookId || this.props.notebookID;
-    this.notebook = await db.notebooks.notebook(id);
+    console.log(notebookId)
+    this.notebook = await db.notebooks.notebook(id).data
     this.setState({
       visible: true,
     });
