@@ -28,7 +28,6 @@ export const UserSection = ({noTextMode}) => {
           alignItems: 'center',
           paddingRight: 8,
           paddingLeft: 8,
-          paddingVertical: 10,
         }}>
         <TouchableOpacity
           activeOpacity={0.8}
@@ -42,6 +41,7 @@ export const UserSection = ({noTextMode}) => {
           style={{
             flexDirection: 'row',
             alignItems: 'center',
+            paddingVertical:10
           }}>
           <View
             style={{
@@ -64,6 +64,7 @@ export const UserSection = ({noTextMode}) => {
             style={{
               flexDirection: 'row',
               alignItems: 'center',
+              paddingVertical:10
             }}>
             <Paragraph
               style={{
