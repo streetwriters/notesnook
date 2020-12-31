@@ -106,14 +106,14 @@ class EditorStore extends BaseStore {
 
     this._saveFn()(this.get().session).then(async (id) => {
       /* eslint-disable */
-      storeSync: if (oldSession) {
-        if (oldSession.tags.length !== this.get().session.tags.length)
+      storeSync: {
+        const session = this.get().session;
+        if (oldSession?.tags?.length !== session.tags.length)
           tagStore.refresh();
 
-        if (oldSession.color !== this.get().session.color)
-          appStore.refreshColors();
+        if (oldSession?.color !== session.color) appStore.refreshColors();
 
-        if (!oldSession.context) break storeSync;
+        if (!oldSession?.context) break storeSync;
 
         const { type, value } = oldSession.context;
         if (type === "topic") await db.notes.move(value, id);
@@ -127,9 +127,12 @@ class EditorStore extends BaseStore {
       }
 
       this.set((state) => {
+        const note = db.notes.note(id).data;
         state.session.id = id;
-        state.session.title = db.notes.note(id).title;
+        state.session.title = note.title;
         state.session.isSaving = false;
+        state.session.color = note.color;
+        state.session.tags = note.tags;
       });
 
       noteStore.refresh();
