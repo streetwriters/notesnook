@@ -150,7 +150,7 @@ export class VaultDialog extends Component {
   onPress = async () => {
     if (this.state.revokeFingerprintAccess) {
       await this._revokeFingerprintAccess();
-      close();
+      this.close();
       return;
     }
     if (this.state.loading) return;
@@ -223,7 +223,7 @@ export class VaultDialog extends Component {
         .catch((e) => {
           this._takeErrorAction(e);
         });
-    } else if (this.state.fingerprintEnroll) {
+    } else if (this.state.fingerprintAccess) {
       this._enrollFingerprint(this.password);
     }
   };
@@ -286,6 +286,9 @@ export class VaultDialog extends Component {
         authenticationPrompt: {cancel: null},
         accessible: Keychain.AUTHENTICATION_TYPE.DEVICE_PASSCODE_OR_BIOMETRICS,
       });
+      eSendEvent('vaultUpdated');
+      ToastEvent.show('Fingerprint access enabled!', 'success');
+      this.close();
     } catch (e) {
       this._takeErrorAction(e);
     }
@@ -350,10 +353,9 @@ export class VaultDialog extends Component {
         failOnCancel: false,
         message: m,
       });
-    } catch(e) {
-      console.log(e)
+    } catch (e) {
+      console.log(e);
     }
-  
   }
 
   _takeErrorAction(e) {
