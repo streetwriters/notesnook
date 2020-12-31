@@ -1,10 +1,10 @@
 import React, {useEffect, useState} from 'react';
-import {TouchableOpacity, View} from 'react-native';
+import {TouchableOpacity, View,Clipboard} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {eSendEvent, openVault, ToastEvent} from '../../services/EventManager';
-import {dWidth, getElevation} from '../../utils';
+import {dWidth, getElevation, toTXT} from '../../utils';
 import {hexToRGBA} from '../../utils/ColorUtils';
 import {db} from '../../utils/DB';
 import {refreshNotesPage} from '../../utils/Events';
@@ -187,8 +187,8 @@ const ActionStrip = ({note, setActionStrip}) => {
             item: note,
           });
         } else {
-          let text = await db.notes.note(note.id).content();
-          text = toTXT(text);
+          let delta = await db.notes.note(note.id).content();
+          let text = toTXT(delta);
           text = `${note.title}\n \n ${text}`;
           Clipboard.setString(text);
           ToastEvent.show('Note copied to clipboard', 'success');
