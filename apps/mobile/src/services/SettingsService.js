@@ -7,7 +7,9 @@ import {MMKV} from '../utils/mmkv';
 import {scale, updateSize} from '../utils/SizeUtils';
 import {enabled} from 'react-native-privacy-snapshot';
 import {Platform} from 'react-native';
+
 let settings = defaultState.settings;
+
 let appLoaded = false;
 
 function setAppLoaded() {
@@ -62,10 +64,11 @@ const setTheme = async () => {
 async function set(name, value) {
   settings[name] = value;
   await MMKV.setStringAsync('appSettings', JSON.stringify(settings));
-  updateEvent({type: Actions.SETTINGS, settings: settings});
+  updateEvent({type: Actions.SETTINGS, settings: {...settings}});
 }
 
 function get() {
+  console.log(settings.useSystemTheme,'getting')
   return settings;
 }
 

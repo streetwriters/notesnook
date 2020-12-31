@@ -550,8 +550,8 @@ const SettingsUserSection = () => {
 
 const SettingsAppearanceSection = () => {
   const [state, dispatch] = useTracked();
-  const {colors, settings} = state;
-
+  const {colors} = state;
+  const settings = {...state.settings};
   function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
     let newColors = setColorScheme(colors, accent);
     dispatch({type: Actions.THEME, colors: newColors});
@@ -565,9 +565,11 @@ const SettingsAppearanceSection = () => {
 
   const switchTheme = async () => {
     await PremiumService.verify(async () => {
-      await SettingsService.set('useSystemTheme', !settings.useSystemTheme);
-
-      if (!settings.useSystemTheme) {
+      await SettingsService.set(
+        'useSystemTheme',
+        SettingsService.get().useSystemTheme ? false : true,
+      );
+      if (SettingsService.get().useSystemTheme) {
         await MMKV.setStringAsync(
           'theme',
           JSON.stringify({night: Appearance.getColorScheme() === 'dark'}),
