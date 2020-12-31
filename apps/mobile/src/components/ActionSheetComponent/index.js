@@ -505,7 +505,7 @@ export const ActionSheetComponent = ({
           Keyboard.dismiss();
         }}
       />
-      {!note.id && !note.dateCreated ? (
+      {!note || !note.id ? (
         <Paragraph style={{marginVertical: 10, alignSelf: 'center'}}>
           Start writing to save your note.
         </Paragraph>
@@ -516,7 +516,7 @@ export const ActionSheetComponent = ({
             alignItems: 'center',
             marginVertical: 10,
           }}>
-          <Heading size={SIZE.md}>{note.title.replace('\n', '')}</Heading>
+          <Heading size={SIZE.md}>{note?.title.replace('\n', '')}</Heading>
 
           <Paragraph
             numberOfLines={2}
