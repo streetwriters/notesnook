@@ -447,7 +447,10 @@ export const ActionSheetComponent = ({
       db.vault
         .add(note.id)
         .then((r) => {
-          close();
+          let n = db.notes.note(note.id).data;
+          if (n.locked) {
+            close();
+          }
           sendNoteEditedEvent(note.id, false, true);
           localRefresh(note.type);
         })
