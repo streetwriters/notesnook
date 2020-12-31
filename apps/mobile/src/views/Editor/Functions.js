@@ -371,10 +371,10 @@ export async function saveNote() {
       eSendEvent(refreshNotesPage);
     }
 
-    await setNoteInEditorAfterSaving(id, noteId);
-    if (id) {
-      await addToCollection(id);
+    if (!id) {
+      await addToCollection(noteId);
     }
+    await setNoteInEditorAfterSaving(id, noteId);
     saveCounter++;
   } else {
     noteData.contentId = note.contentId;
