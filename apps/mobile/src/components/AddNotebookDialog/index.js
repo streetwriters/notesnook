@@ -257,7 +257,7 @@ export class AddNotebookDialog extends React.Component {
         animationType={DDS.isTab ? 'fade' : 'slide'}
         onShow={() => {
           this.topicsToDelete = [];
-          this.hiddenInput.current?.focus();
+          this.titleRef?.focus();
         }}
         onRequestClose={this.close}>
         <SafeAreaView>
