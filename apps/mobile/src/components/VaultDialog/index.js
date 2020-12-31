@@ -1,5 +1,5 @@
 import React, {Component, createRef} from 'react';
-import {TouchableOpacity, View} from 'react-native';
+import {InteractionManager, TouchableOpacity, View} from 'react-native';
 import * as Keychain from 'react-native-keychain';
 import Share from 'react-native-share';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -260,7 +260,7 @@ export class VaultDialog extends Component {
       if (this.state.goToEditor) {
         this._openInEditor(note);
       } else if (this.state.share) {
-        this._shareNote(note);
+        await this._shareNote(note);
       } else if (this.state.deleteNote) {
         await this._deleteNote();
       } else if (this.state.copyNote) {
@@ -271,12 +271,12 @@ export class VaultDialog extends Component {
     }
   };
   async _deleteNote() {
+    this.close();
     await db.notes.delete(this.state.note.id);
     updateEvent({type: Actions.NOTES});
     updateEvent({type: Actions.FAVORITES});
     eSendEvent(refreshNotesPage);
-    this.close();
-    ToastEvent.show('Note deleted', 'success', 'local');
+    ToastEvent.show('Note deleted', 'success');
   }
 
   async _enrollFingerprint(password) {
@@ -323,11 +323,13 @@ export class VaultDialog extends Component {
   }
 
   _openInEditor(note) {
-    eSendEvent(eOnLoadNote, note);
-    if (!DDS.isTab) {
-      tabBarRef.current?.goToPage(1);
-    }
     this.close();
+    InteractionManager.runAfterInteractions(() => {
+      eSendEvent(eOnLoadNote, note);
+      if (!DDS.isTab) {
+        tabBarRef.current?.goToPage(1);
+      }
+    });
   }
 
   _copyNote(note) {
@@ -338,15 +340,20 @@ export class VaultDialog extends Component {
     this.close();
   }
 
-  _shareNote(note) {
+  async _shareNote(note) {
+    this.close();
     let text = toTXT(note.content.data);
     let m = `${note.title}\n \n ${text}`;
-    Share.open({
-      title: 'Share note to',
-      failOnCancel: false,
-      message: m,
-    });
-    this.close();
+    try {
+      await Share.open({
+        title: 'Share note to',
+        failOnCancel: false,
+        message: m,
+      });
+    } catch(e) {
+      console.log(e)
+    }
+  
   }
 
   _takeErrorAction(e) {
