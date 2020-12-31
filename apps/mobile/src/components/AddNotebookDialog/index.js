@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {createRef} from 'react';
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -54,6 +54,9 @@ export class AddNotebookDialog extends React.Component {
     this.titleRef;
     this.descriptionRef;
     this.topicsToDelete = [];
+    this.hiddenInput = createRef();
+    this.topicInputRef = createRef();
+    this.addingTopic = false;
   }
 
   open = () => {
@@ -118,7 +121,7 @@ export class AddNotebookDialog extends React.Component {
       this.prevIndex = null;
       this.prevItem = null;
       this.currentInputValue = null;
-      this.topicInputRef.setNativeProps({
+      this.topicInputRef.current?.setNativeProps({
         text: null,
       });
     }
@@ -193,9 +196,7 @@ export class AddNotebookDialog extends React.Component {
   };
 
   onSubmit = (forward = true) => {
-    this.topicInputRef.setNativeProps({
-      text: null,
-    });
+    this.hiddenInput.current?.focus();
     let {topics} = this.state;
     if (!this.currentInputValue || this.currentInputValue?.trim().length === 0)
       return;
@@ -206,7 +207,6 @@ export class AddNotebookDialog extends React.Component {
       this.setState({
         topics: prevTopics,
       });
-
       setTimeout(() => {
         this.listRef.scrollToEnd({animated: true});
       }, 30);
@@ -219,7 +219,7 @@ export class AddNotebookDialog extends React.Component {
       this.currentInputValue = null;
       console.log('edit topic is', this.state.editTopic);
       if (this.state.editTopic) {
-        this.topicInputRef.blur();
+        this.topicInputRef.current?.blur();
         Keyboard.dismiss();
         this.setState({
           editTopic: false,
@@ -235,6 +235,8 @@ export class AddNotebookDialog extends React.Component {
         }, 30);
       }
     }
+
+    this.topicInputRef.current?.focus();
   };
 
   render() {
@@ -255,10 +257,20 @@ export class AddNotebookDialog extends React.Component {
         animationType={DDS.isTab ? 'fade' : 'slide'}
         onShow={() => {
           this.topicsToDelete = [];
-          this.titleRef.focus();
+          this.hiddenInput.current?.focus();
         }}
         onRequestClose={this.close}>
         <SafeAreaView>
+          <TextInput
+            ref={this.hiddenInput}
+            style={{
+              width: 1,
+              height: 1,
+              opacity: 0,
+              position: 'absolute',
+            }}
+            blurOnSubmit={false}
+          />
           <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : null}
             style={styles.wrapper}>
@@ -304,14 +316,15 @@ export class AddNotebookDialog extends React.Component {
                 }}
                 placeholder="Describe your notebook."
                 onSubmit={() => {
-                  this.topicInputRef.focus();
+                  this.topicInputRef.current?.focus();
                 }}
                 defaultValue={toEdit ? toEdit.description : null}
               />
 
               <Input
-                fwdRef={(ref) => (this.topicInputRef = ref)}
+                fwdRef={this.topicInputRef}
                 testID={notesnook.ids.dialogs.notebook.inputs.topic}
+                clearTextOnFocus={true}
                 onChangeText={(value) => {
                   this.currentInputValue = value;
                   if (this.prevItem !== null) {
@@ -345,10 +358,10 @@ export class AddNotebookDialog extends React.Component {
                     onPress={(item, index) => {
                       this.prevIndex = index;
                       this.prevItem = item;
-                      this.topicInputRef.setNativeProps({
+                      this.topicInputRef.current?.setNativeProps({
                         text: item,
                       });
-                      this.topicInputRef.focus();
+                      this.topicInputRef.current?.focus();
                       this.currentInputValue = item;
                       this.setState({
                         editTopic: true,
@@ -461,7 +474,7 @@ const styles = StyleSheet.create({
     width: DDS.isTab ? 500 : '100%',
     height: DDS.isTab ? 600 : '100%',
     maxHeight: DDS.isTab ? 600 : '100%',
-    borderRadius: 5,
+    borderRadius: DDS.isTab ? 5 : 0,
     paddingHorizontal: 12,
     paddingVertical: pv,
   },
