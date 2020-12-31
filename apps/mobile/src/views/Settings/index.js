@@ -737,6 +737,7 @@ const SettingsAppearanceSection = () => {
                 <MenuItem
                   key={item.name}
                   onPress={async () => {
+                    menuRef.current?.hide();
                     await SettingsService.set('homepage', item.name);
                   }}
                   style={{
