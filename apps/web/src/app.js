@@ -23,6 +23,7 @@ import {
   showAccountDeletedNotice,
   showPasswordChangedNotice,
 } from "./components/dialogs/confirm";
+import StatusBar from "./components/statusbar";
 
 function App() {
   const [show, setShow] = useState(true);
@@ -104,39 +105,48 @@ function App() {
 
   return (
     <ThemeProvider>
-      <Flex id="app" bg="background" height="100%">
-        <NavigationMenu
-          toggleNavigationContainer={(state) => setShow(state || !show)}
-        />
-        <Flex variant="rowFill">
-          <Animated.Flex
-            className="listMenu"
-            variant="columnFill"
-            initial={{ width: "30%", opacity: 1, x: 0 }}
-            animate={{
-              width: show ? "30%" : "0%",
-              x: show ? 0 : "-30%",
-              opacity: show ? 1 : 0,
-            }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
-            sx={{
-              borderRight: "1px solid",
-              borderColor: "border",
-              borderRightWidth: show ? 1 : 0,
-            }}
-          >
-            {isMobile && <Banner />}
-            {routeResult}
-          </Animated.Flex>
-          <Flex
-            width={[show ? 0 : "100%", show ? 0 : "100%", "100%"]}
-            flexDirection="column"
-          >
-            <Editor />
+      <Flex
+        flexDirection="column"
+        id="app"
+        bg="background"
+        height="100%"
+        sx={{ overflow: "hidden" }}
+      >
+        <Flex flex={1} sx={{ overflow: "hidden" }}>
+          <NavigationMenu
+            toggleNavigationContainer={(state) => setShow(state || !show)}
+          />
+          <Flex variant="rowFill">
+            <Animated.Flex
+              className="listMenu"
+              variant="columnFill"
+              initial={{ width: "30%", opacity: 1, x: 0 }}
+              animate={{
+                width: show ? "30%" : "0%",
+                x: show ? 0 : "-30%",
+                opacity: show ? 1 : 0,
+              }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              sx={{
+                borderRight: "1px solid",
+                borderColor: "border",
+                borderRightWidth: show ? 1 : 0,
+              }}
+            >
+              {isMobile && <Banner />}
+              {routeResult}
+            </Animated.Flex>
+            <Flex
+              width={[show ? 0 : "100%", show ? 0 : "100%", "100%"]}
+              flexDirection="column"
+            >
+              <Editor />
+            </Flex>
           </Flex>
+          <Box id="dialogContainer" />
+          <GlobalMenuWrapper />
         </Flex>
-        <Box id="dialogContainer" />
-        <GlobalMenuWrapper />
+        <StatusBar />
       </Flex>
     </ThemeProvider>
   );

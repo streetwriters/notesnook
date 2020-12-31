@@ -9,6 +9,7 @@ class ButtonFactory {
       anchor: new Anchor(),
       tool: new Tool(),
       icon: new Icon(),
+      statusitem: new StatusItem(),
     };
   }
 }
@@ -120,6 +121,17 @@ class Tool {
       ":hover": {
         backgroundColor: "bgSecondary",
       },
+    };
+  }
+}
+
+class StatusItem {
+  constructor() {
+    return {
+      variant: "buttons.icon",
+      p: 0,
+      py: 1,
+      px: 1,
     };
   }
 }

@@ -19,7 +19,6 @@ import useMobile from "../../utils/use-mobile";
 import useTablet from "../../utils/use-tablet";
 import { SUBSCRIPTION_STATUS } from "../../common";
 import Toolbar from "./toolbar";
-import Footer from "./footer";
 import ObservableArray from "../../utils/observablearray";
 import Banner from "../banner";
 import EditorLoading from "./loading";
@@ -170,7 +169,6 @@ function Editor() {
           )}
         </Animated.Flex>
       </Flex>
-      <Footer />
       <Properties />
     </Flex>
   );

@@ -15,6 +15,7 @@ class UserStore extends BaseStore {
   isSigningIn = false;
   isSyncing = false;
   user = undefined;
+  lastSynced = 0;
 
   init = () => {
     return db.user.getUser().then(async (user) => {
@@ -97,8 +98,10 @@ class UserStore extends BaseStore {
     this.set((state) => (state.isSyncing = true));
     return db
       .sync(full)
-      .then(() => {
-        return appStore.refresh();
+      .then(async () => {
+        const lastSynced = await db.lastSynced();
+        this.set((state) => (state.lastSynced = lastSynced));
+        return await appStore.refresh();
       })
       .catch(async (err) => {
         if (err.code === "MERGE_CONFLICT") await appStore.refresh();

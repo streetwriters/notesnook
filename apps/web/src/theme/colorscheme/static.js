@@ -11,6 +11,7 @@ class StaticColorSchemeFactory {
       error: "#E53935",
       errorBg: "#E5393520",
       success: "#4F8A10",
+      warn: "#FF5722",
       favorite: "#ffd700",
     };
   }
