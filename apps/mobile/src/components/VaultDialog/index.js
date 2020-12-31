@@ -10,6 +10,7 @@ import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
+  sendNoteEditedEvent,
   ToastEvent,
 } from '../../services/EventManager';
 import {getElevation, toTXT} from '../../utils';
@@ -313,6 +314,9 @@ export class VaultDialog extends Component {
       .remove(this.state.note.id, this.password)
       .then((r) => {
         console.log(r, 'unocking result');
+        sendNoteEditedEvent(this.state.note.id);
+        updateEvent({type:Actions.NOTES});
+        eSendEvent(refreshNotesPage);
         this.close();
       })
       .catch((e) => {
