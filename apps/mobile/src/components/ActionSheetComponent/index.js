@@ -447,15 +447,11 @@ export const ActionSheetComponent = ({
       db.vault
         .add(note.id)
         .then((r) => {
-          console.log(r);
+          close();
           sendNoteEditedEvent(note.id, false, true);
           localRefresh(note.type);
-          if (note.locked && PremiumService.get()) {
-            close();
-          }
         })
         .catch(async (e) => {
-          console.log(e);
           switch (e.message) {
             case db.vault.ERRORS.noVault:
               close('novault');
