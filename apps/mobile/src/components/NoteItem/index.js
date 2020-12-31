@@ -103,7 +103,7 @@ export default class NoteItem extends React.Component {
                 }}>
                 <Icon
                   name="book-outline"
-                  color={colors.accent}
+                  color={item.color ? COLORS_NOTE[item.color] : colors.accent}
                   size={SIZE.xs}
                   style={{
                     marginRight: 2.5,
