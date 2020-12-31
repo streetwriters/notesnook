@@ -115,129 +115,142 @@ function Properties() {
                 <Icon.Close />
               </Text>
             </Text>
-            <Flex mb={1}>
-              {tools.map((tool, _) => (
-                <Toggle
-                  {...tool}
-                  key={tool.key}
-                  toggleKey={tool.key}
-                  onToggle={(state) => changeState(tool.key, state)}
-                  testId={`properties-${tool.key}`}
+            {sessionId ? (
+              <>
+                <Flex mb={1}>
+                  {tools.map((tool, _) => (
+                    <Toggle
+                      {...tool}
+                      key={tool.key}
+                      toggleKey={tool.key}
+                      onToggle={(state) => changeState(tool.key, state)}
+                      testId={`properties-${tool.key}`}
+                    />
+                  ))}
+                </Flex>
+                <Button
+                  color="static"
+                  onClick={async () => {
+                    await showMoveNoteDialog([sessionId]);
+                  }}
+                  data-test-id="properties-add-to-nb"
+                >
+                  {notebook ? "Move to another notebook" : "Add to notebook"}
+                </Button>
+                {notebook && (
+                  <Text as="span" variant="subBody" mt={1}>
+                    In{" "}
+                    <Text
+                      as="span"
+                      color="primary"
+                      sx={{ cursor: "pointer" }}
+                      onClick={() => {
+                        navigate(`/notebooks/${notebook.id}`);
+                      }}
+                    >
+                      {notebook.title}
+                    </Text>{" "}
+                    under{" "}
+                    <Text
+                      as="span"
+                      color="primary"
+                      sx={{ cursor: "pointer" }}
+                      onClick={() => {
+                        navigate(
+                          `/notebooks/${notebook.id}/${notebook.topic.id}`
+                        );
+                      }}
+                    >
+                      {notebook.topic.title}
+                    </Text>
+                  </Text>
+                )}
+                <Flex flexDirection="column">
+                  {objectMap(COLORS, (label, code) => (
+                    <Flex
+                      key={label}
+                      justifyContent="space-between"
+                      alignItems="center"
+                      onClick={() => setColor(label)}
+                      sx={{ cursor: "pointer" }}
+                      mt={4}
+                      data-test-id={`properties-${label}`}
+                    >
+                      <Flex key={label} alignItems="center">
+                        <Icon.Circle size={14} color={code} />
+                        <Text ml={1} color="text" variant="body">
+                          {toTitleCase(label)}
+                        </Text>
+                      </Flex>
+                      {color === label && (
+                        <Icon.Checkmark
+                          color="primary"
+                          size={20}
+                          data-test-id={`properties-${label}-check`}
+                        />
+                      )}
+                    </Flex>
+                  ))}
+                </Flex>
+
+                <Input
+                  data-test-id="properties-tag"
+                  placeholder="#tag"
+                  mt={4}
+                  onKeyUp={async (event) => {
+                    if (
+                      event.key === "Enter" ||
+                      event.key === " " ||
+                      event.key === ","
+                    ) {
+                      const value = event.target.value;
+                      if (value.trim().length === 0) {
+                        event.target.value = "";
+                        return;
+                      }
+                      event.target.value = "";
+                      await setTag(value.trim().replace(",", ""));
+                    }
+                  }}
                 />
-              ))}
-            </Flex>
-            <Button
-              color="static"
-              onClick={async () => {
-                await showMoveNoteDialog([sessionId]);
-              }}
-              data-test-id="properties-add-to-nb"
-            >
-              {notebook ? "Move to another notebook" : "Add to notebook"}
-            </Button>
-            {notebook && (
-              <Text as="span" variant="subBody" mt={1}>
-                In{" "}
-                <Text
-                  as="span"
-                  color="primary"
-                  sx={{ cursor: "pointer" }}
-                  onClick={() => {
-                    navigate(`/notebooks/${notebook.id}`);
-                  }}
+                <Flex
+                  fontSize="body"
+                  sx={{ marginTop: 2 }}
+                  alignItems="center"
+                  justifyContent="flex-start"
+                  flexWrap="wrap"
                 >
-                  {notebook.title}
-                </Text>{" "}
-                under{" "}
-                <Text
-                  as="span"
-                  color="primary"
-                  sx={{ cursor: "pointer" }}
-                  onClick={() => {
-                    navigate(`/notebooks/${notebook.id}/${notebook.topic.id}`);
-                  }}
-                >
-                  {notebook.topic.title}
-                </Text>
+                  {tags.map((tag) => (
+                    <Text
+                      data-test-id={`properties-tag-${tag}`}
+                      key={tag}
+                      sx={{
+                        backgroundColor: "primary",
+                        color: "static",
+                        borderRadius: "default",
+                        padding: "2px 5px 2px 5px",
+                        marginBottom: 1,
+                        marginRight: 1,
+                        cursor: "pointer",
+                      }}
+                      fontSize={"subBody"}
+                      onClick={async () => {
+                        await setTag(tag);
+                      }}
+                    >
+                      #{tag}
+                    </Text>
+                  ))}
+                </Flex>
+              </>
+            ) : (
+              <Text
+                variant="body"
+                sx={{ justifySelf: "center", alignSelf: "center" }}
+              >
+                Start writing to make a new note.
               </Text>
             )}
-            <Flex flexDirection="column">
-              {objectMap(COLORS, (label, code) => (
-                <Flex
-                  key={label}
-                  justifyContent="space-between"
-                  alignItems="center"
-                  onClick={() => setColor(label)}
-                  sx={{ cursor: "pointer" }}
-                  mt={4}
-                  data-test-id={`properties-${label}`}
-                >
-                  <Flex key={label} alignItems="center">
-                    <Icon.Circle size={14} color={code} />
-                    <Text ml={1} color="text" variant="body">
-                      {toTitleCase(label)}
-                    </Text>
-                  </Flex>
-                  {color === label && (
-                    <Icon.Checkmark
-                      color="primary"
-                      size={20}
-                      data-test-id={`properties-${label}-check`}
-                    />
-                  )}
-                </Flex>
-              ))}
-            </Flex>
-
-            <Input
-              data-test-id="properties-tag"
-              placeholder="#tag"
-              mt={4}
-              onKeyUp={async (event) => {
-                if (
-                  event.key === "Enter" ||
-                  event.key === " " ||
-                  event.key === ","
-                ) {
-                  const value = event.target.value;
-                  if (value.trim().length === 0) {
-                    event.target.value = "";
-                    return;
-                  }
-                  event.target.value = "";
-                  await setTag(value.trim().replace(",", ""));
-                }
-              }}
-            />
-            <Flex
-              fontSize="body"
-              sx={{ marginTop: 2 }}
-              alignItems="center"
-              justifyContent="flex-start"
-              flexWrap="wrap"
-            >
-              {tags.map((tag) => (
-                <Text
-                  data-test-id={`properties-tag-${tag}`}
-                  key={tag}
-                  sx={{
-                    backgroundColor: "primary",
-                    color: "static",
-                    borderRadius: "default",
-                    padding: "2px 5px 2px 5px",
-                    marginBottom: 1,
-                    marginRight: 1,
-                    cursor: "pointer",
-                  }}
-                  fontSize={"subBody"}
-                  onClick={async () => {
-                    await setTag(tag);
-                  }}
-                >
-                  #{tag}
-                </Text>
-              ))}
-            </Flex>
           </Flex>
         </Animated.Flex>
       </>
