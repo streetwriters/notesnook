@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {View} from 'react-native';
 import {TextInput} from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -33,6 +33,7 @@ const Input = ({
   button,
   testID,
   defaultValue,
+  clearTextOnFocus
 }) => {
   const [state] = useTracked();
   const colors = state.colors;
@@ -139,6 +140,8 @@ const Input = ({
     height: 35,
   };
 
+
+
   return (
     <>
       <View style={style}>
@@ -150,7 +153,13 @@ const Input = ({
           autoCapitalize={autoCapitalize}
           onChangeText={onChange}
           onBlur={onBlur}
+          onEndEditing={() => {
+            if (clearTextOnFocus) {
+              setValue(null)
+            }
+          }}
           onFocus={onFocus}
+          value={value}
           onSubmitEditing={onSubmit}
           blurOnSubmit={blurOnSubmit}
           style={textStyle}
