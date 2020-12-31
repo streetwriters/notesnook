@@ -28,7 +28,7 @@ export const UserSection = ({noTextMode}) => {
           alignItems: 'center',
           paddingRight: 8,
           paddingLeft: 8,
-          paddingVertical: 5,
+          paddingVertical: 10,
         }}>
         <TouchableOpacity
           activeOpacity={0.8}
