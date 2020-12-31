@@ -3,7 +3,6 @@ import {
   ActivityIndicator,
   Clipboard,
   Dimensions,
-  InteractionManager,
   Keyboard,
   ScrollView,
   TouchableOpacity,
