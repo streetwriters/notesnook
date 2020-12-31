@@ -8,7 +8,8 @@ import {sleep} from '../../utils/TimeUtils';
 
 export const Search = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
-  const {searchResults} = state;
+  const {searchResults,searching} = state;
+  
   let pageIsLoaded = false;
 
   const onFocus = useCallback(() => {
@@ -45,11 +46,13 @@ export const Search = ({route, navigation}) => {
         focused={() => navigation.isFocused()}
         placeholderText={`Notes you write appear here`}
         jumpToDialog={true}
+        loading={searching}
         CustomHeader={true}
         placeholderData={{
           heading: 'Search',
           paragraph: SearchService.getSearchInformation().placeholder,
           button: null,
+          loading:"Searching..."
         }}
       />
     </>

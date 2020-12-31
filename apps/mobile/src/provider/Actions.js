@@ -33,5 +33,6 @@ export const Actions = {
   DEVICE_MODE:"deviceMode",
   MENU_PINS:"menuPins",
   LAST_SYNC:"lastSynced",
-  INTENT_MODE: "intentMode"
+  INTENT_MODE: "intentMode",
+  SEARCHING:'searching'
 };

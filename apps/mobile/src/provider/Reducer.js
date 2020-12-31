@@ -58,7 +58,7 @@ export const reducer = (state, action) => {
         notes: db.notes.group(
           SORT[sortSettings.sort],
           sortSettings.sortOrder,
-        ),
+        )
       };
     case Actions.THEME: {
       return {
@@ -273,6 +273,12 @@ export const reducer = (state, action) => {
       return {
         ...state,
         intentMode: action.state,
+      };
+    }
+    case Actions.SEARCHING: {
+      return {
+        ...state,
+        searching: action.searching,
       };
     }
     default:

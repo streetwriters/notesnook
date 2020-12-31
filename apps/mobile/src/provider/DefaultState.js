@@ -83,5 +83,6 @@ export const defaultState = {
   keyword: [],
   menuPins:[],
   lastSynced:"Never",
-  intentMode:true
+  intentMode:true,
+  searching:false
 };
