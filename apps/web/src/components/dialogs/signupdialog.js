@@ -65,10 +65,8 @@ function SignUpDialog(props) {
                   password: data.password,
                 });
                 await navigator.credentials.store(c);
-                onClose();
-              } else {
-                onClose();
               }
+              onClose(true);
             })
             .catch((e) => setError(e.message));
         }}
@@ -100,9 +98,9 @@ function SignUpDialog(props) {
 export function showSignUpDialog() {
   return showDialog((perform) => (
     <SignUpDialog
-      onClose={async () => {
-        perform(true);
-        await showRecoveryKeyDialog();
+      onClose={async (res) => {
+        perform(res);
+        if (res) await showRecoveryKeyDialog();
       }}
     />
   ));
