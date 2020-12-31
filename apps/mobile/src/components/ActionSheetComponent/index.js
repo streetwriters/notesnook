@@ -181,7 +181,7 @@ export const ActionSheetComponent = ({
         } catch (e) {
           console.log(e);
         }
-        //close();
+        close();
       },
     },
     {
@@ -228,7 +228,7 @@ export const ActionSheetComponent = ({
         dispatch({type: Actions.FAVORITES});
         eSendEvent(refreshNotesPage);
         ToastEvent.show(
-          item.type === 'note' ? 'Note restored' : 'Notebook restored',
+          note.type === 'note' ? 'Note restored' : 'Notebook restored',
           'success',
         );
         close();
