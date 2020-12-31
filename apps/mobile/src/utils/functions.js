@@ -5,7 +5,7 @@ import {eSendEvent, ToastEvent} from '../services/EventManager';
 import {db} from './DB';
 import {eClearEditor, eOnNewTopicAdded, refreshNotesPage} from './Events';
 
-export async function deleteItems(item) {
+export const deleteItems = async (item) => {
   if (item && item.dateCreated && history.selectedItemsList.length === 0) {
     history.selectedItemsList = [];
     history.selectedItemsList.push(item);
@@ -19,7 +19,7 @@ export async function deleteItems(item) {
 
   if (notes?.length > 0) {
     let ids = notes.map((i) => i.id);
-    await db.notes.delete(ids);
+    await db.notes.delete(...ids);
     updateEvent({type: Actions.NOTES});
     eSendEvent(eClearEditor);
     eSendEvent(refreshNotesPage);
@@ -37,7 +37,7 @@ export async function deleteItems(item) {
 
   if (notebooks?.length > 0) {
     let ids = notebooks.map((i) => i.id);
-    await db.notebooks.delete(ids);
+    await db.notebooks.delete(...ids);
     updateEvent({type: Actions.NOTEBOOKS});
     updateEvent({type: Actions.NOTES});
   }
