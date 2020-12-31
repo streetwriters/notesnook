@@ -492,10 +492,10 @@ const LoginDialog = () => {
                     setError(r);
                   }}
                   marginBottom={0}
-                  validationType={mode === MODES.signup ? 'password' : 'null'}
+                  validationType={mode === MODES.signup ? 'password' : null}
                   secureTextEntry
                   placeholder="Password"
-                  errorMessage="Password is invalid"
+                  errorMessage={mode === MODES.signup && "Password is invalid"}
                   onSubmit={() => {
                     if (
                       mode === MODES.signup ||
