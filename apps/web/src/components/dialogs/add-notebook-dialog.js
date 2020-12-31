@@ -21,6 +21,7 @@ class AddNotebookDialog extends React.Component {
 
   removeTopic(index) {
     const topics = this.state.topics.slice();
+    if (!topics[index]) return;
     if (topics[index].id) {
       this.deletedTopics.push(topics[index].id);
     }
