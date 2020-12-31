@@ -251,28 +251,25 @@ export class VaultDialog extends Component {
     }
   }
 
-  async _openNote() {
-    db.vault
-      .open(this.state.note.id, this.password)
-      .then(async (note) => {
-        if (this.state.biometricUnlock && !this.state.isBiometryEnrolled) {
-          await this._enrollFingerprint(this.password);
-        }
-        if (this.state.goToEditor) {
-          console.log(note, 'NOTE');
-          this._openInEditor(note);
-        } else if (this.state.share) {
-          this._shareNote(note);
-        } else if (this.state.deleteNote) {
-          await this._deleteNote();
-        } else if (this.state.copyNote) {
-          this._copyNote(note);
-        }
-      })
-      .catch((e) => {
-        this._takeErrorAction(e);
-      });
-  }
+  _openNote = async () => {
+    try {
+      let note = await db.vault.open(this.state.note.id, this.password);
+      if (this.state.biometricUnlock && !this.state.isBiometryEnrolled) {
+        await this._enrollFingerprint(this.password);
+      }
+      if (this.state.goToEditor) {
+        this._openInEditor(note);
+      } else if (this.state.share) {
+        this._shareNote(note);
+      } else if (this.state.deleteNote) {
+        await this._deleteNote();
+      } else if (this.state.copyNote) {
+        this._copyNote(note);
+      }
+    } catch (e) {
+      this._takeErrorAction(e);
+    }
+  };
   async _deleteNote() {
     await db.notes.delete(this.state.note.id);
     updateEvent({type: Actions.NOTES});
@@ -315,7 +312,7 @@ export class VaultDialog extends Component {
       .then((r) => {
         console.log(r, 'unocking result');
         sendNoteEditedEvent(this.state.note.id);
-        updateEvent({type:Actions.NOTES});
+        updateEvent({type: Actions.NOTES});
         eSendEvent(refreshNotesPage);
         this.close();
       })
