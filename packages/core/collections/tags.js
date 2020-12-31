@@ -39,11 +39,12 @@ export default class Tags extends Collection {
     await this._collection.addItem(tag);
   }
 
-  async add(tagTitle, noteId) {
-    if (!tagTitle || !noteId) return;
-    const oldTag = this.all.find((t) => t.title === tagTitle) || {};
+  async add(tagId, noteId) {
+    if (!tagId || !noteId) return;
+    let tag = this.all.find((t) => t.id === tagId || t.title === tagId) || {
+      title: tagId,
+    };
 
-    let tag = { ...oldTag, title: tagTitle };
     let id = tag.id || getId();
     let notes = tag.noteIds || [];
 
