@@ -1,4 +1,5 @@
 import {DrawerActions, StackActions} from '@react-navigation/native';
+import {InteractionManager} from 'react-native';
 import {updateEvent} from '../components/DialogManager/recievers';
 import {Actions} from '../provider/Actions';
 import {rootNavigatorRef, sideMenuRef} from '../utils/Refs';
